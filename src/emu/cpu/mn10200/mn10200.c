@@ -16,6 +16,25 @@
 #define MEM_BYTE (0)
 #define MEM_WORD (1)
 
+enum mn10200_flag
+{
+	FLAG_ZF  = 0x0001, // zero flag
+	FLAG_NF  = 0x0002, // negative flag
+	FLAG_CF  = 0x0004, // carry flag
+	FLAG_VF  = 0x0008, // overflow flag
+	FLAG_ZX  = 0x0010, // extended zero flag
+	FLAG_NX  = 0x0020, // extended negative flag
+	FLAG_CX  = 0x0040, // extended carry flag
+	FLAG_VX  = 0x0080, // extended overflow flag
+	FLAG_IM0 = 0x0100, // interrupt mask
+	FLAG_IM1 = 0x0200, // "
+	FLAG_IM2 = 0x0400, // "
+	FLAG_IE  = 0x0800, // interrupt enable
+	FLAG_S0  = 0x1000, // software bit
+	FLAG_S1  = 0x2000, // software bit
+	FLAG_D14 = 0x4000, // ?
+	FLAG_D15 = 0x8000  // ?
+};
 
 const device_type MN10200 = &device_creator<mn10200_device>;
 
@@ -99,12 +118,12 @@ void mn10200_device::w24(offs_t adr, UINT32 val)
 
 void mn10200_device::mn102_change_pc(UINT32 pc)
 {
-		m_pc = pc & 0xffffff;
+	m_pc = pc & 0xffffff;
 }
 
 void mn10200_device::mn102_take_irq(int level, int group)
 {
-	if(!(m_psw & 0x800))
+	if(!(m_psw & FLAG_IE))
 	{
 //      if (group != 8) printf("MN10200: Dropping irq L %d G %d pc=%x, a3=%x\n", level, group, m_pc, m_a[3]);
 		return;
@@ -396,16 +415,16 @@ void mn10200_device::state_string_export(const device_state_entry &entry, astrin
 		case CPUINFO_STR_FLAGS:
 			string.printf( "S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
 				(m_psw >> 12) & 3,
-				m_psw & 0x0800 ? "on " : "off",
+				m_psw & FLAG_IE ? "on " : "off",
 				(m_psw >> 8) & 7,
-				m_psw & 0x0080 ? 'V' : '-',
-				m_psw & 0x0040 ? 'C' : '-',
-				m_psw & 0x0020 ? 'N' : '-',
-				m_psw & 0x0010 ? 'Z' : '-',
-				m_psw & 0x0008 ? 'v' : '-',
-				m_psw & 0x0004 ? 'c' : '-',
-				m_psw & 0x0002 ? 'n' : '-',
-				m_psw & 0x0001 ? 'z' : '-');
+				m_psw & FLAG_VX ? 'V' : '-',
+				m_psw & FLAG_CX ? 'C' : '-',
+				m_psw & FLAG_NX ? 'N' : '-',
+				m_psw & FLAG_ZX ? 'Z' : '-',
+				m_psw & FLAG_VF ? 'v' : '-',
+				m_psw & FLAG_CF ? 'c' : '-',
+				m_psw & FLAG_NF ? 'n' : '-',
+				m_psw & FLAG_ZF ? 'z' : '-');
 			break;
 	}
 }
@@ -447,125 +466,107 @@ void mn10200_device::unemul()
 
 UINT32 mn10200_device::do_add(UINT32 a, UINT32 b)
 {
-	UINT32 r24, r16;
-	r24 = (a & 0xffffff) + (b & 0xffffff);
-	r16 = (a & 0xffff)   + (b & 0xffff);
+	UINT32 r = (a & 0xffffff) + (b & 0xffffff);
 
 	m_psw &= 0xff00;
-	if((~(a^b)) & (a^r24) & 0x00800000)
-	m_psw |= 0x80;
-	if(r24 & 0x01000000)
-	m_psw |= 0x40;
-	if(r24 & 0x00800000)
-	m_psw |= 0x20;
-	if(!(r24 & 0x00ffffff))
-	m_psw |= 0x10;
-	if((~(a^b)) & (a^r16) & 0x00008000)
-	m_psw |= 0x08;
-	if(r16 & 0x00010000)
-	m_psw |= 0x04;
-	if(r16 & 0x00008000)
-	m_psw |= 0x02;
-	if(!(r16 & 0x0000ffff))
-	m_psw |= 0x01;
-	return r24 & 0xffffff;
+	if((a^r) & (b^r) & 0x00800000)
+		m_psw |= FLAG_VX;
+	if(r & 0x01000000)
+		m_psw |= FLAG_CX;
+	if(r & 0x00800000)
+		m_psw |= FLAG_NX;
+	if((r & 0x00ffffff) == 0)
+		m_psw |= FLAG_ZX;
+	if((a^r) & (b^r) & 0x00008000)
+		m_psw |= FLAG_VF;
+	if((a^b^r) & 0x00010000)
+		m_psw |= FLAG_CF;
+	if(r & 0x00008000)
+		m_psw |= FLAG_NF;
+	if((r & 0x0000ffff) == 0)
+		m_psw |= FLAG_ZF;
+	return r & 0xffffff;
 }
 
 UINT32 mn10200_device::do_addc(UINT32 a, UINT32 b)
 {
-	UINT32 r24, r16;
-	r24 = (a & 0xffffff) + (b & 0xffffff);
-	r16 = (a & 0xffff)   + (b & 0xffff);
-
-	if(m_psw & 0x04) {
-	r24++;
-	r16++;
-	}
+	UINT32 r = (a & 0xffffff) + (b & 0xffffff) + ((m_psw & FLAG_CF) ? 1 : 0);
 
 	m_psw &= 0xff00;
-	if((~(a^b)) & (a^r24) & 0x00800000)
-	m_psw |= 0x80;
-	if(r24 & 0x01000000)
-	m_psw |= 0x40;
-	if(r24 & 0x00800000)
-	m_psw |= 0x20;
-	if(!(r24 & 0x00ffffff))
-	m_psw |= 0x10;
-	if((~(a^b)) & (a^r16) & 0x00008000)
-	m_psw |= 0x08;
-	if(r16 & 0x00010000)
-	m_psw |= 0x04;
-	if(r16 & 0x00008000)
-	m_psw |= 0x02;
-	if(!(r16 & 0x0000ffff))
-	m_psw |= 0x01;
-	return r24 & 0xffffff;
+	if((a^r) & (b^r) & 0x00800000)
+		m_psw |= FLAG_VX;
+	if(r & 0x01000000)
+		m_psw |= FLAG_CX;
+	if(r & 0x00800000)
+		m_psw |= FLAG_NX;
+	if((r & 0x00ffffff) == 0)
+		m_psw |= FLAG_ZX;
+	if((a^r) & (b^r) & 0x00008000)
+		m_psw |= FLAG_VF;
+	if((a^b^r) & 0x00010000)
+		m_psw |= FLAG_CF;
+	if(r & 0x00008000)
+		m_psw |= FLAG_NF;
+	if((r & 0x0000ffff) == 0)
+		m_psw |= FLAG_ZF;
+	return r & 0xffffff;
 }
 
 UINT32 mn10200_device::do_sub(UINT32 a, UINT32 b)
 {
-	UINT32 r24, r16;
-	r24 = (a & 0xffffff) - (b & 0xffffff);
-	r16 = (a & 0xffff)   - (b & 0xffff);
+	UINT32 r = (a & 0xffffff) - (b & 0xffffff);
 
 	m_psw &= 0xff00;
-	if((a^b) & (a^r24) & 0x00800000)
-		m_psw |= 0x80;
-	if(r24 & 0x01000000)
-		m_psw |= 0x40;
-	if(r24 & 0x00800000)
-		m_psw |= 0x20;
-	if(!(r24 & 0x00ffffff))
-		m_psw |= 0x10;
-	if((a^b) & (a^r16) & 0x00008000)
-		m_psw |= 0x08;
-	if(r16 & 0x00010000)
-		m_psw |= 0x04;
-	if(r16 & 0x00008000)
-		m_psw |= 0x02;
-	if(!(r16 & 0x0000ffff))
-		m_psw |= 0x01;
-	return r24 & 0xffffff;
+	if((a^b) & (a^r) & 0x00800000)
+		m_psw |= FLAG_VX;
+	if(r & 0x01000000)
+		m_psw |= FLAG_CX;
+	if(r & 0x00800000)
+		m_psw |= FLAG_NX;
+	if((r & 0x00ffffff) == 0)
+		m_psw |= FLAG_ZX;
+	if((a^b) & (a^r) & 0x00008000)
+		m_psw |= FLAG_VF;
+	if((a^b^r) & 0x00010000)
+		m_psw |= FLAG_CF;
+	if(r & 0x00008000)
+		m_psw |= FLAG_NF;
+	if((r & 0x0000ffff) == 0)
+		m_psw |= FLAG_ZF;
+	return r & 0xffffff;
 }
 
 UINT32 mn10200_device::do_subc(UINT32 a, UINT32 b)
 {
-	UINT32 r24, r16;
-	r24 = (a & 0xffffff) - (b & 0xffffff);
-	r16 = (a & 0xffff)   - (b & 0xffff);
-
-	if(m_psw & 0x04) {
-	r24--;
-	r16--;
-	}
+	UINT32 r = (a & 0xffffff) - (b & 0xffffff) - ((m_psw & FLAG_CF) ? 1 : 0);
 
 	m_psw &= 0xff00;
-	if(r24 >= 0x00800000 && r24 < 0xff800000)
-		m_psw |= 0x80;
-	if(r24 & 0x01000000)
-		m_psw |= 0x40;
-	if(r24 & 0x00800000)
-		m_psw |= 0x20;
-	if(!(r24 & 0x00ffffff))
-		m_psw |= 0x10;
-	if(r16 >= 0x00008000 && r16 < 0xffff8000)
-		m_psw |= 0x08;
-	if(r16 & 0x00010000)
-		m_psw |= 0x04;
-	if(r16 & 0x00008000)
-		m_psw |= 0x02;
-	if(!(r16 & 0x0000ffff))
-		m_psw |= 0x01;
-	return r24 & 0xffffff;
+	if((a^b) & (a^r) & 0x00800000)
+		m_psw |= FLAG_VX;
+	if(r & 0x01000000)
+		m_psw |= FLAG_CX;
+	if(r & 0x00800000)
+		m_psw |= FLAG_NX;
+	if((r & 0x00ffffff) == 0)
+		m_psw |= FLAG_ZX;
+	if((a^b) & (a^r) & 0x00008000)
+		m_psw |= FLAG_VF;
+	if((a^b^r) & 0x00010000)
+		m_psw |= FLAG_CF;
+	if(r & 0x00008000)
+		m_psw |= FLAG_NF;
+	if((r & 0x0000ffff) == 0)
+		m_psw |= FLAG_ZF;
+	return r & 0xffffff;
 }
 
 void mn10200_device::test_nz16(UINT16 v)
 {
 	m_psw &= 0xfff0;
 	if(v & 0x8000)
-		m_psw |= 2;
+		m_psw |= FLAG_NF;
 	if(!v)
-		m_psw |= 1;
+		m_psw |= FLAG_ZF;
 }
 
 void mn10200_device::do_jsr(UINT32 to, UINT32 ret)
@@ -574,21 +575,6 @@ void mn10200_device::do_jsr(UINT32 to, UINT32 ret)
 	m_a[3] -= 4;
 	w24(m_a[3], ret);
 }
-
-#if 0
-	log_event("MN102", "PSW change S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
-		(psw >> 12) & 3,
-		psw & 0x0800 ? "on" : "off",
-		(psw >> 8) & 7,
-		psw & 0x0080 ? 'V' : '-',
-		psw & 0x0040 ? 'C' : '-',
-		psw & 0x0020 ? 'N' : '-',
-		psw & 0x0010 ? 'Z' : '-',
-		psw & 0x0008 ? 'v' : '-',
-		psw & 0x0004 ? 'c' : '-',
-		psw & 0x0002 ? 'n' : '-',
-		psw & 0x0001 ? 'z' : '-');
-#endif
 
 // take an external IRQ
 void mn10200_device::execute_set_input(int irqnum, int state)
@@ -637,7 +623,7 @@ void mn10200_device::execute_run()
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 			m_cycles -= 1;
-			mn102_write_byte(m_a[(opcode>>2)&3], (UINT8)m_d[opcode & 3]);
+			mn102_write_byte(m_a[(opcode>>2)&3], (UINT8)m_d[opcode & 3]); // note: typo in manual
 			m_pc += 1;
 			break;
 
@@ -750,7 +736,7 @@ void mn10200_device::execute_run()
 
 		// mov dn, (imm16)
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3:
-			m_cycles -= 2;
+			m_cycles -= 1;
 			mn102_write_word(mn102_read_word(m_pc+1), (UINT16)m_d[opcode & 3]);
 			m_pc += 3;
 			break;
@@ -771,7 +757,7 @@ void mn10200_device::execute_run()
 
 		// movbu (abs16), dn
 		case 0xcc: case 0xcd: case 0xce: case 0xcf:
-			m_cycles -= 2;
+			m_cycles -= 1;
 			m_d[opcode & 3] = mn102_read_byte(mn102_read_word(m_pc+1));
 			m_pc += 3;
 			break;
@@ -806,7 +792,7 @@ void mn10200_device::execute_run()
 
 		// blt label8
 		case 0xe0:
-			if(((m_psw & 0x0a) == 2) || ((m_psw & 0x0a) == 8))
+			if(((m_psw & (FLAG_NF|FLAG_VF)) == FLAG_NF) || ((m_psw & (FLAG_NF|FLAG_VF)) == FLAG_VF)) // (VF^NF)=1
 			{
 				m_cycles -= 2;
 				mn102_change_pc(m_pc+2+(INT8)mn102_read_byte(m_pc+1));
@@ -820,7 +806,7 @@ void mn10200_device::execute_run()
 
 		// bgt label8
 		case 0xe1:
-			if(((m_psw & 0x0b) == 0) || ((m_psw & 0x0b) == 0xa))
+			if(((m_psw & (FLAG_ZF|FLAG_NF|FLAG_VF)) == 0) || ((m_psw & (FLAG_ZF|FLAG_NF|FLAG_VF)) == (FLAG_NF|FLAG_VF))) // ((VF^NF)|ZF)=0
 			{
 				m_cycles -= 2;
 				mn102_change_pc(m_pc+2+(INT8)mn102_read_byte(m_pc+1));
@@ -834,7 +820,7 @@ void mn10200_device::execute_run()
 
 		// bge label8
 		case 0xe2:
-			if(((m_psw & 0x0a) == 0) || ((m_psw & 0x0a) == 0xa))
+			if(((m_psw & (FLAG_NF|FLAG_VF)) == 0) || ((m_psw & (FLAG_NF|FLAG_VF)) == (FLAG_NF|FLAG_VF))) // (VF^NF)=0
 			{
 				m_cycles -= 2;
 				mn102_change_pc(m_pc+2+(INT8)mn102_read_byte(m_pc+1));
@@ -848,21 +834,21 @@ void mn10200_device::execute_run()
 
 		// ble label8
 		case 0xe3:
-			if((m_psw & 0x01) || ((m_psw & 0x0a) == 2) || ((m_psw & 0x0a) == 8))
+			if((m_psw & FLAG_ZF) || ((m_psw & (FLAG_NF|FLAG_VF)) == FLAG_NF) || ((m_psw & (FLAG_NF|FLAG_VF)) == FLAG_VF)) // ((VF^NF)|ZF)=1
 			{
 				m_cycles -= 2;
 				mn102_change_pc(m_pc+2+(INT8)mn102_read_byte(m_pc+1));
 			}
 			else
 			{
-			m_cycles -= 1;
-			m_pc += 2;
+				m_cycles -= 1;
+				m_pc += 2;
 			}
 			break;
 
 		// bcs label8
 		case 0xe4:
-			if(m_psw & 0x04)
+			if(m_psw & FLAG_CF) // CF=1
 			{
 				m_cycles -= 2;
 				mn102_change_pc(m_pc+2+(INT8)mn102_read_byte(m_pc+1));
@@ -876,7 +862,7 @@ void mn10200_device::execute_run()
 
 		// bhi label8
 		case 0xe5:
-			if(!(m_psw & 0x05))
+			if(!(m_psw & (FLAG_ZF|FLAG_CF))) // (CF|ZF)=0
 			{
 				m_cycles -= 2;
 				mn102_change_pc(m_pc+2+(INT8)mn102_read_byte(m_pc+1));
@@ -890,7 +876,7 @@ void mn10200_device::execute_run()
 
 		// bcc label8
 		case 0xe6:
-			if(!(m_psw & 0x04))
+			if(!(m_psw & FLAG_CF)) // CF=0
 			{
 				m_cycles -= 2;
 				mn102_change_pc(m_pc+2+(INT8)mn102_read_byte(m_pc+1));
@@ -904,7 +890,7 @@ void mn10200_device::execute_run()
 
 		// bls label8
 		case 0xe7:
-			if(m_psw & 0x05)
+			if(m_psw & (FLAG_ZF|FLAG_CF)) // (CF|ZF)=1
 			{
 				m_cycles -= 2;
 				mn102_change_pc(m_pc+2+(INT8)mn102_read_byte(m_pc+1));
@@ -918,7 +904,7 @@ void mn10200_device::execute_run()
 
 		// beq label8
 		case 0xe8:
-			if(m_psw & 0x01)
+			if(m_psw & FLAG_ZF) // ZF=1
 			{
 				m_cycles -= 2;
 				mn102_change_pc(m_pc+2+(INT8)mn102_read_byte(m_pc+1));
@@ -932,7 +918,7 @@ void mn10200_device::execute_run()
 
 		// bne label8
 		case 0xe9:
-			if(!(m_psw & 0x01))
+			if(!(m_psw & FLAG_ZF)) // ZF=0
 			{
 				m_cycles -= 2;
 				mn102_change_pc(m_pc+2+(INT8)mn102_read_byte(m_pc+1));
@@ -983,9 +969,8 @@ void mn10200_device::execute_run()
 				// bset dm, (an)
 				case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 				case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f: {
-				UINT8 v;
 				m_cycles -= 5;
-				v = mn102_read_byte(m_a[(opcode>>2) & 3]);
+				UINT8 v = mn102_read_byte(m_a[(opcode>>2) & 3]);
 				test_nz16(v & m_d[opcode & 3]);
 				mn102_write_byte(m_a[(opcode>>2) & 3], v | m_d[opcode & 3]);
 				m_pc += 2;
@@ -995,9 +980,8 @@ void mn10200_device::execute_run()
 				// bclr dm, (an)
 				case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 				case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f: {
-				UINT8 v;
 				m_cycles -= 5;
-				v = mn102_read_byte(m_a[(opcode>>2) & 3]);
+				UINT8 v = mn102_read_byte(m_a[(opcode>>2) & 3]);
 				test_nz16(v & m_d[opcode & 3]);
 				mn102_write_byte(m_a[(opcode>>2) & 3], v & ~m_d[opcode & 3]);
 				m_pc += 2;
@@ -1065,7 +1049,7 @@ void mn10200_device::execute_run()
 				// mov (di, an), dm
 				case 1:
 				m_cycles -= 2;
-				m_d[opcode & 3] = mn102_read_word((m_a[(opcode>>2) & 3] + m_d[(opcode>>4) & 3]) & 0xffffff);
+				m_d[opcode & 3] = (INT16)mn102_read_word((m_a[(opcode>>2) & 3] + m_d[(opcode>>4) & 3]) & 0xffffff);
 				m_pc += 2;
 				break;
 
@@ -1227,9 +1211,9 @@ void mn10200_device::execute_run()
 				case 0x30: case 0x31: case 0x32: case 0x33: {
 				UINT32 d = m_d[opcode & 3];
 				m_cycles -= 2;
-				test_nz16(m_d[opcode & 3] = (d & 0xff0000) | ((d << 1) & 0x00fffe) | ((m_psw & 0x04) ? 1 : 0));
+				test_nz16(m_d[opcode & 3] = (d & 0xff0000) | ((d << 1) & 0x00fffe) | ((m_psw & FLAG_CF) ? 1 : 0));
 				if(d & 0x8000)
-				m_psw |= 0x04;
+				m_psw |= FLAG_CF;
 				m_pc += 2;
 				break;
 				}
@@ -1238,9 +1222,9 @@ void mn10200_device::execute_run()
 				case 0x34: case 0x35: case 0x36: case 0x37: {
 				UINT32 d = m_d[opcode & 3];
 				m_cycles -= 2;
-				test_nz16(m_d[opcode & 3] = (d & 0xff0000) | ((d >> 1) & 0x007fff) | ((m_psw & 0x04) ? 0x8000 : 0));
+				test_nz16(m_d[opcode & 3] = (d & 0xff0000) | ((d >> 1) & 0x007fff) | ((m_psw & FLAG_CF) ? 0x8000 : 0));
 				if(d & 1)
-				m_psw |= 0x04;
+				m_psw |= FLAG_CF;
 				m_pc += 2;
 				break;
 				}
@@ -1251,7 +1235,7 @@ void mn10200_device::execute_run()
 				m_cycles -= 2;
 				test_nz16(m_d[opcode & 3] = (d & 0xff8000) | ((d >> 1) & 0x007fff));
 				if(d & 1)
-				m_psw |= 0x04;
+				m_psw |= FLAG_CF;
 				m_pc += 2;
 				break;
 				}
@@ -1262,7 +1246,7 @@ void mn10200_device::execute_run()
 				m_cycles -= 2;
 				test_nz16(m_d[opcode & 3] = (d & 0xff0000) | ((d >> 1) & 0x007fff));
 				if(d & 1)
-				m_psw |= 0x04;
+				m_psw |= FLAG_CF;
 				m_pc += 2;
 				break;
 				}
@@ -1274,11 +1258,11 @@ void mn10200_device::execute_run()
 				m_cycles -= 12;
 				res = ((INT16)m_d[opcode & 3])*((INT16)m_d[(opcode>>2) & 3]);
 				m_d[opcode & 3] = res & 0xffffff;
-				m_psw &= 0xff00;
+				m_psw &= 0xff00; // f4 is undefined
 				if(res & 0x80000000)
-				m_psw |= 2;
+				m_psw |= FLAG_NF;
 				if(!res)
-				m_psw |= 1;
+				m_psw |= FLAG_ZF;
 				m_mdr = res >> 16;
 				m_pc += 2;
 				break;
@@ -1291,11 +1275,11 @@ void mn10200_device::execute_run()
 				m_cycles -= 12;
 				res = ((UINT16)m_d[opcode & 3])*((UINT16)m_d[(opcode>>2) & 3]);
 				m_d[opcode & 3] = res & 0xffffff;
-				m_psw &= 0xff00;
+				m_psw &= 0xff00; // f4 is undefined
 				if(res & 0x80000000)
-				m_psw |= 2;
+				m_psw |= FLAG_NF;
 				if(!res)
-				m_psw |= 1;
+				m_psw |= FLAG_ZF;
 				m_mdr = res >> 16;
 				m_pc += 2;
 				break;
@@ -1307,26 +1291,30 @@ void mn10200_device::execute_run()
 				UINT32 n, d, q, r;
 				m_cycles -= 13;
 				m_pc += 2;
-				m_psw &= 0xff00;
+				m_psw &= 0xff00; // f7 may be undefined
 
 				n = (m_mdr<<16)|(UINT16)m_d[opcode & 3];
 				d = (UINT16)m_d[(opcode>>2) & 3];
-				if(!d) {
-				m_psw |= 8;
-				break;
+				if(!d)
+				{
+					// divide by 0
+					m_psw |= FLAG_VF;
+					break;
 				}
 				q = n/d;
 				r = n%d;
-				if(q >= 0x10000) {
-				m_psw |= 8;
-				break;
+				if(q >= 0x10000)
+				{
+					// overflow (Dm and MDR are undefined)
+					m_psw |= FLAG_VF;
+					break;
 				}
 				m_d[opcode & 3] = q;
 				m_mdr = r;
 				if(!q)
-				m_psw |= 0x11;
+				m_psw |= FLAG_ZF|FLAG_ZX;
 				if(q & 0x8000)
-				m_psw |= 2;
+				m_psw |= FLAG_NF;
 				break;
 				}
 
@@ -1375,8 +1363,8 @@ void mn10200_device::execute_run()
 
 				// mov psw, dn
 				case 0xf0: case 0xf1: case 0xf2: case 0xf3:
-				m_cycles -= 3;
-				m_d[(opcode>>2) & 3] = m_psw;
+				m_cycles -= 2;
+				m_d[opcode & 3] = m_psw;
 				m_pc += 2;
 				break;
 
@@ -1570,7 +1558,6 @@ void mn10200_device::execute_run()
 				do_jsr(m_pc+5+r24u(m_pc+2), m_pc+5);
 				break;
 
-
 				// mov (abs24, an), am
 				case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
 				case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
@@ -1612,7 +1599,7 @@ void mn10200_device::execute_run()
 				// addnf imm8, an
 				case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 				m_cycles -= 2;
-				m_a[opcode & 3] = m_a[opcode & 3] +(INT8)mn102_read_byte(m_pc+2);
+				m_a[opcode & 3] = m_a[opcode & 3] + (INT8)mn102_read_byte(m_pc+2);
 				m_pc += 3;
 				break;
 
@@ -1658,123 +1645,155 @@ void mn10200_device::execute_run()
 
 				// bltx label8
 				case 0xe0:
-				if(((m_psw & 0xa0) == 0x20) || ((m_psw & 0xa0) == 0x80)) {
-				m_cycles -= 3;
-				mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
-				} else {
-				m_cycles -= 2;
-				m_pc += 3;
+				if(((m_psw & (FLAG_NX|FLAG_VX)) == FLAG_NX) || ((m_psw & (FLAG_NX|FLAG_VX)) == FLAG_VX)) // (VX^NX)=1
+				{
+					m_cycles -= 3;
+					mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
+				}
+				else
+				{
+					m_cycles -= 2;
+					m_pc += 3;
 				}
 				break;
 
 				// bgtx label8
 				case 0xe1:
-				if(((m_psw & 0xb0) == 0) || ((m_psw & 0xb0) == 0xa0)) {
-				m_cycles -= 3;
-				mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
-				} else {
-				m_cycles -= 2;
-				m_pc += 3;
+				if(((m_psw & (FLAG_ZX|FLAG_NX|FLAG_VX)) == 0) || ((m_psw & (FLAG_ZX|FLAG_NX|FLAG_VX)) == (FLAG_NX|FLAG_VX))) // ((VX^NX)|ZX)=0
+				{
+					m_cycles -= 3;
+					mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
+				}
+				else
+				{
+					m_cycles -= 2;
+					m_pc += 3;
 				}
 				break;
 
 				// bgex label8
 				case 0xe2:
-				if(((m_psw & 0xa0) == 0) || ((m_psw & 0xa0) == 0xa0)) {
-				m_cycles -= 3;
-				mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
-				} else {
-				m_cycles -= 2;
-				m_pc += 3;
+				if(((m_psw & (FLAG_NX|FLAG_VX)) == 0) || ((m_psw & (FLAG_NX|FLAG_VX)) == (FLAG_NX|FLAG_VX))) // (VX^NX)=0
+				{
+					m_cycles -= 3;
+					mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
+				}
+				else
+				{
+					m_cycles -= 2;
+					m_pc += 3;
 				}
 				break;
 
 				// blex label8
 				case 0xe3:
-				if((m_psw & 0x10) || ((m_psw & 0xa0) == 0x20) || ((m_psw & 0xa0) == 0x80)) {
-				m_cycles -= 3;
-				mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
-				} else {
-				m_cycles -= 2;
-				m_pc += 3;
+				if((m_psw & FLAG_ZX) || ((m_psw & (FLAG_NX|FLAG_VX)) == FLAG_NX) || ((m_psw & (FLAG_NX|FLAG_VX)) == FLAG_VX)) // ((VX^NX)|ZX)=1
+				{
+					m_cycles -= 3;
+					mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
+				}
+				else
+				{
+					m_cycles -= 2;
+					m_pc += 3;
 				}
 				break;
 
 				// bcsx label8
 				case 0xe4:
-				if(m_psw & 0x40) {
-				m_cycles -= 3;
-				mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
-				} else {
-				m_cycles -= 2;
-				m_pc += 3;
+				if(m_psw & FLAG_CX) // CX=1
+				{
+					m_cycles -= 3;
+					mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
+				}
+				else
+				{
+					m_cycles -= 2;
+					m_pc += 3;
 				}
 				break;
 
 				// bhix label8
 				case 0xe5:
-				if(!(m_psw & 0x50)) {
-				m_cycles -= 3;
-				mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
-				} else {
-				m_cycles -= 2;
-				m_pc += 3;
+				if(!(m_psw & (FLAG_ZX|FLAG_CX))) // (CX|ZX)=0
+				{
+					m_cycles -= 3;
+					mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
+				}
+				else
+				{
+					m_cycles -= 2;
+					m_pc += 3;
 				}
 				break;
 
 				// bccx label8
 				case 0xe6:
-				if(!(m_psw & 0x40)) {
-				m_cycles -= 3;
-				mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
-				} else {
-				m_cycles -= 2;
-				m_pc += 3;
+				if(!(m_psw & FLAG_CX)) // CX=0
+				{
+					m_cycles -= 3;
+					mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
+				}
+				else
+				{
+					m_cycles -= 2;
+					m_pc += 3;
 				}
 				break;
 
 				// blsx label8
 				case 0xe7:
-				if(m_psw & 0x50) {
-				m_cycles -= 3;
-				mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
-				} else {
-				m_cycles -= 2;
-				m_pc += 3;
+				if(m_psw & (FLAG_ZX|FLAG_CX)) // (CX|ZX)=1
+				{
+					m_cycles -= 3;
+					mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
+				}
+				else
+				{
+					m_cycles -= 2;
+					m_pc += 3;
 				}
 				break;
 
 				// beqx label8
 				case 0xe8:
-				if(m_psw & 0x10) {
-				m_cycles -= 3;
-				mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
-				} else {
-				m_cycles -= 2;
-				m_pc += 3;
+				if(m_psw & FLAG_ZX) // ZX=1
+				{
+					m_cycles -= 3;
+					mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
+				}
+				else
+				{
+					m_cycles -= 2;
+					m_pc += 3;
 				}
 				break;
 
 				// bnex label8
 				case 0xe9:
-				if(!(m_psw & 0x10)) {
-				m_cycles -= 3;
-				mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
-				} else {
-				m_cycles -= 2;
-				m_pc += 3;
+				if(!(m_psw & FLAG_ZX)) // ZX=0
+				{
+					m_cycles -= 3;
+					mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
+				}
+				else
+				{
+					m_cycles -= 2;
+					m_pc += 3;
 				}
 				break;
 
-
 				// bnc label8
 				case 0xfe:
-				if(!(m_psw & 0x02)) {
-				m_cycles -= 3;
-				mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
-				} else {
-				m_cycles -= 2;
-				m_pc += 3;
+				if(!(m_psw & FLAG_NF)) // NF=0
+				{
+					m_cycles -= 3;
+					mn102_change_pc(m_pc+3+(INT8)mn102_read_byte(m_pc+2));
+				}
+				else
+				{
+					m_cycles -= 2;
+					m_pc += 3;
 				}
 				break;
 
@@ -1845,7 +1864,7 @@ void mn10200_device::execute_run()
 
 				// or imm16, dn
 				case 0x40: case 0x41: case 0x42: case 0x43:
-				m_cycles -= 3;
+				m_cycles -= 2;
 				test_nz16(m_d[opcode & 3] |= mn102_read_word(m_pc+2));
 				m_pc += 4;
 				break;
@@ -1876,10 +1895,9 @@ void mn10200_device::execute_run()
 				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
 				m_cycles -= 2;
-				m_d[opcode & 3] = (INT16)mn102_read_word((m_a[(opcode>>2) & 3] + (INT16)mn102_read_byte(m_pc+2)) & 0xffffff) & 0xffffff;
+				m_d[opcode & 3] = (INT16)mn102_read_word((m_a[(opcode>>2) & 3] + (INT16)mn102_read_word(m_pc+2)) & 0xffffff);
 				m_pc += 4;
 				break;
-
 
 				default:
 				unemul();

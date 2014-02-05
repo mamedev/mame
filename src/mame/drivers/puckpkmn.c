@@ -264,6 +264,8 @@ READ16_MEMBER(md_boot_state::puckpkmna_70001c_r)
 
 READ16_MEMBER(md_boot_state::puckpkmna_4b2476_r)
 {
+	if (!strcmp(machine().system().name, "puckpkmnb")) return 0x3100;
+
 	return 0x3400;
 }
 
@@ -451,6 +453,16 @@ ROM_START( puckpkmna ) /* Puckman Pockimon  (c)2000 IBS Co. Ltd */
 ROM_END
 
 
+ROM_START( puckpkmnb ) 
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "200061.u5", 0x000000, 0x080000, CRC(502a5093) SHA1(6dc1c79d52ebb653cb2e4388f74fd975ec323566) )
+	ROM_LOAD16_BYTE( "200060.u4", 0x000001, 0x080000, CRC(5f160c18) SHA1(5a5ce1b9a81afe836e435e9d6f16cf57b63cbd31) )
+	ROM_LOAD16_BYTE( "200063.u8", 0x100000, 0x080000, CRC(0c29781e) SHA1(db442f9b588608b2ac04d65fd830103296599a6a) )
+	ROM_LOAD16_BYTE( "200062.u7", 0x100001, 0x080000, CRC(00bbf9a9) SHA1(924c1ed85090c497ce89528082c15d1548a854a0) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "206295.u3", 0x00000, 0x40000, CRC(7b066bac) SHA1(429616e21c672b07e0705bc63234249cac3af56f) )
+ROM_END
 
 
 
@@ -470,7 +482,8 @@ ROM_START( jzth )
 	ROM_CONTINUE(0x40000,0x40000)
 ROM_END
 
-/* Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile ram */
+/* Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile ram */  // is 'Genie 2000' part of the title, and the parent set a bootleg?
 GAME( 2000, puckpkmn, 0,        puckpkmn,  puckpkmn, md_boot_state, puckpkmn, ROT0, "Genie",                  "Puckman Pockimon (set 1)", 0 )
 GAME( 2000, puckpkmna,puckpkmn, puckpkmna, puckpkmn, md_boot_state, puckpkmn, ROT0, "IBS",                    "Puckman Pockimon (set 2)", 0 )
+GAME( 2000, puckpkmnb,puckpkmn, puckpkmna, puckpkmn, md_boot_state, puckpkmn, ROT0, "Sun Mixing",             "Puckman Pockimon (set 3)", 0 )
 GAME( 2000, jzth,     0,        jzth,      jzth, md_boot_state,     puckpkmn, ROT0, "<unknown>",              "Jue Zhan Tian Huang", GAME_IMPERFECT_SOUND )

@@ -237,6 +237,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(epson_sd_321, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(sony_oa_d31v, "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(sony_oa_d32w, "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(sony_oa_d32v, "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(alps_3255190x, "floppy_5_25")
 
 
 class floppy_connector: public device_t,
@@ -285,5 +286,6 @@ extern const device_type EPSON_SD_321;
 extern const device_type SONY_OA_D31V;
 extern const device_type SONY_OA_D32W;
 extern const device_type SONY_OA_D32V;
+extern const device_type ALPS_3255190x;
 
 #endif /* FLOPPY_H */

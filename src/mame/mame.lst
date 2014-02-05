@@ -2565,6 +2565,7 @@ twincobr        // B30 / TP-011 (c) 1987 Taito Corporation (World)
 twincobru       // B30 / TP-011 (c) 1987 Taito America Corporation + Romstar license (US)
 ktiger          // B30 / TP-011 (c) 1987 Taito Corporation (Japan)
 gulfwar2        // (c) 1991 Comad
+gulfwar2a		//
 rallybik        // B45 / TP-O12 (c) 1988 Taito
 truxton         // B65 / TP-O13B (c) 1988 Taito
 hellfire        // B90 / TP-??? (c) 1989 Toaplan + Taito license
@@ -5055,6 +5056,7 @@ pclubjv5
 // Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile ram
 puckpkmn        // (c) 2000 Genie
 puckpkmna       // (c) 2000 IBS
+puckpkmnb       // (c) 2000 IBS
 topshoot        // (c) 1995 Sun Mixing
 
 jzth
@@ -9015,6 +9017,7 @@ pollux          // (c) 1991 Dooyong
 polluxa         // (c) 1991 Dooyong
 polluxa2        // (c) 1991 Dooyong
 flytiger        // (c) 1992 Dooyong
+flytigera		// (c) 1992 Dooyong
 bluehawk        // (c) 1993 Dooyong
 bluehawkn       // (c) 1993 NTC
 sadari          // (c) 1993 NTC

@@ -76,7 +76,10 @@ NETLIB_UPDATE(R)
 NETLIB_UPDATE_PARAM(R)
 {
 	//printf("updating %s to %f\n", name().cstr(), m_R.Value());
-	set_R(m_R.Value());
+	if (m_R.Value() > 1e-9)
+	    set_R(m_R.Value());
+	else
+	    set_R(1e-9);
     update_dev();
 }
 

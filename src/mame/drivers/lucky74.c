@@ -791,6 +791,11 @@
 #include "lucky74.lh"
 #include "includes/lucky74.h"
 
+void lucky74_state::machine_reset()
+{
+	m_copro_sm7831 = 0;
+	m_usart_8251 = 0;
+}
 
 /*****************************
 *    Read/Write  Handlers    *

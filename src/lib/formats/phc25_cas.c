@@ -22,7 +22,7 @@ b. 4.862secs of high bits
 c. The header which is parts 1 and 2 above
 d. 0.652secs of high bits
 e. The main program wjich is parts 3 and 4 above
-f. some more silence
+f. 1.771secs of silence
 
 We don't emulate the full silence and high-bits periods, only just
 enough to make it work.

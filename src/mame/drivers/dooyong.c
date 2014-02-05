@@ -1579,10 +1579,10 @@ ROM_START( flytiger )
 	ROM_CONTINUE(             0x00000, 0x8000 )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */
-	ROM_LOAD16_BYTE( "13.4h", 0x00000, 0x20000, CRC(8a158b95) SHA1(ed09d9c40b76a27e06601381e463a00b16555f1e) )
+	ROM_LOAD16_BYTE( "16.4h", 0x00000, 0x20000, CRC(8a158b95) SHA1(ed09d9c40b76a27e06601381e463a00b16555f1e) )
 	ROM_LOAD16_BYTE( "15.2h", 0x00001, 0x20000, CRC(399f6043) SHA1(ea0debd6d0f8c61f0078809c2828734fc15e891d) )
 	ROM_LOAD16_BYTE( "14.4k", 0x40000, 0x20000, CRC(df66b6f3) SHA1(3a29ae69a09306c5a2a2786acbf227832b408152) )
-	ROM_LOAD16_BYTE( "16.2k", 0x40001, 0x20000, CRC(f24a5099) SHA1(408559057989a40ca298baa85d5fe7cbde72d2b8) )
+	ROM_LOAD16_BYTE( "13.2k", 0x40001, 0x20000, CRC(f24a5099) SHA1(408559057989a40ca298baa85d5fe7cbde72d2b8) )
 
 	ROM_REGION( 0x80000, "gfx3",0 ) /* tiles + tilemaps */
 	ROM_LOAD16_WORD_SWAP( "dy-ft-m1.11n",   0x00000, 0x80000, CRC(f06589c2) SHA1(fb4aa12257e2e0162f2219ebea5177e8bb15e3f0) )
@@ -1592,6 +1592,40 @@ ROM_START( flytiger )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* OKI6295 samples */
 	ROM_LOAD( "4.9n",         0x00000, 0x20000, CRC(cd95cf9a) SHA1(d79e3aeda6a13d7b87369453bcf668778135b7fe) )
+ROM_END
+
+ROM_START( flytigera ) // alt pcb type
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for banks */
+	ROM_LOAD( "ftiger_1.3c",  0x00000, 0x20000, CRC(02acd1ce) SHA1(48167a317d3785bfe688bdda01ff344e72d3b138) )
+	ROM_RELOAD(               0x10000, 0x20000 )                /* banked at 0x8000-0xbfff */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
+	ROM_LOAD( "ftiger_11.6p", 0x00000, 0x10000, CRC(d238df5e) SHA1(428fd7abd78238089c0c0fd73de57102f4f65a74))
+
+	ROM_REGION( 0x10000, "gfx1", 0 )    /* chars */
+	ROM_LOAD( "ftiger_2.4h",  0x08000, 0x08000, CRC(ca9d6713) SHA1(645cccc06c7f6744b25e7917f414956856419b8a) )
+	ROM_CONTINUE(             0x00000, 0x8000 )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    /* sprites */ 
+	ROM_LOAD16_BYTE( "ftiger_16.4h", 0x00000, 0x20000, CRC(8a158b95) SHA1(ed09d9c40b76a27e06601381e463a00b16555f1e) )
+	ROM_LOAD16_BYTE( "ftiger_15.2h", 0x00001, 0x20000, CRC(399f6043) SHA1(ea0debd6d0f8c61f0078809c2828734fc15e891d) )
+	ROM_LOAD16_BYTE( "ftiger_14.4k", 0x40000, 0x20000, CRC(df66b6f3) SHA1(3a29ae69a09306c5a2a2786acbf227832b408152) )
+	ROM_LOAD16_BYTE( "ftiger_13.2k", 0x40001, 0x20000, CRC(f24a5099) SHA1(408559057989a40ca298baa85d5fe7cbde72d2b8) )
+
+	ROM_REGION( 0x80000, "gfx3",0 ) /* tiles + tilemaps */ // same data, but split
+	ROM_LOAD16_BYTE( "ftiger_3.10p", 0x00001, 0x20000, CRC(9fc12ebd) SHA1(c8f03a20da01bd61a27813564eb79bb2e8483f28) )
+	ROM_LOAD16_BYTE( "ftiger_5.10l", 0x00000, 0x20000, CRC(06c9dd2a) SHA1(20235b7d55b9bc73ddb1fec5fd68e5ba32508d1b) )
+	ROM_LOAD16_BYTE( "ftiger_4.11p", 0x40001, 0x20000, CRC(fb30e884) SHA1(1f01ed15ae6cdebb120cc1f03ac65465c824dc89) )
+	ROM_LOAD16_BYTE( "ftiger_6.11l", 0x40000, 0x20000, CRC(dfb85152) SHA1(03a07e016d400c1c0e7a59716c08a61e23e5d60f) )
+
+	ROM_REGION( 0x80000, "gfx4",0 ) /* tiles + tilemaps */ // same data, but split
+	ROM_LOAD16_BYTE( "ftiger_8.11h", 0x00001, 0x20000, CRC(cbd8c22f) SHA1(e7e64c99990e99336abbdbd7ffadfa4c0f1a4c0f) )
+	ROM_LOAD16_BYTE( "ftiger_10.11f",0x00000, 0x20000, CRC(e2175f3b) SHA1(1ce17beb431bb3e8454bb1899f28d16c6a537183) )
+	ROM_LOAD16_BYTE( "ftiger_7.10h", 0x40001, 0x20000, CRC(be431c61) SHA1(3227912117700751370059c173e46d0a8367c5f8) )
+	ROM_LOAD16_BYTE( "ftiger_9.10f", 0x40000, 0x20000, CRC(91bcd84f) SHA1(3577b2d1d6ee4b560b75530ba9e9e6689c1e17e2) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* OKI6295 samples */
+	ROM_LOAD( "ftiger_12.9n",         0x00000, 0x20000, CRC(cd95cf9a) SHA1(d79e3aeda6a13d7b87369453bcf668778135b7fe) )
 ROM_END
 
 ROM_START( sadari )
@@ -1926,21 +1960,31 @@ ROM_END
 /* The differences between the two lastday sets are only in the sound program
    and graphics. The main program is the same. */
 
-GAME( 1990, lastday,  0,        lastday,  lastday, driver_device,  0, ROT270, "Dooyong",  "The Last Day (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1990, lastdaya, lastday,  lastday,  lastday, driver_device,  0, ROT270, "Dooyong",  "The Last Day (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",  "Gulf Storm (set 1)",   GAME_SUPPORTS_SAVE )
-GAME( 1991, gulfstrma,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",  "Gulf Storm (set 2)",   GAME_SUPPORTS_SAVE )
+GAME( 1990, lastday,  0,        lastday,  lastday, driver_device,  0, ROT270, "Dooyong",                       "The Last Day (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, lastdaya, lastday,  lastday,  lastday, driver_device,  0, ROT270, "Dooyong",                       "The Last Day (set 2)", GAME_SUPPORTS_SAVE )
+
+GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (set 1)",        GAME_SUPPORTS_SAVE )
+GAME( 1991, gulfstrma,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong",                       "Gulf Storm (set 2)",        GAME_SUPPORTS_SAVE )
 GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, driver_device, 0, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  GAME_SUPPORTS_SAVE )
-GAME( 1991, pollux,   0,        pollux,   pollux, driver_device,   0, ROT270, "Dooyong",  "Pollux (set 1)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, polluxa,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",  "Pollux (set 2)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, polluxa2, pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",  "Pollux (set 3)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) /* Original Dooyong Board distributed by TCH */
-GAME( 1992, flytiger, 0,        flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",  "Flying Tiger",         GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1993, bluehawk, 0,        bluehawk, bluehawk, driver_device, 0, ROT270, "Dooyong",  "Blue Hawk",            GAME_SUPPORTS_SAVE )
-GAME( 1993, bluehawkn,bluehawk, bluehawk, bluehawk, driver_device, 0, ROT270, "Dooyong (NTC license)", "Blue Hawk (NTC)", GAME_SUPPORTS_SAVE )
-GAME( 1993, sadari,   0,        primella, sadari, driver_device,   0, ROT0,   "Dooyong (NTC license)", "Sadari",  GAME_SUPPORTS_SAVE )
-GAME( 1994, gundl94,  0,        primella, primella, driver_device, 0, ROT0,   "Dooyong",  "Gun Dealer '94",       GAME_SUPPORTS_SAVE )
-GAME( 1994, primella, gundl94,  primella, primella, driver_device, 0, ROT0,   "Dooyong (NTC license)", "Primella",GAME_SUPPORTS_SAVE )
-GAME( 1994, superx,   0,        superx,   superx, driver_device,   0, ROT270, "NTC",      "Super-X (NTC)",        GAME_SUPPORTS_SAVE )
-GAME( 1994, superxm,  superx,   superx,   superx, driver_device,   0, ROT270, "NTC (Mitchell license)", "Super-X (Mitchell)", GAME_SUPPORTS_SAVE )
-GAME( 1995, rshark,   0,        rshark,   rshark, driver_device,   0, ROT270, "Dooyong",  "R-Shark",              GAME_SUPPORTS_SAVE )
-GAME( 1996, popbingo, 0,        popbingo, popbingo, driver_device, 0, ROT0,   "Dooyong",  "Pop Bingo",            GAME_SUPPORTS_SAVE )
+
+GAME( 1991, pollux,   0,        pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 1)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, polluxa,  pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 2)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, polluxa2, pollux,   pollux,   pollux, driver_device,   0, ROT270, "Dooyong",                       "Pollux (set 3)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) /* Original Dooyong Board distributed by TCH */
+
+GAME( 1992, flytiger, 0,        flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, flytigera,flytiger, flytiger, flytiger, driver_device, 0, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+
+GAME( 1993, bluehawk, 0,        bluehawk, bluehawk, driver_device, 0, ROT270, "Dooyong",                       "Blue Hawk",            GAME_SUPPORTS_SAVE )
+GAME( 1993, bluehawkn,bluehawk, bluehawk, bluehawk, driver_device, 0, ROT270, "Dooyong (NTC license)",         "Blue Hawk (NTC)",      GAME_SUPPORTS_SAVE )
+
+GAME( 1993, sadari,   0,        primella, sadari, driver_device,   0, ROT0,   "Dooyong (NTC license)",         "Sadari",  GAME_SUPPORTS_SAVE )
+
+GAME( 1994, gundl94,  0,        primella, primella, driver_device, 0, ROT0,   "Dooyong",                       "Gun Dealer '94",       GAME_SUPPORTS_SAVE )
+GAME( 1994, primella, gundl94,  primella, primella, driver_device, 0, ROT0,   "Dooyong (NTC license)",         "Primella",             GAME_SUPPORTS_SAVE )
+
+GAME( 1994, superx,   0,        superx,   superx, driver_device,   0, ROT270, "Dooyong (NTC license)",         "Super-X (NTC)",      GAME_SUPPORTS_SAVE )
+GAME( 1994, superxm,  superx,   superx,   superx, driver_device,   0, ROT270, "Dooyong (Mitchell license)",    "Super-X (Mitchell)", GAME_SUPPORTS_SAVE )
+
+GAME( 1995, rshark,   0,        rshark,   rshark, driver_device,   0, ROT270, "Dooyong",                       "R-Shark",              GAME_SUPPORTS_SAVE )
+
+GAME( 1996, popbingo, 0,        popbingo, popbingo, driver_device, 0, ROT0,   "Dooyong",                       "Pop Bingo",            GAME_SUPPORTS_SAVE )

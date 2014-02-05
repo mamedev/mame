@@ -1145,14 +1145,20 @@ ATTR_HOT inline void netlist_param_str_t::setTo(const pstring &param)
 
 ATTR_HOT inline void netlist_param_int_t::setTo(const int param)
 {
-	m_param = param;
-	netdev().update_param();
+    if (m_param != param)
+    {
+        m_param = param;
+        netdev().update_param();
+    }
 }
 
 ATTR_HOT inline void netlist_param_double_t::setTo(const double param)
 {
-	m_param = param;
-	netdev().update_param();
+    if (m_param != param)
+    {
+        m_param = param;
+        netdev().update_param();
+    }
 }
 
 

@@ -95,9 +95,10 @@
 #define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
 	void _name(const double data, const attotime &time)
 
-#define NETDEV_SOUND_OUT(_name, _v)                                                 \
+#define NETDEV_SOUND_OUT(_name, _v, _m)                                             \
         NET_REGISTER_DEV(sound_out, _name)                                          \
-        PARAM(_name.CHAN, _v)
+        PARAM(_name.CHAN, _v)                                                       \
+        PARAM(_name.MULT, _m)
 
 #define NETDEV_SOUND_IN(_name)                                                      \
         NET_REGISTER_DEV(sound_in, _name)
@@ -501,6 +502,7 @@ public:
 	{
 		register_input("IN", m_in);
 		register_param("CHAN", m_channel, 0);
+        register_param("MULT", m_mult, 1000.0);
         m_sample = netlist_time::from_hz(1); //sufficiently big enough
 	}
 
@@ -526,7 +528,7 @@ public:
 	{
 		double val = INPANALOG(m_in);
 		sound_update(netlist().time());
-		m_cur = val * 1000;
+		m_cur = val * m_mult.Value();
 	}
 
 	ATTR_HOT void buffer_reset(netlist_time upto)
@@ -536,6 +538,7 @@ public:
 	}
 
 	netlist_param_int_t m_channel;
+    netlist_param_double_t m_mult;
     stream_sample_t *m_buffer;
     netlist_time m_sample;
 
@@ -599,7 +602,7 @@ public:
             if (m_buffer[i] == NULL)
                 break; // stop, called outside of stream_update
             double v = m_buffer[i][m_pos];
-            m_param[i]->setTo(v / 1000.0);
+            m_param[i]->setTo(v);
         }
         m_pos++;
         OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );

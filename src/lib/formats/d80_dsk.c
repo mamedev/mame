@@ -11,13 +11,12 @@
 #include "emu.h"
 #include "formats/d80_dsk.h"
 
-d80_format::d80_format() : d64_format(formats)
+d80_format::d80_format() : d64_format(file_formats)
 {
 }
 
-d80_format::d80_format(const format *_formats)
+d80_format::d80_format(const format *_formats) : d64_format(_formats)
 {
-	formats = _formats;
 }
 
 const char *d80_format::name() const

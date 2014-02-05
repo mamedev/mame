@@ -56,13 +56,11 @@ YMZ294: 0 I/O port
 
 /*
  * The following define causes the driver to output
- * raw volume levels, i.e. 0 .. 15 and 0..31.
- * This is intended to be used in a subsequent
- * mixing modul (i.e. mpatrol ties 6 channels from
- * AY-3-8910 together). Do not use it now.
+ * resistor values. Intended to be used for
+ * netlist interfacing.
  */
-/* TODO: implement mixing module */
-#define AY8910_RAW_OUTPUT           (0x08)
+
+#define AY8910_RESISTOR_OUTPUT      (0x08)
 
 /*
  * This define specifies the initial state of YM2149

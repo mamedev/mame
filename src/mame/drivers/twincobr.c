@@ -1189,6 +1189,50 @@ ROM_START( gulfwar2 )
 ROM_END
 
 
+ROM_START( gulfwar2a )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main 68K code */
+	ROM_LOAD16_BYTE( "gw2_28.u119", 0x00000, 0x20000, CRC(b9118660) SHA1(2b32e2e8d4efa024346d6603f005880f0ffd2c37) )
+	ROM_LOAD16_BYTE( "gw2_27.u92",  0x00001, 0x20000, CRC(3494f1aa) SHA1(4097eae7d22604fe1c996c37715018b2df6b8b39) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
+	ROM_LOAD( "06-u51.bin", 0x0000, 0x8000, CRC(75504f95) SHA1(5bd23e700e1bd4f0fac622dfb7c8cc69ba764956) )
+
+	ROM_REGION( 0x2000, "dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
+	ROM_LOAD16_BYTE( "gw2_21.udsp2", 0x000, 0x800, CRC(87a473af) SHA1(3833ad01e9df6dc3e59ec4f910dc09a0318d865d) ) // Same code as Twin Cobra
+	ROM_IGNORE( 0x800 ) // 2nd half duplicates 1st
+	ROM_LOAD16_BYTE( "gw2_22.udsp1", 0x001, 0x800, CRC(3a97b0db) SHA1(4f4e2e432aa05fddce8bb7c8a6c7e222bdd50c16) ) // Same code as Twin Cobra
+	ROM_IGNORE( 0x800 ) // 2nd half is no good (1 bit error)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )    /* chars */
+	ROM_LOAD( "gw2_23.u9",  0x00000, 0x08000, CRC(a2aee4c8) SHA1(dd6267f6ffbca0621790b76114d7c303a93b18e1) )
+	ROM_LOAD( "gw2_24.u10", 0x08000, 0x08000, CRC(fb3f71cd) SHA1(1594ab7a2700617dfcd73b091d4b94fb21e06c0d) )
+	ROM_LOAD( "gw2_25.u11", 0x10000, 0x08000, CRC(90eeb0a0) SHA1(126877900ce6bb9b2bf6420f588174f010f9bb6c) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )    /* fg tiles */
+	ROM_LOAD( "16-u202.bin", 0x00000, 0x10000, CRC(d815d175) SHA1(917043d0731226d18bcc22dfe27e5a5a18b03c06) )
+	ROM_LOAD( "13-u199.bin", 0x10000, 0x10000, CRC(d949b0d9) SHA1(1974d3b54e082baa9084dd619c8a879d954644cd) )
+	ROM_LOAD( "14-u200.bin", 0x20000, 0x10000, CRC(c109a6ac) SHA1(3a13ec802e5bafcf599c273a0bb0fd078e01e171) )
+	ROM_LOAD( "15-u201.bin", 0x30000, 0x10000, CRC(ad21f2ab) SHA1(0ab6eeb4dc9c2531c6f19479e7f9bc54fc1c1fdf) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )    /* bg tiles */
+	ROM_LOAD( "09-u195.bin", 0x00000, 0x08000, CRC(b7be3a6d) SHA1(68b9223fd07e81d443a1ae3ff04b2af105b27548) )
+	ROM_LOAD( "12-u198.bin", 0x08000, 0x08000, CRC(fd7032a6) SHA1(8be6315d732b154163a3573e2017fdfc77c92e54) )
+	ROM_LOAD( "11-u197.bin", 0x10000, 0x08000, CRC(7b721ed3) SHA1(afd10229414c65a56e184d56a69460ca3a502a27) )
+	ROM_LOAD( "10-u196.rom", 0x18000, 0x08000, CRC(160f38ab) SHA1(da310ec387d439b26c8b6b881e5dcc07c2b9bb00) )
+
+	ROM_REGION( 0x40000, "gfx4", 0 )    /* sprites */
+	ROM_LOAD( "20-u262.bin", 0x00000, 0x10000, CRC(10665ca0) SHA1(0c552c3807e00a7ef4f9fd28c7988a232628a1f5) )
+	ROM_LOAD( "19-u261.bin", 0x10000, 0x10000, CRC(cfa6d417) SHA1(f6c17d938b58dc5756ecf617f00fbfaf701602a7) )
+	ROM_LOAD( "18-u260.bin", 0x20000, 0x10000, CRC(2e6a0c49) SHA1(0b7ddad8775dcebe240a8246ef7816113f517f87) )
+	ROM_LOAD( "17-u259.bin", 0x30000, 0x10000, CRC(66c1b0e6) SHA1(82f3659245913f835c4434131c179b49ee195961) )
+
+	ROM_REGION( 0x260, "proms", 0 )
+	ROM_LOAD( "82s129.d3",  0x000, 0x100, CRC(24e7d62f) SHA1(1c06a1ef1b6a722794ca1d5ee2c476ecaa5178a3) )    /* sprite priority control ?? */
+	ROM_LOAD( "82s129.d4",  0x100, 0x100, CRC(a50cef09) SHA1(55cafb5b2551b80ae708e9b966cf37c70a16d310) )    /* sprite priority control ?? */
+	ROM_LOAD( "82s123.d2",  0x200, 0x020, CRC(f72482db) SHA1(b0cb911f9c81f6088a5aa8760916ddae1f8534d7) )    /* sprite control ?? */
+	ROM_LOAD( "82s123.e18", 0x220, 0x020, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )    /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "82s123.b24", 0x240, 0x020, CRC(4fb5df2a) SHA1(506ef2c8e4cf45c256d6831a0a5760732f2de422) )    /* tile to sprite priority ?? */
+ROM_END
 
 DRIVER_INIT_MEMBER(twincobr_state,twincobr)
 {
@@ -1204,4 +1248,5 @@ GAME( 1987, fnshark,   fshark,   twincobr, hishouza, twincobr_state,  twincobr, 
 GAME( 1987, twincobr,  0,        twincobr, twincobr, twincobr_state,  twincobr, ROT270, "Toaplan / Taito Corporation", "Twin Cobra (World)", 0 )
 GAME( 1987, twincobru, twincobr, twincobr, twincobru, twincobr_state, twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Twin Cobra (US)", 0 )
 GAME( 1987, ktiger,    twincobr, twincobr, ktiger, twincobr_state,    twincobr, ROT270, "Toaplan / Taito Corporation", "Kyukyoku Tiger (Japan)", 0 )
-GAME( 1991, gulfwar2,  0,        twincobr, gulfwar2, twincobr_state,  twincobr, ROT270, "Comad", "Gulf War II", 0 )
+GAME( 1991, gulfwar2,  0,        twincobr, gulfwar2, twincobr_state,  twincobr, ROT270, "Comad", "Gulf War II (set 1)", 0 )
+GAME( 1991, gulfwar2a, gulfwar2, twincobr, gulfwar2, twincobr_state,  twincobr, ROT270, "Comad", "Gulf War II (set 2)", 0 )

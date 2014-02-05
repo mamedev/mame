@@ -274,7 +274,7 @@ READ8_MEMBER( phc25_state::video_ram_r )
 		}
 		else
 		{// screen 3
-			return m_video_ram[((offset & 0x1fc0)<<1) + (offset & 0x3f) + 0x380 ];
+			return m_video_ram[((offset & 0x1fe0)<<2) + (offset & 0x1f) ];
 		}
 	}
 	else	// text
