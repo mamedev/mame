@@ -1300,6 +1300,9 @@ ROM_START( gforce2 )
 	ROM_RELOAD(                  0x120000, 0x20000 )
 	ROM_RELOAD(                  0x140000, 0x20000 )
 	ROM_RELOAD(                  0x160000, 0x20000 )
+
+	ROM_REGION( 0x10000, "motorcpu", 0 )        // Z80 motor CPU (for super deluxe unit)
+	ROM_LOAD( "motorpcb.prg",   0x000000, 0x08000, CRC(fecee31e) SHA1(b50a26896a71d4741bbdc4ae51c3702585531b7e) ) // sega epr label??
 ROM_END
 
 //*************************************************************************************************************************

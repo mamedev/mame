@@ -2989,6 +2989,10 @@ ROM_END
 // Shinobi bootleg by 'Beta' (7751 replaced by what? Sample rom is different, but no extra sound CPU rom present, missing?)
 // otherwise it seems to run fine on System 16A
 //
+// note fron any:
+// on YM3012 and YM2151 sockets a sub pcb is attached
+// on that pcb there are 2x YM2203, 2 Y3014 and 3 ttl chips
+
 ROM_START( shinoblb )
 	ROM_REGION( 0x040000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "4.3k", 0x000000, 0x10000, CRC(c178a39c) SHA1(05ff1679cdfc3618df8b3fabdeab64b1f2299aa3) )
