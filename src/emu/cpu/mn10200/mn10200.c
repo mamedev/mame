@@ -464,9 +464,9 @@ void mn10200_device::unemul()
 	fatalerror("MN10200: unknown opcode @ PC=%x\n", m_pc);
 }
 
-UINT32 mn10200_device::do_add(UINT32 a, UINT32 b)
+UINT32 mn10200_device::do_add(UINT32 a, UINT32 b, UINT32 c)
 {
-	UINT32 r = (a & 0xffffff) + (b & 0xffffff);
+	UINT32 r = (a & 0xffffff) + (b & 0xffffff) + c;
 
 	m_psw &= 0xff00;
 	if((a^r) & (b^r) & 0x00800000)
@@ -479,7 +479,7 @@ UINT32 mn10200_device::do_add(UINT32 a, UINT32 b)
 		m_psw |= FLAG_ZX;
 	if((a^r) & (b^r) & 0x00008000)
 		m_psw |= FLAG_VF;
-	if((a^b^r) & 0x00010000)
+	if (((a & 0xffff) + (b & 0xffff) + c) & 0x00010000)
 		m_psw |= FLAG_CF;
 	if(r & 0x00008000)
 		m_psw |= FLAG_NF;
@@ -488,33 +488,9 @@ UINT32 mn10200_device::do_add(UINT32 a, UINT32 b)
 	return r & 0xffffff;
 }
 
-UINT32 mn10200_device::do_addc(UINT32 a, UINT32 b)
+UINT32 mn10200_device::do_sub(UINT32 a, UINT32 b, UINT32 c)
 {
-	UINT32 r = (a & 0xffffff) + (b & 0xffffff) + ((m_psw & FLAG_CF) ? 1 : 0);
-
-	m_psw &= 0xff00;
-	if((a^r) & (b^r) & 0x00800000)
-		m_psw |= FLAG_VX;
-	if(r & 0x01000000)
-		m_psw |= FLAG_CX;
-	if(r & 0x00800000)
-		m_psw |= FLAG_NX;
-	if((r & 0x00ffffff) == 0)
-		m_psw |= FLAG_ZX;
-	if((a^r) & (b^r) & 0x00008000)
-		m_psw |= FLAG_VF;
-	if((a^b^r) & 0x00010000)
-		m_psw |= FLAG_CF;
-	if(r & 0x00008000)
-		m_psw |= FLAG_NF;
-	if((r & 0x0000ffff) == 0)
-		m_psw |= FLAG_ZF;
-	return r & 0xffffff;
-}
-
-UINT32 mn10200_device::do_sub(UINT32 a, UINT32 b)
-{
-	UINT32 r = (a & 0xffffff) - (b & 0xffffff);
+	UINT32 r = (a & 0xffffff) - (b & 0xffffff) - c;
 
 	m_psw &= 0xff00;
 	if((a^b) & (a^r) & 0x00800000)
@@ -527,31 +503,7 @@ UINT32 mn10200_device::do_sub(UINT32 a, UINT32 b)
 		m_psw |= FLAG_ZX;
 	if((a^b) & (a^r) & 0x00008000)
 		m_psw |= FLAG_VF;
-	if((a^b^r) & 0x00010000)
-		m_psw |= FLAG_CF;
-	if(r & 0x00008000)
-		m_psw |= FLAG_NF;
-	if((r & 0x0000ffff) == 0)
-		m_psw |= FLAG_ZF;
-	return r & 0xffffff;
-}
-
-UINT32 mn10200_device::do_subc(UINT32 a, UINT32 b)
-{
-	UINT32 r = (a & 0xffffff) - (b & 0xffffff) - ((m_psw & FLAG_CF) ? 1 : 0);
-
-	m_psw &= 0xff00;
-	if((a^b) & (a^r) & 0x00800000)
-		m_psw |= FLAG_VX;
-	if(r & 0x01000000)
-		m_psw |= FLAG_CX;
-	if(r & 0x00800000)
-		m_psw |= FLAG_NX;
-	if((r & 0x00ffffff) == 0)
-		m_psw |= FLAG_ZX;
-	if((a^b) & (a^r) & 0x00008000)
-		m_psw |= FLAG_VF;
-	if((a^b^r) & 0x00010000)
+	if (((a & 0xffff) - (b & 0xffff) - c) & 0x00010000)
 		m_psw |= FLAG_CF;
 	if(r & 0x00008000)
 		m_psw |= FLAG_NF;
@@ -694,7 +646,7 @@ void mn10200_device::execute_run()
 		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
 		case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
 			m_cycles -= 1;
-			m_d[opcode & 3] = do_add(m_d[opcode & 3], m_d[(opcode >> 2) & 3]);
+			m_d[opcode & 3] = do_add(m_d[opcode & 3], m_d[(opcode >> 2) & 3], 0);
 			m_pc += 1;
 			break;
 
@@ -702,7 +654,7 @@ void mn10200_device::execute_run()
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 			m_cycles -= 1;
-			m_d[opcode & 3] = do_sub(m_d[opcode & 3], m_d[(opcode >> 2) & 3]);
+			m_d[opcode & 3] = do_sub(m_d[opcode & 3], m_d[(opcode >> 2) & 3], 0);
 			m_pc += 1;
 			break;
 
@@ -765,21 +717,21 @@ void mn10200_device::execute_run()
 		// add imm8, an
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3:
 			m_cycles -= 1;
-			m_a[opcode & 3] = do_add(m_a[opcode & 3], (INT8)mn102_read_byte(m_pc+1));
+			m_a[opcode & 3] = do_add(m_a[opcode & 3], (INT8)mn102_read_byte(m_pc+1), 0);
 			m_pc += 2;
 			break;
 
 		// add imm8, dn
 		case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 			m_cycles -= 1;
-			m_d[opcode & 3] = do_add(m_d[opcode & 3], (INT8)mn102_read_byte(m_pc+1));
+			m_d[opcode & 3] = do_add(m_d[opcode & 3], (INT8)mn102_read_byte(m_pc+1), 0);
 			m_pc += 2;
 			break;
 
 		// cmp imm8, dn
 		case 0xd8: case 0xd9: case 0xda: case 0xdb:
 			m_cycles -= 1;
-			do_sub(m_d[opcode & 3], (INT8)mn102_read_byte(m_pc+1));
+			do_sub(m_d[opcode & 3], (INT8)mn102_read_byte(m_pc+1), 0);
 			m_pc += 2;
 			break;
 
@@ -947,10 +899,11 @@ void mn10200_device::execute_run()
 		// cmp imm16, an
 		case 0xec: case 0xed: case 0xee: case 0xef:
 			m_cycles -= 1;
-			do_sub(m_a[opcode & 3], mn102_read_word(m_pc+1));
+			do_sub(m_a[opcode & 3], mn102_read_word(m_pc+1), 0);
 			m_pc += 3;
 			break;
 
+		// extended code f0 (2 bytes)
 		case 0xf0:
 			opcode = mn102_read_byte(m_pc+1);
 			switch(opcode) {
@@ -1036,6 +989,7 @@ void mn10200_device::execute_run()
 			}
 			break;
 
+		// extended code f1 (2 bytes)
 		case 0xf1:
 			opcode = mn102_read_byte(m_pc+1);
 			switch(opcode>>6) {
@@ -1066,34 +1020,31 @@ void mn10200_device::execute_run()
 				mn102_write_word((m_a[(opcode>>2) & 3] + m_d[(opcode>>4) & 3]) & 0xffffff, m_d[opcode & 3]);
 				m_pc += 2;
 				break;
-
-				default:
-				unemul();
-				break;
 				}
 			break;
 
+		// extended code f2 (2 bytes)
 		case 0xf2:
 			opcode = mn102_read_byte(m_pc+1);
 			switch(opcode>>4) {
 				// add dm, an
 				case 0x0:
 				m_cycles -= 2;
-				m_a[opcode & 3] = do_add(m_a[opcode & 3], m_d[(opcode>>2) & 3]);
+				m_a[opcode & 3] = do_add(m_a[opcode & 3], m_d[(opcode>>2) & 3], 0);
 				m_pc += 2;
 				break;
 
 				// sub dm, an
 				case 0x1:
 				m_cycles -= 2;
-				m_a[opcode & 3] = do_sub(m_a[opcode & 3], m_d[(opcode>>2) & 3]);
+				m_a[opcode & 3] = do_sub(m_a[opcode & 3], m_d[(opcode>>2) & 3], 0);
 				m_pc += 2;
 				break;
 
 				// cmp dm, an
 				case 0x2:
 				m_cycles -= 2;
-				do_sub(m_a[opcode & 3], m_d[(opcode>>2) & 3]);
+				do_sub(m_a[opcode & 3], m_d[(opcode>>2) & 3], 0);
 				m_pc += 2;
 				break;
 
@@ -1107,21 +1058,21 @@ void mn10200_device::execute_run()
 				// add am, an
 				case 0x4:
 				m_cycles -= 2;
-				m_a[opcode & 3] = do_add(m_a[opcode & 3], m_a[(opcode>>2) & 3]);
+				m_a[opcode & 3] = do_add(m_a[opcode & 3], m_a[(opcode>>2) & 3], 0);
 				m_pc += 2;
 				break;
 
 				// sub am, an
 				case 0x5:
 				m_cycles -= 2;
-				m_a[opcode & 3] = do_sub(m_a[opcode & 3], m_a[(opcode>>2) & 3]);
+				m_a[opcode & 3] = do_sub(m_a[opcode & 3], m_a[(opcode>>2) & 3], 0);
 				m_pc += 2;
 				break;
 
 				// cmp am, an
 				case 0x6:
 				m_cycles -= 2;
-				do_sub(m_a[opcode & 3], m_a[(opcode>>2) & 3]);
+				do_sub(m_a[opcode & 3], m_a[(opcode>>2) & 3], 0);
 				m_pc += 2;
 				break;
 
@@ -1135,35 +1086,35 @@ void mn10200_device::execute_run()
 				// addc dm, dn
 				case 0x8:
 				m_cycles -= 2;
-				m_d[opcode & 3] = do_addc(m_d[opcode & 3], m_d[(opcode>>2) & 3]);
+				m_d[opcode & 3] = do_add(m_d[opcode & 3], m_d[(opcode>>2) & 3], (m_psw & FLAG_CF) ? 1 : 0);
 				m_pc += 2;
 				break;
 
 				// subc dm, dn
 				case 0x9:
 				m_cycles -= 2;
-				m_d[opcode & 3] = do_subc(m_d[opcode & 3], m_d[(opcode>>2) & 3]);
+				m_d[opcode & 3] = do_sub(m_d[opcode & 3], m_d[(opcode>>2) & 3], (m_psw & FLAG_CF) ? 1 : 0);
 				m_pc += 2;
 				break;
 
 				// add am, dn
 				case 0xc:
 				m_cycles -= 2;
-				m_d[opcode & 3] = do_add(m_d[opcode & 3], m_a[(opcode>>2) & 3]);
+				m_d[opcode & 3] = do_add(m_d[opcode & 3], m_a[(opcode>>2) & 3], 0);
 				m_pc += 2;
 				break;
 
 				// sub am, dn
 				case 0xd:
 				m_cycles -= 2;
-				m_d[opcode & 3] = do_sub(m_d[opcode & 3], m_a[(opcode>>2) & 3]);
+				m_d[opcode & 3] = do_sub(m_d[opcode & 3], m_a[(opcode>>2) & 3], 0);
 				m_pc += 2;
 				break;
 
 				// cmp am, dn
 				case 0xe:
 				m_cycles -= 2;
-				do_sub(m_d[opcode & 3], m_a[(opcode>>2) & 3]);
+				do_sub(m_d[opcode & 3], m_a[(opcode>>2) & 3], 0);
 				m_pc += 2;
 				break;
 
@@ -1180,6 +1131,7 @@ void mn10200_device::execute_run()
 				}
 			break;
 
+		// extended code f3 (2 bytes)
 		case 0xf3:
 			opcode = mn102_read_byte(m_pc+1);
 			switch(opcode) {
@@ -1322,7 +1274,7 @@ void mn10200_device::execute_run()
 				case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
 				case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
 				m_cycles -= 2;
-				do_sub(m_d[opcode & 3], m_d[(opcode>>2) & 3]);
+				do_sub(m_d[opcode & 3], m_d[(opcode>>2) & 3], 0);
 				m_pc += 2;
 				break;
 
@@ -1374,6 +1326,7 @@ void mn10200_device::execute_run()
 				}
 			break;
 
+		// extended code f4 (5 bytes)
 		case 0xf4:
 			opcode = mn102_read_byte(m_pc+1);
 			switch(opcode) {
@@ -1433,28 +1386,28 @@ void mn10200_device::execute_run()
 				// add abs24, dn
 				case 0x60: case 0x61: case 0x62: case 0x63:
 				m_cycles -= 3;
-				m_d[opcode & 3] = do_add(m_d[opcode & 3], r24u(m_pc+2));
+				m_d[opcode & 3] = do_add(m_d[opcode & 3], r24u(m_pc+2), 0);
 				m_pc += 5;
 				break;
 
 				// add abs24, an
 				case 0x64: case 0x65: case 0x66: case 0x67:
 				m_cycles -= 3;
-				m_a[opcode & 3] = do_add(m_a[opcode & 3], r24u(m_pc+2));
+				m_a[opcode & 3] = do_add(m_a[opcode & 3], r24u(m_pc+2), 0);
 				m_pc += 5;
 				break;
 
 				// sub abs24, dn
 				case 0x68: case 0x69: case 0x6a: case 0x6b:
 				m_cycles -= 3;
-				m_d[opcode & 3] = do_sub(m_d[opcode & 3], r24u(m_pc+2));
+				m_d[opcode & 3] = do_sub(m_d[opcode & 3], r24u(m_pc+2), 0);
 				m_pc += 5;
 				break;
 
 				// sub abs24, an
 				case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 				m_cycles -= 3;
-				m_a[opcode & 3] = do_sub(m_a[opcode & 3], r24u(m_pc+2));
+				m_a[opcode & 3] = do_sub(m_a[opcode & 3], r24u(m_pc+2), 0);
 				m_pc += 5;
 				break;
 
@@ -1475,14 +1428,14 @@ void mn10200_device::execute_run()
 				// cmp abs24, dn
 				case 0x78: case 0x79: case 0x7a: case 0x7b:
 				m_cycles -= 3;
-				do_sub(m_d[opcode & 3], r24u(m_pc+2));
+				do_sub(m_d[opcode & 3], r24u(m_pc+2), 0);
 				m_pc += 5;
 				break;
 
 				// cmp abs24, an
 				case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 				m_cycles -= 3;
-				do_sub(m_a[opcode & 3], r24u(m_pc+2));
+				do_sub(m_a[opcode & 3], r24u(m_pc+2), 0);
 				m_pc += 5;
 				break;
 
@@ -1572,6 +1525,7 @@ void mn10200_device::execute_run()
 				}
 			break;
 
+		// extended code f5 (3 bytes)
 		case 0xf5:
 			opcode = mn102_read_byte(m_pc+1);
 			switch(opcode) {
@@ -1803,6 +1757,13 @@ void mn10200_device::execute_run()
 				}
 			break;
 
+		// nop
+		case 0xf6:
+			m_cycles -= 1;
+			m_pc += 1;
+			break;
+
+		// extended code f7 (4 bytes)
 		case 0xf7:
 			opcode = mn102_read_byte(m_pc+1);
 			switch(opcode) {
@@ -1823,14 +1784,14 @@ void mn10200_device::execute_run()
 				// add imm16, an
 				case 0x08: case 0x09: case 0x0a: case 0x0b:
 				m_cycles -= 2;
-				m_a[opcode & 3] = do_add(m_a[opcode & 3], (INT16)mn102_read_word(m_pc+2));
+				m_a[opcode & 3] = do_add(m_a[opcode & 3], (INT16)mn102_read_word(m_pc+2), 0);
 				m_pc += 4;
 				break;
 
 				// sub imm16, an
 				case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 				m_cycles -= 2;
-				m_a[opcode & 3] = do_sub(m_a[opcode & 3], (INT16)mn102_read_word(m_pc+2));
+				m_a[opcode & 3] = do_sub(m_a[opcode & 3], (INT16)mn102_read_word(m_pc+2), 0);
 				m_pc += 4;
 				break;
 
@@ -1851,14 +1812,14 @@ void mn10200_device::execute_run()
 				// add imm16, dn
 				case 0x18: case 0x19: case 0x1a: case 0x1b:
 				m_cycles -= 2;
-				m_d[opcode & 3] = do_add(m_d[opcode & 3], (INT16)mn102_read_word(m_pc+2));
+				m_d[opcode & 3] = do_add(m_d[opcode & 3], (INT16)mn102_read_word(m_pc+2), 0);
 				m_pc += 4;
 				break;
 
 				// sub imm16, dn
 				case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 				m_cycles -= 2;
-				m_d[opcode & 3] = do_sub(m_d[opcode & 3], (INT16)mn102_read_word(m_pc+2));
+				m_d[opcode & 3] = do_sub(m_d[opcode & 3], (INT16)mn102_read_word(m_pc+2), 0);
 				m_pc += 4;
 				break;
 
@@ -1872,7 +1833,7 @@ void mn10200_device::execute_run()
 				// cmp imm16, dn
 				case 0x48: case 0x49: case 0x4a: case 0x4b:
 				m_cycles -= 2;
-				do_sub(m_d[opcode & 3], (INT16)mn102_read_word(m_pc+2));
+				do_sub(m_d[opcode & 3], (INT16)mn102_read_word(m_pc+2), 0);
 				m_pc += 4;
 				break;
 

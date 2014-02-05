@@ -149,10 +149,8 @@ private:
 	void timer_tick_simple(int tmr);
 	TIMER_CALLBACK_MEMBER( simple_timer_cb );
 	void unemul();
-	UINT32 do_add(UINT32 a, UINT32 b);
-	UINT32 do_addc(UINT32 a, UINT32 b);
-	UINT32 do_sub(UINT32 a, UINT32 b);
-	UINT32 do_subc(UINT32 a, UINT32 b);
+	UINT32 do_add(UINT32 a, UINT32 b, UINT32 c);
+	UINT32 do_sub(UINT32 a, UINT32 b, UINT32 c);
 	void test_nz16(UINT16 v);
 	void do_jsr(UINT32 to, UINT32 ret);
 	void mn10200_w(UINT32 adr, UINT32 data, int type);
