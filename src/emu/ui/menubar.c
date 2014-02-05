@@ -61,6 +61,9 @@ ui_menubar::ui_menubar(running_machine &machine)
 	m_active_item = NULL;
 	m_dragged = false;
 	m_checkmark_width = -1;
+	m_mouse_x = -1;
+	m_mouse_y = -1;
+	m_mouse_button = false;
 }
 
 
@@ -110,9 +113,6 @@ void ui_menubar::handle(render_container *current_container)
 
 	// reset screen locations of all menu items
 	m_menus.clear_area_recursive();
-
-	// find out where the mouse is
-	find_mouse(m_mouse_x, m_mouse_y, m_mouse_button);
 
 	// calculate visibility of the menubar
 	m_menubar_visibility = get_menubar_visibility();
@@ -172,6 +172,7 @@ bool ui_menubar::event_loop()
 	if (ui_input_pop_event(machine(), &local_menu_event))
 	{
 		// find the menu item we're pointing at
+		find_mouse(m_mouse_x, m_mouse_y, m_mouse_button);
 		menu_item *mi = m_menus.find_point(m_mouse_x, m_mouse_y);
 
 		switch (local_menu_event.event_type)
@@ -190,7 +191,7 @@ bool ui_menubar::event_loop()
 				m_last_mouse_move = osd_ticks();
 
 				// moving is only interesting if we have an active menu selection
-				if (m_active_item != NULL)
+				if (m_mouse_button && m_active_item != NULL)
 				{
 					// are we changing the active menu item?
 					if (m_active_item != mi)

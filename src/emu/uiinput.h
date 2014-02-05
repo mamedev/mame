@@ -110,7 +110,6 @@ INLINE void ui_input_push_mouse_move_event(running_machine &machine, render_targ
     ui_input_push_mouse_leave_event - pushes a
     mouse leave event to the specified render_target
 -------------------------------------------------*/
-
 INLINE void ui_input_push_mouse_leave_event(running_machine &machine, render_target *target)
 {
 	ui_event event = { UI_EVENT_NONE };
