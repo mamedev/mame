@@ -190,9 +190,20 @@ $9C00 to $9FFF 1k empty space (39936 to 40959)
 
 <!-- Homebrew -->
 
+	<software name="chardump" supported="yes">
+		<description>Character Dump</description>
+		<year>2010</year>
+		<publisher>Adam Trionfo</publisher>
+		<part name="cart" interface="apfm1000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="chardump.bin" size="4096" crc="27bd1c3c" sha1="826b608b6c33798942bd716928eef70cc8e83bda" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="columns" supported="no">
 		<description>Columns / Targets / Bacteria / Autopista</description>
-		<year>????</year>
+		<year>1995</year>
 		<publisher>Enrique Collado</publisher>
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="4096">
@@ -201,13 +212,35 @@ $9C00 to $9FFF 1k empty space (39936 to 40959)
 		</part>
 	</software>
 
-	<software name="movblock" supported="no">
+	<software name="movblock" supported="yes">
 		<description>Move Block</description>
 		<year>2010</year>
 		<publisher>Adam Trionfo</publisher>
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="movblock.bin" size="4096" crc="f77f72f4" sha1="2cf3a82d584b2a2e4c7e5ae751da8d0255c2295a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mblock02" supported="yes">
+		<description>Move Block 2</description>
+		<year>2010</year>
+		<publisher>Adam Trionfo</publisher>
+		<part name="cart" interface="apfm1000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="mblock02.bin" size="4096" crc="cf63865a" sha1="8c8e6924ab511d69a31eb52faaaad5efb7888f33" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="readpia" supported="yes">
+		<description>Read PIA</description>
+		<year>2010</year>
+		<publisher>Adam Trionfo</publisher>
+		<part name="cart" interface="apfm1000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="readpia.bin" size="4096" crc="700c1e39" sha1="701c4f8a9fc20c8f28a5c0562592ed873d9d9ab4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
