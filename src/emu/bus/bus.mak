@@ -250,6 +250,7 @@ ifneq ($(filter IEEE488,$(BUSES)),)
 BUSOBJS += $(BUSOBJ)/ieee488/ieee488.o
 BUSOBJS += $(BUSOBJ)/ieee488/c2031.o
 BUSOBJS += $(BUSOBJ)/ieee488/c2040.o
+BUSOBJS += $(BUSOBJ)/ieee488/c2040fdc.o
 BUSOBJS += $(BUSOBJ)/ieee488/c8280.o
 BUSOBJS += $(BUSOBJ)/ieee488/d9060.o
 BUSOBJS += $(BUSOBJ)/ieee488/d9060hd.o

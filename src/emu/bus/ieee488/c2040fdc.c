@@ -1,0 +1,626 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+/**********************************************************************
+
+    Commodore 2040 floppy disk controller emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
+/*
+
+	TODO:
+
+	- writing (write sr shifted before write starts)
+	- 8050 PLL
+
+*/
+
+#include "c2040fdc.h"
+
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 0
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type C2040_FDC = &device_creator<c2040_fdc_t>;
+const device_type C8050_FDC = &device_creator<c8050_fdc_t>;
+
+
+//-------------------------------------------------
+//  ROM( c2040_fdc )
+//-------------------------------------------------
+
+ROM_START( c2040_fdc )
+	ROM_REGION( 0x800, "gcr", 0)
+	ROM_LOAD( "901467.uk6", 0x000, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c2040_fdc_t::device_rom_region() const
+{
+	return ROM_NAME( c2040_fdc );
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  c2040_fdc_t - constructor
+//-------------------------------------------------
+
+c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) : 
+	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+	m_read_pi(*this),
+	m_write_sync(*this),
+	m_write_ready(*this),
+	m_write_error(*this),
+	m_gcr_rom(*this, "gcr"),
+	m_floppy0(NULL),
+	m_floppy1(NULL),
+	m_mtr0(1),
+	m_mtr1(1),
+	m_stp0(0),
+	m_stp1(0),
+	m_ds(0),
+	m_drv_sel(0),
+	m_mode_sel(0),
+	m_rw_sel(0),
+	m_period(attotime::from_hz(clock))
+{
+}
+
+c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : 
+	device_t(mconfig, C2040_FDC, "C2040 FDC", tag, owner, clock, "c2040fdc", __FILE__),
+	m_read_pi(*this),
+	m_write_sync(*this),
+	m_write_ready(*this),
+	m_write_error(*this),
+	m_gcr_rom(*this, "gcr"),
+	m_floppy0(NULL),
+	m_floppy1(NULL),
+	m_mtr0(1),
+	m_mtr1(1),
+	m_stp0(0),
+	m_stp1(0),
+	m_ds(0),
+	m_drv_sel(0),
+	m_mode_sel(0),
+	m_rw_sel(0),
+	m_period(attotime::from_hz(clock))
+{
+}
+
+c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : 
+	c2040_fdc_t(mconfig, C2040_FDC, "C2040 FDC", tag, owner, clock, "c2040fdc", __FILE__) { }
+
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void c2040_fdc_t::device_start()
+{
+	// resolve callbacks
+	m_read_pi.resolve_safe(0);
+	m_write_sync.resolve_safe();
+	m_write_ready.resolve_safe();
+	m_write_error.resolve_safe();
+
+	// allocate timer
+	t_gen = timer_alloc(0);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void c2040_fdc_t::device_reset()
+{
+	live_abort();
+}
+
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void c2040_fdc_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	live_sync();
+	live_run();
+}
+
+floppy_image_device* c2040_fdc_t::get_floppy()
+{
+	return cur_live.drv_sel ? m_floppy1 : m_floppy0;
+}
+
+void c2040_fdc_t::live_start()
+{
+	cur_live.tm = machine().time();
+	cur_live.state = RUNNING;
+	cur_live.next_state = -1;
+
+	cur_live.shift_reg = 0;
+	cur_live.shift_reg_write = 0;
+	cur_live.cycle_counter = 0;
+	cur_live.cell_counter = 0;
+	cur_live.bit_counter = 0;
+	cur_live.ds = m_ds;
+	cur_live.drv_sel = m_drv_sel;
+	cur_live.mode_sel = m_mode_sel;
+	cur_live.rw_sel = m_rw_sel;
+
+	checkpoint_live = cur_live;
+
+	live_run();
+}
+
+void c2040_fdc_t::checkpoint()
+{
+	checkpoint_live = cur_live;
+}
+
+void c2040_fdc_t::rollback()
+{
+	cur_live = checkpoint_live;
+	get_next_edge(cur_live.tm);
+}
+
+void c2040_fdc_t::start_writing(attotime tm)
+{
+	cur_live.write_start_time = tm;
+	cur_live.write_position = 0;
+}
+
+void c2040_fdc_t::stop_writing(attotime tm)
+{
+	commit(tm);
+	cur_live.write_start_time = attotime::never;
+}
+
+bool c2040_fdc_t::write_next_bit(bool bit, attotime limit)
+{
+	if(cur_live.write_start_time.is_never()) {
+		cur_live.write_start_time = cur_live.tm;
+		cur_live.write_position = 0;
+	}
+
+	attotime etime = cur_live.tm + m_period;
+	if(etime > limit)
+		return true;
+
+	if(bit && cur_live.write_position < ARRAY_LENGTH(cur_live.write_buffer))
+		cur_live.write_buffer[cur_live.write_position++] = cur_live.tm;
+
+	return false;
+}
+
+void c2040_fdc_t::commit(attotime tm)
+{
+	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
+		return;
+
+	if(get_floppy())
+		get_floppy()->write_flux(cur_live.write_start_time, tm, cur_live.write_position, cur_live.write_buffer);
+	cur_live.write_start_time = tm;
+	cur_live.write_position = 0;
+}
+
+void c2040_fdc_t::live_delay(int state)
+{
+	cur_live.next_state = state;
+	if(cur_live.tm != machine().time())
+		t_gen->adjust(cur_live.tm - machine().time());
+	else
+		live_sync();
+}
+
+void c2040_fdc_t::live_sync()
+{
+	if(!cur_live.tm.is_never()) {
+		if(cur_live.tm > machine().time()) {
+			rollback();
+			live_run(machine().time());
+			commit(cur_live.tm);
+		} else {
+			commit(cur_live.tm);
+			if(cur_live.next_state != -1) {
+				cur_live.state = cur_live.next_state;
+				cur_live.next_state = -1;
+			}
+			if(cur_live.state == IDLE) {
+				stop_writing(cur_live.tm);
+				cur_live.tm = attotime::never;
+			}
+		}
+		cur_live.next_state = -1;
+		checkpoint();
+	}
+}
+
+void c2040_fdc_t::live_abort()
+{
+	if(!cur_live.tm.is_never() && cur_live.tm > machine().time()) {
+		rollback();
+		live_run(machine().time());
+	}
+
+	stop_writing(cur_live.tm);
+
+	cur_live.tm = attotime::never;
+	cur_live.state = IDLE;
+	cur_live.next_state = -1;
+	cur_live.write_position = 0;
+	cur_live.write_start_time = attotime::never;
+
+	cur_live.ready = 1;
+	cur_live.sync = 1;
+	cur_live.error = 1;
+}
+
+void c2040_fdc_t::live_run(attotime limit)
+{
+	if(cur_live.state == IDLE || cur_live.next_state != -1)
+		return;
+
+	for(;;) {
+		switch(cur_live.state) {
+		case RUNNING: {
+			bool syncpoint = false;
+
+			int bit = get_next_bit(cur_live.tm, limit);
+			if(bit < 0)
+				return;
+
+			int cell_counter = cur_live.cell_counter;
+
+			if (bit) {
+				cur_live.cycle_counter = cur_live.ds;
+				cur_live.cell_counter = 0;
+			} else {
+				cur_live.cycle_counter++;
+			}
+
+			if (cur_live.cycle_counter == 16) {
+				cur_live.cycle_counter = cur_live.ds;
+
+				cur_live.cell_counter++;
+				cur_live.cell_counter &= 0xf;
+			}
+			
+			int ready = cur_live.ready;
+			
+			if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1)) {
+				// read bit
+				cur_live.shift_reg <<= 1;
+				cur_live.shift_reg |= !(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2));
+				cur_live.shift_reg &= 0x3ff;
+
+				// write bit
+				if (!cur_live.rw_sel) {
+					write_next_bit(BIT(cur_live.shift_reg_write, 9), limit);
+				cur_live.shift_reg_write <<= 1;
+				cur_live.shift_reg_write &= 0x3ff;
+				}
+
+				// update bit counter
+				if ((cur_live.shift_reg == 0x3ff) && cur_live.rw_sel) {
+					cur_live.bit_counter = 0;
+				} else {
+					cur_live.bit_counter++;
+					if (cur_live.bit_counter == 10) {
+						cur_live.bit_counter = 0;
+						ready = 0;
+					} else {
+						ready = 1;
+					}
+				}
+			}
+
+			// update GCR
+			if (cur_live.rw_sel) {
+				cur_live.i = (cur_live.rw_sel << 10) | cur_live.shift_reg;
+			} else {
+				cur_live.i = (cur_live.rw_sel << 10) | ((cur_live.pi & 0xf0) << 1) | (cur_live.mode_sel << 4) | (cur_live.pi & 0x0f);
+			}
+
+			cur_live.e = m_gcr_rom->base()[cur_live.i];
+	
+			// load write shift register
+			if (!ready) {
+				// E7 E6 I7 E5 E4 E3 E2 I2 E1 E0
+				UINT8 e = cur_live.e;
+				offs_t i = cur_live.i;
+
+				cur_live.shift_reg_write = BIT(e,7)<<9 | BIT(e,6)<<8 | BIT(i,7)<<7 | BIT(e,5)<<6 | BIT(e,4)<<5 | BIT(e,3)<<4 | BIT(e,2)<<3 | BIT(i,2)<<2 | (e & 0x03);
+			}
+
+			// update signals
+			int sync = !((cur_live.shift_reg == 0x3ff) && cur_live.rw_sel);
+			int error = !(BIT(cur_live.e, 3) || ready);
+
+			if (ready != cur_live.ready) {
+				cur_live.ready = ready;
+				syncpoint = true;
+			}
+
+			if (sync != cur_live.sync) {
+				cur_live.sync = sync;
+				syncpoint = true;
+			}
+
+			if (error != cur_live.error) {
+				cur_live.error = error;
+				syncpoint = true;
+			}
+
+			if (syncpoint) {
+				commit(cur_live.tm);
+				live_delay(RUNNING_SYNCPOINT);
+				return;
+			}
+			break;
+		}
+
+		case RUNNING_SYNCPOINT: {
+			cur_live.pi = m_read_pi(0);
+			m_write_ready(cur_live.ready);
+			m_write_sync(cur_live.sync);
+			m_write_error(cur_live.error);
+
+			cur_live.state = RUNNING;
+			checkpoint();
+			break;
+		}
+		}
+	}
+}
+
+void c2040_fdc_t::get_next_edge(attotime when)
+{
+	floppy_image_device *floppy = get_floppy();
+
+	m_edge = floppy ? floppy->get_next_transition(when) : attotime::never;
+}
+
+int c2040_fdc_t::get_next_bit(attotime &tm, attotime limit)
+{
+/*	floppy_image_device *floppy = cur_live.drv_sel ? m_floppy1 : m_floppy0;
+
+	attotime edge = floppy ? floppy->get_next_transition(tm) : attotime::never;*/
+	attotime edge = m_edge;
+	attotime next = tm + m_period;
+
+	tm = next;
+
+	int bit = (edge.is_never() || edge >= next) ? 0 : 1;
+
+	if (bit) {
+		get_next_edge(tm);
+	}
+
+	return bit && cur_live.rw_sel;
+}
+
+READ8_MEMBER( c2040_fdc_t::read )
+{
+	UINT8 e = checkpoint_live.e;
+	offs_t i = checkpoint_live.i;
+
+	return (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x33) | (BIT(e, 2) << 3) | (i & 0x04);
+}
+
+WRITE8_MEMBER( c2040_fdc_t::write )
+{
+	live_sync();
+	cur_live.pi = data;
+	live_run();
+}
+
+WRITE_LINE_MEMBER( c2040_fdc_t::drv_sel_w )
+{
+	if (m_drv_sel != state)
+	{
+		live_sync();
+		m_drv_sel = cur_live.drv_sel = state;
+		get_next_edge(machine().time());
+		live_run();
+	}
+}
+
+WRITE_LINE_MEMBER( c2040_fdc_t::mode_sel_w )
+{
+	if (m_mode_sel != state)
+	{
+		live_sync();
+		m_mode_sel = cur_live.mode_sel = state;
+		live_run();
+	}
+}
+
+WRITE_LINE_MEMBER( c2040_fdc_t::rw_sel_w )
+{
+	if (m_rw_sel != state)
+	{
+		live_sync();
+		m_rw_sel = cur_live.rw_sel = state;
+		if (state)
+			stop_writing(machine().time());
+		live_run();
+	}
+}
+
+WRITE_LINE_MEMBER( c2040_fdc_t::mtr0_w )
+{
+	if (m_mtr0 != state)
+	{
+		live_sync();
+		m_mtr0 = state;
+		m_floppy0->mon_w(state);
+		get_next_edge(machine().time());
+
+		if (!m_mtr0 || !m_mtr1) {
+			if(cur_live.state == IDLE) {
+				live_start();
+			}
+		} else {
+			live_abort();
+		}
+
+		live_run();
+	}
+}
+
+WRITE_LINE_MEMBER( c2040_fdc_t::mtr1_w )
+{
+	if (m_mtr1 != state)
+	{
+		live_sync();
+		m_mtr1 = state;
+		if (m_floppy1) m_floppy1->mon_w(state);
+		get_next_edge(machine().time());
+
+		if (!m_mtr0 || !m_mtr1) {
+			if(cur_live.state == IDLE) {
+				live_start();
+			}
+		} else {
+			live_abort();
+		}
+
+		live_run();
+	}
+}
+
+WRITE_LINE_MEMBER( c2040_fdc_t::odd_hd_w )
+{
+	if (m_odd_hd != state)
+	{
+		live_sync();
+		m_odd_hd = cur_live.odd_hd = state;
+		m_floppy0->ss_w(!state);
+		if (m_floppy1) m_floppy1->ss_w(!state);
+		get_next_edge(machine().time());
+		live_run();
+	}
+}
+
+void c2040_fdc_t::stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp)
+{
+	if (mtr) return;
+
+	int tracks = 0;
+
+	switch (old_stp)
+	{
+	case 0: if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+	case 1: if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+	case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
+	case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
+	}
+
+	if (tracks == -1)
+	{
+		floppy->dir_w(1);
+		floppy->stp_w(1);
+		floppy->stp_w(0);
+	}
+	else if (tracks == 1)
+	{
+		floppy->dir_w(0);
+		floppy->stp_w(1);
+		floppy->stp_w(0);
+	}
+
+	old_stp = stp;
+}
+
+void c8050_fdc_t::stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp)
+{
+	if (mtr) return;
+
+	int tracks = 0;
+
+	switch (old_stp)
+	{
+	case 0: if (stp == 1) tracks++; else if (stp == 2) tracks--; break;
+	case 1: if (stp == 3) tracks++; else if (stp == 0) tracks--; break;
+	case 2: if (stp == 0) tracks++; else if (stp == 3) tracks--; break;
+	case 3: if (stp == 2) tracks++; else if (stp == 1) tracks--; break;
+	}
+
+	if (tracks == -1)
+	{
+		floppy->dir_w(1);
+		floppy->stp_w(1);
+		floppy->stp_w(0);
+	}
+	else if (tracks == 1)
+	{
+		floppy->dir_w(0);
+		floppy->stp_w(1);
+		floppy->stp_w(0);
+	}
+
+	old_stp = stp;
+}
+
+void c2040_fdc_t::stp0_w(int stp)
+{
+	if (m_stp0 != stp)
+	{
+		live_sync();
+		this->stp_w(m_floppy0, m_mtr0, m_stp0, stp);
+		get_next_edge(machine().time());
+		live_run();
+	}
+}
+
+void c2040_fdc_t::stp1_w(int stp)
+{
+	if (m_stp1 != stp)
+	{
+		live_sync();
+		if (m_floppy1) this->stp_w(m_floppy1, m_mtr1, m_stp1, stp);
+		get_next_edge(machine().time());
+		live_run();
+	}
+}
+
+void c2040_fdc_t::ds_w(int ds)
+{
+	if (m_ds != ds)
+	{
+		live_sync();
+		m_ds = cur_live.ds = ds;
+		live_run();
+	}
+}
+
+void c2040_fdc_t::set_floppy(floppy_image_device *floppy0, floppy_image_device *floppy1)
+{
+	m_floppy0 = floppy0;
+	m_floppy1 = floppy1;
+}

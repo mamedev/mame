@@ -41,7 +41,7 @@ const d80_format::format d80_format::file_formats[] = {
 	{}
 };
 
-const UINT32 d80_format::cell_size[] =
+const UINT32 d80_format::d80_cell_size[] =
 {
 	2667, // 12MHz/16/2
 	2500, // 12MHz/15/2
@@ -49,7 +49,7 @@ const UINT32 d80_format::cell_size[] =
 	2167  // 12MHz/13/2
 };
 
-const int d80_format::sectors_per_track[] =
+const int d80_format::d80_sectors_per_track[] =
 {
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, //  1-39
 	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
@@ -59,7 +59,7 @@ const int d80_format::sectors_per_track[] =
 	23, 23, 23, 23, 23, 23, 23                                                      // 78-84
 };
 
-const int d80_format::speed_zone[] =
+const int d80_format::d80_speed_zone[] =
 {
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, //  1-39
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
@@ -76,12 +76,12 @@ int d80_format::get_physical_track(const format &f, int head, int track)
 
 UINT32 d80_format::get_cell_size(const format &f, int track)
 {
-	return cell_size[speed_zone[track]];
+	return d80_cell_size[speed_zone[track]];
 }
 
 int d80_format::get_sectors_per_track(const format &f, int track)
 {
-	return sectors_per_track[track];
+	return d80_sectors_per_track[track];
 }
 
 int d80_format::get_disk_id_offset(const format &f)

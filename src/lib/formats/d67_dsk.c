@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "formats/d67_dsk.h"
 
-d67_format::d67_format() : d64_format(formats)
+d67_format::d67_format() : d64_format(file_formats)
 {
 }
 
@@ -30,14 +30,14 @@ const char *d67_format::extensions() const
 	return "d67";
 }
 
-const d67_format::format d67_format::formats[] = {
+const d67_format::format d67_format::file_formats[] = {
 	{ // d67, dos 1, 35 tracks, head 48 tpi, stepper 96 tpi
 		floppy_image::FF_525, floppy_image::SSSD, 690, 35, 1, 256, 9, 8
 	},
 	{}
 };
 
-const int d67_format::sectors_per_track[] =
+const int d67_format::d67_sectors_per_track[] =
 {
 	21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, 21, //  1-17
 	20, 20, 20, 20, 20, 20, 20,                                         // 18-24
@@ -49,7 +49,7 @@ const int d67_format::sectors_per_track[] =
 
 int d67_format::get_sectors_per_track(const format &f, int track)
 {
-	return sectors_per_track[track];
+	return d67_sectors_per_track[track];
 }
 
 const floppy_format_type FLOPPY_D67_FORMAT = &floppy_image_format_creator<d67_format>;
