@@ -164,7 +164,7 @@ private:
 	UINT32 do_sub(UINT32 a, UINT32 b, UINT32 c);
 	void test_nz16(UINT16 v);
 	void do_jsr(UINT32 to, UINT32 ret);
-	void do_branch(int offset, bool state);
+	void do_branch(bool state);
 };
 
 
