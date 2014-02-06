@@ -142,8 +142,8 @@
           - All games using the blue TAB PCB with 2x HY18CV85 (electrically-erasable PLDs), use
              complex operations for each byte nibble. See DRIVER_INIT for the final algorithm.
           - Saloon (french) use bitswaps to address & data in program, graphics and color PROM.
-          - Dino4 hardware games have address/data bitswap in program, data bitswap (sometimes
-           	 with extra boolean XOR operations)
+          - Dino4 hardware games have address/data bitswap in program, and data bitswap (sometimes
+           	 with extra boolean XOR operations) in graphics.
 
   - Microcontroller. Some games are using an extra microcontroller mainly for protection.
 
