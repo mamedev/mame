@@ -419,6 +419,22 @@
   48E5: 05 B7      ORA $B7     ;/
   48E7: 4C 05 76   JMP $7605   ; jump to $7605 (no code there)
   
+  and the IRQ vector pointed code...
+  
+  C20F: 40         RTI         ; return from interrupt
+  
+  and the code pointed from $0000...
+  
+  C210: 48         PHA         ; transfer accumulator to stack
+  C211: AD 01 0A   LDA $0A01   ; read the PIA #2 input
+  C214: 29 F7      AND #$F7    ; \ compare with 0xF7
+  C216: CD 01 0A   CMP $0A01   ; /
+  C219: D0 02      BNE $C21D   ; if not... jump to $C21D
+  C21B: 09 08      ORA #$08    ; \ clean the value
+  C21D: 8D 01 0A   STA $0A01   ; /
+  C220: 68         PLA         ; take out from the stack the previous accumulator value
+  C221: 40         RTI         ; return from interrupt
+
   The board was later tested with a fluke, and the code dumped from the real hardware,
   match 100% the one I decrypted here. Even with the game working properly in the real
   hardware. The only visible changes are in the NVRAM, where the $0000 offset hasn't
@@ -427,7 +443,7 @@
   Maybe some scrambled instructions on the fatidic 'mexican' Rockwell R65C02 (like Magic Card II)??...
   Maybe mnemonic 93 is AXA (ab),Y (93 ab) instead of NOP (as some sources said)??...
 
-  Tooo much obscure / darkness here
+  Tooo much obscure/darkness here
   
   So... No idea what's wrong here.
   If someone could figure a possible transform, please let me know.
