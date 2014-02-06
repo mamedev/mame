@@ -57,7 +57,7 @@ static const nes_mmc mmc_list[] =
 	{ 25, KONAMI_VRC4 },
 	{ 26, KONAMI_VRC6 },
 	{ 27, UNL_WORLDHERO },	// 27 World Hero board - Unsupported
-	// 28 Unused
+	{ 28, BTL_ACTION53 },	// 28 - Multi-discrete PCB designed by Tepples for Action 53
 	// 29 Unused
 	// 30 Unused
 	// 31 Unused
