@@ -148,8 +148,9 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf1_tile_info)
 			tile_number,
 			color,
 			0);
-	if (m_pf1_tilevram16[2*tile_index+1] & 0x8000) tileinfo.pen_data = m_empty_tile;
-	tileinfo.category = (attrib & 0xf000) >> 12;
+	// "disabled" tiles are behind everything else
+	if (m_pf1_tilevram16[2*tile_index+1] & 0x8000) tileinfo.category = 16;
+		else tileinfo.category = (attrib & 0xf000) >> 12;
 }
 
 TILE_GET_INFO_MEMBER(toaplan1_state::get_pf2_tile_info)
@@ -164,8 +165,9 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf2_tile_info)
 			tile_number,
 			color,
 			0);
-	if (m_pf2_tilevram16[2*tile_index+1] & 0x8000) tileinfo.pen_data = m_empty_tile;
-	tileinfo.category = (attrib & 0xf000) >> 12;
+	// "disabled" tiles are behind everything else
+	if (m_pf2_tilevram16[2*tile_index+1] & 0x8000) tileinfo.category = 16;
+		else tileinfo.category = (attrib & 0xf000) >> 12;
 }
 
 TILE_GET_INFO_MEMBER(toaplan1_state::get_pf3_tile_info)
@@ -180,8 +182,9 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf3_tile_info)
 			tile_number,
 			color,
 			0);
-	if (m_pf3_tilevram16[2*tile_index+1] & 0x8000) tileinfo.pen_data = m_empty_tile;
-	tileinfo.category = (attrib & 0xf000) >> 12;
+	// "disabled" tiles are behind everything else
+	if (m_pf3_tilevram16[2*tile_index+1] & 0x8000) tileinfo.category = 16;
+		else tileinfo.category = (attrib & 0xf000) >> 12;
 }
 
 TILE_GET_INFO_MEMBER(toaplan1_state::get_pf4_tile_info)
@@ -196,8 +199,9 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf4_tile_info)
 			tile_number,
 			color,
 			0);
-	if (m_pf4_tilevram16[2*tile_index+1] & 0x8000) tileinfo.pen_data = m_empty_tile;
-	tileinfo.category = (attrib & 0xf000) >> 12;
+	// "disabled" tiles are behind everything else
+	if (m_pf4_tilevram16[2*tile_index+1] & 0x8000) tileinfo.category = 16;
+		else tileinfo.category = (attrib & 0xf000) >> 12;
 }
 
 /***************************************************************************
@@ -217,11 +221,6 @@ void toaplan1_state::toaplan1_create_tilemaps()
 	m_pf2_tilemap->set_transparent_pen(0);
 	m_pf3_tilemap->set_transparent_pen(0);
 	m_pf4_tilemap->set_transparent_pen(0);
-	
-	m_pf1_tilemap->set_scrolldy(0, 0x100); m_pf1_tilemap->set_scrolldx(0, -0x28);
-	m_pf2_tilemap->set_scrolldy(0, 0x100); m_pf2_tilemap->set_scrolldx(0, -0x28);
-	m_pf3_tilemap->set_scrolldy(0, 0x100); m_pf3_tilemap->set_scrolldx(0, -0x28);
-	m_pf4_tilemap->set_scrolldy(0, 0x100); m_pf4_tilemap->set_scrolldx(0, -0x28);
 
 	memset(m_empty_tile, 0x00, sizeof(m_empty_tile));
 }
@@ -1076,13 +1075,12 @@ UINT32 toaplan1_rallybik_state::screen_update_rallybik(screen_device &screen, bi
 
 	toaplan1_log_vram();
 
-	bitmap.fill(0x120, cliprect);
 	m_spritegen->draw_sprites_to_tempbitmap(cliprect, m_buffered_spriteram,  m_spriteram.bytes());
 
+	// first draw everything, including "disabled" tiles and priority 0
+	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
-	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 0);
-	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);
-
+	// then draw the higher priority layers in order
 	for (priority = 1; priority < 16; priority++)
 	{
 		m_pf4_tilemap->draw(screen, bitmap, cliprect, priority, 0);
@@ -1107,12 +1105,11 @@ UINT32 toaplan1_state::screen_update_toaplan1(screen_device &screen, bitmap_ind1
 	toaplan1_log_vram();
 
 	screen.priority().fill(0, cliprect);
-	bitmap.fill(0x120, cliprect);
 
-// it's really correct?
-	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 0);
-	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);
+	// first draw everything, including "disabled" tiles and priority 0
+	m_pf1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
+	// then draw the higher priority layers in order
 	for (priority = 1; priority < 16; priority++)
 	{
 		m_pf4_tilemap->draw(screen, bitmap, cliprect, priority, priority, 0);
