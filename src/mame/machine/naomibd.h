@@ -24,7 +24,6 @@ public:
 	DECLARE_WRITE16_MEMBER(rom_data_w);             // 5f7008
 	DECLARE_WRITE16_MEMBER(dma_offseth_w);          // 5f700c
 	DECLARE_WRITE16_MEMBER(dma_offsetl_w);          // 5f7010
-	DECLARE_READ16_MEMBER(actel_r);					// 5f7014
 	DECLARE_WRITE16_MEMBER(dma_count_w);            // 5f7014
 
 	DECLARE_WRITE16_MEMBER(boardid_w);              // 5f7078
@@ -47,13 +46,14 @@ protected:
 	// To be optionally defined in the underlying class
 	virtual void board_write(offs_t offset, UINT16 data);
 
+	UINT32 rom_offset;
+	const char *rombdid_tag;
 private:
-	UINT32 rom_offset, dma_offset, dma_cur_offset;
+	UINT32 dma_offset, dma_cur_offset;
 	UINT16 dma_count;
 	bool pio_ready, dma_ready;
 
 	const char *eeprom_tag;
-	const char *actel_tag;
 	class x76f100_device *eeprom;
 };
 

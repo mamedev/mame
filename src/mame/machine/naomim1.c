@@ -24,6 +24,12 @@ void naomi_m1_board::static_set_tags(device_t &device, const char *_key_tag)
 
 READ16_MEMBER(naomi_m1_board::actel_id_r)
 {
+	if (rombdid_tag && memregion(rombdid_tag) != NULL)
+	{
+		const UINT8 *bdid = memregion(rombdid_tag)->base();
+		return bdid[0] | (bdid[1] << 8);
+	}
+
 	return 0x0000;
 }
 
