@@ -79,9 +79,6 @@ void nes_exrom_device::device_start()
 
 	m_exram = auto_alloc_array_clear(machine(), UINT8, 0x400);
 	save_pointer(NAME(m_exram), 0x400);
-
-	m_mapper_sram_size = 0x400;
-	m_mapper_sram = m_exram;
 }
 
 void nes_exrom_device::pcb_reset()
@@ -119,22 +116,6 @@ void nes_exrom_device::pcb_reset()
 	m_prg_regs[2] = 0xfe;
 	m_prg_regs[3] = 0xff;
 }
-
-
-READ8_MEMBER(nes_exrom_device::nt_r)
-{
-	int page = ((offset & 0xc00) >> 10);
-
-	if (m_nt_src[page] == MMC5FILL)
-	{
-		if ((offset & 0x3ff) >= 0x3c0)
-			return m_floodattr;
-
-		return m_floodtile;
-	}
-	return m_nt_access[page][offset & 0x3ff];
-}
-
 
 
 /*-------------------------------------------------
@@ -348,16 +329,16 @@ void nes_exrom_device::set_mirror(int page, int src)
 {
 	switch (src)
 	{
-		case 0: /* CIRAM0 */
+		case 0:
 			set_nt_page(page, CIRAM, 0, 1);
 			break;
-		case 1: /* CIRAM1 */
+		case 1:
 			set_nt_page(page, CIRAM, 1, 1);
 			break;
-		case 2: /* ExRAM */
-			set_nt_page(page, EXRAM, 0, 1);  // actually only works during rendering.
+		case 2:
+			set_nt_page(page, EXRAM, 0, 1);
 			break;
-		case 3: /* Fill Registers */
+		case 3:
 			set_nt_page(page, MMC5FILL, 0, 0);
 			break;
 		default:
@@ -365,6 +346,51 @@ void nes_exrom_device::set_mirror(int page, int src)
 			break;
 	}
 }
+
+
+READ8_MEMBER(nes_exrom_device::nt_r)
+{
+	int page = ((offset & 0xc00) >> 10);
+
+	switch (m_nt_src[page])
+	{
+		case MMC5FILL:
+			if ((offset & 0x3ff) >= 0x3c0)
+				return m_floodattr;			
+			return m_floodtile;
+
+		case EXRAM:
+			if (!BIT(m_exram_control, 1))
+				return m_exram[offset & 0x3ff];
+			else
+				return 0x00;
+
+		case CIRAM:
+		default:
+			return m_nt_access[page][offset & 0x3ff];
+	}
+}
+
+WRITE8_MEMBER(nes_exrom_device::nt_w)
+{
+	int page = ((offset & 0xc00) >> 10);	
+	
+	if (!m_nt_writable[page])
+		return;
+	
+	switch (m_nt_src[page])
+	{
+		case EXRAM:
+			m_exram[offset & 0x3ff] = data;
+			break;
+			
+		case CIRAM:
+		default:
+			m_nt_access[page][offset & 0x3ff] = data;
+			break;
+	}
+}
+
 
 READ8_MEMBER(nes_exrom_device::read_l)
 {

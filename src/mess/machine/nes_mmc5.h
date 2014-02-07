@@ -19,6 +19,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 	virtual DECLARE_READ8_MEMBER(nt_r);
+	virtual DECLARE_WRITE8_MEMBER(nt_w);
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked);
 	virtual void pcb_reset();
