@@ -122,7 +122,6 @@ Abnormalities:
 
 #include "emu.h"
 #include "includes/toaplan1.h"
-#include "cpu/m68000/m68000.h"
 
 
 #define TOAPLAN1_TILEVRAM_SIZE       0x4000 /* 4 tile layers each this RAM size */
@@ -221,8 +220,6 @@ void toaplan1_state::toaplan1_create_tilemaps()
 	m_pf2_tilemap->set_transparent_pen(0);
 	m_pf3_tilemap->set_transparent_pen(0);
 	m_pf4_tilemap->set_transparent_pen(0);
-
-	memset(m_empty_tile, 0x00, sizeof(m_empty_tile));
 }
 
 
@@ -267,41 +264,20 @@ void toaplan1_state::toaplan1_spritevram_alloc()
 
 void toaplan1_state::toaplan1_set_scrolls()
 {
-	m_pf1_tilemap->set_scrollx(0, (m_pf1_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs1));
-	m_pf2_tilemap->set_scrollx(0, (m_pf2_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs2));
-	m_pf3_tilemap->set_scrollx(0, (m_pf3_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs3));
-	m_pf4_tilemap->set_scrollx(0, (m_pf4_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs4));
-	m_pf1_tilemap->set_scrolly(0, (m_pf1_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
-	m_pf2_tilemap->set_scrolly(0, (m_pf2_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
-	m_pf3_tilemap->set_scrolly(0, (m_pf3_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
-	m_pf4_tilemap->set_scrolly(0, (m_pf4_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
-}
-
-void toaplan1_rallybik_state::rallybik_flipscreen()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	rallybik_bcu_flipscreen_w(space, 0, m_bcu_flipscreen, 0xffff);
-}
-
-void toaplan1_state::toaplan1_flipscreen()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	toaplan1_bcu_flipscreen_w(space, 0, m_bcu_flipscreen, 0xffff);
+	m_pf1_tilemap->set_scrollx(0, (m_pf1_scrollx >> 7) - m_tiles_offsetx);
+	m_pf2_tilemap->set_scrollx(0, (m_pf2_scrollx >> 7) - m_tiles_offsetx);
+	m_pf3_tilemap->set_scrollx(0, (m_pf3_scrollx >> 7) - m_tiles_offsetx);
+	m_pf4_tilemap->set_scrollx(0, (m_pf4_scrollx >> 7) - m_tiles_offsetx);
+	m_pf1_tilemap->set_scrolly(0, (m_pf1_scrolly >> 7) - m_tiles_offsety);
+	m_pf2_tilemap->set_scrolly(0, (m_pf2_scrolly >> 7) - m_tiles_offsety);
+	m_pf3_tilemap->set_scrolly(0, (m_pf3_scrolly >> 7) - m_tiles_offsety);
+	m_pf4_tilemap->set_scrolly(0, (m_pf4_scrolly >> 7) - m_tiles_offsety);
 }
 
 void toaplan1_state::register_common()
 {
-	save_item(NAME(m_scrollx_offs1));
-	save_item(NAME(m_scrollx_offs2));
-	save_item(NAME(m_scrollx_offs3));
-	save_item(NAME(m_scrollx_offs4));
-	save_item(NAME(m_scrolly_offs));
-
 	save_item(NAME(m_bcu_flipscreen));
 	save_item(NAME(m_fcu_flipscreen));
-	save_item(NAME(m_reset));
 
 	save_item(NAME(m_pf1_scrollx));
 	save_item(NAME(m_pf1_scrolly));
@@ -331,19 +307,19 @@ VIDEO_START_MEMBER(toaplan1_rallybik_state,rallybik)
 	m_buffered_spriteram = auto_alloc_array_clear(machine(), UINT16, m_spriteram.bytes()/2);
 	save_pointer(NAME(m_buffered_spriteram), m_spriteram.bytes()/2);
 
-	m_scrollx_offs1 = 0x00d + 6;
-	m_scrollx_offs2 = 0x00d + 4;
-	m_scrollx_offs3 = 0x00d + 2;
-	m_scrollx_offs4 = 0x00d + 0;
-	m_scrolly_offs  = 0x111;
+	m_pf1_tilemap->set_scrolldx(-0x00d-6, -0x1c0+6);
+	m_pf2_tilemap->set_scrolldx(-0x00d-4, -0x1c0+4);
+	m_pf3_tilemap->set_scrolldx(-0x00d-2, -0x1c0+2);
+	m_pf4_tilemap->set_scrolldx(-0x00d-0, -0x1c0+0);
+	m_pf1_tilemap->set_scrolldy(-0x111, -0x0e8);
+	m_pf2_tilemap->set_scrolldy(-0x111, -0x0e8);
+	m_pf3_tilemap->set_scrolldy(-0x111, -0x0e8);
+	m_pf4_tilemap->set_scrolldy(-0x111, -0x0e8);
 
 	m_bcu_flipscreen = -1;
 	m_fcu_flipscreen = 0;
-	m_reset = 0;
 
 	register_common();
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_rallybik_state::rallybik_flipscreen), this));
 }
 
 VIDEO_START_MEMBER(toaplan1_state,toaplan1)
@@ -353,19 +329,19 @@ VIDEO_START_MEMBER(toaplan1_state,toaplan1)
 	toaplan1_vram_alloc();
 	toaplan1_spritevram_alloc();
 
-	m_scrollx_offs1 = 0x1ef + 6;
-	m_scrollx_offs2 = 0x1ef + 4;
-	m_scrollx_offs3 = 0x1ef + 2;
-	m_scrollx_offs4 = 0x1ef + 0;
-	m_scrolly_offs  = 0x101;
+	m_pf1_tilemap->set_scrolldx(-0x1ef-6, -0x151+6);
+	m_pf2_tilemap->set_scrolldx(-0x1ef-4, -0x151+4);
+	m_pf3_tilemap->set_scrolldx(-0x1ef-2, -0x151+2);
+	m_pf4_tilemap->set_scrolldx(-0x1ef-0, -0x151+0);
+	m_pf1_tilemap->set_scrolldy(-0x101, -0x1ef);
+	m_pf2_tilemap->set_scrolldy(-0x101, -0x1ef);
+	m_pf3_tilemap->set_scrolldy(-0x101, -0x1ef);
+	m_pf4_tilemap->set_scrolldy(-0x101, -0x1ef);
 
 	m_bcu_flipscreen = -1;
 	m_fcu_flipscreen = 0;
-	m_reset = 1;
 
 	register_common();
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_state::toaplan1_flipscreen), this));
 }
 
 
@@ -392,35 +368,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_tile_offsets_w)
 		COMBINE_DATA(&m_tiles_offsety);
 		logerror("Tiles_offsety now = %08x\n", m_tiles_offsety);
 	}
-	m_reset = 1;
 	toaplan1_set_scrolls();
-}
-
-WRITE16_MEMBER(toaplan1_rallybik_state::rallybik_bcu_flipscreen_w)
-{
-	if (ACCESSING_BITS_0_7 && (data != m_bcu_flipscreen))
-	{
-		logerror("Setting BCU controller flipscreen port to %04x\n",data);
-		m_bcu_flipscreen = data & 0x01;     /* 0x0001 = flip, 0x0000 = no flip */
-		machine().tilemap().set_flip_all((data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
-		if (m_bcu_flipscreen)
-		{
-			m_scrollx_offs1 = 0x1c0 - 6;
-			m_scrollx_offs2 = 0x1c0 - 4;
-			m_scrollx_offs3 = 0x1c0 - 2;
-			m_scrollx_offs4 = 0x1c0 - 0;
-			m_scrolly_offs  = 0x0e8;
-		}
-		else
-		{
-			m_scrollx_offs1 = 0x00d + 6;
-			m_scrollx_offs2 = 0x00d + 4;
-			m_scrollx_offs3 = 0x00d + 2;
-			m_scrollx_offs4 = 0x00d + 0;
-			m_scrolly_offs  = 0x111;
-		}
-		toaplan1_set_scrolls();
-	}
 }
 
 WRITE16_MEMBER(toaplan1_state::toaplan1_bcu_flipscreen_w)
@@ -430,25 +378,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_bcu_flipscreen_w)
 		logerror("Setting BCU controller flipscreen port to %04x\n",data);
 		m_bcu_flipscreen = data & 0x01;     /* 0x0001 = flip, 0x0000 = no flip */
 		machine().tilemap().set_flip_all((data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
-		if (m_bcu_flipscreen)
-		{
-			const rectangle &visarea = m_screen->visible_area();
 
-			m_scrollx_offs1 = 0x151 - 6;
-			m_scrollx_offs2 = 0x151 - 4;
-			m_scrollx_offs3 = 0x151 - 2;
-			m_scrollx_offs4 = 0x151 - 0;
-			m_scrolly_offs  = 0x1ef;
-			m_scrolly_offs += ((visarea.max_y + 1) - ((visarea.max_y + 1) - visarea.min_y)) * 2;    /* Horizontal games are offset so adjust by +0x20 */
-		}
-		else
-		{
-			m_scrollx_offs1 = 0x1ef + 6;
-			m_scrollx_offs2 = 0x1ef + 4;
-			m_scrollx_offs3 = 0x1ef + 2;
-			m_scrollx_offs4 = 0x1ef + 0;
-			m_scrolly_offs  = 0x101;
-		}
 		toaplan1_set_scrolls();
 	}
 }
@@ -542,16 +472,6 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_spritesizeram16_w)
 WRITE16_MEMBER(toaplan1_state::toaplan1_bcu_control_w)
 {
 	logerror("BCU tile controller register:%02x now = %04x\n",offset,data);
-
-	/*** Hack for Zero Wing and OutZone, to reset the sound system on */
-	/*** soft resets. These two games don't have a sound reset port,  */
-	/*** unlike the other games */
-
-	if (m_unk_reset_port && m_reset)
-	{
-		m_reset = 0;
-		toaplan1_reset_sound(space,0,0,0);
-	}
 }
 
 READ16_MEMBER(toaplan1_state::toaplan1_tileram_offs_r)
@@ -670,28 +590,28 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_scroll_regs_w)
 	switch(offset)
 	{
 		case 00: COMBINE_DATA(&m_pf1_scrollx);      /* 1D3h */
-					m_pf1_tilemap->set_scrollx(0, (m_pf1_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs1));
+					m_pf1_tilemap->set_scrollx(0, (m_pf1_scrollx >> 7) - m_tiles_offsetx);
 					break;
 		case 01: COMBINE_DATA(&m_pf1_scrolly);      /* 1EBh */
-					m_pf1_tilemap->set_scrolly(0, (m_pf1_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
+					m_pf1_tilemap->set_scrolly(0, (m_pf1_scrolly >> 7) - m_tiles_offsety);
 					break;
 		case 02: COMBINE_DATA(&m_pf2_scrollx);      /* 1D5h */
-					m_pf2_tilemap->set_scrollx(0, (m_pf2_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs2));
+					m_pf2_tilemap->set_scrollx(0, (m_pf2_scrollx >> 7) - m_tiles_offsetx);
 					break;
 		case 03: COMBINE_DATA(&m_pf2_scrolly);      /* 1EBh */
-					m_pf2_tilemap->set_scrolly(0, (m_pf2_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
+					m_pf2_tilemap->set_scrolly(0, (m_pf2_scrolly >> 7) - m_tiles_offsety);
 					break;
 		case 04: COMBINE_DATA(&m_pf3_scrollx);      /* 1D7h */
-					m_pf3_tilemap->set_scrollx(0, (m_pf3_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs3));
+					m_pf3_tilemap->set_scrollx(0, (m_pf3_scrollx >> 7) - m_tiles_offsetx);
 					break;
 		case 05: COMBINE_DATA(&m_pf3_scrolly);      /* 1EBh */
-					m_pf3_tilemap->set_scrolly(0, (m_pf3_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
+					m_pf3_tilemap->set_scrolly(0, (m_pf3_scrolly >> 7) - m_tiles_offsety);
 					break;
 		case 06: COMBINE_DATA(&m_pf4_scrollx);      /* 1D9h */
-					m_pf4_tilemap->set_scrollx(0, (m_pf4_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs4));
+					m_pf4_tilemap->set_scrollx(0, (m_pf4_scrollx >> 7) - m_tiles_offsetx);
 					break;
 		case 07: COMBINE_DATA(&m_pf4_scrolly);      /* 1EBh */
-					m_pf4_tilemap->set_scrolly(0, (m_pf4_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
+					m_pf4_tilemap->set_scrolly(0, (m_pf4_scrolly >> 7) - m_tiles_offsety);
 					break;
 		default: logerror("Hmmm, writing %08x to unknown video scroll register (%08x) !!!\n",data ,offset);
 					break;
@@ -821,47 +741,6 @@ void toaplan1_state::toaplan1_log_vram()
 		logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
 			m_pf1_scrollx, m_pf1_scrolly, m_pf2_scrollx, m_pf2_scrolly, m_pf3_scrollx, m_pf3_scrolly, m_pf4_scrollx, m_pf4_scrolly);
 	}
-	if ( machine().input().code_pressed(KEYCODE_B) )
-	{
-//      while (machine().input().code_pressed(KEYCODE_B)) ;
-		m_scrollx_offs1 += 0x1; m_scrollx_offs2 += 0x1; m_scrollx_offs3 += 0x1; m_scrollx_offs4 += 0x1;
-		logerror("Scrollx_offs now = %08x\n", m_scrollx_offs4);
-		m_pf1_tilemap->set_scrollx(0, (m_pf1_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs1));
-		m_pf2_tilemap->set_scrollx(0, (m_pf2_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs2));
-		m_pf3_tilemap->set_scrollx(0, (m_pf3_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs3));
-		m_pf4_tilemap->set_scrollx(0, (m_pf4_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs4));
-	}
-	if ( machine().input().code_pressed(KEYCODE_V) )
-	{
-//      while (machine().input().code_pressed(KEYCODE_V)) ;
-		m_scrollx_offs1 -= 0x1; m_scrollx_offs2 -= 0x1; m_scrollx_offs3 -= 0x1; m_scrollx_offs4 -= 0x1;
-		logerror("Scrollx_offs now = %08x\n", m_scrollx_offs4);
-		m_pf1_tilemap->set_scrollx(0, (m_pf1_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs1));
-		m_pf2_tilemap->set_scrollx(0, (m_pf2_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs2));
-		m_pf3_tilemap->set_scrollx(0, (m_pf3_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs3));
-		m_pf4_tilemap->set_scrollx(0, (m_pf4_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs4));
-	}
-	if ( machine().input().code_pressed(KEYCODE_C) )
-	{
-//      while (machine().input().code_pressed(KEYCODE_C)) ;
-		m_scrolly_offs += 0x1;
-		logerror("Scrolly_offs now = %08x\n", m_scrolly_offs);
-		m_pf1_tilemap->set_scrolly(0, (m_pf1_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
-		m_pf2_tilemap->set_scrolly(0, (m_pf2_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
-		m_pf3_tilemap->set_scrolly(0, (m_pf3_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
-		m_pf4_tilemap->set_scrolly(0, (m_pf4_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
-	}
-	if ( machine().input().code_pressed(KEYCODE_X) )
-	{
-//      while (machine().input().code_pressed(KEYCODE_X)) ;
-		m_scrolly_offs -= 0x1;
-		logerror("Scrolly_offs now = %08x\n", m_scrolly_offs);
-		m_pf1_tilemap->set_scrolly(0, (m_pf1_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
-		m_pf2_tilemap->set_scrolly(0, (m_pf2_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
-		m_pf3_tilemap->set_scrolly(0, (m_pf3_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
-		m_pf4_tilemap->set_scrolly(0, (m_pf4_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
-	}
-
 	if ( machine().input().code_pressed(KEYCODE_L) )      /* Turn Playfield 4 on/off */
 	{
 		while (machine().input().code_pressed(KEYCODE_L)) ;

@@ -5,13 +5,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "sound/3812intf.h"
 #include "includes/toaplan1.h"
 
-#define CLEAR 0
-#define ASSERT 1
 
 
 /* List of possible regions for coinage (for games with unemulated sound CPU) */
@@ -297,17 +294,18 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_shared_w)
 }
 
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_reset_sound)
+void toaplan1_state::toaplan1_reset_sound()
 {
-	/* Reset the secondary CPU and sound chip during soft resets */
+	/* Reset the secondary CPU and sound chip */
+	/* rallybik, truxton, hellfire, demonwld write to a port to cause a reset */
+	/* zerowing, fireshrk, outzone, vimana use a RESET instruction instead */
+	machine().device("ymsnd")->reset();
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+}
 
-	if (ACCESSING_BITS_0_7 && (data == 0))
-	{
-		logerror("PC:%04x  Resetting Sound CPU and Sound chip (%08x)\n", space.device().safe_pcbase(), data);
-		machine().device("ymsnd")->reset();
-		if (m_audiocpu != NULL && m_audiocpu->type() == Z80)
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-	}
+WRITE16_MEMBER(toaplan1_state::toaplan1_reset_sound_w)
+{
+	if (ACCESSING_BITS_0_7 && (data == 0)) toaplan1_reset_sound();
 }
 
 
@@ -368,26 +366,25 @@ WRITE16_MEMBER(toaplan1_state::samesame_coin_w)
 	}
 }
 
+static void toaplan1_reset_callback(device_t *device)
+{
+	toaplan1_state *state = device->machine().driver_data<toaplan1_state>();
+
+	state->toaplan1_reset_sound();
+}
 
 MACHINE_RESET_MEMBER(toaplan1_state,toaplan1)
 {
 	m_intenable = 0;
 	m_coin_count = 0;
-	m_unk_reset_port = 0;
 	coin_lockout_global_w(machine(), 0);
 }
 
-void toaplan1_state::toaplan1_driver_savestate()
-{
-	save_item(NAME(m_intenable));
-	save_item(NAME(m_coin_count));
-	save_item(NAME(m_unk_reset_port));
-}
-
-MACHINE_RESET_MEMBER(toaplan1_state,zerowing)/* Hack for ZeroWing and OutZone. See the video driver */
+/* zerowing, fireshrk, outzone */
+MACHINE_RESET_MEMBER(toaplan1_state,zerowing)
 {
 	MACHINE_RESET_CALL_MEMBER(toaplan1);
-	m_unk_reset_port = 1;
+	m68k_set_reset_callback(m_maincpu, toaplan1_reset_callback);
 }
 
 MACHINE_RESET_MEMBER(toaplan1_state,demonwld)
@@ -398,6 +395,22 @@ MACHINE_RESET_MEMBER(toaplan1_state,demonwld)
 	m_dsp_execute = 0;
 }
 
+MACHINE_RESET_MEMBER(toaplan1_state,vimana)
+{
+	MACHINE_RESET_CALL_MEMBER(toaplan1);
+	m_vimana_coins[0] = m_vimana_coins[1] = 0;
+	m_vimana_credits = 0;
+	m_vimana_latch = 0;
+	m68k_set_reset_callback(m_maincpu, toaplan1_reset_callback);
+}
+
+
+void toaplan1_state::toaplan1_driver_savestate()
+{
+	save_item(NAME(m_intenable));
+	save_item(NAME(m_coin_count));
+}
+
 void toaplan1_state::demonwld_driver_savestate()
 {
 	save_item(NAME(m_dsp_on));
@@ -406,14 +419,6 @@ void toaplan1_state::demonwld_driver_savestate()
 	save_item(NAME(m_dsp_BIO));
 	save_item(NAME(m_dsp_execute));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_state::demonwld_restore_dsp), this));
-}
-
-MACHINE_RESET_MEMBER(toaplan1_state,vimana)
-{
-	MACHINE_RESET_CALL_MEMBER(toaplan1);
-	m_vimana_coins[0] = m_vimana_coins[1] = 0;
-	m_vimana_credits = 0;
-	m_vimana_latch = 0;
 }
 
 void toaplan1_state::vimana_driver_savestate()
