@@ -36,6 +36,7 @@
 #define LAST_CHR_REG_A 0
 #define LAST_CHR_REG_B 1
 
+static const int m_mmc5_attrib[4] = {0x00, 0x55, 0xaa, 0xff};
 
 //-------------------------------------------------
 //  constructor
@@ -294,11 +295,6 @@ void nes_exrom_device::update_chr()
 	}
 }
 
-void nes_exrom_device::update_render_mode()
-{
-	// if m_exram_control is 0 or 1, m_exram must be used for NT
-}
-
 void nes_exrom_device::hblank_irq(int scanline, int vblank, int blanked )
 {
 	if (scanline == m_irq_count)
@@ -367,6 +363,18 @@ READ8_MEMBER(nes_exrom_device::nt_r)
 
 		case CIRAM:
 		default:
+			if (m_exram_control == 1)
+			{
+				if ((offset & 0x3ff) >= 0x3c0)
+					return m_mmc5_attrib[(m_exram[offset & 0x3ff] >> 6) & 0x03];
+				else
+				{
+					// in this case, we swap CHR bank, but then access NT normally!
+					int bank = (m_exram[offset & 0x3ff] & 0x3f) | (m_high_chr << 6);
+					chr4_0(bank, CHRROM);
+					chr4_4(bank, CHRROM);
+				}
+			}
 			return m_nt_access[page][offset & 0x3ff];
 	}
 }
@@ -481,8 +489,6 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 
 		case 0x1104: // Extra VRAM (EXRAM)
 			m_exram_control = data & 0x03;
-			// update render
-			update_render_mode();
 			LOG_MMC(("MMC5 exram control: %02x\n", data));
 			break;
 
@@ -491,25 +497,14 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 			set_mirror(1, (data & 0x0c) >> 2);
 			set_mirror(2, (data & 0x30) >> 4);
 			set_mirror(3, (data & 0xc0) >> 6);
-			// update render
-			update_render_mode();
 			break;
 
-			/* tile data for MMC5 flood-fill NT mode */
 		case 0x1106:
 			m_floodtile = data;
 			break;
 
-			/* attr data for MMC5 flood-fill NT mode */
 		case 0x1107:
-			switch (data & 3)
-			{
-				default:
-				case 0: m_floodattr = 0x00; break;
-				case 1: m_floodattr = 0x55; break;
-				case 2: m_floodattr = 0xaa; break;
-				case 3: m_floodattr = 0xff; break;
-			}
+			m_floodattr = m_mmc5_attrib[data & 3];
 			break;
 
 		case 0x1113:
@@ -550,11 +545,6 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 
 		case 0x1130:
 			m_high_chr = data & 0x03;
-			if (m_exram_control == 1)
-			{
-// in this case m_high_chr selects which 256KB of CHR ROM
-// is to be used for all background tiles on the screen.
-			}
 			break;
 
 
