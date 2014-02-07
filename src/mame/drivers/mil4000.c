@@ -554,6 +554,7 @@ Similar hardware to TOP XXI
 35.u35    1xxxxxxxxxxxxxxxxx = 0xFF
 36.u36    1ST AND 2ND HALF IDENTICAL
 
+The PIC16c65b @U60 seems to be used to talk with the touch screen controller via RS-232
 The program writes constantly to $708000, where should be an input port.
 
 */
