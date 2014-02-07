@@ -308,6 +308,7 @@ public:
 
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
+	virtual void customize_menubar(ui_menubar &menubar);
 
 	// font overridables
 	virtual osd_font font_open(const char *name, int &height);
@@ -318,6 +319,9 @@ private:
 	static void osd_exit(running_machine &machine);
 
 	static const int DEFAULT_FONT_HEIGHT = 200;
+
+	// trampolines to support menu bar
+	void toggle_full_screen();
 };
 
 

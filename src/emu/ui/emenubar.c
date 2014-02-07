@@ -99,12 +99,16 @@ void ui_emu_menubar::menubar_draw_ui_elements()
 
 void ui_emu_menubar::menubar_build_menus()
 {
+	// build normal menus
 	build_file_menu();
 	if (has_images())
 		build_images_menu();
 	build_options_menu();
 	build_settings_menu();
 	build_help_menu();
+
+	// and customize them
+	machine().osd().customize_menubar(*this);
 }
 
 

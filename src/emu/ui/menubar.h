@@ -27,13 +27,7 @@ public:
 	ui_menubar(running_machine &machine);
 	virtual ~ui_menubar();
 
-	virtual void reset();
-	void handle(render_container *container);
-
-	// getters
-	bool is_visible() const { return m_menubar_visibility != MENUBAR_VISIBILITY_INVISIBLE; }
-
-protected:
+	// menu item
 	class menu_item
 	{
 	public:
@@ -47,6 +41,7 @@ protected:
 		virtual void invoke();
 		void clear_area_recursive();
 		menu_item *find_point(float x, float y);
+		menu_item &find_child(const char *target);
 		const char *shortcut_text();
 		float shortcut_text_width();
 		void sensible_seq_name(astring &text, const input_seq &seq);
@@ -136,8 +131,18 @@ protected:
 
 		// private methods
 		void initialize(menu_item &child);
+		menu_item *find_child_internal(const char *target);
 	};
 
+	// methods
+	virtual void reset();
+	void handle(render_container *container);
+
+	// getters
+	bool is_visible() const { return m_menubar_visibility != MENUBAR_VISIBILITY_INVISIBLE; }
+	menu_item &root_menu() { return m_menus; }
+
+protected:
 	// implemented by child classes
 	virtual void menubar_build_menus() = 0;
 	virtual void menubar_draw_ui_elements() = 0;
@@ -145,7 +150,6 @@ protected:
 	// accessors
 	running_machine &machine() { return m_machine; }
 	render_container *container() { return m_container; }
-	menu_item &root_menu() { return m_menus; }
 
 private:
 	// classes

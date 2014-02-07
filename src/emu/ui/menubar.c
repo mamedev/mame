@@ -873,6 +873,37 @@ ui_menubar::menu_item *ui_menubar::menu_item::find_point(float x, float y)
 
 
 //-------------------------------------------------
+//  menu_item::find_child
+//-------------------------------------------------
+
+ui_menubar::menu_item &ui_menubar::menu_item::find_child(const char *target)
+{
+	menu_item *item = find_child_internal(target);
+	assert(item != NULL);
+	return *item;
+}
+
+
+//-------------------------------------------------
+//  menu_item::find_child_internal
+//-------------------------------------------------
+
+ui_menubar::menu_item *ui_menubar::menu_item::find_child_internal(const char *target)
+{
+	if (!strcmp(target, text()))
+		return this;
+
+	for(menu_item *item = child(); item != NULL; item = item->next())
+	{
+		menu_item *result = item->find_child_internal(target);
+		if (result != NULL)
+			return result;
+	}
+	return NULL;
+}
+
+
+//-------------------------------------------------
 //  menu_item::shortcut_text
 //-------------------------------------------------
 

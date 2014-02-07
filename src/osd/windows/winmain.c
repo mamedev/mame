@@ -965,6 +965,16 @@ bool windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, b
 }
 
 
+//-------------------------------------------------
+//  toggle_full_screen
+//-------------------------------------------------
+
+void windows_osd_interface::toggle_full_screen()
+{
+	winwindow_toggle_full_screen();
+}
+
+
 //============================================================
 //  winmain_dump_stack
 //============================================================

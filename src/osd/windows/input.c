@@ -785,6 +785,22 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 
 
 //============================================================
+//  customize_menubar
+//============================================================
+
+void windows_osd_interface::customize_menubar(ui_menubar &menu_bar)
+{
+	// find existing menus
+	ui_menubar::menu_item &root_menu = menu_bar.root_menu();
+	ui_menubar::menu_item &options_menu = root_menu.find_child("Options");
+
+	// Fullscreen
+	ui_menubar::menu_item &fullscreen_menu = options_menu.append("Fullscreen", &windows_osd_interface::toggle_full_screen, *this, IPT_OSD_1);
+	fullscreen_menu.set_checked(video_config.windowed ? false : true);
+}
+
+
+//============================================================
 //  device_list_poll_devices
 //============================================================
 
