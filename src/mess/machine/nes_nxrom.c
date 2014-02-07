@@ -564,9 +564,9 @@ WRITE8_MEMBER(nes_nochr_device::chr_w)
 {
 	int mirr = get_mirroring();
 	if (mirr == PPU_MIRROR_HIGH)
-		m_ciram[offset & 0x3ff + 0x000] = data;
+		m_ciram[(offset & 0x3ff) + 0x000] = data;
 	else if (mirr == PPU_MIRROR_LOW)
-		m_ciram[offset & 0x3ff + 0x400] = data;
+		m_ciram[(offset & 0x3ff) + 0x400] = data;
 	else
 		m_ciram[offset & 0x7ff] = data;	// not sure here, since there is no software to test...
 }
@@ -575,9 +575,9 @@ READ8_MEMBER(nes_nochr_device::chr_r)
 {
 	int mirr = get_mirroring();
 	if (mirr == PPU_MIRROR_HIGH)
-		return m_ciram[offset & 0x3ff + 0x000];
+		return m_ciram[(offset & 0x3ff) + 0x000];
 	else if (mirr == PPU_MIRROR_LOW)
-		return m_ciram[offset & 0x3ff + 0x400];
+		return m_ciram[(offset & 0x3ff) + 0x400];
 	else
 		return m_ciram[offset & 0x7ff];	// not sure here, since there is no software to test...
 }
