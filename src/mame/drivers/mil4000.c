@@ -1,5 +1,5 @@
 // license:?
-// copyright-holders:Angelo Salese, Roberto Fresca,David Haywood
+// copyright-holders:Angelo Salese, Roberto Fresca, David Haywood
 /*******************************************************************************************
 
   Millennium Nuovo 4000 / Nuovo Millennium 4000
@@ -544,6 +544,44 @@ ROM_START( top21 )
 	ROM_LOAD( "top21_nvram.bin", 0x00000, 0x10000, CRC(638726ce) SHA1(c55c77df5fbddfb19acf50f1b4467c63c818d5e7) )
 ROM_END
 
+/*
+Cherry Wheel.
+Similar hardware to TOP XXI
+
+32.u32    1ST AND 2ND HALF IDENTICAL
+33.u33    1xxxxxxxxxxxxxxxxx = 0xFF
+34.u34    1ST AND 2ND HALF IDENTICAL
+35.u35    1xxxxxxxxxxxxxxxxx = 0xFF
+36.u36    1ST AND 2ND HALF IDENTICAL
+
+The PIC16c65b @U60 seems to be used to talk with the touch screen controller via RS-232
+The program writes constantly to $708000, where should be an input port.
+
+*/
+ROM_START( chewheel )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "even.u76", 0x000000, 0x20000, CRC(7790d480) SHA1(e9d4bf16c61d57840076cf3c8bc865f92caae44c) )
+	ROM_LOAD16_BYTE( "odd.u77",  0x000001, 0x20000, CRC(08f1b4b6) SHA1(7fa424b3fe899b7e8596156af6c3dbfba43984d6) )
+
+	ROM_REGION( 0xa0000, "gfx1", 0 )
+	ROM_LOAD( "36.u36",     0x000000, 0x20000, CRC(64ce0eb8) SHA1(d6533d730ecd01385c75b03884bb9b001f963ceb) )   // double size. identical halves.
+	ROM_IGNORE(                       0x20000)
+	ROM_LOAD( "35.u35",     0x020000, 0x20000, CRC(27f95f6f) SHA1(bb84b08ec5df60814d1d6825f4377ab1e8a63a70) )   // double size. 2nd half empty.
+	ROM_IGNORE(                       0x20000)
+	ROM_LOAD( "34.u34",     0x040000, 0x20000, CRC(47cac442) SHA1(e98bec034d5ab532faf86e5a11cfa1f1157491c4) )   // double size. identical halves.
+	ROM_IGNORE(                       0x20000)
+	ROM_LOAD( "33.u33",     0x060000, 0x20000, CRC(dd55ce6c) SHA1(4f5a2358ec96ed4afb4881fc8d6aa74e9f1d6aec) )   // double size. 2nd half empty.
+	ROM_IGNORE(                       0x20000)
+	ROM_LOAD( "32.u32",     0x080000, 0x20000, CRC(179e512a) SHA1(ba02563df98015349bc6fb5ac233ce3b9d6ed42e) )   // double size. identical halves.
+	ROM_IGNORE(                       0x20000)
+
+	ROM_REGION( 0x80000, "oki", 0 ) // 6295 samples
+	ROM_LOAD( "v29c51002t.u54",  0x00000, 0x40000, CRC(3c37ec4d) SHA1(11045f9b3f6fb35befdb67c111218750a4f750a7) )
+
+	ROM_REGION( 0x4000, "mcu", 0 )  // MCU code
+	ROM_LOAD( "pic16c65b_chewheel.u60", 0x0000, 0x4000, NO_DUMP )
+ROM_END
+
 
 /*     YEAR  NAME      PARENT    MACHINE   INPUT    STATE          INIT      ROT     COMPANY              FULLNAME                              FLAGS  LAYOUT  */
 GAMEL( 2000, mil4000,  0,        mil4000,  mil4000, driver_device, 0,        ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 2.0)", 0,     layout_mil4000 )
@@ -551,3 +589,4 @@ GAMEL( 2000, mil4000a, mil4000,  mil4000,  mil4000, driver_device, 0,        ROT
 GAMEL( 2000, mil4000b, mil4000,  mil4000,  mil4000, driver_device, 0,        ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.5)", 0,     layout_mil4000 )
 GAMEL( 2000, mil4000c, mil4000,  mil4000,  mil4000, driver_device, 0,        ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.6)", 0,     layout_mil4000 )
 GAMEL( 200?, top21,    0,        mil4000,  mil4000, driver_device, 0,        ROT0,  "Assogiochi Assago", "Top XXI (Version 1.2)",               0,     layout_mil4000 )
+GAME(  200?, chewheel, 0,        mil4000,  mil4000, driver_device, 0,        ROT0,  "Assogiochi Assago", "Cherry Wheel (Version 1.7)",          GAME_NOT_WORKING )

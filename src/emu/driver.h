@@ -404,8 +404,8 @@ private:
 	UINT8                   m_latch_read[4];
 
 	// generic video
-	UINT32                  m_flip_screen_x;
-	UINT32                  m_flip_screen_y;
+	UINT8                   m_flip_screen_x;
+	UINT8                   m_flip_screen_y;
 };
 
 

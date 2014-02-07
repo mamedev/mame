@@ -33,9 +33,9 @@ protected:
 
 	static const format file_formats[];
 
-	static const UINT32 cell_size[];
-	static const int speed_zone[];
-	static const int sectors_per_track[];
+	static const UINT32 d80_cell_size[];
+	static const int d80_speed_zone[];
+	static const int d80_sectors_per_track[];
 };
 
 extern const floppy_format_type FLOPPY_D80_FORMAT;

@@ -5208,14 +5208,14 @@ mvsc2           // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (Rev A)
 smarinef        // 2000.03 Sega Marine Fishing
 wldkicks        // 2000.03 World Kicks (WK2 Ver. A)
 wldkicksa       // 2000.03 World Kicks (WK3 Ver. A)
-wldkicksb       // 2000.03 World Kicks (WK1 Ver. A)
+wldkicksb       // 2000.03 World Kicks PCB (WKC1 Ver. A)
 pstone2         // 2000.04 Power Stone 2
 toukon4         // 2000.04 Shin Nihon Prowrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)
 qmegamis        // 2000.05 Quiz Ah Megamisama
 derbyo2k        // 2000.06 Derby Owners Club 2000 Ver.2 (Rev A)
-starhrse		// 2000.?? Star Horse (big screens)
-starhrct		// 2000.?? Star Horse (server)
-starhrcl		// 2000.?? Star Horse (client)
+starhrse        // 2000.?? Star Horse (big screens)
+starhrct        // 2000.?? Star Horse (server)
+starhrcl        // 2000.?? Star Horse (client)
 vonot           // 2000.06 Virtual-on Oratorio Tangram M.S.B.S. Ver.5.66 2000 Edition
 ggx             // 2000.07 Guilty Gear X
 slasho          // 2000.07 Slashout
@@ -5230,8 +5230,8 @@ deathcox        // 2000.10 Death Crimson OX
 cspike          // 2000.10 Gun Spike / Cannon Spike
 sstrkfgt        // 2000.10 Sega Strike Fighter (Rev A)
 confmiss        // 2000.11 Confidential Mission         // First GD-ROM game?
-				// 2000.11 Ninja Assault (NJA1 Ver. A)
-				// 2000.11 Ninja Assault (NJA2 Ver. A)
+ninjaslt1       // 2000.11 Ninja Assault (NJA1 Ver. A)
+ninjaslt2       // 2000.11 Ninja Assault (NJA2 Ver. A)
 ninjaslt        // 2000.11 Ninja Assault (NJA3 Ver. A)
 ninjaslt4       // 2000.11 Ninja Assault (NJA4 Ver. A)
 				// 2000.11 Shakatto Tambourine (Rev B)
@@ -5248,7 +5248,7 @@ f355twn2        // 2001.01 F355 Challenge 2 Twin
 sfz3ugd         // 2001.02 Street Fighter ZERO3 Upper
 gundmgd         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (GD-ROM)
 gundmct         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (cartridge)
-				// 2001.03 Star Horse Progress (Rev A)
+starhrsp        // 2001.03 Star Horse Progress (Rev A)
 dygolf          // 2001.04 Dynamic Golf / Virtua Golf (Rev A)
 				// 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika
 shaktmsp        // 2001.04 Shakatto Tambourine 2K1 SPR
@@ -5279,7 +5279,7 @@ drbyocwc        // 2001.?? Derby Owners Club World Edition (Rev. C)
 derbyocw        // 2001.?? Derby Owners Club World Edition (Rev. D)
 shootplm        // 2001.?? Shootout Pool Medal
 				// 2001.?? Star Horse 2001
-hopper			// 2002.?? SWP Hopper Board
+hopper          // 2002.?? SWP Hopper Board
 vathlete        // 2002.03 Virtua Athletics / Virtua Athlete
 luptype         // 2002.04 Lupin The Third - The Typing (Rev A)
 cleoftp         // 2002.05 Cleopatra Fortune Plus
@@ -5287,7 +5287,7 @@ ggxx            // 2002.05 Guilty Gear XX
 mok             // 2002.05 The Maze of the Kings
 chocomk         // 2002.06 Musapey's Choco Marker (Rev A)
 mazan           // 2002.07 Mazan : Flash of the Blade (MAZ2 Ver. A)
-				// 2002.07 Mazan : Flash of the Blade (MAZ3 Ver. A)
+mazana          // 2002.07 Mazan : Flash of the Blade (MAZ3 Ver. A)
 				// 2002.09 Yonin Uchi Mahjong MJ
 azumanga        // 2002.12 Azumanga Daiou Puzzle Bobble
 moeru           // 2002.12 Moeru Casinyo
@@ -5326,11 +5326,12 @@ undefeat        // 2005.10 Under Defeat
 radirgya        // 2005.12 Radirgy (Rev A)
 				// 2005.?? Dragon Treasure 3 (Rev A)
 				// 2005.?? ExZeus
-				// 2005.?? Mushiking The King Of Beetles II ENG
+mushik2e        // 2005.?? Mushiking The King Of Beetles II ENG
+mushi2ea        // 2005.?? Mushiking The King Of Beetles II ENG
 				// 2005.?? MushiKing The King Of Beetle III
 kurucham        // 2006.03 Kurukuru Chameleon
 trgheart        // 2006.05 Trigger Heart Exelica (Rev A)
-				// 2006.07 Touch de Zunou
+zunou           // 2006.07 Touch de Zunou
 senkosp         // 2006.08 Senkou no Rondo SP
 jingystm        // 2006.09 Jingi Storm
 karous          // 2006.11 Karous
@@ -5343,7 +5344,7 @@ takoron         // 2006.12.16 Noukone Puzzle Takoron                        // L
 ngdup23a        // DIMM Firmware Updater (Rev A)
 ngdup23c        // DIMM Firmware Updater (Rev C)
 ngdup23e        // DIMM Firmware Updater (Rev E)
-ndcfboxa		// DIMM Firmware Updater for CF-BOX (Rev A)
+ndcfboxa        // DIMM Firmware Updater for CF-BOX (Rev A)
 
 // Releases below use flash/mask ROMs like older NAOMI titles, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced.
 pokasuka        // 2007.07 Pokasuka Ghost!
@@ -5352,10 +5353,10 @@ asndynmt        // 2007.07 Dynamite Deka EX - Asian dynamite
 				// 2007.09 Rhythm Tengoku
 ausfache        // 2008.02 Akatsuki Denkou Senki Ausf.Achse
 illvelo         // 2008.06 Illvelo (Illmatic Envelope)
-				// 2008.07 Mamoru-kun wa Norowarete Shimatta!
+mamonoro        // 2008.07 Mamoru-kun wa Norowarete Shimatta!
 mbaa            // 2008.09 Melty Blood Actress Again
-				// 2008.12 Melty Blood Actress Again Ver.A
-				// 2009.06 Radirgy Noa
+mbaaa           // 2008.12 Melty Blood Actress Again Ver.A
+radirgyn        // 2009.06 Radirgy Noa
 				// 2009.?? Project Cerberus (planned to be released in 2009)
 
 // NAOMI based (System SP)
@@ -5375,7 +5376,7 @@ vstrik3         // 2001.04 Virtua Striker 3 Ver. 2002 (GD-ROM)
 vstrik3cb       // 2001.04 Virtua Striker 3 (Rev B) (cartridge)
 vstrik3c        // 2001.04 Virtua Striker 3 (Rev C) (cartridge)
 wldrider        // 2001.05 Wild Riders
-				// 2001.06 Club Kart
+clubkrte        // 2001.06 Club Kart
 beachspi        // 2001.07 Beach Spikers
 vf4cart         // 2001.08.02 Virtua Fighter 4 (cartridge)
 vf4             // 2001.08.02 Virtua Fighter 4 (GD-ROM)
@@ -5392,16 +5393,16 @@ initdv2j        // 2002.12 Initial D Arcade Stage Ver. 2 (Japan) (Rev B)
 initdv2jo       // 2002.12 Initial D Arcade Stage Ver. 2 (Japan)
 initdv2e        // 2002.12 Initial D Arcade Stage Ver. 2 (export)
 vf4evo          // 2002.12 Virtua Fighter 4 Evolution Ver.B
-clubkrte        // 2002.?? Club Kart: European Session
+	        		// 2002.?? Club Kart: European Session
 initdexp        // 2002.?? Initial D Arcade Stage (Export)
 				// 2002.?? Sega Driving Simulator
 				// 2003.03 World Club Champion Football Serie A 2001-2002 Ver.2
 				// 2003.09 World Club Champion Football Serie A 2002-2003
 				// 2003.?? Club Kart Cycraft Edition
-clubkprz		// 2003.?? Club Kart Prize
+clubkprz        // 2003.?? Club Kart Prize
 initdv3j        // 2004.01 Initial D Arcade Stage Ver. 3 (Japan) (Rev C)
 initdv3jb       // 2004.01 Initial D Arcade Stage Ver. 3 (Japan) (Rev B)
-clubkpzb		// 2004.?? Club Kart Prize Ver. B (strings in the EPROM indicate a build date of Jan. 23, 2004 for the game's program)
+clubkpzb        // 2004.?? Club Kart Prize Ver. B (strings in the EPROM indicate a build date of Jan. 23, 2004 for the game's program)
 initdv3e        // 2004.05 Initial D Arcade Stage Ver. 3 (Export)
 				// 2004.06 World Club Champion Football Serie A 2002-2003 Ver.2
 				// 2004.07 Virtua Fighter 4 Final Tuned
@@ -8219,7 +8220,8 @@ raiden2d        // (c) 1993 Seibu Kaihatsu
 raiden2e        // (c) 1993 Seibu Kaihatsu
 raiden2f        // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2g        // (c) 1993 Seibu Kaihatsu
-raidendx            // (c) 1994 Seibu Kaihatsu
+raiden2nl		// (c) 1993 Seibu Kaihatsu
+raidendx        // (c) 1994 Seibu Kaihatsu
 raidendxj       // (c) 1994 Seibu Kaihatsu
 raidendxu       // (c) 1994 Seibu Kaihatsu + Fabtek license
 raidendxa1      // (c) 1994 Seibu Kaihatsu + Metrotainment license
@@ -10463,6 +10465,7 @@ sbugger         // (c) 1981 Game-A-Tron
 sbuggera        // (c) 1981 Game-A-Tron
 poker41         // (c) 1983 Game-A-Tron
 pulltabs        // (c) 1983 Game-A-Tron
+bingo           // Game-A-Tron?
 
 vroulet         // (c) 1989 World Game
 rcasino         // (c) 1984 Dyna Electronics (D-2608208A1-2)
@@ -10498,6 +10501,7 @@ trailblz        // (c) 1987 Coinmaster
 supnudg2        // (c) 1989 Coinmaster
 pokeroul        // (c) 1990 Coinmaster
 jpcoin          // (c) 19?? Coinmaster
+jpcoin2         // (c) 19?? Coinmaster
 egghunt         // (c) 1995 Invi Image
 magic10         // (c) 1995 A.W.P. Games
 magic10a        // (c) 1995 A.W.P. Games
@@ -11141,6 +11145,7 @@ mil4000a        // (c) 2000 Sure Milano
 mil4000b        // (c) 2000 Sure Milano
 mil4000c        // (c) 2000 Sure Milano
 top21           // (c) 200? Assogiochi Assago (Mi)
+chewheel        // (c) 200? Assogiochi Assago (Mi)
 
 // Mitsubishi/Renesas M16/62A italian gambling games
 ejollyx5        // (c) 200? Solar Games
@@ -31123,4 +31128,3 @@ arac6000
 //
 number1    // 1996 San Remo Games
 gluck2     // 1992 Yung Yu / CYE
-

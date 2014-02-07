@@ -4,22 +4,41 @@
 
     Apple ///
 
-
     VIA #0 (D VIA)
-        CA1:    1 if a cartridge is inserted, 0 otherwise
-
-    VIA #1 (E VIA)
-        CA2:    1 if key pressed, 0 otherwise
+	    CA1: IRQ from the MM58167 RTC
+    	CA2: 1 if key pressed, 0 otherwise
+    	CB1/CB2: connected to VBL
  
-    m_via_0_a: Environment register
-    	bit 7: 1 for 1 MHz, 0 for 2 MHz
-    	bit 6: 1 for I/O at C000-CFFF
-    	bit 5: 1 to enable video 
-    	bit 4: 1 to enable NMI/Reset 
-    	bit 3: 1 to write-protect RAM in system bank C000-FFFF
-    	bit 2: 1 to force primary stack at 0100-01FF
-    	bit 1: 1 for primary ROM, 0 for secondary (Apple III doesn't have a secondary ROM, so this should always be '1' when bit 0 is)
-    	bit 0: 1 to enable ROM in F000-FFFF
+		Port A: Environment register (all bits out)
+			bit 7: 1 for 1 MHz, 0 for 2 MHz
+			bit 6: 1 for I/O at C000-CFFF
+			bit 5: 1 to enable video 
+			bit 4: 1 to enable NMI/Reset 
+			bit 3: 1 to write-protect RAM in system bank C000-FFFF
+			bit 2: 1 to force primary stack at 0100-01FF
+			bit 1: 1 for primary ROM, 0 for secondary (Apple III doesn't have a secondary ROM, so this should always be '1' when bit 0 is)
+			bit 0: 1 to enable ROM in F000-FFFF
+ 
+		Port B: Zero page high 8 address bits, also MM58167 RTC register select (all bits out)
+ 
+    VIA #1 (E VIA)
+    	CA1: OR of all 4 slots' IRQ status
+    	CA2: SW1 (Open Apple key?)
+    	CB1: SW3/SCO
+    	CB2: SER
+ 
+    	Port A:
+			bits 0-2: bank select for $2000-$9FFF range
+			bit 3: n/c
+			bit 4: slot 4 IRQ (in)
+			bit 5: slot 3 IRQ (in)
+			bit 6: Apple II mode trap output (out)
+			bit 7: IRQ status (in) (0 = IRQ, 1 = no IRQ)
+ 
+		Port B:
+			bits 0-5: 6-bit audio DAC output
+			bit 6: screen blank
+			bit 7: OR of NMI from slots
  
 ***************************************************************************/
 
@@ -228,14 +247,12 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(apple3_state::apple3_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_interrupt)
 {
 	m_via_1->write_ca2((AY3600_keydata_strobe_r(machine()) & 0x80) ? 1 : 0);
-	m_via_1->write_cb1(machine().primary_screen->vblank());
+	m_via_1->write_cb1(machine().primary_screen->vblank()); 
 	m_via_1->write_cb2(machine().primary_screen->vblank());
 }
-
-
 
 UINT8 *apple3_state::apple3_bankaddr(UINT16 bank, offs_t offset)
 {
@@ -373,31 +390,35 @@ WRITE8_MEMBER(apple3_state::apple3_via_1_out_b)
 	apple3_via_out(&m_via_1_b, data);
 }
 
-WRITE_LINE_MEMBER(apple3_state::apple3_via_1_irq_func)
+void apple3_state::apple3_irq_update()
 {
-	m_via_1_irq = state;
 	if (m_via_1_irq || m_via_0_irq)
 	{
+//		printf("   asserting IRQ\n");
 		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		m_via_1->write_pa7(0);	// this is active low
 	}
 	else
 	{
+//		printf("   clearing IRQ\n");
 		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+		m_via_1->write_pa7(1);
 	}
+}
+
+WRITE_LINE_MEMBER(apple3_state::apple3_via_1_irq_func)
+{
+//	printf("via 1 IRQ: %d\n", state);
+	m_via_1_irq = state;
+	apple3_irq_update();
 }
 
 
 WRITE_LINE_MEMBER(apple3_state::apple3_via_0_irq_func)
 {
+//	printf("via 0 IRQ: %d\n", state);
 	m_via_0_irq = state;
-	if (m_via_1_irq || m_via_0_irq)
-	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	}
+	apple3_irq_update();
 }
 
 MACHINE_RESET_MEMBER(apple3_state,apple3)

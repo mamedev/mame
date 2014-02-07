@@ -60,6 +60,9 @@ public:
 	// construction/destruction
 	mn10200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_READ8_MEMBER(io_control_r);
+	DECLARE_WRITE8_MEMBER(io_control_w);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -137,26 +140,31 @@ private:
 	address_space *m_program;
 	address_space *m_io;
 
-	UINT8 mn102_read_byte(UINT32 address);
-	UINT16 mn102_read_word(UINT32 address);
-	void mn102_write_byte(UINT32 address, UINT8 data);
-	void mn102_write_word(UINT32 address, UINT16 data);
-	INT32 r24u(offs_t adr);
-	void w24(offs_t adr, UINT32 val);
-	void mn102_change_pc(UINT32 pc);
-	void mn102_take_irq(int level, int group);
+	// internal read/write
+	inline UINT8 read_arg8(UINT32 address) { return m_program->read_byte(address); }
+	inline UINT16 read_arg16(UINT32 address) { return m_program->read_byte(address) | m_program->read_byte(address + 1) << 8; }
+	inline UINT32 read_arg24(UINT32 address) { return m_program->read_byte(address) | m_program->read_byte(address + 1) << 8 | m_program->read_byte(address + 2) << 16; }
+
+	inline UINT8 read_mem8(UINT32 address) { return m_program->read_byte(address); }
+	inline UINT16 read_mem16(UINT32 address) { return m_program->read_word(address & ~1); }
+	inline UINT32 read_mem24(UINT32 address) { return m_program->read_word(address & ~1) | m_program->read_byte((address & ~1) + 2) << 16; }
+
+	inline void write_mem8(UINT32 address, UINT8 data) { m_program->write_byte(address, data); }
+	inline void write_mem16(UINT32 address, UINT16 data) { m_program->write_word(address & ~1, data); }
+	inline void write_mem24(UINT32 address, UINT32 data) { m_program->write_word(address & ~1, data); m_program->write_byte((address & ~1) + 2, data >> 16); }
+
+	inline void change_pc(UINT32 pc) { m_pc = pc & 0xffffff; }
+
+	void take_irq(int level, int group);
 	void refresh_timer(int tmr);
 	void timer_tick_simple(int tmr);
 	TIMER_CALLBACK_MEMBER( simple_timer_cb );
 	void unemul();
-	UINT32 do_add(UINT32 a, UINT32 b);
-	UINT32 do_addc(UINT32 a, UINT32 b);
-	UINT32 do_sub(UINT32 a, UINT32 b);
-	UINT32 do_subc(UINT32 a, UINT32 b);
+	UINT32 do_add(UINT32 a, UINT32 b, UINT32 c);
+	UINT32 do_sub(UINT32 a, UINT32 b, UINT32 c);
 	void test_nz16(UINT16 v);
 	void do_jsr(UINT32 to, UINT32 ret);
-	void mn10200_w(UINT32 adr, UINT32 data, int type);
-	UINT32 mn10200_r(UINT32 adr, int type);
+	void do_branch(bool state);
 };
 
 

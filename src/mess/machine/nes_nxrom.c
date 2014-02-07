@@ -556,18 +556,28 @@ WRITE8_MEMBER(nes_un1rom_device::write_h)
  
  iNES: mapper 218
  
- In MESS: Not Supported.
+ In MESS: Supported.
  
  -------------------------------------------------*/
 
 WRITE8_MEMBER(nes_nochr_device::chr_w)
 {
-	int bank = offset >> 10;
-	m_nt_access[bank & 0x03][offset & 0x3ff] = data;
+	int mirr = get_mirroring();
+	if (mirr == PPU_MIRROR_HIGH)
+		m_ciram[(offset & 0x3ff) + 0x000] = data;
+	else if (mirr == PPU_MIRROR_LOW)
+		m_ciram[(offset & 0x3ff) + 0x400] = data;
+	else
+		m_ciram[offset & 0x7ff] = data;	// not sure here, since there is no software to test...
 }
 
 READ8_MEMBER(nes_nochr_device::chr_r)
 {
-	int bank = offset >> 10;
-	return m_nt_access[bank & 0x03][offset & 0x3ff];
+	int mirr = get_mirroring();
+	if (mirr == PPU_MIRROR_HIGH)
+		return m_ciram[(offset & 0x3ff) + 0x000];
+	else if (mirr == PPU_MIRROR_LOW)
+		return m_ciram[(offset & 0x3ff) + 0x400];
+	else
+		return m_ciram[offset & 0x7ff];	// not sure here, since there is no software to test...
 }

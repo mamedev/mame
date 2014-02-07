@@ -140,8 +140,10 @@
       B) General encryption. Managed through hardware:
 
           - All games using the blue TAB PCB with 2x HY18CV85 (electrically-erasable PLDs), use
-            complex operations for each byte nibble. See DRIVER_INIT for the final algorithm.
+             complex operations for each byte nibble. See DRIVER_INIT for the final algorithm.
           - Saloon (french) use bitswaps to address & data in program, graphics and color PROM.
+          - Dino4 hardware games have address/data bitswap in program, and data bitswap (sometimes
+           	 with extra boolean XOR operations) in graphics.
 
   - Microcontroller. Some games are using an extra microcontroller mainly for protection.
 
@@ -386,7 +388,67 @@
 
   Press DEAL/DRAW to exit the mode.
 
+  
+  * Unknown Royal Card on Dino4 hardware....
+  
+  This one is really strange. The game is running in a Dino4 hardware, plus a daughterboard
+  with a mexican Rockwell R65C02 + an unknown PLCC. The program/gfx are totally decrypted.
+  The game vectors are $C122 (RESET) and $C20F (IRQ)
+  
+  The code starts...
+  
+  C122: A2 FF      LDX #$FF    ; load 0xFF to reg X
+  C124: 9A         TXS         ; transfer to the stack
+  C125: 78         SEI         ; set interrupts
+  C126: D8         CLD         ; clear decimal
+  C127: 18         CLC         ; clear carry
+  C128: A9 4C      LDA #$4C    ;\
+  C12A: 8D 00 00   STA $0000   ; \
+  C12D: A9 10      LDA #$10    ;  \ set 4C 10 C2 (JMP $C210) into $0000
+  C12F: 8D 01 00   STA $0001   ;  /
+  C132: A9 C2      LDA #$C2    ; /
+  C134: 8D 02 00   STA $0002   ;/
+  C137: 4C DC 48   JMP $48DC   ; jump to $48DC...
+  
+  48DC: 93         NOP         ;\
+  48DD: 00         BRK         ; \
+  48DE: B7 4B      SMB3 $4B    ;  \
+  48E0: 05 93      ORA $93     ;   > nothing has sense here...
+  48E2: 00         BRK         ;  /
+  48E3: B7 4D      SMB3 $4B    ; /
+  48E5: 05 B7      ORA $B7     ;/
+  48E7: 4C 05 76   JMP $7605   ; jump to $7605 (no code there)
+  
+  and the IRQ vector pointed code...
+  
+  C20F: 40         RTI         ; return from interrupt
+  
+  and the code pointed from $0000...
+  
+  C210: 48         PHA         ; transfer accumulator to stack
+  C211: AD 01 0A   LDA $0A01   ; read the PIA #2 input
+  C214: 29 F7      AND #$F7    ; \ compare with 0xF7
+  C216: CD 01 0A   CMP $0A01   ; /
+  C219: D0 02      BNE $C21D   ; if not... jump to $C21D
+  C21B: 09 08      ORA #$08    ; \ clean the value
+  C21D: 8D 01 0A   STA $0A01   ; /
+  C220: 68         PLA         ; take out from the stack the previous accumulator value
+  C221: 40         RTI         ; return from interrupt
 
+  The board was later tested with a fluke, and the code dumped from the real hardware,
+  match 100% the one I decrypted here. Even with the game working properly in the real
+  hardware. The only visible changes are in the NVRAM, where the $0000 offset hasn't
+  the JMP $C210 instruction injected at the start...
+  
+  Maybe some scrambled instructions on the fatidic 'mexican' Rockwell R65C02 (like Magic Card II)??...
+  Maybe mnemonic 93 is AXA (ab),Y (93 ab) instead of NOP (as some sources said)??...
+
+  Tooo much obscure/darkness here
+  
+  So... No idea what's wrong here.
+  If someone could figure a possible transform, please let me know.
+  
+  
 ***********************************************************************************
 
 
@@ -842,6 +904,10 @@
   - Decrypted program address + data, but code still jumps into $48xx
      range where there's no valid code.
   - Decoded and partially decrypted the graphics set.
+
+  [2014/02/05]
+  - Rcdino4: Fully decrypted the graphics set.
+  - Added technical notes...
 
 
   *** TO DO ***
@@ -5442,12 +5508,14 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 
 	auto_free(machine(), buffer);
 
+	/* d4-d5 data lines swap, plus a XOR with 0x81, implemented in two steps for an easy view */
 	
 	int x;
 	UINT8 *src = memregion( "gfx1" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
+		src[x] = BITSWAP8(src[x], 7, 6, 4, 5, 3, 2, 1, 0);
 		src[x] = src[x] ^ 0x81;
 	}
 	

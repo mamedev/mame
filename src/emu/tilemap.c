@@ -935,8 +935,10 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 	// flush the dirty state to all tiles as appropriate
 	realize_all_dirty_tiles();
 
-	UINT32 width  = screen.width();
-	UINT32 height = screen.height();
+	// flip the tilemap around the center of the visible area
+	rectangle visarea = screen.visible_area();
+	UINT32 width = visarea.min_x + visarea.max_x + 1;
+	UINT32 height = visarea.min_y + visarea.max_y + 1;
 
 	// XY scrolling playfield
 	if (m_scrollrows == 1 && m_scrollcols == 1)

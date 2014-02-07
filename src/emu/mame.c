@@ -148,14 +148,6 @@ int mame_execute(emu_options &options, osd_interface &osd)
 	bool exit_pending = false;
 	int error = MAMERR_NONE;
 
-		// We need to preprocess the config files once to determine the web server's configuration
-		if (options.read_config())
-		{
-			options.revert(OPTION_PRIORITY_INI);
-			astring errors;
-			options.parse_standard_inis(errors);
-		}
-
 	web_engine web(options);
 
 	while (error == MAMERR_NONE && !exit_pending)

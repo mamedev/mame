@@ -22,7 +22,7 @@ public:
 	virtual const char *extensions() const;
 
 protected:
-	static const format formats[];
+	static const format file_formats[];
 };
 
 extern const floppy_format_type FLOPPY_D82_FORMAT;

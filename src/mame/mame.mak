@@ -2438,7 +2438,8 @@ $(DRIVERS)/g627.o:  $(LAYOUT)/g627.lh
 $(DRIVERS)/galaxi.o:    $(LAYOUT)/galaxi.lh
 
 $(DRIVERS)/gatron.o:    $(LAYOUT)/poker41.lh \
-			$(LAYOUT)/pulltabs.lh
+			$(LAYOUT)/pulltabs.lh \
+			$(LAYOUT)/bingo.lh
 
 $(DRIVERS)/globalfr.o:  $(LAYOUT)/globalfr.lh
 

@@ -73,7 +73,7 @@ public:
 	DECLARE_MACHINE_RESET(apple3);
 	DECLARE_VIDEO_START(apple3);
 	UINT32 screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(apple3_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(apple3_interrupt);
 	DECLARE_WRITE8_MEMBER(apple3_via_0_out_a);
 	DECLARE_WRITE8_MEMBER(apple3_via_0_out_b);
 	DECLARE_WRITE8_MEMBER(apple3_via_1_out_a);
@@ -95,6 +95,7 @@ public:
 	UINT8 *apple3_get_indexed_addr(offs_t offset);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_c040_tick);
 	DECLARE_PALETTE_INIT(apple3);
+	void apple3_irq_update();
 
 	bool m_sync;
 	UINT8 m_indir_opcode;

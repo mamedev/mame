@@ -492,8 +492,6 @@ VIDEO_START_MEMBER(twin16_state,twin16)
 
 	m_text_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(twin16_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_text_tilemap->set_transparent_pen(0);
-	m_text_tilemap->set_scrolldx(0, m_screen->width() - 320);
-	m_text_tilemap->set_scrolldy(0, m_screen->height() - 256);
 
 	palette_set_shadow_factor(machine(),0.4); // screenshots estimate
 

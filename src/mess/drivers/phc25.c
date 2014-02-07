@@ -1,13 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Robbbert
 /***************************************************************************
 
         Sanyo PHC-25
-
-        Skeleton driver.
-
-****************************************************************************
-
 
 
     http://www.geocities.jp/sanyo_phc_25/
@@ -26,10 +21,7 @@
 
     TODO:
 
-    - MC6847 mode selection lines
-    - accurate video timing
-
-    - sound isn't working (should be a keyclick)
+    - sound isn't working
     - screen attribute bit 7 is unknown
 
 
@@ -42,7 +34,7 @@ RUN
 10 SCREEN2,1,1:CLS:FORX=0TO8:LINE(X*24,0)-(X*24+16,191),X,BF:NEXT
 RUN
 
-*/
+*****************************************************************************/
 
 #include "includes/phc25.h"
 
@@ -90,11 +82,11 @@ WRITE8_MEMBER( phc25_state::port40_w )
 
 	    0       cassette output
 	    1       cassette motor
-	    2       LED in the LOCK button (on = uppercase)
+	    2       LED in the LOCK button (on = capslock)
 	    3       centronics strobe
 	    4
-	    5       MC6847 GM1
-	    6       MC6847 GM0
+	    5       MC6847 GM0
+	    6       MC6847 CSS
 	    7       MC6847 A/G
 
 	*/
@@ -109,9 +101,7 @@ WRITE8_MEMBER( phc25_state::port40_w )
 	m_centronics->strobe_w(BIT(data, 3));
 
 	/* MC6847 */
-	m_vdg->intext_w(1);
 	m_vdg->gm0_w(BIT(data, 5));
-	m_vdg->gm1_w(1);
 	m_vdg->css_w(BIT(data, 6));
 	m_vdg->ag_w(BIT(data, 7));
 	m_port40 = data;
@@ -268,14 +258,7 @@ READ8_MEMBER( phc25_state::video_ram_r )
 {
 	if BIT(m_port40, 7) // graphics
 	{
-		if BIT(m_port40, 5)
-		{// screen 4
-			return m_video_ram[((offset & 0x1fe0)<<1) + (offset & 0x1f) + 0x800 ];
-		}
-		else
-		{// screen 3
-			return m_video_ram[((offset & 0x1fe0)<<2) + (offset & 0x1f) ];
-		}
+		return m_video_ram[offset];
 	}
 	else	// text
 	{
@@ -317,12 +300,12 @@ static const mc6847_interface ntsc_vdg_intf =
 	DEVCB_DRIVER_LINE_MEMBER(phc25_state, irq_w),       /* field sync */
 
 	DEVCB_NULL,                                         /* AG */
-	DEVCB_NULL,                                         /* GM2 */
-	DEVCB_NULL,                                         /* GM1 */
+	DEVCB_LINE_VCC,                                     /* GM2 */
+	DEVCB_LINE_VCC,                                     /* GM1 */
 	DEVCB_NULL,                                         /* GM0 */
 	DEVCB_NULL,                                         /* CSS */
 	DEVCB_NULL,                                         /* AS */
-	DEVCB_NULL,                                         /* INTEXT */
+	DEVCB_LINE_VCC,                                     /* INTEXT */
 	DEVCB_NULL,                                         /* INV */
 
 	&phc25_state::ntsc_char_rom_r
@@ -337,12 +320,12 @@ static const mc6847_interface pal_vdg_intf =
 	DEVCB_DRIVER_LINE_MEMBER(phc25_state, irq_w),       /* field sync */
 
 	DEVCB_NULL,                                         /* AG */
-	DEVCB_NULL,                                         /* GM2 */
-	DEVCB_NULL,                                         /* GM1 */
+	DEVCB_LINE_VCC,                                     /* GM2 */
+	DEVCB_LINE_VCC,                                     /* GM1 */
 	DEVCB_NULL,                                         /* GM0 */
 	DEVCB_NULL,                                         /* CSS */
 	DEVCB_NULL,                                         /* AS */
-	DEVCB_NULL,                                         /* INTEXT */
+	DEVCB_LINE_VCC,                                     /* INTEXT */
 	DEVCB_NULL,                                         /* INV */
 
 	&phc25_state::pal_char_rom_r
