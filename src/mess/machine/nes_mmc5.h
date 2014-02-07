@@ -28,6 +28,7 @@ protected:
 	void prgram_bank8_x(int start, int bank);
 	void update_render_mode();
 	void update_prg();
+	void update_chr();
 
 	UINT16     m_irq_count;
 	UINT8      m_irq_status;
@@ -51,6 +52,7 @@ protected:
 	int m_wram_base;    // $5113
 
 	UINT8 m_mmc5_last_chr_a;
+	UINT8 m_last_chr;
 	UINT8 m_prg_regs[4];
 
 	UINT8 m_high_chr;   // $5130
