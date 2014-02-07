@@ -99,10 +99,10 @@ VIDEO_START_MEMBER(ddragon_state,ddragon)
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ddragon_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
-	m_fg_tilemap->set_scrolldx(0, 256);
+	m_fg_tilemap->set_scrolldx(0, 0);
 	m_bg_tilemap->set_scrolldx(0, 0);
 	m_fg_tilemap->set_scrolldy(-8, -8);
-	m_bg_tilemap->set_scrolldy(-8, -24);
+	m_bg_tilemap->set_scrolldy(-8, -8);
 }
 
 
@@ -174,8 +174,8 @@ void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 			if (flip_screen())
 			{
-				sx = 240 + 128 - sx;
-				sy = 256 + 16 - sy;
+				sx = 240 - sx;
+				sy = 240 - 16 - sy;
 				flipx = !flipx;
 				flipy = !flipy;
 				dx = -dx;
