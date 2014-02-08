@@ -142,7 +142,9 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 					m_tile_page(0),
 					m_sprite_page(0),
 					m_back_color(0),
-					m_scan_scale(1) // set the scan scale (this is for dual monitor vertical setups)
+					m_scan_scale(1), // set the scan scale (this is for dual monitor vertical setups)
+					m_tilecount(0),
+					m_draw_phase(0)
 {
 	for (int i = 0; i < PPU_MAX_REG; i++)
 		m_regs[i] = 0;
@@ -258,6 +260,8 @@ void ppu2c0x_device::device_start()
 	save_item(NAME(m_scanlines_per_frame));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_palette_ram));
+	save_item(NAME(m_draw_phase));
+	save_item(NAME(m_tilecount));
 	save_pointer(NAME(m_spriteram), SPRITERAM_SIZE);
 	save_pointer(NAME(m_colortable), ARRAY_LENGTH(default_colortable));
 	save_pointer(NAME(m_colortable_mono), ARRAY_LENGTH(default_colortable_mono));
@@ -565,7 +569,7 @@ void ppu2c0x_device::draw_background( UINT8 *line_priority )
 	const pen_t *color_table;
 	const pen_t *paldata;
 
-	int tilecount = 0;
+	m_tilecount = 0;
 
 	/* setup the color mask and colortable to use */
 	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
@@ -597,7 +601,7 @@ void ppu2c0x_device::draw_background( UINT8 *line_priority )
 	dest = &bitmap.pix16(m_scanline, start_x);
 
 	/* draw the 32 or 33 tiles that make up a line */
-	while (tilecount < 34)
+	while (m_tilecount < 34)
 	{
 		int color_byte;
 		int color_bits;
@@ -672,7 +676,7 @@ void ppu2c0x_device::draw_background( UINT8 *line_priority )
 				tile_index ^= 0x400;
 			}
 		}
-		tilecount++;
+		m_tilecount++;
 	}
 
 	/* if the left 8 pixels for the background are off, blank 'em */
@@ -897,6 +901,8 @@ void ppu2c0x_device::render_scanline( void )
 	/* clear the line priority for this scanline */
 	memset(line_priority, 0, VISIBLE_SCREEN_WIDTH);
 
+	m_draw_phase = PPU_DRAW_BG;
+
 	/* see if we need to render the background */
 	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND)
 		draw_background(line_priority);
@@ -921,9 +927,13 @@ void ppu2c0x_device::render_scanline( void )
 			bitmap.pix16(m_scanline, i) = back_pen;
 	}
 
+	m_draw_phase = PPU_DRAW_OAM;
+	
 	/* if sprites are on, draw them, but we call always to process them */
 	draw_sprites(line_priority);
 
+	m_draw_phase = PPU_DRAW_BG;
+	
 	/* done updating, whew */
 	g_profiler.stop();
 }

@@ -68,15 +68,20 @@ void nes_exrom_device::device_start()
 	save_item(NAME(m_wram_base));
 	save_item(NAME(m_wram_protect_1));
 	save_item(NAME(m_wram_protect_2));
-	save_item(NAME(m_mmc5_last_chr_a)); // basically unused in current code
+	save_item(NAME(m_vrom_bank));
+	save_item(NAME(m_last_chr));
+	save_item(NAME(m_ex1_chr));
+	save_item(NAME(m_split_chr));
+	save_item(NAME(m_prg_regs));
+	save_item(NAME(m_prg_ram_mapped));
+	save_item(NAME(m_ex1_bank));
 	save_item(NAME(m_high_chr));
 	save_item(NAME(m_split_scr));
+	save_item(NAME(m_split_rev));
 	save_item(NAME(m_split_ctrl));
 	save_item(NAME(m_split_yst));
 	save_item(NAME(m_split_bank));
-	save_item(NAME(m_prg_regs));
-	save_item(NAME(m_vrom_bank));
-	save_item(NAME(m_last_chr));
+	save_item(NAME(m_vcount));
 
 	m_exram = auto_alloc_array_clear(machine(), UINT8, 0x400);
 	save_pointer(NAME(m_exram), 0x400);
@@ -103,19 +108,27 @@ void nes_exrom_device::pcb_reset()
 	m_wram_base = 0;
 	m_wram_protect_1 = 0;
 	m_wram_protect_2 = 0;
-	m_mmc5_last_chr_a = 1;
 	m_high_chr = 0;
 	m_split_scr = 0;
+	m_split_rev = 0;
 	m_split_ctrl = 0;
 	m_split_yst = 0;
 	m_split_bank = 0;
 	m_last_chr = LAST_CHR_REG_A;
-
+	m_ex1_chr = 0;
+	m_split_chr = 0;
+	m_ex1_bank = 0;
+	m_vcount = 0;
+	
 	memset(m_vrom_bank, 0x3ff, ARRAY_LENGTH(m_vrom_bank));
 	m_prg_regs[0] = 0xfc;
 	m_prg_regs[1] = 0xfd;
 	m_prg_regs[2] = 0xfe;
 	m_prg_regs[3] = 0xff;
+	m_prg_ram_mapped[0] = 0;
+	m_prg_ram_mapped[1] = 0;
+	m_prg_ram_mapped[2] = 0;
+	m_prg_ram_mapped[3] = 0;
 }
 
 
@@ -140,8 +153,13 @@ void nes_exrom_device::prgram_bank8_x(int start, int bank)
 {
 	assert(start < 4);
 	assert(bank >= 0);
+	assert(m_prgram_size + m_battery_size);
 
-	bank &= (m_prgram_size / 0x2000) - 1;
+	// currently we use 4x8k BWRAM + 4x8k WRAM banks, independently from the actual PRG-RAM size
+	// mirroring of the actual size is taken care of at bank setup (even if no known commercial game relies on it!)
+	//bank &= (m_prgram_size / 0x2000) - 1;
+	if (!m_prgram_size || !m_battery_size)
+		bank &= 3;
 
 	// PRG RAM is mapped after PRG ROM
 	m_prg_bank[start] = m_prg_chunks + bank;
@@ -156,15 +174,15 @@ void nes_exrom_device::update_prg()
 	switch (m_prg_mode)
 	{
 		case 0: // 32k banks
-			bank3 = (m_prg_regs[3] & 0x7f) >> 2;
+			bank3 = m_prg_regs[3] >> 2;
 			prg32(bank3);
 			break;
 
 		case 1: // 16k banks
-			bank1 = (m_prg_regs[1] & 0x7f) >> 1;
-			bank3 = (m_prg_regs[3] & 0x7f) >> 1;
+			bank1 = m_prg_regs[1] >> 1;
+			bank3 = m_prg_regs[3] >> 1;
 
-			if (!BIT(m_prg_regs[1], 7)) // PRG RAM
+			if (m_prg_ram_mapped[1])
 			{
 				prgram_bank8_x(0, ((bank1 << 1) & 0x07));
 				prgram_bank8_x(1, ((bank1 << 1) & 0x07) | 1);
@@ -176,11 +194,11 @@ void nes_exrom_device::update_prg()
 			break;
 
 		case 2: // 16k-8k banks
-			bank1 = (m_prg_regs[1] & 0x7f) >> 1;
-			bank2 = (m_prg_regs[2] & 0x7f);
-			bank3 = (m_prg_regs[3] & 0x7f);
+			bank1 = m_prg_regs[1] >> 1;
+			bank2 = m_prg_regs[2];
+			bank3 = m_prg_regs[3];
 
-			if (!BIT(m_prg_regs[1], 7))
+			if (m_prg_ram_mapped[1])
 			{
 				prgram_bank8_x(0, ((bank1 << 1) & 0x07));
 				prgram_bank8_x(1, ((bank1 << 1) & 0x07) | 1);
@@ -188,7 +206,7 @@ void nes_exrom_device::update_prg()
 			else
 				prg16_89ab(bank1);
 
-			if (!BIT(m_prg_regs[2], 7))
+			if (m_prg_ram_mapped[2])
 				prgram_bank8_x(2, bank2 & 0x07);
 			else
 				prg8_cd(bank2);
@@ -197,22 +215,22 @@ void nes_exrom_device::update_prg()
 			break;
 
 		case 3: // 8k banks
-			bank0 = (m_prg_regs[0] & 0x7f);
-			bank1 = (m_prg_regs[1] & 0x7f);
-			bank2 = (m_prg_regs[2] & 0x7f);
-			bank3 = (m_prg_regs[3] & 0x7f);
+			bank0 = m_prg_regs[0];
+			bank1 = m_prg_regs[1];
+			bank2 = m_prg_regs[2];
+			bank3 = m_prg_regs[3];
 
-			if (!BIT(m_prg_regs[0], 7))
+			if (m_prg_ram_mapped[0])
 				prgram_bank8_x(0, bank0 & 0x07);
 			else
 				prg8_89(bank0);
 
-			if (!BIT(m_prg_regs[1], 7))
+			if (m_prg_ram_mapped[1])
 				prgram_bank8_x(1, bank1 & 0x07);
 			else
 				prg8_ab(bank1);
 
-			if (!BIT(m_prg_regs[2], 7))
+			if (m_prg_ram_mapped[2])
 				prgram_bank8_x(2, bank2 & 0x07);
 			else
 				prg8_cd(bank2);
@@ -222,81 +240,10 @@ void nes_exrom_device::update_prg()
 	}
 }
 
-void nes_exrom_device::update_chr()
-{
-	// for the moment ignore the case of sprite_8x16 [need to be hooked up to PPU properly!]
-	switch (m_chr_mode)
-	{
-		case 0: // 8k pages
-			if (m_last_chr == LAST_CHR_REG_A)
-			{
-				chr8(m_vrom_bank[7] & 0xff, CHRROM);
-			}
-			else
-			{
-				chr8((m_vrom_bank[11] & 0xff) << 1, CHRROM);
-			}
-			break;
-			
-		case 1: // 4k pages
-			if (m_last_chr == LAST_CHR_REG_A)
-			{
-				chr4_0(m_vrom_bank[3] & 0xff, CHRROM);
-				chr4_4(m_vrom_bank[7] & 0xff, CHRROM);
-			}
-			else
-			{
-				chr4_0(m_vrom_bank[11] & 0xff, CHRROM);
-				chr4_4(m_vrom_bank[11] & 0xff, CHRROM);
-			}
-			break;
-			
-		case 2: // 2k pages
-			if (m_last_chr == LAST_CHR_REG_A)
-			{
-				chr2_0(m_vrom_bank[1], CHRROM);
-				chr2_2(m_vrom_bank[3], CHRROM);
-				chr2_4(m_vrom_bank[5], CHRROM);
-				chr2_6(m_vrom_bank[7], CHRROM);
-			}
-			else
-			{
-				chr2_0(m_vrom_bank[ 9], CHRROM);
-				chr2_2(m_vrom_bank[11], CHRROM);
-				chr2_4(m_vrom_bank[ 9], CHRROM);
-				chr2_6(m_vrom_bank[11], CHRROM);
-			}
-			break;
-			
-		case 3: // 1k pages
-			if (m_last_chr == LAST_CHR_REG_A)
-			{
-				chr1_0(m_vrom_bank[0], CHRROM);
-				chr1_1(m_vrom_bank[1], CHRROM);
-				chr1_2(m_vrom_bank[2], CHRROM);
-				chr1_3(m_vrom_bank[3], CHRROM);
-				chr1_4(m_vrom_bank[4], CHRROM);
-				chr1_5(m_vrom_bank[5], CHRROM);
-				chr1_6(m_vrom_bank[6], CHRROM);
-				chr1_7(m_vrom_bank[7], CHRROM);
-			}
-			else
-			{
-//				chr1_0(m_vrom_bank[ 8], CHRROM);
-//				chr1_1(m_vrom_bank[ 9], CHRROM);
-//				chr1_2(m_vrom_bank[10], CHRROM);
-//				chr1_3(m_vrom_bank[11], CHRROM);
-				chr1_4(m_vrom_bank[ 8], CHRROM);
-				chr1_5(m_vrom_bank[ 9], CHRROM);
-				chr1_6(m_vrom_bank[10], CHRROM);
-				chr1_7(m_vrom_bank[11], CHRROM);
-			}
-			break;
-	}
-}
-
 void nes_exrom_device::hblank_irq(int scanline, int vblank, int blanked )
 {
+	m_vcount = scanline;
+	
 	if (scanline == m_irq_count)
 	{
 		if (m_irq_enable)
@@ -310,14 +257,6 @@ void nes_exrom_device::hblank_irq(int scanline, int vblank, int blanked )
 		m_irq_status |= 0x40;
 	else if (scanline > PPU_BOTTOM_VISIBLE_SCANLINE)
 		m_irq_status &= ~0x40;
-
-	/* FIXME: this is ok, but then we would need to update them again when we have the BG Hblank
-	 I leave it commented out until the PPU is updated for this */
-// 		ppu2c0x_device *m_ppu = machine().device<ppu2c0x_device>("ppu");
-//  if (m_ppu->is_sprite_8x16() || m_mmc5_last_chr_a)
-//      update_chr_a();
-//  else
-//      update_chr_b();
 }
 
 
@@ -343,6 +282,20 @@ void nes_exrom_device::set_mirror(int page, int src)
 	}
 }
 
+inline bool nes_exrom_device::in_split()
+{
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
+	int tile = ppu->get_tilenum();
+	
+	if (tile < 34)
+	{
+		if (!m_split_rev && tile < m_split_ctrl)
+			return TRUE;
+		if (m_split_rev && tile >= m_split_ctrl)
+			return TRUE;
+	}
+	return FALSE;
+}
 
 READ8_MEMBER(nes_exrom_device::nt_r)
 {
@@ -356,6 +309,7 @@ READ8_MEMBER(nes_exrom_device::nt_r)
 			return m_floodtile;
 
 		case EXRAM:
+			// to investigate: can split screen affect this too?
 			if (!BIT(m_exram_control, 1))
 				return m_exram[offset & 0x3ff];
 			else
@@ -363,16 +317,33 @@ READ8_MEMBER(nes_exrom_device::nt_r)
 
 		case CIRAM:
 		default:
+			// Uchuu Keibitai SDF uses extensively split screen for its intro, 
+			// but it does not work yet
+			if (m_split_scr && !(m_exram_control & 0x02) && in_split())
+			{
+				ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
+				int tile = ppu->get_tilenum();
+
+				if ((offset & 0x3ff) >= 0x3c0)
+				{
+					int pos = (((m_split_yst + m_vcount) & ~0x1f) | (tile & 0x1f)) >> 2;
+					return m_exram[0x3c0 | pos];
+				}
+				else
+				{
+					int pos = (((m_split_yst + m_vcount) & 0xf8) << 2) | (tile & 0x1f);
+					return m_exram[pos];
+				}
+			}
+
 			if (m_exram_control == 1)
 			{
 				if ((offset & 0x3ff) >= 0x3c0)
 					return m_mmc5_attrib[(m_exram[offset & 0x3ff] >> 6) & 0x03];
-				else
+				else	// in this case, we write Ex1 CHR bank, but then access NT normally!
 				{
-					// in this case, we swap CHR bank, but then access NT normally!
-					int bank = (m_exram[offset & 0x3ff] & 0x3f) | (m_high_chr << 6);
-					chr4_0(bank, CHRROM);
-					chr4_4(bank, CHRROM);
+					m_ex1_chr = 1;
+					m_ex1_bank = (m_exram[offset & 0x3ff] & 0x3f) | (m_high_chr << 6);
 				}
 			}
 			return m_nt_access[page][offset & 0x3ff];
@@ -397,6 +368,72 @@ WRITE8_MEMBER(nes_exrom_device::nt_w)
 			m_nt_access[page][offset & 0x3ff] = data;
 			break;
 	}
+}
+
+inline UINT8 nes_exrom_device::base_chr_r(int bank, UINT32 offset)
+{
+	UINT32 helper = 0;
+
+	switch (m_chr_mode)
+	{
+		case 0:
+			if (bank < 8)
+				helper = ((m_vrom_bank[bank | 7] & 0xff) * 0x2000) + (offset & 0x1fff);
+			else
+				helper = ((m_vrom_bank[bank | 3] & 0xff) * 0x2000) + (offset & 0xfff);
+			break;
+		case 1:
+			helper = ((m_vrom_bank[bank | 3] & 0xff) * 0x1000) + (offset & 0xfff);
+			break;
+		case 2:
+			helper = (m_vrom_bank[bank | 1] * 0x800) + (offset & 0x7ff);
+			break;
+		case 3:
+			helper = (m_vrom_bank[bank] * 0x400) + (offset & 0x3ff);
+			break;
+	}
+
+	return m_vrom[helper];
+}
+
+inline UINT8 nes_exrom_device::split_chr_r(UINT32 offset)
+{
+	UINT32 helper = (m_split_bank * 0x1000) + (offset & 0x3f8) + (m_split_yst & 7);
+	return m_vrom[helper];
+}
+
+inline UINT8 nes_exrom_device::bg_ex1_chr_r(UINT32 offset)
+{
+	UINT32 helper = (m_ex1_bank * 0x1000) + (offset & 0xfff);
+	return m_vrom[helper];
+}
+
+READ8_MEMBER(nes_exrom_device::chr_r)
+{
+	int bank = offset >> 10;
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
+
+	// Extended Attribute Mode (Ex1) does affect BG drawing even for 8x16 sprites (JustBreed uses it extensively!)
+	// However, if a game enables Ex1 but does not write a new m_ex1_bank, I'm not sure here we get the correct behavior
+	if (m_exram_control == 1 && ppu->get_draw_phase() == PPU_DRAW_BG && m_ex1_chr)
+		return bg_ex1_chr_r(offset & 0xfff);
+	
+	if (m_split_scr && !(m_exram_control & 0x02) && in_split() && ppu->get_draw_phase() == PPU_DRAW_BG && m_split_chr)
+		return split_chr_r(offset & 0xfff);
+	
+	if (ppu->is_sprite_8x16())
+	{
+		if (ppu->get_draw_phase() == PPU_DRAW_OAM)
+			return base_chr_r(bank & 7, offset & 0x1fff);
+
+		if (ppu->get_draw_phase() == PPU_DRAW_BG)
+			return base_chr_r((bank & 3) + 8, offset & 0x1fff);
+	}
+
+	if (m_last_chr == LAST_CHR_REG_A)
+		return base_chr_r(bank & 7, offset & 0x1fff);
+	else
+		return base_chr_r((bank & 3) + 8, offset & 0x1fff);
 }
 
 
@@ -430,7 +467,7 @@ READ8_MEMBER(nes_exrom_device::read_l)
 
 		default:
 			logerror("MMC5 uncaught read, offset: %04x\n", offset + 0x4100);
-			return 0x00;
+			return m_open_bus;
 	}
 }
 
@@ -474,7 +511,8 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 
 		case 0x1101:
 			m_chr_mode = data & 0x03;
-			update_chr();
+			m_ex1_chr = 0;
+			m_split_chr = 0;
 			//LOG_MMC(("MMC5 vrom bank mode: %02x\n", data));
 			break;
 
@@ -517,7 +555,8 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 		case 0x1115:
 		case 0x1116:
 		case 0x1117:
-			m_prg_regs[offset & 3] = data;
+			m_prg_regs[offset & 3] = data & 0x7f;
+			m_prg_ram_mapped[offset & 3] = !BIT(data, 7);	// m_prg_ram_mapped[3] is not used, in fact!
 			update_prg();
 			break;
 
@@ -531,7 +570,8 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 		case 0x1127:
 			m_vrom_bank[offset & 0x07] = data | (m_high_chr << 8);
 			m_last_chr = LAST_CHR_REG_A;
-			update_chr();
+			m_ex1_chr = 0;
+			m_split_chr = 0;
 			break;
 
 		case 0x1128:
@@ -540,20 +580,22 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 		case 0x112b:
 			m_vrom_bank[offset & 0x0f] = data | (m_high_chr << 8);
 			m_last_chr = LAST_CHR_REG_B;
-			update_chr();
+			m_ex1_chr = 0;
+			m_split_chr = 0;
 			break;
 
 		case 0x1130:
 			m_high_chr = data & 0x03;
+			m_ex1_chr = 0;
+			m_split_chr = 0;
 			break;
 
 
 		case 0x1200:
-			m_split_scr = data;
 			// in EX2 and EX3 modes, no split screen
-			if (m_exram_control & 0x02)
-				m_split_scr &= 0x7f;
-			m_split_ctrl = data;
+			m_split_scr = BIT(data, 7);
+			m_split_rev = BIT(data, 6);
+			m_split_ctrl = data & 0x1f;
 			break;
 
 		case 0x1201:
@@ -562,6 +604,7 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 
 		case 0x1202:
 			m_split_bank = data;
+			m_split_chr = 1;
 			break;
 
 		case 0x1203:
@@ -580,7 +623,7 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 			break;
 
 		default:
-			logerror("** MMC5 uncaught write, offset: %04x, data: %02x\n", offset + 0x4100, data);
+			logerror("MMC5 uncaught write, offset: %04x, data: %02x\n", offset + 0x4100, data);
 			break;
 	}
 }
@@ -604,7 +647,7 @@ READ8_MEMBER(nes_exrom_device::read_m)
 	else if (m_battery) // 1 chip, BWRAM
 		return m_battery[(offset + (m_wram_base & 0x03) * 0x2000) & (m_battery_size - 1)];
 	else
-		return  ((offset + 0x6000) & 0xff00) >> 8;
+		return m_open_bus;
 }
 
 WRITE8_MEMBER(nes_exrom_device::write_m)
@@ -612,8 +655,23 @@ WRITE8_MEMBER(nes_exrom_device::write_m)
 	if (m_wram_protect_1 != 0x02 || m_wram_protect_2 != 0x01)
 		return;
 
-	if (m_battery)
-		m_battery[offset & (m_battery_size - 1)] = data;
-	if (m_prgram)
-		m_prgram[offset & (m_prgram_size - 1)] = data;
+	if (m_battery && m_wram_base < 4)
+		m_battery[(offset + m_wram_base * 0x2000) & (m_battery_size - 1)] = data;
+	else if (m_prgram)
+		m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram_size - 1)] = data;
+}
+
+// some games (e.g. Bandit Kings of Ancient China) write to PRG-RAM through 0x8000-0xdfff
+// it does not work well yet!
+WRITE8_MEMBER(nes_exrom_device::write_h)
+{
+	int bank = offset / 0x2000;
+	if (m_wram_protect_1 != 0x02 || m_wram_protect_2 != 0x01 || bank == 3 || !m_prg_ram_mapped[bank])
+		return;
+
+	bank = m_prg_bank[bank] - m_prg_chunks;
+	if (m_battery && m_prg_bank[bank] < m_prg_chunks + 4)
+		m_battery[((bank * 0x2000) + (offset & 0x1fff)) & (m_battery_size - 1)] = data;
+	else if (m_prgram)
+		m_prgram[(((bank & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram_size - 1)] = data;
 }
