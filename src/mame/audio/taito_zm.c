@@ -124,7 +124,8 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(taito_zoom_device::sound_irq_w)
 {
-	m_soundcpu->set_input_line(0, HOLD_LINE);
+	m_soundcpu->set_input_line(0, ASSERT_LINE);
+	m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
 
 READ16_MEMBER(taito_zoom_device::sound_irq_r)

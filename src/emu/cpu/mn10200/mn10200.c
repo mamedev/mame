@@ -50,21 +50,55 @@ mn10200_device::mn10200_device(const machine_config &mconfig, const char *tag, d
 
 void mn10200_device::take_irq(int level, int group)
 {
-	if (!(m_psw & FLAG_IE))
-	{
-		// if (group != 8) printf("MN10200: Dropping irq L %d G %d pc=%x, a3=%x\n", level, group, m_pc, m_a[3]);
-		return;
-	}
+	m_cycles -= 7;
 
-	// if (group != 8) printf("MN10200: Taking irq L %d G %d pc=%x, a3=%x\n", level, group, m_pc, m_a[3]);
-
+	write_mem24(m_a[3] - 4, m_pc);
+	write_mem16(m_a[3] - 6, m_psw);
 	m_a[3] -= 6;
-	write_mem24(m_a[3] + 2, m_pc);
-	write_mem16(m_a[3], m_psw);
 	change_pc(0x80008);
 	m_psw = (m_psw & 0xf0ff) | (level << 8);
-	m_iagr = group << 1;
+	m_iagr = group;
 }
+
+void mn10200_device::check_irq()
+{
+	if (!m_nmicr && !(m_psw & FLAG_IE))
+		return;
+	
+	int level = m_psw >> 8 & 7;
+	int group = 0;
+	
+	// find highest valid level
+	for (int i = 1; i < 11; i++)
+	{
+		if (m_icrl[i] >> 4 & m_icrh[i] & 0xf && (m_icrh[i] >> 4 & 7) < level)
+		{
+			level = m_icrh[i] >> 4 & 7;
+			group = i;
+		}
+	}
+	
+	// take interrupt
+	if (m_nmicr && group)
+		take_irq(level, 0);
+	else if (m_nmicr)
+		take_irq(0, 0);
+	else if (group)
+		take_irq(level, group);
+}
+
+void mn10200_device::check_ext_irq()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		// active irq at low or high? (not edge triggered)
+		if ((m_p4 >> i & 1) == (m_extmdl >> (i * 2) & 3))
+			m_icrl[8] |= (1 << (4 + i));
+	}
+	
+	check_irq();
+}
+
 
 void mn10200_device::refresh_timer(int tmr)
 {
@@ -107,8 +141,6 @@ void mn10200_device::timer_tick_simple(int tmr)
 	// did we expire?
 	if (m_simple_timer[tmr].cur == 0)
 	{
-		int group, irq_in_grp, level;
-
 		// does timer auto-reload?  apparently.
 		m_simple_timer[tmr].cur = m_simple_timer[tmr].base;
 
@@ -126,25 +158,9 @@ void mn10200_device::timer_tick_simple(int tmr)
 				}
 			}
 		}
-
-		// interrupt from this timer if possible
-		group = (tmr / 4);
-		irq_in_grp = (tmr % 4);
-		level = (m_icrh[group]>>4) & 0x7;
-
-		// indicate interrupt pending
-		m_icrl[group] |= (1 << (4 + irq_in_grp));
-
-		// interrupt detect = pending AND enable
-		m_icrl[group] |= (m_icrh[group]&0x0f) & (m_icrl[group]>>4);
-
-		// is the result enabled?
-		if (m_icrl[group] & (1 << irq_in_grp))
-		{
-//          printf("Timer %d IRQ! (Group %d in_grp %d ICRH %x ICRL %x\n", tmr, group, irq_in_grp, m_icrh[group], m_icrl[group]);
-			// try to take it now
-			take_irq(level, group + 1);
-		}
+		
+		m_icrl[1 + (tmr / 4)] |= (1 << (4 + (tmr % 4)));
+		check_irq();
 	}
 }
 
@@ -165,6 +181,7 @@ void mn10200_device::device_start()
 	int tmr;
 
 	m_pc = 0;
+	m_p4 = 0xf;
 	m_d[0] = m_d[1] = m_d[2] = m_d[3] = 0;
 	m_a[0] = m_a[1] = m_d[2] = m_d[3] = 0;
 	m_nmicr = 0;
@@ -452,9 +469,9 @@ void mn10200_device::test_nz16(UINT16 v)
 
 void mn10200_device::do_jsr(UINT32 to, UINT32 ret)
 {
-	change_pc(to);
 	m_a[3] -= 4;
 	write_mem24(m_a[3], ret);
+	change_pc(to);
 }
 
 void mn10200_device::do_branch(bool state)
@@ -470,30 +487,49 @@ void mn10200_device::do_branch(bool state)
 // take an external IRQ
 void mn10200_device::execute_set_input(int irqnum, int state)
 {
-	int level = (m_icrh[7]>>4)&0x7;
+	assert(((UINT32)irqnum) < MN10200_MAX_EXT_IRQ);
 
-	// printf("mn102_extirq: irq %d status %d G8 ICRL %x\n", irqnum, status, m_icrl[7]);
-
-	// if interrupt is enabled, handle it
-	if (state)
+	int pin = state ? 0 : 1;
+	int old = m_p4 >> irqnum & 1;
+	bool active = false;
+	
+	switch (m_extmdl >> (irqnum * 2) & 3)
 	{
-		// indicate interrupt pending
-		m_icrl[7] |= (1 << (4 + irqnum));
-
-		// set interrupt detect = pending AND enable
-		m_icrl[7] |= (m_icrh[7]&0x0f) & (m_icrl[7]>>4);
-
-		// is the result enabled?
-		if (m_icrl[7] & (1 << irqnum))
-		{
-			// try to take it now
-			take_irq(level, 8);
-		}
+		// 'L' level
+		case 0:
+			active = (pin == 0);
+			break;
+		
+		// 'H' level
+		case 1:
+			active = (pin == 1);
+			break;
+		
+		// falling edge
+		case 2:
+			active = (pin == 0 && old == 1);
+			break;
+		
+		// rising edge
+		case 3:
+			active = (pin == 1 && old == 0);
+			break;
+	}
+	
+	m_p4 &= ~(1 << irqnum);
+	m_p4 |= pin << irqnum;
+	
+	if (active)
+	{
+		m_icrl[8] |= (1 << (4 + irqnum));
+		check_irq();
 	}
 }
 
 void mn10200_device::execute_run()
 {
+	bool possible_irq = false;
+
 	while (m_cycles > 0)
 	{
 		UINT8 opcode;
@@ -724,6 +760,7 @@ void mn10200_device::execute_run()
 				m_psw = read_mem16(m_a[3]);
 				change_pc(read_mem24(m_a[3] + 2));
 				m_a[3] += 6;
+				possible_irq = true;
 				break;
 
 			// cmp imm16, an
@@ -1084,6 +1121,7 @@ void mn10200_device::execute_run()
 					case 0xd0: case 0xd4: case 0xd8: case 0xdc:
 						m_cycles -= 1;
 						m_psw = m_d[opcode >> 2 & 3];
+						possible_irq = true;
 						break;
 
 					// mov dn, mdr
@@ -1432,6 +1470,7 @@ void mn10200_device::execute_run()
 					case 0x14:
 						m_cycles -= 1;
 						m_psw |= read_arg16(m_pc);
+						possible_irq = true;
 						break;
 
 					// add imm16, dn
@@ -1508,22 +1547,16 @@ void mn10200_device::execute_run()
 				unemul();
 				break;
 		}
+		
+		// instruction may have changed irq state
+		if (possible_irq)
+		{
+			check_irq();
+			possible_irq = false;
+		}
 	}
 }
 
-static const char *const inames[10][4] =
-{
-	{ "timer0", "timer1", "timer2", "timer3" },
-	{ "timer4", "timer5", "timer6", "timer7" },
-	{ "timer8", "timer9", "timer12a", "timer12b" },
-	{ "timer10u", "timer10a", "timer10b", "?" },
-	{ "timer11u", "timer11a", "timer11b", "?" },
-	{ "dma0", "dma1", "dma2", "dma3" },
-	{ "dma4", "dma5", "dma6", "dma7" },
-	{ "X0", "X1", "X2", "X3" },
-	{ "ser0tx", "ser0rx", "ser1tx", "ser1rx" },
-	{ "key", "a/d", "?", "?" }
-};
 
 WRITE8_MEMBER(mn10200_device::io_control_w)
 {
@@ -1549,58 +1582,34 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 		case 0x036: case 0x037: // Memory mode reg 3
 			break;
 
-		// Non-Maskable irqs
+		// group 0, NMI control
 		case 0x040:
-			m_nmicr = data & 6;
+			m_nmicr &= data; // nmi ack
 			break;
 		case 0x041:
 			break;
 
-		// Maskable irq control
+		// group 1-10, maskable irq control
 		case 0x042: case 0x044: case 0x046: case 0x048: case 0x04a:
 		case 0x04c: case 0x04e: case 0x050: case 0x052: case 0x054:
-		{
-			// note: writes here ack interrupts
-			m_icrl[((offset & 0x3f)>>1)-1] = data;
+			m_icrl[(offset & 0x3f) >> 1] &= data; // irq ack
+			if (offset == 0x050) check_ext_irq(); // group 8, external irqs might still be active
 			break;
-		}
 
 		case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
 		case 0x04d: case 0x04f: case 0x051: case 0x053: case 0x055:
-		{
-			int irq = ((offset & 0x3f)>>1)-1;
-#if 0
-			if((m_icrh[irq] != data) && (data & 15))
-			{
-				printf("MN10200: irq %d enabled, level=%x, enable= %s %s %s %s\n", irq+1, (data >> 4) & 7,
-				data & 1 ? inames[irq][0] : "-",
-				data & 2 ? inames[irq][1] : "-",
-				data & 4 ? inames[irq][2] : "-",
-				data & 8 ? inames[irq][3] : "-");
-			}
-			if((m_icrh[irq] != data) && !(data & 15))
-			{
-				printf("MN10200: irq %d disabled\n", irq+1);
-			}
-#endif
-			m_icrh[irq] = data;
+			m_icrh[(offset & 0x3f) >> 1] = data;
+			check_irq();
 			break;
-		}
 
+		// external irq control
 		case 0x056:
-		{
-			// const char *modes[4] = { "l", "h", "fall", "rise" };
-			// log_event("MN102", "irq3=%s irq2=%s irq1=%s irq0=%s",
-			//     modes[(data >> 6) & 3], modes[(data >> 4) & 3], modes[(data >> 2) & 3], modes[data & 3]);
+			m_extmdl = data;
+			check_ext_irq();
 			break;
-		}
-
 		case 0x057:
-		{
-			// const char *modes[4] = { "l", "1", "fall", "3" };
-			// log_event("MN102", "irq_ki=%s", modes[data & 3]);
+			m_extmdh = data;
 			break;
-		}
 
 		case 0x100: case 0x101: // DRAM control reg
 		case 0x102: case 0x103: // Refresh counter
@@ -1963,7 +1972,7 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 			//     data & 0x08 ? data & 0x20 ? "serial_0" : "tm8" : "p33",
 			//     data & 0x04 ? "tm7" : "p32",
 			//     data & 0x04 ? "tm6" : "p31",
-			//     data & 0x04 ? "tm5" : "p30");*/
+			//     data & 0x04 ? "tm5" : "p30");
 			break;
 
 
@@ -1978,25 +1987,31 @@ READ8_MEMBER(mn10200_device::io_control_r)
 	switch(offset)
 	{
 		case 0x00e:
-			return m_iagr;
-
+			return m_iagr << 1;
 		case 0x00f:
 			return 0;
 
+		// group 0, NMI control
+		case 0x040:
+			return m_nmicr;
+		case 0x041:
+			return 0;
+
+		// group 1-10, maskable irq control
 		case 0x042: case 0x044: case 0x046: case 0x048: case 0x04a:
 		case 0x04c: case 0x04e: case 0x050: case 0x052: case 0x054:
-			return m_icrl[((offset & 0x3f)>>1)-1];
+			// low 4 bits are a mask of IEN and IRF
+			return (m_icrl[(offset & 0x3f) >> 1] & 0xf0) | (m_icrl[(offset & 0x3f) >> 1] >> 4 & m_icrh[(offset & 0x3f) >> 1]);
 
 		case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
 		case 0x04d: case 0x04f: case 0x051: case 0x053: case 0x055:
-			return m_icrh[((offset & 0x3f)>>1)-1];
+			return m_icrh[(offset & 0x3f) >> 1];
 
+		// external irq control
 		case 0x056:
-			return 0;
-
-		// p4i1 = tms empty line
+			return m_extmdl;
 		case 0x057:
-			return 0x20;
+			return (m_extmdh & 3) | (m_p4 << 4);
 
 		case 0x180: case 0x190:
 			return m_serial[(offset-0x180) >> 4].ctrll;
