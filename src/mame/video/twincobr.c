@@ -91,6 +91,13 @@ void twincobr_state::twincobr_create_tilemaps()
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(twincobr_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(twincobr_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
+	m_bg_tilemap->set_scrolldx(-55, -134 );
+	m_fg_tilemap->set_scrolldx(-55, -134 );
+	m_tx_tilemap->set_scrolldx(-55, -134 );
+	m_bg_tilemap->set_scrolldy(-30, -243 );
+	m_fg_tilemap->set_scrolldy(-30, -243 );
+	m_tx_tilemap->set_scrolldy(-30, -243 );
+	
 	m_fg_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);
 }
@@ -112,7 +119,6 @@ VIDEO_START_MEMBER(twincobr_state,toaplan0)
 	m_bgvideoram16 = auto_alloc_array_clear(machine(), UINT16, m_bgvideoram_size);
 
 	m_display_on = 0;
-	twincobr_display(m_display_on);
 
 	save_pointer(NAME(m_txvideoram16), m_txvideoram_size);
 	save_pointer(NAME(m_fgvideoram16), m_fgvideoram_size);
@@ -120,8 +126,6 @@ VIDEO_START_MEMBER(twincobr_state,toaplan0)
 	save_item(NAME(m_txoffs));
 	save_item(NAME(m_fgoffs));
 	save_item(NAME(m_bgoffs));
-	save_item(NAME(m_scroll_x));
-	save_item(NAME(m_scroll_y));
 	save_item(NAME(m_txscrollx));
 	save_item(NAME(m_fgscrollx));
 	save_item(NAME(m_bgscrollx));
@@ -131,15 +135,8 @@ VIDEO_START_MEMBER(twincobr_state,toaplan0)
 	save_item(NAME(m_display_on));
 	save_item(NAME(m_fg_rom_bank));
 	save_item(NAME(m_bg_ram_bank));
-	save_item(NAME(m_flip_screen));
-	machine().save().register_postload(save_prepost_delegate(FUNC(twincobr_state::twincobr_restore_screen), this));
 }
 
-void twincobr_state::twincobr_restore_screen()
-{
-	twincobr_display(m_display_on);
-	twincobr_flipscreen(m_flip_screen);
-}
 
 
 /***************************************************************************
@@ -149,23 +146,11 @@ void twincobr_state::twincobr_restore_screen()
 void twincobr_state::twincobr_display(int enable)
 {
 	m_display_on = enable;
-	m_bg_tilemap->enable(enable);
-	m_fg_tilemap->enable(enable);
-	m_tx_tilemap->enable(enable);
 }
 
 void twincobr_state::twincobr_flipscreen(int flip)
 {
 	machine().tilemap().set_flip_all((flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
-	m_flip_screen = flip;
-	if (flip) {
-		m_scroll_x = 0x008;
-		m_scroll_y = 0x0c5;
-	}
-	else {
-		m_scroll_x = 0x037;
-		m_scroll_y = 0x01e;
-	}
 }
 
 
@@ -219,11 +204,11 @@ WRITE16_MEMBER(twincobr_state::twincobr_txscroll_w)
 {
 	if (offset == 0) {
 		COMBINE_DATA(&m_txscrollx);
-		m_tx_tilemap->set_scrollx(0,(m_txscrollx+m_scroll_x) & 0x1ff);
+		m_tx_tilemap->set_scrollx(0, m_txscrollx);
 	}
 	else {
 		COMBINE_DATA(&m_txscrolly);
-		m_tx_tilemap->set_scrolly(0,(m_txscrolly+m_scroll_y) & 0x1ff);
+		m_tx_tilemap->set_scrolly(0, m_txscrolly);
 	}
 }
 
@@ -231,11 +216,11 @@ WRITE16_MEMBER(twincobr_state::twincobr_bgscroll_w)
 {
 	if (offset == 0) {
 		COMBINE_DATA(&m_bgscrollx);
-		m_bg_tilemap->set_scrollx(0,(m_bgscrollx+m_scroll_x) & 0x1ff);
+		m_bg_tilemap->set_scrollx(0, m_bgscrollx);
 	}
 	else {
 		COMBINE_DATA(&m_bgscrolly);
-		m_bg_tilemap->set_scrolly(0,(m_bgscrolly+m_scroll_y) & 0x1ff);
+		m_bg_tilemap->set_scrolly(0, m_bgscrolly);
 	}
 }
 
@@ -243,11 +228,11 @@ WRITE16_MEMBER(twincobr_state::twincobr_fgscroll_w)
 {
 	if (offset == 0) {
 		COMBINE_DATA(&m_fgscrollx);
-		m_fg_tilemap->set_scrollx(0,(m_fgscrollx+m_scroll_x) & 0x1ff);
+		m_fg_tilemap->set_scrollx(0, m_fgscrollx);
 	}
 	else {
 		COMBINE_DATA(&m_fgscrolly);
-		m_fg_tilemap->set_scrolly(0,(m_fgscrolly+m_scroll_y) & 0x1ff);
+		m_fg_tilemap->set_scrolly(0, m_fgscrolly);
 	}
 }
 
@@ -403,21 +388,21 @@ UINT32 twincobr_state::screen_update_toaplan0(screen_device &screen, bitmap_ind1
 		bytes = m_spriteram8->bytes();
 	}
 
-	bitmap.fill(0, cliprect);
+	if (!m_display_on)
+	{
+		bitmap.fill(0, cliprect);
+	}
+	else
+	{
+		m_spritegen->draw_sprites_to_tempbitmap(cliprect, buffered_spriteram16, bytes);
 
+		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,1);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+		m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,2);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
+		m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,3);
+	}
 
-	if (m_display_on) m_spritegen->draw_sprites_to_tempbitmap(cliprect, buffered_spriteram16, bytes);
-
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-	if (m_display_on) m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,1);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	if (m_display_on) m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,2);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	if (m_display_on) m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,3);
 	return 0;
 }
-
-/* Spriteram is always 1 frame ahead, suggesting spriteram buffering.
-  There are no CPU output registers that control this so we
-  assume it happens automatically every frame, at the end of vblank */
