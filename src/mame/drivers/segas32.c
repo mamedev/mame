@@ -3903,7 +3903,7 @@ ROM_START( spidman )
 	ROM_LOAD_x4( "epr-14307.ic13",        0x000000, 0x020000, CRC(d900219c) SHA1(d59654db1fc0ec4d5f8cda9000ab4bd3bb36cdfc) )
 	ROM_LOAD_x4( "epr-14306.ic7",         0x080000, 0x020000, CRC(64379dc6) SHA1(7efc7175351186c54f141161a395e63b1cc7e7a5) )
 	ROM_LOAD16_BYTE_x4( "epr-14281.ic14", 0x100000, 0x020000, CRC(8a746c42) SHA1(fa3729ec3aa4b3c59322408146ce2cfbf5a11b98) )
-	ROM_LOAD16_BYTE_x4( "epr-14280.ic7",  0x100001, 0x020000, CRC(3c8148f7) SHA1(072b7982bb95e7a9ab77844b59020146c262488d) )
+	ROM_LOAD16_BYTE_x4( "epr-14280.ic6",  0x100001, 0x020000, CRC(3c8148f7) SHA1(072b7982bb95e7a9ab77844b59020146c262488d) )
 
 	ROM_REGION( 0x500000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-14285.ic35", 0x100000, 0x040000, CRC(25aefad6) SHA1(10153f4e773a0f55378f869eb1d85156e85f893f) )
@@ -3942,7 +3942,7 @@ ROM_START( spidmanu )
 	ROM_LOAD_x4( "epr-14303a.ic13",       0x000000, 0x020000, CRC(7f1bd28f) SHA1(cff57e66d09682baf44aace99d698ad305f6a3d5) )
 	ROM_LOAD_x4( "epr-14302a.ic7",        0x080000, 0x020000, CRC(d954c40a) SHA1(436c81779274861de79dc6ce2c0fcc65bfd52098) )
 	ROM_LOAD16_BYTE_x4( "epr-14281.ic14", 0x100000, 0x020000, CRC(8a746c42) SHA1(fa3729ec3aa4b3c59322408146ce2cfbf5a11b98) )
-	ROM_LOAD16_BYTE_x4( "epr-14280.ic7",  0x100001, 0x020000, CRC(3c8148f7) SHA1(072b7982bb95e7a9ab77844b59020146c262488d) )
+	ROM_LOAD16_BYTE_x4( "epr-14280.ic6",  0x100001, 0x020000, CRC(3c8148f7) SHA1(072b7982bb95e7a9ab77844b59020146c262488d) )
 
 	ROM_REGION( 0x500000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-14285.ic35", 0x100000, 0x040000, CRC(25aefad6) SHA1(10153f4e773a0f55378f869eb1d85156e85f893f) )
@@ -3967,7 +3967,41 @@ ROM_START( spidmanu )
 	ROMX_LOAD( "mpr-14292-s.ic24", 0x000007, 0x100000, CRC(41f71443) SHA1(351d40d6159cb5b792519bce5d16490965800cfb) , ROM_SKIP(7) )
 ROM_END
 
+/**************************************************************************************************************************
+    Spiderman (Japan)
+    not protected
+     Game: 833-8331 SPIDER-MAN
+Rom board: 834-8332
+*/
+ROM_START( spidmanj )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code + data */
+	ROM_LOAD_x4( "epr-14287.ic13",       0x000000, 0x020000, CRC(403ccdc9) SHA1(4e240c749e362dfa5c579ccbdff18ae3fab58dff) )
+	ROM_LOAD_x4( "epr-14286.ic7",        0x080000, 0x020000, CRC(5c2b4e2c) SHA1(79229594710416510f85e6e53ea578789afd4091) )
+	ROM_LOAD16_BYTE_x4( "epr-14281.ic14", 0x100000, 0x020000, CRC(8a746c42) SHA1(fa3729ec3aa4b3c59322408146ce2cfbf5a11b98) )
+	ROM_LOAD16_BYTE_x4( "epr-14280.ic6",  0x100001, 0x020000, CRC(3c8148f7) SHA1(072b7982bb95e7a9ab77844b59020146c262488d) )
 
+	ROM_REGION( 0x500000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD_x4( "epr-14285.ic35", 0x100000, 0x040000, CRC(25aefad6) SHA1(10153f4e773a0f55378f869eb1d85156e85f893f) )
+	ROM_LOAD_x2( "mpr-14284.ic31", 0x200000, 0x080000, CRC(760542d4) SHA1(dcac73869c02fefd328bd6bdbcbdb3b68b0647da) )
+	ROM_LOAD_x2( "mpr-14283.ic26", 0x300000, 0x080000, CRC(c863a91c) SHA1(afdc76bbb9b207cfcb47d437248a757d03212f4e) )
+	ROM_LOAD_x2( "mpr-14282.ic22", 0x400000, 0x080000, CRC(ea20979e) SHA1(9b70ef055da8c7c56da54b7edef2379678e7c50f) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD32_BYTE( "mpr-14291-s.ic38", 0x000000, 0x100000, CRC(490f95a1) SHA1(f220788670b76164ac414ed9b16a422f719be267) )
+	ROM_LOAD32_BYTE( "mpr-14290-s.ic34", 0x000002, 0x100000, CRC(a144162d) SHA1(d43f12dd9f690cdfcebb6c7b515ff7dc7dcaa377) )
+	ROM_LOAD32_BYTE( "mpr-14289-s.ic29", 0x000001, 0x100000, CRC(38570582) SHA1(a9d810a02a1f5a6849c79d65fbebff21a4b82b59) )
+	ROM_LOAD32_BYTE( "mpr-14288-s.ic25", 0x000003, 0x100000, CRC(3188b636) SHA1(bc0adeeca5040caa563ee1e0eded9c323ca23446) )
+
+	ROM_REGION32_BE( 0x800000, "gfx2", 0 ) /* sprites */
+	ROMX_LOAD( "mpr-14299-h.ic36", 0x000000, 0x100000, CRC(ce59231b) SHA1(bcb1f11b74935694d0617ec8df66db2cc57b6219) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14298-h.ic32", 0x000001, 0x100000, CRC(2745c84c) SHA1(5a0528c921cba7a1047d3a2ece79925103d719a1) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14297-h.ic27", 0x000002, 0x100000, CRC(29cb9450) SHA1(7dc38d23a2f0cee2f4edde05c1a6f0dc83f331db) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14296-h.ic23", 0x000003, 0x100000, CRC(9d8cbd31) SHA1(55a9f9ec9029157da033e69664b58e694a28db47) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14295-h.ic37", 0x000004, 0x100000, CRC(29591f50) SHA1(1ac4ceaf74892e30f210ad77024eb441c5e4a959) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14294-h.ic33", 0x000005, 0x100000, CRC(fa86b794) SHA1(7b6907e5734fbf2fba7bcc213a8551fec5e9f3d5) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14293-s.ic28", 0x000006, 0x100000, CRC(52899269) SHA1(ff809ff88701109e0ca79e785a61402d97335cec) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14292-s.ic24", 0x000007, 0x100000, CRC(41f71443) SHA1(351d40d6159cb5b792519bce5d16490965800cfb) , ROM_SKIP(7) )
+ROM_END
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
@@ -4686,6 +4720,7 @@ GAME( 1992, sonic,     0,        system32,     sonic,    segas32_state, sonic,  
 GAME( 1992, sonicp,    sonic,    system32,     sonic,    segas32_state, sonicp,   ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, prototype)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, spidman,   0,        system32,     spidman,  segas32_state, spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, spidmanu,  spidman,  system32,     spidmanu, segas32_state, spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, spidmanj,  spidman,  system32,     spidman,  segas32_state, spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, svf,       0,        system32,     svf,      segas32_state, svf,      ROT0, "Sega",   "Super Visual Football: European Sega Cup", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, svs,       svf,      system32,     svf,      segas32_state, svf,      ROT0, "Sega",   "Super Visual Soccer: Sega Cup (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, jleague,   svf,      system32,     svf,      segas32_state, jleague,  ROT0, "Sega",   "The J.League 1994 (Japan)", GAME_IMPERFECT_GRAPHICS )
