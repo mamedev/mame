@@ -322,6 +322,9 @@ private:
 
 	// trampolines to support menu bar
 	void toggle_full_screen();
+	void take_snap();
+	void take_video();
+	void toggle_fsfx();
 };
 
 

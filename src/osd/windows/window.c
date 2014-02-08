@@ -464,6 +464,18 @@ void winwindow_dispatch_message(running_machine &machine, MSG *message)
 
 
 //============================================================
+//  winwindow_can_take_snap
+//  (main thread)
+//============================================================
+
+bool winwindow_can_take_snap(void)
+{
+	return draw.window_record != NULL;
+}
+
+
+
+//============================================================
 //  winwindow_take_snap
 //  (main thread)
 //============================================================
@@ -487,6 +499,30 @@ void winwindow_take_snap(void)
 
 
 //============================================================
+//  winwindow_can_toggle_fsfx
+//  (main thread)
+//============================================================
+
+bool winwindow_can_toggle_fsfx(void)
+{
+	return draw.window_toggle_fsfx != NULL;
+}
+
+
+
+//============================================================
+//  winwindow_is_fsfx_enabled
+//  (main thread)
+//============================================================
+
+bool winwindow_is_fsfx_enabled(void)
+{
+	return draw.window_fsfx_enabled != NULL && draw.window_fsfx_enabled(win_window_list);
+}
+
+
+
+//============================================================
 //  winwindow_toggle_fsfx
 //  (main thread)
 //============================================================
@@ -505,6 +541,18 @@ void winwindow_toggle_fsfx(void)
 	{
 		(*draw.window_toggle_fsfx)(window);
 	}
+}
+
+
+
+//============================================================
+//  winwindow_can_take_video
+//  (main thread)
+//============================================================
+
+bool winwindow_can_take_video(void)
+{
+	return draw.window_record != NULL;
 }
 
 

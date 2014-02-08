@@ -185,6 +185,7 @@ static render_primitive_list *drawd3d_window_get_primitives(win_window_info *win
 static void drawd3d_window_save(win_window_info *window);
 static void drawd3d_window_record(win_window_info *window);
 static void drawd3d_window_toggle_fsfx(win_window_info *window);
+static bool drawd3d_window_fsfx_enabled(win_window_info *window);
 static int drawd3d_window_draw(win_window_info *window, HDC dc, int update);
 
 
@@ -222,6 +223,12 @@ static void drawd3d_window_toggle_fsfx(win_window_info *window)
 {
 	d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
 	d3d->set_restarting(true);
+}
+
+static bool drawd3d_window_fsfx_enabled(win_window_info *window)
+{
+	d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
+	return d3d->get_shaders() != NULL && d3d->get_shaders()->enabled();
 }
 
 static void drawd3d_window_record(win_window_info *window)
@@ -301,6 +308,7 @@ int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks)
 	callbacks->window_save = drawd3d_window_save;
 	callbacks->window_record = drawd3d_window_record;
 	callbacks->window_toggle_fsfx = drawd3d_window_toggle_fsfx;
+	callbacks->window_fsfx_enabled = drawd3d_window_fsfx_enabled;
 	callbacks->window_destroy = drawd3d_window_destroy;
 	return 0;
 }
