@@ -195,7 +195,6 @@ RoadBlasters (aka Future Vette):005*
 #include "cpu/m6502/m6502.h"
 #include "machine/atarigen.h"
 #include "machine/6522via.h"
-#include "sound/tms5220.h"
 #include "sound/2151intf.h"
 #include "sound/pokey.h"
 #include "video/atarimo.h"
@@ -377,37 +376,33 @@ READ8_MEMBER(atarisy1_state::switch_6502_r)
 
 WRITE8_MEMBER(atarisy1_state::via_pa_w)
 {
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
-	tms5220->data_w(space, 0, data);
+	m_tms->data_w(space, 0, data);
 }
 
 
 READ8_MEMBER(atarisy1_state::via_pa_r)
 {
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
-	return tms5220->status_r(space, 0);
+	return m_tms->status_r(space, 0);
 }
 
 
 WRITE8_MEMBER(atarisy1_state::via_pb_w)
 {
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
 	/* write strobe */
-	tms5220->wsq_w(data & 1);
+	m_tms->wsq_w(data & 1);
 
 	/* read strobe */
-	tms5220->rsq_w((data & 2)>>1);
+	m_tms->rsq_w((data & 2)>>1);
 
 	/* bit 4 is connected to an up-counter, clocked by SYCLKB */
 	data = 5 | ((data >> 3) & 2);
-	tms5220->set_frequency(ATARI_CLOCK_14MHz/2 / (16 - data));
+	m_tms->set_frequency(ATARI_CLOCK_14MHz/2 / (16 - data));
 }
 
 
 READ8_MEMBER(atarisy1_state::via_pb_r)
 {
-	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
-	return (tms5220->readyq_r() << 2) | (tms5220->intq_r() << 3);
+	return (m_tms->readyq_r() << 2) | (m_tms->intq_r() << 3);
 }
 
 

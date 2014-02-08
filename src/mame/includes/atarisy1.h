@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "sound/tms5220.h"
 #include "video/atarimo.h"
 
 class atarisy1_state : public atarigen_state
@@ -21,7 +22,8 @@ public:
 			m_alpha_tilemap(*this, "alpha"),
 			m_yscroll_reset_timer(*this, "yreset_timer"),
 			m_scanline_timer(*this, "scan_timer"),
-			m_int3off_timer(*this, "int3off_timer") { }
+			m_int3off_timer(*this, "int3off_timer"),
+			m_tms(*this, "tms") { }
 
 	required_shared_ptr<UINT16> m_bankselect;
 	required_device<atari_motion_objects_device> m_mob;
@@ -46,6 +48,9 @@ public:
 	int             m_next_timer_scanline;
 	required_device<timer_device> m_scanline_timer;
 	required_device<timer_device> m_int3off_timer;
+	
+	/* speech */
+	required_device<tms5220_device> m_tms;
 
 	/* graphics bank tracking */
 	UINT8           m_bank_gfx[3][8];
