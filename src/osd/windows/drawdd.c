@@ -184,13 +184,11 @@ int drawdd_init(running_machine &machine, win_draw_callbacks *callbacks)
 	}
 
 	// fill in the callbacks
+	memset(callbacks, 0, sizeof(*callbacks));
 	callbacks->exit = drawdd_exit;
 	callbacks->window_init = drawdd_window_init;
 	callbacks->window_get_primitives = drawdd_window_get_primitives;
 	callbacks->window_draw = drawdd_window_draw;
-	callbacks->window_save = NULL;
-	callbacks->window_record = NULL;
-	callbacks->window_toggle_fsfx = NULL;
 	callbacks->window_destroy = drawdd_window_destroy;
 
 	mame_printf_verbose("DirectDraw: Using DirectDraw 7\n");

@@ -293,6 +293,7 @@ int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks)
 	}
 
 	// fill in the callbacks
+	memset(callbacks, 0, sizeof(*callbacks));
 	callbacks->exit = drawd3d_exit;
 	callbacks->window_init = drawd3d_window_init;
 	callbacks->window_get_primitives = drawd3d_window_get_primitives;
