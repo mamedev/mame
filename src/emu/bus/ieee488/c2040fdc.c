@@ -13,7 +13,9 @@
 
 	TODO:
 
-	- writing (write sr shifted before write starts)
+	- writing starts in the middle of a byte
+	- READY output is actually low when (CNT=9 QB=0), but since we latch the read 
+	  byte on syncpoints, READY is low when (prevCNT=9 CNT=0) as seen below
 	- 8050 PLL
 
 */
@@ -69,7 +71,6 @@ const rom_entry *c2040_fdc_t::device_rom_region() const
 
 c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) : 
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
-	m_read_pi(*this),
 	m_write_sync(*this),
 	m_write_ready(*this),
 	m_write_error(*this),
@@ -86,11 +87,13 @@ c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, device_type type, const 
 	m_rw_sel(0),
 	m_period(attotime::from_hz(clock))
 {
+	cur_live.tm = attotime::never;
+	cur_live.state = IDLE;
+	cur_live.next_state = -1;
 }
 
 c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : 
 	device_t(mconfig, C2040_FDC, "C2040 FDC", tag, owner, clock, "c2040fdc", __FILE__),
-	m_read_pi(*this),
 	m_write_sync(*this),
 	m_write_ready(*this),
 	m_write_error(*this),
@@ -107,6 +110,9 @@ c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_
 	m_rw_sel(0),
 	m_period(attotime::from_hz(clock))
 {
+	cur_live.tm = attotime::never;
+	cur_live.state = IDLE;
+	cur_live.next_state = -1;
 }
 
 c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : 
@@ -121,7 +127,6 @@ c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_
 void c2040_fdc_t::device_start()
 {
 	// resolve callbacks
-	m_read_pi.resolve_safe(0);
 	m_write_sync.resolve_safe();
 	m_write_ready.resolve_safe();
 	m_write_error.resolve_safe();
@@ -171,6 +176,7 @@ void c2040_fdc_t::live_start()
 	cur_live.drv_sel = m_drv_sel;
 	cur_live.mode_sel = m_mode_sel;
 	cur_live.rw_sel = m_rw_sel;
+	cur_live.pi = m_pi;
 
 	checkpoint_live = cur_live;
 
@@ -179,12 +185,15 @@ void c2040_fdc_t::live_start()
 
 void c2040_fdc_t::checkpoint()
 {
+	get_next_edge(machine().time());
 	checkpoint_live = cur_live;
+	if (LOG) logerror("---- checkpoint rw=%u mode=%u\n", checkpoint_live.rw_sel, checkpoint_live.mode_sel);
 }
 
 void c2040_fdc_t::rollback()
 {
 	cur_live = checkpoint_live;
+	if (LOG) logerror("---- rollback rw=%u mode=%u\n", cur_live.rw_sel, cur_live.mode_sel);
 	get_next_edge(cur_live.tm);
 }
 
@@ -214,6 +223,8 @@ bool c2040_fdc_t::write_next_bit(bool bit, attotime limit)
 	if(bit && cur_live.write_position < ARRAY_LENGTH(cur_live.write_buffer))
 		cur_live.write_buffer[cur_live.write_position++] = cur_live.tm;
 
+	if (LOG) logerror("%s write bit %u (%u)\n", cur_live.tm.as_string(), cur_live.bit_counter, bit);
+
 	return false;
 }
 
@@ -221,9 +232,12 @@ void c2040_fdc_t::commit(attotime tm)
 {
 	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
 		return;
+	
+	if (LOG) logerror("%s committing %u transitions since %s\n", tm.as_string(), cur_live.write_position, cur_live.write_start_time.as_string());
 
 	if(get_floppy())
 		get_floppy()->write_flux(cur_live.write_start_time, tm, cur_live.write_position, cur_live.write_buffer);
+
 	cur_live.write_start_time = tm;
 	cur_live.write_position = 0;
 }
@@ -290,6 +304,9 @@ void c2040_fdc_t::live_run(attotime limit)
 		case RUNNING: {
 			bool syncpoint = false;
 
+			if (cur_live.tm > limit)
+				return;
+
 			int bit = get_next_bit(cur_live.tm, limit);
 			if(bit < 0)
 				return;
@@ -317,12 +334,13 @@ void c2040_fdc_t::live_run(attotime limit)
 				cur_live.shift_reg <<= 1;
 				cur_live.shift_reg |= !(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2));
 				cur_live.shift_reg &= 0x3ff;
+	
+				if (LOG) logerror("%s read bit %u (%u) >> %03x, rw=%u mode=%u\n", cur_live.tm.as_string(), cur_live.bit_counter, 
+					!(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2)), cur_live.shift_reg, cur_live.rw_sel, cur_live.mode_sel);
 
 				// write bit
 				if (!cur_live.rw_sel) {
 					write_next_bit(BIT(cur_live.shift_reg_write, 9), limit);
-				cur_live.shift_reg_write <<= 1;
-				cur_live.shift_reg_write &= 0x3ff;
 				}
 
 				// update bit counter
@@ -337,6 +355,8 @@ void c2040_fdc_t::live_run(attotime limit)
 						ready = 1;
 					}
 				}
+
+				syncpoint = true;
 			}
 
 			// update GCR
@@ -347,14 +367,26 @@ void c2040_fdc_t::live_run(attotime limit)
 			}
 
 			cur_live.e = m_gcr_rom->base()[cur_live.i];
+
+			if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1) && cur_live.bit_counter == 9) {
+				//ready = 0;
+			}
 	
-			// load write shift register
 			if (!ready) {
+				// load write shift register
 				// E7 E6 I7 E5 E4 E3 E2 I2 E1 E0
 				UINT8 e = cur_live.e;
 				offs_t i = cur_live.i;
 
 				cur_live.shift_reg_write = BIT(e,7)<<9 | BIT(e,6)<<8 | BIT(i,7)<<7 | BIT(e,5)<<6 | BIT(e,4)<<5 | BIT(e,3)<<4 | BIT(e,2)<<3 | BIT(i,2)<<2 | (e & 0x03);
+			
+				if(LOG) logerror("%s load write shift register %03x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
+			} else if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1)) {
+				// clock write shift register
+				cur_live.shift_reg_write <<= 1;
+				cur_live.shift_reg_write &= 0x3ff;
+				
+				if (LOG) logerror("%s write shift << %03x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
 			}
 
 			// update signals
@@ -362,11 +394,13 @@ void c2040_fdc_t::live_run(attotime limit)
 			int error = !(BIT(cur_live.e, 3) || ready);
 
 			if (ready != cur_live.ready) {
+				if (LOG) logerror("%s READY %u\n", cur_live.tm.as_string(),ready);
 				cur_live.ready = ready;
 				syncpoint = true;
 			}
 
 			if (sync != cur_live.sync) {
+				if (LOG) logerror("%s SYNC %u\n", cur_live.tm.as_string(),sync);
 				cur_live.sync = sync;
 				syncpoint = true;
 			}
@@ -378,14 +412,17 @@ void c2040_fdc_t::live_run(attotime limit)
 
 			if (syncpoint) {
 				commit(cur_live.tm);
+
+				cur_live.tm += m_period;
 				live_delay(RUNNING_SYNCPOINT);
 				return;
 			}
+
+			cur_live.tm += m_period;
 			break;
 		}
 
 		case RUNNING_SYNCPOINT: {
-			cur_live.pi = m_read_pi(0);
 			m_write_ready(cur_live.ready);
 			m_write_sync(cur_live.sync);
 			m_write_error(cur_live.error);
@@ -402,23 +439,17 @@ void c2040_fdc_t::get_next_edge(attotime when)
 {
 	floppy_image_device *floppy = get_floppy();
 
-	m_edge = floppy ? floppy->get_next_transition(when) : attotime::never;
+	cur_live.edge = floppy ? floppy->get_next_transition(when) : attotime::never;
 }
 
 int c2040_fdc_t::get_next_bit(attotime &tm, attotime limit)
 {
-/*	floppy_image_device *floppy = cur_live.drv_sel ? m_floppy1 : m_floppy0;
-
-	attotime edge = floppy ? floppy->get_next_transition(tm) : attotime::never;*/
-	attotime edge = m_edge;
 	attotime next = tm + m_period;
 
-	tm = next;
-
-	int bit = (edge.is_never() || edge >= next) ? 0 : 1;
+	int bit = (cur_live.edge.is_never() || cur_live.edge >= next) ? 0 : 1;
 
 	if (bit) {
-		get_next_edge(tm);
+		get_next_edge(next);
 	}
 
 	return bit && cur_live.rw_sel;
@@ -429,14 +460,23 @@ READ8_MEMBER( c2040_fdc_t::read )
 	UINT8 e = checkpoint_live.e;
 	offs_t i = checkpoint_live.i;
 
-	return (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x33) | (BIT(e, 2) << 3) | (i & 0x04);
+	UINT8 data = (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x33) | (BIT(e, 2) << 3) | (i & 0x04);
+	
+	if (LOG) logerror("%s VIA reads data %02x (%03x)\n", machine().time().as_string(), data, checkpoint_live.shift_reg);
+	
+	return data;
 }
 
 WRITE8_MEMBER( c2040_fdc_t::write )
 {
-	live_sync();
-	cur_live.pi = data;
-	live_run();
+	if (m_pi != data)
+	{
+		live_sync();
+		m_pi = cur_live.pi = data;
+		checkpoint();
+		if (LOG) logerror("%s PI %02x\n", machine().time().as_string(), data);
+		live_run();
+	}
 }
 
 WRITE_LINE_MEMBER( c2040_fdc_t::drv_sel_w )
@@ -445,7 +485,8 @@ WRITE_LINE_MEMBER( c2040_fdc_t::drv_sel_w )
 	{
 		live_sync();
 		m_drv_sel = cur_live.drv_sel = state;
-		get_next_edge(machine().time());
+		checkpoint();
+		if (LOG) logerror("%s DRV SEL %u\n", machine().time().as_string(), state);
 		live_run();
 	}
 }
@@ -456,6 +497,8 @@ WRITE_LINE_MEMBER( c2040_fdc_t::mode_sel_w )
 	{
 		live_sync();
 		m_mode_sel = cur_live.mode_sel = state;
+		checkpoint();
+		if (LOG) logerror("%s MODE SEL %u\n", machine().time().as_string(), state);
 		live_run();
 	}
 }
@@ -466,6 +509,8 @@ WRITE_LINE_MEMBER( c2040_fdc_t::rw_sel_w )
 	{
 		live_sync();
 		m_rw_sel = cur_live.rw_sel = state;
+		checkpoint();
+		if (LOG) logerror("%s RW SEL %u\n", machine().time().as_string(), state);
 		if (state)
 			stop_writing(machine().time());
 		live_run();
@@ -478,8 +523,9 @@ WRITE_LINE_MEMBER( c2040_fdc_t::mtr0_w )
 	{
 		live_sync();
 		m_mtr0 = state;
+		if (LOG) logerror("%s MTR0 %u\n", machine().time().as_string(), state);
 		m_floppy0->mon_w(state);
-		get_next_edge(machine().time());
+		checkpoint();
 
 		if (!m_mtr0 || !m_mtr1) {
 			if(cur_live.state == IDLE) {
@@ -499,8 +545,9 @@ WRITE_LINE_MEMBER( c2040_fdc_t::mtr1_w )
 	{
 		live_sync();
 		m_mtr1 = state;
+		if (LOG) logerror("%s MTR1 %u\n", machine().time().as_string(), state);
 		if (m_floppy1) m_floppy1->mon_w(state);
-		get_next_edge(machine().time());
+		checkpoint();
 
 		if (!m_mtr0 || !m_mtr1) {
 			if(cur_live.state == IDLE) {
@@ -520,11 +567,18 @@ WRITE_LINE_MEMBER( c2040_fdc_t::odd_hd_w )
 	{
 		live_sync();
 		m_odd_hd = cur_live.odd_hd = state;
+		if (LOG) logerror("%s ODD HD %u\n", machine().time().as_string(), state);
 		m_floppy0->ss_w(!state);
 		if (m_floppy1) m_floppy1->ss_w(!state);
-		get_next_edge(machine().time());
+		checkpoint();
 		live_run();
 	}
+}
+
+WRITE_LINE_MEMBER( c2040_fdc_t::pull_sync_w )
+{
+	// TODO
+	if (LOG) logerror("%s PULL SYNC %u\n", machine().time().as_string(), state);
 }
 
 void c2040_fdc_t::stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp)
@@ -593,7 +647,7 @@ void c2040_fdc_t::stp0_w(int stp)
 	{
 		live_sync();
 		this->stp_w(m_floppy0, m_mtr0, m_stp0, stp);
-		get_next_edge(machine().time());
+		checkpoint();
 		live_run();
 	}
 }
@@ -604,7 +658,7 @@ void c2040_fdc_t::stp1_w(int stp)
 	{
 		live_sync();
 		if (m_floppy1) this->stp_w(m_floppy1, m_mtr1, m_stp1, stp);
-		get_next_edge(machine().time());
+		checkpoint();
 		live_run();
 	}
 }
@@ -615,6 +669,7 @@ void c2040_fdc_t::ds_w(int ds)
 	{
 		live_sync();
 		m_ds = cur_live.ds = ds;
+		checkpoint();
 		live_run();
 	}
 }

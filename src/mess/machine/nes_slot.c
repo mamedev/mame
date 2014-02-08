@@ -503,15 +503,13 @@ void device_nes_cart_interface::set_nt_page(int page, int source, int bank, int 
 		case CART_NTRAM:
 			base_ptr = m_ext_ntram;
 			break;
-		case MMC5FILL:
-			base_ptr = NULL;
-			break;
 		case VROM:
 			bank &= ((m_vrom_chunks << 3) - 1);
 			base_ptr = m_vrom;
 			break;
 		case EXRAM:
-			base_ptr = m_mapper_sram;
+		case MMC5FILL:
+			base_ptr = NULL;
 			break;
 		case CIRAM:
 		default:
@@ -522,7 +520,7 @@ void device_nes_cart_interface::set_nt_page(int page, int source, int bank, int 
 	page &= 3; /* mask down to the 4 logical pages */
 	m_nt_src[page] = source;
 
-	if (base_ptr != NULL)
+	if (base_ptr)
 	{
 		m_nt_orig[page] = bank * 0x400;
 		m_nt_access[page] = base_ptr + m_nt_orig[page];

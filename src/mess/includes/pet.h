@@ -6,6 +6,7 @@
 #define __PET__
 
 #include "emu.h"
+#include "bus/ieee488/c8050.h"
 #include "bus/ieee488/ieee488.h"
 #include "bus/pet/cass.h"
 #include "bus/pet/exp.h"

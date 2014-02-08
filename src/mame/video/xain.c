@@ -177,8 +177,8 @@ void xain_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		flipy = 0;
 		if (flip_screen())
 		{
-			sx = 238 + 128 - sx;
-			sy = 240 + 16 - sy;
+			sx = 238 - sx;
+			sy = 240 - sy;
 			flipx = !flipx;
 			flipy = !flipy;
 		}

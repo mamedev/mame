@@ -26,9 +26,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_C2040_PI_CALLBACK(_read) \
-	devcb = &c2040_fdc_t::set_pi_rd_callback(*device, DEVCB2_##_read);
-
 #define MCFG_C2040_SYNC_CALLBACK(_write) \
 	devcb = &c2040_fdc_t::set_sync_wr_callback(*device, DEVCB2_##_write);
 
@@ -53,7 +50,6 @@ public:
 	c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	c2040_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	template<class _Object> static devcb2_base &set_pi_rd_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_read_pi.set_callback(object); }
 	template<class _Object> static devcb2_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_sync.set_callback(object); }
 	template<class _Object> static devcb2_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_ready.set_callback(object); }
 	template<class _Object> static devcb2_base &set_error_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_error.set_callback(object); }
@@ -67,6 +63,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( mtr0_w );
 	DECLARE_WRITE_LINE_MEMBER( mtr1_w );
 	DECLARE_WRITE_LINE_MEMBER( odd_hd_w );
+	DECLARE_WRITE_LINE_MEMBER( pull_sync_w );
 	DECLARE_READ_LINE_MEMBER( wps_r ) { return checkpoint_live.drv_sel ? m_floppy1->wpt_r() : m_floppy0->wpt_r(); }
 	DECLARE_READ_LINE_MEMBER( sync_r ) { return checkpoint_live.sync; }
 	DECLARE_READ_LINE_MEMBER( ready_r ) { return checkpoint_live.ready; }
@@ -89,7 +86,6 @@ protected:
 
 	void stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp);
 
-private:
 	enum {
 		IDLE,
 		RUNNING,
@@ -108,6 +104,7 @@ private:
 		int rw_sel;
 		int odd_hd;
 
+		attotime edge;
 		UINT16 shift_reg;
 		int cycle_counter;
 		int cell_counter;
@@ -122,7 +119,6 @@ private:
 		int write_position;
 	};
 
-	devcb2_read8 m_read_pi;
 	devcb2_write_line m_write_sync;
 	devcb2_write_line m_write_ready;
 	devcb2_write_line m_write_error;
@@ -141,8 +137,9 @@ private:
 	int m_mode_sel;
 	int m_rw_sel;
 	int m_odd_hd;
+	UINT8 m_pi;
 
-	attotime m_period, m_edge;
+	attotime m_period;
 
 	live_info cur_live, checkpoint_live;
 	emu_timer *t_gen;
