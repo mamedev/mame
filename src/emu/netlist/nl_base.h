@@ -1086,6 +1086,18 @@ public:
 	    return tmp;
 	}
 
+    template<class _C>
+    _C get_first_device()
+    {
+        for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+        {
+            _C dev = dynamic_cast<_C>(entry->object());
+            if (dev != NULL)
+                return dev;
+        }
+        return NULL;
+    }
+
 	tagmap_devices_t m_devices;
 	netlist_net_t::list_t m_nets;
 

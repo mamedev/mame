@@ -728,16 +728,16 @@ static NETLIST_START(pong)
 	//NETLIST_INCLUDE(pong_schematics)
 	NETLIST_MEMREGION("maincpu")
 
-	NETDEV_ANALOG_CALLBACK(sound_cb, sound, pong_state, sound_cb, "")
-	NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
+	//NETDEV_ANALOG_CALLBACK(sound_cb, sound, pong_state, sound_cb, "")
+	//NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 NETLIST_END()
 
 static NETLIST_START(pong_fast)
 
 	NETLIST_INCLUDE(pong_schematics)
 
-	NETDEV_ANALOG_CALLBACK(sound_cb, sound, pong_state, sound_cb, "")
-    NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
+	//NETDEV_ANALOG_CALLBACK(sound_cb, sound, pong_state, sound_cb, "")
+    //NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 
 NETLIST_END()
 
@@ -747,8 +747,8 @@ static NETLIST_START(pongd)
 
     NETLIST_INCLUDE(pongdoubles)
 
-    NETDEV_ANALOG_CALLBACK(sound_cb, AUDIO, pong_state, sound_cb, "")
-    NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
+    //NETDEV_ANALOG_CALLBACK(sound_cb, AUDIO, pong_state, sound_cb, "")
+    //NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 
 NETLIST_END()
 #endif
@@ -766,8 +766,8 @@ static NETLIST_START(test)
     SOLVER(Solver)
     PARAM(Solver.FREQ, 48000)
 
-    NETDEV_SOUND_IN(SND_IN)
-    PARAM(SND_IN.CHAN0, "tin.IN")
+    //NETDEV_SOUND_IN(SND_IN)
+    //PARAM(SND_IN.CHAN0, "tin.IN")
 
     ANALOG_INPUT(tin, 0)
 
@@ -779,12 +779,15 @@ static NETLIST_START(test)
     NET_C(n1.Q, R1.2)
     NET_C(n2.Q, C1.1)
     NET_C(C1.2, R1.1)
+    LOG(log1, n2.Q)
 
+#if 0
     NETDEV_SOUND_OUT(CH0, 0)
     NET_C(CH0.IN, n2.Q)
 
     NETDEV_SOUND_OUT(CH1, 1)
     NET_C(CH1.IN, tin.Q)
+#endif
 
 NETLIST_END()
 #endif
@@ -876,15 +879,18 @@ static MACHINE_CONFIG_START( pong, pong_state )
     MCFG_NETLIST_SETUP(pong)
 
     MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr0", "ic_b9_R.R")
-    MCFG_NETLIST_ANALOG_INPUT_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
+    MCFG_NETLIST_ANALOG_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
     MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr1", "ic_a9_R.R")
-    MCFG_NETLIST_ANALOG_INPUT_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
+    MCFG_NETLIST_ANALOG_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
     MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot0", "ic_b9_POT.DIAL")
     MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "ic_a9_POT.DIAL")
     MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1a", "sw1a.POS", 0, 0x01)
     MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1b", "sw1b.POS", 0, 0x01)
     MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw", "coinsw.POS", 0, 0x01)
     MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0, 0x01)
+
+    MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "sound", pong_state, sound_cb, "")
+    MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_vid, "fixfreq")
 
 	/* video hardware */
 
@@ -905,6 +911,16 @@ static MACHINE_CONFIG_START( pong, pong_state )
     MCFG_SOUND_ADD("snd_test", NETLIST_SOUND, 48000)
     MCFG_NETLIST_SETUP(test)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+    MCFG_NETLIST_STREAM_INPUT("snd_test", 0, "tin.IN")
+    MCFG_NETLIST_ANALOG_MULT_OFFSET(0.001, 0.0)
+
+    //MCFG_NETLIST_STREAM_OUTPUT("snd_test", 0, "tin.Q", 100)
+    MCFG_NETLIST_STREAM_OUTPUT("snd_test", 0, "n2.Q")
+    MCFG_NETLIST_ANALOG_MULT_OFFSET(1000.0, 0.0)
+    MCFG_NETLIST_STREAM_OUTPUT("snd_test", 1, "tin.Q")
+    MCFG_NETLIST_ANALOG_MULT_OFFSET(1000.0, 0.0)
+
 #endif
 
 MACHINE_CONFIG_END
@@ -939,6 +955,9 @@ static MACHINE_CONFIG_START( pongd, pong_state )
 #if 0
     MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0, 0x01)
 #endif
+
+    MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "AUDIO", pong_state, sound_cb, "")
+    MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_vid, "fixfreq")
 
     /* video hardware */
 

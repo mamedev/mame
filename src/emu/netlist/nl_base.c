@@ -551,13 +551,7 @@ ATTR_HOT inline void netlist_net_t::update_devs()
     m_in_queue = 2; /* mark as taken ... */
 
     netlist_core_terminal_t *p = m_head;
-#if 0
-    do
-    {
-        update_dev(p, mask);
-        p = p->m_update_list_next;
-    } while (p != NULL);
-#else
+
     switch (m_num_cons)
     {
     case 2:
@@ -574,7 +568,7 @@ ATTR_HOT inline void netlist_net_t::update_devs()
         } while (p != NULL);
         break;
     }
-#endif
+
     m_last = m_cur;
 }
 
