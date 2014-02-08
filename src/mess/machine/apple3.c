@@ -494,8 +494,15 @@ UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
 		/* The Apple /// Diagnostics seems to expect that indexed writes
 		 * always write to RAM.  That image jumps to an address that is
 		 * undefined unless this code is enabled. 
+		 *  
+		 * The confidence test and the diagnostics together indicates 
+		 * that this *doesn't* apply to the VIA region, however. 
 		 */ 
-		result = apple3_bankaddr(~0, offset - 0x8000);
+
+		if (offset < 0xffd0 || offset > 0xffef)
+		{
+			result = apple3_bankaddr(~0, offset - 0x8000); 
+		}
 	}
 
 	return result;
@@ -619,13 +626,13 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 {
 	UINT8 rv = 0xff;
 
-	// (zp), y read
+	// (zp), y or (zp,x) read
 	if (!space.debugger_access())
 	{
-		if (m_indir_count == 4)
+		if (((m_indir_count == 4) && (m_indir_opcode & 0x10)) ||
+			((m_indir_count == 5) && !(m_indir_opcode & 0x10)))
 		{
 			UINT8 *test;
-//			printf("doing redirect on (zp),y, offset %x\n", offset);
 			test = apple3_get_indexed_addr(offset);
 
 			if (test)
@@ -659,7 +666,10 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 	{
 		if (m_via_0_a & 0x40)
 		{
-			rv = apple3_c0xx_r(space, offset-0xc000);
+			if (!space.debugger_access())
+			{
+				rv = apple3_c0xx_r(space, offset-0xc000);
+			}
 		}
 		else
 		{
@@ -714,10 +724,10 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 		// capture last opcode for indirect mode shenanigans
 		if (m_sync)
 		{
-			// 0xN1 with bit 4 set is a (zp),y opcode
-			if (((rv & 0x0f) == 0x1) && (rv & 0x10))
+			// 0xN1 is a (zp),y or (zp, x) opcode
+			if ((rv & 0x0f) == 0x1)
 			{
-//				printf("(zp),y %02x at %x\n", rv, offset);
+//				printf("(zp),y or (zp,x) %02x at %x\n", rv, offset);
 				m_indir_count = 1;
 				m_indir_opcode = rv;
 			}
@@ -732,7 +742,6 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	if ((!space.debugger_access()) && (m_indir_count > 0))
 	{
 		UINT8 *test;
-//			printf("store (zp),y %02x at %x\n", data, offset);
 		test = apple3_get_indexed_addr(offset);
 
 		if (test)
@@ -767,7 +776,10 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	{
 		if (m_via_0_a & 0x40)
 		{
-			apple3_c0xx_w(space, offset-0xc000, data);
+			if (!space.debugger_access())
+			{
+				apple3_c0xx_w(space, offset-0xc000, data);
+			}
 		}
 		else
 		{
@@ -816,11 +828,17 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	{
 		if (offset >= 0xffd0 && offset <= 0xffdf)
 		{
-			m_via_0->write(space, offset, data);
+			if (!space.debugger_access())
+			{
+				m_via_0->write(space, offset, data);
+			}
 		}
 		else if (offset >= 0xffe0 && offset <= 0xffef)
 		{
-			m_via_1->write(space, offset, data);
+			if (!space.debugger_access())
+			{
+				m_via_1->write(space, offset, data);
+			}
 		}
 		else
 		{
