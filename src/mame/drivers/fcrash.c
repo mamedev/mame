@@ -1340,9 +1340,6 @@ MACHINE_START_MEMBER(cps_state,fcrash)
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	m_msm_1 = machine().device<msm5205_device>("msm1");
-	m_msm_2 = machine().device<msm5205_device>("msm2");
-
 	m_layer_enable_reg = 0x20;
 	m_layer_mask_reg[0] = 0x26;
 	m_layer_mask_reg[1] = 0x30;
@@ -1406,9 +1403,6 @@ MACHINE_START_MEMBER(cps_state, sf2mdt)
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	m_msm_1 = machine().device<msm5205_device>("msm1");
-	m_msm_2 = machine().device<msm5205_device>("msm2");
-
 	m_layer_enable_reg = 0x26;
 	m_layer_mask_reg[0] = 0x28;
 	m_layer_mask_reg[1] = 0x2a;
@@ -1433,8 +1427,6 @@ MACHINE_START_MEMBER(cps_state, knightsb)
 
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 
-	m_msm_1 = machine().device<msm5205_device>("msm1");
-	m_msm_2 = machine().device<msm5205_device>("msm2");
 	m_layer_enable_reg = 0x30;
 	m_layer_mask_reg[0] = 0x28;
 	m_layer_mask_reg[1] = 0x2a;

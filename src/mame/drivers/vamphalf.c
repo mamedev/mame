@@ -79,6 +79,7 @@ public:
 			m_tiles32(*this,"tiles32"),
 			m_wram32(*this,"wram32"),
 			m_maincpu(*this, "maincpu"),
+			m_qs1000(*this, "qs1000"),
 			m_oki(*this, "oki"),
 			m_oki2(*this, "oki_2"),
 			m_eeprom(*this, "eeprom") {
@@ -89,6 +90,13 @@ public:
 	optional_shared_ptr<UINT16> m_wram;
 	optional_shared_ptr<UINT32> m_tiles32;
 	optional_shared_ptr<UINT32> m_wram32;
+	
+	required_device<cpu_device> m_maincpu;
+	optional_device<qs1000_device> m_qs1000;
+	optional_device<okim6295_device> m_oki;
+	optional_device<okim6295_device> m_oki2;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	
 	int m_flip_bit;
 	int m_flipscreen;
 	int m_palshift;
@@ -173,10 +181,6 @@ public:
 	DECLARE_DRIVER_INIT(wyvernwg);
 	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	optional_device<okim6295_device> m_oki;
-	optional_device<okim6295_device> m_oki2;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 READ16_MEMBER(vamphalf_state::eeprom_r)
@@ -377,19 +381,15 @@ WRITE16_MEMBER(vamphalf_state::boonggab_lamps_w)
 
 WRITE32_MEMBER( vamphalf_state::wyvernwg_snd_w )
 {
-	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");
-
 	m_qs1000_data = data & 0xff;
-	qs1000->set_irq(ASSERT_LINE);
+	m_qs1000->set_irq(ASSERT_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 WRITE16_MEMBER( vamphalf_state::misncrft_snd_w )
 {
-	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");
-
 	m_qs1000_data = data & 0xff;
-	qs1000->set_irq(ASSERT_LINE);
+	m_qs1000->set_irq(ASSERT_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
@@ -400,10 +400,8 @@ READ8_MEMBER( vamphalf_state::qs1000_p1_r )
 
 WRITE8_MEMBER( vamphalf_state::qs1000_p3_w )
 {
-	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");
-
 	if (!BIT(data, 5))
-		qs1000->set_irq(CLEAR_LINE);
+		m_qs1000->set_irq(CLEAR_LINE);
 
 	membank("qs1000:data")->set_entry(data & 7);
 }

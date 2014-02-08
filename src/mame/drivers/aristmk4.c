@@ -281,16 +281,25 @@ class aristmk4_state : public driver_device
 public:
 	aristmk4_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_rtc(*this, "rtc"),
+		m_ay1(*this, "ay1"),
+		m_ay2(*this, "ay2"),
 		m_samples(*this, "samples"),
-		m_mkiv_vram(*this, "mkiv_vram"),
-		m_maincpu(*this, "maincpu") { }
+		m_mkiv_vram(*this, "mkiv_vram") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<mc146818_device> m_rtc;
+	required_device<ay8910_device> m_ay1;
+	required_device<ay8910_device> m_ay2;
+	required_device<samples_device> m_samples;
+	
+	required_shared_ptr<UINT8> m_mkiv_vram;
+	
 	int m_rtc_address_strobe;
 	int m_rtc_data_strobe;
-	required_device<samples_device> m_samples;
 	UINT8 *m_shapeRomPtr;
 	UINT8 m_shapeRom[0xc000];
-	required_shared_ptr<UINT8> m_mkiv_vram;
 	UINT8 *m_nvram;
 	UINT8 m_psg_data;
 	int m_ay8910_1;
@@ -344,7 +353,6 @@ public:
 	TIMER_CALLBACK_MEMBER(hopper_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_pf);
 	inline void uBackgroundColour();
-	required_device<cpu_device> m_maincpu;
 };
 
 /* Partial Cashcade protocol */
@@ -563,22 +571,21 @@ READ8_MEMBER(aristmk4_state::mkiv_pia_ina)
 {
 	/* uncomment this code once RTC is fixed */
 
-	//return machine().device<mc146818_device>("rtc")->read(space,1);
+	//return m_rtc->read(space,1);
 	return 0;   // OK for now, the aussie version has no RTC on the MB so this is valid.
 }
 
 //output a
 WRITE8_MEMBER(aristmk4_state::mkiv_pia_outa)
 {
-	mc146818_device *mc = machine().device<mc146818_device>("rtc");
 	if(m_rtc_data_strobe)
 	{
-		mc->write(space,1,data);
+		m_rtc->write(space,1,data);
 		//logerror("rtc protocol write data: %02X\n",data);
 	}
 	else
 	{
-		mc->write(space,0,data);
+		m_rtc->write(space,0,data);
 		//logerror("rtc protocol write address: %02X\n",data);
 	}
 }
@@ -688,13 +695,13 @@ READ8_MEMBER(aristmk4_state::via_a_r)
 
 	if (m_ay8910_1&0x03) // SW1 read.
 	{
-		psg_ret = machine().device<ay8910_device>("ay1")->data_r(space, 0);
+		psg_ret = m_ay1->data_r(space, 0);
 		//logerror("PSG porta ay1 returned %02X\n",psg_ret);
 	}
 
 	else if (m_ay8910_2&0x03) //i don't think we read anything from Port A on ay2, Can be removed once game works ok.
 	{
-		psg_ret = machine().device<ay8910_device>("ay2")->data_r(space, 0);
+		psg_ret = m_ay2->data_r(space, 0);
 		//logerror("PSG porta ay2 returned %02X\n",psg_ret);
 	}
 	return psg_ret;
@@ -788,13 +795,13 @@ WRITE8_MEMBER(aristmk4_state::via_b_w)
 		break;
 	case 0x06:  //WRITE
 	{
-		machine().device<ay8910_device>("ay1")->data_w(space, 0 , m_psg_data);
+		m_ay1->data_w(space, 0 , m_psg_data);
 		//logerror("VIA Port A write data ay1: %02X\n",m_psg_data);
 		break;
 	}
 	case 0x07:  //LATCH Address (set register)
 	{
-		machine().device<ay8910_device>("ay1")->address_w(space, 0 , m_psg_data);
+		m_ay1->address_w(space, 0 , m_psg_data);
 		//logerror("VIA Port B write register ay1: %02X\n",m_psg_data);
 		break;
 	}
@@ -815,13 +822,13 @@ WRITE8_MEMBER(aristmk4_state::via_b_w)
 		break;
 	case 0x06:  //WRITE
 	{
-		machine().device<ay8910_device>("ay2")->data_w(space, 0, m_psg_data);
+		m_ay2->data_w(space, 0, m_psg_data);
 		//logerror("VIA Port A write data ay2: %02X\n",m_psg_data);
 		break;
 	}
 	case 0x07:  //LATCH Address (set register)
 	{
-		machine().device<ay8910_device>("ay2")->address_w(space, 0, m_psg_data);
+		m_ay2->address_w(space, 0, m_psg_data);
 		//logerror("VIA Port B write register ay2: %02X\n",m_psg_data);
 		break;
 	}

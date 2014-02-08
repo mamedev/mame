@@ -164,10 +164,10 @@ void sanremo_state::palette_init()
 	int index;
 
 	for (index = 0; index < 0x8; index++)
-		palette_entry_set_color(machine().palette, index, MAKE_RGB(pal1bit((index >> 0)&1), pal1bit((index >> 1)&1), pal1bit((index >> 2)&1)));
+		palette_set_color_rgb(machine(), index, pal1bit((index >> 0)&1), pal1bit((index >> 1)&1), pal1bit((index >> 2)&1));
 
 	for (index = 0x8; index < 0x10; index++)
-		palette_entry_set_color(machine().palette, index, MAKE_RGB(pal2bit((index >> 0)&1), pal2bit((index >> 1)&1), pal2bit((index >> 2)&1)));
+		palette_set_color_rgb(machine(), index, pal2bit((index >> 0)&1), pal2bit((index >> 1)&1), pal2bit((index >> 2)&1));
 }
 
 

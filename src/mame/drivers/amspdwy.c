@@ -15,7 +15,6 @@ Sound:  YM2151
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/2151intf.h"
 #include "includes/amspdwy.h"
 
 /***************************************************************************
@@ -63,8 +62,7 @@ READ8_MEMBER(amspdwy_state::amspdwy_wheel_1_r)
 
 READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 {
-	ym2151_device *device = machine().device<ym2151_device>("ymsnd");
-	return (device->status_r(space, 0) & ~ 0x30) | ioport("IN0")->read();
+	return (m_ym2151->status_r(space, 0) & ~ 0x30) | ioport("IN0")->read();
 }
 
 WRITE8_MEMBER(amspdwy_state::amspdwy_sound_w)

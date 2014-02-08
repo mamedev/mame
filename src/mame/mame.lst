@@ -2302,7 +2302,8 @@ spacegunj       // C57 (c) 1990 Taito Corporation (Japan)
 dblaxle         // C78 (c) 1991 Taito America Corporation (US)
 dblaxleu        // C78 (c) 1991 Taito America Corporation (US)
 pwheelsj        // C78 (c) 1991 Taito Corporation (Japan)
-racingb         // C84 (c) 1991 Taito Corporation ..
+racingb         // C84 (c) 1991 Taito Corporation Japan (World)
+racingbj        // C84 (c) 1991 Taito Corporation (Japan)
 
 // Taito Air System games
 mlanding        // ??? (c) 1987 Taito America Corporation (US)
@@ -4718,7 +4719,7 @@ radru           // 1991.09 Rad Rally (US)
 radrj           // 1991.07 Rad Rally (Japan)
 spidman         // 1991.?? Spiderman (World)
 spidmanu        // 1991.09 Spiderman (US)
-				// 1991.09 Spiderman (Japan)
+spidmanj	// 1991.09 Spiderman (Japan)
 f1en            // 1991.?? F-1 Exhaust Note (World)
 				// 1992.01 F-1 Exhaust Note (US)
 				// 1991.11 F-1 Exhaust Note (Japan)

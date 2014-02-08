@@ -80,8 +80,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
-		m_m48t35(*this,"m48t35")
-	{ }
+		m_m48t35(*this,"m48t35"),
+		m_msm_1(*this, "msm1"),
+		m_msm_2(*this, "msm2") { }
 
 	/* memory pointers */
 	// cps1
@@ -172,8 +173,8 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
 	optional_device<m48t35_device> m_m48t35;
-	msm5205_device *m_msm_1;    // fcrash
-	msm5205_device *m_msm_2;    // fcrash
+	optional_device<msm5205_device> m_msm_1;    // fcrash
+	optional_device<msm5205_device> m_msm_2;    // fcrash
 	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
 	DECLARE_READ16_MEMBER(cps1_in1_r);
 	DECLARE_READ16_MEMBER(cps1_in2_r);
