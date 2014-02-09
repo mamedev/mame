@@ -540,8 +540,8 @@ MACHINE_CONFIG_END
 Yun Sung, 1995
 
 +-------------------------------------+
-|VOL YM3104      6116               04|
-|     M5202 400KHz                  03|
+|VOL YM3014      6116               04|
+|     M5205 400KHz                  03|
 |     Z80A      CXK5118PN-15L       02|
 |      08       GM76C28-10          01|
 |    MCM2018AN45                      |
@@ -559,7 +559,7 @@ Yun Sung, 1995
 
  Main CPU: Z80B
 Sound CPU: Z80A
-    Sound: Yamaha YM3812 + Oki M5202 + YM3014 DAC
+    Sound: Yamaha YM3812 + Oki M5205 + YM3014 DAC
     Video: QuickLogic FPGA - unknown type / model
       OSC: 16MHz + 400Khz resontator
    Memory: 2 x MCM2018AN45, 2 x HM6264, CXK5118PN-15L, GM76C28-10 & 6116
@@ -627,8 +627,8 @@ Yun Sung, 1995
 
 Cannon Ball (vertical)
 +-------------------------------------+
-|VOL YM3104      6116         YunSung7|
-|     M5202 400KHz            YunSung6|
+|VOL YM3014      6116         YunSung7|
+|     M5205 400KHz            YunSung6|
 |     Z80A      CXK5118PN-15L YunSung5|
 |    YunSung8   GM76C28-10    YunSung4|
 |    MCM2018AN45                      |
@@ -646,7 +646,7 @@ Cannon Ball (vertical)
 
  Main CPU: Z80B
 Sound CPU: Z80A
-    Sound: Yamaha YM3812 + Oki M5202 + YM3014 DAC
+    Sound: Yamaha YM3812 + Oki M5205 + YM3014 DAC
     Video: Cypress CY7C384A - Very high speed 6K gate CMOS FPGA
       OSC: 16MHz + 400Khz resontator
    Memory: 2 x MCM2018AN45, 2 x HM6264, CXK5118PN-15L, GM76C28-10 & 6116
