@@ -16,7 +16,6 @@
 #include "rendutil.h"
 #include "cheat.h"
 #include "uiinput.h"
-#include "ui/filemngr.h"
 #include "ui/miscmenu.h"
 #include "audit.h"
 #include "crsshair.h"
