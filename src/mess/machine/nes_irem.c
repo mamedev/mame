@@ -243,8 +243,16 @@ WRITE8_MEMBER(nes_g101_device::write_h)
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
-			// NEStopia here differs a little bit
-			m_latch ? prg8_cd(data) : prg8_89(data);
+			if (m_latch)
+			{
+				prg8_89(0xfe);
+				prg8_cd(data & 0x1f);
+			}
+			else
+			{
+				prg8_89(data & 0x1f);
+				prg8_cd(0xfe);
+			}
 			break;
 		case 0x1000:
 			m_latch = BIT(data, 1);
@@ -252,10 +260,10 @@ WRITE8_MEMBER(nes_g101_device::write_h)
 				set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x2000:
-			prg8_ab(data);
+			prg8_ab(data & 0x1f);
 			break;
 		case 0x3000:
-			chr1_x(offset & 0x07, data, CHRROM);
+			chr1_x(offset & 0x07, data & 0x7f, CHRROM);
 			break;
 	}
 }
