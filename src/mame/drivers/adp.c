@@ -214,7 +214,7 @@ UINT32 adp_state::screen_update_adp(screen_device &screen, bitmap_ind16 &bitmap,
 	#if 0
 	int x, y, b, src;
 
-	b = ((m_hd63484->regs_r(, 0xcc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(0xce/2, 0xffff);
+	b = ((m_hd63484->regs_r(0xcc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(0xce/2, 0xffff);
 
 	for (y = 0;y < 280;y++)
 	{
