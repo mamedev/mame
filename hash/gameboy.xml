@@ -1609,6 +1609,18 @@
 		</part>
 	</software>
 
+	<software name="jetpack" cloneof="bzeoth">
+		<description>Jetpack (Battle Unit Zeoth Prototype)</description>
+		<year>1991</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="jetpack.bin" size="131072" crc="1c223204" sha1="df7abbcaaccd5cff4c55bb331fa5d3049fb92896" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bzeothj" cloneof="bzeoth">
 		<description>Battle Unit Zeoth (Jpn)</description>
 		<year>1990</year>

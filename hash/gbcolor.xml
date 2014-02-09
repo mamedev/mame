@@ -2942,7 +2942,7 @@ List of verified retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="xmenma">
+	<software name="xmenma1" cloneof="xmenma">
 		<!-- Notes: GBC only -->
 		<description>X-Men - Mutant Academy (Euro, USA)</description><!-- only Euro confirmed -->
 		<year>2000</year>
@@ -22455,6 +22455,20 @@ List of unconfirmed retail cartridge roms
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="worms armageddon (usa) (en,fr,es).bin" size="1048576" crc="e241edde" sha1="ec587a3660298f95bf85f4471a626727b5fe6d7c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmenma">
+		<!-- Notes: GBC only -->
+		<description>X-Men - Mutant Academy (Euro, USA, Rev. 1)</description><!-- only Euro confirmed -->
+		<year>2000</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="CGB-BXAE-USA, CGB-BXAP-NOE"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="x-men - mutant academy (usa, europe) (rev 1).bin" size="1048576" crc="234e1e9c" sha1="167770befb087c0f95cfe3c3efa3540c5f55a799" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

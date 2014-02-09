@@ -20,7 +20,6 @@
     FIRE SHARK                  PAL     dump check
     GAIN GROUND                 PAL     revision order check
     GALAXY FORCE II             ALL     we have Rev B, Rev 0 and Rev A needed (does it exist?)
-    GO NET                  JAPAN
     INTERNATIONAL SUPERSTAR SOCCER      BRAZIL
     JEWEL MASTER                USA/PAL     we have Rev A, Rev 0 needed (does it match Japanese release?)
     NBA PLAYOFFS - BULLS VS BLAZERS     JAPAN       (alt) version contain a checksum check which have been wiped out of the non-alt revision
@@ -29,7 +28,6 @@
     OSAKA BANK MY LINE DEMO         JAPAN
     OUTBACK JOEY - PERSONAL TRAINER     ???     http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
     PGA TOUR GOLF               USA/PAL     we have v1.1 and v1.2, v1.0 needed (does it exist?)
-    ROAD RASH                   JAPAN
     ROAD RASH                   USA/PAL     needs proper dump
     SHINING FORCE               PAL
     SIDE POCKET                 JAPAN/USA   conflict in current info
@@ -14384,6 +14382,18 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+<!-- This was found by the developers in some old disks -->
+	<software name="frogdude">
+		<description>Frog Dude (Prototype)</description>
+		<year>1993</year>
+		<publisher>Twilight</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="froggy.bin" size="99792" crc="c5e80ce2" sha1="93b50bc93a3cbd510190fa7f0920ca4e07ba86ab" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="frogger">
 		<description>Frogger (USA)</description>
 		<year>1998</year>
@@ -14720,6 +14730,18 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="mick &amp; mack as the global gladiators (usa) (beta).bin" size="1048576" crc="08c2af21" sha1="433db3e145499ebad4f71aae66ee6726ef30d5db" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gonet" supported="no">
+		<description>Go Net (Jpn)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-4533"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="go-net (japan).bin" size="524288" crc="db30f773" sha1="22502a21b9508b385de32bd7e2c9d304ddcef38b" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21731,6 +21753,20 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="roadrashj" cloneof="roadrash">
+		<description>Road Rash (Jpn)</description>
+		<year>1991</year>
+		<publisher>Electronic Arts Victor</publisher>
+		<info name="serial" value="EM20003"/>
+		<info name="release" value="19921120"/>
+		<info name="alt_title" value="ロード・ラッシュ"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="road rash (japan).bin" size="1048576" crc="256a21d2" sha1="d822e5c16ee51dd1a030168bb8fd7c918398a82a" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rrash2">
 		<description>Road Rash II (Euro, USA, v1.2)</description>
 		<year>1992</year>
@@ -25814,6 +25850,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="time killers (usa).bin" size="2097152" crc="4b5f52ac" sha1="91b2dd5463261ca240c4977f58d9c8fd7e770624" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timetrax">
+		<description>Time Trax (Prototype)</description>
+		<year>1994</year>
+		<publisher>Black Pearl</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="time trax (usa) (proto).bin" size="1048576" crc="dff045eb" sha1="d7eb65f67ebb89a85c25a3accf06368554a13834" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>
