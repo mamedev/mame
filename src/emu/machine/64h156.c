@@ -15,7 +15,7 @@
 
     http://personalpages.tds.net/~rcarlsen/cbm/1541/1541%20EARLY/1540-2.GIF
 
-    - write circuitry
+    - write
     - cycle exact VIA
 
     - get these running and we're golden
@@ -37,8 +37,6 @@
 
 #define LOG 0
 
-#define ATN (m_atni ^ m_atna)
-
 #define CYCLES_UNTIL_ANALOG_DESYNC      288 // 18 us
 
 
@@ -52,237 +50,6 @@ const device_type C64H156 = &device_creator<c64h156_device>;
 
 
 //**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  set_atn_line -
-//-------------------------------------------------
-
-inline void c64h156_device::set_atn_line()
-{
-	m_write_atn(ATN);
-}
-
-
-//-------------------------------------------------
-//  get_next_edge -
-//-------------------------------------------------
-
-inline void c64h156_device::get_next_edge(attotime when)
-{
-	m_edge = m_floppy->get_next_transition(when);
-}
-
-
-//-------------------------------------------------
-//  receive_bit - receive bit
-//-------------------------------------------------
-
-inline void c64h156_device::receive_bit()
-{
-	attotime when = machine().time();
-	attotime next = when + m_period;
-
-	m_bit_sync = (m_edge.is_never() || m_edge >= next) ? 0 : 1;
-
-	if (m_bit_sync) {
-		m_zero_count = 0;
-		m_cycles_until_random_flux = (rand() % 31) + 289;
-
-		get_next_edge(when);
-	} else {
-		m_zero_count++;
-	}
-
-	if (m_zero_count >= m_cycles_until_random_flux) {
-		m_bit_sync = 1;
-
-		m_zero_count = 0;
-		m_cycles_until_random_flux = (rand() % 367) + 33;
-	}
-}
-
-
-//-------------------------------------------------
-//  decode_bit -
-//-------------------------------------------------
-
-inline void c64h156_device::decode_bit()
-{
-	// UE7
-
-	bool ue7_tc = false;
-
-	if (!m_last_bit_sync && m_bit_sync)
-	{
-		m_ue7 = m_ds;
-	}
-	else
-	{
-		m_ue7++;
-
-		if (m_ue7 == 16)
-		{
-			m_ue7 = m_ds;
-			ue7_tc = true;
-		}
-	}
-
-	if (LOG) logerror("%s UE7 CTR %01x TC %u, ", machine().time().as_string(),m_ue7, ue7_tc);
-
-	// UF4
-
-	if (!m_last_bit_sync && m_bit_sync)
-	{
-		m_uf4 = 0;
-
-		if (LOG) logerror("--");
-	}
-	else
-	{
-		if (!m_ue7_tc && ue7_tc)
-		{
-			m_uf4++;
-			m_uf4 &= 0x0f;
-
-			if (LOG) logerror("++");
-		}
-		else
-		{
-			if (LOG) logerror("  ");
-		}
-	}
-
-	m_last_bit_sync = m_bit_sync;
-	m_ue7_tc = ue7_tc;
-
-	int uf4_qa = BIT(m_uf4, 0);
-	int uf4_qb = BIT(m_uf4, 1);
-	int uf4_qc = BIT(m_uf4, 2);
-	int uf4_qd = BIT(m_uf4, 3);
-
-	int ue5a = !(uf4_qc || uf4_qd);
-
-	if (LOG) logerror("UF4 CTR %01x %u%u%u%u UE5A %u, ", m_uf4, uf4_qd, uf4_qc, uf4_qb, uf4_qa, ue5a);
-
-	if (!m_uf4_qb && uf4_qb)
-	{
-		// shift bits thru flip-flops
-		m_u4b = m_u4a;
-		m_u4a = BIT(m_ud2, 7);
-
-		// shift in data bit
-		m_ud2 <<= 1;
-		m_ud2 |= ue5a;
-
-		if (LOG) logerror("<<");
-	}
-	else
-	{
-		if (LOG) logerror("  ");
-	}
-
-	if (LOG) logerror("UD2 %u%u%u%u%u%u%u%u%u%u : %02x (%02x), ", m_u4b, m_u4a, BIT(m_ud2, 7), BIT(m_ud2, 6), BIT(m_ud2, 5), BIT(m_ud2, 4), BIT(m_ud2, 3), BIT(m_ud2, 2), BIT(m_ud2, 1), BIT(m_ud2, 0), m_ud2, m_shift & 0xff);
-
-	// UE3
-
-	int block_sync = !(m_oe && (m_ud2 == 0xff) && m_u4a && m_u4b);
-
-	if (LOG) logerror("SYNC %u, ", block_sync);
-
-	if (!block_sync)
-	{
-		// load UE3
-		m_ue3 = 8; // pin D is floating and TTL inputs float high
-
-		if (LOG) logerror("--");
-	}
-	else
-	{
-		if (m_block_sync && !m_uf4_qb && uf4_qb)
-		{
-			// clock UE3
-			m_ue3++;
-			m_ue3 &= 0x0f;
-
-			if (LOG) logerror("++");
-		}
-		else
-		{
-			if (LOG) logerror("  ");
-		}
-	}
-
-	int ue3_qa = BIT(m_ue3, 0);
-	int ue3_qb = BIT(m_ue3, 1);
-	int ue3_qc = BIT(m_ue3, 2);
-
-	int uf3a = !(ue3_qa && ue3_qb && ue3_qc);
-	int uc1b = !uf3a; // schmitt trigger
-
-	if (LOG) logerror("UE3 CTR %01x UF3A %u UC1B %u, ", m_ue3, uf3a, uc1b);
-
-	int byte_sync = !(uc1b && m_soe && !uf4_qb);
-
-	if (LOG) logerror("BYTE %u SOE %u\n", byte_sync, m_soe);
-
-	// UD3
-#ifdef WRITE_SUPPORTED
-	int uf3b = !(uc1b && uf4_qa && uf4_qb);
-
-	if (!uf3b)
-	{
-		m_ud3 = m_via_pa;
-	}
-	else if (!m_uf4_qb && uf4_qb)
-	{
-		// shift out bits
-		int ud3_qh = BIT(m_ud3, 0);
-		m_ud3 >>= 1;
-
-		int uf5b = !(!uf4_qb && ud3_qh);
-
-		if (!m_oe && m_floppy->wpt_r())
-		{
-			// TODO write bit to disk
-			if (LOG) logerror("WRITE BIT %u\n", uf5b);
-		}
-	}
-#endif
-	// prepare for next cycle
-
-	if (m_block_sync != block_sync)
-	{
-		m_block_sync = block_sync;
-		m_write_sync(m_block_sync);
-	}
-
-	if (m_byte_sync != byte_sync)
-	{
-		m_byte_sync = byte_sync;
-
-		if (m_accl)
-		{
-			if (!byte_sync)
-			{
-				m_accl_yb = m_ud2;
-				m_accl_byte_sync = byte_sync;
-				m_write_byte(m_accl_byte_sync);
-			}
-		}
-		else
-		{
-			m_write_byte(m_byte_sync);
-		}
-	}
-
-	m_uf4_qb = uf4_qb;
-}
-
-
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -290,43 +57,29 @@ inline void c64h156_device::decode_bit()
 //  c64h156_device - constructor
 //-------------------------------------------------
 
-c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C64H156, "64H156", tag, owner, clock, "c64h156", __FILE__),
-		device_execute_interface(mconfig, *this),
-		m_icount(0),
-		m_write_atn(*this),
-		m_write_sync(*this),
-		m_write_byte(*this),
-		m_floppy(NULL),
-		m_period(attotime::from_hz(clock)),
-		m_edge(attotime::never),
-		m_shift(0),
-		m_mtr(0),
-		m_accl(0),
-		m_stp(-1),
-		m_ds(0),
-		m_soe(0),
-		m_oe(0),
-		m_atni(1),
-		m_atna(1),
-		m_last_bit_sync(0),
-		m_bit_sync(0),
-		m_byte_sync(1),
-		m_accl_byte_sync(1),
-		m_block_sync(1),
-		m_ue7(0),
-		m_ue7_tc(0),
-		m_uf4(0),
-		m_uf4_qb(0),
-		m_ud2(0),
-		m_accl_yb(0),
-		m_u4a(0),
-		m_u4b(0),
-		m_ue3(0),
-		m_uc1b(0),
-		m_zero_count(0),
-		m_cycles_until_random_flux(0)
+c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, C64H156, "64H156", tag, owner, clock, "c64h156", __FILE__),
+	m_write_atn(*this),
+	m_write_sync(*this),
+	m_write_byte(*this),
+	m_floppy(NULL),
+	m_mtr(1),
+	m_accl(0),
+	m_stp(0),
+	m_ds(0),
+	m_soe(0),
+	m_oe(1),
+	m_ted(0),
+	m_yb(0),
+	m_atni(0),
+	m_atna(0),
+	m_period(attotime::from_hz(clock))
 {
+	cur_live.tm = attotime::never;
+	cur_live.state = IDLE;
+	cur_live.next_state = -1;
+	cur_live.write_position = 0;
+	cur_live.write_start_time = attotime::never;
 }
 
 
@@ -336,63 +89,305 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 
 void c64h156_device::device_start()
 {
-	// set our instruction counter
-	m_icountptr = &m_icount;
-
 	// resolve callbacks
 	m_write_atn.resolve_safe();
 	m_write_sync.resolve_safe();
 	m_write_byte.resolve_safe();
 
+	// allocate timer
+	t_gen = timer_alloc(0);
+
 	// register for state saving
-	save_item(NAME(m_shift));
 	save_item(NAME(m_mtr));
 	save_item(NAME(m_accl));
 	save_item(NAME(m_stp));
 	save_item(NAME(m_ds));
 	save_item(NAME(m_soe));
 	save_item(NAME(m_oe));
+	save_item(NAME(m_ted));
+	save_item(NAME(m_yb));
 	save_item(NAME(m_atni));
 	save_item(NAME(m_atna));
-	save_item(NAME(m_last_bit_sync));
-	save_item(NAME(m_bit_sync));
-	save_item(NAME(m_byte_sync));
-	save_item(NAME(m_accl_byte_sync));
-	save_item(NAME(m_block_sync));
-	save_item(NAME(m_ue7));
-	save_item(NAME(m_ue7_tc));
-	save_item(NAME(m_uf4));
-	save_item(NAME(m_uf4_qb));
-	save_item(NAME(m_ud2));
-	save_item(NAME(m_accl_yb));
-	save_item(NAME(m_u4a));
-	save_item(NAME(m_u4b));
-	save_item(NAME(m_ue3));
-	save_item(NAME(m_uc1b));
-	save_item(NAME(m_via_pa));
-	save_item(NAME(m_ud3));
-	save_item(NAME(m_zero_count));
-	save_item(NAME(m_cycles_until_random_flux));
 }
 
 
 //-------------------------------------------------
-//  execute_run -
+//  device_reset - device-specific reset
 //-------------------------------------------------
 
-void c64h156_device::execute_run()
+void c64h156_device::device_reset()
 {
-	do
-	{
-		if (m_mtr)
-		{
-			receive_bit();
+	live_abort();
+}
+
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void c64h156_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	live_sync();
+	live_run();
+}
+
+void c64h156_device::live_start()
+{
+	cur_live.tm = machine().time();
+	cur_live.state = RUNNING;
+	cur_live.next_state = -1;
+
+	cur_live.shift_reg = 0;
+	cur_live.shift_reg_write = 0;
+	cur_live.cycle_counter = 0;
+	cur_live.cell_counter = 0;
+	cur_live.bit_counter = 0;
+	cur_live.ds = m_ds;
+	cur_live.oe = m_oe;
+	cur_live.soe = m_soe;
+	cur_live.accl = m_accl;
+
+	checkpoint_live = cur_live;
+
+	live_run();
+}
+
+void c64h156_device::checkpoint()
+{
+	get_next_edge(machine().time());
+	checkpoint_live = cur_live;
+}
+
+void c64h156_device::rollback()
+{
+	cur_live = checkpoint_live;
+	get_next_edge(cur_live.tm);
+}
+
+void c64h156_device::start_writing(attotime tm)
+{
+	cur_live.write_start_time = tm;
+	cur_live.write_position = 0;
+}
+
+void c64h156_device::stop_writing(attotime tm)
+{
+	commit(tm);
+	cur_live.write_start_time = attotime::never;
+}
+
+bool c64h156_device::write_next_bit(bool bit, attotime limit)
+{
+	if(cur_live.write_start_time.is_never()) {
+		cur_live.write_start_time = cur_live.tm;
+		cur_live.write_position = 0;
+	}
+
+	attotime etime = cur_live.tm + m_period;
+	if(etime > limit)
+		return true;
+
+	if(bit && cur_live.write_position < ARRAY_LENGTH(cur_live.write_buffer))
+		cur_live.write_buffer[cur_live.write_position++] = cur_live.tm;
+
+	if (LOG) logerror("%s write bit %u (%u)\n", cur_live.tm.as_string(), cur_live.bit_counter, bit);
+
+	return false;
+}
+
+void c64h156_device::commit(attotime tm)
+{
+	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
+		return;
+	
+	if (LOG) logerror("%s committing %u transitions since %s\n", tm.as_string(), cur_live.write_position, cur_live.write_start_time.as_string());
+
+	m_floppy->write_flux(cur_live.write_start_time, tm, cur_live.write_position, cur_live.write_buffer);
+
+	cur_live.write_start_time = tm;
+	cur_live.write_position = 0;
+}
+
+void c64h156_device::live_delay(int state)
+{
+	cur_live.next_state = state;
+	if(cur_live.tm != machine().time())
+		t_gen->adjust(cur_live.tm - machine().time());
+	else
+		live_sync();
+}
+
+void c64h156_device::live_sync()
+{
+	if(!cur_live.tm.is_never()) {
+		if(cur_live.tm > machine().time()) {
+			rollback();
+			live_run(machine().time());
+			commit(cur_live.tm);
+		} else {
+			commit(cur_live.tm);
+			if(cur_live.next_state != -1) {
+				cur_live.state = cur_live.next_state;
+				cur_live.next_state = -1;
+			}
+			if(cur_live.state == IDLE) {
+				stop_writing(cur_live.tm);
+				cur_live.tm = attotime::never;
+			}
+		}
+		cur_live.next_state = -1;
+		checkpoint();
+	}
+}
+
+void c64h156_device::live_abort()
+{
+	if(!cur_live.tm.is_never() && cur_live.tm > machine().time()) {
+		rollback();
+		live_run(machine().time());
+	}
+
+	stop_writing(cur_live.tm);
+
+	cur_live.tm = attotime::never;
+	cur_live.state = IDLE;
+	cur_live.next_state = -1;
+	cur_live.write_position = 0;
+	cur_live.write_start_time = attotime::never;
+
+	cur_live.sync = 1;
+	cur_live.byte = 1;
+}
+
+void c64h156_device::live_run(attotime limit)
+{
+	if(cur_live.state == IDLE || cur_live.next_state != -1)
+		return;
+
+	for(;;) {
+		switch(cur_live.state) {
+		case RUNNING: {
+			bool syncpoint = false;
+
+			if (cur_live.tm > limit)
+				return;
+
+			int bit = get_next_bit(cur_live.tm, limit);
+			if(bit < 0)
+				return;
+
+			int cell_counter = cur_live.cell_counter;
+
+			if (bit) {
+				cur_live.cycle_counter = cur_live.ds;
+				cur_live.cell_counter = 0;
+			} else {
+				cur_live.cycle_counter++;
+			}
+
+			if (cur_live.cycle_counter == 16) {
+				cur_live.cycle_counter = cur_live.ds;
+
+				cur_live.cell_counter++;
+				cur_live.cell_counter &= 0xf;
+			}
+			
+			if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1)) {
+				// read bit
+				cur_live.shift_reg <<= 1;
+				cur_live.shift_reg |= !(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2));
+				cur_live.shift_reg &= 0x3ff;
+	
+				if (LOG) logerror("%s read bit %u (%u) >> %03x, oe=%u soe=%u sync=%u byte=%u\n", cur_live.tm.as_string(), cur_live.bit_counter, 
+					!(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2)), cur_live.shift_reg, cur_live.oe, cur_live.soe, cur_live.sync, cur_live.byte);
+
+				// write bit
+				if (!cur_live.oe) {
+					write_next_bit(BIT(cur_live.shift_reg_write, 7), limit);
+				}
+
+				syncpoint = true;
+			}
+
+			int sync = !((cur_live.shift_reg == 0x3ff) && cur_live.oe);
+
+			if (!sync) {
+				cur_live.bit_counter = 8;
+			} else if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1) && cur_live.sync) {
+				cur_live.bit_counter++;
+				cur_live.bit_counter &= 0xf;
+			}
+
+			int byte = !(((cur_live.bit_counter & 7) == 7) && cur_live.soe && !BIT(cur_live.cell_counter, 1));
+			int load = !(((cur_live.bit_counter & 7) == 7) && BIT(cur_live.cell_counter, 0) && BIT(cur_live.cell_counter, 1));
+
+			if (!load) {
+				cur_live.shift_reg_write = cur_live.yb;
+				// TODO use data read from disk if via PA is in read mode
+				//if (LOG) logerror("%s load write shift register %02x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
+			} else {
+				cur_live.shift_reg_write <<= 1;
+				cur_live.shift_reg_write &= 0xff;
+			}
+
+			// update signals
+			if (byte != cur_live.byte) {
+				if (!byte || !cur_live.accl) {
+					if (LOG) logerror("%s BYTE %u\n", cur_live.tm.as_string(),byte);
+					cur_live.byte = byte;
+					syncpoint = true;
+				}
+				if (!byte) {
+					cur_live.accl_yb = cur_live.shift_reg & 0xff;
+				}
+			}
+
+			if (sync != cur_live.sync) {
+				if (LOG) logerror("%s SYNC %u\n", cur_live.tm.as_string(),sync);
+				cur_live.sync = sync;
+				syncpoint = true;
+			}
+
+			if (syncpoint) {
+				commit(cur_live.tm);
+
+				cur_live.tm += m_period;
+				live_delay(RUNNING_SYNCPOINT);
+				return;
+			}
+
+			cur_live.tm += m_period;
+			break;
 		}
 
-		decode_bit();
-		
-		m_icount--;
-	} while (m_icount > 0);
+		case RUNNING_SYNCPOINT: {
+			m_write_sync(cur_live.sync);
+			m_write_byte(cur_live.byte);
+
+			cur_live.state = RUNNING;
+			checkpoint();
+			break;
+		}
+		}
+	}
+}
+
+void c64h156_device::get_next_edge(attotime when)
+{
+	cur_live.edge = m_floppy->get_next_transition(when);
+}
+
+int c64h156_device::get_next_bit(attotime &tm, attotime limit)
+{
+	attotime next = tm + m_period;
+
+	int bit = (cur_live.edge.is_never() || cur_live.edge >= next) ? 0 : 1;
+
+	if (bit) {
+		get_next_edge(next);
+	}
+
+	return bit && cur_live.oe;
 }
 
 
@@ -402,23 +397,11 @@ void c64h156_device::execute_run()
 
 READ8_MEMBER( c64h156_device::yb_r )
 {
-	UINT8 data = 0;
-
-	if (m_soe)
-	{
-		if (m_accl)
-		{
-			data = m_accl_yb;
-		}
-		else
-		{
-			data = m_ud2;
-		}
+	if (checkpoint_live.accl) {
+		return checkpoint_live.accl_yb;
+	} else {
+		return checkpoint_live.shift_reg;
 	}
-
-	if (LOG) logerror("%s YB read %02x:%02x\n", machine().describe_context(), m_ud2, data);
-
-	return data;
 }
 
 
@@ -428,7 +411,15 @@ READ8_MEMBER( c64h156_device::yb_r )
 
 WRITE8_MEMBER( c64h156_device::yb_w )
 {
-	m_via_pa = data;
+	if (m_yb != data)
+	{
+		live_sync();
+		m_yb = cur_live.yb = data;
+		checkpoint();
+		if (LOG) logerror("%s YB %02x\n", machine().time().as_string(), data);
+		live_run();
+	}
+
 }
 
 
@@ -447,38 +438,14 @@ WRITE_LINE_MEMBER( c64h156_device::test_w )
 
 WRITE_LINE_MEMBER( c64h156_device::accl_w )
 {
-	m_accl = state;
-}
-
-
-//-------------------------------------------------
-//  sync_r - sync read
-//-------------------------------------------------
-
-READ_LINE_MEMBER( c64h156_device::sync_r )
-{
-	return m_block_sync;
-}
-
-
-//-------------------------------------------------
-//  byte_r - byte ready read
-//-------------------------------------------------
-
-READ_LINE_MEMBER( c64h156_device::byte_r )
-{
-	int state = 1;
-
-	if (m_accl)
+	if (m_accl != state)
 	{
-		state = m_accl_byte_sync;
+		live_sync();
+		m_accl = cur_live.accl = state;
+		checkpoint();
+		if (LOG) logerror("%s ACCL %u\n", machine().time().as_string(), state);
+		live_run();
 	}
-	else
-	{
-		state = m_byte_sync;
-	}
-
-	return state;
 }
 
 
@@ -488,11 +455,17 @@ READ_LINE_MEMBER( c64h156_device::byte_r )
 
 WRITE_LINE_MEMBER( c64h156_device::ted_w )
 {
-	if (m_accl && !m_accl_byte_sync && !state)
+	if (m_ted != state)
 	{
-		m_accl_byte_sync = 1;
-
-		m_write_byte(m_accl_byte_sync);
+		live_sync();
+		if (m_ted && !state && cur_live.accl && !cur_live.byte) {
+			cur_live.byte = 1;
+			m_write_byte(cur_live.byte);
+		}
+		m_ted = state;
+		checkpoint();
+		if (LOG) logerror("%s TED %u\n", machine().time().as_string(), state);
+		live_run();
 	}
 }
 
@@ -505,13 +478,21 @@ WRITE_LINE_MEMBER( c64h156_device::mtr_w )
 {
 	if (m_mtr != state)
 	{
-		if (LOG) logerror("MTR %u\n", state);
-
-		m_floppy->mon_w(!state);
-
+		live_sync();
 		m_mtr = state;
+		if (LOG) logerror("%s MTR %u\n", machine().time().as_string(), state);
+		m_floppy->mon_w(!state);
+		checkpoint();
 
-		get_next_edge(machine().time());
+		if (m_mtr) {
+			if(cur_live.state == IDLE) {
+				live_start();
+			}
+		} else {
+			live_abort();
+		}
+
+		live_run();
 	}
 }
 
@@ -522,9 +503,14 @@ WRITE_LINE_MEMBER( c64h156_device::mtr_w )
 
 WRITE_LINE_MEMBER( c64h156_device::oe_w )
 {
-	if (LOG) logerror("OE %u\n", state);
-
-	m_oe = state;
+	if (m_oe != state)
+	{
+		live_sync();
+		m_oe = cur_live.oe = state;
+		checkpoint();
+		if (LOG) logerror("%s OE %u\n", machine().time().as_string(), state);
+		live_run();
+	}
 }
 
 
@@ -534,19 +520,14 @@ WRITE_LINE_MEMBER( c64h156_device::oe_w )
 
 WRITE_LINE_MEMBER( c64h156_device::soe_w )
 {
-	if (LOG) logerror("SOE %u\n", state);
-
-	m_soe = state;
-}
-
-
-//-------------------------------------------------
-//  atn_r - serial attention read
-//-------------------------------------------------
-
-READ_LINE_MEMBER( c64h156_device::atn_r )
-{
-	return ATN;
+	if (m_soe != state)
+	{
+		live_sync();
+		m_soe = cur_live.soe = state;
+		checkpoint();
+		if (LOG) logerror("%s SOE %u\n", machine().time().as_string(), state);
+		live_run();
+	}
 }
 
 
@@ -560,7 +541,7 @@ WRITE_LINE_MEMBER( c64h156_device::atni_w )
 
 	m_atni = state;
 
-	set_atn_line();
+	m_write_atn(m_atni ^ m_atna);
 }
 
 
@@ -574,7 +555,7 @@ WRITE_LINE_MEMBER( c64h156_device::atna_w )
 
 	m_atna = state;
 
-	set_atn_line();
+	m_write_atn(m_atni ^ m_atna);
 }
 
 
@@ -594,9 +575,11 @@ void c64h156_device::set_floppy(floppy_image_device *floppy)
 
 void c64h156_device::stp_w(int stp)
 {
-	if (m_mtr)
+	if (m_stp != stp)
 	{
-		if (m_stp != stp)
+		live_sync();
+
+		if (m_mtr)
 		{
 			int track = m_floppy->get_cyl();
 			int tracks = (stp - track) & 0x03;
@@ -618,11 +601,12 @@ void c64h156_device::stp_w(int stp)
 				m_floppy->stp_w(1);
 				m_floppy->stp_w(0);
 			}
+
+			m_stp = stp;
 		}
 
-		m_stp = stp;
-
-		get_next_edge(machine().time());
+		checkpoint();
+		live_run();
 	}
 }
 
@@ -633,7 +617,11 @@ void c64h156_device::stp_w(int stp)
 
 void c64h156_device::ds_w(int ds)
 {
-	if (LOG) logerror("DS %u\n", ds & 0x03);
-
-	m_ds = ds & 0x03;
+	if (m_ds != ds)
+	{
+		live_sync();
+		m_ds = cur_live.ds = ds;
+		checkpoint();
+		live_run();
+	}
 }
