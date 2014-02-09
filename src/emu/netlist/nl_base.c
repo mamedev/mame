@@ -121,7 +121,7 @@ ATTR_COLD void netlist_owned_object_t::init_object(netlist_core_device_t &dev,
 
 netlist_base_t::netlist_base_t()
 	:   netlist_object_t(NETLIST, GENERIC),
-		m_time_ps(netlist_time::zero),
+		m_time(netlist_time::zero),
 		m_queue(*this),
 		m_mainclock(NULL),
 		m_solver(NULL)
@@ -155,34 +155,36 @@ netlist_base_t::~netlist_base_t()
 	pstring::resetmem();
 }
 
+ATTR_COLD void netlist_base_t::start()
+{
+    /* find the main clock and solver ... */
+
+    m_mainclock = get_single_device<NETLIB_NAME(mainclock)>("mainclock");
+    m_solver = get_single_device<NETLIB_NAME(solver)>("solver");
+    m_gnd = get_single_device<NETLIB_NAME(gnd)>("gnd");
+
+    NL_VERBOSE_OUT(("Initializing devices ...\n"));
+    for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+    {
+        netlist_device_t *dev = entry->object();
+        dev->init(*this, entry->tag().cstr());
+    }
+
+}
+
 ATTR_COLD netlist_net_t *netlist_base_t::find_net(const pstring &name)
 {
-	for (netlist_net_t * const *p = m_nets.first(); p != NULL; p = m_nets.next(p))
+	for (int i = 0; i < m_nets.count(); i++)
 	{
-		if ((*p)->name() == name)
-			return *p;
+		if (m_nets[i]->name() == name)
+			return m_nets[i];
 	}
 	return NULL;
 }
 
-ATTR_COLD void netlist_base_t::set_mainclock_dev(NETLIB_NAME(mainclock) *dev)
-{
-	m_mainclock = dev;
-}
-
-ATTR_COLD void netlist_base_t::set_solver_dev(NETLIB_NAME(solver) *dev)
-{
-	m_solver = dev;
-}
-
-ATTR_COLD void netlist_base_t::set_gnd_dev(NETLIB_NAME(gnd) *dev)
-{
-    m_gnd = dev;
-}
-
 ATTR_COLD void netlist_base_t::reset()
 {
-	m_time_ps = netlist_time::zero;
+	m_time = netlist_time::zero;
 	m_queue.clear();
 	if (m_mainclock != NULL)
 		m_mainclock->m_Q.net().set_time(netlist_time::zero);
@@ -218,14 +220,14 @@ ATTR_COLD void netlist_base_t::reset()
 
 ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
 {
-    m_stop = m_time_ps + delta;
+    m_stop = m_time + delta;
 
     if (m_mainclock == NULL)
     {
-        while ( (m_time_ps < m_stop) && (m_queue.is_not_empty()))
+        while ( (m_time < m_stop) && (m_queue.is_not_empty()))
         {
             const netlist_queue_t::entry_t &e = m_queue.pop();
-            m_time_ps = e.time();
+            m_time = e.time();
             e.object()->update_devs();
 
             add_to_stat(m_perf_out_processed, 1);
@@ -234,29 +236,29 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
                     error("Stopped");
         }
         if (m_queue.is_empty())
-            m_time_ps = m_stop;
+            m_time = m_stop;
 
     } else {
         netlist_net_t &mcQ = m_mainclock->m_Q.net();
         const netlist_time inc = m_mainclock->m_inc;
 
-        while (m_time_ps < m_stop)
+        while (m_time < m_stop)
         {
             if (m_queue.is_not_empty())
             {
                 while (m_queue.peek().time() > mcQ.time())
                 {
-                    m_time_ps = mcQ.time();
-                    NETLIB_NAME(mainclock)::mc_update(mcQ, m_time_ps + inc);
+                    m_time = mcQ.time();
+                    NETLIB_NAME(mainclock)::mc_update(mcQ, m_time + inc);
                 }
 
                 const netlist_queue_t::entry_t &e = m_queue.pop();
-                m_time_ps = e.time();
+                m_time = e.time();
                 e.object()->update_devs();
 
             } else {
-                m_time_ps = mcQ.time();
-                NETLIB_NAME(mainclock)::mc_update(mcQ, m_time_ps + inc);
+                m_time = mcQ.time();
+                NETLIB_NAME(mainclock)::mc_update(mcQ, m_time + inc);
             }
             if (FATAL_ERROR_AFTER_NS)
                 if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))

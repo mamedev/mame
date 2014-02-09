@@ -115,7 +115,7 @@ void netlist_setup_t::register_alias(const pstring &alias, const pstring &out)
 		netlist().error("Error adding alias %s to alias list\n", alias.cstr());
 }
 
-pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in)
+pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in) const
 {
 	switch (in.type())
 	{
@@ -664,44 +664,7 @@ void netlist_setup_t::start_devices()
 
 	NL_VERBOSE_OUT(("Searching for mainclock and solver ...\n"));
 
-	/* find the main clock and solver ... */
-	bool has_mainclock = false;
-    bool has_solver = false;
-    bool has_gnd = false;
-
-	for (tagmap_devices_t::entry_t *entry = netlist().m_devices.first(); entry != NULL; entry = netlist().m_devices.next(entry))
-	{
-		netlist_device_t *dev = entry->object();
-		if (dynamic_cast<NETLIB_NAME(mainclock)*>(dev) != NULL)
-		{
-		    if (has_mainclock)
-		        m_netlist.error("Found more than one mainclock");
-			m_netlist.set_mainclock_dev(dynamic_cast<NETLIB_NAME(mainclock)*>(dev));
-			has_mainclock = true;
-		}
-		if (dynamic_cast<NETLIB_NAME(solver)*>(dev) != NULL)
-		{
-		    if (has_solver)
-                m_netlist.error("Found more than one solver");
-			m_netlist.set_solver_dev(dynamic_cast<NETLIB_NAME(solver)*>(dev));
-			has_solver = true;
-		}
-        if (dynamic_cast<NETLIB_NAME(gnd)*>(dev) != NULL)
-        {
-            if (has_gnd)
-                m_netlist.error("Found more than one gnd node");
-            m_netlist.set_gnd_dev(dynamic_cast<NETLIB_NAME(gnd)*>(dev));
-            has_gnd = true;
-        }
-	}
-
-	NL_VERBOSE_OUT(("Initializing devices ...\n"));
-	for (tagmap_devices_t::entry_t *entry = netlist().m_devices.first(); entry != NULL; entry = netlist().m_devices.next(entry))
-	{
-		netlist_device_t *dev = entry->object();
-		dev->init(netlist(), entry->tag().cstr());
-	}
-
+	netlist().start();
 }
 
 void netlist_setup_t::parse(const char *buf)
@@ -710,7 +673,7 @@ void netlist_setup_t::parse(const char *buf)
 	parser.parse(buf);
 }
 
-void netlist_setup_t::print_stats()
+void netlist_setup_t::print_stats() const
 {
 #if (NL_KEEP_STATISTICS)
 	{

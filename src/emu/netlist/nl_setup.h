@@ -108,6 +108,7 @@ public:
 	netlist_base_t &netlist() { return m_netlist; }
 	const netlist_base_t &netlist() const { return m_netlist; }
 	netlist_factory_t &factory() { return m_factory; }
+    const netlist_factory_t &factory() const { return m_factory; }
 
 	netlist_device_t *register_dev(netlist_device_t *dev, const pstring &name);
 	void remove_dev(const pstring &name);
@@ -134,7 +135,7 @@ public:
 	/* not ideal, but needed for save_state */
 	tagmap_terminal_t  m_terminals;
 
-	void print_stats();
+	void print_stats() const;
 
 protected:
 
@@ -159,7 +160,7 @@ private:
 	void connect_terminal_input(netlist_terminal_t &term, netlist_input_t &inp);
 
 	// helpers
-	pstring objtype_as_astr(netlist_object_t &in);
+	pstring objtype_as_astr(netlist_object_t &in) const;
 
 	const pstring resolve_alias(const pstring &name) const;
 	nld_base_d_to_a_proxy *get_d_a_proxy(netlist_output_t &out);

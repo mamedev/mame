@@ -206,7 +206,7 @@ void netlist_mame_stream_input_t::device_start()
 
 void netlist_mame_stream_input_t::custom_netlist_additions(netlist_setup_t &setup)
 {
-    NETLIB_NAME(sound_in) *snd_in = setup.netlist().get_first_device<NETLIB_NAME(sound_in) *>();
+    NETLIB_NAME(sound_in) *snd_in = setup.netlist().get_first_device<NETLIB_NAME(sound_in)>();
     if (snd_in == NULL)
     {
         snd_in = dynamic_cast<NETLIB_NAME(sound_in) *>(setup.factory().new_device_by_classname("nld_sound_in", setup));
@@ -580,7 +580,7 @@ void netlist_mame_sound_device_t::device_start()
 
     // Configure outputs
 
-    netlist_list_t<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out *>();
+    netlist_list_t<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out>();
     if (outdevs.count() == 0)
         fatalerror("No output devices");
 
@@ -606,7 +606,7 @@ void netlist_mame_sound_device_t::device_start()
     m_num_inputs = 0;
     m_in = NULL;
 
-    netlist_list_t<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in *>();
+    netlist_list_t<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
     if (indevs.count() > 1)
         fatalerror("A maximum of one input device is allowed!");
     if (indevs.count() == 1)
@@ -644,8 +644,6 @@ void netlist_mame_sound_device_t::sound_stream_update(sound_stream &stream, stre
     }
 
     netlist_time cur = netlist().time();
-
-    //printf("current time %f\n", netlist().time().as_double());
 
     netlist().process_queue(netlist_time::from_raw(m_div) * samples);
 
