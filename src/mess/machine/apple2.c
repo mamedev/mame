@@ -1140,6 +1140,7 @@ void apple2_state::machine_reset()
 {
 	int need_intcxrom;
 
+	m_reset_flag = 0;
 	m_rambase = m_ram->pointer();
 	apple2_refresh_delegates();
 
@@ -1166,7 +1167,11 @@ void apple2_state::machine_reset()
 	m_joystick_x2_time = m_joystick_y2_time = 0;
 }
 
-
+int apple2_state::a2_no_ctrl_reset()
+{
+	return (((m_kbprepeat != NULL) && (m_resetdip == NULL)) ||
+			((m_resetdip != NULL) && !m_resetdip->read()));
+}
 
 /* -----------------------------------------------------------------------
  * Apple II interrupt; used to force partial updates
@@ -1178,6 +1183,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 
 	if((scanline % 8) == 0)
 		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+
+	if (apple2_pressed_specialkey(0x80) &&
+		(a2_no_ctrl_reset() || (m_ay3600->keymod_r() & AY3600_KEYMOD_CONTROL)))
+	{
+			if (!m_reset_flag)
+			{
+				m_reset_flag = 1;
+				/* using PULSE_LINE does not allow us to press and hold key */
+				m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			}
+			return;
+	}
+
+	if (m_reset_flag)
+	{
+		m_reset_flag = 0;
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		machine().schedule_soft_reset();
+	}
 }
 
 
@@ -1587,7 +1611,7 @@ READ8_MEMBER ( apple2_state::apple2_c00x_r )
 	{
 		/* Read the keyboard data and strobe */
 		g_profiler.start(PROFILER_C00X);
-		result = AY3600_keydata_strobe_r(space.machine());
+		result = m_ay3600->keydata_strobe_r();
 		g_profiler.stop();
 	}
 
@@ -1644,7 +1668,7 @@ READ8_MEMBER( apple2_state::apple2_c01x_r )
 		LOG(("a2 softswitch_r: %04x\n", offset + 0xc010));
 		switch (offset)
 		{
-			case 0x00:          result |= AY3600_anykey_clearstrobe_r(space.machine());     break;
+			case 0x00:          result |= m_ay3600->anykey_clearstrobe_r();     break;
 			case 0x01:          result |= (m_flags & VAR_LCRAM2)        ? 0x80 : 0x00;  break;
 			case 0x02:          result |= (m_flags & VAR_LCRAM)     ? 0x80 : 0x00;  break;
 			case 0x03:          result |= (m_flags & VAR_RAMRD)     ? 0x80 : 0x00;  break;
@@ -1678,7 +1702,7 @@ WRITE8_MEMBER( apple2_state::apple2_c01x_w )
 {
 	/* Clear the keyboard strobe - ignore the returned results */
 	g_profiler.start(PROFILER_C01X);
-	AY3600_anykey_clearstrobe_r(machine());
+	m_ay3600->anykey_clearstrobe_r();
 	g_profiler.stop();
 }
 
@@ -1727,14 +1751,7 @@ READ8_MEMBER ( apple2_state::apple2_c03x_r )
 		{
 			speaker_sound_device *speaker = space.machine().device<speaker_sound_device>("a2speaker");
 
-			if (m_a2_speaker_state == 1)
-			{
-				m_a2_speaker_state = 0;
-			}
-			else
-			{
-				m_a2_speaker_state = 1;
-			}
+			m_a2_speaker_state ^= 1;
 			speaker->level_w(m_a2_speaker_state);
 		}
 	}
@@ -1829,15 +1846,15 @@ READ8_MEMBER ( apple2_state::apple2_c06x_r )
 				break;
 			case 0x01:
 				/* Open-Apple/Joystick button 0 */
-				result = apple2_pressed_specialkey(SPECIALKEY_BUTTON0);
+				result = apple2_pressed_specialkey(0x10);
 				break;
 			case 0x02:
 				/* Closed-Apple/Joystick button 1 */
-				result = apple2_pressed_specialkey(SPECIALKEY_BUTTON1);
+				result = apple2_pressed_specialkey(0x20);
 				break;
 			case 0x03:
 				/* Joystick button 2. Later revision motherboards connected this to SHIFT also */
-				result = apple2_pressed_specialkey(SPECIALKEY_BUTTON2);
+				result = apple2_pressed_specialkey(0x40);
 				break;
 			case 0x04:
 				/* X Joystick 1 axis */
@@ -2090,8 +2107,6 @@ void apple2_state::apple2_init_common()
 		m_auxslotdevice = m_a2eauxslot->get_a2eauxslot_card();
 	}
 
-	AY3600_init(machine());
-
 	/* state save registers */
 	save_item(NAME(m_flags));
 	machine().save().register_postload(save_prepost_delegate(FUNC(apple2_state::apple2_update_memory_postload), this));
@@ -2110,9 +2125,9 @@ void apple2_state::apple2_init_common()
 		m_a2_mask &= ~(VAR_RAMRD | VAR_RAMWRT | VAR_80STORE | VAR_ALTZP | VAR_80COL);
 
 	apple2_refresh_delegates();
+
+	m_ay3600->set_runtime_config(m_kpad1 != NULL, m_kbprepeat != NULL);
 }
-
-
 
 MACHINE_START_MEMBER(apple2_state,apple2)
 {

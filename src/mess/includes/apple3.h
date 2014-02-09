@@ -16,6 +16,7 @@
 #include "machine/applefdc.h"
 #include "machine/mos6551.h"
 #include "machine/6522via.h"
+#include "machine/ay3600.h"
 #include "sound/speaker.h"
 #include "sound/dac.h"
 
@@ -31,20 +32,26 @@
 #define SPEAKER_TAG	"a3spkr"
 #define DAC_TAG		"a3dac"
 
-class apple3_state : public apple2_state
+class apple3_state : public driver_device
 {
 public:
 	apple3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: apple2_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
 		m_via_0(*this, "via6522_0"),
 		m_via_1(*this, "via6522_1"),
+		m_ay3600(*this, "ay3600"),
 		m_speaker(*this, SPEAKER_TAG),
 		m_dac(*this, DAC_TAG)
 	{
 	}
 
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_device<via6522_device> m_via_0;
 	required_device<via6522_device> m_via_1;
+	required_device<ay3600n_device> m_ay3600;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<dac_device> m_dac;
 

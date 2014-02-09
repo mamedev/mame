@@ -45,17 +45,10 @@
 #include "emu.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
-#include "cpu/m6502/m6502.h"
-#include "machine/6522via.h"
-#include "machine/ay3600.h"
 #include "machine/applefdc.h"
 #include "machine/appldriv.h"
-#include "machine/mos6551.h"
-#include "machine/ram.h"
-
 
 static void apple3_update_drives(device_t *device);
-
 
 #define LOG_MEMORY      1
 #define LOG_INDXADDR    1
@@ -71,14 +64,14 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		/* keystrobe */
 		case 0x00: case 0x01: case 0x02: case 0x03:
 		case 0x04: case 0x05: case 0x06: case 0x07:
-			result = AY3600_keydata_strobe_r(machine());
+			result = m_ay3600->keydata_strobe_r();
 			break;
 
 		/* modifier keys */
 		case 0x08: case 0x09: case 0x0A: case 0x0B:
 		case 0x0C: case 0x0D: case 0x0E: case 0x0F:
 			{
-				UINT8 tmp = AY3600_keymod_r(machine());
+				UINT8 tmp = m_ay3600->keymod_r();
 
 				result = 0x7e;
 				if (tmp & AY3600_KEYMOD_SHIFT)
@@ -108,7 +101,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1A: case 0x1B:
 		case 0x1C: case 0x1D: case 0x1E: case 0x1F:
-			AY3600_anykey_clearstrobe_r(machine());
+			m_ay3600->anykey_clearstrobe_r();
 			break;
 
 		case 0x30: case 0x31: case 0x32: case 0x33:
@@ -190,7 +183,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1A: case 0x1B:
 		case 0x1C: case 0x1D: case 0x1E: case 0x1F:
-			AY3600_anykey_clearstrobe_r(machine());
+			m_ay3600->anykey_clearstrobe_r();
 			break;
 
 		case 0x30: case 0x31: case 0x32: case 0x33:
@@ -249,7 +242,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_interrupt)
 {
-	m_via_1->write_ca2((AY3600_keydata_strobe_r(machine()) & 0x80) ? 1 : 0);
+	m_via_1->write_ca2((m_ay3600->keydata_strobe_r() & 0x80) ? 1 : 0);
 	m_via_1->write_cb1(machine().primary_screen->vblank()); 
 	m_via_1->write_cb2(machine().primary_screen->vblank());
 }
@@ -592,8 +585,6 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_enable_mask = 0;
 	apple3_update_drives(machine().device("fdc"));
 
-	AY3600_init(machine());
-
 	m_flags = 0;
 	m_via_0_a = ~0;
 	m_via_1_a = ~0;
@@ -620,6 +611,8 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_via_1->write_pb7(1);
 
 	apple3_update_memory();
+
+	m_ay3600->set_runtime_config(false, false);	// no keypad (yet), no repeat key
 }
 
 READ8_MEMBER(apple3_state::apple3_memory_r)

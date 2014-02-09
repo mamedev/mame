@@ -71,6 +71,9 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple3_state, apple3_interrupt, "screen", 0, 1)
 
+	/* keyboard controller */
+	MCFG_DEVICE_ADD("ay3600", AY3600N, 0)
+
 	/* slot bus */
 	MCFG_A2BUS_BUS_ADD("a2bus", "maincpu", a2bus_intf)
 
@@ -103,7 +106,7 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K")
+	MCFG_RAM_EXTRA_OPTIONS("128K, 512K")
 MACHINE_CONFIG_END
 
 
