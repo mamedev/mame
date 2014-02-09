@@ -340,11 +340,12 @@ void nes_cart_slot_device::call_load_ines()
 	UINT32 vram_size = 0, prgram_size = 0, battery_size = 0, mapper_sram_size = 0;
 	UINT32 prg_size, vrom_size;
 	UINT8 header[0x10];
-	UINT8 mapper, local_options;
+	UINT8 mapper, submapper = 0, local_options;
 	bool ines20 = FALSE, prg16k;
 	const char *mapinfo = NULL;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
 	int crc_hack = 0;
+	bool bus_conflict = FALSE;
 
 	// check if the image is recognized by nes.hsi
 	mapinfo = hashfile_extrainfo(*this);
@@ -406,11 +407,92 @@ void nes_cart_slot_device::call_load_ines()
 	if (ines20)
 	{
 		mapper |= (header[8] & 0x0f) << 8;
-		// header[8] & 0xf0 is used for submappers, but I haven't found any specific image to implement this
+		// read submappers (based on 20140116 specs)
+		submapper = (header[8] & 0xf0 >> 8);
 		prg_size += ((header[9] & 0x0f) << 8) * 0x4000;
 		vrom_size += ((header[9] & 0xf0) << 4) * 0x2000;
 	}
 	ines_mapr_setup(mapper, &pcb_id);
+
+	// handle submappers
+	if (submapper)
+	{
+		// 001: MMC1
+		if (mapper == 1 && submapper == 3)
+			pcb_id = STD_SXROM_A;
+		else if (mapper == 1 && submapper == 5)
+			logerror("Unimplemented iNES2.0 submapper: SEROM/SHROM/SH1ROM.\n");
+		// 002, 003, 007: UxROM, CNROM, AxROM
+		else if (mapper == 2 && submapper == 2)
+			bus_conflict = TRUE;
+		else if (mapper == 3 && submapper == 2)
+			bus_conflict = TRUE;
+		else if (mapper == 7 && submapper == 2)
+			bus_conflict = TRUE;
+		// 021, 023, 025: VRC4 / VRC2
+		else if (mapper == 21 || mapper == 23 || mapper == 25)
+		{
+			// 021, 023, 025: VRC4
+			int line_1 = submapper & 0x07;
+			int line_2 = (submapper & 0x08) ? line_1 + 1 : line_1 - 1;
+			if (line_2 >= 0 && line_2 <= 7)
+			{
+				pcb_id = KONAMI_VRC4;
+				m_cart->set_vrc_lines(line_1, line_2, 0);
+			}
+			else if (submapper == 15)
+			{
+				pcb_id = KONAMI_VRC2;
+				m_cart->set_vrc_lines(1, 0, 0);
+			}
+		}
+		// 032: Irem G101
+		else if (mapper == 32 && submapper == 1)
+		{
+			m_cart->set_mirroring(PPU_MIRROR_HIGH); // Major League has hardwired mirroring
+		}
+		// iNES Mapper 034
+		else if (mapper == 34 && submapper == 1)
+		{
+			pcb_id = AVE_NINA01; // Mapper 34 is used for 2 diff boards
+		}
+		// iNES Mapper 068 / Sunsoft 4
+		else if (mapper == 68 && submapper == 1)
+		{
+			submapper = 0;
+			logerror("Unimplemented iNES2.0 submapper: SUNSOFT-DCS.\n");
+		}
+		// iNES Mapper 071
+		else if (mapper == 71 && submapper == 1)
+		{
+			m_cart->set_pcb_ctrl_mirror(TRUE);    // Mapper 71 is used for 2 diff boards
+		}
+		// iNES Mapper 078
+		else if (mapper == 78)
+		{
+			if (submapper == 1)
+				pcb_id = JALECO_JF16;    // Mapper 78 is used for 2 diff boards
+			else if (submapper == 3)
+				pcb_id = IREM_HOLYDIVR;
+		}
+		// iNES Mapper 185
+		else if (mapper == 185)
+		{
+			int ce_state = (submapper & 0x0c) >> 2;
+			m_cart->set_ce(0x03, ce_state);
+		}
+		// iNES Mapper 232
+		else if (mapper == 210 && submapper == 1)
+		{
+			submapper = 0;
+			logerror("Unimplemented iNES2.0 submapper: CAMERICA-BF9096.\n");
+		}
+		else if (submapper)
+		{
+			submapper = 0;
+			logerror("Undocumented iNES2.0 submapper, please report it to the MESS boards!\n");
+		}
+	}
 
 	// SETUP step 3: storing the info needed for emulation
 	m_pcb_id = pcb_id;
@@ -426,11 +508,13 @@ void nes_cart_slot_device::call_load_ines()
 		if ((header[10] & 0x0f) > 0)
 			prgram_size = 0x80 << ((header[10] & 0x0f) - 1);
 		if ((header[10] & 0xf0) > 0)
-			battery_size = 0x80 << ((header[10] & 0xf0) - 5);
+			battery_size = 0x80 << (((header[10] & 0xf0) >> 4) - 1);
 		// VRAM
 		vram_size = 0;
 		if ((header[11] & 0x0f) > 0)
 			vram_size = 0x80 << ((header[11] & 0x0f) - 1);
+		if ((header[11] & 0xf0) > 0)
+			vram_size |= 0x80 << (((header[11] & 0xf0) >> 4) - 1);
 		// header[11] & 0xf0 is the size of battery backed VRAM, found so far in Racermate II only and not supported yet
 	}
 	else
@@ -473,7 +557,7 @@ void nes_cart_slot_device::call_load_ines()
 			break;
 
 		case STD_CNROM:
-			if (mapper == 185)
+			if (mapper == 185 && !submapper)
 			{
 				switch (crc_hack)
 				{
@@ -483,7 +567,7 @@ void nes_cart_slot_device::call_load_ines()
 					case 0x4: // pin26: CE, pin27: /CE (Mighty Bomb Jack, Spy Vs. Spy)
 						m_cart->set_ce(0x03, 0x01);
 						break;
-					case 0x8: // pin26: /CE, pin27: CE (Sansu 1, 2, 3 Nen)
+					case 0x8: // pin26: /CE, pin27: CE (Sansu 1, 2, 3 Nen, Othello)
 						m_cart->set_ce(0x03, 0x02);
 						break;
 					case 0xc: // pin26: /CE, pin27: /CE (Seicross v2.0)
@@ -496,9 +580,9 @@ void nes_cart_slot_device::call_load_ines()
 		case KONAMI_VRC2:
 			if (mapper == 22)
 				m_cart->set_vrc_lines(0, 1, 1);
-			if (mapper == 23 && !crc_hack)
+			if (mapper == 23 && !crc_hack && !submapper)
 				m_cart->set_vrc_lines(1, 0, 0);
-			if (mapper == 23 && crc_hack)
+			if (mapper == 23 && crc_hack && !submapper)
 			{
 				// here there are also Akumajou Special, Crisis Force, Parodius da!, Tiny Toons which are VRC-4
 				m_cart->set_vrc_lines(3, 2, 0);
@@ -507,9 +591,9 @@ void nes_cart_slot_device::call_load_ines()
 			break;
 
 		case KONAMI_VRC4:
-			if (mapper == 21)   // Wai Wai World 2 & Ganbare Goemon Gaiden 2 (the latter with crc_hack)
+			if (mapper == 21 && !submapper)   // Wai Wai World 2 & Ganbare Goemon Gaiden 2 (the latter with crc_hack)
 				m_cart->set_vrc_lines(crc_hack ? 7 : 2, crc_hack ? 6 : 1, 0);
-			if (mapper == 25)   // here there is also Ganbare Goemon Gaiden which is VRC-2
+			if (mapper == 25 && !submapper)   // here there is also Ganbare Goemon Gaiden which is VRC-2
 				m_cart->set_vrc_lines(crc_hack ? 2 : 0, crc_hack ? 3 : 1, 0);
 			break;
 
@@ -521,9 +605,9 @@ void nes_cart_slot_device::call_load_ines()
 			break;
 
 		case IREM_G101:
-			if (crc_hack)
+			if (crc_hack && !submapper)
 				m_cart->set_mirroring(PPU_MIRROR_HIGH); // Major League has hardwired mirroring
-			else
+			else if (!submapper)
 				m_cart->set_pcb_ctrl_mirror(TRUE);
 			break;
 
@@ -547,12 +631,12 @@ void nes_cart_slot_device::call_load_ines()
 			break;
 
 		case CAMERICA_BF9093:
-			if (crc_hack)
+			if (crc_hack && !submapper)
 				m_cart->set_pcb_ctrl_mirror(TRUE);    // Mapper 71 is used for 2 diff boards
 			break;
 
 		case STD_BXROM:
-			if (crc_hack)
+			if (crc_hack && !submapper)
 				m_pcb_id = AVE_NINA01; // Mapper 34 is used for 2 diff boards
 			break;
 
@@ -562,7 +646,7 @@ void nes_cart_slot_device::call_load_ines()
 			break;
 
 		case IREM_HOLYDIVR:
-			if (crc_hack)
+			if (crc_hack && !submapper)
 				m_pcb_id = JALECO_JF16;    // Mapper 78 is used for 2 diff boards
 			break;
 
@@ -575,7 +659,6 @@ void nes_cart_slot_device::call_load_ines()
 			if (crc_hack)
 				m_pcb_id = BMC_MARIOPARTY_7IN1;    // Mapper 52 is used for 2 diff boards
 			break;
-
 
 		case BTL_MARIOBABY:
 			if (crc_hack)
@@ -599,7 +682,7 @@ void nes_cart_slot_device::call_load_ines()
 	}
 
 	// Finally turn off bus conflict emulation, because the pirate variants of the boards are bus conflict free and games would glitch
-	m_cart->set_bus_conflict(FALSE);
+	m_cart->set_bus_conflict(bus_conflict);
 
 	// SETUP step 4: logging what we have found
 	if (!ines20)
@@ -625,10 +708,10 @@ void nes_cart_slot_device::call_load_ines()
 		logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
 		logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
 		logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
-		logerror("-- PRG NVWRAM: %d\n", header[10] & 0x0f);
-		logerror("-- PRG WRAM: %d\n", (header[10] & 0xf0) >> 4);
-		logerror("-- CHR NVWRAM: %d\n", header[11] & 0x0f);
-		logerror("-- CHR WRAM: %d\n", (header[11] & 0xf0) >> 4);
+		logerror("-- PRG NVWRAM: %d\n", (header[10] & 0xf0) >> 4);
+		logerror("-- PRG WRAM: %d\n", header[10] & 0x0f);
+		logerror("-- CHR NVWRAM: %d\n", (header[11] & 0xf0) >> 4);
+		logerror("-- CHR WRAM: %d\n", header[11] & 0x0f);
 		logerror("-- TV System: %s\n", (header[12] & 2) ? "Both NTSC and PAL" : (header[12] & 1) ? "PAL" : "NTSC");
 	}
 
@@ -715,6 +798,7 @@ void nes_cart_slot_device::call_load_ines()
 		battery_load(temp_nvram, tot_size, 0x00);
 		if (battery_size)
 		{
+			//printf("here %d\n", battery_size);
 			m_cart->battery_alloc(machine(), battery_size);
 			memcpy(m_cart->get_battery_base(), temp_nvram, battery_size);
 		}
@@ -728,7 +812,7 @@ void nes_cart_slot_device::call_load_ines()
 
 const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 {
-	UINT8 mapper;
+	UINT8 mapper, submapper = 0;
 	bool ines20 = FALSE;
 	const char *mapinfo = NULL;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
@@ -769,10 +853,45 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 	if (ines20)
 	{
 		mapper |= (ROM[8] & 0x0f) << 8;
-		// ROM[8] & 0xf0 is used for submappers, but I haven't found any specific image to implement this
+		// read submappers (based on 20140116 specs)
+		submapper = (ROM[8] & 0xf0 >> 8);
 	}
 
 	ines_mapr_setup(mapper, &pcb_id);
+
+	// handle submappers
+	if (submapper)
+	{
+		// 001: MMC1
+		if (mapper == 1 && submapper == 3)
+			pcb_id = STD_SXROM_A;
+		else if (mapper == 1 && submapper == 5)
+			logerror("Unimplemented iNES2.0 submapper: SEROM/SHROM/SH1ROM.\n");
+		// 021, 023, 025: VRC4 / VRC2
+		else if (mapper == 21 || mapper == 23 || mapper == 25)
+		{
+			// 021, 023, 025: VRC4
+			int line_1 = submapper & 0x07;
+			int line_2 = (submapper & 0x08) ? line_1 + 1 : line_1 - 1;
+			if (line_2 >= 0 && line_2 <= 7)
+				pcb_id = KONAMI_VRC4;
+			else if (submapper == 15)
+				pcb_id = KONAMI_VRC2;
+		}
+		// iNES Mapper 034
+		else if (mapper == 34 && submapper == 1)
+		{
+			pcb_id = AVE_NINA01; // Mapper 34 is used for 2 diff boards
+		}
+		// iNES Mapper 078
+		else if (mapper == 78)
+		{
+			if (submapper == 1)
+				pcb_id = JALECO_JF16;    // Mapper 78 is used for 2 diff boards
+			else if (submapper == 3)
+				pcb_id = IREM_HOLYDIVR;
+		}
+	}
 
 	// solve mapper conflicts
 	switch (pcb_id)
@@ -783,12 +902,12 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 			break;
 
 		case KONAMI_VRC2:
-			if (mapper == 23 && crc_hack)
+			if (mapper == 23 && crc_hack && !submapper)
 				pcb_id = KONAMI_VRC4; // this allows for konami_irq to be installed at reset
 			break;
 
 		case STD_BXROM:
-			if (crc_hack)
+			if (crc_hack && !submapper)
 				pcb_id = AVE_NINA01; // Mapper 34 is used for 2 diff boards
 			break;
 
@@ -798,7 +917,7 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 			break;
 
 		case IREM_HOLYDIVR:
-			if (crc_hack)
+			if (crc_hack && !submapper)
 				pcb_id = JALECO_JF16;    // Mapper 78 is used for 2 diff boards
 			break;
 

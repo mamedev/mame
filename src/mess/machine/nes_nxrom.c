@@ -403,6 +403,7 @@ WRITE8_MEMBER(nes_cnrom_device::write_h)
 
 	if (m_ce_mask)
 	{
+		//printf("mask %x state %x\n", m_ce_mask, m_ce_state);
 		chr8(data & ~m_ce_mask, CHRROM);
 
 		if ((data & m_ce_mask) == m_ce_state)
@@ -423,8 +424,8 @@ READ8_MEMBER(nes_cnrom_device::chr_r)
 	// give actual VROM content or open bus values.
 	// For most boards, chr_open_bus remains always zero.
 	if (m_chr_open_bus)
-		return 0xff;
-
+		return m_open_bus;
+	
 	return m_chr_access[bank][offset & 0x3ff];
 }
 

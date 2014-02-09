@@ -1365,7 +1365,7 @@
 		</part>
 	</software>
 
-	<software name="aliensyn" supported="no">
+	<software name="aliensyn">
 		<description>Alien Syndrome (USA)</description>
 		<year>1989</year>
 		<publisher>Tengen</publisher>
@@ -17169,13 +17169,14 @@
 		</part>
 	</software>
 
-	<software name="ideyumj" supported="no">
+	<software name="ideyumj">
 		<description>Ide Yousuke Meijin no Jissen Mahjong (Jpn, Rev. A)</description>
 		<year>1987</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-IM"/>
 		<info name="release" value="19870924"/>
 		<info name="alt_title" value="井出洋介名人の実戦麻雀"/>
+		<info name="usage" value="This only works on a Famicom with Mahjong Controller attached"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
@@ -17190,13 +17191,14 @@
 		</part>
 	</software>
 
-	<software name="ideyumj2" supported="no">
+	<software name="ideyumj2">
 		<description>Ide Yousuke Meijin no Jissen Mahjong II (Jpn)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-2Q"/>
 		<info name="release" value="19910222"/>
 		<info name="alt_title" value="井出洋介名人の実戦麻雀Ⅱ"/>
+		<info name="usage" value="This only works on a Famicom with Mahjong Controller attached"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
@@ -17516,7 +17518,7 @@
 		</part>
 	</software>
 
-	<software name="impmiss2" supported="no">
+	<software name="impmiss2">
 		<description>Impossible Mission-II (USA)</description>
 		<year>1989</year>
 		<publisher>American Video Entertainment / SEI</publisher>
@@ -20187,7 +20189,7 @@
 		</part>
 	</software>
 
-	<software name="klax" supported="no">
+	<software name="klax">
 		<description>Klax (USA)</description>
 		<year>1990</year>
 		<publisher>Tengen</publisher>
@@ -30163,7 +30165,7 @@
 		</part>
 	</software>
 
-	<software name="roadrunn" supported="partial">
+	<software name="roadrunn">
 		<description>Road Runner (USA)</description>
 		<year>1989</year>
 		<publisher>Tengen</publisher>
@@ -31798,7 +31800,7 @@
 		</part>
 	</software>
 
-	<software name="sango2ht" supported="no">
+	<software name="sango2ht">
 		<description>Sangokushi II - Haou no Tairiku (Jpn)</description>
 		<year>1992</year>
 		<publisher>Namcot</publisher>
@@ -42848,7 +42850,7 @@
 
 <!-- Non game cartridges -->
 
-	<software name="ggenie" supported="no">
+	<software name="ggenie">
 		<description>Game Genie (USA, v1.5 &amp; v1.5A)</description>
 		<year>1990</year>
 		<publisher>Galoob</publisher>
@@ -46570,7 +46572,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="klaxp" cloneof="klax" supported="no">
+	<software name="klaxp" cloneof="klax">
 		<description>Klax (USA, Prototype)</description>
 		<year>1990</year>
 		<publisher>Tengen</publisher>

@@ -561,8 +561,8 @@ void nes_cart_slot_device::call_load_pcb()
 	logerror("\n-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
 	logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
 	logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
-	logerror("-- PRG NVWRAM: %d\n", m_cart->get_battery_size());
-	logerror("-- PRG WRAM: %d\n",  m_cart->get_prgram_size());
+	logerror("-- PRG NVWRAM: %d\n", battery_size + mapper_sram_size);
+	logerror("-- PRG WRAM: %d\n",  prgram_size);
 
 	// SETUP steps 5/6: allocate pointers for PRG/VROM and load the data!
 	m_cart->prg_alloc(machine(), prg_size);
