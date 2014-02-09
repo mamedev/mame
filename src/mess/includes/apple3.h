@@ -80,8 +80,6 @@ public:
 	DECLARE_WRITE8_MEMBER(apple3_c0xx_w);
 	DECLARE_READ8_MEMBER(apple3_00xx_r);
 	DECLARE_WRITE8_MEMBER(apple3_00xx_w);
-	DECLARE_READ8_MEMBER(apple3_indexed_read);
-	DECLARE_WRITE8_MEMBER(apple3_indexed_write);
 	DECLARE_DRIVER_INIT(apple3);
 	DECLARE_MACHINE_RESET(apple3);
 	DECLARE_VIDEO_START(apple3);

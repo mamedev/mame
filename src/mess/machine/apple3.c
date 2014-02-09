@@ -99,7 +99,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 					result &= ~0x20;
 				}
 			}
-			printf("modifier = %02x\n", result);
+//			printf("modifier = %02x\n", result);
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -503,37 +503,6 @@ UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
 
 	return result;
 }
-
-
-
-READ8_MEMBER(apple3_state::apple3_indexed_read)
-{
-	UINT8 result;
-	UINT8 *addr;
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	addr = apple3_get_indexed_addr(offset);
-	if (!addr)
-		result = prog_space.read_byte(offset);
-	else if (addr != (UINT8 *) ~0)
-		result = *addr;
-	else
-		result = memregion("maincpu")->base()[offset % memregion("maincpu")->bytes()];
-	return result;
-}
-
-
-
-WRITE8_MEMBER(apple3_state::apple3_indexed_write)
-{
-	UINT8 *addr;
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	addr = apple3_get_indexed_addr(offset);
-	if (!addr)
-		prog_space.write_byte(offset, data);
-	else if (addr != (UINT8 *) ~0)
-		*addr = data;
-}
-
 
 static void apple3_update_drives(device_t *device)
 {
