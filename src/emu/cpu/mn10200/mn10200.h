@@ -166,7 +166,7 @@ private:
 	void refresh_timer(int tmr);
 	void timer_tick_simple(int tmr);
 	TIMER_CALLBACK_MEMBER( simple_timer_cb );
-	void unemul();
+	void illegal();
 	UINT32 do_add(UINT32 a, UINT32 b, UINT32 c);
 	UINT32 do_sub(UINT32 a, UINT32 b, UINT32 c);
 	void test_nz16(UINT16 v);
