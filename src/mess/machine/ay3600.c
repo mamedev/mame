@@ -289,10 +289,10 @@ void ay3600n_device::device_start()
 	m_timer = timer_alloc(0, NULL);
 	m_timer->adjust(attotime::never);
 
-/*	machine.ioport().natkeyboard().configure(
-		ioport_queue_chars_delegate(FUNC(AY3600_keyboard_queue_chars), &machine),
-		ioport_accept_char_delegate(FUNC(AY3600_keyboard_accept_char), &machine),
-		ioport_charqueue_empty_delegate(FUNC(AY3600_keyboard_charqueue_empty), &machine));*/
+	machine().ioport().natkeyboard().configure(
+		ioport_queue_chars_delegate(FUNC(ay3600n_device::AY3600_keyboard_queue_chars), this),
+		ioport_accept_char_delegate(FUNC(ay3600n_device::AY3600_keyboard_accept_char), this),
+		ioport_charqueue_empty_delegate(FUNC(ay3600n_device::AY3600_keyboard_charqueue_empty), this));
 
 	save_item(NAME(m_keycode));
 	save_item(NAME(m_keycode_unmodified));
