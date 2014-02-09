@@ -64,6 +64,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( mtr1_w );
 	DECLARE_WRITE_LINE_MEMBER( odd_hd_w );
 	DECLARE_WRITE_LINE_MEMBER( pull_sync_w );
+
 	DECLARE_READ_LINE_MEMBER( wps_r ) { return checkpoint_live.drv_sel ? m_floppy1->wpt_r() : m_floppy0->wpt_r(); }
 	DECLARE_READ_LINE_MEMBER( sync_r ) { return checkpoint_live.sync; }
 	DECLARE_READ_LINE_MEMBER( ready_r ) { return checkpoint_live.ready; }
