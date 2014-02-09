@@ -18,8 +18,9 @@
 #include "uiinput.h"
 #include "ui/selgame.h"
 #include "ui/miscmenu.h"
-#include "ui/emenubar.h"
 #include "audit.h"
+#include "crsshair.h"
+#include <ctype.h>
 
 
 //-------------------------------------------------
@@ -28,9 +29,11 @@
 
 ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
 {
- 	build_driver_list();
- 	if(gamename)
- 		strcpy(m_search, gamename);
+	m_driverlist = global_alloc_array(const game_driver *, driver_list::total()+1);
+	build_driver_list();
+	if(gamename)
+		strcpy(m_search, gamename);
+	m_matchlist[0] = -1;
 }
 
 
@@ -40,8 +43,10 @@ ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_contai
 
 ui_menu_select_game::~ui_menu_select_game()
 {
-	global_free(m_driver_list);
+	global_free(m_drivlist);
+	global_free(m_driverlist);
 }
+
 
 
 //-------------------------------------------------
@@ -52,8 +57,8 @@ ui_menu_select_game::~ui_menu_select_game()
 void ui_menu_select_game::build_driver_list()
 {
 	// start with an empty list
-	driver_enumerator drivlist(machine().options());
-	drivlist.exclude_all();
+	m_drivlist = global_alloc(driver_enumerator(machine().options()));
+	m_drivlist->exclude_all();
 
 	// open a path to the ROMs and find them in the array
 	file_enumerator path(machine().options().media_path());
@@ -71,73 +76,21 @@ void ui_menu_select_game::build_driver_list()
 			*dst++ = tolower((UINT8)*src);
 		*dst = 0;
 
-		int drivnum = drivlist.find(drivername);
+		int drivnum = m_drivlist->find(drivername);
 		if (drivnum != -1)
-			drivlist.include(drivnum);
+			m_drivlist->include(drivnum);
 	}
 
-	// count all drivers
-	m_driver_count = 0;
-	drivlist.reset();
-	while (drivlist.next())
-	{
-		const game_driver *drv = &drivlist.driver();
-		if (!(drv->flags & GAME_NO_STANDALONE))
-			m_driver_count++;
-	}
-
-	// now list them
-	m_driver_list = auto_alloc_array(machine(), const game_driver *, m_driver_count + 1);
-	m_driver_count = 0;
-	drivlist.reset();
-	while (drivlist.next())
-	{
-		const game_driver *drv = &drivlist.driver();
-		if (!(drv->flags & GAME_NO_STANDALONE))
-			m_driver_list[m_driver_count++] = drv;
-	}
-
-	// sort
-	qsort(m_driver_list, m_driver_count, sizeof(m_driver_list[0]), driver_list_compare);
+	// now build the final list
+	m_drivlist->reset();
+	int listnum = 0;
+	while (m_drivlist->next())
+		m_driverlist[listnum++] = &m_drivlist->driver();
 
 	// NULL-terminate
-	m_driver_list[m_driver_count] = NULL;
+	m_driverlist[listnum] = NULL;
 }
 
-
-//-------------------------------------------------
-//  driver_list_compare - qsort callback for
-//	alphebetizing driver lists
-//-------------------------------------------------
-
-int ui_menu_select_game::driver_list_compare(const void *p1, const void *p2)
-{
-	const game_driver *d1 = *((const game_driver **) p1); 
-	const game_driver *d2 = *((const game_driver **) p2);
-	return core_stricmp(d1->name, d2->name);
-}
-
-
-//-------------------------------------------------
-//  populate
-//-------------------------------------------------
-
-void ui_menu_select_game::populate()
-{
-	// populate all menu items
-	for (int curitem = 0; curitem < m_driver_count; curitem++)
-	{
-		item_append(
-			m_driver_list[curitem]->name,
-			m_driver_list[curitem]->description,
-			0,
-			(void *) m_driver_list[curitem]);
-	}
-
-	// configure the custom rendering
-	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-	custombottom = 4.0f * machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
-}
 
 
 //-------------------------------------------------
@@ -150,17 +103,7 @@ void ui_menu_select_game::handle()
 	ui_input_pressed(machine(), IPT_UI_PAUSE);
 
 	// process the menu
-	const game_driver *old_selection = (const game_driver *) get_selection();
 	const ui_menu_event *menu_event = process(0);
-	const game_driver *new_selection = (const game_driver *) get_selection();
-	
-	// has the selection changed?
-	if (old_selection != new_selection)
-	{
-		strcpy(m_search, new_selection ? new_selection->name : "");
-	}
-
-	// process events
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		// reset the error on any future menu_event
@@ -180,9 +123,6 @@ void ui_menu_select_game::handle()
 					break;
 				case IPT_SPECIAL:
 					inkey_special(menu_event);
-					break;
-				case IPT_UI_CONFIGURE:
-					inkey_configure(menu_event);
 					break;
 			}
 		}
@@ -263,7 +203,8 @@ void ui_menu_select_game::inkey_special(const ui_menu_event *menu_event)
 	if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
 	{
 		*(char *)utf8_previous_char(&m_search[buflen]) = 0;
-		select_searched_item();
+		m_rerandomize = true;
+		reset(UI_MENU_RESET_SELECT_FIRST);
 	}
 
 	// if it's any other key and we're not maxed out, update
@@ -271,44 +212,65 @@ void ui_menu_select_game::inkey_special(const ui_menu_event *menu_event)
 	{
 		buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
 		m_search[buflen] = 0;
-		select_searched_item();
+		reset(UI_MENU_RESET_SELECT_FIRST);
 	}
 }
 
 
 //-------------------------------------------------
-//  inkey_configure
+//  populate - populate the game select menu
 //-------------------------------------------------
 
-void ui_menu_select_game::inkey_configure(const ui_menu_event *menu_event)
+void ui_menu_select_game::populate()
 {
-	// TODO
-}
+	int matchcount;
+	int curitem;
 
+	for (curitem = matchcount = 0; m_driverlist[curitem] != NULL && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
+		if (!(m_driverlist[curitem]->flags & GAME_NO_STANDALONE))
+			matchcount++;
 
-//-------------------------------------------------
-//  select_searched_item
-//-------------------------------------------------
+	// if nothing there, add a single multiline item and return
+	if (matchcount == 0)
+	{
+		astring txt;
+		txt.printf("No %s found. Please check the rompath specified in the %s.ini file.\n\n"
+					"If this is your first time using %s, please see the config.txt file in "
+					"the docs directory for information on configuring %s.",
+					emulator_info::get_gamesnoun(),
+					emulator_info::get_configname(),
+					emulator_info::get_appname(),emulator_info::get_appname() );
+		item_append(txt.cstr(), NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
+		return;
+	}
 
-void ui_menu_select_game::select_searched_item()
-{
-	// find the searched item
-	int first = 0;
-	int last = m_driver_count;
-	while(last > first)
- 	{
-		int middle = (first + last) / 2;		
-		int rc = core_stricmp(m_search, m_driver_list[middle]->name);
-		if (rc < 0)
-			last = middle;
-		else if (rc > 0)
-			first = middle + 1;
-		else
-			first = last = middle;
- 	}
- 
-	// and set the selection
-	set_selection((void *) m_driver_list[first]);
+	// otherwise, rebuild the match list
+	assert(m_drivlist != NULL);
+	if (m_search[0] != 0 || m_matchlist[0] == -1 || m_rerandomize)
+		m_drivlist->find_approximate_matches(m_search, matchcount, m_matchlist);
+	m_rerandomize = false;
+
+	// iterate over entries
+	for (curitem = 0; curitem < matchcount; curitem++)
+	{
+		int curmatch = m_matchlist[curitem];
+		if (curmatch != -1)
+		{
+			int cloneof = m_drivlist->non_bios_clone(curmatch);
+			item_append(m_drivlist->driver(curmatch).name, m_drivlist->driver(curmatch).description, (cloneof == -1) ? 0 : MENU_FLAG_INVERT, (void *)&m_drivlist->driver(curmatch));
+		}
+	}
+
+	// if we're forced into this, allow general input configuration as well
+	if (ui_menu::stack_has_special_main_menu())
+	{
+		item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+		item_append("Configure General Inputs", NULL, 0, (void *)1);
+	}
+
+	// configure the custom rendering
+	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = 4.0f * machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 
