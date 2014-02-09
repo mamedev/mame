@@ -66,8 +66,8 @@ private:
 
 
 static NETLIST_START(bailey)
-	SOLVER(Solver)
-	PARAM(Solver.FREQ, 48000)
+	SOLVER(Solver, 48000)
+//	PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
 	// schematics
