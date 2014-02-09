@@ -102,7 +102,6 @@ driver modified by Eisuke Watanabe
 #include "sound/2151intf.h"
 #include "sound/2413intf.h"
 #include "sound/2610intf.h"
-#include "sound/es8712.h"
 #include "sound/okim6295.h"
 #include "sound/ymf278b.h"
 
@@ -1171,11 +1170,10 @@ ADDRESS_MAP_END
                                 Mahjong Gakuensai
 ***************************************************************************/
 
-static void gakusai_oki_bank_set(device_t *device)
+void metro_state::gakusai_oki_bank_set()
 {
-	metro_state *state = device->machine().driver_data<metro_state>();
-	int bank = (state->m_gakusai_oki_bank_lo & 7) + (state->m_gakusai_oki_bank_hi & 1) * 8;
-	downcast<okim6295_device *>(device)->set_bank_base(bank * 0x40000);
+	int bank = (m_gakusai_oki_bank_lo & 7) + (m_gakusai_oki_bank_hi & 1) * 8;
+	m_oki->set_bank_base(bank * 0x40000);
 }
 
 WRITE16_MEMBER(metro_state::gakusai_oki_bank_hi_w)
@@ -1183,7 +1181,7 @@ WRITE16_MEMBER(metro_state::gakusai_oki_bank_hi_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_gakusai_oki_bank_hi = data & 0xff;
-		gakusai_oki_bank_set(m_oki);
+		gakusai_oki_bank_set();
 	}
 }
 
@@ -1192,7 +1190,7 @@ WRITE16_MEMBER(metro_state::gakusai_oki_bank_lo_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_gakusai_oki_bank_lo = data & 0xff;
-		gakusai_oki_bank_set(m_oki);
+		gakusai_oki_bank_set();
 	}
 }
 
@@ -1809,7 +1807,6 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(metro_state::vmetal_control_w)
 {
-	es8712_device *device = machine().device<es8712_device>("essnd");
 	/* Lower nibble is the coin control bits shown in
 	   service mode, but in game mode they're different */
 	coin_counter_w(machine(), 0, data & 0x04);
@@ -1818,14 +1815,14 @@ WRITE8_MEMBER(metro_state::vmetal_control_w)
 	coin_lockout_w(machine(), 1, data & 0x02);  /* never activated in game mode?? */
 
 	if ((data & 0x40) == 0)
-		device->reset();
+		m_essnd->reset();
 	else
-		device->play();
+		m_essnd->play();
 
 	if (data & 0x10)
-		device->set_bank_base(0x100000);
+		m_essnd->set_bank_base(0x100000);
 	else
-		device->set_bank_base(0x000000);
+		m_essnd->set_bank_base(0x000000);
 
 	if (data & 0xa0)
 		logerror("%s: Writing unknown bits %04x to $200000\n",machine().describe_context(),data);
@@ -1863,8 +1860,7 @@ WRITE8_MEMBER(metro_state::vmetal_es8712_w)
 	16   002a 000e 0083 00ee 000f 0069 0069   0e832a-0f69ee
 	*/
 
-	es8712_device *device = machine().device<es8712_device>("essnd");
-	device->es8712_w(space, offset, data);
+	m_essnd->es8712_w(space, offset, data);
 	logerror("%s: Writing %04x to ES8712 offset %02x\n", machine().describe_context(), data, offset);
 }
 
