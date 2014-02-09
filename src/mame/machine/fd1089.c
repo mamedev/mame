@@ -108,10 +108,12 @@
     CPU #     Type  Status   Game              Seed   Unencrypted data range
     --------- ------- --- -------------------- ------ -----------------------------------
     317-0013A FD1089B [1] Enduro Racer         400001 030000-04ffff + 100000-1fffff
+    317-0016  FD1089? ??? Fantasy Zone         400005 ?
     317-0018  FD1089A [1] Action Fighter       400003 400000-4fffff + 840000-8dffff + c00000-c4ffff + ff0000-ffffff
+    317-0019  FD1089A [1] Outrun               400007 000000-03ffff
     317-0021  FD1089A [2] Alex Kidd            40000b ?
     317-0022  FD1089A [1] Dunk Shot            40000d 030000-ffffff
-    317-0024  FD1089B [2] Time Scanner         40000f ?
+    317-0024  FD1089B [1] Time Scanner         40000f 000000-02ffff
     317-0027  FD1089B [2] SDI                  400011 ?
     317-0028  FD1089A [2] Defense              400011 ?
     317-0033  FD1089A [1] Alien Syndrome       400013 030000-ffffff
