@@ -18,20 +18,22 @@
 // ----------------------------------------------------------------------------------------
 
 #define TTL_INPUT(_name, _v)                                                 \
-		NET_REGISTER_DEV(ttl_input, _name)                                          \
+		NET_REGISTER_DEV(ttl_input, _name)                                   \
 		PARAM(_name.IN, _v)
 
 #define ANALOG_INPUT(_name, _v)                                              \
-		NET_REGISTER_DEV(analog_input, _name)                                       \
+		NET_REGISTER_DEV(analog_input, _name)                                \
 		PARAM(_name.IN, _v)
 
-#define MAINCLOCK(_name)                                                     \
-		NET_REGISTER_DEV(mainclock, _name)
+#define MAINCLOCK(_name, _freq)                                              \
+		NET_REGISTER_DEV(mainclock, _name)                                   \
+        PARAM(_name.FREQ, _freq)
 
-#define CLOCK(_name)                                                         \
-		NET_REGISTER_DEV(clock, _name)
+#define CLOCK(_name, _freq)                                                  \
+		NET_REGISTER_DEV(clock, _name)                                       \
+        PARAM(_name.FREQ, _freq)
 
-#define NETDEV_GND()                                                                \
+#define NETDEV_GND()                                                         \
         NET_REGISTER_DEV(gnd, GND)
 
 // ----------------------------------------------------------------------------------------

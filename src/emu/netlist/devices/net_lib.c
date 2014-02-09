@@ -86,9 +86,9 @@ void netlist_factory_t::initialize()
 	ENTRY(analog_input,         ANALOG_INPUT,           "IN")
 	ENTRY(log,                  LOG,                    "+I")
 	ENTRY(logD,                 LOGD,                   "+I,I2")
-	ENTRY(clock,                CLOCK,                  "-")   // FIXME
-	ENTRY(mainclock,            MAINCLOCK,              "-")   // FIXME
-	ENTRY(solver,               SOLVER,                 "-")   // FIXME
+	ENTRY(clock,                CLOCK,                  "FREQ")
+	ENTRY(mainclock,            MAINCLOCK,              "FREQ")
+	ENTRY(solver,               SOLVER,                 "FREQ")
     ENTRY(gnd,                  NETDEV_GND,             "-")
 	ENTRY(switch2,              SWITCH2,                "+i1,i2")
 	ENTRY(nicRSFF,              NETDEV_RSFF,            "+S,R")

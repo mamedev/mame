@@ -21,7 +21,7 @@
 #define PSTATE_INTERFACE(obj, manager, module)               \
 	template<typename C> ATTR_COLD void obj::save(C &state, const pstring &stname) \
 	{                                                                       \
-		manager->save_item(state, module + "." + stname);  \
+		manager->save_item(state, this, module + "." + stname);  \
 	}
 
 enum pstate_data_type_e {
@@ -50,19 +50,6 @@ NETLIST_SAVE_TYPE(UINT32, DT_INT);
 NETLIST_SAVE_TYPE(INT32, DT_INT);
 //NETLIST_SAVE_TYPE(netlist_time::INTERNALTYPE, DT_INT64);
 
-struct pstate_entry_t
-{
-	typedef netlist_list_t<pstate_entry_t *> list_t;
-
-	pstate_entry_t(const pstring &stname, const pstate_data_type_e dt, const int size, const int count, void *ptr) :
-		m_name(stname), m_dt(dt), m_size(size), m_count(count), m_ptr(ptr) { }
-	pstring m_name;
-	pstate_data_type_e m_dt;
-	int m_size;
-	int m_count;
-	void *m_ptr;
-};
-
 class pstate_manager_t;
 
 class pstate_callback_t
@@ -78,50 +65,71 @@ public:
 protected:
 };
 
+struct pstate_entry_t
+{
+    typedef netlist_list_t<pstate_entry_t *> list_t;
+
+    pstate_entry_t(const pstring &stname, const pstate_data_type_e dt, const void *owner,
+            const int size, const int count, void *ptr)
+    : m_name(stname), m_dt(dt), m_owner(owner), m_callback(NULL), m_size(size), m_count(count), m_ptr(ptr) { }
+
+    pstate_entry_t(const pstring &stname, const void *owner, pstate_callback_t *callback)
+    : m_name(stname), m_dt(DT_CUSTOM), m_owner(owner), m_callback(callback), m_size(0), m_count(0), m_ptr(NULL) { }
+
+    pstring m_name;
+    const pstate_data_type_e m_dt;
+    const void *m_owner;
+    pstate_callback_t *m_callback;
+    const int m_size;
+    const int m_count;
+    void *m_ptr;
+};
+
 class pstate_manager_t
 {
 public:
 
 	ATTR_COLD ~pstate_manager_t();
 
-	template<typename C> ATTR_COLD void save_item(C &state, const pstring &stname)
+	template<typename C> ATTR_COLD void save_item(C &state, const void *owner, const pstring &stname)
 	{
-		save_state_ptr(stname, nl_datatype<C>::type, sizeof(C), 1, &state);
+		save_state_ptr(stname, nl_datatype<C>::type, owner, sizeof(C), 1, &state);
 	}
 
-	template<typename C, std::size_t N> ATTR_COLD void save_item(C (&state)[N], const pstring &stname)
+	template<typename C, std::size_t N> ATTR_COLD void save_item(C (&state)[N], const void *owner, const pstring &stname)
 	{
-		save_state_ptr(stname, nl_datatype<C>::type, sizeof(state[0]), N, &(state[0]));
+		save_state_ptr(stname, nl_datatype<C>::type, owner, sizeof(state[0]), N, &(state[0]));
 	}
 
-	template<typename C> ATTR_COLD void save_item(C *state, const pstring &stname, const int count)
+	template<typename C> ATTR_COLD void save_item(C *state, const void *owner, const pstring &stname, const int count)
 	{
-		save_state_ptr(stname, nl_datatype<C>::type, sizeof(C), count, state);
+		save_state_ptr(stname, nl_datatype<C>::type, owner, sizeof(C), count, state);
 	}
 
 	ATTR_COLD void pre_save();
 	ATTR_COLD void post_load();
+	ATTR_COLD void remove_save_items(const void *owner);
 
 	inline const pstate_entry_t::list_t &save_list() const { return m_save; }
 
 protected:
-	ATTR_COLD void save_state_ptr(const pstring &stname, const pstate_data_type_e, const int size, const int count, void *ptr);
+	ATTR_COLD void save_state_ptr(const pstring &stname, const pstate_data_type_e, const void *owner, const int size, const int count, void *ptr);
 
 private:
 	pstate_entry_t::list_t m_save;
-	pstate_callback_t::list_t m_callback;
 };
 
-template<> ATTR_COLD inline void pstate_manager_t::save_item(pstate_callback_t &state, const pstring &stname)
+template<> ATTR_COLD inline void pstate_manager_t::save_item(pstate_callback_t &state, const void *owner, const pstring &stname)
 {
 	//save_state_ptr(stname, DT_CUSTOM, 0, 1, &state);
-	m_callback.add(&state);
+    pstate_entry_t *p = new pstate_entry_t(stname, owner, &state);
+    m_save.add(p);
 	state.register_state(*this, stname);
 }
 
-template<> ATTR_COLD inline void pstate_manager_t::save_item(netlist_time &nlt, const pstring &stname)
+template<> ATTR_COLD inline void pstate_manager_t::save_item(netlist_time &nlt, const void *owner, const pstring &stname)
 {
-	save_state_ptr(stname, DT_INT64, sizeof(netlist_time::INTERNALTYPE), 1, nlt.get_internaltype_ptr());
+	save_state_ptr(stname, DT_INT64, owner, sizeof(netlist_time::INTERNALTYPE), 1, nlt.get_internaltype_ptr());
 }
 
 

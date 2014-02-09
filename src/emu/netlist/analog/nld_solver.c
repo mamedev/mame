@@ -19,9 +19,7 @@
 
 ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &aowner)
 {
-    /* make sure we loop at least once */
-
-	m_owner = &aowner;
+ 	m_owner = &aowner;
 
 	NL_VERBOSE_OUT(("New solver setup\n"));
 
@@ -205,7 +203,10 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::setup(netlist_ne
             m_terms[m_term_num].net_other = ot;
             m_terms[m_term_num].term = terms[i];
             if (ot>=0)
+            {
                 m_term_num++;
+                SOLVER_VERBOSE_OUT(("Net %d Term %s %f %f\n", k, terms[i]->name().cstr(), terms[i]->m_gt, terms[i]->m_go));
+            }
         }
     }
     m_rail_start = m_term_num;
@@ -221,7 +222,10 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::setup(netlist_ne
             m_terms[m_term_num].net_other = ot;
             m_terms[m_term_num].term = terms[i];
             if (ot<0)
+            {
                 m_term_num++;
+                SOLVER_VERBOSE_OUT(("found term with missing othernet %s\n", terms[i]->name().cstr()));
+            }
         }
         for (int i = 0; i < rails.count(); i++)
         {
@@ -229,6 +233,7 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::setup(netlist_ne
             m_terms[m_term_num].net_other = -1; //get_net_idx(&rails[i]->m_otherterm->net());
             m_terms[m_term_num].term = rails[i];
             m_term_num++;
+            SOLVER_VERBOSE_OUT(("Net %d Rail %s %f %f\n", k, rails[i]->name().cstr(), rails[i]->m_gt, rails[i]->m_go));
         }
     }
 }
@@ -258,6 +263,7 @@ ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE(
     for (int i = 0; i < m_rail_start; i++)
     {
         terms_t &t = m_terms[i];
+        //printf("A %d %d %s %f %f\n",t.net_this, t.net_other, t.term->name().cstr(), t.term->m_gt, t.term->m_go);
         RHS[t.net_this] += t.term->m_Idr;
         A[t.net_this][t.net_this] += t.term->m_gt;
 
@@ -280,6 +286,16 @@ ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
         double (* RESTRICT RHS),
         double (* RESTRICT x))
 {
+#if 0
+    for (int i = 0; i < N(); i++)
+    {
+        for (int k = 0; k < N(); k++)
+            printf("%f ", A[i][k]);
+        printf("| %f = %f \n", x[i], RHS[i]);
+    }
+    printf("\n");
+#endif
+
     for (int i = 0; i < N(); i++) {
 
 #if 0
@@ -322,8 +338,8 @@ ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
             tmp += A[j][k] * x[k];
         x[j] = (RHS[j] - tmp) / A[j][j];
     }
-
 #if 0
+    printf("Solution:\n");
     for (int i = 0; i < N(); i++)
     {
         for (int k = 0; k < N(); k++)
@@ -332,6 +348,7 @@ ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
     }
     printf("\n");
 #endif
+
 }
 
 template <int m_N, int _storage_N>
@@ -608,14 +625,14 @@ ATTR_COLD static void process_net(net_groups_t groups, int &cur_group, netlist_n
 	if (net->m_head == NULL)
 		return;
     /* add the net */
-	NL_VERBOSE_OUT(("add %d - %s\n", cur_group, net->name().cstr()));
+	SOLVER_VERBOSE_OUT(("add %d - %s\n", cur_group, net->name().cstr()));
 	groups[cur_group].add(net);
 	for (netlist_core_terminal_t *p = net->m_head; p != NULL; p = p->m_update_list_next)
 	{
-	    NL_VERBOSE_OUT(("terminal %s\n", p->name().cstr()));
+	    SOLVER_VERBOSE_OUT(("terminal %s\n", p->name().cstr()));
 		if (p->isType(netlist_terminal_t::TERMINAL))
 		{
-		    NL_VERBOSE_OUT(("isterminal\n"));
+		    SOLVER_VERBOSE_OUT(("isterminal\n"));
 			netlist_terminal_t *pt = static_cast<netlist_terminal_t *>(p);
 			netlist_net_t *other_net = &pt->m_otherterm->net();
 			if (!already_processed(groups, cur_group, other_net))
@@ -805,9 +822,18 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
         ms->m_resched_loops = m_resched_loops.Value();
         ms->setup(groups[i], *this);
         m_mat_solvers.add(ms);
-        SOLVER_VERBOSE_OUT(("%d ==> %d nets %s\n", i, groups[i].count(), groups[i].first()->object()->m_head->name().cstr()));
+        SOLVER_VERBOSE_OUT(("%d ==> %d nets %s\n", i, groups[i].count(), (*groups[i].first())->m_head->name().cstr()));
         SOLVER_VERBOSE_OUT(("       has %s elements\n", ms->is_dynamic() ? "dynamic" : "no dynamic"));
         SOLVER_VERBOSE_OUT(("       has %s elements\n", ms->is_timestep() ? "timestep" : "no timestep"));
+        for (int j=0; j<groups[i].count(); j++)
+        {
+            SOLVER_VERBOSE_OUT(("Net %d: %s\n", j, groups[i][j]->name().cstr()));
+            netlist_net_t *n = groups[i][j];
+            for (netlist_core_terminal_t *p = n->m_head; p != NULL; p = p->m_update_list_next)
+            {
+                SOLVER_VERBOSE_OUT(("   %s\n", p->name().cstr()));
+            }
+        }
     }
 
 }

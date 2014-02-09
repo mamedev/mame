@@ -94,8 +94,7 @@ enum input_changed_enum
 
 
 static NETLIST_START(pong_schematics)
-    SOLVER(Solver)
-    PARAM(Solver.FREQ, 48000)
+    SOLVER(Solver, 48000)
     PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
     ANALOG_INPUT(V5, 5)
@@ -114,9 +113,8 @@ static NETLIST_START(pong_schematics)
 #else
 	/* abstracting this, performance increases by 40%
 	 * No surprise, the clock is extremely expensive */
-	MAINCLOCK(clk)
-	//CLOCK(clk)
-	PARAM(clk.FREQ, 7159000.0)
+	MAINCLOCK(clk, 7159000.0)
+	//CLOCK(clk, 7159000.0)
 #endif
 #else
 	// benchmarking ...

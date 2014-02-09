@@ -82,8 +82,7 @@ static NETLIST_START(nl_1942)
 
     /* Standard stuff */
 
-    SOLVER(Solver)
-    PARAM(Solver.FREQ, 48000)
+    SOLVER(Solver, 48000)
     ANALOG_INPUT(V5, 5)
 
     /* AY 8910 internal resistors */
