@@ -558,6 +558,16 @@ static const i8251_interface usart_intf =
 //  I8255A_INTERFACE( ppi_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER(compis_state::write_centronics_busy)
+{
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER(compis_state::write_centronics_select)
+{
+	m_centronics_select = state;
+}
+
 READ8_MEMBER( compis_state::ppi_pb_r )
 {
 	/*
@@ -584,8 +594,8 @@ READ8_MEMBER( compis_state::ppi_pb_r )
 	data |= (m_cassette->input() > 0.0) << 2;
 
 	/* Centronics busy */
-	data |= m_centronics->busy_r() << 5;
-	data |= m_centronics->vcc_r() << 6;
+	data |= m_centronics_busy << 5;
+	data |= m_centronics_select << 6;
 
 	// TMR0
 	data |= m_tmr0 << 7;
@@ -612,7 +622,7 @@ WRITE8_MEMBER( compis_state::ppi_pc_w )
 
 	m_isbx0->opt1_w(BIT(data, 4));
 
-	m_centronics->strobe_w(BIT(data, 5));
+	m_centronics->write_strobe(BIT(data, 5));
 
 	if (BIT(data, 6))
 	{
@@ -625,7 +635,7 @@ WRITE8_MEMBER( compis_state::ppi_pc_w )
 static I8255A_INTERFACE( ppi_intf )
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 	DEVCB_DRIVER_MEMBER(compis_state, ppi_pb_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -773,7 +783,10 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, dcdb_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, ctsb_w))
 
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 	MCFG_ISBX_SLOT_ADD(ISBX_0_TAG, 0, isbx_cards, "fdc")
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir1_w))

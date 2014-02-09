@@ -706,26 +706,14 @@ READ8_MEMBER( trs80_state::trs80_wd179x_r )
 
 READ8_MEMBER( trs80_state::trs80_printer_r )
 {
-	/* Bit 7 - 1 = Busy; 0 = Not Busy
-	   Bit 6 - 1 = Out of Paper; 0 = Paper
-	   Bit 5 - 1 = Printer selected; 0 = Printer not selected
-	   Bit 4 - 1 = No Fault; 0 = Fault
-	   Bits 3..0 - Not used */
-
-	UINT8 data = 0;
-	data |= m_printer->busy_r() << 7;
-	data |= m_printer->pe_r() << 6;
-	data |= m_printer->vcc_r() << 5;
-	data |= m_printer->fault_r() << 4;
-
-	return data;
+	return m_cent_status_in->read();
 }
 
 WRITE8_MEMBER( trs80_state::trs80_printer_w )
 {
-	m_printer->strobe_w(1);
-	m_printer->write(space, 0, data);
-	m_printer->strobe_w(0);
+	m_cent_data_out->write(space, 0, data);
+	m_centronics->write_strobe(0);
+	m_centronics->write_strobe(1);
 }
 
 WRITE8_MEMBER( trs80_state::trs80_cassunit_w )

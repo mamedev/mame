@@ -64,7 +64,6 @@ chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/i8251.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/6522via.h"
 #include "machine/scsibus.h"
 

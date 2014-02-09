@@ -11,6 +11,7 @@
 #include "imagedev/snapquik.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
+#include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/mc146818.h"
 #include "video/mc6845.h"
@@ -39,7 +40,8 @@ public:
 		m_cassette(*this, "cassette"),
 		m_wave(*this, WAVE_TAG),
 		m_speaker(*this, "speaker"),
-		m_printer(*this, "centronics"),
+		m_centronics(*this, "centronics"),
+		m_cent_data_out(*this, "cent_data_out"),
 		m_crtc(*this, "crtc"),
 		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
@@ -180,7 +182,8 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<wave_device> m_wave;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<centronics_device> m_printer;
+	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	required_device<mc6845_device> m_crtc;
 	optional_device<wd2793_t> m_fdc;
 	optional_device<floppy_connector> m_floppy0;

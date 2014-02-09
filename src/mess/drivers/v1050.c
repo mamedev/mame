@@ -750,9 +750,14 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pa_w )
 	m_fdc->dden_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER(v1050_state::misc_ppi_pb_w)
+WRITE_LINE_MEMBER(v1050_state::write_centronics_busy)
 {
-	m_centronics->write(~data & 0xff);
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER(v1050_state::write_centronics_perror)
+{
+	m_centronics_perror = state;
 }
 
 READ8_MEMBER(v1050_state::misc_ppi_pc_r)
@@ -774,8 +779,8 @@ READ8_MEMBER(v1050_state::misc_ppi_pc_r)
 
 	UINT8 data = 0;
 
-	data |= m_centronics->not_busy_r() << 4;
-	data |= m_centronics->pe_r() << 5;
+	data |= m_centronics_busy << 4;
+	data |= m_centronics_perror << 5;
 
 	return data;
 }
@@ -798,7 +803,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 	*/
 
 	// printer strobe
-	m_centronics->strobe_w(BIT(data, 0));
+	m_centronics->write_strobe(BIT(data, 0));
 
 	// floppy interrupt enable
 	m_f_int_enb = BIT(data, 1);
@@ -830,7 +835,7 @@ static I8255A_INTERFACE( misc_ppi_intf )
 	DEVCB_NULL,                         // Port A read
 	DEVCB_DRIVER_MEMBER(v1050_state, misc_ppi_pa_w),        // Port A write
 	DEVCB_NULL,                         // Port B read
-	DEVCB_DRIVER_MEMBER(v1050_state,misc_ppi_pb_w),     // Port B write
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),     // Port B write
 	DEVCB_DRIVER_MEMBER(v1050_state,misc_ppi_pc_r),     // Port C read
 	DEVCB_DRIVER_MEMBER(v1050_state, misc_ppi_pc_w)     // Port C write
 };
@@ -1092,6 +1097,8 @@ void v1050_state::machine_start()
 	save_item(NAME(m_txrdy));
 	save_item(NAME(m_baud_sel));
 	save_item(NAME(m_bank));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_perror));
 }
 
 void v1050_state::machine_reset()
@@ -1169,7 +1176,9 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "v1050_hdd")
 
 	// printer
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(v1050_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(v1050_state, write_centronics_perror))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

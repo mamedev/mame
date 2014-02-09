@@ -144,10 +144,10 @@ READ8_MEMBER( fp_state::prtr_snd_r )
 	UINT8 data = 0;
 
 	// centronics
-	data |= m_centronics->busy_r();
-	data |= m_centronics->vcc_r() << 1;
-	data |= m_centronics->fault_r() << 2;
-	data |= m_centronics->pe_r() << 3;
+	data |= m_centronics_busy;
+	data |= m_centronics_select << 1;
+	data |= m_centronics_fault << 2;
+	data |= m_centronics_perror << 3;
 
 	// floppy
 	data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 5;
@@ -163,7 +163,7 @@ WRITE8_MEMBER( fp_state::pint_clr_w )
 
 WRITE8_MEMBER( fp_state::ls_w )
 {
-	m_centronics->strobe_w(!BIT(data, 0));
+	m_centronics->write_strobe(!BIT(data, 0));
 }
 
 
@@ -350,7 +350,7 @@ static ADDRESS_MAP_START( fp_io, AS_IO, 16, fp_state )
 	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8(WD2797_TAG, wd2797_t, read, write, 0x00ff)
 	AM_RANGE(0x008, 0x00f) AM_DEVREADWRITE8(I8253A5_TAG, pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0x018, 0x01f) AM_DEVREADWRITE8(Z80SIO0_TAG, z80sio0_device, ba_cd_r, ba_cd_w, 0x00ff)
-	AM_RANGE(0x020, 0x021) AM_DEVWRITE8(CENTRONICS_TAG, centronics_device, write, 0x00ff)
+	AM_RANGE(0x020, 0x021) AM_DEVWRITE8("cent_data_out", output_latch_device, write, 0x00ff)
 	AM_RANGE(0x022, 0x023) AM_WRITE8(pint_clr_w, 0x00ff)
 	AM_RANGE(0x024, 0x025) AM_READ8(prtr_snd_r, 0x00ff)
 	AM_RANGE(0x026, 0x027) AM_DEVWRITE8(SN76489AN_TAG, sn76489a_device, write, 0x00ff)
@@ -533,22 +533,26 @@ void fp_state::fdc_drq_w(bool state)
 }
 
 
-//-------------------------------------------------
-//  centronics_interface centronics_intf
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( fp_state::busy_w )
+WRITE_LINE_MEMBER( fp_state::write_centronics_busy )
 {
+	m_centronics_busy = state;
 	if (!state) m_pic->ir6_w(ASSERT_LINE);
 }
 
-static const centronics_interface centronics_intf =
+WRITE_LINE_MEMBER( fp_state::write_centronics_select )
 {
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(fp_state, busy_w),
-	DEVCB_NULL
-};
+	m_centronics_select = state;
+}
 
+WRITE_LINE_MEMBER( fp_state::write_centronics_fault )
+{
+	m_centronics_fault = state;
+}
+
+WRITE_LINE_MEMBER( fp_state::write_centronics_perror )
+{
+	m_centronics_perror = state;
+}
 
 /*************************************
  *
@@ -658,7 +662,14 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_WD2797x_ADD(WD2797_TAG, 2000000)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", fp_floppies, "35dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", fp_floppies, NULL,   floppy_image_device::default_floppy_formats)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fp_state, write_centronics_busy))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(fp_state, write_centronics_select))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fp_state, write_centronics_fault))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fp_state, write_centronics_perror))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

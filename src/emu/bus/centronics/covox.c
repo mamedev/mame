@@ -35,9 +35,12 @@ MACHINE_CONFIG_END
 
 centronics_covox_device::centronics_covox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CENTRONICS_COVOX, "Covox Speech Thing", tag, owner, clock, "covox", __FILE__),
-		device_centronics_peripheral_interface( mconfig, *this )
+	device_centronics_peripheral_interface( mconfig, *this ),
+	m_dac(*this, "dac"),
+	m_data(0)
 {
 }
+
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
@@ -48,15 +51,15 @@ machine_config_constructor centronics_covox_device::device_mconfig_additions() c
 	return MACHINE_CONFIG_NAME( covox );
 }
 
-
 void centronics_covox_device::device_start()
 {
-	m_dac = subdevice<dac_device>("dac");
+	save_item(NAME(m_data));
 }
 
-void centronics_covox_device::write(UINT8 data)
+void centronics_covox_device::update_dac()
 {
-	m_dac->write_unsigned8(data);
+	if (started())
+		m_dac->write_unsigned8(m_data);
 }
 
 //**************************************************************************
@@ -87,9 +90,13 @@ MACHINE_CONFIG_END
 
 centronics_covox_stereo_device::centronics_covox_stereo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CENTRONICS_COVOX_STEREO, "Covox (Stereo-in-1)", tag, owner, clock, "covox_stereo", __FILE__),
-		device_centronics_peripheral_interface( mconfig, *this )
+	device_centronics_peripheral_interface( mconfig, *this ),
+	m_dac_left(*this, "dac_left"),
+	m_dac_right(*this, "dac_right"),
+	m_data(0)
 {
 }
+
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
@@ -100,15 +107,21 @@ machine_config_constructor centronics_covox_stereo_device::device_mconfig_additi
 	return MACHINE_CONFIG_NAME( covox_stereo );
 }
 
-
 void centronics_covox_stereo_device::device_start()
 {
-	m_dac_left  = subdevice<dac_device>("dac_left");
-	m_dac_right = subdevice<dac_device>("dac_right");
+	save_item(NAME(m_data));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_autofd));
 }
 
-void centronics_covox_stereo_device::write(UINT8 data)
+void centronics_covox_stereo_device::update_dac()
 {
-	if (m_strobe)  m_dac_left->write_unsigned8(data);
-	if (m_auto_fd) m_dac_right->write_unsigned8(data);
+	if (started())
+	{
+		if (m_strobe)
+			m_dac_left->write_unsigned8(m_data);
+
+		if (m_autofd)
+			m_dac_right->write_unsigned8(m_data);
+	}
 }

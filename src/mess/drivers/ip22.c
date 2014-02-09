@@ -1625,12 +1625,6 @@ static const mips3_config config =
 	32768   /* data cache size */
 };
 
-static const pc_lpt_interface ip22_lpt_config =
-{
-	DEVCB_NULL /* no idea if the lpt irq is connected and where */
-};
-
-
 static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_CPU_ADD( "maincpu", R5000BE, 50000000*3 )
 	MCFG_CPU_CONFIG( config )
@@ -1655,7 +1649,7 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 
 	MCFG_NEWPORT_ADD("newport")
 
-	MCFG_PC_LPT_ADD("lpt_0", ip22_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

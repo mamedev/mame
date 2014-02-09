@@ -17,11 +17,11 @@
 #include "emu.h"
 #include "cbmiec.h"
 #include "bus/c64/bn1541.h"
-#include "bus/centronics/ctronics.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
+#include "machine/latch.h"
 
 
 
@@ -253,7 +253,7 @@ public:
 
 protected:
 	required_device<pia6821_device> m_pia;
-	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	required_memory_region m_mmu_rom;
 };
 

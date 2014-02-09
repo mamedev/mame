@@ -10,6 +10,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "formats/pc_dsk.h"
 #include "machine/am9517a.h"
+#include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/ins8250.h"
 #include "machine/isa.h"
@@ -55,6 +56,7 @@ public:
 			m_uart(*this, INS8250_TAG),
 			m_vdu(*this, AMS40041_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
+			m_cent_data_out(*this, "cent_data_out"),
 			m_speaker(*this, SPEAKER_TAG),
 			m_kb(*this, PC1512_KEYBOARD_TAG),
 			m_ram(*this, RAM_TAG),
@@ -80,7 +82,7 @@ public:
 			m_fdc_dsr(0),
 			m_neop(0),
 			m_ack_int_enable(1),
-			m_ack(0),
+			m_centronics_ack(0),
 			m_speaker_drive(0)
 	{ }
 
@@ -93,6 +95,7 @@ public:
 	required_device<ins8250_device> m_uart;
 	optional_device<ams40041_device> m_vdu;
 	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pc1512_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;
@@ -165,6 +168,11 @@ public:
 	IRQ_CALLBACK_MEMBER(pc1512_irq_callback);
 	void fdc_int_w(bool state);
 	void fdc_drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 
 	// system status register
 	int m_pit1;
@@ -200,7 +208,11 @@ public:
 
 	// printer state
 	int m_ack_int_enable;
-	int m_ack;
+	int m_centronics_ack;
+	int m_centronics_busy;
+	int m_centronics_perror;
+	int m_centronics_select;
+	int m_centronics_fault;
 	UINT8 m_printer_data;
 	UINT8 m_printer_control;
 

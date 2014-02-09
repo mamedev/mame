@@ -35,6 +35,7 @@ public:
 		m_beep(*this, "beeper")
 	{}
 
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_READ8_MEMBER(kaypro2x_87_r);
 	DECLARE_READ8_MEMBER(kaypro2x_system_port_r);
 	DECLARE_READ8_MEMBER(kaypro2x_status_r);
@@ -77,9 +78,11 @@ public:
 	UINT16 m_cursor;
 	UINT8 *m_p_videoram;
 	kay_kbd_t *m_kbd;
+	int m_centronics_busy;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
 private:
 	UINT8 m_system_port;
 	UINT16 m_mc6845_video_address;

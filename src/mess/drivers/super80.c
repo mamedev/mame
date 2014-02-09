@@ -231,7 +231,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( super80_io, AS_IO, 8, super80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xdc, 0xdc) AM_READWRITE(super80_dc_r, super80_dc_w)
+	AM_RANGE(0xdc, 0xdc) AM_DEVREAD("cent_status_in", input_buffer_device, read)
+	AM_RANGE(0xdc, 0xdc) AM_WRITE(super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80_f0_w)
 	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x14) AM_WRITE(super80_f1_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
@@ -241,7 +242,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( super80e_io, AS_IO, 8, super80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xbc, 0xbc) AM_READWRITE(super80_dc_r, super80_dc_w)
+	AM_RANGE(0xbc, 0xbc) AM_DEVREAD("cent_status_in", input_buffer_device, read)
+	AM_RANGE(0xbc, 0xbc) AM_WRITE(super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80_f0_w)
 	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x14) AM_WRITE(super80_f1_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
@@ -254,7 +256,8 @@ static ADDRESS_MAP_START( super80r_io, AS_IO, 8, super80_state )
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREAD("crtc", mc6845_device, register_r)
 	AM_RANGE(0x11, 0x11) AM_WRITE(super80v_11_w)
-	AM_RANGE(0xdc, 0xdc) AM_READWRITE(super80_dc_r, super80_dc_w)
+	AM_RANGE(0xdc, 0xdc) AM_DEVREAD("cent_status_in", input_buffer_device, read)
+	AM_RANGE(0xdc, 0xdc) AM_WRITE(super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80r_f0_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
 	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
@@ -266,7 +269,8 @@ static ADDRESS_MAP_START( super80v_io, AS_IO, 8, super80_state )
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREAD("crtc", mc6845_device, register_r)
 	AM_RANGE(0x11, 0x11) AM_WRITE(super80v_11_w)
-	AM_RANGE(0xdc, 0xdc) AM_READWRITE(super80_dc_r, super80_dc_w)
+	AM_RANGE(0xdc, 0xdc) AM_DEVREAD("cent_status_in", input_buffer_device, read)
+	AM_RANGE(0xdc, 0xdc) AM_WRITE(super80_dc_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x14) AM_WRITE(super80_f0_w)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x14) AM_READ(super80_f2_r)
 	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
@@ -660,7 +664,12 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
+	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", super80_state, super80, "bin", 3)
@@ -729,7 +738,12 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
+	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", super80_state, super80, "bin", 3)

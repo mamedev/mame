@@ -37,30 +37,25 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	// not really public
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start();
 
 	// device_pet_user_port_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER(input_8);
-	virtual WRITE_LINE_MEMBER(input_c) { if (state) m_parallel_output |= 1; else m_parallel_output &= ~1; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_d) { if (state) m_parallel_output |= 2; else m_parallel_output &= ~2; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_e) { if (state) m_parallel_output |= 4; else m_parallel_output &= ~4; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_f) { if (state) m_parallel_output |= 8; else m_parallel_output &= ~8; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_h) { if (state) m_parallel_output |= 16; else m_parallel_output &= ~16; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_j) { if (state) m_parallel_output |= 32; else m_parallel_output &= ~32; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_k) { if (state) m_parallel_output |= 64; else m_parallel_output &= ~64; update_output(); }
-	virtual WRITE_LINE_MEMBER(input_l) { if (state) m_parallel_output |= 128; else m_parallel_output &= ~128; update_output(); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_c) { m_centronics->write_data0(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_d) { m_centronics->write_data1(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_e) { m_centronics->write_data2(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_f) { m_centronics->write_data3(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_h) { m_centronics->write_data4(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_j) { m_centronics->write_data5(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_k) { m_centronics->write_data6(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_l) { m_centronics->write_data7(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_m) { m_centronics->write_strobe(state); }
 
 private:
 	required_device<centronics_device> m_centronics;
 
 	void update_output();
-
-	UINT8 m_parallel_output;
 };
 
 

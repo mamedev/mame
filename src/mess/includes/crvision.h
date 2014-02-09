@@ -9,6 +9,7 @@
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
+#include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
 #include "sound/sn76496.h"
@@ -30,25 +31,24 @@ class crvision_state : public driver_device
 public:
 	crvision_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, M6502_TAG),
-			m_pia(*this, PIA6821_TAG),
-			m_psg(*this, SN76489_TAG),
-			m_cassette(*this, "cassette"),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_ram(*this, RAM_TAG)
-	{ }
+		m_maincpu(*this, M6502_TAG),
+		m_pia(*this, PIA6821_TAG),
+		m_psg(*this, SN76489_TAG),
+		m_cassette(*this, "cassette"),
+		m_cent_data_out(*this, "cent_data_out"),
+		m_ram(*this, RAM_TAG)
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_device<sn76496_base_device> m_psg;
 	required_device<cassette_image_device> m_cassette;
-	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	required_device<ram_device> m_ram;
 
 	virtual void machine_start();
 
-	DECLARE_READ8_MEMBER( centronics_status_r );
-	DECLARE_WRITE8_MEMBER( centronics_ctrl_w );
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
 	DECLARE_READ8_MEMBER( pia_pa_r );
 	DECLARE_READ8_MEMBER( pia_pb_r );
@@ -79,6 +79,7 @@ class laser2001_state : public crvision_state
 public:
 	laser2001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: crvision_state(mconfig, type, tag),
+			m_centronics(*this, CENTRONICS_TAG),
 			m_y0(*this, "Y0"),
 			m_y1(*this, "Y1"),
 			m_y2(*this, "Y2"),
@@ -95,6 +96,7 @@ public:
 
 	virtual void machine_start();
 
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_READ8_MEMBER( pia_pa_r );
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
 	DECLARE_READ8_MEMBER( pia_pb_r );
@@ -104,6 +106,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( pia_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 
+	required_device<centronics_device> m_centronics;
 	required_ioport m_y0;
 	required_ioport m_y1;
 	required_ioport m_y2;
@@ -116,6 +119,7 @@ public:
 	required_ioport m_joy1;
 	required_ioport m_joy2;
 	required_ioport m_joy3;
+	int m_centronics_busy;
 };
 
 #endif

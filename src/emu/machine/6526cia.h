@@ -286,9 +286,6 @@ WRITE_LINE_DEVICE_HANDLER( mos6526_cnt_w );
 READ_LINE_DEVICE_HANDLER( mos6526_sp_r );
 WRITE_LINE_DEVICE_HANDLER( mos6526_sp_w );
 
-/* flag */
-WRITE_LINE_DEVICE_HANDLER( mos6526_flag_w );
-
 /* port mask */
 void cia_set_port_mask_value(device_t *device, int port, int data);
 

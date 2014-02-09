@@ -488,6 +488,21 @@ static Z80DART_INTERFACE( dart_intf )
 
 /* Z80-PIO Interface */
 
+DECLARE_WRITE_LINE_MEMBER( tiki100_state::write_centronics_ack )
+{
+	m_centronics_ack = state;
+}
+
+DECLARE_WRITE_LINE_MEMBER( tiki100_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
+DECLARE_WRITE_LINE_MEMBER( tiki100_state::write_centronics_perror )
+{
+	m_centronics_perror = state;
+}
+
 READ8_MEMBER( tiki100_state::pio_pb_r )
 {
 	/*
@@ -508,9 +523,9 @@ READ8_MEMBER( tiki100_state::pio_pb_r )
 	UINT8 data = 0;
 
 	// centronics
-	data |= m_centronics->ack_r() << 4;
-	data |= m_centronics->busy_r() << 5;
-	data |= m_centronics->pe_r() << 6;
+	data |= m_centronics_ack << 4;
+	data |= m_centronics_busy << 5;
+	data |= m_centronics_perror << 6;
 
 	// cassette
 	data |= (m_cassette->input() > 0.0) << 7;
@@ -536,7 +551,7 @@ WRITE8_MEMBER( tiki100_state::pio_pb_w )
 	*/
 
 	// centronics
-	m_centronics->strobe_w(BIT(data, 0));
+	m_centronics->write_strobe(BIT(data, 0));
 
 	// cassette
 	m_cassette->output(BIT(data, 6) ? -1 : 1);
@@ -545,8 +560,8 @@ WRITE8_MEMBER( tiki100_state::pio_pb_w )
 static Z80PIO_INTERFACE( pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, read),
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
+	DEVCB_DEVICE_MEMBER("cent_data_in", input_buffer_device, read),
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(tiki100_state, pio_pb_r),
 	DEVCB_DRIVER_MEMBER(tiki100_state, pio_pb_w),
@@ -715,7 +730,15 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
 
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(tiki100_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(tiki100_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(tiki100_state, write_centronics_perror))
+
+	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", tiki100_state, tape_tick, attotime::from_hz(44100))
 

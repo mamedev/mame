@@ -42,6 +42,11 @@
 //  MEMORY BANKING
 //**************************************************************************
 
+WRITE_LINE_MEMBER( m5_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
 //-------------------------------------------------
 //  sts_r -
 //-------------------------------------------------
@@ -69,7 +74,7 @@ READ8_MEMBER( m5_state::sts_r )
 	data |= m_cassette->input() >= 0 ? 1 : 0;
 
 	// centronics busy
-	data |= m_centronics->busy_r() << 1;
+	data |= m_centronics_busy << 1;
 
 	// RESET key
 	data |= m_reset->read();
@@ -103,7 +108,7 @@ WRITE8_MEMBER( m5_state::com_w )
 	m_cassette->output( BIT(data, 0) ? -1.0 : 1.0);
 
 	// centronics strobe
-	m_centronics->strobe_w(BIT(data, 0));
+	m_centronics->write_strobe(BIT(data, 0));
 
 	// cassette remote
 	m_cassette->change_state(BIT(data,1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -262,7 +267,7 @@ static ADDRESS_MAP_START( m5_io, AS_IO, 8, m5_state )
 	AM_RANGE(0x35, 0x35) AM_READ_PORT("Y5")
 	AM_RANGE(0x36, 0x36) AM_READ_PORT("Y6")
 	AM_RANGE(0x37, 0x37) AM_READ_PORT("JOY")
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READWRITE(sts_r, com_w)
 //  AM_RANGE(0x60, 0x63) SIO
 //  AM_RANGE(0x6c, 0x6c) EM-64/64KBI bank select
@@ -652,7 +657,12 @@ static MACHINE_CONFIG_START( m5, m5_state )
 
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_14_31818MHz/4, ctc_intf)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(m5_state, write_centronics_busy))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
 	MCFG_CASSETTE_ADD("cassette", cassette_intf)
 	MCFG_I8255_ADD(I8255A_TAG, ppi_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)

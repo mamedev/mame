@@ -30,9 +30,8 @@
 
 READ8_MEMBER(mtx_state::mtx_strobe_r)
 {
-	centronics_device *centronics = machine().device<centronics_device>(CENTRONICS_TAG);
 	/* set STROBE low */
-	centronics->strobe_w(FALSE);
+	m_centronics->write_strobe(FALSE);
 
 	return 0xff;
 }
@@ -142,10 +141,28 @@ WRITE8_MEMBER(mtx_state::mtx_cst_w)
     mtx_prt_r - centronics status
 -------------------------------------------------*/
 
+WRITE_LINE_MEMBER(mtx_state::write_centronics_busy)
+{
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER(mtx_state::write_centronics_fault)
+{
+	m_centronics_fault = state;
+}
+
+WRITE_LINE_MEMBER(mtx_state::write_centronics_perror)
+{
+	m_centronics_perror = state;
+}
+
+WRITE_LINE_MEMBER(mtx_state::write_centronics_select)
+{
+	m_centronics_select = state;
+}
+
 READ8_MEMBER(mtx_state::mtx_prt_r)
 {
-	centronics_device *centronics = machine().device<centronics_device>(CENTRONICS_TAG);
-
 	/*
 
 	    bit     description
@@ -164,19 +181,12 @@ READ8_MEMBER(mtx_state::mtx_prt_r)
 	UINT8 data = 0;
 
 	/* reset STROBE to high */
-	centronics->strobe_w( TRUE);
+	m_centronics->write_strobe( TRUE);
 
-	/* busy */
-	data |= centronics->busy_r() << 0;
-
-	/* fault */
-	data |= centronics->fault_r() << 1;
-
-	/* paper empty */
-	data |= !centronics->pe_r() << 2;
-
-	/* select */
-	data |= centronics->vcc_r() << 3;
+	data |= m_centronics_busy << 0;
+	data |= m_centronics_fault << 1;
+	data |= m_centronics_perror << 2;
+	data |= m_centronics_select << 3;
 
 	return data;
 }

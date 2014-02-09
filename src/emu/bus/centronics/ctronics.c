@@ -1,272 +1,123 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 /***************************************************************************
 
     Centronics printer interface
 
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
-#include "emu.h"
 #include "ctronics.h"
 
-//**************************************************************************
-//  CENTRONICS SLOT DEVICE
-//**************************************************************************
+// class centronics_device
 
-// device type definition
 const device_type CENTRONICS = &device_creator<centronics_device>;
-
-//-------------------------------------------------
-//  centronics_device - constructor
-//-------------------------------------------------
 
 centronics_device::centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CENTRONICS, "Centronics", tag, owner, clock, "centronics", __FILE__),
-		device_slot_interface(mconfig, *this),
-		m_dev(NULL)
+	device_slot_interface(mconfig, *this),
+	m_strobe_handler(*this),
+	m_data0_handler(*this),
+	m_data1_handler(*this),
+	m_data2_handler(*this),
+	m_data3_handler(*this),
+	m_data4_handler(*this),
+	m_data5_handler(*this),
+	m_data6_handler(*this),
+	m_data7_handler(*this),
+	m_ack_handler(*this),
+	m_busy_handler(*this),
+	m_perror_handler(*this),
+	m_select_handler(*this),
+	m_autofd_handler(*this),
+	m_fault_handler(*this),
+	m_init_handler(*this),
+	m_select_in_handler(*this),
+	m_dev(NULL)
 {
 }
-
-//-------------------------------------------------
-//  centronics_device - destructor
-//-------------------------------------------------
-
-centronics_device::~centronics_device()
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
 
 void centronics_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const centronics_interface *intf = reinterpret_cast<const centronics_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<centronics_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_ack_func, 0, sizeof(m_out_ack_func));
-		memset(&m_out_busy_func, 0, sizeof(m_out_busy_func));
-		memset(&m_out_not_busy_func, 0, sizeof(m_out_not_busy_func));
-	}
-
 	m_dev = dynamic_cast<device_centronics_peripheral_interface *>(get_card_device());
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
 void centronics_device::device_start()
 {
-	/* resolve callbacks */
-	m_out_ack_func.resolve(m_out_ack_cb, *this);
-	m_out_busy_func.resolve(m_out_busy_cb, *this);
-	m_out_not_busy_func.resolve(m_out_not_busy_cb, *this);
+	m_strobe_handler.resolve_safe();
+	m_data0_handler.resolve_safe();
+	m_data1_handler.resolve_safe();
+	m_data2_handler.resolve_safe();
+	m_data3_handler.resolve_safe();
+	m_data4_handler.resolve_safe();
+	m_data5_handler.resolve_safe();
+	m_data6_handler.resolve_safe();
+	m_data7_handler.resolve_safe();
+	m_ack_handler.resolve_safe();
+	m_busy_handler.resolve_safe();
+	m_perror_handler.resolve_safe();
+	m_select_handler.resolve_safe();
+	m_autofd_handler.resolve_safe();
+	m_fault_handler.resolve_safe();
+	m_init_handler.resolve_safe();
+	m_select_handler.resolve_safe();
+
+	// pull up
+	m_strobe_handler(1);
+	m_data0_handler(1);
+	m_data1_handler(1);
+	m_data2_handler(1);
+	m_data3_handler(1);
+	m_data4_handler(1);
+	m_data5_handler(1);
+	m_data6_handler(1);
+	m_data7_handler(1);
+	m_ack_handler(1);
+	m_busy_handler(1);
+	m_perror_handler(1);
+	m_select_handler(1);
+	m_autofd_handler(1);
+	m_fault_handler(1);
+	m_init_handler(1);
+	m_select_handler(1);
 }
 
-/*****************************************************************************
-    GLOBAL VARIABLES
-*****************************************************************************/
+WRITE_LINE_MEMBER( centronics_device::write_strobe ) { if (m_dev) m_dev->input_strobe(state); }
+WRITE_LINE_MEMBER( centronics_device::write_data0 ) { if (m_dev) m_dev->input_data0(state); }
+WRITE_LINE_MEMBER( centronics_device::write_data1 ) { if (m_dev) m_dev->input_data1(state); }
+WRITE_LINE_MEMBER( centronics_device::write_data2 ) { if (m_dev) m_dev->input_data2(state); }
+WRITE_LINE_MEMBER( centronics_device::write_data3 ) { if (m_dev) m_dev->input_data3(state); }
+WRITE_LINE_MEMBER( centronics_device::write_data4 ) { if (m_dev) m_dev->input_data4(state); }
+WRITE_LINE_MEMBER( centronics_device::write_data5 ) { if (m_dev) m_dev->input_data5(state); }
+WRITE_LINE_MEMBER( centronics_device::write_data6 ) { if (m_dev) m_dev->input_data6(state); }
+WRITE_LINE_MEMBER( centronics_device::write_data7 ) { if (m_dev) m_dev->input_data7(state); }
+WRITE_LINE_MEMBER( centronics_device::write_ack ) { if (m_dev) m_dev->input_ack(state); }
+WRITE_LINE_MEMBER( centronics_device::write_busy ) { if (m_dev) m_dev->input_busy(state); }
+WRITE_LINE_MEMBER( centronics_device::write_perror ) { if (m_dev) m_dev->input_perror(state); }
+WRITE_LINE_MEMBER( centronics_device::write_select ) { if (m_dev) m_dev->input_select(state); }
+WRITE_LINE_MEMBER( centronics_device::write_autofd ) { if (m_dev) m_dev->input_autofd(state); }
+WRITE_LINE_MEMBER( centronics_device::write_fault ) { if (m_dev) m_dev->input_fault(state); }
+WRITE_LINE_MEMBER( centronics_device::write_init ) { if (m_dev) m_dev->input_init(state); }
+WRITE_LINE_MEMBER( centronics_device::write_select_in ) { if (m_dev) m_dev->input_select_in(state); }
 
-const centronics_interface standard_centronics =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
-//**************************************************************************
-//  DEVICE CENTRONICS PERIPHERAL INTERFACE
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_centronics_peripheral_interface - constructor
-//-------------------------------------------------
+// class device_centronics_peripheral_interface
 
 device_centronics_peripheral_interface::device_centronics_peripheral_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
 {
-	/* set some initial values */
-	m_pe = FALSE;
-	m_fault = FALSE;
-	m_busy = TRUE;
-	m_strobe = TRUE;
-	m_ack = FALSE;
-	m_data = 0x00;
+	m_slot = dynamic_cast<centronics_device *>(device.owner());
 }
-
-
-//-------------------------------------------------
-//  ~device_centronics_peripheral_interface - destructor
-//-------------------------------------------------
 
 device_centronics_peripheral_interface::~device_centronics_peripheral_interface()
 {
 }
 
-//**************************************************************************
-//  CENTRONICS PRINTER DEVICE
-//**************************************************************************
 
-// device type definition
-const device_type CENTRONICS_PRINTER = &device_creator<centronics_printer_device>;
+#include "image.h"
 
-/*****************************************************************************
-    PRINTER INTERFACE
-*****************************************************************************/
-const struct printer_interface centronics_printer_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, centronics_printer_device, printer_online)
-};
-
-static MACHINE_CONFIG_FRAGMENT( centronics_printer )
-	MCFG_PRINTER_ADD("printer")
-	MCFG_DEVICE_CONFIG(centronics_printer_config)
-MACHINE_CONFIG_END
-
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-//-------------------------------------------------
-//  centronics_printer_device - constructor
-//-------------------------------------------------
-
-centronics_printer_device::centronics_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CENTRONICS_PRINTER, "Centronics Printer", tag, owner, clock, "centronics_printer", __FILE__),
-		device_centronics_peripheral_interface( mconfig, *this )
-{
-}
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor centronics_printer_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( centronics_printer );
-}
-
-
-/*-------------------------------------------------
-    printer_online - callback that
-    sets us busy when the printer goes offline
--------------------------------------------------*/
-
-WRITE_LINE_MEMBER(centronics_printer_device::printer_online)
-{
-	/* when going online, set PE and FAULT high and BUSY low */
-	m_pe = state;
-	m_fault = state;
-	m_busy = !state;
-}
-
-static TIMER_CALLBACK( timer_ack_callback )
-{
-	centronics_printer_device *printer = reinterpret_cast<centronics_printer_device *>(ptr);
-	printer->ack_callback(param);
-}
-
-static TIMER_CALLBACK( timer_busy_callback )
-{
-	centronics_printer_device *printer = reinterpret_cast<centronics_printer_device *>(ptr);
-	printer->busy_callback(param);
-}
-
-void centronics_printer_device::ack_callback(UINT8 param)
-{
-	/* signal change */
-	m_owner->out_ack(param);
-	m_ack = param;
-
-	if (param == FALSE)
-	{
-		/* data is now ready, output it */
-		m_printer->output(m_data);
-
-		/* ready to receive more data, return BUSY to low */
-		machine().scheduler().timer_set(attotime::from_usec(7), FUNC(timer_busy_callback), FALSE, this);
-	}
-}
-
-
-void centronics_printer_device::busy_callback(UINT8 param)
-{
-	/* signal change */
-	m_owner->out_busy(param);
-	m_owner->out_not_busy(!param);
-	m_busy = param;
-
-	if (param == TRUE)
-	{
-		/* timer to turn ACK low to receive data */
-		machine().scheduler().timer_set(attotime::from_usec(10), FUNC(timer_ack_callback), FALSE, this);
-	}
-	else
-	{
-		/* timer to return ACK to high state */
-		machine().scheduler().timer_set(attotime::from_usec(5), FUNC(timer_ack_callback), TRUE, this);
-	}
-}
-
-void centronics_printer_device::device_start()
-{
-	m_owner = dynamic_cast<centronics_device *>(owner());
-
-	/* get printer device */
-	m_printer = subdevice<printer_image_device>("printer");
-
-	/* register for state saving */
-	save_item(NAME(m_auto_fd));
-	save_item(NAME(m_strobe));
-	save_item(NAME(m_busy));
-	save_item(NAME(m_ack));
-	save_item(NAME(m_data));
-}
-
-void centronics_printer_device::device_reset()
-{
-}
-
-/*-------------------------------------------------
-    centronics_strobe_w - signal that data is
-    ready
--------------------------------------------------*/
-
-void centronics_printer_device::strobe_w(UINT8 state)
-{
-	/* look for a high -> low transition */
-	if (m_strobe == TRUE && state == FALSE && m_busy == FALSE)
-	{
-		/* STROBE has gone low, data is ready */
-		machine().scheduler().timer_set(attotime::zero, FUNC(timer_busy_callback), TRUE, this);
-	}
-
-	m_strobe = state;
-}
-
-
-/*-------------------------------------------------
-    centronics_prime_w - initialize and reset
-    printer (centronics mode)
--------------------------------------------------*/
-
-void centronics_printer_device::init_prime_w(UINT8 state)
-{
-	/* reset printer if line is low */
-	if (state == FALSE)
-		device_reset();
-}
-
-
-SLOT_INTERFACE_START(centronics_printer)
-	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
+SLOT_INTERFACE_START(centronics_printers)
+	SLOT_INTERFACE("image", CENTRONICS_PRINTER_IMAGE)
 SLOT_INTERFACE_END

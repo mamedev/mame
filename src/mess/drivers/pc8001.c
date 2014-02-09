@@ -51,7 +51,7 @@ WRITE8_MEMBER( pc8001_state::port10_w )
 	m_rtc->data_in_w(BIT(data, 3));
 
 	// centronics
-	m_centronics->write(space, 0, data);
+	m_cent_data_out->write(space, 0, data);
 }
 
 WRITE8_MEMBER( pc8001_state::port30_w )
@@ -99,6 +99,16 @@ WRITE8_MEMBER( pc8001mk2_state::port31_w )
 	*/
 }
 
+WRITE_LINE_MEMBER( pc8001_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER( pc8001_state::write_centronics_ack )
+{
+	m_centronics_ack = state;
+}
+
 READ8_MEMBER( pc8001_state::port40_r )
 {
 	/*
@@ -118,8 +128,8 @@ READ8_MEMBER( pc8001_state::port40_r )
 
 	UINT8 data = 0x08;
 
-	data |= m_centronics->busy_r();
-	data |= m_centronics->ack_r() << 1;
+	data |= m_centronics_busy;
+	data |= m_centronics_ack << 1;
 	data |= m_rtc->data_out_r() << 4;
 	data |= m_crtc->vrtc_r() << 5;
 
@@ -143,7 +153,7 @@ WRITE8_MEMBER( pc8001_state::port40_w )
 
 	*/
 
-	m_centronics->strobe_w(BIT(data, 0));
+	m_centronics->write_strobe(BIT(data, 0));
 
 	m_rtc->clk_w(BIT(data, 2));
 	m_rtc->stb_w(BIT(data, 1));
@@ -563,7 +573,12 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
 	MCFG_UPD3301_ADD(UPD3301_TAG, 14318180, pc8001_upd3301_intf)
 
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pc8001_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(pc8001_state, write_centronics_busy))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
 	MCFG_CASSETTE_ADD("cassette", pc8001_cassette_interface)
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -597,7 +612,10 @@ static MACHINE_CONFIG_START( pc8001mk2, pc8001mk2_state )
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
 	MCFG_UPD3301_ADD(UPD3301_TAG, 14318180, pc8001_upd3301_intf)
 
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
 	MCFG_CASSETTE_ADD("cassette", pc8001_cassette_interface)
 
 	MCFG_RAM_ADD(RAM_TAG)

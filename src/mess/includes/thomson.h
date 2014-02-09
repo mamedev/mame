@@ -104,6 +104,7 @@ public:
 		m_buzzer(*this, "buzzer"),
 		m_dac(*this, "dac"),
 		m_centronics(*this, "centronics"),
+		m_cent_data_out(*this, "cent_data_out"),
 		m_pia_sys(*this, THOM_PIA_SYS),
 		m_pia_io(*this, THOM_PIA_IO),
 		m_pia_game(*this, THOM_PIA_GAME),
@@ -308,12 +309,19 @@ public:
 	
 	optional_device<mc6854_device> m_mc6854;
 
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+
+	int m_centronics_busy;
+	int m_centronics_perror;
+
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<dac_device> m_buzzer;
 	required_device<dac_device> m_dac;
-	required_device<centronics_device> m_centronics;
+	optional_device<centronics_device> m_centronics;
+	optional_device<output_latch_device> m_cent_data_out;
 	required_device<pia6821_device> m_pia_sys;
 	optional_device<pia6821_device> m_pia_io;
 	required_device<pia6821_device> m_pia_game;
@@ -552,8 +560,6 @@ protected:
 
 /*----------- defined in machine/thomson.c -----------*/
 
-extern const centronics_interface to7_centronics_config;
-extern const centronics_interface mo6_centronics_config;
 extern const mc6846_interface to7_timer;
 extern const mea8000_interface to7_speech;
 extern const acia6850_interface to7_modem;

@@ -47,6 +47,7 @@ public:
 	m_sio(*this, "ic15"),
 	m_rs232(*this, "rs232"),
 	m_centronics(*this, "centronics"),
+	m_cent_data_out(*this, "cent_data_out"),
 	m_fdc(*this, "ic68"),
 	m_floppy0(*this, "ic68:0"),
 	m_floppy1(*this, "ic68:1"),
@@ -69,6 +70,7 @@ public:
 	required_device<z80sio0_device> m_sio;
 	required_device<rs232_port_device> m_rs232;
 	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	required_device<wd2793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -83,6 +85,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( timer_out2 );
 	void wd2793_intrq_w(bool state);
 	void wd2793_drq_w(bool state);
+
+	DECLARE_WRITE8_MEMBER( centronics_write );
+
 	DECLARE_WRITE_LINE_MEMBER( apricot_mc6845_de ) { m_display_enabled = state; };
 
 	DECLARE_WRITE_LINE_MEMBER( data_selector_dtr_w ) { m_data_selector_dtr = state; };
@@ -142,12 +147,23 @@ WRITE8_MEMBER( apricot_state::apricot_sysctrl_w )
 	// switch video modes
 	m_crtc->set_clock( m_video_mode ? XTAL_15MHz / 10 : XTAL_15MHz / 16);
 	m_crtc->set_hpixels_per_column( m_video_mode ? 10 : 16);
+
+	// PB7 Centronics transceiver direction. 0 = output, 1 = input
+}
+
+WRITE8_MEMBER( apricot_state::centronics_write )
+{
+	m_cent_data_out->write(space, 0, data);
+
+	/// HACK: This is impossible, strobe might be connected to one of i8255 Port C output bits (4/5/6/7)
+	m_centronics->write_strobe(0);
+	m_centronics->write_strobe(1);
 }
 
 static const i8255_interface apricot_i8255a_intf =
 {
-	DEVCB_DEVICE_MEMBER("centronics", centronics_device, read),
-	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
+	DEVCB_DEVICE_MEMBER("cent_data_in", input_buffer_device, read),
+	DEVCB_DRIVER_MEMBER(apricot_state, centronics_write),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(apricot_state, apricot_sysctrl_w),
 	DEVCB_DRIVER_MEMBER(apricot_state, apricot_sysctrl_r),
@@ -207,14 +223,6 @@ static Z80SIO_INTERFACE( apricot_z80sio_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-// note: fault output should be connected to syncb input of the sio
-static const centronics_interface apricot_centronics_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER("ic15", z80dart_device, ctsb_w),
-	DEVCB_DEVICE_LINE_MEMBER("ic15", z80dart_device, dcdb_w),
 	DEVCB_NULL
 };
 
@@ -413,7 +421,17 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ic15", z80dart_device, ctsa_w))
 
 	// centronics printer
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", apricot_centronics_intf)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("ic15", z80dart_device, ctsb_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("ic15", z80dart_device, dcdb_w))
+	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("ic15", z80dart_device, syncb_w))
+	// TODO: these might be connected to i8255 Port C input bits (0/1/2)
+	//MCFG_CENTRONICS_SELECT_HANDLER()
+	//MCFG_CENTRONICS_PERROR_HANDLER()
+
+	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// floppy
 	MCFG_WD2793x_ADD("ic68", XTAL_4MHz / 2)

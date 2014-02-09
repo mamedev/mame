@@ -222,25 +222,31 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 
 WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 {
+	/// TODO: create a sorcerer parallel slot with a 7 bit and 8 bit centronics adapter as two of the options
+	/// TODO: figure out what role FE plays http://www.trailingedge.com/exidy/exidych7.html
+	m_centronics->write_data0(BIT(data, 0));
+	m_centronics->write_data1(BIT(data, 1));
+	m_centronics->write_data2(BIT(data, 2));
+	m_centronics->write_data3(BIT(data, 3));
+	m_centronics->write_data4(BIT(data, 4));
+	m_centronics->write_data5(BIT(data, 5));
+	m_centronics->write_data6(BIT(data, 6));
+
 	/* reading the config switch */
-	switch (m_iop_config->read() & 0x06)
+	switch (m_iop_config->read() & 0x02)
 	{
-		case 0: /* speaker */
-			m_dac->write_unsigned8(data);
-			break;
+	case 0: /* 7-bit port */
+		/* bit 7 = strobe, bit 6..0 = data */
+		m_centronics->write_data7(0);
+		m_centronics->write_strobe(BIT(data, 7));
+		break;
 
-		case 2: /* Centronics 7-bit printer */
-			/* bit 7 = strobe, bit 6..0 = data */
-			m_centronics->strobe_w((~data>>7) & 0x01);
-			m_centronics->write(space, 0, data & 0x7f);
-			break;
-
-		case 4: /* 8-bit parallel output */
-			/* hardware strobe driven from port select, bit 7..0 = data */
-			m_centronics->strobe_w(1);
-			m_centronics->write(space, 0, data);
-			m_centronics->strobe_w(0);
-			break;
+	case 2: /* 8-bit port */
+		/* hardware strobe driven from port select, bit 7..0 = data */
+		m_centronics->write_data7(BIT(data, 7));
+		m_centronics->write_strobe(0);
+		m_centronics->write_strobe(1);
+		break;
 	}
 }
 
@@ -285,22 +291,6 @@ READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
 
 	/* bits 4..0 - keyboard data */
 	data |= ioport(kbdrow)->read();
-
-	return data;
-}
-
-READ8_MEMBER(sorcerer_state::sorcerer_ff_r)
-{
-	/* The use of the parallel port as a general purpose port is not emulated.
-	Currently the only use is to read the printer status in the Centronics CENDRV bios routine.
-	This uses bit 7. The other bits have been set high (=nothing plugged in).
-	This fixes those games that use a joystick. */
-
-	UINT8 data=0x7f;
-
-	/* bit 7 = printer busy   0 = printer is not busy */
-
-	data |= m_centronics->busy_r() << 7;
 
 	return data;
 }

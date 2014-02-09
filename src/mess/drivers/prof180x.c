@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( prof180x_io , AS_IO, 8, prof180x_state )
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(flr_w)
 	AM_RANGE(0x09, 0x09) AM_MASK(0xff00) AM_READ(status_r)
 	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xff00) AM_DEVREADWRITE(FDC9268_TAG, upd765a_device, mdma_r, mdma_w)
-	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xff00) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
+	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xff00) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x0c, 0x0d) AM_MIRROR(0xff00) AM_DEVICE(FDC9268_TAG, upd765a_device, map)
 ADDRESS_MAP_END
 
@@ -254,7 +254,9 @@ static MACHINE_CONFIG_START( prof180x, prof180x_state )
 	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":3", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
 
 	//MCFG_RTC8583_ADD(MK3835_TAG, rtc_intf)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

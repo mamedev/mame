@@ -10,6 +10,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #ifndef __AMIGA_H__
 #define __AMIGA_H__
 
+#include "bus/centronics/ctronics.h"
 #include "machine/6526cia.h"
 #include "machine/amigafdc.h"
 #include "cpu/m68000/m68000.h"
@@ -388,6 +389,7 @@ public:
 			m_maincpu(*this, "maincpu"), /* accelerator cards may present an interesting challenge because the maincpu will be the one on the card instead */
 			m_cia_0(*this, "cia_0"),
 			m_cia_1(*this, "cia_1"),
+			m_centronics(*this, "centronics"),
 			m_sound(*this, "amiga"),
 			m_fdc(*this, "fdc"),
 			m_chip_ram(*this, "chip_ram", 0),
@@ -406,6 +408,7 @@ public:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<legacy_mos6526_device> m_cia_0;
 	required_device<legacy_mos6526_device> m_cia_1;
+	optional_device<centronics_device> m_centronics;
 	required_device<amiga_sound_device> m_sound;
 	optional_device<amiga_fdc> m_fdc;
 	required_shared_ptr<UINT16> m_chip_ram;
@@ -487,7 +490,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(amiga_cia_0_irq);
 	DECLARE_WRITE_LINE_MEMBER(amiga_cia_1_irq);
 
-
+	DECLARE_READ8_MEMBER(amiga_cia_1_porta_r);
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 
 	DECLARE_READ16_MEMBER( amiga_custom_r );
 	DECLARE_WRITE16_MEMBER( amiga_custom_w );
@@ -502,6 +509,10 @@ public:
 	DECLARE_READ16_MEMBER( amiga_ar23_mode_r );
 	DECLARE_WRITE16_MEMBER( amiga_ar23_mode_w );
 	void amiga_ar23_init( running_machine &machine, int ar3 );
+
+	int m_centronics_busy;
+	int m_centronics_perror;
+	int m_centronics_select;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

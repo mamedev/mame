@@ -11,7 +11,6 @@
 
 #include "user.h"
 
-
 // class pet_user_port_device
 
 const device_type PET_USER_PORT = &device_creator<pet_user_port_device>;
@@ -35,7 +34,8 @@ pet_user_port_device::pet_user_port_device(const machine_config &mconfig, const 
 	m_j_handler(*this),
 	m_k_handler(*this),
 	m_l_handler(*this),
-	m_m_handler(*this)
+	m_m_handler(*this),
+	m_card(NULL)
 {
 }
 

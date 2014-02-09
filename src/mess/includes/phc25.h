@@ -36,6 +36,7 @@ public:
 		, m_cassette(*this, "cassette")
 	{ }
 
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_READ8_MEMBER( port40_r );
 	DECLARE_WRITE8_MEMBER( port40_w );
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
@@ -52,6 +53,7 @@ private:
 	required_device<mc6847_base_device> m_vdg;
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_cassette;
+	int m_centronics_busy;
 };
 
 #endif

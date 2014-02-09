@@ -103,20 +103,15 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 	}
 }
 
-WRITE8_MEMBER(mc1502_state::mc1502_ppi_porta_w)
-{
-	m_centronics->write(space, 0, data);
-}
-
 WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 {
 //  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
 	machine().device<pit8253_device>("pit8253")->gate2_w(BIT(data, 0));
 //  mc1502_speaker_set_spkrdata(BIT(data, 1));
-	m_centronics->strobe_w(BIT(data, 2));
-	m_centronics->autofeed_w(BIT(data, 3));
-	m_centronics->init_prime_w(BIT(data, 4));
+	m_centronics->write_strobe(BIT(data, 2));
+	m_centronics->write_autofd(BIT(data, 3));
+	m_centronics->write_init(BIT(data, 4));
 }
 
 // bit 0: parallel port data transfer direction (default = 0 = out)
@@ -126,18 +121,6 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_portc_w)
 {
 //  DBG_LOG(2,"mc1502_ppi_portc_w",("( %02X )\n", data));
 	m_ppi_portc = data & 15;
-}
-
-READ8_MEMBER(mc1502_state::mc1502_kppi_portc_r)
-{
-	UINT8 data = 0;
-
-	data |= m_centronics->fault_r() << 4;
-	data |= m_centronics->pe_r() << 5;
-	data |= m_centronics->ack_r() << 6;
-	data |= m_centronics->busy_r() << 7;
-
-	return data;
 }
 
 //  0x80 -- serial RxD
@@ -201,7 +184,7 @@ WRITE8_MEMBER(mc1502_state::mc1502_kppi_portc_w)
 I8255_INTERFACE( mc1502_ppi8255_interface_1 )
 {
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mc1502_state,mc1502_ppi_porta_w),
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(mc1502_state,mc1502_ppi_portb_w),
 	DEVCB_DRIVER_MEMBER(mc1502_state,mc1502_ppi_portc_r),
@@ -214,7 +197,7 @@ I8255_INTERFACE( mc1502_ppi8255_interface_2 )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(mc1502_state,mc1502_kppi_portb_w),
-	DEVCB_DRIVER_MEMBER(mc1502_state,mc1502_kppi_portc_r),
+	DEVCB_DEVICE_MEMBER("cent_status_in", input_buffer_device, read),
 	DEVCB_DRIVER_MEMBER(mc1502_state,mc1502_kppi_portc_w)
 };
 
@@ -375,7 +358,14 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_CENTRONICS_PRINTER_ADD( "centronics", standard_centronics )
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit6))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit4))
+	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit5))
+
+	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+
 	MCFG_CASSETTE_ADD( "cassette", mc1502_cassette_interface )
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mc1502_flop")

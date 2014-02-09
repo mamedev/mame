@@ -2659,7 +2659,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_I8214_ADD(I8214_TAG, MASTER_CLOCK, pic_intf)
 	#endif
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
-	//MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	//MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CASSETTE_ADD("cassette", pc8801_cassette_interface)
 	MCFG_SOFTWARE_LIST_ADD("tape_list","pc8801_cass")
 

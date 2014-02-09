@@ -15,6 +15,7 @@
 #include "machine/er59256.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
+#include "bus/centronics/ctronics.h"
 
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG   "iocpu"
@@ -397,7 +398,8 @@ public:
 		m_scsibus(*this, SCSIBUS_TAG ":host"),
 		m_ram(*this, RAM_TAG),
 		m_eeprom(*this, ER59256_TAG),
-		m_via(*this, VIA_TAG)
+		m_via(*this, VIA_TAG),
+		m_centronics(*this, CENTRONICS_TAG)
 	{
 	}
 
@@ -408,6 +410,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<er59256_device> m_eeprom;
 	required_device<via6522_device> m_via;
+	required_device<centronics_device> m_centronics;
 
 	UINT32 m_debug_machine;
 //  i186_state m_i186;

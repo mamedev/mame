@@ -209,11 +209,6 @@ Since pc200 is anyway NOT_WORKING, I comment out this one */
 
 INPUT_PORTS_END
 
-static const pc_lpt_interface pc_lpt_config =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0)
-};
-
 static const floppy_format_type ibmpc_floppy_formats[] = {
 	FLOPPY_PC_FORMAT,
 	FLOPPY_MFI_FORMAT,
@@ -311,9 +306,14 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
@@ -408,9 +408,14 @@ static MACHINE_CONFIG_START( ppc512, amstrad_pc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 

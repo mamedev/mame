@@ -187,6 +187,8 @@ EMUDRIVEROBJS = \
 	$(EMUDRIVERS)/testcpu.o \
 
 EMUMACHINEOBJS = \
+	$(EMUMACHINE)/buffer.o      \
+	$(EMUMACHINE)/latch.o       \
 	$(EMUMACHINE)/generic.o     \
 	$(EMUMACHINE)/ram.o         \
 	$(EMUMACHINE)/nvram.o       \

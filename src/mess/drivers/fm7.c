@@ -48,7 +48,7 @@
 #include "formats/fm7_cas.h"
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
-#include "bus/centronics/ctronics.h"
+#include "bus/centronics/dsjoy.h"
 
 #include "includes/fm7.h"
 
@@ -743,6 +743,26 @@ WRITE8_MEMBER(fm7_state::fm77av_key_encoder_w)
 	}
 }
 
+WRITE_LINE_MEMBER(fm7_state::write_centronics_busy)
+{
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER(fm7_state::write_centronics_fault)
+{
+	m_centronics_fault = state;
+}
+
+WRITE_LINE_MEMBER(fm7_state::write_centronics_ack)
+{
+	m_centronics_ack = state;
+}
+
+WRITE_LINE_MEMBER(fm7_state::write_centronics_perror)
+{
+	m_centronics_perror = state;
+}
+
 READ8_MEMBER(fm7_state::fm7_cassette_printer_r)
 {
 	// bit 7: cassette input
@@ -752,54 +772,25 @@ READ8_MEMBER(fm7_state::fm7_cassette_printer_r)
 	// bit 2: printer acknowledge
 	// bit 1: printer error
 	// bit 0: printer busy
-	UINT8 ret = 0x00;
-	double data = m_cassette->input();
-	centronics_device* centronics = machine().device<centronics_device>("lpt");
-	UINT8 pdata;
-	int x;
+	UINT8 ret = 0;
 
-	if(data > 0.03)
+	if(m_cassette->input() > 0.03)
 		ret |= 0x80;
 
 	if(m_cassette->get_state() & CASSETTE_MOTOR_DISABLED)
 		ret |= 0x80;  // cassette input is high when not in use.
 
 	ret |= 0x70;
+	ret |= m_centronics_perror << 3;
+	ret |= m_centronics_ack << 2;
+	ret |= m_centronics_fault << 1;
+	ret |= m_centronics_busy;
 
-	if(ioport("config")->read() & 0x01)
-	{
-		ret |= 0x0f;
-		pdata = centronics->read(space, 0);
-		for(x=0;x<6;x++)
-		{
-			if(~pdata & (1<<x))
-				if(ioport("lptjoy")->read() & (1 << x))
-					ret &= ~0x08;
-		}
-	}
-	else
-	{
-		device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("lpt:printer:printer"));
-		if(image->exists())
-		{
-			if(centronics->pe_r())
-				ret |= 0x08;
-			if(centronics->ack_r())
-				ret |= 0x04;
-			if(centronics->fault_r())
-				ret |= 0x02;
-			if(centronics->busy_r())
-				ret |= 0x01;
-		}
-		else
-			ret |= 0x0f;
-	}
 	return ret;
 }
 
 WRITE8_MEMBER(fm7_state::fm7_cassette_printer_w)
 {
-	centronics_device* centronics = machine().device<centronics_device>("lpt");
 	switch(offset)
 	{
 		case 0:
@@ -811,12 +802,14 @@ WRITE8_MEMBER(fm7_state::fm7_cassette_printer_w)
 				m_cassette->output((data & 0x01) ? +1.0 : -1.0);
 			if((data & 0x02) != (m_cp_prev & 0x02))
 				m_cassette->change_state((data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-			centronics->strobe_w(!(data & 0x40));
+
+			m_centronics->write_strobe(!BIT(data,6));
+			m_centronics->write_select_in(!BIT(data,7));
 			m_cp_prev = data;
 			break;
 		case 1:
 		// Printer data
-			centronics->write(space,0,data);
+			m_cent_data_out->write(space, 0, data);
 			break;
 	}
 }
@@ -1777,14 +1770,6 @@ INPUT_PORTS_START( fm7_keyboard )
 	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Kana") PORT_CODE(KEYCODE_RCONTROL) PORT_TOGGLE
 
-	PORT_START("lptjoy")
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_JOYSTICK_RIGHT) PORT_NAME("LPT Joystick Right") PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_JOYSTICK_LEFT) PORT_NAME("LPT Joystick Left") PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_JOYSTICK_UP) PORT_NAME("LPT Joystick Up") PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN) PORT_NAME("LPT Joystick Down") PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_BUTTON2) PORT_NAME("LPT Joystick Button 2") PORT_PLAYER(1)
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_BUTTON1) PORT_NAME("LPT Joystick Button 1") PORT_PLAYER(1)
-
 	PORT_START("joy1")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_JOYSTICK_UP) PORT_NAME("1P Joystick Up") PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_JOYSTICK_DOWN) PORT_NAME("1P Joystick Down") PORT_8WAY PORT_PLAYER(1)
@@ -1822,11 +1807,6 @@ static INPUT_PORTS_START( fm7 )
 	PORT_DIPNAME(0x08,0x00,"FM-8 Compatibility mode") PORT_DIPLOCATION("SWA:4")
 	PORT_DIPSETTING(0x00,DEF_STR( Off ))
 	PORT_DIPSETTING(0x08,DEF_STR( On ))
-
-	PORT_START("config")
-	PORT_CONFNAME(0x01,0x00,"Printer port device")
-	PORT_CONFSETTING(0x00,"Printer")
-	PORT_CONFSETTING(0x01,"Dempa Shinbunsha Joystick")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fm8 )
@@ -1836,11 +1816,6 @@ static INPUT_PORTS_START( fm8 )
 	PORT_DIPNAME(0x02,0x02,"Boot mode") PORT_DIPLOCATION("SWA:2")
 	PORT_DIPSETTING(0x00,"DOS")
 	PORT_DIPSETTING(0x02,"BASIC")
-
-	PORT_START("config")
-	PORT_CONFNAME(0x01,0x00,"Printer port device")
-	PORT_CONFSETTING(0x00,"Printer")
-	PORT_CONFSETTING(0x01,"Dempa Shinbunsha Joystick")
 INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(fm7_state,fm7)
@@ -2081,7 +2056,14 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_PRINTER_ADD("lpt",standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_SLOT_OPTION_ADD( "dsjoy", DEMPA_SHINBUNSHA_JOYSTICK )
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 
@@ -2123,7 +2105,13 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_PRINTER_ADD("lpt",standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 
@@ -2166,7 +2154,13 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_PRINTER_ADD("lpt",standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 
@@ -2213,7 +2207,13 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_PRINTER_ADD("lpt",standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 
@@ -2254,7 +2254,13 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
-	MCFG_CENTRONICS_PRINTER_ADD("lpt",standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(fm7_floppy_interface)
 

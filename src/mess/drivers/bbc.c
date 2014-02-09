@@ -587,19 +587,6 @@ static const cassette_interface bbc_cassette_interface =
 };
 
 
-WRITE_LINE_MEMBER(bbc_state::bbcb_ack_w)
-{
-	via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
-	via_1->write_ca1(!state); /* ack seems to be inverted? */
-}
-
-static const centronics_interface bbcb_centronics_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbcb_ack_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 WRITE_LINE_MEMBER(bbc_state::bbcb_acia6850_irq_w)
 {
 	m_acia_irq = state;
@@ -789,16 +776,19 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	/* user via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("centronics", centronics_device, write))
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, strobe_w))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
 	/* adc */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", bbcb_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_ca1)) MCFG_DEVCB_INVERT /* ack seems to be inverted? */
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* fdc */
 	MCFG_I8271_ADD("i8271", bbc_i8271_interface)
@@ -842,16 +832,17 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbca )
 	/* system via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("centronics", centronics_device, write))
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, strobe_w))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
 	/* adc */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", bbcb_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_ca1)) MCFG_DEVCB_INVERT /* ack seems to be inverted? */
 
 	/* fdc */
 	MCFG_I8271_ADD("i8271", bbc_i8271_interface)
@@ -947,7 +938,8 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", bbcb_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_ca1)) MCFG_DEVCB_INVERT /* ack seems to be inverted? */
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", bbc_cassette_interface )
@@ -987,9 +979,9 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	/* user via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("centronics", centronics_device, write))
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, strobe_w))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
 	/* fdc */

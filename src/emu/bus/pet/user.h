@@ -32,11 +32,6 @@
 #include "emu.h"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
 #define MCFG_PET_USER_PORT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, PET_USER_PORT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
@@ -93,11 +88,7 @@
 	devcb = &pet_user_port_device::set_m_handler(*device, DEVCB2_##_devcb);
 
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> pet_user_port_device
+extern const device_type PET_USER_PORT;
 
 class device_pet_user_port_interface;
 
@@ -107,7 +98,6 @@ class pet_user_port_device : public device_t,
 	friend class device_pet_user_port_interface;
 
 public:
-	// construction/destruction
 	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb2_base &set_3_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_3_handler.set_callback(object); }
@@ -128,7 +118,6 @@ public:
 	template<class _Object> static devcb2_base &set_l_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_l_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_m_handler(device_t &device, _Object object) { return downcast<pet_user_port_device &>(device).m_m_handler.set_callback(object); }
 
-	// computer interface
 	DECLARE_WRITE_LINE_MEMBER( write_3 );
 	DECLARE_WRITE_LINE_MEMBER( write_4 );
 	DECLARE_WRITE_LINE_MEMBER( write_5 );
@@ -149,10 +138,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
 	virtual void device_config_complete();
+	virtual void device_start();
 
-	// device interface
 	devcb2_write_line m_3_handler;
 	devcb2_write_line m_4_handler;
 	devcb2_write_line m_5_handler;
@@ -171,13 +159,11 @@ protected:
 	devcb2_write_line m_l_handler;
 	devcb2_write_line m_m_handler;
 
+private:
 	device_pet_user_port_interface *m_card;
 };
 
 
-// ======================> device_pet_user_port_interface
-
-// class representing interface-specific pet_expansion card
 class device_pet_user_port_interface : public device_slot_card_interface
 {
 	friend class pet_user_port_device;
@@ -227,11 +213,6 @@ protected:
 };
 
 
-// device type definition
-extern const device_type PET_USER_PORT;
-
-
-// slot devices
 SLOT_INTERFACE_EXTERN( pet_user_port_cards );
 
 #endif

@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( bw2_io, AS_IO, 8, bw2_state )
 	AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE(BW2_EXPANSION_SLOT_TAG, bw2_expansion_slot_device, slot_r, slot_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
+	AM_RANGE(0x50, 0x50) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(WD2797_TAG, wd2797_t, read, write)
 	AM_RANGE(0x70, 0x7f) AM_DEVREADWRITE(BW2_EXPANSION_SLOT_TAG, bw2_expansion_slot_device, modsel_r, modsel_w)
 ADDRESS_MAP_END
@@ -386,6 +386,11 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
+WRITE_LINE_MEMBER( bw2_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
 //-------------------------------------------------
 //  I8255A_INTERFACE( ppi_intf )
 //-------------------------------------------------
@@ -417,7 +422,7 @@ WRITE8_MEMBER( bw2_state::ppi_pa_w )
 	if (m_floppy) m_floppy->mon_w(m_mtron);
 
 	// centronics strobe
-	m_centronics->strobe_w(BIT(data, 7));
+	m_centronics->write_strobe(BIT(data, 7));
 }
 
 READ8_MEMBER( bw2_state::ppi_pb_r )
@@ -482,7 +487,7 @@ READ8_MEMBER( bw2_state::ppi_pc_r )
 	UINT8 data = 0;
 
 	// centronics busy
-	data |= m_centronics->busy_r() << 4;
+	data |= m_centronics_busy << 4;
 
 	// floppy motor
 	data |= m_mfdbk << 5;
@@ -621,6 +626,7 @@ void bw2_state::machine_start()
 	save_item(NAME(m_bank));
 	save_item(NAME(m_mtron));
 	save_item(NAME(m_mfdbk));
+	save_item(NAME(m_centronics_busy));
 }
 
 
@@ -652,7 +658,12 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, 0, SCREEN_TAG, lcdc_map)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(bw2_state, write_centronics_busy))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
 	MCFG_I8251_ADD(I8251_TAG, usart_intf)
 	MCFG_WD2797x_ADD(WD2797_TAG, XTAL_16MHz/16)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats)

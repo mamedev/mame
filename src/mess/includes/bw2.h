@@ -112,6 +112,9 @@ public:
 	// video state
 	optional_shared_ptr<UINT8> m_video_ram;
 	virtual void palette_init();
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	int m_centronics_busy;
 };
 
 #endif

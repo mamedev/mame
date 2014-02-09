@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "exp.h"
+#include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 
 
@@ -27,7 +28,7 @@
 // ======================> comx_prn_device
 
 class comx_prn_device : public device_t,
-						public device_comx_expansion_card_interface
+	public device_comx_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -49,6 +50,8 @@ protected:
 
 private:
 	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
+	required_device<input_buffer_device> m_cent_status_in;
 	required_memory_region m_rom;
 };
 

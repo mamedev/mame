@@ -213,6 +213,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(frc_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(upd7508_1sec_callback);
 
+	int m_centronics_busy;
+	int m_centronics_perror;
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+
 private:
 	DECLARE_WRITE_LINE_MEMBER( serial_rx_w );
 };
@@ -872,14 +877,24 @@ WRITE8_MEMBER( px4_state::px4_artmr_w )
 	set_data_frame(1, data_bit_count, parity, stop_bits);
 }
 
+WRITE_LINE_MEMBER( px4_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER( px4_state::write_centronics_perror )
+{
+	m_centronics_perror = state;
+}
+
 // io status register
 READ8_MEMBER( px4_state::px4_iostr_r )
 {
 	UINT8 data = 0;
 
 	// centronics status
-	data |= m_centronics->busy_r() << 0;
-	data |= !m_centronics->pe_r() << 1;
+	data |= m_centronics_busy << 0;
+	data |= m_centronics_perror << 1;
 
 	// sio status
 	data |= !m_sio_pin << 2;
@@ -937,8 +952,8 @@ WRITE8_MEMBER( px4_state::px4_ioctlr_w )
 	if (VERBOSE)
 		logerror("%s: px4_ioctlr_w (0x%02x)\n", machine().describe_context(), data);
 
-	m_centronics->strobe_w(!BIT(data, 0));
-	m_centronics->init_prime_w(BIT(data, 1));
+	m_centronics->write_strobe(!BIT(data, 0));
+	m_centronics->write_init(BIT(data, 1));
 
 	m_sio->pout_w(BIT(data, 2));
 
@@ -1168,7 +1183,7 @@ static ADDRESS_MAP_START( px4_io, AS_IO, 8, px4_state )
 	AM_RANGE(0x14, 0x14) AM_READWRITE(px4_artdir_r, px4_artdor_w)
 	AM_RANGE(0x15, 0x15) AM_READWRITE(px4_artsr_r, px4_artmr_w)
 	AM_RANGE(0x16, 0x16) AM_READWRITE(px4_iostr_r, px4_artcr_w)
-	AM_RANGE(0x17, 0x17) AM_DEVWRITE("centronics", centronics_device, write)
+	AM_RANGE(0x17, 0x17) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x18, 0x18) AM_WRITE(px4_swr_w)
 	AM_RANGE(0x19, 0x19) AM_WRITE(px4_ioctlr_w)
 	AM_RANGE(0x1a, 0x1f) AM_NOP
@@ -1397,7 +1412,11 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_RAM_DEFAULT_SIZE("64k")
 
 	// centronics printer
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(px4_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(px4_state, write_centronics_perror))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// external cassette
 	MCFG_CASSETTE_ADD("extcas", px4_cassette_interface)

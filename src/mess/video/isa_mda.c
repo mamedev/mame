@@ -90,15 +90,10 @@ static MC6845_INTERFACE( mc6845_mda_intf )
 	NULL
 };
 
-static WRITE_LINE_DEVICE_HANDLER(pc_cpu_line)
+WRITE_LINE_MEMBER(isa8_mda_device::pc_cpu_line)
 {
-	isa8_mda_device *mda  = downcast<isa8_mda_device *>(device->owner());
-	mda->m_isa->irq7_w(state);
+	m_isa->irq7_w(state);
 }
-static const pc_lpt_interface pc_lpt_config =
-{
-	DEVCB_LINE(pc_cpu_line)
-};
 
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_mda )
@@ -112,7 +107,8 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_mda )
 
 	//MCFG_GFXDECODE(pcmda)
 
-	MCFG_PC_LPT_ADD("lpt", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_mda_device, pc_cpu_line))
 MACHINE_CONFIG_END
 
 ROM_START( mda )
@@ -526,7 +522,8 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_hercules )
 
 	//MCFG_GFXDECODE(pcherc)
 
-	MCFG_PC_LPT_ADD("lpt", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_mda_device, pc_cpu_line))
 MACHINE_CONFIG_END
 
 ROM_START( hercules )

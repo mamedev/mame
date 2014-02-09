@@ -755,7 +755,11 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_12MHz / 8, mbee_crtc)
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com", 2)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 MACHINE_CONFIG_END
 
@@ -796,7 +800,11 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8, mbeeic_crtc)
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com", 2)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 MACHINE_CONFIG_END
 

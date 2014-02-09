@@ -31,13 +31,15 @@ class isbc_state : public driver_device
 public:
 	isbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_uart8251(*this, "uart8251"),
-	m_uart8274(*this, "uart8274"),
-	m_pic_0(*this, "pic_0"),
-	m_pic_1(*this, "pic_1"),
-	m_centronics(*this, "centronics")
-	{ }
+		m_maincpu(*this, "maincpu"),
+		m_uart8251(*this, "uart8251"),
+		m_uart8274(*this, "uart8274"),
+		m_pic_0(*this, "pic_0"),
+		m_pic_1(*this, "pic_1"),
+		m_centronics(*this, "centronics"),
+		m_cent_status_in(*this, "cent_status_in")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8251_device> m_uart8251;
@@ -45,13 +47,14 @@ public:
 	required_device<pic8259_device> m_pic_0;
 	optional_device<pic8259_device> m_pic_1;
 	optional_device<centronics_device> m_centronics;
+	optional_device<input_buffer_device> m_cent_status_in;
 
-	DECLARE_WRITE_LINE_MEMBER(lpt_ack);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
 	DECLARE_WRITE_LINE_MEMBER(isbc286_tmr2_w);
 	DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_READ8_MEMBER(ppi_b_r);
 	DECLARE_WRITE8_MEMBER(ppi_c_w);
 	IRQ_CALLBACK_MEMBER( irq_callback ) { return m_pic_0->inta_r(); }
 	void driver_start() { m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(isbc_state::irq_callback),this)); }
@@ -222,28 +225,27 @@ WRITE_LINE_MEMBER( isbc_state::isbc286_tmr2_w )
 	m_uart8274->txca_w(state);
 }
 
+WRITE_LINE_MEMBER( isbc_state::write_centronics_ack )
+{
+	m_cent_status_in->write_bit4(state);
+
+	if(state)
+		m_pic_1->ir7_w(1);
+}
+
 static const i8255_interface isbc286_ppi_interface =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
-	DEVCB_DRIVER_MEMBER(isbc_state, ppi_b_r),
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
+	DEVCB_DEVICE_MEMBER("cent_status_in", input_buffer_device, read),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(isbc_state, ppi_c_w),
 };
 
-READ8_MEMBER( isbc_state::ppi_b_r )
-{
-	UINT8 data = 0;
-	data |= m_centronics->ack_r() ? 0x10 : 0;
-	data |= m_centronics->fault_r() ? 0x40 : 0;
-	data |= m_centronics->busy_r() ? 0x80 : 0;
-	return data;
-}
-
 WRITE8_MEMBER( isbc_state::ppi_c_w )
 {
-	m_centronics->strobe_w(data & 1);
+	m_centronics->write_strobe(data & 1);
 
 	if(data & 0x80)
 		m_pic_1->ir7_w(0);
@@ -276,19 +278,6 @@ WRITE_LINE_MEMBER(isbc_state::isbc_uart8274_irq)
 {
 	m_uart8274->m1_r(); // always set
 	m_pic_0->ir6_w(state);
-}
-
-static const centronics_interface isbc286_centronics =
-{
-	DEVCB_DRIVER_LINE_MEMBER(isbc_state, lpt_ack),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-WRITE_LINE_MEMBER( isbc_state::lpt_ack )
-{
-	if(state)
-		m_pic_1->ir7_w(1);
 }
 
 static MACHINE_CONFIG_START( isbc86, isbc_state )
@@ -330,7 +319,16 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_PIC8259_ADD("pic_1", DEVWRITELINE("pic_0", pic8259_device, ir7_w), GND, NULL)
 	MCFG_PIT8254_ADD("pit", isbc286_pit_config)
 	MCFG_I8255A_ADD("ppi", isbc286_ppi_interface)
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", isbc286_centronics)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(isbc_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit6))
+
+	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	MCFG_I8274_ADD("uart8274", XTAL_16MHz/4, isbc286_uart8274_interface)
 
 	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, NULL)

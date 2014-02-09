@@ -142,6 +142,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
+	int m_centronics_busy;
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 

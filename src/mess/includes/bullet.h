@@ -35,28 +35,29 @@ class bullet_state : public driver_device
 public:
 	bullet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_ctc(*this, Z80CTC_TAG),
-			m_dart(*this, Z80DART_TAG),
-			m_dmac(*this, Z80DMA_TAG),
-			m_fdc(*this, MB8877_TAG),
-			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, MB8877_TAG":0"),
-			m_floppy1(*this, MB8877_TAG":1"),
-			m_floppy2(*this, MB8877_TAG":2"),
-			m_floppy3(*this, MB8877_TAG":3"),
-			m_floppy4(*this, MB8877_TAG":4"),
-			m_floppy5(*this, MB8877_TAG":5"),
-			m_floppy6(*this, MB8877_TAG":6"),
-			m_floppy7(*this, MB8877_TAG":7"),
-			m_floppy(NULL),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_rom(*this, Z80_TAG),
-			m_sw1(*this, "SW1"),
-			m_fdrdy(0),
-			m_exdsk_sw(false),
-			m_hdcon_sw(false)
-	{ }
+		m_maincpu(*this, Z80_TAG),
+		m_ctc(*this, Z80CTC_TAG),
+		m_dart(*this, Z80DART_TAG),
+		m_dmac(*this, Z80DMA_TAG),
+		m_fdc(*this, MB8877_TAG),
+		m_ram(*this, RAM_TAG),
+		m_floppy0(*this, MB8877_TAG":0"),
+		m_floppy1(*this, MB8877_TAG":1"),
+		m_floppy2(*this, MB8877_TAG":2"),
+		m_floppy3(*this, MB8877_TAG":3"),
+		m_floppy4(*this, MB8877_TAG":4"),
+		m_floppy5(*this, MB8877_TAG":5"),
+		m_floppy6(*this, MB8877_TAG":6"),
+		m_floppy7(*this, MB8877_TAG":7"),
+		m_floppy(NULL),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_rom(*this, Z80_TAG),
+		m_sw1(*this, "SW1"),
+		m_fdrdy(0),
+		m_exdsk_sw(false),
+		m_hdcon_sw(false)
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -97,6 +98,10 @@ public:
 	DECLARE_READ8_MEMBER( pio_pb_r );
 	DECLARE_WRITE_LINE_MEMBER( dartardy_w );
 	DECLARE_WRITE_LINE_MEMBER( dartbrdy_w );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
@@ -119,6 +124,11 @@ public:
 	int m_exrdy2;
 	bool m_exdsk_sw;
 	bool m_hdcon_sw;
+
+	int m_centronics_busy;
+	int m_centronics_perror;
+	int m_centronics_select;
+	int m_centronics_fault;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(dart_rxtxca_w);

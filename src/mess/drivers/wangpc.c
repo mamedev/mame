@@ -420,7 +420,7 @@ READ8_MEMBER( wangpc_state::centronics_r )
 	m_dav = 1;
 	check_level1_interrupts();
 
-	return m_centronics->read(space, 0);
+	return m_cent_data_in->read();
 }
 
 
@@ -430,13 +430,13 @@ READ8_MEMBER( wangpc_state::centronics_r )
 
 WRITE8_MEMBER( wangpc_state::centronics_w )
 {
-	m_acknlg = 1;
+	m_centronics_ack = 1;
 	check_level1_interrupts();
 
-	m_centronics->write(space, 0, data);
+	m_cent_data_out->write(data);
 
-	m_centronics->strobe_w(0);
-	m_centronics->strobe_w(1);
+	m_centronics->write_strobe(0);
+	m_centronics->write_strobe(1);
 }
 
 
@@ -448,7 +448,7 @@ READ8_MEMBER( wangpc_state::busy_clr_r )
 {
 	if (LOG) logerror("%s: BUSY clear\n", machine().describe_context());
 
-	m_busy = 1;
+	m_centronics_busy = 1;
 	check_level1_interrupts();
 
 	return 0xff;
@@ -463,7 +463,7 @@ WRITE8_MEMBER( wangpc_state::acknlg_clr_w )
 {
 	if (LOG) logerror("%s: ACKNLG clear\n", machine().describe_context());
 
-	m_acknlg = 1;
+	m_centronics_ack = 1;
 	check_level1_interrupts();
 }
 
@@ -733,7 +733,7 @@ static AM9517A_INTERFACE( dmac_intf )
 
 void wangpc_state::check_level1_interrupts()
 {
-	int state = !m_timer2_irq || m_epci->rxrdy_r() || m_epci->txemt_r() || !m_acknlg || !m_dav || !m_busy;
+	int state = !m_timer2_irq || m_epci->rxrdy_r() || m_epci->txemt_r() || !m_centronics_ack || !m_dav || !m_centronics_busy;
 
 	m_pic->ir1_w(state);
 }
@@ -775,10 +775,10 @@ READ8_MEMBER( wangpc_state::ppi_pa_r )
 	UINT8 data = 0x08 | 0x02 | 0x01;
 
 	data |= m_dav << 2;
-	data |= m_centronics->busy_r() << 4;
-	data |= m_centronics->fault_r() << 5;
-	data |= m_centronics->pe_r() << 6;
-	data |= m_acknlg << 7;
+	data |= m_centronics_busy << 4;
+	data |= m_centronics_fault << 5;
+	data |= m_centronics_perror << 6;
+	data |= m_centronics_ack << 7;
 
 	return data;
 }
@@ -809,7 +809,7 @@ READ8_MEMBER( wangpc_state::ppi_pb_r )
 	data |= !(m_epci->rxrdy_r() | m_epci->txemt_r()) << 1;
 
 	// parallel port interrupt
-	data |= m_acknlg << 2;
+	data |= m_centronics_ack << 2;
 
 	// DMA interrupt
 	data |= m_dma_eop << 3;
@@ -864,8 +864,9 @@ WRITE8_MEMBER( wangpc_state::ppi_pc_w )
 
 	*/
 
-	m_centronics->autofeed_w(BIT(data, 0));
-	m_centronics->init_prime_w(BIT(data, 2));
+	m_centronics->write_autofd(BIT(data, 0));
+	m_centronics->write_select_in(BIT(data, 1));
+	m_centronics->write_init(BIT(data, 2));
 }
 
 static I8255A_INTERFACE( ppi_intf )
@@ -1013,31 +1014,33 @@ void wangpc_state::update_fdc_drq()
 //  centronics_interface centronics_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wangpc_state::ack_w )
+WRITE_LINE_MEMBER( wangpc_state::write_centronics_ack )
 {
 	if (LOG) logerror("ACKNLG %u\n", state);
 
-	m_acknlg = state;
+	m_centronics_ack = state;
 
 	check_level1_interrupts();
 }
 
-WRITE_LINE_MEMBER( wangpc_state::busy_w )
+WRITE_LINE_MEMBER( wangpc_state::write_centronics_busy )
 {
 	if (LOG) logerror("BUSY %u\n", state);
 
-	m_busy = state;
+	m_centronics_busy = state;
 
 	check_level1_interrupts();
 }
 
-static const centronics_interface centronics_intf =
+WRITE_LINE_MEMBER( wangpc_state::write_centronics_fault )
 {
-	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, ack_w),
-	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, busy_w),
-	DEVCB_NULL
-};
+	m_centronics_fault = state;
+}
 
+WRITE_LINE_MEMBER( wangpc_state::write_centronics_perror )
+{
+	m_centronics_perror = state;
+}
 
 //-------------------------------------------------
 //  WANGPC_BUS_INTERFACE( kb_intf )
@@ -1097,9 +1100,11 @@ void wangpc_state::machine_start()
 	save_item(NAME(m_dma_page));
 	save_item(NAME(m_dack));
 	save_item(NAME(m_timer2_irq));
-	save_item(NAME(m_acknlg));
+	save_item(NAME(m_centronics_ack));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_fault));
+	save_item(NAME(m_centronics_perror));
 	save_item(NAME(m_dav));
-	save_item(NAME(m_busy));
 	save_item(NAME(m_dma_eop));
 	save_item(NAME(m_uart_dr));
 	save_item(NAME(m_uart_tbre));
@@ -1189,7 +1194,16 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(wangpc_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(wangpc_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(wangpc_state, write_centronics_fault))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(wangpc_state, write_centronics_perror))
+
+	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(SCN2661_TAG,mc2661_device,rx_w))

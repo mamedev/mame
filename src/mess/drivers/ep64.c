@@ -211,7 +211,7 @@ WRITE8_MEMBER( ep64_state::wr0_w )
 	m_key = data & 0x0f;
 
 	// printer
-	m_centronics->strobe_w(!BIT(data, 4));
+	m_centronics->write_strobe(!BIT(data, 4));
 
 	// cassette
 	m_cassette1->output(BIT(data, 5) ? -1.0 : +1.0);
@@ -222,6 +222,10 @@ WRITE8_MEMBER( ep64_state::wr0_w )
 	m_cassette2->change_state(BIT(data, 7) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
+WRITE_LINE_MEMBER( ep64_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
 
 //-------------------------------------------------
 //  rd1_r -
@@ -247,7 +251,7 @@ READ8_MEMBER( ep64_state::rd1_r )
 	UINT8 data = 0;
 
 	// printer
-	data |= m_centronics->not_busy_r() << 3;
+	data |= m_centronics_busy << 3;
 
 	// serial
 	data |= m_rs232->rx() << 4;
@@ -339,7 +343,7 @@ static ADDRESS_MAP_START( dave_io, AS_IO, 8, ep64_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x8f) AM_DEVICE(NICK_TAG, nick_device, vio_map)
 	AM_RANGE(0xb5, 0xb5) AM_READWRITE(rd0_r, wr0_w)
-	AM_RANGE(0xb6, 0xb6) AM_READ(rd1_r) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
+	AM_RANGE(0xb6, 0xb6) AM_READ(rd1_r) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0xb7, 0xb7) AM_WRITE(wr2_w)
 ADDRESS_MAP_END
 
@@ -489,6 +493,7 @@ void ep64_state::machine_start()
 {
 	// state saving
 	save_item(NAME(m_key));
+	save_item(NAME(m_centronics_busy));
 }
 
 
@@ -499,7 +504,7 @@ void ep64_state::machine_reset()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	wr0_w(program, 0, 0);
-	m_centronics->write(0);
+	machine().device<output_latch_device>("cent_data_out")->write(program, 0, 0);
 	wr2_w(program, 0, 0);
 }
 
@@ -528,7 +533,11 @@ static MACHINE_CONFIG_START( ep64, ep64_state )
 	// devices
 	MCFG_EP64_EXPANSION_BUS_SLOT_ADD(EP64_EXPANSION_BUS_TAG, DAVE_TAG, NULL)
 	MCFG_EP64_EXPANSION_BUS_CALLBACKS(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0), INPUTLINE(Z80_TAG, INPUT_LINE_NMI), INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT))
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(ep64_state, write_centronics_busy))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(DAVE_TAG, dave_device, int2_w))

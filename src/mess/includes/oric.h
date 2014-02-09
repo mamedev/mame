@@ -13,6 +13,7 @@
 #include "sound/wave.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
+#include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/wd17xx.h"
 //#include <stdio.h>
@@ -75,6 +76,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ay8912(*this, "ay8912"),
 		m_centronics(*this, "centronics"),
+		m_cent_data_out(*this, "cent_data_out"),
 		m_cassette(*this, "cassette"),
 		m_via6522_0(*this, "via6522_0"),
 		m_region_maincpu(*this, "maincpu"),
@@ -154,6 +156,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8910_device> m_ay8912;
 	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	required_device<cassette_image_device> m_cassette;
 	required_device<via6522_device> m_via6522_0;
 	required_memory_region m_region_maincpu;

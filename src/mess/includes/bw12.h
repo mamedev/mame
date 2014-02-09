@@ -111,6 +111,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
 	DECLARE_FLOPPY_FORMATS( bw12_floppy_formats );
 	DECLARE_FLOPPY_FORMATS( bw14_floppy_formats );
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	int m_centronics_busy;
+	int m_centronics_fault;
+	int m_centronics_perror;
 };
 
 #endif

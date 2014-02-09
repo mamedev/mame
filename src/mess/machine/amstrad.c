@@ -2046,7 +2046,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 			/* printer port bit 8 */
 			if (m_printer_bit8_selected && m_system_type == SYSTEM_PLUS)
 			{
-				m_centronics->d7_w(BIT(data, 3));
+				m_centronics->write_data7(BIT(data, 3));
 				m_printer_bit8_selected = FALSE;
 			}
 
@@ -2073,8 +2073,14 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 		if ((offset & (1<<12)) == 0)
 		{
 			/* CPC has a 7-bit data port, bit 8 is the STROBE signal */
-			m_centronics->write(space, 0, data & 0x7f);
-			m_centronics->strobe_w(BIT(data, 7));
+			m_centronics->write_data0(BIT(data, 0));
+			m_centronics->write_data1(BIT(data, 1));
+			m_centronics->write_data2(BIT(data, 2));
+			m_centronics->write_data3(BIT(data, 3));
+			m_centronics->write_data4(BIT(data, 4));
+			m_centronics->write_data5(BIT(data, 5));
+			m_centronics->write_data6(BIT(data, 6));
+			m_centronics->write_strobe(BIT(data, 7));
 		}
 	}
 
@@ -2543,6 +2549,10 @@ Note:
   On the CPC this can be used by a expansion device to report it's presence. "1" = device connected, "0" = device not connected. This is not always used by all expansion devices.
 */
 
+WRITE_LINE_MEMBER(amstrad_state::write_centronics_busy)
+{
+	m_centronics_busy = state;
+}
 
 READ8_MEMBER(amstrad_state::amstrad_ppi_portb_r)
 {
@@ -2558,7 +2568,7 @@ READ8_MEMBER(amstrad_state::amstrad_ppi_portb_r)
 /* Set b6 with Parallel/Printer port ready */
 	if(m_system_type != SYSTEM_GX4000)
 	{
-		data |= m_centronics->busy_r() << 6;
+		data |= m_centronics_busy << 6;
 	}
 /* Set b4-b1 50Hz/60Hz state and manufacturer name defined by links on PCB */
 	data |= (m_ppi_port_inputs[amstrad_ppi_PortB] & 0x1e);
@@ -2965,6 +2975,7 @@ TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)
 MACHINE_START_MEMBER(amstrad_state,amstrad)
 {
 	m_system_type = SYSTEM_CPC;
+	m_centronics->write_data7(0);
 }
 
 
@@ -2996,6 +3007,7 @@ MACHINE_START_MEMBER(amstrad_state,plus)
 {
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_PLUS;
+	m_centronics->write_data7(0);
 }
 
 
@@ -3047,6 +3059,7 @@ MACHINE_START_MEMBER(amstrad_state,gx4000)
 {
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_GX4000;
+	m_centronics->write_data7(0);
 }
 
 MACHINE_RESET_MEMBER(amstrad_state,gx4000)
@@ -3095,6 +3108,7 @@ MACHINE_RESET_MEMBER(amstrad_state,gx4000)
 MACHINE_START_MEMBER(amstrad_state,kccomp)
 {
 	m_system_type = SYSTEM_CPC;
+	m_centronics->write_data7(0);
 }
 
 
@@ -3124,6 +3138,7 @@ MACHINE_RESET_MEMBER(amstrad_state,kccomp)
 MACHINE_START_MEMBER(amstrad_state,aleste)
 {
 	m_system_type = SYSTEM_ALESTE;
+	m_centronics->write_data7(0);
 }
 
 MACHINE_RESET_MEMBER(amstrad_state,aleste)

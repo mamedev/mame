@@ -39,14 +39,14 @@ void mbee_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 WRITE_LINE_MEMBER( mbee_state::pio_ardy )
 {
-	m_printer->strobe_w((state) ? 0 : 1);
+	m_centronics->write_strobe((state) ? 0 : 1);
 }
 
 WRITE8_MEMBER( mbee_state::pio_port_a_w )
 {
 	/* hardware strobe driven by PIO ARDY, bit 7..0 = data */
 	m_pio->strobe_a(1); /* needed - otherwise nothing prints */
-	m_printer->write(space, 0, data);
+	m_cent_data_out->write(space, 0, data);
 };
 
 WRITE8_MEMBER( mbee_state::pio_port_b_w )
@@ -593,8 +593,8 @@ INTERRUPT_GEN_MEMBER(mbee_state::mbee_interrupt)
 	    The line below does what the interrupt should be doing. */
 	/* But it would break any program loaded to that area of memory, such as CP/M programs */
 
-	//m_z80pio->strobe_a(centronics_busy_r(m_printer)); /* signal int when not busy (L->H) */
-	//space.write_byte(0x109, centronics_busy_r(m_printer));
+	//m_z80pio->strobe_a(centronics_busy_r(m_centronics)); /* signal int when not busy (L->H) */
+	//space.write_byte(0x109, centronics_busy_r(m_centronics));
 
 
 	/* once per frame, pulse the PIO B bit 7 - it is in the schematic as an option,

@@ -334,7 +334,6 @@ public:
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
 	INTERRUPT_GEN_MEMBER(bbcm_keyscan);
 	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
-	DECLARE_WRITE_LINE_MEMBER(bbcb_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(bbcb_acia6850_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(econet_clk_w);
 	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_porta);

@@ -340,13 +340,6 @@ static const cassette_interface oric_cassette_interface =
 	NULL
 };
 
-static const centronics_interface oric_centronics_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("via6522_0", via6522_device, write_ca1),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const floppy_interface oric1_floppy_interface =
 {
 	DEVCB_NULL,
@@ -400,7 +393,10 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", oric_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522_0", via6522_device, write_ca1))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", oric_cassette_interface )

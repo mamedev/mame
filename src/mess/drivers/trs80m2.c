@@ -547,6 +547,21 @@ static Z80DMA_INTERFACE( dma_intf )
 //  Z80PIO_INTERFACE( pio_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( trs80m2_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER( trs80m2_state::write_centronics_fault )
+{
+	m_centronics_fault = state;
+}
+
+WRITE_LINE_MEMBER( trs80m2_state::write_centronics_perror )
+{
+	m_centronics_perror = state;
+}
+
 READ8_MEMBER( trs80m2_state::pio_pa_r )
 {
 	/*
@@ -576,13 +591,13 @@ READ8_MEMBER( trs80m2_state::pio_pa_r )
 	data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 2;
 
 	// printer fault
-	data |= m_centronics->fault_r() << 4;
+	data |= m_centronics_fault << 4;
 
 	// paper empty
-	data |= !m_centronics->pe_r() << 6;
+	data |= m_centronics_perror << 6;
 
 	// printer busy
-	data |= m_centronics->busy_r() << 7;
+	data |= m_centronics_busy << 7;
 
 	return data;
 }
@@ -605,12 +620,12 @@ WRITE8_MEMBER( trs80m2_state::pio_pa_w )
 	*/
 
 	// prime
-	m_centronics->init_prime_w(BIT(data, 3));
+	m_centronics->write_init(BIT(data, 3));
 }
 
 WRITE_LINE_MEMBER( trs80m2_state::strobe_w )
 {
-	m_centronics->strobe_w(!state);
+	m_centronics->write_strobe(!state);
 }
 
 static Z80PIO_INTERFACE( pio_intf )
@@ -620,20 +635,8 @@ static Z80PIO_INTERFACE( pio_intf )
 	DEVCB_DRIVER_MEMBER(trs80m2_state, pio_pa_w),               // port A write callback
 	DEVCB_NULL,                                                 // port A ready callback
 	DEVCB_NULL,                                                 // port B read callback
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),  // port B write callback
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write), // port B write callback
 	DEVCB_DRIVER_LINE_MEMBER(trs80m2_state, strobe_w)           // port B ready callback
-};
-
-
-//-------------------------------------------------
-//  centronics_interface centronics_intf
-//-------------------------------------------------
-
-static const centronics_interface centronics_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_TAG, z80pio_device, strobe_b),  // ACK output
-	DEVCB_NULL,                                     // BUSY output
-	DEVCB_NULL                                      // NOT BUSY output
 };
 
 
@@ -832,7 +835,15 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(trs80m2_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(trs80m2_state, write_centronics_fault))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(trs80m2_state, write_centronics_perror))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
@@ -882,7 +893,15 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(trs80m2_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(trs80m2_state, write_centronics_fault))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(trs80m2_state, write_centronics_perror))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)

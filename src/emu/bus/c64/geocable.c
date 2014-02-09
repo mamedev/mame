@@ -1,4 +1,4 @@
-	// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Curt Coder, smf
 /**********************************************************************
 
@@ -29,28 +29,12 @@ const device_type C64_GEOCABLE = &device_creator<c64_geocable_device>;
 
 
 //-------------------------------------------------
-//  centronics_interface centronics_intf
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( c64_geocable_device::busy_w )
-{
-	output_b(state);
-}
-
-static const centronics_interface centronics_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, c64_geocable_device, busy_w),
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_geocable )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_geocable )
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(c64_geocable_device, output_b))
 MACHINE_CONFIG_END
 
 
@@ -88,24 +72,4 @@ c64_geocable_device::c64_geocable_device(const machine_config &mconfig, const ch
 
 void c64_geocable_device::device_start()
 {
-}
-
-
-//-------------------------------------------------
-//  update_output
-//-------------------------------------------------
-
-void c64_geocable_device::update_output()
-{
-	m_centronics->write(m_parallel_output);
-}
-
-
-//-------------------------------------------------
-//  input_8 - CIA2 PC write
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(c64_geocable_device::input_8)
-{
-	m_centronics->strobe_w(state);
 }

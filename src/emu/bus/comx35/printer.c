@@ -10,6 +10,7 @@
 **********************************************************************/
 
 #include "printer.h"
+#include "bus/centronics/image.h"
 
 
 
@@ -57,7 +58,7 @@ const rom_entry *comx_prn_device::device_rom_region() const
 //-------------------------------------------------
 
 SLOT_INTERFACE_START(comx_centronics_printer)
-	SLOT_INTERFACE("printer", CENTRONICS_PRINTER)
+	SLOT_INTERFACE("image", CENTRONICS_PRINTER_IMAGE)
 	//SLOT_INTERFACE("pl80", COMX_PL80)
 SLOT_INTERFACE_END
 
@@ -67,7 +68,13 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( comx_prn )
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics, comx_centronics_printer, "printer")
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, comx_centronics_printer, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit0))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
+	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit2))
+	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit3))
+
+	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 MACHINE_CONFIG_END
 
 
@@ -95,6 +102,8 @@ comx_prn_device::comx_prn_device(const machine_config &mconfig, const char *tag,
 	device_t(mconfig, COMX_PRN, "COMX-35 Printer Card", tag, owner, clock, "comx_prn", __FILE__),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_centronics(*this, CENTRONICS_TAG),
+	m_cent_data_out(*this, "cent_data_out"),
+	m_cent_status_in(*this, "cent_status_in"),
 	m_rom(*this, "c000")
 {
 }
@@ -170,14 +179,7 @@ UINT8 comx_prn_device::comx_io_r(address_space &space, offs_t offset)
 
 	*/
 
-	UINT8 data = 0;
-
-	data |= m_centronics->ack_r();
-	data |= m_centronics->not_busy_r() << 1;
-	data |= m_centronics->pe_r() << 2;
-	data |= m_centronics->vcc_r() << 3;
-
-	return data;
+	return m_cent_status_in->read();
 }
 
 
@@ -197,5 +199,5 @@ void comx_prn_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
 	    OUT 2 is used to send a bit to the printer
 	*/
 
-	m_centronics->write(data);
+	m_cent_data_out->write(space, 0, data);
 }

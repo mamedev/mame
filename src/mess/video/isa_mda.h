@@ -13,43 +13,44 @@
 
 // ======================> isa8_mda_device
 
-class isa8_mda_device :
-		public device_t,
-		public device_isa8_card_interface
+class isa8_mda_device : public device_t,
+	public device_isa8_card_interface
 {
 public:
-		friend class isa8_hercules_device;
+	friend class isa8_hercules_device;
 
-		// construction/destruction
-		isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	// construction/destruction
+	isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual const rom_entry *device_rom_region() const;
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const;
 
-		DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-		DECLARE_WRITE_LINE_MEMBER(vsync_changed);
-		virtual DECLARE_READ8_MEMBER(io_read);
-		virtual DECLARE_WRITE8_MEMBER(io_write);
-		virtual DECLARE_READ8_MEMBER(status_r);
-		virtual DECLARE_WRITE8_MEMBER(mode_control_w);
+	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
+	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	virtual DECLARE_READ8_MEMBER(io_read);
+	virtual DECLARE_WRITE8_MEMBER(io_write);
+	virtual DECLARE_READ8_MEMBER(status_r);
+	virtual DECLARE_WRITE8_MEMBER(mode_control_w);
+
+	WRITE_LINE_MEMBER(pc_cpu_line);
 
 protected:
-		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 public:
-		int m_framecnt;
+	int m_framecnt;
 
-		UINT8   m_mode_control;
+	UINT8   m_mode_control;
 
-		mc6845_update_row_func  m_update_row;
-		UINT8   *m_chr_gen;
-		UINT8   m_vsync;
-		UINT8   m_hsync;
-		UINT8   *m_videoram;
-		UINT8   m_pixel;
+	mc6845_update_row_func  m_update_row;
+	UINT8   *m_chr_gen;
+	UINT8   m_vsync;
+	UINT8   m_hsync;
+	UINT8   *m_videoram;
+	UINT8   m_pixel;
 };
 
 

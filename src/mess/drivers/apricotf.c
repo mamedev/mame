@@ -120,7 +120,7 @@ WRITE8_MEMBER( f1_state::system_w )
 	switch(offset)
 	{
 	case 0: // centronics data port
-		m_centronics->write(space, 0, data);
+		m_cent_data_out->write(space, 0, data);
 		break;
 
 	case 1: // drive select
@@ -150,7 +150,7 @@ WRITE8_MEMBER( f1_state::system_w )
 		break;
 
 	case 0x0f: // centronics strobe output
-		m_centronics->strobe_w(!BIT(data, 0));
+		m_centronics->write_strobe(!BIT(data, 0));
 		break;
 	}
 }
@@ -310,18 +310,6 @@ static SLOT_INTERFACE_START( apricotf_floppies )
 SLOT_INTERFACE_END
 
 
-//-------------------------------------------------
-//  centronics_interface centronics_intf
-//-------------------------------------------------
-
-static const centronics_interface centronics_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(Z80SIO2_TAG, z80dart_device, ctsa_w),
-	DEVCB_NULL
-};
-
-
 
 //**************************************************************************
 //  MACHINE DRIVERS
@@ -351,7 +339,11 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	MCFG_APRICOT_KEYBOARD_ADD(kb_intf)
 	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 2500000, sio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2500000, ctc_intf)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(Z80SIO2_TAG, z80dart_device, ctsa_w))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	// floppy
 	MCFG_WD2797x_ADD(WD2797_TAG, XTAL_4MHz / 2 /* ? */)

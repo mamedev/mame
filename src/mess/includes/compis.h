@@ -119,6 +119,12 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
 
+	int m_centronics_busy;
+	int m_centronics_select;
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
+
 	int m_tmr0;
 };
 

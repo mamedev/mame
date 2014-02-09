@@ -12,6 +12,7 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "machine/ay31015.h"
+#include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/wd17xx.h"
 #include "imagedev/cassette.h"
@@ -27,7 +28,9 @@ public:
 	trs80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_printer(*this, "centronics"),
+		m_centronics(*this, "centronics"),
+		m_cent_data_out(*this, "cent_data_out"),
+		m_cent_status_in(*this, "cent_status_in"),
 		m_ay31015(*this, "tr1602"),
 		m_fdc(*this, "wd179x"),
 		m_speaker(*this, "speaker"),
@@ -63,7 +66,9 @@ public:
 		m_bank19(NULL) { }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<centronics_device> m_printer;
+	optional_device<centronics_device> m_centronics;
+	optional_device<output_latch_device> m_cent_data_out;
+	optional_device<input_buffer_device> m_cent_status_in;
 	optional_device<ay31015_device> m_ay31015;
 	optional_device<fd1793_device> m_fdc;
 	required_device<speaker_sound_device> m_speaker;

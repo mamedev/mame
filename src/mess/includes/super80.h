@@ -6,6 +6,7 @@
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
+#include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "video/mc6845.h"
 #include "machine/z80pio.h"
@@ -29,6 +30,7 @@ public:
 			m_wave(*this, WAVE_TAG),
 			m_speaker(*this, "speaker"),
 			m_centronics(*this, "centronics"),
+			m_cent_data_out(*this, "cent_data_out"),
 			m_6845(*this, "crtc"),
 			m_io_dsw(*this, "DSW"),
 			m_io_x0(*this, "X0"),
@@ -100,6 +102,7 @@ public:
 	required_device<wave_device> m_wave;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	optional_device<mc6845_device> m_6845;
 	required_ioport m_io_dsw;
 	required_ioport m_io_x0;

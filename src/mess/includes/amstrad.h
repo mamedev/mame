@@ -243,6 +243,8 @@ public:
 	void amstrad_rethinkMemory();
 	DECLARE_SNAPSHOT_LOAD_MEMBER( amstrad );
 
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+
 protected:
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_user1;
@@ -306,6 +308,8 @@ protected:
 	void amstrad_common_init();
 	unsigned char kccomp_get_colour_element(int colour_value);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	int m_centronics_busy;
 };
 
 

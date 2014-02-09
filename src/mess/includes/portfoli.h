@@ -8,7 +8,6 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "imagedev/cartslot.h"
-#include "imagedev/printer.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"

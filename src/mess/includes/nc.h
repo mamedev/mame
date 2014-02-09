@@ -6,6 +6,8 @@
 
 #ifndef NC_H_
 #define NC_H_
+
+#include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
 #include "sound/beep.h"
 
@@ -34,7 +36,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_beeper1(*this, "beep.1"),
-		m_beeper2(*this, "beep.2") { }
+		m_beeper2(*this, "beep.2"),
+		m_centronics(*this, "centronics")
+	{
+	}
 
 	emu_timer *m_serial_timer;
 	char m_memory_config[4];
@@ -58,6 +63,10 @@ public:
 	UINT8 m_type;
 	int m_card_size;
 	int m_nc200_backlight;
+
+	int m_centronics_ack;
+	int m_centronics_busy;
+
 	DECLARE_READ8_MEMBER(nc_memory_management_r);
 	DECLARE_WRITE8_MEMBER(nc_memory_management_w);
 	DECLARE_WRITE8_MEMBER(nc_irq_mask_w);
@@ -91,8 +100,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nc100_tc8521_alarm_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc100_txrdy_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc100_rxrdy_callback);
-	DECLARE_WRITE_LINE_MEMBER(nc100_centronics_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(nc200_centronics_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(write_nc100_centronics_ack);
+	DECLARE_WRITE_LINE_MEMBER(write_nc200_centronics_ack);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(nc200_txrdy_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc200_rxrdy_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc200_fdc_interrupt);
@@ -107,6 +117,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<beep_device> m_beeper1;
 	required_device<beep_device> m_beeper2;
+	required_device<centronics_device> m_centronics;
 
 	void nc200_video_set_backlight(int state);
 	void nc_card_save(device_image_interface &image);
@@ -118,7 +129,6 @@ public:
 	void nc_refresh_memory_config();
 	void nc_common_init_machine();
 	void nc_sound_update(int channel);
-	void nc_printer_update(UINT8 data);
 	void nc150_init_machine();
 	void nc200_refresh_uart_interrupt();
 	void nc200_floppy_drive_index_callback(int drive_id);

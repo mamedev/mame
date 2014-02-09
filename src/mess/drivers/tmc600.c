@@ -101,7 +101,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc600_io_map, AS_IO, 8, tmc600_state )
 	AM_RANGE(0x03, 0x03) AM_WRITE(keyboard_latch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x05, 0x05) AM_WRITE(vismac_data_w)
 //  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(vismac_register_w)
@@ -288,7 +288,10 @@ static MACHINE_CONFIG_START( tmc600, tmc600_state )
 	MCFG_FRAGMENT_ADD(tmc600_video)
 
 	/* devices */
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
 	MCFG_CASSETTE_ADD("cassette", tmc600_cassette_interface)
 
 	/* internal ram */

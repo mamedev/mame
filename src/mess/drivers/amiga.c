@@ -37,15 +37,6 @@ very fussy with the state machine.
     mess/drivers/amiga.c
 */
 
-
-
-
-
-
-
-
-
-
 /* Core includes */
 #include "emu.h"
 #include "includes/amiga.h"
@@ -61,7 +52,6 @@ very fussy with the state machine.
 #include "machine/amigacd.h"
 #include "machine/amigacrt.h"
 #include "machine/msm6242.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/nvram.h"
 #include "sound/cdda.h"
 #include "machine/i2cmem.h"
@@ -134,28 +124,41 @@ static WRITE16_HANDLER( amiga_clock_w )
     CENTRONICS PORT
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( amiga_cia_1_porta_r )
+READ8_MEMBER( amiga_state::amiga_cia_1_porta_r )
 {
-	centronics_device *centronics = space.machine().device<centronics_device>("centronics");
 	UINT8 result = 0;
 
 	/* centronics status is stored in PA0 to PA2 */
-	result |= centronics->busy_r() << 0;
-	result |= !centronics->pe_r() << 1;
-	result |= centronics->vcc_r() << 2;
+	result |= m_centronics_busy << 0;
+	result |= m_centronics_perror << 1;
+	result |= m_centronics_select << 2; // shared with rs232 "ring indicator" (not emulated)
 
 	/* PA3 to PA7 store the serial line status (not emulated) */
 
 	return result;
 }
 
-static const centronics_interface amiga_centronics_config =
+WRITE_LINE_MEMBER( amiga_state::write_centronics_ack )
 {
-	DEVCB_DEVICE_LINE("cia_0", mos6526_flag_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
+	m_cia_0->flag_w(state);
+}
 
+WRITE_LINE_MEMBER( amiga_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+	m_cia_1->sp_w(state);
+}
+
+WRITE_LINE_MEMBER( amiga_state::write_centronics_perror )
+{
+	m_centronics_perror = state;
+	m_cia_1->cnt_w(state);
+}
+
+WRITE_LINE_MEMBER( amiga_state::write_centronics_select )
+{
+	m_centronics_select = state;
+}
 
 /***************************************************************************
   Address maps
@@ -510,25 +513,25 @@ MACHINE_RESET_MEMBER(cdtv_state,cdtv)
 static const legacy_mos6526_interface cia_0_ntsc_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_0_irq),                            /* irq_func */
-	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),    /* pc_func */
+	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),    /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_r),
 	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_w),                     /* port A */
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write) /* port B */
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write) /* port B */
 };
 
 static const legacy_mos6526_interface cia_0_pal_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_0_irq),                            /* irq_func */
-	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),    /* pc_func */
+	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),    /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_r),
 	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_w),                     /* port A */
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write) /* port B */
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write) /* port B */
 };
 
 static const legacy_mos6526_interface cia_1_intf =
@@ -537,7 +540,7 @@ static const legacy_mos6526_interface cia_1_intf =
 	DEVCB_NULL,                                             /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("centronics", amiga_cia_1_porta_r),
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_1_porta_r),
 	DEVCB_NULL,                                             /* port A */
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER("fdc", amiga_fdc, ciaaprb_w)        /* port B */
@@ -546,13 +549,13 @@ static const legacy_mos6526_interface cia_1_intf =
 static const legacy_mos6526_interface cia_0_cdtv_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_0_irq),                            /* irq_func */
-	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),    /* pc_func */
+	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),    /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_cdtv_portA_r),
 	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_w),                     /* port A */
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write) /* port B */
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write) /* port B */
 };
 
 static const legacy_mos6526_interface cia_1_cdtv_intf =
@@ -561,7 +564,7 @@ static const legacy_mos6526_interface cia_1_cdtv_intf =
 	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("centronics", amiga_cia_1_porta_r),
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_1_porta_r),
 	DEVCB_NULL,                                             /* port A */
 	DEVCB_NULL,
 	DEVCB_NULL                                              /* port B */
@@ -661,7 +664,13 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 
 	/* devices */
 	MCFG_MSM6242_ADD("rtc",amiga_rtc_intf)
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", amiga_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(amiga_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amiga_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(amiga_state, write_centronics_perror))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(amiga_state, write_centronics_select))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -862,7 +871,13 @@ static MACHINE_CONFIG_START( a1200n, a1200_state )
 
 	/* devices */
 	MCFG_MSM6242_ADD("rtc",amiga_rtc_intf)
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", amiga_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(amiga_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amiga_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(amiga_state, write_centronics_perror))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(amiga_state, write_centronics_select))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -963,7 +978,13 @@ static MACHINE_CONFIG_START( a3000n, amiga_state )
 
 	/* devices */
 	MCFG_MSM6242_ADD("rtc",amiga_rtc_intf)
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", amiga_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(amiga_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amiga_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(amiga_state, write_centronics_perror))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(amiga_state, write_centronics_select))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

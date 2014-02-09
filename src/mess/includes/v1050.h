@@ -65,29 +65,29 @@ class v1050_state : public driver_device
 public:
 	v1050_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_subcpu(*this, M6502_TAG),
-			m_pic(*this, UPB8214_TAG),
-			m_rtc(*this, MSM58321RS_TAG),
-			m_uart_kb(*this, I8251A_KB_TAG),
-			m_uart_sio(*this, I8251A_SIO_TAG),
-			m_fdc(*this, MB8877_TAG),
-			m_crtc(*this, H46505_TAG),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, MB8877_TAG":0"),
-			m_floppy1(*this, MB8877_TAG":1"),
-			m_floppy2(*this, MB8877_TAG":2"),
-			m_floppy3(*this, MB8877_TAG":3"),
-			m_timer_sio(*this, TIMER_SIO_TAG),
-			m_timer_ack(*this, TIMER_ACK_TAG),
-			m_timer_rst(*this, TIMER_RST_TAG),
-			m_sasibus(*this, SASIBUS_TAG ":host"),
-			m_rom(*this, Z80_TAG),
-			m_video_ram(*this, "video_ram"),
-			m_attr_ram(*this, "attr_ram"),
-			m_rtc_ppi_pa(0),
-			m_rtc_ppi_pc(0)
+		m_maincpu(*this, Z80_TAG),
+		m_subcpu(*this, M6502_TAG),
+		m_pic(*this, UPB8214_TAG),
+		m_rtc(*this, MSM58321RS_TAG),
+		m_uart_kb(*this, I8251A_KB_TAG),
+		m_uart_sio(*this, I8251A_SIO_TAG),
+		m_fdc(*this, MB8877_TAG),
+		m_crtc(*this, H46505_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_ram(*this, RAM_TAG),
+		m_floppy0(*this, MB8877_TAG":0"),
+		m_floppy1(*this, MB8877_TAG":1"),
+		m_floppy2(*this, MB8877_TAG":2"),
+		m_floppy3(*this, MB8877_TAG":3"),
+		m_timer_sio(*this, TIMER_SIO_TAG),
+		m_timer_ack(*this, TIMER_ACK_TAG),
+		m_timer_rst(*this, TIMER_RST_TAG),
+		m_sasibus(*this, SASIBUS_TAG ":host"),
+		m_rom(*this, Z80_TAG),
+		m_video_ram(*this, "video_ram"),
+		m_attr_ram(*this, "attr_ram"),
+		m_rtc_ppi_pa(0),
+		m_rtc_ppi_pc(0)
 	{
 	}
 
@@ -200,9 +200,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pic_int_w);
 	DECLARE_WRITE8_MEMBER(disp_ppi_pc_w);
 	DECLARE_WRITE8_MEMBER(m6502_ppi_pc_w);
-	DECLARE_WRITE8_MEMBER(misc_ppi_pb_w);
 	DECLARE_READ8_MEMBER(misc_ppi_pc_r);
 	IRQ_CALLBACK_MEMBER(v1050_int_ack);
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+
+	int m_centronics_busy;
+	int m_centronics_perror;
 };
 
 //----------- defined in video/v1050.c -----------

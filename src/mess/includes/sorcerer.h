@@ -54,7 +54,6 @@ public:
 	m_cassette2(*this, "cassette2"),
 	m_wave1(*this, WAVE_TAG),
 	m_wave2(*this, WAVE2_TAG),
-	m_dac(*this, "dac"),
 	m_uart(*this, "uart"),
 	m_centronics(*this, "centronics"),
 	m_ram(*this, RAM_TAG),
@@ -65,7 +64,6 @@ public:
 	DECLARE_READ8_MEMBER(sorcerer_fc_r);
 	DECLARE_READ8_MEMBER(sorcerer_fd_r);
 	DECLARE_READ8_MEMBER(sorcerer_fe_r);
-	DECLARE_READ8_MEMBER(sorcerer_ff_r);
 	DECLARE_WRITE8_MEMBER(sorcerer_fc_w);
 	DECLARE_WRITE8_MEMBER(sorcerer_fd_w);
 	DECLARE_WRITE8_MEMBER(sorcerer_fe_w);
@@ -83,7 +81,6 @@ public:
 	required_device<cassette_image_device> m_cassette2;
 	required_device<wave_device> m_wave1;
 	required_device<wave_device> m_wave2;
-	required_device<dac_device> m_dac;
 	required_device<ay31015_device> m_uart;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;

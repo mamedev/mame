@@ -10,6 +10,7 @@
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/apricotkb.h"
+#include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
@@ -49,6 +50,7 @@ public:
 			m_floppy0(*this, WD2797_TAG ":0"),
 			m_floppy1(*this, WD2797_TAG ":1"),
 			m_centronics(*this, CENTRONICS_TAG),
+			m_cent_data_out(*this, "cent_data_out"),
 			m_ctc_int(CLEAR_LINE),
 			m_sio_int(CLEAR_LINE),
 			m_p_scrollram(*this, "p_scrollram"),
@@ -64,6 +66,7 @@ public:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	int m_ctc_int;
 	int m_sio_int;
 	required_shared_ptr<UINT16> m_p_scrollram;

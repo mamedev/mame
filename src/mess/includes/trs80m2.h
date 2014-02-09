@@ -40,24 +40,25 @@ class trs80m2_state : public driver_device
 public:
 	trs80m2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_ctc(*this, Z80CTC_TAG),
-			m_dmac(*this, Z80DMA_TAG),
-			m_pio(*this, Z80PIO_TAG),
-			m_crtc(*this, MC6845_TAG),
-			m_fdc(*this, FD1791_TAG),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_floppy0(*this, FD1791_TAG":0"),
-			m_floppy1(*this, FD1791_TAG":1"),
-			m_floppy2(*this, FD1791_TAG":2"),
-			m_floppy3(*this, FD1791_TAG":3"),
-			m_floppy(NULL),
-			m_ram(*this, RAM_TAG),
-			m_kb(*this, TRS80M2_KEYBOARD_TAG),
-			m_rom(*this, Z80_TAG),
-			m_char_rom(*this, MC6845_TAG),
-			m_video_ram(*this, "video_ram")
-	{ }
+		m_maincpu(*this, Z80_TAG),
+		m_ctc(*this, Z80CTC_TAG),
+		m_dmac(*this, Z80DMA_TAG),
+		m_pio(*this, Z80PIO_TAG),
+		m_crtc(*this, MC6845_TAG),
+		m_fdc(*this, FD1791_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_floppy0(*this, FD1791_TAG":0"),
+		m_floppy1(*this, FD1791_TAG":1"),
+		m_floppy2(*this, FD1791_TAG":2"),
+		m_floppy3(*this, FD1791_TAG":3"),
+		m_floppy(NULL),
+		m_ram(*this, RAM_TAG),
+		m_kb(*this, TRS80M2_KEYBOARD_TAG),
+		m_rom(*this, Z80_TAG),
+		m_char_rom(*this, MC6845_TAG),
+		m_video_ram(*this, "video_ram")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -130,6 +131,14 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
+
+	int m_centronics_busy;
+	int m_centronics_fault;
+	int m_centronics_perror;
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 };
 
 class trs80m16_state : public trs80m2_state
