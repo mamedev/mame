@@ -899,8 +899,6 @@ public:
     ATTR_COLD virtual ~netlist_core_device_t();
 
     ATTR_COLD virtual void init(netlist_base_t &anetlist, const pstring &name);
-
-
     ATTR_HOT virtual void update_param() {}
 
     ATTR_HOT inline void update_dev()
@@ -910,6 +908,10 @@ public:
 #else
         update();
 #endif
+    }
+    ATTR_HOT inline void start_dev()
+    {
+        start();
     }
 
     ATTR_HOT const netlist_sig_t INPLOGIC_PASSIVE(netlist_logic_input_t &inp);

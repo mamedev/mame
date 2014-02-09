@@ -167,7 +167,7 @@ ATTR_COLD void netlist_base_t::start()
     for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
     {
         netlist_device_t *dev = entry->object();
-        dev->init(*this, entry->tag().cstr());
+        dev->start_dev();
     }
 
 }
@@ -373,13 +373,13 @@ ATTR_COLD netlist_setup_t &netlist_device_t::setup()
 ATTR_COLD void netlist_device_t::init(netlist_base_t &anetlist, const pstring &name)
 {
 	netlist_core_device_t::init(anetlist, name);
-	start();
 }
 
 
 ATTR_COLD void netlist_device_t::register_sub(netlist_device_t &dev, const pstring &name)
 {
 	dev.init(netlist(), this->name() + "." + name);
+	dev.start_dev();
 }
 
 ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, netlist_core_terminal_t &term)

@@ -59,6 +59,7 @@ netlist_setup_t::~netlist_setup_t()
 // FIXME: Move to netlist ...
 netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const pstring &name)
 {
+    dev->init(netlist(), name);
 	if (!(netlist().m_devices.add(name, dev, false)==TMERR_NONE))
 		netlist().error("Error adding %s to device list\n", name.cstr());
 	return dev;
@@ -364,8 +365,8 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
         pstring x = pstring::sprintf("proxy_da_%d", m_proxy_cnt);
         m_proxy_cnt++;
 
-        proxy->init(netlist(), x);
         register_dev(proxy, x);
+        proxy->start_dev();
 
 #if 1
         /* connect all existing terminals to new net */
@@ -396,8 +397,8 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
 		pstring x = pstring::sprintf("proxy_ad_%d", m_proxy_cnt);
 		m_proxy_cnt++;
 
-		proxy->init(netlist(), x);
 		register_dev(proxy, x);
+        proxy->start_dev();
 
 		proxy->m_Q.net().register_con(in);
 		out.net().register_con(proxy->m_I);
@@ -429,8 +430,8 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_i
 		pstring x = pstring::sprintf("proxy_da_%d", m_proxy_cnt);
 		m_proxy_cnt++;
 
-		proxy->init(netlist(), x);
 		register_dev(proxy, x);
+        proxy->start_dev();
 
 		connect_terminals(term, proxy->m_I);
 
