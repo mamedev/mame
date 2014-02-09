@@ -8950,6 +8950,8 @@ src/regtests/chdman/input/copy_cd_cue_empty_v4/in.chd -text
 src/regtests/chdman/input/copy_cd_nrg_empty_v4/in.chd -text
 src/regtests/chdman/input/copy_cd_toc_empty_v4/in.chd -text
 src/regtests/chdman/input/copy_hd_1/in.chd -text
+src/regtests/chdman/input/createcd_cue_audio_silence/in.bin -text
+src/regtests/chdman/input/createcd_cue_audio_silence/in.cue svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_audio_silence_wav/in.cue svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_audio_silence_wav/silence.wav -text
 src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks/in.cue svneol=native#text/plain
@@ -8963,9 +8965,13 @@ src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_cdlz/silence.
 src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_cdzl/in.cue svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_cdzl/in.params svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_cdzl/silence.wav -text
+src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_none/in.cue svneol=native#text/plain
+src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_none/in.params svneol=native#text/plain
+src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_none/silence.wav -text
 src/regtests/chdman/input/createcd_cue_empty/in.bin -text
 src/regtests/chdman/input/createcd_cue_empty/in.cue svneol=native#text/plain
 src/regtests/chdman/input/createcd_iso_empty/in.iso -text
+src/regtests/chdman/input/createcd_nrg_audio_silence/in.nrg -text
 src/regtests/chdman/input/createcd_nrg_empty/in.nrg -text
 src/regtests/chdman/input/createcd_toc_empty/data.bin -text
 src/regtests/chdman/input/createcd_toc_empty/in.toc svneol=native#text/plain
@@ -8977,6 +8983,8 @@ src/regtests/chdman/input/createhd_raw_empty_huff/in.params svneol=native#text/p
 src/regtests/chdman/input/createhd_raw_empty_huff/in.raw -text
 src/regtests/chdman/input/createhd_raw_empty_lzma/in.params svneol=native#text/plain
 src/regtests/chdman/input/createhd_raw_empty_lzma/in.raw -text
+src/regtests/chdman/input/createhd_raw_empty_none/in.params svneol=native#text/plain
+src/regtests/chdman/input/createhd_raw_empty_none/in.raw -text
 src/regtests/chdman/input/createhd_raw_empty_zlib/in.params svneol=native#text/plain
 src/regtests/chdman/input/createhd_raw_empty_zlib/in.raw -text
 src/regtests/chdman/input/createld_avi_uyvy_3_frames_no_audio/in.avi -text
@@ -8987,13 +8995,16 @@ src/regtests/chdman/output/copy_cd_cue_empty_v4/out.chd -text
 src/regtests/chdman/output/copy_cd_nrg_empty_v4/out.chd -text
 src/regtests/chdman/output/copy_cd_toc_empty_v4/out.chd -text
 src/regtests/chdman/output/copy_hd_1/out.chd -text
+src/regtests/chdman/output/createcd_cue_audio_silence/out.chd -text
 src/regtests/chdman/output/createcd_cue_audio_silence_wav/out.chd -text
 src/regtests/chdman/output/createcd_cue_audio_silence_wav_20_tracks/out.chd -text
 src/regtests/chdman/output/createcd_cue_audio_silence_wav_20_tracks_cdfl/out.chd -text
 src/regtests/chdman/output/createcd_cue_audio_silence_wav_20_tracks_cdlz/out.chd -text
 src/regtests/chdman/output/createcd_cue_audio_silence_wav_20_tracks_cdzl/out.chd -text
+src/regtests/chdman/output/createcd_cue_audio_silence_wav_20_tracks_none/out.chd -text
 src/regtests/chdman/output/createcd_cue_empty/out.chd -text
 src/regtests/chdman/output/createcd_iso_empty/out.chd -text
+src/regtests/chdman/output/createcd_nrg_audio_silence/out.chd -text
 src/regtests/chdman/output/createcd_nrg_empty/out.chd -text
 src/regtests/chdman/output/createcd_toc_empty/out.chd -text
 src/regtests/chdman/output/createhd_1/out.chd -text
@@ -9001,6 +9012,7 @@ src/regtests/chdman/output/createhd_raw_empty/out.chd -text
 src/regtests/chdman/output/createhd_raw_empty_flac/out.chd -text
 src/regtests/chdman/output/createhd_raw_empty_huff/out.chd -text
 src/regtests/chdman/output/createhd_raw_empty_lzma/out.chd -text
+src/regtests/chdman/output/createhd_raw_empty_none/out.chd -text
 src/regtests/chdman/output/createhd_raw_empty_zlib/out.chd -text
 src/regtests/chdman/output/createld_avi_uyvy_3_frames_no_audio/out.chd -text
 src/regtests/chdman/output/createld_avi_yuv2_3_frames_no_audio/out.chd -text
