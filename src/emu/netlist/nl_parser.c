@@ -350,7 +350,6 @@ void netlist_parser::device(const pstring &dev_type)
         pstring paramfq = devname + "." + def_params[cnt];
 
         NL_VERBOSE_OUT(("Defparam: %s\n", def_param.cstr()));
-        printf("Defparam: %s\n", def_params[cnt].cstr());
         require_token(m_tok_comma);
         tok = get_token();
         if (tok.is_type(STRING))
