@@ -63,21 +63,13 @@ correctly.
 #define SOUND_CPU_CLOCK     (XTAL_12MHz/4) /* 12MHz is the only OSC on the PCB */
 #define AUDIO_CLOCK     (XTAL_12MHz/8) /* 12MHz is the only OSC on the PCB */
 
-#define USE_NETLIST (0)
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/1942.h"
-
-#if USE_NETLIST
 #include "machine/netlist.h"
 #include "netlist/devices/net_lib.h"
-#endif
 
-
-
-#if USE_NETLIST
+#include "includes/1942.h"
 
 #define NLFILT(RA, R1, C1, R2) \
     NET_C(RA.1, V5)             \
@@ -93,14 +85,6 @@ static NETLIST_START(nl_1942)
     SOLVER(Solver)
     PARAM(Solver.FREQ, 48000)
     ANALOG_INPUT(V5, 5)
-
-    NETDEV_SOUND_IN(SND_IN)
-    PARAM(SND_IN.CHAN0, "R_AY1_1.R")
-    PARAM(SND_IN.CHAN1, "R_AY1_2.R")
-    PARAM(SND_IN.CHAN2, "R_AY1_3.R")
-    PARAM(SND_IN.CHAN3, "R_AY2_1.R")
-    PARAM(SND_IN.CHAN4, "R_AY2_2.R")
-    PARAM(SND_IN.CHAN5, "R_AY2_3.R")
 
     /* AY 8910 internal resistors */
 
@@ -157,11 +141,7 @@ static NETLIST_START(nl_1942)
     NET_C(CC6.2, R1.1)
     NET_C(R1.2, GND)
 
-    NETDEV_SOUND_OUT(CH0, 0, 100000)
-    NET_C(CH0.IN, R1.1)
-
 NETLIST_END()
-#endif
 
 WRITE8_MEMBER(_1942_state::c1942_bankswitch_w)
 {
@@ -538,7 +518,6 @@ void _1942_state::machine_reset()
 	m_scroll[1] = 0;
 }
 
-#if USE_NETLIST
 static const ay8910_interface ay8910_config =
 {
     AY8910_RESISTOR_OUTPUT,
@@ -548,7 +527,6 @@ static const ay8910_interface ay8910_config =
     DEVCB_NULL,
     DEVCB_NULL
 };
-#endif
 
 static MACHINE_CONFIG_START( 1942, _1942_state )
 
@@ -576,7 +554,7 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-#if USE_NETLIST
+
     MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
     MCFG_SOUND_CONFIG(ay8910_config)
     MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
@@ -588,16 +566,22 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
     MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 4)
     MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 5)
 
+    /* NETLIST configuration using internal AY8910 resistor values */
+
     MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, 48000)
     MCFG_NETLIST_SETUP(nl_1942)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 
-#else
-	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay2", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-#endif
+    MCFG_NETLIST_STREAM_INPUT("snd_nl", 0, "R_AY1_1.R")
+    MCFG_NETLIST_STREAM_INPUT("snd_nl", 1, "R_AY1_2.R")
+    MCFG_NETLIST_STREAM_INPUT("snd_nl", 2, "R_AY1_3.R")
+    MCFG_NETLIST_STREAM_INPUT("snd_nl", 3, "R_AY2_1.R")
+    MCFG_NETLIST_STREAM_INPUT("snd_nl", 4, "R_AY2_2.R")
+    MCFG_NETLIST_STREAM_INPUT("snd_nl", 5, "R_AY2_3.R")
+
+    MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "R1.1")
+    MCFG_NETLIST_ANALOG_MULT_OFFSET(100000.0, 0.0)
+
 MACHINE_CONFIG_END
 
 

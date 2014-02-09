@@ -57,19 +57,32 @@
 const device_type NETLIST_CORE = &device_creator<netlist_mame_device_t>;
 const device_type NETLIST_CPU = &device_creator<netlist_mame_cpu_device_t>;
 const device_type NETLIST_SOUND = &device_creator<netlist_mame_sound_device_t>;
+
+/* subdevices */
+
 const device_type NETLIST_ANALOG_INPUT = &device_creator<netlist_mame_analog_input_t>;
 const device_type NETLIST_LOGIC_INPUT = &device_creator<netlist_mame_logic_input_t>;
+const device_type NETLIST_STREAM_INPUT = &device_creator<netlist_mame_stream_input_t>;
+
+const device_type NETLIST_ANALOG_OUTPUT = &device_creator<netlist_mame_analog_output_t>;
+const device_type NETLIST_STREAM_OUTPUT = &device_creator<netlist_mame_stream_output_t>;
 
 // ----------------------------------------------------------------------------------------
 // netlist_mame_analog_input_t
 // ----------------------------------------------------------------------------------------
 
+void netlist_mame_sub_interface::static_set_mult_offset(device_t &device, const double mult, const double offset)
+{
+    netlist_mame_sub_interface &netlist = dynamic_cast<netlist_mame_sub_interface &>(device);
+    netlist.m_mult = mult;
+    netlist.m_offset = offset;
+}
+
+
 netlist_mame_analog_input_t::netlist_mame_analog_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, NETLIST_ANALOG_INPUT, "netlist analog input", tag, owner, clock, "netlist_analog_input", __FILE__),
 			netlist_mame_sub_interface(*owner),
 			m_param(0),
-			m_offset(0.0),
-			m_mult(1.0),
 			m_auto_port(true),
 			m_param_name("")
 {
@@ -81,15 +94,6 @@ void netlist_mame_analog_input_t::static_set_name(device_t &device, const char *
 	netlist.m_param_name = param_name;
 }
 
-void netlist_mame_analog_input_t::static_set_mult_offset(device_t &device, const double mult, const double offset)
-{
-	netlist_mame_analog_input_t &netlist = downcast<netlist_mame_analog_input_t &>(device);
-	netlist.m_mult = mult;
-	netlist.m_offset = offset;
-	// disable automatic scaling for ioports
-	netlist.m_auto_port = false;
-}
-
 void netlist_mame_analog_input_t::device_start()
 {
 	LOG_DEV_CALLS(("start %s\n", tag()));
@@ -99,7 +103,53 @@ void netlist_mame_analog_input_t::device_start()
 	{
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
 	}
+	if (m_mult != 1.0 || m_offset != 0.0)
+	{
+	    // disable automatic scaling for ioports
+	    m_auto_port = false;
+	}
+
 }
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_analog_output_t
+// ----------------------------------------------------------------------------------------
+
+netlist_mame_analog_output_t::netlist_mame_analog_output_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+        : device_t(mconfig, NETLIST_ANALOG_INPUT, "netlist analog output", tag, owner, clock, "netlist_analog_output", __FILE__),
+            netlist_mame_sub_interface(*owner),
+            m_in("")
+{
+}
+
+void netlist_mame_analog_output_t::static_set_params(device_t &device, const char *in_name, netlist_analog_output_delegate adelegate)
+{
+    netlist_mame_analog_output_t &netlist = downcast<netlist_mame_analog_output_t &>(device);
+    netlist.m_in = in_name;
+    netlist.m_delegate = adelegate;
+}
+
+void netlist_mame_analog_output_t::custom_netlist_additions(netlist_setup_t &setup)
+{
+    pstring dname = "OUT_" + m_in;
+    m_delegate.bind_relative_to(owner()->machine().root_device());
+    NETLIB_NAME(analog_callback) *dev = downcast<NETLIB_NAME(analog_callback) *>(
+            setup.factory().new_device_by_classname("nld_analog_callback", setup));
+
+    setup.register_dev(dev, dname);
+    dev->register_callback(m_delegate);
+    setup.register_link(dname + ".IN", m_in);
+}
+
+void netlist_mame_analog_output_t::device_start()
+{
+    LOG_DEV_CALLS(("start %s\n", tag()));
+}
+
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_logic_input_t
+// ----------------------------------------------------------------------------------------
 
 netlist_mame_logic_input_t::netlist_mame_logic_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, NETLIST_ANALOG_INPUT, "netlist analog input", tag, owner, clock, "netlist_analog_input", __FILE__),
@@ -129,6 +179,83 @@ void netlist_mame_logic_input_t::device_start()
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
 	}
 }
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_stream_input_t
+// ----------------------------------------------------------------------------------------
+
+netlist_mame_stream_input_t::netlist_mame_stream_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+        : device_t(mconfig, NETLIST_ANALOG_INPUT, "netlist analog input", tag, owner, clock, "netlist_analog_input", __FILE__),
+            netlist_mame_sub_interface(*owner),
+            m_channel(0),
+            m_param_name("")
+{
+}
+
+void netlist_mame_stream_input_t::static_set_params(device_t &device, int channel, const char *param_name)
+{
+    netlist_mame_stream_input_t &netlist = downcast<netlist_mame_stream_input_t &>(device);
+    netlist.m_param_name = param_name;
+    netlist.m_channel = channel;
+}
+
+void netlist_mame_stream_input_t::device_start()
+{
+    LOG_DEV_CALLS(("start %s\n", tag()));
+}
+
+void netlist_mame_stream_input_t::custom_netlist_additions(netlist_setup_t &setup)
+{
+    NETLIB_NAME(sound_in) *snd_in = setup.netlist().get_first_device<NETLIB_NAME(sound_in) *>();
+    if (snd_in == NULL)
+    {
+        snd_in = dynamic_cast<NETLIB_NAME(sound_in) *>(setup.factory().new_device_by_classname("nld_sound_in", setup));
+        setup.register_dev(snd_in, "STREAM_INPUT");
+    }
+
+    pstring sparam = pstring::sprintf("STREAM_INPUT.CHAN%d", m_channel);
+    setup.register_param(sparam, m_param_name);
+    pstring mparam = pstring::sprintf("STREAM_INPUT.MULT%d", m_channel);
+    setup.register_param(mparam, m_mult);
+}
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_stream_output_t
+// ----------------------------------------------------------------------------------------
+
+netlist_mame_stream_output_t::netlist_mame_stream_output_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+        : device_t(mconfig, NETLIST_ANALOG_INPUT, "netlist analog input", tag, owner, clock, "netlist_analog_input", __FILE__),
+            netlist_mame_sub_interface(*owner),
+            m_channel(0),
+            m_out_name("")
+{
+}
+
+void netlist_mame_stream_output_t::static_set_params(device_t &device, int channel, const char *out_name)
+{
+    netlist_mame_stream_output_t &netlist = downcast<netlist_mame_stream_output_t &>(device);
+    netlist.m_out_name = out_name;
+    netlist.m_channel = channel;
+}
+
+void netlist_mame_stream_output_t::device_start()
+{
+    LOG_DEV_CALLS(("start %s\n", tag()));
+}
+
+void netlist_mame_stream_output_t::custom_netlist_additions(netlist_setup_t &setup)
+{
+    NETLIB_NAME(sound_out) *snd_out;
+    pstring sname = pstring::sprintf("STREAM_OUT_%d", m_channel);
+
+    snd_out = dynamic_cast<NETLIB_NAME(sound_out) *>(setup.factory().new_device_by_classname("nld_sound_out", setup));
+    setup.register_dev(snd_out, sname);
+
+    setup.register_param(sname + ".CHAN" , m_channel);
+    setup.register_param(sname + ".MULT",  m_mult);
+    setup.register_link(sname + ".IN", m_out_name);
+}
+
 
 // ----------------------------------------------------------------------------------------
 // netlist_mame_t
@@ -221,7 +348,7 @@ void netlist_mame_device_t::device_start()
 		if( sdev != NULL )
 		{
 			LOG_DEV_CALLS(("Found subdevice %s/%s\n", d->name(), d->shortname()));
-			sdev->custom_netlist_additions(*m_netlist);
+			sdev->custom_netlist_additions(*m_setup);
 		}
 	}
 

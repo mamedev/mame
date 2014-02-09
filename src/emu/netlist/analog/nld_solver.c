@@ -120,9 +120,9 @@ void netlist_matrix_solver_t::schedule()
     }
     else
     {
-        //NL_VERBOSE_OUT(("resched\n");
+        m_owner->netlist().warning("Matrix solver reschedule .. Consider increasing RESCHED_LOOPS");
         if (m_owner != NULL)
-            this->m_owner->schedule1();
+            this->m_owner->schedule();
     }
     //solve();
     //    update_inputs();
@@ -637,10 +637,10 @@ NETLIB_START(solver)
 	register_param("FREQ", m_freq, 48000.0);
 	m_inc = netlist_time::from_hz(m_freq.Value());
 
-    //register_param("ACCURACY", m_accuracy, 1e-3);
 	register_param("ACCURACY", m_accuracy, 1e-7);
 	register_param("CONVERG", m_convergence, 0.3);
     register_param("RESCHED_LOOPS", m_resched_loops, 35);
+    register_param("PARALLEL", m_parallel, 0);
 
 	// internal staff
 
@@ -686,6 +686,7 @@ NETLIB_UPDATE(solver)
 	bool do_full = false;
     bool global_resched = false;
     bool this_resched[100];
+    int t_cnt = m_mat_solvers.count();
 
     if (delta < m_inc)
         do_full = true; // we have been called between updates
@@ -693,39 +694,47 @@ NETLIB_UPDATE(solver)
     m_last_step = now;
 
 #if HAS_OPENMP && USE_OPENMP
-    int t_cnt = m_mat_solvers.count();
-    omp_set_num_threads(3);
-    omp_set_dynamic(0);
-    #pragma omp parallel
+    if (m_parallel.Value())
     {
-        int i;
-        #pragma omp for nowait
-        for (i = 0; i <  t_cnt; i++)
+        omp_set_num_threads(4);
+        omp_set_dynamic(0);
+        #pragma omp parallel
         {
-            this_resched[i] = m_mat_solvers[i]->solve();
+            #pragma omp for nowait
+            for (int i = 0; i <  t_cnt; i++)
+            {
+                this_resched[i] = m_mat_solvers[i]->solve();
+            }
         }
     }
+    else
+        for (int i = 0; i < t_cnt; i++)
+        {
+            if (do_full || (m_mat_solvers[i]->is_timestep()))
+                this_resched[i] = m_mat_solvers[i]->solve();
+        }
 #else
-    for (int i = 0; i < m_mat_solvers.count(); i++)
+    for (int i = 0; i < t_cnt; i++)
     {
         if (do_full || (m_mat_solvers[i]->is_timestep()))
             this_resched[i] = m_mat_solvers[i]->solve();
     }
 #endif
 
-    for (int i = 0; i <  m_mat_solvers.count(); i++)
+    for (int i = 0; i < t_cnt; i++)
     {
         if (do_full || m_mat_solvers[i]->is_timestep())
         {
-        global_resched = global_resched || this_resched[i];
-        if (!this_resched[i])
-            m_mat_solvers[i]->update_inputs();
+            global_resched = global_resched || this_resched[i];
+            if (!this_resched[i])
+                m_mat_solvers[i]->update_inputs();
         }
     }
 
 	if (global_resched)
 	{
-		schedule1();
+	    netlist().warning("Gobal reschedule .. Consider increasing RESCHED_LOOPS");
+		schedule();
 	}
 	else
 	{

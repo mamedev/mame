@@ -42,7 +42,9 @@ enum
 	MN10200_IRQ0 = 0,
 	MN10200_IRQ1,
 	MN10200_IRQ2,
-	MN10200_IRQ3
+	MN10200_IRQ3,
+	
+	MN10200_MAX_EXT_IRQ
 };
 
 
@@ -98,6 +100,9 @@ private:
 	UINT32 m_d[4];
 	UINT32 m_a[4];
 
+	UINT8 m_p4;
+	UINT8 m_extmdl;
+	UINT8 m_extmdh;
 	UINT8 m_nmicr;
 	UINT8 m_iagr;
 	UINT8 m_icrl[MN10200_NUM_IRQ_GROUPS];
@@ -156,10 +161,12 @@ private:
 	inline void change_pc(UINT32 pc) { m_pc = pc & 0xffffff; }
 
 	void take_irq(int level, int group);
+	void check_irq();
+	void check_ext_irq();
 	void refresh_timer(int tmr);
 	void timer_tick_simple(int tmr);
 	TIMER_CALLBACK_MEMBER( simple_timer_cb );
-	void unemul();
+	void illegal();
 	UINT32 do_add(UINT32 a, UINT32 b, UINT32 c);
 	UINT32 do_sub(UINT32 a, UINT32 b, UINT32 c);
 	void test_nz16(UINT16 v);

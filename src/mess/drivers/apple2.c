@@ -182,16 +182,10 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65c02.h"
-#include "cpu/z80/z80.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"
 #include "formats/ap2_dsk.h"
 #include "includes/apple2.h"
-#include "machine/ay3600.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
 
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/a2lang.h"
@@ -677,6 +671,9 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("a2speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* keyboard controller */
+	MCFG_DEVICE_ADD("ay3600", AY3600N, 0)
 
 	/* slot devices */
 	MCFG_A2BUS_BUS_ADD("a2bus", "maincpu", a2bus_intf)

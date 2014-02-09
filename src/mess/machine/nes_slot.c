@@ -697,6 +697,7 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 		int next_bank = m_prg_size / 0x2000;
 		m_prg_bank_mem[i]->configure_entries(0, m_prg_size / 0x2000, m_prg, 0x2000);
 		// MMC5 (and a few other PCBs) can also map WRAM/BWRAM in these banks, so we add here 4x8K banks for each RAM chip
+		// No boards with 64Kb of WRAM/BWRAM has been found so far, otherwise the code has to be updated!
 		if (m_battery)
 		{
 			if (m_battery_size / 0x2000 == 4)

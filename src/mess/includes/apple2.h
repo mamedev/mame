@@ -9,11 +9,16 @@
 #ifndef APPLE2_H_
 #define APPLE2_H_
 
+#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/a2eauxslot.h"
 #include "machine/applefdc.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
+#include "machine/ay3600.h"
+#include "sound/speaker.h"
+#include "machine/ram.h"
 
 #define AUXSLOT_TAG "auxbus"
 
@@ -44,20 +49,6 @@
 #define VAR_TK2000RAM   0x100000        // ROM/RAM switch for TK2000
 
 #define VAR_DHIRES      VAR_AN3
-
-
-/***************************************************************************
-    SPECIAL KEYS
-***************************************************************************/
-
-#define SPECIALKEY_CAPSLOCK     0x01
-#define SPECIALKEY_SHIFT        0x06
-#define SPECIALKEY_CONTROL      0x08
-#define SPECIALKEY_BUTTON0      0x10    /* open apple */
-#define SPECIALKEY_BUTTON1      0x20    /* closed apple */
-#define SPECIALKEY_BUTTON2      0x40
-#define SPECIALKEY_RESET        0x80
-
 
 /***************************************************************************
     OTHER
@@ -122,6 +113,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
+		m_ay3600(*this, "ay3600"),
 		m_a2bus(*this, "a2bus"),
 		m_a2eauxslot(*this, AUXSLOT_TAG),
 		m_joy1x(*this, "joystick_1_x"),
@@ -147,6 +139,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<ay3600n_device> m_ay3600;
 	required_device<a2bus_device> m_a2bus;
 	optional_device<a2eauxslot_device> m_a2eauxslot;
 
@@ -170,16 +163,6 @@ public:
 	apple2_memmap_config m_mem_config;
 	apple2_meminfo *m_current_meminfo;
 	int m_fdc_diskreg;
-	unsigned int *m_ay3600_keys;
-	UINT8 m_keycode;
-	UINT8 m_keycode_unmodified;
-	UINT8 m_keywaiting;
-	UINT8 m_keystilldown;
-	UINT8 m_keymodreg;
-	int m_reset_flag;
-	int m_last_key;
-	int m_last_key_unmodified;
-	unsigned int m_time_until_repeat;
 	const UINT8 *m_a2_videoram, *m_a2_videoaux, *m_textgfx_data;
 	UINT32 m_a2_videomask, m_textgfx_datalen;
 	UINT32 m_old_a2;
@@ -191,6 +174,7 @@ public:
 	UINT16 *m_dhires_artifact_map;
 	bool m_monochrome_dhr;
 	int m_inh_slot;
+	int m_reset_flag;
 
 	UINT8 *m_rambase;
 
@@ -354,6 +338,7 @@ public:
 	void apple2_iwm_setdiskreg(UINT8 data);
 	void apple2_init_common();
 	INT8 apple2_slotram_r(address_space &space, int slotnum, int offset);
+	int a2_no_ctrl_reset();
 };
 /*----------- defined in drivers/apple2.c -----------*/
 INPUT_PORTS_EXTERN( apple2ep );

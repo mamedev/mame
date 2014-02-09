@@ -24,6 +24,10 @@
 #define PPU_MIRROR_LOW        4
 #define PPU_MIRROR_4SCREEN    5 // Same effect as NONE, but signals that we should never mirror
 
+#define PPU_DRAW_BG       0
+#define PPU_DRAW_OAM      1
+
+
 // registers definition
 enum
 {
@@ -166,13 +170,17 @@ public:
 
 	int get_colorbase() { return m_color_base; };
 	int get_current_scanline() { return m_scanline; };
-	int is_sprite_8x16() { return BIT(m_regs[0], 5); }; // MMC5 has to be able to check this
 	void set_scanline_callback( ppu2c0x_scanline_delegate cb ) { m_scanline_callback_proc = cb; m_scanline_callback_proc.bind_relative_to(*owner()); };
 	void set_hblank_callback( ppu2c0x_hblank_delegate cb ) { m_hblank_callback_proc = cb; m_hblank_callback_proc.bind_relative_to(*owner()); };
 	void set_vidaccess_callback( ppu2c0x_vidaccess_delegate cb ) { m_vidaccess_callback_proc = cb; m_vidaccess_callback_proc.bind_relative_to(*owner()); };
 	static void set_nmi_delegate(device_t &device,ppu2c0x_nmi_delegate cb);
 	void set_scanlines_per_frame( int scanlines ) { m_scanlines_per_frame = scanlines; };
 
+	// MMC5 has to be able to check this
+	int is_sprite_8x16() { return m_regs[PPU_CONTROL0] & PPU_CONTROL0_SPRITE_SIZE; };
+	int get_draw_phase() { return m_draw_phase; };
+	int get_tilenum() { return m_tilecount; };
+	
 	//27/12/2002 (HACK!)
 	void set_latch( ppu2c0x_latch_delegate cb ) { m_latch = cb; m_latch.bind_relative_to(*owner()); };
 
@@ -205,6 +213,8 @@ public:
 	int                         m_scan_scale;           /* scan scale */
 	int                         m_scanlines_per_frame;  /* number of scanlines per frame */
 	int                         m_security_value;       /* 2C05 protection */
+	int                         m_tilecount;			/* MMC5 can change attributes to subsets of the 34 visibile tiles */
+	int                         m_draw_phase;			/* MMC5 uses different regs for BG and OAM */
 	ppu2c0x_latch_delegate      m_latch;
 
 	// timers

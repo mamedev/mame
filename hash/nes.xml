@@ -1365,7 +1365,7 @@
 		</part>
 	</software>
 
-	<software name="aliensyn" supported="no">
+	<software name="aliensyn">
 		<description>Alien Syndrome (USA)</description>
 		<year>1989</year>
 		<publisher>Tengen</publisher>
@@ -5998,7 +5998,7 @@
 		</part>
 	</software>
 
-	<software name="cvania3u" cloneof="cvania3" supported="partial">
+	<software name="cvania3u" cloneof="cvania3">
 		<description>Castlevania III - Dracula's Curse (USA)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
@@ -6024,7 +6024,7 @@
 		</part>
 	</software>
 
-	<software name="cvania3" supported="partial">
+	<software name="cvania3">
 		<description>Castlevania III - Dracula's Curse (Euro)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
@@ -7586,7 +7586,7 @@
 		</part>
 	</software>
 
-	<software name="daikokai" cloneof="unchartd" supported="no">
+	<software name="daikokai" cloneof="unchartd">
 		<description>Daikoukai Jidai (Jpn)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -13948,7 +13948,7 @@
 		</part>
 	</software>
 
-	<software name="gemfire" supported="no">
+	<software name="gemfire">
 		<description>Gemfire (USA)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
@@ -15336,7 +15336,7 @@
 		</part>
 	</software>
 
-	<software name="gunsight" cloneof="laserinv" supported="no">
+	<software name="gunsight" cloneof="laserinv" supported="partial">
 		<description>Gun Sight (Jpn)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
@@ -17169,13 +17169,14 @@
 		</part>
 	</software>
 
-	<software name="ideyumj" supported="no">
+	<software name="ideyumj">
 		<description>Ide Yousuke Meijin no Jissen Mahjong (Jpn, Rev. A)</description>
 		<year>1987</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-IM"/>
 		<info name="release" value="19870924"/>
 		<info name="alt_title" value="井出洋介名人の実戦麻雀"/>
+		<info name="usage" value="This only works on a Famicom with Mahjong Controller attached"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
@@ -17190,13 +17191,14 @@
 		</part>
 	</software>
 
-	<software name="ideyumj2" supported="no">
+	<software name="ideyumj2">
 		<description>Ide Yousuke Meijin no Jissen Mahjong II (Jpn)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CAP-2Q"/>
 		<info name="release" value="19910222"/>
 		<info name="alt_title" value="井出洋介名人の実戦麻雀Ⅱ"/>
+		<info name="usage" value="This only works on a Famicom with Mahjong Controller attached"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
@@ -17516,7 +17518,7 @@
 		</part>
 	</software>
 
-	<software name="impmiss2" supported="no">
+	<software name="impmiss2">
 		<description>Impossible Mission-II (USA)</description>
 		<year>1989</year>
 		<publisher>American Video Entertainment / SEI</publisher>
@@ -17904,7 +17906,7 @@
 		</part>
 	</software>
 
-	<software name="ishinara" supported="no">
+	<software name="ishinara">
 		<description>Ishin no Arashi (Jpn)</description>
 		<year>1990</year>
 		<publisher>Koei</publisher>
@@ -18876,7 +18878,7 @@
 		</part>
 	</software>
 
-	<software name="justbred" supported="no">
+	<software name="justbred">
 		<description>Just Breed (Jpn)</description>
 		<year>1992</year>
 		<publisher>Enix</publisher>
@@ -20187,7 +20189,7 @@
 		</part>
 	</software>
 
-	<software name="klax" supported="no">
+	<software name="klax">
 		<description>Klax (USA)</description>
 		<year>1990</year>
 		<publisher>Tengen</publisher>
@@ -20778,7 +20780,7 @@
 		</part>
 	</software>
 
-	<software name="emperor" supported="no">
+	<software name="emperor" supported="partial">
 		<description>L'Empereur (USA)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -20805,7 +20807,7 @@
 		</part>
 	</software>
 
-	<software name="emperorj" cloneof="emperor" supported="no">
+	<software name="emperorj" cloneof="emperor" supported="partial">
 		<description>L'Empereur (Jpn)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -20876,7 +20878,7 @@
 		</part>
 	</software>
 
-	<software name="laserinv" supported="no">
+	<software name="laserinv" supported="partial">
 		<description>Laser Invasion (USA)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
@@ -26520,7 +26522,7 @@
 		</part>
 	</software>
 
-	<software name="nobubufu" supported="no">
+	<software name="nobubufu">
 		<description>Nobunaga no Yabou - Bushou Fuuunroku (Jpn)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -26545,7 +26547,7 @@
 		</part>
 	</software>
 
-	<software name="nobuseng1" cloneof="nobuamb2" supported="no">
+	<software name="nobuseng1" cloneof="nobuamb2">
 		<description>Nobunaga no Yabou - Sengoku Gunyuuden (Jpn)</description>
 		<year>1990</year>
 		<publisher>Koei</publisher>
@@ -26624,7 +26626,7 @@
 		</part>
 	</software>
 
-	<software name="nobuamb2" supported="no">
+	<software name="nobuamb2">
 		<description>Nobunaga's Ambition II (USA)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -30163,7 +30165,7 @@
 		</part>
 	</software>
 
-	<software name="roadrunn" supported="partial">
+	<software name="roadrunn">
 		<description>Road Runner (USA)</description>
 		<year>1989</year>
 		<publisher>Tengen</publisher>
@@ -30988,7 +30990,7 @@
 		</part>
 	</software>
 
-	<software name="roman3k2" supported="no">
+	<software name="roman3k2">
 		<description>Romance of the Three Kingdoms II (USA)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -31097,7 +31099,7 @@
 		</part>
 	</software>
 
-	<software name="royalbld" cloneof="gemfire" supported="no">
+	<software name="royalbld" cloneof="gemfire">
 		<description>Royal Blood (Jpn)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -31748,7 +31750,7 @@
 		</part>
 	</software>
 
-	<software name="sangoku2a" cloneof="roman3k2" supported="no">
+	<software name="sangoku2a" cloneof="roman3k2">
 		<description>Sangokushi II (Jpn)</description>
 		<year>1990</year>
 		<publisher>Koei</publisher>
@@ -31773,7 +31775,7 @@
 		</part>
 	</software>
 
-	<software name="sangoku2" cloneof="roman3k" supported="no">
+	<software name="sangoku2" cloneof="roman3k2">
 		<description>Sangokushi II (Jpn, Rev. B)</description>
 		<year>1990</year>
 		<publisher>Koei</publisher>
@@ -31798,7 +31800,7 @@
 		</part>
 	</software>
 
-	<software name="sango2ht" supported="no">
+	<software name="sango2ht">
 		<description>Sangokushi II - Haou no Tairiku (Jpn)</description>
 		<year>1992</year>
 		<publisher>Namcot</publisher>
@@ -39757,7 +39759,7 @@
 		</part>
 	</software>
 
-	<software name="uchuksdf" supported="no">
+	<software name="uchuksdf" supported="partial">
 		<description>Uchuu Keibitai SDF (Jpn)</description>
 		<year>1990</year>
 		<publisher>HAL Kenkyuujo</publisher>
@@ -40104,7 +40106,7 @@
 		</part>
 	</software>
 
-	<software name="unchartd" supported="no">
+	<software name="unchartd">
 		<description>Uncharted Waters (USA)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -42848,7 +42850,7 @@
 
 <!-- Non game cartridges -->
 
-	<software name="ggenie" supported="no">
+	<software name="ggenie">
 		<description>Game Genie (USA, v1.5 &amp; v1.5A)</description>
 		<year>1990</year>
 		<publisher>Galoob</publisher>
@@ -43044,16 +43046,21 @@ We should eventually add it to MESS as a separate driver with a NES CPU and a GB
 			<feature name="slot" value="exrom" />
 			<feature name="pcb" value="NES-EKROM" />
 			<dataarea name="chr" size="8192">
-				<rom name="demo boy 2 (unl).chr" size="8192" crc="d787b963" sha1="320e2d0f134702f34c35b78534145e6cc239e052" offset="00000" status="baddump" />
+				<rom name="dv-chr u32 rev a" size="8192" crc="d787b963" sha1="320e2d0f134702f34c35b78534145e6cc239e052" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="demo boy 2 (unl).prg" size="8192" crc="61bc931a" sha1="5f642bc0c39420d8a006bd2492c397116d106a35" offset="00000" status="baddump" />
+				<rom name="dv-prg u-47 rev. b" size="8192" crc="61bc931a" sha1="5f642bc0c39420d8a006bd2492c397116d106a35" offset="00000" status="baddump" />
 				<rom size="8192" offset="0x2000" loadflag="reload" />
 				<rom size="8192" offset="0x4000" loadflag="reload" />
 				<rom size="8192" offset="0x6000" loadflag="reload" />
 			</dataarea>
 			<!-- This has been added only to avoid crashes. Not sure how much RAM was present in the cart -->
-			<dataarea name="mapper_ram" size="1024">
+			<dataarea name="mapper_ram" size="2048">
+			</dataarea>
+			<!-- 32k WRAM on cartridge (or 40k? readme mentions 5x16k srams!) no batteries? -->
+			<dataarea name="bwram" size="32768">
+			</dataarea>
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -46565,7 +46572,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="klaxp" cloneof="klax" supported="no">
+	<software name="klaxp" cloneof="klax">
 		<description>Klax (USA, Prototype)</description>
 		<year>1990</year>
 		<publisher>Tengen</publisher>
@@ -47105,7 +47112,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="msladerg" supported="no">
+	<software name="msladerg" supported="partial">
 		<description>Metal Slader Glory (Jpn)</description>
 		<year>1991</year>
 		<publisher>HAL Kenkyuujo</publisher>
@@ -47676,7 +47683,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="nobuseng" cloneof="nobuamb2" supported="no">
+	<software name="nobuseng" cloneof="nobuamb2">
 		<description>Nobunaga no Yabou - Sengoku Gunyuuden (Jpn, rev. A)</description>
 		<year>1990</year>
 		<publisher>Koei</publisher>
@@ -72338,7 +72345,7 @@ We include them here as reference if they should coincide with later revisions o
 		</part>
 	</software>
 
-	<software name="cvania3kc" cloneof="cvania3" supported="partial">
+	<software name="cvania3kc" cloneof="cvania3">
 		<description>Castlevania III - Dracula's Curse (Ripped from PC Konami Classics)</description>
 		<year>200?</year>
 		<publisher>Konami</publisher>

@@ -354,6 +354,9 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_PALETTE_INIT_OVERRIDE(apple2gs_state, apple2gs )
 	MCFG_VIDEO_START_OVERRIDE(apple2gs_state, apple2gs )
 
+	/* keyboard controller */
+	MCFG_DEVICE_ADD("ay3600", AY3600N, 0)
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("a2speaker", SPEAKER_SOUND, 0)

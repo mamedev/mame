@@ -164,6 +164,7 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
 		netlist_param_double_t m_accuracy;
 		netlist_param_double_t m_convergence;
         netlist_param_int_t m_resched_loops;
+        netlist_param_int_t m_parallel;
 
 		netlist_time m_inc;
 		netlist_time m_last_step;
@@ -174,12 +175,12 @@ public:
 
 		ATTR_COLD ~NETLIB_NAME(solver)();
 
-		ATTR_HOT inline void schedule1();
+		ATTR_HOT inline void schedule();
 
 		ATTR_COLD void post_start();
 );
 
-ATTR_HOT inline void NETLIB_NAME(solver)::schedule1()
+ATTR_HOT inline void NETLIB_NAME(solver)::schedule()
 {
 	if (!m_Q_sync.net().is_queued())
 		m_Q_sync.net().push_to_queue(m_nt_sync_delay);

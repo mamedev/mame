@@ -268,7 +268,7 @@ WRITE8_MEMBER( nes_sxrom_device::write_h )
 
 WRITE8_MEMBER(nes_sxrom_device::write_m)
 {
-	UINT8 bank = (m_reg[1] & 3) >> 2;
+	UINT8 bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (!BIT(m_reg[3], 4))  // WRAM enabled
@@ -282,7 +282,7 @@ WRITE8_MEMBER(nes_sxrom_device::write_m)
 
 READ8_MEMBER(nes_sxrom_device::read_m)
 {
-	UINT8 bank = (m_reg[1] & 3) >> 2;
+	UINT8 bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom read_m, offset: %04x\n", offset));
 
 	if (!BIT(m_reg[3], 4))  // WRAM enabled
@@ -330,7 +330,7 @@ READ8_MEMBER(nes_sorom_device::read_m)
 // MMC1A boards have no wram enable/disable bit
 WRITE8_MEMBER(nes_sxrom_a_device::write_m)
 {
-	UINT8 bank = (m_reg[1] & 3) >> 2;
+	UINT8 bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom_a write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (m_battery)
@@ -341,7 +341,7 @@ WRITE8_MEMBER(nes_sxrom_a_device::write_m)
 
 READ8_MEMBER(nes_sxrom_a_device::read_m)
 {
-	UINT8 bank = (m_reg[1] & 3) >> 2;
+	UINT8 bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom_a read_m, offset: %04x\n", offset));
 
 	if (m_battery)

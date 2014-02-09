@@ -944,7 +944,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 			#if RUN_ADB_MICRO
 			result = keyglu_816_read(GLU_KEYMOD);
 			#else
-			result = AY3600_keymod_r(space.machine());
+			result = m_ay3600->keymod_r();
 			#endif
 			break;
 

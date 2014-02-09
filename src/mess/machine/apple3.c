@@ -45,25 +45,16 @@
 #include "emu.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
-#include "cpu/m6502/m6502.h"
-#include "machine/6522via.h"
-#include "machine/ay3600.h"
 #include "machine/applefdc.h"
 #include "machine/appldriv.h"
-#include "machine/mos6551.h"
-#include "machine/ram.h"
-
 
 static void apple3_update_drives(device_t *device);
-
 
 #define LOG_MEMORY      1
 #define LOG_INDXADDR    1
 
 READ8_MEMBER(apple3_state::apple3_c0xx_r)
 {
-	mos6551_device *acia = machine().device<mos6551_device>("acia");
-	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 	UINT8 result = 0xFF;
 
 	switch(offset)
@@ -71,44 +62,51 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		/* keystrobe */
 		case 0x00: case 0x01: case 0x02: case 0x03:
 		case 0x04: case 0x05: case 0x06: case 0x07:
-			result = AY3600_keydata_strobe_r(machine());
+			result = (m_transchar & 0x7f) | m_strobe;
 			break;
 
 		/* modifier keys */
 		case 0x08: case 0x09: case 0x0A: case 0x0B:
 		case 0x0C: case 0x0D: case 0x0E: case 0x0F:
 			{
-				UINT8 tmp = AY3600_keymod_r(machine());
+				UINT8 tmp = m_kbspecial->read();
 
-				result = 0x7e;
-				if (tmp & AY3600_KEYMOD_SHIFT)
+				result = 0x7c | (m_transchar & 0x80);
+
+				if (m_strobe)
 				{
-					result &= ~0x02;
+					result |= 1;
 				}
-				if (tmp & AY3600_KEYMOD_CONTROL)
+
+				if (tmp & 0x06)
+				{
+					result |= 0x02;
+				}
+				if (tmp & 0x08)
 				{
 					result &= ~0x04;
 				}
-				if (tmp & AY3600_KEYMOD_CAPSLOCK)
+				if (tmp & 0x01)
 				{
 					result &= ~0x08;
 				}
-				if (tmp & AY3600_KEYMOD_COMMAND)
+				if (tmp & 0x10)
 				{
 					result &= ~0x10;
 				}
-				if (tmp & AY3600_KEYMOD_OPTION)
+				if (tmp & 0x20)
 				{
 					result &= ~0x20;
 				}
 			}
+			printf("modifier = %02x\n", result);
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13:
 		case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1A: case 0x1B:
 		case 0x1C: case 0x1D: case 0x1E: case 0x1F:
-			AY3600_anykey_clearstrobe_r(machine());
+			m_strobe = 0;
 			break;
 
 		case 0x30: case 0x31: case 0x32: case 0x33:
@@ -164,14 +162,14 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
 		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
 		case 0xEC: case 0xED: case 0xEE: case 0xEF:
-			result = fdc->read(offset);
+			result = m_fdc->read(offset);
 			break;
 
 		case 0xF0:
 		case 0xF1:
 		case 0xF2:
 		case 0xF3:
-			result = acia->read(space, offset & 0x03);
+			result = m_acia->read(space, offset & 0x03);
 			break;
 	}
 	return result;
@@ -181,16 +179,13 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 
 WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 {
-	mos6551_device *acia = machine().device<mos6551_device>("acia");
-	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
-
 	switch(offset)
 	{
 		case 0x10: case 0x11: case 0x12: case 0x13:
 		case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1A: case 0x1B:
 		case 0x1C: case 0x1D: case 0x1E: case 0x1F:
-			AY3600_anykey_clearstrobe_r(machine());
+			m_strobe = 0;
 			break;
 
 		case 0x30: case 0x31: case 0x32: case 0x33:
@@ -235,21 +230,20 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
 		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
 		case 0xEC: case 0xED: case 0xEE: case 0xEF:
-			fdc->write(offset, data);
+			m_fdc->write(offset, data);
 			break;
 
 		case 0xF0:
 		case 0xF1:
 		case 0xF2:
 		case 0xF3:
-			acia->write(space, offset & 0x03, data);
+			m_acia->write(space, offset & 0x03, data);
 			break;
 	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_interrupt)
 {
-	m_via_1->write_ca2((AY3600_keydata_strobe_r(machine()) & 0x80) ? 1 : 0);
 	m_via_1->write_cb1(machine().primary_screen->vblank()); 
 	m_via_1->write_cb2(machine().primary_screen->vblank());
 }
@@ -428,6 +422,8 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 	m_speaker_state = 0;
 	m_speaker->level_w(0);
 	m_c040_time = 0;
+	m_strobe = 0;
+	m_lastchar = 0x0d;
 }
 
 
@@ -494,8 +490,15 @@ UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
 		/* The Apple /// Diagnostics seems to expect that indexed writes
 		 * always write to RAM.  That image jumps to an address that is
 		 * undefined unless this code is enabled. 
+		 *  
+		 * The confidence test and the diagnostics together indicates 
+		 * that this *doesn't* apply to the VIA region, however. 
 		 */ 
-		result = apple3_bankaddr(~0, offset - 0x8000);
+
+		if (offset < 0xffd0 || offset > 0xffef)
+		{
+			result = apple3_bankaddr(~0, offset - 0x8000); 
+		}
 	}
 
 	return result;
@@ -585,8 +588,6 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_enable_mask = 0;
 	apple3_update_drives(machine().device("fdc"));
 
-	AY3600_init(machine());
-
 	m_flags = 0;
 	m_via_0_a = ~0;
 	m_via_1_a = ~0;
@@ -619,13 +620,13 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 {
 	UINT8 rv = 0xff;
 
-	// (zp), y read
+	// (zp), y or (zp,x) read
 	if (!space.debugger_access())
 	{
-		if (m_indir_count == 4)
+		if (((m_indir_count == 4) && (m_indir_opcode & 0x10)) ||
+			((m_indir_count == 5) && !(m_indir_opcode & 0x10)))
 		{
 			UINT8 *test;
-//			printf("doing redirect on (zp),y, offset %x\n", offset);
 			test = apple3_get_indexed_addr(offset);
 
 			if (test)
@@ -659,7 +660,10 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 	{
 		if (m_via_0_a & 0x40)
 		{
-			rv = apple3_c0xx_r(space, offset-0xc000);
+			if (!space.debugger_access())
+			{
+				rv = apple3_c0xx_r(space, offset-0xc000);
+			}
 		}
 		else
 		{
@@ -714,10 +718,10 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 		// capture last opcode for indirect mode shenanigans
 		if (m_sync)
 		{
-			// 0xN1 with bit 4 set is a (zp),y opcode
-			if (((rv & 0x0f) == 0x1) && (rv & 0x10))
+			// 0xN1 is a (zp),y or (zp, x) opcode
+			if ((rv & 0x0f) == 0x1)
 			{
-//				printf("(zp),y %02x at %x\n", rv, offset);
+//				printf("(zp),y or (zp,x) %02x at %x\n", rv, offset);
 				m_indir_count = 1;
 				m_indir_opcode = rv;
 			}
@@ -732,7 +736,6 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	if ((!space.debugger_access()) && (m_indir_count > 0))
 	{
 		UINT8 *test;
-//			printf("store (zp),y %02x at %x\n", data, offset);
 		test = apple3_get_indexed_addr(offset);
 
 		if (test)
@@ -767,7 +770,10 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	{
 		if (m_via_0_a & 0x40)
 		{
-			apple3_c0xx_w(space, offset-0xc000, data);
+			if (!space.debugger_access())
+			{
+				apple3_c0xx_w(space, offset-0xc000, data);
+			}
 		}
 		else
 		{
@@ -816,11 +822,17 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	{
 		if (offset >= 0xffd0 && offset <= 0xffdf)
 		{
-			m_via_0->write(space, offset, data);
+			if (!space.debugger_access())
+			{
+				m_via_0->write(space, offset, data);
+			}
 		}
 		else if (offset >= 0xffe0 && offset <= 0xffef)
 		{
-			m_via_1->write(space, offset, data);
+			if (!space.debugger_access())
+			{
+				m_via_1->write(space, offset, data);
+			}
 		}
 		else
 		{
@@ -850,6 +862,138 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_c040_tick)
 		m_speaker_state ^= 1;
 		m_speaker->level_w(m_speaker_state);
 		m_c040_time--;
+	}
+}
+
+READ_LINE_MEMBER(apple3_state::ay3600_shift_r)
+{
+	// either shift key
+	if (m_kbspecial->read() & 0x06)
+	{
+		return ASSERT_LINE;
+	}
+
+	return CLEAR_LINE;
+}
+
+READ_LINE_MEMBER(apple3_state::ay3600_control_r)
+{
+	if (m_kbspecial->read() & 0x08)
+	{
+		return ASSERT_LINE;
+	}
+
+	return CLEAR_LINE;
+}
+
+static const UINT8 key_remap[0x50][4] =
+{
+/*	  norm shft ctrl both */
+	{ 0x9b,0x9b,0x9b,0x9b },    /* Escape  00     */
+	{ 0x31,0x21,0x31,0x31 },    /* 1 !     01     */
+	{ 0x32,0x40,0x32,0x00 },    /* 2 @     02     */
+	{ 0x33,0x23,0x33,0x23 },    /* 3 #     03     */
+	{ 0x34,0x24,0x34,0x24 },    /* 4 $     04     */
+	{ 0x35,0x25,0x35,0x25 },    /* 5 %     05     */
+	{ 0x36,0x5e,0x35,0x53 },    /* 6 ^     06     */
+	{ 0x37,0x26,0x37,0x26 },    /* 7 &     07     */
+	{ 0x38,0x2a,0x38,0x2a },    /* 8 *     08     */
+	{ 0x39,0x28,0x39,0x28 },    /* 9 (     09     */
+	{ 0x89,0x89,0x89,0x89 },    /* Tab     0a     */
+	{ 0x51,0x51,0x11,0x11 },    /* q Q     0b     */
+	{ 0x57,0x57,0x17,0x17 },    /* w W     0c     */
+	{ 0x45,0x45,0x05,0x05 },    /* e E     0d     */
+	{ 0x52,0x52,0x12,0x12 },    /* r R     0e     */
+	{ 0x54,0x54,0x14,0x14 },    /* t T     0f     */
+	{ 0x59,0x59,0x19,0x19 },    /* y Y     10     */
+	{ 0x55,0x55,0x15,0x15 },    /* u U     11     */
+	{ 0x49,0x49,0x09,0x09 },    /* i I     12     */
+	{ 0x4f,0x4f,0x0f,0x0f },    /* o O     13     */
+	{ 0x41,0x41,0x01,0x01 },    /* a A     14     */
+	{ 0x53,0x53,0x13,0x13 },    /* s S     15     */
+	{ 0x44,0x44,0x04,0x04 },    /* d D     16     */
+	{ 0x46,0x46,0x06,0x06 },    /* f F     17     */
+	{ 0x48,0x48,0x08,0x08 },    /* h H     18     */
+	{ 0x47,0x47,0x07,0x07 },    /* g G     19     */
+	{ 0x4a,0x4a,0x0a,0x0a },    /* j J     1a     */
+	{ 0x4b,0x4b,0x0b,0x0b },    /* k K     1b     */
+	{ 0x3b,0x3a,0x3b,0x3a },    /* ; :     1c     */
+	{ 0x4c,0x4c,0x0c,0x0c },    /* l L     1d     */
+	{ 0x5a,0x5a,0x1a,0x1a },    /* z Z     1e     */
+	{ 0x58,0x58,0x18,0x18 },    /* x X     1f     */
+	{ 0x43,0x43,0x03,0x03 },    /* c C     20     */
+	{ 0x56,0x56,0x16,0x16 },    /* v V     21     */
+	{ 0x42,0x42,0x02,0x02 },    /* b B     22     */
+	{ 0x4e,0x4e,0x0e,0x0e },    /* n N     23     */
+	{ 0x4d,0x4d,0x0d,0x0d },    /* m M     24     */
+	{ 0x2c,0x3c,0x2c,0x3c },    /* , <     25     */
+	{ 0x2e,0x3e,0x2e,0x3e },    /* . >     26     */
+	{ 0x3f,0x2f,0x3f,0x2f },    /* / ?     27     */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x28 unused    */
+	{ 0xb9,0xb9,0xb9,0xb9 },    /* 9 (KP)  29     */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x2a unused    */
+	{ 0xb8,0xb8,0xb8,0xb8 },    /* 8 (KP)  2b     */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x2c unused    */
+	{ 0xb7,0xb7,0xb7,0xb7 },    /* 7 (KP)  2d     */
+	{ 0x5c,0x7c,0x7f,0x1c },    /* \ |     2e     */
+	{ 0x3d,0x2b,0x3d,0x2b },    /* = +     2f     */
+	{ 0x30,0x29,0x30,0x29 },    /* 0 )     30     */
+	{ 0x2d,0x5f,0x2d,0x1f },    /* - _     31     */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x32 unused    */
+	{ 0xb6,0xb6,0xb6,0xb6 },    /* 6 (KP)  33     */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x34 unused    */
+	{ 0xb5,0xb5,0xb5,0xb5 },    /* 5 (KP)  35     */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x36 unused    */
+	{ 0xb4,0xb4,0xb4,0xb4 },    /* 4 (KP)  37     */
+	{ 0x27,0x22,0x27,0x22 },    /* ` ~     38     */
+	{ 0x5d,0x7d,0x1d,0x1d },    /* ] }     39     */
+	{ 0x50,0x50,0x10,0x10 },    /* p P     3a     */
+	{ 0x5b,0x7b,0x1b,0x1b },    /* [ {     3b     */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x3c unused    */
+	{ 0xb3,0xb3,0xb3,0xb3 },    /* 3 (KP)  3d     */
+	{ 0xae,0xae,0xae,0xae },    /* . (KP)  3e     */
+	{ 0xb2,0xb2,0xb2,0xb2 },    /* 2 (KP)  3f     */
+	{ 0xb0,0xb0,0xb0,0xb0 },    /* 0 (KP)  40     */
+	{ 0xb1,0xb1,0xb1,0xb1 },    /* 1 (KP)  41     */
+	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   42     */
+	{ 0x8b,0x8b,0x8b,0x8b },    /* Up      43     */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x44 unused    */
+	{ 0x3d,0x2b,0x3d,0x2b },    /* ' "     45     */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x46 unused    */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x47 unused    */
+	{ 0x8d,0x8d,0x8d,0x8d },    /* Ent(KP) 48     */
+	{ 0xa0,0xa0,0xa0,0xa0 },    /* Space   49     */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x4a unused    */
+	{ 0xad,0xad,0xad,0xad },    /* - (KP)  4b     */
+	{ 0x95,0x95,0x95,0x95 },    /* Right   4c     */
+	{ 0x8a,0x8a,0x8a,0x8a },    /* Down    4d     */
+	{ 0x8b,0x8b,0x8b,0x8b },    /* Left    4e     */
+	{ 0x00,0x00,0x00,0x00 }     /* 0x4f unused    */
+};
+
+WRITE_LINE_MEMBER(apple3_state::ay3600_data_ready_w)
+{
+	m_via_1->write_ca2(state);
+
+	if (state == ASSERT_LINE)
+	{
+		UINT16 trans;
+		int mod = 0;
+		m_lastchar = m_ay3600->b_r(); 
+
+		trans = m_lastchar & ~(0x1c0);	// clear the 3600's control/shift stuff
+		trans |= (m_lastchar & 0x100)>>2;	// bring the 0x100 bit down to the 0x40 place
+
+		mod = (m_kbspecial->read() & 0x06) ? 0x01 : 0x00;
+		mod |= (m_kbspecial->read() & 0x08) ? 0x02 : 0x00;
+
+		m_transchar = key_remap[trans][mod];
+
+		if (m_transchar != 0)
+		{
+			m_strobe = 0x80;
+//			printf("new char = %04x (%02x)\n", trans, m_transchar);
+		}
 	}
 }
 

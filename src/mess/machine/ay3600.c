@@ -2,23 +2,15 @@
 
   AY3600.c
 
-  Machine file to handle emulation of the AY-3600 keyboard controller.
+  GI AY-3600 keyboard controller device
 
-  TODO:
-    -Make the caps lock functional, remove dependency on input_port_1.
-     Caps lock now functional. Barry Nelson 04/05/2001
-     Still dependent on input_port_1 though.
-    -Rename variables from a2 to AY3600
-     Done. Barry Nelson 04/05/2001
-    Find the correct MAGIC_KEY_REPEAT_NUMBER
-    Use the keyboard ROM for building a remapping table?
-
+  Rewritten 2014 by R. Belmont, thanks to earlier efforts by
+  Barry Nelson and Nathan Woods.
+ 
 ***************************************************************************/
 
 #include "emu.h"
 #include "machine/ay3600.h"
-#include "includes/apple2.h"
-
 
 /***************************************************************************
     PARAMETERS
@@ -32,15 +24,18 @@
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-
-
 /**************************************************************************/
 
-static TIMER_CALLBACK(AY3600_poll);
+// bit order in the input port of the special keys
+#define SPECIALKEY_CAPSLOCK     0x01
+#define SPECIALKEY_SHIFTL       0x04
+#define SPECIALKEY_SHIFTR       0x08
+#define SPECIALKEY_CONTROL      0x08
+#define SPECIALKEY_ALTL         0x10
+#define SPECIALKEY_ALTR         0x20
+#define SPECIALKEY_WIN          0x40
+#define SPECIALKEY_RESET        0x80
 
-static int AY3600_keyboard_queue_chars(running_machine &machine, const unicode_char *text, size_t text_len);
-static bool AY3600_keyboard_accept_char(running_machine &machine, unicode_char ch);
-static bool AY3600_keyboard_charqueue_empty(running_machine &machine);
 static const unsigned char ay3600_key_remap_2[9*8][4] =
 {
 /*        norm ctrl shft both */
@@ -256,193 +251,167 @@ static const unsigned char ay3600_key_remap_2e[2][9*8][4] =
 	}
 };
 
-#define A2_KEY_NORMAL               0
-#define A2_KEY_CONTROL              1
-#define A2_KEY_SHIFT                2
-#define A2_KEY_BOTH                 3
+#define AY3600_KEY_NORMAL               0
+#define AY3600_KEY_CONTROL              1
+#define AY3600_KEY_SHIFT                2
+#define AY3600_KEY_BOTH                 3
 #define MAGIC_KEY_REPEAT_NUMBER     80
 
 #define AY3600_KEYS_LENGTH          128
 
+const device_type AY3600N = &device_creator<ay3600n_device>;
 
-/***************************************************************************
-    HELPER FUNCTIONS
-***************************************************************************/
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
 
-INLINE int a2_has_keypad(apple2_state *state)
+//-------------------------------------------------
+//  ay3600n_device - constructor
+//-------------------------------------------------
+
+ay3600n_device::ay3600n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, AY3600N, "AY-3600 keyboard controller", tag, owner, clock, "ay3600", __FILE__)
 {
-	return (state->m_kpad1 != NULL);
+	m_keypad = m_repeat = false;
 }
-
-INLINE int a2_has_reset_dip(apple2_state *state)
-{
-	return (state->m_resetdip != NULL);
-}
-
-INLINE int a2_has_repeat(apple2_state *state)
-{
-	return (state->m_kbprepeat != NULL);
-}
-
-INLINE int a2_has_capslock(apple2_state *state)
-{
-	return !a2_has_repeat(state); /* BUG: Doesn't work with Ace */
-}
-
-INLINE int a2_no_ctrl_reset(apple2_state *state)
-{
-	return ((a2_has_repeat(state) && !a2_has_reset_dip(state)) ||
-			(a2_has_reset_dip(state) && !state->m_resetdip->read()));
-}
-
 
 /***************************************************************************
   AY3600_init
 ***************************************************************************/
 
-int AY3600_init(running_machine &machine)
+void ay3600n_device::device_start()
 {
-	apple2_state *state = machine.driver_data<apple2_state>();
 	/* Init the key remapping table */
-	state->m_ay3600_keys = auto_alloc_array_clear(machine, unsigned int, AY3600_KEYS_LENGTH);
+	m_ay3600_keys = auto_alloc_array_clear(machine(), unsigned int, AY3600_KEYS_LENGTH);
 
 	/* We poll the keyboard periodically to scan the keys.  This is
 	actually consistent with how the AY-3600 keyboard controller works. */
-	machine.scheduler().timer_pulse(attotime::from_hz(60), FUNC(AY3600_poll));
+	m_timer = timer_alloc(0, NULL);
+	m_timer->adjust(attotime::never);
 
-	/* Set Caps Lock light to ON, since that's how we default it. */
-	set_led_status(machine,1,1);
+	machine().ioport().natkeyboard().configure(
+		ioport_queue_chars_delegate(FUNC(ay3600n_device::AY3600_keyboard_queue_chars), this),
+		ioport_accept_char_delegate(FUNC(ay3600n_device::AY3600_keyboard_accept_char), this),
+		ioport_charqueue_empty_delegate(FUNC(ay3600n_device::AY3600_keyboard_charqueue_empty), this));
 
-	state->m_keywaiting = 0;
-	state->m_keycode = 0;
-	state->m_keystilldown = 0;
-	state->m_keymodreg = AY3600_KEYMOD_CAPSLOCK;    // caps lock on
-
-	state->m_last_key = 0xff;   /* necessary for special repeat key behaviour */
-	state->m_last_key_unmodified = 0xff;    /* necessary for special repeat key behaviour */
-	state->m_time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
-
-	machine.ioport().natkeyboard().configure(
-		ioport_queue_chars_delegate(FUNC(AY3600_keyboard_queue_chars), &machine),
-		ioport_accept_char_delegate(FUNC(AY3600_keyboard_accept_char), &machine),
-		ioport_charqueue_empty_delegate(FUNC(AY3600_keyboard_charqueue_empty), &machine));
-
-	return 0;
+	save_item(NAME(m_keycode));
+	save_item(NAME(m_keycode_unmodified));
+	save_item(NAME(m_keywaiting));
+	save_item(NAME(m_keystilldown));
+	save_item(NAME(m_keymodreg));
+	save_item(NAME(m_last_key));
+	save_item(NAME(m_last_key_unmodified));
+	save_item(NAME(m_time_until_repeat));
 }
 
-
-
-/***************************************************************************
-  AY3600_poll
-***************************************************************************/
-
-static TIMER_CALLBACK(AY3600_poll)
+void ay3600n_device::device_reset()
 {
-	apple2_state *state = machine.driver_data<apple2_state>();
+	/* Set Caps Lock light to ON, since that's how we default it. */
+	set_led_status(machine(), 1, 1);
+
+	m_keywaiting = 0;
+	m_keycode = 0;
+	m_keystilldown = 0;
+	m_keymodreg = AY3600_KEYMOD_CAPSLOCK;    // caps lock on
+
+	m_last_key = 0xff;   /* necessary for special repeat key behaviour */
+	m_last_key_unmodified = 0xff;    /* necessary for special repeat key behaviour */
+	m_time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
+
+	m_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+}
+
+void ay3600n_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
 	int switchkey;  /* Normal, Shift, Control, or both */
 	int port, num_ports, bit, data;
 	int any_key_pressed = 0;   /* Have we pressed a key? True/False */
 	int caps_lock = 0;
 	int curkey;
 	int curkey_unmodified;
-	ioport_port *portnames[] = { state->m_kb0, state->m_kb1, state->m_kb2, state->m_kb3, state->m_kb4, state->m_kb5, state->m_kb6,
-									state->m_kpad1, state->m_kpad2 };
+	static const char *const portnames[] = 
+	{
+		"keyb_0", "keyb_1", "keyb_2", "keyb_3", "keyb_4", "keyb_5", "keyb_6",
+		"keypad_1", "keypad_2"
+	};
 
 	/* check for these special cases because they affect the emulated key codes */
+	/* does this machine have a special repeat key? */
+	if (m_repeat)
+		m_time_until_repeat = machine().root_device().ioport("keyb_repeat")->read() & 0x01 ? 0 : ~0;
 
-	/* only repeat keys on a 2/2+ if special REPT key is pressed */
-	if (a2_has_repeat(state))
-		state->m_time_until_repeat = state->m_kbprepeat->read() & 0x01 ? 0 : ~0;
+	int special_state = machine().root_device().ioport("keyb_special")->read();
 
 	/* check caps lock and set LED here */
-	if (state->apple2_pressed_specialkey(SPECIALKEY_CAPSLOCK))
+	if (special_state & SPECIALKEY_CAPSLOCK)
 	{
 		caps_lock = 1;
-		set_led_status(machine,1,1);
-		state->m_keymodreg |= AY3600_KEYMOD_CAPSLOCK;
+		set_led_status(machine(), 1, 1);
+		m_keymodreg |= AY3600_KEYMOD_CAPSLOCK;
 	}
 	else
 	{
 		caps_lock = 0;
-		set_led_status(machine,1,0);
-		state->m_keymodreg &= ~AY3600_KEYMOD_CAPSLOCK;
+		set_led_status(machine(), 1, 0);
+		m_keymodreg &= ~AY3600_KEYMOD_CAPSLOCK;
 	}
 
-	switchkey = A2_KEY_NORMAL;
+	switchkey = AY3600_KEY_NORMAL;
 
 	/* shift key check */
-	if (state->apple2_pressed_specialkey(SPECIALKEY_SHIFT))
+	if (special_state & (SPECIALKEY_SHIFTL | SPECIALKEY_SHIFTR))
 	{
-		switchkey |= A2_KEY_SHIFT;
-		state->m_keymodreg |= AY3600_KEYMOD_SHIFT;
+		switchkey |= AY3600_KEY_SHIFT;
+		m_keymodreg |= AY3600_KEYMOD_SHIFT;
 	}
 	else
 	{
-		state->m_keymodreg &= ~AY3600_KEYMOD_SHIFT;
+		m_keymodreg &= ~AY3600_KEYMOD_SHIFT;
 	}
 
-	/* control key check - only one control key on the left side on the Apple */
-	if (state->apple2_pressed_specialkey(SPECIALKEY_CONTROL))
+	/* control key check - only one control key */
+	if (special_state & SPECIALKEY_CONTROL)
 	{
-		switchkey |= A2_KEY_CONTROL;
-		state->m_keymodreg |= AY3600_KEYMOD_CONTROL;
+		switchkey |= AY3600_KEY_CONTROL;
+		m_keymodreg |= AY3600_KEYMOD_CONTROL;
 	}
 	else
 	{
-		state->m_keymodreg &= ~AY3600_KEYMOD_CONTROL;
+		m_keymodreg &= ~AY3600_KEYMOD_CONTROL;
 	}
 
 	/* apple key check */
-	if (state->apple2_pressed_specialkey(SPECIALKEY_BUTTON0))
+	if (special_state & SPECIALKEY_ALTL)
 	{
-		state->m_keymodreg |= AY3600_KEYMOD_COMMAND;
+		m_keymodreg |= AY3600_KEYMOD_COMMAND;
 	}
 	else
 	{
-		state->m_keymodreg &= ~AY3600_KEYMOD_COMMAND;
+		m_keymodreg &= ~AY3600_KEYMOD_COMMAND;
 	}
 
 	/* option key check */
-	if (state->apple2_pressed_specialkey(SPECIALKEY_BUTTON1))
+	if (special_state & SPECIALKEY_ALTR)
 	{
-		state->m_keymodreg |= AY3600_KEYMOD_OPTION;
+		m_keymodreg |= AY3600_KEYMOD_OPTION;
 	}
 	else
 	{
-		state->m_keymodreg &= ~AY3600_KEYMOD_OPTION;
-	}
-
-	/* reset key check */
-	if (state->apple2_pressed_specialkey(SPECIALKEY_RESET) &&
-		(a2_no_ctrl_reset(state) || switchkey & A2_KEY_CONTROL))
-	{
-			if (!state->m_reset_flag)
-			{
-				state->m_reset_flag = 1;
-				/* using PULSE_LINE does not allow us to press and hold key */
-				state->m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			}
-			return;
-	}
-	if (state->m_reset_flag)
-	{
-		state->m_reset_flag = 0;
-		state->m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		machine.schedule_soft_reset();
+		m_keymodreg &= ~AY3600_KEYMOD_OPTION;
 	}
 
 	/* run through real keys and see what's being pressed */
-	num_ports = a2_has_keypad(state) ? 9 : 7;
+	num_ports = m_keypad ? 9 : 7;
 
-	state->m_keymodreg &= ~AY3600_KEYMOD_KEYPAD;
+	m_keymodreg &= ~AY3600_KEYMOD_KEYPAD;
 
 	for (port = 0; port < num_ports; port++)
 	{
-		data = portnames[port]->read();
+		data = machine().root_device().ioport(portnames[port])->read();
 
 		for (bit = 0; bit < 8; bit++)
 		{
-			if (a2_has_capslock(state))
+			if (!m_repeat)
 			{
 				curkey = ay3600_key_remap_2e[caps_lock][port*8+bit][switchkey];
 				curkey_unmodified = ay3600_key_remap_2e[caps_lock][port*8+bit][0];
@@ -458,68 +427,67 @@ static TIMER_CALLBACK(AY3600_poll)
 
 				if (port == 8)
 				{
-					state->m_keymodreg |= AY3600_KEYMOD_KEYPAD;
+					m_keymodreg |= AY3600_KEYMOD_KEYPAD;
 				}
 
 				/* prevent overflow */
-				if (state->m_ay3600_keys[port*8+bit] < 65000)
-					state->m_ay3600_keys[port*8+bit]++;
+				if (m_ay3600_keys[port*8+bit] < 65000)
+					m_ay3600_keys[port*8+bit]++;
 
 				/* on every key press, reset the time until repeat and the key to repeat */
-				if ((state->m_ay3600_keys[port*8+bit] == 1) && (curkey_unmodified != state->m_last_key_unmodified))
+				if ((m_ay3600_keys[port*8+bit] == 1) && (curkey_unmodified != m_last_key_unmodified))
 				{
-					state->m_time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
-					state->m_last_key = curkey;
-					state->m_last_key_unmodified = curkey_unmodified;
+					m_time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
+					m_last_key = curkey;
+					m_last_key_unmodified = curkey_unmodified;
 				}
 			}
 			else
 			{
-				state->m_ay3600_keys[port*8+bit] = 0;
+				m_ay3600_keys[port*8+bit] = 0;
 			}
 		}
 	}
 
-	state->m_keymodreg &= ~AY3600_KEYMOD_REPEAT;
+	m_keymodreg &= ~AY3600_KEYMOD_REPEAT;
 
 	if (!any_key_pressed)
 	{
 		/* If no keys have been pressed, reset the repeat time and return */
-		state->m_time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
-		state->m_last_key = 0xff;
-		state->m_last_key_unmodified = 0xff;
+		m_time_until_repeat = MAGIC_KEY_REPEAT_NUMBER;
+		m_last_key = 0xff;
+		m_last_key_unmodified = 0xff;
 	}
 	else
 	{
 		/* Otherwise, count down the repeat time */
-		if (state->m_time_until_repeat > 0)
-			state->m_time_until_repeat--;
+		if (m_time_until_repeat > 0)
+			m_time_until_repeat--;
 
 		/* Even if a key has been released, repeat it if it was the last key pressed */
 		/* If we should output a key, set the appropriate Apple II data lines */
-		if (state->m_time_until_repeat == 0 ||
-			state->m_time_until_repeat == MAGIC_KEY_REPEAT_NUMBER-1)
+		if (m_time_until_repeat == 0 ||
+			m_time_until_repeat == MAGIC_KEY_REPEAT_NUMBER-1)
 		{
-			state->m_keywaiting = 1;
-			state->m_keycode = state->m_last_key;
-			state->m_keycode_unmodified = state->m_last_key_unmodified;
-			state->m_keymodreg |= AY3600_KEYMOD_REPEAT;
+			m_keywaiting = 1;
+			m_keycode = m_last_key;
+			m_keycode_unmodified = m_last_key_unmodified;
+			m_keymodreg |= AY3600_KEYMOD_REPEAT;
 		}
 	}
-	state->m_keystilldown = (state->m_last_key_unmodified == state->m_keycode_unmodified);
+	m_keystilldown = (m_last_key_unmodified == m_keycode_unmodified);
 }
 
 
 
 /***************************************************************************
-  AY3600_keydata_strobe_r ($C00x)
+  AY3600_keydata_strobe_r
 ***************************************************************************/
 
-int AY3600_keydata_strobe_r(running_machine &machine)
+int ay3600n_device::keydata_strobe_r()
 {
-	apple2_state *state = machine.driver_data<apple2_state>();
 	int rc;
-	rc = state->m_keycode | (state->m_keywaiting ? 0x80 : 0x00);
+	rc = m_keycode | (m_keywaiting ? 0x80 : 0x00);
 	LOG(("AY3600_keydata_strobe_r(): rc=0x%02x\n", rc));
 	return rc;
 }
@@ -527,35 +495,33 @@ int AY3600_keydata_strobe_r(running_machine &machine)
 
 
 /***************************************************************************
-  AY3600_anykey_clearstrobe_r ($C01x)
+  AY3600_anykey_clearstrobe_r
 ***************************************************************************/
 
-int AY3600_anykey_clearstrobe_r(running_machine &machine)
+int ay3600n_device::anykey_clearstrobe_r()
 {
-	apple2_state *state = machine.driver_data<apple2_state>();
 	int rc;
-	state->m_keywaiting = 0;
-	rc = state->m_keycode | (state->m_keystilldown ? 0x80 : 0x00);
+	m_keywaiting = 0;
+	rc = m_keycode | (m_keystilldown ? 0x80 : 0x00);
 	LOG(("AY3600_anykey_clearstrobe_r(): rc=0x%02x\n", rc));
 	return rc;
 }
 
 
 /***************************************************************************
-  AY3600_keymod_r ($C025 - IIgs only)
+  AY3600_keymod_r
 ***************************************************************************/
 
-int AY3600_keymod_r(running_machine &machine)
+int ay3600n_device::keymod_r()
 {
-	apple2_state *state = machine.driver_data<apple2_state>();
-	return state->m_keymodreg;
+	return m_keymodreg;
 }
 
 /***************************************************************************
   Natural keyboard support
 ***************************************************************************/
 
-static UINT8 AY3600_get_keycode(unicode_char ch)
+UINT8 ay3600n_device::AY3600_get_keycode(unicode_char ch)
 {
 	UINT8 result;
 
@@ -587,25 +553,28 @@ static UINT8 AY3600_get_keycode(unicode_char ch)
 
 
 
-static int AY3600_keyboard_queue_chars(running_machine &machine, const unicode_char *text, size_t text_len)
+int ay3600n_device::AY3600_keyboard_queue_chars(const unicode_char *text, size_t text_len)
 {
-	apple2_state *state = machine.driver_data<apple2_state>();
-
-	if (state->m_keywaiting)
+	if (m_keywaiting)
 		return 0;
-	state->m_keycode = AY3600_get_keycode(text[0]);
-	state->m_keywaiting = 1;
+	m_keycode = AY3600_get_keycode(text[0]);
+	m_keywaiting = 1;
 	return 1;
 }
 
-
-
-static bool AY3600_keyboard_accept_char(running_machine &machine, unicode_char ch)
+bool ay3600n_device::AY3600_keyboard_accept_char(unicode_char ch)
 {
 	return AY3600_get_keycode(ch) != 0;
 }
 
-static bool AY3600_keyboard_charqueue_empty(running_machine &machine)
+bool ay3600n_device::AY3600_keyboard_charqueue_empty()
 {
 	return true;
 }
+
+void ay3600n_device::set_runtime_config(bool keypad, bool repeat)
+{
+	m_keypad = keypad;
+	m_repeat = repeat;
+}
+

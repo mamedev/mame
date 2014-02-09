@@ -51,10 +51,7 @@ public:
 	INT32 m_txoffs;
 	INT32 m_fgoffs;
 	INT32 m_bgoffs;
-	INT32 m_scroll_x;
-	INT32 m_scroll_y;
 	INT32 m_display_on;
-	INT32 m_flip_screen;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
@@ -111,7 +108,6 @@ public:
 	UINT32 screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(twincobr_interrupt);
 	INTERRUPT_GEN_MEMBER(wardner_interrupt);
-	void twincobr_restore_screen();
 	void twincobr_restore_dsp();
 	void twincobr_create_tilemaps();
 	void twincobr_display(int enable);
