@@ -23,19 +23,12 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 
   * Missing/Undumped Cartridges
 
-    - 7 Card Stud       26-3074 (1984)
     - 8-Ball
-    - Crosswords        26-3082 (1981)
-    - Math Tutor        26-3148 (1988)
-    - Robot Battle      26-3070 (1981)
     - Star Blaster              (1981)
     - Super Logo        26-2717 (1984)
-    - Appliance & Light 26-3142 (1984)
-    - Color File II     26-3110 (1986)
     - Color Term Plus           (1983)
     - ColorCom/E
-    - Astroblast                        Dragon only
-
+    
   * These ROMs appear to have been dumped from RAM and have been marked as "Bad Dumps"
 
     - Alphabet Zoo  proper size is 16K, not dumped from RAM
@@ -53,6 +46,19 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 -->
 <softwarelist name="coco_cart" description="Tandy Radio Shack Color Computer cartridges">
 
+	<software name="7cardstd">
+		<description>7 Card Stud</description>
+		<year>1983</year>
+		<publisher>Tandy</publisher>
+		<info name="developer" value="Intelligent Software" />
+		<info name="serial" value="26-3074" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="7 card stud (1983) (26-3074) (intelligent software).rom" size="8192" crc="f38d8c97" sha1="5cfcb699ce09840dbb52714c8d91b3d86d3a86c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+		
 	<!--software name="alphazoo">
 	    <description>Alphabet Zoo</description>
 	    <year>1984</year>
@@ -105,6 +111,19 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="androne (1983)(26-3096)(robert arnstein)[!].rom" size="8192" crc="7d1cac0e" sha1="b19da63ba28a1278c3921a2dc739ad1d0dbd5402" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="applianc">
+		<description>Applicance and Light Controller</description>
+		<year>1984</year>
+		<publisher>Tandy</publisher>
+		<info name="developer" value="Pico Electronics Ltd" />
+		<info name="serial" value="26-3142" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="16128">
+				<rom name="applicance and light controller (1984) (26-3142) (pico electronics ltd).rom" size="16128" crc="262a299c" sha1="1f5c8bdb4a75ca61a5d738c3a4100dbaed154357" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -212,12 +231,25 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="26-3089" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
-				<!--rom name="canyon climber (1982)(26-3089)(datasoft)[!].rom" size="8192" crc="aa214e43" sha1="ac5d771b3fd692de72d69945ae1fa4788db54538" offset="0" /-->
-				<rom name="canyon climber.rom" size="8192" crc="41dd5a1a" sha1="2c20412111d315228b8ada24c3b4b02ad1a608c2" offset="0" />
+				<rom name="canyon climber (1982)(26-3089)(datasoft)[!].rom" size="8192" crc="aa214e43" sha1="ac5d771b3fd692de72d69945ae1fa4788db54538" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<software name="cclimbra" cloneof="cclimber">
+		<description>Canyon Climber (Alt)</description>
+		<year>1982</year>
+		<publisher>Tandy</publisher>
+		<info name="developer" value="Datasoft" />
+		<info name="author" value="James Garon" />
+		<info name="serial" value="26-3089" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="canyon climber (1982) (26-3089) (datasoft) [a1].rom" size="8192" crc="23e3869f" sha1="b064b863b0e621bdfece76a0ac7b11301b5d8528" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+		
 	<software name="castlgrd">
 		<description>Castle Guard</description>
 		<year>1981</year>
@@ -321,8 +353,22 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="clrfile">
+	
+	<software name="clrfile2">
+		<description>Color File II</description>
+		<year>1986</year>
+		<publisher>Tandy</publisher>
+		<info name="developer" value="SRB Software" />
+		<info name="author" value="Steve Bjork" />
+		<info name="serial" value="26-3110" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="color file ii (1986) (26-3110) (tandy).rom" size="16384" crc="a12f8164" sha1="52fd1984ac84c280d29c2d701b1773cfcb957305" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+		
+	<software name="clrfile" cloneof="clrfile2">
 		<description>Color File</description>
 		<year>1981</year>
 		<publisher>Tandy</publisher>
@@ -333,7 +379,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-
+		
 	<software name="clrforth">
 		<description>Color FORTH v1.1</description>
 		<year>1981</year>
@@ -358,7 +404,33 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<software name="clrlogof" cloneof="clrlogo">
+		<description>Color LOGO (FR)</description>
+		<year>1983</year>
+		<publisher>Tandy</publisher>
+		<info name="developer" value="Larry Kheriaty &amp; George Gerhold" />
+		<info name="serial" value="26-8722" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="color logo (french) (1983) (26-8722) (larry kheriaty &amp; george gerhold) [!].rom" size="8192" crc="e0dff41f" sha1="f3401fc9cf47fd9fb077e8801970aa8318a955ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="clrrobot">
+		<description>Color Robot Battle</description>
+		<year>1981</year>
+		<publisher>Tandy</publisher>
+		<info name="developer" value="The Image Producers" />
+		<info name="serial" value="26-3070" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="color robot battle (1981) (26-3070) (the image producers).rom" size="8192" crc="abf18f89" sha1="4b4d3b440bd961305bccd9e121c4cf23cd1c4f2d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+		
 	<software name="scrpsit2">
 		<description>Color Scripsit II</description>
 		<year>1986</year>
@@ -384,7 +456,20 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<software name="crosswrd">
+		<description>Crosswords</description>
+		<year>1981</year>
+		<publisher>Tandy</publisher>
+		<info name="developer" value="The Image Producers" />
+		<info name="serial" value="26-3082" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="4097">
+				<rom name="crosswords (1981) (26-3082) (the image producers).rom" size="4096" crc="06075f2a" sha1="949cac570d8ccb6cea0ed565d420f3198e2f1c64" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="cyrus1" cloneof="cyrus">
 		<description>Cyrus Chess (Re-Badge)</description>
 		<year>1983</year>
@@ -779,7 +864,20 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<software name="mathtut">
+		<description>Math Tutor</description>
+		<year>1988</year>
+		<publisher>Tandy</publisher>
+		<info name="developer" value="ZCT Systems" />
+		<info name="serial" value="26-3148" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="16128">
+				<rom name="math tutor (1988) (26-3148) (zct systems).rom" size="16128" crc="a8cff793" sha1="d67e05d119698854ba4e2b084b62bebfc8547978" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="megabug">
 		<description>Mega-Bug</description>
 		<year>1982</year>
@@ -1383,6 +1481,30 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 
 <!-- Cartridges released for Dragon Data systems -->
 
+	<software name="astrblst">
+		<description>Astroblast</description>
+		<year>1982</year>
+		<publisher>Dragon Data</publisher>
+		<info name="developer" value="Mark Data Products" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="astroblast (1982) (dragon data).rom" size="8192" crc="61143386" sha1="64e103c787d551d9504a6e2c5d70fb2c676c92e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="dodlbugd">
+		<description>Doodle Bug (Dragon 32)</description>
+		<year>1982</year>
+		<publisher>Dragon Data</publisher>
+		<info name="developer" value="Computerware" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="doodle bug (1982) (dragon data).rom" size="8192" crc="410a0332" sha1="637d37bffb6ebfd4441ea356904d71989df87b3f" status="baddump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="dospls49">
 		<description>DOSPlus v4.9B</description>
 		<year>1989</year>
@@ -1673,5 +1795,17 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<software name="toolkit">
+		<description>Toolkit</description>
+		<year>1983</year>
+		<publisher>Premier Microsystems</publisher>
+		<info name="author" value="S.J Purdy" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="toolkit (1983) (premier microsystems) [!].rom" size="8192" crc="82ef981a" sha1="b9c0d29382ae1d685f196ab4b53fb75156e12404" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 </softwarelist>
