@@ -2,6 +2,8 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="psx" description="Sony Playstation CD-ROMs">
 
+  <!-- todo, reconvert original dumps using current CHDMAN verison - Feb 2014 -->
+  
 <!--
 ***********************
 NON-REDUMP Rips
@@ -47,6 +49,24 @@ A few comments on these:
 
 <!-- Prototype disks -->
 
+  
+	<software name="bublbob2" >
+		<!-- Original images
+      bb2.bin 62,620,864  1c2c9f63
+      bb2.cue         69  096e5077
+		-->
+		<description>Bubble Bobble II (prototype)</description>
+		<year>1995</year>
+		<publisher>Taito</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="bubble bobble ii (prototype)" sha1="647d50fbb8aa602b82c3f7968d3affe57634f69a" />
+			</diskarea>
+		</part>
+	</software>
+
+  
+    
 	<software name="baldgate" supported="no">
 		<!-- Original images (from drx)
 		<rom name="baldur's gate - disc 1.bin" size="657475728" crc="96e9befa"/>
