@@ -505,6 +505,11 @@ public:
 		m_centronics->write_data7(BIT(data, 7));
 	}
 
+	WRITE8_MEMBER(via1_pb_w)
+	{
+		//int centronics_unknown = !BIT(data,5);
+	}
+
 	ram_device *ram()
 	{
 		return m_ram;
@@ -717,8 +722,9 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 
 	MCFG_DEVICE_ADD("via1", VIA6522, 0)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(clcd_state, via1_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(clcd_state, via1_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, nmi_line))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe)) MCFG_DEVCB_XOR(1)
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
@@ -734,6 +740,7 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb4))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb6)) MCFG_DEVCB_XOR(1)
 
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)
