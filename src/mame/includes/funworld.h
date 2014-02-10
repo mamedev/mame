@@ -19,6 +19,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
 	DECLARE_READ8_MEMBER(funquiz_ay8910_a_r);
 	DECLARE_READ8_MEMBER(funquiz_ay8910_b_r);
+	DECLARE_READ8_MEMBER(chinatow_r_32f0);
 	DECLARE_DRIVER_INIT(magicd2b);
 	DECLARE_DRIVER_INIT(magicd2c);
 	DECLARE_DRIVER_INIT(saloon);
@@ -34,6 +35,7 @@ public:
 	DECLARE_VIDEO_START(funworld);
 	DECLARE_PALETTE_INIT(funworld);
 	DECLARE_VIDEO_START(magicrd2);
+	DECLARE_VIDEO_START(chinatow);
 	UINT32 screen_update_funworld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
