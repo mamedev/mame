@@ -18,6 +18,7 @@
 #include "machine/cpc_ssa1.h"
 #include "machine/cpc_rom.h"
 #include "machine/mface2.h"
+#include "machine/cpc_pds.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"

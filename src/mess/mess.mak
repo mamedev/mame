@@ -914,6 +914,7 @@ $(MESSOBJ)/amstrad.a:           \
 	$(MESS_MACHINE)/cpcexp.o    \
 	$(MESS_MACHINE)/cpc_ssa1.o  \
 	$(MESS_MACHINE)/cpc_rom.o   \
+	$(MESS_MACHINE)/cpc_pds.o   \
 	$(MESS_MACHINE)/mface2.o    \
 	$(MESS_DRIVERS)/amstr_pc.o  \
 	$(MESS_MACHINE)/amstr_pc.o  \
