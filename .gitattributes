@@ -7320,6 +7320,7 @@ src/mess/drivers/pulsar.c svneol=native#text/plain
 src/mess/drivers/pv1000.c svneol=native#text/plain
 src/mess/drivers/pv2000.c svneol=native#text/plain
 src/mess/drivers/pv9234.c svneol=native#text/plain
+src/mess/drivers/pve500.c svneol=native#text/plain
 src/mess/drivers/px4.c svneol=native#text/plain
 src/mess/drivers/px8.c svneol=native#text/plain
 src/mess/drivers/pyl601.c svneol=native#text/plain

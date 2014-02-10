@@ -1891,6 +1891,7 @@ $(MESSOBJ)/sony.a:              \
 	$(MESS_MACHINE)/psxmultitap.o \
 	$(MESS_DRIVERS)/pockstat.o  \
 	$(MESS_DRIVERS)/smc777.o    \
+	$(MESS_DRIVERS)/pve500.o    \
 
 $(MESSOBJ)/sord.a:              \
 	$(MESS_DRIVERS)/m5.o        \
