@@ -4350,13 +4350,13 @@ void segas32_state::orunners_sw1_output( int which, UINT16 data )
 	{
 		output_set_value("MA_Check_Point_lamp", BIT(data, 1));
 		output_set_value("MA_Race_Leader_lamp", BIT(data, 3));
-		output_set_value("MA_Steering_Wheel_lamp", BIT(data, 4));
+		output_set_value("MA_Steering_Wheel_motor", BIT(data, 4));
 	}
 	else
 	{
 		output_set_value("MB_Check_Point_lamp", BIT(data, 1));
 		output_set_value("MB_Race_Leader_lamp", BIT(data, 3));
-		output_set_value("MB_Steering_Wheel_lamp", BIT(data, 4));
+		output_set_value("MB_Steering_Wheel_motor", BIT(data, 4));
 	}
 }
 
