@@ -324,12 +324,17 @@ void c64h156_device::live_run(attotime limit)
 			int load = !(((cur_live.bit_counter & 7) == 7) && ((cur_live.cell_counter & 3) == 3));
 
 			if (!load) {
-				cur_live.shift_reg_write = cur_live.yb;
-				// TODO use data read from disk if via PA is in read mode
-				//if (LOG) logerror("%s load write shift register %02x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
-			} else {
+				if (cur_live.oe) {
+					cur_live.shift_reg_write = cur_live.shift_reg;
+					if (LOG) logerror("%s load write shift register from read shift register %02x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
+				} else {
+					cur_live.shift_reg_write = cur_live.yb;
+					if (LOG) logerror("%s load write shift register from YB %02x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
+				}
+			} else if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1)) {
 				cur_live.shift_reg_write <<= 1;
 				cur_live.shift_reg_write &= 0xff;
+				if (LOG) logerror("%s shift write register << %02x\n", cur_live.tm.as_string(), cur_live.shift_reg_write);
 			}
 
 			// update signals
