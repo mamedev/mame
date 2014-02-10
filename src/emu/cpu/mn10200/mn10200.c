@@ -60,10 +60,10 @@ void mn10200_device::take_irq(int level, int group)
 	m_iagr = group;
 }
 
-void mn10200_device::check_irq()
+bool mn10200_device::check_irq()
 {
 	if (!m_nmicr && !(m_psw & FLAG_IE))
-		return;
+		return false;
 	
 	int level = m_psw >> 8 & 7;
 	int group = 0;
@@ -85,6 +85,9 @@ void mn10200_device::check_irq()
 		take_irq(0, 0);
 	else if (group)
 		take_irq(level, group);
+	else return false;
+	
+	return true;
 }
 
 void mn10200_device::check_ext_irq()
@@ -333,9 +336,9 @@ void mn10200_device::device_reset()
 }
 
 
-void mn10200_device::illegal()
+void mn10200_device::illegal(UINT8 prefix, UINT8 op)
 {
-	logerror("MN10200: illegal opcode @ PC=%x\n", m_pc);
+	logerror("MN10200: illegal opcode %x %x @ PC=%x\n", prefix, op, m_pc);
 	m_nmicr |= 2;
 }
 
@@ -477,13 +480,13 @@ void mn10200_device::execute_run()
 		// mov dm, (an)
 		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
 		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-			write_mem16(m_a[op>>2&3], (UINT16)m_d[op&3]);
+			write_mem16(m_a[op>>2&3], m_d[op&3]);
 			break;
 
 		// movb dm, (an)
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-			write_mem8(m_a[op>>2&3], (UINT8)m_d[op&3]); // note: typo in manual
+			write_mem8(m_a[op>>2&3], m_d[op&3]); // note: typo in manual
 			break;
 
 		// mov (an), dm
@@ -731,7 +734,7 @@ void mn10200_device::execute_run()
 			break;
 
 		default:
-			illegal();
+			illegal(0, op);
 			possible_irq = true;
 			break;
 
@@ -817,7 +820,7 @@ void mn10200_device::execute_run()
 			break;
 
 		default:
-			illegal();
+			illegal(0xf0, op);
 			possible_irq = true;
 			break;
 		}
@@ -940,7 +943,7 @@ void mn10200_device::execute_run()
 			break;
 
 		default:
-			illegal();
+			illegal(0xf2, op);
 			possible_irq = true;
 			break;
 		}
@@ -1120,7 +1123,7 @@ void mn10200_device::execute_run()
 			break;
 
 		default:
-			illegal();
+			illegal(0xf3, op);
 			possible_irq = true;
 			break;
 		}
@@ -1284,7 +1287,7 @@ void mn10200_device::execute_run()
 			break;
 
 		default:
-			illegal();
+			illegal(0xf4, op);
 			possible_irq = true;
 			break;
 		}
@@ -1445,7 +1448,7 @@ void mn10200_device::execute_run()
 			break;
 
 		default:
-			illegal();
+			illegal(0xf5, op);
 			possible_irq = true;
 			break;
 		}
@@ -1506,6 +1509,18 @@ void mn10200_device::execute_run()
 			m_d[op&3] = do_sub(m_d[op&3], (INT16)read_arg16(m_pc), 0);
 			break;
 
+		// mov an, (abs16)
+		case 0x20: case 0x21: case 0x22: case 0x23:
+			m_cycles -= 1;
+			write_mem24(read_arg16(m_pc), m_a[op&3]);
+			break;
+
+		// mov (abs16), an
+		case 0x30: case 0x31: case 0x32: case 0x33:
+			m_cycles -= 1;
+			m_a[op&3] = read_mem24(read_arg16(m_pc));
+			break;
+
 		// or imm16, dn
 		case 0x40: case 0x41: case 0x42: case 0x43:
 			test_nz16(m_d[op&3] |= read_arg16(m_pc));
@@ -1531,12 +1546,14 @@ void mn10200_device::execute_run()
 		// movx dm, (imm16, an)
 		case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
 		case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
+			m_cycles -= 1;
 			write_mem24(m_a[op>>2&3] + (INT16)read_arg16(m_pc), m_d[op&3]);
 			break;
 
 		// movx (imm16, an), dm
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
+			m_cycles -= 1;
 			m_d[op&3] = read_mem24(m_a[op>>2&3] + (INT16)read_arg16(m_pc));
 			break;
 
@@ -1555,12 +1572,14 @@ void mn10200_device::execute_run()
 		// mov am, (imm16, an)
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
+			m_cycles -= 1;
 			write_mem24(m_a[op>>2&3] + (INT16)read_arg16(m_pc), m_a[op&3]);
 			break;
 
 		// mov (imm16, an), am
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
+			m_cycles -= 1;
 			m_a[op&3] = read_mem24(m_a[op>>2&3] + (INT16)read_arg16(m_pc));
 			break;
 
@@ -1577,7 +1596,7 @@ void mn10200_device::execute_run()
 			break;
 
 		default:
-			illegal();
+			illegal(0xf7, op);
 			possible_irq = true;
 			break;
 		}

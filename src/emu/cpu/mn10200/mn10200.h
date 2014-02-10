@@ -161,12 +161,12 @@ private:
 	inline void change_pc(UINT32 pc) { m_pc = pc & 0xffffff; }
 
 	void take_irq(int level, int group);
-	void check_irq();
+	bool check_irq();
 	void check_ext_irq();
 	void refresh_timer(int tmr);
 	void timer_tick_simple(int tmr);
 	TIMER_CALLBACK_MEMBER( simple_timer_cb );
-	void illegal();
+	void illegal(UINT8 prefix, UINT8 op);
 	UINT32 do_add(UINT32 a, UINT32 b, UINT32 c);
 	UINT32 do_sub(UINT32 a, UINT32 b, UINT32 c);
 	void test_nz16(UINT16 v);
