@@ -627,6 +627,8 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	MCFG_AY31015_ADD( "tr1602", trs80_ay31015_config )
 MACHINE_CONFIG_END
 

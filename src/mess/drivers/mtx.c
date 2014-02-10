@@ -379,6 +379,8 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(mtx_state, write_centronics_perror))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(mtx_state, write_centronics_select))
 
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	MCFG_SNAPSHOT_ADD("snapshot", mtx_state, mtx, "mtx", 1)
 	MCFG_CASSETTE_ADD("cassette", mtx_cassette_interface)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", mtx_state, cassette_tick, attotime::from_hz(44100))
