@@ -9,8 +9,8 @@
 
  Here we emulate the following PCBs
 
- * Bandai LZ93D50 [mapper 16]
- * Bandai FCG (alt name of the LZ93D50 or something different?) [mapper 16]
+ * Bandai FCG [mapper 16] (older design, regs are only accessed in 0x6000-0x7fff range)
+ * Bandai LZ93D50 [mapper 16] (this extends FCG by solving issues when writing to 0x8000-0xffff)
  * Bandai LZ93D50 + 24C01 EEPROM [mapper 159]
  * Bandai LZ93D50 + 24C02 EEPROM [mapper 16]
  * Bandai Famicom Jump 2 (aka LZ93D50 + SRAM) [mapper 153]
@@ -48,10 +48,10 @@
 
 const device_type NES_KARAOKESTUDIO = &device_creator<nes_karaokestudio_device>;
 const device_type NES_OEKAKIDS = &device_creator<nes_oekakids_device>;
+const device_type NES_FCG = &device_creator<nes_fcg_device>;
 const device_type NES_LZ93D50 = &device_creator<nes_lz93d50_device>;
 const device_type NES_LZ93D50_24C01 = &device_creator<nes_lz93d50_24c01_device>;
 const device_type NES_LZ93D50_24C02 = &device_creator<nes_lz93d50_24c02_device>;
-const device_type NES_FCG = &device_creator<nes_fcg_device>;
 const device_type NES_DATACH = &device_creator<nes_datach_device>;
 const device_type NES_FJUMP2 = &device_creator<nes_fjump2_device>;
 
@@ -66,13 +66,23 @@ nes_oekakids_device::nes_oekakids_device(const machine_config &mconfig, const ch
 {
 }
 
-nes_lz93d50_device::nes_lz93d50_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_fcg_device::nes_fcg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
+nes_fcg_device::nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: nes_nrom_device(mconfig, NES_FCG, "NES Cart Bandai FCG PCB", tag, owner, clock, "nes_fcg", __FILE__)
+{
+}
+
+nes_lz93d50_device::nes_lz93d50_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+					: nes_fcg_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
 nes_lz93d50_device::nes_lz93d50_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_LZ93D50, "NES Cart Bandai LZ93D50 PCB", tag, owner, clock, "nes_lz93d50", __FILE__)
+					: nes_fcg_device(mconfig, NES_LZ93D50, "NES Cart Bandai LZ93D50 PCB", tag, owner, clock, "nes_lz93d50", __FILE__)
 {
 }
 
@@ -90,11 +100,6 @@ nes_lz93d50_24c01_device::nes_lz93d50_24c01_device(const machine_config &mconfig
 
 nes_lz93d50_24c02_device::nes_lz93d50_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_lz93d50_24c01_device(mconfig, NES_LZ93D50_24C02, "NES Cart Bandai LZ93D50 + 24C02 PCB", tag, owner, clock, "nes_lz93d50_ep2", __FILE__)
-{
-}
-
-nes_fcg_device::nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_lz93d50_device(mconfig, NES_FCG, "NES Cart Bandai FCG PCB", tag, owner, clock, "nes_fcg", __FILE__)
 {
 }
 
@@ -141,7 +146,7 @@ void nes_oekakids_device::pcb_reset()
 	m_reg = 0;
 }
 
-void nes_lz93d50_device::device_start()
+void nes_fcg_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
@@ -151,7 +156,7 @@ void nes_lz93d50_device::device_start()
 	save_item(NAME(m_irq_count));
 }
 
-void nes_lz93d50_device::pcb_reset()
+void nes_fcg_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
@@ -170,8 +175,7 @@ void nes_lz93d50_24c01_device::device_start()
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
-	save_item(NAME(m_i2c_mem));
-	save_item(NAME(m_i2c_clk));
+	save_item(NAME(m_i2c_dir));
 }
 
 void nes_lz93d50_24c01_device::pcb_reset()
@@ -183,8 +187,7 @@ void nes_lz93d50_24c01_device::pcb_reset()
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
-	m_i2c_mem = 0;
-	m_i2c_clk = 0;
+	m_i2c_dir = 0;
 }
 
 void nes_fjump2_device::device_start()
@@ -250,10 +253,10 @@ WRITE8_MEMBER(nes_oekakids_device::nt_w)
 	int page = ((offset & 0xc00) >> 10);
 
 #if 0
-	if (offset < 0x1000 && (m_latch != (offset & 0x300) >> 8))
+	if (!(offset & 0x1000) && (offset & 0x3ff) < 0x3c0)
 	{
 		m_latch = (offset & 0x300) >> 8;
-		update_chr();
+		chr4_0(m_reg | m_latch, CHRRAM);
 	}
 #endif
 
@@ -265,10 +268,10 @@ READ8_MEMBER(nes_oekakids_device::nt_r)
 	int page = ((offset & 0xc00) >> 10);
 
 #if 0
-	if (offset < 0x1000 && (m_latch != (offset & 0x300) >> 8))
+	if (!(offset & 0x1000) && (offset & 0x3ff) < 0x3c0)
 	{
 		m_latch = (offset & 0x300) >> 8;
-		update_chr();
+		chr4_0(m_reg | m_latch, CHRRAM);
 	}
 #endif
 
@@ -297,14 +300,14 @@ WRITE8_MEMBER(nes_oekakids_device::write_h)
 {
 	LOG_MMC(("oeka kids write_h, offset: %04x, data: %02x\n", offset, data));
 
-	prg32(data);
-	m_reg = (data & 0x04);
+	prg32(data & 0x03);
+	m_reg = data & 0x04;
 	update_chr();
 }
 
 /*-------------------------------------------------
 
- Bandai LZ93D50 boards emulation
+ Bandai FCG / LZ93D50 boards emulation
 
  There are several variants: plain board with or without SRAM,
  board + 24C01 EEPROM, board + 24C02 EEPROM, board + Barcode
@@ -325,7 +328,7 @@ WRITE8_MEMBER(nes_oekakids_device::write_h)
 
  -------------------------------------------------*/
 
-void nes_lz93d50_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_fcg_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -348,7 +351,7 @@ void nes_lz93d50_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	}
 }
 
-WRITE8_MEMBER(nes_lz93d50_device::lz93d50_write)
+WRITE8_MEMBER(nes_fcg_device::fcg_write)
 {
 	LOG_MMC(("lz93d50_write, offset: %04x, data: %02x\n", offset, data));
 
@@ -386,18 +389,20 @@ WRITE8_MEMBER(nes_lz93d50_device::lz93d50_write)
 	}
 }
 
-WRITE8_MEMBER(nes_lz93d50_device::write_m)
+WRITE8_MEMBER(nes_fcg_device::write_m)
 {
 	LOG_MMC(("lz93d50 write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (!m_battery && !m_prgram)
-		lz93d50_write(space, offset & 0x0f, data, mem_mask);
+		fcg_write(space, offset & 0x0f, data, mem_mask);
 	else if (m_battery)
 		m_battery[offset] = data;
 	else
 		m_prgram[offset] = data;
 }
 
+// FCG board does not access regs in 0x8000-0xffff space!
+// only later design lz93d50 (and its variants do)!
 
 WRITE8_MEMBER(nes_lz93d50_24c01_device::write_h)
 {
@@ -406,13 +411,12 @@ WRITE8_MEMBER(nes_lz93d50_24c01_device::write_h)
 	switch (offset & 0x0f)
 	{
 		case 0x0d:
-			m_i2c_clk = BIT(data, 5);
-			m_i2c_mem = BIT(data, 6);
-			m_i2cmem->write_scl(m_i2c_clk);
-			m_i2cmem->write_sda(m_i2c_mem);
+			m_i2cmem->write_scl(BIT(data, 5));
+			m_i2cmem->write_sda(BIT(data, 6));
+			m_i2c_dir = BIT(data, 7);
 			break;
 		default:
-			lz93d50_write(space, offset & 0x0f, data, mem_mask);
+			fcg_write(space, offset & 0x0f, data, mem_mask);
 			break;
 	}
 }
@@ -420,7 +424,10 @@ WRITE8_MEMBER(nes_lz93d50_24c01_device::write_h)
 READ8_MEMBER(nes_lz93d50_24c01_device::read_m)
 {
 	LOG_MMC(("lz93d50 EEPROM read, offset: %04x\n", offset));
-	return (m_i2cmem->read_sda() & 1) << 4;
+	if (m_i2c_dir)
+		return (m_i2cmem->read_sda() & 1) << 4;
+	else
+		return 0;
 }
 
 //-------------------------------------------------
@@ -469,10 +476,10 @@ void nes_fjump2_device::set_prg()
 {
 	UINT8 prg_base = 0;
 
-	for (int i = 0; i < 8; i++)
-		prg_base |= ((m_reg[i] & 0x01) << 4);
+	for (int i = 0; i < 4; i++)
+		prg_base |= (m_reg[i] << 4);
 
-	prg16_89ab(prg_base | m_reg[8]);
+	prg16_89ab(prg_base | m_reg[4]);
 	prg16_cdef(prg_base | 0x0f);
 }
 
@@ -495,13 +502,18 @@ WRITE8_MEMBER(nes_fjump2_device::write_h)
 	switch (offset & 0x0f)
 	{
 		case 0: case 1: case 2: case 3:
+			m_reg[offset & 0x0f] = BIT(data,0);
+			set_prg();
+			break;
 		case 4: case 5: case 6: case 7:
+			// these have been verified to be disabled in this board
+			break;
 		case 8:
-			m_reg[offset & 0x0f] = data & 0x0f;
+			m_reg[4] = data & 0x0f;
 			set_prg();
 			break;
 		default:
-			lz93d50_write(space, offset & 0x0f, data, mem_mask);
+			fcg_write(space, offset & 0x0f, data, mem_mask);
 			break;
 	}
 }
