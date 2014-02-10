@@ -844,6 +844,8 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbca )
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_ca1)) MCFG_DEVCB_INVERT /* ack seems to be inverted? */
 
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	/* fdc */
 	MCFG_I8271_ADD("i8271", bbc_i8271_interface)
 	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
@@ -940,6 +942,8 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522_1", via6522_device, write_ca1)) MCFG_DEVCB_INVERT /* ack seems to be inverted? */
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", bbc_cassette_interface )
