@@ -795,6 +795,8 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(tutor_state, write_centronics_busy))
 
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 
 	/* cartridge */
