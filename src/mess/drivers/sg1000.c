@@ -892,7 +892,11 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_I8251_ADD(UPD8251_TAG, usart_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats)
+
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	MCFG_CASSETTE_ADD("cassette", sc3000_cassette_interface)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)

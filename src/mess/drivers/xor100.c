@@ -588,6 +588,8 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(xor100_state, write_centronics_busy))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(xor100_state, write_centronics_select))
 
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8251_A_TAG, i8251_device, write_rx))
 	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(I8251_A_TAG, i8251_device, write_dsr))
