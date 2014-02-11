@@ -823,7 +823,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
                     //ms = new netlist_matrix_solver_direct_t<0,16>();
                     ms = new netlist_matrix_solver_gauss_seidel_t<0,32>();
                 }
-                else if (net_count <= 64)
+                else /* if (net_count <= 64) */
                 {
                     //ms = new netlist_matrix_solver_direct_t<0,16>();
                     ms = new netlist_matrix_solver_gauss_seidel_t<0,64>();
