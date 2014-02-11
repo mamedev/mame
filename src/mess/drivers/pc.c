@@ -861,7 +861,7 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -977,7 +977,7 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
