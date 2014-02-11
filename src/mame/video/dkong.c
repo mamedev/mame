@@ -945,11 +945,9 @@ VIDEO_START_MEMBER(dkong_state,dkong)
 		case HARDWARE_TKG04:
 		case HARDWARE_TKG02:
 			m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dkong_state::dkong_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-			m_bg_tilemap->set_scrolldx(0, 128);
 			break;
 		case HARDWARE_TRS01:
 			m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dkong_state::radarscp1_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-			m_bg_tilemap->set_scrolldx(0, 128);
 
 			m_screen->register_screen_bitmap(m_bg_bits);
 			m_gfx4 = memregion("gfx4")->base();
@@ -965,8 +963,6 @@ VIDEO_START_MEMBER(dkong_state,dkong)
 UINT32 dkong_state::screen_update_dkong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	machine().tilemap().set_flip_all(m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	m_bg_tilemap->set_scrollx(0, m_flip ?  0 : 0);
-	m_bg_tilemap->set_scrolly(0, m_flip ? -8 : 0);
 
 	switch (m_hardware_type)
 	{

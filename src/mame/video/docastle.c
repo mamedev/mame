@@ -75,15 +75,13 @@ WRITE8_MEMBER(docastle_state::docastle_colorram_w)
 
 READ8_MEMBER(docastle_state::flipscreen_r)
 {
-	flip_screen_set_no_update(offset);
-	m_do_tilemap->set_flip(offset ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	flip_screen_set(offset);
 	return (offset ? 1 : 0); // is this really needed?
 }
 
 WRITE8_MEMBER(docastle_state::flipscreen_w)
 {
-	flip_screen_set_no_update(offset);
-	m_do_tilemap->set_flip(offset ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	flip_screen_set(offset);
 }
 
 TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
@@ -97,8 +95,7 @@ TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
 void docastle_state::video_start_common( UINT32 tile_transmask )
 {
 	m_do_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(docastle_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_do_tilemap->set_scrolldx(0, 0x138 - 0x100);
-	m_do_tilemap->set_scrolldy(-32, 0x108 - 0x100 - (-32));
+	m_do_tilemap->set_scrolldy(-32, -32);
 	m_do_tilemap->set_transmask(0, tile_transmask, 0x0000);
 }
 

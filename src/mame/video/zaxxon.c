@@ -131,8 +131,6 @@ void zaxxon_state::video_start_common(tilemap_get_info_delegate fg_tile_info)
 
 	/* configure the foreground tilemap */
 	m_fg_tilemap->set_transparent_pen(0);
-	m_fg_tilemap->set_scrolldx(0, m_screen->width() - 256);
-	m_fg_tilemap->set_scrolldy(0, m_screen->height() - 256);
 
 	/* register for save states */
 	save_item(NAME(m_bg_enable));
