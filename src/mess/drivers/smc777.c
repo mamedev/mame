@@ -1069,24 +1069,6 @@ INTERRUPT_GEN_MEMBER(smc777_state::smc777_vblank_irq)
 }
 
 
-/*************************************
- *
- *  Sound interface
- *
- *************************************/
-
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 #define MASTER_CLOCK XTAL_4_028MHz
 
 static MACHINE_CONFIG_START( smc777, smc777_state )
@@ -1116,7 +1098,6 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 
 	MCFG_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)

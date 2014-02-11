@@ -465,16 +465,6 @@ static const sega315_5124_interface sms_store_intf =
 };
 
 
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 static SLOT_INTERFACE_START(sms_cart)
 	SLOT_INTERFACE_INTERNAL("rom",  SEGA8_ROM_STD)
 	SLOT_INTERFACE_INTERNAL("codemasters",  SEGA8_ROM_CODEMASTERS)
@@ -524,9 +514,9 @@ static MACHINE_CONFIG_START( sms_ntsc_base, sms_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
 	MCFG_SOUND_ADD("segapsg", SEGAPSG, XTAL_53_693175MHz/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SMS_CARTRIDGE_ADD("slot", sms_cart, NULL)
 
@@ -634,9 +624,9 @@ static MACHINE_CONFIG_START( sms_sdisp, smssdisp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
 	MCFG_SOUND_ADD("segapsg", SEGAPSG, XTAL_53_693175MHz/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -713,9 +703,9 @@ static MACHINE_CONFIG_START( sms_pal_base, sms_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
 	MCFG_SOUND_ADD("segapsg", SEGAPSG, MASTER_CLOCK_PAL/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SMS_CARTRIDGE_ADD("slot", sms_cart, NULL)
 
@@ -841,8 +831,8 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+
 	MCFG_SOUND_ADD("gamegear", GAMEGEAR, XTAL_53_693175MHz/15)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 

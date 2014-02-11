@@ -249,23 +249,6 @@ static INPUT_PORTS_START( pachifev )
 INPUT_PORTS_END
 
 
-/*************************************
- *
- *  Sound interface
- *
- *************************************/
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 #if USE_MSM
 
 
@@ -396,10 +379,8 @@ static MACHINE_CONFIG_START( pachifev, pachifev_state )
 #endif
 	MCFG_SOUND_ADD("y2404_1", Y2404, XTAL_10_738635MHz/3) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ADD("y2404_2", Y2404, XTAL_10_738635MHz/3) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 ROM_START( pachifev )

@@ -978,16 +978,6 @@ static TMS9928A_INTERFACE( vdc_intf )
 
 
 //-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL // TODO Z80 RDY
-};
-
-
-//-------------------------------------------------
 //  M6801_INTERFACE( m6801_intf )
 //-------------------------------------------------
 
@@ -1133,7 +1123,7 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL_7_15909MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_CONFIG(psg_intf)
+	// TODO Z80 RDY
 
 	// devices
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddles", adam_state, paddle_tick, attotime::from_msec(20))

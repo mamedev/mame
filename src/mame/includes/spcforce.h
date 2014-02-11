@@ -25,11 +25,17 @@ public:
 
 	int m_sn76496_latch;
 	int m_sn76496_select;
+	int m_sn1_ready;
+	int m_sn2_ready;
+	int m_sn3_ready;
 
 	UINT8 m_irq_mask;
 	DECLARE_WRITE8_MEMBER(spcforce_SN76496_latch_w);
 	DECLARE_READ8_MEMBER(spcforce_SN76496_select_r);
 	DECLARE_WRITE8_MEMBER(spcforce_SN76496_select_w);
+	DECLARE_WRITE_LINE_MEMBER(write_sn1_ready);
+	DECLARE_WRITE_LINE_MEMBER(write_sn2_ready);
+	DECLARE_WRITE_LINE_MEMBER(write_sn3_ready);
 	DECLARE_READ8_MEMBER(spcforce_t0_r);
 	DECLARE_WRITE8_MEMBER(spcforce_soundtrigger_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);

@@ -232,23 +232,6 @@ static GFXDECODE_START( finalizr )
 GFXDECODE_END
 
 
-/*************************************
- *
- *  Sound interface
- *
- *************************************/
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 void finalizr_state::machine_start()
 {
 	save_item(NAME(m_spriterambank));
@@ -296,7 +279,6 @@ static MACHINE_CONFIG_START( finalizr, finalizr_state )
 
 	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)

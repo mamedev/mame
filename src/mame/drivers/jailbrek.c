@@ -229,23 +229,6 @@ static GFXDECODE_START( jailbrek )
 GFXDECODE_END
 
 
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 void jailbrek_state::machine_start()
 {
 	save_item(NAME(m_irq_enable));
@@ -281,7 +264,6 @@ static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
 
 	MCFG_SOUND_ADD("snsnd", SN76489A, MASTER_CLOCK/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, VOICE_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

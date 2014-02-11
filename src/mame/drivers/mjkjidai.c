@@ -377,23 +377,6 @@ INTERRUPT_GEN_MEMBER(mjkjidai_state::vblank_irq)
 }
 
 
-/*************************************
- *
- *  Sound interface
- *
- *************************************/
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( mjkjidai, mjkjidai_state )
 
 	/* basic machine hardware */
@@ -422,11 +405,9 @@ static MACHINE_CONFIG_START( mjkjidai, mjkjidai_state )
 
 	MCFG_SOUND_ADD("sn1", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD("sn2", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD("adpcm", MJKJIDAI, 6000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

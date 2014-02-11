@@ -206,10 +206,6 @@ void ti_video_device::device_reset(void)
     TODO: Seriously consider to simplify this by connecting to the datamux
     directly. We don't do anything reasonable here.
 */
-static const sn76496_config sound_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_sound_system_device, sound_ready),
-};
 
 WRITE8_MEMBER( ti_sound_system_device::write )
 {
@@ -231,16 +227,18 @@ WRITE_LINE_MEMBER( ti_sound_system_device::sound_ready )
 
 MACHINE_CONFIG_FRAGMENT( sn94624 )
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+
 	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SOUND_CONFIG(sound_config)
+	MCFG_SN76496_READY_HANDLER(WRITELINE(ti_sound_system_device, sound_ready))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( sn76496 )
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")
+
 	MCFG_SOUND_ADD(TISOUNDCHIP_TAG, SN76496, 3579545)   /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SOUND_CONFIG(sound_config)
+	MCFG_SN76496_READY_HANDLER(WRITELINE(ti_sound_system_device, sound_ready))
 MACHINE_CONFIG_END
 
 machine_config_constructor ti_sound_sn94624_device::device_mconfig_additions() const

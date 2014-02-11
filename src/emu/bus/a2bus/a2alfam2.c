@@ -27,43 +27,32 @@ const device_type A2BUS_AESMS = &device_creator<a2bus_aesms_device>;
 #define SN3_TAG         "sn76489_3" // right
 #define SN4_TAG         "sn76489_4" // center?
 
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
 MACHINE_CONFIG_FRAGMENT( a2alfam2 )
 	MCFG_SPEAKER_STANDARD_STEREO("alf_l", "alf_r")
+
 	MCFG_SOUND_ADD(SN1_TAG, SN76489, 1020484)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
 	MCFG_SOUND_ADD(SN2_TAG, SN76489, 1020484)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
 	MCFG_SOUND_ADD(SN3_TAG, SN76489, 1020484)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( a2aesms )
 	MCFG_SPEAKER_STANDARD_STEREO("alf_l", "alf_r")
+
 	MCFG_SOUND_ADD(SN1_TAG, SN76489, 1020484)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
+
 	MCFG_SOUND_ADD(SN2_TAG, SN76489, 1020484)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
+
 	MCFG_SOUND_ADD(SN3_TAG, SN76489, 1020484)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
+
 	MCFG_SOUND_ADD(SN4_TAG, SN76489, 1020484)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
 MACHINE_CONFIG_END

@@ -2315,18 +2315,6 @@ static GFXDECODE_START( _4in1 )
 GFXDECODE_END
 
 
-/*************************************
- *
- *  Sound interface
- *
- *************************************/
-
-static const sn76496_config racknrol_sn76496_config =
-{
-	DEVCB_NULL
-};
-
-
 static const ay8910_interface bongo_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -2634,7 +2622,6 @@ static MACHINE_CONFIG_START( racknrol, galaxold_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snsnd", SN76489A, PIXEL_CLOCK/2) // SN76489AN
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_CONFIG(racknrol_sn76496_config)
 MACHINE_CONFIG_END
 
 
@@ -2660,7 +2647,6 @@ static MACHINE_CONFIG_START( hexpoola, galaxold_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snsnd", SN76496, PIXEL_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_CONFIG(racknrol_sn76496_config)
 MACHINE_CONFIG_END
 
 

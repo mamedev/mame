@@ -223,23 +223,6 @@ static I8156_INTERFACE(i8156_intf)
 	DEVCB_DRIVER_LINE_MEMBER(sbugger_state,sbugger_interrupt)
 };
 
-/*************************************
- *
- *  Sound interface
- *
- *************************************/
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( sbugger, sbugger_state )
 
 	MCFG_CPU_ADD("maincpu", I8085A, 6000000)        /* 3.00 MHz??? */
@@ -264,11 +247,9 @@ static MACHINE_CONFIG_START( sbugger, sbugger_state )
 
 	MCFG_SOUND_ADD("sn76489.1", SN76489, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD("sn76489.2", SN76489, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 

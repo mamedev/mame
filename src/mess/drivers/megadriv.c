@@ -454,11 +454,6 @@ DRIVER_INIT_MEMBER(md_cons_state,md_jpn)
 
 /****************************************** 32X emulation ****************************************/
 
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
 // FIXME: non-softlist loading should keep using ROM_CART_LOAD in the ROM definitions,
 // once we better integrate softlist with the old loading procedures
 DEVICE_IMAGE_LOAD_MEMBER( md_base_state, _32x_cart )
@@ -521,7 +516,6 @@ static MACHINE_CONFIG_START( genesis_32x, md_cons_state )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
@@ -555,7 +549,6 @@ static MACHINE_CONFIG_START( mdj_32x, md_cons_state )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
@@ -589,7 +582,6 @@ static MACHINE_CONFIG_START( md_32x, md_cons_state )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 

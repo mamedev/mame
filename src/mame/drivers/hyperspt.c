@@ -287,15 +287,6 @@ INTERRUPT_GEN_MEMBER(hyperspt_state::vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 
 	/* basic machine hardware */
@@ -330,7 +321,6 @@ static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 
 	MCFG_SOUND_ADD("snsnd", SN76496, XTAL_14_31818MHz/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

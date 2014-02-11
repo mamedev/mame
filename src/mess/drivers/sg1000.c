@@ -681,15 +681,6 @@ static SLOT_INTERFACE_START( sf7000_floppies )
 SLOT_INTERFACE_END
 
 /*-------------------------------------------------
-    sn76496_config psg_intf
--------------------------------------------------*/
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-/*-------------------------------------------------
     MACHINE_START( sg1000 )
 -------------------------------------------------*/
 
@@ -797,9 +788,9 @@ static MACHINE_CONFIG_START( sg1000, sg1000_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
 	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL_10_738635MHz/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	/* cartridge */
 	MCFG_SG1000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL)
@@ -845,9 +836,9 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
 	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL_10_738635MHz/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	/* devices */
 	MCFG_I8255_ADD(UPD9255_TAG, sc3000_ppi_intf)
@@ -882,9 +873,9 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
 	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL_10_738635MHz/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	/* devices */
 	MCFG_I8255_ADD(UPD9255_0_TAG, sc3000_ppi_intf)

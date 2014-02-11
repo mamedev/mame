@@ -1725,16 +1725,6 @@ static const pokey_interface warlords_pokey_interface =
 };
 
 
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 /*************************************
  *
  *  Machine drivers
@@ -1921,7 +1911,6 @@ static MACHINE_CONFIG_START( bullsdrt, centiped_state )
 
 	MCFG_SOUND_ADD("snsnd", SN76496, 12096000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 

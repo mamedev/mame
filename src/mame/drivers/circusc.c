@@ -291,23 +291,6 @@ static GFXDECODE_START( circusc )
 GFXDECODE_END
 
 
-/*************************************
- *
- *  Sound interface
- *
- *************************************/
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 static const discrete_mixer_desc circusc_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{RES_K(2.2), RES_K(2.2), RES_K(10)},
@@ -372,11 +355,9 @@ static MACHINE_CONFIG_START( circusc, circusc_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("sn1", SN76496, XTAL_14_31818MHz/8)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 0)
 
 	MCFG_SOUND_ADD("sn2", SN76496, XTAL_14_31818MHz/8)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 1)
 
 	MCFG_DAC_ADD("dac")

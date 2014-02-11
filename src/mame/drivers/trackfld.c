@@ -887,15 +887,6 @@ INTERRUPT_GEN_MEMBER(trackfld_state::vblank_nmi)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( trackfld, trackfld_state )
 
 	/* basic machine hardware */
@@ -934,7 +925,6 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 
 	MCFG_SOUND_ADD("snsnd", SN76496, SOUND_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -987,7 +977,6 @@ static MACHINE_CONFIG_START( yieartf, trackfld_state )
 
 	MCFG_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/6/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

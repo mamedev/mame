@@ -15,10 +15,8 @@ extern const device_type NCR7496;
 extern const device_type GAMEGEAR;
 extern const device_type SEGAPSG;
 
-struct sn76496_config
-{
-	devcb_write_line        ready;
-};
+#define MCFG_SN76496_READY_HANDLER(_devcb) \
+	devcb = &sn76496_base_device::set_ready_handler(*device, DEVCB2_##_devcb);
 
 class sn76496_base_device : public device_t, public device_sound_interface
 {
@@ -26,7 +24,10 @@ public:
 	sn76496_base_device(const machine_config &mconfig, device_type type,  const char *name, const char *tag,
 		int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider, int freq0,
 		device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	DECLARE_READ_LINE_MEMBER( ready_r );
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_ready_handler(device_t &device, _Object object) { return downcast<sn76496_base_device &>(device).m_ready_handler.set_callback(object); }
+
 	DECLARE_WRITE8_MEMBER( stereo_w );
 	void write(UINT8 data);
 	DECLARE_WRITE8_MEMBER( write );
@@ -42,7 +43,7 @@ private:
 
 	bool            m_ready_state;
 
-	devcb_resolved_write_line   m_ready;
+	devcb2_write_line m_ready_handler;
 
 	sound_stream*   m_sound;
 

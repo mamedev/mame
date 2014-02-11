@@ -1522,15 +1522,6 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B      /* 8KHz */
 };
 
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -1569,15 +1560,12 @@ static MACHINE_CONFIG_START( lucky74, lucky74_state )
 
 	MCFG_SOUND_ADD("sn1", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD("sn2", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD("sn3", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, C_06B49P_CLKOUT_04) /* 1.5 MHz. */
 	MCFG_SOUND_CONFIG(ay8910_config)
