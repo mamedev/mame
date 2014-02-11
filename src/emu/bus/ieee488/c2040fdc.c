@@ -199,13 +199,11 @@ void c2040_fdc_t::checkpoint()
 {
 	get_next_edge(machine().time());
 	checkpoint_live = cur_live;
-	if (LOG) logerror("---- checkpoint rw=%u mode=%u\n", checkpoint_live.rw_sel, checkpoint_live.mode_sel);
 }
 
 void c2040_fdc_t::rollback()
 {
 	cur_live = checkpoint_live;
-	if (LOG) logerror("---- rollback rw=%u mode=%u\n", cur_live.rw_sel, cur_live.mode_sel);
 	get_next_edge(cur_live.tm);
 }
 
@@ -386,7 +384,7 @@ void c2040_fdc_t::live_run(attotime limit)
 
 				cur_live.shift_reg_write = BIT(e,7)<<9 | BIT(e,6)<<8 | BIT(i,7)<<7 | BIT(e,5)<<6 | BIT(e,4)<<5 | BIT(e,3)<<4 | BIT(e,2)<<3 | BIT(i,2)<<2 | (e & 0x03);
 			
-				if(LOG) logerror("%s load write shift register %03x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
+				if (LOG) logerror("%s load write shift register %03x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
 			} else if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1)) {
 				// clock write shift register
 				cur_live.shift_reg_write <<= 1;
@@ -515,8 +513,11 @@ WRITE_LINE_MEMBER( c2040_fdc_t::rw_sel_w )
 		m_rw_sel = cur_live.rw_sel = state;
 		checkpoint();
 		if (LOG) logerror("%s RW SEL %u\n", machine().time().as_string(), state);
-		if (state)
+		if (m_rw_sel) {
 			stop_writing(machine().time());
+		} else {
+			start_writing(machine().time());
+		}
 		live_run();
 	}
 }
