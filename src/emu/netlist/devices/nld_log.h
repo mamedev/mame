@@ -21,7 +21,7 @@
 #include "../nl_base.h"
 
 #define LOG(_name, _I)                                                       \
-		NET_REGISTER_DEV(log, _name)                                                \
+		NET_REGISTER_DEV(log, _name)                                         \
 		NET_CONNECT(_name, I, _I)
 
 NETLIB_DEVICE(log,
@@ -32,8 +32,8 @@ protected:
 );
 
 #define LOGD(_name, _I, _I2)                                                 \
-		NET_REGISTER_DEV(logD, _name)                                               \
-		NET_CONNECT(_name, I, _I)                                                   \
+		NET_REGISTER_DEV(logD, _name)                                        \
+		NET_CONNECT(_name, I, _I)                                            \
 		NET_CONNECT(_name, I2, _I2)
 
 NETLIB_DEVICE_DERIVED(logD, log,

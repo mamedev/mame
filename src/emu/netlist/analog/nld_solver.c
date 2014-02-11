@@ -118,7 +118,7 @@ void netlist_matrix_solver_t::schedule()
     }
     else
     {
-        m_owner->netlist().warning("Matrix solver reschedule .. Consider increasing RESCHED_LOOPS");
+        //m_owner->netlist().warning("Matrix solver reschedule .. Consider increasing RESCHED_LOOPS");
         if (m_owner != NULL)
             this->m_owner->schedule();
     }
@@ -750,7 +750,7 @@ NETLIB_UPDATE(solver)
 
 	if (global_resched)
 	{
-	    netlist().warning("Gobal reschedule .. Consider increasing RESCHED_LOOPS");
+	    //netlist().warning("Gobal reschedule .. Consider increasing RESCHED_LOOPS");
 		schedule();
 	}
 	else
@@ -784,8 +784,9 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
     for (int i = 0; i <= cur_group; i++)
     {
         netlist_matrix_solver_t *ms;
+        int net_count = groups[i].count();
 
-        switch (groups[i].count())
+        switch (net_count)
         {
             case 1:
                 ms = new netlist_matrix_solver_direct1_t();
@@ -803,17 +804,31 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
                 break;
 #if 0
             case 5:
-                ms = new netlist_matrix_solver_direct_t<5,5>();
-                //ms = new netlist_matrix_solver_gauss_seidel_t<4,4>();
+                //ms = new netlist_matrix_solver_direct_t<5,5>();
+                ms = new netlist_matrix_solver_gauss_seidel_t<5,5>();
                 break;
             case 6:
-                ms = new netlist_matrix_solver_direct_t<6,6>();
-                //ms = new netlist_matrix_solver_gauss_seidel_t<4,4>();
+                //ms = new netlist_matrix_solver_direct_t<6,6>();
+                ms = new netlist_matrix_solver_gauss_seidel_t<6,6>();
                 break;
 #endif
             default:
-                //ms = new netlist_matrix_solver_direct_t<0,16>();
-                ms = new netlist_matrix_solver_gauss_seidel_t<0,16>();
+                if (net_count <= 16)
+                {
+                    //ms = new netlist_matrix_solver_direct_t<0,16>();
+                    ms = new netlist_matrix_solver_gauss_seidel_t<0,16>();
+                }
+                else if (net_count <= 32)
+                {
+                    //ms = new netlist_matrix_solver_direct_t<0,16>();
+                    ms = new netlist_matrix_solver_gauss_seidel_t<0,32>();
+                }
+                else if (net_count <= 64)
+                {
+                    //ms = new netlist_matrix_solver_direct_t<0,16>();
+                    ms = new netlist_matrix_solver_gauss_seidel_t<0,64>();
+                }
+
                 break;
         }
 

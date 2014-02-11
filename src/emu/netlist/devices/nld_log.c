@@ -12,7 +12,7 @@ NETLIB_START(log)
 {
 	register_input("I", m_I);
 
-	pstring filename = "netlist_" + name() + ".log";
+	pstring filename = pstring::sprintf("%s.log", name().cstr());
 	m_file = fopen(filename, "w");
 }
 

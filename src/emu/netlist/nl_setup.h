@@ -110,11 +110,14 @@ public:
 	netlist_factory_t &factory() { return m_factory; }
     const netlist_factory_t &factory() const { return m_factory; }
 
+    pstring build_fqn(const pstring &obj_name) const;
+
 	netlist_device_t *register_dev(netlist_device_t *dev, const pstring &name);
 	void remove_dev(const pstring &name);
 
 	void register_model(const pstring &model);
 	void register_alias(const pstring &alias, const pstring &out);
+	void register_alias_nofqn(const pstring &alias, const pstring &out);
 	void register_link(const pstring &sin, const pstring &sout);
 	void register_param(const pstring &param, const pstring &value);
 	void register_param(const pstring &param, const double value);
