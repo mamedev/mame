@@ -48,6 +48,7 @@ private:
 		MEMORY_CARD,
 		SELECT_GAME,
 		BIOS_SELECTION,
+		BARCODE_READ,
 	};
 };
 

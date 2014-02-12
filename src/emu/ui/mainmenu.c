@@ -18,6 +18,7 @@
 #include "uiinput.h"
 #include "ui/filemngr.h"
 #include "ui/filesel.h"
+#include "ui/barcode.h"
 #include "ui/bbcontrl.h"
 #include "ui/tapectrl.h"
 #include "ui/mainmenu.h"
@@ -29,6 +30,7 @@
 #include <ctype.h>
 #include "imagedev/cassette.h"
 #include "imagedev/bitbngr.h"
+#include "machine/bcreader.h"
 
 
 
@@ -100,6 +102,13 @@ void ui_menu_main::populate()
 	{
 		/* add slot info menu */
 		item_append("Slot Devices", NULL, 0, (void *)SLOT_DEVICES);
+	}
+
+	barcode_reader_device_iterator bcriter(machine().root_device());
+	if (bcriter.first() != NULL)
+	{
+		/* add slot info menu */
+		item_append("Barcode Reader", NULL, 0, (void *)BARCODE_READ);
 	}
 
 	network_interface_iterator netiter(machine().root_device());
@@ -237,7 +246,11 @@ void ui_menu_main::handle()
 		case BIOS_SELECTION:
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_bios_selection(machine(), container)));
 			break;
-
+				
+		case BARCODE_READ:
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_barcode_reader(machine(), container)));
+			break;
+				
 		default:
 			fatalerror("ui_menu_main::handle - unknown reference\n");
 		}

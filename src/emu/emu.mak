@@ -152,6 +152,7 @@ EMUOBJS = \
 	$(EMUOBJ)/ui/filesel.o \
 	$(EMUOBJ)/ui/imginfo.o \
 	$(EMUOBJ)/ui/bbcontrl.o \
+	$(EMUOBJ)/ui/barcode.o \
 	$(EMUOBJ)/ui/tapectrl.o \
 	$(EMUOBJ)/ui/viewgfx.o \
 	$(EMUOBJ)/validity.o \
