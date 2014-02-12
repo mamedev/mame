@@ -2473,35 +2473,21 @@ void floppy_image_format_t::extract_sectors_from_bitstream_fm_pc(const UINT8 *bi
 
 	// Scan the bitstream for sync marks and follow them to check for
 	// blocks
+	// We scan for address marks only, as index marks are not mandatory,
+	// and many formats actually do not use them
+
 	for(int i=0; i<track_size; i++) {
 		shift_reg = (shift_reg << 1) | sbit_r(bitstream, i);
-		if(shift_reg == 0xf77a) {
-			//index mark
-			UINT16 header;
-			int pos = i+1;
-			do {
-				header = 0;
-				for(int j=0; j<16; j++)
-					if(sbit_rp(bitstream, pos, track_size))
-						header |= 0x8000 >> j;
-				// Accept strings of sync marks as long and they're not wrapping
 
-				// Wrapping ones have already been take into account
-				// thanks to the precharging
-
-				// fe
-				if(header == 0xf57e) { // address mark
-					if(idblk_count < 100)
-						idblk[idblk_count++] = pos;
-					i = pos-1;
-				}
-				// fb
-				if(header == 0xf56f ) { // data mark
-					if(dblk_count < 100)
-						dblk[dblk_count++] = pos;
-					i = pos-1;
-				}
-			} while(header != 0xf77a);
+		// fe
+		if(shift_reg == 0xf57e) {       // address mark
+			if(idblk_count < 100)
+				idblk[idblk_count++] = i+1;
+		}
+		// fb
+		if(shift_reg == 0xf56f) {       // data mark
+			if(dblk_count < 100)
+				dblk[dblk_count++] = i+1;
 		}
 	}
 
