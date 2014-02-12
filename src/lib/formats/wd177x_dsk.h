@@ -44,7 +44,9 @@ protected:
 	const format *formats;
 	virtual floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index);
 	virtual floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index);
-	int find_size(io_generic *io, UINT32 form_factor);
+	virtual int find_size(io_generic *io, UINT32 form_factor);
+	virtual int get_image_offset(const format &f, int head, int track);
+
 	int compute_track_size(const format &f) const;
 	void build_sector_description(const format &d, UINT8 *sectdata, desc_s *sectors) const;
 	void check_compatibility(floppy_image *image, int *candidates, int &candidates_count);

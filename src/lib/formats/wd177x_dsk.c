@@ -16,6 +16,9 @@ wd177x_format::wd177x_format(const format *_formats)
 	formats = _formats;
 }
 
+/*
+    Default implementation for find_size. May be overwritten by subclasses.
+*/
 int wd177x_format::find_size(io_generic *io, UINT32 form_factor)
 {
 	UINT64 size = io_generic_size(io);
@@ -201,7 +204,7 @@ bool wd177x_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 
 	for(int track=0; track < f.track_count; track++)
 		for(int head=0; head < f.head_count; head++) {
-			io_generic_read(io, sectdata, (track*f.head_count + head)*track_size, track_size);
+			io_generic_read(io, sectdata, get_image_offset(f, head, track), track_size);
 			generate_track(desc, track, head, sectors, f.sector_count, total_size, image);
 		}
 
@@ -325,11 +328,20 @@ bool wd177x_format::save(io_generic *io, floppy_image *image)
 	for(int track=0; track < f.track_count; track++)
 		for(int head=0; head < f.head_count; head++) {
 			extract_sectors(image, f, sectors, track, head);
-			io_generic_write(io, sectdata, (track*f.head_count + head)*track_size, track_size);
+			io_generic_write(io, sectdata, get_image_offset(f, head, track), track_size);
 		}
 
 	global_free(candidates);
 	return true;
+}
+
+/*
+    Default implementation of the image offset computation. May be overwritten
+    by subclasses.
+*/
+int wd177x_format::get_image_offset(const format &f, int head, int track)
+{
+	return (track * f.head_count + head) * compute_track_size(f);
 }
 
 void wd177x_format::check_compatibility(floppy_image *image, int *candidates, int &candidates_count)
