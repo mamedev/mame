@@ -145,6 +145,8 @@ public:
 	: ptokenizer(), m_setup(setup) {}
 
 	void parse(const char *buf);
+
+    void parse_netlist(const pstring &nlname);
 	void net_alias();
 	void netdev_param();
 	void net_c();

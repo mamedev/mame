@@ -634,7 +634,7 @@ void netlist_setup_t::resolve_inputs()
 
 	if (m_netlist.solver() == NULL)
 	{
-	    if (!has_twoterms)
+	    if (has_twoterms)
 	        netlist().error("No solver found for this net although analog elements are present\n");
 	}
 	else
