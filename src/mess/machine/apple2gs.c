@@ -119,7 +119,6 @@
 
 #include "includes/apple2gs.h"
 #include "includes/apple2.h"
-#include "machine/ay3600.h"
 #include "machine/applefdc.h"
 #include "machine/sonydriv.h"
 #include "machine/8530scc.h"
