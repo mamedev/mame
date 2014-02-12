@@ -303,6 +303,8 @@ const floppy_format_type FLOPPY_D64_FORMAT = &floppy_image_format_creator<d64_fo
 #define D82_SIZE_154_TRACKS             1066496
 #define D82_SIZE_154_TRACKS_WITH_ERRORS 1070662
 
+#define G64_SPEED_BLOCK_SIZE    1982
+
 enum
 {
 	DOS1,
