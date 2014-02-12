@@ -125,6 +125,7 @@ enum
 
 // Log addresses of executed opcodes
 #define TRACE_EXEC 0
+#define TRACE_CYCLES 0
 
 // This is the previous debugging approach which will be replaced by the
 // specific switches above
@@ -1501,7 +1502,7 @@ void tms9995_device::next_command()
 void tms9995_device::command_completed()
 {
 	// Pseudo state at the end of the current instruction cycle sequence
-	if (VERBOSE>4)
+	if (TRACE_CYCLES)
 	{
 		LOG("tms9995: +++++ Instruction %04x (%s) completed", m_instruction->IR, opname[m_instruction->command]);
 		int cycles =  m_first_cycle - m_icount;
