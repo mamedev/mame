@@ -953,7 +953,6 @@ $(MESSOBJ)/apple.a:             \
 	$(MESS_VIDEO)/apple2gs.o    \
 	$(MESS_MACHINE)/apple2gs.o  \
 	$(MESS_DRIVERS)/apple2gs.o  \
-	$(MESS_MACHINE)/ay3600.o    \
 	$(MESS_MACHINE)/lisa.o      \
 	$(MESS_DRIVERS)/lisa.o      \
 	$(MESS_AUDIO)/mac.o         \
