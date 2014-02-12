@@ -2453,7 +2453,6 @@ WRITE_LINE_MEMBER(apple2_state::ay3600_iie_data_ready_w)
 	{
 		UINT8 *decode = m_kbdrom->base();
 		UINT16 trans;
-		int mod = 0;
 
 		m_lastchar = m_ay3600->b_r();
 
