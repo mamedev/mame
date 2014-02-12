@@ -85,7 +85,8 @@ bool mn10200_device::check_irq()
 		take_irq(0, 0);
 	else if (group)
 		take_irq(level, group);
-	else return false;
+	else
+		return false;
 	
 	return true;
 }
@@ -105,75 +106,82 @@ void mn10200_device::check_ext_irq()
 
 void mn10200_device::refresh_timer(int tmr)
 {
-	// enabled?
-	if (m_simple_timer[tmr].mode & 0x80)
+	// 0: external pin
+	// 1: cascaded (handled elsewhere)
+	// 2: prescaler 0
+	// 3: prescaler 1
+	int p = m_simple_timer[tmr].mode & 1;
+
+	// enabled, and source is prescaler?
+	if ((m_simple_timer[tmr].mode & 0x82) == 0x82 && m_simple_timer[tmr].cur != 0 && m_prescaler[p].mode & 0x80)
 	{
-		UINT8 source = (m_simple_timer[tmr].mode & 3);
-
-		// source is a prescaler?
-		if (source >= 2)
-		{
-			INT32 rate;
-
-			// is prescaler enabled?
-			if (m_prescaler[source-2].mode & 0x80)
-			{
-				// rate = (sysclock / prescaler) / our count
-				rate = unscaled_clock() / m_prescaler[source-2].cycles;
-				rate /= m_simple_timer[tmr].base;
-
-				if (tmr != 8)   // HACK: timer 8 is run at 500 kHz by the Taito program for no obvious reason, which kills performance
-					m_timer_timers[tmr]->adjust(attotime::from_hz(rate), tmr);
-			}
-			else
-			{
-				logerror("MN10200: timer %d using prescaler %d which isn't enabled!\n", tmr, source-2);
-			}
-		}
+		attotime period = m_sysclock_base * (m_prescaler[p].base + 1) * (m_simple_timer[tmr].cur + 1);
+		m_timer_timers[tmr]->adjust(period, tmr);
 	}
-	else    // disabled, so stop it
+	else
 	{
 		m_timer_timers[tmr]->adjust(attotime::never, tmr);
 	}
 }
 
-void mn10200_device::timer_tick_simple(int tmr)
+void mn10200_device::refresh_all_timers()
 {
-	m_simple_timer[tmr].cur--;
+	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
+		refresh_timer(tmr);
+}
 
-	// did we expire?
-	if (m_simple_timer[tmr].cur == 0)
+int mn10200_device::timer_tick_simple(int tmr)
+{
+	int next = tmr + 1;
+	
+	// is it a cascaded timer, and enabled?
+	if (next < MN10200_NUM_TIMERS_8BIT && m_simple_timer[next].mode & 0x83 && (m_simple_timer[next].mode & 0x83) == 0x81)
 	{
-		// does timer auto-reload?  apparently.
-		m_simple_timer[tmr].cur = m_simple_timer[tmr].base;
-
-		// signal the cascade if we're not timer 9
-		if (tmr < (MN10200_NUM_TIMERS_8BIT-1))
+		// did it underflow?
+		if (--m_simple_timer[next].cur == 0xff)
 		{
-			// is next timer enabled?
-			if (m_simple_timer[tmr+1].mode & 0x80)
+			// cascaded underflow?
+			if (timer_tick_simple(next) != 2)
 			{
-				// is it's source "cascade"?
-				if ((m_simple_timer[tmr+1].mode & 0x3) == 1)
-				{
-					// recurse!
-					timer_tick_simple(tmr+1);
-				}
+				m_simple_timer[next].cur = m_simple_timer[next].base;
+				return 1;
 			}
 		}
-		
-		m_icrl[1 + (tmr / 4)] |= (1 << (4 + (tmr % 4)));
+
+		return 2;
+	}
+	else
+	{
+		// reload and trigger irq
+		m_simple_timer[tmr].cur = m_simple_timer[tmr].base;
+		m_icrl[1 + (tmr >> 2)] |= (1 << (4 + (tmr & 3)));
 		check_irq();
+
+		return 0;
 	}
 }
 
 TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
 {
 	int tmr = param;
-
+	
 	// handle our expiring and also tick our cascaded children
-	m_simple_timer[tmr].cur = 1;
-	timer_tick_simple(tmr);
+	switch (timer_tick_simple(tmr))
+	{
+		// cascaded, underflow
+		case 1:
+			m_simple_timer[tmr].cur = m_simple_timer[tmr].base;
+			break;
+		
+		// cascaded, no underflow
+		case 2:
+			m_simple_timer[tmr].cur = 0xff;
+			break;
+
+		// no action needed
+		default:
+			break;
+	}
 
 	// refresh this timer
 	refresh_timer(tmr);
@@ -185,6 +193,8 @@ void mn10200_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
+
+	m_sysclock_base = attotime::from_hz(unscaled_clock() / 2);
 
 	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
 	{
@@ -210,11 +220,13 @@ void mn10200_device::device_start()
 	}
 	for (int i = 0; i < MN10200_NUM_PRESCALERS; i++)
 	{
-		m_prescaler[i].cycles = 0;
 		m_prescaler[i].mode = 0;
+		m_prescaler[i].base = 0;
+		m_prescaler[i].cur = 0;
 
-		save_item(NAME(m_prescaler[i].cycles), i);
 		save_item(NAME(m_prescaler[i].mode), i);
+		save_item(NAME(m_prescaler[i].base), i);
+		save_item(NAME(m_prescaler[i].cur), i);
 	}
 	for (int i = 0; i < 8; i++)
 	{
@@ -324,15 +336,6 @@ void mn10200_device::device_reset()
 	for (int i = 0; i < 2; i++)
 		for (int address = 0xfc04; address < 0x10000; address++)
 			write_mem16(address, 0);
-	
-	// reset all timers
-	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
-	{
-		m_simple_timer[tmr].mode = 0;
-		m_simple_timer[tmr].cur = 0;
-		m_simple_timer[tmr].base = 0;
-		m_timer_timers[tmr]->adjust(attotime::never, tmr);
-	}
 }
 
 
@@ -1640,6 +1643,7 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 		case 0x036: case 0x037: // Memory mode reg 3
 			break;
 
+		// 0xfc40-0xfc57: irq control
 		// group 0, NMI control
 		case 0x040:
 			m_nmicr &= data; // nmi ack
@@ -1651,7 +1655,10 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 		case 0x042: case 0x044: case 0x046: case 0x048: case 0x04a:
 		case 0x04c: case 0x04e: case 0x050: case 0x052: case 0x054:
 			m_icrl[(offset & 0x3f) >> 1] &= data; // irq ack
-			if (offset == 0x050) check_ext_irq(); // group 8, external irqs might still be active
+
+			// group 8, external irqs might still be active
+			if (offset == 0x050)
+				check_ext_irq();
 			break;
 
 		case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
@@ -1666,7 +1673,7 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 			check_ext_irq();
 			break;
 		case 0x057:
-			m_extmdh = data;
+			m_extmdh = data & 3;
 			break;
 
 		case 0x100: case 0x101: // DRAM control reg
@@ -1717,49 +1724,39 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 			log_event("MN102", "AN chans=0-%d current=%d", (data >> 4) & 7, data & 7);
 			break;
 
+		// 0xfe00-0xfe2f: 8-bit timers
+		// timer base
 		case 0x210: case 0x211: case 0x212: case 0x213: case 0x214:
 		case 0x215: case 0x216: case 0x217: case 0x218: case 0x219:
-			m_simple_timer[offset-0x210].base = data + 1;
-			// printf("MN10200: Timer %d value set %02x\n", offset-0x210, data);
-			refresh_timer(offset-0x210);
+			m_simple_timer[offset & 0xf].base = data;
 			break;
 
-		case 0x21a:
-			m_prescaler[0].cycles = data+1;
-			// printf("MN10200: Prescale 0 cycle count %d\n", data+1);
+		// prescaler base
+		case 0x21a: case 0x21b:
+			m_prescaler[offset & 1].base = data;
 			break;
 
-		case 0x21b:
-			m_prescaler[1].cycles = data+1;
-			// printf("MN10200: Prescale 1 cycle count %d\n", data+1);
-			break;
-
+		// timer mode
 		case 0x220: case 0x221: case 0x222: case 0x223: case 0x224:
 		case 0x225: case 0x226: case 0x227: case 0x228: case 0x229:
-		{
-			// const char *source[4] = { "TMxIO", "cascade", "prescale 0", "prescale 1" };
-			m_simple_timer[offset-0x220].mode = data;
-			// printf("MN10200: Timer %d %s b6=%d, source=%s\n", offset-0x220, data & 0x80 ? "on" : "off", (data & 0x40) != 0, source[data & 3]);
+			m_simple_timer[offset & 0xf].mode = data & 0xc3;
 
+			// reload
 			if (data & 0x40)
-			{
-				// printf("MN10200: loading timer %d\n", offset-0x220);
-				m_simple_timer[offset-0x220].cur = m_simple_timer[offset-0x220].base;
-			}
-			refresh_timer(offset-0x220);
-			break;
-		}
+				m_simple_timer[offset & 0xf].cur = m_simple_timer[offset & 0xf].base;
 
-		case 0x22a:
-			// printf("MN10200: Prescale 0 %s, ps0bc %s\n",
-			//     data & 0x80 ? "on" : "off", data & 0x40 ? "-> ps0br" : "off");
-			m_prescaler[0].mode = data;
+			refresh_timer(offset & 0xf);
 			break;
 
-		case 0x22b:
-			// printf("MN10200: Prescale 1 %s, ps1bc %s\n",
-			//     data & 0x80 ? "on" : "off", data & 0x40 ? "-> ps1br" : "off");
-			m_prescaler[1].mode = data;
+		// prescaler mode
+		case 0x22a: case 0x22b:
+			m_prescaler[offset & 1].mode = data & 0xc0;
+
+			// reload
+			if (data & 0x40)
+				m_prescaler[offset & 1].cur = m_prescaler[offset & 1].base;
+
+			refresh_all_timers();
 			break;
 
 		case 0x230: case 0x240: case 0x250:
@@ -2044,11 +2041,13 @@ READ8_MEMBER(mn10200_device::io_control_r)
 {
 	switch(offset)
 	{
+		// active irq group
 		case 0x00e:
 			return m_iagr << 1;
 		case 0x00f:
 			return 0;
 
+		// 0xfc40-0xfc57: irq control
 		// group 0, NMI control
 		case 0x040:
 			return m_nmicr;
@@ -2069,7 +2068,7 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		case 0x056:
 			return m_extmdl;
 		case 0x057:
-			return (m_extmdh & 3) | (m_p4 << 4);
+			return m_extmdh | (m_p4 << 4);
 
 		case 0x180: case 0x190:
 			return m_serial[(offset-0x180) >> 4].ctrll;
@@ -2086,10 +2085,33 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		case 0x183:
 			return 0x10;
 
+		// 0xfe00-0xfe2f: 8-bit timers
+		// timer counter (not accurate)
 		case 0x200: case 0x201: case 0x202: case 0x203: case 0x204:
 		case 0x205: case 0x206: case 0x207: case 0x208: case 0x209:
-			// printf("MN10200: timer %d value read = %d\n", offset-0x200, m_simple_timer[offset-0x200].cur);
-			return m_simple_timer[offset-0x200].cur;
+			return m_simple_timer[offset & 0xf].cur;
+
+		// prescaler counter (not accurate)
+		case 0x20a: case 0x20b:
+			return m_prescaler[offset & 1].cur;
+
+		// timer base
+		case 0x210: case 0x211: case 0x212: case 0x213: case 0x214:
+		case 0x215: case 0x216: case 0x217: case 0x218: case 0x219:
+			return m_simple_timer[offset & 0xf].base;
+
+		// prescaler base
+		case 0x21a: case 0x21b:
+			return m_prescaler[offset & 1].base;
+
+		// timer mode
+		case 0x220: case 0x221: case 0x222: case 0x223: case 0x224:
+		case 0x225: case 0x226: case 0x227: case 0x228: case 0x229:
+			return m_simple_timer[offset & 0xf].mode;
+
+		// prescaler mode
+		case 0x22a: case 0x22b:
+			return m_prescaler[offset & 1].mode;
 
 		case 0x264: // port 1 data
 			return m_io->read_byte(MN10200_PORT1);
@@ -2112,7 +2134,7 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		default:
 			log_event("MN102", "internal_r %04x (%03x)", offset+0xfc00, adr);
 	}
-
+	
 	return 0;
 }
 
