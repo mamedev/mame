@@ -244,11 +244,6 @@ void digdug_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 	rectangle visarea = cliprect;
 	visarea.min_x = 2*8;
 	visarea.max_x = 34*8-1;
-	if (flip_screen())
-	{
-		visarea.min_x += 12*8;
-		visarea.max_x += 12*8;
-	}
 
 	for (offs = 0;offs < 0x80;offs += 2)
 	{
@@ -276,8 +271,6 @@ void digdug_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 		{
 			flipx ^= 1;
 			flipy ^= 1;
-			sy += 40;
-			sx += 96;
 		}
 
 		for (y = 0;y <= size;y++)

@@ -186,8 +186,8 @@ public:
 	void screen_eof_bosco(screen_device &screen, bool state);
 
 	inline void get_tile_info_bosco(tile_data &tileinfo,int tile_index,int ram_offs);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
+	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 	DECLARE_WRITE8_MEMBER( bosco_videoram_w );
 	DECLARE_WRITE8_MEMBER( bosco_scrollx_w );

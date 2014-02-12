@@ -181,7 +181,7 @@ WRITE8_MEMBER( bosco_state::bosco_starclr_w )
 
 ***************************************************************************/
 
-void bosco_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void bosco_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
 {
 	UINT8 *spriteram = m_spriteram;
 	UINT8 *spriteram_2 = m_spriteram2;
@@ -195,11 +195,7 @@ void bosco_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int flipy = spriteram[offs] & 2;
 		int color = spriteram_2[offs + 1] & 0x3f;
 
-		if (flip_screen())
-		{
-			sx += 128-2;
-			sy += 8;
-		}
+		if (flip) sx += 32-2;
 
 		drawgfx_transmask(bitmap,cliprect,machine().gfx[1],
 				(spriteram[offs] & 0xfc) >> 2,
@@ -211,25 +207,25 @@ void bosco_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 }
 
 
-void bosco_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void bosco_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
 {
 	int offs;
 
 	for (offs = 4; offs < 0x10;offs++)
 	{
-		int x = m_bosco_radarx[offs] + ((~m_bosco_radarattr[offs] & 0x01) << 8);
-		int y = 253 - m_bosco_radary[offs];
+		int x = m_bosco_radarx[offs] + ((~m_bosco_radarattr[offs] & 0x01) << 8) - 2;
+		int y = 251 - m_bosco_radary[offs];
 
-		if (flip_screen())
+		if (flip)
 		{
-			x += 96-2;
-			y += 8;
+			x -= 1;
+			y += 2;
 		}
 
 		drawgfx_transmask(bitmap,cliprect,machine().gfx[2],
 				((m_bosco_radarattr[offs] & 0x0e) >> 1) ^ 0x07,
 				0,
-				0,0,
+				!flip,!flip,
 				x,y,0xf0);
 	}
 }
@@ -258,7 +254,7 @@ void bosco_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 				/* dont draw the stars that are off the screen */
 				if ( x < 224 )
 				{
-					if (flip) x += 20*8;
+					if (flip) x += 64;
 
 					if (cliprect.contains(x, y))
 						bitmap.pix16(y, x) = STARS_COLOR_BASE + m_star_seed_tab[star_cntr].col;
@@ -275,10 +271,11 @@ UINT32 bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &bit
 	   the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = cliprect;
 	rectangle bg_clip = cliprect;
-	if (flip_screen())
+	int flip = flip_screen();
+	if (flip)
 	{
-		bg_clip.min_x = 20*8;
-		fg_clip.max_x = 20*8-1;
+		bg_clip.min_x = 8*8;
+		fg_clip.max_x = 8*8-1;
 	}
 	else
 	{
@@ -287,18 +284,18 @@ UINT32 bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &bit
 	}
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
-	draw_stars(bitmap,cliprect,flip_screen());
+	draw_stars(bitmap,cliprect,flip);
 
 	m_bg_tilemap->draw(screen, bitmap, bg_clip, 0,0);
 	m_fg_tilemap->draw(screen, bitmap, fg_clip, 0,0);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(bitmap,cliprect,flip);
 
 	/* draw the high priority characters */
 	m_bg_tilemap->draw(screen, bitmap, bg_clip, 1,0);
 	m_fg_tilemap->draw(screen, bitmap, fg_clip, 1,0);
 
-	draw_bullets(bitmap,cliprect);
+	draw_bullets(bitmap,cliprect,flip);
 
 	return 0;
 }

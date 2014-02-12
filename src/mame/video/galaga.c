@@ -502,8 +502,6 @@ void galaga_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 		{
 			flipx ^= 1;
 			flipy ^= 1;
-			sy += 40;
-			sx += 96;
 		}
 
 		for (y = 0;y <= sizey;y++)
@@ -529,9 +527,6 @@ void galaga_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect )
 	/* $a005 controls the stars ON/OFF */
 	if ( (m_galaga_starcontrol[5] & 1) == 1 )
 	{
-		int y_align = 112; /* 112 is a tweak to get alignment about perfect */
-		int x_align = flip_screen() ? 112 : 16;
-
 		int star_cntr;
 		int set_a, set_b;
 
@@ -545,8 +540,9 @@ void galaga_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 			if ( (set_a == m_star_seed_tab[star_cntr].set) || ( set_b == m_star_seed_tab[star_cntr].set) )
 			{
-				x = (m_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256 + x_align;
-				y = (y_align + m_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
+				x = (m_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256 + 16;
+				y = (112 + m_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
+				/* 112 is a tweak to get alignment about perfect */
 
 				if (cliprect.contains(x, y))
 					bitmap.pix16(y, x) = STARS_COLOR_BASE + m_star_seed_tab[ star_cntr ].col;

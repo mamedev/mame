@@ -82,11 +82,7 @@ PALETTE_INIT_MEMBER(bagman_state,bagman)
 
 WRITE8_MEMBER(bagman_state::bagman_flipscreen_w)
 {
-	if ((flip_screen() ^ data) & 1)
-	{
-		flip_screen_set(data & 0x01);
-		m_bg_tilemap->mark_all_dirty();
-	}
+	flip_screen_set(data & 0x01);
 }
 
 TILE_GET_INFO_MEMBER(bagman_state::get_bg_tile_info)
@@ -102,8 +98,6 @@ VIDEO_START_MEMBER(bagman_state,bagman)
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bagman_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
-
-	m_bg_tilemap->set_scrolldy(-1, -1);
 }
 
 
@@ -117,17 +111,14 @@ void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int sx,sy,flipx,flipy;
 
 		sx = spriteram[offs + 3];
-		sy = 255 - spriteram[offs + 2] - 16;
+		sy = 256 - spriteram[offs + 2] - 16;
 		flipx = spriteram[offs] & 0x40;
 		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x())
+		if (flip_screen())
 		{
-			sx = bitmap.width() - sx - 15;
+			sx = 256 - sx - 15;
+			sy = 255 - sy - 15;
 			flipx = !flipx;
-		}
-		if (flip_screen_y())
-		{
-			sy = bitmap.height() - sy - 15;
 			flipy = !flipy;
 		}
 
