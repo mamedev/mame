@@ -188,6 +188,7 @@ EMUDRIVEROBJS = \
 	$(EMUDRIVERS)/testcpu.o \
 
 EMUMACHINEOBJS = \
+	$(EMUMACHINE)/bcreader.o    \
 	$(EMUMACHINE)/buffer.o      \
 	$(EMUMACHINE)/latch.o       \
 	$(EMUMACHINE)/generic.o     \

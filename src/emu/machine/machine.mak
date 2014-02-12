@@ -338,15 +338,6 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/machine/bankdev.h,MACHINES += BANKDEV
-#-------------------------------------------------
-
-ifneq ($(filter BARCODE_READER,$(MACHINES)),)
-MACHINEOBJS += $(MACHINEOBJ)/bcreader.o
-endif
-
-#-------------------------------------------------
-#
 #@src/emu/machine/cdp1852.h,MACHINES += CDP1852
 #-------------------------------------------------
 
