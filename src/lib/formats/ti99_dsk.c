@@ -123,12 +123,12 @@ int ti99_sdf_format::identify(io_generic *io, UINT32 form_factor)
 			|| (file_size/92160==2)
 			|| (file_size/92160==4)
 			|| (file_size/92160==8)
-			|| (file_size/92160==16))) return 100;
+			|| (file_size/92160==16))) return 50;
 
 	// Formats with 16 sectors per track (rare)
 	if (((file_size % 163840)==0)
 		&& (   (file_size/163840==1)
-			|| (file_size/163840==2))) return 100;
+			|| (file_size/163840==2))) return 50;
 
 	logerror("Unrecognized disk image geometry\n");
 	return 0;
