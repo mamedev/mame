@@ -198,8 +198,8 @@ void chaknpop_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,
-				machine().gfx[0],
+		
+				machine().gfx[0]->transpen(bitmap,cliprect,
 				tile,
 				color,
 				flipx, flipy,

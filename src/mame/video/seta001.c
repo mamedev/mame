@@ -276,28 +276,28 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 			color   =   ( color >> (16-5) ) % total_color_codes;
 			code &= 0x3fff;
 
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+			machine().gfx[0]->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff),((sy) & 0x0ff),
 					transpen);
 
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+			machine().gfx[0]->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff)-512,((sy) & 0x0ff),
 					transpen);
 
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+			machine().gfx[0]->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff),((sy) & 0x0ff)-256,
 					transpen);
 
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+			machine().gfx[0]->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
@@ -365,7 +365,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+		machine().gfx[0]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -373,7 +373,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
 
 		/* wrap around x */
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+		machine().gfx[0]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -381,7 +381,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
 
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+		machine().gfx[0]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -389,7 +389,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff)-256,m_transpen);
 
 		/* wrap around x */
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+		machine().gfx[0]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

@@ -566,7 +566,7 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 				//printf("sprite data %04x %04x %04x %04x\n", supracan_vram[i+0] , supracan_vram[i+1] , supracan_vram[i+2] ,supracan_vram[i+3]  );
 
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,sprite_xflip,sprite_yflip,
+				gfx->transpen(bitmap,cliprect,tile,palette,sprite_xflip,sprite_yflip,
 					x,
 					y,
 					0);
@@ -613,7 +613,7 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 						int tile_xflip = sprite_xflip ^ ((data & 0x0800)>>11);
 						int tile_yflip = sprite_yflip ^ ((data & 0x0400)>>10);
 
-						drawgfx_transpen(bitmap,cliprect,gfx,tile,palette,tile_xflip,tile_yflip,xpos,ypos,0);
+						gfx->transpen(bitmap,cliprect,tile,palette,tile_xflip,tile_yflip,xpos,ypos,0);
 					}
 				}
 			}

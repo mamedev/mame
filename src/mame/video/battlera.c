@@ -272,14 +272,14 @@ void battlera_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &clip,int
 		if (fy) { my += 16*(cgy-1); yinc = -16; } /* Swap tile order on Y flips */
 
 		for (i=0; i<cgy; i++) {
-			drawgfx_transpen(bitmap,clip,machine().gfx[1],
+			machine().gfx[1]->transpen(bitmap,clip,
 				code,
 				colour,
 				fx,fy,
 				mx,my,0);
 
 			if (cgx)
-				drawgfx_transpen(bitmap,clip,machine().gfx[1],
+				machine().gfx[1]->transpen(bitmap,clip,
 						code2,
 						colour,
 						fx,fy,
@@ -318,17 +318,17 @@ UINT32 battlera_state::screen_update_battlera(screen_device &screen, bitmap_ind1
 		/* If this tile was changed OR tilemap was changed, redraw */
 		if (m_vram_dirty[offs/2]) {
 			m_vram_dirty[offs/2]=0;
-			drawgfx_opaque(*m_tile_bitmap,m_tile_bitmap->cliprect(),machine().gfx[0],
+			machine().gfx[0]->opaque(*m_tile_bitmap,m_tile_bitmap->cliprect(),
 					code,
 					m_HuC6270_vram[offs] >> 4,
 					0,0,
 					8*mx,8*my);
-			drawgfx_opaque(*m_front_bitmap,m_tile_bitmap->cliprect(),machine().gfx[2],
+			machine().gfx[2]->opaque(*m_front_bitmap,m_tile_bitmap->cliprect(),
 					0,
 					0,  /* fill the spot with pen 256 */
 					0,0,
 					8*mx,8*my);
-			drawgfx_transmask(*m_front_bitmap,m_tile_bitmap->cliprect(),machine().gfx[0],
+			machine().gfx[0]->transmask(*m_front_bitmap,m_tile_bitmap->cliprect(),
 					code,
 					m_HuC6270_vram[offs] >> 4,
 					0,0,

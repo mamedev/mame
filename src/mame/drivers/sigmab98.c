@@ -298,7 +298,7 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			for (x = x0; x != x1; x += dx)
 			{
-				drawgfxzoom_transpen(   bitmap, cliprect, machine().gfx[gfx],
+				 machine().gfx[gfx]->zoom_transpen(bitmap,cliprect,
 										code++, color,
 										flipx, flipy,
 										(sx + x * dim) / 0x10000, (sy + y * dim) / 0x10000,

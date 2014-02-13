@@ -241,7 +241,7 @@ void m57_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			flipy = !flipy;
 		}
 
-		drawgfx_transmask(bitmap, cliprect, machine().gfx[1 + bank],
+		 machine().gfx[1 + bank]->transmask(bitmap,cliprect,
 			tile_number,
 			color,
 			flipx, flipy,

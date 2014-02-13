@@ -40,7 +40,7 @@ void bigstrkb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		flipx = attr & 0x0100;
 		col = attr & 0x000f;
 
-		drawgfx_transpen(bitmap,cliprect,gfx,num,col,flipx,0,xpos,ypos,15);
+		gfx->transpen(bitmap,cliprect,num,col,flipx,0,xpos,ypos,15);
 		source+=8;
 	}
 }

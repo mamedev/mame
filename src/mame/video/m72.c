@@ -452,7 +452,7 @@ void m72_state::m72_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				if (flipy) c += h-1-y;
 				else c += y;
 
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+				machine().gfx[0]->transpen(bitmap,cliprect,
 						c,
 						color,
 						flipx,flipy,
@@ -504,7 +504,7 @@ void m72_state::majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &clip
 				if (flipy) c += h-1-y;
 				else c += y;
 
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+				machine().gfx[2]->transpen(bitmap,cliprect,
 						c,
 						color,
 						flipx,flipy,

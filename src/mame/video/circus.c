@@ -168,8 +168,8 @@ void circus_state::robotbwl_draw_bowling_alley( bitmap_ind16 &bitmap, const rect
 
 void circus_state::robotbwl_draw_ball( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	drawgfx_transpen(bitmap,/* Y is horizontal position */
-			cliprect,machine().gfx[1],
+	machine().gfx[1]->transpen(bitmap,/* Y is horizontal position */
+			cliprect,
 			m_clown_z,
 			0,
 			0,0,
@@ -187,8 +187,8 @@ UINT32 circus_state::screen_update_robotbwl(screen_device &screen, bitmap_ind16 
 
 void circus_state::crash_draw_car( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	drawgfx_transpen(bitmap,/* Y is horizontal position */
-		cliprect,machine().gfx[1],
+	machine().gfx[1]->transpen(bitmap,/* Y is horizontal position */
+		cliprect,
 		m_clown_z,
 		0,
 		0,0,

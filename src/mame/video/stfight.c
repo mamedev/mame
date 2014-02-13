@@ -306,7 +306,7 @@ void stfight_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 			code = m_sprite_base + m_sprite_ram[offs];
 
-			pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
+			machine().gfx[4]->prio_transpen(bitmap,cliprect,
 						code,
 						color,
 						flipx,flip_screen(),
@@ -355,10 +355,10 @@ void stfight_state::cshooter_draw_sprites(screen_device &screen, bitmap_ind16 &b
 		tile_low += (tile_low > 0x9) ? 0x37 : 0x30;
 		tile_high += (tile_high > 0x9) ? 0x37 : 0x30;
 
-		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_high << 1, color, flipx, 0, m_sprite_ram[i+3],m_sprite_ram[i+2],screen.priority(),pri ? 0x02 : 0,0x00);
-		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_high << 1, color, flipx, 0, m_sprite_ram[i+3]+8,m_sprite_ram[i+2],screen.priority(),pri ? 0x02 : 0,0x00);
-		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_low << 1, color, flipx, 0, m_sprite_ram[i+3]+8,m_sprite_ram[i+2]+8,screen.priority(),pri ? 0x02 : 0,0x00);
-		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_low << 1, color, flipx, 0, m_sprite_ram[i+3],m_sprite_ram[i+2]+8,screen.priority(),pri ? 0x02 : 0,0x00);
+		machine().gfx[0]->prio_transpen(bitmap,cliprect, tile_high << 1, color, flipx, 0, m_sprite_ram[i+3],m_sprite_ram[i+2],screen.priority(),pri ? 0x02 : 0,0x00);
+		machine().gfx[0]->prio_transpen(bitmap,cliprect, tile_high << 1, color, flipx, 0, m_sprite_ram[i+3]+8,m_sprite_ram[i+2],screen.priority(),pri ? 0x02 : 0,0x00);
+		machine().gfx[0]->prio_transpen(bitmap,cliprect, tile_low << 1, color, flipx, 0, m_sprite_ram[i+3]+8,m_sprite_ram[i+2]+8,screen.priority(),pri ? 0x02 : 0,0x00);
+		machine().gfx[0]->prio_transpen(bitmap,cliprect, tile_low << 1, color, flipx, 0, m_sprite_ram[i+3],m_sprite_ram[i+2]+8,screen.priority(),pri ? 0x02 : 0,0x00);
 	}
 }
 

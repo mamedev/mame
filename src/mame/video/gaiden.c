@@ -353,14 +353,14 @@ void gaiden_state::drgnbowl_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		else
 			priority_mask = 0;
 
-		pdrawgfx_transpen_raw(bitmap,cliprect,machine().gfx[3],
+		machine().gfx[3]->prio_transpen_raw(bitmap,cliprect,
 				code,
 				machine().gfx[3]->colorbase() + color * machine().gfx[3]->granularity(),
 				flipx,flipy,x,y,
 				screen.priority(), priority_mask,15);
 
 		/* wrap x*/
-		pdrawgfx_transpen_raw(bitmap,cliprect,machine().gfx[3],
+		machine().gfx[3]->prio_transpen_raw(bitmap,cliprect,
 				code,
 				machine().gfx[3]->colorbase() + color * machine().gfx[3]->granularity(),
 				flipx,flipy,x-512,y,

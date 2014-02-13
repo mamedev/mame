@@ -143,10 +143,10 @@ void shangkid_state::draw_sprite(const UINT8 *source, bitmap_ind16 &bitmap, cons
 		{
 			sx = xpos+(c^xflip)*width;
 			sy = ypos+(r^yflip)*height;
-			drawgfxzoom_transpen(
+			
+				gfx->zoom_transpen(
 				bitmap,
 				cliprect,
-				gfx,
 				tile+c*8+r,
 				color,
 				xflip,yflip,
@@ -154,10 +154,10 @@ void shangkid_state::draw_sprite(const UINT8 *source, bitmap_ind16 &bitmap, cons
 				(width<<16)/16, (height<<16)/16,transparent_pen );
 
 			// wrap around y
-			drawgfxzoom_transpen(
+			
+				gfx->zoom_transpen(
 				bitmap,
 				cliprect,
-				gfx,
 				tile+c*8+r,
 				color,
 				xflip,yflip,
@@ -269,10 +269,10 @@ void shangkid_state::dynamski_draw_background(bitmap_ind16 &bitmap, const rectan
 		if( pri==0 || (attr>>7)==pri )
 		{
 			tile += ((attr>>5)&0x3)*256;
-			drawgfx_transpen(
+			
+				machine().gfx[0]->transpen(
 				bitmap,
 				cliprect,
-				machine().gfx[0],
 				tile,
 				attr & 0x0f,
 				0,0,//xflip,yflip,
@@ -302,10 +302,10 @@ void shangkid_state::dynamski_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 		sx = videoram[0x1381+i]-64+8+16;
 		if( attr&1 ) sx += 0x100;
 
-		drawgfx_transpen(
+		
+				machine().gfx[1]->transpen(
 				bitmap,
 				cliprect,
-				machine().gfx[1],
 				bank*0x40 + (tile&0x3f),
 				color,
 				tile&0x80,tile&0x40, /* flipx,flipy */

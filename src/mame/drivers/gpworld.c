@@ -108,7 +108,7 @@ void gpworld_state::gpworld_draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cli
 		{
 			int current_screen_character = (characterY*64) + characterX;
 
-			drawgfx_transpen(bitmap, cliprect, machine().gfx[0], m_tile_ram[current_screen_character],
+			 machine().gfx[0]->transpen(bitmap,cliprect, m_tile_ram[current_screen_character],
 					characterY, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}

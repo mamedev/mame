@@ -177,7 +177,7 @@ void glass_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 		number = ((number & 0x03) << 14) | ((number & 0x0fffc) >> 2);
 
-		drawgfx_transpen(bitmap,cliprect,gfx,number,
+		gfx->transpen(bitmap,cliprect,number,
 				0x10 + (color & 0x0f),xflip,yflip,
 				sx-0x0f,sy,0);
 	}

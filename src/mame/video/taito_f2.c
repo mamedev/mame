@@ -761,7 +761,7 @@ void taitof2_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 			}
 			else
 			{
-				drawgfxzoom_transpen(bitmap,cliprect,machine().gfx[0],
+				machine().gfx[0]->zoom_transpen(bitmap,cliprect,
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
@@ -778,7 +778,7 @@ void taitof2_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 		sprite_ptr--;
 
 		if (!uses_tc360_mixer)
-			pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[0],
+			machine().gfx[0]->prio_zoom_transpen(bitmap,cliprect,
 					sprite_ptr->code,
 					sprite_ptr->color,
 					sprite_ptr->flipx,sprite_ptr->flipy,

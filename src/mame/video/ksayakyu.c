@@ -102,7 +102,7 @@ void ksayakyu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy ^= 1;
 		}
 
-			drawgfx_transpen(bitmap,cliprect,gfx,
+			gfx->transpen(bitmap,cliprect,
 				tile & 0x7f,
 				(attributes & 0x78) >> 3,
 				flipx,flipy,

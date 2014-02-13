@@ -419,7 +419,7 @@ inline void nmk16_state::nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle
 		xx = w;
 		do
 		{
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+		machine().gfx[2]->transpen(bitmap,cliprect,
 			code,
 			color,
 			flip_screen(), flip_screen(),
@@ -467,7 +467,7 @@ inline void nmk16_state::nmk16_draw_sprite_flipsupported(bitmap_ind16 &bitmap, c
 		xx = w;
 		do
 		{
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+		machine().gfx[2]->transpen(bitmap,cliprect,
 			code,
 			color,
 			flipx, flipy,
@@ -596,7 +596,7 @@ int nmk16_state::nmk16_bioshipbg_sprflip_tx_update(screen_device &screen, bitmap
 				int numtile = data&0xfff;
 				int color = (data&0xf000)>>12;
 
-				drawgfx_opaque(*m_background_bitmap,m_background_bitmap->cliprect(),screen.machine().gfx[3],
+				screen.machine().gfx[3]->opaque(*m_background_bitmap,m_background_bitmap->cliprect(),
 						numtile,
 						color,
 						0,0,   /* no flip */
@@ -605,7 +605,7 @@ int nmk16_state::nmk16_bioshipbg_sprflip_tx_update(screen_device &screen, bitmap
 				data = tilerom[offs+0x1000+bank];
 				numtile = data&0xfff;
 				color = (data&0xf000)>>12;
-				drawgfx_opaque(*m_background_bitmap,m_background_bitmap->cliprect(),screen.machine().gfx[3],
+				screen.machine().gfx[3]->opaque(*m_background_bitmap,m_background_bitmap->cliprect(),
 						numtile,
 						color,
 						0,0,   /* no flip */

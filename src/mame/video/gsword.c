@@ -191,7 +191,7 @@ void gsword_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				flipx = !flipx;
 				flipy = !flipy;
 			}
-			drawgfx_transmask(bitmap,cliprect,machine().gfx[1+spritebank],
+			machine().gfx[1+spritebank]->transmask(bitmap,cliprect,
 					tile,
 					color,
 					flipx,flipy,

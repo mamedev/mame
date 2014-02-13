@@ -62,7 +62,7 @@ void pokechmp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (spriteram[offs+1] & 0x01) tileno += 0x100;
 			if (spriteram[offs+1] & 0x08) tileno += 0x200;
 
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+			machine().gfx[1]->transpen(bitmap,cliprect,
 					tileno,
 					(spriteram[offs+1] & 0xf0) >> 4,
 					flipx,flipy,

@@ -358,7 +358,7 @@ UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		for(int x = 0; x < 80; x++ )
 		{
 			UINT8 code = m_vram[x + y*128];
-			drawgfx_opaque(bitmap, cliprect, machine().gfx[0],  code , 0, 0,0, x*8,y*16);
+			 machine().gfx[0]->opaque(bitmap,cliprect,  code , 0, 0,0, x*8,y*16);
 		}
 	}
 

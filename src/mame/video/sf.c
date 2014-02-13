@@ -164,26 +164,26 @@ void sf_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 				t = c2; c2 = c4; c4 = t;
 			}
 
-			drawgfx_transpen(bitmap,
-					cliprect, machine().gfx[2],
+			 machine().gfx[2]->transpen(bitmap,
+					cliprect,
 					sf_invert(c1),
 					color,
 					flipx,flipy,
 					sx,sy, 15);
-			drawgfx_transpen(bitmap,
-					cliprect, machine().gfx[2],
+			 machine().gfx[2]->transpen(bitmap,
+					cliprect,
 					sf_invert(c2),
 					color,
 					flipx,flipy,
 					sx+16,sy, 15);
-			drawgfx_transpen(bitmap,
-					cliprect, machine().gfx[2],
+			 machine().gfx[2]->transpen(bitmap,
+					cliprect,
 					sf_invert(c3),
 					color,
 					flipx,flipy,
 					sx,sy+16, 15);
-			drawgfx_transpen(bitmap,
-					cliprect, machine().gfx[2],
+			 machine().gfx[2]->transpen(bitmap,
+					cliprect,
 					sf_invert(c4),
 					color,
 					flipx,flipy,
@@ -199,8 +199,8 @@ void sf_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 				flipy = !flipy;
 			}
 
-			drawgfx_transpen(bitmap,
-					cliprect, machine().gfx[2],
+			 machine().gfx[2]->transpen(bitmap,
+					cliprect,
 					sf_invert(c),
 					color,
 					flipx,flipy,

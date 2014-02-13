@@ -133,7 +133,7 @@ void raiden_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 			flipx = !flipx;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, gfx, code, color, flipx, flipy, x, y, 15);
+		 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 15);
 	}
 }
 

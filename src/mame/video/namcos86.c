@@ -317,7 +317,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 		sy++;   /* sprites are buffered and delayed by one scanline */
 
 		gfx->set_source_clip(tx, sizex, ty, sizey);
-		pdrawgfx_transpen( bitmap, cliprect,gfx,
+		gfx->prio_transpen(bitmap,cliprect,
 				sprite,
 				color,
 				flipx,flipy,

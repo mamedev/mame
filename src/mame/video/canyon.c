@@ -39,8 +39,8 @@ void canyon_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		int y = m_videoram[0x3d0 + 2 * i + 0x8];
 		int c = m_videoram[0x3d0 + 2 * i + 0x9];
 
-		drawgfx_transpen(bitmap, cliprect,
-			machine().gfx[1],
+		
+			machine().gfx[1]->transpen(bitmap,cliprect,
 			c >> 3,
 			i,
 			!(c & 0x80), 0,

@@ -677,7 +677,7 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 						m_gramdirtybytes[code] = 0;
 					}
 					// Draw GRAM char
-					drawgfxzoom_transpen(bitmap,&machine().screen[0].visarea,machine().gfx[1],
+					machine().gfx[1]->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code,
 											s->color,
 											s->xflip,s->yflip,
@@ -700,13 +700,13 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 						m_gramdirtybytes[code+1] = 0;
 					}
 					// Draw GRAM char
-					drawgfxzoom_transpen(bitmap,&machine().screen[0].visarea,machine().gfx[1],
+					machine().gfx[1]->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code,
 											s->color,
 											s->xflip,s->yflip,
 											(s->xpos + x0) * STIC_X_SCALE, (s->ypos + y0) * STIC_Y_SCALE + s->yflip * s->ysize * STIC_CARD_HEIGHT,
 											0x8000*s->xsize, 0x8000*s->ysize,0);
-					drawgfxzoom_transpen(bitmap,&machine().screen[0].visarea,machine().gfx[1],
+					machine().gfx[1]->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code+1,
 											s->color,
 											s->xflip,s->yflip,
@@ -719,7 +719,7 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 				if (s->yres == 1)
 				{
 					// Draw GROM char
-					drawgfxzoom_transpen(bitmap,&machine().screen[0].visarea,machine().gfx[0],
+					machine().gfx[0]->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code,
 											s->color,
 											s->xflip,s->yflip,
@@ -728,13 +728,13 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 				}
 				else
 				{
-					drawgfxzoom_transpen(bitmap,&machine().screen[0].visarea,machine().gfx[0],
+					machine().gfx[0]->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code,
 											s->color,
 											s->xflip,s->yflip,
 											(s->xpos + x0) * STIC_X_SCALE, (s->ypos + y0) * STIC_Y_SCALE + s->yflip * s->ysize * STIC_CARD_HEIGHT,
 											0x8000*s->xsize, 0x8000*s->ysize,0);
-					drawgfxzoom_transpen(bitmap,&machine().screen[0].visarea,machine().gfx[0],
+					machine().gfx[0]->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code+1,
 											s->color,
 											s->xflip,s->yflip,

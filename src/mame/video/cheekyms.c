@@ -123,19 +123,19 @@ void cheekyms_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			if (!flip)
 				code++;
 
-			drawgfx_transpen(bitmap, cliprect, gfx, code, color, 0, 0, x, y, 0);
+			 gfx->transpen(bitmap,cliprect, code, color, 0, 0, x, y, 0);
 		}
 		else
 		{
 			if (m_spriteram[offs + 0] & 0x02)
 			{
-				drawgfx_transpen(bitmap, cliprect, gfx, code | 0x20, color, 0, 0,        x, y, 0);
-				drawgfx_transpen(bitmap, cliprect, gfx, code | 0x21, color, 0, 0, 0x10 + x, y, 0);
+				 gfx->transpen(bitmap,cliprect, code | 0x20, color, 0, 0,        x, y, 0);
+				 gfx->transpen(bitmap,cliprect, code | 0x21, color, 0, 0, 0x10 + x, y, 0);
 			}
 			else
 			{
-				drawgfx_transpen(bitmap, cliprect, gfx, code | 0x20, color, 0, 0, x,        y, 0);
-				drawgfx_transpen(bitmap, cliprect, gfx, code | 0x21, color, 0, 0, x, 0x10 + y, 0);
+				 gfx->transpen(bitmap,cliprect, code | 0x20, color, 0, 0, x,        y, 0);
+				 gfx->transpen(bitmap,cliprect, code | 0x21, color, 0, 0, x, 0x10 + y, 0);
 			}
 		}
 	}

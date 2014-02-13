@@ -146,7 +146,7 @@ UINT32 pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind1
 
 			// is spriteram[offs + 0] & 0x200 flipy? it's always set
 
-			drawgfx_transpen(bitmap, cliprect, machine().gfx[1], spr_offs, colour, 0, 1, sx, sy, 0);
+			 machine().gfx[1]->transpen(bitmap,cliprect, spr_offs, colour, 0, 1, sx, sy, 0);
 		}
 	}
 

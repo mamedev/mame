@@ -144,8 +144,8 @@ void taitoh_state::syvalion_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 							flipy ^= 0x0080;
 						}
 
-						drawgfxzoom_transpen( bitmap, cliprect,
-									machine().gfx[0],
+						
+									machine().gfx[0]->zoom_transpen(bitmap,cliprect,
 									tile,
 									color,
 									flipx, flipy,
@@ -256,8 +256,8 @@ void taitoh_state::recordbr_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 							flipy ^= 0x0080;
 						}
 
-						drawgfxzoom_transpen( bitmap, cliprect,
-									machine().gfx[0],
+						
+									machine().gfx[0]->zoom_transpen(bitmap,cliprect,
 									tile,
 									color,
 									flipx, flipy,
@@ -358,8 +358,8 @@ void taitoh_state::dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 								flipy ^= 0x0080;
 							}
 
-							drawgfxzoom_transpen( bitmap, cliprect,
-										machine().gfx[0],
+							
+										machine().gfx[0]->zoom_transpen(bitmap,cliprect,
 										tile,
 										color,
 										flipx, flipy,

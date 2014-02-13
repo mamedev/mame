@@ -517,7 +517,7 @@ void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					pdrawgfx_transtable(bitmap,cliprect,m_gfx,
+					m_gfx->prio_transtable(bitmap,cliprect,
 							c,
 							color,
 							fx,fy,
@@ -527,7 +527,7 @@ void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 				}
 				else
 				{
-					pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
+					m_gfx->prio_zoom_transtable(bitmap,cliprect,
 							c,
 							color,
 							fx,fy,
@@ -765,7 +765,7 @@ void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const re
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					pdrawgfx_transtable(bitmap,cliprect,machine().gfx[0], /* hardcoded to 0 (decoded 6bpp gfx) for le */
+					machine().gfx[0]->prio_transtable(bitmap,cliprect, /* hardcoded to 0 (decoded 6bpp gfx) for le */
 							c,
 							color,
 							fx,fy,
@@ -775,7 +775,7 @@ void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const re
 				}
 				else
 				{
-					pdrawgfxzoom_transtable(bitmap,cliprect,machine().gfx[0],  /* hardcoded to 0 (decoded 6bpp gfx) for le */
+					machine().gfx[0]->prio_zoom_transtable(bitmap,cliprect,  /* hardcoded to 0 (decoded 6bpp gfx) for le */
 							c,
 							color,
 							fx,fy,

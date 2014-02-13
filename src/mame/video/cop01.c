@@ -191,7 +191,7 @@ void cop01_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		if (code & 0x80)
 			code += (m_vreg[0] & 0x30) << 3;
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+		machine().gfx[2]->transpen(bitmap,cliprect,
 			code,
 			color,
 			flipx,flipy,

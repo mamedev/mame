@@ -99,10 +99,10 @@ void karnov_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipr
 		color = tile >> 12;
 		tile = tile & 0x7ff;
 		if (m_flipscreen)
-			drawgfx_opaque(*m_bitmap_f, m_bitmap_f->cliprect(), machine().gfx[1],tile,
+			 machine().gfx[1]->opaque(*m_bitmap_f,m_bitmap_f->cliprect(),tile,
 				color, fx, fy, 496-16*mx,496-16*my);
 		else
-			drawgfx_opaque(*m_bitmap_f, m_bitmap_f->cliprect(), machine().gfx[1],tile,
+			 machine().gfx[1]->opaque(*m_bitmap_f,m_bitmap_f->cliprect(),tile,
 				color, fx, fy, 16*mx,16*my);
 	}
 

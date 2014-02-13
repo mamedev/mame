@@ -417,7 +417,7 @@ void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle
 		code = spriteram[offs + 2];
 		color = (spriteram[offs + 1] & 0xf000) >> 12;
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+		machine().gfx[0]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,0,

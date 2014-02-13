@@ -122,7 +122,7 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 			UINT16 tile = ((m_vram[count])|(m_vram[count+1]<<8)) & 0xfff;
 			UINT8 col = (m_vram[count+1] >> 4);
 
-			drawgfx_opaque(bitmap,cliprect,gfx_2,tile,col,0,0,x*16,y*16);
+			gfx_2->opaque(bitmap,cliprect,tile,col,0,0,x*16,y*16);
 
 			count+=2;
 		}
@@ -137,7 +137,7 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 			UINT16 tile = ((m_vram[count])|(m_vram[count+1]<<8)) & 0xfff;
 			UINT8 col = (m_vram[count+1] >> 4); // ok?
 
-			drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*8,y*8,0);
+			gfx->transpen(bitmap,cliprect,tile,col,0,0,x*8,y*8,0);
 
 			count+=2;
 		}

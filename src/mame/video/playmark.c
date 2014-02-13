@@ -435,7 +435,7 @@ void playmark_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		if(!pri && (color & 0x0c) == 0x0c)
 			pri = 2;
 
-		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+		machine().gfx[0]->prio_transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,0,
@@ -473,7 +473,7 @@ void playmark_state::bigtwinb_draw_sprites( screen_device &screen, bitmap_ind16 
 		code = spriteram[offs + 2] >> codeshift;
 		color = ((spriteram[offs + 1] & 0xf000) >> 12);
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+		machine().gfx[0]->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,0,

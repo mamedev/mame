@@ -159,7 +159,7 @@ void pandoras_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int nflipx = sr[offs + 3] & 0x40;
 		int nflipy = sr[offs + 3] & 0x80;
 
-		drawgfx_transmask(bitmap,cliprect,machine().gfx[0],
+		machine().gfx[0]->transmask(bitmap,cliprect,
 			sr[offs + 2],
 			color,
 			!nflipx,!nflipy,

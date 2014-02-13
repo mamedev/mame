@@ -101,8 +101,8 @@ void vball_state::vb_mark_all_dirty(  )
 	m_bg_tilemap->mark_all_dirty();
 }
 
-#define DRAW_SPRITE( order, sx, sy ) drawgfx_transpen( bitmap, \
-					cliprect,gfx, \
+#define DRAW_SPRITE( order, sx, sy ) gfx->transpen(bitmap,\
+					cliprect, \
 					(which+order),color,flipx,flipy,sx,sy,0);
 
 void vball_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)

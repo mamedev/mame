@@ -803,7 +803,7 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 					else       sx = sx_base + dim_x;
 
 					/*
-					drawgfx_transpen(bitmap,cliprect,gfx,sprite,
+					gfx->transpen(bitmap,cliprect,sprite,
 					    color,
 					    flipx,flipy,
 					    sx,sy,0);

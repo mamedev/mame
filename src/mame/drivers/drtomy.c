@@ -118,7 +118,7 @@ void drtomy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 				ex = xflip ? (spr_size - 1 - x) : x;
 				ey = yflip ? (spr_size - 1 - y) : y;
 
-				drawgfx_transpen(bitmap,cliprect,gfx,number + x_offset[ex] + y_offset[ey],
+				gfx->transpen(bitmap,cliprect,number + x_offset[ex] + y_offset[ey],
 						color,xflip,yflip,
 						sx-0x09+x*8,sy+y*8,0);
 			}

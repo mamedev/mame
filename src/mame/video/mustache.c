@@ -130,7 +130,7 @@ void mustache_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap,clip,gfx,
+		gfx->transpen(bitmap,clip,
 				code,
 				color,
 				flip_screen(),flip_screen(),

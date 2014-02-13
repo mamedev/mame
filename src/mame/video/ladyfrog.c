@@ -104,7 +104,7 @@ void ladyfrog_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			sy = 238 - m_spriteram[offs + 0];
 			flipx = ((m_spriteram[offs + 1] & 0x40)>>6);
 			flipy = ((m_spriteram[offs + 1] & 0x80)>>7);
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+			machine().gfx[1]->transpen(bitmap,cliprect,
 					code,
 					pal,
 					flipx,flipy,
@@ -113,7 +113,7 @@ void ladyfrog_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			if (m_spriteram[offs + 3] > 240)
 			{
 				sx = (m_spriteram[offs + 3] - 256);
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+				machine().gfx[1]->transpen(bitmap,cliprect,
 						code,
 						pal,
 						flipx,flipy,

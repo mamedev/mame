@@ -172,7 +172,7 @@ void quizdna_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		{
 			y &= 0x1ff;
 
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+			machine().gfx[2]->transpen(bitmap,cliprect,
 					code ^ i,
 					col,
 					fx,fy,

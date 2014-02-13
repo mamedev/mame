@@ -484,7 +484,7 @@ void dragngun_state::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rectangl
 						15,zoomx,zoomy,NULL,0,
 						((xpos+(zoomx<<4))>>16) - (xpos>>16), ((ypos+(zoomy<<4))>>16) - (ypos>>16), alpha );
 				else
-					drawgfx_alpha(bitmap,cliprect,machine().gfx[bank],
+					machine().gfx[bank]->alpha(bitmap,cliprect,
 						sprite,
 						colour,
 						fx,fy,

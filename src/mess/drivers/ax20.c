@@ -47,7 +47,7 @@ UINT32 ax20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		{
 			UINT16 tile = m_p_vram[24 +  y * 128 + x ] & 0x7f;
 
-			drawgfx_opaque(bitmap, cliprect, machine().gfx[0], tile, 0, 0, 0, x*8, y*12);
+			 machine().gfx[0]->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*12);
 		}
 	}
 

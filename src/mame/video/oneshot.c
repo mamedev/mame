@@ -122,19 +122,19 @@ void oneshot_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			for (blocky = 0; blocky < ysize; blocky++)
 			{
-				drawgfx_transpen(
+				
+						gfx->transpen(
 						bitmap,
 						cliprect,
-						gfx,
 						num + (blocky * xsize) + blockx,
 						1,
 						0,0,
 						xpos + blockx * 8, ypos + blocky * 8, 0);
 
-				drawgfx_transpen(
+				
+						gfx->transpen(
 						bitmap,
 						cliprect,
-						gfx,
 						num + (blocky * xsize) + blockx,
 						1,
 						0,0,

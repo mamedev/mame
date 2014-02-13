@@ -527,7 +527,7 @@ UINT32 mastboy_state::screen_update_mastboy(screen_device &screen, bitmap_ind16 
 			}
 
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tileno,attr,0,0,x*8,y*8);
+			gfx->opaque(bitmap,cliprect,tileno,attr,0,0,x*8,y*8);
 
 			count+=4;
 

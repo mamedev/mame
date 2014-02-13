@@ -405,7 +405,7 @@ public:
 				{
 					if (nozoom)
 					{
-						pdrawgfx_transtable(bitmap,cliprect,m_gfx,
+						m_gfx->prio_transtable(bitmap,cliprect,
 								tempcode,
 								color,
 								fx,fy,
@@ -415,7 +415,7 @@ public:
 					}
 					else
 					{
-						pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
+						m_gfx->prio_zoom_transtable(bitmap,cliprect,
 								tempcode,
 								color,
 								fx,fy,
@@ -429,7 +429,7 @@ public:
 					{
 						if (nozoom)
 						{
-							pdrawgfx_transtable(bitmap,cliprect,m_gfx,
+							m_gfx->prio_transtable(bitmap,cliprect,
 									tempcode,
 									color,
 									fx,!fy,
@@ -439,7 +439,7 @@ public:
 						}
 						else
 						{
-							pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
+							m_gfx->prio_zoom_transtable(bitmap,cliprect,
 									tempcode,
 									color,
 									fx,!fy,

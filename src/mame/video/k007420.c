@@ -182,14 +182,14 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 					else
 						c += bank;
 
-					drawgfx_transpen(bitmap,cliprect,gfx,
+					gfx->transpen(bitmap,cliprect,
 						c,
 						color,
 						flipx,flipy,
 						sx,sy,0);
 
 					if (m_regs[2] & 0x80)
-						drawgfx_transpen(bitmap,cliprect,gfx,
+						gfx->transpen(bitmap,cliprect,
 							c,
 							color,
 							flipx,flipy,
@@ -226,7 +226,7 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 					else
 						c += bank;
 
-					drawgfxzoom_transpen(bitmap,cliprect,gfx,
+					gfx->zoom_transpen(bitmap,cliprect,
 						c,
 						color,
 						flipx,flipy,
@@ -234,7 +234,7 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 						(zw << 16) / 8,(zh << 16) / 8,0);
 
 					if (m_regs[2] & 0x80)
-						drawgfxzoom_transpen(bitmap,cliprect,gfx,
+						gfx->zoom_transpen(bitmap,cliprect,
 							c,
 							color,
 							flipx,flipy,

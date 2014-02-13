@@ -267,7 +267,7 @@ UINT32 ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_ind1
 		int which = spriteaddr[offs];
 		int color = spriteaddr[offs + 2] >> 7;
 
-		drawgfx_transpen(m_spritebitmap, cliprect, machine().gfx[0], which, color, flip, flip, x, y, 7);
+		 machine().gfx[0]->transpen(m_spritebitmap,cliprect, which, color, flip, flip, x, y, 7);
 	}
 
 	/* draw the bitmap to the screen, looping over Y */

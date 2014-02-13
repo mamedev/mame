@@ -275,7 +275,7 @@ void equites_state::equites_draw_sprites_block( bitmap_ind16 &bitmap, const rect
 			// sprites are 16x14 centered in a 16x16 square, so skip the first line
 			sy += 1;
 
-			drawgfx_transmask(bitmap,cliprect, machine().gfx[2],
+			 machine().gfx[2]->transmask(bitmap,cliprect,
 					tile,
 					color,
 					fx, fy,

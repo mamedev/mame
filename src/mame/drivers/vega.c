@@ -529,7 +529,7 @@ static void draw_tilemap(vega_state *state, screen_device& screen, bitmap_ind16&
 				{
 					//for(int x=0;x<4;++x)
 					{
-						drawgfx_transpen(bitmap, cliprect,  screen.machine().gfx[1], num, 0, 1,flip?1:0,  x*4+x0-offset_x, (flip?(3-y):y)*8+y0-offset_y, 0);
+						  screen.machine().gfx[1]->transpen(bitmap,cliprect, num, 0, 1,flip?1:0,  x*4+x0-offset_x, (flip?(3-y):y)*8+y0-offset_y, 0);
 						++num;
 					}
 				}
@@ -578,7 +578,7 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 
 			//  if(color==0) color=0xf;
 
-				drawgfx_transpen(bitmap, cliprect,  machine().gfx[0], character, color, 0, 0, x*7, y*10,0);
+				  machine().gfx[0]->transpen(bitmap,cliprect, character, color, 0, 0, x*7, y*10,0);
 
 				++idx;
 			}
@@ -599,7 +599,7 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 			{
 				//for(int x=0;x<4;++x)
 				{
-					drawgfx_transpen(bitmap, cliprect,  machine().gfx[2], num, 0, 1, flip?1:0, x*4+x0, (flip?(3-y):y)*8+y0, 0);
+					  machine().gfx[2]->transpen(bitmap,cliprect, num, 0, 1, flip?1:0, x*4+x0, (flip?(3-y):y)*8+y0, 0);
 					++num;
 				}
 			}
@@ -639,7 +639,7 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 
 				for(int y=0;y<4;++y)
 				{
-					drawgfx_transpen(bitmap, cliprect,  machine().gfx[3], strip_num, 0, !xor_line, 0, x*4+x0, y*8+y0, 0);
+					  machine().gfx[3]->transpen(bitmap,cliprect, strip_num, 0, !xor_line, 0, x*4+x0, y*8+y0, 0);
 					++strip_num;
 				}
 			}

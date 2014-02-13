@@ -94,7 +94,7 @@ while (0)
 do                                                                                  \
 {                                                                                   \
 	UINT32 srcdata = (SOURCE);                                                      \
-	if (srcdata != transpen)                                                        \
+	if (srcdata != trans_pen)                                                       \
 		(DEST) = SOURCE;                                                            \
 }                                                                                   \
 while (0)
@@ -122,7 +122,7 @@ while (0)
 
 /*-------------------------------------------------
     PIXEL_OP_REMAP_TRANSPEN - render all pixels
-    except those matching 'transpen', mapping the
+    except those matching 'trans_pen', mapping the
     pen via the 'paldata' array
 -------------------------------------------------*/
 
@@ -130,7 +130,7 @@ while (0)
 do                                                                                  \
 {                                                                                   \
 	UINT32 srcdata = (SOURCE);                                                      \
-	if (srcdata != transpen)                                                        \
+	if (srcdata != trans_pen)                                                       \
 		(DEST) = paldata[srcdata];                                                  \
 }                                                                                   \
 while (0)
@@ -138,7 +138,7 @@ while (0)
 do                                                                                  \
 {                                                                                   \
 	UINT32 srcdata = (SOURCE);                                                      \
-	if (srcdata != transpen)                                                        \
+	if (srcdata != trans_pen)                                                       \
 	{                                                                               \
 		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
 			(DEST) = paldata[srcdata];                                              \
@@ -157,7 +157,7 @@ while (0)
 do                                                                                  \
 {                                                                                   \
 	UINT32 srcdata = (SOURCE);                                                      \
-	if (srcdata != transpen)                                                        \
+	if (srcdata != trans_pen)                                                       \
 		(DEST) = color + srcdata;                                                   \
 }                                                                                   \
 while (0)
@@ -165,7 +165,7 @@ while (0)
 do                                                                                  \
 {                                                                                   \
 	UINT32 srcdata = (SOURCE);                                                      \
-	if (srcdata != transpen)                                                        \
+	if (srcdata != trans_pen)                                                       \
 	{                                                                               \
 		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
 			(DEST) = color + srcdata;                                               \
@@ -176,7 +176,7 @@ while (0)
 
 /*-------------------------------------------------
     PIXEL_OP_REMAP_TRANSMASK - render all pixels
-    except those matching 'transmask', mapping the
+    except those matching 'trans_mask', mapping the
     pen via the 'paldata' array
 -------------------------------------------------*/
 
@@ -184,7 +184,7 @@ while (0)
 do                                                                                  \
 {                                                                                   \
 	UINT32 srcdata = (SOURCE);                                                      \
-	if (((transmask >> srcdata) & 1) == 0)                                          \
+	if (((trans_mask >> srcdata) & 1) == 0)                                         \
 		(DEST) = paldata[srcdata];                                                  \
 }                                                                                   \
 while (0)
@@ -192,7 +192,7 @@ while (0)
 do                                                                                  \
 {                                                                                   \
 	UINT32 srcdata = (SOURCE);                                                      \
-	if (((transmask >> srcdata) & 1) == 0)                                          \
+	if (((trans_mask >> srcdata) & 1) == 0)                                         \
 	{                                                                               \
 		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
 			(DEST) = paldata[srcdata];                                              \
@@ -295,18 +295,18 @@ while (0)
 do                                                                                  \
 {                                                                                   \
 	UINT32 srcdata = (SOURCE);                                                      \
-	if (srcdata != transpen)                                                        \
-		(DEST) = alpha_blend_r32((DEST), paldata[srcdata], alpha);                  \
+	if (srcdata != trans_pen)                                                       \
+		(DEST) = alpha_blend_r32((DEST), paldata[srcdata], alpha_val);              \
 }                                                                                   \
 while (0)
 #define PIXEL_OP_REMAP_TRANSPEN_ALPHA32_PRIORITY(DEST, PRIORITY, SOURCE)            \
 do                                                                                  \
 {                                                                                   \
 	UINT32 srcdata = (SOURCE);                                                      \
-	if (srcdata != transpen)                                                        \
+	if (srcdata != trans_pen)                                                       \
 	{                                                                               \
 		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
-			(DEST) = alpha_blend_r32((DEST), paldata[srcdata], alpha);              \
+			(DEST) = alpha_blend_r32((DEST), paldata[srcdata], alpha_val);          \
 		(PRIORITY) = 31;                                                            \
 	}                                                                               \
 }                                                                                   \
@@ -347,14 +347,14 @@ do {                                                                            
 		assert(gfx != NULL);                                                            \
 		assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());                     \
 		assert(dest.cliprect().contains(cliprect));                                     \
-		assert(code < gfx->elements());                                             \
+		assert(code < elements());                                             \
 																						\
 		/* ignore empty/invalid cliprects */                                            \
 		if (cliprect.empty())                                                           \
 			break;                                                                      \
 																						\
 		/* compute final pixel in X and exit if we are entirely clipped */              \
-		destendx = destx + gfx->width() - 1;                                                \
+		destendx = destx + width() - 1;                                                \
 		if (destx > cliprect.max_x || destendx < cliprect.min_x)                        \
 			break;                                                                      \
 																						\
@@ -371,7 +371,7 @@ do {                                                                            
 			destendx = cliprect.max_x;                                                  \
 																						\
 		/* compute final pixel in Y and exit if we are entirely clipped */              \
-		destendy = desty + gfx->height() - 1;                                               \
+		destendy = desty + height() - 1;                                               \
 		if (desty > cliprect.max_y || destendy < cliprect.min_y)                        \
 			break;                                                                      \
 																						\
@@ -389,25 +389,25 @@ do {                                                                            
 																						\
 		/* apply X flipping */                                                          \
 		if (flipx)                                                                      \
-			srcx = gfx->width() - 1 - srcx;                                             \
+			srcx = width() - 1 - srcx;                                             \
 																						\
 		/* apply Y flipping */                                                          \
-		dy = gfx->rowbytes();                                                           \
+		dy = rowbytes();                                                           \
 		if (flipy)                                                                      \
 		{                                                                               \
-			srcy = gfx->height() - 1 - srcy;                                                \
+			srcy = height() - 1 - srcy;                                                \
 			dy = -dy;                                                                   \
 		}                                                                               \
 																						\
 		/* fetch the source data */                                                     \
-		srcdata = gfx->get_data(code);                                      \
+		srcdata = get_data(code);                                      \
 																						\
 		/* compute how many blocks of 4 pixels we have */                           \
 		UINT32 numblocks = (destendx + 1 - destx) / 4;                              \
 		UINT32 leftovers = (destendx + 1 - destx) - 4 * numblocks;                  \
 																					\
 		/* adjust srcdata to point to the first source pixel of the row */          \
-		srcdata += srcy * gfx->rowbytes() + srcx;                                   \
+		srcdata += srcy * rowbytes() + srcx;                                   \
 																					\
 		/* non-flipped 8bpp case */                                                 \
 		if (!flipx)                                                                 \
@@ -527,14 +527,14 @@ do {                                                                            
 			break;                                                                      \
 																						\
 		/* compute scaled size */                                                       \
-		dstwidth = (scalex * gfx->width() + 0x8000) >> 16;                              \
-		dstheight = (scaley * gfx->height() + 0x8000) >> 16;                                \
+		dstwidth = (scalex * width() + 0x8000) >> 16;                              \
+		dstheight = (scaley * height() + 0x8000) >> 16;                                \
 		if (dstwidth < 1 || dstheight < 1)                                              \
 			break;                                                                      \
 																						\
 		/* compute 16.16 source steps in dx and dy */                                   \
-		dx = (gfx->width() << 16) / dstwidth;                                               \
-		dy = (gfx->height() << 16) / dstheight;                                         \
+		dx = (width() << 16) / dstwidth;                                               \
+		dy = (height() << 16) / dstheight;                                         \
 																						\
 		/* compute final pixel in X and exit if we are entirely clipped */              \
 		destendx = destx + dstwidth - 1;                                                \
@@ -588,7 +588,7 @@ do {                                                                            
 		}                                                                               \
 																						\
 		/* fetch the source data */                                                     \
-		srcdata = gfx->get_data(code);                                      \
+		srcdata = get_data(code);                                      \
 																						\
 		/* compute how many blocks of 4 pixels we have */                           \
 		UINT32 numblocks = (destendx + 1 - destx) / 4;                              \
@@ -599,7 +599,7 @@ do {                                                                            
 		{                                                                           \
 			PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
 			PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);              \
-			const UINT8 *srcptr = srcdata + (srcy >> 16) * gfx->rowbytes();     \
+			const UINT8 *srcptr = srcdata + (srcy >> 16) * rowbytes();     \
 			INT32 cursrcx = srcx;                                                   \
 			srcy += dy;                                                             \
 																					\

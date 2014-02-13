@@ -197,7 +197,7 @@ void mystston_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				flipy = !flipy;
 			}
 
-			drawgfx_transpen(bitmap, cliprect, gfx, code, color, flipx, flipy, x, y, 0);
+			 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
 		}
 	}
 }

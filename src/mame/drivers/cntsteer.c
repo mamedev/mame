@@ -214,17 +214,17 @@ void cntsteer_state::zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		{
 			if (fy)
 			{
-				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, fx, fy, sx, sy, 0);
-				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code + 1, color, fx, fy, sx, sy - 16, 0);
+				 machine().gfx[1]->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+				 machine().gfx[1]->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy - 16, 0);
 			}
 			else
 			{
-				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, fx, fy, sx, sy - 16, 0);
-				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code + 1, color, fx, fy, sx, sy, 0);
+				 machine().gfx[1]->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy - 16, 0);
+				 machine().gfx[1]->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
 			}
 		}
 		else
-			drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, fx, fy, sx, sy, 0);
+			 machine().gfx[1]->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
 	}
 }
 
@@ -271,17 +271,17 @@ void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		{
 			if (fy)
 			{
-				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, fx, fy, sx, sy, 0);
-				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code + 1, color, fx, fy, sx, sy - 16, 0);
+				 machine().gfx[1]->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+				 machine().gfx[1]->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy - 16, 0);
 			}
 			else
 			{
-				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, fx, fy, sx, sy - 16, 0);
-				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code + 1, color, fx, fy, sx, sy, 0);
+				 machine().gfx[1]->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy - 16, 0);
+				 machine().gfx[1]->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
 			}
 		}
 		else
-			drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, fx, fy, sx, sy, 0);
+			 machine().gfx[1]->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
 	}
 }
 

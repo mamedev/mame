@@ -192,7 +192,7 @@ void dogfgt_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect 
 				flipy = !flipy;
 			}
 
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+			machine().gfx[1]->transpen(bitmap,cliprect,
 					m_spriteram[offs + 1] + ((m_spriteram[offs] & 0x30) << 4),
 					(m_spriteram[offs] & 0x08) >> 3,
 					flipx,flipy,

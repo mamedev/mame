@@ -371,7 +371,7 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 			{
 				for (y = ystart; y != yend; y += yinc)
 				{
-					drawgfxzoom_transpen( bitmap, cliprect, machine.gfx[m_gfx_index],
+					 machine.gfx[m_gfx_index]->zoom_transpen(bitmap,cliprect,
 									code++,
 									color,
 									flipx, flipy,

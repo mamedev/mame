@@ -129,7 +129,7 @@ UINT32 flyball_state::screen_update_flyball(screen_device &screen, bitmap_ind16 
 	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw pitcher */
-	drawgfx_transpen(bitmap, cliprect, machine().gfx[1], m_pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
+	 machine().gfx[1]->transpen(bitmap,cliprect, m_pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
 
 	/* draw ball */
 

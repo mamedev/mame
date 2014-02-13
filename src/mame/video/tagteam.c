@@ -164,8 +164,8 @@ void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect,
-			machine().gfx[1],
+		
+			machine().gfx[1]->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -176,8 +176,8 @@ void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		color = m_palettebank;
 		sy += (flip_screen() ? -256 : 256);
 
-		drawgfx_transpen(bitmap, cliprect,
-			machine().gfx[1],
+		
+			machine().gfx[1]->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);

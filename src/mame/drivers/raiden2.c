@@ -797,37 +797,37 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 #define ZEROTEAM_MASK_Y (0x1ff)
 
 
-				drawgfx_transpen(
+				
+						gfx->transpen(
 						bitmap,
 						cliprect,
-						gfx,
 						tile_number,
 						colr,
 						yflip,xflip,
 						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y,15);
 
-				drawgfx_transpen(
+				
+						gfx->transpen(
 						bitmap,
 						cliprect,
-						gfx,
 						tile_number,
 						colr,
 						yflip,xflip,
 						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y,15);
 
-				drawgfx_transpen(
+				
+						gfx->transpen(
 						bitmap,
 						cliprect,
-						gfx,
 						tile_number,
 						colr,
 						yflip,xflip,
 						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200,15);
 
-				drawgfx_transpen(
+				
+						gfx->transpen(
 						bitmap,
 						cliprect,
-						gfx,
 						tile_number,
 						colr,
 						yflip,xflip,

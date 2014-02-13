@@ -81,7 +81,7 @@ void battlex_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, gfx, tile, color, flipx, flipy, sx, sy, 0);
+		 gfx->transpen(bitmap,cliprect, tile, color, flipx, flipy, sx, sy, 0);
 		source += 4;
 	}
 

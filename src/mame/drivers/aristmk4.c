@@ -423,7 +423,7 @@ UINT32 aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_ind1
 								// as we only update the background, not the entire display.
 			flipx = ((m_mkiv_vram[count]) & 0x04);
 			flipy = ((m_mkiv_vram[count]) & 0x08);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,flipx,flipy,(38-x-1)<<3,(27-y-1)<<3);
+			gfx->opaque(bitmap,cliprect,tile,color,flipx,flipy,(38-x-1)<<3,(27-y-1)<<3);
 			count+=2;
 		}
 	}

@@ -189,7 +189,7 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 		{
 			int tile = m_videoram[count];
 			int attr = m_videoram2[count];
-			drawgfx_opaque(bitmap, cliprect, machine().gfx[0], tile, attr, 0, 0, x * 8, y * 8);
+			 machine().gfx[0]->opaque(bitmap,cliprect, tile, attr, 0, 0, x * 8, y * 8);
 			count++;
 		}
 	}
@@ -201,7 +201,7 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 		{
 			int tile = m_videoram[count];
 			int attr = m_videoram2[count];
-			drawgfx_transpen(bitmap, cliprect, machine().gfx[0], tile, attr, 0, 0, x * 8, y * 8, 0xf);
+			 machine().gfx[0]->transpen(bitmap,cliprect, tile, attr, 0, 0, x * 8, y * 8, 0xf);
 			count++;
 		}
 	}
@@ -289,7 +289,7 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 					tile_flipy = !tile_flipy;
 				}
 
-				drawgfx_transpen(   bitmap, cliprect,machine().gfx[0],
+				machine().gfx[0]->transpen(bitmap,cliprect,
 							(tile & 0x1fff) + bank*0x4000,
 							attr,
 							tile_flipx, tile_flipy,

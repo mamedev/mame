@@ -149,7 +149,7 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
 				transpen = 1;
 			}
 
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[rgn],
+			machine().gfx[rgn]->transpen(bitmap,cliprect,
 					code,
 					color,
 					0,0,

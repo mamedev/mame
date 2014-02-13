@@ -191,12 +191,12 @@ void arkanoid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		code = m_spriteram[offs + 3] + ((m_spriteram[offs + 2] & 0x03) << 8) + 1024 * m_gfxbank;
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+		machine().gfx[0]->transpen(bitmap,cliprect,
 				2 * code,
 				((m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * m_palettebank,
 				flip_screen_x(),flip_screen_y(),
 				sx,sy + (flip_screen_y() ? 8 : -8),0);
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+		machine().gfx[0]->transpen(bitmap,cliprect,
 				2 * code + 1,
 				((m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * m_palettebank,
 				flip_screen_x(),flip_screen_y(),

@@ -181,7 +181,7 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		}
 
 		/* first draw the sprite, visible */
-		pdrawgfx_transmask(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->prio_transmask(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -190,7 +190,7 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 				0x00,0x80ff);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		pdrawgfx_transmask(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->prio_transmask(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

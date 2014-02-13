@@ -523,7 +523,7 @@ void atari_motion_objects_device::render_object(bitmap_ind16 &bitmap, const rect
 						continue;
 
 					// draw the sprite
-					drawgfx_transpen_raw(bitmap, cliprect, gfx, code, color, hflip, vflip, sx, sy, m_transpen);
+					 gfx->transpen_raw(bitmap,cliprect, code, color, hflip, vflip, sx, sy, m_transpen);
 					mark_dirty(sx, sx + m_tilewidth - 1, sy, sy + m_tileheight - 1);
 				}
 			}
@@ -552,7 +552,7 @@ void atari_motion_objects_device::render_object(bitmap_ind16 &bitmap, const rect
 						continue;
 
 					// draw the sprite
-					drawgfx_transpen_raw(bitmap, cliprect, gfx, code, color, hflip, vflip, sx, sy, m_transpen);
+					 gfx->transpen_raw(bitmap,cliprect, code, color, hflip, vflip, sx, sy, m_transpen);
 					mark_dirty(sx, sx + m_tilewidth - 1, sy, sy + m_tileheight - 1);
 				}
 			}

@@ -148,7 +148,7 @@ void mainsnk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen( bitmap,cliprect,gfx,
+		gfx->transpen(bitmap,cliprect,
 			tile_number,
 			color,
 			flipx,flipy,

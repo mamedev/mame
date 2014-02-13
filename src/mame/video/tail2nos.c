@@ -156,8 +156,8 @@ void tail2nos_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		flipx = spriteram[offs + 2] & 0x1000;
 		flipy = spriteram[offs + 2] & 0x0800;
 
-		drawgfx_transpen(bitmap,/* placement relative to zoom layer verified on the real thing */
-				cliprect,machine().gfx[1],
+		machine().gfx[1]->transpen(bitmap,/* placement relative to zoom layer verified on the real thing */
+				cliprect,
 				code,
 				40 + color,
 				flipx,flipy,

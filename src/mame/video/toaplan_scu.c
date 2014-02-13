@@ -64,7 +64,7 @@ void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, U
 			flipx = attribute & 0x100;
 			if (flipx) sx -= 14;        /* should really be 15 */
 			flipy = attribute & 0x200;
-			drawgfx_transpen_raw(m_temp_spritebitmap,cliprect,machine().gfx[m_gfxregion],
+			machine().gfx[m_gfxregion]->transpen_raw(m_temp_spritebitmap,cliprect,
 				sprite,
 				color << 4 /* << 4 because using _raw */ ,
 				flipx,flipy,

@@ -160,8 +160,8 @@ void ssozumo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 				flipy = !flipy;
 			}
 
-			drawgfx_transpen(bitmap, cliprect,
-				machine().gfx[2],
+			
+				machine().gfx[2]->transpen(bitmap,cliprect,
 				code, color,
 				flipx, flipy,
 				sx, sy, 0);

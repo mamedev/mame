@@ -16,8 +16,8 @@ UINT32 nascom1_state::screen_update_nascom1(screen_device &screen, bitmap_ind16 
 
 	for (sx = 0; sx < 48; sx++)
 	{
-		drawgfx_opaque (bitmap, cliprect,
-			machine().gfx[0], videoram[0x03ca + sx],
+		
+			machine().gfx[0]->opaque(bitmap,cliprect, videoram[0x03ca + sx],
 			1, 0, 0, sx * 8, 0);
 	}
 
@@ -25,8 +25,8 @@ UINT32 nascom1_state::screen_update_nascom1(screen_device &screen, bitmap_ind16 
 	{
 		for (sx = 0; sx < 48; sx++)
 		{
-			drawgfx_opaque (bitmap, cliprect,
-				machine().gfx[0], videoram[0x000a + (sy * 64) + sx],
+			
+				machine().gfx[0]->opaque(bitmap,cliprect, videoram[0x000a + (sy * 64) + sx],
 				1, 0, 0, sx * 8, (sy + 1) * 16);
 		}
 	}
@@ -40,8 +40,8 @@ UINT32 nascom1_state::screen_update_nascom2(screen_device &screen, bitmap_ind16 
 
 	for (sx = 0; sx < 48; sx++)
 	{
-		drawgfx_opaque (bitmap, cliprect,
-			machine().gfx[0], videoram[0x03ca + sx],
+		
+			machine().gfx[0]->opaque(bitmap,cliprect, videoram[0x03ca + sx],
 			1, 0, 0, sx * 8, 0);
 	}
 
@@ -49,8 +49,8 @@ UINT32 nascom1_state::screen_update_nascom2(screen_device &screen, bitmap_ind16 
 	{
 		for (sx = 0; sx < 48; sx++)
 		{
-			drawgfx_opaque (bitmap, cliprect,
-				machine().gfx[0], videoram[0x000a + (sy * 64) + sx],
+			
+				machine().gfx[0]->opaque(bitmap,cliprect, videoram[0x000a + (sy * 64) + sx],
 				1, 0, 0, sx * 8, (sy + 1) * 14);
 		}
 	}

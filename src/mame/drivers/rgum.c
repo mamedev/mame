@@ -55,7 +55,7 @@ UINT32 rgum_state::screen_update_royalgum(screen_device &screen, bitmap_ind16 &b
 		{
 			int tile = m_vram[count] | ((m_cram[count] & 0xf) <<8);
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
+			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
 
 			count++;
 		}

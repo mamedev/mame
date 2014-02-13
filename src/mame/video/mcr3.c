@@ -277,21 +277,21 @@ void mcr3_state::mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap
 		if (!mcr_cocktail_flip)
 		{
 			/* first draw the sprite, visible */
-			pdrawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, sx, sy,
+			machine().gfx[1]->prio_transmask(bitmap,cliprect, code, color, flipx, flipy, sx, sy,
 					screen.priority(), 0x00, 0x0101);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
-			pdrawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, sx, sy,
+			machine().gfx[1]->prio_transmask(bitmap,cliprect, code, color, flipx, flipy, sx, sy,
 					screen.priority(), 0x02, 0xfeff);
 		}
 		else
 		{
 			/* first draw the sprite, visible */
-			pdrawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
+			machine().gfx[1]->prio_transmask(bitmap,cliprect, code, color, !flipx, !flipy, 480 - sx, 452 - sy,
 					screen.priority(), 0x00, 0x0101);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
-			pdrawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
+			machine().gfx[1]->prio_transmask(bitmap,cliprect, code, color, !flipx, !flipy, 480 - sx, 452 - sy,
 					screen.priority(), 0x02, 0xfeff);
 		}
 	}

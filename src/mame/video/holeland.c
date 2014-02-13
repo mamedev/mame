@@ -135,7 +135,7 @@ void holeland_state::holeland_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -173,7 +173,7 @@ void holeland_state::crzrally_draw_sprites( bitmap_ind16 &bitmap,const rectangle
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

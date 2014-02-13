@@ -274,9 +274,9 @@ void bwing_state::draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, UINT8 
 
 		// single/double
 		if (!(attrib & 0x10))
-			drawgfx_transpen(bmp, clip, gfx, code, color, fx, fy, x, y, 0);
+			 gfx->transpen(bmp,clip, code, color, fx, fy, x, y, 0);
 		else
-			drawgfxzoom_transpen(bmp, clip, gfx, code, color, fx, fy, x, y, 1<<16, 2<<16, 0);
+			 gfx->zoom_transpen(bmp,clip, code, color, fx, fy, x, y, 1<<16, 2<<16, 0);
 	}
 }
 

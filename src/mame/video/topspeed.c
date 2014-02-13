@@ -193,7 +193,7 @@ void topspeed_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			zx = x + (((k + 1) * zoomx) / 8) - curx;
 			zy = y + (((j + 1) * zoomy) / 16) - cury;
 
-			pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[0],
+			machine().gfx[0]->prio_zoom_transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,

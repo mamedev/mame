@@ -133,7 +133,7 @@ void pingpong_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		color = spriteram[offs] & 0x1f;
 		schar = spriteram[offs + 2] & 0x7f;
 
-		drawgfx_transmask(bitmap,spritevisiblearea,machine().gfx[1],
+		machine().gfx[1]->transmask(bitmap,spritevisiblearea,
 				schar,
 				color,
 				flipx,flipy,

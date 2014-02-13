@@ -123,8 +123,8 @@ void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		}
 
 		if (spriteram[offs + 2] && spriteram[offs + 3])
-			drawgfx_transpen(bitmap,
-					cliprect,machine().gfx[1],
+			machine().gfx[1]->transpen(bitmap,
+					cliprect,
 					(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20),
 					spriteram[offs + 1] & 0x1f,
 					flipx,flipy,

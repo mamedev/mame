@@ -338,7 +338,7 @@ UINT32 trvmadns_state::screen_update_trvmadns(screen_device &screen, bitmap_ind1
 			int flipy = attr & 2;
 
 			if(!(attr & 0x20))
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,flipx,flipy,(x*8),(y*8));
+				gfx->opaque(bitmap,cliprect,tile,color,flipx,flipy,(x*8),(y*8));
 			count++;
 		}
 	}
@@ -356,7 +356,7 @@ UINT32 trvmadns_state::screen_update_trvmadns(screen_device &screen, bitmap_ind1
 			int flipy = attr & 2;
 
 			if(attr & 0x20)
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,color,flipx,flipy,(x*8),(y*8),1);
+				gfx->transpen(bitmap,cliprect,tile,color,flipx,flipy,(x*8),(y*8),1);
 			count++;
 		}
 	}

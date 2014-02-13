@@ -120,7 +120,7 @@ int spbactn_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
 					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
 
-					drawgfx_transpen_raw(bitmap, cliprect, screen.machine().gfx[2],
+					 screen.machine().gfx[2]->transpen_raw(bitmap,cliprect,
 						code + layout[row][col],
 						screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
 						flipx, flipy,
@@ -169,7 +169,7 @@ void galspnbl_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const r
 				{
 					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
 					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
-					drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[1],
+					screen.machine().gfx[1]->transpen(bitmap,cliprect,
 						code + layout[row][col],
 						color,
 						flipx,flipy,
@@ -252,7 +252,7 @@ void tecmo16_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap
 							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
 							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
 						}
-						pdrawgfx_transpen_raw(bitmap,cliprect,screen.machine().gfx[2],
+						screen.machine().gfx[2]->prio_transpen_raw(bitmap,cliprect,
 								code + layout[y][x],
 								screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
 								flipx,flipy,
@@ -260,7 +260,7 @@ void tecmo16_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap
 								screen.priority(), priority_mask,0);
 
 						/* wrap around x */
-						pdrawgfx_transpen_raw(bitmap,cliprect,screen.machine().gfx[2],
+						screen.machine().gfx[2]->prio_transpen_raw(bitmap,cliprect,
 								code + layout[y][x],
 								screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
 								flipx,flipy,
@@ -268,7 +268,7 @@ void tecmo16_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap
 								screen.priority(), priority_mask,0);
 
 						/* wrap around x */
-						pdrawgfx_transpen_raw(bitmap,cliprect,screen.machine().gfx[2],
+						screen.machine().gfx[2]->prio_transpen_raw(bitmap,cliprect,
 								code + layout[y][x],
 								screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
 								flipx,flipy,
@@ -295,7 +295,7 @@ void tecmo16_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap
 							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
 							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
 						}
-						pdrawgfx_transpen_raw(bitmap,cliprect,screen.machine().gfx[2],
+						screen.machine().gfx[2]->prio_transpen_raw(bitmap,cliprect,
 								code + layout[y][x],
 								screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
 								flipx,flipy,
@@ -303,7 +303,7 @@ void tecmo16_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap
 								screen.priority(), priority_mask,0);
 
 						/* wrap around x */
-						pdrawgfx_transpen_raw(bitmap,cliprect,screen.machine().gfx[2],
+						screen.machine().gfx[2]->prio_transpen_raw(bitmap,cliprect,
 								code + layout[y][x],
 								screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
 								flipx,flipy,
@@ -311,7 +311,7 @@ void tecmo16_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap
 								screen.priority(), priority_mask,0);
 
 						/* wrap around x */
-						pdrawgfx_transpen_raw(bitmap,cliprect,screen.machine().gfx[2],
+						screen.machine().gfx[2]->prio_transpen_raw(bitmap,cliprect,
 								code + layout[y][x],
 								screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
 								flipx,flipy,
@@ -400,7 +400,7 @@ void gaiden_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap
 						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
 						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
 
-						pdrawgfx_transpen_raw(bitmap_sp, cliprect, gfx,
+						gfx->prio_transpen_raw(bitmap_sp,cliprect,
 							number + layout[row][col],
 							gfx->colorbase() + color * gfx->granularity(),
 							flipx, flipy,
@@ -420,7 +420,7 @@ void gaiden_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap
 						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
 						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
 
-						pdrawgfx_transpen_raw(bitmap, cliprect, gfx,
+						gfx->prio_transpen_raw(bitmap,cliprect,
 							number + layout[row][col],
 							gfx->colorbase() + color * gfx->granularity(),
 							flipx, flipy,
@@ -508,7 +508,7 @@ void raiga_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap_
 						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
 						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
 
-						pdrawgfx_transpen_raw(bitmap_sp, cliprect, gfx,
+						gfx->prio_transpen_raw(bitmap_sp,cliprect,
 							number + layout[row][col],
 							gfx->colorbase() + color * gfx->granularity(),
 							flipx, flipy,
@@ -528,7 +528,7 @@ void raiga_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap_
 						int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
 						int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
 
-						pdrawgfx_transpen_raw(bitmap, cliprect, gfx,
+						gfx->prio_transpen_raw(bitmap,cliprect,
 							number + layout[row][col],
 							gfx->colorbase() + color * gfx->granularity(),
 							flipx, flipy,

@@ -521,7 +521,7 @@ UINT32 avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap,
 			UINT16 tile = m_videoram[count] | ((m_colorram[count] & 1) << 8);
 			UINT8 color = (m_colorram[count] & 0xf0) >> 4;
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8,(y*8));
+			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8,(y*8));
 
 			count++;
 		}

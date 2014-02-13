@@ -74,7 +74,7 @@ void speedspn_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		tileno += ((attr & 0xe0) >> 5) * 0x100;
 		color = attr & 0x0f;
 
-		drawgfx_transpen(bitmap,cliprect,gfx,
+		gfx->transpen(bitmap,cliprect,
 				tileno,
 				color,
 				0,0,

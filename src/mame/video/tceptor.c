@@ -479,9 +479,9 @@ void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			x -= 64;
 			y -= 78;
 
-			drawgfxzoom_transmask(bitmap,
+			
+						machine().gfx[gfx]->zoom_transmask(bitmap,
 						cliprect,
-						machine().gfx[gfx],
 						code,
 						color,
 						flipx, flipy,

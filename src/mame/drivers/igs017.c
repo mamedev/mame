@@ -357,7 +357,7 @@ void igs017_state::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect, i
 
 	gfx_element gfx(machine(), m_sprites_gfx + addr, dimx, dimy, dimx, 0x100, 32);
 
-	drawgfx_transpen(   bitmap,cliprect, &gfx,
+	gfx.transpen(bitmap,cliprect,
 				0, color,
 				flipx, flipy,
 				sx, sy, 0x1f    );

@@ -42,14 +42,14 @@ void aquarium_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 			for (chain_pos = chain; chain_pos >= 0; chain_pos--)
 			{
-				drawgfx_transpen(bitmap, cliprect,machine().gfx[0],
+				machine().gfx[0]->transpen(bitmap,cliprect,
 						code,
 						col,
 						flipx, flipy,
 						curx,cury,0);
 
 				/* wrap around y */
-				drawgfx_transpen(bitmap, cliprect,machine().gfx[0],
+				machine().gfx[0]->transpen(bitmap,cliprect,
 						code,
 						col,
 						flipx, flipy,

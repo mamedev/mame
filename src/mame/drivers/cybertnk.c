@@ -310,7 +310,7 @@ static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectang
 		// seems to be priority related, cases seen are 0xc0 and 0x00 (once the palette bits are masked out)
 		if ((param2&0x80) == pri)
 		{
-			drawgfx_transpen(bitmap,cliprect,gfx,param1,col,0,0,-param3+screen_shift,i/4,0);
+			gfx->transpen(bitmap,cliprect,param1,col,0,0,-param3+screen_shift,i/4,0);
 		}
 
 

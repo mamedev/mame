@@ -365,10 +365,10 @@ UINT32 luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind1
 				if (bgenable==3) m_reel4_tilemap->draw(screen, bitmap, clip, 0, 0);
 			}
 
-			if (tileattr&0x08) drawgfx_transpen(bitmap,clip,machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
+			if (tileattr&0x08) machine().gfx[region]->transpen(bitmap,clip,tile,col,0,0,x*8,y*8, 0);
 
 #else // treat it as priority flag instead (looks better in non-adult title screen - needs verifying)
-			if (!(tileattr&0x08)) drawgfx_transpen(bitmap,clip,machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
+			if (!(tileattr&0x08)) machine().gfx[region]->transpen(bitmap,clip,tile,col,0,0,x*8,y*8, 0);
 
 			if (tileattr&0x04)
 			{
@@ -378,7 +378,7 @@ UINT32 luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind1
 				if (bgenable==3) m_reel4_tilemap->draw(screen, bitmap, clip, 0, 0);
 			}
 
-			if ((tileattr&0x08)) drawgfx_transpen(bitmap,clip,machine().gfx[region],tile,col,0,0,x*8,y*8, 0);
+			if ((tileattr&0x08)) machine().gfx[region]->transpen(bitmap,clip,tile,col,0,0,x*8,y*8, 0);
 #endif
 
 			count++;

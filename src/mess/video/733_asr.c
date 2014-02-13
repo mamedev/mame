@@ -260,7 +260,7 @@ static void asr_draw_char(device_t *device, int character, int x, int y, int col
 {
 	asr_t *asr = get_safe_token(device);
 
-	drawgfx_opaque(*asr->bitmap, asr->bitmap->cliprect(), device->machine().gfx[0], character-32, color, 0, 0,
+	 device->machine().gfx[0]->opaque(*asr->bitmap,asr->bitmap->cliprect(), character-32, color, 0, 0,
 				x+1, y);
 }
 

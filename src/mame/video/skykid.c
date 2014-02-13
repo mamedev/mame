@@ -216,7 +216,7 @@ void skykid_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				drawgfx_transmask(bitmap,cliprect,machine().gfx[2],
+				machine().gfx[2]->transmask(bitmap,cliprect,
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,

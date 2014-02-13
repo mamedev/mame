@@ -134,9 +134,9 @@ UINT32 m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap,
 
 	for (i = 0; i < 4; i++)
 		if (m_flip)
-			drawgfx_opaque(bitmap, cliprect, m_back_gfx, i, color[i], 1, 1, 31 * 8 - xpos[i], 6);
+			 m_back_gfx->opaque(bitmap,cliprect, i, color[i], 1, 1, 31 * 8 - xpos[i], 6);
 		else
-			drawgfx_opaque(bitmap, cliprect, m_back_gfx, i, color[i], 0, 0, xpos[i], 0);
+			 m_back_gfx->opaque(bitmap,cliprect, i, color[i], 0, 0, xpos[i], 0);
 
 	if (m_bottomline)
 	{

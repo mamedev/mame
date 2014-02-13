@@ -235,7 +235,7 @@ void macrossp_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 						xoffset = 0;
 						for (xcnt = 0; xcnt <= wide; xcnt++)
 						{
-							drawgfxzoom_alpha(bitmap,cliprect,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
+							gfx->zoom_alpha(bitmap,cliprect,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
 							xoffset += ((xzoom*16 + (1<<7)) >> 8);
 							loopno++;
@@ -252,7 +252,7 @@ void macrossp_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 						xoffset = 0;
 						for (xcnt = 0; xcnt <= wide; xcnt++)
 						{
-							drawgfxzoom_alpha(bitmap,cliprect,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
+							gfx->zoom_alpha(bitmap,cliprect,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
 							xoffset += ((xzoom * 16 + (1 << 7)) >> 8);
 							loopno++;
@@ -272,7 +272,7 @@ void macrossp_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 						xoffset = ((wide*xzoom*16) >> 8);
 						for (xcnt = wide; xcnt >= 0; xcnt--)
 						{
-							drawgfxzoom_alpha(bitmap,cliprect,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
+							gfx->zoom_alpha(bitmap,cliprect,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
 							xoffset -= ((xzoom * 16 + (1 << 7)) >> 8);
 							loopno++;
@@ -289,7 +289,7 @@ void macrossp_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 						xoffset = ((wide * xzoom * 16) >> 8);
 						for (xcnt = wide; xcnt >=0 ; xcnt--)
 						{
-							drawgfxzoom_alpha(bitmap,cliprect,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
+							gfx->zoom_alpha(bitmap,cliprect,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
 							xoffset -= ((xzoom * 16 + (1 << 7)) >> 8);
 							loopno++;

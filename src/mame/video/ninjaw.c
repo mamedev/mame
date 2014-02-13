@@ -76,7 +76,7 @@ void ninjaw_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		cury = y;
 		code = tilenum;
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+		machine().gfx[0]->transpen(bitmap,cliprect,
 				code, color,
 				flipx, flipy,
 				curx, cury, 0);

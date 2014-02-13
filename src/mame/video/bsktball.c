@@ -44,7 +44,7 @@ void bsktball_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 		pic = (pic & 0x3f);
 		color = (color & 0x3f);
 
-		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], pic, color, flipx, 0, sx, sy, 0);
+		 machine().gfx[1]->transpen(bitmap,cliprect, pic, color, flipx, 0, sx, sy, 0);
 	}
 }
 

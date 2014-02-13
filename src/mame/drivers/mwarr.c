@@ -433,9 +433,8 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 
 			for (i = 0; i <= dy; i++)
 			{
-				pdrawgfx_transpen( bitmap,
+				gfx->prio_transpen(bitmap,
 							cliprect,
-							gfx,
 							source[2]+i,
 							color,
 							flipx,0,
@@ -443,9 +442,8 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 							screen.priority(),pri_mask,0 );
 
 				/* wrap around x */
-				pdrawgfx_transpen( bitmap,
+				gfx->prio_transpen(bitmap,
 							cliprect,
-							gfx,
 							source[2]+i,
 							color,
 							flipx,0,
@@ -453,9 +451,8 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 							screen.priority(),pri_mask,0 );
 
 				/* wrap around y */
-				pdrawgfx_transpen( bitmap,
+				gfx->prio_transpen(bitmap,
 							cliprect,
-							gfx,
 							source[2]+i,
 							color,
 							flipx,0,
@@ -463,9 +460,8 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 							screen.priority(),pri_mask,0 );
 
 				/* wrap around x & y */
-				pdrawgfx_transpen( bitmap,
+				gfx->prio_transpen(bitmap,
 							cliprect,
-							gfx,
 							source[2]+i,
 							color,
 							flipx,0,

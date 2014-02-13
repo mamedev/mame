@@ -500,7 +500,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 						c += yoffset[y];
 
 					if (max_priority == -1)
-						pdrawgfx_transtable(bitmap,cliprect,m_gfx,
+						m_gfx->prio_transtable(bitmap,cliprect,
 								c,
 								color,
 								flipx,flipy,
@@ -508,7 +508,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 								priority_bitmap,pri,
 								drawmode_table,machine().shadow_table);
 					else
-						drawgfx_transtable(bitmap,cliprect,m_gfx,
+						m_gfx->transtable(bitmap,cliprect,
 								c,
 								color,
 								flipx,flipy,
@@ -543,7 +543,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 						c += yoffset[y];
 
 					if (max_priority == -1)
-						pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
+						m_gfx->prio_zoom_transtable(bitmap,cliprect,
 								c,
 								color,
 								flipx,flipy,
@@ -552,7 +552,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 								priority_bitmap,pri,
 								drawmode_table,machine().shadow_table);
 					else
-						drawgfxzoom_transtable(bitmap,cliprect,m_gfx,
+						m_gfx->zoom_transtable(bitmap,cliprect,
 								c,
 								color,
 								flipx,flipy,
