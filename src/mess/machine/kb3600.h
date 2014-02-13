@@ -132,8 +132,12 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
+	static const int MAX_KEYS_DOWN = 4;
+
 	int m_b;                    // output buffer
 	int m_ako;                  // any key down
+
+	int m_keys_down[MAX_KEYS_DOWN];
 
 	// timers
 	emu_timer *m_scan_timer;    // keyboard scan timer

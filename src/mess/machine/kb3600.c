@@ -89,6 +89,7 @@ void ay3600_device::device_start()
 	// state saving
 	save_item(NAME(m_b));
 	save_item(NAME(m_ako));
+	save_item(NAME(m_keys_down));
 }
 
 
@@ -99,6 +100,10 @@ void ay3600_device::device_start()
 void ay3600_device::device_reset()
 {
 	m_ako = 0;
+	for (int i = 0; i < MAX_KEYS_DOWN; i++)
+	{
+		m_keys_down[i] = -1;
+	}
 }
 
 //-------------------------------------------------
@@ -128,27 +133,62 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 		for (int y = 0; y < 10; y++)
 		{
+			int b = (x * 10) + y;
+
+			if (b > 63)
+			{
+				b -= 64;
+				b = 0x100 | b;
+			}
+
+			b |= (m_read_shift() << 6);
+			b |= (m_read_control() << 7);
+
 			if (BIT(data, y))
 			{
-				int b = (x * 10) + y;
+				bool found = false;
 
-				ako = 1;
-
-				if (b > 63)
+				// is this key already down?
+				for (int k = 0; k < MAX_KEYS_DOWN; k++)
 				{
-					b -= 64;
-					b = 0x100 | b;
+					if (b == m_keys_down[k])
+					{
+						found = true;
+						break;
+					}
 				}
 
-				b |= (m_read_shift() << 6);
-				b |= (m_read_control() << 7);
-
-				if (m_b != b)
+				if (!found)
 				{
-					m_b = b;
+					ako = 1; 
 
-					m_write_data_ready(1);
-					return;
+					if (m_b != b)
+					{
+						m_b = b;
+
+						m_write_data_ready(1);
+						return;
+					}
+
+					// add to the keys down list
+					for (int k = 0; k < MAX_KEYS_DOWN; k++)
+					{
+						if (m_keys_down[k] == -1)
+						{
+							m_keys_down[k] = b;
+							break;
+						}
+					}
+				}
+			}
+			else	// key released, unmark it from the keys_down table
+			{
+				for (int k = 0; k < MAX_KEYS_DOWN; k++)
+				{
+					if (b == m_keys_down[k])
+					{
+						m_keys_down[k] = -1;
+					}
 				}
 			}
 		}
