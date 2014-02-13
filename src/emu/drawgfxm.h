@@ -344,7 +344,6 @@ do {                                                                            
 		INT32 dy;                                                                       \
 																						\
 		assert(dest.valid());                                                           \
-		assert(gfx != NULL);                                                            \
 		assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());                     \
 		assert(dest.cliprect().contains(cliprect));                                     \
 		assert(code < elements());                                             \
@@ -518,7 +517,6 @@ do {                                                                            
 		INT32 dx, dy;                                                                   \
 																						\
 		assert(dest.valid());                                                           \
-		assert(gfx != NULL);                                                            \
 		assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());                     \
 		assert(dest.cliprect().contains(cliprect));                                     \
 																						\
