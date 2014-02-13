@@ -64,28 +64,28 @@
 
   IC's Reverse Engineering....
 
-  MARKED   PINS     ID    TYPE        DETAILS
+  MARKED   PINS     ID    TYPE        PART                           DETAILS
 
-  - U1 : 40-pin IC  YES   CPU         MOTOROLA M6809EP               (8-bit microprocessor)
-  - U2 : 28-pin IC  YES   ROM         M27128A                        (NMOS 128K 16K x 8 UV EPROM)
-  - U3 : 28-pin IC  YES   ROM         M27128A                        (NMOS 128K 16K x 8 UV EPROM)
-  - U4 : 40-pin IC  YES   I/O         ST EF6821P                     (PIA: Peripheral Interface Adapter)
-  - U5 : 16-pin IC  YES   TTL         ST M74HC157B1                  (Quad 2 Channel Multiplexer)
-  - U6 : 16-pin IC  YES   TTL         ST M74HC157B1                  (Quad 2 Channel Multiplexer)
-  - U7 : 16-pin IC  YES   TTL         ST M74HC157B1                  (Quad 2 Channel Multiplexer)
-  - U8 : 16-pin IC  YES   TTL         ST M74HC157B1                  (Quad 2 Channel Multiplexer)
-  - U9 : 40-pin IC  YES   CRTC        HD6845 / UM6845 / GS GM68A45S  (CRT Controller)
-  - U10: 28-pin IC  YES   RAM         KM62256BLP-10                  (32K x 8 Low Power CMOS Static RAM)
-  - U11: 14-pin IC  YES   TTL         SN74LS95BN                     (4-bit Parallel-Access Shift Registers)
-  - U12: 14-pin IC  YES   TTL         SN74LS95BN                     (4-bit Parallel-Access Shift Registers)
-  - U13: 20-pin IC  YES   TTL         SN74LS244N                     (Octal Buffers and Line Drivers with 3-State outputs)
-  - U14: 20-pin IC  YES   TTL         HD74LS374                      (Octal D-type Flip-Flops with noninverted 3-state output)
-  - U15: 20-pin IC  NO    PLD         ???
-  - U16: 20-pin IC  YES   PLD         PALCE16V8H-25                  (EE CMOS Zero-Power 20-Pin Universal Programmable Array Logic)
-  - U17: 14-pin IC  YES   TTL         HD74LS00P                      (Quadruple 2-Input NAND Gates)
-  - U18: 14-pin IC  YES   TTL         KS74HCTLS86N                   (Quad 2−Input Exclusive OR Gate)
-  - U19: 16-pin IC  YES   WATCHDOG    MAXIM MAX691                   (Microprocessor Supervisory Circuits)
-  - U20: 16-pin IC  YES   DARLINGTON  ULN2003                        (7 NPN Darlington transistor pairs with high voltage and current capability)
+  - U1 : 40-pin IC  YES   CPU         MOTOROLA M6809EP               8-bit microprocessor.
+  - U2 : 28-pin IC  YES   ROM         M27128A (or M27512FI)          NMOS 128K 16K x 8 UV EPROM (or 64K x 8).
+  - U3 : 28-pin IC  YES   ROM         M27128A (or M27512FI)          NMOS 128K 16K x 8 UV EPROM (or 64K x 8).
+  - U4 : 40-pin IC  YES   I/O         ST EF6821P                     PIA: Peripheral Interface Adapter.
+  - U5 : 16-pin IC  YES   TTL         ST M74HC157B1                  Quad 2 Channel Multiplexer.
+  - U6 : 16-pin IC  YES   TTL         ST M74HC157B1                  Quad 2 Channel Multiplexer.
+  - U7 : 16-pin IC  YES   TTL         ST M74HC157B1                  Quad 2 Channel Multiplexer.
+  - U8 : 16-pin IC  YES   TTL         ST M74HC157B1                  Quad 2 Channel Multiplexer.
+  - U9 : 40-pin IC  YES   CRTC        HD6845 / UM6845 / GS GM68A45S  CRT Controller.
+  - U10: 28-pin IC  YES   RAM         KM62256BLP-10                  32K x 8 Low Power CMOS Static RAM.
+  - U11: 14-pin IC  YES   TTL         SN74LS95BN                     4-bit Parallel-Access Shift Registers.
+  - U12: 14-pin IC  YES   TTL         SN74LS95BN                     4-bit Parallel-Access Shift Registers.
+  - U13: 20-pin IC  YES   TTL         SN74LS244N                     Octal Buffers and Line Drivers with 3-State output.
+  - U14: 20-pin IC  YES   TTL         HD74LS374                      Octal D-type Flip-Flops with noninverted 3-state output.
+  - U15: 20-pin IC  YES   PLD         PALCE16V8H-25                  EE CMOS Zero-Power 20-Pin Universal Programmable Array Logic.
+  - U16: 20-pin IC  YES   PLD         PALCE16V8H-25                  EE CMOS Zero-Power 20-Pin Universal Programmable Array Logic.
+  - U17: 14-pin IC  YES   TTL         HD74LS00P                      Quadruple 2-Input NAND Gates.
+  - U18: 14-pin IC  YES   TTL         KS74HCTLS86N                   Quad 2−Input Exclusive OR Gate.
+  - U19: 16-pin IC  YES   WATCHDOG    MAXIM MAX691                   Microprocessor Supervisory Circuits.
+  - U20: 16-pin IC  YES   DARLINGTON  ULN2003                        7 NPN Darlington transistor pairs with high voltage and current capability.
 
 
                              M6809
@@ -260,9 +260,9 @@ WRITE_LINE_MEMBER(truco_state::pia_irqb_w)
 *******************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, truco_state )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM                                                     /* General purpose RAM */
+	AM_RANGE(0x0000, 0x17ff) AM_RAM                                     /* General purpose RAM */
 	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_SHARE("videoram")                /* Video RAM */
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_SHARE("battery_ram")         /* Battery backed RAM */
+	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_SHARE("battery_ram")             /* Battery backed RAM */
 	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x8005, 0x8005) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
