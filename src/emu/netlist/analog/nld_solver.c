@@ -118,7 +118,7 @@ void netlist_matrix_solver_t::schedule()
     }
     else
     {
-        //m_owner->netlist().warning("Matrix solver reschedule .. Consider increasing RESCHED_LOOPS");
+        m_owner->netlist().warning("Matrix solver reschedule .. Consider increasing RESCHED_LOOPS");
         if (m_owner != NULL)
             this->m_owner->schedule();
     }
@@ -167,6 +167,7 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
     else
     {
         resched_cnt = solve_non_dynamic();
+        //printf("resched_cnt %d %d\n", resched_cnt, m_resched_loops);
     }
     return (resched_cnt >= m_resched_loops);
 }
@@ -750,7 +751,7 @@ NETLIB_UPDATE(solver)
 
 	if (global_resched)
 	{
-	    //netlist().warning("Gobal reschedule .. Consider increasing RESCHED_LOOPS");
+	    netlist().warning("Gobal reschedule .. Consider increasing RESCHED_LOOPS");
 		schedule();
 	}
 	else

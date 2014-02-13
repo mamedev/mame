@@ -55,8 +55,13 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist)                    
 
 #define NETLIST_END()  }
 
-#define NETLIST_INCLUDE(_name)                                                      \
+#define INCLUDE(_name)                                                              \
 		NETLIST_NAME(_name)(netlist);
+
+#define SUBMODEL(_name, _model)                                                     \
+        netlist.namespace_push(# _name);                                            \
+        NETLIST_NAME(_model)(netlist);                                              \
+        netlist.namespace_pop();
 
 // ----------------------------------------------------------------------------------------
 // FIXME: Clean this up
@@ -135,6 +140,11 @@ public:
 	void start_devices();
 	void resolve_inputs();
 
+	/* handle namespace */
+
+	void namespace_push(const pstring &aname);
+    void namespace_pop();
+
 	/* not ideal, but needed for save_state */
 	tagmap_terminal_t  m_terminals;
 
@@ -156,6 +166,9 @@ private:
 	netlist_list_t<pstring> m_models;
 
 	int m_proxy_cnt;
+
+    netlist_stack_t<pstring> m_stack;
+
 
 	void connect_terminals(netlist_core_terminal_t &in, netlist_core_terminal_t &out);
 	void connect_input_output(netlist_input_t &in, netlist_output_t &out);

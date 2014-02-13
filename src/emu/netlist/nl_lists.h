@@ -92,6 +92,16 @@ public:
 		}
 	}
 
+    ATTR_HOT inline void remove_at(const int pos)
+    {
+        assert((pos>=0) && (pos<m_count));
+        m_count--;
+        for (int i = pos; i < m_count; i++)
+        {
+            m_list[i] = m_list[i+1];
+        }
+    }
+
 	ATTR_HOT inline bool contains(const _ListClass &elem) const
 	{
 		for (_ListClass *i = m_list; i < m_list + m_count; i++)
@@ -222,6 +232,63 @@ private:
 	//entry_t *m_list;
 	entry_t m_list[_Size];
 
+};
+
+// ----------------------------------------------------------------------------------------
+// netlist_stack_t: a simple stack
+// ----------------------------------------------------------------------------------------
+
+
+template <class _StackClass, int _NumElem = 128>
+class netlist_stack_t
+{
+public:
+
+    ATTR_COLD netlist_stack_t(int numElements = _NumElem)
+    : m_list(numElements)
+    {
+    }
+
+    ATTR_COLD netlist_stack_t(const netlist_stack_t &rhs)
+    : m_list(rhs.m_list)
+    {
+    }
+
+    ATTR_COLD netlist_stack_t &operator=(const netlist_stack_t &rhs)
+    {
+        m_list = rhs.m_list;
+        return *this;
+    }
+
+
+    ATTR_COLD ~netlist_stack_t()
+    {
+    }
+
+    ATTR_HOT inline void push(const _StackClass &elem)
+    {
+        m_list.add(elem);
+    }
+
+    ATTR_HOT inline _StackClass peek() const
+    {
+        return m_list[m_list.count() - 1];
+    }
+
+    ATTR_HOT inline _StackClass pop()
+    {
+        _StackClass ret = peek();
+        m_list.remove_at(m_list.count() - 1);
+        return ret;
+    }
+
+    ATTR_HOT inline int count() const { return m_list.count(); }
+    ATTR_HOT inline bool empty() const { return (m_list.count() == 0); }
+    ATTR_HOT inline void reset() { m_list.reset(); }
+    ATTR_HOT inline int capacity() const { return m_list.capacity(); }
+
+private:
+    netlist_list_t<_StackClass, _NumElem> m_list;
 };
 
 

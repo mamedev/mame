@@ -732,7 +732,7 @@ NETLIST_END()
 
 static NETLIST_START(pong_fast)
 
-	NETLIST_INCLUDE(pong_schematics)
+	INCLUDE(pong_schematics)
 
 	//NETDEV_ANALOG_CALLBACK(sound_cb, sound, pong_state, sound_cb, "")
     //NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")

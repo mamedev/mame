@@ -58,8 +58,25 @@ netlist_setup_t::~netlist_setup_t()
 
 ATTR_COLD pstring netlist_setup_t::build_fqn(const pstring &obj_name) const
 {
-    return netlist().name() + "." + obj_name;
+    if (m_stack.empty())
+        return netlist().name() + "." + obj_name;
+    else
+        return m_stack.peek() + "." + obj_name;
 }
+
+void netlist_setup_t::namespace_push(const pstring &aname)
+{
+    if (m_stack.empty())
+        m_stack.push(netlist().name() + "." + aname);
+    else
+        m_stack.push(m_stack.peek() + "." + aname);
+}
+
+void netlist_setup_t::namespace_pop()
+{
+    m_stack.pop();
+}
+
 
 netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const pstring &name)
 {
