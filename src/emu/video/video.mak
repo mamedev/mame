@@ -401,6 +401,14 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/video/sed1520.h,VIDEOS += SED1520
+#-------------------------------------------------
+ifneq ($(filter SED1520,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/sed1520.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/video/stvvdp1.h,VIDEOS += STVVDP
 #@src/emu/video/stvvdp2.h,VIDEOS += STVVDP
 #-------------------------------------------------
