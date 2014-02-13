@@ -42,7 +42,8 @@ protected:
 	};
 
 	static const UINT32 c1541_cell_size[];
-	static const int c1541_speed_zone[];
+
+	int generate_bitstream(int track, int head, int speed_zone, UINT8 *trackbuf, int &track_size, floppy_image *image);
 };
 
 extern const floppy_format_type FLOPPY_G64_FORMAT;

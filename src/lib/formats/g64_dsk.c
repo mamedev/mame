@@ -27,16 +27,6 @@ const UINT32 g64_format::c1541_cell_size[] =
 	3250  // 16MHz/13/4
 };
 
-const int g64_format::c1541_speed_zone[] =
-{
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, //  1-17
-	2, 2, 2, 2, 2, 2, 2,                               // 18-24
-	1, 1, 1, 1, 1, 1,                                  // 25-30
-	0, 0, 0, 0, 0,                                     // 31-35
-	0, 0, 0, 0, 0,                                     // 36-40
-	0, 0                                               // 41-42
-};
-
 int g64_format::identify(io_generic *io, UINT32 form_factor)
 {
 	char h[8];
@@ -91,12 +81,23 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	return true;
 }
 
+int g64_format::generate_bitstream(int track, int head, int speed_zone, UINT8 *trackbuf, int &track_size, floppy_image *image)
+{
+	int cell_size = c1541_cell_size[speed_zone];
+	
+	generate_bitstream_from_track(track, head, cell_size, trackbuf, track_size, image);
+	
+	int actual_cell_size = 200000000L/track_size;
+
+	// allow a tolerance of +- 10 us (3990..4010 -> 4000)
+	return ((actual_cell_size >= cell_size-10) && (actual_cell_size <= cell_size+10)) ? speed_zone : -1;
+}
+
 bool g64_format::save(io_generic *io, floppy_image *image)
 {
-	UINT8 header[4] = { 0x00, 0x54, 0xf8, 0x1e };
+	UINT8 header[] = { 'G', 'C', 'R', '-', '1', '5', '4', '1', 0x00, 0x54, TRACK_LENGTH & 0xff, TRACK_LENGTH >> 8 };
 
-	io_generic_write(io, G64_FORMAT_HEADER, SIGNATURE, sizeof(G64_FORMAT_HEADER));
-	io_generic_write(io, header, VERSION, 4);
+	io_generic_write(io, header, SIGNATURE, sizeof(header));
 	
 	int head = 0;
 	int tracks_written = 0;
@@ -112,14 +113,18 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 		if (image->get_track_size(track, head) <= 1)
 			continue;
 
-		int speed_zone = c1541_speed_zone[track >> 1];
-		int cell_size = c1541_cell_size[speed_zone];
 		UINT8 *trackbuf = global_alloc_array(UINT8, TRACK_LENGTH-2);
 		int track_size;
+		int speed_zone;
 
-		generate_bitstream_from_track(track, head, cell_size, trackbuf, track_size, image);
+		// figure out the cell size and speed zone from the track data
+		if ((speed_zone = generate_bitstream(track, head, 3, trackbuf, track_size, image)) == -1)
+			if ((speed_zone = generate_bitstream(track, head, 2, trackbuf, track_size, image)) == -1)
+				if ((speed_zone = generate_bitstream(track, head, 1, trackbuf, track_size, image)) == -1)
+					if ((speed_zone = generate_bitstream(track, head, 0, trackbuf, track_size, image)) == -1)
+						throw emu_fatalerror("g64_format: Cannot determine speed zone for track %u", track);
 
-		LOG_FORMATS("track %u size %u cell %ld\n", track, track_size, 200000000L/track_size);
+		LOG_FORMATS("track %u size %u cell %u\n", track, track_size, c1541_cell_size[speed_zone]);
 
 		UINT8 track_offset[4];
 		UINT8 speed_offset[4];
