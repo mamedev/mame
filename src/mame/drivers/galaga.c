@@ -677,7 +677,10 @@ TODO:
 
 - bosco: is the scrolling tilemap placement correct? It is currently aligned so that
   the test grid shown on startup is correct, but this way an unerased grey strip
-  remains on the left of the screen during the title sequence.
+  remains on the left of the screen during the title sequence. Alignment of the
+  bullets/radar blips is also mysterious. Currently the radar blips are perfectly
+  aligned with the radar, but the alignment of the player bullets with the player
+  ship differs by one horizontal pixel when the screen is flipped.
 
 - gallag/gatsbee: explosions are not emulated since the bootleg board doesn't have
   the 54XX custom. Should probably use samples like Battles?

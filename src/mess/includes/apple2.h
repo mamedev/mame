@@ -16,7 +16,7 @@
 #include "machine/applefdc.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
-#include "machine/ay3600.h"
+#include "machine/kb3600.h"
 #include "sound/speaker.h"
 #include "machine/ram.h"
 
@@ -121,34 +121,24 @@ public:
 		m_joy2x(*this, "joystick_2_x"),
 		m_joy2y(*this, "joystick_2_y"),
 		m_joybuttons(*this, "joystick_buttons"),
-		m_kb0(*this, "keyb_0"),
-		m_kb1(*this, "keyb_1"),
-		m_kb2(*this, "keyb_2"),
-		m_kb3(*this, "keyb_3"),
-		m_kb4(*this, "keyb_4"),
-		m_kb5(*this, "keyb_5"),
-		m_kb6(*this, "keyb_6"),
+		m_kbdrom(*this, "keyboard"),
 		m_kbspecial(*this, "keyb_special"),
 		m_kbrepeat(*this, "keyb_repeat"),
 		m_resetdip(*this, "reset_dip"),
-		m_kpad1(*this, "keypad_1"),
-		m_kpad2(*this, "keypad_2"),
-		m_kbprepeat(*this, "keyb_repeat"),
 		m_cassette(*this, "cassette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<ay3600n_device> m_ay3600;
+	required_device<ay3600_device> m_ay3600;
 	required_device<a2bus_device> m_a2bus;
 	optional_device<a2eauxslot_device> m_a2eauxslot;
 
 	optional_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
-	required_ioport m_kb0, m_kb1, m_kb2, m_kb3, m_kb4, m_kb5, m_kb6, m_kbspecial;
+	optional_memory_region m_kbdrom;
+	required_ioport m_kbspecial;
 	optional_ioport m_kbrepeat;
 	optional_ioport m_resetdip;
-	optional_ioport m_kpad1, m_kpad2;
-	optional_ioport m_kbprepeat;
 	optional_device<cassette_image_device> m_cassette;
 
 	UINT32 m_flags, m_flags_mask;
@@ -184,6 +174,9 @@ public:
 	machine_type_t m_machinetype;
 
 	device_a2eauxslot_card_interface *m_auxslotdevice;
+
+	UINT16 m_lastchar, m_strobe;
+	UINT8 m_transchar;
 
 	READ8_MEMBER(apple2_c0xx_r);
 	WRITE8_MEMBER(apple2_c0xx_w);
@@ -318,6 +311,10 @@ public:
 	DECLARE_WRITE8_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE8_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE8_MEMBER(a2bus_inh_w);
+	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
+	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
+	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
+	DECLARE_WRITE_LINE_MEMBER(ay3600_iie_data_ready_w);
 	void apple2_update_memory_postload();
 	virtual void machine_reset();
 	void apple2_setup_memory(const apple2_memmap_config *config);

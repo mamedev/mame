@@ -992,11 +992,6 @@ READ8_MEMBER( pet2001b_state::pia1_pb_r )
 	return data;
 }
 
-READ_LINE_MEMBER( pet_state::pia1_cb1_r )
-{
-	return (m_crtc ? m_crtc->vsync_r() : m_sync);
-}
-
 WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
 {
 	m_ieee->eoi_w(state);
@@ -1397,7 +1392,6 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	MCFG_PIA_READPA_HANDLER(READ8(pet_state, pia1_pa_r))
 	MCFG_PIA_READPB_HANDLER(READ8(pet_state, pia1_pb_r))
 	MCFG_PIA_READCA1_HANDLER(DEVREADLINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, read))
-	MCFG_PIA_READCB1_HANDLER(READLINE(pet_state, pia1_cb1_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(pet_state, pia1_pa_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(pet_state, pia1_ca2_w))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))
@@ -1713,7 +1707,6 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_PIA_READPA_HANDLER(READ8(pet_state, pia1_pa_r))
 	MCFG_PIA_READPB_HANDLER(READ8(pet_state, pia1_pb_r))
 	MCFG_PIA_READCA1_HANDLER(DEVREADLINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, read))
-	MCFG_PIA_READCB1_HANDLER(READLINE(pet_state, pia1_cb1_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(pet_state, pia1_pa_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(pet_state, pia1_ca2_w))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))

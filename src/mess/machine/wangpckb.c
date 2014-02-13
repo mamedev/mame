@@ -110,16 +110,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( wangpc_keyboard )
 //-------------------------------------------------
 
@@ -131,7 +121,6 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_keyboard )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76496_TAG, SN76496, 2000000) // ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 

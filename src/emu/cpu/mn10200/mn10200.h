@@ -71,8 +71,10 @@ protected:
 	virtual void device_reset();
 
 	// device_execute_interface overrides
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 2 - 1) / 2; } // internal /2 divider
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 2); } // internal /2 divider
 	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 8; }
+	virtual UINT32 execute_max_cycles() const { return 13; }
 	virtual UINT32 execute_input_lines() const { return 4; }
 	virtual void execute_run();
 	virtual void execute_set_input(int inputnum, int state);
@@ -119,8 +121,9 @@ private:
 	emu_timer *m_timer_timers[MN10200_NUM_TIMERS_8BIT];
 
 	struct {
-		UINT8 cycles;
 		UINT8 mode;
+		UINT8 base;
+		UINT8 cur;
 	} m_prescaler[MN10200_NUM_PRESCALERS];
 
 	struct {
@@ -140,6 +143,7 @@ private:
 
 	UINT8 m_ddr[8];
 
+	attotime m_sysclock_base;
 	int m_cycles;
 
 	address_space *m_program;
@@ -164,7 +168,8 @@ private:
 	bool check_irq();
 	void check_ext_irq();
 	void refresh_timer(int tmr);
-	void timer_tick_simple(int tmr);
+	void refresh_all_timers();
+	int timer_tick_simple(int tmr);
 	TIMER_CALLBACK_MEMBER( simple_timer_cb );
 	void illegal(UINT8 prefix, UINT8 op);
 	UINT32 do_add(UINT32 a, UINT32 b, UINT32 c);

@@ -451,16 +451,6 @@ static TMS9928A_INTERFACE(m5_tms9928a_interface)
 
 
 //-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  I8255_INTERFACE( ppi_intf )
 //-------------------------------------------------
 
@@ -653,7 +643,6 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, XTAL_14_31818MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_14_31818MHz/4, ctc_intf)

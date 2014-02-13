@@ -984,13 +984,6 @@ static const sega315_5124_interface sms_vdp_pal_intf =
 };
 
 
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
-
 MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
@@ -1036,7 +1029,6 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
@@ -1086,7 +1078,6 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_PAL/15)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END

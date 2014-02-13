@@ -381,16 +381,12 @@ void galaxian_state::video_start()
 		/* normal galaxian hardware is row-based and individually scrolling columns */
 		m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxian_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, GALAXIAN_XSCALE*8,8, 32,32);
 		m_bg_tilemap->set_scroll_cols(32);
-		m_bg_tilemap->set_scrolldx(0, -GALAXIAN_XSCALE * 128);
-		m_bg_tilemap->set_scrolldy(0, 8);
 	}
 	else
 	{
 		/* sfx hardware is column-based and individually scrolling rows */
 		m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxian_state::bg_get_tile_info),this), TILEMAP_SCAN_COLS, GALAXIAN_XSCALE*8,8, 32,32);
 		m_bg_tilemap->set_scroll_rows(32);
-		m_bg_tilemap->set_scrolldx(0, -GALAXIAN_XSCALE * 128);
-		m_bg_tilemap->set_scrolldy(0, 8);
 	}
 	m_bg_tilemap->set_transparent_pen(0);
 

@@ -85,7 +85,8 @@ bool mn10200_device::check_irq()
 		take_irq(0, 0);
 	else if (group)
 		take_irq(level, group);
-	else return false;
+	else
+		return false;
 	
 	return true;
 }
@@ -105,76 +106,70 @@ void mn10200_device::check_ext_irq()
 
 void mn10200_device::refresh_timer(int tmr)
 {
-	// enabled?
-	if (m_simple_timer[tmr].mode & 0x80)
+	// 0: external pin
+	// 1: cascaded (handled elsewhere)
+	// 2: prescaler 0
+	// 3: prescaler 1
+	int p = m_simple_timer[tmr].mode & 1;
+
+	// enabled, and source is prescaler?
+	if ((m_simple_timer[tmr].mode & 0x82) == 0x82 && m_prescaler[p].mode & 0x80)
 	{
-		UINT8 source = (m_simple_timer[tmr].mode & 3);
-
-		// source is a prescaler?
-		if (source >= 2)
-		{
-			INT32 rate;
-
-			// is prescaler enabled?
-			if (m_prescaler[source-2].mode & 0x80)
-			{
-				// rate = (sysclock / prescaler) / our count
-				rate = unscaled_clock() / m_prescaler[source-2].cycles;
-				rate /= m_simple_timer[tmr].base;
-
-				if (tmr != 8)   // HACK: timer 8 is run at 500 kHz by the Taito program for no obvious reason, which kills performance
-					m_timer_timers[tmr]->adjust(attotime::from_hz(rate), tmr);
-			}
-			else
-			{
-				logerror("MN10200: timer %d using prescaler %d which isn't enabled!\n", tmr, source-2);
-			}
-		}
+		attotime period = m_sysclock_base * (m_prescaler[p].base + 1) * (m_simple_timer[tmr].cur + 1);
+		m_timer_timers[tmr]->adjust(period, tmr);
 	}
-	else    // disabled, so stop it
+	else
 	{
 		m_timer_timers[tmr]->adjust(attotime::never, tmr);
 	}
 }
 
-void mn10200_device::timer_tick_simple(int tmr)
+void mn10200_device::refresh_all_timers()
 {
-	m_simple_timer[tmr].cur--;
+	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
+		refresh_timer(tmr);
+}
 
-	// did we expire?
-	if (m_simple_timer[tmr].cur == 0)
+int mn10200_device::timer_tick_simple(int tmr)
+{
+	int next = tmr + 1;
+	
+	// is it a cascaded timer, and enabled?
+	if (next < MN10200_NUM_TIMERS_8BIT && m_simple_timer[next].mode & 0x83 && (m_simple_timer[next].mode & 0x83) == 0x81)
 	{
-		// does timer auto-reload?  apparently.
-		m_simple_timer[tmr].cur = m_simple_timer[tmr].base;
-
-		// signal the cascade if we're not timer 9
-		if (tmr < (MN10200_NUM_TIMERS_8BIT-1))
+		// did it underflow?
+		if (--m_simple_timer[next].cur == 0xff)
 		{
-			// is next timer enabled?
-			if (m_simple_timer[tmr+1].mode & 0x80)
+			// cascaded underflow?
+			if (timer_tick_simple(next) != 2)
 			{
-				// is it's source "cascade"?
-				if ((m_simple_timer[tmr+1].mode & 0x3) == 1)
-				{
-					// recurse!
-					timer_tick_simple(tmr+1);
-				}
+				m_simple_timer[next].cur = m_simple_timer[next].base;
+				return 1;
 			}
 		}
-		
-		m_icrl[1 + (tmr / 4)] |= (1 << (4 + (tmr % 4)));
+
+		return 2;
+	}
+	else
+	{
+		// trigger irq
+		m_icrl[1 + (tmr >> 2)] |= (1 << (4 + (tmr & 3)));
 		check_irq();
+
+		return 0;
 	}
 }
 
 TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
 {
 	int tmr = param;
-
+	
 	// handle our expiring and also tick our cascaded children
-	m_simple_timer[tmr].cur = 1;
-	timer_tick_simple(tmr);
-
+	if (timer_tick_simple(tmr) == 2)
+		m_simple_timer[tmr].cur = 0xff; // cascaded and no underflow occured
+	else
+		m_simple_timer[tmr].cur = m_simple_timer[tmr].base;
+	
 	// refresh this timer
 	refresh_timer(tmr);
 }
@@ -185,6 +180,8 @@ void mn10200_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
+
+	m_sysclock_base = attotime::from_hz(unscaled_clock() / 2);
 
 	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
 	{
@@ -210,11 +207,13 @@ void mn10200_device::device_start()
 	}
 	for (int i = 0; i < MN10200_NUM_PRESCALERS; i++)
 	{
-		m_prescaler[i].cycles = 0;
 		m_prescaler[i].mode = 0;
+		m_prescaler[i].base = 0;
+		m_prescaler[i].cur = 0;
 
-		save_item(NAME(m_prescaler[i].cycles), i);
 		save_item(NAME(m_prescaler[i].mode), i);
+		save_item(NAME(m_prescaler[i].base), i);
+		save_item(NAME(m_prescaler[i].cur), i);
 	}
 	for (int i = 0; i < 8; i++)
 	{
@@ -324,15 +323,6 @@ void mn10200_device::device_reset()
 	for (int i = 0; i < 2; i++)
 		for (int address = 0xfc04; address < 0x10000; address++)
 			write_mem16(address, 0);
-	
-	// reset all timers
-	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
-	{
-		m_simple_timer[tmr].mode = 0;
-		m_simple_timer[tmr].cur = 0;
-		m_simple_timer[tmr].base = 0;
-		m_timer_timers[tmr]->adjust(attotime::never, tmr);
-	}
 }
 
 
@@ -486,7 +476,7 @@ void mn10200_device::execute_run()
 		// movb dm, (an)
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-			write_mem8(m_a[op>>2&3], m_d[op&3]); // note: typo in manual
+			write_mem8(m_a[op>>2&3], m_d[op&3]); // note: error in manual
 			break;
 
 		// mov (an), dm
@@ -531,7 +521,7 @@ void mn10200_device::execute_run()
 			m_pc += 1;
 			break;
 
-		// mov dm, dn
+		// mov dn, dm
 		case 0x81: case 0x82: case 0x83: case 0x84: case 0x86: case 0x87:
 		case 0x88: case 0x89: case 0x8b: case 0x8c: case 0x8d: case 0x8e:
 			m_d[op&3] = m_d[op>>2&3];
@@ -575,13 +565,13 @@ void mn10200_device::execute_run()
 			m_d[op&3] = (UINT8)m_d[op&3];
 			break;
 
-		// mov dn, (imm16)
+		// mov dn, (abs16)
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3:
 			write_mem16(read_arg16(m_pc), m_d[op&3]);
 			m_pc += 2;
 			break;
 
-		// movb dn, (imm16)
+		// movb dn, (abs16)
 		case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 			write_mem8(read_arg16(m_pc), m_d[op&3]);
 			m_pc += 2;
@@ -887,52 +877,52 @@ void mn10200_device::execute_run()
 			do_sub(m_a[op&3], m_d[op>>2&3], 0);
 			break;
 
-		// mov am, dn
+		// mov dm, an
 		case 0x30:
 			m_a[op&3] = m_d[op>>2&3];
 			break;
 
-		// add am, an
+		// add an, am
 		case 0x40:
 			m_a[op&3] = do_add(m_a[op&3], m_a[op>>2&3], 0);
 			break;
 
-		// sub am, an
+		// sub an, am
 		case 0x50:
 			m_a[op&3] = do_sub(m_a[op&3], m_a[op>>2&3], 0);
 			break;
 
-		// cmp am, an
+		// cmp an, am
 		case 0x60:
 			do_sub(m_a[op&3], m_a[op>>2&3], 0);
 			break;
 
-		// mov am, an
+		// mov an, am
 		case 0x70:
 			m_a[op&3] = m_a[op>>2&3];
 			break;
 
-		// addc dm, dn
+		// addc dn, dm
 		case 0x80:
 			m_d[op&3] = do_add(m_d[op&3], m_d[op>>2&3], (m_psw & FLAG_CF) ? 1 : 0);
 			break;
 
-		// subc dm, dn
+		// subc dn, dm
 		case 0x90:
 			m_d[op&3] = do_sub(m_d[op&3], m_d[op>>2&3], (m_psw & FLAG_CF) ? 1 : 0);
 			break;
 
-		// add am, dn
+		// add an, dm
 		case 0xc0:
 			m_d[op&3] = do_add(m_d[op&3], m_a[op>>2&3], 0);
 			break;
 
-		// sub am, dn
+		// sub an, dm
 		case 0xd0:
 			m_d[op&3] = do_sub(m_d[op&3], m_a[op>>2&3], 0);
 			break;
 
-		// cmp am, dn
+		// cmp an, dm
 		case 0xe0:
 			do_sub(m_d[op&3], m_a[op>>2&3], 0);
 			break;
@@ -960,19 +950,19 @@ void mn10200_device::execute_run()
 		switch (op)
 		{
 
-		// and dm, dn
+		// and dn, dm
 		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
 		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 			test_nz16(m_d[op&3] &= 0xff0000 | m_d[op>>2&3]);
 			break;
 
-		// or dm, dn
+		// or dn, dm
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 			test_nz16(m_d[op&3] |= 0x00ffff & m_d[op>>2&3]);
 			break;
 
-		// xor dm, dn
+		// xor dn, dm
 		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 			test_nz16(m_d[op&3] ^= 0x00ffff & m_d[op>>2&3]);
@@ -1083,13 +1073,13 @@ void mn10200_device::execute_run()
 			break;
 		}
 
-		// cmp dm, dn
+		// cmp dn, dm
 		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
 		case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
 			do_sub(m_d[op&3], m_d[op>>2&3], 0);
 			break;
 
-		// mov mdr, dn
+		// mov dn, mdr
 		case 0xc0: case 0xc4: case 0xc8: case 0xcc:
 			m_mdr = m_d[op>>2&3];
 			break;
@@ -1107,7 +1097,7 @@ void mn10200_device::execute_run()
 			possible_irq = true;
 			break;
 
-		// mov dn, mdr
+		// mov mdr, dn
 		case 0xe0: case 0xe1: case 0xe2: case 0xe3:
 			m_d[op&3] = m_mdr;
 			break;
@@ -1141,26 +1131,26 @@ void mn10200_device::execute_run()
 		switch (op)
 		{
 
-		// mov dm, (abs24, an)
+		// mov dm, (d24, an)
 		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
 		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 			write_mem16(read_arg24(m_pc) + m_a[op>>2&3], m_d[op&3]);
 			break;
 
-		// mov am, (abs24, an)
+		// mov am, (d24, an)
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 			m_cycles -= 1;
 			write_mem24(read_arg24(m_pc) + m_a[op>>2&3], m_a[op&3]);
 			break;
 
-		// movb dm, (abs24, an)
+		// movb dm, (d24, an)
 		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 			write_mem8(read_arg24(m_pc) + m_a[op>>2&3], m_d[op&3]);
 			break;
 
-		// movx dm, (abs24, an)
+		// movx dm, (d24, an)
 		case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 		case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 			m_cycles -= 1;
@@ -1182,22 +1172,22 @@ void mn10200_device::execute_run()
 			write_mem24(read_arg24(m_pc), m_a[op&3]);
 			break;
 
-		// add abs24, dn
+		// add imm24, dn
 		case 0x60: case 0x61: case 0x62: case 0x63:
 			m_d[op&3] = do_add(m_d[op&3], read_arg24(m_pc), 0);
 			break;
 
-		// add abs24, an
+		// add imm24, an
 		case 0x64: case 0x65: case 0x66: case 0x67:
 			m_a[op&3] = do_add(m_a[op&3], read_arg24(m_pc), 0);
 			break;
 
-		// sub abs24, dn
+		// sub imm24, dn
 		case 0x68: case 0x69: case 0x6a: case 0x6b:
 			m_d[op&3] = do_sub(m_d[op&3], read_arg24(m_pc), 0);
 			break;
 
-		// sub abs24, an
+		// sub imm24, an
 		case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 			m_a[op&3] = do_sub(m_a[op&3], read_arg24(m_pc), 0);
 			break;
@@ -1212,35 +1202,35 @@ void mn10200_device::execute_run()
 			m_a[op&3] = read_arg24(m_pc);
 			break;
 
-		// cmp abs24, dn
+		// cmp imm24, dn
 		case 0x78: case 0x79: case 0x7a: case 0x7b:
 			do_sub(m_d[op&3], read_arg24(m_pc), 0);
 			break;
 
-		// cmp abs24, an
+		// cmp imm24, an
 		case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			do_sub(m_a[op&3], read_arg24(m_pc), 0);
 			break;
 
-		// mov (abs24, an), dm
+		// mov (d24, an), dm
 		case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 		case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
 			m_d[op&3] = (INT16)read_mem16(m_a[op>>2&3] + read_arg24(m_pc));
 			break;
 
-		// movbu (abs24, an), dm
+		// movbu (d24, an), dm
 		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
 		case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
 			m_d[op&3] = read_mem8(m_a[op>>2&3] + read_arg24(m_pc));
 			break;
 
-		// movb (abs24, an), dm
+		// movb (d24, an), dm
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 			m_d[op&3] = (INT8)read_mem8(m_a[op>>2&3] + read_arg24(m_pc));
 			break;
 
-		// movx (abs24, an), dm
+		// movx (d24, an), dm
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
 			m_cycles -= 1;
@@ -1267,7 +1257,7 @@ void mn10200_device::execute_run()
 			m_a[op&3] = read_mem24(read_arg24(m_pc));
 			break;
 
-		// jmp imm24
+		// jmp label24
 		case 0xe0:
 			m_cycles -= 1;
 			change_pc(m_pc + read_arg24(m_pc));
@@ -1279,7 +1269,7 @@ void mn10200_device::execute_run()
 			do_jsr(m_pc + read_arg24(m_pc), m_pc + 3);
 			break;
 
-		// mov (abs24, an), am
+		// mov (d24, an), am
 		case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
 		case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
 			m_cycles -= 1;
@@ -1533,63 +1523,62 @@ void mn10200_device::execute_run()
 
 		// xor imm16, dn
 		case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-			m_cycles -= 1;
 			test_nz16(m_d[op&3] ^= read_arg16(m_pc));
 			break;
 
-		// movbu (imm16, an), dm
+		// movbu (d16, an), dm
 		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
 		case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
 			m_d[op&3] = read_mem8(m_a[op>>2&3] + (INT16)read_arg16(m_pc));
 			break;
 
-		// movx dm, (imm16, an)
+		// movx dm, (d16, an)
 		case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67:
 		case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 			m_cycles -= 1;
 			write_mem24(m_a[op>>2&3] + (INT16)read_arg16(m_pc), m_d[op&3]);
 			break;
 
-		// movx (imm16, an), dm
+		// movx (d16, an), dm
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			m_cycles -= 1;
 			m_d[op&3] = read_mem24(m_a[op>>2&3] + (INT16)read_arg16(m_pc));
 			break;
 
-		// mov dm, (imm16, an)
+		// mov dm, (d16, an)
 		case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 		case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
 			write_mem16(m_a[op>>2&3] + (INT16)read_arg16(m_pc), m_d[op&3]);
 			break;
 
-		// movb dm, (imm16, an)
+		// movb dm, (d16, an)
 		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
 		case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
 			write_mem8(m_a[op>>2&3] + (INT16)read_arg16(m_pc), m_d[op&3]);
 			break;
 
-		// mov am, (imm16, an)
+		// mov am, (d16, an)
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 			m_cycles -= 1;
 			write_mem24(m_a[op>>2&3] + (INT16)read_arg16(m_pc), m_a[op&3]);
 			break;
 
-		// mov (imm16, an), am
+		// mov (d16, an), am
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
 			m_cycles -= 1;
 			m_a[op&3] = read_mem24(m_a[op>>2&3] + (INT16)read_arg16(m_pc));
 			break;
 
-		// mov (imm16, an), dm
+		// mov (d16, an), dm
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 		case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
 			m_d[op&3] = (INT16)read_mem16(m_a[op>>2&3] + (INT16)read_arg16(m_pc));
 			break;
 
-		// movb (imm16, an), dm
+		// movb (d16, an), dm
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 		case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf:
 			m_d[op&3] = (INT8)read_mem8(m_a[op>>2&3] + (INT16)read_arg16(m_pc));
@@ -1640,6 +1629,7 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 		case 0x036: case 0x037: // Memory mode reg 3
 			break;
 
+		// 0xfc40-0xfc57: irq control
 		// group 0, NMI control
 		case 0x040:
 			m_nmicr &= data; // nmi ack
@@ -1651,7 +1641,10 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 		case 0x042: case 0x044: case 0x046: case 0x048: case 0x04a:
 		case 0x04c: case 0x04e: case 0x050: case 0x052: case 0x054:
 			m_icrl[(offset & 0x3f) >> 1] &= data; // irq ack
-			if (offset == 0x050) check_ext_irq(); // group 8, external irqs might still be active
+
+			// group 8, external irqs might still be active
+			if (offset == 0x050)
+				check_ext_irq();
 			break;
 
 		case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
@@ -1666,7 +1659,7 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 			check_ext_irq();
 			break;
 		case 0x057:
-			m_extmdh = data;
+			m_extmdh = data & 3;
 			break;
 
 		case 0x100: case 0x101: // DRAM control reg
@@ -1717,49 +1710,39 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 			log_event("MN102", "AN chans=0-%d current=%d", (data >> 4) & 7, data & 7);
 			break;
 
+		// 0xfe00-0xfe2f: 8-bit timers
+		// timer base
 		case 0x210: case 0x211: case 0x212: case 0x213: case 0x214:
 		case 0x215: case 0x216: case 0x217: case 0x218: case 0x219:
-			m_simple_timer[offset-0x210].base = data + 1;
-			// printf("MN10200: Timer %d value set %02x\n", offset-0x210, data);
-			refresh_timer(offset-0x210);
+			m_simple_timer[offset & 0xf].base = data;
 			break;
 
-		case 0x21a:
-			m_prescaler[0].cycles = data+1;
-			// printf("MN10200: Prescale 0 cycle count %d\n", data+1);
+		// prescaler base
+		case 0x21a: case 0x21b:
+			m_prescaler[offset & 1].base = data;
 			break;
 
-		case 0x21b:
-			m_prescaler[1].cycles = data+1;
-			// printf("MN10200: Prescale 1 cycle count %d\n", data+1);
-			break;
-
+		// timer mode
 		case 0x220: case 0x221: case 0x222: case 0x223: case 0x224:
 		case 0x225: case 0x226: case 0x227: case 0x228: case 0x229:
-		{
-			// const char *source[4] = { "TMxIO", "cascade", "prescale 0", "prescale 1" };
-			m_simple_timer[offset-0x220].mode = data;
-			// printf("MN10200: Timer %d %s b6=%d, source=%s\n", offset-0x220, data & 0x80 ? "on" : "off", (data & 0x40) != 0, source[data & 3]);
+			m_simple_timer[offset & 0xf].mode = data & 0xc3;
 
+			// reload
 			if (data & 0x40)
-			{
-				// printf("MN10200: loading timer %d\n", offset-0x220);
-				m_simple_timer[offset-0x220].cur = m_simple_timer[offset-0x220].base;
-			}
-			refresh_timer(offset-0x220);
-			break;
-		}
+				m_simple_timer[offset & 0xf].cur = m_simple_timer[offset & 0xf].base;
 
-		case 0x22a:
-			// printf("MN10200: Prescale 0 %s, ps0bc %s\n",
-			//     data & 0x80 ? "on" : "off", data & 0x40 ? "-> ps0br" : "off");
-			m_prescaler[0].mode = data;
+			refresh_timer(offset & 0xf);
 			break;
 
-		case 0x22b:
-			// printf("MN10200: Prescale 1 %s, ps1bc %s\n",
-			//     data & 0x80 ? "on" : "off", data & 0x40 ? "-> ps1br" : "off");
-			m_prescaler[1].mode = data;
+		// prescaler mode
+		case 0x22a: case 0x22b:
+			m_prescaler[offset & 1].mode = data & 0xc0;
+
+			// reload
+			if (data & 0x40)
+				m_prescaler[offset & 1].cur = m_prescaler[offset & 1].base;
+
+			refresh_all_timers();
 			break;
 
 		case 0x230: case 0x240: case 0x250:
@@ -2044,11 +2027,13 @@ READ8_MEMBER(mn10200_device::io_control_r)
 {
 	switch(offset)
 	{
+		// active irq group
 		case 0x00e:
 			return m_iagr << 1;
 		case 0x00f:
 			return 0;
 
+		// 0xfc40-0xfc57: irq control
 		// group 0, NMI control
 		case 0x040:
 			return m_nmicr;
@@ -2069,7 +2054,7 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		case 0x056:
 			return m_extmdl;
 		case 0x057:
-			return (m_extmdh & 3) | (m_p4 << 4);
+			return m_extmdh | (m_p4 << 4);
 
 		case 0x180: case 0x190:
 			return m_serial[(offset-0x180) >> 4].ctrll;
@@ -2086,10 +2071,33 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		case 0x183:
 			return 0x10;
 
+		// 0xfe00-0xfe2f: 8-bit timers
+		// timer counter (not accurate)
 		case 0x200: case 0x201: case 0x202: case 0x203: case 0x204:
 		case 0x205: case 0x206: case 0x207: case 0x208: case 0x209:
-			// printf("MN10200: timer %d value read = %d\n", offset-0x200, m_simple_timer[offset-0x200].cur);
-			return m_simple_timer[offset-0x200].cur;
+			return m_simple_timer[offset & 0xf].cur;
+
+		// prescaler counter (not accurate)
+		case 0x20a: case 0x20b:
+			return m_prescaler[offset & 1].cur;
+
+		// timer base
+		case 0x210: case 0x211: case 0x212: case 0x213: case 0x214:
+		case 0x215: case 0x216: case 0x217: case 0x218: case 0x219:
+			return m_simple_timer[offset & 0xf].base;
+
+		// prescaler base
+		case 0x21a: case 0x21b:
+			return m_prescaler[offset & 1].base;
+
+		// timer mode
+		case 0x220: case 0x221: case 0x222: case 0x223: case 0x224:
+		case 0x225: case 0x226: case 0x227: case 0x228: case 0x229:
+			return m_simple_timer[offset & 0xf].mode;
+
+		// prescaler mode
+		case 0x22a: case 0x22b:
+			return m_prescaler[offset & 1].mode;
 
 		case 0x264: // port 1 data
 			return m_io->read_byte(MN10200_PORT1);
@@ -2112,7 +2120,7 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		default:
 			log_event("MN102", "internal_r %04x (%03x)", offset+0xfc00, adr);
 	}
-
+	
 	return 0;
 }
 

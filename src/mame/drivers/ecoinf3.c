@@ -742,12 +742,6 @@ MACHINE_START_MEMBER(ecoinf3_state,ecoinf3)
 	}
 }
 
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180,8000000) // certainly not a plain z80 at least, invalid opcodes for that
@@ -764,7 +758,6 @@ static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 
 	MCFG_SOUND_ADD("sn1", SN76489, 4000000) // no idea what the sound chip is, this sounds terrible
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_I8255_ADD( "ppi8255_a", ppi8255_intf_a )
 	MCFG_I8255_ADD( "ppi8255_b", ppi8255_intf_b )

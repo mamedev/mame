@@ -269,23 +269,6 @@ static I8255_INTERFACE( ppi8255_intf )
 
 /*************************************
  *
- *  Sound interface
- *
- *************************************/
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
-/*************************************
- *
  *  Machine drivers
  *
  *************************************/
@@ -308,7 +291,6 @@ static MACHINE_CONFIG_START( sg1000a, sg1000a_state )
 
 	MCFG_SOUND_ADD("snsnd", SN76489, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 /*************************************

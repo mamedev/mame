@@ -12,6 +12,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
     - A Mazing World of Malcom Mortar
     - Castle of Tharoggad
     - GFL Championship Football II
+    - Predator
     - RAD Warrior
     - Rampage!
     - RoboCop
@@ -23,12 +24,11 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 
   * Missing/Undumped Cartridges
 
-    - 8-Ball
     - Star Blaster              (1981)
     - Super Logo        26-2717 (1984)
     - Color Term Plus           (1983)
     - ColorCom/E
-    
+
   * These ROMs appear to have been dumped from RAM and have been marked as "Bad Dumps"
 
     - Alphabet Zoo  proper size is 16K, not dumped from RAM
@@ -58,7 +58,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<!--software name="alphazoo">
 	    <description>Alphabet Zoo</description>
 	    <year>1984</year>
@@ -235,7 +235,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cclimbra" cloneof="cclimber">
 		<description>Canyon Climber (Alt)</description>
 		<year>1982</year>
@@ -249,7 +249,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="castlgrd">
 		<description>Castle Guard</description>
 		<year>1981</year>
@@ -353,7 +353,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="clrfile2">
 		<description>Color File II</description>
 		<year>1986</year>
@@ -367,7 +367,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="clrfile" cloneof="clrfile2">
 		<description>Color File</description>
 		<year>1981</year>
@@ -379,7 +379,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="clrforth">
 		<description>Color FORTH v1.1</description>
 		<year>1981</year>
@@ -404,7 +404,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="clrlogof" cloneof="clrlogo">
 		<description>Color LOGO (FR)</description>
 		<year>1983</year>
@@ -417,12 +417,13 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="clrrobot">
 		<description>Color Robot Battle</description>
 		<year>1981</year>
 		<publisher>Tandy</publisher>
 		<info name="developer" value="The Image Producers" />
+		<info name="author" value="Del Ogren" />
 		<info name="serial" value="26-3070" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
@@ -430,7 +431,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-		
+
 	<software name="scrpsit2">
 		<description>Color Scripsit II</description>
 		<year>1986</year>
@@ -456,7 +457,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="crosswrd">
 		<description>Crosswords</description>
 		<year>1981</year>
@@ -469,7 +470,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="cyrus1" cloneof="cyrus">
 		<description>Cyrus Chess (Re-Badge)</description>
 		<year>1983</year>
@@ -610,7 +611,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 	</software>
 
 	<software name="doodlbug2" cloneof="doodlbug">
-		<description>Doodle Bug (Alt 1)</description>
+		<description>Doodle Bug (Alt 2)</description>
 		<year>1982</year>
 		<publisher>Computerware</publisher>
 		<part name="cart" interface="coco_cart">
@@ -817,6 +818,17 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
+	<software name="jdos111" cloneof="jdos123">
+		<description>JDOS v1.11</description>
+		<year>1983</year>
+		<publisher>J&amp;M Systems</publisher>
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="jdos v1.11 (1983)(j&amp;m systems).rom" size="8192" crc="4c14620d" sha1="cbfcd3cb3bc26991eee217b6bda53cfbbb073392" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jdos110" cloneof="jdos123">
 		<description>JDOS v1.10</description>
 		<year>1983</year>
@@ -864,7 +876,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mathtut">
 		<description>Math Tutor</description>
 		<year>1988</year>
@@ -877,7 +889,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="megabug">
 		<description>Mega-Bug</description>
 		<year>1982</year>
@@ -959,11 +971,24 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		</part>
 	</software>
 
+	<software name="music">
+		<description>Music</description>
+		<year>1980</year>
+		<publisher>Tandy</publisher>
+		<info name="serial" value="26-3151" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="music (1980) (26-3151).rom" size="4096" crc="90e48836" sha1="9bc5c29f9e8e90ac3d8f91168ea123783ddde9d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="orch90">
 		<description>Orchestra-90 v1.01</description>
 		<year>1984</year>
 		<publisher>Tandy</publisher>
 		<info name="developer" value="Software Affair" />
+		<info name="author" value="Jon Bokelman" />
 		<info name="serial" value="26-3143" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
@@ -1056,6 +1081,19 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="popcorn (1981)(26-3090)(steve bjork)[!].rom" size="2048" crc="7f507089" sha1="f9cc452f5492d98abbd4c3ba6d99ab7cef81db13" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="predator">
+		<description>Predator</description>
+		<year>1989</year>
+		<publisher>Tandy</publisher>
+		<info name="developer" value="Activision" />
+		<info name="serial" value="26-3165" />
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="predator (1989) (26-3165) (activision).rom" size="65536" crc="a9680ede" sha1="551d8d95fd310b2d72b1e22028a517c325fe9ab4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1154,6 +1192,17 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="roman checkers (1981)(26-3071)(the image producers).rom" size="8192" crc="3bf566bb" sha1="ab471a6ab6e5e5636278dd1a211e539503a998b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sds80c">
+		<description>SDS80C Editor Assembler</description>
+		<year>1981</year>
+		<publisher>The Micro Works</publisher>
+		<part name="cart" interface="coco_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="sds80c (1981) (the micro works).rom" size="8192" crc="8d16c62a" sha1="99e67fed099e523e9a8cec593d8f169afdd608d4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1492,7 +1541,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dodlbugd">
 		<description>Doodle Bug (Dragon 32)</description>
 		<year>1982</year>
@@ -1504,7 +1553,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="dospls49">
 		<description>DOSPlus v4.9B</description>
 		<year>1989</year>
@@ -1795,7 +1844,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="toolkit">
 		<description>Toolkit</description>
 		<year>1983</year>
@@ -1807,5 +1856,5 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

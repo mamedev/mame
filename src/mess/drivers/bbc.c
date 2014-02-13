@@ -647,15 +647,6 @@ static const mc6854_interface adlc_intf =
 	DEVCB_NULL
 };
 
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
 WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
 {
 	m_adlc->rxc_w(state);
@@ -729,7 +720,6 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn76489", SN76489, 4000000) /* 4 MHz */
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cassette */
@@ -933,7 +923,6 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn76489", SN76489, 4000000) /* 4 MHz */
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* rtc and cmos */

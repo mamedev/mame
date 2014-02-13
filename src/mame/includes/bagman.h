@@ -71,5 +71,5 @@ public:
  *
  * However VBSYQ (and INTQ) is generated using the following values:
  */
-#define VBEND               (0x0f)
-#define VBSTART             (0xef)
+#define VBEND               (0x10)
+#define VBSTART             (0xf0)

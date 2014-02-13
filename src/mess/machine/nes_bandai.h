@@ -3,6 +3,7 @@
 
 #include "machine/nes_nxrom.h"
 #include "machine/i2cmem.h"
+#include "machine/bcreader.h"
 
 
 // ======================> nes_karaokestudio_device
@@ -97,6 +98,7 @@ public:
 	nes_lz93d50_24c01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	nes_lz93d50_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// device-level overrides
 	virtual void device_start();
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual DECLARE_READ8_MEMBER(read_m);
@@ -118,6 +120,7 @@ public:
 	// construction/destruction
 	nes_lz93d50_24c02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
@@ -130,7 +133,21 @@ public:
 	// construction/destruction
 	nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// TODO: add some kind of barcode reader emulation
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual DECLARE_READ8_MEMBER(read_m);
+	virtual DECLARE_WRITE8_MEMBER(write_h);
+	
+	virtual void pcb_reset();
+
+protected:
+	UINT8 m_datach_latch;
+	required_device<barcode_reader_device> m_reader;	
+	
+	static const device_timer_id TIMER_SERIAL = 1;
+	emu_timer *serial_timer;
 };
 
 
@@ -149,11 +166,11 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
 	virtual void pcb_reset();
-private:
+
+protected:
 	void set_prg();
 	UINT8 m_reg[5];
 };
-
 
 
 // device type definition

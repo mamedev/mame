@@ -128,14 +128,15 @@ sn76496_base_device::sn76496_base_device(const machine_config &mconfig, device_t
 	device_t *owner, UINT32 clock, const char *shortname, const char *source)
 
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_sound_interface(mconfig, *this),
-		m_feedback_mask(feedbackmask),
-		m_whitenoise_tap1(noisetap1),
-		m_whitenoise_tap2(noisetap2),
-		m_negate(negate),
-		m_stereo(stereo),
-		m_clock_divider(clockdivider),
-		m_freq0_is_max(freq0)
+	device_sound_interface(mconfig, *this),
+	m_ready_handler(*this),
+	m_feedback_mask(feedbackmask),
+	m_whitenoise_tap1(noisetap1),
+	m_whitenoise_tap2(noisetap2),
+	m_negate(negate),
+	m_stereo(stereo),
+	m_clock_divider(clockdivider),
+	m_freq0_is_max(freq0)
 {
 }
 
@@ -146,8 +147,7 @@ void sn76496_base_device::device_start()
 	double out;
 	int gain;
 
-	const sn76496_config *conf = reinterpret_cast<const sn76496_config *>(static_config());
-	m_ready.resolve(conf->ready, *this);
+	m_ready_handler.resolve_safe();
 
 	m_sound = machine().sound().stream_alloc(*this, 0, (m_stereo? 2:1), sample_rate, this);
 
@@ -198,13 +198,6 @@ void sn76496_base_device::device_start()
 	m_ready_state = true;
 
 	register_for_save_states();
-}
-
-READ_LINE_MEMBER( sn76496_base_device::ready_r )
-{
-	if (started())
-		m_sound->update();
-	return (m_cycles_to_ready > 0)? FALSE : TRUE;
 }
 
 WRITE8_MEMBER( sn76496_base_device::stereo_w )
@@ -295,12 +288,12 @@ void sn76496_base_device::countdown_cycles()
 	if (m_cycles_to_ready > 0)
 	{
 		m_cycles_to_ready--;
-		if (m_ready_state==true) m_ready(CLEAR_LINE);
+		if (m_ready_state==true) m_ready_handler(CLEAR_LINE);
 		m_ready_state = false;
 	}
 	else
 	{
-		if (m_ready_state==false) m_ready(ASSERT_LINE);
+		if (m_ready_state==false) m_ready_handler(ASSERT_LINE);
 		m_ready_state = true;
 	}
 }

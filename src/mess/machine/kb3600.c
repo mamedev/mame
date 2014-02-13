@@ -35,37 +35,6 @@
 // devices
 const device_type AY3600 = &device_creator<ay3600_device>;
 
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ay3600_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const ay3600_interface *intf = reinterpret_cast<const ay3600_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<ay3600_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_shift_cb, 0, sizeof(m_in_shift_cb));
-		memset(&m_in_control_cb, 0, sizeof(m_in_control_cb));
-		memset(&m_out_data_ready_cb, 0, sizeof(m_out_data_ready_cb));
-		memset(&m_out_ako_cb, 0, sizeof(m_out_ako_cb));
-	}
-}
-
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -75,7 +44,20 @@ void ay3600_device::device_config_complete()
 //-------------------------------------------------
 
 ay3600_device::ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, AY3600, "AY-5-3600", tag, owner, clock, "ay3600", __FILE__)
+	: device_t(mconfig, AY3600, "AY-5-3600", tag, owner, clock, "ay3600", __FILE__),
+	m_read_x0(*this),
+	m_read_x1(*this),
+	m_read_x2(*this),
+	m_read_x3(*this),
+	m_read_x4(*this),
+	m_read_x5(*this),
+	m_read_x6(*this),
+	m_read_x7(*this),
+	m_read_x8(*this),
+	m_read_shift(*this),
+	m_read_control(*this),
+	m_write_data_ready(*this),
+	m_write_ako(*this)
 {
 }
 
@@ -86,19 +68,19 @@ ay3600_device::ay3600_device(const machine_config &mconfig, const char *tag, dev
 void ay3600_device::device_start()
 {
 	// resolve callbacks
-	m_in_x_func[0].resolve(m_in_x0_cb, *this);
-	m_in_x_func[1].resolve(m_in_x1_cb, *this);
-	m_in_x_func[2].resolve(m_in_x2_cb, *this);
-	m_in_x_func[3].resolve(m_in_x3_cb, *this);
-	m_in_x_func[4].resolve(m_in_x4_cb, *this);
-	m_in_x_func[5].resolve(m_in_x5_cb, *this);
-	m_in_x_func[6].resolve(m_in_x6_cb, *this);
-	m_in_x_func[7].resolve(m_in_x7_cb, *this);
-	m_in_x_func[8].resolve(m_in_x8_cb, *this);
-	m_in_shift_func.resolve(m_in_shift_cb, *this);
-	m_in_control_func.resolve(m_in_control_cb, *this);
-	m_out_data_ready_func.resolve(m_out_data_ready_cb, *this);
-	m_out_ako_func.resolve(m_out_ako_cb, *this);
+	m_read_x0.resolve_safe(0);
+	m_read_x1.resolve_safe(0);
+	m_read_x2.resolve_safe(0);
+	m_read_x3.resolve_safe(0);
+	m_read_x4.resolve_safe(0);
+	m_read_x5.resolve_safe(0);
+	m_read_x6.resolve_safe(0);
+	m_read_x7.resolve_safe(0);
+	m_read_x8.resolve_safe(0);
+	m_read_shift.resolve_safe(0);
+	m_read_control.resolve_safe(0);
+	m_write_data_ready.resolve_safe();
+	m_write_ako.resolve_safe();
 
 	// allocate timers
 	m_scan_timer = timer_alloc();
@@ -107,6 +89,7 @@ void ay3600_device::device_start()
 	// state saving
 	save_item(NAME(m_b));
 	save_item(NAME(m_ako));
+	save_item(NAME(m_keys_down));
 }
 
 
@@ -117,6 +100,10 @@ void ay3600_device::device_start()
 void ay3600_device::device_reset()
 {
 	m_ako = 0;
+	for (int i = 0; i < MAX_KEYS_DOWN; i++)
+	{
+		m_keys_down[i] = -1;
+	}
 }
 
 //-------------------------------------------------
@@ -129,31 +116,79 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 	for (int x = 0; x < 9; x++)
 	{
-		UINT16 data = m_in_x_func[x](0,0xffff);
+		UINT16 data = 0;
+
+		switch(x)
+		{
+			case 0: data = m_read_x0(); break;
+			case 1: data = m_read_x1(); break;
+			case 2: data = m_read_x2(); break;
+			case 3: data = m_read_x3(); break;
+			case 4: data = m_read_x4(); break;
+			case 5: data = m_read_x5(); break;
+			case 6: data = m_read_x6(); break;
+			case 7: data = m_read_x7(); break;
+			case 8: data = m_read_x8(); break;
+		}
 
 		for (int y = 0; y < 10; y++)
 		{
+			int b = (x * 10) + y;
+
+			if (b > 63)
+			{
+				b -= 64;
+				b = 0x100 | b;
+			}
+
+			b |= (m_read_shift() << 6);
+			b |= (m_read_control() << 7);
+
 			if (BIT(data, y))
 			{
-				int b = (x * 10) + y;
+				bool found = false;
 
-				ako = 1;
-
-				if (b > 63)
+				// is this key already down?
+				for (int k = 0; k < MAX_KEYS_DOWN; k++)
 				{
-					b -= 64;
-					b = 0x100 | b;
+					if (b == m_keys_down[k])
+					{
+						found = true;
+						break;
+					}
 				}
 
-				b |= (m_in_shift_func() << 6);
-				b |= (m_in_control_func() << 7);
-
-				if (m_b != b)
+				if (!found)
 				{
-					m_b = b;
+					ako = 1; 
 
-					m_out_data_ready_func(1);
-					return;
+					if (m_b != b)
+					{
+						m_b = b;
+
+						m_write_data_ready(1);
+						return;
+					}
+
+					// add to the keys down list
+					for (int k = 0; k < MAX_KEYS_DOWN; k++)
+					{
+						if (m_keys_down[k] == -1)
+						{
+							m_keys_down[k] = b;
+							break;
+						}
+					}
+				}
+			}
+			else	// key released, unmark it from the keys_down table
+			{
+				for (int k = 0; k < MAX_KEYS_DOWN; k++)
+				{
+					if (b == m_keys_down[k])
+					{
+						m_keys_down[k] = -1;
+					}
 				}
 			}
 		}
@@ -166,7 +201,7 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 	if (ako != m_ako)
 	{
-		m_out_ako_func(ako);
+		m_write_ako(ako);
 		m_ako = ako;
 	}
 }
@@ -180,7 +215,7 @@ UINT16 ay3600_device::b_r()
 {
 	UINT16 data = m_b;
 
-	m_out_data_ready_func(0);
+	m_write_data_ready(0);
 
 	return data;
 }

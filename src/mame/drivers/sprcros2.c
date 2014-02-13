@@ -228,23 +228,6 @@ static GFXDECODE_START( sprcros2 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprcros2_fglayout,     512, 64 )
 GFXDECODE_END
 
-/*************************************
- *
- *  Sound interface
- *
- *************************************/
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::sprcros2_m_interrupt)
 {
 	int scanline = param;
@@ -304,15 +287,12 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 
 	MCFG_SOUND_ADD("sn1", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD("sn2", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_SOUND_ADD("sn3", SN76489, 10000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 ROM_START( sprcros2 )

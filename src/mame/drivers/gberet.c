@@ -379,23 +379,6 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Sound interface
- *
- *************************************/
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
-/*************************************
- *
  *  Machine drivers
  *
  *************************************/
@@ -443,7 +426,6 @@ static MACHINE_CONFIG_START( gberet, gberet_state )
 
 	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12) /* type verified on real and bootleg pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mrgoemon, gberet )
@@ -483,7 +465,6 @@ static MACHINE_CONFIG_START( gberetb, gberet_state )
 
 	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_20MHz/12) // divider guessed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 

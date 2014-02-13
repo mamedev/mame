@@ -2689,6 +2689,21 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL        /* update address callback */
 };
 
+static MC6845_INTERFACE( magicrd2_mc6845_intf )
+{
+	false,      /* show border area */
+	0,-56,0,0,    /* visarea adjustment */
+	4,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
+};
+
 
 /**************************
 *     Machine Drivers     *
@@ -2767,6 +2782,9 @@ static MACHINE_CONFIG_DERIVED( magicrd2, fw1stpal )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, magicrd2)
+	
+	MCFG_DEVICE_REMOVE("crtc")
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8, magicrd2_mc6845_intf)
 
 	MCFG_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz */
 	MCFG_SOUND_CONFIG(ay8910_intf)

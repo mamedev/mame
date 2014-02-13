@@ -1831,12 +1831,6 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 MACHINE_CONFIG_END
 
 
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( vsnes_bootleg, vsnes_state )
 
 	/* basic machine hardware */
@@ -1881,7 +1875,6 @@ static MACHINE_CONFIG_START( vsnes_bootleg, vsnes_state )
 	// instead of the above?
 	MCFG_SOUND_ADD("sn1", SN76489A, 4000000) // ?? Mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 /******************************************************************************/

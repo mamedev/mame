@@ -14,13 +14,12 @@
  * Bandai LZ93D50 + 24C01 EEPROM [mapper 159]
  * Bandai LZ93D50 + 24C02 EEPROM [mapper 16]
  * Bandai Famicom Jump 2 (aka LZ93D50 + SRAM) [mapper 153]
- * Bandai LZ93D50 + Datach Barcode reader [mapper 34]
+ * Bandai LZ93D50 + Datach Barcode reader [mapper 157]
  * Bandai Karaoke Studio [mapper 188]
  * Bandai Oeka Kids [mapper 96]
 
  TODO:
  - investigate why EEPROM does not work
- - try to implement some sort of Datach emulation
  - try to implement some sort of Karaoke emulation
  - add support to the PPU for the code necessary to Oeka Kids games (also needed by UNL-DANCE2000 PCB)
  - check the cause for the flickering in Famicom Jump 2
@@ -40,6 +39,7 @@
 #endif
 
 #define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+
 
 
 //-------------------------------------------------
@@ -104,7 +104,8 @@ nes_lz93d50_24c02_device::nes_lz93d50_24c02_device(const machine_config &mconfig
 }
 
 nes_datach_device::nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_lz93d50_device(mconfig, NES_DATACH, "NES Cart Bandai Datach PCB", tag, owner, clock, "nes_datach", __FILE__)
+					: nes_lz93d50_device(mconfig, NES_DATACH, "NES Cart Bandai Datach PCB", tag, owner, clock, "nes_datach", __FILE__),
+					m_reader(*this, "datach")
 {
 }
 
@@ -188,6 +189,31 @@ void nes_lz93d50_24c01_device::pcb_reset()
 	m_irq_enable = 0;
 	m_irq_count = 0;
 	m_i2c_dir = 0;
+}
+
+void nes_datach_device::device_start()
+{
+	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	serial_timer = timer_alloc(TIMER_SERIAL);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	serial_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1000));
+	
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_datach_latch));
+}
+
+void nes_datach_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	prg16_89ab(0);
+	prg16_cdef(m_prg_chunks - 1);
+	chr8(0, m_chr_source);
+	
+	m_irq_enable = 0;
+	m_irq_count = 0;
+	m_datach_latch = 0;
 }
 
 void nes_fjump2_device::device_start()
@@ -516,4 +542,100 @@ WRITE8_MEMBER(nes_fjump2_device::write_h)
 			fcg_write(space, offset & 0x0f, data, mem_mask);
 			break;
 	}
+}
+
+
+/*-------------------------------------------------
+ 
+ Bandai LZ93D50 + Datach barcode reader emulation
+  
+ Games: Datach Games
+  
+ iNES: mappers 157
+ 
+ In MESS: Supported
+ 
+ TODO: Datach carts should actually be handled
+ separately! Original carts were minicarts to be
+ inserted in a smaller slot of the Barcode reader
+ FC cart. The Barcode reader acts as a passthrough
+ but it has no internal ROM (it does not work if
+ you don't have any minicart inserted)
+
+ TODO2: This class should be derived from the 
+ LZ93D50 + X24C02 class, since the main board
+ has this EEPROM. Moreover, Datach - Battle Rush 
+ has a second X24C01 EEPROM that we don't emulate yet...
+ 
+ -------------------------------------------------*/
+
+
+void nes_datach_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_IRQ)
+	{
+		if (m_irq_enable)
+		{
+			// 16bit counter, IRQ fired when the counter goes from 1 to 0
+			// after firing, the counter is *not* reloaded, but next clock
+			// counter wraps around from 0 to 0xffff
+			if (!m_irq_count)
+				m_irq_count = 0xffff;
+			else
+				m_irq_count--;
+			
+			if (!m_irq_count)
+			{
+				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+				m_irq_enable = 0;
+			}
+		}
+	}
+	if (id == TIMER_SERIAL)
+	{
+		m_datach_latch = (m_reader->read_pixel() << 3);
+	}
+}
+
+READ8_MEMBER(nes_datach_device::read_m)
+{
+	LOG_MMC(("Datach read_m, offset: %04x\n", offset));
+	return m_datach_latch;
+}
+
+
+WRITE8_MEMBER(nes_datach_device::write_h)
+{
+	LOG_MMC(("Datach write_h, offset: %04x, data: %02x\n", offset, data));
+	
+	switch (offset & 0x0f)
+	{
+		case 0: case 1: case 2: case 3:
+		case 4: case 5: case 6: case 7:
+			// these don't switch CHR bank, but are SCL output
+			// of the oncart I2C EEPROM!
+			break;
+		case 0x0d:
+			// these should go to the I2C EEPROM on the Datach base
+			// but SDA line is shared with the oncart I2C EEPROM if 
+			// there is one (only in Datach - Battle Rush )
+			break;
+		default:
+			fcg_write(space, offset & 0x0f, data, mem_mask);
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  BARCODE READER DEVICE
+//-------------------------------------------------
+
+MACHINE_CONFIG_FRAGMENT( bandai_datach )
+	MCFG_BARCODE_READER_ADD("datach")
+MACHINE_CONFIG_END
+
+machine_config_constructor nes_datach_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( bandai_datach );
 }

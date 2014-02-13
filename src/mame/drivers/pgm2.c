@@ -69,10 +69,13 @@ public:
 	UINT32 screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pgm2(screen_device &screen, bool state);
 	required_device<cpu_device> m_maincpu;
+
+	void pgm_create_dummy_internal_arm_region(void);
 };
 
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
+	AM_RANGE(0x00000000, 0x00003fff) AM_ROM //AM_REGION("user1", 0x00000) // internal ROM
+	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("user1", 0) // not 100% sure it maps here.
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pgm2 )
@@ -151,6 +154,41 @@ static GFXDECODE_START( pgm2 )
 GFXDECODE_END
 
 
+void pgm2_state::pgm_create_dummy_internal_arm_region(void)
+{
+	UINT16 *temp16 = (UINT16 *)memregion("maincpu")->base();
+	int i;
+	for (i=0;i<0x4000/2;i+=2)
+	{
+		temp16[i] = 0xFFFE;
+		temp16[i+1] = 0xEAFF;
+
+	}
+	int base = 0;
+
+	// just do a jump to 0x080003c9  because there is some valid thumb code there with the current hookup..
+	// i'd expect valid non-thumb code at 0x08000000 tho?
+
+	temp16[(base) / 2] = 0x0004; base += 2;
+	temp16[(base) / 2] = 0xe59f; base += 2;
+	temp16[(base) / 2] = 0x0000; base += 2;
+	temp16[(base) / 2] = 0xe590; base += 2;
+	temp16[(base) / 2] = 0xff10; base += 2;
+	temp16[(base) / 2] = 0xe12f; base += 2;
+	temp16[(base) / 2] = 0x0010; base += 2;
+	temp16[(base) / 2] = 0x0000; base += 2;
+
+#if 1
+	temp16[(base) / 2] = 0x03c9; base += 2;
+	temp16[(base) / 2] = 0x0800; base += 2;
+#else
+	temp16[(base) / 2] = 0x0000; base += 2;
+	temp16[(base) / 2] = 0x0800; base += 2;
+#endif
+
+}
+
+
 
 static MACHINE_CONFIG_START( pgm2, pgm2_state )
 
@@ -186,6 +224,7 @@ ROM_START( orleg2 )
 
 	ROM_REGION( 0x800000, "user1", 0 )
 	ROM_LOAD( "xyj2_v104cn.u7",          0x00000000, 0x0800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) )
+//	ROM_LOAD( "decrypted4.bin",          0x00000000, 0x0800000, CRC(9a4101ac) SHA1(364aed3a3bee7caed598db1c5100e125adc42a79) )
 
 	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF )
 	ROM_LOAD( "ig-a_text.u4",            0x00000000, 0x0200000, CRC(fa444c32) SHA1(31e5e3efa92d52bf9ab97a0ece51e3b77f52ce8a) )
@@ -212,6 +251,7 @@ ROM_START( orleg2o )
 
 	ROM_REGION( 0x800000, "user1", 0 )
 	ROM_LOAD( "xyj2_v103cn.u7",  0x000000, 0x800000, CRC(21c1fae8) SHA1(36eeb7a5e8dc8ee7c834f3ff1173c28cf6c2f1a3) )
+//	ROM_LOAD( "decrypted3.bin",          0x00000000, 0x0800000, CRC(eec442b4) SHA1(f5f4f65702f7384e7971240b835783be24ebc723) )
 
 	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF )
 	ROM_LOAD( "ig-a_text.u4",            0x00000000, 0x0200000, CRC(fa444c32) SHA1(31e5e3efa92d52bf9ab97a0ece51e3b77f52ce8a) )
@@ -400,6 +440,8 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 
 	iga_u12_decode(src, 0x2000000, 0x4761);
 	iga_u16_decode(src, 0x2000000, 0xc79f);
+
+	pgm_create_dummy_internal_arm_region();
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
@@ -408,6 +450,8 @@ DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 
 	iga_u12_decode(src, 0x2000000, 0xa193);
 	iga_u16_decode(src, 0x2000000, 0xb780);
+
+	pgm_create_dummy_internal_arm_region();
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
@@ -417,7 +461,7 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 	iga_u12_decode(src, 0x800000, 0x1e96);
 	iga_u16_decode(src, 0x800000, 0x869c);
 
-
+	pgm_create_dummy_internal_arm_region();
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
@@ -426,6 +470,8 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 
 	iga_u12_decode(src, 0x2000000, 0x956d);
 	iga_u16_decode(src, 0x2000000, 0x3d17);
+
+	pgm_create_dummy_internal_arm_region();
 }
 
 

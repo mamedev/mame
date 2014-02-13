@@ -425,8 +425,6 @@ void mappy_state::mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 			{
 				flipx ^= 1;
 				flipy ^= 1;
-				sy += 40;
-				sx += 96;
 			}
 
 			for (y = 0;y <= sizey;y++)
@@ -504,8 +502,6 @@ void mappy_state::phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cli
 			{
 				flipx ^= 1;
 				flipy ^= 1;
-				sy += 40;
-				sx += 96;
 			}
 
 			for (y = 0;y <= sizey;y++)

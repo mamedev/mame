@@ -313,23 +313,6 @@ static GFXDECODE_START( mz800 )
 GFXDECODE_END
 
 
-/*************************************
- *
- *  Sound interface
- *
- *************************************/
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -398,7 +381,6 @@ static MACHINE_CONFIG_DERIVED( mz800, mz700 )
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz800)
 
 	MCFG_SOUND_ADD("sn76489n", SN76489, XTAL_17_73447MHz/5)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_REMOVE("cass_list")

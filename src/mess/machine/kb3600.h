@@ -65,72 +65,79 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_AY3600_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, AY3600, _clock)   \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define AY3600_INTERFACE(name) \
-	const ay3600_interface (name) =
-
-
+#define MCFG_AY3600_MATRIX_X0(_cb)	\
+	devcb = &ay3600_device::set_x0_cb(*device, DEVCB2_##_cb);
+#define MCFG_AY3600_MATRIX_X1(_cb)	\
+	devcb = &ay3600_device::set_x1_cb(*device, DEVCB2_##_cb);
+#define MCFG_AY3600_MATRIX_X2(_cb)	\
+	devcb = &ay3600_device::set_x2_cb(*device, DEVCB2_##_cb);
+#define MCFG_AY3600_MATRIX_X3(_cb)	\
+	devcb = &ay3600_device::set_x3_cb(*device, DEVCB2_##_cb);
+#define MCFG_AY3600_MATRIX_X4(_cb)	\
+	devcb = &ay3600_device::set_x4_cb(*device, DEVCB2_##_cb);
+#define MCFG_AY3600_MATRIX_X5(_cb)	\
+	devcb = &ay3600_device::set_x5_cb(*device, DEVCB2_##_cb);
+#define MCFG_AY3600_MATRIX_X6(_cb)	\
+	devcb = &ay3600_device::set_x6_cb(*device, DEVCB2_##_cb);
+#define MCFG_AY3600_MATRIX_X7(_cb)	\
+	devcb = &ay3600_device::set_x7_cb(*device, DEVCB2_##_cb);
+#define MCFG_AY3600_MATRIX_X8(_cb)	\
+	devcb = &ay3600_device::set_x8_cb(*device, DEVCB2_##_cb);
+#define MCFG_AY3600_SHIFT_CB(_cb)	\
+	devcb = &ay3600_device::set_shift_cb(*device, DEVCB2_##_cb);
+#define MCFG_AY3600_CONTROL_CB(_cb)	\
+	devcb = &ay3600_device::set_control_cb(*device, DEVCB2_##_cb);
+#define MCFG_AY3600_DATA_READY_CB(_cb)	\
+	devcb = &ay3600_device::set_data_ready_cb(*device, DEVCB2_##_cb);
+#define MCFG_AY3600_AKO_CB(_cb)	\
+	devcb = &ay3600_device::set_ako_cb(*device, DEVCB2_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> ay3600_interface
-
-struct ay3600_interface
-{
-	devcb_read16        m_in_x0_cb;
-	devcb_read16        m_in_x1_cb;
-	devcb_read16        m_in_x2_cb;
-	devcb_read16        m_in_x3_cb;
-	devcb_read16        m_in_x4_cb;
-	devcb_read16        m_in_x5_cb;
-	devcb_read16        m_in_x6_cb;
-	devcb_read16        m_in_x7_cb;
-	devcb_read16        m_in_x8_cb;
-
-	devcb_read_line     m_in_shift_cb;
-	devcb_read_line     m_in_control_cb;
-
-	devcb_write_line    m_out_data_ready_cb;
-	devcb_write_line    m_out_ako_cb;
-};
-
-
 // ======================> ay3600_device
 
-class ay3600_device :   public device_t,
-						public ay3600_interface
+class ay3600_device :   public device_t
 {
 public:
 	// construction/destruction
 	ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-public:
+	// public interface
 	UINT16 b_r();
+
+	template<class _Object> static devcb2_base &set_x0_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x0.set_callback(rd); }
+	template<class _Object> static devcb2_base &set_x1_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x1.set_callback(rd); }
+	template<class _Object> static devcb2_base &set_x2_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x2.set_callback(rd); }
+	template<class _Object> static devcb2_base &set_x3_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x3.set_callback(rd); }
+	template<class _Object> static devcb2_base &set_x4_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x4.set_callback(rd); }
+	template<class _Object> static devcb2_base &set_x5_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x5.set_callback(rd); }
+	template<class _Object> static devcb2_base &set_x6_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x6.set_callback(rd); }
+	template<class _Object> static devcb2_base &set_x7_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x7.set_callback(rd); }
+	template<class _Object> static devcb2_base &set_x8_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x8.set_callback(rd); }
+	template<class _Object> static devcb2_base &set_shift_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_shift.set_callback(rd); }
+	template<class _Object> static devcb2_base &set_control_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_control.set_callback(rd); }
+	template<class _Object> static devcb2_base &set_data_ready_cb(device_t &device, _Object wr) { return downcast<ay3600_device &>(device).m_write_data_ready.set_callback(wr); }
+	template<class _Object> static devcb2_base &set_ako_cb(device_t &device, _Object wr) { return downcast<ay3600_device &>(device).m_write_ako.set_callback(wr); }
+
+	devcb2_read16 m_read_x0, m_read_x1, m_read_x2, m_read_x3, m_read_x4, m_read_x5, m_read_x6, m_read_x7, m_read_x8;
+	devcb2_read_line m_read_shift, m_read_control;
+	devcb2_write_line m_write_data_ready, m_write_ako;
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb_resolved_read16       m_in_x_func[9];
-
-	devcb_resolved_read_line    m_in_shift_func;
-	devcb_resolved_read_line    m_in_control_func;
-
-	devcb_resolved_write_line   m_out_data_ready_func;
-	devcb_resolved_write_line   m_out_ako_func;
+	static const int MAX_KEYS_DOWN = 4;
 
 	int m_b;                    // output buffer
 	int m_ako;                  // any key down
+
+	int m_keys_down[MAX_KEYS_DOWN];
 
 	// timers
 	emu_timer *m_scan_timer;    // keyboard scan timer

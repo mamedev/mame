@@ -286,11 +286,6 @@ void pencil2_state::machine_reset()
 {
 }
 
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
 static TMS9928A_INTERFACE(pencil2_tms9929a_interface)
 {
 	0x4000,     // vram size
@@ -311,7 +306,6 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_10_738635MHz/3) // guess
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/apple2.h"
-#include "machine/ay3600.h"
 #include "machine/applefdc.h"
 #include "machine/sonydriv.h"
 #include "machine/appldriv.h"
@@ -1169,7 +1168,7 @@ void apple2_state::machine_reset()
 
 int apple2_state::a2_no_ctrl_reset()
 {
-	return (((m_kbprepeat != NULL) && (m_resetdip == NULL)) ||
+	return (((m_kbrepeat != NULL) && (m_resetdip == NULL)) ||
 			((m_resetdip != NULL) && !m_resetdip->read()));
 }
 
@@ -1183,9 +1182,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 
 	if((scanline % 8) == 0)
 		machine().primary_screen->update_partial(machine().primary_screen->vpos());
-
-	if (apple2_pressed_specialkey(0x80) &&
-		(a2_no_ctrl_reset() || (m_ay3600->keymod_r() & AY3600_KEYMOD_CONTROL)))
+	if ((m_kbspecial->read() & 0x80) &&
+		(a2_no_ctrl_reset() || (m_kbspecial->read() & 0x08)))
 	{
 			if (!m_reset_flag)
 			{
@@ -1611,7 +1609,7 @@ READ8_MEMBER ( apple2_state::apple2_c00x_r )
 	{
 		/* Read the keyboard data and strobe */
 		g_profiler.start(PROFILER_C00X);
-		result = m_ay3600->keydata_strobe_r();
+		result = m_transchar | m_strobe;
 		g_profiler.stop();
 	}
 
@@ -1668,7 +1666,7 @@ READ8_MEMBER( apple2_state::apple2_c01x_r )
 		LOG(("a2 softswitch_r: %04x\n", offset + 0xc010));
 		switch (offset)
 		{
-			case 0x00:          result |= m_ay3600->anykey_clearstrobe_r();     break;
+			case 0x00:          result |= m_transchar | m_strobe;  m_strobe = 0;  break;
 			case 0x01:          result |= (m_flags & VAR_LCRAM2)        ? 0x80 : 0x00;  break;
 			case 0x02:          result |= (m_flags & VAR_LCRAM)     ? 0x80 : 0x00;  break;
 			case 0x03:          result |= (m_flags & VAR_RAMRD)     ? 0x80 : 0x00;  break;
@@ -1700,9 +1698,9 @@ READ8_MEMBER( apple2_state::apple2_c01x_r )
 
 WRITE8_MEMBER( apple2_state::apple2_c01x_w )
 {
-	/* Clear the keyboard strobe - ignore the returned results */
+	/* Clear the keyboard strobe */
 	g_profiler.start(PROFILER_C01X);
-	m_ay3600->anykey_clearstrobe_r();
+	m_strobe = 0;
 	g_profiler.stop();
 }
 
@@ -2125,8 +2123,6 @@ void apple2_state::apple2_init_common()
 		m_a2_mask &= ~(VAR_RAMRD | VAR_RAMWRT | VAR_80STORE | VAR_ALTZP | VAR_80COL);
 
 	apple2_refresh_delegates();
-
-	m_ay3600->set_runtime_config(m_kpad1 != NULL, m_kbprepeat != NULL);
 }
 
 MACHINE_START_MEMBER(apple2_state,apple2)
@@ -2353,4 +2349,123 @@ void apple2_state::apple2_refresh_delegates()
 	write_delegates_d000[1] = write8_delegate(FUNC(apple2_state::apple2_mainramd000_w), this);
 	write_delegates_e000[0] = write8_delegate(FUNC(apple2_state::apple2_auxrame000_w), this);
 	write_delegates_e000[1] = write8_delegate(FUNC(apple2_state::apple2_mainrame000_w), this);
+}
+
+READ_LINE_MEMBER(apple2_state::ay3600_shift_r)
+{
+	// either shift key
+	if (m_kbspecial->read() & 0x06)
+	{
+		return ASSERT_LINE;
+	}
+
+	return CLEAR_LINE;
+}
+
+READ_LINE_MEMBER(apple2_state::ay3600_control_r)
+{
+	if (m_kbspecial->read() & 0x08)
+	{
+		return ASSERT_LINE;
+	}
+
+	return CLEAR_LINE;
+}
+
+static const UINT8 a2_key_remap[0x32][4] =
+{
+/*	  norm shft ctrl both */
+	{ 0x33,0x23,0x33,0x23 },    /* 3 #     00     */
+	{ 0x34,0x24,0x34,0x24 },    /* 4 $     01     */
+	{ 0x35,0x25,0x35,0x25 },    /* 5 %     02     */
+	{ 0x36,0x5e,0x35,0x53 },    /* 6 ^     03     */
+	{ 0x37,0x26,0x37,0x26 },    /* 7 &     04     */
+	{ 0x38,0x2a,0x38,0x2a },    /* 8 *     05     */
+	{ 0x39,0x28,0x39,0x28 },    /* 9 (     06     */
+	{ 0x30,0x29,0x30,0x29 },    /* 0 )     07     */
+	{ 0x3b,0x3a,0x3b,0x3a },    /* ; :     08     */
+	{ 0x2d,0x5f,0x2d,0x1f },    /* - _     09     */
+	{ 0x51,0x51,0x11,0x11 },    /* q Q     0a     */
+	{ 0x57,0x57,0x17,0x17 },    /* w W     0b     */
+	{ 0x45,0x45,0x05,0x05 },    /* e E     0c     */
+	{ 0x52,0x52,0x12,0x12 },    /* r R     0d     */
+	{ 0x54,0x54,0x14,0x14 },    /* t T     0e     */
+	{ 0x59,0x59,0x19,0x19 },    /* y Y     0f     */
+	{ 0x55,0x55,0x15,0x15 },    /* u U     10     */
+	{ 0x49,0x49,0x09,0x09 },    /* i I     11     */
+	{ 0x4f,0x4f,0x0f,0x0f },    /* o O     12     */
+	{ 0x50,0x50,0x10,0x10 },    /* p P     13     */
+	{ 0x44,0x44,0x04,0x04 },    /* d D     14     */
+	{ 0x46,0x46,0x06,0x06 },    /* f F     15     */
+	{ 0x47,0x47,0x07,0x07 },    /* g G     16     */
+	{ 0x48,0x48,0x08,0x08 },    /* h H     17     */
+	{ 0x4a,0x4a,0x0a,0x0a },    /* j J     18     */
+	{ 0x4b,0x4b,0x0b,0x0b },    /* k K     19     */
+	{ 0x4c,0x4c,0x0c,0x0c },    /* l L     1a     */
+	{ 0x3d,0x2b,0x3d,0x2b },    /* = +     1b     */
+	{ 0x08,0x08,0x08,0x08 },    /* Left    1c     */
+	{ 0x15,0x15,0x15,0x15 },    /* Right   1d     */
+	{ 0x5a,0x5a,0x1a,0x1a },    /* z Z     1e     */
+	{ 0x58,0x58,0x18,0x18 },    /* x X     1f     */
+	{ 0x43,0x43,0x03,0x03 },    /* c C     20     */
+	{ 0x56,0x56,0x16,0x16 },    /* v V     21     */
+	{ 0x42,0x42,0x02,0x02 },    /* b B     22     */
+	{ 0x4e,0x4e,0x0e,0x0e },    /* n N     23     */
+	{ 0x4d,0x4d,0x0d,0x0d },    /* m M     24     */
+	{ 0x2c,0x3c,0x2c,0x3c },    /* , <     25     */
+	{ 0x2e,0x3e,0x2e,0x3e },    /* . >     26     */
+	{ 0x2f,0x3f,0x2f,0x3f },    /* / ?     27     */
+	{ 0x53,0x53,0x13,0x13 },    /* s S     28     */
+	{ 0x32,0x40,0x32,0x00 },    /* 2 @     29     */
+	{ 0x31,0x21,0x31,0x31 },    /* 1 !     2a     */
+	{ 0x9b,0x9b,0x9b,0x9b },    /* Escape  2b     */
+	{ 0x41,0x41,0x01,0x01 },    /* a A     2c     */
+	{ 0x20,0x20,0x20,0x20 },    /* Space   2d     */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x2e unused    */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x2f unused    */
+	{ 0x00,0x00,0x00,0x00 },    /* 0x30 unused    */
+	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   31     */
+};
+
+WRITE_LINE_MEMBER(apple2_state::ay3600_data_ready_w)
+{
+	if (state == ASSERT_LINE)
+	{
+		int mod = 0;
+		m_lastchar = m_ay3600->b_r(); 
+
+		mod = (m_kbspecial->read() & 0x06) ? 0x01 : 0x00;
+		mod |= (m_kbspecial->read() & 0x08) ? 0x02 : 0x00;
+
+		m_transchar = a2_key_remap[m_lastchar&0x3f][mod];
+
+		if (m_transchar != 0)
+		{
+			m_strobe = 0x80;
+//			printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
+		}
+	}
+}
+
+WRITE_LINE_MEMBER(apple2_state::ay3600_iie_data_ready_w)
+{
+	if (state == ASSERT_LINE)
+	{
+		UINT8 *decode = m_kbdrom->base();
+		UINT16 trans;
+
+		m_lastchar = m_ay3600->b_r();
+
+		trans = m_lastchar & ~(0x1c0);	// clear the 3600's control/shift stuff
+		trans |= (m_lastchar & 0x100)>>2;	// bring the 0x100 bit down to the 0x40 place
+		trans <<= 2;					// 4 entries per key
+		trans |= (m_kbspecial->read() & 0x06) ? 0x00 : 0x01;	// shift is bit 1 (active low)
+		trans |= (m_kbspecial->read() & 0x08) ? 0x00 : 0x02; 	// control is bit 2 (active low)
+		trans |= (m_kbspecial->read() & 0x01) ? 0x0000 : 0x0200; 	// caps lock is bit 9 (active low)
+
+		m_transchar = decode[trans];
+		m_strobe = 0x80;
+
+//		printf("new char = %04x (%02x)\n", m_lastchar, m_transchar);
+	}
 }

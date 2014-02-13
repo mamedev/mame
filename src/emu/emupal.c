@@ -395,7 +395,7 @@ void colortable_palette_set_color(colortable_t *ctable, UINT32 entry, rgb_t colo
 	assert(entry < ctable->palentries);
 
 	/* alpha doesn't matter */
-	color &= 0xffffff;
+	color |= 0xff000000;
 
 	/* update if it has changed */
 	if (ctable->palette[entry] != color)

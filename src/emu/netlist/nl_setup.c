@@ -56,11 +56,35 @@ netlist_setup_t::~netlist_setup_t()
 	pstring::resetmem();
 }
 
-// FIXME: Move to netlist ...
+ATTR_COLD pstring netlist_setup_t::build_fqn(const pstring &obj_name) const
+{
+    if (m_stack.empty())
+        return netlist().name() + "." + obj_name;
+    else
+        return m_stack.peek() + "." + obj_name;
+}
+
+void netlist_setup_t::namespace_push(const pstring &aname)
+{
+    if (m_stack.empty())
+        m_stack.push(netlist().name() + "." + aname);
+    else
+        m_stack.push(m_stack.peek() + "." + aname);
+}
+
+void netlist_setup_t::namespace_pop()
+{
+    m_stack.pop();
+}
+
+
 netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const pstring &name)
 {
-    dev->init(netlist(), name);
-	if (!(netlist().m_devices.add(name, dev, false)==TMERR_NONE))
+    pstring fqn = build_fqn(name);
+
+    dev->init(netlist(), fqn);
+
+	if (!(netlist().m_devices.add(fqn, dev, false)==TMERR_NONE))
 		netlist().error("Error adding %s to device list\n", name.cstr());
 	return dev;
 }
@@ -109,11 +133,17 @@ void netlist_setup_t::register_model(const pstring &model)
 	m_models.add(model);
 }
 
+void netlist_setup_t::register_alias_nofqn(const pstring &alias, const pstring &out)
+{
+    if (!(m_alias.add(alias, out, false)==TMERR_NONE))
+        netlist().error("Error adding alias %s to alias list\n", alias.cstr());
+}
+
 void netlist_setup_t::register_alias(const pstring &alias, const pstring &out)
 {
-	//if (!(m_alias.add(alias, new nstring(out), false)==TMERR_NONE))
-	if (!(m_alias.add(alias, out, false)==TMERR_NONE))
-		netlist().error("Error adding alias %s to alias list\n", alias.cstr());
+    pstring alias_fqn = build_fqn(alias);
+    pstring out_fqn = build_fqn(out);
+    register_alias_nofqn(alias_fqn, out_fqn);
 }
 
 pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in) const
@@ -239,7 +269,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 
 void netlist_setup_t::register_link(const pstring &sin, const pstring &sout)
 {
-	link_t temp = link_t(sin, sout);
+	link_t temp = link_t(build_fqn(sin), build_fqn(sout));
 	NL_VERBOSE_OUT(("link %s <== %s\n", sin.cstr(), sout.cstr()));
 	m_links.add(temp);
 	//if (!(m_links.add(sin + "." + sout, temp, false)==TMERR_NONE))
@@ -254,8 +284,9 @@ void netlist_setup_t::register_param(const pstring &param, const double value)
 
 void netlist_setup_t::register_param(const pstring &param, const pstring &value)
 {
-	//if (!(m_params_temp.add(param, new nstring(value), false)==TMERR_NONE))
-	if (!(m_params_temp.add(param, value, false)==TMERR_NONE))
+    pstring fqn = build_fqn(param);
+
+	if (!(m_params_temp.add(fqn, value, false)==TMERR_NONE))
 		netlist().error("Error adding parameter %s to parameter list\n", param.cstr());
 }
 
@@ -323,12 +354,14 @@ netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_
 
 netlist_param_t *netlist_setup_t::find_param(const pstring &param_in, bool required)
 {
-	const pstring &outname = resolve_alias(param_in);
+    const pstring param_in_fqn = build_fqn(param_in);
+
+	const pstring &outname = resolve_alias(param_in_fqn);
 	netlist_param_t *ret;
 
 	ret = m_params.find(outname);
 	if (ret == NULL && required)
-		netlist().error("parameter %s(%s) not found!\n", param_in.cstr(), outname.cstr());
+		netlist().error("parameter %s(%s) not found!\n", param_in_fqn.cstr(), outname.cstr());
 	if (ret != NULL)
 		NL_VERBOSE_OUT(("Found parameter %s\n", outname.cstr()));
 	return ret;
@@ -618,7 +651,7 @@ void netlist_setup_t::resolve_inputs()
 
 	if (m_netlist.solver() == NULL)
 	{
-	    if (!has_twoterms)
+	    if (has_twoterms)
 	        netlist().error("No solver found for this net although analog elements are present\n");
 	}
 	else

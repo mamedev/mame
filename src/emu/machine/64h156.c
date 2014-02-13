@@ -303,12 +303,11 @@ void c64h156_device::live_run(attotime limit)
 				if (LOG) logerror("%s read bit %u (%u) >> %03x, oe=%u soe=%u sync=%u byte=%u\n", cur_live.tm.as_string(), cur_live.bit_counter, 
 					!(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2)), cur_live.shift_reg, cur_live.oe, cur_live.soe, cur_live.sync, cur_live.byte);
 
-				// write bit
-				if (!cur_live.oe) {
-					write_next_bit(BIT(cur_live.shift_reg_write, 7), limit);
-				}
-
 				syncpoint = true;
+			}
+
+			if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1) && !cur_live.oe) {
+				write_next_bit(BIT(cur_live.shift_reg_write, 7), limit);
 			}
 
 			int sync = !((cur_live.shift_reg == 0x3ff) && cur_live.oe);
@@ -524,6 +523,11 @@ WRITE_LINE_MEMBER( c64h156_device::oe_w )
 	{
 		live_sync();
 		m_oe = cur_live.oe = state;
+		if (m_oe) {
+			stop_writing(machine().time());
+		} else {
+			start_writing(machine().time());
+		}
 		checkpoint();
 		if (LOG) logerror("%s OE %u\n", machine().time().as_string(), state);
 		live_run();
@@ -641,6 +645,7 @@ void c64h156_device::ds_w(int ds)
 		live_sync();
 		m_ds = cur_live.ds = ds;
 		checkpoint();
+		if (LOG) logerror("%s DS %u\n", machine().time().as_string(), ds);
 		live_run();
 	}
 }

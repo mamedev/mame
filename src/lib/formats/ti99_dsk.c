@@ -74,6 +74,7 @@
  *        always be done.
  ********************************************************************/
 
+#include "emu.h"
 #include <string.h>
 #include <assert.h>
 #include <time.h>
@@ -81,8 +82,230 @@
 #include "imageutl.h"
 #include "ti99_dsk.h"
 
+/*
+    New format implementation. See below for legacy implementation.
+*/
+const char *ti99_sdf_format::name() const
+{
+	return "sdf";
+}
+
+const char *ti99_sdf_format::description() const
+{
+	return "TI99 sector dump floppy disk image";
+}
+
+const char *ti99_sdf_format::extensions() const
+{
+	return "dsk";
+}
+
+bool ti99_sdf_format::supports_save() const
+{
+	return true;
+}
+
+int ti99_sdf_format::identify(io_generic *io, UINT32 form_factor)
+{
+	UINT64 file_size = io_generic_size(io);
+
+	// Adding support for another sector image format which adds 768 bytes
+	// as a bad sector map
+	if ((file_size / 256) % 10 == 3)
+	{
+		logerror("Stripping map of bad sectors at image end\n");
+		file_size -= 768;
+	}
+
+	// Formats with 9 sectors per track
+	if (((file_size % 92160)==0)
+		&& (   (file_size/92160==1)
+			|| (file_size/92160==2)
+			|| (file_size/92160==4)
+			|| (file_size/92160==8)
+			|| (file_size/92160==16))) return 50;
+
+	// Formats with 16 sectors per track (rare)
+	if (((file_size % 163840)==0)
+		&& (   (file_size/163840==1)
+			|| (file_size/163840==2))) return 50;
+
+	logerror("Unrecognized disk image geometry\n");
+	return 0;
+}
+
+int ti99_sdf_format::find_size(io_generic *io, UINT32 form_factor)
+{
+	UINT64 file_size = io_generic_size(io);
+
+	// See above
+	if ((file_size / 256) % 10 == 3) file_size -= 768;
+
+	for (int i=0; formats[i].form_factor != 0; i++)
+	{
+		logerror("ti99_dsk: trying size=%d, sec=%d, tr=%d, head=%d, ss=%d\n", (int)file_size, formats[i].sector_count, formats[i].track_count, formats[i].head_count, formats[i].sector_base_size);
+		if (formats[i].sector_count * formats[i].track_count * formats[i].head_count * formats[i].sector_base_size == (int)file_size)
+		{
+			logerror("ti99_dsk: format %d matches\n", i);
+			return i;
+		}
+	}
+	return -1;
+}
+
+int ti99_sdf_format::get_image_offset(const format &f, int head, int track)
+{
+	// Note that the logical track arrangement on TI disks is
+	//
+	//   00 01 02 03 ... 38 39     side 0
+	//   79 78 77 76 ... 41 40     side 1
+	//
+	// and that the SDF format stores the tracks in logical order
+	//   00 01 02 03 ... 38 39 [40 41 ... 79]
+	//
+	int logicaltrack = head * f.track_count;
+	logicaltrack += ((head&1)==0)?  track : (f.track_count - 1 - track);
+	logerror("ti99_dsk: track %d, head %d -> logical track %d\n", track, head, logicaltrack);
+	return logicaltrack * compute_track_size(f);
+}
+
+/*
+ * Common formats:
+ * 90 KiB = 40 tracks / 1 side / 9 sectors = SSSD
+ * 180 KiB = 40 tracks / 2 side / 9 sectors = DSSD (most common)
+ *         = 40 tracks / 1 side / 18 sectors = SSDD (rare)
+ *         = 80 tracks / 1 side / 9 sectors = SSSD80 (rare)
+ * 360 KiB = 40 tracks / 2 side / 18 sectors = DSDD (most common)
+ *         = 80 tracks / 2 side / 9 sectors = DSSD80 (rare)
+ *         = 80 tracks / 1 side / 18 sectors = SSDD80 (rare)
+ *         = 40 tracks / 1 side / 36 sectors = SSHD (rare)
+ * 720 KiB = 80 tracks / 2 side / 18 sectors = DSDD80 (most common)
+ * 1440 KiB= 80 tracks / 2 side / 36 sectors = DSHD80 (most common)
+ *
+ * Moreover, there may be formats with 35 tracks (ancient) and 8 sectors/track.
+ * We only check for the 8 sector formats.
+ * 160 KiB = 40 tracks / 1 side / 16 sectors = SSDD8
+ * 320 KiB = 40 tracks / 2 side / 16 sectors = DSDD8
+ */
+/* const ti99_sdf_format::file_format ti99_sdf_format::file_formats[] =
+{
+    {   90,    floppy_image::SSSD,  9, 40, 1, 4000  },  // 5.25, 3.5 with double-step
+    {   160,   floppy_image::DSSD,  8, 40, 2, 4000  },  // 5.25, 3.5 with double-step
+    {   180,   floppy_image::DSSD,  9, 40, 2, 4000  },  // 5.25, 3.5 with double-step
+    {   180,   floppy_image::SSDD, 18, 40, 2, 2000  },  // 5.25, 3.5 with double-step
+    {   320,   floppy_image::DSDD, 16, 40, 2, 2000  },  // 5.25, 3.5 with double-step
+    {   360,   floppy_image::DSDD, 18, 40, 2, 2000  },  // 5.25, 3.5 with double-step
+    {   720,   floppy_image::DSDD, 18, 80, 2, 2000  },  // 3.5
+    {   1440,  floppy_image::DSHD, 36, 80, 2, 1000  },  // 3.5
+    {   0, 0, 0, 0, 0, 0 }
+    // Add more formats with VIB check
+}; */
+
+// Format: form_factor, variant, encoding, cell_size, sector_count, track_count,
+//         head_count, sector_base_size, per_sector_size, sector_base_id,
+//         per_sector_id, gap1, gap2, gap3
+
+const ti99_sdf_format::format ti99_sdf_format::formats[] =
+{
+	{   //  90K 5.25" single density single sided
+		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
+		4000, 9, 40, 1, 256, {}, 0, {}, 16, 11, 45
+	},
+	{   //  180K 5.25" single density double sided
+		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
+		4000, 9, 40, 2, 256, {}, 0, {}, 16, 11, 45
+	},
+
+	{ 0 }
+};
+
+/*
+ * FM track image
+ */
+floppy_image_format_t::desc_e* ti99_sdf_format::get_desc_fm(const format &f, int &current_size, int &end_gap_index)
+{
+	static floppy_image_format_t::desc_e desc_fm[] =
+	{
+		{ SECTOR_INTERLEAVE_SKEW, 3, 3 },        // skew/2 because of track*2+head
+		{ FM, 0x00, f.gap_1 },                       // Gap 1 (note that we have 00 instead of ff)
+		{ SECTOR_LOOP_START, 0, 8 },            // 9 sectors
+			{ FM, 0x00, 6 },                    // pre-id gap
+			{ CRC_CCITT_FM_START, 1 },
+			{   RAW, 0xf57e, 1 },                 // IDAM (fe, clock=c7; 11110101 01111110)
+			{   TRACK_ID_FM },
+			{   HEAD_ID_FM },
+			{   SECTOR_ID_FM },
+			{   SIZE_ID_FM },
+			{ CRC_END, 1 },
+			{ CRC, 1 },
+			{ FM, 0xff, f.gap_2 },                    // Gap 2
+			{ FM, 0x00, 6 },
+			{ CRC_CCITT_FM_START, 2 },
+			{   RAW, 0xf56f, 1 },                // DAM (fb, clock=c7; 11110101 01101111)
+			{   SECTOR_DATA_FM, -1 },            // Sector data
+			{ CRC_END, 2 },
+			{ CRC, 2 },
+			{ FM, 0xff, f.gap_3 },                   // Gap 3
+		{ SECTOR_LOOP_END },
+		{ FM, 0xff, 0 },                     // track lead-out (end gap, 231)
+		{ END }
+	};
+	current_size = (f.gap_1 + 9 * (6 + 1 + 4 + 2 + f.gap_2 + 6 + 1 + 256 + 2 + f.gap_3) + 0) * 16;
+	end_gap_index = 21;
+
+	return desc_fm;
+}
+
+/*
+ * MFM track image
+ */
+floppy_image_format_t::desc_e* ti99_sdf_format::get_desc_mfm(const format &f, int &current_size, int &end_gap_index)
+{
+	static floppy_image_format_t::desc_e desc_mfm[] =
+	{
+		{ SECTOR_INTERLEAVE_SKEW, 10, 0 },
+		{ MFM, 0x4e, 40 },                       // track lead-in
+		{ SECTOR_LOOP_START, 0, 17 },            // 18 sectors
+			{ CRC_CCITT_START, 1 },
+			{   RAW, 0x4489, 3 },                 // A1 sync mark
+			{   MFM, 0xfe, 1 },                  // IDAM
+			{   TRACK_ID },
+			{   HEAD_ID },
+			{   SECTOR_ID },
+			{   SIZE_ID },
+			{ CRC_END, 1 },
+			{ CRC, 1 },
+			{ MFM, 0x4e, 22 },                   // Gap 2
+			{ MFM, 0x00, 12 },
+			{ CRC_CCITT_START, 2 },
+			{   RAW, 0x4489, 3 },                // A1
+			{   MFM, 0xfb, 1 },                  // DAM
+			{   SECTOR_DATA, -1 },               // Sector data
+			{ CRC_END, 2 },
+			{ CRC, 2 },
+			{ MFM, 0x4e, 24 },                   // Gap 3
+		{ SECTOR_LOOP_END },
+		{ MFM, 0x4e, 0 },                      // track lead-out (712)
+		{ END }
+	};
+	current_size = (40 + 18 * (3 + 1 + 4 + 2 + 22 + 12 + 3 + 1 + 256 + 2 + 24) + 0) * 16;
+	end_gap_index = 22;
+
+	return desc_mfm;
+}
+
+const floppy_format_type FLOPPY_TI99_SDF_FORMAT = &floppy_image_format_creator<ti99_sdf_format>;
+
+//==========================================================================
 #define SECTOR_SIZE 256
 #define TI99_IDAM_LENGTH 7
+
+
+/**************************************************************
+
+    Legacy implementation
+
+**************************************************************/
 
 /*
     Determines whether we are using 80 track drives. This variable is

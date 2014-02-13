@@ -32,7 +32,8 @@
 #define JOYPORT_TAG     "joyport"
 #define VDP_TAG         "vdp"
 
-#define GROMFREQ 10700000.0/24
+#define VDPFREQ XTAL_10_738635MHz
+#define GROMFREQ VDPFREQ/24
 
 // TI-99/8
 #define SRAM_TAG        "sram8"

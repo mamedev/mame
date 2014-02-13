@@ -10,8 +10,8 @@ PeT   around February 2008:
 
 APF M1000/MP1000 and Imagination Machine
 ----------------------------------------
-- The M1000 contains the RAM, ROM, CPU, PIA0, handsets, Video and cart slot, and thus was a TV Game computer.
-- The MPA-10 was a base unit containing the main keyboard, custom cassette recorder and PIA1.
+- The M1000 contains the video RAM, ROM, CPU, PIA0, handsets, Video and cart slot, and thus was a TV Game computer.
+- The MPA-10 was a base unit containing the main keyboard, custom cassette recorder, 8k RAM and PIA1.
 - When the two were joined, they formed the Imagination Machine.
 - Although the BASIC cart could be plugged into the M1000, it could not be used as it needs the main keyboard.
 - BB-01 Building Block - provides 4 cart slots. Includes a RS-232 cart for a printer or modem.
@@ -21,6 +21,21 @@ APF M1000/MP1000 and Imagination Machine
 - A cassette program must be loaded on the same memory size it was saved from. Since the standard machine
   had 8K, almost all tapes require this exact amount of RAM to be present
 - The cart-slot is physically the same as the Arcadia 2001.
+
+
+RAM switch
+----------
+- The M1000 only had available the 1K video ram (0000-03FF)
+- Space Destroyer needs more, so it includes another 1K in the cart (-ram 1K to enable it)
+- The MPA-10 base includes 8K of RAM (A000-BFFF) (-ram 8K)
+- A very few games need 16K which requires hacking the pcb (-ram 16K)
+- Basic will work with 8K or 16K.
+
+- On the M1000, only the 1K option has any affect. 8K and 16K are ignored.
+- On the IMAG, all ram switches work, however the 1K option gives you 9K. This is because
+  the MPA-10 8K ram is always there.
+
+
 
 
 Status of cart-based games
@@ -129,11 +144,11 @@ READ8_MEMBER( apf_state::videoram_r )
 	{
 		// Need the cpu and crtc to be locked together for proper graphics
 		// This is a hack to fix Rocket Patrol and Blackjack
-		if (BIT(m_pad_data, 6) && (m_ram->size() != 9*1024))
+		if (BIT(m_pad_data, 6) && (m_ram->size() != 1*1024))
 			offset -= 0x400;
 
 		// This is a hack to fix Space Destroyer
-		if (BIT(m_pad_data, 6) && (m_ram->size() == 9*1024))
+		if (BIT(m_pad_data, 6) && (m_ram->size() == 1*1024))
 			offset -= 0x120;
 
 		UINT16 part1 = offset & 0x1f;
@@ -222,19 +237,24 @@ WRITE8_MEMBER( apf_state::pia1_portb_w )
 
 void apf_state::machine_reset()
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_portb = 0;
 	m_ca2 = 0;
 
 	if (m_cass) // apfimag only
+	{
 		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
-	/* if we specified 8K of RAM, delete the extended RAM */
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	if (m_ram->size() < 16*1024)
-		space.unmap_readwrite(0xc000, 0xdfff);
+		/* if we specified 8K of RAM, delete the extended RAM */
+		if (m_ram->size() < 16*1024)
+			space.unmap_readwrite(0xc000, 0xdfff);
+		// this is a hack to get 'columns' to work. It misbehaves if a000-a003 are all zero
+		else
+			space.write_byte(0xa002, 0xe5);
+	}
 
-	/* 9K indicates special mapping for space destroyer */
-	if (m_ram->size() == 9*1024)
+	/* 1K indicates special mapping for space destroyer */
+	if (m_ram->size() == 1*1024)
 	{
 		space.unmap_readwrite(0x9800, 0x9fff);
 		space.install_ram(0x9800, 0x9bff, m_ram->pointer());
@@ -308,8 +328,6 @@ static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
 	AM_RANGE( 0x4000, 0x47ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x6800, 0x7fff) AM_ROM AM_REGION("cart", 0x2000)
 	AM_RANGE( 0x8000, 0x9fff) AM_ROM AM_REGION("cart", 0)
-	AM_RANGE( 0xa000, 0xbfff) AM_RAM // standard
-	AM_RANGE( 0xc000, 0xdfff) AM_RAM // expansion
 	AM_RANGE( 0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
@@ -323,6 +341,8 @@ static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
 	//AM_RANGE( 0x6502, 0x6502) AM_READWRITE(apf_wd179x_sector_r, apf_wd179x_sector_w)
 	//AM_RANGE( 0x6503, 0x6503) AM_READWRITE(apf_wd179x_data_r, apf_wd179x_data_w)
 	//AM_RANGE( 0x6600, 0x6600) AM_WRITE(apf_dischw_w)
+	AM_RANGE( 0xa000, 0xbfff) AM_RAM // standard
+	AM_RANGE( 0xc000, 0xdfff) AM_RAM // expansion
 ADDRESS_MAP_END
 
 
@@ -579,7 +599,7 @@ static MACHINE_CONFIG_START( apfm1000, apf_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("9K, 16K")
+	MCFG_RAM_EXTRA_OPTIONS("1K,16K")
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_INTERFACE("apfm1000_cart")

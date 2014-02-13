@@ -432,8 +432,6 @@ void xevious_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 			{
 				flipx = !flipx;
 				flipy = !flipy;
-				sy += 40;
-				sx += 96;
 			}
 
 			transmask = colortable_get_transpen_mask(machine().colortable, machine().gfx[bank], color, 0x80);

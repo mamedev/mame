@@ -312,7 +312,7 @@ public:
     ATTR_COLD void init_object(netlist_base_t &nl, const pstring &aname);
     ATTR_COLD bool isInitalized() { return (m_netlist != NULL); }
 
-    ATTR_COLD const pstring &name() const;
+    ATTR_COLD const pstring name() const;
 
     PSTATE_INTERFACE_DECL()
 
@@ -1121,7 +1121,7 @@ protected:
     };
 
     // any derived netlist must override this ...
-    virtual void vfatalerror(const loglevel_e level,
+    ATTR_COLD ATTR_NORETURN virtual void vfatalerror(const loglevel_e level,
             const char *format, va_list ap) const = 0;
 
     /* from netlist_object */

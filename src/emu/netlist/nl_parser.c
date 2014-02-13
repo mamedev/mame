@@ -214,8 +214,10 @@ ATTR_COLD void netlist_parser::verror(pstring msg, int line_num, pstring line)
 }
 
 
-void netlist_parser::parse(const char *buf)
+void netlist_parser::parse(const char *buf, const pstring nlname)
 {
+    m_buf = buf;
+
     reset(buf);
     set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
     set_number_chars("01234567890eE-."); //FIXME: processing of numbers
@@ -234,13 +236,54 @@ void netlist_parser::parse(const char *buf)
     m_tok_ALIAS = register_token("ALIAS");
     m_tok_NET_C = register_token("NET_C");
     m_tok_PARAM = register_token("PARAM");
-    m_tok_NET_MODEL = register_token("PARAM");
+    m_tok_NET_MODEL = register_token("NET_MODEL");
+    m_tok_INCLUDE = register_token("INCLUDE");
+    m_tok_SUBMODEL = register_token("SUBMODEL");
     m_tok_NETLIST_START = register_token("NETLIST_START");
     m_tok_NETLIST_END = register_token("NETLIST_END");
 
+    bool in_nl = false;
 
-	while (true)
+    while (true)
 	{
+        token_t token = get_token();
+
+        if (token.is_type(ENDOFFILE))
+            error("EOF while searching for <%s>", nlname.cstr());
+
+        if (token.is(m_tok_NETLIST_END))
+        {
+            require_token(m_tok_param_left);
+            if (!in_nl)
+                error("Unexpected NETLIST_END");
+            else
+            {
+                in_nl = false;
+            }
+            require_token(m_tok_param_right);
+        }
+        else if (token.is(m_tok_NETLIST_START))
+        {
+            if (in_nl)
+                error("Unexpected NETLIST_START");
+            require_token(m_tok_param_left);
+            token_t name = get_token();
+            require_token(m_tok_param_right);
+            if (name.str() == nlname || nlname == "")
+            {
+                parse_netlist(name.str());
+                return;
+            } else
+                in_nl = true;
+        }
+	}
+}
+
+void netlist_parser::parse_netlist(const pstring &nlname)
+{
+
+    while (true)
+    {
         token_t token = get_token();
 
         if (token.is_type(ENDOFFILE))
@@ -257,14 +300,20 @@ void netlist_parser::parse(const char *buf)
             netdev_param();
         else if (token.is(m_tok_NET_MODEL))
             net_model();
-        else if (token.is(m_tok_NETLIST_START))
-            netdev_netlist_start();
+        else if (token.is(m_tok_SUBMODEL))
+            net_submodel();
+        else if (token.is(m_tok_INCLUDE))
+            net_include();
         else if (token.is(m_tok_NETLIST_END))
+        {
             netdev_netlist_end();
+            return;
+        }
         else
             device(token.str());
-	}
+    }
 }
+
 
 void netlist_parser::netdev_netlist_start()
 {
@@ -285,6 +334,30 @@ void netlist_parser::net_model()
     pstring model = get_string();
     m_setup.register_model(model);
     require_token(m_tok_param_right);
+}
+
+void netlist_parser::net_submodel()
+{
+    // don't do much
+    pstring name = get_identifier();
+    require_token(m_tok_comma);
+    pstring model = get_identifier();
+    require_token(m_tok_param_right);
+
+    m_setup.namespace_push(name);
+    netlist_parser subparser(m_setup);
+    subparser.parse(m_buf, model);
+    m_setup.namespace_pop();
+}
+
+void netlist_parser::net_include()
+{
+    // don't do much
+    pstring name = get_identifier();
+    require_token(m_tok_param_right);
+
+    netlist_parser subparser(m_setup);
+    subparser.parse(m_buf, name);
 }
 
 void netlist_parser::net_alias()

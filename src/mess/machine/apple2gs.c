@@ -119,7 +119,6 @@
 
 #include "includes/apple2gs.h"
 #include "includes/apple2.h"
-#include "machine/ay3600.h"
 #include "machine/applefdc.h"
 #include "machine/sonydriv.h"
 #include "machine/8530scc.h"
@@ -944,8 +943,49 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 			#if RUN_ADB_MICRO
 			result = keyglu_816_read(GLU_KEYMOD);
 			#else
-			result = m_ay3600->keymod_r();
-			#endif
+
+			result = 0;
+			{
+				UINT8 temp = m_kbspecial->read();
+				if (temp & 1)	// capslock
+				{
+					result |= 4;
+				}
+				if (temp & 6)	// shift
+				{
+					result |= 1;
+				}
+				if (temp & 8)	// control
+				{
+					result |= 2;
+				}
+				if (temp & 0x10)	// open apple/command
+				{
+					result |= 0x40;
+				}
+				if (temp & 0x20)	// option
+				{
+					result |= 0x80;
+				}
+				// keypad is a little rough right now
+				if (m_lastchar >= 0x28 && m_lastchar <= 0x2d)
+				{
+					result |= 0x10;
+				}
+				else if (m_lastchar >= 0x32 && m_lastchar <= 0x3f)
+				{
+					result |= 0x10;
+				}
+				else if (m_lastchar >= 0x100 && m_lastchar <= 0x101)
+				{
+					result |= 0x10;
+				}
+				else if (m_lastchar >= 0x109 && m_lastchar <= 0x10a)
+				{
+					result |= 0x10;
+				}
+			}
+#endif
 			break;
 
 		case 0x26:  /* C026 - DATAREG */

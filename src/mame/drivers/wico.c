@@ -393,15 +393,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( wico_state::firq_housekeeping )
 }
 
 
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( wico, wico_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("ccpu", M6809, 10000000 / 8)
@@ -420,7 +411,6 @@ static MACHINE_CONFIG_START( wico, wico_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn76494", SN76494, 10000000 / 64)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_SOUND_CONFIG(psg_intf)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

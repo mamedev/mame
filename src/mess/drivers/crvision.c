@@ -672,10 +672,16 @@ WRITE_LINE_MEMBER(laser2001_state::write_centronics_busy)
 	m_pia->cb1_w(pia_cb1_r());
 }
 
+WRITE_LINE_MEMBER(laser2001_state::write_psg_ready)
+{
+	m_psg_ready = state;
+	m_pia->cb1_w(pia_cb1_r());
+}
+
 READ_LINE_MEMBER( laser2001_state::pia_cb1_r )
 {
 	/* actually this is a diode-AND (READY & _BUSY), but ctronics.c returns busy status if no device is mounted -> Manager won't boot */
-	return m_psg->ready_r() && (!m_centronics_busy || m_pia->ca2_output_z());
+	return m_psg_ready && (!m_centronics_busy || m_pia->ca2_output_z());
 }
 
 WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )
@@ -714,15 +720,6 @@ static const cassette_interface lasr2001_cassette_interface =
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
 	NULL,
 	NULL
-};
-
-/*-------------------------------------------------
-    sn76496_config psg_intf
--------------------------------------------------*/
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
 };
 
 /***************************************************************************
@@ -887,7 +884,6 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(crvision_state, pia_pa_r))
 	MCFG_PIA_READPB_HANDLER(READ8(crvision_state, pia_pb_r))
-	MCFG_PIA_READCB1_HANDLER(DEVREADLINE(SN76489_TAG, sn76496_base_device, ready_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(crvision_state, pia_pa_w))
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8(SN76489_TAG, sn76496_base_device, write))
 
@@ -905,7 +901,7 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76489_TAG, SN76489A, XTAL_2MHz)
-	MCFG_SOUND_CONFIG(psg_intf)
+	MCFG_SN76496_READY_HANDLER(DEVWRITELINE(PIA6821_TAG, pia6821_device, cb1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
@@ -963,7 +959,6 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	MCFG_PIA_READPA_HANDLER(READ8(laser2001_state, pia_pa_r))
 	MCFG_PIA_READPB_HANDLER(READ8(laser2001_state, pia_pb_r))
 	MCFG_PIA_READCA1_HANDLER(READLINE(laser2001_state, pia_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(laser2001_state, pia_cb1_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(laser2001_state, pia_pa_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(laser2001_state, pia_pb_w))
 	MCFG_PIA_CA2_HANDLER(WRITELINE(laser2001_state, pia_ca2_w))
@@ -984,7 +979,8 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76489_TAG, SN76489A, XTAL_17_73447MHz/9)
-	MCFG_SOUND_CONFIG(psg_intf)
+	MCFG_SN76496_READY_HANDLER(WRITELINE(laser2001_state, write_psg_ready))
+
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")

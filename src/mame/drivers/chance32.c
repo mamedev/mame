@@ -103,12 +103,6 @@ void chance32_state::video_start()
 
 UINT32 chance32_state::screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* TODO: wtf? */
-	m_bg_tilemap->set_scrollx(0, 352);
-	m_bg_tilemap->set_scrolly(0, 160);
-	m_fg_tilemap->set_scrollx(0, 352);
-	m_fg_tilemap->set_scrolly(0, 160);
-
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 

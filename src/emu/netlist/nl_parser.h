@@ -144,7 +144,9 @@ public:
 	netlist_parser(netlist_setup_t &setup)
 	: ptokenizer(), m_setup(setup) {}
 
-	void parse(const char *buf);
+	void parse(const char *buf, const pstring nlname = "");
+
+    void parse_netlist(const pstring &nlname);
 	void net_alias();
 	void netdev_param();
 	void net_c();
@@ -152,6 +154,8 @@ public:
     void netdev_netlist_start();
     void netdev_netlist_end();
     void net_model();
+    void net_submodel();
+    void net_include();
 
 protected:
     virtual void verror(pstring msg, int line_num, pstring line);
@@ -168,8 +172,12 @@ private:
     token_id_t m_tok_NET_MODEL;
     token_id_t m_tok_NETLIST_START;
     token_id_t m_tok_NETLIST_END;
+    token_id_t m_tok_SUBMODEL;
+    token_id_t m_tok_INCLUDE;
 
     netlist_setup_t &m_setup;
+
+    const char *m_buf;
 };
 
 

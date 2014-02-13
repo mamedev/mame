@@ -631,11 +631,6 @@ void mplay_state::screen_eof_megaplay(screen_device &screen, bool state)
 	SCREEN_VBLANK_CALL(megatech_bios);
 }
 
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( megaplay, mplay_state )
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(md_ntsc)
@@ -651,7 +646,6 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 

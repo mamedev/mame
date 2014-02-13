@@ -243,16 +243,6 @@ static TMS9928A_INTERFACE(coleco_tms9928a_interface)
 };
 
 
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 void coleco_state::machine_start()
 {
 	memset(m_ram, 0xff, m_ram.bytes()); // initialize RAM
@@ -332,7 +322,6 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -361,7 +350,6 @@ static MACHINE_CONFIG_START( czz50, coleco_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2) // ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_CONFIG(psg_intf)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

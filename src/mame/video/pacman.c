@@ -175,9 +175,6 @@ VIDEO_START_MEMBER(pacman_state,pacman)
 	m_xoffsethack = 1;
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::pacman_get_tile_info),this), tilemap_mapper_delegate(FUNC(pacman_state::pacman_scan_rows),this),  8, 8, 36, 28 );
-
-	m_bg_tilemap->set_scrolldx(0, 384 - 288 );
-	m_bg_tilemap->set_scrolldy(0, 264 - 224 );
 }
 
 VIDEO_START_MEMBER(pacman_state,birdiy)
@@ -327,9 +324,6 @@ VIDEO_START_MEMBER(pacman_state,pengo)
 	m_xoffsethack = 0;
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pacman_state::pacman_get_tile_info),this), tilemap_mapper_delegate(FUNC(pacman_state::pacman_scan_rows),this),  8, 8, 36, 28 );
-
-	m_bg_tilemap->set_scrolldx(0, 384 - 288 );
-	m_bg_tilemap->set_scrolldy(0, 264 - 224 );
 }
 
 WRITE8_MEMBER(pacman_state::pengo_palettebank_w)

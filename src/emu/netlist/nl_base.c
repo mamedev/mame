@@ -90,11 +90,11 @@ ATTR_COLD void netlist_object_t::init_object(netlist_base_t &nl, const pstring &
 	save_register();
 }
 
-ATTR_COLD const pstring &netlist_object_t::name() const
+ATTR_COLD const pstring netlist_object_t::name() const
 {
 	if (m_name == "")
 		netlist().error("object not initialized");
-	return m_name;
+    return m_name;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -386,7 +386,8 @@ ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, netlist_
 {
 	pstring alias = this->name() + "." + name;
 
-	setup().register_alias(alias, term.name());
+	// everything already fully qualified
+	setup().register_alias_nofqn(alias, term.name());
 
 	if (term.isType(netlist_terminal_t::INPUT) || term.isType(netlist_terminal_t::TERMINAL))
 		m_terminals.add(alias);

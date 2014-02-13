@@ -87,8 +87,7 @@
 #include "emu.h"
 #include "grom.h"
 
-#define LOG logerror
-#define VERBOSE 1
+#define TRACE_ADDRESS 0
 
 /*
     Constructor.
@@ -139,6 +138,7 @@ READ8Z_MEMBER( ti99_grom_device::readz )
 		{
 			// GROMs are buffered. Data is retrieved from a buffer,
 			// while the buffer is replaced with the next cell content.
+			if (TRACE_ADDRESS) if (m_ident==0) logerror("grom0: %04x = %02x\n", m_address-1, m_buffer);
 			*value = m_buffer;
 			// Get next value, put it in buffer. Note that the GROM
 			// wraps at 8K boundaries.
@@ -191,6 +191,7 @@ WRITE8_MEMBER( ti99_grom_device::write )
 				m_buffer = m_memptr[m_address-(m_ident<<13)];
 			}
 			m_waddr_LSB = false;
+			if (TRACE_ADDRESS) if (m_ident==0) logerror("grom0: %04x\n", m_address);
 		}
 		else
 		{

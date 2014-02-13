@@ -44,7 +44,6 @@
 #include "emu.h"
 #include "cpu/g65816/g65816.h"
 #include "includes/apple2.h"
-#include "machine/ay3600.h"
 #include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
@@ -355,7 +354,19 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_VIDEO_START_OVERRIDE(apple2gs_state, apple2gs )
 
 	/* keyboard controller */
-	MCFG_DEVICE_ADD("ay3600", AY3600N, 0)
+	MCFG_DEVICE_ADD("ay3600", AY3600, 0)
+	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
+	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
+	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
+	MCFG_AY3600_MATRIX_X3(IOPORT("X3"))
+	MCFG_AY3600_MATRIX_X4(IOPORT("X4"))
+	MCFG_AY3600_MATRIX_X5(IOPORT("X5"))
+	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
+	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
+	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
+	MCFG_AY3600_SHIFT_CB(READLINE(apple2_state, ay3600_shift_r))
+	MCFG_AY3600_CONTROL_CB(READLINE(apple2_state, ay3600_control_r))
+	MCFG_AY3600_DATA_READY_CB(WRITELINE(apple2_state, ay3600_iie_data_ready_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -447,6 +458,10 @@ ROM_START(apple2gs)
 	ROM_LOAD("341-0748", 0x20000, 0x20000, CRC(d4c50550) SHA1(2784cdd7ac7094b3e494409db3e72b4e6d2d9e81)) /* Needs verification; 341-0748: IIgs ROM03 FE-FF */
 
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE00)
+
+	// temporary: use IIe enhanced keyboard decode ROM
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
 ROM_START(apple2gsr3p)
@@ -465,6 +480,10 @@ ROM_START(apple2gsr3p)
 	ROM_LOAD("341-0729", 0x20000, 0x20000, NO_DUMP) /* 341-0729: IIgs ROM03 prototype FE-FF */
 
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE00)
+
+	// temporary: use IIe enhanced keyboard decode ROM
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
 ROM_START(apple2gsr3lp)
@@ -483,6 +502,10 @@ ROM_START(apple2gsr3lp)
 	ROM_LOAD("341-0749", 0x20000, 0x20000, NO_DUMP) /* 341-0749: unknown ?post? ROM03 IIgs prototype? FE-FF */
 
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE00)
+
+	// temporary: use IIe enhanced keyboard decode ROM
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
 ROM_START(apple2gsr1)
@@ -500,6 +523,10 @@ ROM_START(apple2gsr1)
 	ROM_LOAD("342-0077-b", 0x0000, 0x20000, CRC(42f124b0) SHA1(e4fc7560b69d062cb2da5b1ffbe11cd1ca03cc37)) /* 342-0077-B: IIgs ROM01 */
 
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE00)
+
+	// temporary: use IIe enhanced keyboard decode ROM
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
 ROM_START(apple2gsr0)
@@ -521,6 +548,10 @@ ROM_START(apple2gsr0)
 	ROM_LOAD("rom0d.bin", 0x18000, 0x8000, CRC(200a15b8) SHA1(0c2890bb169ead63369738bbd5f33b869f24c42a))
 
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE00)
+
+	// temporary: use IIe enhanced keyboard decode ROM
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
 ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
@@ -538,6 +569,10 @@ ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
 	ROM_LOAD( "rombf.bin",    0x000000, 0x020000, CRC(ab04fedf) SHA1(977589a17553956d583a21020080a39dd396df5c) )
 
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE00)
+
+	// temporary: use IIe enhanced keyboard decode ROM
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      COMPANY            FULLNAME */

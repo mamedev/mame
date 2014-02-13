@@ -329,15 +329,6 @@ static TMS9928A_INTERFACE(mtx_tms9928a_interface)
 	DEVCB_DRIVER_LINE_MEMBER(mtx_state,mtx_tms9929a_interrupt)
 };
 
-/*-------------------------------------------------
-    sn76496_config psg_intf
--------------------------------------------------*/
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -366,7 +357,6 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL_4MHz)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */

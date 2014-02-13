@@ -382,11 +382,6 @@ ADDRESS_MAP_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( apricot, apricot_state )
 	// main cpu
 	MCFG_CPU_ADD("ic91", I8086, XTAL_15MHz / 3)
@@ -413,7 +408,6 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ic7", SN76489, XTAL_4MHz / 2)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// internal ram

@@ -1039,7 +1039,7 @@ MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
 static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 10738635, memmap, crumap, ti99_8_processor_config)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_10_738635MHz, memmap, crumap, ti99_8_processor_config)
 	MCFG_MACHINE_START_OVERRIDE(ti99_8_state, ti99_8 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_8_state, ti99_8 )
 
@@ -1047,7 +1047,7 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	MCFG_TI998_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9118, ti99_8_tms9118a_interface)
 
 	/* Main board */
-	MCFG_TMS9901_ADD( TMS9901_TAG, tms9901_wiring_ti99_8, 2684658.75 )
+	MCFG_TMS9901_ADD( TMS9901_TAG, tms9901_wiring_ti99_8, XTAL_10_738635MHz/4.0)
 	MCFG_MAINBOARD8_ADD( MAINBOARD8_TAG, mapper_conf )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
@@ -1084,7 +1084,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 10738635, memmap, crumap, ti99_8_processor_config)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_10_738635MHz, memmap, crumap, ti99_8_processor_config)
 	MCFG_MACHINE_START_OVERRIDE(ti99_8_state, ti99_8 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_8_state, ti99_8 )
 
@@ -1092,7 +1092,7 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	MCFG_TI998_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9129, ti99_8_tms9118a_interface)
 
 	/* Main board */
-	MCFG_TMS9901_ADD( TMS9901_TAG, tms9901_wiring_ti99_8, 2684658.75 )
+	MCFG_TMS9901_ADD( TMS9901_TAG, tms9901_wiring_ti99_8, XTAL_10_738635MHz/4.0 )
 	MCFG_MAINBOARD8_ADD( MAINBOARD8_TAG, mapper_conf )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 

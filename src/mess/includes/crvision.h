@@ -97,6 +97,7 @@ public:
 	virtual void machine_start();
 
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	DECLARE_WRITE_LINE_MEMBER( write_psg_ready );
 	DECLARE_READ8_MEMBER( pia_pa_r );
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
 	DECLARE_READ8_MEMBER( pia_pb_r );
@@ -120,6 +121,7 @@ public:
 	required_ioport m_joy2;
 	required_ioport m_joy3;
 	int m_centronics_busy;
+	int m_psg_ready;
 };
 
 #endif

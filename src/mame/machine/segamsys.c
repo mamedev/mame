@@ -1710,11 +1710,6 @@ static NVRAM_HANDLER( sms )
 	}
 }
 
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
 MACHINE_CONFIG_START( sms, driver_device )
 	MCFG_CPU_ADD("maincpu", Z80, 3579540)
 	//MCFG_CPU_PROGRAM_MAP(sms_map)
@@ -1740,6 +1735,5 @@ MACHINE_CONFIG_START( sms, driver_device )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("snsnd", SN76496, 3579540)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

@@ -789,23 +789,6 @@ static GFXDECODE_START( ibm5150 )
 GFXDECODE_END
 
 
-/*************************************
- *
- *  Sound interface
- *
- *************************************/
-
-
-//-------------------------------------------------
-//  sn76496_config psg_intf
-//-------------------------------------------------
-
-static const sn76496_config psg_intf =
-{
-	DEVCB_NULL
-};
-
-
 static const pc_kbdc_interface pc_kbdc_intf =
 {
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pc_state, keyboard_clock_w),
@@ -1051,7 +1034,6 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MCFG_SOUND_ADD("sn76496", NCR7496, XTAL_14_31818MHz/4)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_NVRAM_HANDLER( tandy1000 )
@@ -1121,7 +1103,6 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MCFG_SOUND_ADD("sn76496", NCR7496, XTAL_14_31818MHz/4)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_NVRAM_HANDLER( tandy1000 )
@@ -1192,7 +1173,6 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MCFG_SOUND_ADD("sn76496", NCR7496, XTAL_14_31818MHz/4)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_NVRAM_HANDLER( tandy1000 )
@@ -1268,7 +1248,6 @@ static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MCFG_SOUND_ADD("sn76496", SN76496, XTAL_14_31818MHz/4)
-	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_NVRAM_HANDLER( tandy1000 )
