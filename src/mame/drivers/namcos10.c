@@ -158,7 +158,7 @@ Additional Notes:
                 1. In test mode (Display Test) the screen can be set to interlace or non-interlace mode. The graphics in
                    interlace mode are visually much smoother with noticeable screen flickering. Non-interlace modes gives
                    a much blockier graphic display (i.e. lower resolution) but without screen flickering.
-                2. There is no dedicated highscore/options EEPROM present on the PCB, the game stores it's settings on the
+                2. There is no dedicated highscore/options EEPROM present on the PCB, the game stores its settings on the
                    game board (probably in the program EEPROMs/FlashROMs or maybe the CPLD?).
 
 ROM Daughterboard PCB
@@ -805,9 +805,9 @@ ROM_END
 
 
 GAME( 2000, mrdrilr2,  0,        namcos10_memm, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, mrdrlr2a,  mrdrilr2, namcos10_memm, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR22 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Point Blank 3 (GNN2 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Gunbalina (GNN1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2000, mrdrlr2a,  mrdrilr2, namcos10_memm, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Asia, DR22 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Point Blank 3 (Asia, GNN2 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2001, gjspace,   0,        namcos10_memn, namcos10, namcos10_state, gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2001, mrdrilrg,  0,        namcos10_memn, namcos10, namcos10_state, mrdrilrg, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2001, mrdrilrga, mrdrilrg, namcos10_memn, namcos10, namcos10_state, mrdrilrg, ROT0, "Namco", "Mr. Driller G ALT (Japan, DRG1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
@@ -815,6 +815,6 @@ GAME( 2001, knpuzzle,  0,        namcos10_memn, namcos10, namcos10_state, knpuzz
 GAME( 2002, chocovdr,  0,        namcos10_memn, namcos10, namcos10_state, chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2002, startrgn,  0,        namcos10_memn, namcos10, namcos10_state, startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2002, panikuru,  0,        namcos10_memn, namcos10, namcos10_state, panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2003, nflclsfb,  0,        namcos10_memn, namcos10, namcos10_state, nflclsfb, ROT0, "Namco", "NFL Classic Football (NCF3 Ver.A.)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2003, nflclsfb,  0,        namcos10_memn, namcos10, namcos10_state, nflclsfb, ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2003, gamshara,  0,        namcos10_memn, namcos10, namcos10_state, gamshara, ROT0, "Mitchell", "Gamshara (10021 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2003, konotako,  0,        namcos10_memn, namcos10, namcos10_state, konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )

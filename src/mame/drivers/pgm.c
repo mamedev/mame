@@ -4085,7 +4085,7 @@ GAME( 1997, pgm,          0,         pgm,     pgm, pgm_state,      pgm,        R
    Working (at least one set of the game is fully working)
    -----------------------------------------------------------------------------------------------------------------------*/
 
-// the version numbering on these is a mess... date srings from ROM (and in some cases even those are missing..)
+// the version numbering on these is a mess... date strings from ROM (and in some cases even those are missing..)
 GAME( 1997, orlegend,     pgm,       pgm_asic3,     orlegend, pgm_asic3_state, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 126)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )                // V0001 01/14/98 18:16:38 - runs as World
 GAME( 1997, orlegende,    orlegend,  pgm_asic3,     orlegend, pgm_asic3_state, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 112)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )                // V0001 07/14/97 11:19:45 - runs as World
 GAME( 1997, orlegendc,    orlegend,  pgm_asic3,     orlegend, pgm_asic3_state, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 112, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // V0001 05/05/97 10:08:21 - runs as World, Korea, China
