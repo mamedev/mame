@@ -186,7 +186,7 @@ static const nes_mmc mmc_list[] =
 	{ 154, NAMCOT_34X3 },
 	{ 155, STD_SXROM_A }, // diff compared to MMC1 concern WRAM
 	{ 156, OPENCORP_DAOU306 },
-	{ 157, BANDAI_DATACH }, // no Datach Reader -> we fall back to mapper 16
+	{ 157, BANDAI_DATACH }, // Datach Reader games -> must go in the Datach subslot
 	{ 158, TENGEN_800037 },
 	{ 159, BANDAI_LZ93EX1 }, // with 24c01
 	{ 160, SACHEN_SA009 },
@@ -679,6 +679,10 @@ void nes_cart_slot_device::call_load_ines()
 			mapper_sram_size = m_cart->get_mapper_sram_size();
 			break;
 			//FIXME: we also have to fix Action 52 PRG loading somewhere...
+
+		case BANDAI_DATACH:
+			fatalerror("Bandai Datach games have to be mounted in the Datach subslot!\n");
+			break;
 	}
 
 	// Finally turn off bus conflict emulation, because the pirate variants of the boards are bus conflict free and games would glitch
