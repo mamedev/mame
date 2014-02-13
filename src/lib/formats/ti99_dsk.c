@@ -215,6 +215,10 @@ const ti99_sdf_format::format ti99_sdf_format::formats[] =
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
 		4000, 9, 40, 2, 256, {}, 0, {}, 16, 11, 45
 	},
+	{   //  360K 5.25" double density double sided
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+		2000, 18, 40, 2, 256, {}, 0, {}, 40, 22, 24
+	},
 
 	{ 0 }
 };
@@ -264,7 +268,7 @@ floppy_image_format_t::desc_e* ti99_sdf_format::get_desc_mfm(const format &f, in
 	static floppy_image_format_t::desc_e desc_mfm[] =
 	{
 		{ SECTOR_INTERLEAVE_SKEW, 10, 0 },
-		{ MFM, 0x4e, 40 },                       // track lead-in
+		{ MFM, 0x4e, f.gap_1 },                  // track lead-in
 		{ SECTOR_LOOP_START, 0, 17 },            // 18 sectors
 			{ CRC_CCITT_START, 1 },
 			{   RAW, 0x4489, 3 },                 // A1 sync mark
@@ -275,7 +279,7 @@ floppy_image_format_t::desc_e* ti99_sdf_format::get_desc_mfm(const format &f, in
 			{   SIZE_ID },
 			{ CRC_END, 1 },
 			{ CRC, 1 },
-			{ MFM, 0x4e, 22 },                   // Gap 2
+			{ MFM, 0x4e, f.gap_2 },                   // Gap 2
 			{ MFM, 0x00, 12 },
 			{ CRC_CCITT_START, 2 },
 			{   RAW, 0x4489, 3 },                // A1
@@ -283,12 +287,12 @@ floppy_image_format_t::desc_e* ti99_sdf_format::get_desc_mfm(const format &f, in
 			{   SECTOR_DATA, -1 },               // Sector data
 			{ CRC_END, 2 },
 			{ CRC, 2 },
-			{ MFM, 0x4e, 24 },                   // Gap 3
+			{ MFM, 0x4e, f.gap_3 },                   // Gap 3
 		{ SECTOR_LOOP_END },
 		{ MFM, 0x4e, 0 },                      // track lead-out (712)
 		{ END }
 	};
-	current_size = (40 + 18 * (3 + 1 + 4 + 2 + 22 + 12 + 3 + 1 + 256 + 2 + 24) + 0) * 16;
+	current_size = (f.gap_1 + 18 * (3 + 1 + 4 + 2 + f.gap_2 + 12 + 3 + 1 + 256 + 2 + f.gap_3) + 0) * 16;
 	end_gap_index = 22;
 
 	return desc_mfm;
