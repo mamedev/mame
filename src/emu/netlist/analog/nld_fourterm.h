@@ -83,8 +83,6 @@ protected:
     ATTR_COLD virtual void update_param();
     ATTR_HOT ATTR_ALIGN void update();
 
-    ATTR_COLD void configure(const double Gfac, const double GI);
-
     netlist_terminal_t m_OP;
     netlist_terminal_t m_ON;
 
@@ -95,6 +93,9 @@ protected:
     netlist_terminal_t m_ON1;
 
     netlist_param_double_t m_G;
+    netlist_param_double_t m_RI;
+
+    double m_gfac;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -133,6 +134,7 @@ public:
 
 protected:
     ATTR_COLD virtual void start();
+    ATTR_COLD virtual void reset();
     ATTR_COLD virtual void update_param();
     //ATTR_HOT ATTR_ALIGN void update();
 

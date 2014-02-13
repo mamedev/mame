@@ -18,12 +18,17 @@ WRITE_LINE_MEMBER(kaypro_state::kaypro_interrupt)
 	m_maincpu->set_input_line(0, state);
 }
 
+WRITE_LINE_MEMBER( kaypro_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
 READ8_MEMBER( kaypro_state::pio_system_r )
 {
 	UINT8 data = 0;
 
 	/* centronics busy */
-	data |= m_centronics->not_busy_r() << 3;
+	data |= m_centronics_busy << 3;
 
 	/* PA7 is pulled high */
 	data |= 0x80;
@@ -62,7 +67,7 @@ WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 	output_set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
 	output_set_value("ledB", BIT(data, 1));
 
-	m_centronics->strobe_w(BIT(data, 4));
+	m_centronics->write_strobe(BIT(data, 4));
 
 	m_system_port = data;
 }
@@ -79,7 +84,7 @@ const z80pio_interface kayproii_pio_g_intf =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 	DEVCB_NULL,         /* portA ready active callback */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -118,7 +123,7 @@ const z80pio_interface kaypro4_pio_s_intf =
 
 READ8_MEMBER( kaypro_state::kaypro2x_system_port_r )
 {
-	UINT8 data = m_centronics->busy_r() << 6;
+	UINT8 data = m_centronics_busy << 6;
 	return (m_system_port & 0xbf) | data;
 }
 
@@ -155,7 +160,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 	output_set_value("ledA", BIT(data, 0));     /* LEDs in artwork */
 	output_set_value("ledB", BIT(data, 1));
 
-	m_centronics->strobe_w(BIT(data, 3));
+	m_centronics->write_strobe(BIT(data, 3));
 
 	m_system_port = data;
 }

@@ -63,6 +63,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( speaker_w );
 	DECLARE_WRITE8_MEMBER( kb_w );
 
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
+
 	void crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 
 protected:
@@ -84,6 +87,9 @@ private:
 	required_ioport m_j3a;
 	required_ioport m_j3b;
 	required_ioport m_j7;
+
+	int m_centronics_busy;
+	int m_centronics_fault;
 
 	// sound state
 	int m_vol0;

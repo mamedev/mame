@@ -34,9 +34,9 @@ netlist_queue_t::netlist_queue_t(netlist_base_t &nl)
 void netlist_queue_t::register_state(pstate_manager_t &manager, const pstring &module)
 {
 	NL_VERBOSE_OUT(("register_state\n"));
-	manager.save_item(m_qsize, module + "." + "qsize");
-	manager.save_item(m_times, module + "." + "times");
-	manager.save_item(&(m_name[0][0]), module + "." + "names", sizeof(m_name));
+	manager.save_item(m_qsize, this, module + "." + "qsize");
+	manager.save_item(m_times, this, module + "." + "times");
+	manager.save_item(&(m_name[0][0]), this, module + "." + "names", sizeof(m_name));
 }
 
 void netlist_queue_t::on_pre_save()
@@ -140,18 +140,18 @@ static void tagmap_free_entries(T &tm)
 
 netlist_base_t::~netlist_base_t()
 {
-	tagmap_free_entries<tagmap_devices_t>(m_devices);
-
-	netlist_net_t * const *p = m_nets.first();
-	while (p != NULL)
+	for (int i=0; i < m_nets.count(); i++)
 	{
-		netlist_net_t * const *pn = m_nets.next(p);
-		if (!(*p)->isRailNet())
-			delete (*p);
-		p = pn;
+        if (!m_nets[i]->isRailNet())
+        {
+            delete m_nets[i];
+        }
 	}
 
 	m_nets.reset();
+
+	tagmap_free_entries<tagmap_devices_t>(m_devices);
+
 	pstring::resetmem();
 }
 
@@ -167,7 +167,7 @@ ATTR_COLD void netlist_base_t::start()
     for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
     {
         netlist_device_t *dev = entry->object();
-        dev->init(*this, entry->tag().cstr());
+        dev->start_dev();
     }
 
 }
@@ -373,13 +373,13 @@ ATTR_COLD netlist_setup_t &netlist_device_t::setup()
 ATTR_COLD void netlist_device_t::init(netlist_base_t &anetlist, const pstring &name)
 {
 	netlist_core_device_t::init(anetlist, name);
-	start();
 }
 
 
 ATTR_COLD void netlist_device_t::register_sub(netlist_device_t &dev, const pstring &name)
 {
 	dev.init(netlist(), this->name() + "." + name);
+	dev.start_dev();
 }
 
 ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, netlist_core_terminal_t &term)
@@ -407,7 +407,6 @@ ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_ou
 
 ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_input_t &inp)
 {
-    // FIXME: change register_object as well
     inp.m_family_desc = this->m_family_desc;
 	setup().register_object(*this, name, inp);
     m_terminals.add(inp.name());
@@ -425,7 +424,6 @@ ATTR_COLD void netlist_device_t::register_param(const pstring &sname, C &param, 
 	pstring fullname = this->name() + "." + sname;
 	param.init_object(*this, fullname);
 	param.initial(initialVal);
-	//FIXME: pass fullname from above
 	setup().register_object(*this, fullname, param);
 }
 
@@ -455,6 +453,12 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
     m_new.Analog = 0.0;
     m_cur.Analog = 0.0;
 };
+
+ATTR_COLD netlist_net_t::~netlist_net_t()
+{
+    netlist().remove_save_items(this);
+}
+
 
 ATTR_COLD void netlist_net_t::reset()
 {

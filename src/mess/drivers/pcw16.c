@@ -1031,11 +1031,6 @@ static INPUT_PORTS_START(pcw16)
 INPUT_PORTS_END
 
 
-static const pc_lpt_interface pcw16_lpt_config =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0)
-};
-
 static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 16000000)
@@ -1065,7 +1060,9 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt", pcw16_lpt_config)
+	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
 	MCFG_PC_FDC_SUPERIO_ADD("fdc")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats)

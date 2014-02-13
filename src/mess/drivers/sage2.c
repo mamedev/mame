@@ -260,6 +260,34 @@ static I8255A_INTERFACE( ppi0_intf )
 //  I8255A_INTERFACE( ppi1_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER(sage2_state::write_centronics_ack)
+{
+	if (!state)
+	{
+		m_pic->ir5_w(ASSERT_LINE);
+	}
+}
+
+WRITE_LINE_MEMBER(sage2_state::write_centronics_busy)
+{
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER(sage2_state::write_centronics_perror)
+{
+	m_centronics_perror = state;
+}
+
+WRITE_LINE_MEMBER(sage2_state::write_centronics_select)
+{
+	m_centronics_select = state;
+}
+
+WRITE_LINE_MEMBER(sage2_state::write_centronics_fault)
+{
+	m_centronics_fault = state;
+}
+
 READ8_MEMBER( sage2_state::ppi1_pb_r )
 {
 	/*
@@ -290,10 +318,10 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 	// RS-232 carrier detect
 
 	// centronics
-	data |= m_centronics->busy_r() << 4;
-	data |= m_centronics->pe_r() << 5;
-	data |= m_centronics->vcc_r() << 6;
-	data |= m_centronics->fault_r() << 7;
+	data |= m_centronics_busy << 4;
+	data |= m_centronics_perror << 5;
+	data |= m_centronics_select << 6;
+	data |= m_centronics_fault << 7;
 
 	return data;
 }
@@ -328,8 +356,8 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
 	output_set_led_value(0, BIT(data, 3));
 
 	// centronics
-	m_centronics->strobe_w(BIT(data, 4));
-	m_centronics->init_prime_w(BIT(data, 5));
+	m_centronics->write_strobe(BIT(data, 4));
+	m_centronics->write_init(BIT(data, 5));
 
 	if (!BIT(data, 6))
 	{
@@ -347,7 +375,7 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
 static I8255A_INTERFACE( ppi1_intf )
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 	DEVCB_DRIVER_MEMBER(sage2_state, ppi1_pb_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -473,26 +501,6 @@ void sage2_state::fdc_irq(bool state)
 }
 
 
-//-------------------------------------------------
-//  centronics_interface centronics_intf
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( sage2_state::ack_w )
-{
-	if (!state)
-	{
-		m_pic->ir5_w(ASSERT_LINE);
-	}
-}
-
-static const centronics_interface centronics_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(sage2_state, ack_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "TERM_TXBAUD", 0xff, 0x08 ) // 19200
 	DEVICE_INPUT_DEFAULTS( "TERM_RXBAUD", 0xff, 0x08 ) // 19200
@@ -551,7 +559,14 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_I8251_ADD(I8251_0_TAG, usart0_intf)
 	MCFG_I8251_ADD(I8251_1_TAG, usart1_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(sage2_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(sage2_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(sage2_state, write_centronics_perror))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(sage2_state, write_centronics_select))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(sage2_state, write_centronics_fault))
+
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_IEEE488_BUS_ADD()

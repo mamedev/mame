@@ -225,18 +225,6 @@ WRITE_LINE_MEMBER( e01_device::scsi_req_w )
 
 
 //-------------------------------------------------
-//  centronics_interface e01_centronics_intf
-//-------------------------------------------------
-
-static centronics_interface e01_centronics_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(R6522_TAG, via6522_device, write_ca1),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  ADDRESS_MAP( e01_mem )
 //-------------------------------------------------
 
@@ -272,14 +260,18 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 
 	// devices
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, XTAL_8MHz/4)
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8(CENTRONICS_TAG, centronics_device, write))
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(e01_device, via_irq_w))
 
 	MCFG_MC6854_ADD(MC6854_TAG, adlc_intf)
 	MCFG_WD2793x_ADD(WD2793_TAG, XTAL_8MHz/4)
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", e01_floppies, "35dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", e01_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, e01_centronics_intf)
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
@@ -394,6 +386,7 @@ e01_device::e01_device(const machine_config &mconfig, const char *tag, device_t 
 		m_floppy0(*this, WD2793_TAG":0"),
 		m_floppy1(*this, WD2793_TAG":1"),
 		m_rom(*this, R65C102_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
 		m_adlc_ie(0),
 		m_hdc_ie(0),
 		m_rtc_irq(CLEAR_LINE),
@@ -419,6 +412,7 @@ e01_device::e01_device(const machine_config &mconfig, device_type type, const ch
 		m_floppy0(*this, WD2793_TAG":0"),
 		m_floppy1(*this, WD2793_TAG":1"),
 		m_rom(*this, R65C102_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
 		m_adlc_ie(0),
 		m_hdc_ie(0),
 		m_rtc_irq(CLEAR_LINE),

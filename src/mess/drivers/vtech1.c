@@ -142,12 +142,15 @@ class vtech1_state : public driver_device
 public:
 	vtech1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_mc6847(*this, "mc6847"),
-			m_speaker(*this, "speaker"),
-			m_cassette(*this, "cassette"),
-			m_videoram(*this, "videoram"),
+		m_mc6847(*this, "mc6847"),
+		m_speaker(*this, "speaker"),
+		m_cassette(*this, "cassette"),
+		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG),
+		m_centronics(*this, "centronics")
+	{
+	}
 
 	/* devices */
 	required_device<mc6847_base_device> m_mc6847;
@@ -171,6 +174,8 @@ public:
 	int m_fdc_write;
 	int m_fdc_offs;
 	int m_fdc_latch;
+	int m_centronics_busy;
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_READ8_MEMBER(vtech1_fdc_r);
 	DECLARE_WRITE8_MEMBER(vtech1_fdc_w);
 	DECLARE_READ8_MEMBER(vtech1_serial_r);
@@ -191,6 +196,7 @@ public:
 	void vtech1_put_track();
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<centronics_device> m_centronics;
 };
 
 
@@ -468,18 +474,21 @@ static const floppy_interface vtech1_floppy_interface =
     PRINTER
 ***************************************************************************/
 
+WRITE_LINE_MEMBER(vtech1_state::write_centronics_busy)
+{
+	m_centronics_busy = state;
+}
+
 READ8_MEMBER(vtech1_state::vtech1_printer_r)
 {
-	centronics_device *centronics = machine().device<centronics_device>("centronics");
-	return 0xfe | centronics->busy_r();
+	return 0xfe | m_centronics_busy;
 }
 
 /* TODO: figure out how this really works */
 WRITE8_MEMBER(vtech1_state::vtech1_strobe_w)
 {
-	centronics_device *centronics = machine().device<centronics_device>("centronics");
-	centronics->strobe_w(TRUE);
-	centronics->strobe_w(FALSE);
+	m_centronics->write_strobe(TRUE);
+	m_centronics->write_strobe(FALSE);
 }
 
 
@@ -719,7 +728,7 @@ static ADDRESS_MAP_START( vtech1_io, AS_IO, 8, vtech1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(vtech1_printer_r)
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(vtech1_strobe_w)
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("centronics", centronics_device, write)
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x10, 0x1f) AM_READWRITE(vtech1_fdc_r, vtech1_fdc_w)
 	AM_RANGE(0x20, 0x2f) AM_READ(vtech1_joystick_r)
 	AM_RANGE(0x30, 0x3f) AM_READWRITE(vtech1_serial_r, vtech1_serial_w)
@@ -970,7 +979,10 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(vtech1_state, write_centronics_busy))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* snapshot/quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", vtech1_state, vtech1, "vz", 1.5)

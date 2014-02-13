@@ -14,6 +14,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/speaker.h"
 #include "imagedev/cassette.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
 
 /* screen dimensions */
@@ -51,6 +52,8 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_speaker(*this, "speaker"),
 			m_cassette(*this, "cassette"),
+			m_lpt1(*this, "lpt1"),
+			m_lpt2(*this, "lpt2"),
 			m_ram(*this, RAM_TAG) {
 				sam_bank_read_ptr[0] = NULL;
 				sam_bank_write_ptr[0] = NULL;
@@ -133,6 +136,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
+	required_device<centronics_device> m_lpt1;
+	required_device<centronics_device> m_lpt2;
 	required_device<ram_device> m_ram;
 	void draw_mode4_line(int y, int hpos);
 	void draw_mode3_line(int y, int hpos);
@@ -145,6 +150,11 @@ public:
 	UINT8 samcoupe_mouse_r();
 	void samcoupe_irq(UINT8 src);
 
+	DECLARE_WRITE_LINE_MEMBER(write_lpt1_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_lpt2_busy);
+
+	int m_lpt1_busy;
+	int m_lpt2_busy;
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

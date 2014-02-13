@@ -61,6 +61,7 @@ public:
 		m_crtc(*this, "crtc"),
 		m_via(*this, "via6522"),
 		m_centronics(*this, "centronics"),
+		m_cent_data_out(*this, "cent_data_out"),
 		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1"),
@@ -98,7 +99,6 @@ public:
 	DECLARE_WRITE16_MEMBER(analog_latch_w);
 	DECLARE_WRITE16_MEMBER(dac_latch_w);
 	DECLARE_WRITE16_MEMBER(video_latch_w);
-	DECLARE_READ8_MEMBER(applix_pa_r);
 	DECLARE_READ8_MEMBER(applix_pb_r);
 	DECLARE_WRITE8_MEMBER(applix_pa_w);
 	DECLARE_WRITE8_MEMBER(applix_pb_w);
@@ -157,10 +157,12 @@ private:
 	UINT8   m_p3;
 	UINT16  m_last_write_addr;
 	UINT8 m_cass_data[4];
+	int m_centronics_busy;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;
 	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	required_device<wd1772_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -229,7 +231,9 @@ WRITE16_MEMBER( applix_state::palette_w )
 {
 	offset >>= 4;
 	if (ACCESSING_BITS_0_7)
-		m_centronics->write(space, 0, data);
+	{
+		m_cent_data_out->write(space, 0, data);
+	}
 	else
 		m_palette_latch[offset] = (data >> 8) & 15;
 }
@@ -249,11 +253,6 @@ d4-7 = SW2 dipswitch block
 READ16_MEMBER( applix_state::applix_inputs_r )
 {
 	return m_io_dsw->read() | m_cass_data[2];
-}
-
-READ8_MEMBER( applix_state::applix_pa_r )
-{
-	return (m_pa & 0xfe) | m_centronics->busy_r();
 }
 
 READ8_MEMBER( applix_state::applix_pb_r )
@@ -293,7 +292,7 @@ WRITE8_MEMBER( applix_state::applix_pa_w )
 	if (!BIT(m_pa, 2) && BIT(data, 2))
 		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 
-	m_centronics->strobe_w(BIT(data, 1));
+	m_centronics->write_strobe(BIT(data, 1));
 
 	m_pa = data;
 }
@@ -853,13 +852,6 @@ static const cassette_interface applix_cassette_interface =
 	NULL
 };
 
-static const centronics_interface applix_centronics_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("via6522", via6522_device, write_ca1), // ack
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( applix, applix_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7500000)
@@ -892,9 +884,7 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1875000, applix_crtc) // 6545
 	MCFG_DEVICE_ADD("via6522", VIA6522, 0)
-	MCFG_VIA6522_READPA_HANDLER(READ8(applix_state, applix_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(applix_state, applix_pb_r))
-	// in CA1 cent ack
 	// in CB1 kbd clk
 	// in CA2 vsync
 	// in CB2 kdb data
@@ -902,7 +892,12 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(applix_state, applix_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m68000_device, write_irq2))
 
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", applix_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522", via6522_device, write_ca1))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("via6522", via6522_device, write_pa0))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	MCFG_CASSETTE_ADD("cassette", applix_cassette_interface)
 	MCFG_WD1772x_ADD("fdc", XTAL_16MHz / 2) //connected to Z80H clock pin
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", applix_floppies, "35dd", applix_state::floppy_formats)

@@ -16,8 +16,8 @@
 
 #include "emu.h"
 #include "exp.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/ataintf.h"
+#include "machine/latch.h"
 
 
 
@@ -28,7 +28,7 @@
 // ======================> powermate_ide_device
 
 class powermate_ide_device :  public device_t,
-								public device_adam_expansion_slot_card_interface
+	public device_adam_expansion_slot_card_interface
 {
 public:
 	// construction/destruction
@@ -48,7 +48,7 @@ protected:
 
 private:
 	required_device<ata_interface_device> m_ata;
-	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 
 	UINT16 m_ata_data;
 };

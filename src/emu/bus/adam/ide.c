@@ -20,6 +20,7 @@
 */
 
 #include "ide.h"
+#include "bus/centronics/ctronics.h"
 
 
 
@@ -64,7 +65,9 @@ const rom_entry *powermate_ide_device::device_rom_region() const
 //-------------------------------------------------
 static MACHINE_CONFIG_FRAGMENT( adam_ata )
 	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", NULL, false)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 MACHINE_CONFIG_END
 
 
@@ -92,7 +95,7 @@ powermate_ide_device::powermate_ide_device(const machine_config &mconfig, const 
 	: device_t(mconfig, ADAM_IDE, "Powermate HP IDE", tag, owner, clock, "adam_ide", __FILE__),
 		device_adam_expansion_slot_card_interface(mconfig, *this),
 		m_ata(*this, ATA_TAG),
-		m_centronics(*this, CENTRONICS_TAG)
+		m_cent_data_out(*this, "cent_data_out")
 {
 }
 
@@ -187,7 +190,7 @@ void powermate_ide_device::adam_bd_w(address_space &space, offs_t offset, UINT8 
 			break;
 
 		case 0x40:
-			m_centronics->write(space, 0, data);
+			m_cent_data_out->write(space, 0, data);
 			break;
 
 		case 0x42: // Bank Number

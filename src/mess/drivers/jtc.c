@@ -46,6 +46,9 @@ public:
 	DECLARE_WRITE8_MEMBER( p3_w );
 	DECLARE_PALETTE_INIT(jtc_es40);
 	optional_shared_ptr<UINT8> m_video_ram;
+
+	int m_centronics_busy;
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 };
 
 
@@ -110,7 +113,12 @@ WRITE8_MEMBER( jtc_state::p2_w )
 
 	*/
 
-	m_centronics->strobe_w(BIT(data, 5));
+	m_centronics->write_strobe(BIT(data, 5));
+}
+
+DECLARE_WRITE_LINE_MEMBER( jtc_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
 }
 
 READ8_MEMBER( jtc_state::p3_r )
@@ -133,7 +141,7 @@ READ8_MEMBER( jtc_state::p3_r )
 	UINT8 data = 0;
 
 	data |= ((m_cassette)->input() < 0.0) ? 1 : 0;
-	data |= m_centronics->busy_r() << 3;
+	data |= m_centronics_busy << 3;
 
 	return data;
 }
@@ -636,6 +644,7 @@ void jtces40_state::video_start()
 	save_pointer(NAME(m_color_ram_r), JTC_ES40_VIDEORAM_SIZE);
 	save_pointer(NAME(m_color_ram_g), JTC_ES40_VIDEORAM_SIZE);
 	save_pointer(NAME(m_color_ram_b), JTC_ES40_VIDEORAM_SIZE);
+	save_item(NAME(m_centronics_busy));
 }
 
 UINT32 jtces40_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -734,7 +743,8 @@ static MACHINE_CONFIG_START( basic, jtc_state )
 	MCFG_CASSETTE_ADD("cassette", jtc_cassette_interface)
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(jtc_state, write_centronics_busy))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jtc, basic )

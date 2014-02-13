@@ -398,6 +398,16 @@ static const i8251_interface terminal_8251_intf =
 
 /* Printer 8255A Interface */
 
+WRITE_LINE_MEMBER( xor100_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER( xor100_state::write_centronics_select )
+{
+	m_centronics_select = state;
+}
+
 READ8_MEMBER(xor100_state::i8255_pc_r)
 {
 	/*
@@ -418,10 +428,10 @@ READ8_MEMBER(xor100_state::i8255_pc_r)
 	UINT8 data = 0;
 
 	/* on line */
-	data |= m_centronics->vcc_r() << 4;
+	data |= m_centronics_select << 4;
 
 	/* busy */
-	data |= m_centronics->busy_r() << 5;
+	data |= m_centronics_busy << 5;
 
 	return data;
 }
@@ -429,17 +439,10 @@ READ8_MEMBER(xor100_state::i8255_pc_r)
 static I8255A_INTERFACE( printer_8255_intf )
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w),
+	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, write_strobe),
 	DEVCB_DRIVER_MEMBER(xor100_state, i8255_pc_r),
-	DEVCB_NULL
-};
-
-static const centronics_interface xor100_centronics_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(I8255A_TAG, i8255_device, pc4_w),
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -550,6 +553,7 @@ void xor100_state::machine_start()
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_fdc_dden));
+	save_item(NAME(m_centronics_busy));
 }
 
 void xor100_state::machine_reset()
@@ -578,7 +582,11 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":1", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":2", xor100_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":3", xor100_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, xor100_centronics_intf)
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(I8255A_TAG, i8255_device, pc4_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(xor100_state, write_centronics_busy))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(xor100_state, write_centronics_select))
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8251_A_TAG, i8251_device, write_rx))

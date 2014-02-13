@@ -623,32 +623,6 @@ WRITE8_MEMBER(msx_state::msx_psg_port_b_w)
 	m_psg_b = data;
 }
 
-WRITE8_MEMBER(msx_state::msx_printer_strobe_w)
-{
-	m_centronics->strobe_w(BIT(data, 1));
-}
-
-WRITE8_MEMBER(msx_state::msx_printer_data_w)
-{
-	if (m_io_dsw->read() & 0x80)
-		/* SIMPL emulation */
-		m_dac->write_signed8(data);
-	else
-		m_centronics->write(space, 0, data);
-}
-
-READ8_MEMBER(msx_state::msx_printer_status_r)
-{
-	UINT8 result = 0xfd;
-
-	if (m_io_dsw->read() & 0x80)
-		return 0xff;
-
-	result |= m_centronics->busy_r() << 1;
-
-	return result;
-}
-
 WRITE8_MEMBER( msx_state::msx_fmpac_w )
 {
 	if (m_opll_active)

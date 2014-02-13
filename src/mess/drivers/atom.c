@@ -563,16 +563,6 @@ static I8255_INTERFACE( ppi_intf )
 	DEVCB_DRIVER_MEMBER(atom_state, ppi_pc_w)
 };
 
-READ8_MEMBER( atom_state::printer_busy )
-{
-	return m_centronics->busy_r() << 7;
-}
-
-WRITE8_MEMBER( atom_state::printer_data )
-{
-	m_centronics->write(space, 0, data & 0x7f);
-}
-
 /*-------------------------------------------------
     i8271_interface fdc_intf
 -------------------------------------------------*/
@@ -603,17 +593,6 @@ static const i8271_interface fdc_intf =
 	DEVCB_DRIVER_LINE_MEMBER(atom_state, atom_8271_interrupt_callback),
 	NULL,
 	{ FLOPPY_0, FLOPPY_1 }
-};
-
-/*-------------------------------------------------
-    centronics_interface atom_centronics_config
--------------------------------------------------*/
-
-static const centronics_interface atom_centronics_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER(R6522_TAG, via6522_device, write_ca1),
-	DEVCB_NULL,
-	DEVCB_NULL
 };
 
 /*-------------------------------------------------
@@ -851,15 +830,20 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
-	MCFG_VIA6522_READPA_HANDLER(READ8(atom_state, printer_busy))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(atom_state, printer_data))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, strobe_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(SY6502_TAG, m6502_device, irq_line))
 
 	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
 	MCFG_I8271_ADD(I8271_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(atom_floppy_interface)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, atom_centronics_config)
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_pa7))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
 	MCFG_CASSETTE_ADD("cassette", atom_cassette_interface)
 	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm", 0)
 
@@ -928,13 +912,16 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
-	MCFG_VIA6522_READPA_HANDLER(READ8(atom_state, printer_busy))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(atom_state, printer_data))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, strobe_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(SY6502_TAG, m6502_device, irq_line))
 
 	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, atom_centronics_config)
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_pa7))
+
 	MCFG_CASSETTE_ADD("cassette", atom_cassette_interface)
 
 	/* internal ram */

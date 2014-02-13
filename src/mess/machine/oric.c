@@ -224,7 +224,7 @@ WRITE8_MEMBER(oric_state::oric_via_out_a_func)
 	if (m_psg_control==0)
 	{
 		/* if psg not selected, write to printer */
-		m_centronics->write(space, 0, data);
+		m_cent_data_out->write(space, 0, data);
 	}
 }
 
@@ -295,7 +295,7 @@ WRITE8_MEMBER(oric_state::oric_via_out_b_func)
 	m_cassette->output((data & (1<<7)) ? -1.0 : +1.0);
 
 	/* centronics STROBE is connected to PB4 */
-	m_centronics->strobe_w(BIT(data, 4));
+	m_centronics->write_strobe(BIT(data, 4));
 
 	oric_psg_connection_refresh(space);
 	m_previous_portb_data = data;
@@ -304,20 +304,20 @@ WRITE8_MEMBER(oric_state::oric_via_out_b_func)
 
 WRITE_LINE_MEMBER(oric_state::oric_via_out_ca2_func)
 {
-	m_psg_control &=~1;
-
 	if (state)
 		m_psg_control |=1;
+	else
+		m_psg_control &=~1;
 
 	oric_psg_connection_refresh(generic_space());
 }
 
 WRITE_LINE_MEMBER(oric_state::oric_via_out_cb2_func)
 {
-	m_psg_control &=~2;
-
 	if (state)
 		m_psg_control |=2;
+	else
+		m_psg_control &=~2;
 
 	oric_psg_connection_refresh(generic_space());
 }

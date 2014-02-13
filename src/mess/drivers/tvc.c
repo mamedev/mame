@@ -228,7 +228,7 @@ WRITE8_MEMBER(tvc_state::tvc_sound_w)
 			// bit 0-1 - video mode
 			// bit 7   - centronics STROBE
 			m_video_mode = data & 0x03;
-			m_centronics->strobe_w(BIT(data, 7));
+			m_centronics->write_strobe(BIT(data, 7));
 			if (!BIT(data, 7))
 				m_centronics_ff = 0;
 			break;
@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( tvc_io , AS_IO, 8, tvc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(tvc_border_color_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x02, 0x02) AM_WRITE(tvc_bank_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(tvc_keyboard_w)
 	AM_RANGE(0x04, 0x06) AM_WRITE(tvc_sound_w)
@@ -657,13 +657,6 @@ static const cassette_interface tvc_cassette_interface =
 	NULL
 };
 
-const centronics_interface tvc_centronics_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(tvc_state, tvc_centronics_ack),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static tvc_sound_interface  tvc_sound_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(tvc_state, tvc_int_ff_set),
@@ -709,7 +702,8 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_SOUND_CONFIG(tvc_sound_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, tvc_centronics_intf)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(tvc_state, tvc_centronics_ack))
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

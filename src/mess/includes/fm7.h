@@ -1,3 +1,5 @@
+#include "machine/buffer.h"
+#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "sound/2203intf.h"
@@ -126,7 +128,9 @@ public:
 		m_cassette(*this, "cassette"),
 		m_beeper(*this, "beeper"),
 		m_ym(*this, "ym"),
-		m_psg(*this, "psg")
+		m_psg(*this, "psg"),
+		m_centronics(*this, "centronics"),
+		m_cent_data_out(*this, "cent_data_out")
 	{
 	}
 
@@ -283,6 +287,8 @@ public:
 	required_device<beep_device> m_beeper;
 	optional_device<ym2203_device> m_ym;
 	optional_device<ay8910_device> m_psg;
+	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	void fm7_alu_mask_write(UINT32 offset, int bank, UINT8 dat);
 	void fm7_alu_function_compare(UINT32 offset);
 	void fm7_alu_function_pset(UINT32 offset);
@@ -302,6 +308,16 @@ public:
 	void fm7_mmr_refresh(address_space& space);
 	void key_press(UINT16 scancode);
 	void fm7_keyboard_poll_scan();
+
+	int m_centronics_busy;
+	int m_centronics_fault;
+	int m_centronics_ack;
+	int m_centronics_perror;
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

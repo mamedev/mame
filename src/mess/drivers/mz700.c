@@ -408,7 +408,10 @@ static MACHINE_CONFIG_DERIVED( mz800, mz700 )
 	MCFG_DEVICE_REMOVE("pit8253")
 	MCFG_PIT8253_ADD("pit8253", mz800_pit8253_config)
 	MCFG_Z80PIO_ADD("z80pio", XTAL_17_73447MHz/5, mz800_z80pio_config)
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
 

@@ -10,6 +10,7 @@
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
+#include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8155.h"
 #include "machine/i8251.h"
@@ -133,6 +134,8 @@ public:
 	DECLARE_WRITE8_MEMBER( i8155_pb_w );
 	DECLARE_READ8_MEMBER( i8155_pc_r );
 	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 
 	/* memory state */
 	UINT8 m_bank;           /* memory bank selection */
@@ -143,6 +146,9 @@ public:
 	/* sound state */
 	int m_buzzer;               /* buzzer select */
 	int m_bell;             /* bell output */
+
+	int m_centronics_busy;
+	int m_centronics_select;
 
 	DECLARE_PALETTE_INIT(kc85);
 	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
@@ -194,6 +200,7 @@ public:
 			m_rtc(*this, RP5C01A_TAG),
 			m_lcdc(*this, HD61830_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
+			m_cent_data_out(*this, "cent_data_out"),
 			m_speaker(*this, "speaker"),
 			m_cassette(*this, "cassette"),
 			m_ram(*this, RAM_TAG),
@@ -215,6 +222,7 @@ public:
 	required_device<rp5c01_device> m_rtc;
 	required_device<hd61830_device> m_lcdc;
 	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
@@ -245,6 +253,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
 	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
 	DECLARE_READ_LINE_MEMBER(kc85_sid_r);
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 
 	DECLARE_PALETTE_INIT(tandy200);
 
@@ -262,6 +272,9 @@ public:
 	/* sound state */
 	int m_buzzer;           /* buzzer select */
 	int m_bell;             /* bell output */
+
+	int m_centronics_busy;
+	int m_centronics_select;
 };
 
 /* ---------- defined in video/kyocera.c ---------- */

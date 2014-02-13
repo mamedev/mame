@@ -110,6 +110,9 @@ public:
 	int m_vsync;
 	UINT8 m_mc6847_attr;
 
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	int m_centronics_busy;
+
 	DECLARE_DRIVER_INIT(mc1000);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tick);
 };

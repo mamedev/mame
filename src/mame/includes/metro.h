@@ -6,6 +6,7 @@
 
 #include "sound/okim6295.h"
 #include "sound/2151intf.h"
+#include "sound/es8712.h"
 #include "video/k053936.h"
 #include "machine/eepromser.h"
 
@@ -25,6 +26,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
 		m_ymsnd(*this, "ymsnd"),
+		m_essnd(*this, "essnd"),
 		m_k053936(*this, "k053936") ,
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
@@ -50,6 +52,7 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
 	optional_device<device_t> m_ymsnd; // TODO set correct type
+	optional_device<es8712_device> m_essnd;
 	optional_device<k053936_device> m_k053936;
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_vram_0;
@@ -152,6 +155,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dokyusp_eeprom_bit_w);
 	DECLARE_WRITE16_MEMBER(dokyusp_eeprom_reset_w);
 	DECLARE_WRITE16_MEMBER(mouja_sound_rombank_w);
+	void gakusai_oki_bank_set();
 
 	// vmetal
 	DECLARE_WRITE8_MEMBER(vmetal_control_w);

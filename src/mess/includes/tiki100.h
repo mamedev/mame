@@ -44,30 +44,30 @@ class tiki100_state : public driver_device
 public:
 	tiki100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_ctc(*this, Z80CTC_TAG),
-			m_fdc(*this, FD1797_TAG),
-			m_pio(*this, Z80PIO_TAG),
-			m_dart(*this, Z80DART_TAG),
-			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, FD1797_TAG":0"),
-			m_floppy1(*this, FD1797_TAG":1"),
-			m_cassette(*this, CASSETTE_TAG),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_rom(*this, Z80_TAG),
-			m_video_ram(*this, "video_ram"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
-			m_y5(*this, "Y5"),
-			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7"),
-			m_y8(*this, "Y8"),
-			m_y9(*this, "Y9"),
-			m_y10(*this, "Y10"),
-			m_y11(*this, "Y11"),
-			m_y12(*this, "Y12")
+		m_maincpu(*this, Z80_TAG),
+		m_ctc(*this, Z80CTC_TAG),
+		m_fdc(*this, FD1797_TAG),
+		m_pio(*this, Z80PIO_TAG),
+		m_dart(*this, Z80DART_TAG),
+		m_ram(*this, RAM_TAG),
+		m_floppy0(*this, FD1797_TAG":0"),
+		m_floppy1(*this, FD1797_TAG":1"),
+		m_cassette(*this, CASSETTE_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_rom(*this, Z80_TAG),
+		m_video_ram(*this, "video_ram"),
+		m_y1(*this, "Y1"),
+		m_y2(*this, "Y2"),
+		m_y3(*this, "Y3"),
+		m_y4(*this, "Y4"),
+		m_y5(*this, "Y5"),
+		m_y6(*this, "Y6"),
+		m_y7(*this, "Y7"),
+		m_y8(*this, "Y8"),
+		m_y9(*this, "Y9"),
+		m_y10(*this, "Y10"),
+		m_y11(*this, "Y11"),
+		m_y12(*this, "Y12")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -132,6 +132,14 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER( ctc_tick );
 	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+
+	int m_centronics_ack;
+	int m_centronics_busy;
+	int m_centronics_perror;
 };
 
 #endif

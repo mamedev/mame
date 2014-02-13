@@ -9,28 +9,22 @@
 
 #include "isa.h"
 #include "bus/centronics/ctronics.h"
-#include "bus/centronics/covox.h"
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct pc_lpt_interface
-{
-	devcb_write_line m_out_irq;
-};
+#define MCFG_PC_LPT_IRQ_HANDLER(_devcb) \
+	devcb = &pc_lpt_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-class pc_lpt_device : public device_t,
-								public pc_lpt_interface
+class pc_lpt_device : public device_t
 {
 public:
 	pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~pc_lpt_device() {}
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<pc_lpt_device &>(device).m_irq_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -41,42 +35,54 @@ public:
 	DECLARE_READ8_MEMBER( control_r );
 	DECLARE_WRITE8_MEMBER( control_w );
 
-	DECLARE_WRITE_LINE_MEMBER( ack_w );
+	DECLARE_WRITE_LINE_MEMBER( write_irq_enabled );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
+	void update_irq();
+
+	enum
+	{
+		CONTROL_STROBE = 1,
+		CONTROL_AUTOFD = 2,
+		CONTROL_INIT = 4,
+		CONTROL_SELECT = 8,
+		CONTROL_IRQ_ENABLED = 16,
+		CONTROL_OUTPUT_ENABLED = 32
+	};
+
+	enum
+	{
+		STATUS_FAULT = 8,
+		STATUS_SELECT = 16,
+		STATUS_PERROR = 32,
+		STATUS_ACK = 64,
+		STATUS_BUSY = 128
+	};
+
 	// internal state
-	centronics_device *m_centronics;
 
-	devcb_resolved_write_line m_out_irq_func;
-
+	int m_irq;
 	UINT8 m_data;
-
-	int m_ack;
-
-	/* control latch */
-	int m_strobe;
-	int m_autofd;
-	int m_init;
-	int m_select;
+	UINT8 m_control;
 	int m_irq_enabled;
+	int m_centronics_ack;
+
+	devcb2_write_line m_irq_handler;
+	required_device<input_buffer_device> m_cent_data_in;
+	required_device<output_latch_device> m_cent_data_out;
+	required_device<input_buffer_device> m_cent_status_in;
+	required_device<input_buffer_device> m_cent_ctrl_in;
+	required_device<output_latch_device> m_cent_ctrl_out;
 };
 
 extern const device_type PC_LPT;
-
-
-#define MCFG_PC_LPT_ADD(_tag, _intf) \
-	MCFG_DEVICE_ADD(_tag, PC_LPT, 0) \
-	MCFG_DEVICE_CONFIG(_intf)
-
-#define MCFG_PC_LPT_REMOVE(_tag) \
-	MCFG_DEVICE_REMOVE(_tag)
 
 
 //**************************************************************************
@@ -85,28 +91,31 @@ extern const device_type PC_LPT;
 
 // ======================> isa8_lpt_device
 
-class isa8_lpt_device :
-		public device_t,
-		public device_isa8_card_interface
+class isa8_lpt_device : public device_t,
+	public device_isa8_card_interface
 {
 public:
-		// construction/destruction
-		isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-		// optional information overrides
-		virtual machine_config_constructor device_mconfig_additions() const;
-		virtual ioport_constructor device_input_ports() const;
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
-		bool is_primary() { return m_is_primary; }
+	bool is_primary() { return m_is_primary; }
+
+	WRITE_LINE_MEMBER(pc_cpu_line);
+
 protected:
-		// device-level overrides
-		virtual void device_start();
-		virtual void device_reset();
-private:
-		// internal state
-		bool m_is_primary;
-};
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 
+private:
+
+	// internal state
+	bool m_is_primary;
+};
 
 // device type definition
 extern const device_type ISA8_LPT;

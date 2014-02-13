@@ -150,17 +150,6 @@ TIMER_CALLBACK_MEMBER(super80_state::super80_halfspeed)
 
 /**************************** I/O PORTS *****************************************************************/
 
-READ8_MEMBER( super80_state::super80_dc_r )
-{
-	UINT8 data=0x7f;
-
-	/* bit 7 = printer busy    0 = printer is not busy */
-
-	data |= m_centronics->busy_r() << 7;
-
-	return data;
-}
-
 READ8_MEMBER( super80_state::super80_f2_r )
 {
 	UINT8 data = m_io_dsw->read() & 0xf0;  // dip switches on pcb
@@ -172,9 +161,9 @@ READ8_MEMBER( super80_state::super80_f2_r )
 WRITE8_MEMBER( super80_state::super80_dc_w )
 {
 	/* hardware strobe driven from port select, bit 7..0 = data */
-	m_centronics->strobe_w( 1);
-	m_centronics->write(space, 0, data);
-	m_centronics->strobe_w(0);
+	m_cent_data_out->write(space, 0, data);
+	m_centronics->write_strobe(0);
+	m_centronics->write_strobe(1);
 }
 
 

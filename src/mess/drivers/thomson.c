@@ -652,7 +652,12 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
 
 /* printer */
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", to7_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(thomson_state, to7_io_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(thomson_state, write_centronics_perror))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 /* cassette */
 	MCFG_CASSETTE_ADD( "cassette", to7_cassette_interface )
@@ -1442,7 +1447,7 @@ static MACHINE_CONFIG_DERIVED( to9, to7 )
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
 
 	MCFG_DEVICE_REMOVE("centronics")
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_DEVICE_REMOVE("cent_data_out")
 
 	MCFG_MC6846_MODIFY( "mc6846", to9_timer )
 
@@ -1665,8 +1670,10 @@ static MACHINE_CONFIG_DERIVED( to8, to7 )
 
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
 
-	MCFG_DEVICE_REMOVE("centronics")
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_DEVICE_MODIFY("centronics")
+	MCFG_CENTRONICS_ACK_HANDLER(NULL)
+	MCFG_CENTRONICS_PERROR_HANDLER(NULL)
+	MCFG_DEVICE_REMOVE("cent_data_out")
 
 	MCFG_MC6846_MODIFY( "mc6846", to8_timer )
 
@@ -1820,8 +1827,10 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
 
-	MCFG_DEVICE_REMOVE("centronics")
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_DEVICE_MODIFY("centronics")
+	MCFG_CENTRONICS_ACK_HANDLER(NULL)
+	MCFG_CENTRONICS_PERROR_HANDLER(NULL)
+	MCFG_DEVICE_REMOVE("cent_data_out")
 
 	MCFG_MC6846_MODIFY( "mc6846", to9p_timer )
 
@@ -2166,8 +2175,9 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_game_cb2_out))
 
-	MCFG_DEVICE_REMOVE("centronics")
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", mo6_centronics_config)
+	MCFG_DEVICE_MODIFY("centronics")
+	MCFG_CENTRONICS_ACK_HANDLER(NULL)
+	MCFG_CENTRONICS_PERROR_HANDLER(NULL)
 
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("m5,rom")
@@ -2229,7 +2239,8 @@ static ADDRESS_MAP_START ( mo5nr, AS_PROGRAM, 8, thomson_state )
 	AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
 	AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE(mo5nr_net_r, mo5nr_net_w )
 	AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE(mo6_vreg_r, mo6_vreg_w )
-	AM_RANGE ( 0xa7e1, 0xa7e1 ) AM_DEVREADWRITE("centronics", centronics_device, read, write)
+	AM_RANGE ( 0xa7e1, 0xa7e1 ) AM_DEVREAD("cent_data_in", input_buffer_device, read)
+	AM_RANGE ( 0xa7e1, 0xa7e1 ) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE ( 0xa7e3, 0xa7e3 ) AM_READWRITE(mo5nr_prn_r, mo5nr_prn_w )
 	AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE(mo6_gatearray_r, mo6_gatearray_w )
 	AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
@@ -2401,8 +2412,12 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))
 
-	MCFG_DEVICE_REMOVE("centronics")
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_DEVICE_MODIFY("centronics")
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
+	MCFG_CENTRONICS_ACK_HANDLER(NULL)
+	MCFG_CENTRONICS_PERROR_HANDLER(NULL)
+
+	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("m5,rom")

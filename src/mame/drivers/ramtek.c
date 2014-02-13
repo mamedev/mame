@@ -2,10 +2,10 @@
  
  Ramtek Discrete Games List
  
- Game Name                  DATA
- ----------------------------------
+ Game Name                  DATA      Board #
+ --------------------------------------------
  (Deluxe) Baseball (1974)   YES
- Clean Sweep (1974)         YES
+ Clean Sweep (1974)         YES       501082
  Hockey (1973)              UNKNOWN
  Horoscope (1976)           UNKNOWN
  Knockout (1974)            UNKNOWN
@@ -77,8 +77,8 @@ private:
 
 
 static NETLIST_START(ramtek)
-	SOLVER(Solver)
-	PARAM(Solver.FREQ, 48000)
+	SOLVER(Solver, 48000)
+//	PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
 	// schematics
@@ -138,13 +138,16 @@ ROM_START( bballrmt )
 ROM_END
 
 
+// The board number for Clean Sweep is 501082, and the letter to the right would be the revision letter (A, B, C, D). 
+// Ramtek had revisions A, B, C, D, noted with a sticker that shows the letter for each specific revision. 
+// Revisions A,B,C have been dumped and rom content is the same (only diff is the location of some chips on the rev B pcb)
 ROM_START( cleanswp )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "ramtek4.c6",     0x0000, 0x0020, CRC(be02b5f5) SHA1(f1c616a73c6c2915ea3d0252543b0806704ab2e9) )
-	ROM_LOAD( "ramtek4.d7",     0x0000, 0x0020, CRC(be40b153) SHA1(07fb64ea8caee601e3e3bd6c69beea619dd0489d) )
-	ROM_LOAD( "ramtek4.k3",     0x0000, 0x0020, CRC(515a34ba) SHA1(471ca9d99851591ff11a87d18b88871edd7fd268) )
+	ROM_LOAD( "501075.c6",     0x0000, 0x0020, CRC(be02b5f5) SHA1(f1c616a73c6c2915ea3d0252543b0806704ab2e9) )	// shape of paddle
+	ROM_LOAD( "501076.d7",     0x0000, 0x0020, CRC(be40b153) SHA1(07fb64ea8caee601e3e3bd6c69beea619dd0489d) )	// ball control memory 
+	ROM_LOAD( "501074.k3",     0x0000, 0x0020, CRC(515a34ba) SHA1(471ca9d99851591ff11a87d18b88871edd7fd268) )	// number character generation
 ROM_END
 
 

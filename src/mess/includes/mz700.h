@@ -16,6 +16,7 @@
 #include "machine/z80pio.h"
 #include "sound/speaker.h"
 #include "imagedev/cassette.h"
+#include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
 
 class mz_state : public driver_device
@@ -28,6 +29,7 @@ public:
 		m_pit(*this, "pit8253"),
 		m_ppi(*this, "ppi8255"),
 		m_cassette(*this, "cassette"),
+		m_centronics(*this, "centronics"),
 		m_ram(*this, RAM_TAG) { }
 
 	int m_mz700;                /* 1 if running on an mz700 */
@@ -49,6 +51,10 @@ public:
 
 	int m_hires_mode;           /* 1 if in 640x200 mode */
 	int m_screennum;           /* screen designation */
+
+	int m_centronics_busy;
+	int m_centronics_perror;
+
 	UINT8 *m_colorram;
 	UINT8 *m_videoram;
 	UINT8 m_speaker_level;
@@ -95,11 +101,14 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_port_c_w);
 	DECLARE_READ8_MEMBER(mz800_z80pio_port_a_r);
 	DECLARE_WRITE8_MEMBER(mz800_z80pio_port_a_w);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pit8253_device> m_pit;
 	required_device<i8255_device> m_ppi;
 	required_device<cassette_image_device> m_cassette;
+	optional_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 };
 

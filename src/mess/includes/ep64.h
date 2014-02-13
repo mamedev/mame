@@ -91,6 +91,9 @@ public:
 	DECLARE_WRITE8_MEMBER( wr2_w );
 
 	UINT8 m_key;
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	int m_centronics_busy;
 };
 
 #endif

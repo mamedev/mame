@@ -450,6 +450,7 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 				save_pointer((bool *) s->m_ptr, s->m_name, s->m_count);
 				break;
 			case DT_CUSTOM:
+			    break;
 			case NOT_SUPPORTED:
 			default:
 				netlist().error("found unsupported save element %s\n", s->m_name.cstr());

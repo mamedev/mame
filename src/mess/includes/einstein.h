@@ -100,6 +100,10 @@ public:
 	UINT8 *m_crtc_ram;
 	UINT8   m_de;
 
+	int m_centronics_busy;
+	int m_centronics_perror;
+	int m_centronics_fault;
+
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE8_MEMBER(einstein_80col_ram_w);
 	DECLARE_READ8_MEMBER(einstein_80col_ram_r);
@@ -111,6 +115,9 @@ public:
 	DECLARE_WRITE8_MEMBER(einstein_kybintmsk_w);
 	DECLARE_WRITE8_MEMBER(einstein_adcintmsk_w);
 	DECLARE_WRITE8_MEMBER(einstein_fire_int_w);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_MACHINE_START(einstein2);

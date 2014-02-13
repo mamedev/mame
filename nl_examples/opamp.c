@@ -19,10 +19,8 @@ NETLIST_START(opamp)
 
     /* Standard stuff */
 
-    CLOCK(clk)
-    PARAM(clk.FREQ, 1000) // 1000 Hz
-    SOLVER(Solver)
-    PARAM(Solver.FREQ, 48000)
+    CLOCK(clk, 1000) // 1000 Hz
+    SOLVER(Solver, 48000)
     PARAM(Solver.ACCURACY, 1e-6)
 
     /* Wiring up the opamp */
@@ -40,9 +38,9 @@ NETLIST_START(opamp)
     PARAM(EBUF.RO, 50)
     PARAM(EBUF.G, 1)
 
-    NET_ALIAS(PLUS, G1.IP) // Positive input
-    NET_ALIAS(MINUS, G1.IN) // Negative input
-    NET_ALIAS(OUT, EBUF.OP) // Opamp output ...
+    ALIAS(PLUS, G1.IP) // Positive input
+    ALIAS(MINUS, G1.IN) // Negative input
+    ALIAS(OUT, EBUF.OP) // Opamp output ...
 
     NET_C(EBUF.ON, GND)
 
@@ -55,6 +53,10 @@ NETLIST_START(opamp)
     NET_C(CP1.1, RP1.1)
     NET_C(EBUF.IP, RP1.1)
 
+    RES(RL, 1000)
+    NET_C(RL.2, GND)
+    NET_C(RL.1, OUT)
+
     //LOG(logX, OUT)
-    //LOG(logY, 4V)
+    //LOG(logY, clk)
 NETLIST_END()

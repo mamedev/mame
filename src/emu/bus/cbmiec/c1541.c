@@ -140,6 +140,7 @@
 */
 
 #include "c1541.h"
+#include "bus/centronics/ctronics.h"
 
 
 
@@ -756,7 +757,7 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_w )
 {
 	m_parallel_data = data;
 
-	m_centronics->write(space, 0, data);
+	m_cent_data_out->write(space, 0, data);
 }
 
 
@@ -882,12 +883,12 @@ static MACHINE_CONFIG_FRAGMENT( c1541pdc )
 
 	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(c1541_prologic_dos_classic_device, pia_pb_r))
-	MCFG_PIA_READCA1_HANDLER(DEVREADLINE(CENTRONICS_TAG, centronics_device, ack_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(c1541_prologic_dos_classic_device, pia_pa_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(c1541_prologic_dos_classic_device, pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, strobe_w))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(MC6821_TAG, pia6821_device, ca1_w))
 MACHINE_CONFIG_END
 
 
@@ -1048,7 +1049,7 @@ c1541_professional_dos_v1_device::c1541_professional_dos_v1_device(const machine
 c1541_prologic_dos_classic_device::c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: base_c1541_device(mconfig, C1541_PROLOGIC_DOS_CLASSIC, "C1541 ProLogic-DOS Classic", tag, owner, clock, "c1541pdc", __FILE__),
 		m_pia(*this, MC6821_TAG),
-		m_centronics(*this, CENTRONICS_TAG),
+		m_cent_data_out(*this, "cent_data_out"),
 		m_mmu_rom(*this, "mmu")
 {
 }

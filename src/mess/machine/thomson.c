@@ -11,7 +11,6 @@
 #include "formats/thom_dsk.h"
 #include "includes/thomson.h"
 #include "machine/6821pia.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
 
 #define VERBOSE       0
@@ -623,14 +622,17 @@ READ8_MEMBER( thomson_state::to7_sys_portb_in )
    because the Data Transmit Ready bit is shared in an incompatible way!
 */
 
-
+WRITE_LINE_MEMBER(thomson_state::write_centronics_perror)
+{
+	m_centronics_perror = state;
+}
 
 /* test whether a parallel or a serial device is connected: both cannot
    be exploited at the same time!
 */
 to7_io_dev thomson_state::to7_io_mode()
 {
-	if (m_centronics->pe_r() == TRUE)
+	if (m_centronics_perror == TRUE)
 		return TO7_IO_CENTRONICS;
 	else if ( m_serial->exists())
 		return TO7_IO_RS232;
@@ -680,15 +682,15 @@ WRITE8_MEMBER( to7_io_line_device::porta_out )
 
 READ8_MEMBER( to7_io_line_device::porta_in )
 {
-	centronics_device *printer = machine().device<centronics_device>("centronics");
+	thomson_state *state = machine().driver_data<thomson_state>();
 	int cts = 1;
 	int dsr = ( m_input_state & device_serial_interface::DSR ) ? 0 : 1;
 	int rd  = get_in_data_bit();
 
-	if ( machine().driver_data<thomson_state>()->to7_io_mode() == TO7_IO_RS232 )
+	if ( state->to7_io_mode() == TO7_IO_RS232 )
 		cts = m_input_state & device_serial_interface::CTS ? 0 : 1;
 	else
-		cts = !printer->busy_r();
+		cts = !state->m_centronics_busy;
 
 	LOG_IO(( "%s %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", machine().describe_context(), machine().time().as_double(), machine().driver_data<thomson_state>()->to7_io_mode(), cts, dsr, rd ));
 
@@ -702,7 +704,7 @@ WRITE8_MEMBER( thomson_state::to7_io_portb_out )
 	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), data ));
 
 	/* set 8-bit data */
-	m_centronics->write( space, 0, data);
+	m_cent_data_out->write(data);
 }
 
 
@@ -712,7 +714,7 @@ WRITE_LINE_MEMBER( thomson_state::to7_io_cb2_out )
 	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", m_maincpu->pc(), machine().time().as_double(), state ));
 
 	/* send STROBE to printer */
-	m_centronics->strobe_w(state);
+	m_centronics->write_strobe(state);
 }
 
 
@@ -723,14 +725,6 @@ void to7_io_line_device::input_callback(UINT8 state)
 	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", machine().time().as_double(), (state & device_serial_interface::CTS) ? 1 : 0, (state & device_serial_interface::DSR) ? 1 : 0, (int)get_in_data_bit() ));
 }
 
-
-
-const centronics_interface to7_centronics_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, to7_io_ack),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 void to7_io_line_device::device_reset()
@@ -2827,15 +2821,21 @@ READ8_MEMBER( thomson_state::to9_sys_porta_in )
 
 WRITE8_MEMBER( thomson_state::to9_sys_porta_out )
 {
-	m_centronics->write(space, 0, data & 0xfe);
+	m_centronics->write_data1(BIT(data, 1));
+	m_centronics->write_data2(BIT(data, 2));
+	m_centronics->write_data3(BIT(data, 3));
+	m_centronics->write_data4(BIT(data, 4));
+	m_centronics->write_data5(BIT(data, 5));
+	m_centronics->write_data6(BIT(data, 6));
+	m_centronics->write_data7(BIT(data, 7));
 }
 
 
 
 WRITE8_MEMBER( thomson_state::to9_sys_portb_out )
 {
-	m_centronics->d0_w(BIT(data, 0));
-	m_centronics->strobe_w(BIT(data, 1));
+	m_centronics->write_data0(BIT(data, 0));
+	m_centronics->write_strobe(BIT(data, 1));
 
 	to9_update_ram_bank();
 
@@ -3808,8 +3808,8 @@ READ8_MEMBER( thomson_state::to8_sys_porta_in )
 
 WRITE8_MEMBER( thomson_state::to8_sys_portb_out )
 {
-	m_centronics->d0_w(BIT(data, 0));
-	m_centronics->strobe_w(BIT(data, 1));
+	m_centronics->write_data0(BIT(data, 0));
+	m_centronics->write_strobe(BIT(data, 1));
 
 	to8_update_ram_bank();
 
@@ -3822,12 +3822,16 @@ WRITE8_MEMBER( thomson_state::to8_sys_portb_out )
 /* ------------ 6846 (timer, I/O) ------------ */
 
 
+WRITE_LINE_MEMBER(thomson_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
 
 READ8_MEMBER( thomson_state::to8_timer_port_in )
 {
 	int lightpen = (ioport("lightpen_button")->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
-	int dtr = m_centronics->busy_r() << 6;
+	int dtr = m_centronics_busy << 6;
 	int lock = m_to8_kbd_caps ? 0 : 8; /* undocumented! */
 	return lightpen | cass | dtr | lock;
 }
@@ -4024,7 +4028,7 @@ READ8_MEMBER( thomson_state::to9p_timer_port_in )
 {
 	int lightpen = (ioport("lightpen_button")->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
-	int dtr = m_centronics->busy_r() << 6;
+	int dtr = m_centronics_busy << 6;
 	return lightpen | cass | dtr;
 }
 
@@ -4445,20 +4449,12 @@ WRITE_LINE_MEMBER( thomson_state::mo6_centronics_busy )
 }
 
 
-const centronics_interface mo6_centronics_config =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, mo6_centronics_busy),
-	DEVCB_NULL
-};
-
-
 WRITE8_MEMBER( thomson_state::mo6_game_porta_out )
 {
 	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), data ));
 
 	/* centronics data */
-	m_centronics->write( space, 0, data);
+	m_cent_data_out->write(data);
 }
 
 
@@ -4468,7 +4464,7 @@ WRITE_LINE_MEMBER( thomson_state::mo6_game_cb2_out )
 	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", m_maincpu->pc(), machine().time().as_double(), state ));
 
 	/* centronics strobe */
-	m_centronics->strobe_w(state);
+	m_centronics->write_strobe(state);
 }
 
 
@@ -4900,7 +4896,7 @@ READ8_MEMBER( thomson_state::mo5nr_prn_r )
 {
 	UINT8 result = 0;
 
-	result |= !m_centronics->busy_r() << 7;
+	result |= m_centronics_busy << 7;
 
 	return result;
 }
@@ -4909,7 +4905,7 @@ READ8_MEMBER( thomson_state::mo5nr_prn_r )
 WRITE8_MEMBER( thomson_state::mo5nr_prn_w )
 {
 	/* TODO: understand other bits */
-	m_centronics->strobe_w(BIT(data, 3));
+	m_centronics->write_strobe(BIT(data, 3));
 }
 
 

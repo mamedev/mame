@@ -27,7 +27,7 @@
 // ======================> comx_pl80_device
 
 class comx_pl80_device :  public device_t,
-							public device_centronics_peripheral_interface
+	public device_centronics_peripheral_interface
 {
 public:
 	// construction/destruction
@@ -49,6 +49,15 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) { if (state) m_data |= 0x01; else m_data &= ~0x01; }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) { if (state) m_data |= 0x02; else m_data &= ~0x02; }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) { if (state) m_data |= 0x04; else m_data &= ~0x04; }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) { if (state) m_data |= 0x08; else m_data &= ~0x08; }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) { if (state) m_data |= 0x10; else m_data &= ~0x10; }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) { if (state) m_data |= 0x20; else m_data &= ~0x20; }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) { if (state) m_data |= 0x40; else m_data &= ~0x40; }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) { if (state) m_data |= 0x80; else m_data &= ~0x80; }
+
 private:
 	required_memory_region m_plotter;
 	required_ioport m_font;
@@ -62,6 +71,8 @@ private:
 	UINT8 m_plotter_data;       // plotter data bus
 	int m_plotter_ack;          // plotter acknowledge
 	int m_plotter_online;       // online LED
+
+	UINT8 m_data;
 };
 
 

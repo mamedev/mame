@@ -101,7 +101,7 @@ static const floppy_interface coco_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(coco),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 

@@ -5,7 +5,10 @@
  TV 21 (197?)
  TV 21 III (197?)
  TV Poker (197?)
- 
+
+ These actually seem to use Intel 4040 as a CPU + a lot of discrete circuitry... 
+ to be checked!
+
 ***************************************************************************/
 
 
@@ -68,8 +71,8 @@ private:
 
 
 static NETLIST_START(a1supply)
-	SOLVER(Solver)
-	PARAM(Solver.FREQ, 48000)
+	SOLVER(Solver, 48000)
+//	PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
 	// schematics
@@ -164,6 +167,6 @@ ROM_START( tvpoker )
 ROM_END
 
 
-GAME( 197?, tv21,     0, a1supply, 0, driver_device,  0, ROT0, "A-1 Supply", "T.V. 21 [TTL]", GAME_IS_SKELETON )
-GAME( 197?, tv21_3,   0, a1supply, 0, driver_device,  0, ROT0, "A-1 Supply", "T.V. 21 III [TTL]", GAME_IS_SKELETON )
-GAME( 197?, tvpoker,  0, a1supply, 0, driver_device,  0, ROT0, "A-1 Supply", "T.V. Poker [TTL]", GAME_IS_SKELETON )
+GAME( 197?, tv21,     0, a1supply, 0, driver_device,  0, ROT0, "A-1 Supply", "T.V. 21", GAME_IS_SKELETON )
+GAME( 197?, tv21_3,   0, a1supply, 0, driver_device,  0, ROT0, "A-1 Supply", "T.V. 21 III", GAME_IS_SKELETON )
+GAME( 197?, tvpoker,  0, a1supply, 0, driver_device,  0, ROT0, "A-1 Supply", "T.V. Poker", GAME_IS_SKELETON )

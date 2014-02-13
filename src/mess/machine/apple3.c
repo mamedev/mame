@@ -99,7 +99,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 					result &= ~0x20;
 				}
 			}
-			printf("modifier = %02x\n", result);
+//			printf("modifier = %02x\n", result);
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -504,37 +504,6 @@ UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
 	return result;
 }
 
-
-
-READ8_MEMBER(apple3_state::apple3_indexed_read)
-{
-	UINT8 result;
-	UINT8 *addr;
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	addr = apple3_get_indexed_addr(offset);
-	if (!addr)
-		result = prog_space.read_byte(offset);
-	else if (addr != (UINT8 *) ~0)
-		result = *addr;
-	else
-		result = memregion("maincpu")->base()[offset % memregion("maincpu")->bytes()];
-	return result;
-}
-
-
-
-WRITE8_MEMBER(apple3_state::apple3_indexed_write)
-{
-	UINT8 *addr;
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	addr = apple3_get_indexed_addr(offset);
-	if (!addr)
-		prog_space.write_byte(offset, data);
-	else if (addr != (UINT8 *) ~0)
-		*addr = data;
-}
-
-
 static void apple3_update_drives(device_t *device)
 {
 	apple3_state *state = device->machine().driver_data<apple3_state>();
@@ -928,7 +897,7 @@ static const UINT8 key_remap[0x50][4] =
 	{ 0x4d,0x4d,0x0d,0x0d },    /* m M     24     */
 	{ 0x2c,0x3c,0x2c,0x3c },    /* , <     25     */
 	{ 0x2e,0x3e,0x2e,0x3e },    /* . >     26     */
-	{ 0x3f,0x2f,0x3f,0x2f },    /* / ?     27     */
+	{ 0x2f,0x3f,0x2f,0x3f },    /* / ?     27     */
 	{ 0x00,0x00,0x00,0x00 },    /* 0x28 unused    */
 	{ 0xb9,0xb9,0xb9,0xb9 },    /* 9 (KP)  29     */
 	{ 0x00,0x00,0x00,0x00 },    /* 0x2a unused    */
@@ -945,7 +914,7 @@ static const UINT8 key_remap[0x50][4] =
 	{ 0xb5,0xb5,0xb5,0xb5 },    /* 5 (KP)  35     */
 	{ 0x00,0x00,0x00,0x00 },    /* 0x36 unused    */
 	{ 0xb4,0xb4,0xb4,0xb4 },    /* 4 (KP)  37     */
-	{ 0x27,0x22,0x27,0x22 },    /* ` ~     38     */
+	{ 0x60,0x7e,0x60,0x7e },    /* ` ~     38     */
 	{ 0x5d,0x7d,0x1d,0x1d },    /* ] }     39     */
 	{ 0x50,0x50,0x10,0x10 },    /* p P     3a     */
 	{ 0x5b,0x7b,0x1b,0x1b },    /* [ {     3b     */
@@ -958,7 +927,7 @@ static const UINT8 key_remap[0x50][4] =
 	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   42     */
 	{ 0x8b,0x8b,0x8b,0x8b },    /* Up      43     */
 	{ 0x00,0x00,0x00,0x00 },    /* 0x44 unused    */
-	{ 0x3d,0x2b,0x3d,0x2b },    /* ' "     45     */
+	{ 0x27,0x22,0x27,0x22 },    /* ' "     45     */
 	{ 0x00,0x00,0x00,0x00 },    /* 0x46 unused    */
 	{ 0x00,0x00,0x00,0x00 },    /* 0x47 unused    */
 	{ 0x8d,0x8d,0x8d,0x8d },    /* Ent(KP) 48     */
@@ -967,7 +936,7 @@ static const UINT8 key_remap[0x50][4] =
 	{ 0xad,0xad,0xad,0xad },    /* - (KP)  4b     */
 	{ 0x95,0x95,0x95,0x95 },    /* Right   4c     */
 	{ 0x8a,0x8a,0x8a,0x8a },    /* Down    4d     */
-	{ 0x8b,0x8b,0x8b,0x8b },    /* Left    4e     */
+	{ 0x88,0x88,0x88,0x88 },    /* Left    4e     */
 	{ 0x00,0x00,0x00,0x00 }     /* 0x4f unused    */
 };
 

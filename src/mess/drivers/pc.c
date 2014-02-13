@@ -737,11 +737,6 @@ INPUT_PORTS_END
 
 
 
-static const pc_lpt_interface pc_lpt_config =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0)
-};
-
 FLOPPY_FORMATS_MEMBER( pc_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
@@ -905,9 +900,15 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
@@ -1037,9 +1038,14 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 	MCFG_NVRAM_HANDLER( europc_rtc )
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
@@ -1119,9 +1125,15 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 	MCFG_NVRAM_HANDLER( tandy1000 )
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
@@ -1189,9 +1201,15 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 	MCFG_NVRAM_HANDLER( tandy1000 )
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
@@ -1260,9 +1278,15 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 	MCFG_NVRAM_HANDLER( tandy1000 )
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
@@ -1344,9 +1368,15 @@ static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 	MCFG_NVRAM_HANDLER( tandy1000 )
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	/* cassette */
@@ -1425,9 +1455,14 @@ static MACHINE_CONFIG_START( asst128, pc_state )
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_CASSETTE_ADD( "cassette", mc1502_cassette_interface )
 
@@ -1521,9 +1556,15 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
@@ -1601,9 +1642,15 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
@@ -1680,9 +1727,15 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
@@ -1759,9 +1812,15 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
@@ -1838,9 +1897,15 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
-	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
-	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
+	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")

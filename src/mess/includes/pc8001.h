@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/8257dma.h"
 #include "machine/i8255.h"
@@ -38,6 +39,7 @@ public:
 			m_crtc(*this, UPD3301_TAG),
 			m_cassette(*this, "cassette"),
 			m_centronics(*this, CENTRONICS_TAG),
+			m_cent_data_out(*this, "cent_data_out"),
 			m_speaker(*this, "speaker"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, Z80_TAG),
@@ -50,6 +52,7 @@ public:
 	required_device<upd3301_device> m_crtc;
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
@@ -70,6 +73,12 @@ public:
 	/* video state */
 	int m_width80;
 	int m_color;
+
+	int m_centronics_busy;
+	int m_centronics_ack;
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 };
 
 class pc8001mk2_state : public pc8001_state

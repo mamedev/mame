@@ -13,8 +13,9 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define SOLVER(_name)                                                        \
-		NET_REGISTER_DEV(solver, _name)
+#define SOLVER(_name, _freq)                                                 \
+		NET_REGISTER_DEV(solver, _name)                                      \
+        PARAM(_name.FREQ, _freq)
 
 // ----------------------------------------------------------------------------------------
 // solver

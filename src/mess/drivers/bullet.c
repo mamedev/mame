@@ -554,7 +554,6 @@ WRITE8_MEMBER( bulletf_state::scsi_w )
 	update_dma_rdy();
 }
 
-
 //-------------------------------------------------
 //  hwsts_r -
 //-------------------------------------------------
@@ -579,7 +578,7 @@ READ8_MEMBER( bulletf_state::hwsts_r )
 	UINT8 data = 0;
 
 	// centronics busy
-	data |= m_centronics->busy_r();
+	data |= m_centronics_busy;
 
 	// DIP switches
 	data |= m_sw1->read() & 0x06;
@@ -908,6 +907,26 @@ static Z80DMA_INTERFACE( bulletf_dma_intf )
 //  Z80PIO_INTERFACE( pio_intf )
 //-------------------------------------------------
 
+DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
+DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_perror )
+{
+	m_centronics_perror = state;
+}
+
+DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_select )
+{
+	m_centronics_select = state;
+}
+
+DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_fault )
+{
+	m_centronics_fault = state;
+}
+
 READ8_MEMBER( bullet_state::pio_pb_r )
 {
 	/*
@@ -928,10 +947,10 @@ READ8_MEMBER( bullet_state::pio_pb_r )
 	UINT8 data = 0;
 
 	// centronics
-	data |= m_centronics->busy_r();
-	data |= m_centronics->pe_r() << 1;
-	data |= m_centronics->vcc_r() << 2;
-	data |= m_centronics->fault_r() << 3;
+	data |= m_centronics_busy;
+	data |= m_centronics_perror << 1;
+	data |= m_centronics_select << 2;
+	data |= m_centronics_fault << 3;
 
 	return data;
 }
@@ -940,7 +959,7 @@ static Z80PIO_INTERFACE( pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(bullet_state, pio_pb_r),
 	DEVCB_NULL,
@@ -1004,7 +1023,7 @@ WRITE8_MEMBER( bulletf_state::pio_pa_w )
 
 WRITE_LINE_MEMBER( bulletf_state::cstrb_w )
 {
-	m_centronics->strobe_w(!state);
+	m_centronics->write_strobe(!state);
 }
 
 static Z80PIO_INTERFACE( bulletf_pio_intf )
@@ -1012,7 +1031,7 @@ static Z80PIO_INTERFACE( bulletf_pio_intf )
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_DRIVER_MEMBER(bulletf_state, pio_pa_r),
 	DEVCB_DRIVER_MEMBER(bulletf_state, pio_pa_w),
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(bulletf_state, cstrb_w)
@@ -1118,6 +1137,10 @@ void bullet_state::machine_start()
 	save_item(NAME(m_winrdy));
 	save_item(NAME(m_exrdy1));
 	save_item(NAME(m_exrdy2));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_perror));
+	save_item(NAME(m_centronics_select));
+	save_item(NAME(m_centronics_fault));
 }
 
 
@@ -1138,6 +1161,7 @@ void bulletf_state::machine_start()
 	save_item(NAME(m_mbank));
 	save_item(NAME(m_wack));
 	save_item(NAME(m_wrdy));
+	save_item(NAME(m_centronics_busy));
 }
 
 
@@ -1225,7 +1249,14 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":5", bullet_8_floppies, NULL,      floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":6", bullet_8_floppies, NULL,      floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":7", bullet_8_floppies, NULL,      floppy_image_device::default_floppy_formats)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(bullet_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(bullet_state, write_centronics_perror))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(bullet_state, write_centronics_select))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(bullet_state, write_centronics_fault))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "serial_terminal")
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
@@ -1271,7 +1302,11 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":7", bullet_8_floppies, NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":8", bullet_35_floppies, NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":9", bullet_35_floppies, NULL, floppy_image_device::default_floppy_formats)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(bullet_state, write_centronics_busy))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "serial_terminal")
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))

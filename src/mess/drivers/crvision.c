@@ -128,32 +128,6 @@ CN1     - main board connector (17x2 pin header)
 #include "includes/crvision.h"
 
 /***************************************************************************
-    READ/WRITE HANDLERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    centronics_status_r - centronics status
--------------------------------------------------*/
-
-READ8_MEMBER( crvision_state::centronics_status_r )
-{
-	UINT8 data = 0;
-
-	data |= m_centronics->busy_r() << 7;
-
-	return data;
-}
-
-/*-------------------------------------------------
-    centronics_ctrl_w - centronics control
--------------------------------------------------*/
-
-WRITE8_MEMBER( crvision_state::centronics_ctrl_w )
-{
-	m_centronics->strobe_w(BIT(data, 4));
-}
-
-/***************************************************************************
     MEMORY MAPS
 ***************************************************************************/
 
@@ -171,8 +145,9 @@ static ADDRESS_MAP_START( crvision_map, AS_PROGRAM, 8, crvision_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(BANK_ROM2)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(BANK_ROM1)
 //  AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(3)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
-	AM_RANGE(0xe801, 0xe801) AM_READWRITE(centronics_status_r, centronics_ctrl_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("cent_data_out", output_latch_device, write)
+	AM_RANGE(0xe801, 0xe801) AM_DEVREAD("cent_status_in", input_buffer_device, read)
+	AM_RANGE(0xe801, 0xe801) AM_DEVWRITE("cent_ctrl_out", output_latch_device, write)
 //  AM_RANGE(0xe802, 0xf7ff) AM_RAMBANK(4)
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
 ADDRESS_MAP_END
@@ -677,7 +652,7 @@ WRITE8_MEMBER( laser2001_state::pia_pb_w )
 	m_keylatch = data;
 
 	/* centronics data */
-	m_centronics->write(space, 0, data);
+	m_cent_data_out->write(space, 0, data);
 }
 
 READ_LINE_MEMBER( laser2001_state::pia_ca1_r )
@@ -690,10 +665,16 @@ WRITE_LINE_MEMBER( laser2001_state::pia_ca2_w )
 	m_cassette->output(state ? +1.0 : -1.0);
 }
 
+
+WRITE_LINE_MEMBER(laser2001_state::write_centronics_busy)
+{
+	m_centronics_busy = state;
+	m_pia->cb1_w(m_psg->ready_r() && m_centronics_busy);
+}
+
 READ_LINE_MEMBER( laser2001_state::pia_cb1_r )
 {
-	/* actually this is a diode-AND (READY & _BUSY), but ctronics.c returns busy status if printer image is not mounted -> Manager won't boot */
-	return m_psg->ready_r() && (m_centronics->not_busy_r() || m_pia->ca2_output_z());
+	return m_psg->ready_r() && m_centronics_busy;
 }
 
 WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )
@@ -704,7 +685,7 @@ WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )
 	}
 	else
 	{
-		m_centronics->strobe_w(state);
+		m_centronics->write_strobe(state);
 	}
 }
 
@@ -732,17 +713,6 @@ static const cassette_interface lasr2001_cassette_interface =
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
 	NULL,
 	NULL
-};
-
-/*-------------------------------------------------
-    centronics_interface lasr2001_centronics_intf
--------------------------------------------------*/
-
-static const centronics_interface lasr2001_centronics_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(PIA6821_TAG, pia6821_device, cb1_w)
 };
 
 /*-------------------------------------------------
@@ -921,7 +891,15 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8(SN76489_TAG, sn76496_base_device, write))
 
 	MCFG_CASSETTE_ADD("cassette", crvision_cassette_interface)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
+
+	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
+	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
+	MCFG_OUTPUT_LATCH_BIT4_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -991,7 +969,11 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(laser2001_state, pia_cb2_w))
 
 	MCFG_CASSETTE_ADD("cassette", lasr2001_cassette_interface)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(laser2001_state, write_centronics_busy))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	// video hardware
 	MCFG_TMS9928A_ADD( TMS9929_TAG, TMS9929A, vdp_intf )

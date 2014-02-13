@@ -370,6 +370,21 @@ static MC6845_INTERFACE( bw12_mc6845_interface )
 
 /* PIA6821 Interface */
 
+WRITE_LINE_MEMBER( bw12_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER( bw12_state::write_centronics_fault )
+{
+	m_centronics_fault = state;
+}
+
+WRITE_LINE_MEMBER( bw12_state::write_centronics_perror )
+{
+	m_centronics_perror = state;
+}
+
 READ8_MEMBER( bw12_state::pia_pa_r )
 {
 	/*
@@ -389,9 +404,9 @@ READ8_MEMBER( bw12_state::pia_pa_r )
 
 	UINT8 data = 0;
 
-	data |= m_centronics->busy_r();
-	data |= (m_centronics->fault_r() << 1);
-	data |= (m_centronics->pe_r() << 2);
+	data |= m_centronics_busy;
+	data |= (m_centronics_fault << 1);
+	data |= (m_centronics_perror << 2);
 	data |= (m_motor_on << 3);
 	data |= (m_pit_out2 << 4);
 	data |= (m_key_stb << 5);
@@ -414,15 +429,6 @@ WRITE_LINE_MEMBER( bw12_state::pia_cb2_w )
 		}
 	}
 }
-
-/* Centronics Interface */
-
-static const centronics_interface bw12_centronics_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(PIA6821_TAG, pia6821_device, ca1_w),       /* ACK output */
-	DEVCB_NULL,                                         /* BUSY output */
-	DEVCB_NULL                                          /* NOT BUSY output */
-};
 
 /* Z80-SIO/0 Interface */
 
@@ -633,9 +639,8 @@ static MACHINE_CONFIG_START( common, bw12_state )
 
 	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(bw12_state, pia_pa_r))
-	MCFG_PIA_READCA1_HANDLER(DEVREADLINE(CENTRONICS_TAG, centronics_device, ack_r))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8(CENTRONICS_TAG, centronics_device, write))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, strobe_w))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(bw12_state, pia_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE(Z80_TAG, z80_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE(Z80_TAG, z80_device, irq_line))
@@ -655,7 +660,13 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsb_w))
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, bw12_centronics_intf)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(PIA6821_TAG, pia6821_device, ca1_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(bw12_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(bw12_state, write_centronics_fault))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(bw12_state, write_centronics_perror))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw12, common )

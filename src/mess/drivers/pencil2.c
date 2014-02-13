@@ -88,22 +88,28 @@ class pencil2_state : public driver_device
 public:
 	pencil2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_printer(*this, "centronics"),
-	m_cass(*this, "cassette")
-	{ }
+		m_maincpu(*this, "maincpu"),
+		m_centronics(*this, "centronics"),
+		m_cass(*this, "cassette")
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port30_w);
 	DECLARE_WRITE8_MEMBER(port80_w);
 	DECLARE_WRITE8_MEMBER(portc0_w);
 	DECLARE_READ8_MEMBER(porte2_r);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
-	required_device<centronics_device> m_printer;
+	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_cass;
+
+	int m_centronics_busy;
+	int m_centronics_ack;
 };
 
 static ADDRESS_MAP_START(pencil2_mem, AS_PROGRAM, 8, pencil2_state)
@@ -117,7 +123,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pencil2_io, AS_IO, 8, pencil2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("centronics", centronics_device, write)
+	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x10, 0x1f) AM_WRITE(port10_w)
 	AM_RANGE(0x30, 0x3f) AM_WRITE(port30_w)
 	AM_RANGE(0x80, 0x9f) AM_WRITE(port80_w)
@@ -144,7 +150,7 @@ READ8_MEMBER( pencil2_state::porte2_r)
 
 WRITE8_MEMBER( pencil2_state::port10_w )
 {
-	m_printer->strobe_w(BIT(data, 0));
+	m_centronics->write_strobe(BIT(data, 0));
 }
 
 WRITE8_MEMBER( pencil2_state::port30_w )
@@ -160,14 +166,24 @@ WRITE8_MEMBER( pencil2_state::portc0_w )
 {
 }
 
+WRITE_LINE_MEMBER( pencil2_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
 CUSTOM_INPUT_MEMBER( pencil2_state::printer_ready_r )
 {
-	return m_printer->busy_r();
+	return m_centronics_busy;
+}
+
+WRITE_LINE_MEMBER( pencil2_state::write_centronics_ack )
+{
+	m_centronics_ack = state;
 }
 
 CUSTOM_INPUT_MEMBER( pencil2_state::printer_ack_r )
 {
-	return m_printer->ack_r();
+	return m_centronics_ack;
 }
 
 
@@ -311,7 +327,11 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 //  MCFG_CARTSLOT_INTERFACE("pencil2_cart")
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pencil2_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(pencil2_state, write_centronics_busy))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
 /* ROM definition */

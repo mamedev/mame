@@ -1759,7 +1759,7 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 	m_rs232->dtr_w(BIT(data, 4));
 
 	// centronics strobe
-	m_centronics->strobe_w(BIT(data, 5));
+	m_centronics->write_strobe(BIT(data, 5));
 }
 
 static const ay8910_interface psg_intf =
@@ -1769,7 +1769,7 @@ static const ay8910_interface psg_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(st_state, psg_pa_w),
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write)
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 };
 
 
@@ -1814,7 +1814,7 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 	m_rs232->dtr_w(BIT(data, 4));
 
 	// centronics strobe
-	m_centronics->strobe_w(BIT(data, 5));
+	m_centronics->write_strobe(BIT(data, 5));
 
 	// density select
 	m_fdc->dden_w(BIT(data, 7));
@@ -1827,7 +1827,7 @@ static const ay8910_interface stbook_psg_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(stbook_state, psg_pa_w),
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write)
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 };
 
 
@@ -1975,18 +1975,6 @@ void st_state::fdc_drq_w(bool state)
 static RP5C15_INTERFACE( rtc_intf )
 {
 	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  centronics_interface centronics_intf
-//-------------------------------------------------
-
-static const centronics_interface centronics_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(MC68901_TAG, mc68901_device, i0_w),
 	DEVCB_NULL
 };
 
@@ -2274,7 +2262,8 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2337,7 +2326,9 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2409,7 +2400,9 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2491,7 +2484,9 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_WD1772x_ADD(WD1772_TAG, U517/2)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))

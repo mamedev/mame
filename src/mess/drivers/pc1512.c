@@ -391,11 +391,11 @@ READ8_MEMBER( pc1512_state::printer_r )
 
 		data |= m_lk->read() & 0x07;
 
-		data |= m_centronics->fault_r() << 3;
-		data |= m_centronics->vcc_r() << 4;
-		data |= m_centronics->pe_r() << 5;
-		data |= m_centronics->ack_r() << 6;
-		data |= m_centronics->busy_r() << 7;
+		data |= m_centronics_fault << 3;
+		data |= m_centronics_select << 4;
+		data |= m_centronics_perror << 5;
+		data |= m_centronics_ack << 6;
+		data |= m_centronics_busy << 7;
 		break;
 
 	case 2:
@@ -496,7 +496,7 @@ WRITE8_MEMBER( pc1512_state::printer_w )
 	{
 	case 0:
 		m_printer_data = data;
-		m_centronics->write(space, 0, data);
+		m_cent_data_out->write(space, 0, data);
 		break;
 
 	case 2:
@@ -517,9 +517,9 @@ WRITE8_MEMBER( pc1512_state::printer_w )
 
 		m_printer_control = data & 0x1f;
 
-		m_centronics->strobe_w(BIT(data, 0));
-		m_centronics->autofeed_w(BIT(data, 1));
-		m_centronics->init_prime_w(BIT(data, 2));
+		m_centronics->write_strobe(BIT(data, 0));
+		m_centronics->write_autofd(BIT(data, 1));
+		m_centronics->write_init(BIT(data, 2));
 
 		m_ack_int_enable = BIT(data, 4);
 		update_ack();
@@ -1081,23 +1081,36 @@ static const ins8250_interface uart_intf =
 void pc1512_state::update_ack()
 {
 	if (m_ack_int_enable)
-		m_pic->ir7_w(m_ack);
+		m_pic->ir7_w(m_centronics_ack);
 	else
 		m_pic->ir7_w(CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( pc1512_state::ack_w )
+WRITE_LINE_MEMBER( pc1512_state::write_centronics_ack )
 {
-	m_ack = state;
+	m_centronics_ack = state;
 	update_ack();
 }
 
-static const centronics_interface centronics_intf =
+WRITE_LINE_MEMBER( pc1512_state::write_centronics_busy )
 {
-	DEVCB_DRIVER_LINE_MEMBER(pc1512_state, ack_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER( pc1512_state::write_centronics_perror )
+{
+	m_centronics_perror = state;
+}
+
+WRITE_LINE_MEMBER( pc1512_state::write_centronics_select )
+{
+	m_centronics_select = state;
+}
+
+WRITE_LINE_MEMBER( pc1512_state::write_centronics_fault )
+{
+	m_centronics_fault = state;
+}
 
 
 //-------------------------------------------------
@@ -1179,7 +1192,11 @@ void pc1512_state::machine_start()
 	save_item(NAME(m_ddrq));
 	save_item(NAME(m_neop));
 	save_item(NAME(m_ack_int_enable));
-	save_item(NAME(m_ack));
+	save_item(NAME(m_centronics_ack));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_perror));
+	save_item(NAME(m_centronics_select));
+	save_item(NAME(m_centronics_fault));
 	save_item(NAME(m_printer_data));
 	save_item(NAME(m_printer_control));
 	save_item(NAME(m_toggle));
@@ -1248,7 +1265,11 @@ void pc1640_state::machine_start()
 	save_item(NAME(m_ddrq));
 	save_item(NAME(m_neop));
 	save_item(NAME(m_ack_int_enable));
-	save_item(NAME(m_ack));
+	save_item(NAME(m_centronics_ack));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_perror));
+	save_item(NAME(m_centronics_select));
+	save_item(NAME(m_centronics_fault));
 	save_item(NAME(m_printer_data));
 	save_item(NAME(m_printer_control));
 	save_item(NAME(m_speaker_drive));
@@ -1296,7 +1317,16 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, NULL,    pc1512_state::floppy_formats)
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pc1512_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(pc1512_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(pc1512_state, write_centronics_perror))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(pc1512_state, write_centronics_select))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(pc1512_state, write_centronics_fault))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, rx_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, dcd_w))
@@ -1365,7 +1395,16 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, NULL,    pc1512_state::floppy_formats)
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pc1512_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(pc1512_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(pc1512_state, write_centronics_perror))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(pc1512_state, write_centronics_select))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(pc1512_state, write_centronics_fault))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, rx_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, dcd_w))

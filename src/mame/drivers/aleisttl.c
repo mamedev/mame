@@ -2,14 +2,14 @@
  
  Allied Leisure discrete hardware games
  
- Hesitation (1974)                AL-6500
+ Hesitation (1974)                AL-6500?
  Paddle Battle (1973)
  Robot (1975)                     AL-7500
  Ski (1975)
- Street Burners (1975)
+ Street Burners (1975)            URL-8300
  Super Soccer (1973)
  Tennis Tourney (1973)
- Zap (1974)
+ Zap (1974)                       AL-6500
  
 ***************************************************************************/
 
@@ -73,8 +73,8 @@ private:
 
 
 static NETLIST_START(sburners)
-	SOLVER(Solver)
-	PARAM(Solver.FREQ, 48000)
+	SOLVER(Solver, 48000)
+//	PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
 	// schematics

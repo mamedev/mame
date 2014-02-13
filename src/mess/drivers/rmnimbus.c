@@ -79,13 +79,6 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B      /* 8 kHz */
 };
 
-static const centronics_interface nimbus_centronics_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_ack_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static ADDRESS_MAP_START(nimbus_mem, AS_PROGRAM, 16, rmnimbus_state )
 	AM_RANGE( 0x00000, 0x1FFFF ) AM_RAMBANK(RAM_BANK00_TAG)
 	AM_RANGE( 0x20000, 0x3FFFF ) AM_RAMBANK(RAM_BANK01_TAG)
@@ -332,12 +325,13 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_ER59256_ADD(ER59256_TAG)
 
 	MCFG_DEVICE_ADD(VIA_TAG, VIA6522, 1000000)
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8(CENTRONICS_TAG, centronics_device, write))
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(rmnimbus_state,nimbus_via_write_portb))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, strobe_w))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(rmnimbus_state,nimbus_via_irq_w))
 
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, nimbus_centronics_config)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(rmnimbus_state, nimbus_ack_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO(MONO_TAG)

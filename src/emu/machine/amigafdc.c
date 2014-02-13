@@ -416,8 +416,8 @@ UINT8 amiga_fdc::ciaapra_r()
 void amiga_fdc::index_callback(floppy_image_device *floppy, int state)
 {
 	/* Issue a index pulse when a disk revolution completes */
-	device_t *cia = machine().device("cia_1");
-	mos6526_flag_w(cia, !state);
+	legacy_mos6526_device *cia = machine().device<legacy_mos6526_device>("cia_1");
+	cia->flag_w(!state);
 }
 
 void amiga_fdc::pll_t::set_clock(attotime period)

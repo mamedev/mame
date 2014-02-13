@@ -15,7 +15,6 @@
 #include "machine/i8255.h"
 #include "machine/z80pio.h"
 #include "machine/74145.h"
-#include "bus/centronics/ctronics.h"
 #include "sound/speaker.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
@@ -533,13 +532,22 @@ static void mz800_z80pio_irq(device_t *device, int which)
 	state->m_maincpu->set_input_line(0, which);
 }
 
+WRITE_LINE_MEMBER(mz_state::write_centronics_busy)
+{
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER(mz_state::write_centronics_perror)
+{
+	m_centronics_perror = state;
+}
+
 READ8_MEMBER(mz_state::mz800_z80pio_port_a_r)
 {
-	centronics_device *centronics = machine().device<centronics_device>("centronics");
 	UINT8 result = 0;
 
-	result |= centronics->busy_r();
-	result |= centronics->pe_r() << 1;
+	result |= m_centronics_busy;
+	result |= m_centronics_perror << 1;
 	result |= machine().primary_screen->hblank() << 5;
 
 	return result;
@@ -547,10 +555,8 @@ READ8_MEMBER(mz_state::mz800_z80pio_port_a_r)
 
 WRITE8_MEMBER(mz_state::mz800_z80pio_port_a_w)
 {
-	centronics_device *centronics = machine().device<centronics_device>("centronics");
-
-	centronics->init_prime_w(BIT(data, 6));
-	centronics->strobe_w(BIT(data, 7));
+	m_centronics->write_init(BIT(data, 6));
+	m_centronics->write_strobe(BIT(data, 7));
 }
 
 const z80pio_interface mz800_z80pio_config =
@@ -560,7 +566,7 @@ const z80pio_interface mz800_z80pio_config =
 	DEVCB_DRIVER_MEMBER(mz_state,mz800_z80pio_port_a_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 	DEVCB_NULL,
 };
 

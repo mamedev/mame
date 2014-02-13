@@ -158,6 +158,7 @@ NOTES (2011-08-08)
 ********************************************************************************/
 
 #include "includes/sorcerer.h"
+#include "bus/centronics/covox.h"
 
 static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -187,7 +188,8 @@ static ADDRESS_MAP_START( sorcerer_io, AS_IO, 8, sorcerer_state)
 	AM_RANGE(0xfc, 0xfc) AM_READWRITE( sorcerer_fc_r, sorcerer_fc_w )
 	AM_RANGE(0xfd, 0xfd) AM_READWRITE( sorcerer_fd_r, sorcerer_fd_w )
 	AM_RANGE(0xfe, 0xfe) AM_READWRITE( sorcerer_fe_r, sorcerer_fe_w )
-	AM_RANGE(0xff, 0xff) AM_READWRITE( sorcerer_ff_r, sorcerer_ff_w )
+	AM_RANGE(0xff, 0xff) AM_DEVREAD("cent_status_in", input_buffer_device, read)
+	AM_RANGE(0xff, 0xff) AM_WRITE( sorcerer_ff_w )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(sorcerer)
@@ -314,10 +316,9 @@ static INPUT_PORTS_START(sorcerer)
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
 	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
 	/* hardware connected to printer port */
-	PORT_CONFNAME( 0x06, 0x00, "Parallel port" )
-	PORT_CONFSETTING(    0x00, "Speaker" )
-	PORT_CONFSETTING(    0x02, "Printer (7-bit)" )
-	PORT_CONFSETTING(    0x04, "Printer (8-bit)" )
+	PORT_CONFNAME( 0x02, 0x02, "Parallel port" )
+	PORT_CONFSETTING(    0x00, "7-bit" )
+	PORT_CONFSETTING(    0x02, "8-bit" )
 	PORT_CONFNAME( 0x08, 0x08, "Cassette Speaker")
 	PORT_CONFSETTING(    0x08, DEF_STR(On))
 	PORT_CONFSETTING(    0x00, DEF_STR(Off))
@@ -443,13 +444,18 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // cass1 speaker
 	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, "cassette2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // cass2 speaker
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75) // speaker or music card on parallel port
 
 	MCFG_AY31015_ADD( "uart", sorcerer_ay31015_config )
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "covox")
+	MCFG_SLOT_OPTION_ADD( "covox", CENTRONICS_COVOX )
+
+	/* The use of the parallel port as a general purpose port is not emulated.
+	Currently the only use is to read the printer status in the Centronics CENDRV bios routine. */
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
+
+	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
 	/* quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", sorcerer_state, sorcerer, "snp", 2)

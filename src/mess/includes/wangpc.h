@@ -50,13 +50,14 @@ public:
 			m_floppy0(*this, UPD765_TAG ":0:525dd"),
 			m_floppy1(*this, UPD765_TAG ":1:525dd"),
 			m_centronics(*this, CENTRONICS_TAG),
+			m_cent_data_in(*this, "cent_data_in"),
+			m_cent_data_out(*this, "cent_data_out"),
 			m_kb(*this, WANGPC_KEYBOARD_TAG),
 			m_bus(*this, WANGPC_BUS_TAG),
 			m_sw(*this, "SW"),
 			m_timer2_irq(1),
-			m_acknlg(1),
+			m_centronics_ack(1),
 			m_dav(1),
-			m_busy(1),
 			m_dma_eop(1),
 			m_uart_dr(0),
 			m_uart_tbre(0),
@@ -84,6 +85,8 @@ public:
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	required_device<centronics_device> m_centronics;
+	required_device<input_buffer_device> m_cent_data_in;
+	required_device<output_latch_device> m_cent_data_out;
 	required_device<wangpc_keyboard_device> m_kb;
 	required_device<wangpcbus_device> m_bus;
 	required_ioport m_sw;
@@ -156,8 +159,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( uart_dr_w );
 	DECLARE_WRITE_LINE_MEMBER( uart_tbre_w );
 	DECLARE_WRITE_LINE_MEMBER( epci_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( ack_w );
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
 	DECLARE_WRITE_LINE_MEMBER( bus_irq2_w );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
@@ -176,9 +181,11 @@ public:
 	int m_dack;
 
 	int m_timer2_irq;
-	int m_acknlg;
+	int m_centronics_ack;
+	int m_centronics_busy;
+	int m_centronics_fault;
+	int m_centronics_perror;
 	int m_dav;
-	int m_busy;
 	int m_dma_eop;
 	int m_uart_dr;
 	int m_uart_tbre;

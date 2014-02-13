@@ -75,14 +75,19 @@ void mc1000_state::bankswitch()
 
 /* Read/Write Handlers */
 
+WRITE_LINE_MEMBER( mc1000_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
 READ8_MEMBER( mc1000_state::printer_r )
 {
-	return m_centronics->busy_r();
+	return m_centronics_busy;
 }
 
 WRITE8_MEMBER( mc1000_state::printer_w )
 {
-	m_centronics->strobe_w(BIT(data, 0));
+	m_centronics->write_strobe(BIT(data, 0));
 }
 
 WRITE8_MEMBER( mc1000_state::mc6845_ctrl_w )
@@ -136,7 +141,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mc1000_io, AS_IO, 8, mc1000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(printer_r, printer_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 //  AM_RANGE(0x10, 0x10) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 //  AM_RANGE(0x11, 0x11) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
 	AM_RANGE(0x12, 0x12) AM_WRITE(mc6845_ctrl_w)
@@ -463,7 +468,10 @@ static MACHINE_CONFIG_START( mc1000, mc1000_state )
 
 	/* devices */
 	MCFG_CASSETTE_ADD("cassette", mc1000_cassette_interface)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(mc1000_state, write_centronics_busy))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -34,14 +34,15 @@ class elwro800_state : public spectrum_state
 {
 public:
 	elwro800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spectrum_state(mconfig, type, tag)
-		, m_i8251(*this, "i8251")
-		, m_i8255(*this, "ppi8255")
-		, m_centronics(*this, "centronics")
-		, m_io_line8(*this, "LINE8")
-		, m_io_line9(*this, "LINE9")
-		, m_io_network_id(*this, "NETWORK ID")
-	{ }
+		: spectrum_state(mconfig, type, tag),
+		m_i8251(*this, "i8251"),
+		m_i8255(*this, "ppi8255"),
+		m_centronics(*this, "centronics"),
+		m_io_line8(*this, "LINE8"),
+		m_io_line9(*this, "LINE9"),
+		m_io_network_id(*this, "NETWORK ID")
+	{
+	}
 
 	/* for elwro800 */
 	/* RAM mapped at 0 */
@@ -59,6 +60,7 @@ public:
 	INTERRUPT_GEN_MEMBER(elwro800jr_interrupt);
 	DECLARE_READ8_MEMBER(i8255_port_c_r);
 	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
 protected:
 	required_device<i8251_device> m_i8251;
@@ -69,6 +71,8 @@ protected:
 	required_ioport m_io_network_id;
 
 	void elwro800jr_mmu_w(UINT8 data);
+
+	int m_centronics_ack;
 };
 
 
@@ -179,31 +183,30 @@ void elwro800_state::elwro800jr_mmu_w(UINT8 data)
  *
  *************************************/
 
+WRITE_LINE_MEMBER(elwro800_state::write_centronics_ack)
+{
+	m_centronics_ack = state;
+	m_i8255->pc2_w(state);
+}
+
 READ8_MEMBER(elwro800_state::i8255_port_c_r)
 {
-	return (m_centronics->ack_r() << 2);
+	return m_centronics_ack << 2;
 }
 
 WRITE8_MEMBER(elwro800_state::i8255_port_c_w)
 {
-	m_centronics->strobe_w((data >> 7) & 0x01);
+	m_centronics->write_strobe((data >> 7) & 0x01);
 }
 
 static I8255_INTERFACE(elwro800jr_ppi8255_interface)
 {
 	DEVCB_INPUT_PORT("JOY"),
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("centronics", centronics_device, read),
-	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
+	DEVCB_DEVICE_MEMBER("cent_data_in", input_buffer_device, read),
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 	DEVCB_DRIVER_MEMBER(elwro800_state,i8255_port_c_r),
 	DEVCB_DRIVER_MEMBER(elwro800_state,i8255_port_c_w)
-};
-
-static const centronics_interface elwro800jr_centronics_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER("ppi8255", i8255_device, pc2_w),
-	DEVCB_NULL,
-	DEVCB_NULL
 };
 
 /*************************************
@@ -582,7 +585,12 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_I8255A_ADD( "ppi8255", elwro800jr_ppi8255_interface)
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", elwro800jr_centronics_interface)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(elwro800_state, write_centronics_ack))
+
+	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_I8251_ADD("i8251", default_i8251_interface)
 

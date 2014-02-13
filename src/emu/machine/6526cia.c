@@ -964,5 +964,3 @@ WRITE_LINE_DEVICE_HANDLER( mos6526_cnt_w ) { downcast<legacy_mos6526_device *>(d
 
 READ_LINE_DEVICE_HANDLER( mos6526_sp_r ) { return downcast<legacy_mos6526_device *>(device)->sp_r(); }
 WRITE_LINE_DEVICE_HANDLER( mos6526_sp_w ) { downcast<legacy_mos6526_device *>(device)->sp_w(state); }
-
-WRITE_LINE_DEVICE_HANDLER( mos6526_flag_w ) { downcast<legacy_mos6526_device *>(device)->flag_w(state); }

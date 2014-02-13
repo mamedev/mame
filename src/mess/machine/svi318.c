@@ -727,6 +727,11 @@ void svi318_state::svi318_set_banks()
 
 /* External I/O */
 
+WRITE_LINE_MEMBER(svi318_state::write_centronics_busy)
+{
+	m_centronics_busy = state;
+}
+
 READ8_MEMBER(svi318_state::svi318_io_ext_r)
 {
 	UINT8 data = 0xff;
@@ -740,7 +745,7 @@ READ8_MEMBER(svi318_state::svi318_io_ext_r)
 	switch( offset )
 	{
 	case 0x12:
-		data = 0xfe | m_centronics->busy_r();
+		data = 0xfe | m_centronics_busy;
 		break;
 
 	case 0x20:
@@ -805,11 +810,11 @@ WRITE8_MEMBER(svi318_state::svi318_io_ext_w)
 	switch( offset )
 	{
 	case 0x10:
-		m_centronics->write(space, 0, data);
+		m_cent_data_out->write(space, 0, data);
 		break;
 
 	case 0x11:
-		m_centronics->strobe_w(BIT(data, 0));
+		m_centronics->write_strobe(BIT(data, 0));
 		break;
 
 	case 0x20:

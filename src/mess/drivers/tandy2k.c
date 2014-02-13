@@ -459,6 +459,32 @@ static const struct pit8253_interface pit_intf =
 
 // Intel 8255A Interface
 
+WRITE_LINE_MEMBER( tandy2k_state::write_centronics_ack )
+{
+	m_centronics_ack = state;
+	m_i8255a->pc6_w(state);
+}
+
+WRITE_LINE_MEMBER( tandy2k_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER( tandy2k_state::write_centronics_perror )
+{
+	m_centronics_perror = state;
+}
+
+WRITE_LINE_MEMBER( tandy2k_state::write_centronics_select )
+{
+	m_centronics_select = state;
+}
+
+WRITE_LINE_MEMBER( tandy2k_state::write_centronics_fault )
+{
+	m_centronics_fault = state;
+}
+
 READ8_MEMBER( tandy2k_state::ppi_pb_r )
 {
 	/*
@@ -482,19 +508,19 @@ READ8_MEMBER( tandy2k_state::ppi_pb_r )
 	{
 	case LPINEN:
 		// printer acknowledge
-		data |= m_centronics->ack_r() << 3;
+		data |= m_centronics_ack << 3;
 
 		// printer fault
-		data |= m_centronics->fault_r() << 4;
+		data |= m_centronics_fault << 4;
 
 		// printer select
-		data |= m_centronics->vcc_r() << 5;
+		data |= m_centronics_select << 5;
 
 		// paper empty
-		data |= m_centronics->pe_r() << 6;
+		data |= m_centronics_perror << 6;
 
 		// printer busy
-		data |= m_centronics->busy_r() << 7;
+		data |= m_centronics_busy << 7;
 		break;
 
 	case KBDINEN:
@@ -535,13 +561,13 @@ WRITE8_MEMBER( tandy2k_state::ppi_pc_w )
 	m_pic1->ir3_w(BIT(data, 3));
 
 	// printer strobe
-	m_centronics->strobe_w(BIT(data, 7));
+	m_centronics->write_strobe(BIT(data, 7));
 }
 
 static I8255A_INTERFACE( ppi_intf )
 {
 	DEVCB_NULL,                                                 // Port A read
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),  // Port A write
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write), // Port A write
 	DEVCB_DRIVER_MEMBER(tandy2k_state, ppi_pb_r),               // Port B write
 	DEVCB_NULL,                                                 // Port B write
 	DEVCB_NULL,                                                 // Port C read
@@ -591,15 +617,6 @@ void tandy2k_state::fdc_drq(bool state)
 static SLOT_INTERFACE_START( tandy2k_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
-
-// Centronics Interface
-
-static const centronics_interface centronics_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(I8255A_TAG, i8255_device, pc6_w),  // ACK output
-	DEVCB_NULL,                                     // BUSY output
-	DEVCB_NULL                                      // NOT BUSY output
-};
 
 // Keyboard
 
@@ -696,7 +713,15 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_I8272A_ADD(I8272A_TAG, true)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(tandy2k_state, write_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(tandy2k_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(tandy2k_state, write_centronics_perror))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(tandy2k_state, write_centronics_select))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(tandy2k_state, write_centronics_fault))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rx))

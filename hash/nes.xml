@@ -43348,7 +43348,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="aisensei" supported="no">
+	<software name="aisensei">
 		<description>Ai Sensei no Oshiete - Watashi no Hoshi (Jpn)</description>
 		<year>1993</year>
 		<publisher>Irem</publisher>
@@ -53804,7 +53804,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 				<rom name="dragon quest viii (es-1077) (ch).prg" size="524288" crc="30f9bb46" sha1="5d9d519b84e245891928f3482a42a071e4402b6c" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="32768">
+			<dataarea name="vram" size="8192">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">

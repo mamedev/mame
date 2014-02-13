@@ -59,6 +59,7 @@ netlist_setup_t::~netlist_setup_t()
 // FIXME: Move to netlist ...
 netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const pstring &name)
 {
+    dev->init(netlist(), name);
 	if (!(netlist().m_devices.add(name, dev, false)==TMERR_NONE))
 		netlist().error("Error adding %s to device list\n", name.cstr());
 	return dev;
@@ -269,22 +270,6 @@ const pstring netlist_setup_t::resolve_alias(const pstring &name) const
 		temp = m_alias.find(ret);
 	} while (temp != "");
 
-	int p = ret.find(".[");
-	if (p > 0)
-	{
-		pstring dname = ret;
-		netlist_device_t *dev = netlist().m_devices.find(dname.substr(0,p));
-		if (dev == NULL)
-			netlist().error("Device for %s not found\n", name.cstr());
-		int c = atoi(ret.substr(p+2,ret.len()-p-3));
-		temp = dev->m_terminals[c];
-		// reresolve ....
-		do {
-			ret = temp;
-			temp = m_alias.find(ret);
-		} while (temp != "");
-	}
-
 	NL_VERBOSE_OUT(("%s==>%s\n", name.cstr(), ret.cstr()));
 	return ret;
 }
@@ -364,8 +349,8 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
         pstring x = pstring::sprintf("proxy_da_%d", m_proxy_cnt);
         m_proxy_cnt++;
 
-        proxy->init(netlist(), x);
         register_dev(proxy, x);
+        proxy->start_dev();
 
 #if 1
         /* connect all existing terminals to new net */
@@ -396,8 +381,8 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
 		pstring x = pstring::sprintf("proxy_ad_%d", m_proxy_cnt);
 		m_proxy_cnt++;
 
-		proxy->init(netlist(), x);
 		register_dev(proxy, x);
+        proxy->start_dev();
 
 		proxy->m_Q.net().register_con(in);
 		out.net().register_con(proxy->m_I);
@@ -429,8 +414,8 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_i
 		pstring x = pstring::sprintf("proxy_da_%d", m_proxy_cnt);
 		m_proxy_cnt++;
 
-		proxy->init(netlist(), x);
 		register_dev(proxy, x);
+        proxy->start_dev();
 
 		connect_terminals(term, proxy->m_I);
 
@@ -446,7 +431,6 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_i
 	}
 }
 
-// FIXME: optimize code  ...
 void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_output_t &out)
 {
 	if (out.isFamily(netlist_terminal_t::ANALOG))
@@ -520,18 +504,16 @@ void netlist_setup_t::connect(netlist_core_terminal_t &t1_in, netlist_core_termi
 	netlist_core_terminal_t &t1 = resolve_proxy(t1_in);
 	netlist_core_terminal_t &t2 = resolve_proxy(t2_in);
 
-	// FIXME: amend device design so that warnings can be turned into errors
-	//        Only variable inputs have this issue
 	if (t1.isType(netlist_core_terminal_t::OUTPUT) && t2.isType(netlist_core_terminal_t::INPUT))
 	{
 		if (t2.has_net())
-			NL_VERBOSE_OUT(("Input %s already connected\n", t2.name().cstr()));
+			netlist().error("Input %s already connected\n", t2.name().cstr());
 		connect_input_output(dynamic_cast<netlist_input_t &>(t2), dynamic_cast<netlist_output_t &>(t1));
 	}
 	else if (t1.isType(netlist_core_terminal_t::INPUT) && t2.isType(netlist_core_terminal_t::OUTPUT))
 	{
 		if (t1.has_net())
-			NL_VERBOSE_OUT(("Input %s already connected\n", t1.name().cstr()));
+		    netlist().error("Input %s already connected\n", t1.name().cstr());
 		connect_input_output(dynamic_cast<netlist_input_t &>(t1), dynamic_cast<netlist_output_t &>(t2));
 	}
 	else if (t1.isType(netlist_core_terminal_t::OUTPUT) && t2.isType(netlist_core_terminal_t::TERMINAL))
@@ -584,24 +566,24 @@ void netlist_setup_t::resolve_inputs()
     netlist().log("deleting empty nets ...");
 
 	// delete empty nets ...
+
+    netlist_net_t::list_t todelete;
+
 	for (netlist_net_t *const *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
 	{
 		if ((*pn)->m_head == NULL)
 		{
-		    netlist().log("Deleting net %s ...", (*pn)->name().cstr());
-			netlist_net_t *to_delete = *pn;
-			netlist().m_nets.remove(to_delete);
-			if (!to_delete->isRailNet())
-				delete to_delete;
-			pn--;
+		    todelete.add(*pn);
 		}
 	}
 
-    /* now that nets were deleted ... register all net items */
-	netlist().log("late state saving for nets ...");
-
-    for (netlist_net_t * const * pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
-        (*pn)->late_save_register();
+    for (int i=0; i < todelete.count(); i++)
+    {
+        netlist().log("Deleting net %s ...", todelete[i]->name().cstr());
+        netlist().m_nets.remove(todelete[i]);
+        if (!todelete[i]->isRailNet())
+            delete todelete[i];
+    }
 
     pstring errstr("");
 

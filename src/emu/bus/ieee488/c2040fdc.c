@@ -14,8 +14,6 @@
 	TODO:
 
 	- writing starts in the middle of a byte
-	- READY output is actually low when (CNT=9 QB=0), but since we latch the read 
-	  byte on syncpoints, READY is low when (prevCNT=9 CNT=0) as seen below
 	- 8050 PLL
 
 */
@@ -90,6 +88,8 @@ c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, device_type type, const 
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
+	cur_live.write_position = 0;
+	cur_live.write_start_time = attotime::never;
 }
 
 c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : 
@@ -113,6 +113,8 @@ c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
+	cur_live.write_position = 0;
+	cur_live.write_start_time = attotime::never;
 }
 
 c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : 
@@ -133,6 +135,16 @@ void c2040_fdc_t::device_start()
 
 	// allocate timer
 	t_gen = timer_alloc(0);
+
+	// register for state saving
+	save_item(NAME(m_mtr0));
+	save_item(NAME(m_mtr1));
+	save_item(NAME(m_stp0));
+	save_item(NAME(m_stp1));
+	save_item(NAME(m_ds));
+	save_item(NAME(m_drv_sel));
+	save_item(NAME(m_mode_sel));
+	save_item(NAME(m_rw_sel));
 }
 
 
@@ -327,8 +339,6 @@ void c2040_fdc_t::live_run(attotime limit)
 				cur_live.cell_counter &= 0xf;
 			}
 			
-			int ready = cur_live.ready;
-			
 			if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1)) {
 				// read bit
 				cur_live.shift_reg <<= 1;
@@ -343,20 +353,18 @@ void c2040_fdc_t::live_run(attotime limit)
 					write_next_bit(BIT(cur_live.shift_reg_write, 9), limit);
 				}
 
-				// update bit counter
-				if ((cur_live.shift_reg == 0x3ff) && cur_live.rw_sel) {
-					cur_live.bit_counter = 0;
-				} else {
-					cur_live.bit_counter++;
-					if (cur_live.bit_counter == 10) {
-						cur_live.bit_counter = 0;
-						ready = 0;
-					} else {
-						ready = 1;
-					}
-				}
-
 				syncpoint = true;
+			}
+
+			int sync = !((cur_live.shift_reg == 0x3ff) && cur_live.rw_sel);
+
+			if (!sync) {
+				cur_live.bit_counter = 0;
+			} else if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1) && cur_live.sync) {
+				cur_live.bit_counter++;
+				if (cur_live.bit_counter == 10) {
+					cur_live.bit_counter = 0;
+				}
 			}
 
 			// update GCR
@@ -368,9 +376,7 @@ void c2040_fdc_t::live_run(attotime limit)
 
 			cur_live.e = m_gcr_rom->base()[cur_live.i];
 
-			if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1) && cur_live.bit_counter == 9) {
-				//ready = 0;
-			}
+			int ready = !(BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1) && (cur_live.bit_counter == 9));
 	
 			if (!ready) {
 				// load write shift register
@@ -389,8 +395,6 @@ void c2040_fdc_t::live_run(attotime limit)
 				if (LOG) logerror("%s write shift << %03x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
 			}
 
-			// update signals
-			int sync = !((cur_live.shift_reg == 0x3ff) && cur_live.rw_sel);
 			int error = !(BIT(cur_live.e, 3) || ready);
 
 			if (ready != cur_live.ready) {

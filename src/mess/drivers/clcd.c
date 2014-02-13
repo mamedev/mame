@@ -5,6 +5,7 @@
         G65SC102PI-2
         G65SC51P-1
         R65C22P2 x 2
+        AMI S3530X Bell 103/V.21 Single chip modem
 
 ****************************************************************************/
 
@@ -711,7 +712,7 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("acia", mos6551_device, rxd_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, dcd_w))
 	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, dsr_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("acia", mos6551_device, cts_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb4))
 
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)

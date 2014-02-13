@@ -97,7 +97,6 @@
 #include "emuopts.h"
 #include "cpu/z80/z80.h"
 #include "includes/nc.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"  /* for NC100 uart */
 #include "machine/mc146818.h"   /* for NC200 real time clock */
 #include "machine/rp5c01.h" /* for NC100 real time clock */
@@ -706,8 +705,8 @@ TIMER_CALLBACK_MEMBER(nc_state::nc_serial_timer_callback)
 
 WRITE8_MEMBER(nc_state::nc_uart_control_w)
 {
-	/* update printer state */
-	nc_printer_update(data);
+	/* same for nc100 and nc200 */
+	m_centronics->write_strobe(BIT(data, 6));
 
 	/* on/off changed state? */
 	if (((m_uart_control ^ data) & (1<<3))!=0)
@@ -729,12 +728,6 @@ WRITE8_MEMBER(nc_state::nc_uart_control_w)
 /* port 0x030 bit 6 = printer strobe */
 
 
-/* same for nc100 and nc200 */
-void nc_state::nc_printer_update(UINT8 data)
-{
-	centronics_device *printer = machine().device<centronics_device>("centronics");
-	printer->strobe_w(BIT(data, 6));
-}
 
 /********************************************************************************************************/
 /* NC100 hardware */
@@ -824,8 +817,10 @@ static const i8251_interface nc100_uart_interface =
 };
 
 
-WRITE_LINE_MEMBER(nc_state::nc100_centronics_ack_w)
+WRITE_LINE_MEMBER(nc_state::write_nc100_centronics_ack)
 {
+	m_centronics_ack = state;
+
 	if (state)
 		m_irq_status |= 0x04;
 	else
@@ -835,13 +830,10 @@ WRITE_LINE_MEMBER(nc_state::nc100_centronics_ack_w)
 	nc_update_interrupts();
 }
 
-static const centronics_interface nc100_centronics_config =
+WRITE_LINE_MEMBER(nc_state::write_centronics_busy)
 {
-	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc100_centronics_ack_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
+	m_centronics_busy = state;
+}
 
 void nc_state::machine_reset()
 {
@@ -883,12 +875,11 @@ WRITE8_MEMBER(nc_state::nc100_poweroff_control_w)
 /* nc100 version of card/battery status */
 READ8_MEMBER(nc_state::nc100_card_battery_status_r)
 {
-	centronics_device *printer = machine().device<centronics_device>("centronics");
 	int nc_card_battery_status = 0x0fc;
 
 	/* printer */
-	nc_card_battery_status |= printer->ack_r();
-	nc_card_battery_status |= printer->busy_r() << 1;
+	nc_card_battery_status |= m_centronics_ack;
+	nc_card_battery_status |= m_centronics_busy << 1;
 
 	if (m_card_status)
 	{
@@ -924,7 +915,7 @@ static ADDRESS_MAP_START(nc100_io, AS_IO, 8, nc_state )
 	AM_RANGE(0x10, 0x13) AM_READWRITE(nc_memory_management_r, nc_memory_management_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(nc100_memory_card_wait_state_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(nc100_uart_control_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("centronics", centronics_device, write)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(nc_irq_mask_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(nc100_poweroff_control_w)
@@ -1095,7 +1086,7 @@ WRITE8_MEMBER(nc_state::nc200_display_memory_start_w)
 #endif
 
 
-WRITE_LINE_MEMBER(nc_state::nc200_centronics_ack_w)
+WRITE_LINE_MEMBER(nc_state::write_nc200_centronics_ack)
 {
 	if (state)
 		m_irq_status |= 0x01;
@@ -1105,14 +1096,6 @@ WRITE_LINE_MEMBER(nc_state::nc200_centronics_ack_w)
 	/* trigger an int if the irq is set */
 	nc_update_interrupts();
 }
-
-static const centronics_interface nc200_centronics_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc200_centronics_ack_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 /* assumption. nc200 uses the same uart chip. The rxrdy and txrdy are combined
 together with a or to generate a single interrupt */
@@ -1281,10 +1264,9 @@ READ8_MEMBER(nc_state::nc200_card_battery_status_r)
 
 READ8_MEMBER(nc_state::nc200_printer_status_r)
 {
-	centronics_device *printer = machine().device<centronics_device>("centronics");
 	UINT8 result = 0;
 
-	result |= printer->busy_r();
+	result |= m_centronics_busy;
 
 	return result;
 }
@@ -1347,7 +1329,7 @@ static ADDRESS_MAP_START(nc200_io, AS_IO, 8, nc_state )
 	AM_RANGE(0x10, 0x13) AM_READWRITE(nc_memory_management_r, nc_memory_management_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(nc200_memory_card_wait_state_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(nc200_uart_control_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("centronics", centronics_device, write)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(nc_irq_mask_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(nc200_poweroff_control_w)
@@ -1501,7 +1483,11 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", nc100_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(nc_state, write_nc100_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(nc_state, write_centronics_busy))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* uart */
 	MCFG_I8251_ADD("uart", nc100_uart_interface)
@@ -1550,8 +1536,8 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 	MCFG_PALETTE_LENGTH(NC200_NUM_COLOURS)
 
 	/* printer */
-	MCFG_DEVICE_REMOVE("centronics")
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", nc200_centronics_config)
+	MCFG_DEVICE_MODIFY("centronics")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(nc_state, write_nc200_centronics_ack))
 
 	/* uart */
 	MCFG_DEVICE_REMOVE("uart")

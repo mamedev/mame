@@ -301,6 +301,21 @@ WRITE8_MEMBER(einstein_state::einstein_rom_w)
     INTERRUPTS
 ***************************************************************************/
 
+WRITE_LINE_MEMBER(einstein_state::write_centronics_busy)
+{
+	m_centronics_busy = state;
+}
+
+WRITE_LINE_MEMBER(einstein_state::write_centronics_perror)
+{
+	m_centronics_perror = state;
+}
+
+WRITE_LINE_MEMBER(einstein_state::write_centronics_fault)
+{
+	m_centronics_fault = state;
+}
+
 READ8_MEMBER(einstein_state::einstein_kybintmsk_r)
 {
 	UINT8 data = 0;
@@ -312,9 +327,9 @@ READ8_MEMBER(einstein_state::einstein_kybintmsk_r)
 	data |= m_buttons->read();
 
 	/* bit 2 to 4: printer status */
-	data |= m_centronics->busy_r() << 2;
-	data |= m_centronics->pe_r() << 3;
-	data |= m_centronics->fault_r() << 4;
+	data |= m_centronics_busy << 2;
+	data |= m_centronics_perror << 3;
+	data |= m_centronics_fault << 4;
 
 	/* bit 5 to 7: graph, control and shift key */
 	data |= m_extra->read();
@@ -665,15 +680,14 @@ static Z80CTC_INTERFACE( einstein_ctc_intf )
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)
 };
 
-
 static Z80PIO_INTERFACE( einstein_pio_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),
+	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),
 	DEVCB_NULL
 };
 
@@ -684,13 +698,6 @@ static const ay8910_interface einstein_ay_interface =
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(einstein_state, einstein_keyboard_data_read),
 	DEVCB_DRIVER_MEMBER(einstein_state, einstein_keyboard_line_write),
-	DEVCB_NULL
-};
-
-static const centronics_interface einstein_centronics_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER(IC_I063, z80pio_device, strobe_a),
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -768,7 +775,13 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* printer */
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", einstein_centronics_config)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(IC_I063, z80pio_device, strobe_a))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(einstein_state, write_centronics_busy))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(einstein_state, write_centronics_perror))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(einstein_state, write_centronics_fault))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* uart */
 	MCFG_I8251_ADD(IC_I060, default_i8251_interface)

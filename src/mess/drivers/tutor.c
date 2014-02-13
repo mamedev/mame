@@ -181,14 +181,17 @@ class tutor_state : public driver_device
 public:
 	tutor_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_cass(*this, "cassette"),
-	m_centronics(*this, "centronics")
-	{ }
+		m_maincpu(*this, "maincpu"),
+		m_cass(*this, "cassette"),
+		m_centronics(*this, "centronics"),
+		m_cent_data_out(*this, "cent_data_out")
+	{
+	}
 
 	required_device<tms9995_device> m_maincpu;
 	optional_device<cassette_image_device> m_cass;
 	optional_device<centronics_device> m_centronics;
+	optional_device<output_latch_device> m_cent_data_out;
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(tutor_mapper_r);
 	DECLARE_WRITE8_MEMBER(tutor_mapper_w);
@@ -210,6 +213,9 @@ public:
 	TIMER_CALLBACK_MEMBER(tape_interrupt_handler);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( tutor_cart );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( tutor_cart );
+
+	int m_centronics_busy;
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 };
 
 
@@ -471,6 +477,11 @@ WRITE8_MEMBER( tutor_state::tutor_cassette_w )
 	}
 }
 
+WRITE_LINE_MEMBER( tutor_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
 /* memory handlers */
 READ8_MEMBER( tutor_state::tutor_printer_r )
 {
@@ -480,7 +491,7 @@ READ8_MEMBER( tutor_state::tutor_printer_r )
 	{
 	case 0x20:
 		/* busy */
-		reply = m_centronics->busy_r() ? 0x00 : 0xff;
+		reply = m_centronics_busy ? 0x00 : 0xff;
 		break;
 
 	default:
@@ -499,12 +510,12 @@ WRITE8_MEMBER( tutor_state::tutor_printer_w )
 	{
 	case 0x10:
 		/* data */
-		m_centronics->write(space, 0, data);
+		m_cent_data_out->write(space, 0, data);
 		break;
 
 	case 0x40:
 		/* strobe */
-		m_centronics->strobe_w(BIT(data, 7));
+		m_centronics->write_strobe(BIT(data, 7));
 		break;
 
 	default:
@@ -781,7 +792,8 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(tutor_state, write_centronics_busy))
 
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 

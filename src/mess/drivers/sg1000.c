@@ -571,6 +571,11 @@ const cassette_interface sc3000_cassette_interface =
     I8255_INTERFACE( sf7000_ppi_intf )
 -------------------------------------------------*/
 
+WRITE_LINE_MEMBER( sf7000_state::write_centronics_busy )
+{
+	m_centronics_busy = state;
+}
+
 READ8_MEMBER( sf7000_state::ppi_pa_r )
 {
 	/*
@@ -589,7 +594,7 @@ READ8_MEMBER( sf7000_state::ppi_pa_r )
 	UINT8 data = 0;
 
 	data |= m_fdc->get_irq() ? 0x01 : 0x00;
-	data |= m_centronics->busy_r() << 1;
+	data |= m_centronics_busy << 1;
 	data |= m_floppy0->idx_r() << 2;
 
 	return data;
@@ -631,7 +636,7 @@ WRITE8_MEMBER( sf7000_state::ppi_pc_w )
 	membank("bank1")->set_entry(BIT(data, 6));
 
 	/* printer strobe */
-	m_centronics->strobe_w(BIT(data, 7));
+	m_centronics->write_strobe(BIT(data, 7));
 }
 
 static I8255_INTERFACE( sf7000_ppi_intf )
@@ -639,7 +644,7 @@ static I8255_INTERFACE( sf7000_ppi_intf )
 	DEVCB_DRIVER_MEMBER(sf7000_state, ppi_pa_r),                // Port A read
 	DEVCB_NULL,                                                 // Port A write
 	DEVCB_NULL,                                                 // Port B read
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),  // Port B write
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write), // Port B write
 	DEVCB_NULL,                                                 // Port C read
 	DEVCB_DRIVER_MEMBER(sf7000_state, ppi_pc_w)                 // Port C write
 };
@@ -743,6 +748,8 @@ void sc3000_state::machine_start()
 void sf7000_state::machine_start()
 {
 	sc3000_state::machine_start();
+
+	save_item(NAME(m_centronics_busy));
 
 	/* configure memory banking */
 	membank("bank1")->configure_entry(0, m_rom->base());
@@ -885,7 +892,7 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_I8251_ADD(UPD8251_TAG, usart_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats)
-	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
 	MCFG_CASSETTE_ADD("cassette", sc3000_cassette_interface)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)

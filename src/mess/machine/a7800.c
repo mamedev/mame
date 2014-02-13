@@ -223,6 +223,7 @@ static const a7800_pcb pcb_list[] =
 	{ "TYPE-3", 0x3 },
 	{ "TYPE-6", 0x6 },
 	{ "TYPE-A", 0xa },
+	{ "TYPE-XM", 0xb }, /* XM cart? (dkongxm) */
 	{ 0 }
 };
 

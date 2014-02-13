@@ -72,7 +72,6 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi0_pc_w );
 	DECLARE_READ8_MEMBER( ppi1_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
-	DECLARE_WRITE_LINE_MEMBER( ack_w );
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 
@@ -87,4 +86,15 @@ public:
 	int m_fdc_int;
 	int m_fdie;
 	DECLARE_DRIVER_INIT(sage2);
+
+	int m_centronics_busy;
+	int m_centronics_perror;
+	int m_centronics_select;
+	int m_centronics_fault;
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 };

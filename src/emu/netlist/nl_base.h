@@ -62,7 +62,6 @@
  *  This would however introduce macro devices for RC, diodes and transistors again.
  *
  *  ====================================================================================
- *  FIXME: Terminals are not yet implemented.
  *
  *  Instead, the following approach in case of a pure terminal/input network is taken:
  *
@@ -557,7 +556,6 @@ public:
     friend class netlist_analog_output_t;
     friend class netlist_setup_t;
 
-    // FIXME: union does not work
     struct hybrid_t
     {
         inline hybrid_t() : Q(0), Analog(0.0) {}
@@ -566,6 +564,8 @@ public:
     };
 
     ATTR_COLD netlist_net_t(const type_t atype, const family_t afamily);
+    ATTR_COLD virtual ~netlist_net_t();
+
     ATTR_COLD void init_object(netlist_base_t &nl, const pstring &aname);
 
     ATTR_COLD void register_con(netlist_core_terminal_t &terminal);
@@ -638,27 +638,12 @@ public:
     typedef netlist_list_t<netlist_terminal_t *> terminal_list_t;
 
     terminal_list_t m_terms;
-    terminal_list_t m_rails;  // FIXME: Make the solver use this !
+    terminal_list_t m_rails;
     netlist_matrix_solver_t *m_solver;
 
     ATTR_HOT void solve();
 
     netlist_core_terminal_t *m_head;
-
-    /* use this to register state.... */
-    ATTR_COLD virtual void late_save_register()
-    {
-        save(NAME(m_last.Analog));
-        save(NAME(m_cur.Analog));
-        save(NAME(m_new.Analog));
-        save(NAME(m_last.Q));
-        save(NAME(m_cur.Q));
-        save(NAME(m_new.Q));
-        save(NAME(m_time));
-        save(NAME(m_active));
-        save(NAME(m_in_queue));
-        netlist_object_t::save_register();
-    }
 
 protected:  //FIXME: needed by current solver code
 
@@ -671,13 +656,18 @@ public:
 
 protected:
 
-    /* we don't use this to save state
-     * because we may get deleted again ...
-     * FIXME: save_register should be called after setup is complete
-     */
     ATTR_COLD virtual void save_register()
     {
-        //assert_always(false, "trying too early to register state in netlist_net_t");
+        save(NAME(m_last.Analog));
+        save(NAME(m_cur.Analog));
+        save(NAME(m_new.Analog));
+        save(NAME(m_last.Q));
+        save(NAME(m_cur.Q));
+        save(NAME(m_new.Q));
+        save(NAME(m_time));
+        save(NAME(m_active));
+        save(NAME(m_in_queue));
+        netlist_object_t::save_register();
     }
     ATTR_COLD virtual void reset();
 
@@ -899,8 +889,6 @@ public:
     ATTR_COLD virtual ~netlist_core_device_t();
 
     ATTR_COLD virtual void init(netlist_base_t &anetlist, const pstring &name);
-
-
     ATTR_HOT virtual void update_param() {}
 
     ATTR_HOT inline void update_dev()
@@ -910,6 +898,10 @@ public:
 #else
         update();
 #endif
+    }
+    ATTR_HOT inline void start_dev()
+    {
+        start();
     }
 
     ATTR_HOT const netlist_sig_t INPLOGIC_PASSIVE(netlist_logic_input_t &inp);
@@ -1233,7 +1225,6 @@ ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time delay)
 {
     if (is_queued())
         return;
-    // if (m_in_queue == 1) return; FIXME: check this at some time
     m_time = netlist().time() + delay;
     m_in_queue = (m_active > 0) ? 1 : 0;     /* queued ? */
     if (m_in_queue)

@@ -214,14 +214,14 @@ UINT32 adp_state::screen_update_adp(screen_device &screen, bitmap_ind16 &bitmap,
 	#if 0
 	int x, y, b, src;
 
-	b = ((hd63484_regs_r(m_hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(m_hd63484, 0xce/2, 0xffff);
+	b = ((m_hd63484->regs_r(0xcc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(0xce/2, 0xffff);
 
 	for (y = 0;y < 280;y++)
 	{
-		for (x = 0 ; x < (hd63484_regs_r(m_hd63484, 0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
+		for (x = 0 ; x < (m_hd63484->regs_r(0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
 		{
 			b &= (HD63484_RAM_SIZE - 1);
-			src = hd63484_ram_r(m_hd63484, b, 0xffff);
+			src = m_hd63484->ram_r(b, 0xffff);
 			bitmap.pix16(y, x    ) = ((src & 0x000f) >>  0) << 0;
 			bitmap.pix16(y, x + 1) = ((src & 0x00f0) >>  4) << 0;
 			bitmap.pix16(y, x + 2) = ((src & 0x0f00) >>  8) << 0;
@@ -230,24 +230,24 @@ UINT32 adp_state::screen_update_adp(screen_device &screen, bitmap_ind16 &bitmap,
 		}
 	}
 if (!machine().input().code_pressed(KEYCODE_O)) // debug: toggle window
-	if ((hd63484_regs_r(m_hd63484, 0x06/2, 0xffff) & 0x0300) == 0x0300)
+	if ((m_hd63484->regs_r(0x06/2, 0xffff) & 0x0300) == 0x0300)
 	{
-		int sy = (hd63484_regs_r(m_hd63484, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(m_hd63484, 0x88/2, 0xffff) >> 8);
-		int h = hd63484_regs_r(m_hd63484, 0x96/2, 0xffff) & 0x0fff;
-		int sx = ((hd63484_regs_r(m_hd63484, 0x92/2, 0xffff) >> 8) - (hd63484_regs_r(m_hd63484, 0x84/2, 0xffff) >> 8)) * 2 * 2;
-		int w = (hd63484_regs_r(m_hd63484, 0x92/2, 0xffff) & 0xff) * 2;
+		int sy = (m_hd63484->regs_r(0x94/2, 0xffff) & 0x0fff) - (m_hd63484->regs_r(0x88/2, 0xffff) >> 8);
+		int h = m_hd63484->regs_r(0x96/2, 0xffff) & 0x0fff;
+		int sx = ((m_hd63484->regs_r(0x92/2, 0xffff) >> 8) - (m_hd63484->regs_r(0x84/2, 0xffff) >> 8)) * 2 * 2;
+		int w = (m_hd63484->regs_r(0x92/2, 0xffff) & 0xff) * 2;
 		if (sx < 0) sx = 0; // not sure about this (shangha2 title screen)
 
-		b = (((hd63484_regs_r(m_hd63484, 0xdc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(m_hd63484, 0xde/2, 0xffff));
+		b = (((m_hd63484->regs_r(0xdc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(0xde/2, 0xffff));
 
 		for (y = sy ; y <= sy + h && y < 280 ; y++)
 		{
-			for (x = 0 ; x < (hd63484_regs_r(m_hd63484, 0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
+			for (x = 0 ; x < (m_hd63484->regs_r(0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
 			{
 				b &= (HD63484_RAM_SIZE - 1);
-				src = hd63484_ram_r(m_hd63484, b, 0xffff);
+				src = m_hd63484->ram_r(b, 0xffff);
 
-				if (x <= w && x + sx >= 0 && x + sx < (hd63484_regs_r(m_hd63484, 0xca/2, 0xffff) & 0x0fff) * 4)
+				if (x <= w && x + sx >= 0 && x + sx < (m_hd63484->regs_r(0xca/2, 0xffff) & 0x0fff) * 4)
 				{
 					bitmap.pix16(y, x + sx    ) = ((src & 0x000f) >>  0) << 0;
 					bitmap.pix16(y, x + sx + 1) = ((src & 0x00f0) >>  4) << 0;
@@ -277,8 +277,6 @@ WRITE_LINE_MEMBER(adp_state::duart_irq_handler)
 
 MACHINE_START_MEMBER(adp_state,skattv)
 {
-	//m_h63484 = machine().device("h63484");
-
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_register_active));
 
@@ -297,14 +295,12 @@ MACHINE_START_MEMBER(adp_state,skattv)
 		UINT16 *rom = (UINT16*)memregion("gfx1")->base();
 		int i;
 
-		device_t *hd63484 = machine().device("hd63484");
-
 		for(i = 0; i < 0x40000/2; ++i)
 		{
-			hd63484_ram_w(hd63484, i + 0x00000/2, rom[i], 0xffff);
-			hd63484_ram_w(hd63484, i + 0x40000/2, rom[i], 0xffff);
-			hd63484_ram_w(hd63484, i + 0x80000/2, rom[i], 0xffff);
-			hd63484_ram_w(hd63484, i + 0xc0000/2, rom[i], 0xffff);
+			m_hd63484->ram_w(i + 0x00000/2, rom[i], 0xffff);
+			m_hd63484->ram_w(i + 0x40000/2, rom[i], 0xffff);
+			m_hd63484->ram_w(i + 0x80000/2, rom[i], 0xffff);
+			m_hd63484->ram_w(i + 0xc0000/2, rom[i], 0xffff);
 		}
 	}
 	#endif

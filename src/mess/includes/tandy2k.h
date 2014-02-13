@@ -44,29 +44,32 @@ class tandy2k_state : public driver_device
 public:
 	tandy2k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, I80186_TAG),
-			m_uart(*this, I8251A_TAG),
-			m_pit(*this, I8253_TAG),
-			m_fdc(*this, I8272A_TAG),
-			m_pic0(*this, I8259A_0_TAG),
-			m_pic1(*this, I8259A_1_TAG),
-			m_vpac(*this, CRT9007_TAG),
-			m_drb0(*this, CRT9212_0_TAG),
-			m_drb1(*this, CRT9212_1_TAG),
-			m_vac(*this, CRT9021B_TAG),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_speaker(*this, "speaker"),
-			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, I8272A_TAG ":0:525qd"),
-			m_floppy1(*this, I8272A_TAG ":1:525qd"),
-			m_kb(*this, TANDY2K_KEYBOARD_TAG),
-			m_kbdclk(0),
-			m_hires_ram(*this, "hires_ram"),
-			m_char_ram(*this, "char_ram")
-	{ }
+		m_maincpu(*this, I80186_TAG),
+		m_uart(*this, I8251A_TAG),
+		m_i8255a(*this, I8255A_TAG),
+		m_pit(*this, I8253_TAG),
+		m_fdc(*this, I8272A_TAG),
+		m_pic0(*this, I8259A_0_TAG),
+		m_pic1(*this, I8259A_1_TAG),
+		m_vpac(*this, CRT9007_TAG),
+		m_drb0(*this, CRT9212_0_TAG),
+		m_drb1(*this, CRT9212_1_TAG),
+		m_vac(*this, CRT9021B_TAG),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_speaker(*this, "speaker"),
+		m_ram(*this, RAM_TAG),
+		m_floppy0(*this, I8272A_TAG ":0:525qd"),
+		m_floppy1(*this, I8272A_TAG ":1:525qd"),
+		m_kb(*this, TANDY2K_KEYBOARD_TAG),
+		m_kbdclk(0),
+		m_hires_ram(*this, "hires_ram"),
+		m_char_ram(*this, "char_ram")
+	{
+	}
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
+	required_device<i8255_device> m_i8255a;
 	required_device<pit8253_device> m_pit;
 	required_device<i8272a_device> m_fdc;
 	required_device<pic8259_device> m_pic0;
@@ -144,6 +147,18 @@ public:
 	/* sound state */
 	int m_outspkr;
 	int m_spkrdata;
+
+	int m_centronics_ack;
+	int m_centronics_fault;
+	int m_centronics_select;
+	int m_centronics_perror;
+	int m_centronics_busy;
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 };
 
 #endif

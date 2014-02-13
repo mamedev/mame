@@ -12,6 +12,7 @@
 #include "machine/i8255.h"
 #include "machine/rp5c01.h"
 #include "machine/wd17xx.h"
+#include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -47,7 +48,6 @@ public:
 		m_ym(*this, "ym2413"),
 		m_k051649(*this, "k051649"),
 		m_dac(*this, "dac"),
-		m_centronics(*this, "centronics"),
 		m_rtc(*this, TC8521_TAG),
 		m_wd179x(*this, "wd179x"),
 		m_bank1(*this, "bank1"),
@@ -102,7 +102,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(msx_wd179x_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(msx_wd179x_drq_w);
 
-
 	/* PSG */
 	int m_psg_b;
 	int m_opll_active;
@@ -146,7 +145,6 @@ public:
 	required_device<ym2413_device> m_ym;
 	optional_device<k051649_device> m_k051649;
 	required_device<dac_device> m_dac;
-	required_device<centronics_device> m_centronics;
 	optional_device<rp5c01_device> m_rtc;
 	optional_device<device_t> m_wd179x;
 	DECLARE_READ8_MEMBER(msx_psg_port_a_r);
@@ -162,9 +160,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(msx2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(msx2p_interrupt);
 	DECLARE_WRITE8_MEMBER(msx_ay8910_w);
-	DECLARE_WRITE8_MEMBER(msx_printer_strobe_w);
-	DECLARE_WRITE8_MEMBER(msx_printer_data_w);
-	DECLARE_READ8_MEMBER(msx_printer_status_r);
 	void msx_memory_init();
 	void msx_memory_set_carts();
 
@@ -183,6 +178,7 @@ public:
 	required_memory_bank m_bank9;
 	required_memory_bank m_bank10;
 	required_memory_bank m_bank11;
+
 protected:
 	required_memory_region m_region_maincpu;
 	required_ioport m_io_joy0;

@@ -30,6 +30,7 @@ public:
 			m_maincpu(*this, CDP1802_TAG),
 			m_vis(*this, CDP1869_TAG),
 			m_cassette(*this, "cassette"),
+			m_centronics(*this, "centronics"),
 			m_ram(*this, RAM_TAG),
 			m_char_rom(*this, "chargen"),
 			m_page_ram(*this, "page_ram"),
@@ -48,6 +49,7 @@ public:
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1869_device> m_vis;
 	required_device<cassette_image_device> m_cassette;
+	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 	required_memory_region m_char_rom;
 	required_shared_ptr<UINT8> m_page_ram;
