@@ -19,6 +19,7 @@
 #include "ui/bbcontrl.h"
 #include "ui/swlist.h"
 #include "ui/viewgfx.h"
+#include "ui/barcode.h"
 #include "softlist.h"
 #include "cheat.h"
 
@@ -346,6 +347,11 @@ void ui_emu_menubar::build_options_menu()
 	if (slotiter.first() != NULL)
 		options_menu.append<ui_emu_menubar>("Slot Devices...", &ui_emu_menubar::start_menu<ui_menu_slot_devices>, *this);
 
+	// barcode reader
+	barcode_reader_device_iterator bcriter(machine().root_device());
+	if (bcriter.first() != NULL)
+		options_menu.append<ui_emu_menubar>("Barcode Reader...", &ui_emu_menubar::start_menu<ui_menu_barcode_reader>, *this);
+		
 	// network devices
 	network_interface_iterator netiter(machine().root_device());
 	if (netiter.first() != NULL)
