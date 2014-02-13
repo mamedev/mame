@@ -26,6 +26,8 @@ public:
 	UINT8 *get_cart_base() { return m_rom; }
 	void write_prg_bank(UINT8 bank) { m_bank = bank; }
 
+	optional_device<i2cmem_device> m_i2cmem;
+
 protected:
 	// internal state
 	UINT8 *m_rom;
@@ -94,6 +96,7 @@ class nes_datach_rom_device : public device_t,
 {
 public:
 	// construction/destruction
+	nes_datach_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	nes_datach_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
@@ -106,8 +109,21 @@ protected:
 	virtual void device_reset();
 };
 
+// ======================> nes_datach_24c01_device
+
+class nes_datach_24c01_device : public nes_datach_rom_device
+{
+public:
+	// construction/destruction
+	nes_datach_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+
 // device type definition
 extern const device_type NES_DATACH_ROM;
+extern const device_type NES_DATACH_24C01;
 
 
 //---------------------------------
@@ -140,6 +156,7 @@ protected:
 	required_device<barcode_reader_device> m_reader;	
 	required_device<nes_datach_slot_device> m_subslot;
 	UINT8 m_i2c_dir;
+	UINT8 m_i2c_in_use;
 	
 	static const device_timer_id TIMER_SERIAL = 1;
 	emu_timer *serial_timer;
