@@ -669,12 +669,13 @@ WRITE_LINE_MEMBER( laser2001_state::pia_ca2_w )
 WRITE_LINE_MEMBER(laser2001_state::write_centronics_busy)
 {
 	m_centronics_busy = state;
-	m_pia->cb1_w(m_psg->ready_r() && m_centronics_busy);
+	m_pia->cb1_w(pia_cb1_r());
 }
 
 READ_LINE_MEMBER( laser2001_state::pia_cb1_r )
 {
-	return m_psg->ready_r() && m_centronics_busy;
+	/* actually this is a diode-AND (READY & _BUSY), but ctronics.c returns busy status if no device is mounted -> Manager won't boot */
+	return m_psg->ready_r() && (!m_centronics_busy || m_pia->ca2_output_z());
 }
 
 WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )

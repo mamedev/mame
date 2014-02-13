@@ -6,6 +6,7 @@
 
 
     http://www.geocities.jp/sanyo_phc_25/
+    http://www.phc25.com/
 
     Z80 @ 4 MHz
     MC6847 video
@@ -135,8 +136,8 @@ static ADDRESS_MAP_START( phc25_io, AS_IO, 8, phc25_state )
 	AM_RANGE(0x86, 0x86) AM_READ_PORT("KEY6")
 	AM_RANGE(0x87, 0x87) AM_READ_PORT("KEY7")
 	AM_RANGE(0x88, 0x88) AM_READ_PORT("KEY8")
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE(AY8910_TAG, ay8910_device, address_w)
-	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE(AY8910_TAG, ay8910_device, data_r, data_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(AY8910_TAG, ay8910_device, data_r, data_w)
+	AM_RANGE(0xc1, 0xc1) AM_DEVWRITE(AY8910_TAG, ay8910_device, address_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -379,7 +380,7 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, 1996750)
 	MCFG_SOUND_CONFIG(ay8910_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
@@ -431,5 +432,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS          INIT    COMPANY     FULLNAME            FLAGS */
-COMP( 1983, phc25,  0,      0,      pal,    phc25,  driver_device,  0,     "Sanyo",  "PHC-25 (Europe)",  GAME_NOT_WORKING )
-COMP( 1983, phc25j, phc25,  0,      ntsc,   phc25j, driver_device,  0,     "Sanyo",  "PHC-25 (Japan)",   GAME_NOT_WORKING )
+COMP( 1983, phc25,  0,      0,      pal,    phc25,  driver_device,  0,     "Sanyo",  "PHC-25 (Europe)",  GAME_NO_SOUND )
+COMP( 1983, phc25j, phc25,  0,      ntsc,   phc25j, driver_device,  0,     "Sanyo",  "PHC-25 (Japan)",   GAME_NO_SOUND )

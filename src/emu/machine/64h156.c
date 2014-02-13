@@ -146,6 +146,8 @@ void c64h156_device::live_start()
 	cur_live.oe = m_oe;
 	cur_live.soe = m_soe;
 	cur_live.accl = m_accl;
+	cur_live.zero_counter = 0;
+	cur_live.cycles_until_random_flux = (rand() % 31) + 289;
 
 	checkpoint_live = cur_live;
 
@@ -318,16 +320,21 @@ void c64h156_device::live_run(attotime limit)
 				cur_live.bit_counter &= 0xf;
 			}
 
-			int byte = !(((cur_live.bit_counter & 7) == 7) && cur_live.soe && !BIT(cur_live.cell_counter, 1));
-			int load = !(((cur_live.bit_counter & 7) == 7) && BIT(cur_live.cell_counter, 0) && BIT(cur_live.cell_counter, 1));
+			int byte = !(((cur_live.bit_counter & 7) == 7) && cur_live.soe && !(cur_live.cell_counter & 2));
+			int load = !(((cur_live.bit_counter & 7) == 7) && ((cur_live.cell_counter & 3) == 3));
 
 			if (!load) {
-				cur_live.shift_reg_write = cur_live.yb;
-				// TODO use data read from disk if via PA is in read mode
-				//if (LOG) logerror("%s load write shift register %02x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
-			} else {
+				if (cur_live.oe) {
+					cur_live.shift_reg_write = cur_live.shift_reg;
+					if (LOG) logerror("%s load write shift register from read shift register %02x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
+				} else {
+					cur_live.shift_reg_write = cur_live.yb;
+					if (LOG) logerror("%s load write shift register from YB %02x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
+				}
+			} else if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1)) {
 				cur_live.shift_reg_write <<= 1;
 				cur_live.shift_reg_write &= 0xff;
+				if (LOG) logerror("%s shift write register << %02x\n", cur_live.tm.as_string(), cur_live.shift_reg_write);
 			}
 
 			// update signals
@@ -384,7 +391,17 @@ int c64h156_device::get_next_bit(attotime &tm, attotime limit)
 	int bit = (cur_live.edge.is_never() || cur_live.edge >= next) ? 0 : 1;
 
 	if (bit) {
+		cur_live.zero_counter = 0;
+		cur_live.cycles_until_random_flux = (rand() % 31) + 289;
+		
 		get_next_edge(next);
+	}
+
+	if (cur_live.zero_counter >= cur_live.cycles_until_random_flux) {
+		cur_live.zero_counter = 0;
+		cur_live.cycles_until_random_flux = (rand() % 367) + 33;
+
+		bit = 1;
 	}
 
 	return bit && cur_live.oe;
@@ -581,12 +598,14 @@ void c64h156_device::stp_w(int stp)
 
 		if (m_mtr)
 		{
-			int track = m_floppy->get_cyl();
-			int tracks = (stp - track) & 0x03;
+			int tracks = 0;
 
-			if (tracks == 3)
+			switch (m_stp)
 			{
-				tracks = -1;
+			case 0: if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+			case 1: if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+			case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
+			case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
 			}
 
 			if (tracks == -1)

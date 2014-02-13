@@ -202,7 +202,8 @@ void sn76496_base_device::device_start()
 
 READ_LINE_MEMBER( sn76496_base_device::ready_r )
 {
-	m_sound->update();
+	if (started())
+		m_sound->update();
 	return (m_cycles_to_ready > 0)? FALSE : TRUE;
 }
 

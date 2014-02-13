@@ -47,7 +47,6 @@ public:
 	m_sio(*this, "ic15"),
 	m_rs232(*this, "rs232"),
 	m_centronics(*this, "centronics"),
-	m_cent_data_out(*this, "cent_data_out"),
 	m_fdc(*this, "ic68"),
 	m_floppy0(*this, "ic68:0"),
 	m_floppy1(*this, "ic68:1"),
@@ -70,7 +69,6 @@ public:
 	required_device<z80sio0_device> m_sio;
 	required_device<rs232_port_device> m_rs232;
 	required_device<centronics_device> m_centronics;
-	required_device<output_latch_device> m_cent_data_out;
 	required_device<wd2793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -79,14 +77,16 @@ public:
 
 	DECLARE_WRITE8_MEMBER( i8089_ca1_w );
 	DECLARE_WRITE8_MEMBER( i8089_ca2_w );
-	DECLARE_READ8_MEMBER( apricot_sysctrl_r );
-	DECLARE_WRITE8_MEMBER( apricot_sysctrl_w );
+	DECLARE_WRITE8_MEMBER( i8255_portb_w );
+	DECLARE_READ8_MEMBER( i8255_portc_r );
+	DECLARE_WRITE8_MEMBER( i8255_portc_w );
 	DECLARE_WRITE_LINE_MEMBER( timer_out1 );
 	DECLARE_WRITE_LINE_MEMBER( timer_out2 );
 	void wd2793_intrq_w(bool state);
 	void wd2793_drq_w(bool state);
 
-	DECLARE_WRITE8_MEMBER( centronics_write );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
 
 	DECLARE_WRITE_LINE_MEMBER( apricot_mc6845_de ) { m_display_enabled = state; };
 
@@ -106,6 +106,9 @@ public:
 	int m_display_enabled;
 
 	UINT32 screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	int m_centronics_fault;
+	int m_centronics_perror;
 };
 
 
@@ -127,16 +130,31 @@ WRITE8_MEMBER( apricot_state::i8089_ca2_w )
 	m_iop->ca_w(0);
 }
 
-READ8_MEMBER( apricot_state::apricot_sysctrl_r )
+WRITE_LINE_MEMBER( apricot_state::write_centronics_fault )
+{
+	m_centronics_fault = state;
+	m_sio->syncb_w(state);
+	m_ppi->pc2_w(state);
+}
+
+WRITE_LINE_MEMBER( apricot_state::write_centronics_perror )
+{
+	m_centronics_perror = state;
+}
+
+READ8_MEMBER( apricot_state::i8255_portc_r )
 {
 	UINT8 data = 0;
 
+	data |= m_centronics_perror << 0;
+	// schematic page 294 says pc1 is centronics pin 34, which is n/c.
+	data |= m_centronics_fault << 2;
 	data |= m_display_enabled << 3;
 
 	return data;
 }
 
-WRITE8_MEMBER( apricot_state::apricot_sysctrl_w )
+WRITE8_MEMBER( apricot_state::i8255_portb_w )
 {
 	m_display_on = BIT(data, 3);
 	m_video_mode = BIT(data, 4);
@@ -151,23 +169,21 @@ WRITE8_MEMBER( apricot_state::apricot_sysctrl_w )
 	// PB7 Centronics transceiver direction. 0 = output, 1 = input
 }
 
-WRITE8_MEMBER( apricot_state::centronics_write )
+WRITE8_MEMBER( apricot_state::i8255_portc_w )
 {
-	m_cent_data_out->write(space, 0, data);
-
-	/// HACK: This is impossible, strobe might be connected to one of i8255 Port C output bits (4/5/6/7)
-	m_centronics->write_strobe(0);
-	m_centronics->write_strobe(1);
+//	schematic page 294 says pc4 outputs to centronics pin 13, which is the "select" output from the printer.
+	m_centronics->write_strobe(BIT(data, 5));
+//	schematic page 294 says pc6 outputs to centronics pin 15, which is unused
 }
 
 static const i8255_interface apricot_i8255a_intf =
 {
 	DEVCB_DEVICE_MEMBER("cent_data_in", input_buffer_device, read),
-	DEVCB_DRIVER_MEMBER(apricot_state, centronics_write),
+	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(apricot_state, apricot_sysctrl_w),
-	DEVCB_DRIVER_MEMBER(apricot_state, apricot_sysctrl_r),
-	DEVCB_NULL
+	DEVCB_DRIVER_MEMBER(apricot_state, i8255_portb_w),
+	DEVCB_DRIVER_MEMBER(apricot_state, i8255_portc_r),
+	DEVCB_DRIVER_MEMBER(apricot_state, i8255_portc_w)
 };
 
 WRITE_LINE_MEMBER( apricot_state::timer_out1 )
@@ -425,10 +441,9 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("ic15", z80dart_device, ctsb_w))
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("ic15", z80dart_device, dcdb_w))
-	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("ic15", z80dart_device, syncb_w))
-	// TODO: these might be connected to i8255 Port C input bits (0/1/2)
-	//MCFG_CENTRONICS_SELECT_HANDLER()
-	//MCFG_CENTRONICS_PERROR_HANDLER()
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(apricot_state, write_centronics_fault))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(apricot_state, write_centronics_perror))
+	//MCFG_CENTRONICS_SELECT_HANDLER() // schematic page 294 says this is connected to pc4, but that is an output to the printer
 
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")

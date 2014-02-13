@@ -155,7 +155,7 @@ private:
 		int cycles_until_random_flux;
 
 		UINT8 yb;
-		UINT16 shift_reg_write;
+		UINT8 shift_reg_write;
 		attotime write_start_time;
 		attotime write_buffer[32];
 		int write_position;

@@ -5917,10 +5917,11 @@ ragtime         // MBD (c) 1992 (Japan)
 ragtimea        // MBD (c) 1992 (Japan)
 dblewing        // MBE (c) 1993 Mitchell
 fghthist        // MBF (c) 1993 Data East Corporation (World) DE-0380-2 PCB
-fghthistu       // MBF (c) 1993 Data East Corporation (US)    DE-0380-2 PCB
-fghthistj       // MBF (c) 1993 Data East Corporation (Japan) DE-0380-2 PCB
-fghthistua      // MBF (c) 1993 Data East Corporation (US)    DE-0395-1 PCB
-fghthistja      // MBF (c) 1993 Data East Corporation (Japan) DE-0395-1 PCB
+fghthistu       // MBF (c) 1993 Data East Corporation (US)    DE-0395-1 PCB
+fghthistj       // MBF (c) 1993 Data East Corporation (Japan) DE-0395-1 PCB
+fghthistua      // MBF (c) 1993 Data East Corporation (US)    DE-0380-2 PCB
+fghthistja      // MBF (c) 1993 Data East Corporation (Japan) DE-0380-2 PCB
+fghthistjb      // MBF (c) 1993 Data East Corporation (Japan) DE-0380-1 PCB
 hvysmsh         // MBG (c) 1993 Data East Corporation (World)
 hvysmsha        // MBG (c) 1993 Data East Corporation (Asia)
 hvysmshj        // MBG (c) 1993 Data East Corporation (Japan)
@@ -8228,6 +8229,7 @@ raidendxu       // (c) 1994 Seibu Kaihatsu + Fabtek license
 raidendxa1      // (c) 1994 Seibu Kaihatsu + Metrotainment license
 raidendxa2      // (c) 1994 Seibu Kaihatsu + Metrotainment license
 raidendxg       // (c) 1994 Seibu Kaihatsu + Tuning license
+raidendxnl		// (c) 1994 Seibu Kaihatsu
 zeroteam        // (c) 1993 Seibu Kaihatsu + Fabtek license
 zeroteama       // (c) 1993 Seibu Kaihatsu
 zeroteamb       // (c) 1993 Seibu Kaihatsu
@@ -10449,7 +10451,8 @@ saloon          // 199? unknown
 funquiz         // (c) 198? Fun World
 witchryl        // (c) 199? Video Klein
 novoplay        // (c) 1986 Novomatic
-rcdino4         // 1997 unknown
+rcdino4         // 1998 unknown
+chinatow        // 1998 unknown
 photoply
 supercrd        // (c) 1992 Fun World
 fruitstr        // (c) 1992 Fun World

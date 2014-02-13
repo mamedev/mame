@@ -366,6 +366,8 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	MCFG_CASSETTE_ADD( "cassette", mc1502_cassette_interface )
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mc1502_flop")

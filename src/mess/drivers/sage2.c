@@ -567,6 +567,8 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(sage2_state, write_centronics_select))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(sage2_state, write_centronics_fault))
 
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_IEEE488_BUS_ADD()

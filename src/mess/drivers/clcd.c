@@ -11,6 +11,7 @@
 
 
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
 #include "machine/bankdev.h"
@@ -30,6 +31,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_via0(*this, "via0"),
 		m_rtc(*this, "rtc"),
+		m_centronics(*this, "centronics"),
 		m_ram(*this,"ram"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
@@ -479,13 +481,33 @@ public:
 
 	WRITE8_MEMBER(via1_pa_w)
 	{
-		m_rtc->d0_w((data>>0) & 1);
-		m_rtc->d1_w((data>>1) & 1);
-		m_rtc->d2_w((data>>2) & 1);
-		m_rtc->d3_w((data>>3) & 1);
-		m_rtc->read_w((data>>4) & 1);
-		m_rtc->write_w((data>>5) & 1);
-		m_rtc->address_write_w((data>>6) & 1);
+		m_rtc->d0_w(BIT(data, 0));
+		m_centronics->write_data0(BIT(data, 0));
+
+		m_rtc->d1_w(BIT(data, 1));
+		m_centronics->write_data1(BIT(data, 1));
+
+		m_rtc->d2_w(BIT(data, 2));
+		m_centronics->write_data2(BIT(data, 2));
+
+		m_rtc->d3_w(BIT(data, 3));
+		m_centronics->write_data3(BIT(data, 3));
+
+		m_rtc->read_w(BIT(data, 4));
+		m_centronics->write_data4(BIT(data, 4));
+
+		m_rtc->write_w(BIT(data, 5));
+		m_centronics->write_data5(BIT(data, 5));
+
+		m_rtc->address_write_w(BIT(data, 6));
+		m_centronics->write_data6(BIT(data, 6));
+
+		m_centronics->write_data7(BIT(data, 7));
+	}
+
+	WRITE8_MEMBER(via1_pb_w)
+	{
+		//int centronics_unknown = !BIT(data,5);
 	}
 
 	ram_device *ram()
@@ -502,6 +524,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via0;
 	required_device<msm58321_device> m_rtc;
+	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_bank1;
 	required_device<address_map_bank_device> m_bank2;
@@ -699,7 +722,9 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 
 	MCFG_DEVICE_ADD("via1", VIA6522, 0)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(clcd_state, via1_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(clcd_state, via1_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, nmi_line))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe)) MCFG_DEVCB_XOR(1)
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
@@ -713,6 +738,9 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, dcd_w))
 	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, dsr_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb4))
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb6)) MCFG_DEVCB_XOR(1)
 
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)

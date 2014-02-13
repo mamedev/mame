@@ -705,6 +705,8 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(tvc_state, tvc_centronics_ack))
 
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("crt,rom,bin")

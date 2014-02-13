@@ -169,13 +169,9 @@ static ADDRESS_MAP_START(pc8_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(pc_nmi_enable_w )
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("pc_joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc_rtc_r,             pc_rtc_w)
-	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE("lpt_2", pc_lpt_device, read, write)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE("ins8250_3", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
-	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE("lpt_1", pc_lpt_device, read, write)
-	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE("lpt_0", pc_lpt_device, read, write)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE("ins8250_2", ins8250_device, ins8250_r, ins8250_w)
+	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE("lpt_0", pc_lpt_device, read, write)
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE("fdc", pc_fdc_interface, map)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
@@ -195,13 +191,9 @@ static ADDRESS_MAP_START(pc16_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(pc_nmi_enable_w, 0x00ff )
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE8(pc_rtc_r,                pc_rtc_w, 0xffff)
-	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8("lpt_2", pc_lpt_device, read, write, 0xffff)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
-	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_device, read, write, 0xffff)
-	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_device, read, write, 0xffff)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_0", pc_lpt_device, read, write, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_interface, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
@@ -214,13 +206,10 @@ static ADDRESS_MAP_START(asst128_io, AS_IO, 16, pc_state)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8( pc_nmi_enable_w, 0x00ff )
-//  AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE8(pc_rtc_r,                pc_rtc_w, 0xffff)
-//  AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_0", pc_lpt_device, read, write, 0xffff)
-//  AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f2, 0x03f3) AM_WRITE8(asst128_fdc_dor_w, 0xffff)
 	AM_RANGE(0x03f4, 0x03f5) AM_DEVICE8("fdc:upd765", upd765a_device, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
@@ -246,15 +235,10 @@ static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00a1) AM_READWRITE8(unk_r, pc_nmi_enable_w, 0x00ff )
-	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE8(pc_rtc_r,                pc_rtc_w, 0xffff)
-	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8("lpt_2", pc_lpt_device, read, write, 0xffff)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
-	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_1", pc_lpt_device, read, write, 0xffff)
-	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_device, read, write, 0xffff)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8("lpt_0", pc_lpt_device, read, write, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_interface, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
@@ -279,13 +263,9 @@ static ADDRESS_MAP_START(europc_io, AS_IO, 8, europc_pc_state )
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,            pc_page_w)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("pc_joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x0250, 0x025f) AM_READWRITE(europc_jim_r,          europc_jim_w)
-	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE("lpt_2", pc_lpt_device, read, write)
 	AM_RANGE(0x02e0, 0x02e0) AM_READ(europc_jim2_r)
-	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE("ins8250_3", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
-	AM_RANGE(0x0378, 0x037b) AM_DEVREADWRITE("lpt_1", pc_lpt_device, read, write)
-//  AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE("lpt_0", pc_lpt_device, read, write)
-	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE("ins8250_2", ins8250_device, ins8250_r, ins8250_w)
+	AM_RANGE(0x0378, 0x037b) AM_DEVREADWRITE("lpt_0", pc_lpt_device, read, write)
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE("fdc", pc_fdc_interface, map)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
@@ -406,17 +386,14 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, tandy_pc_state )
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,                pc_page_w)
 	AM_RANGE(0x00a0, 0x00a0) AM_READWRITE(pcjr_nmi_enable_r, pc_nmi_enable_w )
 	AM_RANGE(0x00c0, 0x00c0) AM_DEVWRITE("sn76496", sn76496_device, write)
 	AM_RANGE(0x00f2, 0x00f2) AM_WRITE(pcjr_fdc_dor_w)
 	AM_RANGE(0x00f4, 0x00f5) AM_DEVICE("upd765", upd765a_device, map)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("pc_joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
-	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r,         pc_t1t_p37x_w)
-	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE("lpt_0", pc_lpt_device, read, write)
+	AM_RANGE(0x0378, 0x037b) AM_DEVREADWRITE("lpt_0", pc_lpt_device, read, write)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE("pcvideo_pcjr", pcvideo_pcjr_device, read, write)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibmpcjx_map, AS_PROGRAM, 8, pc_state )
@@ -855,8 +832,6 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
 
 	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
@@ -872,21 +847,6 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
-
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
-
-	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	MCFG_GFXDECODE(ibm5150)
 
@@ -901,13 +861,7 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -993,8 +947,6 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
 
 	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
@@ -1009,20 +961,6 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
 	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
-
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
-
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -1039,13 +977,7 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
@@ -1126,13 +1058,7 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -1202,13 +1128,7 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -1279,13 +1199,7 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -1336,15 +1250,7 @@ static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", pcjr_ppi8255_interface )
 
-	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
 
 	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
@@ -1369,13 +1275,7 @@ static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -1456,13 +1356,7 @@ static MACHINE_CONFIG_START( asst128, pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w)) // verify
 
 	MCFG_CASSETTE_ADD( "cassette", mc1502_cassette_interface )
 
@@ -1512,8 +1406,6 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
 
 	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
@@ -1529,20 +1421,6 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
-
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
-
 	/* video hardware */
 //  MCFG_FRAGMENT_ADD( pcvideo_ega ) // Put this back after ISA are added to this driver
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1557,13 +1435,7 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w)) // verify
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -1597,8 +1469,6 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
 
 	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
@@ -1613,20 +1483,6 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
 	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
-
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
-
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_poisk2 )
@@ -1643,13 +1499,7 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w)) // verify
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -1682,8 +1532,6 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
 
 	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
@@ -1698,20 +1546,6 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
 	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
-
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
-
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1728,13 +1562,7 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w)) // verify
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -1767,8 +1595,6 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
 
 	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
@@ -1783,20 +1609,6 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
 	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
-
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
-
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1813,13 +1625,7 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w)) // verify
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -1852,8 +1658,6 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
 
 	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
@@ -1868,20 +1672,6 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
 	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
-
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
-
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1898,13 +1688,7 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_1", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-
-	MCFG_DEVICE_ADD("lpt_2", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w)) // verify
 
 	MCFG_PC_JOY_ADD("pc_joy")
 

@@ -3059,7 +3059,6 @@ MACHINE_START_MEMBER(amstrad_state,gx4000)
 {
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_GX4000;
-	m_centronics->write_data7(0);
 }
 
 MACHINE_RESET_MEMBER(amstrad_state,gx4000)

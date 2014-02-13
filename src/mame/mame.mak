@@ -493,6 +493,11 @@ MACHINES += SECFLASH
 MACHINES += PCCARD
 
 #-------------------------------------------------
+# specify available bus cores
+#-------------------------------------------------
+BUSES += CENTRONICS
+
+#-------------------------------------------------
 # this is the list of driver libraries that
 # comprise MAME plus mamedriv.o which contains
 # the list of drivers

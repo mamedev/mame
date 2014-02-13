@@ -333,6 +333,8 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(rmnimbus_state, nimbus_ack_w))
 
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO(MONO_TAG)
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, 2000000)

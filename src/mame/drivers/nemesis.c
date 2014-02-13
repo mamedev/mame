@@ -2749,6 +2749,8 @@ ROM_START( bubsys )
 	ROM_LOAD( "400a1.2b", 0x000, 0x100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
 	ROM_LOAD( "400a2.1b", 0x100, 0x100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
 
+	ROM_REGION( 0x800, "vlm", ROMREGION_ERASE00 ) /* dummy region to set the correct vlm address mask */
+
 	ROM_REGION( 0x4000, "sram", 0 ) // raw RAM dumps, just for emulation aid, to be removed ...
 	ROM_LOAD( "sram1.ic1", 0x0000, 0x2000, CRC(45fc9453) SHA1(eeb4ff2c2c9d3b6ea9d0f0e8fd4873f2cce2cff9) )
 	ROM_LOAD( "sram2.ic3", 0x2000, 0x2000, CRC(dda768be) SHA1(e98bae3ccf63eb67193346e9c40257a3ddb88e59) )

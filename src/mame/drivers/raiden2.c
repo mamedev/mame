@@ -2713,6 +2713,41 @@ ROM_START( raidendxg )
 ROM_END
 
 
+ROM_START( raidendxnl )
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
+	ROM_LOAD32_BYTE("u1210_4n.bin", 0x000000, 0x80000, CRC(c589019a) SHA1(9bdd7f7d0bca16d67ba234d8a1fed5d2c8ab7191) )
+	ROM_LOAD32_BYTE("u1211_4p.bin", 0x000001, 0x80000, CRC(b2222254) SHA1(b0e41d88111a96f0c0fb11b20ea99f436e8d493d) )
+	ROM_LOAD32_BYTE("u129_6n.bin",  0x000002, 0x80000, CRC(60f04634) SHA1(50f1b721a017d879838d920cf5d5355aa024e09b) )
+	ROM_LOAD32_BYTE("u1212_6p.bin", 0x000003, 0x80000, CRC(21ec37cc) SHA1(6da629e2bb5bd4c2192156af017148e99e274544) )
+
+	ROM_REGION( 0x40000, "user2", 0 )   /* COPX */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) ) /* Shared with original Raiden 2 */
+
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* 64k code for sound Z80 */
+	ROM_LOAD( "u1110_5b.bin", 0x000000, 0x08000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
+	ROM_CONTINUE(0x10000,0x8000)
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "seibu_7b_u724.bin", 0x000000, 0x020000, CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
+	ROM_LOAD( "dx_back-1.u075",  0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
+	ROM_LOAD( "dx_back-2.u0714", 0x200000, 0x200000, CRC(5799af3e) SHA1(85d6532abd769da77bcba70bd2e77915af40f987) )
+
+	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Shared with original Raiden 2 */
+	ROM_LOAD32_WORD( "raiden_2_seibu_obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
+	ROM_LOAD32_WORD( "dx_obj-3.u0837", 0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
+	ROM_LOAD32_WORD( "dx_obj-4.u0836", 0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )   /* ADPCM samples */
+	ROM_LOAD( "seibu_6_u1017.bin", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )   /* ADPCM samples */
+	ROM_LOAD( "pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) ) /* Shared with original Raiden 2 */
+ROM_END
+
 /* Zero Team sets */
 /* Zero team is slightly older hardware (early 93 instead of late 93) but
 almost identical to raiden 2 with a few key differences:
@@ -3183,7 +3218,7 @@ DRIVER_INIT_MEMBER(raiden2_state,zeroteam)
 
 // rev numbers at end of the line just indicate which sets are the same code revisions (just a region byte change), they don't reflect the actual order of release
 GAME( 1993, raiden2,  0,       raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden II (set 1, US Fabtek)",     GAME_NOT_WORKING) // rev 1
-GAME( 1993, raiden2a, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden II (set 2, Metrotainment)", GAME_NOT_WORKING) //  ^
+GAME( 1993, raiden2a, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden II (set 2, Hong Kong, Metrotainment)", GAME_NOT_WORKING) //  ^
 GAME( 1993, raiden2b, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 3, Japan)",         GAME_NOT_WORKING) //  ^
 GAME( 1993, raiden2c, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 4, Italy)",         GAME_NOT_WORKING) // rev 2
 GAME( 1993, raiden2d, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 5, Easy Version)",  GAME_NOT_WORKING) // rev 3
@@ -3193,12 +3228,13 @@ GAME( 1993, raiden2g, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT2
 GAME( 1993, raiden2nl,raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 9, Holland)",         GAME_NOT_WORKING)
 
 
-GAME( 1994, raidendx,  0,       raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (UK)",                   GAME_NOT_WORKING)
-GAME( 1994, raidendxa1,raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Asia set 1)",           GAME_NOT_WORKING)
-GAME( 1994, raidendxa2,raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Asia set 2)",           GAME_NOT_WORKING)
+GAME( 1994, raidendx,  0,        raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (UK)",                   GAME_NOT_WORKING)
+GAME( 1994, raidendxa1,raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Hong Kong, set 1)",           GAME_NOT_WORKING)
+GAME( 1994, raidendxa2,raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden DX (Hong Kong, set 2)",           GAME_NOT_WORKING)
 GAME( 1994, raidendxj, raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (Japan)",                GAME_NOT_WORKING)
 GAME( 1994, raidendxu, raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden DX (US)",                   GAME_NOT_WORKING)
 GAME( 1994, raidendxg, raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden DX (Germany)",              GAME_NOT_WORKING)
+GAME( 1994, raidendxnl,raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (Holland)",              GAME_NOT_WORKING)
 
 GAME( 1993, zeroteam, 0,       zeroteam, zeroteam, raiden2_state,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team USA (set 1, US, Fabtek license)", GAME_NOT_WORKING)
 GAME( 1993, zeroteama,zeroteam,zeroteam, zeroteam, raiden2_state,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2, Japan? (earlier?))", GAME_NOT_WORKING)
