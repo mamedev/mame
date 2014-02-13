@@ -25,8 +25,14 @@
 #define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
 
 
+//-----------------------------------------------
+//
+//	Nantettate!! Baseball Cartslot implementation
+//
+//-----------------------------------------------
+
 //-------------------------------------------------
-//  sub-cart device
+//  sub-cart interface
 //-------------------------------------------------
 
 ntb_cart_interface::ntb_cart_interface(const machine_config &mconfig, device_t &device)
@@ -112,9 +118,11 @@ const char * nes_ntb_slot_device::get_default_card_software(const machine_config
 	return software_get_default_slot(config, options, this, "ntbrom");
 }
 
-//-------------------------------------------------
-//  NTB ROM device
-//-------------------------------------------------
+//-----------------------------------------------
+//
+//	Nantettate!! Baseball Minicart implementation
+//
+//-----------------------------------------------
 
 ROM_START( ntb_rom )
 	ROM_REGION(0x8000, "ntbrom", ROMREGION_ERASEFF)
@@ -143,9 +151,15 @@ UINT8 *nes_ntb_rom_device::get_cart_base()
 	return m_rom;
 }
 
-//-------------------------------------------------
-//  constructor
-//-------------------------------------------------
+
+
+//------------------------------------------------
+//
+//	Nantettate!! Baseball base cart implementation
+//  a.k.a. Sunsoft Dual Cassette System 
+//  (variant of Sunsoft-4 PCB)
+//
+//------------------------------------------------
 
 const device_type NES_SUNSOFT_DCS = &device_creator<nes_sunsoft_dcs_device>;
 

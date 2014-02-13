@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="nes_datach" description="Nintendo Entertainment System - Datach Joint ROM System mini-cartridges">
+
+	<software name="dtc_brsh" supported="partial">
+		<description>Datach - Battle Rush - Build Up Robot Tournament (Jpn)</description>
+		<year>1993</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="DATACH-BURT"/>
+		<info name="release" value="19931112"/>
+		<info name="alt_title" value="データック バトルラッシュ"/>
+		<part name="cart" interface="datach_cart">
+			<feature name="slot" value="datach_rom" />
+			<feature name="pcb" value="BANDAI-DATACH" />
+			<dataarea name="rom" size="262144">
+				<rom name="datach - battle rush - build up robot tournament (japan).prg" size="262144" crc="983d8175" sha1="29cc759d5ca214eefc0cc1c6ce0f8b9111e58124" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dtc_cray">
+		<description>Datach - Crayon Shin-Chan - Ora to Poi Poi (Jpn)</description>
+		<year>1993</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="DATACH-CSOPP"/>
+		<info name="release" value="19930827"/>
+		<info name="alt_title" value="データック クレヨンしんちゃん オラとポイポイ"/>
+		<part name="cart" interface="datach_cart">
+			<feature name="slot" value="datach_rom" />
+			<feature name="pcb" value="BANDAI-DATACH" />
+			<dataarea name="rom" size="262144">
+				<rom name="datach - crayon shin-chan - ora to poi poi (japan).prg" size="262144" crc="894efdbc" sha1="6f3c65bd945fe13305a7a39d8cd884a5bf314a8f" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dtc_dbz">
+		<description>Datach - Dragon Ball Z - Gekitou Tenkaichi Budou Kai (Jpn)</description>
+		<year>1992</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="DATACH-DBZ"/>
+		<info name="release" value="19921229"/>
+		<info name="alt_title" value="データック ドラゴンボールZ 激闘天下一武道会"/>
+		<part name="cart" interface="datach_cart">
+			<feature name="slot" value="datach_rom" />
+			<feature name="pcb" value="BANDAI-DATACH" />
+			<dataarea name="rom" size="262144">
+				<rom name="datach - dragon ball z - gekitou tenkaichi budou kai (japan).prg" size="262144" crc="19e81461" sha1="87478b635fefb25fa13c4876e20f505a97426c1b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dtc_jltp">
+		<description>Datach - J League Super Top Players (Jpn)</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="DATACH-STP"/>
+		<info name="release" value="19940422"/>
+		<info name="alt_title" value="データック Jリーグスーパートッププレイヤーズ"/>
+		<part name="cart" interface="datach_cart">
+			<feature name="slot" value="datach_rom" />
+			<feature name="pcb" value="BANDAI-DATACH" />
+			<dataarea name="rom" size="262144">
+				<rom name="datach - j league super top players (japan).prg" size="262144" crc="be06853f" sha1="b2089533e05fe95814d0d77f2729944cbeb95988" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dtc_sdgn">
+		<description>Datach - SD Gundam - Gundam Wars (Jpn)</description>
+		<year>1993</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="DATACH-SDGW"/>
+		<info name="release" value="19930423"/>
+		<info name="alt_title" value="データック SDガンダム ガンダムウォーズ"/>
+		<part name="cart" interface="datach_cart">
+			<feature name="slot" value="datach_rom" />
+			<feature name="pcb" value="BANDAI-DATACH" />
+			<dataarea name="rom" size="262144">
+				<rom name="datach - sd gundam - gundam wars (japan).prg" size="262144" crc="0be0a328" sha1="edd7a45a7f27e396b6d686f1861642d509863132" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dtc_ultr">
+		<description>Datach - Ultraman Club - Supokon Fight! (Jpn)</description>
+		<year>1993</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="DATACH-UCSF"/>
+		<info name="release" value="19930423"/>
+		<info name="alt_title" value="データック ウルトラマン倶楽部 スポ根ファイト!"/>
+		<part name="cart" interface="datach_cart">
+			<feature name="slot" value="datach_rom" />
+			<feature name="pcb" value="BANDAI-DATACH" />
+			<dataarea name="rom" size="262144">
+				<rom name="datach - ultraman club - supokon fight! (japan).prg" size="262144" crc="5b457641" sha1="533170d5eb685231ccd27b9c136ffa4fad68a7b8" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dtc_yuyu">
+		<description>Datach - Yu Yu Hakusho - Bakutou Ankoku Bujutsu Kai (Jpn)</description>
+		<year>1993</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="DATACH-BABK"/>
+		<info name="release" value="19931022"/>
+		<info name="alt_title" value="データック 幽遊白書 爆闘暗黒武術会"/>
+		<part name="cart" interface="datach_cart">
+			<feature name="slot" value="datach_rom" />
+			<feature name="pcb" value="BANDAI-DATACH" />
+			<dataarea name="rom" size="262144">
+				<rom name="datach - yuu yuu hakusho - bakutou ankoku bujutsu kai (japan).prg" size="262144" crc="f51a7f46" sha1="74218aae93e4febfb2284bcf15811453418a2029" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -1543,6 +1543,7 @@ $(MESSOBJ)/nintendo.a:          \
 	$(MESS_MACHINE)/nes_camerica.o  \
 	$(MESS_MACHINE)/nes_cne.o  \
 	$(MESS_MACHINE)/nes_cony.o  \
+	$(MESS_MACHINE)/nes_datach.o  \
 	$(MESS_MACHINE)/nes_discrete.o  \
 	$(MESS_MACHINE)/nes_event.o  \
 	$(MESS_MACHINE)/nes_ggenie.o  \

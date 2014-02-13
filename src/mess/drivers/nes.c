@@ -1070,7 +1070,8 @@ static MACHINE_CONFIG_START( nes, nes_state )
 
 	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_crt_interface, nes_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "nes")
-	MCFG_SOFTWARE_LIST_ADD("ntb_list", "nes_ntbrom") // Nantettate Baseball mini_carts
+	MCFG_SOFTWARE_LIST_ADD("ntb_list", "nes_ntbrom")    // Sunsoft Nantettate! Baseball mini-carts
+	MCFG_SOFTWARE_LIST_ADD("datach_list", "nes_datach") // Bandai Datach Joint ROM System mini-carts
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nespal, nes )
