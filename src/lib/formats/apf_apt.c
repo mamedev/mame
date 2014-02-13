@@ -71,7 +71,40 @@ static int apf_output_byte(INT16 *buffer, int sample_pos, UINT8 byte)
 	return samples;
 }
 
-static int apf_handle_cassette(INT16 *buffer, const UINT8 *bytes)
+static int apf_apt_handle_cassette(INT16 *buffer, const UINT8 *bytes)
+{
+	UINT32 sample_count = 0;
+	UINT32 i;
+	UINT8 cksm = 0;
+	UINT32 temp = 0;
+
+	// silence
+	sample_count += apf_put_samples(buffer, 0, 12000, 0);
+
+	for (i=0; i<apf_image_size; i++)
+	{
+		sample_count += apf_output_byte(buffer, sample_count, bytes[i]);
+		if (bytes[i]==0xfe)
+		{
+			temp = i+1;
+			i = apf_image_size;
+		}
+	}
+
+	/* data */
+	for (i= temp; i<(temp+0x1e00); i++)
+	{
+		cksm += bytes[i];
+		sample_count += apf_output_byte(buffer, sample_count, bytes[i]);
+	}
+
+	/* checksum byte */
+	sample_count += apf_output_byte(buffer, sample_count, cksm);
+
+	return sample_count;
+}
+
+static int apf_cpf_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 {
 	UINT32 sample_count = 0;
 	UINT32 i;
@@ -104,53 +137,99 @@ static int apf_handle_cassette(INT16 *buffer, const UINT8 *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int apf_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+static int apf_apt_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 {
-	return apf_handle_cassette(buffer, bytes);
+	return apf_apt_handle_cassette(buffer, bytes);
+}
+
+static int apf_cpf_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
+{
+	return apf_cpf_handle_cassette(buffer, bytes);
 }
 
 /*******************************************************************
    Calculate the number of samples needed for this tape image
 ********************************************************************/
 
-static int apf_cassette_calculate_size_in_samples(const UINT8 *bytes, int length)
+static int apf_apt_calculate_size_in_samples(const UINT8 *bytes, int length)
 {
 	apf_image_size = length;
 
-	return apf_handle_cassette(NULL, bytes);
+	return apf_apt_handle_cassette(NULL, bytes);
 }
 
-static const struct CassetteLegacyWaveFiller apf_legacy_fill_wave =
+static int apf_cpf_calculate_size_in_samples(const UINT8 *bytes, int length)
 {
-	apf_cassette_fill_wave,                 /* fill_wave */
+	apf_image_size = length;
+
+	return apf_cpf_handle_cassette(NULL, bytes);
+}
+
+//*********************************************************************************
+
+static const struct CassetteLegacyWaveFiller apf_cpf_fill_intf =
+{
+	apf_cpf_fill_wave,                      /* fill_wave */
 	-1,                                     /* chunk_size */
 	0,                                      /* chunk_samples */
-	apf_cassette_calculate_size_in_samples, /* chunk_sample_calc */
+	apf_cpf_calculate_size_in_samples,      /* chunk_sample_calc */
 	APF_WAV_FREQUENCY,                      /* sample_frequency */
 	0,                                      /* header_samples */
 	0                                       /* trailer_samples */
 };
 
-static casserr_t apf_cassette_identify(cassette_image *cassette, struct CassetteOptions *opts)
+static casserr_t apf_cpf_identify(cassette_image *cassette, struct CassetteOptions *opts)
 {
-	return cassette_legacy_identify(cassette, opts, &apf_legacy_fill_wave);
+	return cassette_legacy_identify(cassette, opts, &apf_cpf_fill_intf);
 }
 
-static casserr_t apf_cassette_load(cassette_image *cassette)
+static casserr_t apf_cpf_load(cassette_image *cassette)
 {
-	return cassette_legacy_construct(cassette, &apf_legacy_fill_wave);
+	return cassette_legacy_construct(cassette, &apf_cpf_fill_intf);
+}
+
+static const struct CassetteFormat apf_cpf_format =
+{
+	"cas,cpf",
+	apf_cpf_identify,
+	apf_cpf_load,
+	NULL
+};
+
+//*********************************************************************************
+
+static const struct CassetteLegacyWaveFiller apf_apt_fill_intf =
+{
+	apf_apt_fill_wave,                      /* fill_wave */
+	-1,                                     /* chunk_size */
+	0,                                      /* chunk_samples */
+	apf_apt_calculate_size_in_samples,      /* chunk_sample_calc */
+	APF_WAV_FREQUENCY,                      /* sample_frequency */
+	0,                                      /* header_samples */
+	0                                       /* trailer_samples */
+};
+
+static casserr_t apf_apt_identify(cassette_image *cassette, struct CassetteOptions *opts)
+{
+	return cassette_legacy_identify(cassette, opts, &apf_apt_fill_intf);
+}
+
+static casserr_t apf_apt_load(cassette_image *cassette)
+{
+	return cassette_legacy_construct(cassette, &apf_apt_fill_intf);
 }
 
 static const struct CassetteFormat apf_apt_format =
 {
-	"cas,cpf",
-	apf_cassette_identify,
-	apf_cassette_load,
+	"apt",
+	apf_apt_identify,
+	apf_apt_load,
 	NULL
 };
 
-
+//*********************************************************************************
 
 CASSETTE_FORMATLIST_START(apf_cassette_formats)
+	CASSETTE_FORMAT(apf_cpf_format)
 	CASSETTE_FORMAT(apf_apt_format)
 CASSETTE_FORMATLIST_END
