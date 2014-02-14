@@ -41,6 +41,7 @@ public:
 	DECLARE_READ8_MEMBER(spc1000_video_ram_r);
 	DECLARE_READ8_MEMBER(spc1000_keyboard_r);
 	virtual void machine_reset();
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_WRITE8_MEMBER(spc1000_gmode_w);
 	DECLARE_READ8_MEMBER(spc1000_gmode_r);
 	DECLARE_READ8_MEMBER(spc1000_mc6847_videoram_r);
@@ -281,12 +282,18 @@ static const cassette_interface spc1000_cassette_interface =
 	NULL
 };
 
+// irq is inverted in emulation, so we need this trampoline
+WRITE_LINE_MEMBER( spc1000_state::irq_w )
+{
+	m_maincpu->set_input_line(0, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static const mc6847_interface spc1000_mc6847_intf =
 {
 	"screen",
 	DEVCB_DRIVER_MEMBER(spc1000_state,spc1000_mc6847_videoram_r),   // data fetch
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(spc1000_state, irq_w),       /* field sync */
 
 	DEVCB_NULL,                 /* AG */
 	DEVCB_LINE_VCC,             /* GM2 */
@@ -305,7 +312,6 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(spc1000_mem)
 	MCFG_CPU_IO_MAP(spc1000_io)
-
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
