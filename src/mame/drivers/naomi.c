@@ -6328,6 +6328,9 @@ ROM_START( puyofevp )
 
 	ROM_COPY( "rom_board", 0x01000000, 0x400000, 0xc00000 )
 
+	// M1 board, but it doesn't appear the protection is used
+	ROM_REGION( 4, "rom_key", ROMREGION_ERASE00 )
+
 	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
 	ROM_REGION(0x84, "some_eeprom", 0)
 	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(17150bc9) SHA1(c3af7d91e12141938d2b9e67eb9f5ff961cd09ff) ) 
@@ -7853,6 +7856,9 @@ ROM_START( clubkpzb )
 	ROM_LOAD32_WORD( "opr-24193.ic32s", 0x8000002, 0x800000, CRC(fb39946d) SHA1(d9fa077869709c6fda640bd4be18cf3db7ebe1d1) ) 
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
+
+	ROM_REGION( 4, "rom_key", ROMREGION_ERASE00 )
+	ROM_LOAD( "clubkprz-key.bin", 0x000000, 0x000004, CRC(c9ed13c1) SHA1(2907985375cd5b04846e7214d200926be64d06fd) ) 
 
 	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
 	ROM_REGION(0x84, "some_eeprom", 0)
