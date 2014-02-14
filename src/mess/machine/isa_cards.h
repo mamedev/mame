@@ -26,6 +26,7 @@
 
 // storage
 #include "machine/isa_fdc.h"
+#include "machine/isa_mufdc.h"
 #include "machine/isa_hdc.h"
 #include "machine/isa_wdxt_gen.h"
 #include "machine/isa_ide.h"
