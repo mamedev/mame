@@ -346,9 +346,17 @@ void apple3_state::apple3_update_memory()
 
 	/* install bank 7 (F000-FFFF) */
 	if (m_via_0_a & 0x01)
+	{
 		m_bank7 = memregion("maincpu")->base();
+	}
 	else
+	{
+		m_rom_has_been_disabled = true;
 		m_bank7 = apple3_bankaddr(~0, 0x7000);
+
+		// if we had an IRQ waiting for RAM to be paged in...
+		apple3_irq_update();
+	}
 }
 
 
@@ -388,7 +396,18 @@ void apple3_state::apple3_irq_update()
 {
 	if (m_via_1_irq || m_via_0_irq)
 	{
-//		printf("   asserting IRQ\n");
+		// HACK: SOS floppy driver enables ROM at Fxxx *before* trying to
+		// suppress IRQs.  IRQ hits at inopportune time -> bad vector -> system crash.
+		// This breaks the Confidence Test, but the Confidence Test
+		// never disables the ROM so checking for that gets us 
+		// working in all cases.
+		// Bonus points: for some reason this isn't a problem with -debug.
+		// m6502 heisenbug maybe?
+		if ((m_via_0_a & 0x01) && (m_rom_has_been_disabled))
+		{
+			return;
+		}
+//		printf("   setting IRQ\n");
 		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 		m_via_1->write_pa7(0);	// this is active low
 	}
@@ -424,6 +443,7 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 	m_c040_time = 0;
 	m_strobe = 0;
 	m_lastchar = 0x0d;
+	m_rom_has_been_disabled = false;
 }
 
 

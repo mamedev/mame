@@ -112,6 +112,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 
 	bool m_sync;
+	bool m_rom_has_been_disabled;
 	UINT8 m_indir_opcode;
 	int m_indir_count;
 
