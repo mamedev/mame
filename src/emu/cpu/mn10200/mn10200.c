@@ -904,13 +904,21 @@ void mn10200_device::execute_run()
 
 		// addc dn, dm
 		case 0x80:
+		{
+			UINT16 mask0 = ~FLAG_ZF | (m_psw & FLAG_ZF);
 			m_d[op&3] = do_add(m_d[op&3], m_d[op>>2&3], (m_psw & FLAG_CF) ? 1 : 0);
+			m_psw &= mask0; // ZF can only be set if it was set before the operation
 			break;
+		}
 
 		// subc dn, dm
 		case 0x90:
+		{
+			UINT16 mask0 = ~FLAG_ZF | (m_psw & FLAG_ZF);
 			m_d[op&3] = do_sub(m_d[op&3], m_d[op>>2&3], (m_psw & FLAG_CF) ? 1 : 0);
+			m_psw &= mask0; // ZF can only be set if it was set before the operation
 			break;
+		}
 
 		// add an, dm
 		case 0xc0:
@@ -1169,6 +1177,7 @@ void mn10200_device::execute_run()
 
 		// mov an, (abs24)
 		case 0x50: case 0x51: case 0x52: case 0x53:
+			m_cycles -= 1;
 			write_mem24(read_arg24(m_pc), m_a[op&3]);
 			break;
 
