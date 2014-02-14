@@ -7,6 +7,19 @@ Support for APF Imagination Machine cassette images
 CPF and CAS images consist of the screen and then the program,
 and are exactly 1E00 bytes in length.
 
+APT images are much the same, however it includes a series of FF
+bytes as a header. There's also a large amount of what seems to
+be rubbish at the end.
+
+APW images are not emulated, and are used by the closed-source
+emulator APF_EMUW. Quote: "They allow recording in special formats
+and recording audio. They are audio files sampled at 11025 Hz 8 bits
+unsigned mono, without header. The bit 1 stores the state of the
+recording head."
+
+S19 images are not emulated, however there's no need to as they
+are only used to hold cartridge hex dumps.
+
 Each byte after conversion becomes bit 7,6,etc to 0, There are
 no start or stop bits.
 
