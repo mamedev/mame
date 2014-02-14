@@ -21,6 +21,8 @@
 #include "formats/ap2_dsk.h"
 #include "machine/appldriv.h"
 
+#include "bus/a2bus/a2cffa.h"
+
 static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(apple3_memory_r, apple3_memory_w)
 ADDRESS_MAP_END
@@ -37,6 +39,10 @@ static const floppy_interface apple3_floppy_interface =
 	NULL,
 	NULL
 };
+
+static SLOT_INTERFACE_START(apple3_cards)
+	SLOT_INTERFACE("cffa2", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
+SLOT_INTERFACE_END
 
 static const struct a2bus_interface a2bus_intf =
 {
@@ -88,6 +94,10 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 
 	/* slot bus */
 	MCFG_A2BUS_BUS_ADD("a2bus", "maincpu", a2bus_intf)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple3_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple3_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple3_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple3_cards, NULL)
 
 	/* fdc */
 	MCFG_APPLEFDC_ADD("fdc", apple3_fdc_interface)
@@ -293,4 +303,5 @@ ROM_START(apple3)
 ROM_END
 
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT    INIT    COMPANY             FULLNAME */
-COMP( 1980, apple3,     0,      0,      apple3,    apple3, apple3_state,    apple3,     "Apple Computer",   "Apple ///", 0 )
+COMP( 1980, apple3,     0,      0,      apple3,    apple3, apple3_state,    apple3,     "Apple Computer",   "Apple ///", GAME_SUPPORTS_SAVE )
+

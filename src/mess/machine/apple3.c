@@ -56,6 +56,7 @@ static void apple3_update_drives(device_t *device);
 READ8_MEMBER(apple3_state::apple3_c0xx_r)
 {
 	UINT8 result = 0xFF;
+	device_a2bus_card_interface *slotdevice;
 
 	switch(offset)
 	{
@@ -143,6 +144,50 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			result = 0x00;
 			break;
 
+		case 0x90: case 0x91: case 0x92: case 0x93:
+		case 0x94: case 0x95: case 0x96: case 0x97:
+		case 0x98: case 0x99: case 0x9a: case 0x9b:
+		case 0x9c: case 0x9d: case 0x9e: case 0x9f:
+			slotdevice = m_a2bus->get_a2bus_card(1);
+			if (slotdevice != NULL)
+			{
+				result = slotdevice->read_c0nx(space, offset&0xf);
+			}
+			break; 
+
+		case 0xa0: case 0xa1: case 0xa2: case 0xa3:
+		case 0xa4: case 0xa5: case 0xa6: case 0xa7:
+		case 0xa8: case 0xa9: case 0xaa: case 0xab:
+		case 0xac: case 0xad: case 0xae: case 0xaf:
+			slotdevice = m_a2bus->get_a2bus_card(2);
+			if (slotdevice != NULL)
+			{
+				result = slotdevice->read_c0nx(space, offset&0xf);
+			}
+			break; 
+
+		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
+		case 0xb4: case 0xb5: case 0xb6: case 0xb7:
+		case 0xb8: case 0xb9: case 0xba: case 0xbb:
+		case 0xbc: case 0xbd: case 0xbe: case 0xbf:
+			slotdevice = m_a2bus->get_a2bus_card(3);
+			if (slotdevice != NULL)
+			{
+				result = slotdevice->read_c0nx(space, offset&0xf);
+			}
+			break; 
+
+		case 0xc0: case 0xc1: case 0xc2: case 0xc3:
+		case 0xc4: case 0xc5: case 0xc6: case 0xc7:
+		case 0xc8: case 0xc9: case 0xca: case 0xcb:
+		case 0xcc: case 0xcd: case 0xce: case 0xcf:
+			slotdevice = m_a2bus->get_a2bus_card(4);
+			if (slotdevice != NULL)
+			{
+				result = slotdevice->read_c0nx(space, offset&0xf);
+			}
+			break; 
+
 		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
 		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
 			/* external drive stuff */
@@ -179,6 +224,8 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 
 WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 {
+	device_a2bus_card_interface *slotdevice;
+
 	switch(offset)
 	{
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -211,6 +258,50 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			else
 				m_flags &= ~(1 << ((offset - 0x50) / 2));
 			break;
+
+		case 0x90: case 0x91: case 0x92: case 0x93:
+		case 0x94: case 0x95: case 0x96: case 0x97:
+		case 0x98: case 0x99: case 0x9a: case 0x9b:
+		case 0x9c: case 0x9d: case 0x9e: case 0x9f:
+			slotdevice = m_a2bus->get_a2bus_card(1);
+			if (slotdevice != NULL)
+			{
+				slotdevice->write_c0nx(space, offset&0xf, data);
+			}
+			break; 
+
+		case 0xa0: case 0xa1: case 0xa2: case 0xa3:
+		case 0xa4: case 0xa5: case 0xa6: case 0xa7:
+		case 0xa8: case 0xa9: case 0xaa: case 0xab:
+		case 0xac: case 0xad: case 0xae: case 0xaf:
+			slotdevice = m_a2bus->get_a2bus_card(2);
+			if (slotdevice != NULL)
+			{
+				slotdevice->write_c0nx(space, offset&0xf, data);
+			}
+			break; 
+
+		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
+		case 0xb4: case 0xb5: case 0xb6: case 0xb7:
+		case 0xb8: case 0xb9: case 0xba: case 0xbb:
+		case 0xbc: case 0xbd: case 0xbe: case 0xbf:
+			slotdevice = m_a2bus->get_a2bus_card(3);
+			if (slotdevice != NULL)
+			{
+				slotdevice->write_c0nx(space, offset&0xf, data);
+			}
+			break; 
+
+		case 0xc0: case 0xc1: case 0xc2: case 0xc3:
+		case 0xc4: case 0xc5: case 0xc6: case 0xc7:
+		case 0xc8: case 0xc9: case 0xca: case 0xcb:
+		case 0xcc: case 0xcd: case 0xce: case 0xcf:
+			slotdevice = m_a2bus->get_a2bus_card(4);
+			if (slotdevice != NULL)
+			{
+				slotdevice->write_c0nx(space, offset&0xf, data);
+			}
+			break; 
 
 		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
 		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
@@ -444,6 +535,7 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 	m_strobe = 0;
 	m_lastchar = 0x0d;
 	m_rom_has_been_disabled = false;
+	m_cnxx_slot = -1;
 }
 
 
@@ -603,6 +695,32 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_via_1->write_pb7(1);
 
 	apple3_update_memory();
+
+	save_item(NAME(m_via_0_a));
+	save_item(NAME(m_via_0_b));
+	save_item(NAME(m_via_1_a));
+	save_item(NAME(m_via_1_b));
+	save_item(NAME(m_via_0_irq));
+	save_item(NAME(m_via_1_irq));
+	save_item(NAME(m_zpa));
+	save_item(NAME(m_last_n));
+	save_item(NAME(m_sync));
+	save_item(NAME(m_rom_has_been_disabled));
+	save_item(NAME(m_indir_opcode));
+	save_item(NAME(m_indir_count));
+	save_item(NAME(m_cnxx_slot));
+	save_item(NAME(m_speaker_state));
+	save_item(NAME(m_c040_time));
+	save_item(NAME(m_lastchar));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_transchar));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(apple3_state::apple3_postload), this));
+}
+
+void apple3_state::apple3_postload()
+{
+	apple3_update_memory();
 }
 
 READ8_MEMBER(apple3_state::apple3_memory_r)
@@ -665,6 +783,21 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 		{
 			rv = m_bank9[offset - 0xc100];
 		}
+		else
+		{
+			/* now identify the device */
+			device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card((offset>>8) & 0x7);
+
+			if (slotdevice != NULL)
+			{
+				if (slotdevice->take_c800())
+				{
+					m_cnxx_slot = ((offset>>8) & 7);
+				}
+
+				return slotdevice->read_cnxx(space, offset&0xff);
+			}
+		}
 	}
 	else if (offset < 0xc800)
 	{
@@ -675,6 +808,23 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 		if (!(m_via_0_a & 0x40))
 		{
 			rv = m_bank11[offset - 0xc800];
+		}
+		else
+		{
+			if (offset == 0xcfff)
+			{
+				m_cnxx_slot = -1;
+			}
+
+			if (m_cnxx_slot != -1)
+			{
+				device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(m_cnxx_slot);
+
+				if (slotdevice != NULL)
+				{
+					rv = slotdevice->read_c800(space, offset&0x7ff);
+				}
+			}
 		}
 	}
 	else if (offset < 0xf000)
@@ -782,6 +932,21 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 				m_bank9[offset - 0xc100] = data;
 			}
 		}
+		else
+		{
+			/* now identify the device */
+			device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card((offset>>8) & 0x7);
+
+			if (slotdevice != NULL)
+			{
+				if (slotdevice->take_c800())
+				{
+					m_cnxx_slot = ((offset>>8) & 7);
+				}
+
+				slotdevice->write_cnxx(space, offset&0xff, data);
+			}
+		}
 	}
 	else if (offset < 0xc800)
 	{
@@ -797,6 +962,23 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 			if (!(m_via_0_a & 0x08))
 			{
 				m_bank11[offset - 0xc800] = data;
+			}
+		}
+		else
+		{
+			if (offset == 0xcfff)
+			{
+				m_cnxx_slot = -1;
+			}
+
+			if (m_cnxx_slot != -1)
+			{
+				device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(m_cnxx_slot);
+
+				if (slotdevice != NULL)
+				{
+					slotdevice->write_c800(space, offset&0x7ff, data);
+				}
 			}
 		}
 	}
