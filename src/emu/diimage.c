@@ -422,7 +422,7 @@ const char *device_image_interface::get_feature(const char *feature_name)
 {
 	feature_list *feature;
 
-	if ( ! m_software_part_ptr->featurelist )
+	if ( ! m_software_part_ptr || ! m_software_part_ptr->featurelist )
 		return NULL;
 
 	for ( feature = m_software_part_ptr->featurelist; feature; feature = feature->next )
