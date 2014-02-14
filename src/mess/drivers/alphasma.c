@@ -184,6 +184,14 @@ static ADDRESS_MAP_START(alphasmart_io, AS_IO, 8, alphasmart_state)
 	AM_RANGE( MC68HC11_IO_PORTD, MC68HC11_IO_PORTD ) AM_READWRITE(port_d_r, port_d_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(asma2k_mem, AS_PROGRAM, 8, alphasmart_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0x003f ) AM_NOP   // internal registers
+	AM_RANGE( 0x0040, 0x00ff ) AM_RAM   // internal RAM
+	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("rambank")
+	AM_RANGE( 0x8000, 0xffff ) AM_ROM   AM_REGION("maincpu", 0)
+ADDRESS_MAP_END
+
 /* Input ports */
 static INPUT_PORTS_START( alphasmart )
 	PORT_START("COL0")
@@ -395,14 +403,38 @@ static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( asma2k, alphasmart )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(asma2k_mem)
+MACHINE_CONFIG_END
+
 /* ROM definition */
-ROM_START( alphasma )
+ROM_START( asmapro )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "alphasmartpro212.rom",  0x0000, 0x8000, CRC(896ddf1c) SHA1(c3c6a421c9ced92db97431d04b4a3f09a39de716) )   // Checksum 8D24 on label
 
 	ROM_REGION( 0x20000, "mainram", ROMREGION_ERASE )
 ROM_END
 
+ROM_START( asma2k )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	/*
+	    These dumps 33,253 bytes each, probably contain 32768 bytes of rom,
+	    plus the remaining area is pal data for the mapper/io pal, all of
+	    which is integrated onto one plcc44 chip called a zpsd211r.
+	*/
+	ROM_SYSTEM_BIOS( 0, "v314", "v3.14" )
+	ROMX_LOAD( "alphasmart__2000__v3.1.4__h4.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(49487f6d) SHA1(e0b777dc68c671c31ba808e214fb9d2573b9a853), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v308", "v3.08" )
+	ROMX_LOAD( "alphasmart__2000__v3.0.8.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(0b3b1a0c) SHA1(97878819188a1ec40052fbce9d5a5059728d5aec), ROM_BIOS(2) )
+
+	ROM_REGION( 0x8000, "spellcheck", 0 )
+	ROM_LOAD( "spellcheck.bin",  0x0000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "mainram", ROMREGION_ERASE )
+ROM_END
+
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1995, alphasma,  0,       0,  alphasmart, alphasmart, driver_device,   0,   "Intelligent Peripheral Devices",   "AlphaSmart Pro", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1995, asmapro,  0,       0,  alphasmart, alphasmart, driver_device,   0,   "Intelligent Peripheral Devices",   "AlphaSmart Pro" , GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1997, asma2k ,  0,       0,  asma2k    , alphasmart, driver_device,   0,   "Intelligent Peripheral Devices",   "AlphaSmart 2000", GAME_NOT_WORKING | GAME_NO_SOUND )
