@@ -12,6 +12,7 @@ const device_type PC_FDC_SUPERIO = &device_creator<pc_fdc_superio_device>;
 const device_type DP8473 = &device_creator<dp8473_device>;
 const device_type PC8477A = &device_creator<pc8477a_device>;
 const device_type WD37C65C = &device_creator<wd37c65c_device>;
+const device_type MCS3201 = &device_creator<mcs3201_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 8, upd765a_device)
 	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
@@ -84,6 +85,14 @@ ADDRESS_MAP_END
 DEVICE_ADDRESS_MAP_START(map, 8, wd37c65c_device)
 	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
+ADDRESS_MAP_END
+
+DEVICE_ADDRESS_MAP_START( map, 8, mcs3201_device )
+	AM_RANGE(0x0, 0x0) AM_READ(input_r)
+	AM_RANGE(0x2, 0x2) AM_WRITE(dor_w)
+	AM_RANGE(0x4, 0x4) AM_READ(msr_r)
+	AM_RANGE(0x5, 0x5) AM_READWRITE(fifo_r, fifo_w)
+	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
 ADDRESS_MAP_END
 
 
@@ -2202,7 +2211,6 @@ bool upd765_family_device::sector_matches() const
 		cur_live.idbuf[3] == command[5];
 }
 
-
 upd765a_device::upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, UPD765A, "UPD765A", tag, owner, clock, "upd765a", __FILE__)
 {
 	dor_reset = 0x0c;
@@ -2261,4 +2269,25 @@ wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag,
 	ready_polled = true;
 	ready_connected = false;
 	select_connected = true;
+}
+
+mcs3201_device::mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	upd765_family_device(mconfig, MCS3201, "Motorola MCS3201", tag, owner, clock, "mcs3201", __FILE__),
+	m_input_handler(*this)
+{
+	dor_reset = 0x0c;
+	ready_polled = false;
+	ready_connected = false;
+	select_connected = true;
+}
+
+void mcs3201_device::device_start()
+{
+	upd765_family_device::device_start();
+	m_input_handler.resolve_safe(0);
+}
+
+READ8_MEMBER( mcs3201_device::input_r )
+{
+	return m_input_handler();
 }

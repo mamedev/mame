@@ -49,6 +49,12 @@
 #define MCFG_WD37C65C_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, WD37C65C, 0)
 
+#define MCFG_MCS3201_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MCS3201, 0)
+
+#define MCFG_MCS3201_INPUT_HANDLER(_devcb) \
+	devcb = &mcs3201_device::set_input_handler(*device, DEVCB2_##_devcb);
+
 /* Interface required for PC ISA wrapping */
 class pc_fdc_interface : public device_t {
 public:
@@ -461,6 +467,23 @@ public:
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 };
 
+class mcs3201_device : public upd765_family_device {
+public:
+	mcs3201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_input_handler(device_t &device, _Object object) { return downcast<mcs3201_device &>(device).m_input_handler.set_callback(object); }
+
+	virtual DECLARE_ADDRESS_MAP(map, 8);
+	DECLARE_READ8_MEMBER( input_r );
+
+protected:
+	virtual void device_start();
+
+private:
+	devcb2_read8 m_input_handler;
+};
+
 extern const device_type UPD765A;
 extern const device_type UPD765B;
 extern const device_type I8272A;
@@ -471,5 +494,6 @@ extern const device_type PC_FDC_SUPERIO;
 extern const device_type DP8473;
 extern const device_type PC8477A;
 extern const device_type WD37C65C;
+extern const device_type MCS3201;
 
 #endif
