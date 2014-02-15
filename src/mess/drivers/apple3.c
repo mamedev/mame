@@ -22,6 +22,7 @@
 #include "machine/appldriv.h"
 
 #include "bus/a2bus/a2cffa.h"
+#include "bus/a2bus/a2applicard.h"
 
 static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(apple3_memory_r, apple3_memory_w)
@@ -42,6 +43,7 @@ static const floppy_interface apple3_floppy_interface =
 
 static SLOT_INTERFACE_START(apple3_cards)
 	SLOT_INTERFACE("cffa2", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
+	SLOT_INTERFACE("applicard", A2BUS_APPLICARD)    /* PCPI Applicard */
 SLOT_INTERFACE_END
 
 static const struct a2bus_interface a2bus_intf =

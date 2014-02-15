@@ -93,7 +93,7 @@ public:
 	UINT8 *apple3_get_zpa_addr(offs_t offset);
 	void apple3_update_memory();
 	void apple3_via_out(UINT8 *var, UINT8 data);
-	UINT8 *apple3_get_indexed_addr(offs_t offset);
+	UINT8 *apple3_get_indexed_addr(offs_t offset, bool is_write);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_c040_tick);
 	DECLARE_PALETTE_INIT(apple3);
 	void apple3_irq_update();

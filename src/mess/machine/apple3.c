@@ -3,9 +3,9 @@
     machine/apple3.c
 
     Apple ///
-
+ 
     VIA #0 (D VIA)
-	    CA1: IRQ from the MM58167 RTC
+	CA1: IRQ from the MM58167 RTC
     	CA2: 1 if key pressed, 0 otherwise
     	CB1/CB2: connected to VBL
  
@@ -541,7 +541,7 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 
 
 
-UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
+UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset, bool is_write)
 {
 	UINT8 n;
 	UINT8 *result = NULL;
@@ -598,7 +598,7 @@ UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
 			result = apple3_bankaddr(~0, ((offs_t) m_via_0_b) * 0x100 + offset);
 		}
 	}
-	else if ((offset >= 0xF000) && (m_via_0_a & 0x01))
+	else if ((offset >= 0xF000) && (m_via_0_a & 0x01) && (is_write))
 	{
 		/* The Apple /// Diagnostics seems to expect that indexed writes
 		 * always write to RAM.  That image jumps to an address that is
@@ -606,6 +606,8 @@ UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
 		 *  
 		 * The confidence test and the diagnostics together indicates 
 		 * that this *doesn't* apply to the VIA region, however. 
+		 *  
+		 * The Diagnostics' ROM test shows this is for writes only. 
 		 */ 
 
 		if (offset < 0xffd0 || offset > 0xffef)
@@ -737,7 +739,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 			((m_indir_count == 3) && ((!(m_indir_opcode & 0x10)) && (((m_indir_opcode & 0xf) == 0xc) || ((m_indir_opcode & 0xf) == 0xd)))))
 		{
 			UINT8 *test;
-			test = apple3_get_indexed_addr(offset);
+			test = apple3_get_indexed_addr(offset, false);
 
 			if (test)
 			{
@@ -894,7 +896,7 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	if ((!space.debugger_access()) && (m_indir_count > 0))
 	{
 		UINT8 *test;
-		test = apple3_get_indexed_addr(offset);
+		test = apple3_get_indexed_addr(offset, true);
 
 		if (test)
 		{
