@@ -1263,6 +1263,7 @@ void mn10200_device::execute_run()
 
 		// mov (abs24), an
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3:
+			m_cycles -= 1;
 			m_a[op&3] = read_mem24(read_arg24(m_pc));
 			break;
 

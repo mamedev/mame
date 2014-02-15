@@ -84,7 +84,7 @@ const device_type AMD_29F040 = &device_creator<amd_29f040_device>;
 const device_type AMD_29F080 = &device_creator<amd_29f080_device>;
 const device_type FUJITSU_29F016A = &device_creator<fujitsu_29f016a_device>;
 const device_type FUJITSU_29DL16X = &device_creator<fujitsu_29dl16x_device>;
-const device_type INTEL_E28F400 = &device_creator<intel_e28f400_device>;
+const device_type INTEL_E28F400B = &device_creator<intel_e28f400b_device>;
 const device_type MACRONIX_29L001MC = &device_creator<macronix_29l001mc_device>;
 const device_type MACRONIX_29LV160TMC = &device_creator<macronix_29lv160tmc_device>;
 
@@ -235,11 +235,17 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		map = ADDRESS_MAP_NAME( memory_map16_4Mb );
 		break;
 	case FLASH_SHARP_LH28F400:
-	case FLASH_INTEL_E28F400:
 		m_bits = 16;
 		m_size = 0x80000;
 		m_maker_id = MFG_SHARP;
 		m_device_id = 0xed;
+		map = ADDRESS_MAP_NAME( memory_map16_4Mb );
+		break;
+	case FLASH_INTEL_E28F400B:
+		m_bits = 16;
+		m_size = 0x80000;
+		m_maker_id = MFG_INTEL;
+		m_device_id = 0x4471;
 		map = ADDRESS_MAP_NAME( memory_map16_4Mb );
 		break;
 	case FLASH_FUJITSU_29F016A:
@@ -383,8 +389,8 @@ sharp_lh28f400_device::sharp_lh28f400_device(const machine_config &mconfig, cons
 intel_te28f160_device::intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, INTEL_TE28F160, "Intel TE28F160 Flash", tag, owner, clock, FLASH_INTEL_TE28F160, "intel_te28f160", __FILE__) { }
 
-intel_e28f400_device::intel_e28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: intelfsh16_device(mconfig, INTEL_E28F400, "Intel E28F400 Flash", tag, owner, clock, FLASH_INTEL_E28F400, "intel_e28f400", __FILE__) { }
+intel_e28f400b_device::intel_e28f400b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh16_device(mconfig, INTEL_E28F400B, "Intel E28F400B Flash", tag, owner, clock, FLASH_INTEL_E28F400B, "intel_e28f400b", __FILE__) { }
 
 sharp_unk128mbit_device::sharp_unk128mbit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, SHARP_UNK128MBIT, "Sharp Unknown 128Mbit Flash", tag, owner, clock, FLASH_SHARP_UNK128MBIT, "sharp_unk128mbit", __FILE__) { }
@@ -951,6 +957,49 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 					m_addrspace[0]->write_byte((base & ~0xff) + offs, 0xff);
 
 				m_timer->adjust( attotime::from_msec( 4 ) );
+			}
+			else if (m_type == FLASH_INTEL_E28F400B)
+			{
+				// 00000-03fff -  16KB boot block (may be write protected via external pins)
+				// 04000-05fff -   8KB parameter block
+				// 06000-07fff -   8KB parameter block
+				// 08000-1ffff -  96KB main block
+				// 20000-3ffff - 128KB main block
+				// 40000-5ffff - 128KB main block
+				// 60000-7ffff - 128KB main block
+				// erase duration is 0.3s for boot and parameter blocks, and 0.6s for main blocks
+				UINT32 base = (address & 0x3ffff) * 2;
+				int size, duration;
+				if (base < 0x4000)
+				{
+					base = 0;
+					size = 0x4000;
+					duration = 300;
+				}
+				else if (base < 0x8000)
+				{
+					base &= 0x6000;
+					size = 0x2000;
+					duration = 300;
+				}
+				else if (base < 0x20000)
+				{
+					base = 0x8000;
+					size = 0x18000;
+					duration = 600;
+				}
+				else
+				{
+					base &= 0x60000;
+					size = 0x20000;
+					duration = 600;
+				}
+
+				// clear the block containing the current address to all 0xffffs
+				for (offs_t offs = 0; offs < size / 2; offs += 2)
+					m_addrspace[0]->write_word(base | offs, 0xffff);
+
+				m_timer->adjust( attotime::from_msec( duration ) );
 			}
 			else
 			{

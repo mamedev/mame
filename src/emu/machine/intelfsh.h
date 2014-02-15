@@ -34,8 +34,8 @@
 #define MCFG_FUJITSU_29DL16X_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, FUJITSU_29DL16X, 0)
 
-#define MCFG_INTEL_E28F400_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, INTEL_E28F400, 0)
+#define MCFG_INTEL_E28F400B_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, INTEL_E28F400B, 0)
 
 #define MCFG_MACRONIX_29L001MC_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, MACRONIX_29L001MC, 0)
@@ -108,7 +108,7 @@ public:
 
 		// 16-bit variants
 		FLASH_SHARP_LH28F400 = 0x1000,
-		FLASH_INTEL_E28F400,
+		FLASH_INTEL_E28F400B,
 		FLASH_INTEL_TE28F160,
 		FLASH_SHARP_UNK128MBIT,
 		FLASH_INTEL_28F320J3D,
@@ -141,7 +141,7 @@ protected:
 	UINT32                  m_type;
 	INT32                   m_size;
 	UINT8                   m_bits;
-	UINT8                   m_device_id;
+	UINT16                  m_device_id;
 	UINT8                   m_maker_id;
 	bool                    m_sector_is_4k;
 	bool                    m_sector_is_16k;
@@ -304,10 +304,10 @@ public:
 	intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-class intel_e28f400_device : public intelfsh16_device
+class intel_e28f400b_device : public intelfsh16_device
 {
 public:
-	intel_e28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intel_e28f400b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class sharp_unk128mbit_device : public intelfsh16_device
@@ -338,7 +338,7 @@ extern const device_type AMD_29F040;
 extern const device_type AMD_29F080;
 extern const device_type FUJITSU_29F016A;
 extern const device_type FUJITSU_29DL16X;
-extern const device_type INTEL_E28F400;
+extern const device_type INTEL_E28F400B;
 extern const device_type MACRONIX_29L001MC;
 extern const device_type MACRONIX_29LV160TMC;
 

@@ -78,6 +78,8 @@ Notes:
       CAT702         - Protection chip labelled 'TT10' (DIP20)
       *              - Unpopulated position for additional KM416V1204BT-L5 RAMs
       NEC_78081G503  - NEC uPD78081 MCU, 5MHz
+      
+      Video syncs are 59.8260Hz and 15.4333kHz
 
 
 FC PCB  K91X0721B  M43X0337B
@@ -672,7 +674,7 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_MB3773_ADD("mb3773")
 
 	MCFG_INTEL_TE28F160_ADD("biosflash")
-	MCFG_INTEL_E28F400_ADD("pgmflash")
+	MCFG_INTEL_E28F400B_ADD("pgmflash")
 	MCFG_INTEL_TE28F160_ADD("sndflash0")
 	MCFG_INTEL_TE28F160_ADD("sndflash1")
 	MCFG_INTEL_TE28F160_ADD("sndflash2")
