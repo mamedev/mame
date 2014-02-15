@@ -469,6 +469,7 @@ WRITE8_MEMBER(apple3_state::apple3_via_0_out_a)
 
 WRITE8_MEMBER(apple3_state::apple3_via_0_out_b)
 {
+//	printf("ZP to %02x\n", data);
 	apple3_via_out(&m_via_0_b, data);
 }
 
@@ -726,12 +727,14 @@ void apple3_state::apple3_postload()
 READ8_MEMBER(apple3_state::apple3_memory_r)
 {
 	UINT8 rv = 0xff;
+	bool was_zp = false;
 
 	// (zp), y or (zp,x) read
 	if (!space.debugger_access())
 	{
 		if (((m_indir_count == 4) && (m_indir_opcode & 0x10)) ||
-			((m_indir_count == 5) && !(m_indir_opcode & 0x10)))
+			((m_indir_count == 5) && !(m_indir_opcode & 0x10)) ||
+			((m_indir_count == 3) && ((!(m_indir_opcode & 0x10)) && (((m_indir_opcode & 0xf) == 0xc) || ((m_indir_opcode & 0xf) == 0xd)))))
 		{
 			UINT8 *test;
 			test = apple3_get_indexed_addr(offset);
@@ -746,6 +749,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 	if (offset < 0x100)
 	{
 		rv = *apple3_get_zpa_addr(offset); 
+		was_zp = true;
 	}
 	else if (offset < 0x200)
 	{
@@ -863,6 +867,21 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 //				printf("(zp),y or (zp,x) %02x at %x\n", rv, offset);
 				m_indir_count = 1;
 				m_indir_opcode = rv;
+			}
+			// if instruction is physically on the zero page,
+			// even an absolute load/store will get ZP'd
+			// sayeth the Business BASIC source code:
+			// ;BECAUSE SARA GOES BY WHETHER THE ADDR 
+			// ;IS GOING THROUGH ZERO PAGE, THIS GOES THROUGH THE
+			// ;BANK STUFF ALSO.
+			else if (was_zp)
+			{
+//				printf("ZP opcode fetch %02x\n", rv);
+				if ((!(rv & 0x10)) && (((rv & 0xf) == 0xc) || ((rv & 0xf) == 0xd)))
+				{
+					m_indir_count = 1;
+					m_indir_opcode = rv;
+				}
 			}
 		}
 	}
