@@ -7405,6 +7405,7 @@ src/mess/drivers/spectrum.c svneol=native#text/plain
 src/mess/drivers/ssem.c svneol=native#text/plain
 src/mess/drivers/ssystem3.c svneol=native#text/plain
 src/mess/drivers/stopthie.c svneol=native#text/plain
+src/mess/drivers/stratos.c svneol=native#text/plain
 src/mess/drivers/studio2.c svneol=native#text/plain
 src/mess/drivers/sun1.c svneol=native#text/plain
 src/mess/drivers/sun2.c svneol=native#text/plain
