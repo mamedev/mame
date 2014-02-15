@@ -211,7 +211,7 @@ public:
 
 	void set_default_bios(UINT8 bios) { m_default_bios = bios; }
 	void set_system_bios(UINT8 bios) { m_system_bios = bios; }
-	bool findit(bool isvalidation = false);
+	bool findit(bool isvalidation = false) const;
 
 protected:
 	// miscellaneous helpers

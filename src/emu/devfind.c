@@ -68,6 +68,12 @@ void *finder_base::find_memory(UINT8 width, size_t &bytes, bool required)
 
 bool finder_base::report_missing(bool found, const char *objname, bool required)
 {
+	if (required && strcmp(m_tag, FINDER_DUMMY_TAG)==0)
+	{
+		mame_printf_error("Tag not defined for required device\n");
+		return false;
+	}
+	
 	// just pass through in the found case
 	if (found)
 		return true;

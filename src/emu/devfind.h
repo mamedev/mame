@@ -17,6 +17,7 @@
 #ifndef __DEVFIND_H__
 #define __DEVFIND_H__
 
+#define FINDER_DUMMY_TAG "finder_dummy_tag"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -36,6 +37,9 @@ public:
 
 	// getters
 	virtual bool findit(bool isvalidation = false) = 0;
+
+	// setter for setting the object
+	void set_tag(const char *tag) { m_tag = tag; }
 
 protected:
 	// helpers
@@ -110,7 +114,7 @@ template<class _DeviceClass>
 class optional_device : public device_finder<_DeviceClass, false>
 {
 public:
-	optional_device(device_t &base, const char *tag) : device_finder<_DeviceClass, false>(base, tag) { }
+	optional_device(device_t &base, const char *tag = FINDER_DUMMY_TAG) : device_finder<_DeviceClass, false>(base, tag) { }
 };
 
 // required devices are similar but throw an error if they are not found
@@ -118,7 +122,7 @@ template<class _DeviceClass>
 class required_device : public device_finder<_DeviceClass, true>
 {
 public:
-	required_device(device_t &base, const char *tag) : device_finder<_DeviceClass, true>(base, tag) { }
+	required_device(device_t &base, const char *tag = FINDER_DUMMY_TAG) : device_finder<_DeviceClass, true>(base, tag) { }
 };
 
 
@@ -149,14 +153,14 @@ public:
 class optional_memory_region : public memory_region_finder<false>
 {
 public:
-	optional_memory_region(device_t &base, const char *tag) : memory_region_finder<false>(base, tag) { }
+	optional_memory_region(device_t &base, const char *tag = FINDER_DUMMY_TAG) : memory_region_finder<false>(base, tag) { }
 };
 
 // required devices are similar but throw an error if they are not found
 class required_memory_region : public memory_region_finder<true>
 {
 public:
-	required_memory_region(device_t &base, const char *tag) : memory_region_finder<true>(base, tag) { }
+	required_memory_region(device_t &base, const char *tag = FINDER_DUMMY_TAG) : memory_region_finder<true>(base, tag) { }
 };
 
 
@@ -187,14 +191,14 @@ public:
 class optional_memory_bank : public memory_bank_finder<false>
 {
 public:
-	optional_memory_bank(device_t &base, const char *tag) : memory_bank_finder<false>(base, tag) { }
+	optional_memory_bank(device_t &base, const char *tag = FINDER_DUMMY_TAG) : memory_bank_finder<false>(base, tag) { }
 };
 
 // required devices are similar but throw an error if they are not found
 class required_memory_bank : public memory_bank_finder<true>
 {
 public:
-	required_memory_bank(device_t &base, const char *tag) : memory_bank_finder<true>(base, tag) { }
+	required_memory_bank(device_t &base, const char *tag = FINDER_DUMMY_TAG) : memory_bank_finder<true>(base, tag) { }
 };
 
 
@@ -225,14 +229,14 @@ public:
 class optional_ioport : public ioport_finder<false>
 {
 public:
-	optional_ioport(device_t &base, const char *tag) : ioport_finder<false>(base, tag) { }
+	optional_ioport(device_t &base, const char *tag = FINDER_DUMMY_TAG) : ioport_finder<false>(base, tag) { }
 };
 
 // required devices are similar but throw an error if they are not found
 class required_ioport : public ioport_finder<true>
 {
 public:
-	required_ioport(device_t &base, const char *tag) : ioport_finder<true>(base, tag) { }
+	required_ioport(device_t &base, const char *tag = FINDER_DUMMY_TAG) : ioport_finder<true>(base, tag) { }
 };
 
 
@@ -293,7 +297,7 @@ template<class _PointerType>
 class optional_shared_ptr : public shared_ptr_finder<_PointerType, false>
 {
 public:
-	optional_shared_ptr(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_finder<_PointerType, false>(base, tag, width) { }
+	optional_shared_ptr(device_t &base, const char *tag = FINDER_DUMMY_TAG, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_finder<_PointerType, false>(base, tag, width) { }
 };
 
 // required shared pointer finder
@@ -301,7 +305,7 @@ template<class _PointerType>
 class required_shared_ptr : public shared_ptr_finder<_PointerType, true>
 {
 public:
-	required_shared_ptr(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_finder<_PointerType, true>(base, tag, width) { }
+	required_shared_ptr(device_t &base, const char *tag = FINDER_DUMMY_TAG, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_finder<_PointerType, true>(base, tag, width) { }
 };
 
 
@@ -342,7 +346,7 @@ template<class _PointerType, int _Count>
 class optional_shared_ptr_array : public shared_ptr_array_finder<_PointerType, _Count, false>
 {
 public:
-	optional_shared_ptr_array(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, false>(base, tag, width) { }
+	optional_shared_ptr_array(device_t &base, const char *tag = FINDER_DUMMY_TAG, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, false>(base, tag, width) { }
 };
 
 // required shared pointer array finder
@@ -350,7 +354,7 @@ template<class _PointerType, int _Count>
 class required_shared_ptr_array : public shared_ptr_array_finder<_PointerType, _Count, true>
 {
 public:
-	required_shared_ptr_array(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, true>(base, tag, width) { }
+	required_shared_ptr_array(device_t &base, const char *tag = FINDER_DUMMY_TAG, UINT8 width = sizeof(_PointerType) * 8) : shared_ptr_array_finder<_PointerType, _Count, true>(base, tag, width) { }
 };
 
 
