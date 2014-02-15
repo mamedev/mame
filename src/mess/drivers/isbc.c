@@ -166,8 +166,8 @@ static const struct pit8253_interface isbc86_pit_config =
 
 WRITE_LINE_MEMBER( isbc_state::isbc86_tmr2_w )
 {
-	m_uart8251->rxc_w(state);
-	m_uart8251->txc_w(state);
+	m_uart8251->write_rxc(state);
+	m_uart8251->write_txc(state);
 }
 
 static const i8255_interface isbc86_ppi_interface =
@@ -175,17 +175,6 @@ static const i8255_interface isbc86_ppi_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const i8251_interface isbc86_uart8251_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
-	DEVCB_DEVICE_LINE_MEMBER("pic_0", pic8259_device, ir6_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -287,11 +276,16 @@ static MACHINE_CONFIG_START( isbc86, isbc_state )
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NULL)
 	MCFG_PIT8253_ADD("pit", isbc86_pit_config)
 	MCFG_I8255A_ADD("ppi", isbc86_ppi_interface)
-	MCFG_I8251_ADD("uart8251", isbc86_uart8251_interface)
+
+	MCFG_DEVICE_ADD("uart8251", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
 
 	/* video hardware */
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_rx))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_cts))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_dsr))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", isbc86_terminal)
@@ -335,6 +329,12 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsa_w))
 
+	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, "serial_terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsb_w))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", isbc286_terminal)
+
 	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, NULL)
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir3_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir4_w))
@@ -344,13 +344,6 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 
 	MCFG_ISBC_215_ADD("isbc_215g", 0x100, "maincpu")
 	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
-
-	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, "serial_terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsb_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", isbc286_terminal)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( isbc2861, isbc286 )

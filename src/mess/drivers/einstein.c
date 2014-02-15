@@ -271,12 +271,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_ctc_trigger_callback)
 
 WRITE_LINE_MEMBER(einstein_state::einstein_serial_transmit_clock)
 {
-	m_uart->transmit_clock();
+	m_uart->write_txc(state);
 }
 
 WRITE_LINE_MEMBER(einstein_state::einstein_serial_receive_clock)
 {
-	m_uart->receive_clock();
+	m_uart->write_rxc(state);
 }
 
 
@@ -784,7 +784,7 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* uart */
-	MCFG_I8251_ADD(IC_I060, default_i8251_interface)
+	MCFG_DEVICE_ADD(IC_I060, I8251, 0)
 
 	MCFG_WD1770x_ADD(IC_I042, XTAL_X002)
 

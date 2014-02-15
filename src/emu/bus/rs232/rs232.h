@@ -8,7 +8,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_RS232_RXD_HANDLER(_devcb) \
-	devcb = &rs232_port_device::set_rx_handler(*device, DEVCB2_##_devcb);
+	devcb = &rs232_port_device::set_rxd_handler(*device, DEVCB2_##_devcb);
 
 #define MCFG_RS232_DCD_HANDLER(_devcb) \
 	devcb = &rs232_port_device::set_dcd_handler(*device, DEVCB2_##_devcb);
@@ -35,7 +35,7 @@ public:
 	virtual ~rs232_port_device();
 
 	// static configuration helpers
-	template<class _Object> static devcb2_base &set_rx_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_rxd_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_rxd_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_rxd_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_dcd_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_dcd_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_dsr_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_dsr_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_ri_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_ri_handler.set_callback(object); }

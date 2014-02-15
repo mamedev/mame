@@ -3410,17 +3410,6 @@ void pc9801_state::pc9801rs_fdc_drq(bool state)
 		printf("DRQ %02x %d\n",m_fdc_ctrl,state);
 }
 
-static const i8251_interface pc9801_uart_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 UINT32 pc9801_state::pc9801_286_a20(bool state)
 {
 	return (state ? 0xffffff : 0x0fffff);
@@ -3714,7 +3703,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_FRAGMENT_ADD(pc9801_cbus)
 	MCFG_FRAGMENT_ADD(pc9801_sasi)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
-	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
+	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
 	MCFG_UPD765A_ADD("upd765_2dd", false, true)
@@ -3782,7 +3771,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_FRAGMENT_ADD(pc9801_ide)
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
-	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
+	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
 	//"upd765_2dd"
@@ -3860,7 +3849,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_FRAGMENT_ADD(pc9801_ide)
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
-	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
+	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
 	//"upd765_2dd"

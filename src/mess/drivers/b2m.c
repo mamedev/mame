@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* uart */
-	MCFG_I8251_ADD("uart", default_i8251_interface)
+	MCFG_DEVICE_ADD("uart", I8251, 0)
 
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 

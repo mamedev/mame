@@ -262,14 +262,14 @@ WRITE_LINE_MEMBER( m20_state::pic_irq_line_w )
 
 WRITE_LINE_MEMBER( m20_state::tty_clock_tick_w )
 {
-	m_ttyi8251->transmit_clock();
-	m_ttyi8251->receive_clock();
+	m_ttyi8251->write_txc(state);
+	m_ttyi8251->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER( m20_state::kbd_clock_tick_w )
 {
-	m_kbdi8251->transmit_clock();
-	m_kbdi8251->receive_clock();
+	m_kbdi8251->write_txc(state);
+	m_kbdi8251->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER( m20_state::timer_tick_w )
@@ -866,28 +866,6 @@ void m20_state::fdc_intrq_w(bool state)
 	m_i8259->ir0_w(state);
 }
 
-static const i8251_interface kbd_i8251_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_tx),
-	DEVCB_NULL,         // dtr
-	DEVCB_NULL,         // rts
-	DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_rxrdy_int),  // rx ready
-	DEVCB_NULL,         // tx ready
-	DEVCB_NULL,         // tx empty
-	DEVCB_NULL          // syndet
-};
-
-static const i8251_interface tty_i8251_intf =
-{
-	DEVCB_NULL,         // txd out
-	DEVCB_NULL,         // dtr
-	DEVCB_NULL,         // rts
-	DEVCB_NULL,         // rx ready
-	DEVCB_NULL,         // tx ready
-	DEVCB_NULL,         // tx empty
-	DEVCB_NULL          // syndet
-};
-
 static unsigned char kbxlat[] =
 {
 	0x00, '\\', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
@@ -987,8 +965,13 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK/8, mc6845_intf) /* hand tuned to get ~50 fps */
 	MCFG_I8255A_ADD("ppi8255",  ppi_interface)
-	MCFG_I8251_ADD("i8251_1", kbd_i8251_intf)
-	MCFG_I8251_ADD("i8251_2", tty_i8251_intf)
+
+	MCFG_DEVICE_ADD("i8251_1", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(WRITELINE(m20_state, kbd_tx))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(m20_state, kbd_rxrdy_int))
+
+	MCFG_DEVICE_ADD("i8251_2", I8251, 0)
+
 	MCFG_PIT8253_ADD("pit8253", pit8253_intf)
 	MCFG_PIC8259_ADD("i8259", WRITELINE(m20_state, pic_irq_line_w), VCC, NULL)
 

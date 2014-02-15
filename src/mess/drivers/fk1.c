@@ -475,8 +475,9 @@ static MACHINE_CONFIG_START( fk1, fk1_state )
 	MCFG_I8255_ADD( "ppi8255_1", fk1_ppi8255_interface_1 )
 	MCFG_I8255_ADD( "ppi8255_2", fk1_ppi8255_interface_2 )
 	MCFG_I8255_ADD( "ppi8255_3", fk1_ppi8255_interface_3 )
+
 	/* uart */
-	MCFG_I8251_ADD("uart", default_i8251_interface)
+	MCFG_DEVICE_ADD("uart", I8251, 0)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

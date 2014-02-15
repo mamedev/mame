@@ -63,7 +63,6 @@ public:
 
 
 /*----------- defined in machine/pp01.c -----------*/
-extern const i8251_interface pp01_uart_intf;
 extern const struct pit8253_interface pp01_pit8253_intf;
 extern const i8255_interface pp01_ppi8255_interface;
 

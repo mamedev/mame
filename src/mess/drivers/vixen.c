@@ -633,10 +633,10 @@ WRITE8_MEMBER( vixen_state::io_i8155_pc_w )
 
 WRITE_LINE_MEMBER( vixen_state::io_i8155_to_w )
 {
-	if (m_int_clk && !state)
+	if (m_int_clk)
 	{
-		m_usart->transmit_clock();
-		m_usart->receive_clock();
+		m_usart->write_txc(state);
+		m_usart->write_rxc(state);
 	}
 }
 
@@ -667,18 +667,6 @@ WRITE_LINE_MEMBER( vixen_state::txrdy_w )
 	m_txrdy = state;
 	update_interrupt();
 }
-
-static const i8251_interface usart_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),
-	DEVCB_DRIVER_LINE_MEMBER(vixen_state, rxrdy_w),
-	DEVCB_DRIVER_LINE_MEMBER(vixen_state, txrdy_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  IEEE488_INTERFACE( ieee488_intf )
@@ -809,17 +797,24 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	// devices
 	MCFG_I8155_ADD(P8155H_TAG, XTAL_23_9616MHz/6, i8155_intf)
 	MCFG_I8155_ADD(P8155H_IO_TAG, XTAL_23_9616MHz/6, io_i8155_intf)
-	MCFG_I8251_ADD(P8251A_TAG, usart_intf)
+
+	MCFG_DEVICE_ADD(P8251A_TAG, I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(vixen_state, rxrdy_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(vixen_state, txrdy_w))
+
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_dsr))
+
 	MCFG_FD1797x_ADD(FDC1797_TAG, XTAL_23_9616MHz/24)
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":1", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(vixen_state, srq_w))
 	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(vixen_state, atn_w))
-
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_rx))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_dsr))
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "vixen")

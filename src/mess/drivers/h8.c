@@ -218,7 +218,7 @@ void h8_state::machine_reset()
 	m_cass_state = 1;
 	m_cass_data[0] = 0;
 	m_cass_data[1] = 0;
-	m_uart->write_rx(0);
+	m_uart->write_rxd(0);
 	m_cass_data[3] = 0;
 	m_ff_b = 1;
 }
@@ -266,21 +266,15 @@ WRITE_LINE_MEMBER( h8_state::txdata_callback )
 	m_cass_state = state;
 }
 
-static const i8251_interface uart_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(h8_state,txdata_callback), //txd_cb
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_c)
 {
-	m_uart->receive_clock();
-	m_uart->transmit_clock();
+	/// TODO: double timer rate to get correct duty cycle
+	m_uart->write_rxc(1);
+	m_uart->write_txc(1);
+
+	m_uart->write_rxc(0);
+	m_uart->write_rxc(0);
+
 	m_cass_data[3]++;
 
 	if (m_cass_state)
@@ -298,7 +292,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
 	if (cass_ws != m_cass_data[0])
 	{
 		m_cass_data[0] = cass_ws;
-		m_uart->write_rx((m_cass_data[1] < 12) ? 1 : 0);
+		m_uart->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
 		m_cass_data[1] = 0;
 	}
 }
@@ -332,7 +326,9 @@ static MACHINE_CONFIG_START( h8, h8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_I8251_ADD("uart", uart_intf)
+	MCFG_DEVICE_ADD("uart", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(WRITELINE(h8_state,txdata_callback))
+
 	MCFG_CASSETTE_ADD("cassette", h8_cassette_interface)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_c", h8_state, h8_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_p", h8_state, h8_p, attotime::from_hz(40000))

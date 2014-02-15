@@ -89,16 +89,17 @@ class mbc55x_state : public driver_device
 public:
 	mbc55x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, MAINCPU_TAG),
-	m_crtc(*this, VID_MC6845_NAME),
-	m_kb_uart(*this, I8251A_KB_TAG),
-	m_pit(*this, PIT8253_TAG),
-	m_ppi(*this, PPI8255_TAG),
-	m_pic(*this, PIC8259_TAG),
-	m_fdc(*this, FDC_TAG),
-	m_speaker(*this, "speaker"),
-	m_ram(*this, RAM_TAG)
-	{ }
+		m_maincpu(*this, MAINCPU_TAG),
+		m_crtc(*this, VID_MC6845_NAME),
+		m_kb_uart(*this, I8251A_KB_TAG),
+		m_pit(*this, PIT8253_TAG),
+		m_ppi(*this, PPI8255_TAG),
+		m_pic(*this, PIC8259_TAG),
+		m_fdc(*this, FDC_TAG),
+		m_speaker(*this, "speaker"),
+		m_ram(*this, RAM_TAG)
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -173,8 +174,6 @@ extern const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3];
 
 extern const struct pit8253_interface mbc55x_pit8253_config;
 extern const i8255_interface mbc55x_ppi8255_interface;
-extern const i8251_interface mbc55x_i8251a_interface;
-extern const i8251_interface mbc55x_i8251b_interface;
 
 
 /* Memory controller */

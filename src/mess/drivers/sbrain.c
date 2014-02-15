@@ -269,28 +269,6 @@ static I8255_INTERFACE( ppi_intf )
 	DEVCB_DRIVER_MEMBER(sbrain_state, ppi_pc_w),   // Port C write
 };
 
-static const i8251_interface u0_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const i8251_interface u1_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 MACHINE_RESET_MEMBER( sbrain_state, sbrain )
 {
 	m_beep->set_frequency(800);
@@ -364,8 +342,11 @@ static MACHINE_CONFIG_START( sbrain, sbrain_state )
 
 	/* Devices */
 	MCFG_I8255_ADD("ppi", ppi_intf)
-	MCFG_I8251_ADD("uart0", u0_intf)
-	MCFG_I8251_ADD("uart1", u1_intf)
+
+	MCFG_DEVICE_ADD("uart0", I8251, 0)
+
+	MCFG_DEVICE_ADD("uart1", I8251, 0)
+
 	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, WRITELINE(sbrain_state, fr_w), WRITELINE(sbrain_state, ft_w))
 	MCFG_FD1791x_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

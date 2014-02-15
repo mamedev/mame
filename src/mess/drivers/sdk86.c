@@ -131,20 +131,13 @@ READ8_MEMBER( sdk86_state::kbd_r )
 
 TIMER_DEVICE_CALLBACK_MEMBER( sdk86_state::serial_tick )
 {
-	m_usart->receive_clock();
-	m_usart->transmit_clock();
-}
+	/// TODO: double timer frequency to get correct duty cycle
+	m_usart->write_rxc(1);
+	m_usart->write_txc(1);
 
-static const i8251_interface usart_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
-	DEVCB_NULL, // connected to CTS
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
+	m_usart->write_rxc(0);
+	m_usart->write_txc(0);
+}
 
 static I8279_INTERFACE( sdk86_intf )
 {
@@ -176,15 +169,20 @@ static MACHINE_CONFIG_START( sdk86, sdk86_state )
 	MCFG_DEFAULT_LAYOUT(layout_sdk86)
 
 	/* Devices */
-	MCFG_I8251_ADD(I8251_TAG, usart_intf)
-	MCFG_I8279_ADD("i8279", 2500000, sdk86_intf) // based on divider
+	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_cts))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "serial_terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rx))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
-
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("serial", sdk86_state, serial_tick, attotime::from_hz(307200))
+
+	MCFG_I8279_ADD("i8279", 2500000, sdk86_intf) // based on divider
+
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -159,8 +159,8 @@ WRITE8_MEMBER(mbc55x_state::mbcpit8253_w)
 
 WRITE_LINE_MEMBER( mbc55x_state::pit8253_t2 )
 {
-	m_kb_uart->transmit_clock();
-	m_kb_uart->receive_clock();
+	m_kb_uart->write_txc(state);
+	m_kb_uart->write_txc(state);
 }
 
 /* Video ram page register */
@@ -280,19 +280,6 @@ TIMER_CALLBACK_MEMBER(mbc55x_state::keyscan_callback)
 	scan_keyboard();
 }
 
-/* i8251 serial */
-
-const i8251_interface mbc55x_i8251a_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(PIC8259_TAG, pic8259_device, ir3_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 READ8_MEMBER(mbc55x_state::mbc55x_kb_usart_r)
 {
 	UINT8 result = 0;
@@ -300,14 +287,15 @@ READ8_MEMBER(mbc55x_state::mbc55x_kb_usart_r)
 
 	switch (offset)
 	{
-		case 0  : //logerror("%s read kb_uart\n",machine().describe_context());
-				result = m_kb_uart->data_r(space,0); break;
+		case 0: //logerror("%s read kb_uart\n",machine().describe_context());
+			result = m_kb_uart->data_r(space,0);
+			break;
 
-		case 1  :   result = m_kb_uart->status_r(space,0);
-
-				if (m_keyboard.key_special & KEY_BIT_CTRL)  // Parity error used to flag control down
-					result |= I8251_STATUS_PARITY_ERROR;
-				break;
+		case 1:
+			result = m_kb_uart->status_r(space,0);
+			if (m_keyboard.key_special & KEY_BIT_CTRL)  // Parity error used to flag control down
+				result |= i8251_device::I8251_STATUS_PARITY_ERROR;
+			break;
 	}
 
 	return result;

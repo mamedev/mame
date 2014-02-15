@@ -164,18 +164,6 @@ WRITE_LINE_MEMBER(tsispch_state::i8251_txrdy_int)
 	machine().device<pic8259_device>("pic8259")->ir3_w(state);
 }
 
-// (todo: proper hookup, currently using hack w/i8251_receive_character())
-const i8251_interface i8251_config =
-{
-	DEVCB_NULL, // out txd, serial
-	DEVCB_NULL, // out dtr
-	DEVCB_NULL, // out rts
-	DEVCB_DRIVER_LINE_MEMBER(tsispch_state,i8251_rxrdy_int), // out rxrdy
-	DEVCB_DRIVER_LINE_MEMBER(tsispch_state,i8251_txrdy_int), // out txrdy
-	DEVCB_DRIVER_LINE_MEMBER(tsispch_state,i8251_txempty_int), // out txempty
-	DEVCB_NULL  // out syndet
-};
-
 WRITE8_MEMBER( tsispch_state::i8251_rxd )
 {
 	i8251_device *uart = machine().device<i8251_device>("i8251a_u15");
@@ -434,7 +422,11 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 	MCFG_PIC8259_ADD("pic8259", WRITELINE(tsispch_state,pic8259_set_int_line), VCC, NULL)
 
 	/* uarts */
-	MCFG_I8251_ADD("i8251a_u15", i8251_config)
+	MCFG_DEVICE_ADD("i8251a_u15", I8251, 0)
+	// (todo: proper hookup, currently using hack w/i8251_receive_character())
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(tsispch_state, i8251_rxrdy_int))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(tsispch_state, i8251_txrdy_int))
+	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(tsispch_state, i8251_txempty_int))
 
 	/* sound hardware */
 	//MCFG_SPEAKER_STANDARD_MONO("mono")

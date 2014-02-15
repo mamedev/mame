@@ -592,7 +592,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_I8251_ADD("i8251", default_i8251_interface)
+	MCFG_DEVICE_ADD("i8251", I8251, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

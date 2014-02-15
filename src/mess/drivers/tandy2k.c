@@ -407,17 +407,6 @@ WRITE_LINE_MEMBER( tandy2k_state::txrdy_w )
 	m_pic0->ir2_w(m_rxrdy || m_txrdy);
 }
 
-static const i8251_interface usart_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),
-	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, rxrdy_w),
-	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, txrdy_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 // Intel 8253 Interface
 
 WRITE_LINE_MEMBER( tandy2k_state::outspkr_w )
@@ -428,10 +417,10 @@ WRITE_LINE_MEMBER( tandy2k_state::outspkr_w )
 
 WRITE_LINE_MEMBER( tandy2k_state::intbrclk_w )
 {
-	if (!m_extclk && state)
+	if (!m_extclk)
 	{
-		m_uart->transmit_clock();
-		m_uart->receive_clock();
+		m_uart->write_txc(state);
+		m_uart->write_rxc(state);
 	}
 }
 
@@ -707,7 +696,18 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 
 	// devices
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
-	MCFG_I8251_ADD(I8251A_TAG, usart_intf)
+
+	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(tandy2k_state, rxrdy_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(tandy2k_state, txrdy_w))
+
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_dsr))
+
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_PIC8259_ADD(I8259A_0_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w), VCC, NULL)
 	MCFG_PIC8259_ADD(I8259A_1_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w), VCC, NULL)
@@ -723,10 +723,6 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(tandy2k_state, write_centronics_fault))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
-
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rx))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_dsr))
 
 	MCFG_TANDY2K_KEYBOARD_ADD(WRITELINE(tandy2k_state, kbdclk_w), WRITELINE(tandy2k_state, kbddat_w))
 

@@ -414,20 +414,14 @@ static const struct pit8253_interface pit0_intf =
 
 WRITE_LINE_MEMBER( sage2_state::br1_w )
 {
-	if (state)
-	{
-		m_usart0->transmit_clock();
-		m_usart0->receive_clock();
-	}
+	m_usart0->write_txc(state);
+	m_usart0->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER( sage2_state::br2_w )
 {
-	if (state)
-	{
-		m_usart1->transmit_clock();
-		m_usart1->receive_clock();
-	}
+	m_usart1->write_txc(state);
+	m_usart1->write_rxc(state);
 }
 
 static const struct pit8253_interface pit1_intf =
@@ -448,39 +442,6 @@ static const struct pit8253_interface pit1_intf =
 		}
 	}
 };
-
-
-//-------------------------------------------------
-//  i8251_interface usart0_intf
-//-------------------------------------------------
-
-static const i8251_interface usart0_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_rts),
-	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_5),
-	DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir2_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  i8251_interface usart1_intf
-//-------------------------------------------------
-
-static const i8251_interface usart1_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_dtr),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_rts),
-	DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir1_w),
-	DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir3_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  upd765_interface fdc_intf
@@ -557,8 +518,30 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_I8255A_ADD(I8255A_1_TAG, ppi1_intf)
 	MCFG_PIT8253_ADD(I8253_0_TAG, pit0_intf)
 	MCFG_PIT8253_ADD(I8253_1_TAG, pit1_intf)
-	MCFG_I8251_ADD(I8251_0_TAG, usart0_intf)
-	MCFG_I8251_ADD(I8251_1_TAG, usart1_intf)
+
+	MCFG_DEVICE_ADD(I8251_0_TAG, I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE(M68000_TAG, m68000_base_device, write_irq5))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE(I8259_TAG, pic8259_device, ir2_w))
+
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "serial_terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_0_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_0_TAG, i8251_device, write_dsr))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
+
+	MCFG_DEVICE_ADD(I8251_1_TAG, I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE(I8259_TAG, pic8259_device, ir1_w))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE(I8259_TAG, pic8259_device, ir3_w))
+
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_1_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_1_TAG, i8251_device, write_dsr))
+
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
@@ -573,15 +556,6 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_IEEE488_BUS_ADD()
-
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "serial_terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_0_TAG, i8251_device, write_rx))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_0_TAG, i8251_device, write_dsr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
-
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_1_TAG, i8251_device, write_rx))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_1_TAG, i8251_device, write_dsr))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

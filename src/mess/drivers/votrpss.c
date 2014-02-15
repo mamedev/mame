@@ -192,20 +192,6 @@ IRQ_CALLBACK_MEMBER( votrpss_state::irq_ack )
 	return 0x38;
 }
 
-static const i8251_interface uart_intf =
-{
-	//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
-	//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const struct pit8253_interface pit_intf =
 {
 	{
@@ -304,8 +290,12 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 TIMER_DEVICE_CALLBACK_MEMBER( votrpss_state::serial_tick )
 {
-	m_uart->receive_clock();
-	m_uart->transmit_clock();
+	/// TODO: double timer frequency for correct duty cycle
+	m_uart->write_rxc(1);
+	m_uart->write_txc(1);
+
+	m_uart->write_rxc(0);
+	m_uart->write_txc(0);
 }
 
 /******************************************************************************
@@ -331,7 +321,12 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 
 	/* Devices */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	MCFG_I8251_ADD("uart", uart_intf)
+
+	MCFG_DEVICE_ADD("uart", I8251, 0)
+	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", serial_port_device, tx))
+	//MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	//MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
 	MCFG_PIT8253_ADD( "pit", pit_intf)
 	MCFG_I8255_ADD("ppi", ppi_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", votrpss_state, irq_timer, attotime::from_msec(10))

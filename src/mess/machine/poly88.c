@@ -171,25 +171,26 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
 		/* tape reading */
 		if (m_cassette->get_state()&CASSETTE_PLAY)
 		{
-					if (m_clk_level_tape)
-					{
-						m_previous_level = (m_cassette->input() > 0.038) ? 1 : 0;
-						m_clk_level_tape = 0;
-					}
-					else
-					{
-						current_level = (m_cassette->input() > 0.038) ? 1 : 0;
+			if (m_clk_level_tape)
+			{
+				m_previous_level = (m_cassette->input() > 0.038) ? 1 : 0;
+				m_clk_level_tape = 0;
+			}
+			else
+			{
+				current_level = (m_cassette->input() > 0.038) ? 1 : 0;
 
-						if (m_previous_level!=current_level)
-						{
-							data = (!m_previous_level && current_level) ? 1 : 0;
+				if (m_previous_level!=current_level)
+				{
+					data = (!m_previous_level && current_level) ? 1 : 0;
 //data = current_level;
-							m_uart->write_rx(data);
-							m_uart->receive_clock();
+					m_uart->write_rxd(data);
 
-							m_clk_level_tape = 1;
-						}
-					}
+					m_clk_level_tape = 1;
+				}
+			}
+
+			m_uart->write_rxc(m_clk_level_tape);
 		}
 
 		/* tape writing */
@@ -199,19 +200,16 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
 			data ^= m_clk_level_tape;
 			m_cassette->output(data&0x01 ? 1 : -1);
 
-			if (!m_clk_level_tape)
-				m_uart->transmit_clock();
-
 			m_clk_level_tape = m_clk_level_tape ? 0 : 1;
+			m_uart->write_txc(m_clk_level_tape);
 
 			return;
 		}
 
 		m_clk_level_tape = 1;
 
-		if (!m_clk_level)
-			m_uart->transmit_clock();
 		m_clk_level = m_clk_level ? 0 : 1;
+		m_uart->write_txc(m_clk_level);
 //  }
 }
 
@@ -244,17 +242,6 @@ WRITE_LINE_MEMBER(poly88_state::poly88_usart_rxready)
 	//drvm_int_vector = 0xe7;
 	//execute().set_input_line(0, HOLD_LINE);
 }
-
-const i8251_interface poly88_usart_interface=
-{
-	DEVCB_DRIVER_LINE_MEMBER(poly88_state,write_cas_tx),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(poly88_state,poly88_usart_rxready),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 READ8_MEMBER(poly88_state::poly88_keyboard_r)
 {

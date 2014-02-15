@@ -342,36 +342,6 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    i8251_interface rs232_intf
--------------------------------------------------*/
-
-static const i8251_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/*-------------------------------------------------
-    i8251_interface rs449_intf
--------------------------------------------------*/
-
-static const i8251_interface rs449_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/*-------------------------------------------------
     ay8910_interface ay8910_intf
 -------------------------------------------------*/
 
@@ -434,8 +404,11 @@ static MACHINE_CONFIG_START( cgc7900, cgc7900_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_I8251_ADD(INS8251_0_TAG, rs232_intf)
-	MCFG_I8251_ADD(INS8251_1_TAG, rs449_intf)
+	MCFG_DEVICE_ADD(INS8251_0_TAG, I8251, 0)
+	// rs232
+
+	MCFG_DEVICE_ADD(INS8251_1_TAG, I8251, 0)
+	// rs449
 MACHINE_CONFIG_END
 
 /***************************************************************************

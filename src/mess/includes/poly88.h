@@ -80,9 +80,4 @@ protected:
 	int m_cas_tx;
 };
 
-
-/*----------- defined in machine/poly88.c -----------*/
-extern const i8251_interface poly88_usart_interface;
-
-
 #endif /* POLY88_H_ */

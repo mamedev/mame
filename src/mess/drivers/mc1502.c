@@ -201,18 +201,6 @@ I8255_INTERFACE( mc1502_ppi8255_interface_2 )
 	DEVCB_DRIVER_MEMBER(mc1502_state,mc1502_kppi_portc_w)
 };
 
-const i8251_interface mc1502_i8251_interface =
-{
-	/* XXX RxD data are accessible via PPI port C, bit 7 */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w), /* default handler does nothing */
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(mc1502_state, mc1502_i8251_syndet)
-};
-
 WRITE_LINE_MEMBER(mc1502_state::mc1502_i8251_syndet)
 {
 	if (!BIT(m_ppi_portc,3))
@@ -221,8 +209,8 @@ WRITE_LINE_MEMBER(mc1502_state::mc1502_i8251_syndet)
 
 WRITE_LINE_MEMBER(mc1502_state::mc1502_pit8253_out1_changed)
 {
-	machine().device<i8251_device>("upd8251")->txc_w(state);
-	machine().device<i8251_device>("upd8251")->rxc_w(state);
+	machine().device<i8251_device>("upd8251")->write_txc(state);
+	machine().device<i8251_device>("upd8251")->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER(mc1502_state::mc1502_pit8253_out2_changed)
@@ -342,7 +330,12 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_I8255_ADD( "ppi8255n1", mc1502_ppi8255_interface_1 )
 	MCFG_I8255_ADD( "ppi8255n2", mc1502_ppi8255_interface_2 )
 
-	MCFG_I8251_ADD( "upd8251", mc1502_i8251_interface )
+	MCFG_DEVICE_ADD( "upd8251", I8251, 0)
+	/* XXX RxD data are accessible via PPI port C, bit 7 */
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w)) /* default handler does nothing */
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
+	MCFG_I8251_SYNDET_HANDLER(WRITELINE(mc1502_state, mc1502_i8251_syndet))
+
 	MCFG_SERIAL_ADD( "irps", mc1502_serial )
 
 	MCFG_ISA8_BUS_ADD("isa", ":maincpu", mc1502_isabus_intf)

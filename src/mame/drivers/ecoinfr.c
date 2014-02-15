@@ -772,18 +772,6 @@ MACHINE_START_MEMBER(ecoinfr_state,ecoinfr)
 	}
 }
 
-static const i8251_interface i8251_intf =
-{
-	DEVCB_NULL, // out_txd_cb
-	DEVCB_NULL, // out_dtr_cb
-	DEVCB_NULL, // out_rts_cb
-	DEVCB_NULL, // out_rxrdy_cb
-	DEVCB_NULL, // out_txrdy_cb
-	DEVCB_NULL, // out_txempty_cb
-	DEVCB_NULL // out_syndet_cb
-};
-
-
 static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
@@ -795,7 +783,7 @@ static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
 
 	MCFG_MACHINE_START_OVERRIDE(ecoinfr_state, ecoinfr )
 
-	MCFG_I8251_ADD(UPD8251_TAG, i8251_intf)
+	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 MACHINE_CONFIG_END
 
 

@@ -228,42 +228,6 @@ static SLOT_INTERFACE_START( zorba_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-// COM port
-static const i8251_interface u0_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-// printer port
-static const i8251_interface u1_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-// keyboard
-static const i8251_interface u2_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 WRITE8_MEMBER( zorba_state::pia0_porta_w )
 {
 	m_beep->set_state(BIT(data, 7));
@@ -421,9 +385,15 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 
 	/* Devices */
 	MCFG_Z80DMA_ADD("dma", XTAL_24MHz/6, dma_intf)
-	MCFG_I8251_ADD("uart0", u0_intf)
-	MCFG_I8251_ADD("uart1", u1_intf)
-	MCFG_I8251_ADD("uart2", u2_intf)
+
+	MCFG_DEVICE_ADD("uart0", I8251, 0)
+	// COM port
+
+	MCFG_DEVICE_ADD("uart1", I8251, 0)
+	// printer port
+
+	MCFG_DEVICE_ADD("uart2", I8251, 0)
+	// keyboard
 
 // port A - disk select etc, beeper
 // port B - parallel interface

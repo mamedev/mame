@@ -225,8 +225,8 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_I8255_ADD( "ppi8255_3", pk8020_ppi8255_interface_3 )
 	MCFG_PIT8253_ADD( "pit8253", pk8020_pit8253_intf )
 	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pk8020_state,pk8020_pic_set_int_line), VCC, NULL )
-	MCFG_I8251_ADD( "rs232", default_i8251_interface)
-	MCFG_I8251_ADD( "lan", default_i8251_interface)
+	MCFG_DEVICE_ADD( "rs232", I8251, 0)
+	MCFG_DEVICE_ADD( "lan", I8251, 0)
 
 	MCFG_FD1793_ADD( "wd1793", pk8020_wd17xx_interface )
 
