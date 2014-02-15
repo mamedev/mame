@@ -1319,6 +1319,7 @@ $(MESSOBJ)/hegener.a:           \
 	$(MESS_DRIVERS)/glasgow.o   \
 	$(MESS_DRIVERS)/mephisto.o  \
 	$(MESS_DRIVERS)/mmodular.o  \
+	$(MESS_DRIVERS)/stratos.o   \
 
 
 $(MESSOBJ)/hitachi.a:           \
