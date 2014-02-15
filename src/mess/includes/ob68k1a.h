@@ -5,14 +5,13 @@
 #ifndef __OB68K1A__
 #define __OB68K1A__
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "machine/com8116.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 
 #define MC68000L10_TAG  "u50"
 #define MC6821_0_TAG    "u32"

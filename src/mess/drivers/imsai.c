@@ -23,17 +23,19 @@
 #include "machine/pit8253.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class imsai_state : public driver_device
 {
 public:
 	imsai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-		, m_uart(*this, "uart")
-		, m_pit(*this, "pit")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG),
+		m_uart(*this, "uart"),
+		m_pit(*this, "pit")
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(keyin_r);

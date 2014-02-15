@@ -51,16 +51,17 @@
 #endif
 
 #define BITBANGER_TAG   "bitbanger"
+#define KEYBOARD_TAG "keyboard"
 
 class ie15_state : public driver_device
 {
 public:
 	ie15_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_beeper(*this, "beeper")
-		, m_bitbanger(*this, BITBANGER_TAG)
-		, m_io_keyboard(*this, KEYBOARD_TAG)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_beeper(*this, "beeper"),
+		m_bitbanger(*this, BITBANGER_TAG),
+		m_io_keyboard(*this, KEYBOARD_TAG)
 	{ }
 
 	virtual void machine_reset();

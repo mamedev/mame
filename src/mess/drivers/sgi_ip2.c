@@ -48,6 +48,7 @@
 #include "machine/68681.h" /* DUART0, DUART1 */
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class sgi_ip2_state : public driver_device
 {
@@ -59,7 +60,9 @@ public:
 		m_mainram(*this, "mainram"),
 		m_bss(*this, "bss"),
 		m_ptmap(*this, "ptmap"),
-		m_rtc(*this, "rtc") { }
+		m_rtc(*this, "rtc")
+	{
+	}
 
 	DECLARE_READ8_MEMBER(sgi_ip2_m_but_r);
 	DECLARE_WRITE8_MEMBER(sgi_ip2_m_but_w);

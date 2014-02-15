@@ -2,7 +2,7 @@
 #define X68K_KBD_H_
 
 #include "emu.h"
-#include "machine/keyboard.h"
+#include "bus/rs232/keyboard.h"
 
 #define MCFG_X68K_KEYBOARD_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, X68K_KEYBOARD, 1200) \

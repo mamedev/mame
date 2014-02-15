@@ -10,8 +10,6 @@
 #include "machine/ins8250.h"
 #include "machine/i8255.h"
 #include "machine/am9517a.h"
-#include "machine/serial.h"
-#include "machine/ser_mouse.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "machine/upd765.h"
 #include "sound/speaker.h"

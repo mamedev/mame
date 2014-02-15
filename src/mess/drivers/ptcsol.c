@@ -122,6 +122,8 @@ struct cass_data_t {
 	} output;
 };
 
+#define KEYBOARD_TAG "keyboard"
+
 class sol20_state : public driver_device
 {
 public:
@@ -133,21 +135,22 @@ public:
 
 	sol20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_cass1(*this, "cassette"),
-	m_cass2(*this, "cassette2"),
-	m_uart(*this, "uart"),
-	m_uart_s(*this, "uart_s"),
-	m_p_videoram(*this, "videoram"),
-	m_iop_arrows(*this, "ARROWS"),
-	m_iop_config(*this, "CONFIG"),
-	m_iop_s1(*this, "S1"),
-	m_iop_s2(*this, "S2"),
-	m_iop_s3(*this, "S3"),
-	m_iop_s4(*this, "S4"),
-	m_cassette1(*this, "cassette"),
-	m_cassette2(*this, "cassette2")
-	{ }
+		m_maincpu(*this, "maincpu"),
+		m_cass1(*this, "cassette"),
+		m_cass2(*this, "cassette2"),
+		m_uart(*this, "uart"),
+		m_uart_s(*this, "uart_s"),
+		m_p_videoram(*this, "videoram"),
+		m_iop_arrows(*this, "ARROWS"),
+		m_iop_config(*this, "CONFIG"),
+		m_iop_s1(*this, "S1"),
+		m_iop_s2(*this, "S2"),
+		m_iop_s3(*this, "S3"),
+		m_iop_s4(*this, "S4"),
+		m_cassette1(*this, "cassette"),
+		m_cassette2(*this, "cassette2")
+	{
+	}
 
 	DECLARE_READ8_MEMBER( sol20_f8_r );
 	DECLARE_READ8_MEMBER( sol20_f9_r );

@@ -33,6 +33,8 @@
 
 */
 
+#include "bus/rs232/rs232.h"
+
 /* Fake Keyboard */
 
 void pc8401a_state::scan_keyboard()
@@ -571,9 +573,9 @@ static I8255A_INTERFACE( ppi_intf )
 
 static const i8251_interface uart_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -597,8 +599,8 @@ static MACHINE_CONFIG_START( pc8401a, pc8401a_state )
 	MCFG_I8251_ADD(I8251_TAG, uart_intf)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rx))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rx))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(pc8401a_video)

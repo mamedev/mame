@@ -48,20 +48,20 @@ Z - more scan lines per row (cursor is bigger)
 
 ****************************************************************************/
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "video/mc6845.h"
 #include "machine/keyboard.h"
-#include "machine/serial.h"
 #include "imagedev/cassette.h"
 #include "machine/wd_fdc.h"
 #include "sound/wave.h"
 #include "sound/beep.h"
 #include "tavernie.lh"
 
+#define KEYBOARD_TAG "keyboard"
 
 class tavernie_state : public driver_device
 {
@@ -303,8 +303,8 @@ static ACIA6850_INTERFACE( mc6850_intf )
 {
 	153600,
 	153600,
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
 	DEVCB_NULL
 };
 
@@ -335,8 +335,8 @@ static MACHINE_CONFIG_START( cpu09, tavernie_state )
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rx))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rx))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(tavernie_state, pa_r))

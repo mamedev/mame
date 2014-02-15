@@ -64,7 +64,6 @@ Address map:
 #include "includes/pes.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/tms5220.h"
-#include "machine/terminal.h"
 
 /* Devices */
 WRITE8_MEMBER(pes_state::pes_kbd_input)

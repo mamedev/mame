@@ -54,6 +54,8 @@ Usage of terminal:
 #include "machine/keyboard.h"
 #include "machine/terminal.h"
 
+#define KEYBOARD_TAG "keyboard"
+#define TERMINAL_TAG "terminal"
 
 class okean240_state : public driver_device
 {
@@ -65,12 +67,14 @@ public:
 
 	okean240_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_term_data(0),
-	m_j(0),
-	m_scroll(0),
-	m_p_videoram(*this, "p_videoram"),
-	m_io_modifiers(*this, "MODIFIERS"),
-	m_maincpu(*this, "maincpu") { }
+		m_term_data(0),
+		m_j(0),
+		m_scroll(0),
+		m_p_videoram(*this, "p_videoram"),
+		m_io_modifiers(*this, "MODIFIERS"),
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
 	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);

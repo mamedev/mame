@@ -33,18 +33,22 @@ and be connected to a RS422 network.
 //#include "machine/z80dma.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class onyx_state : public driver_device
 {
 public:
 	onyx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG) { }
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
 	DECLARE_MACHINE_RESET(c8002);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(portff05_r);
+
 private:
 	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;

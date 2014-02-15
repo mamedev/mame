@@ -38,21 +38,24 @@ Unable to proceed due to no info available (& in English).
 #include "machine/keyboard.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
+#define KEYBOARD_TAG "keyboard"
 
 class sapi1_state : public driver_device
 {
 public:
 	sapi1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_p_videoram(*this, "videoram")
-		, m_bank1(*this, "bank1")
-		, m_line0(*this, "LINE0")
-		, m_line1(*this, "LINE1")
-		, m_line2(*this, "LINE2")
-		, m_line3(*this, "LINE3")
-		, m_line4(*this, "LINE4")
-		, m_maincpu(*this, "maincpu")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_p_videoram(*this, "videoram"),
+		m_bank1(*this, "bank1"),
+		m_line0(*this, "LINE0"),
+		m_line1(*this, "LINE1"),
+		m_line2(*this, "LINE2"),
+		m_line3(*this, "LINE3"),
+		m_line4(*this, "LINE4"),
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	optional_shared_ptr<UINT8> m_p_videoram;
 	DECLARE_READ8_MEMBER(sapi1_keyboard_r);

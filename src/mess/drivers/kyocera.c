@@ -1019,8 +1019,8 @@ WRITE8_MEMBER( kc85_state::i8155_pb_w )
 	if (m_buzzer) m_speaker->level_w(m_bell);
 
 	// RS-232
-	m_rs232->dtr_w(BIT(data, 6));
-	m_rs232->rts_w(BIT(data, 7));
+	m_rs232->write_dtr(BIT(data, 6));
+	m_rs232->write_rts(BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER( kc85_state::write_centronics_busy )
@@ -1197,7 +1197,7 @@ static IM6402_INTERFACE( uart_intf )
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1207,9 +1207,9 @@ static IM6402_INTERFACE( uart_intf )
 
 static const i8251_interface tandy200_uart_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1419,7 +1419,7 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(IM6402_TAG, im6402_device, write_rx))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IM6402_TAG, im6402_device, write_rx))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(kc85_state, write_centronics_busy))
@@ -1569,8 +1569,8 @@ static MACHINE_CONFIG_START( tandy200, tandy200_state )
 	MCFG_I8251_ADD(I8251_TAG, /*XTAL_4_9152MHz/2,*/ tandy200_uart_intf)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rx))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rx))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")

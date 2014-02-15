@@ -39,6 +39,8 @@
 
 #include "apollo_dsp.lh"
 
+#define TERMINAL_TAG "terminal"
+
 // we use this to prevent excessive logging (if emulation runs amok)
 // error.log will be 10 MB for 100000 lines
 #define APOLLO_MAX_NO_OF_LOG_LINES 1000000

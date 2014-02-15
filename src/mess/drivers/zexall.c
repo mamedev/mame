@@ -47,16 +47,18 @@ One i/o port is used:
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class zexall_state : public driver_device
 {
 public:
 	zexall_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-		, m_main_ram(*this, "main_ram")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG),
+		m_main_ram(*this, "main_ram")
+	{
+	}
 
 	DECLARE_READ8_MEMBER( zexall_output_ack_r );
 	DECLARE_READ8_MEMBER( zexall_output_req_r );

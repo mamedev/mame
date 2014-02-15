@@ -1,11 +1,11 @@
-#include "machine/null_modem.h"
+#include "null_modem.h"
 
 const device_type NULL_MODEM = &device_creator<null_modem_device>;
 
 null_modem_device::null_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NULL_MODEM, "Null Modem", tag, owner, clock, "null_modem", __FILE__),
-		device_serial_port_interface(mconfig, *this),
-		m_bitbanger(*this, "bitbanger")
+	device_rs232_port_interface(mconfig, *this),
+	m_bitbanger(*this, "bitbanger")
 {
 }
 

@@ -15,12 +15,9 @@
 #define __TURBO232__
 
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/mos6551.h"
-#include "machine/null_modem.h"
-#include "machine/serial.h"
-#include "machine/terminal.h"
+#include "bus/rs232/rs232.h"
 
 
 

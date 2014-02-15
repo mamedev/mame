@@ -11,8 +11,8 @@
 
 ***************************************************************************/
 
-#include "emu.h"
 #include "includes/pc.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 
 #include "machine/i8255.h"
@@ -359,33 +359,33 @@ WRITE_LINE_MEMBER(pc_state::pc_com_interrupt_2)
 const ins8250_interface ibm5150_com_interface[4]=
 {
 	{
-		DEVCB_DEVICE_LINE_MEMBER("serport0", serial_port_device, tx),
-		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, dtr_w),
-		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, rts_w),
+		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, write_txd),
+		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, write_dtr),
+		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, write_rts),
 		DEVCB_DRIVER_LINE_MEMBER(pc_state,pc_com_interrupt_1),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
 	{
-		DEVCB_DEVICE_LINE_MEMBER("serport1", serial_port_device, tx),
-		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, dtr_w),
-		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, rts_w),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_txd),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_dtr),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_rts),
 		DEVCB_DRIVER_LINE_MEMBER(pc_state,pc_com_interrupt_2),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
 	{
-		DEVCB_DEVICE_LINE_MEMBER("serport2", serial_port_device, tx),
-		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, dtr_w),
-		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, rts_w),
+		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_txd),
+		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_dtr),
+		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_rts),
 		DEVCB_DRIVER_LINE_MEMBER(pc_state,pc_com_interrupt_1),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
 	{
-		DEVCB_DEVICE_LINE_MEMBER("serport3", serial_port_device, tx),
-		DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, dtr_w),
-		DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, rts_w),
+		DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, write_txd),
+		DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, write_dtr),
+		DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, write_rts),
 		DEVCB_DRIVER_LINE_MEMBER(pc_state,pc_com_interrupt_2),
 		DEVCB_NULL,
 		DEVCB_NULL

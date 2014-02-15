@@ -28,7 +28,6 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "machine/z80dart.h"
 #include "video/upd7220.h"
 

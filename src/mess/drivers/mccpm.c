@@ -57,16 +57,18 @@ PIO A-Data 0F4h, A-Command 0F5h, B-Data 0F6h, B-Command 0F7h
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class mccpm_state : public driver_device
 {
 public:
 	mccpm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG)
-	,
-		m_p_ram(*this, "p_ram"){ }
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG),
+		m_p_ram(*this, "p_ram")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;

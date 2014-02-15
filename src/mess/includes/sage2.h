@@ -10,7 +10,6 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "machine/upd765.h"
 
 #define M68000_TAG      "u68"

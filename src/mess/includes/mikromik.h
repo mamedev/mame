@@ -5,14 +5,13 @@
 #ifndef __MIKROMIKKO__
 #define __MIKROMIKKO__
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "formats/mm_dsk.h"
 #include "machine/am9517a.h"
 #include "machine/i8212.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "machine/z80dart.h"
 #include "machine/upd765.h"
 #include "sound/speaker.h"

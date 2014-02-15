@@ -30,10 +30,9 @@
 ******************************************************************************/
 
 /* Core includes */
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6850acia.h"
-#include "machine/serial.h"
 #include "sound/votrax.h"
 #include "votrtnt.lh"
 
@@ -93,8 +92,8 @@ static ACIA6850_INTERFACE( acia_intf )
 {
 	153600,
 	153600,
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
 	DEVCB_NULL
 };
 
@@ -119,8 +118,8 @@ static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
 	MCFG_ACIA6850_ADD("acia", acia_intf)
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rx))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rx))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

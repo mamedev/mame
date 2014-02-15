@@ -10,7 +10,7 @@
 
 ***************************************************************************/
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "machine/epson_sio.h"
@@ -20,7 +20,6 @@
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "sound/speaker.h"
-#include "machine/serial.h"
 #include "px4.lh"
 
 
@@ -798,7 +797,7 @@ void px4_state::txd_w(int data)
 	else
 		if (BIT(m_swr, 3))
 			// to rs232
-			m_rs232->tx(data);
+			m_rs232->write_txd(data);
 		// else to cartridge
 }
 
@@ -928,8 +927,8 @@ WRITE8_MEMBER( px4_state::px4_artcr_w )
 		m_artsr &= ~(ART_PE | ART_OE | ART_FE);
 
 	// rs232
-	m_rs232->dtr_w(!BIT(data, 1));
-	m_rs232->rts_w(!BIT(data, 5));
+	m_rs232->write_dtr(!BIT(data, 1));
+	m_rs232->write_rts(!BIT(data, 5));
 }
 
 // switch register
@@ -1429,10 +1428,10 @@ static MACHINE_CONFIG_START( px4, px4_state )
 
 	// rs232 port
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(px4_state, rs232_rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(WRITELINE(px4_state, rs232_dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(WRITELINE(px4_state, rs232_dsr_w))
-	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(px4_state, rs232_cts_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(px4_state, rs232_rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(px4_state, rs232_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(px4_state, rs232_dsr_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(px4_state, rs232_cts_w))
 
 	// rom capsules
 	MCFG_CARTSLOT_ADD("capsule1")

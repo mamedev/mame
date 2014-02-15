@@ -24,6 +24,8 @@ struct cx_timer_regs_t
 	UINT32 timer_irq;
 };
 
+#define TERMINAL_TAG "terminal"
+
 class cxhumax_state : public driver_device
 {
 public:

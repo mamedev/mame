@@ -10,7 +10,8 @@
 
 ***************************************************************************/
 
-#include "emu.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i8089/i8089.h"
 #include "machine/ram.h"
@@ -18,8 +19,6 @@
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/z80dart.h"
-#include "machine/serial.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
 #include "sound/sn76496.h"
@@ -222,9 +221,9 @@ static Z80SIO_INTERFACE( apricot_z80sio_intf )
 	XTAL_4MHz / 16, XTAL_4MHz / 16,
 
 	// channel a
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
 	DEVCB_DEVICE_LINE_MEMBER("ic71", i8089_device, drq2_w),
 	DEVCB_NULL,
 
@@ -425,10 +424,10 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
 // note: missing a receive clock callback to support external clock mode
 // (m_data_selector_rts == 1 and m_data_selector_dtr == 0)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ic15", z80dart_device, rxa_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ic15", z80dart_device, dcda_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ic15", z80dart_device, synca_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ic15", z80dart_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ic15", z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ic15", z80dart_device, dcda_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ic15", z80dart_device, synca_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ic15", z80dart_device, ctsa_w))
 
 	// centronics printer
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")

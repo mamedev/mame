@@ -3,9 +3,8 @@
 #ifndef __EXP85__
 #define __EXP85__
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "imagedev/cassette.h"
-#include "machine/serial.h"
 #include "sound/speaker.h"
 
 #define SCREEN_TAG      "screen"

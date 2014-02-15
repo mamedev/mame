@@ -17,12 +17,11 @@
         http://bitsavers.org/pdf/dec/terminal/vt125/MP01053_VT125_Mar82.pdf
 ****************************************************************************/
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"
-#include "machine/serial.h"
 #include "sound/beep.h"
 #include "video/vtvideo.h"
 #include "vt100.lh"
@@ -41,7 +40,8 @@ public:
 		m_uart(*this, "i8251"),
 		m_dbrg(*this, COM5016T_TAG),
 		m_p_ram(*this, "p_ram")
-		{ }
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
@@ -407,9 +407,9 @@ GFXDECODE_END
 
 static const i8251_interface i8251_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),
 	DEVCB_NULL, // out_rxrdy_cb
 	DEVCB_NULL, // out_txrdy_cb
 	DEVCB_NULL, // out_txempty_cb
@@ -443,8 +443,8 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_I8251_ADD("i8251", i8251_intf)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rx))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rx))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
 
 	MCFG_COM8116_ADD(COM5016T_TAG, XTAL_5_0688MHz, NULL, DEVWRITELINE("i8251", i8251_device, rxc_w), DEVWRITELINE("i8251", i8251_device, txc_w))
 

@@ -16,6 +16,8 @@
 
 /* Defines */
 
+#define TERMINAL_TAG "terminal"
+
 /* Components */
 
 struct hd63701y0_t

@@ -25,11 +25,10 @@
 #define CRT5027_TAG	"uf9"
 #define RS232_TAG	"rs232"
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/compclr_flp.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
 
@@ -411,15 +410,15 @@ WRITE_LINE_MEMBER( compucolor2_state::xmt_w )
 	switch ((m_xo >> 4) & 0x03)
 	{
 	case 0:
-		m_rs232->tx(state);
+		m_rs232->write_txd(state);
 		break;
 
 	case 1:
-		m_floppy0->tx(state);
+		m_floppy0->write_txd(state);
 		break;
 
 	case 2:
-		m_floppy1->tx(state);
+		m_floppy1->write_txd(state);
 		break;
 	}
 }
@@ -439,8 +438,8 @@ void compucolor2_state::machine_start()
 
 void compucolor2_state::machine_reset()
 {
-	m_rs232->rts_w(1);
-	m_rs232->dtr_w(1);
+	m_rs232->write_rts(1);
+	m_rs232->write_dtr(1);
 }
 
 void compucolor2_state::palette_init()
@@ -474,12 +473,15 @@ static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 	MCFG_TMS5501_XMT_CALLBACK(WRITELINE(compucolor2_state, xmt_w))
 	MCFG_TMS5501_XI_CALLBACK(READ8(compucolor2_state, xi_r))
 	MCFG_TMS5501_XO_CALLBACK(WRITE8(compucolor2_state, xo_w))
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+
 	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd0", compucolor_floppy_port_devices, "floppy")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+
 	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd1", compucolor_floppy_port_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

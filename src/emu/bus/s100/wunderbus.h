@@ -14,11 +14,9 @@
 #ifndef __S100_WUNDERBUS__
 #define __S100_WUNDERBUS__
 
-#include "emu.h"
 #include "s100.h"
 #include "machine/ins8250.h"
 #include "machine/pic8259.h"
-#include "machine/serial.h"
 #include "machine/upd1990a.h"
 
 

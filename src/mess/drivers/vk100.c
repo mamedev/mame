@@ -146,13 +146,12 @@ state machine and sees if the GO bit ever finishes and goes back to 0
 // debug state dump for the vector generator
 #undef DEBUG_VG_STATE
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"
-#include "machine/serial.h"
 #include "vk100.lh"
 
 #define RS232_TAG       "rs232"
@@ -179,7 +178,9 @@ public:
 
 		m_capsshift(*this, "CAPSSHIFT"),
 		m_dipsw(*this, "SWITCHES")
-		{ }
+	{
+	}
+
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_speaker;
@@ -1010,9 +1011,9 @@ static MC6845_INTERFACE( mc6845_intf )
 
 static const i8251_interface i8251_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),
 	//DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_rts), // out_rts_cb
 	DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_rxrdy_int), // out_rxrdy_cb
 	DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_txrdy_int), // out_txrdy_cb
@@ -1037,8 +1038,8 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_I8251_ADD("i8251", i8251_intf)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rx))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rx))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
 
 	MCFG_COM8116_ADD(COM5016T_TAG, XTAL_5_0688MHz, NULL, DEVWRITELINE("i8251", i8251_device, rxc_w), DEVWRITELINE("i8251", i8251_device, txc_w))
 

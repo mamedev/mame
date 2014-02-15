@@ -22,6 +22,7 @@
 #define VIA6522_0_TAG "via6522_0"
 #define VIA6522_1_TAG "via6522_1"
 #define MC6845_TAG "mc6845"
+#define KEYBOARD_TAG "keyboard"
 
 class ec65_state : public driver_device
 {
@@ -31,7 +32,9 @@ public:
 		m_via_0(*this, VIA6522_0_TAG),
 		m_via_1(*this, VIA6522_1_TAG),
 		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 *m_p_chargen;

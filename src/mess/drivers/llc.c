@@ -51,6 +51,8 @@
 #include "includes/llc.h"
 #include "llc1.lh"
 
+#define KEYBOARD_TAG "keyboard"
+
 /* Address maps */
 static ADDRESS_MAP_START( llc1_mem, AS_PROGRAM, 8, llc_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM // Monitor ROM

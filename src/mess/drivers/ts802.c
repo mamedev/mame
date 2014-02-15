@@ -29,15 +29,17 @@
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
 
+#define TERMINAL_TAG "terminal"
 
 class ts802_state : public driver_device
 {
 public:
 	ts802_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
 	DECLARE_DRIVER_INIT(ts802);
 	DECLARE_MACHINE_RESET(ts802);
@@ -150,8 +152,8 @@ static Z80DART_INTERFACE( dart0_intf )
 	0, 0, 0, 0,
 
 	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
-	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
+	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -173,8 +175,8 @@ static Z80DART_INTERFACE( dart1_intf )
 	0, 0, 0, 0,
 
 	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
-	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
+	DEVCB_NULL,  //DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
 	DEVCB_NULL,
 	DEVCB_NULL,
 

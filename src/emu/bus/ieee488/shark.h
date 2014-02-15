@@ -16,11 +16,7 @@
 #ifndef __SHARK__
 #define __SHARK__
 
-#include "emu.h"
 #include "ieee488.h"
-#include "cpu/i8085/i8085.h"
-#include "imagedev/harddriv.h"
-#include "machine/serial.h"
 
 
 

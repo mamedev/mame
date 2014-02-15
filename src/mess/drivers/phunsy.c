@@ -35,17 +35,19 @@
 
 #define LOG 1
 
+#define KEYBOARD_TAG "keyboard"
 
 class phunsy_state : public driver_device
 {
 public:
 	phunsy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_speaker(*this, "speaker")
-		, m_cass(*this, "cassette")
-		, m_p_videoram(*this, "videoram")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_speaker(*this, "speaker"),
+		m_cass(*this, "cassette"),
+		m_p_videoram(*this, "videoram")
+	{
+	}
 
 	DECLARE_DRIVER_INIT(phunsy);
 	DECLARE_READ8_MEMBER( phunsy_data_r );

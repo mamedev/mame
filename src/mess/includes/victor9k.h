@@ -14,7 +14,7 @@
 #ifndef __VICTOR9K__
 #define __VICTOR9K__
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
@@ -25,7 +25,6 @@
 #include "machine/mc6852.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
-#include "machine/serial.h"
 #include "machine/z80dart.h"
 #include "machine/victor9kb.h"
 #include "sound/hc55516.h"

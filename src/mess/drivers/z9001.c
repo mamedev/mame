@@ -39,18 +39,21 @@ ToDo:
 // temporary
 #include "machine/keyboard.h"
 
-//
+#define KEYBOARD_TAG "keyboard"
+
 class z9001_state : public driver_device
 {
 public:
 	z9001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_framecnt(0),
-	m_beeper(*this, "beeper"),
-	m_cass(*this, "cassette"),
-	m_p_colorram(*this, "colorram"),
-	m_p_videoram(*this, "videoram"){ }
+		m_maincpu(*this, "maincpu"),
+		m_framecnt(0),
+		m_beeper(*this, "beeper"),
+		m_cass(*this, "cassette"),
+		m_p_colorram(*this, "colorram"),
+		m_p_videoram(*this, "videoram")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	UINT8 m_framecnt;

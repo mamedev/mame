@@ -78,7 +78,7 @@ machine_config_constructor compucolor_floppy_device::device_mconfig_additions() 
 //-------------------------------------------------
 
 device_compucolor_floppy_port_interface::device_compucolor_floppy_port_interface(const machine_config &mconfig, device_t &device)
-	: device_serial_port_interface(mconfig, device)
+	: device_rs232_port_interface(mconfig, device)
 {
 }
 
@@ -88,7 +88,7 @@ device_compucolor_floppy_port_interface::device_compucolor_floppy_port_interface
 //-------------------------------------------------
 
 compucolor_floppy_port_device::compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: serial_port_device(mconfig, COMPUCOLOR_FLOPPY_PORT, "Compucolor Floppy Port", tag, owner, clock, "compclr_flp_port", __FILE__)
+	: rs232_port_device(mconfig, COMPUCOLOR_FLOPPY_PORT, "Compucolor Floppy Port", tag, owner, clock, "compclr_flp_port", __FILE__)
 {
 }
 
@@ -116,7 +116,7 @@ compucolor_floppy_device::compucolor_floppy_device(const machine_config &mconfig
 
 void compucolor_floppy_port_device::device_config_complete()
 {
-	serial_port_device::device_config_complete();
+	rs232_port_device::device_config_complete();
 
 	m_dev = dynamic_cast<device_compucolor_floppy_port_interface *>(get_card_device());
 }
@@ -128,7 +128,7 @@ void compucolor_floppy_port_device::device_config_complete()
 
 void compucolor_floppy_port_device::device_start()
 {
-	serial_port_device::device_start();
+	rs232_port_device::device_start();
 }
 
 
@@ -153,7 +153,7 @@ void compucolor_floppy_device::device_timer(emu_timer &timer, device_timer_id id
 {
 	if (!m_sel && !m_rw)
 	{
-		m_owner->out_rx(read_bit());
+		output_rxd(read_bit());
 	}
 }
 
@@ -179,7 +179,7 @@ void compucolor_floppy_device::rw_w(int state)
 {
 	if (!m_rw && state)
 	{
-		m_owner->out_rx(1);
+		output_rxd(1);
 	}
 
 	m_rw = state;
@@ -224,7 +224,7 @@ void compucolor_floppy_device::select_w(int state)
 
 	if (!m_sel && state)
 	{
-		m_owner->out_rx(1);
+		output_rxd(1);
 	}
 
 	m_sel = state;

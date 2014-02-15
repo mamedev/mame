@@ -3,11 +3,8 @@
 #ifndef __MPU401_H__
 #define __MPU401_H__
 
-#include "emu.h"
+#include "bus/midi/midi.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/serial.h"
-#include "machine/midiinport.h"
-#include "machine/midioutport.h"
 
 #define MCFG_MPU401_ADD(_tag, _irqf ) \
 	MCFG_DEVICE_ADD(_tag, MPU401, 0) \
@@ -30,7 +27,6 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	required_device<m6801_cpu_device> m_ourcpu;
-	required_device<serial_port_device> m_mdout;
 
 	template<class _write> void set_irqf(_write wr)
 	{
@@ -48,7 +44,6 @@ public:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_WRITE_LINE_MEMBER(midi_rx_w);
-	DECLARE_WRITE_LINE_MEMBER(mpu401_midi_tx);
 
 	// public API - call for reads/writes at I/O 330/331 on PC, C0n0/C0n1 on Apple II, etc.
 	DECLARE_READ8_MEMBER(mpu_r);

@@ -38,25 +38,28 @@ Note: because the 8275 isn't working, a generic video handler is being used at t
 #include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
 
+#define KEYBOARD_TAG "keyboard"
+
 class zorba_state : public driver_device
 {
 public:
 	zorba_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_p_videoram(*this, "videoram")
-		, m_maincpu(*this, "maincpu")
-		, m_beep(*this, "beeper")
-		, m_dma(*this, "dma")
-		, m_u0(*this, "uart0")
-		, m_u1(*this, "uart1")
-		, m_u2(*this, "uart2")
-		, m_pia0(*this, "pia0")
-		, m_pia1(*this, "pia1")
-		, m_crtc(*this, "crtc")
-		, m_fdc (*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_p_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_beep(*this, "beeper"),
+		m_dma(*this, "dma"),
+		m_u0(*this, "uart0"),
+		m_u1(*this, "uart1"),
+		m_u2(*this, "uart2"),
+		m_pia0(*this, "pia0"),
+		m_pia1(*this, "pia1"),
+		m_crtc(*this, "crtc"),
+		m_fdc (*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1")
+	{
+	}
 
 public:
 	const UINT8 *m_p_chargen;

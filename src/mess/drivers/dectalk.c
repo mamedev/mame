@@ -273,13 +273,12 @@ dgc (dg(no!spam)cx@mac.com)
 #undef SERIAL_TO_STDERR
 
 /* Core includes */
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "machine/n68681.h"
 #include "machine/x2212.h"
 #include "sound/dac.h"
-#include "machine/serial.h"
 
 
 class dectalk_state : public driver_device
@@ -296,7 +295,9 @@ public:
 		m_dsp(*this, "dsp"),
 		m_duart(*this, "duartn68681"),
 		m_nvram(*this, "x2212"),
-		m_dac(*this, "dac") { }
+		m_dac(*this, "dac")
+	{
+	}
 
 	// input fifo, between m68k and tms32010
 	UINT16 m_infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
@@ -883,7 +884,7 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
 	MCFG_DUARTN68681_ADD( "duartn68681", XTAL_3_6864MHz ) /* 2681 duart (not 68681!); Y3 3.6864MHz Xtal */
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_irq_handler))
 	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_txa))
-	MCFG_DUARTN68681_B_TX_CALLBACK(DEVWRITELINE("rs232", serial_port_device, tx))
+	MCFG_DUARTN68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(dectalk_state, dectalk_duart_input))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(dectalk_state, dectalk_duart_output))
 
@@ -908,7 +909,7 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, rx_b_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, rx_b_w))
 MACHINE_CONFIG_END
 
 

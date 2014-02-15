@@ -15,10 +15,8 @@
 #define __SWIFTLINK__
 
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/mos6551.h"
-#include "machine/serial.h"
 
 
 

@@ -26,6 +26,8 @@ ToDo:
 #include "machine/wd17xx.h"
 #include "includes/jupiter.h"
 
+#define TERMINAL_TAG "terminal"
+#define KEYBOARD_TAG "keyboard"
 
 
 //**************************************************************************

@@ -34,10 +34,10 @@ const device_type VIC1011 = &device_creator<vic1011_device>;
 
 static MACHINE_CONFIG_FRAGMENT( vic1011 )
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_rxd))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_h))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_k))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_l))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_rxd))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_h))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_k))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, output_l))
 MACHINE_CONFIG_END
 
 
@@ -85,12 +85,12 @@ WRITE_LINE_MEMBER( vic1011_device::output_rxd )
 
 void vic1011_device::input_d(int state)
 {
-	m_rs232->rts_w(state);
+	m_rs232->write_rts(state);
 }
 
 void vic1011_device::input_e(int state)
 {
-	m_rs232->dtr_w(state);
+	m_rs232->write_dtr(state);
 }
 
 void vic1011_device::input_j(int state)
@@ -100,5 +100,5 @@ void vic1011_device::input_j(int state)
 
 void vic1011_device::input_m(int state)
 {
-	m_rs232->tx(!state);
+	m_rs232->write_txd(!state);
 }

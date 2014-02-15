@@ -151,7 +151,7 @@ READ_LINE_MEMBER( exp85_state::sid_r )
 	}
 	else
 	{
-		data = m_rs232->rx();
+		data = m_rs232->rxd_r();
 	}
 
 	return data;
@@ -165,7 +165,7 @@ WRITE_LINE_MEMBER( exp85_state::sod_w )
 	}
 	else
 	{
-		m_rs232->tx(state);
+		m_rs232->write_txd(state);
 	}
 }
 

@@ -2,33 +2,33 @@
 
     midiinport.h
 
-    MIDI In serial port - glues the image device to the pluggable serial port
+    MIDI In port - glues the image device to the pluggable midi port
 
 *********************************************************************/
 
 #ifndef _MIDIINPORT_H_
 #define _MIDIINPORT_H_
 
-#include "emu.h"
-#include "machine/serial.h"
+#include "midi.h"
 #include "imagedev/midiin.h"
 
-class midiin_port_device :
-		public device_t,
-		public device_serial_port_interface
+class midiin_port_device : public device_t,
+	public device_midi_port_interface
 {
 public:
 	midiin_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual machine_config_constructor device_mconfig_additions() const;
-	DECLARE_WRITE_LINE_MEMBER( read ) { m_owner->out_rx(state); }
-	virtual void tx(UINT8 state) { }
+
+	DECLARE_WRITE_LINE_MEMBER( read ) { output_rxd(state); }
+
 protected:
-	virtual void device_start() { m_owner = dynamic_cast<serial_port_device *>(owner()); }
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_start() { m_owner = dynamic_cast<midi_port_device *>(owner()); }
 	virtual void device_reset() { }
+
 private:
-	serial_port_device *m_owner;
 	required_device<midiin_device> m_midiin;
 };
 
 extern const device_type MIDIIN_PORT;
+
 #endif

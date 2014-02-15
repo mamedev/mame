@@ -124,11 +124,11 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 		break;
 
 	case 2: // _RTS
-		m_rs232a->rts_w(fb);
+		m_rs232a->write_rts(fb);
 		break;
 
 	case 3: // TX
-		m_rs232a->tx(fb);
+		m_rs232a->write_txd(fb);
 		break;
 
 	case 4: // _MSTOP
@@ -143,7 +143,7 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 		break;
 
 	case 5: // TXP
-		m_rs232b->tx(fb);
+		m_rs232b->write_txd(fb);
 		break;
 
 	case 6: // TSTB
@@ -212,7 +212,7 @@ READ8_MEMBER( prof80_state::status_r )
 	UINT8 data = 0;
 
 	// serial receive
-	data |= !m_rs232a->rx();
+	data |= !m_rs232a->rxd_r();
 
 	// clear to send
 	data |= m_rs232a->cts_r() << 4;

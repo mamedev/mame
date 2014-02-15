@@ -59,21 +59,22 @@ ToDo:
 #include "sound/speaker.h"
 #include "machine/wd_fdc.h"
 
-
+#define KEYBOARD_TAG "keyboard"
 
 class v6809_state : public driver_device
 {
 public:
 	v6809_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_video_address(0)
-		, m_pia0(*this, "pia0")
-		, m_maincpu(*this, "maincpu")
-		, m_crtc(*this, "crtc")
-		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_speaker(*this, "speaker")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_video_address(0),
+		m_pia0(*this, "pia0"),
+		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "crtc"),
+		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_speaker(*this, "speaker")
+	{
+	}
 
 	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);

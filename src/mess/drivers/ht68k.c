@@ -26,28 +26,27 @@ Lot of infos available at: http://www.classiccmp.org/cini/ht68k.htm
 
 ****************************************************************************/
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/n68681.h"
 #include "machine/wd_fdc.h"
-#include "machine/serial.h"
-
 
 class ht68k_state : public driver_device
 {
 public:
 	ht68k_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_duart(*this, "duart68681"),
-	m_fdc(*this, "wd1770"),
-	m_floppy0(*this, "wd1770:0"),
-	m_floppy1(*this, "wd1770:1"),
-	m_floppy2(*this, "wd1770:2"),
-	m_floppy3(*this, "wd1770:3"),
-	m_floppy(NULL),
-	m_p_ram(*this, "p_ram"){ }
-
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_duart(*this, "duart68681"),
+		m_fdc(*this, "wd1770"),
+		m_floppy0(*this, "wd1770:0"),
+		m_floppy1(*this, "wd1770:1"),
+		m_floppy2(*this, "wd1770:2"),
+		m_floppy3(*this, "wd1770:3"),
+		m_floppy(NULL),
+		m_p_ram(*this, "p_ram")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<duartn68681_device> m_duart;
@@ -130,14 +129,15 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(ht68k_mem)
+
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("duart68681", duartn68681_device, rx_a_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681", duartn68681_device, rx_a_w))
 
 	/* video hardware */
 	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8MHz / 2 )
 	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(ht68k_state, duart_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("rs232", serial_port_device, tx))
+	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(ht68k_state, duart_txb))
 	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(ht68k_state, duart_input))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(ht68k_state, duart_output))

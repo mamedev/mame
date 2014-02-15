@@ -10,15 +10,14 @@
 ****************************************************************************/
 
 
-#include "emu.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
 #include "machine/bankdev.h"
 #include "machine/mos6551.h"
 #include "machine/msm58321.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "sound/speaker.h"
 #include "rendlay.h"
 #include "mcfglgcy.h"
@@ -729,15 +728,15 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
 	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, nmi_line))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, tx))
-	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, rts_w))
-	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, dtr_w))
+	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("acia", mos6551_device, rxd_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, dsr_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb4))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, rxd_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, dsr_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb4))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb6)) MCFG_DEVCB_XOR(1)

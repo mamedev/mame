@@ -66,17 +66,19 @@ ToDo:
 #include "machine/terminal.h"
 #include "machine/wd_fdc.h"
 
+#define TERMINAL_TAG "terminal"
 
 class ccs_state : public driver_device
 {
 public:
 	ccs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-		, m_fdc (*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG),
+		m_fdc (*this, "fdc"),
+		m_floppy0(*this, "fdc:0")
+	{
+	}
 
 	DECLARE_DRIVER_INIT(ccs2810);
 	DECLARE_DRIVER_INIT(ccs2422);

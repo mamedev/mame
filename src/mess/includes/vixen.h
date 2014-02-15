@@ -3,13 +3,12 @@
 #ifndef __VIXEN__
 #define __VIXEN__
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8155.h"
 #include "machine/i8251.h"
 #include "bus/ieee488/ieee488.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "machine/wd_fdc.h"
 #include "sound/discrete.h"
 

@@ -50,24 +50,26 @@
 
 ****************************************************************************/
 
-#include "emu.h"
+#include "bus/rs232/keyboard.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/keyboard.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
 #include "imagedev/snapquik.h"
 
+#define KEYBOARD_TAG "keyboard"
 
 class binbug_state : public driver_device
 {
 public:
 	binbug_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_keyboard(*this, KEYBOARD_TAG),
-	m_cass(*this, "cassette"),
-	m_p_videoram(*this, "videoram"),
-	m_p_attribram(*this, "attribram") ,
-		m_maincpu(*this, "maincpu") { }
+		m_keyboard(*this, KEYBOARD_TAG),
+		m_cass(*this, "cassette"),
+		m_p_videoram(*this, "videoram"),
+		m_p_attribram(*this, "attribram"),
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(binbug_ctrl_w);
 	DECLARE_READ8_MEMBER(binbug_serial_r);

@@ -10,6 +10,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class tricep_state : public driver_device
 {

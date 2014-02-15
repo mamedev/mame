@@ -12,12 +12,11 @@
 
 ****************************************************************************/
 
-#include "emu.h"
+#include "bus/rs232/keyboard.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/isa.h"
 #include "machine/isa_cards.h"
 #include "machine/mc68901.h"
-#include "machine/keyboard.h"
 
 #define M68K_TAG "maincpu"
 #define ISABUS_TAG "isa"
@@ -110,7 +109,7 @@ static MC68901_INTERFACE( mfp_interface )
 	DEVCB_NULL,											/* TBO */
 	DEVCB_NULL,                                         /* TCO */
 	DEVCB_NULL,                                         /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER("keyboard", serial_keyboard_device, rx_w), /* serial output */
+	DEVCB_DEVICE_LINE_MEMBER("keyboard", serial_keyboard_device, input_txd), /* serial output */
 	DEVCB_NULL,
 	DEVCB_NULL
 };

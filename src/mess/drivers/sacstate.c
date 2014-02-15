@@ -36,15 +36,17 @@ Other input will either result in '!' message, or halt.
 #include "cpu/i8008/i8008.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class sacstate_state : public driver_device
 {
 public:
 	sacstate_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG)
-	{ }
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;

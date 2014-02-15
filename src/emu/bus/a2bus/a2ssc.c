@@ -6,12 +6,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
-#include "includes/apple2.h"
 #include "a2ssc.h"
-#include "machine/terminal.h"
-#include "machine/null_modem.h"
-#include "machine/serial.h"
+#include "bus/rs232/rs232.h"
 
 
 /***************************************************************************
@@ -31,13 +27,13 @@ const device_type A2BUS_SSC = &device_creator<a2bus_ssc_device>;
 MACHINE_CONFIG_FRAGMENT( ssc )
 	MCFG_DEVICE_ADD(SSC_ACIA_TAG, MOS6551, XTAL_1_8432MHz)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2bus_ssc_device, acia_irq_w))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(SSC_RS232_TAG, rs232_port_device, tx))
+	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(SSC_RS232_TAG, rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD(SSC_RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, rxd_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, dsr_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, rxd_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, dsr_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SSC_ACIA_TAG, mos6551_device, cts_w))
 MACHINE_CONFIG_END
 
 ROM_START( ssc )

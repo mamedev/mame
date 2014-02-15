@@ -9,13 +9,9 @@
 #ifndef __A2BUS_MIDI__
 #define __A2BUS_MIDI__
 
-#include "emu.h"
 #include "a2bus.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
-#include "machine/serial.h"
-#include "machine/midiinport.h"
-#include "machine/midioutport.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -1,5 +1,7 @@
 #include "machine/teleprinter.h"
 
+#define KEYBOARD_TAG "keyboard"
+
 static const UINT8 teleprinter_font[128*8] =
 {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,

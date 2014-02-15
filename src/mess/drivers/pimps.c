@@ -24,14 +24,17 @@ V Virtual Memory
 #include "cpu/i8085/i8085.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class pimps_state : public driver_device
 {
 public:
 	pimps_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_terminal(*this, TERMINAL_TAG) ,
-		m_maincpu(*this, "maincpu") { }
+		m_terminal(*this, TERMINAL_TAG),
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	DECLARE_READ8_MEMBER(term_status_r);
 	DECLARE_READ8_MEMBER(term_r);

@@ -14,12 +14,8 @@
 #ifndef __C64_MIDI_NAMESOFT__
 #define __C64_MIDI_NAMESOFT__
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/6850acia.h"
-#include "machine/serial.h"
-#include "machine/midiinport.h"
-#include "machine/midioutport.h"
 
 
 

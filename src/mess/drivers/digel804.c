@@ -67,21 +67,22 @@
 #include "machine/ram.h"
 #include "digel804.lh"
 
+#define TERMINAL_TAG "terminal"
 
 class digel804_state : public driver_device
 {
 public:
 	digel804_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_terminal(*this, TERMINAL_TAG),
-			m_speaker(*this, "speaker"),
-			m_acia(*this, "acia"),
-			m_vfd(*this, "vfd"),
-			m_kb(*this, "74c923"),
-			m_ram(*this, RAM_TAG)
-		//, m_main_ram(*this, "main_ram")
-		{ }
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG),
+		m_speaker(*this, "speaker"),
+		m_acia(*this, "acia"),
+		m_vfd(*this, "vfd"),
+		m_kb(*this, "74c923"),
+		m_ram(*this, RAM_TAG)
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;

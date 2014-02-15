@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Olivier Galibert
 #include "includes/atarist.h"
+#include "bus/midi/midi.h"
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
 #include "video/atarist.h"
 
 /*
@@ -1753,10 +1756,10 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 	m_fdc->set_floppy(floppy);
 
 	// request to send
-	m_rs232->rts_w(BIT(data, 3));
+	m_rs232->write_rts(BIT(data, 3));
 
 	// data terminal ready
-	m_rs232->dtr_w(BIT(data, 4));
+	m_rs232->write_dtr(BIT(data, 4));
 
 	// centronics strobe
 	m_centronics->write_strobe(BIT(data, 5));
@@ -1808,10 +1811,10 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 	m_fdc->set_floppy(floppy);
 
 	// request to send
-	m_rs232->rts_w(BIT(data, 3));
+	m_rs232->write_rts(BIT(data, 3));
 
 	// data terminal ready
-	m_rs232->dtr_w(BIT(data, 4));
+	m_rs232->write_dtr(BIT(data, 4));
 
 	// centronics strobe
 	m_centronics->write_strobe(BIT(data, 5));
@@ -1886,7 +1889,7 @@ static ACIA6850_INTERFACE( acia_midi_intf )
 {
 	Y2/64,
 	0,          // rx clock (we manually clock rx)
-	DEVCB_DEVICE_LINE_MEMBER("mdout", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("mdout", midi_port_device, write_txd),
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(st_state, acia_midi_irq_w)
 };
@@ -1912,7 +1915,7 @@ static MC68901_INTERFACE( mfp_intf )
 	DEVCB_NULL,                                         /* TBO */
 	DEVCB_NULL,                                         /* TCO */
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx)
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd)
 };
 
 
@@ -1931,7 +1934,7 @@ static MC68901_INTERFACE( atariste_mfp_intf )
 	DEVCB_NULL,                                         /* TBO */
 	DEVCB_NULL,                                         /* TCO */
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx)
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd)
 };
 
 
@@ -1953,7 +1956,7 @@ static MC68901_INTERFACE( stbook_mfp_intf )
 	DEVCB_NULL,                                         /* TBO */
 	DEVCB_NULL,                                         /* TCO */
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx)
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd)
 };
 
 void st_state::fdc_intrq_w(bool state)
@@ -2268,15 +2271,15 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
@@ -2335,15 +2338,15 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 
 	// cartridge
@@ -2411,15 +2414,15 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")

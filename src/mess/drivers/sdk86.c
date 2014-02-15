@@ -26,11 +26,10 @@ ToDo:
 
 ****************************************************************************/
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "machine/i8251.h"
 #include "machine/i8279.h"
-#include "machine/serial.h"
 #include "sdk86.lh"
 
 #define I8251_TAG       "i8251"
@@ -138,8 +137,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( sdk86_state::serial_tick )
 
 static const i8251_interface usart_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
 	DEVCB_NULL, // connected to CTS
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -181,8 +180,8 @@ static MACHINE_CONFIG_START( sdk86, sdk86_state )
 	MCFG_I8279_ADD("i8279", 2500000, sdk86_intf) // based on divider
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "serial_terminal")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rx))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rx))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("serial", sdk86_state, serial_tick, attotime::from_hz(307200))

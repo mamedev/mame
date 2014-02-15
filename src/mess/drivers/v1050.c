@@ -150,6 +150,7 @@ Notes:
 */
 
 #include "includes/v1050.h"
+#include "bus/rs232/rs232.h"
 
 void v1050_state::set_interrupt(UINT8 mask, int state)
 {
@@ -976,9 +977,9 @@ WRITE_LINE_MEMBER( v1050_state::sio_txrdy_w )
 
 static const i8251_interface sio_8251_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),
 	DEVCB_DRIVER_LINE_MEMBER(v1050_state, sio_rxrdy_w),
 	DEVCB_DRIVER_LINE_MEMBER(v1050_state, sio_txrdy_w),
 	DEVCB_NULL,
@@ -1155,8 +1156,8 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_TIMER_DRIVER_ADD(TIMER_SIO_TAG, v1050_state, sio_8251_tick)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8251A_SIO_TAG, i8251_device, write_rx))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(I8251A_SIO_TAG, i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_SIO_TAG, i8251_device, write_rx))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_SIO_TAG, i8251_device, write_dsr))
 
 	// SASI bus
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG)

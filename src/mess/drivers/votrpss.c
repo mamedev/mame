@@ -68,7 +68,7 @@ Things to be looked at:
 ******************************************************************************/
 
 /* Core includes */
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 //#include "votrpss.lh"
 
@@ -78,22 +78,23 @@ Things to be looked at:
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/i8251.h"
-#include "machine/serial.h"
 
 /* For testing */
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class votrpss_state : public driver_device
 {
 public:
 	votrpss_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-		, m_ppi(*this, "ppi")
-		, m_uart(*this, "uart")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG),
+		m_ppi(*this, "ppi"),
+		m_uart(*this, "uart")
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(ppi_pa_r);
@@ -194,8 +195,8 @@ IRQ_CALLBACK_MEMBER( votrpss_state::irq_ack )
 static const i8251_interface uart_intf =
 {
 	//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
-	//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
+	//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

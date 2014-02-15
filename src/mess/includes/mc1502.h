@@ -14,7 +14,6 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "machine/xsu_cards.h"
 #include "sound/speaker.h"
 

@@ -19,19 +19,20 @@
 
 ****************************************************************************/
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
-#include "machine/terminal.h"
 
+#define RS232_TAG "rs232"
 
 class h89_state : public driver_device
 {
 public:
 	h89_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
-	{ }
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 
@@ -107,14 +108,18 @@ WRITE8_MEMBER( h89_state::port_f2_w )
 	m_port_f2 = data;
 }
 
-static const serial_terminal_interface terminal_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER("ins8250", ins8250_uart_device, rx_w)
-};
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "TERM_TXBAUD", 0xff, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_RXBAUD", 0xff, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_STARTBITS", 0xff, 0x01 ) // 1
+	DEVICE_INPUT_DEFAULTS( "TERM_DATABITS", 0xff, 0x03 ) // 8
+	DEVICE_INPUT_DEFAULTS( "TERM_PARITY", 0xff, 0x00 ) // N
+	DEVICE_INPUT_DEFAULTS( "TERM_STOPBITS", 0xff, 0x01 ) // 1
+DEVICE_INPUT_DEFAULTS_END
 
 static const ins8250_interface h89_ins8250_interface =
 {
-	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, rx_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -144,7 +149,9 @@ static MACHINE_CONFIG_START( h89, h89_state )
 
 	MCFG_INS8250_ADD( "ins8250", h89_ins8250_interface, XTAL_1_8432MHz )
 
-	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 9600)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "serial_terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ins8250", ins8250_uart_device, rx_w))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", h89_state, h89_irq_timer, attotime::from_hz(100))
 MACHINE_CONFIG_END

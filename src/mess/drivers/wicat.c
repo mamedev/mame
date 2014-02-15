@@ -8,11 +8,10 @@ Wicat - various systems.
 
 ****************************************************************************/
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"
 #include "cpu/8x300/8x300.h"
-#include "machine/serial.h"
 #include "machine/6522via.h"
 #include "machine/mm58274c.h"
 #include "machine/mc2661.h"
@@ -27,28 +26,29 @@ class wicat_state : public driver_device
 {
 public:
 	wicat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_vram(*this, "vram")
-		, m_maincpu(*this, "maincpu")
-		, m_rtc(*this, "rtc")
-		, m_via(*this, "via")
-		, m_uart0(*this,"uart0")
-		, m_uart1(*this,"uart1")
-		, m_uart2(*this,"uart2")
-		, m_uart3(*this,"uart3")
-		, m_uart4(*this,"uart4")
-		, m_uart5(*this,"uart5")
-		, m_uart6(*this,"uart6")
-		, m_videocpu(*this,"videocpu")
-		, m_videoctrl(*this,"video")
-		, m_videodma(*this,"videodma")
-		, m_videouart0(*this,"videouart0")
-		, m_videouart1(*this,"videouart1")
-		, m_videouart(*this,"videouart")
-		, m_videosram(*this,"vsram")
-		, m_chargen(*this,"g2char")
-		, m_fdc(*this,"fdc")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_vram(*this, "vram"),
+		m_maincpu(*this, "maincpu"),
+		m_rtc(*this, "rtc"),
+		m_via(*this, "via"),
+		m_uart0(*this,"uart0"),
+		m_uart1(*this,"uart1"),
+		m_uart2(*this,"uart2"),
+		m_uart3(*this,"uart3"),
+		m_uart4(*this,"uart4"),
+		m_uart5(*this,"uart5"),
+		m_uart6(*this,"uart6"),
+		m_videocpu(*this,"videocpu"),
+		m_videoctrl(*this,"video"),
+		m_videodma(*this,"videodma"),
+		m_videouart0(*this,"videouart0"),
+		m_videouart1(*this,"videouart1"),
+		m_videouart(*this,"videouart"),
+		m_videosram(*this,"vsram"),
+		m_chargen(*this,"g2char"),
+		m_fdc(*this,"fdc")
+	{
+	}
 
 	DECLARE_READ16_MEMBER(invalid_r);
 	DECLARE_WRITE16_MEMBER(invalid_w);
@@ -766,11 +766,11 @@ static mc2661_interface wicat_uart1_intf =
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER("serial1", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("serial1", rs232_port_device, write_txd),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("serial1", rs232_port_device, rts_w),
-	DEVCB_DEVICE_LINE_MEMBER("serial1", rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER("serial1", rs232_port_device, write_rts),
+	DEVCB_DEVICE_LINE_MEMBER("serial1", rs232_port_device, write_dtr),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // TXEMT out
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -780,11 +780,11 @@ static mc2661_interface wicat_uart2_intf =
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER("serial2", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("serial2", rs232_port_device, write_txd),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("serial2", rs232_port_device, rts_w),
-	DEVCB_DEVICE_LINE_MEMBER("serial2", rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER("serial2", rs232_port_device, write_rts),
+	DEVCB_DEVICE_LINE_MEMBER("serial2", rs232_port_device, write_dtr),
 	DEVCB_NULL,  // TXEMT out
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -794,11 +794,11 @@ static mc2661_interface wicat_uart3_intf =
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER("serial3", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("serial3", rs232_port_device, write_txd),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("serial3", rs232_port_device, rts_w),
-	DEVCB_DEVICE_LINE_MEMBER("serial3", rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER("serial3", rs232_port_device, write_rts),
+	DEVCB_DEVICE_LINE_MEMBER("serial3", rs232_port_device, write_dtr),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // TXEMT out
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -808,11 +808,11 @@ static mc2661_interface wicat_uart4_intf =
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER("serial4", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("serial4", rs232_port_device, write_txd),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("serial4", rs232_port_device, rts_w),
-	DEVCB_DEVICE_LINE_MEMBER("serial4", rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER("serial4", rs232_port_device, write_rts),
+	DEVCB_DEVICE_LINE_MEMBER("serial4", rs232_port_device, write_dtr),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // TXEMT out
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -822,11 +822,11 @@ static mc2661_interface wicat_uart5_intf =
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER("serial5", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("serial5", rs232_port_device, write_txd),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("serial5", rs232_port_device, rts_w),
-	DEVCB_DEVICE_LINE_MEMBER("serial5", rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER("serial5", rs232_port_device, write_rts),
+	DEVCB_DEVICE_LINE_MEMBER("serial5", rs232_port_device, write_dtr),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // TXEMT out
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -837,11 +837,11 @@ static mc2661_interface wicat_uart6_intf =
 {
 	0,  // RXC
 	0,  // TXC
-	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),  // RXD out
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),  // RXD out
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,  // TXRDY out
-	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),  // RTS out
-	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),  // DTR out
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),  // RTS out
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),  // DTR out
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // TXEMT out
 	DEVCB_NULL,  // BKDET out
 	DEVCB_NULL   // XSYNC out
@@ -869,8 +869,8 @@ static mc2661_interface wicat_video_uart1_intf =
 	DEVCB_NULL,  // RXD out
 	DEVCB_CPU_INPUT_LINE("videocpu",INPUT_LINE_IRQ0),  // RXRDY out
 	DEVCB_NULL,  // TXRDY out
-	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),  // RTS out
-	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),  // DTR out
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),  // RTS out
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),  // DTR out
 	DEVCB_NULL,  // TXEMT out
 	DEVCB_NULL,  // BKDET out
 	DEVCB_NULL   // XSYNC out
@@ -926,34 +926,34 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_MC2661_ADD("uart6", XTAL_5_0688MHz, wicat_uart6_intf)  // connected to modem port
 
 	MCFG_RS232_PORT_ADD("serial1",default_rs232_devices,NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart1",mc2661_device,rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart1",mc2661_device,dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("uart1",mc2661_device,dsr_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart1",mc2661_device,cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1",mc2661_device,rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart1",mc2661_device,dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1",mc2661_device,dsr_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1",mc2661_device,cts_w))
 
 	MCFG_RS232_PORT_ADD("serial2",default_rs232_devices,NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart2",mc2661_device,rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart2",mc2661_device,dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("uart2",mc2661_device,dsr_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart2",mc2661_device,cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart2",mc2661_device,rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart2",mc2661_device,dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart2",mc2661_device,dsr_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart2",mc2661_device,cts_w))
 
 	MCFG_RS232_PORT_ADD("serial3",default_rs232_devices,NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart3",mc2661_device,rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart3",mc2661_device,dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("uart3",mc2661_device,dsr_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart3",mc2661_device,cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart3",mc2661_device,rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart3",mc2661_device,dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart3",mc2661_device,dsr_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart3",mc2661_device,cts_w))
 
 	MCFG_RS232_PORT_ADD("serial4",default_rs232_devices,NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart4",mc2661_device,rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart4",mc2661_device,dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("uart4",mc2661_device,dsr_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart4",mc2661_device,cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart4",mc2661_device,rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart4",mc2661_device,dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart4",mc2661_device,dsr_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart4",mc2661_device,cts_w))
 
 	MCFG_RS232_PORT_ADD("serial5",default_rs232_devices,NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart5",mc2661_device,rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart5",mc2661_device,dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("uart5",mc2661_device,dsr_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart5",mc2661_device,cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart5",mc2661_device,rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart5",mc2661_device,dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart5",mc2661_device,dsr_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart5",mc2661_device,cts_w))
 
 	/* video hardware */
 	MCFG_CPU_ADD("videocpu",Z8002,XTAL_8MHz/2)  // AMD AMZ8002DC

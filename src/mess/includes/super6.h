@@ -10,7 +10,6 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/com8116.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"

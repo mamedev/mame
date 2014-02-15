@@ -5,42 +5,42 @@
 ***************************************************************************/
 
 #include "isa_com.h"
-#include "machine/ser_mouse.h"
-#include "machine/terminal.h"
-#include "machine/null_modem.h"
-#include "machine/serial.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/ser_mouse.h"
+#include "bus/rs232/terminal.h"
+#include "bus/rs232/null_modem.h"
 #include "machine/ins8250.h"
 
 static const ins8250_interface genpc_com_interface[2]=
 {
 	{
-		DEVCB_DEVICE_LINE_MEMBER("serport0", serial_port_device, tx),
-		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, dtr_w),
-		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, rts_w),
+		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, write_txd),
+		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, write_dtr),
+		DEVCB_DEVICE_LINE_MEMBER("serport0", rs232_port_device, write_rts),
 		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_com_device, pc_com_interrupt_1),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
 	{
-		DEVCB_DEVICE_LINE_MEMBER("serport1", serial_port_device, tx),
-		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, dtr_w),
-		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, rts_w),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_txd),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_dtr),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_rts),
 		DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_com_device, pc_com_interrupt_2),
 		DEVCB_NULL,
 		DEVCB_NULL
 	}/*,
     {
-        DEVCB_DEVICE_LINE_MEMBER("serport2", serial_port_device, tx),
-        DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, dtr_w),
-        DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, rts_w),
+        DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_txd),
+        DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_dtr),
+        DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_rts),
         DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_com_device, pc_com_interrupt_1),
         DEVCB_NULL,
         DEVCB_NULL
     },
     {
-        DEVCB_DEVICE_LINE_MEMBER("serport3", serial_port_device, tx),
-        DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, dtr_w),
-        DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, rts_w),
+        DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, write_txd),
+        DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, write_dtr),
+        DEVCB_DEVICE_LINE_MEMBER("serport3", rs232_port_device, write_rts),
         DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_com_device, pc_com_interrupt_2),
         DEVCB_NULL,
         DEVCB_NULL
@@ -61,32 +61,32 @@ static MACHINE_CONFIG_FRAGMENT( com_config )
 	//MCFG_INS8250_ADD( "uart_3", genpc_com_interface[3], XTAL_1_8432MHz )
 
 	MCFG_RS232_PORT_ADD( "serport0", isa_com, "microsoft_mouse" )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, cts_w))
 
 	MCFG_RS232_PORT_ADD( "serport1", isa_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, cts_w))
 
 	//MCFG_RS232_PORT_ADD( "serport2", isa_com, NULL )
-	//MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, rx_w))
-	//MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dcd_w))
-	//MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dsr_w))
-	//MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, ri_w))
-	//MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, cts_w))
+	//MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, rx_w))
+	//MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dcd_w))
+	//MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dsr_w))
+	//MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, ri_w))
+	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, cts_w))
 
 	//MCFG_RS232_PORT_ADD( "serport3", isa_com, NULL )
-	//MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart_2", ins8250_uart_device, rx_w))
-	//MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart_2", ins8250_uart_device, dcd_w))
-	//MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("uart_2", ins8250_uart_device, dsr_w))
-	//MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("uart_2", ins8250_uart_device, ri_w))
-	//MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart_2", ins8250_uart_device, cts_w))
+	//MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_2", ins8250_uart_device, rx_w))
+	//MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart_2", ins8250_uart_device, dcd_w))
+	//MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_2", ins8250_uart_device, dsr_w))
+	//MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart_2", ins8250_uart_device, ri_w))
+	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_2", ins8250_uart_device, cts_w))
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -153,18 +153,18 @@ static MACHINE_CONFIG_FRAGMENT( com_at_config )
 //  MCFG_NS16450_ADD( "uart_2", genpc_com_interface[2], XTAL_1_8432MHz )
 //  MCFG_NS16450_ADD( "uart_3", genpc_com_interface[3], XTAL_1_8432MHz )
 	MCFG_RS232_PORT_ADD( "serport0", isa_com, "microsoft_mouse" )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_0", ins8250_uart_device, cts_w))
 
 	MCFG_RS232_PORT_ADD( "serport1", isa_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart_1", ins8250_uart_device, cts_w))
 
 //  MCFG_RS232_PORT_ADD( "serport2", isa_com, NULL )
 //  MCFG_RS232_PORT_ADD( "serport3", isa_com, NULL )

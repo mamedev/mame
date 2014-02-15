@@ -13,7 +13,6 @@
 #include "bus/centronics/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
-#include "machine/serial.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 

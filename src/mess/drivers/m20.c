@@ -48,6 +48,8 @@ E I1     Vectored interrupt error
 
 #include "machine/keyboard.h"
 
+#define KEYBOARD_TAG "keyboard"
+
 class m20_state : public driver_device
 {
 public:
@@ -62,7 +64,9 @@ public:
 		m_fd1797(*this, "fd1797"),
 		m_floppy0(*this, "fd1797:0:5dd"),
 		m_floppy1(*this, "fd1797:1:5dd"),
-		m_p_videoram(*this, "p_videoram"){ }
+		m_p_videoram(*this, "p_videoram")
+	{
+	}
 
 	required_device<z8001_device> m_maincpu;
 	required_device<ram_device> m_ram;

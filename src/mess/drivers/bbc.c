@@ -42,6 +42,7 @@
 #include "emu.h"
 
 /* Components */
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65sc02.h"
 #include "machine/6522via.h"
@@ -731,9 +732,9 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	/* acia */
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
-	MCFG_RS232_OUT_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
-	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
 
 	/* system via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
@@ -954,9 +955,9 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
-	MCFG_RS232_OUT_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
-	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
 
 	/* adc */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)

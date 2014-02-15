@@ -77,6 +77,7 @@ ToDo:
 #include "sound/wave.h"
 #include "ravens.lh"
 
+#define TERMINAL_TAG "terminal"
 
 class ravens_state : public driver_device
 {
@@ -85,7 +86,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG),
-		m_cass(*this, "cassette") { }
+		m_cass(*this, "cassette")
+	{
+	}
 
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_READ8_MEMBER(port17_r);

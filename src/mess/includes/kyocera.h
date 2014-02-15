@@ -6,7 +6,7 @@
 #define __KYOCERA__
 
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
@@ -17,7 +17,6 @@
 #include "machine/im6402.h"
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
-#include "machine/serial.h"
 #include "machine/upd1990a.h"
 #include "video/hd44102.h"
 #include "video/hd61830.h"

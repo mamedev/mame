@@ -14,7 +14,6 @@
 #include "machine/scsibus.h"
 #include "machine/scsicb.h"
 #include "machine/scsihd.h"
-#include "machine/serial.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"

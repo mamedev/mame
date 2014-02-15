@@ -66,6 +66,7 @@ Notes:
 
 
 #include "includes/sg1000.h"
+#include "bus/rs232/rs232.h"
 #include "machine/sega8_rom.h"
 
 
@@ -655,9 +656,9 @@ static I8255_INTERFACE( sf7000_ppi_intf )
 
 static const i8251_interface usart_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -891,8 +892,8 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_CASSETTE_ADD("cassette", sc3000_cassette_interface)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(UPD8251_TAG, i8251_device, write_rx))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(UPD8251_TAG, i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(UPD8251_TAG, i8251_device, write_rx))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(UPD8251_TAG, i8251_device, write_dsr))
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list","sf7000")

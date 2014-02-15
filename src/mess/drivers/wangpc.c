@@ -20,6 +20,7 @@
 */
 
 #include "includes/wangpc.h"
+#include "bus/rs232/rs232.h"
 
 
 //**************************************************************************
@@ -963,11 +964,11 @@ static MC2661_INTERFACE( epci_intf )
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, epci_irq_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, epci_irq_w),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1206,7 +1207,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(SCN2661_TAG,mc2661_device,rx_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCN2661_TAG,mc2661_device,rx_w))
 
 	MCFG_WANGPC_KEYBOARD_ADD()
 

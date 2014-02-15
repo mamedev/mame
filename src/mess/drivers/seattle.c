@@ -33,15 +33,17 @@ There is a 4MHz crystal connected to the 9513.
 #include "cpu/i86/i86.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class seattle_comp_state : public driver_device
 {
 public:
 	seattle_comp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);

@@ -36,17 +36,19 @@ TODO
 #include "sound/wave.h"
 #include "sound/beep.h"
 
+#define KEYBOARD_TAG "keyboard"
 
 class cd2650_state : public driver_device
 {
 public:
 	cd2650_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_p_videoram(*this, "videoram")
-		, m_maincpu(*this, "maincpu")
-		, m_beep(*this, "beeper")
-		, m_cass(*this, "cassette")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_p_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_beep(*this, "beeper"),
+		m_cass(*this, "cassette")
+	{
+	}
 
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_WRITE8_MEMBER(beep_w);
@@ -57,6 +59,7 @@ public:
 	const UINT8 *m_p_chargen;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<UINT8> m_p_videoram;
+
 private:
 	UINT8 m_term_data;
 	virtual void machine_reset();

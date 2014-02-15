@@ -14,7 +14,6 @@
 #include "machine/com8116.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/serial.h"
 
 #define Z80_TAG         "z80"
 #define I8251_TAG       "ic15"

@@ -20,15 +20,17 @@
 #include "cpu/z8000/z8000.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class c900_state : public driver_device
 {
 public:
 	c900_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
 	DECLARE_READ16_MEMBER(port1e_r);
 	DECLARE_READ16_MEMBER(key_r);

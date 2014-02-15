@@ -14,13 +14,9 @@
 #ifndef __C64_MIDI_PASSPORT__
 #define __C64_MIDI_PASSPORT__
 
-#include "emu.h"
 #include "exp.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
-#include "machine/serial.h"
-#include "machine/midiinport.h"
-#include "machine/midioutport.h"
 
 
 
