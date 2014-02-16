@@ -42,6 +42,8 @@
   * Pot Game (Italian),                               C.M.C.,             1996.
   * Bottle 10 (Italian, set 1),                       C.M.C.,             1996.
   * Bottle 10 (Italian, set 2),                       C.M.C.,             1996.
+  * Luna Park (set 1, dual program),                  XxX.,               1998.
+  * Luna Park (set 2),                                XxX.,               1998.
   * Royal Card (Austrian, set 1),                     TAB Austria,        1991.
   * Royal Card (Austrian, set 2),                     TAB Austria,        1991.
   * Royal Card (Austrian/Polish, set 3),              TAB Austria,        1991.
@@ -146,8 +148,11 @@
           - Dino4 hardware games have address/data bitswap in program, and data bitswap (sometimes
            	 with extra boolean XOR operations) in graphics.
 
-  - Microcontroller. Some games are using an extra microcontroller mainly for protection.
-
+  - Microcontroller. Some games (like Soccer New and Mongolfier New are using an extra MCU mainly
+    for protection.
+	
+  - Mirrored video and color RAM. A derivative of CMC hardware uses this trick to avoid ROM swaps.
+    If you run Luna Park in a regular CMC board, you'll get an unplayable mess of graphics.
 
 
   GENERAL NOTES:
@@ -177,6 +182,7 @@
   * Tortuga Family
   * Pot Game
   * Bottle 10
+  * Luna Park
 
   In Italy many people became addicted to videopokers. They put so much money on them,
   and they had to sell the house. Also some engineers modified videopokers to do less
@@ -200,6 +206,14 @@
   There is another set of Cuore 1. I didn't include it because the only difference with
   the supported set is the program rom that is double sized, having identical halves.
 
+  Luna Park, is running in a modified hardware with video RAM mirrored from 4000-4FFF to
+  6000-6FFF and color RAM mirrored from 5000-5FFF to 7000-7FFF. The program writes criti-
+  cal graphics (cans, strings and partial screen cleans) to the mirrored range, so if you
+  run this program in a regular CMC hardware, you'll get an unplayable mess of graphics.
+  Also PRG rom higher address line is connected to DIP switch #1 so it should have 2 games
+  in the same PCB (2 revisions?).
+
+ 
   There is at least one missing game in the family... 'Hyppo Family', also from C.M.C.
   This game should be located and dumped.
 
@@ -918,6 +932,19 @@
   - Added button-lamps support + layout.
   - Added technical notes...
 
+  [2014/02/16]
+  - Added Luna Park (set 1, dual program). Running in modified
+     CMC hardware, with video RAM 4000-4FFF mirrored in 6000-6FFF
+     and color RAM 5000-5FFF mirrored in 7000-7FFF.
+     This game has the highest address line of the program tied to
+     DIP switch #1, so you can select between 2 different programs.
+     Both programs write to videoram either to each video RAM ranges.
+  - Added proper program ROM banking and connected to DIP switch #1.
+  - Added Luna Park (set 2). This one writes to normal CMC video RAM.
+  - Cleaned-up the machine drivers.
+  - Derived clocks via #define.
+  - Added technical notes.
+
 
   *** TO DO ***
 
@@ -934,8 +961,10 @@
 
 ***********************************************************************************/
 
-
 #define MASTER_CLOCK    XTAL_16MHz
+#define CPU_CLOCK      (MASTER_CLOCK/8)
+#define SND_CLOCK      (MASTER_CLOCK/8)
+#define CRTC_CLOCK     (MASTER_CLOCK/8)
 
 #include "emu.h"
 #include "cpu/m6502/r65c02.h"
@@ -1095,6 +1124,7 @@ static ADDRESS_MAP_START( cuoreuno_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+
 READ8_MEMBER(funworld_state::chinatow_r_32f0)
 {
 	logerror("read from 0x32f0 at offset %02X\n",offset);
@@ -1120,6 +1150,19 @@ static ADDRESS_MAP_START( chinatow_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lunapark_map, AS_PROGRAM, 8, funworld_state )	// mirrored video RAM 4000/5000 to 6000/7000
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram") AM_MIRROR(0x2000)
+	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram") AM_MIRROR(0x2000)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( saloon_map, AS_PROGRAM, 8, funworld_state )
@@ -1895,6 +1938,73 @@ static INPUT_PORTS_START( pool10 )
 	PORT_DIPNAME( 0x80, 0x80, "Direct Payout (tickets)" )   PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( lunapark )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* no remote credits */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Stop 1 / Switch Bet (1-Max)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Clear / Bet / Prendi (Take)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Gioca (Play)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Stop 5 / Half Gamble / Super Game")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Stop 4 / Alta (High)")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Stop 2 / Bassa (Low)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Stop 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Ticket") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Hopper") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	/* the following one seems to be disconnected
+    to avoid the use of remote credits or direct payout */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	/* the following one is connected to 1st DSW and is meant
+    for switch between different programs stored in different
+    halves of the program ROM */
+	PORT_START("SELDSW")
+	PORT_DIPNAME( 0x01, 0x00, "Game Selector" )           PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "PROGRAM 1, (5 TIRI LIRE 500, ABILITA VINCE)" )
+	PORT_DIPSETTING(    0x01, "PROGRAM 2, (10 TIRI LIRE 500, PARTITA VINCE)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jolyjokra )
@@ -2705,13 +2815,31 @@ static MC6845_INTERFACE( magicrd2_mc6845_intf )
 };
 
 
+/********************************
+*     Machine Start & Reset     *
+********************************/
+
+MACHINE_START_MEMBER(funworld_state, lunapark)
+{
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x8000);
+}
+
+MACHINE_RESET_MEMBER(funworld_state, lunapark)
+{
+	UINT8 seldsw = (ioport("SELDSW")->read() );
+	popmessage("ROM Bank: %02X", seldsw);
+
+	membank("bank1")->set_entry(seldsw);
+}
+
 /**************************
 *     Machine Drivers     *
 **************************/
 
 static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2MHz */
+	MCFG_CPU_ADD("maincpu", M65SC02, CPU_CLOCK)    /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funworld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 
@@ -2741,22 +2869,21 @@ static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 	MCFG_PALETTE_INIT_OVERRIDE(funworld_state, funworld)
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, funworld)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8, mc6845_intf)    /* 2MHz, veryfied on jollycrd & royalcrd */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)    /* 2MHz, veryfied on jollycrd & royalcrd */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz */
+	MCFG_SOUND_ADD("ay8910", AY8910, SND_CLOCK)    /* 2MHz */
 	MCFG_SOUND_CONFIG(ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)  /* analyzed to avoid clips */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fw2ndpal, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
+static MACHINE_CONFIG_DERIVED( fw2ndpal, fw1stpal )
+	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funworld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
-
 	MCFG_GFXDECODE(fw2ndpal)
 MACHINE_CONFIG_END
 
@@ -2764,75 +2891,79 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( funquiz, fw1stpal )
 //  MCFG_FRAGMENT_ADD(fw2ndpal)
-
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funquiz_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
-
-	MCFG_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz */
+	MCFG_SOUND_REPLACE("ay8910", AY8910, SND_CLOCK)    /* 2MHz */
 	MCFG_SOUND_CONFIG(funquiz_ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( magicrd2, fw1stpal )
-
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
-
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, magicrd2)
 	
 	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8, magicrd2_mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, magicrd2_mc6845_intf)
 
-	MCFG_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz */
+	MCFG_SOUND_REPLACE("ay8910", AY8910, SND_CLOCK)    /* 2MHz */
 	MCFG_SOUND_CONFIG(ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)  /* analyzed to avoid clips */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( royalcd1, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* (G65SC02P in pro version) 2MHz */
+static MACHINE_CONFIG_DERIVED( royalcd1, fw1stpal )
+	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* (G65SC02P in pro version) 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( royalcd2, fw2ndpal )
-
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cuoreuno, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
+static MACHINE_CONFIG_DERIVED( cuoreuno, fw1stpal )
+	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(cuoreuno_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( saloon, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
+static MACHINE_CONFIG_DERIVED( saloon, fw1stpal )
+	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(saloon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( witchryl, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
+static MACHINE_CONFIG_DERIVED( witchryl, fw1stpal )
+	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(witchryl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chinatow, fw2ndpal )
 
-	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8) /* 2MHz */
+static MACHINE_CONFIG_DERIVED( chinatow, fw2ndpal )
+	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(chinatow_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
-
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, chinatow)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( lunapark, fw1stpal )
+	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
+	MCFG_CPU_PROGRAM_MAP(lunapark_map)	// mirrored video RAM (4000/5000 to 6000/7000).
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
+	MCFG_MACHINE_START_OVERRIDE(funworld_state, lunapark)
+	MCFG_MACHINE_RESET_OVERRIDE(funworld_state, lunapark)
 MACHINE_CONFIG_END
 
 
@@ -3932,6 +4063,69 @@ ROM_START( bottl10b )
 	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP ) /* GAL is read protected */
 	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP ) /* GAL is read protected */
+ROM_END
+
+/*
+  Luna Park sets...
+  
+  This board has mirrored video RAM 4000-4FFF to 5000-5FFF,
+  and color RAM 6000-6FFF to 7000-7FFF.
+  
+  Two different programs. One in each program ROM half.
+  PRG rom higher address line is connected to DIP switch #1,
+  so it should have 2 games in the same PCB (2 revisions?)
+  
+         1st half:           2nd half:
+  
+  BE58:  LDA #$04            LDA #$00
+         JSR $9DE2           JSR $9DE2
+		
+  BE60:  LDA #$09            LDA #$00
+         JSR $B25E           JSR $B25E
+
+  BE73:  A5 22               A5 23
+  
+  BEC0: '5 TIRI LIRE 500'   '10 TIRI LIRE 500'
+
+  BF40:  00 00 00 00...     'wait...no coin'
+
+  C3D0: 'ABILITA VINCE'     'PARTITA VINCE'
+
+  DF30:  20 20 20 20 20      00 00 00 00 00
+
+*/
+/* This one has mirrored video RAM 4000/5000 to 6000/7000. */
+ROM_START( lunapark )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* Two different programs. Selectable through a DIP switch */ 
+	ROM_LOAD( "lunapark-425-95n003.u2", 0x0000, 0x10000, CRC(b3a620ee) SHA1(67b3498edf7b536e22c4d97c1f6ad5a71521e68f) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "lunapark-425-95n002.u21", 0x0000, 0x8000, CRC(2bededb7) SHA1(b8d7e6fe307d347d762adf35d361ade620aab37b) )
+	ROM_CONTINUE(                        0x0000, 0x8000)	/* Discarding 1nd half 0xff filled*/
+	ROM_LOAD( "lunapark-425-95n001.u20", 0x8000, 0x8000, CRC(7d91ce1f) SHA1(7e9bfad76f305d5787faffe3a07b218beb37fda8) )
+	ROM_CONTINUE(                        0x8000, 0x8000)	/* Discarding 1nd half 0xff filled*/
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "lunapark_nvram.bin", 0x0000, 0x0800, CRC(f99e749b) SHA1(fafd4205dfaacb4c21215af6997d06ab419c9281) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.u25", 0x0000, 0x0200, CRC(ddb74d72) SHA1(3d5dda3a935a3100cb86017f103b855d6449f73a) )
+ROM_END
+
+/* This one hasn't mirrored video RAM, so could run in regular Cuore 1 hardware */
+ROM_START( lunaparkb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lunapark-number-03.u2", 0x8000, 0x8000, CRC(fdbe49c3) SHA1(a2b14a6998d5a27fba7bc360a15f17a48c91194f) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "lunapark-number-01.u21", 0x0000, 0x8000, CRC(ee057944) SHA1(31b76dcadf1dd5aacac1dfed0c7c9f7190797ead) )
+	ROM_LOAD( "lunapark-number-02.u20", 0x8000, 0x8000, CRC(b8795aec) SHA1(5db2e64657dee7742eb9d11e65d29c83a93332b7) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "lunaparkb_nvram.bin", 0x0000, 0x0800, CRC(005b70fc) SHA1(682c2315b4fafb6255db989f0d49255fd8d7a1a9) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.u25", 0x0000, 0x0200, CRC(ddb74d72) SHA1(3d5dda3a935a3100cb86017f103b855d6449f73a) )
 ROM_END
 
 
@@ -5708,6 +5902,8 @@ GAMEL( 1997, tortufam,  0,        cuoreuno, cuoreuno,  driver_device,  0,       
 GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pot Game (Italian)",                              0,                       layout_jollycrd )
 GAMEL( 1996, bottle10,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 1)",                      0,                       layout_jollycrd )
 GAMEL( 1996, bottl10b,  bottle10, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 2)",                      0,                       layout_jollycrd )
+GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  driver_device,  0,        ROT0, "XxX.",            "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd )	// mirrored video RAM (4000/5000 to 6000/7000).
+GAMEL( 1998, lunaparkb, lunapark, lunapark, cuoreuno,  driver_device,  0,        ROT0, "XxX.",            "Luna Park (set 2)",                               0,                       layout_jollycrd )	// regular video RAM 6000/7000.
 
 // Royal Card based...
 GAMEL( 1991, royalcrd,  0,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 1)",                    0,                       layout_jollycrd )
@@ -5755,7 +5951,7 @@ GAMEL( 1993, jolycdic,  jollycrd, cuoreuno, jolycdic,  funworld_state, tabblue, 
 // Dino 4 encrypted hardware...
 GAMEL( 1997, pool10e,   pool10,   cuoreuno, cuoreuno,  funworld_state, dino4,    ROT0, "C.M.C.",          "Pool 10 (Italian, Dino 4 hardware, encrypted)",   0,                       layout_jollycrd )
 GAME(  1998, rcdino4,   0,        cuoreuno, cuoreuno,  funworld_state, rcdino4,  ROT0, "<unknown>",       "Unknown encrypted Royal Card (Dino4 HW)",         GAME_NOT_WORKING )
-GAMEL( 1998, chinatow,  0,        chinatow, chinatow,  funworld_state, rcdino4,  ROT0, "<unknown>",       "China Town (Ver 1B, Dino4 HW)",                    0,                       layout_jollycrd )
+GAMEL( 1998, chinatow,  0,        chinatow, chinatow,  funworld_state, rcdino4,  ROT0, "<unknown>",       "China Town (Ver 1B, Dino4 HW)",                   0,                       layout_jollycrd )
 
 // MCU based games...
 GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  funworld_state, mongolnw, ROT0, "<unknown>",       "Mongolfier New (Italian)",                        GAME_UNEMULATED_PROTECTION )
@@ -5764,3 +5960,4 @@ GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, soccernw,
 // Other games...
 GAME(  198?, funquiz,   0,        funquiz,  funquiz,   driver_device,  0,        ROT0, "Fun World / Oehlinger", "Fun World Quiz (Austrian)",                 0 )
 GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  driver_device,  0,        ROT0, "Admiral/Novomatic", "Novo Play Multi Card / Club Card",              0,                       layout_novoplay )
+
