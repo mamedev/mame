@@ -416,6 +416,20 @@ void intelfsh_device::device_start()
 
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void intelfsh_device::device_reset()
+{
+	m_status = 0x80;
+	m_flash_mode = FM_NORMAL;
+	m_flash_master_lock = false;
+
+	m_timer->adjust(attotime::never);
+}
+
+
+//-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 
