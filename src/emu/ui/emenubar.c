@@ -166,7 +166,7 @@ void ui_emu_menubar::build_file_menu()
 	file_menu.append(menu_text, &ui_emu_menubar::select_new_game, *this);
 
 	// exit
-	file_menu.append("Exit", &running_machine::schedule_exit, machine());
+	file_menu.append("Exit", &running_machine::schedule_exit, machine(), IPT_UI_EXIT);
 }
 
 

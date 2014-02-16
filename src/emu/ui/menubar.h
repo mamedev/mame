@@ -231,6 +231,7 @@ private:
 	bool walk_selection_next();
 	bool walk_selection_child();
 	bool walk_selection_parent();
+	bool walk_selection_escape();
 	bool walk_selection_previous_peer();
 	bool walk_selection_next_peer();
 
@@ -240,7 +241,7 @@ private:
 	void draw_menu_item_text(menu_item *mi, float x0, float y0, float x1, float y1, bool decorations, const float *column_widths = NULL);
 	bool event_loop();
 	bool poll_navigation_keys();
-	bool poll_shortcut_keys();
+	bool poll_shortcut_keys(bool swallow);
 	bool input_pressed_safe(int key);
 	void toggle_selection();
 	void invoke(menu_item *menu);

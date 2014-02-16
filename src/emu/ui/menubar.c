@@ -237,8 +237,8 @@ bool ui_menubar::event_loop()
 
 	if (!done)
 	{
-		if (!poll_navigation_keys())
-			poll_shortcut_keys();
+		bool navigation_input_pressed = poll_navigation_keys();
+		poll_shortcut_keys(navigation_input_pressed);
 		done = true;
 	}
 	return done;
@@ -283,17 +283,19 @@ bool ui_menubar::poll_navigation_keys()
 
 	bool result = true;
 	if (input_pressed_safe(code_previous_menu))
-		walk_selection_previous();
+		result = walk_selection_previous();
 	else if (input_pressed_safe(code_next_menu))
-		walk_selection_next();
+		result = walk_selection_next();
 	else if (input_pressed_safe(code_child_menu))
-		walk_selection_child();
-	else if (input_pressed_safe(IPT_UI_CANCEL) || input_pressed_safe(code_parent_menu))
-		walk_selection_parent();
+		result = walk_selection_child();
+	else if (input_pressed_safe(IPT_UI_CANCEL))
+		result = walk_selection_escape();
+	else if (input_pressed_safe(code_parent_menu))
+		result = walk_selection_parent();
 	else if (input_pressed_safe(code_previous_peer))
-		walk_selection_previous_peer();
+		result = walk_selection_previous_peer();
 	else if (input_pressed_safe(code_next_peer))
-		walk_selection_next_peer();
+		result = walk_selection_next_peer();
 	else if (input_pressed_safe(IPT_UI_CONFIGURE))
 		toggle_selection();
 	else if (input_pressed_safe(code_selected))
@@ -313,7 +315,7 @@ bool ui_menubar::poll_navigation_keys()
 //  poll_shortcut_keys
 //-------------------------------------------------
 
-bool ui_menubar::poll_shortcut_keys()
+bool ui_menubar::poll_shortcut_keys(bool swallow)
 {
 	// loop through all shortcut items
 	for (menu_item *item = m_shortcuted_menu_items; item != NULL; item = item->next_with_shortcut())
@@ -321,9 +323,9 @@ bool ui_menubar::poll_shortcut_keys()
 		assert(item->is_invokable());
 		
 		// did we press this shortcut?
-		if (input_pressed_safe(item->shortcut()))
+		if (input_pressed_safe(item->shortcut()) && !swallow)
 		{
-			// this shortcut was pressed; invoke it
+			// this shortcut was pressed and we're not swallowing them; invoke it
 			invoke(item);
 			return true;
 		}
@@ -434,6 +436,24 @@ bool ui_menubar::walk_selection_parent()
 		m_selected_item = m_selected_item->parent();
 		result = true;
 	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//  walk_selection_escape
+//-------------------------------------------------
+
+bool ui_menubar::walk_selection_escape()
+{
+	bool result = walk_selection_parent();
+
+	if (!result && m_selected_item != NULL)
+	{
+		m_selected_item = NULL;
+		result = true;
+	}
+
 	return result;
 }
 
