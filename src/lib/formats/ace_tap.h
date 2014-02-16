@@ -2,7 +2,7 @@
 
     ace_tap.h
 
-    Format code for Jupiter Ace casette files
+    Format code for Jupiter Ace cassette files
 
 *********************************************************************/
 

@@ -1030,7 +1030,7 @@ done:
 /*********************************************************************
     cassette_dump
 
-    A debugging call to dump a casette image to a disk based wave file
+    A debugging call to dump a cassette image to a disk based wave file
 *********************************************************************/
 
 void cassette_dump(cassette_image *image, const char *filename)

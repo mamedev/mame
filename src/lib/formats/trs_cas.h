@@ -2,7 +2,7 @@
 
     trs_cas.h
 
-    Format code for TRS80 (level 2) casette files.
+    Format code for TRS80 (level 2) cassette files.
 
 *********************************************************************/
 

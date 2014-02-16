@@ -2,7 +2,7 @@
 
     mz_cas.h
 
-    Format code for MZ700 casette files
+    Format code for MZ700 cassette files
 
 *********************************************************************/
 

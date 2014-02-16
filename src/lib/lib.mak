@@ -180,6 +180,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/smx_dsk.o     \
 	$(LIBOBJ)/formats/sorc_dsk.o    \
 	$(LIBOBJ)/formats/sord_cas.o    \
+	$(LIBOBJ)/formats/spc1000_cas.o \
 	$(LIBOBJ)/formats/st_dsk.o      \
 	$(LIBOBJ)/formats/svi_cas.o     \
 	$(LIBOBJ)/formats/svi_dsk.o     \

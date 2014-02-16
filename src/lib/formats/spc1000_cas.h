@@ -2,14 +2,14 @@
 // copyright-holders:Robbbert
 /*********************************************************************
 
-    phc25_cas.h
+    spc1000_cas.h
 
-    Format code for Sanyo PHC25 cassette images (phc format)
+    Format code for Samsung SPC-1000 cassette images
 
 *********************************************************************/
 
 
 #include "cassimg.h"
 
-CASSETTE_FORMATLIST_EXTERN(phc25_cassette_formats);
+CASSETTE_FORMATLIST_EXTERN(spc1000_cassette_formats);
 

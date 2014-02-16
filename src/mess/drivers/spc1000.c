@@ -14,6 +14,7 @@
 #include "sound/wave.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "formats/spc1000_cas.h"
 
 
 class spc1000_state : public driver_device
@@ -21,6 +22,7 @@ class spc1000_state : public driver_device
 public:
 	spc1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
 		, m_vdg(*this, "mc6847")
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
@@ -41,13 +43,14 @@ public:
 	static UINT8 get_char_rom(running_machine &machine, UINT8 ch, int line)
 	{
 		spc1000_state *state = machine.driver_data<spc1000_state>();
-		return state->m_video_ram[0x1000+(ch&0x7F)*16+line];
+		return state->m_p_videoram[0x1000+(ch&0x7F)*16+line];
 	}
 
+	required_shared_ptr<const UINT8> m_p_videoram;
 private:
 	UINT8 m_IPLK;
 	UINT8 m_GMODE;
-	UINT8 m_video_ram[0x2000];
+	UINT16 m_page;
 	virtual void machine_reset();
 	required_device<mc6847_base_device> m_vdg;
 	required_device<cpu_device> m_maincpu;
@@ -92,18 +95,6 @@ READ8_MEMBER(spc1000_state::spc1000_iplk_r)
 	return 0;
 }
 
-
-
-WRITE8_MEMBER(spc1000_state::spc1000_video_ram_w)
-{
-	m_video_ram[offset] = data;
-}
-
-READ8_MEMBER(spc1000_state::spc1000_video_ram_r)
-{
-	return m_video_ram[offset];
-}
-
 WRITE8_MEMBER( spc1000_state::cass_w )
 {
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
@@ -119,6 +110,7 @@ WRITE8_MEMBER(spc1000_state::spc1000_gmode_w)
 	m_vdg->gm0_w(BIT(data, 2));
 	m_vdg->ag_w(BIT(data, 3));
 	m_vdg->css_w(BIT(data, 7));
+	m_page = ( (BIT(data, 5) << 1) | BIT(data, 4) )*0x200;
 }
 
 READ8_MEMBER(spc1000_state::spc1000_gmode_r)
@@ -128,7 +120,7 @@ READ8_MEMBER(spc1000_state::spc1000_gmode_r)
 
 static ADDRESS_MAP_START( spc1000_io , AS_IO, 8, spc1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(spc1000_video_ram_r, spc1000_video_ram_w)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(spc1000_gmode_r, spc1000_gmode_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
@@ -266,16 +258,18 @@ READ8_MEMBER(spc1000_state::spc1000_mc6847_videoram_r)
 	if (offset == ~0) return 0xff;
 
 	// m_GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
-	//  [PS2,PS1] is used to set screen 0/1 pages
-	if ( !BIT(m_GMODE, 3) ) {   // text mode (~A/G set to A)
-		unsigned int page = (BIT(m_GMODE, 5) << 1) | BIT(m_GMODE, 4);
-		m_vdg->inv_w(BIT(m_video_ram[offset+page*0x200+0x800], 0));
-		m_vdg->css_w(BIT(m_video_ram[offset+page*0x200+0x800], 1));
-		m_vdg->as_w(BIT(m_video_ram[offset+page*0x200+0x800], 2));
-		m_vdg->intext_w(BIT(m_video_ram[offset+page*0x200+0x800], 3));
-		return m_video_ram[offset+page*0x200];
-	} else {    // graphics mode: uses full 6KB of VRAM
-		return m_video_ram[offset];
+	if ( !BIT(m_GMODE, 3) )
+	{   // text mode (~A/G set to A)
+		UINT8 data = m_p_videoram[offset+m_page+0x800];
+		m_vdg->inv_w(BIT(data, 0));
+		m_vdg->css_w(BIT(data, 1));
+		m_vdg->as_w (BIT(data, 2));
+		m_vdg->intext_w(BIT(data, 3));
+		return m_p_videoram[offset+m_page];
+	}
+	else
+	{    // graphics mode: uses full 6KB of VRAM
+		return m_p_videoram[offset];
 	}
 }
 
@@ -299,7 +293,7 @@ static const ay8910_interface spc1000_ay_interface =
 
 static const cassette_interface spc1000_cassette_interface =
 {
-	cassette_default_formats,
+	spc1000_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
 	NULL,
