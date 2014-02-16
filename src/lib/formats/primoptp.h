@@ -2,7 +2,7 @@
 
     primoptp.h
 
-    Format code for Primo casette files
+    Format code for Primo cassette files
 
 *********************************************************************/
 

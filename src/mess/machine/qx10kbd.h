@@ -2,7 +2,7 @@
 #define QX10KBD_H_
 
 #include "emu.h"
-#include "machine/keyboard.h"
+#include "bus/rs232/keyboard.h"
 
 #define MCFG_QX10_KEYBOARD_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, QX10_KEYBOARD, 1200) \

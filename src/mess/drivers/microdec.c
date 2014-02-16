@@ -11,15 +11,17 @@
 #include "machine/upd765.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class microdec_state : public driver_device
 {
 public:
 	microdec_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_terminal(*this, TERMINAL_TAG)
-		, m_maincpu(*this, "maincpu")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_terminal(*this, TERMINAL_TAG),
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(keyin_r);

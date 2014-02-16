@@ -223,7 +223,6 @@ WRITE8_MEMBER(ti_fdc_device::cruwrite)
 			{   // On rising edge, set motor_running for 4.23s
 				if (TRACE_CRU) logerror("tifdc: trigger motor (bit 1)\n");
 				set_floppy_motors_running(true);
-				m_motor_on_timer->adjust(attotime::from_msec(4230));
 			}
 			m_lastval = data;
 			break;
@@ -317,16 +316,28 @@ void ti_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param
 */
 void ti_fdc_device::set_floppy_motors_running(bool run)
 {
-	if (TRACE_MOTOR)
+	if (run)
 	{
-		if (m_DVENA==ASSERT_LINE && !run) logerror("tifdc: Motor STOP\n");
-		if (m_DVENA==CLEAR_LINE && run) logerror("tifdc: Motor START\n");
+		if (TRACE_MOTOR)
+			if (m_DVENA==CLEAR_LINE) logerror("tifdc: Motor START\n");
+		m_DVENA = ASSERT_LINE;
+		m_motor_on_timer->adjust(attotime::from_msec(4230));
 	}
-	m_DVENA = (run)? ASSERT_LINE : CLEAR_LINE;
+	else
+	{
+		if (TRACE_MOTOR)
+			if (m_DVENA==ASSERT_LINE) logerror("tifdc: Motor STOP\n");
+		m_DVENA = CLEAR_LINE;
+	}
+
+	// The monoflop is connected to the READY line
 	m_fd1771->set_force_ready(run);
 
+	// Set all motors
 	for (int i=0; i < 3; i++)
 		if (m_floppy[i] != NULL) m_floppy[i]->mon_w((run)? 0 : 1);
+
+	// The motor-on line also connects to the wait state logic
 	operate_ready_line();
 }
 

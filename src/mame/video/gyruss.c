@@ -142,7 +142,7 @@ void gyruss_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		int flip_x = ~m_spriteram[offs + 2] & 0x40;
 		int flip_y =  m_spriteram[offs + 2] & 0x80;
 
-		drawgfx_transpen(bitmap, cliprect, gfx[gfx_bank], code, color, flip_x, flip_y, x, y, 0);
+		 gfx[gfx_bank]->transpen(bitmap,cliprect, code, color, flip_x, flip_y, x, y, 0);
 	}
 }
 

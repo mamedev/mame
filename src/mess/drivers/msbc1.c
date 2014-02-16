@@ -53,6 +53,8 @@ Notes:
 #include "machine/terminal.h"
 #include "includes/msbc1.h"
 
+#define TERMINAL_TAG "terminal"
+
 static ADDRESS_MAP_START( msbc1_mem, AS_PROGRAM, 16, msbc1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM

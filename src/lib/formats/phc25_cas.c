@@ -14,14 +14,14 @@ phc images consist of 5 sections
 5. A 1-byte trailer of FF which we do not pass on
 
 Each byte after conversion becomes a start bit, bit 0,1,etc to 7,
-then 4 end bits.
+then 4 stop bits.
 
 An actual tape consists of 6 sections
 a. 2.656secs of silence
 b. 4.862secs of high bits
 c. The header which is parts 1 and 2 above
 d. 0.652secs of high bits
-e. The main program wjich is parts 3 and 4 above
+e. The main program which is parts 3 and 4 above
 f. 1.771secs of silence
 
 We don't emulate the full silence and high-bits periods, only just

@@ -178,9 +178,9 @@ UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind1
 
 			palette+=32;
 
-			drawgfx_transpen(
+			
+				machine().gfx[2]->transpen(
 				bitmap,cliprect,
-				machine().gfx[2],
 				tile,
 				palette,
 				fx,fy,

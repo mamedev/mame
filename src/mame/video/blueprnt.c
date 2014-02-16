@@ -145,7 +145,7 @@ void blueprnt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 
 		// sprites are slightly misplaced, regardless of the screen flip
-		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, 0, flipx, flipy, 2 + sx, sy - 1, 0);
+		 machine().gfx[1]->transpen(bitmap,cliprect, code, 0, flipx, flipy, 2 + sx, sy - 1, 0);
 	}
 }
 

@@ -35,14 +35,13 @@ X - Test off-board memory banks
 
 ****************************************************************************/
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80dart.h"
 #include "machine/msm5832.h"
 #include "machine/i8255.h"
 #include "machine/com8116.h"
-#include "machine/serial.h"
 #include "machine/wd_fdc.h"
 
 
@@ -198,9 +197,9 @@ static Z80DART_INTERFACE( dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -261,9 +260,11 @@ static MACHINE_CONFIG_START( pulsar, pulsar_state )
 	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
 	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, WRITELINE(pulsar_state, fr_w), WRITELINE(pulsar_state, ft_w))
 	MCFG_Z80DART_ADD("z80dart",  XTAL_4MHz, dart_intf )
+
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("z80dart", z80dart_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("z80dart", z80dart_device, ctsa_w))
+
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 	MCFG_FD1797x_ADD("fdc", XTAL_4MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525dd", floppy_image_device::default_floppy_formats)

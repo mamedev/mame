@@ -361,7 +361,7 @@ void device_t::set_machine(running_machine &machine)
 //  list and return status
 //-------------------------------------------------
 
-bool device_t::findit(bool isvalidation)
+bool device_t::findit(bool isvalidation) const
 {
 	bool allfound = true;
 	for (finder_base *autodev = m_auto_finder_list; autodev != NULL; autodev = autodev->m_next)

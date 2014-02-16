@@ -434,7 +434,7 @@ static MACHINE_CONFIG_START( irisha, irisha_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_I8251_ADD("uart", default_i8251_interface)
+	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_PIT8253_ADD( "pit8253", irisha_pit8253_intf )
 	MCFG_I8255_ADD( "ppi8255", irisha_ppi8255_interface )
 	MCFG_PIC8259_ADD( "pic8259", WRITELINE(irisha_state,irisha_pic_set_int_line), VCC, NULL )

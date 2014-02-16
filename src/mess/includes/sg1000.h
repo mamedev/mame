@@ -15,7 +15,6 @@
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/sega8_slot.h"
-#include "machine/serial.h"
 #include "machine/upd765.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"

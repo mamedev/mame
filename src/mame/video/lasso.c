@@ -301,7 +301,7 @@ void lasso_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		code = source[1] & 0x3f;
 		color = source[2] & 0x0f;
 
-		drawgfx_transpen(bitmap, cliprect, machine().gfx[1],
+		 machine().gfx[1]->transpen(bitmap,cliprect,
 				code | ((UINT16)m_gfxbank << 6),
 				color,
 				flipx, flipy,

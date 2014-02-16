@@ -181,7 +181,7 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		switch (sr[offs + 4] & 0x0c)
 		{
 			case 0x00:  /* 16x16 */
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+				machine().gfx[1]->transpen(bitmap,cliprect,
 						code/4,
 						color,
 						flipx,flipy,
@@ -192,12 +192,12 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				{
 					if (flip_screen()) sy += 8; // this fixes the train wheels' position
 
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+					machine().gfx[2]->transpen(bitmap,cliprect,
 							code & ~1,
 							color,
 							flipx,flipy,
 							flipx?sx+8:sx,sy,0);
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+					machine().gfx[2]->transpen(bitmap,cliprect,
 							code | 1,
 							color,
 							flipx,flipy,
@@ -207,12 +207,12 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 			case 0x08:  /* 8x16 */
 				{
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+					machine().gfx[2]->transpen(bitmap,cliprect,
 							code & ~2,
 							color,
 							flipx,flipy,
 							sx,flipy?sy+8:sy,0);
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+					machine().gfx[2]->transpen(bitmap,cliprect,
 							code | 2,
 							color,
 							flipx,flipy,
@@ -222,7 +222,7 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 			case 0x0c:  /* 8x8 */
 				{
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+					machine().gfx[2]->transpen(bitmap,cliprect,
 							code,
 							color,
 							flipx,flipy,
@@ -290,7 +290,7 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 		switch (sr[offs + 3] & 0x0c)
 		{
 			case 0x00:  /* 16x16 */
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+				machine().gfx[1]->transpen(bitmap,cliprect,
 						code/4,
 						color,
 						flipx,flipy,
@@ -301,12 +301,12 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 				{
 					if (flip_screen()) sy += 8; // this fixes the train wheels' position
 
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+					machine().gfx[2]->transpen(bitmap,cliprect,
 							code & ~1,
 							color,
 							flipx,flipy,
 							flipx?sx+8:sx,sy,0);
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+					machine().gfx[2]->transpen(bitmap,cliprect,
 							code | 1,
 							color,
 							flipx,flipy,
@@ -316,12 +316,12 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 
 			case 0x08:  /* 8x16 */
 				{
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+					machine().gfx[2]->transpen(bitmap,cliprect,
 							code & ~2,
 							color,
 							flipx,flipy,
 							sx,flipy?sy+8:sy,0);
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+					machine().gfx[2]->transpen(bitmap,cliprect,
 							code | 2,
 							color,
 							flipx,flipy,
@@ -331,7 +331,7 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 
 			case 0x0c:  /* 8x8 */
 				{
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+					machine().gfx[2]->transpen(bitmap,cliprect,
 							code,
 							color,
 							flipx,flipy,

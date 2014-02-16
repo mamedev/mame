@@ -283,7 +283,7 @@ void nova2001_state::nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, gfx,
+		 gfx->transpen(bitmap,cliprect,
 				tile,
 				color,
 				flipx, flipy,
@@ -320,14 +320,14 @@ void nova2001_state::pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle 
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, gfx,
+		 gfx->transpen(bitmap,cliprect,
 				tile,
 				color,
 				flipx, flipy,
 				sx, sy, 0);
 
 		// there's no X MSB, so draw with wraparound (fixes title screen)
-		drawgfx_transpen(bitmap, cliprect, gfx,
+		 gfx->transpen(bitmap,cliprect,
 				tile,
 				color,
 				flipx, flipy,

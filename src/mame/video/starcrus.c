@@ -164,18 +164,18 @@ int starcrus_state::collision_check_s1s2()
 	org_y = m_s1_y;
 
 	/* Draw ship 1 */
-	drawgfx_opaque(*m_ship1_vid,
+	
+			machine().gfx[8+((m_s1_sprite&0x04)>>2)]->opaque(*m_ship1_vid,
 			clip,
-			machine().gfx[8+((m_s1_sprite&0x04)>>2)],
 			(m_s1_sprite&0x03)^0x03,
 			0,
 			(m_s1_sprite&0x08)>>3, (m_s1_sprite&0x10)>>4,
 			m_s1_x-org_x, m_s1_y-org_y);
 
 	/* Draw ship 2 */
-	drawgfx_opaque(*m_ship2_vid,
+	
+			machine().gfx[10+((m_s2_sprite&0x04)>>2)]->opaque(*m_ship2_vid,
 			clip,
-			machine().gfx[10+((m_s2_sprite&0x04)>>2)],
 			(m_s2_sprite&0x03)^0x03,
 			0,
 			(m_s2_sprite&0x08)>>3, (m_s2_sprite&0x10)>>4,
@@ -215,9 +215,9 @@ int starcrus_state::collision_check_p1p2()
 	if (m_p1_sprite & 0x08)  /* if p1 is a projectile */
 	{
 		/* Draw score/projectile 1 */
-		drawgfx_opaque(*m_proj1_vid,
+		
+				machine().gfx[(m_p1_sprite&0x0c)>>2]->opaque(*m_proj1_vid,
 				clip,
-				machine().gfx[(m_p1_sprite&0x0c)>>2],
 				(m_p1_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -227,9 +227,9 @@ int starcrus_state::collision_check_p1p2()
 	if (m_p2_sprite & 0x08)  /* if p2 is a projectile */
 	{
 		/* Draw score/projectile 2 */
-		drawgfx_opaque(*m_proj2_vid,
+		
+				machine().gfx[4+((m_p2_sprite&0x0c)>>2)]->opaque(*m_proj2_vid,
 				clip,
-				machine().gfx[4+((m_p2_sprite&0x0c)>>2)],
 				(m_p2_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -269,9 +269,9 @@ int starcrus_state::collision_check_s1p1p2()
 	org_y = m_s1_y;
 
 	/* Draw ship 1 */
-	drawgfx_opaque(*m_ship1_vid,
+	
+			machine().gfx[8+((m_s1_sprite&0x04)>>2)]->opaque(*m_ship1_vid,
 			clip,
-			machine().gfx[8+((m_s1_sprite&0x04)>>2)],
 			(m_s1_sprite&0x03)^0x03,
 			0,
 			(m_s1_sprite&0x08)>>3, (m_s1_sprite&0x10)>>4,
@@ -280,9 +280,9 @@ int starcrus_state::collision_check_s1p1p2()
 	if (m_p1_sprite & 0x08)  /* if p1 is a projectile */
 	{
 		/* Draw projectile 1 */
-		drawgfx_opaque(*m_proj1_vid,
+		
+				machine().gfx[(m_p1_sprite&0x0c)>>2]->opaque(*m_proj1_vid,
 				clip,
-				machine().gfx[(m_p1_sprite&0x0c)>>2],
 				(m_p1_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -292,9 +292,9 @@ int starcrus_state::collision_check_s1p1p2()
 	if (m_p2_sprite & 0x08)  /* if p2 is a projectile */
 	{
 		/* Draw projectile 2 */
-		drawgfx_opaque(*m_proj2_vid,
+		
+				machine().gfx[4+((m_p2_sprite&0x0c)>>2)]->opaque(*m_proj2_vid,
 				clip,
-				machine().gfx[4+((m_p2_sprite&0x0c)>>2)],
 				(m_p2_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -340,9 +340,9 @@ int starcrus_state::collision_check_s2p1p2()
 	org_y = m_s2_y;
 
 	/* Draw ship 2 */
-	drawgfx_opaque(*m_ship2_vid,
+	
+			machine().gfx[10+((m_s2_sprite&0x04)>>2)]->opaque(*m_ship2_vid,
 			clip,
-			machine().gfx[10+((m_s2_sprite&0x04)>>2)],
 			(m_s2_sprite&0x03)^0x03,
 			0,
 			(m_s2_sprite&0x08)>>3, (m_s2_sprite&0x10)>>4,
@@ -351,9 +351,9 @@ int starcrus_state::collision_check_s2p1p2()
 	if (m_p1_sprite & 0x08)  /* if p1 is a projectile */
 	{
 		/* Draw projectile 1 */
-		drawgfx_opaque(*m_proj1_vid,
+		
+				machine().gfx[(m_p1_sprite&0x0c)>>2]->opaque(*m_proj1_vid,
 				clip,
-				machine().gfx[(m_p1_sprite&0x0c)>>2],
 				(m_p1_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -363,9 +363,9 @@ int starcrus_state::collision_check_s2p1p2()
 	if (m_p2_sprite & 0x08)  /* if p2 is a projectile */
 	{
 		/* Draw projectile 2 */
-		drawgfx_opaque(*m_proj2_vid,
+		
+				machine().gfx[4+((m_p2_sprite&0x0c)>>2)]->opaque(*m_proj2_vid,
 				clip,
-				machine().gfx[4+((m_p2_sprite&0x0c)>>2)],
 				(m_p2_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -393,9 +393,9 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 	bitmap.fill(0, cliprect);
 
 	/* Draw ship 1 */
-	drawgfx_transpen(bitmap,
+	
+			machine().gfx[8+((m_s1_sprite&0x04)>>2)]->transpen(bitmap,
 			cliprect,
-			machine().gfx[8+((m_s1_sprite&0x04)>>2)],
 			(m_s1_sprite&0x03)^0x03,
 			0,
 			(m_s1_sprite&0x08)>>3, (m_s1_sprite&0x10)>>4,
@@ -403,9 +403,9 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 			0);
 
 	/* Draw ship 2 */
-	drawgfx_transpen(bitmap,
+	
+			machine().gfx[10+((m_s2_sprite&0x04)>>2)]->transpen(bitmap,
 			cliprect,
-			machine().gfx[10+((m_s2_sprite&0x04)>>2)],
 			(m_s2_sprite&0x03)^0x03,
 			0,
 			(m_s2_sprite&0x08)>>3, (m_s2_sprite&0x10)>>4,
@@ -413,9 +413,9 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 			0);
 
 	/* Draw score/projectile 1 */
-	drawgfx_transpen(bitmap,
+	
+			machine().gfx[(m_p1_sprite&0x0c)>>2]->transpen(bitmap,
 			cliprect,
-			machine().gfx[(m_p1_sprite&0x0c)>>2],
 			(m_p1_sprite&0x03)^0x03,
 			0,
 			0,0,
@@ -423,9 +423,9 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 			0);
 
 	/* Draw score/projectile 2 */
-	drawgfx_transpen(bitmap,
+	
+			machine().gfx[4+((m_p2_sprite&0x0c)>>2)]->transpen(bitmap,
 			cliprect,
-			machine().gfx[4+((m_p2_sprite&0x0c)>>2)],
 			(m_p2_sprite&0x03)^0x03,
 			0,
 			0,0,

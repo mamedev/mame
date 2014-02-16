@@ -2,7 +2,7 @@
 
     adam_cas.h
 
-    Format code for Coleco Adam .ddp casette files.
+    Format code for Coleco Adam .ddp cassette files.
 
 *********************************************************************/
 

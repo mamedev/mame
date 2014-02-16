@@ -477,7 +477,7 @@ void rallyx_state::rallyx_draw_sprites( screen_device &screen, bitmap_ind16 &bit
 		if (flip_screen())
 			sx -= 2 * displacement;
 
-		pdrawgfx_transmask(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->prio_transmask(bitmap,cliprect,
 				(spriteram[offs] & 0xfc) >> 2,
 				color,
 				flipx,flipy,
@@ -500,7 +500,7 @@ void rallyx_state::locomotn_draw_sprites( screen_device &screen, bitmap_ind16 &b
 		int color = spriteram_2[offs + 1] & 0x3f;
 		int flip = spriteram[offs] & 2;
 
-		pdrawgfx_transmask(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->prio_transmask(bitmap,cliprect,
 				((spriteram[offs] & 0x7c) >> 2) + 0x20*(spriteram[offs] & 0x01) + ((spriteram[offs] & 0x80) >> 1),
 				color,
 				flip,flip,
@@ -524,14 +524,14 @@ void rallyx_state::rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &c
 			x -= 3;
 
 		if (transpen)
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+			machine().gfx[2]->transpen(bitmap,cliprect,
 					((m_radarattr[offs & 0x0f] & 0x0e) >> 1) ^ 0x07,
 					0,
 					0,0,
 					x,y,
 					3);
 		else
-			drawgfx_transtable(bitmap,cliprect,machine().gfx[2],
+			machine().gfx[2]->transtable(bitmap,cliprect,
 					((m_radarattr[offs & 0x0f] & 0x0e) >> 1) ^ 0x07,
 					0,
 					0,0,
@@ -552,14 +552,14 @@ void rallyx_state::jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &
 		y = 253 - m_radary[offs];
 
 		if (transpen)
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+			machine().gfx[2]->transpen(bitmap,cliprect,
 					(m_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
 					0,
 					0,0,
 					x,y,
 					3);
 		else
-			drawgfx_transtable(bitmap,cliprect,machine().gfx[2],
+			machine().gfx[2]->transtable(bitmap,cliprect,
 					(m_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
 					0,
 					0,0,
@@ -588,14 +588,14 @@ void rallyx_state::locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle 
 		y = 252 - m_radary[offs];
 
 		if (transpen)
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+			machine().gfx[2]->transpen(bitmap,cliprect,
 					(m_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
 					0,
 					0,0,
 					x,y,
 					3);
 		else
-			drawgfx_transtable(bitmap,cliprect,machine().gfx[2],
+			machine().gfx[2]->transtable(bitmap,cliprect,
 					(m_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
 					0,
 					0,0,

@@ -10,6 +10,9 @@
 **********************************************************************/
 
 #include "midi_sci.h"
+#include "bus/midi/midi.h"
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
 
 
 
@@ -41,7 +44,7 @@ static ACIA6850_INTERFACE( acia_intf )
 {
 	500000,
 	0,          // rx clock (we manually clock rx)
-	DEVCB_DEVICE_LINE_MEMBER("mdout", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("mdout", midi_port_device, write_txd),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_sequential_midi_cartridge_device, acia_irq_w)
 };
@@ -82,10 +85,10 @@ SLOT_INTERFACE_END
 static MACHINE_CONFIG_FRAGMENT( c64_sequential_midi )
 	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
 
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, c64_sequential_midi_cartridge_device, midi_rx_w))
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, c64_sequential_midi_cartridge_device, midi_rx_w))
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
 

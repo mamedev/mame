@@ -79,7 +79,7 @@ Notes:
 
 #include "includes/abc80.h"
 
-
+#define KEYBOARD_TAG "keyboard"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -322,7 +322,7 @@ READ8_MEMBER( abc80_state::pio_pb_r )
 	UINT8 data = 0;
 
 	// receive data
-	data |= m_rs232->rx();
+	data |= m_rs232->rxd_r();
 
 	// clear to send
 	data |= m_rs232->cts_r() << 1;
@@ -356,10 +356,10 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 	*/
 
 	// transmit data
-	m_rs232->tx(BIT(data, 3));
+	m_rs232->write_txd(BIT(data, 3));
 
 	// request to send
-	m_rs232->rts_w(BIT(data, 4));
+	m_rs232->write_rts(BIT(data, 4));
 
 	// cassette motor
 	if (BIT(data, 5))

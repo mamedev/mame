@@ -739,7 +739,7 @@ void cischeat_state::cischeat_draw_road(bitmap_ind16 &bitmap, const rectangle &c
 
 		for (sx = -(xscroll%TILE_SIZE) ; sx <= max_x ; sx +=TILE_SIZE)
 		{
-			drawgfx_transpen(bitmap,rect,gfx,
+			gfx->transpen(bitmap,rect,
 					curr_code++,
 					attr,
 					0,0,
@@ -845,7 +845,7 @@ void cischeat_state::f1gpstar_draw_road(bitmap_ind16 &bitmap, const rectangle &c
 		/* Draw the line */
 		for (sx = xstart ; sx <= max_x ; sx += xdim)
 		{
-			drawgfxzoom_transpen(bitmap,rect,gfx,
+			gfx->zoom_transpen(bitmap,rect,
 						code++,
 						attr >> 8,
 						0,0,
@@ -1003,7 +1003,7 @@ if ( (m_debugsprites) && ( ((attr & 0x0300)>>8) != (m_debugsprites-1) ) ) { cont
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
-				drawgfxzoom_transtable(bitmap,cliprect,machine().gfx[3],
+				machine().gfx[3]->zoom_transtable(bitmap,cliprect,
 							code++,
 							color,
 							flipx,flipy,
@@ -1157,7 +1157,7 @@ if ( (m_debugsprites) && ( ((attr & 0x0300)>>8) != (m_debugsprites-1) ) ) { cont
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
-				drawgfxzoom_transtable(bitmap,cliprect,machine().gfx[3],
+				machine().gfx[3]->zoom_transtable(bitmap,cliprect,
 							code++,
 							color,
 							flipx,flipy,

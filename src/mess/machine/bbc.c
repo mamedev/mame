@@ -1354,7 +1354,7 @@ WRITE_LINE_MEMBER( bbc_state::bbc_rts_w )
 {
 	if ( m_serproc_data & 0x40 )
 	{
-		m_rs232->rts_w(state);
+		m_rs232->write_rts(state);
 		m_cass_out_enabled = 0;
 	}
 	else
@@ -1368,7 +1368,7 @@ WRITE_LINE_MEMBER( bbc_state::bbc_txd_w )
 {
 	if ( m_serproc_data & 0x40 )
 	{
-		m_rs232->tx(state);
+		m_rs232->write_txd(state);
 	}
 	else
 	{

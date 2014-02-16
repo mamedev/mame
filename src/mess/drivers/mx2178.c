@@ -17,22 +17,23 @@
 
 ***************************************************************************************************/
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "machine/6850acia.h"
-#include "machine/serial.h"
 #include "machine/keyboard.h"
 
+#define KEYBOARD_TAG "keyboard"
 
 class mx2178_state : public driver_device
 {
 public:
 	mx2178_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_p_videoram(*this, "videoram")
-		, m_maincpu(*this, "maincpu")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_p_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
@@ -97,8 +98,8 @@ static ACIA6850_INTERFACE( acia_intf )
 {
 	614400,
 	614400,
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
 };
 

@@ -278,13 +278,13 @@ void digdug_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 			for (x = 0;x <= size;x++)
 			{
 				UINT32 transmask = colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0x1f);
-				drawgfx_transmask(bitmap,visarea,machine().gfx[1],
+				machine().gfx[1]->transmask(bitmap,visarea,
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
 					((sx + 16*x) & 0xff), sy + 16*y,transmask);
 				/* wraparound */
-				drawgfx_transmask(bitmap,visarea,machine().gfx[1],
+				machine().gfx[1]->transmask(bitmap,visarea,
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,

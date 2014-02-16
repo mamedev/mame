@@ -12,7 +12,6 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "machine/upd1990a.h"
 #include "video/mc6845.h"
 #include "video/sed1330.h"

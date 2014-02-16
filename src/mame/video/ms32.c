@@ -254,7 +254,7 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 		{
 			// passes the priority as the upper bits of the colour
 			// for post-processing in mixer instead
-			pdrawgfxzoom_transpen_raw(bitmap, cliprect, gfx,
+			gfx->prio_zoom_transpen_raw(bitmap,cliprect,
 					code,
 					color<<8 | pri<<8,
 					flipx, flipy,

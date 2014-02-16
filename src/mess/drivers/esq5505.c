@@ -126,7 +126,9 @@
 
 #include <cstdio>
 
-#include "emu.h"
+#include "bus/midi/midi.h"
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/es5506.h"
 #include "sound/esqpump.h"
@@ -137,9 +139,6 @@
 #include "formats/esq16_dsk.h"
 #include "machine/esqvfd.h"
 #include "machine/esqpanel.h"
-#include "machine/serial.h"
-#include "machine/midiinport.h"
-#include "machine/midioutport.h"
 
 #define GENERIC (0)
 #define EPS     (1)
@@ -183,7 +182,7 @@ public:
 	optional_device<wd1772_t> m_fdc;
 	required_device<esqpanel_device> m_panel;
 	optional_device<hd63450_device> m_dmac;
-	required_device<serial_port_device> m_mdout;
+	required_device<midi_port_device> m_mdout;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -502,7 +501,7 @@ WRITE8_MEMBER(esq5505_state::duart_output)
 // MIDI send
 WRITE_LINE_MEMBER(esq5505_state::duart_tx_a)
 {
-	m_mdout->tx(state);
+	m_mdout->write_txd(state);
 }
 
 WRITE_LINE_MEMBER(esq5505_state::duart_tx_b)
@@ -660,10 +659,10 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esq5505_state, duart_output))
 	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -722,10 +721,10 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esq5505_state, duart_output))
 	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

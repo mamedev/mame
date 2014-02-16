@@ -142,7 +142,7 @@ UINT32 momoko_state::screen_update_momoko(screen_device &screen, bitmap_ind16 &b
 					py = 248 - (8 * y + dy + 9);
 				}
 
-				drawgfx_opaque(bitmap,cliprect,machine().gfx[1],
+				machine().gfx[1]->opaque(bitmap,cliprect,
 					chr,
 					col,
 					flip,flip,
@@ -176,7 +176,7 @@ UINT32 momoko_state::screen_update_momoko(screen_device &screen, bitmap_ind16 &b
 			py = y + 1;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+		machine().gfx[3]->transpen(bitmap,cliprect,
 			chr,
 			col,
 			!fx,fy,
@@ -238,7 +238,7 @@ UINT32 momoko_state::screen_update_momoko(screen_device &screen, bitmap_ind16 &b
 			px = 248 - x;
 			py = y + 1;
 		}
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+		machine().gfx[3]->transpen(bitmap,cliprect,
 			chr,
 			col,
 			!fx,fy,
@@ -271,7 +271,7 @@ UINT32 momoko_state::screen_update_momoko(screen_device &screen, bitmap_ind16 &b
 				px = 248 - x * 8;
 				py = 255 - y;
 			}
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+			machine().gfx[0]->transpen(bitmap,cliprect,
 				m_videoram[(sy >> 3) * 32 + x] * 8 + dy,
 				col,
 				flip,0,
@@ -304,7 +304,7 @@ UINT32 momoko_state::screen_update_momoko(screen_device &screen, bitmap_ind16 &b
 					px = 248 - (8 * x + dx - 8);
 					py = 248 - (8 * y + dy + 9);
 				}
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+				machine().gfx[2]->transpen(bitmap,cliprect,
 					chr,
 					0, /* color */
 					flip,flip, /* flip */

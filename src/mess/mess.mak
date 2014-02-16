@@ -296,6 +296,7 @@ VIDEOS += RAMDAC
 VIDEOS += S2636
 VIDEOS += SAA5050
 VIDEOS += SED1330
+VIDEOS += SED1520
 VIDEOS += STVVDP
 #VIDEOS += TLC34076
 #VIDEOS += TMS34061
@@ -484,6 +485,7 @@ MACHINES += Z8536
 # specify available bus cores
 #-------------------------------------------------
 
+BUSES += A2BUS
 BUSES += ABCBUS
 BUSES += ADAM
 BUSES += ADAMNET
@@ -491,29 +493,30 @@ BUSES += BW2
 BUSES += C64
 BUSES += CBM2
 BUSES += CBMIEC
+BUSES += CENTRONICS
 BUSES += COMX35
 BUSES += ECBBUS
 BUSES += ECONET
 BUSES += EP64
 BUSES += IEEE488
 BUSES += IMI7000
+BUSES += IQ151
 BUSES += ISBX
+BUSES += KC
+BUSES += MIDI
+BUSES += NUBUS
 BUSES += PC_KBD
 BUSES += PET
 BUSES += PLUS4
+BUSES += RS232
 BUSES += S100
+BUSES += TVC
+BUSES += VCS
 BUSES += VIC10
 BUSES += VIC20
 BUSES += VIDBRAIN
-BUSES += VCS
 BUSES += VIP
 BUSES += WANGPC
-BUSES += A2BUS
-BUSES += NUBUS
-BUSES += CENTRONICS
-BUSES += IQ151
-BUSES += KC
-BUSES += TVC
 BUSES += Z88
 
 #-------------------------------------------------
@@ -800,12 +803,9 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/hd63450.o   \
 	$(MESS_MACHINE)/i8271.o     \
 	$(MESS_MACHINE)/kb3600.o    \
-	$(MESS_MACHINE)/keyboard.o  \
 	$(MESS_MACHINE)/kr2376.o    \
 	$(MESS_MACHINE)/mb8795.o    \
 	$(MESS_MACHINE)/microdrv.o  \
-	$(MESS_MACHINE)/midiinport.o    \
-	$(MESS_MACHINE)/midioutport.o   \
 	$(MESS_MACHINE)/mpc105.o    \
 	$(MESS_MACHINE)/mpu401.o \
 	$(MESS_MACHINE)/msm6222b.o  \
@@ -813,18 +813,15 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/ncr5390.o   \
 	$(MESS_MACHINE)/ne1000.o    \
 	$(MESS_MACHINE)/ne2000.o    \
-	$(MESS_MACHINE)/null_modem.o\
 	$(MESS_MACHINE)/pc_lpt.o    \
 	$(MESS_MACHINE)/s1410.o     \
 	$(MESS_MACHINE)/sa1403d.o   \
 	$(MESS_MACHINE)/sed1200.o   \
-	$(MESS_MACHINE)/serial.o    \
 	$(MESS_MACHINE)/smartmed.o  \
 	$(MESS_MACHINE)/strata.o    \
 	$(MESS_MACHINE)/smc92x4.o   \
 	$(MESS_MACHINE)/sonydriv.o  \
 	$(MESS_MACHINE)/teleprinter.o   \
-	$(MESS_MACHINE)/terminal.o  \
 	$(MESS_MACHINE)/z80bin.o    \
 
 $(MESSOBJ)/isa.a: \
@@ -835,6 +832,7 @@ $(MESSOBJ)/isa.a: \
 	$(MESS_MACHINE)/isa_adlib.o \
 	$(MESS_MACHINE)/isa_com.o   \
 	$(MESS_MACHINE)/isa_fdc.o   \
+	$(MESS_MACHINE)/isa_mufdc.o	\
 	$(MESS_MACHINE)/isa_finalchs.o  \
 	$(MESS_MACHINE)/isa_gblaster.o  \
 	$(MESS_MACHINE)/isa_gus.o   \
@@ -1321,6 +1319,7 @@ $(MESSOBJ)/hegener.a:           \
 	$(MESS_DRIVERS)/glasgow.o   \
 	$(MESS_DRIVERS)/mephisto.o  \
 	$(MESS_DRIVERS)/mmodular.o  \
+	$(MESS_DRIVERS)/stratos.o   \
 
 
 $(MESSOBJ)/hitachi.a:           \
@@ -1543,6 +1542,7 @@ $(MESSOBJ)/nintendo.a:          \
 	$(MESS_MACHINE)/nes_camerica.o  \
 	$(MESS_MACHINE)/nes_cne.o  \
 	$(MESS_MACHINE)/nes_cony.o  \
+	$(MESS_MACHINE)/nes_datach.o  \
 	$(MESS_MACHINE)/nes_discrete.o  \
 	$(MESS_MACHINE)/nes_event.o  \
 	$(MESS_MACHINE)/nes_ggenie.o  \
@@ -1677,7 +1677,6 @@ $(MESSOBJ)/pcshare.a:           \
 	$(MESS_MACHINE)/pc_fdc.o    \
 	$(MESS_MACHINE)/pc_joy.o    \
 	$(MESS_MACHINE)/pc_joy_sw.o \
-	$(MESS_MACHINE)/ser_mouse.o \
 	$(MESS_VIDEO)/crtc_ega.o    \
 	$(MESS_MACHINE)/i82371ab.o  \
 	$(MESS_MACHINE)/i82371sb.o  \

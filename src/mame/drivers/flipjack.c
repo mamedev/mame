@@ -199,7 +199,7 @@ UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb3
 			int tile = m_bank << 8 | m_vram[x+y*0x100];
 			int color = m_cram[x+y*0x100] & 0x3f;
 
-			drawgfx_transpen(bitmap, cliprect, gfx, tile, color, 0, 0, x*8, y*8, 0);
+			 gfx->transpen(bitmap,cliprect, tile, color, 0, 0, x*8, y*8, 0);
 		}
 	}
 

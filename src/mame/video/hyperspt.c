@@ -151,8 +151,8 @@ void hyperspt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		sy += 1;
 
-		drawgfx_transmask(bitmap,cliprect,
-			machine().gfx[0],
+		
+			machine().gfx[0]->transmask(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy,
@@ -160,8 +160,8 @@ void hyperspt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		/* redraw with wraparound */
 
-		drawgfx_transmask(bitmap,cliprect,
-			machine().gfx[0],
+		
+			machine().gfx[0]->transmask(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx - 256, sy,

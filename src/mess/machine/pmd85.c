@@ -795,12 +795,13 @@ TIMER_CALLBACK_MEMBER(pmd85_state::pmd85_cassette_timer_callback)
 						{
 							data = (!m_previous_level && current_level) ? 1 : 0;
 
-							m_uart->write_rx(data);
-							m_uart->receive_clock();
+							m_uart->write_rxd(data);
 
 							m_clk_level_tape = 1;
 						}
 					}
+
+					m_uart->write_rxc(m_clk_level_tape);
 					return;
 				case PMD85_2:
 				case PMD85_2A:
@@ -819,19 +820,16 @@ TIMER_CALLBACK_MEMBER(pmd85_state::pmd85_cassette_timer_callback)
 			data ^= m_clk_level_tape;
 			m_cassette->output(data&0x01 ? 1 : -1);
 
-			if (!m_clk_level_tape)
-				m_uart->transmit_clock();
-
 			m_clk_level_tape = m_clk_level_tape ? 0 : 1;
+			m_uart->write_txc(m_clk_level_tape);
 
 			return;
 		}
 
 		m_clk_level_tape = 1;
 
-		if (!m_clk_level)
-			m_uart->transmit_clock();
 		m_clk_level = m_clk_level ? 0 : 1;
+		m_uart->write_txc(m_clk_level);
 	}
 }
 

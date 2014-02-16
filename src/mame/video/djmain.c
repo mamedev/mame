@@ -93,9 +93,9 @@ void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect
 					int zw = ox + (((x + 1) * xscale + (1 << 11)) >> 12) - sx;
 					int zh = oy + (((y + 1) * yscale + (1 << 11)) >> 12) - sy;
 
-					drawgfxzoom_transpen(bitmap,
+					
+								machine().gfx[0]->zoom_transpen(bitmap,
 								cliprect,
-								machine().gfx[0],
 								c,
 								color,
 								flipx,
@@ -111,9 +111,9 @@ void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect
 					int sx = ox + (x << 4);
 					int sy = oy + (y << 4);
 
-					drawgfx_transpen(bitmap,
+					
+							machine().gfx[0]->transpen(bitmap,
 							cliprect,
-							machine().gfx[0],
 							c,
 							color,
 							flipx,

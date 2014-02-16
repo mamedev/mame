@@ -91,7 +91,7 @@ void ikki_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (y > 240)
 			y = y - 256;
 
-		drawgfx_transmask(m_sprite_bitmap,cliprect, machine().gfx[1],
+		 machine().gfx[1]->transmask(m_sprite_bitmap,cliprect,
 				code, color,
 				m_flipscreen,m_flipscreen,
 				x,y,
@@ -174,7 +174,7 @@ UINT32 ikki_state::screen_update_ikki(screen_device &screen, bitmap_ind16 &bitma
 		bank = (color & 0xe0) << 3;
 		color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
-		drawgfx_opaque(bitmap,cliprect,machine().gfx[0],
+		machine().gfx[0]->opaque(bitmap,cliprect,
 			m_videoram[offs * 2 + 1] + bank,
 			color,
 			m_flipscreen,m_flipscreen,
@@ -209,7 +209,7 @@ UINT32 ikki_state::screen_update_ikki(screen_device &screen, bitmap_ind16 &bitma
 			bank = (color & 0xe0) << 3;
 			color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
-			drawgfx_opaque(bitmap,cliprect,machine().gfx[0],
+			machine().gfx[0]->opaque(bitmap,cliprect,
 				m_videoram[offs * 2 + 1] + bank,
 				color,
 				m_flipscreen,m_flipscreen,

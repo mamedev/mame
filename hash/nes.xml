@@ -44570,139 +44570,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dtc_brsh" supported="partial">
-		<description>Datach - Battle Rush - Build Up Robot Tournament (Jpn)</description>
-		<year>1993</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="DATACH-BURT"/>
-		<info name="release" value="19931112"/>
-		<info name="alt_title" value="データック バトルラッシュ"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="datach" />
-			<feature name="pcb" value="BANDAI-DATACH" />
-			<dataarea name="prg" size="262144">
-				<rom name="datach - battle rush - build up robot tournament (japan).prg" size="262144" crc="983d8175" sha1="29cc759d5ca214eefc0cc1c6ce0f8b9111e58124" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dtc_cray" supported="partial">
-		<description>Datach - Crayon Shin-Chan - Ora to Poi Poi (Jpn)</description>
-		<year>1993</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="DATACH-CSOPP"/>
-		<info name="release" value="19930827"/>
-		<info name="alt_title" value="データック クレヨンしんちゃん オラとポイポイ"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="datach" />
-			<feature name="pcb" value="BANDAI-DATACH" />
-			<dataarea name="prg" size="262144">
-				<rom name="datach - crayon shin-chan - ora to poi poi (japan).prg" size="262144" crc="894efdbc" sha1="6f3c65bd945fe13305a7a39d8cd884a5bf314a8f" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dtc_dbz" supported="partial">
-		<description>Datach - Dragon Ball Z - Gekitou Tenkaichi Budou Kai (Jpn)</description>
-		<year>1992</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="DATACH-DBZ"/>
-		<info name="release" value="19921229"/>
-		<info name="alt_title" value="データック ドラゴンボールZ 激闘天下一武道会"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="datach" />
-			<feature name="pcb" value="BANDAI-DATACH" />
-			<dataarea name="prg" size="262144">
-				<rom name="datach - dragon ball z - gekitou tenkaichi budou kai (japan).prg" size="262144" crc="19e81461" sha1="87478b635fefb25fa13c4876e20f505a97426c1b" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dtc_jltp" supported="partial">
-		<description>Datach - J League Super Top Players (Jpn)</description>
-		<year>1994</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="DATACH-STP"/>
-		<info name="release" value="19940422"/>
-		<info name="alt_title" value="データック Jリーグスーパートッププレイヤーズ"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="datach" />
-			<feature name="pcb" value="BANDAI-DATACH" />
-			<dataarea name="prg" size="262144">
-				<rom name="datach - j league super top players (japan).prg" size="262144" crc="be06853f" sha1="b2089533e05fe95814d0d77f2729944cbeb95988" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dtc_sdgn" supported="partial">
-		<description>Datach - SD Gundam - Gundam Wars (Jpn)</description>
-		<year>1993</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="DATACH-SDGW"/>
-		<info name="release" value="19930423"/>
-		<info name="alt_title" value="データック SDガンダム ガンダムウォーズ"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="datach" />
-			<feature name="pcb" value="BANDAI-DATACH" />
-			<dataarea name="prg" size="262144">
-				<rom name="datach - sd gundam - gundam wars (japan).prg" size="262144" crc="0be0a328" sha1="edd7a45a7f27e396b6d686f1861642d509863132" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dtc_ultr" supported="partial">
-		<description>Datach - Ultraman Club - Supokon Fight! (Jpn)</description>
-		<year>1993</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="DATACH-UCSF"/>
-		<info name="release" value="19930423"/>
-		<info name="alt_title" value="データック ウルトラマン倶楽部 スポ根ファイト!"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="datach" />
-			<feature name="pcb" value="BANDAI-DATACH" />
-			<dataarea name="prg" size="262144">
-				<rom name="datach - ultraman club - supokon fight! (japan).prg" size="262144" crc="5b457641" sha1="533170d5eb685231ccd27b9c136ffa4fad68a7b8" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dtc_yuyu" supported="partial">
-		<description>Datach - Yu Yu Hakusho - Bakutou Ankoku Bujutsu Kai (Jpn)</description>
-		<year>1993</year>
-		<publisher>Bandai</publisher>
-		<info name="serial" value="DATACH-BABK"/>
-		<info name="release" value="19931022"/>
-		<info name="alt_title" value="データック 幽遊白書 爆闘暗黒武術会"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="datach" />
-			<feature name="pcb" value="BANDAI-DATACH" />
-			<dataarea name="prg" size="262144">
-				<rom name="datach - yuu yuu hakusho - bakutou ankoku bujutsu kai (japan).prg" size="262144" crc="f51a7f46" sha1="74218aae93e4febfb2284bcf15811453418a2029" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="deblock">
 		<description>De-Block (Jpn)</description>
 		<year>1991</year>
@@ -55934,7 +55801,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="NJ064"/>
 		<info name="alt_title" value="数独"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_h" />	<!-- Not exactly -->
+			<feature name="slot" value="waixing_h" />   <!-- Not exactly -->
 			<feature name="pcb" value="WAIXING-H" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="262144">
@@ -58250,7 +58117,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="ES-0122"/>
 		<info name="alt_title" value="亚特鲁战记"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />	<!-- marked as mapper 74, but it's not... -->
+			<feature name="slot" value="txrom" />   <!-- marked as mapper 74, but it's not... -->
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="prg" size="524288">
 				<rom name="[es-0122] ya te lu zhan ji (c).prg" size="524288" crc="7696573a" sha1="b88cc75517e9a5f73a26eda6c29de2dfd5a32536" offset="00000" status="baddump" />
@@ -58271,7 +58138,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="口袋钻石之宠物小精灵2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_sgzlz" />
-			<feature name="pcb" value="WAIXING-SGZLZ" />	<!-- mapper 178? -->
+			<feature name="pcb" value="WAIXING-SGZLZ" />    <!-- mapper 178? -->
 			<dataarea name="prg" size="1048576">
 				<rom name="[coolboy] kou dai zuan shi zhi chong wu xiao jing ling 2 (c).prg" size="1048576" crc="925926bc" sha1="41acb3938636bc1f964005aafc54c74c47e27913" offset="00000" status="baddump" />
 			</dataarea>
@@ -59737,7 +59604,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="sub_keyboard" />	<!-- Actually it shall use a custom controller, but it works if you control it with this! -->
+			<feature name="peripheral" value="sub_keyboard" />  <!-- Actually it shall use a custom controller, but it works if you control it with this! -->
 			<dataarea name="chr" size="16384">
 				<rom name="bai-bai dino (unl).chr" size="16384" crc="e84dab0a" sha1="fdf8004229f58a9f9ae4a266abd0561980794e7b" offset="00000" status="baddump" />
 			</dataarea>
@@ -59798,7 +59665,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="scche" cloneof="bbcar" supported="partial">
-		<description>Super Car (Chi)</description>	<!-- This is not the correct title! -->
+		<description>Super Car (Chi)</description>  <!-- This is not the correct title! -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -60136,18 +60003,19 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dbz4" cloneof="dtc_dbz" supported="partial">
+<!-- This is an hacked version of the Datach DBZ game, without the need of a barcode reader: you press Select and choose the barcode sequence in game -->
+	<software name="dbz4">
 		<description>Dragon Ball Z IV (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="datach" />
+			<feature name="slot" value="t230" />
 			<feature name="pcb" value="UNL-T-230" />
 			<dataarea name="prg" size="262144">
 				<rom name="dragon ball z iv (unl) [u].prg" size="262144" crc="da25c8c3" sha1="2f367dbaf621ebcffc07df6105650c0db3e1de6c" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="262144">
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -60732,7 +60600,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Subor</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_commandos" />
-			<feature name="pcb" value="TXC-MXMDHTWO" />		<!-- This was marked as mapper 168, but not the Racermate one. it's not mapper 241 either => new pcb to be emulated, eventually! -->
+			<feature name="pcb" value="TXC-MXMDHTWO" />     <!-- This was marked as mapper 168, but not the Racermate one. it's not mapper 241 either => new pcb to be emulated, eventually! -->
 			<dataarea name="prg" size="1048576">
 				<rom name="[subor] karaoke (c).prg" size="1048576" crc="0a9808ae" sha1="57086cc965ba6828082a7c8c4617093ea6c1434a" offset="00000" status="baddump" />
 			</dataarea>
@@ -78470,6 +78338,22 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-
+<!-- Romless passthrough cart for the unit containing VRAM + barcode reader + EEPROM + subslot -->
+	<software name="datach">
+		<description>Datach Joint ROM System</description>
+		<year>1988</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="datach" />
+			<feature name="pcb" value="BANDAI-DATACH" />
+			<!-- This is a fake and unused PRG dataarea to avoid changing the loading routines for the moment-->
+			<dataarea name="prg" size="32768">
+				<rom value="0xff" size="32768" offset="0" loadflag="fill" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

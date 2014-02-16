@@ -811,7 +811,9 @@ inline void i8086_common_cpu_device::RORC_WORD()
 
 inline void i8086_common_cpu_device::SHL_BYTE(UINT8 c)
 {
-	m_dst <<= c;
+	while (c--)
+		m_dst <<= 1;
+
 	set_CFB(m_dst);
 	set_SZPF_Byte(m_dst);
 	PutbackRMByte(m_dst);
@@ -819,7 +821,9 @@ inline void i8086_common_cpu_device::SHL_BYTE(UINT8 c)
 
 inline void i8086_common_cpu_device::SHL_WORD(UINT8 c)
 {
-	m_dst <<= c;
+	while (c--)
+		m_dst <<= 1;
+
 	set_CFW(m_dst);
 	set_SZPF_Word(m_dst);
 	PutbackRMWord(m_dst);
@@ -827,36 +831,48 @@ inline void i8086_common_cpu_device::SHL_WORD(UINT8 c)
 
 inline void i8086_common_cpu_device::SHR_BYTE(UINT8 c)
 {
-	m_dst >>= c-1;
-	m_CarryVal = m_dst & 0x1;
-	m_dst >>= 1;
+	while (c--)
+	{
+		m_CarryVal = m_dst & 0x01;
+		m_dst >>= 1;
+	}
+
 	set_SZPF_Byte(m_dst);
 	PutbackRMByte(m_dst);
 }
 
 inline void i8086_common_cpu_device::SHR_WORD(UINT8 c)
 {
-	m_dst >>= c-1;
-	m_CarryVal = m_dst & 0x1;
-	m_dst >>= 1;
+	while (c--)
+	{
+		m_CarryVal = m_dst & 0x01;
+		m_dst >>= 1;
+	}
+
 	set_SZPF_Word(m_dst);
 	PutbackRMWord(m_dst);
 }
 
 inline void i8086_common_cpu_device::SHRA_BYTE(UINT8 c)
 {
-	m_dst = ((INT8)m_dst) >> (c-1);
-	m_CarryVal = m_dst & 0x1;
-	m_dst = m_dst >> 1;
+	while (c--)
+	{
+		m_CarryVal = m_dst & 0x01;
+		m_dst = ((INT8) m_dst) >> 1;
+	}
+
 	set_SZPF_Byte(m_dst);
 	PutbackRMByte(m_dst);
 }
 
 inline void i8086_common_cpu_device::SHRA_WORD(UINT8 c)
 {
-	m_dst = ((INT16)m_dst) >> (c-1);
-	m_CarryVal = m_dst & 0x1;
-	m_dst = m_dst >> 1;
+	while (c--)
+	{
+		m_CarryVal = m_dst & 0x01;
+		m_dst = ((INT16) m_dst) >> 1;
+	}
+
 	set_SZPF_Word(m_dst);
 	PutbackRMWord(m_dst);
 }

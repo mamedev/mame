@@ -2,7 +2,7 @@
 
     lviv_lvt.h
 
-    Format code for Lviv casette files
+    Format code for Lviv cassette files
 
 *********************************************************************/
 

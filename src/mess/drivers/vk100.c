@@ -146,13 +146,12 @@ state machine and sees if the GO bit ever finishes and goes back to 0
 // debug state dump for the vector generator
 #undef DEBUG_VG_STATE
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"
-#include "machine/serial.h"
 #include "vk100.lh"
 
 #define RS232_TAG       "rs232"
@@ -179,7 +178,9 @@ public:
 
 		m_capsshift(*this, "CAPSSHIFT"),
 		m_dipsw(*this, "SWITCHES")
-		{ }
+	{
+	}
+
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_speaker;
@@ -1008,18 +1009,6 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL
 };
 
-static const i8251_interface i8251_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
-	//DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_rts), // out_rts_cb
-	DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_rxrdy_int), // out_rxrdy_cb
-	DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_txrdy_int), // out_txrdy_cb
-	DEVCB_NULL, // out_txempty_cb
-	DEVCB_NULL // out_syndet_cb
-};
-
 static MACHINE_CONFIG_START( vk100, vk100_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
@@ -1034,13 +1023,18 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_MC6845_ADD( "crtc", H46505, "screen", XTAL_45_6192Mhz/3/12, mc6845_intf)
 
 	/* i8251 uart */
-	MCFG_I8251_ADD("i8251", i8251_intf)
+	MCFG_DEVICE_ADD("i8251", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(vk100_state, i8251_rxrdy_int))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(vk100_state, i8251_txrdy_int))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rx))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
 
-	MCFG_COM8116_ADD(COM5016T_TAG, XTAL_5_0688MHz, NULL, DEVWRITELINE("i8251", i8251_device, rxc_w), DEVWRITELINE("i8251", i8251_device, txc_w))
+	MCFG_COM8116_ADD(COM5016T_TAG, XTAL_5_0688MHz, NULL, DEVWRITELINE("i8251", i8251_device, write_rxc), DEVWRITELINE("i8251", i8251_device, write_txc))
 
 	MCFG_DEFAULT_LAYOUT( layout_vk100 )
 

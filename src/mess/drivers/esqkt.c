@@ -21,15 +21,14 @@
 
 ***************************************************************************/
 
-#include "emu.h"
+#include "bus/midi/midi.h"
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/es5510/es5510.h"
 #include "sound/es5506.h"
 #include "machine/n68681.h"
 #include "machine/esqpanel.h"
-#include "machine/serial.h"
-#include "machine/midiinport.h"
-#include "machine/midioutport.h"
 
 class esqkt_state : public driver_device
 {
@@ -47,7 +46,7 @@ public:
 	required_device<es5510_device> m_esp;
 	required_device<duartn68681_device> m_duart;
 	required_device<esqpanel2x40_sq1_device> m_sq1panel;
-	required_device<serial_port_device> m_mdout;
+	required_device<midi_port_device> m_mdout;
 
 	virtual void machine_reset();
 
@@ -189,7 +188,7 @@ WRITE8_MEMBER(esqkt_state::duart_output)
 
 WRITE_LINE_MEMBER(esqkt_state::duart_tx_a)
 {
-	m_mdout->tx(state);
+	m_mdout->write_txd(state);
 }
 
 WRITE_LINE_MEMBER(esqkt_state::duart_tx_b)
@@ -250,10 +249,10 @@ static MACHINE_CONFIG_START( kt, esqkt_state )
 	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL_16MHz)

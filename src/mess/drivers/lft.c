@@ -11,15 +11,17 @@
 #include "cpu/i86/i86.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class lft_state : public driver_device
 {
 public:
 	lft_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ16_MEMBER(keyin_r);

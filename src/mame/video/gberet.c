@@ -155,7 +155,7 @@ void gberet_state::gberet_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 				flipy = !flipy;
 			}
 
-			drawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, sx, sy,
+			 machine().gfx[1]->transmask(bitmap,cliprect, code, color, flipx, flipy, sx, sy,
 				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
 		}
 	}
@@ -207,7 +207,7 @@ void gberet_state::gberetb_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 				flipy = !flipy;
 			}
 
-			drawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, sx, sy,
+			 machine().gfx[1]->transmask(bitmap,cliprect, code, color, flipx, flipy, sx, sy,
 				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
 		}
 	}

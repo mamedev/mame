@@ -6,26 +6,27 @@
 
 ***************************************************************************/
 
-#include "machine/ser_mouse.h"
+#include "ser_mouse.h"
 
-
-const device_type MSFT_SERIAL_MOUSE = &device_creator<microsoft_mouse_device>;
-const device_type MSYSTEM_SERIAL_MOUSE = &device_creator<mouse_systems_mouse_device>;
 
 serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_rs232_port_interface(mconfig, *this),
-		device_serial_interface(mconfig, *this),
-		m_x(*this, "ser_mouse_x"),
-		m_y(*this, "ser_mouse_y"),
-		m_btn(*this, "ser_mouse_btn")
+	device_rs232_port_interface(mconfig, *this),
+	device_serial_interface(mconfig, *this),
+	m_x(*this, "ser_mouse_x"),
+	m_y(*this, "ser_mouse_y"),
+	m_btn(*this, "ser_mouse_btn")
 {
 }
+
+const device_type MSFT_SERIAL_MOUSE = &device_creator<microsoft_mouse_device>;
 
 microsoft_mouse_device::microsoft_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: serial_mouse_device(mconfig, MSFT_SERIAL_MOUSE, "Microsoft Serial Mouse", tag, owner, clock, "microsoft_mouse", __FILE__)
 {
 }
+
+const device_type MSYSTEM_SERIAL_MOUSE = &device_creator<mouse_systems_mouse_device>;
 
 mouse_systems_mouse_device::mouse_systems_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: serial_mouse_device(mconfig, MSYSTEM_SERIAL_MOUSE, "Mouse Systems Serial Mouse", tag, owner, clock, "mouse_systems_mouse", __FILE__)
@@ -34,7 +35,6 @@ mouse_systems_mouse_device::mouse_systems_mouse_device(const machine_config &mco
 
 void serial_mouse_device::device_start()
 {
-	m_owner = dynamic_cast<rs232_port_device *>(owner());
 	m_timer = timer_alloc();
 	m_enabled = false;
 	set_frame();
@@ -44,15 +44,11 @@ void serial_mouse_device::device_start()
 void serial_mouse_device::device_reset()
 {
 	m_head = m_tail = 0;
-	tx(0);
-	m_dcd = 0;
-	m_owner->out_dcd(0);
-	m_dsr = 0;
-	m_owner->out_dsr(0);
-	m_ri = 0;
-	m_owner->out_ri(0);
-	m_cts = 0;
-	m_owner->out_cts(0);
+	output_rxd(0);
+	output_dcd(0);
+	output_dsr(0);
+	output_ri(0);
+	output_cts(0);
 }
 
 void serial_mouse_device::tra_complete()
@@ -63,8 +59,7 @@ void serial_mouse_device::tra_complete()
 
 void serial_mouse_device::tra_callback()
 {
-	m_rbit = transmit_register_get_data_bit();
-	m_owner->out_rx(m_rbit);
+	output_rxd(transmit_register_get_data_bit());
 }
 
 /**************************************************************************
@@ -196,15 +191,13 @@ void serial_mouse_device::set_mouse_enable(bool state)
 	if(state && !m_enabled)
 	{
 		m_timer->adjust(attotime::zero, 0, attotime::from_hz(240));
-		m_rbit = 1;
-		m_owner->out_rx(1);
+		output_rxd(1);
 	}
 	else if(!state && m_enabled)
 	{
 		m_timer->adjust(attotime::never);
 		m_head = m_tail = 0;
-		m_rbit = 0;
-		m_owner->out_rx(0);
+		output_rxd(0);
 	}
 	m_enabled = state;
 

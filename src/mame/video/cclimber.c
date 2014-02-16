@@ -569,7 +569,7 @@ void cclimber_state::cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, gfx, code, color, flipx, flipy, x, y, 0);
+		 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
 	}
 }
 
@@ -606,7 +606,7 @@ void cclimber_state::toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, gfx, code, color, flipx, flipy, x, y, 0);
+		 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
 	}
 }
 
@@ -643,7 +643,7 @@ void cclimber_state::swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle 
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, gfx, code, color, flipx, flipy, x, y, 0);
+		 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
 	}
 }
 

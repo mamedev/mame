@@ -179,7 +179,7 @@ void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		fx = (spriteram[i+0] & 0x04) ? 1 : 0;
 		fy = (spriteram[i+0] & 0x02) ? 1 : 0;
 
-		drawgfx_transpen(bitmap,cliprect,gfx,spr_offs,col,fx,fy,x,y,0);
+		gfx->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 
 	for(i=0x3e0;i<0x400;i+=4)
@@ -194,7 +194,7 @@ void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		fx = (spriteram[i+0] & 0x04) ? 1 : 0;
 		fy = (spriteram[i+0] & 0x02) ? 1 : 0;
 
-		drawgfx_transpen(bitmap,cliprect,gfx,spr_offs,col,fx,fy,x,y,0);
+		gfx->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 }
 
@@ -216,7 +216,7 @@ UINT32 deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb32
 			int tile = m_vram0[x+y*32] | ((attr & 3) << 8);
 			int colour = (6 & 0x7); /* TODO */
 
-			drawgfx_transpen(bitmap,cliprect,gfx,tile|0x400,colour,0,0,x*8,y*8,0);
+			gfx->transpen(bitmap,cliprect,tile|0x400,colour,0,0,x*8,y*8,0);
 		}
 	}
 
@@ -228,7 +228,7 @@ UINT32 deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb32
 			int tile = m_vram1[x+y*32] | ((attr & 3) << 8);
 			int colour = (6 & 0x7); /* TODO */
 
-			drawgfx_transpen(bitmap,cliprect,gfx,tile,colour,0,0,x*8,y*8,0);
+			gfx->transpen(bitmap,cliprect,tile,colour,0,0,x*8,y*8,0);
 		}
 	}
 

@@ -43,9 +43,6 @@
 #include "emu.h"
 #include "machine/isa.h"
 #include "machine/6850acia.h"
-#include "machine/serial.h"
-#include "machine/midiinport.h"
-#include "machine/midioutport.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -38,25 +38,28 @@ Note: because the 8275 isn't working, a generic video handler is being used at t
 #include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
 
+#define KEYBOARD_TAG "keyboard"
+
 class zorba_state : public driver_device
 {
 public:
 	zorba_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_p_videoram(*this, "videoram")
-		, m_maincpu(*this, "maincpu")
-		, m_beep(*this, "beeper")
-		, m_dma(*this, "dma")
-		, m_u0(*this, "uart0")
-		, m_u1(*this, "uart1")
-		, m_u2(*this, "uart2")
-		, m_pia0(*this, "pia0")
-		, m_pia1(*this, "pia1")
-		, m_crtc(*this, "crtc")
-		, m_fdc (*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_p_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_beep(*this, "beeper"),
+		m_dma(*this, "dma"),
+		m_u0(*this, "uart0"),
+		m_u1(*this, "uart1"),
+		m_u2(*this, "uart2"),
+		m_pia0(*this, "pia0"),
+		m_pia1(*this, "pia1"),
+		m_crtc(*this, "crtc"),
+		m_fdc (*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1")
+	{
+	}
 
 public:
 	const UINT8 *m_p_chargen;
@@ -225,42 +228,6 @@ static SLOT_INTERFACE_START( zorba_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-// COM port
-static const i8251_interface u0_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-// printer port
-static const i8251_interface u1_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-// keyboard
-static const i8251_interface u2_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 WRITE8_MEMBER( zorba_state::pia0_porta_w )
 {
 	m_beep->set_state(BIT(data, 7));
@@ -418,9 +385,15 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 
 	/* Devices */
 	MCFG_Z80DMA_ADD("dma", XTAL_24MHz/6, dma_intf)
-	MCFG_I8251_ADD("uart0", u0_intf)
-	MCFG_I8251_ADD("uart1", u1_intf)
-	MCFG_I8251_ADD("uart2", u2_intf)
+
+	MCFG_DEVICE_ADD("uart0", I8251, 0)
+	// COM port
+
+	MCFG_DEVICE_ADD("uart1", I8251, 0)
+	// printer port
+
+	MCFG_DEVICE_ADD("uart2", I8251, 0)
+	// keyboard
 
 // port A - disk select etc, beeper
 // port B - parallel interface

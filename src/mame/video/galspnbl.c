@@ -50,7 +50,7 @@ UINT32 galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind1
 		/* What is this? A priority/half transparency marker? */
 		if (!(attr & 0x0008))
 		{
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+			machine().gfx[0]->transpen(bitmap,cliprect,
 					code,
 					color,
 					0,0,

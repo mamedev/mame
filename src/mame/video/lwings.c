@@ -195,7 +195,7 @@ void lwings_state::lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 				flipy = !flipy;
 			}
 
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+			machine().gfx[2]->transpen(bitmap,cliprect,
 					code,color,
 					flipx,flipy,
 					sx,sy,15);
@@ -243,7 +243,7 @@ void lwings_state::trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 				flipy = !flipy;
 			}
 
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+			machine().gfx[2]->transpen(bitmap,cliprect,
 					code,color,
 					flipx,flipy,
 					sx,sy,15);

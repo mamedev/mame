@@ -37,14 +37,17 @@ to discover the special features of this Basic.
 #include "machine/i8255.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class basic52_state : public driver_device
 {
 public:
 	basic52_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG) { }
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(unk_r);

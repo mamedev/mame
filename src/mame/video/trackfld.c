@@ -223,16 +223,16 @@ void trackfld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		//}
 
 
-		drawgfx_transmask(bitmap, cliprect,
-			machine().gfx[0],
+		
+			machine().gfx[0]->transmask(bitmap,cliprect,
 			code + m_sprite_bank1 + m_sprite_bank2, color,
 			flipx, flipy,
 			sx, sy,
 			colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0));
 
 		/* redraw with wraparound */
-		drawgfx_transmask(bitmap,cliprect,
-			machine().gfx[0],
+		
+			machine().gfx[0]->transmask(bitmap,cliprect,
 			code + m_sprite_bank1 + m_sprite_bank2, color,
 			flipx, flipy,
 			sx - 256, sy,

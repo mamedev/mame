@@ -14,15 +14,17 @@
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class ts816_state : public driver_device
 {
 public:
 	ts816_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(keyin_r);

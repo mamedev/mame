@@ -25,6 +25,8 @@
 		} \
 	} while (0)
 
+#define TERMINAL_TAG "terminal"
+
 class besta_state : public driver_device
 {
 public:
@@ -32,7 +34,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_terminal(*this, TERMINAL_TAG),
-		m_p_ram(*this, "p_ram") { }
+		m_p_ram(*this, "p_ram")
+	{
+	}
 
 	DECLARE_READ8_MEMBER( mpcc_reg_r );
 	DECLARE_WRITE8_MEMBER( mpcc_reg_w );

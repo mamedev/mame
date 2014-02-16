@@ -14,12 +14,9 @@
 #ifndef __SUPERPET__
 #define __SUPERPET__
 
-#include "emu.h"
 #include "exp.h"
-#include "cpu/m6809/m6809.h"
 #include "machine/mos6551.h"
 #include "machine/mos6702.h"
-#include "machine/serial.h"
 
 
 

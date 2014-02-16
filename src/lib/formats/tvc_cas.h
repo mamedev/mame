@@ -4,7 +4,7 @@
 
     tvc_cas.h
 
-    Format code for Videoton TVC casette files
+    Format code for Videoton TVC cassette files
 
 *********************************************************************/
 

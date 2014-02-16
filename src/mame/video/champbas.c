@@ -202,16 +202,16 @@ void champbas_state::champbas_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		int sx = m_spriteram_2[offs + 1] - 16;
 		int sy = 255 - m_spriteram_2[offs];
 
-		drawgfx_transmask(bitmap, cliprect,
-				gfx,
+		
+				gfx->transmask(bitmap,cliprect,
 				code, color,
 				flipx, flipy,
 				sx, sy,
 				colortable_get_transpen_mask(machine().colortable, gfx, color, 0));
 
 		// wraparound
-		drawgfx_transmask(bitmap, cliprect,
-				gfx,
+		
+				gfx->transmask(bitmap,cliprect,
 				code, color,
 				flipx, flipy,
 				sx + 256, sy,
@@ -240,8 +240,8 @@ void champbas_state::exctsccr_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		color = (obj1[offs + 1]) & 0x0f;
 		bank = ((obj1[offs + 1] >> 4) & 1);
 
-		drawgfx_transpen(bitmap,cliprect,
-				machine().gfx[1],
+		
+				machine().gfx[1]->transpen(bitmap,cliprect,
 				code + (bank << 6),
 				color,
 				flipx, flipy,
@@ -263,8 +263,8 @@ void champbas_state::exctsccr_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		flipy = (~obj1[offs]) & 0x02;
 		color = (obj1[offs + 1]) & 0x0f;
 
-		drawgfx_transmask(bitmap,cliprect,
-				machine().gfx[2],
+		
+				machine().gfx[2]->transmask(bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,

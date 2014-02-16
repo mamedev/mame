@@ -185,12 +185,12 @@ void xain_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 		if (attr & 0x80)    /* double height */
 		{
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+			machine().gfx[3]->transpen(bitmap,cliprect,
 					numtile,
 					color,
 					flipx,flipy,
 					sx,flipy ? sy+16:sy-16,0);
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+			machine().gfx[3]->transpen(bitmap,cliprect,
 					numtile+1,
 					color,
 					flipx,flipy,
@@ -198,7 +198,7 @@ void xain_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		}
 		else
 		{
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+			machine().gfx[3]->transpen(bitmap,cliprect,
 					numtile,
 					color,
 					flipx,flipy,

@@ -4,7 +4,7 @@
 
     pmd_cas.h
 
-    Format code for PMD-85 casette files
+    Format code for PMD-85 cassette files
 
 *********************************************************************/
 

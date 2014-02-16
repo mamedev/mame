@@ -71,7 +71,7 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 			UINT32 tile = m_vram[count] & 0xffff;
 
 			if(m_screen->visible_area().contains(x*8, y*8))
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
+				gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
 
 			count++;
 		}
@@ -86,7 +86,7 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 			UINT32 tile = m_vram[count] & 0xffff;
 
 			if(m_screen->visible_area().contains(x*8, y*8))
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8,0);
+				gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,y*8,0);
 
 			count++;
 		}

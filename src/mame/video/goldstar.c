@@ -383,7 +383,7 @@ UINT32 goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_ind1
 			int girlyscroll = (INT8)((m_cm_girl_scroll & 0xf0));
 			int girlxscroll = (INT8)((m_cm_girl_scroll & 0x0f)<<4);
 
-			drawgfxzoom_transpen(bitmap,cliprect,gfx,m_cmaster_girl_num,m_cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
+			gfx->zoom_transpen(bitmap,cliprect,m_cmaster_girl_num,m_cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
 		}
 	}
 
@@ -425,7 +425,7 @@ UINT32 goldstar_state::screen_update_bingowng(screen_device &screen, bitmap_ind1
 			int girlyscroll = (INT8)((m_cm_girl_scroll & 0xf0));
 			int girlxscroll = (INT8)((m_cm_girl_scroll & 0x0f)<<4);
 
-			drawgfxzoom_transpen(bitmap,cliprect,gfx,m_cmaster_girl_num,m_cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
+			gfx->zoom_transpen(bitmap,cliprect,m_cmaster_girl_num,m_cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
 		}
 	}
 

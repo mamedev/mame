@@ -218,7 +218,7 @@ void rpunch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		if (x >= BITMAP_WIDTH) x -= 512;
 		if (y >= BITMAP_HEIGHT) y -= 512;
 
-		drawgfx_transpen(bitmap, cliprect, machine().gfx[2],
+		 machine().gfx[2]->transpen(bitmap,cliprect,
 				code, color + (m_sprite_palette / 16), xflip, yflip, x, y, 15);
 	}
 }

@@ -183,7 +183,7 @@ void starshp1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	{
 		int code = (m_obj_ram[i] & 0xf) ^ 0xf;
 
-		drawgfx_transpen(bitmap, cliprect, machine().gfx[1],
+		 machine().gfx[1]->transpen(bitmap,cliprect,
 			code % 8,
 			code / 8,
 			0, 0,
@@ -209,7 +209,7 @@ void starshp1_state::draw_spaceship(bitmap_ind16 &bitmap, const rectangle &clipr
 	if (y <= 0)
 		y -= (yzoom * m_ship_voffset) >> 16;
 
-	drawgfxzoom_transpen(bitmap, cliprect, machine().gfx[2],
+	 machine().gfx[2]->zoom_transpen(bitmap,cliprect,
 		m_ship_picture & 0x03,
 		m_ship_explode,
 		m_ship_picture & 0x80, 0,

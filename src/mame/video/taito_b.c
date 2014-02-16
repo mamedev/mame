@@ -232,7 +232,7 @@ void taitob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		if ( zoomx || zoomy )
 		{
-			drawgfxzoom_transpen_raw(bitmap, cliprect, machine().gfx[1],
+			 machine().gfx[1]->zoom_transpen_raw(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -241,7 +241,7 @@ void taitob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		}
 		else
 		{
-			drawgfx_transpen_raw (bitmap,cliprect,machine().gfx[1],
+			machine().gfx[1]->transpen_raw(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

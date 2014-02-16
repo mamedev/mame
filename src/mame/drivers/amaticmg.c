@@ -486,7 +486,7 @@ UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind1
 			/* TODO: this looks so out of place ... */
 			color = (m_attr[count]&0xf0)>>3;
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*4,y*8);
+			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*4,y*8);
 			count++;
 		}
 	}
@@ -510,7 +510,7 @@ UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind
 			tile += ((m_attr[count]&0xff)<<8);
 			color = 0;
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*4,y*8);
+			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*4,y*8);
 			count++;
 		}
 	}

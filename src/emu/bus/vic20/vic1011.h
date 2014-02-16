@@ -14,9 +14,8 @@
 #ifndef __VIC1011__
 #define __VIC1011__
 
-#include "emu.h"
 #include "user.h"
-#include "machine/serial.h"
+#include "bus/rs232/rs232.h"
 
 
 

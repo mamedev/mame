@@ -14,15 +14,14 @@
 #ifndef __EP64__
 #define __EP64__
 
-#include "emu.h"
 #include "audio/dave.h"
+#include "bus/rs232/rs232.h"
 #include "bus/ep64/exp.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "video/nick.h"
 
 #define Z80_TAG         "u1"

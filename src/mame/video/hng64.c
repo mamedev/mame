@@ -64,106 +64,6 @@ static void hng64_mark_tile_dirty( hng64_state *state, int tilemap, int tile_ind
 }
 
 
-#define PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32(DEST, PRIORITY, SOURCE)                  \
-do                                                                                  \
-{                                                                                   \
-	UINT32 srcdata = (SOURCE);                                                      \
-	if (srcdata != transpen)                                                        \
-	{                                                                               \
-		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
-		{                                                                           \
-			UINT32 srcdata2 = paldata[srcdata];                                     \
-																					\
-			UINT32 add;                                                             \
-			add = (srcdata2 & 0x00ff0000) + (DEST & 0x00ff0000);                    \
-			if (add & 0x01000000) DEST = (DEST & 0xff00ffff) | (0x00ff0000);        \
-			else DEST = (DEST & 0xff00ffff) | (add & 0x00ff0000);                   \
-			add = (srcdata2 & 0x000000ff) + (DEST & 0x000000ff);                    \
-			if (add & 0x00000100) DEST = (DEST & 0xffffff00) | (0x000000ff);        \
-			else DEST = (DEST & 0xffffff00) | (add & 0x000000ff);                   \
-			add = (srcdata2 & 0x0000ff00) + (DEST & 0x0000ff00);                    \
-			if (add & 0x00010000) DEST = (DEST & 0xffff00ff) | (0x0000ff00);        \
-			else DEST = (DEST & 0xffff00ff) | (add & 0x0000ff00);                   \
-		}                                                                           \
-		(PRIORITY) = 31;                                                            \
-	}                                                                               \
-}                                                                                   \
-while (0)
-
-static void pdrawgfx_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
-		bitmap_ind8 &priority, UINT32 pmask, UINT32 transpen)
-{
-	const pen_t *paldata;
-
-	assert(dest.valid());
-	assert(dest.bpp() == 32);
-	assert(gfx != NULL);
-
-	/* get final code and color, and grab lookup tables */
-	code %= gfx->elements();
-	color %= gfx->colors();
-	paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * color];
-
-	/* use pen usage to optimize */
-	if (gfx->has_pen_usage())
-	{
-		UINT32 usage = gfx->pen_usage(code);
-
-		/* fully transparent; do nothing */
-		if ((usage & ~(1 << transpen)) == 0)
-			return;
-	}
-
-	/* high bit of the mask is implicitly on */
-	pmask |= 1 << 31;
-
-	/* render based on dest bitmap depth */
-	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32, UINT8);
-}
-
-
-static void pdrawgfxzoom_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
-		UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,
-		UINT32 transpen)
-{
-	const pen_t *paldata;
-
-	/* non-zoom case */
-
-	if (scalex == 0x10000 && scaley == 0x10000)
-	{
-		pdrawgfx_transpen_additive(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, priority, pmask, transpen);
-		return;
-	}
-
-	assert(dest.valid());
-	assert(dest.bpp() == 32);
-	assert(gfx != NULL);
-
-	/* get final code and color, and grab lookup tables */
-	code %= gfx->elements();
-	color %= gfx->colors();
-	paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * color];
-
-	/* use pen usage to optimize */
-	if (gfx->has_pen_usage())
-	{
-		UINT32 usage = gfx->pen_usage(code);
-
-		/* fully transparent; do nothing */
-		if ((usage & ~(1 << transpen)) == 0)
-			return;
-	}
-
-	/* high bit of the mask is implicitly on */
-	pmask |= 1 << 31;
-
-	DRAWGFXZOOM_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32, UINT8);
-}
-
-
 /*
  * Sprite Format
  * ------------------
@@ -353,8 +253,8 @@ static void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rect
 
 				if (!chaini)
 				{
-					if (!blend) pdrawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
-					else pdrawgfxzoom_transpen_additive(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					if (!blend) gfx->prio_zoom_transpen(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					else gfx->prio_zoom_transpen_additive(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
 					tileno++;
 				}
 				else // inline chain mode, used by ss64
@@ -373,8 +273,8 @@ static void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rect
 						pal&=0xf;
 					}
 
-					if (!blend) pdrawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
-					else pdrawgfxzoom_transpen_additive(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					if (!blend) gfx->prio_zoom_transpen(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					else gfx->prio_zoom_transpen_additive(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
 					source +=8;
 				}
 

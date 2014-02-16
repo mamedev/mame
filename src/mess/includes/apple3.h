@@ -44,6 +44,7 @@ public:
 		m_acia(*this, "acia"),
 		m_fdc(*this, "fdc"),
 		m_ay3600(*this, "ay3600"),
+		m_a2bus(*this, "a2bus"),
 		m_speaker(*this, SPEAKER_TAG),
 		m_dac(*this, DAC_TAG),
 		m_kbspecial(*this, "keyb_special")
@@ -57,22 +58,11 @@ public:
 	required_device<mos6551_device> m_acia;
 	required_device<applefdc_base_device> m_fdc;
 	required_device<ay3600_device> m_ay3600;
+	required_device<a2bus_device> m_a2bus;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<dac_device> m_dac;
 	required_ioport m_kbspecial;
 
-	UINT32 m_flags;
-	UINT8 m_via_0_a;
-	UINT8 m_via_0_b;
-	UINT8 m_via_1_a;
-	UINT8 m_via_1_b;
-	int m_via_0_irq;
-	int m_via_1_irq;
-	int m_enable_mask;
-	offs_t m_zpa;
-	UINT8 m_last_n;
-	UINT8 *m_char_mem;
-	UINT32 *m_hgr_map;
 	DECLARE_READ8_MEMBER(apple3_memory_r);
 	DECLARE_WRITE8_MEMBER(apple3_memory_w);
 	DECLARE_WRITE_LINE_MEMBER(apple3_sync_w);
@@ -103,17 +93,36 @@ public:
 	UINT8 *apple3_get_zpa_addr(offs_t offset);
 	void apple3_update_memory();
 	void apple3_via_out(UINT8 *var, UINT8 data);
-	UINT8 *apple3_get_indexed_addr(offs_t offset);
+	UINT8 *apple3_get_indexed_addr(offs_t offset, bool is_write);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_c040_tick);
 	DECLARE_PALETTE_INIT(apple3);
 	void apple3_irq_update();
 	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
+	void apple3_postload();
+
+	// these need to be public for now
+	UINT32 m_flags;
+	int m_enable_mask;
+
+private:
+	UINT8 m_via_0_a;
+	UINT8 m_via_0_b;
+	UINT8 m_via_1_a;
+	UINT8 m_via_1_b;
+	int m_via_0_irq;
+	int m_via_1_irq;
+	offs_t m_zpa;
+	UINT8 m_last_n;
+	UINT8 m_char_mem[0x800];
+	UINT32 *m_hgr_map;
 
 	bool m_sync;
+	bool m_rom_has_been_disabled;
 	UINT8 m_indir_opcode;
 	int m_indir_count;
+	int m_cnxx_slot;
 
 	UINT8 *m_bank2, *m_bank3, *m_bank4, *m_bank5, *m_bank8, *m_bank9;
 	UINT8 *m_bank10, *m_bank11;

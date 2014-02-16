@@ -138,7 +138,7 @@ void sprint8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (code & 0x80)
 			x |= 0x100;
 
-		drawgfx_transpen(bitmap, cliprect, machine().gfx[2],
+		 machine().gfx[2]->transpen(bitmap,cliprect,
 			code ^ 7,
 			i,
 			!(code & 0x10), !(code & 0x08),

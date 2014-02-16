@@ -27,17 +27,21 @@ Chips:
 #include "cpu/m68000/m68000.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
+
 class ms9540_state : public driver_device
 {
 public:
 	ms9540_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_p_base(*this, "rambase")
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_p_base(*this, "rambase"),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
+
 private:
 	UINT8 m_term_data;
 	virtual void machine_reset();

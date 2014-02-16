@@ -497,7 +497,7 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 			pri_mask = 0xfe;
 
 		gfx->set_source_clip(tx, xsize, ty, ysize);
-		pdrawgfxzoom_transpen(bitmap, cliprect, gfx,
+		gfx->prio_zoom_transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,

@@ -114,7 +114,7 @@ void scotrsht_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		drawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy,
+		 machine().gfx[1]->transmask(bitmap,cliprect, code, color, flipx, flipy,
 			sx, sy,
 			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, m_palette_bank * 16));
 	}

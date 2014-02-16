@@ -41,6 +41,7 @@
  ******************************************************************************/
 
 #include "includes/compis.h"
+#include "bus/rs232/rs232.h"
 
 
 
@@ -504,8 +505,8 @@ WRITE_LINE_MEMBER( compis_state::tmr1_w )
 
 WRITE_LINE_MEMBER( compis_state::tmr2_w )
 {
-	m_uart->rxc_w(state);
-	m_uart->txc_w(state);
+	m_uart->write_rxc(state);
+	m_uart->write_txc(state);
 }
 
 
@@ -535,22 +536,6 @@ static const struct pit8253_interface pit_intf =
 		{ XTAL_16MHz/8, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(compis_state, tmr4_w) },
 		{ XTAL_16MHz/8, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(compis_state, tmr5_w) }
 	}
-};
-
-
-//-------------------------------------------------
-//  i8251_interface usart_intf
-//-------------------------------------------------
-
-static const i8251_interface usart_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(COMPIS_KEYBOARD_TAG, compis_keyboard_device, si_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(I80130_TAG, i80130_device, ir2_w),
-	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(I80186_TAG, i80186_cpu_device, int1_w),
-	DEVCB_NULL,
-	DEVCB_NULL
 };
 
 
@@ -651,15 +636,15 @@ static I8274_INTERFACE( mpsc_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_rts),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_rts),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -768,20 +753,28 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_I80130_BAUD_CALLBACK(DEVWRITELINE(DEVICE_SELF, compis_state, tmr2_w))
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf )
 	MCFG_I8255_ADD(I8255_TAG, ppi_intf )
-	MCFG_I8251_ADD(I8251A_TAG, usart_intf)
+
+	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(COMPIS_KEYBOARD_TAG, compis_keyboard_device, si_w))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE(I80130_TAG, i80130_device, ir2_w))
+	//MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w))
+
+	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0)
+	MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
+
 	MCFG_I8274_ADD(I8274_TAG, XTAL_16MHz/4, mpsc_intf)
 	MCFG_MM58274C_ADD(MM58174A_TAG, rtc_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, compis_cassette_interface)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, rxa_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, dcda_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, ctsa_w))
 
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, rxb_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, dcdb_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, ctsb_w))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
 
@@ -796,9 +789,6 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir6_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir5_w))
 	MCFG_ISBX_SLOT_MDRQT_CALLBACK(DEVWRITELINE(I80186_TAG, i80186_cpu_device, drq1_w))
-
-	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0)
-	MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rx))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "compis")

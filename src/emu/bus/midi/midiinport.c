@@ -6,14 +6,14 @@
 
 *********************************************************************/
 
-#include "machine/midiinport.h"
+#include "midiinport.h"
 
 const device_type MIDIIN_PORT = &device_creator<midiin_port_device>;
 
 midiin_port_device::midiin_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MIDIIN_PORT, "MIDI In port", tag, owner, clock, "midiin_port", __FILE__),
-		device_serial_port_interface(mconfig, *this),
-		m_midiin(*this, "midiinimg")
+	device_midi_port_interface(mconfig, *this),
+	m_midiin(*this, "midiinimg")
 {
 }
 

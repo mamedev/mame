@@ -148,10 +148,9 @@ void lkage_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 
 		for (y = 0; y < height; y++)
 		{
-			pdrawgfx_transpen(
+			machine().gfx[1]->prio_transpen(
 				bitmap,
 				cliprect,
-				machine().gfx[1],
 				sprite_number ^ y,
 				color,
 				flipx,flipy,

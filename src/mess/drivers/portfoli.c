@@ -78,6 +78,7 @@
 */
 
 #include "includes/portfoli.h"
+#include "bus/rs232/rs232.h"
 #include "rendlay.h"
 
 
@@ -731,9 +732,9 @@ WRITE_LINE_MEMBER( portfolio_state::i8250_intrpt_w )
 
 static const ins8250_interface i8250_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),
 	DEVCB_DRIVER_LINE_MEMBER(portfolio_state, i8250_intrpt_w),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -885,11 +886,11 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_TICK_TAG, portfolio_state, system_tick, attotime::from_hz(XTAL_32_768kHz/32768))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, cts_w))
 
 	/* fake keyboard */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", portfolio_state, keyboard_tick, attotime::from_usec(2500))

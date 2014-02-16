@@ -10,8 +10,6 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LK201_TAG   "lk201"
-
 #define LK_CMD_LEDS_ON          0x13    /* light LEDs - 1st param: led bitmask */
 #define LK_CMD_LEDS_OFF         0x11    /* turn off LEDs */
 
@@ -30,17 +28,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_LK201_ADD() \
-	MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
-
-#define MCFG_LK201_REPLACE() \
-	MCFG_DEVICE_REPLACE(LK201_TAG, LK201, 0)
-
-#define MCFG_LK201_REMOVE() \
-	MCFG_DEVICE_REMOVE(LK201_TAG)
-
-#define MCFG_LK201_SET_TX_CALLBACK(_cb) \
-	devcb = &lk201_device::set_tx_cb(*device, DEVCB2_##_cb);
+#define MCFG_LK201_TX_HANDLER(_cb) \
+	devcb = &lk201_device::set_tx_handler(*device, DEVCB2_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -63,9 +52,7 @@ public:
 	DECLARE_READ8_MEMBER( spi_r );
 	DECLARE_WRITE8_MEMBER( spi_w );
 
-	template<class _Object> static devcb2_base &set_tx_cb(device_t &device, _Object wr) { return downcast<lk201_device &>(device).m_tx_write.set_callback(wr); }
-
-	devcb2_write_line m_tx_write;
+	template<class _Object> static devcb2_base &set_tx_handler(device_t &device, _Object wr) { return downcast<lk201_device &>(device).m_tx_handler.set_callback(wr); }
 
 protected:
 	// device-level overrides
@@ -119,6 +106,8 @@ private:
 
 	void send_port(address_space &space, UINT8 offset, UINT8 data);
 	void update_interrupts();
+
+	devcb2_write_line m_tx_handler;
 };
 
 // device type definition

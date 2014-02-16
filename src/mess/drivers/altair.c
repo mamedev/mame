@@ -18,10 +18,9 @@
 
 ****************************************************************************/
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/6850acia.h"
-#include "machine/serial.h"
 #include "imagedev/snapquik.h"
 
 
@@ -90,8 +89,8 @@ static ACIA6850_INTERFACE( acia0_intf )
 {
 	153600, // TODO: these are set using jumpers S3/S2/S1/S0
 	153600,
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
 	DEVCB_NULL
 };
 
@@ -106,9 +105,9 @@ static MACHINE_CONFIG_START( altair, altair_state )
 	MCFG_ACIA6850_ADD("mc6850", acia0_intf)
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("mc6850", acia6850_device, write_rx))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("mc6850", acia6850_device, write_dcd))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("mc6850", acia6850_device, write_cts))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mc6850", acia6850_device, write_rx))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("mc6850", acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("mc6850", acia6850_device, write_cts))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", altair_state, altair, "bin", 0)

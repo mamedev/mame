@@ -344,14 +344,14 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 								if ((ypos<=cliprect.max_y) && (ypos>=(cliprect.min_y)-16))
 								{
 									if (m_pricallback)
-										pdrawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfxregion],
+										machine().gfx[m_gfxregion]->prio_transpen(bitmap,cliprect,
 											sprite - multi * inc,
 											colour,
 											fx,fy,
 											x,ypos,
 											m_screen->priority(),pri,m_transpen);
 									else
-										drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfxregion],
+										machine().gfx[m_gfxregion]->transpen(bitmap,cliprect,
 											sprite - multi * inc,
 											colour,
 											fx,fy,
@@ -363,14 +363,14 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 								if (w)
 								{
 									if (m_pricallback)
-										pdrawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfxregion],
+										machine().gfx[m_gfxregion]->prio_transpen(bitmap,cliprect,
 												(sprite - multi * inc)-mult2,
 												colour,
 												fx,fy,
 												x-16,ypos,
 												m_screen->priority(),pri,m_transpen);
 									else
-										drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfxregion],
+										machine().gfx[m_gfxregion]->transpen(bitmap,cliprect,
 												(sprite - multi * inc)-mult2,
 												colour,
 												fx,fy,
@@ -381,7 +381,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 							else
 							{
 								// if we have a sprite bitmap draw raw data to it for manual mixing
-								drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine().gfx[m_gfxregion],
+								machine().gfx[m_gfxregion]->transpen_raw(m_sprite_bitmap,cliprect,
 									sprite - multi * inc,
 									colour<<m_raw_shift,
 									fx,fy,
@@ -389,7 +389,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 									m_transpen);
 								if (w)
 								{
-									drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine().gfx[m_gfxregion],
+									machine().gfx[m_gfxregion]->transpen_raw(m_sprite_bitmap,cliprect,
 										(sprite - multi * inc)-mult2,
 										colour<<m_raw_shift,
 										fx,fy,
@@ -468,7 +468,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 								if ((ypos<=cliprect.max_y) && (ypos>=(cliprect.min_y)-16))
 								{
-									pdrawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfxregion],
+									machine().gfx[m_gfxregion]->prio_transpen(bitmap,cliprect,
 											sprite + yy + h * xx,
 											colour,
 											fx,fy,
@@ -480,7 +480,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 								if ((ypos<=cliprect.max_y) && (ypos>=(cliprect.min_y-16)))
 								{
-									pdrawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfxregion],
+									machine().gfx[m_gfxregion]->prio_transpen(bitmap,cliprect,
 											sprite + yy + h * xx,
 											colour,
 											fx,fy,
@@ -495,7 +495,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 								if ((ypos<=cliprect.max_y) && (ypos>=(cliprect.min_y)-16))
 								{
-									drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfxregion],
+									machine().gfx[m_gfxregion]->transpen(bitmap,cliprect,
 											sprite + yy + h * xx,
 											colour,
 											fx,fy,
@@ -507,7 +507,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 								if ((ypos<=cliprect.max_y) && (ypos>=(cliprect.min_y-16)))
 								{
-									drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfxregion],
+									machine().gfx[m_gfxregion]->transpen(bitmap,cliprect,
 											sprite + yy + h * xx,
 											colour,
 											fx,fy,
@@ -522,7 +522,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 							if ((ypos<=cliprect.max_y) && (ypos>=(cliprect.min_y)-16))
 							{
-								drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine().gfx[m_gfxregion],
+								machine().gfx[m_gfxregion]->transpen_raw(m_sprite_bitmap,cliprect,
 										sprite + yy + h * xx,
 										colour<<m_raw_shift,
 										fx,fy,
@@ -534,7 +534,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 							if ((ypos<=cliprect.max_y) && (ypos>=(cliprect.min_y-16)))
 							{
-								drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine().gfx[m_gfxregion],
+								machine().gfx[m_gfxregion]->transpen_raw(m_sprite_bitmap,cliprect,
 										sprite + yy + h * xx,
 										colour<<m_raw_shift,
 										fx,fy,

@@ -116,10 +116,10 @@ void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		ypos = (source[0] & 0x00ff) >> 0;
 		tileno = (source2[0] & 0x7ffe) >> 1;
 		xpos |=  (source2[0] & 0x0001) << 8;
-		drawgfx_transpen(bitmap, cliprect, gfx, tileno, 1, 0, 0, xpos, ypos, 0);
-		drawgfx_transpen(bitmap, cliprect, gfx, tileno, 1, 0, 0, xpos, ypos - 0x100, 0); // wrap
-		drawgfx_transpen(bitmap, cliprect, gfx, tileno, 1, 0, 0, xpos - 0x200, ypos, 0); // wrap
-		drawgfx_transpen(bitmap, cliprect, gfx, tileno, 1, 0, 0, xpos - 0x200, ypos - 0x100, 0); // wrap
+		 gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos, ypos, 0);
+		 gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos, ypos - 0x100, 0); // wrap
+		 gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos - 0x200, ypos, 0); // wrap
+		 gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos - 0x200, ypos - 0x100, 0); // wrap
 
 		source++;
 		source2++;

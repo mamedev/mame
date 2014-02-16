@@ -14,10 +14,9 @@
 #ifndef __COMPCLR_FLP__
 #define __COMPCLR_FLP__
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "formats/ccvf_dsk.h"
 #include "imagedev/floppy.h"
-#include "machine/serial.h"
 
 
 
@@ -37,7 +36,7 @@
 
 // ======================> device_compucolor_floppy_port_interface
 
-class device_compucolor_floppy_port_interface : public device_serial_port_interface
+class device_compucolor_floppy_port_interface : public device_rs232_port_interface
 {
 public:
 	device_compucolor_floppy_port_interface(const machine_config &mconfig, device_t &device);
@@ -51,7 +50,7 @@ public:
 
 // ======================> compucolor_floppy_port_device
 
-class compucolor_floppy_port_device : public serial_port_device
+class compucolor_floppy_port_device : public rs232_port_device
 {
 public:
 	compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -74,7 +73,7 @@ private:
 // ======================> compucolor_floppy_device
 
 class compucolor_floppy_device : public device_t,
-								 public device_compucolor_floppy_port_interface
+	public device_compucolor_floppy_port_interface
 {
 public:
 	// construction/destruction
@@ -123,7 +122,5 @@ extern const device_type COMPUCOLOR_FLOPPY;
 
 // slot devices
 SLOT_INTERFACE_EXTERN( compucolor_floppy_port_devices );
-
-
 
 #endif

@@ -228,15 +228,3 @@ I8255A_INTERFACE( pp01_ppi8255_interface )
 	DEVCB_DRIVER_MEMBER(pp01_state,pp01_8255_portc_r),
 	DEVCB_DRIVER_MEMBER(pp01_state,pp01_8255_portc_w)
 };
-
-// when rts and dtr are both high, the uart is being used for cassette operations
-const i8251_interface pp01_uart_intf =
-{
-	DEVCB_NULL, // out txd
-	DEVCB_NULL, // out dtr
-	DEVCB_NULL, // out rts
-	DEVCB_NULL, // out rxrdy
-	DEVCB_NULL, // out txrdy
-	DEVCB_NULL, // out txempty
-	DEVCB_NULL  // out syndet
-};

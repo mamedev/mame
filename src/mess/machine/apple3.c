@@ -3,9 +3,9 @@
     machine/apple3.c
 
     Apple ///
-
+ 
     VIA #0 (D VIA)
-	    CA1: IRQ from the MM58167 RTC
+	CA1: IRQ from the MM58167 RTC
     	CA2: 1 if key pressed, 0 otherwise
     	CB1/CB2: connected to VBL
  
@@ -56,6 +56,7 @@ static void apple3_update_drives(device_t *device);
 READ8_MEMBER(apple3_state::apple3_c0xx_r)
 {
 	UINT8 result = 0xFF;
+	device_a2bus_card_interface *slotdevice;
 
 	switch(offset)
 	{
@@ -109,13 +110,19 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			m_strobe = 0;
 			break;
 
+		case 0x20: case 0x21: case 0x22: case 0x23:
+		case 0x24: case 0x25: case 0x26: case 0x27:
+		case 0x28: case 0x29: case 0x2A: case 0x2B:
+		case 0x2C: case 0x2D: case 0x2E: case 0x2F:
+			m_cnxx_slot = -1;
+			break;
+
 		case 0x30: case 0x31: case 0x32: case 0x33:
 		case 0x34: case 0x35: case 0x36: case 0x37:
 		case 0x38: case 0x39: case 0x3A: case 0x3B:
 		case 0x3C: case 0x3D: case 0x3E: case 0x3F:
 			m_speaker_state ^= 1;
 			m_speaker->level_w(m_speaker_state);
-			result = 0xff;
 			break;
 
 		case 0x40: case 0x41: case 0x42: case 0x43:
@@ -123,7 +130,6 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0x48: case 0x49: case 0x4A: case 0x4B:
 		case 0x4C: case 0x4D: case 0x4E: case 0x4F:
 			m_c040_time = 200;
-			result = 0xff;
 			break;
 
 		case 0x50: case 0x51: case 0x52: case 0x53:
@@ -142,6 +148,50 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			/* unsure what these are */
 			result = 0x00;
 			break;
+
+		case 0x90: case 0x91: case 0x92: case 0x93:
+		case 0x94: case 0x95: case 0x96: case 0x97:
+		case 0x98: case 0x99: case 0x9a: case 0x9b:
+		case 0x9c: case 0x9d: case 0x9e: case 0x9f:
+			slotdevice = m_a2bus->get_a2bus_card(1);
+			if (slotdevice != NULL)
+			{
+				result = slotdevice->read_c0nx(space, offset&0xf);
+			}
+			break; 
+
+		case 0xa0: case 0xa1: case 0xa2: case 0xa3:
+		case 0xa4: case 0xa5: case 0xa6: case 0xa7:
+		case 0xa8: case 0xa9: case 0xaa: case 0xab:
+		case 0xac: case 0xad: case 0xae: case 0xaf:
+			slotdevice = m_a2bus->get_a2bus_card(2);
+			if (slotdevice != NULL)
+			{
+				result = slotdevice->read_c0nx(space, offset&0xf);
+			}
+			break; 
+
+		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
+		case 0xb4: case 0xb5: case 0xb6: case 0xb7:
+		case 0xb8: case 0xb9: case 0xba: case 0xbb:
+		case 0xbc: case 0xbd: case 0xbe: case 0xbf:
+			slotdevice = m_a2bus->get_a2bus_card(3);
+			if (slotdevice != NULL)
+			{
+				result = slotdevice->read_c0nx(space, offset&0xf);
+			}
+			break; 
+
+		case 0xc0: case 0xc1: case 0xc2: case 0xc3:
+		case 0xc4: case 0xc5: case 0xc6: case 0xc7:
+		case 0xc8: case 0xc9: case 0xca: case 0xcb:
+		case 0xcc: case 0xcd: case 0xce: case 0xcf:
+			slotdevice = m_a2bus->get_a2bus_card(4);
+			if (slotdevice != NULL)
+			{
+				result = slotdevice->read_c0nx(space, offset&0xf);
+			}
+			break; 
 
 		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
 		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
@@ -179,6 +229,8 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 
 WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 {
+	device_a2bus_card_interface *slotdevice;
+
 	switch(offset)
 	{
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -186,6 +238,13 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0x18: case 0x19: case 0x1A: case 0x1B:
 		case 0x1C: case 0x1D: case 0x1E: case 0x1F:
 			m_strobe = 0;
+			break;
+
+		case 0x20: case 0x21: case 0x22: case 0x23:
+		case 0x24: case 0x25: case 0x26: case 0x27:
+		case 0x28: case 0x29: case 0x2A: case 0x2B:
+		case 0x2C: case 0x2D: case 0x2E: case 0x2F:
+			m_cnxx_slot = -1;
 			break;
 
 		case 0x30: case 0x31: case 0x32: case 0x33:
@@ -211,6 +270,50 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			else
 				m_flags &= ~(1 << ((offset - 0x50) / 2));
 			break;
+
+		case 0x90: case 0x91: case 0x92: case 0x93:
+		case 0x94: case 0x95: case 0x96: case 0x97:
+		case 0x98: case 0x99: case 0x9a: case 0x9b:
+		case 0x9c: case 0x9d: case 0x9e: case 0x9f:
+			slotdevice = m_a2bus->get_a2bus_card(1);
+			if (slotdevice != NULL)
+			{
+				slotdevice->write_c0nx(space, offset&0xf, data);
+			}
+			break; 
+
+		case 0xa0: case 0xa1: case 0xa2: case 0xa3:
+		case 0xa4: case 0xa5: case 0xa6: case 0xa7:
+		case 0xa8: case 0xa9: case 0xaa: case 0xab:
+		case 0xac: case 0xad: case 0xae: case 0xaf:
+			slotdevice = m_a2bus->get_a2bus_card(2);
+			if (slotdevice != NULL)
+			{
+				slotdevice->write_c0nx(space, offset&0xf, data);
+			}
+			break; 
+
+		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
+		case 0xb4: case 0xb5: case 0xb6: case 0xb7:
+		case 0xb8: case 0xb9: case 0xba: case 0xbb:
+		case 0xbc: case 0xbd: case 0xbe: case 0xbf:
+			slotdevice = m_a2bus->get_a2bus_card(3);
+			if (slotdevice != NULL)
+			{
+				slotdevice->write_c0nx(space, offset&0xf, data);
+			}
+			break; 
+
+		case 0xc0: case 0xc1: case 0xc2: case 0xc3:
+		case 0xc4: case 0xc5: case 0xc6: case 0xc7:
+		case 0xc8: case 0xc9: case 0xca: case 0xcb:
+		case 0xcc: case 0xcd: case 0xce: case 0xcf:
+			slotdevice = m_a2bus->get_a2bus_card(4);
+			if (slotdevice != NULL)
+			{
+				slotdevice->write_c0nx(space, offset&0xf, data);
+			}
+			break; 
 
 		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
 		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
@@ -346,9 +449,17 @@ void apple3_state::apple3_update_memory()
 
 	/* install bank 7 (F000-FFFF) */
 	if (m_via_0_a & 0x01)
+	{
 		m_bank7 = memregion("maincpu")->base();
+	}
 	else
+	{
+		m_rom_has_been_disabled = true;
 		m_bank7 = apple3_bankaddr(~0, 0x7000);
+
+		// if we had an IRQ waiting for RAM to be paged in...
+		apple3_irq_update();
+	}
 }
 
 
@@ -370,6 +481,7 @@ WRITE8_MEMBER(apple3_state::apple3_via_0_out_a)
 
 WRITE8_MEMBER(apple3_state::apple3_via_0_out_b)
 {
+//	printf("ZP to %02x\n", data);
 	apple3_via_out(&m_via_0_b, data);
 }
 
@@ -388,7 +500,18 @@ void apple3_state::apple3_irq_update()
 {
 	if (m_via_1_irq || m_via_0_irq)
 	{
-//		printf("   asserting IRQ\n");
+		// HACK: SOS floppy driver enables ROM at Fxxx *before* trying to
+		// suppress IRQs.  IRQ hits at inopportune time -> bad vector -> system crash.
+		// This breaks the Confidence Test, but the Confidence Test
+		// never disables the ROM so checking for that gets us 
+		// working in all cases.
+		// Bonus points: for some reason this isn't a problem with -debug.
+		// m6502 heisenbug maybe?
+		if ((m_via_0_a & 0x01) && (m_rom_has_been_disabled))
+		{
+			return;
+		}
+//		printf("   setting IRQ\n");
 		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 		m_via_1->write_pa7(0);	// this is active low
 	}
@@ -424,11 +547,13 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 	m_c040_time = 0;
 	m_strobe = 0;
 	m_lastchar = 0x0d;
+	m_rom_has_been_disabled = false;
+	m_cnxx_slot = -1;
 }
 
 
 
-UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
+UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset, bool is_write)
 {
 	UINT8 n;
 	UINT8 *result = NULL;
@@ -485,7 +610,7 @@ UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
 			result = apple3_bankaddr(~0, ((offs_t) m_via_0_b) * 0x100 + offset);
 		}
 	}
-	else if ((offset >= 0xF000) && (m_via_0_a & 0x01))
+	else if ((offset >= 0xF000) && (m_via_0_a & 0x01) && (is_write))
 	{
 		/* The Apple /// Diagnostics seems to expect that indexed writes
 		 * always write to RAM.  That image jumps to an address that is
@@ -493,6 +618,8 @@ UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
 		 *  
 		 * The confidence test and the diagnostics together indicates 
 		 * that this *doesn't* apply to the VIA region, however. 
+		 *  
+		 * The Diagnostics' ROM test shows this is for writes only. 
 		 */ 
 
 		if (offset < 0xffd0 || offset > 0xffef)
@@ -583,20 +710,50 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_via_1->write_pb7(1);
 
 	apple3_update_memory();
+
+	save_item(NAME(m_via_0_a));
+	save_item(NAME(m_via_0_b));
+	save_item(NAME(m_via_1_a));
+	save_item(NAME(m_via_1_b));
+	save_item(NAME(m_via_0_irq));
+	save_item(NAME(m_via_1_irq));
+	save_item(NAME(m_zpa));
+	save_item(NAME(m_last_n));
+	save_item(NAME(m_sync));
+	save_item(NAME(m_rom_has_been_disabled));
+	save_item(NAME(m_indir_opcode));
+	save_item(NAME(m_indir_count));
+	save_item(NAME(m_cnxx_slot));
+	save_item(NAME(m_speaker_state));
+	save_item(NAME(m_c040_time));
+	save_item(NAME(m_lastchar));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_transchar));
+	save_item(NAME(m_flags));
+	save_item(NAME(m_char_mem));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(apple3_state::apple3_postload), this));
+}
+
+void apple3_state::apple3_postload()
+{
+	apple3_update_memory();
 }
 
 READ8_MEMBER(apple3_state::apple3_memory_r)
 {
 	UINT8 rv = 0xff;
+	bool was_zp = false;
 
 	// (zp), y or (zp,x) read
 	if (!space.debugger_access())
 	{
 		if (((m_indir_count == 4) && (m_indir_opcode & 0x10)) ||
-			((m_indir_count == 5) && !(m_indir_opcode & 0x10)))
+			((m_indir_count == 5) && !(m_indir_opcode & 0x10)) ||
+			((m_indir_count == 3) && ((!(m_indir_opcode & 0x10)) && (((m_indir_opcode & 0xf) == 0xc) || ((m_indir_opcode & 0xf) == 0xd)))))
 		{
 			UINT8 *test;
-			test = apple3_get_indexed_addr(offset);
+			test = apple3_get_indexed_addr(offset, false);
 
 			if (test)
 			{
@@ -608,6 +765,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 	if (offset < 0x100)
 	{
 		rv = *apple3_get_zpa_addr(offset); 
+		was_zp = true;
 	}
 	else if (offset < 0x200)
 	{
@@ -645,6 +803,21 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 		{
 			rv = m_bank9[offset - 0xc100];
 		}
+		else
+		{
+			/* now identify the device */
+			device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card((offset>>8) & 0x7);
+
+			if (slotdevice != NULL)
+			{
+				if (slotdevice->take_c800())
+				{
+					m_cnxx_slot = ((offset>>8) & 7);
+				}
+
+				return slotdevice->read_cnxx(space, offset&0xff);
+			}
+		}
 	}
 	else if (offset < 0xc800)
 	{
@@ -655,6 +828,23 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 		if (!(m_via_0_a & 0x40))
 		{
 			rv = m_bank11[offset - 0xc800];
+		}
+		else
+		{
+			if (offset == 0xcfff)
+			{
+				m_cnxx_slot = -1;
+			}
+
+			if (m_cnxx_slot != -1)
+			{
+				device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(m_cnxx_slot);
+
+				if (slotdevice != NULL)
+				{
+					rv = slotdevice->read_c800(space, offset&0x7ff);
+				}
+			}
 		}
 	}
 	else if (offset < 0xf000)
@@ -694,6 +884,21 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 				m_indir_count = 1;
 				m_indir_opcode = rv;
 			}
+			// if instruction is physically on the zero page,
+			// even an absolute load/store will get ZP'd
+			// sayeth the Business BASIC source code:
+			// ;BECAUSE SARA GOES BY WHETHER THE ADDR 
+			// ;IS GOING THROUGH ZERO PAGE, THIS GOES THROUGH THE
+			// ;BANK STUFF ALSO.
+			else if (was_zp)
+			{
+//				printf("ZP opcode fetch %02x\n", rv);
+				if ((!(rv & 0x10)) && (((rv & 0xf) == 0xc) || ((rv & 0xf) == 0xd)))
+				{
+					m_indir_count = 1;
+					m_indir_opcode = rv;
+				}
+			}
 		}
 	}
 
@@ -705,7 +910,7 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	if ((!space.debugger_access()) && (m_indir_count > 0))
 	{
 		UINT8 *test;
-		test = apple3_get_indexed_addr(offset);
+		test = apple3_get_indexed_addr(offset, true);
 
 		if (test)
 		{
@@ -762,6 +967,21 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 				m_bank9[offset - 0xc100] = data;
 			}
 		}
+		else
+		{
+			/* now identify the device */
+			device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card((offset>>8) & 0x7);
+
+			if (slotdevice != NULL)
+			{
+				if (slotdevice->take_c800())
+				{
+					m_cnxx_slot = ((offset>>8) & 7);
+				}
+
+				slotdevice->write_cnxx(space, offset&0xff, data);
+			}
+		}
 	}
 	else if (offset < 0xc800)
 	{
@@ -777,6 +997,23 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 			if (!(m_via_0_a & 0x08))
 			{
 				m_bank11[offset - 0xc800] = data;
+			}
+		}
+		else
+		{
+			if (offset == 0xcfff)
+			{
+				m_cnxx_slot = -1;
+			}
+
+			if (m_cnxx_slot != -1)
+			{
+				device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(m_cnxx_slot);
+
+				if (slotdevice != NULL)
+				{
+					slotdevice->write_c800(space, offset&0x7ff, data);
+				}
 			}
 		}
 	}

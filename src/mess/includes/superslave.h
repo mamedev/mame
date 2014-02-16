@@ -5,13 +5,12 @@
 #ifndef __SUPERSLAVE__
 #define __SUPERSLAVE__
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/com8116.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "machine/z80dart.h"
 #include "machine/z80pio.h"
 

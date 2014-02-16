@@ -48,7 +48,7 @@ public:
 
 
 
-#define DRAW_TILE(machine, offset, transparency) drawgfx_transpen(bitmap, cliprect, (machine).gfx[0],\
+#define DRAW_TILE(machine, offset, transparency)  (machine).gfx[0]->transpen(bitmap,cliprect,\
 					(m_videoram[index+offset] | (m_colorram[index+offset]<<8))&0x3fff,\
 					(m_colorram[index+offset]&0x80)>>7,\
 					0,0,\

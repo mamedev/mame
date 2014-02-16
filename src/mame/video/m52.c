@@ -307,16 +307,16 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	/* this may not be correct */
 	ypos = ypos + (22 - 8);
 
-	drawgfx_transpen(bitmap, cliprect,
-		machine().gfx[image],
+	
+		machine().gfx[image]->transpen(bitmap,cliprect,
 		0, 0,
 		flip_screen(),
 		flip_screen(),
 		xpos,
 		ypos, 0);
 
-	drawgfx_transpen(bitmap, cliprect,
-		machine().gfx[image],
+	
+		machine().gfx[image]->transpen(bitmap,cliprect,
 		0, 0,
 		flip_screen(),
 		flip_screen(),
@@ -410,7 +410,7 @@ UINT32 m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap,
 		clip = cliprect;
 #endif
 
-		drawgfx_transmask(bitmap, clip, machine().gfx[1],
+		 machine().gfx[1]->transmask(bitmap,clip,
 			code, color, flipx, flipy, sx, sy,
 			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 512 + 32));
 	}

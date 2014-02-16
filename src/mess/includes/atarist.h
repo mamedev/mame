@@ -5,7 +5,7 @@
 #ifndef __ATARI_ST__
 #define __ATARI_ST__
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cartslot.h"
@@ -13,12 +13,9 @@
 #include "machine/8530scc.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/mc68901.h"
-#include "machine/midiinport.h"
-#include "machine/midioutport.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
 #include "machine/rp5c15.h"
-#include "machine/serial.h"
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 #include "sound/lmc1992.h"

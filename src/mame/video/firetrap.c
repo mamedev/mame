@@ -219,24 +219,24 @@ void firetrap_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		{
 			if (flip_screen()) sy -= 16;
 
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+			machine().gfx[3]->transpen(bitmap,cliprect,
 					code & ~1,
 					color,
 					flipx,flipy,
 					sx,flipy ? sy : sy + 16,0);
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+			machine().gfx[3]->transpen(bitmap,cliprect,
 					code | 1,
 					color,
 					flipx,flipy,
 					sx,flipy ? sy + 16 : sy,0);
 
 			/* redraw with wraparound */
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+			machine().gfx[3]->transpen(bitmap,cliprect,
 					code & ~1,
 					color,
 					flipx,flipy,
 					sx - 256,flipy ? sy : sy + 16,0);
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+			machine().gfx[3]->transpen(bitmap,cliprect,
 					code | 1,
 					color,
 					flipx,flipy,
@@ -244,14 +244,14 @@ void firetrap_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 		else
 		{
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+			machine().gfx[3]->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					sx,sy,0);
 
 			/* redraw with wraparound */
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+			machine().gfx[3]->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,

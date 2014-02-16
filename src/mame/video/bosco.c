@@ -197,7 +197,7 @@ void bosco_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 		if (flip) sx += 32-2;
 
-		drawgfx_transmask(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->transmask(bitmap,cliprect,
 				(spriteram[offs] & 0xfc) >> 2,
 				color,
 				flipx,flipy,
@@ -222,7 +222,7 @@ void bosco_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 			y += 2;
 		}
 
-		drawgfx_transmask(bitmap,cliprect,machine().gfx[2],
+		machine().gfx[2]->transmask(bitmap,cliprect,
 				((m_bosco_radarattr[offs] & 0x0e) >> 1) ^ 0x07,
 				0,
 				!flip,!flip,

@@ -137,11 +137,11 @@ UINT32 foodf_state::screen_update_foodf(screen_device &screen, bitmap_ind16 &bit
 		int vflip = (data1 >> 14) & 1;
 		int pri = (data1 >> 13) & 1;
 
-		pdrawgfx_transpen(bitmap, cliprect, gfx, pict, color, hflip, vflip,
+		gfx->prio_transpen(bitmap,cliprect, pict, color, hflip, vflip,
 				xpos, ypos, priority_bitmap, pri * 2, 0);
 
 		/* draw again with wraparound (needed to get the end of level animation right) */
-		pdrawgfx_transpen(bitmap, cliprect, gfx, pict, color, hflip, vflip,
+		gfx->prio_transpen(bitmap,cliprect, pict, color, hflip, vflip,
 				xpos - 256, ypos, priority_bitmap, pri * 2, 0);
 	}
 

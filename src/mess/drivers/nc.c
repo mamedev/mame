@@ -699,8 +699,12 @@ TIMER_CALLBACK_MEMBER(nc_state::nc_serial_timer_callback)
 {
 	i8251_device *uart = machine().device<i8251_device>("uart");
 
-	uart->transmit_clock();
-	uart->receive_clock();
+	/// TODO: double timer rate to provide correct duty cycle
+	uart->write_txc(1);
+	uart->write_rxc(1);
+
+	uart->write_txc(0);
+	uart->write_rxc(0);
 }
 
 WRITE8_MEMBER(nc_state::nc_uart_control_w)
@@ -804,18 +808,6 @@ static RP5C01_INTERFACE( rtc_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc100_tc8521_alarm_callback)
 };
-
-static const i8251_interface nc100_uart_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc100_rxrdy_callback),
-	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc100_txrdy_callback),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 WRITE_LINE_MEMBER(nc_state::write_nc100_centronics_ack)
 {
@@ -1139,18 +1131,6 @@ WRITE_LINE_MEMBER(nc_state::nc200_rxrdy_callback)
 
 	nc200_refresh_uart_interrupt();
 }
-
-static const i8251_interface nc200_uart_interface=
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc200_rxrdy_callback),
-	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc200_txrdy_callback),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 void nc_state::nc200_fdc_interrupt(bool state)
 {
@@ -1490,7 +1470,9 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* uart */
-	MCFG_I8251_ADD("uart", nc100_uart_interface)
+	MCFG_DEVICE_ADD("uart", I8251, 0)
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(nc_state,nc100_rxrdy_callback))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(nc_state,nc100_txrdy_callback))
 
 	/* rtc */
 	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
@@ -1540,8 +1522,9 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(nc_state, write_nc200_centronics_ack))
 
 	/* uart */
-	MCFG_DEVICE_REMOVE("uart")
-	MCFG_I8251_ADD("uart", nc200_uart_interface)
+	MCFG_DEVICE_MODIFY("uart")
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(nc_state,nc200_rxrdy_callback))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(nc_state,nc200_txrdy_callback))
 
 	/* no rtc */
 	MCFG_DEVICE_REMOVE("rtc")

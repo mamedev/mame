@@ -3,7 +3,6 @@
 
 #include "machine/nes_nxrom.h"
 #include "machine/i2cmem.h"
-#include "machine/bcreader.h"
 
 
 // ======================> nes_karaokestudio_device
@@ -125,32 +124,6 @@ public:
 };
 
 
-// ======================> nes_datach_device
-
-class nes_datach_device : public nes_lz93d50_device
-{
-public:
-	// construction/destruction
-	nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	
-	virtual void pcb_reset();
-
-protected:
-	UINT8 m_datach_latch;
-	required_device<barcode_reader_device> m_reader;	
-	
-	static const device_timer_id TIMER_SERIAL = 1;
-	emu_timer *serial_timer;
-};
-
-
 // ======================> nes_fjump2_device
 
 class nes_fjump2_device : public nes_lz93d50_device
@@ -180,7 +153,6 @@ extern const device_type NES_FCG;
 extern const device_type NES_LZ93D50;
 extern const device_type NES_LZ93D50_24C01;
 extern const device_type NES_LZ93D50_24C02;
-extern const device_type NES_DATACH;
 extern const device_type NES_FJUMP2;
 
 #endif

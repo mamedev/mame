@@ -413,7 +413,7 @@ void dooyong_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		for (y = 0; y <= height; y++)
 		{
-			pdrawgfx_transpen(bitmap, cliprect, machine().gfx[1],
+			machine().gfx[1]->prio_transpen(bitmap,cliprect,
 					code + y,
 					color,
 					flipx, flipy,
@@ -481,7 +481,7 @@ void dooyong_state::rshark_draw_sprites(screen_device &screen, bitmap_ind16 &bit
 				for (x = 0; x <= width; x++)
 				{
 					int _x = sx + (16 * (flipx ? (width - x) : x));
-					pdrawgfx_transpen(bitmap, cliprect, machine().gfx[0],
+					machine().gfx[0]->prio_transpen(bitmap,cliprect,
 							code,
 							color,
 							flipx, flipy,

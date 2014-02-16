@@ -579,3 +579,27 @@ BUSOBJS += $(BUSOBJ)/centronics/covox.o
 BUSOBJS += $(BUSOBJ)/centronics/dsjoy.o
 BUSOBJS += $(BUSOBJ)/centronics/image.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/rs232/rs232.h,BUSES += RS232
+#-------------------------------------------------
+
+ifneq ($(filter RS232,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/rs232/keyboard.o
+BUSOBJS += $(BUSOBJ)/rs232/null_modem.o
+BUSOBJS += $(BUSOBJ)/rs232/rs232.o
+BUSOBJS += $(BUSOBJ)/rs232/ser_mouse.o
+BUSOBJS += $(BUSOBJ)/rs232/terminal.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/midi/midi.h,BUSES += MIDI
+#-------------------------------------------------
+
+ifneq ($(filter MIDI,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/midi/midi.o
+BUSOBJS += $(BUSOBJ)/midi/midiinport.o
+BUSOBJS += $(BUSOBJ)/midi/midioutport.o
+endif

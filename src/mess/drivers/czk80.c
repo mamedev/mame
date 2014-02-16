@@ -49,16 +49,18 @@ I/O ports: These ranges are what is guessed
 #include "machine/z80ctc.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class czk80_state : public driver_device
 {
 public:
 	czk80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-		, m_fdc(*this, "fdc")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG),
+		m_fdc(*this, "fdc")
+	{
+	}
 
 	DECLARE_DRIVER_INIT(czk80);
 	DECLARE_MACHINE_RESET(czk80);
@@ -162,8 +164,8 @@ static Z80DART_INTERFACE( dart_intf )
 	0, 0, 0, 0,
 
 	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_dtr),
+	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
 	DEVCB_NULL,
 	DEVCB_NULL,
 

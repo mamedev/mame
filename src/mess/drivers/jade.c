@@ -18,16 +18,18 @@
 #include "machine/i8251.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class jade_state : public driver_device
 {
 public:
 	jade_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-		, m_uart(*this, "uart")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG),
+		m_uart(*this, "uart")
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(keyin_r);
@@ -83,17 +85,6 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_DRIVER_MEMBER(jade_state, kbd_put)
 };
 
-static const i8251_interface uart_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 void jade_state::machine_reset()
 {
 	m_term_data = 0;
@@ -109,7 +100,7 @@ static MACHINE_CONFIG_START( jade, jade_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	/* Devices */
-	MCFG_I8251_ADD("uart", uart_intf)
+	MCFG_DEVICE_ADD("uart", I8251, 0)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -190,7 +190,7 @@ void skydiver_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			sx -= 8;
 		}
 
-		drawgfxzoom_transpen(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->zoom_transpen(bitmap,cliprect,
 			charcode, color,
 			xflip,yflip,sx,sy,
 			wide ? 0x20000 : 0x10000, 0x10000,0);

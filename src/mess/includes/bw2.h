@@ -14,7 +14,6 @@
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "machine/wd_fdc.h"
 #include "video/msm6255.h"
 #include "rendlay.h"

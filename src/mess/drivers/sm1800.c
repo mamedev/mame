@@ -190,7 +190,7 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
 	/* Devices */
 	MCFG_I8255_ADD ("i8255", sm1800_ppi8255_interface )
 	MCFG_I8275_ADD  ("i8275", sm1800_i8275_interface)
-	MCFG_I8251_ADD("i8251", default_i8251_interface)
+	MCFG_DEVICE_ADD("i8251", I8251, 0)
 MACHINE_CONFIG_END
 
 /* ROM definition */

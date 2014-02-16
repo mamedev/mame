@@ -10,104 +10,99 @@
 #define __I8251_H__
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define I8251_EXPECTING_MODE        0x01
-#define I8251_EXPECTING_SYNC_BYTE   0x02
-
-#define I8251_STATUS_FRAMING_ERROR  0x20
-#define I8251_STATUS_OVERRUN_ERROR  0x10
-#define I8251_STATUS_PARITY_ERROR   0x08
-#define I8251_STATUS_TX_EMPTY       0x04
-#define I8251_STATUS_RX_READY       0x02
-#define I8251_STATUS_TX_READY       0x01
-
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_I8251_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, I8251, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define MCFG_I8251_TXD_HANDLER(_devcb) \
+	devcb = &i8251_device::set_txd_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_I8251_REMOVE(_tag) \
-	MCFG_DEVICE_REMOVE(_tag)
+#define MCFG_I8251_DTR_HANDLER(_devcb) \
+	devcb = &i8251_device::set_dtr_handler(*device, DEVCB2_##_devcb);
 
+#define MCFG_I8251_RTS_HANDLER(_devcb) \
+	devcb = &i8251_device::set_rts_handler(*device, DEVCB2_##_devcb);
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-// ======================> i8251_interface
+#define MCFG_I8251_RXRDY_HANDLER(_devcb) \
+	devcb = &i8251_device::set_rxrdy_handler(*device, DEVCB2_##_devcb);
 
-struct i8251_interface
-{
-	devcb_write_line    m_out_txd_cb;
-	devcb_write_line    m_out_dtr_cb;
-	devcb_write_line    m_out_rts_cb;
-	devcb_write_line    m_out_rxrdy_cb;
-	devcb_write_line    m_out_txrdy_cb;
-	devcb_write_line    m_out_txempty_cb;
-	devcb_write_line    m_out_syndet_cb;
-};
+#define MCFG_I8251_TXRDY_HANDLER(_devcb) \
+	devcb = &i8251_device::set_txrdy_handler(*device, DEVCB2_##_devcb);
 
-// ======================> i8251_device
+#define MCFG_I8251_TXEMPTY_HANDLER(_devcb) \
+	devcb = &i8251_device::set_txempty_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_I8251_SYNDET_HANDLER(_devcb) \
+	devcb = &i8251_device::set_syndet_handler(*device, DEVCB2_##_devcb);
 
 class i8251_device :  public device_t,
-						public device_serial_interface,
-						public i8251_interface
+	public device_serial_interface
 {
 public:
 	// construction/destruction
 	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	/* read data register */
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_txd_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txd_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dtr_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_dtr_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_rts_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_rts_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_rxrdy_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_rxrdy_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_txrdy_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txrdy_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_txempty_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txempty_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_syndet_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_syndet_handler.set_callback(object); }
+
 	DECLARE_READ8_MEMBER(data_r);
-
-	/* read status register */
-	DECLARE_READ8_MEMBER(status_r);
-
-	/* write data register */
 	DECLARE_WRITE8_MEMBER(data_w);
-
-	/* write control word */
+	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 
-	/* The 8251 has seperate transmit and receive clocks */
-	/* use these two functions to update the i8251 for each clock */
-	/* on NC100 system, the clocks are the same */
-	void transmit_clock();
-	void receive_clock();
-
-	DECLARE_WRITE_LINE_MEMBER( txc_w ) { if (state) transmit_clock(); }
-	DECLARE_WRITE_LINE_MEMBER( rxc_w ) { if (state) receive_clock(); }
-
-	DECLARE_WRITE_LINE_MEMBER( write_rx );
+	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 	DECLARE_WRITE_LINE_MEMBER( write_cts );
 	DECLARE_WRITE_LINE_MEMBER( write_dsr );
+	DECLARE_WRITE_LINE_MEMBER( write_txc );
+	DECLARE_WRITE_LINE_MEMBER( write_rxc );
 
+	/// TODO: REMOVE THIS
 	void receive_character(UINT8 ch);
 
-	virtual void input_callback(UINT8 state);
+	/// TODO: this shouldn't be public
+	enum
+	{
+		I8251_STATUS_FRAMING_ERROR = 0x20,
+		I8251_STATUS_OVERRUN_ERROR = 0x10,
+		I8251_STATUS_PARITY_ERROR = 0x08,
+		I8251_STATUS_TX_EMPTY = 0x04,
+		I8251_STATUS_RX_READY = 0x02,
+		I8251_STATUS_TX_READY = 0x01
+	};
+
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	void update_rx_ready();
 	void update_tx_ready();
 	void update_tx_empty();
+	void transmit_clock();
+	void receive_clock();
+	virtual void input_callback(UINT8 state);
+
+	enum
+	{
+		I8251_EXPECTING_MODE = 0x01,
+		I8251_EXPECTING_SYNC_BYTE = 0x02
+	};
+
 private:
-	devcb_resolved_write_line   m_out_txd_func;
-	devcb_resolved_write_line   m_out_dtr_func;
-	devcb_resolved_write_line   m_out_rts_func;
-	devcb_resolved_write_line   m_out_rxrdy_func;
-	devcb_resolved_write_line   m_out_txrdy_func;
-	devcb_resolved_write_line   m_out_txempty_func;
-	devcb_resolved_write_line   m_out_syndet_func;
+	devcb2_write_line m_txd_handler;
+	devcb2_write_line m_dtr_handler;
+	devcb2_write_line m_rts_handler;
+	devcb2_write_line m_rxrdy_handler;
+	devcb2_write_line m_txrdy_handler;
+	devcb2_write_line m_txempty_handler;
+	devcb2_write_line m_syndet_handler;
 
 	/* flags controlling how i8251_control_w operates */
 	UINT8 m_flags;
@@ -125,16 +120,17 @@ private:
 
 	int m_rxc;
 	int m_txc;
+	int m_rxc_count;
+	int m_txc_count;
 	int m_br_factor;
 
 	/* data being received */
 	UINT8 m_data;
-	bool m_tx_busy, m_disable_tx_pending;
+	bool m_tx_busy;
+	bool m_disable_tx_pending;
 };
 
 // device type definition
 extern const device_type I8251;
-
-extern const i8251_interface default_i8251_interface;
 
 #endif /* __I8251_H__ */

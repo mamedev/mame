@@ -69,36 +69,6 @@ The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and 
 //#define DEBUG_KEYS
 //#define DEBUG_MESSAGE
 
-
-/*-------------------------------------------------
-    palette.h like macros
--------------------------------------------------*/
-
-//#define MAKE_ARGB_RGB(a, rgb) MAKE_ARGB(a, RGB_RED(rgb), RGB_GREEN(rgb), RGB_BLUE(rgb))
-#define MAKE_ARGB_RGB(a, rgb)   ((((rgb_t)(a) & 0xff) << 24) | ((rgb) & 0xffffff))
-
-/*-------------------------------------------------
-    drawgfxm.h like macros
--------------------------------------------------*/
-
-// combine in 'alpha' when copying to store in ARGB
-#define PIXEL_OP_REMAP_TRANS0_ALPHASTORE32(DEST, PRIORITY, SOURCE)                                  \
-do                                                                                                  \
-{                                                                                                   \
-	UINT32 srcdata = (SOURCE);                                                                      \
-	if (srcdata != 0)                                                                               \
-		(DEST) = MAKE_ARGB_RGB(alpha,paldata[srcdata]);                                             \
-}                                                                                                   \
-while (0)
-// combine in 'alphatable' value to store in ARGB
-#define PIXEL_OP_REMAP_TRANS0_ALPHATABLESTORE32(DEST, PRIORITY, SOURCE)                             \
-do                                                                                                  \
-{                                                                                                   \
-	UINT32 srcdata = (SOURCE);                                                                      \
-	if (srcdata != 0)                                                                               \
-		(DEST) = MAKE_ARGB_RGB(alphatable[srcdata], paldata[srcdata]);                              \
-}                                                                                                   \
-while (0)
 // take ARGB pixel with stored alpha and blend in to RGB32 bitmap
 #define PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(DEST, PRIORITY, SOURCE)                             \
 do                                                                                                  \
@@ -126,15 +96,7 @@ do                                                                              
 		(DEST) = srcdata;                                                                           \
 }                                                                                                   \
 while (0)
-// drawgfxm.h macro to render alpha into 32-bit buffer
-#define PIXEL_OP_REMAP_TRANS0_ALPHATABLE32(DEST, PRIORITY, SOURCE)                                  \
-do                                                                                                  \
-{                                                                                                   \
-	UINT32 srcdata = (SOURCE);                                                                      \
-	if (srcdata != 0)                                                                               \
-		(DEST) = alpha_blend_r32((DEST), paldata[srcdata], alphatable[srcdata]);                    \
-}                                                                                                   \
-while (0)
+
 /*-------------------------------------------------
     draw_scanline32_alpha - take an RGB-encoded UINT32
     scanline and alpha-blend it into the destination bitmap
@@ -171,89 +133,6 @@ void psikyosh_state::draw_scanline32_transpen(bitmap_rgb32 &bitmap, INT32 destx,
 	DRAWSCANLINE_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN_RENDER32, NO_PRIORITY);
 }
 
-/*-------------------------------------------------
-    drawgfx_alphastore - render a gfx element with
-    a single transparent pen, storing the alpha value
-    in alpha field of ARGB32, negative alpha implies alphatable
--------------------------------------------------*/
-static void drawgfx_alphastore(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
-		int fixedalpha)
-{
-	psikyosh_state *state = gfx->machine().driver_data<psikyosh_state>();
-	UINT8 *alphatable = state->m_alphatable;
-	DECLARE_NO_PRIORITY;
-	const pen_t *paldata;
-
-	assert(dest.bpp() == 32);
-	assert(dest.format() == BITMAP_FORMAT_ARGB32);
-	assert(gfx != NULL);
-	assert(alphatable != NULL);
-
-	/* if we have a fixed alpha, call the standard drawgfx_transpen */
-	if (fixedalpha == 0xff)
-	{
-		drawgfx_transpen(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, 0);
-		return;
-	}
-
-	/* get final code and color, and grab lookup tables */
-	code %= gfx->elements();
-	color %= gfx->colors();
-	paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * color];
-
-	/* early out if completely transparent */
-	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << 0)) == 0)
-		return;
-
-	if (fixedalpha >= 0)
-	{
-		UINT8 alpha = fixedalpha;
-		DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANS0_ALPHASTORE32, NO_PRIORITY);
-	}
-	else
-	{
-		DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANS0_ALPHATABLESTORE32, NO_PRIORITY);
-	}
-}
-
-/*-------------------------------------------------
-    drawgfx_alphatable - render a sprite with either
-    a fixed alpha value, or if alpha==-1 then uses
-    the per-pen alphatable[] array
- -------------------------------------------------*/
-static void drawgfx_alphatable(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
-		int fixedalpha)
-{
-	psikyosh_state *state = gfx->machine().driver_data<psikyosh_state>();
-	UINT8 *alphatable = state->m_alphatable;
-	DECLARE_NO_PRIORITY;
-
-	const pen_t *paldata;
-
-	/* if we have a fixed alpha, call the standard drawgfx_alpha */
-	if (fixedalpha >= 0)
-	{
-		drawgfx_alpha(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, 0, fixedalpha);
-		return;
-	}
-
-	assert(dest.bpp() == 32);
-	assert(gfx != NULL);
-	assert(alphatable != NULL);
-
-	/* get final code and color, and grab lookup tables */
-	code %= gfx->elements();
-	color %= gfx->colors();
-	paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * color];
-
-	/* early out if completely transparent */
-	if (gfx->has_pen_usage() && (gfx->pen_usage(code) & ~(1 << 0)) == 0)
-		return;
-
-	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANS0_ALPHATABLE32, NO_PRIORITY);
-}
 
 /* Psikyo PS6406B */
 /* --- BACKGROUNDS --- */
@@ -305,14 +184,14 @@ void psikyosh_state::draw_bglayer( int layer, bitmap_rgb32 &bitmap, const rectan
 				tileno = (m_bgram[(tilebank * 0x800) / 4 + offs - 0x4000 / 4] & 0x0007ffff); /* seems to take into account spriteram, hence -0x4000 */
 				colour = (m_bgram[(tilebank * 0x800) / 4 + offs - 0x4000 / 4] & 0xff000000) >> 24;
 
-				drawgfx_alphatable(bitmap, cliprect, gfx, tileno, colour, 0, 0, (16 * sx + scrollx) & 0x1ff, ((16 * sy + scrolly) & (width - 1)), alpha); /* normal */
+				gfx->alphatable(bitmap, cliprect, tileno, colour, 0, 0, (16 * sx + scrollx) & 0x1ff, ((16 * sy + scrolly) & (width - 1)), alpha, m_alphatable); /* normal */
 
 				if (scrollx)
-					drawgfx_alphatable(bitmap, cliprect, gfx, tileno, colour, 0, 0, ((16 * sx + scrollx) & 0x1ff) - 0x200, ((16 * sy + scrolly) & (width - 1)), alpha); /* wrap x */
+					gfx->alphatable(bitmap, cliprect, tileno, colour, 0, 0, ((16 * sx + scrollx) & 0x1ff) - 0x200, ((16 * sy + scrolly) & (width - 1)), alpha, m_alphatable); /* wrap x */
 				if (scrolly)
-					drawgfx_alphatable(bitmap, cliprect, gfx, tileno, colour, 0, 0, (16 * sx + scrollx) & 0x1ff, ((16 * sy + scrolly) & (width - 1)) - width, alpha); /* wrap y */
+					gfx->alphatable(bitmap, cliprect, tileno, colour, 0, 0, (16 * sx + scrollx) & 0x1ff, ((16 * sy + scrolly) & (width - 1)) - width, alpha, m_alphatable); /* wrap y */
 				if (scrollx && scrolly)
-					drawgfx_alphatable(bitmap, cliprect, gfx, tileno, colour, 0, 0, ((16 * sx + scrollx) & 0x1ff) - 0x200, ((16 * sy + scrolly) & (width - 1)) - width, alpha); /* wrap xy */
+					gfx->alphatable(bitmap, cliprect, tileno, colour, 0, 0, ((16 * sx + scrollx) & 0x1ff) - 0x200, ((16 * sy + scrolly) & (width - 1)) - width, alpha, m_alphatable); /* wrap xy */
 
 				offs++;
 			}
@@ -353,7 +232,7 @@ void psikyosh_state::cache_bitmap(int scanline, gfx_element *gfx, int size, int 
 			int need_alpha = alpha < 0 ? -1 : 0xff; // store per-pen alpha in bitmap, otherwise don't since we'll need it per-line
 
 			if(tileno) { // valid tile, but blank in all games?
-				drawgfx_alphastore(m_bg_bitmap, m_bg_bitmap.cliprect(), gfx, tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha);
+				gfx->alphastore(m_bg_bitmap, m_bg_bitmap.cliprect(), tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha, m_alphatable);
 			}
 
 			offs++;

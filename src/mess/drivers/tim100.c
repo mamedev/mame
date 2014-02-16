@@ -136,8 +136,8 @@ static MACHINE_CONFIG_START( tim100, tim100_state )
 
 	MCFG_PALETTE_LENGTH(3)
 
-	MCFG_I8251_ADD("uart_u17", default_i8251_interface)
-	MCFG_I8251_ADD("uart_u18", default_i8251_interface)
+	MCFG_DEVICE_ADD("uart_u17", I8251, 0)
+	MCFG_DEVICE_ADD("uart_u18", I8251, 0)
 MACHINE_CONFIG_END
 
 /* ROM definition */

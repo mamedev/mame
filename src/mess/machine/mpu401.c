@@ -37,6 +37,9 @@
 ***************************************************************************/
 
 #include "machine/mpu401.h"
+#include "bus/midi/midi.h"
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
 
 #define M6801_TAG   "mpu6801"
 #define ROM_TAG     "mpurom"
@@ -78,12 +81,12 @@ MACHINE_CONFIG_FRAGMENT( mpu401 )
 	MCFG_CPU_ADD(M6801_TAG, M6801, 4000000) /* 4 MHz as per schematics */
 	MCFG_CPU_PROGRAM_MAP(mpu401_map)
 	MCFG_CPU_IO_MAP(mpu401_io_map)
-	MCFG_M6801_SER_TX(WRITELINE(mpu401_device, mpu401_midi_tx))
+	MCFG_M6801_SER_TX(DEVWRITELINE(MIDIOUT_TAG, midi_port_device, write_txd))
 
-	MCFG_SERIAL_PORT_ADD(MIDIIN_TAG, midiin_slot, "midiin")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, mpu401_device, midi_rx_w))
+	MCFG_MIDI_PORT_ADD(MIDIIN_TAG, midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, mpu401_device, midi_rx_w))
 
-	MCFG_SERIAL_PORT_ADD(MIDIOUT_TAG, midiout_slot, "midiout")
+	MCFG_MIDI_PORT_ADD(MIDIOUT_TAG, midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
 ROM_START( mpu401 )
@@ -127,7 +130,6 @@ const rom_entry *mpu401_device::device_rom_region() const
 mpu401_device::mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, MPU401, "Roland MPU-401 I/O box", tag, owner, clock, "mpu401", __FILE__),
 	m_ourcpu(*this, M6801_TAG),
-	m_mdout(*this, MIDIOUT_TAG),
 	write_irq(*this)
 {
 }
@@ -292,10 +294,4 @@ WRITE_LINE_MEMBER( mpu401_device::midi_rx_w )
 	{
 		m_port2 &= ~P2_MIDI_IN;
 	}
-}
-
-// MIDI send
-WRITE_LINE_MEMBER(mpu401_device::mpu401_midi_tx)
-{
-	m_mdout->tx(state);
 }

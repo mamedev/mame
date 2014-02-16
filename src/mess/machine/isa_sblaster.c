@@ -9,8 +9,10 @@
 
 ***************************************************************************/
 
-#include "emu.h"
 #include "isa_sblaster.h"
+#include "bus/midi/midi.h"
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
 #include "sound/speaker.h"
 #include "sound/3812intf.h"
 #include "sound/262intf.h"
@@ -87,10 +89,10 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_PC_JOY_ADD("pc_joy")
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
@@ -106,10 +108,10 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_PC_JOY_ADD("pc_joy")
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
@@ -125,10 +127,10 @@ static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_PC_JOY_ADD("pc_joy")
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
 static READ8_DEVICE_HANDLER( ym3812_16_r )
@@ -1656,7 +1658,7 @@ void sb_device::tra_complete()    // Tx completed sending byte
 void sb_device::tra_callback()    // Tx send bit
 {
 	int bit = transmit_register_get_data_bit();
-	m_mdout->tx(bit);
+	m_mdout->write_txd(bit);
 }
 
 void sb_device::xmit_char(UINT8 data)

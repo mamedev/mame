@@ -178,16 +178,14 @@ NOTES:
 
 ***************************************************************************/
 
-#include "emu.h"
+#include "bus/midi/midi.h"
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/es5503.h"
 #include "machine/n68681.h"
 #include "machine/wd_fdc.h"
-
 #include "machine/esqpanel.h"
-#include "machine/serial.h"
-#include "machine/midiinport.h"
-#include "machine/midioutport.h"
 
 #define WD1772_TAG      "wd1772"
 
@@ -399,7 +397,7 @@ public:
 	required_device<esq1_filters> m_filters;
 	optional_device<wd1772_t> m_fdc;
 	optional_device<esqpanel2x40_device> m_panel;
-	optional_device<serial_port_device> m_mdout;
+	optional_device<midi_port_device> m_mdout;
 
 	DECLARE_READ8_MEMBER(wd1772_r);
 	DECLARE_WRITE8_MEMBER(wd1772_w);
@@ -559,7 +557,7 @@ WRITE8_MEMBER(esq1_state::duart_output)
 // MIDI send
 WRITE_LINE_MEMBER(esq1_state::duart_tx_a)
 {
-	m_mdout->tx(state);
+	m_mdout->write_txd(state);
 }
 
 WRITE_LINE_MEMBER(esq1_state::duart_tx_b)
@@ -613,10 +611,10 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
 
 	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
 
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -106,7 +106,7 @@ void kickgoal_state::kickgoal_draw_sprites(bitmap_ind16 &bitmap,const rectangle 
 
 		ypos = 0x110 - ypos;
 
-		drawgfx_transpen(bitmap,cliprect,gfx,
+		gfx->transpen(bitmap,cliprect,
 				tileno+m_sprbase,
 				0x30 + color,
 				flipx,0,

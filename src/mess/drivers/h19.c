@@ -39,6 +39,7 @@
 #include "machine/ins8250.h"
 #include "machine/keyboard.h"
 
+#define KEYBOARD_TAG "keyboard"
 
 #define H19_CLOCK (XTAL_12_288MHz / 6)
 #define H19_BEEP_FRQ (H19_CLOCK / 1024)
@@ -54,12 +55,13 @@ public:
 
 	h19_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_crtc(*this, "crtc"),
-			m_ace(*this, "ins8250"),
-			m_beep(*this, "beeper"),
-			m_p_videoram(*this, "videoram")
-	{ }
+		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "crtc"),
+		m_ace(*this, "ins8250"),
+		m_beep(*this, "beeper"),
+		m_p_videoram(*this, "videoram")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;

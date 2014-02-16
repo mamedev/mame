@@ -128,7 +128,7 @@ void sauro_state::sauro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine().gfx[2],
+		 machine().gfx[2]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,
@@ -199,7 +199,7 @@ void sauro_state::trckydoc_draw_sprites(bitmap_ind16 &bitmap, const rectangle &c
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect,machine().gfx[1],
+		machine().gfx[1]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,

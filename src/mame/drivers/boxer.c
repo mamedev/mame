@@ -173,8 +173,8 @@ void boxer_state::draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 				code = p[32 * l + 4 * i + j];
 
-				drawgfx_transpen(bitmap, cliprect,
-					machine().gfx[n],
+				
+					machine().gfx[n]->transpen(bitmap,cliprect,
 					code,
 					0,
 					code & 0x80, 0,
@@ -183,8 +183,8 @@ void boxer_state::draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 				code = p[32 * r + 4 * i - j + 3];
 
-				drawgfx_transpen(bitmap, cliprect,
-					machine().gfx[n],
+				
+					machine().gfx[n]->transpen(bitmap,cliprect,
 					code,
 					0,
 					!(code & 0x80), 0,
@@ -208,8 +208,8 @@ UINT32 boxer_state::screen_update_boxer(screen_device &screen, bitmap_ind16 &bit
 		{
 			UINT8 code = m_tile_ram[32 * i + j];
 
-			drawgfx_transpen(bitmap, cliprect,
-				machine().gfx[2],
+			
+				machine().gfx[2]->transpen(bitmap,cliprect,
 				code,
 				0,
 				code & 0x40, code & 0x40,

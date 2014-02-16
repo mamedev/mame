@@ -57,15 +57,18 @@ ToDo:
 #include "sound/ay8910.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class sbc6510_state : public driver_device
 {
 public:
 	sbc6510_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") ,
-		m_videocpu(*this, "videocpu") ,
-		m_terminal(*this, TERMINAL_TAG) { }
+		m_maincpu(*this, "maincpu"),
+		m_videocpu(*this, "videocpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
 	DECLARE_READ8_MEMBER(a2_r);
 	DECLARE_WRITE8_MEMBER(a2_w);

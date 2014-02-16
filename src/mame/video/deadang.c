@@ -116,7 +116,7 @@ void deadang_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 			if (fy) fy=0; else fy=1;
 		}
 
-		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->prio_transpen(bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y,
 				screen.priority(),pri,15);

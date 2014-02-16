@@ -541,7 +541,7 @@ void vdt911_refresh(device_t *device, bitmap_ind16 &bitmap, const rectangle &cli
 
 				address++;
 
-				drawgfx_opaque(bitmap, cliprect, gfx, cur_char, color, 0, 0,
+				 gfx->opaque(bitmap,cliprect, cur_char, color, 0, 0,
 						x+j*7, y+i*10);
 			}
 		}

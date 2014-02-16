@@ -277,7 +277,7 @@ void fastfred_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,flip_screen_x() ? spritevisibleareaflipx : spritevisiblearea,machine().gfx[1],
+		machine().gfx[1]->transpen(bitmap,flip_screen_x() ? spritevisibleareaflipx : spritevisiblearea,
 				code,
 				m_colorbank | (m_spriteram[offs + 2] & 0x07),
 				flipx,flipy,

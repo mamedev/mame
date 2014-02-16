@@ -23,6 +23,7 @@
 #include "machine/keyboard.h"
 #include "sound/beep.h"
 
+#define KEYBOARD_TAG "keyboard"
 
 class zrt80_state : public driver_device
 {
@@ -33,13 +34,14 @@ public:
 	};
 
 	zrt80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_p_videoram(*this, "videoram")
-		, m_maincpu(*this, "maincpu")
-		, m_crtc(*this, "crtc")
-		, m_8250(*this, "ins8250")
-		, m_beep(*this, "beeper")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_p_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "crtc"),
+		m_8250(*this, "ins8250"),
+		m_beep(*this, "beeper")
+	{
+	}
 
 	DECLARE_READ8_MEMBER(zrt80_10_r);
 	DECLARE_WRITE8_MEMBER(zrt80_30_w);

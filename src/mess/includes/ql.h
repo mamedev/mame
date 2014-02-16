@@ -5,8 +5,8 @@
 #ifndef __QL__
 #define __QL__
 
+#include "bus/rs232/rs232.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "machine/wd17xx.h"
 
 #define SCREEN_TAG  "screen"

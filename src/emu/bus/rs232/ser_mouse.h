@@ -7,8 +7,7 @@
 #ifndef SER_MOUSE_H_
 #define SER_MOUSE_H_
 
-#include "emu.h"
-#include "machine/serial.h"
+#include "rs232.h"
 
 class serial_mouse_device :
 		public device_t,
@@ -37,7 +36,6 @@ private:
 	UINT8 m_head, m_tail, m_mb;
 
 	emu_timer *m_timer;
-	rs232_port_device *m_owner;
 	bool m_enabled;
 
 	required_ioport m_x;
@@ -49,29 +47,38 @@ class microsoft_mouse_device : public serial_mouse_device
 {
 public:
 	microsoft_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void dtr_w(UINT8 state) { m_dtr = state; check_state(); }
-	virtual void rts_w(UINT8 state) { m_rts = state; check_state(); m_old_rts = state; }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) { m_dtr = state; check_state(); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_rts ) { m_rts = state; check_state(); m_old_rts = state; }
+
 protected:
 	virtual void set_frame() { set_data_frame(1, 7, PARITY_NONE, STOP_BITS_2); }
 	virtual void mouse_trans(int dx, int dy, int nb, int mbc);
 	virtual void device_reset() {m_old_rts = 0; serial_mouse_device::device_reset();}
+
 private:
 	void check_state();
-	UINT8 m_old_rts;
+	int m_dtr;
+	int m_rts;
+	int m_old_rts;
 };
+
 extern const device_type MSFT_SERIAL_MOUSE;
 
 class mouse_systems_mouse_device : public serial_mouse_device
 {
 public:
 	mouse_systems_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void dtr_w(UINT8 state) { m_dtr = state; check_state(); }
-	virtual void rts_w(UINT8 state) { m_rts = state; check_state(); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) { m_dtr = state; check_state(); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_rts ) { m_rts = state; check_state(); }
+
 protected:
 	virtual void set_frame() { set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2); }
 	virtual void mouse_trans(int dx, int dy, int nb, int mbc);
+
 private:
 	void check_state() { set_mouse_enable((m_dtr && m_rts)?true:false); }
+	int m_dtr;
+	int m_rts;
 };
 
 extern const device_type MSYSTEM_SERIAL_MOUSE;

@@ -9,11 +9,10 @@
 #ifndef AVIGO_H_
 #define AVIGO_H_
 
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/rp5c01.h"
 #include "machine/ins8250.h"
-#include "machine/serial.h"
-#include "machine/null_modem.h"
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
 #include "sound/speaker.h"

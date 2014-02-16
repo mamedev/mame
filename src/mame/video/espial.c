@@ -184,11 +184,11 @@ void espial_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		{
 			if (m_flipscreen)
 			{
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+				machine().gfx[1]->transpen(bitmap,cliprect,
 						code,color,
 						flipx,flipy,
 						sx,sy + 16,0);
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+				machine().gfx[1]->transpen(bitmap,cliprect,
 						code + 1,
 						color,
 						flipx,flipy,
@@ -196,11 +196,11 @@ void espial_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 			}
 			else
 			{
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+				machine().gfx[1]->transpen(bitmap,cliprect,
 						code,color,
 						flipx,flipy,
 						sx,sy - 16,0);
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+				machine().gfx[1]->transpen(bitmap,cliprect,
 						code + 1,color,
 						flipx,flipy,
 						sx,sy,0);
@@ -208,7 +208,7 @@ void espial_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		}
 		else
 		{
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+			machine().gfx[1]->transpen(bitmap,cliprect,
 					code,color,
 					flipx,flipy,
 					sx,sy,0);

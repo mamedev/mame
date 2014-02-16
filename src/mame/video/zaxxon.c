@@ -428,10 +428,10 @@ void zaxxon_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		int sx = find_minimum_x(spriteram[offs + 3], flip);
 
 		/* draw with 256 pixel offsets to ensure we wrap properly */
-		drawgfx_transpen(bitmap, cliprect, gfx, code, color, flipx, flipy, sx, sy, 0);
-		drawgfx_transpen(bitmap, cliprect, gfx, code, color, flipx, flipy, sx, sy - 0x100, 0);
-		drawgfx_transpen(bitmap, cliprect, gfx, code, color, flipx, flipy, sx - 0x100, sy, 0);
-		drawgfx_transpen(bitmap, cliprect, gfx, code, color, flipx, flipy, sx - 0x100, sy - 0x100, 0);
+		 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+		 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy - 0x100, 0);
+		 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, sx - 0x100, sy, 0);
+		 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, sx - 0x100, sy - 0x100, 0);
 	}
 }
 

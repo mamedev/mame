@@ -64,13 +64,15 @@
 	</software>
 
 	<software name="bbsb">
-		<description>Bounty Bob Strikes Back! v1.2</description>
+		<description>Bounty Bob Strikes Back! (v1.2)</description>
 		<year>1985</year>
 		<publisher>Big Five</publisher>
 		<info name="protection" value="halftrack" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
+			<!-- will not load if disk is not write protected -->
+			<feature name="read_only" value="true"/>
 			<dataarea name="flop" size="208212">
 				<rom name="bbsb.g64" size="208212" crc="69456d8c" sha1="26801eda258f748aa6f6c45df8af7f7cbb2857d4" offset="0" />
 			</dataarea>

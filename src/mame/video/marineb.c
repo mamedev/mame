@@ -213,7 +213,7 @@ UINT32 marineb_state::screen_update_marineb(screen_device &screen, bitmap_ind16 
 			sx++;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[gfx],
+		machine().gfx[gfx]->transpen(bitmap,cliprect,
 				code,
 				col,
 				flipx,flipy,
@@ -255,7 +255,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 			sx++;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->transpen(bitmap,cliprect,
 				code >> 2,
 				col,
 				flipx,flipy,
@@ -284,7 +284,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 
 	code >>= 4;
 
-	drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+	machine().gfx[2]->transpen(bitmap,cliprect,
 			code,
 			col,
 			flipx,flipy,
@@ -292,7 +292,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 
 	/* draw again for wrap around */
 
-	drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+	machine().gfx[2]->transpen(bitmap,cliprect,
 			code,
 			col,
 			flipx,flipy,
@@ -350,7 +350,7 @@ UINT32 marineb_state::screen_update_springer(screen_device &screen, bitmap_ind16
 			sx--;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[gfx],
+		machine().gfx[gfx]->transpen(bitmap,cliprect,
 				code,
 				col,
 				flipx,flipy,
@@ -393,7 +393,7 @@ UINT32 marineb_state::screen_update_hoccer(screen_device &screen, bitmap_ind16 &
 			flipx = !flipx;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->transpen(bitmap,cliprect,
 				code >> 2,
 				col,
 				flipx,flipy,
@@ -451,7 +451,7 @@ UINT32 marineb_state::screen_update_hopprobo(screen_device &screen, bitmap_ind16
 			sx--;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[gfx],
+		machine().gfx[gfx]->transpen(bitmap,cliprect,
 				code,
 				col,
 				flipx,flipy,

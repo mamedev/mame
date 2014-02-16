@@ -110,7 +110,7 @@ UINT32 murogmbl_state::screen_update_murogmbl(screen_device &screen, bitmap_ind1
 		for (x = 0; x < 32; x++)
 		{
 			int tile = m_video[count];
-			drawgfx_opaque(bitmap, cliprect, gfx, tile, 0, 0, 0, x * 8, y * 8);
+			 gfx->opaque(bitmap,cliprect, tile, 0, 0, 0, x * 8, y * 8);
 
 			count++;
 		}

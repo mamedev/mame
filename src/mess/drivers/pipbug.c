@@ -37,7 +37,7 @@
 
 ****************************************************************************/
 
-#include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/terminal.h"
 #include "imagedev/snapquik.h"
@@ -168,11 +168,11 @@ static MACHINE_CONFIG_START( pipbug, pipbug_state )
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(pipbug_mem)
 	MCFG_CPU_IO_MAP(pipbug_io)
-	MCFG_S2650_FLAG_HANDLER(DEVWRITELINE("rs232", rs232_port_device, tx))
+	MCFG_S2650_FLAG_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
 	/* video hardware */
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("maincpu", s2650_device, write_sense))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu", s2650_device, write_sense))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 
 	/* quickload */

@@ -2,7 +2,7 @@
 
     cgen_cas.h
 
-    Format code for EACA Colour Genie .cas casette files.
+    Format code for EACA Colour Genie .cas cassette files.
 
 *********************************************************************/
 

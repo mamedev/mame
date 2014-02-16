@@ -4,7 +4,7 @@
 
     phc25_cas.h
 
-    Format code for Sanyo PHC25 casette images (phc format)
+    Format code for Sanyo PHC25 cassette images (phc format)
 
 *********************************************************************/
 

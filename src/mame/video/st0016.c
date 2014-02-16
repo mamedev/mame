@@ -509,7 +509,7 @@ void st0016_state::draw_bgmap(bitmap_ind16 &bitmap,const rectangle &cliprect, in
 
 					if(priority)
 					{
-						drawgfx_transpen(bitmap,cliprect,gfx,
+						gfx->transpen(bitmap,cliprect,
 										code,
 										color,
 										flipx,flipy,

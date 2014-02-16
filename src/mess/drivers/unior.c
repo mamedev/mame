@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_I8251_ADD("uart", default_i8251_interface)
+	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_PIT8253_ADD( "pit", pit_intf )
 	MCFG_I8255_ADD( "ppi0", ppi0_intf )
 	MCFG_I8255_ADD( "ppi1", ppi1_intf )

@@ -5,7 +5,9 @@
  */
 
 
-#include "emu.h"
+#include "bus/midi/midi.h"
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
 #include "isa_gus.h"
 #include "sound/speaker.h"
 #include "machine/6850acia.h"
@@ -1204,7 +1206,7 @@ static ACIA6850_INTERFACE(gus_midi_interface)
 {
 	31250 * 16,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER("mdout", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("mdout", midi_port_device, write_txd),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,midi_irq)
 };
@@ -1237,10 +1239,10 @@ static MACHINE_CONFIG_FRAGMENT( gus_config )
 	MCFG_SOUND_ROUTE(0,"lspeaker",0.50)
 	MCFG_SOUND_ROUTE(1,"rspeaker",0.50)
 	MCFG_ACIA6850_ADD("midi",gus_midi_interface)
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, isa16_gus_device, midi_rx_w))
+	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, isa16_gus_device, midi_rx_w))
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
+	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( gus_joy )

@@ -22,6 +22,7 @@
 #include "machine/nes_mmc3.h"
 #include "machine/nes_mmc5.h"
 #include "machine/nes_bandai.h"
+#include "machine/nes_datach.h"
 #include "machine/nes_discrete.h"
 #include "machine/nes_event.h"
 #include "machine/nes_irem.h"

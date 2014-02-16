@@ -9,7 +9,6 @@
 #ifndef __A2BUS_SSC__
 #define __A2BUS_SSC__
 
-#include "emu.h"
 #include "a2bus.h"
 #include "machine/mos6551.h"
 

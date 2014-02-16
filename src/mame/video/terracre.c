@@ -81,8 +81,8 @@ void terracre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				flipy = !flipy;
 		}
 
-		drawgfx_transpen(
-			bitmap,cliprect,pGfx,tile, color,flipx,flipy,sx,sy,transparent_pen );
+		pGfx->transpen(
+			bitmap,cliprect,tile, color,flipx,flipy,sx,sy,transparent_pen );
 
 		pSource += 4;
 	}

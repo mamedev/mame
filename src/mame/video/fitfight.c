@@ -34,7 +34,7 @@ void fitfight_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		if (end) break;
 		if (prio == layer)
-			drawgfx_transpen(bitmap, cliprect, gfx, number, colr, xflip, yflip, xpos, ypos, 0);
+			 gfx->transpen(bitmap,cliprect, number, colr, xflip, yflip, xpos, ypos, 0);
 
 		source += 4;
 	}

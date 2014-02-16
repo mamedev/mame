@@ -21,7 +21,6 @@
 #include "machine/pc1512kb.h"
 #include "machine/pc_fdc.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "sound/speaker.h"
 #include "video/mc6845.h"
 #include "video/isa_pc1640_iga.h"

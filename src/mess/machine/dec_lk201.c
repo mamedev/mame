@@ -429,7 +429,6 @@ ioport_constructor lk201_device::device_input_ports() const
 lk201_device::lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LK201, "DEC LK201 keyboard", tag, owner, clock, "lk201", __FILE__),
 	device_serial_interface(mconfig, *this),
-	m_tx_write(*this),
 	m_maincpu(*this, LK201_CPU_TAG),
 	m_speaker(*this, LK201_SPK_TAG),
 	m_kbd0(*this, "KBD0"),
@@ -449,7 +448,8 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 	m_kbd14(*this, "KBD14"),
 	m_kbd15(*this, "KBD15"),
 	m_kbd16(*this, "KBD16"),
-	m_kbd17(*this, "KBD17")
+	m_kbd17(*this, "KBD17"),
+	m_tx_handler(*this)
 {
 }
 
@@ -459,7 +459,7 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 
 void lk201_device::device_start()
 {
-	m_tx_write.resolve_safe();
+	m_tx_handler.resolve_safe();
 }
 
 
@@ -505,8 +505,7 @@ void lk201_device::tra_complete()
 
 void lk201_device::tra_callback()
 {
-	int bit = transmit_register_send_bit();
-	m_tx_write(bit);
+	m_tx_handler(transmit_register_send_bit());
 }
 
 void lk201_device::input_callback(UINT8 state)

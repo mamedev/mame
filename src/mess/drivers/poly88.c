@@ -196,7 +196,9 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 	MCFG_CASSETTE_ADD( "cassette", poly88_cassette_interface )
 
 	/* uart */
-	MCFG_I8251_ADD("uart", poly88_usart_interface)
+	MCFG_DEVICE_ADD("uart", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(WRITELINE(poly88_state,write_cas_tx))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(poly88_state,poly88_usart_rxready))
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", 0)

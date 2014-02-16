@@ -170,8 +170,8 @@ void pooyan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		int flipx = ~spriteram_2[offs] & 0x40;
 		int flipy = spriteram_2[offs] & 0x80;
 
-		drawgfx_transmask(bitmap,cliprect,
-			machine().gfx[1],
+		
+			machine().gfx[1]->transmask(bitmap,cliprect,
 			code,
 			color,
 			flipx, flipy,

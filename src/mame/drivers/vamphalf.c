@@ -664,7 +664,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 				y = 256 - y;
 			}
 
-			drawgfx_transpen(bitmap,clip,gfx,code,color,fx,fy,x,y,0);
+			gfx->transpen(bitmap,clip,code,color,fx,fy,x,y,0);
 		}
 	}
 }
@@ -725,7 +725,7 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 				y = 256 - y;
 			}
 
-			drawgfx_transpen(bitmap,clip,gfx,code,color,fx,fy,x,y,0);
+			gfx->transpen(bitmap,clip,code,color,fx,fy,x,y,0);
 		}
 	}
 }

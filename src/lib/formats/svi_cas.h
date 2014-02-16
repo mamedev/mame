@@ -2,7 +2,7 @@
 
     svi_cas.h
 
-    Format code for SVI casette files
+    Format code for SVI cassette files
 
 *********************************************************************/
 

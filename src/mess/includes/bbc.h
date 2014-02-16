@@ -11,6 +11,7 @@
 #ifndef BBC_H_
 #define BBC_H_
 
+#include "bus/rs232/rs232.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
 #include "machine/mc6854.h"
@@ -23,7 +24,6 @@
 #include "sound/sn76496.h"
 #include "sound/tms5220.h"
 #include "imagedev/cassette.h"
-#include "machine/serial.h"
 
 #define RS232_TAG       "rs232"
 

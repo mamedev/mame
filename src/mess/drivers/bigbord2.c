@@ -92,6 +92,7 @@ X - change banks
 #include "machine/wd_fdc.h"
 
 #define SCREEN_TAG      "screen"
+#define KEYBOARD_TAG    "keyboard"
 #define Z80_TAG         "u39"
 #define Z80SIO_TAG      "u16"
 #define Z80CTCA_TAG     "u37"
@@ -102,17 +103,18 @@ class bigbord2_state : public driver_device
 {
 public:
 	bigbord2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, Z80_TAG)
-		, m_6845(*this, "crtc")
-		, m_ctca(*this, Z80CTCA_TAG)
-		, m_ctcb(*this, Z80CTCA_TAG)
-		, m_dma(*this, Z80DMA_TAG)
-		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
-		, m_beeper(*this, "beeper")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, Z80_TAG),
+		m_6845(*this, "crtc"),
+		m_ctca(*this, Z80CTCA_TAG),
+		m_ctcb(*this, Z80CTCA_TAG),
+		m_dma(*this, Z80DMA_TAG),
+		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1"),
+		m_beeper(*this, "beeper")
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(portc8_w );
 	DECLARE_WRITE8_MEMBER(portcc_w );

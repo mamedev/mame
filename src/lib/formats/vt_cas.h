@@ -2,7 +2,7 @@
 
     vt_cas.h
 
-    Format code for VTech casette files
+    Format code for VTech cassette files
 
 *********************************************************************/
 

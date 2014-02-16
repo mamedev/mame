@@ -2615,17 +2615,6 @@ WRITE_LINE_MEMBER( pc8801_state::rxrdy_w )
 	// ...
 }
 
-static const i8251_interface uart_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,txdata_callback), //txd_cb
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,rxrdy_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const cassette_interface pc8801_cassette_interface =
 {
 	cassette_default_formats,
@@ -2663,7 +2652,9 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_CASSETTE_ADD("cassette", pc8801_cassette_interface)
 	MCFG_SOFTWARE_LIST_ADD("tape_list","pc8801_cass")
 
-	MCFG_I8251_ADD(I8251_TAG, uart_intf)
+	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
+	MCFG_I8251_TXD_HANDLER(WRITELINE(pc8801_state, txdata_callback))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(pc8801_state, rxrdy_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)

@@ -35,15 +35,17 @@
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class systec_state : public driver_device
 {
 public:
 	systec_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG)
-	{ }
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;

@@ -40,18 +40,19 @@
 #include "machine/keyboard.h"
 #include "sound/speaker.h"
 
-
+#define KEYBOARD_TAG "keyboard"
 
 class poly_state : public driver_device
 {
 public:
 	poly_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_pia0(*this, "pia0"),
-			m_pia1(*this, "pia1"),
-			m_videoram(*this, "videoram")
-	{ }
+		m_maincpu(*this, "maincpu"),
+		m_pia0(*this, "pia0"),
+		m_pia1(*this, "pia1"),
+		m_videoram(*this, "videoram")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
@@ -123,7 +124,7 @@ static ACIA6850_INTERFACE( acia_intf )
 	1,
 	1,
 	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
 	DEVCB_NULL
 };
 

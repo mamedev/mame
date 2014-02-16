@@ -178,6 +178,8 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-23
 
+#define LK201_TAG   "lk201"
+
 class rainbow_state : public driver_device
 {
 public:
@@ -1031,8 +1033,12 @@ WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::keyboard_tick)
 {
-	m_kbd8251->transmit_clock();
-	m_kbd8251->receive_clock();
+	/// TODO: double clock speed to get correct duty cycle
+	m_kbd8251->write_txc(1);
+	m_kbd8251->write_rxc(1);
+
+	m_kbd8251->write_txc(0);
+	m_kbd8251->write_rxc(0);
 
 	if (MOTOR_DISABLE_counter)
 		MOTOR_DISABLE_counter--;
@@ -1105,17 +1111,6 @@ static const floppy_interface floppy_intf =
 	NULL
 };
 
-static const i8251_interface i8251_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, kbd_tx),         // txd out
-	DEVCB_NULL,         // dtr
-	DEVCB_NULL,         // rts
-	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, kbd_rxready_w),
-	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, kbd_txready_w),
-	DEVCB_NULL,         // tx empty
-	DEVCB_NULL          // syndet
-};
-
 static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_DEFAULT_LAYOUT(layout_rainbow)
 
@@ -1145,11 +1140,15 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(floppy_intf)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","rainbow")
 
-	MCFG_I8251_ADD("kbdser", i8251_intf)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", rainbow_state, keyboard_tick, attotime::from_hz(4800*16))	// 8251 is set to /16 on the clock input
+	MCFG_DEVICE_ADD("kbdser", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(WRITELINE(rainbow_state, kbd_tx))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(rainbow_state, kbd_rxready_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(rainbow_state, kbd_txready_w))
 
-	MCFG_LK201_ADD()
-	MCFG_LK201_SET_TX_CALLBACK(DEVWRITELINE("kbdser", i8251_device, write_rx))
+	MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
+	MCFG_LK201_TX_HANDLER(DEVWRITELINE("kbdser", i8251_device, write_rxd))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", rainbow_state, keyboard_tick, attotime::from_hz(4800*16))	// 8251 is set to /16 on the clock input
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

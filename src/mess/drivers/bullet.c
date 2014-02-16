@@ -59,6 +59,7 @@ Notes:
 */
 
 #include "includes/bullet.h"
+#include "bus/rs232/rs232.h"
 
 
 
@@ -759,15 +760,15 @@ static Z80DART_INTERFACE( dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, write_rts),
 	DEVCB_DRIVER_LINE_MEMBER(bullet_state, dartardy_w),
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_rts),
 	DEVCB_DRIVER_LINE_MEMBER(bullet_state, dartbrdy_w),
 	DEVCB_NULL,
 
@@ -1259,11 +1260,11 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "serial_terminal")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")
@@ -1309,11 +1310,11 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "serial_terminal")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
 
 	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)

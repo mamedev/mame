@@ -513,7 +513,7 @@ void aerofgt_state::aerfboo2_draw_sprites( screen_device &screen, bitmap_ind16 &
 				else
 					code = m_spriteram2[map_start % (m_spriteram2.bytes()/2)];
 
-				pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx + chip],
+				machine().gfx[m_sprite_gfx + chip]->prio_zoom_transpen(bitmap,cliprect,
 								code,
 								color,
 								flipx,flipy,
@@ -550,14 +550,14 @@ void aerofgt_state::pspikesb_draw_sprites( screen_device &screen, bitmap_ind16 &
 		flipx = m_spriteram3[i + 1] & 0x0800;
 		color = m_spriteram3[i + 1] & 0x000f;
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx],
+		machine().gfx[m_sprite_gfx]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
 				xpos,ypos,15);
 
 		/* wrap around y */
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx],
+		machine().gfx[m_sprite_gfx]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -593,14 +593,14 @@ void aerofgt_state::spikes91_draw_sprites( screen_device &screen, bitmap_ind16 &
 
 		realcode = (lookup[code] << 8) + lookup[0x10000 + code];
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx],
+		machine().gfx[m_sprite_gfx]->transpen(bitmap,cliprect,
 				realcode,
 				color,
 				flipx,flipy,
 				xpos,ypos,15);
 
 		/* wrap around y */
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx],
+		machine().gfx[m_sprite_gfx]->transpen(bitmap,cliprect,
 				realcode,
 				color,
 				flipx,flipy,
@@ -641,7 +641,7 @@ void aerofgt_state::aerfboot_draw_sprites( screen_device &screen, bitmap_ind16 &
 
 		sx = ((ox + 16 + 3) & 0x1ff) - 16;
 
-		pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx + (code >= 0x1000 ? 0 : 1)],
+		machine().gfx[m_sprite_gfx + (code >= 0x1000 ? 0 : 1)]->prio_zoom_transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -679,7 +679,7 @@ void aerofgt_state::aerfboot_draw_sprites( screen_device &screen, bitmap_ind16 &
 
 		sx = ((ox + 16 + 3) & 0x1ff) - 16;
 
-		pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx + (code >= 0x1000 ? 0 : 1)],
+		machine().gfx[m_sprite_gfx + (code >= 0x1000 ? 0 : 1)]->prio_zoom_transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -752,7 +752,7 @@ UINT32 aerofgt_state::screen_update_spikes91(screen_device &screen, bitmap_ind16
 		{
 			UINT16 tileno = m_tx_tilemap_ram[count] & 0x1fff;
 			UINT16 colour = m_tx_tilemap_ram[count] & 0xe000;
-			drawgfx_transpen(bitmap,cliprect,gfx,
+			gfx->transpen(bitmap,cliprect,
 					tileno,
 					colour>>13,
 					0,0,

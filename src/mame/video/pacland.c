@@ -312,13 +312,13 @@ void pacland_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 			for (x = 0;x <= sizex;x++)
 			{
 				if (whichmask != 0)
-					drawgfx_transmask(bitmap,cliprect,machine().gfx[2],
+					machine().gfx[2]->transmask(bitmap,cliprect,
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,m_transmask[whichmask][color]);
 				else
-					pdrawgfx_transmask(bitmap,cliprect,machine().gfx[2],
+					machine().gfx[2]->prio_transmask(bitmap,cliprect,
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,

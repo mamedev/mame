@@ -219,8 +219,8 @@ void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		if (flip_screen_x()) sx = 233 - sx;
 		if (flip_screen_y()) sy = 244 - sy;
 
-		drawgfx_transpen(bitmap, clip,
-			machine().gfx[2],
+		
+			machine().gfx[2]->transpen(bitmap,clip,
 			code, 0,
 			flip_screen_x(), flip_screen_y(),
 			sx,sy, 0);

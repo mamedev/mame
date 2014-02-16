@@ -441,34 +441,34 @@ void xevious_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				if (spriteram_3[offs] & 1)  /* double width, double height */
 				{
 					code &= ~3;
-					drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
+					machine().gfx[bank]->transmask(bitmap,cliprect,
 							code+3,color,flipx,flipy,
 							flipx ? sx : sx+16,flipy ? sy-16 : sy,transmask);
-					drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
+					machine().gfx[bank]->transmask(bitmap,cliprect,
 							code+1,color,flipx,flipy,
 							flipx ? sx : sx+16,flipy ? sy : sy-16,transmask);
 				}
 				code &= ~2;
-				drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
+				machine().gfx[bank]->transmask(bitmap,cliprect,
 						code+2,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy-16 : sy,transmask);
-				drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
+				machine().gfx[bank]->transmask(bitmap,cliprect,
 						code,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy : sy-16,transmask);
 			}
 			else if (spriteram_3[offs] & 1) /* double width */
 			{
 				code &= ~1;
-				drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
+				machine().gfx[bank]->transmask(bitmap,cliprect,
 						code,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy-16 : sy,transmask);
-				drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
+				machine().gfx[bank]->transmask(bitmap,cliprect,
 						code+1,color,flipx,flipy,
 						flipx ? sx : sx+16,flipy ? sy-16 : sy,transmask);
 			}
 			else    /* normal */
 			{
-				drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
+				machine().gfx[bank]->transmask(bitmap,cliprect,
 						code,color,flipx,flipy,sx,sy,transmask);
 			}
 		}

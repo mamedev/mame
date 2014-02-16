@@ -131,8 +131,8 @@ WRITE8_MEMBER(ddragon_state::ddragon_fgvideoram_w)
 
 ***************************************************************************/
 
-#define DRAW_SPRITE( order, sx, sy ) drawgfx_transpen( bitmap, \
-					cliprect,gfx, \
+#define DRAW_SPRITE( order, sx, sy ) gfx->transpen(bitmap,\
+					cliprect, \
 					(which + order),color,flipx,flipy,sx,sy,0);
 
 void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)

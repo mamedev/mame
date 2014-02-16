@@ -211,7 +211,7 @@ UINT32 bmcpokr_state::screen_update_bmcpokr(screen_device &screen, bitmap_ind16 
 			UINT16 data = m_videoram[count];
 			count++;
 
-			drawgfx_opaque(bitmap,cliprect,gfx,data,0,0,0,x*8,y*8);
+			gfx->opaque(bitmap,cliprect,data,0,0,0,x*8,y*8);
 
 		}
 	}

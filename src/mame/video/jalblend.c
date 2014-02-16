@@ -91,7 +91,7 @@ void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,gfx_e
 {
 	if (jal_blend_table == NULL)
 	{
-		drawgfx_transpen(dest_bmp,clip,gfx,code,color,flipx,flipy,offsx,offsy,transparent_color);
+		gfx->transpen(dest_bmp,clip,code,color,flipx,flipy,offsx,offsy,transparent_color);
 		return;
 	}
 

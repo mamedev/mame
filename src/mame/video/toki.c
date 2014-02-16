@@ -196,7 +196,7 @@ void toki_state::toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprec
 				flipy=1;
 			}
 
-			drawgfx_transpen (bitmap,cliprect,machine().gfx[1],
+			machine().gfx[1]->transpen(bitmap,cliprect,
 					tile,
 					color,
 					flipx,flipy,
@@ -233,7 +233,7 @@ void toki_state::tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &clipre
 			tile    = sprite_word[1] & 0x1fff;
 			color   = sprite_word[2] >> 12;
 
-			drawgfx_transpen (bitmap,cliprect,machine().gfx[1],
+			machine().gfx[1]->transpen(bitmap,cliprect,
 					tile,
 					color,
 					flipx,0,

@@ -448,8 +448,10 @@ prav82  // Pravetz 82
 prav8m  // Pravetz 8M
 apple2jp  // ??? ???? Apple ][j+
 apple2e   // Jan 1983 Apple //e
+apple2euk // Jan 1983 Apple //e (UK)
 mprof3  // Microprofessor III
 apple2ee  // Mar 1985 Apple //e Enhanced
+apple2eeuk  // Mar 1985 Apple //e Enhanced (UK)
 apple2ep  // Jan 1987 Apple //e Platinum
 apple2c   // Apr 1984 Apple //c
 tk2000      // Microdigital TK2000
@@ -1211,7 +1213,8 @@ laser700  // 1984? Laser 700
 socrates  // 1988 Socrates Educational Video System (USA)
 socratfc  // 1988 Socrates SAITOUT (French Canada)
 profweis  // 1988 (Yeno) Proffesor Weiss-Alles (Germany)
-gl8008cx
+gl8008cx  // 1999 Genius Leader 8008 CX (Germany)
+bs9009cx  // 1999 BrainStation 9009 CXL (Germany)
 iq128_fr // 1997 Genius PC (France)
 iq128    // 1997 Genius IQ 128 (Germany)
 iqtv512 // IQ TV512 (Germany)
@@ -1922,6 +1925,7 @@ lond030  // 1996 Mephisto Genius030 London Upgrade V5.00
 
 // Saitek
 risc // Saitek 2500 14MHZ (skeleton)
+stratos // Kasparov Stratos Chess Computer
 
 // JAKKS Pacific, Inc. / HotGen, Ltd.
 batmantv    // The Batman, 2004
@@ -2277,7 +2281,8 @@ itt3030
 vax785
 ms0515
 ie15
-alphasma
+asmapro
+asma2k
 altos5
 merlin
 ts802

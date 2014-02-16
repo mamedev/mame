@@ -196,13 +196,13 @@ void ladybug_state::redclash_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 					{
 						int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
 
-						drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+						machine().gfx[3]->transpen(bitmap,cliprect,
 								code,
 								color,
 								0,0,
 								sx,sy - 16,0);
 						/* wraparound */
-						drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+						machine().gfx[3]->transpen(bitmap,cliprect,
 								code,
 								color,
 								0,0,
@@ -216,7 +216,7 @@ void ladybug_state::redclash_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 							int code = ((spriteram[offs + i + 1] & 0xf8) >> 3) + ((m_gfxbank & 1) << 5);
 							int bank = (spriteram[offs + i + 1] & 0x02) >> 1;
 
-							drawgfx_transpen(bitmap,cliprect,machine().gfx[4+bank],
+							machine().gfx[4+bank]->transpen(bitmap,cliprect,
 									code,
 									color,
 									0,0,
@@ -226,7 +226,7 @@ void ladybug_state::redclash_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 						{
 							int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
 
-							drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+							machine().gfx[2]->transpen(bitmap,cliprect,
 									code,
 									color,
 									0,0,
@@ -235,7 +235,7 @@ void ladybug_state::redclash_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 						break;
 
 					case 1: /* 8x8 */
-						drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+						machine().gfx[1]->transpen(bitmap,cliprect,
 								spriteram[offs + i + 1],// + 4 * (spriteram[offs + i + 2] & 0x10),
 								color,
 								0,0,

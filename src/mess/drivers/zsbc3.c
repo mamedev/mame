@@ -38,15 +38,17 @@
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class zsbc3_state : public driver_device
 {
 public:
 	zsbc3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
 	DECLARE_READ8_MEMBER(zsbc3_28_r);
 	DECLARE_READ8_MEMBER(zsbc3_2a_r);

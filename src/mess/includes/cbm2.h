@@ -22,7 +22,6 @@
 #include "machine/pic8259.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "sound/dac.h"
 #include "sound/mos6581.h"
 #include "video/mc6845.h"

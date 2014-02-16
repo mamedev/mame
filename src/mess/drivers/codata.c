@@ -15,16 +15,18 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class codata_state : public driver_device
 {
 public:
 	codata_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_p_base(*this, "rambase")
-		, m_terminal(*this, TERMINAL_TAG)
-		, m_maincpu(*this, "maincpu")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_p_base(*this, "rambase"),
+		m_terminal(*this, TERMINAL_TAG),
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	DECLARE_READ16_MEMBER(keyin_r);
 	DECLARE_READ16_MEMBER(status_r);

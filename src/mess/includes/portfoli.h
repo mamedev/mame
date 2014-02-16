@@ -13,7 +13,6 @@
 #include "machine/ins8250.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "sound/speaker.h"
 #include "video/hd61830.h"
 

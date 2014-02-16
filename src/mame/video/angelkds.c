@@ -161,10 +161,10 @@ void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		if (enable & enable_n)
 		{
-			drawgfx_transpen(
+			
+					gfx->transpen(
 					bitmap,
 					cliprect,
-					gfx,
 					tile_no,
 					color*4,
 					flipx,flipy,
@@ -172,10 +172,10 @@ void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 					);
 			/* wraparound */
 			if (xpos > 240)
-				drawgfx_transpen(
+				
+						gfx->transpen(
 						bitmap,
 						cliprect,
-						gfx,
 						tile_no,
 						color*4,
 						flipx,flipy,
@@ -184,10 +184,10 @@ void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			/* wraparound */
 			if (ypos > 240)
 			{
-				drawgfx_transpen(
+				
+						gfx->transpen(
 						bitmap,
 						cliprect,
-						gfx,
 						tile_no,
 						color*4,
 						flipx,flipy,
@@ -195,10 +195,10 @@ void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 						);
 				/* wraparound */
 				if (xpos > 240)
-					drawgfx_transpen(
+					
+							gfx->transpen(
 							bitmap,
 							cliprect,
-							gfx,
 							tile_no,
 							color*4,
 							flipx,flipy,

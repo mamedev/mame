@@ -196,24 +196,24 @@ void brkthru_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			if (m_spriteram[offs] & 0x10)    /* double height */
 			{
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[9],
+				machine().gfx[9]->transpen(bitmap,cliprect,
 						code & ~1,
 						color,
 						m_flipscreen, m_flipscreen,
 						sx, m_flipscreen ? sy + 16 : sy - 16,0);
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[9],
+				machine().gfx[9]->transpen(bitmap,cliprect,
 						code | 1,
 						color,
 						m_flipscreen, m_flipscreen,
 						sx,sy,0);
 
 				/* redraw with wraparound */
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[9],
+				machine().gfx[9]->transpen(bitmap,cliprect,
 						code & ~1,
 						color,
 						m_flipscreen, m_flipscreen,
 						sx,(m_flipscreen ? sy + 16 : sy - 16) + 256,0);
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[9],
+				machine().gfx[9]->transpen(bitmap,cliprect,
 						code | 1,
 						color,
 						m_flipscreen, m_flipscreen,
@@ -222,14 +222,14 @@ void brkthru_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			}
 			else
 			{
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[9],
+				machine().gfx[9]->transpen(bitmap,cliprect,
 						code,
 						color,
 						m_flipscreen, m_flipscreen,
 						sx,sy,0);
 
 				/* redraw with wraparound */
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[9],
+				machine().gfx[9]->transpen(bitmap,cliprect,
 						code,
 						color,
 						m_flipscreen, m_flipscreen,

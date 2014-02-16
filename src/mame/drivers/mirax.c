@@ -193,9 +193,9 @@ void mirax_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 			if((x <= 1 || x >= 30) ^ draw_flag)
 			{
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,(m_flipscreen_x),(m_flipscreen_y),res_x,res_y);
+				gfx->opaque(bitmap,cliprect,tile,color & 7,(m_flipscreen_x),(m_flipscreen_y),res_x,res_y);
 				/* wrap-around */
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,(m_flipscreen_x),(m_flipscreen_y),res_x,res_y+wrapy);
+				gfx->opaque(bitmap,cliprect,tile,color & 7,(m_flipscreen_x),(m_flipscreen_y),res_x,res_y+wrapy);
 			}
 		}
 	}
@@ -224,7 +224,7 @@ void mirax_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		y = (m_flipscreen_y) ? spriteram[count] : 0x100 - spriteram[count] - 16;
 		x = (m_flipscreen_x) ? 240 - spriteram[count+3] : spriteram[count+3];
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],spr_offs,color,fx,fy,x,y,0);
+		machine().gfx[1]->transpen(bitmap,cliprect,spr_offs,color,fx,fy,x,y,0);
 	}
 }
 

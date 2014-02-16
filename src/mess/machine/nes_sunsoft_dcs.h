@@ -4,6 +4,12 @@
 #include "machine/nes_sunsoft.h"
 
 
+//-----------------------------------------------
+//
+//	Nantettate!! Baseball Cartslot implementation
+//
+//-----------------------------------------------
+
 // ======================> ntb_cart_interface
 
 class ntb_cart_interface : public device_slot_card_interface
@@ -65,18 +71,16 @@ public:
 extern const device_type NES_NTB_SLOT;
 
 
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
 #define MCFG_NTB_MINICART_ADD(_tag, _slot_intf) \
 		MCFG_DEVICE_ADD(_tag, NES_NTB_SLOT, 0) \
 		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, false)
 
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
+//-----------------------------------------------
+//
+//	Nantettate!! Baseball Minicart implementation
+//
+//-----------------------------------------------
 
 // ======================> nes_ntb_rom_device
 
@@ -100,6 +104,14 @@ protected:
 extern const device_type NES_NTB_ROM;
 
 
+
+//------------------------------------------------
+//
+//	Nantettate!! Baseball base cart implementation
+//  a.k.a. Sunsoft Dual Cassette System 
+//  (variant of Sunsoft-4 PCB)
+//
+//------------------------------------------------
 
 // ======================> nes_sunsoft_dcs_device
 

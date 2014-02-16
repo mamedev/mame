@@ -267,7 +267,7 @@ UINT32 coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_ind1
 		{
 			int tile = m_vram[count];
 			//int colour = tile>>12;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
+			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
 
 			count++;
 		}

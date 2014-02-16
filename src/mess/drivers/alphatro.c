@@ -128,8 +128,12 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_timer_bit ^= 0x80;
 		break;
 	case TIMER_SERIAL:
-		m_usart->transmit_clock();
-		m_usart->receive_clock();
+		/// TODO: double timer frequency for correct duty cycle
+		m_usart->write_txc(1);
+		m_usart->write_rxc(1);
+
+		m_usart->write_txc(0);
+		m_usart->write_rxc(0);
 		break;
 	case TIMER_ALPHATRO_BEEP_OFF:
 		m_beep->set_state(0);
@@ -373,7 +377,7 @@ void alphatro_state::machine_reset()
 	m_cass_state = 1;
 	m_cass_data[0] = 0;
 	m_cass_data[1] = 0;
-	m_usart->write_rx(0);
+	m_usart->write_rxd(0);
 	m_cass_data[3] = 0;
 	m_beep->set_state(0);
 	m_beep->set_frequency(950);    /* piezo-device needs to be measured */
@@ -410,16 +414,6 @@ static MC6845_INTERFACE( alphatro_crtc6845_interface )
 	NULL
 };
 
-static const i8251_interface alphatro_usart_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(alphatro_state,txdata_callback), //txd_cb
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::alphatro_c)
 {
 	m_cass_data[3]++;
@@ -439,7 +433,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::alphatro_p)
 	if (cass_ws != m_cass_data[0])
 	{
 		m_cass_data[0] = cass_ws;
-		m_usart->write_rx((m_cass_data[1] < 12) ? 1 : 0);
+		m_usart->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
 		m_cass_data[1] = 0;
 	}
 }
@@ -480,7 +474,8 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8, alphatro_crtc6845_interface) // clk unknown
 
-	MCFG_I8251_ADD("usart", alphatro_usart_interface)
+	MCFG_DEVICE_ADD("usart", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(WRITELINE(alphatro_state,txdata_callback))
 
 	MCFG_CASSETTE_ADD("cassette", alphatro_cassette_interface)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("alphatro_c", alphatro_state, alphatro_c, attotime::from_hz(4800))

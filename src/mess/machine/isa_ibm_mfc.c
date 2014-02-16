@@ -297,21 +297,13 @@ static const struct pit8253_interface d8253_intf =
 
 void isa8_ibm_mfc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_d71051->transmit_clock();
-	m_d71051->receive_clock();
+	/// TODO: double timer frequency to get correct duty cycle
+	m_d71051->write_txc(1);
+	m_d71051->write_rxc(1);
+
+	m_d71051->write_txc(0);
+	m_d71051->write_rxc(0);
 }
-
-static const i8251_interface d71051_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  YM-2164
@@ -335,7 +327,9 @@ static MACHINE_CONFIG_FRAGMENT( ibm_mfc )
 
 	MCFG_I8255_ADD("d71055c_0", d71055c_0_intf)
 	MCFG_I8255_ADD("d71055c_1", d71055c_1_intf)
-	MCFG_I8251_ADD("d71051", d71051_intf)
+
+	MCFG_DEVICE_ADD("d71051", I8251, 0)
+
 	MCFG_PIT8253_ADD("d8253", d8253_intf)
 
 	MCFG_SPEAKER_STANDARD_STEREO("ymleft", "ymright")

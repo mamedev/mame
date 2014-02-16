@@ -119,7 +119,7 @@ void egghunt_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect
 			sx = 496 - sx;
 			sy = 240 - sy;
 		}
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipscreen,flipscreen,

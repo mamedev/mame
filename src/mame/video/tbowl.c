@@ -162,28 +162,28 @@ void tbowl_state::tbowl_draw_sprites(bitmap_ind16 &bitmap,const rectangle &clipr
 
 					sx -= xscroll;
 
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+					machine().gfx[3]->transpen(bitmap,cliprect,
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx,sy,0 );
 
 					/* wraparound */
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+					machine().gfx[3]->transpen(bitmap,cliprect,
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx,sy-0x200,0 );
 
 					/* wraparound */
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+					machine().gfx[3]->transpen(bitmap,cliprect,
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx-0x400,sy,0 );
 
 					/* wraparound */
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
+					machine().gfx[3]->transpen(bitmap,cliprect,
 							code + layout[y][x],
 							color,
 							flipx,flipy,

@@ -2,7 +2,7 @@
 
     zx81_p.h
 
-    Format code for ZX-81 casette files
+    Format code for ZX-81 cassette files
 
 *********************************************************************/
 

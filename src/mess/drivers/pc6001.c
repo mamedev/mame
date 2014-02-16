@@ -1918,18 +1918,6 @@ static I8255_INTERFACE( pc6001_ppi8255_interface )
 	DEVCB_DRIVER_MEMBER(pc6001_state,pc6001_8255_portc_w)
 };
 
-static const i8251_interface pc6001_usart_interface=
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static const ay8910_interface pc6001_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -2343,7 +2331,7 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 
 	MCFG_I8255_ADD( "ppi8255", pc6001_ppi8255_interface )
 	/* uart */
-	MCFG_I8251_ADD("uart", pc6001_usart_interface)
+	MCFG_DEVICE_ADD("uart", I8251, 0)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")

@@ -218,7 +218,9 @@ static MACHINE_CONFIG_START( pp01, pp01_state )
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_I8251_ADD("uart", pp01_uart_intf)
+	MCFG_DEVICE_ADD("uart", I8251, 0)
+	// when rts and dtr are both high, the uart is being used for cassette operations
+
 	MCFG_PIT8253_ADD( "pit8253", pp01_pit8253_intf )
 	MCFG_I8255A_ADD( "ppi8255", pp01_ppi8255_interface )
 

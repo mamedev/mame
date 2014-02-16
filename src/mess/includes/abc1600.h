@@ -5,8 +5,8 @@
 #ifndef __ABC1600__
 #define __ABC1600__
 
-#include "emu.h"
 #include "bus/abcbus/abcbus.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/8530scc.h"
 #include "machine/abckb.h"
@@ -14,7 +14,6 @@
 #include "machine/e0516.h"
 #include "machine/nmc9306.h"
 #include "machine/ram.h"
-#include "machine/serial.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dart.h"
 #include "machine/z80dma.h"

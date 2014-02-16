@@ -57,14 +57,17 @@
 #include "sound/beep.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class p8k_state : public driver_device
 {
 public:
 	p8k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG) { }
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
 	DECLARE_READ8_MEMBER(p8k_port0_r);
 	DECLARE_WRITE8_MEMBER(p8k_port0_w);

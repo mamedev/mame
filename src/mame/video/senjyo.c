@@ -257,7 +257,7 @@ void senjyo_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,i
 			}
 
 
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[big ? 5 : 4],
+			machine().gfx[big ? 5 : 4]->transpen(bitmap,cliprect,
 					spriteram[offs],
 					spriteram[offs + 1] & 0x07,
 					flipx,flipy,

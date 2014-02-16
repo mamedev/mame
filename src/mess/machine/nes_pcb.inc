@@ -443,18 +443,6 @@ void nes_cart_slot_device::call_load_pcb()
 	if (get_software_region("bwram") != NULL)
 		battery_size = get_software_region_length("bwram");
 
-	if (m_pcb_id == BANDAI_LZ93EX1 || m_pcb_id == BANDAI_LZ93EX2)
-	{
-		// allocate the 24C01 or 24C02 EEPROM
-		battery_size += 0x2000;
-	}
-
-	if (m_pcb_id == BANDAI_DATACH)
-	{
-		// allocate the 24C01 and 24C02 EEPROM
-		battery_size += 0x4000;
-	}
-
 	if (get_software_region("wram") != NULL)
 		prgram_size = get_software_region_length("wram");
 

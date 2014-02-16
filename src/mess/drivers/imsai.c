@@ -23,17 +23,19 @@
 #include "machine/pit8253.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class imsai_state : public driver_device
 {
 public:
 	imsai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-		, m_uart(*this, "uart")
-		, m_pit(*this, "pit")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG),
+		m_uart(*this, "uart"),
+		m_pit(*this, "pit")
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(keyin_r);
@@ -97,17 +99,6 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_DRIVER_MEMBER(imsai_state, kbd_put)
 };
 
-static const i8251_interface uart_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const struct pit8253_interface pit_intf =
 {
 	{
@@ -146,7 +137,7 @@ static MACHINE_CONFIG_START( imsai, imsai_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	/* Devices */
-	MCFG_I8251_ADD("uart", uart_intf)
+	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_PIT8253_ADD( "pit", pit_intf)
 MACHINE_CONFIG_END
 

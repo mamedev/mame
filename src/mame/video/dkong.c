@@ -632,11 +632,11 @@ void dkong_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 			}
 			y = scanline - ((y + add_y + 1 + scanline_vfc) & 0x0F);
 
-			drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, x, y, 0);
+			 machine().gfx[1]->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
 
 			// wraparound
-			drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, m_flip ? x + 256 : x - 256, y, 0);
-			drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, x, y - 256, 0);
+			 machine().gfx[1]->transpen(bitmap,cliprect, code, color, flipx, flipy, m_flip ? x + 256 : x - 256, y, 0);
+			 machine().gfx[1]->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y - 256, 0);
 
 			num_sprt++;
 		}
@@ -995,7 +995,7 @@ UINT32 dkong_state::screen_update_pestplce(screen_device &screen, bitmap_ind16 &
 	{
 		if (m_sprite_ram[offs])
 		{
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+			machine().gfx[1]->transpen(bitmap,cliprect,
 					m_sprite_ram[offs + 2],
 					(m_sprite_ram[offs + 1] & 0x0f) + 16 * m_palette_bank,
 					m_sprite_ram[offs + 1] & 0x80,m_sprite_ram[offs + 1] & 0x40,

@@ -23,6 +23,7 @@
 
 #include "includes/trs80m2.h"
 
+#define KEYBOARD_TAG "keyboard"
 
 
 //**************************************************************************

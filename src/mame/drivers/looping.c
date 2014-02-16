@@ -308,7 +308,7 @@ void looping_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, sx, sy, 0);
+		 machine().gfx[1]->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 

@@ -165,7 +165,7 @@ void pinkiri8_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clip
 				attr = m_janshi_back_vram[count + 2] ^ 0xf0;
 				col = (attr >> 4) | 0x10;
 
-				drawgfx_transpen(bitmap, cliprect, gfx, tile, col, 0, 0, x * 16, y * 8, 0);
+				 gfx->transpen(bitmap,cliprect, tile, col, 0, 0, x * 16, y * 8, 0);
 
 				count += 4;
 			}
@@ -311,7 +311,7 @@ void pinkiri8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			{
 				for (int xx=0;xx<width;xx++)
 				{
-					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+count,col,0,0,(x+xx*16) -7 ,(y+yy*8)-33,0);
+					gfx->transpen(bitmap,cliprect,spr_offs+count,col,0,0,(x+xx*16) -7 ,(y+yy*8)-33,0);
 					count++;
 				}
 			}

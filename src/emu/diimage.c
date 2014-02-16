@@ -422,7 +422,7 @@ const char *device_image_interface::get_feature(const char *feature_name)
 {
 	feature_list *feature;
 
-	if ( ! m_software_part_ptr->featurelist )
+	if ( ! m_software_part_ptr || ! m_software_part_ptr->featurelist )
 		return NULL;
 
 	for ( feature = m_software_part_ptr->featurelist; feature; feature = feature->next )
@@ -938,6 +938,12 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 			// we would have recorded the wrong name, so record it again based on software_info
 			if (m_software_info_ptr && m_full_software_name)
 				m_err = set_image_filename(m_full_software_name);
+
+			// check if image should be read-only		
+			const char *read_only = get_feature("read_only");
+			if (read_only && !strcmp(read_only, "true")) {
+				make_readonly();
+			}
 
 			m_from_swlist = TRUE;
 		}

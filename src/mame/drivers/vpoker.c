@@ -152,7 +152,7 @@ UINT32 vpoker_state::screen_update_vpoker(screen_device &screen, bitmap_ind16 &b
 		{
 			int tile = videoram[count];
 			//int colour = tile>>12;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*16,y*16);
+			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*16,y*16);
 
 			count++;
 		}

@@ -69,7 +69,7 @@
  ******************************************************************************/
 
 
-#include "emu.h"
+#include "bus/rs232/null_modem.h"
 #include "includes/avigo.h"
 #include "avigo.lh"
 
@@ -226,9 +226,9 @@ WRITE_LINE_MEMBER( avigo_state::com_interrupt )
 
 static const ins8250_interface avigo_com_interface =
 {
-	DEVCB_DEVICE_LINE_MEMBER("serport", serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, write_txd),
+	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, write_dtr),
+	DEVCB_DEVICE_LINE_MEMBER("serport", rs232_port_device, write_rts),
 	DEVCB_DRIVER_LINE_MEMBER(avigo_state, com_interrupt),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -886,11 +886,11 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_NS16550_ADD( "ns16550", avigo_com_interface, XTAL_1_8432MHz )
 
 	MCFG_RS232_PORT_ADD( "serport", avigo_com, NULL )
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dsr_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, ri_w))
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

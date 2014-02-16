@@ -105,7 +105,7 @@ void markham_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		if (px > 248)
 			px = px - 256;
 
-		drawgfx_transmask(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->transmask(bitmap,cliprect,
 			chr,
 			col,
 			fx,fy,

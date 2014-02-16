@@ -51,7 +51,7 @@ void freekick_state::gigas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -85,7 +85,7 @@ void freekick_state::pbillrd_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -120,7 +120,7 @@ void freekick_state::freekick_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

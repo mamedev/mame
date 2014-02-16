@@ -538,7 +538,7 @@ void combatsc_state::bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 //          if(m_vreg == 0x23 && (attributes & 0x02)) color += 1*16;
 //          if(m_vreg == 0x66 ) color += 2*16;
 
-			drawgfx_transpen(   bitmap, cliprect, gfx,
+			 gfx->transpen(bitmap,cliprect,
 							number, color,
 							attributes & 0x10,0, /* flip */
 							x, y, 15 );

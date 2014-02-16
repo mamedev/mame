@@ -35,6 +35,7 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/c64 \
 	$(EMUOBJ)/bus/cbm2 \
 	$(EMUOBJ)/bus/cbmiec \
+	$(EMUOBJ)/bus/centronics \
 	$(EMUOBJ)/bus/comx35 \
 	$(EMUOBJ)/bus/ecbbus \
 	$(EMUOBJ)/bus/econet \
@@ -42,9 +43,11 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/ieee488 \
 	$(EMUOBJ)/bus/imi7000 \
 	$(EMUOBJ)/bus/isbx \
+	$(EMUOBJ)/bus/midi \
 	$(EMUOBJ)/bus/pc_kbd \
 	$(EMUOBJ)/bus/pet \
 	$(EMUOBJ)/bus/plus4 \
+	$(EMUOBJ)/bus/rs232 \
 	$(EMUOBJ)/bus/s100 \
 	$(EMUOBJ)/bus/vcs \
 	$(EMUOBJ)/bus/vic10 \
@@ -54,7 +57,6 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/wangpc \
 	$(EMUOBJ)/bus/a2bus \
 	$(EMUOBJ)/bus/nubus \
-	$(EMUOBJ)/bus/centronics \
 	$(EMUOBJ)/bus/iq151 \
 	$(EMUOBJ)/bus/kc \
 	$(EMUOBJ)/bus/tvc \
@@ -190,12 +192,14 @@ EMUDRIVEROBJS = \
 EMUMACHINEOBJS = \
 	$(EMUMACHINE)/bcreader.o    \
 	$(EMUMACHINE)/buffer.o      \
-	$(EMUMACHINE)/latch.o       \
 	$(EMUMACHINE)/generic.o     \
-	$(EMUMACHINE)/ram.o         \
-	$(EMUMACHINE)/nvram.o       \
+	$(EMUMACHINE)/keyboard.o    \
 	$(EMUMACHINE)/laserdsc.o    \
+	$(EMUMACHINE)/latch.o       \
 	$(EMUMACHINE)/netlist.o     \
+	$(EMUMACHINE)/nvram.o       \
+	$(EMUMACHINE)/ram.o         \
+	$(EMUMACHINE)/terminal.o    \
 
 EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/bitbngr.o    \

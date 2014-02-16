@@ -110,8 +110,8 @@ void strnskil_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		if (sx > 248)
 			sx = sx - 256;
 
-		drawgfx_transmask(bitmap, cliprect,
-			machine().gfx[1],
+		
+			machine().gfx[1]->transmask(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			px, py,

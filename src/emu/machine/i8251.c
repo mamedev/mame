@@ -19,13 +19,6 @@
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 /***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-const i8251_interface default_i8251_interface = { DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL };
-
-
-/***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
@@ -60,34 +53,15 @@ const device_type I8251 = &device_creator<i8251_device>;
 
 i8251_device::i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8251, "I8251", tag, owner, clock, "i8251", __FILE__),
-		device_serial_interface(mconfig, *this)
+	device_serial_interface(mconfig, *this),
+	m_txd_handler(*this),
+	m_dtr_handler(*this),
+	m_rts_handler(*this),
+	m_rxrdy_handler(*this),
+	m_txrdy_handler(*this),
+	m_txempty_handler(*this),
+	m_syndet_handler(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void i8251_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const i8251_interface *intf = reinterpret_cast<const i8251_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<i8251_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_txd_cb, 0, sizeof(m_out_txd_cb));
-		memset(&m_out_dtr_cb, 0, sizeof(m_out_dtr_cb));
-		memset(&m_out_rts_cb, 0, sizeof(m_out_rts_cb));
-		memset(&m_out_rxrdy_cb, 0, sizeof(m_out_rxrdy_cb));
-		memset(&m_out_txrdy_cb, 0, sizeof(m_out_txrdy_cb));
-		memset(&m_out_txempty_cb, 0, sizeof(m_out_txempty_cb));
-		memset(&m_out_syndet_cb, 0, sizeof(m_out_syndet_cb));
-	}
 }
 
 //-------------------------------------------------
@@ -97,10 +71,10 @@ void i8251_device::device_config_complete()
 void i8251_device::device_start()
 {
 	// resolve callbacks
-	m_out_txd_func.resolve(m_out_txd_cb,*this);
-	m_out_rxrdy_func.resolve(m_out_rxrdy_cb, *this);
-	m_out_txrdy_func.resolve(m_out_txrdy_cb, *this);
-	m_out_txempty_func.resolve(m_out_txempty_cb, *this);
+	m_txd_handler.resolve_safe();
+	m_rxrdy_handler.resolve_safe();
+	m_txrdy_handler.resolve_safe();
+	m_txempty_handler.resolve_safe();
 
 	m_input_state = 0;
 }
@@ -124,7 +98,7 @@ void i8251_device::update_rx_ready()
 		state = 0;
 	}
 
-	m_out_rxrdy_func(state != 0);
+	m_rxrdy_handler(state != 0);
 }
 
 
@@ -135,10 +109,10 @@ void i8251_device::update_rx_ready()
 
 void i8251_device::receive_clock()
 {
-	m_rxc++;
+	m_rxc_count++;
 
-	if (m_rxc == m_br_factor)
-		m_rxc = 0;
+	if (m_rxc_count == m_br_factor)
+		m_rxc_count = 0;
 	else
 		return;
 
@@ -165,10 +139,10 @@ void i8251_device::receive_clock()
 
 void i8251_device::transmit_clock()
 {
-	m_txc++;
+	m_txc_count++;
 
-	if (m_txc == m_br_factor)
-		m_txc = 0;
+	if (m_txc_count == m_br_factor)
+		m_txc_count = 0;
 	else
 		return;
 
@@ -198,7 +172,7 @@ void i8251_device::transmit_clock()
 		{
 			UINT8 data = transmit_register_get_data_bit();
 			m_tx_busy = true;
-			m_out_txd_func(data);
+			m_txd_handler(data);
 
 			m_connection_state &= ~TX;
 			m_connection_state|=(data<<5);
@@ -282,7 +256,7 @@ void i8251_device::update_tx_ready()
 		}
 	}
 
-	m_out_txrdy_func(tx_ready);
+	m_txrdy_handler(tx_ready);
 }
 
 
@@ -300,7 +274,7 @@ void i8251_device::update_tx_empty()
 		serial_connection_out();
 	}
 
-	m_out_txempty_func((m_status & I8251_STATUS_TX_EMPTY) != 0);
+	m_txempty_handler((m_status & I8251_STATUS_TX_EMPTY) != 0);
 }
 
 
@@ -337,7 +311,7 @@ void i8251_device::device_reset()
 	m_mode_byte = 0;
 	m_command = 0;
 	m_data = 0;
-	m_rxc = m_txc = 0;
+	m_rxc_count = m_txc_count = 0;
 	m_br_factor = 1;
 	m_tx_busy = m_disable_tx_pending = false;
 
@@ -474,7 +448,7 @@ WRITE8_MEMBER(i8251_device::control_w)
 				case 3: m_br_factor = 64; break;
 				}
 
-				m_rxc = m_txc = 0;
+				m_rxc_count = m_txc_count = 0;
 
 #if 0
 				/* data bits */
@@ -750,7 +724,7 @@ void i8251_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 }
 
 
-WRITE_LINE_MEMBER(i8251_device::write_rx)
+WRITE_LINE_MEMBER(i8251_device::write_rxd)
 {
 	if (state)
 	{
@@ -783,5 +757,27 @@ WRITE_LINE_MEMBER(i8251_device::write_dsr)
 	else
 	{
 		input_callback(m_input_state & ~DSR);
+	}
+}
+
+WRITE_LINE_MEMBER(i8251_device::write_rxc)
+{
+	if (m_rxc != state)
+	{
+		m_rxc = state;
+
+		if (m_rxc)
+			receive_clock();
+	}
+}
+
+WRITE_LINE_MEMBER(i8251_device::write_txc)
+{
+	if (m_txc != state)
+	{
+		m_txc = state;
+
+		if (m_txc)
+			receive_clock();
 	}
 }

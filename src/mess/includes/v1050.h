@@ -19,7 +19,6 @@
 #include "machine/scsibus.h"
 #include "machine/scsicb.h"
 #include "machine/scsihd.h"
-#include "machine/serial.h"
 #include "machine/v1050kb.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"

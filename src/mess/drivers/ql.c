@@ -159,7 +159,7 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 	UINT8 data = 0;
 
 	// SER2 serial data input
-	data |= m_ser2->rx();
+	data |= m_ser2->rxd_r();
 
 	// COMDATA
 	data |= m_comdata << 7;
@@ -211,7 +211,7 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 	// TODO SER1 clear to send
 
 	// SER2 data terminal ready
-	m_ser2->dtr_w(!BIT(data, 5));
+	m_ser2->write_dtr(!BIT(data, 5));
 
 	// COMDATA
 	m_comdata = BIT(data, 7);
@@ -782,7 +782,7 @@ static ZX8302_INTERFACE( ql_zx8302_intf )
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_baudx4_w),
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_comdata_w),
 	DEVCB_NULL, // TXD1
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_txd),
 	DEVCB_NULL, // NETOUT
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_mdselck_w),
 	DEVCB_DEVICE_LINE_MEMBER(MDV_1, microdrive_image_device, comms_in_w),
@@ -1005,7 +1005,7 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_MICRODRIVE_ADD(MDV_2, mdv2_config)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL) // wired as DCE
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL) // wired as DTE
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(ZX8302_TAG, zx8302_device, write_cts2))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ZX8302_TAG, zx8302_device, write_cts2))
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")

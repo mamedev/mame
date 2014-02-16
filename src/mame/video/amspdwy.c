@@ -122,7 +122,7 @@ void amspdwy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
+		machine().gfx[0]->transpen(bitmap,cliprect,
 //              code + ((attr & 0x18)<<5),
 				code + ((attr & 0x08)<<5),
 				attr,

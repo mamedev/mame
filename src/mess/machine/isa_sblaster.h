@@ -3,13 +3,10 @@
 #ifndef __ISA_SOUND_BLASTER_H__
 #define __ISA_SOUND_BLASTER_H__
 
-#include "emu.h"
+#include "bus/midi/midi.h"
 #include "machine/isa.h"
 #include "sound/dac.h"
 #include "machine/pc_joy.h"
-#include "machine/serial.h"
-#include "machine/midiinport.h"
-#include "machine/midioutport.h"
 
 #define SIXTEENBIT  0x01
 #define STEREO      0x02
@@ -101,7 +98,7 @@ public:
 		required_device<dac_device> m_dacl;
 		required_device<dac_device> m_dacr;
 		required_device<pc_joy_device> m_joy;
-		required_device<serial_port_device> m_mdout;
+		required_device<midi_port_device> m_mdout;
 
 		void process_fifo(UINT8 cmd);
 		void queue(UINT8 data);

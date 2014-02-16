@@ -253,9 +253,9 @@ UINT32 cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 &b
 			int which = spriteaddr[offs + 0x20];
 			int color = 0;
 
-			drawgfx_transpen(m_spritebitmap, cliprect, machine().gfx[0], which, color, xflip, yflip, x, y, 0);
+			 machine().gfx[0]->transpen(m_spritebitmap,cliprect, which, color, xflip, yflip, x, y, 0);
 			if (x >= 256 - 16)
-				drawgfx_transpen(m_spritebitmap, cliprect, machine().gfx[0], which, color, xflip, yflip, x - 256, y, 0);
+				 machine().gfx[0]->transpen(m_spritebitmap,cliprect, which, color, xflip, yflip, x - 256, y, 0);
 		}
 
 	/* draw the bitmap to the screen, looping over Y */

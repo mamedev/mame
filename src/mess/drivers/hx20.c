@@ -299,7 +299,7 @@ WRITE8_MEMBER( hx20_state::main_p2_w )
 	*/
 
 	// RS-232
-	m_rs232->tx(BIT(data, 1));
+	m_rs232->write_txd(BIT(data, 1));
 
 	// serial
 	m_slave_sio = BIT(data, 2);
@@ -469,7 +469,7 @@ WRITE8_MEMBER( hx20_state::slave_p3_w )
 	*/
 
 	// RS-232
-	m_rs232->rts_w(BIT(data, 1));
+	m_rs232->write_rts(BIT(data, 1));
 
 	// main
 	m_slave_flag = BIT(data, 4);

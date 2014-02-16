@@ -220,7 +220,7 @@ void pdp1_state::pdp1_draw_multipleswitch(bitmap_ind16 &bitmap, int x, int y, in
 /* write a single char on screen */
 void pdp1_state::pdp1_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color)
 {
-	drawgfx_transpen(bitmap, bitmap.cliprect(), machine().gfx[0], character-32, color, 0, 0,
+	 machine().gfx[0]->transpen(bitmap,bitmap.cliprect(), character-32, color, 0, 0,
 				x+1, y, 0);
 }
 

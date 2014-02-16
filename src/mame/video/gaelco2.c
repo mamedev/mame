@@ -377,7 +377,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 					/* normal sprite, pen 0 transparent */
 					if (color_effect == 0){
-						drawgfx_transpen(bitmap, cliprect, gfx, number,
+						 gfx->transpen(bitmap,cliprect, number,
 							color, xflip, yflip,
 							((sx + ex*16) & 0x3ff) + spr_x_adjust,
 							((sy + ey*16) & 0x1ff), 0);

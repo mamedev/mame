@@ -154,8 +154,8 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 
 	machine().gfx[0]->set_source(m_charram);
 
-	drawgfx_opaque(*m_headlight_bitmap, m_headlight_bitmap->cliprect(), machine().gfx[2], 0, 0, 0, 0, 0x00, 0x00);
-	drawgfx_opaque(*m_headlight_bitmap, m_headlight_bitmap->cliprect(), machine().gfx[2], 0, 0, 0, 1, 0x00, 0x40);
+	 machine().gfx[2]->opaque(*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 0, 0x00, 0x00);
+	 machine().gfx[2]->opaque(*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 1, 0x00, 0x40);
 }
 
 

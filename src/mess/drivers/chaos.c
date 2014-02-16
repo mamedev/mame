@@ -33,15 +33,18 @@
 #include "cpu/s2650/s2650.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
 
 class chaos_state : public driver_device
 {
 public:
 	chaos_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_terminal(*this, TERMINAL_TAG),
-	m_p_ram(*this, "p_ram") ,
-		m_maincpu(*this, "maincpu") { }
+		m_terminal(*this, TERMINAL_TAG),
+		m_p_ram(*this, "p_ram") ,
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	DECLARE_READ8_MEMBER(port1e_r);
 	DECLARE_WRITE8_MEMBER(port1f_w);

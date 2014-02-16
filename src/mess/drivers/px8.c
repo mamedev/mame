@@ -723,21 +723,6 @@ GFXDECODE_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    i8251_interface i8251_intf
--------------------------------------------------*/
-
-static const i8251_interface i8251_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/*-------------------------------------------------
     cassette_interface px8_cassette_interface
 -------------------------------------------------*/
 
@@ -823,7 +808,8 @@ static MACHINE_CONFIG_START( px8, px8_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
 
 	/* devices */
-	MCFG_I8251_ADD(I8251_TAG, i8251_intf)
+	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
+
 	MCFG_CASSETTE_ADD("cassette", px8_cassette_interface)
 
 	/* internal ram */

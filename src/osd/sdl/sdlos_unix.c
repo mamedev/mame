@@ -15,6 +15,9 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/stat.h>
+#ifdef SDLMAME_EMSCRIPTEN
+#include <emscripten.h>
+#endif
 
 #include "sdlinc.h"
 
@@ -29,6 +32,9 @@
 
 osd_ticks_t osd_ticks(void)
 {
+#ifdef SDLMAME_EMSCRIPTEN
+		return (osd_ticks_t)(emscripten_get_now() * 1000.0);
+#else
 		struct timeval    tp;
 		static osd_ticks_t start_sec = 0;
 
@@ -36,6 +42,7 @@ osd_ticks_t osd_ticks(void)
 		if (start_sec==0)
 			start_sec = tp.tv_sec;
 		return (tp.tv_sec - start_sec) * (osd_ticks_t) 1000000 + tp.tv_usec;
+#endif
 }
 
 osd_ticks_t osd_ticks_per_second(void)

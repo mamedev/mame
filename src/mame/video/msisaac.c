@@ -176,41 +176,41 @@ void msisaac_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			switch (attributes & 3)
 			{
 			case 0: /* flipx==0 && flipy==0 */
-				drawgfx_transpen(bitmap,cliprect,gfx,
+				gfx->transpen(bitmap,cliprect,
 					sprite_number+1,color,
 					flipx,flipy,
 					sx,sy-16,0 );
-				drawgfx_transpen(bitmap,cliprect,gfx,
+				gfx->transpen(bitmap,cliprect,
 					sprite_number,color,
 					flipx,flipy,
 					sx,sy,0 );
 				break;
 			case 1: /* flipx==1 && flipy==0 */
-				drawgfx_transpen(bitmap,cliprect,gfx,
+				gfx->transpen(bitmap,cliprect,
 					sprite_number+1,color,
 					flipx,flipy,
 					sx,sy-16,0 );
-				drawgfx_transpen(bitmap,cliprect,gfx,
+				gfx->transpen(bitmap,cliprect,
 					sprite_number,color,
 					flipx,flipy,
 					sx,sy,0 );
 				break;
 			case 2: /* flipx==0 && flipy==1 */
-				drawgfx_transpen(bitmap,cliprect,gfx,
+				gfx->transpen(bitmap,cliprect,
 					sprite_number,color,
 					flipx,flipy,
 					sx,sy-16,0 );
-				drawgfx_transpen(bitmap,cliprect,gfx,
+				gfx->transpen(bitmap,cliprect,
 					sprite_number+1,color,
 					flipx,flipy,
 					sx,sy,0 );
 				break;
 			case 3: /* flipx==1 && flipy==1 */
-				drawgfx_transpen(bitmap,cliprect,gfx,
+				gfx->transpen(bitmap,cliprect,
 					sprite_number,color,
 					flipx,flipy,
 					sx,sy-16,0 );
-				drawgfx_transpen(bitmap,cliprect,gfx,
+				gfx->transpen(bitmap,cliprect,
 					sprite_number+1,color,
 					flipx,flipy,
 					sx,sy,0 );
@@ -219,7 +219,7 @@ void msisaac_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 		else
 		{
-			drawgfx_transpen(bitmap,cliprect,gfx,
+			gfx->transpen(bitmap,cliprect,
 				sprite_number,
 				color,
 				flipx,flipy,

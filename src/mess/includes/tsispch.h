@@ -13,17 +13,20 @@
 #include "machine/pic8259.h"
 #include "machine/terminal.h"
 
+#define TERMINAL_TAG "terminal"
+
 class tsispch_state : public driver_device
 {
 public:
 	tsispch_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_dsp(*this, "dsp"),
-			m_terminal(*this, TERMINAL_TAG),
-			m_uart(*this, "i8251a_u15"),
-			m_pic(*this, "pic8259")
-		{ }
+		m_maincpu(*this, "maincpu"),
+		m_dsp(*this, "dsp"),
+		m_terminal(*this, TERMINAL_TAG),
+		m_uart(*this, "i8251a_u15"),
+		m_pic(*this, "pic8259")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;

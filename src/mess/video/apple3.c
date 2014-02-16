@@ -102,7 +102,6 @@ VIDEO_START_MEMBER(apple3_state,apple3)
 	int i, j;
 	UINT32 v;
 
-	m_char_mem = auto_alloc_array(machine(), UINT8, 0x800);
 	memset(m_char_mem, 0, 0x800);
 
 	m_hgr_map = auto_alloc_array(machine(), UINT32, 192);
@@ -348,8 +347,12 @@ void apple3_state::apple3_video_graphics_shgr(bitmap_ind16 &bitmap)
 			for (x = 0; x < 7; x++)
 			{
 				*(ptr++) = (b1 & 0x01) ? WHITE : BLACK;
-				*(ptr++) = (b2 & 0x01) ? WHITE : BLACK;
 				b1 >>= 1;
+			}
+
+			for (x = 0; x < 7; x++)
+			{
+				*(ptr++) = (b2 & 0x01) ? WHITE : BLACK;
 				b2 >>= 1;
 			}
 		}
@@ -391,6 +394,8 @@ void apple3_state::apple3_video_graphics_chires(bitmap_ind16 &bitmap)
 
 UINT32 apple3_state::screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+//	printf("gfx mode %x\n", m_flags & (VAR_VM3|VAR_VM1|VAR_VM0));
+
 	switch(m_flags & (VAR_VM3|VAR_VM1|VAR_VM0))
 	{
 		case 0:

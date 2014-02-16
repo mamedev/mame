@@ -1049,6 +1049,7 @@ timecrs2        // April 1998
 timecrs2v2b     // April 1998
 timecrs2v4a     // April 1998
 panicprk        // May 1998
+panicprkj       // May 1998
 raceon          // Race On - September 1998
 gunwars         // September 1998
 aking           // Angler King - March 1999
@@ -3679,7 +3680,7 @@ tekken2         // 1996.04 Tekken 2 Ver.B (US, TES3/VER.D)
 tekken2ub       // 1995.09 Tekken 2 Ver.B (US, TES3/VER.B)
 tekken2ab       // 1995.09 Tekken 2 Ver.B (Asia, TES2/VER.B)
 tekken2jc       // 1995.11 Tekken 2 Ver.B (Japan, TES1/VER.C)
-				// 1995.10 Tekken 2 Ver.B (Japan, TES1/VER.B)
+tekken2jb       // 1995.09 Tekken 2 Ver.B (Japan, TES1/VER.B)
 tekken2aa       // 1995.08 Tekken 2 (Asia, TES2/VER.A)
 				// 1995.08 Tekken 2 (Japan, TES1/VER.A)
 souledge        // 1996.05 Soul Edge Ver. II (World, SO4/VER.C)
@@ -4764,9 +4765,9 @@ orunnersu       // 1993.06 Outrunners (US)
 orunnersj       // 1993.05 Outrunners (Japan)
 harddunkj       // 1994.04 Hard Dunk 3on3 (Japan)
 harddunk        // 1994.?? Hard Dunk 3on3 (World)
-				// 1993.03 Title Fight (Japan)
 titlef          // 1993.?? Title Fight (World)
 titlefu         // 1993.04 Title Fight (US)
+titlefj         // 1993.03 Title Fight (Japan)
 				// 1992.07 Stadium Cross (Japan)
 scross          // 1992.?? Stadium Cross (World)
 scrossu         // 1992.09 Stadium Cross (US)
@@ -10420,6 +10421,8 @@ tortufam        // (c) 1997 C.M.C.
 potgame         // (c) 1996 C.M.C.
 bottle10        // (c) 1996 C.M.C.
 bottl10b        // (c) 1996 C.M.C.
+lunapark        // (c) 1998 XxX.
+lunaparkb       // (c) 1998 XxX.
 royalcrd        // (c) 1991 TAB-Austria
 royalcrda       // (c) 1991 TAB-Austria
 royalcrdb       // (c) 1991 TAB-Austria
@@ -31132,3 +31135,4 @@ arac6000
 //
 number1    // 1996 San Remo Games
 gluck2     // 1992 Yung Yu / CYE
+

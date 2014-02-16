@@ -541,7 +541,7 @@ UINT32 jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_ind1
 		if (offs < 3 * 4)
 			sy++;
 
-		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+		machine().gfx[1]->transpen(bitmap,cliprect,
 				code,color,
 				flipx,flipy,
 				sx,sy,0);

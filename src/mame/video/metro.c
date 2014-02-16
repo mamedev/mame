@@ -504,7 +504,7 @@ void metro_state::metro_draw_sprites( screen_device &screen, bitmap_ind16 &bitma
 
 				gfx_element gfx(machine(), base_gfx8 + gfxstart, width, height, width, 0, 256);
 
-				pdrawgfxzoom_transpen(  bitmap,cliprect, &gfx,
+				gfx.prio_zoom_transpen(bitmap,cliprect,
 								0,
 								color_start >> 4,
 								flipx, flipy,
@@ -520,7 +520,7 @@ void metro_state::metro_draw_sprites( screen_device &screen, bitmap_ind16 &bitma
 
 				gfx_element gfx(machine(), base_gfx4 + 2 * gfxstart, width, height, width, 0, 16);
 
-				pdrawgfxzoom_transpen(  bitmap,cliprect, &gfx,
+				gfx.prio_zoom_transpen(bitmap,cliprect,
 								0,
 								color + color_start,
 								flipx, flipy,

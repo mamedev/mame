@@ -225,7 +225,7 @@ void kncljoe_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (sx >= 256-8)
 				sx -= 256;
 
-			drawgfx_transpen(bitmap,clip,gfx,
+			gfx->transpen(bitmap,clip,
 				code,
 				color,
 				flipx,flipy,

@@ -4249,6 +4249,36 @@ ROM_START( titlefu )
 	ROM_LOAD( "mpr-15385.ic1", 0x000000, 0x200000, CRC(5a9b0aa0) SHA1(d208aa165f9eea05e3b8c3f406ff44374e4f6887) )
 ROM_END
 
+/**************************************************************************************************************************
+    Title Fight (Japan)
+    not protected
+*/
+ROM_START( titlefj )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code */
+	ROM_LOAD32_WORD_x4( "epr-15377.ic37", 0x000000, 0x40000, CRC(1868403c) SHA1(d34a3a05e5a3bb2e6159f95d1e22d264bf553cda) )
+	ROM_LOAD32_WORD_x4( "epr-15378.ic40", 0x000002, 0x40000, CRC(44487b0a) SHA1(4aefd063bf148334d5f43d69f497766d50ffca30) )
+
+	ROM_REGION( 0x180000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD_x4( "epr-15384.ic31", 0x100000, 0x20000, CRC(0f7d208d) SHA1(5425120480f813210fae28951e8bfd5acb08ca53) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "mpr-15381.ic3",  0x000000, 0x200000, CRC(162cc4d6) SHA1(2369d3d76ab5ef8f033aa45530ab957f0e5ff028) )
+	ROM_LOAD16_BYTE( "mpr-15382.ic11", 0x000001, 0x200000, CRC(fd03a130) SHA1(040c36383ef5d8298af714958cd5b0a4c7556ae7) )
+
+	ROM_REGION32_BE( 0x1000000, "gfx2", 0 ) /* sprites */
+	ROMX_LOAD( "mpr-15379.ic14", 0x000000, 0x200000, CRC(e5c74b11) SHA1(67e4460efe5dcd88ffc12024b255efc843e6a8b5) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15375.ic15", 0x000002, 0x200000, CRC(046a9b50) SHA1(2b4c53f2a0264835cb7197daa9b3461c212541e8) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15371.ic10", 0x000004, 0x200000, CRC(999046c6) SHA1(37ce4e8aaf537b5366eacabaf36e4477b5624121) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15373.ic38", 0x000006, 0x200000, CRC(9b3294d9) SHA1(19542f14ce09753385a44098dfd1aaf331e7af0e) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15380.ic22", 0x800000, 0x200000, CRC(6ea0e58d) SHA1(1c4b761522157b0b9d086181ba6f6994879d8fdf) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15376.ic23", 0x800002, 0x200000, CRC(de3e05c5) SHA1(cac0d04ecd37e5836d246c0809bcfc11430df591) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15372.ic18", 0x800004, 0x200000, CRC(c187c36a) SHA1(bb55c2a768a43ef19a7847a4aa113523fee26c20) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr-15374.ic41", 0x800006, 0x200000, CRC(e026aab0) SHA1(75dfaef6d50c3d1d7f27aa5e44fcbc0ff2173c6f) , ROM_SKIP(6)|ROM_GROUPWORD )
+
+	ROM_REGION( 0x400000, "sega", 0 ) /* Sega PCM sound data */
+	ROM_LOAD( "mpr-15385.ic1", 0x000000, 0x200000, CRC(5a9b0aa0) SHA1(d208aa165f9eea05e3b8c3f406ff44374e4f6887) )
+ROM_END
+
 
 
 /*************************************
@@ -4733,3 +4763,4 @@ GAME( 1992, scross,    0,        multi32,      scross,   segas32_state, scross, 
 GAME( 1992, scrossu,   scross,   multi32,      scross,   segas32_state, scross,   ROT0, "Sega",   "Stadium Cross (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, titlef,    0,        multi32,      titlef,   segas32_state, titlef,   ROT0, "Sega",   "Title Fight (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, titlefu,   titlef,   multi32,      titlef,   segas32_state, titlef,   ROT0, "Sega",   "Title Fight (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, titlefj,   titlef,   multi32,      titlef,   segas32_state, titlef,   ROT0, "Sega",   "Title Fight (Japan)", GAME_IMPERFECT_GRAPHICS )

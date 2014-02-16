@@ -14,13 +14,7 @@
 #ifndef __PET_HARDBOX__
 #define __PET_HARDBOX__
 
-#include "emu.h"
 #include "ieee488.h"
-#include "cpu/z80/z80.h"
-#include "imagedev/harddriv.h"
-#include "includes/corvushd.h"
-#include "machine/i8255.h"
-#include "machine/serial.h"
 
 
 

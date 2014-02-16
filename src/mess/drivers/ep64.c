@@ -254,7 +254,7 @@ READ8_MEMBER( ep64_state::rd1_r )
 	data |= m_centronics_busy << 3;
 
 	// serial
-	data |= m_rs232->rx() << 4;
+	data |= m_rs232->rxd_r() << 4;
 	data |= m_rs232->cts_r() << 5;
 
 	// cassette
@@ -286,8 +286,8 @@ WRITE8_MEMBER( ep64_state::wr2_w )
 	*/
 
 	// serial
-	m_rs232->tx(!BIT(data, 0));
-	m_rs232->rts_w(!BIT(data, 1));
+	m_rs232->write_txd(!BIT(data, 0));
+	m_rs232->write_rts(!BIT(data, 1));
 }
 
 
@@ -540,7 +540,7 @@ static MACHINE_CONFIG_START( ep64, ep64_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(DAVE_TAG, dave_device, int2_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(DAVE_TAG, dave_device, int2_w))
 
 	MCFG_CASSETTE_ADD(CASSETTE1_TAG, cass_intf)
 	MCFG_CASSETTE_ADD(CASSETTE2_TAG, cass_intf)

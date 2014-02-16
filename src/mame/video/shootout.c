@@ -131,7 +131,7 @@ void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 						vy = 240 - vy;
 					}
 
-					pdrawgfx_transpen(bitmap,cliprect,gfx,
+					gfx->prio_transpen(bitmap,cliprect,
 						number,
 						0 /*color*/,
 						flipx,flipy,
@@ -150,7 +150,7 @@ void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 					vy = 240 - vy;
 				}
 
-				pdrawgfx_transpen(bitmap,cliprect,gfx,
+				gfx->prio_transpen(bitmap,cliprect,
 						number,
 						0 /*color*/,
 						flipx,flipy,
