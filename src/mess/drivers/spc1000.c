@@ -20,33 +20,39 @@ class spc1000_state : public driver_device
 {
 public:
 	spc1000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_vdg(*this, "mc6847") ,
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG) {}
+		: driver_device(mconfig, type, tag)
+		, m_vdg(*this, "mc6847")
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_cass(*this, "cassette")
+	{}
 
-	required_device<mc6847_base_device> m_vdg;
-	UINT8 m_IPLK;
-	UINT8 m_GMODE;
-	UINT8 m_video_ram[0x2000];
+	DECLARE_WRITE8_MEMBER(spc1000_iplk_w);
+	DECLARE_READ8_MEMBER(spc1000_iplk_r);
+	DECLARE_WRITE8_MEMBER(spc1000_video_ram_w);
+	DECLARE_READ8_MEMBER(spc1000_video_ram_r);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	DECLARE_WRITE8_MEMBER(spc1000_gmode_w);
+	DECLARE_READ8_MEMBER(spc1000_gmode_r);
+	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_READ8_MEMBER(spc1000_mc6847_videoram_r);
+	DECLARE_WRITE8_MEMBER(cass_w);
 
 	static UINT8 get_char_rom(running_machine &machine, UINT8 ch, int line)
 	{
 		spc1000_state *state = machine.driver_data<spc1000_state>();
 		return state->m_video_ram[0x1000+(ch&0x7F)*16+line];
 	}
-	DECLARE_WRITE8_MEMBER(spc1000_iplk_w);
-	DECLARE_READ8_MEMBER(spc1000_iplk_r);
-	DECLARE_WRITE8_MEMBER(spc1000_video_ram_w);
-	DECLARE_READ8_MEMBER(spc1000_video_ram_r);
-	DECLARE_READ8_MEMBER(spc1000_keyboard_r);
+
+private:
+	UINT8 m_IPLK;
+	UINT8 m_GMODE;
+	UINT8 m_video_ram[0x2000];
 	virtual void machine_reset();
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE8_MEMBER(spc1000_gmode_w);
-	DECLARE_READ8_MEMBER(spc1000_gmode_r);
-	DECLARE_READ8_MEMBER(spc1000_mc6847_videoram_r);
+	required_device<mc6847_base_device> m_vdg;
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<cassette_image_device> m_cass;
 };
 
 
@@ -98,12 +104,9 @@ READ8_MEMBER(spc1000_state::spc1000_video_ram_r)
 	return m_video_ram[offset];
 }
 
-READ8_MEMBER(spc1000_state::spc1000_keyboard_r){
-	static const char *const keynames[] = {
-		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
-		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
-	};
-	return ioport(keynames[offset])->read();
+WRITE8_MEMBER( spc1000_state::cass_w )
+{
+	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
 }
 
 WRITE8_MEMBER(spc1000_state::spc1000_gmode_w)
@@ -127,10 +130,20 @@ static ADDRESS_MAP_START( spc1000_io , AS_IO, 8, spc1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(spc1000_video_ram_r, spc1000_video_ram_w)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(spc1000_gmode_r, spc1000_gmode_w)
-	AM_RANGE(0x8000, 0x8009) AM_READ(spc1000_keyboard_r)
-	AM_RANGE(0xA000, 0xA000) AM_READWRITE(spc1000_iplk_r, spc1000_iplk_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(cass_w)
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("LINE0")
+	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("LINE1")
+	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("LINE2")
+	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("LINE3")
+	AM_RANGE(0x8004, 0x8004) AM_READ_PORT("LINE4")
+	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("LINE5")
+	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("LINE6")
+	AM_RANGE(0x8007, 0x8007) AM_READ_PORT("LINE7")
+	AM_RANGE(0x8008, 0x8008) AM_READ_PORT("LINE8")
+	AM_RANGE(0x8009, 0x8009) AM_READ_PORT("LINE9")
+	AM_RANGE(0xA000, 0xA000) AM_READWRITE(spc1000_iplk_r, spc1000_iplk_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -266,11 +279,22 @@ READ8_MEMBER(spc1000_state::spc1000_mc6847_videoram_r)
 	}
 }
 
+READ8_MEMBER( spc1000_state::porta_r )
+{
+	UINT8 data = 0;
+	if (m_cass->input() > 0.0038)
+		data |= 0x80;
+	return data;
+}
+
 static const ay8910_interface spc1000_ay_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL
+	DEVCB_DRIVER_MEMBER(spc1000_state, porta_r),  //portA_r
+	DEVCB_NULL,  // portB_r
+	DEVCB_NULL,  // portA_w
+	DEVCB_NULL   // portB_w
 };
 
 static const cassette_interface spc1000_cassette_interface =
@@ -340,5 +364,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, spc1000,  0,       0,   spc1000,    spc1000, driver_device,  0,  "Samsung",   "SPC-1000",       GAME_NOT_WORKING)
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY    FULLNAME       FLAGS */
+COMP( 1982, spc1000,  0,      0,       spc1000,   spc1000, driver_device,  0,   "Samsung", "SPC-1000", GAME_NOT_WORKING )
