@@ -5903,7 +5903,7 @@ GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  driver_device,  0,       
 GAMEL( 1996, bottle10,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 1)",                      0,                       layout_jollycrd )
 GAMEL( 1996, bottl10b,  bottle10, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 2)",                      0,                       layout_jollycrd )
 GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  driver_device,  0,        ROT0, "XxX.",            "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd )	// mirrored video RAM (4000/5000 to 6000/7000).
-GAMEL( 1998, lunaparkb, lunapark, lunapark, cuoreuno,  driver_device,  0,        ROT0, "XxX.",            "Luna Park (set 2)",                               0,                       layout_jollycrd )	// regular video RAM 6000/7000.
+GAMEL( 1998, lunaparkb, lunapark, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "XxX.",            "Luna Park (set 2)",                               0,                       layout_jollycrd )	// regular video RAM 6000/7000.
 
 // Royal Card based...
 GAMEL( 1991, royalcrd,  0,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 1)",                    0,                       layout_jollycrd )
