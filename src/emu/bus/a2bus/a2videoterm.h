@@ -97,11 +97,20 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 };
 
+class a2bus_aevm80_device : public a2bus_videx80_device
+{
+public:
+	a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual const rom_entry *device_rom_region() const;
+};
+
 // device type definition
 extern const device_type A2BUS_VIDEOTERM;
 extern const device_type A2BUS_IBSAP16;
 extern const device_type A2BUS_IBSAP16ALT;
 extern const device_type A2BUS_VTC1;
 extern const device_type A2BUS_VTC2;
+extern const device_type A2BUS_AEVIEWMASTER80;
 
 #endif /* __A2BUS_VIDEOTERM__ */
