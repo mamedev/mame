@@ -1,10 +1,12 @@
 /**********************************************************************************
 
-  Fun World / Amatic / TAB / Impera.
+  Fun World / TAB / Impera
   Series 7000 hardware.
 
   65C02 + 2x PIAs + M6845 CRTC + AY8910
 
+  Also from Amatic, CMC, Dino4 encrypted, and Leopard 4.
+ 
   Driver by Roberto Fresca.
   Based on a preliminary work of Curt Coder & Peter Trauner.
 
@@ -42,8 +44,8 @@
   * Pot Game (Italian),                               C.M.C.,             1996.
   * Bottle 10 (Italian, set 1),                       C.M.C.,             1996.
   * Bottle 10 (Italian, set 2),                       C.M.C.,             1996.
-  * Luna Park (set 1, dual program),                  XxX.,               1998.
-  * Luna Park (set 2),                                XxX.,               1998.
+  * Luna Park (set 1, dual program),                  unknown,            1998.
+  * Luna Park (set 2),                                unknown,            1998.
   * Royal Card (Austrian, set 1),                     TAB Austria,        1991.
   * Royal Card (Austrian, set 2),                     TAB Austria,        1991.
   * Royal Card (Austrian/Polish, set 3),              TAB Austria,        1991.
@@ -4067,30 +4069,27 @@ ROM_END
 
 /*
   Luna Park sets...
-  
+
   This board has mirrored video RAM 4000-4FFF to 5000-5FFF,
   and color RAM 6000-6FFF to 7000-7FFF.
-  
+
   Two different programs. One in each program ROM half.
   PRG rom higher address line is connected to DIP switch #1,
   so it should have 2 games in the same PCB (2 revisions?)
-  
+
          1st half:           2nd half:
-  
+
   BE58:  LDA #$04            LDA #$00
          JSR $9DE2           JSR $9DE2
-		
+
   BE60:  LDA #$09            LDA #$00
          JSR $B25E           JSR $B25E
 
   BE73:  A5 22               A5 23
-  
+
   BEC0: '5 TIRI LIRE 500'   '10 TIRI LIRE 500'
-
   BF40:  00 00 00 00...     'wait...no coin'
-
   C3D0: 'ABILITA VINTE'     'PARTITA VINTE'
-
   DF30:  20 20 20 20 20      00 00 00 00 00
 
 */
@@ -5902,8 +5901,8 @@ GAMEL( 1997, tortufam,  0,        cuoreuno, cuoreuno,  driver_device,  0,       
 GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pot Game (Italian)",                              0,                       layout_jollycrd )
 GAMEL( 1996, bottle10,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 1)",                      0,                       layout_jollycrd )
 GAMEL( 1996, bottl10b,  bottle10, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 2)",                      0,                       layout_jollycrd )
-GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  driver_device,  0,        ROT0, "XxX.",            "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd )	// mirrored video RAM (4000/5000 to 6000/7000).
-GAMEL( 1998, lunaparkb, lunapark, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "XxX.",            "Luna Park (set 2)",                               0,                       layout_jollycrd )	// regular video RAM 6000/7000.
+GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  driver_device,  0,        ROT0, "<unknown>.",      "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd )	// mirrored video RAM (4000/5000 to 6000/7000).
+GAMEL( 1998, lunaparkb, lunapark, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "<unknown>.",      "Luna Park (set 2)",                               0,                       layout_jollycrd )	// regular video RAM 6000/7000.
 
 // Royal Card based...
 GAMEL( 1991, royalcrd,  0,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 1)",                    0,                       layout_jollycrd )
