@@ -814,9 +814,6 @@ void device_t::remove_subdevice(device_t &device)
 	for (device_t *scan = iter.first(); scan != NULL; scan = iter.next())
 		scan->m_device_map.reset(); //remove(&device);
 
-	// reset auto finder
-	m_auto_finder_list = NULL;
-
 	// remove from our list
 	m_subdevice_list.remove(device);
 }
