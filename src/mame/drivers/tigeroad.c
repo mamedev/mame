@@ -534,7 +534,7 @@ static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tigeroad_state, screen_update_tigeroad)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(tigeroad)
+	MCFG_GFXDECODE_ADD("gfxdecode", tigeroad)
 	MCFG_PALETTE_LENGTH(576)
 
 

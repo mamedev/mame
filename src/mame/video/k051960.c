@@ -75,9 +75,21 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	m_readroms(0),
 	m_irq_enabled(0),
 	m_nmi_enabled(0),
-	m_k051937_counter(0)
+	m_k051937_counter(0),
+	m_gfxdecode(*this)
 {
 }
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void k051960_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<k051960_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -152,17 +164,17 @@ void k051960_device::device_start()
 	{
 	case NORMAL_PLANE_ORDER:
 		total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / 128;
-		konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &spritelayout, 4);
+		konami_decode_gfx(machine(), m_gfxdecode, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &spritelayout, 4);
 		break;
 
 	case REVERSE_PLANE_ORDER:
 		total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / 128;
-		konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &spritelayout_reverse, 4);
+		konami_decode_gfx(machine(), m_gfxdecode, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &spritelayout_reverse, 4);
 		break;
 
 	case GRADIUS3_PLANE_ORDER:
 		total = 0x4000;
-		konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &spritelayout_gradius3, 4);
+		konami_decode_gfx(machine(), m_gfxdecode, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &spritelayout_gradius3, 4);
 		break;
 
 	default:
@@ -175,7 +187,7 @@ void k051960_device::device_start()
 	/* deinterleave the graphics, if needed */
 	konami_deinterleave_gfx(machine(), m_gfx_memory_region, m_deinterleave);
 
-	m_gfx = machine().gfx[m_gfx_num];
+	m_gfx = m_gfxdecode->gfx(m_gfx_num);
 	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x400);
 
 	save_item(NAME(m_romoffset));

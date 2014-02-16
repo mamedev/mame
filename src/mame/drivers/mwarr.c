@@ -363,7 +363,7 @@ TILE_GET_INFO_MEMBER(mwarr_state::get_bg_tile_info)
 	int tileno = m_bg_videoram[tile_index] & 0x1fff;
 	int colour = (m_bg_videoram[tile_index] & 0xe000) >> 13;
 
-	SET_TILE_INFO_MEMBER(4, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 4, tileno, colour, 0);
 }
 
 TILE_GET_INFO_MEMBER(mwarr_state::get_mlow_tile_info)
@@ -371,7 +371,7 @@ TILE_GET_INFO_MEMBER(mwarr_state::get_mlow_tile_info)
 	int tileno = m_mlow_videoram[tile_index] & 0x1fff;
 	int colour = (m_mlow_videoram[tile_index] & 0xe000) >> 13;
 
-	SET_TILE_INFO_MEMBER(3, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, tileno, colour, 0);
 }
 
 TILE_GET_INFO_MEMBER(mwarr_state::get_mhigh_tile_info)
@@ -379,7 +379,7 @@ TILE_GET_INFO_MEMBER(mwarr_state::get_mhigh_tile_info)
 	int tileno = m_mhigh_videoram[tile_index] & 0x1fff;
 	int colour = (m_mhigh_videoram[tile_index] & 0xe000) >> 13;
 
-	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, tileno, colour, 0);
 }
 
 TILE_GET_INFO_MEMBER(mwarr_state::get_tx_tile_info)
@@ -387,7 +387,7 @@ TILE_GET_INFO_MEMBER(mwarr_state::get_tx_tile_info)
 	int tileno = m_tx_videoram[tile_index] & 0x1fff;
 	int colour = (m_tx_videoram[tile_index] & 0xe000) >> 13;
 
-	SET_TILE_INFO_MEMBER(1, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, colour, 0);
 }
 
 void mwarr_state::video_start()
@@ -412,7 +412,7 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 {
 	const UINT16 *source = m_sprites_buffer + 0x800 - 4;
 	const UINT16 *finish = m_sprites_buffer;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int x, y, color, flipx, dy, pri, pri_mask, i;
 
 	while (source >= finish)
@@ -560,7 +560,7 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	MCFG_SCREEN_VISIBLE_AREA(8+1, 48*8-1-8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mwarr_state, screen_update_mwarr)
 
-	MCFG_GFXDECODE(mwarr)
+	MCFG_GFXDECODE_ADD("gfxdecode", mwarr)
 	MCFG_PALETTE_LENGTH(0x800)
 
 

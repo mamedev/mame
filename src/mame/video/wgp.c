@@ -9,7 +9,7 @@ inline void wgp_state::common_get_piv_tile_info( tile_data &tileinfo, int tile_i
 	UINT16 tilenum = m_pivram[tile_index + num * 0x1000];    /* 3 blocks of $2000 */
 	UINT16 attr = m_pivram[tile_index + num * 0x1000 + 0x8000];  /* 3 blocks of $2000 */
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tilenum & 0x3fff,
 			(attr & 0x3f),  /* attr & 0x1 ?? */
@@ -346,7 +346,7 @@ void wgp_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const
 	UINT8 small_sprite, col, flipx, flipy;
 	UINT16 code, bigsprite, map_index;
 //  UINT16 rotate = 0;
-	UINT16 tile_mask = (machine().gfx[0]->elements()) - 1;
+	UINT16 tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
 	static const int primasks[2] = {0x0, 0xfffc};   /* fff0 => under rhs of road only */
 
 	for (offs = 0x1ff; offs >= 0; offs--)
@@ -418,7 +418,7 @@ void wgp_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const
 					zx = x + (((k + 1) * zoomx) / 2) - curx;
 					zy = y + (((j + 1) * zoomy) / 2) - cury;
 
-					machine().gfx[0]->prio_zoom_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
 							code,
 							col,
 							flipx, flipy,
@@ -449,7 +449,7 @@ void wgp_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const
 					zx = x + (((k + 1) * zoomx) / 4) - curx;
 					zy = y + (((j + 1) * zoomy) / 4) - cury;
 
-					machine().gfx[0]->prio_zoom_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
 							code,
 							col,
 							flipx, flipy,

@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(pushman_state::get_back_tile_info)
 	int tile;
 
 	tile = bg_map[tile_index << 1] + (bg_map[(tile_index << 1) + 1] << 8);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			(tile & 0xff) | ((tile & 0x4000) >> 6),
 			(tile >> 8) & 0xf,
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(pushman_state::get_back_tile_info)
 TILE_GET_INFO_MEMBER(pushman_state::get_text_tile_info)
 {
 	int tile = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			(tile & 0xff) | ((tile & 0xc000) >> 6) | ((tile & 0x2000) >> 3),
 			(tile >> 8) & 0xf,
@@ -108,7 +108,7 @@ void pushman_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		machine().gfx[1]->transpen(bitmap,cliprect, sprite,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, sprite,
 				color, flipx, flipy, x, y, 15);
 	}
 }

@@ -28,7 +28,7 @@ void flower_state::palette_init()
 
 void flower_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	UINT8 *source = m_spriteram + 0x200;
 	UINT8 *finish = source - 0x200;
 
@@ -123,7 +123,7 @@ TILE_GET_INFO_MEMBER(flower_state::get_bg0_tile_info)
 	int color = m_bg0ram[tile_index+0x100];
 	/* Todo - may be tile flip bits? */
 
-	SET_TILE_INFO_MEMBER(2, code, color>>4, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color>>4, 0);
 }
 
 TILE_GET_INFO_MEMBER(flower_state::get_bg1_tile_info)
@@ -132,7 +132,7 @@ TILE_GET_INFO_MEMBER(flower_state::get_bg1_tile_info)
 	int color = m_bg1ram[tile_index+0x100];
 	/* Todo - may be tile flip bits? */
 
-	SET_TILE_INFO_MEMBER(2, code, color>>4, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color>>4, 0);
 }
 
 TILE_GET_INFO_MEMBER(flower_state::get_text_tile_info)
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(flower_state::get_text_tile_info)
 	int color = m_textram[tile_index+0x400];
 	/* Todo - may be tile flip bits? */
 
-	SET_TILE_INFO_MEMBER(0, code, color>>2, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color>>2, 0);
 }
 
 void flower_state::video_start()

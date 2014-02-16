@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( pass, pass_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pass_state, screen_update_pass)
 
 	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_GFXDECODE(pass)
+	MCFG_GFXDECODE_ADD("gfxdecode", pass)
 
 
 	/* sound hardware */

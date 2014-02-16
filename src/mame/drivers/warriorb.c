@@ -519,7 +519,7 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 	MCFG_TC0220IOC_ADD("tc0220ioc", darius2d_io_intf)
 
 	/* video hardware */
-	MCFG_GFXDECODE(warriorb)
+	MCFG_GFXDECODE_ADD("gfxdecode", warriorb)
 	MCFG_PALETTE_LENGTH(4096*2)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -539,7 +539,9 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2d_tc0100scn_intf_l)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2d_tc0100scn_intf_r)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0110PCR_ADD("tc0110pcr_1", darius2d_tc0110pcr_intf_l)
 	MCFG_TC0110PCR_ADD("tc0110pcr_2", darius2d_tc0110pcr_intf_r)
 
@@ -582,7 +584,7 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 	MCFG_TC0510NIO_ADD("tc0510nio", warriorb_io_intf)
 
 	/* video hardware */
-	MCFG_GFXDECODE(warriorb)
+	MCFG_GFXDECODE_ADD("gfxdecode", warriorb)
 	MCFG_PALETTE_LENGTH(4096*2)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -602,7 +604,9 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", warriorb_tc0100scn_intf_l)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_ADD("tc0100scn_2", warriorb_tc0100scn_intf_r)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0110PCR_ADD("tc0110pcr_1", darius2d_tc0110pcr_intf_l)
 	MCFG_TC0110PCR_ADD("tc0110pcr_2", darius2d_tc0110pcr_intf_r)
 

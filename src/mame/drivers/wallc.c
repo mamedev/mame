@@ -149,7 +149,7 @@ WRITE8_MEMBER(wallc_state::wallc_videoram_w)
 TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info)
 {
 	UINT8 *videoram = m_videoram;
-	SET_TILE_INFO_MEMBER(0, videoram[tile_index] + 0x100, 1, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, videoram[tile_index] + 0x100, 1, 0);
 }
 
 void wallc_state::video_start()
@@ -315,7 +315,7 @@ static MACHINE_CONFIG_START( wallc, wallc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wallc_state, screen_update_wallc)
 
-	MCFG_GFXDECODE(wallc)
+	MCFG_GFXDECODE_ADD("gfxdecode", wallc)
 	MCFG_PALETTE_LENGTH(32)
 
 

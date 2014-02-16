@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(yiear_state::get_bg_tile_info)
 //  int color = (attr & 0xf0) >> 4;
 	int flags = ((attr & 0x80) ? TILE_FLIPX : 0) | ((attr & 0x40) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, 0, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, flags);
 }
 
 void yiear_state::video_start()
@@ -130,7 +130,7 @@ void yiear_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		}
 
 		
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);

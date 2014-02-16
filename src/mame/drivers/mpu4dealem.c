@@ -124,7 +124,7 @@ UINT32 mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_ind1
 		{
 			int tile = m_dealem_videoram[count + 0x1000] | (m_dealem_videoram[count] << 8);
 			count++;
-			machine().gfx[0]->opaque(bitmap,cliprect,tile,0,0,0,x * 8,y * 8);
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,0,0,0,x * 8,y * 8);
 		}
 	}
 
@@ -228,7 +228,7 @@ static MACHINE_CONFIG_START( dealem, mpu4dealem_state )
 	MCFG_SCREEN_REFRESH_RATE(56)                            /* Measured accurately from the flip-flop, but 6845 handles this */
 	MCFG_SCREEN_UPDATE_DRIVER(mpu4dealem_state, screen_update_dealem)
 
-	MCFG_GFXDECODE(dealem)
+	MCFG_GFXDECODE_ADD("gfxdecode", dealem)
 
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_PALETTE_INIT_OVERRIDE(mpu4dealem_state,dealem)

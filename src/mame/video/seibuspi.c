@@ -336,7 +336,7 @@ void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	int flip_x, flip_y;
 	int priority;
 	int x1, y1;
-	gfx_element *gfx = machine().gfx[2];
+	gfx_element *gfx = m_gfxdecode->gfx(2);
 	const int has_tile_high = (gfx->elements() > 0x10000) ? 1 : 0;
 	const int colormask = (m_sprite_bpp == 6) ? 0x3f : 0x1f;
 
@@ -545,7 +545,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
@@ -557,7 +557,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
 	tile &= 0x1fff;
 	tile |= m_rf2_layer_bank << 14 & 0x4000; // (d0)
 
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
@@ -570,7 +570,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
 	tile |= 0x2000;
 	tile |= m_rf2_layer_bank << 13 & 0x4000; // (d1)
 
-	SET_TILE_INFO_MEMBER(1, tile, color + 16, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color + 16, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
@@ -584,7 +584,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
 	tile |= m_layer_bank >> 14 & 0x2000; // (d27)
 	tile |= m_rf2_layer_bank << 12 & 0x4000; // (d2)
 
-	SET_TILE_INFO_MEMBER(1, tile, color + 8, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color + 8, 0);
 }
 
 

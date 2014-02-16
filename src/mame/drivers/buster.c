@@ -35,7 +35,7 @@ void buster_state::video_start()
 
 UINT32 buster_state::screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x0000;
 
 	int y,x;
@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( buster, buster_state )
 	MCFG_SCREEN_UPDATE_DRIVER(buster_state, screen_update_buster)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_3_579545MHz/4, mc6845_intf) //unknown clock / type
 
-	MCFG_GFXDECODE(buster)
+	MCFG_GFXDECODE_ADD("gfxdecode", buster)
 	MCFG_PALETTE_LENGTH(8)
 
 

@@ -134,7 +134,7 @@ TILE_GET_INFO_MEMBER(cntsteer_state::get_bg_tile_info)
 {
 	int code = m_videoram2[tile_index];
 
-	SET_TILE_INFO_MEMBER(2, code + m_bg_bank, m_bg_color_bank, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code + m_bg_bank, m_bg_color_bank, 0);
 }
 
 TILE_GET_INFO_MEMBER(cntsteer_state::get_fg_tile_info)
@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(cntsteer_state::get_fg_tile_info)
 
 	code |= (attr & 0x01) << 8;
 
-	SET_TILE_INFO_MEMBER(0, code, 0x30 + ((attr & 0x78) >> 3), 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0x30 + ((attr & 0x78) >> 3), 0);
 }
 
 VIDEO_START_MEMBER(cntsteer_state,cntsteer)
@@ -214,17 +214,17 @@ void cntsteer_state::zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		{
 			if (fy)
 			{
-				 machine().gfx[1]->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
-				 machine().gfx[1]->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy - 16, 0);
+				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy - 16, 0);
 			}
 			else
 			{
-				 machine().gfx[1]->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy - 16, 0);
-				 machine().gfx[1]->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
+				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy - 16, 0);
+				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
 			}
 		}
 		else
-			 machine().gfx[1]->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
 	}
 }
 
@@ -271,17 +271,17 @@ void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		{
 			if (fy)
 			{
-				 machine().gfx[1]->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
-				 machine().gfx[1]->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy - 16, 0);
+				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy - 16, 0);
 			}
 			else
 			{
-				 machine().gfx[1]->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy - 16, 0);
-				 machine().gfx[1]->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
+				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy - 16, 0);
+				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
 			}
 		}
 		else
-			 machine().gfx[1]->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
 	}
 }
 
@@ -901,7 +901,7 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_GFXDECODE(cntsteer)
+	MCFG_GFXDECODE_ADD("gfxdecode", cntsteer)
 	MCFG_PALETTE_LENGTH(256)
 //  MCFG_PALETTE_INIT_OVERRIDE(cntsteer_state,zerotrgt)
 
@@ -948,7 +948,7 @@ static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_zerotrgt)
 
-	MCFG_GFXDECODE(zerotrgt)
+	MCFG_GFXDECODE_ADD("gfxdecode", zerotrgt)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT_OVERRIDE(cntsteer_state,zerotrgt)

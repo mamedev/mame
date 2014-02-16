@@ -165,6 +165,7 @@ public:
 	INTERRUPT_GEN_MEMBER(ddealer_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ddealer_mcu_sim);
 	required_device<cpu_device> m_maincpu;
+	void ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy);
 };
 
 
@@ -177,7 +178,7 @@ WRITE16_MEMBER(ddealer_state::ddealer_flipscreen_w)
 TILE_GET_INFO_MEMBER(ddealer_state::get_back_tile_info)
 {
 	int code = m_back_vram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code & 0xfff,
 			code >> 12,
@@ -190,9 +191,9 @@ void ddealer_state::video_start()
 	m_back_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ddealer_state::get_back_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 }
 
-static void ddealer_draw_video_layer( running_machine &machine, UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy)
+void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy)
 {
-	gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 
 	INT16 sx, sy;
 	int x,y, count;
@@ -289,24 +290,24 @@ UINT32 ddealer_state::screen_update_ddealer(screen_device &screen, bitmap_ind16 
 	{
 		if (m_vregs[0xcc / 2] & 0x80)
 		{
-			ddealer_draw_video_layer(machine(), &m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
-			ddealer_draw_video_layer(machine(), &m_vregs[0xcc / 2], m_right_fg_vram_top, m_right_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(&m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(&m_vregs[0xcc / 2], m_right_fg_vram_top, m_right_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(machine(), &m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(&m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
 		}
 	}
 	else
 	{
 		if (m_vregs[0xcc / 2] & 0x80)
 		{
-			ddealer_draw_video_layer(machine(), &m_vregs[0xcc / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
-			ddealer_draw_video_layer(machine(), &m_vregs[0x1e0 / 2], m_right_fg_vram_top, m_right_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(&m_vregs[0xcc / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(&m_vregs[0x1e0 / 2], m_right_fg_vram_top, m_right_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(machine(), &m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
+			ddealer_draw_video_layer(&m_vregs[0x1e0 / 2], m_left_fg_vram_top, m_left_fg_vram_bottom, bitmap, cliprect, m_flipscreen);
 		}
 
 	}
@@ -626,7 +627,7 @@ static MACHINE_CONFIG_START( ddealer, ddealer_state )
 	// M50747 or NMK-110 8131 MCU
 
 
-	MCFG_GFXDECODE(ddealer)
+	MCFG_GFXDECODE_ADD("gfxdecode", ddealer)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

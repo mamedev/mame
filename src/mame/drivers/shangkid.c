@@ -386,7 +386,7 @@ static MACHINE_CONFIG_START( chinhero, shangkid_state )
 	MCFG_SCREEN_VISIBLE_AREA(16, 319-16, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(shangkid_state, screen_update_shangkid)
 
-	MCFG_GFXDECODE(chinhero)
+	MCFG_GFXDECODE_ADD("gfxdecode", chinhero)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
@@ -420,7 +420,7 @@ static MACHINE_CONFIG_DERIVED( shangkid, chinhero )
 	MCFG_MACHINE_RESET_OVERRIDE(shangkid_state,shangkid)
 
 	/* video hardware */
-	MCFG_GFXDECODE(shangkid)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", shangkid)
 
 	MCFG_SOUND_MODIFY("aysnd")
 	MCFG_SOUND_CONFIG(shangkid_ay8910_interface)
@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( dynamski, shangkid_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255+32, 16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(shangkid_state, screen_update_dynamski)
 
-	MCFG_GFXDECODE(dynamski)
+	MCFG_GFXDECODE_ADD("gfxdecode", dynamski)
 	MCFG_PALETTE_LENGTH(16*4+16*4)
 
 	MCFG_PALETTE_INIT_OVERRIDE(shangkid_state,dynamski)

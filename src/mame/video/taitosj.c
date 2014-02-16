@@ -181,10 +181,10 @@ void taitosj_state::video_start()
 	m_sprite_sprite_collbitmap1.allocate(32,32);
 	m_sprite_sprite_collbitmap2.allocate(32,32);
 
-	machine().gfx[0]->set_source(m_characterram);
-	machine().gfx[1]->set_source(m_characterram);
-	machine().gfx[2]->set_source(m_characterram + 0x1800);
-	machine().gfx[3]->set_source(m_characterram + 0x1800);
+	m_gfxdecode->gfx(0)->set_source(m_characterram);
+	m_gfxdecode->gfx(1)->set_source(m_characterram);
+	m_gfxdecode->gfx(2)->set_source(m_characterram + 0x1800);
+	m_gfxdecode->gfx(3)->set_source(m_characterram + 0x1800);
 
 	compute_draw_order();
 }
@@ -218,13 +218,13 @@ WRITE8_MEMBER(taitosj_state::taitosj_characterram_w)
 	{
 		if (offset < 0x1800)
 		{
-			machine().gfx[0]->mark_dirty((offset / 8) & 0xff);
-			machine().gfx[1]->mark_dirty((offset / 32) & 0x3f);
+			m_gfxdecode->gfx(0)->mark_dirty((offset / 8) & 0xff);
+			m_gfxdecode->gfx(1)->mark_dirty((offset / 32) & 0x3f);
 		}
 		else
 		{
-			machine().gfx[2]->mark_dirty((offset / 8) & 0xff);
-			machine().gfx[3]->mark_dirty((offset / 32) & 0x3f);
+			m_gfxdecode->gfx(2)->mark_dirty((offset / 8) & 0xff);
+			m_gfxdecode->gfx(3)->mark_dirty((offset / 32) & 0x3f);
 		}
 
 		m_characterram[offset] = data;
@@ -261,7 +261,7 @@ inline gfx_element * taitosj_state::get_sprite_gfx_element(UINT8 which)
 {
 	offs_t offs = which * 4;
 
-	return machine().gfx[(m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 3] & 0x40) ? 3 : 1];
+	return m_gfxdecode->gfx((m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 3] & 0x40) ? 3 : 1);
 }
 
 
@@ -513,19 +513,19 @@ void taitosj_state::draw_layers()
 		if (GLOBAL_FLIP_X) sx = 31 - sx;
 		if (GLOBAL_FLIP_Y) sy = 31 - sy;
 
-		machine().gfx[m_colorbank[0] & 0x08 ? 2 : 0]->transpen(m_layer_bitmap[0],m_layer_bitmap[0].cliprect(),
+		m_gfxdecode->gfx(m_colorbank[0] & 0x08 ? 2 : 0)->transpen(m_layer_bitmap[0],m_layer_bitmap[0].cliprect(),
 				m_videoram_1[offs],
 				m_colorbank[0] & 0x07,
 				GLOBAL_FLIP_X,GLOBAL_FLIP_Y,
 				8*sx,8*sy,0);
 
-		machine().gfx[m_colorbank[0] & 0x80 ? 2 : 0]->transpen(m_layer_bitmap[1],m_layer_bitmap[1].cliprect(),
+		m_gfxdecode->gfx(m_colorbank[0] & 0x80 ? 2 : 0)->transpen(m_layer_bitmap[1],m_layer_bitmap[1].cliprect(),
 				m_videoram_2[offs],
 				(m_colorbank[0] >> 4) & 0x07,
 				GLOBAL_FLIP_X,GLOBAL_FLIP_Y,
 				8*sx,8*sy,0);
 
-		machine().gfx[m_colorbank[1] & 0x08 ? 2 : 0]->transpen(m_layer_bitmap[2],m_layer_bitmap[2].cliprect(),
+		m_gfxdecode->gfx(m_colorbank[1] & 0x08 ? 2 : 0)->transpen(m_layer_bitmap[2],m_layer_bitmap[2].cliprect(),
 				m_videoram_3[offs],
 				m_colorbank[1] & 0x07,
 				GLOBAL_FLIP_X,GLOBAL_FLIP_Y,

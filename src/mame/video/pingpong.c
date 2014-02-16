@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(pingpong_state::get_bg_tile_info)
 	int color = attr & 0x1f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 void pingpong_state::video_start()
@@ -133,12 +133,12 @@ void pingpong_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		color = spriteram[offs] & 0x1f;
 		schar = spriteram[offs + 2] & 0x7f;
 
-		machine().gfx[1]->transmask(bitmap,spritevisiblearea,
+		m_gfxdecode->gfx(1)->transmask(bitmap,spritevisiblearea,
 				schar,
 				color,
 				flipx,flipy,
 				sx,sy,
-				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
+				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0));
 	}
 }
 

@@ -240,13 +240,13 @@ void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &
 		}
 		else sy2 = sy + 16;
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 				color,
 				fx,flip_screen(),
 				sx,sy,0);
 		if (multi)
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code+1,
 				color,
 				fx,flip_screen(),
@@ -277,7 +277,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_cobracom_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xe000) >> 13;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile & 0xfff,
 			color,
@@ -313,7 +313,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_ghostb_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xc00) >> 10;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile & 0x3ff,
 			color,
@@ -349,7 +349,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_oscar_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xf000) >> 14;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile&0xfff,
 			color,
@@ -410,7 +410,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_tile_info)
 	else
 		tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile & 0xfff,
 			color,
@@ -423,7 +423,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0xc000) >> 14;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile&0xfff,
 			color,
@@ -470,7 +470,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_fix_tile_info)
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -486,7 +486,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_tile_info)
 	tile = tile & 0x3ff;
 	bank = (tile / 0x100) + 2;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			bank,
 			tile,
 			color,
@@ -539,7 +539,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_gondo_fix_tile_info)
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
 	int color = (tile & 0x7000) >> 12;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile&0xfff,
 			color,
@@ -557,7 +557,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_gondo_tile_info)
 	else
 		tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile&0xfff,
 			color,

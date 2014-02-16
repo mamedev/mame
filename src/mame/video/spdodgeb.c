@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(spdodgeb_state::get_bg_tile_info)
 {
 	UINT8 code = m_videoram[tile_index];
 	UINT8 attr = m_videoram[tile_index + 0x800];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code + ((attr & 0x1f) << 8),
 			((attr & 0xe0) >> 5) + 8 * m_tile_palbank,
@@ -148,7 +148,7 @@ WRITE8_MEMBER(spdodgeb_state::spdodgeb_videoram_w)
 void spdodgeb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *spriteram = m_spriteram;
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	UINT8 *src;
 	int i;
 

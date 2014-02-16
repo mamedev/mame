@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( citycon, citycon_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(citycon_state, screen_update_citycon)
 
-	MCFG_GFXDECODE(citycon)
+	MCFG_GFXDECODE_ADD("gfxdecode", citycon)
 	MCFG_PALETTE_LENGTH(640+1024)   /* 640 real palette + 1024 virtual palette */
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black) /* guess */
 

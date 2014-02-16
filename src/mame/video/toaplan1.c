@@ -142,7 +142,7 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf1_tile_info)
 	tile_number = m_pf1_tilevram16[2*tile_index+1] & 0x7fff;
 	attrib = m_pf1_tilevram16[2*tile_index];
 	color = attrib & 0x3f;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			color,
@@ -159,7 +159,7 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf2_tile_info)
 	tile_number = m_pf2_tilevram16[2*tile_index+1] & 0x7fff;
 	attrib = m_pf2_tilevram16[2*tile_index];
 	color = attrib & 0x3f;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			color,
@@ -176,7 +176,7 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf3_tile_info)
 	tile_number = m_pf3_tilevram16[2*tile_index+1] & 0x7fff;
 	attrib = m_pf3_tilevram16[2*tile_index];
 	color = attrib & 0x3f;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			color,
@@ -193,7 +193,7 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf4_tile_info)
 	tile_number = m_pf4_tilevram16[2*tile_index+1] & 0x7fff;
 	attrib = m_pf4_tilevram16[2*tile_index];
 	color = attrib & 0x3f;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			color,
@@ -928,7 +928,7 @@ void toaplan1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 					if (fcu_flipscreen) sx = sx_base - dim_x;
 					else                sx = sx_base + dim_x;
 
-					toaplan1_draw_sprite_custom(screen,bitmap,cliprect,machine().gfx[1],
+					toaplan1_draw_sprite_custom(screen,bitmap,cliprect,m_gfxdecode->gfx(1),
 												sprite,color,
 												fcu_flipscreen,fcu_flipscreen,
 												sx,sy,

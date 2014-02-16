@@ -23,7 +23,7 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_videoram_w)
 		m_charram[offset + 0x1800] = data;
 
 	if ((m_layers_ctrl & (16|8|4|2)) != (16|8|4|2))
-		machine().gfx[0]->mark_dirty((offset / 8) & 0xff);
+		m_gfxdecode->gfx(0)->mark_dirty((offset / 8) & 0xff);
 
 	if(!(m_layers_ctrl & 1)) {
 		m_tileram[offset] = data;
@@ -112,12 +112,12 @@ void tiamc1_state::palette_init()
 
 TILE_GET_INFO_MEMBER(tiamc1_state::get_bg1_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_tileram[tile_index], 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(tiamc1_state::get_bg2_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index + 1024], 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_tileram[tile_index + 1024], 0, 0);
 }
 
 void tiamc1_state::video_start()
@@ -149,7 +149,7 @@ void tiamc1_state::video_start()
 	save_item(NAME(m_bg_vshift));
 	save_item(NAME(m_bg_hshift));
 
-	machine().gfx[0]->set_source(m_charram);
+	m_gfxdecode->gfx(0)->set_source(m_charram);
 }
 
 void tiamc1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -167,7 +167,7 @@ void tiamc1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		spritecode = m_spriteram_n[offs] ^ 0xff;
 
 		if (!(m_spriteram_a[offs] & 0x01))
-			 machine().gfx[1]->transpen(bitmap,cliprect,
+			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				spritecode,
 				0,
 				flipx, flipy,

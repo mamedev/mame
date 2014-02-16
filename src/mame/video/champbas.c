@@ -134,7 +134,7 @@ TILE_GET_INFO_MEMBER(champbas_state::champbas_get_bg_tile_info)
 	int code = m_bg_videoram[tile_index] | (m_gfx_bank << 8);
 	int color = (m_bg_videoram[tile_index + 0x400] & 0x1f) | 0x20;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(champbas_state::exctsccr_get_bg_tile_info)
@@ -142,7 +142,7 @@ TILE_GET_INFO_MEMBER(champbas_state::exctsccr_get_bg_tile_info)
 	int code = m_bg_videoram[tile_index] | (m_gfx_bank << 8);
 	int color = m_bg_videoram[tile_index + 0x400] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 
@@ -191,7 +191,7 @@ WRITE8_MEMBER(champbas_state::champbas_flipscreen_w)
 void champbas_state::champbas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
-	gfx_element* const gfx = machine().gfx[1];
+	gfx_element* const gfx = m_gfxdecode->gfx(1);
 
 	for (offs = m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
 	{
@@ -241,7 +241,7 @@ void champbas_state::exctsccr_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		bank = ((obj1[offs + 1] >> 4) & 1);
 
 		
-				machine().gfx[1]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code + (bank << 6),
 				color,
 				flipx, flipy,
@@ -264,12 +264,12 @@ void champbas_state::exctsccr_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		color = (obj1[offs + 1]) & 0x0f;
 
 		
-				machine().gfx[2]->transmask(bitmap,cliprect,
+				m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,
 				sx,sy,
-				colortable_get_transpen_mask(machine().colortable, machine().gfx[2], color, 0x10));
+				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(2), color, 0x10));
 	}
 }
 

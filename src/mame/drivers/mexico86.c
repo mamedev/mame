@@ -488,7 +488,7 @@ static MACHINE_CONFIG_START( mexico86, mexico86_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mexico86_state, screen_update_mexico86)
 
-	MCFG_GFXDECODE(mexico86)
+	MCFG_GFXDECODE_ADD("gfxdecode", mexico86)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)

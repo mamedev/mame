@@ -313,7 +313,7 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_CPU_IO_MAP(sound_io_map)
 
 
-	MCFG_GFXDECODE(suprslam)
+	MCFG_GFXDECODE_ADD("gfxdecode", suprslam)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
@@ -329,6 +329,7 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( suprslam_state, suprslam_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(1)
+	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 
 	MCFG_K053936_ADD("k053936", suprslam_k053936_intf)
 

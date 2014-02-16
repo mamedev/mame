@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(ladyfrog_state::get_tile_info)
 {
 	int pal = m_videoram[tile_index * 2 + 1] & 0x0f;
 	int tile = m_videoram[tile_index * 2] + ((m_videoram[tile_index * 2 + 1] & 0xc0) << 2)+ ((m_videoram[tile_index * 2 + 1] & 0x30) << 6);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile + 0x1000 * m_tilebank,
 			pal,TILE_FLIPY
@@ -104,7 +104,7 @@ void ladyfrog_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			sy = 238 - m_spriteram[offs + 0];
 			flipx = ((m_spriteram[offs + 1] & 0x40)>>6);
 			flipy = ((m_spriteram[offs + 1] & 0x80)>>7);
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 					pal,
 					flipx,flipy,
@@ -113,7 +113,7 @@ void ladyfrog_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			if (m_spriteram[offs + 3] > 240)
 			{
 				sx = (m_spriteram[offs + 3] - 256);
-				machine().gfx[1]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						code,
 						pal,
 						flipx,flipy,

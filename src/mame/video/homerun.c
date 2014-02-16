@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(homerun_state::get_homerun_tile_info)
 	int tileno = (m_videoram[tile_index]) | ((m_videoram[tile_index | 0x1000] & 0x38) << 5) | ((m_gfx_ctrl & 1) << 11);
 	int palno = (m_videoram[tile_index | 0x1000] & 0x07);
 
-	SET_TILE_INFO_MEMBER(0, tileno, palno, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, palno, 0);
 }
 
 
@@ -122,14 +122,14 @@ void homerun_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		int flipx = (spriteram[offs + 2] & 0x40) >> 6;
 		int flipy = (spriteram[offs + 2] & 0x80) >> 7;
 
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,0);
 
 		// wraparound
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

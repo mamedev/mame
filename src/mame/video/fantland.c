@@ -134,7 +134,7 @@ void fantland_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 		if (x >= 0x180)     x -= 0x200;
 
-		machine().gfx[0]->transpen(bitmap,cliprect, code,color, flipx,flipy, x,y,0);
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, code,color, flipx,flipy, x,y,0);
 	}
 }
 

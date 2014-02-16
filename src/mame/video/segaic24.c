@@ -22,9 +22,21 @@ const device_type S24MIXER = &device_creator<segas24_mixer>;
 
 
 segas24_tile::segas24_tile(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, S24TILE, "S24TILE", tag, owner, clock, "segas24_tile", __FILE__)
+	: device_t(mconfig, S24TILE, "S24TILE", tag, owner, clock, "segas24_tile", __FILE__),
+		m_gfxdecode(*this)
 {
 }
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void segas24_tile::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<segas24_tile &>(device).m_gfxdecode.set_tag(tag);
+}
+
 
 void segas24_tile::static_set_tile_mask(device_t &device, UINT16 _tile_mask)
 {
@@ -48,7 +60,7 @@ void segas24_tile::tile_info(int offset, tile_data &tileinfo, tilemap_memory_ind
 {
 	UINT16 val = tile_ram[tile_index|offset];
 	tileinfo.category = (val & 0x8000) != 0;
-	tileinfo.set(machine(), char_gfx_index, val & tile_mask, (val >> 7) & 0xff, 0);
+	tileinfo.set(machine(), *m_gfxdecode, char_gfx_index, val & tile_mask, (val >> 7) & 0xff, 0);
 }
 
 TILE_GET_INFO_MEMBER(segas24_tile::tile_info_0s)
@@ -74,7 +86,7 @@ TILE_GET_INFO_MEMBER(segas24_tile::tile_info_1w)
 void segas24_tile::device_start()
 {
 	for(char_gfx_index = 0; char_gfx_index < MAX_GFX_ELEMENTS; char_gfx_index++)
-		if (machine().gfx[char_gfx_index] == 0)
+		if (m_gfxdecode->gfx(char_gfx_index) == 0)
 			break;
 	assert(char_gfx_index != MAX_GFX_ELEMENTS);
 
@@ -94,7 +106,7 @@ void segas24_tile::device_start()
 	memset(char_ram, 0, 0x80000);
 	memset(tile_ram, 0, 0x10000);
 
-	machine().gfx[char_gfx_index] = auto_alloc(machine(), gfx_element(machine(), char_layout, (UINT8 *)char_ram, machine().total_colors() / 16, 0));
+	m_gfxdecode->set_gfx(char_gfx_index, auto_alloc(machine(), gfx_element(machine(), char_layout, (UINT8 *)char_ram, machine().total_colors() / 16, 0)));
 
 	save_pointer(NAME(tile_ram), 0x10000/2);
 	save_pointer(NAME(char_ram), 0x80000/2);
@@ -550,7 +562,7 @@ WRITE16_MEMBER(segas24_tile::char_w)
 	UINT16 old = char_ram[offset];
 	COMBINE_DATA(char_ram + offset);
 	if(old != char_ram[offset])
-		machine().gfx[char_gfx_index]->mark_dirty(offset / 16);
+		m_gfxdecode->gfx(char_gfx_index)->mark_dirty(offset / 16);
 }
 
 READ32_MEMBER(segas24_tile::tile32_r)

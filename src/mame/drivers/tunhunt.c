@@ -307,7 +307,7 @@ static MACHINE_CONFIG_START( tunhunt, tunhunt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(tunhunt_state, screen_update_tunhunt)
 
-	MCFG_GFXDECODE(tunhunt)
+	MCFG_GFXDECODE_ADD("gfxdecode", tunhunt)
 	MCFG_PALETTE_LENGTH(0x1a)
 
 

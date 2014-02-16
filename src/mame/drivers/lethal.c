@@ -717,7 +717,7 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
-	MCFG_GFXDECODE(lethal)
+	MCFG_GFXDECODE_ADD("gfxdecode", lethal)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -732,7 +732,9 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_PALETTE_LENGTH(7168+1)
 
 	MCFG_K056832_ADD("k056832", lethalen_k056832_intf)
+	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K053244_ADD("k053244", lethalen_k05324x_intf)
+	MCFG_K053244_GFXDECODE("gfxdecode")
 	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
@@ -751,6 +753,7 @@ static MACHINE_CONFIG_DERIVED( lethalej, lethalen )
 
 	MCFG_DEVICE_REMOVE("k053244")
 	MCFG_K053244_ADD("k053244", lethalej_k05324x_intf)
+	MCFG_K053244_GFXDECODE("gfxdecode")
 MACHINE_CONFIG_END
 
 ROM_START( lethalen )   // US version UAE

@@ -103,6 +103,9 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// forward declarations
+class gfxdecode_device;
+
 typedef delegate<void ()> driver_callback_delegate;
 
 // legacy callback functions
@@ -375,6 +378,7 @@ protected:
 public:
 	// generic devices
 	optional_device<screen_device> m_screen;
+	optional_device<gfxdecode_device> m_gfxdecode;
 
 	// generic pointers
 	optional_shared_ptr<UINT8> m_generic_paletteram_8;

@@ -591,7 +591,7 @@ static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fuuki32_state, screen_update_fuuki32)
 	MCFG_SCREEN_VBLANK_DRIVER(fuuki32_state, screen_eof_fuuki32)
 
-	MCFG_GFXDECODE(fuuki32)
+	MCFG_GFXDECODE_ADD("gfxdecode", fuuki32)
 	MCFG_PALETTE_LENGTH(0x4000/2)
 
 

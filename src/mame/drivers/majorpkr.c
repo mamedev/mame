@@ -507,7 +507,7 @@ TILE_GET_INFO_MEMBER(majorpkr_state::bg_get_tile_info)
 {
 	int code = m_videoram[0x800 + 2 * tile_index] + (m_videoram[0x800 + 2 * tile_index + 1] << 8);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			(code & 0x1fff),
 			code >> 13,
@@ -518,7 +518,7 @@ TILE_GET_INFO_MEMBER(majorpkr_state::fg_get_tile_info)
 {
 	int code = m_videoram[2 * tile_index] + (m_videoram[2 * tile_index + 1] << 8);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			(code & 0x07ff),
 			code >> 13,
@@ -1036,11 +1036,10 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE((47+1)*16, (36+1)*8)               /* through CRTC registers: 768 x 296 */
 	MCFG_SCREEN_VISIBLE_AREA(0, (36*16)-1, 0, (28*8)-1) /* through CRTC registers: 560(+16) x 224 */
-
-	MCFG_GFXDECODE(majorpkr)
-	MCFG_PALETTE_LENGTH(0x100 * 16)
-
 	MCFG_SCREEN_UPDATE_DRIVER(majorpkr_state, screen_update_majorpkr)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", majorpkr)
+	MCFG_PALETTE_LENGTH(0x100 * 16)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf) /* verified */
 

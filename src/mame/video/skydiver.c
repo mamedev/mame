@@ -38,7 +38,7 @@ void skydiver_state::machine_reset()
 TILE_GET_INFO_MEMBER(skydiver_state::get_tile_info)
 {
 	UINT8 code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code & 0x3f, code >> 6, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code & 0x3f, code >> 6, 0);
 }
 
 
@@ -190,7 +190,7 @@ void skydiver_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			sx -= 8;
 		}
 
-		machine().gfx[1]->zoom_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,
 			charcode, color,
 			xflip,yflip,sx,sy,
 			wide ? 0x20000 : 0x10000, 0x10000,0);

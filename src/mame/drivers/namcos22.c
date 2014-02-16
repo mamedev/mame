@@ -3780,7 +3780,7 @@ static MACHINE_CONFIG_START( namcos22, namcos22_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22)
 
 	MCFG_PALETTE_LENGTH(0x8000)
-	MCFG_GFXDECODE(namcos22)
+	MCFG_GFXDECODE_ADD("gfxdecode", namcos22)
 	MCFG_VIDEO_START_OVERRIDE(namcos22_state,namcos22)
 
 	/* sound hardware */
@@ -3831,7 +3831,7 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22s)
 
 	MCFG_PALETTE_LENGTH(0x8000)
-	MCFG_GFXDECODE(super)
+	MCFG_GFXDECODE_ADD("gfxdecode", super)
 	MCFG_VIDEO_START_OVERRIDE(namcos22_state,namcos22s)
 
 	/* sound hardware */

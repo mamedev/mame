@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(vastar_state::get_fg_tile_info)
 	code = videoram[tile_index + 0x800] | (videoram[tile_index + 0x400] << 8);
 	color = videoram[tile_index];
 	fxy = (code & 0xc00) >> 10; // maybe, based on the other layers
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			color & 0x3f,
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(vastar_state::get_bg1_tile_info)
 	code = videoram[tile_index + 0x800] | (videoram[tile_index] << 8);
 	color = videoram[tile_index + 0xc00];
 	fxy = (code & 0xc00) >> 10;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			4,
 			code,
 			color & 0x3f,
@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(vastar_state::get_bg2_tile_info)
 	code = videoram[tile_index + 0x800] | (videoram[tile_index] << 8);
 	color = videoram[tile_index + 0xc00];
 	fxy = (code & 0xc00) >> 10;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			code,
 			color & 0x3f,
@@ -155,13 +155,13 @@ void vastar_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 			if (!flip_screen())
 				sy = 224 - sy;
 
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code/2,
 					color,
 					flipx,flipy,
 					sx,sy,0);
 			/* redraw with wraparound */
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code/2,
 					color,
 					flipx,flipy,
@@ -172,7 +172,7 @@ void vastar_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 			if (!flip_screen())
 				sy = 240 - sy;
 
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,

@@ -170,14 +170,14 @@ TILE_GET_INFO_MEMBER(cischeat_state::cischeat_get_scroll_tile_info_8x8)
 {
 	int tmap = (FPTR)tilemap.user_data();
 	UINT16 code = m_scrollram[tmap][tile_index];
-	SET_TILE_INFO_MEMBER(tmap, (code & 0xfff), code >> (16 - m_bits_per_color_code), 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, tmap, (code & 0xfff), code >> (16 - m_bits_per_color_code), 0);
 }
 
 TILE_GET_INFO_MEMBER(cischeat_state::cischeat_get_scroll_tile_info_16x16)
 {
 	int tmap = (FPTR)tilemap.user_data();
 	UINT16 code = m_scrollram[tmap][tile_index/4];
-	SET_TILE_INFO_MEMBER(tmap, (code & 0xfff) * 4 + (tile_index & 3), code >> (16 - m_bits_per_color_code), 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, tmap, (code & 0xfff) * 4 + (tile_index & 3), code >> (16 - m_bits_per_color_code), 0);
 }
 
 void cischeat_state::create_tilemaps()
@@ -704,7 +704,7 @@ void cischeat_state::cischeat_draw_road(bitmap_ind16 &bitmap, const rectangle &c
 	int min_priority, max_priority;
 
 	rectangle rect      =   cliprect;
-	gfx_element *gfx        =   machine().gfx[(road_num & 1)?5:4];
+	gfx_element *gfx        =   m_gfxdecode->gfx((road_num & 1)?5:4);
 
 	UINT16 *roadram         =   m_roadram[road_num & 1];
 
@@ -794,7 +794,7 @@ void cischeat_state::f1gpstar_draw_road(bitmap_ind16 &bitmap, const rectangle &c
 	int min_priority, max_priority;
 
 	rectangle rect      =   cliprect;
-	gfx_element *gfx        =   machine().gfx[(road_num & 1)?5:4];
+	gfx_element *gfx        =   m_gfxdecode->gfx((road_num & 1)?5:4);
 
 	UINT16 *roadram         =   m_roadram[road_num & 1];
 
@@ -1003,7 +1003,7 @@ if ( (m_debugsprites) && ( ((attr & 0x0300)>>8) != (m_debugsprites-1) ) ) { cont
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
-				machine().gfx[3]->zoom_transtable(bitmap,cliprect,
+				m_gfxdecode->gfx(3)->zoom_transtable(bitmap,cliprect,
 							code++,
 							color,
 							flipx,flipy,
@@ -1157,7 +1157,7 @@ if ( (m_debugsprites) && ( ((attr & 0x0300)>>8) != (m_debugsprites-1) ) ) { cont
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
-				machine().gfx[3]->zoom_transtable(bitmap,cliprect,
+				m_gfxdecode->gfx(3)->zoom_transtable(bitmap,cliprect,
 							code++,
 							color,
 							flipx,flipy,

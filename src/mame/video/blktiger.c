@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 	};
 	UINT8 attr = m_scroll_ram[2 * tile_index + 1];
 	int color = (attr & 0x78) >> 3;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			m_scroll_ram[2 * tile_index] + ((attr & 0x07) << 8),
 			color,
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(blktiger_state::get_tx_tile_info)
 {
 	UINT8 attr = m_txvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_txvideoram[tile_index] + ((attr & 0xe0) << 3),
 			attr & 0x1f,
@@ -207,7 +207,7 @@ void blktiger_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipx = !flipx;
 		}
 
-		machine().gfx[2]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flip_screen(),

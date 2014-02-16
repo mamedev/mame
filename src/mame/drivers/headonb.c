@@ -69,7 +69,7 @@ void headonb_state::palette_init()
 TILE_GET_INFO_MEMBER(headonb_state::get_headonb_tile_info)
 {
 	UINT8 code = m_video_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 void headonb_state::video_start()
@@ -175,7 +175,7 @@ static MACHINE_CONFIG_START( headonb, headonb_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(headonb_state, screen_update_headonb)
 
-	MCFG_GFXDECODE(headonb)
+	MCFG_GFXDECODE_ADD("gfxdecode", headonb)
 	MCFG_PALETTE_LENGTH(2)
 
 	/* sound hardware */

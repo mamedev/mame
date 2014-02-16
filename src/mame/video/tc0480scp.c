@@ -152,9 +152,21 @@ tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *ta
 	//m_bgscrolly[4](NULL),
 	m_pri_reg(0),
 	m_dblwidth(0),
-	m_x_offs(0)
+	m_x_offs(0),
+	m_gfxdecode(*this)
 {
 }
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void tc0480scp_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<tc0480scp_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -270,7 +282,7 @@ void tc0480scp_device::device_start()
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine().gfx[m_txnum] = auto_alloc_clear(machine(), gfx_element(machine(), tc0480scp_charlayout, (UINT8 *)m_char_ram, 64, 0));
+	m_gfxdecode->set_gfx(m_txnum, auto_alloc_clear(machine(), gfx_element(machine(), tc0480scp_charlayout, (UINT8 *)m_char_ram, 64, 0)));
 
 	save_pointer(NAME(m_ram), TC0480SCP_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
@@ -302,7 +314,7 @@ void tc0480scp_device::common_get_tc0480bg_tile_info( tile_data &tileinfo, int t
 {
 	int code = ram[2 * tile_index + 1] & 0x7fff;
 	int attr = ram[2 * tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			gfxnum,
 			code,
 			(attr & 0xff) + m_col_base,
@@ -312,7 +324,7 @@ void tc0480scp_device::common_get_tc0480bg_tile_info( tile_data &tileinfo, int t
 void tc0480scp_device::common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum )
 {
 	int attr = ram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			gfxnum,
 			attr & 0xff,
 			((attr & 0x3f00) >> 8) + m_col_base,
@@ -416,7 +428,7 @@ WRITE16_MEMBER( tc0480scp_device::word_w )
 		}
 		else if (offset <= 0x7fff)
 		{
-			space.machine().gfx[m_txnum]->mark_dirty((offset - 0x7000) / 16);
+			m_gfxdecode->gfx(m_txnum)->mark_dirty((offset - 0x7000) / 16);
 		}
 	}
 	else
@@ -434,7 +446,7 @@ WRITE16_MEMBER( tc0480scp_device::word_w )
 		}
 		else if (offset <= 0x7fff)
 		{
-			space.machine().gfx[m_txnum]->mark_dirty((offset - 0x7000) / 16);
+			m_gfxdecode->gfx(m_txnum)->mark_dirty((offset - 0x7000) / 16);
 		}
 	}
 }

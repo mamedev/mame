@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(malzak_state, screen_update_malzak)
 
-	MCFG_GFXDECODE(malzak)
+	MCFG_GFXDECODE_ADD("gfxdecode", malzak)
 	MCFG_PALETTE_LENGTH(128)
 
 	MCFG_S2636_ADD("s2636_0", malzac_s2636_0_config)

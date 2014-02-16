@@ -18,7 +18,7 @@ TILE_GET_INFO_MEMBER(gladiatr_state::bg_get_tile_info)
 {
 	UINT8 attr = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			m_videoram[tile_index] + ((attr & 0x07) << 8) + (m_bg_tile_bank << 11),
 			(attr >> 3) ^ 0x1f,
@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(gladiatr_state::bg_get_tile_info)
 
 TILE_GET_INFO_MEMBER(gladiatr_state::fg_get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_textram[tile_index] + (m_fg_tile_bank << 8),
 			0,
@@ -227,7 +227,7 @@ void gladiatr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 				int t = tile_offset[ey][ex] + tile_number;
 
-				machine().gfx[2]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 						t,
 						color,
 						xflip, yflip,

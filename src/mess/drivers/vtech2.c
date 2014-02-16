@@ -442,7 +442,7 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 88*8-1, 0*8, 24*8+32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vtech2_state, screen_update_laser)
 
-	MCFG_GFXDECODE( vtech2 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  vtech2 )
 	MCFG_PALETTE_LENGTH(528)
 
 

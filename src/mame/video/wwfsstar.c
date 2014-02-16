@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_fg0_tile_info)
 	tilebase =  &m_fg0_videoram[tile_index*2];
 	tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	colbank = (tilebase[0] & 0x00f0) >> 4;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tileno,
 			colbank,
@@ -92,7 +92,7 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_bg0_tile_info)
 	tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	colbank = (tilebase[0] & 0x0070) >> 4;
 	flipx   = (tilebase[0] & 0x0080) >> 7;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tileno,
 			colbank,
@@ -128,7 +128,7 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	**- End of Comments -*/
 
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	UINT16 *source = m_spriteram;
 	UINT16 *finish = source + 0x3ff/2;
 

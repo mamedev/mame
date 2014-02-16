@@ -152,7 +152,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc0_tile_info)
 	int tile = data >> 14;
 	int color = (m_sc0_vram[tile_index*2+1] & 0x1f)+0;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -165,7 +165,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc1_tile_info)
 	int tile = data >> 14;
 	int color = (m_sc1_vram[tile_index*2+1] & 0x1f)+0x10;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -178,7 +178,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc2_tile_info)
 	int tile = data >> 14;
 	int color = (m_sc2_vram[tile_index*2+1] & 0x1f)+0x20;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -191,7 +191,7 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc3_tile_info)
 	int tile = data >> 14;
 	int color = (m_sc3_vram[tile_index*2+1] & 0x1f)+0x30;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -406,7 +406,7 @@ static MACHINE_CONFIG_START( mil4000, mil4000_state )
 	MCFG_PALETTE_LENGTH(0x800)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
-	MCFG_GFXDECODE(mil4000)
+	MCFG_GFXDECODE_ADD("gfxdecode", mil4000)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.

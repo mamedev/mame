@@ -2128,7 +2128,10 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("e2ram", bfm_sc2_state, e2ram_init)
 	MCFG_DEFAULT_LAYOUT(layout_sc2_vid)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	MCFG_BFM_ADDER2_ADD("adder2")
+	MCFG_BFM_ADDER2_GFXDECODE("gfxdecode")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)

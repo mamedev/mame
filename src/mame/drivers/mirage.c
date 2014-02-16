@@ -333,12 +333,15 @@ static MACHINE_CONFIG_START( mirage, miragemi_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 
-	MCFG_GFXDECODE(mirage)
+	MCFG_GFXDECODE_ADD("gfxdecode", mirage)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DECO16IC_ADD("tilegen1", mirage_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

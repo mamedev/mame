@@ -59,6 +59,9 @@ public:
 		m_k055555 = 0;
 	}
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+
 	void SetExtLinescroll();    /* Lethal Enforcers */
 
 	DECLARE_READ16_MEMBER( ram_word_r );
@@ -215,7 +218,7 @@ private:
 	void create_tilemaps(running_machine &machine);
 	void finalize_init(running_machine &machine);
 
-
+	required_device<gfxdecode_device> m_gfxdecode;
 public:
 
 	// todo: collapse these into above
@@ -239,6 +242,8 @@ extern const device_type K056832;
 
 
 
+#define MCFG_K056832_GFXDECODE(_gfxtag) \
+	k056832_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 
 

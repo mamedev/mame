@@ -50,14 +50,19 @@
 const device_type YGV608 = &device_creator<ygv608_device>;
 
 ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
-	: device_t(mconfig, YGV608, "YGV608", tag, owner, clock, "ygv608", __FILE__)
+	: device_t(mconfig, YGV608, "YGV608", tag, owner, clock, "ygv608", __FILE__),
+	m_gfxdecode(*this)
 {
 }
 
+void ygv608_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<ygv608_device &>(device).m_gfxdecode.set_tag(tag);
+}
 
 void ygv608_device::set_gfxbank(UINT8 gfxbank)
 {
-	m_namcond1_gfxbank = gfxbank;
+	m_namcond1_gfxbank = gfxbank;	
 }
 
 /* interrupt generated every 1ms second */
@@ -102,7 +107,7 @@ TILEMAP_MAPPER_MEMBER( ygv608_device::get_tile_offset )
 }
 
 #define layout_total(x) \
-(machine().config().m_gfxdecodeinfo[x].gfxlayout->total)
+(m_gfxdecode->gfx(x)->elements())
 
 TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 {
@@ -118,11 +123,11 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 
 	if( col >= m_page_x )
 	{
-		SET_TILE_INFO_MEMBER( set, 0, 0, 0 );
+		SET_TILE_INFO_MEMBER(m_gfxdecode,  set, 0, 0, 0 );
 	}
 	else if( row >= m_page_y )
 	{
-		SET_TILE_INFO_MEMBER( set, 0, 0, 0 );
+		SET_TILE_INFO_MEMBER(m_gfxdecode,  set, 0, 0, 0 );
 	}
 	else
 	{
@@ -193,7 +198,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 			j += m_namcond1_gfxbank * 0x8000;
 		}
 
-		SET_TILE_INFO_MEMBER( set, j, attr & 0x0F, f );
+		SET_TILE_INFO_MEMBER(m_gfxdecode,  set, j, attr & 0x0F, f );
 	}
 }
 
@@ -211,15 +216,15 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 
 	if ((m_regs.s.r7 & r7_md) & MD_1PLANE )
 	{
-		SET_TILE_INFO_MEMBER( set, 0, 0, 0 );
+		SET_TILE_INFO_MEMBER(m_gfxdecode,  set, 0, 0, 0 );
 	}
 	else if (col >= m_page_x)
 	{
-		SET_TILE_INFO_MEMBER( set, 0, 0, 0 );
+		SET_TILE_INFO_MEMBER(m_gfxdecode,  set, 0, 0, 0 );
 	}
 	else if (row >= m_page_y)
 	{
-		SET_TILE_INFO_MEMBER( set, 0, 0, 0 );
+		SET_TILE_INFO_MEMBER(m_gfxdecode,  set, 0, 0, 0 );
 	}
 	else
 	{
@@ -290,7 +295,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 			j += m_namcond1_gfxbank * 0x8000;
 		}
 
-		SET_TILE_INFO_MEMBER( set, j, attr, f );
+		SET_TILE_INFO_MEMBER(m_gfxdecode,  set, j, attr, f );
 	}
 }
 
@@ -307,10 +312,10 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
 	int             base = row >> m_base_y_shift;
 
 	if( col >= m_page_x ) {
-	SET_TILE_INFO_MEMBER( set, 0, 0, 0 );
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  set, 0, 0, 0 );
 	}
 	else if( row >= m_page_y ) {
-	SET_TILE_INFO_MEMBER( set, 0, 0, 0 );
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  set, 0, 0, 0 );
 	}
 	else {
 	int sx, sy, page;
@@ -379,7 +384,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
 	}
 
 
-	SET_TILE_INFO_MEMBER( set, j, attr, f );
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  set, j, attr, f );
 	}
 }
 
@@ -396,13 +401,13 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 	int             base = row >> m_base_y_shift;
 
 	if((m_regs.s.r7 & r7_md) & MD_1PLANE ) {
-	SET_TILE_INFO_MEMBER( set, 0, 0, 0 );
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  set, 0, 0, 0 );
 	}
 	if( col >= m_page_x ) {
-	SET_TILE_INFO_MEMBER( set, 0, 0, 0 );
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  set, 0, 0, 0 );
 	}
 	else if( row >= m_page_y ) {
-	SET_TILE_INFO_MEMBER( set, 0, 0, 0 );
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  set, 0, 0, 0 );
 	}
 	else {
 	int sx, sy, page;
@@ -469,7 +474,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
 		j += m_namcond1_gfxbank * 0x2000;
 	}
 
-	SET_TILE_INFO_MEMBER( set, j, attr, f );
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  set, j, attr, f );
 	}
 }
 
@@ -601,20 +606,20 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		logerror( "SZ_8X8: sprite=%d\n", code );
 		code = 0;
 		}
-		machine().gfx[GFX_8X8_4BIT]->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x10000,
 			color,
 			flipx,flipy,
 			sx,sy,0x00);
 		// redraw with wrap-around
 		if( sx > 512-8 )
-		machine().gfx[GFX_8X8_4BIT]->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x10000,
 			color,
 			flipx,flipy,
 			sx-512,sy,0x00);
 		if( sy > 512-8 )
-		machine().gfx[GFX_8X8_4BIT]->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x10000,
 			color,
 			flipx,flipy,
@@ -631,20 +636,20 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		logerror( "SZ_8X8: sprite=%d\n", code );
 		code = 0;
 		}
-		machine().gfx[GFX_16X16_4BIT]->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x4000,
 			color,
 			flipx,flipy,
 			sx,sy,0x00);
 		// redraw with wrap-around
 		if( sx > 512-16 )
-		machine().gfx[GFX_16X16_4BIT]->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x4000,
 			color,
 			flipx,flipy,
 			sx-512,sy,0x00);
 		if( sy > 512-16 )
-		machine().gfx[GFX_16X16_4BIT]->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x4000,
 			color,
 			flipx,flipy,
@@ -661,20 +666,20 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		logerror( "SZ_32X32: sprite=%d\n", code );
 	code = 0;
 		}
-		machine().gfx[GFX_32X32_4BIT]->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x1000,
 			color,
 			flipx,flipy,
 			sx,sy,0x00);
 		// redraw with wrap-around
 		if( sx > 512-32 )
-		machine().gfx[GFX_32X32_4BIT]->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x1000,
 			color,
 			flipx,flipy,
 			sx-512,sy,0x00);
 		if( sy > 512-32 )
-		machine().gfx[GFX_32X32_4BIT]->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x1000,
 			color,
 			flipx,flipy,
@@ -691,20 +696,20 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		logerror( "SZ_64X64: sprite=%d\n", code );
 		code = 0;
 		}
-		machine().gfx[GFX_64X64_4BIT]->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x400,
 			color,
 			flipx,flipy,
 			sx,sy,0x00);
 		// redraw with wrap-around
 		if( sx > 512-64 )
-		machine().gfx[GFX_64X64_4BIT]->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x400,
 			color,
 			flipx,flipy,
 			sx-512,sy,0x00);
 		if( sy > 512-64 )
-		machine().gfx[GFX_64X64_4BIT]->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x400,
 			color,
 			flipx,flipy,

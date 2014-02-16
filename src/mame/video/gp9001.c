@@ -207,9 +207,21 @@ gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *ta
 		device_video_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
 		m_space_config("gp9001vdp", ENDIANNESS_BIG, 16,14, 0, NULL, *ADDRESS_MAP_NAME(gp9001vdp_map)),
-		m_gfxregion(0)
+		m_gfxregion(0),
+		m_gfxdecode(*this)
 {
 }
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void gp9001vdp_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<gp9001vdp_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
 
 void gp9001vdp_device::static_set_gfx_region(device_t &device, int gfxregion)
 {
@@ -240,7 +252,7 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_top0_tile_info)
 	}
 
 	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			tile_region,
 			tile_number,
 			color,
@@ -263,7 +275,7 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_fg0_tile_info)
 	}
 
 	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			tile_region,
 			tile_number,
 			color,
@@ -284,7 +296,7 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_bg0_tile_info)
 	}
 
 	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			tile_region,
 			tile_number,
 			color,
@@ -700,7 +712,7 @@ WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_spriteram16_w )
 
 void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8* primap )
 {
-	gfx_element *gfx = machine.gfx[tile_region+1];
+	gfx_element *gfx = m_gfxdecode->gfx(tile_region+1);
 
 	int offs, old_x, old_y;
 

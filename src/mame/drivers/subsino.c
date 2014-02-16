@@ -361,14 +361,14 @@ TILE_GET_INFO_MEMBER(subsino_state::get_tile_info)
 	UINT16 color = (code >> 8) & 0x0f;
 	code = ((code & 0xf000) >> 4) + ((code & 0xff) >> 0);
 	code += m_tiles_offset;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(subsino_state::get_stisub_tile_info)
 {
 	UINT16 code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
 	code&= 0x3fff;
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 
@@ -392,7 +392,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel1_tile_info)
 	int code = m_reel1_ram[tile_index];
 	int colour = (m_out_c&0x7) + 8;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			colour,
@@ -404,7 +404,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stisub_reel1_tile_info)
 	int code = m_reel1_ram[tile_index];
 	int attr = m_reel1_attr[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code | (attr << 8),
 			0,
@@ -423,7 +423,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel2_tile_info)
 	int code = m_reel2_ram[tile_index];
 	int colour = (m_out_c&0x7) + 8;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			colour,
@@ -435,7 +435,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stisub_reel2_tile_info)
 	int code = m_reel2_ram[tile_index];
 	int attr = m_reel2_attr[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code | (attr << 8),
 			0,
@@ -453,7 +453,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel3_tile_info)
 	int code = m_reel3_ram[tile_index];
 	int colour = (m_out_c&0x7) + 8;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			colour,
@@ -465,7 +465,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stisub_reel3_tile_info)
 	int code = m_reel3_ram[tile_index];
 	int attr = m_reel3_attr[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code | (attr << 8),
 			0,
@@ -2813,7 +2813,7 @@ static MACHINE_CONFIG_START( victor21, subsino_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino)
 
-	MCFG_GFXDECODE(subsino_depth3)
+	MCFG_GFXDECODE_ADD("gfxdecode", subsino_depth3)
 
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_2proms)
@@ -2855,7 +2855,7 @@ static MACHINE_CONFIG_START( crsbingo, subsino_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino)
 
-	MCFG_GFXDECODE(subsino_depth4)
+	MCFG_GFXDECODE_ADD("gfxdecode", subsino_depth4)
 
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_2proms)
@@ -2886,7 +2886,7 @@ static MACHINE_CONFIG_START( srider, subsino_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino)
 
-	MCFG_GFXDECODE(subsino_depth4)
+	MCFG_GFXDECODE_ADD("gfxdecode", subsino_depth4)
 
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_3proms)
@@ -2927,7 +2927,7 @@ static MACHINE_CONFIG_START( tisub, subsino_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino_reels)
 
-	MCFG_GFXDECODE(subsino_depth4_reels)
+	MCFG_GFXDECODE_ADD("gfxdecode", subsino_depth4_reels)
 
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_3proms)
@@ -2957,7 +2957,7 @@ static MACHINE_CONFIG_START( stisub, subsino_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_stisub_reels)
 
-	MCFG_GFXDECODE(subsino_stisub)
+	MCFG_GFXDECODE_ADD("gfxdecode", subsino_stisub)
 
 	MCFG_PALETTE_LENGTH(0x100)
 	//MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_3proms)

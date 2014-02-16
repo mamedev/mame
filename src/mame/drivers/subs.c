@@ -183,7 +183,7 @@ static MACHINE_CONFIG_START( subs, subs_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE(subs)
+	MCFG_GFXDECODE_ADD("gfxdecode", subs)
 	MCFG_PALETTE_LENGTH(4)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 

@@ -124,7 +124,7 @@ READ8_MEMBER(fastfred_state::boggy84_custom_io_r)
 
 MACHINE_START_MEMBER(fastfred_state,imago)
 {
-	machine().gfx[1]->set_source(m_imago_sprites);
+	m_gfxdecode->gfx(1)->set_source(m_imago_sprites);
 }
 
 WRITE8_MEMBER(fastfred_state::imago_dma_irq_w)
@@ -151,7 +151,7 @@ WRITE8_MEMBER(fastfred_state::imago_sprites_dma_w)
 	sprites_data = rom[m_imago_sprites_address + 0x2000*2 + m_imago_sprites_bank * 0x1000];
 	m_imago_sprites[offset + 0x800*2] = sprites_data;
 
-	machine().gfx[1]->mark_dirty(offset/32);
+	m_gfxdecode->gfx(1)->mark_dirty(offset/32);
 }
 
 READ8_MEMBER(fastfred_state::imago_sprites_offset_r)
@@ -653,7 +653,7 @@ static MACHINE_CONFIG_START( fastfred, fastfred_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fastfred_state, screen_update_fastfred)
 
-	MCFG_GFXDECODE(fastfred)
+	MCFG_GFXDECODE_ADD("gfxdecode", fastfred)
 	MCFG_PALETTE_LENGTH(32*8)
 
 	MCFG_PALETTE_INIT_OVERRIDE(fastfred_state,fastfred)
@@ -678,7 +678,7 @@ static MACHINE_CONFIG_DERIVED( jumpcoas, fastfred )
 	MCFG_DEVICE_REMOVE("audiocpu")
 
 	/* video hardware */
-	MCFG_GFXDECODE(jumpcoas)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", jumpcoas)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("ay8910.2")
@@ -694,7 +694,7 @@ static MACHINE_CONFIG_DERIVED( imago, fastfred )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */
-	MCFG_GFXDECODE(imago)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", imago)
 
 	MCFG_VIDEO_START_OVERRIDE(fastfred_state,imago)
 	MCFG_SCREEN_MODIFY("screen")

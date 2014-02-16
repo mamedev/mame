@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( videopin, videopin_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 303, 0, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(videopin_state, screen_update_videopin)
 
-	MCFG_GFXDECODE(videopin)
+	MCFG_GFXDECODE_ADD("gfxdecode", videopin)
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)

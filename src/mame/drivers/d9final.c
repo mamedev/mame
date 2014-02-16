@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(d9final_state::get_sc0_tile_info)
 	int tile = ((m_hi_vram[tile_index] & 0x3f)<<8) | m_lo_vram[tile_index];
 	int color = m_cram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -299,7 +299,7 @@ static MACHINE_CONFIG_START( d9final, d9final_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(d9final_state, screen_update_d9final)
 
-	MCFG_GFXDECODE(d9final)
+	MCFG_GFXDECODE_ADD("gfxdecode", d9final)
 	MCFG_PALETTE_LENGTH(0x400)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 

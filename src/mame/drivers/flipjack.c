@@ -195,7 +195,7 @@ UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb3
 	{
 		for (x=0;x<32;x++)
 		{
-			gfx_element *gfx = machine().gfx[0];
+			gfx_element *gfx = m_gfxdecode->gfx(0);
 			int tile = m_bank << 8 | m_vram[x+y*0x100];
 			int color = m_cram[x+y*0x100] & 0x3f;
 
@@ -498,7 +498,7 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", VIDEO_CLOCK/8, mc6845_intf)
 
-	MCFG_GFXDECODE(flipjack)
+	MCFG_GFXDECODE_ADD("gfxdecode", flipjack)
 
 	MCFG_PALETTE_LENGTH(128+8)
 

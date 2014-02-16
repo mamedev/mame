@@ -293,7 +293,7 @@ TILE_GET_INFO_MEMBER(witch_state::get_gfx0b_tile_info)
 		code=0;
 	}
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,//tiles beyond 0x7ff only for sprites?
 			color & 0x0f,
@@ -312,7 +312,7 @@ TILE_GET_INFO_MEMBER(witch_state::get_gfx0a_tile_info)
 		code=0;
 	}
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,//tiles beyond 0x7ff only for sprites?
 			color & 0x0f,
@@ -324,7 +324,7 @@ TILE_GET_INFO_MEMBER(witch_state::get_gfx1_tile_info)
 	int code  = m_gfx1_vram[tile_index];
 	int color = m_gfx1_cram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code | ((color & 0xf0) << 4),
 			(color>>0) & 0x0f,
@@ -776,22 +776,22 @@ void witch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			color  =  flags & 0x0f;
 
 
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				tileno, color,
 				flipx, flipy,
 				sx+8*flipx,sy+8*flipy,0);
 
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				tileno+1, color,
 				flipx, flipy,
 				sx+8-8*flipx,sy+8*flipy,0);
 
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				tileno+2, color,
 				flipx, flipy,
 				sx+8*flipx,sy+8-8*flipy,0);
 
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				tileno+3, color,
 				flipx, flipy,
 				sx+8-8*flipx,sy+8-8*flipy,0);
@@ -846,7 +846,7 @@ static MACHINE_CONFIG_START( witch, witch_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 256-1-8, 8*4, 256-8*4-1)
 	MCFG_SCREEN_UPDATE_DRIVER(witch_state, screen_update_witch)
 
-	MCFG_GFXDECODE(witch)
+	MCFG_GFXDECODE_ADD("gfxdecode", witch)
 	MCFG_PALETTE_LENGTH(0x800)
 
 

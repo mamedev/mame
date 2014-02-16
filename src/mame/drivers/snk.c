@@ -3630,7 +3630,7 @@ static MACHINE_CONFIG_START( marvins, snk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_marvins)
 
-	MCFG_GFXDECODE(marvins)
+	MCFG_GFXDECODE_ADD("gfxdecode", marvins)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_PALETTE_INIT_OVERRIDE(snk_state,tnk3)
@@ -3699,7 +3699,7 @@ static MACHINE_CONFIG_START( jcross, snk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
 
-	MCFG_GFXDECODE(tnk3)
+	MCFG_GFXDECODE_ADD("gfxdecode", tnk3)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_PALETTE_INIT_OVERRIDE(snk_state,tnk3)
@@ -3777,7 +3777,7 @@ static MACHINE_CONFIG_START( tnk3, snk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
 
-	MCFG_GFXDECODE(tnk3)
+	MCFG_GFXDECODE_ADD("gfxdecode", tnk3)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_PALETTE_INIT_OVERRIDE(snk_state,tnk3)
@@ -3861,7 +3861,7 @@ static MACHINE_CONFIG_START( ikari, snk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_ikari)
 
-	MCFG_GFXDECODE(ikari)
+	MCFG_GFXDECODE_ADD("gfxdecode", ikari)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
@@ -3917,7 +3917,7 @@ static MACHINE_CONFIG_START( bermudat, snk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_gwar)
 
-	MCFG_GFXDECODE(gwar)
+	MCFG_GFXDECODE_ADD("gfxdecode", gwar)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
@@ -4021,7 +4021,7 @@ static MACHINE_CONFIG_START( tdfever, snk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tdfever)
 
-	MCFG_GFXDECODE(tdfever)
+	MCFG_GFXDECODE_ADD("gfxdecode", tdfever)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)

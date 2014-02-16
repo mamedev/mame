@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(kncljoe_state::get_bg_tile_info)
 	int attr = m_videoram[2 * tile_index + 1];
 	int code = m_videoram[2 * tile_index] + ((attr & 0xc0) << 2) + (m_tile_bank << 10);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			attr & 0xf,
@@ -180,7 +180,7 @@ void kncljoe_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	UINT8 *spriteram = m_spriteram;
 	rectangle clip = cliprect;
-	gfx_element *gfx = machine().gfx[1 + m_sprite_bank];
+	gfx_element *gfx = m_gfxdecode->gfx(1 + m_sprite_bank);
 	int i, j;
 	static const int pribase[4]={0x0180, 0x0080, 0x0100, 0x0000};
 	const rectangle &visarea = m_screen->visible_area();

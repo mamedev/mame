@@ -243,7 +243,7 @@ inline void cave_state::get_tile_info( tile_data &tileinfo, int tile_index, int 
 		code  = (code & 0x00ffffff);
 	}
 
-	SET_TILE_INFO_MEMBER( GFX, code, color, 0 );
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  GFX, code, color, 0 );
 	tileinfo.category = pri;
 }
 
@@ -287,7 +287,7 @@ TILE_GET_INFO_MEMBER(cave_state::sailormn_get_tile_info_2)
 			code += 0x40000;
 	}
 
-	SET_TILE_INFO_MEMBER( 2, code, color, 0 );
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  2, code, color, 0 );
 	tileinfo.category = pri;
 }
 
@@ -425,9 +425,9 @@ void cave_state::cave_vh_start( int num )
 	m_row_effect_offs_n = -1;
 	m_row_effect_offs_f = 1;
 
-	m_background_pen    =   machine().config().m_gfxdecodeinfo[0].color_codes_start +
-							(machine().config().m_gfxdecodeinfo[0].total_color_codes - 1) *
-							machine().gfx[0]->granularity();
+	m_background_pen    =  m_gfxdecode->gfx(0)->colorbase() +
+							(m_gfxdecode->gfx(0)->colors() - 1) *
+							m_gfxdecode->gfx(0)->granularity();
 
 	switch (m_kludge)
 	{

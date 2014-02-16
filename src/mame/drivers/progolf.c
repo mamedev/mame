@@ -123,9 +123,9 @@ UINT32 progolf_state::screen_update_progolf(screen_device &screen, bitmap_ind16 
 			{
 				int tile = videoram[count];
 
-				machine().gfx[0]->opaque(bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll,y*8);
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll,y*8);
 				/* wrap-around */
-				machine().gfx[0]->opaque(bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll-1024,y*8);
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll-1024,y*8);
 
 				count++;
 			}
@@ -437,7 +437,7 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(progolf_state, screen_update_progolf)
 
-	MCFG_GFXDECODE(progolf)
+	MCFG_GFXDECODE_ADD("gfxdecode", progolf)
 	MCFG_PALETTE_LENGTH(32*3)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 3000000/4, mc6845_intf) /* hand tuned to get ~57 fps */

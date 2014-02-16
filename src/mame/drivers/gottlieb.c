@@ -1739,7 +1739,7 @@ static MACHINE_CONFIG_START( gottlieb_core, gottlieb_state )
 	MCFG_SCREEN_RAW_PARAMS(SYSTEM_CLOCK/4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK)
 	MCFG_SCREEN_UPDATE_DRIVER(gottlieb_state, screen_update_gottlieb)
 
-	MCFG_GFXDECODE(gfxdecode)
+	MCFG_GFXDECODE_ADD("gfxdecode", gfxdecode)
 	MCFG_PALETTE_LENGTH(16)
 
 	// basic speaker configuration

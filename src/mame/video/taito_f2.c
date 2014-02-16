@@ -743,7 +743,7 @@ void taitof2_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 		{
 			sprite_ptr->code = code;
 			sprite_ptr->color = color;
-			if (machine().gfx[0]->granularity() == 64)    /* Final Blow is 6-bit deep */
+			if (m_gfxdecode->gfx(0)->granularity() == 64)    /* Final Blow is 6-bit deep */
 				sprite_ptr->color /= 4;
 			sprite_ptr->flipx = flipx;
 			sprite_ptr->flipy = flipy;
@@ -761,7 +761,7 @@ void taitof2_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 			}
 			else
 			{
-				machine().gfx[0]->zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
@@ -778,7 +778,7 @@ void taitof2_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 		sprite_ptr--;
 
 		if (!uses_tc360_mixer)
-			machine().gfx[0]->prio_zoom_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
 					sprite_ptr->code,
 					sprite_ptr->color,
 					sprite_ptr->flipx,sprite_ptr->flipy,
@@ -786,7 +786,7 @@ void taitof2_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 					sprite_ptr->zoomx,sprite_ptr->zoomy,
 					screen.priority(),sprite_ptr->primask,0);
 		else
-			taito_f2_tc360_spritemixdraw(screen,bitmap,cliprect,machine().gfx[0],
+			taito_f2_tc360_spritemixdraw(screen,bitmap,cliprect,m_gfxdecode->gfx(0),
 					sprite_ptr->code,
 					sprite_ptr->color,
 					sprite_ptr->flipx,sprite_ptr->flipy,

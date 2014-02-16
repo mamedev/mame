@@ -1032,7 +1032,7 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_SCREEN_SIZE(640, 494)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 494-1)
 
-	MCFG_GFXDECODE(apc)
+	MCFG_GFXDECODE_ADD("gfxdecode", apc)
 
 	MCFG_UPD7220_ADD("upd7220_chr", XTAL_3_579545MHz, hgdc_1_intf, upd7220_1_map) // unk clock
 	MCFG_UPD7220_ADD("upd7220_btm", XTAL_3_579545MHz, hgdc_2_intf, upd7220_2_map) // unk clock

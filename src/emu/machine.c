@@ -187,7 +187,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 		m_scheduler(*this),
 		m_lua_engine(*this)
 {
-	memset(gfx, 0, sizeof(gfx));
 	memset(&m_base_time, 0, sizeof(m_base_time));
 
 	// set the machine on all devices
@@ -305,9 +304,6 @@ void running_machine::start()
 		primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(running_machine::watchdog_vblank), this));
 	save().save_item(NAME(m_watchdog_enabled));
 	save().save_item(NAME(m_watchdog_counter));
-
-	// allocate the gfx elements prior to device initialization
-	gfx_init(*this);
 
 	// initialize image devices
 	image_init(*this);

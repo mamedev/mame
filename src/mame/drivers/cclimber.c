@@ -995,7 +995,7 @@ static MACHINE_CONFIG_START( root, cclimber_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_cclimber)
 
-	MCFG_GFXDECODE(cclimber)
+	MCFG_GFXDECODE_ADD("gfxdecode", cclimber)
 	MCFG_PALETTE_LENGTH(16*4+8*4)
 
 	MCFG_PALETTE_INIT_OVERRIDE(cclimber_state,cclimber)
@@ -1024,7 +1024,7 @@ static MACHINE_CONFIG_DERIVED( cannonb, cclimber )
 	MCFG_CPU_PROGRAM_MAP(cannonb_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(cannonb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", cannonb)
 MACHINE_CONFIG_END
 
 
@@ -1063,7 +1063,7 @@ static MACHINE_CONFIG_DERIVED( toprollr, cclimber )
 	MCFG_CPU_PROGRAM_MAP(toprollr_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(toprollr)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", toprollr)
 	MCFG_PALETTE_LENGTH(32*5)
 	MCFG_PALETTE_INIT_OVERRIDE(cclimber_state,toprollr)
 
@@ -1093,7 +1093,7 @@ static MACHINE_CONFIG_START( swimmer, cclimber_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_swimmer)
 
-	MCFG_GFXDECODE(swimmer)
+	MCFG_GFXDECODE_ADD("gfxdecode", swimmer)
 	MCFG_PALETTE_LENGTH(32*8+4*8+1)
 
 	MCFG_PALETTE_INIT_OVERRIDE(cclimber_state,swimmer)

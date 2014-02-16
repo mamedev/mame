@@ -591,7 +591,7 @@ static MACHINE_CONFIG_START( trs80, trs80_state )       // the original model I,
 	MCFG_SCREEN_VISIBLE_AREA(0,64*6-1,0,16*12-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_trs80)
 
-	MCFG_GFXDECODE(trs80)
+	MCFG_GFXDECODE_ADD("gfxdecode", trs80)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
@@ -640,7 +640,8 @@ static MACHINE_CONFIG_DERIVED( model3, model1 )
 
 	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, trs80m4 )
 
-	MCFG_GFXDECODE(trs80m4)
+	MCFG_GFXDECODE_MODIFY("gfxdecode",trs80m4)
+	
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_trs80m4)
 	MCFG_SCREEN_SIZE(80*8, 240)
@@ -665,7 +666,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ht1080z, sys80 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_ht1080z)
-	MCFG_GFXDECODE(ht1080z)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", ht1080z)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( lnw80, model1 )
@@ -674,7 +675,8 @@ static MACHINE_CONFIG_DERIVED( lnw80, model1 )
 	MCFG_CPU_IO_MAP( lnw80_io)
 	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, lnw80 )
 
-	MCFG_GFXDECODE(lnw80)
+	MCFG_GFXDECODE_MODIFY("gfxdecode",lnw80)
+	
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT_OVERRIDE(trs80_state,lnw80)
 	MCFG_SCREEN_MODIFY("screen")
@@ -688,7 +690,7 @@ static MACHINE_CONFIG_DERIVED( radionic, model1 )
 	MCFG_SCREEN_SIZE(64*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0,64*8-1,0,16*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_radionic)
-	MCFG_GFXDECODE(radionic)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", radionic)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( meritum, sys80 )
@@ -697,7 +699,7 @@ static MACHINE_CONFIG_DERIVED( meritum, sys80 )
 	MCFG_CPU_IO_MAP( meritum_io)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_meritum)
-	MCFG_GFXDECODE(meritum)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", meritum)
 MACHINE_CONFIG_END
 
 /***************************************************************************

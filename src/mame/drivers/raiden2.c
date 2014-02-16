@@ -726,7 +726,7 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 {
 	UINT16 *source = sprites + sprites_cur_start/2 - 4;
 
-	gfx_element *gfx = machine.gfx[2];
+	gfx_element *gfx = m_gfxdecode->gfx(2);
 
 //  static int ytlim = 1;
 //  static int xtlim = 1;
@@ -955,7 +955,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_back_tile_info)
 
 	tile = (tile & 0xfff) | (bg_bank << 12);
 
-	SET_TILE_INFO_MEMBER(1,tile+0x0000,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tile+0x0000,color,0);
 }
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
@@ -965,7 +965,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
 
 	tile = (tile & 0xfff) | (mid_bank << 12);
 
-	SET_TILE_INFO_MEMBER(1,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
@@ -975,7 +975,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
 
 	tile = (tile & 0xfff) | (fg_bank << 12);
 
-	SET_TILE_INFO_MEMBER(1,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
@@ -985,7 +985,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tile,color,0);
 }
 
 /* VIDEO START (move to video file) */
@@ -1887,7 +1887,7 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
-	MCFG_GFXDECODE(raiden2)
+	MCFG_GFXDECODE_ADD("gfxdecode", raiden2)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
@@ -1943,7 +1943,7 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 //  MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
 	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4,546,0,40*8,264,0,32*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
-	MCFG_GFXDECODE(raiden2)
+	MCFG_GFXDECODE_ADD("gfxdecode", raiden2)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)

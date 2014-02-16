@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START( metlclsh, metlclsh_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metlclsh_state, screen_update_metlclsh)
 
-	MCFG_GFXDECODE(metlclsh)
+	MCFG_GFXDECODE_ADD("gfxdecode", metlclsh)
 	MCFG_PALETTE_LENGTH(3 * 16)
 
 

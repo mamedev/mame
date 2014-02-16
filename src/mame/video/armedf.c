@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_nb1414m4_tx_tile_info)
 	/* bit 3 controls priority, (0) nb1414m4 has priority over all the other video layers */
 	tileinfo.category = (attributes & 0x8) >> 3;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number + 256 * (attributes & 0x3),
 			attributes >> 4,
@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_armedf_tx_tile_info)
 	/* bit 3 controls priority, (0) nb1414m4 has priority over all the other video layers */
 	tileinfo.category = (attributes & 0x8) >> 3;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number + 256 * (attributes & 0x3),
 			attributes >> 4,
@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_armedf_tx_tile_info)
 TILE_GET_INFO_MEMBER(armedf_state::get_fg_tile_info)
 {
 	int data = m_fg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			data&0x7ff,
 			data>>11,
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(armedf_state::get_bg_tile_info)
 {
 	int data = m_bg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			data & 0x3ff,
 			data >> 11,
@@ -351,7 +351,7 @@ void armedf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		if (((buffered_spriteram[offs + 0] & 0x3000) >> 12) == priority)
 		{
-			armedf_drawgfx(bitmap,cliprect,machine().gfx[3],
+			armedf_drawgfx(bitmap,cliprect,m_gfxdecode->gfx(3),
 				code & 0xfff,
 				color,clut,
 				flipx,flipy,

@@ -168,7 +168,7 @@ TILE_GET_INFO_MEMBER(trackfld_state::get_bg_tile_info)
 	if (m_bg_bank)
 		code |= 0x400;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
 }
 
 VIDEO_START_MEMBER(trackfld_state,trackfld)
@@ -224,19 +224,19 @@ void trackfld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 
 		
-			machine().gfx[0]->transmask(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transmask(bitmap,cliprect,
 			code + m_sprite_bank1 + m_sprite_bank2, color,
 			flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0));
+			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(0), color, 0));
 
 		/* redraw with wraparound */
 		
-			machine().gfx[0]->transmask(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transmask(bitmap,cliprect,
 			code + m_sprite_bank1 + m_sprite_bank2, color,
 			flipx, flipy,
 			sx - 256, sy,
-			colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0));
+			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(0), color, 0));
 	}
 }
 

@@ -203,7 +203,7 @@ WRITE8_MEMBER(firefox_state::firefox_disc_data_w)
 
 TILE_GET_INFO_MEMBER(firefox_state::bgtile_get_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_tileram[tile_index], 0, 0);
 }
 
 
@@ -247,7 +247,7 @@ UINT32 firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 
 				int flipx = flags & 0x20;
 				int code = sprite_data[ 15 - row ] + ( 256 * ( ( flags >> 6 ) & 3 ) );
 
-				 machine().gfx[ 1 ]->transpen(bitmap,cliprect, code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), 0 );
+				 m_gfxdecode->gfx( 1 )->transpen(bitmap,cliprect, code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), 0 );
 			}
 		}
 	}
@@ -719,7 +719,7 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz((double)MASTER_XTAL/8/16/16/16/16))
 
 	/* video hardware */
-	MCFG_GFXDECODE(firefox)
+	MCFG_GFXDECODE_ADD("gfxdecode", firefox)
 	MCFG_PALETTE_LENGTH(512)
 
 

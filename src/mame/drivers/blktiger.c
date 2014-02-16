@@ -328,7 +328,7 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_SCREEN_UPDATE_DRIVER(blktiger_state, screen_update_blktiger)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(blktiger)
+	MCFG_GFXDECODE_ADD("gfxdecode", blktiger)
 	MCFG_PALETTE_LENGTH(1024)
 
 

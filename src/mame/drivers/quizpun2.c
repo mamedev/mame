@@ -129,14 +129,14 @@ public:
 TILE_GET_INFO_MEMBER(quizpun2_state::get_bg_tile_info)
 {
 	UINT16 code = m_bg_ram[ tile_index * 2 ] + m_bg_ram[ tile_index * 2 + 1 ] * 256;
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(quizpun2_state::get_fg_tile_info)
 {
 	UINT16 code  = m_fg_ram[ tile_index * 4 ] + m_fg_ram[ tile_index * 4 + 1 ] * 256;
 	UINT8  color = m_fg_ram[ tile_index * 4 + 2 ];
-	SET_TILE_INFO_MEMBER(1, code, color & 0x0f, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color & 0x0f, 0);
 }
 
 WRITE8_MEMBER(quizpun2_state::bg_ram_w)
@@ -509,7 +509,7 @@ static MACHINE_CONFIG_START( quizpun2, quizpun2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(quizpun2_state, screen_update_quizpun2)
 
-	MCFG_GFXDECODE(quizpun2)
+	MCFG_GFXDECODE_ADD("gfxdecode", quizpun2)
 	MCFG_PALETTE_LENGTH(0x200)
 
 

@@ -83,10 +83,10 @@ WRITE8_MEMBER(aceal_state::ace_objpos_w)
 
 void aceal_state::video_start()
 {
-	machine().gfx[1]->set_source(m_characterram);
-	machine().gfx[2]->set_source(m_characterram);
-	machine().gfx[3]->set_source(m_characterram);
-	machine().gfx[4]->set_source(m_scoreram);
+	m_gfxdecode->gfx(1)->set_source(m_characterram);
+	m_gfxdecode->gfx(2)->set_source(m_characterram);
+	m_gfxdecode->gfx(3)->set_source(m_characterram);
+	m_gfxdecode->gfx(4)->set_source(m_scoreram);
 }
 
 UINT32 aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -96,19 +96,19 @@ UINT32 aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bitma
 	/* first of all, fill the screen with the background color */
 	bitmap.fill(0, cliprect);
 
-	 machine().gfx[1]->opaque(bitmap,cliprect,
+	 m_gfxdecode->gfx(1)->opaque(bitmap,cliprect,
 			0,
 			0,
 			0, 0,
 			m_objpos[0], m_objpos[1]);
 
-	 machine().gfx[2]->opaque(bitmap,cliprect,
+	 m_gfxdecode->gfx(2)->opaque(bitmap,cliprect,
 			0,
 			0,
 			0, 0,
 			m_objpos[2], m_objpos[3]);
 
-	 machine().gfx[3]->opaque(bitmap,cliprect,
+	 m_gfxdecode->gfx(3)->opaque(bitmap,cliprect,
 			0,
 			0,
 			0, 0,
@@ -116,7 +116,7 @@ UINT32 aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bitma
 
 	for (offs = 0; offs < 8; offs++)
 	{
-		 machine().gfx[4]->opaque(bitmap,/* ?? */
+		 m_gfxdecode->gfx(4)->opaque(bitmap,/* ?? */
 				cliprect,
 				offs,
 				0,
@@ -144,16 +144,16 @@ WRITE8_MEMBER(aceal_state::ace_characterram_w)
 			popmessage("write to %04x data = %02x\n", 0x8000 + offset, data);
 		}
 		m_characterram[offset] = data;
-		machine().gfx[1]->mark_dirty(0);
-		machine().gfx[2]->mark_dirty(0);
-		machine().gfx[3]->mark_dirty(0);
+		m_gfxdecode->gfx(1)->mark_dirty(0);
+		m_gfxdecode->gfx(2)->mark_dirty(0);
+		m_gfxdecode->gfx(3)->mark_dirty(0);
 	}
 }
 
 WRITE8_MEMBER(aceal_state::ace_scoreram_w)
 {
 	m_scoreram[offset] = data;
-	machine().gfx[4]->mark_dirty(offset / 32);
+	m_gfxdecode->gfx(4)->mark_dirty(offset / 32);
 }
 
 READ8_MEMBER(aceal_state::unk_r)
@@ -323,10 +323,10 @@ GFXDECODE_END
 
 void aceal_state::ace_postload()
 {
-	machine().gfx[1]->mark_dirty(0);
-	machine().gfx[2]->mark_dirty(0);
-	machine().gfx[3]->mark_dirty(0);
-	machine().gfx[4]->mark_dirty(0);
+	m_gfxdecode->gfx(1)->mark_dirty(0);
+	m_gfxdecode->gfx(2)->mark_dirty(0);
+	m_gfxdecode->gfx(3)->mark_dirty(0);
+	m_gfxdecode->gfx(4)->mark_dirty(0);
 }
 
 void aceal_state::machine_start()
@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( ace, aceal_state )
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aceal_state, screen_update_ace)
 
-	MCFG_GFXDECODE(ace)
+	MCFG_GFXDECODE_ADD("gfxdecode", ace)
 	MCFG_PALETTE_LENGTH(2)
 
 	/* sound hardware */

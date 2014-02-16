@@ -289,9 +289,14 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 
 	MCFG_PALETTE_LENGTH(1024)
 
-
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	MCFG_K053244_ADD("k053244", rollerg_k05324x_intf)
+	MCFG_K053244_GFXDECODE("gfxdecode")
+	
 	MCFG_K051316_ADD("k051316", rollerg_k051316_intf)
+	MCFG_K051316_GFXDECODE("gfxdecode")
+	
 	MCFG_K053252_ADD("k053252", 3000000*2, rollerg_k053252_intf)
 
 	/* sound hardware */

@@ -97,7 +97,7 @@ WRITE8_MEMBER(paradise_state::paradise_palbank_w)
 TILE_GET_INFO_MEMBER(paradise_state::get_tile_info_0)
 {
 	int code = m_vram_0[tile_index] + (m_vram_0[tile_index + 0x400] << 8);
-	SET_TILE_INFO_MEMBER(1, code, m_palbank, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, m_palbank, 0);
 }
 
 
@@ -111,7 +111,7 @@ WRITE8_MEMBER(paradise_state::paradise_vram_1_w)
 TILE_GET_INFO_MEMBER(paradise_state::get_tile_info_1)
 {
 	int code = m_vram_1[tile_index] + (m_vram_1[tile_index + 0x400] << 8);
-	SET_TILE_INFO_MEMBER(2, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, 0, 0);
 }
 
 
@@ -125,7 +125,7 @@ WRITE8_MEMBER(paradise_state::paradise_vram_2_w)
 TILE_GET_INFO_MEMBER(paradise_state::get_tile_info_2)
 {
 	int code = m_vram_2[tile_index] + (m_vram_2[tile_index + 0x400] << 8);
-	SET_TILE_INFO_MEMBER(3, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, code, 0, 0);
 }
 
 /* 256 x 256 bitmap. 4 bits per pixel so every byte encodes 2 pixels */
@@ -199,20 +199,20 @@ void paradise_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			y = 0xf0 - y;   flipy = !flipy;
 		}
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code + (attr << 8),
 				0,
 				flipx, flipy,
 				x,y, 0xff );
 
 		/* wrap around x */
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code + (attr << 8),
 				0,
 				flipx, flipy,
 				x - 256,y, 0xff );
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code + (attr << 8),
 				0,
 				flipx, flipy,

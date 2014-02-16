@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(vball_state::get_bg_tile_info)
 {
 	UINT8 code = m_vb_videoram[tile_index];
 	UINT8 attr = m_vb_attribram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code + ((attr & 0x1f) << 8) + (m_gfxset<<8),
 			(attr >> 5) & 0x7,
@@ -107,7 +107,7 @@ void vball_state::vb_mark_all_dirty(  )
 
 void vball_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	UINT8 *src = m_spriteram;
 	int i;
 

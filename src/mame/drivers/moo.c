@@ -589,8 +589,11 @@ static MACHINE_CONFIG_START( moo, moo_state )
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K053246_ADD("k053246", moo_k053247_intf)
+	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K056832_ADD("k056832", moo_k056832_intf)
+	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K053251_ADD("k053251")
 	MCFG_K054338_ADD("k054338", moo_k054338_intf)
 
@@ -632,8 +635,11 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K053246_ADD("k053246", moo_k053247_intf)
+	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K056832_ADD("k056832", moo_k056832_intf)
+	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K053251_ADD("k053251")
 	MCFG_K054338_ADD("k054338", moo_k054338_intf)
 
@@ -654,7 +660,7 @@ static MACHINE_CONFIG_DERIVED( bucky, moo )
 
 	MCFG_DEVICE_REMOVE("k053246")
 	MCFG_K053246_ADD("k053246", bucky_k053247_intf)     // diff x offset
-
+	MCFG_K053246_GFXDECODE("gfxdecode")
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(4096)
 

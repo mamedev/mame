@@ -120,7 +120,7 @@ static MACHINE_CONFIG_START( kramermc, kramermc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kramermc_state, screen_update_kramermc)
 
-	MCFG_GFXDECODE( kramermc )
+	MCFG_GFXDECODE_ADD("gfxdecode",  kramermc )
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)

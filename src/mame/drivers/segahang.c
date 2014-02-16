@@ -817,10 +817,11 @@ static MACHINE_CONFIG_START( shared_base, segahang_state )
 	MCFG_I8255_ADD( "i8255_2", hangon_ppi_intf_1 )
 
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
+	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
 
 	// video hardware
-	MCFG_GFXDECODE(segahang)
+	MCFG_GFXDECODE_ADD("gfxdecode", segahang)
 	MCFG_PALETTE_LENGTH(2048*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

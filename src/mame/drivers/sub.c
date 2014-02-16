@@ -149,8 +149,8 @@ void sub_state::video_start()
 
 UINT32 sub_state::screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[0];
-	gfx_element *gfx_1 = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
+	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
 	int y,x;
 	int count = 0;
 
@@ -452,7 +452,7 @@ static MACHINE_CONFIG_START( sub, sub_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sub_state, screen_update_sub)
 
-	MCFG_GFXDECODE(sub)
+	MCFG_GFXDECODE_ADD("gfxdecode", sub)
 	MCFG_PALETTE_LENGTH(0x400)
 
 

@@ -813,7 +813,7 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 	MCFG_TC0220IOC_ADD("tc0220ioc", ninjaw_io_intf)
 
 	/* video hardware */
-	MCFG_GFXDECODE(ninjaw)
+	MCFG_GFXDECODE_ADD("gfxdecode", ninjaw)
 	MCFG_PALETTE_LENGTH(4096*3)
 	MCFG_DEFAULT_LAYOUT(layout_darius)
 
@@ -840,8 +840,11 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2_tc0100scn_intf_l)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2_tc0100scn_intf_m)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_ADD("tc0100scn_3", darius2_tc0100scn_intf_r)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0110PCR_ADD("tc0110pcr_1", darius2_tc0110pcr_intf_l)
 	MCFG_TC0110PCR_ADD("tc0110pcr_2", darius2_tc0110pcr_intf_m)
 	MCFG_TC0110PCR_ADD("tc0110pcr_3", darius2_tc0110pcr_intf_r)
@@ -893,7 +896,7 @@ static MACHINE_CONFIG_START( darius2, ninjaw_state )
 	MCFG_TC0220IOC_ADD("tc0220ioc", ninjaw_io_intf)
 
 	/* video hardware */
-	MCFG_GFXDECODE(ninjaw)
+	MCFG_GFXDECODE_ADD("gfxdecode", ninjaw)
 	MCFG_PALETTE_LENGTH(4096*3)
 	MCFG_DEFAULT_LAYOUT(layout_darius)
 
@@ -920,8 +923,11 @@ static MACHINE_CONFIG_START( darius2, ninjaw_state )
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2_tc0100scn_intf_l)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2_tc0100scn_intf_m)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_ADD("tc0100scn_3", darius2_tc0100scn_intf_r)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0110PCR_ADD("tc0110pcr_1", darius2_tc0110pcr_intf_l)
 	MCFG_TC0110PCR_ADD("tc0110pcr_2", darius2_tc0110pcr_intf_m)
 	MCFG_TC0110PCR_ADD("tc0110pcr_3", darius2_tc0110pcr_intf_r)

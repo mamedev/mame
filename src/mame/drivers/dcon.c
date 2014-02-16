@@ -283,7 +283,7 @@ static MACHINE_CONFIG_START( dcon, dcon_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE(dcon)
+	MCFG_GFXDECODE_ADD("gfxdecode", dcon)
 	MCFG_PALETTE_LENGTH(2048)
 
 	/* sound hardware */
@@ -309,7 +309,7 @@ static MACHINE_CONFIG_START( sdgndmps, dcon_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE(dcon)
+	MCFG_GFXDECODE_ADD("gfxdecode", dcon)
 	MCFG_PALETTE_LENGTH(2048)
 
 	/* sound hardware */

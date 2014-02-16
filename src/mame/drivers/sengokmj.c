@@ -216,28 +216,28 @@ TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc0_tile_info )
 	int tile = m_sc0_vram[tile_index] & 0xfff;
 	int color = (m_sc0_vram[tile_index] >> 12) & 0x0f;
 //  tile+=(m_seibucrtc_sc0bank<<12);
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc2_tile_info )
 {
 	int tile = m_sc2_vram[tile_index] & 0xfff;
 	int color = (m_sc2_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(2, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc1_tile_info )
 {
 	int tile = m_sc1_vram[tile_index] & 0xfff;
 	int color = (m_sc1_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(3, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc3_tile_info )
 {
 	int tile = m_sc3_vram[tile_index] & 0xfff;
 	int color = (m_sc3_vram[tile_index] >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(4, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 4, tile, color, 0);
 }
 
 void sengokmj_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
@@ -269,11 +269,11 @@ void sengokmj_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		for (ax=0; ax<dx; ax++)
 			for (ay=0; ay<dy; ay++) {
 				if (!fx)
-					machine.gfx[0]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+ax*16,y+ay*16,15);
 				else
-					machine.gfx[0]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,15);
 			}
@@ -578,7 +578,7 @@ static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE(sengokmj)
+	MCFG_GFXDECODE_ADD("gfxdecode", sengokmj)
 	MCFG_PALETTE_LENGTH(0x800)
 
 	/* sound hardware */

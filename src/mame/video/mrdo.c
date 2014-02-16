@@ -137,7 +137,7 @@ void mrdo_state::palette_init()
 TILE_GET_INFO_MEMBER(mrdo_state::get_bg_tile_info)
 {
 	UINT8 attr = m_bgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			m_bgvideoram[tile_index + 0x400] + ((attr & 0x80) << 1),
 			attr & 0x3f,
@@ -147,7 +147,7 @@ TILE_GET_INFO_MEMBER(mrdo_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(mrdo_state::get_fg_tile_info)
 {
 	UINT8 attr = m_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_fgvideoram[tile_index+0x400] + ((attr & 0x80) << 1),
 			attr & 0x3f,
@@ -242,7 +242,7 @@ void mrdo_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 	{
 		if (spriteram[offs + 1] != 0)
 		{
-			 machine().gfx[2]->transpen(bitmap,cliprect,
+			 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					spriteram[offs], spriteram[offs + 2] & 0x0f,
 					spriteram[offs + 2] & 0x10, spriteram[offs + 2] & 0x20,
 					spriteram[offs + 3], 256 - spriteram[offs + 1], 0);

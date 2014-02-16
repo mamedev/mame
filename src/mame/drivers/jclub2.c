@@ -171,14 +171,14 @@ TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_0)
 {
 	UINT16 tile     =   m_tmapram[tile_index] >> 16;
 	UINT16 color    =   m_tmapram[tile_index] & 0xffff;
-	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
 TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_1)
 {
 	UINT16 tile     =   m_tmapram2[tile_index] >> 16;
 	UINT16 color    =   m_tmapram2[tile_index] & 0xffff;
-	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
 WRITE32_MEMBER(darkhors_state::darkhors_tmapram_w)
@@ -220,7 +220,7 @@ void darkhors_state::draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle
 		sy  =   -sy;
 		sy  +=  0xf8;
 
-		 machine().gfx[0]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code/2, color,
 					flipx,  flipy,  sx, sy, 0);
 	}
@@ -233,7 +233,7 @@ VIDEO_START_MEMBER(darkhors_state,darkhors)
 	m_tmap->set_transparent_pen(0);
 	m_tmap2->set_transparent_pen(0);
 
-	machine().gfx[0]->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
+	m_gfxdecode->gfx(0)->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 }
 
 UINT32 darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -702,7 +702,7 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_darkhors)
 
-	MCFG_GFXDECODE(darkhors)
+	MCFG_GFXDECODE_ADD("gfxdecode", darkhors)
 	MCFG_PALETTE_LENGTH(0x10000)
 
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state,darkhors)
@@ -743,10 +743,13 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_jclub2)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 	st0020_device::set_is_st0032(*device, 1);
 	st0020_device::set_is_jclub2o(*device, 1); // offsets
+	MCFG_ST0020_SPRITES_GFXDECODE("gfxdecode")
 
 	MCFG_PALETTE_LENGTH(0x10000)
 
@@ -810,8 +813,12 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_jclub2o)
 
 	MCFG_PALETTE_LENGTH(0x10000)
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 	st0020_device::set_is_jclub2o(*device, 1);
+	MCFG_ST0020_SPRITES_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state,jclub2o)
 

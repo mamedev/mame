@@ -56,7 +56,7 @@ inline void namcos1_state::bg_get_info(tile_data &tileinfo,int tile_index,UINT8 
 
 	tile_index <<= 1;
 	code = info_vram[tile_index + 1] + ((info_vram[tile_index] & 0x3f) << 8);
-	SET_TILE_INFO_MEMBER(0,code,0,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,0,0);
 	tileinfo.mask_data = &m_tilemap_maskdata[code << 3];
 }
 
@@ -66,7 +66,7 @@ inline void namcos1_state::fg_get_info(tile_data &tileinfo,int tile_index,UINT8 
 
 	tile_index <<= 1;
 	code = info_vram[tile_index + 1] + ((info_vram[tile_index] & 0x3f) << 8);
-	SET_TILE_INFO_MEMBER(0,code,0,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,0,0);
 	tileinfo.mask_data = &m_tilemap_maskdata[code << 3];
 }
 
@@ -295,7 +295,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 	UINT8 *spriteram = state->m_spriteram + 0x800;
 	const UINT8 *source = &spriteram[0x800-0x20];   /* the last is NOT a sprite */
 	const UINT8 *finish = &spriteram[0];
-	gfx_element *gfx = screen.machine().gfx[1];
+	gfx_element *gfx = state->m_gfxdecode->gfx(1);
 
 	int sprite_xoffs = spriteram[0x07f5] + ((spriteram[0x07f4] & 1) << 8);
 	int sprite_yoffs = spriteram[0x07f7];

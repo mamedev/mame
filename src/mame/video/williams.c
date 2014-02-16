@@ -354,7 +354,7 @@ READ8_MEMBER(williams_state::williams2_video_counter_r)
 
 TILE_GET_INFO_MEMBER(williams_state::get_tile_info)
 {
-	int mask = machine().gfx[0]->elements() - 1;
+	int mask = m_gfxdecode->gfx(0)->elements() - 1;
 	int data = m_williams2_tileram[tile_index];
 	int y = (tile_index >> 1) & 7;
 	int color = 0;
@@ -382,7 +382,7 @@ TILE_GET_INFO_MEMBER(williams_state::get_tile_info)
 			break;
 	}
 
-	SET_TILE_INFO_MEMBER(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
 }
 
 

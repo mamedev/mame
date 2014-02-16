@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(seicross_state::get_bg_tile_info)
 	int color = m_colorram[tile_index] & 0x0f;
 	int flags = ((m_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((m_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 void seicross_state::video_start()
@@ -101,13 +101,13 @@ void seicross_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int x = spriteram[offs + 3];
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				(spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128,
 				spriteram[offs + 1] & 0x0f,
 				spriteram[offs] & 0x40,spriteram[offs] & 0x80,
 				x,240-spriteram[offs + 2],0);
 		if(x>0xf0)
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					(spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128,
 					spriteram[offs + 1] & 0x0f,
 					spriteram[offs] & 0x40,spriteram[offs] & 0x80,
@@ -117,13 +117,13 @@ void seicross_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	for (offs = m_spriteram2.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int x = spriteram_2[offs + 3];
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				(spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2),
 				spriteram_2[offs + 1] & 0x0f,
 				spriteram_2[offs] & 0x40,spriteram_2[offs] & 0x80,
 				x,240-spriteram_2[offs + 2],0);
 		if(x>0xf0)
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					(spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2),
 					spriteram_2[offs + 1] & 0x0f,
 					spriteram_2[offs] & 0x40,spriteram_2[offs] & 0x80,

@@ -13,7 +13,7 @@ TILE_GET_INFO_MEMBER(drgnmst_state::get_drgnmst_fg_tile_info)
 	colour = m_fg_videoram[tile_index * 2 + 1] & 0x1f;
 	flipyx = (m_fg_videoram[tile_index * 2 + 1] & 0x60)>>5;
 
-	SET_TILE_INFO_MEMBER(1, tileno, colour, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
 WRITE16_MEMBER(drgnmst_state::drgnmst_fg_videoram_w)
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(drgnmst_state::get_drgnmst_bg_tile_info)
 	colour = m_bg_videoram[tile_index * 2 + 1] & 0x1f;
 	flipyx = (m_bg_videoram[tile_index * 2 + 1] & 0x60) >> 5;
 
-	SET_TILE_INFO_MEMBER(3, tileno, colour, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
 WRITE16_MEMBER(drgnmst_state::drgnmst_bg_videoram_w)
@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(drgnmst_state::get_drgnmst_md_tile_info)
 	colour = m_md_videoram[tile_index * 2 + 1] & 0x1f;
 	flipyx = (m_md_videoram[tile_index * 2 + 1] & 0x60) >> 5;
 
-	SET_TILE_INFO_MEMBER(2, tileno, colour, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
 WRITE16_MEMBER(drgnmst_state::drgnmst_md_videoram_w)
@@ -56,7 +56,7 @@ WRITE16_MEMBER(drgnmst_state::drgnmst_md_videoram_w)
 
 void drgnmst_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	UINT16 *source = m_spriteram;
 	UINT16 *finish = source + 0x800 / 2;
 

@@ -15,6 +15,9 @@ public:
 	tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0180vcu_device() {}
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+
 	DECLARE_READ8_MEMBER( get_fb_page );
 	DECLARE_WRITE8_MEMBER( set_fb_page );
 	DECLARE_READ8_MEMBER( get_videoctrl );
@@ -44,6 +47,7 @@ protected:
 	UINT16         m_bg_rambank[2], m_fg_rambank[2], m_tx_rambank;
 	UINT8          m_framebuffer_page;
 	UINT8          m_video_control;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -58,4 +62,6 @@ extern const device_type TC0180VCU;
 	MCFG_DEVICE_ADD(_tag, TC0180VCU, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
+#define MCFG_TC0180VCU_GFXDECODE(_gfxtag) \
+	tc0180vcu_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 #endif

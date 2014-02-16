@@ -179,7 +179,7 @@ void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 		else
 			clipper=&cliprect;
 
-		machine().gfx[sprite_ptr->gfx]->prio_zoom_transpen(bitmap,*clipper,
+		m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(bitmap,*clipper,
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,

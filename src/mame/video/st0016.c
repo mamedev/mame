@@ -111,7 +111,7 @@ READ8_MEMBER(st0016_state::st0016_character_ram_r)
 WRITE8_MEMBER(st0016_state::st0016_character_ram_w)
 {
 	st0016_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset]=data;
-	machine().gfx[st0016_ramgfx]->mark_dirty(st0016_char_bank);
+	m_gfxdecode->gfx(st0016_ramgfx)->mark_dirty(st0016_char_bank);
 }
 
 READ8_MEMBER(st0016_state::st0016_vregs_r)
@@ -256,7 +256,7 @@ void st0016_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	*/
 
-	gfx_element *gfx = machine().gfx[st0016_ramgfx];
+	gfx_element *gfx = m_gfxdecode->gfx(st0016_ramgfx);
 	int i,j,lx,ly,x,y,code,offset,length,sx,sy,color,flipx,flipy,scrollx,scrolly/*,plx,ply*/;
 
 
@@ -443,13 +443,13 @@ VIDEO_START_MEMBER(st0016_state,st0016)
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine().gfx[gfx_index] == 0)
+		if (m_gfxdecode->gfx(gfx_index) == 0)
 			break;
 
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), charlayout, (UINT8 *) st0016_charram, 0x40, 0));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), charlayout, (UINT8 *) st0016_charram, 0x40, 0)));
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;
@@ -489,7 +489,7 @@ VIDEO_START_MEMBER(st0016_state,st0016)
 
 void st0016_state::draw_bgmap(bitmap_ind16 &bitmap,const rectangle &cliprect, int priority)
 {
-	gfx_element *gfx = machine().gfx[st0016_ramgfx];
+	gfx_element *gfx = m_gfxdecode->gfx(st0016_ramgfx);
 	int j;
 	//for(j=0x40-8;j>=0;j-=8)
 	for(j=0;j<0x40;j+=8)

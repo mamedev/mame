@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(bsktball_state::get_bg_tile_info)
 	int color = (attr & 0x40) >> 6;
 	int flags = (attr & 0x80) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 void bsktball_state::video_start()
@@ -44,7 +44,7 @@ void bsktball_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 		pic = (pic & 0x3f);
 		color = (color & 0x3f);
 
-		 machine().gfx[1]->transpen(bitmap,cliprect, pic, color, flipx, 0, sx, sy, 0);
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, pic, color, flipx, 0, sx, sy, 0);
 	}
 }
 

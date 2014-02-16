@@ -79,9 +79,21 @@ pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, d
 	m_ctrl(0),
 	m_sprite_ctrl(0),
 	m_ram(NULL),
-	m_ram_buffered(0)
+	m_ram_buffered(0),
+	m_gfxdecode(*this)
 {
 }
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void pc090oj_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<pc090oj_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -219,7 +231,7 @@ void pc090oj_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		x += m_x_offset;
 		y += m_y_offset;
 
-		machine().gfx[m_gfxnum]->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_gfxnum)->prio_transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

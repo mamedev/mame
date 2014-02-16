@@ -307,7 +307,7 @@ TILE_GET_INFO_MEMBER(sbrkout_state::get_bg_tile_info)
 {
 	UINT8 *videoram = m_videoram;
 	int code = (videoram[tile_index] & 0x80) ? videoram[tile_index] : 0;
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 
@@ -345,7 +345,7 @@ UINT32 sbrkout_state::screen_update_sbrkout(screen_device &screen, bitmap_ind16 
 		int sx = 31 * 8 - videoram[0x380 + 0x10 + ball * 2];
 		int sy = 30 * 8 - videoram[0x380 + 0x18 + ball * 2];
 
-		 machine().gfx[1]->transpen(bitmap,cliprect, code, 0, 0, 0, sx, sy, 0);
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, 0, 0, 0, sx, sy, 0);
 	}
 	return 0;
 }
@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( sbrkout, sbrkout_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
-	MCFG_GFXDECODE(sbrkout)
+	MCFG_GFXDECODE_ADD("gfxdecode", sbrkout)
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

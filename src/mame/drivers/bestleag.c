@@ -70,7 +70,7 @@ TILE_GET_INFO_MEMBER(bestleag_state::get_tx_tile_info)
 {
 	int code = m_txram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			(code & 0x0fff)|0x8000,
 			(code & 0xf000) >> 12,
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(bestleag_state::get_bg_tile_info)
 {
 	int code = m_bgram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			(code & 0x0fff),
 			(code & 0xf000) >> 12,
@@ -92,7 +92,7 @@ TILE_GET_INFO_MEMBER(bestleag_state::get_fg_tile_info)
 {
 	int code = m_fgram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			(code & 0x0fff)|0x1000,
 			((code & 0xf000) >> 12)|0x10,
@@ -153,26 +153,26 @@ void bestleag_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		if(m_vregs[0x00/2] & 0x1000)
 			color &= 7;
 
-		machine().gfx[2]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx, 0,
 					flipx ? (sx+16) : (sx),sy,15);
 
-		machine().gfx[2]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code+1,
 					color,
 					flipx, 0,
 					flipx ? (sx) : (sx+16),sy,15);
 
 		/* wraparound x */
-		machine().gfx[2]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx, 0,
 					flipx ? (sx+16 - 512) : (sx - 512),sy,15);
 
-		machine().gfx[2]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code+1,
 					color,
 					flipx, 0,
@@ -378,7 +378,7 @@ static MACHINE_CONFIG_START( bestleag, bestleag_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bestleag_state, screen_update_bestleag)
 
-	MCFG_GFXDECODE(bestleag)
+	MCFG_GFXDECODE_ADD("gfxdecode", bestleag)
 	MCFG_PALETTE_LENGTH(0x800)
 
 

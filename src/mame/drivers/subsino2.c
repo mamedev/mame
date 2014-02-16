@@ -188,7 +188,7 @@ inline void subsino2_state::ss9601_get_tile_info(layer_t *l, tile_data &tileinfo
 		case TILE_8x32:     addr = tile_index & (~0x180);   offs = (tile_index/0x80) & 3;                           break;
 		case TILE_64x32:    addr = tile_index & (~0x187);   offs = ((tile_index/0x80) & 3) + (tile_index & 7) * 4;  break;
 	}
-	SET_TILE_INFO_MEMBER(0, (l->videorams[VRAM_HI][addr] << 8) + l->videorams[VRAM_LO][addr] + offs, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, (l->videorams[VRAM_HI][addr] << 8) + l->videorams[VRAM_LO][addr] + offs, 0, 0);
 }
 
 // Layer 0
@@ -2141,7 +2141,7 @@ static MACHINE_CONFIG_START( bishjan, subsino2_state )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 
-	MCFG_GFXDECODE( ss9601 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  ss9601 )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
@@ -2169,7 +2169,7 @@ static MACHINE_CONFIG_START( mtrain, subsino2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // game reads vblank state
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 
-	MCFG_GFXDECODE( ss9601 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  ss9601 )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, mtrain )
@@ -2200,7 +2200,7 @@ static MACHINE_CONFIG_START( saklove, subsino2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // game reads vblank state
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 
-	MCFG_GFXDECODE( ss9601 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  ss9601 )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
@@ -2235,7 +2235,7 @@ static MACHINE_CONFIG_START( xplan, subsino2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // game reads vblank state
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
 
-	MCFG_GFXDECODE( ss9601 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  ss9601 )
 	MCFG_PALETTE_LENGTH( 256 )
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )

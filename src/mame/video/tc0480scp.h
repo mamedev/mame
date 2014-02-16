@@ -22,6 +22,9 @@ public:
 	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0480scp_device() {}
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	
 	/* When writing a driver, pass zero for the text and flip offsets initially:
 	then tweak them once you have the 4 bg layer positions correct. Col_base
 	may be needed when tilemaps use a palette area from sprites. */
@@ -75,6 +78,7 @@ private:
 	tilemap_t         *m_tilemap[5][2];
 	INT32           m_dblwidth;
 	int             m_x_offs;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	void common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
 	void common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
@@ -96,5 +100,8 @@ extern const device_type TC0480SCP;
 #define MCFG_TC0480SCP_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, TC0480SCP, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_TC0480SCP_GFXDECODE(_gfxtag) \
+	tc0480scp_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif

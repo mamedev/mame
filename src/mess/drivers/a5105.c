@@ -169,7 +169,7 @@ WRITE8_MEMBER( a5105_state::pcg_val_w )
 {
 	m_char_ram[m_pcg_addr | m_pcg_internal_addr] = data;
 
-	machine().gfx[0]->mark_dirty(m_pcg_addr >> 3);
+	m_gfxdecode->gfx(0)->mark_dirty(m_pcg_addr >> 3);
 
 	m_pcg_internal_addr++;
 	m_pcg_internal_addr&=7;
@@ -597,7 +597,7 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
-	MCFG_GFXDECODE(a5105)
+	MCFG_GFXDECODE_ADD("gfxdecode", a5105)
 	MCFG_PALETTE_LENGTH(16)
 
 	/* sound hardware */

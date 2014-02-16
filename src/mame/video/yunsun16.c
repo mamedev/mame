@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_0)
 {
 	UINT16 code = m_vram_0[2 * tile_index + 0];
 	UINT16 attr = m_vram_0[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			TMAP_GFX,
 			code,
 			attr & 0xf,
@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_1)
 {
 	UINT16 code = m_vram_1[2 * tile_index + 0];
 	UINT16 attr = m_vram_1[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			TMAP_GFX,
 			code,
 			attr & 0xf,
@@ -171,7 +171,7 @@ void yunsun16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			flipy = !flipy;     y = max_y - y - 16;
 		}
 
-		machine().gfx[1]->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 					code,
 					attr & 0x1f,
 					flipx, flipy,

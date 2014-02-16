@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(apple1_state::terminal_gettileinfo)
 	if ((tile_index == m_current_terminal->cur_offset) && !m_current_terminal->cur_hidden && m_current_terminal->getcursorcode)
 		code = m_current_terminal->getcursorcode(code);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		gfxfont,    /* gfx */
 		code,       /* character */
 		color,      /* color */
@@ -184,8 +184,8 @@ terminal_t *apple1_state::terminal_create(
 	terminal_t *term;
 	int char_width, char_height;
 
-	char_width = machine().gfx[gfx]->width();
-	char_height = machine().gfx[gfx]->height();
+	char_width = m_gfxdecode->gfx(gfx)->width();
+	char_height = m_gfxdecode->gfx(gfx)->height();
 
 	term = (terminal_t *) auto_alloc_array(machine(), char, sizeof(terminal_t) - sizeof(term->mem)
 		+ (num_cols * num_rows * sizeof(termchar_t)));

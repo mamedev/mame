@@ -261,7 +261,7 @@ UINT32 carrera_state::screen_update_carrera(screen_device &screen, bitmap_ind16 
 		{
 			int tile = m_tileram[count&0x7ff] | m_tileram[(count&0x7ff)+0x800]<<8;
 
-			machine().gfx[0]->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
 			count++;
 		}
 	}
@@ -344,7 +344,7 @@ static MACHINE_CONFIG_START( carrera, carrera_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16, mc6845_intf)
 
-	MCFG_GFXDECODE(carrera)
+	MCFG_GFXDECODE_ADD("gfxdecode", carrera)
 	MCFG_PALETTE_LENGTH(32)
 
 	/* sound hardware */

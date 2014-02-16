@@ -228,11 +228,19 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 
 	MCFG_PALETTE_LENGTH(8192)
 
-
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	MCFG_K051960_ADD("k051960", ultraman_k051960_intf)
+	MCFG_K051960_GFXDECODE("gfxdecode")
+	
 	MCFG_K051316_ADD("k051316_1", ultraman_k051316_intf_0)
+	MCFG_K051316_GFXDECODE("gfxdecode")
+	
 	MCFG_K051316_ADD("k051316_2", ultraman_k051316_intf_1)
+	MCFG_K051316_GFXDECODE("gfxdecode")
+	
 	MCFG_K051316_ADD("k051316_3", ultraman_k051316_intf_2)
+	MCFG_K051316_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

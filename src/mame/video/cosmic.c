@@ -297,13 +297,13 @@ void cosmic_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 			if (m_spriteram[offs] & 0x80)
 				/* 16x16 sprite */
-				machine().gfx[0]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						code, color,
 						0, ~m_spriteram[offs] & 0x40,
 						256-m_spriteram[offs + 2],m_spriteram[offs + 1],0);
 			else
 				/* 32x32 sprite */
-				machine().gfx[1]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						code >> 2, color,
 						0, ~m_spriteram[offs] & 0x40,
 						256-m_spriteram[offs + 2],m_spriteram[offs + 1],0);

@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(videopin_state::get_tile_info)
 {
 	UINT8 code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, (code & 0x40) ? TILE_FLIPY : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, (code & 0x40) ? TILE_FLIPY : 0);
 }
 
 
@@ -68,7 +68,7 @@ UINT32 videopin_state::screen_update_videopin(screen_device &screen, bitmap_ind1
 				{
 					for (j = 0; j < 2; j++)
 					{
-						 machine().gfx[1]->transpen(bitmap,rect,
+						 m_gfxdecode->gfx(1)->transpen(bitmap,rect,
 							0, 0,
 							0, 0,
 							x + 16 * i,

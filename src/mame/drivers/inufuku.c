@@ -391,8 +391,9 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	vsystem_spr_device::set_pdraw(*device, true);
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( inufuku_state, inufuku_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
+	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE(inufuku)
+	MCFG_GFXDECODE_ADD("gfxdecode", inufuku)
 	MCFG_PALETTE_LENGTH(4096)
 
 
@@ -408,7 +409,7 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( _3on3dunk, inufuku )
-	MCFG_GFXDECODE(_3on3dunk)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", _3on3dunk)
 MACHINE_CONFIG_END
 
 

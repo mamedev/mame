@@ -138,7 +138,7 @@ static MACHINE_CONFIG_START( galeb, galeb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 0, 16*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galeb_state, screen_update_galeb)
 
-	MCFG_GFXDECODE( galeb )
+	MCFG_GFXDECODE_ADD("gfxdecode",  galeb )
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)

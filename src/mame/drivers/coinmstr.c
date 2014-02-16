@@ -1099,7 +1099,7 @@ TILE_GET_INFO_MEMBER(coinmstr_state::get_bg_tile_info)
 
 	tile |= (m_attr_ram3[tile_index + 0x0240] & 0x03) << (6+4);
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
 }
 
 void coinmstr_state::video_start()
@@ -1166,7 +1166,7 @@ static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 46*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(coinmstr_state, screen_update_coinmstr)
 
-	MCFG_GFXDECODE(coinmstr)
+	MCFG_GFXDECODE_ADD("gfxdecode", coinmstr)
 	MCFG_PALETTE_LENGTH(46*32*4)
 
 

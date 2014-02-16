@@ -402,7 +402,7 @@ static MACHINE_CONFIG_START( speglsht, speglsht_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 239-8)
 	MCFG_SCREEN_UPDATE_DRIVER(speglsht_state, screen_update_speglsht)
 
-	MCFG_GFXDECODE(speglsht)
+	MCFG_GFXDECODE_ADD("gfxdecode", speglsht)
 	MCFG_PALETTE_LENGTH(16*16*4+1)
 
 	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)

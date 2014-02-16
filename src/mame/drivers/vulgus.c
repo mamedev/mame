@@ -227,7 +227,7 @@ static MACHINE_CONFIG_START( vulgus, vulgus_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vulgus_state, screen_update_vulgus)
 
-	MCFG_GFXDECODE(vulgus)
+	MCFG_GFXDECODE_ADD("gfxdecode", vulgus)
 	MCFG_PALETTE_LENGTH(64*4+16*16+4*32*8)
 
 

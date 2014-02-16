@@ -732,12 +732,14 @@ static MACHINE_CONFIG_START( undrfire, undrfire_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_undrfire)
 
-	MCFG_GFXDECODE(undrfire)
+	MCFG_GFXDECODE_ADD("gfxdecode", undrfire)
 	MCFG_PALETTE_LENGTH(16384)
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn", undrfire_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)
+	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_en_sound)
@@ -767,12 +769,14 @@ static MACHINE_CONFIG_START( cbombers, undrfire_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_cbombers)
 
-	MCFG_GFXDECODE(cbombers)
+	MCFG_GFXDECODE_ADD("gfxdecode", cbombers)
 	MCFG_PALETTE_LENGTH(16384)
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn", undrfire_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)
+	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_en_sound)

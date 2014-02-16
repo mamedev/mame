@@ -601,7 +601,7 @@ static MACHINE_CONFIG_START( namcofl, namcofl_state )
 
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_GFXDECODE(2)
+	MCFG_GFXDECODE_ADD("gfxdecode", 2)
 
 	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 

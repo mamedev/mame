@@ -124,7 +124,7 @@ TILE_GET_INFO_MEMBER(m14_state::m14_get_tile_info)
 
 	/* colorram & 0xf0 used but unknown purpose*/
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			color,
@@ -343,7 +343,7 @@ static MACHINE_CONFIG_START( m14, m14_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m14_state, screen_update_m14)
-	MCFG_GFXDECODE(m14)
+	MCFG_GFXDECODE_ADD("gfxdecode", m14)
 	MCFG_PALETTE_LENGTH(0x20)
 
 

@@ -161,6 +161,7 @@ TILE_GET_INFO_MEMBER(magic10_state::get_layer0_tile_info)
 {
 	SET_TILE_INFO_MEMBER
 	(
+		m_gfxdecode,
 		1,
 		m_layer0_videoram[tile_index * 2],
 		m_layer0_videoram[tile_index * 2 + 1] & 0x0f,
@@ -172,6 +173,7 @@ TILE_GET_INFO_MEMBER(magic10_state::get_layer1_tile_info)
 {
 	SET_TILE_INFO_MEMBER
 	(
+		m_gfxdecode,
 		1,
 		m_layer1_videoram[tile_index * 2],
 		m_layer1_videoram[tile_index * 2 + 1] & 0x0f,
@@ -183,6 +185,7 @@ TILE_GET_INFO_MEMBER(magic10_state::get_layer2_tile_info)
 {
 	SET_TILE_INFO_MEMBER
 	(
+		m_gfxdecode,
 		0,
 		m_layer2_videoram[tile_index * 2],
 		m_layer2_videoram[tile_index * 2 + 1] & 0x0f,
@@ -745,7 +748,7 @@ static MACHINE_CONFIG_START( magic10, magic10_state )
 	MCFG_SCREEN_UPDATE_DRIVER(magic10_state, screen_update_magic10)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_GFXDECODE(magic10)
+	MCFG_GFXDECODE_ADD("gfxdecode", magic10)
 
 
 	/* sound hardware */

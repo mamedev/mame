@@ -3328,7 +3328,7 @@ static MACHINE_CONFIG_START( pacman, pacman_state )
 	MCFG_WATCHDOG_VBLANK_INIT(16)
 
 	/* video hardware */
-	MCFG_GFXDECODE(pacman)
+	MCFG_GFXDECODE_ADD("gfxdecode", pacman)
 	MCFG_PALETTE_LENGTH(128*4)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3482,7 +3482,7 @@ static MACHINE_CONFIG_DERIVED( s2650games, pacman )
 	MCFG_CPU_PROGRAM_MAP(s2650games_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  s2650_interrupt)
 
-	MCFG_GFXDECODE(s2650games)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", s2650games)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 32*8)
@@ -3558,14 +3558,14 @@ static MACHINE_CONFIG_DERIVED( superabc, pacman )
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,superabc)
 
 	/* video hardware */
-	MCFG_GFXDECODE(superabc)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", superabc)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( crush4, mschamp )
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE(crush4)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", crush4)
 MACHINE_CONFIG_END
 
 static const ay8910_interface crushs_ay8910_interface =

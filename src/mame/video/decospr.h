@@ -7,6 +7,9 @@ class decospr_device : public device_t,
 {
 public:
 	decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);	
 	static void set_gfx_region(device_t &device, int gfxregion);
 	static void set_pri_callback(device_t &device, decospr_priority_callback_func callback);
 	static void set_col_callback(device_t &device, decospr_colour_callback_func callback);
@@ -74,6 +77,10 @@ protected:
 private:
 	template<class _BitmapClass>
 	void draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip);
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 extern const device_type DECO_SPRITE;
+
+#define MCFG_DECO_SPRITE_GFXDECODE(_gfxtag) \
+	decospr_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);

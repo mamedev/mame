@@ -828,7 +828,7 @@ static MACHINE_CONFIG_START( g80r_base, segag80r_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE(segag80r)
+	MCFG_GFXDECODE_ADD("gfxdecode", segag80r)
 	MCFG_PALETTE_LENGTH(64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -870,7 +870,7 @@ static MACHINE_CONFIG_DERIVED( spaceod, g80r_base )
 	/* background board changes */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_GFXDECODE(spaceod)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", spaceod)
 	MCFG_PALETTE_LENGTH(64+64)
 
 	/* sound boards */
@@ -886,7 +886,7 @@ static MACHINE_CONFIG_DERIVED( monsterb, g80r_base )
 	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
 
 	/* background board changes */
-	MCFG_GFXDECODE(monsterb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
 	MCFG_PALETTE_LENGTH(64+64)
 
 	/* sound boards */
@@ -899,7 +899,7 @@ static MACHINE_CONFIG_DERIVED( pignewt, g80r_base )
 	/* basic machine hardware */
 
 	/* background board changes */
-	MCFG_GFXDECODE(monsterb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
 	MCFG_PALETTE_LENGTH(64+64)
 
 	/* sound boards */
@@ -917,7 +917,7 @@ static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 	MCFG_I8255A_ADD( "ppi8255", sindbadm_ppi_intf )
 
 	/* video hardware */
-	MCFG_GFXDECODE(monsterb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
 	MCFG_PALETTE_LENGTH(64+64)
 
 	/* sound boards */

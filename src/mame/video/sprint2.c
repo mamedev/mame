@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(sprint2_state::get_tile_info)
 {
 	UINT8 code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code & 0x3f, code >> 7, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code & 0x3f, code >> 7, 0);
 }
 
 
@@ -125,7 +125,7 @@ UINT32 sprint2_state::screen_update_sprint2(screen_device &screen, bitmap_ind16 
 
 	for (i = 0; i < 4; i++)
 	{
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			get_sprite_code(video_ram, i),
 			i,
 			0, 0,
@@ -160,8 +160,8 @@ void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 
 			rect.min_x = get_sprite_x(video_ram, i);
 			rect.min_y = get_sprite_y(video_ram, i);
-			rect.max_x = get_sprite_x(video_ram, i) + machine().gfx[1]->width() - 1;
-			rect.max_y = get_sprite_y(video_ram, i) + machine().gfx[1]->height() - 1;
+			rect.max_x = get_sprite_x(video_ram, i) + m_gfxdecode->gfx(1)->width() - 1;
+			rect.max_y = get_sprite_y(video_ram, i) + m_gfxdecode->gfx(1)->height() - 1;
 
 			rect &= visarea;
 
@@ -169,7 +169,7 @@ void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 
 			m_bg_tilemap->draw(screen, m_helper, rect, 0, 0);
 
-			 machine().gfx[1]->transpen(m_helper,rect,
+			 m_gfxdecode->gfx(1)->transpen(m_helper,rect,
 				get_sprite_code(video_ram, i),
 				0,
 				0, 0,
@@ -183,7 +183,7 @@ void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 			for (j = 0; j < 4; j++)
 				if (j != i)
 				{
-					 machine().gfx[1]->transpen(m_helper,rect,
+					 m_gfxdecode->gfx(1)->transpen(m_helper,rect,
 						get_sprite_code(video_ram, j),
 						1,
 						0, 0,
@@ -191,7 +191,7 @@ void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 						get_sprite_y(video_ram, j), 0);
 				}
 
-			 machine().gfx[1]->transpen(m_helper,rect,
+			 m_gfxdecode->gfx(1)->transpen(m_helper,rect,
 				get_sprite_code(video_ram, i),
 				0,
 				0, 0,

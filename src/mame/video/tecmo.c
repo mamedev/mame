@@ -24,7 +24,7 @@
 TILE_GET_INFO_MEMBER(tecmo_state::get_bg_tile_info)
 {
 	UINT8 attr = m_bgvideoram[tile_index+0x200];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			m_bgvideoram[tile_index] + ((attr & 0x07) << 8),
 			attr >> 4,
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::get_fg_tile_info)
 {
 	UINT8 attr = m_fgvideoram[tile_index+0x200];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			m_fgvideoram[tile_index] + ((attr & 0x07) << 8),
 			attr >> 4,
@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_bg_tile_info)
 {
 	UINT8 attr = m_bgvideoram[tile_index+0x200];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			m_bgvideoram[tile_index] + ((attr & 0x70) << 4),
 			attr & 0x0f,
@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_bg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_fg_tile_info)
 {
 	UINT8 attr = m_fgvideoram[tile_index+0x200];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			m_fgvideoram[tile_index] + ((attr & 0x70) << 4),
 			attr & 0x0f,
@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_fg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::get_tx_tile_info)
 {
 	UINT8 attr = m_txvideoram[tile_index+0x400];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_txvideoram[tile_index] + ((attr & 0x03) << 8),
 			attr >> 4,
@@ -220,7 +220,7 @@ void tecmo_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const
 				{
 					int sx = xpos + 8*(flipx?(size-1-x):x);
 					int sy = ypos + 8*(flipy?(size-1-y):y);
-					machine().gfx[1]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 							code + layout[y][x],
 							flags & 0xf,
 							flipx,flipy,

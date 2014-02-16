@@ -12,7 +12,7 @@ TILE_GET_INFO_MEMBER(wc90b_state::get_bg_tile_info)
 {
 	int attr = m_bgvideoram[tile_index];
 	int tile = m_bgvideoram[tile_index + 0x800];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			9 + ((attr & 3) + ((attr >> 1) & 4)),
 			tile,
 			attr >> 4,
@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(wc90b_state::get_fg_tile_info)
 {
 	int attr = m_fgvideoram[tile_index];
 	int tile = m_fgvideoram[tile_index + 0x800];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1 + ((attr & 3) + ((attr >> 1) & 4)),
 			tile,
 			attr >> 4,
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(wc90b_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(wc90b_state::get_tx_tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_txvideoram[tile_index + 0x800] + ((m_txvideoram[tile_index] & 0x07) << 8),
 			m_txvideoram[tile_index] >> 4,
@@ -114,7 +114,7 @@ void wc90b_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 			sy = 240 - spriteram[offs + 1];
 
-			machine().gfx[17]->transpen(bitmap,cliprect, code,
+			m_gfxdecode->gfx(17)->transpen(bitmap,cliprect, code,
 					flags >> 4, /* color */
 					bank & 1,   /* flipx */
 					bank & 2,   /* flipy */

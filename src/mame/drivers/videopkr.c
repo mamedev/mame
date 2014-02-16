@@ -513,7 +513,7 @@ TILE_GET_INFO_MEMBER(videopkr_state::get_bg_tile_info)
 	int attr = m_color_ram[offs] + ioport("IN2")->read(); /* Color Switch Action */
 	int code = m_video_ram[offs];
 	int color = attr;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 
@@ -1261,7 +1261,7 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 	MCFG_SCREEN_VBLANK_TIME(2080)
 	MCFG_SCREEN_UPDATE_DRIVER(videopkr_state, screen_update_videopkr)
 
-	MCFG_GFXDECODE(videopkr)
+	MCFG_GFXDECODE_ADD("gfxdecode", videopkr)
 	MCFG_PALETTE_LENGTH(256)
 
 	/* sound hardware */
@@ -1293,7 +1293,7 @@ static MACHINE_CONFIG_DERIVED( videodad, videopkr )
 	MCFG_SCREEN_SIZE(32*16, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*16, 31*16-1, 2*8, 30*8-1)
 
-	MCFG_GFXDECODE(videodad)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", videodad)
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 MACHINE_CONFIG_END
 
@@ -1314,7 +1314,7 @@ static MACHINE_CONFIG_DERIVED( babypkr, videopkr )
 	MCFG_SCREEN_VISIBLE_AREA(5*16, 31*16-1, 3*8, 29*8-1)
 
 	MCFG_PALETTE_INIT_OVERRIDE(videopkr_state,babypkr)
-	MCFG_GFXDECODE(videodad)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", videodad)
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 
 	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK / 6)

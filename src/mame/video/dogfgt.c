@@ -51,7 +51,7 @@ void dogfgt_state::palette_init()
 
 TILE_GET_INFO_MEMBER(dogfgt_state::get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_bgvideoram[tile_index],
 			m_bgvideoram[tile_index + 0x400] & 0x03,
@@ -192,7 +192,7 @@ void dogfgt_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect 
 				flipy = !flipy;
 			}
 
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					m_spriteram[offs + 1] + ((m_spriteram[offs] & 0x30) << 4),
 					(m_spriteram[offs] & 0x08) >> 3,
 					flipx,flipy,

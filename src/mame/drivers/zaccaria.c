@@ -574,7 +574,7 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(zaccaria_state, screen_update_zaccaria)
 
-	MCFG_GFXDECODE(zaccaria)
+	MCFG_GFXDECODE_ADD("gfxdecode", zaccaria)
 	MCFG_PALETTE_LENGTH(32*8+32*8)
 
 

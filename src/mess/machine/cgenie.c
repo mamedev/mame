@@ -555,7 +555,7 @@ WRITE8_MEMBER( cgenie_state::cgenie_fontram_w )
 	m_fontram[offset] = data;
 
 	/* convert eight pixels */
-	dp = const_cast<UINT8 *>(machine().gfx[0]->get_data(256 + offset/8) + (offset % 8) * machine().gfx[0]->width());
+	dp = const_cast<UINT8 *>(m_gfxdecode->gfx(0)->get_data(256 + offset/8) + (offset % 8) * m_gfxdecode->gfx(0)->width());
 	dp[0] = (data & 0x80) ? 1 : 0;
 	dp[1] = (data & 0x40) ? 1 : 0;
 	dp[2] = (data & 0x20) ? 1 : 0;

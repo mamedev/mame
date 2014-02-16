@@ -125,7 +125,7 @@ TILE_GET_INFO_MEMBER(galivan_state::get_bg_tile_info)
 	UINT8 *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			(attr & 0x78) >> 3,     /* seems correct */
@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(galivan_state::get_tx_tile_info)
 {
 	int attr = m_videoram[tile_index + 0x400];
 	int code = m_videoram[tile_index] | ((attr & 0x01) << 8);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			(attr & 0xe0) >> 5,     /* not sure */
@@ -149,7 +149,7 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_bg_tile_info)
 	UINT8 *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			((attr & 0x60) >> 3) | ((attr & 0x0c) >> 2),    /* seems correct */
@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_tx_tile_info)
 	if(tile_index < 0x12) /* don't draw the NB1414M4 params! TODO: could be a better fix */
 		code = attr = 0x01;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			(attr & 0x1c) >> 2,     /* seems correct ? */
@@ -323,7 +323,7 @@ void galivan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 //      code = spriteram[offs + 1] + ((attr & 0x02) << 7);
 		code = spriteram[offs + 1] + ((attr & 0x06) << 7);  // for ninjemak, not sure ?
 
-		machine().gfx[2]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				color + 16 * (spritepalettebank[code >> 2] & 0x0f),
 				flipx,flipy,

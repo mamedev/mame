@@ -1015,7 +1015,7 @@ static MACHINE_CONFIG_START( stv, stv_state )
 	MCFG_SCREEN_UPDATE_DRIVER(stv_state, screen_update_stv_vdp2)
 	MCFG_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
 
-	MCFG_GFXDECODE(stv)
+	MCFG_GFXDECODE_ADD("gfxdecode", stv)
 
 	MCFG_VIDEO_START_OVERRIDE(stv_state,stv_vdp2)
 

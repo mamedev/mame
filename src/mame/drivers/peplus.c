@@ -974,7 +974,7 @@ TILE_GET_INFO_MEMBER(peplus_state::get_bg_tile_info)
 		color += 0x10;
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void peplus_state::video_start()
@@ -1339,7 +1339,7 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(peplus_state, screen_update_peplus)
 
-	MCFG_GFXDECODE(peplus)
+	MCFG_GFXDECODE_ADD("gfxdecode", peplus)
 	MCFG_PALETTE_LENGTH(16*16*2)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", MC6845_CLOCK, mc6845_intf)

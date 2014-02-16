@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(pzletime_state::get_mid_tile_info)
 	int tileno = m_mid_videoram[tile_index] & 0x0fff;
 	int colour = m_mid_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
-	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, tileno, colour, 0);
 }
 
 TILE_GET_INFO_MEMBER(pzletime_state::get_txt_tile_info)
@@ -85,7 +85,7 @@ TILE_GET_INFO_MEMBER(pzletime_state::get_txt_tile_info)
 	int colour = m_txt_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, colour, 0);
 
 	tileinfo.category = BIT(colour, 3);
 }
@@ -146,7 +146,7 @@ UINT32 pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind1
 
 			// is spriteram[offs + 0] & 0x200 flipy? it's always set
 
-			 machine().gfx[1]->transpen(bitmap,cliprect, spr_offs, colour, 0, 1, sx, sy, 0);
+			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, spr_offs, colour, 0, 1, sx, sy, 0);
 		}
 	}
 
@@ -335,7 +335,7 @@ static MACHINE_CONFIG_START( pzletime, pzletime_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pzletime_state, screen_update_pzletime)
-	MCFG_GFXDECODE(pzletime)
+	MCFG_GFXDECODE_ADD("gfxdecode", pzletime)
 	MCFG_PALETTE_LENGTH(0x300 + 32768)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

@@ -411,7 +411,7 @@ inline void taito_f3_state::get_tile_info(tile_data &tileinfo, int tile_index, U
 	// This fixes (at least) the rain in round 6 of Arabian Magic.
 	UINT8 extra_planes = ((tile>>(16+10)) & 3); // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile&0xffff,
 			(tile>>16) & 0x1ff & (~extra_planes),
@@ -471,7 +471,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_vram)
 	if (vram_tile&0x0100) flags|=TILE_FLIPX;
 	if (vram_tile&0x8000) flags|=TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			vram_tile&0xff,
 			(vram_tile>>9)&0x3f,
@@ -496,7 +496,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 	if (vram_tile&0x0100) flags|=TILE_FLIPX;
 	if (vram_tile&0x8000) flags|=TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			tile_index,
 			(vram_tile>>9)&0x3f,
@@ -637,9 +637,9 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 	m_pf_line_inf = auto_alloc_array(machine(), struct f3_playfield_line_inf, 5);
 	m_sa_line_inf = auto_alloc_array(machine(), struct f3_spritealpha_line_inf, 1);
 	m_screen->register_screen_bitmap(m_pri_alp_bitmap);
-	m_tile_opaque_sp = auto_alloc_array(machine(), UINT8, machine().gfx[2]->elements());
+	m_tile_opaque_sp = auto_alloc_array(machine(), UINT8, m_gfxdecode->gfx(2)->elements());
 	for (i=0; i<8; i++)
-		m_tile_opaque_pf[i] = auto_alloc_array(machine(), UINT8, machine().gfx[1]->elements());
+		m_tile_opaque_pf[i] = auto_alloc_array(machine(), UINT8, m_gfxdecode->gfx(1)->elements());
 
 
 	m_vram_layer->set_transparent_pen(0);
@@ -647,8 +647,8 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 
 	/* Palettes have 4 bpp indexes despite up to 6 bpp data. The unused */
 	/* top bits in the gfx data are cleared later.                      */
-	machine().gfx[1]->set_granularity(16);
-	machine().gfx[2]->set_granularity(16);
+	m_gfxdecode->gfx(1)->set_granularity(16);
+	m_gfxdecode->gfx(2)->set_granularity(16);
 
 	m_flipscreen = 0;
 	memset(m_spriteram16_buffered,0,0x10000);
@@ -657,8 +657,8 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 	save_item(NAME(m_f3_control_0));
 	save_item(NAME(m_f3_control_1));
 
-	machine().gfx[0]->set_source((UINT8 *)m_f3_vram);
-	machine().gfx[3]->set_source((UINT8 *)m_f3_pivot_ram);
+	m_gfxdecode->gfx(0)->set_source((UINT8 *)m_f3_vram);
+	m_gfxdecode->gfx(3)->set_source((UINT8 *)m_f3_pivot_ram);
 
 	m_f3_skip_this_frame=0;
 
@@ -667,7 +667,7 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 	init_alpha_blend_func(machine());
 
 	{
-		gfx_element *sprite_gfx = machine().gfx[2];
+		gfx_element *sprite_gfx = m_gfxdecode->gfx(2);
 		int c;
 
 		for (c = 0;c < sprite_gfx->elements();c++)
@@ -691,7 +691,7 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 
 
 	{
-		gfx_element *pf_gfx = machine().gfx[1];
+		gfx_element *pf_gfx = m_gfxdecode->gfx(1);
 		int c;
 
 		for (c = 0;c < pf_gfx->elements();c++)
@@ -801,7 +801,7 @@ READ16_MEMBER(taito_f3_state::f3_vram_r)
 WRITE16_MEMBER(taito_f3_state::f3_vram_w)
 {
 	COMBINE_DATA(&m_f3_vram[offset]);
-	machine().gfx[0]->mark_dirty(offset/16);
+	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
 }
 
 READ16_MEMBER(taito_f3_state::f3_pivot_r)
@@ -812,7 +812,7 @@ READ16_MEMBER(taito_f3_state::f3_pivot_r)
 WRITE16_MEMBER(taito_f3_state::f3_pivot_w)
 {
 	COMBINE_DATA(&m_f3_pivot_ram[offset]);
-	machine().gfx[3]->mark_dirty(offset/16);
+	m_gfxdecode->gfx(3)->mark_dirty(offset/16);
 }
 
 READ16_MEMBER(taito_f3_state::f3_lineram_r)
@@ -1554,7 +1554,7 @@ static void visible_tile_check(running_machine &machine,
 	alpha_mode=line_t->alpha_mode[line];
 	if(!alpha_mode) return;
 
-	total_elements=machine.gfx[1]->elements();
+	total_elements=state->m_gfxdecode->gfx(1)->elements();
 
 	tile_index=x_index_fx>>16;
 	tile_num=(((line_t->x_zoom[line]*320+(x_index_fx & 0xffff)+0xffff)>>16)+(tile_index%16)+15)/16;
@@ -3109,7 +3109,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	const struct tempsprite *sprite_ptr;
-	gfx_element *sprite_gfx = machine.gfx[2];
+	gfx_element *sprite_gfx = state->m_gfxdecode->gfx(2);
 
 	sprite_ptr = state->m_sprite_end;
 	state->m_sprite_pri_usage=0;

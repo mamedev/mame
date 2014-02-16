@@ -18,7 +18,7 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_bg_tile_info)
 	int tile_number = m_bg_videoram[2*tile_index];
 	tile_number += (( attributes & 0xc0 ) >> 6 ) * 256;  /* legacy */
 	tile_number += (( attributes & 0x20 ) >> 5 ) * 1024; /* Mission 660 add-on*/
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			attributes & 0x1f,
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_fg_tile_info)
 	int tile_number = m_videoram[tile_index];
 	if (m_textbank1 & 0x01) tile_number += 256; /* legacy */
 	if (m_textbank2 & 0x01) tile_number += 512; /* Mission 660 add-on */
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile_number,
 			m_colorram[((tile_index&0x1f)*2)+1] & 0x1f,
@@ -129,7 +129,7 @@ WRITE8_MEMBER(tsamurai_state::tsamurai_fg_colorram_w)
 void tsamurai_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *spriteram = m_spriteram;
-	gfx_element *gfx = machine().gfx[2];
+	gfx_element *gfx = m_gfxdecode->gfx(2);
 	const UINT8 *source = spriteram+32*4-4;
 	const UINT8 *finish = spriteram; /* ? */
 	m_flicker = 1-m_flicker;
@@ -234,7 +234,7 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_vsgongf_tile_info)
 	int tile_number = m_videoram[tile_index];
 	int color = m_vsgongf_color&0x1f;
 	if( m_textbank1 ) tile_number += 0x100;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile_number,
 			color,

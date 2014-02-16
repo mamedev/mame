@@ -117,7 +117,7 @@ TILE_GET_INFO_MEMBER(hyperspt_state::get_bg_tile_info)
 	int color = m_colorram[tile_index] & 0x0f;
 	int flags = ((m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) | ((m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
 }
 
 void hyperspt_state::video_start()
@@ -152,20 +152,20 @@ void hyperspt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		sy += 1;
 
 		
-			machine().gfx[0]->transmask(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transmask(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0));
+			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(0), color, 0));
 
 		/* redraw with wraparound */
 
 		
-			machine().gfx[0]->transmask(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transmask(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx - 256, sy,
-			colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0));
+			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(0), color, 0));
 	}
 }
 
@@ -192,7 +192,7 @@ TILE_GET_INFO_MEMBER(hyperspt_state::roadf_get_bg_tile_info)
 	int color = m_colorram[tile_index] & 0x0f;
 	int flags = (m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
 }
 
 VIDEO_START_MEMBER(hyperspt_state,roadf)

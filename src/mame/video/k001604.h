@@ -21,6 +21,9 @@ public:
 	k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k001604_device() {}
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	
 	void draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void draw_front_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE32_MEMBER( tile_w );
@@ -44,6 +47,7 @@ private:
 	UINT32 *       m_tile_ram;
 	UINT32 *       m_char_ram;
 	UINT32 *       m_reg;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	TILEMAP_MAPPER_MEMBER(scan_layer_8x8_0_size0);
 	TILEMAP_MAPPER_MEMBER(scan_layer_8x8_0_size1);
@@ -61,5 +65,12 @@ extern const device_type K001604;
 #define MCFG_K001604_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K001604, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_K001604_MODIFY(_tag, _interface) \
+	MCFG_DEVICE_MODIFY(_tag) \
+	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_K001604_GFXDECODE(_gfxtag) \
+	k001604_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif

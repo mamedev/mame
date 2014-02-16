@@ -108,31 +108,31 @@ public:
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg1_tile_info)
 {
 	UINT16 code = m_bg1_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0x10 + (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg2_tile_info)
 {
 	UINT16 code = m_bg2_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0x10 + (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg3_tile_info)
 {
 	UINT16 code = m_bg3_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg4_tile_info)
 {
 	UINT16 code = m_bg4_ram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_fg_tile_info)
 {
 	UINT16 code = m_fg_ram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code, 0x20 + (code >> 12), 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0x20 + (code >> 12), 0);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_bg1_w)
@@ -416,7 +416,7 @@ static MACHINE_CONFIG_START( galaxi, galaxi_state )
 	MCFG_SCREEN_VISIBLE_AREA(16*5, 512-16*2-1, 16*1, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxi_state, screen_update_galaxi)
 
-	MCFG_GFXDECODE(galaxi)
+	MCFG_GFXDECODE_ADD("gfxdecode", galaxi)
 	MCFG_PALETTE_LENGTH(0x400)
 
 

@@ -1465,7 +1465,7 @@ static MACHINE_CONFIG_START( gunpey, gunpey_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gunpey_state, screen_update_gunpey)
 
 	MCFG_PALETTE_LENGTH(0x10000)
-	MCFG_GFXDECODE(gunpey)
+	MCFG_GFXDECODE_ADD("gfxdecode", gunpey)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 

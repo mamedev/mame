@@ -180,7 +180,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( pentagon, spectrum_128, pentagon_state )
 	MCFG_MACHINE_RESET_OVERRIDE(pentagon_state, pentagon )
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
-	MCFG_GFXDECODE(pentagon)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", pentagon)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
 MACHINE_CONFIG_END

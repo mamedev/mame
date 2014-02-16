@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(mustache_state::get_bg_tile_info)
 	int code = videoram[2 * tile_index] + ((attr & 0x60) << 3) + ((m_control_byte & 0x08) << 7);
 	int color = attr & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0)   );
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0)   );
 
 
 }
@@ -99,7 +99,7 @@ void mustache_state::video_start()
 void mustache_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	rectangle clip = cliprect;
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	const rectangle &visarea = m_screen->visible_area();
 	UINT8 *spriteram = m_spriteram;
 	int offs;

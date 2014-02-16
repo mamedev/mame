@@ -447,7 +447,7 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gcpinbal_state, screen_update_gcpinbal)
 
 
-	MCFG_GFXDECODE(gcpinbal)
+	MCFG_GFXDECODE_ADD("gfxdecode", gcpinbal)
 	MCFG_PALETTE_LENGTH(4096)
 
 

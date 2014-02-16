@@ -107,7 +107,7 @@ TILE_GET_INFO_MEMBER(quizshow_state::get_tile_info)
 	// d6: blink, d7: invert
 	UINT8 color = (code & (m_blink_state | 0x80)) >> 6;
 
-	SET_TILE_INFO_MEMBER(0, code & 0x3f, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code & 0x3f, color, 0);
 }
 
 void quizshow_state::video_start()
@@ -389,7 +389,7 @@ static MACHINE_CONFIG_START( quizshow, quizshow_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(quizshow_state, screen_update_quizshow)
 
-	MCFG_GFXDECODE(quizshow)
+	MCFG_GFXDECODE_ADD("gfxdecode", quizshow)
 	MCFG_PALETTE_LENGTH(8*2)
 
 	/* sound hardware (discrete) */

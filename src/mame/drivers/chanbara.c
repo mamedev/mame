@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(chanbara_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 1) << 8);
 	int color = (m_colorram[tile_index] >> 1) & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(chanbara_state::get_bg2_tile_info)
@@ -152,7 +152,7 @@ TILE_GET_INFO_MEMBER(chanbara_state::get_bg2_tile_info)
 	int code = m_videoram2[tile_index];
 	int color = (m_colorram2[tile_index] >> 1) & 0x1f;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, 0);
 }
 
 void chanbara_state::video_start()
@@ -188,18 +188,18 @@ void chanbara_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			{
 				if (!flipy)
 				{
-					 machine().gfx[1]->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy-16, 0);
-					 machine().gfx[1]->transpen(bitmap,cliprect, code+1, color, flipx, flipy, sx, sy, 0);
+					 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy-16, 0);
+					 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code+1, color, flipx, flipy, sx, sy, 0);
 				}
 				else
 				{
-					 machine().gfx[1]->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
-					 machine().gfx[1]->transpen(bitmap,cliprect, code+1, color, flipx, flipy, sx, sy-16, 0);
+					 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+					 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code+1, color, flipx, flipy, sx, sy-16, 0);
 				}
 			}
 			else
 			{
-				 machine().gfx[1]->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
 			}
 		}
 	}
@@ -406,7 +406,7 @@ static MACHINE_CONFIG_START( chanbara, chanbara_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
 
-	MCFG_GFXDECODE(chanbara)
+	MCFG_GFXDECODE_ADD("gfxdecode", chanbara)
 	MCFG_PALETTE_LENGTH(256)
 
 

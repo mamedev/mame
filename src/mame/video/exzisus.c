@@ -136,7 +136,7 @@ UINT32 exzisus_state::screen_update_exzisus(screen_device &screen, bitmap_ind16 
 					y = 248 - y;
 				}
 
-				 machine().gfx[0]->transpen(bitmap,cliprect,
+				 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						code & 0x3fff,
 						color,
 						flip_screen(), flip_screen(),
@@ -205,7 +205,7 @@ UINT32 exzisus_state::screen_update_exzisus(screen_device &screen, bitmap_ind16 
 					y = 248 - y;
 				}
 
-				 machine().gfx[1]->transpen(bitmap,cliprect,
+				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						code & 0x3fff,
 						color,
 						flip_screen(), flip_screen(),

@@ -24,7 +24,7 @@
 TILE_GET_INFO_MEMBER(aeroboto_state::get_tile_info)
 {
 	UINT8 code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code + (m_charbank << 8),
 			m_tilecolor[code],
@@ -135,7 +135,7 @@ void aeroboto_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			y = 240 - y;
 		}
 
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				m_spriteram[offs + 1],
 				m_spriteram[offs + 2] & 0x07,
 				flip_screen(), flip_screen(),

@@ -358,7 +358,7 @@ UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		for(int x = 0; x < 80; x++ )
 		{
 			UINT8 code = m_vram[x + y*128];
-			 machine().gfx[0]->opaque(bitmap,cliprect,  code , 0, 0,0, x*8,y*16);
+			 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,  code , 0, 0,0, x*8,y*16);
 		}
 	}
 
@@ -622,7 +622,7 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", itt3030_floppies, "525dd", itt3030_state::itt3030_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", itt3030_floppies, "525dd", itt3030_state::itt3030_floppy_formats)
 
-	MCFG_GFXDECODE(itt3030)
+	MCFG_GFXDECODE_ADD("gfxdecode", itt3030)
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)

@@ -1421,9 +1421,10 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 	MCFG_SCREEN_UPDATE_DRIVER(djmain_state, screen_update_djmain)
 
 	MCFG_PALETTE_LENGTH(0x4440/4)
-	MCFG_GFXDECODE(djmain)
+	MCFG_GFXDECODE_ADD("gfxdecode", djmain)
 
 	MCFG_K056832_ADD("k056832", djmain_k056832_intf)
+	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K055555_ADD("k055555")
 
 	/* sound hardware */

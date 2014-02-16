@@ -432,7 +432,7 @@ static MACHINE_CONFIG_START( naughtyb, naughtyb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update_naughtyb)
 
-	MCFG_GFXDECODE(naughtyb)
+	MCFG_GFXDECODE_ADD("gfxdecode", naughtyb)
 	MCFG_PALETTE_LENGTH(256)
 
 
@@ -464,7 +464,7 @@ static MACHINE_CONFIG_START( popflame, naughtyb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update_naughtyb)
 
-	MCFG_GFXDECODE(naughtyb)
+	MCFG_GFXDECODE_ADD("gfxdecode", naughtyb)
 	MCFG_PALETTE_LENGTH(256)
 
 

@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(fortyl_state::get_bg_tile_info)
 		code = (code & 0x3f) | tile_l_bank | 0x100;
 	code |= tile_h_bank;
 
-	SET_TILE_INFO_MEMBER(   0,
+	SET_TILE_INFO_MEMBER(m_gfxdecode,    0,
 			code,
 			tile_attrib & 0x07,
 			0);
@@ -290,7 +290,7 @@ void fortyl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (spriteram[offs + 2] & 0xe0)
 			color = machine().rand() & 0xf;
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -318,7 +318,7 @@ void fortyl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (spriteram_2[offs + 2] & 0xe0)
 			color = machine().rand() & 0xf;
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

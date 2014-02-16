@@ -16,7 +16,7 @@ void bigstrkb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	    ( rest unused )
 	**- End of Comments -*/
 
-	gfx_element *gfx = machine().gfx[2];
+	gfx_element *gfx = m_gfxdecode->gfx(2);
 	UINT16 *source = m_spriteram;
 	UINT16 *finish = source + 0x800/2;
 
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_bsb_tile_info)
 	tileno = m_videoram[tile_index] & 0x0fff;
 	col=    m_videoram[tile_index] & 0xf000;
 
-	SET_TILE_INFO_MEMBER(0,tileno,col>>12,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,col>>12,0);
 }
 
 WRITE16_MEMBER(bigstrkb_state::bsb_videoram_w)
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_bsb_tile2_info)
 	tileno = m_videoram2[tile_index] & 0x0fff;
 	col=    m_videoram2[tile_index] & 0xf000;
 
-	SET_TILE_INFO_MEMBER(1,tileno,col>>12,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tileno,col>>12,0);
 }
 
 WRITE16_MEMBER(bigstrkb_state::bsb_videoram2_w)
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_bsb_tile3_info)
 	tileno = m_videoram3[tile_index] & 0x0fff;
 	col=    m_videoram3[tile_index] & 0xf000;
 
-	SET_TILE_INFO_MEMBER(1,tileno+0x2000,(col>>12)+(0x100/16),0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tileno+0x2000,(col>>12)+(0x100/16),0);
 }
 
 WRITE16_MEMBER(bigstrkb_state::bsb_videoram3_w)

@@ -373,8 +373,19 @@ const device_type SEGAIC16VID = &device_creator<segaic16_video_device>;
 
 segaic16_video_device::segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGAIC16VID, "Sega 16-bit Video", tag, owner, clock, "segaic16_video", __FILE__),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this),
+		m_gfxdecode(*this)
 {
+}
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void segaic16_video_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<segaic16_video_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 
@@ -633,7 +644,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16a_tile_info )
 	int code = ((data >> 1) & 0x1000) | (data & 0xfff);
 	int color = (data >> 5) & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, code, color, 0);
 	tileinfo.category = (data >> 12) & 1;
 }
 
@@ -645,7 +656,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16a_text_info )
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, code, color, 0);
 	tileinfo.category = (data >> 11) & 1;
 }
 
@@ -847,7 +858,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_tile_info )
 
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -860,7 +871,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_text_info )
 	int color = (data >> 9) & 0x07;
 	int code = data & 0x1ff;
 
-	SET_TILE_INFO_MEMBER(0, bank * info->banksize + code, color, 0);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, bank * info->banksize + code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -874,7 +885,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_alt_tile_info 
 
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -887,7 +898,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_alt_text_info 
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
-	SET_TILE_INFO_MEMBER(0, bank * info->banksize + code, color, 0);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, bank * info->banksize + code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 

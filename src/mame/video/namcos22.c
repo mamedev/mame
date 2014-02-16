@@ -503,7 +503,7 @@ void namcos22_renderer::poly3d_drawsprite(
 	int alpha
 )
 {
-	gfx_element *gfx = screen.machine().gfx[2];
+	gfx_element *gfx = m_state.m_gfxdecode->gfx(2);
 	int sprite_screen_height = (scaley * gfx->height() + 0x8000) >> 16;
 	int sprite_screen_width = (scalex * gfx->width() + 0x8000) >> 16;
 	if (sprite_screen_width && sprite_screen_height)
@@ -1727,7 +1727,7 @@ TILE_GET_INFO_MEMBER(namcos22_state::get_text_tile_info)
 	* ----.xx--.----.---- flip
 	* ----.--xx.xxxx.xxxx code
 	*/
-	SET_TILE_INFO_MEMBER(0, data & 0x03ff, data >> 12, TILE_FLIPYX((data & 0x0c00) >> 10));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, data & 0x03ff, data >> 12, TILE_FLIPYX((data & 0x0c00) >> 10));
 }
 
 WRITE32_MEMBER(namcos22_state::namcos22_textram_w)
@@ -1740,7 +1740,7 @@ WRITE32_MEMBER(namcos22_state::namcos22_textram_w)
 WRITE32_MEMBER(namcos22_state::namcos22_cgram_w)
 {
 	COMBINE_DATA(&m_cgram[offset]);
-	machine().gfx[0]->mark_dirty(offset/32);
+	m_gfxdecode->gfx(0)->mark_dirty(offset/32);
 }
 
 READ32_MEMBER(namcos22_state::namcos22_tilemapattr_r)
@@ -2391,11 +2391,11 @@ void namcos22_state::init_tables()
 	m_pointram = auto_alloc_array_clear(machine(), UINT32, 0x20000);
 
 	// textures
-	for (int i = 0; i < machine().gfx[1]->elements(); i++)
-		machine().gfx[1]->decode(i);
+	for (int i = 0; i < m_gfxdecode->gfx(1)->elements(); i++)
+		m_gfxdecode->gfx(1)->decode(i);
 
 	m_texture_tilemap = (UINT16 *)memregion("textilemap")->base();
-	m_texture_tiledata = (UINT8 *)machine().gfx[1]->get_data(0);
+	m_texture_tiledata = (UINT8 *)m_gfxdecode->gfx(1)->get_data(0);
 	m_texture_tileattr = auto_alloc_array(machine(), UINT8, 0x080000*2);
 
 	// unpack textures
@@ -2471,7 +2471,7 @@ VIDEO_START_MEMBER(namcos22_state,common)
 	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos22_state::get_text_tile_info), this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 
-	machine().gfx[0]->set_source((UINT8 *)m_cgram.target());
+	m_gfxdecode->gfx(0)->set_source((UINT8 *)m_cgram.target());
 
 	m_poly = auto_alloc(machine(), namcos22_renderer(*this));
 }

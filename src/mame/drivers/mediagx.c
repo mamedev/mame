@@ -348,7 +348,7 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 void mediagx_state::draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i, j;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	UINT32 *cga = m_cga_ram;
 	int index = 0;
 
@@ -895,7 +895,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(mediagx_state, screen_update_mediagx)
 
-	MCFG_GFXDECODE(CGA)
+	MCFG_GFXDECODE_ADD("gfxdecode", CGA)
 	MCFG_PALETTE_LENGTH(256)
 
 	/* sound hardware */

@@ -847,8 +847,8 @@ static INPUT_PORTS_START( wondstck )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 INPUT_PORTS_END
 
-TILE_GET_INFO_MEMBER(nmg5_state::fg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_fg_videoram[tile_index] | (m_gfx_bank << 16), 0, 0);}
-TILE_GET_INFO_MEMBER(nmg5_state::bg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_bg_videoram[tile_index] | (m_gfx_bank << 16), 1, 0);}
+TILE_GET_INFO_MEMBER(nmg5_state::fg_get_tile_info){ SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_fg_videoram[tile_index] | (m_gfx_bank << 16), 0, 0);}
+TILE_GET_INFO_MEMBER(nmg5_state::bg_get_tile_info){ SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_bg_videoram[tile_index] | (m_gfx_bank << 16), 1, 0);}
 
 void nmg5_state::video_start()
 {
@@ -1016,7 +1016,7 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(nmg5_state, screen_update_nmg5)
 
-	MCFG_GFXDECODE(nmg5)
+	MCFG_GFXDECODE_ADD("gfxdecode", nmg5)
 	MCFG_PALETTE_LENGTH(0x400)
 
 
@@ -1025,6 +1025,7 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	decospr_device::set_is_bootleg(*device, true);
 	decospr_device::set_flipallx(*device, 1);
 	decospr_device::set_offsets(*device, 0,8);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 
 	/* sound hardware */
@@ -1060,7 +1061,7 @@ static MACHINE_CONFIG_DERIVED( pclubys, nmg5 )
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(pclubys_sound_map)
 
-	MCFG_GFXDECODE(pclubys)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( searchp2, nmg5 )
@@ -1070,7 +1071,7 @@ static MACHINE_CONFIG_DERIVED( searchp2, nmg5 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(55) // !
 
-	MCFG_GFXDECODE(pclubys)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( 7ordi, nmg5 )

@@ -158,7 +158,7 @@ void segag80r_state::spaceod_bg_init_palette()
 TILE_GET_INFO_MEMBER(segag80r_state::spaceod_get_tile_info)
 {
 	int code = memregion("gfx2")->base()[tile_index + 0x1000 * (m_spaceod_bg_control >> 6)];
-	SET_TILE_INFO_MEMBER(1, code + 0x100 * ((m_spaceod_bg_control >> 2) & 1), 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code + 0x100 * ((m_spaceod_bg_control >> 2) & 1), 0, 0);
 }
 
 
@@ -173,7 +173,7 @@ TILEMAP_MAPPER_MEMBER(segag80r_state::spaceod_scan_rows)
 TILE_GET_INFO_MEMBER(segag80r_state::bg_get_tile_info)
 {
 	int code = memregion("gfx2")->base()[tile_index];
-	SET_TILE_INFO_MEMBER(1, code + 0x100 * m_bg_char_bank, code >> 4, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code + 0x100 * m_bg_char_bank, code >> 4, 0);
 }
 
 
@@ -196,7 +196,7 @@ void segag80r_state::video_start()
 			3,  rg_resistances, m_gweights, 220, 0,
 			2,  b_resistances,  m_bweights, 220, 0);
 
-	machine().gfx[0]->set_source(&videoram[0x800]);
+	m_gfxdecode->gfx(0)->set_source(&videoram[0x800]);
 
 	/* allocate paletteram */
 	m_generic_paletteram_8.allocate(0x80);
@@ -272,7 +272,7 @@ WRITE8_MEMBER(segag80r_state::segag80r_videoram_w)
 
 	/* track which characters are dirty */
 	if (offset & 0x800)
-		machine().gfx[0]->mark_dirty((offset & 0x7ff) / 8);
+		m_gfxdecode->gfx(0)->mark_dirty((offset & 0x7ff) / 8);
 }
 
 
@@ -644,7 +644,7 @@ void segag80r_state::draw_videoram(bitmap_ind16 &bitmap, const rectangle &clipre
 			UINT8 tile = videoram[offs];
 
 			/* draw the tile */
-			 machine().gfx[0]->transmask(bitmap,cliprect, tile, tile >> 4, m_video_flip, m_video_flip, x*8, y*8, transparent_pens[tile >> 4]);
+			 m_gfxdecode->gfx(0)->transmask(bitmap,cliprect, tile, tile >> 4, m_video_flip, m_video_flip, x*8, y*8, transparent_pens[tile >> 4]);
 		}
 	}
 }

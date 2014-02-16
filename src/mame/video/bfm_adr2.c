@@ -117,10 +117,20 @@ const device_type BFM_ADDER2 = &device_creator<bfm_adder2_device>;
 
 bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t(mconfig, BFM_ADDER2, "BFM ADDER2", tag, owner, clock, "bfm_adder2", __FILE__),
-		m_cpu(*this, "adder2")
+		m_cpu(*this, "adder2"),
+		m_gfxdecode(*this)
 {
 }
 
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void bfm_adder2_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<bfm_adder2_device &>(device).m_gfxdecode.set_tag(tag);
+}
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -142,7 +152,7 @@ TILE_GET_INFO_MEMBER( bfm_adder2_device::get_tile0_info )
 	flags = ((data & 0x4000)?TILE_FLIPY:0) |
 			((data & 0x2000)?TILE_FLIPX:0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, code, color, flags);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -165,7 +175,7 @@ TILE_GET_INFO_MEMBER( bfm_adder2_device::get_tile1_info )
 	flags = ((data & 0x4000)?TILE_FLIPY:0) |
 			((data & 0x2000)?TILE_FLIPX:0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, code, color, flags);
 }
 
 // video initialisation ///////////////////////////////////////////////////
@@ -533,7 +543,7 @@ static const gfx_layout charlayout =
 // there are max 128 of these groups
 
 static GFXDECODE_START( adder2 )
-	GFXDECODE_ENTRY( "gfx1",  0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( ":gfx1",  0, charlayout, 0, 16 )
 GFXDECODE_END
 
 ///////////////////////////////////////////////////////////////////////////
@@ -547,7 +557,7 @@ static MACHINE_CONFIG_FRAGMENT( adder2 )
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, bfm_adder2_device, update_screen)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_GFXDECODE(adder2)
+	MCFG_GFXDECODE_ADD("gfxdecode", adder2)
 
 	MCFG_CPU_ADD("adder2", M6809, ADDER_CLOCK/4 )  // adder2 board 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(adder2_memmap)             // setup adder2 board memorymap

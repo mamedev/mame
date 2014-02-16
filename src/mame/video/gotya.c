@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(gotya_state::get_bg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(gotya_state::tilemap_scan_rows_thehand)
@@ -129,7 +129,7 @@ void gotya_state::draw_status_row( bitmap_ind16 &bitmap, const rectangle &clipre
 			sy = 31 - row;
 
 		
-			machine().gfx[0]->opaque(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
 			m_videoram2[row * 32 + col],
 			m_videoram2[row * 32 + col + 0x10] & 0x0f,
 			flip_screen_x(), flip_screen_y(),
@@ -153,7 +153,7 @@ void gotya_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 			sy = 240 - sy;
 
 		
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			code, color,
 			flip_screen_x(), flip_screen_y(),
 			sx, sy, 0);

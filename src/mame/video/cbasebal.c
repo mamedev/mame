@@ -11,7 +11,7 @@
 TILE_GET_INFO_MEMBER(cbasebal_state::get_bg_tile_info)
 {
 	UINT8 attr = m_scrollram[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			m_scrollram[2 * tile_index] + ((attr & 0x07) << 8) + 0x800 * m_tilebank,
 			(attr & 0xf0) >> 4,
@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(cbasebal_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(cbasebal_state::get_fg_tile_info)
 {
 	UINT8 attr = m_textram[tile_index + 0x800];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_textram[tile_index] + ((attr & 0xf0) << 4),
 			attr & 0x07,
@@ -155,7 +155,7 @@ void cbasebal_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipx = !flipx;
 		}
 
-		machine().gfx[2]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,m_flipscreen,

@@ -140,7 +140,7 @@ TILE_GET_INFO_MEMBER(ironhors_state::get_bg_tile_info)
 	int flags = ((m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |
 		((m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 void ironhors_state::video_start()
@@ -181,7 +181,7 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		switch (sr[offs + 4] & 0x0c)
 		{
 			case 0x00:  /* 16x16 */
-				machine().gfx[1]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						code/4,
 						color,
 						flipx,flipy,
@@ -192,12 +192,12 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				{
 					if (flip_screen()) sy += 8; // this fixes the train wheels' position
 
-					machine().gfx[2]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code & ~1,
 							color,
 							flipx,flipy,
 							flipx?sx+8:sx,sy,0);
-					machine().gfx[2]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code | 1,
 							color,
 							flipx,flipy,
@@ -207,12 +207,12 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 			case 0x08:  /* 8x16 */
 				{
-					machine().gfx[2]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code & ~2,
 							color,
 							flipx,flipy,
 							sx,flipy?sy+8:sy,0);
-					machine().gfx[2]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code | 2,
 							color,
 							flipx,flipy,
@@ -222,7 +222,7 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 			case 0x0c:  /* 8x8 */
 				{
-					machine().gfx[2]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code,
 							color,
 							flipx,flipy,
@@ -252,7 +252,7 @@ TILE_GET_INFO_MEMBER(ironhors_state::farwest_get_bg_tile_info)
 	int color = (m_colorram[tile_index] & 0x0f) + 16 * m_palettebank;
 	int flags = 0;//((m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |  ((m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 VIDEO_START_MEMBER(ironhors_state,farwest)
@@ -290,7 +290,7 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 		switch (sr[offs + 3] & 0x0c)
 		{
 			case 0x00:  /* 16x16 */
-				machine().gfx[1]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						code/4,
 						color,
 						flipx,flipy,
@@ -301,12 +301,12 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 				{
 					if (flip_screen()) sy += 8; // this fixes the train wheels' position
 
-					machine().gfx[2]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code & ~1,
 							color,
 							flipx,flipy,
 							flipx?sx+8:sx,sy,0);
-					machine().gfx[2]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code | 1,
 							color,
 							flipx,flipy,
@@ -316,12 +316,12 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 
 			case 0x08:  /* 8x16 */
 				{
-					machine().gfx[2]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code & ~2,
 							color,
 							flipx,flipy,
 							sx,flipy?sy+8:sy,0);
-					machine().gfx[2]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code | 2,
 							color,
 							flipx,flipy,
@@ -331,7 +331,7 @@ void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 
 			case 0x0c:  /* 8x8 */
 				{
-					machine().gfx[2]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code,
 							color,
 							flipx,flipy,

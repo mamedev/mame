@@ -93,7 +93,7 @@ public:
 
 void dominob_state::video_start()
 {
-	machine().gfx[0]->set_granularity(8);
+	m_gfxdecode->gfx(0)->set_granularity(8);
 }
 
 void dominob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -111,12 +111,12 @@ void dominob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		code = m_spriteram[offs + 3] + ((m_spriteram[offs + 2] & 0x03) << 8)  ;
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				2 * code,
 				((m_spriteram[offs + 2] & 0xf8) >> 3)  ,
 				flip_screen_x(),flip_screen_y(),
 				sx,sy + (flip_screen_y() ? 8 : -8),0);
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				2 * code + 1,
 				((m_spriteram[offs + 2] & 0xf8) >> 3)  ,
 				flip_screen_x(),flip_screen_y(),
@@ -136,7 +136,7 @@ UINT32 dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 
 		for (x = 0; x < 256 / 32; x++)
 		{
 			
-					machine().gfx[1]->opaque(bitmap,
+					m_gfxdecode->gfx(1)->opaque(bitmap,
 					cliprect,
 					m_bgram[index] + 256 * (m_bgram[index + 1] & 0xf),
 					m_bgram[index + 1] >> 4,
@@ -151,7 +151,7 @@ UINT32 dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 
 		for (x = 0; x < 32; x++)
 		{
 			
-					machine().gfx[0]->transpen(bitmap,
+					m_gfxdecode->gfx(0)->transpen(bitmap,
 					cliprect,
 					m_videoram[(y * 32 + x) * 2 + 1] + (m_videoram[(y * 32 + x) * 2] & 7) * 256,
 					(m_videoram[(y * 32 + x) * 2] >> 3),
@@ -311,7 +311,7 @@ static MACHINE_CONFIG_START( dominob, dominob_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dominob_state, screen_update_dominob)
 
-	MCFG_GFXDECODE(dominob)
+	MCFG_GFXDECODE_ADD("gfxdecode", dominob)
 	MCFG_PALETTE_LENGTH(512)
 
 

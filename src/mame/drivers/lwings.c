@@ -791,7 +791,7 @@ static MACHINE_CONFIG_START( lwings, lwings_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lwings_state, screen_update_lwings)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(lwings)
+	MCFG_GFXDECODE_ADD("gfxdecode", lwings)
 	MCFG_PALETTE_LENGTH(1024)
 
 
@@ -827,7 +827,7 @@ static MACHINE_CONFIG_DERIVED( trojan, lwings )
 	MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold,  4000)
 
 	/* video hardware */
-	MCFG_GFXDECODE(trojan)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", trojan)
 
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,trojan)
 	MCFG_SCREEN_MODIFY("screen")

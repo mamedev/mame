@@ -6226,7 +6226,7 @@ static MACHINE_CONFIG_START( goldstar, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE(goldstar)
+	MCFG_GFXDECODE_ADD("gfxdecode", goldstar)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -6260,7 +6260,7 @@ static MACHINE_CONFIG_START( goldstbl, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE(bl)
+	MCFG_GFXDECODE_ADD("gfxdecode", bl)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -6293,7 +6293,7 @@ static MACHINE_CONFIG_START( moonlght, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE(ml)
+	MCFG_GFXDECODE_ADD("gfxdecode", ml)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -6391,7 +6391,7 @@ static MACHINE_CONFIG_START( chrygld, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE(chry10)
+	MCFG_GFXDECODE_ADD("gfxdecode", chry10)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6432,7 +6432,7 @@ static MACHINE_CONFIG_START( cb3c, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE(cb3c)
+	MCFG_GFXDECODE_ADD("gfxdecode", cb3c)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6472,7 +6472,7 @@ static MACHINE_CONFIG_START( ncb3, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE(ncb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 
@@ -6512,7 +6512,7 @@ static MACHINE_CONFIG_START( cm, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE(cmbitmap)
+	MCFG_GFXDECODE_ADD("gfxdecode", cmbitmap)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6527,7 +6527,7 @@ static MACHINE_CONFIG_START( cm, goldstar_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cmasterc, cm )
-	MCFG_GFXDECODE(cmasterc)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", cmasterc)
 
 MACHINE_CONFIG_END
 
@@ -6552,7 +6552,7 @@ static MACHINE_CONFIG_START( cmnobmp, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE(cm)
+	MCFG_GFXDECODE_ADD("gfxdecode", cm)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6587,7 +6587,7 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_cmast91)
 
-	MCFG_GFXDECODE(cmast91)
+	MCFG_GFXDECODE_ADD("gfxdecode", cmast91)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cmast91)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6629,7 +6629,7 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE(ncb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -6668,7 +6668,7 @@ static MACHINE_CONFIG_START( bingowng, goldstar_state )
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_bingowng)
 
-	MCFG_GFXDECODE(ncb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -6707,7 +6707,7 @@ static MACHINE_CONFIG_START( bingownga, goldstar_state )
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_bingowng)
 
-	MCFG_GFXDECODE(bingownga)       /* GFX Decode is the only difference with the parent machine */
+	MCFG_GFXDECODE_ADD("gfxdecode", bingownga)       /* GFX Decode is the only difference with the parent machine */
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -6763,7 +6763,7 @@ static MACHINE_CONFIG_START( magodds, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_magical)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,magodds)
 
-	MCFG_GFXDECODE(magodds)
+	MCFG_GFXDECODE_ADD("gfxdecode", magodds)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -6804,7 +6804,7 @@ static MACHINE_CONFIG_START( kkotnoli, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 
-	MCFG_GFXDECODE(ncb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6839,7 +6839,7 @@ static MACHINE_CONFIG_START( ladylinr, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 
-	MCFG_GFXDECODE(ncb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -6879,7 +6879,7 @@ static MACHINE_CONFIG_START( wcat3, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 
-	MCFG_GFXDECODE(ncb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -6919,7 +6919,7 @@ static MACHINE_CONFIG_START( amcoe1, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE(cm)
+	MCFG_GFXDECODE_ADD("gfxdecode", cm)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6958,7 +6958,7 @@ static MACHINE_CONFIG_START( amcoe1a, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_amcoe1a)
 
-	MCFG_GFXDECODE(cm)
+	MCFG_GFXDECODE_ADD("gfxdecode", cm)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6997,7 +6997,7 @@ static MACHINE_CONFIG_START( amcoe2, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE(cm)
+	MCFG_GFXDECODE_ADD("gfxdecode", cm)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -7031,7 +7031,7 @@ static MACHINE_CONFIG_START( nfm, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE(nfm)
+	MCFG_GFXDECODE_ADD("gfxdecode", nfm)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -7062,7 +7062,7 @@ static MACHINE_CONFIG_START( unkch, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_unkch)
 
-	MCFG_GFXDECODE(unkch)
+	MCFG_GFXDECODE_ADD("gfxdecode", unkch)
 	MCFG_PALETTE_LENGTH(512)
 
 	//MCFG_NVRAM_HANDLER(goldstar)
@@ -7078,12 +7078,12 @@ static MACHINE_CONFIG_START( unkch, goldstar_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cherrys, ncb3 )
-	MCFG_GFXDECODE(cherrys)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", cherrys)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cm97, ncb3 )
-	MCFG_GFXDECODE(cm97)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", cm97)
 
 MACHINE_CONFIG_END
 
@@ -7110,7 +7110,7 @@ static MACHINE_CONFIG_START( pkrmast, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE(pkrmast)
+	MCFG_GFXDECODE_ADD("gfxdecode", pkrmast)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -7147,7 +7147,7 @@ static MACHINE_CONFIG_START( megaline, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 
-	MCFG_GFXDECODE(megaline)
+	MCFG_GFXDECODE_ADD("gfxdecode", megaline)
 	MCFG_PALETTE_LENGTH(256)
 //  MCFG_NVRAM_ADD_1FILL("nvram")
 

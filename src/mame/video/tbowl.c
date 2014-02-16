@@ -16,7 +16,7 @@ TILE_GET_INFO_MEMBER(tbowl_state::get_tx_tile_info)
 	tileno = m_txvideoram[tile_index] | ((m_txvideoram[tile_index+0x800] & 0x07) << 8);
 	col = (m_txvideoram[tile_index+0x800] & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(0,tileno,col,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,col,0);
 }
 
 WRITE8_MEMBER(tbowl_state::tbowl_txvideoram_w)
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(tbowl_state::get_bg_tile_info)
 	tileno = m_bgvideoram[tile_index] | ((m_bgvideoram[tile_index+0x1000] & 0x0f) << 8);
 	col = (m_bgvideoram[tile_index+0x1000] & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(1,tileno,col,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tileno,col,0);
 }
 
 WRITE8_MEMBER(tbowl_state::tbowl_bg2videoram_w)
@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(tbowl_state::get_bg2_tile_info)
 	tileno ^= 0x400;
 	col = (m_bg2videoram[tile_index+0x1000] & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(2,tileno,col,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,tileno,col,0);
 }
 
 WRITE8_MEMBER(tbowl_state::tbowl_bgvideoram_w)
@@ -162,28 +162,28 @@ void tbowl_state::tbowl_draw_sprites(bitmap_ind16 &bitmap,const rectangle &clipr
 
 					sx -= xscroll;
 
-					machine().gfx[3]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx,sy,0 );
 
 					/* wraparound */
-					machine().gfx[3]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx,sy-0x200,0 );
 
 					/* wraparound */
-					machine().gfx[3]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx-0x400,sy,0 );
 
 					/* wraparound */
-					machine().gfx[3]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 							code + layout[y][x],
 							color,
 							flipx,flipy,

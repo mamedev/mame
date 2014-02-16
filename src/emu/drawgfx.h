@@ -19,6 +19,22 @@
 #define __DRAWGFX_H__
 
 
+//**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_GFXDECODE_ADD(_tag, _info) \
+	MCFG_DEVICE_ADD(_tag, GFXDECODE, 0) \
+	MCFG_GFXDECODE_INFO(_info) \
+
+#define MCFG_GFXDECODE_INFO(_info) \
+	gfxdecode_device::static_set_gfxdecodeinfo(*device, GFXDECODE_NAME(_info));
+
+
+#define MCFG_GFXDECODE_MODIFY(_tag, _info) \
+	MCFG_DEVICE_MODIFY(_tag) \
+	MCFG_GFXDECODE_INFO(_info) \
+
 
 /***************************************************************************
     CONSTANTS
@@ -288,12 +304,6 @@ struct gfx_decode_entry
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-
-// ----- graphics elements -----
-
-// allocate memory for the graphics elements referenced by a machine
-void gfx_init(running_machine &machine);
-
 // ----- scanline copying -----
 
 // copy pixels from an 8bpp buffer to a single scanline of a bitmap
@@ -426,5 +436,43 @@ inline UINT32 alpha_blend_r32(UINT32 d, UINT32 s, UINT8 level)
 			((((s & 0xff0000) * level + (d & 0xff0000) * alphad) >> 8) & 0xff0000);
 }
 
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> gfxdecode_device
+
+// device type definition
+extern const device_type GFXDECODE;
+
+class gfxdecode_device : 	public device_t
+{
+public:
+	// construction/destruction
+	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration
+	static void static_set_gfxdecodeinfo(device_t &device, const gfx_decode_entry *info);
+
+	gfx_element * gfx(int index) { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index]; }	
+	gfx_element ** gfx() { return m_gfx; }	
+
+	void set_gfx(int index, gfx_element * val) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index] = val; }	
+protected:
+	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const;
+	virtual void device_start();
+	virtual void device_stop();
+	
+private:
+	// configuration state
+	const gfx_decode_entry *m_gfxdecodeinfo;            // pointer to array of graphics decoding information
+	gfx_element *           m_gfx[MAX_GFX_ELEMENTS];		// array of pointers to graphic sets (chars, sprites)
+};
+
+// device type iterator
+typedef device_type_iterator<&device_creator<gfxdecode_device>, gfxdecode_device> gfxdecode_device_iterator;
+
+GFXDECODE_EXTERN(empty);
 
 #endif  // __DRAWGFX_H__

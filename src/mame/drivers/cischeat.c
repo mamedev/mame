@@ -1578,7 +1578,7 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_bigrun)
 
-	MCFG_GFXDECODE(bigrun)
+	MCFG_GFXDECODE_ADD("gfxdecode", bigrun)
 	MCFG_PALETTE_LENGTH(16*16 * 3 + 64*16 * 2 + 64*16)  /* scroll 0,1,2; road 0,1; sprites */
 
 	MCFG_VIDEO_START_OVERRIDE(cischeat_state,bigrun)
@@ -1620,7 +1620,7 @@ static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_cischeat)
 
-	MCFG_GFXDECODE(cischeat)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", cischeat)
 	MCFG_PALETTE_LENGTH(32*16 * 3 + 64*16 * 2 + 128*16) /* scroll 0,1,2; road 0,1; sprites */
 
 	MCFG_VIDEO_START_OVERRIDE(cischeat_state,cischeat)
@@ -1646,7 +1646,7 @@ static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
 	MCFG_CPU_PROGRAM_MAP(f1gpstar_sound_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(f1gpstar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", f1gpstar)
 	MCFG_PALETTE_LENGTH(16*16 * 3 + 64*16 * 2 + 128*16) /* scroll 0,1,2; road 0,1; sprites */
 
 	MCFG_VIDEO_START_OVERRIDE(cischeat_state,f1gpstar)
@@ -1711,7 +1711,7 @@ static MACHINE_CONFIG_START( scudhamm, cischeat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 
-	MCFG_GFXDECODE(scudhamm)
+	MCFG_GFXDECODE_ADD("gfxdecode", scudhamm)
 	MCFG_PALETTE_LENGTH(16*16+16*16+128*16)
 
 	MCFG_VIDEO_START_OVERRIDE(cischeat_state,f1gpstar)

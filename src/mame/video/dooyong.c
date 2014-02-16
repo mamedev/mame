@@ -238,7 +238,7 @@ inline void dooyong_state::lastday_get_tile_info(tile_data &tileinfo, int tile_i
 		flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 	}
 
-	SET_TILE_INFO_MEMBER(graphics, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, graphics, code, color, flags);
 }
 
 inline void dooyong_state::rshark_get_tile_info(tile_data &tileinfo, int tile_index,
@@ -258,7 +258,7 @@ inline void dooyong_state::rshark_get_tile_info(tile_data &tileinfo, int tile_in
 	int color = tilerom2[offs] & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(graphics, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, graphics, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(dooyong_state::get_bg_tile_info)
@@ -305,7 +305,7 @@ TILE_GET_INFO_MEMBER(dooyong_state::flytiger_get_fg_tile_info)
 	int color = (attr & 0x78) >> 3;
 	int flags = ((attr & 0x02) ? TILE_FLIPX : 0) | ((attr & 0x04) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(m_fg_gfx, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, m_fg_gfx, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(dooyong_state::get_tx_tile_info)
@@ -330,7 +330,7 @@ TILE_GET_INFO_MEMBER(dooyong_state::get_tx_tile_info)
 	code = m_txvideoram[offs] | ((attr & 0x0f) << 8);
 	color = (attr & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 
@@ -413,7 +413,7 @@ void dooyong_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		for (y = 0; y <= height; y++)
 		{
-			machine().gfx[1]->prio_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 					code + y,
 					color,
 					flipx, flipy,
@@ -481,7 +481,7 @@ void dooyong_state::rshark_draw_sprites(screen_device &screen, bitmap_ind16 &bit
 				for (x = 0; x <= width; x++)
 				{
 					int _x = sx + (16 * (flipx ? (width - x) : x));
-					machine().gfx[0]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 							code,
 							color,
 							flipx, flipy,

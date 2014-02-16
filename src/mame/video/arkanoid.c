@@ -166,7 +166,7 @@ TILE_GET_INFO_MEMBER(arkanoid_state::get_bg_tile_info)
 	int code = m_videoram[offs + 1] + ((m_videoram[offs] & 0x07) << 8) + 2048 * m_gfxbank;
 	int color = ((m_videoram[offs] & 0xf8) >> 3) + 32 * m_palettebank;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 VIDEO_START_MEMBER(arkanoid_state,arkanoid)
@@ -191,12 +191,12 @@ void arkanoid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		code = m_spriteram[offs + 3] + ((m_spriteram[offs + 2] & 0x03) << 8) + 1024 * m_gfxbank;
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				2 * code,
 				((m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * m_palettebank,
 				flip_screen_x(),flip_screen_y(),
 				sx,sy + (flip_screen_y() ? 8 : -8),0);
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				2 * code + 1,
 				((m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * m_palettebank,
 				flip_screen_x(),flip_screen_y(),

@@ -206,7 +206,7 @@ void ettrivia_state::get_tile_info(tile_data &tileinfo, int tile_index, UINT8 *v
 
 	code += m_gfx_bank * 0x100;
 
-	SET_TILE_INFO_MEMBER(gfx_code,code,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, gfx_code,code,color,0);
 }
 
 TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_bg)
@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( ettrivia, ettrivia_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ettrivia_state, screen_update_ettrivia)
 
-	MCFG_GFXDECODE(ettrivia)
+	MCFG_GFXDECODE_ADD("gfxdecode", ettrivia)
 	MCFG_PALETTE_LENGTH(256)
 
 

@@ -149,7 +149,7 @@ TILE_GET_INFO_MEMBER(polepos_state::bg_get_tile_info)
 	UINT16 word = m_view16_memory[tile_index];
 	int code = (word & 0xff) | ((word & 0x4000) >> 6);
 	int color = (word & 0x3f00) >> 8;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			color,
@@ -174,7 +174,7 @@ TILE_GET_INFO_MEMBER(polepos_state::tx_get_tile_info)
 	/* 128V input to the palette PROM */
 	if (tile_index >= 32*16) color |= 0x40;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			color,
@@ -195,7 +195,7 @@ VIDEO_START_MEMBER(polepos_state,polepos)
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(polepos_state::bg_get_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,16);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(polepos_state::tx_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, machine().gfx[0], 0x2f);
+	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, m_gfxdecode->gfx(0), 0x2f);
 }
 
 
@@ -419,7 +419,7 @@ void polepos_state::zoom_sprite(bitmap_ind16 &bitmap,int big,
 		UINT32 code,UINT32 color,int flipx,int sx,int sy,
 		int sizex,int sizey)
 {
-	gfx_element *gfx = machine().gfx[big ? 3 : 2];
+	gfx_element *gfx = m_gfxdecode->gfx(big ? 3 : 2);
 	const UINT8 *gfxdata = gfx->get_data(code % gfx->elements());
 	UINT8 *scaling_rom = memregion("gfx6")->base();
 	UINT32 transmask = colortable_get_transpen_mask(machine().colortable, gfx, color, 0x1f);

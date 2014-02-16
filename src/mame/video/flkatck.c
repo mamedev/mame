@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_A)
 		bank = 0;   /*  this allows the game to print text
                     in all banks selected by the k007121 */
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code + 256*bank,
 			(attr & 0x0f) + 16,
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_B)
 	int attr = m_k007121_ram[tile_index + 0x800];
 	int code = m_k007121_ram[tile_index + 0xc00];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			(attr & 0x0f) + 16,
@@ -162,7 +162,7 @@ UINT32 flkatck_state::screen_update_flkatck(screen_device &screen, bitmap_ind16 
 
 	/* draw the graphics */
 	m_k007121_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, machine().gfx[0], NULL, &m_k007121_ram[0x1000], 0, 40, 0, screen.priority(), (UINT32)-1);
+	m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), NULL, &m_k007121_ram[0x1000], 0, 40, 0, screen.priority(), (UINT32)-1);
 	m_k007121_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 	return 0;
 }

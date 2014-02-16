@@ -1641,11 +1641,14 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 
 	MCFG_PALETTE_LENGTH(8192)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K056832_ADD_NOINTF("k056832"/*, konamigx_k056832_intf*/)
+	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K055555_ADD("k055555")
 
 	MCFG_K055673_ADD_NOINTF("k055673")
 	MCFG_K055673_SET_SCREEN("screen")
+	MCFG_K055673_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_5bpp)
 
@@ -1688,7 +1691,7 @@ static MACHINE_CONFIG_DERIVED( opengolf, konamigx )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MCFG_GFXDECODE(opengolf)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", opengolf)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state,opengolf)
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -1702,7 +1705,7 @@ static MACHINE_CONFIG_DERIVED( racinfrc, konamigx )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MCFG_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
-	MCFG_GFXDECODE(racinfrc)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", racinfrc)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state,racinfrc)
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -1734,7 +1737,7 @@ static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx_right)
 
-	MCFG_GFXDECODE(type34)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", type34)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gxtype4, konamigx )
@@ -1758,7 +1761,7 @@ static MACHINE_CONFIG_DERIVED( gxtype4, konamigx )
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx_right)
 
 	MCFG_PALETTE_LENGTH(8192)
-	MCFG_GFXDECODE(type4)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", type4)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_type4)
 MACHINE_CONFIG_END
 

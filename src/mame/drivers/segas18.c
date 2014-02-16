@@ -372,7 +372,7 @@ WRITE16_MEMBER( segas18_state::rom_5987_bank_w )
 	// tile banking
 	if (offset < 8)
 	{
-		int maxbanks = machine().gfx[0]->elements() / 1024;
+		int maxbanks = m_gfxdecode->gfx(0)->elements() / 1024;
 		if (data >= maxbanks)
 			data %= maxbanks;
 		m_segaic16vid->segaic16_tilemap_set_bank(0, offset, data);
@@ -1250,11 +1250,12 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segas18_state, screen_update)
 
-	MCFG_GFXDECODE(segas18)
+	MCFG_GFXDECODE_ADD("gfxdecode", segas18)
 	MCFG_PALETTE_LENGTH(2048*3+2048 + 64*3)
 
 	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
+	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -940,7 +940,7 @@ static MACHINE_CONFIG_START( turbo, turbo_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_GFXDECODE(turbo)
+	MCFG_GFXDECODE_ADD("gfxdecode", turbo)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -969,7 +969,7 @@ static MACHINE_CONFIG_START( subroc3d, turbo_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_GFXDECODE(turbo)
+	MCFG_GFXDECODE_ADD("gfxdecode", turbo)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1005,7 +1005,7 @@ static MACHINE_CONFIG_START( buckrog, turbo_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_GFXDECODE(turbo)
+	MCFG_GFXDECODE_ADD("gfxdecode", turbo)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

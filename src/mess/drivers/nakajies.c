@@ -749,7 +749,7 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MCFG_SCREEN_UPDATE_DRIVER( nakajies_state, screen_update )
 	MCFG_SCREEN_SIZE( 80 * 6, 8 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
-	MCFG_GFXDECODE(wales210)
+	MCFG_GFXDECODE_ADD("gfxdecode", wales210)
 	MCFG_PALETTE_LENGTH( 2 )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
@@ -765,18 +765,18 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dator3k, nakajies210 )
-	MCFG_GFXDECODE(dator3k)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", dator3k)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nakajies220, nakajies210 )
-	MCFG_GFXDECODE(drwrt400)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", drwrt400)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nakajies250, nakajies210 )
 	MCFG_SCREEN_MODIFY( "screen" )
 	MCFG_SCREEN_SIZE( 80 * 6, 16 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 16 * 8 - 1 )
-	MCFG_GFXDECODE(drwrt200)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", drwrt200)
 MACHINE_CONFIG_END
 
 

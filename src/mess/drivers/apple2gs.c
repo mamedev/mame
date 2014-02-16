@@ -345,7 +345,7 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(apple2gs_state, screen_update_apple2gs)
 
 	MCFG_PALETTE_LENGTH( 16+256 )
-	MCFG_GFXDECODE( apple2gs )
+	MCFG_GFXDECODE_ADD("gfxdecode",  apple2gs )
 
 	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gs )
 	MCFG_MACHINE_RESET_OVERRIDE(apple2gs_state, apple2gs )

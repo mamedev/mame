@@ -30,9 +30,21 @@
 const device_type SETA001_SPRITE = &device_creator<seta001_device>;
 
 seta001_device::seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SETA001_SPRITE, "seta001_device", tag, owner, clock, "seta001", __FILE__)
+	: device_t(mconfig, SETA001_SPRITE, "seta001_device", tag, owner, clock, "seta001", __FILE__),
+		m_gfxdecode(*this)
 {
 }
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void seta001_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<seta001_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
 
 void seta001_device::device_start()
 {
@@ -196,7 +208,7 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 	int offs, col;
 	int xoffs, yoffs;
 
-	int total_color_codes   =   machine().config().m_gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes   =   m_gfxdecode->gfx(0)->colors();
 
 	int ctrl    =   m_spritectrl[0];
 	int ctrl2   =   m_spritectrl[1];
@@ -276,28 +288,28 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 			color   =   ( color >> (16-5) ) % total_color_codes;
 			code &= 0x3fff;
 
-			machine().gfx[0]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff),((sy) & 0x0ff),
 					transpen);
 
-			machine().gfx[0]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff)-512,((sy) & 0x0ff),
 					transpen);
 
-			machine().gfx[0]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff),((sy) & 0x0ff)-256,
 					transpen);
 
-			machine().gfx[0]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
@@ -316,7 +328,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 	int ctrl2 = m_spritectrl[1];
 	int xoffs, yoffs;
 
-	int total_color_codes   =   machine().config().m_gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes   =   m_gfxdecode->gfx(0)->colors();
 
 	UINT8 *char_pointer = m_spritecodelow + 0x0000;
 	UINT8 *x_pointer = m_spritecodelow + 0x0200;
@@ -365,7 +377,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 			flipy = !flipy;
 		}
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -373,7 +385,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
 
 		/* wrap around x */
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -381,7 +393,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
 
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -389,7 +401,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff)-256,m_transpen);
 
 		/* wrap around x */
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

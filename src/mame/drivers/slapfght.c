@@ -753,7 +753,7 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_perfrman)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(perfrman)
+	MCFG_GFXDECODE_ADD("gfxdecode", perfrman)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
@@ -799,7 +799,7 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(slapfght)
+	MCFG_GFXDECODE_ADD("gfxdecode", slapfght)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
@@ -847,7 +847,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(slapfght)
+	MCFG_GFXDECODE_ADD("gfxdecode", slapfght)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
@@ -896,7 +896,7 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(slapfght)
+	MCFG_GFXDECODE_ADD("gfxdecode", slapfght)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)

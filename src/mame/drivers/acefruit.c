@@ -128,7 +128,7 @@ UINT32 acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_ind1
 
 			if( color < 0x4 )
 			{
-				 machine().gfx[ 1 ]->opaque(bitmap,cliprect, code, color, 0, 0, col * 16, row * 8 );
+				 m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, code, color, 0, 0, col * 16, row * 8 );
 			}
 			else if( color >= 0x5 && color <= 0x7 )
 			{
@@ -136,7 +136,7 @@ UINT32 acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_ind1
 				int x;
 				static const int spriteskip[] = { 1, 2, 4 };
 				int spritesize = spriteskip[ color - 5 ];
-				gfx_element *gfx = machine().gfx[ 0 ];
+				gfx_element *gfx =  m_gfxdecode->gfx(0);
 
 				for( x = 0; x < 16; x++ )
 				{
@@ -600,8 +600,9 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	MCFG_CPU_ADD("maincpu", Z80, 2500000) /* 2.5MHz */
 	MCFG_CPU_PROGRAM_MAP(acefruit_map)
 	MCFG_CPU_IO_MAP(acefruit_io)
-	MCFG_GFXDECODE(acefruit)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", acefruit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

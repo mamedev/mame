@@ -476,7 +476,7 @@ void dragngun_state::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rectangl
 
 				if (zoomx!=0x10000 || zoomy!=0x10000)
 					dragngun_drawgfxzoom(
-						bitmap,cliprect,machine().gfx[bank],
+						bitmap,cliprect,m_gfxdecode->gfx(bank),
 						sprite,
 						colour,
 						fx,fy,
@@ -484,7 +484,7 @@ void dragngun_state::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rectangl
 						15,zoomx,zoomy,NULL,0,
 						((xpos+(zoomx<<4))>>16) - (xpos>>16), ((ypos+(zoomy<<4))>>16) - (ypos>>16), alpha );
 				else
-					machine().gfx[bank]->alpha(bitmap,cliprect,
+					m_gfxdecode->gfx(bank)->alpha(bitmap,cliprect,
 						sprite,
 						colour,
 						fx,fy,
@@ -679,7 +679,7 @@ void deco32_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitm
 	const pen_t *pens = machine().pens;
 	const pen_t *pal0 = &pens[gfx0->colorbase()];
 	const pen_t *pal1 = &pens[gfx1->colorbase()];
-	const pen_t *pal2 = &pens[machine().gfx[(m_pri&1) ? 1 : 2]->colorbase()];
+	const pen_t *pal2 = &pens[m_gfxdecode->gfx((m_pri&1) ? 1 : 2)->colorbase()];
 	int x,y;
 	bitmap_ind16& sprite0_mix_bitmap = machine().device<decospr_device>("spritegen1")->get_sprite_temp_bitmap();
 	bitmap_ind16& sprite1_mix_bitmap = machine().device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
@@ -860,7 +860,7 @@ UINT32 deco32_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 
 		}
 	}
 
-	mixDualAlphaSprites(screen, bitmap, cliprect, machine().gfx[3], machine().gfx[4], alphaTilemap);
+	mixDualAlphaSprites(screen, bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), alphaTilemap);
 
 	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

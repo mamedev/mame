@@ -230,14 +230,16 @@ static MACHINE_CONFIG_START( dietgo, dietgo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dietgo_state, screen_update_dietgo)
 
 	MCFG_PALETTE_LENGTH(1024)
-	MCFG_GFXDECODE(dietgo)
+	MCFG_GFXDECODE_ADD("gfxdecode", dietgo)
 
 	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", dietgo_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO104_ADD("ioprot104")
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE

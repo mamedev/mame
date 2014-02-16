@@ -333,7 +333,7 @@ GFXDECODE_END
 TILE_GET_INFO_MEMBER(ppmast93_state::get_ppmast93_bg_tile_info)
 {
 	int code = (m_bgram[tile_index*2+1] << 8) | m_bgram[tile_index*2];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code & 0x0fff,
 			(code & 0xf000) >> 12,
@@ -343,7 +343,7 @@ TILE_GET_INFO_MEMBER(ppmast93_state::get_ppmast93_bg_tile_info)
 TILE_GET_INFO_MEMBER(ppmast93_state::get_ppmast93_fg_tile_info)
 {
 	int code = (m_fgram[tile_index*2+1] << 8) | m_fgram[tile_index*2];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			(code & 0x0fff)+0x1000,
 			(code & 0xf000) >> 12,
@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ppmast93_state, screen_update_ppmast93)
 
-	MCFG_GFXDECODE(ppmast93)
+	MCFG_GFXDECODE_ADD("gfxdecode", ppmast93)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_PALETTE_LENGTH(0x100)

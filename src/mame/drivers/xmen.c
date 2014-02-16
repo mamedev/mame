@@ -362,8 +362,11 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen)
 	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K052109_ADD("k052109", xmen_k052109_intf)
+	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K053246_ADD("k053246", xmen_k053246_intf)
+	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
@@ -422,9 +425,12 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 
 	MCFG_VIDEO_START_OVERRIDE(xmen_state,xmen6p)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K052109_ADD("k052109", xmen_k052109_intf)
-	MCFG_K053246_ADD("k053246", xmen6p_k053246_intf)
+	MCFG_K052109_GFXDECODE("gfxdecode")
+	MCFG_K053246_ADD("k053246", xmen6p_k053246_intf)	
 	MCFG_K053246_SET_SCREEN("screen")
+	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

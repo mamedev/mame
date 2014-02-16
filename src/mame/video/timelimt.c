@@ -56,13 +56,13 @@ void timelimt_state::palette_init(){
 
 TILE_GET_INFO_MEMBER(timelimt_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1, m_bg_videoram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, m_bg_videoram[tile_index], 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(timelimt_state::get_fg_tile_info)
 {
 	UINT8 *videoram = m_videoram;
-	SET_TILE_INFO_MEMBER(0, videoram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, videoram[tile_index], 0, 0);
 }
 
 void timelimt_state::video_start()
@@ -126,7 +126,7 @@ void timelimt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		code += ( attr & 0x80 ) ? 0x40 : 0x00;
 		code += ( attr & 0x40 ) ? 0x80 : 0x00;
 
-		machine().gfx[2]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				attr & 7,
 				flipx,flipy,

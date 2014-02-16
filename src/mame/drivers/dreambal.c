@@ -326,13 +326,14 @@ static MACHINE_CONFIG_START( dreambal, dreambal_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dreambal_state, screen_update_dreambal)
 
 	MCFG_PALETTE_LENGTH(0x400/2)
-	MCFG_GFXDECODE(dreambal)
+	MCFG_GFXDECODE_ADD("gfxdecode", dreambal)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93lc46b
 
 	MCFG_DECO104_ADD("ioprot104")
 
 	MCFG_DECO16IC_ADD("tilegen1", dreambal_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

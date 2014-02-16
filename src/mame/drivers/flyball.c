@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(flyball_state::flyball_get_tile_info)
 		code += 64;
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, 0, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, flags);
 }
 
 
@@ -129,7 +129,7 @@ UINT32 flyball_state::screen_update_flyball(screen_device &screen, bitmap_ind16 
 	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw pitcher */
-	 machine().gfx[1]->transpen(bitmap,cliprect, m_pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
+	 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, m_pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
 
 	/* draw ball */
 
@@ -448,7 +448,7 @@ static MACHINE_CONFIG_START( flyball, flyball_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(flyball_state, screen_update_flyball)
 
-	MCFG_GFXDECODE(flyball)
+	MCFG_GFXDECODE_ADD("gfxdecode", flyball)
 	MCFG_PALETTE_LENGTH(4)
 
 

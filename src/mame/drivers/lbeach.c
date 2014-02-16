@@ -113,14 +113,14 @@ TILE_GET_INFO_MEMBER(lbeach_state::get_bg_tile_info)
 	// d6,d7: color
 	UINT8 code = m_bg_vram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1, code & 0x1f, code >> 6 & 3, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code & 0x1f, code >> 6 & 3, 0);
 }
 
 TILE_GET_INFO_MEMBER(lbeach_state::get_fg_tile_info)
 {
 	UINT8 code = m_fg_vram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 void lbeach_state::video_start()
@@ -146,7 +146,7 @@ UINT32 lbeach_state::screen_update_lbeach(screen_device &screen, bitmap_ind16 &b
 	int sprite_y = 160;
 
 	m_colmap_car.fill(0, cliprect);
-	 machine().gfx[2]->transpen(m_colmap_car,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
+	 m_gfxdecode->gfx(2)->transpen(m_colmap_car,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
 	bitmap_ind16 &fg_bitmap = m_fg_tilemap->pixmap();
 
 	m_collision_bg_car = 0;
@@ -165,7 +165,7 @@ UINT32 lbeach_state::screen_update_lbeach(screen_device &screen, bitmap_ind16 &b
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// draw player car
-	 machine().gfx[2]->transpen(bitmap,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
+	 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
 
 	return 0;
 }
@@ -333,7 +333,7 @@ static MACHINE_CONFIG_START( lbeach, lbeach_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lbeach_state, screen_update_lbeach)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // needed for collision detection
 
-	MCFG_GFXDECODE(lbeach)
+	MCFG_GFXDECODE_ADD("gfxdecode", lbeach)
 	MCFG_PALETTE_LENGTH(2+8+2)
 
 	/* sound hardware */

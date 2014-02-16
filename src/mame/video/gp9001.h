@@ -37,6 +37,8 @@ class gp9001vdp_device : public device_t,
 public:
 	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_gfx_region(device_t &device, int gfxregion);
 
 	UINT16 gp9001_voffs;
@@ -108,6 +110,7 @@ private:
 	UINT16 gp9001_vdpstatus_r();
 	void gp9001_scroll_reg_select_w( offs_t offset, UINT16 data, UINT16 mem_mask );
 	void gp9001_scroll_reg_data_w(offs_t offset, UINT16 data, UINT16 mem_mask);
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 extern const device_type GP9001_VDP;
@@ -125,7 +128,11 @@ extern const device_type GP9001_VDP;
 #define MCFG_DEVICE_ADD_VDP0 \
 	MCFG_DEVICE_ADD("gp9001vdp0", GP9001_VDP, 0) \
 	gp9001vdp_device::static_set_gfx_region(*device, 0);
+
 /* vdp map 1, gfx region 2 */
 #define MCFG_DEVICE_ADD_VDP1 \
 	MCFG_DEVICE_ADD("gp9001vdp1", GP9001_VDP, 0) \
 	gp9001vdp_device::static_set_gfx_region(*device, 2);
+
+#define MCFG_GP9001_VDP_GFXDECODE(_gfxtag) \
+	gp9001vdp_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);

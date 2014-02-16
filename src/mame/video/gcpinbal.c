@@ -10,7 +10,7 @@ TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg0_tile_info)
 	UINT16 tilenum = m_tilemapram[0 + tile_index * 2];
 	UINT16 attr    = m_tilemapram[1 + tile_index * 2];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			(tilenum & 0xfff) + m_bg0_gfxset,
 			(attr & 0x1f),
@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg1_tile_info)
 	UINT16 tilenum = m_tilemapram[0x800 + tile_index * 2];
 	UINT16 attr    = m_tilemapram[0x801 + tile_index * 2];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			(tilenum & 0xfff) + 0x2000 + m_bg1_gfxset,
 			(attr & 0x1f) + 0x30,
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(gcpinbal_state::get_fg_tile_info)
 {
 	UINT16 tilenum = m_tilemapram[0x1000 + tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			(tilenum & 0xfff),
 			(tilenum >> 12) | 0x70,
@@ -202,7 +202,7 @@ void gcpinbal_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 
 			for (chain_pos = chain; chain_pos >= 0; chain_pos--)
 			{
-				machine().gfx[0]->prio_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 						code,
 						col,
 						flipx, flipy,

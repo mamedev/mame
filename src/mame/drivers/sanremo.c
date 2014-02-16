@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(sanremo_state::get_sanremo_tile_info)
 	int code = m_videoram[tile_index];
 	int bank = m_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER( 0, code + bank * 256, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  0, code + bank * 256, 0, 0);
 }
 
 void sanremo_state::video_start()
@@ -398,7 +398,7 @@ static MACHINE_CONFIG_START( sanremo, sanremo_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
-	MCFG_GFXDECODE(sanremo)
+	MCFG_GFXDECODE_ADD("gfxdecode", sanremo)
 	MCFG_PALETTE_LENGTH(0x10)
 
 	/* sound hardware */

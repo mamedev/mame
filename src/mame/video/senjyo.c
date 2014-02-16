@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_fg_tile_info)
 	if (m_is_senjyo && (tile_index & 0x1f) >= 32-8)
 		flags |= TILE_FORCE_LAYER0;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_fgvideoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x07,
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::senjyo_bg1_tile_info)
 {
 	UINT8 code = m_bg1videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			(code & 0x70) >> 4,
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::starforc_bg1_tile_info)
 	static const UINT8 colormap[8] = { 0, 2, 4, 6, 1, 3, 5, 7 };
 	UINT8 code = m_bg1videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			colormap[(code & 0xe0) >> 5],
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg2_tile_info)
 {
 	UINT8 code = m_bg2videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code,
 			(code & 0xe0) >> 5,
@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg3_tile_info)
 {
 	UINT8 code = m_bg3videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			code,
 			(code & 0xe0) >> 5,
@@ -257,7 +257,7 @@ void senjyo_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,i
 			}
 
 
-			machine().gfx[big ? 5 : 4]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(big ? 5 : 4)->transpen(bitmap,cliprect,
 					spriteram[offs],
 					spriteram[offs + 1] & 0x07,
 					flipx,flipy,

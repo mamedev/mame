@@ -510,7 +510,7 @@ static MACHINE_CONFIG_START( bigevglf, bigevglf_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bigevglf_state, screen_update_bigevglf)
 
-	MCFG_GFXDECODE(bigevglf)
+	MCFG_GFXDECODE_ADD("gfxdecode", bigevglf)
 	MCFG_PALETTE_LENGTH(0x800)
 
 	/* sound hardware */

@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(kchamp_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 7) << 8);
 	int color = (m_colorram[tile_index] >> 3) & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void kchamp_state::video_start()
@@ -89,7 +89,7 @@ void kchamp_state::kchamp_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 			flipy = !flipy;
 		}
 
-		 machine().gfx[bank]->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+		 m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -117,7 +117,7 @@ void kchamp_state::kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 			flipy = !flipy;
 		}
 
-		 machine().gfx[bank]->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+		 m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 

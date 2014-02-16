@@ -229,7 +229,7 @@ static MACHINE_CONFIG_START( flkatck, flkatck_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(flkatck_state, screen_update_flkatck)
 
-	MCFG_GFXDECODE(flkatck)
+	MCFG_GFXDECODE_ADD("gfxdecode", flkatck)
 	MCFG_PALETTE_LENGTH(512)
 
 

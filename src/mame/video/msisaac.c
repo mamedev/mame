@@ -15,7 +15,7 @@
 TILE_GET_INFO_MEMBER(msisaac_state::get_fg_tile_info)
 {
 	int tile_number = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER( 0,
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  0,
 			tile_number,
 			0x10,
 			0);
@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(msisaac_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(msisaac_state::get_bg_tile_info)
 {
 	int tile_number = m_videoram2[tile_index];
-	SET_TILE_INFO_MEMBER( 1,
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  1,
 			0x100 + tile_number,
 			0x30,
 			0);
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(msisaac_state::get_bg2_tile_info)
 	/* graphics 0 or 1 */
 	int gfx_b = (m_bg2_textbank >> 3) & 1;
 
-	SET_TILE_INFO_MEMBER( gfx_b,
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  gfx_b,
 			tile_number,
 			0x20,
 			0);
@@ -163,12 +163,12 @@ void msisaac_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		int flipx = (attributes & 0x1);
 		int flipy = (attributes & 0x2);
 
-		gfx_element *gfx = machine().gfx[2];
+		gfx_element *gfx = m_gfxdecode->gfx(2);
 
 		if (attributes & 4)
 		{
 			//color = rand() & 15;
-			gfx = machine().gfx[3];
+			gfx = m_gfxdecode->gfx(3);
 		}
 
 		if (attributes & 8) /* double size sprite */

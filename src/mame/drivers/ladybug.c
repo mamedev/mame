@@ -766,7 +766,7 @@ static MACHINE_CONFIG_START( ladybug, ladybug_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ladybug_state, screen_update_ladybug)
 
-	MCFG_GFXDECODE(ladybug)
+	MCFG_GFXDECODE_ADD("gfxdecode", ladybug)
 	MCFG_PALETTE_LENGTH(4*8+4*16)
 
 	MCFG_PALETTE_INIT_OVERRIDE(ladybug_state,ladybug)
@@ -807,7 +807,7 @@ static MACHINE_CONFIG_START( sraider, ladybug_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ladybug_state, screen_update_sraider)
 	MCFG_SCREEN_VBLANK_DRIVER(ladybug_state, screen_eof_sraider)
 
-	MCFG_GFXDECODE(sraider)
+	MCFG_GFXDECODE_ADD("gfxdecode", sraider)
 	MCFG_PALETTE_LENGTH(4*8+4*16+32+2)
 
 	MCFG_PALETTE_INIT_OVERRIDE(ladybug_state,sraider)

@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(playch10_state::get_bg_tile_info)
 	int code = videoram[offs] + ((videoram[offs + 1] & 0x07) << 8);
 	int color = (videoram[offs + 1] >> 3) & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void playch10_state::video_start()

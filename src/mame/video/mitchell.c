@@ -18,7 +18,7 @@ TILE_GET_INFO_MEMBER(mitchell_state::get_tile_info)
 {
 	UINT8 attr = m_colorram[tile_index];
 	int code = m_videoram[2 * tile_index] + (m_videoram[2 * tile_index + 1] << 8);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			attr & 0x7f,
@@ -289,7 +289,7 @@ void mitchell_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			sx = 496 - sx;
 			sy = 240 - sy;
 		}
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 					color,
 					m_flipscreen, m_flipscreen,

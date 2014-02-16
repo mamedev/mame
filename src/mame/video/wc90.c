@@ -13,7 +13,7 @@ TILE_GET_INFO_MEMBER(wc90_state::get_bg_tile_info)
 	int attr = m_bgvideoram[tile_index];
 	int tile = m_bgvideoram[tile_index + 0x800] +
 					256 * ((attr & 3) + ((attr >> 1) & 4));
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile,
 			attr >> 4,
@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(wc90_state::get_fg_tile_info)
 	int attr = m_fgvideoram[tile_index];
 	int tile = m_fgvideoram[tile_index + 0x800] +
 					256 * ((attr & 3) + ((attr >> 1) & 4));
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile,
 			attr >> 4,
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(wc90_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(wc90_state::get_tx_tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_txvideoram[tile_index + 0x800] + ((m_txvideoram[tile_index] & 0x07) << 8),
 			m_txvideoram[tile_index] >> 4,
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(wc90_state::track_get_bg_tile_info)
 	int attr = m_bgvideoram[tile_index];
 	int tile = m_bgvideoram[tile_index + 0x800] +
 					256 * (attr & 7);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile,
 			attr >> 4,
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(wc90_state::track_get_fg_tile_info)
 	int attr = m_fgvideoram[tile_index];
 	int tile = m_fgvideoram[tile_index + 0x800] +
 					256 * (attr & 7);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile,
 			attr >> 4,
@@ -126,7 +126,7 @@ WRITE8_MEMBER(wc90_state::wc90_txvideoram_w)
 ***************************************************************************/
 
 #define WC90_DRAW_SPRITE( code, sx, sy ) \
-					 machine().gfx[3]->transpen(bitmap,cliprect, code, flags >> 4, \
+					 m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, code, flags >> 4, \
 					bank&1, bank&2, sx, sy, 0 )
 
 static const char p32x32[4][4] = {

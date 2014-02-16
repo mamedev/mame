@@ -2123,7 +2123,7 @@ TILE_GET_INFO_MEMBER(namcos23_state::TextTilemapGetInfo)
 	* ----.xx--.----.---- flip
 	* ----.--xx.xxxx.xxxx code
 	*/
-	SET_TILE_INFO_MEMBER(0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10));
 }
 
 WRITE32_MEMBER(namcos23_state::s23_textram_w)
@@ -2136,7 +2136,7 @@ WRITE32_MEMBER(namcos23_state::s23_textram_w)
 WRITE32_MEMBER(namcos23_state::s23_textchar_w)
 {
 	COMBINE_DATA(&m_charram[offset]);
-	machine().gfx[0]->mark_dirty(offset/32);
+	m_gfxdecode->gfx(0)->mark_dirty(offset/32);
 }
 
 
@@ -2145,7 +2145,7 @@ WRITE32_MEMBER(namcos23_state::s23_textchar_w)
 
 VIDEO_START_MEMBER(namcos23_state,s23)
 {
-	machine().gfx[0]->set_source(reinterpret_cast<UINT8 *>(m_charram.target()));
+	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<UINT8 *>(m_charram.target()));
 	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 	m_bgtilemap->set_scrolldx(860, 860);
@@ -3456,7 +3456,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE(namcos23)
+	MCFG_GFXDECODE_ADD("gfxdecode", namcos23)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
@@ -3501,7 +3501,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_GFXDECODE(namcos23)
+	MCFG_GFXDECODE_ADD("gfxdecode", namcos23)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3562,7 +3562,7 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 
 	MCFG_PALETTE_LENGTH(0x8000)
 
-	MCFG_GFXDECODE(namcos23)
+	MCFG_GFXDECODE_ADD("gfxdecode", namcos23)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

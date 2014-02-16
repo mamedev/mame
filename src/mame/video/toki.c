@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(toki_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(toki_state::get_back_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile,
 			color,
@@ -68,7 +68,7 @@ TILE_GET_INFO_MEMBER(toki_state::get_fore_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			tile,
 			color,
@@ -196,7 +196,7 @@ void toki_state::toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprec
 				flipy=1;
 			}
 
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					tile,
 					color,
 					flipx,flipy,
@@ -233,7 +233,7 @@ void toki_state::tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &clipre
 			tile    = sprite_word[1] & 0x1fff;
 			color   = sprite_word[2] >> 12;
 
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					tile,
 					color,
 					flipx,0,

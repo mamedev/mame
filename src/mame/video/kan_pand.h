@@ -28,6 +28,9 @@ public:
 	kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~kaneko_pandora_device() {}
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+
 	DECLARE_WRITE8_MEMBER ( spriteram_w );
 	DECLARE_READ8_MEMBER( spriteram_r );
 	DECLARE_WRITE16_MEMBER( spriteram_LSB_w );
@@ -51,6 +54,7 @@ private:
 	bitmap_ind16    *m_sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
 	int             m_clear_bitmap;
 	int             m_bg_pen; // might work some other way..
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 extern const device_type KANEKO_PANDORA;
@@ -64,5 +68,7 @@ extern const device_type KANEKO_PANDORA;
 	MCFG_DEVICE_ADD(_tag, KANEKO_PANDORA, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
+#define MCFG_KANEKO_PANDORA_GFXDECODE(_gfxtag) \
+	kaneko_pandora_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif /* __KAN_PAND_H__ */

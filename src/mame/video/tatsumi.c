@@ -43,7 +43,7 @@ WRITE16_MEMBER(tatsumi_state::roundup5_vram_w)
 
 	offset=offset%0xc000;
 
-	machine().gfx[1]->mark_dirty(offset/0x10);
+	m_gfxdecode->gfx(1)->mark_dirty(offset/0x10);
 }
 
 
@@ -163,7 +163,7 @@ TILE_GET_INFO_MEMBER(tatsumi_state::get_text_tile_info)
 {
 	UINT16 *videoram = m_videoram;
 	int tile = videoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile & 0xfff,
 			tile >> 12,
@@ -174,14 +174,14 @@ TILE_GET_INFO_MEMBER(tatsumi_state::get_tile_info_bigfight_0)
 {
 	int tile=m_cyclwarr_videoram0[(tile_index+0x400)%0x8000];
 	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
-	SET_TILE_INFO_MEMBER(1,(tile&0x3ff)+(bank<<10),(tile>>12)&0xf,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,(tile&0x3ff)+(bank<<10),(tile>>12)&0xf,0);
 }
 
 TILE_GET_INFO_MEMBER(tatsumi_state::get_tile_info_bigfight_1)
 {
 	int tile=m_cyclwarr_videoram1[(tile_index+0x400)%0x8000];
 	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
-	SET_TILE_INFO_MEMBER(1,(tile&0x3ff)+(bank<<10),(tile>>12)&0xf,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,(tile&0x3ff)+(bank<<10),(tile>>12)&0xf,0);
 }
 
 /********************************************************************/
@@ -204,7 +204,7 @@ VIDEO_START_MEMBER(tatsumi_state,roundup5)
 
 	m_tx_layer->set_transparent_pen(0);
 
-	machine().gfx[1]->set_source((UINT8 *)m_roundup5_vram);
+	m_gfxdecode->gfx(1)->set_source((UINT8 *)m_roundup5_vram);
 }
 
 VIDEO_START_MEMBER(tatsumi_state,cyclwarr)
@@ -622,13 +622,13 @@ static void draw_sprites(running_machine &machine, _BitmapClass &bitmap, const r
 				for (w = 0; w < x_width; w++) {
 					if (rotate)
 						roundupt_drawgfxzoomrotate(state,
-								state->m_temp_bitmap,cliprect,machine.gfx[0],
+								state->m_temp_bitmap,cliprect,state->m_gfxdecode->gfx(0),
 								base,
 								color,flip_x,flip_y,x_pos,render_y,
 								scale,scale,0,write_priority_only);
 					else
 						roundupt_drawgfxzoomrotate(state,
-								bitmap,cliprect,machine.gfx[0],
+								bitmap,cliprect,state->m_gfxdecode->gfx(0),
 								base,
 								color,flip_x,flip_y,x_pos,render_y,
 								scale,scale,0,write_priority_only);

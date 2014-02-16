@@ -52,20 +52,20 @@ void vulgus_state::palette_init()
 
 
 	/* characters use colors 32-47 (?) */
-	for (i = 0;i < machine().gfx[0]->colors() * machine().gfx[0]->granularity();i++)
-		colortable_entry_set_value(machine().colortable, machine().gfx[0]->colorbase() + i, 32 + *color_prom++);
+	for (i = 0;i < m_gfxdecode->gfx(0)->colors() * m_gfxdecode->gfx(0)->granularity();i++)
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(0)->colorbase() + i, 32 + *color_prom++);
 
 	/* sprites use colors 16-31 */
-	for (i = 0;i < machine().gfx[2]->colors() * machine().gfx[2]->granularity();i++)
-		colortable_entry_set_value(machine().colortable, machine().gfx[2]->colorbase() + i, 16 + *color_prom++);
+	for (i = 0;i < m_gfxdecode->gfx(2)->colors() * m_gfxdecode->gfx(2)->granularity();i++)
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(2)->colorbase() + i, 16 + *color_prom++);
 
 	/* background tiles use colors 0-15, 64-79, 128-143, 192-207 in four banks */
-	for (i = 0;i < machine().gfx[1]->colors() * machine().gfx[1]->granularity() / 4;i++)
+	for (i = 0;i < m_gfxdecode->gfx(1)->colors() * m_gfxdecode->gfx(1)->granularity() / 4;i++)
 	{
-		colortable_entry_set_value(machine().colortable, machine().gfx[1]->colorbase() + 0*32*8 + i, *color_prom);
-		colortable_entry_set_value(machine().colortable, machine().gfx[1]->colorbase() + 1*32*8 + i, *color_prom + 64);
-		colortable_entry_set_value(machine().colortable, machine().gfx[1]->colorbase() + 2*32*8 + i, *color_prom + 128);
-		colortable_entry_set_value(machine().colortable, machine().gfx[1]->colorbase() + 3*32*8 + i, *color_prom + 192);
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(1)->colorbase() + 0*32*8 + i, *color_prom);
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(1)->colorbase() + 1*32*8 + i, *color_prom + 64);
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(1)->colorbase() + 2*32*8 + i, *color_prom + 128);
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(1)->colorbase() + 3*32*8 + i, *color_prom + 192);
 		color_prom++;
 	}
 }
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(vulgus_state::get_fg_tile_info)
 
 	code = m_fgvideoram[tile_index];
 	color = m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code + ((color & 0x80) << 1),
 			color & 0x3f,
@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(vulgus_state::get_bg_tile_info)
 
 	code = m_bgvideoram[tile_index];
 	color = m_bgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code + ((color & 0x80) << 1),
 			(color & 0x1f) + (0x20 * m_palette_bank),
@@ -116,7 +116,7 @@ void vulgus_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vulgus_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vulgus_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,16,16,32,32);
 
-	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, machine().gfx[0], 47);
+	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, m_gfxdecode->gfx(0), 47);
 }
 
 
@@ -194,14 +194,14 @@ void vulgus_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 		do
 		{
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code + i,
 					col,
 					flip_screen(),flip_screen(),
 					sx, sy + 16 * i * dir,15);
 
 			/* draw again with wraparound */
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code + i,
 					col,
 					flip_screen(),flip_screen(),

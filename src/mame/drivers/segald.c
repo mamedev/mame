@@ -75,7 +75,7 @@ void segald_state::astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &
 		for (characterY = 0; characterY < 32; characterY++)
 		{
 			int current_screen_character = (characterY*32) + characterX;
-			 machine().gfx[0]->transpen(bitmap,cliprect, m_fix_ram[current_screen_character],
+			 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, m_fix_ram[current_screen_character],
 					1, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( astron, segald_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE(segald)
+	MCFG_GFXDECODE_ADD("gfxdecode", segald)
 	MCFG_PALETTE_LENGTH(256)
 
 	/* sound hardare */

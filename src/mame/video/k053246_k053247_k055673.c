@@ -997,16 +997,28 @@ const device_type K053246 = &device_creator<k053247_device>;
 
 k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053246, "Konami 053246 & 053247", tag, owner, clock, "k053247", __FILE__),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this),
+		m_gfxdecode(*this)
 {
 	clear_all();
 }
 
 k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this),
+		m_gfxdecode(*this)
 {
 	clear_all();
+}
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void k053247_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<k053247_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 
@@ -1069,12 +1081,12 @@ void k053247_device::device_start()
 	{
 	case NORMAL_PLANE_ORDER:
 		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / 128;
-		konami_decode_gfx(machine(), m_intf_gfx_num, machine().root_device().memregion(m_intf_gfx_memory_region)->base(), total, &spritelayout, 4);
+		konami_decode_gfx(machine(), m_gfxdecode, m_intf_gfx_num, machine().root_device().memregion(m_intf_gfx_memory_region)->base(), total, &spritelayout, 4);
 		break;
 
 	case TASMAN_PLANE_ORDER:
 		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / 128;
-		konami_decode_gfx(machine(), m_intf_gfx_num, machine().root_device().memregion(m_intf_gfx_memory_region)->base(), total, &tasman_16x16_layout, 4);
+		konami_decode_gfx(machine(), m_gfxdecode, m_intf_gfx_num, machine().root_device().memregion(m_intf_gfx_memory_region)->base(), total, &tasman_16x16_layout, 4);
 		break;
 
 	default:
@@ -1101,7 +1113,7 @@ void k053247_device::device_start()
 	m_dx = m_intf_dx;
 	m_dy = m_intf_dy;
 	m_memory_region = m_intf_gfx_memory_region;
-	m_gfx = machine().gfx[m_intf_gfx_num];
+	m_gfx = m_gfxdecode->gfx(m_intf_gfx_num);
 	m_callback = m_intf_callback;
 
 	m_ram = auto_alloc_array_clear(machine(), UINT16, 0x1000 / 2);
@@ -1237,7 +1249,7 @@ void k053247_device::alt_k055673_vh_start(running_machine &machine, const char *
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine.gfx[gfx_index] == 0)
+		if (m_gfxdecode->gfx(gfx_index) == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -1265,22 +1277,22 @@ void k053247_device::alt_k055673_vh_start(running_machine &machine, const char *
 		}
 
 		total = size4 / 128;
-		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout, 5);
+		konami_decode_gfx(machine, m_gfxdecode, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout, 5);
 		break;
 
 	case K055673_LAYOUT_RNG:
 		total = machine.root_device().memregion(gfx_memory_region)->bytes() / (16*16/2);
-		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout2, 4);
+		konami_decode_gfx(machine, m_gfxdecode, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout2, 4);
 		break;
 
 	case K055673_LAYOUT_LE2:
 		total = machine.root_device().memregion(gfx_memory_region)->bytes() / (16*16);
-		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout3, 8);
+		konami_decode_gfx(machine, m_gfxdecode, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout3, 8);
 		break;
 
 	case K055673_LAYOUT_GX6:
 		total = machine.root_device().memregion(gfx_memory_region)->bytes() / (16*16*6/8);
-		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout4, 6);
+		konami_decode_gfx(machine, m_gfxdecode, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout4, 6);
 		break;
 
 	default:
@@ -1294,7 +1306,7 @@ void k053247_device::alt_k055673_vh_start(running_machine &machine, const char *
 	m_dy = dy;
 	m_z_rejection = -1;
 	m_memory_region = gfx_memory_region;
-	m_gfx = machine.gfx[gfx_index];
+	m_gfx = m_gfxdecode->gfx(gfx_index);
 	m_callback = callback;
 	m_objcha_line = CLEAR_LINE;
 	m_ram = auto_alloc_array(machine, UINT16, 0x1000/2);

@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::get_fg_tile_info)
 	int const flipyx = (hi & 0x30) >> 4;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::ninjakd2_get_bg_tile_info)
 	int const flipyx = (hi & 0x30) >> 4;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile,
 			color,
@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::mnight_get_bg_tile_info)
 	int const flipy = (hi & 0x20) >> 5;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile,
 			color,
@@ -80,7 +80,7 @@ void ninjakd2_state::robokid_get_bg_tile_info( tile_data& tileinfo, tilemap_memo
 	int const tile = ((hi & 0x10) << 7) | ((hi & 0x20) << 5) | ((hi & 0xc0) << 2) | lo;
 	int const color = hi & 0x0f;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			gfxnum,
 			tile,
 			color,
@@ -337,7 +337,7 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_sprite_overdraw_w)
 
 void ninjakd2_state::draw_sprites( bitmap_ind16 &bitmap)
 {
-	gfx_element* const gfx = machine().gfx[1];
+	gfx_element* const gfx = m_gfxdecode->gfx(1);
 	int const big_xshift = m_robokid_sprites ? 1 : 0;
 	int const big_yshift = m_robokid_sprites ? 0 : 1;
 

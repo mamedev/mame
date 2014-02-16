@@ -85,7 +85,7 @@ void albazc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			flipy = !flipy;
 		}
 
-		 machine().gfx[0]->transpen(bitmap,cliprect, code, color, flipx, flipy,
+		 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, code, color, flipx, flipy,
 			sx, sy, 0);
 	}
 }
@@ -282,7 +282,7 @@ static MACHINE_CONFIG_START( hanaroku, albazc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(albazc_state, screen_update_hanaroku)
 
-	MCFG_GFXDECODE(hanaroku)
+	MCFG_GFXDECODE_ADD("gfxdecode", hanaroku)
 	MCFG_PALETTE_LENGTH(0x200)
 
 

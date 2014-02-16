@@ -233,7 +233,7 @@ static MACHINE_CONFIG_START( gumbo, gumbo_state )
 	MCFG_CPU_PROGRAM_MAP(gumbo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gumbo_state,  irq1_line_hold) // all the same
 
-	MCFG_GFXDECODE(gumbo)
+	MCFG_GFXDECODE_ADD("gfxdecode", gumbo)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

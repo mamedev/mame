@@ -11,7 +11,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::get_pspikes_tile_info)
 {
 	UINT16 code = m_bg1videoram[tile_index];
 	int bank = (code & 0x1000) >> 12;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			(code & 0x0fff) + (m_gfxbank[bank] << 12),
 			((code & 0xe000) >> 13) + 8 * m_charpalettebank,
@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::get_pspikes_tile_info)
 TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg1_tile_info)
 {
 	UINT16 code = m_bg1videoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			(code & 0x1fff) + (m_gfxbank[0] << 13),
 			(code & 0xe000) >> 13,
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg1_tile_info)
 TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg2_tile_info)
 {
 	UINT16 code = m_bg2videoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			(code & 0x1fff) + (m_gfxbank[1] << 13),
 			(code & 0xe000) >> 13,
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg2_tile_info)
 TILE_GET_INFO_MEMBER(aerofgt_state::spinlbrk_bg1_tile_info)
 {
 	UINT16 code = m_bg1videoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			(code & 0x0fff) + (m_gfxbank[0] << 12),
 			(code & 0xf000) >> 12,
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::get_bg1_tile_info)
 {
 	UINT16 code = m_bg1videoram[tile_index];
 	int bank = (code & 0x1800) >> 11;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			(code & 0x07ff) + (m_gfxbank[bank] << 11),
 			(code & 0xe000) >> 13,
@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::get_bg2_tile_info)
 {
 	UINT16 code = m_bg2videoram[tile_index];
 	int bank = 4 + ((code & 0x1800) >> 11);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			(code & 0x07ff) + (m_gfxbank[bank] << 11),
 			(code & 0xe000) >> 13,
@@ -513,7 +513,7 @@ void aerofgt_state::aerfboo2_draw_sprites( screen_device &screen, bitmap_ind16 &
 				else
 					code = m_spriteram2[map_start % (m_spriteram2.bytes()/2)];
 
-				machine().gfx[m_sprite_gfx + chip]->prio_zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(m_sprite_gfx + chip)->prio_zoom_transpen(bitmap,cliprect,
 								code,
 								color,
 								flipx,flipy,
@@ -550,14 +550,14 @@ void aerofgt_state::pspikesb_draw_sprites( screen_device &screen, bitmap_ind16 &
 		flipx = m_spriteram3[i + 1] & 0x0800;
 		color = m_spriteram3[i + 1] & 0x000f;
 
-		machine().gfx[m_sprite_gfx]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_sprite_gfx)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
 				xpos,ypos,15);
 
 		/* wrap around y */
-		machine().gfx[m_sprite_gfx]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_sprite_gfx)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -593,14 +593,14 @@ void aerofgt_state::spikes91_draw_sprites( screen_device &screen, bitmap_ind16 &
 
 		realcode = (lookup[code] << 8) + lookup[0x10000 + code];
 
-		machine().gfx[m_sprite_gfx]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_sprite_gfx)->transpen(bitmap,cliprect,
 				realcode,
 				color,
 				flipx,flipy,
 				xpos,ypos,15);
 
 		/* wrap around y */
-		machine().gfx[m_sprite_gfx]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_sprite_gfx)->transpen(bitmap,cliprect,
 				realcode,
 				color,
 				flipx,flipy,
@@ -641,7 +641,7 @@ void aerofgt_state::aerfboot_draw_sprites( screen_device &screen, bitmap_ind16 &
 
 		sx = ((ox + 16 + 3) & 0x1ff) - 16;
 
-		machine().gfx[m_sprite_gfx + (code >= 0x1000 ? 0 : 1)]->prio_zoom_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_sprite_gfx + (code >= 0x1000 ? 0 : 1))->prio_zoom_transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -679,7 +679,7 @@ void aerofgt_state::aerfboot_draw_sprites( screen_device &screen, bitmap_ind16 &
 
 		sx = ((ox + 16 + 3) & 0x1ff) - 16;
 
-		machine().gfx[m_sprite_gfx + (code >= 0x1000 ? 0 : 1)]->prio_zoom_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_sprite_gfx + (code >= 0x1000 ? 0 : 1))->prio_zoom_transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -732,7 +732,7 @@ UINT32 aerofgt_state::screen_update_spikes91(screen_device &screen, bitmap_ind16
 	int i, scrolly;
 	int y, x;
 	int count;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	m_bg1_tilemap->set_scroll_rows(256);
 	scrolly = m_bg1scrolly;

@@ -183,7 +183,7 @@ UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &b
 				}
 			}
 
-			// machine().gfx[0]->opaque(bitmap,cliprect, tile,color >> 5, 0, 0, x*8, y*8);
+			// m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile,color >> 5, 0, 0, x*8, y*8);
 
 			// draw cursor
 			if(mc6845_cursor_addr+0xc000 == count)
@@ -674,7 +674,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(multi8_state, screen_update_multi8)
 	MCFG_PALETTE_LENGTH(8)
-	MCFG_GFXDECODE(multi8)
+	MCFG_GFXDECODE_ADD("gfxdecode", multi8)
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

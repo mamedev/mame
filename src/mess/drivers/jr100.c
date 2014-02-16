@@ -384,7 +384,7 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 192 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(jr100_state, screen_update_jr100)
 
-	MCFG_GFXDECODE(jr100)
+	MCFG_GFXDECODE_ADD("gfxdecode", jr100)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 

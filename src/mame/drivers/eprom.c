@@ -397,12 +397,13 @@ static MACHINE_CONFIG_START( eprom, eprom_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE(eprom)
+	MCFG_GFXDECODE_ADD("gfxdecode", eprom)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, eprom_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, eprom_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", eprom_state::s_mob_config)
+	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */
@@ -437,12 +438,13 @@ static MACHINE_CONFIG_START( klaxp, eprom_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE(eprom)
+	MCFG_GFXDECODE_ADD("gfxdecode", eprom)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, eprom_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, eprom_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", eprom_state::s_mob_config)
+	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */
@@ -476,12 +478,13 @@ static MACHINE_CONFIG_START( guts, eprom_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE(guts)
+	MCFG_GFXDECODE_ADD("gfxdecode", guts)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, eprom_state, guts_get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, eprom_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", eprom_state::s_guts_mob_config)
+	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

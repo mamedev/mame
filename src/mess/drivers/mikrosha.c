@@ -218,7 +218,7 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_GFXDECODE(mikrosha)
+	MCFG_GFXDECODE_ADD("gfxdecode", mikrosha)
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT_OVERRIDE(mikrosha_state,radio86)
 

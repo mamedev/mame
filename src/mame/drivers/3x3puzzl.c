@@ -99,7 +99,7 @@ protected:
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
 {
 	UINT16 code = m_videoram1_buffer[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			0,
@@ -109,7 +109,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 {
 	UINT16 code = m_videoram2_buffer[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			1,
@@ -119,7 +119,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile3_info)
 {
 	UINT16 code = m_videoram3_buffer[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code,
 			2,
@@ -390,7 +390,7 @@ static MACHINE_CONFIG_START( _3x3puzzle, _3x3puzzle_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
-	MCFG_GFXDECODE(_3x3puzzle)
+	MCFG_GFXDECODE_ADD("gfxdecode", _3x3puzzle)
 
 	MCFG_PALETTE_LENGTH(0x600/2)
 

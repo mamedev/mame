@@ -151,9 +151,11 @@ static void ui_gfx_exit(running_machine &machine)
 
 bool ui_gfx_is_relevant(running_machine &machine)
 {
+	gfxdecode_device_iterator gfx_deviter(machine.root_device());
+
 	return machine.total_colors() != 0
 		|| machine.colortable != NULL
-		|| machine.gfx[0] != NULL
+		|| gfx_deviter.first() != NULL
 		|| machine.tilemap().count() != 0;
 }
 
@@ -165,6 +167,7 @@ bool ui_gfx_is_relevant(running_machine &machine)
 UINT32 ui_gfx_ui_handler(running_machine &machine, render_container *container, UINT32 uistate)
 {
 	ui_gfx_state *state = &ui_gfx;
+	gfxdecode_device_iterator gfx_deviter(machine.root_device());
 
 	// if we have nothing, implicitly cancel
 	if (!ui_gfx_is_relevant(machine))
@@ -191,7 +194,7 @@ again:
 
 		case 1:
 			// if we have graphics sets, display them 
-			if (machine.gfx[0] != NULL)
+			if (gfx_deviter.first() != NULL)
 			{
 				gfxset_handler(machine, container, state);
 				break;
@@ -440,9 +443,11 @@ static void palette_handle_keys(running_machine &machine, ui_gfx_state *state)
 
 static void gfxset_handler(running_machine &machine, render_container *container, ui_gfx_state *state)
 {
+	gfxdecode_device_iterator gfx_deviter(machine.root_device());	
+	gfxdecode_device *m_gfxdecode = gfx_deviter.first();
 	render_font *ui_font = machine.ui().get_font();
 	int set = state->gfxset.set;
-	gfx_element *gfx = machine.gfx[set];
+	gfx_element *gfx = m_gfxdecode->gfx(set);
 	float fullwidth, fullheight;
 	float cellwidth, cellheight;
 	float chwidth, chheight;
@@ -525,7 +530,7 @@ static void gfxset_handler(running_machine &machine, render_container *container
 	boxbounds.y1 = boxbounds.y0 + fullheight;
 
 	// figure out the title and expand the outer box to fit 
-	for (x = 0; x < MAX_GFX_ELEMENTS && machine.gfx[x] != NULL; x++) ;
+	for (x = 0; x < MAX_GFX_ELEMENTS && m_gfxdecode->gfx(x) != NULL; x++) ;
 	sprintf(title, "GFX %d/%d %dx%d COLOR %X", state->gfxset.set, x - 1, gfx->width(), gfx->height(), state->gfxset.color[set]);
 	titlewidth = ui_font->string_width(chheight, machine.render().ui_aspect(), title);
 	x0 = 0.0f;
@@ -604,6 +609,8 @@ static void gfxset_handler(running_machine &machine, render_container *container
 
 static void gfxset_handle_keys(running_machine &machine, ui_gfx_state *state, int xcells, int ycells)
 {
+	gfxdecode_device_iterator gfx_deviter(machine.root_device());	
+	gfxdecode_device *m_gfxdecode = gfx_deviter.first();
 	ui_gfx_state oldstate = *state;
 	gfx_element *gfx;
 	int temp, set;
@@ -612,7 +619,7 @@ static void gfxset_handle_keys(running_machine &machine, ui_gfx_state *state, in
 	if (ui_input_pressed(machine, IPT_UI_PREV_GROUP))
 	{
 		for (temp = state->gfxset.set - 1; temp >= 0; temp--)
-			if (machine.gfx[temp] != NULL)
+			if (m_gfxdecode->gfx(temp) != NULL)
 				break;
 		if (temp >= 0)
 			state->gfxset.set = temp;
@@ -620,7 +627,7 @@ static void gfxset_handle_keys(running_machine &machine, ui_gfx_state *state, in
 	if (ui_input_pressed(machine, IPT_UI_NEXT_GROUP))
 	{
 		for (temp = state->gfxset.set + 1; temp < MAX_GFX_ELEMENTS; temp++)
-			if (machine.gfx[temp] != NULL)
+			if (m_gfxdecode->gfx(temp) != NULL)
 				break;
 		if (temp < MAX_GFX_ELEMENTS)
 			state->gfxset.set = temp;
@@ -628,7 +635,7 @@ static void gfxset_handle_keys(running_machine &machine, ui_gfx_state *state, in
 
 	// cache some info in locals 
 	set = state->gfxset.set;
-	gfx = machine.gfx[set];
+	gfx = m_gfxdecode->gfx(set);
 
 	// handle cells per line (minus,plus) 
 	if (ui_input_pressed(machine, IPT_UI_ZOOM_OUT))

@@ -679,7 +679,7 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
 	MCFG_SCREEN_VBLANK_DRIVER(twin16_state, screen_eof_twin16)
 
-	MCFG_GFXDECODE(twin16)
+	MCFG_GFXDECODE_ADD("gfxdecode", twin16)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_VIDEO_START_OVERRIDE(twin16_state,twin16)
@@ -730,7 +730,7 @@ static MACHINE_CONFIG_START( fround, twin16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
 	MCFG_SCREEN_VBLANK_DRIVER(twin16_state, screen_eof_twin16)
 
-	MCFG_GFXDECODE(twin16)
+	MCFG_GFXDECODE_ADD("gfxdecode", twin16)
 	MCFG_PALETTE_LENGTH(0x400)
 
 	MCFG_VIDEO_START_OVERRIDE(twin16_state,twin16)

@@ -31,7 +31,7 @@ UINT32 taxidriv_state::screen_update_taxidriv(screen_device &screen, bitmap_ind1
 			sx = offs % 32;
 			sy = offs / 32;
 
-			machine().gfx[3]->opaque(bitmap,cliprect,
+			m_gfxdecode->gfx(3)->opaque(bitmap,cliprect,
 					m_vram3[offs],
 					0,
 					0,0,
@@ -43,7 +43,7 @@ UINT32 taxidriv_state::screen_update_taxidriv(screen_device &screen, bitmap_ind1
 			sx = offs % 32;
 			sy = offs / 32;
 
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					m_vram2[offs]+256*m_vram2[offs+0x400],
 					0,
 					0,0,
@@ -109,7 +109,7 @@ UINT32 taxidriv_state::screen_update_taxidriv(screen_device &screen, bitmap_ind1
 			sx = offs % 32;
 			sy = offs / 32;
 
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					m_vram1[offs],
 					0,
 					0,0,
@@ -136,7 +136,7 @@ UINT32 taxidriv_state::screen_update_taxidriv(screen_device &screen, bitmap_ind1
 		sx = offs % 32;
 		sy = offs / 32;
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				m_vram0[offs],
 				0,
 				0,0,

@@ -54,7 +54,7 @@ void pcktgal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 				if (flipy) flipy=0; else flipy=1;
 			}
 
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					spriteram[offs+3] + ((spriteram[offs+1] & 1) << 8),
 					(spriteram[offs+1] & 0x70) >> 4,
 					flipx,flipy,

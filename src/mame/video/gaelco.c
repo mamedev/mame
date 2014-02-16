@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(gaelco_state::get_tile_info_gaelco_screen0)
 
 	tileinfo.category = (data2 >> 6) & 0x03;
 
-	SET_TILE_INFO_MEMBER(1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03));
+	SET_TILE_INFO_MEMBER(m_gfxdecode,1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03));
 }
 
 
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(gaelco_state::get_tile_info_gaelco_screen1)
 
 	tileinfo.category = (data2 >> 6) & 0x03;
 
-	SET_TILE_INFO_MEMBER(1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03));
+	SET_TILE_INFO_MEMBER(m_gfxdecode,1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03));
 }
 
 /***************************************************************************
@@ -119,7 +119,7 @@ VIDEO_START_MEMBER(gaelco_state,maniacsq)
 void gaelco_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int i, x, y, ex, ey;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	static const int x_offset[2] = {0x0,0x2};
 	static const int y_offset[2] = {0x0,0x1};

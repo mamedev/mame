@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(taotaido_state::taotaido_bg_tile_info)
 
 	code |= m_video_bank_select[bank]*0x200;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			col,

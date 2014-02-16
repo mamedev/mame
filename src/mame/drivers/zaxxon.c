@@ -945,7 +945,7 @@ static MACHINE_CONFIG_START( root, zaxxon_state )
 	MCFG_I8255A_ADD( "ppi8255", zaxxon_ppi_intf )
 
 	/* video hardware */
-	MCFG_GFXDECODE(zaxxon)
+	MCFG_GFXDECODE_ADD("gfxdecode", zaxxon)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

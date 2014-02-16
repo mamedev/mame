@@ -258,7 +258,7 @@ TILE_GET_INFO_MEMBER(supercrd_state::get_bg_tile_info)
 	int code = attr & 0xfff;
 	int color = m_colorram[offs] >> 4;  // 4 bits for color.
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 
@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( supercrd, supercrd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)  /* Taken from MC6845 init, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(supercrd_state, screen_update_supercrd)
 
-	MCFG_GFXDECODE(supercrd)
+	MCFG_GFXDECODE_ADD("gfxdecode", supercrd)
 
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_PALETTE_INIT_OVERRIDE(supercrd_state, supercrd)

@@ -6,6 +6,8 @@ class deco_bac06_device : public device_t
 public:
 	deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void set_gfx_region_wide(device_t &device, int region8x8, int region16x16, int wide);
 
 	UINT16* m_pf_data;
@@ -106,6 +108,10 @@ private:
 	TILEMAP_MAPPER_MEMBER(tile_shape2_8x8_scan);
 	TILE_GET_INFO_MEMBER(get_pf8x8_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf16x16_tile_info);
+	required_device<gfxdecode_device> m_gfxdecode;	
 };
 
 extern const device_type DECO_BAC06;
+
+#define MCFG_DECO_BAC06_GFXDECODE(_gfxtag) \
+	deco_bac06_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);

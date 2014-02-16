@@ -84,7 +84,7 @@ void cmmb_state::video_start()
 UINT32 cmmb_state::screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *videoram = m_videoram;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x00000;
 
 	int y,x;
@@ -120,8 +120,8 @@ WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
 	offset&=0xfff;
 
 	/* dirty char */
-	machine().gfx[0]->mark_dirty(offset >> 4);
-	machine().gfx[1]->mark_dirty(offset >> 5);
+	m_gfxdecode->gfx(0)->mark_dirty(offset >> 4);
+	m_gfxdecode->gfx(1)->mark_dirty(offset >> 5);
 }
 
 
@@ -332,7 +332,7 @@ static MACHINE_CONFIG_START( cmmb, cmmb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cmmb_state, screen_update_cmmb)
 
-	MCFG_GFXDECODE(cmmb)
+	MCFG_GFXDECODE_ADD("gfxdecode", cmmb)
 	MCFG_PALETTE_LENGTH(512)
 
 	/* sound hardware */

@@ -24,7 +24,7 @@ WRITE16_MEMBER(sslam_state::sslam_paletteram_w)
 
 void sslam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	UINT16 *source = m_spriteram;
 	UINT16 *finish = source + 0x1000/2;
 
@@ -95,7 +95,7 @@ TILE_GET_INFO_MEMBER(sslam_state::get_sslam_tx_tile_info)
 	int code = m_tx_tileram[tile_index] & 0x0fff;
 	int colr = m_tx_tileram[tile_index] & 0xf000;
 
-	SET_TILE_INFO_MEMBER(3,code+0xc000 ,colr >> 12,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3,code+0xc000 ,colr >> 12,0);
 }
 
 WRITE16_MEMBER(sslam_state::sslam_tx_tileram_w)
@@ -111,7 +111,7 @@ TILE_GET_INFO_MEMBER(sslam_state::get_sslam_md_tile_info)
 	int code = m_md_tileram[tile_index] & 0x0fff;
 	int colr = m_md_tileram[tile_index] & 0xf000;
 
-	SET_TILE_INFO_MEMBER(2,code+0x2000 ,colr >> 12,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,code+0x2000 ,colr >> 12,0);
 }
 
 WRITE16_MEMBER(sslam_state::sslam_md_tileram_w)
@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(sslam_state::get_sslam_bg_tile_info)
 	int code = m_bg_tileram[tile_index] & 0x1fff;
 	int colr = m_bg_tileram[tile_index] & 0xe000;
 
-	SET_TILE_INFO_MEMBER(1,code ,colr >> 13,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,code ,colr >> 13,0);
 }
 
 WRITE16_MEMBER(sslam_state::sslam_bg_tileram_w)
@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(sslam_state::get_powerbls_bg_tile_info)
 
 	//(m_bg_tileram[tile_index*2] & 0x0f00) == 0xf000 ???
 
-	SET_TILE_INFO_MEMBER(1,code,colr,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,code,colr,0);
 }
 
 WRITE16_MEMBER(sslam_state::powerbls_bg_tileram_w)

@@ -74,7 +74,7 @@ TILEMAP_MAPPER_MEMBER(retofinv_state::tilemap_scan)
 
 TILE_GET_INFO_MEMBER(retofinv_state::bg_get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			m_bg_videoram[tile_index] + 256 * m_bg_bank,
 			m_bg_videoram[0x400 + tile_index] & 0x3f,
@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(retofinv_state::fg_get_tile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_fg_videoram[tile_index] + 256 * m_fg_bank,
 			color,
@@ -107,7 +107,7 @@ void retofinv_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(retofinv_state::bg_get_tile_info),this),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),this),8,8,36,28);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(retofinv_state::fg_get_tile_info),this),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),this),8,8,36,28);
 
-	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, machine().gfx[0], 0);
+	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, m_gfxdecode->gfx(0), 0);
 }
 
 
@@ -206,12 +206,12 @@ void retofinv_state::draw_sprites(bitmap_ind16 &bitmap)
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				machine().gfx[1]->transmask(bitmap,spritevisiblearea,
+				m_gfxdecode->gfx(1)->transmask(bitmap,spritevisiblearea,
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,
 					sx + 16*x,sy + 16*y,
-					colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0xff));
+					colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0xff));
 			}
 		}
 	}

@@ -948,7 +948,7 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninja)
 
-	MCFG_GFXDECODE(cninja)
+	MCFG_GFXDECODE_ADD("gfxdecode", cninja)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -956,11 +956,15 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	
 	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_pri_callback(*device, cninja_pri_callback);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO104_ADD("ioprot104")
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
@@ -1005,7 +1009,7 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninja)
 
-	MCFG_GFXDECODE(cninja)
+	MCFG_GFXDECODE_ADD("gfxdecode", cninja)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,stoneage)
@@ -1015,11 +1019,15 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	
 	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_pri_callback(*device, cninja_pri_callback);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO104_ADD("ioprot104")
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
@@ -1061,7 +1069,7 @@ static MACHINE_CONFIG_START( cninjabl, cninja_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninjabl)
 
-	MCFG_GFXDECODE(cninjabl)
+	MCFG_GFXDECODE_ADD("gfxdecode", cninjabl)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1069,7 +1077,10 @@ static MACHINE_CONFIG_START( cninjabl, cninja_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	
 	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1104,7 +1115,7 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_edrandy)
 
-	MCFG_GFXDECODE(cninja)
+	MCFG_GFXDECODE_ADD("gfxdecode", cninja)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1112,11 +1123,15 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", edrandy_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	
 	MCFG_DECO16IC_ADD("tilegen2", edrandy_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_pri_callback(*device, cninja_pri_callback);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO146_ADD("ioprot")
 
@@ -1160,7 +1175,7 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_robocop2)
 
-	MCFG_GFXDECODE(robocop2)
+	MCFG_GFXDECODE_ADD("gfxdecode", robocop2)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1168,11 +1183,15 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", robocop2_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	
 	MCFG_DECO16IC_ADD("tilegen2", robocop2_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_pri_callback(*device, cninja_pri_callback);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
@@ -1221,7 +1240,7 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,mutantf)
 
-	MCFG_GFXDECODE(mutantf)
+	MCFG_GFXDECODE_ADD("gfxdecode", mutantf)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1230,13 +1249,18 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", mutantf_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	
 	MCFG_DECO16IC_ADD("tilegen2", mutantf_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 4);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO146_ADD("ioprot")
 

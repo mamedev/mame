@@ -273,7 +273,7 @@ static MACHINE_CONFIG_START( flower, flower_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(flower_state, screen_update_flower)
 
-	MCFG_GFXDECODE(flower)
+	MCFG_GFXDECODE_ADD("gfxdecode", flower)
 	MCFG_PALETTE_LENGTH(256)
 
 	/* sound hardware */

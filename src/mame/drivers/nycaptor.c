@@ -845,7 +845,7 @@ static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
 
-	MCFG_GFXDECODE(nycaptor)
+	MCFG_GFXDECODE_ADD("gfxdecode", nycaptor)
 	MCFG_PALETTE_LENGTH(512)
 
 
@@ -903,7 +903,7 @@ static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
 
-	MCFG_GFXDECODE(nycaptor)
+	MCFG_GFXDECODE_ADD("gfxdecode", nycaptor)
 	MCFG_PALETTE_LENGTH(512)
 
 
@@ -957,7 +957,7 @@ static MACHINE_CONFIG_START( bronx, nycaptor_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
 
-	MCFG_GFXDECODE(nycaptor)
+	MCFG_GFXDECODE_ADD("gfxdecode", nycaptor)
 	MCFG_PALETTE_LENGTH(512)
 
 

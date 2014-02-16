@@ -284,7 +284,6 @@ void validity_checker::validate_one(const game_driver &driver)
 		validate_roms();
 		validate_inputs();
 		validate_display();
-		validate_gfx();
 		validate_devices();
 	}
 	catch (emu_fatalerror &err)
@@ -712,82 +711,6 @@ void validity_checker::validate_display()
 	// check for empty palette
 	if (palette_modes && m_current_config->m_total_colors == 0)
 		mame_printf_error("Driver has zero palette entries but uses a palette-based bitmap format\n");
-}
-
-
-//-------------------------------------------------
-//  validate_gfx - validate graphics decoding
-//  configuration
-//-------------------------------------------------
-
-void validity_checker::validate_gfx()
-{
-	// bail if no gfx
-	if (!m_current_config->m_gfxdecodeinfo)
-		return;
-
-	// iterate over graphics decoding entries
-	for (int gfxnum = 0; gfxnum < MAX_GFX_ELEMENTS && m_current_config->m_gfxdecodeinfo[gfxnum].gfxlayout != NULL; gfxnum++)
-	{
-		const gfx_decode_entry &gfx = m_current_config->m_gfxdecodeinfo[gfxnum];
-		const gfx_layout &layout = *gfx.gfxlayout;
-
-		// make sure the region exists
-		const char *region = gfx.memory_region;
-		if (region != NULL)
-		{
-			// resolve the region
-			astring gfxregion;
-			m_current_config->root_device().subtag(gfxregion, region);
-
-			// loop over gfx regions
-			UINT32 region_length = m_region_map.find(gfxregion);
-			if (region_length == 0)
-				mame_printf_error("gfx[%d] references non-existent region '%s'\n", gfxnum, region);
-
-			// if we have a valid region, and we're not using auto-sizing, check the decode against the region length
-			else if (!IS_FRAC(layout.total))
-			{
-				// determine which plane is at the largest offset
-				int start = 0;
-				for (int plane = 0; plane < layout.planes; plane++)
-					if (layout.planeoffset[plane] > start)
-						start = layout.planeoffset[plane];
-				start &= ~(layout.charincrement - 1);
-
-				// determine the total length based on this info
-				int len = layout.total * layout.charincrement;
-
-				// do we have enough space in the region to cover the whole decode?
-				int avail = region_length - (gfx.start & ~(layout.charincrement / 8 - 1));
-
-				// if not, this is an error
-				if ((start + len) / 8 > avail)
-					mame_printf_error("gfx[%d] extends past allocated memory of region '%s'\n", gfxnum, region);
-			}
-		}
-
-		int xscale = (m_current_config->m_gfxdecodeinfo[gfxnum].xscale == 0) ? 1 : m_current_config->m_gfxdecodeinfo[gfxnum].xscale;
-		int yscale = (m_current_config->m_gfxdecodeinfo[gfxnum].yscale == 0) ? 1 : m_current_config->m_gfxdecodeinfo[gfxnum].yscale;
-
-		// verify raw decode, which can only be full-region and have no scaling
-		if (layout.planeoffset[0] == GFX_RAW)
-		{
-			if (layout.total != RGN_FRAC(1,1))
-				mame_printf_error("gfx[%d] with unsupported layout total\n", gfxnum);
-			if (xscale != 1 || yscale != 1)
-				mame_printf_error("gfx[%d] with unsupported xscale/yscale\n", gfxnum);
-		}
-
-		// verify traditional decode doesn't have too many planes or is not too large
-		else
-		{
-			if (layout.planes > MAX_GFX_PLANES)
-				mame_printf_error("gfx[%d] with invalid planes\n", gfxnum);
-			if (xscale * layout.width > MAX_ABS_GFX_SIZE || yscale * layout.height > MAX_ABS_GFX_SIZE)
-				mame_printf_error("gfx[%d] with invalid xscale/yscale\n", gfxnum);
-		}
-	}
 }
 
 

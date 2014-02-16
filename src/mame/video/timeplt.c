@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(timeplt_state::get_tile_info)
 	int flags = TILE_FLIPYX(attr >> 6);
 
 	tileinfo.category = (attr & 0x10) >> 4;
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(timeplt_state::get_chkun_tile_info)
@@ -109,7 +109,7 @@ TILE_GET_INFO_MEMBER(timeplt_state::get_chkun_tile_info)
 	int flags = 0;//TILE_FLIPYX(attr >> 6);
 
 	tileinfo.category = (attr & 0x80) >> 7;
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 
@@ -187,7 +187,7 @@ void timeplt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		int flipx = ~spriteram_2[offs] & 0x40;
 		int flipy = spriteram_2[offs] & 0x80;
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

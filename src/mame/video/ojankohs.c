@@ -161,7 +161,7 @@ TILE_GET_INFO_MEMBER(ojankohs_state::ojankohs_get_tile_info)
 		color |= (m_gfxreg & 0xe0) >> 2;
 	}
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(ojankohs_state::ojankoy_get_tile_info)
@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(ojankohs_state::ojankoy_get_tile_info)
 	int flipx = ((m_colorram[tile_index] & 0x40) >> 6) ? TILEMAP_FLIPX : 0;
 	int flipy = ((m_colorram[tile_index] & 0x80) >> 7) ? TILEMAP_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, (flipx | flipy));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, (flipx | flipy));
 }
 
 

@@ -2012,7 +2012,7 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile0_info)
 	     should alternate between the left and right side of the 16x16 tiles */
 	gfxset = (tile_index & 0x20) >> 5;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			gfxset,
 			code,
 			(attr & 0x1f) + 0x20,
@@ -2032,7 +2032,7 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile1_info)
 
 	code = gfxrom_bank_mapper(GFXTYPE_SCROLL2, code);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code,
 			(attr & 0x1f) + 0x40,
@@ -2051,7 +2051,7 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile2_info)
 
 	code = gfxrom_bank_mapper(GFXTYPE_SCROLL3, code);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			code,
 			(attr & 0x1f) + 0x60,
@@ -2319,14 +2319,14 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                    \
 {                                                                   \
 	if (flip_screen())                                           \
-		machine().gfx[2]->prio_transpen(bitmap,\
+		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
 				cliprect,                            \
 				CODE,                                               \
 				COLOR,                                              \
 				!(FLIPX),!(FLIPY),                                  \
 				512-16-(SX),256-16-(SY),    screen.priority(),0x02,15);                   \
 	else                                                            \
-		machine().gfx[2]->prio_transpen(bitmap,\
+		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
 				cliprect,                            \
 				CODE,                                               \
 				COLOR,                                              \
@@ -2552,14 +2552,14 @@ void cps_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                                    \
 {                                                                                   \
 	if (flip_screen())                                                           \
-		machine().gfx[2]->prio_transpen(bitmap,\
+		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
 				cliprect,                                            \
 				CODE,                                                               \
 				COLOR,                                                              \
 				!(FLIPX),!(FLIPY),                                                  \
 				512-16-(SX),256-16-(SY), screen.priority(),primasks[priority],15);                 \
 	else                                                                            \
-		machine().gfx[2]->prio_transpen(bitmap,\
+		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
 				cliprect,                                            \
 				CODE,                                                               \
 				COLOR,                                                              \

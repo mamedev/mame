@@ -154,7 +154,7 @@ PALETTE_INIT_MEMBER(turbo_state,buckrog)
 TILE_GET_INFO_MEMBER(turbo_state::get_fg_tile_info)
 {
 	int code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, code >> 2, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, code >> 2, 0);
 }
 
 

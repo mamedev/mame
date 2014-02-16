@@ -326,7 +326,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pcm_state, screen_update)
 	MCFG_SCREEN_SIZE(64*8, 16*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
-	MCFG_GFXDECODE(pcm)
+	MCFG_GFXDECODE_ADD("gfxdecode", pcm)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 

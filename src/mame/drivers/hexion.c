@@ -234,7 +234,7 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hexion_state, screen_update_hexion)
 
-	MCFG_GFXDECODE(hexion)
+	MCFG_GFXDECODE_ADD("gfxdecode", hexion)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)

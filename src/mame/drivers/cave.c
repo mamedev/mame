@@ -2005,7 +2005,7 @@ static MACHINE_CONFIG_START( dfeveron, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(dfeveron)
+	MCFG_GFXDECODE_ADD("gfxdecode", dfeveron)
 	MCFG_PALETTE_LENGTH(0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,dfeveron)
 
@@ -2047,7 +2047,7 @@ static MACHINE_CONFIG_START( ddonpach, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(ddonpach)
+	MCFG_GFXDECODE_ADD("gfxdecode", ddonpach)
 	MCFG_PALETTE_LENGTH(0x8000 + 0x40*16)   // $400 extra entries for layers 1&2
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,ddonpach)
 
@@ -2093,7 +2093,7 @@ static MACHINE_CONFIG_START( donpachi, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(donpachi)
+	MCFG_GFXDECODE_ADD("gfxdecode", donpachi)
 	MCFG_PALETTE_LENGTH(0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,dfeveron)
 
@@ -2139,7 +2139,7 @@ static MACHINE_CONFIG_START( esprade, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(esprade)
+	MCFG_GFXDECODE_ADD("gfxdecode", esprade)
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,cave)
 
@@ -2179,7 +2179,7 @@ static MACHINE_CONFIG_START( gaia, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(esprade)
+	MCFG_GFXDECODE_ADD("gfxdecode", esprade)
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,cave)
 
@@ -2220,7 +2220,7 @@ static MACHINE_CONFIG_START( guwange, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(esprade)
+	MCFG_GFXDECODE_ADD("gfxdecode", esprade)
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,cave)
 
@@ -2264,7 +2264,7 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(hotdogst)
+	MCFG_GFXDECODE_ADD("gfxdecode", hotdogst)
 	MCFG_PALETTE_LENGTH(0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,dfeveron)
 
@@ -2317,7 +2317,7 @@ static MACHINE_CONFIG_START( korokoro, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1-2, 0, 240-1-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(korokoro)
+	MCFG_GFXDECODE_ADD("gfxdecode", korokoro)
 	MCFG_PALETTE_LENGTH(0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,korokoro)
 
@@ -2371,7 +2371,7 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(mazinger)
+	MCFG_GFXDECODE_ADD("gfxdecode", mazinger)
 	MCFG_PALETTE_LENGTH(0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,mazinger)
 
@@ -2430,7 +2430,7 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0x7d, 0x7d + 0x180-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(donpachi)
+	MCFG_GFXDECODE_ADD("gfxdecode", donpachi)
 	MCFG_PALETTE_LENGTH(0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,dfeveron)
 
@@ -2487,7 +2487,7 @@ static MACHINE_CONFIG_START( pacslot, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(tjumpman)
+	MCFG_GFXDECODE_ADD("gfxdecode", tjumpman)
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,cave)
 
@@ -2556,7 +2556,7 @@ static MACHINE_CONFIG_START( ppsatan, cave_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_ppsatan_right)
 	MCFG_TIMER_DRIVER_ADD("int_timer_right", cave_state, cave_vblank_start_right)
 
-	MCFG_GFXDECODE(ppsatan)
+	MCFG_GFXDECODE_ADD("gfxdecode", ppsatan)
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,ppsatan)
 	MCFG_DEFAULT_LAYOUT(layout_ppsatan)
@@ -2608,7 +2608,7 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0x70, 0x70 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(pwrinst2)
+	MCFG_GFXDECODE_ADD("gfxdecode", pwrinst2)
 	MCFG_PALETTE_LENGTH(0x8000+0x2800)
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,pwrinst2)
 
@@ -2672,7 +2672,7 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0+1, 320+1-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(sailormn)
+	MCFG_GFXDECODE_ADD("gfxdecode", sailormn)
 	MCFG_PALETTE_LENGTH(0x8000) /* $8000 palette entries for consistency with the other games */
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,sailormn) // 4 bit sprites, 6 bit tiles
 
@@ -2728,7 +2728,7 @@ static MACHINE_CONFIG_START( tjumpman, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(tjumpman)
+	MCFG_GFXDECODE_ADD("gfxdecode", tjumpman)
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,cave)
 
@@ -2769,7 +2769,7 @@ static MACHINE_CONFIG_START( uopoko, cave_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
 
-	MCFG_GFXDECODE(uopoko)
+	MCFG_GFXDECODE_ADD("gfxdecode", uopoko)
 	MCFG_PALETTE_LENGTH(0x8000)
 
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,cave)

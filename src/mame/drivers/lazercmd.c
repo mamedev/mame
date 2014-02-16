@@ -646,7 +646,7 @@ static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 
-	MCFG_GFXDECODE(lazercmd)
+	MCFG_GFXDECODE_ADD("gfxdecode", lazercmd)
 	MCFG_PALETTE_LENGTH(5)
 
 	/* sound hardware */
@@ -677,7 +677,7 @@ static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, VERT_RES * VERT_CHR - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 
-	MCFG_GFXDECODE(lazercmd)
+	MCFG_GFXDECODE_ADD("gfxdecode", lazercmd)
 	MCFG_PALETTE_LENGTH(5)
 
 	/* sound hardware */
@@ -708,7 +708,7 @@ static MACHINE_CONFIG_START( bbonk, lazercmd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 
-	MCFG_GFXDECODE(lazercmd)
+	MCFG_GFXDECODE_ADD("gfxdecode", lazercmd)
 	MCFG_PALETTE_LENGTH(5)
 
 	/* sound hardware */

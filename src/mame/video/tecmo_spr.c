@@ -66,7 +66,7 @@ static const UINT8 layout[8][8] =
 
 
 /* from gals pinball (which was in turn from ninja gaiden) */
-int spbactn_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, bool alt_sprites, UINT16* spriteram)
+int spbactn_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, bool alt_sprites, UINT16* spriteram)
 {
 	int count = 0;
 	int offs;
@@ -120,9 +120,9 @@ int spbactn_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
 					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
 
-					 screen.machine().gfx[2]->transpen_raw(bitmap,cliprect,
+					 gfxdecode->gfx(2)->transpen_raw(bitmap,cliprect,
 						code + layout[row][col],
-						screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
+						gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
 						flipx, flipy,
 						x, y,
 						0);
@@ -138,7 +138,7 @@ int spbactn_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 
 
 // comad bootleg of spbactn
-void galspnbl_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16* spriteram, int spriteram_bytes )
+void galspnbl_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16* spriteram, int spriteram_bytes )
 {
 	int offs;
 
@@ -169,7 +169,7 @@ void galspnbl_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const r
 				{
 					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
 					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
-					screen.machine().gfx[1]->transpen(bitmap,cliprect,
+					gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						code + layout[row][col],
 						color,
 						flipx,flipy,
@@ -180,7 +180,7 @@ void galspnbl_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const r
 	}
 }
 
-void tecmo16_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, UINT16 spriteram16_bytes, int game_is_riot, int flipscreen )
+void tecmo16_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, UINT16 spriteram16_bytes, int game_is_riot, int flipscreen )
 {
 	UINT16 *spriteram16 = spriteram;
 	int offs;
@@ -252,25 +252,25 @@ void tecmo16_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap
 							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
 							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
 						}
-						screen.machine().gfx[2]->prio_transpen_raw(bitmap,cliprect,
+						gfxdecode->gfx(2)->prio_transpen_raw(bitmap,cliprect,
 								code + layout[y][x],
-								screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
+								gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
 								flipx,flipy,
 								sx,sy,
 								screen.priority(), priority_mask,0);
 
 						/* wrap around x */
-						screen.machine().gfx[2]->prio_transpen_raw(bitmap,cliprect,
+						gfxdecode->gfx(2)->prio_transpen_raw(bitmap,cliprect,
 								code + layout[y][x],
-								screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
+								gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
 								flipx,flipy,
 								sx-512,sy,
 								screen.priority(), priority_mask,0);
 
 						/* wrap around x */
-						screen.machine().gfx[2]->prio_transpen_raw(bitmap,cliprect,
+						gfxdecode->gfx(2)->prio_transpen_raw(bitmap,cliprect,
 								code + layout[y][x],
-								screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
+								gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
 								flipx,flipy,
 								sx+512,sy,
 								screen.priority(), priority_mask,0);
@@ -295,25 +295,25 @@ void tecmo16_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap
 							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
 							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
 						}
-						screen.machine().gfx[2]->prio_transpen_raw(bitmap,cliprect,
+						gfxdecode->gfx(2)->prio_transpen_raw(bitmap,cliprect,
 								code + layout[y][x],
-								screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
+								gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
 								flipx,flipy,
 								sx,sy,
 								screen.priority(), priority_mask,0);
 
 						/* wrap around x */
-						screen.machine().gfx[2]->prio_transpen_raw(bitmap,cliprect,
+						gfxdecode->gfx(2)->prio_transpen_raw(bitmap,cliprect,
 								code + layout[y][x],
-								screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
+								gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
 								flipx,flipy,
 								sx-512,sy,
 								screen.priority(), priority_mask,0);
 
 						/* wrap around x */
-						screen.machine().gfx[2]->prio_transpen_raw(bitmap,cliprect,
+						gfxdecode->gfx(2)->prio_transpen_raw(bitmap,cliprect,
 								code + layout[y][x],
-								screen.machine().gfx[2]->colorbase() + color * screen.machine().gfx[2]->granularity(),
+								gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
 								flipx,flipy,
 								sx+512,sy,
 								screen.priority(), priority_mask,0);
@@ -326,9 +326,9 @@ void tecmo16_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap
 
 #define NUM_SPRITES 256
 
-void gaiden_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen )
+void gaiden_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen )
 {
-	gfx_element *gfx = screen.machine().gfx[3];
+	gfx_element *gfx = gfxdecode->gfx(3);
 	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram;
 	int count = NUM_SPRITES;
 
@@ -435,9 +435,9 @@ void gaiden_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap
 }
 
 
-void raiga_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen  )
+void raiga_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap_bg, bitmap_ind16 &bitmap_fg, bitmap_ind16 &bitmap_sp, const rectangle &cliprect, UINT16* spriteram, int sprite_sizey, int spr_offset_y, int flip_screen  )
 {
-	gfx_element *gfx = screen.machine().gfx[3];
+	gfx_element *gfx = gfxdecode->gfx(3);
 	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram;
 	int count = NUM_SPRITES;
 

@@ -1236,13 +1236,14 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE(atarisy2)
+	MCFG_GFXDECODE_ADD("gfxdecode", atarisy2)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, atarisy2_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, atarisy2_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,48, 0)
 
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", atarisy2_state::s_mob_config)
+	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 416, 0, 384)

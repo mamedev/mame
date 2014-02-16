@@ -131,7 +131,7 @@ inline void hyprduel_state::get_tile_info( tile_data &tileinfo, int tile_index, 
 	else
 	{
 		tileinfo.group = 0;
-		SET_TILE_INFO_MEMBER(
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 
 				0,
 				(tile & 0xfffff) + (code & 0xf),
 				(((tile & 0x0ff00000) >> 20)) + 0x100,
@@ -169,7 +169,7 @@ inline void hyprduel_state::get_tile_info_8bit( tile_data &tileinfo, int tile_in
 	else if ((tile & 0x00f00000) == 0x00f00000) /* draw tile as 8bpp */
 	{
 		tileinfo.group = 1;
-		SET_TILE_INFO_MEMBER(
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 
 				1,
 				(tile & 0xfffff) + 2*(code & 0xf),
 				((tile & 0x0f000000) >> 24) + 0x10,
@@ -178,7 +178,7 @@ inline void hyprduel_state::get_tile_info_8bit( tile_data &tileinfo, int tile_in
 	else
 	{
 		tileinfo.group = 0;
-		SET_TILE_INFO_MEMBER(
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 
 				0,
 				(tile & 0xfffff) + (code & 0xf),
 				(((tile & 0x0ff00000) >> 20)) + 0x100,
@@ -216,7 +216,7 @@ inline void hyprduel_state::get_tile_info_16x16_8bit( tile_data &tileinfo, int t
 	else if ((tile & 0x00f00000) == 0x00f00000) /* draw tile as 8bpp */
 	{
 		tileinfo.group = 1;
-		SET_TILE_INFO_MEMBER(
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 
 				3,
 				(tile & 0xfffff) + 8*(code & 0xf),
 				((tile & 0x0f000000) >> 24) + 0x10,
@@ -225,7 +225,7 @@ inline void hyprduel_state::get_tile_info_16x16_8bit( tile_data &tileinfo, int t
 	else
 	{
 		tileinfo.group = 0;
-		SET_TILE_INFO_MEMBER(
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 
 				2,
 				(tile & 0xfffff) + 4*(code & 0xf),
 				(((tile & 0x0ff00000) >> 20)) + 0x100,

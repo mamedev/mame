@@ -93,7 +93,7 @@ WRITE16_MEMBER(k3_state::k3_bgram_w)
 TILE_GET_INFO_MEMBER(k3_state::get_k3_bg_tile_info)
 {
 	int tileno = m_bgram[tile_index];
-	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, 0, 0);
 }
 
 void k3_state::video_start()
@@ -103,7 +103,7 @@ void k3_state::video_start()
 
 void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	UINT16 *source = m_spriteram_1;
 	UINT16 *source2 = m_spriteram_2;
 	UINT16 *finish = source + 0x1000 / 2;
@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( k3, k3_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", k3_state,  irq4_line_hold)
 
 
-	MCFG_GFXDECODE(1945kiii)
+	MCFG_GFXDECODE_ADD("gfxdecode", 1945kiii)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

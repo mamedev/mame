@@ -40,9 +40,9 @@ TILE_GET_INFO_MEMBER(ultratnk_state::ultratnk_tile_info)
 	UINT8 code = videoram[tile_index];
 
 	if (code & 0x20)
-		SET_TILE_INFO_MEMBER(0, code, code >> 6, 0);
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, code >> 6, 0);
 	else
-		SET_TILE_INFO_MEMBER(0, code, 4, 0);
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 4, 0);
 }
 
 
@@ -75,7 +75,7 @@ UINT32 ultratnk_state::screen_update_ultratnk(screen_device &screen, bitmap_ind1
 
 		if (!(attr & 0x80))
 		{
-			 machine().gfx[1]->transpen(bitmap,cliprect,
+			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				(code >> 3) | bank,
 				i,
 				0, 0,
@@ -114,8 +114,8 @@ void ultratnk_state::screen_eof_ultratnk(screen_device &screen, bool state)
 
 			rect.min_x = horz - 15;
 			rect.min_y = vert - 15;
-			rect.max_x = horz - 15 + machine().gfx[1]->width() - 1;
-			rect.max_y = vert - 15 + machine().gfx[1]->height() - 1;
+			rect.max_x = horz - 15 + m_gfxdecode->gfx(1)->width() - 1;
+			rect.max_y = vert - 15 + m_gfxdecode->gfx(1)->height() - 1;
 
 			rect &= m_screen->visible_area();
 
@@ -124,7 +124,7 @@ void ultratnk_state::screen_eof_ultratnk(screen_device &screen, bool state)
 			if (code & 4)
 				bank = 32;
 
-			 machine().gfx[1]->transpen(m_helper,rect,
+			 m_gfxdecode->gfx(1)->transpen(m_helper,rect,
 				(code >> 3) | bank,
 				4,
 				0, 0,

@@ -477,10 +477,10 @@ WRITE16_MEMBER(mpu4vid_state::mpu4_vid_vidram_w )
 {
 	COMBINE_DATA(&m_vid_vidram[offset]);
 	offset <<= 1;
-	space.machine().gfx[m_gfx_index+0]->mark_dirty(offset/0x20);
-	space.machine().gfx[m_gfx_index+1]->mark_dirty(offset/0x20);
-	space.machine().gfx[m_gfx_index+2]->mark_dirty(offset/0x20);
-	space.machine().gfx[m_gfx_index+3]->mark_dirty(offset/0x20);
+	m_gfxdecode->gfx(m_gfx_index+0)->mark_dirty(offset/0x20);
+	m_gfxdecode->gfx(m_gfx_index+1)->mark_dirty(offset/0x20);
+	m_gfxdecode->gfx(m_gfx_index+2)->mark_dirty(offset/0x20);
+	m_gfxdecode->gfx(m_gfx_index+3)->mark_dirty(offset/0x20);
 }
 
 
@@ -495,16 +495,16 @@ VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 
 	/* find first empty slot to decode gfx */
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (machine().gfx[m_gfx_index] == 0)
+		if (m_gfxdecode->gfx(m_gfx_index) == 0)
 			break;
 
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine().gfx[m_gfx_index+0] = auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), machine().total_colors() / 16, 0));
-	machine().gfx[m_gfx_index+1] = auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_8x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), machine().total_colors() / 16, 0));
-	machine().gfx[m_gfx_index+2] = auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_16x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), machine().total_colors() / 16, 0));
-	machine().gfx[m_gfx_index+3] = auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_16x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), machine().total_colors() / 16, 0));
+	m_gfxdecode->set_gfx(m_gfx_index+0, auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), machine().total_colors() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+1, auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_8x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), machine().total_colors() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+2, auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_16x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), machine().total_colors() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+3, auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_16x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), machine().total_colors() / 16, 0)));
 
 	m_scn2674->init_stuff();
 
@@ -1441,7 +1441,10 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DRIVER(mpu4vid_state, screen_update_mpu4_vid)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+
 	MCFG_SCN2674_VIDEO_ADD("scn2674_vid", 0, WRITELINE(mpu4vid_state, update_mpu68_interrupts));
+	MCFG_SCN2674_GFXDECODE("gfxdecode")
 
 	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
 	MCFG_CPU_PROGRAM_MAP(mpu4_68k_map)

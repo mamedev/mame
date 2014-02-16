@@ -486,6 +486,7 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	MCFG_MACHINE_RESET_OVERRIDE(champbwl_state,champbwl)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -496,7 +497,7 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_champbwl)
 	MCFG_SCREEN_VBLANK_DRIVER(champbwl_state, screen_eof_champbwl)
 
-	MCFG_GFXDECODE(champbwl)
+	MCFG_GFXDECODE_ADD("gfxdecode", champbwl)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_PALETTE_INIT_OVERRIDE(champbwl_state,arknoid2)
@@ -546,6 +547,7 @@ static MACHINE_CONFIG_START( doraemon, champbwl_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
 	MCFG_MACHINE_START_OVERRIDE(champbwl_state,doraemon)
@@ -559,7 +561,7 @@ static MACHINE_CONFIG_START( doraemon, champbwl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_doraemon)
 	MCFG_SCREEN_VBLANK_DRIVER(champbwl_state, screen_eof_doraemon)
 
-	MCFG_GFXDECODE(champbwl)
+	MCFG_GFXDECODE_ADD("gfxdecode", champbwl)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_PALETTE_INIT_OVERRIDE(champbwl_state,arknoid2)

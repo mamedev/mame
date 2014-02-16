@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(jailbrek_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void jailbrek_state::video_start()
@@ -85,9 +85,9 @@ void jailbrek_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		 machine().gfx[1]->transmask(bitmap,cliprect, code, color, flipx, flipy,
+		 m_gfxdecode->gfx(1)->transmask(bitmap,cliprect, code, color, flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
+			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0));
 	}
 }
 

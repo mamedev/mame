@@ -735,11 +735,13 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(opwolf_state, screen_update_opwolf)
 
-	MCFG_GFXDECODE(opwolf)
+	MCFG_GFXDECODE_ADD("gfxdecode", opwolf)
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_PC080SN_ADD("pc080sn", opwolf_pc080sn_intf)
+	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_ADD("pc090oj", opwolf_pc090oj_intf)
+	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -789,11 +791,13 @@ static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for t
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(opwolf_state, screen_update_opwolf)
 
-	MCFG_GFXDECODE(opwolfb)
+	MCFG_GFXDECODE_ADD("gfxdecode", opwolfb)
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_PC080SN_ADD("pc080sn", opwolf_pc080sn_intf)
+	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_ADD("pc090oj", opwolf_pc090oj_intf)
+	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

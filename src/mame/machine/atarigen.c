@@ -1486,8 +1486,8 @@ WRITE32_MEMBER(atarigen_state::paletteram32_666_w )
 
 void atarigen_state::blend_gfx(int gfx0, int gfx1, int mask0, int mask1)
 {
-	gfx_element *gx0 = machine().gfx[gfx0];
-	gfx_element *gx1 = machine().gfx[gfx1];
+	gfx_element *gx0 = m_gfxdecode->gfx(gfx0);
+	gfx_element *gx1 = m_gfxdecode->gfx(gfx1);
 	UINT8 *srcdata, *dest;
 	int c, x, y;
 
@@ -1520,7 +1520,7 @@ void atarigen_state::blend_gfx(int gfx0, int gfx1, int mask0, int mask1)
 	gx0->set_granularity(granularity);
 
 	// free the second graphics element
-	machine().gfx[gfx1] = NULL;
+	m_gfxdecode->set_gfx(gfx1, NULL);
 	auto_free(machine(), gx1);
 }
 

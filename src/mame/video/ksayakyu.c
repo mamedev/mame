@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(ksayakyu_state::get_ksayakyu_tile_info)
 	int code = memregion("user1")->base()[tile_index];
 	int attr = memregion("user1")->base()[tile_index + 0x2000];
 	code += (attr & 3) << 8;
-	SET_TILE_INFO_MEMBER(1, code, ((attr >> 2) & 0x0f) * 2, (attr & 0x80) ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, ((attr >> 2) & 0x0f) * 2, (attr & 0x80) ? TILE_FLIPX : 0);
 }
 
 /*
@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(ksayakyu_state::get_text_tile_info)
 
 	code |= (attr & 3) << 8;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 /*
@@ -92,7 +92,7 @@ void ksayakyu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int flipx = (tile & 0x80) ? 1 : 0;
 		int flipy = 0;
 
-		gfx_element *gfx = machine().gfx[2];
+		gfx_element *gfx = m_gfxdecode->gfx(2);
 
 		if (m_flipscreen)
 		{

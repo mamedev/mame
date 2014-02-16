@@ -46,7 +46,8 @@ public:
 
 	// helpers for devices
 	void validate_tag(const char *tag);
-
+	int region_length(const char *tag) { return m_region_map.find(tag); }
+	
 private:
 	// internal helpers
 	const char *ioport_string_from_index(UINT32 index);
@@ -63,7 +64,6 @@ private:
 	void validate_driver();
 	void validate_roms();
 	void validate_display();
-	void validate_gfx();
 	void validate_analog_input_field(ioport_field &field);
 	void validate_dip_settings(ioport_field &field);
 	void validate_condition(ioport_condition &condition, device_t &device, int_map &port_map);

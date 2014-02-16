@@ -460,7 +460,7 @@ static MACHINE_CONFIG_START( thedeep, thedeep_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x100-1, 0, 0xf8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(thedeep_state, screen_update_thedeep)
 
-	MCFG_GFXDECODE(thedeep)
+	MCFG_GFXDECODE_ADD("gfxdecode", thedeep)
 	MCFG_PALETTE_LENGTH(512)
 
 

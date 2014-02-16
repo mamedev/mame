@@ -476,7 +476,7 @@ static MACHINE_CONFIG_START( timeplt, timeplt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(timeplt_state, screen_update_timeplt)
 
-	MCFG_GFXDECODE(timeplt)
+	MCFG_GFXDECODE_ADD("gfxdecode", timeplt)
 	MCFG_PALETTE_LENGTH(32*4+64*4)
 
 	/* sound hardware */
@@ -494,7 +494,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bikkuric, timeplt )
 
-	MCFG_GFXDECODE(chkun)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -505,7 +505,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( chkun, bikkuric )
 
-	MCFG_GFXDECODE(chkun)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay2")

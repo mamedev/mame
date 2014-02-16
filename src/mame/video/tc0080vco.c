@@ -94,8 +94,19 @@ tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *ta
 	m_bg0_scrolly(0),
 	m_bg1_scrollx(0),
 	m_bg1_scrolly(0),
-	m_flipscreen(0)
+	m_flipscreen(0),
+	m_gfxdecode(*this)
 {
+}
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void tc0080vco_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<tc0080vco_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -179,7 +190,7 @@ void tc0080vco_device::device_start()
 	m_scroll_ram    = m_ram + 0x20800 / 2;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine().gfx[m_txnum] = auto_alloc_clear(machine(), gfx_element(machine(), charlayout, (UINT8 *)m_char_ram, 64, 0));
+	m_gfxdecode->set_gfx(m_txnum, auto_alloc_clear(machine(), gfx_element(machine(), charlayout, (UINT8 *)m_char_ram, 64, 0)));
 
 	save_pointer(NAME(m_ram), TC0080VCO_RAM_SIZE / 2);
 	machine().save().register_postload(save_prepost_delegate(FUNC(tc0080vco_device::postload), this));
@@ -217,7 +228,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg0_tile_info)
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			m_gfxnum,
 			tile,
 			color,
@@ -233,7 +244,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg1_tile_info)
 
 	tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			m_gfxnum,
 			tile,
 			color,
@@ -261,7 +272,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_tx_tile_info)
 		tileinfo.category = 0;
 	}
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			m_txnum,
 			tile,
 			0x40,
@@ -320,7 +331,7 @@ WRITE16_MEMBER( tc0080vco_device::word_w )
 
 	if (offset < 0x1000 / 2)
 	{
-		space.machine().gfx[m_txnum]->mark_dirty(offset / 8);
+		m_gfxdecode->gfx(m_txnum)->mark_dirty(offset / 8);
 #if 0
 		if (!m_has_fg0)
 		{
@@ -351,7 +362,7 @@ WRITE16_MEMBER( tc0080vco_device::word_w )
 
 	else if (offset < 0x11000 / 2)
 	{
-		space.machine().gfx[m_txnum]->mark_dirty((offset - 0x10000 / 2) / 8);
+		m_gfxdecode->gfx(m_txnum)->mark_dirty((offset - 0x10000 / 2) / 8);
 #if 0
 		if (!m_has_fg0)
 		{

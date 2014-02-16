@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fuuki16_state, screen_update_fuuki16)
 
-	MCFG_GFXDECODE(fuuki16)
+	MCFG_GFXDECODE_ADD("gfxdecode", fuuki16)
 	MCFG_PALETTE_LENGTH(0x800*4)
 
 

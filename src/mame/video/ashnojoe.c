@@ -13,7 +13,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info)
 {
 	int code = m_tileram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code & 0xfff,
 			((code >> 12) & 0x0f),
@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_2)
 	int code = m_tileram_2[tile_index * 2];
 	int attr = m_tileram_2[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			4,
 			(code & 0x7fff),
 			((attr >> 8) & 0x1f) + 0x40,
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_3)
 {
 	int code = m_tileram_3[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code & 0xfff,
 			((code >> 12) & 0x0f) + 0x10,
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_4)
 {
 	int code = m_tileram_4[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code & 0xfff,
 			((code >> 12) & 0x0f) + 0x60,
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_5)
 	int code = m_tileram_5[tile_index * 2];
 	int attr = m_tileram_5[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			4,
 			(code & 0x7fff),
 			((attr >> 8) & 0x1f) + 0x20,
@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_6)
 	int code = m_tileram_6[tile_index * 2];
 	int attr = m_tileram_6[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			(code & 0x1fff),
 			((attr >> 8) & 0x1f) + 0x70,
@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_7)
 	int code = m_tileram_7[tile_index * 2];
 	int attr = m_tileram_7[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			(code & 0x1fff),
 			((attr >> 8) & 0x1f) + 0x70,

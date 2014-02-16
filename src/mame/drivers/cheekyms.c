@@ -135,7 +135,7 @@ static MACHINE_CONFIG_START( cheekyms, cheekyms_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cheekyms_state, screen_update_cheekyms)
 
-	MCFG_GFXDECODE(cheekyms)
+	MCFG_GFXDECODE_ADD("gfxdecode", cheekyms)
 	MCFG_PALETTE_LENGTH(0xc0)
 
 

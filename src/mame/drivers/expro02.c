@@ -559,16 +559,18 @@ static MACHINE_CONFIG_START( galsnew, expro02_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_galsnew)
 
-	MCFG_GFXDECODE(1x4bit_1x4bit)
+	MCFG_GFXDECODE_ADD("gfxdecode", 1x4bit_1x4bit)
 	MCFG_PALETTE_LENGTH(2048 + 32768)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, 0x8, 256, 224);
+	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD_VU002_SPRITES
 	kaneko16_sprite_device::set_priorities(*device, 8,8,8,8); // above all (not verified)
 	kaneko16_sprite_device::set_offsets(*device, 0, -0x40);
+	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
 	kaneko_hit_device::set_type(*device, 0);

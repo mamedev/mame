@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_0)
 {
 	UINT16 attr = m_vram_0[tile_index * 2 + 0];
 	UINT16 code = m_vram_0[tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			attr & 0x7f,
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_1)
 {
 	UINT16 attr = m_vram_1[tile_index * 2 + 0];
 	UINT16 code = m_vram_1[tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			attr & 0x7f,
@@ -119,7 +119,7 @@ WRITE16_MEMBER(realbrk_state::realbrk_vram_1_w)
 TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_2)
 {
 	UINT16 code = m_vram_2[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code & 0x0fff,
 			((code & 0xf000) >> 12) | ((m_vregs[0xa/2] & 0x7f) << 4),
@@ -288,7 +288,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				{
 					m_tmpbitmap0->fill(0, spritetile_clip );
 					m_tmpbitmap1->fill(0, spritetile_clip );
-					machine().gfx[gfx]->zoom_transpen(*m_tmpbitmap0,spritetile_clip,
+					m_gfxdecode->gfx(gfx)->zoom_transpen(*m_tmpbitmap0,spritetile_clip,
 									code++,
 									color,
 									flipx, flipy,
@@ -350,7 +350,7 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 						break;
 
 					default:
-						machine().gfx[gfx]->zoom_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(gfx)->zoom_transpen(bitmap,cliprect,
 										code++,
 										color,
 										flipx, flipy,
@@ -431,7 +431,7 @@ void realbrk_state::dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &
 				int scalex = (sx + (x + 1) * xdim) / 0x10000 - currx;
 				int scaley = (sy + (y + 1) * ydim) / 0x10000 - curry;
 
-				machine().gfx[gfx]->zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(gfx)->zoom_transpen(bitmap,cliprect,
 								code++,
 								color,
 								flipx, flipy,

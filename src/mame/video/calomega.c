@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(calomega_state::get_bg_tile_info)
 	if (attr == 0x32)   /* Is the palette wrong? */
 		color = 0x39;   /* 0x39 is the best match */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
 }
 
 void calomega_state::video_start()

@@ -28,7 +28,7 @@ PALETTE_INIT_MEMBER(xevious_state,xevious)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine().gfx[gfxn]->colors() * machine().gfx[gfxn]->granularity())
+	#define TOTAL_COLORS(gfxn) (m_gfxdecode->gfx(gfxn)->colors() *m_gfxdecode->gfx(gfxn)->granularity())
 
 	machine().colortable = colortable_alloc(machine(), 128+1);
 
@@ -69,7 +69,7 @@ PALETTE_INIT_MEMBER(xevious_state,xevious)
 	/* background tiles */
 	for (i = 0;i < TOTAL_COLORS(1);i++)
 	{
-		colortable_entry_set_value(machine().colortable, machine().gfx[1]->colorbase() + i,
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(1)->colorbase() + i,
 				(color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(1)] & 0x0f) << 4));
 
 		color_prom++;
@@ -81,7 +81,7 @@ PALETTE_INIT_MEMBER(xevious_state,xevious)
 	{
 		int c = (color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(2)] & 0x0f) << 4);
 
-		colortable_entry_set_value(machine().colortable, machine().gfx[2]->colorbase() + i,
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(2)->colorbase() + i,
 				(c & 0x80) ? (c & 0x7f) : 0x80);
 
 		color_prom++;
@@ -91,7 +91,7 @@ PALETTE_INIT_MEMBER(xevious_state,xevious)
 	/* foreground characters */
 	for (i = 0;i < TOTAL_COLORS(0);i++)
 	{
-		colortable_entry_set_value(machine().colortable, machine().gfx[0]->colorbase() + i,
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(0)->colorbase() + i,
 				(i % 2 != 0) ? (i / 2) : 0x80);
 	}
 }
@@ -142,7 +142,7 @@ PALETTE_INIT_MEMBER(xevious_state,battles)
 	/* background tiles */
 	for (i = 0;i < TOTAL_COLORS(1);i++)
 	{
-		colortable_entry_set_value(machine().colortable, machine().gfx[1]->colorbase() + i,
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(1)->colorbase() + i,
 				(color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4));
 
 		color_prom++;
@@ -154,7 +154,7 @@ PALETTE_INIT_MEMBER(xevious_state,battles)
 	{
 		int c = (color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4);
 
-		colortable_entry_set_value(machine().colortable, machine().gfx[2]->colorbase() + i,
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(2)->colorbase() + i,
 				(c & 0x80) ? (c & 0x7f) : 0x80);
 
 		color_prom++;
@@ -163,7 +163,7 @@ PALETTE_INIT_MEMBER(xevious_state,battles)
 	/* foreground characters */
 	for (i = 0;i < TOTAL_COLORS(0);i++)
 	{
-		colortable_entry_set_value(machine().colortable, machine().gfx[0]->colorbase() + i,
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(0)->colorbase() + i,
 				(i % 2 != 0) ? (i / 2) : 0x80);
 	}
 }
@@ -186,7 +186,7 @@ TILE_GET_INFO_MEMBER(xevious_state::get_fg_tile_info)
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
 	UINT8 color = ((attr & 0x03) << 4) | ((attr & 0x3c) >> 2);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_xevious_fg_videoram[tile_index] | (flip_screen() ? 0x100 : 0),
 			color,
@@ -198,7 +198,7 @@ TILE_GET_INFO_MEMBER(xevious_state::get_bg_tile_info)
 	UINT8 code = m_xevious_bg_videoram[tile_index];
 	UINT8 attr = m_xevious_bg_colorram[tile_index];
 	UINT8 color = ((attr & 0x3c) >> 2) | ((code & 0x80) >> 3) | ((attr & 0x03) << 5);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code + ((attr & 0x01) << 8),
 			color,
@@ -434,41 +434,41 @@ void xevious_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				flipy = !flipy;
 			}
 
-			transmask = colortable_get_transpen_mask(machine().colortable, machine().gfx[bank], color, 0x80);
+			transmask = colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(bank), color, 0x80);
 
 			if (spriteram_3[offs] & 2)  /* double height (?) */
 			{
 				if (spriteram_3[offs] & 1)  /* double width, double height */
 				{
 					code &= ~3;
-					machine().gfx[bank]->transmask(bitmap,cliprect,
+					m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
 							code+3,color,flipx,flipy,
 							flipx ? sx : sx+16,flipy ? sy-16 : sy,transmask);
-					machine().gfx[bank]->transmask(bitmap,cliprect,
+					m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
 							code+1,color,flipx,flipy,
 							flipx ? sx : sx+16,flipy ? sy : sy-16,transmask);
 				}
 				code &= ~2;
-				machine().gfx[bank]->transmask(bitmap,cliprect,
+				m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
 						code+2,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy-16 : sy,transmask);
-				machine().gfx[bank]->transmask(bitmap,cliprect,
+				m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
 						code,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy : sy-16,transmask);
 			}
 			else if (spriteram_3[offs] & 1) /* double width */
 			{
 				code &= ~1;
-				machine().gfx[bank]->transmask(bitmap,cliprect,
+				m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
 						code,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy-16 : sy,transmask);
-				machine().gfx[bank]->transmask(bitmap,cliprect,
+				m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
 						code+1,color,flipx,flipy,
 						flipx ? sx : sx+16,flipy ? sy-16 : sy,transmask);
 			}
 			else    /* normal */
 			{
-				machine().gfx[bank]->transmask(bitmap,cliprect,
+				m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
 						code,color,flipx,flipy,sx,sy,transmask);
 			}
 		}

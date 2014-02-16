@@ -59,6 +59,7 @@ struct asr_t
 	void (*int_callback)(running_machine &, int state);
 
 	bitmap_ind16 *bitmap;
+	gfxdecode_device *m_gfxdecode;
 };
 
 enum
@@ -220,10 +221,22 @@ static DEVICE_RESET( asr733 )
 const device_type ASR733 = &device_creator<asr733_device>;
 
 asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ASR733, "733 ASR", tag, owner, clock, "asr733", __FILE__)
+	: device_t(mconfig, ASR733, "733 ASR", tag, owner, clock, "asr733", __FILE__),
+		m_gfxdecode(*this)
 {
 	m_token = global_alloc_clear(asr_t);
 }
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void asr733_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<asr733_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -241,6 +254,8 @@ void asr733_device::device_config_complete()
 
 void asr733_device::device_start()
 {
+	asr_t *asr = get_safe_token(this);
+	asr->m_gfxdecode = m_gfxdecode;
 	DEVICE_START_NAME( asr733 )(this);
 }
 
@@ -260,7 +275,7 @@ static void asr_draw_char(device_t *device, int character, int x, int y, int col
 {
 	asr_t *asr = get_safe_token(device);
 
-	 device->machine().gfx[0]->opaque(*asr->bitmap,asr->bitmap->cliprect(), character-32, color, 0, 0,
+	 asr->m_gfxdecode->gfx(0)->opaque(*asr->bitmap,asr->bitmap->cliprect(), character-32, color, 0, 0,
 				x+1, y);
 }
 

@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bionicc_state, screen_update_bionicc)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(bionicc)
+	MCFG_GFXDECODE_ADD("gfxdecode", bionicc)
 	MCFG_PALETTE_LENGTH(1024)
 
 

@@ -292,7 +292,7 @@ static MACHINE_CONFIG_START( carpolo, carpolo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(carpolo_state, screen_update_carpolo)
 	MCFG_SCREEN_VBLANK_DRIVER(carpolo_state, screen_eof_carpolo)
 
-	MCFG_GFXDECODE(carpolo)
+	MCFG_GFXDECODE_ADD("gfxdecode", carpolo)
 	MCFG_PALETTE_LENGTH(12*2+2*16+4*2)
 
 MACHINE_CONFIG_END

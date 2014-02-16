@@ -107,7 +107,7 @@ WRITE32_MEMBER(tmmjprd_state::tmmjprd_tilemap3_w)
 void tmmjprd_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int screen)
 {
 	int xpos,ypos,tileno,xflip,yflip, colr;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int xoffs;
 	//  int todraw = (m_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
 
@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
 
-	MCFG_GFXDECODE(tmmjprd)
+	MCFG_GFXDECODE_ADD("gfxdecode", tmmjprd)
 
 //  MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)

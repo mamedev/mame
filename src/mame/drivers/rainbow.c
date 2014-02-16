@@ -666,11 +666,13 @@ static MACHINE_CONFIG_START( rbisland, rbisland_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_rainbow)
 
-	MCFG_GFXDECODE(rbisland)
+	MCFG_GFXDECODE_ADD("gfxdecode", rbisland)
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_PC080SN_ADD("pc080sn", rbisland_pc080sn_intf)
+	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_ADD("pc090oj", rbisland_pc090oj_intf)
+	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -707,12 +709,13 @@ static MACHINE_CONFIG_START( jumping, rbisland_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_jumping)
 
-	MCFG_GFXDECODE(jumping)
+	MCFG_GFXDECODE_ADD("gfxdecode", jumping)
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_VIDEO_START_OVERRIDE(rbisland_state,jumping)
 
 	MCFG_PC080SN_ADD("pc080sn", jumping_pc080sn_intf)
+	MCFG_PC080SN_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -579,7 +579,7 @@ TILE_GET_INFO_MEMBER(pgm_state::get_pgm_tx_tilemap_tile_info)
 	colour = (m_tx_videoram[tile_index * 2 + 1] & 0x3e) >> 1;
 	flipyx = (m_tx_videoram[tile_index * 2 + 1] & 0xc0) >> 6;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour,TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,colour,TILE_FLIPYX(flipyx));
 }
 
 /* BG Layer */
@@ -601,7 +601,7 @@ TILE_GET_INFO_MEMBER(pgm_state::get_pgm_bg_tilemap_tile_info)
 	colour = (m_bg_videoram[tile_index * 2 + 1] & 0x3e) >> 1;
 	flipyx = (m_bg_videoram[tile_index * 2 + 1] & 0xc0) >> 6;
 
-	SET_TILE_INFO_MEMBER(1,tileno,colour,TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tileno,colour,TILE_FLIPYX(flipyx));
 }
 
 

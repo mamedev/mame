@@ -27,6 +27,10 @@ public:
 
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
+	
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -36,6 +40,7 @@ protected:
 private:
 	// internal state
 	void *m_token;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 extern const device_type ASR733;
@@ -44,6 +49,9 @@ extern const device_type ASR733;
 #define MCFG_ASR733_VIDEO_ADD(_tag, _intf) \
 	MCFG_DEVICE_ADD(_tag, ASR733, 0) \
 	MCFG_DEVICE_CONFIG(_intf)
+
+#define MCFG_ASR733_VIDEO_GFXDECODE(_gfxtag) \
+	asr733_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 DECLARE_READ8_DEVICE_HANDLER(asr733_cru_r);
 DECLARE_WRITE8_DEVICE_HANDLER(asr733_cru_w);

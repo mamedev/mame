@@ -61,13 +61,13 @@ void gaplus_state::palette_init()
 	/* color_prom now points to the beginning of the lookup table */
 
 	/* characters use colors 0xf0-0xff */
-	for (i = 0;i < machine().gfx[0]->colors() * machine().gfx[0]->granularity();i++)
-		colortable_entry_set_value(machine().colortable, machine().gfx[0]->colorbase() + i, 0xf0 + (*color_prom++ & 0x0f));
+	for (i = 0;i < m_gfxdecode->gfx(0)->colors() * m_gfxdecode->gfx(0)->granularity();i++)
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(0)->colorbase() + i, 0xf0 + (*color_prom++ & 0x0f));
 
 	/* sprites */
-	for (i = 0;i < machine().gfx[1]->colors() * machine().gfx[1]->granularity();i++)
+	for (i = 0;i < m_gfxdecode->gfx(1)->colors() * m_gfxdecode->gfx(1)->granularity();i++)
 	{
-		colortable_entry_set_value(machine().colortable, machine().gfx[1]->colorbase() + i, (color_prom[0] & 0x0f) + ((color_prom[0x200] & 0x0f) << 4));
+		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(1)->colorbase() + i, (color_prom[0] & 0x0f) + ((color_prom[0x200] & 0x0f) << 4));
 		color_prom++;
 	}
 }
@@ -100,7 +100,7 @@ TILE_GET_INFO_MEMBER(gaplus_state::get_tile_info)
 	UINT8 attr = m_videoram[tile_index + 0x400];
 	tileinfo.category = (attr & 0x40) >> 6;
 	tileinfo.group = attr & 0x3f;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_videoram[tile_index] + ((attr & 0x80) << 1),
 			attr & 0x3f,
@@ -182,7 +182,7 @@ void gaplus_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gaplus_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(gaplus_state::tilemap_scan),this),8,8,36,28);
 
-	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[0], 0xff);
+	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, m_gfxdecode->gfx(0), 0xff);
 
 	starfield_init();
 }
@@ -288,12 +288,12 @@ void gaplus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					machine().gfx[1]->transmask(bitmap,cliprect,
+					m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 						sprite + (duplicate ? 0 : (gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)])),
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0xff));
+						colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0xff));
 				}
 			}
 		}

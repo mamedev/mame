@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(cheekyms_state::cheekyms_get_tile_info)
 			color = palette | (x >> 1);
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void cheekyms_state::video_start()
@@ -155,7 +155,7 @@ UINT32 cheekyms_state::screen_update_cheekyms(screen_device &screen, bitmap_ind1
 	m_bitmap_buffer->fill(0, cliprect);
 
 	/* sprites go under the playfield */
-	draw_sprites(bitmap, cliprect, machine().gfx[1], flip);
+	draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1), flip);
 
 	/* draw the tilemap to a temp bitmap */
 	m_cm_tilemap->draw(screen, *m_bitmap_buffer, cliprect, 0, 0);

@@ -622,7 +622,9 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 
 	MCFG_Z80CTC_ADD("ctc", XTAL_16MHz / 4, ctc_intf)
 	MCFG_PC080SN_ADD("pc080sn_1", pc080sn_intf)
+	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC080SN_ADD("pc080sn_2", pc080sn_intf)
+	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_TC0140SYT_ADD("tc0140syt", tc0140syt_intf)
 	MCFG_TC0220IOC_ADD("tc0220ioc", io_intf)
 
@@ -634,7 +636,7 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(topspeed_state, screen_update_topspeed)
 
-	MCFG_GFXDECODE(topspeed)
+	MCFG_GFXDECODE_ADD("gfxdecode", topspeed)
 	MCFG_PALETTE_LENGTH(8192)
 
 	// sound hardware

@@ -666,7 +666,7 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
-	MCFG_GFXDECODE(plygonet)
+	MCFG_GFXDECODE_ADD("gfxdecode", plygonet)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

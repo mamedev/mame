@@ -3272,7 +3272,7 @@ static MACHINE_CONFIG_START( system16b, segas16b_state )
 	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper, mapper_sound_r, mapper_sound_w)
 
 	// video hardware
-	MCFG_GFXDECODE(segas16b)
+	MCFG_GFXDECODE_ADD("gfxdecode", segas16b)
 	MCFG_PALETTE_LENGTH(2048*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3281,6 +3281,7 @@ static MACHINE_CONFIG_START( system16b, segas16b_state )
 
 	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
+	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -7031,7 +7032,7 @@ WRITE16_MEMBER( isgsm_state::data_w )
 			if (dest == memregion("gfx1")->base())
 			{
 				// we need to re-decode the tiles if writing to this area to keep MAME happy
-				machine().gfx[0]->mark_dirty((m_data_addr & 0x1ffff) / 8);
+				m_gfxdecode->gfx(0)->mark_dirty((m_data_addr & 0x1ffff) / 8);
 			}
 		}
 	}

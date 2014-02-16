@@ -1616,6 +1616,7 @@ static MACHINE_CONFIG_START( arknoid2, tnzs_state )
 	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1626,7 +1627,7 @@ static MACHINE_CONFIG_START( arknoid2, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE(tnzs)
+	MCFG_GFXDECODE_ADD("gfxdecode", tnzs)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_PALETTE_INIT_OVERRIDE(tnzs_state,arknoid2)
@@ -1657,6 +1658,7 @@ static MACHINE_CONFIG_START( drtoppel, tnzs_state )
 	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1667,7 +1669,7 @@ static MACHINE_CONFIG_START( drtoppel, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE(tnzs)
+	MCFG_GFXDECODE_ADD("gfxdecode", tnzs)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_PALETTE_INIT_OVERRIDE(tnzs_state,arknoid2)
@@ -1701,6 +1703,7 @@ static MACHINE_CONFIG_START( tnzs, tnzs_state )
 	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1711,7 +1714,7 @@ static MACHINE_CONFIG_START( tnzs, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE(tnzs)
+	MCFG_GFXDECODE_ADD("gfxdecode", tnzs)
 	MCFG_PALETTE_LENGTH(512)
 
 
@@ -1741,6 +1744,7 @@ static MACHINE_CONFIG_START( insectx, tnzs_state )
 	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1751,7 +1755,7 @@ static MACHINE_CONFIG_START( insectx, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE(insectx)
+	MCFG_GFXDECODE_ADD("gfxdecode", insectx)
 	MCFG_PALETTE_LENGTH(512)
 
 	/* sound hardware */
@@ -1780,6 +1784,7 @@ static MACHINE_CONFIG_START( kageki, tnzs_state )
 	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1790,7 +1795,7 @@ static MACHINE_CONFIG_START( kageki, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE(tnzs)
+	MCFG_GFXDECODE_ADD("gfxdecode", tnzs)
 	MCFG_PALETTE_LENGTH(512)
 
 	/* sound hardware */
@@ -1829,6 +1834,7 @@ static MACHINE_CONFIG_START( tnzsb, tnzs_state )
 	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1839,7 +1845,7 @@ static MACHINE_CONFIG_START( tnzsb, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE(tnzs)
+	MCFG_GFXDECODE_ADD("gfxdecode", tnzs)
 	MCFG_PALETTE_LENGTH(512)
 
 	/* sound hardware */
@@ -1889,6 +1895,7 @@ static MACHINE_CONFIG_START( jpopnics, tnzs_state )
 	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,jpopnics)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1899,7 +1906,7 @@ static MACHINE_CONFIG_START( jpopnics, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE(tnzs)
+	MCFG_GFXDECODE_ADD("gfxdecode", tnzs)
 	MCFG_PALETTE_LENGTH(1024)
 
 	/* sound hardware */

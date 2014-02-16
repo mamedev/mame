@@ -417,7 +417,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( scorpion, spectrum_128, scorpion_state )
 
 	MCFG_MACHINE_START_OVERRIDE(scorpion_state, scorpion )
 	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )
-	MCFG_GFXDECODE(scorpion)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", scorpion)
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 
@@ -429,11 +429,11 @@ static MACHINE_CONFIG_DERIVED_CLASS( scorpion, spectrum_128, scorpion_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( profi, scorpion )
-	MCFG_GFXDECODE(profi)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", profi)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quorum, scorpion )
-	MCFG_GFXDECODE(quorum)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", quorum)
 MACHINE_CONFIG_END
 
 

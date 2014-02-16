@@ -216,7 +216,7 @@ static MACHINE_CONFIG_START( itgamble, itgamble_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 
-	MCFG_GFXDECODE(itgamble)
+	MCFG_GFXDECODE_ADD("gfxdecode", itgamble)
 	MCFG_PALETTE_LENGTH(0x200)
 
 	/* sound hardware */

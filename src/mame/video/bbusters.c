@@ -31,21 +31,21 @@ TILE_GET_INFO_MEMBER(bbusters_state::get_bbusters_tile_info)
 {
 	UINT16 tile = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,tile&0xfff,tile>>12,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tile&0xfff,tile>>12,0);
 }
 
 TILE_GET_INFO_MEMBER(bbusters_state::get_pf1_tile_info)
 {
 	UINT16 tile = m_pf1_data[tile_index];
 
-	SET_TILE_INFO_MEMBER(3,tile&0xfff,tile>>12,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3,tile&0xfff,tile>>12,0);
 }
 
 TILE_GET_INFO_MEMBER(bbusters_state::get_pf2_tile_info)
 {
 	UINT16 tile = m_pf2_data[tile_index];
 
-	SET_TILE_INFO_MEMBER(4,tile&0xfff,tile>>12,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 4,tile&0xfff,tile>>12,0);
 }
 
 WRITE16_MEMBER(bbusters_state::bbusters_video_w)
@@ -145,7 +145,7 @@ inline const UINT8 *bbusters_state::get_source_ptr(gfx_element *gfx, UINT32 spri
 
 void bbusters_state::bbusters_draw_block(bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
 {
-	gfx_element *gfx = machine().gfx[bank];
+	gfx_element *gfx = m_gfxdecode->gfx(bank);
 	pen_t pen_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 	UINT32 xinc=(m_scale_line_count * 0x10000 ) / size;
 	UINT8 pixel;

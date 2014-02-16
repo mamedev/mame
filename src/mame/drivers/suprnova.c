@@ -666,8 +666,8 @@ WRITE32_MEMBER(skns_state::skns_v3t_w)
 
 	COMBINE_DATA(&m_v3t_ram[offset]);
 
-	machine().gfx[1]->mark_dirty(offset/0x40);
-	machine().gfx[3]->mark_dirty(offset/0x20);
+	m_gfxdecode->gfx(1)->mark_dirty(offset/0x40);
+	m_gfxdecode->gfx(3)->mark_dirty(offset/0x20);
 
 	data = m_v3t_ram[offset];
 // i think we need to swap around to decode .. endian issues?
@@ -773,7 +773,7 @@ static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_SCREEN_VBLANK_DRIVER(skns_state, screen_eof_skns)
 
 	MCFG_PALETTE_LENGTH(32768)
-	MCFG_GFXDECODE(skns_bg)
+	MCFG_GFXDECODE_ADD("gfxdecode", skns_bg)
 
 	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
 

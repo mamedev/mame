@@ -449,7 +449,7 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_galivan)
 
-	MCFG_GFXDECODE(galivan)
+	MCFG_GFXDECODE_ADD("gfxdecode", galivan)
 	MCFG_PALETTE_LENGTH(8*16+16*16+256*16)
 
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
@@ -491,7 +491,7 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_ninjemak)
 
-	MCFG_GFXDECODE(ninjemak)
+	MCFG_GFXDECODE_ADD("gfxdecode", ninjemak)
 	MCFG_PALETTE_LENGTH(8*16+16*16+256*16)
 
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)

@@ -268,9 +268,11 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rockrage_state, screen_update_rockrage)
 
 	MCFG_K007342_ADD("k007342", rockrage_k007342_intf)
+	MCFG_K007342_GFXDECODE("gfxdecode")
+	
 	MCFG_K007420_ADD("k007420", rockrage_k007420_intf)
 
-	MCFG_GFXDECODE(rockrage)
+	MCFG_GFXDECODE_ADD("gfxdecode", rockrage)
 	MCFG_PALETTE_LENGTH(64 + 2*16*16)
 
 

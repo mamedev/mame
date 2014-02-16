@@ -263,7 +263,7 @@ void cgenie_state::cgenie_refresh_monitor(bitmap_ind16 &bitmap, const rectangle 
 			{
 				/* get graphics code */
 				code = videoram[i];
-				 machine().gfx[1]->opaque(bitmap,r, code, 0,
+				 m_gfxdecode->gfx(1)->opaque(bitmap,r, code, 0,
 					0, 0, r.min_x, r.min_y);
 			}
 			else
@@ -273,7 +273,7 @@ void cgenie_state::cgenie_refresh_monitor(bitmap_ind16 &bitmap, const rectangle 
 
 				/* translate defined character sets */
 				code += m_font_offset[(code >> 6) & 3];
-				 machine().gfx[0]->opaque(bitmap,r, code, m_colorram[i&0x3ff],
+				 m_gfxdecode->gfx(0)->opaque(bitmap,r, code, m_colorram[i&0x3ff],
 					0, 0, r.min_x, r.min_y);
 			}
 
@@ -302,7 +302,7 @@ void cgenie_state::cgenie_refresh_monitor(bitmap_ind16 &bitmap, const rectangle 
 				rc.max_x = r.max_x;
 				rc.min_y = r.min_y + (m_crt.cursor_top & 15);
 				rc.max_y = r.min_y + (m_crt.cursor_bottom & 15);
-				 machine().gfx[0]->opaque(bitmap,rc, 0x7f, m_colorram[i&0x3ff],
+				 m_gfxdecode->gfx(0)->opaque(bitmap,rc, 0x7f, m_colorram[i&0x3ff],
 					0, 0, rc.min_x, rc.min_y);
 			}
 		}
@@ -343,9 +343,9 @@ void cgenie_state::cgenie_refresh_tv_set(bitmap_ind16 &bitmap, const rectangle &
 			{
 				/* get graphics code */
 				code = videoram[i];
-				 machine().gfx[1]->opaque(m_bitmap,r, code, 1,
+				 m_gfxdecode->gfx(1)->opaque(m_bitmap,r, code, 1,
 					0, 0, r.min_x, r.min_y);
-				 machine().gfx[1]->opaque(m_dlybitmap,r, code, 2,
+				 m_gfxdecode->gfx(1)->opaque(m_dlybitmap,r, code, 2,
 					0, 0, r.min_x, r.min_y);
 			}
 			else
@@ -355,9 +355,9 @@ void cgenie_state::cgenie_refresh_tv_set(bitmap_ind16 &bitmap, const rectangle &
 
 				/* translate defined character sets */
 				code += m_font_offset[(code >> 6) & 3];
-				 machine().gfx[0]->opaque(m_bitmap,r, code, m_colorram[i&0x3ff] + 16,
+				 m_gfxdecode->gfx(0)->opaque(m_bitmap,r, code, m_colorram[i&0x3ff] + 16,
 					0, 0, r.min_x, r.min_y);
-				 machine().gfx[0]->opaque(m_dlybitmap,r, code, m_colorram[i&0x3ff] + 32,
+				 m_gfxdecode->gfx(0)->opaque(m_dlybitmap,r, code, m_colorram[i&0x3ff] + 32,
 					0, 0, r.min_x, r.min_y);
 			}
 
@@ -387,9 +387,9 @@ void cgenie_state::cgenie_refresh_tv_set(bitmap_ind16 &bitmap, const rectangle &
 				rc.min_y = r.min_y + (m_crt.cursor_top & 15);
 				rc.max_y = r.min_y + (m_crt.cursor_bottom & 15);
 
-				 machine().gfx[0]->opaque(m_bitmap,rc, 0x7f, m_colorram[i&0x3ff] + 16,
+				 m_gfxdecode->gfx(0)->opaque(m_bitmap,rc, 0x7f, m_colorram[i&0x3ff] + 16,
 					0, 0, rc.min_x, rc.min_y);
-				 machine().gfx[0]->opaque(m_dlybitmap,rc, 0x7f, m_colorram[i&0x3ff] + 32,
+				 m_gfxdecode->gfx(0)->opaque(m_dlybitmap,rc, 0x7f, m_colorram[i&0x3ff] + 32,
 					0, 0, rc.min_x, rc.min_y);
 			}
 		}

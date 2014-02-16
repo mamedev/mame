@@ -577,7 +577,7 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT_OVERRIDE(elwro800_state, spectrum )
-	MCFG_GFXDECODE(elwro800)
+	MCFG_GFXDECODE_ADD("gfxdecode", elwro800)
 
 	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum )
 

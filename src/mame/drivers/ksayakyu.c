@@ -287,7 +287,7 @@ static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ksayakyu_state, screen_update_ksayakyu)
 
-	MCFG_GFXDECODE(ksayakyu)
+	MCFG_GFXDECODE_ADD("gfxdecode", ksayakyu)
 	MCFG_PALETTE_LENGTH(256)
 
 

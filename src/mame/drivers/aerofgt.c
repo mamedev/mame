@@ -1326,12 +1326,13 @@ static MACHINE_CONFIG_START( pspikes, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
 
-	MCFG_GFXDECODE(pspikes)
+	MCFG_GFXDECODE_ADD("gfxdecode", pspikes)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
+	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
@@ -1367,7 +1368,7 @@ static MACHINE_CONFIG_START( spikes91, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 320-1, 0*8+4, 224+4-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_spikes91)
 
-	MCFG_GFXDECODE(spikes91)
+	MCFG_GFXDECODE_ADD("gfxdecode", spikes91)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
@@ -1399,7 +1400,7 @@ static MACHINE_CONFIG_START( pspikesb, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikesb)
 
-	MCFG_GFXDECODE(pspikesb)
+	MCFG_GFXDECODE_ADD("gfxdecode", pspikesb)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
@@ -1429,12 +1430,13 @@ static MACHINE_CONFIG_START( pspikesc, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
 
-	MCFG_GFXDECODE(pspikes)
+	MCFG_GFXDECODE_ADD("gfxdecode", pspikes)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
+	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
@@ -1468,15 +1470,18 @@ static MACHINE_CONFIG_START( karatblz, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 45*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_karatblz)
 
-	MCFG_GFXDECODE(turbofrc)
+	MCFG_GFXDECODE_ADD("gfxdecode", turbofrc)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
+	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
+	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
 
@@ -1514,16 +1519,19 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 45*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_spinlbrk)
 
-	MCFG_GFXDECODE(turbofrc)
+	MCFG_GFXDECODE_ADD("gfxdecode", turbofrc)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(1)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
+	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback ) // rom lookup
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(1)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
+	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,spinlbrk)
 
@@ -1561,15 +1569,18 @@ static MACHINE_CONFIG_START( turbofrc, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_turbofrc)
 
-	MCFG_GFXDECODE(turbofrc)
+	MCFG_GFXDECODE_ADD("gfxdecode", turbofrc)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
+	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
+	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
@@ -1608,15 +1619,18 @@ static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+12, 40*8-1+12, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_turbofrc)
 
-	MCFG_GFXDECODE(aerofgtb)
+	MCFG_GFXDECODE_ADD("gfxdecode", aerofgtb)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
-	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
+	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	
+	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)	
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
+	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
@@ -1655,12 +1669,13 @@ static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerofgt)
 
-	MCFG_GFXDECODE(aerofgt)
+	MCFG_GFXDECODE_ADD("gfxdecode", aerofgt)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( aerofgt_state, aerofgt_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
+	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
@@ -1697,7 +1712,7 @@ static MACHINE_CONFIG_START( aerfboot, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+12, 40*8-1+12, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerfboot)
 
-	MCFG_GFXDECODE(aerfboot)
+	MCFG_GFXDECODE_ADD("gfxdecode", aerfboot)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
@@ -1728,7 +1743,7 @@ static MACHINE_CONFIG_START( aerfboo2, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+12, 40*8-1+12, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerfboo2)
 
-	MCFG_GFXDECODE(aerfboo2)
+	MCFG_GFXDECODE_ADD("gfxdecode", aerfboo2)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
@@ -1761,12 +1776,13 @@ static MACHINE_CONFIG_START( wbbc97, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+14, 44*8-1+4, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_wbbc97)
 
-	MCFG_GFXDECODE(wbbc97)
+	MCFG_GFXDECODE_ADD("gfxdecode", wbbc97)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
+	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,wbbc97)
 

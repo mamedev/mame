@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(orbit_state::get_tile_info)
 	if (m_flip_screen)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(3, code & 0x3f, 0, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, code & 0x3f, 0, flags);
 }
 
 
@@ -69,7 +69,7 @@ void orbit_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		hpos <<= 1;
 		vpos <<= 1;
 
-		 machine().gfx[layout]->zoom_transpen(bitmap,cliprect, code, 0, flip_x, flip_y,
+		 m_gfxdecode->gfx(layout)->zoom_transpen(bitmap,cliprect, code, 0, flip_x, flip_y,
 			hpos, vpos, zoom_x, zoom_y, 0);
 	}
 }

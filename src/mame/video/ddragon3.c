@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(ddragon3_state::get_bg_tile_info)
 	int code = (attr & 0x0fff) | ((m_bg_tilebase & 0x01) << 12);
 	int color = ((attr & 0xf000) >> 12);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 
@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(ddragon3_state::get_fg_tile_info)
 	tilebase =  &m_fg_videoram[tile_index*2];
 	tileno =  (tilebase[1] & 0x1fff);
 	colbank = (tilebase[0] & 0x000f);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tileno,
 			colbank,
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(wwfwfest_state::get_fg0_tile_info)
 	tilebase =  &m_fg0_videoram[tile_index*2];
 	tileno =  (tilebase[0] & 0x00ff) | ((tilebase[1] & 0x000f) << 8);
 	colbank = (tilebase[1] & 0x00f0) >> 4;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			tileno,
 			colbank,
@@ -184,7 +184,7 @@ void ddragon3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	UINT16 *buffered_spriteram16 = m_spriteram->buffer();
 	int length = m_spriteram->bytes();
-	gfx_element *gfx = machine().gfx[2];
+	gfx_element *gfx = m_gfxdecode->gfx(2);
 	UINT16 *source = buffered_spriteram16;
 	UINT16 *finish = source + length/2;
 

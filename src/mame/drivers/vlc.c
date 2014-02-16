@@ -286,7 +286,7 @@ static TILE_GET_INFO_MEMBER( nevada_state::get_bg_tile_info )
     int bank = (attr & 0x02) >> 1;
     int color = (attr & 0x3c) >> 2;
 
-    SET_TILE_INFO_MEMBER(bank, code, color, 0);
+    SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
 
 }
 */
@@ -629,7 +629,7 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 31*8-1)    /* From MC6845 init, registers 01 & 06. */
 	MCFG_SCREEN_UPDATE_DRIVER(nevada_state, screen_update_nevada)
 
-	MCFG_GFXDECODE(nevada)
+	MCFG_GFXDECODE_ADD("gfxdecode", nevada)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK, mc6845_intf)

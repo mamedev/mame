@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(drmicro_state::get_bg1_tile_info)
 	flags = ((col & 0x20) ? TILEMAP_FLIPY : 0) | ((col & 0x10) ? TILEMAP_FLIPX : 0);
 	col &= 0x0f;
 
-	SET_TILE_INFO_MEMBER( 0, code, col, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  0, code, col, flags);
 }
 
 TILE_GET_INFO_MEMBER(drmicro_state::get_bg2_tile_info)
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(drmicro_state::get_bg2_tile_info)
 	flags = ((col & 0x20) ? TILEMAP_FLIPY : 0) | ((col & 0x10) ? TILEMAP_FLIPX : 0);
 	col &= 0x0f;
 
-	SET_TILE_INFO_MEMBER( 1, code, col, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  1, code, col, flags);
 }
 
 /****************************************************************************/
@@ -145,7 +145,7 @@ UINT32 drmicro_state::screen_update_drmicro(screen_device &screen, bitmap_ind16 
 			else
 				x = (240 - x) & 0xff;
 
-			machine().gfx[3-g]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(3-g)->transpen(bitmap,cliprect,
 					chr,
 					col,
 					fx,fy,
@@ -153,7 +153,7 @@ UINT32 drmicro_state::screen_update_drmicro(screen_device &screen, bitmap_ind16 
 
 			if (x > 240)
 			{
-				machine().gfx[3-g]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(3-g)->transpen(bitmap,cliprect,
 						chr,
 						col,
 						fx,fy,

@@ -471,7 +471,7 @@ void amaticmg_state::video_start()
 
 UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y,x;
 	int count = 0;
 
@@ -496,7 +496,7 @@ UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind1
 
 UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y,x;
 	int count = 16;
 
@@ -880,7 +880,7 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
-	MCFG_GFXDECODE(amaticmg)
+	MCFG_GFXDECODE_ADD("gfxdecode", amaticmg)
 
 	MCFG_PALETTE_LENGTH(0x200)
 
@@ -913,7 +913,7 @@ static MACHINE_CONFIG_DERIVED( amaticmg2, amaticmg )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
-	MCFG_GFXDECODE(amaticmg2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", amaticmg2)
 	MCFG_PALETTE_INIT_OVERRIDE(amaticmg_state,amaticmg2)
 	MCFG_PALETTE_LENGTH(0x10000)
 MACHINE_CONFIG_END

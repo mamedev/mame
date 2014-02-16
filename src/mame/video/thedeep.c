@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_0)
 {
 	UINT8 code  =   m_vram_0[ tile_index * 2 + 0 ];
 	UINT8 color =   m_vram_0[ tile_index * 2 + 1 ];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code + (color << 8),
 			(color & 0xf0) >> 4,
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_1)
 {
 	UINT8 code  =   m_vram_1[ tile_index * 2 + 0 ];
 	UINT8 color =   m_vram_1[ tile_index * 2 + 1 ];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code + (color << 8),
 			(color & 0xf0) >> 4,
@@ -187,7 +187,7 @@ void thedeep_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 			for (y = 0; y < ny; y++)
 			{
-				machine().gfx[0]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						code + (flipy ? (ny - y - 1) :  y),
 						color,
 						flipx,flipy,

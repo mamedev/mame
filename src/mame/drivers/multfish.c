@@ -263,7 +263,7 @@ TILE_GET_INFO_MEMBER(multfish_state::get_multfish_tile_info)
 
 	tileinfo.category = (attr&0x100)>>8;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code&0x1fff,
 			attr&0x7,
@@ -274,7 +274,7 @@ TILE_GET_INFO_MEMBER(multfish_state::get_multfish_reel_tile_info)
 {
 	int code = m_vid[tile_index*2+0x2000] | (m_vid[tile_index*2+0x2001] << 8);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			(code&0x1fff)+0x2000,
 			(code>>14)+0x8,
@@ -1139,7 +1139,7 @@ static MACHINE_CONFIG_START( multfish, multfish_state )
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(17*16, 1024-16*7-1, 1*16, 32*16-1*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(multfish_state, screen_update_multfish)
-	MCFG_GFXDECODE(multfish)
+	MCFG_GFXDECODE_ADD("gfxdecode", multfish)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 

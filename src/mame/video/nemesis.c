@@ -40,11 +40,11 @@ TILE_GET_INFO_MEMBER(nemesis_state::get_bg_tile_info)
 
 	if (code & 0xf800)
 	{
-		SET_TILE_INFO_MEMBER( 0, code & 0x7ff, color & 0x7f, flags );
+		SET_TILE_INFO_MEMBER(m_gfxdecode,  0, code & 0x7ff, color & 0x7f, flags );
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER( 0, 0, 0x00, 0 );
+		SET_TILE_INFO_MEMBER(m_gfxdecode,  0, 0, 0x00, 0 );
 		tileinfo.pen_data = m_blank_tile;
 	}
 
@@ -75,11 +75,11 @@ TILE_GET_INFO_MEMBER(nemesis_state::get_fg_tile_info)
 
 	if (code & 0xf800)
 	{
-		SET_TILE_INFO_MEMBER( 0, code & 0x7ff, color & 0x7f, flags );
+		SET_TILE_INFO_MEMBER(m_gfxdecode,  0, code & 0x7ff, color & 0x7f, flags );
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER( 0, 0, 0x00, 0 );
+		SET_TILE_INFO_MEMBER(m_gfxdecode,  0, 0, 0x00, 0 );
 		tileinfo.pen_data = m_blank_tile;
 	}
 
@@ -257,7 +257,7 @@ WRITE16_MEMBER(nemesis_state::nemesis_charram_word_w)
 		{
 			int w = sprite_data[i].width;
 			int h = sprite_data[i].height;
-			machine().gfx[sprite_data[i].char_type]->mark_dirty(offset * 4 / (w * h));
+			m_gfxdecode->gfx(sprite_data[i].char_type)->mark_dirty(offset * 4 / (w * h));
 		}
 	}
 }
@@ -273,7 +273,7 @@ void nemesis_state::nemesis_postload()
 		{
 			int w = sprite_data[i].width;
 			int h = sprite_data[i].height;
-			machine().gfx[sprite_data[i].char_type]->mark_dirty(offs * 4 / (w * h));
+			m_gfxdecode->gfx(sprite_data[i].char_type)->mark_dirty(offs * 4 / (w * h));
 		}
 	}
 	m_background->mark_all_dirty();
@@ -297,14 +297,14 @@ void nemesis_state::video_start()
 	memset(m_charram, 0, m_charram.bytes());
 	memset(m_blank_tile, 0, ARRAY_LENGTH(m_blank_tile));
 
-	machine().gfx[0]->set_source((UINT8 *)m_charram.target());
-	machine().gfx[1]->set_source((UINT8 *)m_charram.target());
-	machine().gfx[2]->set_source((UINT8 *)m_charram.target());
-	machine().gfx[3]->set_source((UINT8 *)m_charram.target());
-	machine().gfx[4]->set_source((UINT8 *)m_charram.target());
-	machine().gfx[5]->set_source((UINT8 *)m_charram.target());
-	machine().gfx[6]->set_source((UINT8 *)m_charram.target());
-	machine().gfx[7]->set_source((UINT8 *)m_charram.target());
+	m_gfxdecode->gfx(0)->set_source((UINT8 *)m_charram.target());
+	m_gfxdecode->gfx(1)->set_source((UINT8 *)m_charram.target());
+	m_gfxdecode->gfx(2)->set_source((UINT8 *)m_charram.target());
+	m_gfxdecode->gfx(3)->set_source((UINT8 *)m_charram.target());
+	m_gfxdecode->gfx(4)->set_source((UINT8 *)m_charram.target());
+	m_gfxdecode->gfx(5)->set_source((UINT8 *)m_charram.target());
+	m_gfxdecode->gfx(6)->set_source((UINT8 *)m_charram.target());
+	m_gfxdecode->gfx(7)->set_source((UINT8 *)m_charram.target());
 
 	/* Set up save state */
 	machine().save().register_postload(save_prepost_delegate(FUNC(nemesis_state::nemesis_postload), this));
@@ -386,7 +386,7 @@ void nemesis_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 						flipy = !flipy;
 					}
 
-					machine().gfx[char_type]->prio_zoom_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(char_type)->prio_zoom_transpen(bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,

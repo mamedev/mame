@@ -41,7 +41,7 @@ WRITE8_MEMBER(mrflea_state::mrflea_spriteram_w)
 
 void mrflea_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	const UINT8 *source = m_spriteram;
 	const UINT8 *finish = source + 0x100;
 	rectangle clip = m_screen->visible_area();
@@ -72,7 +72,7 @@ void mrflea_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 void mrflea_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	const UINT8 *source = m_videoram;
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int sx, sy;
 	int base = 0;
 

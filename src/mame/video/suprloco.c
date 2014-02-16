@@ -78,7 +78,7 @@ void suprloco_state::palette_init()
 TILE_GET_INFO_MEMBER(suprloco_state::get_tile_info)
 {
 	UINT8 attr = m_videoram[2*tile_index+1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_videoram[2*tile_index] | ((attr & 0x03) << 8),
 			(attr & 0x1c) >> 2,

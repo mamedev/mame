@@ -388,7 +388,7 @@ static MACHINE_CONFIG_DERIVED( spectrum_plus3, spectrum_128 )
 	MCFG_CPU_IO_MAP(spectrum_plus3_io)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.01)
-	MCFG_GFXDECODE(specpls3)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", specpls3)
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_plus3 )
 

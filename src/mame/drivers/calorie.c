@@ -132,7 +132,7 @@ TILE_GET_INFO_MEMBER(calorie_state::get_bg_tile_info)
 	int color = src[bg_base + tile_index + 0x100] & 0x0f;
 	int flag  = src[bg_base + tile_index + 0x100] & 0x40 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flag);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flag);
 }
 
 TILE_GET_INFO_MEMBER(calorie_state::get_fg_tile_info)
@@ -140,7 +140,7 @@ TILE_GET_INFO_MEMBER(calorie_state::get_fg_tile_info)
 	int code  = ((m_fg_ram[tile_index + 0x400] & 0x30) << 4) | m_fg_ram[tile_index];
 	int color = m_fg_ram[tile_index + 0x400] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((m_fg_ram[tile_index + 0x400] & 0xc0) >> 6));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, TILE_FLIPYX((m_fg_ram[tile_index + 0x400] & 0xc0) >> 6));
 }
 
 
@@ -193,12 +193,12 @@ UINT32 calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind16 
 		if (m_sprites[x + 1] & 0x10)
 		{
 				/* 32x32 sprites */
-			 machine().gfx[3]->transpen(bitmap,cliprect, tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
+			 m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
 		}
 		else
 		{
 			/* 16x16 sprites */
-			 machine().gfx[2]->transpen(bitmap,cliprect, tileno, color, flipx, flipy, xpos, ypos - 15, 0);
+			 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, tileno, color, flipx, flipy, xpos, ypos - 15, 0);
 		}
 	}
 	return 0;
@@ -457,7 +457,7 @@ static MACHINE_CONFIG_START( calorie, calorie_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(calorie_state, screen_update_calorie)
 
-	MCFG_GFXDECODE(calorie)
+	MCFG_GFXDECODE_ADD("gfxdecode", calorie)
 	MCFG_PALETTE_LENGTH(0x100)
 
 

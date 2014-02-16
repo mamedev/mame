@@ -131,7 +131,7 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_tx_tile_info)
 	lo = m_txram[tile_index];
 	hi = m_txram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
@@ -147,7 +147,7 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_bg0_tile_info)
 	lo = m_dummy_bg0ram[tile_index];
 	hi = m_dummy_bg0ram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
@@ -163,7 +163,7 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_bg1_tile_info)
 	lo = m_bg1ram[tile_index];
 	hi = m_bg1ram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			lo,
 			hi & 0x0f,
@@ -179,7 +179,7 @@ TILE_GET_INFO_MEMBER(argus_state::valtric_get_tx_tile_info)
 	lo = m_txram[tile_index];
 	hi = m_txram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
@@ -195,7 +195,7 @@ TILE_GET_INFO_MEMBER(argus_state::valtric_get_bg_tile_info)
 	lo = m_bg1ram[tile_index];
 	hi = m_bg1ram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			((hi & 0xc0) << 2) | ((hi & 0x20) << 5) | lo,
 			hi & 0x0f,
@@ -212,7 +212,7 @@ TILE_GET_INFO_MEMBER(argus_state::butasan_get_tx_tile_info)
 	lo = m_butasan_txram[tile_index];
 	hi = m_butasan_txram[tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
@@ -231,7 +231,7 @@ TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg0_tile_info)
 	lo = m_butasan_bg0ram[attrib];
 	hi = m_butasan_bg0ram[attrib + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
@@ -247,7 +247,7 @@ TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg1_tile_info)
 
 	tile = m_butasan_bg1ram[attrib] | ((m_butasan_bg1_status & 2) << 7);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile,
 			(tile & 0x80) >> 7,
@@ -841,7 +841,7 @@ void argus_state::argus_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &clip
 
 			if (priority != pri)
 				jal_blend_drawgfx(
-							bitmap,cliprect,machine().gfx[0],
+							bitmap,cliprect,m_gfxdecode->gfx(0),
 							tile,
 							color,
 							flipx, flipy,
@@ -969,7 +969,7 @@ void argus_state::valtric_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 			}
 
 			jal_blend_drawgfx(
-						bitmap,cliprect,machine().gfx[0],
+						bitmap,cliprect,m_gfxdecode->gfx(0),
 						tile,
 						color,
 						flipx, flipy,
@@ -1020,7 +1020,7 @@ void argus_state::butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 			if ((offs >= 0x100 && offs <= 0x2ff) || (offs >= 0x400 && offs <= 0x57f))
 			{
 				jal_blend_drawgfx(
-							bitmap,cliprect,machine().gfx[0],
+							bitmap,cliprect,m_gfxdecode->gfx(0),
 							tile,
 							color,
 							flipx, flipy,
@@ -1034,7 +1034,7 @@ void argus_state::butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 					td = (fx) ? (1 - i) : i;
 
 					jal_blend_drawgfx(
-								bitmap,cliprect,machine().gfx[0],
+								bitmap,cliprect,m_gfxdecode->gfx(0),
 								tile + td,
 								color,
 								flipx, flipy,
@@ -1054,7 +1054,7 @@ void argus_state::butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 							td = (fx) ? (i * 2) + 1 - j : i * 2 + j;
 
 						jal_blend_drawgfx(
-									bitmap,cliprect,machine().gfx[0],
+									bitmap,cliprect,m_gfxdecode->gfx(0),
 									tile + td,
 									color,
 									flipx, flipy,
@@ -1075,7 +1075,7 @@ void argus_state::butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 							td = (fx) ? (i * 4) + 3 - j : i * 4 + j;
 
 						jal_blend_drawgfx(
-									bitmap,cliprect,machine().gfx[0],
+									bitmap,cliprect,m_gfxdecode->gfx(0),
 									tile + td,
 									color,
 									flipx, flipy,

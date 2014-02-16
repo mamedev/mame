@@ -209,7 +209,7 @@ static MACHINE_CONFIG_START( hanaawas, hanaawas_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hanaawas_state, screen_update_hanaawas)
 
-	MCFG_GFXDECODE(hanaawas)
+	MCFG_GFXDECODE_ADD("gfxdecode", hanaawas)
 	MCFG_PALETTE_LENGTH(32*8)
 
 

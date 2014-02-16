@@ -129,7 +129,7 @@ TILE_GET_INFO_MEMBER(warpwarp_state::geebee_get_tile_info)
 {
 	int code = m_geebee_videoram[tile_index];
 	int color = (m_geebee_bgw & 1) | ((code & 0x80) >> 6);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			color,
@@ -140,7 +140,7 @@ TILE_GET_INFO_MEMBER(warpwarp_state::navarone_get_tile_info)
 {
 	int code = m_geebee_videoram[tile_index];
 	int color = m_geebee_bgw & 1;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			color,
@@ -149,7 +149,7 @@ TILE_GET_INFO_MEMBER(warpwarp_state::navarone_get_tile_info)
 
 TILE_GET_INFO_MEMBER(warpwarp_state::warpwarp_get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_videoram[tile_index],
 			m_videoram[tile_index + 0x400],

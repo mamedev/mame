@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( dommy, scregg_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
 
-	MCFG_GFXDECODE(scregg)
+	MCFG_GFXDECODE_ADD("gfxdecode", scregg)
 	MCFG_PALETTE_LENGTH(8)
 
 	MCFG_PALETTE_INIT_OVERRIDE(scregg_state,btime)
@@ -299,7 +299,7 @@ static MACHINE_CONFIG_START( scregg, scregg_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
 
-	MCFG_GFXDECODE(scregg)
+	MCFG_GFXDECODE_ADD("gfxdecode", scregg)
 	MCFG_PALETTE_LENGTH(8)
 
 	MCFG_PALETTE_INIT_OVERRIDE(scregg_state,btime)

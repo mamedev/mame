@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 	int code = m_videoram[tile_index*2]+256*(m_videoram[tile_index*2+1]);
 	int color = m_videoram[tile_index*2+0x800] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		0,
 		code,
 		color,
@@ -521,7 +521,7 @@ static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
 	MCFG_SCREEN_UPDATE_DRIVER(suprgolf_state, screen_update_suprgolf)
 
-	MCFG_GFXDECODE(suprgolf)
+	MCFG_GFXDECODE_ADD("gfxdecode", suprgolf)
 	MCFG_PALETTE_LENGTH(0x800)
 
 	/* sound hardware */

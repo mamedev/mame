@@ -353,7 +353,7 @@ TILE_GET_INFO_MEMBER(blitz_state::get_bg_tile_info)
 	int bank = (attr & 0x02) >> 1;  /* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2; /* bits 2-3-4-5 for color */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
 }
 
 
@@ -786,7 +786,7 @@ static MACHINE_CONFIG_START( megadpkr, blitz_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK, mc6845_intf)
 
-	MCFG_GFXDECODE(megadpkr)
+	MCFG_GFXDECODE_ADD("gfxdecode", megadpkr)
 	MCFG_PALETTE_LENGTH(256)
 
 MACHINE_CONFIG_END

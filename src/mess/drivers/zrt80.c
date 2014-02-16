@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_GFXDECODE(zrt80)
+	MCFG_GFXDECODE_ADD("gfxdecode", zrt80)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 

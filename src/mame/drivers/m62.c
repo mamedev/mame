@@ -946,7 +946,7 @@ static MACHINE_CONFIG_START( ldrun, m62_state )
 	MCFG_SCREEN_VISIBLE_AREA((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun)
 
-	MCFG_GFXDECODE(ldrun)
+	MCFG_GFXDECODE_ADD("gfxdecode", ldrun)
 	MCFG_PALETTE_LENGTH(512)
 
 
@@ -984,7 +984,7 @@ static MACHINE_CONFIG_DERIVED( battroad, ldrun )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_battroad)
-	MCFG_GFXDECODE(battroad)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", battroad)
 	MCFG_PALETTE_LENGTH(544)
 
 	MCFG_PALETTE_INIT_OVERRIDE(m62_state,battroad)
@@ -1013,7 +1013,7 @@ static MACHINE_CONFIG_DERIVED( ldrun3, ldrun )
 	MCFG_CPU_IO_MAP(ldrun3_io_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(ldrun3)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", ldrun3)
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun3)
@@ -1028,7 +1028,7 @@ static MACHINE_CONFIG_DERIVED( ldrun4, ldrun )
 	MCFG_CPU_IO_MAP(ldrun4_io_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(ldrun3)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", ldrun3)
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun4)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun4)
@@ -1042,7 +1042,7 @@ static MACHINE_CONFIG_DERIVED( lotlot, ldrun )
 	MCFG_CPU_PROGRAM_MAP(lotlot_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(lotlot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", lotlot)
 	MCFG_PALETTE_LENGTH(768)
 
 	MCFG_PALETTE_INIT_OVERRIDE(m62_state,lotlot)
@@ -1060,7 +1060,7 @@ static MACHINE_CONFIG_DERIVED( kidniki, ldrun )
 	MCFG_CPU_IO_MAP(kidniki_io_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(kidniki)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", kidniki)
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,kidniki)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1075,7 +1075,7 @@ static MACHINE_CONFIG_DERIVED( spelunkr, ldrun )
 	MCFG_CPU_PROGRAM_MAP(spelunkr_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(spelunkr)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", spelunkr)
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,spelunkr)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1090,7 +1090,7 @@ static MACHINE_CONFIG_DERIVED( spelunk2, ldrun )
 	MCFG_CPU_PROGRAM_MAP(spelunk2_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(spelunk2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", spelunk2)
 	MCFG_PALETTE_LENGTH(768)
 
 	MCFG_PALETTE_INIT_OVERRIDE(m62_state,spelunk2)
@@ -1112,7 +1112,7 @@ static MACHINE_CONFIG_DERIVED( youjyudn, ldrun )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_youjyudn)
-	MCFG_GFXDECODE(youjyudn)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", youjyudn)
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,youjyudn)
 MACHINE_CONFIG_END

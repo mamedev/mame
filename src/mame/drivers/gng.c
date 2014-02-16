@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( gng, gng_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gng_state, screen_update_gng)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(gng)
+	MCFG_GFXDECODE_ADD("gfxdecode", gng)
 	MCFG_PALETTE_LENGTH(256)
 
 

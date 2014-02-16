@@ -213,7 +213,7 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hcastle_state, screen_update_hcastle)
 
-	MCFG_GFXDECODE(hcastle)
+	MCFG_GFXDECODE_ADD("gfxdecode", hcastle)
 	MCFG_PALETTE_LENGTH(2*8*16*16)
 
 

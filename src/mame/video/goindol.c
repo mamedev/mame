@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(goindol_state::get_fg_tile_info)
 {
 	int code = m_fg_videoram[2 * tile_index + 1];
 	int attr = m_fg_videoram[2 * tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code | ((attr & 0x7) << 8) | (m_char_bank << 11),
 			(attr & 0xf8) >> 3,
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(goindol_state::get_bg_tile_info)
 {
 	int code = m_bg_videoram[2 * tile_index + 1];
 	int attr = m_bg_videoram[2 * tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code | ((attr & 0x7) << 8) | (m_char_bank << 11),
 			(attr & 0xf8) >> 3,
@@ -102,13 +102,13 @@ void goindol_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			palette = sprite_ram[offs + 2] >> 3;
 
 			
-						machine().gfx[gfxbank]->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(gfxbank)->transpen(bitmap,cliprect,
 						tile,
 						palette,
 						flip_screen(),flip_screen(),
 						sx,sy, 0);
 			
-						machine().gfx[gfxbank]->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(gfxbank)->transpen(bitmap,cliprect,
 						tile+1,
 						palette,
 						flip_screen(),flip_screen(),

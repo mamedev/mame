@@ -1187,9 +1187,12 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segaybd_state,screen_update)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	MCFG_SEGA_SYS16B_SPRITES_ADD("bsprites")
 	MCFG_SEGA_YBOARD_SPRITES_ADD("ysprites")
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
+	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
 	MCFG_PALETTE_LENGTH(8192*3)
 

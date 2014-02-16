@@ -47,8 +47,9 @@ protected:
 	UINT8 m_eeprom[0x1000];
 
 private:
-	UINT16 m_lastdata;
+	UINT16 m_lastdata, m_lastreaddata;
 	bool m_writeprotect;
+	bool m_inwritecycle;
 };
 
 class a2bus_cffa2_device : public a2bus_cffa2000_device, public device_nvram_interface

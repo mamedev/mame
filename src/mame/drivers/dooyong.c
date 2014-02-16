@@ -873,7 +873,7 @@ static MACHINE_CONFIG_START( lastday, dooyong_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_state, screen_update_lastday)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(lastday)
+	MCFG_GFXDECODE_ADD("gfxdecode", lastday)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,lastday)
@@ -917,7 +917,7 @@ static MACHINE_CONFIG_START( gulfstrm, dooyong_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_state, screen_update_gulfstrm)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(lastday)
+	MCFG_GFXDECODE_ADD("gfxdecode", lastday)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,gulfstrm)
@@ -950,7 +950,7 @@ static MACHINE_CONFIG_START( pollux, dooyong_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_state, screen_update_pollux)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(lastday)
+	MCFG_GFXDECODE_ADD("gfxdecode", lastday)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,pollux)
@@ -982,7 +982,7 @@ static MACHINE_CONFIG_START( bluehawk, dooyong_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_state, screen_update_bluehawk)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(bluehawk)
+	MCFG_GFXDECODE_ADD("gfxdecode", bluehawk)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,bluehawk)
@@ -1014,7 +1014,7 @@ static MACHINE_CONFIG_START( flytiger, dooyong_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_state, screen_update_flytiger)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(flytiger)
+	MCFG_GFXDECODE_ADD("gfxdecode", flytiger)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,flytiger)
@@ -1043,7 +1043,7 @@ static MACHINE_CONFIG_START( primella, dooyong_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 0*8, 32*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_state, screen_update_primella)
 
-	MCFG_GFXDECODE(primella)
+	MCFG_GFXDECODE_ADD("gfxdecode", primella)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,primella)
@@ -1085,7 +1085,7 @@ static MACHINE_CONFIG_START( rshark, dooyong_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_state, screen_update_rshark)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram16", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(rshark)
+	MCFG_GFXDECODE_ADD("gfxdecode", rshark)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,rshark)
@@ -1115,7 +1115,7 @@ static MACHINE_CONFIG_START( superx, dooyong_state ) // dif mem map
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_state, screen_update_rshark)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram16", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(rshark)
+	MCFG_GFXDECODE_ADD("gfxdecode", rshark)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,rshark)
@@ -1145,7 +1145,7 @@ static MACHINE_CONFIG_START( popbingo, dooyong_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_state, screen_update_popbingo)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram16", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(popbingo)
+	MCFG_GFXDECODE_ADD("gfxdecode", popbingo)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,popbingo)

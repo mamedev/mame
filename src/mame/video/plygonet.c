@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(polygonet_state::ttl_get_tile_info)
 
 	attr = m_ttl_vram[tile_index]>>12;  /* palette in all 4 bits? */
 
-	SET_TILE_INFO_MEMBER(m_ttl_gfx_index, code, attr, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, m_ttl_gfx_index, code, attr, 0);
 }
 
 TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
 	attr = (m_roz_vram[tile_index] >> 12) + 16; /* roz base palette is palette 16 */
 	code = m_roz_vram[tile_index] & 0x3ff;
 
-	SET_TILE_INFO_MEMBER(0, code, attr, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, attr, 0);
 }
 
 READ32_MEMBER(polygonet_state::polygonet_ttl_ram_r)
@@ -93,13 +93,13 @@ void polygonet_state::video_start()
 
 	/* find first empty slot to decode gfx */
 	for (m_ttl_gfx_index = 0; m_ttl_gfx_index < MAX_GFX_ELEMENTS; m_ttl_gfx_index++)
-		if (machine().gfx[m_ttl_gfx_index] == 0)
+		if (m_gfxdecode->gfx(m_ttl_gfx_index) == 0)
 			break;
 
 	assert(m_ttl_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* decode the ttl layer's gfx */
-	machine().gfx[m_ttl_gfx_index] = auto_alloc(machine(), gfx_element(machine(), charlayout, memregion("gfx1")->base(), machine().total_colors() / 16, 0));
+	m_gfxdecode->set_gfx(m_ttl_gfx_index, auto_alloc(machine(), gfx_element(machine(), charlayout, memregion("gfx1")->base(), machine().total_colors() / 16, 0)));
 
 	/* create the tilemap */
 	m_ttl_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(polygonet_state::ttl_get_tile_info),this), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan),this),  8, 8, 64, 32);

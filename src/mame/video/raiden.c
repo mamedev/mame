@@ -82,7 +82,7 @@ void raiden_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		return;
 
 	UINT16 *sprites = m_spriteram->buffer();
-	gfx_element *gfx = machine().gfx[3];
+	gfx_element *gfx = m_gfxdecode->gfx(3);
 
 	for (int offs = 0x1000/2-4; offs >= 0; offs -= 4)
 	{
@@ -199,7 +199,7 @@ TILE_GET_INFO_MEMBER(raiden_state::get_back_tile_info)
 	int tile = tiledata & 0x0fff;
 	int color = tiledata >> 12;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(raiden_state::get_fore_tile_info)
@@ -208,7 +208,7 @@ TILE_GET_INFO_MEMBER(raiden_state::get_fore_tile_info)
 	int tile = tiledata & 0x0fff;
 	int color = tiledata >> 12;
 
-	SET_TILE_INFO_MEMBER(2, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(raiden_state::get_text_tile_info)
@@ -217,7 +217,7 @@ TILE_GET_INFO_MEMBER(raiden_state::get_text_tile_info)
 	int tile = (tiledata & 0xff) | ((tiledata >> 6) & 0x300);
 	int color = (tiledata >> 8) & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
 }
 
 void raiden_state::video_start()

@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( wrally, wrally_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 24*16-8-1, 16, 16*16-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wrally_state, screen_update_wrally)
 
-	MCFG_GFXDECODE(wrally)
+	MCFG_GFXDECODE_ADD("gfxdecode", wrally)
 	MCFG_PALETTE_LENGTH(1024*8)
 
 

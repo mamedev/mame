@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_thoop2_screen0)
 
 	tileinfo.category = (data2 >> 6) & 0x03;
 
-	SET_TILE_INFO_MEMBER(1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03));
 }
 
 
@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_thoop2_screen1)
 
 	tileinfo.category = (data2 >> 6) & 0x03;
 
-	SET_TILE_INFO_MEMBER(1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03));
 }
 
 /***************************************************************************
@@ -146,7 +146,7 @@ void thoop2_state::thoop2_sort_sprites()
 void thoop2_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
 	int j, x, y, ex, ey;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	static const int x_offset[2] = {0x0,0x2};
 	static const int y_offset[2] = {0x0,0x1};

@@ -154,7 +154,7 @@ TILE_GET_INFO_MEMBER(cshooter_state::get_cstx_tile_info)
 	int attr = (m_txram[tile_index*2+1]);
 	int color = attr & 0xf;
 
-	SET_TILE_INFO_MEMBER(0, (code << 1) | ((attr & 0x20) >> 5), color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, (code << 1) | ((attr & 0x20) >> 5), color, 0);
 }
 
 WRITE8_MEMBER(cshooter_state::cshooter_txram_w)
@@ -183,10 +183,10 @@ void cshooter_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		tile_low += (tile_low > 0x9) ? 0x37 : 0x30;
 		tile_high += (tile_high > 0x9) ? 0x37 : 0x30;
 
-		machine().gfx[0]->transpen(bitmap,cliprect, tile_high << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2],0);
-		machine().gfx[0]->transpen(bitmap,cliprect, tile_high << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2],0);
-		machine().gfx[0]->transpen(bitmap,cliprect, tile_low << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2]+8,0);
-		machine().gfx[0]->transpen(bitmap,cliprect, tile_low << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2]+8,0);
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, tile_high << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2],0);
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, tile_high << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2],0);
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, tile_low << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2]+8,0);
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, tile_low << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2]+8,0);
 	}
 }
 
@@ -450,7 +450,7 @@ static MACHINE_CONFIG_START( airraid, cshooter_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(cshooter_state, screen_update_airraid)
 
-	MCFG_GFXDECODE(cshooter)
+	MCFG_GFXDECODE_ADD("gfxdecode", cshooter)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	/* sound hardware */

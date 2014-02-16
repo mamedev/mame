@@ -643,8 +643,8 @@ WRITE16_MEMBER(pc88va_state::sys_mem_w)
 			if(knj_offset >= 0x50000/2 && knj_offset <= 0x53fff/2) // TODO: there's an area that can be write protected
 			{
 				COMBINE_DATA(&knj_ram[knj_offset]);
-				machine().gfx[0]->mark_dirty((knj_offset * 2) / 8);
-				machine().gfx[1]->mark_dirty((knj_offset * 2) / 32);
+				m_gfxdecode->gfx(0)->mark_dirty((knj_offset * 2) / 8);
+				m_gfxdecode->gfx(1)->mark_dirty((knj_offset * 2) / 32);
 			}
 		}
 		break;
@@ -1875,7 +1875,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
 	MCFG_PALETTE_LENGTH(32)
 //  MCFG_PALETTE_INIT_OVERRIDE(pc88va_state, pc8801 )
-	MCFG_GFXDECODE( pc88va )
+	MCFG_GFXDECODE_ADD("gfxdecode",  pc88va )
 
 	MCFG_I8255_ADD( "d8255_2", master_fdd_intf )
 	MCFG_I8255_ADD( "d8255_3", r232c_ctrl_intf )

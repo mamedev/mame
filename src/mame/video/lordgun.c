@@ -66,7 +66,7 @@ inline void lordgun_state::get_tile_info(tile_data &tileinfo, tilemap_memory_ind
 	UINT16 attr = m_vram[_N_][tile_index * 2 + 0 ];
 	UINT16 code = m_vram[_N_][ tile_index * 2 + 1 ];
 	UINT16 pri  = (attr & 0x0e00) >> 9;
-	SET_TILE_INFO_MEMBER( _N_, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((_N_ + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  _N_, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((_N_ + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
 TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0); }
@@ -273,7 +273,7 @@ void lordgun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		{
 			for (x = x0; x != x1; x += dx)
 			{
-				 machine().gfx[4]->transpen(bitmap,cliprect,
+				 m_gfxdecode->gfx(4)->transpen(bitmap,cliprect,
 									code, color + pri * 0x800/0x40,
 									flipx, flipy,
 									sx + x * 0x10, sy + y * 0x10,

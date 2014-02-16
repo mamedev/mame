@@ -16,21 +16,21 @@ TILE_GET_INFO_MEMBER(f1gp_state::f1gp_get_roz_tile_info)
 {
 	int code = m_rozvideoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(3, code & 0x7ff, code >> 12, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, code & 0x7ff, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(f1gp_state::f1gp2_get_roz_tile_info)
 {
 	int code = m_rozvideoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(2, (code & 0x7ff) + (m_roz_bank << 11), code >> 12, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, (code & 0x7ff) + (m_roz_bank << 11), code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(f1gp_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code & 0x7fff, 0, (code & 0x8000) ? TILE_FLIPY : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code & 0x7fff, 0, (code & 0x8000) ? TILE_FLIPY : 0);
 }
 
 
@@ -51,7 +51,7 @@ VIDEO_START_MEMBER(f1gp_state,f1gp)
 	m_fg_tilemap->set_transparent_pen(0xff);
 
 	m_zoomdata = (UINT16 *)memregion("gfx4")->base();
-	machine().gfx[3]->set_source((UINT8 *)m_zoomdata);
+	m_gfxdecode->gfx(3)->set_source((UINT8 *)m_zoomdata);
 
 	save_pointer(NAME(m_zoomdata), memregion("gfx4")->bytes()/2);
 }
@@ -65,7 +65,7 @@ VIDEO_START_MEMBER(f1gp_state,f1gpb)
 	m_fg_tilemap->set_transparent_pen(0xff);
 
 	m_zoomdata = (UINT16 *)memregion("gfx4")->base();
-	machine().gfx[3]->set_source((UINT8 *)m_zoomdata);
+	m_gfxdecode->gfx(3)->set_source((UINT8 *)m_zoomdata);
 
 	save_pointer(NAME(m_zoomdata), memregion("gfx4")->bytes()/2);
 }
@@ -117,7 +117,7 @@ READ16_MEMBER(f1gp_state::f1gp_zoomdata_r)
 WRITE16_MEMBER(f1gp_state::f1gp_zoomdata_w)
 {
 	COMBINE_DATA(&m_zoomdata[offset]);
-	machine().gfx[3]->mark_dirty(offset / 64);
+	m_gfxdecode->gfx(3)->mark_dirty(offset / 64);
 }
 
 READ16_MEMBER(f1gp_state::f1gp_rozvideoram_r)
@@ -294,7 +294,7 @@ void f1gp_state::f1gpb_draw_sprites( screen_device &screen,bitmap_ind16 &bitmap,
 			gfx = 0;
 		}
 
-		machine().gfx[1 + gfx]->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1 + gfx)->prio_transpen(bitmap,cliprect,
 			code,
 			color,
 			flipx,flipy,
@@ -303,7 +303,7 @@ void f1gp_state::f1gpb_draw_sprites( screen_device &screen,bitmap_ind16 &bitmap,
 			pri ? 0 : 0x2,15);
 
 		// wrap around x
-		machine().gfx[1 + gfx]->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1 + gfx)->prio_transpen(bitmap,cliprect,
 			code,
 			color,
 			flipx,flipy,

@@ -30,9 +30,9 @@ void battlera_state::video_start()
 	m_current_scanline=0;
 	m_irq_enable=m_rcr_enable=m_sb_enable=m_bb_enable=0;
 
-	machine().gfx[0]->set_source(m_HuC6270_vram);
-	machine().gfx[1]->set_source(m_HuC6270_vram);
-	machine().gfx[2]->set_source(m_blank_tile);
+	m_gfxdecode->gfx(0)->set_source(m_HuC6270_vram);
+	m_gfxdecode->gfx(1)->set_source(m_HuC6270_vram);
+	m_gfxdecode->gfx(2)->set_source(m_blank_tile);
 }
 
 /******************************************************************************/
@@ -123,8 +123,8 @@ WRITE8_MEMBER(battlera_state::HuC6270_data_w)
 			case 2: /* VRAM */
 				if (m_HuC6270_vram[(m_HuC6270_registers[0]<<1)|1]!=data) {
 					m_HuC6270_vram[(m_HuC6270_registers[0]<<1)|1]=data;
-					machine().gfx[0]->mark_dirty(m_HuC6270_registers[0]>>4);
-					machine().gfx[1]->mark_dirty(m_HuC6270_registers[0]>>6);
+					m_gfxdecode->gfx(0)->mark_dirty(m_HuC6270_registers[0]>>4);
+					m_gfxdecode->gfx(1)->mark_dirty(m_HuC6270_registers[0]>>6);
 				}
 				if (m_HuC6270_registers[0]<0x1000) m_vram_dirty[m_HuC6270_registers[0]]=1;
 				return;
@@ -182,8 +182,8 @@ WRITE8_MEMBER(battlera_state::HuC6270_data_w)
 			case 2: /* VWR - VRAM */
 				if (m_HuC6270_vram[(m_HuC6270_registers[0]<<1)|0]!=data) {
 					m_HuC6270_vram[(m_HuC6270_registers[0]<<1)|0]=data;
-					machine().gfx[0]->mark_dirty(m_HuC6270_registers[0]>>4);
-					machine().gfx[1]->mark_dirty(m_HuC6270_registers[0]>>6);
+					m_gfxdecode->gfx(0)->mark_dirty(m_HuC6270_registers[0]>>4);
+					m_gfxdecode->gfx(1)->mark_dirty(m_HuC6270_registers[0]>>6);
 					if (m_HuC6270_registers[0]<0x1000) m_vram_dirty[m_HuC6270_registers[0]]=1;
 				}
 				m_HuC6270_registers[0]+=m_inc_value;
@@ -272,14 +272,14 @@ void battlera_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &clip,int
 		if (fy) { my += 16*(cgy-1); yinc = -16; } /* Swap tile order on Y flips */
 
 		for (i=0; i<cgy; i++) {
-			machine().gfx[1]->transpen(bitmap,clip,
+			m_gfxdecode->gfx(1)->transpen(bitmap,clip,
 				code,
 				colour,
 				fx,fy,
 				mx,my,0);
 
 			if (cgx)
-				machine().gfx[1]->transpen(bitmap,clip,
+				m_gfxdecode->gfx(1)->transpen(bitmap,clip,
 						code2,
 						colour,
 						fx,fy,
@@ -301,9 +301,9 @@ UINT32 battlera_state::screen_update_battlera(screen_device &screen, bitmap_ind1
 	int offs,code,scrollx,scrolly,mx,my;
 
 	/* if any tiles changed, redraw the VRAM */
-	if (machine().gfx[0]->dirtyseq() != m_tile_dirtyseq)
+	if (m_gfxdecode->gfx(0)->dirtyseq() != m_tile_dirtyseq)
 	{
-		m_tile_dirtyseq = machine().gfx[0]->dirtyseq();
+		m_tile_dirtyseq = m_gfxdecode->gfx(0)->dirtyseq();
 		memset(m_vram_dirty, 1, 0x1000);
 	}
 
@@ -318,17 +318,17 @@ UINT32 battlera_state::screen_update_battlera(screen_device &screen, bitmap_ind1
 		/* If this tile was changed OR tilemap was changed, redraw */
 		if (m_vram_dirty[offs/2]) {
 			m_vram_dirty[offs/2]=0;
-			machine().gfx[0]->opaque(*m_tile_bitmap,m_tile_bitmap->cliprect(),
+			m_gfxdecode->gfx(0)->opaque(*m_tile_bitmap,m_tile_bitmap->cliprect(),
 					code,
 					m_HuC6270_vram[offs] >> 4,
 					0,0,
 					8*mx,8*my);
-			machine().gfx[2]->opaque(*m_front_bitmap,m_tile_bitmap->cliprect(),
+			m_gfxdecode->gfx(2)->opaque(*m_front_bitmap,m_tile_bitmap->cliprect(),
 					0,
 					0,  /* fill the spot with pen 256 */
 					0,0,
 					8*mx,8*my);
-			machine().gfx[0]->transmask(*m_front_bitmap,m_tile_bitmap->cliprect(),
+			m_gfxdecode->gfx(0)->transmask(*m_front_bitmap,m_tile_bitmap->cliprect(),
 					code,
 					m_HuC6270_vram[offs] >> 4,
 					0,0,

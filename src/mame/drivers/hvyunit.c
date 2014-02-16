@@ -169,7 +169,7 @@ TILE_GET_INFO_MEMBER(hvyunit_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((attr & 0x0f) << 8);
 	int color = (attr >> 4);
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
 }
 
 void hvyunit_state::video_start()
@@ -664,11 +664,11 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hvyunit_state, screen_update_hvyunit)
 	MCFG_SCREEN_VBLANK_DRIVER(hvyunit_state, screen_eof_hvyunit)
 
-	MCFG_GFXDECODE(hvyunit)
+	MCFG_GFXDECODE_ADD("gfxdecode", hvyunit)
 	MCFG_PALETTE_LENGTH(0x800)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", hvyunit_pandora_config)
-
+	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

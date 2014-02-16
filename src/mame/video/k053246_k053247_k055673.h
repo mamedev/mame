@@ -62,6 +62,9 @@ public:
 
 	~k053247_device() { }
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+
 	void clear_all();
 
 	DECLARE_READ16_MEMBER( k055673_rom_word_r );
@@ -113,7 +116,8 @@ public:
 	k05324x_callback m_callback;
 
 	const char *m_memory_region;
-
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	/* alt implementation - to be collapsed */
 	void alt_k055673_vh_start(running_machine &machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
 			void (*callback)(running_machine &machine, int *code,int *color,int *priority));
@@ -498,6 +502,10 @@ extern const device_type K055673;
 
 #define MCFG_K053246_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
+#define MCFG_K053246_GFXDECODE(_gfxtag) \
+	k053247_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+
 #define MCFG_K055673_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K055673, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
@@ -506,6 +514,9 @@ extern const device_type K055673;
 	MCFG_DEVICE_ADD(_tag, K055673, 0)
 
 #define MCFG_K055673_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
+#define MCFG_K055673_GFXDECODE(_gfxtag) \
+	k055673_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 
 /* old non-device stuff */

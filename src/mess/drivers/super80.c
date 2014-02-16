@@ -652,7 +652,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 
-	MCFG_GFXDECODE(super80)
+	MCFG_GFXDECODE_ADD("gfxdecode", super80)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
 	MCFG_VIDEO_START_OVERRIDE(super80_state,super80)
 
@@ -679,7 +679,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( super80d, super80 )
-	MCFG_GFXDECODE(super80d)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", super80d)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80d)
 MACHINE_CONFIG_END
@@ -687,7 +687,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( super80e, super80 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(super80e_io)
-	MCFG_GFXDECODE(super80e)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", super80e)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80e)
 MACHINE_CONFIG_END
@@ -696,7 +696,7 @@ static MACHINE_CONFIG_DERIVED( super80m, super80 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(super80m_map)
 
-	MCFG_GFXDECODE(super80m)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", super80m)
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT_OVERRIDE(super80_state,super80m)
 
@@ -726,7 +726,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
 
-	MCFG_GFXDECODE(super80v)
+	MCFG_GFXDECODE_ADD("gfxdecode", super80v)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
 	MCFG_VIDEO_START_OVERRIDE(super80_state,super80v)
 

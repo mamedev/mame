@@ -853,7 +853,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_GFXDECODE(portfolio)
+	MCFG_GFXDECODE_ADD("gfxdecode", portfolio)
 
 	MCFG_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
 

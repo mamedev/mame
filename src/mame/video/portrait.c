@@ -49,7 +49,7 @@ inline void portrait_state::get_tile_info( tile_data &tileinfo, int tile_index, 
 	else
 		color = ((tilenum&0xff)>>1)+0x80;
 
-	SET_TILE_INFO_MEMBER( 0, tilenum, color, flags );
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  0, tilenum, color, flags );
 }
 
 TILE_GET_INFO_MEMBER(portrait_state::get_bg_tile_info)
@@ -174,7 +174,7 @@ void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		}
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				tilenum,color,
 				0,fy,
 				sx,sy,7);

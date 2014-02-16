@@ -253,7 +253,7 @@ static MACHINE_CONFIG_START( pirates, pirates_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_GFXDECODE(pirates)
+	MCFG_GFXDECODE_ADD("gfxdecode", pirates)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

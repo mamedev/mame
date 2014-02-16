@@ -400,7 +400,7 @@ static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
 	MCFG_CPU_IO_MAP(drgnmst_sound_io_map)
 
 
-	MCFG_GFXDECODE(drgnmst)
+	MCFG_GFXDECODE_ADD("gfxdecode", drgnmst)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

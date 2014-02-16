@@ -213,7 +213,7 @@ UINT32 mpoker_state::screen_update_mpoker(screen_device &screen, bitmap_ind16 &b
 {
 	int y,x;
 	int count;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	count = 0;
 	for (y=0;y<32;y++)
@@ -601,7 +601,7 @@ static MACHINE_CONFIG_START( mpoker, mpoker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mpoker_state, screen_update_mpoker)
 
-	MCFG_GFXDECODE(mpoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", mpoker)
 	MCFG_PALETTE_LENGTH(0x200)
 
 

@@ -435,7 +435,7 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE(atarig1)
+	MCFG_GFXDECODE_ADD("gfxdecode", atarig1)
 	MCFG_PALETTE_LENGTH(1280)
 
 	/* initialize the playfield */

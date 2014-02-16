@@ -32,13 +32,13 @@ void lsasquad_state::draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect
 			code = m_videoram[base + 2 * y] + ((attr & 0x0f) << 8);
 			color = attr >> 4;
 
-			machine().gfx[0]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flip_screen(),flip_screen(),
 					sx,sy,15);
 			if (sx > 248)   /* wraparound */
-				machine().gfx[0]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						code,
 						color,
 						flip_screen(),flip_screen(),
@@ -119,13 +119,13 @@ int lsasquad_state::draw_layer_daikaiju( bitmap_ind16 &bitmap, const rectangle &
 
 			if ((type == 0 && color != 0x0d) || (type != 0 && color == 0x0d))
 			{
-				machine().gfx[0]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flip_screen(),flip_screen(),
 					sx,sy,15);
 				if (sx > 248)   /* wraparound */
-					machine().gfx[0]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						code,
 						color,
 						flip_screen(),flip_screen(),
@@ -180,13 +180,13 @@ void lsasquad_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,15);
 		/* wraparound */
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

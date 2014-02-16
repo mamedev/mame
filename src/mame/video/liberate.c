@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(liberate_state::get_back_tile_info)
 		bank = 3;
 	else
 		bank = 2;
-	SET_TILE_INFO_MEMBER(bank, tile & 0x7f, m_background_color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, tile & 0x7f, m_background_color, 0);
 }
 
 TILE_GET_INFO_MEMBER(liberate_state::get_fix_tile_info)
@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(liberate_state::get_fix_tile_info)
 	tile = videoram[tile_index] + (colorram[tile_index] << 8);
 	color = (colorram[tile_index] & 0x70) >> 4;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(liberate_state::prosport_get_back_tile_info)
@@ -95,7 +95,7 @@ TILE_GET_INFO_MEMBER(liberate_state::prosport_get_back_tile_info)
 
 	tile += m_io_ram[0]&0x20; //Pro Bowling bg tiles banking bit
 
-	SET_TILE_INFO_MEMBER(8, tile, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 8, tile, 0, 0);
 }
 
 /***************************************************************************/
@@ -332,13 +332,13 @@ void liberate_state::liberate_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 				sy2 = sy + 16;
 		}
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 					color,
 					fx,fy,
 					sx,sy,0);
 		if (multi)
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code+1,
 					color,
 					fx,fy,
@@ -396,13 +396,13 @@ void liberate_state::prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 			sy2 = sy + 16;
 		}
 
-		machine().gfx[gfx_region]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(gfx_region)->transpen(bitmap,cliprect,
 				code,
 				color,
 				fx,fy,
 				sx,sy,0);
 		if (multi)
-			machine().gfx[gfx_region]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(gfx_region)->transpen(bitmap,cliprect,
 				code2,
 				color,
 				fx,fy,
@@ -456,13 +456,13 @@ void liberate_state::boomrang_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 			sy2 = sy + 16;
 		}
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				fx,fy,
 				sx,sy,0);
 		if (multi)
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code2,
 				color,
 				fx,fy,
@@ -486,7 +486,7 @@ void liberate_state::prosoccr_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		fx = spriteram[offs + 0] & 4;
 		fy = spriteram[offs + 0] & 2;
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				0,
 				fx,fy,
@@ -546,7 +546,7 @@ UINT32 liberate_state::screen_update_prosport(screen_device &screen, bitmap_ind1
 		my = (offs) % 32;
 		mx = (offs) / 32;
 
-		machine().gfx[gfx_region]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(gfx_region)->transpen(bitmap,cliprect,
 				tile, 1, 0, 0, 248 - 8 * mx, 8 * my, 0);
 	}
 

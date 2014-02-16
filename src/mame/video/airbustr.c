@@ -95,7 +95,7 @@ TILE_GET_INFO_MEMBER(airbustr_state::get_fg_tile_info)
 	int code = m_videoram2[tile_index] + ((attr & 0x0f) << 8);
 	int color = attr >> 4;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(airbustr_state::get_bg_tile_info)
@@ -104,7 +104,7 @@ TILE_GET_INFO_MEMBER(airbustr_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((attr & 0x0f) << 8);
 	int color = (attr >> 4) + 16;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void airbustr_state::video_start()

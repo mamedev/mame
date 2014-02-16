@@ -417,16 +417,19 @@ static MACHINE_CONFIG_START( sshangha, sshangha_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sshangha_state, screen_update_sshangha)
 
-	MCFG_GFXDECODE(sshangha)
+	MCFG_GFXDECODE_ADD("gfxdecode", sshangha)
 	MCFG_PALETTE_LENGTH(0x4000)
 
 	MCFG_DECO16IC_ADD("tilegen1", sshangha_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO146_ADD("ioprot")
 

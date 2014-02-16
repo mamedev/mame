@@ -323,7 +323,7 @@ static MACHINE_CONFIG_START( matmania, matmania_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(matmania_state, screen_update_matmania)
 
-	MCFG_GFXDECODE(matmania)
+	MCFG_GFXDECODE_ADD("gfxdecode", matmania)
 	MCFG_PALETTE_LENGTH(64+16)
 
 
@@ -404,7 +404,7 @@ static MACHINE_CONFIG_START( maniach, matmania_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(matmania_state, screen_update_maniach)
 
-	MCFG_GFXDECODE(maniach)
+	MCFG_GFXDECODE_ADD("gfxdecode", maniach)
 	MCFG_PALETTE_LENGTH(64+16)
 
 

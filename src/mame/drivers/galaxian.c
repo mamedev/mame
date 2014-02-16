@@ -5168,7 +5168,7 @@ static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
-	MCFG_GFXDECODE(galaxian)
+	MCFG_GFXDECODE_ADD("gfxdecode", galaxian)
 	MCFG_PALETTE_LENGTH(32)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -5253,7 +5253,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pacmanbl, galaxian )
 
 	/* separate tile/sprite ROMs */
-	MCFG_GFXDECODE(pacmanbl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", pacmanbl)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tenspot, galaxian )
@@ -5267,13 +5267,13 @@ static MACHINE_CONFIG_DERIVED( tenspot, galaxian )
 	//MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* separate tile/sprite ROMs */
-	MCFG_GFXDECODE(tenspot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", tenspot)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( zigzag, galaxian_base )
 
 	/* separate tile/sprite ROMs */
-	MCFG_GFXDECODE(pacmanbl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", pacmanbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -5289,7 +5289,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gmgalax, galaxian )
 
 	/* banked video hardware */
-	MCFG_GFXDECODE(gmgalax)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gmgalax)
 	MCFG_PALETTE_LENGTH(64)
 MACHINE_CONFIG_END
 
@@ -6040,12 +6040,12 @@ void galaxian_state::tenspot_set_game_bank(running_machine& machine, int bank, i
 	{
 		for (x=0;x<0x200;x++)
 		{
-			machine.gfx[0]->mark_dirty(x);
+			m_gfxdecode->gfx(0)->mark_dirty(x);
 		}
 
 		for (x=0;x<0x80;x++)
 		{
-			machine.gfx[1]->mark_dirty(x);
+			m_gfxdecode->gfx(1)->mark_dirty(x);
 		}
 	}
 

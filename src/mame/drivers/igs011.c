@@ -3942,7 +3942,7 @@ static MACHINE_CONFIG_START( igs011_base, igs011_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs011_state, screen_update_igs011)
 
 	MCFG_PALETTE_LENGTH(0x800)
-//  MCFG_GFXDECODE(igs011)
+//  MCFG_GFXDECODE_ADD("gfxdecode", igs011)
 
 
 	/* sound hardware */
@@ -4035,7 +4035,7 @@ static MACHINE_CONFIG_DERIVED( lhb2, igs011_base )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
 	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 
-//  MCFG_GFXDECODE(igs011_hi)
+//  MCFG_GFXDECODE_ADD("gfxdecode", igs011_hi)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -4051,7 +4051,7 @@ static MACHINE_CONFIG_DERIVED( nkishusp, igs011_base )
 
 	// VSync 60.0052Hz, HSync 15.620kHz
 
-//  MCFG_GFXDECODE(igs011_hi)
+//  MCFG_GFXDECODE_ADD("gfxdecode", igs011_hi)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -4074,7 +4074,7 @@ static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_DRIVER(igs011_state, screen_eof_vbowl)
-//  MCFG_GFXDECODE(igs011_hi)
+//  MCFG_GFXDECODE_ADD("gfxdecode", igs011_hi)
 
 	MCFG_DEVICE_REMOVE("oki")
 	MCFG_ICS2115_ADD("ics", 0, sound_irq)

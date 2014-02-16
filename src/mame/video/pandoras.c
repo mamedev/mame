@@ -91,7 +91,7 @@ void pandoras_state::palette_init()
 TILE_GET_INFO_MEMBER(pandoras_state::get_tile_info0)
 {
 	UINT8 attr = m_colorram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			m_videoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x0f,
@@ -159,12 +159,12 @@ void pandoras_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int nflipx = sr[offs + 3] & 0x40;
 		int nflipy = sr[offs + 3] & 0x80;
 
-		machine().gfx[0]->transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transmask(bitmap,cliprect,
 			sr[offs + 2],
 			color,
 			!nflipx,!nflipy,
 			sx,sy,
-			colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0));
+			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(0), color, 0));
 	}
 }
 

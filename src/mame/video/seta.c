@@ -367,7 +367,7 @@ inline void seta_state::twineagl_tile_info( tile_data &tileinfo, int tile_index,
 	UINT16 attr =   vram[ tile_index + 0x800 ];
 	if ((code & 0x3e00) == 0x3e00)
 		code = (code & 0xc07f) | ((m_twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);
-	SET_TILE_INFO_MEMBER( 1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
 TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info_0){ twineagl_tile_info(tileinfo, tile_index, 0x0000 ); }
@@ -382,7 +382,7 @@ inline void seta_state::get_tile_info( tile_data &tileinfo, int tile_index, int 
 	UINT16 code =   vram[ tile_index ];
 	UINT16 attr =   vram[ tile_index + 0x800 ];
 
-	if(machine().gfx[gfx + ((vctrl[ 4/2 ] & 0x10) >> m_color_mode_shift)] != NULL)
+	if(m_gfxdecode->gfx(gfx + ((vctrl[ 4/2 ] & 0x10) >> m_color_mode_shift)) != NULL)
 	{
 		gfx += (vctrl[ 4/2 ] & 0x10) >> m_color_mode_shift;
 	}
@@ -391,7 +391,7 @@ inline void seta_state::get_tile_info( tile_data &tileinfo, int tile_index, int 
 		popmessage("Missing Color Mode = 1 for Layer = %d. Contact MAMETesters.",layer);
 	}
 
-	SET_TILE_INFO_MEMBER( gfx, m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  gfx, m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
 TILE_GET_INFO_MEMBER(seta_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0, 0x0000 ); }
@@ -674,8 +674,8 @@ PALETTE_INIT_MEMBER(seta_state,inttoote)
 
 PALETTE_INIT_MEMBER(seta_state,setaroul)
 {
-	machine().gfx[0]->set_granularity(16);
-	machine().gfx[1]->set_granularity(16);
+	m_gfxdecode->gfx(0)->set_granularity(16);
+	m_gfxdecode->gfx(1)->set_granularity(16);
 
 	PALETTE_INIT_CALL_MEMBER(inttoote);
 }
@@ -767,7 +767,7 @@ void seta_state::usclssic_set_pens()
 void seta_state::draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen)
 {
 	int y;
-	gfx_element *gfx_tilemap = machine().gfx[gfxnum];
+	gfx_element *gfx_tilemap = m_gfxdecode->gfx(gfxnum);
 	const bitmap_ind16 &src_bitmap = tilemap->pixmap();
 	int width_mask, height_mask;
 	int opaque_mask = gfx_tilemap->granularity() - 1;

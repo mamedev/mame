@@ -200,7 +200,7 @@ TILE_GET_INFO_MEMBER(pkscram_state::get_bg_tile_info)
 	int tile  = m_pkscramble_bgtilemap_ram[tile_index*2];
 	int color = m_pkscramble_bgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(pkscram_state::get_md_tile_info)
@@ -208,7 +208,7 @@ TILE_GET_INFO_MEMBER(pkscram_state::get_md_tile_info)
 	int tile  = m_pkscramble_mdtilemap_ram[tile_index*2];
 	int color = m_pkscramble_mdtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(pkscram_state::get_fg_tile_info)
@@ -216,7 +216,7 @@ TILE_GET_INFO_MEMBER(pkscram_state::get_fg_tile_info)
 	int tile  = m_pkscramble_fgtilemap_ram[tile_index*2];
 	int color = m_pkscramble_fgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tile,color,0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pkscram_state::scanline_callback)
@@ -318,7 +318,7 @@ static MACHINE_CONFIG_START( pkscramble, pkscram_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pkscram_state, screen_update_pkscramble)
 
 	MCFG_PALETTE_LENGTH(0x800)
-	MCFG_GFXDECODE(pkscram)
+	MCFG_GFXDECODE_ADD("gfxdecode", pkscram)
 
 
 	/* sound hardware */

@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(sonson_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + 256 * (attr & 0x03);
 	int color = attr >> 2;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void sonson_state::video_start()
@@ -158,14 +158,14 @@ void sonson_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		}
 
 		
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
 
 		/* wrap-around */
-		 machine().gfx[1]->transpen(bitmap,cliprect, code, color, flipx, flipy, sx - 256, sy, 0);
-		 machine().gfx[1]->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy - 256, 0);
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx - 256, sy, 0);
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy - 256, 0);
 	}
 }
 

@@ -355,13 +355,14 @@ static MACHINE_CONFIG_START( crospang, crospang_state )
 	MCFG_SCREEN_UPDATE_DRIVER(crospang_state, screen_update_crospang)
 
 	MCFG_PALETTE_LENGTH(0x300)
-	MCFG_GFXDECODE(crospang)
+	MCFG_GFXDECODE_ADD("gfxdecode", crospang)
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 0);
 	decospr_device::set_is_bootleg(*device, true);
 	decospr_device::set_offsets(*device, 5,7);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 
 	/* sound hardware */

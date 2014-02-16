@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)
 	}
 #endif
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_videoram[tile_index * 2] + ((m_videoram[tile_index * 2 + 1] & 0xc0) << 2) + 0x400 * m_char_bank,
 			pal, 0
@@ -173,7 +173,7 @@ void nycaptor_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipx = BIT(m_spriteram[offs + 1], 6);
 			flipy = BIT(m_spriteram[offs + 1], 7);
 
-			 machine().gfx[1]->transpen(bitmap,cliprect,
+			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 					pal,
 					flipx,flipy,
@@ -182,7 +182,7 @@ void nycaptor_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			if (m_spriteram[offs + 3] > 240)
 			{
 				sx = (m_spriteram[offs + 3] - 256);
-				 machine().gfx[1]->transpen(bitmap,cliprect,
+				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 					pal,
 					flipx,flipy,

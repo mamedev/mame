@@ -174,7 +174,7 @@ READ8_MEMBER( paso1600_state::paso1600_pcg_r )
 WRITE8_MEMBER( paso1600_state::paso1600_pcg_w )
 {
 	m_p_pcg[offset] = data;
-	machine().gfx[0]->mark_dirty(offset >> 3);
+	m_gfxdecode->gfx(0)->mark_dirty(offset >> 3);
 }
 
 WRITE8_MEMBER( paso1600_state::paso1600_6845_address_w )
@@ -348,7 +348,7 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(paso1600_state, screen_update_paso1600)
-	MCFG_GFXDECODE(paso1600)
+	MCFG_GFXDECODE_ADD("gfxdecode", paso1600)
 	MCFG_PALETTE_LENGTH(8)
 //  MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 

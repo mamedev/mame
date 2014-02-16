@@ -591,7 +591,7 @@ static MACHINE_CONFIG_START( famibox, famibox_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(famibox_state, screen_update_famibox)
 
-	MCFG_GFXDECODE(famibox)
+	MCFG_GFXDECODE_ADD("gfxdecode", famibox)
 	MCFG_PALETTE_LENGTH(8*4*16)
 
 

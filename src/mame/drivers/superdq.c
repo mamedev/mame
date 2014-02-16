@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(superdq_state::get_tile_info)
 {
 	int tile = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, tile, m_color_bank, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, m_color_bank, 0);
 }
 
 void superdq_state::video_start()
@@ -333,7 +333,7 @@ static MACHINE_CONFIG_START( superdq, superdq_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE(superdq)
+	MCFG_GFXDECODE_ADD("gfxdecode", superdq)
 	MCFG_PALETTE_LENGTH(32)
 
 

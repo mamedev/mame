@@ -193,7 +193,7 @@ WRITE8_MEMBER( pv1000_state::pv1000_gfxram_w )
 	UINT8 *gfxram = memregion( "gfxram" )->base();
 
 	gfxram[ offset ] = data;
-	machine().gfx[1]->mark_dirty(offset/32);
+	m_gfxdecode->gfx(1)->mark_dirty(offset/32);
 }
 
 
@@ -352,12 +352,12 @@ UINT32 pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &b
 			if ( tile < 0xe0 || m_force_pattern )
 			{
 				tile += ( m_pcg_bank << 8);
-				 machine().gfx[0]->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
+				 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
 			}
 			else
 			{
 				tile -= 0xe0;
-				 machine().gfx[1]->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
+				 m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
 			}
 		}
 	}
@@ -462,7 +462,7 @@ static MACHINE_CONFIG_START( pv1000, pv1000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pv1000_state, screen_update_pv1000)
 
 	MCFG_PALETTE_LENGTH( 8 )
-	MCFG_GFXDECODE( pv1000 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  pv1000 )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD( "pv1000_sound", PV1000, 17897725 )

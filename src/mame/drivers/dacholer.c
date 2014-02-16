@@ -100,12 +100,12 @@ public:
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1, m_bgvideoram[tile_index] + m_bg_bank * 0x100, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, m_bgvideoram[tile_index] + m_bg_bank * 0x100, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_fg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_fgvideoram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_fgvideoram[tile_index], 0, 0);
 }
 
 void dacholer_state::video_start()
@@ -149,7 +149,7 @@ void dacholer_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		 machine().gfx[2]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				0,
 				flipx,flipy,
@@ -669,7 +669,7 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dacholer_state, screen_update_dacholer)
 
 	MCFG_PALETTE_LENGTH(32)
-	MCFG_GFXDECODE(dacholer)
+	MCFG_GFXDECODE_ADD("gfxdecode", dacholer)
 
 
 	/* sound hardware */
@@ -698,7 +698,7 @@ static MACHINE_CONFIG_DERIVED( itaten, dacholer )
 	MCFG_CPU_IO_MAP(itaten_snd_io_map)
 	MCFG_CPU_VBLANK_INT_REMOVE()
 
-	MCFG_GFXDECODE(itaten)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", itaten)
 
 	MCFG_DEVICE_REMOVE("msm")
 MACHINE_CONFIG_END

@@ -13,10 +13,21 @@
 const device_type ST0020_SPRITES = &device_creator<st0020_device>;
 
 st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ST0020_SPRITES, "st0020_device", tag, owner, clock, "st0020", __FILE__)
+	: device_t(mconfig, ST0020_SPRITES, "st0020_device", tag, owner, clock, "st0020", __FILE__),
+		m_gfxdecode(*this)
 {
 	m_is_st0032 = 0;
 	m_is_jclub2 = 0;
+}
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void st0020_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<st0020_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 void st0020_device::set_is_st0032(device_t &device, int is_st0032)
@@ -53,12 +64,12 @@ void st0020_device::device_start()
 	m_st0020_blitram = auto_alloc_array_clear(machine(), UINT16, 0x100 / 2);
 
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (machine().gfx[m_gfx_index] == 0)
+		if (m_gfxdecode->gfx(m_gfx_index) == 0)
 			break;
 
-	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), layout_16x8x8_2, (UINT8 *)m_st0020_gfxram, machine().total_colors() / 64, 0));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), layout_16x8x8_2, (UINT8 *)m_st0020_gfxram, machine().total_colors() / 64, 0)));
 
-	machine().gfx[m_gfx_index]->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
+	m_gfxdecode->gfx(m_gfx_index)->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
 	save_pointer(NAME(m_st0020_gfxram), 4 * 0x100000/2);
 	save_pointer(NAME(m_st0020_spriteram), 0x80000/2);
@@ -89,7 +100,7 @@ WRITE16_MEMBER(st0020_device::st0020_gfxram_w)
 
 	offset += m_st0020_gfxram_bank * 0x100000/2;
 	COMBINE_DATA(&m_st0020_gfxram[offset]);
-	machine().gfx[m_gfx_index]->mark_dirty(offset / (16*8/2));
+	m_gfxdecode->gfx(m_gfx_index)->mark_dirty(offset / (16*8/2));
 }
 
 READ16_MEMBER(st0020_device::st0020_sprram_r)
@@ -178,7 +189,7 @@ WRITE16_MEMBER(st0020_device::st0020_blit_w)
 				dst /= 16*8;
 				while (len--)
 				{
-					machine().gfx[m_gfx_index]->mark_dirty(dst);
+					m_gfxdecode->gfx(m_gfx_index)->mark_dirty(dst);
 					dst++;
 				}
 			}
@@ -371,7 +382,7 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 			{
 				for (y = ystart; y != yend; y += yinc)
 				{
-					 machine.gfx[m_gfx_index]->zoom_transpen(bitmap,cliprect,
+					 m_gfxdecode->gfx(m_gfx_index)->zoom_transpen(bitmap,cliprect,
 									code++,
 									color,
 									flipx, flipy,

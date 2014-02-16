@@ -177,7 +177,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx0_tile_info)
 	tileno = m_ms32_tx0_ram[tile_index *2+0] & 0x0000ffff;
 	colour = m_ms32_tx0_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO_MEMBER(3,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx1_tile_info)
@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx1_tile_info)
 	tileno = m_ms32_tx1_ram[tile_index *2+0] & 0x0000ffff;
 	colour = m_ms32_tx1_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO_MEMBER(7,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 7,tileno,colour,0);
 }
 
 WRITE32_MEMBER(bnstars_state::ms32_tx0_ram_w)
@@ -211,7 +211,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg0_tile_info)
 	tileno = m_ms32_bg0_ram[tile_index *2+0] & 0x0000ffff;
 	colour = m_ms32_bg0_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO_MEMBER(2,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg1_tile_info)
@@ -221,7 +221,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg1_tile_info)
 	tileno = m_ms32_bg1_ram[tile_index *2+0] & 0x0000ffff;
 	colour = m_ms32_bg1_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO_MEMBER(6,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 6,tileno,colour,0);
 }
 
 WRITE32_MEMBER(bnstars_state::ms32_bg0_ram_w)
@@ -330,7 +330,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz0_tile_info)
 	tileno = m_ms32_roz0_ram[tile_index *2+0] & 0x0000ffff;
 	colour = m_ms32_roz0_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz1_tile_info)
@@ -340,7 +340,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz1_tile_info)
 	tileno = m_ms32_roz1_ram[tile_index *2+0] & 0x0000ffff;
 	colour = m_ms32_roz1_ram[tile_index *2+1] & 0x0000000f;
 
-	SET_TILE_INFO_MEMBER(5,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 5,tileno,colour,0);
 }
 
 WRITE32_MEMBER(bnstars_state::ms32_roz0_ram_w)
@@ -423,7 +423,7 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize, xzoom, yzoom;
 	int code, attr, color, size, pri, pri_mask;
-	gfx_element *gfx = machine().gfx[region];
+	gfx_element *gfx = m_gfxdecode->gfx(region);
 
 	UINT32      *source = sprram_top;
 	const UINT32    *finish = sprram_top + (sprram_size - 0x10) / 4;
@@ -1387,7 +1387,7 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 
-	MCFG_GFXDECODE(bnstars)
+	MCFG_GFXDECODE_ADD("gfxdecode", bnstars)
 	MCFG_PALETTE_LENGTH(0x8000*2)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)

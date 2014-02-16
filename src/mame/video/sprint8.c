@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info1)
 
 	}
 
-	SET_TILE_INFO_MEMBER(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 
@@ -99,7 +99,7 @@ TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info2)
 	else
 		color = 17;
 
-	SET_TILE_INFO_MEMBER(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 
@@ -138,7 +138,7 @@ void sprint8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (code & 0x80)
 			x |= 0x100;
 
-		 machine().gfx[2]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			code ^ 7,
 			i,
 			!(code & 0x10), !(code & 0x08),

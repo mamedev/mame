@@ -222,7 +222,7 @@ static MACHINE_CONFIG_START( shisen, shisen_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(shisen_state, screen_update_sichuan2)
 
-	MCFG_GFXDECODE(shisen)
+	MCFG_GFXDECODE_ADD("gfxdecode", shisen)
 	MCFG_PALETTE_LENGTH(256)
 
 

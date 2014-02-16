@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(amspdwy_state::get_tile_info)
 {
 	UINT8 code = m_videoram[tile_index];
 	UINT8 color = m_colorram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code + ((color & 0x18)<<5),
 			color & 0x07,
@@ -122,7 +122,7 @@ void amspdwy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 //              code + ((attr & 0x18)<<5),
 				code + ((attr & 0x08)<<5),
 				attr,

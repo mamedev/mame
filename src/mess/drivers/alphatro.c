@@ -461,7 +461,7 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_GFXDECODE(alphatro)
+	MCFG_GFXDECODE_ADD("gfxdecode", alphatro)
 	MCFG_PALETTE_LENGTH(9) // 8 colours + amber
 
 	/* sound hardware */

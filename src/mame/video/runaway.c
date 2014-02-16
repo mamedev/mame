@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(runaway_state::runaway_get_tile_info)
 {
 	UINT8 code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, ((code & 0x3f) << 1) | ((code & 0x40) >> 6) | (m_tile_bank << 7), 0, (code & 0x80) ? TILE_FLIPY : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, ((code & 0x3f) << 1) | ((code & 0x40) >> 6) | (m_tile_bank << 7), 0, (code & 0x80) ? TILE_FLIPY : 0);
 }
 
 
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(runaway_state::qwak_get_tile_info)
 {
 	UINT8 code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), 0, 0);
 }
 
 
@@ -101,13 +101,13 @@ UINT32 runaway_state::screen_update_runaway(screen_device &screen, bitmap_ind16 
 
 		code |= (m_sprite_ram[i + 0x30] << 2) & 0x1c0;
 
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			code,
 			0,
 			flipx, flipy,
 			x, 240 - y, 0);
 
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			code,
 			0,
 			flipx, flipy,
@@ -135,13 +135,13 @@ UINT32 runaway_state::screen_update_qwak(screen_device &screen, bitmap_ind16 &bi
 
 		code |= (m_sprite_ram[i + 0x30] << 2) & 0x1c0;
 
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			code,
 			0,
 			flipx, flipy,
 			x, 240 - y, 0);
 
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			code,
 			0,
 			flipx, flipy,

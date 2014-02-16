@@ -199,11 +199,11 @@ static void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rect
 
 		if (state->m_spriteregs[0] & 0x00800000) //bpp switch
 		{
-			gfx= screen.machine().gfx[4];
+			gfx= state->m_gfxdecode->gfx(4);
 		}
 		else
 		{
-			gfx= screen.machine().gfx[5];
+			gfx= state->m_gfxdecode->gfx(5);
 			tileno>>=1;
 			pal&=0xf;
 		}
@@ -230,7 +230,7 @@ static void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rect
 		}
 
 #if 0
-		if (((source[2] & 0xffff0000) >> 16) == 0x0001)
+		if (((source[2) & 0xffff0000) >> 16) == 0x0001)
 		{
 			popmessage("T %.8x %.8x %.8x %.8x %.8x", source[0], source[1], source[2], source[3], source[4]);
 			//popmessage("T %.8x %.8x %.8x %.8x %.8x", source[0], source[1], source[2], source[3], source[4]);
@@ -264,11 +264,11 @@ static void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rect
 
 					if (state->m_spriteregs[0] & 0x00800000) //bpp switch
 					{
-						gfx= screen.machine().gfx[4];
+						gfx= state->m_gfxdecode->gfx(4);
 					}
 					else
 					{
-						gfx= screen.machine().gfx[5];
+						gfx= state->m_gfxdecode->gfx(5);
 						tileno>>=1;
 						pal&=0xf;
 					}
@@ -445,22 +445,22 @@ static void transition_control(running_machine &machine, bitmap_rgb32 &bitmap, c
 	{                                                                          \
 		if (tilemapinfo&0x400)                                                 \
 		{                                                                      \
-			SET_TILE_INFO_MEMBER(1,tileno>>1,pal>>4,TILE_FLIPYX(flip));               \
+			SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tileno>>1,pal>>4,TILE_FLIPYX(flip));               \
 		}                                                                      \
 		else                                                                   \
 		{                                                                      \
-			SET_TILE_INFO_MEMBER(0,tileno, pal,TILE_FLIPYX(flip));                    \
+			SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno, pal,TILE_FLIPYX(flip));                    \
 		}                                                                      \
 	}                                                                          \
 	else                                                                       \
 	{                                                                          \
 		if (tilemapinfo&0x400)                                                 \
 		{                                                                      \
-			SET_TILE_INFO_MEMBER(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));               \
+			SET_TILE_INFO_MEMBER(m_gfxdecode, 3,tileno>>3,pal>>4,TILE_FLIPYX(flip));               \
 		}                                                                      \
 		else                                                                   \
 		{                                                                      \
-			SET_TILE_INFO_MEMBER(2,tileno>>2, pal,TILE_FLIPYX(flip));                 \
+			SET_TILE_INFO_MEMBER(m_gfxdecode, 2,tileno>>2, pal,TILE_FLIPYX(flip));                 \
 		}                                                                      \
 	}                                                                          \
 }

@@ -275,7 +275,7 @@ TILEMAP_MAPPER_MEMBER(jalmah_state::range3_8x8)
 TILE_GET_INFO_MEMBER(jalmah_state::get_sc0_tile_info)
 {
 	int code = m_sc0_vram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			(code & 0xfff) + ((m_sc0bank & 3) << 12),
 			code >> 12,
@@ -285,7 +285,7 @@ TILE_GET_INFO_MEMBER(jalmah_state::get_sc0_tile_info)
 TILE_GET_INFO_MEMBER(jalmah_state::get_sc1_tile_info)
 {
 	int code = m_sc1_vram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code & 0xfff,
 			code >> 12,
@@ -295,7 +295,7 @@ TILE_GET_INFO_MEMBER(jalmah_state::get_sc1_tile_info)
 TILE_GET_INFO_MEMBER(jalmah_state::get_sc2_tile_info)
 {
 	int code = m_sc2_vram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code & 0xfff,
 			code >> 12,
@@ -305,7 +305,7 @@ TILE_GET_INFO_MEMBER(jalmah_state::get_sc2_tile_info)
 TILE_GET_INFO_MEMBER(jalmah_state::get_sc3_tile_info)
 {
 	int code = m_sc3_vram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code & 0xfff,
 			code >> 12,
@@ -1414,7 +1414,7 @@ static MACHINE_CONFIG_START( jalmah, jalmah_state )
 
 	//M50747 MCU
 
-	MCFG_GFXDECODE(jalmah)
+	MCFG_GFXDECODE_ADD("gfxdecode", jalmah)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1438,7 +1438,7 @@ static MACHINE_CONFIG_DERIVED( urashima, jalmah )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(urashima)
 
-	MCFG_GFXDECODE(urashima)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", urashima)
 
 	MCFG_VIDEO_START_OVERRIDE(jalmah_state,urashima)
 	MCFG_SCREEN_MODIFY("screen")

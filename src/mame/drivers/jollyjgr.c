@@ -448,7 +448,7 @@ TILE_GET_INFO_MEMBER(jollyjgr_state::get_bg_tile_info)
 {
 	int color = m_colorram[((tile_index & 0x1f) << 1) | 1] & 7;
 	int region = (m_tilemap_bank & 0x20) ? 2 : 0;
-	SET_TILE_INFO_MEMBER(region, m_videoram[tile_index], color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, region, m_videoram[tile_index], color, 0);
 }
 
 void jollyjgr_state::video_start()
@@ -541,7 +541,7 @@ UINT32 jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_ind1
 		if (offs < 3 * 4)
 			sy++;
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,color,
 				flipx,flipy,
 				sx,sy,0);
@@ -662,7 +662,7 @@ static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jollyjgr_state, screen_update_jollyjgr)
 
-	MCFG_GFXDECODE(jollyjgr)
+	MCFG_GFXDECODE_ADD("gfxdecode", jollyjgr)
 	MCFG_PALETTE_LENGTH(32+8) /* 32 for tilemap and sprites + 8 for the bitmap */
 
 

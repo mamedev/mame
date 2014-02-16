@@ -9,7 +9,7 @@ TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_fgtile_info)
 	tileno = (m_fgvideoram[tile_index *2] & 0x00ff) | ((m_fgvideoram[tile_index *2+1] & 0x000f) << 8);
 	colour = (m_fgvideoram[tile_index *2+1] & 0x00f0) >>4;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour*4,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,colour*4,0);
 }
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_fgvideoram_w)
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_bg0tile_info)
 	if (colour & 0x10) colour ^= 0x30;  /* skip hole */
 	fyx = (m_bg0videoram[tile_index *2] & 0x00c0) >>6;
 
-	SET_TILE_INFO_MEMBER(2,tileno,colour,TILE_FLIPYX(fyx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,tileno,colour,TILE_FLIPYX(fyx));
 }
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_bg0videoram_w)
@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_bg1tile_info)
 	tileno = (m_bg1videoram[tile_index] & 0x0fff);
 	colour = (m_bg1videoram[tile_index] & 0xf000) >> 12;
 
-	SET_TILE_INFO_MEMBER(2,tileno,colour+64,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,tileno,colour+64,0);
 }
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_bg1videoram_w)
@@ -108,7 +108,7 @@ void shadfrce_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	   P = priority
 	*/
 
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	UINT16 *finish = m_spvideoram_old;
 	UINT16 *source = finish + 0x2000/2 - 8;
 	int hcount;

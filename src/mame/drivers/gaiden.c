@@ -770,7 +770,7 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_gaiden)
 
-	MCFG_GFXDECODE(gaiden)
+	MCFG_GFXDECODE_ADD("gfxdecode", gaiden)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,gaiden)
@@ -802,7 +802,7 @@ static MACHINE_CONFIG_DERIVED( raiga, shadoww )
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_raiga)
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,raiga)
-	MCFG_GFXDECODE(raiga)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", raiga)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
@@ -827,7 +827,7 @@ static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_drgnbowl)
 
-	MCFG_GFXDECODE(drgnbowl)
+	MCFG_GFXDECODE_ADD("gfxdecode", drgnbowl)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
@@ -943,7 +943,7 @@ static MACHINE_CONFIG_START( mastninj, gaiden_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_gaiden)
 
-	MCFG_GFXDECODE(mastninj)
+	MCFG_GFXDECODE_ADD("gfxdecode", mastninj)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,mastninj)

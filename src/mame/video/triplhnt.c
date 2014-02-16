@@ -12,7 +12,7 @@ TILE_GET_INFO_MEMBER(triplhnt_state::get_tile_info)
 {
 	int code = m_playfield_ram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(2, code, code == 0x3f ? 1 : 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, code == 0x3f ? 1 : 0, 0);
 }
 
 
@@ -72,7 +72,7 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		/* render sprite to auxiliary bitmap */
 
-		 machine().gfx[m_sprite_zoom]->opaque(m_helper,cliprect,
+		 m_gfxdecode->gfx(m_sprite_zoom)->opaque(m_helper,cliprect,
 			2 * code + m_sprite_bank, 0, code & 8, 0,
 			rect.min_x, rect.min_y);
 

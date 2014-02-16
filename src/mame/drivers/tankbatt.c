@@ -293,7 +293,7 @@ static MACHINE_CONFIG_START( tankbatt, tankbatt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tankbatt_state, screen_update_tankbatt)
 
-	MCFG_GFXDECODE(tankbatt)
+	MCFG_GFXDECODE_ADD("gfxdecode", tankbatt)
 	MCFG_PALETTE_LENGTH(256*2)
 
 

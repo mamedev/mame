@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(pbaction_state::get_bg_tile_info)
 	int color = attr & 0x07;
 	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(pbaction_state::get_fg_tile_info)
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(pbaction_state::get_fg_tile_info)
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 void pbaction_state::video_start()
@@ -115,7 +115,7 @@ void pbaction_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		machine().gfx[(spriteram[offs] & 0x80) ? 3 : 2]->transpen(bitmap,cliprect, /* normal or double size */
+		m_gfxdecode->gfx((spriteram[offs] & 0x80) ? 3 : 2)->transpen(bitmap,cliprect, /* normal or double size */
 				spriteram[offs],
 				spriteram[offs + 1] & 0x0f,
 				flipx,flipy,

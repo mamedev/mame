@@ -23,6 +23,9 @@
 	MCFG_VIDEO_SET_SCREEN(_screen) \
 	atari_motion_objects_device::static_set_config(*device, _config);
 
+#define MCFG_ATARI_MOTION_OBJECTS_GFXDECODE(_gfxtag) \
+	atari_motion_objects_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -82,7 +85,8 @@ public:
 	// construction/destruction
 	atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// static configuration helpers
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_config(device_t &device, const atari_motion_objects_config &config);
 
 	// getters
@@ -217,6 +221,7 @@ private:
 
 	UINT32                  m_last_xpos;          // (during processing) the previous X position
 	UINT32                  m_next_xpos;          // (during processing) the next X position
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

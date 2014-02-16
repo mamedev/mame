@@ -1111,7 +1111,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::get_bg_tile_info)
 	int bank = (attr & 0x02) >> 1;  /* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2; /* bits 2-3-4-5 for color */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(goldnpkr_state::wcrdxtnd_get_bg_tile_info)
@@ -1129,7 +1129,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::wcrdxtnd_get_bg_tile_info)
 	int bank = (attr & 0x03) + ((attr & 0xc0) >> 4);    /* bits 0, 1, 6 & 7 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2; /* bits 2-3-4-5 for color */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
 }
 
 void goldnpkr_state::video_start()
@@ -3714,7 +3714,7 @@ static MACHINE_CONFIG_START( goldnpkr_base, goldnpkr_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK, mc6845_intf) /* 68B45 or 6845s @ CPU clock */
 
-	MCFG_GFXDECODE(goldnpkr)
+	MCFG_GFXDECODE_ADD("gfxdecode", goldnpkr)
 	MCFG_PALETTE_LENGTH(256)
 MACHINE_CONFIG_END
 
@@ -3802,7 +3802,7 @@ static MACHINE_CONFIG_DERIVED( wildcard, goldnpkr_base )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* video hardware */
-//  MCFG_GFXDECODE(wildcard)
+//  MCFG_GFXDECODE_MODIFY("gfxdecode", wildcard)
 	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
@@ -3825,7 +3825,7 @@ static MACHINE_CONFIG_DERIVED( wcrdxtnd, goldnpkr_base )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* video hardware */
-	MCFG_GFXDECODE(wcrdxtnd)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", wcrdxtnd)
 	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,wcrdxtnd)
 	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wcrdxtnd)
 
@@ -3854,7 +3854,7 @@ static MACHINE_CONFIG_DERIVED( wildcrdb, goldnpkr_base )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, wcfalcon_snd_w))
 
 	/* video hardware */
-//  MCFG_GFXDECODE(wildcard)
+//  MCFG_GFXDECODE_MODIFY("gfxdecode", wildcard)
 	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 

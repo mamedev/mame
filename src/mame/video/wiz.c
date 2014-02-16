@@ -124,7 +124,7 @@ void wiz_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		if (m_flipx) sx = 31 - sx;
 
 
-		machine().gfx[bank]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect,
 			videoram[offs],
 			col + 8 * m_palette_bank,
 			m_flipx,m_flipy,
@@ -162,7 +162,7 @@ void wiz_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		if (m_flipx) sx = 31 - sx;
 
 
-		machine().gfx[m_char_bank[1]]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_char_bank[1])->transpen(bitmap,cliprect,
 			m_videoram2[offs],
 			col + 8 * m_palette_bank,
 			m_flipx,m_flipy,
@@ -187,7 +187,7 @@ void wiz_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, UIN
 		if ( m_flipx) sx = 240 - sx;
 		if (!m_flipy) sy = 240 - sy;
 
-		machine().gfx[bank]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect,
 				sprite_ram[offs + 1],
 				(sprite_ram[offs + 2] & 0x07) + 8 * m_palette_bank,
 				m_flipx,m_flipy,

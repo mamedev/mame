@@ -176,7 +176,7 @@ UINT32 ti99_2_state::screen_update_ti99_2(screen_device &screen, bitmap_ind16 &b
 	for (i = 0; i < 768; i++)
 	{
 		/* Is the char code masked or not ??? */
-		 machine().gfx[0]->opaque(bitmap,cliprect, videoram[i] & 0x7F, 0,
+		 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, videoram[i] & 0x7F, 0,
 			0, 0, sx, sy);
 
 		sx += 8;
@@ -395,7 +395,7 @@ static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ti99_2_state, screen_update_ti99_2)
 
-	MCFG_GFXDECODE(ti99_2)
+	MCFG_GFXDECODE_ADD("gfxdecode", ti99_2)
 	MCFG_PALETTE_LENGTH(2)
 MACHINE_CONFIG_END
 

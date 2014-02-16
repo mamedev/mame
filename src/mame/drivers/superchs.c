@@ -345,11 +345,12 @@ static MACHINE_CONFIG_START( superchs, superchs_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(superchs_state, screen_update_superchs)
 
-	MCFG_GFXDECODE(superchs)
+	MCFG_GFXDECODE_ADD("gfxdecode", superchs)
 	MCFG_PALETTE_LENGTH(8192)
 
 
 	MCFG_TC0480SCP_ADD("tc0480scp", superchs_tc0480scp_intf)
+	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_en_sound)

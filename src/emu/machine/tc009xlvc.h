@@ -17,6 +17,9 @@ class tc0091lvc_device : public device_t,
 public:
 	tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	
 	DECLARE_READ8_MEMBER( vregs_r );
 	DECLARE_WRITE8_MEMBER( vregs_w );
 
@@ -76,8 +79,13 @@ protected:
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 	address_space_config        m_space_config;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 extern const device_type TC0091LVC;
+
+#define MCFG_TC0091LVC_GFXDECODE(_gfxtag) \
+	tc0091lvc_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
 
 #endif

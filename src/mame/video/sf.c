@@ -13,7 +13,7 @@ TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			color,
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(sf_state::get_fg_tile_info)
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			color,
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(sf_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(sf_state::get_tx_tile_info)
 {
 	int code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			code & 0x3ff,
 			code>>12,
@@ -164,25 +164,25 @@ void sf_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 				t = c2; c2 = c4; c4 = t;
 			}
 
-			 machine().gfx[2]->transpen(bitmap,
+			 m_gfxdecode->gfx(2)->transpen(bitmap,
 					cliprect,
 					sf_invert(c1),
 					color,
 					flipx,flipy,
 					sx,sy, 15);
-			 machine().gfx[2]->transpen(bitmap,
+			 m_gfxdecode->gfx(2)->transpen(bitmap,
 					cliprect,
 					sf_invert(c2),
 					color,
 					flipx,flipy,
 					sx+16,sy, 15);
-			 machine().gfx[2]->transpen(bitmap,
+			 m_gfxdecode->gfx(2)->transpen(bitmap,
 					cliprect,
 					sf_invert(c3),
 					color,
 					flipx,flipy,
 					sx,sy+16, 15);
-			 machine().gfx[2]->transpen(bitmap,
+			 m_gfxdecode->gfx(2)->transpen(bitmap,
 					cliprect,
 					sf_invert(c4),
 					color,
@@ -199,7 +199,7 @@ void sf_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 				flipy = !flipy;
 			}
 
-			 machine().gfx[2]->transpen(bitmap,
+			 m_gfxdecode->gfx(2)->transpen(bitmap,
 					cliprect,
 					sf_invert(c),
 					color,

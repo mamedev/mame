@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(wrally_state::get_tile_info_wrally_screen0)
 
 	tileinfo.category = (data2 >> 5) & 0x01;
 
-	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPYX((data2 >> 6) & 0x03));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, data2 & 0x1f, TILE_FLIPYX((data2 >> 6) & 0x03));
 }
 
 TILE_GET_INFO_MEMBER(wrally_state::get_tile_info_wrally_screen1)
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(wrally_state::get_tile_info_wrally_screen1)
 
 	tileinfo.category = (data2 >> 5) & 0x01;
 
-	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPYX((data2 >> 6) & 0x03));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, data2 & 0x1f, TILE_FLIPYX((data2 >> 6) & 0x03));
 }
 
 /***************************************************************************
@@ -104,7 +104,7 @@ void wrally_state::video_start()
 void wrally_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	int i, px, py;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	for (i = 6/2; i < (0x1000 - 6)/2; i += 4) {
 		int sx = m_spriteram[i+2] & 0x03ff;

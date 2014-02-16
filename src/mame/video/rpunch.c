@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(rpunch_state::get_bg0_tile_info)
 	if (m_videoflags & 0x0400)  code = (data & 0x0fff) | 0x2000;
 	else                        code = (data & 0x1fff);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			((m_videoflags & 0x0010) >> 1) | ((data >> 13) & 7),
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(rpunch_state::get_bg1_tile_info)
 	if (m_videoflags & 0x0800)  code = (data & 0x0fff) | 0x2000;
 	else                        code = (data & 0x1fff);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			((m_videoflags & 0x0020) >> 2) | ((data >> 13) & 7),
@@ -218,7 +218,7 @@ void rpunch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		if (x >= BITMAP_WIDTH) x -= 512;
 		if (y >= BITMAP_HEIGHT) y -= 512;
 
-		 machine().gfx[2]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code, color + (m_sprite_palette / 16), xflip, yflip, x, y, 15);
 	}
 }

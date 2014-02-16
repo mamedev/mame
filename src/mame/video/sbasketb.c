@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(sbasketb_state::get_bg_tile_info)
 	int color = m_colorram[tile_index] & 0x0f;
 	int flags = ((m_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((m_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 void sbasketb_state::video_start()
@@ -158,7 +158,7 @@ void sbasketb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			}
 
 			
-				machine().gfx[1]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code, color,
 				flipx, flipy,
 				sx, sy, 0);

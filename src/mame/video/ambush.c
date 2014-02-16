@@ -78,7 +78,7 @@ void ambush_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, 
 			scroll = ~scroll - 1;
 		}
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 			code,
 			(col & 0x0f) | ((*m_colorbank & 0x03) << 4),
 			flip_screen(), flip_screen(),
@@ -145,7 +145,7 @@ UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &b
 			flipy = !flipy;
 		}
 
-		machine().gfx[gfx]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(gfx)->transpen(bitmap,cliprect,
 				code, col | ((*m_colorbank & 0x03) << 4),
 				flipx, flipy,
 				sx,sy,0);

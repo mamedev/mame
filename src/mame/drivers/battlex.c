@@ -258,7 +258,7 @@ static MACHINE_CONFIG_START( battlex, battlex_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(battlex_state, screen_update_battlex)
 
-	MCFG_GFXDECODE(battlex)
+	MCFG_GFXDECODE_ADD("gfxdecode", battlex)
 	MCFG_PALETTE_LENGTH(64)
 
 	/* sound hardware */

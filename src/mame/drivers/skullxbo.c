@@ -235,12 +235,13 @@ static MACHINE_CONFIG_START( skullxbo, skullxbo_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE(skullxbo)
+	MCFG_GFXDECODE_ADD("gfxdecode", skullxbo)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, skullxbo_state, get_playfield_tile_info, 16,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, skullxbo_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", skullxbo_state::s_mob_config)
+	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

@@ -452,7 +452,7 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_GFXDECODE(svi328)
+	MCFG_GFXDECODE_ADD("gfxdecode", svi328)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "svi806", XTAL_12MHz / 8, svi806_crtc6845_interface)
 

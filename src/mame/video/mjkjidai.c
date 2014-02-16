@@ -13,7 +13,7 @@ TILE_GET_INFO_MEMBER(mjkjidai_state::get_tile_info)
 	int attr = m_videoram[tile_index + 0x800];
 	int code = m_videoram[tile_index] + ((attr & 0x1f) << 8);
 	int color = m_videoram[tile_index + 0x1000];
-	SET_TILE_INFO_MEMBER(0,code,color >> 3,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,color >> 3,0);
 }
 
 
@@ -112,7 +112,7 @@ void mjkjidai_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 		sx += 16;
 		sy += 1;
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

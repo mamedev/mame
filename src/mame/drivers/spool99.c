@@ -133,7 +133,7 @@ TILE_GET_INFO_MEMBER(spool99_state::get_spool99_tile_info)
 	int code = ((m_vram[tile_index*2+1]<<8) | (m_vram[tile_index*2+0]));
 	int color = m_cram[tile_index*2+0];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code & 0x3fff,
 			color & 0x1f,
@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( spool99, spool99_state )
 	MCFG_CPU_PROGRAM_MAP(spool99_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spool99_state,  irq0_line_hold)
 
-	MCFG_GFXDECODE(spool99)
+	MCFG_GFXDECODE_ADD("gfxdecode", spool99)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

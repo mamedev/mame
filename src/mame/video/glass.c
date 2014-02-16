@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(glass_state::get_tile_info_glass_screen0)
 	int data2 = m_videoram[(tile_index << 1) + 1];
 	int code = ((data & 0x03) << 14) | ((data & 0x0fffc) >> 2);
 
-	SET_TILE_INFO_MEMBER(0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6));
 }
 
 
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(glass_state::get_tile_info_glass_screen1)
 	int data2 = m_videoram[(0x1000 / 2) + (tile_index << 1) + 1];
 	int code = ((data & 0x03) << 14) | ((data & 0x0fffc) >> 2);
 
-	SET_TILE_INFO_MEMBER(0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6));
 }
 
 /***************************************************************************
@@ -162,7 +162,7 @@ void glass_state::video_start()
 void glass_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int i;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	for (i = 3; i < (0x1000 - 6) / 2; i += 4)
 	{

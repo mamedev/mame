@@ -142,7 +142,7 @@ TILE_GET_INFO_MEMBER(phoenix_state::get_fg_tile_info)
 	code = m_videoram_pg[m_videoram_pg_index][tile_index];
 	col = (code >> 5);
 	col = col | 0x08 | (m_palette_bank << 4);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			col,
@@ -156,7 +156,7 @@ TILE_GET_INFO_MEMBER(phoenix_state::get_bg_tile_info)
 	code = m_videoram_pg[m_videoram_pg_index][tile_index + 0x800];
 	col = (code >> 5);
 	col = col | 0x00 | (m_palette_bank << 4);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			col,

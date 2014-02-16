@@ -100,7 +100,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_sidearms_bg_tile_info)
 	color = attr>>3 & 0x1f;
 	flags = attr>>1 & 0x03;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(sidearms_state::get_philko_bg_tile_info)
@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_philko_bg_tile_info)
 	color = attr>>3 & 0x0f;
 	flags = attr>>1 & 0x03;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(sidearms_state::get_fg_tile_info)
@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_fg_tile_info)
 	int code = m_videoram[tile_index] + (attr<<2 & 0x300);
 	int color = attr & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(sidearms_state::sidearms_tilemap_scan)
@@ -164,7 +164,7 @@ void sidearms_state::video_start()
 void sidearms_state::draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset )
 {
 	UINT8 *buffered_spriteram = m_spriteram->buffer();
-	gfx_element *gfx = machine().gfx[2];
+	gfx_element *gfx = m_gfxdecode->gfx(2);
 	int offs, attr, color, code, x, y, flipx, flipy;
 
 	flipy = flipx = m_flipon;

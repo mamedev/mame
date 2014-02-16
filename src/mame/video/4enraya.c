@@ -19,7 +19,7 @@ WRITE8_MEMBER(_4enraya_state::fenraya_videoram_w)
 TILE_GET_INFO_MEMBER(_4enraya_state::get_tile_info)
 {
 	int code = m_videoram[tile_index * 2] + (m_videoram[tile_index * 2 + 1] << 8);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		0,
 		code,
 		0,

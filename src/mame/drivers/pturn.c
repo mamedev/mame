@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(pturn_state::get_pturn_tile_info)
 
 	tileno=tile_lookup[tileno>>4]|(tileno&0xf)|(m_fgbank<<8);
 
-	SET_TILE_INFO_MEMBER(0,tileno,m_fgpalette,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,m_fgpalette,0);
 }
 
 
@@ -157,7 +157,7 @@ TILE_GET_INFO_MEMBER(pturn_state::get_pturn_bg_tile_info)
 	{
 		palno=25;
 	}
-	SET_TILE_INFO_MEMBER(1,tileno+m_bgbank*256,palno,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tileno+m_bgbank*256,palno,0);
 }
 
 void pturn_state::video_start()
@@ -200,7 +200,7 @@ UINT32 pturn_state::screen_update_pturn(screen_device &screen, bitmap_ind16 &bit
 
 		if(sx|sy)
 		{
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			spriteram[offs+1] & 0x3f ,
 			(spriteram[offs+2] & 0x1f),
 			flipx, flipy,
@@ -505,7 +505,7 @@ static MACHINE_CONFIG_START( pturn, pturn_state )
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 
-	MCFG_GFXDECODE(pturn)
+	MCFG_GFXDECODE_ADD("gfxdecode", pturn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

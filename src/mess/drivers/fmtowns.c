@@ -2781,7 +2781,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
 	MCFG_SCREEN_UPDATE_DRIVER(towns_state, screen_update)
 
-	MCFG_GFXDECODE(towns)
+	MCFG_GFXDECODE_ADD("gfxdecode", towns)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

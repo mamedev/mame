@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_bg)
 	int color = ((m_colorram[tile_index] >> 4) & 0x0f) | m_palette_bank;
 	int flags = m_colorram[tile_index] & 0x08 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_fg)
@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_fg)
 	int color = ((m_colorram2[tile_index] >> 4) & 0x0f) | m_palette_bank;
 	int flags = m_colorram2[tile_index] & 0x08 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
 }
 
 /* Sauro */
@@ -128,7 +128,7 @@ void sauro_state::sauro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 			sy = 240 - sy;
 		}
 
-		 machine().gfx[2]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,
@@ -199,7 +199,7 @@ void sauro_state::trckydoc_draw_sprites(bitmap_ind16 &bitmap, const rectangle &c
 			sy = 240 - sy;
 		}
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,

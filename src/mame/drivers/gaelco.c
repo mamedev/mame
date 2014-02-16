@@ -515,7 +515,7 @@ static MACHINE_CONFIG_START( bigkarnk, gaelco_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_bigkarnk)
 
-	MCFG_GFXDECODE(0x100000)
+	MCFG_GFXDECODE_ADD("gfxdecode", 0x100000)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco_state,bigkarnk)
@@ -546,7 +546,7 @@ static MACHINE_CONFIG_START( maniacsq, gaelco_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
 
-	MCFG_GFXDECODE(0x100000)
+	MCFG_GFXDECODE_ADD("gfxdecode", 0x100000)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
@@ -576,7 +576,7 @@ static MACHINE_CONFIG_START( squash, gaelco_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
 
-	MCFG_GFXDECODE(0x100000)
+	MCFG_GFXDECODE_ADD("gfxdecode", 0x100000)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
@@ -606,7 +606,7 @@ static MACHINE_CONFIG_START( thoop, gaelco_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
 
-	MCFG_GFXDECODE(0x100000)
+	MCFG_GFXDECODE_ADD("gfxdecode", 0x100000)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)

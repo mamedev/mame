@@ -490,7 +490,7 @@ static MACHINE_CONFIG_START( rpunch, rpunch_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
 
-	MCFG_GFXDECODE(rpunch)
+	MCFG_GFXDECODE_ADD("gfxdecode", rpunch)
 	MCFG_PALETTE_LENGTH(1024)
 
 
@@ -525,7 +525,7 @@ static MACHINE_CONFIG_START( svolleybl, rpunch_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
 
-	MCFG_GFXDECODE(svolleybl)
+	MCFG_GFXDECODE_ADD("gfxdecode", svolleybl)
 	MCFG_PALETTE_LENGTH(1024)
 
 

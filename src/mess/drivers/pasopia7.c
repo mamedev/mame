@@ -1017,7 +1017,7 @@ static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT_OVERRIDE(pasopia7_state,p7_raster)
-	MCFG_GFXDECODE( pasopia7 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  pasopia7 )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", VDP_CLOCK, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
 MACHINE_CONFIG_END
@@ -1033,7 +1033,7 @@ static MACHINE_CONFIG_DERIVED( p7_lcd, p7_base )
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
 	MCFG_PALETTE_LENGTH(8)
 	MCFG_PALETTE_INIT_OVERRIDE(pasopia7_state,p7_lcd)
-	MCFG_GFXDECODE( pasopia7 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  pasopia7 )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", LCD_CLOCK, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_DEFAULT_LAYOUT( layout_lcd )

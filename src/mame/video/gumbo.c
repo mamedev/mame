@@ -13,7 +13,7 @@ WRITE16_MEMBER(gumbo_state::gumbo_bg_videoram_w)
 TILE_GET_INFO_MEMBER(gumbo_state::get_gumbo_bg_tile_info)
 {
 	int tileno = m_bg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, 0, 0);
 }
 
 
@@ -26,7 +26,7 @@ WRITE16_MEMBER(gumbo_state::gumbo_fg_videoram_w)
 TILE_GET_INFO_MEMBER(gumbo_state::get_gumbo_fg_tile_info)
 {
 	int tileno = m_fg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(1, tileno, 1, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, 1, 0);
 }
 
 

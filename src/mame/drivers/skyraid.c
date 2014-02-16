@@ -228,7 +228,7 @@ static MACHINE_CONFIG_START( skyraid, skyraid_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(skyraid_state, screen_update_skyraid)
 
-	MCFG_GFXDECODE(skyraid)
+	MCFG_GFXDECODE_ADD("gfxdecode", skyraid)
 
 	MCFG_PALETTE_LENGTH(20)
 

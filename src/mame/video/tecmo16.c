@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(tecmo16_state::fg_get_tile_info)
 	/* bit 4 controls blending */
 	tileinfo.category = (m_colorram[tile_index] & 0x10) >> 4;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile,
 			color | (tileinfo.category ? 0x70 : 0x00),
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(tecmo16_state::bg_get_tile_info)
 	int tile = m_videoram2[tile_index] & 0x1fff;
 	int color = (m_colorram2[tile_index] & 0x0f)+0x10;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile,
 			color,
@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(tecmo16_state::bg_get_tile_info)
 TILE_GET_INFO_MEMBER(tecmo16_state::tx_get_tile_info)
 {
 	int tile = m_charram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile & 0x0fff,
 			tile >> 12,
@@ -323,7 +323,7 @@ UINT32 tecmo16_state::screen_update_tecmo16(screen_device &screen, bitmap_rgb32 
 	m_tx_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	tecmo16_draw_sprites(screen, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), m_game_is_riot, m_flipscreen);
+	tecmo16_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), m_game_is_riot, m_flipscreen);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
 	blendbitmaps(machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);

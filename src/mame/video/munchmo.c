@@ -48,7 +48,7 @@ void munchmo_state::video_start()
 
 void munchmo_state::draw_status( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int row;
 
 	for (row = 0; row < 4; row++)
@@ -80,7 +80,7 @@ void munchmo_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clip
     the tiles in ROM B2.2B
 */
 	UINT8 *rom = memregion("gfx2")->base();
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int offs;
 
 	for (offs = 0; offs < 0x100; offs++)
@@ -117,7 +117,7 @@ void munchmo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	int flags = m_vreg[7];                           /*   XB?????? */
 	int xadjust = - 128 - 16 - ((flags & 0x80) ? 1 : 0);
 	int bank = (flags & 0x40) ? 1 : 0;
-	gfx_element *gfx = machine().gfx[2 + bank];
+	gfx_element *gfx = m_gfxdecode->gfx(2 + bank);
 	int color_base = m_palette_bank * 4 + 3;
 	int i, j;
 	int firstsprite = m_vreg[4] & 0x3f;

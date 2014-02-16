@@ -6,6 +6,9 @@ class seta001_device : public device_t
 public:
 	seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+
 	DECLARE_WRITE8_MEMBER( spritebgflag_w8 );
 
 	DECLARE_READ16_MEMBER( spritectrl_r16 );
@@ -72,7 +75,10 @@ private:
 
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac_type);
 	void draw_foreground( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
-
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 extern const device_type SETA001_SPRITE;
+
+#define MCFG_SETA001_SPRITE_GFXDECODE(_gfxtag) \
+	seta001_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);

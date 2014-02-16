@@ -83,7 +83,7 @@ UINT32 intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &bi
 			{
 				offs = current_row*64+x;
 				
-					machine().gfx[0]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					videoram[offs],
 					7, /* white */
 					0,0,
@@ -94,7 +94,7 @@ UINT32 intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &bi
 				/* draw the cursor as a solid white block */
 				/* (should use a filled rect here!) */
 				
-					machine().gfx[0]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					191, /* a block */
 					7,   /* white   */
 					0,0,
@@ -107,25 +107,25 @@ UINT32 intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &bi
 #if 0
 	// debugging
 	c = tape_motor_mode_desc[m_tape_motor_mode][0];
-	 machine().gfx[0]->transpen(bitmap,&machine().screen[0].visarea,
+	 m_gfxdecode->gfx(0)->transpen(bitmap,&machine().screen[0].visarea,
 		c,
 		1,
 		0,0,
 		0*8,0*8, 0);
 	for(y=0;y<5;y++)
 	{
-		 machine().gfx[0]->transpen(bitmap,&machine().screen[0].visarea,
+		 m_gfxdecode->gfx(0)->transpen(bitmap,&machine().screen[0].visarea,
 			m_tape_unknown_write[y]+'0',
 			1,
 			0,0,
 			0*8,(y+2)*8, 0);
 	}
-	 machine().gfx[0]->transpen(bitmap,&machine().screen[0].visarea,
+	 m_gfxdecode->gfx(0)->transpen(bitmap,&machine().screen[0].visarea,
 			m_tape_unknown_write[5]+'0',
 			1,
 			0,0,
 			0*8,8*8, 0);
-	 machine().gfx[0]->transpen(bitmap,&machine().screen[0].visarea,
+	 m_gfxdecode->gfx(0)->transpen(bitmap,&machine().screen[0].visarea,
 			m_tape_interrupts_enabled+'0',
 			1,
 			0,0,

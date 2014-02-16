@@ -137,13 +137,13 @@ TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info)
 {
 	UINT16 code = m_videoram[tile_index];
 	UINT8 color = m_colorram[tile_index] & 0x0f;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info2)
 {
 	UINT16 code = m_videoram2[tile_index];
 	UINT8 color = m_colorram2[tile_index] & 0x0f;
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
 }
 
 void dunhuang_state::video_start()
@@ -832,7 +832,7 @@ static MACHINE_CONFIG_START( dunhuang, dunhuang_state )
 	MCFG_SCREEN_VISIBLE_AREA(0+8, 512-8-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dunhuang_state, screen_update_dunhuang)
 
-	MCFG_GFXDECODE(dunhuang)
+	MCFG_GFXDECODE_ADD("gfxdecode", dunhuang)
 	MCFG_PALETTE_LENGTH(0x100)
 
 

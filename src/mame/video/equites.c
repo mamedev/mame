@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(equites_state::equites_fg_info)
 	int tile = m_fg_videoram[2 * tile_index];
 	int color = m_fg_videoram[2 * tile_index + 1] & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
 	if (color & 0x10)
 		tileinfo.flags |= TILE_FORCE_LAYER0;
 }
@@ -77,7 +77,7 @@ TILE_GET_INFO_MEMBER(equites_state::splndrbt_fg_info)
 	int tile = m_fg_videoram[2 * tile_index] + (m_fg_char_bank << 8);
 	int color = m_fg_videoram[2 * tile_index + 1] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
 	if (color & 0x10)
 		tileinfo.flags |= TILE_FORCE_LAYER0;
 }
@@ -89,7 +89,7 @@ TILE_GET_INFO_MEMBER(equites_state::equites_bg_info)
 	int color = (data & 0xf000) >> 12;
 	int fxy = (data & 0x0600) >> 9;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, TILE_FLIPXY(fxy));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color, TILE_FLIPXY(fxy));
 }
 
 TILE_GET_INFO_MEMBER(equites_state::splndrbt_bg_info)
@@ -99,7 +99,7 @@ TILE_GET_INFO_MEMBER(equites_state::splndrbt_bg_info)
 	int color = (data & 0xf800) >> 11;
 	int fxy = (data & 0x0600) >> 9;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, TILE_FLIPXY(fxy));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color, TILE_FLIPXY(fxy));
 	tileinfo.group = color;
 }
 
@@ -136,7 +136,7 @@ VIDEO_START_MEMBER(equites_state,splndrbt)
 	m_fg_tilemap->set_scrolldx(8, -8);
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::splndrbt_bg_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[1], 0x10);
+	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, m_gfxdecode->gfx(1), 0x10);
 }
 
 
@@ -259,7 +259,7 @@ void equites_state::equites_draw_sprites_block( bitmap_ind16 &bitmap, const rect
 			int color = (~attr & 0xf000) >> 12;
 			int sx = (m_spriteram[offs] & 0xff00) >> 8;
 			int sy = (m_spriteram[offs] & 0x00ff);
-			int transmask = colortable_get_transpen_mask(machine().colortable, machine().gfx[2], color, 0);
+			int transmask = colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(2), color, 0);
 
 			if (flip_screen())
 			{
@@ -275,7 +275,7 @@ void equites_state::equites_draw_sprites_block( bitmap_ind16 &bitmap, const rect
 			// sprites are 16x14 centered in a 16x16 square, so skip the first line
 			sy += 1;
 
-			 machine().gfx[2]->transmask(bitmap,cliprect,
+			 m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
 					tile,
 					color,
 					fx, fy,
@@ -321,7 +321,7 @@ void equites_state::splndrbt_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 {
 	const UINT8 * const xrom = memregion("user2")->base();
 	const UINT8 * const yrom = xrom + 0x100;
-	gfx_element* gfx = machine().gfx[2];
+	gfx_element* gfx = m_gfxdecode->gfx(2);
 	int offs;
 
 	// note that sprites are actually 30x30, contained in 32x32 squares. The outer edge is not used.

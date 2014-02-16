@@ -11,7 +11,7 @@ TILE_GET_INFO_MEMBER(pirates_state::get_tx_tile_info)
 	int code = m_tx_tileram[tile_index*2];
 	int colr = m_tx_tileram[tile_index*2+1];
 
-	SET_TILE_INFO_MEMBER(0,code,colr,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,colr,0);
 }
 
 TILE_GET_INFO_MEMBER(pirates_state::get_fg_tile_info)
@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(pirates_state::get_fg_tile_info)
 	int code = m_fg_tileram[tile_index*2];
 	int colr = m_fg_tileram[tile_index*2+1]+0x80;
 
-	SET_TILE_INFO_MEMBER(0,code,colr,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,colr,0);
 }
 
 TILE_GET_INFO_MEMBER(pirates_state::get_bg_tile_info)
@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(pirates_state::get_bg_tile_info)
 	int code = m_bg_tileram[tile_index*2];
 	int colr = m_bg_tileram[tile_index*2+1]+ 0x100;
 
-	SET_TILE_INFO_MEMBER(0,code,colr,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,colr,0);
 }
 
 
@@ -69,7 +69,7 @@ WRITE16_MEMBER(pirates_state::pirates_bg_tileram_w)
 
 void pirates_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	UINT16 *source = m_spriteram + 4;
 	UINT16 *finish = source + 0x800/2-4;
 

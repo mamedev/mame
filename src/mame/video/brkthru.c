@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(brkthru_state::get_bg_tile_info)
 	int region = 1 + (code >> 7);
 	int colour = m_bgbasecolor + ((m_videoram[tile_index * 2 + 1] & 0x04) >> 2);
 
-	SET_TILE_INFO_MEMBER(region, code & 0x7f, colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, region, code & 0x7f, colour,0);
 }
 
 WRITE8_MEMBER(brkthru_state::brkthru_bgram_w)
@@ -96,7 +96,7 @@ WRITE8_MEMBER(brkthru_state::brkthru_bgram_w)
 TILE_GET_INFO_MEMBER(brkthru_state::get_fg_tile_info)
 {
 	UINT8 code = m_fg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 WRITE8_MEMBER(brkthru_state::brkthru_fgram_w)
@@ -196,24 +196,24 @@ void brkthru_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			if (m_spriteram[offs] & 0x10)    /* double height */
 			{
-				machine().gfx[9]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(9)->transpen(bitmap,cliprect,
 						code & ~1,
 						color,
 						m_flipscreen, m_flipscreen,
 						sx, m_flipscreen ? sy + 16 : sy - 16,0);
-				machine().gfx[9]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(9)->transpen(bitmap,cliprect,
 						code | 1,
 						color,
 						m_flipscreen, m_flipscreen,
 						sx,sy,0);
 
 				/* redraw with wraparound */
-				machine().gfx[9]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(9)->transpen(bitmap,cliprect,
 						code & ~1,
 						color,
 						m_flipscreen, m_flipscreen,
 						sx,(m_flipscreen ? sy + 16 : sy - 16) + 256,0);
-				machine().gfx[9]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(9)->transpen(bitmap,cliprect,
 						code | 1,
 						color,
 						m_flipscreen, m_flipscreen,
@@ -222,14 +222,14 @@ void brkthru_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			}
 			else
 			{
-				machine().gfx[9]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(9)->transpen(bitmap,cliprect,
 						code,
 						color,
 						m_flipscreen, m_flipscreen,
 						sx,sy,0);
 
 				/* redraw with wraparound */
-				machine().gfx[9]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(9)->transpen(bitmap,cliprect,
 						code,
 						color,
 						m_flipscreen, m_flipscreen,

@@ -10,12 +10,16 @@ typedef device_delegate<UINT32 (UINT32)> vsystem_tile2_indirection_delegate;
 	vsystem_spr2_device::set_gfx_region(*device, _rgn);
 #define MCFG_VSYSTEM_SPR2_SET_OFFSETS( _xoffs, _yoffs ) \
 	vsystem_spr2_device::set_offsets(*device, _xoffs,_yoffs);
+#define MCFG_VSYSTEM_SPR2_GFXDECODE(_gfxtag) \
+	vsystem_spr2_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 class vsystem_spr2_device : public device_t
 {
 public:
 	vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+		// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void set_tile_indirect_cb(device_t &device,vsystem_tile2_indirection_delegate newtilecb);
 	static void set_pritype(device_t &device, int pritype);
 	static void set_gfx_region(device_t &device, int gfx_region);
@@ -58,7 +62,7 @@ protected:
 
 
 private:
-
+	required_device<gfxdecode_device> m_gfxdecode;
 
 };
 

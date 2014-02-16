@@ -20,7 +20,7 @@ TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info){
 		*/
 		color = attributes>>3;
 		color = (color&0x03)|((color&0x1c)<<1);
-		SET_TILE_INFO_MEMBER(
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 
 				0,
 				tile_number,
 				color,
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info){
 		    x-------    flipx?
 		*/
 		color = (attributes>>2)&0x1f;
-		SET_TILE_INFO_MEMBER(
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 
 				0,
 				tile_number,
 				color,
@@ -128,7 +128,7 @@ void shangkid_state::draw_sprite(const UINT8 *source, bitmap_ind16 &bitmap, cons
 		transparent_pen = 7;
 	}
 
-	gfx = machine().gfx[1+bank_index];
+	gfx = m_gfxdecode->gfx(1+bank_index);
 
 	width = (xscale+1)*2;
 	height = (yscale+1)*2;
@@ -270,7 +270,7 @@ void shangkid_state::dynamski_draw_background(bitmap_ind16 &bitmap, const rectan
 		{
 			tile += ((attr>>5)&0x3)*256;
 			
-				machine().gfx[0]->transpen(
+				m_gfxdecode->gfx(0)->transpen(
 				bitmap,
 				cliprect,
 				tile,
@@ -303,7 +303,7 @@ void shangkid_state::dynamski_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 		if( attr&1 ) sx += 0x100;
 
 		
-				machine().gfx[1]->transpen(
+				m_gfxdecode->gfx(1)->transpen(
 				bitmap,
 				cliprect,
 				bank*0x40 + (tile&0x3f),

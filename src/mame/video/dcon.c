@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_back_tile_info)
 
 	tile&=0xfff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile,
 			color,
@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_fore_tile_info)
 
 	tile&=0xfff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile,
 			color,
@@ -77,7 +77,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_mid_tile_info)
 
 	tile&=0xfff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			tile|m_gfx_bank_select,
 			color,
@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_text_tile_info)
 
 	tile&=0xfff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -157,76 +157,76 @@ void dcon_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const
 			for (ay=0; ay<dy; ay++) {
 				if (!fx && !fy)
 				{
-					machine().gfx[4]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+ay*16,
 						screen.priority(),pri_mask,15);
 
 					// wrap around y
-					machine().gfx[4]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+ay*16 + 512,
 						screen.priority(),pri_mask,15);
 
 					// wrap around y
-					machine().gfx[4]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+ay*16 - 512,
 						screen.priority(),pri_mask,15);
 				}
 				else if (fx && !fy)
 				{
-					machine().gfx[4]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,
 						screen.priority(),pri_mask,15);
 
 					// wrap around y
-					machine().gfx[4]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16 + 512,
 						screen.priority(),pri_mask,15);
 
 					// wrap around y
-					machine().gfx[4]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16 - 512,
 						screen.priority(),pri_mask,15);
 				}
 				else if (!fx && fy)
 				{
-					machine().gfx[4]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+(dy-1-ay)*16,
 						screen.priority(),pri_mask,15);
 
 					// wrap around y
-					machine().gfx[4]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+(dy-1-ay)*16 + 512,
 						screen.priority(),pri_mask,15);
 
 					// wrap around y
-					machine().gfx[4]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+(dy-1-ay)*16 - 512,
 						screen.priority(),pri_mask,15);
 				}
 				else
 				{
-					machine().gfx[4]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16,
 						screen.priority(),pri_mask,15);
 
 					// wrap around y
-					machine().gfx[4]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16 + 512,
 						screen.priority(),pri_mask,15);
 
 					// wrap around y
-					machine().gfx[4]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16 - 512,
 						screen.priority(),pri_mask,15);

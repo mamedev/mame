@@ -1560,7 +1560,7 @@ static MACHINE_CONFIG_START( nemesis, nemesis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
-	MCFG_GFXDECODE(nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -1611,7 +1611,7 @@ static MACHINE_CONFIG_START( gx400, nemesis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
-	MCFG_GFXDECODE(nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -1664,7 +1664,7 @@ static MACHINE_CONFIG_START( konamigt, nemesis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
-	MCFG_GFXDECODE(nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -1715,7 +1715,7 @@ static MACHINE_CONFIG_START( rf2_gx400, nemesis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
-	MCFG_GFXDECODE(nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -1770,7 +1770,7 @@ static MACHINE_CONFIG_START( salamand, nemesis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
-	MCFG_GFXDECODE(nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -1816,7 +1816,7 @@ static MACHINE_CONFIG_START( blkpnthr, nemesis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
-	MCFG_GFXDECODE(nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -1858,7 +1858,7 @@ static MACHINE_CONFIG_START( citybomb, nemesis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
-	MCFG_GFXDECODE(nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -1904,7 +1904,7 @@ static MACHINE_CONFIG_START( nyanpani, nemesis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
-	MCFG_GFXDECODE(nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -1948,7 +1948,7 @@ static MACHINE_CONFIG_START( hcrash, nemesis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
-	MCFG_GFXDECODE(nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -2700,7 +2700,7 @@ static MACHINE_CONFIG_START( bubsys, nemesis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
-	MCFG_GFXDECODE(nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
 	MCFG_PALETTE_LENGTH(2048)
 
 

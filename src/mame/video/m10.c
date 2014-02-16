@@ -50,7 +50,7 @@ TILEMAP_MAPPER_MEMBER(m10_state::tilemap_scan)
 
 TILE_GET_INFO_MEMBER(m10_state::get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], m_colorram[tile_index] & 0x07, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_videoram[tile_index], m_colorram[tile_index] & 0x07, 0);
 }
 
 
@@ -79,7 +79,7 @@ WRITE8_MEMBER(m10_state::m15_chargen_w)
 	if (m_chargen[offset] != data)
 	{
 		m_chargen[offset] = data;
-		machine().gfx[0]->mark_dirty(offset >> 3);
+		m_gfxdecode->gfx(0)->mark_dirty(offset >> 3);
 	}
 }
 
@@ -102,13 +102,13 @@ VIDEO_START_MEMBER(m10_state,m10)
 
 	m_back_gfx = auto_alloc(machine(), gfx_element(machine(), backlayout, m_chargen, 8, 0));
 
-	machine().gfx[1] = m_back_gfx;
+	m_gfxdecode->set_gfx(1, m_back_gfx);
 	return ;
 }
 
 VIDEO_START_MEMBER(m10_state,m15)
 {
-	machine().gfx[0] = auto_alloc(machine(), gfx_element(machine(), charlayout, m_chargen, 8, 0));
+	m_gfxdecode->set_gfx(0,auto_alloc(machine(), gfx_element(machine(), charlayout, m_chargen, 8, 0)));
 
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
 	m_tx_tilemap->set_scrolldx(0, 116);

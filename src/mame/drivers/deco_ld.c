@@ -155,7 +155,7 @@ public:
 
 void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *spriteram, UINT16 tile_bank )
 {
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int i,spr_offs,x,y,col,fx,fy;
 
 	/*
@@ -200,7 +200,7 @@ void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 UINT32 deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y,x;
 
 	bitmap.fill(0, cliprect);
@@ -476,7 +476,7 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_GFXDECODE(rblaster)
+	MCFG_GFXDECODE_ADD("gfxdecode", rblaster)
 	MCFG_PALETTE_LENGTH(512)
 
 	/* sound hardware */

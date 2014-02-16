@@ -19,7 +19,7 @@ void buggychl_state::video_start()
 	save_item(NAME(m_tmp_bitmap1));
 	save_item(NAME(m_tmp_bitmap2));
 
-	machine().gfx[0]->set_source(m_charram);
+	m_gfxdecode->gfx(0)->set_source(m_charram);
 }
 
 
@@ -29,7 +29,7 @@ WRITE8_MEMBER(buggychl_state::buggychl_chargen_w)
 	if (m_charram[offset] != data)
 	{
 		m_charram[offset] = data;
-		machine().gfx[0]->mark_dirty((offset / 8) & 0xff);
+		m_gfxdecode->gfx(0)->mark_dirty((offset / 8) & 0xff);
 	}
 }
 
@@ -105,7 +105,7 @@ void buggychl_state::draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (flip_screen_y())
 			sy = 31 - sy;
 
-		 machine().gfx[0]->opaque(m_tmp_bitmap1,m_tmp_bitmap1.cliprect(),
+		 m_gfxdecode->gfx(0)->opaque(m_tmp_bitmap1,m_tmp_bitmap1.cliprect(),
 				code,
 				2,
 				flip_screen_x(),flip_screen_y(),
@@ -144,7 +144,7 @@ void buggychl_state::draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (flipy)
 			sy = 31 - sy;
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				0,
 				flipx,flipy,
@@ -201,7 +201,7 @@ void buggychl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 					code = 8 * (lookup[pos] | ((lookup[pos + 1] & 0x07) << 8));
 					realflipy = (lookup[pos + 1] & 0x80) ? !flipy : flipy;
 					code += (realflipy ? (charline ^ 7) : charline);
-					pendata = machine().gfx[1]->get_data(code);
+					pendata = m_gfxdecode->gfx(1)->get_data(code);
 
 					for (x = 0; x < 16; x++)
 					{

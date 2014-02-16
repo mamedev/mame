@@ -141,7 +141,7 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 
-	MCFG_GFXDECODE(wswan)
+	MCFG_GFXDECODE_ADD("gfxdecode", wswan)
 	MCFG_PALETTE_LENGTH(16)
 
 	/* sound hardware */

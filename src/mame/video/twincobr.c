@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_bg_tile_info)
 	code = m_bgvideoram16[tile_index+m_bg_ram_bank];
 	tile_number = code & 0x0fff;
 	color = (code & 0xf000) >> 12;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile_number,
 			color,
@@ -60,7 +60,7 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_fg_tile_info)
 	code = m_fgvideoram16[tile_index];
 	tile_number = (code & 0x0fff) | m_fg_rom_bank;
 	color = (code & 0xf000) >> 12;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile_number,
 			color,
@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_tx_tile_info)
 	code = m_txvideoram16[tile_index];
 	tile_number = code & 0x07ff;
 	color = (code & 0xf800) >> 11;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			color,

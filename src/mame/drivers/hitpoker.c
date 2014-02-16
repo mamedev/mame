@@ -115,7 +115,7 @@ UINT32 hitpoker_state::screen_update_hitpoker(screen_device &screen, bitmap_ind1
 			gfx_bpp = (m_colorram[count] & 0x80)>>7; //flag between 4 and 8 bpp
 			color = gfx_bpp ? ((m_colorram[count] & 0x70)>>4) : (m_colorram[count] & 0xf);
 
-			machine().gfx[gfx_bpp]->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
+			m_gfxdecode->gfx(gfx_bpp)->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
 
 			count+=2;
 		}
@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( hitpoker, hitpoker_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", CRTC_CLOCK/2, mc6845_intf)  /* hand tuned to get ~60 fps */
 
-	MCFG_GFXDECODE(hitpoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", hitpoker)
 	MCFG_PALETTE_LENGTH(0x800)
 
 
