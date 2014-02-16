@@ -47,132 +47,9 @@ mn10200_device::mn10200_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-
-void mn10200_device::take_irq(int level, int group)
-{
-	m_cycles -= 7;
-
-	write_mem24(m_a[3] - 4, m_pc);
-	write_mem16(m_a[3] - 6, m_psw);
-	m_a[3] -= 6;
-	change_pc(0x80008);
-	m_psw = (m_psw & 0xf0ff) | (level << 8);
-	m_iagr = group;
-}
-
-bool mn10200_device::check_irq()
-{
-	if (!m_nmicr && !(m_psw & FLAG_IE))
-		return false;
-	
-	int level = m_psw >> 8 & 7;
-	int group = 0;
-	
-	// find highest valid level
-	for (int i = 1; i < 11; i++)
-	{
-		if (m_icrl[i] >> 4 & m_icrh[i] & 0xf && (m_icrh[i] >> 4 & 7) < level)
-		{
-			level = m_icrh[i] >> 4 & 7;
-			group = i;
-		}
-	}
-	
-	// take interrupt
-	if (m_nmicr && group)
-		take_irq(level, 0);
-	else if (m_nmicr)
-		take_irq(0, 0);
-	else if (group)
-		take_irq(level, group);
-	else
-		return false;
-	
-	return true;
-}
-
-void mn10200_device::check_ext_irq()
-{
-	for (int i = 0; i < 4; i++)
-	{
-		// active irq at low or high? (not edge triggered)
-		if ((m_p4 >> i & 1) == (m_extmdl >> (i * 2) & 3))
-			m_icrl[8] |= (1 << (4 + i));
-	}
-	
-	check_irq();
-}
-
-
-void mn10200_device::refresh_timer(int tmr)
-{
-	// 0: external pin
-	// 1: cascaded (handled elsewhere)
-	// 2: prescaler 0
-	// 3: prescaler 1
-	int p = m_simple_timer[tmr].mode & 1;
-
-	// enabled, and source is prescaler?
-	if ((m_simple_timer[tmr].mode & 0x82) == 0x82 && m_prescaler[p].mode & 0x80)
-	{
-		attotime period = m_sysclock_base * (m_prescaler[p].base + 1) * (m_simple_timer[tmr].cur + 1);
-		m_timer_timers[tmr]->adjust(period, tmr);
-	}
-	else
-	{
-		m_timer_timers[tmr]->adjust(attotime::never, tmr);
-	}
-}
-
-void mn10200_device::refresh_all_timers()
-{
-	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
-		refresh_timer(tmr);
-}
-
-int mn10200_device::timer_tick_simple(int tmr)
-{
-	int next = tmr + 1;
-	
-	// is it a cascaded timer, and enabled?
-	if (next < MN10200_NUM_TIMERS_8BIT && m_simple_timer[next].mode & 0x83 && (m_simple_timer[next].mode & 0x83) == 0x81)
-	{
-		// did it underflow?
-		if (--m_simple_timer[next].cur == 0xff)
-		{
-			// cascaded underflow?
-			if (timer_tick_simple(next) != 2)
-			{
-				m_simple_timer[next].cur = m_simple_timer[next].base;
-				return 1;
-			}
-		}
-
-		return 2;
-	}
-	else
-	{
-		// trigger irq
-		m_icrl[1 + (tmr >> 2)] |= (1 << (4 + (tmr & 3)));
-		check_irq();
-
-		return 0;
-	}
-}
-
-TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
-{
-	int tmr = param;
-	
-	// handle our expiring and also tick our cascaded children
-	if (timer_tick_simple(tmr) == 2)
-		m_simple_timer[tmr].cur = 0xff; // cascaded and no underflow occured
-	else
-		m_simple_timer[tmr].cur = m_simple_timer[tmr].base;
-	
-	// refresh this timer
-	refresh_timer(tmr);
-}
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
 void mn10200_device::device_start()
 {
@@ -303,6 +180,17 @@ void mn10200_device::state_string_export(const device_state_entry &entry, astrin
 }
 
 
+offs_t mn10200_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	extern CPU_DISASSEMBLE( mn10200 );
+	return CPU_DISASSEMBLE_NAME(mn10200)(this, buffer, pc, oprom, opram, options);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
 void mn10200_device::device_reset()
 {
 	change_pc(0x80000);
@@ -325,6 +213,181 @@ void mn10200_device::device_reset()
 			write_mem16(address, 0);
 }
 
+
+// interrupts
+
+void mn10200_device::take_irq(int level, int group)
+{
+	m_cycles -= 7;
+
+	write_mem24(m_a[3] - 4, m_pc);
+	write_mem16(m_a[3] - 6, m_psw);
+	m_a[3] -= 6;
+	change_pc(0x80008);
+	m_psw = (m_psw & 0xf0ff) | (level << 8);
+	m_iagr = group;
+}
+
+bool mn10200_device::check_irq()
+{
+	if (!m_nmicr && !(m_psw & FLAG_IE))
+		return false;
+	
+	int level = m_psw >> 8 & 7;
+	int group = 0;
+	
+	// find highest valid level
+	for (int i = 1; i < 11; i++)
+	{
+		if (m_icrl[i] >> 4 & m_icrh[i] & 0xf && (m_icrh[i] >> 4 & 7) < level)
+		{
+			level = m_icrh[i] >> 4 & 7;
+			group = i;
+		}
+	}
+	
+	// take interrupt
+	if (m_nmicr && group)
+		take_irq(level, 0);
+	else if (m_nmicr)
+		take_irq(0, 0);
+	else if (group)
+		take_irq(level, group);
+	else
+		return false;
+	
+	return true;
+}
+
+void mn10200_device::check_ext_irq()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		// active irq at low or high? (not edge triggered)
+		if ((m_p4 >> i & 1) == (m_extmdl >> (i * 2) & 3))
+			m_icrl[8] |= (1 << (4 + i));
+	}
+	
+	check_irq();
+}
+
+void mn10200_device::execute_set_input(int irqnum, int state)
+{
+	// take an external IRQ
+	assert(((UINT32)irqnum) < MN10200_MAX_EXT_IRQ);
+
+	int pin = state ? 0 : 1;
+	int old = m_p4 >> irqnum & 1;
+	bool active = false;
+	
+	switch (m_extmdl >> (irqnum * 2) & 3)
+	{
+		// 'L' level
+		case 0:
+			active = (pin == 0);
+			break;
+		
+		// 'H' level
+		case 1:
+			active = (pin == 1);
+			break;
+		
+		// falling edge
+		case 2:
+			active = (pin == 0 && old == 1);
+			break;
+		
+		// rising edge
+		case 3:
+			active = (pin == 1 && old == 0);
+			break;
+	}
+	
+	m_p4 &= ~(1 << irqnum);
+	m_p4 |= pin << irqnum;
+	
+	if (active)
+	{
+		m_icrl[8] |= (1 << (4 + irqnum));
+		check_irq();
+	}
+}
+
+
+// 8-bit timers
+
+int mn10200_device::timer_tick_simple(int tmr)
+{
+	int next = tmr + 1;
+	
+	// is it a cascaded timer, and enabled?
+	if (next < MN10200_NUM_TIMERS_8BIT && m_simple_timer[next].mode & 0x83 && (m_simple_timer[next].mode & 0x83) == 0x81)
+	{
+		// did it underflow?
+		if (--m_simple_timer[next].cur == 0xff)
+		{
+			// cascaded underflow?
+			if (timer_tick_simple(next) != 2)
+			{
+				m_simple_timer[next].cur = m_simple_timer[next].base;
+				return 1;
+			}
+		}
+
+		return 2;
+	}
+	else
+	{
+		// trigger irq
+		m_icrl[1 + (tmr >> 2)] |= (1 << (4 + (tmr & 3)));
+		check_irq();
+
+		return 0;
+	}
+}
+
+void mn10200_device::refresh_timer(int tmr)
+{
+	// 0: external pin
+	// 1: cascaded (handled elsewhere)
+	// 2: prescaler 0
+	// 3: prescaler 1
+	int p = m_simple_timer[tmr].mode & 1;
+
+	// enabled, and source is prescaler?
+	if ((m_simple_timer[tmr].mode & 0x82) == 0x82 && m_prescaler[p].mode & 0x80)
+	{
+		attotime period = m_sysclock_base * (m_prescaler[p].base + 1) * (m_simple_timer[tmr].cur + 1);
+		m_timer_timers[tmr]->adjust(period, tmr);
+	}
+	else
+	{
+		m_timer_timers[tmr]->adjust(attotime::never, tmr);
+	}
+}
+
+TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
+{
+	int tmr = param;
+	
+	// handle our expiring and also tick our cascaded children
+	if (timer_tick_simple(tmr) == 2)
+		m_simple_timer[tmr].cur = 0xff; // cascaded and no underflow occured
+	else
+		m_simple_timer[tmr].cur = m_simple_timer[tmr].base;
+	
+	// refresh this timer
+	refresh_timer(tmr);
+}
+
+void mn10200_device::refresh_all_timers()
+{
+	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
+		refresh_timer(tmr);
+}
+
+
+// opcode handlers
 
 void mn10200_device::illegal(UINT8 prefix, UINT8 op)
 {
@@ -408,47 +471,6 @@ void mn10200_device::do_branch(bool state)
 }
 
 
-// take an external IRQ
-void mn10200_device::execute_set_input(int irqnum, int state)
-{
-	assert(((UINT32)irqnum) < MN10200_MAX_EXT_IRQ);
-
-	int pin = state ? 0 : 1;
-	int old = m_p4 >> irqnum & 1;
-	bool active = false;
-	
-	switch (m_extmdl >> (irqnum * 2) & 3)
-	{
-		// 'L' level
-		case 0:
-			active = (pin == 0);
-			break;
-		
-		// 'H' level
-		case 1:
-			active = (pin == 1);
-			break;
-		
-		// falling edge
-		case 2:
-			active = (pin == 0 && old == 1);
-			break;
-		
-		// rising edge
-		case 3:
-			active = (pin == 1 && old == 0);
-			break;
-	}
-	
-	m_p4 &= ~(1 << irqnum);
-	m_p4 |= pin << irqnum;
-	
-	if (active)
-	{
-		m_icrl[8] |= (1 << (4 + irqnum));
-		check_irq();
-	}
-}
 
 void mn10200_device::execute_run()
 {
@@ -1615,6 +1637,8 @@ void mn10200_device::execute_run()
 }
 
 
+// internal i/o
+
 WRITE8_MEMBER(mn10200_device::io_control_w)
 {
 	switch(offset)
@@ -2033,6 +2057,8 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 	}
 }
 
+
+
 READ8_MEMBER(mn10200_device::io_control_r)
 {
 	switch(offset)
@@ -2132,11 +2158,4 @@ READ8_MEMBER(mn10200_device::io_control_r)
 	}
 	
 	return 0;
-}
-
-
-offs_t mn10200_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
-{
-	extern CPU_DISASSEMBLE( mn10200 );
-	return CPU_DISASSEMBLE_NAME(mn10200)(this, buffer, pc, oprom, opram, options);
 }
