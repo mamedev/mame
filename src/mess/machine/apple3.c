@@ -110,13 +110,19 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			m_strobe = 0;
 			break;
 
+		case 0x20: case 0x21: case 0x22: case 0x23:
+		case 0x24: case 0x25: case 0x26: case 0x27:
+		case 0x28: case 0x29: case 0x2A: case 0x2B:
+		case 0x2C: case 0x2D: case 0x2E: case 0x2F:
+			m_cnxx_slot = -1;
+			break;
+
 		case 0x30: case 0x31: case 0x32: case 0x33:
 		case 0x34: case 0x35: case 0x36: case 0x37:
 		case 0x38: case 0x39: case 0x3A: case 0x3B:
 		case 0x3C: case 0x3D: case 0x3E: case 0x3F:
 			m_speaker_state ^= 1;
 			m_speaker->level_w(m_speaker_state);
-			result = 0xff;
 			break;
 
 		case 0x40: case 0x41: case 0x42: case 0x43:
@@ -124,7 +130,6 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0x48: case 0x49: case 0x4A: case 0x4B:
 		case 0x4C: case 0x4D: case 0x4E: case 0x4F:
 			m_c040_time = 200;
-			result = 0xff;
 			break;
 
 		case 0x50: case 0x51: case 0x52: case 0x53:
@@ -233,6 +238,13 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0x18: case 0x19: case 0x1A: case 0x1B:
 		case 0x1C: case 0x1D: case 0x1E: case 0x1F:
 			m_strobe = 0;
+			break;
+
+		case 0x20: case 0x21: case 0x22: case 0x23:
+		case 0x24: case 0x25: case 0x26: case 0x27:
+		case 0x28: case 0x29: case 0x2A: case 0x2B:
+		case 0x2C: case 0x2D: case 0x2E: case 0x2F:
+			m_cnxx_slot = -1;
 			break;
 
 		case 0x30: case 0x31: case 0x32: case 0x33:
@@ -717,6 +729,8 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	save_item(NAME(m_lastchar));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_transchar));
+	save_item(NAME(m_flags));
+	save_item(NAME(m_char_mem));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(apple3_state::apple3_postload), this));
 }

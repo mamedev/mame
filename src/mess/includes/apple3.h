@@ -115,7 +115,7 @@ private:
 	int m_via_1_irq;
 	offs_t m_zpa;
 	UINT8 m_last_n;
-	UINT8 *m_char_mem;
+	UINT8 m_char_mem[0x800];
 	UINT32 *m_hgr_map;
 
 	bool m_sync;
