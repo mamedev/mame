@@ -117,13 +117,16 @@ void a2bus_cffa2000_device::device_start()
 	m_rom[0x801] = 13;
 
 	save_item(NAME(m_lastdata));
+	save_item(NAME(m_lastreaddata));
 	save_item(NAME(m_writeprotect));
 	save_item(NAME(m_eeprom));
+	save_item(NAME(m_inwritecycle));
 }
 
 void a2bus_cffa2000_device::device_reset()
 {
 	m_writeprotect = true;
+	m_inwritecycle = false;
 }
 
 
@@ -136,7 +139,7 @@ UINT8 a2bus_cffa2000_device::read_c0nx(address_space &space, UINT8 offset)
 	switch (offset)
 	{
 		case 0:
-			return m_lastdata>>8;
+			return m_lastreaddata>>8;
 
 		case 3:
 			m_writeprotect = false;
@@ -147,8 +150,12 @@ UINT8 a2bus_cffa2000_device::read_c0nx(address_space &space, UINT8 offset)
 			break;
 
 		case 8:
-			m_lastdata = m_ata->read_cs0(space, offset-8, 0xffff);
-			return m_lastdata & 0xff;
+			// Apple /// driver uses sta $c080,x when writing, which causes spurious reads of c088
+			if (!m_inwritecycle)
+			{
+				m_lastreaddata = m_ata->read_cs0(space, offset - 8, 0xffff); 
+			}
+			return m_lastreaddata & 0xff;
 
 		case 9:
 		case 0xa:
@@ -170,11 +177,15 @@ UINT8 a2bus_cffa2000_device::read_c0nx(address_space &space, UINT8 offset)
 
 void a2bus_cffa2000_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
+	m_inwritecycle = false;
+
 	switch (offset)
 	{
 		case 0:
 			m_lastdata &= 0x00ff;
 			m_lastdata |= data<<8;
+//			printf("%02x to 0, m_lastdata = %x\n", data, m_lastdata);
+			m_inwritecycle = true;
 			break;
 
 		case 3:
@@ -188,6 +199,7 @@ void a2bus_cffa2000_device::write_c0nx(address_space &space, UINT8 offset, UINT8
 		case 8:
 			m_lastdata &= 0xff00;
 			m_lastdata |= data;
+//			printf("%02x to 8, m_lastdata = %x\n", data, m_lastdata);
 			m_ata->write_cs0(space, offset-8, m_lastdata, 0xffff);
 			break;
 
