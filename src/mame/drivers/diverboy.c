@@ -107,7 +107,7 @@ void diverboy_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 
 		if (!flash || (m_screen->frame_number() & 1))
 		{
-			machine().gfx[bank]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect,
 					number,
 					colr,
 					0,0,
@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 
 
-	MCFG_GFXDECODE(diverboy)
+	MCFG_GFXDECODE_ADD("gfxdecode", diverboy)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

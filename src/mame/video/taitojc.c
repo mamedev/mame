@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(taitojc_state::taitojc_tile_info)
 	UINT32 val = m_tile_ram[tile_index];
 	int color = (val >> 22) & 0xff;
 	int tile = (val >> 2) & 0x7f;
-	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, m_gfx_index, tile, color, 0);
 }
 
 READ32_MEMBER(taitojc_state::taitojc_palette_r)
@@ -68,7 +68,7 @@ WRITE32_MEMBER(taitojc_state::taitojc_tile_w)
 WRITE32_MEMBER(taitojc_state::taitojc_char_w)
 {
 	COMBINE_DATA(m_char_ram + offset);
-	machine().gfx[m_gfx_index]->mark_dirty(offset/32);
+	m_gfxdecode->gfx(m_gfx_index)->mark_dirty(offset/32);
 }
 
 // Object data format:
@@ -302,7 +302,7 @@ void taitojc_state::video_start()
 {
 	/* find first empty slot to decode gfx */
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (machine().gfx[m_gfx_index] == 0)
+		if (m_gfxdecode->gfx(m_gfx_index) == 0)
 			break;
 
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
@@ -315,7 +315,7 @@ void taitojc_state::video_start()
 	m_tile_ram = auto_alloc_array_clear(machine(), UINT32, 0x4000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), taitojc_char_layout, (UINT8 *)m_char_ram, machine().total_colors() / 16, 0));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), taitojc_char_layout, (UINT8 *)m_char_ram, machine().total_colors() / 16, 0)));
 
 	m_texture = auto_alloc_array(machine(), UINT8, 0x400000);
 

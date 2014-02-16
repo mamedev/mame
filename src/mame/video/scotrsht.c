@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(scotrsht_state::scotrsht_get_bg_tile_info)
 
 	// data & 0x80 -> tile priority?
 
-	SET_TILE_INFO_MEMBER(0, code, color, flag);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flag);
 }
 
 /* Same as Jailbreak + palette bank */
@@ -114,9 +114,9 @@ void scotrsht_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		 machine().gfx[1]->transmask(bitmap,cliprect, code, color, flipx, flipy,
+		 m_gfxdecode->gfx(1)->transmask(bitmap,cliprect, code, color, flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, m_palette_bank * 16));
+			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, m_palette_bank * 16));
 	}
 }
 

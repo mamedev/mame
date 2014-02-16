@@ -108,7 +108,7 @@ TILE_GET_INFO_MEMBER(popper_state::get_popper_p123_tile_info)
 	UINT8 attr = m_attribram[tile_index];
 	tile_number += m_gfx_bank << 8;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			(attr & 0xf),
@@ -125,7 +125,7 @@ TILE_GET_INFO_MEMBER(popper_state::get_popper_p0_tile_info)
 	//pen 0 only in front if colour set as well
 	tileinfo.group = (attr & 0x70) ? ((attr & 0x80) >> 7) : 0;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			((attr & 0x70) >> 4) + 8,
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(popper_state::get_popper_ol_p123_tile_info)
 	UINT8 attr  = m_ol_attribram[tile_index];
 	tile_number += m_gfx_bank << 8;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			(attr & 0xf),
@@ -155,7 +155,7 @@ TILE_GET_INFO_MEMBER(popper_state::get_popper_ol_p0_tile_info)
 	//pen 0 only in front if colour set as well
 	tileinfo.group = (attr & 0x70) ? ((attr & 0x80) >> 7) : 0;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			((attr & 0x70) >> 4) + 8,
@@ -213,7 +213,7 @@ void popper_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect 
 				flipy = !flipy;
 			}
 
-			 machine().gfx[1]->transpen(bitmap,cliprect,
+			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					m_spriteram[offs + 1],
 					(m_spriteram[offs + 2] & 0x0f),
 					flipx,flipy,

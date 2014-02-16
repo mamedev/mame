@@ -121,7 +121,7 @@ TILE_GET_INFO_MEMBER(jackie_state::get_fg_tile_info)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
-	SET_TILE_INFO_MEMBER(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
 WRITE8_MEMBER(jackie_state::fg_tile_w)
@@ -154,7 +154,7 @@ WRITE8_MEMBER(jackie_state::jackie_reel1_ram_w)
 TILE_GET_INFO_MEMBER(jackie_state::get_jackie_reel1_tile_info)
 {
 	int code = m_reel1_ram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, 0);
 }
 
 
@@ -168,7 +168,7 @@ WRITE8_MEMBER(jackie_state::jackie_reel2_ram_w)
 TILE_GET_INFO_MEMBER(jackie_state::get_jackie_reel2_tile_info)
 {
 	int code = m_reel2_ram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, 0);
 }
 
 
@@ -181,7 +181,7 @@ WRITE8_MEMBER(jackie_state::jackie_reel3_ram_w)
 TILE_GET_INFO_MEMBER(jackie_state::get_jackie_reel3_tile_info)
 {
 	int code = m_reel3_ram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, 0);
 }
 
 void jackie_state::video_start()
@@ -587,7 +587,7 @@ static MACHINE_CONFIG_START( jackie, jackie_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jackie_state, screen_update_jackie)
 
-	MCFG_GFXDECODE(jackie)
+	MCFG_GFXDECODE_ADD("gfxdecode", jackie)
 	MCFG_PALETTE_LENGTH(2048)
 
 

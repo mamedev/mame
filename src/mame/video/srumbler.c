@@ -19,7 +19,7 @@
 TILE_GET_INFO_MEMBER(srumbler_state::get_fg_tile_info)
 {
 	UINT8 attr = m_foregroundram[2*tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_foregroundram[2*tile_index + 1] + ((attr & 0x03) << 8),
 			(attr & 0x3c) >> 2,
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(srumbler_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(srumbler_state::get_bg_tile_info)
 {
 	UINT8 attr = m_backgroundram[2*tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			m_backgroundram[2*tile_index + 1] + ((attr & 0x07) << 8),
 			(attr & 0xe0) >> 5,
@@ -144,7 +144,7 @@ void srumbler_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		machine().gfx[2]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				colour,
 				flip_screen(),flipy,

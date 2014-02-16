@@ -615,7 +615,7 @@ static MACHINE_CONFIG_START( macrossp, macrossp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(macrossp_state, screen_update_macrossp)
 	MCFG_SCREEN_VBLANK_DRIVER(macrossp_state, screen_eof_macrossp)
 
-	MCFG_GFXDECODE(macrossp)
+	MCFG_GFXDECODE_ADD("gfxdecode", macrossp)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 

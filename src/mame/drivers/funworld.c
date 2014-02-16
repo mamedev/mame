@@ -2863,7 +2863,7 @@ static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)  /* Taken from MC6845 init, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(funworld_state, screen_update_funworld)
 
-	MCFG_GFXDECODE(fw1stpal)
+	MCFG_GFXDECODE_ADD("gfxdecode", fw1stpal)
 
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_PALETTE_INIT_OVERRIDE(funworld_state, funworld)
@@ -2884,7 +2884,7 @@ static MACHINE_CONFIG_DERIVED( fw2ndpal, fw1stpal )
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funworld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
-	MCFG_GFXDECODE(fw2ndpal)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
 MACHINE_CONFIG_END
 
 

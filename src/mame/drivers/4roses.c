@@ -399,7 +399,7 @@ static MACHINE_CONFIG_START( 4roses, _4roses_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)  /* guess. taken from funworld games */
 	MCFG_SCREEN_UPDATE_DRIVER(_4roses_state, screen_update_funworld)
 
-	MCFG_GFXDECODE(4roses)
+	MCFG_GFXDECODE_ADD("gfxdecode", 4roses)
 
 	MCFG_PALETTE_LENGTH(0x1000)
 	MCFG_PALETTE_INIT_OVERRIDE(_4roses_state,funworld)

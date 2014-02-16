@@ -867,7 +867,7 @@ static MACHINE_CONFIG_START( firetrk, firetrk_state )
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_firetrk)
 
 	MCFG_PALETTE_LENGTH(28)
-	MCFG_GFXDECODE(firetrk)
+	MCFG_GFXDECODE_ADD("gfxdecode", firetrk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -889,7 +889,7 @@ static MACHINE_CONFIG_DERIVED( superbug, firetrk )
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_superbug)
 
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,superbug)
-	MCFG_GFXDECODE(superbug)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", superbug)
 	MCFG_PALETTE_LENGTH(28)
 
 	/* sound hardware */
@@ -910,7 +910,7 @@ static MACHINE_CONFIG_DERIVED( montecar, firetrk )
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_montecar)
 
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,montecar)
-	MCFG_GFXDECODE(montecar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", montecar)
 
 	MCFG_PALETTE_INIT_OVERRIDE(firetrk_state,montecar)
 	MCFG_PALETTE_LENGTH(46)

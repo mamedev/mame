@@ -149,7 +149,7 @@ void pinkiri8_state::video_start() {}
 
 void pinkiri8_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	/* FIXME: color is a bit of a mystery */
 	{
@@ -177,7 +177,7 @@ void pinkiri8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	int game_type_hack = 0;
 	int col_bank;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	if (!strcmp(machine().system().name,"janshi")) game_type_hack = 1;
 
@@ -1092,7 +1092,7 @@ static MACHINE_CONFIG_START( pinkiri8, pinkiri8_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pinkiri8_state, screen_update_pinkiri8)
 
-	MCFG_GFXDECODE(pinkiri8)
+	MCFG_GFXDECODE_ADD("gfxdecode", pinkiri8)
 	MCFG_PALETTE_LENGTH(0x2000)
 
 

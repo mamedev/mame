@@ -395,7 +395,7 @@ static MACHINE_CONFIG_START( baraduke, baraduke_state )
 	MCFG_SCREEN_UPDATE_DRIVER(baraduke_state, screen_update_baraduke)
 	MCFG_SCREEN_VBLANK_DRIVER(baraduke_state, screen_eof_baraduke)
 
-	MCFG_GFXDECODE(baraduke)
+	MCFG_GFXDECODE_ADD("gfxdecode", baraduke)
 	MCFG_PALETTE_LENGTH(2048)
 
 

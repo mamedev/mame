@@ -1969,7 +1969,10 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)3)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
+	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
@@ -2019,7 +2022,9 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)3)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
+	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
@@ -2121,7 +2126,9 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)3)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
+	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
@@ -2168,7 +2175,9 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)3)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
+	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 

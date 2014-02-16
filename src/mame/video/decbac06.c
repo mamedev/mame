@@ -77,13 +77,24 @@ deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *
 		m_gfxregion16x16(0),
 		m_wide(0),
 		m_bppmult(0),
-		m_bppmask(0)
+		m_bppmask(0),
+		m_gfxdecode(*this)
 {
 	for (int i = 0; i < 8; i++)
 		{
 			m_pf_control_0[i] = 0;
 			m_pf_control_1[i] = 0;
 		}
+}
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void deco_bac06_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<deco_bac06_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 void deco_bac06_device::device_start()
@@ -155,7 +166,7 @@ TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf8x8_tile_info)
 	if (m_rambank&1) tile_index+=0x1000;
 	int tile=m_pf_data[tile_index];
 	int colourpri=(tile>>12);
-	SET_TILE_INFO_MEMBER(m_tile_region,tile&0xfff,0,0);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, m_tile_region,tile&0xfff,0,0);
 	tileinfo.category = colourpri;
 }
 
@@ -164,7 +175,7 @@ TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf16x16_tile_info)
 	if (m_rambank&1) tile_index+=0x1000;
 	int tile=m_pf_data[tile_index];
 	int colourpri=(tile>>12);
-	SET_TILE_INFO_MEMBER(m_tile_region,tile&0xfff,0,0);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, m_tile_region,tile&0xfff,0,0);
 	tileinfo.category = colourpri;
 }
 

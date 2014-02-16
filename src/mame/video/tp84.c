@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(tp84_state::get_bg_tile_info)
 				(m_bg_colorram[tile_index] & 0x0f);
 	int flags = TILE_FLIPYX(m_bg_colorram[tile_index] >> 6);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(tp84_state::get_fg_tile_info)
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(tp84_state::get_fg_tile_info)
 				(m_fg_colorram[tile_index] & 0x0f);
 	int flags = TILE_FLIPYX(m_fg_colorram[tile_index] >> 6);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 
@@ -164,8 +164,8 @@ void tp84_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int flip_x = ~m_spriteram[offs + 2] & 0x40;
 		int flip_y =  m_spriteram[offs + 2] & 0x80;
 
-		 machine().gfx[1]->transmask(bitmap,cliprect, code, color, flip_x, flip_y, x, y,
-				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, palette_base));
+		 m_gfxdecode->gfx(1)->transmask(bitmap,cliprect, code, color, flip_x, flip_y, x, y,
+				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, palette_base));
 
 	}
 }

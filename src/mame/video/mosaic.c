@@ -18,7 +18,7 @@
 TILE_GET_INFO_MEMBER(mosaic_state::get_fg_tile_info)
 {
 	tile_index *= 2;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_fgvideoram[tile_index] + (m_fgvideoram[tile_index+1] << 8),
 			0,
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(mosaic_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(mosaic_state::get_bg_tile_info)
 {
 	tile_index *= 2;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			m_bgvideoram[tile_index] + (m_bgvideoram[tile_index+1] << 8),
 			0,

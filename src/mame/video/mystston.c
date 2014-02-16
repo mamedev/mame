@@ -152,7 +152,7 @@ TILE_GET_INFO_MEMBER(mystston_state::get_bg_tile_info)
 	int code = ((m_bg_videoram[page | 0x200 | tile_index] & 0x01) << 8) | m_bg_videoram[page | tile_index];
 	int flags = (tile_index & 0x10) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, 0, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, flags);
 }
 
 
@@ -161,7 +161,7 @@ TILE_GET_INFO_MEMBER(mystston_state::get_fg_tile_info)
 	int code = ((m_fg_videoram[0x400 | tile_index] & 0x07) << 8) | m_fg_videoram[tile_index];
 	int color = ((*m_video_control & 0x01) << 1) | ((*m_video_control & 0x02) >> 1);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 
@@ -253,7 +253,7 @@ UINT32 mystston_state::screen_update_mystston(screen_device &screen, bitmap_ind1
 	machine().tilemap().set_flip_all(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect, machine().gfx[2], flip);
+	draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(2), flip);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -311,7 +311,7 @@ MACHINE_CONFIG_FRAGMENT( mystston_video )
 	MCFG_VIDEO_START_OVERRIDE(mystston_state,mystston)
 	MCFG_VIDEO_RESET_OVERRIDE(mystston_state,mystston)
 
-	MCFG_GFXDECODE(mystston)
+	MCFG_GFXDECODE_ADD("gfxdecode", mystston)
 	MCFG_PALETTE_LENGTH(0x40)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

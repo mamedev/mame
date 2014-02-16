@@ -207,14 +207,14 @@ static MACHINE_CONFIG_START( batman, batman_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE(batman)
+	MCFG_GFXDECODE_ADD("gfxdecode", batman)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(batman_state, get_playfield_tile_info)
 	MCFG_ATARI_VAD_PLAYFIELD2(batman_state, get_playfield2_tile_info)
 	MCFG_ATARI_VAD_ALPHA(batman_state, get_alpha_tile_info)
-	MCFG_ATARI_VAD_MOB(batman_state::s_mob_config)
+	MCFG_ATARI_VAD_MOB(batman_state::s_mob_config, "gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

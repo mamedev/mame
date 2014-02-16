@@ -776,7 +776,7 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_7_15909MHz/2 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
-	MCFG_GFXDECODE( odyssey2 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  odyssey2 )
 	MCFG_PALETTE_LENGTH(32)
 
 	/* sound hardware */
@@ -805,7 +805,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_17_73447MHz/5 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
-	MCFG_GFXDECODE( odyssey2 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  odyssey2 )
 	MCFG_PALETTE_LENGTH(16)
 
 	/* sound hardware */
@@ -833,7 +833,7 @@ static MACHINE_CONFIG_START( g7400, g7400_state )
 	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
-	MCFG_GFXDECODE( odyssey2 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  odyssey2 )
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(g7400_state,i8243_port_w))
@@ -867,7 +867,7 @@ static MACHINE_CONFIG_START( odyssey3, g7400_state )
 	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
-	MCFG_GFXDECODE( odyssey2 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  odyssey2 )
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(g7400_state,i8243_port_w))

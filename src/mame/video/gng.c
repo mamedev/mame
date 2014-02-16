@@ -19,7 +19,7 @@
 TILE_GET_INFO_MEMBER(gng_state::get_fg_tile_info)
 {
 	UINT8 attr = m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_fgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x0f,
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(gng_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(gng_state::get_bg_tile_info)
 {
 	UINT8 attr = m_bgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			m_bgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x07,
@@ -104,7 +104,7 @@ WRITE8_MEMBER(gng_state::gng_flipscreen_w)
 void gng_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *buffered_spriteram = m_spriteram->buffer();
-	gfx_element *gfx = machine().gfx[2];
+	gfx_element *gfx = m_gfxdecode->gfx(2);
 	int offs;
 
 

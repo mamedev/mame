@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(xorworld_state::get_bg_tile_info)
 	int data = videoram[tile_index];
 	int code = data & 0x0fff;
 
-	SET_TILE_INFO_MEMBER(0, code, data >> 12, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, data >> 12, 0);
 }
 
 void xorworld_state::video_start()
@@ -106,7 +106,7 @@ void xorworld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int code = (spriteram16[i+1] & 0x0ffc) >> 2;
 		int color = (spriteram16[i+1] & 0xf000) >> 12;
 
-		 machine().gfx[1]->transpen(bitmap,cliprect, code, color, 0, 0, sx, sy, 0);
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, 0, 0, sx, sy, 0);
 	}
 }
 

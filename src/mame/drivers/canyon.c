@@ -250,7 +250,7 @@ static MACHINE_CONFIG_START( canyon, canyon_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(canyon_state, screen_update_canyon)
 
-	MCFG_GFXDECODE(canyon)
+	MCFG_GFXDECODE_ADD("gfxdecode", canyon)
 	MCFG_PALETTE_LENGTH(4)
 
 

@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_SCREEN_UPDATE_DRIVER(boogwing_state, screen_update_boogwing)
 
 	MCFG_PALETTE_LENGTH(2048)
-	MCFG_GFXDECODE(boogwing)
+	MCFG_GFXDECODE_ADD("gfxdecode", boogwing)
 
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -361,13 +361,18 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", boogwing_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	
 	MCFG_DECO16IC_ADD("tilegen2", boogwing_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 4);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DECO104_ADD("ioprot104")
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE

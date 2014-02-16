@@ -627,11 +627,12 @@ static MACHINE_CONFIG_START( galpani2, galpani2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(galpani2_state, screen_update_galpani2)
 
-	MCFG_GFXDECODE(galpani2)
+	MCFG_GFXDECODE_ADD("gfxdecode", galpani2)
 	MCFG_PALETTE_LENGTH(0x4000 + 0x200 + 0x8000)    // sprites, bg8, bg15
 
 	MCFG_DEVICE_ADD_KC002_SPRITES
 	kaneko16_sprite_device::set_offsets(*device, 0x10000 - 0x16c0 + 0xc00, 0);
+	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 
 	/* sound hardware */

@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
 {
 	UINT16 code = m_tileram[tile_index];
 
-	SET_TILE_INFO_MEMBER((code & 0x200) ? 1 : 0, code & 0x1ff, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, (code & 0x200) ? 1 : 0, code & 0x1ff, 0, 0);
 }
 
 void mole_state::video_start()
@@ -328,7 +328,7 @@ static MACHINE_CONFIG_START( mole, mole_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mole_state, screen_update_mole)
 
-	MCFG_GFXDECODE(mole)
+	MCFG_GFXDECODE_ADD("gfxdecode", mole)
 	MCFG_PALETTE_LENGTH(8)
 
 

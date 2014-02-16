@@ -20,7 +20,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
 	code+=(attr&3)<<8;
 	pal=(attr>>4);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		1,
 		code,
 		pal,
@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
 
 	pal+=16;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		1,
 		code,
 		pal,
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 
 	pal+=48;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		0,
 		code,
 		pal,
@@ -179,7 +179,7 @@ UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind1
 			palette+=32;
 
 			
-				machine().gfx[2]->transpen(
+				m_gfxdecode->gfx(2)->transpen(
 				bitmap,cliprect,
 				tile,
 				palette,

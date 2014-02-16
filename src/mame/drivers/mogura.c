@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(mogura_state::get_mogura_tile_info)
 	int code = m_tileram[tile_index];
 	int attr = m_tileram[tile_index + 0x800];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			(attr >> 1) & 7,
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(mogura_state::get_mogura_tile_info)
 
 void mogura_state::video_start()
 {
-	machine().gfx[0]->set_source(m_gfxram);
+	m_gfxdecode->gfx(0)->set_source(m_gfxram);
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mogura_state::get_mogura_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
@@ -122,7 +122,7 @@ WRITE8_MEMBER(mogura_state::mogura_gfxram_w)
 {
 	m_gfxram[offset] = data ;
 
-	machine().gfx[0]->mark_dirty(offset / 16);
+	m_gfxdecode->gfx(0)->mark_dirty(offset / 16);
 }
 
 
@@ -210,7 +210,7 @@ static MACHINE_CONFIG_START( mogura, mogura_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mogura_state, screen_update_mogura)
 
-	MCFG_GFXDECODE(mogura)
+	MCFG_GFXDECODE_ADD("gfxdecode", mogura)
 	MCFG_PALETTE_LENGTH(32)
 
 	/* sound hardware */

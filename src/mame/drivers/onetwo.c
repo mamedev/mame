@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(onetwo_state::get_fg_tile_info)
 
 	code &= 0x7fff;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void onetwo_state::video_start()
@@ -372,7 +372,7 @@ static MACHINE_CONFIG_START( onetwo, onetwo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(onetwo_state, screen_update_onetwo)
 
-	MCFG_GFXDECODE(onetwo)
+	MCFG_GFXDECODE_ADD("gfxdecode", onetwo)
 	MCFG_PALETTE_LENGTH(0x80)
 
 

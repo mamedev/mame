@@ -1963,7 +1963,7 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	MCFG_DEVICE_ADD("typewriter", PDP1_PRINTER, 0)
 	MCFG_DEVICE_ADD("drum", PDP1_CYLINDER, 0)
 
-	MCFG_GFXDECODE(pdp1)
+	MCFG_GFXDECODE_ADD("gfxdecode", pdp1)
 	MCFG_PALETTE_LENGTH(pen_crt_num_levels + sizeof(pdp1_colors) / 3 + sizeof(pdp1_palette))
 
 MACHINE_CONFIG_END

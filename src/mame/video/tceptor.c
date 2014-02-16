@@ -111,7 +111,7 @@ TILE_GET_INFO_MEMBER(tceptor_state::get_tx_tile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void tceptor_state::tile_mark_dirty(int offset)
@@ -168,7 +168,7 @@ TILE_GET_INFO_MEMBER(tceptor_state::get_bg1_tile_info)
 	int code = (data & 0x3ff) | 0x000;
 	int color = (data & 0xfc00) >> 10;
 
-	SET_TILE_INFO_MEMBER(m_bg, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, m_bg, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(tceptor_state::get_bg2_tile_info)
@@ -177,7 +177,7 @@ TILE_GET_INFO_MEMBER(tceptor_state::get_bg2_tile_info)
 	int code = (data & 0x3ff) | 0x400;
 	int color = (data & 0xfc00) >> 10;
 
-	SET_TILE_INFO_MEMBER(m_bg, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, m_bg, code, color, 0);
 }
 
 WRITE8_MEMBER(tceptor_state::tceptor_bg_ram_w)
@@ -256,13 +256,13 @@ void tceptor_state::decode_bg(const char * region)
 	auto_free(machine(), buffer);
 
 	/* decode the graphics */
-	machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), bg_layout, memregion(region)->base(), 64, 2048));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), bg_layout, memregion(region)->base(), 64, 2048)));
 }
 
 void tceptor_state::decode_sprite(int gfx_index, const gfx_layout *layout, const void *data)
 {
 	/* decode the graphics */
-	machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), *layout, (const UINT8 *)data, 64, 1024));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), *layout, (const UINT8 *)data, 64, 1024)));
 }
 
 // fix sprite order
@@ -369,7 +369,7 @@ void tceptor_state::video_start()
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine().gfx[gfx_index] == 0)
+		if (m_gfxdecode->gfx(gfx_index) == 0)
 			break;
 	assert(gfx_index + 4 <= MAX_GFX_ELEMENTS);
 
@@ -391,7 +391,7 @@ void tceptor_state::video_start()
 
 	m_tx_tilemap->set_scrollx(0, -2*8);
 	m_tx_tilemap->set_scrolly(0, 0);
-	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, machine().gfx[0], 7);
+	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, m_gfxdecode->gfx(0), 7);
 
 	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
@@ -480,7 +480,7 @@ void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			y -= 78;
 
 			
-						machine().gfx[gfx]->zoom_transmask(bitmap,
+						m_gfxdecode->gfx(gfx)->zoom_transmask(bitmap,
 						cliprect,
 						code,
 						color,
@@ -488,7 +488,7 @@ void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 						x, y,
 						scalex,
 						scaley,
-						colortable_get_transpen_mask(machine().colortable, machine().gfx[gfx], color, SPR_TRANS_COLOR));
+						colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(gfx), color, SPR_TRANS_COLOR));
 		}
 	}
 

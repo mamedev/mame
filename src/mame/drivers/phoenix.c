@@ -461,7 +461,7 @@ static MACHINE_CONFIG_START( phoenix, phoenix_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(phoenix_state, screen_update_phoenix)
 
-	MCFG_GFXDECODE(phoenix)
+	MCFG_GFXDECODE_ADD("gfxdecode", phoenix)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT_OVERRIDE(phoenix_state,phoenix)
@@ -490,7 +490,7 @@ static MACHINE_CONFIG_DERIVED( pleiads, phoenix )
 	MCFG_CPU_PROGRAM_MAP(pleiads_memory_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(pleiads)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", pleiads)
 
 	MCFG_PALETTE_INIT_OVERRIDE(phoenix_state,pleiads)
 
@@ -527,7 +527,7 @@ static MACHINE_CONFIG_START( survival, phoenix_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(phoenix_state, screen_update_phoenix)
 
-	MCFG_GFXDECODE(phoenix)
+	MCFG_GFXDECODE_ADD("gfxdecode", phoenix)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT_OVERRIDE(phoenix_state,survival)

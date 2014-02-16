@@ -225,7 +225,7 @@ static MACHINE_CONFIG_START( poolshrk, poolshrk_state )
 	MCFG_SCREEN_VISIBLE_AREA(1, 255, 24, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(poolshrk_state, screen_update_poolshrk)
 
-	MCFG_GFXDECODE(poolshrk)
+	MCFG_GFXDECODE_ADD("gfxdecode", poolshrk)
 	MCFG_PALETTE_LENGTH(4)
 
 	/* sound hardware */

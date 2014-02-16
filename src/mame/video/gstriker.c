@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(gstriker_state::VS920A_get_tile_info)
 	tileno = data & 0xFFF;
 	pal =   (data >> 12) & 0xF;
 
-	SET_TILE_INFO_MEMBER(m_VS920A_cur_chip->gfx_region, tileno, m_VS920A_cur_chip->pal_base + pal, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, m_VS920A_cur_chip->gfx_region, tileno, m_VS920A_cur_chip->pal_base + pal, 0);
 }
 
 WRITE16_MEMBER(gstriker_state::VS920A_0_vram_w)
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(gstriker_state::MB60553_get_tile_info)
 	pal = (data >> 12) & 0xF;
 	bankno = (data >> 9) & 0x7;
 
-	SET_TILE_INFO_MEMBER(m_MB60553->gfx_region, tileno + m_MB60553_cur_chip->bank[bankno] * 0x200, pal + m_MB60553->pal_base, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, m_MB60553->gfx_region, tileno + m_MB60553_cur_chip->bank[bankno] * 0x200, pal + m_MB60553->pal_base, 0);
 }
 
 void gstriker_state::MB60553_reg_written(int numchip, int num_reg)

@@ -82,7 +82,7 @@ UINT32 istellar_state::screen_update_istellar(screen_device &screen, bitmap_rgb3
 			int tile = m_tile_ram[x+y*32];
 			int attr = m_tile_control_ram[x+y*32];
 
-			 machine().gfx[0]->transpen(bitmap,cliprect,tile,attr & 0x0f,0, 0, x*8, y*8, 0);
+			 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,tile,attr & 0x0f,0, 0, x*8, y*8, 0);
 		}
 	}
 
@@ -358,7 +358,7 @@ static MACHINE_CONFIG_START( istellar, istellar_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_GFXDECODE(istellar)
+	MCFG_GFXDECODE_ADD("gfxdecode", istellar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

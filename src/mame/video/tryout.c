@@ -48,12 +48,12 @@ TILE_GET_INFO_MEMBER(tryout_state::get_fg_tile_info)
 	code |= ((attr & 0x03) << 8);
 	color = ((attr & 0x4)>>2)+6;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(tryout_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(2, m_vram[tile_index] & 0x7f, 2, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, m_vram[tile_index] & 0x7f, 2, 0);
 }
 
 READ8_MEMBER(tryout_state::tryout_vram_r)
@@ -133,7 +133,7 @@ WRITE8_MEMBER(tryout_state::tryout_vram_w)
 		break;
 	}
 
-	machine().gfx[2]->mark_dirty((offset-0x400/64)&0x7f);
+	m_gfxdecode->gfx(2)->mark_dirty((offset-0x400/64)&0x7f);
 }
 
 WRITE8_MEMBER(tryout_state::tryout_vram_bankswitch_w)
@@ -171,7 +171,7 @@ void tryout_state::video_start()
 	m_vram=auto_alloc_array(machine(), UINT8, 8 * 0x800);
 	m_vram_gfx=auto_alloc_array(machine(), UINT8, 0x6000);
 
-	machine().gfx[2]->set_source(m_vram_gfx);
+	m_gfxdecode->gfx(2)->set_source(m_vram_gfx);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -209,17 +209,17 @@ void tryout_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		/* Double Height */
 		if(spriteram[offs] & 0x10)
 		{
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y + inc,0);
 
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				sprite+1,
 				color,fx,fy,x,y,0);
 		}
 		else
 		{
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y,0);
 		}

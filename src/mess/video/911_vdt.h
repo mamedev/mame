@@ -51,6 +51,10 @@ public:
 
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
+	
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -59,6 +63,7 @@ protected:
 private:
 	// internal state
 	void *m_token;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 extern const device_type VDT911;
@@ -68,6 +73,8 @@ extern const device_type VDT911;
 	MCFG_DEVICE_ADD(_tag, VDT911, 0) \
 	MCFG_DEVICE_CONFIG(_intf)
 
+#define MCFG_VDT911_VIDEO_GFXDECODE(_gfxtag) \
+	vdt911_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 	DECLARE_READ8_DEVICE_HANDLER(vdt911_cru_r);
 DECLARE_WRITE8_DEVICE_HANDLER(vdt911_cru_w);

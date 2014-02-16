@@ -266,8 +266,8 @@ TILE_GET_INFO_MEMBER(mpu12wbk_state::get_bg_tile_info)
 //  int code = m_videoram[tile_index] | ((attr & 0xc0) << 2);
 //  int color = (attr & 0x0f);
 
-//  SET_TILE_INFO_MEMBER( 0, code, color, 0);
-	SET_TILE_INFO_MEMBER( 0, 0 ,0 ,0);
+//  SET_TILE_INFO_MEMBER(m_gfxdecode,  0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  0, 0 ,0 ,0);
 }
 
 
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( mpu12wbk, mpu12wbk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)    /* Driven by MC6845, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(mpu12wbk_state, screen_update_mpu12wbk)
 
-	MCFG_GFXDECODE(mpu12wbk)
+	MCFG_GFXDECODE_ADD("gfxdecode", mpu12wbk)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4, mc6845_intf) /* guess */

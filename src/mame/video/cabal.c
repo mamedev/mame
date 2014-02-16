@@ -16,7 +16,7 @@ TILE_GET_INFO_MEMBER(cabal_state::get_back_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile,
 			color,
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(cabal_state::get_text_tile_info)
 
 	tile &= 0x3ff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -126,7 +126,7 @@ void cabal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				flipy = !flipy;
 			}
 
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				tile_number,
 				color,
 				flipx,flipy,

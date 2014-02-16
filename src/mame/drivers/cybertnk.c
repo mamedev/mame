@@ -245,7 +245,7 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap0_tile_info)
 	int pal = (code & 0xe000) >> 13;
 	pal     |=(code & 0x1c00) >> 7;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code & 0x1fff,
 			pal,
@@ -258,7 +258,7 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap1_tile_info)
 	int pal = (code & 0xe000) >> 13;
 	pal     |=(code & 0x1c00) >> 7;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code & 0x1fff,
 			pal,
@@ -271,7 +271,7 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap2_tile_info)
 	int pal = (code & 0xe000) >> 13;
 	pal     |=(code & 0x1c00) >> 7;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code & 0x1fff,
 			pal,
@@ -296,7 +296,7 @@ static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectang
 {
 	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
 	int i;
-	gfx_element *gfx = screen.machine().gfx[3];
+	gfx_element *gfx = state->m_gfxdecode->gfx(3);
 
 
 	for (i=0;i<0x1000/4;i+=4)
@@ -858,7 +858,7 @@ static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cybertnk_state, screen_update_cybertnk_right)
 
-	MCFG_GFXDECODE(cybertnk)
+	MCFG_GFXDECODE_ADD("gfxdecode", cybertnk)
 	MCFG_PALETTE_LENGTH(0x4000)
 
 

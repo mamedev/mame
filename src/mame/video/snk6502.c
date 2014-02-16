@@ -10,8 +10,8 @@
 #include "includes/snk6502.h"
 
 
-#define TOTAL_COLORS(m,gfxn) ((m).gfx[gfxn]->colors() * (m).gfx[gfxn]->granularity())
-#define COLOR(m,gfxn,offs) ((m).config().m_gfxdecodeinfo[gfxn].color_codes_start + offs)
+#define TOTAL_COLORS(gfxn) (m_gfxdecode->gfx(gfxn)->colors() * m_gfxdecode->gfx(gfxn)->granularity())
+#define COLOR(gfxn,offs) (m_gfxdecode->gfx(gfxn)->colorbase() + offs)
 
 
 
@@ -62,15 +62,15 @@ PALETTE_INIT_MEMBER(snk6502_state,snk6502)
 
 	m_backcolor = 0;    /* background color can be changed by the game */
 
-	for (i = 0; i < TOTAL_COLORS(machine(),0); i++)
-		palette_set_color(machine(), COLOR(machine(), 0, i), m_palette[i]);
+	for (i = 0; i < TOTAL_COLORS(0); i++)
+		palette_set_color(machine(), COLOR(0, i), m_palette[i]);
 
-	for (i = 0; i < TOTAL_COLORS(machine(),1); i++)
+	for (i = 0; i < TOTAL_COLORS(1); i++)
 	{
 		if (i % 4 == 0)
-			palette_set_color(machine(), COLOR(machine(), 1, i), m_palette[4 * m_backcolor + 0x20]);
+			palette_set_color(machine(), COLOR(1, i), m_palette[4 * m_backcolor + 0x20]);
 		else
-			palette_set_color(machine(), COLOR(machine(), 1, i), m_palette[i + 0x20]);
+			palette_set_color(machine(), COLOR(1, i), m_palette[i + 0x20]);
 	}
 }
 
@@ -98,7 +98,7 @@ WRITE8_MEMBER(snk6502_state::snk6502_charram_w)
 	if (m_charram[offset] != data)
 	{
 		m_charram[offset] = data;
-		machine().gfx[0]->mark_dirty((offset/8) % 256);
+		m_gfxdecode->gfx(0)->mark_dirty((offset/8) % 256);
 	}
 }
 
@@ -116,7 +116,7 @@ WRITE8_MEMBER(snk6502_state::snk6502_flipscreen_w)
 		m_backcolor = data & 7;
 
 		for (i = 0;i < 32;i += 4)
-			palette_set_color(machine(), COLOR(machine(), 1, i), m_palette[4 * m_backcolor + 0x20]);
+			palette_set_color(machine(), COLOR(1, i), m_palette[4 * m_backcolor + 0x20]);
 	}
 
 	/* bit 3 selects char bank */
@@ -154,7 +154,7 @@ TILE_GET_INFO_MEMBER(snk6502_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + 256 * m_charbank;
 	int color = (m_colorram[tile_index] & 0x38) >> 3;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(snk6502_state::get_fg_tile_info)
@@ -162,7 +162,7 @@ TILE_GET_INFO_MEMBER(snk6502_state::get_fg_tile_info)
 	int code = m_videoram2[tile_index];
 	int color = m_colorram[tile_index] & 0x07;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 VIDEO_START_MEMBER(snk6502_state,snk6502)
@@ -172,7 +172,7 @@ VIDEO_START_MEMBER(snk6502_state,snk6502)
 
 	m_fg_tilemap->set_transparent_pen(0);
 
-	machine().gfx[0]->set_source(m_charram);
+	m_gfxdecode->gfx(0)->set_source(m_charram);
 }
 
 VIDEO_START_MEMBER(snk6502_state,pballoon)
@@ -233,15 +233,15 @@ PALETTE_INIT_MEMBER(snk6502_state,satansat)
 
 	m_backcolor = 0;    /* background color can be changed by the game */
 
-	for (i = 0; i < TOTAL_COLORS(machine(),0); i++)
-		palette_set_color(machine(), COLOR(machine(), 0, i), m_palette[4 * (i % 4) + (i / 4)]);
+	for (i = 0; i < TOTAL_COLORS(0); i++)
+		palette_set_color(machine(), COLOR(0, i), m_palette[4 * (i % 4) + (i / 4)]);
 
-	for (i = 0; i < TOTAL_COLORS(machine(),1); i++)
+	for (i = 0; i < TOTAL_COLORS(1); i++)
 	{
 		if (i % 4 == 0)
-			palette_set_color(machine(), COLOR(machine(), 1, i), m_palette[m_backcolor + 0x10]);
+			palette_set_color(machine(), COLOR(1, i), m_palette[m_backcolor + 0x10]);
 		else
-			palette_set_color(machine(), COLOR(machine(), 1, i), m_palette[4 * (i % 4) + (i / 4) + 0x10]);
+			palette_set_color(machine(), COLOR(1, i), m_palette[4 * (i % 4) + (i / 4) + 0x10]);
 	}
 }
 
@@ -272,7 +272,7 @@ WRITE8_MEMBER(snk6502_state::satansat_backcolor_w)
 		m_backcolor = data & 0x03;
 
 		for (i = 0; i < 16; i += 4)
-			palette_set_color(machine(), COLOR(machine(), 1, i), m_palette[m_backcolor + 0x10]);
+			palette_set_color(machine(), COLOR(1, i), m_palette[m_backcolor + 0x10]);
 	}
 }
 
@@ -281,7 +281,7 @@ TILE_GET_INFO_MEMBER(snk6502_state::satansat_get_bg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = (m_colorram[tile_index] & 0x0c) >> 2;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(snk6502_state::satansat_get_fg_tile_info)
@@ -289,7 +289,7 @@ TILE_GET_INFO_MEMBER(snk6502_state::satansat_get_fg_tile_info)
 	int code = m_videoram2[tile_index];
 	int color = m_colorram[tile_index] & 0x03;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 VIDEO_START_MEMBER(snk6502_state,satansat)
@@ -299,5 +299,5 @@ VIDEO_START_MEMBER(snk6502_state,satansat)
 
 	m_fg_tilemap->set_transparent_pen(0);
 
-	machine().gfx[0]->set_source(m_charram);
+	m_gfxdecode->gfx(0)->set_source(m_charram);
 }

@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( battlane, battlane_state )
 	MCFG_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 0 * 8, 32 * 8 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(battlane_state, screen_update_battlane)
 
-	MCFG_GFXDECODE(battlane)
+	MCFG_GFXDECODE_ADD("gfxdecode", battlane)
 	MCFG_PALETTE_LENGTH(64)
 
 

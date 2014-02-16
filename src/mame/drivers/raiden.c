@@ -290,7 +290,7 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	MCFG_SCREEN_UPDATE_DRIVER(raiden_state, screen_update_raiden)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(raiden)
+	MCFG_GFXDECODE_ADD("gfxdecode", raiden)
 	MCFG_PALETTE_LENGTH(2048)
 
 	/* sound hardware */

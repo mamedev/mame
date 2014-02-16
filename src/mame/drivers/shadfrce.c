@@ -554,7 +554,7 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update_shadfrce)
 	MCFG_SCREEN_VBLANK_DRIVER(shadfrce_state, screen_eof_shadfrce)
 
-	MCFG_GFXDECODE(shadfrce)
+	MCFG_GFXDECODE_ADD("gfxdecode", shadfrce)
 	MCFG_PALETTE_LENGTH(0x4000)
 
 

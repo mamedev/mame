@@ -1307,18 +1307,22 @@ WRITE_LINE_MEMBER(dec0_state::sound_irq2)
 
 
 static MACHINE_CONFIG_START( dec0_base, dec0_state )
-	MCFG_GFXDECODE(dec0)
+	MCFG_GFXDECODE_ADD("gfxdecode", dec0)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,0,0);
+	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,1,0);
+	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 	MCFG_DEVICE_ADD("tilegen3", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,2,0);
+	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 3);
+	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0)
 MACHINE_CONFIG_END
@@ -1413,17 +1417,20 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,0,0);
+	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,1,0);
+	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 	MCFG_DEVICE_ADD("tilegen3", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,2,0);
+	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 3);
-
+	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 	MCFG_PALETTE_LENGTH(1024)
-	MCFG_GFXDECODE(automat)
+	MCFG_GFXDECODE_ADD("gfxdecode", automat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1466,17 +1473,20 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,0,0);
+	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,1,0);
+	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 	MCFG_DEVICE_ADD("tilegen3", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,2,0);
+	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 3);
-
+	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 	MCFG_PALETTE_LENGTH(1024)
-	MCFG_GFXDECODE(secretab)
+	MCFG_GFXDECODE_ADD("gfxdecode", secretab)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1710,7 +1720,7 @@ static MACHINE_CONFIG_DERIVED( midres, dec0_base_sound_alt )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_midres)
 
-	MCFG_GFXDECODE(midres)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", midres)
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
 MACHINE_CONFIG_END
 

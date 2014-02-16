@@ -163,14 +163,14 @@ WRITE8_MEMBER(igspoker_state::igs_irqack_w)
 TILE_GET_INFO_MEMBER(igspoker_state::get_bg_tile_info)
 {
 	int code = m_bg_tile_ram[tile_index];
-	SET_TILE_INFO_MEMBER(1 + (tile_index & 3), code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1 + (tile_index & 3), code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(igspoker_state::get_fg_tile_info)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
-	SET_TILE_INFO_MEMBER(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
 WRITE8_MEMBER(igspoker_state::bg_tile_w)
@@ -1782,7 +1782,7 @@ static MACHINE_CONFIG_START( igspoker, igspoker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_igs_video)
 
-	MCFG_GFXDECODE(igspoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", igspoker)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -1820,7 +1820,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cpokerpk, number10 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(cpokerpk_io_map)
-	MCFG_GFXDECODE(cpokerpk)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", cpokerpk)
 MACHINE_CONFIG_END
 
 

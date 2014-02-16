@@ -68,20 +68,20 @@ TILE_GET_INFO_MEMBER(cultures_state::get_bg1_tile_info)
 {
 	UINT8 *region = memregion("gfx3")->base() + 0x200000 + 0x80000 * m_bg1_bank;
 	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
-	SET_TILE_INFO_MEMBER(2, code, code >> 12, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(cultures_state::get_bg2_tile_info)
 {
 	UINT8 *region = memregion("gfx2")->base() + 0x200000 + 0x80000 * m_bg2_bank;
 	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
-	SET_TILE_INFO_MEMBER(1, code, code >> 12, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(cultures_state::get_bg0_tile_info)
 {
 	int code = m_bg0_videoram[tile_index * 2] + (m_bg0_videoram[tile_index * 2 + 1] << 8);
-	SET_TILE_INFO_MEMBER(0, code, code >> 12, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, code >> 12, 0);
 }
 
 void cultures_state::video_start()
@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( cultures, cultures_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cultures_state, screen_update_cultures)
 
-	MCFG_GFXDECODE(culture)
+	MCFG_GFXDECODE_ADD("gfxdecode", culture)
 	MCFG_PALETTE_LENGTH(0x2000)
 
 

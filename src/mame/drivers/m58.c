@@ -196,7 +196,7 @@ static MACHINE_CONFIG_START( yard, m58_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m58_state,  irq0_line_hold)
 
 	/* video hardware */
-	MCFG_GFXDECODE(yard)
+	MCFG_GFXDECODE_ADD("gfxdecode", yard)
 	MCFG_PALETTE_LENGTH(256+256+256)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

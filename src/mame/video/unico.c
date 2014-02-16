@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(unico_state::get_tile_info)
 	UINT16 *vram = (UINT16 *)tilemap.user_data();
 	UINT16 code = vram[2 * tile_index + 0 ];
 	UINT16 attr = vram[2 * tile_index + 1 ];
-	SET_TILE_INFO_MEMBER(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
 }
 
 READ16_MEMBER(unico_state::unico_vram_r) { return m_vram[offset]; }
@@ -230,7 +230,7 @@ void unico_state::unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			machine().gfx[0]->prio_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 						code++,
 						attr & 0x1f,
 						flipx, flipy,

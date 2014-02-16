@@ -348,14 +348,14 @@ TILE_GET_INFO_MEMBER(megasys1_state::megasys1_get_scroll_tile_info_8x8)
 {
 	int tmap = (FPTR)tilemap.user_data();
 	UINT16 code = m_scrollram[tmap][tile_index];
-	SET_TILE_INFO_MEMBER(tmap, (code & 0xfff) * m_8x8_scroll_factor[tmap], code >> (16 - m_bits_per_color_code), 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, tmap, (code & 0xfff) * m_8x8_scroll_factor[tmap], code >> (16 - m_bits_per_color_code), 0);
 }
 
 TILE_GET_INFO_MEMBER(megasys1_state::megasys1_get_scroll_tile_info_16x16)
 {
 	int tmap = (FPTR)tilemap.user_data();
 	UINT16 code = m_scrollram[tmap][tile_index/4];
-	SET_TILE_INFO_MEMBER(tmap, (code & 0xfff) * m_16x16_scroll_factor[tmap] + (tile_index & 3), code >> (16 - m_bits_per_color_code), 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, tmap, (code & 0xfff) * m_16x16_scroll_factor[tmap] + (tile_index & 3), code >> (16 - m_bits_per_color_code), 0);
 }
 
 void megasys1_state::create_tilemaps()
@@ -597,7 +597,7 @@ void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 				code  = spritedata[0x0E/2] + objectdata[0x06/2];
 				color = (attr & color_mask);
 
-				machine().gfx[3]->prio_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
 						(code & 0xfff ) + ((m_sprite_bank & 1) << 12),
 						color,
 						flipx, flipy,
@@ -637,7 +637,7 @@ void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 				sx = 240-sx;        sy = 240-sy;
 			}
 
-			machine().gfx[2]->prio_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->prio_transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx, flipy,

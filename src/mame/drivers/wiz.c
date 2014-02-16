@@ -729,7 +729,7 @@ static MACHINE_CONFIG_START( wiz, wiz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_wiz)
 
-	MCFG_GFXDECODE(wiz)
+	MCFG_GFXDECODE_ADD("gfxdecode", wiz)
 	MCFG_PALETTE_LENGTH(256)
 
 
@@ -755,7 +755,7 @@ static MACHINE_CONFIG_DERIVED( stinger, wiz )
 	MCFG_CPU_PROGRAM_MAP(stinger_sound_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(stinger)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", stinger)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_stinger)
 
@@ -784,7 +784,7 @@ static MACHINE_CONFIG_DERIVED( kungfut, wiz )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_GFXDECODE(stinger)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", stinger)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_kungfut)
 

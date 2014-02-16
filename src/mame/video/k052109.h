@@ -21,6 +21,9 @@ public:
 	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k052109_device() {}
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+
 	/*
 	You don't have to decode the graphics: the vh_start() routines will do that
 	for you, using the plane order passed.
@@ -86,6 +89,7 @@ private:
 	UINT8    m_irq_enabled;
 	INT32    m_dx[3], m_dy[3];
 	UINT8    m_romsubbank, m_scrollctrl;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
@@ -100,5 +104,8 @@ extern const device_type K052109;
 #define MCFG_K052109_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K052109, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_K052109_GFXDECODE(_gfxtag) \
+	k052109_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif

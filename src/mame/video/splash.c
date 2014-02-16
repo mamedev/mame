@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(splash_state::get_tile_info_splash_tilemap0)
 	int attr = data >> 8;
 	int code = data & 0xff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code + ((0x20 + (attr & 0x0f)) << 8),
 			(attr & 0xf0) >> 4,
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(splash_state::get_tile_info_splash_tilemap1)
 	int attr = data >> 8;
 	int code = data & 0xff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			(code >> 2) + ((0x30 + (attr & 0x0f)) << 6),
 			(attr & 0xf0) >> 4,
@@ -206,7 +206,7 @@ void splash_state::video_start()
 void splash_state::splash_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int i;
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 
 	for (i = 0; i < 0x400; i += 4){
 		int sx = m_spriteram[i+2] & 0xff;
@@ -226,7 +226,7 @@ void splash_state::splash_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cli
 void splash_state::funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int i;
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 
 	for (i = 0; i < 0x400; i += 4){
 		int sx = m_spriteram[i+2] & 0xff;

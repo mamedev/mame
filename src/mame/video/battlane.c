@@ -99,7 +99,7 @@ TILE_GET_INFO_MEMBER(battlane_state::get_tile_info_bg)
 	int gfxn = (attr & 0x01) + 1;
 	int color = (attr >> 1) & 0x03;
 
-	SET_TILE_INFO_MEMBER(gfxn, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, gfxn, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(battlane_state::battlane_tilemap_scan_rows_2x2)
@@ -181,7 +181,7 @@ void battlane_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			}
 
 			
-				machine().gfx[0]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,
@@ -192,7 +192,7 @@ void battlane_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				dy = flipy ? 16 : -16;
 
 				
-					machine().gfx[0]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code + 1,
 					color,
 					flipx, flipy,

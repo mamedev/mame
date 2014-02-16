@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( shaolins, shaolins_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(shaolins_state, screen_update_shaolins)
 
-	MCFG_GFXDECODE(shaolins)
+	MCFG_GFXDECODE_ADD("gfxdecode", shaolins)
 	MCFG_PALETTE_LENGTH(16*8*16+16*8*16)
 
 

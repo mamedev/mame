@@ -48,7 +48,7 @@ inline void namcos2_shared_state::namcoic_get_tile_info(tile_data &tileinfo,int 
 	int tile, mask;
 	mTilemapInfo.cb( machine(), vram[tile_index], &tile, &mask );
 	tileinfo.mask_data = mTilemapInfo.maskBaseAddr+mask*8;
-	SET_TILE_INFO_MEMBER(mTilemapInfo.gfxbank,tile,0,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, mTilemapInfo.gfxbank,tile,0,0);
 } /* get_tile_info */
 
 TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info0 ) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x0000]); }
@@ -480,7 +480,7 @@ namcos2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const r
 				int scaley = (sizey<<16)/((word0&0x0200)?0x20:0x10);
 				if(scalex && scaley)
 				{
-					gfx_element *gfx = machine().gfx[rgn];
+					gfx_element *gfx = m_gfxdecode->gfx(rgn);
 
 					if( (word0&0x0200)==0 )
 						gfx->set_source_clip((word1&0x0001) ? 16 : 0, 16, (word1&0x0002) ? 16 : 0, 16);
@@ -615,7 +615,7 @@ void namcos2_state::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &
 				screen,
 				bitmap,
 				rect,
-				machine().gfx[0],
+				m_gfxdecode->gfx(0),
 				sprn, color,
 				flipx,flipy,
 				sx,sy,
@@ -855,7 +855,7 @@ void namcos2_shared_state::c355_obj_draw_sprite(screen_device &screen, _BitmapCl
 					screen,
 					bitmap,
 					clip,
-					machine().gfx[m_c355_obj_gfxbank],
+					m_gfxdecode->gfx(m_c355_obj_gfxbank),
 					m_c355_obj_code2tile(tile) + offset,
 					color,
 					flipx,flipy,
@@ -1021,7 +1021,7 @@ void namcos2_shared_state::c169_roz_get_info(tile_data &tileinfo, int tile_index
 			tile &= 0x3fff; // cap mask offset
 			break;
 	}
-	SET_TILE_INFO_MEMBER(m_c169_roz_gfxbank, mangle, 0/*color*/, 0/*flag*/);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, m_c169_roz_gfxbank, mangle, 0/*color*/, 0/*flag*/);
 	tileinfo.mask_data = m_c169_roz_mask + 32*tile;
 }
 
@@ -1318,10 +1318,20 @@ namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, cons
 	: device_t(mconfig, NAMCO_C45_ROAD, "Namco C45 Road", tag, owner, clock, "namco_c45_road", __FILE__),
 		m_transparent_color(~0),
 		m_gfx(NULL),
-		m_tilemap(NULL)
+		m_tilemap(NULL),
+		m_gfxdecode(*this)
 {
 }
 
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void namco_c45_road_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<namco_c45_road_device &>(device).m_gfxdecode.set_tag(tag);
+}
 
 //-------------------------------------------------
 //  read -- read from RAM
@@ -1476,8 +1486,8 @@ TILE_GET_INFO_MEMBER( namco_c45_road_device::get_road_info )
 {
 	// ------xx xxxxxxxx tile number
 	// xxxxxx-- -------- palette select
-	UINT16 data = m_ram[tile_index];
-	int tile = data & 0x3ff;
-	int color = data >> 10;
-	SET_TILE_INFO_MEMBER(*m_gfx, tile, color, 0);
+	//UINT16 data = m_ram[tile_index];
+	//int tile = data & 0x3ff;
+	//int color = data >> 10;
+	//SET_TILE_INFO_MEMBER(*m_gfxdecode, *m_gfx, tile, color, 0);
 }

@@ -9,7 +9,7 @@ TILE_GET_INFO_MEMBER(speedspn_state::get_speedspn_tile_info)
 	int code = m_vidram[tile_index*2+1] | (m_vidram[tile_index*2] << 8);
 	int attr = m_attram[tile_index^0x400];
 
-	SET_TILE_INFO_MEMBER(0,code,attr & 0x3f,(attr & 0x80) ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,attr & 0x3f,(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
 void speedspn_state::video_start()
@@ -54,7 +54,7 @@ WRITE8_MEMBER(speedspn_state::speedspn_global_display_w)
 
 void speedspn_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	UINT8 *source = m_vidram+ 0x1000;
 	UINT8 *finish = source + 0x1000;
 

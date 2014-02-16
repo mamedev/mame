@@ -155,7 +155,7 @@ TILE_GET_INFO_MEMBER(dday_state::get_bg_tile_info)
 	int code;
 
 	code = m_bgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, code >> 5, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, code >> 5, 0);
 }
 
 TILE_GET_INFO_MEMBER(dday_state::get_fg_tile_info)
@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(dday_state::get_fg_tile_info)
 
 	flipx = m_colorram[tile_index & 0x03e0] & 0x01;
 	code = m_fgvideoram[flipx ? tile_index ^ 0x1f : tile_index];
-	SET_TILE_INFO_MEMBER(2, code, code >> 5, flipx ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, code >> 5, flipx ? TILE_FLIPX : 0);
 }
 
 TILE_GET_INFO_MEMBER(dday_state::get_text_tile_info)
@@ -172,7 +172,7 @@ TILE_GET_INFO_MEMBER(dday_state::get_text_tile_info)
 	int code;
 
 	code = m_textvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code, code >> 5, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, code >> 5, 0);
 }
 
 TILE_GET_INFO_MEMBER(dday_state::get_sl_tile_info)
@@ -194,7 +194,7 @@ TILE_GET_INFO_MEMBER(dday_state::get_sl_tile_info)
 		/* no mirroring, draw dark spot */
 		code = 1;
 
-	SET_TILE_INFO_MEMBER(3, code & 0x3f, 0, flipx ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, code & 0x3f, 0, flipx ? TILE_FLIPX : 0);
 }
 
 

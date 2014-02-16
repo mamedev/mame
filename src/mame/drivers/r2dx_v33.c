@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(r2dx_v33_state::get_bg_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(1,tile + 0x0000,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tile + 0x0000,color,0);
 }
 
 TILE_GET_INFO_MEMBER(r2dx_v33_state::get_md_tile_info)
@@ -96,7 +96,7 @@ TILE_GET_INFO_MEMBER(r2dx_v33_state::get_md_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(2,tile + 0x2000,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,tile + 0x2000,color,0);
 }
 
 TILE_GET_INFO_MEMBER(r2dx_v33_state::get_fg_tile_info)
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(r2dx_v33_state::get_fg_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(3,tile + 0x1000,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3,tile + 0x1000,color,0);
 }
 
 TILE_GET_INFO_MEMBER(r2dx_v33_state::get_tx_tile_info)
@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(r2dx_v33_state::get_tx_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(4,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 4,tile,color,0);
 }
 
 /* copied from Legionnaire */
@@ -163,7 +163,7 @@ void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						machine().gfx[0]->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+ax*16,y+ay*16,15);
 					}
@@ -173,7 +173,7 @@ void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						machine().gfx[0]->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+ax*16,y+(dy-ay-1)*16,15);
 					}
@@ -186,7 +186,7 @@ void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						machine().gfx[0]->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+(dx-ax-1)*16,y+ay*16,15);
 					}
@@ -196,7 +196,7 @@ void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						machine().gfx[0]->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+(dx-ax-1)*16,y+(dy-ay-1)*16,15);
 					}
@@ -708,7 +708,7 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update_rdx_v33)
 
-	MCFG_GFXDECODE(rdx_v33)
+	MCFG_GFXDECODE_ADD("gfxdecode", rdx_v33)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -738,7 +738,7 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update_rdx_v33)
-	MCFG_GFXDECODE(rdx_v33)
+	MCFG_GFXDECODE_ADD("gfxdecode", rdx_v33)
 	MCFG_PALETTE_LENGTH(2048)
 
 

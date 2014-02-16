@@ -336,7 +336,7 @@ static MACHINE_CONFIG_START( quasar, quasar_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8+1, 29*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(quasar_state, screen_update_quasar)
 
-	MCFG_GFXDECODE(quasar)
+	MCFG_GFXDECODE_ADD("gfxdecode", quasar)
 	MCFG_PALETTE_LENGTH((64+1)*8+(4*256))
 
 	MCFG_S2636_ADD("s2636_0", s2636_0_config)

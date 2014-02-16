@@ -351,7 +351,7 @@ static MACHINE_CONFIG_START( strnskil, strnskil_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(strnskil_state, screen_update_strnskil)
 
-	MCFG_GFXDECODE(strnskil)
+	MCFG_GFXDECODE_ADD("gfxdecode", strnskil)
 	MCFG_PALETTE_LENGTH(1024)
 
 

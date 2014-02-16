@@ -208,7 +208,7 @@ void rabbit_state::get_rabbit_tilemap_info(tile_data &tileinfo, int tile_index, 
 		colour &= 0x0f;
 		colour += 0x20;
 		tileinfo.group = 1;
-		SET_TILE_INFO_MEMBER(6+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 6+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
 	else
 	{
@@ -216,7 +216,7 @@ void rabbit_state::get_rabbit_tilemap_info(tile_data &tileinfo, int tile_index, 
 		if (cmask) colour&=0x3f; // see health bars
 		colour += 0x200;
 		tileinfo.group = 0;
-		SET_TILE_INFO_MEMBER(4+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 4+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
 }
 
@@ -287,7 +287,7 @@ sprites invisible at the end of a round in rabbit, why?
 void rabbit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int xpos,ypos,tileno,xflip,yflip, colr;
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int todraw = (m_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
 
 	UINT32 *source = (m_spriteram+ (todraw*2))-2;
@@ -895,7 +895,7 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_GFXDECODE(rabbit)
+	MCFG_GFXDECODE_ADD("gfxdecode", rabbit)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

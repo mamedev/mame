@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(finalizr_state::get_bg_tile_info)
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(finalizr_state::get_fg_tile_info)
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(finalizr_state::get_fg_tile_info)
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 void finalizr_state::video_start()
@@ -93,8 +93,8 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 
 	/* Draw the sprites. */
 	{
-		gfx_element *gfx1 = machine().gfx[1];
-		gfx_element *gfx2 = machine().gfx[2];
+		gfx_element *gfx1 = m_gfxdecode->gfx(1);
+		gfx_element *gfx2 = m_gfxdecode->gfx(2);
 
 		UINT8 *sr = m_spriterambank ? m_spriteram_2 : m_spriteram;
 

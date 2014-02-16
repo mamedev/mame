@@ -398,7 +398,7 @@ static MACHINE_CONFIG_START( m52, m52_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m52_state,  irq0_line_hold)
 
 	/* video hardware */
-	MCFG_GFXDECODE(m52)
+	MCFG_GFXDECODE_ADD("gfxdecode", m52)
 	MCFG_PALETTE_LENGTH(128*4+16*4+3*4)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

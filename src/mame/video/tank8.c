@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(tank8_state::tank8_get_tile_info)
 			color |= 4;
 	}
 
-	SET_TILE_INFO_MEMBER(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 
@@ -136,7 +136,7 @@ void tank8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int x = get_x_pos(i);
 		int y = get_y_pos(i);
 
-		 machine().gfx[(code & 0x04) ? 2 : 3]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx((code & 0x04) ? 2 : 3)->transpen(bitmap,cliprect,
 			code & 0x03,
 			i,
 			code & 0x10,

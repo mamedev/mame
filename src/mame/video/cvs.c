@@ -154,7 +154,7 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 
 		int gfxnum = (code < ram_based_char_start_indices[m_character_banking_mode]) ? 0 : 1;
 
-		 machine().gfx[gfxnum]->opaque(m_background_bitmap,m_background_bitmap.cliprect(),
+		 m_gfxdecode->gfx(gfxnum)->opaque(m_background_bitmap,m_background_bitmap.cliprect(),
 				code, color,
 				0, 0,
 				x, y);
@@ -170,7 +170,7 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 				collision_color = 0x102;
 		}
 
-		 machine().gfx[gfxnum]->opaque(m_collision_background,m_collision_background.cliprect(),
+		 m_gfxdecode->gfx(gfxnum)->opaque(m_collision_background,m_collision_background.cliprect(),
 				code, collision_color,
 				0, 0,
 				x, y);

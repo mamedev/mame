@@ -310,7 +310,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 287, 0, 223)   // default visible area
 	MCFG_SCREEN_UPDATE_DEVICE("ygv608", ygv608_device, update_screen)
 
-	MCFG_GFXDECODE(namcond1)
+	MCFG_GFXDECODE_ADD("gfxdecode", namcond1)
 	MCFG_PALETTE_LENGTH(256)
 
 	/* sound hardware */
@@ -325,6 +325,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	MCFG_AT28C16_ADD( "at28c16", NULL )
 
 	MCFG_YGV608_ADD("ygv608")
+	MCFG_YGV608_GFXDECODE("gfxdecode")
 MACHINE_CONFIG_END
 
 ROM_START( ncv1 )

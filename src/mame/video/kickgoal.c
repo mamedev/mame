@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(kickgoal_state::get_kickgoal_fg_tile_info)
 	int tileno = m_fgram[tile_index * 2] & 0x0fff;
 	int color = m_fgram[tile_index * 2 + 1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(0, tileno + m_fg_base, color + 0x00, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno + m_fg_base, color + 0x00, 0);
 }
 
 /* BG */
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(kickgoal_state::get_kickgoal_bg_tile_info)
 	int flipx = m_bgram[tile_index * 2 + 1] & 0x0020;
 	int flipy = m_bgram[tile_index * 2 + 1] & 0x0040;
 
-	SET_TILE_INFO_MEMBER(1, tileno + m_bg_base, color + 0x10, (flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno + m_bg_base, color + 0x10, (flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0));
 }
 
 /* BG 2 */
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(kickgoal_state::get_kickgoal_bg2_tile_info)
 	int flipx = m_bg2ram[tile_index * 2 + 1] & 0x0020;
 	int flipy = m_bg2ram[tile_index * 2 + 1] & 0x0040;
 
-	SET_TILE_INFO_MEMBER(m_bg2_region, tileno + m_bg2_base, color + 0x20, (flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, m_bg2_region, tileno + m_bg2_base, color + 0x20, (flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0));
 }
 
 
@@ -91,7 +91,7 @@ TILEMAP_MAPPER_MEMBER(kickgoal_state::tilemap_scan_actionhwbg2)// 32x32 tiles
 void kickgoal_state::kickgoal_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	UINT16 *spriteram = m_spriteram;
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int offs;
 
 	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)

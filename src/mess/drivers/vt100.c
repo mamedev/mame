@@ -421,7 +421,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*10-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vt100_state, screen_update_vt100)
 
-	MCFG_GFXDECODE(vt100)
+	MCFG_GFXDECODE_ADD("gfxdecode", vt100)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 

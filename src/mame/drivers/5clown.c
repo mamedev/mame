@@ -534,7 +534,7 @@ TILE_GET_INFO_MEMBER(_5clown_state::get_fclown_tile_info)
 	int bank = (attr & 0x02) >> 1;                                                  /* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2 | ((attr & 0x80) >> 3);                          /* bits 2-3-4-5-7 for color */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
 }
 
 
@@ -1061,7 +1061,7 @@ static MACHINE_CONFIG_START( fclown, _5clown_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_5clown_state, screen_update_fclown)
 
-	MCFG_GFXDECODE(fclown)
+	MCFG_GFXDECODE_ADD("gfxdecode", fclown)
 	MCFG_PALETTE_LENGTH(256)
 
 

@@ -56,7 +56,7 @@ void vigilant_state::update_background()
 		{
 			for( col=0; col<512; col+=32 )
 			{
-				machine().gfx[2]->opaque(*m_bg_bitmap,
+				m_gfxdecode->gfx(2)->opaque(*m_bg_bitmap,
 						m_bg_bitmap->cliprect(),
 						charcode,
 						row < 128 ? 0 : 1,
@@ -181,7 +181,7 @@ void vigilant_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &clip
 				{
 					sx = (sx + scroll) & 0x1ff;
 
-					machine().gfx[0]->transmask(bitmap,bottomvisiblearea,
+					m_gfxdecode->gfx(0)->transmask(bitmap,bottomvisiblearea,
 							tile_number,
 							color,
 							0,0,
@@ -194,7 +194,7 @@ void vigilant_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &clip
 			if (sy >= 48)
 				sx = (sx + scroll) & 0x1ff;
 
-			machine().gfx[0]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					tile_number,
 					color,
 					0,0,
@@ -248,7 +248,7 @@ void vigilant_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 			if (flipy) c += h-1-y;
 			else c += y;
 
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					c,
 					color,
 					flipx,flipy,
@@ -270,7 +270,7 @@ UINT32 vigilant_state::screen_update_kikcubic(screen_device &screen, bitmap_ind1
 		int color = (attributes & 0xF0) >> 4;
 		int tile_number = videoram[offs] | ((attributes & 0x0F) << 8);
 
-		machine().gfx[0]->opaque(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
 				tile_number,
 				color,
 				0,0,

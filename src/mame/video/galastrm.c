@@ -198,7 +198,7 @@ void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		if ((priority != 0 && sprite_ptr->primask != 0) ||
 			(priority == 0 && sprite_ptr->primask == 0))
 		{
-			machine().gfx[sprite_ptr->gfx]->prio_zoom_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(bitmap,cliprect,
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,

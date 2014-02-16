@@ -295,7 +295,7 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dynduke_state, screen_update_dynduke)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(dynduke)
+	MCFG_GFXDECODE_ADD("gfxdecode", dynduke)
 	MCFG_PALETTE_LENGTH(2048)
 
 

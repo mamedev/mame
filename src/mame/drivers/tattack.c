@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
 
 	color>>=1;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		0,
 		code,
 		color,
@@ -213,7 +213,7 @@ static MACHINE_CONFIG_START( tattack, tattack_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tattack_state, screen_update_tattack)
 
-	MCFG_GFXDECODE(tattack)
+	MCFG_GFXDECODE_ADD("gfxdecode", tattack)
 	MCFG_PALETTE_LENGTH(16)
 
 

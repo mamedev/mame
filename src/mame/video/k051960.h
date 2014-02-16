@@ -20,6 +20,9 @@ public:
 	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k051960_device() {}
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	
 	/*
 	The callback is passed:
 	- code (range 00-1FFF, output of the pins CA5-CA17)
@@ -67,6 +70,7 @@ private:
 	int      m_irq_enabled, m_nmi_enabled;
 
 	int      m_k051937_counter;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	int k051960_fetchromdata( int byte );
 };
@@ -76,5 +80,8 @@ extern const device_type K051960;
 #define MCFG_K051960_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K051960, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_K051960_GFXDECODE(_gfxtag) \
+	k051960_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif

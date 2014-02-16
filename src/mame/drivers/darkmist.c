@@ -242,7 +242,7 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkmist_state, screen_update_darkmist)
 
-	MCFG_GFXDECODE(darkmist)
+	MCFG_GFXDECODE_ADD("gfxdecode", darkmist)
 	MCFG_PALETTE_LENGTH(0x100*4)
 
 	/* sound hardware */

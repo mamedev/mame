@@ -455,7 +455,7 @@ static MACHINE_CONFIG_DERIVED( appoooh, appoooh_common )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_appoooh)
 
-	MCFG_GFXDECODE(appoooh)
+	MCFG_GFXDECODE_ADD("gfxdecode", appoooh)
 	MCFG_PALETTE_LENGTH(32*8+32*8)
 
 	MCFG_PALETTE_INIT_OVERRIDE(appoooh_state,appoooh)
@@ -473,7 +473,7 @@ static MACHINE_CONFIG_DERIVED( robowres, appoooh_common )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_robowres)
 
-	MCFG_GFXDECODE(robowres)
+	MCFG_GFXDECODE_ADD("gfxdecode", robowres)
 	MCFG_PALETTE_LENGTH(32*8+32*8)
 
 	MCFG_PALETTE_INIT_OVERRIDE(appoooh_state,robowres)

@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(battlex_state::get_bg_tile_info)
 	int tile = m_videoram[tile_index * 2] | (((m_videoram[tile_index * 2 + 1] & 0x01)) << 8);
 	int color = (m_videoram[tile_index * 2 + 1] & 0x0e) >> 1; // high bits unused
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
 }
 
 void battlex_state::video_start()
@@ -60,7 +60,7 @@ void battlex_state::video_start()
 
 void battlex_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	UINT8 *source = m_spriteram;
 	UINT8 *finish = m_spriteram + 0x200;
 

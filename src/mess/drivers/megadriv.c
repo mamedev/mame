@@ -642,6 +642,9 @@ static MACHINE_CONFIG_START( genesis_scd, md_cons_state )
 	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
+	MCFG_SEGACD_GFXDECODE("gfxdecode")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
@@ -654,6 +657,9 @@ static MACHINE_CONFIG_START( md_scd, md_cons_state )
 	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
+	MCFG_SEGACD_GFXDECODE("gfxdecode")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 
 	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 
@@ -667,6 +673,10 @@ static MACHINE_CONFIG_START( mdj_scd, md_cons_state )
 	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
+	MCFG_SEGACD_GFXDECODE("gfxdecode")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","megacdj")
@@ -676,6 +686,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
+	MCFG_SEGACD_GFXDECODE("gfxdecode")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
 MACHINE_CONFIG_END
 

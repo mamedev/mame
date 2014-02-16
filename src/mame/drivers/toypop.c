@@ -566,7 +566,7 @@ static MACHINE_CONFIG_START( liblrabl, toypop_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(toypop_state, screen_update_toypop)
 
-	MCFG_GFXDECODE(toypop)
+	MCFG_GFXDECODE_ADD("gfxdecode", toypop)
 	MCFG_PALETTE_LENGTH(128*4+64*4+16*2)
 
 

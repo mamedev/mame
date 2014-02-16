@@ -546,7 +546,7 @@ void coolridr_state::video_start()
 {
 	/* find first empty slot to decode gfx */
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (machine().gfx[m_gfx_index] == 0)
+		if (m_gfxdecode->gfx(m_gfx_index) == 0)
 			break;
 
 	m_screen->register_screen_bitmap(m_temp_bitmap_sprites);
@@ -559,7 +559,7 @@ void coolridr_state::video_start()
 	m_screen->register_screen_bitmap(m_screen1_bitmap);
 	m_screen->register_screen_bitmap(m_screen2_bitmap);
 
-	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), h1_tile_layout, m_h1_pcg, 8, 0));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), h1_tile_layout, m_h1_pcg, 8, 0)));
 }
 
 /*
@@ -793,7 +793,7 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 		int scrollx;
 		int scrolly;
 		UINT8 transpen_setting;
-		gfx_element *gfx = machine().gfx[m_gfx_index];
+		gfx_element *gfx = m_gfxdecode->gfx(m_gfx_index);
 		#define VREG(_offs) \
 			m_framebuffer_vram[(0x9b80+_offs+which*0x40)/4]
 
@@ -2754,7 +2754,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				for(int i=0;i<size;i++)
 				{
 					m_h1_pcg[dst] = space.read_byte(src);
-					machine().gfx[m_gfx_index]->mark_dirty(dst/256);
+					m_gfxdecode->gfx(m_gfx_index)->mark_dirty(dst/256);
 					dst++;
 					src++;
 				}
@@ -3599,7 +3599,7 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE(coolridr)
+	MCFG_GFXDECODE_ADD("gfxdecode", coolridr)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

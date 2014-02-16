@@ -368,7 +368,7 @@ static MACHINE_CONFIG_START( pasopia, pasopia_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-	MCFG_GFXDECODE(pasopia)
+	MCFG_GFXDECODE_ADD("gfxdecode", pasopia)
 	MCFG_PALETTE_LENGTH(8)
 
 	/* Devices */

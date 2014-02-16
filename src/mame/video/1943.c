@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(_1943_state::c1943_get_bg2_tile_info)
 	int color = (attr & 0x3c) >> 2;
 	int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 
-	SET_TILE_INFO_MEMBER(2, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(_1943_state::c1943_get_bg_tile_info)
@@ -185,7 +185,7 @@ TILE_GET_INFO_MEMBER(_1943_state::c1943_get_bg_tile_info)
 	int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 
 	tileinfo.group = color;
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(_1943_state::c1943_get_fg_tile_info)
@@ -194,7 +194,7 @@ TILE_GET_INFO_MEMBER(_1943_state::c1943_get_fg_tile_info)
 	int code = m_videoram[tile_index] + ((attr & 0xe0) << 3);
 	int color = attr & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void _1943_state::video_start()
@@ -203,7 +203,7 @@ void _1943_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_1943_state::c1943_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_1943_state::c1943_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[1], 0x0f);
+	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, m_gfxdecode->gfx(1), 0x0f);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_char_on));
@@ -234,12 +234,12 @@ void _1943_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		if (priority)
 		{
 			if (color != 0x0a && color != 0x0b)
-				 machine().gfx[3]->transpen(bitmap,cliprect, code, color, flip_screen(), flip_screen(), sx, sy, 0);
+				 m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, code, color, flip_screen(), flip_screen(), sx, sy, 0);
 		}
 		else
 		{
 			if (color == 0x0a || color == 0x0b)
-				 machine().gfx[3]->transpen(bitmap,cliprect, code, color, flip_screen(), flip_screen(), sx, sy, 0);
+				 m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, code, color, flip_screen(), flip_screen(), sx, sy, 0);
 		}
 	}
 }

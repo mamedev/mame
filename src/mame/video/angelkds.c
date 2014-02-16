@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_tx_tile_info)
 	int tileno;
 
 	tileno = m_txvideoram[tile_index] + (m_txbank * 0x100);
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, 0, 0);
 }
 
 WRITE8_MEMBER(angelkds_state::angelkds_txvideoram_w)
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_bgtop_tile_info)
 	tileno = m_bgtopvideoram[tile_index];
 
 	tileno += m_bgtopbank * 0x100 ;
-	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, 0, 0);
 }
 
 WRITE8_MEMBER(angelkds_state::angelkds_bgtopvideoram_w)
@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_bgbot_tile_info)
 	tileno = m_bgbotvideoram[tile_index];
 
 	tileno += m_bgbotbank * 0x100 ;
-	SET_TILE_INFO_MEMBER(2, tileno, 1, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, tileno, 1, 0);
 }
 
 WRITE8_MEMBER(angelkds_state::angelkds_bgbotvideoram_w)
@@ -123,7 +123,7 @@ void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	const UINT8 *source = m_spriteram + 0x100 - 4;
 	const UINT8 *finish = m_spriteram;
-	gfx_element *gfx = machine().gfx[3];
+	gfx_element *gfx = m_gfxdecode->gfx(3);
 
 	while (source >= finish)
 	{

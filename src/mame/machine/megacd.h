@@ -193,12 +193,17 @@ _32x32_START
 	_32x32_SEQUENCE_1_FLIP
 _32x32_END
 
+#define MCFG_SEGACD_GFXDECODE(_gfxtag) \
+	sega_segacd_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 
 class sega_segacd_device : public device_t
 {
 public:
 	sega_segacd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 
 	required_device<cpu_device> m_scdcpu;
 	lc89510_temp_device *lc89510_temp;
@@ -359,6 +364,7 @@ public:
 
 	void SegaCD_CDC_Do_DMA( int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination );
 	timer_device* scd_dma_timer;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
 	virtual void device_start();

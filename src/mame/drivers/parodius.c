@@ -297,8 +297,11 @@ static MACHINE_CONFIG_START( parodius, parodius_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K052109_ADD("k052109", parodius_k052109_intf)
+	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K053245_ADD("k053245", parodius_k05324x_intf)
+	MCFG_K053245_GFXDECODE("gfxdecode")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

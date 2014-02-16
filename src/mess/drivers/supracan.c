@@ -343,7 +343,7 @@ void supracan_state::supracan_tilemap_get_info_common(int layer, tile_data &tile
 	int flipxy = (supracan_vram[count] & 0x0c00)>>10;
 	int palette = ((supracan_vram[count] & 0xf000) >> 12) + palette_bank;
 
-	SET_TILE_INFO_MEMBER(region, tile, palette, TILE_FLIPXY(flipxy));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, region, tile, palette, TILE_FLIPXY(flipxy));
 }
 
 // I wonder how different this really is.. my guess, not at all.
@@ -372,7 +372,7 @@ void supracan_state::supracan_tilemap_get_info_roz(int layer, tile_data &tileinf
 				if (count & 0x20) tile ^= 1;
 				tile |= (count & 0xc0)>>2;
 
-				SET_TILE_INFO_MEMBER(region, tile, 0, 0);
+				SET_TILE_INFO_MEMBER(m_gfxdecode, region, tile, 0, 0);
 				return;
 			}
 
@@ -396,7 +396,7 @@ void supracan_state::supracan_tilemap_get_info_roz(int layer, tile_data &tileinf
 	int flipxy = (supracan_vram[count] & 0x0c00)>>10;
 	int palette = ((supracan_vram[count] & 0xf000) >> 12) + palette_bank;
 
-	SET_TILE_INFO_MEMBER(region, tile, palette, TILE_FLIPXY(flipxy));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, region, tile, palette, TILE_FLIPXY(flipxy));
 }
 
 
@@ -528,7 +528,7 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int sprite_xflip = (supracan_vram[i+1] & 0x0800) >> 11;
 		int sprite_yflip = (supracan_vram[i+1] & 0x0400) >> 10;
 		//int xscale = (supracan_vram[i+2] & 0xf000) >> 12;
-		gfx_element *gfx = machine().gfx[region];
+		gfx_element *gfx = m_gfxdecode->gfx(region);
 
 
 
@@ -1114,11 +1114,11 @@ WRITE16_MEMBER( supracan_state::supracan_vram_w )
 	write_swapped_byte(offset*2, (data & 0x00ff));
 
 	// mark tiles of each depth as dirty
-	machine().gfx[0]->mark_dirty((offset*2)/(64));
-	machine().gfx[1]->mark_dirty((offset*2)/(32));
-	machine().gfx[2]->mark_dirty((offset*2)/(16));
-	machine().gfx[3]->mark_dirty((offset*2)/(512));
-	machine().gfx[4]->mark_dirty((offset*2)/(8));
+	m_gfxdecode->gfx(0)->mark_dirty((offset*2)/(64));
+	m_gfxdecode->gfx(1)->mark_dirty((offset*2)/(32));
+	m_gfxdecode->gfx(2)->mark_dirty((offset*2)/(16));
+	m_gfxdecode->gfx(3)->mark_dirty((offset*2)/(512));
+	m_gfxdecode->gfx(4)->mark_dirty((offset*2)/(8));
 
 }
 
@@ -1924,7 +1924,7 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )  /* No idea if this is correct */
 	MCFG_SCREEN_UPDATE_DRIVER(supracan_state, screen_update_supracan)
 	MCFG_PALETTE_LENGTH( 32768 )
-	MCFG_GFXDECODE(supracan)
+	MCFG_GFXDECODE_ADD("gfxdecode", supracan)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")

@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(vindictr_state::get_alpha_tile_info)
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
-	SET_TILE_INFO_MEMBER(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(vindictr_state::get_playfield_tile_info)
 	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = (m_playfield_tile_bank * 0x1000) + (data & 0xfff);
 	int color = 0x10 + 2 * ((data >> 12) & 7);
-	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, (data >> 15) & 1);
 }
 
 

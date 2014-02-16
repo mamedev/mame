@@ -394,14 +394,14 @@ TILE_GET_INFO_MEMBER(powerbal_state::powerbal_get_bg_tile_info)
 	if (m_videoram1[tile_index] & 0x800)
 		code |= 0x8000;
 
-	SET_TILE_INFO_MEMBER(1, code, colr >> 12, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, colr >> 12, 0);
 }
 
 void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT16 *spriteram = m_spriteram;
 	int offs;
-	int height = machine().gfx[0]->height();
+	int height = m_gfxdecode->gfx(0)->height();
 
 	for (offs = 4; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
@@ -417,7 +417,7 @@ void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle
 		code = spriteram[offs + 2];
 		color = (spriteram[offs + 1] & 0xf000) >> 12;
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,0,
@@ -502,7 +502,7 @@ static MACHINE_CONFIG_START( powerbal, powerbal_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
 
-	MCFG_GFXDECODE(powerbal)
+	MCFG_GFXDECODE_ADD("gfxdecode", powerbal)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( magicstk, powerbal_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
 
-	MCFG_GFXDECODE(powerbal)
+	MCFG_GFXDECODE_ADD("gfxdecode", powerbal)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)

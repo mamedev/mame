@@ -568,14 +568,14 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 						code &= (STIC_CSTM_C50 >> 3);  // keep from going outside the array
 						//if (m_gramdirtybytes[code] == 1)
 						{
-							decodechar(machine().gfx[1],
+							decodechar(m_gfxdecode->gfx(1),
 										code,
 										m_gram,
 										machine().config()->gfxdecodeinfo[1].gfxlayout);
 							m_gramdirtybytes[code] = 0;
 						}
 						// Draw GRAM char
-						drawgfx(bitmap,machine().gfx[1],
+						drawgfx(bitmap,m_gfxdecode->gfx(1),
 								code,
 								bgcolor*16+fgcolor,
 								0,0, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE,
@@ -589,7 +589,7 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 					}
 					else // read from grom
 					{
-						drawgfx(bitmap,machine().gfx[0],
+						drawgfx(bitmap,m_gfxdecode->gfx(0),
 								code,
 								bgcolor*16+fgcolor,
 								0,0, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE,
@@ -621,14 +621,14 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 				{
 					//if (m_gramdirtybytes[code] == 1)
 					{
-						decodechar(machine().gfx[1],
+						decodechar(m_gfxdecode->gfx(1),
 									code,
 									m_gram,
 									machine().config()->gfxdecodeinfo[1].gfxlayout);
 						m_gramdirtybytes[code] = 0;
 					}
 					// Draw GRAM char
-					drawgfx(bitmap,machine().gfx[1],
+					drawgfx(bitmap,m_gfxdecode->gfx(1),
 							code,
 							bgcolor*16+fgcolor,
 							0,0, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE,
@@ -636,7 +636,7 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 				}
 				else // read from GROM
 				{
-					drawgfx(bitmap,machine().gfx[0],
+					drawgfx(bitmap,m_gfxdecode->gfx(0),
 							code,
 							bgcolor*16+fgcolor,
 							0,0, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE,
@@ -670,14 +670,14 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 				{
 					//if (m_gramdirtybytes[code] == 1)
 					{
-						decodechar(machine().gfx[1],
+						decodechar(m_gfxdecode->gfx(1),
 									code,
 									m_gram,
 									machine().config()->gfxdecodeinfo[1].gfxlayout);
 						m_gramdirtybytes[code] = 0;
 					}
 					// Draw GRAM char
-					machine().gfx[1]->zoom_transpen(bitmap,&machine().screen[0].visarea,
+					m_gfxdecode->gfx(1)->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code,
 											s->color,
 											s->xflip,s->yflip,
@@ -688,11 +688,11 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 				{
 					//if ((m_gramdirtybytes[code] == 1) || (m_gramdirtybytes[code+1] == 1))
 					{
-						decodechar(machine().gfx[1],
+						decodechar(m_gfxdecode->gfx(1),
 									code,
 									m_gram,
 									machine().config()->gfxdecodeinfo[1].gfxlayout);
-						decodechar(machine().gfx[1],
+						decodechar(m_gfxdecode->gfx(1),
 									code+1,
 									m_gram,
 									machine().config()->gfxdecodeinfo[1].gfxlayout);
@@ -700,13 +700,13 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 						m_gramdirtybytes[code+1] = 0;
 					}
 					// Draw GRAM char
-					machine().gfx[1]->zoom_transpen(bitmap,&machine().screen[0].visarea,
+					m_gfxdecode->gfx(1)->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code,
 											s->color,
 											s->xflip,s->yflip,
 											(s->xpos + x0) * STIC_X_SCALE, (s->ypos + y0) * STIC_Y_SCALE + s->yflip * s->ysize * STIC_CARD_HEIGHT,
 											0x8000*s->xsize, 0x8000*s->ysize,0);
-					machine().gfx[1]->zoom_transpen(bitmap,&machine().screen[0].visarea,
+					m_gfxdecode->gfx(1)->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code+1,
 											s->color,
 											s->xflip,s->yflip,
@@ -719,7 +719,7 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 				if (s->yres == 1)
 				{
 					// Draw GROM char
-					machine().gfx[0]->zoom_transpen(bitmap,&machine().screen[0].visarea,
+					m_gfxdecode->gfx(0)->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code,
 											s->color,
 											s->xflip,s->yflip,
@@ -728,13 +728,13 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 				}
 				else
 				{
-					machine().gfx[0]->zoom_transpen(bitmap,&machine().screen[0].visarea,
+					m_gfxdecode->gfx(0)->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code,
 											s->color,
 											s->xflip,s->yflip,
 											(s->xpos + x0) * STIC_X_SCALE, (s->ypos + y0) * STIC_Y_SCALE + s->yflip * s->ysize * STIC_CARD_HEIGHT,
 											0x8000*s->xsize, 0x8000*s->ysize,0);
-					machine().gfx[0]->zoom_transpen(bitmap,&machine().screen[0].visarea,
+					m_gfxdecode->gfx(0)->zoom_transpen(bitmap,&machine().screen[0].visarea,
 											code+1,
 											s->color,
 											s->xflip,s->yflip,

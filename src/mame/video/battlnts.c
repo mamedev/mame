@@ -46,7 +46,7 @@ UINT32 battlnts_state::screen_update_battlnts(screen_device &screen, bitmap_ind1
 	m_k007342->tilemap_update();
 
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE ,0);
-	m_k007420->sprites_draw(bitmap, cliprect, machine().gfx[1]);
+	m_k007420->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(1));
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, 1 | TILEMAP_DRAW_OPAQUE ,0);
 	return 0;
 }

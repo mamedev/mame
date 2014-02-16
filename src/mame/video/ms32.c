@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_tx_tile_info)
 	tileno = m_txram[tile_index *2]   & 0xffff;
 	colour = m_txram[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(3,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_roz_tile_info)
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_roz_tile_info)
 	tileno = m_rozram[tile_index *2]   & 0xffff;
 	colour = m_rozram[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
 	tileno = m_bgram[tile_index *2]   & 0xffff;
 	colour = m_bgram[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(2,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_extra_tile_info)
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_extra_tile_info)
 	tileno = m_f1superb_extraram[tile_index *2]   & 0xffff;
 	colour = m_f1superb_extraram[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(4,tileno,colour+0x50,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 4,tileno,colour+0x50,0);
 }
 
 
@@ -202,7 +202,7 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 	int code, attr, color, size;
 	int pri;
 	int xzoom, yzoom;
-	gfx_element *gfx = machine().gfx[gfxnum];
+	gfx_element *gfx = m_gfxdecode->gfx(gfxnum);
 
 	UINT16      *source =   sprram_top;
 	UINT16  *finish =   sprram_top + (sprram_size - 0x10) / 2;

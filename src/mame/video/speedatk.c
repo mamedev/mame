@@ -102,7 +102,7 @@ UINT32 speedatk_state::screen_update_speedatk(screen_device &screen, bitmap_ind1
 			color = m_colorram[count] & 0x1f;
 			region = (m_colorram[count] & 0x10) >> 4;
 
-			machine().gfx[region]->opaque(bitmap,cliprect,tile,color,m_flip_scr,m_flip_scr,x*8,y*8);
+			m_gfxdecode->gfx(region)->opaque(bitmap,cliprect,tile,color,m_flip_scr,m_flip_scr,x*8,y*8);
 
 			count = (m_flip_scr) ? count-1 : count+1;
 			count&=0x3ff;

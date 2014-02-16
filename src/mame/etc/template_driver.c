@@ -154,7 +154,7 @@ static MACHINE_CONFIG_START( xxx, xxx_state )
 //	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240) /* generic video timing, change accordingly */
 
-	MCFG_GFXDECODE(xxx)
+	MCFG_GFXDECODE_ADD("gfxdecode", xxx)
 
 	MCFG_PALETTE_LENGTH(8)
 

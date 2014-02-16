@@ -255,7 +255,7 @@ void coinmvga_state::video_start()
 
 UINT32 coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x04000/2;
 
 	int y,x;
@@ -684,7 +684,7 @@ static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(coinmvga_state, screen_update_coinmvga)
 
-	MCFG_GFXDECODE(coinmvga)
+	MCFG_GFXDECODE_ADD("gfxdecode", coinmvga)
 
 	MCFG_PALETTE_LENGTH(512)
 

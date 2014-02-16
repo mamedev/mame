@@ -338,7 +338,7 @@ TILE_GET_INFO_MEMBER(dmndrby_state::get_dmndrby_tile_info)
 	int flipx = (attr&0x40)>>6;
 
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code,
 			col,
@@ -358,9 +358,9 @@ UINT32 dmndrby_state::screen_update_dderby(screen_device &screen, bitmap_ind16 &
 {
 	int x,y,count;
 	int off,scrolly;
-	gfx_element *gfx = machine().gfx[0];
-	gfx_element *sprites = machine().gfx[1];
-	gfx_element *track = machine().gfx[2];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
+	gfx_element *sprites = m_gfxdecode->gfx(1);
+	gfx_element *track = m_gfxdecode->gfx(2);
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
@@ -537,7 +537,7 @@ static MACHINE_CONFIG_START( dderby, dmndrby_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dmndrby_state, screen_update_dderby)
 
-	MCFG_GFXDECODE(dmndrby)
+	MCFG_GFXDECODE_ADD("gfxdecode", dmndrby)
 	MCFG_PALETTE_LENGTH(0x300)
 
 

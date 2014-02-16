@@ -402,7 +402,7 @@ static MACHINE_CONFIG_DERIVED( trckydoc, tecfri )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trckydoc_map)
 
-	MCFG_GFXDECODE(trckydoc)
+	MCFG_GFXDECODE_ADD("gfxdecode", trckydoc)
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state,trckydoc)
 	MCFG_SCREEN_MODIFY("screen")
@@ -420,7 +420,7 @@ static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 	MCFG_CPU_PROGRAM_MAP(sauro_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(sauro_state, sauro_interrupt,  8*60) // ?
 
-	MCFG_GFXDECODE(sauro)
+	MCFG_GFXDECODE_ADD("gfxdecode", sauro)
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state,sauro)
 	MCFG_SCREEN_MODIFY("screen")

@@ -141,8 +141,19 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 	m_bg0_colbank(0),
 	m_bg1_colbank(0),
 	m_tx_colbank(0),
-	m_dblwidth(0)
+	m_dblwidth(0),
+	m_gfxdecode(*this)
 {
+}
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void tc0100scn_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<tc0100scn_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -245,13 +256,13 @@ void tc0100scn_device::device_start()
 	m_bg_col_mult = 1; /* multiplier for when bg gfx != 4bpp */
 	m_tx_col_mult = 1; /* multiplier needed when bg gfx is 6bpp */
 
-	if (machine().gfx[m_gfxnum]->granularity() == 2)    /* Yuyugogo, Yesnoj */
+	if (m_gfxdecode->gfx(m_gfxnum)->granularity() == 2)    /* Yuyugogo, Yesnoj */
 		m_bg_col_mult = 8;
 
-	if (machine().gfx[m_gfxnum]->granularity() == 0x40) /* Undrfire */
+	if (m_gfxdecode->gfx(m_gfxnum)->granularity() == 0x40) /* Undrfire */
 		m_tx_col_mult = 4;
 
-//logerror("TC0100SCN bg gfx granularity %04x: multiplier %04x\n", machine().gfx[m_gfxnum]->granularity(), m_tx_col_mult);
+//logerror("TC0100SCN bg gfx granularity %04x: multiplier %04x\n", m_gfxdecode->gfx(m_gfxnum)->granularity(), m_tx_col_mult);
 
 	m_ram = auto_alloc_array_clear(machine(), UINT16, TC0100SCN_RAM_SIZE / 2);
 
@@ -261,7 +272,7 @@ void tc0100scn_device::device_start()
 									/* we call this here, so that they can be modified at video_start*/
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine().gfx[m_txnum] = auto_alloc_clear(machine(), gfx_element(machine(), tc0100scn_charlayout, (UINT8 *)m_char_ram, 64, 0));
+	m_gfxdecode->set_gfx(m_txnum, auto_alloc_clear(machine(), gfx_element(machine(), tc0100scn_charlayout, (UINT8 *)m_char_ram, 64, 0)));
 
 	save_pointer(NAME(m_ram), TC0100SCN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
@@ -307,7 +318,7 @@ void tc0100scn_device::common_get_bg0_tile_info( tile_data &tileinfo, int tile_i
 		attr = ram[2 * tile_index];
 	}
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			gfxnum,
 			code,
 			(((attr * m_bg_col_mult) + m_bg0_colbank) & 0xff) + colbank,
@@ -330,7 +341,7 @@ void tc0100scn_device::common_get_bg1_tile_info( tile_data &tileinfo, int tile_i
 		attr = ram[2 * tile_index];
 	}
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			gfxnum,
 			code,
 			(((attr * m_bg_col_mult) + m_bg1_colbank) & 0xff) + colbank,
@@ -341,7 +352,7 @@ void tc0100scn_device::common_get_tx_tile_info( tile_data &tileinfo, int tile_in
 {
 	int attr = ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			gfxnum,
 			attr & 0xff,
 			((((attr >> 6) & 0xfc) * m_tx_col_mult + (m_tx_colbank << 2)) & 0x3ff) + colbank * 4,
@@ -468,7 +479,7 @@ WRITE16_MEMBER( tc0100scn_device::word_w )
 		else if (offset < 0x3000)
 			m_tilemap[2][0]->mark_tile_dirty((offset & 0x0fff));
 		else if (offset < 0x3800)
-			space.machine().gfx[m_txnum]->mark_dirty((offset - 0x3000) / 8);
+			m_gfxdecode->gfx(m_txnum)->mark_dirty((offset - 0x3000) / 8);
 		else if (offset >= 0x4000 && offset < 0x6000)
 			m_tilemap[1][0]->mark_tile_dirty((offset & 0x1fff) / 2);
 	}
@@ -479,7 +490,7 @@ WRITE16_MEMBER( tc0100scn_device::word_w )
 		else if (offset >= 0x4000 && offset < 0x8000)
 			m_tilemap[1][1]->mark_tile_dirty((offset & 0x3fff) / 2);
 		else if (offset >= 0x8800 && offset < 0x9000)
-			space.machine().gfx[m_txnum]->mark_dirty((offset - 0x8800) / 8);
+			m_gfxdecode->gfx(m_txnum)->mark_dirty((offset - 0x8800) / 8);
 		else if (offset >= 0x9000)
 			m_tilemap[2][1]->mark_tile_dirty((offset & 0x0fff));
 	}
@@ -538,7 +549,7 @@ WRITE16_MEMBER( tc0100scn_device::ctrl_word_w )
 				dirty_tilemaps();
 
 				/* reset the pointer to the text characters (and dirty them all) */
-				space.machine().gfx[m_txnum]->set_source((UINT8 *)m_char_ram);
+				m_gfxdecode->gfx(m_txnum)->set_source((UINT8 *)m_char_ram);
 			}
 
 			break;

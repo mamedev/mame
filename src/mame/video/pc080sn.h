@@ -17,6 +17,9 @@ public:
 	pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~pc080sn_device() {}
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
 	DECLARE_WRITE16_MEMBER( xscroll_word_w );
@@ -58,7 +61,7 @@ public:
 	int            m_bgscrollx[2], m_bgscrolly[2];
 
 	tilemap_t      *m_tilemap[2];
-
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 extern const device_type PC080SN;
@@ -66,5 +69,8 @@ extern const device_type PC080SN;
 #define MCFG_PC080SN_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, PC080SN, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_PC080SN_GFXDECODE(_gfxtag) \
+	pc080sn_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif

@@ -387,7 +387,7 @@ static MACHINE_CONFIG_START( skydiver, skydiver_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(skydiver_state, screen_update_skydiver)
 
-	MCFG_GFXDECODE(skydiver)
+	MCFG_GFXDECODE_ADD("gfxdecode", skydiver)
 	MCFG_PALETTE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
 

@@ -145,7 +145,7 @@ public:
 
 
 		COMBINE_DATA(&m_vram_rearranged[swapped_offset]);
-		machine().gfx[m_gfx_index]->mark_dirty((swapped_offset)/32);
+		m_gfxdecode->gfx(m_gfx_index)->mark_dirty((swapped_offset)/32);
 
 		// unfortunately tilemaps and tilegfx share the same ram so we're always dirty if we write to RAM
 		m_bg_tilemap[0]->mark_all_dirty();
@@ -176,7 +176,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg0_tile_info)
 	int base = tilemap_base[0];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg1_tile_info)
@@ -184,7 +184,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg1_tile_info)
 	int base = tilemap_base[1];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg2_tile_info)
@@ -192,7 +192,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg2_tile_info)
 	int base = tilemap_base[2];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg3_tile_info)
@@ -200,7 +200,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg3_tile_info)
 	int base = tilemap_base[3];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 
@@ -210,7 +210,7 @@ void popobear_state::video_start()
 {
 	/* find first empty slot to decode gfx */
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
-		if (machine().gfx[m_gfx_index] == 0)
+		if (m_gfxdecode->gfx(m_gfx_index) == 0)
 			break;
 
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
@@ -220,7 +220,7 @@ void popobear_state::video_start()
 
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), popobear_char_layout, (UINT8 *)m_vram_rearranged, machine().total_colors() / 16, 0));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), popobear_char_layout, (UINT8 *)m_vram_rearranged, machine().total_colors() / 16, 0)));
 
 	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);

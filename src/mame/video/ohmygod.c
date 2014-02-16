@@ -11,7 +11,7 @@ TILE_GET_INFO_MEMBER(ohmygod_state::get_tile_info)
 {
 	UINT16 code = m_videoram[2 * tile_index + 1];
 	UINT16 attr = m_videoram[2 * tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			(attr & 0x0f00) >> 8,
@@ -90,7 +90,7 @@ void ohmygod_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			sy -= 65536;
 		flipx = sr[offs + 3] & 0x8000;
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,0,

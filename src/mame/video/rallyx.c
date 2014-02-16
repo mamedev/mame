@@ -226,7 +226,7 @@ inline void rallyx_state::rallyx_get_tile_info( tile_data &tileinfo, int tile_in
 {
 	UINT8 attr = m_videoram[ram_offs + tile_index + 0x800];
 	tileinfo.category = (attr & 0x20) >> 5;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_videoram[ram_offs + tile_index],
 			attr & 0x3f,
@@ -250,7 +250,7 @@ inline void rallyx_state::locomotn_get_tile_info(tile_data &tileinfo,int tile_in
 	int code = m_videoram[ram_offs + tile_index];
 	code = (code & 0x7f) + 2 * (attr & 0x40) + 2 * (code & 0x80);
 	tileinfo.category = (attr & 0x20) >> 5;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			attr & 0x3f,
@@ -477,13 +477,13 @@ void rallyx_state::rallyx_draw_sprites( screen_device &screen, bitmap_ind16 &bit
 		if (flip_screen())
 			sx -= 2 * displacement;
 
-		machine().gfx[1]->prio_transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect,
 				(spriteram[offs] & 0xfc) >> 2,
 				color,
 				flipx,flipy,
 				sx,sy,
 				screen.priority(),0x02,
-				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
+				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0));
 	}
 }
 
@@ -500,13 +500,13 @@ void rallyx_state::locomotn_draw_sprites( screen_device &screen, bitmap_ind16 &b
 		int color = spriteram_2[offs + 1] & 0x3f;
 		int flip = spriteram[offs] & 2;
 
-		machine().gfx[1]->prio_transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect,
 				((spriteram[offs] & 0x7c) >> 2) + 0x20*(spriteram[offs] & 0x01) + ((spriteram[offs] & 0x80) >> 1),
 				color,
 				flip,flip,
 				sx,sy,
 				screen.priority(),0x02,
-				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
+				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0));
 	}
 }
 
@@ -524,14 +524,14 @@ void rallyx_state::rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &c
 			x -= 3;
 
 		if (transpen)
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					((m_radarattr[offs & 0x0f] & 0x0e) >> 1) ^ 0x07,
 					0,
 					0,0,
 					x,y,
 					3);
 		else
-			machine().gfx[2]->transtable(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transtable(bitmap,cliprect,
 					((m_radarattr[offs & 0x0f] & 0x0e) >> 1) ^ 0x07,
 					0,
 					0,0,
@@ -552,14 +552,14 @@ void rallyx_state::jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &
 		y = 253 - m_radary[offs];
 
 		if (transpen)
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					(m_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
 					0,
 					0,0,
 					x,y,
 					3);
 		else
-			machine().gfx[2]->transtable(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transtable(bitmap,cliprect,
 					(m_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
 					0,
 					0,0,
@@ -588,14 +588,14 @@ void rallyx_state::locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle 
 		y = 252 - m_radary[offs];
 
 		if (transpen)
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					(m_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
 					0,
 					0,0,
 					x,y,
 					3);
 		else
-			machine().gfx[2]->transtable(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transtable(bitmap,cliprect,
 					(m_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
 					0,
 					0,0,

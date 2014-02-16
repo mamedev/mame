@@ -135,31 +135,31 @@ WRITE8_MEMBER(skylncr_state::skylncr_colorram_w)
 TILE_GET_INFO_MEMBER(skylncr_state::get_tile_info)
 {
 	UINT16 code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
-	SET_TILE_INFO_MEMBER(0, code, 0, TILE_FLIPYX( 0 ));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, TILE_FLIPYX( 0 ));
 }
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_1_tile_info)
 {
 	UINT16 code = m_reeltiles_1_ram[ tile_index ] + (m_reeltileshigh_1_ram[ tile_index ] << 8);
-	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX( 0 ));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_2_tile_info)
 {
 	UINT16 code = m_reeltiles_2_ram[ tile_index ] + (m_reeltileshigh_2_ram[ tile_index ] << 8);
-	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX( 0 ));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_3_tile_info)
 {
 	UINT16 code = m_reeltiles_3_ram[ tile_index ] + (m_reeltileshigh_3_ram[ tile_index ] << 8);
-	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX( 0 ));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_4_tile_info)
 {
 	UINT16 code = m_reeltiles_4_ram[ tile_index ] + (m_reeltileshigh_4_ram[ tile_index ] << 8);
-	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX( 0 ));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, TILE_FLIPYX( 0 ));
 }
 
 
@@ -727,7 +727,7 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(skylncr_state, screen_update_skylncr)
 
-	MCFG_GFXDECODE(skylncr)
+	MCFG_GFXDECODE_ADD("gfxdecode", skylncr)
 	MCFG_PALETTE_LENGTH(0x200)
 
 

@@ -15,7 +15,7 @@ TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_bg)
 	int code = m_background_videoram[tile_index*2] + ((m_background_videoram[tile_index*2+1] & 0x30) << 4);
 	int color = m_background_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
 	tileinfo.group = (color == 8);
 }
 
@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_fg)
 	int code = m_foreground_videoram[tile_index*2] + ((m_foreground_videoram[tile_index*2+1] & 0x30) << 4);
 	int color = m_foreground_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 	tileinfo.group = (color == 9);
 }
 
@@ -107,7 +107,7 @@ void speedbal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipx = flipy = 1;
 		}
 
-		machine().gfx[2]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

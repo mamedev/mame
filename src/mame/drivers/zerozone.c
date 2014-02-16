@@ -184,7 +184,7 @@ static MACHINE_CONFIG_START( zerozone, zerozone_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 47*8-1, 2*8, 30*8-1)
 
-	MCFG_GFXDECODE(zerozone)
+	MCFG_GFXDECODE_ADD("gfxdecode", zerozone)
 	MCFG_PALETTE_LENGTH(256)
 
 	/* sound hardware */

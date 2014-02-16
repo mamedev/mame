@@ -638,7 +638,7 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo_state, screen_update_tecmo)
 
-	MCFG_GFXDECODE(tecmo)
+	MCFG_GFXDECODE_ADD("gfxdecode", tecmo)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(tecmo_state,tecmo)
@@ -697,7 +697,7 @@ static MACHINE_CONFIG_START( backfirt, tecmo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo_state, screen_update_tecmo)
 
-	MCFG_GFXDECODE(tecmo)
+	MCFG_GFXDECODE_ADD("gfxdecode", tecmo)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(tecmo_state,tecmo)

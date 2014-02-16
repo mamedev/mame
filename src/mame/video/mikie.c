@@ -128,7 +128,7 @@ TILE_GET_INFO_MEMBER(mikie_state::get_bg_tile_info)
 	else
 		tileinfo.category = 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 
 
 }
@@ -160,7 +160,7 @@ void mikie_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		}
 
 		
-			machine().gfx[gfxbank]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(gfxbank)->transpen(bitmap,cliprect,
 			code, color,
 			flipx,flipy,
 			sx,sy, 0);

@@ -79,7 +79,7 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_0)
 	int tile = m_vram_0[tile_index*2+0];
 	int color = m_vram_0[tile_index*2+1] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_1)
 	int tile = m_vram_1[tile_index*2+0];
 	int color = m_vram_1[tile_index*2+1] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_2)
 	int tile = m_vram_2[tile_index*2+0];
 	int color = m_vram_2[tile_index*2+1] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_3)
 	int tile = m_vram_3[tile_index*2+0];
 	int color = m_vram_3[tile_index*2+1] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -675,7 +675,7 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(umipoker_state, screen_update_umipoker)
 
-	MCFG_GFXDECODE(umipoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", umipoker)
 
 	MCFG_PALETTE_LENGTH(0x400)
 

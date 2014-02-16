@@ -248,7 +248,7 @@ static MACHINE_CONFIG_START( skyfox, skyfox_state )
 	MCFG_SCREEN_VISIBLE_AREA(0+0x60, 320-1+0x60, 0+16, 256-1-16)    // from $30*2 to $CC*2+8
 	MCFG_SCREEN_UPDATE_DRIVER(skyfox_state, screen_update_skyfox)
 
-	MCFG_GFXDECODE(skyfox)
+	MCFG_GFXDECODE_ADD("gfxdecode", skyfox)
 	MCFG_PALETTE_LENGTH(256+256)    /* 256 static colors (+256 for the background??) */
 
 

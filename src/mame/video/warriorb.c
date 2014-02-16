@@ -61,7 +61,7 @@ void warriorb_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		if (x > 0x3c0) x -= 0x400;
 		if (y > 0x180) y -= 0x200;
 
-		machine().gfx[0]->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 					tilenum,
 					color,
 					flipx,flipy,

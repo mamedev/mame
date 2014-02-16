@@ -191,18 +191,18 @@ TILE_GET_INFO_MEMBER(ladybug_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + 32 * (m_colorram[tile_index] & 0x08);
 	int color = m_colorram[tile_index] & 0x07;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(ladybug_state::get_grid_tile_info)
 {
 	if (tile_index < 512)
-		SET_TILE_INFO_MEMBER(3, tile_index, 0, 0);
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 3, tile_index, 0, 0);
 	else
 	{
 		int temp = tile_index / 32;
 		tile_index = (31 - temp) * 32 + (tile_index % 32);
-		SET_TILE_INFO_MEMBER(4, tile_index, 0, 0);
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 4, tile_index, 0, 0);
 	}
 }
 
@@ -256,14 +256,14 @@ void ladybug_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (spriteram[offs + i] & 0x80)
 			{
 				if (spriteram[offs + i] & 0x40) /* 16x16 */
-					machine().gfx[1]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 							(spriteram[offs + i + 1] >> 2) + 4 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
 							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,
 							spriteram[offs + i + 3],
 							offs / 4 - 8 + (spriteram[offs + i] & 0x0f),0);
 				else    /* 8x8 */
-					machine().gfx[2]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							spriteram[offs + i + 1] + 16 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
 							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,

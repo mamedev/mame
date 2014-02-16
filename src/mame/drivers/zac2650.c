@@ -250,7 +250,7 @@ static MACHINE_CONFIG_START( tinvader, zac2650_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 719, 0, 767)
 	MCFG_SCREEN_UPDATE_DRIVER(zac2650_state, screen_update_tinvader)
 
-	MCFG_GFXDECODE(tinvader)
+	MCFG_GFXDECODE_ADD("gfxdecode", tinvader)
 	MCFG_PALETTE_LENGTH(4)
 
 	/* sound hardware */

@@ -199,7 +199,7 @@ static MACHINE_CONFIG_START( quizpani, quizpani_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizpani_state,  irq4_line_hold)
 	MCFG_CPU_PERIODIC_INT_DRIVER(quizpani_state, irq1_line_hold, 164) // music tempo
 
-	MCFG_GFXDECODE(quizpani)
+	MCFG_GFXDECODE_ADD("gfxdecode", quizpani)
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

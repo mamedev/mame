@@ -922,7 +922,7 @@ static MACHINE_CONFIG_START( jack, jack_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_jack)
 
-	MCFG_GFXDECODE(jack)
+	MCFG_GFXDECODE_ADD("gfxdecode", jack)
 	MCFG_PALETTE_LENGTH(32)
 
 	/* sound hardware */
@@ -972,7 +972,7 @@ static MACHINE_CONFIG_DERIVED( joinem, jack )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_joinem)
 
-	MCFG_GFXDECODE(joinem)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", joinem)
 	MCFG_PALETTE_LENGTH(0x40)
 
 	MCFG_PALETTE_INIT_OVERRIDE(jack_state,joinem)

@@ -983,7 +983,9 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 
 	MCFG_VIDEO_START_OVERRIDE(gticlub_state,gticlub)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K001604_ADD("k001604_1", gticlub_k001604_intf)
+	MCFG_K001604_GFXDECODE("gfxdecode")
 
 	MCFG_K056800_ADD("k056800", XTAL_33_8688MHz/2)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
@@ -1011,6 +1013,7 @@ static MACHINE_CONFIG_DERIVED( slrasslt, gticlub )
 
 	MCFG_DEVICE_REMOVE("k001604_1")
 	MCFG_K001604_ADD("k001604_1", slrasslt_k001604_intf)
+	MCFG_K001604_GFXDECODE("gfxdecode")
 MACHINE_CONFIG_END
 
 
@@ -1100,8 +1103,13 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_hangplt)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	MCFG_K001604_ADD("k001604_1", hangplt_k001604_intf_l)
+	MCFG_K001604_GFXDECODE("gfxdecode")
+	
 	MCFG_K001604_ADD("k001604_2", hangplt_k001604_intf_r)
+	MCFG_K001604_GFXDECODE("gfxdecode")
 
 	MCFG_K056800_ADD("k056800", XTAL_33_8688MHz/2)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))

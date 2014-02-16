@@ -17,6 +17,9 @@ public:
 	k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k007342_device() {}
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( scroll_r );
@@ -46,6 +49,7 @@ private:
 	UINT8    m_regs[8];
 	UINT16   m_scrollx[2];
 	UINT8    m_scrolly[2];
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	TILEMAP_MAPPER_MEMBER(scan);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
@@ -58,5 +62,8 @@ extern const device_type K007342;
 #define MCFG_K007342_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K007342, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_K007342_GFXDECODE(_gfxtag) \
+	k007342_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif

@@ -71,9 +71,11 @@
 	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_ROWS, 64,32) \
 	MCFG_TILEMAP_TRANSPARENT_PEN(0) }
 
-#define MCFG_ATARI_VAD_MOB(_config) \
+#define MCFG_ATARI_VAD_MOB(_config, _gfxdecode) \
 	{ astring fulltag(device->tag(), ":mob"); device_t *device; \
-	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag, "^^screen", _config) }
+	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag, "^^screen", _config) \
+	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("^" _gfxdecode) }
+	
 
 
 #define MCFG_ATARI_EEPROM_2804_ADD(_tag) \

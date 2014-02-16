@@ -196,7 +196,7 @@ public:
 TILE_GET_INFO_MEMBER(supershot_state::get_supershot_text_tile_info)
 {
 	UINT8 code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 void supershot_state::video_start()
@@ -354,7 +354,7 @@ static MACHINE_CONFIG_START( supershot, supershot_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(supershot_state, screen_update_supershot)
 
-	MCFG_GFXDECODE(supershot)
+	MCFG_GFXDECODE_ADD("gfxdecode", supershot)
 	MCFG_PALETTE_LENGTH(2)
 
 	/* sound hardware */

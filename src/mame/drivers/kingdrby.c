@@ -147,7 +147,7 @@ TILE_GET_INFO_MEMBER(kingdrby_state::get_sc0_tile_info)
 
 	tile&=0x1ff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile,
 			color|0x40,
@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(kingdrby_state::get_sc1_tile_info)
 	//0x13
 	//
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile,
 			color|0x40,
@@ -221,13 +221,13 @@ void kingdrby_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					machine().gfx[0]->transpen(bitmap,cliprect,spr_offs++,colour,1,0,((x+16*w)-(dx+1)*16),(y+dy*16),0);
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,spr_offs++,colour,1,0,((x+16*w)-(dx+1)*16),(y+dy*16),0);
 		}
 		else
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					machine().gfx[0]->transpen(bitmap,cliprect,spr_offs++,colour,0,0,(x+dx*16),(y+dy*16),0);
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,spr_offs++,colour,0,0,(x+dx*16),(y+dy*16),0);
 		}
 	}
 }
@@ -1038,7 +1038,7 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
-	MCFG_GFXDECODE(kingdrby)
+	MCFG_GFXDECODE_ADD("gfxdecode", kingdrby)
 	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_PALETTE_INIT_OVERRIDE(kingdrby_state,kingdrby)
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1077,7 +1077,7 @@ static MACHINE_CONFIG_DERIVED( cowrace, kingdrbb )
 	MCFG_CPU_PROGRAM_MAP(cowrace_sound_map)
 	MCFG_CPU_IO_MAP(cowrace_sound_io)
 
-	MCFG_GFXDECODE(cowrace)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", cowrace)
 	MCFG_PALETTE_INIT_OVERRIDE(kingdrby_state,kingdrby)
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

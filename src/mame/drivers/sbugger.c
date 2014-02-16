@@ -230,7 +230,7 @@ static MACHINE_CONFIG_START( sbugger, sbugger_state )
 	MCFG_CPU_IO_MAP(sbugger_io_map)
 	MCFG_I8156_ADD("i8156", 200000, i8156_intf)     /* freq is an approximation */
 
-	MCFG_GFXDECODE(sbugger)
+	MCFG_GFXDECODE_ADD("gfxdecode", sbugger)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

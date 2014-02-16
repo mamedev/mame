@@ -496,7 +496,7 @@ TILE_GET_INFO_MEMBER(avt_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] | ((attr & 1) << 8);
 	int color = (attr & 0xf0)>>4;
 
-	SET_TILE_INFO_MEMBER( 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  0, code, color, 0);
 }
 
 
@@ -510,7 +510,7 @@ UINT32 avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	int x,y;
 	int count;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	count = 0;
 
@@ -904,7 +904,7 @@ static MACHINE_CONFIG_START( avt, avt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* 240x224 (through CRTC) */
 	MCFG_SCREEN_UPDATE_DRIVER(avt_state, screen_update_avt)
 
-	MCFG_GFXDECODE(avt)
+	MCFG_GFXDECODE_ADD("gfxdecode", avt)
 
 	MCFG_PALETTE_LENGTH(8*16)
 

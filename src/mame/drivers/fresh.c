@@ -108,7 +108,7 @@ TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_tile_info)
 	int tileno, pal;
 	tileno = m_bg_videoram[tile_index];
 	pal = m_attr_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(1, tileno, pal, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, pal, 0);
 }
 
 
@@ -130,7 +130,7 @@ TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_2_tile_info)
 	int tileno, pal;
 	tileno = m_bg_2_videoram[tile_index];
 	pal = m_attr_2_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, tileno, pal, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, pal, 0);
 }
 
 
@@ -625,7 +625,7 @@ static MACHINE_CONFIG_START( fresh, fresh_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fresh_state, screen_update_fresh)
 
 	MCFG_PALETTE_LENGTH(0x1000) // or 0xc00
-	MCFG_GFXDECODE(fresh)
+	MCFG_GFXDECODE_ADD("gfxdecode", fresh)
 
 	/* sound hw? */
 MACHINE_CONFIG_END

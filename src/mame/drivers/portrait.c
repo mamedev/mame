@@ -259,7 +259,7 @@ static MACHINE_CONFIG_START( portrait, portrait_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 0*8, 40*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(portrait_state, screen_update_portrait)
 
-	MCFG_GFXDECODE(portrait)
+	MCFG_GFXDECODE_ADD("gfxdecode", portrait)
 	MCFG_PALETTE_LENGTH(0x800)
 
 

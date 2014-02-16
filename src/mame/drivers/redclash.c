@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( zerohour, ladybug_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ladybug_state, screen_update_redclash)
 	MCFG_SCREEN_VBLANK_DRIVER(ladybug_state, screen_eof_redclash)
 
-	MCFG_GFXDECODE(redclash)
+	MCFG_GFXDECODE_ADD("gfxdecode", redclash)
 	MCFG_PALETTE_LENGTH(4*8+4*16+32)
 
 	MCFG_PALETTE_INIT_OVERRIDE(ladybug_state,redclash)
@@ -391,7 +391,7 @@ static MACHINE_CONFIG_START( redclash, ladybug_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ladybug_state, screen_update_redclash)
 	MCFG_SCREEN_VBLANK_DRIVER(ladybug_state, screen_eof_redclash)
 
-	MCFG_GFXDECODE(redclash)
+	MCFG_GFXDECODE_ADD("gfxdecode", redclash)
 	MCFG_PALETTE_LENGTH(4*8+4*16+32)
 
 	MCFG_PALETTE_INIT_OVERRIDE(ladybug_state,redclash)

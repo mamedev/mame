@@ -558,7 +558,7 @@ static MACHINE_CONFIG_START( argus, argus_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_argus)
 
-	MCFG_GFXDECODE(argus)
+	MCFG_GFXDECODE_ADD("gfxdecode", argus)
 	MCFG_PALETTE_LENGTH(896)
 
 	MCFG_VIDEO_START_OVERRIDE(argus_state,argus)
@@ -603,7 +603,7 @@ static MACHINE_CONFIG_START( valtric, argus_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_valtric)
 
-	MCFG_GFXDECODE(valtric)
+	MCFG_GFXDECODE_ADD("gfxdecode", valtric)
 	MCFG_PALETTE_LENGTH(768)
 
 	MCFG_VIDEO_START_OVERRIDE(argus_state,valtric)
@@ -648,7 +648,7 @@ static MACHINE_CONFIG_START( butasan, argus_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(argus_state, screen_update_butasan)
 
-	MCFG_GFXDECODE(butasan)
+	MCFG_GFXDECODE_ADD("gfxdecode", butasan)
 	MCFG_PALETTE_LENGTH(768)
 
 	MCFG_VIDEO_START_OVERRIDE(argus_state,butasan)

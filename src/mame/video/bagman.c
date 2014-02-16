@@ -87,11 +87,11 @@ WRITE8_MEMBER(bagman_state::bagman_flipscreen_w)
 
 TILE_GET_INFO_MEMBER(bagman_state::get_bg_tile_info)
 {
-	int gfxbank = (machine().gfx[2] && (m_colorram[tile_index] & 0x10)) ? 2 : 0;
+	int gfxbank = (m_gfxdecode->gfx(2) && (m_colorram[tile_index] & 0x10)) ? 2 : 0;
 	int code = m_videoram[tile_index] + 8 * (m_colorram[tile_index] & 0x20);
 	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(gfxbank, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, gfxbank, code, color, 0);
 }
 
 VIDEO_START_MEMBER(bagman_state,bagman)
@@ -123,7 +123,7 @@ void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		}
 
 		if (spriteram[offs + 2] && spriteram[offs + 3])
-			machine().gfx[1]->transpen(bitmap,
+			m_gfxdecode->gfx(1)->transpen(bitmap,
 					cliprect,
 					(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20),
 					spriteram[offs + 1] & 0x1f,

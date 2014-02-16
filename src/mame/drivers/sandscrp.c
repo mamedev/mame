@@ -509,17 +509,19 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sandscrp_state, screen_update_sandscrp)
 	MCFG_SCREEN_VBLANK_DRIVER(sandscrp_state, screen_eof_sandscrp)
 
-	MCFG_GFXDECODE(sandscrp)
+	MCFG_GFXDECODE_ADD("gfxdecode", sandscrp)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, 0, 256, 224);
+	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
 	kaneko_hit_device::set_type(*device, 0);
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", sandscrp_pandora_config)
+	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

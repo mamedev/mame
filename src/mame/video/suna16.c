@@ -188,7 +188,7 @@ void suna16_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 					tile_flipy = !tile_flipy;
 				}
 
-				machine().gfx[gfx]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(gfx)->transpen(bitmap,cliprect,
 							(tile & 0x3fff) + bank*0x4000,
 							attr + (m_color_bank << 4),
 							tile_flipx, tile_flipy,

@@ -366,7 +366,7 @@ static MACHINE_CONFIG_START( foodf, foodf_state )
 	MCFG_TIMER_DRIVER_ADD("scan_timer", foodf_state, scanline_update_timer)
 
 	/* video hardware */
-	MCFG_GFXDECODE(foodf)
+	MCFG_GFXDECODE_ADD("gfxdecode", foodf)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("playfield", 2, foodf_state, get_playfield_tile_info, 8,8, SCAN_COLS, 32,32, 0)

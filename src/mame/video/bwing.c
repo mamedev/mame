@@ -96,9 +96,9 @@ WRITE8_MEMBER(bwing_state::bwing_scrollram_w)
 	{
 		offs = offset;
 		if (offset < 0x1000)
-			machine().gfx[2]->mark_dirty(offset / 32);
+			m_gfxdecode->gfx(2)->mark_dirty(offset / 32);
 		else
-			machine().gfx[3]->mark_dirty(offset / 32);
+			m_gfxdecode->gfx(3)->mark_dirty(offset / 32);
 	}
 
 	(m_srbase[m_srbank])[offs] = data;
@@ -172,19 +172,19 @@ WRITE8_MEMBER(bwing_state::bwing_paletteram_w)
 
 TILE_GET_INFO_MEMBER(bwing_state::get_fgtileinfo)
 {
-	tileinfo.pen_data = machine().gfx[2]->get_data(m_fgdata[tile_index] & (BW_NTILES - 1));
-	tileinfo.palette_base = machine().gfx[2]->colorbase() + ((m_fgdata[tile_index] >> 7) << 3);
+	tileinfo.pen_data = m_gfxdecode->gfx(2)->get_data(m_fgdata[tile_index] & (BW_NTILES - 1));
+	tileinfo.palette_base = m_gfxdecode->gfx(2)->colorbase() + ((m_fgdata[tile_index] >> 7) << 3);
 }
 
 TILE_GET_INFO_MEMBER(bwing_state::get_bgtileinfo)
 {
-	tileinfo.pen_data = machine().gfx[3]->get_data(m_bgdata[tile_index] & (BW_NTILES - 1));
-	tileinfo.palette_base = machine().gfx[3]->colorbase() + ((m_bgdata[tile_index] >> 7) << 3);
+	tileinfo.pen_data = m_gfxdecode->gfx(3)->get_data(m_bgdata[tile_index] & (BW_NTILES - 1));
+	tileinfo.palette_base = m_gfxdecode->gfx(3)->colorbase() + ((m_bgdata[tile_index] >> 7) << 3);
 }
 
 TILE_GET_INFO_MEMBER(bwing_state::get_charinfo)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_videoram[tile_index], 0, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(bwing_state::bwing_scan_cols)
@@ -219,20 +219,20 @@ void bwing_state::video_start()
 	for (i = 0; i < 8; i++)
 		m_sreg[i] = 0;
 
-//  m_fgfx = machine().gfx[2];
-	machine().gfx[2]->set_source(m_srbase[1]);
+//  m_fgfx = m_gfxdecode->gfx(2);
+	m_gfxdecode->gfx(2)->set_source(m_srbase[1]);
 
-//  m_bgfx = machine().gfx[3];
-	machine().gfx[3]->set_source(m_srbase[1] + 0x1000);
+//  m_bgfx = m_gfxdecode->gfx(3);
+	m_gfxdecode->gfx(3)->set_source(m_srbase[1] + 0x1000);
 /*
     WTF??
 
-    dwptr = machine().gfx[2]->pen_usage();
+    dwptr = m_gfxdecode->gfx(2)->pen_usage();
     if (dwptr)
     {
         dwptr[0] = 0;
         for(i = 1; i < BW_NTILES; i++)
-            dwptr[i] = -1;
+            dwptr[i) = -1;
     }
 */
 }
@@ -243,7 +243,7 @@ void bwing_state::video_start()
 void bwing_state::draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, UINT8 *ram, int pri )
 {
 	int attrib, fx, fy, code, x, y, color, i;
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 
 	for (i = 0; i < 0x200; i += 4)
 	{

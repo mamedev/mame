@@ -894,11 +894,13 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_bonzeadv)
 	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
-	MCFG_GFXDECODE(asuka)
+	MCFG_GFXDECODE_ADD("gfxdecode", asuka)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
+	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_ADD("tc0100scn", asuka_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
 
 	/* sound hardware */
@@ -937,11 +939,13 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
 	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
-	MCFG_GFXDECODE(asuka)
+	MCFG_GFXDECODE_ADD("gfxdecode", asuka)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_PC090OJ_ADD("pc090oj", asuka_pc090oj_intf)
+	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_ADD("tc0100scn", asuka_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
 
 	/* sound hardware */
@@ -988,11 +992,13 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_bonzeadv)
 	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
-	MCFG_GFXDECODE(asuka)
+	MCFG_GFXDECODE_ADD("gfxdecode", asuka)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_PC090OJ_ADD("pc090oj", asuka_pc090oj_intf)
+	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
 
 	/* sound hardware */
@@ -1031,11 +1037,13 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
 	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
-	MCFG_GFXDECODE(asuka)
+	MCFG_GFXDECODE_ADD("gfxdecode", asuka)
 	MCFG_PALETTE_LENGTH(4096)   /* only Mofflott uses full palette space */
 
 	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
+	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
 
 	/* sound hardware */
@@ -1078,11 +1086,13 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
 	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
-	MCFG_GFXDECODE(asuka)
+	MCFG_GFXDECODE_ADD("gfxdecode", asuka)
 	MCFG_PALETTE_LENGTH(4096)   /* only Mofflott uses full palette space */
 
 	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
+	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
 
 	/* sound hardware */
@@ -1121,11 +1131,13 @@ static MACHINE_CONFIG_START( eto, asuka_state )
 	MCFG_SCREEN_UPDATE_DRIVER(asuka_state, screen_update_asuka)
 	MCFG_SCREEN_VBLANK_DRIVER(asuka_state, screen_eof_asuka)
 
-	MCFG_GFXDECODE(asuka)
+	MCFG_GFXDECODE_ADD("gfxdecode", asuka)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
+	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
 
 	/* sound hardware */

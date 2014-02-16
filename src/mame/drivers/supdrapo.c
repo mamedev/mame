@@ -123,7 +123,7 @@ UINT32 supdrapo_state::screen_update_supdrapo(screen_device &screen, bitmap_ind1
 			/* Global Column Coloring, GUESS! */
 			color = m_col_line[(x*2) + 1] ? (m_col_line[(x*2) + 1] - 1) & 7 : 0;
 
-			 machine().gfx[0]->opaque(bitmap,cliprect, tile,color, 0, 0, x*8, y*8);
+			 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile,color, 0, 0, x*8, y*8);
 
 			count++;
 		}
@@ -462,7 +462,7 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(supdrapo_state, screen_update_supdrapo)
 
-	MCFG_GFXDECODE(supdrapo)
+	MCFG_GFXDECODE_ADD("gfxdecode", supdrapo)
 	MCFG_PALETTE_LENGTH(0x100)
 
 

@@ -149,7 +149,7 @@ TILE_GET_INFO_MEMBER(igs_m027_state::get_tx_tilemap_tile_info)
 	tileno = m_igs_tx_videoram[tile_index] & 0xffff;
 	colour = (m_igs_tx_videoram[tile_index]>>0x10) & 0xffff;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,colour,0);
 }
 
 /* BG Layer */
@@ -168,7 +168,7 @@ TILE_GET_INFO_MEMBER(igs_m027_state::get_bg_tilemap_tile_info)
 	tileno = m_igs_bg_videoram[tile_index] & 0xffff;
 	colour = (m_igs_bg_videoram[tile_index]>>0x10) & 0xffff;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,colour,0);
 }
 
 
@@ -389,7 +389,7 @@ static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs_m027_state,  igs_majhong_interrupt)
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE(igs_m027)
+	MCFG_GFXDECODE_ADD("gfxdecode", igs_m027)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

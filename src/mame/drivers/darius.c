@@ -873,7 +873,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE(darius)
+	MCFG_GFXDECODE_ADD("gfxdecode", darius)
 	MCFG_PALETTE_LENGTH(4096*2)
 	MCFG_DEFAULT_LAYOUT(layout_darius)
 
@@ -900,6 +900,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 
 
 	MCFG_PC080SN_ADD("pc080sn", darius_pc080sn_intf)
+	MCFG_PC080SN_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

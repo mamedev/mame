@@ -256,7 +256,7 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 	MCFG_SCREEN_UPDATE_DRIVER(srumbler_state, screen_update_srumbler)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(srumbler)
+	MCFG_GFXDECODE_ADD("gfxdecode", srumbler)
 	MCFG_PALETTE_LENGTH(512)
 
 

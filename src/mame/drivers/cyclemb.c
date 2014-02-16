@@ -166,7 +166,7 @@ void cyclemb_state::video_start()
 
 void cyclemb_state::cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int x,y,count;
 	count = 0;
 
@@ -255,14 +255,14 @@ void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			fx = !fx;
 			fy = !fy;
 		}
-		screen.machine().gfx[region]->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 }
 
 
 void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int x,y;
 
 
@@ -351,7 +351,7 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			fx = !fx;
 			fy = !fy;
 		}
-		screen.machine().gfx[region]->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 }
 
@@ -914,7 +914,7 @@ static MACHINE_CONFIG_START( cyclemb, cyclemb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_cyclemb)
 
-	MCFG_GFXDECODE(cyclemb)
+	MCFG_GFXDECODE_ADD("gfxdecode", cyclemb)
 	MCFG_PALETTE_LENGTH(256)
 
 

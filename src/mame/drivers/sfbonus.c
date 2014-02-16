@@ -781,7 +781,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_tile_info)
 	int flipx = (m_tilemap_ram[(tile_index*2)+1] & 0x80)>>7;
 	int flipy = (m_tilemap_ram[(tile_index*2)+1] & 0x40)>>5;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			0,
@@ -796,7 +796,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel_tile_info)
 
 	int priority = (m_reel_ram[(tile_index*2)+1] & 0x40)>>6;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			priority,  // colour aboused as priority
@@ -811,7 +811,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel2_tile_info)
 
 	int priority = (m_reel2_ram[(tile_index*2)+1] & 0x40)>>6;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			priority,  // colour abused as priority
@@ -826,7 +826,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel3_tile_info)
 
 	int priority = (m_reel3_ram[(tile_index*2)+1] & 0x40)>>6;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			priority,  // colour abused as priority
@@ -841,7 +841,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel4_tile_info)
 
 	int priority = (m_reel4_ram[(tile_index*2)+1] & 0x40)>>6;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			priority, // colour abused as priority
@@ -1366,7 +1366,7 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE(sfbonus)
+	MCFG_GFXDECODE_ADD("gfxdecode", sfbonus)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

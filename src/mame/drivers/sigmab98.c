@@ -298,7 +298,7 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			for (x = x0; x != x1; x += dx)
 			{
-				 machine().gfx[gfx]->zoom_transpen(bitmap,cliprect,
+				 m_gfxdecode->gfx(gfx)->zoom_transpen(bitmap,cliprect,
 										code++, color,
 										flipx, flipy,
 										(sx + x * dim) / 0x10000, (sy + y * dim) / 0x10000,
@@ -1698,7 +1698,7 @@ static MACHINE_CONFIG_START( gegege, sigmab98_state )
 	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0,0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 
-	MCFG_GFXDECODE(sigmab98)
+	MCFG_GFXDECODE_ADD("gfxdecode", sigmab98)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	// sound hardware
@@ -1738,7 +1738,7 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 	MCFG_SCREEN_VBLANK_DRIVER(sigmab98_state, screen_eof_sammymdl)
 
-	MCFG_GFXDECODE(sigmab98)
+	MCFG_GFXDECODE_ADD("gfxdecode", sigmab98)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	// sound hardware

@@ -17,7 +17,7 @@ TILE_GET_INFO_MEMBER(himesiki_state::get_bg_tile_info)
 
 	code &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(0, code, col, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, col, 0);
 }
 
 void himesiki_state::video_start()
@@ -78,7 +78,7 @@ void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 				y -= 0x100;
 		}
 
-		 machine().gfx[1]->transpen(bitmap,cliprect, code, col, fx, fy, x, y, 15);
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, col, fx, fy, x, y, 15);
 	}
 
 	for (offs = 0; offs < 0x100; offs += 4)
@@ -107,7 +107,7 @@ void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		if (y > 0xf0)
 			y -= 0x100;
 
-		 machine().gfx[2]->transpen(bitmap,cliprect, code, col, f, f, x, y, 15);
+		 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, code, col, f, f, x, y, 15);
 	}
 }
 

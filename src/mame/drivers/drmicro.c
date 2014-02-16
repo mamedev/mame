@@ -258,7 +258,7 @@ static MACHINE_CONFIG_START( drmicro, drmicro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drmicro_state, screen_update_drmicro)
 
-	MCFG_GFXDECODE(drmicro)
+	MCFG_GFXDECODE_ADD("gfxdecode", drmicro)
 	MCFG_PALETTE_LENGTH(512)
 
 

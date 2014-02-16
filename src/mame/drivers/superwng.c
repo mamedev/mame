@@ -89,7 +89,7 @@ TILE_GET_INFO_MEMBER(superwng_state::get_bg_tile_info)
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, flipx|flipy);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, attr & 0xf, flipx|flipy);
 }
 
 TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
@@ -104,7 +104,7 @@ TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, flipx|flipy);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, attr & 0xf, flipx|flipy);
 }
 
 void superwng_state::video_start()
@@ -153,7 +153,7 @@ UINT32 superwng_state::screen_update_superwng(screen_device &screen, bitmap_ind1
 		int sy = m_colorram_bg[i];
 		int color = m_colorram_bg[i + 1] & 0xf;
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						code,
 						color,
 						flip, flip,
@@ -475,11 +475,11 @@ static MACHINE_CONFIG_START( superwng, superwng_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(superwng_state, screen_update_superwng)
 
-	MCFG_GFXDECODE(superwng)
+	MCFG_GFXDECODE_ADD("gfxdecode", superwng)
 
 	MCFG_PALETTE_LENGTH(0x40)
-	MCFG_SCREEN_UPDATE_DRIVER(superwng_state, screen_update_superwng)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

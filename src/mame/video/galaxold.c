@@ -431,7 +431,7 @@ VIDEO_START_MEMBER(galaxold_state,galaxold_plain)
 
 	m_bg_tilemap->set_scroll_cols(32);
 
-	m_color_mask = (machine().gfx[0]->granularity() == 4) ? 7 : 3;
+	m_color_mask = (m_gfxdecode->gfx(0)->granularity() == 4) ? 7 : 3;
 }
 
 VIDEO_START_MEMBER(galaxold_state,galaxold)
@@ -642,7 +642,7 @@ TILE_GET_INFO_MEMBER(galaxold_state::drivfrcg_get_tile_info)
 	code |= (bank << 4);
 	color |= ((m_attributesram[(x << 1) | 1] & 0x40) >> 3);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 VIDEO_START_MEMBER(galaxold_state,drivfrcg)
@@ -692,7 +692,7 @@ TILE_GET_INFO_MEMBER(galaxold_state::racknrol_get_tile_info)
 
 	code |= (bank << 8);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 VIDEO_START_MEMBER(galaxold_state,racknrol)
@@ -718,7 +718,7 @@ TILE_GET_INFO_MEMBER(galaxold_state::harem_get_tile_info)
 
 	code  |= bank * 0x200;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void galaxold_state::harem_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
@@ -734,7 +734,7 @@ VIDEO_START_MEMBER(galaxold_state,harem)
 
 	m_bg_tilemap->set_scroll_cols(32);
 
-	m_color_mask = (machine().gfx[0]->granularity() == 4) ? 7 : 3;
+	m_color_mask = (m_gfxdecode->gfx(0)->granularity() == 4) ? 7 : 3;
 
 	m_modify_spritecode = &galaxold_state::harem_modify_spritecode;
 }
@@ -772,7 +772,7 @@ TILE_GET_INFO_MEMBER(galaxold_state::dambustr_get_tile_info2)
 		(this->*m_modify_color)(&color);
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 VIDEO_START_MEMBER(galaxold_state,dambustr)
@@ -1612,13 +1612,13 @@ TILE_GET_INFO_MEMBER(galaxold_state::get_tile_info)
 		(this->*m_modify_color)(&color);
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxold_state::rockclim_get_tile_info)
 {
 	UINT16 code = m_rockclim_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(2, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, 0, 0);
 }
 
 void galaxold_state::draw_bullets_common(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -1700,7 +1700,7 @@ void galaxold_state::draw_sprites(bitmap_ind16 &bitmap, UINT8 *spriteram, size_t
 		if (offs < 3*4)  sy++;
 
 
-		 machine().gfx[1]->transpen(bitmap,m_flipscreen_x ? spritevisibleareaflipx : spritevisiblearea,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,m_flipscreen_x ? spritevisibleareaflipx : spritevisiblearea,
 				code,color,
 				flipx,flipy,
 				sx,sy,0);

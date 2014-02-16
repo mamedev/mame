@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
-	MCFG_GFXDECODE(v6809)
+	MCFG_GFXDECODE_ADD("gfxdecode", v6809)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -38,32 +38,32 @@ TILEMAP_MAPPER_MEMBER(nmk16_state::afega_tilemap_scan_pages)
 TILE_GET_INFO_MEMBER(nmk16_state::macross_get_bg0_tile_info)
 {
 	int code = m_nmk_bgvideoram0[tile_index];
-	SET_TILE_INFO_MEMBER(1,(code & 0xfff) + (m_bgbank << 12),code >> 12,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,(code & 0xfff) + (m_bgbank << 12),code >> 12,0);
 }
 
 TILE_GET_INFO_MEMBER(nmk16_state::macross_get_bg1_tile_info)
 {
 	int code = m_nmk_bgvideoram1[tile_index];
-	SET_TILE_INFO_MEMBER(1,(code & 0xfff) + (m_bgbank << 12),code >> 12,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,(code & 0xfff) + (m_bgbank << 12),code >> 12,0);
 }
 
 TILE_GET_INFO_MEMBER(nmk16_state::macross_get_bg2_tile_info)
 {
 	int code = m_nmk_bgvideoram2[tile_index];
-	SET_TILE_INFO_MEMBER(1,(code & 0xfff) + (m_bgbank << 12),code >> 12,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,(code & 0xfff) + (m_bgbank << 12),code >> 12,0);
 }
 
 TILE_GET_INFO_MEMBER(nmk16_state::macross_get_bg3_tile_info)
 {
 	int code = m_nmk_bgvideoram3[tile_index];
-	SET_TILE_INFO_MEMBER(1,(code & 0xfff) + (m_bgbank << 12),code >> 12,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,(code & 0xfff) + (m_bgbank << 12),code >> 12,0);
 }
 
 
 TILE_GET_INFO_MEMBER(nmk16_state::strahl_get_fg_tile_info)
 {
 	int code = m_nmk_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			(code & 0xfff),
 			code >> 12,
@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(nmk16_state::strahl_get_fg_tile_info)
 TILE_GET_INFO_MEMBER(nmk16_state::macross_get_tx_tile_info)
 {
 	int code = m_nmk_txvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code & 0xfff,
 			code >> 12,
@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(nmk16_state::bjtwin_get_bg_tile_info)
 {
 	int code = m_nmk_bgvideoram0[tile_index];
 	int bank = (code & 0x800) ? 1 : 0;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			bank,
 			(code & 0x7ff) + ((bank) ? (m_bgbank << 11) : 0),
 			code >> 12,
@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(nmk16_state::bjtwin_get_bg_tile_info)
 TILE_GET_INFO_MEMBER(nmk16_state::get_tile_info_0_8bit)
 {
 	UINT16 code = m_nmk_bgvideoram0[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			0,
@@ -419,7 +419,7 @@ inline void nmk16_state::nmk16_draw_sprite(bitmap_ind16 &bitmap, const rectangle
 		xx = w;
 		do
 		{
-		machine().gfx[2]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			code,
 			color,
 			flip_screen(), flip_screen(),
@@ -467,7 +467,7 @@ inline void nmk16_state::nmk16_draw_sprite_flipsupported(bitmap_ind16 &bitmap, c
 		xx = w;
 		do
 		{
-		machine().gfx[2]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			code,
 			color,
 			flipx, flipy,
@@ -596,7 +596,7 @@ int nmk16_state::nmk16_bioshipbg_sprflip_tx_update(screen_device &screen, bitmap
 				int numtile = data&0xfff;
 				int color = (data&0xf000)>>12;
 
-				screen.machine().gfx[3]->opaque(*m_background_bitmap,m_background_bitmap->cliprect(),
+				m_gfxdecode->gfx(3)->opaque(*m_background_bitmap,m_background_bitmap->cliprect(),
 						numtile,
 						color,
 						0,0,   /* no flip */
@@ -605,7 +605,7 @@ int nmk16_state::nmk16_bioshipbg_sprflip_tx_update(screen_device &screen, bitmap
 				data = tilerom[offs+0x1000+bank];
 				numtile = data&0xfff;
 				color = (data&0xf000)>>12;
-				screen.machine().gfx[3]->opaque(*m_background_bitmap,m_background_bitmap->cliprect(),
+				m_gfxdecode->gfx(3)->opaque(*m_background_bitmap,m_background_bitmap->cliprect(),
 						numtile,
 						color,
 						0,0,   /* no flip */

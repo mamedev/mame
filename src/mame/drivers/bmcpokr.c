@@ -201,7 +201,7 @@ GFXDECODE_END
 
 UINT32 bmcpokr_state::screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	int count = 0;
 	for (int y=0;y<32;y++)
@@ -236,7 +236,7 @@ static MACHINE_CONFIG_START( bmcpokr, bmcpokr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(bmcpokr_state, screen_update_bmcpokr)
 
-	MCFG_GFXDECODE(bmcpokr)
+	MCFG_GFXDECODE_ADD("gfxdecode", bmcpokr)
 
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)

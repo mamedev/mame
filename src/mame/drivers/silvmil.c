@@ -124,7 +124,7 @@ TILE_GET_INFO_MEMBER(silvmil_state::get_bg_tile_info)
 	int color = (data >> 12) & 0x0f;
 	int bank = m_silvmil_tilebank[(data&0xc00)>>10]*0x400;
 
-	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x20, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile + bank, color + 0x20, 0);
 }
 
 TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
@@ -134,7 +134,7 @@ TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
 	int color = (data >> 12) & 0x0f;
 	int bank = m_silvmil_tilebank[(data&0xc00)>>10]*0x400;
 
-	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x10, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile + bank, color + 0x10, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(silvmil_state::deco16_scan_rows)
@@ -321,13 +321,14 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_SCREEN_UPDATE_DRIVER(silvmil_state, screen_update_silvmil)
 
 	MCFG_PALETTE_LENGTH(0x300)
-	MCFG_GFXDECODE(silvmil)
+	MCFG_GFXDECODE_ADD("gfxdecode", silvmil)
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 0);
 	decospr_device::set_is_bootleg(*device, true);
 	decospr_device::set_offsets(*device, 5,7);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

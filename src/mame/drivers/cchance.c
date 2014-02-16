@@ -218,9 +218,10 @@ static MACHINE_CONFIG_START( cchance, cchance_state )
 	MCFG_MACHINE_START_OVERRIDE(cchance_state,cchance)
 	MCFG_MACHINE_RESET_OVERRIDE(cchance_state,cchance)
 
-	MCFG_GFXDECODE(cchance)
+	MCFG_GFXDECODE_ADD("gfxdecode", cchance)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

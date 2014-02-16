@@ -31,7 +31,8 @@ const device_type KANEKO_KC002_SPRITE = &device_creator<kaneko_kc002_sprite_devi
 
 kaneko16_sprite_device::kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type)
 	: device_t(mconfig, type, "kaneko16_sprite_device", tag, owner, clock, "kaneko16_sprite", __FILE__),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this),
+		m_gfxdecode(*this)
 {
 	m_keep_sprites = 0; // default disabled for games not using it
 
@@ -57,6 +58,15 @@ kaneko16_sprite_device::kaneko16_sprite_device(const machine_config &mconfig, co
 	m_priority.sprite[3] = 8;   // above all
 }
 
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void kaneko16_sprite_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<kaneko16_sprite_device &>(device).m_gfxdecode.set_tag(tag);
+}
 
 void kaneko16_sprite_device::device_start()
 {
@@ -429,7 +439,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(running_machine &machine, bit
 		UINT32 primask = m_priority.sprite[curr_pri];
 
 		kaneko16_draw_sprites_custom(
-										bitmap,cliprect,machine.gfx[0],
+										bitmap,cliprect,m_gfxdecode->gfx(0),
 										s->code,
 										s->color,
 										s->flipx, s->flipy,

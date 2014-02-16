@@ -464,7 +464,7 @@ static MACHINE_CONFIG_START( sprint8, sprint8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sprint8_state, screen_update_sprint8)
 	MCFG_SCREEN_VBLANK_DRIVER(sprint8_state, screen_eof_sprint8)
 
-	MCFG_GFXDECODE(sprint8)
+	MCFG_GFXDECODE_ADD("gfxdecode", sprint8)
 	MCFG_PALETTE_LENGTH(36)
 
 

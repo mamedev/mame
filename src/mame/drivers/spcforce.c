@@ -278,7 +278,7 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(spcforce_state, screen_update_spcforce)
 
-	MCFG_GFXDECODE(spcforce)
+	MCFG_GFXDECODE_ADD("gfxdecode", spcforce)
 	MCFG_PALETTE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
 	/* sound hardware */

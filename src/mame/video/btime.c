@@ -116,10 +116,10 @@ Start the video hardware emulation.
 
 VIDEO_START_MEMBER(btime_state,btime)
 {
-	if (machine().gfx[0]->srcdata() == NULL)
-		machine().gfx[0]->set_source(m_deco_charram);
-	if (machine().gfx[1]->srcdata() == NULL)
-		machine().gfx[1]->set_source(m_deco_charram);
+	if (m_gfxdecode->gfx(0)->srcdata() == NULL)
+		m_gfxdecode->gfx(0)->set_source(m_deco_charram);
+	if (m_gfxdecode->gfx(1)->srcdata() == NULL)
+		m_gfxdecode->gfx(1)->set_source(m_deco_charram);
 }
 
 
@@ -219,10 +219,10 @@ WRITE8_MEMBER(btime_state::deco_charram_w)
 	offset &= 0x1fff;
 
 	/* dirty sprite */
-	machine().gfx[1]->mark_dirty(offset >> 5);
+	m_gfxdecode->gfx(1)->mark_dirty(offset >> 5);
 
 	/* diry char */
-	machine().gfx[0]->mark_dirty(offset >> 3);
+	m_gfxdecode->gfx(0)->mark_dirty(offset >> 3);
 }
 
 WRITE8_MEMBER(btime_state::bnj_background_w)
@@ -310,7 +310,7 @@ void btime_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, U
 			y = 33 - y;
 		}
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flip_screen(),flip_screen(),
@@ -351,7 +351,7 @@ void btime_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 		y = y - sprite_y_adjust;
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				sprite_ram[offs + interleave],
 				color,
 				flipx,flipy,
@@ -360,7 +360,7 @@ void btime_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		y = y + (flip_screen() ? -256 : 256);
 
 		// Wrap around
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				sprite_ram[offs + interleave],
 				color,
 				flipx,flipy,
@@ -398,7 +398,7 @@ void btime_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipre
 				y = 256 - y;
 			}
 
-			machine().gfx[2]->opaque(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->opaque(bitmap,cliprect,
 					gfx[tileoffset + offs],
 					color,
 					flip_screen(),flip_screen(),
@@ -494,7 +494,7 @@ UINT32 btime_state::screen_update_bnj(screen_device &screen, bitmap_ind16 &bitma
 				sy = 256 - sy;
 			}
 
-			 machine().gfx[2]->opaque(*m_background_bitmap,m_background_bitmap->cliprect(),
+			 m_gfxdecode->gfx(2)->opaque(*m_background_bitmap,m_background_bitmap->cliprect(),
 					(m_bnj_backgroundram[offs] >> 4) + ((offs & 0x80) >> 3) + 32,
 					0,
 					flip_screen(), flip_screen(),
@@ -540,7 +540,7 @@ UINT32 btime_state::screen_update_cookrace(screen_device &screen, bitmap_ind16 &
 			sy = 33 - sy;
 		}
 
-		 machine().gfx[2]->opaque(bitmap,cliprect,
+		 m_gfxdecode->gfx(2)->opaque(bitmap,cliprect,
 				m_bnj_backgroundram[offs],
 				0,
 				flip_screen(), flip_screen(),

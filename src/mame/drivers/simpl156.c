@@ -435,12 +435,15 @@ static MACHINE_CONFIG_START( chainrec, simpl156_state )
 	MCFG_SCREEN_UPDATE_DRIVER(simpl156_state, screen_update_simpl156)
 
 	MCFG_PALETTE_LENGTH(4096)
-	MCFG_GFXDECODE(simpl156)
+	MCFG_GFXDECODE_ADD("gfxdecode", simpl156)
 
 	MCFG_DECO16IC_ADD("tilegen1", simpl156_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
 	decospr_device::set_pri_callback(*device, simpl156_pri_callback);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

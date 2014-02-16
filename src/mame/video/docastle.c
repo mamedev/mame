@@ -89,7 +89,7 @@ TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
 	int code = m_videoram[tile_index] + 8 * (m_colorram[tile_index] & 0x20);
 	int color = m_colorram[tile_index] & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void docastle_state::video_start_common( UINT32 tile_transmask )
@@ -119,7 +119,7 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 	{
 		int sx, sy, flipx, flipy, code, color;
 
-		if (machine().gfx[1]->elements() > 256)
+		if (m_gfxdecode->gfx(1)->elements() > 256)
 		{
 			/* spriteram
 
@@ -181,7 +181,7 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		}
 
 		/* first draw the sprite, visible */
-		machine().gfx[1]->prio_transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -190,7 +190,7 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 				0x00,0x80ff);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		machine().gfx[1]->prio_transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

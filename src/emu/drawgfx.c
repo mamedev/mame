@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "drawgfxm.h"
+#include "validity.h"
 
 
 /***************************************************************************
@@ -64,18 +65,45 @@ static inline INT32 normalize_yscroll(bitmap_t &bitmap, INT32 yscroll)
 
 
 
-/***************************************************************************
-    GRAPHICS ELEMENTS
-***************************************************************************/
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
 
-/*-------------------------------------------------
-    gfx_init - allocate memory for the graphics
-    elements referenced by a machine
--------------------------------------------------*/
+const device_type GFXDECODE = &device_creator<gfxdecode_device>;
 
-void gfx_init(running_machine &machine)
+gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, GFXDECODE, "gfxdecode", tag, owner, clock, "gfxdecode", __FILE__),
+		m_gfxdecodeinfo(NULL)
 {
-	const gfx_decode_entry *gfxdecodeinfo = machine.config().m_gfxdecodeinfo;
+	memset(m_gfx, 0, sizeof(m_gfx));
+}
+
+//**************************************************************************
+//  INITIALIZATION AND CONFIGURATION
+//**************************************************************************
+
+void gfxdecode_device::static_set_gfxdecodeinfo(device_t &device, const gfx_decode_entry *info)
+{
+	downcast<gfxdecode_device &>(device).m_gfxdecodeinfo = info;
+}
+
+//-------------------------------------------------
+//  device_stop - final cleanup
+//-------------------------------------------------
+
+void gfxdecode_device::device_stop()
+{
+	for (int i = 0; i < MAX_GFX_ELEMENTS; i++)
+		auto_free(machine(), m_gfx[i]);
+}
+
+//-------------------------------------------------
+//  device_start - start up the device
+//-------------------------------------------------
+
+void gfxdecode_device::device_start()
+{
+	const gfx_decode_entry *gfxdecodeinfo = m_gfxdecodeinfo;
 	int curgfx;
 
 	// skip if nothing to do
@@ -86,7 +114,10 @@ void gfx_init(running_machine &machine)
 	for (curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != NULL; curgfx++)
 	{
 		const gfx_decode_entry *gfxdecode = &gfxdecodeinfo[curgfx];
-		memory_region *region = (gfxdecode->memory_region != NULL) ? machine.root_device().memregion(gfxdecode->memory_region) : NULL;
+		// resolve the region
+		astring gfxregion;
+		owner()->subtag(gfxregion, gfxdecode->memory_region);
+		memory_region *region = (gfxdecode->memory_region != NULL) ? owner()->memregion(gfxregion) : NULL;
 		UINT32 region_length = (region != NULL) ? (8 * region->bytes()) : 0;
 		const UINT8 *region_base = (region != NULL) ? region->base() : NULL;
 		UINT32 xscale = (gfxdecode->xscale == 0) ? 1 : gfxdecode->xscale;
@@ -200,10 +231,93 @@ void gfx_init(running_machine &machine)
 		glcopy.total = total;
 
 		// allocate the graphics
-		machine.gfx[curgfx] = auto_alloc(machine, gfx_element(machine, glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start));
+		m_gfx[curgfx] = auto_alloc(machine(), gfx_element(machine(), glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start));
 	}
 }
 
+
+//-------------------------------------------------
+//  device_validity_check - validate graphics decoding
+//  configuration
+//-------------------------------------------------/
+
+void gfxdecode_device::device_validity_check(validity_checker &valid) const
+{
+
+	// bail if no gfx
+	if (!m_gfxdecodeinfo)
+		return;
+
+	// iterate over graphics decoding entries
+	for (int gfxnum = 0; gfxnum < MAX_GFX_ELEMENTS && m_gfxdecodeinfo[gfxnum].gfxlayout != NULL; gfxnum++)
+	{
+		const gfx_decode_entry &gfx = m_gfxdecodeinfo[gfxnum];
+		const gfx_layout &layout = *gfx.gfxlayout;
+
+		// make sure the region exists
+		const char *region = gfx.memory_region;
+		if (region != NULL)
+		{
+			// resolve the region
+			astring gfxregion;
+			
+			owner()->subtag(gfxregion, region);
+
+			// loop over gfx regions
+			UINT32 region_length = valid.region_length(gfxregion);
+			if (region_length == 0)
+				mame_printf_error("gfx[%d] references non-existent region '%s'\n", gfxnum, gfxregion.cstr());
+
+			// if we have a valid region, and we're not using auto-sizing, check the decode against the region length
+			else if (!IS_FRAC(layout.total))
+			{
+				// determine which plane is at the largest offset
+				int start = 0;
+				for (int plane = 0; plane < layout.planes; plane++)
+					if (layout.planeoffset[plane] > start)
+						start = layout.planeoffset[plane];
+				start &= ~(layout.charincrement - 1);
+
+				// determine the total length based on this info
+				int len = layout.total * layout.charincrement;
+
+				// do we have enough space in the region to cover the whole decode?
+				int avail = region_length - (gfx.start & ~(layout.charincrement / 8 - 1));
+
+				// if not, this is an error
+				if ((start + len) / 8 > avail)
+					mame_printf_error("gfx[%d] extends past allocated memory of region '%s'\n", gfxnum, region);
+			}
+		}
+
+		int xscale = (m_gfxdecodeinfo[gfxnum].xscale == 0) ? 1 : m_gfxdecodeinfo[gfxnum].xscale;
+		int yscale = (m_gfxdecodeinfo[gfxnum].yscale == 0) ? 1 : m_gfxdecodeinfo[gfxnum].yscale;
+
+		// verify raw decode, which can only be full-region and have no scaling
+		if (layout.planeoffset[0] == GFX_RAW)
+		{
+			if (layout.total != RGN_FRAC(1,1))
+				mame_printf_error("gfx[%d] with unsupported layout total\n", gfxnum);
+			if (xscale != 1 || yscale != 1)
+				mame_printf_error("gfx[%d] with unsupported xscale/yscale\n", gfxnum);
+		}
+
+		// verify traditional decode doesn't have too many planes or is not too large
+		else
+		{
+			if (layout.planes > MAX_GFX_PLANES)
+				mame_printf_error("gfx[%d] with invalid planes\n", gfxnum);
+			if (xscale * layout.width > MAX_ABS_GFX_SIZE || yscale * layout.height > MAX_ABS_GFX_SIZE)
+				mame_printf_error("gfx[%d] with invalid xscale/yscale\n", gfxnum);
+		}
+	}
+	
+}
+
+
+/***************************************************************************
+    GRAPHICS ELEMENTS
+***************************************************************************/
 
 
 //-------------------------------------------------
@@ -2190,3 +2304,6 @@ void copyrozbitmap_trans(bitmap_rgb32 &dest, const rectangle &cliprect, bitmap_r
 	DECLARE_NO_PRIORITY;
 	COPYROZBITMAP_CORE(UINT32, PIXEL_OP_COPY_TRANSPEN, NO_PRIORITY);
 }
+
+GFXDECODE_START( empty )
+GFXDECODE_END

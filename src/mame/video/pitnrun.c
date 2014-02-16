@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info1)
 	UINT8 *videoram = m_videoram;
 	int code;
 	code = videoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		0,
 		code,
 		0,
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info2)
 {
 	int code;
 	code = m_videoram2[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		1,
 		code + (m_char_bank<<8),
 		m_color_select&1,
@@ -196,7 +196,7 @@ void pitnrun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		machine().gfx[2]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			(spriteram[offs+1]&0x3f)+((spriteram[offs+2]&0x80)>>1)+((spriteram[offs+2]&0x40)<<1),
 			pal,
 			flipx,flipy,

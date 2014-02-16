@@ -1524,7 +1524,7 @@ static MACHINE_CONFIG_FRAGMENT ( chess_common )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(polgar_state,chess_lcd)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_GFXDECODE(chess_lcd)
+	MCFG_GFXDECODE_ADD("gfxdecode", chess_lcd)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)

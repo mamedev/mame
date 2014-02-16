@@ -278,7 +278,7 @@ static MACHINE_CONFIG_START( itgambl2, itgambl2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(itgambl2_state, screen_update_itgambl2)
 
 
-	MCFG_GFXDECODE(itgambl2)
+	MCFG_GFXDECODE_ADD("gfxdecode", itgambl2)
 	MCFG_PALETTE_LENGTH(0x200)
 
 	/* sound hardware */

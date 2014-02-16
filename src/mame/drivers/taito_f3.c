@@ -451,7 +451,7 @@ static MACHINE_CONFIG_START( f3, taito_f3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
 	MCFG_SCREEN_VBLANK_DRIVER(taito_f3_state, screen_eof_f3)
 
-	MCFG_GFXDECODE(taito_f3)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_f3)
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_VIDEO_START_OVERRIDE(taito_f3_state,f3)
@@ -544,7 +544,7 @@ static MACHINE_CONFIG_START( bubsympb, taito_f3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taito_f3_state, screen_update_f3)
 	MCFG_SCREEN_VBLANK_DRIVER(taito_f3_state, screen_eof_f3)
 
-	MCFG_GFXDECODE(bubsympb)
+	MCFG_GFXDECODE_ADD("gfxdecode", bubsympb)
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_VIDEO_START_OVERRIDE(taito_f3_state,f3)

@@ -1131,7 +1131,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SCREEN_SIZE(132*10, 49*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80 * 10-1, 0, 24 * 10-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
-	MCFG_GFXDECODE(rainbow)
+	MCFG_GFXDECODE_ADD("gfxdecode", rainbow)
 	MCFG_PALETTE_LENGTH(4)
 
 	MCFG_RAINBOW_VIDEO_ADD("vt100_video", video_interface)

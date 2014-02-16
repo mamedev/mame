@@ -1751,7 +1751,7 @@ static MACHINE_CONFIG_START( centiped_base, centiped_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_centiped)
 
-	MCFG_GFXDECODE(centiped)
+	MCFG_GFXDECODE_ADD("gfxdecode", centiped)
 	MCFG_PALETTE_LENGTH(4+4*4*4*4)
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,centiped)
@@ -1824,7 +1824,7 @@ static MACHINE_CONFIG_DERIVED( milliped, centiped )
 	MCFG_CPU_PROGRAM_MAP(milliped_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(milliped)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", milliped)
 	MCFG_PALETTE_LENGTH(4*4+4*4*4*4*4)
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,milliped)
@@ -1860,7 +1860,7 @@ static MACHINE_CONFIG_DERIVED( warlords, centiped )
 	MCFG_CPU_PROGRAM_MAP(warlords_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(warlords)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", warlords)
 	MCFG_PALETTE_LENGTH(8*4+8*4)
 
 	MCFG_PALETTE_INIT_OVERRIDE(centiped_state,warlords)
@@ -1901,7 +1901,7 @@ static MACHINE_CONFIG_START( bullsdrt, centiped_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_bullsdrt)
 
-	MCFG_GFXDECODE(centiped)
+	MCFG_GFXDECODE_ADD("gfxdecode", centiped)
 	MCFG_PALETTE_LENGTH(4+4*4*4*4)
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,bullsdrt)

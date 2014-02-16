@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(atarisy1_state::get_alpha_tile_info)
 	int code = data & 0x3ff;
 	int color = (data >> 10) & 0x07;
 	int opaque = data & 0x2000;
-	SET_TILE_INFO_MEMBER(0, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(atarisy1_state::get_playfield_tile_info)
 	int gfxindex = (lookup >> 8) & 15;
 	int code = ((lookup & 0xff) << 8) | (data & 0xff);
 	int color = 0x20 + (((lookup >> 12) & 15) << m_bank_color_shift[gfxindex]);
-	SET_TILE_INFO_MEMBER(gfxindex, code, color, (data >> 15) & 1);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, gfxindex, code, color, (data >> 15) & 1);
 }
 
 
@@ -608,7 +608,7 @@ int atarisy1_state::get_bank(UINT8 prom1, UINT8 prom2, int bpp)
 
 	/* don't have one? let's make it ... first find any empty slot */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine().gfx[gfx_index] == NULL)
+		if (m_gfxdecode->gfx(gfx_index) == NULL)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -617,15 +617,15 @@ int atarisy1_state::get_bank(UINT8 prom1, UINT8 prom2, int bpp)
 	switch (bpp)
 	{
 	case 4:
-		machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), objlayout_4bpp, srcdata, 0x40, 256));
+		m_gfxdecode->set_gfx(gfx_index,auto_alloc(machine(), gfx_element(machine(), objlayout_4bpp, srcdata, 0x40, 256)));
 		break;
 
 	case 5:
-		machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), objlayout_5bpp, srcdata, 0x40, 256));
+		m_gfxdecode->set_gfx(gfx_index,auto_alloc(machine(), gfx_element(machine(), objlayout_5bpp, srcdata, 0x40, 256)));
 		break;
 
 	case 6:
-		machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), objlayout_6bpp, srcdata, 0x40, 256));
+		m_gfxdecode->set_gfx(gfx_index,auto_alloc(machine(), gfx_element(machine(), objlayout_6bpp, srcdata, 0x40, 256)));
 		break;
 
 	default:
@@ -633,7 +633,7 @@ int atarisy1_state::get_bank(UINT8 prom1, UINT8 prom2, int bpp)
 	}
 
 	/* set the color information */
-	machine().gfx[gfx_index]->set_granularity(8);
+	m_gfxdecode->gfx(gfx_index)->set_granularity(8);
 	m_bank_color_shift[gfx_index] = bpp - 3;
 
 	/* set the entry and return it */

@@ -153,7 +153,7 @@ READ8_MEMBER(fp6000_state::fp6000_pcg_r)
 WRITE8_MEMBER(fp6000_state::fp6000_pcg_w)
 {
 	m_char_rom[offset] = data;
-	machine().gfx[0]->mark_dirty(offset >> 4);
+	m_gfxdecode->gfx(0)->mark_dirty(offset >> 4);
 }
 
 WRITE8_MEMBER(fp6000_state::fp6000_6845_address_w)
@@ -318,7 +318,7 @@ static MACHINE_CONFIG_START( fp6000, fp6000_state )
 
 	MCFG_PALETTE_LENGTH(8)
 //  MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
-	MCFG_GFXDECODE(fp6000)
+	MCFG_GFXDECODE_ADD("gfxdecode", fp6000)
 
 MACHINE_CONFIG_END
 

@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(snk_state::marvins_get_tx_tile_info)
 	int code = m_tx_videoram[tile_index];
 	int color = code >> 5;
 
-	SET_TILE_INFO_MEMBER(0,
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,
 			m_tx_tile_offset + code,
 			color,
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
@@ -85,7 +85,7 @@ TILE_GET_INFO_MEMBER(snk_state::ikari_get_tx_tile_info)
 {
 	int code = m_tx_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,
 			m_tx_tile_offset + code,
 			0,
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
@@ -95,7 +95,7 @@ TILE_GET_INFO_MEMBER(snk_state::gwar_get_tx_tile_info)
 {
 	int code = m_tx_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,
 			m_tx_tile_offset + code,
 			0,
 			0);
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(snk_state::marvins_get_fg_tile_info)
 {
 	int code = m_fg_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,
 			code,
 			0,
 			0);
@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(snk_state::marvins_get_bg_tile_info)
 {
 	int code = m_bg_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(2,
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,
 			code,
 			0,
 			0);
@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(snk_state::aso_get_bg_tile_info)
 {
 	int code = m_bg_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(1,
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,
 			m_bg_tile_offset + code,
 			0,
 			0);
@@ -139,7 +139,7 @@ TILE_GET_INFO_MEMBER(snk_state::tnk3_get_bg_tile_info)
 	int code = m_bg_videoram[2*tile_index] | ((attr & 0x30) << 4);
 	int color = (attr & 0xf) ^ 8;
 
-	SET_TILE_INFO_MEMBER(1,
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,
 			code,
 			color,
 			0);
@@ -151,7 +151,7 @@ TILE_GET_INFO_MEMBER(snk_state::ikari_get_bg_tile_info)
 	int code = m_bg_videoram[2*tile_index] | ((attr & 0x03) << 8);
 	int color = (attr & 0x70) >> 4;
 
-	SET_TILE_INFO_MEMBER(1,
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,
 			code,
 			color,
 			0);
@@ -166,7 +166,7 @@ TILE_GET_INFO_MEMBER(snk_state::gwar_get_bg_tile_info)
 	if (m_is_psychos)   // psychos has a separate palette bank bit
 		color &= 7;
 
-	SET_TILE_INFO_MEMBER(1,
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,
 			code,
 			color,
 			0);
@@ -174,7 +174,7 @@ TILE_GET_INFO_MEMBER(snk_state::gwar_get_bg_tile_info)
 	// bermudat, tdfever use FFFF to blank the background.
 	// (still call SET_TILE_INFO_MEMBER, otherwise problems might occur on boot when
 	// the tile data hasn't been initialised)
-	if (code >= machine().gfx[1]->elements())
+	if (code >= m_gfxdecode->gfx(1)->elements())
 		tileinfo.pen_data = m_empty_tile;
 }
 
@@ -662,7 +662,7 @@ static void marvins_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		const int scrollx, const int scrolly, const int from, const int to)
 {
 	snk_state *state = machine.driver_data<snk_state>();
-	gfx_element *gfx = machine.gfx[3];
+	gfx_element *gfx = state->m_gfxdecode->gfx(3);
 	const UINT8 *source, *finish;
 
 	source = state->m_spriteram + from*4;
@@ -706,7 +706,7 @@ static void marvins_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 void snk_state::tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int xscroll, const int yscroll)
 {
 	UINT8 *spriteram = m_spriteram;
-	gfx_element *gfx = machine().gfx[2];
+	gfx_element *gfx = m_gfxdecode->gfx(2);
 	const int size = gfx->width();
 	int tile_number, attributes, color, sx, sy;
 	int xflip,yflip;
@@ -771,7 +771,7 @@ static void ikari_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 		const int start, const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum )
 {
 	snk_state *state = machine.driver_data<snk_state>();
-	gfx_element *gfx = machine.gfx[gfxnum];
+	gfx_element *gfx = state->m_gfxdecode->gfx(gfxnum);
 	const int size = gfx->width();
 	int tile_number, attributes, color, sx, sy;
 	int which, finish;
@@ -843,7 +843,7 @@ static void tdfever_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum, const int hw_xflip, const int from, const int to )
 {
 	snk_state *state = machine.driver_data<snk_state>();
-	gfx_element *gfx = machine.gfx[gfxnum];
+	gfx_element *gfx = state->m_gfxdecode->gfx(gfxnum);
 	const int size = gfx->width();
 	int tile_number, attributes, sx, sy, color;
 	int which;

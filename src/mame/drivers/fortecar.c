@@ -373,7 +373,7 @@ UINT32 fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind1
 			if(bpp)
 				color&=0x3;
 
-			machine().gfx[bpp]->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
+			m_gfxdecode->gfx(bpp)->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
 			count++;
 
 		}
@@ -696,7 +696,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_I8255A_ADD( "fcppi0", ppi8255_intf )
 	MCFG_V3021_ADD("rtc")
 
-	MCFG_GFXDECODE(fortecar)
+	MCFG_GFXDECODE_ADD("gfxdecode", fortecar)
 	MCFG_PALETTE_LENGTH(0x200)
 
 

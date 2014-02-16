@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_bg2_tile_info)
 	int color = attr >> 12;
 	int flags = (attr & 0x800) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(prehisle_state::get_bg_tile_info)
@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_bg_tile_info)
 	int color = attr >> 12;
 	int flags = (attr & 0x800) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(2, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(prehisle_state::get_fg_tile_info)
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_fg_tile_info)
 	int code = attr & 0xfff;
 	int color = attr >> 12;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void prehisle_state::video_start()
@@ -147,7 +147,7 @@ void prehisle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		if ((foreground && priority) || (!foreground && !priority))
 		{
-			 machine().gfx[3]->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 15);
+			 m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 15);
 		}
 	}
 }

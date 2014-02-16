@@ -359,7 +359,7 @@ UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &b
 					tile += m_videobank*0x2000;
 
 
-					machine().gfx[0]->opaque(bitmap,cliprect,tile,colour,0,0,x*8,y*8);
+					m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,colour,0,0,x*8,y*8);
 
 					count++;
 				}
@@ -425,7 +425,7 @@ UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &b
 				tile += 0x1000;
 			}
 
-			machine().gfx[0]->transpen(bitmap,cliprect,tile,colour,0,0,x*8,y*8,0);
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,tile,colour,0,0,x*8,y*8,0);
 			count++;
 		}
 	}
@@ -475,7 +475,7 @@ TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel1_tile_info)
 
 	int colour = 0;//= (cb2001_out_c&0x7) + 8;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code+0x800,
 			colour,
@@ -493,7 +493,7 @@ TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel2_tile_info)
 
 	int colour = 0;//(cb2001_out_c&0x7) + 8;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code+0x800,
 			colour,
@@ -511,7 +511,7 @@ TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel3_tile_info)
 
 	code &=0xff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code+0x800,
 			colour,
@@ -842,7 +842,7 @@ static MACHINE_CONFIG_START( cb2001, cb2001_state )
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
-	MCFG_GFXDECODE(cb2001)
+	MCFG_GFXDECODE_ADD("gfxdecode", cb2001)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

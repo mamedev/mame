@@ -88,7 +88,7 @@ TILE_GET_INFO_MEMBER(albazg_state::y_get_bg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code + ((color & 0xf8) << 3),
 			color & 0x7,
@@ -403,7 +403,7 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/16, mc6845_intf)   /* hand tuned to get ~60 fps */
 
-	MCFG_GFXDECODE( yumefuda )
+	MCFG_GFXDECODE_ADD("gfxdecode",  yumefuda )
 	MCFG_PALETTE_LENGTH(0x80)
 
 

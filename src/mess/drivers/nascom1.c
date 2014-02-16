@@ -295,7 +295,7 @@ static MACHINE_CONFIG_START( nascom1, nascom1_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 16 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(nascom1_state, screen_update_nascom1)
 
-	MCFG_GFXDECODE(nascom1)
+	MCFG_GFXDECODE_ADD("gfxdecode", nascom1)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
@@ -352,7 +352,7 @@ static MACHINE_CONFIG_DERIVED( nascom2, nascom1 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 14 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(nascom1_state, screen_update_nascom2)
 
-	MCFG_GFXDECODE(nascom2)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", nascom2)
 
 	MCFG_FD1793_ADD("wd1793", nascom2_wd17xx_interface )
 

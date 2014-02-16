@@ -354,12 +354,17 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 0*8, 32*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(overdriv_state, screen_update_overdriv)
 
-//  MCFG_GFXDECODE(overdriv)
+//  MCFG_GFXDECODE_ADD("gfxdecode", overdriv)
 	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	MCFG_K053246_ADD("k053246", overdriv_k053246_intf)
+	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K051316_ADD("k051316_1", overdriv_k051316_intf_1)
+	MCFG_K051316_GFXDECODE("gfxdecode")
 	MCFG_K051316_ADD("k051316_2", overdriv_k051316_intf_2)
+	MCFG_K051316_GFXDECODE("gfxdecode")
 	MCFG_K053251_ADD("k053251")
 	MCFG_K053250_ADD("k053250_1", "screen", 0, 0)
 	MCFG_K053250_ADD("k053250_2", "screen", 0, 0)

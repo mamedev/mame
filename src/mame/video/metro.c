@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(metro_state::metro_k053936_get_tile_info)
 {
 	int code = m_k053936_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			4,
 			code & 0x7fff,
 			0xe,
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(metro_state::metro_k053936_gstrik2_get_tile_info)
 {
 	int code = m_k053936_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			4,
 			(code & 0x7fff)>>2,
 			0xe,
@@ -158,7 +158,7 @@ inline UINT8 metro_state::get_tile_pix( UINT16 code, UINT8 x, UINT8 y, int big, 
 	}
 	else if (((tile & 0x00f00000) == 0x00f00000)    && (m_support_8bpp)) /* draw tile as 8bpp (e.g. balcube bg) */
 	{
-		gfx_element *gfx1 = machine().gfx[big?3:1];
+		gfx_element *gfx1 = m_gfxdecode->gfx(big?3:1);
 		UINT32 tile2 = big ? ((tile & 0xfffff) + 8*(code & 0xf)) :
 								((tile & 0xfffff) + 2*(code & 0xf));
 		const UINT8* data;
@@ -190,7 +190,7 @@ inline UINT8 metro_state::get_tile_pix( UINT16 code, UINT8 x, UINT8 y, int big, 
 	}
 	else
 	{
-		gfx_element *gfx1 = machine().gfx[big?2:0];
+		gfx_element *gfx1 = m_gfxdecode->gfx(big?2:0);
 		UINT32 tile2 = big ? ((tile & 0xfffff) + 4*(code & 0xf)) :
 								((tile & 0xfffff) +   (code & 0xf));
 		const UINT8* data;

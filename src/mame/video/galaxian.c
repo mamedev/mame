@@ -472,7 +472,7 @@ TILE_GET_INFO_MEMBER(galaxian_state::bg_get_tile_info)
 	if (m_extend_tile_info_ptr != NULL)
 		(this->*m_extend_tile_info_ptr)(&code, &color, attrib, x);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 
@@ -578,7 +578,7 @@ void galaxian_state::sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 		/* draw */
 		
-				machine().gfx[1]->transpen(bitmap,clip,
+				m_gfxdecode->gfx(1)->transpen(bitmap,clip,
 				code, color,
 				flipx, flipy,
 				GALAXIAN_H0START + GALAXIAN_XSCALE * sx, sy, 0);

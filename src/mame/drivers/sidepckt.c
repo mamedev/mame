@@ -379,7 +379,7 @@ static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sidepckt_state, screen_update_sidepckt)
 
-	MCFG_GFXDECODE(sidepckt)
+	MCFG_GFXDECODE_ADD("gfxdecode", sidepckt)
 	MCFG_PALETTE_LENGTH(256)
 
 	/* sound hardware */

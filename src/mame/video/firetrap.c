@@ -88,7 +88,7 @@ TILE_GET_INFO_MEMBER(firetrap_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
 	int color = m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code | ((color & 0x01) << 8),
 			color >> 4,
@@ -99,7 +99,7 @@ inline void firetrap_state::get_bg_tile_info(tile_data &tileinfo, int tile_index
 {
 	int code = bgvideoram[tile_index];
 	int color = bgvideoram[tile_index + 0x100];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			gfx_region,
 			code + ((color & 0x03) << 8),
 			(color & 0x30) >> 4,
@@ -219,24 +219,24 @@ void firetrap_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		{
 			if (flip_screen()) sy -= 16;
 
-			machine().gfx[3]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 					code & ~1,
 					color,
 					flipx,flipy,
 					sx,flipy ? sy : sy + 16,0);
-			machine().gfx[3]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 					code | 1,
 					color,
 					flipx,flipy,
 					sx,flipy ? sy + 16 : sy,0);
 
 			/* redraw with wraparound */
-			machine().gfx[3]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 					code & ~1,
 					color,
 					flipx,flipy,
 					sx - 256,flipy ? sy : sy + 16,0);
-			machine().gfx[3]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 					code | 1,
 					color,
 					flipx,flipy,
@@ -244,14 +244,14 @@ void firetrap_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 		else
 		{
-			machine().gfx[3]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					sx,sy,0);
 
 			/* redraw with wraparound */
-			machine().gfx[3]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,

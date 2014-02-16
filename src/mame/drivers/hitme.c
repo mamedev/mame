@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(hitme_state::get_hitme_tile_info)
 {
 	/* the code is the low 6 bits */
 	UINT8 code = m_videoram[tile_index] & 0x3f;
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 
@@ -322,7 +322,7 @@ static MACHINE_CONFIG_START( hitme, hitme_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 19*10-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_hitme)
 
-	MCFG_GFXDECODE(hitme)
+	MCFG_GFXDECODE_ADD("gfxdecode", hitme)
 	MCFG_PALETTE_LENGTH(2)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
@@ -351,7 +351,7 @@ static MACHINE_CONFIG_DERIVED( barricad, hitme )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_barricad)
 
-	MCFG_GFXDECODE(barricad)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", barricad)
 
 	MCFG_VIDEO_START_OVERRIDE(hitme_state,barricad)
 MACHINE_CONFIG_END

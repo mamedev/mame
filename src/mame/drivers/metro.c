@@ -3584,7 +3584,7 @@ static MACHINE_CONFIG_START( balcube, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4220)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4220)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -3617,7 +3617,7 @@ static MACHINE_CONFIG_START( daitoa, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4220)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4220)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -3650,7 +3650,7 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4220)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4220)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -3683,7 +3683,7 @@ static MACHINE_CONFIG_START( bangball, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4220)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4220)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -3716,7 +3716,7 @@ static MACHINE_CONFIG_START( batlbubl, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4220)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4220)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -3753,7 +3753,7 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4220)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4220)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -3795,7 +3795,7 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4220)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4220)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -3836,7 +3836,7 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4100)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4100)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -3877,7 +3877,7 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4220)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4220)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -3918,7 +3918,7 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4100)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4100)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -3958,7 +3958,7 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4100)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4100)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -3992,7 +3992,7 @@ static MACHINE_CONFIG_START( dokyusei, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4300)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4300)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -4027,7 +4027,7 @@ static MACHINE_CONFIG_START( dokyusp, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4300)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4300)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -4063,7 +4063,7 @@ static MACHINE_CONFIG_START( gakusai, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4300)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4300)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -4099,7 +4099,7 @@ static MACHINE_CONFIG_START( gakusai2, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4300)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4300)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -4140,7 +4140,7 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4100)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4100)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -4181,7 +4181,7 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4100)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4100)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -4222,7 +4222,7 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4220)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4220)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -4264,7 +4264,7 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4100)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4100)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -4305,7 +4305,7 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4220)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4220)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -4340,7 +4340,7 @@ static MACHINE_CONFIG_START( mouja, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4300)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4300)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -4375,7 +4375,7 @@ static MACHINE_CONFIG_START( vmetal, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4220)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4220)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_sprite)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -4422,7 +4422,7 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 320-8-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(blzntrnd)
+	MCFG_GFXDECODE_ADD("gfxdecode", blzntrnd)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,blzntrnd)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -4469,7 +4469,7 @@ static MACHINE_CONFIG_START( gstrik2, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 320-8-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(gstrik2)
+	MCFG_GFXDECODE_ADD("gfxdecode", gstrik2)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
 	MCFG_PALETTE_LENGTH(0x1000)
 
@@ -4506,7 +4506,7 @@ static MACHINE_CONFIG_START( puzzlet, metro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
-	MCFG_GFXDECODE(i4300)
+	MCFG_GFXDECODE_ADD("gfxdecode", i4300)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
 	MCFG_PALETTE_LENGTH(0x1000)
 

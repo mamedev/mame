@@ -85,14 +85,14 @@ WRITE8_MEMBER(cabaret_state::bg_tile_w)
 TILE_GET_INFO_MEMBER(cabaret_state::get_bg_tile_info)
 {
 	int code = m_bg_tile_ram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code & 0xff, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code & 0xff, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(cabaret_state::get_fg_tile_info)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
-	SET_TILE_INFO_MEMBER(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
 WRITE8_MEMBER(cabaret_state::fg_tile_w)
@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( cabaret, cabaret_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cabaret_state, screen_update_cabaret)
 
-	MCFG_GFXDECODE(cabaret)
+	MCFG_GFXDECODE_ADD("gfxdecode", cabaret)
 	MCFG_PALETTE_LENGTH(0x800)
 
 

@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( atetris, atetris_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MCFG_GFXDECODE(atetris)
+	MCFG_GFXDECODE_ADD("gfxdecode", atetris)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MCFG_GFXDECODE(atetris)
+	MCFG_GFXDECODE_ADD("gfxdecode", atetris)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

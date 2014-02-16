@@ -1476,7 +1476,7 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update_megasys1)
 	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof_megasys1)
 
-	MCFG_GFXDECODE(ABC)
+	MCFG_GFXDECODE_ADD("gfxdecode", ABC)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_PALETTE_INIT_OVERRIDE(megasys1_state,megasys1)
@@ -1536,7 +1536,7 @@ static MACHINE_CONFIG_START( system_Bbl, megasys1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update_megasys1)
 	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof_megasys1)
 
-	MCFG_GFXDECODE(ABC)
+	MCFG_GFXDECODE_ADD("gfxdecode", ABC)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_PALETTE_INIT_OVERRIDE(megasys1_state,megasys1)
@@ -1608,7 +1608,7 @@ static MACHINE_CONFIG_START( system_D, megasys1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update_megasys1)
 	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof_megasys1)
 
-	MCFG_GFXDECODE(ABC)
+	MCFG_GFXDECODE_ADD("gfxdecode", ABC)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_PALETTE_INIT_OVERRIDE(megasys1_state,megasys1)
@@ -1667,7 +1667,7 @@ static MACHINE_CONFIG_START( system_Z, megasys1_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update_megasys1)
 
-	MCFG_GFXDECODE(Z)
+	MCFG_GFXDECODE_ADD("gfxdecode", Z)
 	MCFG_PALETTE_LENGTH(768)
 
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)

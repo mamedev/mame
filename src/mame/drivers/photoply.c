@@ -123,7 +123,7 @@ static MACHINE_CONFIG_START( photoply, photoply_state )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 
-	MCFG_GFXDECODE( photoply )
+	MCFG_GFXDECODE_ADD("gfxdecode",  photoply )
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))

@@ -693,6 +693,7 @@ static MACHINE_CONFIG_START( twincobr, twincobr_state )
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_28MHz/8, twincobr_mc6845_intf) /* 3.5MHz measured on CLKin */
 
 	MCFG_TOAPLAN_SCU_ADD("toaplan_scu")
+	MCFG_TOAPLAN_SCU_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram16")
@@ -702,7 +703,7 @@ static MACHINE_CONFIG_START( twincobr, twincobr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(twincobr_state, screen_update_toaplan0)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram16", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(twincobr)
+	MCFG_GFXDECODE_ADD("gfxdecode", twincobr)
 	MCFG_PALETTE_LENGTH(1792)
 
 	MCFG_VIDEO_START_OVERRIDE(twincobr_state,toaplan0)

@@ -13,6 +13,8 @@ typedef device_delegate<UINT32 (UINT32)> vsystem_tile_indirection_delegate;
 	vsystem_spr_device::set_pal_mask(*device, _palmask);
 #define MCFG_VSYSTEM_SPR_SET_TRANSPEN( _transpen ) \
 	vsystem_spr_device::CG10103_set_transpen(*device, _transpen);
+#define MCFG_VSYSTEM_SPR_GFXDECODE(_gfxtag) \
+	vsystem_spr_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 /*** CG10103 **********************************************/
 
@@ -21,6 +23,8 @@ class vsystem_spr_device : public device_t
 public:
 	vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void set_offsets(device_t &device, int xoffs, int yoffs);
 	static void set_pdraw(device_t &device, bool pdraw);
 	static void set_tile_indirect_cb(device_t &device,vsystem_tile_indirection_delegate newtilecb);
@@ -68,7 +72,7 @@ protected:
 
 private:
 
-
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

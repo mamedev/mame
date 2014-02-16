@@ -349,8 +349,11 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K056832_ADD("k056832", gijoe_k056832_intf)
+	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K053246_ADD("k053246", gijoe_k053247_intf)
+	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

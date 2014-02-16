@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_bg_tile_info)
 	int code = m_bg_videoram[tile_index];
 	int color = m_bg_videoram[tile_index + 0x400] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_fg_tile_info)
@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_fg_tile_info)
 	int code = m_fg_videoram[tile_index];
 	int color = attr & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
 
 	tileinfo.category = (attr & 0x10) >> 4;
 }
@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_bg_tile_info)
 	int code = m_bg_videoram[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_fg_tile_info)
@@ -111,7 +111,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_fg_tile_info)
 	int code = m_fg_videoram[tile_index] + ((attr & 0x20) << 3);
 	int color = attr & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
 
 	tileinfo.category = (attr & 0x10) >> 4;
 }
@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::pkunwar_get_bg_tile_info)
 	int code = m_bg_videoram[tile_index] + ((attr & 0x07) << 8);
 	int color = (attr & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
 
 	tileinfo.category = (attr & 0x08) >> 3;
 }
@@ -133,7 +133,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_bg_tile_info)
 	int code = m_bg_videoram[tile_index] + ((attr & 0x01) << 8);
 	int color = (attr & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_fg_tile_info)
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_fg_tile_info)
 	int code = m_fg_videoram[tile_index];
 	int color = (m_fg_videoram[tile_index + 0x400] & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
 }
 
 
@@ -257,7 +257,7 @@ WRITE8_MEMBER(nova2001_state::pkunwar_flipscreen_w)
 void nova2001_state::nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *spriteram = m_spriteram;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int offs;
 
 	for (offs = 0; offs < 0x800; offs += 32)
@@ -294,7 +294,7 @@ void nova2001_state::nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 void nova2001_state::pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *spriteram = m_spriteram;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int offs;
 
 	for (offs = 0; offs < 0x800; offs += 32)

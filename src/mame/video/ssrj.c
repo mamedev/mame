@@ -13,7 +13,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info1)
 {
 	int code;
 	code = m_vram1[tile_index<<1] + (m_vram1[(tile_index<<1)+1]<<8);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		0,
 		code&0x3ff,
 		(code>>12)&0x3,
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info2)
 {
 	int code;
 	code = m_vram2[tile_index<<1] + (m_vram2[(tile_index<<1)+1]<<8);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		0,
 		code&0x3ff,
 		((code>>12)&0x3)+4,
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info4)
 {
 	int code;
 	code = m_vram4[tile_index<<1] + (m_vram4[(tile_index<<1)+1]<<8);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		0,
 		code&0x3ff,
 		((code>>12)&0x3)+12,
@@ -249,7 +249,7 @@ void ssrj_state::draw_objects(bitmap_ind16 &bitmap, const rectangle &cliprect )
 					int offs = (i * 5 + k) * 64 + (31 - j) * 2;
 
 					code = m_vram3[offs] + 256 * m_vram3[offs + 1];
-					machine().gfx[0]->transpen(bitmap,
+					m_gfxdecode->gfx(0)->transpen(bitmap,
 						cliprect,
 						code&1023,
 						((code>>12)&0x3)+8,

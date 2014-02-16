@@ -477,7 +477,7 @@ static MACHINE_CONFIG_START( bloodbro, bloodbro_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE(bloodbro)
+	MCFG_GFXDECODE_ADD("gfxdecode", bloodbro)
 	MCFG_PALETTE_LENGTH(2048)
 
 	// sound hardware
@@ -490,7 +490,7 @@ static MACHINE_CONFIG_DERIVED( weststry, bloodbro )
 	MCFG_CPU_PROGRAM_MAP(weststry_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq6_line_hold)
 
-	MCFG_GFXDECODE(weststry)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", weststry)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_SCREEN_MODIFY("screen")

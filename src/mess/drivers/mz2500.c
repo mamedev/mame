@@ -934,9 +934,9 @@ void mz2500_state::mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num)
 			{
 				m_pcg_ram[offset] = data;
 				if((offset & 0x1800) == 0x0000)
-					machine().gfx[3]->mark_dirty((offset) >> 3);
+					m_gfxdecode->gfx(3)->mark_dirty((offset) >> 3);
 				else
-					machine().gfx[4]->mark_dirty((offset & 0x7ff) >> 3);
+					m_gfxdecode->gfx(4)->mark_dirty((offset & 0x7ff) >> 3);
 			}
 			break;
 		}
@@ -1776,8 +1776,8 @@ void mz2500_state::machine_start()
 	save_pointer(NAME(m_emm_ram), 0x100000);
 
 	/* TODO: gfx[4] crashes as per now */
-	machine().gfx[3] = auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_1bpp, (UINT8 *)m_pcg_ram, 0x10, 0));
-	machine().gfx[4] = auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_3bpp, (UINT8 *)m_pcg_ram, 4, 0));
+	m_gfxdecode->set_gfx(3, auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_1bpp, (UINT8 *)m_pcg_ram, 0x10, 0)));
+	m_gfxdecode->set_gfx(4, auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_3bpp, (UINT8 *)m_pcg_ram, 4, 0)));
 }
 
 void mz2500_state::machine_reset()
@@ -2160,7 +2160,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_GFXDECODE(mz2500)
+	MCFG_GFXDECODE_ADD("gfxdecode", mz2500)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

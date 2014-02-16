@@ -22,7 +22,7 @@ inline void fromanc2_state::fromanc2_get_tile_info( tile_data &tileinfo, int til
 	tile  = (m_videoram[vram][layer][tile_index] & 0x3fff) | (m_gfxbank[vram][layer] << 14);
 	color = ((m_videoram[vram][layer][tile_index] & 0xc000) >> 14) | (0x10 * vram);
 
-	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, layer, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l0_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 0); }
@@ -42,7 +42,7 @@ inline void fromanc2_state::fromancr_get_tile_info( tile_data &tileinfo, int til
 	tile  = m_videoram[vram][layer][tile_index] | (m_gfxbank[vram][layer] << 16);
 	color = vram;
 
-	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, layer, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v0_l0_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 0, 0); }

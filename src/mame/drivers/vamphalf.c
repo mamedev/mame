@@ -586,7 +586,7 @@ Offset+3
 static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 {
 	vamphalf_state *state = screen.machine().driver_data<vamphalf_state>();
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = state->m_gfxdecode->gfx(0);
 	UINT32 cnt;
 	int block, offs;
 	int code,color,x,y,fx,fy;
@@ -672,7 +672,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 static void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 {
 	vamphalf_state *state = screen.machine().driver_data<vamphalf_state>();
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = state->m_gfxdecode->gfx(0);
 	UINT32 cnt;
 	int block, offs;
 	int code,color,x,y,fx,fy;
@@ -996,7 +996,7 @@ static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vamphalf_state, screen_update_common)
 
 	MCFG_PALETTE_LENGTH(0x8000)
-	MCFG_GFXDECODE(vamphalf)
+	MCFG_GFXDECODE_ADD("gfxdecode", vamphalf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( sound_ym_oki )
@@ -1127,7 +1127,7 @@ static MACHINE_CONFIG_START( aoh, vamphalf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vamphalf_state, screen_update_aoh)
 
 	MCFG_PALETTE_LENGTH(0x8000)
-	MCFG_GFXDECODE(vamphalf)
+	MCFG_GFXDECODE_ADD("gfxdecode", vamphalf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

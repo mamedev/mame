@@ -73,13 +73,13 @@ WRITE8_MEMBER(spoker_state::bg_tile_w)
 TILE_GET_INFO_MEMBER(spoker_state::get_bg_tile_info)
 {
 	int code = m_bg_tile_ram[tile_index];
-	SET_TILE_INFO_MEMBER(1 + (tile_index & 3), code & 0xff, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1 + (tile_index & 3), code & 0xff, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(spoker_state::get_fg_tile_info)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
-	SET_TILE_INFO_MEMBER(0, code, (4*(code >> 14)+3), 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, (4*(code >> 14)+3), 0);
 }
 
 WRITE8_MEMBER(spoker_state::fg_tile_w)
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( spoker, spoker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(spoker_state, screen_update_spoker)
 
-	MCFG_GFXDECODE(spoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", spoker)
 	MCFG_PALETTE_LENGTH(0x400)
 
 
@@ -557,7 +557,7 @@ static MACHINE_CONFIG_DERIVED( 3super8, spoker )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, spoker_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(spoker_state, irq0_line_hold, 120) // this signal comes from the PIC
 
-	MCFG_GFXDECODE(3super8)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", 3super8)
 
 	MCFG_DEVICE_REMOVE("ymsnd")
 MACHINE_CONFIG_END

@@ -504,7 +504,7 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(2048)
-	MCFG_GFXDECODE(backfire)
+	MCFG_GFXDECODE_ADD("gfxdecode", backfire)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
@@ -522,20 +522,25 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	MCFG_SCREEN_UPDATE_DRIVER(backfire_state, screen_update_backfire_right)
 
 
-	MCFG_DECO16IC_ADD("tilegen1", backfire_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen1", backfire_deco16ic_tilegen1_intf)	
 	MCFG_DECO16IC_SET_SCREEN("lscreen")
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	
 	MCFG_DECO16IC_ADD("tilegen2", backfire_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_SET_SCREEN("lscreen")
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	MCFG_VIDEO_SET_SCREEN("lscreen")
 	decospr_device::set_gfx_region(*device, 4);
 	decospr_device::set_pri_callback(*device, backfire_pri_callback);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	MCFG_VIDEO_SET_SCREEN("rscreen")
 	decospr_device::set_gfx_region(*device, 5);
 	decospr_device::set_pri_callback(*device, backfire_pri_callback);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 
 	/* sound hardware */

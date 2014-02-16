@@ -410,16 +410,18 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE(interleaved)
+	MCFG_GFXDECODE_ADD("gfxdecode", interleaved)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, cyberbal_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, cyberbal_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "lscreen", cyberbal_state::s_mob_config)
+	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield2", 2, cyberbal_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha2", 2, cyberbal_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob2", "rscreen", cyberbal_state::s_mob_config)
+	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	/* note: these parameters are from published specs, not derived */
@@ -472,12 +474,13 @@ static MACHINE_CONFIG_START( cyberbal2p, cyberbal_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE(cyberbal)
+	MCFG_GFXDECODE_ADD("gfxdecode", cyberbal)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, cyberbal_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, cyberbal_state, get_alpha_tile_info, 16,8, SCAN_ROWS, 64,32, 0)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", cyberbal_state::s_mob_config)
+	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

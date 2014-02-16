@@ -26,7 +26,7 @@ void mugsmash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	const UINT16 *source = m_spriteram;
 	const UINT16 *finish = source + 0x2000;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	while (source < finish)
 	{
@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(mugsmash_state::get_mugsmash_tile_info1)
 	colour = m_videoram1[tile_index * 2] & 0x000f;
 	fx = (m_videoram1[tile_index * 2] & 0xc0) >> 6;
 
-	SET_TILE_INFO_MEMBER(1, tileno, colour, TILE_FLIPYX(fx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, colour, TILE_FLIPYX(fx));
 }
 
 WRITE16_MEMBER(mugsmash_state::mugsmash_videoram1_w)
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(mugsmash_state::get_mugsmash_tile_info2)
 	colour = m_videoram2[tile_index * 2] & 0x000f;
 	fx = (m_videoram2[tile_index * 2] & 0xc0) >> 6;
 
-	SET_TILE_INFO_MEMBER(1, tileno, 16 + colour, TILE_FLIPYX(fx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, 16 + colour, TILE_FLIPYX(fx));
 }
 
 WRITE16_MEMBER(mugsmash_state::mugsmash_videoram2_w)

@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(mayumi_state::get_tile_info)
 	int code = m_videoram[tile_index] + (m_videoram[tile_index + 0x800] & 0x1f) * 0x100;
 	int col = (m_videoram[tile_index + 0x1000] >> 3) & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, code, col, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, col, 0);
 }
 
 void mayumi_state::video_start()
@@ -408,7 +408,7 @@ static MACHINE_CONFIG_START( mayumi, mayumi_state )
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 62*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mayumi_state, screen_update_mayumi)
 
-	MCFG_GFXDECODE(mayumi)
+	MCFG_GFXDECODE_ADD("gfxdecode", mayumi)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)

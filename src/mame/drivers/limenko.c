@@ -306,21 +306,21 @@ TILE_GET_INFO_MEMBER(limenko_state::get_bg_tile_info)
 {
 	int tile  = m_bg_videoram[tile_index] & 0x7ffff;
 	int color = (m_bg_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(limenko_state::get_md_tile_info)
 {
 	int tile  = m_md_videoram[tile_index] & 0x7ffff;
 	int color = (m_md_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(limenko_state::get_fg_tile_info)
 {
 	int tile  = m_fg_videoram[tile_index] & 0x7ffff;
 	int color = (m_fg_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tile,color,0);
 }
 
 static void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
@@ -764,7 +764,7 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 
-	MCFG_GFXDECODE(limenko)
+	MCFG_GFXDECODE_ADD("gfxdecode", limenko)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 
@@ -795,7 +795,7 @@ static MACHINE_CONFIG_START( spotty, limenko_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 
-	MCFG_GFXDECODE(limenko)
+	MCFG_GFXDECODE_ADD("gfxdecode", limenko)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 

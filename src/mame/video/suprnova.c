@@ -280,7 +280,7 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_A_tile_info)
 	if(m_tilemapA_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
 	if(m_tilemapA_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0+depth,
 			code,
 			0x40+colr,
@@ -307,7 +307,7 @@ TILE_GET_INFO_MEMBER(skns_state::get_tilemap_B_tile_info)
 	if(m_tilemapB_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
 	if(m_tilemapB_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1+depth,
 			code,
 			0x40+colr,
@@ -361,8 +361,8 @@ void skns_state::video_start()
 	m_tilemap_bitmap_higher.allocate(320,240);
 	m_tilemap_bitmapflags_higher.allocate(320,240);
 
-	machine().gfx[2]->set_granularity(256);
-	machine().gfx[3]->set_granularity(256);
+	m_gfxdecode->gfx(2)->set_granularity(256);
+	m_gfxdecode->gfx(3)->set_granularity(256);
 }
 
 void skns_state::video_reset()

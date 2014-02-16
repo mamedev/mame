@@ -117,7 +117,7 @@ TILEMAP_MAPPER_MEMBER(acommand_state::bg_scan)
 TILE_GET_INFO_MEMBER(acommand_state::ac_get_bg_tile_info)
 {
 	int code = m_ac_bgvram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code & 0xfff,
 			(code & 0xf000) >> 12,
@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(acommand_state::ac_get_bg_tile_info)
 TILE_GET_INFO_MEMBER(acommand_state::ac_get_tx_tile_info)
 {
 	int code = m_ac_txvram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code & 0xfff,
 			(code & 0xf000) >> 12,
@@ -175,7 +175,7 @@ void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				xx = w;
 				do
 				{
-					machine().gfx[2]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code,
 							color,
 							flipx, flipy,
@@ -617,7 +617,7 @@ static MACHINE_CONFIG_START( acommand, acommand_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(acommand_state, screen_update_acommand)
 
-	MCFG_GFXDECODE(acommand)
+	MCFG_GFXDECODE_ADD("gfxdecode", acommand)
 	MCFG_PALETTE_LENGTH(0x4000)
 
 

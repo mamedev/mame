@@ -143,7 +143,7 @@ void wolfpack_state::draw_ship(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	int chop = (scaler[m_ship_size >> 2] * m_ship_h_precess) >> 16;
 
 	
-		machine().gfx[1]->zoom_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,
 		m_ship_pic,
 		0,
 		m_ship_reflect, 0,
@@ -161,7 +161,7 @@ void wolfpack_state::draw_torpedo(bitmap_ind16 &bitmap, const rectangle &cliprec
 	int y;
 
 	
-		machine().gfx[3]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 		m_torpedo_pic,
 		0,
 		0, 0,
@@ -197,7 +197,7 @@ void wolfpack_state::draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		rect.max_x = 255;
 
 	
-		machine().gfx[2]->transpen(bitmap,rect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,rect,
 		m_pt_pic,
 		0,
 		0, 0,
@@ -205,7 +205,7 @@ void wolfpack_state::draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		m_pt_pos_select ? 0x70 : 0xA0, 0);
 
 	
-		machine().gfx[2]->transpen(bitmap,rect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,rect,
 		m_pt_pic,
 		0,
 		0, 0,
@@ -258,7 +258,7 @@ UINT32 wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_ind1
 			int code = m_alpha_num_ram[32 * i + j];
 
 			
-				machine().gfx[0]->opaque(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
 				code,
 				m_video_invert,
 				0, 0,

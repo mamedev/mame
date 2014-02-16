@@ -174,7 +174,7 @@ public:
 
 void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	UINT32 *source = m_spritebuf1;
 	UINT32 *finish = m_spritebuf1 + 0x1000 / 4;
 	UINT16 *redirect = (UINT16 *)memregion("spritelut")->base();
@@ -249,7 +249,7 @@ TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg_tile_info)
 	tileno = (tile_index & 1) ? (m_bg_videoram[tile_index >> 1] & 0xffff) : ((m_bg_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
 	tileno &= 0x1fff;
-	SET_TILE_INFO_MEMBER(1, tileno + m_tilebank[0] * 0x2000, 0x80 + colour, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno + m_tilebank[0] * 0x2000, 0x80 + colour, 0);
 }
 
 
@@ -266,7 +266,7 @@ TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg2_tile_info)
 	tileno = (tile_index & 1) ? (m_bg2_videoram[tile_index >> 1] & 0xffff) : ((m_bg2_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
 	tileno &= 0x1fff;
-	SET_TILE_INFO_MEMBER(1, tileno + m_tilebank[1] * 0x2000, 0xc0 + colour, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno + m_tilebank[1] * 0x2000, 0xc0 + colour, 0);
 }
 
 void dreamwld_state::video_start()
@@ -601,7 +601,7 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_SCREEN_VBLANK_DRIVER(dreamwld_state, screen_eof_dreamwld)
 
 	MCFG_PALETTE_LENGTH(0x1000)
-	MCFG_GFXDECODE(dreamwld)
+	MCFG_GFXDECODE_ADD("gfxdecode", dreamwld)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -1010,7 +1010,7 @@ void x68k_state::x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle
 			sx += m_crtc.bg_hshift;
 			sx += m_sprite_shift;
 
-			machine().gfx[1]->zoom_transpen(bitmap,cliprect,code,colour+0x10,xflip,yflip,m_crtc.hbegin+sx,m_crtc.vbegin+(sy*m_crtc.bg_double),0x10000,0x10000*m_crtc.bg_double,0x00);
+			m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,code,colour+0x10,xflip,yflip,m_crtc.hbegin+sx,m_crtc.vbegin+(sy*m_crtc.bg_double),0x10000,0x10000*m_crtc.bg_double,0x00);
 		}
 	}
 }
@@ -1057,7 +1057,7 @@ TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg0_tile)
 	int code = m_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(0,code,colour+16,flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,colour+16,flags);
 }
 
 TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile)
@@ -1065,7 +1065,7 @@ TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile)
 	int code = m_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(0,code,colour+16,flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,colour+16,flags);
 }
 
 TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg0_tile_16)
@@ -1073,7 +1073,7 @@ TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg0_tile_16)
 	int code = m_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(1,code,colour+16,flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,code,colour+16,flags);
 }
 
 TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile_16)
@@ -1081,7 +1081,7 @@ TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile_16)
 	int code = m_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (m_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(1,code,colour+16,flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,code,colour+16,flags);
 }
 
 VIDEO_START_MEMBER(x68k_state,x68000)
@@ -1089,16 +1089,16 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 	int gfx_index;
 
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine().gfx[gfx_index] == 0)
+		if (m_gfxdecode->gfx(gfx_index) == 0)
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), x68k_pcg_8, memregion("user1")->base(), 32, 0));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), x68k_pcg_8, memregion("user1")->base(), 32, 0)));
 
 	gfx_index++;
 
-	machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), x68k_pcg_16, memregion("user1")->base(), 32, 0));
-	machine().gfx[gfx_index]->set_colors(32);
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), x68k_pcg_16, memregion("user1")->base(), 32, 0)));
+	m_gfxdecode->gfx(gfx_index)->set_colors(32);
 
 	/* Tilemaps */
 	m_bg0_8 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(x68k_state::x68k_get_bg0_tile),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -1159,12 +1159,12 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bit
 	{
 		if(m_video.tile16_dirty[x] != 0)
 		{
-			machine().gfx[1]->mark_dirty(x);
+			m_gfxdecode->gfx(1)->mark_dirty(x);
 			m_video.tile16_dirty[x] = 0;
 		}
 		if(m_video.tile8_dirty[x] != 0)
 		{
-			machine().gfx[0]->mark_dirty(x);
+			m_gfxdecode->gfx(0)->mark_dirty(x);
 			m_video.tile8_dirty[x] = 0;
 		}
 	}

@@ -381,7 +381,7 @@ static MACHINE_CONFIG_START( brkthru, brkthru_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE(brkthru)
+	MCFG_GFXDECODE_ADD("gfxdecode", brkthru)
 	MCFG_PALETTE_LENGTH(256)
 
 	/* not sure; assuming to be the same as darwin */
@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( darwin, brkthru_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE(brkthru)
+	MCFG_GFXDECODE_ADD("gfxdecode", brkthru)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

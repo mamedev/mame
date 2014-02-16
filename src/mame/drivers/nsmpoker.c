@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(nsmpoker_state::get_bg_tile_info)
 //  int bank = (attr & 0x08) >> 3;
 //  int color = (attr & 0x03);
 
-	SET_TILE_INFO_MEMBER( 0 /* bank */, code, 0 /* color */, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  0 /* bank */, code, 0 /* color */, 0);
 }
 
 
@@ -428,7 +428,7 @@ static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nsmpoker_state, screen_update_nsmpoker)
 
-	MCFG_GFXDECODE(nsmpoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", nsmpoker)
 
 	MCFG_PALETTE_LENGTH(8)
 

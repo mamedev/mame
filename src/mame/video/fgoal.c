@@ -48,14 +48,14 @@ UINT32 fgoal_state::screen_update_fgoal(screen_device &screen, bitmap_ind16 &bit
 
 	if (m_fgoal_player == 1 && (ioport("IN1")->read() & 0x40))
 	{
-		 machine().gfx[0]->zoom_opaque(m_fgbitmap,cliprect,
+		 m_gfxdecode->gfx(0)->zoom_opaque(m_fgbitmap,cliprect,
 			0, (m_fgoal_player << 2) | m_current_color,
 			1, 1,
 			0, 16,
 			0x40000,
 			0x40000);
 
-		 machine().gfx[1]->zoom_opaque(m_bgbitmap,cliprect,
+		 m_gfxdecode->gfx(1)->zoom_opaque(m_bgbitmap,cliprect,
 			0, 0,
 			1, 1,
 			0, 16,
@@ -64,14 +64,14 @@ UINT32 fgoal_state::screen_update_fgoal(screen_device &screen, bitmap_ind16 &bit
 	}
 	else
 	{
-		 machine().gfx[0]->zoom_opaque(m_fgbitmap,cliprect,
+		 m_gfxdecode->gfx(0)->zoom_opaque(m_fgbitmap,cliprect,
 			0, (m_fgoal_player << 2) | m_current_color,
 			0, 0,
 			0, 0,
 			0x40000,
 			0x40000);
 
-		 machine().gfx[1]->zoom_opaque(m_bgbitmap,cliprect,
+		 m_gfxdecode->gfx(1)->zoom_opaque(m_bgbitmap,cliprect,
 			0, 0,
 			0, 0,
 			0, 0,

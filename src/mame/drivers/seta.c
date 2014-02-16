@@ -7490,6 +7490,7 @@ static MACHINE_CONFIG_START( tndrcade, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, tndrcade_sub_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7499,7 +7500,7 @@ static MACHINE_CONFIG_START( tndrcade, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
 	MCFG_PALETTE_LENGTH(512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -7540,6 +7541,7 @@ static MACHINE_CONFIG_START( twineagl, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7549,7 +7551,7 @@ static MACHINE_CONFIG_START( twineagl, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(downtown)
+	MCFG_GFXDECODE_ADD("gfxdecode", downtown)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,twineagl_1_layer)
@@ -7582,6 +7584,7 @@ static MACHINE_CONFIG_START( downtown, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7591,7 +7594,7 @@ static MACHINE_CONFIG_START( downtown, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(downtown)
+	MCFG_GFXDECODE_ADD("gfxdecode", downtown)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
@@ -7640,6 +7643,7 @@ static MACHINE_CONFIG_START( usclssic, seta_state )
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7649,7 +7653,7 @@ static MACHINE_CONFIG_START( usclssic, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_usclssic)
 
-	MCFG_GFXDECODE(usclssic)
+	MCFG_GFXDECODE_ADD("gfxdecode", usclssic)
 	MCFG_PALETTE_LENGTH(16*32 + 64*32*2)        /* sprites, layer */
 
 	MCFG_PALETTE_INIT_OVERRIDE(seta_state,usclssic) /* layer is 6 planes deep */
@@ -7689,6 +7693,7 @@ static MACHINE_CONFIG_START( calibr50, seta_state )
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7698,7 +7703,7 @@ static MACHINE_CONFIG_START( calibr50, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(downtown)
+	MCFG_GFXDECODE_ADD("gfxdecode", downtown)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
@@ -7729,6 +7734,7 @@ static MACHINE_CONFIG_START( metafox, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7738,7 +7744,7 @@ static MACHINE_CONFIG_START( metafox, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(downtown)
+	MCFG_GFXDECODE_ADD("gfxdecode", downtown)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
@@ -7765,6 +7771,7 @@ static MACHINE_CONFIG_START( atehate, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7774,7 +7781,7 @@ static MACHINE_CONFIG_START( atehate, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
 	MCFG_PALETTE_LENGTH(512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -7807,6 +7814,7 @@ static MACHINE_CONFIG_START( blandia, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7817,7 +7825,7 @@ static MACHINE_CONFIG_START( blandia, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
 
-	MCFG_GFXDECODE(blandia)
+	MCFG_GFXDECODE_ADD("gfxdecode", blandia)
 	MCFG_PALETTE_LENGTH((16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
 
 	MCFG_PALETTE_INIT_OVERRIDE(seta_state,blandia)              /* layers 1&2 are 6 planes deep */
@@ -7840,6 +7848,7 @@ static MACHINE_CONFIG_START( blandiap, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7850,7 +7859,7 @@ static MACHINE_CONFIG_START( blandiap, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
 
-	MCFG_GFXDECODE(blandia)
+	MCFG_GFXDECODE_ADD("gfxdecode", blandia)
 	MCFG_PALETTE_LENGTH((16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
 
 	MCFG_PALETTE_INIT_OVERRIDE(seta_state,blandia)              /* layers 1&2 are 6 planes deep */
@@ -7878,6 +7887,7 @@ static MACHINE_CONFIG_START( blockcar, seta_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7887,7 +7897,7 @@ static MACHINE_CONFIG_START( blockcar, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
 	MCFG_PALETTE_LENGTH(512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -7950,6 +7960,7 @@ static MACHINE_CONFIG_START( daioh, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7959,7 +7970,7 @@ static MACHINE_CONFIG_START( daioh, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
 	MCFG_PALETTE_LENGTH(512 * 3)    /* sprites, layer1, layer2 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -7991,6 +8002,7 @@ static MACHINE_CONFIG_START( drgnunit, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8001,7 +8013,7 @@ static MACHINE_CONFIG_START( drgnunit, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
 
-	MCFG_GFXDECODE(downtown)
+	MCFG_GFXDECODE_ADD("gfxdecode", downtown)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
@@ -8026,6 +8038,7 @@ static MACHINE_CONFIG_START( qzkklgy2, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8036,7 +8049,7 @@ static MACHINE_CONFIG_START( qzkklgy2, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
 
-	MCFG_GFXDECODE(qzkklgy2)
+	MCFG_GFXDECODE_ADD("gfxdecode", qzkklgy2)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
@@ -8074,6 +8087,7 @@ static MACHINE_CONFIG_START( setaroul, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, setaroul_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
@@ -8086,7 +8100,7 @@ static MACHINE_CONFIG_START( setaroul, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_setaroul)
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_setaroul)
 
-	MCFG_GFXDECODE(setaroul)
+	MCFG_GFXDECODE_ADD("gfxdecode", setaroul)
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT_OVERRIDE(seta_state,setaroul)
 
@@ -8114,6 +8128,7 @@ static MACHINE_CONFIG_START( eightfrc, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8123,7 +8138,7 @@ static MACHINE_CONFIG_START( eightfrc, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
 	MCFG_PALETTE_LENGTH(512 * 3)    /* sprites, layer1, layer2 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -8155,6 +8170,7 @@ static MACHINE_CONFIG_START( extdwnhl, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8164,7 +8180,7 @@ static MACHINE_CONFIG_START( extdwnhl, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(zingzip)
+	MCFG_GFXDECODE_ADD("gfxdecode", zingzip)
 	MCFG_PALETTE_LENGTH(16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
 
 	MCFG_PALETTE_INIT_OVERRIDE(seta_state,zingzip)          /* layer 1 gfx is 6 planes deep */
@@ -8216,6 +8232,7 @@ static MACHINE_CONFIG_START( gundhara, seta_state )
 #endif  // __uPD71054_TIMER
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8225,7 +8242,7 @@ static MACHINE_CONFIG_START( gundhara, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(jjsquawk)
+	MCFG_GFXDECODE_ADD("gfxdecode", jjsquawk)
 	MCFG_PALETTE_LENGTH(16*32+64*32*4)  /* sprites, layer2, layer1 */
 
 	MCFG_PALETTE_INIT_OVERRIDE(seta_state,gundhara)             /* layers are 6 planes deep (seta_state,but have only 4 palettes) */
@@ -8257,6 +8274,7 @@ static MACHINE_CONFIG_START( jjsquawk, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8266,7 +8284,7 @@ static MACHINE_CONFIG_START( jjsquawk, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(jjsquawk)
+	MCFG_GFXDECODE_ADD("gfxdecode", jjsquawk)
 	MCFG_PALETTE_LENGTH(16*32+64*32*4)  /* sprites, layer2, layer1 */
 
 	MCFG_PALETTE_INIT_OVERRIDE(seta_state,jjsquawk)             /* layers are 6 planes deep */
@@ -8289,6 +8307,7 @@ static MACHINE_CONFIG_START( jjsquawb, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8298,7 +8317,7 @@ static MACHINE_CONFIG_START( jjsquawb, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(jjsquawk)
+	MCFG_GFXDECODE_ADD("gfxdecode", jjsquawk)
 	MCFG_PALETTE_LENGTH(16*32+64*32*4)  /* sprites, layer2, layer1 */
 
 	MCFG_PALETTE_INIT_OVERRIDE(seta_state,jjsquawk)             /* layers are 6 planes deep */
@@ -8330,6 +8349,7 @@ static MACHINE_CONFIG_START( kamenrid, seta_state )
 #endif  // __uPD71054_TIMER
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8339,7 +8359,7 @@ static MACHINE_CONFIG_START( kamenrid, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
 	MCFG_PALETTE_LENGTH(512 * 3)    /* sprites, layer2, layer1 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -8367,6 +8387,7 @@ static MACHINE_CONFIG_START( orbs, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8376,7 +8397,7 @@ static MACHINE_CONFIG_START( orbs, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(orbs)
+	MCFG_GFXDECODE_ADD("gfxdecode", orbs)
 	MCFG_PALETTE_LENGTH(512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8405,6 +8426,7 @@ static MACHINE_CONFIG_START( keroppi, seta_state )
 	MCFG_MACHINE_START_OVERRIDE(seta_state,keroppi)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8414,7 +8436,7 @@ static MACHINE_CONFIG_START( keroppi, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(orbs)
+	MCFG_GFXDECODE_ADD("gfxdecode", orbs)
 	MCFG_PALETTE_LENGTH(512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8441,6 +8463,7 @@ static MACHINE_CONFIG_START( krzybowl, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8450,7 +8473,7 @@ static MACHINE_CONFIG_START( krzybowl, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
 	MCFG_PALETTE_LENGTH(512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8482,6 +8505,7 @@ static MACHINE_CONFIG_START( madshark, seta_state )
 #endif  // __uPD71054_TIMER
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8491,7 +8515,7 @@ static MACHINE_CONFIG_START( madshark, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(jjsquawk)
+	MCFG_GFXDECODE_ADD("gfxdecode", jjsquawk)
 	MCFG_PALETTE_LENGTH(16*32+64*32*4)  /* sprites, layer2, layer1 */
 
 	MCFG_PALETTE_INIT_OVERRIDE(seta_state,jjsquawk)             /* layers are 6 planes deep */
@@ -8524,6 +8548,7 @@ static MACHINE_CONFIG_START( magspeed, seta_state )
 #endif  // __uPD71054_TIMER
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8533,7 +8558,7 @@ static MACHINE_CONFIG_START( magspeed, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
 	MCFG_PALETTE_LENGTH(512 * 3)    /* sprites, layer2, layer1 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -8570,6 +8595,7 @@ static MACHINE_CONFIG_START( msgundam, seta_state )
 #endif  // __uPD71054_TIMER
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8580,7 +8606,7 @@ static MACHINE_CONFIG_START( msgundam, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
 
-	MCFG_GFXDECODE(msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
 	MCFG_PALETTE_LENGTH(512 * 3)    /* sprites, layer2, layer1 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -8608,6 +8634,7 @@ static MACHINE_CONFIG_START( oisipuzl, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8617,7 +8644,7 @@ static MACHINE_CONFIG_START( oisipuzl, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
 	MCFG_PALETTE_LENGTH(512 * 3)    /* sprites, layer2, layer1 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
@@ -8645,6 +8672,7 @@ static MACHINE_CONFIG_START( triplfun, seta_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8654,7 +8682,7 @@ static MACHINE_CONFIG_START( triplfun, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
 	MCFG_PALETTE_LENGTH(512 * 3)    /* sprites, layer2, layer1 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
@@ -8680,6 +8708,7 @@ static MACHINE_CONFIG_START( kiwame, seta_state )
                                    the interrupt table is written to. */
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8689,7 +8718,7 @@ static MACHINE_CONFIG_START( kiwame, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
 	MCFG_PALETTE_LENGTH(512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8719,6 +8748,7 @@ static MACHINE_CONFIG_START( rezon, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8728,7 +8758,7 @@ static MACHINE_CONFIG_START( rezon, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
 	MCFG_PALETTE_LENGTH(512 * 3)    /* sprites, layer1, layer2 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -8758,6 +8788,7 @@ static MACHINE_CONFIG_START( thunderl, seta_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8767,7 +8798,7 @@ static MACHINE_CONFIG_START( thunderl, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
 	MCFG_PALETTE_LENGTH(512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8829,6 +8860,7 @@ static MACHINE_CONFIG_START( wiggie, seta_state )
 	MCFG_CPU_PROGRAM_MAP(wiggie_sound_map)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8838,7 +8870,7 @@ static MACHINE_CONFIG_START( wiggie, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(wiggie)
+	MCFG_GFXDECODE_ADD("gfxdecode", wiggie)
 	MCFG_PALETTE_LENGTH(512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8852,7 +8884,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( superbar, wiggie )
 
-	MCFG_GFXDECODE(superbar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", superbar)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( wits, seta_state )
@@ -8863,6 +8895,7 @@ static MACHINE_CONFIG_START( wits, seta_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8872,7 +8905,7 @@ static MACHINE_CONFIG_START( wits, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
 	MCFG_PALETTE_LENGTH(512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8899,6 +8932,7 @@ static MACHINE_CONFIG_START( umanclub, seta_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8908,7 +8942,7 @@ static MACHINE_CONFIG_START( umanclub, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8939,6 +8973,7 @@ static MACHINE_CONFIG_START( utoukond, seta_state )
 	MCFG_CPU_IO_MAP(utoukond_sound_io_map)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8948,7 +8983,7 @@ static MACHINE_CONFIG_START( utoukond, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
 	MCFG_PALETTE_LENGTH(512 * 3)    /* sprites, layer2, layer1 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -8988,6 +9023,7 @@ static MACHINE_CONFIG_START( wrofaero, seta_state )
 #endif  // __uPD71054_TIMER
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8997,7 +9033,7 @@ static MACHINE_CONFIG_START( wrofaero, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
 	MCFG_PALETTE_LENGTH(512 * 3)    /* sprites, layer1, layer2 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -9031,6 +9067,7 @@ static MACHINE_CONFIG_START( zingzip, seta_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9040,7 +9077,7 @@ static MACHINE_CONFIG_START( zingzip, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(zingzip)
+	MCFG_GFXDECODE_ADD("gfxdecode", zingzip)
 	MCFG_PALETTE_LENGTH(16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
 
 	MCFG_PALETTE_INIT_OVERRIDE(seta_state,zingzip)              /* layer 1 gfx is 6 planes deep */
@@ -9057,7 +9094,7 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( zingzipbl, zingzip )
-	MCFG_GFXDECODE(zingzipbl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", zingzipbl)
 
 	MCFG_DEVICE_REMOVE("maincpu")
 
@@ -9084,6 +9121,7 @@ static MACHINE_CONFIG_START( pairlove, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9093,7 +9131,7 @@ static MACHINE_CONFIG_START( pairlove, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
 	MCFG_PALETTE_LENGTH(2048)   /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -9131,6 +9169,7 @@ static MACHINE_CONFIG_START( crazyfgt, seta_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, crazyfgt_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9140,7 +9179,7 @@ static MACHINE_CONFIG_START( crazyfgt, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
-	MCFG_GFXDECODE(crazyfgt)
+	MCFG_GFXDECODE_ADD("gfxdecode", crazyfgt)
 	MCFG_PALETTE_LENGTH(16*32+64*32*4)  /* sprites, layer1, layer2 */
 
 	MCFG_PALETTE_INIT_OVERRIDE(seta_state,gundhara)             /* layers are 6 planes deep (seta_state,but have only 4 palettes) */
@@ -9195,6 +9234,7 @@ static MACHINE_CONFIG_START( inttoote, seta_state )
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9204,7 +9244,7 @@ static MACHINE_CONFIG_START( inttoote, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_inttoote)
 
-	MCFG_GFXDECODE(inttoote)
+	MCFG_GFXDECODE_ADD("gfxdecode", inttoote)
 	MCFG_PALETTE_LENGTH(512 * 1)
 
 	MCFG_PALETTE_INIT_OVERRIDE(seta_state,inttoote)

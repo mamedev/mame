@@ -509,10 +509,6 @@ void video_manager::exit()
 	// stop recording any movie
 	end_recording();
 
-	// free all the graphics elements
-	for (int i = 0; i < MAX_GFX_ELEMENTS; i++)
-		auto_free(machine(), machine().gfx[i]);
-
 	// free the snapshot target
 	machine().render().target_free(m_snap_target);
 	m_snap_bitmap.reset();

@@ -162,7 +162,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
 	{
 		offset |= (0 * 0x800) | 0x400 | m_character_ram_page_start;
 		m_character_ram[offset] = data;
-		machine().gfx[1]->mark_dirty((offset / 8) % 256);
+		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
 		m_s2636_0->work_ram_w(space, offset, data);
@@ -183,7 +183,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
 	{
 		offset |= (1 * 0x800) | 0x400 | m_character_ram_page_start;
 		m_character_ram[offset] = data;
-		machine().gfx[1]->mark_dirty((offset / 8) % 256);
+		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
 		m_s2636_1->work_ram_w(space, offset, data);
@@ -204,7 +204,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 	{
 		offset |= (2 * 0x800) | 0x400 | m_character_ram_page_start;
 		m_character_ram[offset] = data;
-		machine().gfx[1]->mark_dirty((offset / 8) % 256);
+		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
 		m_s2636_2->work_ram_w(space, offset, data);
@@ -967,8 +967,8 @@ static const s2636_interface s2636_2_config =
 MACHINE_START_MEMBER(cvs_state,cvs)
 {
 	/* allocate memory */
-	if (machine().gfx[1] != NULL)
-		machine().gfx[1]->set_source(m_character_ram);
+	if (m_gfxdecode->gfx(1) != NULL)
+		m_gfxdecode->gfx(1)->set_source(m_character_ram);
 
 	start_393hz_timer();
 
@@ -1027,7 +1027,7 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START_OVERRIDE(cvs_state,cvs)
 
-	MCFG_GFXDECODE(cvs)
+	MCFG_GFXDECODE_ADD("gfxdecode", cvs)
 	MCFG_PALETTE_LENGTH((256+4)*8+8+1)
 	MCFG_PALETTE_INIT_OVERRIDE(cvs_state,cvs)
 

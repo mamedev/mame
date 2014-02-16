@@ -779,7 +779,7 @@ static MACHINE_CONFIG_START( realbrk, realbrk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(realbrk_state, screen_update_realbrk)
 
-	MCFG_GFXDECODE(realbrk)
+	MCFG_GFXDECODE_ADD("gfxdecode", realbrk)
 	MCFG_PALETTE_LENGTH(0x8000)
 
 
@@ -811,7 +811,7 @@ static MACHINE_CONFIG_DERIVED( dai2kaku, realbrk )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dai2kaku_mem)
 
-	MCFG_GFXDECODE(dai2kaku)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", dai2kaku)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(realbrk_state, screen_update_dai2kaku)
 MACHINE_CONFIG_END

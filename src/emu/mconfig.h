@@ -117,7 +117,6 @@ public:
 
 	// other parameters
 	UINT32                  m_video_attributes;         // flags describing the video system
-	const gfx_decode_entry *m_gfxdecodeinfo;            // pointer to array of graphics decoding information
 	UINT32                  m_total_colors;             // total number of colors in the palette
 	const char *            m_default_layout;           // default layout for this machine
 
@@ -199,8 +198,6 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 // core video parameters
 #define MCFG_VIDEO_ATTRIBUTES(_flags) \
 	config.m_video_attributes = _flags;
-#define MCFG_GFXDECODE(_gfx) \
-	config.m_gfxdecodeinfo = GFXDECODE_NAME(_gfx);
 #define MCFG_PALETTE_LENGTH(_length) \
 	config.m_total_colors = _length;
 #define MCFG_DEFAULT_LAYOUT(_layout) \

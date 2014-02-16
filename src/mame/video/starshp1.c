@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(starshp1_state::get_tile_info)
 {
 	UINT8 code = m_playfield_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code & 0x3f, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code & 0x3f, 0, 0);
 }
 
 
@@ -183,7 +183,7 @@ void starshp1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	{
 		int code = (m_obj_ram[i] & 0xf) ^ 0xf;
 
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			code % 8,
 			code / 8,
 			0, 0,
@@ -209,7 +209,7 @@ void starshp1_state::draw_spaceship(bitmap_ind16 &bitmap, const rectangle &clipr
 	if (y <= 0)
 		y -= (yzoom * m_ship_voffset) >> 16;
 
-	 machine().gfx[2]->zoom_transpen(bitmap,cliprect,
+	 m_gfxdecode->gfx(2)->zoom_transpen(bitmap,cliprect,
 		m_ship_picture & 0x03,
 		m_ship_explode,
 		m_ship_picture & 0x80, 0,
@@ -384,8 +384,8 @@ void starshp1_state::screen_eof_starshp1(screen_device &screen, bool state)
 
 		rect.min_x = get_sprite_hpos(13);
 		rect.min_y = get_sprite_vpos(13);
-		rect.max_x = rect.min_x + machine().gfx[1]->width() - 1;
-		rect.max_y = rect.min_y + machine().gfx[1]->height() - 1;
+		rect.max_x = rect.min_x + m_gfxdecode->gfx(1)->width() - 1;
+		rect.max_y = rect.min_y + m_gfxdecode->gfx(1)->height() - 1;
 
 		rect &= m_helper.cliprect();
 

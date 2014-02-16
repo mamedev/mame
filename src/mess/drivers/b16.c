@@ -112,7 +112,7 @@ WRITE8_MEMBER( b16_state::b16_pcg_w )
 {
 	m_char_rom[offset] = data;
 
-	machine().gfx[0]->mark_dirty(offset >> 4);
+	m_gfxdecode->gfx(0)->mark_dirty(offset >> 4);
 }
 
 static ADDRESS_MAP_START( b16_map, AS_PROGRAM, 16, b16_state)
@@ -310,7 +310,7 @@ static MACHINE_CONFIG_START( b16, b16_state )
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz/5, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_I8237_ADD("8237dma", XTAL_14_31818MHz/2, b16_dma8237_interface)
 
-	MCFG_GFXDECODE(b16)
+	MCFG_GFXDECODE_ADD("gfxdecode", b16)
 	MCFG_PALETTE_LENGTH(8)
 //  MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white) // TODO
 

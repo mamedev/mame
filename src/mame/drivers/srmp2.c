@@ -1168,6 +1168,7 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1177,7 +1178,7 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 	MCFG_SCREEN_VISIBLE_AREA(16, 464-1, 8, 256-1-24)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_srmp2)
 
-	MCFG_GFXDECODE(srmp2)
+	MCFG_GFXDECODE_ADD("gfxdecode", srmp2)
 	MCFG_PALETTE_LENGTH(1024)   /* sprites only */
 
 	MCFG_PALETTE_INIT_OVERRIDE(srmp2_state,srmp2)
@@ -1209,6 +1210,7 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1218,7 +1220,7 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MCFG_SCREEN_VISIBLE_AREA(16, 400-1, 8, 256-1-24)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_srmp3)
 
-	MCFG_GFXDECODE(srmp3)
+	MCFG_GFXDECODE_ADD("gfxdecode", srmp3)
 	MCFG_PALETTE_LENGTH(512)    /* sprites only */
 
 	MCFG_PALETTE_INIT_OVERRIDE(srmp2_state,srmp3)
@@ -1243,7 +1245,7 @@ static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,rmgoldyh)
 
-	MCFG_GFXDECODE(rmgoldyh)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", rmgoldyh)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
@@ -1259,6 +1261,7 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1268,7 +1271,7 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 	MCFG_SCREEN_VISIBLE_AREA(16, 400-1, 0, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_mjyuugi)
 
-	MCFG_GFXDECODE(srmp3)
+	MCFG_GFXDECODE_ADD("gfxdecode", srmp3)
 	MCFG_PALETTE_LENGTH(512)            /* sprites only */
 
 	/* sound hardware */

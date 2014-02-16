@@ -274,7 +274,7 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gotcha_state, screen_update_gotcha)
 
-	MCFG_GFXDECODE(gotcha)
+	MCFG_GFXDECODE_ADD("gfxdecode", gotcha)
 	MCFG_PALETTE_LENGTH(768)
 
 
@@ -282,7 +282,7 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	decospr_device::set_gfx_region(*device, 1);
 	decospr_device::set_is_bootleg(*device, true);
 	decospr_device::set_offsets(*device, 5,-1); // aligned to 2nd instruction screen in attract
-
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

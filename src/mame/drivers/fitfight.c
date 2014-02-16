@@ -742,7 +742,7 @@ static MACHINE_CONFIG_START( fitfight, fitfight_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  snd_irq)
 
 
-	MCFG_GFXDECODE(fitfight)
+	MCFG_GFXDECODE_ADD("gfxdecode", fitfight)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -767,7 +767,7 @@ static MACHINE_CONFIG_START( bbprot, fitfight_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
 
 
-	MCFG_GFXDECODE(prot)
+	MCFG_GFXDECODE_ADD("gfxdecode", prot)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

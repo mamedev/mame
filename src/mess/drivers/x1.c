@@ -1165,7 +1165,7 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
 
 			pcg_offset &= 0x7ff;
 
-			machine().gfx[3]->mark_dirty(pcg_offset >> 3);
+			m_gfxdecode->gfx(3)->mark_dirty(pcg_offset >> 3);
 		}
 		else // Compatible Mode
 		{
@@ -1182,7 +1182,7 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
 
 			pcg_offset &= 0x7ff;
 
-			machine().gfx[3]->mark_dirty(pcg_offset >> 3);
+			m_gfxdecode->gfx(3)->mark_dirty(pcg_offset >> 3);
 		}
 	}
 }
@@ -2443,7 +2443,7 @@ MACHINE_RESET_MEMBER(x1_state,x1)
 	for(i=0;i<0x1800;i++)
 	{
 		m_pcg_ram[i] = 0;
-		machine().gfx[3]->mark_dirty(i >> 3);
+		m_gfxdecode->gfx(3)->mark_dirty(i >> 3);
 	}
 
 	m_is_turbo = 0;
@@ -2526,7 +2526,7 @@ MACHINE_START_MEMBER(x1_state,x1)
 	save_pointer(NAME(m_emm_ram), 0x1000000);
 	save_pointer(NAME(m_pcg_ram), 0x1800);
 
-	machine().gfx[3] = auto_alloc(machine(), gfx_element(machine(), x1_pcg_8x8, (UINT8 *)m_pcg_ram, 1, 0));
+	m_gfxdecode->set_gfx(3, auto_alloc(machine(), gfx_element(machine(), x1_pcg_8x8, (UINT8 *)m_pcg_ram, 1, 0)));
 }
 
 PALETTE_INIT_MEMBER(x1_state,x1)
@@ -2587,7 +2587,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_PALETTE_LENGTH(0x10+0x1000)
 	MCFG_PALETTE_INIT_OVERRIDE(x1_state,x1)
 
-	MCFG_GFXDECODE(x1)
+	MCFG_GFXDECODE_ADD("gfxdecode", x1)
 
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 

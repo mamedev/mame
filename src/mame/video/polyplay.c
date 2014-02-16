@@ -33,7 +33,7 @@ WRITE8_MEMBER(polyplay_state::polyplay_characterram_w)
 {
 	if (m_characterram[offset] != data)
 	{
-		machine().gfx[1]->mark_dirty((offset >> 3) & 0x7f);
+		m_gfxdecode->gfx(1)->mark_dirty((offset >> 3) & 0x7f);
 
 		m_characterram[offset] = data;
 	}
@@ -41,7 +41,7 @@ WRITE8_MEMBER(polyplay_state::polyplay_characterram_w)
 
 void polyplay_state::video_start()
 {
-	machine().gfx[1]->set_source(m_characterram);
+	m_gfxdecode->gfx(1)->set_source(m_characterram);
 }
 
 
@@ -57,7 +57,7 @@ UINT32 polyplay_state::screen_update_polyplay(screen_device &screen, bitmap_ind1
 		int sy = offs >> 6 << 3;
 		UINT8 code = videoram[offs];
 
-		 machine().gfx[(code >> 7) & 0x01]->opaque(bitmap,cliprect,
+		 m_gfxdecode->gfx((code >> 7) & 0x01)->opaque(bitmap,cliprect,
 				code, 0, 0, 0, sx, sy);
 	}
 

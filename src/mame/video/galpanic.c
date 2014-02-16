@@ -72,7 +72,7 @@ void galpanic_state::comad_draw_sprites(bitmap_ind16 &bitmap, const rectangle &c
 		sx = (sx&0x1ff) - (sx&0x200);
 		sy = (sy&0x1ff) - (sy&0x200);
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

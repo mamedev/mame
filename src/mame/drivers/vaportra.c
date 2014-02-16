@@ -255,16 +255,19 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vaportra_state, screen_update_vaportra)
-	MCFG_GFXDECODE(vaportra)
+	MCFG_GFXDECODE_ADD("gfxdecode", vaportra)
 	MCFG_PALETTE_LENGTH(1280)
 
 
 	MCFG_DECO16IC_ADD("tilegen1", vaportra_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	MCFG_DECO16IC_ADD("tilegen2", vaportra_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 4);
+	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

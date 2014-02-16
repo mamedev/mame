@@ -830,7 +830,7 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	MCFG_GFXDECODE(ibm5150)
+	MCFG_GFXDECODE_ADD("gfxdecode", ibm5150)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -877,7 +877,7 @@ static GFXDECODE_START( pc10iii )
 GFXDECODE_END
 
 static MACHINE_CONFIG_DERIVED( pc10iii, pccga )
-	MCFG_GFXDECODE(pc10iii)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", pc10iii)
 MACHINE_CONFIG_END
 
 static const gfx_layout europc_8_charlayout =
@@ -948,7 +948,7 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_aga )
-	MCFG_GFXDECODE(europc)
+	MCFG_GFXDECODE_ADD("gfxdecode", europc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1026,7 +1026,7 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
-	MCFG_GFXDECODE(t1000)
+	MCFG_GFXDECODE_ADD("gfxdecode", t1000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1095,7 +1095,7 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
-	MCFG_GFXDECODE(t1000)
+	MCFG_GFXDECODE_ADD("gfxdecode", t1000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1165,7 +1165,7 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
-	MCFG_GFXDECODE(t1000)
+	MCFG_GFXDECODE_ADD("gfxdecode", t1000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1240,7 +1240,7 @@ static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 
 	/* video hardware */
 	MCFG_PCVIDEO_PCJR_ADD("pcvideo_pcjr")
-	MCFG_GFXDECODE(ibmpcjr)
+	MCFG_GFXDECODE_ADD("gfxdecode", ibmpcjr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1300,7 +1300,7 @@ static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "35dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "35dd", pc_state::floppy_formats)
 
-	MCFG_GFXDECODE(ibmpcjx)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", ibmpcjx)
 MACHINE_CONFIG_END
 
 
@@ -1321,7 +1321,7 @@ static MACHINE_CONFIG_START( asst128, pc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_mc1502 )
-	MCFG_GFXDECODE(ibmpcjr)
+	MCFG_GFXDECODE_ADD("gfxdecode", ibmpcjr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1464,7 +1464,7 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_poisk2 )
-	MCFG_GFXDECODE(ibm5150)
+	MCFG_GFXDECODE_ADD("gfxdecode", ibm5150)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1527,7 +1527,7 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	MCFG_GFXDECODE(ibm5150)
+	MCFG_GFXDECODE_ADD("gfxdecode", ibm5150)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1590,7 +1590,7 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	MCFG_GFXDECODE(ibm5150)
+	MCFG_GFXDECODE_ADD("gfxdecode", ibm5150)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1653,7 +1653,7 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	MCFG_GFXDECODE(ibm5150)
+	MCFG_GFXDECODE_ADD("gfxdecode", ibm5150)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

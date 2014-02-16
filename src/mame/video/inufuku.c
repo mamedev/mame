@@ -64,7 +64,7 @@ WRITE16_MEMBER(inufuku_state::inufuku_scrollreg_w)
 
 TILE_GET_INFO_MEMBER(inufuku_state::get_inufuku_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_bg_videoram[tile_index],
 			m_bg_palettebank,
@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(inufuku_state::get_inufuku_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(inufuku_state::get_inufuku_tx_tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			m_tx_videoram[tile_index],
 			m_tx_palettebank,

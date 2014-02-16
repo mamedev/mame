@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(fastfred_state::get_tile_info)
 	UINT16 code = m_charbank | m_videoram[tile_index];
 	UINT8 color = m_colorbank | (m_attributesram[2 * x + 1] & 0x07);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 
@@ -277,7 +277,7 @@ void fastfred_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		machine().gfx[1]->transpen(bitmap,flip_screen_x() ? spritevisibleareaflipx : spritevisiblearea,
+		m_gfxdecode->gfx(1)->transpen(bitmap,flip_screen_x() ? spritevisibleareaflipx : spritevisiblearea,
 				code,
 				m_colorbank | (m_spriteram[offs + 2] & 0x07),
 				flipx,flipy,
@@ -303,18 +303,18 @@ TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_bg)
 	UINT16 code = m_charbank * 0x100 + m_videoram[tile_index];
 	UINT8 color = m_colorbank | (m_attributesram[2 * x + 1] & 0x07);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_fg)
 {
 	int code = m_imago_fg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(2, code, 2, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, 2, 0);
 }
 
 TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_web)
 {
-	SET_TILE_INFO_MEMBER(3, tile_index & 0x1ff, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, tile_index & 0x1ff, 0, 0);
 }
 
 WRITE8_MEMBER(fastfred_state::imago_fg_videoram_w )

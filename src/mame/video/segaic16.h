@@ -96,6 +96,9 @@ public:
 	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~segaic16_video_device() {}
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	
 	UINT8 segaic16_display_enable;
 	UINT16 *segaic16_tileram_0;
 	UINT16 *segaic16_textram_0;
@@ -146,11 +149,15 @@ protected:
 
 private:
 	// internal state
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 extern const device_type SEGAIC16VID;
 
 #define MCFG_SEGAIC16VID_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGAIC16VID, 0)
+
+#define MCFG_SEGAIC16VID_GFXDECODE(_gfxtag) \
+	segaic16_video_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif

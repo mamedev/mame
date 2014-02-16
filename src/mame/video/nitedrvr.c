@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(nitedrvr_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 

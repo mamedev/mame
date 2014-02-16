@@ -507,7 +507,7 @@ static MACHINE_CONFIG_START( yunsung8, yunsung8_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2, 512, 64, 512-64, 262, 8, 256-8) /* TODO: completely inaccurate */
 	MCFG_SCREEN_UPDATE_DRIVER(yunsung8_state, screen_update_yunsung8)
 
-	MCFG_GFXDECODE(yunsung8)
+	MCFG_GFXDECODE_ADD("gfxdecode", yunsung8)
 	MCFG_PALETTE_LENGTH(2048)
 
 

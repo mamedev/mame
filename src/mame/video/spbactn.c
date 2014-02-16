@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_bg_tile_info)
 {
 	int attr = m_bgvideoram[tile_index];
 	int tileno = m_bgvideoram[tile_index+0x2000];
-	SET_TILE_INFO_MEMBER(1, tileno, ((attr & 0x00f0)>>4)+0x80, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, ((attr & 0x00f0)>>4)+0x80, 0);
 }
 
 
@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_fg_tile_info)
 	else
 		color |= 0x0080;
 
-	SET_TILE_INFO_MEMBER(0, tileno, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, color, 0);
 }
 
 
@@ -140,7 +140,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_extra_tile_info)
 {
 	int tileno = m_extraram[(tile_index*2)+1];
 	tileno |= m_extraram[(tile_index*2)] << 8;
-	SET_TILE_INFO_MEMBER(3, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, tileno, 0, 0);
 }
 
 
@@ -154,18 +154,18 @@ int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 
 
-	if (spbactn_draw_sprites(screen, m_tile_bitmap_bg, cliprect, 0, alt_sprites, m_spvideoram))
+	if (spbactn_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, cliprect, 0, alt_sprites, m_spvideoram))
 	{
 		m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	}
 
-	spbactn_draw_sprites(screen, m_tile_bitmap_bg, cliprect, 1, alt_sprites, m_spvideoram);
+	spbactn_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, cliprect, 1, alt_sprites, m_spvideoram);
 
 	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 
 
-	spbactn_draw_sprites(screen, m_tile_bitmap_fg, cliprect, 2, alt_sprites, m_spvideoram);
-	spbactn_draw_sprites(screen, m_tile_bitmap_fg, cliprect, 3, alt_sprites, m_spvideoram);
+	spbactn_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_fg, cliprect, 2, alt_sprites, m_spvideoram);
+	spbactn_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_fg, cliprect, 3, alt_sprites, m_spvideoram);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
 	blendbitmaps(machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, cliprect);

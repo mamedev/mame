@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
     MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1) */
 	MCFG_SCREEN_UPDATE_DRIVER(ddribble_state, screen_update_ddribble)
 
-	MCFG_GFXDECODE(ddribble)
+	MCFG_GFXDECODE_ADD("gfxdecode", ddribble)
 	MCFG_PALETTE_LENGTH(64 + 256)
 
 

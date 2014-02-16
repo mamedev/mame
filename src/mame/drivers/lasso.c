@@ -496,7 +496,7 @@ static MACHINE_CONFIG_START( base, lasso_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_lasso)
 
-	MCFG_GFXDECODE(lasso)
+	MCFG_GFXDECODE_ADD("gfxdecode", lasso)
 	MCFG_PALETTE_LENGTH(0x40)
 
 
@@ -548,7 +548,7 @@ static MACHINE_CONFIG_DERIVED( wwjgtin, base )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)  // Smaller visible area?
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_wwjgtin)
-	MCFG_GFXDECODE(wwjgtin) // Has 1 additional layer
+	MCFG_GFXDECODE_MODIFY("gfxdecode", wwjgtin) // Has 1 additional layer
 	MCFG_PALETTE_LENGTH(0x40 + 16*16)
 
 	MCFG_PALETTE_INIT_OVERRIDE(lasso_state,wwjgtin)
@@ -571,7 +571,7 @@ static MACHINE_CONFIG_DERIVED( pinbo, base )
 	MCFG_CPU_IO_MAP(pinbo_audio_io_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(pinbo)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", pinbo)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)

@@ -742,7 +742,7 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
-	MCFG_GFXDECODE(ace)
+	MCFG_GFXDECODE_ADD("gfxdecode", ace)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

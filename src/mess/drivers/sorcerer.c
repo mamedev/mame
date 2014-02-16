@@ -434,7 +434,7 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_SCREEN_SIZE(64*8, 30*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sorcerer_state, screen_update)
-	MCFG_GFXDECODE(sorcerer)
+	MCFG_GFXDECODE_ADD("gfxdecode", sorcerer)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 

@@ -9,7 +9,7 @@
 
 void silkroad_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	UINT32 *source = m_sprram;
 	UINT32 *finish = source + 0x1000/4;
 
@@ -60,7 +60,7 @@ TILE_GET_INFO_MEMBER(silkroad_state::get_fg_tile_info)
 
 	code += 0x18000;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			color,
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(silkroad_state::get_fg2_tile_info)
 	int color = ((m_vidram2[tile_index] & 0x000001f));
 	int flipx =  ((m_vidram2[tile_index] & 0x0000080) >> 7);
 	code += 0x18000;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			color,
@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(silkroad_state::get_fg3_tile_info)
 	int color = ((m_vidram3[tile_index] & 0x000001f));
 	int flipx =  ((m_vidram3[tile_index] & 0x0000080) >> 7);
 	code += 0x18000;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			color,

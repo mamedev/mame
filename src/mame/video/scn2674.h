@@ -7,6 +7,9 @@
 	MCFG_DEVICE_ADD(_tag, SCN2674_VIDEO, _clock) \
 	downcast<scn2674_device *>(device)->set_callbacks(DEVCB2_##_irq);
 
+#define MCFG_SCN2674_GFXDECODE(_gfxtag) \
+	scn2674_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
 typedef void (*s2574_interrupt_callback_func)(running_machine &machine);
 
 static const UINT8 vsync_table[4] = {3,1,5,7}; //Video related
@@ -15,6 +18,9 @@ class scn2674_device : public device_t
 {
 public:
 	scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 
 	template<class _irq> void set_callbacks(_irq irq) {
 		m_interrupt_callback.set_callback(irq);
@@ -109,7 +115,7 @@ protected:
 	void scn2574_draw_common( running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, UINT16* vid_mainram );
 
 private:
-
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

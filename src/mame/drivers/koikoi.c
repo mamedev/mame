@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(koikoi_state::get_tile_info)
 	int color = (m_videoram[tile_index + 0x400] & 0x1f);
 	int flip  = (m_videoram[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 
-	SET_TILE_INFO_MEMBER( 0, code, color, flip);
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  0, code, color, flip);
 }
 
 void koikoi_state::palette_init()
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( koikoi, koikoi_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(koikoi_state, screen_update_koikoi)
 
-	MCFG_GFXDECODE(koikoi)
+	MCFG_GFXDECODE_ADD("gfxdecode", koikoi)
 	MCFG_PALETTE_LENGTH(8*32)
 
 

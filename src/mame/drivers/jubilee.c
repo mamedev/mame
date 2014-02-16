@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER( 0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  0, code, 0, 0);
 }
 
 
@@ -459,7 +459,7 @@ static MACHINE_CONFIG_START( jubileep, jubilee_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jubilee_state, screen_update_jubileep)
 
-	MCFG_GFXDECODE(jubileep)
+	MCFG_GFXDECODE_ADD("gfxdecode", jubileep)
 
 	MCFG_PALETTE_LENGTH(256)
 

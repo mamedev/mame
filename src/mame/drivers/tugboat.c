@@ -77,8 +77,8 @@ void tugboat_state::machine_start()
 
 void tugboat_state::video_start()
 {
-	machine().gfx[0]->set_granularity(8);
-	machine().gfx[2]->set_granularity(8);
+	m_gfxdecode->gfx(0)->set_granularity(8);
+	m_gfxdecode->gfx(2)->set_granularity(8);
 }
 
 /*  there isn't the usual resistor array anywhere near the color prom,
@@ -149,7 +149,7 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
 				transpen = 1;
 			}
 
-			machine().gfx[rgn]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(rgn)->transpen(bitmap,cliprect,
 					code,
 					color,
 					0,0,
@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( tugboat, tugboat_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8,31*8-1,2*8,30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tugboat_state, screen_update_tugboat)
 
-	MCFG_GFXDECODE(tugboat)
+	MCFG_GFXDECODE_ADD("gfxdecode", tugboat)
 	MCFG_PALETTE_LENGTH(256)
 
 	/* sound hardware */

@@ -19,10 +19,21 @@ k001604_device::k001604_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K001604, "Konami 001604", tag, owner, clock, "k001604", __FILE__),
 	m_tile_ram(NULL),
 	m_char_ram(NULL),
-	m_reg(NULL)
+	m_reg(NULL),
+	m_gfxdecode(*this)
 {
 	m_gfx_index[0] = 0;
 	m_gfx_index[1] = 0;
+}
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void k001604_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<k001604_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -108,8 +119,8 @@ void k001604_device::device_start()
 	m_layer_8x8[0]->set_transparent_pen(0);
 	m_layer_8x8[1]->set_transparent_pen(0);
 
-	machine().gfx[m_gfx_index[0]] = auto_alloc_clear(machine(), gfx_element(machine(), k001604_char_layout_layer_8x8, (UINT8*)&m_char_ram[0], machine().total_colors() / 16, 0));
-	machine().gfx[m_gfx_index[1]] = auto_alloc_clear(machine(), gfx_element(machine(), k001604_char_layout_layer_16x16, (UINT8*)&m_char_ram[0], machine().total_colors() / 16, 0));
+	m_gfxdecode->set_gfx(m_gfx_index[0], auto_alloc_clear(machine(), gfx_element(machine(), k001604_char_layout_layer_8x8, (UINT8*)&m_char_ram[0], machine().total_colors() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index[1], auto_alloc_clear(machine(), gfx_element(machine(), k001604_char_layout_layer_16x16, (UINT8*)&m_char_ram[0], machine().total_colors() / 16, 0)));
 
 	save_pointer(NAME(m_reg), 0x400 / 4);
 	save_pointer(NAME(m_char_ram), 0x200000 / 4);
@@ -183,7 +194,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_8x8)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(m_gfx_index[0], tile, color, flags);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, m_gfx_index[0], tile, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_roz)
@@ -200,7 +211,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_roz)
 
 	tile += m_roz_size ? 0x800 : 0x2000;
 
-	SET_TILE_INFO_MEMBER(m_gfx_index[m_roz_size], tile, color, flags);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, m_gfx_index[m_roz_size], tile, color, flags);
 }
 
 
@@ -398,8 +409,8 @@ WRITE32_MEMBER( k001604_device::char_w )
 
 	COMBINE_DATA(m_char_ram + addr);
 
-	space.machine().gfx[m_gfx_index[0]]->mark_dirty(addr / 32);
-	space.machine().gfx[m_gfx_index[1]]->mark_dirty(addr / 128);
+	m_gfxdecode->gfx(m_gfx_index[0])->mark_dirty(addr / 32);
+	m_gfxdecode->gfx(m_gfx_index[1])->mark_dirty(addr / 128);
 }
 
 WRITE32_MEMBER( k001604_device::reg_w )

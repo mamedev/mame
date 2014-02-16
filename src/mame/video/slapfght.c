@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(slapfght_state::get_pf_tile_info)/* For Performan only */
 
 	tile=m_slapfight_videoram[tile_index] + ((m_slapfight_colorram[tile_index] & 0x03) << 8);
 	color=(m_slapfight_colorram[tile_index] >> 3) & 0x0f;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(slapfght_state::get_pf1_tile_info)
 	tile=m_slapfight_videoram[tile_index] + ((m_slapfight_colorram[tile_index] & 0x0f) << 8);
 	color=(m_slapfight_colorram[tile_index] & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile,
 			color,
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(slapfght_state::get_fix_tile_info)
 	tile=m_slapfight_fixvideoram[tile_index] + ((m_slapfight_fixcolorram[tile_index] & 0x03) << 8);
 	color=(m_slapfight_fixcolorram[tile_index] & 0xfc) >> 2;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -163,7 +163,7 @@ void slapfght_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				sx = buffered_spriteram[offs+1] + 3;
 				sy = buffered_spriteram[offs+3] - 1;
 			}
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				buffered_spriteram[offs],
 				((buffered_spriteram[offs+2] >> 1) & 3) |
 					((buffered_spriteram[offs+2] << 2) & 4) | (m_slapfight_palette_bank << 3),
@@ -220,13 +220,13 @@ UINT32 slapfght_state::screen_update_slapfight(screen_device &screen, bitmap_ind
 	for (offs = 0;offs < m_spriteram->bytes();offs += 4)
 	{
 		if (m_flipscreen)
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2),
 				(buffered_spriteram[offs+2] & 0x1e) >> 1,
 				1,1,
 				288-(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) +18,240-buffered_spriteram[offs+3],0);
 		else
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2),
 				(buffered_spriteram[offs+2] & 0x1e) >> 1,
 				0,0,

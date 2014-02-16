@@ -238,7 +238,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg_tile_info)
 	int data = source[tile_index%(64*32)];
 	int tile_number = (data & 0xfff) + 0x1000 * ((data & m_tilebank_switch) ? m_tile_bank1 : m_tile_bank0);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			(data >> 6) & 0x7f,
@@ -251,7 +251,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg_tile_info)
 	int data = source[tile_index % (64 * 32)];
 	int tile_number = (data & 0xfff) + 0x1000 * ((data & m_tilebank_switch) ? m_tile_bank1 : m_tile_bank0);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			(data >> 6) & 0x7f,
@@ -264,7 +264,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg2_tile_info)
 	int data = source[tile_index % (64 * 32)];
 	int tile_number = (data & 0xfff) + 0x1000 * ((data & 0x1000) ? m_tile_bank1 : m_tile_bank0);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			(data >> 6) & 0x7f,
@@ -277,7 +277,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg2_tile_info)
 	int data = source[tile_index % (64 * 32)];
 	int tile_number = (data & 0xfff) + 0x1000 * ((data & 0x1000) ? m_tile_bank1 : m_tile_bank0);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			(data >> 6) & 0x7f,
@@ -330,7 +330,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_text_tile_info)
 
 	if (!m_shinobl_kludge)
 	{
-		SET_TILE_INFO_MEMBER(
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 
 				0,
 				(tile_number & 0x1ff) + m_tile_bank0 * 0x1000,
 				(tile_number >> 9) % 8,
@@ -338,7 +338,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_text_tile_info)
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 
 				0,
 				(tile_number & 0xff)  + m_tile_bank0 * 0x1000,
 				(tile_number >> 8) % 8,
@@ -485,7 +485,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_infotxt)
 	data = m_textram[tile_index];
 	tile_number = data & 0x1ff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			((data >> 9) & 0x7),
@@ -500,7 +500,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_info0)
 	tile_number = data & 0x1fff;
 
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			(data >> 6) & 0x7f,
@@ -514,7 +514,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_info1)
 	data = m_bg1_tileram[tile_index];
 	tile_number = data & 0x1fff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			(data >> 6) & 0x7f,

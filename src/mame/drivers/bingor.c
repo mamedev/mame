@@ -632,7 +632,7 @@ static MACHINE_CONFIG_START( bingor, bingor_state )
 	MCFG_CPU_IO_MAP(pic_io_map)
 
 
-	MCFG_GFXDECODE(bingor)
+	MCFG_GFXDECODE_ADD("gfxdecode", bingor)
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)

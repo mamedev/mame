@@ -1535,10 +1535,11 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbros)
 	MCFG_SCREEN_VBLANK_DRIVER(snowbros_state, screen_eof_snowbros)
 
-	MCFG_GFXDECODE(snowbros)
+	MCFG_GFXDECODE_ADD("gfxdecode", snowbros)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", snowbros_pandora_config)
+	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1559,7 +1560,7 @@ static MACHINE_CONFIG_DERIVED( wintbob, snowbros )
 	MCFG_DEVICE_REMOVE("pandora")
 
 	/* video hardware */
-	MCFG_GFXDECODE(wb)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", wb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_wintbob)
 	MCFG_SCREEN_VBLANK_NONE()
@@ -1578,7 +1579,7 @@ static MACHINE_CONFIG_DERIVED( semicom, snowbros )
 	MCFG_CPU_PROGRAM_MAP(hyperpac_sound_map)
 	MCFG_CPU_IO_MAP(hyperpac_sound_io_map)
 
-	MCFG_GFXDECODE(hyperpac)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", hyperpac)
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
@@ -1645,7 +1646,7 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_honeydol)
 
-	MCFG_GFXDECODE(honeydol)
+	MCFG_GFXDECODE_ADD("gfxdecode", honeydol)
 	MCFG_PALETTE_LENGTH(0x800/2)
 
 	/* sound hardware */
@@ -1682,7 +1683,7 @@ static MACHINE_CONFIG_START( twinadv, snowbros_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_twinadv)
 
-	MCFG_GFXDECODE(twinadv)
+	MCFG_GFXDECODE_ADD("gfxdecode", twinadv)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	/* sound hardware */
@@ -1736,7 +1737,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( _4in1, semicom )
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE(snowbros)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", snowbros)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( snowbro3, snowbros_state )
@@ -1754,7 +1755,7 @@ static MACHINE_CONFIG_START( snowbro3, snowbros_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbro3)
 
-	MCFG_GFXDECODE(sb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", sb3)
 	MCFG_PALETTE_LENGTH(512)
 
 	/* sound hardware */

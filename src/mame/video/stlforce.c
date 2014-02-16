@@ -12,7 +12,7 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_bg_tile_info)
 	tileno = m_bg_videoram[tile_index] & 0x0fff;
 	colour = m_bg_videoram[tile_index] & 0xe000;
 	colour = colour >> 13;
-	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,colour,0);
 }
 
 WRITE16_MEMBER(stlforce_state::stlforce_bg_videoram_w)
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mlow_tile_info)
 	colour += 8;
 	tileno += 0x1000;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,colour,0);
 }
 
 WRITE16_MEMBER(stlforce_state::stlforce_mlow_videoram_w)
@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mhigh_tile_info)
 	colour += 16;
 	tileno += 0x2000;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,colour,0);
 }
 
 WRITE16_MEMBER(stlforce_state::stlforce_mhigh_videoram_w)
@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_tx_tile_info)
 	tileno += 0xc000;
 
 	colour += 24;
-	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tileno,colour,0);
 }
 
 WRITE16_MEMBER(stlforce_state::stlforce_tx_videoram_w)
@@ -91,7 +91,7 @@ void stlforce_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	const UINT16 *source = m_spriteram+0x0;
 	const UINT16 *finish = m_spriteram+0x800;
-	gfx_element *gfx = machine().gfx[2];
+	gfx_element *gfx = m_gfxdecode->gfx(2);
 	int ypos, xpos, attr, num;
 
 	while (source<finish)

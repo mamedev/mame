@@ -13,7 +13,7 @@ UINT32 comquest_state::screen_update_comquest(screen_device &screen, bitmap_ind1
 	for (y=0; y<128;y++) {
 		for (x=0, j=0; j<8;j++,x+=8*4) {
 #if 0
-			 machine.gfx[0]->opaque(bitmap,0, state->m_data[y][j],0,
+			 m_gfxdecode->gfx(0)->opaque(bitmap,0, state->m_data[y][j],0,
 					0,0,x,y);
 #endif
 		}

@@ -52,7 +52,7 @@ inline void fuuki32_state::get_tile_info8bpp(tile_data &tileinfo, tilemap_memory
 {
 	UINT16 code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
 	UINT16 attr = (m_vram[_N_][tile_index] & 0x0000ffff);
-	SET_TILE_INFO_MEMBER(1 + _N_, code, (attr & 0x3f) >> 4, TILE_FLIPYX((attr >> 6) & 3));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1 + _N_, code, (attr & 0x3f) >> 4, TILE_FLIPYX((attr >> 6) & 3));
 }
 
 TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_0){ get_tile_info8bpp(tileinfo, tile_index, 0); }
@@ -62,7 +62,7 @@ inline void fuuki32_state::get_tile_info4bpp(tile_data &tileinfo, tilemap_memory
 {
 	UINT16 code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
 	UINT16 attr = (m_vram[_N_][tile_index] & 0x0000ffff);
-	SET_TILE_INFO_MEMBER(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
 }
 
 TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_2){ get_tile_info4bpp(tileinfo, tile_index, 2); }
@@ -106,8 +106,8 @@ void fuuki32_state::video_start()
 	m_tilemap[2]->set_transparent_pen(0x0f);    // 4 bits
 	m_tilemap[3]->set_transparent_pen(0x0f);    // 4 bits
 
-	//machine().gfx[1]->set_granularity(16); /* 256 colour tiles with palette selectable on 16 colour boundaries */
-	//machine().gfx[2]->set_granularity(16);
+	//m_gfxdecode->gfx(1)->set_granularity(16); /* 256 colour tiles with palette selectable on 16 colour boundaries */
+	//m_gfxdecode->gfx(2)->set_granularity(16);
 }
 
 
@@ -142,7 +142,7 @@ void fuuki32_state::video_start()
 void fuuki32_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	const rectangle &visarea = screen.visible_area();
 	int max_x = visarea.max_x + 1;

@@ -19,8 +19,19 @@ k037122_device::k037122_device(const machine_config &mconfig, const char *tag, d
 	m_tile_ram(NULL),
 	m_char_ram(NULL),
 	m_reg(NULL),
-	m_gfx_index(0)
+	m_gfx_index(0),
+	m_gfxdecode(*this)
 {
+}
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void k037122_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<k037122_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -50,7 +61,7 @@ void k037122_device::device_start()
 	m_layer[0]->set_transparent_pen(0);
 	m_layer[1]->set_transparent_pen(0);
 
-	machine().gfx[m_gfx_index] = auto_alloc_clear(machine(), gfx_element(machine(), k037122_char_layout, (UINT8*)m_char_ram, machine().total_colors() / 16, 0));
+	m_gfxdecode->set_gfx(m_gfx_index,auto_alloc_clear(machine(), gfx_element(machine(), k037122_char_layout, (UINT8*)m_char_ram, machine().total_colors() / 16, 0)));
 
 	save_pointer(NAME(m_reg), 0x400 / 4);
 	save_pointer(NAME(m_char_ram), 0x200000 / 4);
@@ -85,7 +96,7 @@ TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer0)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, flags);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, m_gfx_index, tile, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer1)
@@ -100,7 +111,7 @@ TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer1)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, flags);
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, m_gfx_index, tile, color, flags);
 }
 
 
@@ -184,7 +195,7 @@ WRITE32_MEMBER( k037122_device::char_w )
 	UINT32 addr = offset + (bank * (0x40000/4));
 
 	COMBINE_DATA(m_char_ram + addr);
-	space.machine().gfx[m_gfx_index]->mark_dirty(addr / 32);
+	m_gfxdecode->gfx(m_gfx_index)->mark_dirty(addr / 32);
 }
 
 READ32_MEMBER( k037122_device::reg_r )

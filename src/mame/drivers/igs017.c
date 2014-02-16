@@ -223,13 +223,13 @@ TILE_GET_INFO_MEMBER(igs017_state::get_fg_tile_info)
 {
 	int code = m_fg_videoram[tile_index*4+0] + (m_fg_videoram[tile_index*4+1] << 8);
 	int attr = m_fg_videoram[tile_index*4+2] + (m_fg_videoram[tile_index*4+3] << 8);
-	SET_TILE_INFO_MEMBER(0, code, COLOR(attr), TILE_FLIPXY( attr >> 5 ));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, COLOR(attr), TILE_FLIPXY( attr >> 5 ));
 }
 TILE_GET_INFO_MEMBER(igs017_state::get_bg_tile_info)
 {
 	int code = m_bg_videoram[tile_index*4+0] + (m_bg_videoram[tile_index*4+1] << 8);
 	int attr = m_bg_videoram[tile_index*4+2] + (m_bg_videoram[tile_index*4+3] << 8);
-	SET_TILE_INFO_MEMBER(0, code, COLOR(attr)+8, TILE_FLIPXY( attr >> 5 ));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, COLOR(attr)+8, TILE_FLIPXY( attr >> 5 ));
 }
 
 WRITE8_MEMBER(igs017_state::fg_w)
@@ -3496,7 +3496,7 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE(igs017)
+	MCFG_GFXDECODE_ADD("gfxdecode", igs017)
 	MCFG_PALETTE_LENGTH(0x100*2)
 
 
@@ -3560,7 +3560,7 @@ static MACHINE_CONFIG_START( mgcs, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE(igs017_flipped)
+	MCFG_GFXDECODE_ADD("gfxdecode", igs017_flipped)
 	MCFG_PALETTE_LENGTH(0x100*2)
 
 
@@ -3601,7 +3601,7 @@ static MACHINE_CONFIG_START( lhzb2, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE(igs017_swapped)
+	MCFG_GFXDECODE_ADD("gfxdecode", igs017_swapped)
 	MCFG_PALETTE_LENGTH(0x100*2)
 
 	// protection
@@ -3644,7 +3644,7 @@ static MACHINE_CONFIG_START( lhzb2a, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE(igs017_swapped)
+	MCFG_GFXDECODE_ADD("gfxdecode", igs017_swapped)
 	MCFG_PALETTE_LENGTH(0x100*2)
 
 
@@ -3675,7 +3675,7 @@ static MACHINE_CONFIG_START( slqz2, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE(igs017)
+	MCFG_GFXDECODE_ADD("gfxdecode", igs017)
 	MCFG_PALETTE_LENGTH(0x100*2)
 
 	// protection
@@ -3721,7 +3721,7 @@ static MACHINE_CONFIG_START( sdmg2, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE(igs017)
+	MCFG_GFXDECODE_ADD("gfxdecode", igs017)
 	MCFG_PALETTE_LENGTH(0x100*2)
 
 
@@ -3772,7 +3772,7 @@ static MACHINE_CONFIG_START( mgdha, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE(igs017_swapped)
+	MCFG_GFXDECODE_ADD("gfxdecode", igs017_swapped)
 	MCFG_PALETTE_LENGTH(0x100*2)
 
 
@@ -3803,7 +3803,7 @@ static MACHINE_CONFIG_START( tjsb, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE(igs017)
+	MCFG_GFXDECODE_ADD("gfxdecode", igs017)
 	MCFG_PALETTE_LENGTH(0x100*2)
 
 
@@ -3837,7 +3837,7 @@ static MACHINE_CONFIG_START( spkrform, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE(igs017)
+	MCFG_GFXDECODE_ADD("gfxdecode", igs017)
 	MCFG_PALETTE_LENGTH(0x100*2)
 
 

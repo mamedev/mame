@@ -100,7 +100,7 @@ void murogmbl_state::video_start()
 
 UINT32 murogmbl_state::screen_update_murogmbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0;
 
 	int y, x;
@@ -188,7 +188,7 @@ static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 	MCFG_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
 	MCFG_CPU_PROGRAM_MAP(murogmbl_map)
 
-	MCFG_GFXDECODE(murogmbl)
+	MCFG_GFXDECODE_ADD("gfxdecode", murogmbl)
 
 
 	/* video hardware */

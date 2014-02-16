@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(lasso_state::lasso_get_bg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,
 					code + ((UINT16)m_gfxbank << 8),
 					color & 0x0f,
 					0);
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(lasso_state::wwjgtin_get_track_tile_info)
 	int code = ROM[tile_index];
 	int color = ROM[tile_index + 0x2000];
 
-	SET_TILE_INFO_MEMBER(2,
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,
 					code,
 					color & 0x0f,
 					0);
@@ -149,7 +149,7 @@ TILE_GET_INFO_MEMBER(lasso_state::pinbo_get_bg_tile_info)
 	int code  = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,
 					code + ((color & 0x30) << 4),
 					color & 0x0f,
 					0);
@@ -301,7 +301,7 @@ void lasso_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		code = source[1] & 0x3f;
 		color = source[2] & 0x0f;
 
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code | ((UINT16)m_gfxbank << 6),
 				color,
 				flipx, flipy,

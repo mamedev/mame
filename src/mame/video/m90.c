@@ -37,7 +37,7 @@ inline void m90_state::get_tile_info(tile_data &tileinfo,int tile_index,int laye
 
 	tile=m_video_data[tile_index];
 	color=m_video_data[tile_index+1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color&0xf,
@@ -52,7 +52,7 @@ inline void m90_state::bomblord_get_tile_info(tile_data &tileinfo,int tile_index
 
 	tile=m_video_data[tile_index];
 	color=m_video_data[tile_index+1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color&0xf,
@@ -67,7 +67,7 @@ inline void m90_state::dynablsb_get_tile_info(tile_data &tileinfo,int tile_index
 
 	tile=m_video_data[tile_index];
 	color=m_video_data[tile_index+1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color&0xf,
@@ -160,7 +160,7 @@ void m90_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const r
 		for (i = 0;i < y_multi;i++)
 
 			if (m_video_control_data[7] & 0x01)
-				machine().gfx[1]->prio_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
@@ -168,7 +168,7 @@ void m90_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const r
 					screen.priority(),
 					(colour & 0x08) ? 0x00 : 0x02,0);
 			else if (m_video_control_data[7] & 0x02)
-				machine().gfx[1]->prio_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
@@ -176,7 +176,7 @@ void m90_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const r
 					screen.priority(),
 					((colour & 0x0c)==0x0c) ? 0x00 : 0x02,0);
 			else
-				machine().gfx[1]->prio_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
@@ -215,7 +215,7 @@ void m90_state::bomblord_draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 		fx = (spriteram16[offs+3] >> 8) & 0x02;
 		fy = (spriteram16[offs+2] >> 8) & 0x80;
 
-		machine().gfx[1]->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 				sprite,
 				colour,
 				fx,fy,
@@ -253,7 +253,7 @@ void m90_state::dynablsb_draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 		fx = (spriteram16[offs+3] >> 8) & 0x02;
 		fy = (spriteram16[offs+2] >> 8) & 0x80;
 
-		machine().gfx[1]->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 				sprite,
 				colour,
 				fx,fy,

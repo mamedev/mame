@@ -454,7 +454,7 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_CPU_IO_MAP(io_map)
 
 
-	MCFG_GFXDECODE(tecmosys)
+	MCFG_GFXDECODE_ADD("gfxdecode", tecmosys)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()

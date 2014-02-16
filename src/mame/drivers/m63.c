@@ -303,14 +303,14 @@ TILE_GET_INFO_MEMBER(m63_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] | ((attr & 0x30) << 4);
 	int color = (attr & 0x0f) + (m_pal_bank << 4);
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(m63_state::get_fg_tile_info)
 {
 	int code = m_videoram2[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, m_fg_flag);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, m_fg_flag);
 }
 
 VIDEO_START_MEMBER(m63_state,m63)
@@ -344,7 +344,7 @@ void m63_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		}
 
 		
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -353,7 +353,7 @@ void m63_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (sx > 0xf0)
 		{
 			
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx - 0x100, sy, 0);
@@ -772,7 +772,7 @@ static MACHINE_CONFIG_START( m63, m63_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
 
-	MCFG_GFXDECODE(m63)
+	MCFG_GFXDECODE_ADD("gfxdecode", m63)
 	MCFG_PALETTE_LENGTH(256+4)
 
 	MCFG_PALETTE_INIT_OVERRIDE(m63_state,m63)
@@ -816,7 +816,7 @@ static MACHINE_CONFIG_START( fghtbskt, m63_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
 
-	MCFG_GFXDECODE(fghtbskt)
+	MCFG_GFXDECODE_ADD("gfxdecode", fghtbskt)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)

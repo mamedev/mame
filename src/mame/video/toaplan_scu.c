@@ -12,8 +12,19 @@ const device_type TOAPLAN_SCU = &device_creator<toaplan_scu_device>;
 
 toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TOAPLAN_SCU, "toaplan_scu_device", tag, owner, clock, "toaplan_scu", __FILE__),
-	m_gfxregion(0)
+	m_gfxregion(0),
+	m_gfxdecode(*this)
 {
+}
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void toaplan_scu_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<toaplan_scu_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 void toaplan_scu_device::device_start()
@@ -64,7 +75,7 @@ void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, U
 			flipx = attribute & 0x100;
 			if (flipx) sx -= 14;        /* should really be 15 */
 			flipy = attribute & 0x200;
-			machine().gfx[m_gfxregion]->transpen_raw(m_temp_spritebitmap,cliprect,
+			m_gfxdecode->gfx(m_gfxregion)->transpen_raw(m_temp_spritebitmap,cliprect,
 				sprite,
 				color << 4 /* << 4 because using _raw */ ,
 				flipx,flipy,
@@ -83,7 +94,7 @@ void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, U
 void toaplan_scu_device::copy_sprites_from_tempbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	int y, x;
-	int colourbase = machine().gfx[m_gfxregion]->colorbase();
+	int colourbase = m_gfxdecode->gfx(m_gfxregion)->colorbase();
 
 	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{

@@ -20,7 +20,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::ld_get_bg_tile_info)
 {
 	int tile = m_scroll2[2 * tile_index] & 0x1fff;
 	int color = m_scroll2[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile,color & 0xf,
 			TILE_FLIPYX((color & 0x60) >> 5));
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::ld_get_fg_tile_info)
 {
 	int tile = m_scroll1[2 * tile_index] & 0x1fff;
 	int color = m_scroll1[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			tile,
 			color & 0xf,
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_bg_tile_info)
 {
 	int tile = m_scroll2[tile_index] & 0x1fff;
 	int color = m_scroll2[tile_index + 0x0800];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile,
 			color & 0xf,
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_fg_tile_info)
 {
 	int tile = m_scroll1[tile_index] & 0x1fff;
 	int color = m_scroll1[tile_index + 0x0800];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			tile,
 			color & 0xf,
@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(lastduel_state::get_fix_info)
 {
 	int tile = m_vram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile & 0x7ff,
 			tile>>12,
@@ -238,7 +238,7 @@ void lastduel_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 
 		
-				machine().gfx[0]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

@@ -119,7 +119,7 @@ WRITE8_MEMBER(warpspeed_state::warpspeed_hardware_w)
 TILE_GET_INFO_MEMBER(warpspeed_state::get_warpspeed_text_tile_info)
 {
 	UINT8 code = m_videoram[tile_index] & 0x3f;
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(warpspeed_state::get_warpspeed_starfield_tile_info)
@@ -129,7 +129,7 @@ TILE_GET_INFO_MEMBER(warpspeed_state::get_warpspeed_starfield_tile_info)
 	{
 		code = memregion("starfield")->base()[tile_index >> 1] & 0x3f;
 	}
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, 0);
 }
 
 WRITE8_MEMBER(warpspeed_state::warpspeed_vidram_w)
@@ -319,7 +319,7 @@ static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(warpspeed_state, screen_update_warpspeed)
 
-	MCFG_GFXDECODE(warpspeed)
+	MCFG_GFXDECODE_ADD("gfxdecode", warpspeed)
 	MCFG_PALETTE_LENGTH(2+8)
 MACHINE_CONFIG_END
 

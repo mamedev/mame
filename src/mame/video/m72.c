@@ -22,7 +22,7 @@ inline void m72_state::m72_get_tile_info(tile_data &tileinfo,int tile_index,cons
 	else pri = 0;
 /* color & 0x10 is used in bchopper and hharry, more priority? */
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			gfxnum,
 			code + ((attr & 0x3f) << 8),
 			color & 0x0f,
@@ -47,7 +47,7 @@ inline void m72_state::rtype2_get_tile_info(tile_data &tileinfo,int tile_index,c
 /* (vram[tile_index+2] & 0x10) is used by majtitle on the green, but it's not clear for what */
 /* (vram[tile_index+3] & 0xfe) are used as well */
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			gfxnum,
 			code,
 			color & 0x0f,
@@ -452,7 +452,7 @@ void m72_state::m72_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				if (flipy) c += h-1-y;
 				else c += y;
 
-				machine().gfx[0]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						c,
 						color,
 						flipx,flipy,
@@ -504,7 +504,7 @@ void m72_state::majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &clip
 				if (flipy) c += h-1-y;
 				else c += y;
 
-				machine().gfx[2]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 						c,
 						color,
 						flipx,flipy,

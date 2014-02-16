@@ -359,7 +359,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_pf_tile_info)
 
 	color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 
@@ -376,7 +376,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::swimmer_get_pf_tile_info)
 	code = ((m_colorram[tile_index] & 0x10) << 4) | m_videoram[tile_index];
 	color = ((*m_swimmer_palettebank & 0x01) << 4) | (m_colorram[tile_index] & 0x0f);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 
@@ -388,7 +388,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::toprollr_get_pf_tile_info)
 	code = ((attr & 0x30) << 4) | m_videoram[tile_index];
 	color = attr & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 
@@ -405,7 +405,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_bs_tile_info)
 	code = ((m_bigsprite_control[1] & 0x08) << 5) | m_bigsprite_videoram[tile_index];
 	color = m_bigsprite_control[1] & 0x07;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, 0);
 }
 
 
@@ -422,7 +422,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::toprollr_get_bs_tile_info)
 	code = ((m_bigsprite_control[1] & 0x18) << 5) | m_bigsprite_videoram[tile_index];
 	color = m_bigsprite_control[1] & 0x07;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, 0);
 }
 
 
@@ -431,7 +431,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::toproller_get_bg_tile_info)
 	int code = ((m_toprollr_bg_coloram[tile_index] & 0x40) << 2) | m_toprollr_bg_videoram[tile_index];
 	int color = m_toprollr_bg_coloram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(3, code, color, TILE_FLIPX);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, code, color, TILE_FLIPX);
 }
 
 
@@ -657,13 +657,13 @@ UINT32 cclimber_state::screen_update_cclimber(screen_device &screen, bitmap_ind1
 	if ((m_bigsprite_control[0] & 0x01))
 	{
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
-		cclimber_draw_sprites(bitmap, cliprect, machine().gfx[1]);
+		cclimber_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 	}
 
 	/* draw the "big sprite" over the regular sprites */
 	else
 	{
-		cclimber_draw_sprites(bitmap, cliprect, machine().gfx[1]);
+		cclimber_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
 	}
 
@@ -691,13 +691,13 @@ UINT32 cclimber_state::screen_update_yamato(screen_device &screen, bitmap_ind16 
 	if ((m_bigsprite_control[0] & 0x01))
 	{
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
-		toprollr_draw_sprites(bitmap, cliprect, machine().gfx[1]);
+		toprollr_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 	}
 
 	/* draw the "big sprite" over the regular sprites */
 	else
 	{
-		toprollr_draw_sprites(bitmap, cliprect, machine().gfx[1]);
+		toprollr_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
 	}
 
@@ -743,13 +743,13 @@ UINT32 cclimber_state::screen_update_swimmer(screen_device &screen, bitmap_ind16
 	if ((m_bigsprite_control[0] & 0x01))
 	{
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
-		swimmer_draw_sprites(bitmap, cliprect, machine().gfx[1]);
+		swimmer_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 	}
 
 	/* draw the "big sprite" over the regular sprites */
 	else
 	{
-		swimmer_draw_sprites(bitmap, cliprect, machine().gfx[1]);
+		swimmer_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
 		cclimber_draw_bigsprite(screen, bitmap, cliprect);
 	}
 
@@ -774,7 +774,7 @@ UINT32 cclimber_state::screen_update_toprollr(screen_device &screen, bitmap_ind1
 	/* draw the "big sprite" over the regular sprites */
 	if ((m_bigsprite_control[1] & 0x20))
 	{
-		toprollr_draw_sprites(bitmap, scroll_area_clip, machine().gfx[1]);
+		toprollr_draw_sprites(bitmap, scroll_area_clip, m_gfxdecode->gfx(1));
 		toprollr_draw_bigsprite(screen, bitmap, scroll_area_clip);
 	}
 
@@ -782,7 +782,7 @@ UINT32 cclimber_state::screen_update_toprollr(screen_device &screen, bitmap_ind1
 	else
 	{
 		toprollr_draw_bigsprite(screen, bitmap, scroll_area_clip);
-		toprollr_draw_sprites(bitmap, scroll_area_clip, machine().gfx[1]);
+		toprollr_draw_sprites(bitmap, scroll_area_clip, m_gfxdecode->gfx(1));
 	}
 
 	m_pf_tilemap->mark_all_dirty();

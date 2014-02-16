@@ -541,7 +541,7 @@ static MACHINE_CONFIG_START( arcadia, arcadia_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 2*XPOS+128-1, 0, 262-1)
 	MCFG_SCREEN_UPDATE_DRIVER(arcadia_state, screen_update_arcadia)
 
-	MCFG_GFXDECODE( arcadia )
+	MCFG_GFXDECODE_ADD("gfxdecode",  arcadia )
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(arcadia_palette))
 
 

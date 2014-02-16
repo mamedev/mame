@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_fg_tile_info)
 	int code = m_fg_vidram[tile_index];
 	int attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code | (attr & 0xf0)<<4,
 			attr&0x0f,
@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_magical_fg_tile_info)
 	int code = m_fg_vidram[tile_index];
 	int attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			(code | (attr & 0xf0)<<4)+m_tile_bank*0x1000,
 			attr&0x0f,
@@ -89,7 +89,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_fg_tile_info)
 	int code = m_fg_vidram[tile_index];
 	int attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code | (attr & 0x0f)<<8,
 			(attr&0xf0)>>4,
@@ -108,7 +108,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel1_tile_info)
 {
 	int code = m_reel1_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			m_bgcolor,
@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel2_tile_info)
 {
 	int code = m_reel2_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			m_bgcolor,
@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel3_tile_info)
 {
 	int code = m_reel3_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			m_bgcolor,
@@ -175,7 +175,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_unkch_reel1_tile_info)
 	int code = m_reel1_ram[tile_index];
 	int attr = m_reel1_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code | (attr & 0x0f)<<8,
 			(attr&0xf0)>>4,
@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_unkch_reel2_tile_info)
 	int code = m_reel2_ram[tile_index];
 	int attr = m_reel2_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code | (attr & 0x0f)<<8,
 			(attr&0xf0)>>4,
@@ -199,7 +199,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_unkch_reel3_tile_info)
 	int code = m_reel3_ram[tile_index];
 	int attr = m_reel3_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code | (attr & 0x0f)<<8,
 			(attr&0xf0)>>4,
@@ -379,7 +379,7 @@ UINT32 goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_ind1
 	{
 		if (memregion("user1")->base())
 		{
-			gfx_element *gfx = machine().gfx[2];
+			gfx_element *gfx = m_gfxdecode->gfx(2);
 			int girlyscroll = (INT8)((m_cm_girl_scroll & 0xf0));
 			int girlxscroll = (INT8)((m_cm_girl_scroll & 0x0f)<<4);
 
@@ -421,7 +421,7 @@ UINT32 goldstar_state::screen_update_bingowng(screen_device &screen, bitmap_ind1
 	{
 		if (memregion("user1")->base())
 		{
-			gfx_element *gfx = machine().gfx[2];
+			gfx_element *gfx = m_gfxdecode->gfx(2);
 			int girlyscroll = (INT8)((m_cm_girl_scroll & 0xf0));
 			int girlxscroll = (INT8)((m_cm_girl_scroll & 0x0f)<<4);
 

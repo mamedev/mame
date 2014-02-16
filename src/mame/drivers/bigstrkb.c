@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( bigstrkb, bigstrkb_state )
 	MCFG_CPU_PROGRAM_MAP(bigstrkb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bigstrkb_state,  irq6_line_hold)
 
-	MCFG_GFXDECODE(bigstrkb)
+	MCFG_GFXDECODE_ADD("gfxdecode", bigstrkb)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

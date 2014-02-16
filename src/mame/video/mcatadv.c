@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info1)
 	int colour = (m_videoram1[tile_index * 2] & 0x3f00) >> 8;
 	int pri = (m_videoram1[tile_index * 2] & 0xc000) >> 14;
 
-	SET_TILE_INFO_MEMBER(0,tileno,colour + m_palette_bank1 * 0x40, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,colour + m_palette_bank1 * 0x40, 0);
 	tileinfo.category = pri;
 }
 
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info2)
 	int colour = (m_videoram2[tile_index * 2] & 0x3f00) >> 8;
 	int pri = (m_videoram2[tile_index * 2] & 0xc000) >> 14;
 
-	SET_TILE_INFO_MEMBER(1, tileno, colour + m_palette_bank2 * 0x40, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, colour + m_palette_bank2 * 0x40, 0);
 	tileinfo.category = pri;
 }
 

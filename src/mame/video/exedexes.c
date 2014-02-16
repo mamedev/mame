@@ -132,14 +132,14 @@ TILE_GET_INFO_MEMBER(exedexes_state::get_bg_tile_info)
 	int color = tilerom[tile_index + (8 * 8)];
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(exedexes_state::get_fg_tile_info)
 {
 	int code = memregion("gfx5")->base()[tile_index];
 
-	SET_TILE_INFO_MEMBER(2, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(exedexes_state::get_tx_tile_info)
@@ -149,7 +149,7 @@ TILE_GET_INFO_MEMBER(exedexes_state::get_tx_tile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(exedexes_state::exedexes_bg_tilemap_scan)
@@ -171,7 +171,7 @@ void exedexes_state::video_start()
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(exedexes_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
-	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, machine().gfx[0], 0xcf);
+	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, m_gfxdecode->gfx(0), 0xcf);
 }
 
 void exedexes_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
@@ -197,7 +197,7 @@ void exedexes_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			sx = buffered_spriteram[offs + 3] - ((buffered_spriteram[offs + 1] & 0x80) << 1);
 			sy = buffered_spriteram[offs + 2];
 
-			machine().gfx[3]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,

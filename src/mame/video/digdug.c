@@ -99,7 +99,7 @@ TILE_GET_INFO_MEMBER(digdug_state::bg_get_tile_info)
 	   tilemap RAM, therefore allowing to pick some bits of the color code from
 	   the top 4 bits of alpha code. This feature is not used by Dig Dug. */
 	int color = m_bg_disable ? 0xf : (code >> 4);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code,
 			color | m_bg_color_bank,
@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(digdug_state::tx_get_tile_info)
 	   timing signals, while x flip is done by selecting the 2nd character set.
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			(code & 0x7f) | (flip_screen() ? 0x80 : 0),
 			color,
@@ -277,14 +277,14 @@ void digdug_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 		{
 			for (x = 0;x <= size;x++)
 			{
-				UINT32 transmask = colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0x1f);
-				machine().gfx[1]->transmask(bitmap,visarea,
+				UINT32 transmask = colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0x1f);
+				m_gfxdecode->gfx(1)->transmask(bitmap,visarea,
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
 					((sx + 16*x) & 0xff), sy + 16*y,transmask);
 				/* wraparound */
-				machine().gfx[1]->transmask(bitmap,visarea,
+				m_gfxdecode->gfx(1)->transmask(bitmap,visarea,
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,

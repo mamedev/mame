@@ -140,7 +140,7 @@ static MACHINE_CONFIG_START( tcl, tcl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tcl_state, screen_update_tcl)
 
-	MCFG_GFXDECODE(tcl)
+	MCFG_GFXDECODE_ADD("gfxdecode", tcl)
 	MCFG_PALETTE_LENGTH(16*16)
 
 

@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(pooyan_state::get_bg_tile_info)
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX(attr >> 6);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 
@@ -171,12 +171,12 @@ void pooyan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		int flipy = spriteram_2[offs] & 0x80;
 
 		
-			machine().gfx[1]->transmask(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 			code,
 			color,
 			flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
+			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0));
 	}
 }
 

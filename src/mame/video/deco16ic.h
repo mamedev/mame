@@ -39,6 +39,10 @@ class deco16ic_device : public device_t,
 public:
 	deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~deco16ic_device() {}
+	
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	
 
 	DECLARE_WRITE16_MEMBER( pf1_data_w );
 	DECLARE_WRITE16_MEMBER( pf2_data_w );
@@ -143,6 +147,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info_b);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info_b);
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 extern const device_type DECO16IC;
@@ -158,5 +163,8 @@ extern const device_type DECO16IC;
 	MCFG_DEVICE_CONFIG(_interface)
 
 #define MCFG_DECO16IC_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
+#define MCFG_DECO16IC_GFXDECODE(_gfxtag) \
+	deco16ic_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif

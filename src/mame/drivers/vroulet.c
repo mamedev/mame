@@ -109,7 +109,7 @@ TILE_GET_INFO_MEMBER(vroulet_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void vroulet_state::video_start()
@@ -121,7 +121,7 @@ void vroulet_state::video_start()
 UINT32 vroulet_state::screen_update_vroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	 machine().gfx[0]->transpen(bitmap,cliprect, 0x320, 1, 0, 0,
+	 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, 0x320, 1, 0, 0,
 		m_ball[1], m_ball[0] - 12, 0);
 	return 0;
 }
@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( vroulet, vroulet_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vroulet_state, screen_update_vroulet)
 
-	MCFG_GFXDECODE(vroulet)
+	MCFG_GFXDECODE_ADD("gfxdecode", vroulet)
 	MCFG_PALETTE_LENGTH(128*4)
 
 

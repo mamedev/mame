@@ -772,7 +772,10 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 
 	MCFG_PALETTE_LENGTH(65536)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	MCFG_K001604_ADD("k001604", racingj_k001604_intf)
+	MCFG_K001604_GFXDECODE("gfxdecode")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -788,6 +791,7 @@ static MACHINE_CONFIG_DERIVED( thrilld, nwktr )
 
 	MCFG_DEVICE_REMOVE("k001604")
 	MCFG_K001604_ADD("k001604", thrilld_k001604_intf)
+	MCFG_K001604_GFXDECODE("gfxdecode")
 MACHINE_CONFIG_END
 
 /*****************************************************************************/

@@ -869,7 +869,7 @@ static MACHINE_CONFIG_START( rallyx, rallyx_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_rallyx)
 
-	MCFG_GFXDECODE(rallyx)
+	MCFG_GFXDECODE_ADD("gfxdecode", rallyx)
 	MCFG_PALETTE_LENGTH(64*4+4)
 
 	MCFG_PALETTE_INIT_OVERRIDE(rallyx_state,rallyx)
@@ -907,7 +907,7 @@ static MACHINE_CONFIG_START( jungler, rallyx_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_jungler)
 
-	MCFG_GFXDECODE(jungler)
+	MCFG_GFXDECODE_ADD("gfxdecode", jungler)
 	MCFG_PALETTE_LENGTH(64*4+4+64)
 
 	MCFG_PALETTE_INIT_OVERRIDE(rallyx_state,jungler)

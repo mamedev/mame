@@ -119,7 +119,7 @@ void egghunt_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect
 			sx = 496 - sx;
 			sy = 240 - sy;
 		}
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipscreen,flipscreen,
@@ -142,7 +142,7 @@ TILE_GET_INFO_MEMBER(egghunt_state::get_bg_tile_info)
 //          code += 0;
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, colour, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, colour, 0);
 }
 
 READ8_MEMBER(egghunt_state::egghunt_bgram_r)
@@ -426,7 +426,7 @@ static MACHINE_CONFIG_START( egghunt, egghunt_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(egghunt_state, screen_update_egghunt)
 
-	MCFG_GFXDECODE(egghunt)
+	MCFG_GFXDECODE_ADD("gfxdecode", egghunt)
 	MCFG_PALETTE_LENGTH(0x400)
 
 

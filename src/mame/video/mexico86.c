@@ -85,7 +85,7 @@ UINT32 mexico86_state::screen_update_mexico86(screen_device &screen, bitmap_ind1
 				x = (sx + xc * 8) & 0xff;
 				y = (sy + yc * 8) & 0xff;
 
-				machine().gfx[0]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,
@@ -143,7 +143,7 @@ UINT32 mexico86_state::screen_update_kikikai(screen_device &screen, bitmap_ind16
 			color = (m_videoram[goffs + 1] & 0xe0) >> 5;
 			goffs += 0x40;
 
-			machine().gfx[0]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					0,0,
@@ -152,7 +152,7 @@ UINT32 mexico86_state::screen_update_kikikai(screen_device &screen, bitmap_ind16
 			code = m_videoram[goffs] + ((m_videoram[goffs + 1] & 0x1f) << 8);
 			color = (m_videoram[goffs + 1] & 0xe0) >> 5;
 
-			machine().gfx[0]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					0,0,

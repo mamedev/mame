@@ -489,7 +489,7 @@ static MACHINE_CONFIG_START( shangha3, shangha3_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 
-	MCFG_GFXDECODE(shangha3)
+	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -528,7 +528,7 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 
-	MCFG_GFXDECODE(shangha3)
+	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 
-	MCFG_GFXDECODE(shangha3)
+	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
 	MCFG_PALETTE_LENGTH(2048)
 
 

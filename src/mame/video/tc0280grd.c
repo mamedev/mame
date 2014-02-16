@@ -30,9 +30,21 @@ tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, TC0280GRD, "Taito TC0280GRD & TC0430GRW", tag, owner, clock, "tc0280grd", __FILE__),
 	m_ram(NULL),
 	//m_ctrl[8](0),
-	m_base_color(0)
+	m_base_color(0),
+	m_gfxdecode(*this)
 {
 }
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void tc0280grd_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<tc0280grd_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -87,7 +99,7 @@ void tc0280grd_device::device_reset()
 TILE_GET_INFO_MEMBER(tc0280grd_device::tc0280grd_get_tile_info)
 {
 	int attr = m_ram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			m_gfxnum,
 			attr & 0x3fff,
 			((attr & 0xc000) >> 14) + m_base_color,

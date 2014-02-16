@@ -108,7 +108,7 @@ static MACHINE_CONFIG_START( hideseek, hideseek_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hideseek_state, screen_update_hideseek)
 
 	MCFG_PALETTE_LENGTH(0x10000)
-	MCFG_GFXDECODE(hideseek)
+	MCFG_GFXDECODE_ADD("gfxdecode", hideseek)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 

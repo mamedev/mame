@@ -10,7 +10,7 @@
 
 TILE_GET_INFO_MEMBER(tecmosys_state::get_bg0tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			m_bg0tilemap_ram[2*tile_index+1],
 			(m_bg0tilemap_ram[2*tile_index]&0x3f),
@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(tecmosys_state::get_bg0tile_info)
 
 TILE_GET_INFO_MEMBER(tecmosys_state::get_bg1tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			m_bg1tilemap_ram[2*tile_index+1],
 			(m_bg1tilemap_ram[2*tile_index]&0x3f),
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(tecmosys_state::get_bg1tile_info)
 
 TILE_GET_INFO_MEMBER(tecmosys_state::get_bg2tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			m_bg2tilemap_ram[2*tile_index+1],
 			(m_bg2tilemap_ram[2*tile_index]&0x3f),
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(tecmosys_state::get_bg2tile_info)
 
 TILE_GET_INFO_MEMBER(tecmosys_state::get_fg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_fgtilemap_ram[2*tile_index+1],
 			(m_fgtilemap_ram[2*tile_index]&0x3f),

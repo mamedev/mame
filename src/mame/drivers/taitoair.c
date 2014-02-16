@@ -717,11 +717,12 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoair_state, screen_update_taitoair)
 
-	MCFG_GFXDECODE(airsys)
+	MCFG_GFXDECODE_ADD("gfxdecode", airsys)
 	MCFG_PALETTE_LENGTH(512*16+512*16)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 	MCFG_TC0080VCO_ADD("tc0080vco", airsys_tc0080vco_intf)
+	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -16,7 +16,7 @@ TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 
 	tileno = memregion("user1")->base()[tile_index];
 	palno = 0x18; //memregion("user2")->base()[tile_index] >> 3;
-	SET_TILE_INFO_MEMBER(2, tileno, palno, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, tileno, palno, 0);
 }
 
 
@@ -159,7 +159,7 @@ UINT32 fcombat_state::screen_update_fcombat(screen_device &screen, bitmap_ind16 
 		int code2 = code;
 
 		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (m_sprite_palette * 16);
-				gfx_element *gfx = machine().gfx[1];
+				gfx_element *gfx = m_gfxdecode->gfx(1);
 
 		if (m_cocktail_flip)
 		{
@@ -201,7 +201,7 @@ UINT32 fcombat_state::screen_update_fcombat(screen_device &screen, bitmap_ind16 
 			int y = m_cocktail_flip ? (31 * 8 - 8 * sy) : 8 * sy;
 
 			offs = sx + sy * 64;
-			 machine().gfx[0]->transpen(bitmap,cliprect,
+			 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				m_videoram[offs] + 256 * m_char_bank,
 				((m_videoram[offs] & 0xf0) >> 4) + m_char_palette * 16,
 				m_cocktail_flip, m_cocktail_flip, x, y, 0);

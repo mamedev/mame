@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(hcastle_state::get_fg_tile_info)
 				((attr >> (bit2    )) & 0x08) |
 				((attr >> (bit3 - 1)) & 0x10);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile + bank * 0x100 + m_pf1_bankbase,
 			((ctrl_6 & 0x30) * 2 + 16) + color,
@@ -110,7 +110,7 @@ TILE_GET_INFO_MEMBER(hcastle_state::get_bg_tile_info)
 				((attr >> (bit2    )) & 0x08) |
 				((attr >> (bit3 - 1)) & 0x10);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile + bank * 0x100 + m_pf2_bankbase,
 			((ctrl_6 & 0x30) * 2 + 16) + color,
@@ -204,7 +204,7 @@ void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	int base_color = (k007121->ctrlram_r(space, 6) & 0x30) * 2;
 	int bank_base = (bank == 0) ? 0x4000 * (m_gfx_bank & 1) : 0;
 
-	k007121->sprites_draw(bitmap, cliprect, machine().gfx[bank], machine().colortable, sbank, base_color, 0, bank_base, priority_bitmap, (UINT32)-1);
+	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(bank), machine().colortable, sbank, base_color, 0, bank_base, priority_bitmap, (UINT32)-1);
 }
 
 /*****************************************************************************/

@@ -110,7 +110,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0a)
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
 	code    =   m_vram_0[ tile_index * 2 + 0x40 ];
 //  color   =   m_vram_0[ tile_index * 2 + 0x41 ];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			0,
@@ -123,7 +123,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0b)
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
 	code    =   m_vram_0[ tile_index * 2 + 0x00 ];
 //  color   =   m_vram_0[ tile_index * 2 + 0x01 ];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			0,
@@ -179,7 +179,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_fb1)
 	UINT8 code  =   m_vram_1[ tile_index + 0x000 ];
 	UINT8 color =   m_vram_1[ tile_index + 0x400 ] & 0x3f;
 	tileinfo.group = color;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code,
 			color,
@@ -190,7 +190,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_1)
 {
 	UINT8 code  =   m_vram_1[ tile_index + 0x000 ];
 	UINT8 color =   m_vram_1[ tile_index + 0x400 ];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code + ((color & 0xf0)<<4),
 			color & 0x0f,
@@ -224,7 +224,7 @@ VIDEO_START_MEMBER(clshroad_state,firebatl)
 	m_tilemap_0b->set_scrolldx(-0x30, -0xb5);
 
 	m_tilemap_0b->set_transparent_pen(0 );
-	colortable_configure_tilemap_groups(machine().colortable, m_tilemap_1, machine().gfx[2], 0x0f);
+	colortable_configure_tilemap_groups(machine().colortable, m_tilemap_1, m_gfxdecode->gfx(2), 0x0f);
 }
 
 VIDEO_START_MEMBER(clshroad_state,clshroad)
@@ -303,7 +303,7 @@ void clshroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				attr & 0x0f,
 				flipx,flipy,

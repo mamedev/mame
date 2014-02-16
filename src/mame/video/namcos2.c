@@ -49,7 +49,7 @@ WRITE16_MEMBER( namcos2_state::gfx_ctrl_w )
 TILE_GET_INFO_MEMBER( namcos2_state::roz_tile_info )
 {
 	int tile = m_rozram[tile_index];
-	SET_TILE_INFO_MEMBER(3,tile,0/*color*/,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3,tile,0/*color*/,0);
 } /* roz_tile_info */
 
 struct RozParam

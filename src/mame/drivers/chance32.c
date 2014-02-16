@@ -70,7 +70,7 @@ TILE_GET_INFO_MEMBER(chance32_state::get_fg_tile_info)
 {
 	int code = (m_fgram[tile_index * 2 + 1] << 8) | m_fgram[tile_index * 2];
 	int flip = (~code >> 12)&1;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code & 0x0fff,
 			code >> 13,
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(chance32_state::get_bg_tile_info)
 {
 	int code = (m_bgram[tile_index * 2 +1] << 8) | m_bgram[tile_index * 2];
 	int flip = (~code >> 12)&1;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code & 0x0fff,
 			code >> 13,
@@ -476,7 +476,7 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 12000000/16, mc6845_intf)   /* 52.786 Hz (similar to Major Poker) */
 
-	MCFG_GFXDECODE(chance32)
+	MCFG_GFXDECODE_ADD("gfxdecode", chance32)
 	MCFG_PALETTE_LENGTH(0x800)
 
 

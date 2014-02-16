@@ -452,14 +452,14 @@ TILE_GET_INFO_MEMBER(gstream_state::get_gs1_tile_info)
 {
 	int tileno = (m_vram[tile_index + 0x000 / 4] & 0x0fff0000) >> 16;
 	int palette = (m_vram[tile_index + 0x000 / 4] & 0xc0000000) >> 30;
-	SET_TILE_INFO_MEMBER(0, tileno, palette + 0x10, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, palette + 0x10, 0);
 }
 
 TILE_GET_INFO_MEMBER(gstream_state::get_gs2_tile_info)
 {
 	int tileno = (m_vram[tile_index + 0x400 / 4] & 0x0fff0000) >> 16;
 	int palette = (m_vram[tile_index + 0x400 / 4] & 0xc0000000) >> 30;
-	SET_TILE_INFO_MEMBER(0, tileno + 0x1000, palette + 0x14, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno + 0x1000, palette + 0x14, 0);
 }
 
 
@@ -467,7 +467,7 @@ TILE_GET_INFO_MEMBER(gstream_state::get_gs3_tile_info)
 {
 	int tileno = (m_vram[tile_index + 0x800 / 4] & 0x0fff0000) >> 16;
 	int palette = (m_vram[tile_index + 0x800 / 4] & 0xc0000000) >> 30;
-	SET_TILE_INFO_MEMBER(0, tileno + 0x2000, palette + 0x18, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno + 0x2000, palette + 0x18, 0);
 }
 
 
@@ -526,7 +526,7 @@ UINT32 gstream_state::screen_update_gstream(screen_device &screen, bitmap_ind16 
 		if (x & 0x8000) x -= 0x10000;
 		if (y & 0x8000) y -= 0x10000;
 
-		machine().gfx[1]->transpen(bitmap,cliprect,code,col,0,0,x-2,y,0);
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,code,col,0,0,x-2,y,0);
 	}
 
 	return 0;
@@ -577,7 +577,7 @@ static MACHINE_CONFIG_START( gstream, gstream_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update_gstream)
 
 	MCFG_PALETTE_LENGTH(0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
-	MCFG_GFXDECODE(gstream)
+	MCFG_GFXDECODE_ADD("gfxdecode", gstream)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

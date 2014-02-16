@@ -1064,7 +1064,7 @@ static MACHINE_CONFIG_START( wecleman, wecleman_state )
 	MCFG_SCREEN_VISIBLE_AREA(0 +8, 320-1 +8, 0 +8, 224-1 +8)
 	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_wecleman)
 
-	MCFG_GFXDECODE(wecleman)
+	MCFG_GFXDECODE_ADD("gfxdecode", wecleman)
 
 	MCFG_PALETTE_LENGTH(2048)
 
@@ -1148,13 +1148,16 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_hotchase)
 
-	MCFG_GFXDECODE(hotchase)
+	MCFG_GFXDECODE_ADD("gfxdecode", hotchase)
 	MCFG_PALETTE_LENGTH(2048*2)
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state,hotchase)
 
 	MCFG_K051316_ADD("k051316_1", hotchase_k051316_intf_0)
+	MCFG_K051316_GFXDECODE("gfxdecode")
+	
 	MCFG_K051316_ADD("k051316_2", hotchase_k051316_intf_1)
+	MCFG_K051316_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -315,7 +315,7 @@ static MACHINE_CONFIG_START( aquarium, aquarium_state )
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 42*8-1, 2*8, 34*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aquarium_state, screen_update_aquarium)
 
-	MCFG_GFXDECODE(aquarium)
+	MCFG_GFXDECODE_ADD("gfxdecode", aquarium)
 	MCFG_PALETTE_LENGTH(0x1000/2)
 
 

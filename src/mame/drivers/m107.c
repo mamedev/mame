@@ -776,7 +776,7 @@ static MACHINE_CONFIG_START( firebarr, m107_state )
 	MCFG_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
 	MCFG_SCREEN_UPDATE_DRIVER(m107_state, screen_update_m107)
 
-	MCFG_GFXDECODE(firebarr)
+	MCFG_GFXDECODE_ADD("gfxdecode", firebarr)
 	MCFG_PALETTE_LENGTH(2048)
 
 
@@ -803,7 +803,7 @@ static MACHINE_CONFIG_DERIVED( dsoccr94, firebarr )
 	MCFG_V25_CONFIG(dsoccr94_decryption_table)
 
 	/* video hardware */
-	MCFG_GFXDECODE(m107)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
 MACHINE_CONFIG_END
 
 

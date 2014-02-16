@@ -2015,6 +2015,7 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2024,7 +2025,7 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_lastmisn)
 
-	MCFG_GFXDECODE(shackled)
+	MCFG_GFXDECODE_ADD("gfxdecode", shackled)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
@@ -2064,6 +2065,7 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2073,7 +2075,7 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_shackled)
 
-	MCFG_GFXDECODE(shackled)
+	MCFG_GFXDECODE_ADD("gfxdecode", shackled)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,shackled)
@@ -2112,6 +2114,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2122,7 +2125,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_gondo)
 	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
 
-	MCFG_GFXDECODE(gondo)
+	MCFG_GFXDECODE_ADD("gfxdecode", gondo)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,gondo)
@@ -2161,6 +2164,7 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2171,7 +2175,7 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_garyoret)
 	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
 
-	MCFG_GFXDECODE(gondo)
+	MCFG_GFXDECODE_ADD("gfxdecode", gondo)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,garyoret)
@@ -2210,9 +2214,11 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,2,2,0);
+	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2223,7 +2229,7 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_ghostb)
 	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
 
-	MCFG_GFXDECODE(ghostb)
+	MCFG_GFXDECODE_ADD("gfxdecode", ghostb)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_PALETTE_INIT_OVERRIDE(dec8_state,ghostb)
@@ -2269,6 +2275,7 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2278,7 +2285,7 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_lastmisn)
 
-	MCFG_GFXDECODE(shackled)
+	MCFG_GFXDECODE_ADD("gfxdecode", shackled)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,lastmisn)
@@ -2322,9 +2329,11 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,2,2,0);
+	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen_mxc", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 1);
+	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2334,7 +2343,7 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_oscar)
 
-	MCFG_GFXDECODE(oscar)
+	MCFG_GFXDECODE_ADD("gfxdecode", oscar)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,oscar)
@@ -2376,7 +2385,7 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_srdarwin)
 
-	MCFG_GFXDECODE(srdarwin)
+	MCFG_GFXDECODE_ADD("gfxdecode", srdarwin)
 	MCFG_PALETTE_LENGTH(144)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,srdarwin)
@@ -2412,11 +2421,14 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,2,2,0);
+	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,3,3,0);
+	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen_mxc", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 1);
+	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2427,7 +2439,7 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_cobracom)
 
-	MCFG_GFXDECODE(cobracom)
+	MCFG_GFXDECODE_ADD("gfxdecode", cobracom)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,cobracom)

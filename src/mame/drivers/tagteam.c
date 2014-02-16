@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( tagteam, tagteam_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tagteam_state, screen_update_tagteam)
 
-	MCFG_GFXDECODE(tagteam)
+	MCFG_GFXDECODE_ADD("gfxdecode", tagteam)
 	MCFG_PALETTE_LENGTH(32)
 
 

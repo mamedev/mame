@@ -811,7 +811,7 @@ static MACHINE_CONFIG_START( base, exidy_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_GFXDECODE(exidy)
+	MCFG_GFXDECODE_ADD("gfxdecode", exidy)
 	MCFG_PALETTE_LENGTH(8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

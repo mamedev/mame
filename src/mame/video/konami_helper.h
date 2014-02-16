@@ -25,7 +25,7 @@ void konamid_rom_deinterleave_2_half(running_machine &machine, const char *mem_r
 void konamid_rom_deinterleave_4(running_machine &machine, const char *mem_region);
 
 
-void konami_decode_gfx(running_machine &machine, int gfx_index, UINT8 *data, UINT32 total, const gfx_layout *layout, int bpp);
+void konami_decode_gfx(running_machine &machine, gfxdecode_device * gfxdecode, int gfx_index, UINT8 *data, UINT32 total, const gfx_layout *layout, int bpp);
 void konami_deinterleave_gfx(running_machine &machine, const char *gfx_memory_region, int deinterleave);
 
 /* helper function to sort three tile layers by priority order */

@@ -2655,7 +2655,7 @@ static MACHINE_CONFIG_START( sys903, calomega_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 31*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(calomega_state, screen_update_calomega)
 
-	MCFG_GFXDECODE(calomega)
+	MCFG_GFXDECODE_ADD("gfxdecode", calomega)
 	MCFG_PALETTE_LENGTH(1024)
 
 
@@ -2729,7 +2729,7 @@ static MACHINE_CONFIG_DERIVED( sys906, sys903 )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(calomega_state, pia1_aout_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(calomega_state, pia1_bout_w))
 
-	MCFG_GFXDECODE(sys906)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", sys906)
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay8912")

@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_targeth_screen0)
 	int data2 = m_videoram[(tile_index << 1) + 1];
 	int code = data & 0x3fff;
 
-	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
 }
 
 TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_targeth_screen1)
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_targeth_screen1)
 	int data2 = m_videoram[(0x2000/2) + (tile_index << 1) + 1];
 	int code = data & 0x3fff;
 
-	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
 }
 
 /***************************************************************************
@@ -104,7 +104,7 @@ void targeth_state::video_start()
 void targeth_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	for (i = 3; i < (0x1000 - 6)/2; i += 4){
 		int sx = m_spriteram[i+2] & 0x03ff;

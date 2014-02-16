@@ -217,7 +217,7 @@ static MACHINE_CONFIG_START( fastlane, fastlane_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fastlane_state, screen_update_fastlane)
 
-	MCFG_GFXDECODE(fastlane)
+	MCFG_GFXDECODE_ADD("gfxdecode", fastlane)
 	MCFG_PALETTE_LENGTH(1024*16)
 
 	MCFG_K007121_ADD("k007121")

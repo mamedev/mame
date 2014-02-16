@@ -203,7 +203,7 @@ TILE_GET_INFO_MEMBER(psychic5_state::get_bg_tile_info)
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(psychic5_state::get_fg_tile_info)
@@ -214,7 +214,7 @@ TILE_GET_INFO_MEMBER(psychic5_state::get_fg_tile_info)
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
-	SET_TILE_INFO_MEMBER(2, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, flags);
 }
 
 
@@ -293,7 +293,7 @@ VIDEO_RESET_MEMBER(psychic5_state,bombsa)
   Screen refresh
 ***************************************************************************/
 
-#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(bitmap, cliprect, machine().gfx[0], code, color, flipx, flipy, sx, sy, 15);
+#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(bitmap, cliprect, m_gfxdecode->gfx(0), code, color, flipx, flipy, sx, sy, 15);
 
 void psychic5_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

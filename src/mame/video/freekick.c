@@ -10,7 +10,7 @@ TILE_GET_INFO_MEMBER(freekick_state::get_freek_tile_info)
 
 	tileno = m_videoram[tile_index] + ((m_videoram[tile_index + 0x400] & 0xe0) << 3);
 	palno = m_videoram[tile_index + 0x400] & 0x1f;
-	SET_TILE_INFO_MEMBER(0, tileno, palno, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, palno, 0);
 }
 
 
@@ -51,7 +51,7 @@ void freekick_state::gigas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 			flipy = !flipy;
 		}
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -85,7 +85,7 @@ void freekick_state::pbillrd_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -120,7 +120,7 @@ void freekick_state::freekick_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 			flipy = !flipy;
 		}
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

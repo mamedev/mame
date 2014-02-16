@@ -203,7 +203,7 @@ GFXDECODE_END
 TILE_GET_INFO_MEMBER(dynadice_state::get_tile_info)
 {
 	int code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, 0);
 }
 
 void dynadice_state::video_start()
@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( dynadice, dynadice_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 3*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynadice_state, screen_update_dynadice)
 
-	MCFG_GFXDECODE(dynadice)
+	MCFG_GFXDECODE_ADD("gfxdecode", dynadice)
 	MCFG_PALETTE_LENGTH(8)
 
 

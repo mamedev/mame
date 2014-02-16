@@ -202,7 +202,7 @@ static MACHINE_CONFIG_START( ut88, ut88_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ut88_state, screen_update_ut88)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
-	MCFG_GFXDECODE( ut88 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  ut88 )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

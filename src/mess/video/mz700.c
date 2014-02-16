@@ -62,7 +62,7 @@ UINT32 mz_state::screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap
 		color = m_colorram[offs];
 		code = videoram[offs] | (color & 0x80) << 1;
 
-		 machine().gfx[0]->opaque(bitmap,cliprect, code, color, 0, 0, sx, sy);
+		 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, code, color, 0, 0, sx, sy);
 	}
 
 	return 0;
@@ -75,7 +75,7 @@ UINT32 mz_state::screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap
 
 VIDEO_START_MEMBER(mz_state,mz800)
 {
-	machine().gfx[0]->set_source(m_cgram);
+	m_gfxdecode->gfx(0)->set_source(m_cgram);
 }
 
 UINT32 mz_state::screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -124,5 +124,5 @@ WRITE8_MEMBER(mz_state::mz800_cgram_w)
 {
 	m_cgram[offset] = data;
 
-	machine().gfx[0]->mark_dirty(offset/8);
+	m_gfxdecode->gfx(0)->mark_dirty(offset/8);
 }

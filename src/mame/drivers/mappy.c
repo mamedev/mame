@@ -1719,7 +1719,7 @@ static MACHINE_CONFIG_FRAGMENT( superpac_common )
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,superpac)
 
 	/* video hardware */
-	MCFG_GFXDECODE(superpac)
+	MCFG_GFXDECODE_ADD("gfxdecode", superpac)
 	MCFG_PALETTE_LENGTH(64*4+64*4)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1799,7 +1799,7 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_NAMCO56XX_ADD("namcoio_2", intf1_interleave)
 
 	/* video hardware */
-	MCFG_GFXDECODE(phozon)
+	MCFG_GFXDECODE_ADD("gfxdecode", phozon)
 	MCFG_PALETTE_LENGTH(64*4+64*4)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1836,7 +1836,7 @@ static MACHINE_CONFIG_FRAGMENT( mappy_common )
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,mappy)
 
 	/* video hardware */
-	MCFG_GFXDECODE(mappy)
+	MCFG_GFXDECODE_ADD("gfxdecode", mappy)
 	MCFG_PALETTE_LENGTH(64*4+16*16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1878,7 +1878,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( todruaga, digdug2 )
 
 	/* video hardware */
-	MCFG_GFXDECODE(todruaga)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", todruaga)
 	MCFG_PALETTE_LENGTH(64*4+64*16)
 MACHINE_CONFIG_END
 

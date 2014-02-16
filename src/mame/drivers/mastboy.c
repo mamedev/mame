@@ -492,7 +492,7 @@ public:
 
 void mastboy_state::video_start()
 {
-	machine().gfx[0]->set_source(m_vram);
+	m_gfxdecode->gfx(0)->set_source(m_vram);
 }
 
 UINT32 mastboy_state::screen_update_mastboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -518,12 +518,12 @@ UINT32 mastboy_state::screen_update_mastboy(screen_device &screen, bitmap_ind16 
 
 			if (tileno&0x800)
 			{
-				gfx = machine().gfx[1];
+				gfx = m_gfxdecode->gfx(1);
 				tileno &=0x7ff;
 			}
 			else
 			{
-				gfx = machine().gfx[0];
+				gfx = m_gfxdecode->gfx(0);
 			}
 
 
@@ -596,7 +596,7 @@ WRITE8_MEMBER(mastboy_state::banked_ram_w)
 			m_vram[offs] = data^0xff;
 
 			/* Decode the new tile */
-			machine().gfx[0]->mark_dirty(offs/32);
+			m_gfxdecode->gfx(0)->mark_dirty(offs/32);
 		}
 	}
 	else
@@ -900,7 +900,7 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mastboy_state, screen_update_mastboy)
 
-	MCFG_GFXDECODE(mastboy)
+	MCFG_GFXDECODE_ADD("gfxdecode", mastboy)
 	MCFG_PALETTE_LENGTH(0x100)
 
 

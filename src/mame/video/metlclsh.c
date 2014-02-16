@@ -69,7 +69,7 @@ TILEMAP_MAPPER_MEMBER(metlclsh_state::metlclsh_bgtilemap_scan)
 
 TILE_GET_INFO_MEMBER(metlclsh_state::get_bg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(1, m_bgram[tile_index] + (m_gfxbank << 7), 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, m_bgram[tile_index] + (m_gfxbank << 7), 0, 0);
 }
 
 WRITE8_MEMBER(metlclsh_state::metlclsh_bgram_w)
@@ -112,7 +112,7 @@ TILE_GET_INFO_MEMBER(metlclsh_state::get_fg_tile_info)
 {
 	UINT8 code = m_fgram[tile_index + 0x000];
 	UINT8 attr = m_fgram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(2, code + ((attr & 0x03) << 8), (attr >> 5) & 3, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code + ((attr & 0x03) << 8), (attr >> 5) & 3, 0);
 	tileinfo.category = ((attr & 0x80) ? 1 : 2);
 }
 
@@ -166,7 +166,7 @@ void metlclsh_state::video_start()
 void metlclsh_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	UINT8 *spriteram = m_spriteram;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int offs;
 
 	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)

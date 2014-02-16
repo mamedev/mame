@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( dragrace, dragrace_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(dragrace_state, screen_update_dragrace)
 
-	MCFG_GFXDECODE(dragrace)
+	MCFG_GFXDECODE_ADD("gfxdecode", dragrace)
 	MCFG_PALETTE_LENGTH(16)
 
 	/* sound hardware */

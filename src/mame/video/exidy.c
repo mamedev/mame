@@ -216,7 +216,7 @@ void exidy_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	int sx = 236 - *m_sprite2_xpos - 4;
 	int sy = 244 - *m_sprite2_ypos - 4;
 
-	 machine().gfx[0]->transpen(bitmap,cliprect,
+	 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 			((*m_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 1,
 			0, 0, sx, sy, 0);
 
@@ -230,7 +230,7 @@ void exidy_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 		if (sy < 0) sy = 0;
 
-		 machine().gfx[0]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				(*m_spriteno & 0x0f) + 16 * sprite_set_1, 0,
 				0, 0, sx, sy, 0);
 	}
@@ -295,7 +295,7 @@ void exidy_state::check_collision()
 	{
 		org_1_x = 236 - *m_sprite1_xpos - 4;
 		org_1_y = 244 - *m_sprite1_ypos - 4;
-		 machine().gfx[0]->transpen(m_motion_object_1_vid,clip,
+		 m_gfxdecode->gfx(0)->transpen(m_motion_object_1_vid,clip,
 				(*m_spriteno & 0x0f) + 16 * sprite_set_1, 0,
 				0, 0, 0, 0, 0);
 	}
@@ -304,7 +304,7 @@ void exidy_state::check_collision()
 	m_motion_object_2_vid.fill(0xff, clip);
 	org_2_x = 236 - *m_sprite2_xpos - 4;
 	org_2_y = 244 - *m_sprite2_ypos - 4;
-	 machine().gfx[0]->transpen(m_motion_object_2_vid,clip,
+	 m_gfxdecode->gfx(0)->transpen(m_motion_object_2_vid,clip,
 			((*m_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 0,
 			0, 0, 0, 0, 0);
 
@@ -314,7 +314,7 @@ void exidy_state::check_collision()
 	{
 		sx = org_2_x - org_1_x;
 		sy = org_2_y - org_1_y;
-		 machine().gfx[0]->transpen(m_motion_object_2_clip,clip,
+		 m_gfxdecode->gfx(0)->transpen(m_motion_object_2_clip,clip,
 				((*m_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 0,
 				0, 0, sx, sy, 0);
 	}

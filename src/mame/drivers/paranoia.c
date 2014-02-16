@@ -201,7 +201,7 @@ static MACHINE_CONFIG_START( paranoia, paranoia_state )
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
 	MCFG_SCREEN_UPDATE_STATIC( pce )
 
-	/* MCFG_GFXDECODE( pce_gfxdecodeinfo ) */
+	/* MCFG_GFXDECODE_ADD("gfxdecode",  pce_gfxdecodeinfo ) */
 	MCFG_PALETTE_LENGTH(1024)
 	MCFG_PALETTE_INIT( vce )
 

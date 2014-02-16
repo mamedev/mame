@@ -20,6 +20,9 @@ public:
 	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k051316_device() {}
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+
 	/*
 	The callback is passed:
 	- code (range 00-FF, contents of the first tilemap RAM byte)
@@ -49,6 +52,7 @@ private:
 	UINT8    *m_ram;
 	tilemap_t  *m_tmap;
 	UINT8    m_ctrlram[16];
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	void get_tile_info( tile_data &tileinfo, int tile_index );
@@ -60,4 +64,6 @@ extern const device_type K051316;
 	MCFG_DEVICE_ADD(_tag, K051316, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
+#define MCFG_K051316_GFXDECODE(_gfxtag) \
+	k051316_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 #endif

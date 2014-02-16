@@ -242,11 +242,12 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tail2nos_state, screen_update_tail2nos)
 
-	MCFG_GFXDECODE(tail2nos)
+	MCFG_GFXDECODE_ADD("gfxdecode", tail2nos)
 	MCFG_PALETTE_LENGTH(2048)
 
 
 	MCFG_K051316_ADD("k051316", tail2nos_k051316_intf)
+	MCFG_K051316_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

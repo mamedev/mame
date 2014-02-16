@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(bogeyman_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] & 0x7f;
 	int color = (attr >> 1) & 0x07;
 
-	SET_TILE_INFO_MEMBER(gfxbank, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, gfxbank, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(bogeyman_state::get_fg_tile_info)
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(bogeyman_state::get_fg_tile_info)
 	int gfxbank = tile / 0x200;
 	int code = tile & 0x1ff;
 
-	SET_TILE_INFO_MEMBER(gfxbank, code, m_colbank, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, gfxbank, code, m_colbank, 0);
 }
 
 void bogeyman_state::video_start()
@@ -123,7 +123,7 @@ void bogeyman_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			}
 
 			
-				machine().gfx[2]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code, color,
 				flipx, flipy,
 				sx, sy, 0);
@@ -131,7 +131,7 @@ void bogeyman_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			if (multi)
 			{
 				
-					machine().gfx[2]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code + 1, color,
 					flipx, flipy,
 					sx, sy + (flip_screen() ? -16 : 16), 0);

@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( homez80, homez80_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 344-1, 0, 32*8-1)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
-	MCFG_GFXDECODE( homez80 )
+	MCFG_GFXDECODE_ADD("gfxdecode",  homez80 )
 MACHINE_CONFIG_END
 
 /* ROM definition */

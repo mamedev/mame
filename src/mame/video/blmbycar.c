@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(blmbycar_state::get_tile_info_0)
 {
 	UINT16 code = m_vram_0[tile_index * 2 + 0];
 	UINT16 attr = m_vram_0[tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			attr & 0x1f,
@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(blmbycar_state::get_tile_info_1)
 {
 	UINT16 code = m_vram_1[tile_index * 2 + 0];
 	UINT16 attr = m_vram_1[tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code,
 			attr & 0x1f,
@@ -191,7 +191,7 @@ void blmbycar_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		x   = (x & 0x1ff) - 0x10;
 		y   = 0xf0 - ((y & 0xff)  - (y & 0x100));
 
-		machine().gfx[0]->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 					code,
 					0x20 + (attr & 0xf),
 					flipx, flipy,

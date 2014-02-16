@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(tunhunt_state::get_fg_tile_info)
 	int color = attr >> 6;
 	int flags = color ? TILE_FORCE_LAYER0 : 0;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 void tunhunt_state::video_start()
@@ -337,7 +337,7 @@ void tunhunt_state::draw_shell(bitmap_ind16 &bitmap,
 			for( sy=0; sy<256; sy+=16 )
 			{
 				
-					machine().gfx[1]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					picture_code,
 					0, /* color */
 					0,0, /* flip */
@@ -362,7 +362,7 @@ void tunhunt_state::draw_shell(bitmap_ind16 &bitmap,
 
 	*/
 	
-			machine().gfx[1]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			picture_code,
 			0, /* color */
 			0,0, /* flip */

@@ -2343,7 +2343,7 @@ static MACHINE_CONFIG_START( system32, segas32_state )
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
 
 	/* video hardware */
-	MCFG_GFXDECODE(segas32)
+	MCFG_GFXDECODE_ADD("gfxdecode", segas32)
 	MCFG_PALETTE_LENGTH(0x4000)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2400,7 +2400,7 @@ static MACHINE_CONFIG_START( multi32, segas32_state )
 	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
 
 	/* video hardware */
-	MCFG_GFXDECODE(segas32)
+	MCFG_GFXDECODE_ADD("gfxdecode", segas32)
 	MCFG_PALETTE_LENGTH(0x8000)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 

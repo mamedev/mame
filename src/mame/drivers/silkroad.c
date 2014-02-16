@@ -283,7 +283,7 @@ static MACHINE_CONFIG_START( silkroad, silkroad_state )
 	MCFG_SCREEN_VISIBLE_AREA(6*8+2, 64*8-1-(10*8)-2, 2*8, 32*8-1-(2*8))
 	MCFG_SCREEN_UPDATE_DRIVER(silkroad_state, screen_update_silkroad)
 
-	MCFG_GFXDECODE(silkroad)
+	MCFG_GFXDECODE_ADD("gfxdecode", silkroad)
 	MCFG_PALETTE_LENGTH(0x2000)
 
 

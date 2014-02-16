@@ -341,12 +341,15 @@ static MACHINE_CONFIG_START( supbtime, supbtime_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_supbtime)
 
-	MCFG_GFXDECODE(supbtime)
+	MCFG_GFXDECODE_ADD("gfxdecode", supbtime)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DECO16IC_ADD("tilegen1", supbtime_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -382,12 +385,15 @@ static MACHINE_CONFIG_START( chinatwn, supbtime_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_supbtime)
 
-	MCFG_GFXDECODE(supbtime)
+	MCFG_GFXDECODE_ADD("gfxdecode", supbtime)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DECO16IC_ADD("tilegen1", supbtime_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

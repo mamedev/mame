@@ -14,8 +14,19 @@ const device_type DECO_KARNOVSPRITES = &device_creator<deco_karnovsprites_device
 
 deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_KARNOVSPRITES, "karnovsprites_device", tag, owner, clock, "deco_karnovsprites", __FILE__),
-		m_gfxregion(0)
+		m_gfxregion(0),
+		m_gfxdecode(*this)
 {
+}
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void deco_karnovsprites_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<deco_karnovsprites_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 void deco_karnovsprites_device::device_start()
@@ -99,13 +110,13 @@ void deco_karnovsprites_device::draw_sprites( running_machine &machine, bitmap_i
 		else
 			sprite2 = sprite + 1;
 
-		machine.gfx[m_gfxregion]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
 				sprite,
 				colour,fx,fy,x,y,0);
 
 		/* 1 more sprite drawn underneath */
 		if (extra)
-			machine.gfx[m_gfxregion]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
 				sprite2,
 				colour,fx,fy,x,y+16,0);
 	}

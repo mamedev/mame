@@ -12,7 +12,7 @@ TILE_GET_INFO_MEMBER(playmark_state::bigtwin_get_tx_tile_info)
 {
 	UINT16 code = m_videoram1[2 * tile_index];
 	UINT16 color = m_videoram1[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code,
 			color,
@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(playmark_state::bigtwin_get_fg_tile_info)
 {
 	UINT16 code = m_videoram2[2 * tile_index];
 	UINT16 color = m_videoram2[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			color,
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_tx_tile_info)
 	UINT16 code = m_videoram1[2 * tile_index];
 	UINT16 color = m_videoram1[2 * tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code,
 			color / 4,
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_fg_tile_info)
 	UINT16 code = m_videoram2[2 * tile_index];
 	UINT16 color = m_videoram2[2 * tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code & 0x7fff,
 			color / 4 + 8,
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_bg_tile_info)
 	UINT16 code = m_videoram3[2 * tile_index];
 	UINT16 color = m_videoram3[2 * tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code & 0x7fff,
 			color / 4,
@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_tx_tile_info)
 	int code = m_videoram1[tile_index] & 0x03ff;
 	int colr = m_videoram1[tile_index] & 0xe000;
 
-	SET_TILE_INFO_MEMBER(2,code + m_txt_tile_offset, colr >> 13, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,code + m_txt_tile_offset, colr >> 13, 0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::bigtwinb_get_tx_tile_info)
@@ -79,7 +79,7 @@ TILE_GET_INFO_MEMBER(playmark_state::bigtwinb_get_tx_tile_info)
 	int code = m_videoram1[tile_index] & 0x0fff;
 	int colr = m_videoram1[tile_index] & 0xf000;
 
-	SET_TILE_INFO_MEMBER(2,code + m_txt_tile_offset, colr >> 12, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,code + m_txt_tile_offset, colr >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_fg_tile_info)
@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_fg_tile_info)
 	int code = m_videoram2[tile_index] & 0x1fff;
 	int colr = m_videoram2[tile_index] & 0xe000;
 
-	SET_TILE_INFO_MEMBER(1,code + m_fg_tile_offset,(colr >> 13) + 8,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,code + m_fg_tile_offset,(colr >> 13) + 8,0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_bg_tile_info)
@@ -95,7 +95,7 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_bg_tile_info)
 	int code = m_videoram3[tile_index] & 0x1fff;
 	int colr = m_videoram3[tile_index] & 0xe000;
 
-	SET_TILE_INFO_MEMBER(1, code, colr >> 13, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, colr >> 13, 0);
 }
 
 /***************************************************************************
@@ -405,8 +405,8 @@ WRITE16_MEMBER(playmark_state::hrdtimes_scroll_w)
 void playmark_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
 {
 	int offs, start_offset = m_spriteram.bytes() / 2 - 4;
-	int height = machine().gfx[0]->height();
-	int colordiv = machine().gfx[0]->granularity() / 16;
+	int height = m_gfxdecode->gfx(0)->height();
+	int colordiv = m_gfxdecode->gfx(0)->granularity() / 16;
 	UINT16 *spriteram = m_spriteram;
 
 	// find the "end of list" to draw the sprites in reverse order
@@ -435,7 +435,7 @@ void playmark_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		if(!pri && (color & 0x0c) == 0x0c)
 			pri = 2;
 
-		machine().gfx[0]->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,0,
@@ -448,7 +448,7 @@ void playmark_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 void playmark_state::bigtwinb_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
 {
 	int offs, start_offset = m_spriteram.bytes() / 2 - 4;
-	int height = machine().gfx[0]->height();
+	int height = m_gfxdecode->gfx(0)->height();
 	UINT16 *spriteram = m_spriteram;
 
 	// find the "end of list" to draw the sprites in reverse order
@@ -473,7 +473,7 @@ void playmark_state::bigtwinb_draw_sprites( screen_device &screen, bitmap_ind16 
 		code = spriteram[offs + 2] >> codeshift;
 		color = ((spriteram[offs + 1] & 0xf000) >> 12);
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,0,

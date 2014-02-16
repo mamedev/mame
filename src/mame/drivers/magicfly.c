@@ -512,7 +512,7 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_magicfly_tile_info)
 	m_colorram[0] = m_colorram[0] | ((m_colorram[0] & 0x08) << 4);  /* only for 1st offset */
 	//m_colorram[tile_index] = attr | ((attr & 0x08) << 4);         /* for the whole color RAM */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
 }
 
 void magicfly_state::video_start()
@@ -543,7 +543,7 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
 	m_colorram[0] = m_colorram[0] | ((m_colorram[0] & 0x04) << 5);  /* only for 1st offset */
 	//m_colorram[tile_index] = attr | ((attr & 0x04) << 5);         /* for the whole color RAM */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
 }
 
 VIDEO_START_MEMBER(magicfly_state,7mezzo)
@@ -956,7 +956,7 @@ static MACHINE_CONFIG_START( magicfly, magicfly_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)  /* Taken from MC6845 init, registers 01 & 06. */
 	MCFG_SCREEN_UPDATE_DRIVER(magicfly_state, screen_update_magicfly)
 
-	MCFG_GFXDECODE(magicfly)
+	MCFG_GFXDECODE_ADD("gfxdecode", magicfly)
 	MCFG_PALETTE_LENGTH(32)
 	MCFG_PALETTE_INIT_OVERRIDE(magicfly_state, magicfly)
 

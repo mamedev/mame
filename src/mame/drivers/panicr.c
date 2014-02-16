@@ -196,7 +196,7 @@ TILE_GET_INFO_MEMBER(panicr_state::get_bgtile_info)
 	code=memregion("user1")->base()[tile_index];
 	attr=memregion("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		1,
 		code,
 		(attr & 0xf0) >> 4,
@@ -212,7 +212,7 @@ TILE_GET_INFO_MEMBER(panicr_state::get_infotile_info_2)
 	code=memregion("user1")->base()[tile_index];
 	attr=memregion("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		3,
 		code,
 		0,
@@ -230,7 +230,7 @@ TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		0,
 		code + ((attr & 8) << 5),
 		color,
@@ -244,7 +244,7 @@ void panicr_state::video_start()
 	m_infotilemap_2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_infotile_info_2),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
 
 	m_txttilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
-	colortable_configure_tilemap_groups(machine().colortable, m_txttilemap, machine().gfx[0], 0);
+	colortable_configure_tilemap_groups(machine().colortable, m_txttilemap, m_gfxdecode->gfx(0), 0);
 }
 
 void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
@@ -277,10 +277,10 @@ void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
 		color = spriteram[offs+1] & 0x0f;
 		sprite = spriteram[offs+0] | (*m_spritebank << 8);
 
-		machine().gfx[2]->transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
 				sprite,
 				color,flipx,flipy,x,y,
-				colortable_get_transpen_mask(machine().colortable, machine().gfx[2], color, 0));
+				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(2), color, 0));
 	}
 }
 
@@ -624,7 +624,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update_panicr)
 
-	MCFG_GFXDECODE(panicr)
+	MCFG_GFXDECODE_ADD("gfxdecode", panicr)
 	MCFG_PALETTE_LENGTH(256*4)
 
 

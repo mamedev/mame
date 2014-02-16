@@ -111,6 +111,7 @@ struct vdt_t
 	UINT8 last_key_pressed;
 	int last_modifier_state;
 	char foreign_mode;
+	gfxdecode_device * m_gfxdecode;
 };
 
 /*
@@ -272,9 +273,20 @@ static DEVICE_START( vdt911 )
 const device_type VDT911 = &device_creator<vdt911_device>;
 
 vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VDT911, "911 VDT", tag, owner, clock, "vdt911", __FILE__)
+	: device_t(mconfig, VDT911, "911 VDT", tag, owner, clock, "vdt911", __FILE__),
+		m_gfxdecode(*this)
 {
 	m_token = global_alloc_clear(vdt_t);
+}
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void vdt911_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<vdt911_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -293,6 +305,8 @@ void vdt911_device::device_config_complete()
 
 void vdt911_device::device_start()
 {
+	vdt_t *vdt = get_safe_token(this);
+	vdt->m_gfxdecode = m_gfxdecode;
 	DEVICE_START_NAME( vdt911 )(this);
 }
 
@@ -506,7 +520,7 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 void vdt911_refresh(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y)
 {
 	vdt_t *vdt = get_safe_token(device);
-	gfx_element *gfx = device->machine().gfx[vdt->model];
+	gfx_element *gfx = vdt->m_gfxdecode->gfx(vdt->model);
 	int height = (vdt->screen_size == char_960) ? 12 : /*25*/24;
 	int use_8bit_charcodes = USES_8BIT_CHARCODES(vdt);
 	int address = 0;

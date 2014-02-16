@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( espial, espial_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(espial_state, screen_update_espial)
 
-	MCFG_GFXDECODE(espial)
+	MCFG_GFXDECODE_ADD("gfxdecode", espial)
 	MCFG_PALETTE_LENGTH(256)
 
 

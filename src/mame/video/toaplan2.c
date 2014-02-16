@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
 	attrib = m_txvideoram16[tile_index];
 	tile_number = attrib & 0x3ff;
 	color = ((attrib >> 10) | 0x40) & 0x7f;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile_number,
 			color,
@@ -71,7 +71,7 @@ void toaplan2_state::register_state_save()
 void toaplan2_state::truxton2_postload()
 {
 	for (int i = 0; i < 1024; i++)
-		machine().gfx[2]->mark_dirty(i);
+		m_gfxdecode->gfx(2)->mark_dirty(i);
 }
 
 VIDEO_START_MEMBER(toaplan2_state,toaplan2)
@@ -99,7 +99,7 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	machine().gfx[2]->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
+	m_gfxdecode->gfx(2)->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
 	truxton2_create_tx_tilemap();
@@ -157,7 +157,7 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 
 	/* Create the Text tilemap for this game */
 	m_tx_gfxram16.allocate(RAIZING_TX_GFXRAM_SIZE/2);
-	machine().gfx[2]->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
+	m_gfxdecode->gfx(2)->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
 	truxton2_create_tx_tilemap();
@@ -225,7 +225,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_tx_gfxram16_w)
 	{
 		int code = offset/32;
 		COMBINE_DATA(&m_tx_gfxram16[offset]);
-		machine().gfx[2]->mark_dirty(code);
+		m_gfxdecode->gfx(2)->mark_dirty(code);
 	}
 }
 
@@ -247,7 +247,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
 	memcpy(dest, m_mainram16, m_mainram16.bytes());
 
 	for (int i = 0; i < 1024; i++)
-		machine().gfx[2]->mark_dirty(i);
+		m_gfxdecode->gfx(2)->mark_dirty(i);
 }
 
 WRITE16_MEMBER(toaplan2_state::batrider_unknown_dma_w)

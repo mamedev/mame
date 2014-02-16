@@ -116,7 +116,7 @@ void zaccaria_state::palette_init()
 TILE_GET_INFO_MEMBER(zaccaria_state::get_tile_info)
 {
 	UINT8 attr = m_videoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_videoram[tile_index] + ((attr & 0x03) << 8),
 			((attr & 0x0c) >> 2) + ((m_attributesram[2 * (tile_index % 32) + 1] & 0x07) << 2),
@@ -233,7 +233,7 @@ void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				(spriteram[offs + o1] & 0x3f) + (spriteram[offs + o2] & 0xc0),
 				((spriteram[offs + o2] & 0x07) << 2) | color,
 				flipx,flipy,sx,sy,0);

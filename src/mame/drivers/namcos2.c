@@ -1732,7 +1732,7 @@ static MACHINE_CONFIG_START( default, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 
-	MCFG_GFXDECODE(namcos2)
+	MCFG_GFXDECODE_ADD("gfxdecode", namcos2)
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1806,7 +1806,7 @@ static MACHINE_CONFIG_START( gollygho, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 
-	MCFG_GFXDECODE(namcos2)
+	MCFG_GFXDECODE_ADD("gfxdecode", namcos2)
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1853,12 +1853,13 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_finallap)
 
-	MCFG_GFXDECODE(finallap)
+	MCFG_GFXDECODE_ADD("gfxdecode", finallap)
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finallap)
 
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
+	MCFG_NAMCO_C45_ROAD_GFXDECODE("gfxdecode")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1904,7 +1905,7 @@ static MACHINE_CONFIG_START( sgunner, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 
-	MCFG_GFXDECODE(sgunner)
+	MCFG_GFXDECODE_ADD("gfxdecode", sgunner)
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
@@ -1958,7 +1959,7 @@ static MACHINE_CONFIG_START( sgunner2, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 
-	MCFG_GFXDECODE(sgunner)
+	MCFG_GFXDECODE_ADD("gfxdecode", sgunner)
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
@@ -2007,12 +2008,13 @@ static MACHINE_CONFIG_START( luckywld, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_luckywld)
 
-	MCFG_GFXDECODE(luckywld)
+	MCFG_GFXDECODE_ADD("gfxdecode", luckywld)
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
 
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
+	MCFG_NAMCO_C45_ROAD_GFXDECODE("gfxdecode")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2058,7 +2060,7 @@ static MACHINE_CONFIG_START( metlhawk, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_metlhawk)
 
-	MCFG_GFXDECODE(metlhawk)
+	MCFG_GFXDECODE_ADD("gfxdecode", metlhawk)
 	MCFG_PALETTE_LENGTH(0x2000)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)

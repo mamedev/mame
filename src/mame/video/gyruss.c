@@ -107,7 +107,7 @@ TILE_GET_INFO_MEMBER(gyruss_state::gyruss_get_tile_info)
 
 	tileinfo.group = (m_colorram[tile_index] & 0x10) ? 0 : 1;
 
-	SET_TILE_INFO_MEMBER(2, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, flags);
 }
 
 
@@ -156,7 +156,7 @@ UINT32 gyruss_state::screen_update_gyruss(screen_device &screen, bitmap_ind16 &b
 	}
 
 	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(bitmap, cliprect, machine().gfx);
+	draw_sprites(bitmap, cliprect, m_gfxdecode->gfx());
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;

@@ -70,7 +70,8 @@ Abstracts the VS9210
 const device_type VSYSTEM_SPR = &device_creator<vsystem_spr_device>;
 
 vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VSYSTEM_SPR, "vsystem_spr_device", tag, owner, clock, "vsystem_spr", __FILE__)
+	: device_t(mconfig, VSYSTEM_SPR, "vsystem_spr_device", tag, owner, clock, "vsystem_spr", __FILE__),
+		m_gfxdecode(*this)
 {
 	m_transpen = 15;
 	m_pal_base = 0;
@@ -82,6 +83,17 @@ vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char
 
 	m_newtilecb =  vsystem_tile_indirection_delegate(FUNC(vsystem_spr_device::tile_callback_noindirect), this);
 }
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void vsystem_spr_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<vsystem_spr_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
 
 UINT32 vsystem_spr_device::tile_callback_noindirect(UINT32 tile)
 {
@@ -195,7 +207,7 @@ void vsystem_spr_device::get_sprite_attributes(UINT16* ram)
 
 void vsystem_spr_device::common_sprite_drawgfx( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
-	gfx_element *gfx = machine.gfx[m_gfx_region];
+	gfx_element *gfx = m_gfxdecode->gfx(m_gfx_region);
 	int priority_mask = 0x00;
 
 	curr_sprite.oy += m_yoffs;

@@ -19,14 +19,14 @@
 TILE_GET_INFO_MEMBER(suprridr_state::get_tile_info)
 {
 	UINT8 code = m_bgram[tile_index];
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 
 TILE_GET_INFO_MEMBER(suprridr_state::get_tile_info2)
 {
 	UINT8 code = m_fgram[tile_index];
-	SET_TILE_INFO_MEMBER(1, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, 0);
 }
 
 
@@ -207,7 +207,7 @@ UINT32 suprridr_state::screen_update_suprridr(screen_device &screen, bitmap_ind1
 			fy = !fy;
 			y = 240 - y;
 		}
-		 machine().gfx[2]->transpen(bitmap,cliprect, code, color, fx, fy, x, y, 0);
+		 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, code, color, fx, fy, x, y, 0);
 	}
 	return 0;
 }

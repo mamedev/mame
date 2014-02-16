@@ -183,11 +183,12 @@ static MACHINE_CONFIG_START( blstroid, blstroid_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE(blstroid)
+	MCFG_GFXDECODE_ADD("gfxdecode", blstroid)
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, blstroid_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", blstroid_state::s_mob_config)
+	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

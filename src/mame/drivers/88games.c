@@ -370,9 +370,14 @@ static MACHINE_CONFIG_START( 88games, _88games_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	MCFG_K052109_ADD("k052109", _88games_k052109_intf)
+	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K051960_ADD("k051960", _88games_k051960_intf)
+	MCFG_K051960_GFXDECODE("gfxdecode")
 	MCFG_K051316_ADD("k051316", _88games_k051316_intf)
+	MCFG_K051316_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

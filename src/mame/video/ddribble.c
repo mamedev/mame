@@ -96,7 +96,7 @@ TILE_GET_INFO_MEMBER(ddribble_state::get_fg_tile_info)
 {
 	UINT8 attr = m_fg_videoram[tile_index];
 	int num = m_fg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + ((m_charbank[0] & 2) << 10);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			num,
 			0,
@@ -107,7 +107,7 @@ TILE_GET_INFO_MEMBER(ddribble_state::get_bg_tile_info)
 {
 	UINT8 attr = m_bg_videoram[tile_index];
 	int num = m_bg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + (m_charbank[1] << 11);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			num,
 			0,
@@ -170,7 +170,7 @@ byte #4:    attributes
 
 void ddribble_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* source, int lenght, int gfxset, int flipscreen )
 {
-	gfx_element *gfx = machine().gfx[gfxset];
+	gfx_element *gfx = m_gfxdecode->gfx(gfxset);
 	const UINT8 *finish = source + lenght;
 
 	while (source < finish)

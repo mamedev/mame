@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(carjmbre_state::get_carjmbre_tile_info)
 	UINT8 attr = m_videoram[tile_index + 0x400];
 	tile_number += (attr & 0x80) << 1; /* bank */
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			attr & 0xf,
@@ -145,7 +145,7 @@ UINT32 carjmbre_state::screen_update_carjmbre(screen_device &screen, bitmap_ind1
 				flipy = !flipy;
 			}
 
-			 machine().gfx[1]->transpen(bitmap,cliprect,
+			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					m_spriteram[troffs + 1],
 					m_spriteram[troffs + 2] & 0xf,
 					flipx,flipy,

@@ -99,7 +99,7 @@ static MACHINE_CONFIG_START( unistar, unistar_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(unistar_state, screen_update_unistar)
-	MCFG_GFXDECODE(unistar)
+	MCFG_GFXDECODE_ADD("gfxdecode", unistar)
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT_OVERRIDE(unistar_state, unistar)
 MACHINE_CONFIG_END

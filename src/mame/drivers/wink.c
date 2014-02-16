@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(wink_state::get_bg_tile_info)
 		code |= 0x100;
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 void wink_state::video_start()
@@ -366,7 +366,7 @@ static MACHINE_CONFIG_START( wink, wink_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wink_state, screen_update_wink)
 
-	MCFG_GFXDECODE(wink)
+	MCFG_GFXDECODE_ADD("gfxdecode", wink)
 	MCFG_PALETTE_LENGTH(16)
 
 

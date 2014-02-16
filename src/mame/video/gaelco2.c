@@ -107,7 +107,7 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen0)
 	int data2 = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
-	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
 TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1)
@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1)
 	int data2 = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
-	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
 
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen0_dual)
 	int data2 = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
-	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
 TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1_dual)
@@ -157,7 +157,7 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1_dual)
 	int data2 = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
 	int code = ((data & 0x07) << 16) | (data2 & 0xffff);
 
-	SET_TILE_INFO_MEMBER(0, code, 0x40 + ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0x40 + ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
 
@@ -336,7 +336,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 {
 	UINT16 *buffered_spriteram16 = m_spriteram->buffer();
 	int j, x, y, ex, ey, px, py;
-	gfx_element *gfx = screen.machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	/* get sprite ram start and end offsets */
 	int start_offset = (m_vregs[1] & 0x10)*0x100;

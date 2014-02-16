@@ -11,7 +11,7 @@ TILE_GET_INFO_MEMBER(pass_state::get_pass_bg_tile_info)
 
 	tileno = m_bg_videoram[tile_index] & 0x1fff;
 	fx = (m_bg_videoram[tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO_MEMBER(1, tileno, 0, TILE_FLIPYX(fx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, 0, TILE_FLIPYX(fx));
 
 }
 
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(pass_state::get_pass_fg_tile_info)
 	tileno = m_fg_videoram[tile_index] & 0x3fff;
 	flip = (m_fg_videoram[tile_index] & 0xc000) >>14;
 
-	SET_TILE_INFO_MEMBER(0, tileno, 0, TILE_FLIPYX(flip));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, 0, TILE_FLIPYX(flip));
 
 }
 

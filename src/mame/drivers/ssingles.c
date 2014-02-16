@@ -577,7 +577,7 @@ static MACHINE_CONFIG_START( ssingles, ssingles_state )
 
 	MCFG_PALETTE_LENGTH(4) //guess
 
-	MCFG_GFXDECODE(ssingles)
+	MCFG_GFXDECODE_ADD("gfxdecode", ssingles)
 
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */, ssingles_mc6845_intf)
@@ -608,7 +608,7 @@ static MACHINE_CONFIG_DERIVED( atamanot, ssingles )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */, atamanot_mc6845_intf)
 
-	MCFG_GFXDECODE(atamanot)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", atamanot)
 MACHINE_CONFIG_END
 
 ROM_START( ssingles )

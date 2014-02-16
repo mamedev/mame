@@ -834,7 +834,7 @@ void dwarfd_state::drawCrt( bitmap_rgb32 &bitmap,const rectangle &cliprect )
 				else
 					b = 1;
 			}
-			 machine().gfx[0]->transpen(bitmap,cliprect,
+			 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				tile + (m_bank + bank2) * 128,
 				0,
 				0, 0,
@@ -1066,7 +1066,7 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dwarfd_state, screen_update_dwarfd)
 
-	MCFG_GFXDECODE(dwarfd)
+	MCFG_GFXDECODE_ADD("gfxdecode", dwarfd)
 	MCFG_PALETTE_LENGTH(0x100)
 
 

@@ -831,7 +831,7 @@ static MACHINE_CONFIG_START( atarigt, atarigt_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE(atarigt)
+	MCFG_GFXDECODE_ADD("gfxdecode", atarigt)
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)

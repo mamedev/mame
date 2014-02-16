@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 
 	number = m_page[0][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			number,
 			color,
@@ -172,7 +172,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1)
 
 	number = m_page[1][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			number,
 			color,
@@ -186,7 +186,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info)
 	int number = m_page[0][tile_index + 0xc00];
 	int color = 16 + (attributes & 0x0f);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			number,
 			color,
@@ -219,7 +219,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0_bootleg)
 	color = pal*16;// + (attributes & 0x0f);
 	number = m_page[0][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			number,
 			color,
@@ -251,7 +251,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1_bootleg)
 	color = pal * 16;// + (attributes & 0x0f);
 	number = m_page[1][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			number,
 			color,
@@ -264,7 +264,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info_bootleg)
 	int number = m_page[0][tile_index + 0xc00];
 	int color = 16;// + (attributes & 0x0f);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			number,
 			color,
@@ -385,7 +385,7 @@ void combatsc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	address_space &space = machine().driver_data()->generic_space();
 	int base_color = (circuit * 4) * 16 + (k007121->ctrlram_r(space, 6) & 0x10) * 2;
 
-	k007121->sprites_draw(bitmap, cliprect, machine().gfx[circuit], machine().colortable, source, base_color, 0, 0, priority_bitmap, pri_mask);
+	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(circuit), machine().colortable, source, base_color, 0, 0, priority_bitmap, pri_mask);
 }
 
 
@@ -504,7 +504,7 @@ byte #4:
 void combatsc_state::bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	gfx_element *gfx = machine().gfx[circuit + 2];
+	gfx_element *gfx = m_gfxdecode->gfx(circuit + 2);
 
 	int limit = circuit ? (space.read_byte(0xc2) * 256 + space.read_byte(0xc3)) : (space.read_byte(0xc0) * 256 + space.read_byte(0xc1));
 	const UINT8 *finish;

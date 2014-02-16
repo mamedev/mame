@@ -516,7 +516,7 @@ static MACHINE_CONFIG_START( exprraid, exprraid_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 0, 256, 262, 8, 256-8) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(exprraid_state, screen_update_exprraid)
 
-	MCFG_GFXDECODE(exprraid)
+	MCFG_GFXDECODE_ADD("gfxdecode", exprraid)
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)

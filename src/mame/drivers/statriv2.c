@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, code, attr, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, attr, 0);
 }
 
 TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
@@ -145,7 +145,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
 }
 
 
@@ -623,7 +623,7 @@ static MACHINE_CONFIG_START( statriv2, statriv2_state )
 
 	MCFG_TMS9927_ADD("tms", MASTER_CLOCK/2, tms9927_intf)
 
-	MCFG_GFXDECODE(horizontal)
+	MCFG_GFXDECODE_ADD("gfxdecode", horizontal)
 	MCFG_PALETTE_LENGTH(2*64)
 
 
@@ -642,7 +642,7 @@ static MACHINE_CONFIG_DERIVED( statriv2v, statriv2 )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256)
 
 	MCFG_VIDEO_START_OVERRIDE(statriv2_state,vertical)
-	MCFG_GFXDECODE(vertical)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", vertical)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( funcsino, statriv2 )

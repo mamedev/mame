@@ -89,7 +89,7 @@ TILE_GET_INFO_MEMBER(crospang_state::get_bg_tile_info)
 	int tile  = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1, tile + m_bestri_tilebank * 0x1000, color + 0x20, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile + m_bestri_tilebank * 0x1000, color + 0x20, 0);
 }
 
 TILE_GET_INFO_MEMBER(crospang_state::get_fg_tile_info)
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(crospang_state::get_fg_tile_info)
 	int tile  = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO_MEMBER(1, tile + m_bestri_tilebank * 0x1000, color + 0x10, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile + m_bestri_tilebank * 0x1000, color + 0x10, 0);
 }
 
 

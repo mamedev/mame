@@ -626,8 +626,9 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 	decospr_device::set_is_bootleg(*device, true);
 	decospr_device::set_pri_callback(*device, esd16_state::hedpanic_pri_callback);
 	decospr_device::set_flipallx(*device, 1);
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE(esd16)
+	MCFG_GFXDECODE_ADD("gfxdecode", esd16)
 	MCFG_PALETTE_LENGTH(0x1000/2)
 
 
@@ -652,7 +653,7 @@ static MACHINE_CONFIG_DERIVED( jumppop, esd16 )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_CLOCK( XTAL_14MHz/4) /* 3.5MHz - Verified */
 
-	MCFG_GFXDECODE(jumppop)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", jumppop)
 
 	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL_14MHz/4) /* 3.5MHz - Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

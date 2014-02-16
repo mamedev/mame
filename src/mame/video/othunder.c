@@ -64,7 +64,7 @@ spriteram is being tested, take no notice of that.]
 void othunder_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs )
 {
 	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
-	UINT16 tile_mask = (machine().gfx[0]->elements()) - 1;
+	UINT16 tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
 	UINT16 *spriteram16 = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -164,7 +164,7 @@ void othunder_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			}
 			else
 			{
-				machine().gfx[0]->zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
@@ -182,7 +182,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	{
 		sprite_ptr--;
 
-		machine().gfx[0]->prio_zoom_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,

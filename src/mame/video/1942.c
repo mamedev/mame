@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(_1942_state::get_fg_tile_info)
 
 	code = m_fg_videoram[tile_index];
 	color = m_fg_videoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code + ((color & 0x80) << 1),
 			color & 0x3f,
@@ -137,7 +137,7 @@ TILE_GET_INFO_MEMBER(_1942_state::get_bg_tile_info)
 
 	code = m_bg_videoram[tile_index];
 	color = m_bg_videoram[tile_index + 0x10];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code + ((color & 0x80) << 1),
 			(color & 0x1f) + (0x20 * m_palette_bank),
@@ -251,7 +251,7 @@ void _1942_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 		do
 		{
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code + i,col,
 					flip_screen(),flip_screen(),
 					sx,sy + 16 * i * dir,15);
@@ -310,7 +310,7 @@ void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		do
 		{
-			machine().gfx[2]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code + i,col,
 					flip_screen(),flip_screen(),
 					sx,sy + 16 * i * dir,15);

@@ -250,7 +250,7 @@ static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bogeyman_state, screen_update_bogeyman)
 
-	MCFG_GFXDECODE(bogeyman)
+	MCFG_GFXDECODE_ADD("gfxdecode", bogeyman)
 	MCFG_PALETTE_LENGTH(16+256)
 
 

@@ -41,9 +41,9 @@ TILE_GET_INFO_MEMBER(sprint4_state::sprint4_tile_info)
 	UINT8 code = videoram[tile_index];
 
 	if ((code & 0x30) == 0x30)
-		SET_TILE_INFO_MEMBER(0, code & ~0x40, (code >> 6) ^ 3, 0);
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code & ~0x40, (code >> 6) ^ 3, 0);
 	else
-		SET_TILE_INFO_MEMBER(0, code, 4, 0);
+		SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 4, 0);
 }
 
 
@@ -74,7 +74,7 @@ UINT32 sprint4_state::screen_update_sprint4(screen_device &screen, bitmap_ind16 
 		if (i & 1)
 			bank = 32;
 
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			(code >> 3) | bank,
 			(attr & 0x80) ? 4 : i,
 			0, 0,
@@ -110,8 +110,8 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 
 			rect.min_x = horz - 15;
 			rect.min_y = vert - 15;
-			rect.max_x = horz - 15 + machine().gfx[1]->width() - 1;
-			rect.max_y = vert - 15 + machine().gfx[1]->height() - 1;
+			rect.max_x = horz - 15 + m_gfxdecode->gfx(1)->width() - 1;
+			rect.max_y = vert - 15 + m_gfxdecode->gfx(1)->height() - 1;
 
 			rect &= m_screen->visible_area();
 
@@ -120,7 +120,7 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 			if (i & 1)
 				bank = 32;
 
-			 machine().gfx[1]->transpen(m_helper,rect,
+			 m_gfxdecode->gfx(1)->transpen(m_helper,rect,
 				(code >> 3) | bank,
 				4,
 				0, 0,

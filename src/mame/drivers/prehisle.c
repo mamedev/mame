@@ -216,7 +216,7 @@ static MACHINE_CONFIG_START( prehisle, prehisle_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(prehisle_state, screen_update_prehisle)
 
-	MCFG_GFXDECODE(prehisle)
+	MCFG_GFXDECODE_ADD("gfxdecode", prehisle)
 	MCFG_PALETTE_LENGTH(1024)
 
 

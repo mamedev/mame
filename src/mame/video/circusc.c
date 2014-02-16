@@ -104,7 +104,7 @@ TILE_GET_INFO_MEMBER(circusc_state::get_tile_info)
 	UINT8 attr = m_colorram[tile_index];
 	tileinfo.category = (attr & 0x10) >> 4;
 
-	SET_TILE_INFO_MEMBER(0,
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,
 					m_videoram[tile_index] + ((attr & 0x20) << 3),
 					attr & 0x0f,
 					TILE_FLIPYX((attr & 0xc0) >> 6));
@@ -186,11 +186,11 @@ void circusc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 
 
-		machine().gfx[1]->transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 				code, color,
 				flipx,flipy,
 				sx,sy,
-				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
+				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0));
 	}
 }
 

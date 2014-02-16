@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(goal92_state::get_text_tile_info)
 
 	tile |= 0xc000;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(goal92_state::get_back_tile_info)
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(goal92_state::get_back_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(2, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(goal92_state::get_fore_tile_info)
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(goal92_state::get_fore_tile_info)
 		tile |= 0x2000;
 	}
 
-	SET_TILE_INFO_MEMBER(region, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, region, tile, color, 0);
 }
 
 void goal92_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
@@ -121,7 +121,7 @@ void goal92_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		y = 256 - (y + 7);
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y,15);
 	}

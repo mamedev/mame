@@ -161,7 +161,7 @@ public:
 	int flipyx = (ram[tile_index*2+1] & 0xc000)>>14; \
 	int col = (ram[tile_index*2] & 0x00ff); \
 	if (rgn==1) col >>=4; \
-	SET_TILE_INFO_MEMBER(1-rgn, tileno, col, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1-rgn, tileno, col, TILE_FLIPYX(flipyx));
 
 TILE_GET_INFO_MEMBER(blackt96_state::get_bg0_tile_info){ GET_INFO(m_spriteram0); }
 TILE_GET_INFO_MEMBER(blackt96_state::get_bg1_tile_info){ GET_INFO(m_spriteram1); }
@@ -205,8 +205,8 @@ void blackt96_state::video_start()
 void blackt96_state::draw_strip(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int column)
 {
 	/* the very first 'page' in the spriteram contains the x/y positions for each tile strip */
-	gfx_element *gfxbg = machine().gfx[0];
-	gfx_element *gfxspr = machine().gfx[1];
+	gfx_element *gfxbg = m_gfxdecode->gfx(0);
+	gfx_element *gfxspr = m_gfxdecode->gfx(1);
 
 	int base = column * (0x80/2);
 	base += page * 2;
@@ -265,7 +265,7 @@ UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind1
 	/* Text Layer */
 	int count = 0;
 	int x,y;
-	gfx_element *gfx = machine().gfx[2];
+	gfx_element *gfx = m_gfxdecode->gfx(2);
 
 	for (x=0;x<64;x++)
 	{
@@ -600,7 +600,7 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 	MCFG_CPU_ADD("audiocpu", PIC16C57, 8000000) /* ? */
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_GFXDECODE(blackt96)
+	MCFG_GFXDECODE_ADD("gfxdecode", blackt96)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

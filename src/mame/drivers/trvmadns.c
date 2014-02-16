@@ -191,7 +191,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 WRITE8_MEMBER(trvmadns_state::trvmadns_gfxram_w)
 {
 	m_gfxram[offset] = data;
-	machine().gfx[0]->mark_dirty(offset/16);
+	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
 }
 
 WRITE8_MEMBER(trvmadns_state::trvmadns_palette_w)
@@ -304,7 +304,7 @@ TILE_GET_INFO_MEMBER(trvmadns_state::get_bg_tile_info)
 	//0x20? tile transparent pen 1?
 	//0x40? tile transparent pen 1?
 
-	SET_TILE_INFO_MEMBER(0,tile,color,flag);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tile,color,flag);
 
 	tileinfo.category = (attr & 0x20)>>5;
 }
@@ -315,13 +315,13 @@ void trvmadns_state::video_start()
 
 //  fg_tilemap->set_transparent_pen(1);
 
-	machine().gfx[0]->set_source(m_gfxram);
+	m_gfxdecode->gfx(0)->set_source(m_gfxram);
 }
 
 UINT32 trvmadns_state::screen_update_trvmadns(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	bitmap.fill(0xd, cliprect);
 
@@ -384,7 +384,7 @@ static MACHINE_CONFIG_START( trvmadns, trvmadns_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trvmadns_state, screen_update_trvmadns)
 
-	MCFG_GFXDECODE(trvmadns)
+	MCFG_GFXDECODE_ADD("gfxdecode", trvmadns)
 	MCFG_PALETTE_LENGTH(16)
 
 

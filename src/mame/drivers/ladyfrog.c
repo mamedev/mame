@@ -314,7 +314,7 @@ static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 29*8-1) // black borders in ladyfrog gameplay are correct
 	MCFG_SCREEN_UPDATE_DRIVER(ladyfrog_state, screen_update_ladyfrog)
 
-	MCFG_GFXDECODE(ladyfrog)
+	MCFG_GFXDECODE_ADD("gfxdecode", ladyfrog)
 	MCFG_PALETTE_LENGTH(512)
 
 

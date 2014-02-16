@@ -517,7 +517,7 @@ static MACHINE_CONFIG_START( lastduel, lastduel_state )
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
-	MCFG_GFXDECODE(lastduel)
+	MCFG_GFXDECODE_ADD("gfxdecode", lastduel)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
@@ -561,7 +561,7 @@ static MACHINE_CONFIG_START( madgear, lastduel_state )
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
-	MCFG_GFXDECODE(madgear)
+	MCFG_GFXDECODE_ADD("gfxdecode", madgear)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)

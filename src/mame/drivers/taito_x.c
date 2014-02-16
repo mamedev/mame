@@ -819,6 +819,7 @@ static MACHINE_CONFIG_START( superman, taitox_state )
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,superman)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -828,7 +829,7 @@ static MACHINE_CONFIG_START( superman, taitox_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(superman)
+	MCFG_GFXDECODE_ADD("gfxdecode", superman)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
@@ -861,6 +862,7 @@ static MACHINE_CONFIG_START( daisenpu, taitox_state )
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -870,7 +872,7 @@ static MACHINE_CONFIG_START( daisenpu, taitox_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(superman)
+	MCFG_GFXDECODE_ADD("gfxdecode", superman)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
@@ -901,6 +903,7 @@ static MACHINE_CONFIG_START( gigandes, taitox_state )
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -910,7 +913,7 @@ static MACHINE_CONFIG_START( gigandes, taitox_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(superman)
+	MCFG_GFXDECODE_ADD("gfxdecode", superman)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
@@ -943,6 +946,7 @@ static MACHINE_CONFIG_START( ballbros, taitox_state )
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -952,7 +956,7 @@ static MACHINE_CONFIG_START( ballbros, taitox_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitox_state, screen_update_seta_no_layers)
 
-	MCFG_GFXDECODE(ballbros)
+	MCFG_GFXDECODE_ADD("gfxdecode", ballbros)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)

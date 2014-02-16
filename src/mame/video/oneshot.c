@@ -9,7 +9,7 @@ TILE_GET_INFO_MEMBER(oneshot_state::get_oneshot_bg_tile_info)
 {
 	int tileno = m_bg_videoram[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, 0, 0);
 }
 
 WRITE16_MEMBER(oneshot_state::oneshot_bg_videoram_w)
@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(oneshot_state::get_oneshot_mid_tile_info)
 {
 	int tileno = m_mid_videoram[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(0, tileno, 2, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, 2, 0);
 }
 
 WRITE16_MEMBER(oneshot_state::oneshot_mid_videoram_w)
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(oneshot_state::get_oneshot_fg_tile_info)
 {
 	int tileno = m_fg_videoram[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(0, tileno, 3, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, 3, 0);
 }
 
 WRITE16_MEMBER(oneshot_state::oneshot_fg_videoram_w)
@@ -94,7 +94,7 @@ void oneshot_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	const UINT16 *source = m_sprites;
 	const UINT16 *finish = source + (0x1000 / 2);
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 
 	int xpos, ypos;
 

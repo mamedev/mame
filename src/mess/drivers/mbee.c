@@ -738,7 +738,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_GFXDECODE(mbee)
+	MCFG_GFXDECODE_ADD("gfxdecode", mbee)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_amber) // usually sold with amber or green monitor
 
@@ -783,7 +783,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_GFXDECODE(mbeeic)
+	MCFG_GFXDECODE_ADD("gfxdecode", mbeeic)
 	MCFG_PALETTE_LENGTH(96)
 	MCFG_PALETTE_INIT_OVERRIDE(mbee_state,mbeeic)
 
@@ -829,7 +829,7 @@ static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MCFG_CPU_PROGRAM_MAP(mbeeppc_mem)
 	MCFG_CPU_IO_MAP(mbeeppc_io)
 	MCFG_VIDEO_START_OVERRIDE(mbee_state,mbeeppc)
-	MCFG_GFXDECODE(mbeeppc)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", mbeeppc)
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT_OVERRIDE(mbee_state,mbeeppc)
 	MCFG_DEVICE_REMOVE("crtc")

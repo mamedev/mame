@@ -840,7 +840,7 @@ static MACHINE_CONFIG_START( ddragon3, ddragon3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon3_state, screen_update_ddragon3)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(ddragon3)
+	MCFG_GFXDECODE_ADD("gfxdecode", ddragon3)
 	MCFG_PALETTE_LENGTH(768)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -905,7 +905,7 @@ static MACHINE_CONFIG_START( wwfwfest, wwfwfest_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wwfwfest_state, screen_update_wwfwfest)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(wwfwfest)
+	MCFG_GFXDECODE_ADD("gfxdecode", wwfwfest)
 	MCFG_PALETTE_LENGTH(8192)
 
 	/* sound hardware */

@@ -242,7 +242,7 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(osborne1_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 512, 0, 416, 260, 0, 240 )
-	MCFG_GFXDECODE(osborne1)
+	MCFG_GFXDECODE_ADD("gfxdecode", osborne1)
 	MCFG_PALETTE_LENGTH( 3 )
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )

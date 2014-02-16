@@ -137,7 +137,7 @@ TILE_GET_INFO_MEMBER(chaknpop_state::chaknpop_get_tx_tile_info)
 
 	tile |= tile_h_bank;
 
-	SET_TILE_INFO_MEMBER(1, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color, 0);
 }
 
 
@@ -199,7 +199,7 @@ void chaknpop_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 
 		
-				machine().gfx[0]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				tile,
 				color,
 				flipx, flipy,

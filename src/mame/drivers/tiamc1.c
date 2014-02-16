@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( tiamc1, tiamc1_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_tiamc1)
 
-	MCFG_GFXDECODE(tiamc1)
+	MCFG_GFXDECODE_ADD("gfxdecode", tiamc1)
 	MCFG_PALETTE_LENGTH(16)
 
 

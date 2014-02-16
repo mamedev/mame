@@ -47,11 +47,23 @@ const device_type K051316 = &device_creator<k051316_device>;
 
 k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K051316, "Konami 051316", tag, owner, clock, "k051316", __FILE__),
-	m_ram(NULL)
+	m_ram(NULL),
 	//m_tmap,
-	//m_ctrlram[16]
+	//m_ctrlram[16],
+	m_gfxdecode(*this)
 {
 }
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void k051316_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<k051316_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -148,22 +160,22 @@ void k051316_device::device_start()
 	case -4:
 		total = 0x400;
 		is_tail2nos = 1;
-		konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region_tag)->base(), total, &charlayout_tail2nos, 4);
+		konami_decode_gfx(machine(), m_gfxdecode, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region_tag)->base(), total, &charlayout_tail2nos, 4);
 		break;
 
 	case 4:
 		total = machine().root_device().memregion(m_gfx_memory_region_tag)->bytes() / 128;
-		konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region_tag)->base(), total, &charlayout4, 4);
+		konami_decode_gfx(machine(), m_gfxdecode, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region_tag)->base(), total, &charlayout4, 4);
 		break;
 
 	case 7:
 		total = machine().root_device().memregion(m_gfx_memory_region_tag)->bytes() / 256;
-		konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region_tag)->base(), total, &charlayout7, 7);
+		konami_decode_gfx(machine(), m_gfxdecode, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region_tag)->base(), total, &charlayout7, 7);
 		break;
 
 	case 8:
 		total = machine().root_device().memregion(m_gfx_memory_region_tag)->bytes() / 256;
-		konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region_tag)->base(), total, &charlayout8, 8);
+		konami_decode_gfx(machine(), m_gfxdecode, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region_tag)->base(), total, &charlayout8, 8);
 		break;
 
 	default:
@@ -261,7 +273,7 @@ void k051316_device::get_tile_info( tile_data &tileinfo, int tile_index )
 
 	m_callback(machine(), &code, &color, &flags);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			m_gfx_num,
 			code,
 			color,

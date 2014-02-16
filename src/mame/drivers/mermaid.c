@@ -449,7 +449,7 @@ static MACHINE_CONFIG_START( mermaid, mermaid_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mermaid_state, screen_update_mermaid)
 	MCFG_SCREEN_VBLANK_DRIVER(mermaid_state, screen_eof_mermaid)
 
-	MCFG_GFXDECODE(mermaid)
+	MCFG_GFXDECODE_ADD("gfxdecode", mermaid)
 	MCFG_PALETTE_LENGTH(4*16+2*2)
 
 

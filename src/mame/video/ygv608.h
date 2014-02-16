@@ -286,6 +286,9 @@ public:
 	// construction/destruction
 	ygv608_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_READ16_MEMBER( read );
 
@@ -370,6 +373,7 @@ private:
 
 	UINT8 m_screen_resize;  // screen requires resize
 	UINT8 m_tilemap_resize; // tilemap requires resize
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 // device type definition
@@ -383,5 +387,7 @@ extern const device_type YGV608;
 #define MCFG_YGV608_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, YGV608, 0)
 
+#define MCFG_YGV608_GFXDECODE(_gfxtag) \
+	ygv608_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #endif

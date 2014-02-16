@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(rmhaihai_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + (m_gfxbank << 12) + ((attr & 0x07) << 8) + ((attr & 0x80) << 4);
 	int color = (m_gfxbank << 5) + (attr >> 3);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void rmhaihai_state::video_start()
@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( rmhaihai, rmhaihai_state )
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 60*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rmhaihai_state, screen_update_rmhaihai)
 
-	MCFG_GFXDECODE(rmhaihai)
+	MCFG_GFXDECODE_ADD("gfxdecode", rmhaihai)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
@@ -504,7 +504,7 @@ static MACHINE_CONFIG_DERIVED( rmhaisei, rmhaihai )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_GFXDECODE(themj)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", themj)
 	MCFG_PALETTE_LENGTH(0x200)
 MACHINE_CONFIG_END
 
@@ -519,7 +519,7 @@ static MACHINE_CONFIG_DERIVED( themj, rmhaihai )
 	MCFG_MACHINE_RESET_OVERRIDE(rmhaihai_state,themj)
 
 	/* video hardware */
-	MCFG_GFXDECODE(themj)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", themj)
 	MCFG_PALETTE_LENGTH(0x200)
 MACHINE_CONFIG_END
 

@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(stadhero_state::get_pf1_tile_info)
 	int color=tile >> 12;
 
 	tile=tile&0xfff;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,

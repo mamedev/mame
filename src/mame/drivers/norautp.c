@@ -589,7 +589,7 @@ UINT32 norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 
 				int tile = m_np_vram[count] & 0x3f;
 				int colour = (m_np_vram[count] & 0xc0) >> 6;
 
-				 machine().gfx[1]->opaque(bitmap,cliprect, tile, colour, 0, 0, (x * 32) + 8, y * 32);
+				 m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, colour, 0, 0, (x * 32) + 8, y * 32);
 
 				count+=2;
 			}
@@ -601,7 +601,7 @@ UINT32 norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 
 				int tile = m_np_vram[count] & 0x3f;
 				int colour = (m_np_vram[count] & 0xc0) >> 6;
 
-				 machine().gfx[0]->opaque(bitmap,cliprect, tile, colour, 0, 0, x * 16, y * 32);
+				 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, colour, 0, 0, x * 16, y * 32);
 
 				count++;
 			}
@@ -1271,7 +1271,7 @@ static MACHINE_CONFIG_START( noraut_base, norautp_state )
 	MCFG_SCREEN_VISIBLE_AREA(2*16, 31*16-1, (0*16) + 8, 16*16-1)    /* the hardware clips the top 8 pixels */
 	MCFG_SCREEN_UPDATE_DRIVER(norautp_state, screen_update_norautp)
 
-	MCFG_GFXDECODE(norautp)
+	MCFG_GFXDECODE_ADD("gfxdecode", norautp)
 
 	MCFG_PALETTE_LENGTH(8)
 

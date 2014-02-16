@@ -95,7 +95,7 @@ TILEMAP_MAPPER_MEMBER(toypop_state::tilemap_scan)
 TILE_GET_INFO_MEMBER(toypop_state::get_tile_info)
 {
 	UINT8 attr = m_videoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_videoram[tile_index],
 			(attr & 0x3f) + 0x40 * m_palettebank,
@@ -254,12 +254,12 @@ void toypop_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 			{
 				for (int x = 0;x <= sizex;x++)
 				{
-					machine().gfx[1]->transmask(bitmap,cliprect,
+					m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 						sprite + gfx_offs[y ^ (sizey & flipy)][x ^ (sizex & flipx)],
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0xff));
+						colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0xff));
 				}
 			}
 		}

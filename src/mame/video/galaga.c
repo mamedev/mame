@@ -413,7 +413,7 @@ TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
 	int color = m_videoram[tile_index + 0x400] & 0x3f;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			(m_videoram[tile_index] & 0x7f) | (flip_screen() ? 0x80 : 0) | (m_galaga_gfxbank << 8),
 			color,
@@ -432,7 +432,7 @@ TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 VIDEO_START_MEMBER(galaga_state,galaga)
 {
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaga_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(galaga_state::tilemap_scan),this),8,8,36,28);
-	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, machine().gfx[0], 0x1f);
+	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, m_gfxdecode->gfx(0), 0x1f);
 
 	m_galaga_gfxbank = 0;
 
@@ -508,12 +508,12 @@ void galaga_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				machine().gfx[1]->transmask(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,
 					sx + 16*x, sy + 16*y,
-					colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0x0f));
+					colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0x0f));
 			}
 		}
 	}

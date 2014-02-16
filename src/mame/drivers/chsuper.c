@@ -59,7 +59,7 @@ void chsuper_state::video_start()
 
 UINT32 chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x0000;
 	int y,x;
 
@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( chsuper, chsuper_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE(chsuper)
+	MCFG_GFXDECODE_ADD("gfxdecode", chsuper)
 	MCFG_PALETTE_LENGTH(0x100)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)

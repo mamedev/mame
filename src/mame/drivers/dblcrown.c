@@ -108,8 +108,8 @@ void dblcrown_state::video_start()
 
 UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gfx_element *gfx = machine().gfx[0];
-	gfx_element *gfx_2 = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
+	gfx_element *gfx_2 = m_gfxdecode->gfx(1);
 	int x,y;
 	int count;
 
@@ -216,7 +216,7 @@ WRITE8_MEMBER( dblcrown_state::vram_w)
 		UINT8 *VRAM = memregion("vram")->base();
 
 		VRAM[(offset & 0xfff) | hi_offs] = data;
-		machine().gfx[0]->mark_dirty(((offset & 0xfff) | hi_offs) / 32);
+		m_gfxdecode->gfx(0)->mark_dirty(((offset & 0xfff) | hi_offs) / 32);
 	}
 	#endif
 }
@@ -571,7 +571,7 @@ static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MCFG_GFXDECODE(dblcrown)
+	MCFG_GFXDECODE_ADD("gfxdecode", dblcrown)
 
 	MCFG_PALETTE_LENGTH(0x100)
 

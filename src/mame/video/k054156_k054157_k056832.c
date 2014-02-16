@@ -213,8 +213,19 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_use_ext_linescroll(0),
 	m_uses_tile_banks(0),
 	m_cur_tile_bank(0),
-	m_k055555(0)
+	m_k055555(0),
+	m_gfxdecode(*this)
 {
+}
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void k056832_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<k056832_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 
@@ -538,7 +549,7 @@ void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pa
 
 	m_callback(machine(), layer, &code, &color, &flags);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			m_gfx_num,
 			code,
 			color,
@@ -1295,7 +1306,7 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 
 			pixmap  = m_pixmap[page];
 			pal_ptr = machine.pens;
-			src_gfx = machine.gfx[m_gfx_num];
+			src_gfx = m_gfxdecode->gfx(m_gfx_num];
 			src_pitch  = src_gfx->rowbytes();
 			src_modulo = src_gfx->char_modulo;
 			dst_pitch  = pixmap->rowpixels;
@@ -1312,7 +1323,7 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 					offs = line >> 5;
 					mask = 1 << (line & 0x1f);
 					if (!(dirty[offs] & mask)) continue;
-					dirty[offs] ^= mask;
+					dirty[offs) ^= mask;
 				}
 
 				for (count = 0; count < LINE_WIDTH; count += 8)
@@ -2103,7 +2114,7 @@ void k056832_device::create_gfx(running_machine &machine, const char *gfx_memory
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 	{
-		if (machine.gfx[gfx_index] == 0) break;
+		if (m_gfxdecode->gfx(gfx_index) == 0) break;
 	}
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -2115,44 +2126,44 @@ void k056832_device::create_gfx(running_machine &machine, const char *gfx_memory
 	{
 		case K056832_BPP_4:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*4);
-			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout4, 4);
+			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout4, 4);
 			break;
 
 		case K056832_BPP_5:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*5);
-			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout5, 5);
+			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout5, 5);
 			break;
 
 		case K056832_BPP_6:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*6);
-			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout6, 6);
+			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout6, 6);
 			break;
 
 		case K056832_BPP_8:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 8);
+			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 8);
 			break;
 
 		case K056832_BPP_8LE:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8le, 8);
+			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8le, 8);
 			break;
 
 		case K056832_BPP_8TASMAN:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8_tasman, 8);
+			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8_tasman, 8);
 			break;
 
 		case K056832_BPP_4dj:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*4);
-			konami_decode_gfx(machine, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout4dj, 4);
+			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout4dj, 4);
 			break;
 
 		default:
 			fatalerror("Unsupported bpp\n");
 	}
 
-	machine.gfx[gfx_index]->set_granularity(16); /* override */
+	m_gfxdecode->gfx(gfx_index)->set_granularity(16); /* override */
 
 	m_gfx_memory_region = gfx_memory_region;
 	m_gfx_num = gfx_index;
@@ -2251,7 +2262,7 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 
 			pixmap  = m_pixmap[page];
 			pal_ptr    = machine.pens;
-			src_gfx    = machine.gfx[m_gfx_num];
+			src_gfx    = m_gfxdecode->gfx(m_gfx_num];
 			src_pitch  = src_gfx->rowbytes();
 			src_modulo = src_gfx->char_modulo;
 			dst_pitch  = pixmap->rowpixels;
@@ -2268,7 +2279,7 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 					offs = line >> 5;
 					mask = 1 << (line & 0x1f);
 					if (!(dirty[offs] & mask)) continue;
-					dirty[offs] ^= mask;
+					dirty[offs) ^= mask;
 				}
 
 				for (count = 0; count < LINE_WIDTH; count+=8)

@@ -366,12 +366,14 @@ static MACHINE_CONFIG_START( groundfx, groundfx_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(groundfx_state, screen_update_groundfx)
 
-	MCFG_GFXDECODE(groundfx)
+	MCFG_GFXDECODE_ADD("gfxdecode", groundfx)
 	MCFG_PALETTE_LENGTH(16384)
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn", groundfx_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_ADD("tc0480scp", groundfx_tc0480scp_intf)
+	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_en_sound)

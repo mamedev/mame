@@ -406,6 +406,7 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_14MHz/4, twincobr_mc6845_intf) /* 3.5MHz measured on CLKin */
 
 	MCFG_TOAPLAN_SCU_ADD("toaplan_scu")
+	MCFG_TOAPLAN_SCU_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram8")
@@ -415,7 +416,7 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wardner_state, screen_update_toaplan0)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram8", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(wardner)
+	MCFG_GFXDECODE_ADD("gfxdecode", wardner)
 	MCFG_PALETTE_LENGTH(1792)
 
 	MCFG_VIDEO_START_OVERRIDE(wardner_state,toaplan0)

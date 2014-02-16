@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_bg_tile_info)
 
 	tile=tile&0xfff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			tile+m_back_bankbase,
 			color,
@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_fg_tile_info)
 
 	tile=tile&0xfff;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile+m_fore_bankbase,
 			color,
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_tx_tile_info)
 
 	tile = (tile & 0xff) | ((tile & 0xc000) >> 6);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile,
 			color,
@@ -157,7 +157,7 @@ void dynduke_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,
 			if (fy) fy=0; else fy=1;
 		}
 
-		machine().gfx[3]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y,15);
 	}

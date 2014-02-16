@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(ltcasino_state::get_ltcasino_tile_info)
 
 	tileno += (colour & 0x80) << 1;
 
-	SET_TILE_INFO_MEMBER(0,tileno,0,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,0,0);
 }
 
 void ltcasino_state::video_start()
@@ -659,7 +659,7 @@ static MACHINE_CONFIG_START( ltcasino, ltcasino_state )
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 58*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ltcasino_state, screen_update_ltcasino)
 
-	MCFG_GFXDECODE(ltcasino)
+	MCFG_GFXDECODE_ADD("gfxdecode", ltcasino)
 	MCFG_PALETTE_LENGTH(0x100)
 
 

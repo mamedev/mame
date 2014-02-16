@@ -622,7 +622,7 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update_sidearms)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(sidearms)
+	MCFG_GFXDECODE_ADD("gfxdecode", sidearms)
 	MCFG_PALETTE_LENGTH(1024)
 
 
@@ -666,7 +666,7 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update_sidearms)
 
-	MCFG_GFXDECODE(turtship)
+	MCFG_GFXDECODE_ADD("gfxdecode", turtship)
 	MCFG_PALETTE_LENGTH(1024)
 
 	/* sound hardware */
@@ -712,7 +712,7 @@ static MACHINE_CONFIG_START( whizz, sidearms_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update_sidearms)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(turtship)
+	MCFG_GFXDECODE_ADD("gfxdecode", turtship)
 	MCFG_PALETTE_LENGTH(1024)
 
 	/* sound hardware */

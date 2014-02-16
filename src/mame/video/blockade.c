@@ -17,7 +17,7 @@ TILE_GET_INFO_MEMBER(blockade_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 void blockade_state::video_start()

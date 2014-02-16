@@ -992,7 +992,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
 
 	colour = (psac_colorbase << 4) + col;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPYX(flip));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, colour, TILE_FLIPYX(flip));
 }
 
 static int konamigx_type3_psac2_actual_bank;
@@ -1035,7 +1035,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
 	if (tmap[(base_index*2)+1] & 0x20) flip |= TILE_FLIPY;
 	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, flip);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, colour, flip);
 	}
 
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
@@ -1056,7 +1056,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
 	if (tmap[(base_index*2)+1] & 0x20) flip |= TILE_FLIPY;
 	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, flip);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, colour, flip);
 	}
 
 
@@ -1082,7 +1082,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1a_tile_info)
 	if (flipx) flip |= TILE_FLIPX;
 	if (flipy) flip |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(1, tileno, colour, flip);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, colour, flip);
 }
 
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1b_tile_info)
@@ -1104,7 +1104,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1b_tile_info)
 	if (flipx) flip |= TILE_FLIPX;
 	if (flipy) flip |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, flip);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, colour, flip);
 }
 
 static void konamigx_type2_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags)

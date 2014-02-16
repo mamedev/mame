@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scra_tile_info)
 			break;
 	}
 
-	SET_TILE_INFO_MEMBER(1, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
 }
 
 /*** SCR B LAYER ***/
@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scrb_tile_info)
 			break;
 	}
 
-	SET_TILE_INFO_MEMBER(2, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
 }
 
 /*** SCR C LAYER ***/
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scrc_tile_info)
 			break;
 	}
 
-	SET_TILE_INFO_MEMBER(3, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
 }
 
 /*** TEXT LAYER ***/
@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_text_tile_info)
 	tileno = m_text_videoram[tile_index] & 0x0000ffff;
 	colour = (m_text_videoram[tile_index] & 0x00fe0000) >> 17;
 
-	SET_TILE_INFO_MEMBER(4, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 4, tileno, colour, 0);
 }
 
 
@@ -148,10 +148,10 @@ void macrossp_state::video_start()
 	m_scrb_tilemap->set_transparent_pen(0);
 	m_scrc_tilemap->set_transparent_pen(0);
 
-	machine().gfx[0]->set_granularity(64);
-	machine().gfx[1]->set_granularity(64);
-	machine().gfx[2]->set_granularity(64);
-	machine().gfx[3]->set_granularity(64);
+	m_gfxdecode->gfx(0)->set_granularity(64);
+	m_gfxdecode->gfx(1)->set_granularity(64);
+	m_gfxdecode->gfx(2)->set_granularity(64);
+	m_gfxdecode->gfx(3)->set_granularity(64);
 
 	save_pointer(NAME(m_spriteram_old), m_spriteram.bytes() / 4);
 	save_pointer(NAME(m_spriteram_old2), m_spriteram.bytes() / 4);
@@ -161,7 +161,7 @@ void macrossp_state::video_start()
 
 void macrossp_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority )
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	//  UINT32 *source = m_spriteram;
 	UINT32 *source = m_spriteram_old2; /* buffers by two frames */
 	UINT32 *finish = source + m_spriteram.bytes() / 4;

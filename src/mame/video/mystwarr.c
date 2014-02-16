@@ -14,14 +14,15 @@
 // reading the original raw data
 static void mystwarr_decode_tiles(running_machine &machine)
 {
+	mystwarr_state *state = machine.driver_data<mystwarr_state>();
 	UINT8 *s = machine.root_device().memregion("gfx1")->base();
 	int len = machine.root_device().memregion("gfx1")->bytes();
 	UINT8 *pFinish = s+len-3;
 	UINT8 *d, *decoded;
 	int gfxnum;
 
-	for (gfxnum = 0; gfxnum < ARRAY_LENGTH(machine.gfx); gfxnum++)
-		if (machine.gfx[gfxnum] != NULL && machine.gfx[gfxnum]->srcdata() == s)
+	for (gfxnum = 0; gfxnum < ARRAY_LENGTH(state->m_gfxdecode->gfx()); gfxnum++)
+		if (state->m_gfxdecode->gfx(gfxnum) != NULL && state->m_gfxdecode->gfx(gfxnum)->srcdata() == s)
 			break;
 	assert(gfxnum != ARRAY_LENGTH(machine.gfx));
 
@@ -54,7 +55,7 @@ static void mystwarr_decode_tiles(running_machine &machine)
 		d += 5;
 	}
 
-	machine.gfx[gfxnum]->set_source(decoded);
+	state->m_gfxdecode->gfx(gfxnum)->set_source(decoded);
 }
 
 
@@ -156,7 +157,7 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_gai_936_tile_info)
 
 	colour |= m_sub1_colorbase << 4;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, colour, 0);
 }
 
 VIDEO_START_MEMBER(mystwarr_state,gaiapols)
@@ -196,7 +197,7 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_ult_936_tile_info)
 
 	colour = m_sub1_colorbase;
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, (dat1[tile_index]&0x40) ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, colour, (dat1[tile_index]&0x40) ? TILE_FLIPX : 0);
 }
 
 VIDEO_START_MEMBER(mystwarr_state,dadandrn)

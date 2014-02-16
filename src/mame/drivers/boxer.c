@@ -174,7 +174,7 @@ void boxer_state::draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect )
 				code = p[32 * l + 4 * i + j];
 
 				
-					machine().gfx[n]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(n)->transpen(bitmap,cliprect,
 					code,
 					0,
 					code & 0x80, 0,
@@ -184,7 +184,7 @@ void boxer_state::draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect )
 				code = p[32 * r + 4 * i - j + 3];
 
 				
-					machine().gfx[n]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(n)->transpen(bitmap,cliprect,
 					code,
 					0,
 					!(code & 0x80), 0,
@@ -209,7 +209,7 @@ UINT32 boxer_state::screen_update_boxer(screen_device &screen, bitmap_ind16 &bit
 			UINT8 code = m_tile_ram[32 * i + j];
 
 			
-				machine().gfx[2]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				0,
 				code & 0x40, code & 0x40,
@@ -479,7 +479,7 @@ static MACHINE_CONFIG_START( boxer, boxer_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 247, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(boxer_state, screen_update_boxer)
 
-	MCFG_GFXDECODE(boxer)
+	MCFG_GFXDECODE_ADD("gfxdecode", boxer)
 	MCFG_PALETTE_LENGTH(4)
 
 	/* sound hardware */

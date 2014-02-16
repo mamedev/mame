@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(shootout_state::get_bg_tile_info)
 	int tile_number = m_videoram[tile_index] + 256*(attributes&7);
 	int color = attributes>>4;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile_number,
 			color,
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(shootout_state::get_fg_tile_info)
 	int tile_number = m_textram[tile_index] + 256*(attributes&0x3);
 	int color = attributes>>4;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile_number,
 			color,
@@ -87,7 +87,7 @@ void shootout_state::video_start()
 void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits )
 {
 	UINT8 *spriteram = m_spriteram;
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	const UINT8 *source = spriteram+127*4;
 	int count;
 

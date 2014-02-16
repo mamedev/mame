@@ -88,7 +88,7 @@ UINT32 esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap,
 			//int blinkLine = (m_tile_control_ram[current_screen_character] & 0x40) >> 6;
 			//int blinkChar = (m_tile_control_ram[current_screen_character] & 0x80) >> 7;
 
-			 machine().gfx[0]->transpen(bitmap,cliprect,
+			 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					m_tile_ram[current_screen_character] + (0x100 * tileOffs),
 					palIndex,
 					0, 0, charx*8, chary*8, 0);
@@ -333,7 +333,7 @@ static MACHINE_CONFIG_START( esh, esh_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_GFXDECODE(esh)
+	MCFG_GFXDECODE_ADD("gfxdecode", esh)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

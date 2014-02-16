@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(pacman_state::pacman_get_tile_info)
 	int code = m_videoram[tile_index] | (m_charbank << 8);
 	int attr = (m_colorram[tile_index] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6 );
 
-	SET_TILE_INFO_MEMBER(0,code,attr,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,attr,0);
 }
 
 /***************************************************************************
@@ -243,20 +243,20 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 
 			color = ( spriteram[offs + 1] & 0x1f ) | (m_colortablebank << 5) | (m_palettebank << 6 );
 
-			machine().gfx[1]->transmask(bitmap,spriteclip,
+			m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
 					( spriteram[offs] >> 2 ) | (m_spritebank << 6),
 					color,
 					fx,fy,
 					sx,sy,
-					colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color & 0x3f, 0));
+					colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			machine().gfx[1]->transmask(bitmap,spriteclip,
+			m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
 					( spriteram[offs] >> 2 ) | (m_spritebank << 6),
 					color,
 					fx,fy,
 					sx - 256,sy,
-					colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color & 0x3f, 0));
+					colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color & 0x3f, 0));
 		}
 		/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 		/* one pixel to the left to get a more correct placement */
@@ -281,20 +281,20 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 			fx = (spriteram[offs] & 1) ^ m_inv_spr;
 			fy = (spriteram[offs] & 2) ^ ((m_inv_spr) << 1);
 
-			machine().gfx[1]->transmask(bitmap,spriteclip,
+			m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
 					( spriteram[offs] >> 2 ) | (m_spritebank << 6),
 					color,
 					fx,fy,
 					sx,sy + m_xoffsethack,
-					colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color & 0x3f, 0));
+					colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			machine().gfx[1]->transmask(bitmap,spriteclip,
+			m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
 					( spriteram[offs] >> 2 ) | (m_spritebank << 6),
 					color,
 					fy,fx,          //FIXME: flipping bits are really supposed to be inverted here?
 					sx - 256,sy + m_xoffsethack,
-					colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color & 0x3f, 0));
+					colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color & 0x3f, 0));
 		}
 	}
 
@@ -370,7 +370,7 @@ TILE_GET_INFO_MEMBER(pacman_state::s2650_get_tile_info)
 	code = m_videoram[tile_index] + (colbank << 8);
 	attr = m_colorram[tile_index & 0x1f];
 
-	SET_TILE_INFO_MEMBER(0,code,attr & 0x1f,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,attr & 0x1f,0);
 }
 
 VIDEO_START_MEMBER(pacman_state,s2650games)
@@ -410,12 +410,12 @@ UINT32 pacman_state::screen_update_s2650games(screen_device &screen, bitmap_ind1
 		color = spriteram[offs + 1] & 0x1f;
 
 		/* TODO: ?? */
-		machine().gfx[1]->transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 				(spriteram[offs] >> 2) | ((m_s2650_spriteram[offs] & 3) << 6),
 				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,
 				sx,sy,
-				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color & 0x3f, 0));
+				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color & 0x3f, 0));
 	}
 	/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 	/* one pixel to the left to get a more correct placement */
@@ -430,12 +430,12 @@ UINT32 pacman_state::screen_update_s2650games(screen_device &screen, bitmap_ind1
 		color = spriteram[offs + 1] & 0x1f;
 
 		/* TODO: ?? */
-		machine().gfx[1]->transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 				(spriteram[offs] >> 2) | ((m_s2650_spriteram[offs] & 3)<<6),
 				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,
 				sx,sy + m_xoffsethack,
-				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color & 0x3f, 0));
+				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color & 0x3f, 0));
 	}
 	return 0;
 }
@@ -515,7 +515,7 @@ TILE_GET_INFO_MEMBER(pacman_state::jrpacman_get_tile_info)
 	code = m_videoram[tile_index] | (m_charbank << 8);
 	attr = (m_videoram[color_index] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6 );
 
-	SET_TILE_INFO_MEMBER(0,code,attr,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,attr,0);
 }
 
 void pacman_state::jrpacman_mark_tile_dirty( int offset )

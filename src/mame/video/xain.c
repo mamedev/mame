@@ -49,7 +49,7 @@ TILEMAP_MAPPER_MEMBER(xain_state::back_scan)
 TILE_GET_INFO_MEMBER(xain_state::get_bgram0_tile_info)
 {
 	int attr = m_bgram0[tile_index | 0x400];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			m_bgram0[tile_index] | ((attr & 7) << 8),
 			(attr & 0x70) >> 4,
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(xain_state::get_bgram0_tile_info)
 TILE_GET_INFO_MEMBER(xain_state::get_bgram1_tile_info)
 {
 	int attr = m_bgram1[tile_index | 0x400];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			m_bgram1[tile_index] | ((attr & 7) << 8),
 			(attr & 0x70) >> 4,
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(xain_state::get_bgram1_tile_info)
 TILE_GET_INFO_MEMBER(xain_state::get_char_tile_info)
 {
 	int attr = m_charram[tile_index | 0x400];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_charram[tile_index] | ((attr & 3) << 8),
 			(attr & 0xe0) >> 5,
@@ -185,12 +185,12 @@ void xain_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 		if (attr & 0x80)    /* double height */
 		{
-			machine().gfx[3]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 					numtile,
 					color,
 					flipx,flipy,
 					sx,flipy ? sy+16:sy-16,0);
-			machine().gfx[3]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 					numtile+1,
 					color,
 					flipx,flipy,
@@ -198,7 +198,7 @@ void xain_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		}
 		else
 		{
-			machine().gfx[3]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 					numtile,
 					color,
 					flipx,flipy,

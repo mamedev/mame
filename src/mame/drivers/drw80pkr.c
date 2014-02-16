@@ -333,7 +333,7 @@ TILE_GET_INFO_MEMBER(drw80pkr_state::get_bg_tile_info)
 	int color = m_color_ram[tile_index];
 	int code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void drw80pkr_state::video_start()
@@ -480,7 +480,7 @@ static MACHINE_CONFIG_START( drw80pkr, drw80pkr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 27*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drw80pkr_state, screen_update_drw80pkr)
 
-	MCFG_GFXDECODE(drw80pkr)
+	MCFG_GFXDECODE_ADD("gfxdecode", drw80pkr)
 	MCFG_PALETTE_LENGTH(16*16)
 
 

@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(m57_state::get_tile_info)
 	UINT8 attr = m_videoram[tile_index * 2 + 0];
 	UINT16 code = m_videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);
 
-	SET_TILE_INFO_MEMBER(0, code, attr & 0x0f, TILE_FLIPXY(attr >> 4));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, attr & 0x0f, TILE_FLIPXY(attr >> 4));
 }
 
 
@@ -241,12 +241,12 @@ void m57_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			flipy = !flipy;
 		}
 
-		 machine().gfx[1 + bank]->transmask(bitmap,cliprect,
+		 m_gfxdecode->gfx(1 + bank)->transmask(bitmap,cliprect,
 			tile_number,
 			color,
 			flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 256 + 15));
+			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 256 + 15));
 	}
 }
 

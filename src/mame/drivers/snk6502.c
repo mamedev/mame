@@ -830,7 +830,7 @@ static MACHINE_CONFIG_START( sasuke, snk6502_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update_snk6502)
 
-	MCFG_GFXDECODE(sasuke)
+	MCFG_GFXDECODE_ADD("gfxdecode", sasuke)
 	MCFG_PALETTE_LENGTH(32)
 
 	MCFG_PALETTE_INIT_OVERRIDE(snk6502_state,satansat)
@@ -870,7 +870,7 @@ static MACHINE_CONFIG_DERIVED( satansat, sasuke )
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,satansat)
 
 	// video hardware
-	MCFG_GFXDECODE(satansat)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", satansat)
 
 	// sound hardware
 	MCFG_SAMPLES_REPLACE("samples", vanguard_samples_interface)
@@ -903,7 +903,7 @@ static MACHINE_CONFIG_START( vanguard, snk6502_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update_snk6502)
 
-	MCFG_GFXDECODE(vanguard)
+	MCFG_GFXDECODE_ADD("gfxdecode", vanguard)
 	MCFG_PALETTE_LENGTH(64)
 
 	MCFG_PALETTE_INIT_OVERRIDE(snk6502_state,snk6502)

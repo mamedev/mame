@@ -95,11 +95,21 @@ There are more!
 const device_type KANEKO_TMAP = &device_creator<kaneko_view2_tilemap_device>;
 
 kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO_TMAP, "kaneko_view2_tilemap_device", tag, owner, clock, "kaneko_view2_tilemap", __FILE__)
+	: device_t(mconfig, KANEKO_TMAP, "kaneko_view2_tilemap_device", tag, owner, clock, "kaneko_view2_tilemap", __FILE__),
+	m_gfxdecode(*this)
 {
 	m_invert_flip = 0;
 }
 
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void kaneko_view2_tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<kaneko_view2_tilemap_device &>(device).m_gfxdecode.set_tag(tag);
+}
 
 void kaneko_view2_tilemap_device::set_gfx_region(device_t &device, int region)
 {
@@ -126,7 +136,7 @@ void kaneko_view2_tilemap_device::get_tile_info(tile_data &tileinfo, tilemap_mem
 {
 	UINT16 code_hi = m_vram[_N_][ 2 * tile_index + 0];
 	UINT16 code_lo = m_vram[_N_][ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(m_tilebase, code_lo + m_vram_tile_addition[_N_], (code_hi >> 2) & 0x3f, TILE_FLIPXY( code_hi & 3 ));
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, m_tilebase, code_lo + m_vram_tile_addition[_N_], (code_hi >> 2) & 0x3f, TILE_FLIPXY( code_hi & 3 ));
 	tileinfo.category   =   (code_hi >> 8) & 7;
 }
 

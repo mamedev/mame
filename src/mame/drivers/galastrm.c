@@ -312,12 +312,14 @@ static MACHINE_CONFIG_START( galastrm, galastrm_state )
 	MCFG_SCREEN_VISIBLE_AREA(0+96, 40*8-1+96, 3*8+60, 32*8-1+60)
 	MCFG_SCREEN_UPDATE_DRIVER(galastrm_state, screen_update_galastrm)
 
-	MCFG_GFXDECODE(galastrm)
+	MCFG_GFXDECODE_ADD("gfxdecode", galastrm)
 	MCFG_PALETTE_LENGTH(4096)
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn", galastrm_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_ADD("tc0480scp", galastrm_tc0480scp_intf)
+	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_en_sound)

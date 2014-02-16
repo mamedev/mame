@@ -382,7 +382,7 @@ static MACHINE_CONFIG_START( pengo, pengo_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pengo_state,  vblank_irq)
 
 	/* video hardware */
-	MCFG_GFXDECODE(pengo)
+	MCFG_GFXDECODE_ADD("gfxdecode", pengo)
 	MCFG_PALETTE_LENGTH(128*4)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

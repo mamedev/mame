@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_fg)
 {
 	int code  = m_videoram_fg[tile_index] & 0xfff;
 	int color = (m_videoram_fg[tile_index] & 0xf000) >> 12;
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, 0);
 }
 
 
@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_bg)
 {
 	int code  = m_videoram_bg[tile_index] & 0xfff;
 	int color = (m_videoram_bg[tile_index] & 0xf000) >> 12;
-	SET_TILE_INFO_MEMBER(1, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
 }
 
 
@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_bg)
 void drtomy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int i, x, y, ex, ey;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 
 	static const int x_offset[2] = {0x0, 0x2};
 	static const int y_offset[2] = {0x0, 0x1};
@@ -308,7 +308,7 @@ static MACHINE_CONFIG_START( drtomy, drtomy_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drtomy_state, screen_update_drtomy)
 
-	MCFG_GFXDECODE(drtomy)
+	MCFG_GFXDECODE_ADD("gfxdecode", drtomy)
 	MCFG_PALETTE_LENGTH(1024)
 
 

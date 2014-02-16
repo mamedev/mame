@@ -9,6 +9,8 @@ public:
 	k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k037122_device() {}
 
+	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_gfx_index(device_t &device, int index) { downcast<k037122_device &>(device).m_gfx_index = index; }
 
 	void tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
@@ -33,6 +35,7 @@ private:
 	UINT32 *       m_reg;
 
 	int            m_gfx_index;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	TILE_GET_INFO_MEMBER(tile_info_layer0);
 	TILE_GET_INFO_MEMBER(tile_info_layer1);
@@ -46,4 +49,6 @@ extern const device_type K037122;
 	MCFG_VIDEO_SET_SCREEN(_screen) \
 	k037122_device::static_set_gfx_index(*device, _gfxindex);
 
+#define MCFG_K037122_GFXDECODE(_gfxtag) \
+	k037122_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 #endif

@@ -253,7 +253,7 @@ TILE_GET_INFO_MEMBER(gluck2_state::get_gluck2_tile_info)
 	int bank = ((attr & 0xc0) >> 5 ) + ((attr & 0x02) >> 1 );   /* bits 1-6-7 handle the gfx banks */
 	int color = (attr & 0x3c) >> 2;                             /* bits 2-3-4-5 handle the color */
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
 }
 
 
@@ -565,7 +565,7 @@ static MACHINE_CONFIG_START( gluck2, gluck2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* from MC6845 init, registers 01 & 06. */
 	MCFG_SCREEN_UPDATE_DRIVER(gluck2_state, screen_update_gluck2)
 
-	MCFG_GFXDECODE(gluck2)
+	MCFG_GFXDECODE_ADD("gfxdecode", gluck2)
 	MCFG_PALETTE_LENGTH(0x100)
 	MCFG_PALETTE_INIT_OVERRIDE(gluck2_state, gluck2)
 

@@ -52,7 +52,7 @@ UINT32 intrscti_state::screen_update_intrscti(screen_device &screen, bitmap_ind1
 		{
 			int dat;
 			dat = m_vram[count];
-			machine().gfx[0]->transpen(bitmap,cliprect,dat/*+0x100*/,0,0,0,x*8,y*8,0);
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,dat/*+0x100*/,0,0,0,x*8,y*8,0);
 			count++;
 		}
 	}
@@ -64,7 +64,7 @@ UINT32 intrscti_state::screen_update_intrscti(screen_device &screen, bitmap_ind1
 		{
 			int dat;
 			dat = m_vram[count];
-			machine().gfx[0]->transpen(bitmap,cliprect,dat+0x100,0,0,0,x*8,y*8,0);
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,dat+0x100,0,0,0,x*8,y*8,0);
 			count++;
 		}
 	}
@@ -189,7 +189,7 @@ static MACHINE_CONFIG_START( intrscti, intrscti_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(intrscti_state, screen_update_intrscti)
 
-	MCFG_GFXDECODE(intrscti)
+	MCFG_GFXDECODE_ADD("gfxdecode", intrscti)
 	MCFG_PALETTE_LENGTH(0x100)
 MACHINE_CONFIG_END
 

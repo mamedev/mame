@@ -1632,15 +1632,17 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_berlwall)
 
-	MCFG_GFXDECODE(1x4bit_1x4bit)
+	MCFG_GFXDECODE_ADD("gfxdecode", 1x4bit_1x4bit)
 	MCFG_PALETTE_LENGTH(2048 + 32768)   /* 32768 static colors for the bg */
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, -0x8, 256, 240);
+	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD_VU002_SPRITES
 	kaneko16_sprite_device::set_altspacing(*device, 1);
+	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 
 	MCFG_PALETTE_INIT_OVERRIDE(kaneko16_berlwall_state,berlwall)
@@ -1686,19 +1688,22 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_kaneko16)
 
-	MCFG_GFXDECODE(1x4bit_2x4bit)
+	MCFG_GFXDECODE_ADD("gfxdecode", 1x4bit_2x4bit)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, -0x8, 256, 240);
+	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
+	
 	MCFG_DEVICE_ADD("view2_1", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 2);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, -0x8, 256, 240);
+	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD_VU002_SPRITES
 	kaneko16_sprite_device::set_priorities(*device, 8,8,8,8); // above all
-
+	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 
 
@@ -1755,16 +1760,18 @@ static MACHINE_CONFIG_START( blazeon, kaneko16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1 -8)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_kaneko16)
 
-	MCFG_GFXDECODE(1x4bit_1x4bit)
+	MCFG_GFXDECODE_ADD("gfxdecode", 1x4bit_1x4bit)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x33, 0x8, 320, 240);
+	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD_VU002_SPRITES
 	kaneko16_sprite_device::set_priorities(*device, 1 /* "above tile[0], below the others" */ ,2 /* "above tile[0-1], below the others" */ ,8 /* above all */,8 /* above all */);
 	kaneko16_sprite_device::set_offsets(*device, 0x10000 - 0x680, 0x000);
+	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 	// there is actually a 2nd sprite chip! looks like our device emulation handles both at once
 
@@ -1815,18 +1822,21 @@ static MACHINE_CONFIG_START( gtmr, kaneko16_gtmr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_kaneko16)
 
-	MCFG_GFXDECODE(1x8bit_2x4bit)
+	MCFG_GFXDECODE_ADD("gfxdecode", 1x8bit_2x4bit)
 	MCFG_PALETTE_LENGTH(32768)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x33, 0x0, 320, 240);
+	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("view2_1", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 2);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x33, 0x0, 320, 240);
+	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD_KC002_SPRITES
+	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
 	kaneko_toybox_device::set_toybox_table(*device, TABLE_NORMAL);
@@ -1933,20 +1943,22 @@ static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_kaneko16)
 
-	MCFG_GFXDECODE(1x4bit_2x4bit)
+	MCFG_GFXDECODE_ADD("gfxdecode", 1x4bit_2x4bit)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, -0x8, 256, 240);
+	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("view2_1", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 2);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, -0x8, 256, 240);
+	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD_VU002_SPRITES
 	kaneko16_sprite_device::set_priorities(*device, 2 /* below all */ ,3 /* above tile[0], below the other */ ,5 /* above all */ ,7 /* above all */);
-
+	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 
 
@@ -2058,12 +2070,13 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MCFG_GFXDECODE(1x4bit_1x4bit)
+	MCFG_GFXDECODE_ADD("gfxdecode", 1x4bit_1x4bit)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x33, -0x8, 320, 240);
+	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_shogwarr_state,kaneko16)
 
@@ -2071,6 +2084,7 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
 	kaneko16_sprite_device::set_priorities(*device, 1 /* below all */ ,3 /* above tile[0], below the others */ ,5 /* above all */ ,7 /* above all */);
 	kaneko16_sprite_device::set_offsets(*device, 0xa00, -0x40);
 	kaneko16_sprite_device::set_fliptype(*device, 1);
+	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("kan_hit", KANEKO_HIT, 0)
 	kaneko_hit_device::set_type(*device, 1);

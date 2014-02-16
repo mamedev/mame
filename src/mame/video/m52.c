@@ -135,7 +135,7 @@ TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
 		flag |= TILE_FORCE_LAYER0; /* lines 0 to 6 are opaqe? */
 	}
 
-	SET_TILE_INFO_MEMBER(0, code, color & 0x3f, flag);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color & 0x3f, flag);
 }
 
 
@@ -308,7 +308,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	ypos = ypos + (22 - 8);
 
 	
-		machine().gfx[image]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
 		0, 0,
 		flip_screen(),
 		flip_screen(),
@@ -316,7 +316,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		ypos, 0);
 
 	
-		machine().gfx[image]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
 		0, 0,
 		flip_screen(),
 		flip_screen(),
@@ -337,7 +337,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		rect.max_y = ypos + 2 * BGHEIGHT - 1;
 	}
 
-	bitmap.fill(machine().gfx[image]->colorbase() + 3, rect);
+	bitmap.fill(m_gfxdecode->gfx(image)->colorbase() + 3, rect);
 }
 
 
@@ -410,9 +410,9 @@ UINT32 m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap,
 		clip = cliprect;
 #endif
 
-		 machine().gfx[1]->transmask(bitmap,clip,
+		 m_gfxdecode->gfx(1)->transmask(bitmap,clip,
 			code, color, flipx, flipy, sx, sy,
-			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 512 + 32));
+			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 512 + 32));
 	}
 	return 0;
 }

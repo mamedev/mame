@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_back_tile_info)
 	tile &= 0xfff;
 	tile |= m_back_gfx_bank;        /* Heatbrl uses banking */
 
-	SET_TILE_INFO_MEMBER(1,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info)
@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(5,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 5,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_denji)
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_denji)
 	tile &= 0xfff;
 	tile |= m_mid_gfx_bank;
 
-	SET_TILE_INFO_MEMBER(5,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 5,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_cupsoc)
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_cupsoc)
 	tile |= 0x1000;
 	color += 0x10;
 
-	SET_TILE_INFO_MEMBER(1,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info)/* this is giving bad tiles... */
@@ -117,7 +117,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info)/* this is giving bad ti
 	// legionnaire tile numbers / gfx set wrong, see screen after coin insertion
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(4,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 4,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info_denji)
@@ -128,7 +128,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info_denji)
 	tile &= 0xfff;
 	tile |= m_fore_gfx_bank;
 
-	SET_TILE_INFO_MEMBER(4,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 4,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(0,tile,color,0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tile,color,0);
 }
 
 VIDEO_START_MEMBER(legionna_state,legionna)
@@ -359,7 +359,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						machine().gfx[3]->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,(x+ax*16)+m_sprite_xoffs,y+ay*16+m_sprite_yoffs,
 						screen.priority(),pri_mask, 15);
@@ -370,7 +370,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						machine().gfx[3]->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,(x+ax*16)+m_sprite_xoffs,y+(dy-ay-1)*16+m_sprite_yoffs,
 						screen.priority(),pri_mask,15);
@@ -384,7 +384,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						machine().gfx[3]->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,(x+(dx-ax-1)*16)+m_sprite_xoffs,y+ay*16+m_sprite_yoffs,
 						screen.priority(),pri_mask,15);
@@ -395,7 +395,7 @@ void legionna_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						machine().gfx[3]->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,(x+(dx-ax-1)*16)+m_sprite_xoffs,y+(dy-ay-1)*16+m_sprite_yoffs,
 						screen.priority(),pri_mask, 15);

@@ -147,7 +147,7 @@ void psikyosh_state::draw_bglayer( int layer, bitmap_rgb32 &bitmap, const rectan
 
 	assert(!BG_LINE(layer));
 
-	gfx = BG_DEPTH_8BPP(layer) ? machine().gfx[1] : machine().gfx[0];
+	gfx = BG_DEPTH_8BPP(layer) ? m_gfxdecode->gfx(1) : m_gfxdecode->gfx(0);
 	size = BG_LARGE(layer) ? 32 : 16;
 	width = 16 * size;
 
@@ -250,7 +250,7 @@ void psikyosh_state::draw_bglayerscroll( int layer, bitmap_rgb32 &bitmap, const 
 {
 	assert(BG_LINE(layer));
 
-	gfx_element *gfx = BG_DEPTH_8BPP(layer) ? machine().gfx[1] : machine().gfx[0];
+	gfx_element *gfx = BG_DEPTH_8BPP(layer) ? m_gfxdecode->gfx(1) : m_gfxdecode->gfx(0);
 	int size = BG_LARGE(layer) ? 32 : 16;
 	int width = size * 16;
 
@@ -1001,7 +1001,7 @@ void psikyosh_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 			alphamap = (alpha_table[BYTE4_XOR_BE(alpha)] & 0x80)? 1:0;
 			alpha = alpha_table[BYTE4_XOR_BE(alpha)] & 0x3f;
 
-			gfx = dpth ? machine().gfx[1] : machine().gfx[0];
+			gfx = dpth ? m_gfxdecode->gfx(1) : m_gfxdecode->gfx(0);
 
 			if (alphamap) /* alpha values are per-pen */
 				alpha = -1;
@@ -1093,7 +1093,7 @@ void psikyosh_state::video_start()
 	m_bg_bitmap.allocate(32*16, 32*16); /* temp buffer for assembling tilemaps */
 	m_bg_zoom = auto_alloc_array(machine(), UINT16, 256);
 
-	machine().gfx[1]->set_granularity(16); /* 256 colour sprites with palette selectable on 16 colour boundaries */
+	m_gfxdecode->gfx(1)->set_granularity(16); /* 256 colour sprites with palette selectable on 16 colour boundaries */
 
 	/* Pens 0xc0-0xff have a gradient of alpha values associated with them */
 	int i;

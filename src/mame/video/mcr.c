@@ -31,7 +31,7 @@ static tilemap_t *bg_tilemap;
 TILE_GET_INFO_MEMBER(mcr_state::mcr_90009_get_tile_info)
 {
 	UINT8 *videoram = m_videoram;
-	SET_TILE_INFO_MEMBER(0, videoram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, videoram[tile_index], 0, 0);
 
 	/* sprite color base is constant 0x10 */
 	tileinfo.category = 1;
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_90010_get_tile_info)
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = data & 0x1ff;
 	int color = (data >> 11) & 3;
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((data >> 9) & 3));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, TILE_FLIPYX((data >> 9) & 3));
 
 	/* sprite color base comes from the top 2 bits */
 	tileinfo.category = (data >> 14) & 3;
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_91490_get_tile_info)
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 3;
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((data >> 10) & 3));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, TILE_FLIPYX((data >> 10) & 3));
 
 	/* sprite color base might come from the top 2 bits */
 	tileinfo.category = (data >> 14) & 3;
@@ -252,7 +252,7 @@ WRITE8_MEMBER(mcr_state::mcr_91490_videoram_w)
 void mcr_state::render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *spriteram = m_spriteram;
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int offs;
 
 	/* render the sprites into the bitmap, ORing together */
@@ -324,7 +324,7 @@ void mcr_state::render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap
 void mcr_state::render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask)
 {
 	UINT8 *spriteram = m_spriteram;
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int offs;
 
 	/* render the sprites into the bitmap, working from topmost to bottommost */

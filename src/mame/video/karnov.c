@@ -99,10 +99,10 @@ void karnov_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipr
 		color = tile >> 12;
 		tile = tile & 0x7ff;
 		if (m_flipscreen)
-			 machine().gfx[1]->opaque(*m_bitmap_f,m_bitmap_f->cliprect(),tile,
+			 m_gfxdecode->gfx(1)->opaque(*m_bitmap_f,m_bitmap_f->cliprect(),tile,
 				color, fx, fy, 496-16*mx,496-16*my);
 		else
-			 machine().gfx[1]->opaque(*m_bitmap_f,m_bitmap_f->cliprect(),tile,
+			 m_gfxdecode->gfx(1)->opaque(*m_bitmap_f,m_bitmap_f->cliprect(),tile,
 				color, fx, fy, 16*mx,16*my);
 	}
 
@@ -135,7 +135,7 @@ UINT32 karnov_state::screen_update_karnov(screen_device &screen, bitmap_ind16 &b
 TILE_GET_INFO_MEMBER(karnov_state::get_fix_tile_info)
 {
 	int tile = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			tile&0xfff,
 			tile>>14,

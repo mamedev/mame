@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(snk68_state::get_pow_tile_info)
 	int tile = m_fg_tile_offset + (m_pow_fg_videoram[2*tile_index] & 0xff);
 	int color = m_pow_fg_videoram[2*tile_index+1] & 0x07;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(snk68_state::get_searchar_tile_info)
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(snk68_state::get_searchar_tile_info)
 	// used in the ikari3 intro
 	int flags = (data & 0x8000) ? TILE_FORCE_LAYER0 : 0;
 
-	SET_TILE_INFO_MEMBER(0, tile, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, flags);
 }
 
 /***************************************************************************
@@ -188,7 +188,7 @@ void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	// pow has 0x4000 tiles and independent x/y flipping
 	// the other games have > 0x4000 tiles and flipping in only one direction
 	// (globally selected)
-	int const is_pow = (machine().gfx[1]->elements() <= 0x4000);
+	int const is_pow = (m_gfxdecode->gfx(1)->elements() <= 0x4000);
 	int offs;
 
 	for (offs = 0; offs < 0x800; offs += 0x40)
@@ -246,7 +246,7 @@ void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					fy = !fy;
 				}
 
-				 machine().gfx[1]->transpen(bitmap,cliprect,
+				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						tile,
 						color,
 						fx, fy,

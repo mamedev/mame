@@ -483,7 +483,7 @@ TILE_GET_INFO_MEMBER(twin16_state::get_text_tile_info)
 	if (attr&0x2000) flags|=TILE_FLIPX;
 	if (attr&0x4000) flags|=TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 VIDEO_START_MEMBER(twin16_state,twin16)

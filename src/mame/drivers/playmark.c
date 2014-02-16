@@ -1058,7 +1058,7 @@ static MACHINE_CONFIG_START( bigtwin, playmark_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_bigtwin)
 
-	MCFG_GFXDECODE(playmark)
+	MCFG_GFXDECODE_ADD("gfxdecode", playmark)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwin)
@@ -1092,7 +1092,7 @@ static MACHINE_CONFIG_START( bigtwinb, playmark_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_bigtwinb)
 
-	MCFG_GFXDECODE(bigtwinb)
+	MCFG_GFXDECODE_ADD("gfxdecode", bigtwinb)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwinb)
@@ -1129,7 +1129,7 @@ static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_wbeachvl)
 
-	MCFG_GFXDECODE(wbeachvl)
+	MCFG_GFXDECODE_ADD("gfxdecode", wbeachvl)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,wbeachvl)
@@ -1163,7 +1163,7 @@ static MACHINE_CONFIG_START( excelsr, playmark_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_excelsr)
 
-	MCFG_GFXDECODE(excelsr)
+	MCFG_GFXDECODE_ADD("gfxdecode", excelsr)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,excelsr)
@@ -1200,7 +1200,7 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
 
-	MCFG_GFXDECODE(hrdtimes)
+	MCFG_GFXDECODE_ADD("gfxdecode", hrdtimes)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,hotmind)
@@ -1238,7 +1238,7 @@ static MACHINE_CONFIG_START( hrdtimes, playmark_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
 
-	MCFG_GFXDECODE(hrdtimes)
+	MCFG_GFXDECODE_ADD("gfxdecode", hrdtimes)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,hrdtimes)

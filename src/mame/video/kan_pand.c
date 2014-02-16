@@ -54,9 +54,21 @@ const device_type KANEKO_PANDORA = &device_creator<kaneko_pandora_device>;
 
 kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KANEKO_PANDORA, "Kaneko Pandora - PX79C480FP-3", tag, owner, clock, "kaneko_pandora", __FILE__),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this),
+		m_gfxdecode(*this)
 {
 }
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void kaneko_pandora_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<kaneko_pandora_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -211,7 +223,7 @@ void kaneko_pandora_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprec
 		if (sy & 0x100)
 			sy -= 0x200;
 
-		machine().gfx[m_gfx_region]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_gfx_region)->transpen(bitmap,cliprect,
 				tile,
 				(tilecolour & 0xf0) >> 4,
 				flipx, flipy,

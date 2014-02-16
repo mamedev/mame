@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(jack_state::get_bg_tile_info)
 
 	// striv: m_colorram[tile_index] & 0x80 ???
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(jack_state::tilemap_scan_cols_flipy)
@@ -89,7 +89,7 @@ void jack_state::jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipr
 			flipy = !flipy;
 		}
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -175,7 +175,7 @@ TILE_GET_INFO_MEMBER(jack_state::joinem_get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x03) << 8);
 	int color = (m_colorram[tile_index] & 0x38) >> 3 | m_joinem_palette_bank;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 VIDEO_START_MEMBER(jack_state,joinem)
@@ -209,7 +209,7 @@ void jack_state::joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 			flipy = !flipy;
 		}
 
-		machine().gfx[0]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

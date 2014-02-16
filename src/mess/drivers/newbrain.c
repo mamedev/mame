@@ -1371,7 +1371,7 @@ static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 	MCFG_CPU_IO_MAP(newbrain_cop_io_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED )
 
-	MCFG_GFXDECODE(newbrain)
+	MCFG_GFXDECODE_ADD("gfxdecode", newbrain)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cop_regint", newbrain_state, cop_regint_tick, attotime::from_usec(12500))
 

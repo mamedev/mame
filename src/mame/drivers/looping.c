@@ -215,7 +215,7 @@ TILE_GET_INFO_MEMBER(looping_state::get_tile_info)
 {
 	int tile_number = m_videoram[tile_index];
 	int color = m_colorram[(tile_index & 0x1f) * 2 + 1] & 0x07;
-	SET_TILE_INFO_MEMBER(0, tile_number, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile_number, color, 0);
 }
 
 
@@ -308,7 +308,7 @@ void looping_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		 machine().gfx[1]->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -681,7 +681,7 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(looping_state, screen_update_looping)
 
-	MCFG_GFXDECODE(looping)
+	MCFG_GFXDECODE_ADD("gfxdecode", looping)
 	MCFG_PALETTE_LENGTH(32)
 
 

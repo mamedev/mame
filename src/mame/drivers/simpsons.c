@@ -344,8 +344,11 @@ static MACHINE_CONFIG_START( simpsons, simpsons_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K052109_ADD("k052109", simpsons_k052109_intf)
+	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K053246_ADD("k053246", simpsons_k053246_intf)
+	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

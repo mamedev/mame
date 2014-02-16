@@ -313,7 +313,7 @@ static MACHINE_CONFIG_START( ultratnk, ultratnk_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ultratnk_state, screen_update_ultratnk)
 	MCFG_SCREEN_VBLANK_DRIVER(ultratnk_state, screen_eof_ultratnk)
 
-	MCFG_GFXDECODE(ultratnk)
+	MCFG_GFXDECODE_ADD("gfxdecode", ultratnk)
 	MCFG_PALETTE_LENGTH(10)
 
 

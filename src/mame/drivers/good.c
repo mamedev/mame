@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(good_state::get_fg_tile_info)
 {
 	int tileno = m_fg_tilemapram[tile_index * 2];
 	int attr = m_fg_tilemapram[tile_index * 2 + 1] & 0xf;
-	SET_TILE_INFO_MEMBER(0, tileno, attr, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, attr, 0);
 }
 
 WRITE16_MEMBER(good_state::bg_tilemapram_w)
@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(good_state::get_bg_tile_info)
 {
 	int tileno = m_bg_tilemapram[tile_index * 2];
 	int attr = m_bg_tilemapram[tile_index * 2 + 1] & 0xf;
-	SET_TILE_INFO_MEMBER(1, tileno, attr, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, attr, 0);
 }
 
 
@@ -283,7 +283,7 @@ static MACHINE_CONFIG_START( good, good_state )
 	MCFG_CPU_PROGRAM_MAP(good_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", good_state,  irq2_line_hold)
 
-	MCFG_GFXDECODE(good)
+	MCFG_GFXDECODE_ADD("gfxdecode", good)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(strnskil_state::get_bg_tile_info)
 	int code = videoram[(tile_index * 2) + 1] + ((attr & 0x60) << 3);
 	int color = (attr & 0x1f) | ((attr & 0x80) >> 2);
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void strnskil_state::video_start()
@@ -111,11 +111,11 @@ void strnskil_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			sx = sx - 256;
 
 		
-			machine().gfx[1]->transmask(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			px, py,
-			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
+			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0));
 	}
 }
 

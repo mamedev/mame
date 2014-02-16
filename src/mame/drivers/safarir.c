@@ -173,7 +173,7 @@ TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
 			color |= (tile_index & 0xc0) ? 1 : 0;
 	}
 
-	SET_TILE_INFO_MEMBER(0, code & 0x7f, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code & 0x7f, color, 0);
 }
 
 
@@ -190,7 +190,7 @@ TILE_GET_INFO_MEMBER(safarir_state::get_fg_tile_info)
 
 	flags = ((tile_index & 0x1f) >= 0x03) ? 0 : TILE_FORCE_LAYER0;
 
-	SET_TILE_INFO_MEMBER(1, code & 0x7f, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code & 0x7f, color, flags);
 }
 
 
@@ -407,7 +407,7 @@ static MACHINE_CONFIG_START( safarir, safarir_state )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(2*8)
-	MCFG_GFXDECODE(safarir)
+	MCFG_GFXDECODE_ADD("gfxdecode", safarir)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(32*8, 32*8)

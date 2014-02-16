@@ -721,7 +721,7 @@ static MACHINE_CONFIG_START( thepit, thepit_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thepit_state,  irq0_line_hold)
 
 	/* video hardware */
-	MCFG_GFXDECODE(thepit)
+	MCFG_GFXDECODE_ADD("gfxdecode", thepit)
 	MCFG_PALETTE_LENGTH(32+8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -749,7 +749,7 @@ static MACHINE_CONFIG_DERIVED( desertdn, thepit )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update_desertdan)
 
-	MCFG_GFXDECODE(intrepid)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", intrepid)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( intrepid, thepit )
@@ -759,7 +759,7 @@ static MACHINE_CONFIG_DERIVED( intrepid, thepit )
 	MCFG_CPU_PROGRAM_MAP(intrepid_main_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(intrepid)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", intrepid)
 MACHINE_CONFIG_END
 
 
@@ -769,7 +769,7 @@ static MACHINE_CONFIG_DERIVED( suprmous, intrepid )
 
 	/* video hardware */
 	MCFG_PALETTE_INIT_OVERRIDE(thepit_state,suprmous)
-	MCFG_GFXDECODE(suprmous)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", suprmous)
 MACHINE_CONFIG_END
 
 

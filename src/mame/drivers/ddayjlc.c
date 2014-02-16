@@ -381,7 +381,7 @@ TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_bg)
 	int color = (m_bgram[tile_index + 0x400] & 0x7);
 	color |= (m_bgram[tile_index + 0x400] & 0x40) >> 3;
 
-	SET_TILE_INFO_MEMBER(2, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, 0);
 }
 
 void ddayjlc_state::video_start()
@@ -406,7 +406,7 @@ UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 
 
 		code = (code & 0x7f) | ((flags & 0x30) << 3);
 
-		 machine().gfx[0]->transpen(bitmap,cliprect, code, color, xflip, yflip, x, y, 0);
+		 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, code, color, xflip, yflip, x, y, 0);
 	}
 
 	{
@@ -417,9 +417,9 @@ UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 
 			{
 				c = m_videoram[y * 32 + x];
 				if (x > 1 && x < 30)
-					 machine().gfx[1]->transpen(bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
+					 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
 				else
-					 machine().gfx[1]->opaque(bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
+					 m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
 			}
 	}
 	return 0;
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddayjlc_state, screen_update_ddayjlc)
 
-	MCFG_GFXDECODE(ddayjlc)
+	MCFG_GFXDECODE_ADD("gfxdecode", ddayjlc)
 	MCFG_PALETTE_LENGTH(0x200)
 
 

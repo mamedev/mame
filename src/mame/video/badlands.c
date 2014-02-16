@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(badlands_state::get_playfield_tile_info)
 	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = (data & 0x1fff) + ((data & 0x1000) ? (m_playfield_tile_bank << 12) : 0);
 	int color = (data >> 13) & 0x07;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 

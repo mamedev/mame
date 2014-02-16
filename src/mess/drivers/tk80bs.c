@@ -67,7 +67,7 @@ UINT32 tk80bs_state::screen_update_tk80bs(screen_device &screen, bitmap_ind16 &b
 		{
 			int tile = m_p_videoram[count++];
 
-			 machine().gfx[0]->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8);
+			 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8);
 		}
 	}
 
@@ -193,7 +193,7 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tk80bs_state, screen_update_tk80bs)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
-	MCFG_GFXDECODE(tk80bs)
+	MCFG_GFXDECODE_ADD("gfxdecode", tk80bs)
 
 	/* Devices */
 	MCFG_I8255_ADD( "ppi", ppi_intf)

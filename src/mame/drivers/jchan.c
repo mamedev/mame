@@ -588,7 +588,7 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_CPU_ADD("sub", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(jchan_sub)
 
-	MCFG_GFXDECODE(jchan)
+	MCFG_GFXDECODE_ADD("gfxdecode", jchan)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -603,6 +603,7 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 25, 11, 320, 240);
+	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 
 

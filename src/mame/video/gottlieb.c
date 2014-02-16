@@ -105,7 +105,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_charram_w)
 	if (m_charram[offset] != data)
 	{
 		m_charram[offset] = data;
-		machine().gfx[0]->mark_dirty(offset / 32);
+		m_gfxdecode->gfx(0)->mark_dirty(offset / 32);
 	}
 }
 
@@ -122,9 +122,9 @@ TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
 	UINT8 *videoram = m_videoram;
 	int code = videoram[tile_index];
 	if ((code & 0x80) == 0)
-		SET_TILE_INFO_MEMBER(m_gfxcharlo, code, 0, 0);
+		SET_TILE_INFO_MEMBER(m_gfxdecode, m_gfxcharlo, code, 0, 0);
 	else
-		SET_TILE_INFO_MEMBER(m_gfxcharhi, code, 0, 0);
+		SET_TILE_INFO_MEMBER(m_gfxdecode, m_gfxcharhi, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(gottlieb_state::get_screwloo_bg_tile_info)
@@ -132,9 +132,9 @@ TILE_GET_INFO_MEMBER(gottlieb_state::get_screwloo_bg_tile_info)
 	UINT8 *videoram = m_videoram;
 	int code = videoram[tile_index];
 	if ((code & 0xc0) == 0)
-		SET_TILE_INFO_MEMBER(m_gfxcharlo, code, 0, 0);
+		SET_TILE_INFO_MEMBER(m_gfxdecode, m_gfxcharlo, code, 0, 0);
 	else
-		SET_TILE_INFO_MEMBER(m_gfxcharhi, code, 0, 0);
+		SET_TILE_INFO_MEMBER(m_gfxdecode, m_gfxcharhi, code, 0, 0);
 }
 
 
@@ -156,7 +156,7 @@ void gottlieb_state::video_start()
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(0, 318 - 256);
 
-	machine().gfx[0]->set_source(m_charram);
+	m_gfxdecode->gfx(0)->set_source(m_charram);
 
 	/* save some state */
 	save_item(NAME(m_background_priority));
@@ -182,7 +182,7 @@ VIDEO_START_MEMBER(gottlieb_state,screwloo)
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(0, 318 - 256);
 
-	machine().gfx[0]->set_source(m_charram);
+	m_gfxdecode->gfx(0)->set_source(m_charram);
 
 	/* save some state */
 	save_item(NAME(m_background_priority));
@@ -220,7 +220,7 @@ void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		if (flip_screen_y()) sy = 244 - sy;
 
 		
-			machine().gfx[2]->transpen(bitmap,clip,
+			m_gfxdecode->gfx(2)->transpen(bitmap,clip,
 			code, 0,
 			flip_screen_x(), flip_screen_y(),
 			sx,sy, 0);

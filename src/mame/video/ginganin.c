@@ -78,7 +78,7 @@ TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
 {
 	UINT8 *gfx = memregion("gfx5")->base();
 	int code = gfx[2 * tile_index + 0] * 256 + gfx[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			BG_GFX,
 			code,
 			code >> 12,
@@ -95,7 +95,7 @@ TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(ginganin_state::get_fg_tile_info)
 {
 	UINT16 code = m_fgram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			FG_GFX,
 			code,
 			code >> 12,
@@ -118,7 +118,7 @@ WRITE16_MEMBER(ginganin_state::ginganin_fgram16_w)
 TILE_GET_INFO_MEMBER(ginganin_state::get_txt_tile_info)
 {
 	UINT16 code = m_txtram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			TXT_GFX,
 			code,
 			code >> 12,
@@ -228,7 +228,7 @@ void ginganin_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		machine().gfx[3]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 				code & 0x3fff,
 				attr >> 12,
 				flipx, flipy,

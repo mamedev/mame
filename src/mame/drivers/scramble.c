@@ -1474,7 +1474,7 @@ static MACHINE_CONFIG_START( scramble, scramble_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 
-	MCFG_GFXDECODE(scramble)
+	MCFG_GFXDECODE_ADD("gfxdecode", scramble)
 	MCFG_PALETTE_LENGTH(32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 
 	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,scrambold)
@@ -1512,7 +1512,7 @@ static MACHINE_CONFIG_DERIVED( devilfsh, scramble )
 	MCFG_CPU_PROGRAM_MAP(mars_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(devilfsh)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", devilfsh)
 	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,galaxold)
 MACHINE_CONFIG_END
@@ -1524,7 +1524,7 @@ static MACHINE_CONFIG_DERIVED( newsin7, scramble )
 	MCFG_CPU_PROGRAM_MAP(newsin7_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(newsin7)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", newsin7)
 	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scrambold)
@@ -1540,7 +1540,7 @@ static MACHINE_CONFIG_DERIVED( mrkougar, scramble )
 	MCFG_I8255A_ADD( "ppi8255_1", mrkougar_ppi_1_intf )
 
 	/* video hardware */
-	MCFG_GFXDECODE(mrkougar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", mrkougar)
 	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,galaxold)
 MACHINE_CONFIG_END
@@ -1711,7 +1711,7 @@ static MACHINE_CONFIG_START( ad2083, scramble_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 
-	MCFG_GFXDECODE(ad2083)
+	MCFG_GFXDECODE_ADD("gfxdecode", ad2083)
 	MCFG_PALETTE_LENGTH(32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
 	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,turtles)

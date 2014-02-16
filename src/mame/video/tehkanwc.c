@@ -70,7 +70,7 @@ TILE_GET_INFO_MEMBER(tehkanwc_state::get_bg_tile_info)
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(2, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(tehkanwc_state::get_fg_tile_info)
@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(tehkanwc_state::get_fg_tile_info)
 
 	tileinfo.category = (attr & 0x20) ? 0 : 1;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 void tehkanwc_state::video_start()
@@ -148,7 +148,7 @@ void tehkanwc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			code, color, flipx, flipy, sx, sy, 0);
 	}
 }

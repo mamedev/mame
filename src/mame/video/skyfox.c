@@ -191,7 +191,7 @@ void skyfox_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		}
 
 #define DRAW_SPRITE(DX,DY,CODE) \
-		machine().gfx[0]->transpen(bitmap,\
+		m_gfxdecode->gfx(0)->transpen(bitmap,\
 				cliprect, \
 				(CODE), \
 				0, \

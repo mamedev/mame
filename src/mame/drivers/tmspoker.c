@@ -260,7 +260,7 @@ TILE_GET_INFO_MEMBER(tmspoker_state::get_bg_tile_info)
 */
 	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER( 0 /* bank */, code, 0 /* color */, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode,  0 /* bank */, code, 0 /* color */, 0);
 }
 
 void tmspoker_state::video_start()
@@ -592,12 +592,11 @@ static MACHINE_CONFIG_START( tmspoker, tmspoker_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(tmspoker_state, screen_update_tmspoker)
 
-	MCFG_GFXDECODE(tmspoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", tmspoker)
 
 	MCFG_PALETTE_LENGTH(256)
-
-	MCFG_SCREEN_UPDATE_DRIVER(tmspoker_state, screen_update_tmspoker)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4, mc6845_intf) /* guess */
 

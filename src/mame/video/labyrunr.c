@@ -85,7 +85,7 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info0)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16)+(attr & 7),
@@ -114,7 +114,7 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info1)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code+bank*256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
@@ -208,7 +208,7 @@ UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind1
 		}
 
 		m_layer0->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_OPAQUE, 0);
-		m_k007121->sprites_draw(bitmap, cliprect, machine().gfx[0], machine().colortable, m_spriteram,(m_k007121->ctrlram_r(space, 6) & 0x30) * 2, 40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
+		m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), machine().colortable, m_spriteram,(m_k007121->ctrlram_r(space, 6) & 0x30) * 2, 40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
 		m_layer1->draw(screen, bitmap, finalclip1, TILEMAP_DRAW_OPAQUE, 0);
 	}
@@ -278,7 +278,7 @@ UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind1
 		if(use_clip3[1])
 			m_layer1->draw(screen, bitmap, finalclip3, 0, 1);
 
-		m_k007121->sprites_draw(bitmap, cliprect, machine().gfx[0], machine().colortable, m_spriteram, (m_k007121->ctrlram_r(space, 6) & 0x30) * 2,40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
+		m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), machine().colortable, m_spriteram, (m_k007121->ctrlram_r(space, 6) & 0x30) * 2,40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
 	}
 	return 0;
 }

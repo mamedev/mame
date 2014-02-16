@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(jackal_state::get_bg_tile_info)
 	int color = 0;//attr & 0x0f;
 	int flags = ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 void jackal_state::video_start()
@@ -112,7 +112,7 @@ void jackal_state::draw_background( screen_device &screen, bitmap_ind16 &bitmap,
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 }
 
-#define DRAW_SPRITE(bank, code, sx, sy)  machine().gfx[bank]->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+#define DRAW_SPRITE(bank, code, sx, sy)  m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
 
 void jackal_state::draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *sram, int length, int bank )
 {

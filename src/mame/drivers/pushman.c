@@ -436,7 +436,7 @@ static MACHINE_CONFIG_START( pushman, pushman_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pushman_state, screen_update_pushman)
 
-	MCFG_GFXDECODE(pushman)
+	MCFG_GFXDECODE_ADD("gfxdecode", pushman)
 	MCFG_PALETTE_LENGTH(1024)
 
 
@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( bballs, pushman_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pushman_state, screen_update_pushman)
 
-	MCFG_GFXDECODE(pushman)
+	MCFG_GFXDECODE_ADD("gfxdecode", pushman)
 	MCFG_PALETTE_LENGTH(1024)
 
 

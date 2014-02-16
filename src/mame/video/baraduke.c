@@ -74,7 +74,7 @@ TILEMAP_MAPPER_MEMBER(baraduke_state::tx_tilemap_scan)
 
 TILE_GET_INFO_MEMBER(baraduke_state::tx_get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_textram[tile_index],
 			(m_textram[tile_index+0x400] << 2) & 0x1ff,
@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(baraduke_state::get_tile_info0)
 	int code = m_videoram[2*tile_index];
 	int attr = m_videoram[2*tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code + ((attr & 0x03) << 8),
 			attr,
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(baraduke_state::get_tile_info1)
 	int code = m_videoram[0x1000 + 2*tile_index];
 	int attr = m_videoram[0x1000 + 2*tile_index + 1];
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code + ((attr & 0x03) << 8),
 			attr,
@@ -267,7 +267,7 @@ void baraduke_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					machine().gfx[3]->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,

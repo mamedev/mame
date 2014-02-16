@@ -345,7 +345,7 @@ GFXDECODE_END
 
 void hp9k_state::putChar(UINT8 thec,int x,int y,bitmap_ind16 &bitmap)
 {
-	const UINT8* pchar=machine().gfx[0]->get_data(thec);
+	const UINT8* pchar=m_gfxdecode->gfx(0)->get_data(thec);
 
 	for (int py=0;py<HP9816_CHDIMY;py++)
 	{
@@ -416,7 +416,7 @@ static MACHINE_CONFIG_START( hp9k, hp9k_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(hp9k_state, screen_update)
 
-	MCFG_GFXDECODE(hp9k)
+	MCFG_GFXDECODE_ADD("gfxdecode", hp9k)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 

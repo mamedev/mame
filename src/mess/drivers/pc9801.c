@@ -1489,13 +1489,13 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 				if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 				{
 					m_kanji_rom[pcg_offset] = data;
-					machine().gfx[2]->mark_dirty(pcg_offset >> 5);
+					m_gfxdecode->gfx(2)->mark_dirty(pcg_offset >> 5);
 				}
 				return;
 			}
 		}
 
-		//printf("Write to undefined port [%02x] <- %02x\n",offset+0xa0,data);
+		//printf("Write to undefined port [%02x) <- %02x\n",offset+0xa0,data);
 	}
 }
 
@@ -1901,7 +1901,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 	{
 		m_kanji_rom[pcg_offset] = data;
-		machine().gfx[2]->mark_dirty(pcg_offset >> 5);
+		m_gfxdecode->gfx(2)->mark_dirty(pcg_offset >> 5);
 	}
 }
 
@@ -3734,7 +3734,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT_OVERRIDE(pc9801_state,pc9801)
-	MCFG_GFXDECODE(pc9801)
+	MCFG_GFXDECODE_ADD("gfxdecode", pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3798,7 +3798,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 
 	MCFG_PALETTE_LENGTH(16+16)
 	MCFG_PALETTE_INIT_OVERRIDE(pc9801_state,pc9801)
-	MCFG_GFXDECODE(pc9801)
+	MCFG_GFXDECODE_ADD("gfxdecode", pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3876,7 +3876,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 
 	MCFG_PALETTE_LENGTH(16+16+256)
 	MCFG_PALETTE_INIT_OVERRIDE(pc9801_state,pc9801)
-	MCFG_GFXDECODE(pc9801)
+	MCFG_GFXDECODE_ADD("gfxdecode", pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

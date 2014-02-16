@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(sbowling_state::get_sb_tile_info)
 	UINT8 *rom = memregion("user1")->base();
 	int tileno = rom[tile_index + m_bgmap * 1024];
 
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, 0, 0);
 }
 
 static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int flip)
@@ -389,7 +389,7 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sbowling_state, screen_update_sbowling)
 
-	MCFG_GFXDECODE(sbowling)
+	MCFG_GFXDECODE_ADD("gfxdecode", sbowling)
 
 	MCFG_PALETTE_LENGTH(0x400)
 

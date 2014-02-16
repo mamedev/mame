@@ -1057,9 +1057,13 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_mystwarr)
 
 	MCFG_PALETTE_LENGTH(2048)
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K056832_ADD_NOINTF("k056832"/*, mystwarr_k056832_intf*/)
+	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K055555_ADD("k055555")
 	MCFG_K055673_ADD_NOINTF("k055673")
+	MCFG_K055673_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,mystwarr)
 
@@ -1138,7 +1142,7 @@ static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 	MCFG_DEVICE_REMOVE("k053252")
 	MCFG_K053252_ADD("k053252", 6000000, dadandrm_k053252_intf) // 6 MHz?
 
-	MCFG_GFXDECODE(dadandrn)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", dadandrn)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,dadandrn)
@@ -1164,7 +1168,7 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 	MCFG_DEVICE_REMOVE("k053252")
 	MCFG_K053252_ADD("k053252", 6000000, gaiapols_k053252_intf) // 6 MHz?
 
-	MCFG_GFXDECODE(gaiapols)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gaiapols)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,gaiapols)

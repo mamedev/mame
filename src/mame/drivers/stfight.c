@@ -561,7 +561,7 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 	MCFG_SCREEN_UPDATE_DRIVER(stfight_state, screen_update_stfight)
 	MCFG_VIDEO_START_OVERRIDE(stfight_state,stfight)
 
-	MCFG_GFXDECODE(stfight)
+	MCFG_GFXDECODE_ADD("gfxdecode", stfight)
 	MCFG_PALETTE_LENGTH(16*4+16*16+16*16+16*16)
 
 	/* sound hardware */
@@ -600,7 +600,7 @@ static MACHINE_CONFIG_DERIVED( cshooter, stfight )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(stfight_state, screen_update_cshooter)
 
-	MCFG_GFXDECODE(cshooter)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", cshooter)
 	MCFG_VIDEO_START_OVERRIDE(stfight_state,cshooter)
 
 	MCFG_SOUND_MODIFY("ym1")

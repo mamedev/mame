@@ -428,7 +428,7 @@ static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu *
 	MCFG_SCREEN_UPDATE_DRIVER(toki_state, screen_update_toki)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(toki)
+	MCFG_GFXDECODE_ADD("gfxdecode", toki)
 	MCFG_PALETTE_LENGTH(1024)
 
 
@@ -457,7 +457,7 @@ static MACHINE_CONFIG_START( tokib, toki_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toki_state, screen_update_tokib)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE(tokib)
+	MCFG_GFXDECODE_ADD("gfxdecode", tokib)
 	MCFG_PALETTE_LENGTH(1024)
 
 

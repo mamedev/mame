@@ -3084,12 +3084,13 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_contcirc)
 
-	MCFG_GFXDECODE(taitoz)
+	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
 	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
 
@@ -3146,12 +3147,13 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_chasehq)
 
-	MCFG_GFXDECODE(chasehq)
+	MCFG_GFXDECODE_ADD("gfxdecode", chasehq)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", chasehq_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
 	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
 
@@ -3210,12 +3212,13 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_contcirc)
 
-	MCFG_GFXDECODE(taitoz)
+	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
 	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
 
@@ -3270,12 +3273,13 @@ static MACHINE_CONFIG_START( bshark, taitoz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_bshark)
 
-	MCFG_GFXDECODE(taitoz)
+	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
 
 	/* sound hardware */
@@ -3341,12 +3345,13 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_sci)
 
-	MCFG_GFXDECODE(taitoz)
+	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
 
 	/* sound hardware */
@@ -3403,12 +3408,13 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_chasehq)
 
-	MCFG_GFXDECODE(chasehq)
+	MCFG_GFXDECODE_ADD("gfxdecode", chasehq)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", chasehq_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
 	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
 
@@ -3467,12 +3473,13 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_aquajack)
 
-	MCFG_GFXDECODE(taitoz)
+	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
 	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
 
@@ -3528,11 +3535,12 @@ static MACHINE_CONFIG_START( spacegun, taitoz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_spacegun)
 
-	MCFG_GFXDECODE(taitoz)
+	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
 	MCFG_PALETTE_LENGTH(4096)
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn", spacegun_tc0100scn_intf)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
 
 	/* sound hardware */
@@ -3589,12 +3597,13 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_dblaxle)
 
-	MCFG_GFXDECODE(dblaxle)
+	MCFG_GFXDECODE_ADD("gfxdecode", dblaxle)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0480SCP_ADD("tc0480scp", taitoz_tc0480scp_intf)
+	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
 
 	/* sound hardware */
@@ -3651,12 +3660,13 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_racingb)
 
-	MCFG_GFXDECODE(dblaxle)
+	MCFG_GFXDECODE_ADD("gfxdecode", dblaxle)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0480SCP_ADD("tc0480scp", taitoz_tc0480scp_intf)
+	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
 
 	/* sound hardware */

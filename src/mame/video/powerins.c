@@ -121,7 +121,7 @@ Offset:
 TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_0)
 {
 	UINT16 code = m_vram_0[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			(code & 0x07ff) + (m_tile_bank*0x800),
 			((code & 0xf000) >> (16-4)) + ((code & 0x0800) >> (11-4)),
@@ -161,7 +161,7 @@ Offset:
 TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_1)
 {
 	UINT16 code = m_vram_1[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code & 0x0fff,
 			(code & 0xf000) >> (16-4),
@@ -297,7 +297,7 @@ void powerins_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 		{
 			for (y = 0 ; y < dimy ; y++)
 			{
-				machine().gfx[2]->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 						code,
 						color,
 						flipx, flipy,

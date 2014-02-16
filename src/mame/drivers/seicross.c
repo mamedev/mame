@@ -418,7 +418,7 @@ static MACHINE_CONFIG_START( nvram, seicross_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seicross_state, screen_update_seicross)
 
-	MCFG_GFXDECODE(seicross)
+	MCFG_GFXDECODE_ADD("gfxdecode", seicross)
 	MCFG_PALETTE_LENGTH(64)
 
 

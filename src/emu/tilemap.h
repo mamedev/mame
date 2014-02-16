@@ -169,7 +169,7 @@
 
             // set the common info for the tile
             SET_TILE_INFO(
-                1,              // use machine.gfx[1] for tile graphics
+                1,              // use m_gfxdecode->gfx(1) for tile graphics
                 code,           // the index of the graphics for this tile
                 color,          // the color to use for this tile
                 (flipx ? TILE_FLIPX : 0) |  // flags for this tile; also
@@ -431,10 +431,12 @@ struct tile_data
 	UINT8           flags;          // defaults to 0; one or more of TILE_* flags above
 	UINT8           pen_mask;       // defaults to 0xff; mask to apply to pen_data while rendering the tile
 	UINT8           gfxnum;         // defaults to 0xff; specify index of machine.gfx for auto-invalidation on dirty
-
-	void set(running_machine &machine, int _gfxnum, int rawcode, int rawcolor, int _flags)
+	gfxdecode_device *decoder;
+	
+	void set(running_machine &machine, gfxdecode_device &_decoder, int _gfxnum, int rawcode, int rawcolor, int _flags)
 	{
-		gfx_element *gfx = machine.gfx[_gfxnum];
+		decoder = &_decoder;
+		gfx_element *gfx = _decoder.gfx(_gfxnum);
 		int code = rawcode % gfx->elements();
 		pen_data = gfx->get_data(code);
 		palette_base = gfx->colorbase() + gfx->granularity() * rawcolor;
@@ -772,7 +774,7 @@ private:
 #define TILEMAP_MAPPER_MEMBER(_name)    tilemap_memory_index _name(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 
 // useful macro inside of a TILE_GET_INFO callback to set tile information
-#define SET_TILE_INFO_MEMBER(GFX,CODE,COLOR,FLAGS)  tileinfo.set(machine(), GFX, CODE, COLOR, FLAGS)
+#define SET_TILE_INFO_MEMBER(DECODER,GFX,CODE,COLOR,FLAGS)  tileinfo.set(machine(), DECODER, GFX, CODE, COLOR, FLAGS)
 
 // Macros for setting tile attributes in the TILE_GET_INFO callback:
 //   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0

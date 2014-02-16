@@ -15,9 +15,9 @@
 
 VIDEO_START_MEMBER(deco_mlc_state,mlc)
 {
-	if (machine().gfx[0]->granularity()==16)
+	if (m_gfxdecode->gfx(0)->granularity()==16)
 		m_colour_mask=0x7f;
-	else if (machine().gfx[0]->granularity()==32)
+	else if (m_gfxdecode->gfx(0)->granularity()==32)
 		m_colour_mask=0x3f;
 	else
 		m_colour_mask=0x1f;
@@ -522,7 +522,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 			}
 
 			mlc_drawgfxzoomline(
-							dest,user_clip,machine().gfx[0],
+							dest,user_clip,m_gfxdecode->gfx(0),
 							tile,tile2,
 							color + colorOffset,fx,realxbase,
 							0,

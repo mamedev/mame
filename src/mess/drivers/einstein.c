@@ -820,7 +820,7 @@ static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DRIVER(einstein_state, screen_update_einstein2)
-	MCFG_GFXDECODE(einstei2)
+	MCFG_GFXDECODE_ADD("gfxdecode", einstei2)
 
 	/* 2 additional colors for the 80 column screen */
 	MCFG_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE + 2)

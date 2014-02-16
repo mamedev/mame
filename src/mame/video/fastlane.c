@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info0)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code+bank*256,
 			1 + 64 * (attr & 0x0f),
@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info1)
 
 	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code+bank*256,
 			0 + 64 * (attr & 0x0f),
@@ -167,7 +167,7 @@ UINT32 fastlane_state::screen_update_fastlane(screen_device &screen, bitmap_ind1
 	m_layer0->set_scrolly(0, m_k007121->ctrlram_r(space, 2));
 
 	m_layer0->draw(screen, bitmap, finalclip0, 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, machine().gfx[0], machine().colortable, m_spriteram, 0, 40, 0, screen.priority(), (UINT32)-1);
+	m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), machine().colortable, m_spriteram, 0, 40, 0, screen.priority(), (UINT32)-1);
 	m_layer1->draw(screen, bitmap, finalclip1, 0, 0);
 	return 0;
 }

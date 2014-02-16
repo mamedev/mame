@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(funkybee_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x80) << 1);
 	int color = m_colorram[tile_index] & 0x03;
 
-	SET_TILE_INFO_MEMBER(m_gfx_bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, m_gfx_bank, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(funkybee_state::funkybee_tilemap_scan)
@@ -111,7 +111,7 @@ void funkybee_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipx = !flipx;
 		}
 
-		 machine().gfx[2 + m_gfx_bank]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(2 + m_gfx_bank)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -133,7 +133,7 @@ void funkybee_state::draw_columns( bitmap_ind16 &bitmap, const rectangle &clipre
 		if (flip)
 			sy = 248 - sy;
 
-		machine().gfx[m_gfx_bank]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_gfx_bank)->transpen(bitmap,cliprect,
 				code, color,
 				flip, flip,
 				sx, sy,0);
@@ -146,7 +146,7 @@ void funkybee_state::draw_columns( bitmap_ind16 &bitmap, const rectangle &clipre
 		if (flip)
 			sy = 248 - sy;
 
-		machine().gfx[m_gfx_bank]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_gfx_bank)->transpen(bitmap,cliprect,
 				code, color,
 				flip, flip,
 				sx, sy,0);

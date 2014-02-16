@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(superqix_state::pb_get_bg_tile_info)
 	int attr = m_videoram[tile_index + 0x400];
 	int code = m_videoram[tile_index] + 256 * (attr & 0x7);
 	int color = (attr & 0xf0) >> 4;
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(superqix_state::sqix_get_bg_tile_info)
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(superqix_state::sqix_get_bg_tile_info)
 
 	if (bank) code += 1024 * m_gfxbank;
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
 	tileinfo.group = (attr & 0x08) >> 3;
 }
 
@@ -175,7 +175,7 @@ void superqix_state::pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			sy = 240 - sy;
 		}
 
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flip_screen(), flip_screen(),
@@ -206,7 +206,7 @@ void superqix_state::superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle 
 			flipy = !flipy;
 		}
 
-		 machine().gfx[2]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,

@@ -111,7 +111,7 @@ TILE_GET_INFO_MEMBER(rocnrope_state::get_bg_tile_info)
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(1, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
 }
 
 void rocnrope_state::video_start()
@@ -129,12 +129,12 @@ void rocnrope_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	{
 		int color = spriteram_2[offs] & 0x0f;
 
-		 machine().gfx[0]->transmask(bitmap,cliprect,
+		 m_gfxdecode->gfx(0)->transmask(bitmap,cliprect,
 				spriteram[offs + 1],
 				color,
 				spriteram_2[offs] & 0x40,~spriteram_2[offs] & 0x80,
 				240 - spriteram[offs], spriteram_2[offs + 1],
-				colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0));
+				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(0), color, 0));
 	}
 }
 

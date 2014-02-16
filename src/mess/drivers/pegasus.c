@@ -477,7 +477,7 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pegasus_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
-	MCFG_GFXDECODE(pegasus)
+	MCFG_GFXDECODE_ADD("gfxdecode", pegasus)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 

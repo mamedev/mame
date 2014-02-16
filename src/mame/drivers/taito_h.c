@@ -692,10 +692,11 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_syvalion)
 
-	MCFG_GFXDECODE(syvalion)
+	MCFG_GFXDECODE_ADD("gfxdecode", syvalion)
 	MCFG_PALETTE_LENGTH(33*16)
 
 	MCFG_TC0080VCO_ADD("tc0080vco", syvalion_tc0080vco_intf)
+	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -733,10 +734,11 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*16, 21*16-1, 2*16, 17*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_recordbr)
 
-	MCFG_GFXDECODE(recordbr)
+	MCFG_GFXDECODE_ADD("gfxdecode", recordbr)
 	MCFG_PALETTE_LENGTH(32*16)
 
 	MCFG_TC0080VCO_ADD("tc0080vco", recordbr_tc0080vco_intf)
+	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -782,10 +784,11 @@ static MACHINE_CONFIG_START( dleague, taitoh_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*16, 21*16-1, 2*16, 17*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_dleague)
 
-	MCFG_GFXDECODE(dleague)
+	MCFG_GFXDECODE_ADD("gfxdecode", dleague)
 	MCFG_PALETTE_LENGTH(33*16)
 
 	MCFG_TC0080VCO_ADD("tc0080vco", recordbr_tc0080vco_intf)
+	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -111,7 +111,7 @@ public:
 TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info)
 {
 	int code = m_vram2[tile_index]+m_vram2[tile_index+0x800]*256;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 		0,
 		code,
 		0,
@@ -124,6 +124,7 @@ TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info2)
 	int color=((m_vram1[tile_index+0x800])&0xf);
 	SET_TILE_INFO_MEMBER
 	(
+		m_gfxdecode,
 		1,
 		code,
 		color,
@@ -414,7 +415,7 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(pipeline_state, screen_update_pipeline)
 
-	MCFG_GFXDECODE(pipeline)
+	MCFG_GFXDECODE_ADD("gfxdecode", pipeline)
 
 	MCFG_PALETTE_LENGTH(0x100+0x100)
 

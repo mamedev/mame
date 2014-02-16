@@ -736,7 +736,7 @@ static MACHINE_CONFIG_START( decocass, decocass_state )
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 0*8, 256, 272, 1*8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(decocass_state, screen_update_decocass)
 
-	MCFG_GFXDECODE(decocass)
+	MCFG_GFXDECODE_ADD("gfxdecode", decocass)
 	MCFG_PALETTE_LENGTH(32+2*8+2*4)
 
 	/* sound hardware */

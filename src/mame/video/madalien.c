@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_1)
 {
 	UINT8 *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6);
 
-	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
 
 
@@ -101,13 +101,13 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_2)
 {
 	UINT8 *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6) + 0x80;
 
-	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
 
 
 TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_FG)
 {
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_videoram[tile_index], 0, 0);
 }
 
 WRITE8_MEMBER(madalien_state::madalien_videoram_w)
@@ -152,10 +152,10 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 
 	m_headlight_bitmap = auto_bitmap_ind16_alloc(machine(), 128, 128);
 
-	machine().gfx[0]->set_source(m_charram);
+	m_gfxdecode->gfx(0)->set_source(m_charram);
 
-	 machine().gfx[2]->opaque(*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 0, 0x00, 0x00);
-	 machine().gfx[2]->opaque(*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 1, 0x00, 0x40);
+	 m_gfxdecode->gfx(2)->opaque(*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 0, 0x00, 0x00);
+	 m_gfxdecode->gfx(2)->opaque(*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 1, 0x00, 0x40);
 }
 
 
@@ -242,7 +242,7 @@ void madalien_state::draw_foreground(screen_device &screen, bitmap_ind16 &bitmap
 WRITE8_MEMBER(madalien_state::madalien_charram_w)
 {
 	m_charram[offset] = data;
-	machine().gfx[0]->mark_dirty((offset/8) & 0xff);
+	m_gfxdecode->gfx(0)->mark_dirty((offset/8) & 0xff);
 }
 
 
@@ -395,7 +395,7 @@ MACHINE_CONFIG_FRAGMENT( madalien_video )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(madalien_state, screen_update_madalien)
 
-	MCFG_GFXDECODE(madalien)
+	MCFG_GFXDECODE_ADD("gfxdecode", madalien)
 	MCFG_PALETTE_LENGTH(0x30)
 	MCFG_PALETTE_INIT_OVERRIDE(madalien_state,madalien)
 	MCFG_VIDEO_START_OVERRIDE(madalien_state,madalien)

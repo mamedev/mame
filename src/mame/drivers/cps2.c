@@ -1269,7 +1269,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
          8MHz / 15.4445kHz =  517.983 ~ 518 -> likely
         16MHz -> same as 8 but with a /2 divider; also a possibility
 */
-	MCFG_GFXDECODE(cps2)
+	MCFG_GFXDECODE_ADD("gfxdecode", cps2)
 	MCFG_PALETTE_LENGTH(0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps2)

@@ -24,7 +24,7 @@ TILEMAP_MAPPER_MEMBER(citycon_state::citycon_scan)
 
 TILE_GET_INFO_MEMBER(citycon_state::get_fg_tile_info)
 {
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_videoram[tile_index],
 			(tile_index & 0x03e0) >> 5, /* color depends on scanline only */
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(citycon_state::get_bg_tile_info)
 {
 	UINT8 *rom = memregion("gfx4")->base();
 	int code = rom[0x1000 * m_bg_image + tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3 + m_bg_image,
 			code,
 			rom[0xc000 + 0x100 * m_bg_image + code],
@@ -117,7 +117,7 @@ void citycon_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipx = !flipx;
 		}
 
-		 machine().gfx[m_spriteram[offs + 1] & 0x80 ? 2 : 1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(m_spriteram[offs + 1] & 0x80 ? 2 : 1)->transpen(bitmap,cliprect,
 				m_spriteram[offs + 1] & 0x7f,
 				m_spriteram[offs + 2] & 0x0f,
 				flipx,flip_screen(),

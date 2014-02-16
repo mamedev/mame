@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(djboy_state::get_bg_tile_info)
 	if (color & 8)
 		code |= 0x1000;
 
-	SET_TILE_INFO_MEMBER(1, code, color, 0);    /* no flip */
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);    /* no flip */
 }
 
 WRITE8_MEMBER(djboy_state::djboy_videoram_w)

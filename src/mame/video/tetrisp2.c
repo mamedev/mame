@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_bg)
 {
 	UINT16 code_hi = m_vram_bg[ 2 * tile_index + 0];
 	UINT16 code_lo = m_vram_bg[ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code_hi,
 			code_lo & 0xf,
@@ -134,7 +134,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_fg)
 {
 	UINT16 code_hi = m_vram_fg[ 2 * tile_index + 0];
 	UINT16 code_lo = m_vram_fg[ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			3,
 			code_hi,
 			code_lo & 0xf,
@@ -152,7 +152,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rot)
 {
 	UINT16 code_hi = m_vram_rot[ 2 * tile_index + 0];
 	UINT16 code_lo = m_vram_rot[ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code_hi,
 			code_lo & 0xf,
@@ -169,7 +169,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_bg)
 {
 	UINT16 code_hi = m_rocknms_sub_vram_bg[ 2 * tile_index + 0];
 	UINT16 code_lo = m_rocknms_sub_vram_bg[ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			5,
 			code_hi,
 			code_lo & 0xf,
@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_fg)
 {
 	UINT16 code_hi = m_rocknms_sub_vram_fg[ 2 * tile_index + 0];
 	UINT16 code_lo = m_rocknms_sub_vram_fg[ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			7,
 			code_hi,
 			code_lo & 0xf,
@@ -205,7 +205,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_rot)
 {
 	UINT16 code_hi = m_rocknms_sub_vram_rot[ 2 * tile_index + 0];
 	UINT16 code_lo = m_rocknms_sub_vram_rot[ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			6,
 			code_hi,
 			code_lo & 0xf,
@@ -318,7 +318,7 @@ VIDEO_START_MEMBER(tetrisp2_state,rocknms)
   -- it appears that sprites which should be shadows are often rendered *UNDER* the tilemaps, maybe related?
 */
 template<class _BitmapClass>
-static void tetrisp2_draw_sprites(  running_machine &machine, _BitmapClass &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, UINT8* priority_ram,
+static void tetrisp2_draw_sprites(  tetrisp2_state *state, _BitmapClass &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, UINT8* priority_ram,
 									UINT16 *sprram_top, size_t sprram_size, int gfxnum, int flip    )
 {
 	int tx, ty, sx, sy, flipx, flipy;
@@ -327,7 +327,7 @@ static void tetrisp2_draw_sprites(  running_machine &machine, _BitmapClass &bitm
 	int pri;
 	int xzoom, yzoom;
 	UINT32 primask;
-	gfx_element *gfx = machine.gfx[gfxnum];
+	gfx_element *gfx = state->m_gfxdecode->gfx(gfxnum);
 
 	UINT16  *source =   sprram_top;
 	UINT16  *finish =   sprram_top + (sprram_size - 0x10) / 2;
@@ -485,7 +485,7 @@ UINT32 tetrisp2_state::screen_update_tetrisp2(screen_device &screen, bitmap_ind1
 	else if (asc_pri == 2)
 		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites( this, bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram, m_spriteram.bytes(), 0, (m_systemregs[0x00] & 0x02)    );
 	return 0;
 }
@@ -570,7 +570,7 @@ UINT32 tetrisp2_state::screen_update_rockntread(screen_device &screen, bitmap_in
 	else if (asc_pri == 2)
 		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites( this, bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram, m_spriteram.bytes(), 0, (m_systemregs[0x00] & 0x02)    );
 	return 0;
 }
@@ -632,7 +632,7 @@ UINT32 tetrisp2_state::screen_update_rocknms_left(screen_device &screen, bitmap_
 	else if (asc_pri == 2)
 		m_tilemap_sub_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites( this, bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram2, m_spriteram2.bytes(), 4, (m_systemregs[0x00] & 0x02)  );
 
 	return 0;
@@ -693,7 +693,7 @@ UINT32 tetrisp2_state::screen_update_rocknms_right(screen_device &screen, bitmap
 	else if (asc_pri == 2)
 		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites( this, bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram, m_spriteram.bytes(), 0, (m_systemregs[0x00] & 0x02)    );
 
 	return 0;
@@ -717,7 +717,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::stepstag_get_tile_info_fg)
 	code_hi = (code_hi & 0x0f) + (code_hi & 0xf0)*2;
 	code_hi += 0xbd6c;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code_hi,
 			code_lo & 0xf,
@@ -748,7 +748,7 @@ UINT32 stepstag_state::screen_update_stepstag_left(screen_device &screen, bitmap
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites( this, bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram, m_spriteram.bytes(), 1, (m_systemregs[0x00] & 0x02)    );
 	return 0;
 }
@@ -757,7 +757,7 @@ UINT32 stepstag_state::screen_update_stepstag_right(screen_device &screen, bitma
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites( this, bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram3, m_spriteram3.bytes(), 1, (m_systemregs[0x00] & 0x02)  );
 	return 0;
 }
@@ -767,7 +767,7 @@ UINT32 stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitmap_
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
-	tetrisp2_draw_sprites(  machine(), bitmap, screen.priority(), cliprect, m_priority,
+	tetrisp2_draw_sprites( this, bitmap, screen.priority(), cliprect, m_priority,
 							m_spriteram2, m_spriteram2.bytes(), 0, (m_systemregs[0x00] & 0x02)  );
 
 	m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);

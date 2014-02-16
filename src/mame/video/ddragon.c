@@ -59,7 +59,7 @@ TILEMAP_MAPPER_MEMBER(ddragon_state::background_scan)
 TILE_GET_INFO_MEMBER(ddragon_state::get_bg_tile_info)
 {
 	UINT8 attr = m_bgvideoram[2 * tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			m_bgvideoram[2 * tile_index+1] + ((attr & 0x07) << 8),
 			(attr >> 3) & 0x07,
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(ddragon_state::get_fg_tile_info)
 {
 	UINT8 attr = m_fgvideoram[2 * tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_fgvideoram[2 * tile_index + 1] + ((attr & 0x07) << 8),
 			attr >> 5,
@@ -79,7 +79,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(ddragon_state::get_fg_16color_tile_info)
 {
 	UINT8 attr = m_fgvideoram[2 * tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_fgvideoram[2 * tile_index+1] + ((attr & 0x0f) << 8),
 			attr >> 4,
@@ -137,7 +137,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_fgvideoram_w)
 
 void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[1];
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 	const UINT8 *src = m_spriteram;
 	const UINT32 bytes = m_spriteram.bytes();
 

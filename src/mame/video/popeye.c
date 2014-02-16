@@ -234,7 +234,7 @@ TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void popeye_state::video_start()
@@ -357,7 +357,7 @@ void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			sy = 496 - sy;
 		}
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code ^ 0x1ff,
 					color,
 					flipx,flipy,

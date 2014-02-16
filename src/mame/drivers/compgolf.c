@@ -256,7 +256,7 @@ static MACHINE_CONFIG_START( compgolf, compgolf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(compgolf_state, screen_update_compgolf)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_GFXDECODE(compgolf)
+	MCFG_GFXDECODE_ADD("gfxdecode", compgolf)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

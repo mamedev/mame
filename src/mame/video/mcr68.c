@@ -26,8 +26,8 @@ TILE_GET_INFO_MEMBER(mcr68_state::get_bg_tile_info)
 	int data = LOW_BYTE(videoram[tile_index * 2]) | (LOW_BYTE(videoram[tile_index * 2 + 1]) << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0xc00);
 	int color = (~data >> 12) & 3;
-	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((data >> 10) & 3));
-	if (machine().gfx[0]->elements() < 0x1000)
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, TILE_FLIPYX((data >> 10) & 3));
+	if (m_gfxdecode->gfx(0)->elements() < 0x1000)
 		tileinfo.category = (data >> 15) & 1;
 }
 
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::zwackery_get_bg_tile_info)
 	UINT16 *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int color = (data >> 13) & 7;
-	SET_TILE_INFO_MEMBER(0, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
 }
 
 
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::zwackery_get_fg_tile_info)
 	UINT16 *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int color = (data >> 13) & 7;
-	SET_TILE_INFO_MEMBER(2, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
 	tileinfo.category = (color != 0);
 }
 
@@ -69,8 +69,8 @@ VIDEO_START_MEMBER(mcr68_state,mcr68)
 VIDEO_START_MEMBER(mcr68_state,zwackery)
 {
 	const UINT8 *colordatabase = (const UINT8 *)memregion("gfx3")->base();
-	gfx_element *gfx0 = machine().gfx[0];
-	gfx_element *gfx2 = machine().gfx[2];
+	gfx_element *gfx0 = m_gfxdecode->gfx(0);
+	gfx_element *gfx2 = m_gfxdecode->gfx(2);
 	UINT8 *srcdata0, *dest0;
 	UINT8 *srcdata2, *dest2;
 	int code, y, x;
@@ -240,11 +240,11 @@ void mcr68_state::mcr68_update_sprites(screen_device &screen, bitmap_ind16 &bitm
 		    The color 8 is used to cover over other sprites. */
 
 		/* first draw the sprite, visible */
-		machine().gfx[1]->prio_transmask(bitmap,sprite_clip, code, color, flipx, flipy, x, y,
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap,sprite_clip, code, color, flipx, flipy, x, y,
 				screen.priority(), 0x00, 0x0101);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		machine().gfx[1]->prio_transmask(bitmap,sprite_clip, code, color, flipx, flipy, x, y,
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap,sprite_clip, code, color, flipx, flipy, x, y,
 				screen.priority(), 0x02, 0xfeff);
 	}
 }
@@ -297,11 +297,11 @@ void mcr68_state::zwackery_update_sprites(screen_device &screen, bitmap_ind16 &b
 		    The color 8 is used to cover over other sprites. */
 
 		/* first draw the sprite, visible */
-		machine().gfx[1]->prio_transmask(bitmap,cliprect, code, color, flipx, flipy, x, y,
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect, code, color, flipx, flipy, x, y,
 				screen.priority(), 0x00, 0x0101);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		machine().gfx[1]->prio_transmask(bitmap,cliprect, code, color, flipx, flipy, x, y,
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect, code, color, flipx, flipy, x, y,
 				screen.priority(), 0x02, 0xfeff);
 	}
 }

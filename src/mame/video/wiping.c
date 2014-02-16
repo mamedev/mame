@@ -120,7 +120,7 @@ UINT32 wiping_state::screen_update_wiping(screen_device &screen, bitmap_ind16 &b
 			sy = 27 - sy;
 		}
 
-		machine().gfx[0]->opaque(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
 				m_videoram[offs],
 				m_colorram[offs] & 0x3f,
 				m_flipscreen,m_flipscreen,
@@ -148,12 +148,12 @@ UINT32 wiping_state::screen_update_wiping(screen_device &screen, bitmap_ind16 &b
 			flipy = !flipy;
 		}
 
-		machine().gfx[1]->transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 			(spriteram[offs] & 0x3f) + 64 * otherbank,
 			color,
 			flipx,flipy,
 			sx,sy,
-			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0x1f));
+			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0x1f));
 	}
 
 	/* redraw high priority chars */
@@ -188,7 +188,7 @@ UINT32 wiping_state::screen_update_wiping(screen_device &screen, bitmap_ind16 &b
 				sy = 27 - sy;
 			}
 
-			machine().gfx[0]->opaque(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
 					m_videoram[offs],
 					m_colorram[offs] & 0x3f,
 					m_flipscreen,m_flipscreen,

@@ -268,7 +268,6 @@ public:
 	cpu_device *            firstcpu;           // first CPU
 
 	// video-related information
-	gfx_element *           gfx[MAX_GFX_ELEMENTS];// array of pointers to graphic sets (chars, sprites)
 	screen_device *         primary_screen;     // the primary screen device, or NULL if screenless
 	palette_t *             palette;            // global palette object
 

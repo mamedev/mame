@@ -361,9 +361,9 @@ static const UINT8 cashcade_p[] ={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0
 void aristmk4_state::video_start()
 {
 	int tile;
-	for (tile = 0; tile < machine().gfx[0]->elements(); tile++)
+	for (tile = 0; tile < m_gfxdecode->gfx(0)->elements(); tile++)
 	{
-		machine().gfx[0]->decode(tile);
+		m_gfxdecode->gfx(0)->decode(tile);
 	}
 }
 
@@ -402,7 +402,7 @@ void aristmk4_state::uBackgroundColour()
 
 UINT32 aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int x,y;
 	int count = 0;
 	int color;
@@ -1694,11 +1694,11 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 216-1)    /* from the crtc registers... updated by crtc */
+	MCFG_SCREEN_UPDATE_DRIVER(aristmk4_state, screen_update_aristmk4)
 
-	MCFG_GFXDECODE(aristmk4)
+	MCFG_GFXDECODE_ADD("gfxdecode", aristmk4)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_SCREEN_UPDATE_DRIVER(aristmk4_state, screen_update_aristmk4)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0) /* 1 MHz.(only 1 or 2 MHz.are valid) */

@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(higemaru_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x80) << 1);
 	int color = m_colorram[tile_index] & 0x1f;
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
 }
 
 void higemaru_state::video_start()
@@ -125,14 +125,14 @@ void higemaru_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				col,
 				flipx,flipy,
 				sx,sy,15);
 
 		/* draw again with wraparound */
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				col,
 				flipx,flipy,

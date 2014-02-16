@@ -200,12 +200,12 @@ UINT32 magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &b
 			if (code & 0x80)    /* sprite bankswitch */
 				code += (*m_vreg & 0x30) * 0x8;
 
-			 machine().gfx[1]->transmask(bitmap,cliprect,
+			 m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 					code,
 					color,
 					flipx, flipy,
 					sx, sy,
-					colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0x1f));
+					colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0x1f));
 		}
 	}
 
@@ -230,7 +230,7 @@ UINT32 magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &b
 				sy = 31 - sy;
 			}
 
-			 machine().gfx[0]->transpen(bitmap,cliprect,
+			 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,
 					0,
 					m_flipscreen, m_flipscreen,

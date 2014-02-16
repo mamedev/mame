@@ -374,7 +374,7 @@ static MACHINE_CONFIG_START( suprridr, suprridr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suprridr_state, screen_update_suprridr)
 
-	MCFG_GFXDECODE(suprridr)
+	MCFG_GFXDECODE_ADD("gfxdecode", suprridr)
 	MCFG_PALETTE_LENGTH(96)
 
 

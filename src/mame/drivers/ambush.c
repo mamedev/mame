@@ -242,7 +242,7 @@ static MACHINE_CONFIG_START( ambush, ambush_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-3)  /* The -3 makes the cocktail mode perfect */
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update_ambush)
 
-	MCFG_GFXDECODE(ambush)
+	MCFG_GFXDECODE_ADD("gfxdecode", ambush)
 	MCFG_PALETTE_LENGTH(256)
 
 

@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( osi600, sb2m600_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(osi600_video)
-	MCFG_GFXDECODE(osi)
+	MCFG_GFXDECODE_ADD("gfxdecode", osi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -784,7 +784,7 @@ static MACHINE_CONFIG_START( uk101, uk101_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(uk101_video)
-	MCFG_GFXDECODE(osi)
+	MCFG_GFXDECODE_ADD("gfxdecode", osi)
 
 	/* cassette ACIA */
 	MCFG_ACIA6850_ADD("acia_0", uk101_acia_intf)
@@ -806,7 +806,7 @@ static MACHINE_CONFIG_START( c1p, c1p_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(osi630_video)
-	MCFG_GFXDECODE(osi)
+	MCFG_GFXDECODE_ADD("gfxdecode", osi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

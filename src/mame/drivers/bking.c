@@ -480,7 +480,7 @@ static MACHINE_CONFIG_START( bking, bking_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bking_state, screen_update_bking)
 	MCFG_SCREEN_VBLANK_DRIVER(bking_state, screen_eof_bking)
 
-	MCFG_GFXDECODE(bking)
+	MCFG_GFXDECODE_ADD("gfxdecode", bking)
 	MCFG_PALETTE_LENGTH(4*8+4*4+4*2+4*2)
 
 	/* sound hardware */

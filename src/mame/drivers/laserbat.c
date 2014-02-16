@@ -476,7 +476,7 @@ GFXDECODE_END
 TILE_GET_INFO_MEMBER(laserbat_state::get_tile_info)
 {
 	// wrong color index!
-	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], m_colorram[tile_index] & 0x7f, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_videoram[tile_index], m_colorram[tile_index] & 0x7f, 0);
 }
 
 void laserbat_state::video_start()
@@ -521,7 +521,7 @@ UINT32 laserbat_state::screen_update_laserbat(screen_device &screen, bitmap_ind1
 	}
 
 	if (m_sprite_enable)
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				m_sprite_code,
 				m_sprite_color,
 				0,0,
@@ -722,7 +722,7 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state, screen_update_laserbat)
 
-	MCFG_GFXDECODE(laserbat)
+	MCFG_GFXDECODE_ADD("gfxdecode", laserbat)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_S2636_ADD("s2636_1", s2636_1_config)
@@ -770,7 +770,7 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state, screen_update_laserbat)
 
-	MCFG_GFXDECODE(laserbat)
+	MCFG_GFXDECODE_ADD("gfxdecode", laserbat)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_S2636_ADD("s2636_1", s2636_1_config)

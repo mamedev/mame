@@ -53,7 +53,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0)
 {
 	UINT16 code = m_vram_0[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			m_tilemap0_color,
@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0)
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0_16x16)
 {
 	UINT16 code = m_vram_0[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code,
 			m_tilemap0_color,
@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_0_16x16)
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_1)
 {
 	UINT16 code = m_vram_1[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code,
 			m_tilemap1_color,
@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_1)
 TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_1_16x16)
 {
 	UINT16 code = m_vram_1[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			code,
 			m_tilemap1_color,

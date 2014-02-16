@@ -262,17 +262,19 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 #endif
 
 #if VIDEO_911
-	MCFG_GFXDECODE(vdt911)
+	MCFG_GFXDECODE_ADD("gfxdecode", vdt911)
 	MCFG_PALETTE_LENGTH(8)
 #else
-	MCFG_GFXDECODE(asr733)
+	MCFG_GFXDECODE_ADD("gfxdecode", asr733)
 	MCFG_PALETTE_LENGTH(2)
 #endif
 
 #if VIDEO_911
 	MCFG_VDT911_VIDEO_ADD("vdt911", vdt911_intf)
+	MCFG_VDT911_VIDEO_GFXDECODE("gfxdecode")
 #else
 	MCFG_ASR733_VIDEO_ADD("asr733", asr733_intf)
+	MCFG_ASR733_VIDEO_GFXDECODE("gfxdecode")
 #endif
 
 #if VIDEO_911

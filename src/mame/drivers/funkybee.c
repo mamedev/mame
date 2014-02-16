@@ -305,7 +305,7 @@ static MACHINE_CONFIG_START( funkybee, funkybee_state )
 	MCFG_SCREEN_VISIBLE_AREA(12, 32*8-8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(funkybee_state, screen_update_funkybee)
 
-	MCFG_GFXDECODE(funkybee)
+	MCFG_GFXDECODE_ADD("gfxdecode", funkybee)
 	MCFG_PALETTE_LENGTH(32)
 
 

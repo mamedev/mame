@@ -45,11 +45,22 @@ k007342_device::k007342_device(const machine_config &mconfig, const char *tag, d
 	m_colorram_1(NULL),
 	//m_tilemap[2];
 	m_flipscreen(0),
-	m_int_enabled(0)
+	m_int_enabled(0),
 	//m_regs[8],
 	//m_scrollx[2],
-	//m_scrolly[2]
+	//m_scrolly[2],
+	m_gfxdecode(*this)
 {
+}
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void k007342_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<k007342_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -287,7 +298,7 @@ void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, int lay
 
 	m_callback(machine(), layer, m_regs[1], &code, &color, &flags);
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
 			m_gfxnum,
 			code,
 			color,

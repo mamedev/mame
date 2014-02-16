@@ -35,6 +35,7 @@ driver_device::driver_device(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, "Driver Device", tag, NULL, 0, "", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_screen(*this, "screen"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_generic_paletteram_8(*this, "paletteram"),
 		m_generic_paletteram2_8(*this, "paletteram2"),
 		m_generic_paletteram_16(*this, "paletteram"),

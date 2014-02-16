@@ -88,7 +88,7 @@ xxxx xxxx xxxx xxxx [2] scroll Y, signed
 void neoprint_state::draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift)
 {
 	int i, y, x;
-	gfx_element *gfx = machine().gfx[0];
+	gfx_element *gfx = m_gfxdecode->gfx(0);
 	INT16 scrollx, scrolly;
 
 	i = (m_npvidregs[((layer*8)+0x06)/2] & 7) * 0x1000/4;
@@ -477,7 +477,7 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_UPD4990A_OLD_ADD("upd4990a")
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE(neoprint)
+	MCFG_GFXDECODE_ADD("gfxdecode", neoprint)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -517,7 +517,7 @@ static MACHINE_CONFIG_START( nprsp, neoprint_state )
 	MCFG_UPD4990A_OLD_ADD("upd4990a")
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE(neoprint)
+	MCFG_GFXDECODE_ADD("gfxdecode", neoprint)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

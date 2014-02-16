@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
 	attr = (lvram[BYTE_XOR_LE(tile_index<<2)] & 0xf0) >> 4;
 	code = ((lvram[BYTE_XOR_LE(tile_index<<2)] & 0x0f) << 8) | (lvram[BYTE_XOR_LE((tile_index<<2)+2)]);
 
-	SET_TILE_INFO_MEMBER(m_ttl_gfx_index, code, attr, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, m_ttl_gfx_index, code, attr, 0);
 }
 
 void rng_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(rungun_state::get_rng_936_tile_info)
 	flipx = (m_936_videoram[tile_index * 2 + 1] & 0xc000) >> 14;
 	colour = 0x10 + (m_936_videoram[tile_index * 2] & 0x000f);
 
-	SET_TILE_INFO_MEMBER(0, tileno, colour, TILE_FLIPYX(flipx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, colour, TILE_FLIPYX(flipx));
 }
 
 
@@ -80,13 +80,13 @@ void rungun_state::video_start()
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine().gfx[gfx_index] == 0)
+		if (m_gfxdecode->gfx(gfx_index) == 0)
 			break;
 
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	// decode the ttl layer's gfx
-	machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), charlayout, memregion("gfx3")->base(), machine().total_colors() / 16, 0));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), charlayout, memregion("gfx3")->base(), machine().total_colors() / 16, 0)));
 	m_ttl_gfx_index = gfx_index;
 
 	// create the tilemap

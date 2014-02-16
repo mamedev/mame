@@ -101,7 +101,7 @@ UINT32 rbisland_state::screen_update_jumping(screen_device &screen, bitmap_ind16
 	for (offs = m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
 		int tile = spriteram[offs];
-		if (tile < machine().gfx[1]->elements())
+		if (tile < m_gfxdecode->gfx(1)->elements())
 		{
 			int sx,sy,color,data1;
 
@@ -113,7 +113,7 @@ UINT32 rbisland_state::screen_update_jumping(screen_device &screen, bitmap_ind16
 			data1 = spriteram[offs + 3];
 			color = (spriteram[offs + 4] & 0x0f) | sprite_colbank;
 
-			machine().gfx[0]->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					tile,
 					color,
 					data1 & 0x40, data1 & 0x80,

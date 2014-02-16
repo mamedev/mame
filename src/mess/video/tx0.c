@@ -197,7 +197,7 @@ void tx0_state::tx0_draw_multipleswitch(bitmap_ind16 &bitmap, int x, int y, int 
 /* write a single char on screen */
 void tx0_state::tx0_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color)
 {
-	 machine().gfx[0]->transpen(bitmap,bitmap.cliprect(), character-32, color, 0, 0,
+	 m_gfxdecode->gfx(0)->transpen(bitmap,bitmap.cliprect(), character-32, color, 0, 0,
 				x+1, y, 0);
 }
 

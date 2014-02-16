@@ -53,7 +53,7 @@ void sidepckt_state::palette_init()
 TILE_GET_INFO_MEMBER(sidepckt_state::get_tile_info)
 {
 	UINT8 attr = m_colorram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			m_videoram[tile_index] + ((attr & 0x07) << 8),
 			((attr & 0x10) >> 3) | ((attr & 0x20) >> 5),
@@ -130,13 +130,13 @@ void sidepckt_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 		flipx = spriteram[offs+1] & 0x08;
 		flipy = spriteram[offs+1] & 0x04;
 
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,0);
 		/* wraparound */
-		machine().gfx[1]->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

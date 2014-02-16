@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( pgm2, pgm2_state )
 //  MCFG_DEVICE_DISABLE()
 
 
-	MCFG_GFXDECODE(pgm2)
+	MCFG_GFXDECODE_ADD("gfxdecode", pgm2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -489,7 +489,7 @@ TILE_GET_INFO_MEMBER(marinedt_state::get_tile_info)
 	int color = 0;
 	int flags = TILE_FLIPX;
 
-	SET_TILE_INFO_MEMBER(0, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
 }
 
 void marinedt_state::video_start()
@@ -527,14 +527,14 @@ UINT32 marinedt_state::screen_update_marinedt(screen_device &screen, bitmap_ind1
 	m_tx_tilemap->draw(screen, *m_tile, cliprect, 0, 0);
 
 	m_obj1->fill(0);
-	 machine().gfx[1]->transpen(*m_obj1,m_obj1->cliprect(),
+	 m_gfxdecode->gfx(1)->transpen(*m_obj1,m_obj1->cliprect(),
 			OBJ_CODE(m_obj1_a),
 			OBJ_COLOR(m_obj1_a),
 			OBJ_FLIPX(m_obj1_a), OBJ_FLIPY(m_obj1_a),
 			0, 0, 0);
 
 	m_obj2->fill(0);
-	 machine().gfx[2]->transpen(*m_obj2,m_obj2->cliprect(),
+	 m_gfxdecode->gfx(2)->transpen(*m_obj2,m_obj2->cliprect(),
 			OBJ_CODE(m_obj2_a),
 			OBJ_COLOR(m_obj2_a),
 			OBJ_FLIPX(m_obj2_a), OBJ_FLIPY(m_obj2_a),
@@ -682,7 +682,7 @@ static MACHINE_CONFIG_START( marinedt, marinedt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(marinedt_state, screen_update_marinedt)
 
-	MCFG_GFXDECODE(marinedt)
+	MCFG_GFXDECODE_ADD("gfxdecode", marinedt)
 	MCFG_PALETTE_LENGTH(64)
 
 

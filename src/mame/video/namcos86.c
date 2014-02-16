@@ -96,7 +96,7 @@ inline void namcos86_state::get_tile_info(tile_data &tileinfo,int tile_index,int
 	else
 		tile_offs = ((m_tile_address_prom[((layer & 1) << 4) + ((attr & 0x03) << 2)] & 0x0e) >> 1) * 0x100 + m_tilebank * 0x800;
 
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			(layer & 2) ? 1 : 0,
 			vram[2*tile_index] + tile_offs,
 			attr,
@@ -273,12 +273,12 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 	namcos86_state *state = screen.machine().driver_data<namcos86_state>();
 	const UINT8 *source = &state->m_spriteram[0x0800-0x20]; /* the last is NOT a sprite */
 	const UINT8 *finish = &state->m_spriteram[0];
-	gfx_element *gfx = screen.machine().gfx[2];
+	gfx_element *gfx = state->m_gfxdecode->gfx(2);
 
 	int sprite_xoffs = state->m_spriteram[0x07f5] + ((state->m_spriteram[0x07f4] & 1) << 8);
 	int sprite_yoffs = state->m_spriteram[0x07f7];
 
-	int bank_sprites = screen.machine().gfx[2]->elements() / 8;
+	int bank_sprites = state->m_gfxdecode->gfx(2)->elements() / 8;
 
 	while (source >= finish)
 	{
@@ -363,7 +363,7 @@ UINT32 namcos86_state::screen_update_namcos86(screen_device &screen, bitmap_ind1
 
 	screen.priority().fill(0, cliprect);
 
-	bitmap.fill(machine().gfx[0]->colorbase() + 8*m_backcolor+7, cliprect);
+	bitmap.fill(m_gfxdecode->gfx(0)->colorbase() + 8*m_backcolor+7, cliprect);
 
 	for (layer = 0;layer < 8;layer++)
 	{

@@ -2343,7 +2343,7 @@ static MACHINE_CONFIG_START( galaxold_base, galaxold_state )
 	MCFG_TIMER_DRIVER_ADD("int_timer", galaxold_state, galaxold_interrupt_timer)
 
 	/* video hardware */
-	MCFG_GFXDECODE(galaxian)
+	MCFG_GFXDECODE_ADD("gfxdecode", galaxian)
 	MCFG_PALETTE_LENGTH(32+2+64)        /* 32 for the characters, 2 for the bullets, 64 for the stars */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2457,7 +2457,7 @@ static MACHINE_CONFIG_DERIVED( 4in1, galaxian )
 	MCFG_CPU_PROGRAM_MAP(_4in1_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE(_4in1)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", _4in1)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,pisces)
 MACHINE_CONFIG_END
@@ -2492,7 +2492,7 @@ static MACHINE_CONFIG_DERIVED( rockclim, galaxian )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rockclim_map)
-	MCFG_GFXDECODE(rockclim)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", rockclim)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,rockclim)
@@ -2541,7 +2541,7 @@ static MACHINE_CONFIG_START( drivfrcg, galaxold_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 
 	MCFG_PALETTE_LENGTH(64)
-	MCFG_GFXDECODE(gmgalax)
+	MCFG_GFXDECODE_ADD("gfxdecode", gmgalax)
 
 	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,rockclim)
 
@@ -2608,7 +2608,7 @@ static MACHINE_CONFIG_START( racknrol, galaxold_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
 	/* video hardware */
-	MCFG_GFXDECODE(galaxian)
+	MCFG_GFXDECODE_ADD("gfxdecode", galaxian)
 	MCFG_PALETTE_LENGTH(32)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2633,7 +2633,7 @@ static MACHINE_CONFIG_START( hexpoola, galaxold_state )
 	MCFG_CPU_IO_MAP(hexpoola_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
-	MCFG_GFXDECODE(galaxian)
+	MCFG_GFXDECODE_ADD("gfxdecode", galaxian)
 	MCFG_PALETTE_LENGTH(32)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2656,7 +2656,7 @@ static MACHINE_CONFIG_DERIVED( ckongg, galaxian )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ckongg_map)
 
-	MCFG_GFXDECODE(gmgalax)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gmgalax)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ckongs)
 MACHINE_CONFIG_END
@@ -2668,7 +2668,7 @@ static MACHINE_CONFIG_DERIVED( ckongmc, galaxian )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ckongmc_map)
 
-	MCFG_GFXDECODE(gmgalax)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gmgalax)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ckongs)
 MACHINE_CONFIG_END

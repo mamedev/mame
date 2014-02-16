@@ -660,7 +660,7 @@ static MACHINE_CONFIG_START( ps4big, psikyo4_state )
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	/* video hardware */
-	MCFG_GFXDECODE(ps4)
+	MCFG_GFXDECODE_ADD("gfxdecode", ps4)
 	MCFG_PALETTE_LENGTH((0x2000/4)*2 + 2) /* 0x2000/4 for each screen. 1 for each screen clear colour */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 

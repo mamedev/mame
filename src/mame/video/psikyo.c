@@ -74,7 +74,7 @@ Offset:
 TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_0)
 {
 	UINT16 code = ((UINT16 *)m_vram_0.target())[BYTE_XOR_BE(tile_index)];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			(code & 0x1fff) + 0x2000 * m_tilemap_0_bank,
 			(code >> 13) & 7,
@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_0)
 TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_1)
 {
 	UINT16 code = ((UINT16 *)m_vram_1.target())[BYTE_XOR_BE(tile_index)];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			(code & 0x1fff) + 0x2000 * m_tilemap_1_bank,
 			((code >> 13) & 7) + 0x40, // So we only have to decode the gfx once.
@@ -343,7 +343,7 @@ void psikyo_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 				int addr = (code * 2) & (TILES_LEN - 1);
 
 				if (zoomx == 32 && zoomy == 32)
-					machine().gfx[0]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 							TILES[addr+1] * 256 + TILES[addr],
 							attr >> 8,
 							flipx, flipy,
@@ -351,7 +351,7 @@ void psikyo_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 							screen.priority(),
 							pri[(attr & 0xc0) >> 6],trans_pen);
 				else
-					machine().gfx[0]->prio_zoom_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
 								TILES[addr+1] * 256 + TILES[addr],
 								attr >> 8,
 								flipx, flipy,
@@ -462,7 +462,7 @@ void psikyo_state::draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bi
 				int addr = (code * 2) & (TILES_LEN-1);
 
 				if (zoomx == 32 && zoomy == 32)
-					machine().gfx[0]->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 							TILES[addr+1] * 256 + TILES[addr],
 							attr >> 8,
 							flipx, flipy,
@@ -470,7 +470,7 @@ void psikyo_state::draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bi
 							screen.priority(),
 							pri[(attr & 0xc0) >> 6],trans_pen);
 				else
-					machine().gfx[0]->prio_zoom_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
 								TILES[addr+1] * 256 + TILES[addr],
 								attr >> 8,
 								flipx, flipy,

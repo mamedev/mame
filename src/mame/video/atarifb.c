@@ -23,7 +23,7 @@ void atarifb_state::get_tile_info_common( tile_data &tileinfo, tilemap_memory_in
 	if (disable)
 		code = 0;   /* I *know* this is a space */
 
-	SET_TILE_INFO_MEMBER(0, code, 0, (flip ? TILE_FLIPX | TILE_FLIPY : 0));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, (flip ? TILE_FLIPX | TILE_FLIPY : 0));
 }
 
 
@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(atarifb_state::field_get_tile_info)
 	int code = m_field_videoram[tile_index] & 0x3f;
 	int flipyx = m_field_videoram[tile_index] >> 6;
 
-	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, TILE_FLIPYX(flipyx));
 }
 
 
@@ -139,14 +139,14 @@ void atarifb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			shade = ((m_spriteram[obj * 2 + 1 + 0x20]) & 0x07);
 
-			 machine().gfx[gfx + 1]->transpen(bitmap,bigfield_area,
+			 m_gfxdecode->gfx(gfx + 1)->transpen(bitmap,bigfield_area,
 				charcode, shade,
 				flipx, flipy, sx, sy, 0);
 
 			shade = ((m_spriteram[obj * 2 + 1 + 0x20]) & 0x08) >> 3;
 		}
 
-		 machine().gfx[gfx]->transpen(bitmap,bigfield_area,
+		 m_gfxdecode->gfx(gfx)->transpen(bitmap,bigfield_area,
 				charcode, shade,
 				flipx, flipy, sx, sy, 0);
 
@@ -158,7 +158,7 @@ void atarifb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			if ((charcode == 0x11) && (sy == 0x07))
 			{
 				sy = 0xf1; /* When multiplexed, it's 0x10...why? */
-				 machine().gfx[gfx]->transpen(bitmap,bigfield_area,
+				 m_gfxdecode->gfx(gfx)->transpen(bitmap,bigfield_area,
 					charcode, 0,
 					flipx, flipy, sx, sy, 0);
 			}

@@ -200,7 +200,7 @@ TILEMAP_MAPPER_MEMBER(decocass_state::bgvideoram_scan_cols )
 TILE_GET_INFO_MEMBER(decocass_state::get_bg_l_tile_info)
 {
 	int color = (m_color_center_bot >> 7) & 1;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			(0x80 == (tile_index & 0x80)) ? 16 : m_bgvideoram[tile_index] >> 4,
 			color,
@@ -210,7 +210,7 @@ TILE_GET_INFO_MEMBER(decocass_state::get_bg_l_tile_info)
 TILE_GET_INFO_MEMBER(decocass_state::get_bg_r_tile_info )
 {
 	int color = (m_color_center_bot >> 7) & 1;
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			(0x00 == (tile_index & 0x80)) ? 16 : m_bgvideoram[tile_index] >> 4,
 			color,
@@ -221,7 +221,7 @@ TILE_GET_INFO_MEMBER(decocass_state::get_fg_tile_info )
 {
 	UINT8 code = m_fgvideoram[tile_index];
 	UINT8 attr = m_colorram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			256 * (attr & 3) + code,
 			m_color_center_bot & 1,
@@ -248,10 +248,10 @@ void decocass_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect
 	else
 		sx = 91 - (m_part_h_shift & 0x7f);
 
-	 machine().gfx[3]->transpen(bitmap,cliprect, 0, color, 0, 0, sx + 64, sy, 0);
-	 machine().gfx[3]->transpen(bitmap,cliprect, 1, color, 0, 0, sx, sy, 0);
-	 machine().gfx[3]->transpen(bitmap,cliprect, 0, color, 0, 1, sx + 64, sy - 64, 0);
-	 machine().gfx[3]->transpen(bitmap,cliprect, 1, color, 0, 1, sx, sy - 64, 0);
+	 m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, 0, color, 0, 0, sx + 64, sy, 0);
+	 m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, 1, color, 0, 0, sx, sy, 0);
+	 m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, 0, color, 0, 1, sx + 64, sy - 64, 0);
+	 m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, 1, color, 0, 1, sx, sy - 64, 0);
 }
 
 void decocass_state::draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -301,9 +301,9 @@ WRITE8_MEMBER(decocass_state::decocass_charram_w )
 {
 	m_charram[offset] = data;
 	/* dirty sprite */
-	machine().gfx[1]->mark_dirty((offset >> 5) & 255);
+	m_gfxdecode->gfx(1)->mark_dirty((offset >> 5) & 255);
 	/* dirty char */
-	machine().gfx[0]->mark_dirty((offset >> 3) & 1023);
+	m_gfxdecode->gfx(0)->mark_dirty((offset >> 3) & 1023);
 }
 
 
@@ -329,7 +329,7 @@ WRITE8_MEMBER(decocass_state::decocass_tileram_w )
 {
 	m_tileram[offset] = data;
 	/* dirty tile (64 bytes per tile) */
-	machine().gfx[2]->mark_dirty((offset / 64) & 15);
+	m_gfxdecode->gfx(2)->mark_dirty((offset / 64) & 15);
 	/* first 1KB of tile RAM is shared with tilemap RAM */
 	if (offset < m_bgvideoram_size)
 		mark_bg_tile_dirty(offset);
@@ -339,8 +339,8 @@ WRITE8_MEMBER(decocass_state::decocass_objectram_w )
 {
 	m_objectram[offset] = data;
 	/* dirty the object */
-	machine().gfx[3]->mark_dirty(0);
-	machine().gfx[3]->mark_dirty(1);
+	m_gfxdecode->gfx(3)->mark_dirty(0);
+	m_gfxdecode->gfx(3)->mark_dirty(1);
 }
 
 WRITE8_MEMBER(decocass_state::decocass_bgvideoram_w )
@@ -515,7 +515,7 @@ void decocass_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		sy -= sprite_y_adjust;
 
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				sprite_ram[offs + interleave],
 				color,
 				flipx,flipy,
@@ -524,7 +524,7 @@ void decocass_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		sy += (flip_screen() ? -256 : 256);
 
 		// Wrap around
-		 machine().gfx[1]->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				sprite_ram[offs + interleave],
 				color,
 				flipx,flipy,
@@ -674,14 +674,14 @@ void decocass_state::video_start()
 	m_bgvideoram = m_tileram;
 	m_bgvideoram_size = 0x0400; /* d000-d3ff */
 
-	machine().gfx[0]->set_source(m_charram);
-	machine().gfx[1]->set_source(m_charram);
-	machine().gfx[2]->set_source(m_tileram);
-	machine().gfx[3]->set_source(m_objectram);
+	m_gfxdecode->gfx(0)->set_source(m_charram);
+	m_gfxdecode->gfx(1)->set_source(m_charram);
+	m_gfxdecode->gfx(2)->set_source(m_tileram);
+	m_gfxdecode->gfx(3)->set_source(m_objectram);
 
 	/* This should ensure that the fake 17th tile is left blank
 	 * now that dirty-tile tracking is handled by the core */
-	machine().gfx[2]->decode(16);
+	m_gfxdecode->gfx(2)->decode(16);
 }
 
 UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -858,7 +858,7 @@ static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
 
-	MCFG_GFXDECODE(ojankohs)
+	MCFG_GFXDECODE_ADD("gfxdecode", ojankohs)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankohs)
@@ -894,7 +894,7 @@ static MACHINE_CONFIG_START( ojankoy, ojankohs_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
 
-	MCFG_GFXDECODE(ojankohs)
+	MCFG_GFXDECODE_ADD("gfxdecode", ojankohs)
 	MCFG_PALETTE_LENGTH(1024)
 	MCFG_PALETTE_INIT_OVERRIDE(ojankohs_state,ojankoy)
 
@@ -931,7 +931,7 @@ static MACHINE_CONFIG_START( ccasino, ojankohs_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ojankohs_state, screen_update_ojankohs)
 
-	MCFG_GFXDECODE(ojankohs)
+	MCFG_GFXDECODE_ADD("gfxdecode", ojankohs)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(ojankohs_state,ojankoy)

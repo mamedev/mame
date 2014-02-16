@@ -307,7 +307,7 @@ static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hyperspt_state, screen_update_hyperspt)
 
-	MCFG_GFXDECODE(hyperspt)
+	MCFG_GFXDECODE_ADD("gfxdecode", hyperspt)
 	MCFG_PALETTE_LENGTH(16*16+16*16)
 
 
@@ -341,7 +341,7 @@ static MACHINE_CONFIG_DERIVED( roadf, hyperspt )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(roadf_map)
-	MCFG_GFXDECODE(roadf)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", roadf)
 	MCFG_VIDEO_START_OVERRIDE(hyperspt_state,roadf)
 	
 	MCFG_CPU_MODIFY("audiocpu")

@@ -11,7 +11,7 @@
 TILE_GET_INFO_MEMBER(iqblock_state::get_bg_tile_info)
 {
 	int code = m_bgvideoram[tile_index] + (m_bgvideoram[tile_index + 0x800] << 8);
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			0,
 			code &(m_video_type ? 0x1fff : 0x3fff),
 			m_video_type? (2*(code >> 13)+1) : (4*(code >> 14)+3),
@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(iqblock_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(iqblock_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
 			code & 0x7f,
 			(code & 0x80) ? 3 : 0,

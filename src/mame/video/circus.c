@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(circus_state::get_bg_tile_info)
 {
 	int code = m_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
 }
 
 void circus_state::video_start()
@@ -60,7 +60,7 @@ void circus_state::draw_line( bitmap_ind16 &bitmap, const rectangle &cliprect, i
 
 void circus_state::draw_sprite_collision( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gfx_element *sprite_gfx = machine().gfx[1];
+	gfx_element *sprite_gfx = m_gfxdecode->gfx(1);
 	const UINT8 *sprite_data = sprite_gfx->get_data(m_clown_z);
 	int sx, sy, dx, dy;
 	int pixel, collision = 0;
@@ -168,7 +168,7 @@ void circus_state::robotbwl_draw_bowling_alley( bitmap_ind16 &bitmap, const rect
 
 void circus_state::robotbwl_draw_ball( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	machine().gfx[1]->transpen(bitmap,/* Y is horizontal position */
+	m_gfxdecode->gfx(1)->transpen(bitmap,/* Y is horizontal position */
 			cliprect,
 			m_clown_z,
 			0,
@@ -187,7 +187,7 @@ UINT32 circus_state::screen_update_robotbwl(screen_device &screen, bitmap_ind16 
 
 void circus_state::crash_draw_car( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	machine().gfx[1]->transpen(bitmap,/* Y is horizontal position */
+	m_gfxdecode->gfx(1)->transpen(bitmap,/* Y is horizontal position */
 		cliprect,
 		m_clown_z,
 		0,

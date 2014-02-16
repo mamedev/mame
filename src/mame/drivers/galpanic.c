@@ -568,10 +568,11 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update_galpanic)
 	MCFG_SCREEN_VBLANK_DRIVER(galpanic_state, screen_eof_galpanic)
 
-	MCFG_GFXDECODE(galpanic)
+	MCFG_GFXDECODE_ADD("gfxdecode", galpanic)
 	MCFG_PALETTE_LENGTH(1024 + 32768)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", galpanic_pandora_config)
+	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
 	kaneko_hit_device::set_type(*device, 0);
