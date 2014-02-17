@@ -53,6 +53,15 @@ static void apple3_update_drives(device_t *device);
 #define LOG_MEMORY      1
 #define LOG_INDXADDR    1
 
+#define ENV_SLOWSPEED	(0x80)
+#define ENV_IOENABLE	(0x40)
+#define ENV_VIDENABLE	(0x20)
+#define ENV_NMIENABLE	(0x10)
+#define ENV_WRITEPROT	(0x08)
+#define ENV_STACK1XX	(0x04)
+#define ENV_PRIMARYROM	(0x02)
+#define ENV_ROMENABLE	(0x01)
+
 READ8_MEMBER(apple3_state::apple3_c0xx_r)
 {
 	UINT8 result = 0xFF;
@@ -402,10 +411,10 @@ void apple3_state::apple3_update_memory()
 		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", m_via_0_b, m_via_1_a);
 	}
 
-	machine().device("maincpu")->set_unscaled_clock((m_via_0_a & 0x80) ? 1000000 : 2000000);
+	machine().device("maincpu")->set_unscaled_clock((m_via_0_a & ENV_SLOWSPEED) ? 1000000 : 2000000);
 
 	/* bank 2 (0100-01FF) */
-	if (!(m_via_0_a & 0x04))
+	if (!(m_via_0_a & ENV_STACK1XX))
 	{
 		if (m_via_0_b < 0x20)
 		{
@@ -440,13 +449,13 @@ void apple3_state::apple3_update_memory()
 	m_bank5 = apple3_bankaddr(~0, 0x2000); 
 
 	/* bank 8 (C000-C0FF) */
-	if (!(m_via_0_a & 0x40))
+	if (!(m_via_0_a & ENV_IOENABLE))
 	{
 		m_bank8 = apple3_bankaddr(~0, 0x4000); 
 	}
 
 	/* bank 9 (C100-C4FF) */
-	if (!(m_via_0_a & 0x40))
+	if (!(m_via_0_a & ENV_IOENABLE))
 	{
 		m_bank9 = apple3_bankaddr(~0, 0x4100);                                  
 	}
@@ -455,7 +464,7 @@ void apple3_state::apple3_update_memory()
 	m_bank10 = apple3_bankaddr(~0, 0x4500); 
 
 	/* bank 11 (C800-CFFF) */
-	if (!(m_via_0_a & 0x40))
+	if (!(m_via_0_a & ENV_IOENABLE))
 	{
 		m_bank11 = apple3_bankaddr(~0, 0x4800);
 	}
@@ -464,14 +473,15 @@ void apple3_state::apple3_update_memory()
 	m_bank6 = apple3_bankaddr(~0, 0x5000);
 
 	/* install bank 7 (F000-FFFF) */
-	if (m_via_0_a & 0x01)
+	m_bank7wr = apple3_bankaddr(~0, 0x7000);
+	if (m_via_0_a & ENV_ROMENABLE)
 	{
-		m_bank7 = memregion("maincpu")->base();
+		m_bank7rd = memregion("maincpu")->base();
 	}
 	else
 	{
 		m_rom_has_been_disabled = true;
-		m_bank7 = apple3_bankaddr(~0, 0x7000);
+		m_bank7rd = m_bank7wr;
 
 		// if we had an IRQ waiting for RAM to be paged in...
 		apple3_irq_update();
@@ -523,7 +533,7 @@ void apple3_state::apple3_irq_update()
 		// working in all cases.
 		// Bonus points: for some reason this isn't a problem with -debug.
 		// m6502 heisenbug maybe?
-		if ((m_via_0_a & 0x01) && (m_rom_has_been_disabled))
+		if ((m_via_0_a & ENV_ROMENABLE) && (m_rom_has_been_disabled))
 		{
 			return;
 		}
@@ -624,23 +634,6 @@ UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset, bool is_write)
 		else if (offset < 0x0100)
 		{
 			result = apple3_bankaddr(~0, ((offs_t) m_via_0_b) * 0x100 + offset);
-		}
-	}
-	else if ((offset >= 0xF000) && (m_via_0_a & 0x01) && (is_write))
-	{
-		/* The Apple /// Diagnostics seems to expect that indexed writes
-		 * always write to RAM.  That image jumps to an address that is
-		 * undefined unless this code is enabled. 
-		 *  
-		 * The confidence test and the diagnostics together indicates 
-		 * that this *doesn't* apply to the VIA region, however. 
-		 *  
-		 * The Diagnostics' ROM test shows this is for writes only. 
-		 */ 
-
-		if (offset < 0xffd0 || offset > 0xffef)
-		{
-			result = apple3_bankaddr(~0, offset - 0x8000); 
 		}
 	}
 
@@ -801,7 +794,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 	}
 	else if (offset < 0xc100)
 	{
-		if (m_via_0_a & 0x40)
+		if (m_via_0_a & ENV_IOENABLE)
 		{
 			if (!space.debugger_access())
 			{
@@ -815,7 +808,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 	}
 	else if (offset < 0xc500)
 	{
-		if (!(m_via_0_a & 0x40))
+		if (!(m_via_0_a & ENV_IOENABLE))
 		{
 			rv = m_bank9[offset - 0xc100];
 		}
@@ -841,7 +834,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 	}
 	else if (offset < 0xd000)
 	{
-		if (!(m_via_0_a & 0x40))
+		if (!(m_via_0_a & ENV_IOENABLE))
 		{
 			rv = m_bank11[offset - 0xc800];
 		}
@@ -879,7 +872,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 		}
 		else
 		{
-			rv = m_bank7[offset - 0xf000]; 
+			rv = m_bank7rd[offset - 0xf000]; 
 		}
 	}
 
@@ -958,7 +951,7 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	}
 	else if (offset < 0xc100)
 	{
-		if (m_via_0_a & 0x40)
+		if (m_via_0_a & ENV_IOENABLE)
 		{
 			if (!space.debugger_access())
 			{
@@ -968,7 +961,7 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 		else
 		{
 			// is this page write protected?
-			if (!(m_via_0_a & 0x08))
+			if (!(m_via_0_a & ENV_WRITEPROT))
 			{
 				m_bank8[offset - 0xc000] = data;
 			}
@@ -976,9 +969,9 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	}
 	else if (offset < 0xc500)
 	{
-		if (!(m_via_0_a & 0x40))
+		if (!(m_via_0_a & ENV_IOENABLE))
 		{
-			if (!(m_via_0_a & 0x08))
+			if (!(m_via_0_a & ENV_WRITEPROT))
 			{
 				m_bank9[offset - 0xc100] = data;
 			}
@@ -1001,16 +994,16 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	}
 	else if (offset < 0xc800)
 	{
-		if (!(m_via_0_a & 0x08))
+		if (!(m_via_0_a & ENV_WRITEPROT))
 		{
 			m_bank10[offset - 0xc500] = data;
 		}
 	}
 	else if (offset < 0xd000)
 	{
-		if (!(m_via_0_a & 0x40))
+		if (!(m_via_0_a & ENV_IOENABLE))
 		{
-			if (!(m_via_0_a & 0x08))
+			if (!(m_via_0_a & ENV_WRITEPROT))
 			{
 				m_bank11[offset - 0xc800] = data;
 			}
@@ -1035,7 +1028,7 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	}
 	else if (offset < 0xf000)
 	{
-		if (!(m_via_0_a & 0x08))
+		if (!(m_via_0_a & ENV_WRITEPROT))
 		{
 			m_bank6[offset - 0xd000] = data;
 		}
@@ -1058,9 +1051,9 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 		}
 		else
 		{
-			if (!(m_via_0_a & 0x09))
+			if (!(m_via_0_a & ENV_WRITEPROT))
 			{
-				m_bank7[offset - 0xf000] = data;
+				m_bank7wr[offset - 0xf000] = data;
 			}
 		}
 	}

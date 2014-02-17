@@ -129,7 +129,7 @@ private:
 
 	UINT8 *m_bank2, *m_bank3, *m_bank4, *m_bank5, *m_bank8, *m_bank9;
 	UINT8 *m_bank10, *m_bank11;
-	UINT8 *m_bank6, *m_bank7;
+	UINT8 *m_bank6, *m_bank7rd, *m_bank7wr;
 	int m_speaker_state;
 	int m_c040_time;
 	UINT16 m_lastchar, m_strobe;
