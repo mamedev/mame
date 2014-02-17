@@ -311,7 +311,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6258_device> m_okim6258;
 	required_device<ram_device> m_ram;
-	optional_device<gfxdecode_device> m_gfxdecode;
+	required_device<gfxdecode_device> m_gfxdecode;
 	bitmap_ind16* x68k_get_gfx_page(int pri,int type);
 	attotime prescale(int val);
 	void mfp_trigger_irq(int irq);
