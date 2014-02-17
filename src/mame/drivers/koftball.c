@@ -251,13 +251,11 @@ static MACHINE_CONFIG_START( koftball, koftball_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_UPDATE_DRIVER(koftball_state, screen_update_koftball)
-
-	MCFG_GFXDECODE_ADD("gfxdecode", koftball)
-
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 30*8-1)
 	MCFG_PALETTE_LENGTH(256)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", koftball)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	
