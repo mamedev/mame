@@ -186,7 +186,7 @@ public:
 	DECLARE_READ8_MEMBER(casloopy_bitmap_r);
 	DECLARE_WRITE8_MEMBER(casloopy_bitmap_w);
 	required_device<cpu_device> m_maincpu;
-	optional_device<gfxdecode_device> m_gfxdecode;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -492,6 +492,8 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update_casloopy)
 
 	MCFG_PALETTE_LENGTH(512)
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("ic1,bin")
