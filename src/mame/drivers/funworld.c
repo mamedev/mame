@@ -945,6 +945,9 @@
      Both programs write to videoram either to each video RAM ranges.
   - Added proper program ROM banking and connected to DIP switch #1.
   - Added Luna Park (set 2). This one writes to normal CMC video RAM.
+  - Added Crystal Colours (CMC hardware).
+  - Added default NVRAM to Crystal Colours (CMC hardware), allowing
+     to boot with clean meters/settings.
   - Cleaned-up the machine drivers.
   - Derived clocks via #define.
   - Added technical notes.
@@ -4161,8 +4164,8 @@ ROM_START( crystal )
 	ROM_LOAD( "425-1995-number-02.u21", 0x0000, 0x8000, CRC(1eaf1bd9) SHA1(eb392f4a8864c59c7792f905f165f543087cb4a0) )
 	ROM_LOAD( "425-1995-number-01.u20", 0x8000, 0x8000, CRC(d3972c19) SHA1(a84ae765eeae1f9d443b0c4941b6f93dcc540f8c) )
 
-// ROM_REGION( 0x0800, "nvram", 0 ) /* default NVRAM */
-// ROM_LOAD( "lunaparkb_nvram.bin", 0x0000, 0x0800, CRC(005b70fc) SHA1(682c2315b4fafb6255db989f0d49255fd8d7a1a9) )
+	ROM_REGION( 0x0800, "nvram", 0 ) /* default NVRAM */
+	ROM_LOAD( "crystal_nvram.bin", 0x0000, 0x0800, CRC(21a712ee) SHA1(259d83b8268a93f96b53580562e9c6e835f7473e) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.u25", 0x0000, 0x0200, CRC(dd9db8bd) SHA1(6374795ae243759a887464b38ece078dc3735b6f) )
