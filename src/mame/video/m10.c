@@ -89,7 +89,7 @@ inline void m10_state::plot_pixel_m10( bitmap_ind16 &bm, int x, int y, int col )
 	if (!m_flip)
 		bm.pix16(y, x) = col;
 	else
-		bm.pix16((IREMM10_VBSTART - 1) - (y - IREMM10_VBEND) + 6,
+		bm.pix16((IREMM10_VBSTART - 1) - (y - IREMM10_VBEND),
 				(IREMM10_HBSTART - 1) - (x - IREMM10_HBEND)) = col; // only when flip_screen(?)
 }
 
@@ -97,8 +97,6 @@ VIDEO_START_MEMBER(m10_state,m10)
 {
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
 	m_tx_tilemap->set_transparent_pen(0);
-	m_tx_tilemap->set_scrolldx(0, 62);
-	m_tx_tilemap->set_scrolldy(0, 0);
 
 	m_back_gfx = auto_alloc(machine(), gfx_element(machine(), backlayout, m_chargen, 8, 0));
 
@@ -111,8 +109,6 @@ VIDEO_START_MEMBER(m10_state,m15)
 	m_gfxdecode->set_gfx(0,auto_alloc(machine(), gfx_element(machine(), charlayout, m_chargen, 8, 0)));
 
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
-	m_tx_tilemap->set_scrolldx(0, 116);
-	m_tx_tilemap->set_scrolldy(0, 0);
 
 	return ;
 }
@@ -134,7 +130,7 @@ UINT32 m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap,
 
 	for (i = 0; i < 4; i++)
 		if (m_flip)
-			 m_back_gfx->opaque(bitmap,cliprect, i, color[i], 1, 1, 31 * 8 - xpos[i], 6);
+			 m_back_gfx->opaque(bitmap,cliprect, i, color[i], 1, 1, 31 * 8 - xpos[i], 0);
 		else
 			 m_back_gfx->opaque(bitmap,cliprect, i, color[i], 0, 0, xpos[i], 0);
 
