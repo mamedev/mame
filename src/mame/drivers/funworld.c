@@ -47,6 +47,7 @@
   * Luna Park (set 1, dual program),                  unknown,            1998.
   * Luna Park (set 2, dual program),                  unknown,            1998.
   * Luna Park (set 3),                                unknown,            1998.
+  * Crystal Colours (CMC hardware),                   J.C.D. srl,         1998.
   * Royal Card (Austrian, set 1),                     TAB Austria,        1991.
   * Royal Card (Austrian, set 2),                     TAB Austria,        1991.
   * Royal Card (Austrian/Polish, set 3),              TAB Austria,        1991.
@@ -4148,6 +4149,25 @@ ROM_START( lunaparkc )
 	ROM_LOAD( "82s147.u25", 0x0000, 0x0200, CRC(ddb74d72) SHA1(3d5dda3a935a3100cb86017f103b855d6449f73a) )
 ROM_END
 
+/*
+  Crystal Colours...
+  Version running in CMC hardware.
+*/
+ROM_START( crystal )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "425-1995-number-03.u2", 0x8000, 0x8000, CRC(bab1ab88) SHA1(d224f2f7cd9313f51c484d781dc278e358f1e4fd) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "425-1995-number-02.u21", 0x0000, 0x8000, CRC(1eaf1bd9) SHA1(eb392f4a8864c59c7792f905f165f543087cb4a0) )
+	ROM_LOAD( "425-1995-number-01.u20", 0x8000, 0x8000, CRC(d3972c19) SHA1(a84ae765eeae1f9d443b0c4941b6f93dcc540f8c) )
+
+// ROM_REGION( 0x0800, "nvram", 0 ) /* default NVRAM */
+// ROM_LOAD( "lunaparkb_nvram.bin", 0x0000, 0x0800, CRC(005b70fc) SHA1(682c2315b4fafb6255db989f0d49255fd8d7a1a9) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.u25", 0x0000, 0x0200, CRC(dd9db8bd) SHA1(6374795ae243759a887464b38ece078dc3735b6f) )
+ROM_END
+
 
 /******************************** Royal Card sets ************************************/
 
@@ -5925,6 +5945,7 @@ GAMEL( 1996, bottl10b,  bottle10, cuoreuno, cuoreuno,  driver_device,  0,       
 GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  driver_device,  0,        ROT0, "<unknown>.",      "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd )	// mirrored video RAM (4000/5000 to 6000/7000).
 GAMEL( 1998, lunaparkb, lunapark, lunapark, lunapark,  driver_device,  0,        ROT0, "<unknown>.",      "Luna Park (set 2, dual program)",                 0,                       layout_jollycrd )	// mirrored video RAM (4000/5000 to 6000/7000).
 GAMEL( 1998, lunaparkc, lunapark, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "<unknown>.",      "Luna Park (set 3)",                               0,                       layout_jollycrd )	// regular video RAM 6000/7000.
+GAMEL( 1998, crystal,   0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "J.C.D. srl",      "Crystal Colours (CMC hardware)",                  0,                       layout_jollycrd )
 
 // Royal Card based...
 GAMEL( 1991, royalcrd,  0,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 1)",                    0,                       layout_jollycrd )
