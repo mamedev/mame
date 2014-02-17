@@ -46,7 +46,6 @@ public:
 	tilemap_t *m_fg_tilemap;
 	UINT8 m_main_nmi_enabled;
 	UINT8 m_sound_nmi_enabled;
-	UINT8 m_flipscreen;
 	bool m_percuss_hardware;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

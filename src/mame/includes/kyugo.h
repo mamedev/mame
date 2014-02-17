@@ -34,7 +34,6 @@ public:
 	UINT8       m_scroll_y;
 	int         m_bgpalbank;
 	int         m_fgcolor;
-	int         m_flipscreen;
 	const UINT8 *m_color_codes;
 
 	/* devices */

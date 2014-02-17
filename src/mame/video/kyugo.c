@@ -50,8 +50,7 @@ void kyugo_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_fg_tilemap->set_scrolldx(0, 224);
-	m_bg_tilemap->set_scrolldx(-32, 32);
+	m_bg_tilemap->set_scrolldx(-32, 288+32);
 }
 
 
@@ -128,11 +127,7 @@ WRITE8_MEMBER(kyugo_state::kyugo_scroll_y_w)
 
 WRITE8_MEMBER(kyugo_state::kyugo_flipscreen_w)
 {
-	if (m_flipscreen != (data & 0x01))
-	{
-		m_flipscreen = (data & 0x01);
-		machine().tilemap().set_flip_all((m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY): 0));
-	}
+	flip_screen_set(data & 0x01);
 }
 
 
@@ -150,11 +145,11 @@ void kyugo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 	UINT8 *spriteram_area2 = &m_spriteram_2[0x28];
 	UINT8 *spriteram_area3 = &m_fgvideoram[0x28];
 
-	int n;
+	int flip = flip_screen();
 
-	for (n = 0; n < 12 * 2; n++)
+	for (int n = 0; n < 12 * 2; n++)
 	{
-		int offs, y, sy, sx, color;
+		int offs, sy, sx, color;
 
 		offs = 2 * (n % 12) + 64 * (n / 12);
 
@@ -166,12 +161,12 @@ void kyugo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		if (sy > 0xf0)
 			sy -= 256;
 
-		if (m_flipscreen)
+		if (flip)
 			sy = 240 - sy;
 
 		color = spriteram_area1[offs + 1] & 0x1f;
 
-		for (y = 0; y < 16; y++)
+		for (int y = 0; y < 16; y++)
 		{
 			int code, attr, flipx, flipy;
 
@@ -183,7 +178,7 @@ void kyugo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 			flipx =  attr & 0x08;
 			flipy =  attr & 0x04;
 
-			if (m_flipscreen)
+			if (flip)
 			{
 				flipx = !flipx;
 				flipy = !flipy;
@@ -194,7 +189,7 @@ void kyugo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 						code,
 						color,
 						flipx,flipy,
-						sx,m_flipscreen ? sy - 16*y : sy + 16*y, 0 );
+						sx,flip ? sy - 16*y : sy + 16*y, 0 );
 		}
 	}
 }
@@ -202,7 +197,7 @@ void kyugo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 UINT32 kyugo_state::screen_update_kyugo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_flipscreen)
+	if (flip_screen())
 		m_bg_tilemap->set_scrollx(0, -(m_scroll_x_lo + (m_scroll_x_hi * 256)));
 	else
 		m_bg_tilemap->set_scrollx(0,   m_scroll_x_lo + (m_scroll_x_hi * 256));
