@@ -11,9 +11,11 @@
 		<info name="alt_title" value="データック バトルラッシュ"/>
 		<part name="cart" interface="datach_cart">
 			<feature name="slot" value="datach_ep1" />
-			<feature name="pcb" value="BANDAI-DATACH" />
+			<feature name="pcb_model" value="MINI" />
+			<feature name="ic1" value="B-AI '93 BATTLE-RUSH" />
+			<feature name="ic2" value="X24C01" />
 			<dataarea name="rom" size="262144">
-				<rom name="datach - battle rush - build up robot tournament (japan).prg" size="262144" crc="983d8175" sha1="29cc759d5ca214eefc0cc1c6ce0f8b9111e58124" offset="00000" status="baddump" />
+				<rom name="b-ai '93 battle-rush.ic1" size="262144" crc="983d8175" sha1="29cc759d5ca214eefc0cc1c6ce0f8b9111e58124" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -75,9 +77,10 @@
 		<info name="alt_title" value="データック SDガンダム ガンダムウォーズ"/>
 		<part name="cart" interface="datach_cart">
 			<feature name="slot" value="datach_rom" />
-			<feature name="pcb" value="BANDAI-DATACH" />
+			<feature name="pcb_model" value="MINI" />
+			<feature name="ic1" value="DATACH GUNDAM" />
 			<dataarea name="rom" size="262144">
-				<rom name="datach - sd gundam - gundam wars (japan).prg" size="262144" crc="0be0a328" sha1="edd7a45a7f27e396b6d686f1861642d509863132" offset="00000" status="baddump" />
+				<rom name="datach gundam.ic1" size="262144" crc="0be0a328" sha1="edd7a45a7f27e396b6d686f1861642d509863132" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

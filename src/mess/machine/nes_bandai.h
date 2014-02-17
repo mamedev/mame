@@ -5,24 +5,6 @@
 #include "machine/i2cmem.h"
 
 
-// ======================> nes_karaokestudio_device
-
-class nes_karaokestudio_device : public nes_nrom_device
-{
-public:
-	// construction/destruction
-	nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_start();
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-
-	virtual void pcb_reset();
-
-	// TODO: add microphone I/O emulation
-};
-
-
 // ======================> nes_oekakids_device
 
 class nes_oekakids_device : public nes_nrom_device
@@ -147,7 +129,6 @@ protected:
 
 
 // device type definition
-extern const device_type NES_KARAOKESTUDIO;
 extern const device_type NES_OEKAKIDS;
 extern const device_type NES_FCG;
 extern const device_type NES_LZ93D50;

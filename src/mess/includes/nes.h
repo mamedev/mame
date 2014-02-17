@@ -27,6 +27,7 @@
 #include "machine/nes_event.h"
 #include "machine/nes_irem.h"
 #include "machine/nes_jaleco.h"
+#include "machine/nes_karastudio.h"
 #include "machine/nes_konami.h"
 #include "machine/nes_namcot.h"
 #include "machine/nes_pt554.h"

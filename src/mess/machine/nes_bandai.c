@@ -14,17 +14,18 @@
  * Bandai LZ93D50 + 24C01 EEPROM [mapper 159]
  * Bandai LZ93D50 + 24C02 EEPROM [mapper 16]
  * Bandai Famicom Jump 2 (aka LZ93D50 + SRAM) [mapper 153]
- * Bandai Karaoke Studio [mapper 188]
  * Bandai Oeka Kids [mapper 96]
 
  * Bandai Datach Joint ROM System [mapper 157] is emulated in a separate source file
    to implement also the subslot, but the PCB is basically a Bandai LZ93D50 + 24C02 EEPROM
    pcb with added barcode reader and subslot
-
+ 
+ * Bandai Karaoke Studio [mapper 188] is emulated in a separate source file
+   to implement also the subslot and the mic inputs
+ 
  
  TODO:
  - investigate why EEPROM does not work
- - try to implement some sort of Karaoke emulation
  - add support to the PPU for the code necessary to Oeka Kids games (also needed by UNL-DANCE2000 PCB)
  - check the cause for the flickering in Famicom Jump 2
 
@@ -50,7 +51,6 @@
 //  constructor
 //-------------------------------------------------
 
-const device_type NES_KARAOKESTUDIO = &device_creator<nes_karaokestudio_device>;
 const device_type NES_OEKAKIDS = &device_creator<nes_oekakids_device>;
 const device_type NES_FCG = &device_creator<nes_fcg_device>;
 const device_type NES_LZ93D50 = &device_creator<nes_lz93d50_device>;
@@ -58,11 +58,6 @@ const device_type NES_LZ93D50_24C01 = &device_creator<nes_lz93d50_24c01_device>;
 const device_type NES_LZ93D50_24C02 = &device_creator<nes_lz93d50_24c02_device>;
 const device_type NES_FJUMP2 = &device_creator<nes_fjump2_device>;
 
-
-nes_karaokestudio_device::nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_KARAOKESTUDIO, "NES Cart Bandai Karaoke Studio PCB", tag, owner, clock, "nes_karaoke", __FILE__)
-{
-}
 
 nes_oekakids_device::nes_oekakids_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_OEKAKIDS, "NES Cart Bandai Oeka Kids PCB", tag, owner, clock, "nes_oeka", __FILE__)
@@ -112,20 +107,6 @@ nes_fjump2_device::nes_fjump2_device(const machine_config &mconfig, const char *
 }
 
 
-
-
-void nes_karaokestudio_device::device_start()
-{
-	common_start();
-}
-
-void nes_karaokestudio_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef((m_prg_chunks - 1) ^ 0x08);
-	chr8(0, m_chr_source);
-}
 
 void nes_oekakids_device::device_start()
 {
@@ -209,25 +190,6 @@ void nes_fjump2_device::pcb_reset()
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
-
-/*-------------------------------------------------
-
- Bandai Karaoke Studio board emulation
-
- Games: Karaoke Studio
-
- Note: we currently do not emulate the mic
-
- iNES: mapper 188
-
- -------------------------------------------------*/
-
-WRITE8_MEMBER(nes_karaokestudio_device::write_h)
-{
-	LOG_MMC(("karaoke studio write_h, offset: %04x, data: %02x\n", offset, data));
-
-	prg16_89ab(data ^ 0x08);
-}
 
 /*-------------------------------------------------
 
