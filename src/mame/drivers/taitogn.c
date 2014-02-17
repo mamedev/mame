@@ -410,6 +410,17 @@ WRITE8_MEMBER(taitogn_state::control_w)
 {
 	// 20 = watchdog
 	m_mb3773->write_line_ck((data & 0x20) >> 5);
+	
+	// 10 = soundcpu reset
+	m_mn10200->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	if (~data & m_control & 0x10)
+	{
+		// assume that this also readys the sound flash chips
+		m_pgmflash->write(0, 0xff);
+		m_sndflash0->write(0, 0xff);
+		m_sndflash1->write(0, 0xff);
+		m_sndflash2->write(0, 0xff);
+	}
 
 	// 04 = select bank
 	// According to the rom code, bits 1-0 may be part of the bank
@@ -488,25 +499,7 @@ WRITE8_MEMBER(taitogn_state::znsecsel_w)
 
 READ8_MEMBER(taitogn_state::boardconfig_r)
 {
-	/*
-	------00 mem=4M
-	------01 mem=4M
-	------10 mem=8M
-	------11 mem=16M
-	-----0-- smem=hM
-	-----1-- smem=2M
-	----0--- vmem=1M
-	----1--- vmem=2M
-	000----- rev=-2
-	001----- rev=-1
-	010----- rev=0
-	011----- rev=1
-	100----- rev=2
-	101----- rev=3
-	110----- rev=4
-	111----- rev=5
-	*/
-
+	// see zn.c
 	return 64|32|8;
 }
 
@@ -564,7 +557,7 @@ void taitogn_state::driver_start()
 
 void taitogn_state::machine_reset()
 {
-	m_control = 0;
+	m_control = 0xf8;
 
 	// halt sound CPU since it has no valid program at start
 	m_mn10200->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -589,8 +582,8 @@ static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 	AM_RANGE(0x1fb40000, 0x1fb40003) AM_READWRITE8(control_r, control_w, 0x000000ff)
 	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE16(control2_w, 0x0000ffff)
 	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE16(gn_1fb70000_r, gn_1fb70000_w, 0x0000ffff)
-	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, global_volume_w, 0x0000ffff)
-	//AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reset_control_w, 0xffff0000)
+	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reg_data_w, 0x0000ffff)
+	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reg_address_w, 0xffff0000)
 	AM_RANGE(0x1fba0000, 0x1fba0003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, sound_irq_w, 0x0000ffff)
 	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_DEVREAD16("taito_zoom", taito_zoom_device, sound_irq_r, 0x0000ffff)
 	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0x00ff00ff) // M66220FP for comms with the MN10200
