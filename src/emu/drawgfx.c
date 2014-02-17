@@ -114,12 +114,24 @@ void gfxdecode_device::device_start()
 	for (curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != NULL; curgfx++)
 	{
 		const gfx_decode_entry *gfxdecode = &gfxdecodeinfo[curgfx];
+		UINT32 region_length;
+		const UINT8 *region_base;
+
 		// resolve the region
-		astring gfxregion;
-		owner()->subtag(gfxregion, gfxdecode->memory_region);
-		memory_region *region = (gfxdecode->memory_region != NULL) ? owner()->memregion(gfxregion) : NULL;
-		UINT32 region_length = (region != NULL) ? (8 * region->bytes()) : 0;
-		const UINT8 *region_base = (region != NULL) ? region->base() : NULL;
+		if (gfxdecode->memory_region != NULL)
+		{
+			astring gfxregion;
+			owner()->subtag(gfxregion, gfxdecode->memory_region);
+			memory_region *region = owner()->memregion(gfxregion);
+			region_length = 8 * region->bytes();
+			region_base = region->base();
+		}
+		else
+		{
+			region_length = 0;
+			region_base = NULL;
+		}
+
 		UINT32 xscale = (gfxdecode->xscale == 0) ? 1 : gfxdecode->xscale;
 		UINT32 yscale = (gfxdecode->yscale == 0) ? 1 : gfxdecode->yscale;
 		UINT32 *extpoffs, extxoffs[MAX_ABS_GFX_SIZE], extyoffs[MAX_ABS_GFX_SIZE];
