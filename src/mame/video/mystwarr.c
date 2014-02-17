@@ -24,7 +24,7 @@ static void mystwarr_decode_tiles(running_machine &machine)
 	for (gfxnum = 0; gfxnum < ARRAY_LENGTH(state->m_gfxdecode->gfx()); gfxnum++)
 		if (state->m_gfxdecode->gfx(gfxnum) != NULL && state->m_gfxdecode->gfx(gfxnum)->srcdata() == s)
 			break;
-	assert(gfxnum != ARRAY_LENGTH(machine.gfx));
+	assert(gfxnum != ARRAY_LENGTH(state->m_gfxdecode->gfx()));
 
 	decoded = auto_alloc_array(machine, UINT8, len);
 	d = decoded;
