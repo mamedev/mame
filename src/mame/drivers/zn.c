@@ -330,13 +330,13 @@ READ8_MEMBER(zn_state::znsecsel_r)
 
 WRITE8_MEMBER(zn_state::znsecsel_w)
 {
-	COMBINE_DATA( &m_n_znsecsel );
-
-	m_znsec0->select( ( m_n_znsecsel >> 2 ) & 1 );
-	m_znsec1->select( ( m_n_znsecsel >> 3 ) & 1 );
-	m_zndip->select( ( m_n_znsecsel & 0x8c ) != 0x8c );
-
 	verboselog(2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+
+	m_znsec0->select( ( data >> 2 ) & 1 );
+	m_znsec1->select( ( data >> 3 ) & 1 );
+	m_zndip->select( ( data & 0x8c ) != 0x8c );
+
+	m_n_znsecsel = data;
 }
 
 READ8_MEMBER(zn_state::boardconfig_r)

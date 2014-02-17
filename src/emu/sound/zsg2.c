@@ -42,6 +42,15 @@
     To compute the final 16bits value just shift left by (9-s).
     Yes, that simple.
 
+    ---------------------------------------------------------
+
+Emulation is still preliminary.
+
+TODO:
+- channel volume, 16bits?? need to make a lookup table?
+- memory reads out of range sometimes
+- a lot of unknowns
+
 */
 
 #include "emu.h"
@@ -50,11 +59,6 @@
 
 // device type definition
 const device_type ZSG2 = &device_creator<zsg2_device>;
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
 
 //-------------------------------------------------
 //  zsg2_device - constructor
@@ -86,8 +90,49 @@ void zsg2_device::device_start()
 	m_mem_blocks = m_mem_size / 4;
 	
 	m_mem_copy = auto_alloc_array_clear(machine(), UINT32, m_mem_blocks);
-	m_full_samples = auto_alloc_array_clear(machine(), INT16, m_mem_blocks * 4 + 4);
+	m_full_samples = auto_alloc_array_clear(machine(), INT16, m_mem_blocks * 4 + 4); // +4 is for empty block
+	
+	// register for savestates
+	save_pointer(NAME(m_mem_copy), m_mem_blocks / sizeof(UINT32));
+	save_pointer(NAME(m_full_samples), (m_mem_blocks * 4 + 4) / sizeof(INT16));
+	save_item(NAME(m_read_address));
+
+	for (int ch = 0; ch < 48; ch++)
+	{
+		save_item(NAME(m_chan[ch].v), ch);
+		save_item(NAME(m_chan[ch].is_playing), ch);
+		save_item(NAME(m_chan[ch].cur_pos), ch);
+		save_item(NAME(m_chan[ch].step_ptr), ch);
+		save_item(NAME(m_chan[ch].step), ch);
+		save_item(NAME(m_chan[ch].start_pos), ch);
+		save_item(NAME(m_chan[ch].end_pos), ch);
+		save_item(NAME(m_chan[ch].loop_pos), ch);
+		save_item(NAME(m_chan[ch].page), ch);
+		save_item(NAME(m_chan[ch].vol), ch);
+	}
 }
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void zsg2_device::device_reset()
+{
+	m_read_address = 0;
+
+	// stop playing and clear all channels
+	control_w(4, 0xffff);
+	control_w(5, 0xffff);
+	control_w(6, 0xffff);
+	
+	for (int ch = 0; ch < 48; ch++)
+		for (int reg = 0; reg < 0x10; reg++)
+			chan_w(ch, reg, 0);
+}
+
+
+/******************************************************************************/
 
 UINT32 zsg2_device::read_memory(UINT32 offset)
 {
@@ -155,18 +200,24 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			if (m_chan[ch].step_ptr & 0x80000)
 			{
 				m_chan[ch].step_ptr &= 0xffff;
-				if (++m_chan[ch].cur_pos >= m_chan[ch].end_pos)
+				if (++m_chan[ch].cur_pos > m_chan[ch].end_pos)
 				{
-					m_chan[ch].is_playing = false;
-					//..
-					//m_chan[ch].cur_pos = m_chan[ch].loop_pos;
+					// loop sample
+					m_chan[ch].cur_pos = m_chan[ch].loop_pos;
+					if ((m_chan[ch].cur_pos + 1) >= m_chan[ch].end_pos)
+					{
+						// end of sample
+						m_chan[ch].is_playing = false;
+						continue;
+					}
 				}
 				m_chan[ch].samples = prepare_samples(m_chan[ch].page | m_chan[ch].cur_pos);
 			}
 			
 			INT16 sample = m_chan[ch].samples[m_chan[ch].step_ptr >> 16 & 3];
 			
-			
+			//sample = (sample * (m_chan[ch].vol & 0xffff)) / 0x10000;
+			if (m_chan[ch].vol == 0) sample = 0; // temp hack to prevent stuck notes
 			
 			mix_l += sample;
 			mix_r += sample;
@@ -178,15 +229,14 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 }
 
 
+/******************************************************************************/
 
 void zsg2_device::chan_w(int ch, int reg, UINT16 data)
 {
-	m_chan[ch].v[reg] = data;
-	
 	switch (reg)
 	{
 		case 0x0:
-			// lo byte: ?
+			// lo byte: always 0?
 			// hi byte: start address low
 			m_chan[ch].start_pos = (m_chan[ch].start_pos & 0xff00) | (data >> 8 & 0xff);
 			break;
@@ -199,7 +249,7 @@ void zsg2_device::chan_w(int ch, int reg, UINT16 data)
 			break;
 		
 		case 0x4:
-			// frequency?
+			// frequency
 			m_chan[ch].step = data;
 			break;
 
@@ -220,27 +270,48 @@ void zsg2_device::chan_w(int ch, int reg, UINT16 data)
 			m_chan[ch].loop_pos = (m_chan[ch].loop_pos & 0x00ff) | (data << 8 & 0xff00);
 			break;
 		
+		case 0xb:
+			// always writes 0
+			// this register is read-only
+			break;
+		
+		case 0xe:
+			// channel volume, reg 0xc is also related?
+			m_chan[ch].vol = data;
+			break;
+		
 		default:
 			break;
-			
 	}
+
+	m_chan[ch].v[reg] = data;
 }
 
 UINT16 zsg2_device::chan_r(int ch, int reg)
 {
+	switch (reg)
+	{
+		case 0xb:
+			// ?
+			return 0;
+
+		default:
+			break;
+	}
+	
 	return m_chan[ch].v[reg];
 }
 
 
-
+/******************************************************************************/
 
 void zsg2_device::control_w(int reg, UINT16 data)
 {
-	switch(reg)
+	switch (reg)
 	{
 		case 0x00: case 0x01: case 0x02:
 		{
-			// key on?
+			// key on
 			int base = (reg & 3) << 4;
 			for (int i = 0; i < 16; i++)
 			{
@@ -251,39 +322,6 @@ void zsg2_device::control_w(int reg, UINT16 data)
 					m_chan[ch].cur_pos = m_chan[ch].start_pos;
 					m_chan[ch].step_ptr = 0;
 					m_chan[ch].samples = prepare_samples(m_chan[ch].page | m_chan[ch].cur_pos);
-					
-
-
-#if 0
-	printf("keyon %02x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x\n",
-		ch,
-		m_chan[ch].v[0x0], m_chan[ch].v[0x1], m_chan[ch].v[0x2], m_chan[ch].v[0x3],
-		m_chan[ch].v[0x4], m_chan[ch].v[0x5], m_chan[ch].v[0x6], m_chan[ch].v[0x7],
-		m_chan[ch].v[0x8], m_chan[ch].v[0x9], m_chan[ch].v[0xa], m_chan[ch].v[0xb],
-		m_chan[ch].v[0xc], m_chan[ch].v[0xd], m_chan[ch].v[0xe], m_chan[ch].v[0xf]);
-
-/*
-r 0020 0010 - 0000ee50 00003b94
-r 0020 0014 - 00019be0 000066f8
-r 0020 0018 - 00018eac 000063ab
-r 0020 001c - 0000003c 0000000f
-keyon 15
-
-9400 083b   00 01   start addr  083b94
-0000 0400   02 03
-2cec        04
-1cab        05      ab = loop addr low
-66f8        06      end addr
-1c63        07      63 = loop addr high
-f1a0 0000 0000 0000 f1a0 1b78 089e 1523
-
-
-
-*/
-
-#endif
-
-
 				}
 			}
 			break;
@@ -324,24 +362,29 @@ f1a0 0000 0000 0000 f1a0 1b78 089e 1523
 
 UINT16 zsg2_device::control_r(int reg)
 {
-	switch(reg)
+	switch (reg)
 	{
 		case 0x14:
-			return 0xff00;
+			// memory bus busy?
+			// right before reading memory, it polls until low 8 bits are 0
+			return 0;
 
 		case 0x1e:
 			// rom readback word low
-			if (m_read_address >= m_mem_blocks) return 0;
-			return m_mem_base[m_read_address] & 0xffff;
+			return read_memory(m_read_address) & 0xffff;
 		case 0x1f:
 			// rom readback word high
-			if (m_read_address >= m_mem_blocks) return 0;
-			return m_mem_base[m_read_address] >> 16;
-	}
+			return read_memory(m_read_address) >> 16;
 
-	return 0xffff;
+		default:
+			break;
+	}
+	
+	return 0;
 }
 
+
+/******************************************************************************/
 
 WRITE16_MEMBER(zsg2_device::write)
 {
@@ -366,7 +409,6 @@ WRITE16_MEMBER(zsg2_device::write)
 		control_w(offset - 0x300, data);
 	}
 }
-
 
 READ16_MEMBER(zsg2_device::read)
 {

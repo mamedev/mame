@@ -43,6 +43,7 @@ const device_type TAITO_ZOOM = &device_creator<taito_zoom_device>;
 taito_zoom_device::taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TAITO_ZOOM, "Taito Zoom Sound System", tag, owner, clock, "taito_zoom", __FILE__),
 	m_soundcpu(*this, ":mn10200"),
+	m_control(0),
 	m_tms_ctrl(0)
 {
 }
@@ -56,6 +57,7 @@ void taito_zoom_device::device_start()
 	m_snd_shared_ram = auto_alloc_array_clear(machine(), UINT8, 0x100);
 	
 	// register for savestates
+	save_item(NAME(m_control));
 	save_item(NAME(m_tms_ctrl));
 	save_pointer(NAME(m_snd_shared_ram), 0x100);
 }
@@ -105,7 +107,7 @@ WRITE8_MEMBER(taito_zoom_device::tms_ctrl_w)
 
 ADDRESS_MAP_START( taitozoom_mn_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mn10200", 0)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM
+	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 	AM_RANGE(0x800000, 0x8007ff) AM_DEVREADWRITE("zsg2", zsg2_device, read, write)
 	AM_RANGE(0xc00000, 0xc00001) AM_RAM // TMS57002 comms
 	AM_RANGE(0xe00000, 0xe000ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0xffff) // M66220FP for comms with maincpu
@@ -136,13 +138,16 @@ READ16_MEMBER(taito_zoom_device::sound_irq_r)
 
 WRITE16_MEMBER(taito_zoom_device::global_volume_w)
 {
+	// TODO
+	// m_control d0 selects left/right speaker volume (zsg2+dsp)
 }
 
 WRITE16_MEMBER(taito_zoom_device::reset_control_w)
 {
-	// d0: ? (toggles in soundtest)
 	// d2: reset sound cpu?
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
+
+	m_control = data;
 }
 
 

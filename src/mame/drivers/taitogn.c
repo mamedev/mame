@@ -403,40 +403,25 @@ private:
 
 READ8_MEMBER(taitogn_state::control_r)
 {
-	//      fprintf(stderr, "gn_r %08x @ %08x (%s)\n", 0x1fb00000+4*offset, mem_mask, machine().describe_context());
 	return m_control;
 }
 
 WRITE8_MEMBER(taitogn_state::control_w)
 {
 	// 20 = watchdog
-	// 04 = select bank
-
-	COMBINE_DATA(&m_control);
-
 	m_mb3773->write_line_ck((data & 0x20) >> 5);
 
-#if 0
-	if((p ^ control) & ~0x20)
-		fprintf(stderr, "control = %c%c.%c %c%c%c%c (%s)\n",
-				control & 0x80 ? '1' : '0',
-				control & 0x40 ? '1' : '0',
-				control & 0x10 ? '1' : '0',
-				control & 0x08 ? '1' : '0',
-				control & 0x04 ? 'f' : '-',
-				control & 0x02 ? '1' : '0',
-				control & 0x01 ? '1' : '0',
-				machine().describe_context());
-#endif
-
+	// 04 = select bank
 	// According to the rom code, bits 1-0 may be part of the bank
 	// selection too, but they're always 0.
-	m_flashbank->set_bank(m_control & 4);
+	m_flashbank->set_bank(data & 4);
+
+	m_control = data;
 }
 
 WRITE16_MEMBER(taitogn_state::control2_w)
 {
-	COMBINE_DATA(&m_control2);
+	m_control2 = data;
 }
 
 READ8_MEMBER(taitogn_state::control3_r)
@@ -446,7 +431,7 @@ READ8_MEMBER(taitogn_state::control3_r)
 
 WRITE8_MEMBER(taitogn_state::control3_w)
 {
-	COMBINE_DATA(&m_control3);
+	m_control3 = data;
 }
 
 READ16_MEMBER(taitogn_state::gn_1fb70000_r)
@@ -494,11 +479,11 @@ READ8_MEMBER(taitogn_state::znsecsel_r)
 
 WRITE8_MEMBER(taitogn_state::znsecsel_w)
 {
-	COMBINE_DATA( &m_n_znsecsel );
+	m_znsec0->select( ( data >> 2 ) & 1 );
+	m_znsec1->select( ( data >> 3 ) & 1 );
+	m_zndip->select( ( data & 0x8c ) != 0x8c );
 
-	m_znsec0->select( ( m_n_znsecsel >> 2 ) & 1 );
-	m_znsec1->select( ( m_n_znsecsel >> 3 ) & 1 );
-	m_zndip->select( ( m_n_znsecsel & 0x8c ) != 0x8c );
+	m_n_znsecsel = data;
 }
 
 READ8_MEMBER(taitogn_state::boardconfig_r)
