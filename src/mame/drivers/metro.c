@@ -5193,6 +5193,14 @@ ROM_START( ladykill )
 	ROM_LOAD( "e8.1d", 0x000000, 0x040000, CRC(da88244d) SHA1(90c0cc275b69afffd9a0126985fd3fe16d44dced) )
 ROM_END
 
+/* an 'Electronic Devices' manufactured board has been seen with the following roms. The data is 100% identical to the above set
+   but due to lazy manufacturing larger ROMs were used and the first half filled with 0xff
+
+	ROM_LOAD16_BYTE( "ladyki_3.h9",   0x000000, 0x080000, CRC(c658f954) SHA1(d50043457e67a94feff1328fe9bf522aa3c124b6) ) // == e2.8g
+	ROM_LOAD16_BYTE( "ladyki_2.h10",  0x000001, 0x080000, CRC(bf58e4db) SHA1(9d7f74dc348b0ccb3bcf1b618d6092292b6945b8) ) // == e3.10g
+	ROM_LOAD( "ladyki_1.d1", 0x000000, 0x080000, CRC(3dca957c) SHA1(4b815b7cb124a38c639a4b425ed6e8b1f0946451) ) // == e8.1d
+*/
+
 ROM_START( moegonta )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "j2.8g",  0x000000, 0x040000, CRC(aa18d130) SHA1(6e0fd3b95d8589665b418bcae4fe64b288289c78) )
