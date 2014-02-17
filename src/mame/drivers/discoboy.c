@@ -15,7 +15,7 @@ PROGRAM NO-93-01-14-0024
 +------------------------------------------+
 | YM3014 YM3812 10MHz            5.u94     |
 |       6116                    6.u124     |
-|       1.u45                    7.u95     |
+|400kHz 1.u45                    7.u95     |
 | M5205 2.u28                   8.u125     |
 |J     Z8400B                          6116|
 |A          6116          6116 TPC1020AFN  |
@@ -34,7 +34,7 @@ Notes:
   Yamaha YM3014/YM3812 (rebadged as 83142/5A12)
   OKI M5205
   TI TPC1020AFN-084C
-  10.000MHz & 12.000MHz OSCs
+  10.000MHz & 12.000MHz OSCs, 400KHz resonator
 
 */
 
@@ -489,12 +489,12 @@ static const msm5205_interface yunsung8_msm5205_interface =
 static MACHINE_CONFIG_START( discoboy, discoboy_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)      /* 6 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(discoboy_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", discoboy_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,10000000/2)         /* 5 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_10MHz/2)	/* 5 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(discoboy_state, nmi_line_pulse, 32*60)
 
@@ -514,11 +514,11 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 2500000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_10MHz/4)	/* 2.5 MHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) // ???? unknown
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
 	MCFG_SOUND_CONFIG(yunsung8_msm5205_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
@@ -552,7 +552,7 @@ ROM_START( discoboy )
 ROM_END
 
 
-ROM_START( discoboyp )
+ROM_START( discoboyp ) // all ROMs had PROMAT stickers but copyright in the game shows no indication of it
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "discob.u2",  0x00000, 0x10000, CRC(7f07afd1) SHA1(f81d38a45764289a78e9727934ccbda25933624c) )
 	ROM_LOAD( "discob.u18", 0x10000, 0x20000, CRC(05f0daaf) SHA1(8691e0afff069a589a4601fe08f96f93c3773c7d) )
@@ -603,4 +603,4 @@ DRIVER_INIT_MEMBER(discoboy_state,discoboy)
 
 
 GAME( 1993, discoboy,  0,           discoboy, discoboy, discoboy_state, discoboy, ROT270, "Soft Art Co.", "Disco Boy",                   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1993, discoboyp, discoboy,    discoboy, discoboy, discoboy_state, discoboy, ROT270, "Soft Art Co.", "Disco Boy (Promat license?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // all ROMs were had promat stickers but copyright in the game shows no indication of it
+GAME( 1993, discoboyp, discoboy,    discoboy, discoboy, discoboy_state, discoboy, ROT270, "Soft Art Co.", "Disco Boy (Promat license?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
