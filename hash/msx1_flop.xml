@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="msx1_flop" description="MSX1 disk images">
+
+<!--
+   Things listed here should have a requirement of BASIC 1.0 + Disk Basic 1.0 (ie a Standard MSX1 type system with FDD)
+   I've noticed some 'MSX1' floppy images in TOSEC seem to require a higher BASIC version?
+   Some also require more RAM? the driver currently isn't very flexible.
+   
+   This for now is just a skeleton list for quick testing.
+   
+   To use the floppy drive the disk basic ROM must be mounted, example use case.
+   msx -cart1 diskbas -flop1 ohshit
+   
+-->
+
+	<software name="jsw2">
+		<description>Jet Set Willy II (trained)</description>
+		<year>1986</year>
+		<publisher>bootleg</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="jet set willy ii - the final frontier (1985)(software projects)(gb)[t].dsk" size="737280" crc="af505b0c" sha1="80c9d7d113acbda75f92d10bec1b8f3322e62176" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+  <software name="ohmummy">
+    <description>Oh Mummy!!</description>
+    <year>1984</year>
+    <publisher>Longman Software</publisher>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="737280">
+        <rom name="oh mummy!! (1984)(longman software)(gb).dsk" size="737280" crc="9cf775cc" sha1="cd7db0faf25ae33699b1708a19a874e3662e158a" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ohshit">
+    <description>Oh Shit!</description>
+    <year>1986</year>
+    <publisher>Aackosoft</publisher>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="737280">
+        <rom name="oh shit! (1986)(aackosoft)(nl).dsk" size="737280" crc="735ebc21" sha1="7de3f69a8a5136e0dd25214d36b1194a6506b377" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ohno" cloneof="ohshit">
+    <description>Oh No!</description>
+    <year>1986</year>
+    <publisher>Eaglesoft</publisher>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="737280">
+        <rom name="oh no! (1986)(eaglesoft)(nl)[aka oh shit!].dsk" size="737280" crc="aee65f34" sha1="5c2cd6dd8192a8c29fc0e272181272cb26cc2af6" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+
+</softwarelist>

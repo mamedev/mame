@@ -120,6 +120,7 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 				{ "KONAMI-SCC",         SLOT_KONAMI_SCC },
 				{ "SUPERLODE",          SLOT_SUPERLODERUNNER },
 				{ "MAJUTSUSHI",         SLOT_MAJUTSUSHI },
+				{ "DISK_ROM",           SLOT_DISK_ROM },
 			};
 
 			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && type < 0; i++)

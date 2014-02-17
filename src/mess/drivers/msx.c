@@ -1062,7 +1062,7 @@ static const floppy_interface msx_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(msx),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
@@ -1126,6 +1126,8 @@ static MACHINE_CONFIG_START( msx, msx_state )
 	MCFG_FD1793_ADD("wd179x", msx_wd17xx_interface ) // TODO confirm type
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(msx_floppy_interface)
+
+	MCFG_SOFTWARE_LIST_ADD("flop_list","msx1_flop")
 
 	MCFG_FRAGMENT_ADD(msx_cartslot)
 
