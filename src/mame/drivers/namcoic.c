@@ -1317,20 +1317,9 @@ const gfx_layout namco_c45_road_device::s_tile_layout =
 namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAMCO_C45_ROAD, "Namco C45 Road", tag, owner, clock, "namco_c45_road", __FILE__),
 		m_transparent_color(~0),
-		m_gfx(NULL),
 		m_tilemap(NULL),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this, "gfxdecode")
 {
-}
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void namco_c45_road_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<namco_c45_road_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -1359,7 +1348,7 @@ WRITE16_MEMBER( namco_c45_road_device::write )
 	else
 	{
 		offset -= 0x10000/2;
-		m_gfx->mark_dirty(offset / WORDS_PER_ROAD_TILE);
+		m_gfxdecode->gfx(0)->mark_dirty(offset / WORDS_PER_ROAD_TILE);
 	}
 }
 
@@ -1460,13 +1449,25 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 void namco_c45_road_device::device_start()
 {
 	// create a gfx_element describing the road graphics
-	m_gfx = auto_alloc(machine(), gfx_element(machine(), s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], 0x3f, 0xf00));
+	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], 0x3f, 0xf00)));
 
 	// create a tilemap for the road
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),
 		TILEMAP_SCAN_ROWS, ROAD_TILE_SIZE, ROAD_TILE_SIZE, ROAD_COLS, ROAD_ROWS);
 }
 
+MACHINE_CONFIG_FRAGMENT( namco_c45_road )
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+MACHINE_CONFIG_END
+//-------------------------------------------------
+//  device_mconfig_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor namco_c45_road_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( namco_c45_road );
+}
 
 //-------------------------------------------------
 //  device_stop -- device shutdown
@@ -1474,7 +1475,7 @@ void namco_c45_road_device::device_start()
 
 void namco_c45_road_device::device_stop()
 {
-	auto_free(machine(), m_gfx);
+
 }
 
 
@@ -1486,8 +1487,8 @@ TILE_GET_INFO_MEMBER( namco_c45_road_device::get_road_info )
 {
 	// ------xx xxxxxxxx tile number
 	// xxxxxx-- -------- palette select
-	//UINT16 data = m_ram[tile_index];
-	//int tile = data & 0x3ff;
-	//int color = data >> 10;
-	//SET_TILE_INFO_MEMBER(*m_gfxdecode, *m_gfx, tile, color, 0);
+	UINT16 data = m_ram[tile_index];
+	int tile = data & 0x3ff;
+	int color = data >> 10;
+	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
 }

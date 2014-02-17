@@ -387,7 +387,6 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 	MCFG_DEFAULT_LAYOUT(layout_horizont)
 
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
-	MCFG_NAMCO_C45_ROAD_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("2dscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.606060)
