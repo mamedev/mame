@@ -227,7 +227,8 @@ public:
 		m_acia_1(*this, "acia6850_1"),
 		m_ptm(*this, "6840ptm_68k"),
 		m_trackx_port(*this, "TRACKX"),
-		m_tracky_port(*this, "TRACKY")
+		m_tracky_port(*this, "TRACKY"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -240,6 +241,7 @@ public:
 	required_device<ptm6840_device> m_ptm;
 	optional_ioport m_trackx_port;
 	optional_ioport m_tracky_port;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	struct ef9369_t m_pal;
 	struct bt471_t m_bt471;

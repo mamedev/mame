@@ -19,7 +19,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_scroll_ram(*this, "scroll_ram"),
 		m_back_data(*this, "back_data"),
-		m_fore_data(*this, "fore_data")
+		m_fore_data(*this, "fore_data"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -30,6 +31,7 @@ public:
 	optional_shared_ptr<UINT16> m_scroll_ram;
 	required_shared_ptr<UINT16> m_back_data;
 	required_shared_ptr<UINT16> m_fore_data;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	tilemap_t *m_bg_layer;
 	tilemap_t *m_fg_layer;

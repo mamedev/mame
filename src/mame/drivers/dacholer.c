@@ -47,7 +47,8 @@ public:
 		m_bgvideoram(*this, "bgvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_spriteram(*this, "spriteram"),
-		m_msm(*this, "msm"){ }
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -58,6 +59,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 
 	optional_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

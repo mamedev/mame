@@ -27,7 +27,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
-		m_videoram(*this, "videoram")
+		m_videoram(*this, "videoram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	/* device */
@@ -35,6 +36,8 @@ public:
 	required_device<dac_device> m_dac;
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
+	
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* video-related */
 	UINT8 m_marker_x;

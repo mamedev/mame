@@ -22,7 +22,8 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_subcpu(*this, "sub"),
 		m_adpcm1(*this, "adpcm1"),
-		m_adpcm2(*this, "adpcm2") { }
+		m_adpcm2(*this, "adpcm2"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_rambase;
@@ -69,6 +70,7 @@ public:
 	optional_device<cpu_device> m_subcpu;
 	optional_device<msm5205_device> m_adpcm1;
 	optional_device<msm5205_device> m_adpcm2;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 
 	int scanline_to_vcount(int scanline);

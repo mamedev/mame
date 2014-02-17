@@ -8,7 +8,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_videoram;
 	tilemap_t *m_bg_tilemap;
@@ -27,4 +28,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

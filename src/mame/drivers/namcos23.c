@@ -1356,7 +1356,8 @@ public:
 		m_textram(*this, "textram"),
 		m_czattr(*this, "czattr"),
 		m_gmen_sh2(*this, "gmen_sh2"),
-		m_gmen_sh2_shared(*this, "gmen_sh2_shared")
+		m_gmen_sh2_shared(*this, "gmen_sh2_shared"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -1371,6 +1372,7 @@ public:
 	optional_shared_ptr<UINT32> m_czattr;
 	optional_device<cpu_device> m_gmen_sh2;
 	optional_shared_ptr<UINT32> m_gmen_sh2_shared;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	c404_t m_c404;
 	c361_t m_c361;

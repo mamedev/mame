@@ -10,7 +10,8 @@ public:
 		m_charvideoram(*this, "charvideoram"),
 		m_spr_old(*this, "vsystem_spr_old"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_pending_command;
 
@@ -46,4 +47,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

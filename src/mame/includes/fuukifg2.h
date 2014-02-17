@@ -19,7 +19,8 @@ public:
 		m_priority(*this, "priority"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki"){ }
+		m_oki(*this, "oki"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr_array<UINT16,4> m_vram;
@@ -37,7 +38,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_audiocpu;	
 	DECLARE_WRITE16_MEMBER(fuuki16_vregs_w);
 	DECLARE_WRITE16_MEMBER(fuuki16_sound_command_w);
 	DECLARE_WRITE8_MEMBER(fuuki16_sound_rombank_w);
@@ -60,6 +61,7 @@ public:
 	void fuuki16_draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 	DECLARE_WRITE_LINE_MEMBER(soundirq);
 	required_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

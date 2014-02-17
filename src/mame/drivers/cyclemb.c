@@ -88,7 +88,8 @@ public:
 		m_cram(*this, "cram"),
 		m_obj1_ram(*this, "obj1_ram"),
 		m_obj2_ram(*this, "obj2_ram"),
-		m_obj3_ram(*this, "obj3_ram")
+		m_obj3_ram(*this, "obj3_ram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -98,6 +99,7 @@ public:
 	required_shared_ptr<UINT8> m_obj1_ram;
 	required_shared_ptr<UINT8> m_obj2_ram;
 	required_shared_ptr<UINT8> m_obj3_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	struct
 	{

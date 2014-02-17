@@ -11,7 +11,8 @@ public:
 		m_ram16(*this, "ram16"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_videoram;
@@ -38,4 +39,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

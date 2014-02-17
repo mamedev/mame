@@ -22,7 +22,8 @@ public:
 			m_slave(*this, "slave"),
 			m_audiocpu(*this, "audiocpu"),
 			m_scudsp(*this, "scudsp"),
-			m_eeprom(*this, "eeprom")
+			m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -148,6 +149,7 @@ public:
 	required_device<m68000_base_device> m_audiocpu;
 	required_device<scudsp_cpu_device> m_scudsp;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_VIDEO_START(stv_vdp2);

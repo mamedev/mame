@@ -25,7 +25,8 @@ public:
 		m_spriteram(*this,"spriteram") ,
 		m_maincpu(*this, "maincpu"),
 		m_tc0100scn(*this, "tc0100scn"),
-		m_tc0480scp(*this, "tc0480scp") { }
+		m_tc0480scp(*this, "tc0480scp"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT32> m_ram;
 	required_shared_ptr<UINT32> m_spriteram;
@@ -33,6 +34,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0100scn_device> m_tc0100scn;
 	required_device<tc0480scp_device> m_tc0480scp;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT16 m_coin_word;
 	UINT16 m_frame_counter;

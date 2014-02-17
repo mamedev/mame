@@ -16,7 +16,8 @@ public:
 		m_scrollram(*this, "scrollram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_data;
@@ -61,4 +62,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(goal92_adpcm_int);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

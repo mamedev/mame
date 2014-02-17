@@ -53,7 +53,8 @@ public:
 		m_digit5(*this, "tm_unity"),
 		m_s2636(*this, "s2636"),
 		m_waveenable(false),
-		m_collision(0)
+		m_collision(0),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -94,6 +95,7 @@ public:
 	UINT32 screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	bool m_waveenable;
 	UINT8 m_collision;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

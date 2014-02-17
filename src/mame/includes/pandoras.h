@@ -15,7 +15,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu"){ }
+		m_mcu(*this, "mcu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -37,6 +38,8 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_mcu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(pandoras_int_control_w);
 	DECLARE_WRITE8_MEMBER(pandoras_cpua_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(pandoras_cpub_irqtrigger_w);

@@ -19,7 +19,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_discrete(*this, "discrete") { }
+		m_discrete(*this, "discrete"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -47,6 +48,7 @@ public:
 	UINT8 read_port_and_t0_and_hblank( int port );
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

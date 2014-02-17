@@ -23,12 +23,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	emu_timer *m_refresh_timer;
 	DECLARE_WRITE8_MEMBER(acefruit_colorram_w);
 	DECLARE_WRITE8_MEMBER(acefruit_coin_w);

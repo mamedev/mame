@@ -20,7 +20,8 @@ public:
 		m_rocknms_sub_vram_bg(*this, "sub_vram_bg"),
 		m_rocknms_sub_scroll_fg(*this, "sub_scroll_fg"),
 		m_rocknms_sub_scroll_bg(*this, "sub_scroll_bg"),
-		m_rocknms_sub_rotregs(*this, "sub_rotregs")
+		m_rocknms_sub_rotregs(*this, "sub_rotregs"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -45,6 +46,7 @@ public:
 	optional_shared_ptr<UINT16> m_rocknms_sub_scroll_fg;
 	optional_shared_ptr<UINT16> m_rocknms_sub_scroll_bg;
 	optional_shared_ptr<UINT16> m_rocknms_sub_rotregs;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT16 m_rocknms_sub_systemregs[0x10];
 	UINT16 m_rockn_protectdata;

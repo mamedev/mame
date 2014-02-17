@@ -46,7 +46,8 @@ public:
 		m_sprite_palette(*this, "sprite_palette"),
 		m_tile_palette(*this, "tile_palette"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<phillips_22vp931_device> m_laserdisc;
 	required_shared_ptr<unsigned char> m_tileram;
@@ -106,6 +107,7 @@ public:
 	void firq_gen(phillips_22vp931_device &laserdisc, int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

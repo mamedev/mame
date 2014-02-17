@@ -9,7 +9,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_textram(*this, "textram"),
 		m_maincpu(*this, "maincpu"),
-		m_cus30(*this, "namco") { }
+		m_cus30(*this, "namco"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_inputport_selected;
 	int m_counter;
@@ -18,6 +19,7 @@ public:
 	required_shared_ptr<UINT8> m_textram;
 	required_device<cpu_device> m_maincpu;
 	required_device<namco_cus30_device> m_cus30;
+	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap[2];
 	int m_xscroll[2];

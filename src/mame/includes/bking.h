@@ -8,7 +8,8 @@ public:
 		m_playfield_ram(*this, "playfield_ram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
-		m_bmcu(*this, "bmcu") { }
+		m_bmcu(*this, "bmcu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_playfield_ram;
@@ -45,6 +46,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_mcu;
 	optional_device<buggychl_mcu_device> m_bmcu;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 #if 0
 	/* 68705 */

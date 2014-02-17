@@ -9,7 +9,8 @@ public:
 		m_scroll_x(*this, "scroll_x"),
 		m_scroll_y(*this, "scroll_y"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_spriteram;
@@ -39,4 +40,5 @@ public:
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

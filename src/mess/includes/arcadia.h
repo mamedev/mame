@@ -39,7 +39,8 @@ public:
 		m_controller2_col3(*this, "controller2_col3"),
 		m_controller2_extra(*this, "controller2_extra"),
 		m_joysticks(*this, "joysticks") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	DECLARE_READ8_MEMBER(arcadia_vsync_r);
 	DECLARE_READ8_MEMBER(arcadia_video_r);
@@ -113,5 +114,6 @@ protected:
 	int arcadia_sprite_collision(int n1, int n2);
 	void arcadia_draw_sprites();
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 #endif /* ARCADIA_H_ */

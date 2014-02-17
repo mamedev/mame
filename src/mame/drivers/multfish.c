@@ -186,7 +186,8 @@ public:
 	multfish_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_m48t35(*this, "m48t35" )
+		m_m48t35(*this, "m48t35" ),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -254,6 +255,7 @@ public:
 	UINT32 screen_update_multfish(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<timekeeper_device> m_m48t35;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 TILE_GET_INFO_MEMBER(multfish_state::get_multfish_tile_info)

@@ -15,7 +15,8 @@ public:
 		m_sprite_bank(*this, "sprite_bank"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_discrete(*this, "discrete") { }
+		m_discrete(*this, "discrete"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_dsc0;
 	int m_dsc1;
@@ -64,4 +65,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

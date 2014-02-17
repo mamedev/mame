@@ -39,7 +39,8 @@ public:
 		m_hd6402(*this, "hd6402"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
-		m_videoram(*this, "videoram")
+		m_videoram(*this, "videoram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -71,6 +72,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
 	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

@@ -9,7 +9,8 @@ public:
 		m_bgvideoram(*this, "bgvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<tms5200_device> m_tms;
 	required_shared_ptr<UINT8> m_bgvideoram;
@@ -31,4 +32,5 @@ public:
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, const UINT8 *source );
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

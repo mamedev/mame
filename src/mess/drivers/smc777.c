@@ -55,7 +55,8 @@ public:
 	m_crtc(*this, "crtc"),
 	m_fdc(*this, "fdc"),
 	m_sn(*this, "sn1"),
-	m_beeper(*this, "beeper")
+	m_beeper(*this, "beeper"),
+	m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -125,6 +126,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(smc777_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(smc777_fdc_drq_w);
 	void check_floppy_inserted();
+	optional_device<gfxdecode_device> m_gfxdecode;
 };
 
 

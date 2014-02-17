@@ -30,7 +30,8 @@ public:
 		m_alpha_num_ram(*this, "alpha_nuram"),
 		m_major_obj_ram(*this, "major_obj_ram"),
 		m_minor_obj_ram(*this, "minor_obj_ram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_alpha_num_ram;
@@ -50,6 +51,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(destroyr_misc_w);
 	DECLARE_WRITE8_MEMBER(destroyr_cursor_load_w);
 	DECLARE_WRITE8_MEMBER(destroyr_interrupt_ack_w);

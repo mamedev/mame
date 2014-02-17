@@ -15,7 +15,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_subcpu2(*this, "sub2"),
-		m_namco_sound(*this, "namco") { }
+		m_namco_sound(*this, "namco"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_videoram;
@@ -27,6 +28,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_subcpu2;
 	required_device<namco_device> m_namco_sound;
+	required_device<gfxdecode_device> m_gfxdecode;
 	emu_timer *m_cpu3_interrupt_timer;
 	UINT8 m_custom_mod;
 

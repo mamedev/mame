@@ -28,7 +28,8 @@ public:
 		m_main_ram(*this, "main_ram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_main_ram;
@@ -50,6 +51,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_READ8_MEMBER(exerion_protection_r);
 	DECLARE_WRITE8_MEMBER(exerion_videoreg_w);
 	DECLARE_WRITE8_MEMBER(exerion_video_latch_w);

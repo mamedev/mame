@@ -15,7 +15,8 @@ public:
 		m_vram_0ras(*this, "vram_0ras"),
 		m_vram_1ras(*this, "vram_1ras"),
 		m_maincpu(*this, "maincpu"),
-		m_tmp68301(*this, "tmp68301") { }
+		m_tmp68301(*this, "tmp68301"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_vram_0;
@@ -55,4 +56,5 @@ public:
 	void dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer);
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

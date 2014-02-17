@@ -38,7 +38,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
 		m_scrollram(*this, "scrollram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
@@ -57,6 +58,7 @@ public:
 	UINT32 screen_update_skyarmy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(skyarmy_nmi_source);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 WRITE8_MEMBER(skyarmy_state::skyarmy_flip_screen_x_w)

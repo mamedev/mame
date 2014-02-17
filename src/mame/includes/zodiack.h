@@ -12,7 +12,8 @@ public:
 			m_videoram_2(*this, "videoram_2"),
 			m_attributeram(*this, "attributeram"),
 			m_spriteram(*this, "spriteram"),
-			m_bulletsram(*this, "bulletsram")
+			m_bulletsram(*this, "bulletsram"),
+			m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	// in drivers/zodiack.c
@@ -40,6 +41,8 @@ public:
 	required_shared_ptr<UINT8> m_attributeram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_bulletsram;
+	
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	// state
 	tilemap_t *m_bg_tilemap;

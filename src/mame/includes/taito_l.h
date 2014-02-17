@@ -10,7 +10,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_msm(*this, "msm")
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -62,6 +63,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* memory buffers */
 	UINT8         m_rambanks[0x1000 * 12];

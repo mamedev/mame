@@ -12,7 +12,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_mb14241(*this, "mb14241")
+		m_mb14241(*this, "mb14241"),
+		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
 	/* memory pointers */
@@ -34,6 +35,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<mb14241_device> m_mb14241;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_READ8_MEMBER(fgoal_analog_r);
 	DECLARE_READ8_MEMBER(fgoal_nmi_reset_r);
 	DECLARE_READ8_MEMBER(fgoal_irq_reset_r);

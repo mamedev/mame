@@ -21,7 +21,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_msm(*this, "5205"),
-		m_upd7759(*this, "7759") { }
+		m_upd7759(*this, "7759"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_textram;
 	optional_shared_ptr<UINT16> m_bg0_tileram;
@@ -117,6 +118,8 @@ public:
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<msm5205_device> m_msm;
 	optional_device<upd7759_device> m_upd7759;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(sys16_coinctrl_w);

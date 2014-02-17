@@ -5,7 +5,8 @@ public:
 	starcrus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
-		m_samples(*this, "samples") { }
+		m_samples(*this, "samples"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	bitmap_ind16 *m_ship1_vid;
 	bitmap_ind16 *m_ship2_vid;
@@ -60,4 +61,5 @@ public:
 	int collision_check_s2p1p2();
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

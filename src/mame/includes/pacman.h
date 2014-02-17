@@ -19,7 +19,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_s2650games_tileram(*this, "s2650_tileram"),
-		m_rocktrv2_prot_data(*this, "rocktrv2_prot")
+		m_rocktrv2_prot_data(*this, "rocktrv2_prot"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -31,6 +32,7 @@ public:
 	optional_shared_ptr<UINT8> m_colorram;
 	optional_shared_ptr<UINT8> m_s2650games_tileram;
 	optional_shared_ptr<UINT8> m_rocktrv2_prot_data;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 m_cannonb_bit_to_read;
 	int m_mystery;

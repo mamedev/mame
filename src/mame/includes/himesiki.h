@@ -12,7 +12,8 @@ public:
 		m_bg_ram(*this, "bg_ram"),
 		m_spriteram(*this, "spriteram"),
 		m_subcpu(*this, "sub"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bg_ram;
@@ -38,4 +39,5 @@ public:
 	UINT32 screen_update_himesiki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

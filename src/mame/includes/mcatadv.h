@@ -11,7 +11,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_vidregs(*this, "vidregs"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"){ }
+		m_soundcpu(*this, "soundcpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram1;
@@ -33,6 +34,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE16_MEMBER(mcat_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(mcat_coin_w);
 	DECLARE_READ16_MEMBER(mcat_wd_r);

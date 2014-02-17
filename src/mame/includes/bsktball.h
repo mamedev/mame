@@ -21,7 +21,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_motion(*this, "motion"),
 		m_discrete(*this, "discrete"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -65,6 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bsktball_noise_reset_w);
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /*----------- defined in audio/bsktball.c -----------*/

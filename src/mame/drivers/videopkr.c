@@ -303,7 +303,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_dac(*this, "dac") { }
+		m_dac(*this, "dac"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 m_data_ram[0x100];
 	UINT8 m_video_ram[0x0400];
@@ -371,6 +372,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<dac_device> m_dac;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

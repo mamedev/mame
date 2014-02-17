@@ -58,7 +58,8 @@ class mole_state : public driver_device
 public:
 	mole_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -77,6 +78,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

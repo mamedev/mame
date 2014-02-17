@@ -112,7 +112,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_bitmap(*this, "bitmap"),
 		m_bulletram(*this, "bulletram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -145,6 +146,7 @@ public:
 	INTERRUPT_GEN_MEMBER(jollyjgr_interrupt);
 	void draw_bitmap( bitmap_ind16 &bitmap );
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

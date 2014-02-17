@@ -14,7 +14,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_samples(*this, "samples") { }
+		m_samples(*this, "samples"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_spriteram;
@@ -89,6 +90,7 @@ public:
 	void zaxxonj_decode(const char *cputag);
 	required_device<cpu_device> m_maincpu;
 	optional_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

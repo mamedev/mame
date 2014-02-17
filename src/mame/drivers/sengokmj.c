@@ -71,7 +71,8 @@ public:
 		m_sc2_vram(*this, "sc2_vram"),
 		m_sc3_vram(*this, "sc3_vram"),
 		m_spriteram16(*this, "sprite_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_sc0_vram;
 	required_shared_ptr<UINT16> m_sc1_vram;
@@ -79,6 +80,7 @@ public:
 	required_shared_ptr<UINT16> m_sc3_vram;
 	required_shared_ptr<UINT16> m_spriteram16;
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;

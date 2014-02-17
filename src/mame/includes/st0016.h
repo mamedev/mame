@@ -5,7 +5,8 @@ public:
 	st0016_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int mux_port;
 	UINT32 m_st0016_rom_bank;
@@ -44,6 +45,7 @@ public:
 	void st0016_save_init();
 	void draw_bgmap(bitmap_ind16 &bitmap,const rectangle &cliprect, int priority);
 	optional_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 #define ISMACS  (st0016_game&0x80)

@@ -77,7 +77,8 @@ public:
 			m_laserdisc(*this, "laserdisc") ,
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_control_ram(*this, "tile_ctrl_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<UINT8> m_tile_ram;
@@ -91,6 +92,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
 	TIMER_CALLBACK_MEMBER(irq_stop);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

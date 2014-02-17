@@ -84,7 +84,8 @@ public:
 		m_vram(*this, "vram"),
 		m_attr(*this, "attr"),
 		m_spriteram(*this, "spriteram"),
-		m_soundcpu(*this, "soundcpu"){ }
+		m_soundcpu(*this, "soundcpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 m_sound_cmd;
 	required_shared_ptr<UINT8> m_vram;
@@ -116,6 +117,7 @@ public:
 	UINT32 screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_soundcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

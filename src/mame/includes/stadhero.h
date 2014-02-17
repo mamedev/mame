@@ -11,7 +11,8 @@ public:
 		m_tilegen1(*this, "tilegen1"),
 		m_spritegen(*this, "spritegen"),
 		m_spriteram(*this, "spriteram"),
-		m_pf1_data(*this, "pf1_data") { }
+		m_pf1_data(*this, "pf1_data"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -19,6 +20,8 @@ public:
 	required_device<deco_mxc06_device> m_spritegen;
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_pf1_data;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	tilemap_t *m_pf1_tilemap;
 	int m_flipscreen;
 	DECLARE_READ16_MEMBER(stadhero_control_r);

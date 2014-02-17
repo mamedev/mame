@@ -11,11 +11,13 @@ public:
 			text_data(*this, "text_data"),
 			sprites(*this, "sprites") ,
 		m_maincpu(*this, "maincpu"),
-		m_seibu_sound(*this, "seibu_sound") { }
+		m_seibu_sound(*this, "seibu_sound"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> back_data,fore_data,mid_data, text_data, sprites;
 	required_device<cpu_device> m_maincpu;
 	required_device<seibu_sound_device> m_seibu_sound;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_WRITE16_MEMBER( cop_itoa_low_w );
 	DECLARE_WRITE16_MEMBER( cop_itoa_high_w );

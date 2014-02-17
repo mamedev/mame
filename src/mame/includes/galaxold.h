@@ -37,7 +37,8 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_7474_9m_1(*this, "7474_9m_1"),
-			m_7474_9m_2(*this, "7474_9m_2")
+			m_7474_9m_2(*this, "7474_9m_2"),
+			m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -248,6 +249,7 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<ttl7474_device> m_7474_9m_1;
 	optional_device<ttl7474_device> m_7474_9m_2;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w

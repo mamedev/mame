@@ -103,7 +103,8 @@ public:
 		m_vg2(0),
 		m_vg3(0),
 		m_cv3(0),
-		m_cv4(0)
+		m_cv4(0),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	/* devices */
@@ -179,6 +180,8 @@ public:
 	double m_vc17;
 	int m_pixelcnt;
 
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	/* radarscp_scanline */
 	int m_counter;
 

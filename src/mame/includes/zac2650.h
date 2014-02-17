@@ -8,14 +8,16 @@ public:
 		m_videoram(*this, "videoram"),
 		m_s2636_0_ram(*this, "s2636_0_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_s2636_sound(*this, "s2636snd") { }
+		m_s2636_sound(*this, "s2636snd"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_s2636_0_ram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s2636_device> m_s2636_sound;
-
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_spritebitmap;
 	int m_CollisionBackground;

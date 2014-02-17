@@ -7,7 +7,8 @@ public:
 		m_md_videoram(*this, "md_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_md_videoram;
@@ -39,4 +40,5 @@ public:
 	UINT32 screen_update_pmroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int codeshift);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

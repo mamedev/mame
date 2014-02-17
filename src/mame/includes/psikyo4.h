@@ -20,7 +20,8 @@ public:
 		m_io_select(*this, "io_select"),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
-		m_eeprom(*this, "eeprom"){ }
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_spriteram;
@@ -38,6 +39,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_WRITE32_MEMBER(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);
 	DECLARE_WRITE32_MEMBER(ps4_bgpen_1_dword_w);

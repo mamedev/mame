@@ -132,7 +132,8 @@ public:
 		m_bg2_videoram(*this, "bg2_videoram"),
 		m_vregs(*this, "vregs"),
 		m_workram(*this, "workram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_spriteram;
@@ -168,6 +169,7 @@ public:
 	void screen_eof_dreamwld(screen_device &screen, bool state);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

@@ -971,7 +971,8 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
-		m_soundcomm(*this, "soundcomm")
+		m_soundcomm(*this, "soundcomm"),
+		m_gfxdecode(*this, "gfxdecode")
 {
 }
 

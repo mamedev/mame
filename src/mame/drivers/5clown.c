@@ -460,7 +460,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_ay8910(*this, "ay8910")
+		m_ay8910(*this, "ay8910"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -494,6 +495,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<ay8910_device> m_ay8910;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

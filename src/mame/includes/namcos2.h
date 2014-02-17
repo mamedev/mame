@@ -107,7 +107,8 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_slave(*this, "slave"),
-			m_mcu(*this, "mcu") { }
+			m_mcu(*this, "mcu"),
+			m_gfxdecode(*this, "gfxdecode") { }
 
 	optional_device<cpu_device> m_dspmaster;
 	optional_device<cpu_device> m_dspslave;
@@ -221,6 +222,7 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_slave;
 	optional_device<cpu_device> m_mcu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 class namcos2_state : public namcos2_shared_state

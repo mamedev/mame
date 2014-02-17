@@ -33,7 +33,8 @@ public:
 		m_code_ram(*this, "code_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
-		m_samples(*this, "samples") { }
+		m_samples(*this, "samples"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 m_cmos[16];
 	UINT8 m_da_latch;
@@ -65,7 +66,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<samples_device> m_samples;
-
+	required_device<gfxdecode_device> m_gfxdecode;
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

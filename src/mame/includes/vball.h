@@ -8,7 +8,8 @@ public:
 		m_vb_scrolly_lo(*this, "vb_scrolly_lo"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_vb_attribram;
 	required_shared_ptr<UINT8> m_vb_videoram;
@@ -42,4 +43,5 @@ public:
 	inline int scanline_to_vcount(int scanline);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

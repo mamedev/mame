@@ -16,7 +16,8 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu"){ }
+		m_mcu(*this, "mcu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -54,6 +55,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_mcu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(matmania_sh_command_w);
 	DECLARE_WRITE8_MEMBER(maniach_sh_command_w);
 	DECLARE_WRITE8_MEMBER(matmania_paletteram_w);

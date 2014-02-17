@@ -17,7 +17,8 @@ class apexc_state : public driver_device
 public:
 	apexc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT32 m_panel_data_reg;    /* value of a data register on the control panel which can
                                 be edited - the existence of this register is a personnal
@@ -45,6 +46,7 @@ public:
 	void apexc_teletyper_linefeed();
 	void apexc_teletyper_putchar(int character);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 void apexc_state::machine_start()

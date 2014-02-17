@@ -27,7 +27,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_dma8237(*this, "8237dma"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 *m_char_rom;
 	required_shared_ptr<UINT16> m_vram;
@@ -50,6 +51,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])

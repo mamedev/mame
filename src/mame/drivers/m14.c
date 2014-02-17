@@ -63,7 +63,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_color_ram(*this, "color_ram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* video-related */
 	tilemap_t  *m_m14_tilemap;
@@ -75,6 +76,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(m14_vram_w);
 	DECLARE_WRITE8_MEMBER(m14_cram_w);
 	DECLARE_READ8_MEMBER(m14_rng_r);

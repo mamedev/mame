@@ -33,7 +33,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_tile_ram(*this, "tile_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_tile_ram;
@@ -45,6 +46,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_READ8_MEMBER(boxer_input_r);
 	DECLARE_READ8_MEMBER(boxer_misc_r);
 	DECLARE_WRITE8_MEMBER(boxer_bell_w);

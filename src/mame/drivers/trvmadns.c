@@ -97,7 +97,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_gfxram(*this, "gfxram"),
 		m_tileram(*this, "tileram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	tilemap_t *m_bg_tilemap;
 	required_shared_ptr<UINT8> m_gfxram;
@@ -114,6 +115,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_trvmadns(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

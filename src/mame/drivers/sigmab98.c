@@ -104,12 +104,14 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_spriteram(*this, "spriteram"),
 		m_nvram(*this, "nvram"),
-		m_eeprom(*this, "eeprom"){ }
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_nvram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 m_reg;
 	UINT8 m_rombank;

@@ -45,7 +45,8 @@ public:
 		m_blink(*this, "blink"),
 		m_drone_x(*this, "drone_x"),
 		m_drone_y(*this, "drone_y"),
-		m_drone_rot(*this, "drone_rot")
+		m_drone_rot(*this, "drone_rot"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -59,6 +60,7 @@ public:
 	optional_shared_ptr<UINT8> m_drone_x;
 	optional_shared_ptr<UINT8> m_drone_y;
 	optional_shared_ptr<UINT8> m_drone_rot;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 m_in_service_mode;
 	UINT32 m_dial[2];

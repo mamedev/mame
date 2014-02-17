@@ -35,7 +35,8 @@ public:
 		m_ram(*this, "ram"),
 		m_sprgen(*this, "spritegen"),
 		m_sprgen1(*this, "spritegen1"),
-		m_sprgen2(*this, "spritegen2")
+		m_sprgen2(*this, "spritegen2"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	/* devices */
@@ -59,7 +60,8 @@ public:
 	optional_device<decospr_device> m_sprgen;
 	optional_device<decospr_device> m_sprgen1;
 	optional_device<decospr_device> m_sprgen2;
-
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	/* misc */
 	int        m_scanline;
 	int        m_irq_mask;

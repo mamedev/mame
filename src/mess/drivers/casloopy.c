@@ -159,9 +159,9 @@ public:
 	casloopy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bios_rom(*this, "bios_rom"),
-		m_vregs(*this, "vregs")
-		,
-		m_maincpu(*this, "maincpu") { }
+		m_vregs(*this, "vregs"),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT32> m_bios_rom;
 	required_shared_ptr<UINT32> m_vregs;
@@ -186,6 +186,7 @@ public:
 	DECLARE_READ8_MEMBER(casloopy_bitmap_r);
 	DECLARE_WRITE8_MEMBER(casloopy_bitmap_w);
 	required_device<cpu_device> m_maincpu;
+	optional_device<gfxdecode_device> m_gfxdecode;
 };
 
 

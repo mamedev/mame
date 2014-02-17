@@ -42,7 +42,8 @@ public:
 		m_sprite_x(*this, "sprite_x"),
 		m_sprite_code(*this, "sprite_code"),
 		m_collision_bg_car(0),
-		m_collision_fg_car(0)
+		m_collision_fg_car(0),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	/* devices / memory pointers */
@@ -55,6 +56,7 @@ public:
 
 	int m_collision_bg_car;
 	int m_collision_fg_car;
+	required_device<gfxdecode_device> m_gfxdecode;
 	bitmap_ind16 m_colmap_car;
 	tilemap_t* m_bg_tilemap;
 	tilemap_t* m_fg_tilemap;

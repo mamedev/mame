@@ -26,9 +26,9 @@ class ax20_state : public driver_device
 public:
 	ax20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-	,
-		m_p_vram(*this, "p_vram"){ }
+		m_maincpu(*this, "maincpu"),
+		m_p_vram(*this, "p_vram"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 
@@ -36,6 +36,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_shared_ptr<UINT8> m_p_vram;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

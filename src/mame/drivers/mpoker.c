@@ -182,7 +182,8 @@ public:
 	mpoker_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video(*this, "video"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 m_output[8];
 	required_shared_ptr<UINT8> m_video;
@@ -202,6 +203,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_mpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

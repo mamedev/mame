@@ -40,7 +40,8 @@ public:
 			m_tc0430grw(*this, "tc0430grw"),
 			m_tc0480scp(*this, "tc0480scp"),
 			m_tc0220ioc(*this, "tc0220ioc"),
-			m_tc0510nio(*this, "tc0510nio")
+			m_tc0510nio(*this, "tc0510nio"),
+			m_gfxdecode(*this, "gfxdecode")
 			{ }
 
 	/* memory pointers */
@@ -107,6 +108,8 @@ public:
 	optional_device<tc0480scp_device> m_tc0480scp;
 	optional_device<tc0220ioc_device> m_tc0220ioc;
 	optional_device<tc0510nio_device> m_tc0510nio;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE16_MEMBER(growl_coin_word_w);
 	DECLARE_WRITE16_MEMBER(taitof2_4p_coin_word_w);
 	DECLARE_WRITE16_MEMBER(ninjak_coin_word_w);

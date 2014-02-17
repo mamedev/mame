@@ -15,7 +15,8 @@ public:
 		m_pf1_scroll_data(*this, "pf1_scroll_data"),
 		m_pf2_scroll_data(*this, "pf2_scroll_data"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	optional_shared_ptr<UINT16> m_eprom_data;
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -65,4 +66,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

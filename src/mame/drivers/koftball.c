@@ -43,13 +43,15 @@ public:
 		m_main_ram(*this, "main_ram"),
 		m_bmc_1_videoram(*this, "bmc_1_videoram"),
 		m_bmc_2_videoram(*this, "bmc_2_videoram"),
-		m_colorram(*this, "colorram", 16) { }
+		m_colorram(*this, "colorram", 16),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_main_ram;
 	required_shared_ptr<UINT16> m_bmc_1_videoram;
 	required_shared_ptr<UINT16> m_bmc_2_videoram;
 	required_shared_ptr<UINT8> m_colorram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
 	int m_clr_offset;

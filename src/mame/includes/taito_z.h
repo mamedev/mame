@@ -36,7 +36,8 @@ public:
 		m_tc0110pcr(*this, "tc0110pcr"),
 		m_tc0220ioc(*this, "tc0220ioc"),
 		m_tc0510nio(*this, "tc0510nio"),
-		m_tc0140syt(*this, "tc0140syt") { }
+		m_tc0140syt(*this, "tc0140syt"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -64,6 +65,7 @@ public:
 	optional_device<tc0220ioc_device> m_tc0220ioc;
 	optional_device<tc0510nio_device> m_tc0510nio;
 	required_device<tc0140syt_device> m_tc0140syt;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(chasehq_cpua_ctrl_w);

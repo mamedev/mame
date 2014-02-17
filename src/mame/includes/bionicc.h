@@ -16,7 +16,8 @@ public:
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_paletteram(*this, "paletteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -55,4 +56,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bionicc_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

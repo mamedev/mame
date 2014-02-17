@@ -106,7 +106,8 @@ public:
 		m_blitterregs(*this, "blitterregs"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT32> m_viewregs0;
 	required_shared_ptr<UINT32> m_viewregs6;
@@ -153,6 +154,7 @@ public:
 	void rabbit_do_blit();
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

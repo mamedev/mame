@@ -13,7 +13,8 @@ public:
 		m_wram(*this, "wram"),
 		m_banked_paletteram(*this, "paletteram"),
 		m_audiocpu(*this, "audiocpu"),
-		m_samples(*this, "samples") { }
+		m_samples(*this, "samples"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_hardhead_ip;
@@ -22,6 +23,7 @@ public:
 	optional_shared_ptr<UINT8> m_banked_paletteram;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 m_rombank;
 	UINT8 m_rombank_latch;

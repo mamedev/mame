@@ -14,7 +14,8 @@ public:
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
 		m_gfxram(*this, "gfxram"),
-		m_tileram(*this, "tileram")
+		m_tileram(*this, "tileram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -22,6 +23,7 @@ public:
 	required_device<dac_device> m_dac2;
 	required_shared_ptr<UINT8> m_gfxram;
 	required_shared_ptr<UINT8> m_tileram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	tilemap_t *m_tilemap;
 	DECLARE_WRITE8_MEMBER(mogura_tileram_w);

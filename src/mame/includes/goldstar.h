@@ -14,7 +14,8 @@ public:
 		m_reel1_attrram(*this, "reel1_attrram"),
 		m_reel2_attrram(*this, "reel2_attrram"),
 		m_reel3_attrram(*this, "reel3_attrram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_dataoffset;
 
@@ -156,4 +157,5 @@ public:
 	UINT8 decrypt(UINT8 cipherText, UINT16 address);
 	UINT8 chry10_decrypt(UINT8 cipherText);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

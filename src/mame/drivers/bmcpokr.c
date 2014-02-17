@@ -49,7 +49,8 @@ public:
 	bmcpokr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_videoram(*this, "videoram")
+		m_videoram(*this, "videoram"),
+		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
 	DECLARE_READ16_MEMBER( bmcpokr_unk_r )
@@ -59,6 +60,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_videoram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	virtual void video_start();
 	UINT32 screen_update_bmcpokr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

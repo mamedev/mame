@@ -38,7 +38,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_palreg;
 	int m_gfx_bank;
@@ -65,6 +66,7 @@ public:
 	INTERRUPT_GEN_MEMBER(ettrivia_interrupt);
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, UINT8 *vidram, int gfx_code);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

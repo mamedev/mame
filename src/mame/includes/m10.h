@@ -44,7 +44,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_chargen(*this, "chargen"),
 		m_maincpu(*this, "maincpu"),
-		m_samples(*this, "samples"){ }
+		m_samples(*this, "samples"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_memory;
@@ -72,6 +73,8 @@ public:
 	device_t *m_ic8j1;
 	device_t *m_ic8j2;
 	required_device<samples_device> m_samples;
+	optional_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(m10_ctrl_w);
 	DECLARE_WRITE8_MEMBER(m11_ctrl_w);
 	DECLARE_WRITE8_MEMBER(m15_ctrl_w);

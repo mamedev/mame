@@ -118,7 +118,8 @@ public:
 		m_sc1_vram(*this, "sc1_vram"),
 		m_sc2_vram(*this, "sc2_vram"),
 		m_sc3_vram(*this, "sc3_vram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_sc0_vram;
 	required_shared_ptr<UINT16> m_sc1_vram;
@@ -143,6 +144,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_mil4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

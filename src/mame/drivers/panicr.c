@@ -74,7 +74,8 @@ public:
 		m_textram(*this, "textram"),
 		m_spritebank(*this, "spritebank"),
 		m_maincpu(*this, "maincpu"),
-		m_t5182(*this, "t5182") { }
+		m_t5182(*this, "t5182"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -83,6 +84,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<t5182_device> m_t5182;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	tilemap_t *m_bgtilemap;
 	tilemap_t *m_infotilemap_2;

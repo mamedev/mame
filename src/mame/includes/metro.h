@@ -44,7 +44,8 @@ public:
 		m_screenctrl(*this, "screenctrl"),
 		m_input_sel(*this, "input_sel"),
 		m_k053936_ram(*this, "k053936_ram"),
-		m_eeprom(*this, "eeprom")
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	/* devices */
@@ -74,6 +75,7 @@ public:
 	optional_shared_ptr<UINT16> m_k053936_ram;
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 
 	int         m_flip_screen;

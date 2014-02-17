@@ -125,7 +125,8 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_scrolly(*this, "scrolly"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_attr;
 	required_shared_ptr<UINT8> m_vid;
@@ -141,6 +142,7 @@ public:
 	INTERRUPT_GEN_MEMBER(subm_sound_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 void sub_state::video_start()

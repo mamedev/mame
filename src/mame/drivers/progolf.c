@@ -66,7 +66,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_fbram(*this, "fbram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")  { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode")  { }
 
 	UINT8 *m_videoram;
 	UINT8 m_char_pen;
@@ -92,6 +93,7 @@ public:
 	UINT32 screen_update_progolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

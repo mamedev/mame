@@ -23,7 +23,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_hvc(*this, "hvc"),
 		m_maincpu(*this, "maincpu"),
-		m_discrete(*this, "discrete"){ }
+		m_discrete(*this, "discrete"),
+		m_gfxdecode(*this, "gfxdecode"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -46,6 +47,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_READ8_MEMBER(nitedrvr_steering_reset_r);
 	DECLARE_WRITE8_MEMBER(nitedrvr_steering_reset_w);
 	DECLARE_READ8_MEMBER(nitedrvr_in0_r);

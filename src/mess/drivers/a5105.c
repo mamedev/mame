@@ -49,7 +49,8 @@ public:
 			m_floppy2(*this, "upd765a:2"),
 			m_floppy3(*this, "upd765a:3"),
 			m_video_ram(*this, "video_ram"),
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_gfxdecode(*this, "gfxdecode")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -84,6 +85,7 @@ public:
 	virtual void palette_init();
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<ram_device> m_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /* TODO */

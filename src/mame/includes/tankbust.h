@@ -8,7 +8,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_latch;
 	UINT32 m_timer1;
@@ -51,4 +52,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

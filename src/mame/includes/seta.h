@@ -46,7 +46,8 @@ public:
 		m_paletteram2(*this,"paletteram2"),
 		m_kiwame_nvram(*this,"kiwame_nvram"),
 		m_inttoote_key_select(*this,"inttoote_keysel"),
-		m_inttoote_700000(*this,"inttoote_700000") { }
+		m_inttoote_700000(*this,"inttoote_700000"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -66,6 +67,8 @@ public:
 	optional_shared_ptr<UINT16> m_kiwame_nvram;
 	optional_shared_ptr<UINT16> m_inttoote_key_select;
 	optional_shared_ptr<UINT16> m_inttoote_700000;
+	
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	int m_tiles_offset;
 	tilemap_t *m_tilemap_0;

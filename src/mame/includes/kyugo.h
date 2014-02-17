@@ -16,7 +16,8 @@ public:
 		m_spriteram_2(*this, "spriteram_2"),
 		m_shared_ram(*this, "shared_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"){ }
+		m_subcpu(*this, "sub"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_fgvideoram;
@@ -39,6 +40,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8       m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(kyugo_nmi_mask_w);

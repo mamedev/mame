@@ -190,7 +190,8 @@ public:
 		m_tilemap2scroll(*this, "tilemap2_scroll"),
 		m_roadram(*this, "roadram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	tilemap_t *m_tilemap0_tilemap;
 	tilemap_t *m_tilemap1_tilemap;
@@ -226,6 +227,7 @@ public:
 	UINT32 screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /* tile format

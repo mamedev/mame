@@ -236,7 +236,8 @@ public:
 		m_gfx1_cram(*this, "gfx1_cram"),
 		m_sprite_ram(*this, "sprite_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	tilemap_t *m_gfx0a_tilemap;
 	tilemap_t *m_gfx0b_tilemap;
@@ -275,6 +276,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

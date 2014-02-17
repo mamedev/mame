@@ -34,7 +34,8 @@ public:
 		m_samples(*this, "samples") ,
 		m_customio_3(*this,"customio_3"),
 		m_videoram(*this,"videoram"),
-		m_spriteram(*this,"spriteram") { }
+		m_spriteram(*this,"spriteram"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -44,6 +45,7 @@ public:
 	required_shared_ptr<UINT8> m_customio_3;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	namco58xx_device *m_namco58xx;
 	namco56xx_device *m_namco56xx;
 

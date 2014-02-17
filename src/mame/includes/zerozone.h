@@ -14,7 +14,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
-			m_vram(*this, "videoram")
+			m_vram(*this, "videoram"),
+			m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	// in drivers/zerozone.c
@@ -32,6 +33,7 @@ public:
 	required_shared_ptr<UINT16> m_vram;
 	// currently this driver uses generic palette handling
 
+	required_device<gfxdecode_device> m_gfxdecode;
 	// state
 	// video-related
 	UINT16         m_tilebank;

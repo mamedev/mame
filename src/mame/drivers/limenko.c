@@ -42,7 +42,8 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_videoreg(*this, "videoreg"),
 		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki")  { }
+		m_oki(*this, "oki"),
+		m_gfxdecode(*this, "gfxdecode")  { }
 
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_fg_videoram;
@@ -94,6 +95,7 @@ public:
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /*****************************************************************************************************

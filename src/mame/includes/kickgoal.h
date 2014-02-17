@@ -20,7 +20,8 @@ public:
 		m_adpcm(*this, "oki"),
 		m_eeprom(*this, "eeprom") ,
 		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki") { }
+		m_oki(*this, "oki"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_fgram;
@@ -82,4 +83,5 @@ public:
 	void kickgoal_play(okim6295_device *oki, int melody, int data);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

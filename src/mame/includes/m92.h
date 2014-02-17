@@ -30,7 +30,8 @@ public:
 			m_spritecontrol(*this, "spritecontrol"),
 			m_maincpu(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
-			m_oki(*this, "oki")
+			m_oki(*this, "oki"),
+			m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -91,7 +92,7 @@ public:
 	void m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void m92_sprite_interrupt();
 	optional_device<okim6295_device> m_oki;
-
+	required_device<gfxdecode_device> m_gfxdecode;
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

@@ -12,7 +12,8 @@ public:
 		m_charram(*this, "charram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_colorram;
@@ -56,4 +57,5 @@ public:
 	UINT32 screen_update_tecmo16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

@@ -21,7 +21,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_adpcm(*this, "adpcm"),
 		m_ay1(*this, "ay1"),
-		m_ay2(*this, "ay2")
+		m_ay2(*this, "ay2"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -61,6 +62,7 @@ public:
 	optional_device<msm5205_device> m_adpcm;
 	required_device<ay8910_device> m_ay1;
 	required_device<ay8910_device> m_ay2;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8    m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(mermaid_ay8910_write_port_w);

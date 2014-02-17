@@ -37,7 +37,8 @@ public:
 		m_k053936(*this, "k053936"),
 		m_k054000(*this, "k054000"),
 		m_upd7759(*this, "upd"),
-		m_samples(*this, "samples"){ }
+		m_samples(*this, "samples"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_spriteram;
@@ -85,6 +86,7 @@ public:
 	optional_device<k054000_device> m_k054000;
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* memory buffers */
 	INT16      m_sampledata[0x40000];

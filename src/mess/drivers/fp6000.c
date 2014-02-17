@@ -31,7 +31,8 @@ public:
 		m_gvram(*this, "gvram"),
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu")
-		, m_crtc(*this, "crtc")
+		, m_crtc(*this, "crtc"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	UINT8 *m_char_rom;
@@ -57,6 +58,7 @@ public:
 	UINT32 screen_update_fp6000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device>m_crtc;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 void fp6000_state::video_start()

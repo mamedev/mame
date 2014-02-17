@@ -22,7 +22,8 @@ class mpu4dealem_state : public mpu4_state
 public:
 	mpu4dealem_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mpu4_state(mconfig, type, tag),
-			m_dealem_videoram(*this, "dealem_videoram")
+			m_dealem_videoram(*this, "dealem_videoram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -31,6 +32,7 @@ public:
 	DECLARE_PALETTE_INIT(dealem);
 	UINT32 screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

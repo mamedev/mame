@@ -13,7 +13,8 @@ public:
 		m_nob_mcu_status(*this, "nob_mcu_status"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_mcu(*this, "mcu") { }
+		m_mcu(*this, "mcu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	optional_device<i8255_device>  m_ppi8255;
 	required_shared_ptr<UINT8> m_ram;
@@ -127,4 +128,5 @@ public:
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_mcu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

@@ -12,7 +12,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_slave(*this, "slave") { }
+		m_slave(*this, "slave"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -48,4 +49,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

@@ -23,7 +23,8 @@ public:
 		m_sn_2(*this, "sn2"),
 		m_dac(*this, "dac"),
 		m_discrete(*this, "fltdisc"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spritebank;
@@ -65,4 +66,5 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

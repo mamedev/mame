@@ -11,7 +11,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -27,6 +28,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_READ8_MEMBER(kopunch_in_r);
 	DECLARE_WRITE8_MEMBER(kopunch_lamp_w);
 	DECLARE_WRITE8_MEMBER(kopunch_coin_w);

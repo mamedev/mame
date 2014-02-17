@@ -13,7 +13,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac") { }
+		m_dac(*this, "dac"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_cur_dac_address;
 	int m_cur_dac_address_index;
@@ -34,6 +35,7 @@ public:
 	INTERRUPT_GEN_MEMBER(trucocl_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

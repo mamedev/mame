@@ -10,7 +10,8 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_upd7759(*this, "upd") { }
+		m_upd7759(*this, "upd"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_invert_controls;
 	int m_sound_status;
@@ -55,4 +56,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

@@ -16,7 +16,8 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki") { }
+		m_oki(*this, "oki"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram;
@@ -71,4 +72,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu; // system 16c does not have sound CPU
 	required_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

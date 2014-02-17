@@ -13,7 +13,8 @@ public:
 		m_subcpu(*this, "sub"),
 		m_seibu_sound(*this, "seibu_sound"),
 		m_adpcm1(*this, "adpcm1"),
-		m_adpcm2(*this, "adpcm2") { }
+		m_adpcm2(*this, "adpcm2"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_videoram;
@@ -26,6 +27,8 @@ public:
 	required_device<seibu_adpcm_device> m_adpcm1;
 	required_device<seibu_adpcm_device> m_adpcm2;
 
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	tilemap_t *m_pf3_layer;
 	tilemap_t *m_pf2_layer;
 	tilemap_t *m_pf1_layer;

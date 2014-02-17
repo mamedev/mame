@@ -199,7 +199,8 @@ public:
 		m_sf000_ram(*this, "sf000_ram"),
 		m_io_port(*this, "io_port"),
 		m_maincpu(*this, "maincpu"),
-		m_i2cmem(*this, "i2cmem")
+		m_i2cmem(*this, "i2cmem"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -282,6 +283,7 @@ public:
 	void peplus_init();
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

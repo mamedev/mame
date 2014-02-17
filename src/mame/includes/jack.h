@@ -14,7 +14,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_scrollram(*this, "scrollram"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram")
+		m_colorram(*this, "colorram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	/* device- and memory pointers */
@@ -24,7 +25,8 @@ public:
 	optional_shared_ptr<UINT8> m_scrollram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 

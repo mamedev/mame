@@ -12,7 +12,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_bg_ram(*this, "bg_ram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -47,4 +48,5 @@ public:
 	void compgolf_expand_bg();
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

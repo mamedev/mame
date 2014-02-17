@@ -12,7 +12,8 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_oki2(*this, "oki2") { }
+		m_oki2(*this, "oki2"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_vram_0;
@@ -62,4 +63,5 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki2;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

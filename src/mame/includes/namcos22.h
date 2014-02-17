@@ -196,7 +196,8 @@ public:
 		m_tilemapattr(*this, "tilemapattr"),
 		m_czram(*this, "czram"),
 		m_motor_timer(*this, "motor_timer"),
-		m_pc_pedal_interrupt(*this, "pc_p_int")
+		m_pc_pedal_interrupt(*this, "pc_p_int"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -222,6 +223,7 @@ public:
 	optional_shared_ptr<UINT32> m_czram;
 	optional_device<timer_device> m_motor_timer;
 	optional_device<timer_device> m_pc_pedal_interrupt;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 m_syscontrol[0x20];
 	bool m_dsp_irq_enabled;

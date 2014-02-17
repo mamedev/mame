@@ -17,7 +17,8 @@ public:
 		m_spriteram_3(*this, "spriteram_3"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_attributeram;
@@ -39,6 +40,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(espial_master_interrupt_mask_w);
 	DECLARE_WRITE8_MEMBER(espial_master_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(espial_sound_nmi_mask_w);

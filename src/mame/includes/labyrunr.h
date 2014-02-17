@@ -18,7 +18,8 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram1(*this, "videoram1"),
-		m_videoram2(*this, "videoram2"){ }
+		m_videoram2(*this, "videoram2"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* devices */
 	required_device<k007121_device> m_k007121;
@@ -30,6 +31,8 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram1;
 	required_shared_ptr<UINT8> m_videoram2;
+	
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* video-related */
 	tilemap_t    *m_layer0;

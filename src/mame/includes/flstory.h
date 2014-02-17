@@ -12,7 +12,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
-		m_msm(*this, "msm"){ }
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -61,6 +62,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<msm5232_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* mcu */
 	UINT8 m_mcu_cmd;

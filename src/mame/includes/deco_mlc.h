@@ -14,7 +14,8 @@ public:
 		m_mlc_vram(*this, "mlc_vram"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
-		m_ymz(*this, "ymz")
+		m_ymz(*this, "ymz"),
+		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
 	optional_device<deco146_device> m_deco146;
@@ -67,6 +68,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<ymz280b_device> m_ymz;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );

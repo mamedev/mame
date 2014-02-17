@@ -36,7 +36,8 @@ public:
 		m_io_p2(*this, "P2"),
 		m_io_dsw(*this, "DSW"),
 		m_io_dsw1(*this, "DSW1"),
-		m_io_dsw2(*this, "DSW2") { }
+		m_io_dsw2(*this, "DSW2"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_objectram;
@@ -54,6 +55,7 @@ public:
 	optional_ioport m_io_dsw;
 	optional_ioport m_io_dsw1;
 	optional_ioport m_io_dsw2;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT16 *m_spriteram;
 	UINT16 m_ip_select;

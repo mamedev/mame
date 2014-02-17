@@ -64,7 +64,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -91,6 +92,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(olibochu_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

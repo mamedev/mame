@@ -127,7 +127,8 @@ public:
 		m_sc3_vram(*this, "sc3_vram"),
 		m_jm_shared_ram(*this, "jshared_ram"),
 		m_jm_mcu_code(*this, "jmcu_code"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	tilemap_t *m_sc0_tilemap_0;
 	tilemap_t *m_sc0_tilemap_1;
@@ -221,6 +222,7 @@ public:
 	void urashima_mcu_run();
 	void second_mcu_run();
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

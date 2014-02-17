@@ -99,7 +99,8 @@ public:
 		m_seibu_sound(*this, "seibu_sound"),
 		m_txram(*this, "txram"),
 		m_mainram(*this, "mainram"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -107,6 +108,7 @@ public:
 	required_shared_ptr<UINT8> m_txram;
 	optional_shared_ptr<UINT8> m_mainram;
 	optional_shared_ptr<UINT8> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	tilemap_t *m_txtilemap;
 	int m_coin_stat;

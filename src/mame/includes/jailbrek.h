@@ -20,7 +20,8 @@ public:
 		m_scroll_x(*this, "scroll_x"),
 		m_scroll_dir(*this, "scroll_dir"),
 		m_maincpu(*this, "maincpu"),
-		m_vlm(*this, "vlm") { }
+		m_vlm(*this, "vlm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_colorram;
@@ -32,6 +33,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<vlm5030_device> m_vlm;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* video-related */
 	tilemap_t      *m_bg_tilemap;

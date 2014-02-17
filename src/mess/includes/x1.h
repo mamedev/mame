@@ -79,7 +79,8 @@ public:
 	m_cassette(*this, "cassette"),
 	m_fdc(*this, "fdc"),
 	m_crtc(*this, "crtc"),
-	m_ctc(*this, "ctc")
+	m_ctc(*this, "ctc"),
+	m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -228,6 +229,7 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /*----------- defined in machine/x1.c -----------*/

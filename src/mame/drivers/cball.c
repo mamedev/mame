@@ -19,7 +19,8 @@ public:
 	cball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	/* memory pointers */
@@ -30,6 +31,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(cball_vram_w);
 	DECLARE_READ8_MEMBER(cball_wram_r);
 	DECLARE_WRITE8_MEMBER(cball_wram_w);

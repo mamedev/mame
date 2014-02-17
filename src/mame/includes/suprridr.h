@@ -15,7 +15,8 @@ public:
 		m_bgram(*this, "bgram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 m_nmi_enable;
 	UINT8 m_sound_data;
@@ -50,6 +51,7 @@ public:
 	int suprridr_is_screen_flipped();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /*----------- defined in video/suprridr.c -----------*/

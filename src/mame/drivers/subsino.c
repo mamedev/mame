@@ -248,7 +248,8 @@ public:
 		m_reel2_ram(*this, "reel2_ram"),
 		m_reel3_ram(*this, "reel3_ram"),
 		m_stisub_out_c(*this, "stisub_out_c"),
-		m_maincpu(*this, "maincpu") {
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") {
 	}
 
 	required_shared_ptr<UINT8> m_colorram;
@@ -324,6 +325,7 @@ public:
 	UINT32 screen_update_stisub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_start();
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 void subsino_state::machine_start()

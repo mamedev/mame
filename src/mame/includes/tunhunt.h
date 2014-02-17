@@ -6,7 +6,8 @@ public:
 		m_workram(*this, "workram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 m_control;
 	required_shared_ptr<UINT8> m_workram;
@@ -32,4 +33,5 @@ public:
 	void draw_shell(bitmap_ind16 &bitmap, const rectangle &cliprect, int picture_code,
 		int hposition,int vstart,int vstop,int vstretch,int hstretch);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

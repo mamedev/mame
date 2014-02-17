@@ -21,7 +21,8 @@ public:
 		m_k007232(*this, "k007232"),
 		m_k007232_1(*this, "k007232_1"),
 		m_k007232_2(*this, "k007232_2"),
-		m_k007232_3(*this, "k007232_3") { }
+		m_k007232_3(*this, "k007232_3"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	optional_shared_ptr<UINT16> m_videostatus;
 	optional_shared_ptr<UINT16> m_protection_ram;
@@ -105,6 +106,7 @@ public:
 	optional_device<k007232_device> m_k007232_1;
 	optional_device<k007232_device> m_k007232_2;
 	optional_device<k007232_device> m_k007232_3;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /*----------- defined in video/wecleman.c -----------*/

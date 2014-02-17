@@ -25,7 +25,8 @@ public:
 		m_dma(*this, "8237dma"),
 		m_crtc(*this, "crtc"),
 		m_p_vram(*this, "vram"),
-		m_p_gvram(*this, "gvram"){ }
+		m_p_gvram(*this, "gvram"),
+		m_gfxdecode(*this, "gfxdecode"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
@@ -47,6 +48,7 @@ public:
 	UINT8 *m_p_pcg;
 	required_shared_ptr<UINT16> m_p_vram;
 	required_shared_ptr<UINT16> m_p_gvram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	struct{
 		UINT8 portb;

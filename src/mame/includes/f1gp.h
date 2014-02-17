@@ -24,7 +24,8 @@ public:
 		m_spr(*this, "vsystem_spr"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k053936(*this, "k053936"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_sharedram;
@@ -98,4 +99,5 @@ public:
 	void f1gpb_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

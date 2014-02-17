@@ -22,12 +22,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_subcpu(*this,"subcpu"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_shared_ptr<UINT8> m_vram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_DRIVER_INIT(intrscti);
 	virtual void video_start();

@@ -26,7 +26,8 @@ public:
 		m_880000regs(*this, "880000regs"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_tilemap_paletteram16;
@@ -95,4 +96,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

@@ -34,7 +34,8 @@ public:
 			m_y4(*this, "Y4"),
 			m_y5(*this, "Y5"),
 			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7")
+			m_y7(*this, "Y7"),
+			m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -52,6 +53,7 @@ public:
 	required_ioport m_y5;
 	required_ioport m_y6;
 	required_ioport m_y7;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 m_scrambler;
 	tilemap_t *m_tilemap;

@@ -21,7 +21,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_eeprom(*this, "eeprom"),
-		m_msm(*this, "msm"){ }
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode"){ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -34,7 +35,8 @@ public:
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<msm5205_device> m_msm;
-
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	UINT8      *m_objram;           /* Sprite RAM */

@@ -55,7 +55,8 @@ public:
 		m_janshi_paletteram(*this, "paletteram"),
 		m_janshi_paletteram2(*this, "paletteram2"),
 		m_janshi_crtc_regs(*this, "crtc_regs"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_janshi_back_vram;
 	required_shared_ptr<UINT8> m_janshi_vram1;
@@ -85,6 +86,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

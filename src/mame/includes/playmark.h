@@ -16,7 +16,8 @@ public:
 		m_oki(*this, "oki"),
 		m_eeprom(*this, "eeprom"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_bgvideoram;
@@ -108,4 +109,5 @@ public:
 	UINT8 playmark_asciitohex(UINT8 data);
 	required_device<cpu_device> m_maincpu;
 	optional_device<pic16c57_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

@@ -34,7 +34,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") ,
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	UINT8 m_ld_in_latch;
@@ -55,6 +56,7 @@ public:
 	UINT32 screen_update_superdq(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superdq_vblank);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 TILE_GET_INFO_MEMBER(superdq_state::get_tile_info)

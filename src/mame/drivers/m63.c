@@ -135,7 +135,8 @@ public:
 		m_samples(*this, "samples"),
 		m_maincpu(*this, "maincpu"),
 		m_ay1(*this, "ay1"),
-		m_ay2(*this, "ay2")
+		m_ay2(*this, "ay2"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -195,6 +196,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8910_device> m_ay1;
 	optional_device<ay8910_device> m_ay2;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

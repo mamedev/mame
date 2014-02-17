@@ -119,7 +119,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
-			m_soundram(*this, "soundram")
+			m_soundram(*this, "soundram"),
+			m_gfxdecode(*this, "gfxdecode")
 	{
 		m_m6502_reset = 0;
 	}
@@ -225,6 +226,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mark_active_tilemap_all_dirty(int layer);
 	void supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, UINT32* scrollram*/, int transmask);
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

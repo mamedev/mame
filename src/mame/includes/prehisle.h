@@ -10,7 +10,8 @@ public:
 		m_bg_videoram16(*this, "bg_videoram16"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_upd7759(*this, "upd") { }
+		m_upd7759(*this, "upd"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 
 	required_shared_ptr<UINT16> m_videoram;
@@ -38,4 +39,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<upd7759_device> m_upd7759;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

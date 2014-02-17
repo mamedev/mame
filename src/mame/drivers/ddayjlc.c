@@ -66,7 +66,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_bgram(*this, "bgram"),
 		m_audiocpu(*this, "audiocpu"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_mainram;
@@ -111,6 +112,7 @@ public:
 	INTERRUPT_GEN_MEMBER(ddayjlc_interrupt);
 	INTERRUPT_GEN_MEMBER(ddayjlc_snd_interrupt);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

@@ -18,7 +18,8 @@ public:
 		m_k007342(*this, "k007342"),
 		m_k007420(*this, "k007420"),
 		m_maincpu(*this, "maincpu"),
-		m_upd7759(*this, "upd") { }
+		m_upd7759(*this, "upd"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_paletteram;
@@ -47,6 +48,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bladestl_scanline);
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /*----------- defined in video/bladestl.c -----------*/

@@ -42,7 +42,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
 		m_soundcpu(*this, "soundcpu"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram;
@@ -57,6 +58,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

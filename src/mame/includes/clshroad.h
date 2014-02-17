@@ -7,7 +7,8 @@ public:
 		m_vram_1(*this, "vram_1"),
 		m_vregs(*this, "vregs"),
 		m_vram_0(*this, "vram_0"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_vram_1;
@@ -34,4 +35,5 @@ public:
 	UINT32 screen_update_clshroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

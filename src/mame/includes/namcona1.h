@@ -36,7 +36,8 @@ public:
 		m_spriteram(*this,"spriteram"),
 		m_workram(*this,"workram"),
 		m_vreg(*this,"vreg"),
-		m_scroll(*this,"scroll")
+		m_scroll(*this,"scroll"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -47,6 +48,7 @@ public:
 	required_shared_ptr<UINT16> m_workram;
 	required_shared_ptr<UINT16> m_vreg;
 	required_shared_ptr<UINT16> m_scroll;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT16 *m_mpBank0;
 	UINT16 *m_mpBank1;

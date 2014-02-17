@@ -86,7 +86,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_fgmap;
@@ -122,6 +123,7 @@ public:
 	INTERRUPT_GEN_MEMBER(pturn_sub_intgen);
 	INTERRUPT_GEN_MEMBER(pturn_main_intgen);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

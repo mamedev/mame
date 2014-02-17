@@ -19,7 +19,8 @@ public:
 		m_pixel_1_data(*this, "pixel_1_data"),
 		m_sprgen(*this, "spritegen"),
 		m_sprgen2(*this, "spritegen2"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* video-related */
 	bitmap_ind16 m_bitmap0;
@@ -56,6 +57,7 @@ public:
 	void screen_eof_lemmings(screen_device &screen, bool state);
 	void lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_READ16_MEMBER( lem_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( lem_protection_region_0_146_w );

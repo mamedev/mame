@@ -19,7 +19,8 @@ public:
 		m_subcpu(*this, "sub"),
 		m_k007232(*this, "k007232"),
 		m_k052109(*this, "k052109"),
-		m_k051960(*this, "k051960") { }
+		m_k051960(*this, "k051960"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_gfxram;
@@ -41,6 +42,8 @@ public:
 	required_device<k007232_device> m_k007232;
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_READ16_MEMBER(k052109_halfword_r);
 	DECLARE_WRITE16_MEMBER(k052109_halfword_w);
 	DECLARE_READ16_MEMBER(k051937_halfword_r);

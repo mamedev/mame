@@ -449,7 +449,8 @@ public:
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"),
 		m_beeper(*this, "beeper"),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dmac;
@@ -747,6 +748,7 @@ public:
 	DECLARE_DRIVER_INIT(pc9801_kanji);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	inline void set_dma_channel(int channel, int state);
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

@@ -13,7 +13,8 @@ public:
 		m_scroll(*this, "scroll"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki") { }
+		m_oki(*this, "oki"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_mid_videoram;
@@ -54,4 +55,5 @@ public:
 	UINT8 aquarium_snd_bitswap( UINT8 scrambled_data );
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

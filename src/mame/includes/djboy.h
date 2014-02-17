@@ -19,7 +19,8 @@ public:
 		m_cpu1(*this, "cpu1"),
 		m_cpu2(*this, "cpu2"),
 		m_beast(*this, "beast"),
-		m_pandora(*this, "pandora")
+		m_pandora(*this, "pandora"),
+		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
 	/* memory pointers */
@@ -52,6 +53,8 @@ public:
 	required_device<cpu_device> m_cpu2;
 	required_device<cpu_device> m_beast;
 	required_device<kaneko_pandora_device> m_pandora;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(beast_data_w);
 	DECLARE_READ8_MEMBER(beast_data_r);
 	DECLARE_READ8_MEMBER(beast_status_r);

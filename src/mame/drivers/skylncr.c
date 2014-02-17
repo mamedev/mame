@@ -58,7 +58,8 @@ public:
 		m_reelscroll2(*this, "reelscroll2"),
 		m_reelscroll3(*this, "reelscroll3"),
 		m_reelscroll4(*this, "reelscroll4"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	tilemap_t *m_tmap;
 	required_shared_ptr<UINT8> m_videoram;
@@ -112,6 +113,7 @@ public:
 	UINT32 screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

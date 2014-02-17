@@ -19,7 +19,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_namco_sound(*this, "namco"),
 		m_samples(*this, "samples"),
-		m_timeplt_audio(*this, "timeplt_audio") { }
+		m_timeplt_audio(*this, "timeplt_audio"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -46,6 +47,7 @@ public:
 	optional_device<namco_device> m_namco_sound;
 	optional_device<samples_device> m_samples;
 	optional_device<timeplt_audio_device> m_timeplt_audio;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8    m_main_irq_mask;
 	DECLARE_WRITE8_MEMBER(rallyx_interrupt_vector_w);

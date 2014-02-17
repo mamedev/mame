@@ -15,7 +15,8 @@ public:
 		m_tx_videoram(*this, "tx_videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_countryc_trackball;
 	int m_last_value[2];
@@ -184,4 +185,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

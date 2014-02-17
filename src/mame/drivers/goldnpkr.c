@@ -1021,7 +1021,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_discrete(*this, "discrete") { }
+		m_discrete(*this, "discrete"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
@@ -1076,6 +1077,7 @@ public:
 	UINT32 screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	optional_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

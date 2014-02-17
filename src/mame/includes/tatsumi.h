@@ -28,7 +28,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
 		m_subcpu2(*this, "sub2"),
-		m_oki(*this, "oki") { }
+		m_oki(*this, "oki"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	optional_shared_ptr<UINT16> m_videoram;
 	optional_shared_ptr<UINT16> m_cyclwarr_cpua_ram;
@@ -140,6 +141,7 @@ public:
 	required_device<m68000_base_device> m_subcpu;
 	optional_device<cpu_device> m_subcpu2;
 	required_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /*----------- defined in machine/tatsumi.c -----------*/

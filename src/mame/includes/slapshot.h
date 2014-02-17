@@ -37,7 +37,8 @@ public:
 		m_tc0140syt(*this, "tc0140syt"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_tc0360pri(*this, "tc0360pri"),
-		m_tc0640fio(*this, "tc0640fio") { }
+		m_tc0640fio(*this, "tc0640fio"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_color_ram;
@@ -69,6 +70,8 @@ public:
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<tc0360pri_device> m_tc0360pri;
 	required_device<tc0640fio_device> m_tc0640fio;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_READ16_MEMBER(color_ram_word_r);
 	DECLARE_WRITE16_MEMBER(color_ram_word_w);
 	DECLARE_READ16_MEMBER(slapshot_service_input_r);

@@ -10,7 +10,8 @@ public:
 		m_scrollreg(*this, "scrollreg"),
 		m_maincpu(*this, "maincpu"),
 		m_naughtyb_custom(*this, "naughtyb_custom"),
-		m_popflame_custom(*this, "popflame_custom") { }
+		m_popflame_custom(*this, "popflame_custom"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_videoram2;
@@ -18,6 +19,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<naughtyb_sound_device> m_naughtyb_custom;
 	optional_device<popflame_sound_device> m_popflame_custom;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	UINT8 m_popflame_prot_seed;
 	int m_r_index;
 	int m_prot_count;

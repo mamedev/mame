@@ -16,7 +16,8 @@ public:
 		m_toprollr_bg_videoram(*this, "bg_videoram"),
 		m_toprollr_bg_coloram(*this, "bg_coloram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_bigsprite_videoram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -85,4 +86,5 @@ public:
 	void cannonb_patch();
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

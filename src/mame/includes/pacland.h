@@ -10,7 +10,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
-		m_cus30(*this, "namco") { }
+		m_cus30(*this, "namco"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_videoram2;
@@ -18,6 +19,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<namco_cus30_device> m_cus30;
+	required_device<gfxdecode_device> m_gfxdecode;
 	UINT8 m_palette_bank;
 	const UINT8 *m_color_prom;
 	tilemap_t *m_bg_tilemap;

@@ -82,7 +82,8 @@ public:
 			m_qs1000(*this, "qs1000"),
 			m_oki(*this, "oki"),
 			m_oki2(*this, "oki_2"),
-			m_eeprom(*this, "eeprom") {
+			m_eeprom(*this, "eeprom"),
+			m_gfxdecode(*this, "gfxdecode") {
 			m_has_extra_gfx = 0;
 		}
 
@@ -96,6 +97,7 @@ public:
 	optional_device<okim6295_device> m_oki;
 	optional_device<okim6295_device> m_oki2;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 	
 	int m_flip_bit;
 	int m_flipscreen;

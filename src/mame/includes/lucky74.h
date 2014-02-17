@@ -10,7 +10,8 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_bg_colorram(*this, "bg_colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 m_ym2149_portb;
 	UINT8 m_usart_8251;
@@ -50,4 +51,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(lucky74_adpcm_int);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

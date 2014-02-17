@@ -24,7 +24,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_bg_tilemap;
@@ -48,6 +49,7 @@ public:
 	INTERRUPT_GEN_MEMBER(wink_sound);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

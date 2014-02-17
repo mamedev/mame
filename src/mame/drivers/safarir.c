@@ -59,13 +59,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_ram(*this, "ram"),
-		m_bg_scroll(*this, "bg_scroll")
+		m_bg_scroll(*this, "bg_scroll"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_shared_ptr<UINT8> m_ram;
 	required_shared_ptr<UINT8> m_bg_scroll;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 *m_ram_1;
 	UINT8 *m_ram_2;

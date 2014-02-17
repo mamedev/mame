@@ -82,7 +82,8 @@ public:
 		m_slavecpu(*this, "slave"),
 		m_mermaid(*this, "mermaid"),
 		m_soundcpu(*this, "soundcpu"),
-		m_pandora(*this, "pandora")
+		m_pandora(*this, "pandora"),
+		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
 	/* Video */
@@ -107,6 +108,8 @@ public:
 	required_device<cpu_device> m_mermaid;
 	required_device<cpu_device> m_soundcpu;
 	required_device<kaneko_pandora_device> m_pandora;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(trigger_nmi_on_slave_cpu);
 	DECLARE_WRITE8_MEMBER(master_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(mermaid_data_w);

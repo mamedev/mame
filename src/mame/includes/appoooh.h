@@ -12,7 +12,8 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_bg_colorram(*this, "bg_colorram"),
 		m_msm(*this, "msm"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -59,6 +60,7 @@ public:
 	void robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, UINT8 *sprite );
 	DECLARE_WRITE_LINE_MEMBER(appoooh_adpcm_int);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */
