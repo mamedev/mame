@@ -566,7 +566,7 @@ WRITE_LINE_MEMBER(apple3_state::apple3_via_0_irq_func)
 
 MACHINE_RESET_MEMBER(apple3_state,apple3)
 {
-	m_indir_count = 0;
+	m_indir_bank = 0;
 	m_sync = false;
 	m_speaker_state = 0;
 	m_speaker->level_w(0);
@@ -579,62 +579,26 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 
 
 
-UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset, bool is_write)
+UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
 {
-	UINT8 n;
 	UINT8 *result = NULL;
 
-	if ((m_via_0_b >= 0x18) && (m_via_0_b <= 0x1F))
+	// m_indir_bank is guaranteed to be between 0x80 and 0x8f
+	if (m_indir_bank == 0x8f)
 	{
-		n = *apple3_bankaddr(~0, m_zpa ^ 0x0C00);
-
-		if (LOG_INDXADDR)
-		{
-			if (m_last_n != n)
-			{
-				logerror("indxaddr: zpa=0x%04x n=0x%02x\n", m_zpa, n);
-				m_last_n = n;
-			}
-		}
-
-		if (n == 0x8F)
-		{
-			/* get at that special ram under the VIAs */
-			if ((offset >= 0xFFD0) && (offset <= 0xFFEF))
-				result = apple3_bankaddr(~0, offset & 0x7FFF);
-			else if (offset < 0x2000)
-				result = apple3_bankaddr(~0, offset - 0x2000);
-			else if (offset > 0x9FFF)
-				result = apple3_bankaddr(~0, offset - 0x8000);
-			else
-				result = &m_ram->pointer()[offset - 0x2000];
-		}
-		else if ((n >= 0x80) && (n <= 0x8E))
-		{
-			if (offset < 0x0100)
-				result = apple3_bankaddr(~0, ((offs_t) m_via_0_b) * 0x100 + offset);
-			else
-				result = apple3_bankaddr(n, offset);
-		}
-		else if (n == 0xFF)
-		{
-			if (offset < 0x2000)
-				result = apple3_bankaddr(~0, offset - 0x2000);
-			else if (offset < 0xA000)
-				result = apple3_bankaddr(m_via_1_a, offset - 0x2000);
-			else if (offset < 0xC000)
-				result = apple3_bankaddr(~0, offset - 0x8000);
-			else if (offset < 0xD000)
-				result = NULL;
-			else if (offset < 0xF000)
-				result = apple3_bankaddr(~0, offset - 0x8000);
-			else
-				result = (UINT8 *) ~0;
-		}
-		else if (offset < 0x0100)
-		{
-			result = apple3_bankaddr(~0, ((offs_t) m_via_0_b) * 0x100 + offset);
-		}
+		/* get at that special ram under the VIAs */
+		if ((offset >= 0xFFD0) && (offset <= 0xFFEF))
+			result = apple3_bankaddr(~0, offset & 0x7FFF);
+		else if (offset < 0x2000)
+			result = apple3_bankaddr(~0, offset - 0x2000);
+		else if (offset > 0x9FFF)
+			result = apple3_bankaddr(~0, offset - 0x8000);
+		else
+			result = &m_ram->pointer()[offset - 0x2000];
+	}
+	else
+	{
+		result = apple3_bankaddr(m_indir_bank, offset);
 	}
 
 	return result;
@@ -730,8 +694,7 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	save_item(NAME(m_last_n));
 	save_item(NAME(m_sync));
 	save_item(NAME(m_rom_has_been_disabled));
-	save_item(NAME(m_indir_opcode));
-	save_item(NAME(m_indir_count));
+	save_item(NAME(m_indir_bank));
 	save_item(NAME(m_cnxx_slot));
 	save_item(NAME(m_speaker_state));
 	save_item(NAME(m_c040_time));
@@ -752,17 +715,14 @@ void apple3_state::apple3_postload()
 READ8_MEMBER(apple3_state::apple3_memory_r)
 {
 	UINT8 rv = 0xff;
-	bool was_zp = false;
 
 	// (zp), y or (zp,x) read
 	if (!space.debugger_access())
 	{
-		if (((m_indir_count == 4) && (m_indir_opcode & 0x10)) ||
-			((m_indir_count == 5) && !(m_indir_opcode & 0x10)) ||
-			((m_indir_count == 3) && ((!(m_indir_opcode & 0x10)) && (((m_indir_opcode & 0xf) == 0xc) || ((m_indir_opcode & 0xf) == 0xd)))))
+		if ((m_indir_bank & 0x80) && (offset >= 0x100))
 		{
 			UINT8 *test;
-			test = apple3_get_indexed_addr(offset, false);
+			test = apple3_get_indexed_addr(offset);
 
 			if (test)
 			{
@@ -774,7 +734,12 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 	if (offset < 0x100)
 	{
 		rv = *apple3_get_zpa_addr(offset); 
-		was_zp = true;
+
+		if ((!m_sync) && (m_via_0_b >= 0x18) && (m_via_0_b <= 0x1F))
+		{
+			// fetch the "X byte"
+			m_indir_bank = *apple3_bankaddr(~0, m_zpa ^ 0x0C00) & 0x8f;
+		}
 	}
 	else if (offset < 0x200)
 	{
@@ -876,50 +841,15 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 		}
 	}
 
-	if (!space.debugger_access())
-	{
-		if (m_indir_count > 0) 
-		{
-			m_indir_count++;
-		}
-
-		// capture last opcode for indirect mode shenanigans
-		if (m_sync)
-		{
-			// 0xN1 is a (zp),y or (zp, x) opcode
-			if ((rv & 0x0f) == 0x1)
-			{
-//				printf("(zp),y or (zp,x) %02x at %x\n", rv, offset);
-				m_indir_count = 1;
-				m_indir_opcode = rv;
-			}
-			// if instruction is physically on the zero page,
-			// even an absolute load/store will get ZP'd
-			// sayeth the Business BASIC source code:
-			// ;BECAUSE SARA GOES BY WHETHER THE ADDR 
-			// ;IS GOING THROUGH ZERO PAGE, THIS GOES THROUGH THE
-			// ;BANK STUFF ALSO.
-			else if (was_zp)
-			{
-//				printf("ZP opcode fetch %02x\n", rv);
-				if ((!(rv & 0x10)) && (((rv & 0xf) == 0xc) || ((rv & 0xf) == 0xd)))
-				{
-					m_indir_count = 1;
-					m_indir_opcode = rv;
-				}
-			}
-		}
-	}
-
 	return rv;
 }
 
 WRITE8_MEMBER(apple3_state::apple3_memory_w)
 {
-	if ((!space.debugger_access()) && (m_indir_count > 0))
+	if ((m_indir_bank & 0x80) && (offset >= 0x100))
 	{
 		UINT8 *test;
-		test = apple3_get_indexed_addr(offset, true);
+		test = apple3_get_indexed_addr(offset);
 
 		if (test)
 		{
@@ -931,7 +861,6 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 	if (offset < 0x100)
 	{
 		*apple3_get_zpa_addr(offset) = data;
-		return;
 	}
 	else if (offset < 0x200)
 	{
@@ -1066,7 +995,7 @@ WRITE_LINE_MEMBER(apple3_state::apple3_sync_w)
 
 	if (m_sync)
 	{
-		m_indir_count = 0; 
+		m_indir_bank = 0;
 	}
 }
 
