@@ -34,6 +34,7 @@ Oh! Bakyuuun (OB1/VER.A)                 (C) Namco/Raizing,1999  COH-700     SYS
 Golgo 13 (GLG1/VER.A)                    (C) Raizing/Namco,1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC054
 Golgo 13 Kiseki no Dandou (GLS1/VER.A)   (C) Raizing/Namco,2000  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC059
 Kaiun Quiz (KW1/VER.A1)                  (C) Namco/Moss,   1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M10X64  KC050
+Kart Duel (KTD1/VER.A)                   (C) Namco,        2000
 Libero Grande (LG1/VER.A)                (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC014
 Libero Grande (LG2/VER.A)                (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC014
 Mr Driller (DRI3/VER.A2)                 (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F2F   KC048
@@ -72,9 +73,6 @@ Wanted Games
 ------------
 Aerosmith - Quest for Fame              (C) Namco,        2001
 http://www.bandainamcogames.co.jp/am/vg/questforfame/
-
-Kart Duel                               (C) Namco,        2000
-http://www.bandainamcogames.co.jp/am/english/aa/kartduel/
 
 Soul Calibur Ver.B                      (C) Namco,        199?
 Probably doesn't exist
@@ -1416,6 +1414,7 @@ MACHINE_RESET_MEMBER(namcos12_state,namcos12)
 		strcmp( machine().system().name, "sws2000" ) == 0 ||
 		strcmp( machine().system().name, "sws2001" ) == 0 ||
 		strcmp( machine().system().name, "truckk" ) == 0 ||
+		strcmp( machine().system().name, "kartduel" ) == 0 ||
 		strcmp( machine().system().name, "ohbakyuun" ) == 0 ||
 		strcmp( machine().system().name, "ghlpanic" ) == 0 )
 	{
@@ -1979,6 +1978,22 @@ ROM_START( kaiunqz )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
 	ROM_LOAD( "kw1wave0.2",   0x000000, 0x800000, CRC(060e52ae) SHA1(7ea95cae9d3c648163b225d0c7d365644be90241) )
+ROM_END
+
+ROM_START( kartduel )
+	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "ktd1vera.2l",  0x0000000, 0x200000, CRC(0c207249) SHA1(6c57de25d452226a25f658638d89b81257960741) )
+	ROM_LOAD16_BYTE( "ktd1vera.2p",  0x0000001, 0x200000, CRC(f6e2581f) SHA1(06eb108c2775290590dba75f964f26443a585d70) )
+
+	ROM_REGION32_LE( 0x00800000, "user2", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "kdt1rom0l.ic12", 0x000000, 0x400000, CRC(8e2d5d9e) SHA1(6f703e27a19740af4094004b783b3cc2974c3de0) )
+	ROM_LOAD16_BYTE( "kdt1rom0u.ic11", 0x000001, 0x400000, CRC(49ec5dbd) SHA1(336db6d3e361938850a9234b6b64070dbdc36d45) )
+
+	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "ktd1vera.11s", 0x000000, 0x080000, CRC(c2ff1971) SHA1(32ee2afe08e92049d8139c9324a0ea1a3b7ee5a1) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "ktd1wave0.ic2",  0x0000000, 0x800000, CRC(c54d5539) SHA1(17518dc76bb3627ca42bac665938bb11ea926396) )
 ROM_END
 
 ROM_START( lbgrande )
@@ -2859,8 +2874,9 @@ GAME( 1999, mrdrillrj, mrdrillr, coh700,   namcos124w,namcos12_state,namcos12, R
 GAME( 1999, kaiunqz,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC050 */
 GAME( 1999, pacappsp,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion Special (Japan, PSP1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC052 */
 GAME( 1999, aquarush,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Aqua Rush (Japan, AQ1/VER.A1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC053 */
-GAME( 1999, golgo13,   0,        coh700,   golgo13, namcos12_state,  namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC054 */
-GAME( 1999, g13knd,    0,        coh700,   golgo13, namcos12_state,  namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC059 */
+GAME( 1999, golgo13,   0,        coh700,   golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC054 */
+GAME( 1999, g13knd,    0,        coh700,   golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC059 */
 GAME( 2000, sws2000,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC055 */
 GAME( 2000, truckk,    0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC056 */
+GAME( 2000, kartduel,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kart Duel (Japan, KTD1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 2001, sws2001,   sws2000,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC061 */
