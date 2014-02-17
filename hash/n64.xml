@@ -9438,6 +9438,17 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
+	<software name="swshadowp" cloneof="swshadow">
+		<description>Star Wars - Shadows of the Empire (Prototype)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="12582912">
+				<rom name="star wars - shadows of the empire (prototype).bin" size="12582912" crc="448228ce" sha1="3509758f8920fcb653b7239580ea036d395a3c73" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="swshadowu" cloneof="swshadow">
 		<description>Star Wars - Shadows of the Empire (USA, Rev. B)</description>
 		<year>1996</year>
