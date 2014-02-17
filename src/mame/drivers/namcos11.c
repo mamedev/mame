@@ -35,7 +35,8 @@ dunkmnia   Dunk Mania (DM2/VER.C)                  COH-100 / COH-110   SYSTEM11 
 dunkmniajc Dunk Mania (DM1/VER.C)                  COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C410     5
 xevi3dg    Xevious 3D/G (XV31/VER.A)               COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C430     5
 primglex   Prime Goal EX (PG1/VER.A)               COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C411     6
-danceyes   Dancing Eyes (DC1/VER.A)                COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C431     5
+danceyes   Dancing Eyes (DC3/VER.C)                COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C431     5
+danceyesj  Dancing Eyes (DC1/VER.A)                COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C431     5
 pocketrc   Pocket Racer (PKR1/VER.B)               COH-110             SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C432     5
 starswep   Star Sweep (STP1/VER.A)                 COH-100 / COH-110   SYSTEM11 MOTHER(B) PCB                           C442     -
 myangel3   Kosodate Quiz My Angel 3 (KQT1/VER.A)   COH-110             SYSTEM11 MOTHER(B) PCB   SYSTEM11 ROM8(64) PCB   C443     2
@@ -1012,6 +1013,32 @@ INPUT_PORTS_END
 
 ROM_START( danceyes )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "dc3verc.2l",   0x0000000, 0x100000, CRC(a7a00bc6) SHA1(9e51e28fee1f3f5bf212d1c2c07c674487a61ed3) )
+	ROM_LOAD16_BYTE( "dc3verc.2j",   0x0000001, 0x100000, CRC(02fc2415) SHA1(cfe597302e2d322c1068a2a3b3ab27efd6154c72) )
+	ROM_LOAD16_BYTE( "dc1vera.2k",   0x0200000, 0x100000, CRC(bdd9484e) SHA1(2f85e0ac4b12b2cf4c9717fad745d2d68c27d39a) )
+	ROM_LOAD16_BYTE( "dc1vera.2f",   0x0200001, 0x100000, CRC(25a2f06f) SHA1(400806a262681cf908ac16e039686b5a0d5fd58e) )
+
+	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "dc1rom0l.ic5", 0x0000000, 0x200000, CRC(8b5b4b13) SHA1(9681e29ad95a2cc555d0fbb558a0865a87a77268) )
+	ROM_LOAD16_BYTE( "dc1rom0u.ic6", 0x0000001, 0x200000, CRC(93ca9bd0) SHA1(c7d2ecbeb451bd57097fb39f21dc347b86a2b838) )
+	ROM_LOAD16_BYTE( "dc1rom1l.ic3", 0x0400000, 0x200000, CRC(380e0282) SHA1(33389e3b15b93fb939991b8d7dc8b182ba88e78a) )
+	ROM_LOAD16_BYTE( "dc1rom1u.ic8", 0x0400001, 0x200000, CRC(47d966a7) SHA1(3b6f004136bd9d75dbef846f417ca34a56893d61) )
+	ROM_LOAD16_BYTE( "dc1rom2l.ic4", 0x0800000, 0x200000, CRC(8f130220) SHA1(7f086d502178c27511c1142254381a9a2a999e8d) )
+	ROM_LOAD16_BYTE( "dc1rom2u.ic7", 0x0800001, 0x200000, CRC(24514dc6) SHA1(f9f7d6a45cbd51513cc038f6321a30c1a72b7a58) )
+	ROM_LOAD16_BYTE( "dc1rom3l.ic1", 0x0c00000, 0x200000, CRC(a76bcd4c) SHA1(817abdc43158b7aaac329c3ea17782277acb36a4) )
+	ROM_LOAD16_BYTE( "dc1rom3u.ic9", 0x0c00001, 0x200000, CRC(1405d123) SHA1(3d7be5558358740f5a0a3a3022543cf5aca4cf24) )
+
+	ROM_REGION16_LE( 0x100000, "c76", 0 ) /* sound data and MCU BIOS */
+	ROM_LOAD( "dc1sprog.6d",  0x0000000, 0x040000, CRC(96cd7788) SHA1(68a5a53a5fc50e2b6b684c99d27d81e3a8c56287) )
+	ROM_LOAD( "c76.bin",      0x040000, 0x004000, CRC(399faac7) SHA1(ceb184ef0486caf715dd997101999785f67a40b8) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "dc1wave.8k",   0x000000, 0x400000, CRC(8ba0f6a7) SHA1(e9868debd808e92b196d1baeeeae9c4855356a01) )
+	ROM_RELOAD( 0x800000, 0x400000 )
+ROM_END
+
+ROM_START( danceyesj )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "dc1vera.2l",   0x0000000, 0x100000, CRC(b164ad67) SHA1(62a7f9bc7fb9c218e5031598512dbd1e013283b3) )
 	ROM_LOAD16_BYTE( "dc1vera.2j",   0x0000001, 0x100000, CRC(28e4cb3d) SHA1(17923c66725da1f8e77b7c08d8017160bba53eb9) )
 	ROM_LOAD16_BYTE( "dc1vera.2k",   0x0200000, 0x100000, CRC(bdd9484e) SHA1(2f85e0ac4b12b2cf4c9717fad745d2d68c27d39a) )
@@ -1597,7 +1624,8 @@ GAME( 1995, dunkmnia,   0,        dunkmnia,   namcos11,   driver_device, 0, ROT0
 GAME( 1995, dunkmniajc, dunkmnia, dunkmnia,   namcos11,   driver_device, 0, ROT0, "Namco", "Dunk Mania (Japan, DM1/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, xevi3dg,    0,        xevi3dg,    namcos11,   driver_device, 0, ROT0, "Namco", "Xevious 3D/G (Japan, XV31/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, primglex,   0,        primglex,   tekken,     driver_device, 0, ROT0, "Namco", "Prime Goal EX (Japan, PG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, danceyes,   0,        danceyes,   namcos11,   driver_device, 0, ROT0, "Namco", "Dancing Eyes (Japan, DC1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, danceyes,   0,        danceyes,   namcos11,   driver_device, 0, ROT0, "Namco", "Dancing Eyes (US, DC3/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   driver_device, 0, ROT0, "Namco", "Dancing Eyes (Japan, DC1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   driver_device, 0, ROT0, "Namco", "Pocket Racer (Japan, PKR1/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, starswep,   0,        starswep,   namcos11,   driver_device, 0, ROT0, "Axela/Namco", "Star Sweep (Japan, STP1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, myangel3,   0,        myangel3,   myangel3,   driver_device, 0, ROT0, "Namco", "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
