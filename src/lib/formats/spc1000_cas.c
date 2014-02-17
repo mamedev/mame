@@ -5,6 +5,18 @@
 Support for Samsung SPC-1000 cassette images
 
 
+Tape formats:
+
+TAP: This is a series of 0x30 and 0x31 bytes, representing binary
+     0 and 1. It includes the header and leaders.
+
+CAS: This format has not been investigated yet.
+
+STA: This format has not been investigated yet, but is assumed to
+     be the save state of some other emulator.
+
+IPL: This format has not been investigated yet.
+
 ********************************************************************/
 
 #include "spc1000_cas.h"

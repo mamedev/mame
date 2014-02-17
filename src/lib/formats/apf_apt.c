@@ -20,6 +20,8 @@ recording head."
 S19 images are not emulated, however there's no need to as they
 are only used to hold cartridge hex dumps.
 
+TXT images can be copy/pasted by using the Paste menu option.
+
 Each byte after conversion becomes bit 7,6,etc to 0, There are
 no start or stop bits.
 

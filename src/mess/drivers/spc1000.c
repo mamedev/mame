@@ -1,8 +1,15 @@
 /***************************************************************************
 
-        Samsung SPC-1000 driver by Miodrag Milanovic
+Samsung SPC-1000 driver by Miodrag Milanovic
 
-        10/05/2009 Preliminary driver.
+    2009-05-10 Preliminary driver.
+    2014-02-16 Added cassette, many games are playable
+
+ToDo:
+- Some games have keyboard problems (e.g. Invaders, Panzerspitze)
+- Some games freeze at start (e.g. Super Xevious)
+- Find out if any of the unconnected parts of 6000,4000,4001 are used
+
 
 ****************************************************************************/
 
@@ -31,8 +38,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(spc1000_iplk_w);
 	DECLARE_READ8_MEMBER(spc1000_iplk_r);
-	DECLARE_WRITE8_MEMBER(spc1000_video_ram_w);
-	DECLARE_READ8_MEMBER(spc1000_video_ram_r);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_WRITE8_MEMBER(spc1000_gmode_w);
 	DECLARE_READ8_MEMBER(spc1000_gmode_r);
@@ -276,8 +281,9 @@ READ8_MEMBER(spc1000_state::spc1000_mc6847_videoram_r)
 READ8_MEMBER( spc1000_state::porta_r )
 {
 	UINT8 data = 0;
-	if (m_cass->input() > 0.0038)
-		data |= 0x80;
+	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;
+	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x40;
+
 	return data;
 }
 
@@ -339,7 +345,7 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 1)
 	MCFG_SOUND_CONFIG(spc1000_ay_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
