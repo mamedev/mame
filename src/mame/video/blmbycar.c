@@ -45,7 +45,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 WRITE16_MEMBER(blmbycar_state::blmbycar_palette_w)
 {
 	data = COMBINE_DATA(&m_paletteram[offset]);
-	palette_set_color_rgb( machine(), offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
+	m_palette->set_pen_color( offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 }
 
 

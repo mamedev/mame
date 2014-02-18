@@ -685,10 +685,10 @@ static MACHINE_CONFIG_START( gsword, gsword_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gsword_state, screen_update_gsword)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gsword)
-	MCFG_PALETTE_LENGTH(64*4+64*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",gsword,"palette")
+	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 
-	MCFG_PALETTE_INIT_OVERRIDE(gsword_state,gsword)
+	MCFG_PALETTE_INIT_OWNER(gsword_state,gsword)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -728,10 +728,10 @@ static MACHINE_CONFIG_START( josvolly, gsword_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gsword_state, screen_update_gsword)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gsword)
-	MCFG_PALETTE_LENGTH(64*4+64*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",gsword,"palette")
+	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 
-	MCFG_PALETTE_INIT_OVERRIDE(gsword_state,josvolly)
+	MCFG_PALETTE_INIT_OWNER(gsword_state,josvolly)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

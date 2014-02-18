@@ -182,9 +182,8 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*10-1, 0, 16*15-1)
 	MCFG_SCREEN_UPDATE_DRIVER(poly88_state, screen_update_poly88)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", poly88)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_GFXDECODE_ADD("gfxdecode",poly88,"palette")
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 
 	/* audio hardware */

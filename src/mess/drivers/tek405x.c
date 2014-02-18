@@ -1017,8 +1017,7 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 780-1)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1126,8 +1125,7 @@ static MACHINE_CONFIG_START( tek4052, tek4052_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 780-1)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

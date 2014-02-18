@@ -1218,14 +1218,14 @@ WRITE8_MEMBER(leland_state::ataxx_master_output_w)
 WRITE8_MEMBER(leland_state::leland_gated_paletteram_w)
 {
 	if (m_wcol_enable)
-		paletteram_BBGGGRRR_byte_w(space, offset, data);
+		m_palette->write(space, offset, data);
 }
 
 
 READ8_MEMBER(leland_state::leland_gated_paletteram_r)
 {
 	if (m_wcol_enable)
-		return m_generic_paletteram_8[offset];
+		return m_palette->basemem().read8(offset);
 	return 0xff;
 }
 
@@ -1233,7 +1233,7 @@ READ8_MEMBER(leland_state::leland_gated_paletteram_r)
 WRITE8_MEMBER(leland_state::ataxx_paletteram_and_misc_w)
 {
 	if (m_wcol_enable)
-		paletteram_xxxxRRRRGGGGBBBB_byte_le_w(space, offset, data);
+		m_palette->write(space, offset, data);
 	else if (offset == 0x7f8 || offset == 0x7f9)
 		leland_master_video_addr_w(space, offset - 0x7f8, data);
 	else if (offset == 0x7fc)
@@ -1264,7 +1264,7 @@ WRITE8_MEMBER(leland_state::ataxx_paletteram_and_misc_w)
 READ8_MEMBER(leland_state::ataxx_paletteram_and_misc_r)
 {
 	if (m_wcol_enable)
-		return m_generic_paletteram_8[offset];
+		return m_palette->basemem().read8(offset);
 	else if (offset == 0x7fc || offset == 0x7fd)
 	{
 		int result = m_xrom_base[0x00000 | m_xrom1_addr | ((offset & 1) << 16)];

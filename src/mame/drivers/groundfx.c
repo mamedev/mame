@@ -88,7 +88,7 @@ WRITE32_MEMBER(groundfx_state::color_ram_w)
 		g = (a &0xff00) >> 8;
 		b = (a &0xff);
 
-		palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+		m_palette->set_pen_color(offset,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -366,8 +366,8 @@ static MACHINE_CONFIG_START( groundfx, groundfx_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(groundfx_state, screen_update_groundfx)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", groundfx)
-	MCFG_PALETTE_LENGTH(16384)
+	MCFG_GFXDECODE_ADD("gfxdecode",groundfx,"palette")
+	MCFG_PALETTE_ADD("palette", 16384)
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn", groundfx_tc0100scn_intf)

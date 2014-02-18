@@ -703,7 +703,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	if (machine().input().code_pressed(KEYCODE_A))  msk |= 8;
 	if (msk != 0)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		layers_ctrl &= msk;
 	}
 

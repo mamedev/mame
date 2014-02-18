@@ -73,16 +73,16 @@ PALETTE_INIT_MEMBER(mcr3_state,spyhunt)
 {
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
-		palette_set_color(machine(),i,RGB_BLACK); /* black */
+		palette.set_pen_color(i,RGB_BLACK); /* black */
 	}
 
 	/* alpha colors are hard-coded */
-	palette_set_color(machine(),4*16+0,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine(),4*16+1,MAKE_RGB(0x00,0xff,0x00));
-	palette_set_color(machine(),4*16+2,MAKE_RGB(0x00,0x00,0xff));
-	palette_set_color(machine(),4*16+3,MAKE_RGB(0xff,0xff,0xff));
+	palette.set_pen_color(4*16+0,MAKE_RGB(0x00,0x00,0x00));
+	palette.set_pen_color(4*16+1,MAKE_RGB(0x00,0xff,0x00));
+	palette.set_pen_color(4*16+2,MAKE_RGB(0x00,0x00,0xff));
+	palette.set_pen_color(4*16+3,MAKE_RGB(0xff,0xff,0xff));
 }
 
 
@@ -154,7 +154,7 @@ WRITE8_MEMBER(mcr3_state::mcr3_paletteram_w)
 	offset &= 0x7f;
 
 	/* high bit of red comes from low bit of address */
-	palette_set_color_rgb(machine(), offset / 2, pal3bit(((offset & 1) << 2) + (data >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
+	m_palette->set_pen_color(offset / 2, pal3bit(((offset & 1) << 2) + (data >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
 }
 
 WRITE8_MEMBER(mcr3_state::spyhuntpr_paletteram_w)
@@ -166,7 +166,7 @@ WRITE8_MEMBER(mcr3_state::spyhuntpr_paletteram_w)
 	int g = (data & 0x38) >> 3;
 	int b = (data & 0xc0) >> 6;
 
-	palette_set_color(machine(), offset^0xf, MAKE_RGB(r<<5,g<<5,b<<6));
+	m_palette->set_pen_color(offset^0xf, MAKE_RGB(r<<5,g<<5,b<<6));
 }
 
 

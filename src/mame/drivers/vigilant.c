@@ -489,8 +489,8 @@ static MACHINE_CONFIG_START( vigilant, vigilant_state )
 	MCFG_SCREEN_VISIBLE_AREA(16*8, (64-16)*8-1, 0*8, 32*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_vigilant)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vigilant)
-	MCFG_PALETTE_LENGTH(512+32) /* 512 real palette, 32 virtual palette */
+	MCFG_GFXDECODE_ADD("gfxdecode",vigilant,"palette")
+	MCFG_PALETTE_ADD("palette", 512+32) /* 512 real palette, 32 virtual palette */
 
 
 	/* sound hardware */
@@ -529,8 +529,8 @@ static MACHINE_CONFIG_START( buccanrs, vigilant_state )
 	MCFG_SCREEN_VISIBLE_AREA(16*8, (64-16)*8-1, 0*8, 32*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_vigilant)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", buccanrs)
-	MCFG_PALETTE_LENGTH(512+32) /* 512 real palette, 32 virtual palette */
+	MCFG_GFXDECODE_ADD("gfxdecode",buccanrs,"palette")
+	MCFG_PALETTE_ADD("palette", 512+32) /* 512 real palette, 32 virtual palette */
 
 
 	/* sound hardware */
@@ -586,8 +586,8 @@ static MACHINE_CONFIG_START( kikcubic, vigilant_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 0*8, 32*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_kikcubic)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", kikcubic)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",kikcubic,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	/* sound hardware */

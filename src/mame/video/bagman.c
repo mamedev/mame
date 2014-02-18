@@ -57,7 +57,7 @@ PALETTE_INIT_MEMBER(bagman_state,bagman)
 			2,  resistances_b,  weights_b,  470,    0);
 
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -76,7 +76,7 @@ PALETTE_INIT_MEMBER(bagman_state,bagman)
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 	}
 }
 

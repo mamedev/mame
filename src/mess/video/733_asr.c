@@ -96,8 +96,8 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(asr733_device, asr733)
 {
-	palette_set_color(machine(),0,RGB_WHITE); /* white */
-	palette_set_color(machine(),1,RGB_BLACK); /* black */
+	palette.set_pen_color(0,RGB_WHITE); /* white */
+	palette.set_pen_color(1,RGB_BLACK); /* black */
 }
 
 /*
@@ -780,7 +780,7 @@ void asr733_keyboard(device_t *device)
 }
 
 static MACHINE_CONFIG_FRAGMENT( asr733 )
-	MCFG_PALETTE_INIT_OVERRIDE(asr733_device, asr733)
+	MCFG_PALETTE_INIT_OWNER(asr733_device, asr733)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

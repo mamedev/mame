@@ -1250,8 +1250,8 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segas18_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", segas18)
-	MCFG_PALETTE_LENGTH(2048*3+2048 + 64*3)
+	MCFG_GFXDECODE_ADD("gfxdecode",segas18,"palette")
+	MCFG_PALETTE_ADD("palette", 2048*3+2048 + 64*3)
 
 	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
 	MCFG_SEGAIC16VID_ADD("segaic16vid")

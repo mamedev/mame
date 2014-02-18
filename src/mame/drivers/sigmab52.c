@@ -236,7 +236,7 @@ if (!machine().input().code_pressed(KEYCODE_O))
 }
 
 
-void sigmab52_state::palette_init()
+PALETTE_INIT_MEMBER(sigmab52_state, sigmab52)
 {
 }
 
@@ -606,7 +606,7 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 
 	MCFG_HD63484_ADD("hd63484", jwildb52_hd63484_intf)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 MACHINE_CONFIG_END

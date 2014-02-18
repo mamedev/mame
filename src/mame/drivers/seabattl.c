@@ -105,24 +105,24 @@ public:
 
 ***************************************************************************/
 
-void seabattl_state::palette_init()
+PALETTE_INIT_MEMBER(seabattl_state, seabattl)
 {
 	// sprites (m.obj) + s2636
 	for (int i = 0; i < 8; i++)
 	{
-		palette_set_color(machine(), i, MAKE_RGB((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
+		palette.set_pen_color(i, MAKE_RGB((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
 	}
 
 	// scr
 	for (int i = 0; i < 8; i++)
 	{
-		palette_set_color(machine(), 8 + 2 * i + 0, RGB_BLACK);
-		palette_set_color(machine(), 8 + 2 * i + 1, MAKE_RGB((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
+		palette.set_pen_color(8 + 2 * i + 0, RGB_BLACK);
+		palette.set_pen_color(8 + 2 * i + 1, MAKE_RGB((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
 	}
 
 	// wave
-	palette_set_color(machine(), 24, RGB_BLACK);
-	palette_set_color(machine(), 25, MAKE_RGB(0x00, 0xff, 0xff)); // cyan
+	palette.set_pen_color(24, RGB_BLACK);
+	palette.set_pen_color(25, MAKE_RGB(0x00, 0xff, 0xff)); // cyan
 }
 
 TILE_GET_INFO_MEMBER(seabattl_state::get_bg_tile_info)
@@ -544,8 +544,8 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seabattl_state, screen_update_seabattl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", seabattl)
-	MCFG_PALETTE_LENGTH(26)
+	MCFG_GFXDECODE_ADD("gfxdecode",seabattl,"palette")
+	MCFG_PALETTE_ADD("palette", 26)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

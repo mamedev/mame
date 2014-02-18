@@ -215,7 +215,7 @@ void vga_device::device_start()
 
 	int i;
 	for (i = 0; i < 0x100; i++)
-		palette_set_color_rgb(machine(), i, 0, 0, 0);
+		m_palette->set_pen_color(i, 0, 0, 0);
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
 	vga.crtc.maximum_scan_line = 1;
@@ -249,7 +249,7 @@ void cirrus_vga_device::device_start()
 
 	int i;
 	for (i = 0; i < 0x100; i++)
-		palette_set_color_rgb(machine(), i, 0, 0, 0);
+		m_palette->set_pen_color(i, 0, 0, 0);
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
 	vga.crtc.maximum_scan_line = 1;
@@ -844,7 +844,7 @@ UINT8 vga_device::pc_vga_choosevideomode()
 			for (i=0; i<256;i++)
 			{
 				/* TODO: color shifters? */
-				palette_set_color_rgb(machine(), i, (vga.dac.color[i & vga.dac.mask].red & 0x3f) << 2,
+				m_palette->set_pen_color(i, (vga.dac.color[i & vga.dac.mask].red & 0x3f) << 2,
 										(vga.dac.color[i & vga.dac.mask].green & 0x3f) << 2,
 										(vga.dac.color[i & vga.dac.mask].blue & 0x3f) << 2);
 			}
@@ -905,7 +905,7 @@ UINT8 svga_device::pc_vga_choosevideomode()
 			for (i=0; i<256;i++)
 			{
 				/* TODO: color shifters? */
-				palette_set_color_rgb(machine(), i, (vga.dac.color[i & vga.dac.mask].red & 0x3f) << 2,
+				m_palette->set_pen_color(i, (vga.dac.color[i & vga.dac.mask].red & 0x3f) << 2,
 										(vga.dac.color[i & vga.dac.mask].green & 0x3f) << 2,
 										(vga.dac.color[i & vga.dac.mask].blue & 0x3f) << 2);
 			}
@@ -980,7 +980,7 @@ UINT32 vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	UINT8 cur_mode = pc_vga_choosevideomode();
 	switch(cur_mode)
 	{
-		case SCREEN_OFF:   bitmap.fill  (get_black_pen(machine()), cliprect);break;
+		case SCREEN_OFF:   bitmap.fill  (m_palette->black_pen(), cliprect);break;
 		case TEXT_MODE:    vga_vh_text  (bitmap, cliprect); break;
 		case VGA_MODE:     vga_vh_vga   (bitmap, cliprect); break;
 		case EGA_MODE:     vga_vh_ega   (bitmap, cliprect); break;
@@ -997,7 +997,7 @@ UINT32 svga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 	switch(cur_mode)
 	{
-		case SCREEN_OFF:   bitmap.fill  (get_black_pen(machine()), cliprect);break;
+		case SCREEN_OFF:   bitmap.fill  (m_palette->black_pen(), cliprect);break;
 		case TEXT_MODE:    vga_vh_text  (bitmap, cliprect); break;
 		case VGA_MODE:     vga_vh_vga   (bitmap, cliprect); break;
 		case EGA_MODE:     vga_vh_ega   (bitmap, cliprect); break;
@@ -2113,7 +2113,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", VGA, 0)
 MACHINE_CONFIG_END
 
@@ -2122,7 +2122,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_trident_vga )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", trident_vga_device, screen_update)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", TRIDENT_VGA, 0)
 MACHINE_CONFIG_END
 
@@ -2131,7 +2131,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_cirrus_vga )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_vga_device, screen_update)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", CIRRUS_VGA, 0)
 MACHINE_CONFIG_END
 
@@ -2140,7 +2140,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_gamtor_vga )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", gamtor_vga_device, screen_update)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", GAMTOR_VGA, 0)
 MACHINE_CONFIG_END
 
@@ -2149,7 +2149,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_s3_vga )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3_vga_device, screen_update)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", S3_VGA, 0)
 MACHINE_CONFIG_END
 

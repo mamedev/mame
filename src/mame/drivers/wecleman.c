@@ -1064,9 +1064,9 @@ static MACHINE_CONFIG_START( wecleman, wecleman_state )
 	MCFG_SCREEN_VISIBLE_AREA(0 +8, 320-1 +8, 0 +8, 224-1 +8)
 	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_wecleman)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wecleman)
+	MCFG_GFXDECODE_ADD("gfxdecode",wecleman,"palette")
 
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state,wecleman)
 
@@ -1117,7 +1117,7 @@ MACHINE_RESET_MEMBER(wecleman_state,hotchase)
 	for(i=0;i<0x2000/2;i++)
 	{
 		m_generic_paletteram_16[i] = 0xffff;
-		palette_set_color_rgb(machine(),i,0xff,0xff,0xff);
+		m_palette->set_pen_color(i,0xff,0xff,0xff);
 	}
 }
 
@@ -1148,8 +1148,8 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_hotchase)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hotchase)
-	MCFG_PALETTE_LENGTH(2048*2)
+	MCFG_GFXDECODE_ADD("gfxdecode",hotchase,"palette")
+	MCFG_PALETTE_ADD("palette", 2048*2)
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state,hotchase)
 

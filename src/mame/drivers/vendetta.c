@@ -490,8 +490,6 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.17) /* measured on PCB */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -499,9 +497,10 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(vendetta_state, screen_update_vendetta)
 
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K052109_ADD("k052109", vendetta_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K053246_ADD("k053246", vendetta_k053246_intf)

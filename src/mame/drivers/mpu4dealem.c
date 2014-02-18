@@ -109,7 +109,7 @@ PALETTE_INIT_MEMBER(mpu4dealem_state,dealem)
 		bit1 = BIT(*color_prom,7);
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -230,10 +230,10 @@ static MACHINE_CONFIG_START( dealem, mpu4dealem_state )
 	MCFG_SCREEN_REFRESH_RATE(56)                            /* Measured accurately from the flip-flop, but 6845 handles this */
 	MCFG_SCREEN_UPDATE_DRIVER(mpu4dealem_state, screen_update_dealem)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dealem)
+	MCFG_GFXDECODE_ADD("gfxdecode",dealem,"palette")
 
-	MCFG_PALETTE_LENGTH(32)
-	MCFG_PALETTE_INIT_OVERRIDE(mpu4dealem_state,dealem)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(mpu4dealem_state,dealem)
 
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", MPU4_MASTER_CLOCK / 4 / 8, hd6845_intf) /* HD68B45 */
 MACHINE_CONFIG_END

@@ -483,7 +483,7 @@ void ddayjlc_state::machine_reset()
 	}
 }
 
-void ddayjlc_state::palette_init()
+PALETTE_INIT_MEMBER(ddayjlc_state, ddayjlc)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
@@ -506,7 +506,7 @@ void ddayjlc_state::palette_init()
 		bit2 = (val >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -532,8 +532,8 @@ static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddayjlc_state, screen_update_ddayjlc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ddayjlc)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_GFXDECODE_ADD("gfxdecode",ddayjlc,"palette")
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

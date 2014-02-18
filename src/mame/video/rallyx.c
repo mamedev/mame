@@ -69,9 +69,6 @@ PALETTE_INIT_MEMBER(rallyx_state,rallyx)
 			3, &resistances_rg[0], gweights,    0, 0,
 			2, &resistances_b[0],  bweights, 1000, 0);
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x20);
-
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
 	{
@@ -95,7 +92,7 @@ PALETTE_INIT_MEMBER(rallyx_state,rallyx)
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -105,12 +102,12 @@ PALETTE_INIT_MEMBER(rallyx_state,rallyx)
 	for (i = 0x000; i < 0x100; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* bullets use colors 0x10-0x13 */
 	for (i = 0x100; i < 0x104; i++)
-		colortable_entry_set_value(machine().colortable, i, (i - 0x100) | 0x10);
+		palette.set_pen_indirect(i, (i - 0x100) | 0x10);
 }
 
 
@@ -135,9 +132,6 @@ PALETTE_INIT_MEMBER(rallyx_state,jungler)
 						3, resistances_rg, gweights, 1000, 0,
 						2, resistances_b,  bweights, 1000, 0);
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x60);
-
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
 	{
@@ -161,7 +155,7 @@ PALETTE_INIT_MEMBER(rallyx_state,jungler)
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* star pens */
@@ -185,7 +179,7 @@ PALETTE_INIT_MEMBER(rallyx_state,jungler)
 		bit1 = ((i - 0x20) >> 5) & 0x01;
 		b = combine_2_weights(bweights_star, bit0, bit1);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -195,16 +189,16 @@ PALETTE_INIT_MEMBER(rallyx_state,jungler)
 	for (i = 0x000; i < 0x100; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* bullets use colors 0x10-0x13 */
 	for (i = 0x100; i < 0x104; i++)
-		colortable_entry_set_value(machine().colortable, i, (i - 0x100) | 0x10);
+		palette.set_pen_indirect(i, (i - 0x100) | 0x10);
 
 	/* stars */
 	for (i = 0x104; i < 0x144; i++)
-		colortable_entry_set_value(machine().colortable, i, (i - 0x104) + 0x20);
+		palette.set_pen_indirect(i, (i - 0x104) + 0x20);
 }
 
 
@@ -469,7 +463,7 @@ void rallyx_state::rallyx_draw_sprites( screen_device &screen, bitmap_ind16 &bit
 				flipx,flipy,
 				sx,sy,
 				screen.priority(),0x02,
-				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0));
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0));
 	}
 }
 
@@ -492,7 +486,7 @@ void rallyx_state::locomotn_draw_sprites( screen_device &screen, bitmap_ind16 &b
 				flip,flip,
 				sx,sy,
 				screen.priority(),0x02,
-				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0));
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0));
 	}
 }
 

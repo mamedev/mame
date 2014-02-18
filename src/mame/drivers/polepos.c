@@ -918,11 +918,11 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16)
 	MCFG_SCREEN_UPDATE_DRIVER(polepos_state, screen_update_polepos)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", polepos)
-	MCFG_PALETTE_LENGTH(0x0f00)
+	MCFG_GFXDECODE_ADD("gfxdecode",polepos,"palette")
+	MCFG_PALETTE_ADD("palette", 0x0f00)
 	MCFG_DEFAULT_LAYOUT(layout_polepos)
 
-	MCFG_PALETTE_INIT_OVERRIDE(polepos_state,polepos)
+	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)
 	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
 
 	/* sound hardware */
@@ -997,11 +997,11 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16)
 	MCFG_SCREEN_UPDATE_DRIVER(polepos_state, screen_update_polepos)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", polepos)
-	MCFG_PALETTE_LENGTH(0x0f00)
+	MCFG_GFXDECODE_ADD("gfxdecode",polepos,"palette")
+	MCFG_PALETTE_ADD("palette", 0x0f00)
 	MCFG_DEFAULT_LAYOUT(layout_topracer)
 
-	MCFG_PALETTE_INIT_OVERRIDE(polepos_state,polepos)
+	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)
 	MCFG_VIDEO_START_OVERRIDE(polepos_state,polepos)
 
 	/* sound hardware */

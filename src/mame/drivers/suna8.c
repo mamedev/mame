@@ -1840,8 +1840,8 @@ static MACHINE_CONFIG_START( hardhead, suna8_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", suna8)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",suna8,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_textdim12)
 
@@ -1901,8 +1901,8 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", suna8)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",suna8,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_textdim8)
 
@@ -1961,8 +1961,8 @@ static MACHINE_CONFIG_START( brickzn, suna8_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", suna8)
-	MCFG_PALETTE_LENGTH(256 * 2)    // 2 x Palette RAM
+	MCFG_GFXDECODE_ADD("gfxdecode",suna8,"palette")
+	MCFG_PALETTE_ADD("palette", 256 * 2)    // 2 x Palette RAM
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_brickzn)
 
@@ -2022,7 +2022,7 @@ static MACHINE_CONFIG_DERIVED( hardhea2, brickzn )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(suna8_state,hardhea2)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 MACHINE_CONFIG_END
 
 
@@ -2061,8 +2061,8 @@ static MACHINE_CONFIG_START( starfigh, suna8_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", suna8)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",suna8,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_starfigh)
 
@@ -2108,8 +2108,8 @@ static MACHINE_CONFIG_START( sparkman, suna8_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", suna8_x2)    // 2 sprite "chips"
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",suna8_x2,"palette")    // 2 sprite "chips"
+	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_sparkman)
 

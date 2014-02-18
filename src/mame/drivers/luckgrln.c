@@ -470,7 +470,7 @@ WRITE8_MEMBER(luckgrln_state::palette_w)
 		g = (dat >> 5) & 0x1f;
 		b = (dat >> 10) & 0x1f;
 
-		palette_set_color_rgb(machine(), offs/2, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color(offs/2, pal5bit(r), pal5bit(g), pal5bit(b));
 
 	}
 
@@ -1013,8 +1013,8 @@ static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(luckgrln_state, screen_update_luckgrln)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", luckgrln)
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_GFXDECODE_ADD("gfxdecode",luckgrln,"palette")
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

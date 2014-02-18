@@ -384,7 +384,7 @@ UINT32 fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void fortecar_state::palette_init()
+PALETTE_INIT_MEMBER(fortecar_state, fortecar)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 /* Video resistors...
@@ -431,7 +431,7 @@ R = 82 Ohms Pull Down.
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -698,8 +698,8 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_I8255A_ADD( "fcppi0", ppi8255_intf )
 	MCFG_V3021_ADD("rtc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fortecar)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_GFXDECODE_ADD("gfxdecode",fortecar,"palette")
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)    /* 1.5 MHz, measured */

@@ -184,8 +184,8 @@ static MACHINE_CONFIG_START( xorworld, xorworld_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xorworld_state, screen_update_xorworld)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", xorworld)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",xorworld,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	// sound hardware

@@ -19,7 +19,7 @@ WRITE8_MEMBER(funybubl_state::funybubl_paldatawrite)
 	coldat = m_paletteram[colchanged * 4] | (m_paletteram[colchanged * 4 + 1] << 8) |
 			(m_paletteram[colchanged * 4 + 2] << 16) | (m_paletteram[colchanged * 4 + 3] << 24);
 
-	palette_set_color_rgb(machine(), colchanged, pal6bit(coldat >> 12), pal6bit(coldat >> 0), pal6bit(coldat >> 6));
+	m_palette->set_pen_color(colchanged, pal6bit(coldat >> 12), pal6bit(coldat >> 0), pal6bit(coldat >> 6));
 }
 
 
@@ -76,7 +76,7 @@ UINT32 funybubl_state::screen_update_funybubl(screen_device &screen, bitmap_ind1
 	int x, y, offs;
 	offs = 0;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	/* tilemap .. convert it .. banking makes it slightly more annoying but still easy */
 	for (y = 0; y < 32; y++)

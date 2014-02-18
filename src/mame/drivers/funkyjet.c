@@ -337,8 +337,8 @@ static MACHINE_CONFIG_START( funkyjet, funkyjet_state )
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", funkyjet)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",funkyjet,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DECO16IC_ADD("tilegen1", funkyjet_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")

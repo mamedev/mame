@@ -271,8 +271,8 @@ static MACHINE_CONFIG_START( mosaic, mosaic_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mosaic_state, screen_update_mosaic)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mosaic)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",mosaic,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	/* sound hardware */

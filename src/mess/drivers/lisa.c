@@ -152,8 +152,7 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 364-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lisa_state, screen_update_lisa)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 
 	/* sound hardware */

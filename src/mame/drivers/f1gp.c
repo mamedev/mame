@@ -461,8 +461,8 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", f1gp)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",f1gp,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, f1gp_old_tile_callback )
@@ -516,8 +516,8 @@ static MACHINE_CONFIG_START( f1gpb, f1gp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gpb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", f1gp)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",f1gp,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gpb)
 

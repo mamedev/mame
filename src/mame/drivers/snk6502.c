@@ -830,10 +830,10 @@ static MACHINE_CONFIG_START( sasuke, snk6502_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update_snk6502)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sasuke)
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE_ADD("gfxdecode",sasuke,"palette")
+	MCFG_PALETTE_ADD("palette", 32)
 
-	MCFG_PALETTE_INIT_OVERRIDE(snk6502_state,satansat)
+	MCFG_PALETTE_INIT_OWNER(snk6502_state,satansat)
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state,satansat)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16, mc6845_intf)
@@ -903,10 +903,10 @@ static MACHINE_CONFIG_START( vanguard, snk6502_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update_snk6502)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vanguard)
-	MCFG_PALETTE_LENGTH(64)
+	MCFG_GFXDECODE_ADD("gfxdecode",vanguard,"palette")
+	MCFG_PALETTE_ADD("palette", 64)
 
-	MCFG_PALETTE_INIT_OVERRIDE(snk6502_state,snk6502)
+	MCFG_PALETTE_INIT_OWNER(snk6502_state,snk6502)
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state,snk6502)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16, mc6845_intf)

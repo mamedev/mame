@@ -770,8 +770,8 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bublbobl)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",bublbobl,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -850,8 +850,8 @@ static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
 	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bublbobl)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",bublbobl,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

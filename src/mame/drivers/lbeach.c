@@ -83,7 +83,7 @@ public:
 
 ***************************************************************************/
 
-void lbeach_state::palette_init()
+PALETTE_INIT_MEMBER(lbeach_state, lebeach)
 {
 	// tiles
 	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00);
@@ -335,7 +335,7 @@ static MACHINE_CONFIG_START( lbeach, lbeach_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lbeach_state, screen_update_lbeach)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // needed for collision detection
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lbeach)
+	MCFG_GFXDECODE_ADD("gfxdecode",lbeach,"palette")
 	MCFG_PALETTE_LENGTH(2+8+2)
 
 	/* sound hardware */

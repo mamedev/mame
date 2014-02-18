@@ -310,8 +310,8 @@ static MACHINE_CONFIG_START( drtomy, drtomy_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drtomy_state, screen_update_drtomy)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", drtomy)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",drtomy,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 
 	/* sound hardware */

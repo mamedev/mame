@@ -67,7 +67,7 @@ static MACHINE_CONFIG_START( bowltry, bowltry_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bowltry_state, screen_update_bowltry)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	/* tt5665 sound */
 

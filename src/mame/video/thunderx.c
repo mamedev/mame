@@ -55,7 +55,7 @@ void thunderx_state::video_start()
 	m_layer_colorbase[2] = 16;
 	m_sprite_colorbase = 32;
 
-	palette_set_shadow_factor(machine(),7.0/8.0);
+	m_palette->set_shadow_factor(7.0/8.0);
 }
 
 

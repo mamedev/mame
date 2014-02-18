@@ -151,7 +151,7 @@ WRITE8_MEMBER( tiki100_state::video_mode_w )
 		int color = data & 0x0f;
 		UINT8 colordata = ~m_palette;
 
-		palette_set_color_rgb(machine(), color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
+		m_palette->set_pen_color(color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
 	}
 }
 
@@ -713,7 +713,7 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_SCREEN_SIZE(1024, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 	// pixel clock 20.01782 MHz
 
 	/* devices */

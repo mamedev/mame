@@ -351,8 +351,8 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(boogwing_state, screen_update_boogwing)
 
-	MCFG_PALETTE_LENGTH(2048)
-	MCFG_GFXDECODE_ADD("gfxdecode", boogwing)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",boogwing,"palette")
 
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")

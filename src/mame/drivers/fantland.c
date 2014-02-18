@@ -860,8 +860,8 @@ static MACHINE_CONFIG_START( fantland, fantland_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fantland)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",fantland,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	/* sound hardware */
@@ -904,8 +904,8 @@ static MACHINE_CONFIG_START( galaxygn, fantland_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fantland)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",fantland,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1002,8 +1002,8 @@ static MACHINE_CONFIG_START( borntofi, fantland_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fantland)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",fantland,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1037,8 +1037,8 @@ static MACHINE_CONFIG_START( wheelrun, fantland_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fantland)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",fantland,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

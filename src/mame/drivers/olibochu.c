@@ -97,12 +97,12 @@ public:
 
 
 
-void olibochu_state::palette_init()
+PALETTE_INIT_MEMBER(olibochu_state, olibochu)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		UINT8 pen;
 		int bit0, bit1, bit2, r, g, b;
@@ -131,7 +131,7 @@ void olibochu_state::palette_init()
 		bit1 = BIT(color_prom[pen], 7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -468,8 +468,8 @@ static MACHINE_CONFIG_START( olibochu, olibochu_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(olibochu_state, screen_update_olibochu)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", olibochu)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",olibochu,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */

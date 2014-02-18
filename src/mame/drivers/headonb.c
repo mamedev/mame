@@ -47,7 +47,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(headonb_video_ram_w);
 
-	virtual void palette_init();
 	virtual void video_start();
 	UINT32 screen_update_headonb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_headonb_tile_info);
@@ -61,12 +60,6 @@ public:
   Video
 
 ***************************************************************************/
-
-void headonb_state::palette_init()
-{
-	palette_set_color(machine(), 0, RGB_BLACK);
-	palette_set_color(machine(), 1, RGB_WHITE);
-}
 
 TILE_GET_INFO_MEMBER(headonb_state::get_headonb_tile_info)
 {
@@ -177,8 +170,8 @@ static MACHINE_CONFIG_START( headonb, headonb_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(headonb_state, screen_update_headonb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", headonb)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE_ADD("gfxdecode",headonb,"palette")
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */
 	// TODO

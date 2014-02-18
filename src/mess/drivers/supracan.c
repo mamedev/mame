@@ -1354,7 +1354,7 @@ static INPUT_PORTS_START( supracan )
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Button A")
 INPUT_PORTS_END
 
-void supracan_state::palette_init()
+PALETTE_INIT_MEMBER(supracan_state, supracan)
 {
 	// Used for debugging purposes for now
 	//#if 0
@@ -1365,7 +1365,7 @@ void supracan_state::palette_init()
 		r = (i & 0x1f) << 3;
 		g = ((i >> 5) & 0x1f) << 3;
 		b = ((i >> 10) & 0x1f) << 3;
-		palette_set_color_rgb( machine(), i, r, g, b );
+		palette.set_pen_color( i, r, g, b );
 	}
 	//#endif
 }
@@ -1925,8 +1925,8 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )  /* No idea if this is correct */
 	MCFG_SCREEN_UPDATE_DRIVER(supracan_state, screen_update_supracan)
-	MCFG_PALETTE_LENGTH( 32768 )
-	MCFG_GFXDECODE_ADD("gfxdecode", supracan)
+	MCFG_PALETTE_ADD( "palette", 32768 )
+	MCFG_GFXDECODE_ADD("gfxdecode",supracan,"palette")
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")

@@ -451,12 +451,12 @@ static GFXDECODE_START( marinedt )
 	GFXDECODE_ENTRY( "gfx3", 0, marinedt_objlayout,  32, 4 )
 GFXDECODE_END
 
-void marinedt_state::palette_init()
+PALETTE_INIT_MEMBER(marinedt_state, marinedt)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i,r,b,g;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
 
@@ -480,7 +480,7 @@ bit0 = 0;
 //      *(palette++) = 0x92 * bit0 + 0x46 * bit1 + 0x27 * bit2;
 		b = 0x27 * bit0 + 0x46 * bit1 + 0x92 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -684,8 +684,8 @@ static MACHINE_CONFIG_START( marinedt, marinedt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(marinedt_state, screen_update_marinedt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", marinedt)
-	MCFG_PALETTE_LENGTH(64)
+	MCFG_GFXDECODE_ADD("gfxdecode",marinedt,"palette")
+	MCFG_PALETTE_ADD("palette", 64)
 
 
 	/* sound hardware */

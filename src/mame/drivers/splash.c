@@ -502,8 +502,8 @@ static MACHINE_CONFIG_START( splash, splash_state )
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 48*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update_splash)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", splash)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",splash,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
@@ -555,8 +555,8 @@ static MACHINE_CONFIG_START( roldfrog, splash_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update_splash)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", splash)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",splash,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
@@ -633,8 +633,8 @@ static MACHINE_CONFIG_START( funystrp, splash_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update_funystrp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", splash)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",splash,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, funystrp )

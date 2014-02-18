@@ -295,7 +295,7 @@ static GFXDECODE_START( summit )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-void summit_state::palette_init()
+PALETTE_INIT_MEMBER(summit_state, summit)
 {
 }
 
@@ -313,9 +313,9 @@ static MACHINE_CONFIG_START( summit, summit_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(summit_state, screen_update_summit)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", summit)
+	MCFG_GFXDECODE_ADD("gfxdecode",summit,"palette")
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 MACHINE_CONFIG_END
 

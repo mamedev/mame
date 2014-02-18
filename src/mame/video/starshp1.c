@@ -8,20 +8,20 @@ Atari Starship 1 video emulation
 #include "includes/starshp1.h"
 
 
-void starshp1_state::set_pens(colortable_t *colortable)
+void starshp1_state::set_pens()
 {
-	colortable_palette_set_color(colortable, m_inverse ? 7 : 0, MAKE_RGB(0x00, 0x00, 0x00));
-	colortable_palette_set_color(colortable, m_inverse ? 6 : 1, MAKE_RGB(0x1e, 0x1e, 0x1e));
-	colortable_palette_set_color(colortable, m_inverse ? 5 : 2, MAKE_RGB(0x4e, 0x4e, 0x4e));
-	colortable_palette_set_color(colortable, m_inverse ? 4 : 3, MAKE_RGB(0x6c, 0x6c, 0x6c));
-	colortable_palette_set_color(colortable, m_inverse ? 3 : 4, MAKE_RGB(0x93, 0x93, 0x93));
-	colortable_palette_set_color(colortable, m_inverse ? 2 : 5, MAKE_RGB(0xb1, 0xb1, 0xb1));
-	colortable_palette_set_color(colortable, m_inverse ? 1 : 6, MAKE_RGB(0xe1, 0xe1, 0xe1));
-	colortable_palette_set_color(colortable, m_inverse ? 0 : 7, MAKE_RGB(0xff, 0xff, 0xff));
+	m_palette->set_indirect_color(m_inverse ? 7 : 0, MAKE_RGB(0x00, 0x00, 0x00));
+	m_palette->set_indirect_color(m_inverse ? 6 : 1, MAKE_RGB(0x1e, 0x1e, 0x1e));
+	m_palette->set_indirect_color(m_inverse ? 5 : 2, MAKE_RGB(0x4e, 0x4e, 0x4e));
+	m_palette->set_indirect_color(m_inverse ? 4 : 3, MAKE_RGB(0x6c, 0x6c, 0x6c));
+	m_palette->set_indirect_color(m_inverse ? 3 : 4, MAKE_RGB(0x93, 0x93, 0x93));
+	m_palette->set_indirect_color(m_inverse ? 2 : 5, MAKE_RGB(0xb1, 0xb1, 0xb1));
+	m_palette->set_indirect_color(m_inverse ? 1 : 6, MAKE_RGB(0xe1, 0xe1, 0xe1));
+	m_palette->set_indirect_color(m_inverse ? 0 : 7, MAKE_RGB(0xff, 0xff, 0xff));
 }
 
 
-void starshp1_state::palette_init()
+PALETTE_INIT_MEMBER(starshp1_state, starshp1)
 {
 	int i;
 
@@ -37,11 +37,8 @@ void starshp1_state::palette_init()
 		5, 7        /* 0x11        - circle */
 	};
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 8);
-
 	for (i = 0; i < sizeof(colortable_source) / sizeof(colortable_source[0]); i++)
-		colortable_entry_set_value(machine().colortable, i, colortable_source[i]);
+		palette.set_pen_indirect(i, colortable_source[i]);
 }
 
 
@@ -347,7 +344,7 @@ int starshp1_state::circle_collision(const rectangle &rect)
 
 UINT32 starshp1_state::screen_update_starshp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(machine().colortable);
+	set_pens();
 
 	bitmap.fill(0, cliprect);
 

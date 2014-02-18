@@ -74,10 +74,10 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_bg_hshift_w)
 
 WRITE8_MEMBER(tiamc1_state::tiamc1_palette_w)
 {
-	palette_set_color(machine(), offset, m_palette[data]);
+	m_palette->set_pen_color(offset, m_palette[data]);
 }
 
-void tiamc1_state::palette_init()
+PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
 {
 	// Voltage computed by Proteus
 	//static const float g_v[8]={1.05f,0.87f,0.81f,0.62f,0.44f,0.25f,0.19f,0.00f};

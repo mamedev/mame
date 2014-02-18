@@ -93,7 +93,7 @@ static void mlc_drawgfxzoomline(
 
 		if( ex>sx )
 		{ /* skip if inner loop doesn't draw anything */
-			const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+			const pen_t *pal = &gfx->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const UINT8 *code_base1 = gfx->get_data(code1 % gfx->elements());
 
 			/* no alpha */
@@ -552,7 +552,7 @@ void deco_mlc_state::screen_eof_mlc(screen_device &screen, bool state)
 UINT32 deco_mlc_state::screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 //  temp_bitmap->fill(0, cliprect);
-	bitmap.fill(machine().pens[0], cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
+	bitmap.fill(m_palette->pen(0), cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
 
 
 

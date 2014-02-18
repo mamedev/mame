@@ -1085,8 +1085,8 @@ static MACHINE_CONFIG_START( flstory, flstory_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_flstory)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", flstory)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",flstory,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
@@ -1142,8 +1142,8 @@ static MACHINE_CONFIG_START( onna34ro, flstory_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_flstory)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", flstory)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",flstory,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
@@ -1199,8 +1199,8 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_victnine)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", flstory)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",flstory,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,victnine)
 
@@ -1262,8 +1262,8 @@ static MACHINE_CONFIG_START( rumba, flstory_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_rumba)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", flstory)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",flstory,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,rumba)
 

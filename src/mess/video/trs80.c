@@ -582,5 +582,5 @@ static const rgb_t lnw80_palette[] =
 
 PALETTE_INIT_MEMBER(trs80_state,lnw80)
 {
-	palette_set_colors(machine(), 0, lnw80_palette, ARRAY_LENGTH(lnw80_palette));
+	palette.set_pen_colors(0, lnw80_palette, ARRAY_LENGTH(lnw80_palette));
 }

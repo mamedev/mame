@@ -497,9 +497,9 @@ static MACHINE_CONFIG_START( sprint2, sprint2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sprint2_state, screen_update_sprint2)
 	MCFG_SCREEN_VBLANK_DRIVER(sprint2_state, screen_eof_sprint2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sprint2)
-	MCFG_PALETTE_LENGTH(12)
-
+	MCFG_GFXDECODE_ADD("gfxdecode",sprint2,"palette")
+	MCFG_PALETTE_ADD("palette", 12)
+	MCFG_PALETTE_INIT_OWNER(sprint2_state, sprint2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

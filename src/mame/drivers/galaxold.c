@@ -2343,14 +2343,14 @@ static MACHINE_CONFIG_START( galaxold_base, galaxold_state )
 	MCFG_TIMER_DRIVER_ADD("int_timer", galaxold_state, galaxold_interrupt_timer)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", galaxian)
-	MCFG_PALETTE_LENGTH(32+2+64)        /* 32 for the characters, 2 for the bullets, 64 for the stars */
+	MCFG_GFXDECODE_ADD("gfxdecode",galaxian,"palette")
+	MCFG_PALETTE_ADD("palette", 32+2+64)        /* 32 for the characters, 2 for the bullets, 64 for the stars */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 
-	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,galaxold)
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,galaxold)
 
 	/* sound hardware */
@@ -2401,9 +2401,9 @@ static MACHINE_CONFIG_DERIVED( scramblb, galaxian )
 	MCFG_CPU_PROGRAM_MAP(scramblb_map)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
+	MCFG_PALETTE_ADD("palette", 32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
-	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,scrambold)
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,scrambold)
 MACHINE_CONFIG_END
 
@@ -2415,9 +2415,9 @@ static MACHINE_CONFIG_DERIVED( scramb2, galaxian )
 	MCFG_CPU_PROGRAM_MAP(scramb2_map)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
+	MCFG_PALETTE_ADD("palette", 32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
-	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,scrambold)
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,scrambold)
 MACHINE_CONFIG_END
 
@@ -2429,9 +2429,9 @@ static MACHINE_CONFIG_DERIVED( scrambler, galaxian )
 	MCFG_CPU_PROGRAM_MAP(scrambler_map)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
+	MCFG_PALETTE_ADD("palette", 32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
-	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,scrambold)
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,scrambold)
 MACHINE_CONFIG_END
 
@@ -2443,9 +2443,9 @@ static MACHINE_CONFIG_DERIVED( guttang, galaxian )
 	MCFG_CPU_PROGRAM_MAP(guttang_map)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
+	MCFG_PALETTE_ADD("palette", 32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
-//  MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,scrambold)
+//  MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
 MACHINE_CONFIG_END
 
@@ -2496,8 +2496,8 @@ static MACHINE_CONFIG_DERIVED( rockclim, galaxian )
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,rockclim)
-	MCFG_PALETTE_LENGTH(64+64+2)    /* 64 colors only, but still uses bullets so we need to keep the palette big */
-	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,rockclim)
+	MCFG_PALETTE_ADD("palette", 64+64+2)    /* 64 colors only, but still uses bullets so we need to keep the palette big */
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(64*8, 32*8)
@@ -2515,8 +2515,8 @@ static MACHINE_CONFIG_DERIVED( ozon1, galaxold_base )
 	MCFG_MACHINE_RESET_REMOVE()
 
 	/* video hardware */
-	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,rockclim)
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
+	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ozon1)
 	MCFG_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
@@ -2540,10 +2540,10 @@ static MACHINE_CONFIG_START( drivfrcg, galaxold_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 
-	MCFG_PALETTE_LENGTH(64)
-	MCFG_GFXDECODE_ADD("gfxdecode", gmgalax)
+	MCFG_PALETTE_ADD("palette", 64)
+	MCFG_GFXDECODE_ADD("gfxdecode",gmgalax,"palette")
 
-	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,rockclim)
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,drivfrcg)
 
@@ -2608,14 +2608,14 @@ static MACHINE_CONFIG_START( racknrol, galaxold_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", galaxian)
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE_ADD("gfxdecode",galaxian,"palette")
+	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 
-	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,rockclim)
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
 	/* sound hardware */
@@ -2633,7 +2633,7 @@ static MACHINE_CONFIG_START( hexpoola, galaxold_state )
 	MCFG_CPU_IO_MAP(hexpoola_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galaxian)
+	MCFG_GFXDECODE_ADD("gfxdecode",galaxian,"palette")
 	MCFG_PALETTE_LENGTH(32)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

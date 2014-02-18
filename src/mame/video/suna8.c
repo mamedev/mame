@@ -174,7 +174,7 @@ WRITE8_MEMBER( suna8_state::brickzn_banked_paletteram_w )
 		b   =   (rgb >>  4) & 0x0f;
 	}
 
-	palette_set_color_rgb(machine(),offset/2,pal4bit(r),pal4bit(g),pal4bit(b));
+	m_palette->set_pen_color(offset/2,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
 

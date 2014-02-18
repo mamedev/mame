@@ -677,8 +677,8 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_psychic5)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", psychic5)
-	MCFG_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE_ADD("gfxdecode",psychic5,"palette")
+	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,psychic5)
 	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
@@ -722,8 +722,8 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_bombsa)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bombsa)
-	MCFG_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE_ADD("gfxdecode",bombsa,"palette")
+	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,bombsa)
 	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,bombsa)

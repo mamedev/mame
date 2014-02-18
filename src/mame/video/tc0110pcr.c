@@ -108,7 +108,7 @@ void tc0110pcr_device::restore_colors()
 			}
 		}
 
-		palette_set_color(machine(), i + (m_pal_offs << 12), MAKE_RGB(r, g, b));
+		m_palette->set_pen_color(i + (m_pal_offs << 12), MAKE_RGB(r, g, b));
 	}
 }
 
@@ -139,7 +139,7 @@ WRITE16_MEMBER(tc0110pcr_device::word_w )
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			palette_set_color_rgb(space.machine(), m_addr, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+			m_palette->set_pen_color(m_addr, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 			break;
 
 		default:
@@ -160,7 +160,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_word_w )
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			palette_set_color_rgb(space.machine(), m_addr + (m_pal_offs << 12), pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+			m_palette->set_pen_color(m_addr + (m_pal_offs << 12), pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 			break;
 
 		default:
@@ -183,7 +183,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_rbswap_word_w )
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			palette_set_color_rgb(space.machine(), m_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+			m_palette->set_pen_color(m_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 			break;
 
 		default:
@@ -206,7 +206,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_4bpg_word_w )
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			palette_set_color_rgb(space.machine(), m_addr, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
+			m_palette->set_pen_color(m_addr, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
 			break;
 
 		default:

@@ -172,7 +172,7 @@ UINT32 jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_ind1
 }
 
 
-void jokrwild_state::palette_init()
+PALETTE_INIT_MEMBER(jokrwild_state, jokrwild)
 {
 	//missing proms
 }
@@ -474,8 +474,8 @@ static MACHINE_CONFIG_START( jokrwild, jokrwild_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 26*8-1)    /* From MC6845, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(jokrwild_state, screen_update_jokrwild)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jokrwild)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",jokrwild,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16, mc6845_intf) /* guess */
 

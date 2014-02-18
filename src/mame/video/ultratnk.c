@@ -9,28 +9,26 @@ Atari Ultra Tank video emulation
 #include "audio/sprint4.h"
 
 
-void ultratnk_state::palette_init()
+PALETTE_INIT_MEMBER(ultratnk_state, ultratnk)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 4);
 
-	colortable_palette_set_color(machine().colortable, 0, MAKE_RGB(0x00, 0x00, 0x00));
-	colortable_palette_set_color(machine().colortable, 1, MAKE_RGB(0xa4, 0xa4, 0xa4));
-	colortable_palette_set_color(machine().colortable, 2, MAKE_RGB(0x5b, 0x5b, 0x5b));
-	colortable_palette_set_color(machine().colortable, 3, MAKE_RGB(0xff, 0xff, 0xff));
+	palette.set_indirect_color(0, MAKE_RGB(0x00, 0x00, 0x00));
+	palette.set_indirect_color(1, MAKE_RGB(0xa4, 0xa4, 0xa4));
+	palette.set_indirect_color(2, MAKE_RGB(0x5b, 0x5b, 0x5b));
+	palette.set_indirect_color(3, MAKE_RGB(0xff, 0xff, 0xff));
 
-	colortable_entry_set_value(machine().colortable, 0, color_prom[0x00] & 3);
-	colortable_entry_set_value(machine().colortable, 2, color_prom[0x00] & 3);
-	colortable_entry_set_value(machine().colortable, 4, color_prom[0x00] & 3);
-	colortable_entry_set_value(machine().colortable, 6, color_prom[0x00] & 3);
-	colortable_entry_set_value(machine().colortable, 8, color_prom[0x00] & 3);
+	palette.set_pen_indirect(0, color_prom[0x00] & 3);
+	palette.set_pen_indirect(2, color_prom[0x00] & 3);
+	palette.set_pen_indirect(4, color_prom[0x00] & 3);
+	palette.set_pen_indirect(6, color_prom[0x00] & 3);
+	palette.set_pen_indirect(8, color_prom[0x00] & 3);
 
-	colortable_entry_set_value(machine().colortable, 1, color_prom[0x01] & 3);
-	colortable_entry_set_value(machine().colortable, 3, color_prom[0x02] & 3);
-	colortable_entry_set_value(machine().colortable, 5, color_prom[0x04] & 3);
-	colortable_entry_set_value(machine().colortable, 7, color_prom[0x08] & 3);
-	colortable_entry_set_value(machine().colortable, 9, color_prom[0x10] & 3);
+	palette.set_pen_indirect(1, color_prom[0x01] & 3);
+	palette.set_pen_indirect(3, color_prom[0x02] & 3);
+	palette.set_pen_indirect(5, color_prom[0x04] & 3);
+	palette.set_pen_indirect(7, color_prom[0x08] & 3);
+	palette.set_pen_indirect(9, color_prom[0x10] & 3);
 }
 
 
@@ -94,7 +92,7 @@ void ultratnk_state::screen_eof_ultratnk(screen_device &screen, bool state)
 	if (state)
 	{
 		int i;
-		UINT16 BG = colortable_entry_get_value(machine().colortable, 0);
+		UINT16 BG = m_palette->pen_indirect(0);
 		UINT8 *videoram = m_videoram;
 
 		/* check for sprite-playfield collisions */
@@ -133,7 +131,7 @@ void ultratnk_state::screen_eof_ultratnk(screen_device &screen, bool state)
 
 			for (y = rect.min_y; y <= rect.max_y; y++)
 				for (x = rect.min_x; x <= rect.max_x; x++)
-					if (colortable_entry_get_value(machine().colortable, m_helper.pix16(y, x)) != BG)
+					if (m_palette->pen_indirect(m_helper.pix16(y, x)) != BG)
 						m_collision[i] = 1;
 		}
 

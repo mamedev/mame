@@ -1719,14 +1719,14 @@ static MACHINE_CONFIG_FRAGMENT( superpac_common )
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,superpac)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", superpac)
-	MCFG_PALETTE_LENGTH(64*4+64*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",superpac,"palette")
+	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_superpac)
 
-	MCFG_PALETTE_INIT_OVERRIDE(mappy_state,superpac)
+	MCFG_PALETTE_INIT_OWNER(mappy_state,superpac)
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,superpac)
 
 	/* sound hardware */
@@ -1799,14 +1799,14 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_NAMCO56XX_ADD("namcoio_2", intf1_interleave)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", phozon)
-	MCFG_PALETTE_LENGTH(64*4+64*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",phozon,"palette")
+	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_phozon)
 
-	MCFG_PALETTE_INIT_OVERRIDE(mappy_state,phozon)
+	MCFG_PALETTE_INIT_OWNER(mappy_state,phozon)
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,phozon)
 
 	/* sound hardware */
@@ -1836,14 +1836,14 @@ static MACHINE_CONFIG_FRAGMENT( mappy_common )
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,mappy)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", mappy)
-	MCFG_PALETTE_LENGTH(64*4+16*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",mappy,"palette")
+	MCFG_PALETTE_ADD("palette", 64*4+16*16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_mappy)
 
-	MCFG_PALETTE_INIT_OVERRIDE(mappy_state,mappy)
+	MCFG_PALETTE_INIT_OWNER(mappy_state,mappy)
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,mappy)
 
 	/* sound hardware */

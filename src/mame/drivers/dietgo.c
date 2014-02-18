@@ -229,8 +229,8 @@ static MACHINE_CONFIG_START( dietgo, dietgo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dietgo_state, screen_update_dietgo)
 
-	MCFG_PALETTE_LENGTH(1024)
-	MCFG_GFXDECODE_ADD("gfxdecode", dietgo)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",dietgo,"palette")
 
 	MCFG_DECOCOMN_ADD("deco_common")
 

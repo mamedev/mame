@@ -199,8 +199,8 @@ static MACHINE_CONFIG_START( labyrunr, labyrunr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(labyrunr_state, screen_update_labyrunr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", labyrunr)
-	MCFG_PALETTE_LENGTH(2*8*16*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",labyrunr,"palette")
+	MCFG_PALETTE_ADD("palette", 2*8*16*16)
 
 
 	MCFG_K007121_ADD("k007121")

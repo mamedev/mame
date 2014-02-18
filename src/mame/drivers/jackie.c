@@ -207,7 +207,7 @@ UINT32 jackie_state::screen_update_jackie(screen_device &screen, bitmap_ind16 &b
 	int startclipmin = 0;
 	const rectangle &visarea = screen.visible_area();
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	for (i=0;i < 0x40;i++)
 	{
@@ -589,8 +589,8 @@ static MACHINE_CONFIG_START( jackie, jackie_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jackie_state, screen_update_jackie)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jackie)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",jackie,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */

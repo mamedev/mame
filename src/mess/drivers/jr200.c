@@ -200,7 +200,7 @@ UINT32 jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &bit
 						pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1) ? (attr & 0x7) : ((attr & 0x38) >> 3);
 					}
 
-					bitmap.pix16(y*8+yi+16, x*8+xi+16) = machine().pens[pen];
+					bitmap.pix16(y*8+yi+16, x*8+xi+16) = m_palette->pen(pen);
 				}
 			}
 		}
@@ -493,12 +493,12 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT CTRL") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 INPUT_PORTS_END
 
-void jr200_state::palette_init()
+PALETTE_INIT_MEMBER(jr200_state, jr200)
 {
 	int i;
 
 	for (i = 0; i < 8; i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
 static const gfx_layout tiles8x8_layout =
@@ -555,8 +555,8 @@ static MACHINE_CONFIG_START( jr200, jr200_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 16 + 256 + 16 - 1, 0, 16 + 192 + 16 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(jr200_state, screen_update_jr200)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jr200)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_GFXDECODE_ADD("gfxdecode",jr200,"palette")
+	MCFG_PALETTE_ADD("palette", 8)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

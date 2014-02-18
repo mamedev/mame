@@ -629,7 +629,7 @@ static MACHINE_CONFIG_START( ddealer, ddealer_state )
 	// M50747 or NMK-110 8131 MCU
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ddealer)
+	MCFG_GFXDECODE_ADD("gfxdecode",ddealer,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -638,7 +638,7 @@ static MACHINE_CONFIG_START( ddealer, ddealer_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddealer_state, screen_update_ddealer)
 
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_PALETTE_ADD("palette", 0x400)
 
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", ddealer_state, ddealer_mcu_sim, attotime::from_hz(10000))

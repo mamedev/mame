@@ -368,6 +368,8 @@ static MACHINE_CONFIG_START( turrett, turrett_state )
 	MCFG_PALETTE_LENGTH(32768)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRRR_GGGGG_BBBBB)
 
+	MCFG_PALETTE_ADD("palette", 0x2000)
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

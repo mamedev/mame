@@ -354,7 +354,7 @@ static MACHINE_CONFIG_START( spool99, spool99_state )
 	MCFG_CPU_PROGRAM_MAP(spool99_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spool99_state,  irq0_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", spool99)
+	MCFG_GFXDECODE_ADD("gfxdecode",spool99,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( spool99, spool99_state )
 	MCFG_SCREEN_VISIBLE_AREA(7*8, 55*8-1, 1*8, 31*8-1) //384x240,raw guess
 	MCFG_SCREEN_UPDATE_DRIVER(spool99_state, screen_update_spool99)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

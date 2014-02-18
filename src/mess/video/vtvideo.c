@@ -122,8 +122,8 @@ void vt100_video_device::device_start()
 
 void vt100_video_device::device_reset()
 {
-	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine(), 1, 0xff, 0xff, 0xff); // white
+	m_palette->set_pen_color(0, 0x00, 0x00, 0x00); // black
+	m_palette->set_pen_color(1, 0xff, 0xff, 0xff); // white
 
 	m_height = 25;
 	m_height_MAX = 25;
@@ -349,7 +349,7 @@ WRITE8_MEMBER( vt100_video_device::dc011_w )
 
 WRITE8_MEMBER( vt100_video_device::brightness_w )
 {
-	//palette_set_color_rgb(machine(), 1, data, data, data);
+	//m_palette->set_pen_color(1, data, data, data);
 }
 
 

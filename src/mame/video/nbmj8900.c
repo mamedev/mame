@@ -33,7 +33,7 @@ WRITE8_MEMBER(nbmj8900_state::nbmj8900_palette_type1_w)
 	g = ((m_palette[offset + 1] & 0xf0) >> 4);
 	b = ((m_palette[offset + 1] & 0x0f) >> 0);
 
-	palette_set_color_rgb(machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 #ifdef UNUSED_FUNCTION
@@ -56,7 +56,7 @@ WRITE8_MEMBER(nbmj8900_state::nbmj8900_palette_type2_w)
 	g = ((m_palette[offset + 0x000] & 0xf0) >> 4);
 	b = ((m_palette[offset + 0x100] & 0x0f) >> 0);
 
-	palette_set_color_rgb(machine(), (offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
+	m_palette->set_pen_color((offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 READ8_MEMBER(nbmj8900_state::nbmj8900_palette_type3_r)
@@ -78,7 +78,7 @@ WRITE8_MEMBER(nbmj8900_state::nbmj8900_palette_type3_w)
 	g = ((m_palette[offset + 0] & 0xf0) >> 4);
 	b = ((m_palette[offset + 0] & 0x0f) >> 0);
 
-	palette_set_color_rgb(machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 #endif
 
@@ -186,13 +186,13 @@ void nbmj8900_state::nbmj8900_vramflip(int vram)
 void nbmj8900_state::update_pixel0(int x, int y)
 {
 	UINT8 color = m_videoram0[(y * m_screen_width) + x];
-	m_tmpbitmap0.pix16(y, x) = machine().pens[color];
+	m_tmpbitmap0.pix16(y, x) = m_palette->pen(color);
 }
 
 void nbmj8900_state::update_pixel1(int x, int y)
 {
 	UINT8 color = m_videoram1[(y * m_screen_width) + x];
-	m_tmpbitmap1.pix16(y, x) = machine().pens[color];
+	m_tmpbitmap1.pix16(y, x) = m_palette->pen(color);
 }
 
 void nbmj8900_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -375,7 +375,7 @@ void nbmj8900_state::video_start()
 	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
 	memset(m_videoram0, 0xff, (m_screen_width * m_screen_height * sizeof(UINT8)));
 	memset(m_videoram1, 0xff, (m_screen_width * m_screen_height * sizeof(UINT8)));
-//  machine().pens[0x07f] = 0xff;    /* palette_transparent_pen */
+//  m_palette->pen(0x07f) = 0xff;    /* palette_transparent_pen */
 	m_gfxdraw_mode = 1;
 }
 

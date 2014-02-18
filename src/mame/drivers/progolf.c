@@ -149,7 +149,7 @@ UINT32 progolf_state::screen_update_progolf(screen_device &screen, bitmap_ind16 
 						color = m_fg_fb[(xi+yi*8)+count*0x40];
 
 						if(color != 0 && cliprect.contains(x+yi, 256-y+xi))
-							bitmap.pix16(x+yi, 256-y+xi) = machine().pens[(color & 0x7)];
+							bitmap.pix16(x+yi, 256-y+xi) = m_palette->pen((color & 0x7));
 					}
 				}
 
@@ -392,12 +392,12 @@ static MC6845_INTERFACE( mc6845_intf )
 
 };
 
-void progolf_state::palette_init()
+PALETTE_INIT_MEMBER(progolf_state, progolf)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < m_palette->entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -417,7 +417,7 @@ void progolf_state::palette_init()
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		m_palette->set_pen_color(i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -439,8 +439,8 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(progolf_state, screen_update_progolf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", progolf)
-	MCFG_PALETTE_LENGTH(32*3)
+	MCFG_GFXDECODE_ADD("gfxdecode",progolf,"palette")
+	MCFG_PALETTE_ADD("palette", 32*3)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 3000000/4, mc6845_intf) /* hand tuned to get ~57 fps */
 

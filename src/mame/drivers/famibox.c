@@ -516,9 +516,9 @@ static const nesapu_interface famibox_interface_1 =
 	"maincpu"
 };
 
-void famibox_state::palette_init()
+PALETTE_INIT_MEMBER(famibox_state, famibox)
 {
-	m_ppu->init_palette(machine(), 0);
+	m_ppu->init_palette(palette, 0);
 }
 
 void famibox_state::ppu_irq(int *ppu_regs)
@@ -591,8 +591,8 @@ static MACHINE_CONFIG_START( famibox, famibox_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(famibox_state, screen_update_famibox)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", famibox)
-	MCFG_PALETTE_LENGTH(8*4*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",famibox,"palette")
+	MCFG_PALETTE_ADD("palette", 8*4*16)
 
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)

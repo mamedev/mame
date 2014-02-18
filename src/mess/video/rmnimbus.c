@@ -562,7 +562,7 @@ void rmnimbus_state::change_palette(UINT8 bank, UINT16 colours, UINT8 regno)
 	for(colourno=first; colourno<(first+colourmax); colourno++)
 	{
 		paletteidx=(colours & mask) >> shifts;
-		palette_set_color_rgb(machine(), colourno, nimbus_palette[paletteidx][RED], nimbus_palette[paletteidx][GREEN], nimbus_palette[paletteidx][BLUE]);
+		m_palette->set_pen_color(colourno, nimbus_palette[paletteidx][RED], nimbus_palette[paletteidx][GREEN], nimbus_palette[paletteidx][BLUE]);
 
 		if(DEBUG_SET(DEBUG_TEXT))
 			logerror("set colourno[%02X](r,g,b)=(%02X,%02X,%02X), paletteidx=%02X\n",colourno, nimbus_palette[paletteidx][RED], nimbus_palette[paletteidx][GREEN], nimbus_palette[paletteidx][BLUE],paletteidx);

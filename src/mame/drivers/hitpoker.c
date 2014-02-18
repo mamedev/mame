@@ -181,7 +181,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_paletteram_w)
 	g = ((datax)&0x07e0)>>5;
 	r = ((datax)&0x001f)>>0;
 
-	palette_set_color_rgb(machine(), offset, pal5bit(r), pal6bit(g), pal5bit(b));
+	m_palette->set_pen_color(offset, pal5bit(r), pal6bit(g), pal5bit(b));
 }
 
 READ8_MEMBER(hitpoker_state::rtc_r)
@@ -510,8 +510,8 @@ static MACHINE_CONFIG_START( hitpoker, hitpoker_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", CRTC_CLOCK/2, mc6845_intf)  /* hand tuned to get ~60 fps */
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hitpoker)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_GFXDECODE_ADD("gfxdecode",hitpoker,"palette")
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

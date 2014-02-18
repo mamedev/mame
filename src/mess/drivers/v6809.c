@@ -339,9 +339,8 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
-	MCFG_GFXDECODE_ADD("gfxdecode", v6809)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",v6809,"palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

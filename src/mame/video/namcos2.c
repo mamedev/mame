@@ -378,7 +378,7 @@ namcos2_state::update_palette()
 			int r = m_paletteram[offset | 0x0000] & 0x00ff;
 			int g = m_paletteram[offset | 0x0800] & 0x00ff;
 			int b = m_paletteram[offset | 0x1000] & 0x00ff;
-			palette_set_color(machine(),pen++,MAKE_RGB(r,g,b));
+			m_palette->set_pen_color(pen++,MAKE_RGB(r,g,b));
 			offset++;
 		}
 	}
@@ -421,7 +421,7 @@ UINT32 namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	int pri;
 
 	update_palette();
-	bitmap.fill(get_black_pen(machine()), cliprect );
+	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 
 	/* HACK: enable ROZ layer only if it has priority > 0 */
@@ -457,7 +457,7 @@ UINT32 namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16
 	int pri;
 
 	update_palette();
-	bitmap.fill(get_black_pen(machine()), cliprect );
+	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -490,7 +490,7 @@ UINT32 namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16
 	int pri;
 
 	update_palette();
-	bitmap.fill(get_black_pen(machine()), cliprect );
+	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -523,7 +523,7 @@ UINT32 namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 
 	int pri;
 
 	update_palette();
-	bitmap.fill(get_black_pen(machine()), cliprect );
+	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 
 	for( pri=0; pri<8; pri++ )
@@ -549,7 +549,7 @@ UINT32 namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16
 	int pri;
 
 	update_palette();
-	bitmap.fill(get_black_pen(machine()), cliprect );
+	bitmap.fill(m_palette->black_pen(), cliprect );
 	apply_clip( clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )

@@ -148,7 +148,7 @@ UINT32 deadang_state::screen_update_deadang(screen_device &screen, bitmap_ind16 
 	m_pf2_layer->enable(!(m_scroll_ram[0x34]&4));
 	flip_screen_set(m_scroll_ram[0x34]&0x40 );
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 	m_pf3_layer->draw(screen, bitmap, cliprect, 0,1);
 	m_pf1_layer->draw(screen, bitmap, cliprect, 0,2);

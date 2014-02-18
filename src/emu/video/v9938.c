@@ -249,7 +249,7 @@ PALETTE_INIT_MEMBER(v99x8_device, v9938)
 
 	// create the full 512 colour palette
 	for (i=0;i<512;i++)
-		palette_set_color_rgb(machine(), i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
+		palette.set_pen_color(i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
 }
 
 /*
@@ -273,7 +273,7 @@ PALETTE_INIT_MEMBER(v9958_device, v9958)
 	// init v9938 512-color palette
 	PALETTE_INIT_CALL_MEMBER(v9938);
 
-	if(machine().total_colors() != 19780)
+	if(palette.entries() != 19780)
 		fatalerror("V9958: not enough palette, must be 19780");
 
 	// set up YJK table
@@ -312,7 +312,7 @@ PALETTE_INIT_MEMBER(v9958_device, v9958)
 			pal[i*3+0] = r;
 			pal[i*3+1] = g;
 			pal[i*3+2] = b;
-			palette_set_color(machine(), i+512, MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b)));
+			palette.set_pen_color(i+512, MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b)));
 			v99x8_device::s_pal_indYJK[y | j << 5 | k << (5 + 6)] = i + 512;
 			i++;
 		}
@@ -3259,7 +3259,7 @@ void v99x8_device::update_command()
 }
 
 static MACHINE_CONFIG_FRAGMENT( v9938 )
-	MCFG_PALETTE_INIT_OVERRIDE(v9938_device, v9938)
+	MCFG_PALETTE_INIT_OWNER(v9938_device, v9938)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -3273,7 +3273,7 @@ machine_config_constructor v9938_device::device_mconfig_additions() const
 }
 
 static MACHINE_CONFIG_FRAGMENT( v9958 )
-	MCFG_PALETTE_INIT_OVERRIDE(v9958_device, v9958)
+	MCFG_PALETTE_INIT_OWNER(v9958_device, v9958)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

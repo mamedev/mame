@@ -29,9 +29,6 @@ PALETTE_INIT_MEMBER(cvs_state,cvs)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i, attr;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x10);
-
 	/* color mapping PROM */
 	for (attr = 0; attr < 0x100; attr++)
 	{
@@ -42,25 +39,25 @@ PALETTE_INIT_MEMBER(cvs_state,cvs)
 			/* bits 0 and 2 are swapped */
 			ctabentry = BITSWAP8(ctabentry,7,6,5,4,3,0,1,2);
 
-			colortable_entry_set_value(machine().colortable, (attr << 3) | i, ctabentry);
+			palette.set_pen_indirect((attr << 3) | i, ctabentry);
 		}
 	}
 
 	/* background collision map */
 	for (i = 0; i < 8; i++)
 	{
-		colortable_entry_set_value(machine().colortable, 0x800 + i, 0);
-		colortable_entry_set_value(machine().colortable, 0x808 + i, i & 0x04);
-		colortable_entry_set_value(machine().colortable, 0x810 + i, i & 0x02);
-		colortable_entry_set_value(machine().colortable, 0x818 + i, i & 0x06);
+		palette.set_pen_indirect(0x800 + i, 0);
+		palette.set_pen_indirect(0x808 + i, i & 0x04);
+		palette.set_pen_indirect(0x810 + i, i & 0x02);
+		palette.set_pen_indirect(0x818 + i, i & 0x06);
 	}
 
 	/* sprites */
 	for (i = 0; i < 8; i++)
-		colortable_entry_set_value(machine().colortable, SPRITE_PEN_BASE + i, i | 0x08);
+		palette.set_pen_indirect(SPRITE_PEN_BASE + i, i | 0x08);
 
 	/* bullet */
-	colortable_entry_set_value(machine().colortable, BULLET_STAR_PEN, 7);
+	palette.set_pen_indirect(BULLET_STAR_PEN, 7);
 }
 
 
@@ -74,7 +71,7 @@ void cvs_state::set_pens(  )
 		int g = pal3bit(~m_palette_ram[i] >> 2);
 		int b = pal3bit(~m_palette_ram[i] >> 5);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		m_palette->set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -212,7 +209,7 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 					m_collision_register |= 0x08;
 
 				/* Bullet/Background Collision */
-				if (colortable_entry_get_value(machine().colortable, m_scrolled_collision_background.pix16(offs, bx)))
+				if (m_palette->pen_indirect(m_scrolled_collision_background.pix16(offs, bx)))
 					m_collision_register |= 0x80;
 
 				bitmap.pix16(offs, bx) = BULLET_STAR_PEN;
@@ -247,7 +244,7 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x04;
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(machine().colortable, m_scrolled_collision_background.pix16(y, x)))
+					if (m_palette->pen_indirect(m_scrolled_collision_background.pix16(y, x)))
 					{
 						if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x10;
 						if (S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x20;
@@ -330,7 +327,7 @@ void cvs_state::cvs_update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect
 				y = ~y;
 
 			if ((y >= cliprect.min_y) && (y <= cliprect.max_y) &&
-				(update_always || (colortable_entry_get_value(machine().colortable, bitmap.pix16(y, x)) == 0)))
+				(update_always || (m_palette->pen_indirect(bitmap.pix16(y, x)) == 0)))
 				bitmap.pix16(y, x) = star_pen;
 		}
 	}

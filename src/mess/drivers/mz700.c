@@ -339,8 +339,8 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 40*8, 312, 0, 25*8)
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz700)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mz700)
-	MCFG_PALETTE_LENGTH(256*2)
+	MCFG_GFXDECODE_ADD("gfxdecode",mz700,"palette")
+	MCFG_PALETTE_ADD("palette", 256*2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

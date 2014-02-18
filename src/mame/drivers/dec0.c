@@ -1307,8 +1307,8 @@ WRITE_LINE_MEMBER(dec0_state::sound_irq2)
 
 
 static MACHINE_CONFIG_START( dec0_base, dec0_state )
-	MCFG_GFXDECODE_ADD("gfxdecode", dec0)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",dec0,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,0,0);
@@ -1429,8 +1429,8 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 	deco_mxc06_device::set_gfx_region(*device, 3);
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
-	MCFG_PALETTE_LENGTH(1024)
-	MCFG_GFXDECODE_ADD("gfxdecode", automat)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",automat,"palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1485,8 +1485,8 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 	deco_mxc06_device::set_gfx_region(*device, 3);
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
-	MCFG_PALETTE_LENGTH(1024)
-	MCFG_GFXDECODE_ADD("gfxdecode", secretab)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",secretab,"palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

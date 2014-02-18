@@ -344,7 +344,7 @@ WRITE8_MEMBER(peplus_state::peplus_bgcolor_w)
 {
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < m_palette->entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -366,7 +366,7 @@ WRITE8_MEMBER(peplus_state::peplus_bgcolor_w)
 		bit2 = 0;
 		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
-		palette_set_color(machine(), (15 + (i*16)), MAKE_RGB(r, g, b));
+		m_palette->set_pen_color((15 + (i*16)), MAKE_RGB(r, g, b));
 	}
 }
 
@@ -995,7 +995,7 @@ UINT32 peplus_state::screen_update_peplus(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-void peplus_state::palette_init()
+PALETTE_INIT_MEMBER(peplus_state, peplus)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	UINT32 proms_size = memregion("proms")->bytes();
@@ -1007,7 +1007,7 @@ void peplus_state::palette_init()
 */
 	int i;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -1029,7 +1029,7 @@ void peplus_state::palette_init()
 		bit2 = 0;
 		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -1341,8 +1341,8 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(peplus_state, screen_update_peplus)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", peplus)
-	MCFG_PALETTE_LENGTH(16*16*2)
+	MCFG_GFXDECODE_ADD("gfxdecode",peplus,"palette")
+	MCFG_PALETTE_ADD("palette", 16*16*2)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", MC6845_CLOCK, mc6845_intf)
 	MCFG_X2404P_ADD("i2cmem")

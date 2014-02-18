@@ -281,9 +281,9 @@ void cham24_state::machine_reset()
 {
 }
 
-void cham24_state::palette_init()
+PALETTE_INIT_MEMBER(cham24_state, cham24)
 {
-	m_ppu->init_palette(machine(), 0);
+	m_ppu->init_palette(palette, 0);
 }
 
 void cham24_state::ppu_irq(int *ppu_regs)
@@ -357,8 +357,8 @@ static MACHINE_CONFIG_START( cham24, cham24_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cham24_state, screen_update_cham24)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cham24)
-	MCFG_PALETTE_LENGTH(8*4*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",cham24,"palette")
+	MCFG_PALETTE_ADD("palette", 8*4*16)
 
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)

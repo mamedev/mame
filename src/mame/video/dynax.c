@@ -32,14 +32,14 @@ PALETTE_INIT_MEMBER(dynax_state,sprtmtch)
 	if (!color_prom)
 		return;
 
-	for (int i = 0; i < machine().total_colors(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		int x = (color_prom[i] << 8) + color_prom[0x200 + i];
 		/* The bits are in reverse order! */
 		int r = BITSWAP8((x >>  0) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
 		int g = BITSWAP8((x >>  5) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
 		int b = BITSWAP8((x >> 10) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
-		palette_set_color_rgb(machine(), i, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -50,14 +50,14 @@ PALETTE_INIT_MEMBER(dynax_state,janyuki)
 	if (!color_prom)
 		return;
 
-	for (int i = 0; i < machine().total_colors(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		int x = (color_prom[i] << 8) + color_prom[0x200 + i];
 		/* The bits are in reverse order! */
 		int r = BITSWAP8((x >>  0) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
 		int g = BITSWAP8((x >>  5) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
 		int b = BITSWAP8((x >> 10) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
-		palette_set_color_rgb(machine(), i, pal4bit(r), pal4bit(g), pal4bit(b));
+		palette.set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 

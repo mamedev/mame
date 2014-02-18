@@ -226,7 +226,6 @@ public:
 
 	// configuration helpers
 	device_t &add_dynamic_device(device_t &owner, device_type type, const char *tag, UINT32 clock);
-	UINT32 total_colors() const { return m_config.m_total_colors; }
 
 	// immediate operations
 	int run(bool firstrun);
@@ -269,18 +268,11 @@ public:
 
 	// video-related information
 	screen_device *         primary_screen;     // the primary screen device, or NULL if screenless
-	palette_t *             palette;            // global palette object
-
-	// palette-related information
-	const pen_t *           pens;               // remapped palette pen numbers
-	colortable_t *          colortable;         // global colortable for remapping
-	pen_t *                 shadow_table;       // table for looking up a shadowed pen
 
 	// debugger-related information
 	UINT32                  debug_flags;        // the current debug flags
 
 	// internal core information
-	palette_private *       palette_data;       // internal data from palette.c
 	romload_private *       romload_data;       // internal data from romload.c
 	ui_input_private *      ui_input_data;      // internal data from uiinput.c
 	debugcpu_private *      debugcpu_data;      // internal data from debugcpu.c

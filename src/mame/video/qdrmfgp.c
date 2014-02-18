@@ -54,7 +54,7 @@ VIDEO_START_MEMBER(qdrmfgp_state,qdrmfgp2)
 
 UINT32 qdrmfgp_state::screen_update_qdrmfgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);

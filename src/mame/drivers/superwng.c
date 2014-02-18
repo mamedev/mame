@@ -174,12 +174,12 @@ static const UINT8 superwng_colors[]= /* temporary */
 	0x00, 0xc0, 0x07, 0x3f, 0x00, 0x1f, 0x3f, 0xff, 0x00, 0x86, 0x05, 0xff, 0x00, 0xc0, 0xe8, 0xff
 };
 
-void superwng_state::palette_init()
+PALETTE_INIT_MEMBER(superwng_state, superwng)
 {
 	int i;
 	const UINT8 * ptr=superwng_colors;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -197,7 +197,7 @@ void superwng_state::palette_init()
 		bit1 = BIT(*ptr, 7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 		++ptr;
 	}
 }
@@ -479,9 +479,9 @@ static MACHINE_CONFIG_START( superwng, superwng_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(superwng_state, screen_update_superwng)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", superwng)
+	MCFG_GFXDECODE_ADD("gfxdecode",superwng,"palette")
 
-	MCFG_PALETTE_LENGTH(0x40)
+	MCFG_PALETTE_ADD("palette", 0x40)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

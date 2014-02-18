@@ -20,11 +20,11 @@
 
 ***************************************************************************/
 
-void blueprnt_state::palette_init()
+PALETTE_INIT_MEMBER(blueprnt_state, blueprnt)
 {
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		UINT8 pen;
 		int r, g, b;
@@ -42,7 +42,7 @@ void blueprnt_state::palette_init()
 		g = ((pen >> 2) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
 		b = ((pen >> 1) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -160,7 +160,7 @@ UINT32 blueprnt_state::screen_update_blueprnt(screen_device &screen, bitmap_ind1
 		for (i = 0; i < 32; i++)
 			m_bg_tilemap->set_scrolly(i, m_scrollram[30 - i]);
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);

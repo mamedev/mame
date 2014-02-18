@@ -287,9 +287,10 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(rollerg_state, screen_update_rollerg)
 
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	
 	MCFG_K053244_ADD("k053244", rollerg_k05324x_intf)
 	MCFG_K053244_GFXDECODE("gfxdecode")

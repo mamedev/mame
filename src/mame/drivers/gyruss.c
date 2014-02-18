@@ -534,8 +534,8 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(gyruss_state, screen_update_gyruss)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gyruss)
-	MCFG_PALETTE_LENGTH(16*4+16*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",gyruss,"palette")
+	MCFG_PALETTE_ADD("palette", 16*4+16*16)
 
 
 	/* sound hardware */

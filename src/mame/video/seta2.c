@@ -474,7 +474,7 @@ VIDEO_START_MEMBER(seta2_state,seta2_yoffset)
 UINT32 seta2_state::screen_update_seta2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Black or pen 0?
-	bitmap.fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	if ( (m_vregs[0x30/2] & 1) == 0 )   // 1 = BLANK SCREEN
 		draw_sprites(bitmap, cliprect);

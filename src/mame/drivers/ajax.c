@@ -228,9 +228,10 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(ajax_state, screen_update_ajax)
 
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 
 	MCFG_K052109_ADD("k052109", ajax_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")

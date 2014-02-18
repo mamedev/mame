@@ -184,7 +184,7 @@ static INPUT_PORTS_START( lola8a )
 INPUT_PORTS_END
 
 
-void lola8a_state::palette_init()
+PALETTE_INIT_MEMBER(lola8a_state, lola8a)
 {
 	int i;
 

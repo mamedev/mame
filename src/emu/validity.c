@@ -703,14 +703,13 @@ void validity_checker::validate_display()
 {
 	// iterate over screen devices looking for paletted screens
 	screen_device_iterator iter(m_current_config->root_device());
-	bool palette_modes = false;
 	for (const screen_device *scrconfig = iter.first(); scrconfig != NULL; scrconfig = iter.next())
 		if (scrconfig->format() == BITMAP_FORMAT_IND16)
-			palette_modes = true;
-
-	// check for empty palette
-	if (palette_modes && m_current_config->m_total_colors == 0)
-		mame_printf_error("Driver has zero palette entries but uses a palette-based bitmap format\n");
+		{
+			// check for empty palette
+			//if (scrconfig->palette()->entries() == 0)
+//				mame_printf_error("Driver has zero palette entries but uses a palette-based bitmap format\n");
+		}
 }
 
 

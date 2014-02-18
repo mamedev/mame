@@ -450,7 +450,7 @@ static MACHINE_CONFIG_START( drill, _2mindril_state )
 	MCFG_CPU_PROGRAM_MAP(drill_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _2mindril_state,  drill_vblank_irq)
 	//MCFG_CPU_PERIODIC_INT_DRIVER(_2mindril_state, drill_device_irq, 60)
-	MCFG_GFXDECODE_ADD("gfxdecode", 2mindril)
+	MCFG_GFXDECODE_ADD("gfxdecode",2mindril,"palette")
 
 	MCFG_MACHINE_START_OVERRIDE(_2mindril_state,drill)
 	MCFG_MACHINE_RESET_OVERRIDE(_2mindril_state,drill)
@@ -463,7 +463,7 @@ static MACHINE_CONFIG_START( drill, _2mindril_state )
 	MCFG_SCREEN_UPDATE_DRIVER(_2mindril_state, screen_update_f3)
 	MCFG_SCREEN_VBLANK_DRIVER(_2mindril_state, screen_eof_f3)
 
-	MCFG_PALETTE_LENGTH(0x2000)
+	MCFG_PALETTE_ADD("palette", 0x2000)
 
 	MCFG_VIDEO_START_OVERRIDE(_2mindril_state,f3)
 

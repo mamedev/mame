@@ -46,7 +46,7 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_w)
 		g |= ((i & 2) >> 1);
 		r |= (i & 1);
 
-		palette_set_color_rgb(machine(), offset / 2, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color(offset / 2, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -290,7 +290,7 @@ void tc0091lvc_device::device_start()
 
 	//printf("m_gfx_index %d\n", m_gfx_index);
 
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), char_layout, (UINT8 *)m_pcg_ram, machine().total_colors() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), m_palette, char_layout, (UINT8 *)m_pcg_ram, m_palette->entries() / 16, 0)));
 }
 
 void tc0091lvc_device::device_reset()
@@ -339,7 +339,7 @@ UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	int x,y;
 	UINT8 global_flip;
 
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if((m_vregs[4] & 0x20) == 0)
 		return 0;

@@ -730,10 +730,10 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatsc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", combatsc)
-	MCFG_PALETTE_LENGTH(8*16*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",combatsc,"palette")
+	MCFG_PALETTE_ADD("palette", 8*16*16)
 
-	MCFG_PALETTE_INIT_OVERRIDE(combatsc_state,combatsc)
+	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatsc)
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatsc)
 
 	MCFG_K007121_ADD("k007121_1")
@@ -781,10 +781,10 @@ static MACHINE_CONFIG_START( combatscb, combatsc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatscb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", combatscb)
-	MCFG_PALETTE_LENGTH(8*16*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",combatscb,"palette")
+	MCFG_PALETTE_ADD("palette", 8*16*16)
 
-	MCFG_PALETTE_INIT_OVERRIDE(combatsc_state,combatscb)
+	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatscb)
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatscb)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -999,9 +999,9 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_hornet)
 
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_ADD("palette", 65536)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	
 	MCFG_K037122_ADD("k037122_1", "screen", 0)
 	MCFG_K037122_GFXDECODE("gfxdecode")
@@ -1086,7 +1086,7 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 	MCFG_K033906_ADD("k033906_2", hornet_k033906_intf_1)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_ADD("palette", 65536)
 
 	MCFG_DEVICE_REMOVE("screen")
 

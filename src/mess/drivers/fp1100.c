@@ -360,8 +360,8 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_GFXDECODE_ADD("gfxdecode", fp1100)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_GFXDECODE_ADD("gfxdecode",fp1100,"palette")
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MAIN_CLOCK/2, mc6845_intf)   /* hand tuned to get ~60 fps */

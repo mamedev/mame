@@ -420,7 +420,7 @@ UINT32 legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind1
 	m_text_layer->set_scrolly(0,  0/*m_scrollram16[7]*/ );
 
 	screen.priority().fill(0, cliprect);
-	bitmap.fill(get_black_pen(machine()), cliprect);    /* wrong color? */
+	bitmap.fill(m_palette->black_pen(), cliprect);    /* wrong color? */
 
 	/* m_layer_disable is a guess based on 'stage 1' screen in heatbrl  */
 
@@ -476,7 +476,7 @@ UINT32 legionna_state::screen_update_grainbow(screen_device &screen, bitmap_ind1
 	m_text_layer->set_scrollx(0,  0/*m_scrollram16[6]*/ );
 	m_text_layer->set_scrolly(0,  0/*m_scrollram16[7]*/ );
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
 	if(!(m_layer_disable & 1))

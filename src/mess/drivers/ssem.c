@@ -645,8 +645,7 @@ static MACHINE_CONFIG_START( ssem, ssem_state )
 	MCFG_SCREEN_SIZE(256, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 279)
 	MCFG_SCREEN_UPDATE_DRIVER(ssem_state, screen_update_ssem)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

@@ -64,7 +64,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 WRITE16_MEMBER(hyprduel_state::hyprduel_paletteram_w)
 {
 	data = COMBINE_DATA(&m_paletteram[offset]);
-	palette_set_color_rgb(machine(), offset, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
+	m_palette->set_pen_color(offset, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
 }
 
 

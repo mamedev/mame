@@ -633,11 +633,11 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(qdrmfgp_state, screen_update_qdrmfgp)
 
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K056832_ADD("k056832", qdrmfgp_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K053252_ADD("k053252", XTAL_32MHz/4, qdrmfgp_k053252_intf)
@@ -672,11 +672,11 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(qdrmfgp_state, screen_update_qdrmfgp)
 
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K056832_ADD("k056832", qdrmfgp2_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K053252_ADD("k053252", XTAL_32MHz/4, qdrmfgp2_k053252_intf)

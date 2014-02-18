@@ -567,15 +567,15 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 				if(y_double)
 				{
 					if(cliprect.contains(x+xi, y+0))
-						bitmap.pix16(y+0, x+xi) = machine().pens[pen & 7];
+						bitmap.pix16(y+0, x+xi) = m_palette->pen(pen & 7);
 
 					if(cliprect.contains(x+xi, y+1))
-						bitmap.pix16(y+1, x+xi) = machine().pens[pen & 7];
+						bitmap.pix16(y+1, x+xi) = m_palette->pen(pen & 7);
 				}
 				else
 				{
 					if(cliprect.contains(x+xi, y+0))
-						bitmap.pix16(y, x+xi) = machine().pens[pen & 7];
+						bitmap.pix16(y, x+xi) = m_palette->pen(pen & 7);
 				}
 			}
 
@@ -613,15 +613,15 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 				if((m_gfx_ctrl & 1))
 				{
 					if(cliprect.contains(x+xi, y*2+0))
-						bitmap.pix16(y*2+0, x+xi) = machine().pens[pen ? color : 0];
+						bitmap.pix16(y*2+0, x+xi) = m_palette->pen(pen ? color : 0);
 
 					if(cliprect.contains(x+xi, y*2+1))
-						bitmap.pix16(y*2+1, x+xi) = machine().pens[pen ? color : 0];
+						bitmap.pix16(y*2+1, x+xi) = m_palette->pen(pen ? color : 0);
 				}
 				else
 				{
 					if(cliprect.contains(x+xi, y))
-						bitmap.pix16(y, x+xi) = machine().pens[pen ? color : 0];
+						bitmap.pix16(y, x+xi) = m_palette->pen(pen ? color : 0);
 				}
 			}
 
@@ -649,7 +649,7 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 						pen^=1;
 
 					if(cliprect.contains(x+xi, y))
-						bitmap.pix16(y, x+xi) = machine().pens[pen ? 7 : 0];
+						bitmap.pix16(y, x+xi) = m_palette->pen(pen ? 7 : 0);
 				}
 
 				count++;
@@ -794,13 +794,13 @@ void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UIN
 
 				if(color != -1)
 				{
-					bitmap.pix16(res_y, res_x) = machine().pens[color];
+					bitmap.pix16(res_y, res_x) = m_palette->pen(color);
 					if(width)
 					{
 						if(!machine().primary_screen->visible_area().contains(res_x+1, res_y))
 							continue;
 
-						bitmap.pix16(res_y, res_x+1) = machine().pens[color];
+						bitmap.pix16(res_y, res_x+1) = m_palette->pen(color);
 					}
 				}
 			}
@@ -865,7 +865,7 @@ void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, UINT8 width)
 
 UINT32 pc8801_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 //  popmessage("%04x %04x %02x",m_dma_address[2],m_dma_counter[2],m_dmac_mode);
 
@@ -1424,7 +1424,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_palram_w)
 		m_palram[offset].g = data & 4 ? 7 : 0;
 	}
 
-	palette_set_color_rgb(machine(), offset, pal3bit(m_palram[offset].r), pal3bit(m_palram[offset].g), pal3bit(m_palram[offset].b));
+	m_palette->set_pen_color(offset, pal3bit(m_palram[offset].r), pal3bit(m_palram[offset].g), pal3bit(m_palram[offset].b));
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_layer_masking_w)
@@ -2507,7 +2507,7 @@ void pc8801_state::machine_reset()
 		int i;
 
 		for(i=0;i<0x10;i++) //text + bitmap
-			palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+			m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
 
 	m_has_clock_speed = 0;
@@ -2550,12 +2550,12 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_cdrom)
 	}
 }
 
-void pc8801_state::palette_init()
+PALETTE_INIT_MEMBER(pc8801_state, pc8801)
 {
 	int i;
 
 	for(i=0;i<0x10;i++) //text + bitmap
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
 void pc8801_state::fdc_irq_w(bool state)
@@ -2665,8 +2665,8 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK_24KHz,848,0,640,448,0,400)
 	MCFG_SCREEN_UPDATE_DRIVER(pc8801_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",  pc8801 )
-	MCFG_PALETTE_LENGTH(0x10)
+	MCFG_GFXDECODE_ADD("gfxdecode",pc8801 ,"palette")
+	MCFG_PALETTE_ADD("palette", 0x10)
 
 //  MCFG_VIDEO_START_OVERRIDE(pc8801_state,pc8801)
 

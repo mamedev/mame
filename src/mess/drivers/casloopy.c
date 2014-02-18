@@ -226,8 +226,8 @@ void casloopy_state::video_start()
 	for(int i=0;i<0x10000;i++)
 		m_vram[i] = i & 0xff;
 
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), casloopy_4bpp_layout, m_vram, 0x10, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+1, auto_alloc(machine(), gfx_element(machine(), casloopy_8bpp_layout, m_vram, 1, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), m_palette, casloopy_4bpp_layout, m_vram, 0x10, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+1, auto_alloc(machine(), gfx_element(machine(), m_palette, casloopy_8bpp_layout, m_vram, 1, 0)));
 }
 
 UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -252,7 +252,7 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 	r = pal5bit((m_vregs[0x4/4] >> 10) & 0x1f);
 	g = pal5bit((m_vregs[0x4/4] >> 5) & 0x1f);
 	b = pal5bit((m_vregs[0x4/4] >> 0) & 0x1f);
-	palette_set_color(machine(),0x100,MAKE_RGB(r^0xff,g^0xff,b^0xff));
+	m_palette->set_pen_color(0x100,MAKE_RGB(r^0xff,g^0xff,b^0xff));
 	bitmap.fill( 0x100 ,cliprect);
 	#endif
 
@@ -328,7 +328,7 @@ WRITE16_MEMBER(casloopy_state::casloopy_pal_w)
 	g = ((m_paletteram[offset])&0x03e0)>>5;
 	r = ((m_paletteram[offset])&0x7c00)>>10;
 
-	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 READ8_MEMBER(casloopy_state::casloopy_vram_r)
@@ -491,9 +491,9 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update_casloopy)
 
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("ic1,bin")

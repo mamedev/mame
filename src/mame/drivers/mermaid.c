@@ -449,8 +449,8 @@ static MACHINE_CONFIG_START( mermaid, mermaid_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mermaid_state, screen_update_mermaid)
 	MCFG_SCREEN_VBLANK_DRIVER(mermaid_state, screen_eof_mermaid)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mermaid)
-	MCFG_PALETTE_LENGTH(4*16+2*2)
+	MCFG_GFXDECODE_ADD("gfxdecode",mermaid,"palette")
+	MCFG_PALETTE_ADD("palette", 4*16+2*2)
 
 
 	/* sound hardware */
@@ -469,7 +469,7 @@ static MACHINE_CONFIG_DERIVED( rougien, mermaid )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rougien_map)
 
-	MCFG_PALETTE_INIT_OVERRIDE(mermaid_state,rougien)
+	MCFG_PALETTE_INIT_OWNER(mermaid_state,rougien)
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, 384000)
 	MCFG_SOUND_CONFIG(msm5205_config)

@@ -41,7 +41,7 @@
   bit 0 -- 2.2kohm resistor  -- BLUE
 
 ***************************************************************************/
-void matmania_state::palette_init()
+PALETTE_INIT_MEMBER(matmania_state, matmania)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -66,7 +66,7 @@ void matmania_state::palette_init()
 		bit3 = BIT(color_prom[64], 3);
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -103,7 +103,7 @@ WRITE8_MEMBER(matmania_state::matmania_paletteram_w)
 	bit3 = BIT(val, 3);
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(machine(),offs2 + 64,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offs2 + 64,MAKE_RGB(r,g,b));
 }
 
 

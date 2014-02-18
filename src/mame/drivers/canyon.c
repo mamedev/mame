@@ -48,12 +48,12 @@
  *
  *************************************/
 
-void canyon_state::palette_init()
+PALETTE_INIT_MEMBER(canyon_state, canyon)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0x80, 0x80, 0x80)); /* GREY  */
-	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x00, 0x00)); /* BLACK */
-	palette_set_color(machine(), 2, MAKE_RGB(0x80, 0x80, 0x80)); /* GREY  */
-	palette_set_color(machine(), 3, MAKE_RGB(0xff, 0xff, 0xff)); /* WHITE */
+	palette.set_pen_color(0, MAKE_RGB(0x80, 0x80, 0x80)); /* GREY  */
+	palette.set_pen_color(1, MAKE_RGB(0x00, 0x00, 0x00)); /* BLACK */
+	palette.set_pen_color(2, MAKE_RGB(0x80, 0x80, 0x80)); /* GREY  */
+	palette.set_pen_color(3, MAKE_RGB(0xff, 0xff, 0xff)); /* WHITE */
 }
 
 
@@ -250,9 +250,9 @@ static MACHINE_CONFIG_START( canyon, canyon_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(canyon_state, screen_update_canyon)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", canyon)
-	MCFG_PALETTE_LENGTH(4)
-
+	MCFG_GFXDECODE_ADD("gfxdecode",canyon,"palette")
+	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(canyon_state, canyon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

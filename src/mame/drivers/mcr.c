@@ -1851,8 +1851,8 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr_state, screen_update_mcr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mcr)
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE_ADD("gfxdecode",mcr,"palette")
+	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_VIDEO_START_OVERRIDE(mcr_state,mcr)
 
@@ -1882,7 +1882,7 @@ static MACHINE_CONFIG_DERIVED( mcr_90010, mcr_90009 )
 	MCFG_CPU_IO_MAP(cpu_90010_portmap)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(64)
+	MCFG_PALETTE_ADD("palette", 64)
 MACHINE_CONFIG_END
 
 
@@ -1900,7 +1900,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_91475, mcr_90010 )
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(128)
+	MCFG_PALETTE_ADD("palette", 128)
 
 	/* sound hardware */
 	MCFG_SAMPLES_ADD("samples", journey_samples_interface)

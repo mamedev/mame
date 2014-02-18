@@ -82,12 +82,12 @@ static GFXDECODE_START( hideseek )
 GFXDECODE_END
 
 
-void hideseek_state::palette_init()
+PALETTE_INIT_MEMBER(hideseek_state, hideseek)
 {
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
-		palette_set_color(machine(), i, MAKE_RGB( pal5bit((i >> 10)&0x1f), pal5bit(((i >> 5))&0x1f), pal5bit((i >> 0)&0x1f)));
+		palette.set_pen_color(i, MAKE_RGB( pal5bit((i >> 10)&0x1f), pal5bit(((i >> 5))&0x1f), pal5bit((i >> 0)&0x1f)));
 }
 
 
@@ -108,7 +108,7 @@ static MACHINE_CONFIG_START( hideseek, hideseek_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hideseek_state, screen_update_hideseek)
 
 	MCFG_PALETTE_LENGTH(0x10000)
-	MCFG_GFXDECODE_ADD("gfxdecode", hideseek)
+	MCFG_GFXDECODE_ADD("gfxdecode",hideseek,"palette")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 

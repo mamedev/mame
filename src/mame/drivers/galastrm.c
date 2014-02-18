@@ -71,7 +71,7 @@ WRITE32_MEMBER(galastrm_state::galastrm_palette_w)
 	if (ACCESSING_BITS_16_31)
 		m_tc0110pcr_addr = data >> 16;
 	if ((ACCESSING_BITS_0_15) && (m_tc0110pcr_addr < 4096))
-		palette_set_color_rgb(machine(), m_tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+		m_palette->set_pen_color(m_tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 WRITE32_MEMBER(galastrm_state::galastrm_tc0610_0_w)
@@ -312,8 +312,8 @@ static MACHINE_CONFIG_START( galastrm, galastrm_state )
 	MCFG_SCREEN_VISIBLE_AREA(0+96, 40*8-1+96, 3*8+60, 32*8-1+60)
 	MCFG_SCREEN_UPDATE_DRIVER(galastrm_state, screen_update_galastrm)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galastrm)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",galastrm,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn", galastrm_tc0100scn_intf)

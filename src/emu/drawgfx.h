@@ -23,12 +23,16 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_GFXDECODE_ADD(_tag, _info) \
+#define MCFG_GFXDECODE_ADD(_tag, _info, _palettetag) \
 	MCFG_DEVICE_ADD(_tag, GFXDECODE, 0) \
 	MCFG_GFXDECODE_INFO(_info) \
+	MCFG_GFXDECODE_PALETTE(_palettetag) \
 
 #define MCFG_GFXDECODE_INFO(_info) \
 	gfxdecode_device::static_set_gfxdecodeinfo(*device, GFXDECODE_NAME(_info));
+
+#define MCFG_GFXDECODE_PALETTE(_palettetag) \
+	gfxdecode_device::static_set_palette(*device, "^" _palettetag);
 
 
 #define MCFG_GFXDECODE_MODIFY(_tag, _info) \
@@ -134,9 +138,9 @@ class gfx_element
 {
 public:
 	// construction/destruction
-	gfx_element(running_machine &machine);
-	gfx_element(running_machine &machine, const gfx_layout &gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base);
-	gfx_element(running_machine &machine, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 color_base, UINT32 color_granularity);
+	gfx_element(running_machine &machine, palette_device &palette);
+	gfx_element(running_machine &machine, palette_device &palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base);
+	gfx_element(running_machine &machine, palette_device &palette, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 color_base, UINT32 color_granularity);
 
 	// getters
 	running_machine &machine() const { return m_machine; }
@@ -182,7 +186,7 @@ public:
 		if (m_dirty[code]) decode(code);
 		return m_pen_usage[code];
 	}
-
+	
 	// ----- core graphics drawing -----
 
 	// specific drawgfx implementations for each transparency type
@@ -284,6 +288,7 @@ private:
 	dynamic_array<UINT32> m_layout_yoffset; // Y offsets
 
 	running_machine &m_machine;             // pointer to the owning machine
+	palette_device  &m_palette;
 };
 
 
@@ -453,6 +458,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecodeinfo(device_t &device, const gfx_decode_entry *info);
+	static void static_set_palette(device_t &device, const char *tag);
 
 	gfx_element * gfx(int index) { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index]; }	
 	gfx_element ** gfx() { return m_gfx; }	
@@ -468,6 +474,7 @@ private:
 	// configuration state
 	const gfx_decode_entry *m_gfxdecodeinfo;            // pointer to array of graphics decoding information
 	gfx_element *           m_gfx[MAX_GFX_ELEMENTS];		// array of pointers to graphic sets (chars, sprites)
+	required_device<palette_device> m_palette;
 };
 
 // device type iterator

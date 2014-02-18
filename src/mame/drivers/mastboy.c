@@ -506,7 +506,7 @@ UINT32 mastboy_state::screen_update_mastboy(screen_device &screen, bitmap_ind16 
 	{
 		int coldat = m_colram[i+1] |  (m_colram[i+0]<<8);
 
-		palette_set_color_rgb(machine(),i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
+		m_palette->set_pen_color(i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
 	}
 
 	for (y=0;y<32;y++)
@@ -902,8 +902,8 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mastboy_state, screen_update_mastboy)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mastboy)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE_ADD("gfxdecode",mastboy,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 	// sound hardware

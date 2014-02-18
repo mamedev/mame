@@ -250,9 +250,10 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(aliens_state, screen_update_aliens)
 
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K052109_ADD("k052109", aliens_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K051960_ADD("k051960", aliens_k051960_intf)

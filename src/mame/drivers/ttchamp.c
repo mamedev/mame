@@ -106,7 +106,7 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 //  int i;
 	static const int xxx=320,yyy=204;
 
-	bitmap.fill(get_black_pen(machine()));
+	bitmap.fill(m_palette->black_pen());
 
 //  for (i=0;i<256;i++)
 //  {
@@ -116,7 +116,7 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 //      b = (dat>>10)&0x1f;
 //      g = (dat>>5)&0x1f;
 //      r = (dat>>0)&0x1f;
-//      palette_set_color_rgb(machine(),i,pal5bit(r),pal5bit(g),pal5bit(b));
+//      m_palette->set_pen_color(i,pal5bit(r),pal5bit(g),pal5bit(b));
 //  }
 
 	count=0;
@@ -154,7 +154,7 @@ WRITE16_MEMBER(ttchamp_state::pcup_prgbank_w)
 
 WRITE16_MEMBER(ttchamp_state::paldat_w)
 {
-	palette_set_color_rgb(machine(),m_paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
+	m_palette->set_pen_color(m_paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
 
 READ16_MEMBER(ttchamp_state::peno_rand)
@@ -291,7 +291,7 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ttchamp_state, screen_update_ttchamp)
 
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 MACHINE_CONFIG_END
 

@@ -536,9 +536,10 @@ static MACHINE_CONFIG_START( spy, spy_state )
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(spy_state, screen_update_spy)
 
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K052109_ADD("k052109", spy_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K051960_ADD("k051960", spy_k051960_intf)

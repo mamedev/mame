@@ -386,8 +386,7 @@ static MACHINE_CONFIG_START( tecfri, sauro_state )
 	MCFG_SCREEN_SIZE(32 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1)
 
-	MCFG_PALETTE_LENGTH(1024)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 1024)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -402,7 +401,7 @@ static MACHINE_CONFIG_DERIVED( trckydoc, tecfri )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trckydoc_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", trckydoc)
+	MCFG_GFXDECODE_ADD("gfxdecode",trckydoc,"palette")
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state,trckydoc)
 	MCFG_SCREEN_MODIFY("screen")
@@ -420,7 +419,7 @@ static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 	MCFG_CPU_PROGRAM_MAP(sauro_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(sauro_state, sauro_interrupt,  8*60) // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sauro)
+	MCFG_GFXDECODE_ADD("gfxdecode",sauro,"palette")
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state,sauro)
 	MCFG_SCREEN_MODIFY("screen")

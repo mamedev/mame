@@ -445,8 +445,8 @@ static MACHINE_CONFIG_START( pacland, pacland_state )
 	MCFG_SCREEN_VISIBLE_AREA(3*8, 39*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pacland_state, screen_update_pacland)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pacland)
-	MCFG_PALETTE_LENGTH(256*4+256*4+64*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",pacland,"palette")
+	MCFG_PALETTE_ADD("palette", 256*4+256*4+64*16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

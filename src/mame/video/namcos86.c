@@ -32,7 +32,7 @@ Namco System 86 Video Hardware
 
 ***************************************************************************/
 
-void namcos86_state::palette_init()
+PALETTE_INIT_MEMBER(namcos86_state, namcos86)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -67,11 +67,11 @@ void namcos86_state::palette_init()
 
 	/* tiles lookup table */
 	for (i = 0;i < 2048;i++)
-		palette_set_color(machine(), i, palette[*color_prom++]);
+		palette.set_pen_color(i, palette[*color_prom++]);
 
 	/* sprites lookup table */
 	for (i = 0;i < 2048;i++)
-		palette_set_color(machine(), 2048 + i, palette[256 + *color_prom++]);
+		palette.set_pen_color(2048 + i, palette[256 + *color_prom++]);
 
 	/* color_prom now points to the beginning of the tile address decode PROM */
 

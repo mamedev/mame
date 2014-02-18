@@ -409,8 +409,8 @@ static MACHINE_CONFIG_START( vball, vball_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)   /* based on ddragon driver */
 	MCFG_SCREEN_UPDATE_DRIVER(vball_state, screen_update_vb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vb)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",vb,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	/* sound hardware */

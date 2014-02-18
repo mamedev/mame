@@ -454,7 +454,7 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_CPU_IO_MAP(io_map)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tecmosys)
+	MCFG_GFXDECODE_ADD("gfxdecode",tecmosys,"palette")
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
@@ -468,7 +468,7 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tecmosys_state, screen_update_tecmosys)
 
-	MCFG_PALETTE_LENGTH(0x4000+0x800)
+	MCFG_PALETTE_ADD("palette", 0x4000+0x800)
 
 
 	/* sound hardware */

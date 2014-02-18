@@ -259,10 +259,8 @@ static MACHINE_CONFIG_START( commando, commando_state )
 	MCFG_SCREEN_UPDATE_DRIVER(commando_state, screen_update_commando)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", commando)
-	MCFG_PALETTE_LENGTH(256)
-
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
+	MCFG_GFXDECODE_ADD("gfxdecode",commando,"palette")
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 

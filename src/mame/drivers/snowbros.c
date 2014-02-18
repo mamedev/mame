@@ -1535,8 +1535,8 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbros)
 	MCFG_SCREEN_VBLANK_DRIVER(snowbros_state, screen_eof_snowbros)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", snowbros)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",snowbros,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", snowbros_pandora_config)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
@@ -1646,8 +1646,8 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_honeydol)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", honeydol)
-	MCFG_PALETTE_LENGTH(0x800/2)
+	MCFG_GFXDECODE_ADD("gfxdecode",honeydol,"palette")
+	MCFG_PALETTE_ADD("palette", 0x800/2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1683,8 +1683,8 @@ static MACHINE_CONFIG_START( twinadv, snowbros_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_twinadv)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", twinadv)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE_ADD("gfxdecode",twinadv,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1755,8 +1755,8 @@ static MACHINE_CONFIG_START( snowbro3, snowbros_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbro3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sb3)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",sb3,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

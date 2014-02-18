@@ -33,8 +33,8 @@ public:
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_rle_objects_device> m_rle;
 
-	bitmap_ind16 *      m_pf_bitmap;
-	bitmap_ind16 *      m_an_bitmap;
+	bitmap_ind16    m_pf_bitmap;
+	bitmap_ind16    m_an_bitmap;
 
 	UINT8           m_playfield_tile_bank;
 	UINT8           m_playfield_color_bank;

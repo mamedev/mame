@@ -230,7 +230,7 @@ static MACHINE_CONFIG_START( sbugger, sbugger_state )
 	MCFG_CPU_IO_MAP(sbugger_io_map)
 	MCFG_I8156_ADD("i8156", 200000, i8156_intf)     /* freq is an approximation */
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sbugger)
+	MCFG_GFXDECODE_ADD("gfxdecode",sbugger,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -239,7 +239,7 @@ static MACHINE_CONFIG_START( sbugger, sbugger_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sbugger_state, screen_update_sbugger)
 
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */

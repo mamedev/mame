@@ -366,7 +366,7 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 3000000/4, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
 
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_ADD("palette", 32)
 MACHINE_CONFIG_END
 
 /*

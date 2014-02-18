@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( galpani3, galpani3_state )
 
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, 0)
 
-	MCFG_PALETTE_LENGTH(0x4303)
+	MCFG_PALETTE_ADD("palette", 0x4303)
 
 
 	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)

@@ -92,7 +92,7 @@ void sshangha_state::machine_reset()
 
 inline void sshangha_state::sshangha_set_color_888(pen_t color, int rshift, int gshift, int bshift, UINT32 data)
 {
-	palette_set_color_rgb(machine(), color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
+	m_palette->set_pen_color(color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
 }
 
 
@@ -417,8 +417,8 @@ static MACHINE_CONFIG_START( sshangha, sshangha_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sshangha_state, screen_update_sshangha)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sshangha)
-	MCFG_PALETTE_LENGTH(0x4000)
+	MCFG_GFXDECODE_ADD("gfxdecode",sshangha,"palette")
+	MCFG_PALETTE_ADD("palette", 0x4000)
 
 	MCFG_DECO16IC_ADD("tilegen1", sshangha_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")

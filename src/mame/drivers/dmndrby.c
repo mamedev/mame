@@ -364,7 +364,7 @@ UINT32 dmndrby_state::screen_update_dderby(screen_device &screen, bitmap_ind16 &
 	gfx_element *sprites = m_gfxdecode->gfx(1);
 	gfx_element *track = m_gfxdecode->gfx(2);
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 
 /* Draw racetrack
@@ -453,7 +453,7 @@ wouldnt like to say its the most effective way though...
 }
 
 // copied from elsewhere. surely incorrect
-void dmndrby_state::palette_init()
+PALETTE_INIT_MEMBER(dmndrby_state, dmndrby)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -466,9 +466,6 @@ void dmndrby_state::palette_init()
 			3, &resistances_rg[0], rweights, 470, 0,
 			3, &resistances_rg[0], gweights, 470, 0,
 			2, &resistances_b[0],  bweights, 470, 0);
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -493,7 +490,7 @@ void dmndrby_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -503,7 +500,7 @@ void dmndrby_state::palette_init()
 	for (i = 0x000; i < 0x300; i++)
 	{
 		UINT8 ctabentry = color_prom[i];
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -539,8 +536,8 @@ static MACHINE_CONFIG_START( dderby, dmndrby_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dmndrby_state, screen_update_dderby)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dmndrby)
-	MCFG_PALETTE_LENGTH(0x300)
+	MCFG_GFXDECODE_ADD("gfxdecode",dmndrby,"palette")
+	MCFG_PALETTE_ADD("palette", 0x300)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -52,13 +52,10 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 
 ***************************************************************************/
 
-void galivan_state::palette_init()
+PALETTE_INIT_MEMBER(galivan_state, galivan)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -67,7 +64,7 @@ void galivan_state::palette_init()
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -75,7 +72,7 @@ void galivan_state::palette_init()
 
 	/* characters use colors 0-0x7f */
 	for (i = 0; i < 0x80; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* I think that */
 	/* background tiles use colors 0xc0-0xff in four banks */
@@ -90,7 +87,7 @@ void galivan_state::palette_init()
 		else
 			ctabentry = 0xc0 | (i & 0x0f) | ((i & 0x30) >> 0);
 
-		colortable_entry_set_value(machine().colortable, 0x80 + i, ctabentry);
+		palette.set_pen_indirect(0x80 + i, ctabentry);
 	}
 
 	/* sprites use colors 0x80-0xbf in four banks */
@@ -108,7 +105,7 @@ void galivan_state::palette_init()
 		else
 			ctabentry = 0x80 | ((i & 0x03) << 4) | (color_prom[i >> 4] & 0x0f);
 
-		colortable_entry_set_value(machine().colortable, 0x180 + i_swapped, ctabentry);
+		palette.set_pen_indirect(0x180 + i_swapped, ctabentry);
 	}
 }
 

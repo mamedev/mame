@@ -301,9 +301,9 @@ static MACHINE_CONFIG_START( orbit, orbit_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2, 384*2, 0, 256*2, 261*2, 0, 240*2)
 	MCFG_SCREEN_UPDATE_DRIVER(orbit_state, screen_update_orbit)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", orbit)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_GFXDECODE_ADD("gfxdecode",orbit,"palette")
+
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

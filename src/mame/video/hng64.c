@@ -676,7 +676,7 @@ do {                                                                            
 static void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound)
 {
-	const pen_t *clut = &screen.machine().pens[blit->tilemap_priority_code >> 16];
+	const pen_t *clut = &screen.m_palette->pen(blit->tilemap_priority_code >> 16);
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	bitmap_rgb32 &destbitmap = *blit->bitmap;
 	bitmap_ind16 &srcbitmap = tmap->pixmap();
@@ -1347,7 +1347,7 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	}
 #endif
 
-	bitmap.fill(hng64_tcram[0x50/4] & 0x10000 ? get_black_pen(screen.machine()) : screen.machine().pens[0], cliprect); //FIXME: Is the register correct? check with HW tests
+	bitmap.fill(hng64_tcram[0x50/4] & 0x10000 ? m_palette->black_pen() : screen.m_palette->pen(0), cliprect); //FIXME: Is the register correct? check with HW tests
 	screen.priority().fill(0x00, cliprect);
 
 	if (m_screen_dis)

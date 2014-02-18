@@ -251,9 +251,9 @@ void sega_genesis_vdp_device::write_cram_value(int offset, int data)
 		b = ((data >> 9)&0x07);
 		if (m_palwrite_base != -1)
 		{
-			palette_set_color_rgb(machine(),offset + m_palwrite_base ,pal3bit(r),pal3bit(g),pal3bit(b));
-			palette_set_color_rgb(machine(),offset + m_palwrite_base + 0x40 ,pal3bit(r>>1),pal3bit(g>>1),pal3bit(b>>1));
-			palette_set_color_rgb(machine(),offset + m_palwrite_base + 0x80 ,pal3bit((r>>1)|0x4),pal3bit((g>>1)|0x4),pal3bit((b>>1)|0x4));
+			m_palette->set_pen_color(offset + m_palwrite_base ,pal3bit(r),pal3bit(g),pal3bit(b));
+			m_palette->set_pen_color(offset + m_palwrite_base + 0x40 ,pal3bit(r>>1),pal3bit(g>>1),pal3bit(b>>1));
+			m_palette->set_pen_color(offset + m_palwrite_base + 0x80 ,pal3bit((r>>1)|0x4),pal3bit((g>>1)|0x4),pal3bit((b>>1)|0x4));
 		}
 		megadrive_vdp_palette_lookup[offset] = (b<<2) | (g<<7) | (r<<12);
 		megadrive_vdp_palette_lookup_sprite[offset] = (b<<2) | (g<<7) | (r<<12);

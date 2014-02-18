@@ -509,7 +509,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_paletteram_w)
 
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	newword = m_generic_paletteram_32[offset];
-	palette_set_color_rgb(machine(), offset, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
+	m_palette->set_pen_color(offset, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
 }
 
 

@@ -2063,8 +2063,8 @@ static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 	decospr_device::set_is_bootleg(*device, true);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",tumbleb,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
@@ -2099,8 +2099,8 @@ static MACHINE_CONFIG_START( tumbleb2, tumbleb_state )
 	decospr_device::set_is_bootleg(*device, true);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",tumbleb,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
@@ -2138,8 +2138,8 @@ static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
 	decospr_device::set_is_bootleg(*device, true);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",tumbleb,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
@@ -2174,8 +2174,8 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 	decospr_device::set_transpen(*device, 15);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fncywld)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_GFXDECODE_ADD("gfxdecode",fncywld,"palette")
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,fncywld)
 
@@ -2231,8 +2231,8 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	decospr_device::set_is_bootleg(*device, true);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",tumbleb,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
@@ -2334,8 +2334,8 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 	decospr_device::set_is_bootleg(*device, true);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", suprtrio)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",suprtrio,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,suprtrio)
 
@@ -2370,8 +2370,8 @@ static MACHINE_CONFIG_START( pangpang, tumbleb_state )
 	decospr_device::set_is_bootleg(*device, true);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",tumbleb,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,pangpang)
 

@@ -42,7 +42,7 @@
 
 ***************************************************************************/
 
-void mrdo_state::palette_init()
+PALETTE_INIT_MEMBER(mrdo_state, mrdo)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -75,9 +75,6 @@ void mrdo_state::palette_init()
 		if (weight[i] < 0) weight[i] = 0;
 	}
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
-
 	for (i = 0; i < 0x100; i++)
 	{
 		int a1,a2;
@@ -102,7 +99,7 @@ void mrdo_state::palette_init()
 		bits2 = (color_prom[a2] >> 4) & 0x03;
 		b = weight[bits0 + (bits2 << 2)];
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -110,7 +107,7 @@ void mrdo_state::palette_init()
 
 	/* characters */
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* sprites */
 	for (i = 0x100; i < 0x140; i++)
@@ -122,7 +119,7 @@ void mrdo_state::palette_init()
 		else
 			ctabentry &= 0x0f;  /* low 4 bits are for sprite color n */
 
-		colortable_entry_set_value(machine().colortable, i, ctabentry + ((ctabentry & 0x0c) << 3));
+		palette.set_pen_indirect(i, ctabentry + ((ctabentry & 0x0c) << 3));
 	}
 }
 

@@ -940,14 +940,14 @@ static MACHINE_CONFIG_START( turbo, turbo_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_GFXDECODE_ADD("gfxdecode", turbo)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",turbo,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(turbo_state, screen_update_turbo)
 
-	MCFG_PALETTE_INIT_OVERRIDE(turbo_state,turbo)
+	MCFG_PALETTE_INIT_OWNER(turbo_state,turbo)
 	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
 
 	/* sound hardware */
@@ -969,14 +969,14 @@ static MACHINE_CONFIG_START( subroc3d, turbo_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_GFXDECODE_ADD("gfxdecode", turbo)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",turbo,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(turbo_state, screen_update_subroc3d)
 
-	MCFG_PALETTE_INIT_OVERRIDE(turbo_state,subroc3d)
+	MCFG_PALETTE_INIT_OWNER(turbo_state,subroc3d)
 	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
 
 	/* sound hardware */
@@ -1005,14 +1005,14 @@ static MACHINE_CONFIG_START( buckrog, turbo_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_GFXDECODE_ADD("gfxdecode", turbo)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",turbo,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(turbo_state, screen_update_buckrog)
 
-	MCFG_PALETTE_INIT_OVERRIDE(turbo_state,buckrog)
+	MCFG_PALETTE_INIT_OWNER(turbo_state,buckrog)
 	MCFG_VIDEO_START_OVERRIDE(turbo_state,buckrog)
 
 	/* sound hardware */

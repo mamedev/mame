@@ -232,7 +232,7 @@ UINT32 mpoker_state::screen_update_mpoker(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-void mpoker_state::palette_init()
+PALETTE_INIT_MEMBER(mpoker_state, mpoker)
 {
 	int i;
 
@@ -245,7 +245,7 @@ void mpoker_state::palette_init()
 		else
 			color = RGB_BLACK;
 
-		palette_set_color(machine(), i, color);
+		palette.set_pen_color(i, color);
 	}
 }
 
@@ -603,8 +603,8 @@ static MACHINE_CONFIG_START( mpoker, mpoker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mpoker_state, screen_update_mpoker)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mpoker)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_GFXDECODE_ADD("gfxdecode",mpoker,"palette")
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 
 	/* sound hardware */

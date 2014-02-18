@@ -418,12 +418,12 @@ static void count_7dig(unsigned long data, UINT8 index)
 	}
 }
 
-void videopkr_state::palette_init()
+PALETTE_INIT_MEMBER(videopkr_state, videopkr)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int j;
 
-	for (j = 0; j < machine().total_colors(); j++)
+	for (j = 0; j < palette.entries(); j++)
 	{
 		int r, g, b, tr, tg, tb, i;
 
@@ -441,7 +441,7 @@ void videopkr_state::palette_init()
 		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
 		b = tb - (i * (tb / 5));
 
-		palette_set_color(machine(), j, MAKE_RGB(r, g, b));
+		palette.set_pen_color(j, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -450,7 +450,7 @@ PALETTE_INIT_MEMBER(videopkr_state,babypkr)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int j;
 
-	for (j = 0; j < machine().total_colors(); j++)
+	for (j = 0; j < palette.entries(); j++)
 	{
 		int r, g, b, tr, tg, tb, i, top;
 
@@ -472,7 +472,7 @@ PALETTE_INIT_MEMBER(videopkr_state,babypkr)
 		tb =  0xdf * ((color_prom[j] >> 2) & 0x01);
 		b = top - ((tb * top) / 0x100);
 
-		palette_set_color(machine(), j, MAKE_RGB(r, g, b));
+		palette.set_pen_color(j, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -481,7 +481,7 @@ PALETTE_INIT_MEMBER(videopkr_state,fortune1)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int j;
 
-	for (j = 0; j < machine().total_colors(); j++)
+	for (j = 0; j < palette.entries(); j++)
 	{
 		int r, g, b, tr, tg, tb, i, c;
 
@@ -505,7 +505,7 @@ PALETTE_INIT_MEMBER(videopkr_state,fortune1)
 		if ((c % 4) == 1 || (c % 4) == 2)
 			c = ((int)(c / 4) * 4) + (3 - (c % 4));
 
-		palette_set_color(machine(), c, MAKE_RGB(r, g, b));
+		palette.set_pen_color(c, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -1263,8 +1263,8 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 	MCFG_SCREEN_VBLANK_TIME(2080)
 	MCFG_SCREEN_UPDATE_DRIVER(videopkr_state, screen_update_videopkr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", videopkr)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",videopkr,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1315,7 +1315,7 @@ static MACHINE_CONFIG_DERIVED( babypkr, videopkr )
 	MCFG_SCREEN_SIZE(32*16, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(5*16, 31*16-1, 3*8, 29*8-1)
 
-	MCFG_PALETTE_INIT_OVERRIDE(videopkr_state,babypkr)
+	MCFG_PALETTE_INIT_OWNER(videopkr_state,babypkr)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", videodad)
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 
@@ -1330,7 +1330,7 @@ static MACHINE_CONFIG_DERIVED( fortune1, videopkr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(CPU_CLOCK_ALT)
 
-	MCFG_PALETTE_INIT_OVERRIDE(videopkr_state,fortune1)
+	MCFG_PALETTE_INIT_OWNER(videopkr_state,fortune1)
 MACHINE_CONFIG_END
 
 /*************************

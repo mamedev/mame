@@ -206,7 +206,7 @@ static GFXDECODE_START( murogem )
 GFXDECODE_END
 
 
-void murogem_state::palette_init()
+PALETTE_INIT_MEMBER(murogem_state, murogem)
 {}
 
 UINT32 murogem_state::screen_update_murogem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -264,8 +264,8 @@ static MACHINE_CONFIG_START( murogem, murogem_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(murogem_state, screen_update_murogem)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", murogem)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE_ADD("gfxdecode",murogem,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 750000, mc6845_intf) /* ? MHz */

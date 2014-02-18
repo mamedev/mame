@@ -263,7 +263,7 @@ UINT32 z100_state::screen_update_z100(screen_device &screen, bitmap_ind16 &bitma
 						dot = m_display_mask;
 
 					if(y*mc6845_tile_height+yi < 216 && x*8+xi < 640) /* TODO: safety check */
-						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = machine().pens[dot];
+						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(dot);
 				}
 			}
 		}
@@ -698,7 +698,7 @@ static const floppy_interface z100_floppy_interface =
 	NULL
 };
 
-void z100_state::palette_init()
+PALETTE_INIT_MEMBER(z100_state, z100)
 {
 	// ...
 }
@@ -716,12 +716,12 @@ void z100_state::machine_reset()
 	if(ioport("CONFIG")->read() & 1)
 	{
 		for(i=0;i<8;i++)
-			palette_set_color_rgb(machine(), i,pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
+			m_palette->set_pen_color(i,pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 	}
 	else
 	{
 		for(i=0;i<8;i++)
-			palette_set_color_rgb(machine(), i,pal3bit(0),pal3bit(i),pal3bit(0));
+			m_palette->set_pen_color(i,pal3bit(0),pal3bit(i),pal3bit(0));
 	}
 }
 
@@ -739,7 +739,7 @@ static MACHINE_CONFIG_START( z100, z100_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(z100_state, screen_update_z100)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_14_31818MHz/8, mc6845_intf)    /* unknown clock, hand tuned to get ~50/~60 fps */

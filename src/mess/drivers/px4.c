@@ -1355,16 +1355,16 @@ INPUT_PORTS_END
 //  PALETTE
 //**************************************************************************
 
-void px4_state::palette_init()
+PALETTE_INIT_MEMBER(px4_state, px4)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
+	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
 }
 
 PALETTE_INIT_MEMBER(px4_state, px4p)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(149, 157, 130));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, MAKE_RGB(149, 157, 130));
+	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
 }
 
 
@@ -1396,7 +1396,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_px4)
 
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1455,7 +1455,7 @@ static MACHINE_CONFIG_DERIVED( px4p, px4 )
 	MCFG_MACHINE_START_OVERRIDE(px4_state, px4_ramdisk)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PALETTE_INIT_OVERRIDE(px4_state, px4p)
+	MCFG_PALETTE_INIT_OWNER(px4_state, px4p)
 
 	MCFG_CARTSLOT_ADD("ramdisk")
 	MCFG_CARTSLOT_NOT_MANDATORY

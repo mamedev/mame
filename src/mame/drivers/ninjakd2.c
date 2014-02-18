@@ -947,8 +947,8 @@ static MACHINE_CONFIG_START( ninjakd2, ninjakd2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_ninjakd2)
 	MCFG_SCREEN_VBLANK_DRIVER(ninjakd2_state, screen_eof_ninjakd2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ninjakd2)
-	MCFG_PALETTE_LENGTH(0x300)
+	MCFG_GFXDECODE_ADD("gfxdecode",ninjakd2,"palette")
+	MCFG_PALETTE_ADD("palette", 0x300)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1005,7 +1005,7 @@ static MACHINE_CONFIG_DERIVED( robokid, mnight )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", robokid)
-	MCFG_PALETTE_LENGTH(0x400)  // RAM is this large, but still only 0x300 colors used
+	MCFG_PALETTE_ADD("palette", 0x400)  // RAM is this large, but still only 0x300 colors used
 
 	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,robokid)
 	MCFG_SCREEN_MODIFY("screen")

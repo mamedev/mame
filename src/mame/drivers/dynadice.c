@@ -225,11 +225,11 @@ UINT32 dynadice_state::screen_update_dynadice(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void dynadice_state::palette_init()
+PALETTE_INIT_MEMBER(dynadice_state, dynadice)
 {
 	int i;
 	for(i = 0; i < 8; i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
 void dynadice_state::machine_start()
@@ -264,8 +264,8 @@ static MACHINE_CONFIG_START( dynadice, dynadice_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 3*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynadice_state, screen_update_dynadice)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dynadice)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_GFXDECODE_ADD("gfxdecode",dynadice,"palette")
+	MCFG_PALETTE_ADD("palette", 8)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

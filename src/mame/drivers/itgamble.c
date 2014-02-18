@@ -90,7 +90,7 @@ void itgamble_state::video_start()
 
 UINT32 itgamble_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()));
+	bitmap.fill(m_palette->black_pen());
 	return 0;
 }
 
@@ -216,8 +216,8 @@ static MACHINE_CONFIG_START( itgamble, itgamble_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", itgamble)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_GFXDECODE_ADD("gfxdecode",itgamble,"palette")
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

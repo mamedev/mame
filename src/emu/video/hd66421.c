@@ -220,7 +220,7 @@ UINT32 hd66421_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 		bright = 1.0 * temp / 31;
 		pen[i] = i;
 		#ifdef HD66421_BRIGHTNESS_DOES_NOT_WORK
-		palette_set_color(machine(), pen[i], 255 * bright, 255 * bright, 255 * bright);
+		m_palette->set_pen_color(pen[i], 255 * bright, 255 * bright, 255 * bright);
 		#else
 		palette_set_pen_contrast(machine(), pen[i], bright);
 		#endif

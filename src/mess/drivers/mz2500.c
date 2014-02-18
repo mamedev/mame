@@ -251,23 +251,23 @@ void mz2500_state::mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,UINT16  pe
 {
 	if(width && height)
 	{
-		bitmap.pix16(y*2+0, x*2+0) = machine().pens[pen];
-		bitmap.pix16(y*2+0, x*2+1) = machine().pens[pen];
-		bitmap.pix16(y*2+1, x*2+0) = machine().pens[pen];
-		bitmap.pix16(y*2+1, x*2+1) = machine().pens[pen];
+		bitmap.pix16(y*2+0, x*2+0) = m_palette->pen(pen);
+		bitmap.pix16(y*2+0, x*2+1) = m_palette->pen(pen);
+		bitmap.pix16(y*2+1, x*2+0) = m_palette->pen(pen);
+		bitmap.pix16(y*2+1, x*2+1) = m_palette->pen(pen);
 	}
 	else if(width)
 	{
-		bitmap.pix16(y, x*2+0) = machine().pens[pen];
-		bitmap.pix16(y, x*2+1) = machine().pens[pen];
+		bitmap.pix16(y, x*2+0) = m_palette->pen(pen);
+		bitmap.pix16(y, x*2+1) = m_palette->pen(pen);
 	}
 	else if(height)
 	{
-		bitmap.pix16(y*2+0, x) = machine().pens[pen];
-		bitmap.pix16(y*2+1, x) = machine().pens[pen];
+		bitmap.pix16(y*2+0, x) = m_palette->pen(pen);
+		bitmap.pix16(y*2+1, x) = m_palette->pen(pen);
 	}
 	else
-		bitmap.pix16(y, x) = machine().pens[pen];
+		bitmap.pix16(y, x) = m_palette->pen(pen);
 }
 
 void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr)
@@ -677,7 +677,7 @@ void mz2500_state::draw_cg_screen(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 UINT32 mz2500_state::screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(machine().pens[0], cliprect); //TODO: correct?
+	bitmap.fill(m_palette->pen(0), cliprect); //TODO: correct?
 
 	if(m_screen_enable)
 		return 0;
@@ -1122,7 +1122,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_tv_crtc_w)
 					bit2 = i & 0x40 ? 4 : 0;
 					g = bit0|bit1|bit2;
 
-					palette_set_color_rgb(machine(), i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
+					m_palette->set_pen_color(i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
 				}
 			}
 			if(m_text_reg_index >= 0x80 && m_text_reg_index <= 0x8f) //Bitmap 16 clut registers
@@ -1273,7 +1273,7 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 		m_pal[pal_entry].b = data & 0x0f;
 	}
 
-	palette_set_color_rgb(machine(), pal_entry+0x10, pal4bit(m_pal[pal_entry].r), pal4bit(m_pal[pal_entry].g), pal4bit(m_pal[pal_entry].b));
+	m_palette->set_pen_color(pal_entry+0x10, pal4bit(m_pal[pal_entry].r), pal4bit(m_pal[pal_entry].g), pal4bit(m_pal[pal_entry].b));
 }
 
 READ8_MEMBER(mz2500_state::mz2500_wd17xx_r)
@@ -1778,8 +1778,8 @@ void mz2500_state::machine_start()
 	save_pointer(NAME(m_emm_ram), 0x100000);
 
 	/* TODO: gfx[4] crashes as per now */
-	m_gfxdecode->set_gfx(3, auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_1bpp, (UINT8 *)m_pcg_ram, 0x10, 0)));
-	m_gfxdecode->set_gfx(4, auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_3bpp, (UINT8 *)m_pcg_ram, 4, 0)));
+	m_gfxdecode->set_gfx(3, auto_alloc(machine(), gfx_element(machine(), m_palette, mz2500_pcg_layout_1bpp, (UINT8 *)m_pcg_ram, 0x10, 0)));
+	m_gfxdecode->set_gfx(4, auto_alloc(machine(), gfx_element(machine(), m_palette, mz2500_pcg_layout_3bpp, (UINT8 *)m_pcg_ram, 4, 0)));
 }
 
 void mz2500_state::machine_reset()
@@ -2032,16 +2032,16 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL                  // write B
 };
 
-void mz2500_state::palette_init()
+PALETTE_INIT_MEMBER(mz2500_state, mz2500)
 {
 	int i;
 
 	for(i=0;i<0x200;i++)
-		palette_set_color_rgb(machine(), i,pal1bit(0),pal1bit(0),pal1bit(0));
+		palette.set_pen_color(i,pal1bit(0),pal1bit(0),pal1bit(0));
 
 	/* set up 8 colors (PCG) */
 	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine(), i+8,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
+		m_palette->set_pen_color(i+8,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
 
 	/* set up 16 colors (PCG / CG) */
 
@@ -2066,7 +2066,7 @@ void mz2500_state::palette_init()
 			bit2 = i & 0x40 ? 4 : 0;
 			g = bit0|bit1|bit2;
 
-			palette_set_color_rgb(machine(), i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
+			m_palette->set_pen_color(i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
 		}
 	}
 }
@@ -2160,9 +2160,9 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
 	MCFG_SCREEN_UPDATE_DRIVER(mz2500_state, screen_update_mz2500)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mz2500)
+	MCFG_GFXDECODE_ADD("gfxdecode",mz2500,"palette")
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

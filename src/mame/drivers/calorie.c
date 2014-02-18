@@ -459,8 +459,8 @@ static MACHINE_CONFIG_START( calorie, calorie_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(calorie_state, screen_update_calorie)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", calorie)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE_ADD("gfxdecode",calorie,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 	/* sound hardware */

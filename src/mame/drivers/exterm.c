@@ -458,7 +458,7 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 	MCFG_TIMER_DRIVER_ADD("snd_nmi_timer", exterm_state, master_sound_nmi_callback)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(2048+32768)
+	MCFG_PALETTE_ADD("palette", 2048+32768)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(40000000/8, 318, 0, 256, 264, 0, 240)

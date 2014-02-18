@@ -61,7 +61,7 @@ public:
 	DECLARE_READ8_MEMBER(destroyr_scanline_r);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(destroyr);
 	UINT32 screen_update_destroyr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(destroyr_dial_callback);
 	TIMER_CALLBACK_MEMBER(destroyr_frame_callback);
@@ -448,16 +448,16 @@ static GFXDECODE_START( destroyr )
 GFXDECODE_END
 
 
-void destroyr_state::palette_init()
+PALETTE_INIT_MEMBER(destroyr_state, destroyr)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0x00, 0x00, 0x00));   /* major objects */
-	palette_set_color(machine(), 1, MAKE_RGB(0x50, 0x50, 0x50));
-	palette_set_color(machine(), 2, MAKE_RGB(0xAF, 0xAF, 0xAF));
-	palette_set_color(machine(), 3, MAKE_RGB(0xFF ,0xFF, 0xFF));
-	palette_set_color(machine(), 4, MAKE_RGB(0x00, 0x00, 0x00));   /* alpha numerics, waves, minor objects */
-	palette_set_color(machine(), 5, MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 6, MAKE_RGB(0x00, 0x00, 0x00));   /* cursor */
-	palette_set_color(machine(), 7, MAKE_RGB(0x78, 0x78, 0x78));
+	palette.set_pen_color(0, MAKE_RGB(0x00, 0x00, 0x00));   /* major objects */
+	palette.set_pen_color(1, MAKE_RGB(0x50, 0x50, 0x50));
+	palette.set_pen_color(2, MAKE_RGB(0xAF, 0xAF, 0xAF));
+	palette.set_pen_color(3, MAKE_RGB(0xFF ,0xFF, 0xFF));
+	palette.set_pen_color(4, MAKE_RGB(0x00, 0x00, 0x00));   /* alpha numerics, waves, minor objects */
+	palette.set_pen_color(5, MAKE_RGB(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(6, MAKE_RGB(0x00, 0x00, 0x00));   /* cursor */
+	palette.set_pen_color(7, MAKE_RGB(0x78, 0x78, 0x78));
 }
 
 
@@ -487,8 +487,9 @@ static MACHINE_CONFIG_START( destroyr, destroyr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(destroyr_state, screen_update_destroyr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", destroyr)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_GFXDECODE_ADD("gfxdecode",destroyr,"palette")
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(destroyr_state, destroyr)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

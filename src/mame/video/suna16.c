@@ -91,7 +91,7 @@ WRITE16_MEMBER(suna16_state::bestbest_flipscreen_w)
 
 void suna16_state::video_start()
 {
-	m_paletteram = auto_alloc_array(machine(), UINT16, machine().total_colors());
+	m_paletteram = auto_alloc_array(machine(), UINT16, m_palette->entries());
 }
 
 READ16_MEMBER(suna16_state::suna16_paletteram16_r)
@@ -103,7 +103,7 @@ WRITE16_MEMBER(suna16_state::suna16_paletteram16_w)
 {
 	offset += m_color_bank * 256;
 	data = COMBINE_DATA(&m_paletteram[offset]);
-	palette_set_color_rgb( machine(), offset, pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+	m_palette->set_pen_color( offset, pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
 

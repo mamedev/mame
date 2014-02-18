@@ -296,7 +296,7 @@ void sengokmj_state::video_start()
 
 UINT32 sengokmj_state::screen_update_sengokmj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(screen.machine().pens[0x7ff], cliprect); //black pen
+	bitmap.fill(screen.m_palette->pen(0x7ff), cliprect); //black pen
 
 	/* TODO: offsetted? */
 	m_sc0_tilemap->set_scrollx(0, (SEIBU_CRTC_SC0_SX + 128) & 0x1ff );
@@ -580,8 +580,8 @@ static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sengokmj)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_GFXDECODE_ADD("gfxdecode",sengokmj,"palette")
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)

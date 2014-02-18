@@ -161,10 +161,10 @@ static INPUT_PORTS_START( pc4 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_UNUSED
 INPUT_PORTS_END
 
-void pc4_state::palette_init()
+PALETTE_INIT_MEMBER(pc4_state, pc4)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
+	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
 }
 
 static const gfx_layout pc4_charlayout =
@@ -230,8 +230,8 @@ static MACHINE_CONFIG_START( pc4, pc4_state )
 	MCFG_SCREEN_SIZE(240, 36)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 36-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_GFXDECODE_ADD("gfxdecode", pc4)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_GFXDECODE_ADD("gfxdecode",pc4,"palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )

@@ -602,7 +602,7 @@ PALETTE_INIT_MEMBER(subsino_state,subsino_2proms)
 		bit2 = (val >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -629,7 +629,7 @@ PALETTE_INIT_MEMBER(subsino_state,subsino_3proms)
 		bit2 = (val >> 0) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -1086,7 +1086,7 @@ WRITE8_MEMBER(subsino_state::colordac_w)
 
 		case 1:
 			m_stisub_colorram[m_colordac_offs] = data;
-			palette_set_color_rgb(machine(), m_colordac_offs/3,
+			m_palette->set_pen_color(m_colordac_offs/3,
 				pal6bit(m_stisub_colorram[(m_colordac_offs/3)*3+0]),
 				pal6bit(m_stisub_colorram[(m_colordac_offs/3)*3+1]),
 				pal6bit(m_stisub_colorram[(m_colordac_offs/3)*3+2])
@@ -2815,10 +2815,10 @@ static MACHINE_CONFIG_START( victor21, subsino_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", subsino_depth3)
+	MCFG_GFXDECODE_ADD("gfxdecode",subsino_depth3,"palette")
 
-	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_2proms)
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(subsino_state,subsino_2proms)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
@@ -2857,10 +2857,10 @@ static MACHINE_CONFIG_START( crsbingo, subsino_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", subsino_depth4)
+	MCFG_GFXDECODE_ADD("gfxdecode",subsino_depth4,"palette")
 
-	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_2proms)
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(subsino_state,subsino_2proms)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
@@ -2888,10 +2888,10 @@ static MACHINE_CONFIG_START( srider, subsino_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", subsino_depth4)
+	MCFG_GFXDECODE_ADD("gfxdecode",subsino_depth4,"palette")
 
-	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_3proms)
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(subsino_state,subsino_3proms)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
@@ -2929,10 +2929,10 @@ static MACHINE_CONFIG_START( tisub, subsino_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_subsino_reels)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", subsino_depth4_reels)
+	MCFG_GFXDECODE_ADD("gfxdecode",subsino_depth4_reels,"palette")
 
-	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_3proms)
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(subsino_state,subsino_3proms)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino_reels)
 
@@ -2959,10 +2959,10 @@ static MACHINE_CONFIG_START( stisub, subsino_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_stisub_reels)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", subsino_stisub)
+	MCFG_GFXDECODE_ADD("gfxdecode",subsino_stisub,"palette")
 
-	MCFG_PALETTE_LENGTH(0x100)
-	//MCFG_PALETTE_INIT_OVERRIDE(subsino_state,subsino_3proms)
+	MCFG_PALETTE_ADD("palette", 0x100)
+	//MCFG_PALETTE_INIT_OWNER(subsino_state,subsino_3proms)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,stisub)
 

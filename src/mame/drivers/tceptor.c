@@ -382,8 +382,8 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", tceptor)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",tceptor,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_DEFAULT_LAYOUT(layout_horizont)
 
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")

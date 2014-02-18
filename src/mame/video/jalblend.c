@@ -98,7 +98,7 @@ void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,gfx_e
 	/* Start drawing */
 	if (gfx)
 	{
-		const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+		const pen_t *pal = &gfx->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const UINT8 *alpha = &jal_blend_table[gfx->granularity() * (color % gfx->colors())];
 		const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 		int x_index_base, y_index, sx, sy, ex, ey;

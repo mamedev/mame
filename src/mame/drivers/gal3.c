@@ -189,7 +189,7 @@ void gal3_state::update_palette(  )
 		g = data1&0xff;
 		b = data2&0xff;
 
-		palette_set_color( machine(),i, MAKE_RGB(r,g,b) );
+		m_palette->set_pen_color( i, MAKE_RGB(r,g,b) );
 	}
 } /* update_palette */
 
@@ -630,8 +630,8 @@ static MACHINE_CONFIG_START( gal3, gal3_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gal3_state, screen_update_gal3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", namcos21)
-	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
+	MCFG_GFXDECODE_ADD("gfxdecode",namcos21,"palette")
+	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 
 	MCFG_VIDEO_START_OVERRIDE(gal3_state,gal3)
 

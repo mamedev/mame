@@ -390,8 +390,8 @@ static MACHINE_CONFIG_START( skyskipr, popeye_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(popeye_state, screen_update_popeye)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", popeye)
-	MCFG_PALETTE_LENGTH(16+16*2+64*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",popeye,"palette")
+	MCFG_PALETTE_ADD("palette", 16+16*2+64*4)
 
 
 	/* sound hardware */
@@ -425,7 +425,7 @@ static MACHINE_CONFIG_DERIVED( popeyebl, popeye )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(popeyebl_map)
 
-	MCFG_PALETTE_INIT_OVERRIDE(popeye_state,popeyebl)
+	MCFG_PALETTE_INIT_OWNER(popeye_state,popeyebl)
 MACHINE_CONFIG_END
 
 

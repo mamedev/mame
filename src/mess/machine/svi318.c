@@ -379,8 +379,8 @@ MACHINE_RESET_MEMBER(svi318_state,svi328_806)
 	svi318_set_banks();
 
 	/* Set SVI-806 80 column card palette */
-	palette_set_color_rgb( machine(), TMS9928A_PALETTE_SIZE, 0, 0, 0 );     /* Monochrome black */
-	palette_set_color_rgb( machine(), TMS9928A_PALETTE_SIZE+1, 0, 224, 0 ); /* Monochrome green */
+	m_palette->set_pen_color( TMS9928A_PALETTE_SIZE, 0, 0, 0 );     /* Monochrome black */
+	m_palette->set_pen_color( TMS9928A_PALETTE_SIZE+1, 0, 224, 0 ); /* Monochrome green */
 }
 
 /* Init functions */

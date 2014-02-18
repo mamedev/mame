@@ -236,7 +236,7 @@ void cgenie_state::cgenie_refresh_monitor(bitmap_ind16 &bitmap, const rectangle 
 	int i, address, offset, cursor, size, code, x, y;
 	rectangle r;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if(m_crt.vertical_displayed || m_crt.horizontal_displayed)
 	{
@@ -315,8 +315,8 @@ void cgenie_state::cgenie_refresh_tv_set(bitmap_ind16 &bitmap, const rectangle &
 	int i, address, offset, cursor, size, code, x, y;
 	rectangle r;
 
-	m_bitmap.fill(get_black_pen(machine()), cliprect);
-	m_dlybitmap.fill(get_black_pen(machine()), cliprect);
+	m_bitmap.fill(m_palette->black_pen(), cliprect);
+	m_dlybitmap.fill(m_palette->black_pen(), cliprect);
 
 	if(m_crt.vertical_displayed || m_crt.horizontal_displayed)
 	{

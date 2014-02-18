@@ -1025,7 +1025,7 @@ PALETTE_INIT_MEMBER(x68k_state,x68000)
 		g = (pal & 0x7c00) >> 7;
 		r = (pal & 0x03e0) >> 2;
 		b = (pal & 0x001f) << 3;
-		palette_set_color_rgb(machine(),pal+512,r,g,b);
+		palette.set_pen_color(pal+512,r,g,b);
 	}
 }
 
@@ -1093,11 +1093,11 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), x68k_pcg_8, memregion("user1")->base(), 32, 0)));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), m_palette, x68k_pcg_8, memregion("user1")->base(), 32, 0)));
 
 	gfx_index++;
 
-	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), x68k_pcg_16, memregion("user1")->base(), 32, 0)));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), m_palette, x68k_pcg_16, memregion("user1")->base(), 32, 0)));
 	m_gfxdecode->gfx(gfx_index)->set_colors(32);
 
 	/* Tilemaps */

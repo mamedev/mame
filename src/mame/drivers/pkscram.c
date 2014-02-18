@@ -319,8 +319,8 @@ static MACHINE_CONFIG_START( pkscramble, pkscram_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pkscram_state, screen_update_pkscramble)
 
-	MCFG_PALETTE_LENGTH(0x800)
-	MCFG_GFXDECODE_ADD("gfxdecode", pkscram)
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_GFXDECODE_ADD("gfxdecode",pkscram,"palette")
 
 
 	/* sound hardware */

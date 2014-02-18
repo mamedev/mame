@@ -48,7 +48,7 @@ READ8_MEMBER(cbasebal_state::bankedram_r)
 		return cbasebal_textram_r(space, offset);   /* VRAM */
 	case 1:
 		if (offset < 0x800)
-			return m_generic_paletteram_8[offset];
+			return m_palette->basemem().read8(offset);
 		else
 			return 0;
 		break;
@@ -66,7 +66,7 @@ WRITE8_MEMBER(cbasebal_state::bankedram_w)
 		break;
 	case 1:
 		if (offset < 0x800)
-			paletteram_xxxxBBBBRRRRGGGG_byte_le_w(space, offset, data);
+			m_palette->write(space, offset, data);
 		break;
 	default:
 		cbasebal_scrollram_w(space, offset, data);
@@ -270,9 +270,10 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(cbasebal_state, screen_update_cbasebal)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cbasebal)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",cbasebal,"palette")
 
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

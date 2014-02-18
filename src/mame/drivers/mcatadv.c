@@ -451,8 +451,8 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mcatadv_state, screen_update_mcatadv)
 	MCFG_SCREEN_VBLANK_DRIVER(mcatadv_state, screen_eof_mcatadv)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mcatadv)
-	MCFG_PALETTE_LENGTH(0x2000/2)
+	MCFG_GFXDECODE_ADD("gfxdecode",mcatadv,"palette")
+	MCFG_PALETTE_ADD("palette", 0x2000/2)
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 

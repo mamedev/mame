@@ -265,8 +265,8 @@ static MACHINE_CONFIG_START( mikie, mikie_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mikie_state, screen_update_mikie)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mikie)
-	MCFG_PALETTE_LENGTH(16*8*16+16*8*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",mikie,"palette")
+	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
 
 
 	/* sound hardware */

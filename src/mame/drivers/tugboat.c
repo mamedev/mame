@@ -86,12 +86,12 @@ void tugboat_state::video_start()
 
 /*  there isn't the usual resistor array anywhere near the color prom,
     just four 1k resistors. */
-void tugboat_state::palette_init()
+PALETTE_INIT_MEMBER(tugboat_state, tugboat)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int r,g,b,brt;
 
@@ -101,7 +101,7 @@ void tugboat_state::palette_init()
 		g = brt * ((color_prom[i] >> 1) & 0x01);
 		b = brt * ((color_prom[i] >> 2) & 0x01);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -360,8 +360,8 @@ static MACHINE_CONFIG_START( tugboat, tugboat_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8,31*8-1,2*8,30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tugboat_state, screen_update_tugboat)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tugboat)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",tugboat,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

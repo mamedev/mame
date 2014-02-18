@@ -112,7 +112,7 @@ static const int colortable_source[] =
 	0x01, 0x02
 };
 
-void skydiver_state::palette_init()
+PALETTE_INIT_MEMBER(skydiver_state, skydiver)
 {
 	int i;
 
@@ -127,7 +127,7 @@ void skydiver_state::palette_init()
 		default:  color = MAKE_RGB(0xa0, 0xa0, 0xa0); break; /* grey */
 		}
 
-		palette_set_color(machine(), i, color);
+		palette.set_pen_color(i, color);
 	}
 }
 
@@ -387,8 +387,8 @@ static MACHINE_CONFIG_START( skydiver, skydiver_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(skydiver_state, screen_update_skydiver)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", skydiver)
-	MCFG_PALETTE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
+	MCFG_GFXDECODE_ADD("gfxdecode",skydiver,"palette")
+	MCFG_PALETTE_ADD("palette", sizeof(colortable_source) / sizeof(colortable_source[0]))
 
 
 	/* sound hardware */

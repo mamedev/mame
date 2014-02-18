@@ -387,7 +387,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_lcd_palette_w)
 	{
 		verboselog( machine(), 0, "s3c240x_lcd_palette_w: unknown mask %08x\n", mem_mask);
 	}
-	palette_set_color( machine(), offset, s3c240x_get_color_5551( data & 0xFFFF));
+	m_palette->set_pen_color( offset, s3c240x_get_color_5551( data & 0xFFFF));
 }
 
 // CLOCK & POWER MANAGEMENT
@@ -1678,7 +1678,7 @@ static MACHINE_CONFIG_START( gp32, gp32_state )
 	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
 	MCFG_CPU_PROGRAM_MAP(gp32_map)
 
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD("palette", 32768)
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

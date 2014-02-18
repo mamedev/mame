@@ -246,10 +246,10 @@ static MACHINE_CONFIG_START( firebatl, clshroad_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update_clshroad)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", firebatl)
-	MCFG_PALETTE_LENGTH(512+64*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",firebatl,"palette")
+	MCFG_PALETTE_ADD("palette", 512+64*4)
 
-	MCFG_PALETTE_INIT_OVERRIDE(clshroad_state,firebatl)
+	MCFG_PALETTE_INIT_OWNER(clshroad_state,firebatl)
 	MCFG_VIDEO_START_OVERRIDE(clshroad_state,firebatl)
 
 	/* sound hardware */
@@ -279,10 +279,10 @@ static MACHINE_CONFIG_START( clshroad, clshroad_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update_clshroad)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", clshroad)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",clshroad,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_PALETTE_INIT_OVERRIDE(clshroad_state,clshroad)
+	MCFG_PALETTE_INIT_OWNER(clshroad_state,clshroad)
 	MCFG_VIDEO_START_OVERRIDE(clshroad_state,clshroad)
 
 	/* sound hardware */

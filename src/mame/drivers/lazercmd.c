@@ -593,15 +593,15 @@ static GFXDECODE_START( lazercmd )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 2 )
 GFXDECODE_END
 
-void lazercmd_state::palette_init()
+PALETTE_INIT_MEMBER(lazercmd_state, lazercmd)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0xb0, 0xb0, 0xb0)); /* white */
-	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
+	palette.set_pen_color(0, MAKE_RGB(0xb0, 0xb0, 0xb0)); /* white */
+	palette.set_pen_color(1, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
 
-	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
-	palette_set_color(machine(), 3, MAKE_RGB(0xb0, 0xb0, 0xb0)); /* white */
+	palette.set_pen_color(2, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
+	palette.set_pen_color(3, MAKE_RGB(0xb0, 0xb0, 0xb0)); /* white */
 
-	palette_set_color(machine(), 4, MAKE_RGB(0xff, 0xff, 0xff)); /* bright white */
+	palette.set_pen_color(4, MAKE_RGB(0xff, 0xff, 0xff)); /* bright white */
 }
 
 
@@ -646,8 +646,8 @@ static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lazercmd)
-	MCFG_PALETTE_LENGTH(5)
+	MCFG_GFXDECODE_ADD("gfxdecode",lazercmd,"palette")
+	MCFG_PALETTE_ADD("palette", 5)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -677,8 +677,8 @@ static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, VERT_RES * VERT_CHR - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lazercmd)
-	MCFG_PALETTE_LENGTH(5)
+	MCFG_GFXDECODE_ADD("gfxdecode",lazercmd,"palette")
+	MCFG_PALETTE_ADD("palette", 5)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -708,8 +708,8 @@ static MACHINE_CONFIG_START( bbonk, lazercmd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lazercmd)
-	MCFG_PALETTE_LENGTH(5)
+	MCFG_GFXDECODE_ADD("gfxdecode",lazercmd,"palette")
+	MCFG_PALETTE_ADD("palette", 5)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

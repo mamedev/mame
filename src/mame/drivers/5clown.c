@@ -552,7 +552,7 @@ UINT32 _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-void _5clown_state::palette_init()
+PALETTE_INIT_MEMBER(_5clown_state, _5clown)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 /*
@@ -569,7 +569,7 @@ void _5clown_state::palette_init()
 
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < m_palette->entries();i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b, bk;
 
@@ -589,7 +589,7 @@ void _5clown_state::palette_init()
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		b = bk * (bit2 * 0xff);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		m_palette->set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -1063,8 +1063,8 @@ static MACHINE_CONFIG_START( fclown, _5clown_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_5clown_state, screen_update_fclown)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fclown)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",fclown,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16, mc6845_intf) /* guess */

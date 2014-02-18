@@ -558,10 +558,10 @@ WRITE_LINE_MEMBER( rex6000_state::alarm_irq )
 }
 
 
-void rex6000_state::palette_init()
+PALETTE_INIT_MEMBER(rex6000_state, rex6000)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
+	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
 }
 
 QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
@@ -660,8 +660,8 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	MCFG_SCREEN_SIZE(240, 120)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 120-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_GFXDECODE_ADD("gfxdecode", rex6000)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_GFXDECODE_ADD("gfxdecode",rex6000,"palette")
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)

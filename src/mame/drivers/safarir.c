@@ -146,14 +146,14 @@ static GFXDECODE_START( safarir )
 GFXDECODE_END
 
 
-void safarir_state::palette_init()
+PALETTE_INIT_MEMBER(safarir_state, safarir)
 {
 	int i;
 
-	for (i = 0; i < machine().total_colors() / 2; i++)
+	for (i = 0; i < palette.entries() / 2; i++)
 	{
-		palette_set_color(machine(), (i * 2) + 0, RGB_BLACK);
-		palette_set_color(machine(), (i * 2) + 1, MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
+		palette.set_pen_color((i * 2) + 0, RGB_BLACK);
+		palette.set_pen_color((i * 2) + 1, MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
 	}
 }
 
@@ -408,8 +408,8 @@ static MACHINE_CONFIG_START( safarir, safarir_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(2*8)
-	MCFG_GFXDECODE_ADD("gfxdecode", safarir)
+	MCFG_PALETTE_ADD("palette", 2*8)
+	MCFG_GFXDECODE_ADD("gfxdecode",safarir,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(32*8, 32*8)

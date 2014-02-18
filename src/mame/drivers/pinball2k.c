@@ -136,7 +136,7 @@ void pinball2k_state::video_start()
 	int i;
 	for (i=0; i < 16; i++)
 	{
-		palette_set_color(machine(), i, cga_palette[i]);
+		m_palette->set_pen_color(i, cga_palette[i]);
 	}
 }
 
@@ -593,8 +593,8 @@ static MACHINE_CONFIG_START( mediagx, pinball2k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(pinball2k_state, screen_update_mediagx)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", CGA)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",CGA,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

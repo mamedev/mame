@@ -349,9 +349,10 @@ static MACHINE_CONFIG_START( bottom9, bottom9_state )
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(bottom9_state, screen_update_bottom9)
 
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K052109_ADD("k052109", bottom9_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K051960_ADD("k051960", bottom9_k051960_intf)

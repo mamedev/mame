@@ -340,7 +340,7 @@ e3 -> c6
 UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count,x,y;
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	count = 0x0000;
 
@@ -775,7 +775,7 @@ static GFXDECODE_START( cb2001 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout32, 0x0, 32 )
 GFXDECODE_END
 
-void cb2001_state::palette_init()
+PALETTE_INIT_MEMBER(cb2001_state, cb2001)
 {
 	int i;
 	for (i = 0; i < 0x200; i++)
@@ -795,11 +795,11 @@ void cb2001_state::palette_init()
 
 		if (length==0x400) // are the cb2001 proms dumped incorrectly?
 		{
-			if (!(i&0x20)) palette_set_color(machine(), (i&0x1f) | ((i&~0x3f)>>1), MAKE_RGB(r, g, b));
+			if (!(i&0x20)) palette.set_pen_color((i&0x1f) | ((i&~0x3f)>>1), MAKE_RGB(r, g, b));
 		}
 		else
 		{
-			palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+			palette.set_pen_color(i, MAKE_RGB(r, g, b));
 		}
 	}
 }
@@ -844,7 +844,7 @@ static MACHINE_CONFIG_START( cb2001, cb2001_state )
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cb2001)
+	MCFG_GFXDECODE_ADD("gfxdecode",cb2001,"palette")
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -854,7 +854,7 @@ static MACHINE_CONFIG_START( cb2001, cb2001_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cb2001_state, screen_update_cb2001)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 	/* sound hardware */

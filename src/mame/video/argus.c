@@ -376,7 +376,7 @@ void argus_state::argus_change_palette(int color, int lo_offs, int hi_offs)
 	UINT8 lo = m_paletteram[lo_offs];
 	UINT8 hi = m_paletteram[hi_offs];
 	jal_blend_set(color, hi & 0x0f);
-	palette_set_color_rgb(machine(), color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
+	m_palette->set_pen_color(color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
 }
 
 void argus_state::argus_change_bg_palette(int color, int lo_offs, int hi_offs)
@@ -413,7 +413,7 @@ void argus_state::argus_change_bg_palette(int color, int lo_offs, int hi_offs)
 
 	rgb = jal_blend_func(rgb,irgb,ix);
 
-	palette_set_color(machine(),color,rgb);
+	m_palette->set_pen_color(color,rgb);
 }
 
 
@@ -1165,7 +1165,7 @@ UINT32 argus_state::screen_update_valtric(screen_device &screen, bitmap_rgb32 &b
 	if (m_bg_status & 1)    /* Backgound enable */
 		valtric_draw_mosaic(screen, bitmap, cliprect);
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	valtric_draw_sprites(bitmap, cliprect);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -1178,7 +1178,7 @@ UINT32 argus_state::screen_update_butasan(screen_device &screen, bitmap_rgb32 &b
 	if (m_bg_status & 1)    /* Backgound enable */
 		m_bg0_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	if (m_butasan_bg1_status & 1) m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	butasan_draw_sprites(bitmap, cliprect);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);

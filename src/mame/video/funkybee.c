@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "includes/funkybee.h"
 
-void funkybee_state::palette_init()
+PALETTE_INIT_MEMBER(funkybee_state, funkybee)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -35,7 +35,7 @@ void funkybee_state::palette_init()
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
+		palette.set_pen_color(i, MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }

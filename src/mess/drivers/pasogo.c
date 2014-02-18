@@ -598,13 +598,13 @@ static const unsigned char pasogo_palette[][3] =
 };
 
 
-void pasogo_state::palette_init()
+PALETTE_INIT_MEMBER(pasogo_state, pasogo)
 {
 	int i;
 
 	for ( i = 0; i < ARRAY_LENGTH(pasogo_palette); i++ )
 	{
-		palette_set_color_rgb(machine(), i, pasogo_palette[i][0], pasogo_palette[i][1], pasogo_palette[i][2]);
+		palette.set_pen_color(i, pasogo_palette[i][0], pasogo_palette[i][1], pasogo_palette[i][2]);
 	}
 }
 
@@ -994,7 +994,7 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pasogo_state, screen_update_pasogo)
 
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(pasogo_palette))
+	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(pasogo_palette))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)

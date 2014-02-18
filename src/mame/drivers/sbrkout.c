@@ -515,14 +515,13 @@ static MACHINE_CONFIG_START( sbrkout, sbrkout_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", sbrkout)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE_ADD("gfxdecode",sbrkout,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sbrkout_state, screen_update_sbrkout)
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -125,7 +125,7 @@ void gpworld_state::draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,in
 	}
 
 	if (cliprect.contains(x, y))
-		bitmap.pix32(y, x) = machine().pens[color];
+		bitmap.pix32(y, x) = m_palette->pen(color);
 }
 
 void gpworld_state::gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -307,7 +307,7 @@ WRITE8_MEMBER(gpworld_state::palette_write)
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
-	palette_set_color(machine(), (pal_index & 0xffe) >> 1, MAKE_ARGB(a, r, g, b));
+	m_palette->set_pen_color((pal_index & 0xffe) >> 1, MAKE_ARGB(a, r, g, b));
 }
 
 /* PROGRAM MAP */
@@ -496,8 +496,8 @@ static MACHINE_CONFIG_START( gpworld, gpworld_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gpworld)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",gpworld,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

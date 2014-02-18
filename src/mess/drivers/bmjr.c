@@ -324,12 +324,12 @@ static GFXDECODE_START( bmjr )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bmjr_charlayout, 0, 4 )
 GFXDECODE_END
 
-void bmjr_state::palette_init()
+PALETTE_INIT_MEMBER(bmjr_state, bmjr)
 {
 	int i;
 
 	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 }
 
 
@@ -359,8 +359,8 @@ static MACHINE_CONFIG_START( bmjr, bmjr_state )
 	MCFG_SCREEN_SIZE(256, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bmjr_state, screen_update_bmjr)
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_GFXDECODE_ADD("gfxdecode", bmjr)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_GFXDECODE_ADD("gfxdecode",bmjr,"palette")
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

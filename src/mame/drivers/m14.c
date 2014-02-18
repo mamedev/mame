@@ -103,7 +103,7 @@ public:
  *************************************/
 
 /* guess, might not be 100% accurate. */
-void m14_state::palette_init()
+PALETTE_INIT_MEMBER(m14_state, m14)
 {
 	int i;
 
@@ -116,7 +116,7 @@ void m14_state::palette_init()
 		else
 			color = (i & 0x10) ? RGB_WHITE : RGB_BLACK;
 
-		palette_set_color(machine(), i, color);
+		palette.set_pen_color(i, color);
 	}
 }
 
@@ -346,8 +346,8 @@ static MACHINE_CONFIG_START( m14, m14_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m14_state, screen_update_m14)
-	MCFG_GFXDECODE_ADD("gfxdecode", m14)
-	MCFG_PALETTE_LENGTH(0x20)
+	MCFG_GFXDECODE_ADD("gfxdecode",m14,"palette")
+	MCFG_PALETTE_ADD("palette", 0x20)
 
 
 	/* sound hardware */

@@ -682,8 +682,8 @@ static MACHINE_CONFIG_START( ppking, gladiatr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gladiatr_state, screen_update_ppking)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ppking)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",ppking,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(gladiatr_state,ppking)
 
@@ -730,8 +730,8 @@ static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gladiatr_state, screen_update_gladiatr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gladiatr)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",gladiatr,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(gladiatr_state,gladiatr)
 

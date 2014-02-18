@@ -43,9 +43,6 @@ PALETTE_INIT_MEMBER(trackfld_state,trackfld)
 			3, &resistances_rg[0], gweights, 1000, 0,
 			2, &resistances_b[0],  bweights, 1000, 0);
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x20);
-
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
 	{
@@ -69,7 +66,7 @@ PALETTE_INIT_MEMBER(trackfld_state,trackfld)
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -79,14 +76,14 @@ PALETTE_INIT_MEMBER(trackfld_state,trackfld)
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* characters */
 	for (i = 0x100; i < 0x200; i++)
 	{
 		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -228,7 +225,7 @@ void trackfld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			code + m_sprite_bank1 + m_sprite_bank2, color,
 			flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(0), color, 0));
+			m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0));
 
 		/* redraw with wraparound */
 		
@@ -236,7 +233,7 @@ void trackfld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			code + m_sprite_bank1 + m_sprite_bank2, color,
 			flipx, flipy,
 			sx - 256, sy,
-			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(0), color, 0));
+			m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0));
 	}
 }
 

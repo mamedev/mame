@@ -628,8 +628,8 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 	decospr_device::set_flipallx(*device, 1);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", esd16)
-	MCFG_PALETTE_LENGTH(0x1000/2)
+	MCFG_GFXDECODE_ADD("gfxdecode",esd16,"palette")
+	MCFG_PALETTE_ADD("palette", 0x1000/2)
 
 
 	/* sound hardware */

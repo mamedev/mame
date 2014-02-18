@@ -858,9 +858,9 @@ WRITE16_MEMBER(wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w)
 	g = ((newword >> 3) & 0x1E ) | ((newword >> 13) & 0x01);
 	b = ((newword >> 7) & 0x1E ) | ((newword >> 14) & 0x01);
 
-	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	r>>=1; g>>=1; b>>=1;
-	palette_set_color_rgb(machine(), offset+0x800, pal5bit(r)/2, pal5bit(g)/2, pal5bit(b)/2);
+	m_palette->set_pen_color(offset+0x800, pal5bit(r)/2, pal5bit(g)/2, pal5bit(b)/2);
 }
 
 WRITE16_MEMBER(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)
@@ -869,7 +869,7 @@ WRITE16_MEMBER(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)
 
 	// the highest nibble has some unknown functions
 //  if (newword & 0xf000) logerror("MSN set on color %03x: %1x\n", offset, newword>>12);
-	palette_set_color_rgb(machine(), offset, pal4bit(newword >> 0), pal4bit(newword >> 4), pal4bit(newword >> 8));
+	m_palette->set_pen_color(offset, pal4bit(newword >> 0), pal4bit(newword >> 4), pal4bit(newword >> 8));
 }
 
 
@@ -904,7 +904,7 @@ VIDEO_START_MEMBER(wecleman_state,wecleman)
 	m_cloud_blend = BLEND_MAX;
 	m_cloud_ds = 0;
 	m_cloud_visible = 0;
-	m_black_pen = get_black_pen(machine());
+	m_black_pen = m_palette->black_pen();
 
 	m_rgb_half     =          (UINT16*)(buffer + 0x00000);
 	m_t32x32pm     =             (int*)(buffer + 0x10020);
@@ -1001,7 +1001,7 @@ VIDEO_START_MEMBER(wecleman_state,hotchase)
 	m_gfx_bank = bank;
 	m_spr_offsx = -0xc0;
 	m_spr_offsy = 0;
-	m_black_pen = get_black_pen(machine());
+	m_black_pen = m_palette->black_pen();
 
 	m_spr_ptr_list = (struct sprite **)buffer;
 

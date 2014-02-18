@@ -283,8 +283,8 @@ static MACHINE_CONFIG_START( dcon, dcon_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dcon)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",dcon,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(4000000,1320000)
@@ -309,8 +309,8 @@ static MACHINE_CONFIG_START( sdgndmps, dcon_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dcon)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",dcon,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)

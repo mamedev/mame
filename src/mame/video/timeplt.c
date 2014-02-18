@@ -37,7 +37,7 @@
 
 ***************************************************************************/
 
-void timeplt_state::palette_init()
+PALETTE_INIT_MEMBER(timeplt_state, timeplt)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t palette[32];
@@ -75,11 +75,11 @@ void timeplt_state::palette_init()
 
 	/* sprites */
 	for (i = 0; i < 64 * 4; i++)
-		palette_set_color(machine(), 32 * 4 + i, palette[*color_prom++ & 0x0f]);
+		palette.set_pen_color(32 * 4 + i, palette[*color_prom++ & 0x0f]);
 
 	/* characters */
 	for (i = 0; i < 32 * 4; i++)
-		palette_set_color(machine(), i, palette[(*color_prom++ & 0x0f) + 0x10]);
+		palette.set_pen_color(i, palette[(*color_prom++ & 0x0f) + 0x10]);
 }
 
 

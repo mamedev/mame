@@ -102,7 +102,7 @@ UINT32 feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind1
 	UINT32 *spriteram32 = m_spriteram;
 	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
 
-	bitmap.fill(machine().pens[0], cliprect); //black pen
+	bitmap.fill(m_palette->pen(0), cliprect); //black pen
 
 	for(offs=(0x2000/4)-2;offs>-1;offs-=2)
 	{
@@ -135,13 +135,13 @@ WRITE32_MEMBER(feversoc_state::fs_paletteram_w)
 	g = ((m_generic_paletteram_32[offset] & 0x03e00000)>>16) >> 2;
 	b = ((m_generic_paletteram_32[offset] & 0x7c000000)>>16) >> 7;
 
-	palette_set_color(machine(),offset*2+0,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offset*2+0,MAKE_RGB(r,g,b));
 
 	r = (m_generic_paletteram_32[offset] & 0x001f) << 3;
 	g = (m_generic_paletteram_32[offset] & 0x03e0) >> 2;
 	b = (m_generic_paletteram_32[offset] & 0x7c00) >> 7;
 
-	palette_set_color(machine(),offset*2+1,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offset*2+1,MAKE_RGB(r,g,b));
 }
 
 READ32_MEMBER(feversoc_state::in0_r)
@@ -274,8 +274,8 @@ static MACHINE_CONFIG_START( feversoc, feversoc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1) //dynamic resolution?
 	MCFG_SCREEN_UPDATE_DRIVER(feversoc_state, screen_update_feversoc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", feversoc)
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE_ADD("gfxdecode",feversoc,"palette")
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
 	/* sound hardware */

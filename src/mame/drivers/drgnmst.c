@@ -400,7 +400,7 @@ static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
 	MCFG_CPU_IO_MAP(drgnmst_sound_io_map)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", drgnmst)
+	MCFG_GFXDECODE_ADD("gfxdecode",drgnmst,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drgnmst_state, screen_update_drgnmst)
 
-	MCFG_PALETTE_LENGTH(0x2000)
+	MCFG_PALETTE_ADD("palette", 0x2000)
 
 
 	/* sound hardware */

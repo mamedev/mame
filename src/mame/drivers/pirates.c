@@ -253,7 +253,7 @@ static MACHINE_CONFIG_START( pirates, pirates_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pirates)
+	MCFG_GFXDECODE_ADD("gfxdecode",pirates,"palette")
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -263,7 +263,7 @@ static MACHINE_CONFIG_START( pirates, pirates_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pirates_state, screen_update_pirates)
 
-	MCFG_PALETTE_LENGTH(0x2000)
+	MCFG_PALETTE_ADD("palette", 0x2000)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

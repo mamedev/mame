@@ -25,13 +25,13 @@
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
-void seicross_state::palette_init()
+PALETTE_INIT_MEMBER(seicross_state, seicross)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -50,7 +50,7 @@ void seicross_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 	}
 }
 

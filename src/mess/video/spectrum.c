@@ -175,7 +175,7 @@ static const rgb_t spectrum_palette[16] = {
 /* Initialise the palette */
 PALETTE_INIT_MEMBER(spectrum_state,spectrum)
 {
-	palette_set_colors(machine(), 0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
+	palette.set_pen_colors(0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
 }
 
 

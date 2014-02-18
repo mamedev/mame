@@ -909,10 +909,10 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trackfld_state, screen_update_trackfld)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", trackfld)
-	MCFG_PALETTE_LENGTH(16*16+16*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",trackfld,"palette")
+	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 
-	MCFG_PALETTE_INIT_OVERRIDE(trackfld_state,trackfld)
+	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)
 	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */
@@ -961,10 +961,10 @@ static MACHINE_CONFIG_START( yieartf, trackfld_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trackfld_state, screen_update_trackfld)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", trackfld)
-	MCFG_PALETTE_LENGTH(16*16+16*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",trackfld,"palette")
+	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 
-	MCFG_PALETTE_INIT_OVERRIDE(trackfld_state,trackfld)
+	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)
 	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */

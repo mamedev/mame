@@ -3282,7 +3282,7 @@ void powervr2_device::debug_paletteram()
 				g = (pal & 0x03e0)>>5;
 				b = (pal & 0x001f)>>0;
 				//a = a ? 0xff : 0x00;
-				palette_set_color_rgb(machine(), i, pal5bit(r), pal5bit(g), pal5bit(b));
+				m_palette->set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 			}
 			break;
 			case 1: //rgb565
@@ -3291,7 +3291,7 @@ void powervr2_device::debug_paletteram()
 				r = (pal & 0xf800)>>11;
 				g = (pal & 0x07e0)>>5;
 				b = (pal & 0x001f)>>0;
-				palette_set_color_rgb(machine(), i, pal5bit(r), pal6bit(g), pal5bit(b));
+				m_palette->set_pen_color(i, pal5bit(r), pal6bit(g), pal5bit(b));
 			}
 			break;
 			case 2: //argb4444
@@ -3300,7 +3300,7 @@ void powervr2_device::debug_paletteram()
 				r = (pal & 0x0f00)>>8;
 				g = (pal & 0x00f0)>>4;
 				b = (pal & 0x000f)>>0;
-				palette_set_color_rgb(machine(), i, pal4bit(r), pal4bit(g), pal4bit(b));
+				m_palette->set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
 			}
 			break;
 			case 3: //argb8888
@@ -3309,7 +3309,7 @@ void powervr2_device::debug_paletteram()
 				r = (pal & 0x00ff0000)>>16;
 				g = (pal & 0x0000ff00)>>8;
 				b = (pal & 0x000000ff)>>0;
-				palette_set_color_rgb(machine(), i, r, g, b);
+				m_palette->set_pen_color(i, r, g, b);
 			}
 			break;
 		}

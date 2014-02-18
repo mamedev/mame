@@ -28,7 +28,7 @@
 
 ***************************************************************************/
 
-void bking_state::palette_init()
+PALETTE_INIT_MEMBER(bking_state, bking)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 220, 390, 820 };
@@ -42,7 +42,7 @@ void bking_state::palette_init()
 			3, &resistances_rg[0], gweights, 0, 0,
 			2, &resistances_b[0],  bweights, 0, 0);
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		UINT16 pen;
 		int bit0, bit1, bit2, r, g, b;
@@ -78,7 +78,7 @@ void bking_state::palette_init()
 		bit1 = (color_prom[pen] >> 7) & 0x01;
 		b = combine_2_weights(gweights, bit0, bit1);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 

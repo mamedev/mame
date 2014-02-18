@@ -529,8 +529,8 @@ static MACHINE_CONFIG_START( amazon, terracre_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(terracre_state, screen_update_amazon)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", terracre)
-	MCFG_PALETTE_LENGTH(1*16+16*16+16*256)
+	MCFG_GFXDECODE_ADD("gfxdecode",terracre,"palette")
+	MCFG_PALETTE_ADD("palette", 1*16+16*16+16*256)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -562,8 +562,8 @@ static MACHINE_CONFIG_START( ym3526, terracre_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(terracre_state, screen_update_amazon)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", terracre)
-	MCFG_PALETTE_LENGTH(1*16+16*16+16*256)
+	MCFG_GFXDECODE_ADD("gfxdecode",terracre,"palette")
+	MCFG_PALETTE_ADD("palette", 1*16+16*16+16*256)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -595,8 +595,8 @@ static MACHINE_CONFIG_START( ym2203, terracre_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(terracre_state, screen_update_amazon)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", terracre)
-	MCFG_PALETTE_LENGTH(1*16+16*16+16*256)
+	MCFG_GFXDECODE_ADD("gfxdecode",terracre,"palette")
+	MCFG_PALETTE_ADD("palette", 1*16+16*16+16*256)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

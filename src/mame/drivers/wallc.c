@@ -103,7 +103,7 @@ public:
 
 ***************************************************************************/
 
-void wallc_state::palette_init()
+PALETTE_INIT_MEMBER(wallc_state, wallc)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -117,7 +117,7 @@ void wallc_state::palette_init()
 			2,  resistances_rg, weights_g,  330,    0,
 			3,  resistances_b,  weights_b,  330,    655+220);
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit7,r,g,b;
 
@@ -137,7 +137,7 @@ void wallc_state::palette_init()
 		bit7 = (color_prom[i] >> 7) & 0x01;
 		b = combine_3_weights(weights_b, bit7, bit1, bit0);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -317,8 +317,8 @@ static MACHINE_CONFIG_START( wallc, wallc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wallc_state, screen_update_wallc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wallc)
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE_ADD("gfxdecode",wallc,"palette")
+	MCFG_PALETTE_ADD("palette", 32)
 
 
 	/* sound hardware */

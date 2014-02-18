@@ -188,7 +188,7 @@ WRITE16_MEMBER(lastduel_state::lastduel_palette_word_w)
 	green = ((data >> 8)  & 0x0f) * bright * 0x11 / 0x1f;
 	blue  = ((data >> 4)  & 0x0f) * bright * 0x11 / 0x1f;
 
-	palette_set_color (machine(), offset, MAKE_RGB(red, green, blue));
+	m_palette->set_pen_color (offset, MAKE_RGB(red, green, blue));
 }
 
 /***************************************************************************

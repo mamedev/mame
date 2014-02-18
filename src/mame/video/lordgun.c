@@ -50,7 +50,7 @@ WRITE16_MEMBER(lordgun_state::lordgun_paletteram_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	for (int pri = 0; pri < 8; pri++)
-		palette_set_color_rgb(machine(), offset+0x800*pri, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
+		m_palette->set_pen_color(offset+0x800*pri, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
 }
 
 

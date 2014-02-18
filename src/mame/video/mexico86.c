@@ -105,7 +105,7 @@ UINT32 mexico86_state::screen_update_kikikai(screen_device &screen, bitmap_ind16
 	int goffs, code, color, y;
 	int tx, ty;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	sx = 0;
 	for (offs = 0; offs < m_objectram.bytes(); offs += 4)
 	{

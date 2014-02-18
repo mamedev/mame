@@ -326,20 +326,20 @@ GFXDECODE_END
 /* Palette Initialization */
 
 
-void zx_state::palette_init()
+PALETTE_INIT_MEMBER(zx_state, zx)
 {
-	palette_set_color(machine(),0,RGB_WHITE); /* white */
-	palette_set_color(machine(),1,RGB_BLACK); /* black */
-	palette_set_color(machine(),2,RGB_BLACK); /* black */
-	palette_set_color(machine(),3,RGB_WHITE); /* white */
+	palette.set_pen_color(0,RGB_WHITE); /* white */
+	palette.set_pen_color(1,RGB_BLACK); /* black */
+	palette.set_pen_color(2,RGB_BLACK); /* black */
+	palette.set_pen_color(3,RGB_WHITE); /* white */
 }
 
 PALETTE_INIT_MEMBER(zx_state,ts1000)
 {
-	palette_set_color(machine(),0,MAKE_RGB(64, 244, 244)); /* cyan */
-	palette_set_color(machine(),1,RGB_BLACK); /* black */
-	palette_set_color(machine(),2,RGB_BLACK); /* black */
-	palette_set_color(machine(),3,MAKE_RGB(64, 244, 244)); /* cyan */
+	palette.set_pen_color(0,MAKE_RGB(64, 244, 244)); /* cyan */
+	palette.set_pen_color(1,RGB_BLACK); /* black */
+	palette.set_pen_color(2,RGB_BLACK); /* black */
+	palette.set_pen_color(3,MAKE_RGB(64, 244, 244)); /* cyan */
 }
 
 
@@ -397,8 +397,8 @@ static MACHINE_CONFIG_START( zx80, zx_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, ZX81_PIXELS_PER_SCANLINE-1, 0, ZX81_PAL_SCANLINES-1)
 	MCFG_SCREEN_VBLANK_DRIVER(zx_state, screen_eof_zx)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", zx80)
-	MCFG_PALETTE_LENGTH(4)
+	MCFG_GFXDECODE_ADD("gfxdecode",zx80,"palette")
+	MCFG_PALETTE_ADD("palette", 4)
 
 
 	/* sound hardware */
@@ -428,7 +428,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ts1000, zx81 )
 
-	MCFG_PALETTE_INIT_OVERRIDE(zx_state,ts1000)
+	MCFG_PALETTE_INIT_OWNER(zx_state,ts1000)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ts1500, ts1000 )

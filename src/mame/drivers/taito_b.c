@@ -2007,8 +2007,8 @@ static MACHINE_CONFIG_START( rastsag2, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
@@ -2052,8 +2052,8 @@ static MACHINE_CONFIG_START( masterw, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
@@ -2113,8 +2113,8 @@ static MACHINE_CONFIG_START( ashura, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
@@ -2158,8 +2158,8 @@ static MACHINE_CONFIG_START( crimec, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
 
@@ -2203,8 +2203,8 @@ static MACHINE_CONFIG_START( hitice, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,hitice)
 	MCFG_VIDEO_RESET_OVERRIDE(taitob_state,hitice)
@@ -2254,8 +2254,8 @@ static MACHINE_CONFIG_START( rambo3p, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rambo3)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",rambo3,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
@@ -2299,8 +2299,8 @@ static MACHINE_CONFIG_START( rambo3, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
@@ -2348,8 +2348,8 @@ static MACHINE_CONFIG_START( pbobble, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
 
@@ -2397,8 +2397,8 @@ static MACHINE_CONFIG_START( spacedx, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
 
@@ -2442,8 +2442,8 @@ static MACHINE_CONFIG_START( spacedxo, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
@@ -2491,8 +2491,8 @@ static MACHINE_CONFIG_START( qzshowby, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
 
@@ -2536,8 +2536,8 @@ static MACHINE_CONFIG_START( viofight, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
@@ -2586,8 +2586,8 @@ static MACHINE_CONFIG_START( silentd, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
@@ -2631,8 +2631,8 @@ static MACHINE_CONFIG_START( selfeena, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
@@ -2685,8 +2685,8 @@ static MACHINE_CONFIG_START( ryujin, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
@@ -2737,8 +2737,8 @@ static MACHINE_CONFIG_START( sbm, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
@@ -2787,8 +2787,8 @@ static MACHINE_CONFIG_START( realpunc, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_realpunc)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,realpunc)
 

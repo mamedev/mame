@@ -222,7 +222,7 @@ void r2dx_v33_state::video_start()
 
 UINT32 r2dx_v33_state::screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -710,8 +710,8 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update_rdx_v33)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rdx_v33)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",rdx_v33,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
@@ -740,8 +740,8 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update_rdx_v33)
-	MCFG_GFXDECODE_ADD("gfxdecode", rdx_v33)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",rdx_v33,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */

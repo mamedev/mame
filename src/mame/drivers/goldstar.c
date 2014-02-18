@@ -6226,8 +6226,8 @@ static MACHINE_CONFIG_START( goldstar, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", goldstar)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",goldstar,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6260,8 +6260,8 @@ static MACHINE_CONFIG_START( goldstbl, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bl)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",bl,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6293,8 +6293,8 @@ static MACHINE_CONFIG_START( moonlght, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ml)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",ml,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6323,7 +6323,7 @@ PALETTE_INIT_MEMBER(goldstar_state,cm)
 
 		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 
-		palette_set_color_rgb(machine(), i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+		palette.set_pen_color(i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 }
 
@@ -6340,7 +6340,7 @@ PALETTE_INIT_MEMBER(goldstar_state,cmast91)
 		g = proms[0x100 + i] << 4;
 		r = proms[0x200 + i] << 4;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -6357,7 +6357,7 @@ PALETTE_INIT_MEMBER(goldstar_state,lucky8)
 	{
 		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 
-		palette_set_color_rgb(machine(), i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+		palette.set_pen_color(i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 
 	proms = memregion("proms2")->base();
@@ -6365,7 +6365,7 @@ PALETTE_INIT_MEMBER(goldstar_state,lucky8)
 	{
 		data = proms[i];
 
-		palette_set_color_rgb(machine(), i + 0x80, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+		palette.set_pen_color(i + 0x80, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 }
 
@@ -6391,9 +6391,9 @@ static MACHINE_CONFIG_START( chrygld, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chry10)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_GFXDECODE_ADD("gfxdecode",chry10,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6432,9 +6432,9 @@ static MACHINE_CONFIG_START( cb3c, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cb3c)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_GFXDECODE_ADD("gfxdecode",cb3c,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6472,9 +6472,9 @@ static MACHINE_CONFIG_START( ncb3, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_GFXDECODE_ADD("gfxdecode",ncb3,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -6512,9 +6512,9 @@ static MACHINE_CONFIG_START( cm, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cmbitmap)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_GFXDECODE_ADD("gfxdecode",cmbitmap,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -6552,9 +6552,9 @@ static MACHINE_CONFIG_START( cmnobmp, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cm)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_GFXDECODE_ADD("gfxdecode",cm,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -6587,9 +6587,9 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_cmast91)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cmast91)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cmast91)
+	MCFG_GFXDECODE_ADD("gfxdecode",cmast91,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cmast91)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -6626,11 +6626,11 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",ncb3,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6665,11 +6665,11 @@ static MACHINE_CONFIG_START( bingowng, goldstar_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_bingowng)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",ncb3,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,bingowng)
@@ -6704,11 +6704,11 @@ static MACHINE_CONFIG_START( bingownga, goldstar_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_bingowng)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bingownga)       /* GFX Decode is the only difference with the parent machine */
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",bingownga,"palette")       /* GFX Decode is the only difference with the parent machine */
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,bingowng)
@@ -6737,7 +6737,7 @@ PALETTE_INIT_MEMBER(goldstar_state,magodds)
 		g = proms[0x100 + i] << 4;
 		r = proms[0x200 + i] << 4;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -6761,10 +6761,10 @@ static MACHINE_CONFIG_START( magodds, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_magical)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,magodds)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,magodds)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", magodds)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",magodds,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,magical)
@@ -6802,10 +6802,10 @@ static MACHINE_CONFIG_START( kkotnoli, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",ncb3,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
@@ -6837,10 +6837,10 @@ static MACHINE_CONFIG_START( ladylinr, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",ncb3,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6877,10 +6877,10 @@ static MACHINE_CONFIG_START( wcat3, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",ncb3,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6919,9 +6919,9 @@ static MACHINE_CONFIG_START( amcoe1, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cm)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_GFXDECODE_ADD("gfxdecode",cm,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -6958,9 +6958,9 @@ static MACHINE_CONFIG_START( amcoe1a, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_amcoe1a)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cm)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_GFXDECODE_ADD("gfxdecode",cm,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -6997,9 +6997,9 @@ static MACHINE_CONFIG_START( amcoe2, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cm)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_GFXDECODE_ADD("gfxdecode",cm,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -7031,9 +7031,9 @@ static MACHINE_CONFIG_START( nfm, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nfm)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_GFXDECODE_ADD("gfxdecode",nfm,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -7062,8 +7062,8 @@ static MACHINE_CONFIG_START( unkch, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_unkch)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", unkch)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",unkch,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 	//MCFG_NVRAM_HANDLER(goldstar)
 
@@ -7110,9 +7110,9 @@ static MACHINE_CONFIG_START( pkrmast, goldstar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pkrmast)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_GFXDECODE_ADD("gfxdecode",pkrmast,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -7145,10 +7145,10 @@ static MACHINE_CONFIG_START( megaline, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", megaline)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",megaline,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 //  MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)

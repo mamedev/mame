@@ -587,8 +587,8 @@ static MACHINE_CONFIG_START( chinagat, chinagat_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)   /* based on ddragon driver */
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chinagat)
-	MCFG_PALETTE_LENGTH(384)
+	MCFG_GFXDECODE_ADD("gfxdecode",chinagat,"palette")
+	MCFG_PALETTE_ADD("palette", 384)
 
 	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 
@@ -631,8 +631,8 @@ static MACHINE_CONFIG_START( saiyugoub1, chinagat_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)   /* based on ddragon driver */
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chinagat)
-	MCFG_PALETTE_LENGTH(384)
+	MCFG_GFXDECODE_ADD("gfxdecode",chinagat,"palette")
+	MCFG_PALETTE_ADD("palette", 384)
 
 	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 
@@ -672,8 +672,8 @@ static MACHINE_CONFIG_START( saiyugoub2, chinagat_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)   /* based on ddragon driver */
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chinagat)
-	MCFG_PALETTE_LENGTH(384)
+	MCFG_GFXDECODE_ADD("gfxdecode",chinagat,"palette")
+	MCFG_PALETTE_ADD("palette", 384)
 
 	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 

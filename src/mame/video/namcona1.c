@@ -291,9 +291,9 @@ void namcona1_state::video_start()
 	m_shaperam           = auto_alloc_array_clear(machine(), UINT16, 0x2000*4/2 );
 	m_cgram              = auto_alloc_array_clear(machine(), UINT16, 0x1000*0x40/2 );
 
-	m_gfxdecode->set_gfx(0, auto_alloc( machine(), gfx_element( machine(), cg_layout_8bpp, (UINT8 *)m_cgram, machine().total_colors()/256, 0 )));
-	m_gfxdecode->set_gfx(1, auto_alloc( machine(), gfx_element( machine(), cg_layout_4bpp, (UINT8 *)m_cgram, machine().total_colors()/16, 0 )));
-	m_gfxdecode->set_gfx(2, auto_alloc( machine(), gfx_element( machine(), shape_layout, (UINT8 *)m_shaperam, machine().total_colors()/2, 0 )));
+	m_gfxdecode->set_gfx(0, auto_alloc( machine(), gfx_element( machine(), cg_layout_8bpp, (UINT8 *)m_cgram, m_palette->entries()/256, 0 )));
+	m_gfxdecode->set_gfx(1, auto_alloc( machine(), gfx_element( machine(), cg_layout_4bpp, (UINT8 *)m_cgram, m_palette->entries()/16, 0 )));
+	m_gfxdecode->set_gfx(2, auto_alloc( machine(), gfx_element( machine(), shape_layout, (UINT8 *)m_shaperam, m_palette->entries()/2, 0 )));
 
 } /* namcona1_vh_start */
 
@@ -561,7 +561,7 @@ static void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const r
 	gfx_element *pGfx;
 
 	pGfx = state->m_gfxdecode->gfx(0);
-	paldata = &screen.machine().pens[pGfx->colorbase() + pGfx->granularity() * state->m_tilemap_palette_bank[which]];
+	paldata = &screen.m_palette->pen(pGfx->colorbase() + pGfx->granularity() * state->m_tilemap_palette_bank[which)];
 
 	/* draw one scanline at a time */
 	clip.min_x = cliprect.min_x;

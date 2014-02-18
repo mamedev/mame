@@ -86,7 +86,7 @@ UINT32 superdq_state::screen_update_superdq(screen_device &screen, bitmap_rgb32 
  *
  *************************************/
 
-void superdq_state::palette_init()
+PALETTE_INIT_MEMBER(superdq_state, superdq)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -100,7 +100,7 @@ void superdq_state::palette_init()
 			2,  &resistances[1], bweights, 220, 0);
 
 	/* initialize the palette with these colors */
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -122,7 +122,7 @@ void superdq_state::palette_init()
 		bit1 = (color_prom[i] >> 0) & 0x01;
 		b = combine_2_weights(bweights, bit1, bit0);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -170,9 +170,9 @@ WRITE8_MEMBER(superdq_state::superdq_io_w)
 	{
 		int index = black_color_entries[i];
 		if (data & 0x80)
-			palette_set_color(machine(), index, palette_get_color(machine(), index) & MAKE_ARGB(0,255,255,255));
+			m_palette->set_pen_color(index) & MAKE_ARGB(0,255,255,255));
 		else
-			palette_set_color(machine(), index, palette_get_color(machine(), index) | MAKE_ARGB(255,0,0,0));
+			m_palette->set_pen_color(index) | MAKE_ARGB(255,0,0,0));
 	}
 
 	/*
@@ -335,8 +335,8 @@ static MACHINE_CONFIG_START( superdq, superdq_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", superdq)
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE_ADD("gfxdecode",superdq,"palette")
+	MCFG_PALETTE_ADD("palette", 32)
 
 
 	/* sound hardware */

@@ -10,13 +10,10 @@
 #include "includes/cop01.h"
 
 
-void cop01_state::palette_init()
+PALETTE_INIT_MEMBER(cop01_state, cop01)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -25,7 +22,7 @@ void cop01_state::palette_init()
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -33,7 +30,7 @@ void cop01_state::palette_init()
 
 	/* characters use colors 0x00-0x0f (or 0x00-0x7f, but the eight rows are identical) */
 	for (i = 0; i < 0x10; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* background tiles use colors 0xc0-0xff */
 	/* I don't know how much of the lookup table PROM is hooked up, */
@@ -42,14 +39,14 @@ void cop01_state::palette_init()
 	{
 		UINT8 ctabentry = 0xc0 | ((i - 0x10) & 0x30) |
 							(color_prom[(((i - 0x10) & 0x40) >> 2) | ((i - 0x10) & 0x0f)] & 0x0f);
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites use colors 0x80-0x8f (or 0x80-0xbf, but the four rows are identical) */
 	for (i = 0x90; i < 0x190; i++)
 	{
 		UINT8 ctabentry = 0x80 | (color_prom[i - 0x90 + 0x100] & 0x0f);
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 

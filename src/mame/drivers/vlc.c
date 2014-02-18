@@ -311,7 +311,7 @@ UINT32 nevada_state::screen_update_nevada(screen_device &screen, bitmap_ind16 &b
 }
 
 /***************************************************************************/
-void nevada_state::palette_init()
+PALETTE_INIT_MEMBER(nevada_state, nevada)
 {
 	// Palette init
 }
@@ -629,8 +629,8 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 31*8-1)    /* From MC6845 init, registers 01 & 06. */
 	MCFG_SCREEN_UPDATE_DRIVER(nevada_state, screen_update_nevada)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nevada)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",nevada,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK, mc6845_intf)
 

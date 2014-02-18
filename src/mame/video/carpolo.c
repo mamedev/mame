@@ -64,7 +64,7 @@
  *
  **************************************************************************/
 
-void carpolo_state::palette_init()
+PALETTE_INIT_MEMBER(carpolo_state, carpolo)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -91,7 +91,7 @@ void carpolo_state::palette_init()
 	};
 
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		UINT8 pen, r, g, b;
 
@@ -130,7 +130,7 @@ void carpolo_state::palette_init()
 		/* blue component */
 		b = ((b_voltage[(color_prom[pen] >> 0) & 0x03] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 

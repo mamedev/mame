@@ -97,25 +97,25 @@ PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
 		int r = i & 0x03;
 		int g = (i & 0x0c) >> 2;
 		int b = (i & 0x30) >> 4;
-		palette_set_color_rgb(machine(), i, pal2bit(r), pal2bit(g), pal2bit(b));
+		palette.set_pen_color(i, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
 	/* TMS9918 palette */
-	palette_set_color_rgb(machine(), 64+ 0,   0,   0,   0);
-	palette_set_color_rgb(machine(), 64+ 1,   0,   0,   0);
-	palette_set_color_rgb(machine(), 64+ 2,  33, 200,  66);
-	palette_set_color_rgb(machine(), 64+ 3,  94, 220, 120);
-	palette_set_color_rgb(machine(), 64+ 4,  84,  85, 237);
-	palette_set_color_rgb(machine(), 64+ 5, 125, 118, 252);
-	palette_set_color_rgb(machine(), 64+ 6, 212,  82,  77);
-	palette_set_color_rgb(machine(), 64+ 7,  66, 235, 245);
-	palette_set_color_rgb(machine(), 64+ 8, 252,  85,  84);
-	palette_set_color_rgb(machine(), 64+ 9, 255, 121, 120);
-	palette_set_color_rgb(machine(), 64+10, 212, 193,  84);
-	palette_set_color_rgb(machine(), 64+11, 230, 206, 128);
-	palette_set_color_rgb(machine(), 64+12,  33, 176,  59);
-	palette_set_color_rgb(machine(), 64+13, 201,  91, 186);
-	palette_set_color_rgb(machine(), 64+14, 204, 204, 204);
-	palette_set_color_rgb(machine(), 64+15, 255, 255, 255);
+	palette.set_pen_color(64+ 0,   0,   0,   0);
+	palette.set_pen_color(64+ 1,   0,   0,   0);
+	palette.set_pen_color(64+ 2,  33, 200,  66);
+	palette.set_pen_color(64+ 3,  94, 220, 120);
+	palette.set_pen_color(64+ 4,  84,  85, 237);
+	palette.set_pen_color(64+ 5, 125, 118, 252);
+	palette.set_pen_color(64+ 6, 212,  82,  77);
+	palette.set_pen_color(64+ 7,  66, 235, 245);
+	palette.set_pen_color(64+ 8, 252,  85,  84);
+	palette.set_pen_color(64+ 9, 255, 121, 120);
+	palette.set_pen_color(64+10, 212, 193,  84);
+	palette.set_pen_color(64+11, 230, 206, 128);
+	palette.set_pen_color(64+12,  33, 176,  59);
+	palette.set_pen_color(64+13, 201,  91, 186);
+	palette.set_pen_color(64+14, 204, 204, 204);
+	palette.set_pen_color(64+15, 255, 255, 255);
 }
 
 
@@ -127,7 +127,7 @@ PALETTE_INIT_MEMBER(sega315_5378_device, sega315_5378)
 		int r = i & 0x000f;
 		int g = (i & 0x00f0) >> 4;
 		int b = (i & 0x0f00) >> 8;
-		palette_set_color_rgb(machine(), i, pal4bit(r), pal4bit(g), pal4bit(b));
+		palette.set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
@@ -1803,7 +1803,7 @@ void sega315_5124_device::device_reset()
 }
 
 static MACHINE_CONFIG_FRAGMENT( sega315_5124 )
-	MCFG_PALETTE_INIT_OVERRIDE(sega315_5124_device, sega315_5124)
+	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -1824,7 +1824,7 @@ void sega315_5378_device::device_reset()
 }
 
 static MACHINE_CONFIG_FRAGMENT( sega315_5378 )
-	MCFG_PALETTE_INIT_OVERRIDE(sega315_5378_device, sega315_5378)
+	MCFG_PALETTE_INIT_OWNER(sega315_5378_device, sega315_5378)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

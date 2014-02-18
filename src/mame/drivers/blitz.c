@@ -371,7 +371,7 @@ UINT32 blitz_state::screen_update_megadpkr(screen_device &screen, bitmap_ind16 &
 }
 
 
-void blitz_state::palette_init()
+PALETTE_INIT_MEMBER(blitz_state, blitz)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 /*
@@ -392,7 +392,7 @@ void blitz_state::palette_init()
 
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b, bk;
 
@@ -412,7 +412,7 @@ void blitz_state::palette_init()
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		b = bk * (bit2 * 0xff);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -788,8 +788,8 @@ static MACHINE_CONFIG_START( megadpkr, blitz_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK, mc6845_intf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", megadpkr)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",megadpkr,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 MACHINE_CONFIG_END
 

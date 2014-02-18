@@ -95,7 +95,7 @@ READ8_MEMBER(exidy_state::exidy_interrupt_r)
 
 inline void exidy_state::set_1_color(int index, int which)
 {
-	palette_set_color_rgb(machine(), index,
+	m_palette->set_pen_color(index,
 							pal1bit(m_color_latch[2] >> which),
 							pal1bit(m_color_latch[1] >> which),
 							pal1bit(m_color_latch[0] >> which));

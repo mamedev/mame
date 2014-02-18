@@ -738,9 +738,8 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mbee)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_amber) // usually sold with amber or green monitor
+	MCFG_GFXDECODE_ADD("gfxdecode",mbee,"palette")
+	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette") // usually sold with amber or green monitor
 
 	MCFG_VIDEO_START_OVERRIDE(mbee_state,mbee)
 
@@ -783,9 +782,9 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mbeeic)
-	MCFG_PALETTE_LENGTH(96)
-	MCFG_PALETTE_INIT_OVERRIDE(mbee_state,mbeeic)
+	MCFG_GFXDECODE_ADD("gfxdecode",mbeeic,"palette")
+	MCFG_PALETTE_ADD("palette", 96)
+	MCFG_PALETTE_INIT_OWNER(mbee_state,mbeeic)
 
 	MCFG_VIDEO_START_OVERRIDE(mbee_state,mbeeic)
 
@@ -821,7 +820,7 @@ static MACHINE_CONFIG_DERIVED( mbeepc85, mbeeic )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeepc85b, mbeepc85 )
-	MCFG_PALETTE_INIT_OVERRIDE(mbee_state,mbeepc85b)
+	MCFG_PALETTE_INIT_OWNER(mbee_state,mbeepc85b)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
@@ -830,8 +829,8 @@ static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MCFG_CPU_IO_MAP(mbeeppc_io)
 	MCFG_VIDEO_START_OVERRIDE(mbee_state,mbeeppc)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", mbeeppc)
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(mbee_state,mbeeppc)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(mbee_state,mbeeppc)
 	MCFG_DEVICE_REMOVE("crtc")
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8, mbeeppc_crtc)
 MACHINE_CONFIG_END

@@ -337,7 +337,7 @@ static MACHINE_CONFIG_START( taotaido, taotaido_state )
 	MCFG_CPU_IO_MAP(sound_port_map)
 								/* IRQs are triggered by the YM2610 */
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taotaido)
+	MCFG_GFXDECODE_ADD("gfxdecode",taotaido,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( taotaido, taotaido_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taotaido_state, screen_update_taotaido)
 	MCFG_SCREEN_VBLANK_DRIVER(taotaido_state, screen_eof_taotaido)
 
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( taotaido_state, taotaido_tile_callback )

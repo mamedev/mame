@@ -490,8 +490,8 @@ static MACHINE_CONFIG_START( rpunch, rpunch_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rpunch)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",rpunch,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 
 	/* sound hardware */
@@ -525,8 +525,8 @@ static MACHINE_CONFIG_START( svolleybl, rpunch_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", svolleybl)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",svolleybl,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 
 	/* sound hardware */

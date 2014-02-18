@@ -436,8 +436,6 @@ static MACHINE_CONFIG_START( mainevt, mainevt_state )
 
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -445,11 +443,12 @@ static MACHINE_CONFIG_START( mainevt, mainevt_state )
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mainevt_state, screen_update_mainevt)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(mainevt_state,mainevt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K052109_ADD("k052109", mainevt_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K051960_ADD("k051960", mainevt_k051960_intf)
@@ -497,8 +496,6 @@ static MACHINE_CONFIG_START( devstors, mainevt_state )
 
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -506,11 +503,12 @@ static MACHINE_CONFIG_START( devstors, mainevt_state )
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mainevt_state, screen_update_dv)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(mainevt_state,dv)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K052109_ADD("k052109", dv_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K051960_ADD("k051960", dv_k051960_intf)

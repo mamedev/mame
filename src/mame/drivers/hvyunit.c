@@ -187,7 +187,7 @@ UINT32 hvyunit_state::screen_update_hvyunit(screen_device &screen, bitmap_ind16 
 
 	m_bg_tilemap->set_scrollx(0, ((m_port0_data & 0x40) << 2) + m_scrollx + SX_POS); // TODO
 	m_bg_tilemap->set_scrolly(0, ((m_port0_data & 0x80) << 1) + m_scrolly + SY_POS); // TODO
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_pandora->update(bitmap, cliprect);
 
@@ -667,8 +667,8 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hvyunit_state, screen_update_hvyunit)
 	MCFG_SCREEN_VBLANK_DRIVER(hvyunit_state, screen_eof_hvyunit)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hvyunit)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_GFXDECODE_ADD("gfxdecode",hvyunit,"palette")
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", hvyunit_pandora_config)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")

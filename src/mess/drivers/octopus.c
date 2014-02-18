@@ -177,8 +177,7 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(octopus_state, screen_update_octopus)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

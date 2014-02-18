@@ -1019,8 +1019,8 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(nmg5_state, screen_update_nmg5)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nmg5)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_GFXDECODE_ADD("gfxdecode",nmg5,"palette")
+	MCFG_PALETTE_ADD("palette", 0x400)
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)

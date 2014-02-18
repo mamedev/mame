@@ -387,10 +387,9 @@ static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ppmast93_state, screen_update_ppmast93)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ppmast93)
+	MCFG_GFXDECODE_ADD("gfxdecode",ppmast93,"palette")
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x100)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -636,8 +636,8 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(topspeed_state, screen_update_topspeed)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", topspeed)
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE_ADD("gfxdecode",topspeed,"palette")
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

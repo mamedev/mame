@@ -235,7 +235,7 @@ H=B0: 0C,0C,0D,0D,0E,0E,0F,0F 0C,0C,2D,2D,0E,0E,2F,2F
  *
  *************************************/
 
-void galaxian_state::palette_init()
+PALETTE_INIT_MEMBER(galaxian_state, galaxian)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int rgb_resistances[3] = { 1000, 470, 220 };
@@ -301,7 +301,7 @@ void galaxian_state::palette_init()
 		bit1 = BIT(color_prom[i],7);
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
+		palette.set_pen_color(i, MAKE_RGB(r,g,b));
 	}
 
 	/*
@@ -361,7 +361,7 @@ void galaxian_state::palette_init()
 
 PALETTE_INIT_MEMBER(galaxian_state,moonwar)
 {
-	galaxian_state::palette_init();
+	PALETTE_INIT_CALL(galaxian_state, galaxian);
 
 	/* wire mod to connect the bullet blue output to the 220 ohm resistor */
 	m_bullet_color[7] = MAKE_RGB(0xef,0xef,0x97);

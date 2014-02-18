@@ -1474,10 +1474,10 @@ static MACHINE_CONFIG_START( scramble, scramble_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", scramble)
-	MCFG_PALETTE_LENGTH(32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_GFXDECODE_ADD("gfxdecode",scramble,"palette")
+	MCFG_PALETTE_ADD("palette", 32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 
-	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,scrambold)
+	MCFG_PALETTE_INIT_OWNER(scramble_state,scrambold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scrambold)
 
 	/* sound hardware */
@@ -1501,8 +1501,8 @@ static MACHINE_CONFIG_DERIVED( mars, scramble )
 	MCFG_I8255A_ADD( "ppi8255_1", stratgyx_ppi_1_intf )
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,galaxold)
+	MCFG_PALETTE_ADD("palette", 32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( devilfsh, scramble )
@@ -1513,8 +1513,8 @@ static MACHINE_CONFIG_DERIVED( devilfsh, scramble )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", devilfsh)
-	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,galaxold)
+	MCFG_PALETTE_ADD("palette", 32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( newsin7, scramble )
@@ -1525,8 +1525,8 @@ static MACHINE_CONFIG_DERIVED( newsin7, scramble )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", newsin7)
-	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,galaxold)
+	MCFG_PALETTE_ADD("palette", 32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,scrambold)
 MACHINE_CONFIG_END
 
@@ -1541,8 +1541,8 @@ static MACHINE_CONFIG_DERIVED( mrkougar, scramble )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", mrkougar)
-	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,galaxold)
+	MCFG_PALETTE_ADD("palette", 32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mrkougb, scramble )
@@ -1555,8 +1555,8 @@ static MACHINE_CONFIG_DERIVED( mrkougb, scramble )
 	MCFG_I8255A_ADD( "ppi8255_1", mrkougar_ppi_1_intf )
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,galaxold)
+	MCFG_PALETTE_ADD("palette", 32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ckongs, scramble )
@@ -1566,8 +1566,8 @@ static MACHINE_CONFIG_DERIVED( ckongs, scramble )
 	MCFG_CPU_PROGRAM_MAP(ckongs_map)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,galaxold)
+	MCFG_PALETTE_ADD("palette", 32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,ckongs)
 MACHINE_CONFIG_END
 
@@ -1586,8 +1586,8 @@ static MACHINE_CONFIG_DERIVED( hotshock, scramble )
 	MCFG_MACHINE_RESET_OVERRIDE(scramble_state,galaxold)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,galaxold)
+	MCFG_PALETTE_ADD("palette", 32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,pisces)
 
 	MCFG_SOUND_MODIFY("8910.1")
@@ -1605,8 +1605,8 @@ static MACHINE_CONFIG_DERIVED( cavelon, scramble )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,galaxold)
+	MCFG_PALETTE_ADD("palette", 32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,ckongs)
 MACHINE_CONFIG_END
 
@@ -1633,9 +1633,9 @@ static MACHINE_CONFIG_DERIVED( triplep, scramble )
 	MCFG_DEVICE_REMOVE("konami_7474")
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets */
+	MCFG_PALETTE_ADD("palette", 32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets */
 
-	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,galaxold)
+	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("8910.1")
@@ -1652,9 +1652,9 @@ static MACHINE_CONFIG_DERIVED( mariner, triplep )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+64+2+16) /* 32 for characters, 64 for stars, 2 for bullets, 16 for background */
+	MCFG_PALETTE_ADD("palette", 32+64+2+16) /* 32 for characters, 64 for stars, 2 for bullets, 16 for background */
 
-	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,mariner)
+	MCFG_PALETTE_INIT_OWNER(scramble_state,mariner)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,mariner)
 MACHINE_CONFIG_END
 
@@ -1671,9 +1671,9 @@ static MACHINE_CONFIG_DERIVED( hunchbks, scramble )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets */
+	MCFG_PALETTE_ADD("palette", 32+64+2+0)  /* 32 for characters, 64 for stars, 2 for bullets */
 
-	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,galaxold)
+	MCFG_PALETTE_INIT_OWNER(scramble_state,galaxold)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hncholms, hunchbks )
@@ -1711,10 +1711,10 @@ static MACHINE_CONFIG_START( ad2083, scramble_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ad2083)
-	MCFG_PALETTE_LENGTH(32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
+	MCFG_GFXDECODE_ADD("gfxdecode",ad2083,"palette")
+	MCFG_PALETTE_ADD("palette", 32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
-	MCFG_PALETTE_INIT_OVERRIDE(scramble_state,turtles)
+	MCFG_PALETTE_INIT_OWNER(scramble_state,turtles)
 	MCFG_VIDEO_START_OVERRIDE(scramble_state,ad2083)
 
 	/* sound hardware */

@@ -242,7 +242,7 @@ WRITE8_MEMBER(liberate_state::prosport_paletteram_w)
 	m_paletteram[offset] = data;
 
 	/* RGB output is inverted */
-	palette_set_color_rgb(machine(), offset, pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6));
+	m_palette->set_pen_color(offset, pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6));
 }
 
 PALETTE_INIT_MEMBER(liberate_state,liberate)
@@ -271,9 +271,9 @@ PALETTE_INIT_MEMBER(liberate_state,liberate)
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		color_prom++;
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 	}
-	palette_set_color(machine(),32,MAKE_RGB(0,0,0)); /* Allocate black for when no background is displayed */
+	palette.set_pen_color(32,MAKE_RGB(0,0,0)); /* Allocate black for when no background is displayed */
 }
 
 /***************************************************************************/

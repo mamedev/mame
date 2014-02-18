@@ -928,9 +928,9 @@ static MACHINE_CONFIG_START( tubep, tubep_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tubep_state, screen_update_tubep)
 
-	MCFG_PALETTE_LENGTH(32 + 256*64)
+	MCFG_PALETTE_ADD("palette", 32 + 256*64)
 
-	MCFG_PALETTE_INIT_OVERRIDE(tubep_state,tubep)
+	MCFG_PALETTE_INIT_OWNER(tubep_state,tubep)
 	MCFG_VIDEO_START_OVERRIDE(tubep_state,tubep)
 	MCFG_VIDEO_RESET_OVERRIDE(tubep_state,tubep)
 
@@ -988,9 +988,9 @@ static MACHINE_CONFIG_START( rjammer, tubep_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tubep_state, screen_update_rjammer)
 
-	MCFG_PALETTE_LENGTH(64)
+	MCFG_PALETTE_ADD("palette", 64)
 
-	MCFG_PALETTE_INIT_OVERRIDE(tubep_state,rjammer)
+	MCFG_PALETTE_INIT_OWNER(tubep_state,rjammer)
 	MCFG_VIDEO_START_OVERRIDE(tubep_state,tubep)
 	MCFG_VIDEO_RESET_OVERRIDE(tubep_state,tubep)
 

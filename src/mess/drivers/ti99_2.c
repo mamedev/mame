@@ -102,7 +102,6 @@ public:
 	DECLARE_DRIVER_INIT(ti99_2_24);
 	DECLARE_DRIVER_INIT(ti99_2_32);
 	virtual void machine_reset();
-	virtual void palette_init();
 	UINT32 screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ti99_2_vblank_interrupt);
 	required_device<cpu_device> m_maincpu;
@@ -159,12 +158,6 @@ INTERRUPT_GEN_MEMBER(ti99_2_state::ti99_2_vblank_interrupt)
     the CPU can get more bus time.
 */
 
-
-void ti99_2_state::palette_init()
-{
-	palette_set_color(machine(),0,RGB_WHITE); /* white */
-	palette_set_color(machine(),1,RGB_BLACK); /* black */
-}
 
 
 UINT32 ti99_2_state::screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -397,8 +390,8 @@ static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ti99_2_state, screen_update_ti99_2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ti99_2)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE_ADD("gfxdecode",ti99_2,"palette")
+	MCFG_PALETTE_ADD_WHITE_AND_BLACK("palette")
 MACHINE_CONFIG_END
 
 

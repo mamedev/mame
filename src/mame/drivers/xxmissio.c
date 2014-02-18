@@ -295,8 +295,8 @@ static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xxmissio_state, screen_update_xxmissio)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", xxmissio)
-	MCFG_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE_ADD("gfxdecode",xxmissio,"palette")
+	MCFG_PALETTE_ADD("palette", 768)
 
 
 	/* sound hardware */

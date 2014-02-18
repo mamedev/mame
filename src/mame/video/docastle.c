@@ -27,7 +27,7 @@
 
 ***************************************************************************/
 
-void docastle_state::palette_init()
+PALETTE_INIT_MEMBER(docastle_state, docastle)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -55,8 +55,8 @@ void docastle_state::palette_init()
 		/* because the graphics are decoded as 4bpp with the top bit used for transparency
 		   or priority, we create matching 3bpp sets of palette entries, which effectively
 		   ignores the value of the top bit */
-		palette_set_color(machine(), ((i & 0xf8) << 1) | 0x00 | (i & 0x07), MAKE_RGB(r,g,b));
-		palette_set_color(machine(), ((i & 0xf8) << 1) | 0x08 | (i & 0x07), MAKE_RGB(r,g,b));
+		palette.set_pen_color(((i & 0xf8) << 1) | 0x00 | (i & 0x07), MAKE_RGB(r,g,b));
+		palette.set_pen_color(((i & 0xf8) << 1) | 0x08 | (i & 0x07), MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }

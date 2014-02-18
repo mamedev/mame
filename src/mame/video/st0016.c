@@ -99,8 +99,8 @@ WRITE8_MEMBER(st0016_state::st0016_palette_ram_w)
 	st0016_paletteram[ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset]=data;
 	val=st0016_paletteram[color*2]+(st0016_paletteram[color*2+1]<<8);
 	if(!color)
-		palette_set_color_rgb(machine(),UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
-	palette_set_color_rgb(machine(),color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
+		m_palette->set_pen_color(UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
+	m_palette->set_pen_color(color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
 }
 
 READ8_MEMBER(st0016_state::st0016_character_ram_r)
@@ -449,7 +449,7 @@ VIDEO_START_MEMBER(st0016_state,st0016)
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), charlayout, (UINT8 *) st0016_charram, 0x40, 0)));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), m_palette, charlayout, (UINT8 *) st0016_charram, 0x40, 0)));
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;

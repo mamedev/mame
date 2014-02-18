@@ -115,13 +115,13 @@ WRITE32_MEMBER(limenko_state::limenko_paletteram_w)
 	if(ACCESSING_BITS_0_15)
 	{
 		paldata = m_generic_paletteram_32[offset] & 0x7fff;
-		palette_set_color_rgb(machine(), offset * 2 + 1, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
+		m_palette->set_pen_color(offset * 2 + 1, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
 	}
 
 	if(ACCESSING_BITS_16_31)
 	{
 		paldata = (m_generic_paletteram_32[offset] >> 16) & 0x7fff;
-		palette_set_color_rgb(machine(), offset * 2 + 0, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
+		m_palette->set_pen_color(offset * 2 + 0, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
 	}
 }
 
@@ -766,8 +766,8 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", limenko)
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE_ADD("gfxdecode",limenko,"palette")
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
 	/* sound hardware */
@@ -797,8 +797,8 @@ static MACHINE_CONFIG_START( spotty, limenko_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", limenko)
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE_ADD("gfxdecode",limenko,"palette")
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
 	/* sound hardware */

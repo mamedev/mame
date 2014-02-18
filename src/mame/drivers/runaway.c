@@ -360,8 +360,8 @@ static MACHINE_CONFIG_START( runaway, runaway_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(runaway_state, screen_update_runaway)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", runaway)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE_ADD("gfxdecode",runaway,"palette")
+	MCFG_PALETTE_ADD("palette", 16)
 
 
 	/* sound hardware */

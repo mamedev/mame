@@ -153,12 +153,12 @@ PALETTE_INIT_MEMBER(stuntair_state, stuntair)
 		int g = (data&0x38)>>3;
 		int r = (data&0x07)>>0;
 
-		palette_set_color(machine(),i,MAKE_RGB(r<<5,g<<5,b<<6));
+		palette.set_pen_color(i,MAKE_RGB(r<<5,g<<5,b<<6));
 	}
 
 	// just set the FG layer to black and white
-	palette_set_color(machine(),0x100,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine(),0x101,MAKE_RGB(0xff,0xff,0xff));
+	palette.set_pen_color(0x100,MAKE_RGB(0x00,0x00,0x00));
+	palette.set_pen_color(0x101,MAKE_RGB(0xff,0xff,0xff));
 }
 
 
@@ -540,10 +540,10 @@ static MACHINE_CONFIG_START( stuntair, stuntair_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stuntair_state, screen_update_stuntair)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", stuntair)
-	MCFG_PALETTE_LENGTH(0x100+2)
+	MCFG_GFXDECODE_ADD("gfxdecode",stuntair,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100+2)
 
-	MCFG_PALETTE_INIT_OVERRIDE(stuntair_state, stuntair)
+	MCFG_PALETTE_INIT_OWNER(stuntair_state, stuntair)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono") // stereo?

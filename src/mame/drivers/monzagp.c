@@ -60,7 +60,7 @@ public:
 
 
 
-void monzagp_state::palette_init()
+PALETTE_INIT_MEMBER(monzagp_state, monzagp)
 {
 }
 
@@ -269,9 +269,9 @@ static MACHINE_CONFIG_START( monzagp, monzagp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(monzagp_state, screen_update_monzagp)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", monzagp)
+	MCFG_GFXDECODE_ADD("gfxdecode",monzagp,"palette")
 MACHINE_CONFIG_END
 
 ROM_START( monzagp )

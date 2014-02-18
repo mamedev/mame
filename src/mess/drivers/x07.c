@@ -1070,10 +1070,10 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 	return IMAGE_INIT_PASS;
 }
 
-void x07_state::palette_init()
+PALETTE_INIT_MEMBER(x07_state, x07)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
+	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
 }
 
 
@@ -1506,9 +1506,9 @@ static MACHINE_CONFIG_START( x07, x07_state )
 	MCFG_SCREEN_UPDATE_DRIVER(x07_state, screen_update)
 	MCFG_SCREEN_SIZE(120, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 32-1)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", x07)
+	MCFG_GFXDECODE_ADD("gfxdecode",x07,"palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )

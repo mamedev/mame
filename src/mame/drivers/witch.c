@@ -848,8 +848,8 @@ static MACHINE_CONFIG_START( witch, witch_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 256-1-8, 8*4, 256-8*4-1)
 	MCFG_SCREEN_UPDATE_DRIVER(witch_state, screen_update_witch)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", witch)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_GFXDECODE_ADD("gfxdecode",witch,"palette")
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 
 	/* sound hardware */

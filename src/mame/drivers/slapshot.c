@@ -160,7 +160,7 @@ WRITE16_MEMBER(slapshot_state::color_ram_word_w)
 		g = (m_color_ram[offset] & 0xff00) >> 8;
 		b = (m_color_ram[offset] & 0xff);
 
-		palette_set_color(machine(), offset / 2, MAKE_RGB(r,g,b));
+		m_palette->set_pen_color(offset / 2, MAKE_RGB(r,g,b));
 	}
 }
 
@@ -546,8 +546,8 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update_slapshot)
 	MCFG_SCREEN_VBLANK_DRIVER(slapshot_state, screen_eof_taito_no_buffer)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", slapshot)
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE_ADD("gfxdecode",slapshot,"palette")
+	MCFG_PALETTE_ADD("palette", 8192)
 
 
 	MCFG_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)
@@ -593,8 +593,8 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update_slapshot)
 	MCFG_SCREEN_VBLANK_DRIVER(slapshot_state, screen_eof_taito_no_buffer)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", slapshot)
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE_ADD("gfxdecode",slapshot,"palette")
+	MCFG_PALETTE_ADD("palette", 8192)
 
 
 	MCFG_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)

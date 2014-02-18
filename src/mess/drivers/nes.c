@@ -1057,7 +1057,7 @@ static MACHINE_CONFIG_START( nes, nes_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nes_state, screen_update_nes)
 
 
-	MCFG_PALETTE_LENGTH(4*16*8)
+	MCFG_PALETTE_ADD("palette", 4*16*8)
 
 	MCFG_PPU2C02_ADD("ppu", nes_ppu_interface)
 	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)

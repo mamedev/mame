@@ -62,16 +62,16 @@ static const res_net_info mario_net_info_std =
   bit 0 -- 470 ohm resistor -- inverter  -- BLUE
 
 ***************************************************************************/
-void mario_state::palette_init()
+PALETTE_INIT_MEMBER(mario_state, mario)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t   *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &mario_decode_info, &mario_net_info);
-	palette_set_colors(machine(), 0, rgb, 256);
+	palette.set_pen_colors(0, rgb, 256);
 	auto_free(machine(), rgb);
 	rgb = compute_res_net_all(machine(), color_prom+256, &mario_decode_info, &mario_net_info_std);
-	palette_set_colors(machine(), 256, rgb, 256);
+	palette.set_pen_colors(256, rgb, 256);
 	auto_free(machine(), rgb);
 
 	machine().palette->normalize_range(0, 255);

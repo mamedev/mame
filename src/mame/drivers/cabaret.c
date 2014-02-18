@@ -120,7 +120,7 @@ void cabaret_state::video_start()
 
 UINT32 cabaret_state::screen_update_cabaret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -351,8 +351,8 @@ static MACHINE_CONFIG_START( cabaret, cabaret_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cabaret_state, screen_update_cabaret)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cabaret)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_GFXDECODE_ADD("gfxdecode",cabaret,"palette")
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 
 	/* sound hardware */

@@ -478,8 +478,6 @@ static MACHINE_CONFIG_START( shangha3, shangha3_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -489,9 +487,10 @@ static MACHINE_CONFIG_START( shangha3, shangha3_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",shangha3,"palette")
 
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -517,8 +516,6 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 	MCFG_CPU_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -528,9 +525,10 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",shangha3,"palette")
 
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -557,8 +555,6 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 	MCFG_CPU_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -568,9 +564,10 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",shangha3,"palette")
 
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

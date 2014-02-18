@@ -95,7 +95,7 @@ public:
 #define VIDEOBUF_SIZE 256*256
 
 
-void roul_state::palette_init()
+PALETTE_INIT_MEMBER(roul_state, roul)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int bit6, bit7, bit0, bit1, r, g, b;
@@ -116,7 +116,7 @@ void roul_state::palette_init()
 		bit1 = (color_prom[0] >> 5) & 0x01;
 		r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( roul, roul_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(roul_state, screen_update_roul)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

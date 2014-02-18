@@ -2870,10 +2870,10 @@ static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)  /* Taken from MC6845 init, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(funworld_state, screen_update_funworld)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fw1stpal)
+	MCFG_GFXDECODE_ADD("gfxdecode",fw1stpal,"palette")
 
-	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_PALETTE_INIT_OVERRIDE(funworld_state, funworld)
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(funworld_state, funworld)
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, funworld)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)    /* 2MHz, veryfied on jollycrd & royalcrd */

@@ -88,7 +88,7 @@ WRITE8_MEMBER(vroulet_state::vroulet_paletteram_w)
 		{
 			a=m_generic_paletteram_8[((i*8+j)*2)&0xff ];
 			b=m_generic_paletteram_8[((i*8+j)*2+1)&0xff ];
-			palette_set_color_rgb(machine(),i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
+			m_palette->set_pen_color(i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
 		}
 	}
 }
@@ -308,8 +308,8 @@ static MACHINE_CONFIG_START( vroulet, vroulet_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vroulet_state, screen_update_vroulet)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vroulet)
-	MCFG_PALETTE_LENGTH(128*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",vroulet,"palette")
+	MCFG_PALETTE_ADD("palette", 128*4)
 
 
 	// sound hardware

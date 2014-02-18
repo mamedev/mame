@@ -149,10 +149,10 @@ void svmu_state::machine_reset()
 	m_page = 0;
 }
 
-void svmu_state::palette_init()
+PALETTE_INIT_MEMBER(svmu_state, svmu)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
+	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
 }
 
 static LC8670_LCD_UPDATE( svmu_lcd_update )
@@ -314,7 +314,7 @@ static MACHINE_CONFIG_START( svmu, svmu_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*(PIXEL_SIZE + PIXEL_DISTANCE) - 1, 0, 32*(PIXEL_SIZE + PIXEL_DISTANCE) - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", lc8670_cpu_device, screen_update)
 	MCFG_DEFAULT_LAYOUT(layout_svmu)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

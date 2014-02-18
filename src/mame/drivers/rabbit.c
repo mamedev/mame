@@ -479,7 +479,7 @@ UINT32 rabbit_state::screen_update_rabbit(screen_device &screen, bitmap_ind16 &b
 {
 	int prilevel;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 //  popmessage("%08x %08x", m_viewregs0[0], m_viewregs0[1]);
 //  popmessage("%08x %08x %08x %08x %08x %08x", m_tilemap_regs[0][0],m_tilemap_regs[0][1],m_tilemap_regs[0][2],m_tilemap_regs[0][3],m_tilemap_regs[0][4],m_tilemap_regs[0][5]);
@@ -522,7 +522,7 @@ WRITE32_MEMBER(rabbit_state::rabbit_paletteram_dword_w)
 	r = ((m_generic_paletteram_32[offset] & 0x0000ff00) >>8);
 	g = ((m_generic_paletteram_32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offset,MAKE_RGB(r,g,b));
 }
 
 READ32_MEMBER(rabbit_state::rabbit_tilemap0_r)
@@ -897,7 +897,7 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rabbit)
+	MCFG_GFXDECODE_ADD("gfxdecode",rabbit,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -908,9 +908,7 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 20*16-1, 32*16, 48*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rabbit_state, screen_update_rabbit)
 
-	MCFG_PALETTE_LENGTH(0x4000)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
-
+	MCG_PALETTE_ADD_INIT_BLACK("palette", 0x4000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

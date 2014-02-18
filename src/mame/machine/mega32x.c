@@ -256,7 +256,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_palette_w )
 
 	m_32x_palette_lookup[offset] = (r << 10) | (g << 5) | (b << 0) | (p << 15);
 
-	palette_set_color_rgb(space.machine(),offset+0x40,pal5bit(r),pal5bit(g),pal5bit(b));
+	m_palette->set_pen_color(offset+0x40,pal5bit(r),pal5bit(g),pal5bit(b));
 
 }
 

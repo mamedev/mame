@@ -154,7 +154,7 @@ static MACHINE_CONFIG_START( taito_type_x, taito_type_x_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taito_type_x_state, screen_update_taito_type_x)
 
-	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_PALETTE_ADD("palette", 0x10000)
 
 MACHINE_CONFIG_END
 

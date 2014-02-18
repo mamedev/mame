@@ -280,10 +280,10 @@ static INPUT_PORTS_START( pb2000c )
 		PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-void pb1000_state::palette_init()
+PALETTE_INIT_MEMBER(pb1000_state, pb1000)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
+	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
 }
 
 
@@ -519,8 +519,8 @@ static MACHINE_CONFIG_START( pb1000, pb1000_state )
 	MCFG_SCREEN_SIZE(192, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 32-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_GFXDECODE_ADD("gfxdecode",  pb1000 )
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_GFXDECODE_ADD("gfxdecode",pb1000 ,"palette")
 
 	MCFG_HD44352_ADD("hd44352", 910000, hd44352_pb1000_conf)
 

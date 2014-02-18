@@ -71,12 +71,12 @@ static const unsigned char palette[] =
 	0x00, 0x00, 0x00,   /* Black */
 };
 
-void gamecom_state::palette_init()
+PALETTE_INIT_MEMBER(gamecom_state, gamecom)
 {
 	int index;
 	for ( index = 0; index < 5; index++ )
 	{
-		palette_set_color_rgb(machine(),  4-index, palette[index*3+0], palette[index*3+1], palette[index*3+2] );
+		palette.set_pen_color(4-index, palette[index*3+0], palette[index*3+1], palette[index*3+2] );
 	}
 }
 
@@ -114,7 +114,7 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 199, 0, 159 )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_LENGTH(5)
+	MCFG_PALETTE_ADD("palette", 5)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker", "rspeaker" )

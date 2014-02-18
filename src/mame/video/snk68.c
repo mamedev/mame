@@ -168,7 +168,7 @@ WRITE16_MEMBER(snk68_state::pow_paletteram16_word_w)
 	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01) ;
 	b = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01) ;
 
-	palette_set_color_rgb(machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	m_palette->set_pen_color(offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 

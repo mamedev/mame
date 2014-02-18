@@ -651,7 +651,7 @@ UINT32 upd3301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	}
 	else
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	}
 	return 0;
 }

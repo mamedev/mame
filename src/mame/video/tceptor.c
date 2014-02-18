@@ -18,13 +18,10 @@
 
 /*******************************************************************/
 
-void tceptor_state::palette_init()
+PALETTE_INIT_MEMBER(tceptor_state, tceptor)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x400);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x400; i++)
@@ -33,7 +30,7 @@ void tceptor_state::palette_init()
 		int g = pal4bit(color_prom[i + 0x400]);
 		int b = pal4bit(color_prom[i + 0x800]);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -52,28 +49,28 @@ void tceptor_state::palette_init()
 	for (i = 0; i < 0x0400; i++)
 	{
 		int ctabentry = color_prom[i];
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites lookup table (1024 colors) */
 	for (i = 0x0400; i < 0x0800; i++)
 	{
 		int ctabentry = color_prom[i] | 0x300;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* background: no lookup PROM, use directly (512 colors) */
 	for (i = 0x0a00; i < 0x0c00; i++)
 	{
 		int ctabentry = i & 0x1ff;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* road lookup table (256 colors) */
 	for (i = 0x0f00; i < 0x1000; i++)
 	{
 		int ctabentry = color_prom[i - 0x700] | 0x200;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* setup sprite mask color map */
@@ -256,13 +253,13 @@ void tceptor_state::decode_bg(const char * region)
 	auto_free(machine(), buffer);
 
 	/* decode the graphics */
-	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), bg_layout, memregion(region)->base(), 64, 2048)));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), m_palette, bg_layout, memregion(region)->base(), 64, 2048)));
 }
 
 void tceptor_state::decode_sprite(int gfx_index, const gfx_layout *layout, const void *data)
 {
 	/* decode the graphics */
-	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), *layout, (const UINT8 *)data, 64, 1024)));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), m_palette, *layout, (const UINT8 *)data, 64, 1024)));
 }
 
 // fix sprite order
@@ -391,7 +388,7 @@ void tceptor_state::video_start()
 
 	m_tx_tilemap->set_scrollx(0, -2*8);
 	m_tx_tilemap->set_scrolly(0, 0);
-	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, m_gfxdecode->gfx(0), 7);
+	palette.configure_tilemap_groups(*m_tx_tilemap, *m_gfxdecode->gfx(0), 7);
 
 	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
@@ -488,7 +485,7 @@ void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 						x, y,
 						scalex,
 						scaley,
-						colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(gfx), color, SPR_TRANS_COLOR));
+						m_palette->transpen_mask(*m_gfxdecode->gfx(gfx), color, SPR_TRANS_COLOR));
 		}
 	}
 

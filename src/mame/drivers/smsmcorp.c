@@ -489,13 +489,13 @@ UINT32 smsmfg_state::screen_update_sms(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-void smsmfg_state::palette_init()
+PALETTE_INIT_MEMBER(smsmfg_state, smsmfg)
 {
 	int i;
 
 	for (i = 0; i < 8; i++ )
 	{
-		palette_set_color(machine(), i, MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i)));
+		palette.set_pen_color(i, MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i)));
 	}
 }
 
@@ -582,7 +582,7 @@ static MACHINE_CONFIG_START( sms, smsmfg_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x1af, 0, 0xff)
 	MCFG_SCREEN_UPDATE_DRIVER(smsmfg_state, screen_update_sms)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 
 	/* sound hardware */

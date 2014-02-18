@@ -75,7 +75,7 @@ bit 0:  3.9kOhm resistor
 
 	offset&=~1;
 	word = ((m_generic_paletteram_16[offset] & 0xff)<<8) | (m_generic_paletteram_16[offset+1] & 0xff);
-	palette_set_color_rgb(machine(),offset/2,pal5bit(word >> 10),pal5bit(word >> 5),pal5bit(word >> 0));
+	m_palette->set_pen_color(offset/2,pal5bit(word >> 10),pal5bit(word >> 5),pal5bit(word >> 0));
 }
 
 
@@ -105,7 +105,7 @@ bit 0:  3.9kOhm resistor
 //  logerror("PAL: %04x %02x\n",offset,data);
 
 	data = m_generic_paletteram_16[offset];
-	palette_set_color_rgb(machine(),offset,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
+	m_palette->set_pen_color(offset,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
 }
 
 
@@ -254,7 +254,7 @@ INLINE void roundupt_drawgfxzoomrotate(tatsumi_state *state,
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+			const pen_t *pal = &gfx->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const UINT8 *shadow_pens = state->m_shadow_pen_array + (gfx->granularity() * (color % gfx->colors()));
 			const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
@@ -1065,7 +1065,7 @@ UINT32 tatsumi_state::screen_update_apache3(screen_device &screen, bitmap_rgb32 
 
 	m_tx_layer->set_scrollx(0,24);
 
-	bitmap.fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 	draw_sky(machine(), bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
 //  draw_ground(machine(), bitmap, cliprect);
 	draw_sprites(machine(), bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
@@ -1083,7 +1083,7 @@ UINT32 tatsumi_state::screen_update_roundup5(screen_device &screen, bitmap_rgb32
 	m_tx_layer->set_scrollx(0,24);
 	m_tx_layer->set_scrolly(0,0); //(((m_roundupt_crt_reg[0xe]<<8)|m_roundupt_crt_reg[0xf])>>5) + 96);
 
-	bitmap.fill(machine().pens[384], cliprect); // todo
+	bitmap.fill(m_palette->pen(384), cliprect); // todo
 	screen.priority().fill(0, cliprect);
 
 	draw_sprites(machine(), screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
@@ -1105,7 +1105,7 @@ UINT32 tatsumi_state::screen_update_cyclwarr(screen_device &screen, bitmap_rgb32
 		m_bigfight_last_bank=m_bigfight_bank;
 	}
 
-	bitmap.fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	draw_bg(machine(), bitmap, m_layer3, &m_cyclwarr_videoram1[0x000], &m_cyclwarr_videoram1[0x100], m_cyclwarr_videoram1, m_bigfight_a40000[0], 8, -0x80, 512, 4096);
 	draw_bg(machine(), bitmap, m_layer2, &m_cyclwarr_videoram1[0x200], &m_cyclwarr_videoram1[0x300], m_cyclwarr_videoram1, m_bigfight_a40000[0], 8, -0x80, 512, 4096);
@@ -1129,7 +1129,7 @@ UINT32 tatsumi_state::screen_update_bigfight(screen_device &screen, bitmap_rgb32
 		m_bigfight_last_bank=m_bigfight_bank;
 	}
 
-	bitmap.fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 	draw_bg(machine(), bitmap, m_layer3, &m_cyclwarr_videoram1[0x000], &m_cyclwarr_videoram1[0x100], m_cyclwarr_videoram1, m_bigfight_a40000[0], 8, -0x40, 1024, 2048);
 	draw_bg(machine(), bitmap, m_layer2, &m_cyclwarr_videoram1[0x200], &m_cyclwarr_videoram1[0x300], m_cyclwarr_videoram1, m_bigfight_a40000[0], 8, -0x40, 1024, 2048);
 	draw_bg(machine(), bitmap, m_layer1, &m_cyclwarr_videoram0[0x000], &m_cyclwarr_videoram0[0x100], m_cyclwarr_videoram0, m_bigfight_a40000[0], 8, -0x40, 1024, 2048);

@@ -335,8 +335,8 @@ static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255+32+32,0, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(munchmo_state, screen_update_mnchmobl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mnchmobl)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",mnchmobl,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	/* sound hardware */

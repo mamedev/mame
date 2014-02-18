@@ -364,7 +364,7 @@ void bingoman_state::machine_reset()
 }
 
 
-void bingoman_state::palette_init()
+PALETTE_INIT_MEMBER(bingoman_state, bingoman)
 {
 }
 
@@ -383,9 +383,9 @@ static MACHINE_CONFIG_START( bingoman, bingoman_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bingoman)
+	MCFG_GFXDECODE_ADD("gfxdecode",bingoman,"palette")
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

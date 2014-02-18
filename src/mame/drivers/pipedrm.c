@@ -660,8 +660,8 @@ static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_pipedrm)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pipedrm)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",pipedrm,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
@@ -705,8 +705,8 @@ static MACHINE_CONFIG_START( hatris, pipedrm_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pipedrm_state, screen_update_fromance)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hatris)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",hatris,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,hatris)
 

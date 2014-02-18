@@ -10,7 +10,7 @@
 
 WRITE8_MEMBER(battlex_state::battlex_palette_w)
 {
-	palette_set_color_rgb(machine(), offset, pal1bit(data >> 0), pal1bit(data >> 2), pal1bit(data >> 1));
+	m_palette->set_pen_color(offset, pal1bit(data >> 0), pal1bit(data >> 2), pal1bit(data >> 1));
 }
 
 WRITE8_MEMBER(battlex_state::battlex_scroll_x_lsb_w)

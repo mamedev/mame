@@ -141,7 +141,7 @@ inline void cyberbal_state::set_palette_entry(int entry, UINT16 value)
 	g = ((value >> 4) & 0x3e) | ((value >> 15) & 1);
 	b = ((value << 1) & 0x3e) | ((value >> 15) & 1);
 
-	palette_set_color_rgb(machine(), entry, pal6bit(r), pal6bit(g), pal6bit(b));
+	m_palette->set_pen_color(entry, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 

@@ -442,7 +442,7 @@ void compucolor2_state::machine_reset()
 	m_rs232->write_dtr(1);
 }
 
-void compucolor2_state::palette_init()
+PALETTE_INIT_MEMBER(compucolor2_state, compucolor2)
 {
 	for (int i = 0; i < 8; i++)
 	{

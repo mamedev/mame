@@ -336,14 +336,14 @@ static MACHINE_CONFIG_START( quasar, quasar_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8+1, 29*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(quasar_state, screen_update_quasar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", quasar)
-	MCFG_PALETTE_LENGTH((64+1)*8+(4*256))
+	MCFG_GFXDECODE_ADD("gfxdecode",quasar,"palette")
+	MCFG_PALETTE_ADD("palette", (64+1)*8+(4*256))
 
 	MCFG_S2636_ADD("s2636_0", s2636_0_config)
 	MCFG_S2636_ADD("s2636_1", s2636_1_config)
 	MCFG_S2636_ADD("s2636_2", s2636_2_config)
 
-	MCFG_PALETTE_INIT_OVERRIDE(quasar_state,quasar)
+	MCFG_PALETTE_INIT_OWNER(quasar_state,quasar)
 	MCFG_VIDEO_START_OVERRIDE(quasar_state,quasar)
 
 	/* sound hardware */

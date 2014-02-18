@@ -80,7 +80,7 @@ void circus_state::draw_sprite_collision( bitmap_ind16 &bitmap, const rectangle 
 					if (pixel)
 					{
 						collision |= bitmap.pix16(dy, dx);
-						bitmap.pix16(dy, dx) = machine().pens[pixel];
+						bitmap.pix16(dy, dx) = m_palette->pen(pixel);
 					}
 				}
 			}

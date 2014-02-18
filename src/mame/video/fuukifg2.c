@@ -85,8 +85,8 @@ PALETTE_INIT_MEMBER(fuuki16_state,fuuki16)
 
 	/* The game does not initialise the palette at startup. It should
 	   be totally black */
-	for (pen = 0; pen < machine().total_colors(); pen++)
-		palette_set_color(machine(),pen,MAKE_RGB(0,0,0));
+	for (pen = 0; pen < palette.entries(); pen++)
+		palette.set_pen_color(pen,MAKE_RGB(0,0,0));
 }
 #endif
 

@@ -180,7 +180,7 @@ static GFXDECODE_START( tattack )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 1 )
 GFXDECODE_END
 
-void tattack_state::palette_init()
+PALETTE_INIT_MEMBER(tattack_state, tattack)
 {
 	int i,r,g,b;
 	for(i=0;i<8;i++)
@@ -194,8 +194,8 @@ void tattack_state::palette_init()
 		else
 			r=g=b=128;
 
-		palette_set_color(machine(),2*i,MAKE_RGB(0x00,0x00,0x00));
-		palette_set_color(machine(),2*i+1,MAKE_RGB(r,g,b));
+		palette.set_pen_color(2*i,MAKE_RGB(0x00,0x00,0x00));
+		palette.set_pen_color(2*i+1,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -215,8 +215,8 @@ static MACHINE_CONFIG_START( tattack, tattack_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tattack_state, screen_update_tattack)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tattack)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE_ADD("gfxdecode",tattack,"palette")
+	MCFG_PALETTE_ADD("palette", 16)
 
 
 	/* sound hardware */

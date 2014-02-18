@@ -371,7 +371,7 @@ static MACHINE_CONFIG_START( arabian, arabian_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 11, 244)
 	MCFG_SCREEN_UPDATE_DRIVER(arabian_state, screen_update_arabian)
 
-	MCFG_PALETTE_LENGTH(256*32)
+	MCFG_PALETTE_ADD("palette", 256*32)
 
 
 	/* sound hardware */

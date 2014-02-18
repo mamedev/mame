@@ -140,7 +140,6 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST driver cocktail (good|imperfect|preliminary) #IMPLIED>\n"
 "\t\t\t<!ATTLIST driver protection (good|imperfect|preliminary) #IMPLIED>\n"
 "\t\t\t<!ATTLIST driver savestate (supported|unsupported) #REQUIRED>\n"
-"\t\t\t<!ATTLIST driver palettesize CDATA #REQUIRED>\n"
 "\t\t<!ELEMENT device (instance*, extension*)>\n"
 "\t\t\t<!ATTLIST device type CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST device tag CDATA #IMPLIED>\n"
@@ -1192,8 +1191,6 @@ void info_xml_creator::output_driver()
 		fprintf(m_output, " savestate=\"supported\"");
 	else
 		fprintf(m_output, " savestate=\"unsupported\"");
-
-	fprintf(m_output, " palettesize=\"%d\"", m_drivlist.config().m_total_colors);
 
 	fprintf(m_output, "/>\n");
 }

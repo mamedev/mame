@@ -386,7 +386,7 @@ UINT32 macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rgb3
 {
 	int layers[3],layerpri[3];
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	layers[0] = 0;
 	layerpri[0] = (m_scra_videoregs[0] & 0x0000c000) >> 14;

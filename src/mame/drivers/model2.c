@@ -1969,7 +1969,7 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
@@ -1983,7 +1983,7 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
@@ -2022,7 +2022,7 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
 
@@ -2035,7 +2035,7 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
@@ -2126,7 +2126,7 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
 
@@ -2139,7 +2139,7 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
@@ -2175,7 +2175,7 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_TIMER_DRIVER_ADD("timer3", model2_state, model2_timer_cb)
 	MCFG_TIMER_PTR((FPTR)3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
 
@@ -2188,7 +2188,7 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 

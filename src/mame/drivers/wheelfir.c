@@ -625,7 +625,7 @@ WRITE16_MEMBER(wheelfir_state::pal_data_w)
 		int r = m_palette[color*3];
 		int g = m_palette[color*3+1];
 		int b = m_palette[color*3+2];
-		palette_set_color(machine(), color, MAKE_RGB(r,g,b));
+		m_palette->set_pen_color(color, MAKE_RGB(r,g,b));
 	}
 
 }
@@ -816,7 +816,7 @@ static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wheelfir_state, screen_update_wheelfir)
 	MCFG_SCREEN_VBLANK_DRIVER(wheelfir_state, screen_eof_wheelfir)
 
-	MCFG_PALETTE_LENGTH(NUM_COLORS)
+	MCFG_PALETTE_ADD("palette", NUM_COLORS)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

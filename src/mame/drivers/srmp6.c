@@ -156,7 +156,7 @@ void srmp6_state::update_palette()
 			b += ((0x1F - b) * brg) >> 5;
 			if(b > 0x1F) b = 0x1F;
 		}
-		palette_set_color(machine(), i, MAKE_RGB(r << 3, g << 3, b << 3));
+		m_palette->set_pen_color(i, MAKE_RGB(r << 3, g << 3, b << 3));
 	}
 }
 
@@ -167,7 +167,7 @@ void srmp6_state::video_start()
 	m_sprram_old = auto_alloc_array_clear(machine(), UINT16, 0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), tiles8x8_layout, (UINT8*)m_tileram, machine().total_colors() / 256, 0)));
+	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), m_palette, tiles8x8_layout, (UINT8*)m_tileram, m_palette->entries() / 256, 0)));
 	m_gfxdecode->gfx(0)->set_granularity(256);
 
 	m_brightness = 0x60;
@@ -529,7 +529,7 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 			if(b > 0x1F) b = 0x1F;
 		}
 
-		palette_set_color(machine(), offset, MAKE_RGB(r << 3, g << 3, b << 3));
+		m_palette->set_pen_color(offset, MAKE_RGB(r << 3, g << 3, b << 3));
 	}
 }
 
@@ -677,9 +677,9 @@ static MACHINE_CONFIG_START( srmp6, srmp6_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp6_state, screen_update_srmp6)
 
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

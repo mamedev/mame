@@ -334,8 +334,8 @@ static MACHINE_CONFIG_START( bladestl, bladestl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bladestl_state, screen_update_bladestl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bladestl)
-	MCFG_PALETTE_LENGTH(32 + 16*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",bladestl,"palette")
+	MCFG_PALETTE_ADD("palette", 32 + 16*16)
 
 	MCFG_K007342_ADD("k007342", bladestl_k007342_intf)
 	MCFG_K007342_GFXDECODE("gfxdecode")

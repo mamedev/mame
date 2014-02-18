@@ -172,7 +172,7 @@ void apc_state::video_start()
 
 UINT32 apc_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	/* graphics */
 	m_hgdc2->screen_update(screen, bitmap, cliprect);
@@ -776,7 +776,7 @@ void apc_state::machine_reset()
 }
 
 
-void apc_state::palette_init()
+PALETTE_INIT_MEMBER(apc_state, apc)
 {
 }
 
@@ -997,9 +997,9 @@ PALETTE_INIT_MEMBER(apc_state,apc)
 	int i;
 
 	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-	for(i=8;i<machine().total_colors();i++)
-		palette_set_color_rgb(machine(), i, pal1bit(0), pal1bit(0), pal1bit(0));
+		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+	for(i=8;i<palette.entries();i++)
+		palette.set_pen_color(i, pal1bit(0), pal1bit(0), pal1bit(0));
 }
 
 static const upd1771_interface upd1771c_config = { DEVCB_NULL };
@@ -1032,13 +1032,13 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_SCREEN_SIZE(640, 494)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 494-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", apc)
+	MCFG_GFXDECODE_ADD("gfxdecode",apc,"palette")
 
 	MCFG_UPD7220_ADD("upd7220_chr", XTAL_3_579545MHz, hgdc_1_intf, upd7220_1_map) // unk clock
 	MCFG_UPD7220_ADD("upd7220_btm", XTAL_3_579545MHz, hgdc_2_intf, upd7220_2_map) // unk clock
 
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(apc_state,apc)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(apc_state,apc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

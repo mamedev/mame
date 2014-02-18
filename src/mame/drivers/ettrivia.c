@@ -221,7 +221,7 @@ TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_fg)
 	get_tile_info(tileinfo, tile_index, m_fg_videoram, 1);
 }
 
-void ettrivia_state::palette_init()
+PALETTE_INIT_MEMBER(ettrivia_state, ettrivia)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[2] = { 270, 130 };
@@ -234,7 +234,7 @@ void ettrivia_state::palette_init()
 			2, resistances, weights, 0, 0,
 			0, 0, 0, 0, 0);
 
-	for (i = 0;i < machine().total_colors(); i++)
+	for (i = 0;i < palette.entries(); i++)
 	{
 		int bit0, bit1;
 		int r, g, b;
@@ -254,7 +254,7 @@ void ettrivia_state::palette_init()
 		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
 		b = combine_2_weights(weights, bit0, bit1);
 
-		palette_set_color(machine(), BITSWAP8(i,5,7,6,2,1,0,4,3), MAKE_RGB(r, g, b));
+		palette.set_pen_color(BITSWAP8(i,5,7,6,2,1,0,4,3), MAKE_RGB(r, g, b));
 	}
 }
 
@@ -318,8 +318,8 @@ static MACHINE_CONFIG_START( ettrivia, ettrivia_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ettrivia_state, screen_update_ettrivia)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ettrivia)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",ettrivia,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	/* sound hardware */

@@ -204,7 +204,7 @@ UINT32 galaxi_state::screen_update_galaxi(screen_device &screen, bitmap_ind16 &b
 #endif
 
 	if (layers_ctrl & 1)    m_bg1_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	else                bitmap.fill(get_black_pen(machine()), cliprect);
+	else                bitmap.fill(m_palette->black_pen(), cliprect);
 	if (layers_ctrl & 2)    m_bg2_tmap->draw(screen, bitmap, cliprect, 0, 0);
 	if (layers_ctrl & 4)    m_bg3_tmap->draw(screen, bitmap, cliprect, 0, 0);
 	if (layers_ctrl & 8)    m_bg4_tmap->draw(screen, bitmap, cliprect, 0, 0);
@@ -418,8 +418,8 @@ static MACHINE_CONFIG_START( galaxi, galaxi_state )
 	MCFG_SCREEN_VISIBLE_AREA(16*5, 512-16*2-1, 16*1, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxi_state, screen_update_galaxi)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galaxi)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_GFXDECODE_ADD("gfxdecode",galaxi,"palette")
+	MCFG_PALETTE_ADD("palette", 0x400)
 
 
 	/* sound hardware */

@@ -155,7 +155,7 @@ UINT32 gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bit
 
 	konami_sortlayers4(layer, m_layer_pri);
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);

@@ -1178,10 +1178,10 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 	MCFG_SCREEN_VISIBLE_AREA(16, 464-1, 8, 256-1-24)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_srmp2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", srmp2)
-	MCFG_PALETTE_LENGTH(1024)   /* sprites only */
+	MCFG_GFXDECODE_ADD("gfxdecode",srmp2,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)   /* sprites only */
 
-	MCFG_PALETTE_INIT_OVERRIDE(srmp2_state,srmp2)
+	MCFG_PALETTE_INIT_OWNER(srmp2_state,srmp2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1220,10 +1220,10 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MCFG_SCREEN_VISIBLE_AREA(16, 400-1, 8, 256-1-24)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_srmp3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", srmp3)
-	MCFG_PALETTE_LENGTH(512)    /* sprites only */
+	MCFG_GFXDECODE_ADD("gfxdecode",srmp3,"palette")
+	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
-	MCFG_PALETTE_INIT_OVERRIDE(srmp2_state,srmp3)
+	MCFG_PALETTE_INIT_OWNER(srmp2_state,srmp3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1271,8 +1271,8 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 	MCFG_SCREEN_VISIBLE_AREA(16, 400-1, 0, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_mjyuugi)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", srmp3)
-	MCFG_PALETTE_LENGTH(512)            /* sprites only */
+	MCFG_GFXDECODE_ADD("gfxdecode",srmp3,"palette")
+	MCFG_PALETTE_ADD("palette", 512)            /* sprites only */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

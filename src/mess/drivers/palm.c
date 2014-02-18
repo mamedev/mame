@@ -156,8 +156,8 @@ void palm_state::machine_reset()
 /* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
 PALETTE_INIT_MEMBER(palm_state, palm)
 {
-	palette_set_color_rgb(machine(), 0, 0x7b, 0x8c, 0x5a);
-	palette_set_color_rgb(machine(), 1, 0x00, 0x00, 0x00);
+	palette.set_pen_color(0, 0x7b, 0x8c, 0x5a);
+	palette.set_pen_color(1, 0x00, 0x00, 0x00);
 }
 
 
@@ -234,8 +234,8 @@ static MACHINE_CONFIG_START( palm, palm_state )
 	MCFG_SCREEN_SIZE( 160, 220 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 159, 0, 219 )
 	MCFG_SCREEN_UPDATE_DEVICE(MC68328_TAG, mc68328_device, screen_update)
-	MCFG_PALETTE_LENGTH( 2 )
-	MCFG_PALETTE_INIT_OVERRIDE(palm_state, palm)
+	MCFG_PALETTE_ADD( "palette", 2 )
+	MCFG_PALETTE_INIT_OWNER(palm_state, palm)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* audio hardware */

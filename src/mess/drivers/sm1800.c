@@ -143,11 +143,11 @@ I8255A_INTERFACE( sm1800_ppi8255_interface )
 	DEVCB_DRIVER_MEMBER(sm1800_state, sm1800_8255_portc_w)
 };
 
-void sm1800_state::palette_init()
+PALETTE_INIT_MEMBER(sm1800_state, sm1800)
 {
-	palette_set_color(machine(), 0, RGB_BLACK); // black
-	palette_set_color_rgb(machine(), 1, 0xa0, 0xa0, 0xa0); // white
-	palette_set_color(machine(), 2, RGB_WHITE); // highlight
+	palette.set_pen_color(0, RGB_BLACK); // black
+	palette.set_pen_color(1, 0xa0, 0xa0, 0xa0); // white
+	palette.set_pen_color(2, RGB_WHITE); // highlight
 }
 
 
@@ -184,8 +184,9 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_PALETTE_ADD("palette", 3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sm1800)
+	MCFG_GFXDECODE_ADD("gfxdecode",sm1800,"palette")
 	MCFG_PALETTE_LENGTH(3)
 
 	/* Devices */

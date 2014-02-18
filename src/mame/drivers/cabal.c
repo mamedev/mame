@@ -488,8 +488,8 @@ static MACHINE_CONFIG_START( cabal, cabal_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update_cabal)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cabal)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",cabal,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 
 	/* sound hardware */
@@ -545,8 +545,8 @@ static MACHINE_CONFIG_START( cabalbl, cabal_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update_cabal)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cabal)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",cabal,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 
 	/* sound hardware */

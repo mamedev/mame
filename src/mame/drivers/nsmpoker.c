@@ -141,7 +141,7 @@ UINT32 nsmpoker_state::screen_update_nsmpoker(screen_device &screen, bitmap_ind1
 }
 
 
-void nsmpoker_state::palette_init()
+PALETTE_INIT_MEMBER(nsmpoker_state, nsmpoker)
 {
 }
 
@@ -430,9 +430,9 @@ static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nsmpoker_state, screen_update_nsmpoker)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nsmpoker)
+	MCFG_GFXDECODE_ADD("gfxdecode",nsmpoker,"palette")
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 
 MACHINE_CONFIG_END

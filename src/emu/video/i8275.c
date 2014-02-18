@@ -385,7 +385,7 @@ UINT32 i8275_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	m_fifo_write = 0;
 
 	if ((m_status_reg & I8275_STATUS_VIDEO_ENABLE)==0) {
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	} else {
 		// if value < 16 it is visible otherwise not
 		m_cursor_blink_cnt++;

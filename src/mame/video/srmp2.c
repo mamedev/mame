@@ -13,12 +13,12 @@ PALETTE_INIT_MEMBER(srmp2_state,srmp2)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int col;
 
-		col = (color_prom[i] << 8) + color_prom[i + machine().total_colors()];
-		palette_set_color_rgb(machine(),i ^ 0x0f,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
+		col = (color_prom[i] << 8) + color_prom[i + palette.entries()];
+		palette.set_pen_color(i ^ 0x0f,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
 	}
 }
 
@@ -28,12 +28,12 @@ PALETTE_INIT_MEMBER(srmp2_state,srmp3)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int col;
 
-		col = (color_prom[i] << 8) + color_prom[i + machine().total_colors()];
-		palette_set_color_rgb(machine(),i,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
+		col = (color_prom[i] << 8) + color_prom[i + palette.entries()];
+		palette.set_pen_color(i,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
 	}
 }
 

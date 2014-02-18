@@ -326,7 +326,7 @@ UINT32 sigmab98_state::screen_update_sigmab98(screen_device &screen, bitmap_ind1
 	}
 #endif
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	// Draw from priority 3 (bottom, converted to a bitmask) to priority 0 (top)
 	draw_sprites(bitmap, cliprect, layers_ctrl & 8);
@@ -1700,8 +1700,8 @@ static MACHINE_CONFIG_START( gegege, sigmab98_state )
 	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0,0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sigmab98)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE_ADD("gfxdecode",sigmab98,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1740,8 +1740,8 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 	MCFG_SCREEN_VBLANK_DRIVER(sigmab98_state, screen_eof_sammymdl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sigmab98)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE_ADD("gfxdecode",sigmab98,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

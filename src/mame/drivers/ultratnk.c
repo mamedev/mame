@@ -313,9 +313,9 @@ static MACHINE_CONFIG_START( ultratnk, ultratnk_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ultratnk_state, screen_update_ultratnk)
 	MCFG_SCREEN_VBLANK_DRIVER(ultratnk_state, screen_eof_ultratnk)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ultratnk)
-	MCFG_PALETTE_LENGTH(10)
-
+	MCFG_GFXDECODE_ADD("gfxdecode",ultratnk,"palette")
+	MCFG_PALETTE_ADD("palette", 10)
+	MCFG_PALETTE_INIT_OWNER(ultratnk_state, ultratnk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

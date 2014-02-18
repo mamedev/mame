@@ -94,7 +94,7 @@ MACHINE_CONFIG_DERIVED_CLASS( mpu4plasma    , mod2, mpu4plasma_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0*8, 40-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mpu4plasma_state, screen_update_mpu4plasma)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
 // plasma v0.1

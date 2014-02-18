@@ -189,12 +189,12 @@ static GFXDECODE_START( cardline )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 2 )
 GFXDECODE_END
 
-void cardline_state::palette_init()
+PALETTE_INIT_MEMBER(cardline_state, cardline)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i,r,g,b,data;
 	int bit0,bit1,bit2;
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		data=color_prom[i];
 
@@ -212,7 +212,7 @@ void cardline_state::palette_init()
 		bit0 = (data >> 0) & 0x01;
 		bit1 = (data >> 1) & 0x01;
 		b = 0x55 * bit0 + 0xaa * bit1;
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -232,8 +232,8 @@ static MACHINE_CONFIG_START( cardline, cardline_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cardline_state, screen_update_cardline)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cardline)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",cardline,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_DEFAULT_LAYOUT(layout_cardline)
 

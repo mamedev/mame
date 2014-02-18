@@ -113,7 +113,7 @@ UINT32 fitfight_state::screen_update_fitfight(screen_device &screen, bitmap_ind1
 	vblank = (m_fof_700000[0] & 0x8000);
 
 	if (vblank > 0)
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	else {
 //      if (machine().input().code_pressed(KEYCODE_Q))
 //          scrollbak = ((m_fof_a00000[0] & 0xff00) >> 5) - ((m_fof_700000[0] & 0x0038) >> 3);

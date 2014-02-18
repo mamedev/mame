@@ -348,9 +348,10 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(chqflag_state, screen_update_chqflag)
 
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K051960_ADD("k051960", chqflag_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
 	MCFG_K051316_ADD("k051316_1", chqflag_k051316_intf_1)

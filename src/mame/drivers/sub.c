@@ -394,14 +394,11 @@ static GFXDECODE_START( sub )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x32_layout, 0, 0x80 )
 GFXDECODE_END
 
-void sub_state::palette_init()
+PALETTE_INIT_MEMBER(sub_state, sub)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	UINT8* lookup = memregion("proms2")->base();
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	for (i = 0;i < 0x100;i++)
 	{
@@ -410,8 +407,8 @@ void sub_state::palette_init()
 		g = (color_prom[0x100] >> 0);
 		b = (color_prom[0x200] >> 0);
 
-		//colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b)));
+		//palette.set_indirect_color(i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b)));
 
 		color_prom++;
 	}
@@ -420,7 +417,7 @@ void sub_state::palette_init()
 	for (i = 0;i < 0x400;i++)
 	{
 		UINT8 ctabentry = lookup[i+0x400] | (lookup[i+0x000] << 4);
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 }
@@ -454,8 +451,8 @@ static MACHINE_CONFIG_START( sub, sub_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sub_state, screen_update_sub)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sub)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_GFXDECODE_ADD("gfxdecode",sub,"palette")
+	MCFG_PALETTE_ADD("palette", 0x400)
 
 
 	/* sound hardware */

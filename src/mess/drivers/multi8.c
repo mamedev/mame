@@ -575,12 +575,12 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL        /* update address callback */
 };
 
-void multi8_state::palette_init()
+PALETTE_INIT_MEMBER(multi8_state, multi8)
 {
 	UINT8 i;
 
 	for(i=0; i<8; i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 }
 
 READ8_MEMBER( multi8_state::porta_r )
@@ -673,8 +673,8 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(multi8_state, screen_update_multi8)
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_GFXDECODE_ADD("gfxdecode", multi8)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_GFXDECODE_ADD("gfxdecode",multi8,"palette")
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

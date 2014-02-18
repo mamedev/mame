@@ -148,7 +148,7 @@ UINT32 snowbros_state::screen_update_wintbob(screen_device &screen, bitmap_ind16
 	UINT16 *spriteram16 = m_bootleg_spriteram16;
 	int offs;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	for (offs = 0;offs < m_bootleg_spriteram16.bytes()/2;offs += 8)
 	{
@@ -215,7 +215,7 @@ UINT32 snowbros_state::screen_update_snowbro3(screen_device &screen, bitmap_ind1
 
 	/* This clears & redraws the entire screen each pass */
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	for (offs = 0;offs < m_bootleg_spriteram16.bytes()/2;offs += 8)
 	{

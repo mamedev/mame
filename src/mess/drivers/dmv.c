@@ -331,9 +331,8 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dmv)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_GFXDECODE_ADD("gfxdecode",dmv,"palette")
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_DEFAULT_LAYOUT(layout_dmv)
 
 	// devices

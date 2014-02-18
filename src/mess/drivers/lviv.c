@@ -447,7 +447,7 @@ static MACHINE_CONFIG_START( lviv, lviv_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lviv_state, screen_update_lviv)
 
-	MCFG_PALETTE_LENGTH(sizeof (lviv_palette) / 3)
+	MCFG_PALETTE_ADD("palette", sizeof (lviv_palette) / 3)
 
 
 	/* sound hardware */

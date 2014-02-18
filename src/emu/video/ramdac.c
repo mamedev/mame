@@ -198,7 +198,7 @@ WRITE8_MEMBER( ramdac_device::ramdac_rgb666_w )
 	m_palram[offset] = data & 0x3f;
 	pal_offs = (offset & 0xff);
 
-	palette_set_color_rgb(machine(),offset&0xff,pal6bit(m_palram[pal_offs|0x000]),pal6bit(m_palram[pal_offs|0x100]),pal6bit(m_palram[pal_offs|0x200]));
+	m_palette->set_pen_color(offset&0xff,pal6bit(m_palram[pal_offs|0x000]),pal6bit(m_palram[pal_offs|0x100]),pal6bit(m_palram[pal_offs|0x200]));
 }
 
 WRITE8_MEMBER( ramdac_device::ramdac_rgb888_w )
@@ -208,5 +208,5 @@ WRITE8_MEMBER( ramdac_device::ramdac_rgb888_w )
 	m_palram[offset] = data;
 	pal_offs = (offset & 0xff);
 
-	palette_set_color_rgb(machine(),offset&0xff,m_palram[pal_offs|0x000],m_palram[pal_offs|0x100],m_palram[pal_offs|0x200]);
+	m_palette->set_pen_color(offset&0xff,m_palram[pal_offs|0x000],m_palram[pal_offs|0x100],m_palram[pal_offs|0x200]);
 }

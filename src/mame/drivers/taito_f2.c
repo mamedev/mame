@@ -3026,8 +3026,8 @@ static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2)
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_no_buffer)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taitof2)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",taitof2,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_default)
 
@@ -3430,7 +3430,7 @@ static MACHINE_CONFIG_DERIVED( metalb, taito_f2_tc0510nio )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_metalb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_metalb)
@@ -3621,8 +3621,8 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_no_buffer)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pivot)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",pivot,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dondokod)
 
@@ -3673,8 +3673,8 @@ static MACHINE_CONFIG_START( driveout, taitof2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_no_buffer)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pivot)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",pivot,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_driftout)
 

@@ -325,13 +325,13 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL        /* update address callback */
 };
 
-void buster_state::palette_init()
+PALETTE_INIT_MEMBER(buster_state, buster)
 {
 	int i;
 
 	/* RGB format */
 	for(i=0;i<8;i++)
-		palette_set_color(machine(), i, MAKE_RGB(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
+		palette.set_pen_color(i, MAKE_RGB(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
 }
 
 static MACHINE_CONFIG_START( buster, buster_state )
@@ -349,8 +349,8 @@ static MACHINE_CONFIG_START( buster, buster_state )
 	MCFG_SCREEN_UPDATE_DRIVER(buster_state, screen_update_buster)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_3_579545MHz/4, mc6845_intf) //unknown clock / type
 
-	MCFG_GFXDECODE_ADD("gfxdecode", buster)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_GFXDECODE_ADD("gfxdecode",buster,"palette")
+	MCFG_PALETTE_ADD("palette", 8)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

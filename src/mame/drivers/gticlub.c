@@ -308,7 +308,7 @@ WRITE32_MEMBER(gticlub_state::paletteram32_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
-	palette_set_color_rgb(machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 WRITE_LINE_MEMBER(gticlub_state::voodoo_vblank_0)
@@ -917,7 +917,7 @@ UINT32 gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb32 
 
 UINT32 gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	if (strcmp(screen.tag(), ":lscreen") == 0)
 	{
@@ -979,11 +979,11 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_gticlub)
 
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_ADD("palette", 65536)
 
 	MCFG_VIDEO_START_OVERRIDE(gticlub_state,gticlub)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K001604_ADD("k001604_1", gticlub_k001604_intf)
 	MCFG_K001604_GFXDECODE("gfxdecode")
 
@@ -1089,7 +1089,7 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_K033906_ADD("k033906_2", hangplt_k033906_intf_1)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_ADD("palette", 65536)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1103,7 +1103,7 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_hangplt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	
 	MCFG_K001604_ADD("k001604_1", hangplt_k001604_intf_l)
 	MCFG_K001604_GFXDECODE("gfxdecode")

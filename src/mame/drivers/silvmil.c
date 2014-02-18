@@ -322,8 +322,8 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(silvmil_state, screen_update_silvmil)
 
-	MCFG_PALETTE_LENGTH(0x300)
-	MCFG_GFXDECODE_ADD("gfxdecode", silvmil)
+	MCFG_PALETTE_ADD("palette", 0x300)
+	MCFG_GFXDECODE_ADD("gfxdecode",silvmil,"palette")
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)

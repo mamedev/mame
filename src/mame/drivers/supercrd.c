@@ -211,7 +211,7 @@ PALETTE_INIT_MEMBER(supercrd_state, supercrd)
 			2,  resistances_g,  weights_g,  100,    0);
 
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -230,7 +230,7 @@ PALETTE_INIT_MEMBER(supercrd_state, supercrd)
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		g = combine_2_weights(weights_g, bit0, bit1);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -473,10 +473,10 @@ static MACHINE_CONFIG_START( supercrd, supercrd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)  /* Taken from MC6845 init, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(supercrd_state, screen_update_supercrd)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", supercrd)
+	MCFG_GFXDECODE_ADD("gfxdecode",supercrd,"palette")
 
-	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_PALETTE_INIT_OVERRIDE(supercrd_state, supercrd)
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(supercrd_state, supercrd)
 	MCFG_VIDEO_START_OVERRIDE(supercrd_state, supercrd)
 
 //  MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8, mc6845_intf)

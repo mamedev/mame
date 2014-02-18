@@ -118,7 +118,8 @@ const device_type BFM_ADDER2 = &device_creator<bfm_adder2_device>;
 bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t(mconfig, BFM_ADDER2, "BFM ADDER2", tag, owner, clock, "bfm_adder2", __FILE__),
 		m_cpu(*this, "adder2"),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this),
+		m_palette(*this, "^^palette")
 {
 }
 
@@ -219,22 +220,22 @@ void bfm_adder2_device::device_start()
 
 	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bfm_adder2_device::get_tile1_info),this), TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
 
-	palette_set_color(machine(), 0,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine(), 1,MAKE_RGB(0x00,0x00,0xFF));
-	palette_set_color(machine(), 2,MAKE_RGB(0x00,0xFF,0x00));
-	palette_set_color(machine(), 3,MAKE_RGB(0x00,0xFF,0xFF));
-	palette_set_color(machine(), 4,MAKE_RGB(0xFF,0x00,0x00));
-	palette_set_color(machine(), 5,MAKE_RGB(0xFF,0x00,0xFF));
-	palette_set_color(machine(), 6,MAKE_RGB(0xFF,0xFF,0x00));
-	palette_set_color(machine(), 7,MAKE_RGB(0xFF,0xFF,0xFF));
-	palette_set_color(machine(), 8,MAKE_RGB(0x80,0x80,0x80));
-	palette_set_color(machine(), 9,MAKE_RGB(0x00,0x00,0x80));
-	palette_set_color(machine(),10,MAKE_RGB(0x00,0x80,0x00));
-	palette_set_color(machine(),11,MAKE_RGB(0x00,0x80,0x80));
-	palette_set_color(machine(),12,MAKE_RGB(0x80,0x00,0x00));
-	palette_set_color(machine(),13,MAKE_RGB(0x80,0x00,0x80));
-	palette_set_color(machine(),14,MAKE_RGB(0x80,0x80,0x00));
-	palette_set_color(machine(),15,MAKE_RGB(0x80,0x80,0x80));
+	m_palette->set_pen_color(0,MAKE_RGB(0x00,0x00,0x00));
+	m_palette->set_pen_color(1,MAKE_RGB(0x00,0x00,0xFF));
+	m_palette->set_pen_color(2,MAKE_RGB(0x00,0xFF,0x00));
+	m_palette->set_pen_color(3,MAKE_RGB(0x00,0xFF,0xFF));
+	m_palette->set_pen_color(4,MAKE_RGB(0xFF,0x00,0x00));
+	m_palette->set_pen_color(5,MAKE_RGB(0xFF,0x00,0xFF));
+	m_palette->set_pen_color(6,MAKE_RGB(0xFF,0xFF,0x00));
+	m_palette->set_pen_color(7,MAKE_RGB(0xFF,0xFF,0xFF));
+	m_palette->set_pen_color(8,MAKE_RGB(0x80,0x80,0x80));
+	m_palette->set_pen_color(9,MAKE_RGB(0x00,0x00,0x80));
+	m_palette->set_pen_color(10,MAKE_RGB(0x00,0x80,0x00));
+	m_palette->set_pen_color(11,MAKE_RGB(0x00,0x80,0x80));
+	m_palette->set_pen_color(12,MAKE_RGB(0x80,0x00,0x00));
+	m_palette->set_pen_color(13,MAKE_RGB(0x80,0x00,0x80));
+	m_palette->set_pen_color(14,MAKE_RGB(0x80,0x80,0x00));
+	m_palette->set_pen_color(15,MAKE_RGB(0x80,0x80,0x80));	
 }
 
 // video update ///////////////////////////////////////////////////////////
@@ -282,7 +283,7 @@ WRITE8_MEMBER( bfm_adder2_device::screen_ram_w )
 		r = ((data & 0x18)>>3) *  85;  // 00011000b = 0x18
 		g = ((data & 0x06)>>1) *  85;  // 00000110b = 0x06
 		b = ((data & 0x01)   ) * 255;
-		palette_set_color(space.machine(), pal, MAKE_RGB(r,g,b));
+		m_palette->set_pen_color(pal, MAKE_RGB(r,g,b));
 	}
 
 	if ( m_adder2_screen_page_reg & SL_ACCESS )
@@ -556,8 +557,8 @@ static MACHINE_CONFIG_FRAGMENT( adder2 )
 
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, bfm_adder2_device, update_screen)
 
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_GFXDECODE_ADD("gfxdecode", adder2)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_GFXDECODE_ADD("gfxdecode",adder2,"palette")
 
 	MCFG_CPU_ADD("adder2", M6809, ADDER_CLOCK/4 )  // adder2 board 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(adder2_memmap)             // setup adder2 board memorymap

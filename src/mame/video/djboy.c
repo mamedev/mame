@@ -48,7 +48,7 @@ WRITE8_MEMBER(djboy_state::djboy_paletteram_w)
 	offset &= ~1;
 	val = (m_paletteram[offset] << 8) | m_paletteram[offset + 1];
 
-	palette_set_color_rgb(machine(), offset / 2, pal4bit(val >> 8), pal4bit(val >> 4), pal4bit(val >> 0));
+	m_palette->set_pen_color(offset / 2, pal4bit(val >> 8), pal4bit(val >> 4), pal4bit(val >> 0));
 }
 
 UINT32 djboy_state::screen_update_djboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

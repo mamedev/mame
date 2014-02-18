@@ -1729,7 +1729,7 @@ void zaurus_state::machine_reset()
 }
 
 
-void zaurus_state::palette_init()
+PALETTE_INIT_MEMBER(zaurus_state, zaurus)
 {
 }
 

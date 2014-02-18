@@ -301,10 +301,8 @@ static MACHINE_CONFIG_START( d9final, d9final_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(d9final_state, screen_update_d9final)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", d9final)
-	MCFG_PALETTE_LENGTH(0x400)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
-
+	MCFG_GFXDECODE_ADD("gfxdecode",d9final,"palette")
+	MCG_PALETTE_ADD_INIT_BLACK("palette", 0x400)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

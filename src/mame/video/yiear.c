@@ -28,12 +28,12 @@
 
 ***************************************************************************/
 
-void yiear_state::palette_init()
+PALETTE_INIT_MEMBER(yiear_state, yiear)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -55,7 +55,7 @@ void yiear_state::palette_init()
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
+		palette.set_pen_color(i, MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }

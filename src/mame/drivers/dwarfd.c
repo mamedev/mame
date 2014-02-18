@@ -849,7 +849,7 @@ void dwarfd_state::drawCrt( bitmap_rgb32 &bitmap,const rectangle &cliprect )
 
 UINT32 dwarfd_state::screen_update_dwarfd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	drawCrt(bitmap, cliprect);
 	return 0;
 }
@@ -978,7 +978,7 @@ static GFXDECODE_START( dwarfd )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout3, 0, 16 )
 GFXDECODE_END
 
-void dwarfd_state::palette_init()
+PALETTE_INIT_MEMBER(dwarfd_state, dwarfd)
 {
 	int i;
 
@@ -989,12 +989,12 @@ void dwarfd_state::palette_init()
 		int b = machine().rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 	}
-	palette_set_color(machine(), 8, MAKE_RGB(255, 255, 0));
-	palette_set_color(machine(), 12, MAKE_RGB(127, 127, 255));
-	palette_set_color(machine(), 4, MAKE_RGB(0, 255, 0));
-	palette_set_color(machine(), 6, MAKE_RGB(255, 0, 0));
+	palette.set_pen_color(8, MAKE_RGB(255, 255, 0));
+	palette.set_pen_color(12, MAKE_RGB(127, 127, 255));
+	palette.set_pen_color(4, MAKE_RGB(0, 255, 0));
+	palette.set_pen_color(6, MAKE_RGB(255, 0, 0));
 }
 
 static const ay8910_interface ay8910_config =
@@ -1069,8 +1069,8 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dwarfd_state, screen_update_dwarfd)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dwarfd)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE_ADD("gfxdecode",dwarfd,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

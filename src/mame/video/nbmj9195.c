@@ -33,7 +33,7 @@ WRITE8_MEMBER(nbmj9195_state::nbmj9195_palette_w)
 		g = ((m_palette[offset + 0] & 0xf0) >> 4);
 		b = ((m_palette[offset + 1] & 0x0f) >> 0);
 
-		palette_set_color_rgb(machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+		m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
@@ -56,7 +56,7 @@ WRITE8_MEMBER(nbmj9195_state::nbmj9195_nb22090_palette_w)
 	g = m_nb22090_palette[(0x100 + (offs_h * 0x300) + offs_l)];
 	b = m_nb22090_palette[(0x200 + (offs_h * 0x300) + offs_l)];
 
-	palette_set_color(machine(), ((offs_h * 0x100) + offs_l), MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(((offs_h * 0x100) + offs_l), MAKE_RGB(r, g, b));
 }
 
 /******************************************************************************

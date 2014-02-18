@@ -660,8 +660,8 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 	MCFG_SCREEN_VISIBLE_AREA(9*8, 55*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", kickgoal)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",kickgoal,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,kickgoal)
 
@@ -695,8 +695,8 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 	MCFG_SCREEN_VISIBLE_AREA(10*8+2, 54*8-1+2, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", actionhw)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",actionhw,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,actionhw)
 

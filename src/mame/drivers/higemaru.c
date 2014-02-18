@@ -172,9 +172,10 @@ static MACHINE_CONFIG_START( higemaru, higemaru_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(higemaru_state, screen_update_higemaru)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", higemaru)
-	MCFG_PALETTE_LENGTH(32*4+16*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",higemaru,"palette")
 
+	MCFG_PALETTE_ADD("palette", 32*4+16*16)
+	MCFG_PALETTE_INIT_OWNER(higemaru_state, higemaru)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

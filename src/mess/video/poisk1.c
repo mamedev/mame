@@ -269,7 +269,7 @@ POISK1_UPDATE_ROW( p1_state::poisk1_gfx_1bpp_update_row )
 }
 
 /* Initialise the cga palette */
-void p1_state::palette_init()
+PALETTE_INIT_MEMBER(p1_state, p1)
 {
 	int i;
 

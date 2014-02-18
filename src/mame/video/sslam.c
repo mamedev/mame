@@ -19,7 +19,7 @@ WRITE16_MEMBER(sslam_state::sslam_paletteram_w)
 	g |= ((val & 0x04) >> 2);
 	b |= ((val & 0x02) >> 1);
 
-	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 void sslam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -178,7 +178,7 @@ UINT32 sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bit
 {
 	if (!(m_regs[6] & 1))
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 
@@ -216,7 +216,7 @@ UINT32 sslam_state::screen_update_powerbls(screen_device &screen, bitmap_ind16 &
 {
 	if (!(m_regs[6] & 1))
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 

@@ -2158,8 +2158,8 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 260, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", system1)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",system1,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */

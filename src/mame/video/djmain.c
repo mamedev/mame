@@ -162,7 +162,7 @@ UINT32 djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &b
 				order[j] = temp;
 			}
 
-	bitmap.fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	for (i = 0; i < NUM_LAYERS + 1; i++)
 	{

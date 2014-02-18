@@ -491,10 +491,10 @@ static MACHINE_CONFIG_START( kingofb, kingofb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kingofb_state, screen_update_kingofb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", kingobox)
-	MCFG_PALETTE_LENGTH(256+8*2)
+	MCFG_GFXDECODE_ADD("gfxdecode",kingobox,"palette")
+	MCFG_PALETTE_ADD("palette", 256+8*2)
 
-	MCFG_PALETTE_INIT_OVERRIDE(kingofb_state,kingofb)
+	MCFG_PALETTE_INIT_OWNER(kingofb_state,kingofb)
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,kingofb)
 
 	/* sound hardware */
@@ -541,10 +541,10 @@ static MACHINE_CONFIG_START( ringking, kingofb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kingofb_state, screen_update_ringking)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rk)
-	MCFG_PALETTE_LENGTH(256+8*2)
+	MCFG_GFXDECODE_ADD("gfxdecode",rk,"palette")
+	MCFG_PALETTE_ADD("palette", 256+8*2)
 
-	MCFG_PALETTE_INIT_OVERRIDE(kingofb_state,ringking)
+	MCFG_PALETTE_INIT_OWNER(kingofb_state,ringking)
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,ringking)
 
 	/* sound hardware */

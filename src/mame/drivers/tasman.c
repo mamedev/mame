@@ -608,7 +608,7 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 80*8-1, 0*8, 64*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kongambl_state, screen_update_kongambl)
 
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
 
@@ -618,7 +618,7 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_K055673_ADD_NOINTF("k055673")
 	MCFG_K055673_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tasman)
+	MCFG_GFXDECODE_ADD("gfxdecode",tasman,"palette")
 
 	MCFG_K056832_ADD("k056832", k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")

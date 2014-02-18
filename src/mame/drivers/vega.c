@@ -481,13 +481,13 @@ INPUT_PORTS_END
 
 
 
-void vega_state::palette_init()
+PALETTE_INIT_MEMBER(vega_state, vega)
 {
 	int i;
 	for(i=0;i<8;++i)
 	{
-		palette_set_color( machine(),2*i, MAKE_RGB(0x00, 0x00, 0x00) );
-		palette_set_color( machine(),2*i+1, MAKE_RGB( (i&1)?0xff:0x00, (i&2)?0xff:0x00, (i&4)?0xff:0x00) );
+		palette.set_pen_color( 2*i, MAKE_RGB(0x00, 0x00, 0x00) );
+		palette.set_pen_color( 2*i+1, MAKE_RGB( (i&1)?0xff:0x00, (i&2)?0xff:0x00, (i&4)?0xff:0x00) );
 	}
 }
 
@@ -851,9 +851,9 @@ static MACHINE_CONFIG_START( vega, vega_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 280, 0*8, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(vega_state, screen_update_vega)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", test_decode)
+	MCFG_GFXDECODE_ADD("gfxdecode",test_decode,"palette")
 
 	/* sound hardware */
 

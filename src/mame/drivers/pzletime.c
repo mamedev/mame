@@ -106,7 +106,7 @@ UINT32 pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind1
 	int count;
 	int y, x;
 
-	bitmap.fill(machine().pens[0], cliprect); //bg pen
+	bitmap.fill(m_palette->pen(0), cliprect); //bg pen
 
 	m_txt_tilemap->set_scrolly(0, m_tilemap_regs[0] - 3);
 	m_txt_tilemap->set_scrollx(0, m_tilemap_regs[1]);
@@ -301,7 +301,7 @@ static GFXDECODE_START( pzletime )
 	GFXDECODE_ENTRY( "gfx3", 0, layout16x16, 0x000, 0x10 )
 GFXDECODE_END
 
-void pzletime_state::palette_init()
+PALETTE_INIT_MEMBER(pzletime_state, pzletime)
 {
 	int i;
 
@@ -309,7 +309,7 @@ void pzletime_state::palette_init()
 
 	/* initialize 555 RGB lookup */
 	for (i = 0; i < 32768; i++)
-		palette_set_color_rgb(machine(), i + 0x300, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
+		palette.set_pen_color(i + 0x300, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
 }
 
 void pzletime_state::machine_start()
@@ -337,8 +337,8 @@ static MACHINE_CONFIG_START( pzletime, pzletime_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pzletime_state, screen_update_pzletime)
-	MCFG_GFXDECODE_ADD("gfxdecode", pzletime)
-	MCFG_PALETTE_LENGTH(0x300 + 32768)
+	MCFG_GFXDECODE_ADD("gfxdecode",pzletime,"palette")
+	MCFG_PALETTE_ADD("palette", 0x300 + 32768)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 

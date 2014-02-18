@@ -3622,18 +3622,18 @@ static MACHINE_CONFIG_START( marvins, snk_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_marvins)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", marvins)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_GFXDECODE_ADD("gfxdecode",marvins,"palette")
 
-	MCFG_PALETTE_INIT_OVERRIDE(snk_state,tnk3)
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+
+	MCFG_PALETTE_INIT_OWNER(snk_state,tnk3)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,marvins)
 
 	/* sound hardware */
@@ -3691,18 +3691,18 @@ static MACHINE_CONFIG_START( jcross, snk_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tnk3)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_GFXDECODE_ADD("gfxdecode",tnk3,"palette")
 
-	MCFG_PALETTE_INIT_OVERRIDE(snk_state,tnk3)
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+
+	MCFG_PALETTE_INIT_OWNER(snk_state,tnk3)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,jcross)
 
 	/* sound hardware */
@@ -3769,18 +3769,18 @@ static MACHINE_CONFIG_START( tnk3, snk_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tnk3)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_GFXDECODE_ADD("gfxdecode",tnk3,"palette")
 
-	MCFG_PALETTE_INIT_OVERRIDE(snk_state,tnk3)
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+
+	MCFG_PALETTE_INIT_OWNER(snk_state,tnk3)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,tnk3)
 
 	/* sound hardware */
@@ -3853,18 +3853,17 @@ static MACHINE_CONFIG_START( ikari, snk_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_ikari)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ikari)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_GFXDECODE_ADD("gfxdecode",ikari,"palette")
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x400)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+
 	MCFG_VIDEO_START_OVERRIDE(snk_state,ikari)
 
 	/* sound hardware */
@@ -3917,10 +3916,8 @@ static MACHINE_CONFIG_START( bermudat, snk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_gwar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gwar)
-	MCFG_PALETTE_LENGTH(0x400)
-
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
+	MCFG_GFXDECODE_ADD("gfxdecode",gwar,"palette")
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x400)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,gwar)
 
 	/* sound hardware */
@@ -4013,18 +4010,17 @@ static MACHINE_CONFIG_START( tdfever, snk_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(50*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tdfever)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tdfever)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_GFXDECODE_ADD("gfxdecode",tdfever,"palette")
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x400)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+
 	MCFG_VIDEO_START_OVERRIDE(snk_state,tdfever)
 
 	/* sound hardware */

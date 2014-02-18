@@ -109,7 +109,7 @@ WRITE32_MEMBER( beathead_state::palette_w )
 	int r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 0x01);
 	int g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 0x01);
 	int b = ((newword << 1) & 0x3e) | ((newword >> 15) & 0x01);
-	palette_set_color_rgb(space.machine(), offset, pal6bit(r), pal6bit(g), pal6bit(b));
+	m_palette->set_pen_color(offset, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 

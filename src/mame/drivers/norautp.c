@@ -577,7 +577,7 @@ UINT32 norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 
 
 	count = 0;
 
-	bitmap.fill(machine().pens[0], cliprect); //black pen
+	bitmap.fill(m_palette->pen(0), cliprect); //black pen
 
 	for(y = 0; y < 8; y++)
 	{
@@ -612,17 +612,17 @@ UINT32 norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 
 }
 
 
-void norautp_state::palette_init()
+PALETTE_INIT_MEMBER(norautp_state, norautp)
 {
 	/* 1st gfx bank */
-	palette_set_color(machine(), 0, MAKE_RGB(0x00, 0x00, 0xff));    /* blue */
-	palette_set_color(machine(), 1, MAKE_RGB(0xff, 0xff, 0x00));    /* yellow */
-	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0x00, 0xff));    /* blue */
-	palette_set_color(machine(), 3, MAKE_RGB(0xff, 0xff, 0xff));    /* white */
-	palette_set_color(machine(), 4, MAKE_RGB(0xff, 0xff, 0xff));    /* white */
-	palette_set_color(machine(), 5, MAKE_RGB(0xff, 0x00, 0x00));    /* red */
-	palette_set_color(machine(), 6, MAKE_RGB(0xff, 0xff, 0xff));    /* white */
-	palette_set_color(machine(), 7, MAKE_RGB(0x00, 0x00, 0x00));    /* black */
+	palette.set_pen_color(0, MAKE_RGB(0x00, 0x00, 0xff));    /* blue */
+	palette.set_pen_color(1, MAKE_RGB(0xff, 0xff, 0x00));    /* yellow */
+	palette.set_pen_color(2, MAKE_RGB(0x00, 0x00, 0xff));    /* blue */
+	palette.set_pen_color(3, MAKE_RGB(0xff, 0xff, 0xff));    /* white */
+	palette.set_pen_color(4, MAKE_RGB(0xff, 0xff, 0xff));    /* white */
+	palette.set_pen_color(5, MAKE_RGB(0xff, 0x00, 0x00));    /* red */
+	palette.set_pen_color(6, MAKE_RGB(0xff, 0xff, 0xff));    /* white */
+	palette.set_pen_color(7, MAKE_RGB(0x00, 0x00, 0x00));    /* black */
 }
 
 
@@ -1271,9 +1271,9 @@ static MACHINE_CONFIG_START( noraut_base, norautp_state )
 	MCFG_SCREEN_VISIBLE_AREA(2*16, 31*16-1, (0*16) + 8, 16*16-1)    /* the hardware clips the top 8 pixels */
 	MCFG_SCREEN_UPDATE_DRIVER(norautp_state, screen_update_norautp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", norautp)
+	MCFG_GFXDECODE_ADD("gfxdecode",norautp,"palette")
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

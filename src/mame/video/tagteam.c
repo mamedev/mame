@@ -32,13 +32,13 @@ static const res_net_decode_info tagteam_decode_info =
 	{  0x07, 0x07, 0x03 }  /* masks */
 };
 
-void tagteam_state::palette_init()
+PALETTE_INIT_MEMBER(tagteam_state, tagteam)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &tagteam_decode_info, &tagteam_net_info);
-	palette_set_colors(machine(), 0x00, rgb, 0x20);
+	palette.set_pen_colors(0x00, rgb, 0x20);
 	auto_free(machine(), rgb);
 }
 

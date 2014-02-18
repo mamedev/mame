@@ -470,7 +470,7 @@ UINT32 bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 &b
 {
 	int x,y,count;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	count = (0x2000/2);
 
@@ -483,22 +483,22 @@ UINT32 bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 &b
 			color = (m_blit_ram[count] & 0xf000)>>12;
 
 			if(cliprect.contains(x+3, y))
-				bitmap.pix32(y, x+3) = machine().pens[color];
+				bitmap.pix32(y, x+3) = m_palette->pen(color);
 
 			color = (m_blit_ram[count] & 0x0f00)>>8;
 
 			if(cliprect.contains(x+2, y))
-				bitmap.pix32(y, x+2) = machine().pens[color];
+				bitmap.pix32(y, x+2) = m_palette->pen(color);
 
 			color = (m_blit_ram[count] & 0x00f0)>>4;
 
 			if(cliprect.contains(x+1, y))
-				bitmap.pix32(y, x+1) = machine().pens[color];
+				bitmap.pix32(y, x+1) = m_palette->pen(color);
 
 			color = (m_blit_ram[count] & 0x000f)>>0;
 
 			if(cliprect.contains(x+0, y))
-				bitmap.pix32(y, x+0) = machine().pens[color];
+				bitmap.pix32(y, x+0) = m_palette->pen(color);
 
 			count++;
 		}
@@ -632,7 +632,7 @@ static MACHINE_CONFIG_START( bingor, bingor_state )
 	MCFG_CPU_IO_MAP(pic_io_map)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bingor)
+	MCFG_GFXDECODE_ADD("gfxdecode",bingor,"palette")
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -642,7 +642,7 @@ static MACHINE_CONFIG_START( bingor, bingor_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bingor_state, screen_update_bingor)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

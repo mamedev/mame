@@ -123,7 +123,7 @@ void diverboy_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 
 UINT32 diverboy_state::screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  bitmap.fill(get_black_pen(machine()), cliprect);
+//  bitmap.fill(m_palette->black_pen(), cliprect);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
@@ -264,7 +264,7 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", diverboy)
+	MCFG_GFXDECODE_ADD("gfxdecode",diverboy,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -273,7 +273,7 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 40*8+1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(diverboy_state, screen_update_diverboy)
 
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_PALETTE_ADD("palette", 0x400)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

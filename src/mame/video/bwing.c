@@ -160,7 +160,7 @@ WRITE8_MEMBER(bwing_state::bwing_paletteram_w)
 		if (b > 0xff) b = 0xff;
 	}
 
-	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(offset, MAKE_RGB(r, g, b));
 
 	#if BW_DEBUG
 		m_paletteram[offset + 0x40] = m_palatch;
@@ -307,7 +307,7 @@ UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bit
 		m_bgmap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 
 	// draw low priority sprites
 	draw_sprites(bitmap, cliprect, m_spriteram, 0);

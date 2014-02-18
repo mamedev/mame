@@ -11,13 +11,10 @@ Video hardware driver by Uki
 #include "emu.h"
 #include "includes/ikki.h"
 
-void ikki_state::palette_init()
+PALETTE_INIT_MEMBER(ikki_state, ikki)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable - extra pen for the punch through pen */
-	machine().colortable = colortable_alloc(machine(), 0x101);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -26,7 +23,7 @@ void ikki_state::palette_init()
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -44,14 +41,14 @@ void ikki_state::palette_init()
 			ctabentry = 0x100;
 		}
 
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* bg lookup table */
 	for (i = 0x200; i < 0x400; i++)
 	{
 		UINT8 ctabentry = color_prom[i];
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -95,7 +92,7 @@ void ikki_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 				code, color,
 				m_flipscreen,m_flipscreen,
 				x,y,
-				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0));
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0));
 	}
 
 	/* copy the sprite bitmap into the main bitmap, skipping the transparent pixels */

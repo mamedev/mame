@@ -37,7 +37,7 @@ public:
 };
 
 
-void mogura_state::palette_init()
+PALETTE_INIT_MEMBER(mogura_state, mogura)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i, j;
@@ -63,7 +63,7 @@ void mogura_state::palette_init()
 		bit2 = BIT(color_prom[i], 7);
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), j, MAKE_RGB(r, g, b));
+		palette.set_pen_color(j, MAKE_RGB(r, g, b));
 		j += 4;
 		if (j > 31) j -= 31;
 	}
@@ -212,8 +212,8 @@ static MACHINE_CONFIG_START( mogura, mogura_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mogura_state, screen_update_mogura)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mogura)
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE_ADD("gfxdecode",mogura,"palette")
+	MCFG_PALETTE_ADD("palette", 32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

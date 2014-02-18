@@ -568,8 +568,8 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update_galpanic)
 	MCFG_SCREEN_VBLANK_DRIVER(galpanic_state, screen_eof_galpanic)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galpanic)
-	MCFG_PALETTE_LENGTH(1024 + 32768)
+	MCFG_GFXDECODE_ADD("gfxdecode",galpanic,"palette")
+	MCFG_PALETTE_ADD("palette", 1024 + 32768)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", galpanic_pandora_config)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
@@ -580,7 +580,7 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 
 
 
-	MCFG_PALETTE_INIT_OVERRIDE(galpanic_state,galpanic)
+	MCFG_PALETTE_INIT_OWNER(galpanic_state,galpanic)
 	MCFG_VIDEO_START_OVERRIDE(galpanic_state,galpanic)
 
 	/* sound hardware */

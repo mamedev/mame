@@ -228,7 +228,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 UINT32 mz3500_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	bitmap.fill(machine().pens[(m_crtc[4] & 2) ? m_crtc[3] & 7 : 0], cliprect);
+	bitmap.fill(m_palette->pen((m_crtc[4) & 2) ? m_crtc[3] & 7 : 0], cliprect);
 
 	/* graphics */
 	m_hgdc2->screen_update(screen, bitmap, cliprect);
@@ -824,12 +824,12 @@ void mz3500_state::machine_reset()
 
 
 
-void mz3500_state::palette_init()
+PALETTE_INIT_MEMBER(mz3500_state, mz3500)
 {
 	int i;
 
 	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine(), i,pal1bit((i >> 1) & 1),pal1bit(i >> 2),pal1bit((i >> 0) & 1));
+		palette.set_pen_color(i,pal1bit((i >> 1) & 1),pal1bit(i >> 2),pal1bit((i >> 0) & 1));
 
 }
 
@@ -879,9 +879,9 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mz3500)
+	MCFG_GFXDECODE_ADD("gfxdecode",mz3500,"palette")
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

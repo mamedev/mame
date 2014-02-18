@@ -558,9 +558,9 @@ static const rectangle teletyper_scroll_clear_window(
 );
 static const int var_teletyper_scroll_step = - teletyper_scroll_step;
 
-void apexc_state::palette_init()
+PALETTE_INIT_MEMBER(apexc_state, apexc)
 {
-	palette_set_colors(machine(), 0, apexc_palette, APEXC_PALETTE_SIZE);
+	palette.set_pen_colors(0, apexc_palette, APEXC_PALETTE_SIZE);
 }
 
 void apexc_state::video_start()
@@ -887,8 +887,8 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 	MCFG_SCREEN_UPDATE_DRIVER(apexc_state, screen_update_apexc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", apexc)
-	MCFG_PALETTE_LENGTH(APEXC_PALETTE_SIZE)
+	MCFG_GFXDECODE_ADD("gfxdecode",apexc,"palette")
+	MCFG_PALETTE_ADD("palette", APEXC_PALETTE_SIZE)
 
 
 	MCFG_APEXC_CYLINDER_ADD("cylinder")

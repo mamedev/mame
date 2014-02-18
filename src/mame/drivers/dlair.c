@@ -224,8 +224,8 @@ PALETTE_INIT_MEMBER(dlair_state,dleuro)
 
 	for (i = 0; i < 8; i++)
 	{
-		palette_set_color(machine(), 2 * i + 0, MAKE_RGB(0, 0, 0));
-		palette_set_color_rgb(machine(), 2 * i + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		palette.set_pen_color(2 * i + 0, MAKE_RGB(0, 0, 0));
+		palette.set_pen_color(2 * i + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
 }
 
@@ -786,10 +786,10 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dlair)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE_ADD("gfxdecode",dlair,"palette")
+	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_PALETTE_INIT_OVERRIDE(dlair_state,dleuro)
+	MCFG_PALETTE_INIT_OWNER(dlair_state,dleuro)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

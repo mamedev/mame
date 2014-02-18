@@ -286,8 +286,8 @@ static MACHINE_CONFIG_START( iqblock, iqblock_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(iqblock_state, screen_update_iqblock)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", iqblock)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",iqblock,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 
 	/* sound hardware */

@@ -130,7 +130,7 @@ WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
 WRITE8_MEMBER(cmmb_state::cmmb_paletteram_w)
 {
 	/* RGB output is inverted */
-	paletteram_RRRGGGBB_byte_w(space,offset,~data);
+	m_palette->write(space, offset, UINT8(~data), mem_mask);
 }
 
 READ8_MEMBER(cmmb_state::cmmb_input_r)
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( cmmb_map, AS_PROGRAM, 8, cmmb_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM /* zero page address */
 //  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE(cmmb_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE(cmmb_paletteram_w) AM_SHARE("palette")
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w) //i/o
 	AM_RANGE(0x4900, 0x4900) AM_READ(kludge_r)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -334,8 +334,10 @@ static MACHINE_CONFIG_START( cmmb, cmmb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cmmb_state, screen_update_cmmb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cmmb)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",cmmb,"palette")
+	
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(RRRGGGBB)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")

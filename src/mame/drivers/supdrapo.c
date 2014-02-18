@@ -136,7 +136,7 @@ UINT32 supdrapo_state::screen_update_supdrapo(screen_device &screen, bitmap_ind1
 
 
 /*Maybe bit 2 & 3 of the second color prom are intensity bits? */
-void supdrapo_state::palette_init()
+PALETTE_INIT_MEMBER(supdrapo_state, supdrapo)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
@@ -159,7 +159,7 @@ void supdrapo_state::palette_init()
 		bit2 = (color_prom[0x100] >> 1) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -464,8 +464,8 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(supdrapo_state, screen_update_supdrapo)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", supdrapo)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE_ADD("gfxdecode",supdrapo,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

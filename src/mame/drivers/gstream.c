@@ -224,12 +224,12 @@ WRITE32_MEMBER(gstream_state::gstream_palette_w)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 
-	palette_set_color_rgb(machine(), offset * 2, pal5bit(m_paletteram[offset] >> (0 + 16)),
+	m_palette->set_pen_color(offset * 2, pal5bit(m_paletteram[offset] >> (0 + 16)),
 									pal5bit(m_paletteram[offset] >> (6 + 16)),
 									pal5bit(m_paletteram[offset] >> (11 + 16)));
 
 
-	palette_set_color_rgb(machine(),offset * 2 + 1,pal5bit(m_paletteram[offset] >> (0)),
+	m_palette->set_pen_color(offset * 2 + 1,pal5bit(m_paletteram[offset] >> (0)),
 									pal5bit(m_paletteram[offset] >> (6)),
 									pal5bit(m_paletteram[offset] >> (11)));
 }
@@ -579,8 +579,8 @@ static MACHINE_CONFIG_START( gstream, gstream_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update_gstream)
 
-	MCFG_PALETTE_LENGTH(0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
-	MCFG_GFXDECODE_ADD("gfxdecode", gstream)
+	MCFG_PALETTE_ADD("palette", 0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
+	MCFG_GFXDECODE_ADD("gfxdecode",gstream,"palette")
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

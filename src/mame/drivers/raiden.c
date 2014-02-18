@@ -290,8 +290,8 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	MCFG_SCREEN_UPDATE_DRIVER(raiden_state, screen_update_raiden)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", raiden)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",raiden,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) // frequency and pin 7 verified (pin set in audio\seibu.h)

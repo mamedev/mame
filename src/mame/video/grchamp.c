@@ -12,7 +12,7 @@
 #define RGB_MAX     191
 
 
-void grchamp_state::palette_init()
+PALETTE_INIT_MEMBER(grchamp_state, grchamp)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 100, 270, 470 };
@@ -110,8 +110,8 @@ void grchamp_state::video_start()
 #if 0
 int grchamp_state::collision_check(grchamp_state *state, bitmap_ind16 &bitmap, int which )
 {
-	int bgcolor = machine().pens[0];
-	int sprite_transp = machine().pens[0x24];
+	int bgcolor = m_palette->pen(0);
+	int sprite_transp = m_palette->pen(0x24);
 	const rectangle &visarea = m_screen->visible_area();
 	int y0 = 240 - m_cpu0_out[3];
 	int x0 = 256 - m_cpu0_out[2];

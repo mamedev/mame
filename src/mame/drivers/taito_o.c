@@ -255,8 +255,8 @@ static MACHINE_CONFIG_START( parentj, taitoo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 31*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoo_state, screen_update_parentj)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", parentj)
-	MCFG_PALETTE_LENGTH(33*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",parentj,"palette")
+	MCFG_PALETTE_ADD("palette", 33*16)
 
 	MCFG_TC0080VCO_ADD("tc0080vco", parentj_intf)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")

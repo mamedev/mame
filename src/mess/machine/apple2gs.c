@@ -1377,7 +1377,7 @@ WRITE8_MEMBER( apple2gs_state::apple2gs_aux4000_w )
 			{
 				int color = (offset - 0x19e00) >> 1;
 
-				palette_set_color_rgb(space.machine(), color + 16,
+				m_palette->set_pen_color(color + 16,
 					((m_slowmem[0x19E00 + (color * 2) + 1] >> 0) & 0x0F) * 17,
 					((m_slowmem[0x19E00 + (color * 2) + 0] >> 4) & 0x0F) * 17,
 					((m_slowmem[0x19E00 + (color * 2) + 0] >> 0) & 0x0F) * 17);
@@ -1839,7 +1839,7 @@ WRITE8_MEMBER( apple2gs_state::apple2gs_slowmem_w )
 	{
 		int color = (offset - 0x19e00) >> 1;
 
-		palette_set_color_rgb(space.machine(), color + 16,
+		m_palette->set_pen_color(color + 16,
 			((m_slowmem[0x19E00 + (color * 2) + 1] >> 0) & 0x0F) * 17,
 			((m_slowmem[0x19E00 + (color * 2) + 0] >> 4) & 0x0F) * 17,
 			((m_slowmem[0x19E00 + (color * 2) + 0] >> 0) & 0x0F) * 17);

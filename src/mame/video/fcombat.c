@@ -37,13 +37,10 @@ TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-void fcombat_state::palette_init()
+PALETTE_INIT_MEMBER(fcombat_state, fcombat)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -69,7 +66,7 @@ void fcombat_state::palette_init()
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -79,7 +76,7 @@ void fcombat_state::palette_init()
 	for (i = 0; i < 0x200; i++)
 	{
 		UINT8 ctabentry = (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* bg chars (this is not the full story... there are four layers mixed */
@@ -87,7 +84,7 @@ void fcombat_state::palette_init()
 	for (i = 0x200; i < 0x300; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 

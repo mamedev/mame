@@ -5,18 +5,18 @@
 PALETTE_INIT_MEMBER(sb2m600_state, osi630)
 {
 	/* black and white */
-	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine(), 1, 0xff, 0xff, 0xff); // white
+	palette.set_pen_color(0, 0x00, 0x00, 0x00); // black
+	palette.set_pen_color(1, 0xff, 0xff, 0xff); // white
 
 	/* color enabled */
-	palette_set_color_rgb(machine(), 2, 0xff, 0xff, 0x00); // yellow
-	palette_set_color_rgb(machine(), 3, 0xff, 0x00, 0x00); // red
-	palette_set_color_rgb(machine(), 4, 0x00, 0xff, 0x00); // green
-	palette_set_color_rgb(machine(), 5, 0x00, 0x80, 0x00); // olive green
-	palette_set_color_rgb(machine(), 6, 0x00, 0x00, 0xff); // blue
-	palette_set_color_rgb(machine(), 7, 0xff, 0x00, 0xff); // purple
-	palette_set_color_rgb(machine(), 8, 0x00, 0x00, 0x80); // sky blue
-	palette_set_color_rgb(machine(), 9, 0x00, 0x00, 0x00); // black
+	palette.set_pen_color(2, 0xff, 0xff, 0x00); // yellow
+	palette.set_pen_color(3, 0xff, 0x00, 0x00); // red
+	palette.set_pen_color(4, 0x00, 0xff, 0x00); // green
+	palette.set_pen_color(5, 0x00, 0x80, 0x00); // olive green
+	palette.set_pen_color(6, 0x00, 0x00, 0xff); // blue
+	palette.set_pen_color(7, 0xff, 0x00, 0xff); // purple
+	palette.set_pen_color(8, 0x00, 0x00, 0x80); // sky blue
+	palette.set_pen_color(9, 0x00, 0x00, 0x00); // black
 }
 
 /* Video Start */
@@ -150,8 +150,7 @@ MACHINE_CONFIG_FRAGMENT( osi600_video )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( uk101_video )
@@ -161,8 +160,7 @@ MACHINE_CONFIG_FRAGMENT( uk101_video )
 	MCFG_SCREEN_SIZE(64*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( osi630_video )
@@ -172,6 +170,6 @@ MACHINE_CONFIG_FRAGMENT( osi630_video )
 	MCFG_SCREEN_SIZE(64*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
 
-	MCFG_PALETTE_LENGTH(8+2)
-	MCFG_PALETTE_INIT_OVERRIDE(sb2m600_state, osi630)
+	MCFG_PALETTE_ADD("palette", 8+2)
+	MCFG_PALETTE_INIT_OWNER(sb2m600_state, osi630)
 MACHINE_CONFIG_END

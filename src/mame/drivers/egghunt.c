@@ -227,7 +227,7 @@ WRITE8_MEMBER(egghunt_state::egghunt_okibanking_w)
 
 static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8, egghunt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(egghunt_atram_w) AM_SHARE("atram")
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(egghunt_bgram_r, egghunt_bgram_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
@@ -428,9 +428,10 @@ static MACHINE_CONFIG_START( egghunt, egghunt_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(egghunt_state, screen_update_egghunt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", egghunt)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_GFXDECODE_ADD("gfxdecode",egghunt,"palette")
 
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

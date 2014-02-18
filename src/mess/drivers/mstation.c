@@ -502,10 +502,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(mstation_state::mstation_kb_timer)
 	refresh_ints();
 }
 
-void mstation_state::palette_init()
+PALETTE_INIT_MEMBER(mstation_state, mstation)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
+	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
 }
 
 static RP5C01_INTERFACE( rtc_intf )
@@ -527,7 +527,7 @@ static MACHINE_CONFIG_START( mstation, mstation_state )
 	MCFG_SCREEN_SIZE(320, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 128-1)
 
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_AMD_29F080_ADD("flash0")

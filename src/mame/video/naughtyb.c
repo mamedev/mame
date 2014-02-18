@@ -55,7 +55,7 @@ static const res_net_info naughtyb_net_info =
 
 ***************************************************************************/
 
-void naughtyb_state::palette_init()
+PALETTE_INIT_MEMBER(naughtyb_state, naughtyb)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[2] = { 270, 130 };
@@ -68,7 +68,7 @@ void naughtyb_state::palette_init()
 			2, resistances, weights, 0, 0,
 			0, 0, 0, 0, 0);
 
-	for (i = 0;i < machine().total_colors(); i++)
+	for (i = 0;i < palette.entries(); i++)
 	{
 		int bit0, bit1;
 		int r, g, b;
@@ -88,7 +88,7 @@ void naughtyb_state::palette_init()
 		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
 		b = combine_2_weights(weights, bit0, bit1);
 
-		palette_set_color(machine(), BITSWAP8(i,5,7,6,2,1,0,4,3), MAKE_RGB(r, g, b));
+		palette.set_pen_color(BITSWAP8(i,5,7,6,2,1,0,4,3), MAKE_RGB(r, g, b));
 	}
 }
 

@@ -2,13 +2,13 @@
 #include "includes/galspnbl.h"
 
 
-void galspnbl_state::palette_init()
+PALETTE_INIT_MEMBER(galspnbl_state, galspnbl)
 {
 	int i;
 
 	/* initialize 555 RGB lookup */
 	for (i = 0; i < 32768; i++)
-		palette_set_color_rgb(machine(), i + 1024, pal5bit(i >> 5), pal5bit(i >> 10), pal5bit(i >> 0));
+		palette.set_pen_color(i + 1024, pal5bit(i >> 5), pal5bit(i >> 10), pal5bit(i >> 0));
 }
 
 

@@ -176,8 +176,8 @@ static MACHINE_CONFIG_START( mrdo, mrdo_state )
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/4, 312, 8, 248, 262, 32, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mrdo_state, screen_update_mrdo)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mrdo)
-	MCFG_PALETTE_LENGTH(64*4+16*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",mrdo,"palette")
+	MCFG_PALETTE_ADD("palette", 64*4+16*4)
 
 
 	/* sound hardware */

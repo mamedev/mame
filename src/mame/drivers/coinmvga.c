@@ -280,7 +280,7 @@ UINT32 coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_ind1
 }
 
 
-void coinmvga_state::palette_init()
+PALETTE_INIT_MEMBER(coinmvga_state, coinmvga)
 {
 }
 
@@ -315,7 +315,7 @@ WRITE16_MEMBER(coinmvga_state::ramdac_bg_w)
 				break;
 			case 2:
 				m_bgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(machine(), m_bgpal.offs, MAKE_RGB(m_bgpal.r, m_bgpal.g, m_bgpal.b));
+				m_palette->set_pen_color(m_bgpal.offs, MAKE_RGB(m_bgpal.r, m_bgpal.g, m_bgpal.b));
 				m_bgpal.offs_internal = 0;
 				m_bgpal.offs++;
 				break;
@@ -345,7 +345,7 @@ WRITE16_MEMBER(coinmvga_state::ramdac_fg_w)
 				break;
 			case 2:
 				m_fgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(machine(), 0x100+m_fgpal.offs, MAKE_RGB(m_fgpal.r, m_fgpal.g, m_fgpal.b));
+				m_palette->set_pen_color(0x100+m_fgpal.offs, MAKE_RGB(m_fgpal.r, m_fgpal.g, m_fgpal.b));
 				m_fgpal.offs_internal = 0;
 				m_fgpal.offs++;
 				break;
@@ -686,9 +686,9 @@ static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(coinmvga_state, screen_update_coinmvga)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", coinmvga)
+	MCFG_GFXDECODE_ADD("gfxdecode",coinmvga,"palette")
 
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */

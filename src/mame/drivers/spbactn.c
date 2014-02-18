@@ -426,8 +426,8 @@ static MACHINE_CONFIG_START( spbactn, spbactn_state )
 	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactn)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactn)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", spbactn)
-	MCFG_PALETTE_LENGTH(0x2800/2)
+	MCFG_GFXDECODE_ADD("gfxdecode",spbactn,"palette")
+	MCFG_PALETTE_ADD("palette", 0x2800/2)
 
 
 	/* sound hardware */
@@ -468,8 +468,8 @@ static MACHINE_CONFIG_START( spbactnp, spbactn_state )
 	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactnp)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactnp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", spbactnp)
-	MCFG_PALETTE_LENGTH(0x2800/2)
+	MCFG_GFXDECODE_ADD("gfxdecode",spbactnp,"palette")
+	MCFG_PALETTE_ADD("palette", 0x2800/2)
 
 
 	/* sound hardware  - different? */

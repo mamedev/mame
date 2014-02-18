@@ -103,7 +103,7 @@ WRITE32_MEMBER(superchs_state::superchs_palette_w)
 	g = (a &0xff00) >> 8;
 	b = (a &0xff);
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offset,MAKE_RGB(r,g,b));
 }
 
 READ32_MEMBER(superchs_state::superchs_input_r)
@@ -345,8 +345,8 @@ static MACHINE_CONFIG_START( superchs, superchs_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(superchs_state, screen_update_superchs)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", superchs)
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE_ADD("gfxdecode",superchs,"palette")
+	MCFG_PALETTE_ADD("palette", 8192)
 
 
 	MCFG_TC0480SCP_ADD("tc0480scp", superchs_tc0480scp_intf)

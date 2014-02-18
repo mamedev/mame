@@ -99,7 +99,7 @@ UINT32 warriorb_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 
 	// draw middle layer
 	tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 1);

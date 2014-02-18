@@ -235,7 +235,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 UINT32 qx10_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_hgdc->screen_update(screen, bitmap, cliprect);
 
@@ -765,15 +765,15 @@ void qx10_state::machine_reset()
 		if(m_color_mode) //color
 		{
 			for ( i = 0; i < 8; i++ )
-				palette_set_color_rgb(machine(), i, pal1bit((i >> 2) & 1), pal1bit((i >> 1) & 1), pal1bit((i >> 0) & 1));
+				m_palette->set_pen_color(i, pal1bit((i >> 2) & 1), pal1bit((i >> 1) & 1), pal1bit((i >> 0) & 1));
 		}
 		else //monochrome
 		{
 			for ( i = 0; i < 8; i++ )
-				palette_set_color_rgb(machine(), i, pal1bit(0), pal1bit(0), pal1bit(0));
+				m_palette->set_pen_color(i, pal1bit(0), pal1bit(0), pal1bit(0));
 
-			palette_set_color_rgb(machine(), 1, 0x00, 0x9f, 0x00);
-			palette_set_color_rgb(machine(), 2, 0x00, 0xff, 0x00);
+			m_palette->set_pen_color(1, 0x00, 0x9f, 0x00);
+			m_palette->set_pen_color(2, 0x00, 0xff, 0x00);
 			m_vram_bank = 0;
 		}
 	}
@@ -815,7 +815,7 @@ static UPD7220_INTERFACE( hgdc_intf )
 	DEVCB_NULL
 };
 
-void qx10_state::palette_init()
+PALETTE_INIT_MEMBER(qx10_state, qx10)
 {
 	// ...
 }
@@ -859,8 +859,8 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_SCREEN_UPDATE_DRIVER(qx10_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", qx10)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_GFXDECODE_ADD("gfxdecode",qx10,"palette")
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */
 	MCFG_PIT8253_ADD("pit8253_1", qx10_pit8253_1_config)

@@ -1953,7 +1953,7 @@ void vic3_device::raster_interrupt_gen()
 		m_rasterline = 0;
 		if (m_palette_dirty)
 			for (i = 0; i < 256; i++)
-				palette_set_color_rgb(machine(), i, m_palette_red[i] << 4, m_palette_green[i] << 4, m_palette_blue[i] << 4);
+				m_palette->set_pen_color(i, m_palette_red[i] << 4, m_palette_green[i] << 4, m_palette_blue[i] << 4);
 
 		if (m_palette_dirty)
 		{

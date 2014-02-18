@@ -946,8 +946,8 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", punchout)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_GFXDECODE_ADD("gfxdecode",punchout,"palette")
+	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
 
 	MCFG_SCREEN_ADD("top", RASTER)

@@ -1752,8 +1752,8 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_captaven)
 	MCFG_SCREEN_VBLANK_DRIVER(deco32_state, screen_eof_captaven)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", captaven)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",captaven,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECO16IC_ADD("tilegen1", captaven_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
@@ -1824,8 +1824,8 @@ static MACHINE_CONFIG_START( fghthist, deco32_state ) /* DE-0380-2 PCB */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_fghthist)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fghthist)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",fghthist,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECO16IC_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
@@ -1883,8 +1883,8 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_fghthist)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fghthist)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",fghthist,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECO16IC_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
@@ -2013,8 +2013,8 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_DECO16IC_ADD("tilegen2", dragngun_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dragngun)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",dragngun,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(dragngun_state,dragngun)
 
@@ -2098,8 +2098,8 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_DECO16IC_ADD("tilegen2", lockload_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dragngun)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",dragngun,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(dragngun_state,lockload)
 
@@ -2194,8 +2194,8 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	decospr_device::set_gfx_region(*device, 4);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tattass)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",tattass,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECO104_ADD("ioprot104")
 	MCFG_DECO146_SET_PORTB_CALLBACK( deco32_state, port_b_tattass )
@@ -2243,8 +2243,8 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	decospr_device::set_gfx_region(*device, 4);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nslasher)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",nslasher,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,nslasher)
 

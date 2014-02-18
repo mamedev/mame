@@ -271,7 +271,7 @@ WRITE16_MEMBER(neoprint_state::nprsp_palette_w)
 
 		pal_entry = ((offset & 0xfffe) >> 1) + ((offset & 0x20000) ? 0x8000 : 0);
 
-		palette_set_color(machine(), pal_entry, MAKE_RGB(r,g,b));
+		m_palette->set_pen_color(pal_entry, MAKE_RGB(r,g,b));
 	}
 }
 
@@ -479,7 +479,7 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_UPD4990A_OLD_ADD("upd4990a")
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", neoprint)
+	MCFG_GFXDECODE_ADD("gfxdecode",neoprint,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -488,7 +488,7 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(neoprint_state, screen_update_neoprint)
 
-	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_PALETTE_ADD("palette", 0x10000)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -519,7 +519,7 @@ static MACHINE_CONFIG_START( nprsp, neoprint_state )
 	MCFG_UPD4990A_OLD_ADD("upd4990a")
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", neoprint)
+	MCFG_GFXDECODE_ADD("gfxdecode",neoprint,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( nprsp, neoprint_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(neoprint_state,nprsp)
 
-	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_PALETTE_ADD("palette", 0x10000)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

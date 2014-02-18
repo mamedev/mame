@@ -565,9 +565,7 @@ static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hnayayoi_state, screen_update_hnayayoi)
 
-	MCFG_PALETTE_LENGTH(256)
-
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -145,12 +145,12 @@ public:
 };
 
 
-void mirax_state::palette_init()
+PALETTE_INIT_MEMBER(mirax_state, mirax)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -169,7 +169,7 @@ void mirax_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -476,8 +476,8 @@ static MACHINE_CONFIG_START( mirax, mirax_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mirax_state, screen_update_mirax)
 
-	MCFG_PALETTE_LENGTH(0x40)
-	MCFG_GFXDECODE_ADD("gfxdecode", mirax)
+	MCFG_PALETTE_ADD("palette", 0x40)
+	MCFG_GFXDECODE_ADD("gfxdecode",mirax,"palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay1", AY8910, 12000000/4)

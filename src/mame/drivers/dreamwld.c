@@ -455,10 +455,10 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_palette_w)
 	color = offset * 2;
 
 	dat = m_paletteram[offset] & 0x7fff;
-	palette_set_color_rgb(machine(), color+1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
+	m_palette->set_pen_color(color+1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 
 	dat = (m_paletteram[offset] >> 16) & 0x7fff;
-	palette_set_color_rgb(machine(), color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
+	m_palette->set_pen_color(color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 }
 
 
@@ -602,8 +602,8 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dreamwld_state, screen_update_dreamwld)
 	MCFG_SCREEN_VBLANK_DRIVER(dreamwld_state, screen_eof_dreamwld)
 
-	MCFG_PALETTE_LENGTH(0x1000)
-	MCFG_GFXDECODE_ADD("gfxdecode", dreamwld)
+	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_GFXDECODE_ADD("gfxdecode",dreamwld,"palette")
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -172,11 +172,11 @@ static const i8275_interface rt1715_i8275_intf =
     PALETTE
 ***************************************************************************/
 
-void rt1715_state::palette_init()
+PALETTE_INIT_MEMBER(rt1715_state, rt1715)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
-	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x7f, 0x00)); /* low intensity */
-	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0xff, 0x00)); /* high intensitiy */
+	palette.set_pen_color(0, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
+	palette.set_pen_color(1, MAKE_RGB(0x00, 0x7f, 0x00)); /* low intensity */
+	palette.set_pen_color(2, MAKE_RGB(0x00, 0xff, 0x00)); /* high intensitiy */
 }
 
 
@@ -347,8 +347,8 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rt1715)
-	MCFG_PALETTE_LENGTH(3)
+	MCFG_GFXDECODE_ADD("gfxdecode",rt1715,"palette")
+	MCFG_PALETTE_ADD("palette", 3)
 
 	MCFG_I8275_ADD("a26", rt1715_i8275_intf)
 	MCFG_Z80CTC_ADD("a30", XTAL_10MHz/4 /* ? */, rt1715_ctc_intf)

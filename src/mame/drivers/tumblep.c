@@ -304,8 +304,8 @@ static MACHINE_CONFIG_START( tumblep, tumblep_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-2, 1*8, 31*8-1) // hmm
 	MCFG_SCREEN_UPDATE_DRIVER(tumblep_state, screen_update_tumblep)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumblep)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",tumblep,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DECO16IC_ADD("tilegen1", tumblep_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")

@@ -8,40 +8,37 @@ Atari Wolf Pack (prototype) video emulation
 #include "includes/wolfpack.h"
 
 
-void wolfpack_state::palette_init()
+PALETTE_INIT_MEMBER(wolfpack_state, wolfpack)
 {
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 8);
-
-	colortable_palette_set_color(machine().colortable, 0, MAKE_RGB(0x00, 0x00, 0x00));
-	colortable_palette_set_color(machine().colortable, 1, MAKE_RGB(0xc1, 0xc1, 0xc1));
-	colortable_palette_set_color(machine().colortable, 2, MAKE_RGB(0x81, 0x81, 0x81));
-	colortable_palette_set_color(machine().colortable, 3, MAKE_RGB(0x48, 0x48, 0x48));
+	palette.set_indirect_color(0, MAKE_RGB(0x00, 0x00, 0x00));
+	palette.set_indirect_color(1, MAKE_RGB(0xc1, 0xc1, 0xc1));
+	palette.set_indirect_color(2, MAKE_RGB(0x81, 0x81, 0x81));
+	palette.set_indirect_color(3, MAKE_RGB(0x48, 0x48, 0x48));
 
 	for (i = 0; i < 4; i++)
 	{
-		rgb_t color = colortable_palette_get_color(machine().colortable, i);
+		rgb_t color = palette.indirect_color(i);
 
-		colortable_palette_set_color(machine().colortable, 4 + i,
+		palette.set_indirect_color(4 + i,
 										MAKE_RGB(RGB_RED(color)   < 0xb8 ? RGB_RED(color)   + 0x48 : 0xff,
 												RGB_GREEN(color) < 0xb8 ? RGB_GREEN(color) + 0x48 : 0xff,
 												RGB_BLUE(color)  < 0xb8 ? RGB_BLUE(color)  + 0x48 : 0xff));
 	}
 
-	colortable_entry_set_value(machine().colortable, 0x00, 0);
-	colortable_entry_set_value(machine().colortable, 0x01, 1);
-	colortable_entry_set_value(machine().colortable, 0x02, 1);
-	colortable_entry_set_value(machine().colortable, 0x03, 0);
-	colortable_entry_set_value(machine().colortable, 0x04, 0);
-	colortable_entry_set_value(machine().colortable, 0x05, 2);
-	colortable_entry_set_value(machine().colortable, 0x06, 0);
-	colortable_entry_set_value(machine().colortable, 0x07, 3);
-	colortable_entry_set_value(machine().colortable, 0x08, 4);
-	colortable_entry_set_value(machine().colortable, 0x09, 5);
-	colortable_entry_set_value(machine().colortable, 0x0a, 6);
-	colortable_entry_set_value(machine().colortable, 0x0b, 7);
+	palette.set_pen_indirect(0x00, 0);
+	palette.set_pen_indirect(0x01, 1);
+	palette.set_pen_indirect(0x02, 1);
+	palette.set_pen_indirect(0x03, 0);
+	palette.set_pen_indirect(0x04, 0);
+	palette.set_pen_indirect(0x05, 2);
+	palette.set_pen_indirect(0x06, 0);
+	palette.set_pen_indirect(0x07, 3);
+	palette.set_pen_indirect(0x08, 4);
+	palette.set_pen_indirect(0x09, 5);
+	palette.set_pen_indirect(0x0a, 6);
+	palette.set_pen_indirect(0x0b, 7);
 }
 
 
@@ -214,7 +211,7 @@ void wolfpack_state::draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect)
 }
 
 
-void wolfpack_state::draw_water(colortable_t *colortable, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void wolfpack_state::draw_water(palette_device &palette, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle rect = cliprect;
 
@@ -229,7 +226,7 @@ void wolfpack_state::draw_water(colortable_t *colortable, bitmap_ind16 &bitmap, 
 		UINT16* p = &bitmap.pix16(y);
 
 		for (x = rect.min_x; x <= rect.max_x; x++)
-			p[x] = colortable_entry_get_value(colortable, p[x]) | 0x08;
+			p[x] = palette.pen_indirect(p[x]) | 0x08;
 	}
 }
 
@@ -245,8 +242,8 @@ UINT32 wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_ind1
 	if (m_ship_size & 0x40) color += 0x3a;
 	if (m_ship_size & 0x80) color += 0x48;
 
-	colortable_palette_set_color(machine().colortable, 3, MAKE_RGB(color,color,color));
-	colortable_palette_set_color(machine().colortable, 7, MAKE_RGB(color < 0xb8 ? color + 0x48 : 0xff,
+	m_palette->set_indirect_color(3, MAKE_RGB(color,color,color));
+	m_palette->set_indirect_color(7, MAKE_RGB(color < 0xb8 ? color + 0x48 : 0xff,
 																			color < 0xb8 ? color + 0x48 : 0xff,
 																			color < 0xb8 ? color + 0x48 : 0xff));
 
@@ -269,7 +266,7 @@ UINT32 wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_ind1
 	draw_pt(bitmap, cliprect);
 	draw_ship(bitmap, cliprect);
 	draw_torpedo(bitmap, cliprect);
-	draw_water(machine().colortable, bitmap, cliprect);
+	draw_water(*m_palette, bitmap, cliprect);
 	return 0;
 }
 

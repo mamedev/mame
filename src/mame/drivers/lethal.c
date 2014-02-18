@@ -717,11 +717,9 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lethal)
+	MCFG_GFXDECODE_ADD("gfxdecode",lethal,"palette")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -729,7 +727,8 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_SCREEN_VISIBLE_AREA(216, 504-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lethal_state, screen_update_lethalen)
 
-	MCFG_PALETTE_LENGTH(7168+1)
+	MCFG_PALETTE_ADD("palette", 7168+1)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_K056832_ADD("k056832", lethalen_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")

@@ -37,7 +37,7 @@ void eprom_state::update_palette()
 		g = ((data >> 4) & 15) * i / 4;
 		b = ((data >> 0) & 15) * i / 4;
 
-		palette_set_color_rgb(machine(), color, r, g, b);
+		m_palette->set_pen_color(color, r, g, b);
 	}
 }
 
@@ -202,7 +202,7 @@ UINT32 eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &bit
 {
 	if (m_video_disable)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 
@@ -349,7 +349,7 @@ UINT32 eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bitm
 {
 	if (m_video_disable)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 

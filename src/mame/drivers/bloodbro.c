@@ -477,8 +477,8 @@ static MACHINE_CONFIG_START( bloodbro, bloodbro_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bloodbro)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",bloodbro,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	// sound hardware
 	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_7_15909MHz/2, XTAL_12MHz/12)
@@ -491,7 +491,7 @@ static MACHINE_CONFIG_DERIVED( weststry, bloodbro )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq6_line_hold)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", weststry)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(bloodbro_state, screen_update_weststry)

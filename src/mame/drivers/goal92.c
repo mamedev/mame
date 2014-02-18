@@ -323,8 +323,8 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goal92_state, screen_update_goal92)
 	MCFG_SCREEN_VBLANK_DRIVER(goal92_state, screen_eof_goal92)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", goal92)
-	MCFG_PALETTE_LENGTH(128*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",goal92,"palette")
+	MCFG_PALETTE_ADD("palette", 128*16)
 
 
 	/* sound hardware */

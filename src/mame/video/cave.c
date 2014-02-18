@@ -73,13 +73,13 @@ PALETTE_INIT_MEMBER(cave_state,cave)
 	for (int chip = 0; chip < 4; chip++)
 	{
 		/* create a 1:1 palette map covering everything */
-		m_palette_map[chip] = auto_alloc_array(machine(), UINT16, machine().total_colors());
+		m_palette_map[chip] = auto_alloc_array(machine(), UINT16, palette.entries());
 
 		int maxpens = m_paletteram[chip].bytes() / 2;
 		if (!maxpens)
 			continue;
 
-		for (int pen = 0; pen < machine().total_colors(); pen++)
+		for (int pen = 0; pen < palette.entries(); pen++)
 			m_palette_map[chip][pen] = pen % maxpens;
 	}
 }
@@ -182,13 +182,13 @@ void cave_state::set_pens(int chip)
 {
 	int pen;
 
-	for (pen = 0; pen < machine().total_colors(); pen++)
+	for (pen = 0; pen < m_palette->entries(); pen++)
 	{
 		UINT16 data = m_paletteram[chip][m_palette_map[chip][pen]];
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
 
-		palette_set_color(machine(), pen, color);
+		m_palette->set_pen_color(pen, color);
 	}
 }
 

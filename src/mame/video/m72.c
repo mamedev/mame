@@ -273,7 +273,7 @@ READ16_MEMBER(m72_state::m72_palette2_r)
 
 inline void m72_state::changecolor(int color,int r,int g,int b)
 {
-	palette_set_color_rgb(machine(),color,pal5bit(r),pal5bit(g),pal5bit(b));
+	m_palette->set_pen_color(color,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 WRITE16_MEMBER(m72_state::m72_palette1_w)
@@ -518,7 +518,7 @@ UINT32 m72_state::screen_update_m72(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	if (m_video_off)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 
@@ -543,7 +543,7 @@ UINT32 m72_state::screen_update_majtitle(screen_device &screen, bitmap_ind16 &bi
 
 	if (m_video_off)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 

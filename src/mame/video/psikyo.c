@@ -655,7 +655,7 @@ UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &b
 	m_tilemap_1_size2->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 	m_tilemap_1_size3->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	screen.priority().fill(0, cliprect);
 
@@ -828,7 +828,7 @@ UINT32 psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_
 	m_tilemap_1_size2->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 	m_tilemap_1_size3->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	screen.priority().fill(0, cliprect);
 

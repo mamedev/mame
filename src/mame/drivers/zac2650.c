@@ -185,12 +185,12 @@ static INPUT_PORTS_START( dodgem )
 INPUT_PORTS_END
 
 
-void zac2650_state::palette_init()
+PALETTE_INIT_MEMBER(zac2650_state, zac2650)
 {
-	palette_set_color(machine(),0,RGB_BLACK);
-	palette_set_color(machine(),1,RGB_WHITE);
-	palette_set_color(machine(),2,RGB_BLACK);
-	palette_set_color(machine(),3,RGB_BLACK);
+	palette.set_pen_color(0,RGB_BLACK);
+	palette.set_pen_color(1,RGB_WHITE);
+	palette.set_pen_color(2,RGB_BLACK);
+	palette.set_pen_color(3,RGB_BLACK);
 }
 
 /************************************************************************************************
@@ -250,8 +250,8 @@ static MACHINE_CONFIG_START( tinvader, zac2650_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 719, 0, 767)
 	MCFG_SCREEN_UPDATE_DRIVER(zac2650_state, screen_update_tinvader)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tinvader)
-	MCFG_PALETTE_LENGTH(4)
+	MCFG_GFXDECODE_ADD("gfxdecode",tinvader,"palette")
+	MCFG_PALETTE_ADD("palette", 4)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

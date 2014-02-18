@@ -3328,14 +3328,14 @@ static MACHINE_CONFIG_START( pacman, pacman_state )
 	MCFG_WATCHDOG_VBLANK_INIT(16)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", pacman)
-	MCFG_PALETTE_LENGTH(128*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",pacman,"palette")
+	MCFG_PALETTE_ADD("palette", 128*4)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(pacman_state, screen_update_pacman)
 
-	MCFG_PALETTE_INIT_OVERRIDE(pacman_state,pacman)
+	MCFG_PALETTE_INIT_OWNER(pacman_state,pacman)
 	MCFG_VIDEO_START_OVERRIDE(pacman_state,pacman)
 
 	/* sound hardware */

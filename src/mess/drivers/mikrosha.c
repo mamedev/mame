@@ -218,9 +218,9 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mikrosha)
-	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT_OVERRIDE(mikrosha_state,radio86)
+	MCFG_GFXDECODE_ADD("gfxdecode",mikrosha,"palette")
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(mikrosha_state,radio86)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")

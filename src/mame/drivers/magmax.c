@@ -362,8 +362,8 @@ static MACHINE_CONFIG_START( magmax, magmax_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(magmax_state, screen_update_magmax)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", magmax)
-	MCFG_PALETTE_LENGTH(1*16 + 16*16 + 256)
+	MCFG_GFXDECODE_ADD("gfxdecode",magmax,"palette")
+	MCFG_PALETTE_ADD("palette", 1*16 + 16*16 + 256)
 
 
 	/* sound hardware */

@@ -415,10 +415,10 @@ static MACHINE_CONFIG_START( gberet, gberet_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gberet_state, screen_update_gberet)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gberet)
-	MCFG_PALETTE_LENGTH(2*16*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",gberet,"palette")
+	MCFG_PALETTE_ADD("palette", 2*16*16)
 
-	MCFG_PALETTE_INIT_OVERRIDE(gberet_state,gberet)
+	MCFG_PALETTE_INIT_OWNER(gberet_state,gberet)
 	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
 
 	/* sound hardware */
@@ -454,10 +454,10 @@ static MACHINE_CONFIG_START( gberetb, gberet_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gberet_state, screen_update_gberetb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gberetb)
-	MCFG_PALETTE_LENGTH(2*16*16)
+	MCFG_GFXDECODE_ADD("gfxdecode",gberetb,"palette")
+	MCFG_PALETTE_ADD("palette", 2*16*16)
 
-	MCFG_PALETTE_INIT_OVERRIDE(gberet_state,gberet)
+	MCFG_PALETTE_INIT_OWNER(gberet_state,gberet)
 	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
 
 	/* sound hardware */

@@ -137,19 +137,19 @@ public:
 
 ***************************************************************************/
 
-void flipjack_state::palette_init()
+PALETTE_INIT_MEMBER(flipjack_state, flipjack)
 {
 	// from prom
 	const UINT8 *color_prom = memregion("proms")->base();
 	for (int i = 0; i < 0x40; i++)
 	{
-		palette_set_color_rgb(machine(), 2*i+1, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-		palette_set_color_rgb(machine(), 2*i+0, pal1bit(color_prom[i] >> 1), pal1bit(color_prom[i] >> 2), pal1bit(color_prom[i] >> 0));
+		palette.set_pen_color(2*i+1, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette.set_pen_color(2*i+0, pal1bit(color_prom[i] >> 1), pal1bit(color_prom[i] >> 2), pal1bit(color_prom[i] >> 0));
 	}
 
 	// standard 3bpp for blitter
 	for (int i = 0; i < 8; i++)
-		palette_set_color_rgb(machine(), i+0x80, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette.set_pen_color(i+0x80, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
 
@@ -157,7 +157,7 @@ UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb3
 {
 	int x,y,count;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	// draw playfield
 	if (m_layer & 2)
@@ -184,7 +184,7 @@ UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb3
 						color = ((pen_r >> (7-xi)) & 1)<<0;
 						color|= ((pen_g >> (7-xi)) & 1)<<1;
 						color|= ((pen_b >> (7-xi)) & 1)<<2;
-						bitmap.pix32(y, x+xi) = machine().pens[color+0x80];
+						bitmap.pix32(y, x+xi) = m_palette->pen(color+0x80);
 					}
 				}
 
@@ -226,7 +226,7 @@ UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb3
 					{
 						color = ((pen >> (7-xi)) & 1) ? 0x87 : 0;
 						if(color)
-							bitmap.pix32(y, x+xi) = machine().pens[color];
+							bitmap.pix32(y, x+xi) = m_palette->pen(color);
 					}
 				}
 
@@ -501,9 +501,9 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", VIDEO_CLOCK/8, mc6845_intf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", flipjack)
+	MCFG_GFXDECODE_ADD("gfxdecode",flipjack,"palette")
 
-	MCFG_PALETTE_LENGTH(128+8)
+	MCFG_PALETTE_ADD("palette", 128+8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

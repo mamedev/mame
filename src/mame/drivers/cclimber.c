@@ -995,10 +995,10 @@ static MACHINE_CONFIG_START( root, cclimber_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_cclimber)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cclimber)
-	MCFG_PALETTE_LENGTH(16*4+8*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",cclimber,"palette")
+	MCFG_PALETTE_ADD("palette", 16*4+8*4)
 
-	MCFG_PALETTE_INIT_OVERRIDE(cclimber_state,cclimber)
+	MCFG_PALETTE_INIT_OWNER(cclimber_state,cclimber)
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,cclimber)
 MACHINE_CONFIG_END
 
@@ -1040,8 +1040,8 @@ static MACHINE_CONFIG_DERIVED( yamato, root )
 	MCFG_CPU_IO_MAP(yamato_audio_portmap)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(16*4+8*4+256)
-	MCFG_PALETTE_INIT_OVERRIDE(cclimber_state,yamato)
+	MCFG_PALETTE_ADD("palette", 16*4+8*4+256)
+	MCFG_PALETTE_INIT_OWNER(cclimber_state,yamato)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_yamato)
 
@@ -1064,8 +1064,8 @@ static MACHINE_CONFIG_DERIVED( toprollr, cclimber )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", toprollr)
-	MCFG_PALETTE_LENGTH(32*5)
-	MCFG_PALETTE_INIT_OVERRIDE(cclimber_state,toprollr)
+	MCFG_PALETTE_ADD("palette", 32*5)
+	MCFG_PALETTE_INIT_OWNER(cclimber_state,toprollr)
 
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,toprollr)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1093,10 +1093,10 @@ static MACHINE_CONFIG_START( swimmer, cclimber_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_swimmer)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", swimmer)
-	MCFG_PALETTE_LENGTH(32*8+4*8+1)
+	MCFG_GFXDECODE_ADD("gfxdecode",swimmer,"palette")
+	MCFG_PALETTE_ADD("palette", 32*8+4*8+1)
 
-	MCFG_PALETTE_INIT_OVERRIDE(cclimber_state,swimmer)
+	MCFG_PALETTE_INIT_OWNER(cclimber_state,swimmer)
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,swimmer)
 
 	/* audio hardware */

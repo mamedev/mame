@@ -4,13 +4,10 @@
 #include "includes/flower.h"
 
 
-void flower_state::palette_init()
+PALETTE_INIT_MEMBER(flower_state, flower)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -19,11 +16,11 @@ void flower_state::palette_init()
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 }
 
 void flower_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )

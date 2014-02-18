@@ -133,21 +133,18 @@ public:
 };
 
 
-void cshooter_state::palette_init()
+PALETTE_INIT_MEMBER(cshooter_state, cshooter)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	// allocate the colortable
-	machine().colortable = colortable_alloc(machine(), 0x100);
-
 	// text uses colors 0xc0-0xdf
 	for (i = 0; i < 0x40; i++)
-		colortable_entry_set_value(machine().colortable, i, (color_prom[i] & 0x1f) | 0xc0);
+		palette.set_pen_indirect(i, (color_prom[i] & 0x1f) | 0xc0);
 
 	// rest is still unknown..
 	for (i = 0x40; i < 0x100; i++)
-		colortable_entry_set_value(machine().colortable, i, color_prom[i]);
+		palette.set_pen_indirect(i, color_prom[i]);
 }
 
 TILE_GET_INFO_MEMBER(cshooter_state::get_cstx_tile_info)
@@ -202,7 +199,7 @@ UINT32 cshooter_state::screen_update_airraid(screen_device &screen, bitmap_ind16
 		int b = m_generic_paletteram2_8[i] & 0xf;
 
 		rgb_t color = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
-		colortable_palette_set_color(machine().colortable, i, color);
+		m_palette->set_indirect_color(i, color);
 	}
 
 	bitmap.fill(0x80, cliprect); // temp
@@ -452,8 +449,8 @@ static MACHINE_CONFIG_START( airraid, cshooter_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(cshooter_state, screen_update_airraid)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cshooter)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE_ADD("gfxdecode",cshooter,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	/* sound hardware */
 	SEIBU_AIRRAID_SOUND_SYSTEM_YM2151_INTERFACE(XTAL_14_31818MHz/4)

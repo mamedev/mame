@@ -147,7 +147,7 @@ WRITE16_MEMBER(deniam_state::deniam_palette_w)
 	r = ((data << 1) & 0x1e) | ((data >> 12) & 0x01);
 	g = ((data >> 3) & 0x1e) | ((data >> 13) & 0x01);
 	b = ((data >> 7) & 0x1e) | ((data >> 14) & 0x01);
-	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 READ16_MEMBER(deniam_state::deniam_coinctrl_r)

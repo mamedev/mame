@@ -446,7 +446,7 @@ static void draw_black_line(running_machine &machine, int line)
 	UINT16 *line_buffer = &vce.bmp->pix16(line);
 
 	for( i=0; i< VDC_WPF; i++ )
-		line_buffer[i] = get_black_pen( machine );
+		line_buffer[i] = m_palette->black_pen();
 }
 
 static void draw_overscan_line(int line)

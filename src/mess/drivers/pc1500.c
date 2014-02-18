@@ -258,10 +258,10 @@ READ8_MEMBER( pc1500_state::port_a_r )
 	return 0xff;
 }
 
-void pc1500_state::palette_init()
+PALETTE_INIT_MEMBER(pc1500_state, pc1500)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
+	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
 }
 
 static const lh5810_interface lh5810_pc1500_config =
@@ -287,7 +287,7 @@ static MACHINE_CONFIG_START( pc1500, pc1500_state )
 	MCFG_SCREEN_SIZE(156, 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 156-1, 0, 7-1)
 	MCFG_DEFAULT_LAYOUT(layout_pc1500)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 
 	MCFG_LH5810_ADD("lh5810", lh5810_pc1500_config)
 

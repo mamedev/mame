@@ -71,7 +71,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
 	UINT32 screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ace_postload();
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -126,13 +125,6 @@ UINT32 aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bitma
 				10 * 8 + offs * 16, 256 - 16);
 	}
 	return 0;
-}
-
-
-void aceal_state::palette_init()
-{
-	palette_set_color(machine(), 0, MAKE_RGB(0x00,0x00,0x00)); /* black */
-	palette_set_color(machine(), 1, MAKE_RGB(0xff,0xff,0xff)); /* white */
 }
 
 
@@ -359,8 +351,8 @@ static MACHINE_CONFIG_START( ace, aceal_state )
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aceal_state, screen_update_ace)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ace)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE_ADD("gfxdecode",ace,"palette")
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */
 	/* ???? */

@@ -19,9 +19,6 @@ PALETTE_INIT_MEMBER(madalien_state,madalien)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x20);
-
 	for (i = 0; i < 0x20; i++)
 	{
 		int r = 0;
@@ -41,11 +38,11 @@ PALETTE_INIT_MEMBER(madalien_state,madalien)
 		if (BIT(color_prom[i], 5))
 			b += 0xc0;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	for (i = 0; i < 0x10; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	for (i = 0x10; i < 0x20; i++)
 	{
@@ -57,11 +54,11 @@ PALETTE_INIT_MEMBER(madalien_state,madalien)
 		if (BIT((i - 0x10), 2))
 			ctabentry = ctabentry ^ 0x06;
 
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	for (i = 0x20; i < 0x30; i++)
-		colortable_entry_set_value(machine().colortable, i, (i - 0x20) | 0x10);
+		palette.set_pen_indirect(i, (i - 0x20) | 0x10);
 }
 
 
@@ -389,9 +386,9 @@ MACHINE_CONFIG_FRAGMENT( madalien_video )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(madalien_state, screen_update_madalien)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", madalien)
-	MCFG_PALETTE_LENGTH(0x30)
-	MCFG_PALETTE_INIT_OVERRIDE(madalien_state,madalien)
+	MCFG_GFXDECODE_ADD("gfxdecode",madalien,"palette")
+	MCFG_PALETTE_ADD("palette", 0x30)
+	MCFG_PALETTE_INIT_OWNER(madalien_state,madalien)
 	MCFG_VIDEO_START_OVERRIDE(madalien_state,madalien)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK / 8, mc6845_intf)

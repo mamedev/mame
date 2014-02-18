@@ -700,14 +700,14 @@ return composedcolor;
 }
 
 
-void socrates_state::palette_init()
+PALETTE_INIT_MEMBER(socrates_state, socrates)
 {
 	int i; // iterator
 	for (i = 0; i < 256; i++)
 	{
 		m_palette[i] = socrates_create_color(i);
 	}
-	palette_set_colors(machine(), 0, m_palette, ARRAY_LENGTH(m_palette));
+	palette.set_pen_colors(0, m_palette, ARRAY_LENGTH(m_palette));
 }
 
 void socrates_state::video_start()
@@ -1375,7 +1375,7 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 219) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	/* sound hardware */
@@ -1409,7 +1409,7 @@ static MACHINE_CONFIG_START( socrates_pal, socrates_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 229) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	/* sound hardware */

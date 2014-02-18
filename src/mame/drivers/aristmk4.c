@@ -347,7 +347,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(aristmk4);
 	DECLARE_PALETTE_INIT(lions);
 	UINT32 screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(note_input_reset);
@@ -1605,12 +1605,12 @@ static I8255A_INTERFACE( ppi8255_intf )
 
 
 /* same as Casino Winner HW */
-void aristmk4_state::palette_init()
+PALETTE_INIT_MEMBER(aristmk4_state, aristmk4)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -1626,7 +1626,7 @@ void aristmk4_state::palette_init()
 		bit2 = (color_prom[0] >> 7) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -1698,8 +1698,9 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 216-1)    /* from the crtc registers... updated by crtc */
 	MCFG_SCREEN_UPDATE_DRIVER(aristmk4_state, screen_update_aristmk4)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", aristmk4)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",aristmk4,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(aristmk4_state, aristmk4)
 
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
@@ -1751,7 +1752,7 @@ PALETTE_INIT_MEMBER(aristmk4_state,lions)
 {
 	int i;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,r,g,b;
 
@@ -1765,12 +1766,12 @@ PALETTE_INIT_MEMBER(aristmk4_state,lions)
 		bit1 = (i >> 5) & 0x01;
 		r = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
 static MACHINE_CONFIG_DERIVED( 86lions, aristmk4 )
-	MCFG_PALETTE_INIT_OVERRIDE(aristmk4_state,lions)
+	MCFG_PALETTE_INIT_OWNER(aristmk4_state,lions)
 MACHINE_CONFIG_END
 
 ROM_START( 3bagflvt )

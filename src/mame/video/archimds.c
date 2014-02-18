@@ -16,7 +16,7 @@ UINT32 archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	const UINT8 x_step[4] = { 5, 7, 11, 19 };
 
 	/* border color */
-	bitmap.fill(machine().pens[0x10], cliprect);
+	bitmap.fill(m_palette->pen(0x10), cliprect);
 
 	/* define X display area through BPP mode register */
 	calc_dxs = (m_vidc_regs[VIDC_HDSR]*2)+x_step[m_vidc_bpp_mode & 3];
@@ -61,14 +61,14 @@ UINT32 archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 							if(m_vidc_interlace)
 							{
 								if (cliprect.contains(res_x, res_y) && (res_x) <= xend && (res_y) <= yend)
-									bitmap.pix32(res_y, res_x) = machine().pens[(pen>>(xi))&0x1];
+									bitmap.pix32(res_y, res_x) = m_palette->pen((pen>>(xi))&0x1);
 								if (cliprect.contains(res_x, res_y+1) && (res_x) <= xend && (res_y+1) <= yend)
-									bitmap.pix32(res_y+1, res_x) = machine().pens[(pen>>(xi))&0x1];
+									bitmap.pix32(res_y+1, res_x) = m_palette->pen((pen>>(xi))&0x1);
 							}
 							else
 							{
 								if (cliprect.contains(res_x, res_y) && (res_x) <= xend && (res_y) <= yend)
-									bitmap.pix32(res_y, res_x) = machine().pens[(pen>>(xi))&0x1];
+									bitmap.pix32(res_y, res_x) = m_palette->pen((pen>>(xi))&0x1);
 							}
 						}
 
@@ -91,14 +91,14 @@ UINT32 archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 						if(m_vidc_interlace)
 						{
 							if (cliprect.contains(res_x, res_y) && (res_x) <= xend && (res_y) <= yend)
-								bitmap.pix32(res_y, res_x) = machine().pens[(pen&0xff)+0x100];
+								bitmap.pix32(res_y, res_x) = m_palette->pen((pen&0xff)+0x100);
 							if (cliprect.contains(res_x, res_y) && (res_x) <= xend && (res_y+1) <= yend)
-								bitmap.pix32(res_y+1, res_x) = machine().pens[(pen&0xff)+0x100];
+								bitmap.pix32(res_y+1, res_x) = m_palette->pen((pen&0xff)+0x100);
 						}
 						else
 						{
 							if (cliprect.contains(res_x, res_y) && (res_x) <= xend && (res_y) <= yend)
-								bitmap.pix32(res_y, res_x) = machine().pens[(pen&0xff)+0x100];
+								bitmap.pix32(res_y, res_x) = m_palette->pen((pen&0xff)+0x100);
 						}
 
 						count++;

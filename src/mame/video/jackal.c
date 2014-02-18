@@ -12,30 +12,27 @@
 #include "includes/jackal.h"
 
 
-void jackal_state::palette_init()
+PALETTE_INIT_MEMBER(jackal_state, jackal)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x200);
-
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT16 ctabentry = i | 0x100;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	for (i = 0x100; i < 0x200; i++)
 	{
 		UINT16 ctabentry = color_prom[i - 0x100] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	for (i = 0x200; i < 0x300; i++)
 	{
 		UINT16 ctabentry = (color_prom[i - 0x100] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -50,7 +47,7 @@ void jackal_state::set_pens(  )
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine().colortable, i >> 1, color);
+		m_palette->set_indirect_color(i >> 1, color);
 	}
 }
 

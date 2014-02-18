@@ -886,7 +886,7 @@ WRITE32_MEMBER(taito_f3_state::f3_palette_24bit_w)
 		b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 	}
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offset,MAKE_RGB(r,g,b));
 }
 
 /******************************************************************************/
@@ -2586,7 +2586,7 @@ INLINE void f3_drawgfx(
 
 	if( gfx )
 	{
-		const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+		const pen_t *pal = &gfx->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
 		{
@@ -2737,7 +2737,7 @@ INLINE void f3_drawgfxzoom(
 
 	if( gfx )
 	{
-		const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+		const pen_t *pal = &gfx->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
 		{

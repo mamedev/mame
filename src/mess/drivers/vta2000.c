@@ -150,11 +150,11 @@ static GFXDECODE_START( vta2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vta2000_charlayout, 0, 1 )
 GFXDECODE_END
 
-void vta2000_state::palette_init()
+PALETTE_INIT_MEMBER(vta2000_state, vta2000)
 {
-	palette_set_color(machine(), 0, RGB_BLACK); // black
-	palette_set_color_rgb(machine(), 1, 0x00, 0xc0, 0x00); // green
-	palette_set_color_rgb(machine(), 2, 0x00, 0xff, 0x00); // highlight
+	palette.set_pen_color(0, RGB_BLACK); // black
+	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
+	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
 }
 
 static MACHINE_CONFIG_START( vta2000, vta2000_state )
@@ -170,8 +170,8 @@ static MACHINE_CONFIG_START( vta2000, vta2000_state )
 	MCFG_SCREEN_SIZE(80*8, 25*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*12-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vta2000_state, screen_update_vta2000)
-	MCFG_PALETTE_LENGTH(3)
-	MCFG_GFXDECODE_ADD("gfxdecode", vta2000)
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_GFXDECODE_ADD("gfxdecode",vta2000,"palette")
 MACHINE_CONFIG_END
 
 

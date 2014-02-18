@@ -87,7 +87,7 @@ void deco32_state::updateAceRam()
 			r = (UINT8)((float)r + (((float)fadeptr - (float)r) * (float)fadepsr/255.0f));
 		}
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		m_palette->set_pen_color(i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -106,7 +106,7 @@ WRITE32_MEMBER(deco32_state::deco32_nonbuffered_palette_w)
 	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
 	r = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offset,MAKE_RGB(r,g,b));
 }
 
 WRITE32_MEMBER(deco32_state::deco32_buffered_palette_w)
@@ -117,7 +117,7 @@ WRITE32_MEMBER(deco32_state::deco32_buffered_palette_w)
 
 WRITE32_MEMBER(deco32_state::deco32_palette_dma_w)
 {
-	const int m=machine().total_colors();
+	const int m=m_palette->entries();
 	int r,g,b,i;
 
 	for (i=0; i<m; i++) {
@@ -134,7 +134,7 @@ WRITE32_MEMBER(deco32_state::deco32_palette_dma_w)
 				g = (m_generic_paletteram_32[i] >> 8) & 0xff;
 				r = (m_generic_paletteram_32[i] >> 0) & 0xff;
 
-				palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+				m_palette->set_pen_color(i,MAKE_RGB(r,g,b));
 			}
 		}
 	}
@@ -167,7 +167,7 @@ INLINE void dragngun_drawgfxzoom(
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+			const pen_t *pal = &gfx->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
 			if (sprite_screen_width && sprite_screen_height)
@@ -570,7 +570,7 @@ UINT32 deco32_state::screen_update_captaven(screen_device &screen, bitmap_ind16 
 	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	screen.priority().fill(0, cliprect);
-	bitmap.fill(machine().pens[0x000], cliprect); // Palette index not confirmed
+	bitmap.fill(m_palette->pen(0x000), cliprect); // Palette index not confirmed
 
 	m_deco_tilegen2->set_pf1_8bpp_mode(1);
 
@@ -600,7 +600,7 @@ UINT32 deco32_state::screen_update_captaven(screen_device &screen, bitmap_ind16 
 
 UINT32 dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
@@ -637,7 +637,7 @@ UINT32 dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rgb3
 UINT32 deco32_state::screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
-	bitmap.fill(machine().pens[0x300], cliprect); // Palette index not confirmed
+	bitmap.fill(m_palette->pen(0x300), cliprect); // Palette index not confirmed
 
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
@@ -820,7 +820,7 @@ UINT32 deco32_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 
 
 	screen.priority().fill(0, cliprect);
 
-	bitmap.fill(machine().pens[0x200], cliprect);
+	bitmap.fill(m_palette->pen(0x200), cliprect);
 
 	/* Draw sprites to temporary bitmaps, saving alpha & priority info for later mixing */
 	m_sprgen1->set_pix_raw_shift(8);

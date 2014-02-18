@@ -455,8 +455,8 @@ static MACHINE_CONFIG_START( pingpong, pingpong_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pingpong_state, screen_update_pingpong)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pingpong)
-	MCFG_PALETTE_LENGTH(64*4+64*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",pingpong,"palette")
+	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 
 
 	/* sound hardware */

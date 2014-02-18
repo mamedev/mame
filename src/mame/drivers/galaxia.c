@@ -304,10 +304,10 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_galaxia)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galaxia)
-	MCFG_PALETTE_LENGTH(0x18+2)
+	MCFG_GFXDECODE_ADD("gfxdecode",galaxia,"palette")
+	MCFG_PALETTE_ADD("palette", 0x18+2)
 
-	MCFG_PALETTE_INIT_OVERRIDE(galaxia_state,galaxia)
+	MCFG_PALETTE_INIT_OWNER(galaxia_state,galaxia)
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,galaxia)
 
 	MCFG_S2636_ADD("s2636_0", galaxia_s2636_config[0])
@@ -340,10 +340,10 @@ static MACHINE_CONFIG_START( astrowar, galaxia_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_astrowar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", astrowar)
-	MCFG_PALETTE_LENGTH(0x18+2)
+	MCFG_GFXDECODE_ADD("gfxdecode",astrowar,"palette")
+	MCFG_PALETTE_ADD("palette", 0x18+2)
 
-	MCFG_PALETTE_INIT_OVERRIDE(galaxia_state,astrowar)
+	MCFG_PALETTE_INIT_OWNER(galaxia_state,astrowar)
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,astrowar)
 
 	MCFG_S2636_ADD("s2636_0", astrowar_s2636_config)

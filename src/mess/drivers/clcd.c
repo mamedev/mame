@@ -89,10 +89,10 @@ public:
 		m_rtc->cs1_w(1);
 	}
 
-	void palette_init()
+	PALETTE_INIT_NAME(hprot1)()
 	{
-		palette_set_color(machine(), 0, MAKE_RGB(36,72,36));
-		palette_set_color(machine(), 1, MAKE_RGB(2,4,2));
+		palette.set_pen_color(0, MAKE_RGB(36,72,36));
+		palette.set_pen_color(1, MAKE_RGB(2,4,2));
 	}
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -10,28 +10,28 @@ Atari Sky Raider driver
 
 
 
-void skyraid_state::palette_init()
+PALETTE_INIT_MEMBER(skyraid_state, skyraid)
 {
-	palette_set_color(machine(),  0, MAKE_RGB(0x00, 0x00, 0x00));   /* terrain */
-	palette_set_color(machine(),  1, MAKE_RGB(0x18, 0x18, 0x18));
-	palette_set_color(machine(),  2, MAKE_RGB(0x30, 0x30, 0x30));
-	palette_set_color(machine(),  3, MAKE_RGB(0x48, 0x48, 0x48));
-	palette_set_color(machine(),  4, MAKE_RGB(0x60, 0x60, 0x60));
-	palette_set_color(machine(),  5, MAKE_RGB(0x78, 0x78, 0x78));
-	palette_set_color(machine(),  6, MAKE_RGB(0x90, 0x90, 0x90));
-	palette_set_color(machine(),  7, MAKE_RGB(0xA8, 0xA8, 0xA8));
-	palette_set_color(machine(),  8, MAKE_RGB(0x10, 0x10, 0x10));   /* sprites */
-	palette_set_color(machine(),  9, MAKE_RGB(0xE0, 0xE0, 0xE0));
-	palette_set_color(machine(), 10, MAKE_RGB(0xA0, 0xA0, 0xA0));
-	palette_set_color(machine(), 11, MAKE_RGB(0x48, 0x48, 0x48));
-	palette_set_color(machine(), 12, MAKE_RGB(0x10, 0x10, 0x10));
-	palette_set_color(machine(), 13, MAKE_RGB(0x48, 0x48, 0x48));
-	palette_set_color(machine(), 14, MAKE_RGB(0xA0, 0xA0, 0xA0));
-	palette_set_color(machine(), 15, MAKE_RGB(0xE0, 0xE0, 0xE0));
-	palette_set_color(machine(), 16, MAKE_RGB(0x00, 0x00, 0x00));   /* missiles */
-	palette_set_color(machine(), 17, MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 18, MAKE_RGB(0x00, 0x00, 0x00));   /* text */
-	palette_set_color(machine(), 19, MAKE_RGB(0xE0, 0xE0, 0xE0));
+	palette.set_pen_color(0, MAKE_RGB(0x00, 0x00, 0x00));   /* terrain */
+	palette.set_pen_color(1, MAKE_RGB(0x18, 0x18, 0x18));
+	palette.set_pen_color(2, MAKE_RGB(0x30, 0x30, 0x30));
+	palette.set_pen_color(3, MAKE_RGB(0x48, 0x48, 0x48));
+	palette.set_pen_color(4, MAKE_RGB(0x60, 0x60, 0x60));
+	palette.set_pen_color(5, MAKE_RGB(0x78, 0x78, 0x78));
+	palette.set_pen_color(6, MAKE_RGB(0x90, 0x90, 0x90));
+	palette.set_pen_color(7, MAKE_RGB(0xA8, 0xA8, 0xA8));
+	palette.set_pen_color(8, MAKE_RGB(0x10, 0x10, 0x10));   /* sprites */
+	palette.set_pen_color(9, MAKE_RGB(0xE0, 0xE0, 0xE0));
+	palette.set_pen_color(10, MAKE_RGB(0xA0, 0xA0, 0xA0));
+	palette.set_pen_color(11, MAKE_RGB(0x48, 0x48, 0x48));
+	palette.set_pen_color(12, MAKE_RGB(0x10, 0x10, 0x10));
+	palette.set_pen_color(13, MAKE_RGB(0x48, 0x48, 0x48));
+	palette.set_pen_color(14, MAKE_RGB(0xA0, 0xA0, 0xA0));
+	palette.set_pen_color(15, MAKE_RGB(0xE0, 0xE0, 0xE0));
+	palette.set_pen_color(16, MAKE_RGB(0x00, 0x00, 0x00));   /* missiles */
+	palette.set_pen_color(17, MAKE_RGB(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(18, MAKE_RGB(0x00, 0x00, 0x00));   /* text */
+	palette.set_pen_color(19, MAKE_RGB(0xE0, 0xE0, 0xE0));
 }
 
 READ8_MEMBER(skyraid_state::skyraid_port_0_r)
@@ -228,10 +228,10 @@ static MACHINE_CONFIG_START( skyraid, skyraid_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(skyraid_state, screen_update_skyraid)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", skyraid)
+	MCFG_GFXDECODE_ADD("gfxdecode",skyraid,"palette")
 
-	MCFG_PALETTE_LENGTH(20)
-
+	MCFG_PALETTE_ADD("palette", 20)
+	MCFG_PALETTE_INIT_OWNER(skyraid_state, skyraid)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

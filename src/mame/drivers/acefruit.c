@@ -282,27 +282,27 @@ WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
 	}
 }
 
-void acefruit_state::palette_init()
+PALETTE_INIT_MEMBER(acefruit_state, acefruit)
 {
 	/* sprites */
-	palette_set_color( machine(), 0, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 1, MAKE_RGB(0x00, 0x00, 0xff) );
-	palette_set_color( machine(), 2, MAKE_RGB(0x00, 0xff, 0x00) );
-	palette_set_color( machine(), 3, MAKE_RGB(0xff, 0x7f, 0x00) );
-	palette_set_color( machine(), 4, MAKE_RGB(0xff, 0x00, 0x00) );
-	palette_set_color( machine(), 5, MAKE_RGB(0xff, 0xff, 0x00) );
-	palette_set_color( machine(), 6, MAKE_RGB(0xff, 0xff, 0xff) );
-	palette_set_color( machine(), 7, MAKE_RGB(0x7f, 0x3f, 0x1f) );
+	palette.set_pen_color( 0, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette.set_pen_color( 1, MAKE_RGB(0x00, 0x00, 0xff) );
+	palette.set_pen_color( 2, MAKE_RGB(0x00, 0xff, 0x00) );
+	palette.set_pen_color( 3, MAKE_RGB(0xff, 0x7f, 0x00) );
+	palette.set_pen_color( 4, MAKE_RGB(0xff, 0x00, 0x00) );
+	palette.set_pen_color( 5, MAKE_RGB(0xff, 0xff, 0x00) );
+	palette.set_pen_color( 6, MAKE_RGB(0xff, 0xff, 0xff) );
+	palette.set_pen_color( 7, MAKE_RGB(0x7f, 0x3f, 0x1f) );
 
 	/* tiles */
-	palette_set_color( machine(), 8, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 9, MAKE_RGB(0xff, 0xff, 0xff) );
-	palette_set_color( machine(), 10, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 11, MAKE_RGB(0x00, 0x00, 0xff) );
-	palette_set_color( machine(), 12, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 13, MAKE_RGB(0x00, 0xff, 0x00) );
-	palette_set_color( machine(), 14, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 15, MAKE_RGB(0xff, 0x00, 0x00) );
+	palette.set_pen_color( 8, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette.set_pen_color( 9, MAKE_RGB(0xff, 0xff, 0xff) );
+	palette.set_pen_color( 10, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette.set_pen_color( 11, MAKE_RGB(0x00, 0x00, 0xff) );
+	palette.set_pen_color( 12, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette.set_pen_color( 13, MAKE_RGB(0x00, 0xff, 0x00) );
+	palette.set_pen_color( 14, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette.set_pen_color( 15, MAKE_RGB(0xff, 0x00, 0x00) );
 }
 
 static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )
@@ -604,7 +604,7 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	MCFG_CPU_IO_MAP(acefruit_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", acefruit)
+	MCFG_GFXDECODE_ADD("gfxdecode",acefruit,"palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -614,7 +614,7 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(acefruit_state, screen_update_acefruit)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

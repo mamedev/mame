@@ -10,7 +10,7 @@ Atari Fire Truck + Super Bug + Monte Carlo video emulation
 static const rectangle playfield_window(0x02a, 0x115, 0x000, 0x0ff);
 
 
-void firetrk_state::palette_init()
+PALETTE_INIT_MEMBER(firetrk_state, firetrk)
 {
 	int i;
 
@@ -43,14 +43,14 @@ void firetrk_state::palette_init()
 		else if (color == 2)
 			m_color2_mask |= 1 << i;
 
-		palette_set_color(machine(), i, palette_source[color]);
+		palette.set_pen_color(i, palette_source[color]);
 	}
 }
 
 
 void firetrk_state::prom_to_palette(int number, UINT8 val)
 {
-	palette_set_color(machine(), number, MAKE_RGB(pal1bit(val >> 2), pal1bit(val >> 1), pal1bit(val >> 0)));
+	m_palette->set_pen_color(number, MAKE_RGB(pal1bit(val >> 2), pal1bit(val >> 1), pal1bit(val >> 0)));
 }
 
 
@@ -106,8 +106,8 @@ PALETTE_INIT_MEMBER(firetrk_state,montecar)
 		prom_to_palette(i, color_prom[0x100 + colortable_source[i]]);
 	}
 
-	palette_set_color(machine(), ARRAY_LENGTH(colortable_source) + 0, RGB_BLACK);
-	palette_set_color(machine(), ARRAY_LENGTH(colortable_source) + 1, RGB_WHITE);
+	palette.set_pen_color(ARRAY_LENGTH(colortable_source) + 0, RGB_BLACK);
+	palette.set_pen_color(ARRAY_LENGTH(colortable_source) + 1, RGB_WHITE);
 }
 
 

@@ -245,7 +245,7 @@ void k001005_device::swap_buffers( )
 
 	//if (m_status == 2)
 	{
-		m_bitmap[m_bitmap_page]->fill(machine().pens[0] & 0x00ffffff, m_cliprect);
+		m_bitmap[m_bitmap_page]->fill(m_palette->pen(0) & 0x00ffffff, m_cliprect);
 		m_zbuffer->fill(0xffffffff, m_cliprect);
 	}
 }

@@ -151,7 +151,7 @@ WRITE32_MEMBER(simpl156_state::simpl156_palette_w)
 	color = offset;
 
 	dat = m_generic_paletteram_16[offset] & 0xffff;
-	palette_set_color_rgb(machine(),color,pal5bit(dat >> 0),pal5bit(dat >> 5),pal5bit(dat >> 10));
+	m_palette->set_pen_color(color,pal5bit(dat >> 0),pal5bit(dat >> 5),pal5bit(dat >> 10));
 }
 
 
@@ -434,8 +434,8 @@ static MACHINE_CONFIG_START( chainrec, simpl156_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(simpl156_state, screen_update_simpl156)
 
-	MCFG_PALETTE_LENGTH(4096)
-	MCFG_GFXDECODE_ADD("gfxdecode", simpl156)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",simpl156,"palette")
 
 	MCFG_DECO16IC_ADD("tilegen1", simpl156_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")

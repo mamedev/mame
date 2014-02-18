@@ -137,7 +137,7 @@ public:
 	DECLARE_DRIVER_INIT(gorf);
 	DECLARE_DRIVER_INIT(astrocde);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(astrocde);
 	DECLARE_VIDEO_START(profpac);
 	DECLARE_PALETTE_INIT(profpac);
 	UINT32 screen_update_astrocde(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

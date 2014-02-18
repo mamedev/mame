@@ -107,7 +107,7 @@ UINT32 lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap,
 	int charx, chary;
 
 	/* make color 0 transparent */
-	palette_set_color(machine(), 0, MAKE_ARGB(0,0,0,0));
+	m_palette->set_pen_color(0, MAKE_ARGB(0,0,0,0));
 
 	/* clear */
 	bitmap.fill(0, cliprect);
@@ -379,10 +379,10 @@ static MACHINE_CONFIG_START( lgp, lgp_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_PALETTE_LENGTH(256)
-	/* MCFG_PALETTE_INIT_OVERRIDE(lgp_state,lgp) */
+	MCFG_PALETTE_ADD("palette", 256)
+	/* MCFG_PALETTE_INIT_OWNER(lgp_state,lgp) */
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lgp)
+	MCFG_GFXDECODE_ADD("gfxdecode",lgp,"palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

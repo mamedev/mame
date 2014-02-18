@@ -201,31 +201,31 @@ public:
  *
  *************************************/
 
-void spaceg_state::palette_init()
+PALETTE_INIT_MEMBER(spaceg_state, spaceg)
 {
 	int i;
 
 	for (i = 0; i < 128; i++)
-		palette_set_color (machine(), i, MAKE_RGB(0x00,0x00,0x00));
+		palette.set_pen_color (i, MAKE_RGB(0x00,0x00,0x00));
 
 	// proms are currently undumped...
-	palette_set_color (machine(), 0, MAKE_RGB(0x00,0x00,0x00)); //ok czarny
-	palette_set_color (machine(), 1, MAKE_RGB(0x7f,0x00,0x00));//???
-	palette_set_color (machine(), 2, MAKE_RGB(0xff,0xff,0xff)); //ok+ bialy
-	palette_set_color (machine(), 3, MAKE_RGB(0xff,0x00,0x00)); //ok j.czerw.
-	palette_set_color (machine(), 4, MAKE_RGB(0x3f,0x3f,0xff)); //ok j.niebieski
-	palette_set_color (machine(), 5, MAKE_RGB(0x3f,0xff,0x3f)); //ok j.zielony
-	palette_set_color (machine(), 6, MAKE_RGB(0xff,0xbf,0xbf)); //ok+ 'majtki'
-	palette_set_color (machine(), 7, MAKE_RGB(0xff,0xff,0x00)); //ok+ zolty
+	palette.set_pen_color (0, MAKE_RGB(0x00,0x00,0x00)); //ok czarny
+	palette.set_pen_color (1, MAKE_RGB(0x7f,0x00,0x00));//???
+	palette.set_pen_color (2, MAKE_RGB(0xff,0xff,0xff)); //ok+ bialy
+	palette.set_pen_color (3, MAKE_RGB(0xff,0x00,0x00)); //ok j.czerw.
+	palette.set_pen_color (4, MAKE_RGB(0x3f,0x3f,0xff)); //ok j.niebieski
+	palette.set_pen_color (5, MAKE_RGB(0x3f,0xff,0x3f)); //ok j.zielony
+	palette.set_pen_color (6, MAKE_RGB(0xff,0xbf,0xbf)); //ok+ 'majtki'
+	palette.set_pen_color (7, MAKE_RGB(0xff,0xff,0x00)); //ok+ zolty
 
-	palette_set_color (machine(), 8, MAKE_RGB(0xff,0x7f,0x00)); //ok+ pomaranczowy
-	palette_set_color (machine(), 9, MAKE_RGB(0x3f,0xbf,0xff)); //ok j.niebieski (ciemniejszy od 13)
-	palette_set_color (machine(), 10, MAKE_RGB(0x3f,0xbf,0x3f));    //ok+ c.zielony
-	palette_set_color (machine(), 11, MAKE_RGB(0x00,0xff,0x00));    //ok j.zielony
-	palette_set_color (machine(), 12, MAKE_RGB(0x7f,0x00,0x00));    //ok brazowy (c.czerw)
-	palette_set_color (machine(), 13, MAKE_RGB(0x7f,0xbf,0xff));    //ok j.niebieski (jasniejszy od 9)
-	palette_set_color (machine(), 14, MAKE_RGB(0x00,0xff,0xff));//???
-	palette_set_color (machine(), 15, MAKE_RGB(0x7f,0x7f,0x7f));//???
+	palette.set_pen_color (8, MAKE_RGB(0xff,0x7f,0x00)); //ok+ pomaranczowy
+	palette.set_pen_color (9, MAKE_RGB(0x3f,0xbf,0xff)); //ok j.niebieski (ciemniejszy od 13)
+	palette.set_pen_color (10, MAKE_RGB(0x3f,0xbf,0x3f));    //ok+ c.zielony
+	palette.set_pen_color (11, MAKE_RGB(0x00,0xff,0x00));    //ok j.zielony
+	palette.set_pen_color (12, MAKE_RGB(0x7f,0x00,0x00));    //ok brazowy (c.czerw)
+	palette.set_pen_color (13, MAKE_RGB(0x7f,0xbf,0xff));    //ok j.niebieski (jasniejszy od 9)
+	palette.set_pen_color (14, MAKE_RGB(0x00,0xff,0xff));//???
+	palette.set_pen_color (15, MAKE_RGB(0x7f,0x7f,0x7f));//???
 }
 
 WRITE8_MEMBER(spaceg_state::zvideoram_w)
@@ -281,13 +281,13 @@ READ8_MEMBER(spaceg_state::spaceg_colorram_r)
 		{
 			/* palette 1 */
 			int col_ind = offset & 0x1f;
-			palette_set_color_rgb(machine(), 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
+			m_palette->set_pen_color(0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
 		}
 		else if ((offset >= 0x300) && (offset < 0x320)) /* 0xa300- 0xa31f */
 		{
 			/* palette 2 */
 			int col_ind = offset & 0x1f;
-			palette_set_color_rgb(machine(), 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
+			m_palette->set_pen_color(0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
 		}
 		else
 			logerror("palette? read from colorram offset = %04x\n",offset);
@@ -423,7 +423,7 @@ static MACHINE_CONFIG_START( spaceg, spaceg_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 32, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(spaceg_state, screen_update_spaceg)
 
-	MCFG_PALETTE_LENGTH(16+128-16)
+	MCFG_PALETTE_ADD("palette", 16+128-16)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")

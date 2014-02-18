@@ -607,7 +607,7 @@ void dacholer_state::machine_reset()
 }
 
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-void dacholer_state::palette_init()
+PALETTE_INIT_MEMBER(dacholer_state, dacholer)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -621,7 +621,7 @@ void dacholer_state::palette_init()
 			2, resistances_b,  weights_b,  0, 0,
 			0, 0, 0, 0, 0);
 
-	for (i = 0;i < machine().total_colors(); i++)
+	for (i = 0;i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -643,7 +643,7 @@ void dacholer_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -670,8 +670,8 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(dacholer_state, screen_update_dacholer)
 
-	MCFG_PALETTE_LENGTH(32)
-	MCFG_GFXDECODE_ADD("gfxdecode", dacholer)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_GFXDECODE_ADD("gfxdecode",dacholer,"palette")
 
 
 	/* sound hardware */

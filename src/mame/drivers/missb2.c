@@ -475,8 +475,8 @@ static MACHINE_CONFIG_START( missb2, missb2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(missb2_state, screen_update_missb2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", missb2)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",missb2,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

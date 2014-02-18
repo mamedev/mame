@@ -509,8 +509,8 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sandscrp_state, screen_update_sandscrp)
 	MCFG_SCREEN_VBLANK_DRIVER(sandscrp_state, screen_eof_sandscrp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sandscrp)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",sandscrp,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);

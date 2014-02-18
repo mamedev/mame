@@ -405,8 +405,8 @@ static MACHINE_CONFIG_START( dfruit, dfruit_state )
 	
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 	
-	MCFG_GFXDECODE_ADD("gfxdecode",  dfruit )
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE_ADD("gfxdecode",dfruit ,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

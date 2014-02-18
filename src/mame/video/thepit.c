@@ -29,7 +29,7 @@
 
 ***************************************************************************/
 
-void thepit_state::palette_init()
+PALETTE_INIT_MEMBER(thepit_state, thepit)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -53,13 +53,13 @@ void thepit_state::palette_init()
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* allocate primary colors for the background and foreground
 	   this is wrong, but I don't know where to pick the colors from */
 	for (i = 0; i < 8; i++)
-		palette_set_color_rgb(machine(), i + 32, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette.set_pen_color(i + 32, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 
 
@@ -81,13 +81,13 @@ PALETTE_INIT_MEMBER(thepit_state,suprmous)
 		UINT8 g = BITSWAP8(color_prom[i + 0x20], 0, 1, 2, 3, 4, 5, 6, 7);
 		UINT8 r = (b>>5&7)<<2 | (g>>6&3);
 
-		palette_set_color_rgb(machine(), i, pal5bit(r), pal5bit(g), pal4bit(b));
+		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal4bit(b));
 	}
 
 	/* allocate primary colors for the background and foreground
 	   this is wrong, but I don't know where to pick the colors from */
 	for (i = 0; i < 8; i++)
-		palette_set_color_rgb(machine(), i + 32, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette.set_pen_color(i + 32, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 
 

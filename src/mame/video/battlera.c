@@ -45,7 +45,7 @@ WRITE8_MEMBER(battlera_state::battlera_palette_w)
 	if (offset%2) offset-=1;
 
 	pal_word=m_generic_paletteram_8[offset] | (m_generic_paletteram_8[offset+1]<<8);
-	palette_set_color_rgb(machine(), offset/2, pal3bit(pal_word >> 3), pal3bit(pal_word >> 6), pal3bit(pal_word >> 0));
+	m_palette->set_pen_color(offset/2, pal3bit(pal_word >> 3), pal3bit(pal_word >> 6), pal3bit(pal_word >> 0));
 }
 
 /******************************************************************************/

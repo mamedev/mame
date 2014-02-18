@@ -145,7 +145,7 @@ UINT32 umipoker_state::screen_update_umipoker(screen_device &screen, bitmap_ind1
 	m_tilemap_2->set_scrolly(0, m_umipoker_scrolly[2]);
 	m_tilemap_3->set_scrolly(0, m_umipoker_scrolly[3]);
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
 	m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
@@ -677,9 +677,9 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(umipoker_state, screen_update_umipoker)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", umipoker)
+	MCFG_GFXDECODE_ADD("gfxdecode",umipoker,"palette")
 
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_PALETTE_ADD("palette", 0x400)
 
 
 	/* sound hardware */

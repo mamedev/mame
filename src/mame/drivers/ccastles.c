@@ -475,8 +475,8 @@ static MACHINE_CONFIG_START( ccastles, ccastles_state )
 	MCFG_X2212_ADD_AUTOSAVE("nvram_4a")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", ccastles)
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE_ADD("gfxdecode",ccastles,"palette")
+	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1)   /* will be adjusted later */

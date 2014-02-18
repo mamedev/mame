@@ -310,9 +310,8 @@ static MACHINE_CONFIG_START( binbug, binbug_state )
 	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
-	MCFG_GFXDECODE_ADD("gfxdecode", dg640)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_amber)
+	MCFG_GFXDECODE_ADD("gfxdecode",dg640,"palette")
+	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
 
 	/* Keyboard */
 	MCFG_SERIAL_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf, 300)
@@ -569,9 +568,8 @@ static MACHINE_CONFIG_START( dg680, dg680_state )
 	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
-	MCFG_GFXDECODE_ADD("gfxdecode", dg640)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_amber)
+	MCFG_GFXDECODE_ADD("gfxdecode",dg640,"palette")
+	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
 
 	/* Keyboard */
 	MCFG_ASCII_KEYBOARD_ADD("keyb", dg680_keyboard_intf)

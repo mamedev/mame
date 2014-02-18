@@ -1007,7 +1007,7 @@ VIDEO_START_MEMBER(raiden2_state,raiden2)
 
 UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	//if (!machine().input().code_pressed(KEYCODE_Q))
 	{
@@ -1887,8 +1887,8 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
-	MCFG_GFXDECODE_ADD("gfxdecode", raiden2)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",raiden2,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
@@ -1943,8 +1943,8 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 //  MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
 	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4,546,0,40*8,264,0,32*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
-	MCFG_GFXDECODE_ADD("gfxdecode", raiden2)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",raiden2,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 

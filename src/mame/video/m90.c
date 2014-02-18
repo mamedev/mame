@@ -444,7 +444,7 @@ UINT32 m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap,
 		draw_sprites(screen,bitmap,cliprect);
 
 	} else {
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	}
 
 	return 0;
@@ -454,7 +454,7 @@ UINT32 m90_state::screen_update_bomblord(screen_device &screen, bitmap_ind16 &bi
 {
 	int i;
 	screen.priority().fill(0, cliprect);
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	/* Setup scrolling */
 	if (m_video_control_data[6]&0x20) {
@@ -505,7 +505,7 @@ UINT32 m90_state::screen_update_bomblord(screen_device &screen, bitmap_ind16 &bi
 UINT32 m90_state::screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if (!(m_video_data[0xf008/2] & 0x4000)) {
 		m_pf1_wide_layer->mark_all_dirty();

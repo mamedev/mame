@@ -267,10 +267,9 @@ static MACHINE_CONFIG_START( dday, dday_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dday_state, screen_update_dday)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dday)
-	MCFG_PALETTE_LENGTH(256)
-
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
+	MCFG_GFXDECODE_ADD("gfxdecode",dday,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

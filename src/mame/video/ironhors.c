@@ -16,7 +16,7 @@
 
 ***************************************************************************/
 
-void ironhors_state::palette_init()
+PALETTE_INIT_MEMBER(ironhors_state, ironhors)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2000, 1000, 470, 220 };
@@ -28,9 +28,6 @@ void ironhors_state::palette_init()
 			4, resistances, rweights, 1000, 0,
 			4, resistances, gweights, 1000, 0,
 			4, resistances, bweights, 1000, 0);
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -59,7 +56,7 @@ void ironhors_state::palette_init()
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table,*/
@@ -74,7 +71,7 @@ void ironhors_state::palette_init()
 		for (j = 0; j < 8; j++)
 		{
 			UINT8 ctabentry = (j << 5) | ((~i & 0x100) >> 4) | (color_prom[i] & 0x0f);
-			colortable_entry_set_value(machine().colortable, ((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
+			palette.set_pen_indirect(((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
 		}
 	}
 }

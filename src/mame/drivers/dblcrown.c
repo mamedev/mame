@@ -194,7 +194,7 @@ WRITE8_MEMBER( dblcrown_state::palette_w)
 	b = ((datax)&0x0f00)>>8;
 	/* TODO: remaining bits */
 
-	palette_set_color_rgb(machine(), offset, pal4bit(r), pal4bit(g), pal4bit(b));
+	m_palette->set_pen_color(offset, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 
@@ -510,7 +510,7 @@ void dblcrown_state::machine_reset()
 }
 
 
-void dblcrown_state::palette_init()
+PALETTE_INIT_MEMBER(dblcrown_state, dblcrown)
 {
 }
 
@@ -573,9 +573,9 @@ static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dblcrown)
+	MCFG_GFXDECODE_ADD("gfxdecode",dblcrown,"palette")
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

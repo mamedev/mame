@@ -209,8 +209,8 @@ WRITE32_MEMBER(psikyo4_state::ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_
 	g = ((m_paletteram[offset] & 0x00ff0000) >> 16);
 	r = ((m_paletteram[offset] & 0xff000000) >> 24);
 
-	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
-	palette_set_color(machine(), offset + 0x800, MAKE_RGB(r, g, b)); // For screen 2
+	m_palette->set_pen_color(offset, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(offset + 0x800, MAKE_RGB(r, g, b)); // For screen 2
 }
 
 WRITE32_MEMBER(psikyo4_state::ps4_bgpen_1_dword_w)
@@ -222,7 +222,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_bgpen_1_dword_w)
 	g = ((m_bgpen_1[0] & 0x00ff0000) >>16);
 	r = ((m_bgpen_1[0] & 0xff000000) >>24);
 
-	palette_set_color(machine(), 0x1000, MAKE_RGB(r, g, b)); // Clear colour for screen 1
+	m_palette->set_pen_color(0x1000, MAKE_RGB(r, g, b)); // Clear colour for screen 1
 }
 
 WRITE32_MEMBER(psikyo4_state::ps4_bgpen_2_dword_w)
@@ -234,7 +234,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_bgpen_2_dword_w)
 	g = ((m_bgpen_2[0] & 0x00ff0000) >>16);
 	r = ((m_bgpen_2[0] & 0xff000000) >>24);
 
-	palette_set_color(machine(), 0x1001, MAKE_RGB(r, g, b)); // Clear colour for screen 2
+	m_palette->set_pen_color(0x1001, MAKE_RGB(r, g, b)); // Clear colour for screen 2
 }
 
 WRITE32_MEMBER(psikyo4_state::ps4_screen1_brt_w)
@@ -660,8 +660,8 @@ static MACHINE_CONFIG_START( ps4big, psikyo4_state )
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", ps4)
-	MCFG_PALETTE_LENGTH((0x2000/4)*2 + 2) /* 0x2000/4 for each screen. 1 for each screen clear colour */
+	MCFG_GFXDECODE_ADD("gfxdecode",ps4,"palette")
+	MCFG_PALETTE_ADD("palette", (0x2000/4)*2 + 2) /* 0x2000/4 for each screen. 1 for each screen clear colour */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)

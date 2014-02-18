@@ -115,22 +115,22 @@ protected:
 
 PALETTE_INIT_MEMBER(microvision_state,microvision)
 {
-	palette_set_color_rgb( machine(), 15, 0x00, 0x00, 0x00 );
-	palette_set_color_rgb( machine(), 14, 0x11, 0x11, 0x11 );
-	palette_set_color_rgb( machine(), 13, 0x22, 0x22, 0x22 );
-	palette_set_color_rgb( machine(), 12, 0x33, 0x33, 0x33 );
-	palette_set_color_rgb( machine(), 11, 0x44, 0x44, 0x44 );
-	palette_set_color_rgb( machine(), 10, 0x55, 0x55, 0x55 );
-	palette_set_color_rgb( machine(),  9, 0x66, 0x66, 0x66 );
-	palette_set_color_rgb( machine(),  8, 0x77, 0x77, 0x77 );
-	palette_set_color_rgb( machine(),  7, 0x88, 0x88, 0x88 );
-	palette_set_color_rgb( machine(),  6, 0x99, 0x99, 0x99 );
-	palette_set_color_rgb( machine(),  5, 0xaa, 0xaa, 0xaa );
-	palette_set_color_rgb( machine(),  4, 0xbb, 0xbb, 0xbb );
-	palette_set_color_rgb( machine(),  3, 0xcc, 0xcc, 0xcc );
-	palette_set_color_rgb( machine(),  2, 0xdd, 0xdd, 0xdd );
-	palette_set_color_rgb( machine(),  1, 0xee, 0xee, 0xee );
-	palette_set_color_rgb( machine(),  0, 0xff, 0xff, 0xff );
+	palette.set_pen_color( 15, 0x00, 0x00, 0x00 );
+	palette.set_pen_color( 14, 0x11, 0x11, 0x11 );
+	palette.set_pen_color( 13, 0x22, 0x22, 0x22 );
+	palette.set_pen_color( 12, 0x33, 0x33, 0x33 );
+	palette.set_pen_color( 11, 0x44, 0x44, 0x44 );
+	palette.set_pen_color( 10, 0x55, 0x55, 0x55 );
+	palette.set_pen_color( 9, 0x66, 0x66, 0x66 );
+	palette.set_pen_color( 8, 0x77, 0x77, 0x77 );
+	palette.set_pen_color( 7, 0x88, 0x88, 0x88 );
+	palette.set_pen_color( 6, 0x99, 0x99, 0x99 );
+	palette.set_pen_color( 5, 0xaa, 0xaa, 0xaa );
+	palette.set_pen_color( 4, 0xbb, 0xbb, 0xbb );
+	palette.set_pen_color( 3, 0xcc, 0xcc, 0xcc );
+	palette.set_pen_color( 2, 0xdd, 0xdd, 0xdd );
+	palette.set_pen_color( 1, 0xee, 0xee, 0xee );
+	palette.set_pen_color( 0, 0xff, 0xff, 0xff );
 }
 
 
@@ -655,8 +655,8 @@ static MACHINE_CONFIG_START( microvision, microvision_state )
 	MCFG_SCREEN_SIZE(16, 16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 15, 0, 15)
 
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(microvision_state,microvision)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(microvision_state,microvision)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

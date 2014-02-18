@@ -233,7 +233,7 @@ static MACHINE_CONFIG_START( gumbo, gumbo_state )
 	MCFG_CPU_PROGRAM_MAP(gumbo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gumbo_state,  irq1_line_hold) // all the same
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gumbo)
+	MCFG_GFXDECODE_ADD("gfxdecode",gumbo,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -242,7 +242,7 @@ static MACHINE_CONFIG_START( gumbo, gumbo_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gumbo_state, screen_update_gumbo)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

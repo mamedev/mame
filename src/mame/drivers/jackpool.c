@@ -268,7 +268,7 @@ static MACHINE_CONFIG_START( jackpool, jackpool_state )
 	MCFG_CPU_PROGRAM_MAP(jackpool_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jackpool)
+	MCFG_GFXDECODE_ADD("gfxdecode",jackpool,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( jackpool, jackpool_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

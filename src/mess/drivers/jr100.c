@@ -384,9 +384,8 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 192 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(jr100_state, screen_update_jr100)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jr100)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_GFXDECODE_ADD("gfxdecode",jr100,"palette")
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL_14_31818MHz / 16)
 	MCFG_VIA6522_READPB_HANDLER(READ8(jr100_state,jr100_via_read_b))

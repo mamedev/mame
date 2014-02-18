@@ -232,7 +232,7 @@ WRITE32_MEMBER(backfire_state::backfire_eeprom_w)
 WRITE32_MEMBER(backfire_state::backfire_nonbuffered_palette_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	palette_set_color_rgb(machine(),offset,pal5bit(m_generic_paletteram_32[offset] >> 0),pal5bit(m_generic_paletteram_32[offset] >> 5),pal5bit(m_generic_paletteram_32[offset] >> 10));
+	m_palette->set_pen_color(offset,pal5bit(m_generic_paletteram_32[offset] >> 0),pal5bit(m_generic_paletteram_32[offset] >> 5),pal5bit(m_generic_paletteram_32[offset] >> 10));
 }
 
 /* map 32-bit writes to 16-bit */
@@ -503,8 +503,8 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(2048)
-	MCFG_GFXDECODE_ADD("gfxdecode", backfire)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",backfire,"palette")
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)

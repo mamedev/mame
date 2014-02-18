@@ -198,16 +198,13 @@ PALETTE_INIT_MEMBER(shangkid_state,dynamski)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x20);
-
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
 	{
 		UINT16 data = (color_prom[i | 0x20] << 8) | color_prom[i];
 		rgb_t color = MAKE_RGB(pal5bit(data >> 1), pal5bit(data >> 6), pal5bit(data >> 11));
 
-		colortable_palette_set_color(machine().colortable, i, color);
+		palette.set_indirect_color(i, color);
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -217,14 +214,14 @@ PALETTE_INIT_MEMBER(shangkid_state,dynamski)
 	for (i = 0; i < 0x40; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites */
 	for (i = 0x40; i < 0x80; i++)
 	{
 		UINT8 ctabentry = (color_prom[(i - 0x40) + 0x100] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 

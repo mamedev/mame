@@ -295,10 +295,10 @@ static INPUT_PORTS_START( pv1000 )
 INPUT_PORTS_END
 
 
-void pv1000_state::palette_init()
+PALETTE_INIT_MEMBER(pv1000_state, pv1000)
 {
 	for (int i = 0; i < 8; i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 
 
@@ -463,8 +463,8 @@ static MACHINE_CONFIG_START( pv1000, pv1000_state )
 	MCFG_SCREEN_RAW_PARAMS( 17897725/3, 380, 0, 256, 262, 0, 192 )
 	MCFG_SCREEN_UPDATE_DRIVER(pv1000_state, screen_update_pv1000)
 
-	MCFG_PALETTE_LENGTH( 8 )
-	MCFG_GFXDECODE_ADD("gfxdecode",  pv1000 )
+	MCFG_PALETTE_ADD( "palette", 8 )
+	MCFG_GFXDECODE_ADD("gfxdecode",pv1000 ,"palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD( "pv1000_sound", PV1000, 17897725 )

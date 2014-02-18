@@ -19,7 +19,7 @@ void nes_state::video_start()
 	m_last_frame_flip =  0;
 }
 
-void nes_state::palette_init()
+PALETTE_INIT_MEMBER(nes_state, nes)
 {
 	m_ppu->init_palette(machine(), 0);
 }

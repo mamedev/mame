@@ -105,7 +105,7 @@ void spoker_state::video_start()
 
 UINT32 spoker_state::screen_update_spoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -537,8 +537,8 @@ static MACHINE_CONFIG_START( spoker, spoker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(spoker_state, screen_update_spoker)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", spoker)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_GFXDECODE_ADD("gfxdecode",spoker,"palette")
+	MCFG_PALETTE_ADD("palette", 0x400)
 
 
 	/* sound hardware */

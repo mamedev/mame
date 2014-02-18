@@ -95,7 +95,7 @@ void cubeqst_state::video_start()
 }
 
 /* TODO: Use resistor values */
-void cubeqst_state::palette_init()
+PALETTE_INIT_MEMBER(cubeqst_state, cubeqst)
 {
 	int i;
 

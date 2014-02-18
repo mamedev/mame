@@ -32,7 +32,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_paletteram_w)
 
 	/* alpha is set to 0 if laserdisc video is enabled */
 	a = (m_transparent0 && offset / 2 == 0) ? 0 : 255;
-	palette_set_color(machine(), offset / 2, MAKE_ARGB(a, r, g, b));
+	m_palette->set_pen_color(offset / 2, MAKE_ARGB(a, r, g, b));
 }
 
 
@@ -231,7 +231,7 @@ UINT32 gottlieb_state::screen_update_gottlieb(screen_device &screen, bitmap_rgb3
 	if (!m_background_priority)
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	else
-		bitmap.fill(machine().pens[0], cliprect);
+		bitmap.fill(m_palette->pen(0), cliprect);
 
 	/* draw the sprites */
 	draw_sprites(bitmap, cliprect);

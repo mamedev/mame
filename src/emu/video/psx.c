@@ -3788,7 +3788,7 @@ PALETTE_INIT_MEMBER( psxgpu_device, psx )
 
 	for( n_colour = 0; n_colour < 0x10000; n_colour++ )
 	{
-		palette_set_color_rgb( machine(), n_colour, pal5bit(n_colour >> 0), pal5bit(n_colour >> 5), pal5bit(n_colour >> 10) );
+		palette.set_pen_color( n_colour, pal5bit(n_colour >> 0), pal5bit(n_colour >> 5), pal5bit(n_colour >> 10) );
 	}
 }
 
@@ -3801,8 +3801,8 @@ MACHINE_CONFIG_FRAGMENT( psxgpu )
 	MCFG_SCREEN_UPDATE_DEVICE( DEVICE_SELF, psxgpu_device, update_screen )
 	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(FUNC(psxgpu_device::vblank), (psxgpu_device *) owner));
 
-	MCFG_PALETTE_LENGTH( 65536 )
-	MCFG_PALETTE_INIT_OVERRIDE(psxgpu_device, psx)
+	MCFG_PALETTE_ADD( "palette", 65536 )
+	MCFG_PALETTE_INIT_OWNER(psxgpu_device, psx)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

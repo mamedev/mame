@@ -168,7 +168,7 @@ WRITE8_MEMBER(pipeline_state::vram2_w)
 			if(offset<0x300)
 			{
 			offset&=0xff;
-			palette_set_color_rgb(machine(), offset, pal6bit(m_palram[offset]), pal6bit(m_palram[offset+0x100]), pal6bit(m_palram[offset+0x200]));
+			m_palette->set_pen_color(offset, pal6bit(m_palram[offset]), pal6bit(m_palram[offset+0x100]), pal6bit(m_palram[offset+0x200]));
 			}
 	}
 }
@@ -369,7 +369,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
-void pipeline_state::palette_init()
+PALETTE_INIT_MEMBER(pipeline_state, pipeline)
 {
 	int r,g,b,i,c;
 	UINT8 *prom1 = &memregion("proms")->base()[0x000];
@@ -384,7 +384,7 @@ void pipeline_state::palette_init()
 		r*=36;
 		g*=36;
 		b*=85;
-		palette_set_color(machine(), 0x100+i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(0x100+i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -417,9 +417,9 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(pipeline_state, screen_update_pipeline)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pipeline)
+	MCFG_GFXDECODE_ADD("gfxdecode",pipeline,"palette")
 
-	MCFG_PALETTE_LENGTH(0x100+0x100)
+	MCFG_PALETTE_ADD("palette", 0x100+0x100)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

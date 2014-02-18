@@ -505,7 +505,7 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 
 	if (m_disable_video)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 	else
@@ -575,7 +575,7 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 
 	if (m_disable_video)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 	else

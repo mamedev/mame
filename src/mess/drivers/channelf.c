@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( channelf, channelf_state )
 	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 
 	/* sound hardware */
@@ -298,7 +298,7 @@ static MACHINE_CONFIG_START( sabavdpl, channelf_state )
 	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 
 	/* sound hardware */
@@ -325,7 +325,7 @@ static MACHINE_CONFIG_START( channlf2, channelf_state )
 	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 
 	/* sound hardware */
@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( sabavpl2, channelf_state )
 	MCFG_SCREEN_VISIBLE_AREA(4, 112 - 7, 4, 64 - 3)
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 
 	/* sound hardware */

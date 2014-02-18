@@ -1869,7 +1869,7 @@ WRITE32_MEMBER(cobra_state::sub_psac_palette_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
-	palette_set_color_rgb(machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 READ32_MEMBER(cobra_state::sub_psac2_r)
@@ -3213,7 +3213,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_ADD("palette", 65536)
 	MCFG_SCREEN_UPDATE_DRIVER(cobra_state, screen_update_cobra)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3230,7 +3230,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	MCFG_M48T58_ADD("m48t58")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K001604_ADD("k001604", cobra_k001604_intf)     // on the LAN board in Racing Jam DX
 	MCFG_K001604_GFXDECODE("gfxdecode")
 

@@ -510,8 +510,8 @@ static MACHINE_CONFIG_START( badlands, badlands_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE_ADD("gfxdecode", badlands)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",badlands,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", badlands_state::s_mob_config)
@@ -713,8 +713,8 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE_ADD("gfxdecode", badlandsb)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",badlandsb,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", badlands_state::s_mob_config)

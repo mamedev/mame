@@ -15,9 +15,6 @@ PALETTE_INIT_MEMBER(combatsc_state,combatsc)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int pal;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x80);
-
 	for (pal = 0; pal < 8; pal++)
 	{
 		int i, clut;
@@ -55,7 +52,7 @@ PALETTE_INIT_MEMBER(combatsc_state,combatsc)
 			else
 				ctabentry = (pal << 4) | (color_prom[(clut << 8) | i] & 0x0f);
 
-			colortable_entry_set_value(machine().colortable, (pal << 8) | i, ctabentry);
+			palette.set_pen_indirect((pal << 8) | i, ctabentry);
 		}
 	}
 }
@@ -65,9 +62,6 @@ PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int pal;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x80);
 
 	for (pal = 0; pal < 8; pal++)
 	{
@@ -84,7 +78,7 @@ PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 				/* chars - no lookup? */
 				ctabentry = (pal << 4) | (i & 0x0f);    /* no lookup? */
 
-			colortable_entry_set_value(machine().colortable, (pal << 8) | i, ctabentry);
+			palette.set_pen_indirect((pal << 8) | i, ctabentry);
 		}
 	}
 }
@@ -100,7 +94,7 @@ void combatsc_state::set_pens(  )
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine().colortable, i >> 1, color);
+		m_palette->set_indirect_color(i >> 1, color);
 	}
 }
 

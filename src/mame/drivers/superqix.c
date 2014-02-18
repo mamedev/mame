@@ -1005,8 +1005,8 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_pbillian)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pbillian)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",pbillian,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,pbillian)
 
@@ -1039,8 +1039,8 @@ static MACHINE_CONFIG_START( hotsmash, superqix_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_pbillian)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pbillian)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",pbillian,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,pbillian)
 
@@ -1077,8 +1077,8 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_superqix)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sqix)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",sqix,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 
@@ -1120,8 +1120,8 @@ static MACHINE_CONFIG_START( sqixbl, superqix_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_superqix)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sqix)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",sqix,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 

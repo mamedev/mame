@@ -507,7 +507,7 @@ READ_LINE_MEMBER( uv201_device::kbd_r )
 
 UINT32 uv201_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if (!(m_cmd & COMMAND_ENB))
 	{

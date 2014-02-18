@@ -370,14 +370,14 @@ static const UINT8 lynx48k_palette[8*3] =
 	0xff, 0xff, 0xff,   /*  7 White     */
 };
 
-void camplynx_state::palette_init()
+PALETTE_INIT_MEMBER(camplynx_state, camplynx)
 {
 	UINT8 r, b, g, i=0, color_count = 8;
 
 	while (color_count--)
 	{
 		r = lynx48k_palette[i++]; g = lynx48k_palette[i++]; b = lynx48k_palette[i++];
-		palette_set_color(machine(), 7-color_count, MAKE_RGB(r, g, b));
+		palette.set_pen_color(7-color_count, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -479,7 +479,7 @@ static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 	MCFG_SCREEN_SIZE(512, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -506,7 +506,7 @@ static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 	MCFG_SCREEN_SIZE(512, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

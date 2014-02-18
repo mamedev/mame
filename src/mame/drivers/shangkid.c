@@ -386,10 +386,8 @@ static MACHINE_CONFIG_START( chinhero, shangkid_state )
 	MCFG_SCREEN_VISIBLE_AREA(16, 319-16, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(shangkid_state, screen_update_shangkid)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chinhero)
-	MCFG_PALETTE_LENGTH(256)
-
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
+	MCFG_GFXDECODE_ADD("gfxdecode",chinhero,"palette")
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(shangkid_state,shangkid)
 
 	/* sound hardware */
@@ -465,10 +463,10 @@ static MACHINE_CONFIG_START( dynamski, shangkid_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255+32, 16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(shangkid_state, screen_update_dynamski)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dynamski)
-	MCFG_PALETTE_LENGTH(16*4+16*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",dynamski,"palette")
+	MCFG_PALETTE_ADD("palette", 16*4+16*4)
 
-	MCFG_PALETTE_INIT_OVERRIDE(shangkid_state,dynamski)
+	MCFG_PALETTE_INIT_OWNER(shangkid_state,dynamski)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -2592,8 +2592,8 @@ static MACHINE_CONFIG_START( ssv, ssv_state )
 	MCFG_SCREEN_RAW_PARAMS(SSV_PIXEL_CLOCK,SSV_HTOTAL,SSV_HBEND,SSV_HBSTART,SSV_VTOTAL,SSV_VBEND,SSV_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_ssv)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ssv)
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_GFXDECODE_ADD("gfxdecode",ssv,"palette")
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

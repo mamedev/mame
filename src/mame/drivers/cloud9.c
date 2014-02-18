@@ -425,8 +425,8 @@ static MACHINE_CONFIG_START( cloud9, cloud9_state )
 	MCFG_X2212_ADD_AUTOSAVE("nvram")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", cloud9)
-	MCFG_PALETTE_LENGTH(64)
+	MCFG_GFXDECODE_ADD("gfxdecode",cloud9,"palette")
+	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE((float)PIXEL_CLOCK / (float)VTOTAL / (float)HTOTAL)

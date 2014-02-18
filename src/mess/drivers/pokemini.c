@@ -136,12 +136,12 @@ static INPUT_PORTS_START( pokemini )
 INPUT_PORTS_END
 
 
-void pokemini_state::palette_init()
+PALETTE_INIT_MEMBER(pokemini_state, pokemini)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0xff, 0xfb, 0x87));
-	palette_set_color(machine(), 1, MAKE_RGB(0xb1, 0xae, 0x4e));
-	palette_set_color(machine(), 2, MAKE_RGB(0x84, 0x80, 0x4e));
-	palette_set_color(machine(), 3, MAKE_RGB(0x4e, 0x4e, 0x4e));
+	palette.set_pen_color(0, MAKE_RGB(0xff, 0xfb, 0x87));
+	palette.set_pen_color(1, MAKE_RGB(0xb1, 0xae, 0x4e));
+	palette.set_pen_color(2, MAKE_RGB(0x84, 0x80, 0x4e));
+	palette.set_pen_color(3, MAKE_RGB(0x4e, 0x4e, 0x4e));
 }
 
 
@@ -1790,7 +1790,7 @@ static MACHINE_CONFIG_START( pokemini, pokemini_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_PALETTE_LENGTH( 4 )
+	MCFG_PALETTE_ADD( "palette", 4 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

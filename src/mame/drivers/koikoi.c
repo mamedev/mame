@@ -96,13 +96,10 @@ TILE_GET_INFO_MEMBER(koikoi_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(m_gfxdecode,  0, code, color, flip);
 }
 
-void koikoi_state::palette_init()
+PALETTE_INIT_MEMBER(koikoi_state, koikoi)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x10);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x10; i++)
@@ -128,7 +125,7 @@ void koikoi_state::palette_init()
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -138,7 +135,7 @@ void koikoi_state::palette_init()
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -378,8 +375,8 @@ static MACHINE_CONFIG_START( koikoi, koikoi_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(koikoi_state, screen_update_koikoi)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", koikoi)
-	MCFG_PALETTE_LENGTH(8*32)
+	MCFG_GFXDECODE_ADD("gfxdecode",koikoi,"palette")
+	MCFG_PALETTE_ADD("palette", 8*32)
 
 
 	/* sound hardware */

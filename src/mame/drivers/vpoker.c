@@ -630,7 +630,7 @@ static GFXDECODE_START( vpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
-void vpoker_state::palette_init()
+PALETTE_INIT_MEMBER(vpoker_state, vpoker)
 {
 	int i;
 
@@ -640,7 +640,7 @@ void vpoker_state::palette_init()
 
 		color = MAKE_RGB(pal1bit((i & 4) >> 2),pal1bit(i & 1),pal1bit((i & 2) >> 1));
 
-		palette_set_color(machine(), i, color);
+		palette.set_pen_color(i, color);
 	}
 }
 
@@ -673,8 +673,8 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vpoker_state, screen_update_vpoker)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vpoker)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_GFXDECODE_ADD("gfxdecode",vpoker,"palette")
+	MCFG_PALETTE_ADD("palette", 8)
 
 
 	/* 6840 PTM */

@@ -257,7 +257,7 @@ void blackt96_state::draw_page(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	draw_page(bitmap, cliprect, 2); // bg
 	draw_page(bitmap, cliprect, 3); // lower pri sprites
@@ -602,7 +602,7 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 	MCFG_CPU_ADD("audiocpu", PIC16C57, 8000000) /* ? */
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", blackt96)
+	MCFG_GFXDECODE_ADD("gfxdecode",blackt96,"palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -612,7 +612,7 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 256-1, 0*8, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blackt96_state, screen_update_blackt96)
 
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

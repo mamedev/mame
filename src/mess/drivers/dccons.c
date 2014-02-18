@@ -637,7 +637,7 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(13458568*2, 857, 0, 640, 524, 0, 480) /* TODO: where pclk actually comes? */
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_POWERVR2_ADD("powervr2", WRITE8(dc_state, pvr_irq))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

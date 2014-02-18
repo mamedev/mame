@@ -443,7 +443,7 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_TMS9928A_SET_SCREEN( "screen" )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9929a_device, screen_update )
-	MCFG_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE + 2)  /* 2 additional entries for monochrome svi806 output */
+	MCFG_PALETTE_ADD("palette", TMS9928A_PALETTE_SIZE + 2)  /* 2 additional entries for monochrome svi806 output */
 
 	MCFG_SCREEN_ADD("svi806", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -452,7 +452,7 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", svi328)
+	MCFG_GFXDECODE_ADD("gfxdecode",svi328,"palette")
 
 	MCFG_MC6845_ADD("crtc", MC6845, "svi806", XTAL_12MHz / 8, svi806_crtc6845_interface)
 

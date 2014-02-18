@@ -368,8 +368,8 @@ static MACHINE_CONFIG_START( jackal, jackal_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jackal_state, screen_update_jackal)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jackal)
-	MCFG_PALETTE_LENGTH(0x300)
+	MCFG_GFXDECODE_ADD("gfxdecode",jackal,"palette")
+	MCFG_PALETTE_ADD("palette", 0x300)
 
 
 	/* sound hardware */

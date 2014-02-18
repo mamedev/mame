@@ -482,8 +482,8 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", tbowl)
-	MCFG_PALETTE_LENGTH(1024*2)
+	MCFG_GFXDECODE_ADD("gfxdecode",tbowl,"palette")
+	MCFG_PALETTE_ADD("palette", 1024*2)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)

@@ -718,10 +718,10 @@ void pc1000_state::machine_reset()
 	m_bank1->set_entry(0);
 }
 
-void pc2000_state::palette_init()
+PALETTE_INIT_MEMBER(pc2000_state, pc2000)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
+	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
 }
 
 static const gfx_layout hd44780_charlayout =
@@ -757,8 +757,8 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
 	MCFG_SCREEN_SIZE(120, 18) //2x20 chars
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18-1)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_GFXDECODE_ADD("gfxdecode", pc2000)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_GFXDECODE_ADD("gfxdecode",pc2000,"palette")
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_HD44780_ADD("hd44780")

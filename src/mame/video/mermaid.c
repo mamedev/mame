@@ -2,13 +2,10 @@
 #include "includes/mermaid.h"
 
 
-void mermaid_state::palette_init()
+PALETTE_INIT_MEMBER(mermaid_state, mermaid)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x41);
 
 	for (i = 0; i < 0x40; i++)
 	{
@@ -16,21 +13,21 @@ void mermaid_state::palette_init()
 		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
 		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* blue background */
-	colortable_palette_set_color(machine().colortable, 0x40, MAKE_RGB(0, 0, 0xff));
+	palette.set_indirect_color(0x40, MAKE_RGB(0, 0, 0xff));
 
 	/* char/sprite palette */
 	for (i = 0; i < 0x40; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* background palette */
-	colortable_entry_set_value(machine().colortable, 0x40, 0x20);
-	colortable_entry_set_value(machine().colortable, 0x41, 0x21);
-	colortable_entry_set_value(machine().colortable, 0x42, 0x40);
-	colortable_entry_set_value(machine().colortable, 0x43, 0x21);
+	palette.set_pen_indirect(0x40, 0x20);
+	palette.set_pen_indirect(0x41, 0x21);
+	palette.set_pen_indirect(0x42, 0x40);
+	palette.set_pen_indirect(0x43, 0x21);
 }
 
 PALETTE_INIT_MEMBER(mermaid_state,rougien)
@@ -38,30 +35,27 @@ PALETTE_INIT_MEMBER(mermaid_state,rougien)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x41);
-
 	for (i = 0; i < 0x40; i++)
 	{
 		int r = 0x21 * BIT(color_prom[i], 0) + 0x47 * BIT(color_prom[i], 1) + 0x97 * BIT(color_prom[i], 2);
 		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
 		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* blue background */
-	colortable_palette_set_color(machine().colortable, 0x40, MAKE_RGB(0, 0, 0));
+	palette.set_indirect_color(0x40, MAKE_RGB(0, 0, 0));
 
 	/* char/sprite palette */
 	for (i = 0; i < 0x40; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* background palette */
-	colortable_entry_set_value(machine().colortable, 0x40, 0x40);
-	colortable_entry_set_value(machine().colortable, 0x41, 0x00);
-	colortable_entry_set_value(machine().colortable, 0x42, 0x00);
-	colortable_entry_set_value(machine().colortable, 0x43, 0x02);
+	palette.set_pen_indirect(0x40, 0x40);
+	palette.set_pen_indirect(0x41, 0x00);
+	palette.set_pen_indirect(0x42, 0x00);
+	palette.set_pen_indirect(0x43, 0x02);
 }
 
 

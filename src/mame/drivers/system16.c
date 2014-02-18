@@ -2007,8 +2007,8 @@ static MACHINE_CONFIG_START( system16, segas1x_bootleg_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system16)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sys16)
-	MCFG_PALETTE_LENGTH(2048*SHADOW_COLORS_MULTIPLIER)
+	MCFG_GFXDECODE_ADD("gfxdecode",sys16,"palette")
+	MCFG_PALETTE_ADD("palette", 2048*SHADOW_COLORS_MULTIPLIER)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
 
@@ -2154,13 +2154,13 @@ static MACHINE_CONFIG_START( goldnaxeb1, segas1x_bootleg_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system16)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sys16)
-	MCFG_PALETTE_LENGTH(2048*SHADOW_COLORS_MULTIPLIER)
+	MCFG_GFXDECODE_ADD("gfxdecode",sys16,"palette")
+
+	MCG_PALETTE_ADD_INIT_BLACK("palette", 2048*SHADOW_COLORS_MULTIPLIER)
 
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-121)
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
 MACHINE_CONFIG_END
 
@@ -2287,8 +2287,8 @@ static MACHINE_CONFIG_START( system18, segas1x_bootleg_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sys16)
-	MCFG_PALETTE_LENGTH((2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
+	MCFG_GFXDECODE_ADD("gfxdecode",sys16,"palette")
+	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 

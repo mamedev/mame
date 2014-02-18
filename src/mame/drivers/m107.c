@@ -776,8 +776,8 @@ static MACHINE_CONFIG_START( firebarr, m107_state )
 	MCFG_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
 	MCFG_SCREEN_UPDATE_DRIVER(m107_state, screen_update_m107)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", firebarr)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",firebarr,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */

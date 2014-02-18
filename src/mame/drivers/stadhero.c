@@ -235,8 +235,8 @@ static MACHINE_CONFIG_START( stadhero, stadhero_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stadhero_state, screen_update_stadhero)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", stadhero)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",stadhero,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,1,1,2);

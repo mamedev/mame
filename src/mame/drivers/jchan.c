@@ -305,7 +305,7 @@ UINT32 jchan_state::screen_update_jchan(screen_device &screen, bitmap_ind16 &bit
 	UINT16 pixdata1;
 	UINT16 pixdata2;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	screen.priority().fill(0, cliprect);
 
@@ -588,7 +588,7 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_CPU_ADD("sub", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(jchan_sub)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jchan)
+	MCFG_GFXDECODE_ADD("gfxdecode",jchan,"palette")
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -598,7 +598,7 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jchan_state, screen_update_jchan)
 
-	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_PALETTE_ADD("palette", 0x10000)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);

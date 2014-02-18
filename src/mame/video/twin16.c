@@ -52,7 +52,7 @@ WRITE16_MEMBER(twin16_state::twin16_paletteram_word_w)
 	offset &= ~1;
 
 	data = ((m_generic_paletteram_16[offset] & 0xff) << 8) | (m_generic_paletteram_16[offset + 1] & 0xff);
-	palette_set_color_rgb(machine(), offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	m_palette->set_pen_color(offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
 WRITE16_MEMBER(twin16_state::fround_gfx_bank_w)
@@ -493,7 +493,7 @@ VIDEO_START_MEMBER(twin16_state,twin16)
 	m_text_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(twin16_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_text_tilemap->set_transparent_pen(0);
 
-	palette_set_shadow_factor(machine(),0.4); // screenshots estimate
+	m_palette->set_shadow_factor(0.4); // screenshots estimate
 
 	memset(m_sprite_buffer,0xff,0x800*sizeof(UINT16));
 	m_sprite_busy = 0;

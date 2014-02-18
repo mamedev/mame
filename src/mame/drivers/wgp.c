@@ -989,8 +989,8 @@ static MACHINE_CONFIG_START( wgp, wgp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wgp_state, screen_update_wgp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wgp)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",wgp,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 
 	MCFG_TC0100SCN_ADD("tc0100scn", wgp_tc0100scn_intf)

@@ -255,8 +255,8 @@ static MACHINE_CONFIG_START( battlnts, battlnts_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(battlnts_state, screen_update_battlnts)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", battlnts)
-	MCFG_PALETTE_LENGTH(128)
+	MCFG_GFXDECODE_ADD("gfxdecode",battlnts,"palette")
+	MCFG_PALETTE_ADD("palette", 128)
 
 	MCFG_K007342_ADD("k007342", bladestl_k007342_intf)
 	MCFG_K007342_GFXDECODE("gfxdecode")

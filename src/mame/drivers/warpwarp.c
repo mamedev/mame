@@ -733,10 +733,10 @@ static MACHINE_CONFIG_START( geebee, warpwarp_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update_geebee)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 1k)
-	MCFG_PALETTE_LENGTH(4*2)
+	MCFG_GFXDECODE_ADD("gfxdecode",1k,"palette")
+	MCFG_PALETTE_ADD("palette", 4*2)
 
-	MCFG_PALETTE_INIT_OVERRIDE(warpwarp_state,geebee)
+	MCFG_PALETTE_INIT_OWNER(warpwarp_state,geebee)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,geebee)
 
 	/* sound hardware */
@@ -750,9 +750,9 @@ static MACHINE_CONFIG_DERIVED( navarone, geebee )
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 2k)
-	MCFG_PALETTE_LENGTH(2*2)
+	MCFG_PALETTE_ADD("palette", 2*2)
 
-	MCFG_PALETTE_INIT_OVERRIDE(warpwarp_state,navarone)
+	MCFG_PALETTE_INIT_OWNER(warpwarp_state,navarone)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,navarone)
 MACHINE_CONFIG_END
 
@@ -768,10 +768,10 @@ static MACHINE_CONFIG_START( bombbee, warpwarp_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update_geebee)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", color)
-	MCFG_PALETTE_LENGTH(2*256+1)
+	MCFG_GFXDECODE_ADD("gfxdecode",color,"palette")
+	MCFG_PALETTE_ADD("palette", 2*256+1)
 
-	MCFG_PALETTE_INIT_OVERRIDE(warpwarp_state,warpwarp)
+	MCFG_PALETTE_INIT_OWNER(warpwarp_state,warpwarp)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,warpwarp)
 
 	/* sound hardware */

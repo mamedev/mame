@@ -196,7 +196,7 @@ void harriet_state::machine_reset()
 }
 
 
-void harriet_state::palette_init()
+PALETTE_INIT_MEMBER(harriet_state, harriet)
 {
 }
 
@@ -211,7 +211,7 @@ static MACHINE_CONFIG_START( harriet, harriet_state )
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -697,10 +697,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::kb_timer)
 }
 
 
-void nakajies_state::palette_init()
+PALETTE_INIT_MEMBER(nakajies_state, nakajies)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
+	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
 }
 
 
@@ -749,8 +749,8 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MCFG_SCREEN_UPDATE_DRIVER( nakajies_state, screen_update )
 	MCFG_SCREEN_SIZE( 80 * 6, 8 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
-	MCFG_GFXDECODE_ADD("gfxdecode", wales210)
-	MCFG_PALETTE_LENGTH( 2 )
+	MCFG_GFXDECODE_ADD("gfxdecode",wales210,"palette")
+	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound */

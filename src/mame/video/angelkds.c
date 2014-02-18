@@ -226,7 +226,7 @@ WRITE8_MEMBER(angelkds_state::angelkds_paletteram_w)
 	m_paletteram[offset] = data;
 
 	no = offset & 0xff;
-	palette_set_color_rgb(machine(), no, pal4bit(m_paletteram[no]), pal4bit(m_paletteram[no]>>4), pal4bit(m_paletteram[no + 0x100]));
+	m_palette->set_pen_color(no, pal4bit(m_paletteram[no]), pal4bit(m_paletteram[no]>>4), pal4bit(m_paletteram[no + 0x100]));
 }
 
 /*** Video Start & Update

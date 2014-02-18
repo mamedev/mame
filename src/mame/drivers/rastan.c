@@ -400,8 +400,8 @@ static MACHINE_CONFIG_START( rastan, rastan_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rastan_state, screen_update_rastan)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rastan)
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE_ADD("gfxdecode",rastan,"palette")
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_PC080SN_ADD("pc080sn", rastan_pc080sn_intf)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")

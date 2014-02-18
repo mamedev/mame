@@ -411,7 +411,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void jollyjgr_state::palette_init()
+PALETTE_INIT_MEMBER(jollyjgr_state, jollyjgr)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -436,13 +436,13 @@ void jollyjgr_state::palette_init()
 		bit1 = BIT(*color_prom, 7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
+		palette.set_pen_color(i, MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
 	/* bitmap palette */
 	for (i = 0;i < 8;i++)
-		palette_set_color_rgb(machine(), 32 + i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		palette.set_pen_color(32 + i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 }
 
 /* Tilemap is the same as in Galaxian */
@@ -664,8 +664,8 @@ static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jollyjgr_state, screen_update_jollyjgr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jollyjgr)
-	MCFG_PALETTE_LENGTH(32+8) /* 32 for tilemap and sprites + 8 for the bitmap */
+	MCFG_GFXDECODE_ADD("gfxdecode",jollyjgr,"palette")
+	MCFG_PALETTE_ADD("palette", 32+8) /* 32 for tilemap and sprites + 8 for the bitmap */
 
 
 	/* sound hardware */

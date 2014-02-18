@@ -474,7 +474,7 @@ static INPUT_PORTS_START(exelv)
 INPUT_PORTS_END
 
 
-void exelv_state::palette_init()
+PALETTE_INIT_MEMBER(exelv_state, exelv)
 {
 	int i, red, green, blue;
 
@@ -484,7 +484,7 @@ void exelv_state::palette_init()
 		red = (i & 1) ? 255 : 0;    /* red */
 		green = (i & 2) ? 255 : 0;  /* green */
 		blue = (i & 4) ? 255 : 0;   /* blue */
-		palette_set_color_rgb(machine(), i, red, green, blue);
+		palette.set_pen_color(i, red, green, blue);
 	}
 }
 
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH, TMS3556_TOTAL_HEIGHT*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
 #endif
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -577,7 +577,7 @@ static MACHINE_CONFIG_START( exeltel, exelv_state )
 	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH, TMS3556_TOTAL_HEIGHT*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
 #endif
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */

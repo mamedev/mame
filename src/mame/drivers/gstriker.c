@@ -552,8 +552,8 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gstriker_state, screen_update_gstriker)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gstriker)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_GFXDECODE_ADD("gfxdecode",gstriker,"palette")
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
@@ -601,8 +601,8 @@ static MACHINE_CONFIG_START( vgoal, gstriker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gstriker_state, screen_update_gstriker)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gstriker)
-	MCFG_PALETTE_LENGTH(0x2000)
+	MCFG_GFXDECODE_ADD("gfxdecode",gstriker,"palette")
+	MCFG_PALETTE_ADD("palette", 0x2000)
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)

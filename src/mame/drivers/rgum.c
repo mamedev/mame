@@ -286,8 +286,8 @@ static MACHINE_CONFIG_START( rgum, rgum_state )
 
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rgum)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE_ADD("gfxdecode",rgum,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

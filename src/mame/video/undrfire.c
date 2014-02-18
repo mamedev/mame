@@ -12,7 +12,7 @@ void undrfire_state::video_start()
 	m_spritelist = auto_alloc_array(machine(), struct tempsprite, 0x4000);
 
 	for (i = 0; i < 16384; i++) /* Fix later - some weird colours in places */
-		palette_set_color(machine(), i, MAKE_RGB(0,0,0));
+		m_palette->set_pen_color(i, MAKE_RGB(0,0,0));
 }
 
 /***************************************************************

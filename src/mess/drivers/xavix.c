@@ -140,7 +140,7 @@ void xavix_state::machine_reset()
 }
 
 
-void xavix_state::palette_init()
+PALETTE_INIT_MEMBER(xavix_state, xavix)
 {
 }
 
@@ -158,7 +158,7 @@ static MACHINE_CONFIG_START( xavix, xavix_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", xavix)
+	MCFG_GFXDECODE_ADD("gfxdecode",xavix,"palette")
 
 	MCFG_PALETTE_LENGTH(16)
 

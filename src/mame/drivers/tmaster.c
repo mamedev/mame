@@ -375,7 +375,7 @@ UINT32 tmaster_state::screen_update_tmaster(screen_device &screen, bitmap_ind16 
 #endif
 
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if (layers_ctrl & 1)    copybitmap_trans(bitmap, m_bitmap[0][(m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
 	if (layers_ctrl & 2)    copybitmap_trans(bitmap, m_bitmap[1][(m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
@@ -636,7 +636,7 @@ WRITE16_MEMBER(tmaster_state::galgames_palette_data_w)
 		{
 			int palette_base;
 			for (palette_base = 0; palette_base < 0x1000; palette_base += 0x100)
-				palette_set_color(machine(), m_palette_offset + palette_base, MAKE_RGB(m_palette_data[0], m_palette_data[1], m_palette_data[2]));
+				m_palette->set_pen_color(m_palette_offset + palette_base, MAKE_RGB(m_palette_data[0], m_palette_data[1], m_palette_data[2]));
 			m_palette_index = 0;
 			m_palette_offset++;
 		}
@@ -930,7 +930,7 @@ static MACHINE_CONFIG_START( tm, tmaster_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tmaster_state, screen_update_tmaster)
 
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 	MCFG_VIDEO_START_OVERRIDE(tmaster_state,tmaster)
 
@@ -989,7 +989,7 @@ static MACHINE_CONFIG_START( galgames, tmaster_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tmaster_state, screen_update_tmaster)
 
-	MCFG_PALETTE_LENGTH(0x1000) // only 0x100 used
+	MCFG_PALETTE_ADD("palette", 0x1000) // only 0x100 used
 
 	MCFG_VIDEO_START_OVERRIDE(tmaster_state,galgames)
 

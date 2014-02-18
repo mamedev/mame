@@ -12,7 +12,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 
 /**************************************************************************/
 
-void ssozumo_state::palette_init()
+PALETTE_INIT_MEMBER(ssozumo_state, ssozumo)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2, bit3, r, g, b;
@@ -36,7 +36,7 @@ void ssozumo_state::palette_init()
 		bit3 = (color_prom[64] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -95,7 +95,7 @@ WRITE8_MEMBER(ssozumo_state::ssozumo_paletteram_w)
 	bit3 = (val >> 3) & 0x01;
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(machine(), offs2 + 64, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(offs2 + 64, MAKE_RGB(r, g, b));
 }
 
 WRITE8_MEMBER(ssozumo_state::ssozumo_scroll_w)

@@ -1074,8 +1074,8 @@ static MACHINE_CONFIG_START( 40love, fortyl_state )
 	MCFG_SCREEN_VISIBLE_AREA(128,128+255, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fortyl_state, screen_update_fortyl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 40love)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",40love,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 
 	/* sound hardware */
@@ -1129,8 +1129,8 @@ static MACHINE_CONFIG_START( undoukai, fortyl_state )
 	MCFG_SCREEN_VISIBLE_AREA(128,128+255, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fortyl_state, screen_update_fortyl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 40love)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE_ADD("gfxdecode",40love,"palette")
+	MCFG_PALETTE_ADD("palette", 1024)
 
 
 	/* sound hardware */

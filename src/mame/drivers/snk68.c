@@ -595,8 +595,8 @@ static MACHINE_CONFIG_START( pow, snk68_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(snk68_state, screen_update_pow)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pow)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_GFXDECODE_ADD("gfxdecode",pow,"palette")
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 
 	/* sound hardware */

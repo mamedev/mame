@@ -177,8 +177,8 @@ static MACHINE_CONFIG_START( suprloco, suprloco_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suprloco_state, screen_update_suprloco)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", suprloco)
-	MCFG_PALETTE_LENGTH(512+256)
+	MCFG_GFXDECODE_ADD("gfxdecode",suprloco,"palette")
+	MCFG_PALETTE_ADD("palette", 512+256)
 
 
 	/* sound hardware */

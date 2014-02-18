@@ -199,13 +199,13 @@ void phunsy_state::machine_reset()
 }
 
 
-void phunsy_state::palette_init()
+PALETTE_INIT_MEMBER(phunsy_state, phunsy)
 {
 	for ( int i = 0; i < 8; i++ )
 	{
 		int j = ( i << 5 ) | ( i << 2 ) | ( i >> 1 );
 
-		palette_set_color_rgb( machine(), i, j, j, j );
+		palette.set_pen_color( i, j, j, j );
 	}
 }
 
@@ -363,8 +363,8 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	*/
 	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz, 480, 0, 64*6, 313, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(phunsy_state, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", phunsy)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_GFXDECODE_ADD("gfxdecode",phunsy,"palette")
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

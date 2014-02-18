@@ -389,8 +389,8 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 	MCFG_SCREEN_SIZE(336, 300)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vg5k)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_GFXDECODE_ADD("gfxdecode",vg5k,"palette")
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

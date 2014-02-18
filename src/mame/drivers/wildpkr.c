@@ -195,7 +195,7 @@ UINT32 wildpkr_state::screen_update_wildpkr(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-void wildpkr_state::palette_init()
+PALETTE_INIT_MEMBER(wildpkr_state, wildpkr)
 {
 }
 
@@ -291,7 +291,7 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 //  MCFG_HD63484_ADD("hd63484", wildpkr_hd63484_intf)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 MACHINE_CONFIG_END

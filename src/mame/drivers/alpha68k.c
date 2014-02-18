@@ -1963,9 +1963,9 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_sstingry)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sstingry)
-	MCFG_PALETTE_LENGTH(256 + 1)
-	MCFG_PALETTE_INIT_OVERRIDE(alpha68k_state,kyros)
+	MCFG_GFXDECODE_ADD("gfxdecode",sstingry,"palette")
+	MCFG_PALETTE_ADD("palette", 256 + 1)
+	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2008,10 +2008,10 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_kyros)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", kyros)
-	MCFG_PALETTE_LENGTH(256 + 1)
+	MCFG_GFXDECODE_ADD("gfxdecode",kyros,"palette")
+	MCFG_PALETTE_ADD("palette", 256 + 1)
 
-	MCFG_PALETTE_INIT_OVERRIDE(alpha68k_state,kyros)
+	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2053,10 +2053,10 @@ static MACHINE_CONFIG_START( jongbou, alpha68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_kyros)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jongbou)
-	MCFG_PALETTE_LENGTH(256 + 1)
+	MCFG_GFXDECODE_ADD("gfxdecode",jongbou,"palette")
+	MCFG_PALETTE_ADD("palette", 256 + 1)
 
-	MCFG_PALETTE_INIT_OVERRIDE(alpha68k_state,kyros)
+	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2087,10 +2087,10 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_I)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", paddle)
+	MCFG_GFXDECODE_ADD("gfxdecode",paddle,"palette")
 
-	MCFG_PALETTE_LENGTH(1024)
-	MCFG_PALETTE_INIT_OVERRIDE(alpha68k_state,paddlem)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INIT_OWNER(alpha68k_state,paddlem)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2129,8 +2129,8 @@ static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_II)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", alpha68k_II)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",alpha68k_II,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
@@ -2178,8 +2178,8 @@ static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_II)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", alpha68k_II)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",alpha68k_II,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
@@ -2221,8 +2221,8 @@ static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_V)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", alpha68k_V)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",alpha68k_V,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
@@ -2263,8 +2263,8 @@ static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_V_sb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", alpha68k_V)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",alpha68k_V,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
@@ -2304,10 +2304,10 @@ static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_I)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tnextspc)
+	MCFG_GFXDECODE_ADD("gfxdecode",tnextspc,"palette")
 
-	MCFG_PALETTE_LENGTH(1024)
-	MCFG_PALETTE_INIT_OVERRIDE(alpha68k_state,paddlem)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INIT_OWNER(alpha68k_state,paddlem)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

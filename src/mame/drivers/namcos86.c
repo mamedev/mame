@@ -1014,8 +1014,8 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcos86_state, screen_update_namcos86)
 	MCFG_SCREEN_VBLANK_DRIVER(namcos86_state, screen_eof_namcos86)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", namcos86)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",namcos86,"palette")
+	MCFG_PALETTE_ADD("palette", 4096)
 
 
 	/* sound hardware */

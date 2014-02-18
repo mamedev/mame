@@ -200,7 +200,7 @@ void igs_m027_state::video_start()
 UINT32 igs_m027_state::screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//??????????
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	//??????
 	m_igs_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
@@ -391,7 +391,7 @@ static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs_m027_state,  igs_majhong_interrupt)
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", igs_m027)
+	MCFG_GFXDECODE_ADD("gfxdecode",igs_m027,"palette")
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 
 	/* sound hardware */
@@ -427,7 +427,7 @@ static MACHINE_CONFIG_START( fearless, igs_m027_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_fearless)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

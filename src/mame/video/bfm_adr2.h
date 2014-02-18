@@ -63,6 +63,7 @@ private:
 
 	optional_device<cpu_device> m_cpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 // device type definition

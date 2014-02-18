@@ -15,7 +15,7 @@ WRITE8_MEMBER(bigevglf_state::bigevglf_palette_w)
 
 	m_paletteram[offset] = data;
 	color = m_paletteram[offset & 0x3ff] | (m_paletteram[0x400 + (offset & 0x3ff)] << 8);
-	palette_set_color_rgb(machine(), offset & 0x3ff, pal4bit(color >> 4), pal4bit(color >> 0), pal4bit(color >> 8));
+	m_palette->set_pen_color(offset & 0x3ff, pal4bit(color >> 4), pal4bit(color >> 0), pal4bit(color >> 8));
 }
 
 WRITE8_MEMBER(bigevglf_state::bigevglf_gfxcontrol_w)

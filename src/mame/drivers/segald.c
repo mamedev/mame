@@ -226,7 +226,7 @@ WRITE8_MEMBER(segald_state::astron_COLOR_write)
 	b = (highBits & 0x0f);
 	a = (highBits & 0x80) ? 0 : 255;
 
-	palette_set_color(machine(), palIndex, MAKE_ARGB(a, r, g, b));
+	m_palette->set_pen_color(palIndex, MAKE_ARGB(a, r, g, b));
 	logerror("COLOR write : 0x%04x @   0x%04x [0x%x]\n", data, offset, space.device().safe_pc());
 }
 
@@ -378,8 +378,8 @@ static MACHINE_CONFIG_START( astron, segald_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", segald)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",segald,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardare */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -341,8 +341,8 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldx)
 
-	MCFG_PALETTE_LENGTH(4096)
-	MCFG_GFXDECODE_ADD("gfxdecode", pktgaldx)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",pktgaldx,"palette")
 
 	MCFG_DECOCOMN_ADD("deco_common")
 
@@ -385,8 +385,8 @@ static MACHINE_CONFIG_START( pktgaldb, pktgaldx_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldb)
 
-	MCFG_PALETTE_LENGTH(4096)
-	MCFG_GFXDECODE_ADD("gfxdecode", bootleg)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_GFXDECODE_ADD("gfxdecode",bootleg,"palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

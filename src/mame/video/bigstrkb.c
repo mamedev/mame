@@ -122,7 +122,7 @@ void bigstrkb_state::video_start()
 
 UINT32 bigstrkb_state::screen_update_bigstrkb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  bitmap.fill(get_black_pen(machine()), cliprect);
+//  bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_tilemap2->set_scrollx(0, m_vidreg1[0]+(256-14));
 	m_tilemap2->set_scrolly(0, m_vidreg2[0]);

@@ -220,8 +220,8 @@ static MACHINE_CONFIG_START( pokechmp, pokechmp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pokechmp_state, screen_update_pokechmp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pokechmp)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_GFXDECODE_ADD("gfxdecode",pokechmp,"palette")
+	MCFG_PALETTE_ADD("palette", 0x400)
 
 
 	/* sound hardware */

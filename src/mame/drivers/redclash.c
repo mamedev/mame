@@ -363,10 +363,10 @@ static MACHINE_CONFIG_START( zerohour, ladybug_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ladybug_state, screen_update_redclash)
 	MCFG_SCREEN_VBLANK_DRIVER(ladybug_state, screen_eof_redclash)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", redclash)
-	MCFG_PALETTE_LENGTH(4*8+4*16+32)
+	MCFG_GFXDECODE_ADD("gfxdecode",redclash,"palette")
+	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
 
-	MCFG_PALETTE_INIT_OVERRIDE(ladybug_state,redclash)
+	MCFG_PALETTE_INIT_OWNER(ladybug_state,redclash)
 	MCFG_VIDEO_START_OVERRIDE(ladybug_state,redclash)
 
 	/* sound hardware */
@@ -391,10 +391,10 @@ static MACHINE_CONFIG_START( redclash, ladybug_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ladybug_state, screen_update_redclash)
 	MCFG_SCREEN_VBLANK_DRIVER(ladybug_state, screen_eof_redclash)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", redclash)
-	MCFG_PALETTE_LENGTH(4*8+4*16+32)
+	MCFG_GFXDECODE_ADD("gfxdecode",redclash,"palette")
+	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
 
-	MCFG_PALETTE_INIT_OVERRIDE(ladybug_state,redclash)
+	MCFG_PALETTE_INIT_OWNER(ladybug_state,redclash)
 	MCFG_VIDEO_START_OVERRIDE(ladybug_state,redclash)
 
 	/* sound hardware */

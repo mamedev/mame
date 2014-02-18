@@ -287,24 +287,24 @@ static GFXDECODE_START( dragrace )
 GFXDECODE_END
 
 
-void dragrace_state::palette_init()
+PALETTE_INIT_MEMBER(dragrace_state, dragrace)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0xFF, 0xFF, 0xFF));   /* 2 color tiles */
-	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 3, MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 4, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 5, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 6, MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 7, MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 8, MAKE_RGB(0xFF, 0xFF, 0xFF));   /* 4 color tiles */
-	palette_set_color(machine(), 9, MAKE_RGB(0xB0, 0xB0, 0xB0));
-	palette_set_color(machine(), 10,MAKE_RGB(0x5F, 0x5F, 0x5F));
-	palette_set_color(machine(), 11,MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 12,MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 13,MAKE_RGB(0x5F, 0x5F, 0x5F));
-	palette_set_color(machine(), 14,MAKE_RGB(0xB0, 0xB0, 0xB0));
-	palette_set_color(machine(), 15,MAKE_RGB(0x00, 0x00, 0x00));
+	palette.set_pen_color(0, MAKE_RGB(0xFF, 0xFF, 0xFF));   /* 2 color tiles */
+	palette.set_pen_color(1, MAKE_RGB(0x00, 0x00, 0x00));
+	palette.set_pen_color(2, MAKE_RGB(0x00, 0x00, 0x00));
+	palette.set_pen_color(3, MAKE_RGB(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(4, MAKE_RGB(0x00, 0x00, 0x00));
+	palette.set_pen_color(5, MAKE_RGB(0x00, 0x00, 0x00));
+	palette.set_pen_color(6, MAKE_RGB(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(7, MAKE_RGB(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(8, MAKE_RGB(0xFF, 0xFF, 0xFF));   /* 4 color tiles */
+	palette.set_pen_color(9, MAKE_RGB(0xB0, 0xB0, 0xB0));
+	palette.set_pen_color(10,MAKE_RGB(0x5F, 0x5F, 0x5F));
+	palette.set_pen_color(11,MAKE_RGB(0x00, 0x00, 0x00));
+	palette.set_pen_color(12,MAKE_RGB(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(13,MAKE_RGB(0x5F, 0x5F, 0x5F));
+	palette.set_pen_color(14,MAKE_RGB(0xB0, 0xB0, 0xB0));
+	palette.set_pen_color(15,MAKE_RGB(0x00, 0x00, 0x00));
 }
 
 
@@ -338,8 +338,8 @@ static MACHINE_CONFIG_START( dragrace, dragrace_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(dragrace_state, screen_update_dragrace)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dragrace)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE_ADD("gfxdecode",dragrace,"palette")
+	MCFG_PALETTE_INIT_OWNER(dragrace_state, dragrace)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

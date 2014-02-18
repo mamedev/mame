@@ -941,8 +941,8 @@ static MACHINE_CONFIG_START( m92, m92_state )
 	MCFG_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
 	MCFG_SCREEN_UPDATE_DRIVER(m92_state, screen_update_m92)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", m92)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",m92,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(m92_state,m92)
 
@@ -1020,8 +1020,8 @@ static MACHINE_CONFIG_START( ppan, m92_state )
 	MCFG_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
 	MCFG_SCREEN_UPDATE_DRIVER(m92_state, screen_update_ppan)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", m92)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",m92,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(m92_state,ppan)
 

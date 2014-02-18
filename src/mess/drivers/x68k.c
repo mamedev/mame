@@ -970,7 +970,7 @@ WRITE16_MEMBER(x68k_state::x68k_vid_w)
 	{
 		COMBINE_DATA(m_video.gfx_pal+offset);
 		val = m_video.gfx_pal[offset];
-		palette_set_color_rgb(machine(),offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		m_palette->set_pen_color(offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
@@ -978,7 +978,7 @@ WRITE16_MEMBER(x68k_state::x68k_vid_w)
 	{
 		COMBINE_DATA(m_video.text_pal+(offset-0x100));
 		val = m_video.text_pal[offset-0x100];
-		palette_set_color_rgb(machine(),offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		m_palette->set_pen_color(offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
@@ -1945,14 +1945,14 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55.45)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-//  MCFG_GFXDECODE_ADD("gfxdecode", x68k)
+//  MCFG_GFXDECODE_ADD("gfxdecode",x68k,"palette")
 	MCFG_SCREEN_SIZE(1096, 568)  // inital setting
 	MCFG_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
 	MCFG_SCREEN_UPDATE_DRIVER(x68k_state, screen_update_x68000)
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 
-	MCFG_PALETTE_LENGTH(65536)
-	MCFG_PALETTE_INIT_OVERRIDE(x68k_state, x68000 )
+	MCFG_PALETTE_ADD("palette", 65536)
+	MCFG_PALETTE_INIT_OWNER(x68k_state, x68000 )
 
 	MCFG_VIDEO_START_OVERRIDE(x68k_state, x68000 )
 

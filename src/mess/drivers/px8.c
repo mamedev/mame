@@ -682,10 +682,10 @@ INPUT_PORTS_END
     VIDEO
 ***************************************************************************/
 
-void px8_state::palette_init()
+PALETTE_INIT_MEMBER(px8_state, px8)
 {
-	palette_set_color_rgb(machine(), 0, 0xa5, 0xad, 0xa5);
-	palette_set_color_rgb(machine(), 1, 0x31, 0x39, 0x10);
+	palette.set_pen_color(0, 0xa5, 0xad, 0xa5);
+	palette.set_pen_color(1, 0x31, 0x39, 0x10);
 }
 
 UINT32 px8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -792,8 +792,8 @@ static MACHINE_CONFIG_START( px8, px8_state )
 	MCFG_SCREEN_SIZE(480, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 63)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", px8)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE_ADD("gfxdecode",px8,"palette")
+	MCFG_PALETTE_ADD("palette", 2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

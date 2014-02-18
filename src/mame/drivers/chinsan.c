@@ -92,13 +92,13 @@ public:
  *
  *************************************/
 
-void chinsan_state::palette_init()
+PALETTE_INIT_MEMBER(chinsan_state, chinsan)
 {
 	UINT8 *src = memregion( "color_proms" )->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
-		palette_set_color_rgb(machine(), i, pal4bit(src[i + 0x200]), pal4bit(src[i + 0x100]), pal4bit(src[i + 0x000]));
+		palette.set_pen_color(i, pal4bit(src[i + 0x200]), pal4bit(src[i + 0x100]), pal4bit(src[i + 0x000]));
 }
 
 void chinsan_state::video_start()
@@ -612,8 +612,8 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_SCREEN_VISIBLE_AREA(24, 512-24-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(chinsan_state, screen_update_chinsan)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chinsan)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE_ADD("gfxdecode",chinsan,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 	/* sound hardware */

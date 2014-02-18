@@ -276,7 +276,7 @@ UINT32 tmspoker_state::screen_update_tmspoker(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void tmspoker_state::palette_init()
+PALETTE_INIT_MEMBER(tmspoker_state, tmspoker)
 {
 }
 
@@ -596,9 +596,9 @@ static MACHINE_CONFIG_START( tmspoker, tmspoker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tmspoker_state, screen_update_tmspoker)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tmspoker)
+	MCFG_GFXDECODE_ADD("gfxdecode",tmspoker,"palette")
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4, mc6845_intf) /* guess */
 

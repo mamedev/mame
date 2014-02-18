@@ -520,7 +520,7 @@ UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind
 	return 0;
 }
 
-void amaticmg_state::palette_init()
+PALETTE_INIT_MEMBER(amaticmg_state, amaticmg)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
@@ -541,7 +541,7 @@ void amaticmg_state::palette_init()
 		bit2 = (color_prom[0] >> 5) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -559,7 +559,7 @@ PALETTE_INIT_MEMBER(amaticmg_state,amaticmg2)
 		g = ((color_prom[0] & 0xc0) >> 6) | ((color_prom[1] & 0x7) << 2);
 		r = ((color_prom[0] & 0x3e) >> 1);
 
-		palette_set_color_rgb(machine(), i >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette.set_pen_color(i >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 		color_prom+=2;
 	}
 }
@@ -882,9 +882,9 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", amaticmg)
+	MCFG_GFXDECODE_ADD("gfxdecode",amaticmg,"palette")
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 
 	/* sound hardware */
@@ -916,8 +916,8 @@ static MACHINE_CONFIG_DERIVED( amaticmg2, amaticmg )
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", amaticmg2)
-	MCFG_PALETTE_INIT_OVERRIDE(amaticmg_state,amaticmg2)
-	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_PALETTE_INIT_OWNER(amaticmg_state,amaticmg2)
+	MCFG_PALETTE_ADD("palette", 0x10000)
 MACHINE_CONFIG_END
 
 

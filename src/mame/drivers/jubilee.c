@@ -220,7 +220,7 @@ UINT32 jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_ind16
 }
 
 
-void jubilee_state::palette_init()
+PALETTE_INIT_MEMBER(jubilee_state, jubilee)
 {
 }
 
@@ -467,8 +467,8 @@ static MACHINE_CONFIG_START( jubileep, jubilee_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jubilee_state, screen_update_jubileep)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jubileep)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",jubileep,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 

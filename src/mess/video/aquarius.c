@@ -51,17 +51,15 @@ static const unsigned short aquarius_palette[] =
 	0,15, 1,15, 2,15, 3,15, 4,15, 5,15, 6,15, 7,15, 8,15, 9,15,10,15,11,15,12,15,13,15,14,15,15,15,
 };
 
-void aquarius_state::palette_init()
+PALETTE_INIT_MEMBER(aquarius_state, aquarius)
 {
 	int i;
 
-	machine().colortable = colortable_alloc(machine(), 16);
-
 	for (i = 0; i < 16; i++)
-		colortable_palette_set_color(machine().colortable, i, aquarius_colors[i]);
+		m_palette->set_indirect_color(i, aquarius_colors[i]);
 
 	for (i = 0; i < 512; i++)
-		colortable_entry_set_value(machine().colortable, i, aquarius_palette[i]);
+		m_palette->set_pen_indirect(i, aquarius_palette[i]);
 }
 
 WRITE8_MEMBER(aquarius_state::aquarius_videoram_w)

@@ -175,7 +175,7 @@ UINT32 jantotsu_state::screen_update_jantotsu(screen_device &screen, bitmap_rgb3
 					color |= (((m_bitmap[count + pen_i*0x2000]) >> (7 - i)) & 1) << pen_i;
 
 				if (cliprect.contains(x + i, y))
-					bitmap.pix32(y, x + i) = machine().pens[color];
+					bitmap.pix32(y, x + i) = m_palette->pen(color);
 			}
 
 			count++;
@@ -207,7 +207,7 @@ WRITE8_MEMBER(jantotsu_state::bankaddr_w)
 		logerror("I/O port $07 write trips %02x\n",data);
 }
 
-void jantotsu_state::palette_init()
+PALETTE_INIT_MEMBER(jantotsu_state, jantotsu)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2, r, g, b;
@@ -228,7 +228,7 @@ void jantotsu_state::palette_init()
 		bit2 = (color_prom[0] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -519,7 +519,7 @@ static MACHINE_CONFIG_START( jantotsu, jantotsu_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jantotsu_state, screen_update_jantotsu)
 
-	MCFG_PALETTE_LENGTH(0x20)
+	MCFG_PALETTE_ADD("palette", 0x20)
 
 
 	/* sound hardware */

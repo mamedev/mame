@@ -78,24 +78,12 @@ TILEMAP_MAPPER_MEMBER(atarigt_state::atarigt_playfield_scan)
 
 VIDEO_START_MEMBER(atarigt_state,atarigt)
 {
-	pen_t *substitute_pens;
-	int i, width, height;
-
 	/* blend the playfields and free the temporary one */
 	blend_gfx(0, 2, 0x0f, 0x30);
 
 	/* allocate temp bitmaps */
-	width = m_screen->width();
-	height = m_screen->height();
-
-	m_pf_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
-	m_an_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
-
-	/* map pens 1:1 */
-	substitute_pens = auto_alloc_array(machine(), pen_t, 65536);
-	for (i = 0; i < machine().total_colors(); i++)
-		substitute_pens[i] = i;
-	machine().pens = substitute_pens;
+	m_screen->register_screen_bitmap(m_pf_bitmap);
+	m_screen->register_screen_bitmap(m_an_bitmap);
 
 	/* reset statics */
 	memset(m_colorram, 0, 0x80000);
@@ -506,10 +494,10 @@ UINT32 atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb32 
 	int x, y;
 
 	/* draw the playfield */
-	m_playfield_tilemap->draw(screen, *m_pf_bitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(screen, m_pf_bitmap, cliprect, 0, 0);
 
 	/* draw the alpha layer */
-	m_alpha_tilemap->draw(screen, *m_an_bitmap, cliprect, 0, 0);
+	m_alpha_tilemap->draw(screen, m_an_bitmap, cliprect, 0, 0);
 
 	/* cache pointers */
 	color_latch = m_colorram[0x30000/2];
@@ -520,8 +508,8 @@ UINT32 atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb32 
 	/* now do the nasty blend */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *an = &m_an_bitmap->pix16(y);
-		UINT16 *pf = &m_pf_bitmap->pix16(y);
+		UINT16 *an = &m_an_bitmap.pix16(y);
+		UINT16 *pf = &m_pf_bitmap.pix16(y);
 		UINT16 *mo = &mo_bitmap.pix16(y);
 		UINT16 *tm = &tm_bitmap.pix16(y);
 		UINT32 *dst = &bitmap.pix32(y);

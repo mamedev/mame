@@ -229,7 +229,7 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ti990_10_state, screen_update_ti990_10)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vdt911)
+	MCFG_GFXDECODE_ADD("gfxdecode",vdt911,"palette")
 	MCFG_PALETTE_LENGTH(8)
 
 	MCFG_VDT911_VIDEO_ADD("vdt911", vdt911_intf)

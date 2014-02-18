@@ -1040,7 +1040,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_lcd_palette_w )
 	{
 		verboselog( device->machine(), 0, "s3c24xx_lcd_palette_w: unknown mask %08x\n", mem_mask);
 	}
-	palette_set_color( device->machine(), offset, s3c24xx_get_color_tft_16( device, data & 0xFFFF));
+	m_palette->set_pen_color( offset, s3c24xx_get_color_tft_16( device, data & 0xFFFF));
 }
 
 /* Clock & Power Management */

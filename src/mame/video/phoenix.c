@@ -87,7 +87,7 @@ PALETTE_INIT_MEMBER(phoenix_state,phoenix)
 	{
 		int col;
 		col = ((i << 3 ) & 0x18) | ((i>>2) & 0x07) | (i & 0x60);
-		palette_set_color(machine(),i,rgb[col]);
+		palette.set_pen_color(i,rgb[col]);
 	}
 	machine().palette->normalize_range(0, 255);
 	auto_free(machine(), rgb);
@@ -105,7 +105,7 @@ PALETTE_INIT_MEMBER(phoenix_state,survival)
 	{
 		int col;
 		col = ((i << 3 ) & 0x18) | ((i>>2) & 0x07) | (i & 0x60);
-		palette_set_color(machine(),i,rgb[col]);
+		palette.set_pen_color(i,rgb[col]);
 	}
 	machine().palette->normalize_range(0, 255);
 	auto_free(machine(), rgb);
@@ -123,7 +123,7 @@ PALETTE_INIT_MEMBER(phoenix_state,pleiads)
 	{
 		int col;
 		col = ((i << 3 ) & 0x18) | ((i>>2) & 0x07) | (i & 0xE0);
-		palette_set_color(machine(),i,rgb[col]);
+		palette.set_pen_color(i,rgb[col]);
 	}
 	machine().palette->normalize_range(0, 255);
 	auto_free(machine(), rgb);

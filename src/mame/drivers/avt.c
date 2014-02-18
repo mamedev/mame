@@ -533,7 +533,7 @@ UINT32 avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-void avt_state::palette_init()
+PALETTE_INIT_MEMBER(avt_state, avt)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 /*  prom bits
@@ -549,7 +549,7 @@ void avt_state::palette_init()
 	/* 0000BGRI */
 	if (color_prom == 0) return;
 
-	for (j = 0; j < machine().total_colors(); j++)
+	for (j = 0; j < palette.entries(); j++)
 	{
 		int bit1, bit2, bit3, r, g, b, inten, intenmin, intenmax, i;
 
@@ -578,9 +578,9 @@ void avt_state::palette_init()
 
 		/* hack to switch cyan->magenta for highlighted background */
 		if (j == 0x40)
-			palette_set_color(machine(), j, MAKE_RGB(g, r, b)); // Why this one has R-G swapped?...
+			palette.set_pen_color(j, MAKE_RGB(g, r, b)); // Why this one has R-G swapped?...
 		else
-			palette_set_color(machine(), j, MAKE_RGB(r, g, b));
+			palette.set_pen_color(j, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -906,9 +906,9 @@ static MACHINE_CONFIG_START( avt, avt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* 240x224 (through CRTC) */
 	MCFG_SCREEN_UPDATE_DRIVER(avt_state, screen_update_avt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", avt)
+	MCFG_GFXDECODE_ADD("gfxdecode",avt,"palette")
 
-	MCFG_PALETTE_LENGTH(8*16)
+	MCFG_PALETTE_ADD("palette", 8*16)
 
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)    /* guess */

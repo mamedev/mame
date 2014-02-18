@@ -27,7 +27,7 @@ void dassault_state::video_start()
 void dassault_state::mixdassaultlayer(bitmap_rgb32 &bitmap, bitmap_ind16* sprite_bitmap, const rectangle &cliprect, UINT16 pri, UINT16 primask, UINT16 penbase, UINT8 alpha)
 {
 	int y, x;
-	const pen_t *paldata = machine().pens;
+	const pen_t *paldata = &m_palette->pen(0);
 
 	UINT16* srcline;
 	UINT32* dstline;
@@ -89,7 +89,7 @@ UINT32 dassault_state::screen_update_dassault(screen_device &screen, bitmap_rgb3
 
 	/* Draw playfields/update priority bitmap */
 	screen.priority().fill(0, cliprect);
-	bitmap.fill(machine().pens[3072], cliprect);
+	bitmap.fill(m_palette->pen(3072), cliprect);
 	m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* The middle playfields can be swapped priority-wise */

@@ -146,7 +146,7 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 
 //  popmessage("%d %d %d %d",mc6845_v_char_total,mc6845_v_total_adj,mc6845_v_display,mc6845_v_sync_pos);
 
-	bitmap.fill(machine().pens[m_backdrop_pen], cliprect);
+	bitmap.fill(m_palette->pen(m_backdrop_pen), cliprect);
 
 	x_width = ((m_display_reg & 0x80) >> 7);
 
@@ -164,23 +164,23 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 				/* todo: clean this up! */
 				//if(x_width)
 				{
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = machine().pens[color];
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = machine().pens[color];
+					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = m_palette->pen(color);
 				}
 				//else
 				//{
-				//  bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = machine().pens[color];
+				//  bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = m_palette->pen(color);
 				//}
 
 				color = (m_gvram[count] & 0x0f) >> 0;
 				//if(x_width)
 				{
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = machine().pens[color];
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = machine().pens[color];
+					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = m_palette->pen(color);
+					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = m_palette->pen(color);
 				}
 				//else
 				//{
-				//  bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = machine().pens[color];
+				//  bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = m_palette->pen(color);
 				//}
 
 				count++;
@@ -233,11 +233,11 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 					{
 						if(x_width)
 						{
-							bitmap.pix16(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+0+CRTC_MIN_X) = machine().pens[pen];
-							bitmap.pix16(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+1+CRTC_MIN_X) = machine().pens[pen];
+							bitmap.pix16(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+0+CRTC_MIN_X) = m_palette->pen(pen);
+							bitmap.pix16(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+1+CRTC_MIN_X) = m_palette->pen(pen);
 						}
 						else
-							bitmap.pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = machine().pens[pen];
+							bitmap.pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = m_palette->pen(pen);
 					}
 				}
 			}
@@ -264,11 +264,11 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 						{
 							if(x_width)
 							{
-								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+0+CRTC_MIN_X) = machine().pens[0x7];
-								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+1+CRTC_MIN_X) = machine().pens[0x7];
+								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+0+CRTC_MIN_X) = m_palette->pen(0x7);
+								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+1+CRTC_MIN_X) = m_palette->pen(0x7);
 							}
 							else
-								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = machine().pens[0x7];
+								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = m_palette->pen(0x7);
 						}
 					}
 				}
@@ -564,9 +564,9 @@ WRITE8_MEMBER(smc777_state::smc777_ramdac_w)
 
 	switch((offset & 0x3000) >> 12)
 	{
-		case 0: m_pal.r = (data & 0xf0) >> 4; palette_set_color_rgb(machine(), pal_index, pal4bit(m_pal.r), pal4bit(m_pal.g), pal4bit(m_pal.b)); break;
-		case 1: m_pal.g = (data & 0xf0) >> 4; palette_set_color_rgb(machine(), pal_index, pal4bit(m_pal.r), pal4bit(m_pal.g), pal4bit(m_pal.b)); break;
-		case 2: m_pal.b = (data & 0xf0) >> 4; palette_set_color_rgb(machine(), pal_index, pal4bit(m_pal.r), pal4bit(m_pal.g), pal4bit(m_pal.b)); break;
+		case 0: m_pal.r = (data & 0xf0) >> 4; m_palette->set_pen_color(pal_index, pal4bit(m_pal.r), pal4bit(m_pal.g), pal4bit(m_pal.b)); break;
+		case 1: m_pal.g = (data & 0xf0) >> 4; m_palette->set_pen_color(pal_index, pal4bit(m_pal.r), pal4bit(m_pal.g), pal4bit(m_pal.b)); break;
+		case 2: m_pal.b = (data & 0xf0) >> 4; m_palette->set_pen_color(pal_index, pal4bit(m_pal.r), pal4bit(m_pal.g), pal4bit(m_pal.b)); break;
 		case 3: printf("RAMdac used with gradient index = 3! pal_index = %02x data = %02x\n",pal_index,data); break;
 	}
 }
@@ -986,7 +986,7 @@ void smc777_state::machine_start()
 	save_pointer(NAME(m_gvram), 0x8000);
 	save_pointer(NAME(m_pcg), 0x800);
 
-	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), smc777_charlayout, (UINT8 *)m_pcg, 8, 0)));
+	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), m_palette, smc777_charlayout, (UINT8 *)m_pcg, 8, 0)));
 }
 
 void smc777_state::machine_reset()
@@ -1017,7 +1017,7 @@ static MC6845_INTERFACE( mc6845_intf )
 };
 
 /* set-up SMC-70 mode colors */
-void smc777_state::palette_init()
+PALETTE_INIT_MEMBER(smc777_state, smc777)
 {
 	int i;
 
@@ -1029,8 +1029,8 @@ void smc777_state::palette_init()
 		g = (i & 2) >> 1;
 		b = (i & 1) >> 0;
 
-		palette_set_color_rgb(machine(), i, pal1bit(r),pal1bit(g),pal1bit(b));
-		palette_set_color_rgb(machine(), i+8, pal1bit(0),pal1bit(0),pal1bit(0));
+		palette.set_pen_color(i, pal1bit(r),pal1bit(g),pal1bit(b));
+		palette.set_pen_color(i+8, pal1bit(0),pal1bit(0),pal1bit(0));
 	}
 }
 
@@ -1088,9 +1088,9 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
 	MCFG_SCREEN_UPDATE_DRIVER(smc777_state, screen_update_smc777)
 
-	MCFG_PALETTE_LENGTH(0x20) // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
+	MCFG_PALETTE_ADD("palette", 0x20) // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 

@@ -291,16 +291,16 @@ static GFXDECODE_START( warpspeed )
 	GFXDECODE_ENTRY( "gfx2", 0, warpspeed_charlayout,   0, 1  )
 GFXDECODE_END
 
-void warpspeed_state::palette_init()
+PALETTE_INIT_MEMBER(warpspeed_state, warpspeed)
 {
 	// tilemaps
-	palette_set_color(machine(),0,RGB_BLACK); /* black */
-	palette_set_color(machine(),1,RGB_WHITE); /* white */
+	palette.set_pen_color(0,RGB_BLACK); /* black */
+	palette.set_pen_color(1,RGB_WHITE); /* white */
 
 	// circles
 	for ( int i = 0; i < 8; i++ )
 	{
-		palette_set_color_rgb(machine(), 2 + i, 0xff*BIT(i,0), 0xff*BIT(i,1), 0xff*BIT(i,2));
+		palette.set_pen_color(2 + i, 0xff*BIT(i,0), 0xff*BIT(i,1), 0xff*BIT(i,2));
 	}
 }
 
@@ -321,8 +321,8 @@ static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(warpspeed_state, screen_update_warpspeed)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", warpspeed)
-	MCFG_PALETTE_LENGTH(2+8)
+	MCFG_GFXDECODE_ADD("gfxdecode",warpspeed,"palette")
+	MCFG_PALETTE_ADD("palette", 2+8)
 MACHINE_CONFIG_END
 
 ROM_START( warpsped )

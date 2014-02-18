@@ -52,7 +52,7 @@ PALETTE_INIT_MEMBER(shanghai_state,shanghai)
 	int i;
 
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -73,7 +73,7 @@ PALETTE_INIT_MEMBER(shanghai_state,shanghai)
 		bit2 = (i >> 1) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -453,9 +453,9 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
 	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_PALETTE_INIT_OVERRIDE(shanghai_state,shanghai)
+	MCFG_PALETTE_INIT_OWNER(shanghai_state,shanghai)
 
 	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 
@@ -486,7 +486,7 @@ static MACHINE_CONFIG_START( shangha2, shanghai_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
 	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
@@ -521,7 +521,7 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
 	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)

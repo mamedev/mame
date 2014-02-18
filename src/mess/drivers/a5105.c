@@ -516,7 +516,7 @@ static GFXDECODE_START( a5105 )
 GFXDECODE_END
 
 
-void a5105_state::palette_init()
+PALETTE_INIT_MEMBER(a5105_state, a5105)
 {
 	int i;
 	int r,g,b;
@@ -527,7 +527,7 @@ void a5105_state::palette_init()
 		g = i & 2 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
 		b = i & 1 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
 
-		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
+		palette.set_pen_color(i, MAKE_RGB(r,g,b));
 	}
 }
 
@@ -599,8 +599,8 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", a5105)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE_ADD("gfxdecode",a5105,"palette")
+	MCFG_PALETTE_ADD("palette", 16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

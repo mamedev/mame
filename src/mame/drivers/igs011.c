@@ -315,7 +315,7 @@ UINT32 igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 &b
 
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
-				bitmap.pix16(y, x) = get_black_pen(machine());
+				bitmap.pix16(y, x) = m_palette->black_pen();
 			else
 #endif
 				bitmap.pix16(y, x) = m_layer[l][scr_addr] | (l << 8);
@@ -389,7 +389,7 @@ WRITE16_MEMBER(igs011_state::igs011_palette)
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
 	rgb = (m_generic_paletteram_16[offset & 0x7ff] & 0xff) | ((m_generic_paletteram_16[offset | 0x800] & 0xff) << 8);
-	palette_set_color_rgb(machine(),offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
+	m_palette->set_pen_color(offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
 }
 
 /***************************************************************************
@@ -3941,8 +3941,8 @@ static MACHINE_CONFIG_START( igs011_base, igs011_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs011_state, screen_update_igs011)
 
-	MCFG_PALETTE_LENGTH(0x800)
-//  MCFG_GFXDECODE_ADD("gfxdecode", igs011)
+	MCFG_PALETTE_ADD("palette", 0x800)
+//  MCFG_GFXDECODE_ADD("gfxdecode",igs011,"palette")
 
 
 	/* sound hardware */
@@ -4035,7 +4035,7 @@ static MACHINE_CONFIG_DERIVED( lhb2, igs011_base )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
 	MCFG_TIMER_ADD_PERIODIC("timer_irq", lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", igs011_hi)
+//  MCFG_GFXDECODE_ADD("gfxdecode",igs011_hi,"palette")
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -4051,7 +4051,7 @@ static MACHINE_CONFIG_DERIVED( nkishusp, igs011_base )
 
 	// VSync 60.0052Hz, HSync 15.620kHz
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", igs011_hi)
+//  MCFG_GFXDECODE_ADD("gfxdecode",igs011_hi,"palette")
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -4074,7 +4074,7 @@ static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_DRIVER(igs011_state, screen_eof_vbowl)
-//  MCFG_GFXDECODE_ADD("gfxdecode", igs011_hi)
+//  MCFG_GFXDECODE_ADD("gfxdecode",igs011_hi,"palette")
 
 	MCFG_DEVICE_REMOVE("oki")
 	MCFG_ICS2115_ADD("ics", 0, sound_irq)

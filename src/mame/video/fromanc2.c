@@ -77,7 +77,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_paletteram_0_w)
 
 	// GGGG_GRRR_RRBB_BBBx
 	color = ((offset & 0x0700) << 1) + (offset & 0x00ff);
-	palette_set_color_rgb(machine(), 0x000 + color, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
+	m_palette->set_pen_color(0x000 + color, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
 }
 
 WRITE16_MEMBER(fromanc2_state::fromanc2_paletteram_1_w)
@@ -88,7 +88,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_paletteram_1_w)
 
 	// GGGG_GRRR_RRBB_BBBx
 	color = ((offset & 0x0700) << 1) + (offset & 0x00ff);
-	palette_set_color_rgb(machine(), 0x100 + color, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
+	m_palette->set_pen_color(0x100 + color, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
 }
 
 
@@ -110,7 +110,7 @@ WRITE16_MEMBER(fromanc2_state::fromancr_paletteram_0_w)
 
 	// xGGG_GGRR_RRRB_BBBB
 	color = ((offset & 0x0700) << 1) + (offset & 0x00ff);
-	palette_set_color_rgb(machine(), 0x000 + color, pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
+	m_palette->set_pen_color(0x000 + color, pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
 }
 
 WRITE16_MEMBER(fromanc2_state::fromancr_paletteram_1_w)
@@ -121,7 +121,7 @@ WRITE16_MEMBER(fromanc2_state::fromancr_paletteram_1_w)
 
 	// xGGG_GGRR_RRRB_BBBB
 	color = ((offset & 0x0700) << 1) + (offset & 0x00ff);
-	palette_set_color_rgb(machine(), 0x100 + color, pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
+	m_palette->set_pen_color(0x100 + color, pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
 }
 
 
@@ -143,7 +143,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_paletteram_0_w)
 
 	// xRRR_RRGG_GGGB_BBBB
 	color = ((offset & 0x0700) << 1) + (offset & 0x00ff);
-	palette_set_color_rgb(machine(), 0x000 + color, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	m_palette->set_pen_color(0x000 + color, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 WRITE16_MEMBER(fromanc2_state::fromanc4_paletteram_1_w)
@@ -154,7 +154,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_paletteram_1_w)
 
 	// xRRR_RRGG_GGGB_BBBB
 	color = ((offset & 0x0700) << 1) + (offset & 0x00ff);
-	palette_set_color_rgb(machine(), 0x100 + color, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	m_palette->set_pen_color(0x100 + color, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 

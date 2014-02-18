@@ -1168,8 +1168,8 @@ static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 46*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(coinmstr_state, screen_update_coinmstr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", coinmstr)
-	MCFG_PALETTE_LENGTH(46*32*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",coinmstr,"palette")
+	MCFG_PALETTE_ADD("palette", 46*32*4)
 
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 14000000 / 16, h46505_intf)

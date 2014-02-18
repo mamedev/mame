@@ -228,8 +228,8 @@ static MACHINE_CONFIG_START( xyonix, xyonix_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*4-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xyonix_state, screen_update_xyonix)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", xyonix)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",xyonix,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	/* sound hardware */

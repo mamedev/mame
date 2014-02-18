@@ -437,7 +437,7 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
 
@@ -483,7 +483,7 @@ static MACHINE_CONFIG_START( aristmk5_usa, aristmk5_state )
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
 

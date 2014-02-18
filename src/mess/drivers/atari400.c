@@ -922,13 +922,13 @@ static const UINT8 atari_palette[256*3] =
 
 
 /* Initialise the palette */
-void a400_state::palette_init()
+PALETTE_INIT_MEMBER(a400_state, a400)
 {
 	int i;
 
 	for ( i = 0; i < sizeof(atari_palette) / 3; i++ )
 	{
-		palette_set_color_rgb(machine(), i, atari_palette[i*3], atari_palette[i*3+1], atari_palette[i*3+2]);
+		palette.set_pen_color(i, atari_palette[i*3], atari_palette[i*3+1], atari_palette[i*3+2]);
 	}
 }
 /******************************************************************
@@ -2481,7 +2481,7 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
 	MCFG_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
-	MCFG_PALETTE_LENGTH(sizeof(atari_palette) / 3)
+	MCFG_PALETTE_ADD("palette", sizeof(atari_palette) / 3)
 	MCFG_SCREEN_UPDATE_STATIC(atari)
 
 	MCFG_VIDEO_START(atari)

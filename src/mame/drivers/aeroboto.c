@@ -261,11 +261,11 @@ static MACHINE_CONFIG_START( formatz, aeroboto_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aeroboto_state, screen_update_aeroboto)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", aeroboto)
+	MCFG_GFXDECODE_ADD("gfxdecode",aeroboto,"palette")
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_STANDARD(RRRR_GGGG_BBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

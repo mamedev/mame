@@ -651,10 +651,10 @@ INPUT_PORTS_END
 //  VIDEO
 //**************************************************************************
 
-void portfolio_state::palette_init()
+PALETTE_INIT_MEMBER(portfolio_state, portfolio)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
+	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
 }
 
 
@@ -851,9 +851,9 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", portfolio)
+	MCFG_GFXDECODE_ADD("gfxdecode",portfolio,"palette")
 
 	MCFG_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
 

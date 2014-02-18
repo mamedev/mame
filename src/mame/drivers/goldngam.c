@@ -283,7 +283,7 @@ UINT32 goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_ind1
 }
 
 
-void goldngam_state::palette_init()
+PALETTE_INIT_MEMBER(goldngam_state, goldngam)
 {
 }
 
@@ -569,9 +569,9 @@ static MACHINE_CONFIG_START( swisspkr, goldngam_state )
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 43*8-1, 1*8, 37*8-1)  // 312x288
 	MCFG_SCREEN_UPDATE_DRIVER(goldngam_state, screen_update_goldngam)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", goldngam)
+	MCFG_GFXDECODE_ADD("gfxdecode",goldngam,"palette")
 
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */

@@ -1828,8 +1828,8 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 		m_mikey.data[offset] = data;
 
 		/* RED = 0xb- & 0x0f, GREEN = 0xa- & 0x0f, BLUE = (0xb- & 0xf0) >> 4 */
-		m_palette[offset & 0x0f] = machine().pens[
-			((m_mikey.data[0xb0 + (offset & 0x0f)] & 0x0f)) |
+		m_palette[offset & 0x0f] = m_palette->pen(
+			((m_mikey.data[0xb0 + (offset & 0x0f)) & 0x0f)) |
 			((m_mikey.data[0xa0 + (offset & 0x0f)] & 0x0f) << 4) |
 			((m_mikey.data[0xb0 + (offset & 0x0f)] & 0xf0) << 4)];
 		break;

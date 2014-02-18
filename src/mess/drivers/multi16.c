@@ -76,7 +76,7 @@ UINT32 multi16_state::screen_update_multi16(screen_device &screen, bitmap_ind16 
 				int dot = (BITSWAP16(m_p_vram[count],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-xi)) & 0x1;
 
 				if(screen.visible_area().contains(x*16+xi, y))
-					bitmap.pix16(y, x*16+xi) = machine().pens[dot];
+					bitmap.pix16(y, x*16+xi) = m_palette->pen(dot);
 			}
 
 			count++;
@@ -168,7 +168,7 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(multi16_state, screen_update_multi16)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/5, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */

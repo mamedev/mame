@@ -369,8 +369,8 @@ static MACHINE_CONFIG_START( crbaloon, crbaloon_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", crbaloon)
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE_ADD("gfxdecode",crbaloon,"palette")
+	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

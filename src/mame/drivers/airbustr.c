@@ -324,7 +324,7 @@ WRITE8_MEMBER(airbustr_state::airbustr_paletteram_w)
 	m_paletteram[offset] = data;
 	val = (m_paletteram[offset | 1] << 8) | m_paletteram[offset & ~1];
 
-	palette_set_color_rgb(machine(), offset / 2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
+	m_palette->set_pen_color(offset / 2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
 }
 
 WRITE8_MEMBER(airbustr_state::airbustr_coin_counter_w)
@@ -636,8 +636,8 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(airbustr_state, screen_update_airbustr)
 	MCFG_SCREEN_VBLANK_DRIVER(airbustr_state, screen_eof_airbustr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", airbustr)
-	MCFG_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE_ADD("gfxdecode",airbustr,"palette")
+	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", airbustr_pandora_config)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")

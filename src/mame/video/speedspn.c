@@ -89,7 +89,7 @@ UINT32 speedspn_state::screen_update_speedspn(screen_device &screen, bitmap_ind1
 {
 	if (m_display_disable)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 

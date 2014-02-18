@@ -45,7 +45,7 @@ UINT32 intrscti_state::screen_update_intrscti(screen_device &screen, bitmap_ind1
 	int y,x;
 	int count;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	count = 0;
 	for (y=0;y<32;y++)
@@ -191,8 +191,8 @@ static MACHINE_CONFIG_START( intrscti, intrscti_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(intrscti_state, screen_update_intrscti)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", intrscti)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE_ADD("gfxdecode",intrscti,"palette")
+	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 
 

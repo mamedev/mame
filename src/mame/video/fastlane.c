@@ -2,13 +2,10 @@
 #include "includes/fastlane.h"
 
 
-void fastlane_state::palette_init()
+PALETTE_INIT_MEMBER(fastlane_state, fastlane)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int pal;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x400);
 
 	for (pal = 0; pal < 0x10; pal++)
 	{
@@ -17,7 +14,7 @@ void fastlane_state::palette_init()
 		for (i = 0; i < 0x400; i++)
 		{
 			UINT8 ctabentry = (i & 0x3f0) | color_prom[(pal << 4) | (i & 0x0f)];
-			colortable_entry_set_value(machine().colortable, (pal << 10) | i, ctabentry);
+			palette.set_pen_indirect((pal << 10) | i, ctabentry);
 		}
 	}
 }
@@ -33,7 +30,7 @@ void fastlane_state::set_pens(  )
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine().colortable, i >> 1, color);
+		m_palette->set_indirect_color(i >> 1, color);
 	}
 }
 

@@ -278,8 +278,8 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sprcros2_state, screen_update_sprcros2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sprcros2)
-	MCFG_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE_ADD("gfxdecode",sprcros2,"palette")
+	MCFG_PALETTE_ADD("palette", 768)
 
 
 	/* sound hardware */

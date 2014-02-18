@@ -223,7 +223,7 @@ UINT32 mlanding_state::screen_update_mlanding(screen_device &screen, bitmap_ind1
 
 		for (UINT32 x = cliprect.min_x; x <= cliprect.max_x; ++x)
 		{
-			*dst++ = pens[*src++ & 0x3fff];
+			*dst++ = m_palette->pen(*src++ & 0x3fff);
 		}
 	}
 
@@ -993,7 +993,7 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 	MCFG_SCREEN_RAW_PARAMS(16000000, 640, 0, 512, 462, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(mlanding_state, screen_update_mlanding)
 
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD("palette", 32768)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

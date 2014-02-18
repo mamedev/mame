@@ -109,7 +109,7 @@ void gamecstl_state::video_start()
 {
 	int i;
 	for (i=0; i < 16; i++)
-		palette_set_color(machine(), i, cga_palette[i]);
+		m_palette->set_pen_color(i, cga_palette[i]);
 }
 
 void gamecstl_state::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
@@ -448,8 +448,8 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
 	MCFG_SCREEN_UPDATE_DRIVER(gamecstl_state, screen_update_gamecstl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", CGA)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE_ADD("gfxdecode",CGA,"palette")
+	MCFG_PALETTE_ADD("palette", 16)
 
 
 MACHINE_CONFIG_END

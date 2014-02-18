@@ -549,7 +549,7 @@ static MACHINE_CONFIG_START( rbmk, rbmk_state )
 	MCFG_CPU_IO_MAP(rbmk_mcu_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  mcu_irq)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rbmk)
+	MCFG_GFXDECODE_ADD("gfxdecode",rbmk,"palette")
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -559,7 +559,7 @@ static MACHINE_CONFIG_START( rbmk, rbmk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rbmk_state, screen_update_rbmk)
 
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")

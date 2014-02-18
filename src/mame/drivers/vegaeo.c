@@ -113,7 +113,7 @@ WRITE32_MEMBER(vegaeo_state::vega_palette_w)
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
 	paldata = m_generic_paletteram_32[offset] & 0x7fff;
-	palette_set_color_rgb(machine(), offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	m_palette->set_pen_color(offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 }
 
 WRITE32_MEMBER(vegaeo_state::vega_misc_w)
@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( vega, vegaeo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(vegaeo_state, screen_update_vega)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(vegaeo_state,vega)
 

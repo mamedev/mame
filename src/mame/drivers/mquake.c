@@ -397,8 +397,8 @@ static MACHINE_CONFIG_START( mquake, mquake_state )
 	MCFG_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mquake_state, screen_update_amiga)
 
-	MCFG_PALETTE_LENGTH(4096)
-	MCFG_PALETTE_INIT_OVERRIDE(mquake_state,amiga)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_INIT_OWNER(mquake_state,amiga)
 
 	MCFG_VIDEO_START_OVERRIDE(mquake_state,amiga)
 

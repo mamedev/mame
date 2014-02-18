@@ -33,8 +33,6 @@ PALETTE_INIT( pocketc )
 {
 	UINT8 i=0, r, b, g, color_count = 6;
 
-	machine.colortable = colortable_alloc(machine, color_count);
-
 	while (color_count--)
 	{
 		r = pocketc_palette[i++]; g = pocketc_palette[i++]; b = pocketc_palette[i++];

@@ -933,7 +933,7 @@ static const rgb_t apple2_palette[] =
 /* Initialize the palette */
 PALETTE_INIT_MEMBER(apple2_state,apple2)
 {
-	palette_set_colors(machine(), 0, apple2_palette, ARRAY_LENGTH(apple2_palette));
+	palette.set_pen_colors(0, apple2_palette, ARRAY_LENGTH(apple2_palette));
 }
 
 static const cassette_interface apple2_cassette_interface =
@@ -1019,8 +1019,8 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
 	MCFG_SCREEN_UPDATE_DRIVER(apple2_state, screen_update_apple2)
 
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(apple2_palette))
-	MCFG_PALETTE_INIT_OVERRIDE(apple2_state,apple2)
+	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(apple2_palette))
+	MCFG_PALETTE_INIT_OWNER(apple2_state,apple2)
 
 	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2)
 

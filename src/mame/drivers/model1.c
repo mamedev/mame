@@ -1520,7 +1520,7 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
@@ -1532,7 +1532,7 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(model1_state, screen_update_model1)
 	MCFG_SCREEN_VBLANK_DRIVER(model1_state, screen_eof_model1)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
@@ -1563,7 +1563,7 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1_vr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
@@ -1575,7 +1575,7 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(model1_state, screen_update_model1)
 	MCFG_SCREEN_VBLANK_DRIVER(model1_state, screen_eof_model1)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 

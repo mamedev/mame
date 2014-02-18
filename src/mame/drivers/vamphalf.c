@@ -252,10 +252,10 @@ WRITE32_MEMBER(vamphalf_state::paletteram32_w)
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
 	paldata = m_generic_paletteram_32[offset] & 0xffff;
-	palette_set_color_rgb(machine(), offset*2 + 1, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	m_palette->set_pen_color(offset*2 + 1, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 
 	paldata = (m_generic_paletteram_32[offset] >> 16) & 0xffff;
-	palette_set_color_rgb(machine(), offset*2 + 0, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	m_palette->set_pen_color(offset*2 + 0, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 }
 
 READ32_MEMBER(vamphalf_state::wyvernwg_prot_r)
@@ -997,8 +997,8 @@ static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_SCREEN_VISIBLE_AREA(31, 350, 16, 251)
 	MCFG_SCREEN_UPDATE_DRIVER(vamphalf_state, screen_update_common)
 
-	MCFG_PALETTE_LENGTH(0x8000)
-	MCFG_GFXDECODE_ADD("gfxdecode", vamphalf)
+	MCFG_PALETTE_ADD("palette", 0x8000)
+	MCFG_GFXDECODE_ADD("gfxdecode",vamphalf,"palette")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( sound_ym_oki )
@@ -1128,8 +1128,8 @@ static MACHINE_CONFIG_START( aoh, vamphalf_state )
 	MCFG_SCREEN_VISIBLE_AREA(64, 511-64, 16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(vamphalf_state, screen_update_aoh)
 
-	MCFG_PALETTE_LENGTH(0x8000)
-	MCFG_GFXDECODE_ADD("gfxdecode", vamphalf)
+	MCFG_PALETTE_ADD("palette", 0x8000)
+	MCFG_GFXDECODE_ADD("gfxdecode",vamphalf,"palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

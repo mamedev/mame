@@ -204,7 +204,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 	int i;
 
 	rgb = compute_res_net_all(machine(), color_prom, &dkong_decode_info, &dkong_net_info);
-	palette_set_colors(machine(), 0, rgb, 256);
+	palette.set_pen_colors(0, rgb, 256);
 
 	/* Now treat tri-state black background generation */
 
@@ -215,7 +215,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 			r = compute_res_net( 1, 0, &dkong_net_bck_info );
 			g = compute_res_net( 1, 1, &dkong_net_bck_info );
 			b = compute_res_net( 1, 2, &dkong_net_bck_info );
-			palette_set_color_rgb(machine(),i,r,g,b);
+			palette.set_pen_color(i,r,g,b);
 		}
 
 	machine().palette->normalize_range(0, 255);
@@ -242,7 +242,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong4b)
 		/* blue component */
 		b = compute_res_net( (color_prom[0]>>0) & 0x03, 2, &radarscp_net_info );
 
-		palette_set_color_rgb(machine(),i,r,g,b);
+		palette.set_pen_color(i,r,g,b);
 		color_prom++;
 	}
 
@@ -254,7 +254,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong4b)
 			r = compute_res_net( 1, 0, &radarscp_net_bck_info );
 			g = compute_res_net( 1, 1, &radarscp_net_bck_info );
 			b = compute_res_net( 1, 2, &radarscp_net_bck_info );
-			palette_set_color_rgb(machine(),i,r,g,b);
+			palette.set_pen_color(i,r,g,b);
 		}
 
 	machine().palette->normalize_range(0, 255);
@@ -280,7 +280,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp)
 		/* blue component */
 		b = compute_res_net( (color_prom[0]>>0) & 0x03, 2, &radarscp_net_info );
 
-		palette_set_color_rgb(machine(),i,r,g,b);
+		palette.set_pen_color(i,r,g,b);
 		color_prom++;
 	}
 
@@ -292,14 +292,14 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp)
 			r = compute_res_net( 1, 0, &radarscp_net_bck_info );
 			g = compute_res_net( 1, 1, &radarscp_net_bck_info );
 			b = compute_res_net( 1, 2, &radarscp_net_bck_info );
-			palette_set_color_rgb(machine(),i,r,g,b);
+			palette.set_pen_color(i,r,g,b);
 		}
 
 	/* Star color */
 	r = compute_res_net( 1, 0, &radarscp_stars_net_info );
 	g = compute_res_net( 0, 1, &radarscp_stars_net_info );
 	b = compute_res_net( 0, 2, &radarscp_stars_net_info );
-	palette_set_color_rgb(machine(),RADARSCP_STAR_COL,r,g,b);
+	palette.set_pen_color(RADARSCP_STAR_COL,r,g,b);
 
 	/* Oscillating background */
 	for (i = 0;i < 256;i++)
@@ -308,7 +308,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp)
 		g = compute_res_net( 0, 1, &radarscp_blue_net_info );
 		b = compute_res_net( i, 2, &radarscp_blue_net_info );
 
-		palette_set_color_rgb(machine(),RADARSCP_BCK_COL_OFFSET + i,r,g,b);
+		palette.set_pen_color(RADARSCP_BCK_COL_OFFSET + i,r,g,b);
 	}
 
 	/* Grid */
@@ -318,7 +318,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp)
 		g = compute_res_net( (i>>1) & 1, 1, &radarscp_grid_net_info );
 		b = compute_res_net( (i>>2) & 1, 2, &radarscp_grid_net_info );
 
-		palette_set_color_rgb(machine(),RADARSCP_GRID_COL_OFFSET + i,r,g,b);
+		palette.set_pen_color(RADARSCP_GRID_COL_OFFSET + i,r,g,b);
 	}
 
 	machine().palette->normalize_range(0, RADARSCP_GRID_COL_OFFSET+7);
@@ -343,7 +343,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 		/* blue component */
 		b = compute_res_net( color_prom[0], 2, &radarscp1_net_info );
 
-		palette_set_color_rgb(machine(),i,r,g,b);
+		palette.set_pen_color(i,r,g,b);
 		color_prom++;
 	}
 
@@ -355,14 +355,14 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 			r = compute_res_net( 0, 0, &radarscp1_net_info );
 			g = compute_res_net( 0, 1, &radarscp1_net_info );
 			b = compute_res_net( 0, 2, &radarscp1_net_info );
-			palette_set_color_rgb(machine(),i,r,g,b);
+			palette.set_pen_color(i,r,g,b);
 		}
 
 	/* Star color */
 	r = compute_res_net( 1, 0, &radarscp_stars_net_info );
 	g = compute_res_net( 0, 1, &radarscp_stars_net_info );
 	b = compute_res_net( 0, 2, &radarscp_stars_net_info );
-	palette_set_color_rgb(machine(),RADARSCP_STAR_COL,r,g,b);
+	palette.set_pen_color(RADARSCP_STAR_COL,r,g,b);
 
 	/* Oscillating background */
 	for (i = 0;i < 256;i++)
@@ -371,7 +371,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 		g = compute_res_net( 0, 1, &radarscp_blue_net_info );
 		b = compute_res_net( i, 2, &radarscp_blue_net_info );
 
-		palette_set_color_rgb(machine(),RADARSCP_BCK_COL_OFFSET + i,r,g,b);
+		palette.set_pen_color(RADARSCP_BCK_COL_OFFSET + i,r,g,b);
 	}
 
 	/* Grid */
@@ -381,7 +381,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 		g = compute_res_net( (i>>1) & 1, 1, &radarscp_grid_net_info );
 		b = compute_res_net( (i>>2) & 1, 2, &radarscp_grid_net_info );
 
-		palette_set_color_rgb(machine(),RADARSCP_GRID_COL_OFFSET + i,r,g,b);
+		palette.set_pen_color(RADARSCP_GRID_COL_OFFSET + i,r,g,b);
 	}
 	machine().palette->normalize_range(0, RADARSCP_GRID_COL_OFFSET+7);
 
@@ -433,7 +433,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong3)
 	rgb_t   *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &dkong3_decode_info, &dkong3_net_info);
-	palette_set_colors(machine(), 0, rgb, 256);
+	palette.set_pen_colors(0, rgb, 256);
 	machine().palette->normalize_range(0, 255);
 	auto_free(machine(), rgb);
 

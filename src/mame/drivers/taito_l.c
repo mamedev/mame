@@ -101,7 +101,7 @@ void taitol_state::palette_notifier(int addr)
 	else
 	{
 		//      r = g = b = ((addr & 0x1e) != 0)*255;
-		palette_set_color_rgb(machine(), addr / 2, pal4bit(byte0), pal4bit(byte0 >> 4), pal4bit(byte1));
+		m_palette->set_pen_color(addr / 2, pal4bit(byte0), pal4bit(byte0 >> 4), pal4bit(byte1));
 	}
 }
 
@@ -1823,8 +1823,8 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update_taitol)
 	MCFG_SCREEN_VBLANK_DRIVER(taitol_state, screen_eof_taitol)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 2)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",2,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(taitol_state,taitol)
 
@@ -1917,8 +1917,8 @@ static MACHINE_CONFIG_START( kurikint, taitol_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update_taitol)
 	MCFG_SCREEN_VBLANK_DRIVER(taitol_state, screen_eof_taitol)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 2)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",2,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(taitol_state,taitol)
 
@@ -1963,8 +1963,8 @@ static MACHINE_CONFIG_START( plotting, taitol_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update_taitol)
 	MCFG_SCREEN_VBLANK_DRIVER(taitol_state, screen_eof_taitol)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 1)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",1,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(taitol_state,taitol)
 
@@ -2056,8 +2056,8 @@ static MACHINE_CONFIG_START( evilston, taitol_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update_taitol)
 	MCFG_SCREEN_VBLANK_DRIVER(taitol_state, screen_eof_taitol)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 2)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE_ADD("gfxdecode",2,"palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(taitol_state,taitol)
 

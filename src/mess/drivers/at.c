@@ -357,7 +357,7 @@ static MACHINE_CONFIG_FRAGMENT( at_motherboard )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH( 256 )
+	MCFG_PALETTE_ADD( "palette", 256 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ibm5170, at_state )

@@ -18,21 +18,6 @@ void alpha68k_state::alpha68k_V_video_bank_w( int bank )
 	m_bank_base = bank & 0xf;
 }
 
-WRITE16_MEMBER(alpha68k_state::alpha68k_paletteram_w)
-{
-	int newword;
-	int r, g, b;
-
-	COMBINE_DATA(m_paletteram + offset);
-	newword = m_paletteram[offset];
-
-	r = ((newword >> 7) & 0x1e) | ((newword >> 14) & 0x01);
-	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01);
-	b = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01);
-
-	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
-}
-
 /******************************************************************************/
 
 TILE_GET_INFO_MEMBER(alpha68k_state::get_tile_info)
@@ -356,7 +341,7 @@ UINT32 alpha68k_state::screen_update_alpha68k_I(screen_device &screen, bitmap_in
 {
 	int yshift = (m_microcontroller_id == 0x890a) ? 1 : 0; // The Next Space is 1 pixel off
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	/* This appears to be correct priority */
 	draw_sprites_I(bitmap, cliprect, 2, 0x0800, yshift);
@@ -372,9 +357,6 @@ PALETTE_INIT_MEMBER(alpha68k_state,kyros)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
-
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
 	{
@@ -382,7 +364,7 @@ PALETTE_INIT_MEMBER(alpha68k_state,kyros)
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -391,7 +373,7 @@ PALETTE_INIT_MEMBER(alpha68k_state,kyros)
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = ((color_prom[i] & 0x0f) << 4) | (color_prom[i + 0x100] & 0x0f);
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -400,9 +382,6 @@ PALETTE_INIT_MEMBER(alpha68k_state,paddlem)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
-
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
 	{
@@ -410,7 +389,7 @@ PALETTE_INIT_MEMBER(alpha68k_state,paddlem)
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -419,7 +398,7 @@ PALETTE_INIT_MEMBER(alpha68k_state,paddlem)
 	for (i = 0; i < 0x400; i++)
 	{
 		UINT8 ctabentry = ((color_prom[i + 0x400] & 0x0f) << 4) | (color_prom[i] & 0x0f);
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -487,7 +466,7 @@ void alpha68k_state::kyros_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 
 UINT32 alpha68k_state::screen_update_kyros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	colortable_entry_set_value(machine().colortable, 0x100, *m_videoram & 0xff);
+	m_palette->set_pen_indirect(0x100, *m_videoram & 0xff);
 	bitmap.fill(0x100, cliprect); //AT
 
 	kyros_draw_sprites(bitmap, cliprect, 2, 0x0800);
@@ -545,7 +524,7 @@ void alpha68k_state::sstingry_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 
 UINT32 alpha68k_state::screen_update_sstingry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	colortable_entry_set_value(machine().colortable, 0x100, *m_videoram & 0xff);
+	m_palette->set_pen_indirect(0x100, *m_videoram & 0xff);
 	bitmap.fill(0x100, cliprect); //AT
 
 	sstingry_draw_sprites(bitmap, cliprect, 2, 0x0800);

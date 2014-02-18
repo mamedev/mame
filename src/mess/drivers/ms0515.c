@@ -212,25 +212,25 @@ UINT32 ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-void ms0515_state::palette_init()
+PALETTE_INIT_MEMBER(ms0515_state, ms0515)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0, 0, 0));
-	palette_set_color(machine(), 1, MAKE_RGB(0, 0, 127));
-	palette_set_color(machine(), 2, MAKE_RGB(127, 0, 0));
-	palette_set_color(machine(), 3, MAKE_RGB(127, 0, 127));
-	palette_set_color(machine(), 4, MAKE_RGB(0, 127, 0));
-	palette_set_color(machine(), 5, MAKE_RGB(0, 127, 127));
-	palette_set_color(machine(), 6, MAKE_RGB(127, 127, 0));
-	palette_set_color(machine(), 7, MAKE_RGB(127, 127, 127));
+	palette.set_pen_color(0, MAKE_RGB(0, 0, 0));
+	palette.set_pen_color(1, MAKE_RGB(0, 0, 127));
+	palette.set_pen_color(2, MAKE_RGB(127, 0, 0));
+	palette.set_pen_color(3, MAKE_RGB(127, 0, 127));
+	palette.set_pen_color(4, MAKE_RGB(0, 127, 0));
+	palette.set_pen_color(5, MAKE_RGB(0, 127, 127));
+	palette.set_pen_color(6, MAKE_RGB(127, 127, 0));
+	palette.set_pen_color(7, MAKE_RGB(127, 127, 127));
 
-	palette_set_color(machine(), 8, MAKE_RGB(127, 127, 127));
-	palette_set_color(machine(), 9, MAKE_RGB(127, 127, 255));
-	palette_set_color(machine(), 10, MAKE_RGB(255, 127, 127));
-	palette_set_color(machine(), 11, MAKE_RGB(255, 127, 255));
-	palette_set_color(machine(), 12, MAKE_RGB(127, 255, 127));
-	palette_set_color(machine(), 13, MAKE_RGB(127, 255, 255));
-	palette_set_color(machine(), 14, MAKE_RGB(255, 255, 127));
-	palette_set_color(machine(), 15, MAKE_RGB(255, 255, 255));
+	palette.set_pen_color(8, MAKE_RGB(127, 127, 127));
+	palette.set_pen_color(9, MAKE_RGB(127, 127, 255));
+	palette.set_pen_color(10, MAKE_RGB(255, 127, 127));
+	palette.set_pen_color(11, MAKE_RGB(255, 127, 255));
+	palette.set_pen_color(12, MAKE_RGB(127, 255, 127));
+	palette.set_pen_color(13, MAKE_RGB(127, 255, 255));
+	palette.set_pen_color(14, MAKE_RGB(255, 255, 127));
+	palette.set_pen_color(15, MAKE_RGB(255, 255, 255));
 }
 
 WRITE8_MEMBER(ms0515_state::ms0515_portc_w)
@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ms0515_state, screen_update_ms0515)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_I8255_ADD( "ppi8255_1", ms0515_ppi8255_interface_1 )
 	//MCFG_I8255_ADD( "ppi8255_2", ms0515_ppi8255_interface_2 )

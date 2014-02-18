@@ -271,12 +271,12 @@ static INPUT_PORTS_START( istellar )
 	/* SERVICE might be hanging out back here */
 INPUT_PORTS_END
 
-void istellar_state::palette_init()
+PALETTE_INIT_MEMBER(istellar_state, istellar)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int r,g,b;
 		int bit0,bit1,bit2,bit3;
@@ -304,7 +304,7 @@ void istellar_state::palette_init()
 		bit3 = (color_prom[i+0x200] >> 3) & 0x01;
 		b = (0x8f * bit3) + (0x43 * bit2) + (0x1f * bit1) + (0x0e * bit0);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -358,9 +358,9 @@ static MACHINE_CONFIG_START( istellar, istellar_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", istellar)
+	MCFG_GFXDECODE_ADD("gfxdecode",istellar,"palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

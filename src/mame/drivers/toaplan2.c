@@ -3141,8 +3141,8 @@ static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_toaplan2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", toaplan2)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",toaplan2,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3184,8 +3184,8 @@ static MACHINE_CONFIG_START( ghox, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_toaplan2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", toaplan2)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",toaplan2,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3271,8 +3271,8 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_dogyuun)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", t2dualvdp)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",t2dualvdp,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3319,8 +3319,8 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_toaplan2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", toaplan2)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",toaplan2,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3358,8 +3358,8 @@ static MACHINE_CONFIG_START( kbash2, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_toaplan2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", toaplan2)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",toaplan2,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3394,8 +3394,8 @@ static MACHINE_CONFIG_START( truxton2, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_truxton2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", truxton2)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",truxton2,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3451,8 +3451,8 @@ static MACHINE_CONFIG_START( pipibibs, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_toaplan2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", toaplan2)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",toaplan2,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3494,8 +3494,8 @@ static MACHINE_CONFIG_START( pipibibsbl, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_toaplan2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", toaplan2)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",toaplan2,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3572,8 +3572,8 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_truxton2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", truxton2)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",truxton2,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3611,8 +3611,8 @@ static MACHINE_CONFIG_START( fixeightbl, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_truxton2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fixeightbl)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",fixeightbl,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3650,8 +3650,8 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_toaplan2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", toaplan2)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",toaplan2,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3690,8 +3690,8 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_batsugun)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", t2dualvdp)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",t2dualvdp,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3729,7 +3729,7 @@ static MACHINE_CONFIG_START( pwrkick, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_toaplan2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", toaplan2)
+	MCFG_GFXDECODE_ADD("gfxdecode",toaplan2,"palette")
 	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
@@ -3761,7 +3761,7 @@ static MACHINE_CONFIG_START( othldrby, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_toaplan2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", toaplan2)
+	MCFG_GFXDECODE_ADD("gfxdecode",toaplan2,"palette")
 	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
@@ -3796,8 +3796,8 @@ static MACHINE_CONFIG_START( snowbro2, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_toaplan2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", toaplan2)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",toaplan2,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3841,8 +3841,8 @@ static MACHINE_CONFIG_START( mahoudai, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_truxton2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", raizing)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",raizing,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3886,8 +3886,8 @@ static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_truxton2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", raizing)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",raizing,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3942,8 +3942,8 @@ static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_truxton2)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", raizing)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",raizing,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -3993,8 +3993,8 @@ static MACHINE_CONFIG_START( batrider, toaplan2_state )
 	//MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_batrider)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", batrider)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",batrider,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
@@ -4046,8 +4046,8 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 	//MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_batrider)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", batrider)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+	MCFG_GFXDECODE_ADD("gfxdecode",batrider,"palette")
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")

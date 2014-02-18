@@ -478,8 +478,8 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 12000000/16, mc6845_intf)   /* 52.786 Hz (similar to Major Poker) */
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chance32)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_GFXDECODE_ADD("gfxdecode",chance32,"palette")
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 
 	/* sound hardware */

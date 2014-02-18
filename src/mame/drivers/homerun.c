@@ -389,8 +389,8 @@ static MACHINE_CONFIG_START( dynashot, homerun_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homerun_state, screen_update_homerun)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", homerun)
-	MCFG_PALETTE_LENGTH(16*4)
+	MCFG_GFXDECODE_ADD("gfxdecode",homerun,"palette")
+	MCFG_PALETTE_ADD("palette", 16*4)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

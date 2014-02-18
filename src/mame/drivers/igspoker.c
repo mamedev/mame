@@ -203,7 +203,7 @@ void igspoker_state::video_start()
 
 UINT32 igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	// FIX: CSK227IT must have some way to disable background, or wrong gfx?
 	if (m_bg_enable) m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -1784,8 +1784,8 @@ static MACHINE_CONFIG_START( igspoker, igspoker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_igs_video)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", igspoker)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE_ADD("gfxdecode",igspoker,"palette")
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */

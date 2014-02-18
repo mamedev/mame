@@ -58,7 +58,7 @@ public:
 };
 
 
-void murogmbl_state::palette_init()
+PALETTE_INIT_MEMBER(murogmbl_state, murogmbl)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
@@ -79,7 +79,7 @@ void murogmbl_state::palette_init()
 		bit2 = (color_prom[0] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -190,7 +190,7 @@ static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 	MCFG_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
 	MCFG_CPU_PROGRAM_MAP(murogmbl_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", murogmbl)
+	MCFG_GFXDECODE_ADD("gfxdecode",murogmbl,"palette")
 
 
 	/* video hardware */
@@ -201,7 +201,7 @@ static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(murogmbl_state, screen_update_murogmbl)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -759,7 +759,7 @@ WRITE8_MEMBER(changela_state::changela_colors_w)
 	g = color_table[(c >> 3) & 0x07];
 	b = color_table[(c >> 6) & 0x07];
 
-	palette_set_color_rgb(machine(),color_index,r,g,b);
+	m_palette->set_pen_color(color_index,r,g,b);
 }
 
 

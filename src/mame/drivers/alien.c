@@ -90,7 +90,7 @@ static MACHINE_CONFIG_START( alien, alien_state )
 	MCFG_SCREEN_SIZE((32)*8, (32)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

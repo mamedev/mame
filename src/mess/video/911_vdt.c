@@ -136,16 +136,14 @@ PALETTE_INIT_MEMBER(vdt911_device, vdt911)
 {
 	UINT8 i, r, g, b;
 
-	machine().colortable = colortable_alloc(machine(), 3);
-
 	for ( i = 0; i < 3; i++ )
 	{
 		r = vdt911_colors[i*3]; g = vdt911_colors[i*3+1]; b = vdt911_colors[i*3+2];
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
 	}
 
 	for(i=0;i<8;i++)
-		colortable_entry_set_value(machine().colortable, i, vdt911_palette[i]);
+		palette.set_pen_indirect(i, vdt911_palette[i]);
 }
 
 /*
@@ -724,7 +722,7 @@ void vdt911_keyboard(device_t *device)
 }
 
 static MACHINE_CONFIG_FRAGMENT( vdt911 )
-	MCFG_PALETTE_INIT_OVERRIDE(vdt911_device, vdt911)
+	MCFG_PALETTE_INIT_OWNER(vdt911_device, vdt911)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

@@ -81,7 +81,7 @@ void segajw_state::machine_reset()
 {
 }
 
-void segajw_state::palette_init()
+PALETTE_INIT_MEMBER(segajw_state, segajw)
 {
 }
 
@@ -99,7 +99,7 @@ static MACHINE_CONFIG_START( segajw, segajw_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

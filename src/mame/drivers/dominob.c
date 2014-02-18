@@ -313,8 +313,8 @@ static MACHINE_CONFIG_START( dominob, dominob_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dominob_state, screen_update_dominob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dominob)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE_ADD("gfxdecode",dominob,"palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */

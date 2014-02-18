@@ -274,7 +274,7 @@ static MACHINE_CONFIG_START( destiny, destiny_state )
 	MCFG_SCREEN_SIZE(48*8, 16*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 16*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(destiny_state, screen_update_destiny)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 
 	/* sound hardware */

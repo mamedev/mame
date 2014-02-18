@@ -405,10 +405,10 @@ static MACHINE_CONFIG_START( mil4000, mil4000_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mil4000_state, screen_update_mil4000)
 
-	MCFG_PALETTE_LENGTH(0x800)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_INIT_STANDARD(all_black)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mil4000)
+	MCFG_GFXDECODE_ADD("gfxdecode",mil4000,"palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.

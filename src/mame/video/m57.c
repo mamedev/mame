@@ -30,12 +30,10 @@
 
 ***************************************************************************/
 
-void m57_state::palette_init()
+PALETTE_INIT_MEMBER(m57_state, m57)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	machine().colortable = colortable_alloc(machine(), 32 * 8 + 16);
 
 	/* character palette */
 	for (i = 0; i < 256; i++)
@@ -58,8 +56,8 @@ void m57_state::palette_init()
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r,g,b));
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_indirect_color(i, MAKE_RGB(r,g,b));
+		palette.set_pen_indirect(i, i);
 		color_prom++;
 	}
 
@@ -87,7 +85,7 @@ void m57_state::palette_init()
 		bit2 = (*color_prom >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i + 256, MAKE_RGB(r,g,b));
+		palette.set_indirect_color(i + 256, MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -98,7 +96,7 @@ void m57_state::palette_init()
 	/* sprite lookup table */
 	for (i = 0; i < 32 * 8; i++)
 	{
-		colortable_entry_set_value(machine().colortable, i + 32 * 8, 256 + (~*color_prom & 0x0f));
+		palette.set_pen_indirect(i + 32 * 8, 256 + (~*color_prom & 0x0f));
 		color_prom++;
 	}
 }
@@ -246,7 +244,7 @@ void m57_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			color,
 			flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 256 + 15));
+			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 256 + 15));
 	}
 }
 
