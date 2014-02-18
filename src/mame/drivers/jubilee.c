@@ -68,13 +68,13 @@
   3000-33FF    ; Video RAM.   ----------> First half of TC5517AP battery backed RAM.
   3400-37FF    ; Working RAM. ----------> Second half of TC5517AP battery backed RAM.
   3800-3BFF    ; Color (ATTR) RAM. -----> Whole 2114 RAM.
-  3E00-3E03    ; CRTC Controller.
+  3E00-3E03    ; CRT Controller. -------> MC6845P.
 
   CRU...
 
   0080-0080    ; ??? Read.
-  00C8-00C8    ; Multiplexed Input Port
-  0CC2-0CC6    ; Input Port mux selectors
+  00C8-00C8    ; Multiplexed Input Port.
+  0CC2-0CC6    ; Input Port mux selectors.
 
 
   TMS9980A memory map:
@@ -98,6 +98,9 @@
   - Demuxed the input system.
   - Hooked an cleaned all inputs, except the coin in (missing).
   - Added NVRAM support.
+  - Hooked CRTC properly.
+  - Adjusted the screen size and visible area according to CRTC values.
+  - Adjusted the screen pos 8 pixels, to get a bit centered.
   - Added technical notes.
  
   [2014-02-17]
@@ -126,8 +129,7 @@
   TODO:
 
   - Improve the CRU map.
-  - Where is Coin In? Interrupts issue?
-  - Confirm the CRT controller offset.
+  - Where is Coin/Credit input? Interrupts issue?
   - Discrete sound?.
   - Check clocks on a PCB (if someday appear!)
 
@@ -250,9 +252,9 @@ static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_WRITE(jubileep_videoram_w) AM_SHARE("videoworkram")	/* TC5517AP battery backed RAM */
 	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_WRITE(jubileep_colorram_w) AM_SHARE("colorram")      /* Whole 2114 RAM */
 
-/*	CRTC seems to be mapped here. Read 00-01 and then write on them.
-    Then does the same for 02-03. Initialization is incomplete since
-    set till register 0x0D.
+/*	CRTC *is* mapped here. Read 00-01 and then write on them.
+    Then does the same for 02-03. Initialization seems incomplete since
+    set till register 0x0D. Maybe the last registers are unused.
 */
 	AM_RANGE(0x3e00, 0x3e01) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x3e02, 0x3e03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -325,7 +327,7 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 	}
 
 	return 0xff;
-//	return (machine().rand() & 0xff);
+//	return (machine().rand() & 0x43);
 }
 
 
@@ -426,7 +428,7 @@ GFXDECODE_END
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
+	-8,0,0,0,    /* visarea adjustment */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -463,8 +465,8 @@ static MACHINE_CONFIG_START( jubileep, jubilee_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_SIZE(32*8, 32*8)                         /* (47+1*8, 38+1*8) from CRTC settings */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)   /* (32*8, 32*8) from CRTC settings */
 	MCFG_SCREEN_UPDATE_DRIVER(jubilee_state, screen_update_jubileep)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jubileep)
