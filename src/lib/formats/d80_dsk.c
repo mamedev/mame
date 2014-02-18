@@ -76,7 +76,7 @@ int d80_format::get_physical_track(const format &f, int head, int track)
 
 UINT32 d80_format::get_cell_size(const format &f, int track)
 {
-	return d80_cell_size[speed_zone[track]];
+	return d80_cell_size[d80_speed_zone[track]];
 }
 
 int d80_format::get_sectors_per_track(const format &f, int track)
