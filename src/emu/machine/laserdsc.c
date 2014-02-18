@@ -769,7 +769,7 @@ void laserdisc_device::init_video()
 	m_screen->register_vblank_callback(vblank_state_delegate(FUNC(laserdisc_device::vblank_state_changed), this));
 
 	// allocate palette for applying brightness/contrast/gamma
-	m_videopalette = new palette_t(256);
+	m_videopalette = palette_t::alloc(256);
 	if (m_videopalette == NULL)
 		throw emu_fatalerror("Out of memory allocating video palette");
 	for (int index = 0; index < 256; index++)

@@ -189,6 +189,16 @@ const UINT32 *palette_client::dirty_list(UINT32 &mindirty, UINT32 &maxdirty)
 //**************************************************************************
 
 //-------------------------------------------------
+//  alloc - static allocator
+//-------------------------------------------------
+
+palette_t *palette_t::alloc(UINT32 numcolors, UINT32 numgroups)
+{
+	return new palette_t(numcolors, numgroups);
+}
+
+
+//-------------------------------------------------
 //  palette_t - constructor
 //-------------------------------------------------
 

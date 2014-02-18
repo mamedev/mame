@@ -106,8 +106,8 @@ class palette_t
 	friend class palette_client;
 
 public:
-	// construction/destruction
-	palette_t(UINT32 numcolors, UINT32 numgroups = 1);
+	// static constructor: used to ensure same new/delete is used
+	static palette_t *alloc(UINT32 numcolors, UINT32 numgroups = 1);
 	
 	// reference counting
 	void ref() { m_refcount++; }
@@ -147,7 +147,8 @@ public:
 	void normalize_range(UINT32 start, UINT32 end, int lum_min = 0, int lum_max = 255);
 	
 private:
-	// destructor -- can only destruct via 
+	// construction/destruction
+	palette_t(UINT32 numcolors, UINT32 numgroups = 1);
 	~palette_t();
 
 	// internal helpers

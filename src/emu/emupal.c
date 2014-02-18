@@ -593,7 +593,7 @@ static void allocate_palette(running_machine &machine, palette_private *palette)
 	assert_always(machine.total_colors() * numgroups <= 65536, "Error: palette has more than 65536 colors.");
 
 	/* allocate a palette object containing all the colors and groups */
-	machine.palette = new palette_t(machine.total_colors(), numgroups);
+	machine.palette = palette_t::alloc(machine.total_colors(), numgroups);
 
 	/* configure the groups */
 	if (palette->shadow_group != 0)
