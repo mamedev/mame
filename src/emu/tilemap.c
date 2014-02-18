@@ -1183,7 +1183,7 @@ void tilemap_t::draw_instance(_BitmapClass &dest, const blit_parameters &blit, i
 			x_end = MIN(x_end, x2);
 
 			// if we're rendering something, compute the pointers
-			const rgb_t *clut = (dest.palette() != NULL) ? palette_entry_list_raw(dest.palette()) : machine().pens;
+			const rgb_t *clut = (dest.palette() != NULL) ? dest.palette()->entry_list_raw() : machine().pens;
 			if (prev_trans != WHOLLY_TRANSPARENT)
 			{
 				const UINT16 *source0 = source_baseaddr + x_start;
@@ -1277,7 +1277,7 @@ void tilemap_t::draw_roz_core(_BitmapClass &destbitmap, const blit_parameters &b
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound)
 {
 	// pre-cache all the inner loop values
-	const rgb_t *clut = ((destbitmap.palette() != NULL) ? palette_entry_list_raw(destbitmap.palette()) : machine().pens) + (blit.tilemap_priority_code >> 16);
+	const rgb_t *clut = ((destbitmap.palette() != NULL) ? destbitmap.palette()->entry_list_raw() : machine().pens) + (blit.tilemap_priority_code >> 16);
 	bitmap_ind8 &priority_bitmap = *blit.priority;
 	const int xmask = m_pixmap.width() - 1;
 	const int ymask = m_pixmap.height() - 1;

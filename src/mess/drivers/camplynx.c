@@ -384,7 +384,7 @@ void camplynx_state::palette_init()
 static MC6845_UPDATE_ROW( lynx48k_update_row )
 {
 	UINT8 *RAM = device->machine().root_device().memregion("maincpu")->base();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 r,g,b;
 	UINT32 x, *p = &bitmap.pix32(y);
 
@@ -408,7 +408,7 @@ static MC6845_UPDATE_ROW( lynx48k_update_row )
 static MC6845_UPDATE_ROW( lynx128k_update_row )
 {
 	UINT8 *RAM = device->machine().root_device().memregion("maincpu")->base();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 r,g,b;
 	UINT32 x, *p = &bitmap.pix32(y);
 

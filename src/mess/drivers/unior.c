@@ -252,7 +252,7 @@ WRITE8_MEMBER( unior_state::scroll_w )
 static I8275_DISPLAY_PIXELS(display_pixels)
 {
 	unior_state *state = device->machine().driver_data<unior_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 gfx = state->m_p_chargen[(linecount & 7) | (charcode << 3)];
 	if (vsp)
 		gfx = 0;

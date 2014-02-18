@@ -88,7 +88,7 @@ static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 {
 	int i;
 	sm1800_state *state = device->machine().driver_data<sm1800_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 *charmap = state->memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp)

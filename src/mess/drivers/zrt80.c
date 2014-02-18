@@ -214,7 +214,7 @@ void zrt80_state::video_start()
 static MC6845_UPDATE_ROW( zrt80_update_row )
 {
 	zrt80_state *state = device->machine().driver_data<zrt80_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

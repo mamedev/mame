@@ -197,7 +197,7 @@ static MC6845_UPDATE_ROW( lola8a_update_row )
 {
 	lola8a_state *state = device->machine().driver_data<lola8a_state>();
 	address_space &program = state->m_maincpu->space(AS_PROGRAM);
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 
 	for (int sx = 0; sx < x_count; sx++)
 	{

@@ -74,8 +74,8 @@ void mario_state::palette_init()
 	palette_set_colors(machine(), 256, rgb, 256);
 	auto_free(machine(), rgb);
 
-	palette_normalize_range(machine().palette, 0, 255, 0, 255);
-	palette_normalize_range(machine().palette, 256, 511, 0, 255);
+	machine().palette->normalize_range(0, 255);
+	machine().palette->normalize_range(256, 511);
 }
 
 WRITE8_MEMBER(mario_state::mario_videoram_w)

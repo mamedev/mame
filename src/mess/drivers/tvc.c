@@ -513,7 +513,7 @@ void tvc_state::machine_reset()
 static MC6845_UPDATE_ROW( tvc_update_row )
 {
 	tvc_state *state = device->machine().driver_data<tvc_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT8 *vram = state->memregion("vram")->base() + ((state->m_vram_bank & 0x30)<<10);
 	UINT16 offset = ((ma*4 + ra*0x40) & 0x3fff);

@@ -278,7 +278,7 @@ static I8275_DISPLAY_PIXELS( zorba_update_chr )
 {
 	int i;
 	zorba_state *state = device->machine().driver_data<zorba_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 gfx = state->m_p_chargen[(linecount & 15) + (charcode << 4)];
 
 	if (vsp)

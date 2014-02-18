@@ -325,7 +325,7 @@ void laserdisc_device::device_stop()
 	if (m_videotex != NULL)
 		machine().render().texture_free(m_videotex);
 	if (m_videopalette != NULL)
-		palette_deref(m_videopalette);
+		m_videopalette->deref();
 	if (m_overtex != NULL)
 		machine().render().texture_free(m_overtex);
 }
@@ -769,11 +769,11 @@ void laserdisc_device::init_video()
 	m_screen->register_vblank_callback(vblank_state_delegate(FUNC(laserdisc_device::vblank_state_changed), this));
 
 	// allocate palette for applying brightness/contrast/gamma
-	m_videopalette = palette_alloc(256, 1);
+	m_videopalette = new palette_t(256);
 	if (m_videopalette == NULL)
 		throw emu_fatalerror("Out of memory allocating video palette");
 	for (int index = 0; index < 256; index++)
-		palette_entry_set_color(m_videopalette, index, MAKE_RGB(index, index, index));
+		m_videopalette->entry_set_color(index, MAKE_RGB(index, index, index));
 
 	// allocate video frames
 	for (int index = 0; index < ARRAY_LENGTH(m_frame); index++)

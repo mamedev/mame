@@ -105,7 +105,7 @@ public:
 static MC6845_UPDATE_ROW( update_row )
 {
 	othello_state *state = device->machine().driver_data<othello_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	int cx, x;
 	UINT32 data_address;
 	UINT32 tmp;

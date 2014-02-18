@@ -508,7 +508,7 @@ void samcoupe_state::palette_init()
 		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 
-	palette_normalize_range(machine().palette, 0, 127, 0, 255);
+	machine().palette->normalize_range(0, 127);
 }
 
 

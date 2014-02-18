@@ -419,7 +419,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr )
 MC6845_UPDATE_ROW( mbee_update_row )
 {
 	mbee_state *state = device->machine().driver_data<mbee_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -458,7 +458,7 @@ MC6845_UPDATE_ROW( mbee_update_row )
 MC6845_UPDATE_ROW( mbeeic_update_row )
 {
 	mbee_state *state = device->machine().driver_data<mbee_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx,fg,bg;
 	UINT16 mem,x,col;
 	UINT16 colourm = (state->m_08 & 0x0e) << 7;
@@ -502,7 +502,7 @@ MC6845_UPDATE_ROW( mbeeic_update_row )
 MC6845_UPDATE_ROW( mbeeppc_update_row )
 {
 	mbee_state *state = device->machine().driver_data<mbee_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 gfx,fg,bg;
 	UINT16 mem,x,col,chr;
 	UINT32 *p = &bitmap.pix32(y);

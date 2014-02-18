@@ -90,7 +90,7 @@ static void video_debug(running_machine &machine, int ref, int params, const cha
 static MC6845_UPDATE_ROW( vid_update_row )
 {
 	mbc55x_state *mstate = device->machine().driver_data<mbc55x_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 
 	UINT8   *ram    = &mstate->m_ram->pointer()[0];
 	UINT8   *red    = &mstate->m_video_mem[RED_PLANE_OFFSET];

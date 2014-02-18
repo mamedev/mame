@@ -774,7 +774,7 @@ static MC6845_UPDATE_ROW( applix_update_row )
 // Need to display a border colour.
 // There is a monochrome mode, but no info found as yet.
 	applix_state *state = device->machine().driver_data<applix_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 i;
 	UINT16 chr,x;
 	UINT32 mem, vidbase = (state->m_video_latch & 15) << 14, *p = &bitmap.pix32(y);

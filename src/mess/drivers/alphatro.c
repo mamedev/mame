@@ -156,7 +156,7 @@ void alphatro_state::video_start()
 static MC6845_UPDATE_ROW( alphatro_update_row )
 {
 	alphatro_state *state = device->machine().driver_data<alphatro_state>();
-	const rgb_t *pens = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *pens = bitmap.palette()->entry_list_raw();
 	bool palette = BIT(state->ioport("CONFIG")->read(), 5);
 	UINT8 chr,gfx,attr,fg,inv;
 	UINT16 mem,x;

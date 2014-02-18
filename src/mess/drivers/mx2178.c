@@ -106,7 +106,7 @@ static ACIA6850_INTERFACE( acia_intf )
 static MC6845_UPDATE_ROW( update_row )
 {
 	mx2178_state *state = device->machine().driver_data<mx2178_state>();
-	const rgb_t *pens = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *pens = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

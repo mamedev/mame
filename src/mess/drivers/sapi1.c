@@ -407,7 +407,7 @@ UINT32 sapi1_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bit
 static MC6845_UPDATE_ROW( update_row )
 {
 	sapi1_state *state = device->machine().driver_data<sapi1_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

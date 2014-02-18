@@ -102,7 +102,7 @@ READ8_MEMBER(einstein_state::einstein_80col_ram_r)
 static MC6845_UPDATE_ROW( einstein_6845_update_row )
 {
 	einstein_state *einstein = device->machine().driver_data<einstein_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 *data = einstein->m_region_gfx1->base();
 	UINT8 char_code, data_byte;
 	int i, x;

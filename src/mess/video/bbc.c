@@ -165,7 +165,7 @@ WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 static MC6845_UPDATE_ROW( vid_update_row )
 {
 	bbc_state *state = device->machine().driver_data<bbc_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 
 	if (state->m_videoULA_teletext_normal_select)
 	{

@@ -199,7 +199,7 @@ WRITE8_MEMBER( tavernie_state::ds_w )
 static MC6845_UPDATE_ROW( update_row )
 {
 	tavernie_state *state = device->machine().driver_data<tavernie_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx=0;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

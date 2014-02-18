@@ -160,7 +160,7 @@ GFXDECODE_END
 MC6845_UPDATE_ROW( v6809_update_row )
 {
 	v6809_state *state = device->machine().driver_data<v6809_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

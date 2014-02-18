@@ -134,7 +134,7 @@ void ec65_state::video_start()
 static MC6845_UPDATE_ROW( ec65_update_row )
 {
 	ec65_state *state = device->machine().driver_data<ec65_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

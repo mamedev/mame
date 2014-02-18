@@ -144,7 +144,7 @@ void palette_init(running_machine &machine)
 		allocate_shadow_tables(machine, palette);
 
 		/* set up save/restore of the palette */
-		numcolors = palette_get_num_colors(machine.palette);
+		numcolors = machine.palette->num_colors();
 		palette->save_pen = auto_alloc_array(machine, pen_t, numcolors);
 		palette->save_bright = auto_alloc_array(machine, float, numcolors);
 		machine.save().save_pointer(NAME(palette->save_pen), numcolors);
@@ -170,7 +170,7 @@ void palette_set_shadow_factor(running_machine &machine, double factor)
 	palette_private *palette = machine.palette_data;
 
 	assert(palette->shadow_group != 0);
-	palette_group_set_contrast(machine.palette, palette->shadow_group, factor);
+	machine.palette->group_set_contrast(palette->shadow_group, factor);
 }
 
 
@@ -184,7 +184,7 @@ void palette_set_highlight_factor(running_machine &machine, double factor)
 	palette_private *palette = machine.palette_data;
 
 	assert(palette->hilight_group != 0);
-	palette_group_set_contrast(machine.palette, palette->hilight_group, factor);
+	machine.palette->group_set_contrast(palette->hilight_group, factor);
 }
 
 
@@ -530,15 +530,15 @@ pen_t get_white_pen(running_machine &machine)
 
 static void palette_presave(running_machine &machine)
 {
-	int numcolors = palette_get_num_colors(machine.palette);
+	int numcolors = machine.palette->num_colors();
 	palette_private *palette = machine.palette_data;
 	int index;
 
 	/* fill the save arrays with updated pen and brightness information */
 	for (index = 0; index < numcolors; index++)
 	{
-		palette->save_pen[index] = palette_entry_get_color(machine.palette, index);
-		palette->save_bright[index] = palette_entry_get_contrast(machine.palette, index);
+		palette->save_pen[index] = machine.palette->entry_color(index);
+		palette->save_bright[index] = machine.palette->entry_contrast(index);
 	}
 }
 
@@ -550,15 +550,15 @@ static void palette_presave(running_machine &machine)
 
 static void palette_postload(running_machine &machine)
 {
-	int numcolors = palette_get_num_colors(machine.palette);
+	int numcolors = machine.palette->num_colors();
 	palette_private *palette = machine.palette_data;
 	int index;
 
 	/* reset the pen and brightness for each entry */
 	for (index = 0; index < numcolors; index++)
 	{
-		palette_entry_set_color(machine.palette, index, palette->save_pen[index]);
-		palette_entry_set_contrast(machine.palette, index, palette->save_bright[index]);
+		machine.palette->entry_set_color(index, palette->save_pen[index]);
+		machine.palette->entry_set_contrast(index, palette->save_bright[index]);
 	}
 }
 
@@ -571,7 +571,7 @@ static void palette_exit(running_machine &machine)
 {
 	/* dereference the palette */
 	if (machine.palette != NULL)
-		palette_deref(machine.palette);
+		machine.palette->deref();
 }
 
 
@@ -593,26 +593,25 @@ static void allocate_palette(running_machine &machine, palette_private *palette)
 	assert_always(machine.total_colors() * numgroups <= 65536, "Error: palette has more than 65536 colors.");
 
 	/* allocate a palette object containing all the colors and groups */
-	machine.palette = palette_alloc(machine.total_colors(), numgroups);
-	assert_always(machine.palette != NULL, "Failed to allocate system palette");
+	machine.palette = new palette_t(machine.total_colors(), numgroups);
 
 	/* configure the groups */
 	if (palette->shadow_group != 0)
-		palette_group_set_contrast(machine.palette, palette->shadow_group, (float)PALETTE_DEFAULT_SHADOW_FACTOR);
+		machine.palette->group_set_contrast(palette->shadow_group, (float)PALETTE_DEFAULT_SHADOW_FACTOR);
 	if (palette->hilight_group != 0)
-		palette_group_set_contrast(machine.palette, palette->hilight_group, (float)PALETTE_DEFAULT_HIGHLIGHT_FACTOR);
+		machine.palette->group_set_contrast(palette->hilight_group, (float)PALETTE_DEFAULT_HIGHLIGHT_FACTOR);
 
 	/* set the initial colors to a standard rainbow */
 	for (index = 0; index < machine.total_colors(); index++)
-		palette_entry_set_color(machine.palette, index, MAKE_RGB(pal1bit(index >> 0), pal1bit(index >> 1), pal1bit(index >> 2)));
+		machine.palette->entry_set_color(index, MAKE_RGB(pal1bit(index >> 0), pal1bit(index >> 1), pal1bit(index >> 2)));
 
 	/* switch off the color mode */
 	switch (palette->format)
 	{
 		/* 16-bit paletteized case */
 		case BITMAP_FORMAT_IND16:
-			palette->black_pen = palette_get_black_entry(machine.palette);
-			palette->white_pen = palette_get_white_entry(machine.palette);
+			palette->black_pen = machine.palette->black_entry();
+			palette->white_pen = machine.palette->white_entry();
 			if (palette->black_pen >= 65536)
 				palette->black_pen = 0;
 			if (palette->white_pen >= 65536)
@@ -640,7 +639,7 @@ static void allocate_palette(running_machine &machine, palette_private *palette)
 
 static void allocate_color_tables(running_machine &machine, palette_private *palette)
 {
-	int total_colors = palette_get_num_colors(machine.palette) * palette_get_num_groups(machine.palette);
+	int total_colors = machine.palette->num_colors() * machine.palette->num_groups();
 	pen_t *pentable;
 	int i;
 
@@ -655,7 +654,7 @@ static void allocate_color_tables(running_machine &machine, palette_private *pal
 			break;
 
 		case BITMAP_FORMAT_RGB32:
-			machine.pens = palette_entry_list_adjusted(machine.palette);
+			machine.pens = machine.palette->entry_list_adjusted();
 			break;
 
 		default:

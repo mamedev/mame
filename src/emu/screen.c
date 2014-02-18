@@ -880,7 +880,7 @@ void screen_device::update_burnin()
 			{
 				UINT64 *dst = &m_burnin.pix64(y);
 				const UINT16 *src = &srcbitmap.pix16(srcy >> 16);
-				const rgb_t *palette = palette_entry_list_adjusted(machine().palette);
+				const rgb_t *palette = machine().palette->entry_list_adjusted();
 				for (x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 				{
 					rgb_t pixel = palette[src[srcx >> 16]];

@@ -585,7 +585,7 @@ GFXDECODE_END
 MC6845_UPDATE_ROW( bigbord2_update_row )
 {
 	bigbord2_state *state = device->machine().driver_data<bigbord2_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

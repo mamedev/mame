@@ -184,7 +184,7 @@ void p1_state::set_palette_luts(void)
 
 POISK1_UPDATE_ROW( p1_state::cga_gfx_2bpp_update_row )
 {
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(ra);
 	UINT16  odd, offset;
 	int i;
@@ -211,7 +211,7 @@ POISK1_UPDATE_ROW( p1_state::cga_gfx_2bpp_update_row )
 
 POISK1_UPDATE_ROW( p1_state::cga_gfx_1bpp_update_row )
 {
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(ra);
 	UINT8   fg = 15, bg = BG_COLOR(m_video.color_select_68);
 	UINT16  odd, offset;
@@ -243,7 +243,7 @@ POISK1_UPDATE_ROW( p1_state::cga_gfx_1bpp_update_row )
 
 POISK1_UPDATE_ROW( p1_state::poisk1_gfx_1bpp_update_row )
 {
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(ra);
 	UINT8   fg, bg = BG_COLOR(m_video.color_select_68);
 	UINT16  odd, offset;
