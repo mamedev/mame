@@ -132,6 +132,7 @@
 #include "emu.h"
 #include "cpu/tms9900/tms9980a.h"
 #include "video/mc6845.h"
+#include "machine/nvram.h"
 
 
 class jubilee_state : public driver_device
@@ -233,7 +234,7 @@ static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_WRITE(jubileep_videoram_w) AM_SHARE("videoram")		/* First half of TC5517AP RAM */
-	AM_RANGE(0x3400, 0x37ff) AM_RAM															/* Second half of TC5517AP RAM */
+	AM_RANGE(0x3400, 0x37ff) AM_RAM AM_SHARE("nvram")										/* Second half of TC5517AP RAM */
 	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_WRITE(jubileep_colorram_w) AM_SHARE("colorram")      /* Whole 2114 RAM (attr for gfx banks 00-03) */
 
 /*	CRTC seems to be mapped here. Read 00-01 and then write on them.
@@ -263,8 +264,14 @@ ADDRESS_MAP_END
     behavior at best.
 */
 READ8_MEMBER(jubilee_state::unk_r)
+/* bits... -x-- --xx
+            |     ||
+            |     ++-- Credits.
+            +--------- Bypass memory start error.
+
+*/
 {
-  return (machine().rand() & 0xff);
+	return (machine().rand() & 0x43);	// bit0 and bit1 are involved in credits input.
 	logerror("CRU read from address %04x\n", offset<<4);
 //	return 0;
 }
@@ -286,44 +293,35 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 
 	// Inputs Multiplexion...
 
-	if (((offset<<1)==0x0cc0)&&(data==1))
-	{
-		mux_sel = 1;
-	}
-
 	if (((offset<<1)==0x0cc2)&&(data==1))
 	{
-		mux_sel = 2;
+		mux_sel = 1;
 	}
 
 	if (((offset<<1)==0x0cc4)&&(data==1))
 	{
-		mux_sel = 3;
+		mux_sel = 2;
 	}
 
 	if (((offset<<1)==0x0cc6)&&(data==1))
 	{
-		mux_sel = 4;
+		mux_sel = 3;
 	}
 
-	if (((offset<<1)==0x0ccc)&&(data==1))
-	{
-		mux_sel = 5;
-	}
 
-	// suspicious... just for testing
-	if (((offset<<1)==0x0ce0)&&(data==1))
-	{
-		mux_sel = 1;
-	}
-	if (((offset<<1)==0x0ce2)&&(data==1))
-	{
-		mux_sel = 5;
-	}
-	if (((offset<<1)==0x0ce6)&&(data==1))
-	{
-		mux_sel = 1;
-	}
+	// suspicious... just for testing not ce0 ce2 ce6
+//	if (((offset<<1)==0x0cc0)&&(data==0))
+//	{
+//		mux_sel = 6;
+//	}
+//	if (((offset<<1)==0x0ce2)&&(data==1))
+//	{
+//		mux_sel = 6;
+//	}
+//	if (((offset<<1)==0x0ce6)&&(data==1))
+//	{
+//		mux_sel = 6;
+//	}
 }
 
 READ8_MEMBER(jubilee_state::mux_port_r)
@@ -333,30 +331,30 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 		case 0x01: return ioport("IN0")->read();
 		case 0x02: return ioport("IN1")->read();
 		case 0x03: return ioport("IN2")->read();
-		case 0x04: return ioport("IN3")->read();
-		case 0x05: return ioport("IN4")->read();
-	//	case 0x00: return ioport("DSW0")->read();
 	}
+
 	return 0xff;
+//	return (machine().rand() & 0xff);
 }
 
 
 static ADDRESS_MAP_START( jubileep_cru_map, AS_IO, 8, jubilee_state )
 //	AM_RANGE(0x0000, 0x01ff) AM_READ(unk_r)
 //	AM_RANGE(0x0080, 0x0080) AM_READ(unk_r)
-//	AM_RANGE(0x00c8, 0x00c8) AM_READ(unk_r)		// use to see the game stuff (even cards)
-//	AM_RANGE(0x00c8, 0x00c8) AM_READ_PORT("IN0")	// D0 needs to be triggered constantly to advance.
-	AM_RANGE(0x00c8, 0x00c8) AM_READ(mux_port_r)	// Multiplexed inputs?
+//	AM_RANGE(0x00c8, 0x00c8) AM_READ(unk_r)		    // use to see the game stuff (even cards)
+	AM_RANGE(0x00c8, 0x00c8) AM_READ(mux_port_r)	// Multiplexed inputs
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(unk_w)
 ADDRESS_MAP_END
 
 /* I/O byte R/W
 
    0x080  R    ; Input port? polled at begining.
-   0x0C8  R    ; Input port. If you tie it to a rnd value, you can see the game running at some point.
+   0x0C8  R    ; Input port. If you tie it to a rnd value, you can see the game running.
 
-   Can't see more inputs. Maybe there is a multiplexion with these possible writes:
-   0CC0/0CC2/0CC4/0CC6
+   Can't see more inputs. There is a multiplexion with the following offsets as selectors:
+   CC2/CC4/CC6
+   
+   None of them seems involved in the coin input.
 
 */
 
@@ -365,159 +363,41 @@ ADDRESS_MAP_END
 *************************/
 
 static INPUT_PORTS_START( jubileep )
+/* Coin In is tied to bits 0 & 1 (together) of port 0xC8.
+   Need to find the selector status to implement in some way.
+   (if you inject random data masked in port 0xC8, you can see 
+   credits entering in the game)
+*/
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_CANCEL )   PORT_NAME("Cancel / Take")			// cancel / take
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BET )     PORT_NAME("Bet / Gamble")			// bet / gamble
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 / Half Gamble")	// hold 4 / half gamble
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )    PORT_NAME("Hold 5 / Red")			// hold 5 / red
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE )        PORT_CODE(KEYCODE_8) PORT_NAME("Attendant Hand Pay")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1 / Black")		// hold 1 / black
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2")				// hold 2
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3")				// hold 3
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")		// bet
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) 	PORT_CODE(KEYCODE_9) PORT_NAME("Attendant (to pass the memory error and hand pay)")		// attendant (to pass the memory error and hand pay)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )   PORT_CODE(KEYCODE_0) PORT_NAME("Bookkeeping")  PORT_TOGGLE		// service / bookeeping
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN2-3")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-4")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")		// attandant (to pass the memory error)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")		// service / bookeeping
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE )	PORT_CODE(KEYCODE_R) PORT_NAME("Reset")		// reset?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )		PORT_NAME("Deal/Start")		// deal
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")		// deal
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
-
-	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -586,6 +466,8 @@ static MACHINE_CONFIG_START( jubileep, jubilee_state )
 	/* basic machine hardware */
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, CPU_CLOCK, jubileep_map, jubileep_cru_map, cpuconf)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
