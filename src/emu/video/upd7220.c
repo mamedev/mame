@@ -1600,9 +1600,9 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 
 		if (im || force_bitmap)
 		{
-			get_graphics_partition(area, &sad, &len, &im, &wd);
+			//get_graphics_partition(area, &sad, &len, &im, &wd);
 
-			if(area >= 2) // TODO: correct?
+			if(area >= 3) // TODO: correct? Quarth (PC-98xx) definitely draws with area 2.
 				break;
 
 			for (y = 0; y < len; y++)
@@ -1610,7 +1610,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				addr = ((sad << 1) & 0x3ffff) + (y * m_pitch * 2);
 
 				if (m_display_cb)
-					draw_graphics_line(bitmap, addr, y + bsy, wd);
+					draw_graphics_line(bitmap, addr, y + bsy/2, wd);
 			}
 		}
 		else
