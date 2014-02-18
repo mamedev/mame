@@ -1285,6 +1285,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_video_ff_w)
 					printf("Graphic f/f actually enabled!\n");
 					break;
 			case 4:
+				printf("%d %d\n",data & 1,m_gfx_ff);
 				if(m_gfx_ff)
 				{
 					m_video_ff[(data & 0x0e) >> 1] = data &1;
