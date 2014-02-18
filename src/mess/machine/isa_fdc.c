@@ -9,11 +9,12 @@
 #include "machine/pc_fdc.h"
 #include "imagedev/flopdrv.h"
 #include "formats/pc_dsk.h"
-#include "formats/mfi_dsk.h"
+#include "formats/naslite_dsk.h"
 
 
 FLOPPY_FORMATS_MEMBER( isa8_fdc_device::floppy_formats )
-	FLOPPY_PC_FORMAT
+	FLOPPY_PC_FORMAT,
+	FLOPPY_NASLITE_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( pc_dd_floppies )

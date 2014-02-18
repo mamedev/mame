@@ -90,7 +90,7 @@ video HW too.
 #include "imagedev/harddriv.h"
 #include "imagedev/cassette.h"
 #include "imagedev/cartslot.h"
-#include "formats/mfi_dsk.h"
+#include "formats/naslite_dsk.h"
 #include "formats/pc_dsk.h"
 #include "formats/asst128_dsk.h"
 
@@ -714,7 +714,8 @@ INPUT_PORTS_END
 
 
 FLOPPY_FORMATS_MEMBER( pc_state::floppy_formats )
-	FLOPPY_PC_FORMAT
+	FLOPPY_PC_FORMAT,
+	FLOPPY_NASLITE_FORMAT
 FLOPPY_FORMATS_END
 
 FLOPPY_FORMATS_MEMBER( pc_state::asst128_formats )

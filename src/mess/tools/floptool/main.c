@@ -54,6 +54,7 @@ static floppy_format_type floppy_formats[] = {
 
 	FLOPPY_D88_FORMAT,
 	FLOPPY_PC_FORMAT,
+	FLOPPY_NASLITE_FORMAT,
 
 	FLOPPY_DC42_FORMAT,
 	FLOPPY_A216S_FORMAT,

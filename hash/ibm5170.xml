@@ -2937,6 +2937,54 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="naslite">
+		<description>NASLite NAS Server Operating System (v1.x)</description>
+		<year>2004</year>
+		<publisher>Server Elements</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="NASLite-FTP v1.1" />
+			<dataarea name="flop" size="1763328">
+				<rom name="naslite-ftp-v1.1.img" size="1763328" crc="b8677a3f" sha1="f1b3b6e11ae0f6d2a6092fe3f7a59affebaf9468" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="NASLite-FTPG v1.1" />
+			<dataarea name="flop" size="1763328">
+				<rom name="naslite-ftpg-v1.1.img" size="1763328" crc="cbe53dd4" sha1="ff4bb09ea4125597cbe055923111ae0219340fb8" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="NASLite-NFS v1.0" />
+			<dataarea name="flop" size="1763328">
+				<rom name="naslite-nfs-v1.0.img" size="1763328" crc="4eb327ee" sha1="dea54f8373ef15bd4088c68ba4456c7f6381df07" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="NASLite-NFSG v1.1" />
+			<dataarea name="flop" size="1763328">
+				<rom name="naslite-nfsg-v1.1.img" size="1763328" crc="a9290112" sha1="824ef40f29d638f78cb929d32a344ddbb1b6b6a0" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="NASLite-SMB v1.3" />
+			<dataarea name="flop" size="1763328">
+				<rom name="naslite-smb-v1.3.img" size="1763328" crc="207ef71e" sha1="5b7814d700596223f812e17a1fe2ac1d716a9f23" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="NASLite-SMBG v1.4" />
+			<dataarea name="flop" size="1763328">
+				<rom name="naslite-smbg-v1.4.img.img" size="1763328" crc="bfdbca0a" sha1="7a975040a2c50c20efa6f0fa63dc15f9f17338e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Driver Disks -->
 
 	<software name="scrlmous">

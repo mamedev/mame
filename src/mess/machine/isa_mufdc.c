@@ -16,6 +16,7 @@
 ***************************************************************************/
 
 #include "isa_mufdc.h"
+#include "formats/naslite_dsk.h"
 #include "formats/pc_dsk.h"
 
 
@@ -32,7 +33,8 @@ const device_type ISA8_FDCMAG = &device_creator<fdcmag_device>;
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( mufdc_device::floppy_formats )
-	FLOPPY_PC_FORMAT
+	FLOPPY_PC_FORMAT,
+	FLOPPY_NASLITE_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( drives )
