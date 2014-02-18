@@ -34,7 +34,7 @@ Oh! Bakyuuun (OB1/VER.A)                 (C) Namco/Raizing,1999  COH-700     SYS
 Golgo 13 (GLG1/VER.A)                    (C) Raizing/Namco,1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC054
 Golgo 13 Kiseki no Dandou (GLS1/VER.A)   (C) Raizing/Namco,2000  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC059
 Kaiun Quiz (KW1/VER.A1)                  (C) Namco/Moss,   1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M10X64  KC050
-Kart Duel (KTD1/VER.A)                   (C) Namco,        2000
+Kart Duel (KTD1/VER.A)                   (C) Namco,        2000  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F0    KC057
 Libero Grande (LG1/VER.A)                (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC014
 Libero Grande (LG2/VER.A)                (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC014
 Mr Driller (DRI3/VER.A2)                 (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F2F   KC048
@@ -102,7 +102,7 @@ ROM PCB     - There are nine known revisions of this PCB (so far). They're mostl
 And 4 game-specific/optional PCBs....
 NETWORK PCB - Used to connect 2 PCBs together using standard USB cables. The board plugs in where the CPU board would
               normally be, and the CPU board plugs into another connector on the Network PCB. Seems to be only used on
-              Libero Grande, Tekken 3 and Ehrgeiz (so far?)
+              Kart Duel, Libero Grande, Tekken 3 and Ehrgeiz (so far?)
 GUN I/F PCB - Used to connect and control the light guns. The board plugs in where the CPU board would
               normally be, and the CPU board plugs into another connector on the GUN I/F PCB. The guns plug into this
               PCB directly, no extra gun hardware is needed. Used only on Ghoul Panic and Point Blank 2 so far.
@@ -232,7 +232,9 @@ Notes:
                      Golgo 13 Kiseki no Dandou GLS1 Ver.A   GLS1/VER.A       MOTHER(C) (ROMs serialised)
                      Kaiun Quiz                KW1 Ver.A    KW1/VER.A1       MOTHER(C) (ROMs serialised)
                      Libero Grande             LG2 Ver.A    LG2/VER.A        MOTHER(B)
+                     Mr Driller                DRI3 Ver.A   DRI3/VER.A2      MOTHER(C) (ROMs serialised)
                      Mr Driller                DRI1 Ver.A   DRI1/VER.A2      MOTHER(C) (ROMs serialised)
+                     Oh! Bakyuuun              OB1 Ver.A    OB1/VER.A        MOTHER(B)
                      Paca Paca Passion         PPP1 Ver.A   PPP1/VER.A2      MOTHER(B)
                      Paca Paca Passion 2       PKS1 Ver.A   PKS1/VER.A       MOTHER(B)
                      Paca Paca Passion SP      PSP1 Ver.A   PSP1/VER.A       MOTHER(C) (ROMs serialised)
@@ -351,6 +353,15 @@ Shooting                                                                        
 
 Ghoul Panic   OB2/VER.A    Same PCB but sticker says....                  KC045    OB1 WAVEB.IC2
                            'SYSTEM 12 M4F0 PCB 8661962000'                         OB1 PRG0U.IC11, OB1 PRG0L.IC12
+                           (i.e no FlashROMs)
+
+Oh! Bakyuuun  OB1/VER.A    Same PCB but sticker says....                  KC045    OB1 WAVEB.IC2
+                           'SYSTEM 12 M4F0 PCB 8661962000'                         OB1 PRG0U.IC11, OB1 PRG0L.IC12
+                           (i.e no FlashROMs)
+                           (i.e no FlashROMs)
+
+Kart Duel     KTD1/VER.A   Same PCB but sticker says....                  KC057    KTD1 WAVE-0.IC2
+                           'SYSTEM 12 M4F0 PCB 8661962000'                         KTD1 ROM-0U.IC11, KTD1 ROM-0L.IC12
                            (i.e no FlashROMs)
 
 Point Blank 2 GNB5/VER.A   Same PCB but sticker says....                  KC042    GNB1 WAVEB.IC2
@@ -561,6 +572,9 @@ Paca Paca      PPP1/VER.A2   Same PCB but sticker says....                  KC03
 Passion                      'SYSTEM 12 M8F0 PCB 8661961700'                         PPP1 ROM0U, PPP1 ROM1U
                              (i.e no FlashROMs)                                      PPP1 ROM2U, PPP1 ROM0L
                                                                                      PPP1 ROM1L, PPP1 ROM2L
+
+Mr Driller     DRI3/VER.A2   Same as Paca Paca Passion                      KC048    DRI1 WAVE0               R5, R7
+                                                                                     DRI1 ROM0U, DRI1 ROM0L
 
 Mr Driller     DRI1/VER.A2   Same as Paca Paca Passion                      KC048    DRI1 WAVE0               R5, R7
                                                                                      DRI1 ROM0U, DRI1 ROM0L
@@ -2878,5 +2892,5 @@ GAME( 1999, golgo13,   0,        coh700,   golgo13,  namcos12_state, namcos12, R
 GAME( 1999, g13knd,    0,        coh700,   golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC059 */
 GAME( 2000, sws2000,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC055 */
 GAME( 2000, truckk,    0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC056 */
-GAME( 2000, kartduel,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kart Duel (Japan, KTD1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 2000, kartduel,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kart Duel (Japan, KTD1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC057 */
 GAME( 2001, sws2001,   sws2000,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC061 */
