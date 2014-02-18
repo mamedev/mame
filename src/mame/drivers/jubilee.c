@@ -25,7 +25,7 @@
   1x TMS9980 CPU
   1x MC6845P CRTC
   
-  1x TC5517AP-2 (2048 words x 8 bits Asynchronous CMOS Static RAM)
+  1x TC5517AP-2 (2048 words x 8 bits Asynchronous CMOS Static RAM), tied to a battery.
   1x 2114       (1024 words x 4 bits RAM)
 
   3x 2732 labelled 1, 2 and 3.
@@ -53,7 +53,9 @@
 
   *** Game Notes ***
 
-  Nothing, yet...
+  The game is totally playable, except for the fact that you can't coin currently.
+  Need to find how to hookup the input. See the notes for more info about this issue
+  and all the findings.
 
 
 *****************************************************************************************
@@ -63,16 +65,16 @@
   --------------------
 
   0000-2FFF    ; ROM space.
-  3000-33FF    ; Video RAM.
-  3400-37FF    ; Working RAM.
-  3800-3BFF    ; Color (ATTR) RAM.
+  3000-33FF    ; Video RAM.   ----------> First half of TC5517AP battery backed RAM.
+  3400-37FF    ; Working RAM. ----------> Second half of TC5517AP battery backed RAM.
+  3800-3BFF    ; Color (ATTR) RAM. -----> Whole 2114 RAM.
   3E00-3E03    ; CRTC Controller.
 
   CRU...
 
   0080-0080    ; ??? Read.
   00C8-00C8    ; Multiplexed Input Port
-  0CC0-0CC6    ; Input Port mux selector?
+  0CC2-0CC6    ; Input Port mux selectors
 
 
   TMS9980A memory map:
@@ -90,7 +92,14 @@
 
   DRIVER UPDATES:
 
+  
+  [2014-02-17]
 
+  - Demuxed the input system.
+  - Hooked an cleaned all inputs, except the coin in (missing).
+  - Added NVRAM support.
+  - Added technical notes.
+ 
   [2014-02-17]
 
   - Corrected the crystal value and derivate clocks via #DEFINE.
@@ -119,7 +128,7 @@
   - Improve the CRU map.
   - Where is Coin In? Interrupts issue?
   - Confirm the CRT controller offset.
-  - Sound.
+  - Discrete sound?.
   - Check clocks on a PCB (if someday appear!)
 
 
@@ -140,7 +149,7 @@ class jubilee_state : public driver_device
 public:
 	jubilee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
+		m_videoram(*this, "videoworkram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
@@ -184,15 +193,15 @@ WRITE8_MEMBER(jubilee_state::jubileep_colorram_w)
 
 TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
 {
-/*  - bits -
+/*  - bits -   (attr for gfx banks 00-03)
     7654 3210
-    ---- --xx   bank select.
-    xxxx xx--   seems unused.
+    <no> --xx   bank select.
+    <no> xx--   seems unused.
 */
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
 	int bank = (attr & 0x03);
-	int color = 0;						/* fixed colors: one rom for each R, G and B. */
+	int color = 0;	/* fixed colors: one rom for each R, G and B. */
 
 	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
 }
@@ -233,42 +242,39 @@ INTERRUPT_GEN_MEMBER(jubilee_state::jubileep_interrupt)
 static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_WRITE(jubileep_videoram_w) AM_SHARE("videoram")		/* First half of TC5517AP RAM */
-	AM_RANGE(0x3400, 0x37ff) AM_RAM AM_SHARE("nvram")										/* Second half of TC5517AP RAM */
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_WRITE(jubileep_colorram_w) AM_SHARE("colorram")      /* Whole 2114 RAM (attr for gfx banks 00-03) */
+	
+/*  Video RAM =   3000-33FF
+    Working RAM = 3400-37FF
+    Color RAM =   3800-3BFF (lower 4-bits)
+*/
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_WRITE(jubileep_videoram_w) AM_SHARE("videoworkram")	/* TC5517AP battery backed RAM */
+	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_WRITE(jubileep_colorram_w) AM_SHARE("colorram")      /* Whole 2114 RAM */
 
 /*	CRTC seems to be mapped here. Read 00-01 and then write on them.
     Then does the same for 02-03. Initialization is incomplete since
     set till register 0x0D.
 */
-	AM_RANGE(0x3e00, 0x3e01) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)	// Incomplete... Till reg 0x0D
-	AM_RANGE(0x3e02, 0x3e03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)	// Incomplete... Till reg 0x0D
+	AM_RANGE(0x3e00, 0x3e01) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
+	AM_RANGE(0x3e02, 0x3e03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 
-/* CRTC address: $3E01; register: $3E03
-   CRTC registers: 2f 20 25 64 26 00 20 23 00 07 00 00 00
-   screen total: (0x2f+1)*8 (0x26+1)*8  ---> 384 x 312
-   visible area: 0x20 0x20  ---------------> 256 x 256
+/*  CRTC address: $3E01; register: $3E03
+    CRTC registers: 2f 20 25 64 26 00 20 23 00 07 00 00 00
+    screen total: (0x2f+1)*8 (0x26+1)*8  ---> 384 x 312
+    visible area: 0x20 0x20  ---------------> 256 x 256
 */
 ADDRESS_MAP_END
 
-/*
-  Video RAM =   3000-33FF
-  Working RAM = 3400-37ff
-  Color RAM =   3800-3bff (lower 4-bits)
-*/
-
-/*
-    TODO: I/O lines handling. This is still work to be done; someone needs to
+/*  TODO: I/O lines handling. This is still work to be done; someone needs to
     check the schematics. Here, we need to deliver some reasonable return values
     instead of the 0. Returning a random number will create a nondeterministic
     behavior at best.
 */
 READ8_MEMBER(jubilee_state::unk_r)
-/* bits... -x-- --xx
-            |     ||
-            |     ++-- Credits.
-            +--------- Bypass memory start error.
-
+/*   bits...
+   7654 3210
+  -x-- --xx
+   |     ++-- Credits.
+   +--------- Bypass memory start error.
 */
 {
 	return (machine().rand() & 0x43);	// bit0 and bit1 are involved in credits input.
@@ -291,7 +297,7 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 		m_maincpu->set_input_line(INT_9980A_LEVEL1, CLEAR_LINE);
 	}
 
-	// Inputs Multiplexion...
+	/* Inputs Multiplexion */
 
 	if (((offset<<1)==0x0cc2)&&(data==1))
 	{
@@ -307,21 +313,6 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		mux_sel = 3;
 	}
-
-
-	// suspicious... just for testing not ce0 ce2 ce6
-//	if (((offset<<1)==0x0cc0)&&(data==0))
-//	{
-//		mux_sel = 6;
-//	}
-//	if (((offset<<1)==0x0ce2)&&(data==1))
-//	{
-//		mux_sel = 6;
-//	}
-//	if (((offset<<1)==0x0ce6)&&(data==1))
-//	{
-//		mux_sel = 6;
-//	}
 }
 
 READ8_MEMBER(jubilee_state::mux_port_r)
@@ -340,7 +331,6 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 
 static ADDRESS_MAP_START( jubileep_cru_map, AS_IO, 8, jubilee_state )
 //	AM_RANGE(0x0000, 0x01ff) AM_READ(unk_r)
-//	AM_RANGE(0x0080, 0x0080) AM_READ(unk_r)
 //	AM_RANGE(0x00c8, 0x00c8) AM_READ(unk_r)		    // use to see the game stuff (even cards)
 	AM_RANGE(0x00c8, 0x00c8) AM_READ(mux_port_r)	// Multiplexed inputs
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(unk_w)
@@ -369,14 +359,14 @@ static INPUT_PORTS_START( jubileep )
    credits entering in the game)
 */
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_CANCEL )   PORT_NAME("Cancel / Take")			// cancel / take
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BET )     PORT_NAME("Bet / Gamble")			// bet / gamble
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4 / Half Gamble")	// hold 4 / half gamble
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )    PORT_NAME("Hold 5 / Red")			// hold 5 / red
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE )        PORT_CODE(KEYCODE_8) PORT_NAME("Attendant Hand Pay")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1 / Black")		// hold 1 / black
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2")				// hold 2
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3")				// hold 3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_CANCEL )  PORT_NAME("Cancel / Take")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BET )    PORT_NAME("Bet / Gamble")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 )   PORT_NAME("Hold 4 / Half Gamble")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )   PORT_NAME("Hold 5 / Red")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE )       PORT_NAME("Attendant Hand Pay")  PORT_CODE(KEYCODE_8) 
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )   PORT_NAME("Hold 1 / Black")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )   PORT_NAME("Hold 2")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 )   PORT_NAME("Hold 3")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -385,15 +375,15 @@ static INPUT_PORTS_START( jubileep )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) 	PORT_CODE(KEYCODE_9) PORT_NAME("Attendant (to pass the memory error and hand pay)")		// attendant (to pass the memory error and hand pay)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )   PORT_CODE(KEYCODE_0) PORT_NAME("Bookkeeping")  PORT_TOGGLE		// service / bookeeping
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_CODE(KEYCODE_9) PORT_NAME("Attendant (to pass the memory error and hand pay)")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_CODE(KEYCODE_0) PORT_NAME("Bookkeeping")  PORT_TOGGLE
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE )	PORT_CODE(KEYCODE_R) PORT_NAME("Reset")		// reset?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )		PORT_NAME("Deal/Start")		// deal
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )   PORT_NAME("Deal / Start")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -467,7 +457,7 @@ static MACHINE_CONFIG_START( jubileep, jubilee_state )
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, CPU_CLOCK, jubileep_map, jubileep_cru_map, cpuconf)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("videoworkram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -478,7 +468,6 @@ static MACHINE_CONFIG_START( jubileep, jubilee_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jubilee_state, screen_update_jubileep)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jubileep)
-
 	MCFG_PALETTE_LENGTH(256)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
