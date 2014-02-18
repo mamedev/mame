@@ -836,6 +836,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 			{
 				if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+0))
 					bitmap.pix32(res_y*2+0, res_x) = palette[pen + colors16_mode];
+				/* TODO: it looks like that PC-98xx can only display even lines ... */
 				if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+1))
 					bitmap.pix32(res_y*2+1, res_x) = palette[pen + colors16_mode];
 			}
