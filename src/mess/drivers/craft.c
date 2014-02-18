@@ -1,5 +1,5 @@
 // license:MAME
-// copyright-holders:Ryan Holz
+// copyright-holders:Ryan Holtz
 /*\
 * * Linus Akesson's "Craft"
 * *
