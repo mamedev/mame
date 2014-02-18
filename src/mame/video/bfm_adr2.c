@@ -118,18 +118,8 @@ const device_type BFM_ADDER2 = &device_creator<bfm_adder2_device>;
 bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t(mconfig, BFM_ADDER2, "BFM ADDER2", tag, owner, clock, "bfm_adder2", __FILE__),
 		m_cpu(*this, "adder2"),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this, "gfxdecode")
 {
-}
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void bfm_adder2_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<bfm_adder2_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 ///////////////////////////////////////////////////////////////////////////

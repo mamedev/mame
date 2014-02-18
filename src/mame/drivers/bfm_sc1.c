@@ -1093,10 +1093,7 @@ static MACHINE_CONFIG_DERIVED( scorpion1_adder2, scorpion1 )
 
 	MCFG_DEFAULT_LAYOUT(layout_sc1_vid)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
-	
 	MCFG_BFM_ADDER2_ADD("adder2")
-	MCFG_BFM_ADDER2_GFXDECODE("gfxdecode")
 MACHINE_CONFIG_END
 
 /////////////////////////////////////////////////////////////////////////////////////
