@@ -14,7 +14,7 @@ PALETTE_INIT_MEMBER(equites_state,equites)
 	int i;
 
 	for (i = 0; i < 256; i++)
-		palette.set_indirect_color(i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
+		palette.set_indirect_color(i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
 	// point to the CLUT
 	color_prom += 0x380;
@@ -32,7 +32,7 @@ PALETTE_INIT_MEMBER(equites_state,splndrbt)
 	int i;
 
 	for (i = 0; i < 0x100; i++)
-		palette.set_indirect_color(i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
+		palette.set_indirect_color(i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
 	for (i = 0; i < 0x100; i++)
 		palette.set_pen_indirect(i, i);

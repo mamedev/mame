@@ -366,7 +366,7 @@ WRITE8_MEMBER(peplus_state::peplus_bgcolor_w)
 		bit2 = 0;
 		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
-		m_palette->set_pen_color((15 + (i*16)), MAKE_RGB(r, g, b));
+		m_palette->set_pen_color((15 + (i*16)), rgb_t(r, g, b));
 	}
 }
 
@@ -1029,7 +1029,7 @@ PALETTE_INIT_MEMBER(peplus_state, peplus)
 		bit2 = 0;
 		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

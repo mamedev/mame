@@ -417,7 +417,7 @@ PALETTE_INIT_MEMBER(progolf_state, progolf)
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		m_palette->set_pen_color(i,MAKE_RGB(r,g,b));
+		m_palette->set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 

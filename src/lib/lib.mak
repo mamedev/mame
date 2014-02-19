@@ -161,6 +161,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/mfi_dsk.o     \
 	$(LIBOBJ)/formats/mz_cas.o      \
 	$(LIBOBJ)/formats/nanos_dsk.o   \
+	$(LIBOBJ)/formats/naslite_dsk.o \
 	$(LIBOBJ)/formats/nes_dsk.o     \
 	$(LIBOBJ)/formats/orao_cas.o    \
 	$(LIBOBJ)/formats/oric_dsk.o    \

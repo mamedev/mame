@@ -188,10 +188,10 @@ PALETTE_INIT_MEMBER(lucky74_state, lucky74)
 
 
 		/* PROMs circuitry, 1st state */
-		palette.set_pen_color(i, MAKE_RGB(r1, g1, b1));
+		palette.set_pen_color(i, rgb_t(r1, g1, b1));
 
 		/* PROMs circuitry, 2nd state */
-		palette.set_pen_color(i + 256, MAKE_RGB(r2, g2, b2));
+		palette.set_pen_color(i + 256, rgb_t(r2, g2, b2));
 	}
 }
 

@@ -47,7 +47,7 @@ PALETTE_INIT_MEMBER(rollrace_state, rollrace)
 		bit3 = (color_prom[2*palette.entries()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
 
-		palette.set_pen_color(i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 
 		color_prom++;
 	}

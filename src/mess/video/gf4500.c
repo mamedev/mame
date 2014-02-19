@@ -93,7 +93,7 @@ static rgb_t gf4500_get_color_16( UINT16 data )
 	r = BITS(data, 15, 11) << 3;
 	g = BITS(data, 10, 5) << 2;
 	b = BITS(data, 4, 0) << 3;
-	return MAKE_RGB(r, g, b);
+	return rgb_t(r, g, b);
 }
 
 UINT32 gf4500_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)

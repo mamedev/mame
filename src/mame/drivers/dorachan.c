@@ -78,7 +78,7 @@ static void get_pens(pen_t *pens)
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		pens[i] = MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		pens[i] = rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 	}
 }
 
@@ -113,7 +113,7 @@ UINT32 dorachan_state::screen_update_dorachan(screen_device &screen, bitmap_rgb3
 
 		for (i = 0; i < 8; i++)
 		{
-			UINT8 color = (data & 0x01) ? fore_color : RGB_BLACK;
+			UINT8 color = (data & 0x01) ? fore_color : 0;
 			bitmap.pix32(y, x) = pens[color];
 
 			data = data >> 1;

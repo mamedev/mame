@@ -174,9 +174,9 @@ static const i8275_interface rt1715_i8275_intf =
 
 PALETTE_INIT_MEMBER(rt1715_state, rt1715)
 {
-	palette.set_pen_color(0, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
-	palette.set_pen_color(1, MAKE_RGB(0x00, 0x7f, 0x00)); /* low intensity */
-	palette.set_pen_color(2, MAKE_RGB(0x00, 0xff, 0x00)); /* high intensitiy */
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); /* black */
+	palette.set_pen_color(1, rgb_t(0x00, 0x7f, 0x00)); /* low intensity */
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); /* high intensitiy */
 }
 
 

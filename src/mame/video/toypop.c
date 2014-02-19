@@ -45,7 +45,7 @@ PALETTE_INIT_MEMBER(toypop_state, toypop)
 		bit3 = (color_prom[i+0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_indirect_color(i, MAKE_RGB(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r,g,b));
 	}
 
 	for (int i = 0;i < 256;i++)

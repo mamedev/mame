@@ -43,8 +43,8 @@ UINT32 tgtpanic_state::screen_update_tgtpanic(screen_device &screen, bitmap_rgb3
 
 	colors[0] = 0;
 	colors[1] = 0xffffffff;
-	colors[2] = MAKE_RGB(pal1bit(m_color >> 2), pal1bit(m_color >> 1), pal1bit(m_color >> 0));
-	colors[3] = MAKE_RGB(pal1bit(m_color >> 6), pal1bit(m_color >> 5), pal1bit(m_color >> 4));
+	colors[2] = rgb_t(pal1bit(m_color >> 2), pal1bit(m_color >> 1), pal1bit(m_color >> 0));
+	colors[3] = rgb_t(pal1bit(m_color >> 6), pal1bit(m_color >> 5), pal1bit(m_color >> 4));
 
 	for (offs = 0; offs < 0x2000; ++offs)
 	{

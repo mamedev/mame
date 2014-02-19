@@ -337,7 +337,7 @@ PALETTE_INIT_MEMBER(adp_state,adp)
 		bit2 = (i >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i, MAKE_RGB(r,g,b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 
@@ -459,7 +459,7 @@ WRITE8_MEMBER(adp_state::ramdac_io_w)
 					break;
 				case 2:
 					m_pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					m_palette->set_pen_color(m_pal.offs, MAKE_RGB(m_pal.r, m_pal.g, m_pal.b));
+					m_palette->set_pen_color(m_pal.offs, rgb_t(m_pal.r, m_pal.g, m_pal.b));
 					m_pal.offs_internal = 0;
 					m_pal.offs++;
 					m_pal.offs&=0xff;

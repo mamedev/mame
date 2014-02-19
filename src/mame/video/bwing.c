@@ -160,7 +160,7 @@ WRITE8_MEMBER(bwing_state::bwing_paletteram_w)
 		if (b > 0xff) b = 0xff;
 	}
 
-	m_palette->set_pen_color(offset, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 
 	#if BW_DEBUG
 		m_paletteram[offset + 0x40] = m_palatch;

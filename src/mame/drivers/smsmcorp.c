@@ -495,7 +495,7 @@ PALETTE_INIT_MEMBER(smsmfg_state, smsmfg)
 
 	for (i = 0; i < 8; i++ )
 	{
-		palette.set_pen_color(i, MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i)));
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i)));
 	}
 }
 

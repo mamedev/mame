@@ -197,7 +197,7 @@ PALETTE_INIT_MEMBER(superwng_state, superwng)
 		bit1 = BIT(*ptr, 7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette.set_pen_color(i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 		++ptr;
 	}
 }

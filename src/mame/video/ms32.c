@@ -142,7 +142,7 @@ void ms32_state::update_color(int color)
 		b = ((m_palram[color*2+1] & 0x00ff) >>0 );
 	}
 
-	m_palette->set_pen_color(color,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(color,rgb_t(r,g,b));
 }
 
 WRITE32_MEMBER(ms32_state::ms32_brightness_w)

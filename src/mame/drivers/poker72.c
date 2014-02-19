@@ -331,7 +331,7 @@ PALETTE_INIT_MEMBER(poker72_state, poker72)
 		r = (x & 0xf)*0x10;
 		g = ((x & 0x3c)>>2)*0x10;
 		b = ((x & 0xf0)>>4)*0x10;
-		palette.set_pen_color(x,MAKE_RGB(r,g,b));
+		palette.set_pen_color(x,rgb_t(r,g,b));
 	}
 }
 

@@ -27,7 +27,7 @@ PALETTE_INIT_MEMBER(truco_state, truco)
 			b >>= 1;
 		}
 
-		palette.set_pen_color(i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 

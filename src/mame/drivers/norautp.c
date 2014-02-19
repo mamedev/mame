@@ -615,14 +615,14 @@ UINT32 norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 
 PALETTE_INIT_MEMBER(norautp_state, norautp)
 {
 	/* 1st gfx bank */
-	palette.set_pen_color(0, MAKE_RGB(0x00, 0x00, 0xff));    /* blue */
-	palette.set_pen_color(1, MAKE_RGB(0xff, 0xff, 0x00));    /* yellow */
-	palette.set_pen_color(2, MAKE_RGB(0x00, 0x00, 0xff));    /* blue */
-	palette.set_pen_color(3, MAKE_RGB(0xff, 0xff, 0xff));    /* white */
-	palette.set_pen_color(4, MAKE_RGB(0xff, 0xff, 0xff));    /* white */
-	palette.set_pen_color(5, MAKE_RGB(0xff, 0x00, 0x00));    /* red */
-	palette.set_pen_color(6, MAKE_RGB(0xff, 0xff, 0xff));    /* white */
-	palette.set_pen_color(7, MAKE_RGB(0x00, 0x00, 0x00));    /* black */
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0xff));    /* blue */
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0x00));    /* yellow */
+	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0xff));    /* blue */
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff));    /* white */
+	palette.set_pen_color(4, rgb_t(0xff, 0xff, 0xff));    /* white */
+	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0x00));    /* red */
+	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0xff));    /* white */
+	palette.set_pen_color(7, rgb_t(0x00, 0x00, 0x00));    /* black */
 }
 
 

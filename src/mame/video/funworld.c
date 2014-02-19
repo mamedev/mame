@@ -81,7 +81,7 @@ PALETTE_INIT_MEMBER(funworld_state,funworld)
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		g = combine_2_weights(weights_g, bit0, bit1);
 
-		palette.set_pen_color(i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 

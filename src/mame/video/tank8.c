@@ -12,8 +12,8 @@ PALETTE_INIT_MEMBER(tank8_state, tank8)
 {
 	int i;
 
-	palette.set_indirect_color(8, MAKE_RGB(0x00, 0x00, 0x00));
-	palette.set_indirect_color(9, MAKE_RGB(0xff, 0xff, 0xff));
+	palette.set_indirect_color(8, rgb_t(0x00, 0x00, 0x00));
+	palette.set_indirect_color(9, rgb_t(0xff, 0xff, 0xff));
 
 	for (i = 0; i < 8; i++)
 	{
@@ -35,25 +35,25 @@ void tank8_state::set_pens()
 {
 	if (*m_team & 0x01)
 	{
-		m_palette->set_indirect_color(0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-		m_palette->set_indirect_color(1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-		m_palette->set_indirect_color(2, MAKE_RGB(0xff, 0xff, 0x00)); /* yellow  */
-		m_palette->set_indirect_color(3, MAKE_RGB(0x00, 0xff, 0x00)); /* green   */
-		m_palette->set_indirect_color(4, MAKE_RGB(0xff, 0x00, 0xff)); /* magenta */
-		m_palette->set_indirect_color(5, MAKE_RGB(0xe0, 0xc0, 0x70)); /* puce    */
-		m_palette->set_indirect_color(6, MAKE_RGB(0x00, 0xff, 0xff)); /* cyan    */
-		m_palette->set_indirect_color(7, MAKE_RGB(0xff, 0xaa, 0xaa)); /* pink    */
+		m_palette->set_indirect_color(0, rgb_t(0xff, 0x00, 0x00)); /* red     */
+		m_palette->set_indirect_color(1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+		m_palette->set_indirect_color(2, rgb_t(0xff, 0xff, 0x00)); /* yellow  */
+		m_palette->set_indirect_color(3, rgb_t(0x00, 0xff, 0x00)); /* green   */
+		m_palette->set_indirect_color(4, rgb_t(0xff, 0x00, 0xff)); /* magenta */
+		m_palette->set_indirect_color(5, rgb_t(0xe0, 0xc0, 0x70)); /* puce    */
+		m_palette->set_indirect_color(6, rgb_t(0x00, 0xff, 0xff)); /* cyan    */
+		m_palette->set_indirect_color(7, rgb_t(0xff, 0xaa, 0xaa)); /* pink    */
 	}
 	else
 	{
-		m_palette->set_indirect_color(0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-		m_palette->set_indirect_color(2, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-		m_palette->set_indirect_color(4, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-		m_palette->set_indirect_color(6, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-		m_palette->set_indirect_color(1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-		m_palette->set_indirect_color(3, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-		m_palette->set_indirect_color(5, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-		m_palette->set_indirect_color(7, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+		m_palette->set_indirect_color(0, rgb_t(0xff, 0x00, 0x00)); /* red     */
+		m_palette->set_indirect_color(2, rgb_t(0xff, 0x00, 0x00)); /* red     */
+		m_palette->set_indirect_color(4, rgb_t(0xff, 0x00, 0x00)); /* red     */
+		m_palette->set_indirect_color(6, rgb_t(0xff, 0x00, 0x00)); /* red     */
+		m_palette->set_indirect_color(1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+		m_palette->set_indirect_color(3, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+		m_palette->set_indirect_color(5, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+		m_palette->set_indirect_color(7, rgb_t(0x00, 0x00, 0xff)); /* blue    */
 	}
 }
 

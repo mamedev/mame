@@ -453,8 +453,8 @@ HD44780_PIXEL_UPDATE(psion_state::lz_pixel_update)
 
 PALETTE_INIT_MEMBER(psion_state, psion)
 {
-	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
-	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 static const gfx_layout psion_charlayout =

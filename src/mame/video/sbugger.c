@@ -49,8 +49,8 @@ PALETTE_INIT_MEMBER(sbugger_state, sbugger)
 		int b = machine().rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
-		palette.set_pen_color(i*2+1,MAKE_RGB(r,g,b));
-		palette.set_pen_color(i*2,MAKE_RGB(0,0,0));
+		palette.set_pen_color(i*2+1,rgb_t(r,g,b));
+		palette.set_pen_color(i*2,rgb_t(0,0,0));
 
 	}
 

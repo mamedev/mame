@@ -120,7 +120,7 @@ UINT32 meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rgb3
 
 		for (i = 0; i < 8; i++)
 		{
-			bitmap.pix32(y, x) = MAKE_RGB(pal1bit(data_r >> 7), pal1bit(data_g >> 7), pal1bit(data_b >> 7));
+			bitmap.pix32(y, x) = rgb_t(pal1bit(data_r >> 7), pal1bit(data_g >> 7), pal1bit(data_b >> 7));
 
 			data_r = data_r << 1;
 			data_g = data_g << 1;

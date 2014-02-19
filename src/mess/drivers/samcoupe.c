@@ -505,7 +505,7 @@ PALETTE_INIT_MEMBER(samcoupe_state, samcoupe)
 		g <<= 5;
 		b <<= 5;
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
 	machine().palette->normalize_range(0, 127);

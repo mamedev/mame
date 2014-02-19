@@ -374,7 +374,7 @@ PALETTE_INIT_MEMBER(drw80pkr_state, drw80pkr)
 		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
 		b = tb - (i * (tb / 5));
 
-		palette.set_pen_color(j, MAKE_RGB(r, g, b));
+		palette.set_pen_color(j, rgb_t(r, g, b));
 	}
 }
 

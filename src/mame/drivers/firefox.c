@@ -273,7 +273,7 @@ void firefox_state::set_rgba( int start, int index, unsigned char *palette_ram )
 	int b = palette_ram[ index + 512 ];
 	int a = ( b & 3 ) * 0x55;
 
-	m_palette->set_pen_color( start + index, MAKE_ARGB( a, r, g, b ) );
+	m_palette->set_pen_color( start + index, rgb_t( a, r, g, b ) );
 }
 
 WRITE8_MEMBER(firefox_state::tile_palette_w)

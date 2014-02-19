@@ -615,7 +615,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(ie15_state, ie15)
 {
-	palette.set_pen_color(0, RGB_BLACK); // black
+	palette.set_pen_color(0, rgb_t::black); // black
 	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
 }
 

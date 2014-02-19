@@ -44,7 +44,7 @@ PALETTE_INIT_MEMBER(ladybug_state,redclash)
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = 0x47 * bit0 + 0x97 * bit1;
 
-		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* star colors */
@@ -67,7 +67,7 @@ PALETTE_INIT_MEMBER(ladybug_state,redclash)
 		bit0 = ((i - 0x20) >> 0) & 0x01;
 		r = 0x47 * bit0;
 
-		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */

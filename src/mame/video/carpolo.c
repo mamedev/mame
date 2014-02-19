@@ -130,7 +130,7 @@ PALETTE_INIT_MEMBER(carpolo_state, carpolo)
 		/* blue component */
 		b = ((b_voltage[(color_prom[pen] >> 0) & 0x03] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.;
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

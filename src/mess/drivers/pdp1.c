@@ -326,19 +326,19 @@ PALETTE_INIT_MEMBER(pdp1_state, pdp1)
 		g = (int) ((g1*cur_level_1 + g2*cur_level_2) + .5);
 		b = (int) ((b1*cur_level_1 + b2*cur_level_2) + .5);
 		/* write color in palette */
-		m_palette->set_indirect_color(i, MAKE_RGB(r, g, b));
+		m_palette->set_indirect_color(i, rgb_t(r, g, b));
 		/* apply decay for next iteration */
 		cur_level_1 *= decay_1;
 		cur_level_2 *= decay_2;
 	}
 
-	m_palette->set_indirect_color(0, MAKE_RGB(0, 0, 0));
+	m_palette->set_indirect_color(0, rgb_t(0, 0, 0));
 
 	/* load static palette */
 	for ( i = 0; i < 6; i++ )
 	{
 		r = pdp1_colors[i*3]; g = pdp1_colors[i*3+1]; b = pdp1_colors[i*3+2];
-		m_palette->set_indirect_color(pen_crt_num_levels + i, MAKE_RGB(r, g, b));
+		m_palette->set_indirect_color(pen_crt_num_levels + i, rgb_t(r, g, b));
 	}
 
 	/* copy colortable to palette */

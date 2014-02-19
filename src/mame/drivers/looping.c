@@ -201,7 +201,7 @@ PALETTE_INIT_MEMBER(looping_state, looping)
 		bit1 = (color_prom[i] >> 7) & 1;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

@@ -512,10 +512,10 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
 static const rgb_t apexc_palette[] =
 {
-	RGB_WHITE,
-	RGB_BLACK,
-	MAKE_RGB(255, 0, 0),
-	MAKE_RGB(50, 0, 0)
+	rgb_t::white,
+	rgb_t::black,
+	rgb_t(255, 0, 0),
+	rgb_t(50, 0, 0)
 };
 
 static const unsigned short apexc_colortable[] =

@@ -45,7 +45,7 @@ void tutankhm_state::get_pens( pen_t *pens )
 	{
 		UINT8 data = m_paletteram[i];
 
-		pens[i] = MAKE_RGB(pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+		pens[i] = rgb_t(pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 }
 

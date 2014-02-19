@@ -210,6 +210,7 @@ ALLOW_SAVE_TYPE(PAIR64);
 ALLOW_SAVE_TYPE(float);
 ALLOW_SAVE_TYPE(double);
 ALLOW_SAVE_TYPE(endianness_t);
+ALLOW_SAVE_TYPE(rgb_t);
 
 
 

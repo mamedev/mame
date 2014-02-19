@@ -298,7 +298,7 @@ static MC6845_BEGIN_UPDATE( begin_update )
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		state->m_pens[i] = MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		state->m_pens[i] = rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 	}
 
 	return state->m_pens;
@@ -344,7 +344,7 @@ static MC6845_UPDATE_ROW( update_row )
 				data = data << 1;
 			}
 
-			color = bit ? fore_color : RGB_BLACK;
+			color = bit ? fore_color : 0;
 			bitmap.pix32(y, x) = pens[color];
 
 			x = x + 1;

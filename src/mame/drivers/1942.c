@@ -191,7 +191,7 @@ WRITE8_MEMBER(_1942_state::c1942p_palette_w)
 	int g = (data & 0x38) >> 3;
 	int b = (data & 0xc0) >> 6;
 
-	m_palette->set_indirect_color(offset, MAKE_RGB(r<<5,g<<5,b<<6));
+	m_palette->set_indirect_color(offset, rgb_t(r<<5,g<<5,b<<6));
 }
 
 static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )

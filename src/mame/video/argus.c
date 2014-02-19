@@ -390,7 +390,7 @@ void argus_state::argus_change_bg_palette(int color, int lo_offs, int hi_offs)
 	ib = pal4bit(m_palette_intensity >>  4);
 	ix = m_palette_intensity & 0x0f;
 
-	irgb = MAKE_RGB(ir,ig,ib);
+	irgb = rgb_t(ir,ig,ib);
 
 	lo = m_paletteram[lo_offs];
 	hi = m_paletteram[hi_offs];
@@ -404,11 +404,11 @@ void argus_state::argus_change_bg_palette(int color, int lo_offs, int hi_offs)
 	if (m_bg_status & 2)
 	{
 		UINT8 val = (r + g + b) / 3;
-		rgb = MAKE_RGB(val,val,val);
+		rgb = rgb_t(val,val,val);
 	}
 	else
 	{
-		rgb = MAKE_RGB(r,g,b);
+		rgb = rgb_t(r,g,b);
 	}
 
 	rgb = jal_blend_func(rgb,irgb,ix);

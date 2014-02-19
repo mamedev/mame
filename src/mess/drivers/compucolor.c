@@ -446,7 +446,7 @@ PALETTE_INIT_MEMBER(compucolor2_state, compucolor2)
 {
 	for (int i = 0; i < 8; i++)
 	{
-		m_palette[i] = MAKE_RGB(BIT(i, 0) * 0xff, BIT(i, 1) * 0xff, BIT(i, 2) * 0xff);
+		m_palette[i] = rgb_t(BIT(i, 0) * 0xff, BIT(i, 1) * 0xff, BIT(i, 2) * 0xff);
 	}
 }
 

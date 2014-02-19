@@ -64,7 +64,7 @@ WRITE8_MEMBER(carjmbre_state::carjmbre_bgcolor_w)
 		else
 			// restore to initial state (black)
 			for (i = 0; i < 64; i += 4)
-				m_palette->set_pen_color(i, RGB_BLACK);
+				m_palette->set_pen_color(i, rgb_t::black);
 	}
 }
 

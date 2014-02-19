@@ -451,7 +451,7 @@ UINT32 trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	if (m_blnkvid)
 	{
-		bitmap.fill(RGB_BLACK, cliprect);
+		bitmap.fill(rgb_t::black, cliprect);
 	}
 	else
 	{

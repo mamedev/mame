@@ -212,7 +212,7 @@ PALETTE_INIT_MEMBER(cardline_state, cardline)
 		bit0 = (data >> 0) & 0x01;
 		bit1 = (data >> 1) & 0x01;
 		b = 0x55 * bit0 + 0xaa * bit1;
-		palette.set_pen_color(i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 

@@ -145,11 +145,11 @@ TIMER_CALLBACK_MEMBER(boxer_state::periodic_callback)
 
 PALETTE_INIT_MEMBER(boxer_state, boxer)
 {
-	palette.set_pen_color(0, MAKE_RGB(0x00,0x00,0x00));
-	palette.set_pen_color(1, MAKE_RGB(0xff,0xff,0xff));
+	palette.set_pen_color(0, rgb_t(0x00,0x00,0x00));
+	palette.set_pen_color(1, rgb_t(0xff,0xff,0xff));
 
-	palette.set_pen_color(2, MAKE_RGB(0xff,0xff,0xff));
-	palette.set_pen_color(3, MAKE_RGB(0x00,0x00,0x00));
+	palette.set_pen_color(2, rgb_t(0xff,0xff,0xff));
+	palette.set_pen_color(3, rgb_t(0x00,0x00,0x00));
 }
 
 void boxer_state::draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect )

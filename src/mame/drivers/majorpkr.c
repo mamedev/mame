@@ -590,7 +590,7 @@ WRITE8_MEMBER(majorpkr_state::paletteram_w)
 
 	offset >>= 1;
 	int color = m_generic_paletteram_8[m_palette_bank * 0x800 + offset * 2] + m_generic_paletteram_8[m_palette_bank * 0x800 + offset * 2 + 1] * 256;
-	m_palette->set_pen_color(offset + m_palette_bank * 256 * 4, MAKE_RGB(pal5bit(color >> 5), pal5bit(color >> 10), pal5bit(color)));
+	m_palette->set_pen_color(offset + m_palette_bank * 256 * 4, rgb_t(pal5bit(color >> 5), pal5bit(color >> 10), pal5bit(color)));
 }
 
 

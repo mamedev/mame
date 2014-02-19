@@ -13,11 +13,11 @@ PALETTE_INIT_MEMBER(mermaid_state, mermaid)
 		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
 		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
 
-		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* blue background */
-	palette.set_indirect_color(0x40, MAKE_RGB(0, 0, 0xff));
+	palette.set_indirect_color(0x40, rgb_t(0, 0, 0xff));
 
 	/* char/sprite palette */
 	for (i = 0; i < 0x40; i++)
@@ -41,11 +41,11 @@ PALETTE_INIT_MEMBER(mermaid_state,rougien)
 		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
 		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
 
-		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* blue background */
-	palette.set_indirect_color(0x40, MAKE_RGB(0, 0, 0));
+	palette.set_indirect_color(0x40, rgb_t(0, 0, 0));
 
 	/* char/sprite palette */
 	for (i = 0; i < 0x40; i++)

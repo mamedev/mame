@@ -716,7 +716,7 @@ rgb_t *compute_res_net_all(running_machine &machine, const UINT8 *prom, const re
 		r = compute_res_net(t[0], RES_NET_CHAN_RED, di);
 		g = compute_res_net(t[1], RES_NET_CHAN_GREEN, di);
 		b = compute_res_net(t[2], RES_NET_CHAN_BLUE, di);
-		rgb[i-rdi->start] = MAKE_RGB(r,g,b);
+		rgb[i-rdi->start] = rgb_t(r,g,b);
 	}
 	return rgb;
 }

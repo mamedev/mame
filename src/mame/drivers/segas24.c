@@ -1106,7 +1106,7 @@ WRITE16_MEMBER( segas24_state::sys16_paletteram_w )
 	g |= g >> 5;
 	b |= b >> 5;
 
-	m_palette->set_pen_color(offset, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 
 	if(data & 0x8000) {
 		r = 255-0.6*(255-r);
@@ -1117,7 +1117,7 @@ WRITE16_MEMBER( segas24_state::sys16_paletteram_w )
 		g = 0.6*g;
 		b = 0.6*b;
 	}
-	m_palette->set_pen_color(offset+m_palette->entries()/2, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(offset+m_palette->entries()/2, rgb_t(r, g, b));
 }
 
 

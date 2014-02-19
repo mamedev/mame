@@ -49,9 +49,9 @@ static INPUT_PORTS_START( tim100 )
 INPUT_PORTS_END
 
 static const rgb_t tim100_palette[3] = {
-	MAKE_RGB(0x00, 0x00, 0x00), // black
-	MAKE_RGB(0xa0, 0xa0, 0xa0), // white
-	MAKE_RGB(0xff, 0xff, 0xff)  // highlight
+	rgb_t(0x00, 0x00, 0x00), // black
+	rgb_t(0xa0, 0xa0, 0xa0), // white
+	rgb_t(0xff, 0xff, 0xff)  // highlight
 };
 
 void tim100_state::machine_reset()

@@ -28,7 +28,7 @@ PALETTE_INIT_MEMBER(sspeedr_state, sspeedr)
 			b += 0x4f;
 		}
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

@@ -334,7 +334,7 @@ void nick_device::initialize_palette()
 		UINT8 g = combine_3_weights(color_weights_rg, gc, gb, ga);
 		UINT8 b = combine_2_weights(color_weights_b, bb, ba);
 
-		m_palette[i] = MAKE_RGB(r, g, b);
+		m_palette[i] = rgb_t(r, g, b);
 	}
 
 	for (int i = 0; i < 256; i++)

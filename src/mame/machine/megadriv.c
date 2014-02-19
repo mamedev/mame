@@ -839,7 +839,7 @@ UINT32 md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb32
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			UINT16 src = srcy[x];
-			desty[x] = MAKE_RGB(pal5bit(src >> 10), pal5bit(src >> 5), pal5bit(src >> 0));
+			desty[x] = rgb_t(pal5bit(src >> 10), pal5bit(src >> 5), pal5bit(src >> 0));
 		}
 	}
 

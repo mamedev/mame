@@ -886,7 +886,7 @@ INLINE UINT32 ycc_to_rgb(UINT32 ycc)
 	b = (common + 516 * cb - 13696);
 
 	/* Now clamp and shift back */
-	return MAKE_RGB(clamp16_shift8(r), clamp16_shift8(g), clamp16_shift8(b));
+	return rgb_t(clamp16_shift8(r), clamp16_shift8(g), clamp16_shift8(b));
 }
 
 UINT32 cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

@@ -638,7 +638,7 @@ PALETTE_INIT_MEMBER(vpoker_state, vpoker)
 	{
 		rgb_t color;
 
-		color = MAKE_RGB(pal1bit((i & 4) >> 2),pal1bit(i & 1),pal1bit((i & 2) >> 1));
+		color = rgb_t(pal1bit((i & 4) >> 2),pal1bit(i & 1),pal1bit((i & 2) >> 1));
 
 		palette.set_pen_color(i, color);
 	}

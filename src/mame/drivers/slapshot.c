@@ -160,7 +160,7 @@ WRITE16_MEMBER(slapshot_state::color_ram_word_w)
 		g = (m_color_ram[offset] & 0xff00) >> 8;
 		b = (m_color_ram[offset] & 0xff);
 
-		m_palette->set_pen_color(offset / 2, MAKE_RGB(r,g,b));
+		m_palette->set_pen_color(offset / 2, rgb_t(r,g,b));
 	}
 }
 

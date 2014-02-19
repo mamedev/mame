@@ -720,8 +720,8 @@ void pc1000_state::machine_reset()
 
 PALETTE_INIT_MEMBER(pc2000_state, pc2000)
 {
-	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
-	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 static const gfx_layout hd44780_charlayout =

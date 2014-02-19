@@ -146,7 +146,7 @@ void namcos1_state::video_start()
 	memset(m_paletteram, 0, 0x8000);
 	memset(m_cus116, 0, 0x10);
 	for (i = 0; i < 0x2000; i++)
-		m_palette->set_pen_color(i, MAKE_RGB(0, 0, 0));
+		m_palette->set_pen_color(i, rgb_t(0, 0, 0));
 
 	/* all palette entries are not affected by shadow sprites... */
 	for (i = 0;i < 0x2000;i++)
@@ -210,7 +210,7 @@ WRITE8_HANDLER( namcos1_paletteram_w )
 		r = state->m_paletteram[offset];
 		g = state->m_paletteram[offset + 0x0800];
 		b = state->m_paletteram[offset + 0x1000];
-		m_palette->set_pen_color(color,MAKE_RGB(r,g,b));
+		m_palette->set_pen_color(color,rgb_t(r,g,b));
 	}
 	else
 	{

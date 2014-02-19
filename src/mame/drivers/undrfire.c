@@ -216,7 +216,7 @@ WRITE32_MEMBER(undrfire_state::color_ram_w)
 		g = (a & 0xff00) >> 8;
 		b = (a & 0xff);
 
-		m_palette->set_pen_color(offset,MAKE_RGB(r,g,b));
+		m_palette->set_pen_color(offset,rgb_t(r,g,b));
 	}
 }
 

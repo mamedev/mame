@@ -71,7 +71,7 @@ void cvs_state::set_pens(  )
 		int g = pal3bit(~m_palette_ram[i] >> 2);
 		int b = pal3bit(~m_palette_ram[i] >> 5);
 
-		m_palette->set_indirect_color(i, MAKE_RGB(r, g, b));
+		m_palette->set_indirect_color(i, rgb_t(r, g, b));
 	}
 }
 

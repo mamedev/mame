@@ -96,8 +96,8 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(asr733_device, asr733)
 {
-	palette.set_pen_color(0,RGB_WHITE); /* white */
-	palette.set_pen_color(1,RGB_BLACK); /* black */
+	palette.set_pen_color(0,rgb_t::white); /* white */
+	palette.set_pen_color(1,rgb_t::black); /* black */
 }
 
 /*

@@ -97,6 +97,6 @@ PALETTE_INIT_MEMBER(calomega_state, calomega)
 		b = bit2 * 0xff;
 
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }

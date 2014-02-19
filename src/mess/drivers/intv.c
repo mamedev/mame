@@ -95,8 +95,8 @@ PALETTE_INIT_MEMBER(intv_state, intv)
 		r = intv_colors[i * 3 + 0];
 		g = intv_colors[i * 3 + 1];
 		b = intv_colors[i * 3 + 2];
-		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
-		palette.set_indirect_color(i + 16, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+		palette.set_indirect_color(i + 16, rgb_t(r, g, b));
 	}
 
 	for (int i = 0; i < 16; i++)

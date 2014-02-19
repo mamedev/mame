@@ -166,10 +166,10 @@ PALETTE_INIT_MEMBER(sanremo_state, sanremo)
 	int index;
 
 	for (index = 0; index < 0x8; index++)
-		palette.set_pen_color(index, MAKE_RGB(pal1bit((index >> 0)&1), pal1bit((index >> 1)&1), pal1bit((index >> 2)&1)));
+		palette.set_pen_color(index, rgb_t(pal1bit((index >> 0)&1), pal1bit((index >> 1)&1), pal1bit((index >> 2)&1)));
 
 	for (index = 0x8; index < 0x10; index++)
-		palette.set_pen_color(index, MAKE_RGB(pal2bit((index >> 0)&1), pal2bit((index >> 1)&1), pal2bit((index >> 2)&1)));
+		palette.set_pen_color(index, rgb_t(pal2bit((index >> 0)&1), pal2bit((index >> 1)&1), pal2bit((index >> 2)&1)));
 }
 
 

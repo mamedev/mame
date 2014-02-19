@@ -206,26 +206,26 @@ PALETTE_INIT_MEMBER(spaceg_state, spaceg)
 	int i;
 
 	for (i = 0; i < 128; i++)
-		palette.set_pen_color (i, MAKE_RGB(0x00,0x00,0x00));
+		palette.set_pen_color (i, rgb_t(0x00,0x00,0x00));
 
 	// proms are currently undumped...
-	palette.set_pen_color (0, MAKE_RGB(0x00,0x00,0x00)); //ok czarny
-	palette.set_pen_color (1, MAKE_RGB(0x7f,0x00,0x00));//???
-	palette.set_pen_color (2, MAKE_RGB(0xff,0xff,0xff)); //ok+ bialy
-	palette.set_pen_color (3, MAKE_RGB(0xff,0x00,0x00)); //ok j.czerw.
-	palette.set_pen_color (4, MAKE_RGB(0x3f,0x3f,0xff)); //ok j.niebieski
-	palette.set_pen_color (5, MAKE_RGB(0x3f,0xff,0x3f)); //ok j.zielony
-	palette.set_pen_color (6, MAKE_RGB(0xff,0xbf,0xbf)); //ok+ 'majtki'
-	palette.set_pen_color (7, MAKE_RGB(0xff,0xff,0x00)); //ok+ zolty
+	palette.set_pen_color (0, rgb_t(0x00,0x00,0x00)); //ok czarny
+	palette.set_pen_color (1, rgb_t(0x7f,0x00,0x00));//???
+	palette.set_pen_color (2, rgb_t(0xff,0xff,0xff)); //ok+ bialy
+	palette.set_pen_color (3, rgb_t(0xff,0x00,0x00)); //ok j.czerw.
+	palette.set_pen_color (4, rgb_t(0x3f,0x3f,0xff)); //ok j.niebieski
+	palette.set_pen_color (5, rgb_t(0x3f,0xff,0x3f)); //ok j.zielony
+	palette.set_pen_color (6, rgb_t(0xff,0xbf,0xbf)); //ok+ 'majtki'
+	palette.set_pen_color (7, rgb_t(0xff,0xff,0x00)); //ok+ zolty
 
-	palette.set_pen_color (8, MAKE_RGB(0xff,0x7f,0x00)); //ok+ pomaranczowy
-	palette.set_pen_color (9, MAKE_RGB(0x3f,0xbf,0xff)); //ok j.niebieski (ciemniejszy od 13)
-	palette.set_pen_color (10, MAKE_RGB(0x3f,0xbf,0x3f));    //ok+ c.zielony
-	palette.set_pen_color (11, MAKE_RGB(0x00,0xff,0x00));    //ok j.zielony
-	palette.set_pen_color (12, MAKE_RGB(0x7f,0x00,0x00));    //ok brazowy (c.czerw)
-	palette.set_pen_color (13, MAKE_RGB(0x7f,0xbf,0xff));    //ok j.niebieski (jasniejszy od 9)
-	palette.set_pen_color (14, MAKE_RGB(0x00,0xff,0xff));//???
-	palette.set_pen_color (15, MAKE_RGB(0x7f,0x7f,0x7f));//???
+	palette.set_pen_color (8, rgb_t(0xff,0x7f,0x00)); //ok+ pomaranczowy
+	palette.set_pen_color (9, rgb_t(0x3f,0xbf,0xff)); //ok j.niebieski (ciemniejszy od 13)
+	palette.set_pen_color (10, rgb_t(0x3f,0xbf,0x3f));    //ok+ c.zielony
+	palette.set_pen_color (11, rgb_t(0x00,0xff,0x00));    //ok j.zielony
+	palette.set_pen_color (12, rgb_t(0x7f,0x00,0x00));    //ok brazowy (c.czerw)
+	palette.set_pen_color (13, rgb_t(0x7f,0xbf,0xff));    //ok j.niebieski (jasniejszy od 9)
+	palette.set_pen_color (14, rgb_t(0x00,0xff,0xff));//???
+	palette.set_pen_color (15, rgb_t(0x7f,0x7f,0x7f));//???
 }
 
 WRITE8_MEMBER(spaceg_state::zvideoram_w)

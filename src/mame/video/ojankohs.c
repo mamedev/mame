@@ -44,7 +44,7 @@ PALETTE_INIT_MEMBER(ojankohs_state,ojankoy)
 		bit4 = BIT(color_prom[palette.entries()], 4);
 		b = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }

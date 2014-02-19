@@ -201,7 +201,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 				int g = BIT(col, 1) * 0xff;
 				int b = BIT(col, 2) * 0xff;
 
-				rgb_t rgb = MAKE_RGB(r, g, b);
+				rgb_t rgb = rgb_t(r, g, b);
 
 				bitmap.pix32(y, (x_pos*state->m_pixels_per_byte)+pixelno) = rgb;
 			}

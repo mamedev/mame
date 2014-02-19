@@ -406,7 +406,7 @@ void hyperscan_state::spg290_argb1555(bitmap_rgb32 &bitmap, const rectangle &cli
 {
 	if (!(argb & 0x8000) && cliprect.contains(posx, posy))
 	{
-		rgb_t color = MAKE_RGB(pal5bit(argb >> 10), pal5bit(argb >> 5), pal5bit(argb >> 0));
+		rgb_t color = rgb_t(pal5bit(argb >> 10), pal5bit(argb >> 5), pal5bit(argb >> 0));
 		bitmap.pix32(posy, posx) = color;
 	}
 }
@@ -415,7 +415,7 @@ void hyperscan_state::spg290_rgb565(bitmap_rgb32 &bitmap, const rectangle &clipr
 {
 	if ((!(transrgb & 0x10000) || (transrgb & 0xffff) != rgb) && cliprect.contains(posx, posy))
 	{
-		rgb_t color = MAKE_RGB(pal5bit(rgb >> 11), pal6bit(rgb >> 5), pal5bit(rgb >> 0));
+		rgb_t color = rgb_t(pal5bit(rgb >> 11), pal6bit(rgb >> 5), pal5bit(rgb >> 0));
 		bitmap.pix32(posy, posx) = color;
 	}
 }
@@ -515,7 +515,7 @@ UINT32 hyperscan_state::spg290_screen_update(screen_device &screen, bitmap_rgb32
 	}
 	else
 	{
-		bitmap.fill(RGB_BLACK, cliprect);
+		bitmap.fill(rgb_t::black, cliprect);
 	}
 
 	return 0;

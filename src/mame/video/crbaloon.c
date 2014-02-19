@@ -42,7 +42,7 @@ PALETTE_INIT_MEMBER(crbaloon_state, crbaloon)
 		g = h * ((~pen >> 1) & 1);
 		b = h * ((~pen >> 2) & 1);
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

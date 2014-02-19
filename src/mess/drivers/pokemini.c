@@ -138,10 +138,10 @@ INPUT_PORTS_END
 
 PALETTE_INIT_MEMBER(pokemini_state, pokemini)
 {
-	palette.set_pen_color(0, MAKE_RGB(0xff, 0xfb, 0x87));
-	palette.set_pen_color(1, MAKE_RGB(0xb1, 0xae, 0x4e));
-	palette.set_pen_color(2, MAKE_RGB(0x84, 0x80, 0x4e));
-	palette.set_pen_color(3, MAKE_RGB(0x4e, 0x4e, 0x4e));
+	palette.set_pen_color(0, rgb_t(0xff, 0xfb, 0x87));
+	palette.set_pen_color(1, rgb_t(0xb1, 0xae, 0x4e));
+	palette.set_pen_color(2, rgb_t(0x84, 0x80, 0x4e));
+	palette.set_pen_color(3, rgb_t(0x4e, 0x4e, 0x4e));
 }
 
 

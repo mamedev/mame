@@ -82,7 +82,7 @@ void redalert_state::get_pens(pen_t *pens)
 		UINT8 g = combine_3_weights(charmap_rg_weights, g0_bit, g1_bit, g2_bit);
 		UINT8 b = combine_2_weights(charmap_b_weights,  b0_bit, b1_bit);
 
-		pens[offs] = MAKE_RGB(r, g, b);
+		pens[offs] = rgb_t(r, g, b);
 	}
 
 	/* the bitmap layer colors are directly mapped */
@@ -92,11 +92,11 @@ void redalert_state::get_pens(pen_t *pens)
 		UINT8 g = bitmap_weight[(offs >> 1) & 0x01];
 		UINT8 b = bitmap_weight[(offs >> 0) & 0x01];
 
-		pens[NUM_CHARMAP_PENS + offs] = MAKE_RGB(r, g, b);
+		pens[NUM_CHARMAP_PENS + offs] = rgb_t(r, g, b);
 	}
 
 	/* background color */
-	pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS] = MAKE_RGB(back_r_weight[0], back_gb_weight[0], back_gb_weight[0]);
+	pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS] = rgb_t(back_r_weight[0], back_gb_weight[0], back_gb_weight[0]);
 }
 
 /* this uses the same color hook-up between bitmap and chars. */
@@ -137,7 +137,7 @@ void redalert_state::get_panther_pens(pen_t *pens)
 		UINT8 g = bitmap_weight[(~data >> 1) & 0x01];
 		UINT8 b = bitmap_weight[(~data >> 0) & 0x01];
 
-		pens[offs] = MAKE_RGB(r, g, b);
+		pens[offs] = rgb_t(r, g, b);
 	}
 
 	/* the bitmap layer colors are directly mapped */
@@ -147,11 +147,11 @@ void redalert_state::get_panther_pens(pen_t *pens)
 		UINT8 g = bitmap_weight[(offs >> 1) & 0x01];
 		UINT8 b = bitmap_weight[(offs >> 0) & 0x01];
 
-		pens[NUM_CHARMAP_PENS + offs] = MAKE_RGB(r, g, b);
+		pens[NUM_CHARMAP_PENS + offs] = rgb_t(r, g, b);
 	}
 
 	/* background color */
-	pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS] = MAKE_RGB(back_r_weight[0], back_gb_weight[0], back_gb_weight[0]);
+	pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS] = rgb_t(back_r_weight[0], back_gb_weight[0], back_gb_weight[0]);
 }
 
 /*************************************

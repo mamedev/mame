@@ -135,13 +135,13 @@ WRITE32_MEMBER(feversoc_state::fs_paletteram_w)
 	g = ((m_generic_paletteram_32[offset] & 0x03e00000)>>16) >> 2;
 	b = ((m_generic_paletteram_32[offset] & 0x7c000000)>>16) >> 7;
 
-	m_palette->set_pen_color(offset*2+0,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offset*2+0,rgb_t(r,g,b));
 
 	r = (m_generic_paletteram_32[offset] & 0x001f) << 3;
 	g = (m_generic_paletteram_32[offset] & 0x03e0) >> 2;
 	b = (m_generic_paletteram_32[offset] & 0x7c00) >> 7;
 
-	m_palette->set_pen_color(offset*2+1,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offset*2+1,rgb_t(r,g,b));
 }
 
 READ32_MEMBER(feversoc_state::in0_r)

@@ -53,7 +53,7 @@ PALETTE_INIT_MEMBER(irobot_state, irobot)
 
 		int swapped_i = BITSWAP8(i,7,6,5,4,3,0,1,2);
 
-		palette.set_pen_color(swapped_i + 64, MAKE_RGB(r, g, b));
+		palette.set_pen_color(swapped_i + 64, rgb_t(r, g, b));
 	}
 }
 
@@ -72,7 +72,7 @@ WRITE8_MEMBER(irobot_state::irobot_paletteram_w)
 	g = 12 * bits * intensity;
 	bits = (color >> 7) & 0x03;
 	r = 12 * bits * intensity;
-	m_palette->set_pen_color((offset >> 1) & 0x3F,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color((offset >> 1) & 0x3F,rgb_t(r,g,b));
 }
 
 

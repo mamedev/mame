@@ -71,11 +71,11 @@ PALETTE_INIT_MEMBER(zodiack_state,zodiack)
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* white for bullets */
-	palette.set_indirect_color(0x30, RGB_WHITE);
+	palette.set_indirect_color(0x30, rgb_t::white);
 
 	for (i = 0; i < 0x20; i++)
 		if ((i & 3) == 0)

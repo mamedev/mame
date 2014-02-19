@@ -1357,14 +1357,14 @@ INPUT_PORTS_END
 
 PALETTE_INIT_MEMBER(px4_state, px4)
 {
-	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
-	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 PALETTE_INIT_MEMBER(px4_state, px4p)
 {
-	palette.set_pen_color(0, MAKE_RGB(149, 157, 130));
-	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(149, 157, 130));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 

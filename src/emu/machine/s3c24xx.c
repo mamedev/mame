@@ -183,7 +183,7 @@ static rgb_t s3c24xx_get_color_tft_16( device_t *device, UINT16 data)
 		g = (BITS( data, 10, 6) << 3);
 		b = (BITS( data, 5, 1) << 3);
 		i = BIT( data, 1) << 2;
-		return MAKE_RGB( r | i, g | i, b | i);
+		return rgb_t( r | i, g | i, b | i);
 	}
 	else
 	{
@@ -191,7 +191,7 @@ static rgb_t s3c24xx_get_color_tft_16( device_t *device, UINT16 data)
 		r = BITS( data, 15, 11) << 3;
 		g = BITS( data, 10, 5) << 2;
 		b = BITS( data, 4, 0) << 3;
-		return MAKE_RGB( r, g, b);
+		return rgb_t( r, g, b);
 	}
 }
 
@@ -203,7 +203,7 @@ static rgb_t s3c24xx_get_color_tft_24( device_t *device, UINT32 data)
 	r = BITS( data, 23, 16);
 	g = BITS( data, 15, 8);
 	b = BITS( data, 7, 0);
-	return MAKE_RGB( r, g, b);
+	return rgb_t( r, g, b);
 }
 
 #endif
@@ -214,7 +214,7 @@ static rgb_t s3c24xx_get_color_stn_12( device_t *device, UINT16 data)
 	r = BITS( data, 11, 8) << 4;
 	g = BITS( data, 7, 4) << 4;
 	b = BITS( data, 3, 0) << 4;
-	return MAKE_RGB( r, g, b);
+	return rgb_t( r, g, b);
 }
 
 static rgb_t s3c24xx_get_color_stn_08( device_t *device, UINT8 data)
@@ -224,18 +224,18 @@ static rgb_t s3c24xx_get_color_stn_08( device_t *device, UINT8 data)
 	r = ((s3c24xx->lcd.regs.redlut   >> (BITS( data, 7, 5) << 2)) & 0xF) << 4;
 	g = ((s3c24xx->lcd.regs.greenlut >> (BITS( data, 4, 2) << 2)) & 0xF) << 4;
 	b = ((s3c24xx->lcd.regs.bluelut  >> (BITS( data, 1, 0) << 2)) & 0xF) << 4;
-	return MAKE_RGB( r, g, b);
+	return rgb_t( r, g, b);
 }
 
 static rgb_t s3c24xx_get_color_stn_01( device_t *device, UINT8 data)
 {
 	if ((data & 1) == 0)
 	{
-		return RGB_BLACK;
+		return rgb_t::black;
 	}
 	else
 	{
-		return RGB_WHITE;
+		return rgb_t::white;
 	}
 }
 
@@ -244,14 +244,14 @@ static rgb_t s3c24xx_get_color_stn_02( device_t *device, UINT8 data)
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT8 r, g, b;
 	r = g = b = ((s3c24xx->lcd.regs.bluelut >> (BITS( data, 1, 0) << 2)) & 0xF) << 4;
-	return MAKE_RGB( r, g, b);
+	return rgb_t( r, g, b);
 }
 
 static rgb_t s3c24xx_get_color_stn_04( device_t *device, UINT8 data)
 {
 	UINT8 r, g, b;
 	r = g = b = BITS( data, 3, 0) << 4;
-	return MAKE_RGB( r, g, b);
+	return rgb_t( r, g, b);
 }
 
 static rgb_t s3c24xx_get_color_tpal( device_t *device)

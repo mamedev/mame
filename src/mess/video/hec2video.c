@@ -46,24 +46,24 @@ void hec2hrp_state::Init_Hector_Palette()
 	hector_color[3] = 3; // Ecriture de choix (jaune)
 
 	// Color initialisation : full lightning
-	m_palette->set_pen_color( 0,MAKE_RGB(000,000,000));//Noir
-	m_palette->set_pen_color( 1,MAKE_RGB(255,000,000));//Rouge
-	m_palette->set_pen_color( 2,MAKE_RGB(000,255,000));//Vert
-	m_palette->set_pen_color( 3,MAKE_RGB(255,255,000));//Jaune
-	m_palette->set_pen_color( 4,MAKE_RGB(000,000,255));//Bleu
-	m_palette->set_pen_color( 5,MAKE_RGB(255,000,255));//Magneta
-	m_palette->set_pen_color( 6,MAKE_RGB(000,255,255));//Cyan
-	m_palette->set_pen_color( 7,MAKE_RGB(255,255,255));//Blanc
+	m_palette->set_pen_color( 0,rgb_t(000,000,000));//Noir
+	m_palette->set_pen_color( 1,rgb_t(255,000,000));//Rouge
+	m_palette->set_pen_color( 2,rgb_t(000,255,000));//Vert
+	m_palette->set_pen_color( 3,rgb_t(255,255,000));//Jaune
+	m_palette->set_pen_color( 4,rgb_t(000,000,255));//Bleu
+	m_palette->set_pen_color( 5,rgb_t(255,000,255));//Magneta
+	m_palette->set_pen_color( 6,rgb_t(000,255,255));//Cyan
+	m_palette->set_pen_color( 7,rgb_t(255,255,255));//Blanc
 	// 1/2 lightning
 
-	m_palette->set_pen_color( 8,MAKE_RGB(000,000,000));//Noir
-	m_palette->set_pen_color( 9,MAKE_RGB(128,000,000));//Rouge
-	m_palette->set_pen_color( 10,MAKE_RGB(000,128,000));//Vert
-	m_palette->set_pen_color( 11,MAKE_RGB(128,128,000));//Jaune
-	m_palette->set_pen_color( 12,MAKE_RGB(000,000,128));//Bleu
-	m_palette->set_pen_color( 13,MAKE_RGB(128,000,128));//Magneta
-	m_palette->set_pen_color( 14,MAKE_RGB(000,128,128));//Cyan
-	m_palette->set_pen_color( 15,MAKE_RGB(128,128,128));//Blanc
+	m_palette->set_pen_color( 8,rgb_t(000,000,000));//Noir
+	m_palette->set_pen_color( 9,rgb_t(128,000,000));//Rouge
+	m_palette->set_pen_color( 10,rgb_t(000,128,000));//Vert
+	m_palette->set_pen_color( 11,rgb_t(128,128,000));//Jaune
+	m_palette->set_pen_color( 12,rgb_t(000,000,128));//Bleu
+	m_palette->set_pen_color( 13,rgb_t(128,000,128));//Magneta
+	m_palette->set_pen_color( 14,rgb_t(000,128,128));//Cyan
+	m_palette->set_pen_color( 15,rgb_t(128,128,128));//Blanc
 }
 
 void hec2hrp_state::hector_hr(bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram)

@@ -133,7 +133,7 @@ static void K001006_w(int chip, int offset, UINT32 data, UINT32 mem_mask)
 				b |= (b >> 5);
 				g |= (g >> 5);
 				r |= (r >> 5);
-				K001006_palette[chip][index>>1] = MAKE_ARGB(a, r, g, b);
+				K001006_palette[chip][index>>1] = rgb_t(a, r, g, b);
 
 				K001006_addr[chip] += 2;
 				break;

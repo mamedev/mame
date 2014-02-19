@@ -625,7 +625,7 @@ WRITE16_MEMBER(mpu4vid_state::bt471_w )
 
 			if (++*addr_cnt == 3)
 			{
-				m_palette->set_pen_color(bt471.address, MAKE_RGB(color[0], color[1], color[2]));
+				m_palette->set_pen_color(bt471.address, rgb_t(color[0], color[1], color[2]));
 				*addr_cnt = 0;
 
 				/* Address register increments */

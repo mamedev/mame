@@ -42,7 +42,7 @@ PALETTE_INIT_MEMBER(blueprnt_state, blueprnt)
 		g = ((pen >> 2) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
 		b = ((pen >> 1) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

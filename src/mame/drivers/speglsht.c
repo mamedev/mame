@@ -370,7 +370,7 @@ UINT32 speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rgb3
 			if(srcline[x])
 			{
 				rgb_t color=palette_get_color(machine(), srcline[x]);
-				PLOT_PIXEL_RGB(x,y,RGB_RED(color),RGB_GREEN(color),RGB_BLUE(color));
+				PLOT_PIXEL_RGB(x,y,color.r(),color.g(),color.b());
 			}
 		}
 	}

@@ -83,7 +83,7 @@ void pacland_state::switch_palette()
 
 		color_prom++;
 
-		m_palette->set_indirect_color(i,MAKE_RGB(r,g,b));
+		m_palette->set_indirect_color(i,rgb_t(r,g,b));
 	}
 }
 

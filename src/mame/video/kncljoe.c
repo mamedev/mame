@@ -26,7 +26,7 @@ PALETTE_INIT_MEMBER(kncljoe_state, kncljoe)
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	for (i = 0x80; i < 0x90; i++)
@@ -52,7 +52,7 @@ PALETTE_INIT_MEMBER(kncljoe_state, kncljoe)
 		bit2 = (color_prom[(i - 0x80) + 0x300] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */

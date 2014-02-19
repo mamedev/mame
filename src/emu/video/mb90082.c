@@ -210,7 +210,7 @@ UINT32 mb90082_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	bg_b = m_uc & 1 ? 0xdf : 0;
 	bg_g = m_uc & 2 ? 0xdf : 0;
 	bg_r = m_uc & 4 ? 0xdf : 0;
-	bitmap.fill(MAKE_ARGB(0xff,bg_r,bg_g,bg_b),cliprect);
+	bitmap.fill(rgb_t(0xff,bg_r,bg_g,bg_b),cliprect);
 
 	for(y=0;y<12;y++)
 	{

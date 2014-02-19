@@ -120,22 +120,22 @@
 PALETTE_INIT_MEMBER(atarifb_state, atarifb)
 {
 	/* chars */
-	palette.set_pen_color(0, MAKE_RGB(0xff,0xff,0xff)); /* white  */
-	palette.set_pen_color(1, MAKE_RGB(0x00,0x00,0x00)); /* black  */
+	palette.set_pen_color(0, rgb_t(0xff,0xff,0xff)); /* white  */
+	palette.set_pen_color(1, rgb_t(0x00,0x00,0x00)); /* black  */
 
 	/* sprites */
-	palette.set_pen_color(2, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette.set_pen_color(3, MAKE_RGB(0xff,0xff,0xff)); /* white  */
-	palette.set_pen_color(4, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette.set_pen_color(5, MAKE_RGB(0x00,0x00,0x00)); /* black  */
+	palette.set_pen_color(2, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette.set_pen_color(3, rgb_t(0xff,0xff,0xff)); /* white  */
+	palette.set_pen_color(4, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette.set_pen_color(5, rgb_t(0x00,0x00,0x00)); /* black  */
 
 	/* sprite masks */
-	palette.set_pen_color(6, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette.set_pen_color(7, MAKE_RGB(0x80,0x80,0x80)); /* grey  */
-	palette.set_pen_color(8, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette.set_pen_color(9, MAKE_RGB(0x00,0x00,0x00)); /* black  */
-	palette.set_pen_color(10, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette.set_pen_color(11, MAKE_RGB(0xff,0xff,0xff)); /* white  */
+	palette.set_pen_color(6, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette.set_pen_color(7, rgb_t(0x80,0x80,0x80)); /* grey  */
+	palette.set_pen_color(8, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette.set_pen_color(9, rgb_t(0x00,0x00,0x00)); /* black  */
+	palette.set_pen_color(10, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette.set_pen_color(11, rgb_t(0xff,0xff,0xff)); /* white  */
 }
 
 

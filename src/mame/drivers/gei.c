@@ -179,7 +179,7 @@ PALETTE_INIT_MEMBER(gei_state, gei)
 
 	for (i = 0; i < 8; i++ )
 	{
-		palette.set_pen_color(i, MAKE_RGB(pal1bit(i >> 2), pal1bit(i), pal1bit(i >> 1)));
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 2), pal1bit(i), pal1bit(i >> 1)));
 	}
 }
 
@@ -189,7 +189,7 @@ PALETTE_INIT_MEMBER(gei_state,quizvid)
 
 	for (i = 0; i < 8; i++ )
 	{
-		palette.set_pen_color(i, MAKE_RGB(pal1bit(i >> 1), pal1bit(i), pal1bit(i >> 2)));
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 1), pal1bit(i), pal1bit(i >> 2)));
 	}
 }
 

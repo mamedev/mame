@@ -625,8 +625,8 @@ const avr8_config atmega1280_config =
 PALETTE_INIT_MEMBER(replicator_state, replicator)
 {
 //These colors were picked with the color picker in Inkscape, based on a photo of the LCD used in the Replicator 1 3d printer:
-	palette.set_pen_color(0, MAKE_RGB(0xCA, 0xE7, 0xEB));
-	palette.set_pen_color(1, MAKE_RGB(0x78, 0xAB, 0xA8));
+	palette.set_pen_color(0, rgb_t(0xCA, 0xE7, 0xEB));
+	palette.set_pen_color(1, rgb_t(0x78, 0xAB, 0xA8));
 }
 
 static const gfx_layout hd44780_charlayout =

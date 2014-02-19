@@ -108,7 +108,7 @@ void tc0110pcr_device::restore_colors()
 			}
 		}
 
-		m_palette->set_pen_color(i + (m_pal_offs << 12), MAKE_RGB(r, g, b));
+		m_palette->set_pen_color(i + (m_pal_offs << 12), rgb_t(r, g, b));
 	}
 }
 

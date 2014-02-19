@@ -63,7 +63,7 @@ PALETTE_INIT_MEMBER(mogura_state, mogura)
 		bit2 = BIT(color_prom[i], 7);
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(j, MAKE_RGB(r, g, b));
+		palette.set_pen_color(j, rgb_t(r, g, b));
 		j += 4;
 		if (j > 31) j -= 31;
 	}

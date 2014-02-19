@@ -307,7 +307,7 @@ WRITE8_MEMBER(gpworld_state::palette_write)
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
-	m_palette->set_pen_color((pal_index & 0xffe) >> 1, MAKE_ARGB(a, r, g, b));
+	m_palette->set_pen_color((pal_index & 0xffe) >> 1, rgb_t(a, r, g, b));
 }
 
 /* PROGRAM MAP */

@@ -294,8 +294,8 @@ GFXDECODE_END
 PALETTE_INIT_MEMBER(warpspeed_state, warpspeed)
 {
 	// tilemaps
-	palette.set_pen_color(0,RGB_BLACK); /* black */
-	palette.set_pen_color(1,RGB_WHITE); /* white */
+	palette.set_pen_color(0,rgb_t::black); /* black */
+	palette.set_pen_color(1,rgb_t::white); /* white */
 
 	// circles
 	for ( int i = 0; i < 8; i++ )

@@ -52,7 +52,7 @@ int upd765_format::compute_track_size(const format &f) const
 	return track_size;
 }
 
-void upd765_format::build_sector_description(const format &f, UINT8 *sectdata, desc_s *sectors) const
+void upd765_format::build_sector_description(const format &f, UINT8 *sectdata, desc_s *sectors, int track, int head) const
 {
 	if(f.sector_base_id == -1) {
 		for(int i=0; i<f.sector_count; i++) {
@@ -210,10 +210,10 @@ bool upd765_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 
 	UINT8 sectdata[40*512];
 	desc_s sectors[40];
-	build_sector_description(f, sectdata, sectors);
 
 	for(int track=0; track < f.track_count; track++)
 		for(int head=0; head < f.head_count; head++) {
+			build_sector_description(f, sectdata, sectors, track, head);
 			io_generic_read(io, sectdata, (track*f.head_count + head)*track_size, track_size);
 			generate_track(desc, track, head, sectors, f.sector_count, total_size, image);
 		}
@@ -333,13 +333,15 @@ bool upd765_format::save(io_generic *io, floppy_image *image)
 
 	UINT8 sectdata[40*512];
 	desc_s sectors[40];
-	build_sector_description(f, sectdata, sectors);
 
 	for(int track=0; track < f.track_count; track++)
 		for(int head=0; head < f.head_count; head++) {
+			build_sector_description(f, sectdata, sectors, track, head);
 			extract_sectors(image, f, sectors, track, head);
 			io_generic_write(io, sectdata, (track*f.head_count + head)*track_size, track_size);
 		}
+
+	global_free(candidates);
 
 	return true;
 }

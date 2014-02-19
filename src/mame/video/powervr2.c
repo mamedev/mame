@@ -3456,7 +3456,7 @@ UINT32 powervr2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	}
 #endif
 
-	bitmap.fill(MAKE_ARGB(0xff,
+	bitmap.fill(rgb_t(0xff,
 							(vo_border_col >> 16) & 0xff,
 							(vo_border_col >> 8 ) & 0xff,
 							(vo_border_col      ) & 0xff), cliprect); //FIXME: Chroma bit?

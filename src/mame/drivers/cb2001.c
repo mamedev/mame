@@ -795,11 +795,11 @@ PALETTE_INIT_MEMBER(cb2001_state, cb2001)
 
 		if (length==0x400) // are the cb2001 proms dumped incorrectly?
 		{
-			if (!(i&0x20)) palette.set_pen_color((i&0x1f) | ((i&~0x3f)>>1), MAKE_RGB(r, g, b));
+			if (!(i&0x20)) palette.set_pen_color((i&0x1f) | ((i&~0x3f)>>1), rgb_t(r, g, b));
 		}
 		else
 		{
-			palette.set_pen_color(i, MAKE_RGB(r, g, b));
+			palette.set_pen_color(i, rgb_t(r, g, b));
 		}
 	}
 }

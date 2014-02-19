@@ -8,7 +8,7 @@ PALETTE_INIT_MEMBER(buggychl_state, buggychl)
 
 	/* arbitrary blue shading for the sky, estimation */
 	for (i = 0; i < 128; i++)
-		palette.set_pen_color(i + 128, MAKE_RGB(0, 240-i, 255));
+		palette.set_pen_color(i + 128, rgb_t(0, 240-i, 255));
 }
 
 void buggychl_state::video_start()

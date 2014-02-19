@@ -1130,7 +1130,7 @@ PALETTE_INIT_MEMBER(halleys_state, halleys)
 	for (count=0; count<1024; count++)
 	{
 		pal_ptr[count] = 0;
-		palette.set_pen_color(count, MAKE_RGB(0, 0, 0));
+		palette.set_pen_color(count, rgb_t(0, 0, 0));
 	}
 
 	// 00-31: palette RAM(ffc0-ffdf)
@@ -1151,7 +1151,7 @@ PALETTE_INIT_MEMBER(halleys_state, halleys)
 			g = r + count + BG_MONO;
 			r += i;
 			pal_ptr[g] = d;
-			palette.set_pen_color(g, MAKE_RGB(r, r, r));
+			palette.set_pen_color(g, rgb_t(r, r, r));
 		}
 	}
 
@@ -1234,13 +1234,13 @@ WRITE8_MEMBER(halleys_state::halleys_paletteram_IIRRGGBB_w)
 	g = d    & 0x0c; g |= i;  g = g<<4 | g;
 	b = d<<2 & 0x0c; b |= i;  b = b<<4 | b;
 
-	m_palette->set_pen_color(offset, MAKE_RGB(r, g, b));
-	m_palette->set_pen_color(offset+SP_2BACK, MAKE_RGB(r, g, b));
-	m_palette->set_pen_color(offset+SP_ALPHA, MAKE_RGB(r, g, b));
-	m_palette->set_pen_color(offset+SP_COLLD, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset+SP_2BACK, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset+SP_ALPHA, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset+SP_COLLD, rgb_t(r, g, b));
 
 	halleys_decode_rgb(&r, &g, &b, offset, 0);
-	m_palette->set_pen_color(offset+0x20, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(offset+0x20, rgb_t(r, g, b));
 }
 
 

@@ -589,7 +589,7 @@ PALETTE_INIT_MEMBER(_5clown_state, _5clown)
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		b = bk * (bit2 * 0xff);
 
-		m_palette->set_pen_color(i, MAKE_RGB(r, g, b));
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

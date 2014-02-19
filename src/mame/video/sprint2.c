@@ -10,10 +10,10 @@
 
 PALETTE_INIT_MEMBER(sprint2_state, sprint2)
 {
-	palette.set_indirect_color(0, MAKE_RGB(0x00, 0x00, 0x00));
-	palette.set_indirect_color(1, MAKE_RGB(0x5b, 0x5b, 0x5b));
-	palette.set_indirect_color(2, MAKE_RGB(0xa4, 0xa4, 0xa4));
-	palette.set_indirect_color(3, MAKE_RGB(0xff, 0xff, 0xff));
+	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
+	palette.set_indirect_color(1, rgb_t(0x5b, 0x5b, 0x5b));
+	palette.set_indirect_color(2, rgb_t(0xa4, 0xa4, 0xa4));
+	palette.set_indirect_color(3, rgb_t(0xff, 0xff, 0xff));
 
 	palette.set_pen_indirect(0x0, 1);   /* black playfield */
 	palette.set_pen_indirect(0x1, 0);

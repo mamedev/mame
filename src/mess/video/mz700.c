@@ -33,7 +33,7 @@ PALETTE_INIT_MEMBER(mz_state, mz)
 	int i;
 
 	for (i = 0; i < 8; i++)
-		m_palette->set_indirect_color(i, MAKE_RGB((i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00, (i & 1) ? 0xff : 0x00));
+		m_palette->set_indirect_color(i, rgb_t((i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00, (i & 1) ? 0xff : 0x00));
 
 	for (i = 0; i < 256; i++)
 	{

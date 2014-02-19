@@ -1,5 +1,5 @@
 // license:MAME
-// copyright-holders:Ryan Holz, Robbbert
+// copyright-holders:Ryan Holtz, Robbbert
 /******************************************************************************
 
 

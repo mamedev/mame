@@ -13,7 +13,7 @@ PALETTE_INIT_MEMBER(jailbrek_state, jailbrek)
 		int g = pal4bit(color_prom[i + 0x00] >> 4);
 		int b = pal4bit(color_prom[i + 0x20] >> 0);
 
-		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */

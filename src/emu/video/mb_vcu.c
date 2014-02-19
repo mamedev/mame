@@ -72,7 +72,7 @@ WRITE8_MEMBER( mb_vcu_device::mb_vcu_paletteram_w )
 	bit0 = (m_palram[offset] >> 0) & 0x01;
 	b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
 
-	m_palette->set_pen_color(offset, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
 //-------------------------------------------------
@@ -470,7 +470,7 @@ WRITE8_MEMBER( mb_vcu_device::background_color_w )
 	bit0 = (m_bk_color >> 0) & 0x01;
 	b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
 
-	m_palette->set_pen_color(0x100, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(0x100, rgb_t(r, g, b));
 }
 
 READ8_MEMBER( mb_vcu_device::status_r )

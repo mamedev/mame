@@ -384,7 +384,7 @@ PALETTE_INIT_MEMBER(pipeline_state, pipeline)
 		r*=36;
 		g*=36;
 		b*=85;
-		palette.set_pen_color(0x100+i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(0x100+i, rgb_t(r, g, b));
 	}
 }
 

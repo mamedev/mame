@@ -188,7 +188,7 @@ rgb_t astrof_state::make_pen( UINT8 data )
 	UINT8 g = (0xc0 * g1_bit) + (0x3f * g2_bit);
 	UINT8 b = (0xc0 * b1_bit) + (0x3f * b2_bit);
 
-	return MAKE_RGB(r, g, b);
+	return rgb_t(r, g, b);
 }
 
 

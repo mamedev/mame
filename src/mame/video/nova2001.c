@@ -44,7 +44,7 @@ PALETTE_INIT_MEMBER(nova2001_state,nova2001)
 		/* blue component */
 		b = (((color_prom[entry] >> 4) & 0x0c) | intensity) * 0x11;
 
-		palette.set_pen_color(i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 

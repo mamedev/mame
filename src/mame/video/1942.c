@@ -52,7 +52,7 @@ void _1942_state::create_palette()
 		bit3 = (color_prom[i + 2 * 256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		m_palette->set_indirect_color(i,MAKE_RGB(r,g,b));
+		m_palette->set_indirect_color(i,rgb_t(r,g,b));
 	}
 }
 

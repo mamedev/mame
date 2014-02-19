@@ -382,7 +382,7 @@ PALETTE_INIT_MEMBER(taxidriv_state, taxidriv)
 		bit1 = (color_prom[0] >> 5) & 0x01;
 		b = 0x55 * bit0 + 0xaa * bit1;
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }

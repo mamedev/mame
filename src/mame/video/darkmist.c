@@ -107,10 +107,10 @@ void darkmist_state::set_pens()
 		int g = pal4bit(m_generic_paletteram_8[i | 0x000] >> 4);
 		int b = pal4bit(m_generic_paletteram_8[i | 0x000] >> 0);
 
-		m_palette->set_indirect_color(i, MAKE_RGB(r, g, b));
+		m_palette->set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	m_palette->set_indirect_color(0x100, RGB_BLACK);
+	m_palette->set_indirect_color(0x100, rgb_t::black);
 }
 
 

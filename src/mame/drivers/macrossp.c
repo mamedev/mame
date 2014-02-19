@@ -300,7 +300,7 @@ WRITE32_MEMBER(macrossp_state::paletteram32_macrossp_w)
 	g = ((m_paletteram[offset] & 0x00ff0000) >>16);
 	r = ((m_paletteram[offset] & 0xff000000) >>24);
 
-	m_palette->set_pen_color(offset, MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offset, rgb_t(r,g,b));
 }
 
 
@@ -361,7 +361,7 @@ void macrossp_state::update_colors(  )
 		else
 			r -= m_fade_effect;
 
-		m_palette->set_pen_color(i, MAKE_RGB(r, g, b));
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

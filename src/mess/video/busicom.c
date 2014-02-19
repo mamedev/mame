@@ -1849,10 +1849,10 @@ PALETTE_INIT_MEMBER(busicom_state, busicom)
 {
 	int i;
 	for(i=0;i<8;i++) {
-		m_palette->set_pen_color( i, MAKE_RGB(color[i],color[i],color[i]) );
+		m_palette->set_pen_color( i, rgb_t(color[i],color[i],color[i]) );
 	}
-	m_palette->set_pen_color( 8, MAKE_RGB(0xff,0xff,0xff) );
+	m_palette->set_pen_color( 8, rgb_t(0xff,0xff,0xff) );
 	for(i=0;i<7;i++) {
-		m_palette->set_pen_color( i+9, MAKE_RGB(color_red[i],0x00,0x00) );
+		m_palette->set_pen_color( i+9, rgb_t(color_red[i],0x00,0x00) );
 	}
 }

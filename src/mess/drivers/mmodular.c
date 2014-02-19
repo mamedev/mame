@@ -1077,9 +1077,9 @@ MACHINE_RESET_MEMBER(polgar_state,academy)
 
 PALETTE_INIT_MEMBER(polgar_state,chess_lcd)
 {
-	// palette.set_pen_color(0, MAKE_RGB(138, 146, 148)); // some think this is closer, but slightly less readable
-	palette.set_pen_color(0, MAKE_RGB(255, 255, 255));
-	palette.set_pen_color(1, MAKE_RGB(0, 0, 0));
+	// palette.set_pen_color(0, rgb_t(138, 146, 148)); // some think this is closer, but slightly less readable
+	palette.set_pen_color(0, rgb_t(255, 255, 255));
+	palette.set_pen_color(1, rgb_t(0, 0, 0));
 }
 
 static const gfx_layout chess_charlayout =

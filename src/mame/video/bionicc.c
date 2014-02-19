@@ -142,7 +142,7 @@ WRITE16_MEMBER(bionicc_state::bionicc_paletteram_w)
 		b = b * (0x07 + bright) / 0x0e;
 	}
 
-	m_palette->set_pen_color (offset, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color (offset, rgb_t(r, g, b));
 }
 
 WRITE16_MEMBER(bionicc_state::bionicc_scroll_w)

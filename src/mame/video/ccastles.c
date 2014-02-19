@@ -103,7 +103,7 @@ WRITE8_MEMBER(ccastles_state::ccastles_paletteram_w)
 	bit2 = (~b >> 2) & 0x01;
 	b = combine_3_weights(m_bweights, bit0, bit1, bit2);
 
-	m_palette->set_pen_color(offset & 0x1f, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(offset & 0x1f, rgb_t(r, g, b));
 }
 
 

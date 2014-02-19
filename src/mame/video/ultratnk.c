@@ -13,10 +13,10 @@ PALETTE_INIT_MEMBER(ultratnk_state, ultratnk)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 
-	palette.set_indirect_color(0, MAKE_RGB(0x00, 0x00, 0x00));
-	palette.set_indirect_color(1, MAKE_RGB(0xa4, 0xa4, 0xa4));
-	palette.set_indirect_color(2, MAKE_RGB(0x5b, 0x5b, 0x5b));
-	palette.set_indirect_color(3, MAKE_RGB(0xff, 0xff, 0xff));
+	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
+	palette.set_indirect_color(1, rgb_t(0xa4, 0xa4, 0xa4));
+	palette.set_indirect_color(2, rgb_t(0x5b, 0x5b, 0x5b));
+	palette.set_indirect_color(3, rgb_t(0xff, 0xff, 0xff));
 
 	palette.set_pen_indirect(0, color_prom[0x00] & 3);
 	palette.set_pen_indirect(2, color_prom[0x00] & 3);

@@ -1076,9 +1076,9 @@ VIDEO_RESET_MEMBER(sms_state,sms1)
 		UINT8 sscope_binocular_hack = m_port_scope_binocular->read();
 
 		if (sscope_binocular_hack & 0x01)
-			m_prevleft_bitmap.fill(RGB_BLACK);
+			m_prevleft_bitmap.fill(rgb_t::black);
 		if (sscope_binocular_hack & 0x02)
-			m_prevright_bitmap.fill(RGB_BLACK);
+			m_prevright_bitmap.fill(rgb_t::black);
 	}
 
 	m_sscope_state = 0;
@@ -1187,7 +1187,7 @@ UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap
 				}
 			}
 		}
-		bitmap.fill(RGB_BLACK, cliprect);
+		bitmap.fill(rgb_t::black, cliprect);
 	}
 
 	return 0;
@@ -1216,7 +1216,7 @@ UINT32 sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bi
 		copybitmap(bitmap, vdp_bitmap, 0, 0, 0, 0, cliprect);
 		if (prev_bitmap_copied)
 		{
-			m_prev_bitmap.fill(RGB_BLACK);
+			m_prev_bitmap.fill(rgb_t::black);
 			prev_bitmap_copied = false;
 		}
 	}

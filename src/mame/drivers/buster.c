@@ -331,7 +331,7 @@ PALETTE_INIT_MEMBER(buster_state, buster)
 
 	/* RGB format */
 	for(i=0;i<8;i++)
-		palette.set_pen_color(i, MAKE_RGB(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
 }
 
 static MACHINE_CONFIG_START( buster, buster_state )

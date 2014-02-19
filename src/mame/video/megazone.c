@@ -73,7 +73,7 @@ PALETTE_INIT_MEMBER(megazone_state, megazone)
 		bit1 = BIT(color_prom[i], 7);
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */

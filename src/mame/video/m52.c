@@ -43,7 +43,7 @@ PALETTE_INIT_MEMBER(m52_state, m52)
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
 
-		palette.set_indirect_color(i, MAKE_RGB(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r,g,b));
 	}
 
 	/* background palette */
@@ -54,7 +54,7 @@ PALETTE_INIT_MEMBER(m52_state, m52)
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
 
-		palette.set_indirect_color(512+i, MAKE_RGB(r,g,b));
+		palette.set_indirect_color(512+i, rgb_t(r,g,b));
 	}
 
 	/* compute palette information for sprites */
@@ -71,7 +71,7 @@ PALETTE_INIT_MEMBER(m52_state, m52)
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		palette.set_indirect_color(512 + 32 + i, MAKE_RGB(r,g,b));
+		palette.set_indirect_color(512 + 32 + i, rgb_t(r,g,b));
 	}
 
 	/* character lookup table */

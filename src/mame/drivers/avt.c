@@ -578,9 +578,9 @@ PALETTE_INIT_MEMBER(avt_state, avt)
 
 		/* hack to switch cyan->magenta for highlighted background */
 		if (j == 0x40)
-			palette.set_pen_color(j, MAKE_RGB(g, r, b)); // Why this one has R-G swapped?...
+			palette.set_pen_color(j, rgb_t(g, r, b)); // Why this one has R-G swapped?...
 		else
-			palette.set_pen_color(j, MAKE_RGB(r, g, b));
+			palette.set_pen_color(j, rgb_t(r, g, b));
 	}
 }
 

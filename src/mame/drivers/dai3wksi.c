@@ -138,7 +138,7 @@ static void dai3wksi_get_pens(pen_t *pens)
 
 	for (i = 0; i <= 7; i++)
 	{
-		pens[i] = MAKE_RGB(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		pens[i] = rgb_t(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
 }
 

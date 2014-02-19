@@ -95,7 +95,7 @@ WRITE32_MEMBER(djmain_state::paletteram32_w)
 	g = (data >>  8) & 0xff;
 	b = (data >> 16) & 0xff;
 
-	m_palette->set_pen_color(offset, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
 

@@ -216,10 +216,10 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 					// expand the four bits
 					if (dest != NULL)
 					{
-						*dest++ = (bits & 8) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
-						*dest++ = (bits & 4) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
-						*dest++ = (bits & 2) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
-						*dest++ = (bits & 1) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
+						*dest++ = (bits & 8) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
+						*dest++ = (bits & 4) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
+						*dest++ = (bits & 2) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
+						*dest++ = (bits & 1) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
 					}
 				}
 
@@ -235,7 +235,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 					if (accumbit == 7)
 						accum = *ptr++;
 					if (dest != NULL)
-						*dest++ = (accum & (1 << accumbit)) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
+						*dest++ = (accum & (1 << accumbit)) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
 					accumbit = (accumbit - 1) & 7;
 				}
 			}
@@ -712,7 +712,7 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 						const UINT32 *src = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : NULL;
 						for (int x = 0; x < gl.bmwidth; x++)
 						{
-							if (src != NULL && RGB_ALPHA(src[x]) != 0)
+							if (src != NULL && rgb_t(src[x]).a() != 0)
 								accum |= 1 << accbit;
 							if (accbit-- == 0)
 							{

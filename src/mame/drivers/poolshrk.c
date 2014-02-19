@@ -204,10 +204,10 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(poolshrk_state, poolshrk)
 {
-	palette.set_pen_color(0,MAKE_RGB(0x7F, 0x7F, 0x7F));
-	palette.set_pen_color(1,MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette.set_pen_color(2,MAKE_RGB(0x7F, 0x7F, 0x7F));
-	palette.set_pen_color(3,MAKE_RGB(0x00, 0x00, 0x00));
+	palette.set_pen_color(0,rgb_t(0x7F, 0x7F, 0x7F));
+	palette.set_pen_color(1,rgb_t(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(2,rgb_t(0x7F, 0x7F, 0x7F));
+	palette.set_pen_color(3,rgb_t(0x00, 0x00, 0x00));
 }
 
 

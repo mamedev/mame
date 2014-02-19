@@ -48,6 +48,8 @@ Emulation is still preliminary.
 
 TODO:
 - channel volume, 16bits?? need to make a lookup table?
+- how does panning work? it is not simply left/right volume
+- (some) samples are in stereo format?
 - memory reads out of range sometimes
 - a lot of unknowns
 
@@ -109,6 +111,8 @@ void zsg2_device::device_start()
 		save_item(NAME(m_chan[ch].loop_pos), ch);
 		save_item(NAME(m_chan[ch].page), ch);
 		save_item(NAME(m_chan[ch].vol), ch);
+		save_item(NAME(m_chan[ch].panl), ch);
+		save_item(NAME(m_chan[ch].panr), ch);
 	}
 }
 
@@ -255,8 +259,9 @@ void zsg2_device::chan_w(int ch, int reg, UINT16 data)
 
 		case 0x5:
 			// lo byte: loop address low
-			// hi byte: ?
+			// hi byte: right(?) panning (high bits always 0)
 			m_chan[ch].loop_pos = (m_chan[ch].loop_pos & 0xff00) | (data & 0xff);
+			m_chan[ch].panr = data >> 8 & 0x1f;
 			break;
 		
 		case 0x6:
@@ -266,8 +271,9 @@ void zsg2_device::chan_w(int ch, int reg, UINT16 data)
 
 		case 0x7:
 			// lo byte: loop address high
-			// hi byte: ?
+			// hi byte: left(?) panning (high bits always 0)
 			m_chan[ch].loop_pos = (m_chan[ch].loop_pos & 0x00ff) | (data << 8 & 0xff00);
+			m_chan[ch].panl = data >> 8 & 0x1f;
 			break;
 		
 		case 0xb:

@@ -120,7 +120,7 @@ PALETTE_INIT_MEMBER(lockon_state, lockon)
 			b = compute_res_net((p1 & 0x1f), 2, &lockon_pd_net_info);
 		}
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

@@ -759,7 +759,7 @@ PALETTE_INIT_MEMBER(applix_state, applix)
 	for (i = 0; i < 48; color_count++)
 	{
 		r = colors[i++]; g = colors[i++]; b = colors[i++];
-		palette.set_pen_color(color_count, MAKE_RGB(r, g, b));
+		palette.set_pen_color(color_count, rgb_t(r, g, b));
 	}
 }
 

@@ -72,7 +72,7 @@ void stfight_state::set_pens()
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT16 data = m_generic_paletteram_8[i] | (m_generic_paletteram2_8[i] << 8);
-		rgb_t color = MAKE_RGB(pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
+		rgb_t color = rgb_t(pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 
 		m_palette->set_indirect_color(i, color);
 	}

@@ -1595,9 +1595,9 @@ void sega315_5378_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 				rgb_t   c3 = machine().pens[line3[x]];
 				rgb_t   c4 = machine().pens[line4[x]];
 				m_tmpbitmap.pix32(pixel_plot_y, pixel_offset_x + x) =
-					MAKE_RGB((RGB_RED(c1) / 6 + RGB_RED(c2) / 3 + RGB_RED(c3) / 3 + RGB_RED(c4) / 6 ),
-						(RGB_GREEN(c1) / 6 + RGB_GREEN(c2) / 3 + RGB_GREEN(c3) / 3 + RGB_GREEN(c4) / 6 ),
-						(RGB_BLUE(c1) / 6 + RGB_BLUE(c2) / 3 + RGB_BLUE(c3) / 3 + RGB_BLUE(c4) / 6 ) );
+					rgb_t((c1.r() / 6 + c2.r() / 3 + c3.r() / 3 + c4.r() / 6 ),
+						(c1.g() / 6 + c2.g() / 3 + c3.g() / 3 + c4.g() / 6 ),
+						(c1.b() / 6 + c2.b() / 3 + c3.b() / 3 + c4.b() / 6 ) );
 			}
 			return;
 		}

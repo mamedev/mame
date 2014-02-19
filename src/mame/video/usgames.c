@@ -25,7 +25,7 @@ PALETTE_INIT_MEMBER(usgames_state, usgames)
 		g = 0x7f * g * (i + 1);
 		b = 0x7f * b * (i + 1);
 
-		palette.set_pen_color(j,MAKE_RGB(r, g, b));
+		palette.set_pen_color(j,rgb_t(r, g, b));
 	}
 }
 

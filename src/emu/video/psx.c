@@ -3788,7 +3788,7 @@ PALETTE_INIT_MEMBER( psxgpu_device, psx )
 
 	for( n_colour = 0; n_colour < 0x10000; n_colour++ )
 	{
-		palette.set_pen_color( n_colour, pal5bit(n_colour >> 0), pal5bit(n_colour >> 5), pal5bit(n_colour >> 10) );
+		palette.set_pen_color( n_colour, pal555(n_colour,0, 5, 10) );
 	}
 }
 

@@ -40,7 +40,7 @@ PALETTE_INIT_MEMBER(lvcards_state,ponttehk)
 		bit3 = (color_prom[2*palette.entries()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_pen_color(i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 
 		color_prom++;
 	}
@@ -76,7 +76,7 @@ PALETTE_INIT_MEMBER(lvcards_state, lvcards)//Ever so slightly different, but dif
 		bit3 = (color_prom[2*palette.entries()] >> 3) & 0x11;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_pen_color(i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 
 		color_prom++;
 	}

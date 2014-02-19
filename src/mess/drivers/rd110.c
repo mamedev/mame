@@ -197,8 +197,8 @@ WRITE8_MEMBER(d110_state::so_w)
 
 PALETTE_INIT_MEMBER(d110_state, d110)
 {
-	palette.set_pen_color(0, MAKE_RGB(0, 255, 0));
-	palette.set_pen_color(1, MAKE_RGB(0, 0, 0));
+	palette.set_pen_color(0, rgb_t(0, 255, 0));
+	palette.set_pen_color(1, rgb_t(0, 0, 0));
 }
 
 static ADDRESS_MAP_START( d110_map, AS_PROGRAM, 8, d110_state )

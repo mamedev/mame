@@ -54,15 +54,15 @@ PALETTE_INIT_MEMBER(suprloco_state, suprloco)
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 
 		/* hack: generate a second bank of sprite palette with red changed to purple */
 		if (i >= 256)
 		{
 			if ((i & 0x0f) == 0x09)
-				palette.set_pen_color(i+256,MAKE_RGB(r,g,0xff));
+				palette.set_pen_color(i+256,rgb_t(r,g,0xff));
 			else
-				palette.set_pen_color(i+256,MAKE_RGB(r,g,b));
+				palette.set_pen_color(i+256,rgb_t(r,g,b));
 		}
 	}
 }

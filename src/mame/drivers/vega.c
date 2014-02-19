@@ -486,8 +486,8 @@ PALETTE_INIT_MEMBER(vega_state, vega)
 	int i;
 	for(i=0;i<8;++i)
 	{
-		palette.set_pen_color( 2*i, MAKE_RGB(0x00, 0x00, 0x00) );
-		palette.set_pen_color( 2*i+1, MAKE_RGB( (i&1)?0xff:0x00, (i&2)?0xff:0x00, (i&4)?0xff:0x00) );
+		palette.set_pen_color( 2*i, rgb_t(0x00, 0x00, 0x00) );
+		palette.set_pen_color( 2*i+1, rgb_t( (i&1)?0xff:0x00, (i&2)?0xff:0x00, (i&4)?0xff:0x00) );
 	}
 }
 

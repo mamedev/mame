@@ -46,7 +46,7 @@ WRITE32_MEMBER(taitojc_state::taitojc_palette_w)
 	g = (color >> 16) & 0xff;
 	b = (color >>  0) & 0xff;
 
-	m_palette->set_pen_color(offset, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
 READ32_MEMBER(taitojc_state::taitojc_tile_r)

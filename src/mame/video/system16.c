@@ -150,9 +150,9 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_paletteram_w)
 		//gh = combine_6_weights(m_weights[1][1], g0, g1, g2, g3, g4, 1);
 		//bh = combine_6_weights(m_weights[1][2], b0, b1, b2, b3, b4, 1);
 
-		m_palette->set_pen_color(offset, MAKE_RGB(r, g, b) );
+		m_palette->set_pen_color(offset, rgb_t(r, g, b) );
 
-		m_palette->set_pen_color(offset + m_palette->entries()/2, MAKE_RGB(rs,gs,bs));
+		m_palette->set_pen_color(offset + m_palette->entries()/2, rgb_t(rs,gs,bs));
 	}
 }
 #endif

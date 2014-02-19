@@ -249,22 +249,21 @@ void palette_device::set_shadow_dRGB32(int mode, int dr, int dg, int db, bool no
 		int r = pal5bit(i >> 10) + dr;
 		int g = pal5bit(i >> 5) + dg;
 		int b = pal5bit(i >> 0) + db;
-		pen_t final;
 
 		// apply clipping
 		if (!noclip)
 		{
-			r = rgb_clamp(r);
-			g = rgb_clamp(g);
-			b = rgb_clamp(b);
+			r = rgb_t::clamp(r);
+			g = rgb_t::clamp(g);
+			b = rgb_t::clamp(b);
 		}
-		final = MAKE_RGB(r, g, b);
+		rgb_t final = rgb_t(r, g, b); 
 
 		// store either 16 or 32 bit
 		if (m_format == BITMAP_FORMAT_RGB32)
 			stable.base[i] = final;
 		else
-			stable.base[i] = rgb_to_rgb15(final);
+			stable.base[i] = final.as_rgb15();
 	}
 }
 
@@ -481,7 +480,7 @@ void palette_device::allocate_palette()
 	assert_always(m_entries * numgroups <= 65536, "Error: palette has more than 65536 colors.");
 
 	// allocate a palette object containing all the colors and groups
-	m_palette = new palette_t(m_entries, numgroups);
+	m_palette = palette_t::alloc(m_entries, numgroups);
 
 	// configure the groups
 	if (m_shadow_group != 0)
@@ -491,7 +490,7 @@ void palette_device::allocate_palette()
 
 	// set the initial colors to a standard rainbow
 	for (int index = 0; index < m_entries; index++)
-		set_pen_color(index, MAKE_RGB(pal1bit(index >> 0), pal1bit(index >> 1), pal1bit(index >> 2)));
+		set_pen_color(index, rgb_t(pal1bit(index >> 0), pal1bit(index >> 1), pal1bit(index >> 2)));
 
 	// switch off the color mode
 	switch (m_format)
@@ -508,8 +507,8 @@ void palette_device::allocate_palette()
 
 		// 32-bit direct case
 		case BITMAP_FORMAT_RGB32:
-			m_black_pen = MAKE_RGB(0x00,0x00,0x00);
-			m_white_pen = MAKE_RGB(0xff,0xff,0xff);
+			m_black_pen = rgb_t(0x00,0x00,0x00);
+			m_white_pen = rgb_t(0xff,0xff,0xff);
 			break;
 
 		// screenless case
@@ -544,7 +543,7 @@ void palette_device::allocate_color_tables()
 			break;
 
 		case BITMAP_FORMAT_RGB32:
-			m_pens = m_palette->entry_list_adjusted();
+			m_pens = reinterpret_cast<const pen_t *>(m_palette->entry_list_adjusted());
 			break;
 
 		default:
@@ -629,16 +628,16 @@ void palette_device::configure_rgb_shadows(int mode, float factor)
 	int ifactor = int(factor * 256.0f);
 	for (int rgb555 = 0; rgb555 < 32768; rgb555++)
 	{
-		UINT8 r = rgb_clamp((pal5bit(rgb555 >> 10) * ifactor) >> 8);
-		UINT8 g = rgb_clamp((pal5bit(rgb555 >> 5) * ifactor) >> 8);
-		UINT8 b = rgb_clamp((pal5bit(rgb555 >> 0) * ifactor) >> 8);
+		UINT8 r = rgb_t::clamp((pal5bit(rgb555 >> 10) * ifactor) >> 8);
+		UINT8 g = rgb_t::clamp((pal5bit(rgb555 >> 5) * ifactor) >> 8);
+		UINT8 b = rgb_t::clamp((pal5bit(rgb555 >> 0) * ifactor) >> 8);
 
 		// store either 16 or 32 bit
-		pen_t final = MAKE_RGB(r, g, b);
+		rgb_t final = rgb_t(r, g, b);
 		if (m_format == BITMAP_FORMAT_RGB32)
 			stable.base[rgb555] = final;
 		else
-			stable.base[rgb555] = rgb_to_rgb15(final);
+			stable.base[rgb555] = final.as_rgb15();
 	}
 }
 
@@ -658,7 +657,7 @@ void palette_device::palette_init_all_black(palette_device &palette)
 
 	for (i = 0; i < palette.entries(); i++)
 	{
-		palette.set_pen_color(i,RGB_BLACK); // black
+		palette.set_pen_color(i,rgb_t::black); // black
 	}
 }
 
@@ -669,8 +668,8 @@ void palette_device::palette_init_all_black(palette_device &palette)
 
 void palette_device::palette_init_black_and_white(palette_device &palette)
 {
-	palette.set_pen_color(0,RGB_BLACK); // black
-	palette.set_pen_color(1,RGB_WHITE); // white
+	palette.set_pen_color(0,rgb_t::black); // black
+	palette.set_pen_color(1,rgb_t::white); // white
 }
 
 
@@ -680,8 +679,8 @@ void palette_device::palette_init_black_and_white(palette_device &palette)
 
 void palette_device::palette_init_white_and_black(palette_device &palette)
 {
-	palette.set_pen_color(0,RGB_WHITE); // white
-	palette.set_pen_color(1,RGB_BLACK); // black
+	palette.set_pen_color(0,rgb_t::white); // white
+	palette.set_pen_color(1,rgb_t::black); // black
 }
 
 
@@ -691,7 +690,7 @@ void palette_device::palette_init_white_and_black(palette_device &palette)
 
 void palette_device::palette_init_monochrome_amber(palette_device &palette)
 {
-	palette.set_pen_color(0, RGB_BLACK); // black
+	palette.set_pen_color(0, rgb_t::black); // black
 	palette.set_pen_color(1, 0xf7, 0xaa, 0x00); // amber
 }
 
@@ -702,7 +701,7 @@ void palette_device::palette_init_monochrome_amber(palette_device &palette)
 
 void palette_device::palette_init_monochrome_green(palette_device &palette)
 {
-	palette.set_pen_color(0, RGB_BLACK); // black
+	palette.set_pen_color(0, rgb_t::black); // black
 	palette.set_pen_color(1, 0x00, 0xff, 0x00); // green
 }
 
@@ -747,7 +746,7 @@ void palette_device::palette_init_RRRRGGGGBBBB_proms(palette_device &palette)
 		bit3 = (color_prom[i + 2*palette.entries()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_pen_color(i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -764,7 +763,7 @@ void palette_device::palette_init_RRRRRGGGGGBBBBB(palette_device &palette)
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
-		palette.set_pen_color(i, MAKE_RGB(pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0)));
+		palette.set_pen_color(i, rgb_t(pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0)));
 }
 
 
@@ -773,7 +772,7 @@ void palette_device::palette_init_BBBBBGGGGGRRRRR(palette_device &palette)
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
-		palette.set_pen_color(i, MAKE_RGB(pal5bit(i >> 0), pal5bit(i >> 5), pal5bit(i >> 10)));
+		palette.set_pen_color(i, rgb_t(pal5bit(i >> 0), pal5bit(i >> 5), pal5bit(i >> 10)));
 }
 
 
@@ -789,5 +788,5 @@ void palette_device::palette_init_RRRRRGGGGGGBBBBB(palette_device &palette)
 	int i;
 
 	for (i = 0; i < 0x10000; i++)
-		palette.set_pen_color(i, MAKE_RGB(pal5bit(i >> 11), pal6bit(i >> 5), pal5bit(i >> 0)));
+		palette.set_pen_color(i, rgb_t(pal5bit(i >> 11), pal6bit(i >> 5), pal5bit(i >> 0)));
 }

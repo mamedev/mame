@@ -234,7 +234,7 @@ inline rgb_t cdp1869_device::get_rgb(int i, int c, int l)
 	g = (c & 1) ? luma : 0;
 	b = (c & 2) ? luma : 0;
 
-	return MAKE_RGB(r, g, b);
+	return rgb_t(r, g, b);
 }
 
 

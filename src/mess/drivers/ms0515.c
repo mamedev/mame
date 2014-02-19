@@ -214,23 +214,23 @@ UINT32 ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &b
 
 PALETTE_INIT_MEMBER(ms0515_state, ms0515)
 {
-	palette.set_pen_color(0, MAKE_RGB(0, 0, 0));
-	palette.set_pen_color(1, MAKE_RGB(0, 0, 127));
-	palette.set_pen_color(2, MAKE_RGB(127, 0, 0));
-	palette.set_pen_color(3, MAKE_RGB(127, 0, 127));
-	palette.set_pen_color(4, MAKE_RGB(0, 127, 0));
-	palette.set_pen_color(5, MAKE_RGB(0, 127, 127));
-	palette.set_pen_color(6, MAKE_RGB(127, 127, 0));
-	palette.set_pen_color(7, MAKE_RGB(127, 127, 127));
+	palette.set_pen_color(0, rgb_t(0, 0, 0));
+	palette.set_pen_color(1, rgb_t(0, 0, 127));
+	palette.set_pen_color(2, rgb_t(127, 0, 0));
+	palette.set_pen_color(3, rgb_t(127, 0, 127));
+	palette.set_pen_color(4, rgb_t(0, 127, 0));
+	palette.set_pen_color(5, rgb_t(0, 127, 127));
+	palette.set_pen_color(6, rgb_t(127, 127, 0));
+	palette.set_pen_color(7, rgb_t(127, 127, 127));
 
-	palette.set_pen_color(8, MAKE_RGB(127, 127, 127));
-	palette.set_pen_color(9, MAKE_RGB(127, 127, 255));
-	palette.set_pen_color(10, MAKE_RGB(255, 127, 127));
-	palette.set_pen_color(11, MAKE_RGB(255, 127, 255));
-	palette.set_pen_color(12, MAKE_RGB(127, 255, 127));
-	palette.set_pen_color(13, MAKE_RGB(127, 255, 255));
-	palette.set_pen_color(14, MAKE_RGB(255, 255, 127));
-	palette.set_pen_color(15, MAKE_RGB(255, 255, 255));
+	palette.set_pen_color(8, rgb_t(127, 127, 127));
+	palette.set_pen_color(9, rgb_t(127, 127, 255));
+	palette.set_pen_color(10, rgb_t(255, 127, 127));
+	palette.set_pen_color(11, rgb_t(255, 127, 255));
+	palette.set_pen_color(12, rgb_t(127, 255, 127));
+	palette.set_pen_color(13, rgb_t(127, 255, 255));
+	palette.set_pen_color(14, rgb_t(255, 255, 127));
+	palette.set_pen_color(15, rgb_t(255, 255, 255));
 }
 
 WRITE8_MEMBER(ms0515_state::ms0515_portc_w)

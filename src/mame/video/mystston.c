@@ -110,7 +110,7 @@ void mystston_state::set_palette()
 		bit1 = (data >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		m_palette->set_pen_color(i, MAKE_RGB(r, g, b));
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

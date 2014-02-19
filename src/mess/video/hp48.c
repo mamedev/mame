@@ -45,7 +45,7 @@ PALETTE_INIT_MEMBER(hp48_state, hp48)
 	for ( i = 0; i < 255; i++ )
 	{
 		float c = i/255.;
-		m_palette->set_pen_color( i, MAKE_ARGB( 0, mix2(0,c), mix2(1,c), mix2(2,c) ) );
+		m_palette->set_pen_color( i, rgb_t( 0, mix2(0,c), mix2(1,c), mix2(2,c) ) );
 	}
 }
 

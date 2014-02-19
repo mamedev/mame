@@ -10,14 +10,14 @@ Atari Starship 1 video emulation
 
 void starshp1_state::set_pens()
 {
-	m_palette->set_indirect_color(m_inverse ? 7 : 0, MAKE_RGB(0x00, 0x00, 0x00));
-	m_palette->set_indirect_color(m_inverse ? 6 : 1, MAKE_RGB(0x1e, 0x1e, 0x1e));
-	m_palette->set_indirect_color(m_inverse ? 5 : 2, MAKE_RGB(0x4e, 0x4e, 0x4e));
-	m_palette->set_indirect_color(m_inverse ? 4 : 3, MAKE_RGB(0x6c, 0x6c, 0x6c));
-	m_palette->set_indirect_color(m_inverse ? 3 : 4, MAKE_RGB(0x93, 0x93, 0x93));
-	m_palette->set_indirect_color(m_inverse ? 2 : 5, MAKE_RGB(0xb1, 0xb1, 0xb1));
-	m_palette->set_indirect_color(m_inverse ? 1 : 6, MAKE_RGB(0xe1, 0xe1, 0xe1));
-	m_palette->set_indirect_color(m_inverse ? 0 : 7, MAKE_RGB(0xff, 0xff, 0xff));
+	m_palette->set_indirect_color(m_inverse ? 7 : 0, rgb_t(0x00, 0x00, 0x00));
+	m_palette->set_indirect_color(m_inverse ? 6 : 1, rgb_t(0x1e, 0x1e, 0x1e));
+	m_palette->set_indirect_color(m_inverse ? 5 : 2, rgb_t(0x4e, 0x4e, 0x4e));
+	m_palette->set_indirect_color(m_inverse ? 4 : 3, rgb_t(0x6c, 0x6c, 0x6c));
+	m_palette->set_indirect_color(m_inverse ? 3 : 4, rgb_t(0x93, 0x93, 0x93));
+	m_palette->set_indirect_color(m_inverse ? 2 : 5, rgb_t(0xb1, 0xb1, 0xb1));
+	m_palette->set_indirect_color(m_inverse ? 1 : 6, rgb_t(0xe1, 0xe1, 0xe1));
+	m_palette->set_indirect_color(m_inverse ? 0 : 7, rgb_t(0xff, 0xff, 0xff));
 }
 
 

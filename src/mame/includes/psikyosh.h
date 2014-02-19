@@ -13,7 +13,7 @@
 #define BG_TYPE(n) (((m_vidregs[6] << (8*n)) & 0x7f000000 ) >> 24)
 #define BG_LINE(n) (((m_vidregs[6] << (8*n)) & 0x80000000 ) ? 1:0)
 
-#define BG_TRANSPEN MAKE_ARGB(0x00,0xff,0x00,0xff) // used for representing transparency in temporary bitmaps
+#define BG_TRANSPEN rgb_t(0x00,0xff,0x00,0xff) // used for representing transparency in temporary bitmaps
 
 #define SPRITE_PRI(n) (((m_vidregs[2] << (4*n)) & 0xf0000000 ) >> 28)
 

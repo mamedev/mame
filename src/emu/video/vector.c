@@ -95,7 +95,7 @@ static render_texture *get_vector_texture(float dx, float dy, float intensity)
 
 	height = lbucket * VECTOR_WIDTH_DENOM / TEXTURE_LENGTH_BUCKETS;
 	tex->bitmap = global_alloc(bitmap_argb32(TEXTURE_WIDTH, height));
-	tex->bitmap.fill(MAKE_ARGB(0xff,0xff,0xff,0xff));
+	tex->bitmap.fill(rgb_t(0xff,0xff,0xff,0xff));
 
 	totalint = 1.0f;
 	for (x = TEXTURE_WIDTH / 2 - 1; x >= 0; x--)
@@ -109,10 +109,10 @@ static render_texture *get_vector_texture(float dx, float dy, float intensity)
 			UINT32 *pix;
 
 			pix = (UINT32 *)bitmap.base + y * bitmap.rowpixels + x;
-			*pix = MAKE_ARGB((RGB_ALPHA(*pix) * intensity) >> 8,0xff,0xff,0xff);
+			*pix = rgb_t((*pix.a() * intensity) >> 8,0xff,0xff,0xff);
 
 			pix = (UINT32 *)bitmap.base + y * bitmap.rowpixels + (TEXTURE_WIDTH - 1 - x);
-			*pix = MAKE_ARGB((RGB_ALPHA(*pix) * intensity) >> 8,0xff,0xff,0xff);
+			*pix = rgb_t((*pix.a() * intensity) >> 8,0xff,0xff,0xff);
 		}
 	}
 
@@ -264,7 +264,7 @@ UINT32 vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	curpoint = m_vector_list;
 
 	screen.container().empty();
-	screen.container().add_rect(0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_VECTORBUF(1));
+	screen.container().add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_VECTORBUF(1));
 
 	clip.x0 = clip.y0 = 0.0f;
 	clip.x1 = clip.y1 = 1.0f;

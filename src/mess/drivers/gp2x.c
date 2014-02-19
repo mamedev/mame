@@ -168,7 +168,7 @@ UINT32 gp2x_state::screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bitma
 				{
 					UINT16 pixel = vram[(320*y)+x];
 
-					*scanline++ = MAKE_ARGB(0xff, (pixel>>11)<<3, ((pixel>>5)&0x3f)<<2, (pixel&0x1f)<<3);
+					*scanline++ = rgb_t(0xff, (pixel>>11)<<3, ((pixel>>5)&0x3f)<<2, (pixel&0x1f)<<3);
 				}
 			}
 		}

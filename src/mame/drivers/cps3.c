@@ -889,7 +889,7 @@ void cps3_state::cps3_set_mame_colours(int colournum, UINT16 data, UINT32 fadeva
 
 	m_mame_colours[colournum] = (r << (16+3)) | (g << (8+3)) | (b << (0+3));
 
-	if (colournum<0x10000) m_palette->set_pen_color(colournum,m_mame_colours[colournum]/* MAKE_RGB(r<<3,g<<3,b<<3)*/);//m_mame_colours[colournum]);
+	if (colournum<0x10000) m_palette->set_pen_color(colournum,m_mame_colours[colournum]/* rgb_t(r<<3,g<<3,b<<3)*/);//m_mame_colours[colournum]);
 }
 
 

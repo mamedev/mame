@@ -284,7 +284,7 @@ public:
 		UINT8 r = palexpand<_RedBits>(raw >> _RedShift);
 		UINT8 g = palexpand<_GreenBits>(raw >> _GreenShift);
 		UINT8 b = palexpand<_BlueBits>(raw >> _BlueShift);
-		return MAKE_RGB(r, g, b);
+		return rgb_t(r, g, b);
 	}
 	template<int _IntBits, int _RedBits, int _GreenBits, int _BlueBits, int _IntShift, int _RedShift, int _GreenShift, int _BlueShift>
 	static rgb_t standard_irgb_decoder(UINT32 raw)
@@ -293,7 +293,7 @@ public:
 		UINT8 r = (i * palexpand<_RedBits>(raw >> _RedShift)) >> 8;
 		UINT8 g = (i * palexpand<_GreenBits>(raw >> _GreenShift)) >> 8;
 		UINT8 b = (i * palexpand<_BlueBits>(raw >> _BlueShift)) >> 8;
-		return MAKE_RGB(r, g, b);
+		return rgb_t(r, g, b);
 	}
 	
 	// other standard decoders
@@ -342,7 +342,7 @@ public:
 
 	// setters
 	void set_pen_color(pen_t pen, rgb_t rgb) { m_palette->entry_set_color(pen, rgb); }
-	void set_pen_color(pen_t pen, UINT8 r, UINT8 g, UINT8 b) { m_palette->entry_set_color(pen, MAKE_RGB(r, g, b)); }
+	void set_pen_color(pen_t pen, UINT8 r, UINT8 g, UINT8 b) { m_palette->entry_set_color(pen, rgb_t(r, g, b)); }
 	void set_pen_colors(pen_t color_base, const rgb_t *colors, int color_count) { while (color_count--) set_pen_color(color_base++, *colors++); }
 	void set_pen_contrast(pen_t pen, double bright) { m_palette->entry_set_contrast(pen, bright); }
 

@@ -571,7 +571,7 @@ void cps_state::fcrash_build_palette()
 		g = ((palette >> 4) & 0x0f) * 0x11 * bright / 0x2d;
 		b = ((palette >> 0) & 0x0f) * 0x11 * bright / 0x2d;
 
-		m_palette->set_pen_color (offset, MAKE_RGB(r, g, b));
+		m_palette->set_pen_color (offset, rgb_t(r, g, b));
 	}
 }
 

@@ -126,12 +126,12 @@ void cball_state::machine_reset()
 
 PALETTE_INIT_MEMBER(cball_state, cball)
 {
-	palette.set_pen_color(0, MAKE_RGB(0x80, 0x80, 0x80));
-	palette.set_pen_color(1, MAKE_RGB(0x00, 0x00, 0x00));
-	palette.set_pen_color(2, MAKE_RGB(0x80, 0x80, 0x80));
-	palette.set_pen_color(3, MAKE_RGB(0xff, 0xff, 0xff));
-	palette.set_pen_color(4, MAKE_RGB(0x80, 0x80, 0x80));
-	palette.set_pen_color(5, MAKE_RGB(0xc0, 0xc0, 0xc0));
+	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80));
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(2, rgb_t(0x80, 0x80, 0x80));
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(4, rgb_t(0x80, 0x80, 0x80));
+	palette.set_pen_color(5, rgb_t(0xc0, 0xc0, 0xc0));
 }
 
 

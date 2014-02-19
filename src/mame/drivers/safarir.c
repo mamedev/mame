@@ -152,8 +152,8 @@ PALETTE_INIT_MEMBER(safarir_state, safarir)
 
 	for (i = 0; i < palette.entries() / 2; i++)
 	{
-		palette.set_pen_color((i * 2) + 0, RGB_BLACK);
-		palette.set_pen_color((i * 2) + 1, MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
+		palette.set_pen_color((i * 2) + 0, rgb_t::black);
+		palette.set_pen_color((i * 2) + 1, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
 	}
 }
 

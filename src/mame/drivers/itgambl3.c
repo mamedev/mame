@@ -243,7 +243,7 @@ PALETTE_INIT_MEMBER(itgambl3_state, itgambl3)
 		r = (x & 0xf)*0x11;
 		g = ((x & 0x3c)>>2)*0x11;
 		b = ((x & 0xf0)>>4)*0x11;
-		palette.set_pen_color(x,MAKE_RGB(r,g,b));
+		palette.set_pen_color(x,rgb_t(r,g,b));
 	}
 }
 

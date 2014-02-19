@@ -444,8 +444,8 @@ void prestige_state::machine_start()
 
 PALETTE_INIT_MEMBER(prestige_state, prestige)
 {
-	palette.set_pen_color(0, MAKE_RGB(39, 108, 51));
-	palette.set_pen_color(1, MAKE_RGB(16, 37, 84));
+	palette.set_pen_color(0, rgb_t(39, 108, 51));
+	palette.set_pen_color(1, rgb_t(16, 37, 84));
 }
 
 UINT32 prestige_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

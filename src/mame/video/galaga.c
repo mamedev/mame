@@ -346,7 +346,7 @@ PALETTE_INIT_MEMBER(galaga_state,galaga)
 		bit2 = ((*color_prom) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_indirect_color(i,MAKE_RGB(r,g,b));
+		palette.set_indirect_color(i,rgb_t(r,g,b));
 		color_prom++;
 	}
 
@@ -363,7 +363,7 @@ PALETTE_INIT_MEMBER(galaga_state,galaga)
 		bits = (i >> 4) & 0x03;
 		b = map[bits];
 
-		palette.set_indirect_color(32 + i,MAKE_RGB(r,g,b));
+		palette.set_indirect_color(32 + i,rgb_t(r,g,b));
 	}
 
 	/* characters */

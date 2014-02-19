@@ -702,7 +702,7 @@ void aerofgt_state::wbbc97_draw_bitmap( bitmap_rgb32 &bitmap )
 			int color = m_bitmapram[count] >> 1;
 
 			/* data is GRB; convert to RGB */
-			rgb_t pen = MAKE_RGB(pal5bit((color & 0x3e0) >> 5), pal5bit((color & 0x7c00) >> 10), pal5bit(color & 0x1f));
+			rgb_t pen = rgb_t(pal5bit((color & 0x3e0) >> 5), pal5bit((color & 0x7c00) >> 10), pal5bit(color & 0x1f));
 			bitmap.pix32(y, (10 + x - m_rasterram[(y & 0x7f)]) & 0x1ff) = pen;
 
 			count++;

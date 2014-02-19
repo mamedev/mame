@@ -126,7 +126,7 @@ void taitosj_state::set_pens()
 		bit2 = (~val >> 2) & 0x01;
 		b = combine_3_weights(bweights, bit0, bit1, bit2);
 
-		m_palette->set_pen_color(i, MAKE_RGB(r, g, b));
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

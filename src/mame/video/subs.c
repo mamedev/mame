@@ -12,13 +12,13 @@ WRITE8_MEMBER(subs_state::subs_invert1_w)
 {
 	if ((offset & 0x01) == 1)
 	{
-		m_palette->set_pen_color(0, MAKE_RGB(0x00, 0x00, 0x00));
-		m_palette->set_pen_color(1, MAKE_RGB(0xFF, 0xFF, 0xFF));
+		m_palette->set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
+		m_palette->set_pen_color(1, rgb_t(0xFF, 0xFF, 0xFF));
 	}
 	else
 	{
-		m_palette->set_pen_color(1, MAKE_RGB(0x00, 0x00, 0x00));
-		m_palette->set_pen_color(0, MAKE_RGB(0xFF, 0xFF, 0xFF));
+		m_palette->set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
+		m_palette->set_pen_color(0, rgb_t(0xFF, 0xFF, 0xFF));
 	}
 }
 
@@ -26,13 +26,13 @@ WRITE8_MEMBER(subs_state::subs_invert2_w)
 {
 	if ((offset & 0x01) == 1)
 	{
-		m_palette->set_pen_color(2, MAKE_RGB(0x00, 0x00, 0x00));
-		m_palette->set_pen_color(3, MAKE_RGB(0xFF, 0xFF, 0xFF));
+		m_palette->set_pen_color(2, rgb_t(0x00, 0x00, 0x00));
+		m_palette->set_pen_color(3, rgb_t(0xFF, 0xFF, 0xFF));
 	}
 	else
 	{
-		m_palette->set_pen_color(3, MAKE_RGB(0x00, 0x00, 0x00));
-		m_palette->set_pen_color(2, MAKE_RGB(0xFF, 0xFF, 0xFF));
+		m_palette->set_pen_color(3, rgb_t(0x00, 0x00, 0x00));
+		m_palette->set_pen_color(2, rgb_t(0xFF, 0xFF, 0xFF));
 	}
 }
 

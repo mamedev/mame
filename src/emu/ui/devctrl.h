@@ -30,7 +30,7 @@ protected:
 
 private:
 	// device iterator
-	typedef device_type_iterator<&device_creator<_DeviceType>, _DeviceType> device_iterator;
+//	typedef device_type_iterator<&device_creator<_DeviceType>, _DeviceType> device_iterator;
 
 	_DeviceType *	m_device;
 	int				m_count;
@@ -46,7 +46,7 @@ ui_menu_device_control<_DeviceType>::ui_menu_device_control(running_machine &mac
 	: ui_menu(machine, container)
 {
 	device_iterator iter(machine.root_device());
-	m_device = device ? device : iter.first();
+	m_device = device ? device : downcast<_DeviceType *>(iter.first());
 	m_count = iter.count();
 }
 
@@ -79,7 +79,7 @@ void ui_menu_device_control<_DeviceType>::previous()
 			index--;
 		else
 			index = m_count - 1;
-		m_device = iter.byindex(index);
+		m_device = downcast<_DeviceType *>(iter.byindex(index));
 	}
 }
 
@@ -100,7 +100,7 @@ void ui_menu_device_control<_DeviceType>::next()
 			index++;
 		else
 			index = 0;
-		m_device = iter.byindex(index);
+		m_device = downcast<_DeviceType *>(iter.byindex(index));
 	}
 }
 

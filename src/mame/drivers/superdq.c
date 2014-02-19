@@ -122,7 +122,7 @@ PALETTE_INIT_MEMBER(superdq_state, superdq)
 		bit1 = (color_prom[i] >> 0) & 0x01;
 		b = combine_2_weights(bweights, bit1, bit0);
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -170,9 +170,9 @@ WRITE8_MEMBER(superdq_state::superdq_io_w)
 	{
 		int index = black_color_entries[i];
 		if (data & 0x80)
-			m_palette->set_pen_color(index) & MAKE_ARGB(0,255,255,255));
+			m_palette->set_pen_color(index) & rgb_t(0,255,255,255));
 		else
-			m_palette->set_pen_color(index) | MAKE_ARGB(255,0,0,0));
+			m_palette->set_pen_color(index) | rgb_t(255,0,0,0));
 	}
 
 	/*

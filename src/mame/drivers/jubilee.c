@@ -8,7 +8,7 @@
 
   Games running on this hardware:
 
-  * Double-Up Poker,  198?,  Jubilee.
+  * Jubilee Double-Up Poker,  198?,  Jubilee.
 
 
 *****************************************************************************************
@@ -32,6 +32,7 @@
   3x 2764 labelled Red Blue and Green.
 
   1x 6.0 MHz crystal.
+  1x Unknown lithium battery.
 
 
   From some forums...
@@ -53,10 +54,16 @@
 
   *** Game Notes ***
 
-  The game is totally playable, except for the fact that you can't coin currently.
-  Need to find how to hookup the input. See the notes for more info about this issue
-  and all the findings.
+  Just insert credits, and play. :)
 
+  A default NVRAM is provided. Without it, the game stucks at boot with a memory error
+  screen. If this happens, press the key 9 (Attendant). The game will initialize the NVRAM
+  and then boots OK.
+
+  The RESET service button (key R) is just for payment purposes.
+
+  The Supervisor Key (Key 0), brings a menu for bookkeeping, and replay (still can't see
+  the point). The key behaves like a real lock key, with off/on status.
 
 *****************************************************************************************
 
@@ -68,13 +75,14 @@
   3000-33FF    ; Video RAM.   ----------> First half of TC5517AP battery backed RAM.
   3400-37FF    ; Working RAM. ----------> Second half of TC5517AP battery backed RAM.
   3800-3BFF    ; Color (ATTR) RAM. -----> Whole 2114 RAM.
-  3E00-3E03    ; CRTC Controller.
+  3E00-3E03    ; CRT Controller. -------> MC6845P.
 
   CRU...
 
-  0080-0080    ; ??? Read.
-  00C8-00C8    ; Multiplexed Input Port
-  0CC2-0CC6    ; Input Port mux selectors
+  0080-0080    ; Unknown Read. Maybe a leftover.
+  00C8-00C8    ; Multiplexed Input Port.
+  0CC2-0CC6    ; Input Port mux selectors.
+  0CE2-0CE2    ; Clear Interrupts line.
 
 
   TMS9980A memory map:
@@ -92,12 +100,22 @@
 
   DRIVER UPDATES:
 
-  
+ 
+  [2014-02-19]
+
+  - Added a default clean NVRAM.
+  - Found and implemented the credits input.
+    The game is now working!. Still no sound.
+
   [2014-02-17]
 
   - Demuxed the input system.
   - Hooked an cleaned all inputs, except the coin in (missing).
   - Added NVRAM support.
+  - Hooked CRTC properly.
+  - Adjusted the screen size and visible area according to CRTC values.
+  - Adjusted the screen pos 8 pixels, to get a bit centered.
+  - Fixed palette to 8 colors.
   - Added technical notes.
  
   [2014-02-17]
@@ -125,11 +143,9 @@
 
   TODO:
 
-  - Improve the CRU map.
-  - Where is Coin In? Interrupts issue?
-  - Confirm the CRT controller offset.
+  - Analize the remaining CRU writes.
   - Discrete sound?.
-  - Check clocks on a PCB (if someday appear!)
+  - Check clocks on a PCB (if someday appear one!)
 
 
 ****************************************************************************************/
@@ -209,9 +225,8 @@ TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
 
 void jubilee_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jubilee_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jubilee_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
-
 
 UINT32 jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -219,10 +234,8 @@ UINT32 jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-
-PALETTE_INIT_MEMBER(jubilee_state, jubilee)
-{
-}
+void jubilee_state::palette_init()
+{}
 
 
 /**************************
@@ -250,9 +263,9 @@ static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_WRITE(jubileep_videoram_w) AM_SHARE("videoworkram")	/* TC5517AP battery backed RAM */
 	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_WRITE(jubileep_colorram_w) AM_SHARE("colorram")      /* Whole 2114 RAM */
 
-/*	CRTC seems to be mapped here. Read 00-01 and then write on them.
-    Then does the same for 02-03. Initialization is incomplete since
-    set till register 0x0D.
+/*	CRTC *is* mapped here. Read 00-01 and then write on them.
+    Then does the same for 02-03. Initialization seems incomplete since
+    set till register 0x0D. Maybe the last registers are unused.
 */
 	AM_RANGE(0x3e00, 0x3e01) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x3e02, 0x3e03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -264,34 +277,15 @@ static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 */
 ADDRESS_MAP_END
 
-/*  TODO: I/O lines handling. This is still work to be done; someone needs to
-    check the schematics. Here, we need to deliver some reasonable return values
-    instead of the 0. Returning a random number will create a nondeterministic
-    behavior at best.
-*/
-READ8_MEMBER(jubilee_state::unk_r)
-/*   bits...
-   7654 3210
-  -x-- --xx
-   |     ++-- Credits.
-   +--------- Bypass memory start error.
-*/
-{
-	return (machine().rand() & 0x43);	// bit0 and bit1 are involved in credits input.
-	logerror("CRU read from address %04x\n", offset<<4);
-//	return 0;
-}
 
 WRITE8_MEMBER(jubilee_state::unk_w)
 {
-//  return (machine().rand() & 0xff);
-	logerror("CRU write to address %04x: %d\n", offset<<1, data & 1);
-
-	// In particular, the interrupt from above must be cleared. We assume that
-	// this is done by one of the output lines, and from the 32 lines that are
-	// set right after an interrupt is serviced, all are set to 0, and only one
-	// is set to one. Maybe this one clears the interrupt.
-	// TODO: Check the schematics.
+/*  In particular, the interrupt from above must be cleared. We assume that
+    this is done by one of the output lines, and from the 32 lines that are
+    set right after an interrupt is serviced, all are set to 0, and only one
+    is set to one. Maybe this one clears the interrupt.
+    TODO: Check the schematics.
+*/
 	if (((offset<<1)==0x0ce2)&&(data==1))
 	{
 		m_maincpu->set_input_line(INT_9980A_LEVEL1, CLEAR_LINE);
@@ -313,6 +307,13 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		mux_sel = 3;
 	}
+
+	/* for debug purposes */
+
+	if (data==1)
+	{
+		logerror("CRU write to address %04x: %d\n", offset<<1, data & 1);
+	}
 }
 
 READ8_MEMBER(jubilee_state::mux_port_r)
@@ -320,31 +321,28 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 	switch( mux_sel )
 	{
 		case 0x01: return ioport("IN0")->read();
-		case 0x02: return ioport("IN1")->read();
+		case 0x02: return ioport("IN1")->read();	/* muxed credits input is here! */
 		case 0x03: return ioport("IN2")->read();
 	}
 
 	return 0xff;
-//	return (machine().rand() & 0xff);
 }
 
 
 static ADDRESS_MAP_START( jubileep_cru_map, AS_IO, 8, jubilee_state )
-//	AM_RANGE(0x0000, 0x01ff) AM_READ(unk_r)
-//	AM_RANGE(0x00c8, 0x00c8) AM_READ(unk_r)		    // use to see the game stuff (even cards)
-	AM_RANGE(0x00c8, 0x00c8) AM_READ(mux_port_r)	// Multiplexed inputs
+	AM_RANGE(0x00c8, 0x00c8) AM_READ(mux_port_r)	/* multiplexed input port */
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(unk_w)
 ADDRESS_MAP_END
 
 /* I/O byte R/W
 
-   0x080  R    ; Input port? polled at begining.
-   0x0C8  R    ; Input port. If you tie it to a rnd value, you can see the game running.
+   0x080  R    ; Input port? polled once at begining.
+   0x0C8  R    ; Input port.
 
    Can't see more inputs. There is a multiplexion with the following offsets as selectors:
-   CC2/CC4/CC6
-   
-   None of them seems involved in the coin input.
+   0xCC2 / 0xCC4 / 0xCC6.
+
+   0xCC4 status carry the coin input state.
 
 */
 
@@ -353,11 +351,6 @@ ADDRESS_MAP_END
 *************************/
 
 static INPUT_PORTS_START( jubileep )
-/* Coin In is tied to bits 0 & 1 (together) of port 0xC8.
-   Need to find the selector status to implement in some way.
-   (if you inject random data masked in port 0xC8, you can see 
-   credits entering in the game)
-*/
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_CANCEL )  PORT_NAME("Cancel / Take")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BET )    PORT_NAME("Bet / Gamble")
@@ -369,8 +362,12 @@ static INPUT_PORTS_START( jubileep )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 )   PORT_NAME("Hold 3")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_NAME("Attendant Paid Status (reset)")  PORT_CODE(KEYCODE_7) 
+/*  Don't know if this needs a custom port. Bits 0 and 1 together are the credits input.
+	Bit 1 alone could be "Attendant Paid Status (reset)" that does a reset and update the
+	paid status, or just is for edge coin-in timeouts... Impossible to say without a PCB.
+*/
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_IMPULSE (2)
+//	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_NAME("Attendant Paid Status (reset)")  PORT_CODE(KEYCODE_7) 
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -425,26 +422,26 @@ GFXDECODE_END
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	false,      /* show border area */
-	0,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
+	false,        /* show border area */
+	-8, 0, 0, 0,  /* visarea adjustment */
+	8,            /* number of pixels per video memory address */
+	NULL,         /* before pixel update callback */
+	NULL,         /* row update callback */
+	NULL,         /* after pixel update callback */
+	DEVCB_NULL,   /* callback for display state changes */
+	DEVCB_NULL,   /* callback for cursor state changes */
+	DEVCB_NULL,   /* HSYNC callback */
+	DEVCB_NULL,   /* VSYNC callback */
+	NULL          /* update address callback */
 };
 
 static TMS9980A_CONFIG( cpuconf )
 {
 	DEVCB_NULL,
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,     // Hold acknowledge
-	DEVCB_NULL      // DBIN
+	DEVCB_NULL,     /* Instruction acquisition */
+	DEVCB_NULL,     /* Clock out */
+	DEVCB_NULL,     /* Hold acknowledge */
+	DEVCB_NULL      /* DBIN */
 };
 
 /*************************
@@ -463,12 +460,12 @@ static MACHINE_CONFIG_START( jubileep, jubilee_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_SIZE(32*8, 32*8)                         /* (47+1*8, 38+1*8) from CRTC settings */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)   /* (32*8, 32*8) from CRTC settings */
 	MCFG_SCREEN_UPDATE_DRIVER(jubilee_state, screen_update_jubileep)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",jubileep,"palette")
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ADD("palette",8)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
@@ -489,6 +486,9 @@ ROM_START( jubileep )
 	ROM_LOAD( "ic49.bin",   0x0000, 0x2000, CRC(ec65d259) SHA1(9e82e4043cbea26b91965a19507a5f00dc3ba01a) )
 	ROM_LOAD( "ic48.bin",   0x2000, 0x2000, CRC(74e9ffd9) SHA1(7349fea72a349a58014b795ec6c29647e7159d39) )
 	ROM_LOAD( "ic47.bin",   0x4000, 0x2000, CRC(55dc8482) SHA1(53f22bd66e5fcad5e2397998bc58109c3c19af96) )
+
+	ROM_REGION( 0x0800, "videoworkram", 0 )    /* default NVRAM */
+	ROM_LOAD( "jubileep_videoworkram.bin", 0x0000, 0x0800, CRC(595bf2b3) SHA1(ae311873b15d8cebfb6ef6a80f27fafc9544178c) )
 ROM_END
 
 
@@ -497,4 +497,4 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY    FULLNAME                  FLAGS */
-GAME( 198?, jubileep, 0,      jubileep, jubileep, driver_device, 0,    ROT0, "Jubilee", "Jubilee Double-Up Poker", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 198?, jubileep, 0,      jubileep, jubileep, driver_device, 0,    ROT0, "Jubilee", "Jubilee Double-Up Poker", GAME_NO_SOUND )

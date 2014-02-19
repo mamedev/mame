@@ -108,8 +108,8 @@ void nubus_vikbw_device::device_reset()
 	m_vbl_disable = 1;
 	memset(m_vram, 0, VRAM_SIZE);
 
-	m_palette[0] = MAKE_RGB(255, 255, 255);
-	m_palette[1] = MAKE_RGB(0, 0, 0);
+	m_palette[0] = rgb_t(255, 255, 255);
+	m_palette[1] = rgb_t(0, 0, 0);
 }
 
 /***************************************************************************

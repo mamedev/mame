@@ -106,7 +106,7 @@ PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
 		tcol = 255.0f * b_v[ib] / b_v[0];
 		b = 255 - (((int)tcol) & 255);
 
-		m_palette[col] = MAKE_RGB(r,g,b);
+		m_palette[col] = rgb_t(r,g,b);
 	}
 }
 

@@ -106,15 +106,15 @@ const gfx_layout gfx_16x16x4_planar =
 
 const rgb_t RGB_MONOCHROME_WHITE[] =
 {
-	RGB_BLACK,
-	RGB_WHITE
+	rgb_t::black,
+	rgb_t::white
 };
 
 const rgb_t RGB_MONOCHROME_WHITE_HIGHLIGHT[] =
 {
-	RGB_BLACK,
-	MAKE_RGB(0xc0, 0xc0, 0xc0),
-	RGB_WHITE
+	rgb_t::black,
+	rgb_t(0xc0, 0xc0, 0xc0),
+	rgb_t::white
 };
 
 
@@ -124,8 +124,8 @@ const rgb_t RGB_MONOCHROME_WHITE_HIGHLIGHT[] =
 
 const rgb_t RGB_MONOCHROME_AMBER[] =
 {
-	RGB_BLACK,
-	MAKE_RGB(0xf7, 0xaa, 0x00)
+	rgb_t::black,
+	rgb_t(0xf7, 0xaa, 0x00)
 };
 
 
@@ -135,15 +135,15 @@ const rgb_t RGB_MONOCHROME_AMBER[] =
 
 const rgb_t RGB_MONOCHROME_GREEN[] =
 {
-	RGB_BLACK,
-	MAKE_RGB(0x00, 0xff, 0x00)
+	rgb_t::black,
+	rgb_t(0x00, 0xff, 0x00)
 };
 
 const rgb_t RGB_MONOCHROME_GREEN_HIGHLIGHT[] =
 {
-	RGB_BLACK,
-	MAKE_RGB(0x00, 0xc0, 0x00),
-	MAKE_RGB(0x00, 0xff, 0x00)
+	rgb_t::black,
+	rgb_t(0x00, 0xc0, 0x00),
+	rgb_t(0x00, 0xff, 0x00)
 };
 
 /*-------------------------------------------------
@@ -152,6 +152,6 @@ const rgb_t RGB_MONOCHROME_GREEN_HIGHLIGHT[] =
 
 const rgb_t RGB_MONOCHROME_YELLOW[] =
 {
-	RGB_BLACK,
-	MAKE_RGB(0xff, 0xff, 0x00)
+	rgb_t::black,
+	rgb_t(0xff, 0xff, 0x00)
 };

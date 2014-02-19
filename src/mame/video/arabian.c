@@ -139,7 +139,7 @@ PALETTE_INIT_MEMBER(arabian_state, arabian)
 
 		b = (bhi * 192) + (bbase * 63);
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

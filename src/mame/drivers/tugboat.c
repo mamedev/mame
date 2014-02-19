@@ -101,7 +101,7 @@ PALETTE_INIT_MEMBER(tugboat_state, tugboat)
 		g = brt * ((color_prom[i] >> 1) & 0x01);
 		b = brt * ((color_prom[i] >> 2) & 0x01);
 
-		palette.set_pen_color(i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 

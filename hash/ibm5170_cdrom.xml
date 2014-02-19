@@ -62,4 +62,16 @@
 		</part>
 	</software>
 
+	<software name="nasfdu12">
+		<description>NASLite NAS Server Operating System (v1.x)</description>
+		<year>2004</year>
+		<publisher>Server Elements</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="naslite-fdu-v1.2" sha1="cb996013c327fd6d5c323fd03f8e9c8061cb4820" />
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -56,7 +56,7 @@ WRITE8_MEMBER(nbmj9195_state::nbmj9195_nb22090_palette_w)
 	g = m_nb22090_palette[(0x100 + (offs_h * 0x300) + offs_l)];
 	b = m_nb22090_palette[(0x200 + (offs_h * 0x300) + offs_l)];
 
-	m_palette->set_pen_color(((offs_h * 0x100) + offs_l), MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(((offs_h * 0x100) + offs_l), rgb_t(r, g, b));
 }
 
 /******************************************************************************

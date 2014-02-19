@@ -108,7 +108,7 @@ PALETTE_INIT_MEMBER(ampoker2_state, ampoker2)
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		r = combine_3_weights(weights_r, bit0, bit1, bit2);
 
-		palette.set_pen_color(i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 

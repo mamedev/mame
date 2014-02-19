@@ -625,7 +625,7 @@ WRITE16_MEMBER(wheelfir_state::pal_data_w)
 		int r = m_palette[color*3];
 		int g = m_palette[color*3+1];
 		int b = m_palette[color*3+2];
-		m_palette->set_pen_color(color, MAKE_RGB(r,g,b));
+		m_palette->set_pen_color(color, rgb_t(r,g,b));
 	}
 
 }

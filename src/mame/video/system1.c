@@ -347,7 +347,7 @@ WRITE8_MEMBER(system1_state::system1_paletteram_w)
 		b = pal2bit(data >> 6);
 	}
 
-	m_palette->set_pen_color(offset,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
 

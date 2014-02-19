@@ -213,7 +213,7 @@ WRITE32_MEMBER(skns_state::skns_palette_ram_w)
 		r <<= 3;
 	}
 
-	m_palette->set_pen_color(offset,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
 
@@ -246,7 +246,7 @@ void skns_state::palette_set_rgb_brightness (int offset, UINT8 brightness_r, UIN
 		r <<= 3;
 	}
 
-	m_palette->set_pen_color(offset,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
 

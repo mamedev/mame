@@ -156,7 +156,7 @@ void srmp6_state::update_palette()
 			b += ((0x1F - b) * brg) >> 5;
 			if(b > 0x1F) b = 0x1F;
 		}
-		m_palette->set_pen_color(i, MAKE_RGB(r << 3, g << 3, b << 3));
+		m_palette->set_pen_color(i, rgb_t(r << 3, g << 3, b << 3));
 	}
 }
 
@@ -529,7 +529,7 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 			if(b > 0x1F) b = 0x1F;
 		}
 
-		m_palette->set_pen_color(offset, MAKE_RGB(r << 3, g << 3, b << 3));
+		m_palette->set_pen_color(offset, rgb_t(r << 3, g << 3, b << 3));
 	}
 }
 

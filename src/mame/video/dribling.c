@@ -32,7 +32,7 @@ PALETTE_INIT_MEMBER(dribling_state, dribling)
 		g *= 0x55;
 		b *= 0xff;
 
-		palette.set_pen_color(i, MAKE_RGB(r,g,b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 

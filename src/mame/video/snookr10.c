@@ -81,7 +81,7 @@ PALETTE_INIT_MEMBER(snookr10_state, snookr10)
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		g = combine_2_weights(weights_g, bit0, bit1);
 
-		palette.set_pen_color(i, MAKE_RGB(r,g,b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 
@@ -150,7 +150,7 @@ PALETTE_INIT_MEMBER(snookr10_state, apple10)
 		/* encrypted color matrix */
 		cn = BITSWAP8(i,4,5,6,7,2,3,0,1);
 
-		palette.set_pen_color(cn, MAKE_RGB(r,g,b));
+		palette.set_pen_color(cn, rgb_t(r,g,b));
 	}
 }
 
@@ -219,7 +219,7 @@ PALETTE_INIT_MEMBER(snookr10_state, crystalc)
 		/* encrypted color matrix */
 		cn = BITSWAP8(i,7,5,6,4,3,2,1,0);
 
-		palette.set_pen_color(cn, MAKE_RGB(r,g,b));
+		palette.set_pen_color(cn, rgb_t(r,g,b));
 	}
 }
 

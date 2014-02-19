@@ -377,7 +377,7 @@ PALETTE_INIT_MEMBER(camplynx_state, camplynx)
 	while (color_count--)
 	{
 		r = lynx48k_palette[i++]; g = lynx48k_palette[i++]; b = lynx48k_palette[i++];
-		palette.set_pen_color(7-color_count, MAKE_RGB(r, g, b));
+		palette.set_pen_color(7-color_count, rgb_t(r, g, b));
 	}
 }
 

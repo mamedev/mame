@@ -58,7 +58,7 @@ PALETTE_INIT_MEMBER(zaccaria_state, zaccaria)
 		  black anyway.
 		 */
 		if (((i % 64) / 8) == 0)
-			palette.set_indirect_color(i, RGB_BLACK);
+			palette.set_indirect_color(i, rgb_t::black);
 		else
 		{
 			int bit0, bit1, bit2;
@@ -81,7 +81,7 @@ PALETTE_INIT_MEMBER(zaccaria_state, zaccaria)
 			bit1 = (color_prom[i + 0x200] >> 0) & 0x01;
 			b = combine_2_weights(weights_b, bit0, bit1);
 
-			palette.set_indirect_color(i, MAKE_RGB(r, g, b));
+			palette.set_indirect_color(i, rgb_t(r, g, b));
 		}
 	}
 

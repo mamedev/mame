@@ -189,7 +189,7 @@ void tunhunt_state::set_pens()
 		green   = APPLY_SHADE(green,shade);
 		blue    = APPLY_SHADE(blue,shade);
 
-		m_palette->set_indirect_color( i,MAKE_RGB(red,green,blue) );
+		m_palette->set_indirect_color( i,rgb_t(red,green,blue) );
 	}
 }
 

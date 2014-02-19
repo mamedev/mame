@@ -1072,8 +1072,8 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 
 PALETTE_INIT_MEMBER(x07_state, x07)
 {
-	palette.set_pen_color(0, MAKE_RGB(138, 146, 148));
-	palette.set_pen_color(1, MAKE_RGB(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 

@@ -11,9 +11,9 @@
 
 PALETTE_INIT_MEMBER(kaypro_state,kaypro)
 {
-	palette.set_pen_color(0, RGB_BLACK); /* black */
-	palette.set_pen_color(1, MAKE_RGB(0, 220, 0)); /* green */
-	palette.set_pen_color(2, MAKE_RGB(0, 110, 0)); /* low intensity green */
+	palette.set_pen_color(0, rgb_t::black); /* black */
+	palette.set_pen_color(1, rgb_t(0, 220, 0)); /* green */
+	palette.set_pen_color(2, rgb_t(0, 110, 0)); /* low intensity green */
 }
 
 UINT32 kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -241,9 +241,9 @@ PALETTE_INIT_MEMBER(mpoker_state, mpoker)
 		rgb_t color;
 
 		if (i & 0x01)
-			color = MAKE_RGB(pal2bit((i & 0x6) >> 1),pal2bit((i & 0x18) >> 3),pal2bit((i & 0x60) >> 5));
+			color = rgb_t(pal2bit((i & 0x6) >> 1),pal2bit((i & 0x18) >> 3),pal2bit((i & 0x60) >> 5));
 		else
-			color = RGB_BLACK;
+			color = rgb_t::black;
 
 		palette.set_pen_color(i, color);
 	}

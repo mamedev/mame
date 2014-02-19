@@ -407,8 +407,8 @@ PALETTE_INIT_MEMBER(sub_state, sub)
 		g = (color_prom[0x100] >> 0);
 		b = (color_prom[0x200] >> 0);
 
-		//palette.set_indirect_color(i, MAKE_RGB(r, g, b));
-		palette.set_indirect_color(i, MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b)));
+		//palette.set_indirect_color(i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(pal4bit(r), pal4bit(g), pal4bit(b)));
 
 		color_prom++;
 	}

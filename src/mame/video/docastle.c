@@ -55,8 +55,8 @@ PALETTE_INIT_MEMBER(docastle_state, docastle)
 		/* because the graphics are decoded as 4bpp with the top bit used for transparency
 		   or priority, we create matching 3bpp sets of palette entries, which effectively
 		   ignores the value of the top bit */
-		palette.set_pen_color(((i & 0xf8) << 1) | 0x00 | (i & 0x07), MAKE_RGB(r,g,b));
-		palette.set_pen_color(((i & 0xf8) << 1) | 0x08 | (i & 0x07), MAKE_RGB(r,g,b));
+		palette.set_pen_color(((i & 0xf8) << 1) | 0x00 | (i & 0x07), rgb_t(r,g,b));
+		palette.set_pen_color(((i & 0xf8) << 1) | 0x08 | (i & 0x07), rgb_t(r,g,b));
 		color_prom++;
 	}
 }

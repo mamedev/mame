@@ -47,7 +47,7 @@ PALETTE_INIT_MEMBER(m58_state, m58)
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		palette.set_indirect_color(i, MAKE_RGB(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r,g,b));
 	}
 
 	/* radar palette */
@@ -58,7 +58,7 @@ PALETTE_INIT_MEMBER(m58_state, m58)
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		palette.set_indirect_color(256+i, MAKE_RGB(r,g,b));
+		palette.set_indirect_color(256+i, rgb_t(r,g,b));
 	}
 
 	/* compute palette information for sprites */
@@ -75,7 +75,7 @@ PALETTE_INIT_MEMBER(m58_state, m58)
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		palette.set_indirect_color(256+256+i, MAKE_RGB(r,g,b));
+		palette.set_indirect_color(256+256+i, rgb_t(r,g,b));
 	}
 
 	/* character lookup table */

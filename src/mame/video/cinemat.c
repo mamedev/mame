@@ -78,7 +78,7 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 	{
 		case COLOR_BILEVEL:
 			/* color is either bright or dim, selected by the value sent to the port */
-			m_vector_color = (data & 1) ? MAKE_RGB(0x80,0x80,0x80) : MAKE_RGB(0xff,0xff,0xff);
+			m_vector_color = (data & 1) ? rgb_t(0x80,0x80,0x80) : rgb_t(0xff,0xff,0xff);
 			break;
 
 		case COLOR_16LEVEL:
@@ -88,7 +88,7 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 			{
 				int xval = cpu->state_int(CCPU_X) & 0x0f;
 				i = (xval + 1) * 255 / 16;
-				m_vector_color = MAKE_RGB(i,i,i);
+				m_vector_color = rgb_t(i,i,i);
 			}
 			break;
 
@@ -100,7 +100,7 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 				int xval = cpu->state_int(CCPU_X);
 				xval = (~xval >> 2) & 0x3f;
 				i = (xval + 1) * 255 / 64;
-				m_vector_color = MAKE_RGB(i,i,i);
+				m_vector_color = rgb_t(i,i,i);
 			}
 			break;
 
@@ -116,7 +116,7 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 				g = g * 255 / 15;
 				b = (~xval >> 8) & 0x0f;
 				b = b * 255 / 15;
-				m_vector_color = MAKE_RGB(r,g,b);
+				m_vector_color = rgb_t(r,g,b);
 			}
 			break;
 
@@ -143,7 +143,7 @@ WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 					g = g * 255 / 7;
 					b = (~yval >> 6) & 0x03;
 					b = b * 255 / 3;
-					m_vector_color = MAKE_RGB(r,g,b);
+					m_vector_color = rgb_t(r,g,b);
 
 					/* restore the original X,Y values */
 					cpu->set_state_int(CCPU_X, m_qb3_lastx);

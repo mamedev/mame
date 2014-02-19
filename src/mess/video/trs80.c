@@ -570,14 +570,14 @@ WRITE8_MEMBER( trs80_state::trs80_gfxram_w )
 /* Levels are unknown - guessing */
 static const rgb_t lnw80_palette[] =
 {
-	MAKE_RGB(220, 220, 220), // white
-	MAKE_RGB(0, 175, 0), // green
-	MAKE_RGB(200, 200, 0), // yellow
-	MAKE_RGB(255, 0, 0), // red
-	MAKE_RGB(255, 0, 255), // magenta
-	MAKE_RGB(0, 0, 175), // blue
-	MAKE_RGB(0, 255, 255), // cyan
-	MAKE_RGB(0, 0, 0), // black
+	rgb_t(220, 220, 220), // white
+	rgb_t(0, 175, 0), // green
+	rgb_t(200, 200, 0), // yellow
+	rgb_t(255, 0, 0), // red
+	rgb_t(255, 0, 255), // magenta
+	rgb_t(0, 0, 175), // blue
+	rgb_t(0, 255, 255), // cyan
+	rgb_t(0, 0, 0), // black
 };
 
 PALETTE_INIT_MEMBER(trs80_state,lnw80)

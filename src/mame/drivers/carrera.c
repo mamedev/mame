@@ -307,7 +307,7 @@ PALETTE_INIT_MEMBER(carrera_state, carrera)
 		bit1 = (color_prom[0] >> 5) & 0x01;
 		r = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }

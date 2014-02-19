@@ -695,7 +695,7 @@ rgb_t socrates_state::socrates_create_color(UINT8 color)
 	finalR = pow(finalR, 1/GAMMA)*255;
 	finalG = pow(finalG, 1/GAMMA)*255;
 	finalB = pow(finalB, 1/GAMMA)*255;
-composedcolor = MAKE_RGB((int)finalR,(int)finalG,(int)finalB);
+composedcolor = rgb_t((int)finalR,(int)finalG,(int)finalB);
 return composedcolor;
 }
 

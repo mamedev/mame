@@ -63,7 +63,7 @@ PALETTE_INIT_MEMBER(fastfred_state,fastfred)
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* characters and sprites use the same palette */
@@ -343,8 +343,8 @@ VIDEO_START_MEMBER(fastfred_state,imago)
 	m_stars_on = 1;
 
 	/* web colors */
-	m_palette->set_pen_color(256+64+0,MAKE_RGB(0x50,0x00,0x00));
-	m_palette->set_pen_color(256+64+1,MAKE_RGB(0x00,0x00,0x00));
+	m_palette->set_pen_color(256+64+0,rgb_t(0x50,0x00,0x00));
+	m_palette->set_pen_color(256+64+1,rgb_t(0x00,0x00,0x00));
 }
 
 UINT32 fastfred_state::screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

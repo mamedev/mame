@@ -46,7 +46,7 @@ void labyrunr_state::set_pens(  )
 	{
 		UINT16 data = m_paletteram[i | 1] | (m_paletteram[i] << 8);
 
-		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
 		m_palette->set_indirect_color(i >> 1, color);
 	}

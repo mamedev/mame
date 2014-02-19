@@ -56,12 +56,12 @@ UINT32 sstrangr_state::screen_update_sstrangr(screen_device &screen, bitmap_rgb3
 
 			if (m_flip_screen)
 			{
-				pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
+				pen = (data & 0x80) ? rgb_t::white : rgb_t::black;
 				data = data << 1;
 			}
 			else
 			{
-				pen = (data & 0x01) ? RGB_WHITE : RGB_BLACK;
+				pen = (data & 0x01) ? rgb_t::white : rgb_t::black;
 				data = data >> 1;
 			}
 
@@ -81,7 +81,7 @@ static void get_pens(pen_t *pens)
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
+		pens[i] = rgb_t(pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
 	}
 }
 

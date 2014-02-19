@@ -304,7 +304,7 @@ PALETTE_INIT_MEMBER(istellar_state, istellar)
 		bit3 = (color_prom[i+0x200] >> 3) & 0x01;
 		b = (0x8f * bit3) + (0x43 * bit2) + (0x1f * bit1) + (0x0e * bit0);
 
-		palette.set_pen_color(i,MAKE_RGB(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 

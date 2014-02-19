@@ -89,7 +89,7 @@ PALETTE_INIT_MEMBER(portrait_state, portrait)
         g = (data >> 3) & 0x3;
         b = (data >> 5) & 0x7;
 
-        palette.set_indirect_color(i, MAKE_RGB(pal3bit(r), pal2bit(g), pal3bit(b)));
+        palette.set_indirect_color(i, rgb_t(pal3bit(r), pal2bit(g), pal3bit(b)));
 
         color_prom++;
     }
@@ -104,10 +104,10 @@ PALETTE_INIT_MEMBER(portrait_state, portrait)
 		g = (data >> 5) & 0x1f;
 		b = (data >> 10) & 0x1f;
 
-		palette.set_indirect_color(i, MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b)));
+		palette.set_indirect_color(i, rgb_t(pal5bit(r), pal5bit(g), pal5bit(b)));
 
 		// ?? the lookup seems to reference 0x3f colours, unless 1 bit is priority or similar?
-		palette.set_indirect_color(i+0x20, MAKE_RGB(pal5bit(r>>1), pal5bit(g>>1), pal5bit(b>>1)));
+		palette.set_indirect_color(i+0x20, rgb_t(pal5bit(r>>1), pal5bit(g>>1), pal5bit(b>>1)));
 
 		color_prom++;
 	}

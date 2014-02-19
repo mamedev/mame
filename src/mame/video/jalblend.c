@@ -60,13 +60,13 @@ rgb_t jal_blend_func(rgb_t dest, rgb_t addMe, UINT8 alpha)
 	int r, g, b;
 	int ir, ig, ib;
 
-	r = (int)RGB_RED  (dest);
-	g = (int)RGB_GREEN(dest);
-	b = (int)RGB_BLUE (dest);
+	r = (int)dest.r();
+	g = (int)dest.g();
+	b = (int)dest.b();
 
-	ir = (int)RGB_RED  (addMe);
-	ig = (int)RGB_GREEN(addMe);
-	ib = (int)RGB_BLUE (addMe);
+	ir = (int)addMe.r();
+	ig = (int)addMe.g();
+	ib = (int)addMe.b();
 
 	if (alpha & 4)
 		{ r -= ir; if (r < 0) r = 0; }
@@ -81,7 +81,7 @@ rgb_t jal_blend_func(rgb_t dest, rgb_t addMe, UINT8 alpha)
 	else
 		{ b += ib; if (b > 255) b = 255; }
 
-	return MAKE_RGB(r,g,b);
+	return rgb_t(r,g,b);
 }
 
 template<class _BitmapClass>

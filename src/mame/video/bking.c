@@ -78,7 +78,7 @@ PALETTE_INIT_MEMBER(bking_state, bking)
 		bit1 = (color_prom[pen] >> 7) & 0x01;
 		b = combine_2_weights(gweights, bit0, bit1);
 
-		palette.set_pen_color(i, MAKE_RGB(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

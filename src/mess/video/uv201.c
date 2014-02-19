@@ -248,14 +248,14 @@ void uv201_device::initialize_palette()
 			onvalue = onhiintensity;
 		}
 
-		m_palette[offset + 0] = MAKE_RGB(offvalue, offvalue, offvalue); // black
-		m_palette[offset + 1] = MAKE_RGB(onvalue, offvalue, offvalue); // red
-		m_palette[offset + 2] = MAKE_RGB(offvalue, onvalue, offvalue); // green
-		m_palette[offset + 3] = MAKE_RGB(onvalue, onvalue, offvalue); // red-green
-		m_palette[offset + 4] = MAKE_RGB(offvalue, offvalue, onvalue); // blue
-		m_palette[offset + 5] = MAKE_RGB(onvalue, offvalue, onvalue); // red-blue
-		m_palette[offset + 6] = MAKE_RGB(offvalue, onvalue, onvalue); // green-blue
-		m_palette[offset + 7] = MAKE_RGB(onvalue, onvalue, onvalue); // white
+		m_palette[offset + 0] = rgb_t(offvalue, offvalue, offvalue); // black
+		m_palette[offset + 1] = rgb_t(onvalue, offvalue, offvalue); // red
+		m_palette[offset + 2] = rgb_t(offvalue, onvalue, offvalue); // green
+		m_palette[offset + 3] = rgb_t(onvalue, onvalue, offvalue); // red-green
+		m_palette[offset + 4] = rgb_t(offvalue, offvalue, onvalue); // blue
+		m_palette[offset + 5] = rgb_t(onvalue, offvalue, onvalue); // red-blue
+		m_palette[offset + 6] = rgb_t(offvalue, onvalue, onvalue); // green-blue
+		m_palette[offset + 7] = rgb_t(onvalue, onvalue, onvalue); // white
 	}
 }
 

@@ -46,7 +46,7 @@ PALETTE_INIT_MEMBER(tankbatt_state, tankbatt)
 		b = RES_1 * bit3;
 		if (bit3) b += RES_2 * bit0;
 
-		palette.set_indirect_color(i, MAKE_RGB(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	for (i = 0; i < 0x200; i += 2)

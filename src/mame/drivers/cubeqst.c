@@ -110,7 +110,7 @@ PALETTE_INIT_MEMBER(cubeqst_state, cubeqst)
 		r = (i >> 8) & 7;
 		y = ((i >> 12) & 0xf) * 2;
 
-		m_colormap[i] = MAKE_ARGB(a ? 0 : 255, y*r, y*g, y*b);
+		m_colormap[i] = rgb_t(a ? 0 : 255, y*r, y*g, y*b);
 	}
 }
 

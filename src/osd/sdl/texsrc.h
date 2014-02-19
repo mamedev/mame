@@ -41,9 +41,9 @@
 	#define DEST_NAME(name) name ## _32bpp
 	#define TEXSRC_TYPE UINT32
 	#define TEXSRC_TO_DEST(src) \
-		(texsource->palette[0x200 + RGB_RED(src)]   | \
-			texsource->palette[0x100 + RGB_GREEN(src)] | \
-			texsource->palette[RGB_BLUE(src)] | 0xff000000)
+		(texsource->palette[0x200 + (((src) >> 16) & 0xff) ]   | \
+			texsource->palette[0x100 + (((src) >> 8) & 0xff) ] | \
+			texsource->palette[((src) & 0xff) ] | 0xff000000)
 	#define FUNC_NAME(name) name ## _rgb32_paletted
 #elif SDL_TEXFORMAT == SDL_TEXFORMAT_PALETTE16
 	#define DEST_TYPE UINT32

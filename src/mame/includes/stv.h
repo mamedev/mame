@@ -352,7 +352,7 @@ public:
 	void stv_vdp2_draw_mosaic(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 is_roz);
 	void stv_vdp2_fade_effects( void );
 	void stv_vdp2_compute_color_offset( int *r, int *g, int *b, int cor );
-	void stv_vdp2_compute_color_offset_UINT32(UINT32 *rgb, int cor);
+	void stv_vdp2_compute_color_offset_UINT32(rgb_t *rgb, int cor);
 	void stv_vdp2_check_fade_control_for_layer( void );
 
 	void stv_vdp2_draw_line(bitmap_rgb32 &bitmap, const rectangle &cliprect);

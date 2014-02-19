@@ -33,7 +33,7 @@ void darkseal_state::update_24bitcol(int offset)
 	g = (m_generic_paletteram_16[offset] >> 8) & 0xff;
 	b = (m_generic_paletteram2_16[offset] >> 0) & 0xff;
 
-	m_palette->set_pen_color(offset,MAKE_RGB(r,g,b));
+	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
 WRITE16_MEMBER(darkseal_state::darkseal_palette_24bit_rg_w)

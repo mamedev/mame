@@ -151,7 +151,7 @@ void mcr_state::journey_set_color(int index, int data)
 	b = (b << 5) | (b << 1);
 
 	/* set the BG color */
-	m_palette->set_pen_color(index, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(index, rgb_t(r, g, b));
 
 	/* if this is an odd entry in the upper palette bank, the hardware */
 	/* hard-codes a low 1 bit -- this is used for better grayscales */
@@ -163,7 +163,7 @@ void mcr_state::journey_set_color(int index, int data)
 	}
 
 	/* set the FG color */
-	m_palette->set_pen_color(index + 64, MAKE_RGB(r, g, b));
+	m_palette->set_pen_color(index + 64, rgb_t(r, g, b));
 }
 
 

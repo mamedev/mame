@@ -31,7 +31,7 @@ PALETTE_INIT_MEMBER(bogeyman_state, bogeyman)
 		bit2 = (color_prom[256] >> 3) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i + 16, MAKE_RGB(r,g,b));
+		palette.set_pen_color(i + 16, rgb_t(r,g,b));
 		color_prom++;
 	}
 }

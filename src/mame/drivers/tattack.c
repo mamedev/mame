@@ -194,8 +194,8 @@ PALETTE_INIT_MEMBER(tattack_state, tattack)
 		else
 			r=g=b=128;
 
-		palette.set_pen_color(2*i,MAKE_RGB(0x00,0x00,0x00));
-		palette.set_pen_color(2*i+1,MAKE_RGB(r,g,b));
+		palette.set_pen_color(2*i,rgb_t(0x00,0x00,0x00));
+		palette.set_pen_color(2*i+1,rgb_t(r,g,b));
 	}
 }
 
