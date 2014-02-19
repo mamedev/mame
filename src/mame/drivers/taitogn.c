@@ -23,6 +23,9 @@ which I suspect is one of the flashROMs that is acting like a standard ROM and i
 Upon inspecting the GNET top board, it appears flash.u30 is the sub-BIOS and perhaps U27 is something sound related.
 The flashROMs at U55, U56 & U29 appear to be the ones that are re-flashed when swapping game carts.
 
+Not every game uses the Taito Zoom sound hardware, these are: Otenami Haiken, Otenami Haiken Final,
+Zoku Otenamihaiken, Zooo, and possibly Space Invaders Anniversary.
+
 PCB Layouts
 -----------
 (Standard ZN2 Motherboard)
@@ -415,6 +418,8 @@ WRITE8_MEMBER(taitogn_state::control_w)
 	m_mn10200->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 	if (~data & m_control & 0x10)
 	{
+		logerror("control_w Zoom reset\n");
+
 		// assume that this also readys the sound flash chips
 		m_pgmflash->write(0, 0xff);
 		m_sndflash0->write(0, 0xff);
@@ -667,7 +672,7 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_CPU_MODIFY("mn10200")
 	MCFG_CPU_PROGRAM_MAP(taitogn_mn_map)
 
-	MCFG_SOUND_REPLACE("zsg2", ZSG2, XTAL_25MHz/2)
+	MCFG_SOUND_REPLACE("zsg2", ZSG2, XTAL_25MHz)
 	MCFG_ZSG2_EXT_READ_HANDLER(READ32(taitogn_state, zsg2_ext_r))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1037,7 +1042,7 @@ GAME( 1999, otenamih, taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "S
 GAME( 2005, otenamhf, taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Success / Warashi", "Otenami Haiken Final (V2.07JC)", GAME_IMPERFECT_SOUND )
 GAME( 2000, psyvaria, taitogn,  coh3002t, coh3002t, driver_device, 0, ROT270, "Success", "Psyvariar -Medium Unit- (V2.04J)", GAME_IMPERFECT_SOUND )
 GAME( 2000, psyvarrv, taitogn,  coh3002t, coh3002t, driver_device, 0, ROT270, "Success", "Psyvariar -Revision- (V2.04J)", GAME_IMPERFECT_SOUND )
-GAME( 2000, zokuoten, taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Success", "Zoku Otenamihaiken (V2.03J)", GAME_IMPERFECT_SOUND )
+GAME( 2000, zokuoten, taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Success", "Zoku Otenamihaiken (V2.03J)", GAME_IMPERFECT_SOUND ) // boots the soundcpu without any valid code, causing an infinite NMI loop
 GAME( 2004, zooo,     taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Success", "Zooo (V2.01J)", GAME_IMPERFECT_SOUND )
 
 GAME( 1999, mahjngoh, taitogn,  coh3002t_mp, coh3002t_mp, driver_device, 0, ROT0, "Warashi / Mahjong Kobo / Taito", "Mahjong Oh (V2.06J)", GAME_IMPERFECT_SOUND )
