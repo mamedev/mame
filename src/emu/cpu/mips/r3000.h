@@ -249,8 +249,8 @@ protected:
 
 	// cache memory
 	UINT32 *    m_cache;
-	UINT32 *    m_icache;
-	UINT32 *    m_dcache;
+	dynamic_array<UINT32> m_icache;
+	dynamic_array<UINT32> m_dcache;
 	size_t      m_cache_size;
 	size_t      m_icache_size;
 	size_t      m_dcache_size;

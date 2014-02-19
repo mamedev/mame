@@ -35,10 +35,9 @@ struct vtlb_state
 	int                 dynindex;           /* index of next dynamic entry */
 	int                 pageshift;          /* bits to shift to get page index */
 	int                 addrwidth;          /* logical address bus width */
-	offs_t *            live;               /* array of live entries by table index */
-	int *               fixedpages;         /* number of pages each fixed entry covers */
-	vtlb_entry *        table;              /* table of entries by address */
-	vtlb_entry *        save;               /* cache of live table entries for saving */
+	dynamic_array<offs_t> live;             /* array of live entries by table index */
+	dynamic_array<int> fixedpages;          /* number of pages each fixed entry covers */
+	dynamic_array<vtlb_entry> table;        /* table of entries by address */
 };
 
 
@@ -74,18 +73,18 @@ vtlb_state *vtlb_alloc(device_t *cpu, address_spacenum space, int fixed_entries,
 	assert(vtlb->addrwidth > vtlb->pageshift);
 
 	/* allocate the entry array */
-	vtlb->live = auto_alloc_array_clear(cpu->machine(), offs_t, fixed_entries + dynamic_entries);
-	cpu->save_pointer(NAME(vtlb->live), fixed_entries + dynamic_entries, space);
+	vtlb->live.resize_and_clear(fixed_entries + dynamic_entries);
+	cpu->save_item(NAME(vtlb->live));
 
 	/* allocate the lookup table */
-	vtlb->table = auto_alloc_array_clear(cpu->machine(), vtlb_entry, (size_t) 1 << (vtlb->addrwidth - vtlb->pageshift));
-	cpu->save_pointer(NAME(vtlb->table), 1 << (vtlb->addrwidth - vtlb->pageshift), space);
+	vtlb->table.resize_and_clear((size_t) 1 << (vtlb->addrwidth - vtlb->pageshift));
+	cpu->save_item(NAME(vtlb->table));
 
 	/* allocate the fixed page count array */
 	if (fixed_entries > 0)
 	{
-		vtlb->fixedpages = auto_alloc_array_clear(cpu->machine(), int, fixed_entries);
-		cpu->save_pointer(NAME(vtlb->fixedpages), fixed_entries, space);
+		vtlb->fixedpages.resize_and_clear(fixed_entries);
+		cpu->save_item(NAME(vtlb->fixedpages));
 	}
 	return vtlb;
 }

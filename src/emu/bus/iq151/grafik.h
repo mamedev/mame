@@ -45,7 +45,6 @@ private:
 
 	required_device<i8255_device> m_ppi8255;
 
-	UINT8 *     m_videoram;
 	UINT8       m_posx;     // horizontal position
 	UINT8       m_posy;     // vertical position
 	UINT8       m_all;      // 0: bit mode 1: byte mode
@@ -54,6 +53,7 @@ private:
 	UINT8       m_ev;       // enable video out
 	UINT8       m_ex;
 	UINT8       m_sel;      // enable vram access
+	UINT8       m_videoram[0x4000];
 };
 
 

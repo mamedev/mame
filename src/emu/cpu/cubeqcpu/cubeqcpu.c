@@ -172,9 +172,6 @@ void cquestsnd_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 
-	/* Allocate RAM shared with 68000 */
-	m_sram = auto_alloc_array(machine(), UINT16, 4096/2);
-
 	memset(m_ram, 0, sizeof(m_ram));
 	m_q = 0;
 	m_f = 0;
@@ -248,10 +245,6 @@ void cquestsnd_cpu_device::device_reset()
 
 void cquestrot_cpu_device::device_start()
 {
-	/* Allocate RAM */
-	m_dram = auto_alloc_array(machine(), UINT16, 16384);  /* Shared with 68000 */
-	m_sram = auto_alloc_array(machine(), UINT16, 2048);   /* Private */
-
 	m_linedata_w.resolve_safe();
 
 	m_program = &space(AS_PROGRAM);
@@ -375,12 +368,6 @@ void cquestrot_cpu_device::state_string_export(const device_state_entry &entry, 
 
 void cquestlin_cpu_device::device_start()
 {
-	/* Allocate RAM */
-	m_sram = auto_alloc_array(machine(), UINT16, 4096);      /* Shared with rotate CPU */
-	m_ptr_ram = auto_alloc_array(machine(), UINT8, 1024);                    /* Pointer RAM */
-	m_e_stack = auto_alloc_array(machine(), UINT32, 32768);  /* Stack DRAM: 32kx20 */
-	m_o_stack = auto_alloc_array(machine(), UINT32, 32768);  /* Stack DRAM: 32kx20 */
-
 	m_linedata_r.resolve_safe(0);
 
 	m_program = &space(AS_PROGRAM);

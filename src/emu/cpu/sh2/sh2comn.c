@@ -1007,9 +1007,6 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_ackno
 	sh2->dma_current_active_timer[1] = device->machine().scheduler().timer_alloc(FUNC(sh2_dma_current_active_callback), sh2);
 	sh2->dma_current_active_timer[1]->adjust(attotime::never);
 
-
-	sh2->m = auto_alloc_array(device->machine(), UINT32, 0x200/4);
-
 	if(conf)
 	{
 		sh2->is_slave = conf->is_slave;

@@ -187,7 +187,7 @@ void esrip_device::device_start()
 	m_draw = _config->draw;
 
 	/* Allocate image pointer table RAM */
-	m_ipt_ram = auto_alloc_array(machine(), UINT16, IPT_RAM_SIZE/2);
+	m_ipt_ram.resize(IPT_RAM_SIZE/2);
 
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
@@ -291,7 +291,7 @@ void esrip_device::device_start()
 	save_item(NAME(m_ipt_cnt));
 	save_item(NAME(m_fig));
 	save_item(NAME(m_fig_cycles));
-	save_pointer(NAME(m_ipt_ram), IPT_RAM_SIZE / sizeof(UINT16));
+	save_item(NAME(m_ipt_ram));
 
 	// set our instruction counter
 	m_icountptr = &m_icount;

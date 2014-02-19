@@ -215,10 +215,10 @@ private:
 	UINT16              m_pc;
 	UINT16              m_ppc;
 	UINT8               m_op;
-	UINT8 *             m_sfr;                  // special function registers
-	UINT8 *             m_mram;                 // main RAM
-	UINT8 *             m_xram;                 // XRAM
-	UINT8 *             m_vtrbf;                // work RAM
+	UINT8               m_sfr[0x80];            // special function registers
+	UINT8               m_mram[0x200];          // main RAM
+	UINT8               m_xram[0xc6];           // XRAM
+	UINT8               m_vtrbf[0x200];         // work RAM
 	UINT16              m_irq_flag;
 	UINT8               m_irq_lev;
 	bool                m_after_reti;

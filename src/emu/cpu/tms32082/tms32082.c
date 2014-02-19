@@ -197,8 +197,6 @@ void tms32082_mp_device::device_start()
 
 	state_add(STATE_GENPC, "curpc", m_pc).noshow();
 
-	m_param_ram = auto_alloc_array(machine(), UINT32, 0x800);
-
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 

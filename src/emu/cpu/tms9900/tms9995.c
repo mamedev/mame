@@ -163,9 +163,6 @@ void tms9995_device::device_start()
 
 	assert (conf != NULL);
 
-	// Allocate onchip memory
-	m_onchip_memory = auto_alloc_array(machine(), UINT8, 256);
-
 	// TODO: Restore save state suport
 
 	m_prgspace = &space(AS_PROGRAM);                        // dimemory.h

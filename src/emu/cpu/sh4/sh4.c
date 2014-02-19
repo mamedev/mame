@@ -2842,14 +2842,12 @@ static CPU_RESET( common_sh4_reset )
 	sh4_state *sh4 = get_safe_token(device);
 	emu_timer *tsaved[4];
 	emu_timer *tsave[5];
-	UINT32 *m;
 	int save_is_slave;
 	int savecpu_clock, savebus_clock, savepm_clock;
 
 	void (*f)(UINT32 data);
 	device_irq_acknowledge_callback save_irqcallback;
 
-	m = sh4->m;
 	tsaved[0] = sh4->dma_timer[0];
 	tsaved[1] = sh4->dma_timer[1];
 	tsaved[2] = sh4->dma_timer[2];
@@ -2888,7 +2886,6 @@ static CPU_RESET( common_sh4_reset )
 	sh4->timer[0] = tsave[2];
 	sh4->timer[1] = tsave[3];
 	sh4->timer[2] = tsave[4];
-	sh4->m = m;
 	memset(sh4->m, 0, 16384*4);
 	sh4_default_exception_priorities(sh4);
 	memset(sh4->exception_requesting, 0, sizeof(sh4->exception_requesting));

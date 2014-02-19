@@ -30,10 +30,10 @@ private:
 
 public:
 	// construction/destruction
-	dynamic_array(int initial = 0)
+	dynamic_array(int initial = 0, bool clearit = false)
 		: m_array(NULL),
 			m_count(0),
-			m_allocated(0) { if (initial != 0) expand_internal(initial); m_count = initial; }
+			m_allocated(0) { if (initial != 0) expand_internal(initial); m_count = initial; if (clearit) clear(); }
 	virtual ~dynamic_array() { reset(); }
 
 	// operators
@@ -46,9 +46,15 @@ public:
 	int count() const { return m_count; }
 
 	// helpers
-	void append(const _ElementType &element) { if (m_count == m_allocated) expand_internal((m_allocated == 0) ? 16 : (m_allocated << 1), true); m_array[m_count++] = element; }
+	const _ElementType &append(const _ElementType &element) { if (m_count == m_allocated) expand_internal((m_allocated == 0) ? 16 : (m_allocated << 1), true); m_array[m_count++] = element; return element; }
 	void reset() { delete[] m_array; m_array = NULL; m_count = m_allocated = 0; }
 	void resize(int count, bool keepdata = false) { if (count > m_allocated) expand_internal(count, keepdata); m_count = count; }
+#ifdef __GNUC__
+	void clear() { assert(__is_pod(_ElementType)); memset(m_array, 0, m_count * sizeof(*m_array)); }
+#else
+	void clear() { memset(m_array, 0, m_count * sizeof(*m_array)); }
+#endif
+	void resize_and_clear(int count) { resize(count); clear(); }
 
 private:
 	// internal helpers

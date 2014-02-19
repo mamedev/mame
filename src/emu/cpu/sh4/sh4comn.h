@@ -80,7 +80,7 @@ struct sh4_state
 	address_space *io;
 
 	// sh4 internal
-	UINT32  *m;
+	UINT32 m[16384];
 
 	// timer regs handled manually for reuse
 	UINT32 SH4_TSTR;
@@ -125,10 +125,6 @@ struct sh4_state
 	UINT32 SH4_DMAOR;
 
 
-	// sh3 internal
-	UINT32  m_sh3internal_upper[0x3000/4];
-	UINT32  m_sh3internal_lower[0x1000];
-
 	INT8    nmi_line_state;
 
 	UINT8 sleep_mode;
@@ -168,6 +164,10 @@ struct sh4_state
 	UINT8 sh4_mmu_enabled;
 
 	int cpu_type;
+
+	// sh3 internal
+	UINT32  m_sh3internal_upper[0x3000/4];
+	UINT32  m_sh3internal_lower[0x1000];
 
 #ifdef USE_SH4DRC
 	int icount;

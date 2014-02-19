@@ -91,7 +91,7 @@ void nubus_vikbw_device::device_start()
 
 //  printf("[vikbw %p] slotspace = %x\n", this, slotspace);
 
-	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
+	m_vram.resize(VRAM_SIZE);
 	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, 0, 0, "bank_vikbw", m_vram);
 	install_bank(slotspace+0x940000, slotspace+0x940000+VRAM_SIZE-1, 0, 0, "bank_vikbw2", m_vram);
 
