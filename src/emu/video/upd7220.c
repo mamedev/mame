@@ -1609,8 +1609,9 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 			{
 				/* TODO: again correct?
 				         Quarth (PC-98xx) doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
-				         Xevious (PC-98xx) wants the pitch to be fixed at 80, and wants bsy to be /1  */
-				addr = ((sad << 1) & 0x3ffff) + (y * 80);
+				         Xevious (PC-98xx) wants the pitch to be fixed at 80, and wants bsy to be /1
+				         Dragon Buster (PC-98xx) contradicts with Xevious with regards of the pitch tho ... */
+				addr = ((sad << 1) & 0x3ffff) + (y * m_pitch * 2);
 
 				if (m_display_cb)
 					draw_graphics_line(bitmap, addr, y + bsy/((m_pitch == 40)+1), wd);
