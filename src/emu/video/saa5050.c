@@ -110,14 +110,14 @@ enum
 
 static const rgb_t PALETTE[] =
 {
-	RGB_BLACK,
-	MAKE_RGB(0xff, 0x00, 0x00),
-	MAKE_RGB(0x00, 0xff, 0x00),
-	MAKE_RGB(0xff, 0xff, 0x00),
-	MAKE_RGB(0x00, 0x00, 0xff),
-	MAKE_RGB(0xff, 0x00, 0xff),
-	MAKE_RGB(0x00, 0xff, 0xff),
-	RGB_WHITE
+	rgb_t::black,
+	rgb_t(0xff, 0x00, 0x00),
+	rgb_t(0x00, 0xff, 0x00),
+	rgb_t(0xff, 0xff, 0x00),
+	rgb_t(0x00, 0x00, 0xff),
+	rgb_t(0xff, 0x00, 0xff),
+	rgb_t(0x00, 0xff, 0xff),
+	rgb_t::white
 };
 
 
@@ -475,7 +475,7 @@ UINT32 saa5050_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				int g = BIT(color, 1) * 0xff;
 				int b = BIT(color, 2) * 0xff;
 
-				rgb_t rgb = MAKE_RGB(r, g, b);
+				rgb_t rgb = rgb_t(r, g, b);
 
 				bitmap.pix32(y, x++) = rgb;
 				bitmap.pix32(y, x++) = rgb;

@@ -522,7 +522,7 @@ WRITE32_MEMBER(rabbit_state::rabbit_paletteram_dword_w)
 	r = ((m_generic_paletteram_32[offset] & 0x0000ff00) >>8);
 	g = ((m_generic_paletteram_32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,rgb_t(r,g,b));
 }
 
 READ32_MEMBER(rabbit_state::rabbit_tilemap0_r)

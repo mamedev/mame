@@ -108,7 +108,7 @@ void ampoker2_state::palette_init()
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		r = combine_3_weights(weights_r, bit0, bit1, bit2);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 	}
 }
 

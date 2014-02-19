@@ -97,6 +97,6 @@ void calomega_state::palette_init()
 		b = bit2 * 0xff;
 
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }

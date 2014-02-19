@@ -192,7 +192,7 @@ void tunhunt_state::set_pens()
 		green   = APPLY_SHADE(green,shade);
 		blue    = APPLY_SHADE(blue,shade);
 
-		colortable_palette_set_color( machine().colortable,i,MAKE_RGB(red,green,blue) );
+		colortable_palette_set_color( machine().colortable,i,rgb_t(red,green,blue) );
 	}
 }
 

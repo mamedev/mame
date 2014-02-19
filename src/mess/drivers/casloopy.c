@@ -252,7 +252,7 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 	r = pal5bit((m_vregs[0x4/4] >> 10) & 0x1f);
 	g = pal5bit((m_vregs[0x4/4] >> 5) & 0x1f);
 	b = pal5bit((m_vregs[0x4/4] >> 0) & 0x1f);
-	palette_set_color(machine(),0x100,MAKE_RGB(r^0xff,g^0xff,b^0xff));
+	palette_set_color(machine(),0x100,rgb_t(r^0xff,g^0xff,b^0xff));
 	bitmap.fill( 0x100 ,cliprect);
 	#endif
 

@@ -110,7 +110,7 @@ WRITE16_MEMBER( toobin_state::toobin_paletteram_w )
 		if (green) green += 38;
 		if (blue) blue += 38;
 
-		palette_set_color(machine(), offset & 0x3ff, MAKE_RGB(red, green, blue));
+		palette_set_color(machine(), offset & 0x3ff, rgb_t(red, green, blue));
 		if (!(newword & 0x8000))
 			palette_set_pen_contrast(machine(), offset & 0x3ff, m_brightness);
 		else

@@ -766,9 +766,9 @@ READ8_MEMBER(bfcobra_state::ramdac_r)
 				rgb_t color;
 				color = palette_get_color(machine(), ramdac.addr_r);
 
-				ramdac.color_r[0] = RGB_RED(color);
-				ramdac.color_r[1] = RGB_GREEN(color);
-				ramdac.color_r[2] = RGB_BLUE(color);
+				ramdac.color_r[0] = color.r();
+				ramdac.color_r[1] = color.g();
+				ramdac.color_r[2] = color.b();
 			}
 
 			val = ramdac.color_r[*count];

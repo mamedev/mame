@@ -271,7 +271,7 @@ WRITE16_MEMBER(neoprint_state::nprsp_palette_w)
 
 		pal_entry = ((offset & 0xfffe) >> 1) + ((offset & 0x20000) ? 0x8000 : 0);
 
-		palette_set_color(machine(), pal_entry, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), pal_entry, rgb_t(r,g,b));
 	}
 }
 

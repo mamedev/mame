@@ -34,7 +34,7 @@ void cheekyms_state::palette_init()
 			bit = (color_prom[0x20 * (i / 2) + j] >> ((4 * (i & 1)) + 2)) & 0x01;
 			b = 0xff * bit;
 
-			palette_set_color(machine(), (i * 0x20) + j, MAKE_RGB(r,g,b));
+			palette_set_color(machine(), (i * 0x20) + j, rgb_t(r,g,b));
 		}
 	}
 }

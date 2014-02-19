@@ -82,7 +82,7 @@ void iq151_minigraf_device::device_stop()
 
 	if (filerr == FILERR_NONE)
 	{
-		static const rgb_t png_palette[] = { RGB_WHITE, RGB_BLACK };
+		static const rgb_t png_palette[] = { rgb_t::white, rgb_t::black };
 
 		// save the paper into a png
 		png_write_bitmap(file, NULL, *m_paper, 2, png_palette);

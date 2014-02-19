@@ -98,7 +98,7 @@ WRITE16_MEMBER(foodf_state::foodf_paletteram_w)
 	bit1 = (newword >> 7) & 0x01;
 	b = combine_2_weights(m_bweights, bit0, bit1);
 
-	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset, rgb_t(r, g, b));
 }
 
 

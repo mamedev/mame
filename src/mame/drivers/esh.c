@@ -269,11 +269,11 @@ void esh_state::palette_init()
 		bit2 = (color_prom[i+0x100] >> 6) & 0x01;
 		b = (0x97 * bit2) + (0x47 * bit1) + (0x21 * bit0);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 	}
 
 	/* make color 0 transparent */
-	palette_set_color(machine(), 0, MAKE_ARGB(0,0,0,0));
+	palette_set_color(machine(), 0, rgb_t(0,0,0,0));
 }
 
 static const gfx_layout esh_gfx_layout =

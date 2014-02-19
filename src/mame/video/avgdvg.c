@@ -976,7 +976,7 @@ static int tempest_strobe3(vgdata *vg)
 		avg_apply_flipping(&x, &y);
 
 		vg_add_point_buf(y - ycenter + xcenter,
-							x - xcenter + ycenter, MAKE_RGB(r, g, b),
+							x - xcenter + ycenter, rgb_t(r, g, b),
 							(((vg->int_latch >> 1) == 1)? vg->intensity: vg->int_latch & 0xe) << 4);
 	}
 
@@ -1026,7 +1026,7 @@ static int mhavoc_strobe3(vgdata *vg)
 				g = bit1 * 0xcb;
 				b = bit0 * 0xcb;
 
-				vg_add_point_buf(vg->xpos, vg->ypos, MAKE_RGB(r, g, b),
+				vg_add_point_buf(vg->xpos, vg->ypos, rgb_t(r, g, b),
 									(((vg->int_latch >> 1) == 1)? vg->intensity: vg->int_latch & 0xe) << 4);
 				vg->spkl_shift = (((vg->spkl_shift & 0x40) >> 6)
 									^ ((vg->spkl_shift & 0x20) >> 5)
@@ -1051,7 +1051,7 @@ static int mhavoc_strobe3(vgdata *vg)
 			g = bit1 * 0xcb;
 			b = bit0 * 0xcb;
 
-			vg_add_point_buf(vg->xpos, vg->ypos, MAKE_RGB(r, g, b),
+			vg_add_point_buf(vg->xpos, vg->ypos, rgb_t(r, g, b),
 								(((vg->int_latch >> 1) == 1)? vg->intensity: vg->int_latch & 0xe) << 4);
 		}
 	}
@@ -1114,7 +1114,7 @@ static int quantum_strobe3(vgdata *vg)
 		avg_apply_flipping(&x, &y);
 
 		vg_add_point_buf(y - ycenter + xcenter,
-							x - xcenter + ycenter, MAKE_RGB(r, g, b),
+							x - xcenter + ycenter, rgb_t(r, g, b),
 							((vg->int_latch == 2)? vg->intensity: vg->int_latch) << 4);
 	}
 	if (OP2)

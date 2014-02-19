@@ -980,7 +980,7 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
 		bit2 = (color_prom[0] >> 5) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
@@ -1013,7 +1013,7 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 		bit2 = (prom[i] >> 5) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 

@@ -6340,7 +6340,7 @@ PALETTE_INIT_MEMBER(goldstar_state,cmast91)
 		g = proms[0x100 + i] << 4;
 		r = proms[0x200 + i] << 4;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 
@@ -6737,7 +6737,7 @@ PALETTE_INIT_MEMBER(goldstar_state,magodds)
 		g = proms[0x100 + i] << 4;
 		r = proms[0x200 + i] << 4;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 

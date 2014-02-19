@@ -315,7 +315,7 @@ WRITE16_MEMBER(coinmvga_state::ramdac_bg_w)
 				break;
 			case 2:
 				m_bgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(machine(), m_bgpal.offs, MAKE_RGB(m_bgpal.r, m_bgpal.g, m_bgpal.b));
+				palette_set_color(machine(), m_bgpal.offs, rgb_t(m_bgpal.r, m_bgpal.g, m_bgpal.b));
 				m_bgpal.offs_internal = 0;
 				m_bgpal.offs++;
 				break;
@@ -345,7 +345,7 @@ WRITE16_MEMBER(coinmvga_state::ramdac_fg_w)
 				break;
 			case 2:
 				m_fgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(machine(), 0x100+m_fgpal.offs, MAKE_RGB(m_fgpal.r, m_fgpal.g, m_fgpal.b));
+				palette_set_color(machine(), 0x100+m_fgpal.offs, rgb_t(m_fgpal.r, m_fgpal.g, m_fgpal.b));
 				m_fgpal.offs_internal = 0;
 				m_fgpal.offs++;
 				break;

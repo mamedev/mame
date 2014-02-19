@@ -40,7 +40,7 @@ INLINE UINT32 ycc_to_rgb(unsigned y, unsigned cb, unsigned cr)
 
 	/* MAME_RGB does upper clamping */
 
-	return MAKE_RGB(r >> 8, g >> 8, b >> 8);
+	return rgb_t(r >> 8, g >> 8, b >> 8);
 }
 #else
 

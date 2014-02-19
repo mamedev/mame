@@ -98,7 +98,7 @@ WRITE8_MEMBER(vigilant_state::vigilant_paletteram_w)
 	g = (m_generic_paletteram_8[bank + offset + 0x100] << 3) & 0xFF;
 	b = (m_generic_paletteram_8[bank + offset + 0x200] << 3) & 0xFF;
 
-	palette_set_color(machine(), (bank >> 2) + offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(), (bank >> 2) + offset,rgb_t(r,g,b));
 }
 
 
@@ -295,13 +295,13 @@ UINT32 vigilant_state::screen_update_vigilant(screen_device &screen, bitmap_ind1
 		g = (m_generic_paletteram_8[0x500 + 16 * m_rear_color + i] << 3) & 0xFF;
 		b = (m_generic_paletteram_8[0x600 + 16 * m_rear_color + i] << 3) & 0xFF;
 
-		palette_set_color(machine(),512 + i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),512 + i,rgb_t(r,g,b));
 
 		r = (m_generic_paletteram_8[0x400 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
 		g = (m_generic_paletteram_8[0x500 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
 		b = (m_generic_paletteram_8[0x600 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
 
-		palette_set_color(machine(),512 + 16 + i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),512 + 16 + i,rgb_t(r,g,b));
 	}
 
 	if (m_rear_disable)  /* opaque foreground */

@@ -1190,7 +1190,7 @@ void goldnpkr_state::palette_init()
 		b = (bit2 * intenmin) + (inten * (bit2 * (intenmax - intenmin)));
 
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 
@@ -1238,7 +1238,7 @@ PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		b = bk * (bit2 * 0xff);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 
@@ -1284,7 +1284,7 @@ PALETTE_INIT_MEMBER(goldnpkr_state,wcrdxtnd)
 		//if ((b == 0) & (bk = 1))   --> needs better implementation
 		//  b = 0x3f;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 

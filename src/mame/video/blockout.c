@@ -35,7 +35,7 @@ void blockout_state::setcolor( int color, int rgb )
 	bit3 = (rgb >> 11) & 0x01;
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(machine(), color, MAKE_RGB(r,g,b));
+	palette_set_color(machine(), color, rgb_t(r,g,b));
 }
 
 WRITE16_MEMBER(blockout_state::blockout_paletteram_w)

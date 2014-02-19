@@ -245,7 +245,7 @@ INPUT_PORTS_END
 void uzebox_state::line_update()
 {
 	UINT32 cycles = (UINT32)(m_maincpu->get_elapsed_cycles() - m_line_start_cycles) / 2;
-	rgb_t color = MAKE_RGB(pal3bit(m_port_c >> 0), pal3bit(m_port_c >> 3), pal2bit(m_port_c >> 6));
+	rgb_t color = rgb_t(pal3bit(m_port_c >> 0), pal3bit(m_port_c >> 3), pal2bit(m_port_c >> 6));
 
 	for (UINT32 x = m_line_pos_cycles; x < cycles; x++)
 	{

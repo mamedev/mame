@@ -136,8 +136,8 @@ void macpds_sedisplay_device::device_reset()
 	memset(m_vram, 0, VRAM_SIZE);
 	memset(m_palette, 0, sizeof(m_palette));
 
-	m_palette[0] = MAKE_RGB(0, 0, 0);
-	m_palette[1] = MAKE_RGB(255, 255, 255);
+	m_palette[0] = rgb_t(0, 0, 0);
+	m_palette[1] = rgb_t(255, 255, 255);
 }
 
 
@@ -217,7 +217,7 @@ WRITE16_MEMBER( macpds_sedisplay_device::ramdac_w )
 
 			if (m_count == 3)
 			{                       // only the green channel drives the output
-				m_palette[m_clutoffs] = MAKE_RGB(m_colors[1], m_colors[1], m_colors[1]);
+				m_palette[m_clutoffs] = rgb_t(m_colors[1], m_colors[1], m_colors[1]);
 				m_clutoffs++;
 				m_count = 0;
 			}

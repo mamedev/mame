@@ -13,10 +13,10 @@ void sprint2_state::palette_init()
 	/* allocate the colortable */
 	machine().colortable = colortable_alloc(machine(), 4);
 
-	colortable_palette_set_color(machine().colortable, 0, MAKE_RGB(0x00, 0x00, 0x00));
-	colortable_palette_set_color(machine().colortable, 1, MAKE_RGB(0x5b, 0x5b, 0x5b));
-	colortable_palette_set_color(machine().colortable, 2, MAKE_RGB(0xa4, 0xa4, 0xa4));
-	colortable_palette_set_color(machine().colortable, 3, MAKE_RGB(0xff, 0xff, 0xff));
+	colortable_palette_set_color(machine().colortable, 0, rgb_t(0x00, 0x00, 0x00));
+	colortable_palette_set_color(machine().colortable, 1, rgb_t(0x5b, 0x5b, 0x5b));
+	colortable_palette_set_color(machine().colortable, 2, rgb_t(0xa4, 0xa4, 0xa4));
+	colortable_palette_set_color(machine().colortable, 3, rgb_t(0xff, 0xff, 0xff));
 
 	colortable_entry_set_value(machine().colortable, 0x0, 1);   /* black playfield */
 	colortable_entry_set_value(machine().colortable, 0x1, 0);

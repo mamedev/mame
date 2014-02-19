@@ -221,7 +221,7 @@ void starfire_state::get_pens(pen_t *pens)
 	{
 		UINT16 color = m_starfire_colors[offs];
 
-		pens[offs] = MAKE_RGB(pal3bit(color >> 6), pal3bit(color >> 3), pal3bit(color >> 0));
+		pens[offs] = rgb_t(pal3bit(color >> 6), pal3bit(color >> 3), pal3bit(color >> 0));
 	}
 }
 

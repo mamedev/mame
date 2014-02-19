@@ -245,7 +245,7 @@ void spcforce_state::palette_init()
 	for (i = 0; i < sizeof(colortable_source) / sizeof(colortable_source[0]); i++)
 	{
 		int data = colortable_source[i];
-		rgb_t color = MAKE_RGB(pal1bit(data >> 0), pal1bit(data >> 1), pal1bit(data >> 2));
+		rgb_t color = rgb_t(pal1bit(data >> 0), pal1bit(data >> 1), pal1bit(data >> 2));
 
 		palette_set_color(machine(), i, color);
 	}

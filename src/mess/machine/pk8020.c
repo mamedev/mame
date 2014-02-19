@@ -60,7 +60,7 @@ WRITE8_MEMBER(pk8020_state::sysreg_w)
 		UINT8 r = ((color & 0x04) ? 0xC0 : 0) + i;
 		UINT8 g = ((color & 0x02) ? 0xC0 : 0) + i;
 		UINT8 b = ((color & 0x01) ? 0xC0 : 0) + i;
-		palette_set_color( machine(), number, MAKE_RGB(r,g,b) );
+		palette_set_color( machine(), number, rgb_t(r,g,b) );
 	}
 }
 

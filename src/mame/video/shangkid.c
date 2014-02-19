@@ -205,7 +205,7 @@ PALETTE_INIT_MEMBER(shangkid_state,dynamski)
 	for (i = 0; i < 0x20; i++)
 	{
 		UINT16 data = (color_prom[i | 0x20] << 8) | color_prom[i];
-		rgb_t color = MAKE_RGB(pal5bit(data >> 1), pal5bit(data >> 6), pal5bit(data >> 11));
+		rgb_t color = rgb_t(pal5bit(data >> 1), pal5bit(data >> 6), pal5bit(data >> 11));
 
 		colortable_palette_set_color(machine().colortable, i, color);
 	}

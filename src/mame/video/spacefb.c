@@ -130,7 +130,7 @@ void spacefb_state::get_starfield_pens(spacefb_state *state, pen_t *pens)
 		UINT8 g = combine_3_weights(m_color_weights_rg, 0, gb, ga);
 		UINT8 b = combine_2_weights(m_color_weights_b,     bb, ba);
 
-		pens[i] = MAKE_RGB(r, g, b);
+		pens[i] = rgb_t(r, g, b);
 	}
 }
 
@@ -239,7 +239,7 @@ void spacefb_state::get_sprite_pens(pen_t *pens)
 			b = (b / fade_weight) + 0.5;
 		}
 
-		pens[i] = MAKE_RGB(r, g, b);
+		pens[i] = rgb_t(r, g, b);
 	}
 }
 
@@ -361,7 +361,7 @@ void spacefb_state::draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 	/* since the way the schematics show the bullet color
 	   connected is impossible, just use pure red for now */
-	pen_t bullet_pen = MAKE_RGB(0xff, 0x00, 0x00);
+	pen_t bullet_pen = rgb_t(0xff, 0x00, 0x00);
 
 	get_sprite_pens(sprite_pens);
 

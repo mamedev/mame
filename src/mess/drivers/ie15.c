@@ -615,7 +615,7 @@ GFXDECODE_END
 
 void ie15_state::palette_init()
 {
-	palette_set_color(machine(), 0, RGB_BLACK); // black
+	palette_set_color(machine(), 0, rgb_t::black); // black
 	palette_set_color_rgb(machine(), 1, 0x00, 0xc0, 0x00); // green
 }
 

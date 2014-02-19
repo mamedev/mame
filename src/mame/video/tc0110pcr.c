@@ -108,7 +108,7 @@ void tc0110pcr_device::restore_colors()
 			}
 		}
 
-		palette_set_color(machine(), i + (m_pal_offs << 12), MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i + (m_pal_offs << 12), rgb_t(r, g, b));
 	}
 }
 

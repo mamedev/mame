@@ -69,7 +69,7 @@ VIDEO_START_MEMBER(taitol_state,taitol)
 	m_ch1a_tilemap->set_transparent_pen(0);
 
 	for (i = 0; i < 256; i++)
-		palette_set_color(machine(), i, MAKE_RGB(0, 0, 0));
+		palette_set_color(machine(), i, rgb_t(0, 0, 0));
 
 	m_ch1a_tilemap->set_scrolldx(-8, -8);
 	m_bg18_tilemap->set_scrolldx(28, -11);

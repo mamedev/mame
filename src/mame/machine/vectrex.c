@@ -5,10 +5,10 @@
 #include "includes/vectrex.h"
 
 
-#define VC_RED      MAKE_RGB(0xff, 0x00, 0x00)
-#define VC_GREEN    MAKE_RGB(0x00, 0xff, 0x00)
-#define VC_BLUE     MAKE_RGB(0x00, 0x00, 0xff)
-#define VC_DARKRED  MAKE_RGB(0x80, 0x00, 0x00)
+#define VC_RED      rgb_t(0xff, 0x00, 0x00)
+#define VC_GREEN    rgb_t(0x00, 0xff, 0x00)
+#define VC_BLUE     rgb_t(0x00, 0x00, 0xff)
+#define VC_DARKRED  rgb_t(0x80, 0x00, 0x00)
 
 #define DAMPC (-0.2)
 #define MMI (5.0)
@@ -176,7 +176,7 @@ void vectrex_state::vectrex_configuration()
 		switch ((cport >> 2) & 0x07)
 		{
 		case 0x00:
-			m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = RGB_BLACK;
+			m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = rgb_t::black;
 			break;
 		case 0x01:
 			m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = VC_DARKRED;
@@ -206,7 +206,7 @@ void vectrex_state::vectrex_configuration()
 		switch ((cport >> 5) & 0x07)
 		{
 		case 0x00:
-			m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = RGB_BLACK;
+			m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = rgb_t::black;
 			break;
 		case 0x01:
 			m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = VC_DARKRED;
@@ -235,8 +235,8 @@ void vectrex_state::vectrex_configuration()
 	else
 	{
 		vector_add_point_function = &vectrex_state::vectrex_add_point;
-		m_beam_color = RGB_WHITE;
-		m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = RGB_WHITE;
+		m_beam_color = rgb_t::white;
+		m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = rgb_t::white;
 	}
 	m_lightpen_port = m_io_lpenconf->read() & 0x03;
 }
@@ -381,9 +381,9 @@ DRIVER_INIT_MEMBER(vectrex_state,vectrex)
 
 	m_64k_cart = 0;
 	m_imager_angles = unknown_game_angles;
-	m_beam_color = RGB_WHITE;
+	m_beam_color = rgb_t::white;
 	for (i=0; i<ARRAY_LENGTH(m_imager_colors); i++)
-		m_imager_colors[i] = RGB_WHITE;
+		m_imager_colors[i] = rgb_t::white;
 
 	/*
 	 * Minestorm's PRNG doesn't work with a 0 seed (mines in the first

@@ -101,7 +101,7 @@ void segag80r_state::g80_set_palette_entry(int entry, UINT8 data)
 	bit1 = (b >> 1) & 0x01;
 	b = combine_2_weights(m_bweights, bit0, bit1);
 
-	palette_set_color(machine(), entry, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), entry, rgb_t(r, g, b));
 }
 
 
@@ -143,7 +143,7 @@ void segag80r_state::spaceod_bg_init_palette()
 		bit1 = (b >> 1) & 0x01;
 		b = combine_2_weights(tbweights, bit0, bit1);
 
-		palette_set_color(machine(), 64 + i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), 64 + i, rgb_t(r, g, b));
 	}
 }
 

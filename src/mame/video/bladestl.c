@@ -32,7 +32,7 @@ static void set_pens( running_machine &machine )
 	{
 		UINT16 data = state->m_paletteram[i | 1] | (state->m_paletteram[i] << 8);
 
-		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
 		colortable_palette_set_color(machine.colortable, i >> 1, color);
 	}

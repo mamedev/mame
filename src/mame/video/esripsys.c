@@ -168,7 +168,7 @@ UINT32 esripsys_state::screen_update_esripsys(screen_device &screen, bitmap_rgb3
 			int b = (m_pal_ram[512 + idx] & 0xf);
 			int i = intensity_buf[x];
 
-			*dest++ = MAKE_RGB(r*i, g*i, b*i);
+			*dest++ = rgb_t(r*i, g*i, b*i);
 
 			/* Clear the line buffer as we scan out */
 			colour_buf[x] = 0xff;

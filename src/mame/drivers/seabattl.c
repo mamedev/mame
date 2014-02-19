@@ -110,19 +110,19 @@ void seabattl_state::palette_init()
 	// sprites (m.obj) + s2636
 	for (int i = 0; i < 8; i++)
 	{
-		palette_set_color(machine(), i, MAKE_RGB((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
+		palette_set_color(machine(), i, rgb_t((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
 	}
 
 	// scr
 	for (int i = 0; i < 8; i++)
 	{
-		palette_set_color(machine(), 8 + 2 * i + 0, RGB_BLACK);
-		palette_set_color(machine(), 8 + 2 * i + 1, MAKE_RGB((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
+		palette_set_color(machine(), 8 + 2 * i + 0, rgb_t::black);
+		palette_set_color(machine(), 8 + 2 * i + 1, rgb_t((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
 	}
 
 	// wave
-	palette_set_color(machine(), 24, RGB_BLACK);
-	palette_set_color(machine(), 25, MAKE_RGB(0x00, 0xff, 0xff)); // cyan
+	palette_set_color(machine(), 24, rgb_t::black);
+	palette_set_color(machine(), 25, rgb_t(0x00, 0xff, 0xff)); // cyan
 }
 
 TILE_GET_INFO_MEMBER(seabattl_state::get_bg_tile_info)

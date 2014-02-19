@@ -78,7 +78,7 @@ PALETTE_INIT_MEMBER(stactics_state,stactics)
 		/* blue component */
 		int b = 0xff * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 

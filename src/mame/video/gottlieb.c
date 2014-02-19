@@ -32,7 +32,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_paletteram_w)
 
 	/* alpha is set to 0 if laserdisc video is enabled */
 	a = (m_transparent0 && offset / 2 == 0) ? 0 : 255;
-	palette_set_color(machine(), offset / 2, MAKE_ARGB(a, r, g, b));
+	palette_set_color(machine(), offset / 2, rgb_t(a, r, g, b));
 }
 
 

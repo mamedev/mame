@@ -289,22 +289,22 @@ GFXDECODE_END
 
 void dragrace_state::palette_init()
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0xFF, 0xFF, 0xFF));   /* 2 color tiles */
-	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 3, MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 4, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 5, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 6, MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 7, MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 8, MAKE_RGB(0xFF, 0xFF, 0xFF));   /* 4 color tiles */
-	palette_set_color(machine(), 9, MAKE_RGB(0xB0, 0xB0, 0xB0));
-	palette_set_color(machine(), 10,MAKE_RGB(0x5F, 0x5F, 0x5F));
-	palette_set_color(machine(), 11,MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 12,MAKE_RGB(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 13,MAKE_RGB(0x5F, 0x5F, 0x5F));
-	palette_set_color(machine(), 14,MAKE_RGB(0xB0, 0xB0, 0xB0));
-	palette_set_color(machine(), 15,MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 0, rgb_t(0xFF, 0xFF, 0xFF));   /* 2 color tiles */
+	palette_set_color(machine(), 1, rgb_t(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 2, rgb_t(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 3, rgb_t(0xFF, 0xFF, 0xFF));
+	palette_set_color(machine(), 4, rgb_t(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 5, rgb_t(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 6, rgb_t(0xFF, 0xFF, 0xFF));
+	palette_set_color(machine(), 7, rgb_t(0xFF, 0xFF, 0xFF));
+	palette_set_color(machine(), 8, rgb_t(0xFF, 0xFF, 0xFF));   /* 4 color tiles */
+	palette_set_color(machine(), 9, rgb_t(0xB0, 0xB0, 0xB0));
+	palette_set_color(machine(), 10,rgb_t(0x5F, 0x5F, 0x5F));
+	palette_set_color(machine(), 11,rgb_t(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 12,rgb_t(0xFF, 0xFF, 0xFF));
+	palette_set_color(machine(), 13,rgb_t(0x5F, 0x5F, 0x5F));
+	palette_set_color(machine(), 14,rgb_t(0xB0, 0xB0, 0xB0));
+	palette_set_color(machine(), 15,rgb_t(0x00, 0x00, 0x00));
 }
 
 

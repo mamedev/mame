@@ -28,7 +28,7 @@ void sspeedr_state::palette_init()
 			b += 0x4f;
 		}
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 

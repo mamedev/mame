@@ -132,7 +132,7 @@ WRITE32_MEMBER( k001006_device::write )
 				b |= (b >> 5);
 				g |= (g >> 5);
 				r |= (r >> 5);
-				m_palette[index >> 1] = MAKE_ARGB(a, r, g, b);
+				m_palette[index >> 1] = rgb_t(a, r, g, b);
 
 				m_addr += 2;
 				break;

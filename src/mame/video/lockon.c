@@ -120,7 +120,7 @@ void lockon_state::palette_init()
 			b = compute_res_net((p1 & 0x1f), 2, &lockon_pd_net_info);
 		}
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 

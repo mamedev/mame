@@ -187,7 +187,7 @@ UINT32 laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 		// add the video texture
 		if (m_videoenable)
-			screen.container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), m_videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+			screen.container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0xff,0xff,0xff), m_videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 
 		// add the overlay
 		if (m_overenable && overbitmap.valid())
@@ -196,7 +196,7 @@ UINT32 laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 			float y0 = 0.5f - 0.5f * m_overscaley + m_overposy;
 			float x1 = x0 + m_overscalex;
 			float y1 = y0 + m_overscaley;
-			screen.container().add_quad(x0, y0, x1, y1, MAKE_ARGB(0xff,0xff,0xff,0xff), m_overtex, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
+			screen.container().add_quad(x0, y0, x1, y1, rgb_t(0xff,0xff,0xff,0xff), m_overtex, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
 		}
 
 		// swap to the next bitmap
@@ -773,7 +773,7 @@ void laserdisc_device::init_video()
 	if (m_videopalette == NULL)
 		throw emu_fatalerror("Out of memory allocating video palette");
 	for (int index = 0; index < 256; index++)
-		m_videopalette->entry_set_color(index, MAKE_RGB(index, index, index));
+		m_videopalette->entry_set_color(index, rgb_t(index, index, index));
 
 	// allocate video frames
 	for (int index = 0; index < ARRAY_LENGTH(m_frame); index++)

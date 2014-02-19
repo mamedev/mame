@@ -337,8 +337,8 @@ GFXDECODE_END
 
 void supershot_state::palette_init()
 {
-	palette_set_color(machine(),0,RGB_BLACK); /* black */
-	palette_set_color(machine(),1,RGB_WHITE); /* white */
+	palette_set_color(machine(),0,rgb_t::black); /* black */
+	palette_set_color(machine(),1,rgb_t::white); /* white */
 }
 
 static MACHINE_CONFIG_START( supershot, supershot_state )

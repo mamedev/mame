@@ -209,8 +209,8 @@ WRITE32_MEMBER(psikyo4_state::ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_
 	g = ((m_paletteram[offset] & 0x00ff0000) >> 16);
 	r = ((m_paletteram[offset] & 0xff000000) >> 24);
 
-	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
-	palette_set_color(machine(), offset + 0x800, MAKE_RGB(r, g, b)); // For screen 2
+	palette_set_color(machine(), offset, rgb_t(r, g, b));
+	palette_set_color(machine(), offset + 0x800, rgb_t(r, g, b)); // For screen 2
 }
 
 WRITE32_MEMBER(psikyo4_state::ps4_bgpen_1_dword_w)
@@ -222,7 +222,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_bgpen_1_dword_w)
 	g = ((m_bgpen_1[0] & 0x00ff0000) >>16);
 	r = ((m_bgpen_1[0] & 0xff000000) >>24);
 
-	palette_set_color(machine(), 0x1000, MAKE_RGB(r, g, b)); // Clear colour for screen 1
+	palette_set_color(machine(), 0x1000, rgb_t(r, g, b)); // Clear colour for screen 1
 }
 
 WRITE32_MEMBER(psikyo4_state::ps4_bgpen_2_dword_w)
@@ -234,7 +234,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_bgpen_2_dword_w)
 	g = ((m_bgpen_2[0] & 0x00ff0000) >>16);
 	r = ((m_bgpen_2[0] & 0xff000000) >>24);
 
-	palette_set_color(machine(), 0x1001, MAKE_RGB(r, g, b)); // Clear colour for screen 2
+	palette_set_color(machine(), 0x1001, rgb_t(r, g, b)); // Clear colour for screen 2
 }
 
 WRITE32_MEMBER(psikyo4_state::ps4_screen1_brt_w)

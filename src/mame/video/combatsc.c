@@ -98,7 +98,7 @@ void combatsc_state::set_pens(  )
 	{
 		UINT16 data = m_paletteram[i] | (m_paletteram[i | 1] << 8);
 
-		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
 		colortable_palette_set_color(machine().colortable, i >> 1, color);
 	}

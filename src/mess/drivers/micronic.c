@@ -326,8 +326,8 @@ static NVRAM_HANDLER( micronic )
 
 void micronic_state::palette_init()
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
+	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
 }
 
 static HD61830_INTERFACE( lcdc_intf )

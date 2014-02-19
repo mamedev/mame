@@ -282,7 +282,7 @@ WRITE8_MEMBER(skylncr_state::skylncr_paletteram_w)
 		g = (g << 2) | (g >> 4);
 		b = (b << 2) | (b >> 4);
 
-		palette_set_color(machine(), m_color / 3, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), m_color / 3, rgb_t(r, g, b));
 		m_color = (m_color + 1) % (0x100 * 3);
 	}
 }
@@ -305,7 +305,7 @@ WRITE8_MEMBER(skylncr_state::skylncr_paletteram2_w)
 		g = (g << 2) | (g >> 4);
 		b = (b << 2) | (b >> 4);
 
-		palette_set_color(machine(), 0x100 + m_color2 / 3, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), 0x100 + m_color2 / 3, rgb_t(r, g, b));
 		m_color2 = (m_color2 + 1) % (0x100 * 3);
 	}
 }

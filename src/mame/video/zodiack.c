@@ -74,11 +74,11 @@ PALETTE_INIT_MEMBER(zodiack_state,zodiack)
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	/* white for bullets */
-	colortable_palette_set_color(machine().colortable, 0x30, RGB_WHITE);
+	colortable_palette_set_color(machine().colortable, 0x30, rgb_t::white);
 
 	for (i = 0; i < 0x20; i++)
 		if ((i & 3) == 0)

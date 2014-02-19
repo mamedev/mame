@@ -452,7 +452,7 @@ PALETTE_INIT_MEMBER(cgenie_state,cgenie)
 	for ( i = 0; i < 49; i++ )
 	{
 		r = cgenie_colors[i*3]; g = cgenie_colors[i*3+1]; b = cgenie_colors[i*3+2];
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	for(i=0; i<108; i++)
@@ -468,7 +468,7 @@ PALETTE_INIT_MEMBER(cgenie_state,cgenienz)
 	for ( i = 0; i < 49; i++ )
 	{
 		r = cgenienz_colors[i*3]; g = cgenienz_colors[i*3+1]; b = cgenienz_colors[i*3+2];
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	for(i=0; i<108; i++)

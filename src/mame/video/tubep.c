@@ -189,7 +189,7 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 		bit1 = (*color_prom >> 7) & 0x01;
 		b = combine_2_weights(weights_txt_b, bit0, bit1);
 
-		palette_set_color(machine(),i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i, rgb_t(r,g,b));
 
 		color_prom++;
 	}
@@ -330,7 +330,7 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 			/*logerror("Calculate [%x:%x] (active resistors:r=%i g=%i b=%i) = ", i, shade, active_r, active_g, active_b);*/
 			/*logerror("r:%3i g:%3i b:%3i\n",r,g,b );*/
 
-			palette_set_color(machine(),32+i*0x40+sh, MAKE_RGB(r,g,b));
+			palette_set_color(machine(),32+i*0x40+sh, rgb_t(r,g,b));
 		}
 	}
 }
@@ -706,7 +706,7 @@ PALETTE_INIT_MEMBER(tubep_state,rjammer)
 		bit1 = (*color_prom >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(),i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i, rgb_t(r,g,b));
 
 		color_prom++;
 	}

@@ -83,7 +83,7 @@ void pacland_state::switch_palette()
 
 		color_prom++;
 
-		colortable_palette_set_color(machine().colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable,i,rgb_t(r,g,b));
 	}
 }
 

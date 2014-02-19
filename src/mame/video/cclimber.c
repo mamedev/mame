@@ -72,7 +72,7 @@ PALETTE_INIT_MEMBER(cclimber_state,cclimber)
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 
@@ -141,7 +141,7 @@ PALETTE_INIT_MEMBER(cclimber_state,swimmer)
 		bit2 = (color_prom[i + 0x100] >> 3) & 0x01;
 		b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 
 	color_prom += 0x200;
@@ -170,15 +170,15 @@ PALETTE_INIT_MEMBER(cclimber_state,swimmer)
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-		palette_set_color(machine(), i + 0x100, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i + 0x100, rgb_t(r, g, b));
 	}
 
 	/* side panel backgrond pen */
 #if 0
 	// values calculated from the resistors don't seem to match the real board
-	palette_set_color(machine(), SWIMMER_SIDE_BG_PEN, MAKE_RGB(0x24, 0x5d, 0x4e));
+	palette_set_color(machine(), SWIMMER_SIDE_BG_PEN, rgb_t(0x24, 0x5d, 0x4e));
 #endif
-	palette_set_color(machine(), SWIMMER_SIDE_BG_PEN, MAKE_RGB(0x20, 0x98, 0x79));
+	palette_set_color(machine(), SWIMMER_SIDE_BG_PEN, rgb_t(0x20, 0x98, 0x79));
 }
 
 
@@ -214,7 +214,7 @@ PALETTE_INIT_MEMBER(cclimber_state,yamato)
 		bit3 = (color_prom[i + 0x40] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 
 	/* big sprite - 8 bits RGB */
@@ -241,12 +241,12 @@ PALETTE_INIT_MEMBER(cclimber_state,yamato)
 		bit2 = (color_prom[i + 0x80] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i + 0x40, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i + 0x40, rgb_t(r, g, b));
 	}
 
 	/* fake colors for bg gradient */
 	for (i = 0; i < 0x100; i++)
-		palette_set_color(machine(), YAMATO_SKY_PEN_BASE + i, MAKE_RGB(0, 0, i));
+		palette_set_color(machine(), YAMATO_SKY_PEN_BASE + i, rgb_t(0, 0, i));
 }
 
 
@@ -278,7 +278,7 @@ PALETTE_INIT_MEMBER(cclimber_state,toprollr)
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 
@@ -323,7 +323,7 @@ void cclimber_state::swimmer_set_background_pen()
 	bit2 = (*m_swimmer_background_color >> 2) & 0x01;
 	b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-	palette_set_color(machine(), CCLIMBER_BG_PEN, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), CCLIMBER_BG_PEN, rgb_t(r, g, b));
 }
 
 

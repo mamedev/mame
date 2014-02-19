@@ -455,7 +455,7 @@ public:
 
 	/* playfield states */
 	int m_last_scanline;
-	int m_ham_color;
+	rgb_t m_ham_color;
 
 	/* misc states */
 	UINT16 m_genlock_color;
@@ -465,7 +465,7 @@ public:
 
 	/* aga */
 	int m_aga_diwhigh_written;
-	pen_t m_aga_palette[256];
+	rgb_t m_aga_palette[256];
 	UINT64 m_aga_bpldat[8];
 	UINT16 m_aga_sprdata[8][4];
 	UINT16 m_aga_sprdatb[8][4];

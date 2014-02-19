@@ -139,7 +139,7 @@ void arabian_state::palette_init()
 
 		b = (bhi * 192) + (bbase * 63);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 

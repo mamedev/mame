@@ -45,7 +45,7 @@ void hp48_state::palette_init()
 	for ( i = 0; i < 255; i++ )
 	{
 		float c = i/255.;
-		palette_set_color( machine(), i, MAKE_ARGB( 0, mix2(0,c), mix2(1,c), mix2(2,c) ) );
+		palette_set_color( machine(), i, rgb_t( 0, mix2(0,c), mix2(1,c), mix2(2,c) ) );
 	}
 }
 

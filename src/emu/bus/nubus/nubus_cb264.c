@@ -281,7 +281,7 @@ WRITE32_MEMBER( nubus_cb264_device::cb264_ramdac_w )
 
 			if (m_count == 3)
 			{
-				m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
+				m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				m_count = 0;
 			}

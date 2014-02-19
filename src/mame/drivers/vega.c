@@ -486,8 +486,8 @@ void vega_state::palette_init()
 	int i;
 	for(i=0;i<8;++i)
 	{
-		palette_set_color( machine(),2*i, MAKE_RGB(0x00, 0x00, 0x00) );
-		palette_set_color( machine(),2*i+1, MAKE_RGB( (i&1)?0xff:0x00, (i&2)?0xff:0x00, (i&4)?0xff:0x00) );
+		palette_set_color( machine(),2*i, rgb_t(0x00, 0x00, 0x00) );
+		palette_set_color( machine(),2*i+1, rgb_t( (i&1)?0xff:0x00, (i&2)?0xff:0x00, (i&4)?0xff:0x00) );
 	}
 }
 

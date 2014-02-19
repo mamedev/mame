@@ -43,7 +43,7 @@ void vulgus_state::palette_init()
 		bit3 = (color_prom[2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine().colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable,i,rgb_t(r,g,b));
 		color_prom++;
 	}
 

@@ -384,7 +384,7 @@ void pipeline_state::palette_init()
 		r*=36;
 		g*=36;
 		b*=85;
-		palette_set_color(machine(), 0x100+i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), 0x100+i, rgb_t(r, g, b));
 	}
 }
 

@@ -214,23 +214,23 @@ UINT32 ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &b
 
 void ms0515_state::palette_init()
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0, 0, 0));
-	palette_set_color(machine(), 1, MAKE_RGB(0, 0, 127));
-	palette_set_color(machine(), 2, MAKE_RGB(127, 0, 0));
-	palette_set_color(machine(), 3, MAKE_RGB(127, 0, 127));
-	palette_set_color(machine(), 4, MAKE_RGB(0, 127, 0));
-	palette_set_color(machine(), 5, MAKE_RGB(0, 127, 127));
-	palette_set_color(machine(), 6, MAKE_RGB(127, 127, 0));
-	palette_set_color(machine(), 7, MAKE_RGB(127, 127, 127));
+	palette_set_color(machine(), 0, rgb_t(0, 0, 0));
+	palette_set_color(machine(), 1, rgb_t(0, 0, 127));
+	palette_set_color(machine(), 2, rgb_t(127, 0, 0));
+	palette_set_color(machine(), 3, rgb_t(127, 0, 127));
+	palette_set_color(machine(), 4, rgb_t(0, 127, 0));
+	palette_set_color(machine(), 5, rgb_t(0, 127, 127));
+	palette_set_color(machine(), 6, rgb_t(127, 127, 0));
+	palette_set_color(machine(), 7, rgb_t(127, 127, 127));
 
-	palette_set_color(machine(), 8, MAKE_RGB(127, 127, 127));
-	palette_set_color(machine(), 9, MAKE_RGB(127, 127, 255));
-	palette_set_color(machine(), 10, MAKE_RGB(255, 127, 127));
-	palette_set_color(machine(), 11, MAKE_RGB(255, 127, 255));
-	palette_set_color(machine(), 12, MAKE_RGB(127, 255, 127));
-	palette_set_color(machine(), 13, MAKE_RGB(127, 255, 255));
-	palette_set_color(machine(), 14, MAKE_RGB(255, 255, 127));
-	palette_set_color(machine(), 15, MAKE_RGB(255, 255, 255));
+	palette_set_color(machine(), 8, rgb_t(127, 127, 127));
+	palette_set_color(machine(), 9, rgb_t(127, 127, 255));
+	palette_set_color(machine(), 10, rgb_t(255, 127, 127));
+	palette_set_color(machine(), 11, rgb_t(255, 127, 255));
+	palette_set_color(machine(), 12, rgb_t(127, 255, 127));
+	palette_set_color(machine(), 13, rgb_t(127, 255, 255));
+	palette_set_color(machine(), 14, rgb_t(255, 255, 127));
+	palette_set_color(machine(), 15, rgb_t(255, 255, 255));
 }
 
 WRITE8_MEMBER(ms0515_state::ms0515_portc_w)

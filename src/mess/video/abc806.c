@@ -28,14 +28,14 @@
 
 static const rgb_t PALETTE[] =
 {
-	RGB_BLACK, // black
-	MAKE_RGB(0xff, 0x00, 0x00), // red
-	MAKE_RGB(0x00, 0xff, 0x00), // green
-	MAKE_RGB(0xff, 0xff, 0x00), // yellow
-	MAKE_RGB(0x00, 0x00, 0xff), // blue
-	MAKE_RGB(0xff, 0x00, 0xff), // magenta
-	MAKE_RGB(0x00, 0xff, 0xff), // cyan
-	RGB_WHITE // white
+	rgb_t::black, // black
+	rgb_t(0xff, 0x00, 0x00), // red
+	rgb_t(0x00, 0xff, 0x00), // green
+	rgb_t(0xff, 0xff, 0x00), // yellow
+	rgb_t(0x00, 0x00, 0xff), // blue
+	rgb_t(0xff, 0x00, 0xff), // magenta
+	rgb_t(0x00, 0xff, 0xff), // cyan
+	rgb_t::white // white
 };
 
 
@@ -446,7 +446,7 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			{
 				int x = HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
 
-				if (BIT(dot, 15) || (bitmap.pix32(y, x) == RGB_BLACK))
+				if (BIT(dot, 15) || (bitmap.pix32(y, x) == rgb_t::black))
 				{
 					bitmap.pix32(y, x) = PALETTE[(dot >> 12) & 0x07];
 				}

@@ -377,7 +377,7 @@ void camplynx_state::palette_init()
 	while (color_count--)
 	{
 		r = lynx48k_palette[i++]; g = lynx48k_palette[i++]; b = lynx48k_palette[i++];
-		palette_set_color(machine(), 7-color_count, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), 7-color_count, rgb_t(r, g, b));
 	}
 }
 

@@ -795,11 +795,11 @@ void cb2001_state::palette_init()
 
 		if (length==0x400) // are the cb2001 proms dumped incorrectly?
 		{
-			if (!(i&0x20)) palette_set_color(machine(), (i&0x1f) | ((i&~0x3f)>>1), MAKE_RGB(r, g, b));
+			if (!(i&0x20)) palette_set_color(machine(), (i&0x1f) | ((i&~0x3f)>>1), rgb_t(r, g, b));
 		}
 		else
 		{
-			palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+			palette_set_color(machine(), i, rgb_t(r, g, b));
 		}
 	}
 }

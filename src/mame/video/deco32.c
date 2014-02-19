@@ -87,7 +87,7 @@ void deco32_state::updateAceRam()
 			r = (UINT8)((float)r + (((float)fadeptr - (float)r) * (float)fadepsr/255.0f));
 		}
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 	}
 }
 
@@ -106,7 +106,7 @@ WRITE32_MEMBER(deco32_state::deco32_nonbuffered_palette_w)
 	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
 	r = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,rgb_t(r,g,b));
 }
 
 WRITE32_MEMBER(deco32_state::deco32_buffered_palette_w)
@@ -134,7 +134,7 @@ WRITE32_MEMBER(deco32_state::deco32_palette_dma_w)
 				g = (m_generic_paletteram_32[i] >> 8) & 0xff;
 				r = (m_generic_paletteram_32[i] >> 0) & 0xff;
 
-				palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+				palette_set_color(machine(),i,rgb_t(r,g,b));
 			}
 		}
 	}

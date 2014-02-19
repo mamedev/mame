@@ -41,7 +41,7 @@ WRITE8_MEMBER(route16_state::route16_out1_w)
 
 pen_t route16_state::route16_make_pen(UINT8 color)
 {
-	return MAKE_RGB(pal1bit((color >> 0) & 0x01),
+	return rgb_t(pal1bit((color >> 0) & 0x01),
 					pal1bit((color >> 1) & 0x01),
 					pal1bit((color >> 2) & 0x01));
 
@@ -50,7 +50,7 @@ pen_t route16_state::route16_make_pen(UINT8 color)
 
 pen_t route16_state::ttmajng_make_pen(UINT8 color)
 {
-	return MAKE_RGB(pal1bit((color >> 2) & 0x01),
+	return rgb_t(pal1bit((color >> 2) & 0x01),
 					pal1bit((color >> 1) & 0x01),
 					pal1bit((color >> 0) & 0x01));
 

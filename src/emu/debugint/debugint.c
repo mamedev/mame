@@ -387,8 +387,8 @@ static void dview_draw_hsb(DView *dv)
 
 	dview_get_rect(dv, RECT_DVIEW_HSB, r);
 
-	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, 0, 0, VSB_WIDTH,HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
-	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, r.width() - VSB_WIDTH, 0, VSB_WIDTH, HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
+	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, 0, 0, VSB_WIDTH,HSB_HEIGHT, rgb_t(0xff, 0xff, 0x00, 0x00));
+	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, r.width() - VSB_WIDTH, 0, VSB_WIDTH, HSB_HEIGHT, rgb_t(0xff, 0xff, 0x00, 0x00));
 
 	ts = (r.width()) - 2 * VSB_WIDTH;
 
@@ -397,7 +397,7 @@ static void dview_draw_hsb(DView *dv)
 
 	vt = (ts * (sb->value - sb->lower)) / (sb->upper - sb->lower - sb->page_size) + sz / 2 + r.min_x + VSB_WIDTH;
 
-	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, vt - sz / 2, 0, sz, HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
+	dview_draw_outlined_box(dv, RECT_DVIEW_HSB, vt - sz / 2, 0, sz, HSB_HEIGHT, rgb_t(0xff, 0xff, 0x00, 0x00));
 }
 
 static void dview_draw_vsb(DView *dv)
@@ -411,8 +411,8 @@ static void dview_draw_vsb(DView *dv)
 
 	dview_get_rect(dv, RECT_DVIEW_VSB, r);
 
-	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, r.height() - HSB_HEIGHT, VSB_WIDTH, HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
-	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, 0,                       VSB_WIDTH, HSB_HEIGHT, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
+	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, r.height() - HSB_HEIGHT, VSB_WIDTH, HSB_HEIGHT, rgb_t(0xff, 0xff, 0x00, 0x00));
+	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, 0,                       VSB_WIDTH, HSB_HEIGHT, rgb_t(0xff, 0xff, 0x00, 0x00));
 
 	ts = r.height() - 2 * HSB_HEIGHT;
 
@@ -421,7 +421,7 @@ static void dview_draw_vsb(DView *dv)
 
 	vt = (ts * (sb->value - sb->lower)) / (sb->upper - sb->lower - sb->page_size) + sz / 2 + HSB_HEIGHT;
 
-	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, vt - sz / 2, VSB_WIDTH, sz, MAKE_ARGB(0xff, 0xff, 0x00, 0x00));
+	dview_draw_outlined_box(dv, RECT_DVIEW_VSB, 0, vt - sz / 2, VSB_WIDTH, sz, rgb_t(0xff, 0xff, 0x00, 0x00));
 }
 
 static void dview_draw_size(DView *dv)
@@ -431,7 +431,7 @@ static void dview_draw_size(DView *dv)
 	dview_get_rect(dv, RECT_DVIEW_SIZE, r);
 
 	dview_draw_outlined_box(dv, RECT_DVIEW_SIZE, 0, 0,
-			r.width(),r.height(), MAKE_ARGB(0xff, 0xff, 0xff, 0x00));
+			r.width(),r.height(), rgb_t(0xff, 0xff, 0xff, 0x00));
 }
 
 static void dview_set_title(DView *dv, astring title)
@@ -446,13 +446,13 @@ static void dview_set_title(DView *dv, astring title)
 static void dview_draw_title(DView *dv)
 {
 	int i;
-	rgb_t col = MAKE_ARGB(0xff,0x00,0x00,0xff);
+	rgb_t col = rgb_t(0xff,0x00,0x00,0xff);
 	rectangle r;
 
 	dview_get_rect(dv, RECT_DVIEW_TITLE, r);
 
 	if (dv == focus_view)
-		col = MAKE_ARGB(0xff,0x00,0x7f,0x00);
+		col = rgb_t(0xff,0x00,0x7f,0x00);
 
 	dview_draw_outlined_box(dv, RECT_DVIEW_TITLE, 0, 0, dv->bounds.width(), TITLE_HEIGHT, col);
 
@@ -463,7 +463,7 @@ static void dview_draw_title(DView *dv)
 	{
 		dview_draw_char(dv, RECT_DVIEW_TITLE, i * debug_font_width + BORDER_XTHICKNESS,
 				BORDER_YTHICKNESS, debug_font_height, //r.max_y - 2 * BORDER_YTHICKNESS,
-				MAKE_ARGB(0xff,0xff,0xff,0xff), (UINT16) dv->title[i] );
+				rgb_t(0xff,0xff,0xff,0xff), (UINT16) dv->title[i] );
 	}
 }
 
@@ -628,31 +628,28 @@ static int dview_on_mouse(DView *dv, int mx, int my, bool button)
 
 INLINE void map_attr_to_fg_bg(unsigned char attr, rgb_t *fg, rgb_t *bg)
 {
-	*bg = MAKE_ARGB(0xff,0xff,0xff,0xff);
-	*fg = MAKE_ARGB(0xff,0x00,0x00,0x00);
+	*bg = rgb_t(0xff,0xff,0xff,0xff);
+	*fg = rgb_t(0xff,0x00,0x00,0x00);
 
 	if(attr & DCA_ANCILLARY)
-		*bg = MAKE_ARGB(0xff,0xe0,0xe0,0xe0);
+		*bg = rgb_t(0xff,0xe0,0xe0,0xe0);
 	if(attr & DCA_SELECTED) {
-		*bg = MAKE_ARGB(0xff,0xff,0x80,0x80);
+		*bg = rgb_t(0xff,0xff,0x80,0x80);
 	}
 	if(attr & DCA_CURRENT) {
-		*bg = MAKE_ARGB(0xff,0xff,0xff,0x00);
+		*bg = rgb_t(0xff,0xff,0xff,0x00);
 	}
 	if(attr & DCA_CHANGED) {
-		*fg = MAKE_ARGB(0xff,0xff,0x00,0x00);
+		*fg = rgb_t(0xff,0xff,0x00,0x00);
 	}
 	if(attr & DCA_INVALID) {
-		*fg = MAKE_ARGB(0xff,0x00,0x00,0xff);
+		*fg = rgb_t(0xff,0x00,0x00,0xff);
 	}
 	if(attr & DCA_DISABLED) {
-		*fg = MAKE_ARGB(RGB_ALPHA(*fg),
-				(RGB_RED(*fg)+RGB_RED(*bg)) >> 1,
-				(RGB_GREEN(*fg)+RGB_GREEN(*bg)) >> 1,
-				(RGB_BLUE(*fg)+RGB_BLUE(*bg)) >> 1);
+		*fg = rgb_t(fg->a(), (fg->r() + bg->r()) >> 1, (fg->g() + bg->g()) >> 1, (fg->b() + bg->b()) >> 1);
 	}
 	if(attr & DCA_COMMENT) {
-		*fg = MAKE_ARGB(0xff,0x00,0x80,0x00);
+		*fg = rgb_t(0xff,0x00,0x80,0x00);
 	}
 }
 
@@ -666,7 +663,7 @@ static void dview_draw(DView *dv)
 
 	vsize = dv->view->visible_size();
 
-	bg_base = MAKE_ARGB(0xff,0xff,0xff,0xff);
+	bg_base = rgb_t(0xff,0xff,0xff,0xff);
 
 	/* always start clean */
 	dview_clear(dv);

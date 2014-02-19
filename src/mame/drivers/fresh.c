@@ -154,7 +154,7 @@ void fresh_state::update_palette( int offset )
 	UINT16 pal1 = m_paletteram_1[offset];
 	UINT8 pal2 = m_paletteram_2[offset];
 
-	palette_set_color(machine(),offset,MAKE_RGB(pal1&0xff,(pal1>>8)&0xff,pal2));
+	palette_set_color(machine(),offset,rgb_t(pal1&0xff,(pal1>>8)&0xff,pal2));
 }
 
 WRITE16_MEMBER(fresh_state::fresh_paletteram_1_w)

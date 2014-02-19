@@ -43,7 +43,7 @@ void xorworld_state::palette_init()
 		bit2 = (color_prom[2*machine().total_colors()] >> 2) & 0x01;
 		bit3 = (color_prom[2*machine().total_colors()] >> 3) & 0x01;
 		b = 0x0e*bit0 + 0x1e * bit1 + 0x44*bit2 + 0x8f*bit3;
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 
 		color_prom++;
 	}

@@ -331,7 +331,7 @@ void poker72_state::palette_init()
 		r = (x & 0xf)*0x10;
 		g = ((x & 0x3c)>>2)*0x10;
 		b = ((x & 0xf0)>>4)*0x10;
-		palette_set_color(machine(),x,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),x,rgb_t(r,g,b));
 	}
 }
 

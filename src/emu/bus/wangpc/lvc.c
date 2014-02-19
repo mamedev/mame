@@ -350,7 +350,7 @@ void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 				int g = BIT(data, 7) ? (i ? 0xff : 0x80) : 0;
 				int b = BIT(data, 3) ? (i ? 0xff : 0x80) : 0;
 
-				m_palette[index] = MAKE_RGB(r, g, b);
+				m_palette[index] = rgb_t(r, g, b);
 			}
 			break;
 

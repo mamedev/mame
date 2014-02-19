@@ -257,7 +257,7 @@ WRITE16_MEMBER(highvdeo_state::tv_vcf_paletteram_w)
 					break;
 				case 2:
 					m_pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(machine(), m_pal.offs, MAKE_RGB(m_pal.r, m_pal.g, m_pal.b));
+					palette_set_color(machine(), m_pal.offs, rgb_t(m_pal.r, m_pal.g, m_pal.b));
 					m_pal.offs_internal = 0;
 					m_pal.offs++;
 					break;

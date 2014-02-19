@@ -81,8 +81,8 @@ WRITE32_MEMBER(ultrsprt_state::palette_w)
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
 
-	palette_set_color(machine(), (offset*2)+0, MAKE_RGB(pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16)));
-	palette_set_color(machine(), (offset*2)+1, MAKE_RGB(pal5bit(data >> 10), pal5bit(data >>  5), pal5bit(data >>  0)));
+	palette_set_color(machine(), (offset*2)+0, rgb_t(pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16)));
+	palette_set_color(machine(), (offset*2)+1, rgb_t(pal5bit(data >> 10), pal5bit(data >>  5), pal5bit(data >>  0)));
 }
 
 

@@ -164,8 +164,8 @@ UINT32 rotaryf_state::screen_update_rotaryf(screen_device &screen, bitmap_rgb32 
 {
 	offs_t offs;
 	pen_t pens[2];
-	pens[0] = RGB_BLACK;
-	pens[1] = RGB_WHITE;
+	pens[0] = rgb_t::black;
+	pens[1] = rgb_t::white;
 	UINT8 i,x,y,data;
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)

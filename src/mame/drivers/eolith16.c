@@ -158,7 +158,7 @@ PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 		bit1 = (c >> 7) & 0x01;
 		b = 0x55 * bit0 + 0xaa * bit1;
 
-		palette_set_color(machine(),c,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),c,rgb_t(r,g,b));
 	}
 }
 

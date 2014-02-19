@@ -60,7 +60,7 @@ WRITE8_MEMBER( vector06_state::vector06_color_set )
 	UINT8 r = (data & 7) << 5;
 	UINT8 g = ((data >> 3) & 7) << 5;
 	UINT8 b = ((data >>6) & 3) << 6;
-	palette_set_color( machine(), m_color_index, MAKE_RGB(r,g,b) );
+	palette_set_color( machine(), m_color_index, rgb_t(r,g,b) );
 }
 
 

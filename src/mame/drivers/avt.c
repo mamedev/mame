@@ -578,9 +578,9 @@ void avt_state::palette_init()
 
 		/* hack to switch cyan->magenta for highlighted background */
 		if (j == 0x40)
-			palette_set_color(machine(), j, MAKE_RGB(g, r, b)); // Why this one has R-G swapped?...
+			palette_set_color(machine(), j, rgb_t(g, r, b)); // Why this one has R-G swapped?...
 		else
-			palette_set_color(machine(), j, MAKE_RGB(r, g, b));
+			palette_set_color(machine(), j, rgb_t(r, g, b));
 	}
 }
 

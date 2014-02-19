@@ -374,7 +374,7 @@ void drw80pkr_state::palette_init()
 		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
 		b = tb - (i * (tb / 5));
 
-		palette_set_color(machine(), j, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), j, rgb_t(r, g, b));
 	}
 }
 

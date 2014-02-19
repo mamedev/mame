@@ -69,8 +69,8 @@ UINT32 dotrikun_state::screen_update_dotrikun(screen_device &screen, bitmap_rgb3
 {
 	int x,y,i;
 
-	pen_t back_pen = MAKE_RGB(pal1bit(m_color >> 3), pal1bit(m_color >> 4), pal1bit(m_color >> 5));
-	pen_t fore_pen = MAKE_RGB(pal1bit(m_color >> 0), pal1bit(m_color >> 1), pal1bit(m_color >> 2));
+	pen_t back_pen = rgb_t(pal1bit(m_color >> 3), pal1bit(m_color >> 4), pal1bit(m_color >> 5));
+	pen_t fore_pen = rgb_t(pal1bit(m_color >> 0), pal1bit(m_color >> 1), pal1bit(m_color >> 2));
 
 	for(y = (cliprect.min_y & ~1); y < cliprect.max_y; y+=2)
 	{

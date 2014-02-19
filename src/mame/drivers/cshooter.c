@@ -201,7 +201,7 @@ UINT32 cshooter_state::screen_update_airraid(screen_device &screen, bitmap_ind16
 		int g = m_generic_paletteram_8[i] >> 4;
 		int b = m_generic_paletteram2_8[i] & 0xf;
 
-		rgb_t color = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
+		rgb_t color = rgb_t(pal4bit(r), pal4bit(g), pal4bit(b));
 		colortable_palette_set_color(machine().colortable, i, color);
 	}
 

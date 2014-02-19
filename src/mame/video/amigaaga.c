@@ -37,7 +37,7 @@ To do:
 void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 data)
 {
 	amiga_state *state = machine.driver_data<amiga_state>();
-	pen_t *aga_palette = state->m_aga_palette;
+	rgb_t *aga_palette = state->m_aga_palette;
 	int r,g,b;
 	int cr,cg,cb;
 	int color;
@@ -46,9 +46,9 @@ void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 dat
 	r = (data & 0xf00) >> 8;
 	g = (data & 0x0f0) >> 4;
 	b = (data & 0x00f) >> 0;
-	cr = RGB_RED(aga_palette[color]);
-	cg = RGB_GREEN(aga_palette[color]);
-	cb = RGB_BLUE(aga_palette[color]);
+	cr = aga_palette[color].r();
+	cg = aga_palette[color].g();
+	cb = aga_palette[color].b();
 	if (BIT(CUSTOM_REG(REG_BPLCON3),9))
 	{
 		// load low nibbles
@@ -62,7 +62,7 @@ void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 dat
 		cg = (g << 4) | g;
 		cb = (b << 4) | b;
 	}
-	aga_palette[color] = MAKE_RGB(cr,cg,cb);
+	aga_palette[color] = rgb_t(cr,cg,cb);
 }
 
 /*************************************
@@ -411,7 +411,7 @@ void amiga_aga_diwhigh_written(running_machine &machine, int written)
  *
  *************************************/
 
-INLINE int update_ham(amiga_state *state, int newpix)
+INLINE rgb_t update_ham(amiga_state *state, int newpix)
 {
 	switch (newpix & 0x03)
 	{
@@ -420,15 +420,15 @@ INLINE int update_ham(amiga_state *state, int newpix)
 			break;
 
 		case 1:
-			state->m_ham_color = MAKE_RGB(RGB_RED(state->m_ham_color), RGB_GREEN(state->m_ham_color), (newpix & 0xfc) | (RGB_BLUE(state->m_ham_color) & 0x03));
+			state->m_ham_color = rgb_t(state->m_ham_color.r(), state->m_ham_color.g(), (newpix & 0xfc) | (state->m_ham_color.b() & 0x03));
 			break;
 
 		case 2:
-			state->m_ham_color = MAKE_RGB((newpix & 0xfc) | (RGB_RED(state->m_ham_color) & 0x03), RGB_GREEN(state->m_ham_color), RGB_BLUE(state->m_ham_color));
+			state->m_ham_color = rgb_t((newpix & 0xfc) | (state->m_ham_color.r() & 0x03), state->m_ham_color.g(), state->m_ham_color.b());
 			break;
 
 		case 3:
-			state->m_ham_color = MAKE_RGB(RGB_RED(state->m_ham_color), (newpix & 0xfc) | (RGB_GREEN(state->m_ham_color) & 0x03), RGB_BLUE(state->m_ham_color));
+			state->m_ham_color = rgb_t(state->m_ham_color.r(), (newpix & 0xfc) | (state->m_ham_color.g() & 0x03), state->m_ham_color.b());
 			break;
 	}
 	return state->m_ham_color;
@@ -461,7 +461,7 @@ void amiga_aga_render_scanline(running_machine &machine, bitmap_rgb32 &bitmap, i
 	int next_copper_x;
 	int pl;
 	int defbitoffs = 0;
-	pen_t *aga_palette = state->m_aga_palette;
+	rgb_t *aga_palette = state->m_aga_palette;
 
 	state->m_last_scanline = scanline;
 

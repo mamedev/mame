@@ -107,7 +107,7 @@ UINT32 lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap,
 	int charx, chary;
 
 	/* make color 0 transparent */
-	palette_set_color(machine(), 0, MAKE_ARGB(0,0,0,0));
+	palette_set_color(machine(), 0, rgb_t(0,0,0,0));
 
 	/* clear */
 	bitmap.fill(0, cliprect);

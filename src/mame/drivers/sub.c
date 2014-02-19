@@ -410,8 +410,8 @@ void sub_state::palette_init()
 		g = (color_prom[0x100] >> 0);
 		b = (color_prom[0x200] >> 0);
 
-		//colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b)));
+		//colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(pal4bit(r), pal4bit(g), pal4bit(b)));
 
 		color_prom++;
 	}

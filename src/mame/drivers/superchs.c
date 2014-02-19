@@ -103,7 +103,7 @@ WRITE32_MEMBER(superchs_state::superchs_palette_w)
 	g = (a &0xff00) >> 8;
 	b = (a &0xff);
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,rgb_t(r,g,b));
 }
 
 READ32_MEMBER(superchs_state::superchs_input_r)

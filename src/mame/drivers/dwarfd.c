@@ -989,12 +989,12 @@ void dwarfd_state::palette_init()
 		int b = machine().rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 	}
-	palette_set_color(machine(), 8, MAKE_RGB(255, 255, 0));
-	palette_set_color(machine(), 12, MAKE_RGB(127, 127, 255));
-	palette_set_color(machine(), 4, MAKE_RGB(0, 255, 0));
-	palette_set_color(machine(), 6, MAKE_RGB(255, 0, 0));
+	palette_set_color(machine(), 8, rgb_t(255, 255, 0));
+	palette_set_color(machine(), 12, rgb_t(127, 127, 255));
+	palette_set_color(machine(), 4, rgb_t(0, 255, 0));
+	palette_set_color(machine(), 6, rgb_t(255, 0, 0));
 }
 
 static const ay8910_interface ay8910_config =

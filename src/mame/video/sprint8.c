@@ -36,30 +36,30 @@ void sprint8_state::set_pens(sprint8_state *state, colortable_t *colortable)
 	{
 		if (*m_team & 1)
 		{
-			colortable_palette_set_color(colortable, i + 0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-			colortable_palette_set_color(colortable, i + 1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-			colortable_palette_set_color(colortable, i + 2, MAKE_RGB(0xff, 0xff, 0x00)); /* yellow  */
-			colortable_palette_set_color(colortable, i + 3, MAKE_RGB(0x00, 0xff, 0x00)); /* green   */
-			colortable_palette_set_color(colortable, i + 4, MAKE_RGB(0xff, 0x00, 0xff)); /* magenta */
-			colortable_palette_set_color(colortable, i + 5, MAKE_RGB(0xe0, 0xc0, 0x70)); /* puce    */
-			colortable_palette_set_color(colortable, i + 6, MAKE_RGB(0x00, 0xff, 0xff)); /* cyan    */
-			colortable_palette_set_color(colortable, i + 7, MAKE_RGB(0xff, 0xaa, 0xaa)); /* pink    */
+			colortable_palette_set_color(colortable, i + 0, rgb_t(0xff, 0x00, 0x00)); /* red     */
+			colortable_palette_set_color(colortable, i + 1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+			colortable_palette_set_color(colortable, i + 2, rgb_t(0xff, 0xff, 0x00)); /* yellow  */
+			colortable_palette_set_color(colortable, i + 3, rgb_t(0x00, 0xff, 0x00)); /* green   */
+			colortable_palette_set_color(colortable, i + 4, rgb_t(0xff, 0x00, 0xff)); /* magenta */
+			colortable_palette_set_color(colortable, i + 5, rgb_t(0xe0, 0xc0, 0x70)); /* puce    */
+			colortable_palette_set_color(colortable, i + 6, rgb_t(0x00, 0xff, 0xff)); /* cyan    */
+			colortable_palette_set_color(colortable, i + 7, rgb_t(0xff, 0xaa, 0xaa)); /* pink    */
 		}
 		else
 		{
-			colortable_palette_set_color(colortable, i + 0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-			colortable_palette_set_color(colortable, i + 1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-			colortable_palette_set_color(colortable, i + 2, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-			colortable_palette_set_color(colortable, i + 3, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-			colortable_palette_set_color(colortable, i + 4, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-			colortable_palette_set_color(colortable, i + 5, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-			colortable_palette_set_color(colortable, i + 6, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-			colortable_palette_set_color(colortable, i + 7, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+			colortable_palette_set_color(colortable, i + 0, rgb_t(0xff, 0x00, 0x00)); /* red     */
+			colortable_palette_set_color(colortable, i + 1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+			colortable_palette_set_color(colortable, i + 2, rgb_t(0xff, 0x00, 0x00)); /* red     */
+			colortable_palette_set_color(colortable, i + 3, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+			colortable_palette_set_color(colortable, i + 4, rgb_t(0xff, 0x00, 0x00)); /* red     */
+			colortable_palette_set_color(colortable, i + 5, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+			colortable_palette_set_color(colortable, i + 6, rgb_t(0xff, 0x00, 0x00)); /* red     */
+			colortable_palette_set_color(colortable, i + 7, rgb_t(0x00, 0x00, 0xff)); /* blue    */
 		}
 	}
 
-	colortable_palette_set_color(colortable, 0x10, MAKE_RGB(0x00, 0x00, 0x00));
-	colortable_palette_set_color(colortable, 0x11, MAKE_RGB(0xff, 0xff, 0xff));
+	colortable_palette_set_color(colortable, 0x10, rgb_t(0x00, 0x00, 0x00));
+	colortable_palette_set_color(colortable, 0x11, rgb_t(0xff, 0xff, 0xff));
 }
 
 

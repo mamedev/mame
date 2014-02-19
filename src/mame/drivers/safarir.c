@@ -152,8 +152,8 @@ void safarir_state::palette_init()
 
 	for (i = 0; i < machine().total_colors() / 2; i++)
 	{
-		palette_set_color(machine(), (i * 2) + 0, RGB_BLACK);
-		palette_set_color(machine(), (i * 2) + 1, MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
+		palette_set_color(machine(), (i * 2) + 0, rgb_t::black);
+		palette_set_color(machine(), (i * 2) + 1, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
 	}
 }
 

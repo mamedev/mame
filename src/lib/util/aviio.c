@@ -2327,10 +2327,10 @@ static avi_error rgb32_compress_to_rgb(avi_stream *stream, const bitmap_rgb32 &b
 
 		for (x = 0; x < width && dest < dataend; x++)
 		{
-			UINT32 pix = *source++;
-			*dest++ = RGB_BLUE(pix);
-			*dest++ = RGB_GREEN(pix);
-			*dest++ = RGB_RED(pix);
+			rgb_t pix = *source++;
+			*dest++ = pix.b();
+			*dest++ = pix.g();
+			*dest++ = pix.r();
 		}
 
 		/* fill in any blank space on the right */

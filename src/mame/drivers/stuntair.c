@@ -153,12 +153,12 @@ PALETTE_INIT_MEMBER(stuntair_state, stuntair)
 		int g = (data&0x38)>>3;
 		int r = (data&0x07)>>0;
 
-		palette_set_color(machine(),i,MAKE_RGB(r<<5,g<<5,b<<6));
+		palette_set_color(machine(),i,rgb_t(r<<5,g<<5,b<<6));
 	}
 
 	// just set the FG layer to black and white
-	palette_set_color(machine(),0x100,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine(),0x101,MAKE_RGB(0xff,0xff,0xff));
+	palette_set_color(machine(),0x100,rgb_t(0x00,0x00,0x00));
+	palette_set_color(machine(),0x101,rgb_t(0xff,0xff,0xff));
 }
 
 

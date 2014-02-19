@@ -226,7 +226,7 @@ WRITE8_MEMBER(segald_state::astron_COLOR_write)
 	b = (highBits & 0x0f);
 	a = (highBits & 0x80) ? 0 : 255;
 
-	palette_set_color(machine(), palIndex, MAKE_ARGB(a, r, g, b));
+	palette_set_color(machine(), palIndex, rgb_t(a, r, g, b));
 	logerror("COLOR write : 0x%04x @   0x%04x [0x%x]\n", data, offset, space.device().safe_pc());
 }
 

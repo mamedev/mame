@@ -780,10 +780,10 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
 
 static void gfxset_draw_item(running_machine &machine, gfx_element *gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate)
 {
-	static const pen_t default_palette[] =
+	static const rgb_t default_palette[] =
 	{
-		MAKE_RGB(0,0,0), MAKE_RGB(0,0,255), MAKE_RGB(0,255,0), MAKE_RGB(0,255,255),
-		MAKE_RGB(255,0,0), MAKE_RGB(255,0,255), MAKE_RGB(255,255,0), MAKE_RGB(255,255,255)
+		rgb_t(0,0,0), rgb_t(0,0,255), rgb_t(0,255,0), rgb_t(0,255,255),
+		rgb_t(255,0,0), rgb_t(255,0,255), rgb_t(255,255,0), rgb_t(255,255,255)
 	};
 	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx->height() : gfx->width();
 	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx->width() : gfx->height();

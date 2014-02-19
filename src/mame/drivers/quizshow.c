@@ -87,8 +87,8 @@ void quizshow_state::palette_init()
 {
 	machine().colortable = colortable_alloc(machine(), 2);
 
-	colortable_palette_set_color(machine().colortable, 0, RGB_BLACK);
-	colortable_palette_set_color(machine().colortable, 1, RGB_WHITE);
+	colortable_palette_set_color(machine().colortable, 0, rgb_t::black);
+	colortable_palette_set_color(machine().colortable, 1, rgb_t::white);
 
 	// normal, blink/off, invert, blink+invert
 	const int lut_pal[16] = {

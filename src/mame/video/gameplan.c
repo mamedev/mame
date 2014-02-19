@@ -66,7 +66,7 @@ void gameplan_state::gameplan_get_pens( pen_t *pens )
 	offs_t i;
 
 	for (i = 0; i < GAMEPLAN_NUM_PENS; i++)
-		pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		pens[i] = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 }
 
 
@@ -82,7 +82,7 @@ void gameplan_state::leprechn_get_pens( pen_t *pens )
 		UINT8 g = (i & 2) ? 0xff : bk;
 		UINT8 b = (i & 4) ? 0xff : bk;
 
-		pens[i] = MAKE_RGB(r, g, b);
+		pens[i] = rgb_t(r, g, b);
 	}
 }
 

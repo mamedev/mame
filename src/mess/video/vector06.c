@@ -55,5 +55,5 @@ UINT32 vector06_state::screen_update_vector06(screen_device &screen, bitmap_ind1
 void vector06_state::palette_init()
 {
 	for (UINT8 i=0; i<16; i++)
-		palette_set_color( machine(), i, RGB_BLACK );
+		palette_set_color( machine(), i, rgb_t::black );
 }

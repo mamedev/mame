@@ -123,8 +123,8 @@ void nubus_procolor816_device::device_reset()
 	memset(m_vram, 0, VRAM_SIZE);
 	memset(m_palette, 0, sizeof(m_palette));
 
-	m_palette[0] = MAKE_RGB(255, 255, 255);
-	m_palette[0x80] = MAKE_RGB(0, 0, 0);
+	m_palette[0] = rgb_t(255, 255, 255);
+	m_palette[0x80] = rgb_t(0, 0, 0);
 }
 
 
@@ -229,7 +229,7 @@ UINT32 nubus_procolor816_device::screen_update(screen_device &screen, bitmap_rgb
 					for (x = 0; x < 640; x++)
 					{
 						pixels = vram16[(y * 640) + (x^1)];
-						*scanline++ = MAKE_RGB(((pixels>>10) & 0x1f)<<3, ((pixels>>5) & 0x1f)<<3, (pixels & 0x1f)<<3);
+						*scanline++ = rgb_t(((pixels>>10) & 0x1f)<<3, ((pixels>>5) & 0x1f)<<3, (pixels & 0x1f)<<3);
 					}
 				}
 			}
@@ -287,7 +287,7 @@ WRITE32_MEMBER( nubus_procolor816_device::procolor816_w )
 					if (m_count == 3)
 					{
 //                        printf("RAMDAC: color %02x = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
-						m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
+						m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 						m_clutoffs++;
 						if (m_clutoffs > 255)
 						{

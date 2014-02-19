@@ -224,7 +224,7 @@ PALETTE_INIT_MEMBER(dlair_state,dleuro)
 
 	for (i = 0; i < 8; i++)
 	{
-		palette_set_color(machine(), 2 * i + 0, MAKE_RGB(0, 0, 0));
+		palette_set_color(machine(), 2 * i + 0, rgb_t(0, 0, 0));
 		palette_set_color_rgb(machine(), 2 * i + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
 }

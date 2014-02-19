@@ -991,7 +991,7 @@ WRITE8_MEMBER(fm7_state::fm7_palette_w)
 	if(data & 0x01)
 		b = 0xff;
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,rgb_t(r,g,b));
 	m_video.fm7_pal[offset] = data & 0x07;
 }
 
@@ -1023,21 +1023,21 @@ WRITE8_MEMBER(fm7_state::fm77av_analog_palette_w)
 		case 2:
 			m_video.fm77av_pal_b[m_video.fm77av_pal_selected] = (data & 0x0f) << 4;
 			palette_set_color(machine(),m_video.fm77av_pal_selected+8,
-				MAKE_RGB(m_video.fm77av_pal_r[m_video.fm77av_pal_selected],
+				rgb_t(m_video.fm77av_pal_r[m_video.fm77av_pal_selected],
 				m_video.fm77av_pal_g[m_video.fm77av_pal_selected],
 				m_video.fm77av_pal_b[m_video.fm77av_pal_selected]));
 			break;
 		case 3:
 			m_video.fm77av_pal_r[m_video.fm77av_pal_selected] = (data & 0x0f) << 4;
 			palette_set_color(machine(),m_video.fm77av_pal_selected+8,
-				MAKE_RGB(m_video.fm77av_pal_r[m_video.fm77av_pal_selected],
+				rgb_t(m_video.fm77av_pal_r[m_video.fm77av_pal_selected],
 				m_video.fm77av_pal_g[m_video.fm77av_pal_selected],
 				m_video.fm77av_pal_b[m_video.fm77av_pal_selected]));
 			break;
 		case 4:
 			m_video.fm77av_pal_g[m_video.fm77av_pal_selected] = (data & 0x0f) << 4;
 			palette_set_color(machine(),m_video.fm77av_pal_selected+8,
-				MAKE_RGB(m_video.fm77av_pal_r[m_video.fm77av_pal_selected],
+				rgb_t(m_video.fm77av_pal_r[m_video.fm77av_pal_selected],
 				m_video.fm77av_pal_g[m_video.fm77av_pal_selected],
 				m_video.fm77av_pal_b[m_video.fm77av_pal_selected]));
 			break;
@@ -1583,14 +1583,14 @@ UINT32 fm7_state::screen_update_fm7(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 static const rgb_t fm7_initial_palette[8] = {
-	MAKE_RGB(0x00, 0x00, 0x00), // 0
-	MAKE_RGB(0x00, 0x00, 0xff), // 1
-	MAKE_RGB(0xff, 0x00, 0x00), // 2
-	MAKE_RGB(0xff, 0x00, 0xff), // 3
-	MAKE_RGB(0x00, 0xff, 0x00), // 4
-	MAKE_RGB(0x00, 0xff, 0xff), // 5
-	MAKE_RGB(0xff, 0xff, 0x00), // 6
-	MAKE_RGB(0xff, 0xff, 0xff), // 7
+	rgb_t(0x00, 0x00, 0x00), // 0
+	rgb_t(0x00, 0x00, 0xff), // 1
+	rgb_t(0xff, 0x00, 0x00), // 2
+	rgb_t(0xff, 0x00, 0xff), // 3
+	rgb_t(0x00, 0xff, 0x00), // 4
+	rgb_t(0x00, 0xff, 0xff), // 5
+	rgb_t(0xff, 0xff, 0x00), // 6
+	rgb_t(0xff, 0xff, 0xff), // 7
 };
 
 void fm7_state::palette_init()

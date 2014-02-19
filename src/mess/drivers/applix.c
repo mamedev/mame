@@ -759,7 +759,7 @@ void applix_state::palette_init()
 	for (i = 0; i < 48; color_count++)
 	{
 		r = colors[i++]; g = colors[i++]; b = colors[i++];
-		palette_set_color(machine(), color_count, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), color_count, rgb_t(r, g, b));
 	}
 }
 

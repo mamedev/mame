@@ -13,6 +13,9 @@
 #include <math.h>
 
 
+const rgb_t rgb_t::black(0,0,0);
+const rgb_t rgb_t::white(255,255,255);
+
 
 //**************************************************************************
 //  INLINE FUNCTIONS
@@ -25,11 +28,11 @@
 
 inline rgb_t palette_t::adjust_palette_entry(rgb_t entry, float brightness, float contrast, const UINT8 *gamma_map)
 {
-	int r = rgb_clamp(float(gamma_map[RGB_RED(entry)]) * contrast + brightness);
-	int g = rgb_clamp(float(gamma_map[RGB_GREEN(entry)]) * contrast + brightness);
-	int b = rgb_clamp(float(gamma_map[RGB_BLUE(entry)]) * contrast + brightness);
-	int a = RGB_ALPHA(entry);
-	return MAKE_ARGB(a,r,g,b);
+	int r = rgb_t::clamp(float(gamma_map[entry.r()]) * contrast + brightness);
+	int g = rgb_t::clamp(float(gamma_map[entry.g()]) * contrast + brightness);
+	int b = rgb_t::clamp(float(gamma_map[entry.b()]) * contrast + brightness);
+	int a = entry.a();
+	return rgb_t(a,r,g,b);
 }
 
 
@@ -224,7 +227,7 @@ palette_t::palette_t(UINT32 numcolors, UINT32 numgroups)
 	// initialize the per-entry data
 	for (UINT32 index = 0; index < numcolors; index++)
 	{
-		m_entry_color[index] = RGB_BLACK;
+		m_entry_color[index] = rgb_t::black;
 		m_entry_contrast[index] = 1.0f;
 	}
 
@@ -238,15 +241,15 @@ palette_t::palette_t(UINT32 numcolors, UINT32 numgroups)
 	// initialize the expanded data
 	for (UINT32 index = 0; index < numcolors * numgroups; index++)
 	{
-		m_adjusted_color[index] = RGB_BLACK;
-		m_adjusted_rgb15[index] = rgb_to_rgb15(RGB_BLACK);
+		m_adjusted_color[index] = rgb_t::black;
+		m_adjusted_rgb15[index] = rgb_t::black.as_rgb15();
 	}
 
 	// add black and white as the last two colors
-	m_adjusted_color[numcolors * numgroups + 0] = RGB_BLACK;
-	m_adjusted_rgb15[numcolors * numgroups + 0] = rgb_to_rgb15(RGB_BLACK);
-	m_adjusted_color[numcolors * numgroups + 1] = RGB_WHITE;
-	m_adjusted_rgb15[numcolors * numgroups + 1] = rgb_to_rgb15(RGB_WHITE);
+	m_adjusted_color[numcolors * numgroups + 0] = rgb_t::black;
+	m_adjusted_rgb15[numcolors * numgroups + 0] = rgb_t::black.as_rgb15();
+	m_adjusted_color[numcolors * numgroups + 1] = rgb_t::white;
+	m_adjusted_rgb15[numcolors * numgroups + 1] = rgb_t::white.as_rgb15();
 }
 
 
@@ -260,13 +263,11 @@ palette_t::~palette_t()
 
 
 //-------------------------------------------------
-//  deref - dereference a palette object; if the 
-//  reference count goes to 0, it is freed
+//  palette_t - destructor
 //-------------------------------------------------
 
 void palette_t::deref()
 {
-	// if the reference count goes to 0, free
 	if (--m_refcount == 0)
 		delete this;
 }
@@ -331,7 +332,7 @@ void palette_t::set_gamma(float gamma)
 	{
 		float fval = float(index) * (1.0f / 255.0f);
 		float fresult = pow(fval, gamma);
-		m_gamma_map[index] = rgb_clamp(255.0f * fresult);
+		m_gamma_map[index] = rgb_t::clamp(255.0f * fresult);
 	}
 
 	// update across all indices in all groups
@@ -440,7 +441,7 @@ void palette_t::normalize_range(UINT32 start, UINT32 end, int lum_min, int lum_m
 	for (UINT32 index = start; index <= end; index++)
 	{
 		rgb_t rgb = m_entry_color[index];
-		UINT32 y = 299 * RGB_RED(rgb) + 587 * RGB_GREEN(rgb) + 114 * RGB_BLUE(rgb);
+		UINT32 y = 299 * rgb.r() + 587 * rgb.g() + 114 * rgb.b();
 		ymin = MIN(ymin, y);
 		ymax = MAX(ymax, y);
 	}
@@ -453,14 +454,14 @@ void palette_t::normalize_range(UINT32 start, UINT32 end, int lum_min, int lum_m
 	for (UINT32 index = start; index <= end; index++)
 	{
 		rgb_t rgb = m_entry_color[index];
-		INT32 y = 299 * RGB_RED(rgb) + 587 * RGB_GREEN(rgb) + 114 * RGB_BLUE(rgb);
-		INT32 u = ((INT32)RGB_BLUE(rgb)-y /1000)*492 / 1000;
-		INT32 v = ((INT32)RGB_RED(rgb)-y / 1000)*877 / 1000;
+		INT32 y = 299 * rgb.r() + 587 * rgb.g() + 114 * rgb.b();
+		INT32 u = ((INT32)rgb.b()-y /1000)*492 / 1000;
+		INT32 v = ((INT32)rgb.r()-y / 1000)*877 / 1000;
 		INT32 target = tmin + ((y - ymin) * (tmax - tmin + 1)) / (ymax - ymin);
-		UINT8 r = rgb_clamp(target + 1140 * v / 1000);
-		UINT8 g = rgb_clamp(target -  395 * u / 1000 - 581 * v / 1000);
-		UINT8 b = rgb_clamp(target + 2032 * u / 1000);
-		entry_set_color(index, MAKE_RGB(r, g, b));
+		UINT8 r = rgb_t::clamp(target + 1140 * v / 1000);
+		UINT8 g = rgb_t::clamp(target -  395 * u / 1000 - 581 * v / 1000);
+		UINT8 b = rgb_t::clamp(target + 2032 * u / 1000);
+		entry_set_color(index, rgb_t(r, g, b));
 	}
 }
 
@@ -485,7 +486,7 @@ void palette_t::update_adjusted_color(UINT32 group, UINT32 index)
 
 	// otherwise, modify the adjusted color array
 	m_adjusted_color[finalindex] = adjusted;
-	m_adjusted_rgb15[finalindex] = rgb_to_rgb15(adjusted);
+	m_adjusted_rgb15[finalindex] = adjusted.as_rgb15();
 
 	// mark dirty in all clients
 	for (palette_client *client = m_client_list; client != NULL; client = client->next())

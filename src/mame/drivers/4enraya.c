@@ -307,7 +307,7 @@ void _4enraya_state::palette_init()
 
 	/* RGB format */
 	for(i=0;i<8;i++)
-		palette_set_color(machine(), i, MAKE_RGB(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
+		palette_set_color(machine(), i, rgb_t(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
 }
 
 static MACHINE_CONFIG_START( 4enraya, _4enraya_state )

@@ -749,7 +749,7 @@ PALETTE_INIT_MEMBER(driver_device, all_black)
 
 	for (i = 0; i < machine().total_colors(); i++)
 	{
-		palette_set_color(machine(),i,RGB_BLACK); /* black */
+		palette_set_color(machine(),i,rgb_t::black); /* black */
 	}
 }
 
@@ -760,8 +760,8 @@ PALETTE_INIT_MEMBER(driver_device, all_black)
 
 PALETTE_INIT_MEMBER(driver_device, black_and_white)
 {
-	palette_set_color(machine(),0,RGB_BLACK); /* black */
-	palette_set_color(machine(),1,RGB_WHITE); /* white */
+	palette_set_color(machine(),0,rgb_t::black); /* black */
+	palette_set_color(machine(),1,rgb_t::white); /* white */
 }
 
 
@@ -771,7 +771,7 @@ PALETTE_INIT_MEMBER(driver_device, black_and_white)
 
 PALETTE_INIT_MEMBER(driver_device, monochrome_amber)
 {
-	palette_set_color(machine(), 0, RGB_BLACK); /* black */
+	palette_set_color(machine(), 0, rgb_t::black); /* black */
 	palette_set_color_rgb(machine(), 1, 0xf7, 0xaa, 0x00); /* amber */
 }
 
@@ -782,7 +782,7 @@ PALETTE_INIT_MEMBER(driver_device, monochrome_amber)
 
 PALETTE_INIT_MEMBER(driver_device, monochrome_green)
 {
-	palette_set_color(machine(), 0, RGB_BLACK); /* black */
+	palette_set_color(machine(), 0, rgb_t::black); /* black */
 	palette_set_color_rgb(machine(), 1, 0x00, 0xff, 0x00); /* green */
 }
 
@@ -827,7 +827,7 @@ PALETTE_INIT_MEMBER(driver_device, RRRR_GGGG_BBBB)
 		bit3 = (color_prom[i + 2*machine().total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 	}
 }
 
@@ -844,7 +844,7 @@ PALETTE_INIT_MEMBER(driver_device, RRRRR_GGGGG_BBBBB)
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
-		palette_set_color(machine(), i, MAKE_RGB(pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0)));
+		palette_set_color(machine(), i, rgb_t(pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0)));
 }
 
 
@@ -853,7 +853,7 @@ PALETTE_INIT_MEMBER(driver_device, BBBBB_GGGGG_RRRRR)
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
-		palette_set_color(machine(), i, MAKE_RGB(pal5bit(i >> 0), pal5bit(i >> 5), pal5bit(i >> 10)));
+		palette_set_color(machine(), i, rgb_t(pal5bit(i >> 0), pal5bit(i >> 5), pal5bit(i >> 10)));
 }
 
 
@@ -869,5 +869,5 @@ PALETTE_INIT_MEMBER(driver_device, RRRRR_GGGGGG_BBBBB)
 	int i;
 
 	for (i = 0; i < 0x10000; i++)
-		palette_set_color(machine(), i, MAKE_RGB(pal5bit(i >> 11), pal6bit(i >> 5), pal5bit(i >> 0)));
+		palette_set_color(machine(), i, rgb_t(pal5bit(i >> 11), pal6bit(i >> 5), pal5bit(i >> 0)));
 }

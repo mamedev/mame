@@ -55,7 +55,7 @@ WRITE8_MEMBER(thief_state::thief_color_map_w){
 	int r = intensity[(data & 0x03) >> 0];
 	int g = intensity[(data & 0x0C) >> 2];
 	int b = intensity[(data & 0x30) >> 4];
-	palette_set_color( machine(),offset,MAKE_RGB(r,g,b) );
+	palette_set_color( machine(),offset,rgb_t(r,g,b) );
 }
 
 /***************************************************************************/

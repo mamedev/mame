@@ -694,7 +694,7 @@ PALETTE_INIT_MEMBER(seta_state,usclssic)
 	{
 		UINT16 data = (color_prom[x*2] <<8) | color_prom[x*2+1];
 
-		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+		rgb_t color = rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
 		if (x >= 0x100)
 			colortable_palette_set_color(machine().colortable, x + 0x000, color);
@@ -719,7 +719,7 @@ void seta_state::set_pens()
 	{
 		UINT16 data = m_paletteram[i];
 
-		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+		rgb_t color = rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
 		if (machine().colortable != NULL)
 			colortable_palette_set_color(machine().colortable, i, color);
@@ -733,7 +733,7 @@ void seta_state::set_pens()
 		{
 			UINT16 data = m_paletteram2[i];
 
-			rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+			rgb_t color = rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
 			if (machine().colortable != NULL)
 				colortable_palette_set_color(machine().colortable, i + m_paletteram.bytes() / 2, color);
@@ -752,7 +752,7 @@ void seta_state::usclssic_set_pens()
 	{
 		UINT16 data = m_paletteram[i];
 
-		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+		rgb_t color = rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
 		if (i >= 0x100)
 			colortable_palette_set_color(machine().colortable, i - 0x100, color);

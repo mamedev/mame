@@ -2113,7 +2113,7 @@ VIDEO_START_MEMBER(cps_state,cps)
 	cps1_update_transmasks();
 
 	for (i = 0; i < cps1_palette_entries * 16; i++)
-		palette_set_color(machine(), i, MAKE_RGB(0,0,0));
+		palette_set_color(machine(), i, rgb_t(0,0,0));
 
 	m_buffered_obj = auto_alloc_array_clear(machine(), UINT16, m_obj_size / 2);
 
@@ -2232,7 +2232,7 @@ void cps_state::cps1_build_palette( const UINT16* const palette_base )
 				g = ((palette >> 4) & 0x0f) * 0x11 * bright / 0x2d;
 				b = ((palette >> 0) & 0x0f) * 0x11 * bright / 0x2d;
 
-				palette_set_color (machine(), 0x200 * page + offset, MAKE_RGB(r, g, b));
+				palette_set_color (machine(), 0x200 * page + offset, rgb_t(r, g, b));
 			}
 		}
 		else

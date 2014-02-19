@@ -145,7 +145,7 @@ void hyhoo_state::hyhoo_gfxdraw()
 						g = ((color & 0x18) >> 3) & 0x03;
 						b = ((color & 0xe0) >> 5) & 0x07;
 
-						pen = MAKE_RGB(pal6bit(r), pal5bit(g), pal5bit(b));
+						pen = rgb_t(pal6bit(r), pal5bit(g), pal5bit(b));
 
 						m_tmpbitmap.pix32(dy, dx1) = m_tmpbitmap.pix32(dy, dx1) | pen;
 						m_tmpbitmap.pix32(dy, dx2) = m_tmpbitmap.pix32(dy, dx2) | pen;
@@ -161,7 +161,7 @@ void hyhoo_state::hyhoo_gfxdraw()
 						g = ((color & 0x38) >> 3) & 0x07;
 						b = ((color & 0xc0) >> 6) & 0x03;
 
-						pen = MAKE_RGB(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
+						pen = rgb_t(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
 
 						m_tmpbitmap.pix32(dy, dx1) = pen;
 						m_tmpbitmap.pix32(dy, dx2) = pen;
@@ -194,7 +194,7 @@ void hyhoo_state::hyhoo_gfxdraw()
 					g = ((~m_clut[color1] & 0x38) >> 3) & 0x07;
 					b = ((~m_clut[color1] & 0xc0) >> 6) & 0x03;
 
-					pen = MAKE_RGB(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
+					pen = rgb_t(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
 
 					m_tmpbitmap.pix32(dy, dx1) = pen;
 				}
@@ -208,7 +208,7 @@ void hyhoo_state::hyhoo_gfxdraw()
 					g = ((~m_clut[color2] & 0x38) >> 3) & 0x07;
 					b = ((~m_clut[color2] & 0xc0) >> 6) & 0x03;
 
-					pen = MAKE_RGB(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
+					pen = rgb_t(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
 
 					m_tmpbitmap.pix32(dy, dx2) = pen;
 				}
@@ -234,7 +234,7 @@ UINT32 hyhoo_state::screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bit
 	if (m_dispflag)
 		copybitmap(bitmap, m_tmpbitmap, m_flipscreen, m_flipscreen, 0, 0, cliprect);
 	else
-		bitmap.fill(RGB_BLACK, cliprect);
+		bitmap.fill(rgb_t::black, cliprect);
 
 	return 0;
 }

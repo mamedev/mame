@@ -189,7 +189,7 @@ void gal3_state::update_palette(  )
 		g = data1&0xff;
 		b = data2&0xff;
 
-		palette_set_color( machine(),i, MAKE_RGB(r,g,b) );
+		palette_set_color( machine(),i, rgb_t(r,g,b) );
 	}
 } /* update_palette */
 

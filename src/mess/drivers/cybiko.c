@@ -289,7 +289,7 @@ void cybiko_state::palette_init()
 	// init palette
 	for (int i = 0; i < 4; i++)
 	{
-		palette_set_color(machine(), i, RGB_WHITE);
+		palette_set_color(machine(), i, rgb_t::white);
 #ifndef HD66421_BRIGHTNESS_DOES_NOT_WORK
 		palette_set_pen_contrast(machine(), i, 1.0 * i / (4 - 1));
 #endif

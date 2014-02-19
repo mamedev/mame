@@ -638,7 +638,7 @@ void vpoker_state::palette_init()
 	{
 		rgb_t color;
 
-		color = MAKE_RGB(pal1bit((i & 4) >> 2),pal1bit(i & 1),pal1bit((i & 2) >> 1));
+		color = rgb_t(pal1bit((i & 4) >> 2),pal1bit(i & 1),pal1bit((i & 2) >> 1));
 
 		palette_set_color(machine(), i, color);
 	}

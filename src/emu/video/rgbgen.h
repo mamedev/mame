@@ -63,9 +63,9 @@ INLINE void rgba_comp_to_rgbaint(rgbaint *rgb, INT16 a, INT16 r, INT16 g, INT16 
 
 INLINE void rgb_to_rgbint(rgbint *rgb, rgb_t color)
 {
-	rgb->r = RGB_RED(color);
-	rgb->g = RGB_GREEN(color);
-	rgb->b = RGB_BLUE(color);
+	rgb->r = color.r();
+	rgb->g = color.g();
+	rgb->b = color.b();
 }
 
 
@@ -76,10 +76,10 @@ INLINE void rgb_to_rgbint(rgbint *rgb, rgb_t color)
 
 INLINE void rgba_to_rgbaint(rgbaint *rgb, rgb_t color)
 {
-	rgb->a = RGB_ALPHA(color);
-	rgb->r = RGB_RED(color);
-	rgb->g = RGB_GREEN(color);
-	rgb->b = RGB_BLUE(color);
+	rgb->a = color.a();
+	rgb->r = color.r();
+	rgb->g = color.g();
+	rgb->b = color.b();
 }
 
 
@@ -90,7 +90,7 @@ INLINE void rgba_to_rgbaint(rgbaint *rgb, rgb_t color)
 
 INLINE rgb_t rgbint_to_rgb(const rgbint *color)
 {
-	return MAKE_RGB(color->r, color->g, color->b);
+	return rgb_t(color->r, color->g, color->b);
 }
 
 
@@ -101,7 +101,7 @@ INLINE rgb_t rgbint_to_rgb(const rgbint *color)
 
 INLINE rgb_t rgbaint_to_rgba(const rgbaint *color)
 {
-	return MAKE_ARGB(color->a, color->r, color->g, color->b);
+	return rgb_t(color->a, color->r, color->g, color->b);
 }
 
 
@@ -116,7 +116,7 @@ INLINE rgb_t rgbint_to_rgb_clamp(const rgbint *color)
 	UINT8 r = (color->r < 0) ? 0 : (color->r > 255) ? 255 : color->r;
 	UINT8 g = (color->g < 0) ? 0 : (color->g > 255) ? 255 : color->g;
 	UINT8 b = (color->b < 0) ? 0 : (color->b > 255) ? 255 : color->b;
-	return MAKE_RGB(r, g, b);
+	return rgb_t(r, g, b);
 }
 
 
@@ -132,7 +132,7 @@ INLINE rgb_t rgbaint_to_rgba_clamp(const rgbaint *color)
 	UINT8 r = (color->r < 0) ? 0 : (color->r > 255) ? 255 : color->r;
 	UINT8 g = (color->g < 0) ? 0 : (color->g > 255) ? 255 : color->g;
 	UINT8 b = (color->b < 0) ? 0 : (color->b > 255) ? 255 : color->b;
-	return MAKE_ARGB(a, r, g, b);
+	return rgb_t(a, r, g, b);
 }
 
 
@@ -402,10 +402,10 @@ INLINE rgb_t rgba_bilinear_filter(rgb_t rgb00, rgb_t rgb01, rgb_t rgb10, rgb_t r
 
 	rb0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
 	rb1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
-	rgb00 >>= 8;
-	rgb01 >>= 8;
-	rgb10 >>= 8;
-	rgb11 >>= 8;
+	rgb00 = rgb00 >> 8;
+	rgb01 = rgb01 >> 8;
+	rgb10 = rgb10 >> 8;
+	rgb11 = rgb11 >> 8;
 	ag0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
 	ag1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
 
@@ -452,10 +452,10 @@ INLINE void rgbaint_bilinear_filter(rgbaint *color, rgb_t rgb00, rgb_t rgb01, rg
 
 	rb0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
 	rb1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
-	rgb00 >>= 8;
-	rgb01 >>= 8;
-	rgb10 >>= 8;
-	rgb11 >>= 8;
+	rgb00 = rgb00 >> 8;
+	rgb01 = rgb01 >> 8;
+	rgb10 = rgb10 >> 8;
+	rgb11 = rgb11 >> 8;
 	ag0 = (rgb00 & 0x00ff00ff) + ((((rgb01 & 0x00ff00ff) - (rgb00 & 0x00ff00ff)) * u) >> 8);
 	ag1 = (rgb10 & 0x00ff00ff) + ((((rgb11 & 0x00ff00ff) - (rgb10 & 0x00ff00ff)) * u) >> 8);
 

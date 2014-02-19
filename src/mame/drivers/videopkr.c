@@ -441,7 +441,7 @@ void videopkr_state::palette_init()
 		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
 		b = tb - (i * (tb / 5));
 
-		palette_set_color(machine(), j, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), j, rgb_t(r, g, b));
 	}
 }
 
@@ -472,7 +472,7 @@ PALETTE_INIT_MEMBER(videopkr_state,babypkr)
 		tb =  0xdf * ((color_prom[j] >> 2) & 0x01);
 		b = top - ((tb * top) / 0x100);
 
-		palette_set_color(machine(), j, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), j, rgb_t(r, g, b));
 	}
 }
 
@@ -505,7 +505,7 @@ PALETTE_INIT_MEMBER(videopkr_state,fortune1)
 		if ((c % 4) == 1 || (c % 4) == 2)
 			c = ((int)(c / 4) * 4) + (3 - (c % 4));
 
-		palette_set_color(machine(), c, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), c, rgb_t(r, g, b));
 	}
 }
 

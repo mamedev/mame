@@ -198,7 +198,7 @@ void supertnk_state::video_start()
 	{
 		UINT8 data = prom[i];
 
-		m_pens[i] = MAKE_RGB(pal1bit(data >> 2), pal1bit(data >> 5), pal1bit(data >> 6));
+		m_pens[i] = rgb_t(pal1bit(data >> 2), pal1bit(data >> 5), pal1bit(data >> 6));
 	}
 
 	m_videoram[0] = auto_alloc_array(machine(), UINT8, 0x2000);

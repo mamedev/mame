@@ -181,9 +181,9 @@ PALETTE_INIT_MEMBER(m10_state,m10)
 		rgb_t color;
 
 		if (i & 0x01)
-			color = MAKE_RGB(pal1bit(~i >> 3), pal1bit(~i >> 2), pal1bit(~i >> 1));
+			color = rgb_t(pal1bit(~i >> 3), pal1bit(~i >> 2), pal1bit(~i >> 1));
 		else
-			color = RGB_BLACK;
+			color = rgb_t::black;
 
 		palette_set_color(machine(), i, color);
 	}

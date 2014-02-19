@@ -59,8 +59,8 @@ void fgoal_state::palette_init()
 
 	for (i = 0; i < 8; i++)
 	{
-		palette_set_color(machine(), 128 + 0*8 + i, MAKE_RGB(0x2e,0x80,0x2e));
-		palette_set_color(machine(), 128 + 1*8 + i, MAKE_RGB(0x2e,0x2e,0x2e));
+		palette_set_color(machine(), 128 + 0*8 + i, rgb_t(0x2e,0x80,0x2e));
+		palette_set_color(machine(), 128 + 1*8 + i, rgb_t(0x2e,0x2e,0x2e));
 	}
 
 	/* ball is a fixed color */

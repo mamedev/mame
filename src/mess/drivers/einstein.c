@@ -445,8 +445,8 @@ MACHINE_RESET_MEMBER(einstein_state,einstein2)
 	einstein_state::machine_reset();
 
 	/* 80 column card palette */
-	palette_set_color(machine(), TMS9928A_PALETTE_SIZE, RGB_BLACK);
-	palette_set_color(machine(), TMS9928A_PALETTE_SIZE + 1, MAKE_RGB(0, 224, 0));
+	palette_set_color(machine(), TMS9928A_PALETTE_SIZE, rgb_t::black);
+	palette_set_color(machine(), TMS9928A_PALETTE_SIZE + 1, rgb_t(0, 224, 0));
 }
 
 MACHINE_START_MEMBER(einstein_state,einstein2)

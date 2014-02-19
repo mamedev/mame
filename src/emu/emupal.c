@@ -289,22 +289,21 @@ void palette_set_shadow_dRGB32(running_machine &machine, int mode, int dr, int d
 		int r = pal5bit(i >> 10) + dr;
 		int g = pal5bit(i >> 5) + dg;
 		int b = pal5bit(i >> 0) + db;
-		pen_t final;
 
 		/* apply clipping */
 		if (!noclip)
 		{
-			r = rgb_clamp(r);
-			g = rgb_clamp(g);
-			b = rgb_clamp(b);
+			r = rgb_t::clamp(r);
+			g = rgb_t::clamp(g);
+			b = rgb_t::clamp(b);
 		}
-		final = MAKE_RGB(r, g, b);
+		rgb_t final = rgb_t(r, g, b);
 
 		/* store either 16 or 32 bit */
 		if (palette->format == BITMAP_FORMAT_RGB32)
 			stable->base[i] = final;
 		else
-			stable->base[i] = rgb_to_rgb15(final);
+			stable->base[i] = final.as_rgb15();
 	}
 }
 
@@ -342,7 +341,7 @@ colortable_t *colortable_alloc(running_machine &machine, UINT32 palettesize)
 	/* allocate the palette */
 	ctable->palette = auto_alloc_array(machine, rgb_t, ctable->palentries);
 	for (index = 0; index < ctable->palentries; index++)
-		ctable->palette[index] = MAKE_ARGB(0x80,0xff,0xff,0xff);
+		ctable->palette[index] = rgb_t(0x80,0xff,0xff,0xff);
 	machine.save().save_pointer(NAME(ctable->palette), ctable->palentries);
 
 	return ctable;
@@ -395,7 +394,7 @@ void colortable_palette_set_color(colortable_t *ctable, UINT32 entry, rgb_t colo
 	assert(entry < ctable->palentries);
 
 	/* alpha doesn't matter */
-	color |= 0xff000000;
+	color.set_a(0xff);
 
 	/* update if it has changed */
 	if (ctable->palette[entry] != color)
@@ -603,7 +602,7 @@ static void allocate_palette(running_machine &machine, palette_private *palette)
 
 	/* set the initial colors to a standard rainbow */
 	for (index = 0; index < machine.total_colors(); index++)
-		machine.palette->entry_set_color(index, MAKE_RGB(pal1bit(index >> 0), pal1bit(index >> 1), pal1bit(index >> 2)));
+		machine.palette->entry_set_color(index, rgb_t(pal1bit(index >> 0), pal1bit(index >> 1), pal1bit(index >> 2)));
 
 	/* switch off the color mode */
 	switch (palette->format)
@@ -620,8 +619,8 @@ static void allocate_palette(running_machine &machine, palette_private *palette)
 
 		/* 32-bit direct case */
 		case BITMAP_FORMAT_RGB32:
-			palette->black_pen = MAKE_RGB(0x00,0x00,0x00);
-			palette->white_pen = MAKE_RGB(0xff,0xff,0xff);
+			palette->black_pen = rgb_t(0x00,0x00,0x00);
+			palette->white_pen = rgb_t(0xff,0xff,0xff);
 			break;
 
 		/* screenless case */
@@ -654,7 +653,7 @@ static void allocate_color_tables(running_machine &machine, palette_private *pal
 			break;
 
 		case BITMAP_FORMAT_RGB32:
-			machine.pens = machine.palette->entry_list_adjusted();
+			machine.pens = reinterpret_cast<const pen_t *>(machine.palette->entry_list_adjusted());
 			break;
 
 		default:
@@ -741,15 +740,12 @@ static void configure_rgb_shadows(running_machine &machine, int mode, float fact
 	/* regenerate the table */
 	for (i = 0; i < 32768; i++)
 	{
-		UINT8 r = rgb_clamp((pal5bit(i >> 10) * ifactor) >> 8);
-		UINT8 g = rgb_clamp((pal5bit(i >> 5) * ifactor) >> 8);
-		UINT8 b = rgb_clamp((pal5bit(i >> 0) * ifactor) >> 8);
-		pen_t final = MAKE_RGB(r, g, b);
+		rgb_t final = pal555(i, 10, 5, 0).scale8(ifactor);
 
 		/* store either 16 or 32 bit */
 		if (palette->format == BITMAP_FORMAT_RGB32)
 			stable->base[i] = final;
 		else
-			stable->base[i] = rgb_to_rgb15(final);
+			stable->base[i] = final.as_rgb15();
 	}
 }

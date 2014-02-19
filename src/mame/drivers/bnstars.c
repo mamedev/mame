@@ -366,7 +366,7 @@ void bnstars_state::update_color(int color, int screen)
 	g = ((m_ms32_pal_ram[screen][color*2] & 0x00ff) >>0 );
 	b = ((m_ms32_pal_ram[screen][color*2+1] & 0x00ff) >>0 );
 
-	palette_set_color(machine(),color+screen*0x8000,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),color+screen*0x8000,rgb_t(r,g,b));
 }
 
 WRITE32_MEMBER(bnstars_state::ms32_pal0_ram_w)

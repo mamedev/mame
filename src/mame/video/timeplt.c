@@ -66,7 +66,7 @@ void timeplt_state::palette_init()
 		bit4 = (color_prom[i + 0 * 32] >> 7) & 0x01;
 		b = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
 
-		palette[i] = MAKE_RGB(r, g, b);
+		palette[i] = rgb_t(r, g, b);
 	}
 
 	color_prom += 2*32;

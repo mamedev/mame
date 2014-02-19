@@ -342,14 +342,14 @@ INPUT_PORTS_END
 static const rgb_t vc4000_palette[] =
 {
 	// background colors
-	MAKE_RGB(0, 0, 0), // black
-	MAKE_RGB(0, 0, 175), // blue
-	MAKE_RGB(0, 175, 0), // green
-	MAKE_RGB(0, 255, 255), // cyan
-	MAKE_RGB(255, 0, 0), // red
-	MAKE_RGB(255, 0, 255), // magenta
-	MAKE_RGB(200, 200, 0), // yellow
-	MAKE_RGB(200, 200, 200), // white
+	rgb_t(0, 0, 0), // black
+	rgb_t(0, 0, 175), // blue
+	rgb_t(0, 175, 0), // green
+	rgb_t(0, 255, 255), // cyan
+	rgb_t(255, 0, 0), // red
+	rgb_t(255, 0, 255), // magenta
+	rgb_t(200, 200, 0), // yellow
+	rgb_t(200, 200, 200), // white
 	/* sprite colors
 	The control line simply inverts the RGB lines all at once.
 	We can do that in the code with ^7 */

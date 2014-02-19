@@ -74,7 +74,7 @@ void kingofb_state::palette_init_common( const UINT8 *color_prom, void (kingofb_
 		bit3 = (b_data >> 3) & 0x01;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	/* the foreground chars directly map to primary colors */
@@ -91,7 +91,7 @@ void kingofb_state::palette_init_common( const UINT8 *color_prom, void (kingofb_
 		/* blue component */
 		b = (((i - 0x100) >> 0) & 0x01) * bweights_fg[0];
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	for (i = 0; i < 0x100; i++)

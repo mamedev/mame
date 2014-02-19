@@ -66,7 +66,7 @@ void matmania_state::palette_init()
 		bit3 = BIT(color_prom[64], 3);
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 		color_prom++;
 	}
 }
@@ -103,7 +103,7 @@ WRITE8_MEMBER(matmania_state::matmania_paletteram_w)
 	bit3 = BIT(val, 3);
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(machine(),offs2 + 64,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offs2 + 64,rgb_t(r,g,b));
 }
 
 

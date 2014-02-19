@@ -142,7 +142,7 @@ UINT32 pcxt_state::screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &b
 
 	//popmessage("%04x",m_start_offs);
 
-	bitmap.fill(RGB_BLACK, cliprect);
+	bitmap.fill(rgb_t::black, cliprect);
 
 	for(y=0;y<200/8;y++)
 	{

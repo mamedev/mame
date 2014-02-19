@@ -112,9 +112,9 @@ void m14_state::palette_init()
 		rgb_t color;
 
 		if (i & 0x01)
-			color = MAKE_RGB(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 3));
+			color = rgb_t(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 3));
 		else
-			color = (i & 0x10) ? RGB_WHITE : RGB_BLACK;
+			color = (i & 0x10) ? rgb_t::white : rgb_t::black;
 
 		palette_set_color(machine(), i, color);
 	}

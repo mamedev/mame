@@ -188,10 +188,10 @@ void lucky74_state::palette_init()
 
 
 		/* PROMs circuitry, 1st state */
-		palette_set_color(machine(), i, MAKE_RGB(r1, g1, b1));
+		palette_set_color(machine(), i, rgb_t(r1, g1, b1));
 
 		/* PROMs circuitry, 2nd state */
-		palette_set_color(machine(), i + 256, MAKE_RGB(r2, g2, b2));
+		palette_set_color(machine(), i + 256, rgb_t(r2, g2, b2));
 	}
 }
 

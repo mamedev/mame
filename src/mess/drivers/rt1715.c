@@ -174,9 +174,9 @@ static const i8275_interface rt1715_i8275_intf =
 
 void rt1715_state::palette_init()
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0x00, 0x00, 0x00)); /* black */
-	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x7f, 0x00)); /* low intensity */
-	palette_set_color(machine(), 2, MAKE_RGB(0x00, 0xff, 0x00)); /* high intensitiy */
+	palette_set_color(machine(), 0, rgb_t(0x00, 0x00, 0x00)); /* black */
+	palette_set_color(machine(), 1, rgb_t(0x00, 0x7f, 0x00)); /* low intensity */
+	palette_set_color(machine(), 2, rgb_t(0x00, 0xff, 0x00)); /* high intensitiy */
 }
 
 

@@ -58,7 +58,7 @@ void m57_state::palette_init()
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r,g,b));
 		colortable_entry_set_value(machine().colortable, i, i);
 		color_prom++;
 	}
@@ -87,7 +87,7 @@ void m57_state::palette_init()
 		bit2 = (*color_prom >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i + 256, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable, i + 256, rgb_t(r,g,b));
 		color_prom++;
 	}
 

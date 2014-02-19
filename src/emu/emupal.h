@@ -209,7 +209,7 @@ INLINE void palette_set_color(running_machine &machine, pen_t pen, rgb_t rgb)
 
 INLINE void palette_set_color_rgb(running_machine &machine, pen_t pen, UINT8 r, UINT8 g, UINT8 b)
 {
-	machine.palette->entry_set_color(pen, MAKE_RGB(r, g, b));
+	machine.palette->entry_set_color(pen, rgb_t(r, g, b));
 }
 
 

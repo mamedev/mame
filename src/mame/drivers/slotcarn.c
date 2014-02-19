@@ -97,7 +97,7 @@ static MC6845_BEGIN_UPDATE( begin_update )
 		bit0 = BIT(i,0);
 		bit1 = BIT(i,1);
 		bit2 = BIT(i,2);
-		state->m_pens[i] = MAKE_RGB(dim*bit0, dim*bit1, dim*bit2);
+		state->m_pens[i] = rgb_t(dim*bit0, dim*bit1, dim*bit2);
 	}
 
 	return state->m_pens;

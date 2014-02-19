@@ -49,8 +49,8 @@ void sbugger_state::palette_init()
 		int b = machine().rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
-		palette_set_color(machine(),i*2+1,MAKE_RGB(r,g,b));
-		palette_set_color(machine(),i*2,MAKE_RGB(0,0,0));
+		palette_set_color(machine(),i*2+1,rgb_t(r,g,b));
+		palette_set_color(machine(),i*2,rgb_t(0,0,0));
 
 	}
 

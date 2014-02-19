@@ -29,22 +29,6 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 
 
 /***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    compute_brightness - compute the effective
-    brightness for an RGB pixel
--------------------------------------------------*/
-
-INLINE UINT8 compute_brightness(rgb_t rgb)
-{
-	return (RGB_RED(rgb) * 222 + RGB_GREEN(rgb) * 707 + RGB_BLUE(rgb) * 71) / 1000;
-}
-
-
-
-/***************************************************************************
     RENDER UTILITIES
 ***************************************************************************/
 
@@ -125,7 +109,6 @@ static void resample_argb_bitmap_average(UINT32 *dest, UINT32 drowpixels, UINT32
 				for (curx = startx; xremaining; curx += xchunk)
 				{
 					UINT32 factor;
-					UINT32 pix;
 
 					/* determine the X contribution, clamping to the amount remaining */
 					xchunk = 0x1000 - (curx & 0xfff);
@@ -137,13 +120,13 @@ static void resample_argb_bitmap_average(UINT32 *dest, UINT32 drowpixels, UINT32
 					factor = xchunk * ychunk;
 
 					/* fetch the source pixel */
-					pix = source[(cury >> 12) * srowpixels + (curx >> 12)];
+					rgb_t pix = source[(cury >> 12) * srowpixels + (curx >> 12)];
 
 					/* accumulate the RGBA values */
-					sumr += factor * RGB_RED(pix);
-					sumg += factor * RGB_GREEN(pix);
-					sumb += factor * RGB_BLUE(pix);
-					suma += factor * RGB_ALPHA(pix);
+					sumr += factor * pix.r();
+					sumg += factor * pix.g();
+					sumb += factor * pix.b();
+					suma += factor * pix.a();
 				}
 			}
 
@@ -156,15 +139,15 @@ static void resample_argb_bitmap_average(UINT32 *dest, UINT32 drowpixels, UINT32
 			/* if we're translucent, add in the destination pixel contribution */
 			if (a < 256)
 			{
-				UINT32 dpix = dest[y * drowpixels + x];
-				suma += RGB_ALPHA(dpix) * (256 - a);
-				sumr += RGB_RED(dpix) * (256 - a);
-				sumg += RGB_GREEN(dpix) * (256 - a);
-				sumb += RGB_BLUE(dpix) * (256 - a);
+				rgb_t dpix = dest[y * drowpixels + x];
+				suma += dpix.a() * (256 - a);
+				sumr += dpix.r() * (256 - a);
+				sumg += dpix.g() * (256 - a);
+				sumb += dpix.b() * (256 - a);
 			}
 
 			/* store the target pixel, dividing the RGBA values by the overall scale factor */
-			dest[y * drowpixels + x] = MAKE_ARGB(suma, sumr, sumg, sumb);
+			dest[y * drowpixels + x] = rgb_t(suma, sumr, sumg, sumb);
 		}
 	}
 }
@@ -196,7 +179,7 @@ static void resample_argb_bitmap_bilinear(UINT32 *dest, UINT32 drowpixels, UINT3
 		for (x = 0; x < dwidth; x++)
 		{
 			UINT32 startx = x * dx;
-			UINT32 pix0, pix1, pix2, pix3;
+			rgb_t pix0, pix1, pix2, pix3;
 			UINT32 sumr, sumg, sumb, suma;
 			UINT32 nextx, nexty;
 			UINT32 curx, cury;
@@ -228,31 +211,31 @@ static void resample_argb_bitmap_bilinear(UINT32 *dest, UINT32 drowpixels, UINT3
 
 			/* contributions from pixel 0 (top,left) */
 			factor = (0x1000 - curx) * (0x1000 - cury);
-			sumr = factor * RGB_RED(pix0);
-			sumg = factor * RGB_GREEN(pix0);
-			sumb = factor * RGB_BLUE(pix0);
-			suma = factor * RGB_ALPHA(pix0);
+			sumr = factor * pix0.r();
+			sumg = factor * pix0.g();
+			sumb = factor * pix0.b();
+			suma = factor * pix0.a();
 
 			/* contributions from pixel 1 (top,right) */
 			factor = curx * (0x1000 - cury);
-			sumr += factor * RGB_RED(pix1);
-			sumg += factor * RGB_GREEN(pix1);
-			sumb += factor * RGB_BLUE(pix1);
-			suma += factor * RGB_ALPHA(pix1);
+			sumr += factor * pix1.r();
+			sumg += factor * pix1.g();
+			sumb += factor * pix1.b();
+			suma += factor * pix1.a();
 
 			/* contributions from pixel 2 (bottom,left) */
 			factor = (0x1000 - curx) * cury;
-			sumr += factor * RGB_RED(pix2);
-			sumg += factor * RGB_GREEN(pix2);
-			sumb += factor * RGB_BLUE(pix2);
-			suma += factor * RGB_ALPHA(pix2);
+			sumr += factor * pix2.r();
+			sumg += factor * pix2.g();
+			sumb += factor * pix2.b();
+			suma += factor * pix2.a();
 
 			/* contributions from pixel 3 (bottom,right) */
 			factor = curx * cury;
-			sumr += factor * RGB_RED(pix3);
-			sumg += factor * RGB_GREEN(pix3);
-			sumb += factor * RGB_BLUE(pix3);
-			suma += factor * RGB_ALPHA(pix3);
+			sumr += factor * pix3.r();
+			sumg += factor * pix3.g();
+			sumb += factor * pix3.b();
+			suma += factor * pix3.a();
 
 			/* apply scaling */
 			suma = (suma >> 24) * a / 256;
@@ -263,15 +246,15 @@ static void resample_argb_bitmap_bilinear(UINT32 *dest, UINT32 drowpixels, UINT3
 			/* if we're translucent, add in the destination pixel contribution */
 			if (a < 256)
 			{
-				UINT32 dpix = dest[y * drowpixels + x];
-				suma += RGB_ALPHA(dpix) * (256 - a);
-				sumr += RGB_RED(dpix) * (256 - a);
-				sumg += RGB_GREEN(dpix) * (256 - a);
-				sumb += RGB_BLUE(dpix) * (256 - a);
+				rgb_t dpix = dest[y * drowpixels + x];
+				suma += dpix.a() * (256 - a);
+				sumr += dpix.r() * (256 - a);
+				sumg += dpix.g() * (256 - a);
+				sumb += dpix.b() * (256 - a);
 			}
 
 			/* store the target pixel, dividing the RGBA values by the overall scale factor */
-			dest[y * drowpixels + x] = MAKE_ARGB(suma, sumr, sumg, sumb);
+			dest[y * drowpixels + x] = rgb_t(suma, sumr, sumg, sumb);
 		}
 	}
 }
@@ -633,7 +616,7 @@ static bool copy_png_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 				/* determine alpha and expand to 32bpp */
 				UINT8 alpha = (*src < png->num_trans) ? png->trans[*src] : 0xff;
 				accumalpha &= alpha;
-				bitmap.pix32(y, x) = MAKE_ARGB(alpha, png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]);
+				bitmap.pix32(y, x) = rgb_t(alpha, png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]);
 			}
 	}
 
@@ -644,7 +627,7 @@ static bool copy_png_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 		src = png->image;
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src++)
-				bitmap.pix32(y, x) = MAKE_ARGB(0xff, *src, *src, *src);
+				bitmap.pix32(y, x) = rgb_t(0xff, *src, *src, *src);
 	}
 
 	/* handle 32bpp non-alpha case */
@@ -654,7 +637,7 @@ static bool copy_png_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 		src = png->image;
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src += 3)
-				bitmap.pix32(y, x) = MAKE_ARGB(0xff, src[0], src[1], src[2]);
+				bitmap.pix32(y, x) = rgb_t(0xff, src[0], src[1], src[2]);
 	}
 
 	/* handle 32bpp alpha case */
@@ -666,7 +649,7 @@ static bool copy_png_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 			for (x = 0; x < png->width; x++, src += 4)
 			{
 				accumalpha &= src[3];
-				bitmap.pix32(y, x) = MAKE_ARGB(src[3], src[0], src[1], src[2]);
+				bitmap.pix32(y, x) = rgb_t(src[3], src[0], src[1], src[2]);
 			}
 	}
 
@@ -695,9 +678,9 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 			for (x = 0; x < png->width; x++, src++)
 			{
 				rgb_t pixel = bitmap.pix32(y, x);
-				UINT8 alpha = compute_brightness(MAKE_RGB(png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]));
+				UINT8 alpha = rgb_t(png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]).brightness();
 				accumalpha &= alpha;
-				bitmap.pix32(y, x) = MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
+				bitmap.pix32(y, x) = rgb_t(alpha, pixel.r(), pixel.g(), pixel.b());
 			}
 	}
 
@@ -711,7 +694,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 			{
 				rgb_t pixel = bitmap.pix32(y, x);
 				accumalpha &= *src;
-				bitmap.pix32(y, x) = MAKE_ARGB(*src, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
+				bitmap.pix32(y, x) = rgb_t(*src, pixel.r(), pixel.g(), pixel.b());
 			}
 	}
 
@@ -724,9 +707,9 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 			for (x = 0; x < png->width; x++, src += 3)
 			{
 				rgb_t pixel = bitmap.pix32(y, x);
-				UINT8 alpha = compute_brightness(MAKE_RGB(src[0], src[1], src[2]));
+				UINT8 alpha = rgb_t(src[0], src[1], src[2]).brightness();
 				accumalpha &= alpha;
-				bitmap.pix32(y, x) = MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
+				bitmap.pix32(y, x) = rgb_t(alpha, pixel.r(), pixel.g(), pixel.b());
 			}
 	}
 
@@ -739,9 +722,9 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 			for (x = 0; x < png->width; x++, src += 4)
 			{
 				rgb_t pixel = bitmap.pix32(y, x);
-				UINT8 alpha = compute_brightness(MAKE_RGB(src[0], src[1], src[2]));
+				UINT8 alpha = rgb_t(src[0], src[1], src[2]).brightness();
 				accumalpha &= alpha;
-				bitmap.pix32(y, x) = MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
+				bitmap.pix32(y, x) = rgb_t(alpha, pixel.r(), pixel.g(), pixel.b());
 			}
 	}
 

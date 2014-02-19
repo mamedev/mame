@@ -73,9 +73,9 @@ The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and 
 #define PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(DEST, PRIORITY, SOURCE)                             \
 do                                                                                                  \
 {                                                                                                   \
-	UINT32 srcdata = (SOURCE);                                                                      \
+	rgb_t srcdata = (SOURCE);                                                                      \
 	if (srcdata != transpen)                                                                        \
-		(DEST) = alpha_blend_r32((DEST), srcdata, RGB_ALPHA(srcdata));                              \
+		(DEST) = alpha_blend_r32((DEST), srcdata, srcdata.a());                              \
 }                                                                                                   \
 while (0)
 // take RGB pixel with separate alpha and blend in to RGB32 bitmap

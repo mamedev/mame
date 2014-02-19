@@ -548,7 +548,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT16 pixdata = texsrc[x];
-					alpha &= dest[x] = MAKE_ARGB(pal1bit(~pixdata >> 15), pal5bit(pixdata >> 10), pal5bit(pixdata >> 5), pal5bit(pixdata >> 0));
+					alpha &= dest[x] = rgb_t(pal1bit(~pixdata >> 15), pal5bit(pixdata >> 10), pal5bit(pixdata >> 5), pal5bit(pixdata >> 0));
 				}
 				break;
 
@@ -556,7 +556,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT8 grayvalue = pal4bit(texsrc[x] >> 0);
-					alpha &= dest[x] = MAKE_ARGB(0xff, grayvalue, grayvalue, grayvalue);
+					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
 				}
 				break;
 
@@ -564,7 +564,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT8 grayvalue = pal4bit(texsrc[x] >> 4);
-					alpha &= dest[x] = MAKE_ARGB(0xff, grayvalue, grayvalue, grayvalue);
+					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
 				}
 				break;
 
@@ -572,7 +572,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT8 grayvalue = pal4bit(texsrc[x] >> 8);
-					alpha &= dest[x] = MAKE_ARGB(0xff, grayvalue, grayvalue, grayvalue);
+					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
 				}
 				break;
 
@@ -580,7 +580,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT8 pixdata = texsrc[x / 2] >> ((~x & 1) * 8);
-					alpha &= dest[x] = MAKE_ARGB(pal4bit(pixdata >> 4), pal4bit(~pixdata), pal4bit(~pixdata), pal4bit(~pixdata));
+					alpha &= dest[x] = rgb_t(pal4bit(pixdata >> 4), pal4bit(~pixdata), pal4bit(~pixdata), pal4bit(~pixdata));
 				}
 				break;
 
@@ -588,7 +588,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT8 grayvalue = texsrc[x / 2] >> ((~x & 1) * 8);
-					alpha &= dest[x] = MAKE_ARGB(0xff, grayvalue, grayvalue, grayvalue);
+					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
 				}
 				break;
 
@@ -596,7 +596,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT8 grayvalue = pal4bit(texsrc[x] >> 12);
-					alpha &= dest[x] = MAKE_ARGB(0xff, grayvalue, grayvalue, grayvalue);
+					alpha &= dest[x] = rgb_t(0xff, grayvalue, grayvalue, grayvalue);
 				}
 				break;
 
@@ -604,7 +604,7 @@ static cached_texture *get_texture(running_machine &machine, int page, int texx,
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT16 pixdata = texsrc[x];
-					alpha &= dest[x] = MAKE_ARGB(pal4bit(pixdata >> 0), pal4bit(pixdata >> 12), pal4bit(pixdata >> 8), pal4bit(pixdata >> 4));
+					alpha &= dest[x] = rgb_t(pal4bit(pixdata >> 0), pal4bit(pixdata >> 12), pal4bit(pixdata >> 8), pal4bit(pixdata >> 4));
 				}
 				break;
 		}

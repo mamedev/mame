@@ -50,10 +50,10 @@
 
 void canyon_state::palette_init()
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0x80, 0x80, 0x80)); /* GREY  */
-	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x00, 0x00)); /* BLACK */
-	palette_set_color(machine(), 2, MAKE_RGB(0x80, 0x80, 0x80)); /* GREY  */
-	palette_set_color(machine(), 3, MAKE_RGB(0xff, 0xff, 0xff)); /* WHITE */
+	palette_set_color(machine(), 0, rgb_t(0x80, 0x80, 0x80)); /* GREY  */
+	palette_set_color(machine(), 1, rgb_t(0x00, 0x00, 0x00)); /* BLACK */
+	palette_set_color(machine(), 2, rgb_t(0x80, 0x80, 0x80)); /* GREY  */
+	palette_set_color(machine(), 3, rgb_t(0xff, 0xff, 0xff)); /* WHITE */
 }
 
 

@@ -155,7 +155,7 @@ void tankbust_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		r = 0x55 * bit0 + 0xaa * bit1;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 	}
 }
 

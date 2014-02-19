@@ -2046,7 +2046,7 @@ void namcos22_state::update_palette()
 				int r = nthbyte(m_paletteram, which + 0x00000);
 				int g = nthbyte(m_paletteram, which + 0x08000);
 				int b = nthbyte(m_paletteram, which + 0x10000);
-				palette_set_color(machine(), which, MAKE_RGB(r, g, b));
+				palette_set_color(machine(), which, rgb_t(r, g, b));
 			}
 			m_dirtypal[i] = 0;
 		}

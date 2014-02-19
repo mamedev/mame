@@ -1849,10 +1849,10 @@ void busicom_state::palette_init()
 {
 	int i;
 	for(i=0;i<8;i++) {
-		palette_set_color( machine(), i, MAKE_RGB(color[i],color[i],color[i]) );
+		palette_set_color( machine(), i, rgb_t(color[i],color[i],color[i]) );
 	}
-	palette_set_color( machine(), 8, MAKE_RGB(0xff,0xff,0xff) );
+	palette_set_color( machine(), 8, rgb_t(0xff,0xff,0xff) );
 	for(i=0;i<7;i++) {
-		palette_set_color( machine(), i+9, MAKE_RGB(color_red[i],0x00,0x00) );
+		palette_set_color( machine(), i+9, rgb_t(color_red[i],0x00,0x00) );
 	}
 }

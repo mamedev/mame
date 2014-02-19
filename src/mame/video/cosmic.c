@@ -90,7 +90,7 @@ PALETTE_INIT_MEMBER(cosmic_state,panic)
 		int g = pal1bit(i >> 1);
 		int b = ((i & 0x0c) == 0x08) ? 0xaa : pal1bit(i >> 2);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	/* background uses colors 0x00-0x0f */
@@ -128,7 +128,7 @@ PALETTE_INIT_MEMBER(cosmic_state,cosmica)
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x08; i++)
 	{
-		rgb_t color = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		rgb_t color = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 		colortable_palette_set_color(machine().colortable, i, color);
 	}
 
@@ -170,7 +170,7 @@ PALETTE_INIT_MEMBER(cosmic_state,cosmicg)
 		int g = 0xaa * ((i >> 1) & 1);
 		int b = 0xaa * ((i >> 2) & 1);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 
 	m_map_color = cosmicg_map_color;
@@ -192,7 +192,7 @@ PALETTE_INIT_MEMBER(cosmic_state,magspot)
 		int g = pal1bit(i >> 1);
 		int b = pal1bit(i >> 2);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	/* background uses colors 0x00-0x0f */
@@ -222,7 +222,7 @@ PALETTE_INIT_MEMBER(cosmic_state,nomnlnd)
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x10; i++)
 	{
-		rgb_t color = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		rgb_t color = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 		colortable_palette_set_color(machine().colortable, i, color);
 	}
 

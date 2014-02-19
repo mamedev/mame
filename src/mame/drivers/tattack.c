@@ -194,8 +194,8 @@ void tattack_state::palette_init()
 		else
 			r=g=b=128;
 
-		palette_set_color(machine(),2*i,MAKE_RGB(0x00,0x00,0x00));
-		palette_set_color(machine(),2*i+1,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),2*i,rgb_t(0x00,0x00,0x00));
+		palette_set_color(machine(),2*i+1,rgb_t(r,g,b));
 	}
 }
 

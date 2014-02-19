@@ -55,7 +55,7 @@ PALETTE_INIT_MEMBER(snk6502_state,snk6502)
 
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		m_palette[i] = MAKE_RGB(r, g, b);
+		m_palette[i] = rgb_t(r, g, b);
 
 		color_prom++;
 	}
@@ -226,7 +226,7 @@ PALETTE_INIT_MEMBER(snk6502_state,satansat)
 
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		m_palette[i] = MAKE_RGB(r, g, b);
+		m_palette[i] = rgb_t(r, g, b);
 
 		color_prom++;
 	}

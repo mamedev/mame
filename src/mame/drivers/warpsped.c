@@ -294,8 +294,8 @@ GFXDECODE_END
 void warpspeed_state::palette_init()
 {
 	// tilemaps
-	palette_set_color(machine(),0,RGB_BLACK); /* black */
-	palette_set_color(machine(),1,RGB_WHITE); /* white */
+	palette_set_color(machine(),0,rgb_t::black); /* black */
+	palette_set_color(machine(),1,rgb_t::white); /* white */
 
 	// circles
 	for ( int i = 0; i < 8; i++ )

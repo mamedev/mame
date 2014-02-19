@@ -862,22 +862,22 @@ INPUT_PORTS_END
 
 static const UINT32 vtech1_palette_mono[] =
 {
-	MAKE_RGB(131, 131, 131),
-	MAKE_RGB(211, 211, 211),
-	MAKE_RGB(29, 29, 29),
-	MAKE_RGB(76, 76, 76),
-	MAKE_RGB(213, 213, 213),
-	MAKE_RGB(167, 167, 167),
-	MAKE_RGB(105, 105, 105),
-	MAKE_RGB(136, 136, 136),
-	MAKE_RGB(0, 0, 0),
-	MAKE_RGB(131, 131, 131),
-	MAKE_RGB(0, 0, 0),
-	MAKE_RGB(213, 213, 213),
-	MAKE_RGB(37, 37, 37),
-	MAKE_RGB(133, 133, 133),
-	MAKE_RGB(28, 28, 28),
-	MAKE_RGB(193, 193, 193)
+	rgb_t(131, 131, 131),
+	rgb_t(211, 211, 211),
+	rgb_t(29, 29, 29),
+	rgb_t(76, 76, 76),
+	rgb_t(213, 213, 213),
+	rgb_t(167, 167, 167),
+	rgb_t(105, 105, 105),
+	rgb_t(136, 136, 136),
+	rgb_t(0, 0, 0),
+	rgb_t(131, 131, 131),
+	rgb_t(0, 0, 0),
+	rgb_t(213, 213, 213),
+	rgb_t(37, 37, 37),
+	rgb_t(133, 133, 133),
+	rgb_t(28, 28, 28),
+	rgb_t(193, 193, 193)
 };
 
 

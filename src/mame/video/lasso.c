@@ -60,7 +60,7 @@ rgb_t lasso_state::get_color( int data )
 	bit1 = (data >> 7) & 0x01;
 	b = 0x4f * bit0 + 0xa8 * bit1;
 
-	return MAKE_RGB(r, g, b);
+	return rgb_t(r, g, b);
 }
 
 

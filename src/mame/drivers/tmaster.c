@@ -636,7 +636,7 @@ WRITE16_MEMBER(tmaster_state::galgames_palette_data_w)
 		{
 			int palette_base;
 			for (palette_base = 0; palette_base < 0x1000; palette_base += 0x100)
-				palette_set_color(machine(), m_palette_offset + palette_base, MAKE_RGB(m_palette_data[0], m_palette_data[1], m_palette_data[2]));
+				palette_set_color(machine(), m_palette_offset + palette_base, rgb_t(m_palette_data[0], m_palette_data[1], m_palette_data[2]));
 			m_palette_index = 0;
 			m_palette_offset++;
 		}

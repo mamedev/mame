@@ -126,7 +126,7 @@ WRITE32_MEMBER(deco156_state::deco156_nonbuffered_palette_w)
 	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
 	r = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,rgb_t(r,g,b));
 }
 
 READ32_MEMBER(deco156_state::wcvol95_pf1_rowscroll_r){ return m_pf1_rowscroll[offset] ^ 0xffff0000; }

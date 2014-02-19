@@ -283,9 +283,9 @@ UINT32 wpc_dot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			for(bit=0;bit<8;bit++)  // bits
 			{
 				if(m_dmdram[offset] & (1<<bit))
-					col = MAKE_RGB(0xff,0xaa,0x00);
+					col = rgb_t(0xff,0xaa,0x00);
 				else
-					col = MAKE_RGB(0x00,0x00,0x00);
+					col = rgb_t(0x00,0x00,0x00);
 				bitmap.pix32(y,x+bit) = col;
 			}
 			offset++;

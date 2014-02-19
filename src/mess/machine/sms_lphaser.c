@@ -212,7 +212,7 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 			color = m_port->pixel_r();
 
 			/* reference: http://www.w3.org/TR/AERT#color-contrast */
-			brightness = (RGB_RED(color) * 0.299) + (RGB_GREEN(color) * 0.587) + (RGB_BLUE(color) * 0.114);
+			brightness = (color.r() * 0.299) + (color.g() * 0.587) + (color.b() * 0.114);
 			//printf ("color brightness: %2X for x %d y %d\n", brightness, beam_x, beam_y);
 
 			result = (brightness >= sensor_min_brightness) ? 0 : 1;

@@ -49,7 +49,7 @@ void m58_state::palette_init()
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r,g,b));
 	}
 
 	/* radar palette */
@@ -60,7 +60,7 @@ void m58_state::palette_init()
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		colortable_palette_set_color(machine().colortable, 256+i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable, 256+i, rgb_t(r,g,b));
 	}
 
 	/* compute palette information for sprites */
@@ -77,7 +77,7 @@ void m58_state::palette_init()
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		colortable_palette_set_color(machine().colortable, 256+256+i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable, 256+256+i, rgb_t(r,g,b));
 	}
 
 	/* character lookup table */

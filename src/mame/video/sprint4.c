@@ -14,12 +14,12 @@ void sprint4_state::palette_init()
 	/* allocate the colortable */
 	machine().colortable = colortable_alloc(machine(), 6);
 
-	colortable_palette_set_color(machine().colortable, 0, MAKE_RGB(0x00, 0x00, 0x00)); /* black  */
-	colortable_palette_set_color(machine().colortable, 1, MAKE_RGB(0xfc, 0xdf, 0x80)); /* peach  */
-	colortable_palette_set_color(machine().colortable, 2, MAKE_RGB(0xf0, 0x00, 0xf0)); /* violet */
-	colortable_palette_set_color(machine().colortable, 3, MAKE_RGB(0x00, 0xf0, 0x0f)); /* green  */
-	colortable_palette_set_color(machine().colortable, 4, MAKE_RGB(0x30, 0x4f, 0xff)); /* blue   */
-	colortable_palette_set_color(machine().colortable, 5, MAKE_RGB(0xff, 0xff, 0xff)); /* white  */
+	colortable_palette_set_color(machine().colortable, 0, rgb_t(0x00, 0x00, 0x00)); /* black  */
+	colortable_palette_set_color(machine().colortable, 1, rgb_t(0xfc, 0xdf, 0x80)); /* peach  */
+	colortable_palette_set_color(machine().colortable, 2, rgb_t(0xf0, 0x00, 0xf0)); /* violet */
+	colortable_palette_set_color(machine().colortable, 3, rgb_t(0x00, 0xf0, 0x0f)); /* green  */
+	colortable_palette_set_color(machine().colortable, 4, rgb_t(0x30, 0x4f, 0xff)); /* blue   */
+	colortable_palette_set_color(machine().colortable, 5, rgb_t(0xff, 0xff, 0xff)); /* white  */
 
 	colortable_entry_set_value(machine().colortable, 0, 0);
 	colortable_entry_set_value(machine().colortable, 2, 0);

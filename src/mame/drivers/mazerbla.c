@@ -328,7 +328,7 @@ WRITE8_MEMBER(mazerbla_state::cfb_backgnd_color_w)
 		bit0 = BIT(data, 0);
 		b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
 
-		palette_set_color(machine(), 255, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), 255, rgb_t(r, g, b));
 		//logerror("background color (port 01) write=%02x\n",data);
 	}
 }
@@ -674,7 +674,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 						b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
 
 						if ((x + y * 16) < 255)//keep color 255 free for use as background color
-							palette_set_color(machine(), x + y * 16, MAKE_RGB(r, g, b));
+							palette_set_color(machine(), x + y * 16, rgb_t(r, g, b));
 
 						m_lookup_ram[lookup_offs + x + y * 16] = colour;
 					}

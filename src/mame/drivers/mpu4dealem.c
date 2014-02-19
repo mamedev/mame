@@ -109,7 +109,7 @@ PALETTE_INIT_MEMBER(mpu4dealem_state,dealem)
 		bit1 = BIT(*color_prom,7);
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 		color_prom++;
 	}
 }

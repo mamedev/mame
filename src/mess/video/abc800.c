@@ -18,14 +18,14 @@
 
 static const rgb_t PALETTE[] =
 {
-	RGB_BLACK,
-	MAKE_RGB(0xff, 0x00, 0x00), // red
-	MAKE_RGB(0x00, 0xff, 0x00), // green
-	MAKE_RGB(0xff, 0xff, 0x00), // yellow
-	MAKE_RGB(0x00, 0x00, 0xff), // blue
-	MAKE_RGB(0xff, 0x00, 0xff), // magenta
-	MAKE_RGB(0x00, 0xff, 0xff), // cyan
-	RGB_WHITE
+	rgb_t::black,
+	rgb_t(0xff, 0x00, 0x00), // red
+	rgb_t(0x00, 0xff, 0x00), // green
+	rgb_t(0xff, 0xff, 0x00), // yellow
+	rgb_t(0x00, 0x00, 0xff), // blue
+	rgb_t(0xff, 0x00, 0xff), // magenta
+	rgb_t(0x00, 0xff, 0xff), // cyan
+	rgb_t::white
 };
 
 
@@ -101,7 +101,7 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 				if (color)
 				{
-					bool black = bitmap.pix32(y, x) == RGB_BLACK;
+					bool black = bitmap.pix32(y, x) == rgb_t::black;
 					bool opaque = !BIT(fgctl, 3);
 
 					if (black || opaque)
@@ -137,7 +137,7 @@ void abc800_state::video_start()
 UINT32 abc800c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// clear screen
-	bitmap.fill(RGB_BLACK, cliprect);
+	bitmap.fill(rgb_t::black, cliprect);
 
 	// draw text
 	if (!BIT(m_fgctl, 7))
@@ -295,7 +295,7 @@ UINT32 abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	screen.set_visible_area(0, 767, 0, 311);
 
 	// clear screen
-	bitmap.fill(RGB_BLACK, cliprect);
+	bitmap.fill(rgb_t::black, cliprect);
 
 	// draw HR graphics
 	hr_update(bitmap, cliprect);

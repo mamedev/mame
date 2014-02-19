@@ -42,7 +42,7 @@ void psychic5_state::psychic5_change_bg_palette(int color, int lo_offs, int hi_o
 	ib = pal4bit(m_palette_intensity >>  4);
 	ix = m_palette_intensity & 0x0f;
 
-	irgb = MAKE_RGB(ir,ig,ib);
+	irgb = rgb_t(ir,ig,ib);
 
 	lo = m_ps5_palette_ram[lo_offs];
 	hi = m_ps5_palette_ram[hi_offs];
@@ -57,7 +57,7 @@ void psychic5_state::psychic5_change_bg_palette(int color, int lo_offs, int hi_o
 	{
 		UINT8 val = (r + g + b) / 3;        /* Grey */
 		/* Just leave plain grey */
-		palette_set_color(machine(),color,jal_blend_func(MAKE_RGB(val,val,val),irgb,ix));
+		palette_set_color(machine(),color,jal_blend_func(rgb_t(val,val,val),irgb,ix));
 	}
 	else
 	{
@@ -65,7 +65,7 @@ void psychic5_state::psychic5_change_bg_palette(int color, int lo_offs, int hi_o
 		if (!(m_title_screen & 1))
 		{
 			/* Leave the world as-is */
-			palette_set_color(machine(),color,jal_blend_func(MAKE_RGB(r,g,b),irgb,ix));
+			palette_set_color(machine(),color,jal_blend_func(rgb_t(r,g,b),irgb,ix));
 		}
 	}
 }

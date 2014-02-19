@@ -204,7 +204,7 @@ WRITE16_MEMBER(nemesis_state::nemesis_palette_word_w)
 	bit5 = BIT(data, 14);
 	b = MULTIPLIER;
 
-	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset, rgb_t(r, g, b));
 }
 
 WRITE16_MEMBER(nemesis_state::salamander_palette_word_w)

@@ -886,7 +886,7 @@ WRITE32_MEMBER(taito_f3_state::f3_palette_24bit_w)
 		b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 	}
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,rgb_t(r,g,b));
 }
 
 /******************************************************************************/

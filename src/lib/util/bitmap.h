@@ -152,8 +152,8 @@ public:
 
 	// operations
 	void set_palette(palette_t *palette);
-	void fill(rgb_t color) { fill(color, m_cliprect); }
-	void fill(rgb_t color, const rectangle &cliprect);
+	void fill(UINT32 color) { fill(color, m_cliprect); }
+	void fill(UINT32 color, const rectangle &cliprect);
 	void plot_box(int x, int y, int width, int height, UINT32 color)
 	{
 		rectangle clip(x, x + width - 1, y, y + height - 1);

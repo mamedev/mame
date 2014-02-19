@@ -330,7 +330,7 @@ INLINE void gsp_palette_change(running_machine &machine, int offset)
 	int red = (state->m_gsp_paletteram_lo[offset] >> 8) & 0xff;
 	int green = state->m_gsp_paletteram_lo[offset] & 0xff;
 	int blue = state->m_gsp_paletteram_hi[offset] & 0xff;
-	palette_set_color(machine, offset, MAKE_RGB(red, green, blue));
+	palette_set_color(machine, offset, rgb_t(red, green, blue));
 }
 
 
