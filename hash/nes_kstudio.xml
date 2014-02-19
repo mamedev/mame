@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="nes_kstudio" description="Nintendo Entertainment System - Karaoke Studio expansion cartridges">
+
+
+	<software name="top20v1" supported="partial">
+		<description>Karaoke Studio - Senyou Cassette - Top Hit 20 Vol. 1 (Jpn)</description>
+		<year>1987</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="BA-KARAOKE-VOL1"/>
+		<info name="release" value="19871001"/>
+		<info name="alt_title" value="カラオケスタジオ 専用カセット トップヒット20 VOL. 1"/>
+		<part name="cart" interface="ks_cart">
+			<feature name="slot" value="ks_exp" />
+			<dataarea name="rom" size="131072">
+				<rom name="karaoke studio senyou cassette vol. 1 (japan).prg" size="131072" crc="7dda2982" sha1="4a5f9af0a810dba95a2ba82c4c23a07adbbe845f" offset="0000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="top20v2" supported="partial">
+		<description>Karaoke Studio - Senyou Cassette - Top Hit 20 Vol. 2 (Jpn)</description>
+		<year>1988</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="BA-KARAOKE-VOL2"/>
+		<info name="release" value="19880218"/>
+		<info name="alt_title" value="カラオケスタジオ 専用カセット トップヒット20 VOL. 2"/>
+		<part name="cart" interface="ks_cart">
+			<feature name="slot" value="ks_exp" />
+			<dataarea name="rom" size="131072">
+				<rom name="karaoke studio senyou cassette vol. 2 (japan).prg" size="131072" crc="66473923" sha1="8a64ac421c82c8bc0c47e8fb28890ba13a086d56" offset="0000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
