@@ -3,26 +3,26 @@
     FULLY TRUSTED
 */
 
-static UINT32 opBGT8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBGT8() /* TRUSTED */
 {
-	NORMALIZEFLAGS(cpustate);
+	NORMALIZEFLAGS();
 
-	if (!((cpustate->_S ^ cpustate->_OV) | cpustate->_Z))
+	if (!((_S ^ _OV) | _Z))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBGT16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBGT16() /* TRUSTED */
 {
-	NORMALIZEFLAGS(cpustate);
+	NORMALIZEFLAGS();
 
-	if (!((cpustate->_S ^ cpustate->_OV) | cpustate->_Z))
+	if (!((_S ^ _OV) | _Z))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
@@ -30,52 +30,52 @@ static UINT32 opBGT16(v60_state *cpustate) /* TRUSTED */
 }
 
 
-static UINT32 opBGE8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBGE8() /* TRUSTED */
 {
-	NORMALIZEFLAGS(cpustate);
+	NORMALIZEFLAGS();
 
-	if (!(cpustate->_S ^ cpustate->_OV))
+	if (!(_S ^ _OV))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBGE16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBGE16() /* TRUSTED */
 {
-	NORMALIZEFLAGS(cpustate);
+	NORMALIZEFLAGS();
 
-	if (!(cpustate->_S ^ cpustate->_OV))
+	if (!(_S ^ _OV))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
 	return 3;
 }
 
-static UINT32 opBLT8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBLT8() /* TRUSTED */
 {
-	NORMALIZEFLAGS(cpustate);
+	NORMALIZEFLAGS();
 
-	if ((cpustate->_S ^ cpustate->_OV))
+	if ((_S ^ _OV))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBLT16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBLT16() /* TRUSTED */
 {
-	NORMALIZEFLAGS(cpustate);
+	NORMALIZEFLAGS();
 
-	if ((cpustate->_S ^ cpustate->_OV))
+	if ((_S ^ _OV))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
@@ -83,271 +83,271 @@ static UINT32 opBLT16(v60_state *cpustate) /* TRUSTED */
 }
 
 
-static UINT32 opBLE8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBLE8() /* TRUSTED */
 {
-	NORMALIZEFLAGS(cpustate);
+	NORMALIZEFLAGS();
 
-	if (((cpustate->_S ^ cpustate->_OV) | cpustate->_Z))
+	if (((_S ^ _OV) | _Z))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBLE16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBLE16() /* TRUSTED */
 {
-	NORMALIZEFLAGS(cpustate);
+	NORMALIZEFLAGS();
 
-	if (((cpustate->_S ^ cpustate->_OV) | cpustate->_Z))
+	if (((_S ^ _OV) | _Z))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
 	return 3;
 }
 
-static UINT32 opBH8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBH8() /* TRUSTED */
 {
-	if (!(cpustate->_CY | cpustate->_Z))
+	if (!(_CY | _Z))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBH16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBH16() /* TRUSTED */
 {
-	if (!(cpustate->_CY | cpustate->_Z))
+	if (!(_CY | _Z))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
 	return 3;
 }
 
-static UINT32 opBNH8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBNH8() /* TRUSTED */
 {
-	if ((cpustate->_CY | cpustate->_Z))
+	if ((_CY | _Z))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBNH16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBNH16() /* TRUSTED */
 {
-	if ((cpustate->_CY | cpustate->_Z))
+	if ((_CY | _Z))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
 	return 3;
 }
 
-static UINT32 opBNL8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBNL8() /* TRUSTED */
 {
-	if (!(cpustate->_CY))
+	if (!(_CY))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBNL16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBNL16() /* TRUSTED */
 {
-	if (!(cpustate->_CY))
+	if (!(_CY))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
 	return 3;
 }
 
-static UINT32 opBL8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBL8() /* TRUSTED */
 {
-	if ((cpustate->_CY))
+	if ((_CY))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBL16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBL16() /* TRUSTED */
 {
-	if ((cpustate->_CY))
+	if ((_CY))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
 	return 3;
 }
 
-static UINT32 opBNE8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBNE8() /* TRUSTED */
 {
-	if (!(cpustate->_Z))
+	if (!(_Z))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBNE16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBNE16() /* TRUSTED */
 {
-	if (!(cpustate->_Z))
+	if (!(_Z))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
 	return 3;
 }
 
-static UINT32 opBE8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBE8() /* TRUSTED */
 {
-	if ((cpustate->_Z))
+	if ((_Z))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBE16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBE16() /* TRUSTED */
 {
-	if ((cpustate->_Z))
+	if ((_Z))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
 	return 3;
 }
 
-static UINT32 opBNV8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBNV8() /* TRUSTED */
 {
-	if (!(cpustate->_OV))
+	if (!(_OV))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBNV16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBNV16() /* TRUSTED */
 {
-	if (!(cpustate->_OV))
+	if (!(_OV))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
 	return 3;
 }
 
-static UINT32 opBV8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBV8() /* TRUSTED */
 {
-	if ((cpustate->_OV))
+	if ((_OV))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBV16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBV16() /* TRUSTED */
 {
-	if ((cpustate->_OV))
+	if ((_OV))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
 	return 3;
 }
 
-static UINT32 opBP8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBP8() /* TRUSTED */
 {
-	if (!(cpustate->_S))
+	if (!(_S))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBP16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBP16() /* TRUSTED */
 {
-	if (!(cpustate->_S))
+	if (!(_S))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
 	return 3;
 }
 
-static UINT32 opBN8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBN8() /* TRUSTED */
 {
-	if ((cpustate->_S))
+	if ((_S))
 	{
-		cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+		PC += (INT8)OpRead8(PC + 1);
 		return 0;
 	}
 
 	return 2;
 }
 
-static UINT32 opBN16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBN16() /* TRUSTED */
 {
-	if ((cpustate->_S))
+	if ((_S))
 	{
-		cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+		PC += (INT16)OpRead16(PC + 1);
 		return 0;
 	}
 
 	return 3;
 }
 
-static UINT32 opBR8(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBR8() /* TRUSTED */
 {
-	cpustate->PC += (INT8)OpRead8(cpustate, cpustate->PC + 1);
+	PC += (INT8)OpRead8(PC + 1);
 	return 0;
 }
 
-static UINT32 opBR16(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBR16() /* TRUSTED */
 {
-	cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+	PC += (INT16)OpRead16(PC + 1);
 	return 0;
 }
 
-static UINT32 opBSR(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opBSR() /* TRUSTED */
 {
-	// Save Next cpustate->PC onto the stack
-	cpustate->SP -= 4;
-	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->PC + 3);
+	// Save Next PC onto the stack
+	SP -= 4;
+	m_program->write_dword_unaligned(SP, PC + 3);
 
 	// Jump to subroutine
-	cpustate->PC += (INT16)OpRead16(cpustate, cpustate->PC + 1);
+	PC += (INT16)OpRead16(PC + 1);
 	return 0;
 }

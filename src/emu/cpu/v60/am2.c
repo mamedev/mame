@@ -2,692 +2,692 @@
 // AM2 Functions (for ReadAMAddress)
 // *********************************
 
-static UINT32 am2Register(v60_state *cpustate)
+UINT32 v60_device::am2Register()
 {
-	cpustate->amflag = 1;
-	cpustate->amout = cpustate->modval & 0x1F;
+	m_amflag = 1;
+	m_amout = m_modval & 0x1F;
 	return 1;
 }
 
-static UINT32 am2RegisterIndirect(v60_state *cpustate)
+UINT32 v60_device::am2RegisterIndirect()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = m_reg[m_modval & 0x1F];
 	return 1;
 }
 
-static UINT32 bam2RegisterIndirect(v60_state *cpustate)
+UINT32 v60_device::bam2RegisterIndirect()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
-	cpustate->bamoffset = 0;
+	m_amflag = 0;
+	m_amout = m_reg[m_modval & 0x1F];
+	m_bamoffset = 0;
 	return 1;
 }
 
-static UINT32 am2RegisterIndirectIndexed(v60_state *cpustate)
+UINT32 v60_device::am2RegisterIndirectIndexed()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = m_reg[m_modval2 & 0x1F] + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = m_reg[m_modval2 & 0x1F] + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = m_reg[m_modval2 & 0x1F] + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = m_reg[m_modval2 & 0x1F] + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 2;
 }
 
-static UINT32 bam2RegisterIndirectIndexed(v60_state *cpustate)
+UINT32 v60_device::bam2RegisterIndirectIndexed()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F];
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = m_reg[m_modval2 & 0x1F];
+	m_bamoffset = m_reg[m_modval & 0x1F];
 	return 2;
 }
 
-static UINT32 am2Autoincrement(v60_state *cpustate)
+UINT32 v60_device::am2Autoincrement()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = m_reg[m_modval & 0x1F];
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->reg[cpustate->modval & 0x1F] += 1;
+		m_reg[m_modval & 0x1F] += 1;
 		break;
 	case 1:
-		cpustate->reg[cpustate->modval & 0x1F] += 2;
+		m_reg[m_modval & 0x1F] += 2;
 		break;
 	case 2:
-		cpustate->reg[cpustate->modval & 0x1F] += 4;
+		m_reg[m_modval & 0x1F] += 4;
 		break;
 	case 3:
-		cpustate->reg[cpustate->modval & 0x1F] += 8;
+		m_reg[m_modval & 0x1F] += 8;
 		break;
 	}
 
 	return 1;
 }
 
-static UINT32 bam2Autoincrement(v60_state *cpustate)
+UINT32 v60_device::bam2Autoincrement()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
-	cpustate->bamoffset = 0;
+	m_amflag = 0;
+	m_amout = m_reg[m_modval & 0x1F];
+	m_bamoffset = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 10:
-		cpustate->reg[cpustate->modval & 0x1F] +=1;
+		m_reg[m_modval & 0x1F] +=1;
 		break;
 	case 11:
-		cpustate->reg[cpustate->modval & 0x1F] +=4;
+		m_reg[m_modval & 0x1F] +=4;
 		break;
 	default:
-		fatalerror("CPU - AM2 - 7 (t0 cpustate->PC=%x)\n", cpustate->PC);
+		fatalerror("CPU - AM2 - 7 (t0 PC=%x)\n", PC);
 		break;
 	}
 
 	return 1;
 }
 
-static UINT32 am2Autodecrement(v60_state *cpustate)
+UINT32 v60_device::am2Autodecrement()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->reg[cpustate->modval & 0x1F] -= 1;
+		m_reg[m_modval & 0x1F] -= 1;
 		break;
 	case 1:
-		cpustate->reg[cpustate->modval & 0x1F] -= 2;
+		m_reg[m_modval & 0x1F] -= 2;
 		break;
 	case 2:
-		cpustate->reg[cpustate->modval & 0x1F] -= 4;
+		m_reg[m_modval & 0x1F] -= 4;
 		break;
 	case 3:
-		cpustate->reg[cpustate->modval & 0x1F] -= 8;
+		m_reg[m_modval & 0x1F] -= 8;
 		break;
 	}
 
-	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
+	m_amout = m_reg[m_modval & 0x1F];
 	return 1;
 }
 
-static UINT32 bam2Autodecrement(v60_state *cpustate)
+UINT32 v60_device::bam2Autodecrement()
 {
-	cpustate->amflag = 0;
-	cpustate->bamoffset = 0;
+	m_amflag = 0;
+	m_bamoffset = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 10:
-		cpustate->reg[cpustate->modval & 0x1F]-=1;
+		m_reg[m_modval & 0x1F]-=1;
 		break;
 	case 11:
-		cpustate->reg[cpustate->modval & 0x1F]-=4;
+		m_reg[m_modval & 0x1F]-=4;
 		break;
 	default:
-		fatalerror("CPU - BAM2 - 7 (cpustate->PC=%06x)\n", cpustate->PC);
+		fatalerror("CPU - BAM2 - 7 (PC=%06x)\n", PC);
 		break;
 	}
 
-	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
+	m_amout = m_reg[m_modval & 0x1F];
 	return 1;
 }
 
 
-static UINT32 am2Displacement8(v60_state *cpustate)
+UINT32 v60_device::am2Displacement8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1);
+	m_amflag = 0;
+	m_amout = m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1);
 
 	return 2;
 }
 
-static UINT32 bam2Displacement8(v60_state *cpustate)
+UINT32 v60_device::bam2Displacement8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
-	cpustate->bamoffset = (INT8)OpRead8(cpustate, cpustate->modadd + 1);
+	m_amflag = 0;
+	m_amout = m_reg[m_modval & 0x1F];
+	m_bamoffset = (INT8)OpRead8(m_modadd + 1);
 
 	return 2;
 }
 
-static UINT32 am2Displacement16(v60_state *cpustate)
+UINT32 v60_device::am2Displacement16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1);
+	m_amflag = 0;
+	m_amout = m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1);
 
 	return 3;
 }
 
-static UINT32 bam2Displacement16(v60_state *cpustate)
+UINT32 v60_device::bam2Displacement16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
-	cpustate->bamoffset = (INT16)OpRead16(cpustate, cpustate->modadd + 1);
+	m_amflag = 0;
+	m_amout = m_reg[m_modval & 0x1F];
+	m_bamoffset = (INT16)OpRead16(m_modadd + 1);
 
 	return 3;
 }
 
-static UINT32 am2Displacement32(v60_state *cpustate)
+UINT32 v60_device::am2Displacement32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1);
+	m_amflag = 0;
+	m_amout = m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1);
 
 	return 5;
 }
 
-static UINT32 bam2Displacement32(v60_state *cpustate)
+UINT32 v60_device::bam2Displacement32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
-	cpustate->bamoffset = OpRead32(cpustate, cpustate->modadd + 1);
+	m_amflag = 0;
+	m_amout = m_reg[m_modval & 0x1F];
+	m_bamoffset = OpRead32(m_modadd + 1);
 
 	return 5;
 }
 
-static UINT32 am2DisplacementIndexed8(v60_state *cpustate)
+UINT32 v60_device::am2DisplacementIndexed8()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 bam2DisplacementIndexed8(v60_state *cpustate)
+UINT32 v60_device::bam2DisplacementIndexed8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2);
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2);
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 3;
 }
 
-static UINT32 am2DisplacementIndexed16(v60_state *cpustate)
+UINT32 v60_device::am2DisplacementIndexed16()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 4;
 }
 
-static UINT32 bam2DisplacementIndexed16(v60_state *cpustate)
+UINT32 v60_device::bam2DisplacementIndexed16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2);
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2);
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 4;
 }
 
-static UINT32 am2DisplacementIndexed32(v60_state *cpustate)
+UINT32 v60_device::am2DisplacementIndexed32()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 bam2DisplacementIndexed32(v60_state *cpustate)
+UINT32 v60_device::bam2DisplacementIndexed32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2);
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2);
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 6;
 }
 
-static UINT32 am2PCDisplacement8(v60_state *cpustate)
+UINT32 v60_device::am2PCDisplacement8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1);
+	m_amflag = 0;
+	m_amout = PC + (INT8)OpRead8(m_modadd + 1);
 
 	return 2;
 }
 
-static UINT32 bam2PCDisplacement8(v60_state *cpustate)
+UINT32 v60_device::bam2PCDisplacement8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->PC;
-	cpustate->bamoffset = (INT8)OpRead8(cpustate, cpustate->modadd + 1);
+	m_amflag = 0;
+	m_amout = PC;
+	m_bamoffset = (INT8)OpRead8(m_modadd + 1);
 
 	return 2;
 }
 
-static UINT32 am2PCDisplacement16(v60_state *cpustate)
+UINT32 v60_device::am2PCDisplacement16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1);
+	m_amflag = 0;
+	m_amout = PC + (INT16)OpRead16(m_modadd + 1);
 
 	return 3;
 }
 
-static UINT32 bam2PCDisplacement16(v60_state *cpustate)
+UINT32 v60_device::bam2PCDisplacement16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->PC;
-	cpustate->bamoffset = (INT16)OpRead16(cpustate, cpustate->modadd + 1);
+	m_amflag = 0;
+	m_amout = PC;
+	m_bamoffset = (INT16)OpRead16(m_modadd + 1);
 
 	return 3;
 }
 
-static UINT32 am2PCDisplacement32(v60_state *cpustate)
+UINT32 v60_device::am2PCDisplacement32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1);
+	m_amflag = 0;
+	m_amout = PC + OpRead32(m_modadd + 1);
 
 	return 5;
 }
 
-static UINT32 bam2PCDisplacement32(v60_state *cpustate)
+UINT32 v60_device::bam2PCDisplacement32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->PC;
-	cpustate->bamoffset = OpRead32(cpustate, cpustate->modadd + 1);
+	m_amflag = 0;
+	m_amout = PC;
+	m_bamoffset = OpRead32(m_modadd + 1);
 
 	return 5;
 }
 
 
-static UINT32 am2PCDisplacementIndexed8(v60_state *cpustate)
+UINT32 v60_device::am2PCDisplacementIndexed8()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = PC + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = PC + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = PC + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = PC + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 bam2PCDisplacementIndexed8(v60_state *cpustate)
+UINT32 v60_device::bam2PCDisplacementIndexed8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2);
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = PC + (INT8)OpRead8(m_modadd + 2);
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 3;
 }
 
-static UINT32 am2PCDisplacementIndexed16(v60_state *cpustate)
+UINT32 v60_device::am2PCDisplacementIndexed16()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = PC + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = PC + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = PC + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = PC + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 4;
 }
 
-static UINT32 bam2PCDisplacementIndexed16(v60_state *cpustate)
+UINT32 v60_device::bam2PCDisplacementIndexed16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2);
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = PC + (INT16)OpRead16(m_modadd + 2);
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 4;
 }
 
-static UINT32 am2PCDisplacementIndexed32(v60_state *cpustate)
+UINT32 v60_device::am2PCDisplacementIndexed32()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = PC + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = PC + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = PC + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = PC + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 bam2PCDisplacementIndexed32(v60_state *cpustate)
+UINT32 v60_device::bam2PCDisplacementIndexed32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2);
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = PC + OpRead32(m_modadd + 2);
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 6;
 }
 
-static UINT32 am2DisplacementIndirect8(v60_state *cpustate)
+UINT32 v60_device::am2DisplacementIndirect8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1));
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1));
 
 	return 2;
 }
 
-static UINT32 bam2DisplacementIndirect8(v60_state *cpustate)
+UINT32 v60_device::bam2DisplacementIndirect8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1));
-	cpustate->bamoffset = 0;
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1));
+	m_bamoffset = 0;
 	return 2;
 }
 
-static UINT32 am2DisplacementIndirect16(v60_state *cpustate)
+UINT32 v60_device::am2DisplacementIndirect16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1));
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1));
 
 	return 3;
 }
 
-static UINT32 bam2DisplacementIndirect16(v60_state *cpustate)
+UINT32 v60_device::bam2DisplacementIndirect16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1));
-	cpustate->bamoffset = 0;
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1));
+	m_bamoffset = 0;
 	return 3;
 }
 
-static UINT32 am2DisplacementIndirect32(v60_state *cpustate)
+UINT32 v60_device::am2DisplacementIndirect32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1));
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1));
 
 	return 5;
 }
 
-static UINT32 bam2DisplacementIndirect32(v60_state *cpustate)
+UINT32 v60_device::bam2DisplacementIndirect32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1));
-	cpustate->bamoffset = 0;
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1));
+	m_bamoffset = 0;
 
 	return 5;
 }
 
-static UINT32 am2DisplacementIndirectIndexed8(v60_state *cpustate)
+UINT32 v60_device::am2DisplacementIndirectIndexed8()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 bam2DisplacementIndirectIndexed8(v60_state *cpustate)
+UINT32 v60_device::bam2DisplacementIndirectIndexed8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2));
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2));
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 3;
 }
 
-static UINT32 am2DisplacementIndirectIndexed16(v60_state *cpustate)
+UINT32 v60_device::am2DisplacementIndirectIndexed16()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 4;
 }
 
-static UINT32 bam2DisplacementIndirectIndexed16(v60_state *cpustate)
+UINT32 v60_device::bam2DisplacementIndirectIndexed16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2));
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2));
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 4;
 }
 
-static UINT32 am2DisplacementIndirectIndexed32(v60_state *cpustate)
+UINT32 v60_device::am2DisplacementIndirectIndexed32()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 bam2DisplacementIndirectIndexed32(v60_state *cpustate)
+UINT32 v60_device::bam2DisplacementIndirectIndexed32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2));
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2));
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 6;
 }
 
-static UINT32 am2PCDisplacementIndirect8(v60_state *cpustate)
+UINT32 v60_device::am2PCDisplacementIndirect8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1));
-
-	return 2;
-}
-
-static UINT32 bam2PCDisplacementIndirect8(v60_state *cpustate)
-{
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1));
-	cpustate->bamoffset = 0;
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1));
 
 	return 2;
 }
 
-static UINT32 am2PCDisplacementIndirect16(v60_state *cpustate)
+UINT32 v60_device::bam2PCDisplacementIndirect8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1));
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1));
+	m_bamoffset = 0;
+
+	return 2;
+}
+
+UINT32 v60_device::am2PCDisplacementIndirect16()
+{
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1));
 
 	return 3;
 }
 
-static UINT32 bam2PCDisplacementIndirect16(v60_state *cpustate)
+UINT32 v60_device::bam2PCDisplacementIndirect16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1));
-	cpustate->bamoffset = 0;
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1));
+	m_bamoffset = 0;
 
 	return 3;
 }
 
-static UINT32 am2PCDisplacementIndirect32(v60_state *cpustate)
+UINT32 v60_device::am2PCDisplacementIndirect32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1));
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1));
 
 	return 5;
 }
 
-static UINT32 bam2PCDisplacementIndirect32(v60_state *cpustate)
+UINT32 v60_device::bam2PCDisplacementIndirect32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1));
-	cpustate->bamoffset = 0;
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1));
+	m_bamoffset = 0;
 
 	return 5;
 }
 
-static UINT32 am2PCDisplacementIndirectIndexed8(v60_state *cpustate)
+UINT32 v60_device::am2PCDisplacementIndirectIndexed8()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 bam2PCDisplacementIndirectIndexed8(v60_state *cpustate)
+UINT32 v60_device::bam2PCDisplacementIndirectIndexed8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2));
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2));
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 3;
 }
 
-static UINT32 am2PCDisplacementIndirectIndexed16(v60_state *cpustate)
+UINT32 v60_device::am2PCDisplacementIndirectIndexed16()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
@@ -695,559 +695,559 @@ static UINT32 am2PCDisplacementIndirectIndexed16(v60_state *cpustate)
 }
 
 
-static UINT32 bam2PCDisplacementIndirectIndexed16(v60_state *cpustate)
+UINT32 v60_device::bam2PCDisplacementIndirectIndexed16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2));
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2));
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 4;
 }
 
 
-static UINT32 am2PCDisplacementIndirectIndexed32(v60_state *cpustate)
+UINT32 v60_device::am2PCDisplacementIndirectIndexed32()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 bam2PCDisplacementIndirectIndexed32(v60_state *cpustate)
+UINT32 v60_device::bam2PCDisplacementIndirectIndexed32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2));
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 2));
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 6;
 }
 
-static UINT32 am2DoubleDisplacement8(v60_state *cpustate)
+UINT32 v60_device::am2DoubleDisplacement8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1)) + (INT8)OpRead8(cpustate, cpustate->modadd + 2);
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1)) + (INT8)OpRead8(m_modadd + 2);
 
 	return 3;
 }
 
-static UINT32 bam2DoubleDisplacement8(v60_state *cpustate)
+UINT32 v60_device::bam2DoubleDisplacement8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1));
-	cpustate->bamoffset = (INT8)OpRead8(cpustate, cpustate->modadd + 2);
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1));
+	m_bamoffset = (INT8)OpRead8(m_modadd + 2);
 
 	return 3;
 }
 
-static UINT32 am2DoubleDisplacement16(v60_state *cpustate)
+UINT32 v60_device::am2DoubleDisplacement16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1)) + (INT16)OpRead16(cpustate, cpustate->modadd + 3);
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1)) + (INT16)OpRead16(m_modadd + 3);
 
 	return 5;
 }
 
-static UINT32 bam2DoubleDisplacement16(v60_state *cpustate)
+UINT32 v60_device::bam2DoubleDisplacement16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1));
-	cpustate->bamoffset = (INT8)OpRead8(cpustate, cpustate->modadd + 3);
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1));
+	m_bamoffset = (INT8)OpRead8(m_modadd + 3);
 
 	return 5;
 }
 
-static UINT32 am2DoubleDisplacement32(v60_state *cpustate)
+UINT32 v60_device::am2DoubleDisplacement32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1)) + OpRead32(cpustate, cpustate->modadd + 5);
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1)) + OpRead32(m_modadd + 5);
 
 	return 9;
 }
 
-static UINT32 bam2DoubleDisplacement32(v60_state *cpustate)
+UINT32 v60_device::bam2DoubleDisplacement32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1));
-	cpustate->bamoffset = OpRead32(cpustate, cpustate->modadd + 5);
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1));
+	m_bamoffset = OpRead32(m_modadd + 5);
 
 	return 9;
 }
 
 
-static UINT32 am2PCDoubleDisplacement8(v60_state *cpustate)
+UINT32 v60_device::am2PCDoubleDisplacement8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1)) + (INT8)OpRead8(cpustate, cpustate->modadd + 2);
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1)) + (INT8)OpRead8(m_modadd + 2);
 
 	return 3;
 }
 
-static UINT32 bam2PCDoubleDisplacement8(v60_state *cpustate)
+UINT32 v60_device::bam2PCDoubleDisplacement8()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1));
-	cpustate->bamoffset = (INT8)OpRead8(cpustate, cpustate->modadd + 2);
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1));
+	m_bamoffset = (INT8)OpRead8(m_modadd + 2);
 
 	return 3;
 }
 
-static UINT32 am2PCDoubleDisplacement16(v60_state *cpustate)
+UINT32 v60_device::am2PCDoubleDisplacement16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1)) + (INT16)OpRead16(cpustate, cpustate->modadd + 3);
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1)) + (INT16)OpRead16(m_modadd + 3);
 
 	return 5;
 }
 
-static UINT32 bam2PCDoubleDisplacement16(v60_state *cpustate)
+UINT32 v60_device::bam2PCDoubleDisplacement16()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1));
-	cpustate->bamoffset = (INT8)OpRead8(cpustate, cpustate->modadd + 3);
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1));
+	m_bamoffset = (INT8)OpRead8(m_modadd + 3);
 
 	return 5;
 }
 
-static UINT32 am2PCDoubleDisplacement32(v60_state *cpustate)
+UINT32 v60_device::am2PCDoubleDisplacement32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1)) + OpRead32(cpustate, cpustate->modadd + 5);
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1)) + OpRead32(m_modadd + 5);
 
 	return 9;
 }
 
-static UINT32 bam2PCDoubleDisplacement32(v60_state *cpustate)
+UINT32 v60_device::bam2PCDoubleDisplacement32()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1));
-	cpustate->bamoffset = OpRead32(cpustate, cpustate->modadd + 5);
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1));
+	m_bamoffset = OpRead32(m_modadd + 5);
 
 	return 9;
 }
 
-static UINT32 am2DirectAddress(v60_state *cpustate)
+UINT32 v60_device::am2DirectAddress()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = OpRead32(cpustate, cpustate->modadd + 1);
+	m_amflag = 0;
+	m_amout = OpRead32(m_modadd + 1);
 
 	return 5;
 }
 
-static UINT32 bam2DirectAddress(v60_state *cpustate)
+UINT32 v60_device::bam2DirectAddress()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = OpRead32(cpustate, cpustate->modadd + 1);
-	cpustate->bamoffset = 0;
+	m_amflag = 0;
+	m_amout = OpRead32(m_modadd + 1);
+	m_bamoffset = 0;
 
 	return 5;
 }
 
-static UINT32 am2DirectAddressIndexed(v60_state *cpustate)
+UINT32 v60_device::am2DirectAddressIndexed()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 bam2DirectAddressIndexed(v60_state *cpustate)
+UINT32 v60_device::bam2DirectAddressIndexed()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = OpRead32(cpustate, cpustate->modadd + 2);
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = OpRead32(m_modadd + 2);
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 6;
 }
 
-static UINT32 am2DirectAddressDeferred(v60_state *cpustate)
+UINT32 v60_device::am2DirectAddressDeferred()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 1));
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(OpRead32(m_modadd + 1));
 
 	return 5;
 }
 
-static UINT32 bam2DirectAddressDeferred(v60_state *cpustate)
+UINT32 v60_device::bam2DirectAddressDeferred()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 1));
-	cpustate->bamoffset = 0;
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(OpRead32(m_modadd + 1));
+	m_bamoffset = 0;
 
 	return 5;
 }
 
-static UINT32 am2DirectAddressDeferredIndexed(v60_state *cpustate)
+UINT32 v60_device::am2DirectAddressDeferredIndexed()
 {
-	cpustate->amflag = 0;
+	m_amflag = 0;
 
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->amout = cpustate->program->read_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
+		m_amout = m_program->read_dword_unaligned(OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F];
 		break;
 	case 1:
-		cpustate->amout = cpustate->program->read_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
+		m_amout = m_program->read_dword_unaligned(OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2;
 		break;
 	case 2:
-		cpustate->amout = cpustate->program->read_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
+		m_amout = m_program->read_dword_unaligned(OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4;
 		break;
 	case 3:
-		cpustate->amout = cpustate->program->read_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
+		m_amout = m_program->read_dword_unaligned(OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 8;
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 bam2DirectAddressDeferredIndexed(v60_state *cpustate)
+UINT32 v60_device::bam2DirectAddressDeferredIndexed()
 {
-	cpustate->amflag = 0;
-	cpustate->amout = cpustate->program->read_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 2));
-	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
+	m_amflag = 0;
+	m_amout = m_program->read_dword_unaligned(OpRead32(m_modadd + 2));
+	m_bamoffset = m_reg[m_modval & 0x1F];
 
 	return 6;
 }
 
-static UINT32 am2Immediate(v60_state *cpustate)
+UINT32 v60_device::am2Immediate()
 {
 	// ignore LDPR
-	return am1Immediate(cpustate);
+	return am1Immediate();
 }
 
-static UINT32 am2ImmediateQuick(v60_state *cpustate)
+UINT32 v60_device::am2ImmediateQuick()
 {
 	// ignore LDPR
-	return am1ImmediateQuick(cpustate);
+	return am1ImmediateQuick();
 }
 
 
 // AM2 Tables (for ReadAMAddress)
 // ******************************
 
-static UINT32 am2Error1(v60_state *cpustate)
+UINT32 v60_device::am2Error1()
 {
 	// f1lap trips this, why?
-	logerror("CPU - AM2 - 1 (cpustate->PC=%06x)", cpustate->PC);
+	logerror("CPU - AM2 - 1 (PC=%06x)", PC);
 	return 0;
 }
 
-static UINT32 am2Error2(v60_state *cpustate)
+UINT32 v60_device::am2Error2()
 {
-	fatalerror("CPU - AM2 - 2 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - AM2 - 2 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 #ifdef UNUSED_FUNCTION
-static UINT32 am2Error3(v60_state *cpustate)
+UINT32 v60_device::am2Error3()
 {
-	fatalerror("CPU - AM2 - 3 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - AM2 - 3 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 #endif
 
-static UINT32 am2Error4(v60_state *cpustate)
+UINT32 v60_device::am2Error4()
 {
-	fatalerror("CPU - AM2 - 4 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - AM2 - 4 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 am2Error5(v60_state *cpustate)
+UINT32 v60_device::am2Error5()
 {
-	fatalerror("CPU - AM2 - 5 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - AM2 - 5 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 bam2Error1(v60_state *cpustate)
+UINT32 v60_device::bam2Error1()
 {
-	fatalerror("CPU - BAM2 - 1 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - BAM2 - 1 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 bam2Error2(v60_state *cpustate)
+UINT32 v60_device::bam2Error2()
 {
-	fatalerror("CPU - BAM2 - 2 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - BAM2 - 2 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 #ifdef UNUSED_FUNCTION
-static UINT32 bam2Error3(v60_state *cpustate)
+UINT32 v60_device::bam2Error3()
 {
-	fatalerror("CPU - BAM2 - 3 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - BAM2 - 3 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 #endif
 
-static UINT32 bam2Error4(v60_state *cpustate)
+UINT32 v60_device::bam2Error4()
 {
-	fatalerror("CPU - BAM2 - 4 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - BAM2 - 4 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 bam2Error5(v60_state *cpustate)
+UINT32 v60_device::bam2Error5()
 {
-	fatalerror("CPU - BAM2 - 5 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - BAM2 - 5 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 bam2Error6(v60_state *cpustate)
+UINT32 v60_device::bam2Error6()
 {
-	fatalerror("CPU - BAM2 - 6 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - BAM2 - 6 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 
-static UINT32 (*const AMTable2_G7a[16])(v60_state *) =
+const v60_device::am_func v60_device::s_AMTable2_G7a[16] =
 {
-	am2PCDisplacementIndexed8,
-	am2PCDisplacementIndexed16,
-	am2PCDisplacementIndexed32,
-	am2DirectAddressIndexed,
-	am2Error5,
-	am2Error5,
-	am2Error5,
-	am2Error5,
-	am2PCDisplacementIndirectIndexed8,
-	am2PCDisplacementIndirectIndexed16,
-	am2PCDisplacementIndirectIndexed32,
-	am2DirectAddressDeferredIndexed,
-	am2Error5,
-	am2Error5,
-	am2Error5,
-	am2Error5
+	&v60_device::am2PCDisplacementIndexed8,
+	&v60_device::am2PCDisplacementIndexed16,
+	&v60_device::am2PCDisplacementIndexed32,
+	&v60_device::am2DirectAddressIndexed,
+	&v60_device::am2Error5,
+	&v60_device::am2Error5,
+	&v60_device::am2Error5,
+	&v60_device::am2Error5,
+	&v60_device::am2PCDisplacementIndirectIndexed8,
+	&v60_device::am2PCDisplacementIndirectIndexed16,
+	&v60_device::am2PCDisplacementIndirectIndexed32,
+	&v60_device::am2DirectAddressDeferredIndexed,
+	&v60_device::am2Error5,
+	&v60_device::am2Error5,
+	&v60_device::am2Error5,
+	&v60_device::am2Error5
 };
 
-static UINT32 (*const BAMTable2_G7a[16])(v60_state *) =
+const v60_device::am_func v60_device::s_BAMTable2_G7a[16] =
 {
-	bam2PCDisplacementIndexed8,
-	bam2PCDisplacementIndexed16,
-	bam2PCDisplacementIndexed32,
-	bam2DirectAddressIndexed,
-	bam2Error5,
-	bam2Error5,
-	bam2Error5,
-	bam2Error5,
-	bam2PCDisplacementIndirectIndexed8,
-	bam2PCDisplacementIndirectIndexed16,
-	bam2PCDisplacementIndirectIndexed32,
-	bam2DirectAddressDeferredIndexed,
-	bam2Error5,
-	bam2Error5,
-	bam2Error5,
-	bam2Error5
+	&v60_device::bam2PCDisplacementIndexed8,
+	&v60_device::bam2PCDisplacementIndexed16,
+	&v60_device::bam2PCDisplacementIndexed32,
+	&v60_device::bam2DirectAddressIndexed,
+	&v60_device::bam2Error5,
+	&v60_device::bam2Error5,
+	&v60_device::bam2Error5,
+	&v60_device::bam2Error5,
+	&v60_device::bam2PCDisplacementIndirectIndexed8,
+	&v60_device::bam2PCDisplacementIndirectIndexed16,
+	&v60_device::bam2PCDisplacementIndirectIndexed32,
+	&v60_device::bam2DirectAddressDeferredIndexed,
+	&v60_device::bam2Error5,
+	&v60_device::bam2Error5,
+	&v60_device::bam2Error5,
+	&v60_device::bam2Error5
 };
 
-static UINT32 am2Group7a(v60_state *cpustate)
+UINT32 v60_device::am2Group7a()
 {
-	if (!(cpustate->modval2 & 0x10))
-		return am2Error4(cpustate);
+	if (!(m_modval2 & 0x10))
+		return am2Error4();
 
-	return AMTable2_G7a[cpustate->modval2 & 0xF](cpustate);
+	return (this->*s_AMTable2_G7a[m_modval2 & 0xF])();
 }
 
-static UINT32 bam2Group7a(v60_state *cpustate)
+UINT32 v60_device::bam2Group7a()
 {
-	if (!(cpustate->modval2 & 0x10))
-		return bam2Error4(cpustate);
+	if (!(m_modval2 & 0x10))
+		return bam2Error4();
 
-	return BAMTable2_G7a[cpustate->modval2 & 0xF](cpustate);
+	return (this->*s_BAMTable2_G7a[m_modval2 & 0xF])();
 }
 
-static UINT32 (*const AMTable2_G7[32])(v60_state *) =
+const v60_device::am_func v60_device::s_AMTable2_G7[32] =
 {
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2ImmediateQuick,
-	am2PCDisplacement8,
-	am2PCDisplacement16,
-	am2PCDisplacement32,
-	am2DirectAddress,
-	am2Immediate,
-	am2Error2,
-	am2Error2,
-	am2Error2,
-	am2PCDisplacementIndirect8,
-	am2PCDisplacementIndirect16,
-	am2PCDisplacementIndirect32,
-	am2DirectAddressDeferred,
-	am2PCDoubleDisplacement8,
-	am2PCDoubleDisplacement16,
-	am2PCDoubleDisplacement32,
-	am2Error2
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2ImmediateQuick,
+	&v60_device::am2PCDisplacement8,
+	&v60_device::am2PCDisplacement16,
+	&v60_device::am2PCDisplacement32,
+	&v60_device::am2DirectAddress,
+	&v60_device::am2Immediate,
+	&v60_device::am2Error2,
+	&v60_device::am2Error2,
+	&v60_device::am2Error2,
+	&v60_device::am2PCDisplacementIndirect8,
+	&v60_device::am2PCDisplacementIndirect16,
+	&v60_device::am2PCDisplacementIndirect32,
+	&v60_device::am2DirectAddressDeferred,
+	&v60_device::am2PCDoubleDisplacement8,
+	&v60_device::am2PCDoubleDisplacement16,
+	&v60_device::am2PCDoubleDisplacement32,
+	&v60_device::am2Error2
 };
 
-static UINT32 (*const BAMTable2_G7[32])(v60_state *) =
+const v60_device::am_func v60_device::s_BAMTable2_G7[32] =
 {
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2Error6,
-	bam2PCDisplacement8,
-	bam2PCDisplacement16,
-	bam2PCDisplacement32,
-	bam2DirectAddress,
-	bam2Error6,
-	bam2Error2,
-	bam2Error2,
-	bam2Error2,
-	bam2PCDisplacementIndirect8,
-	bam2PCDisplacementIndirect16,
-	bam2PCDisplacementIndirect32,
-	bam2DirectAddressDeferred,
-	bam2PCDoubleDisplacement8,
-	bam2PCDoubleDisplacement16,
-	bam2PCDoubleDisplacement32,
-	bam2Error2
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error6,
+	&v60_device::bam2PCDisplacement8,
+	&v60_device::bam2PCDisplacement16,
+	&v60_device::bam2PCDisplacement32,
+	&v60_device::bam2DirectAddress,
+	&v60_device::bam2Error6,
+	&v60_device::bam2Error2,
+	&v60_device::bam2Error2,
+	&v60_device::bam2Error2,
+	&v60_device::bam2PCDisplacementIndirect8,
+	&v60_device::bam2PCDisplacementIndirect16,
+	&v60_device::bam2PCDisplacementIndirect32,
+	&v60_device::bam2DirectAddressDeferred,
+	&v60_device::bam2PCDoubleDisplacement8,
+	&v60_device::bam2PCDoubleDisplacement16,
+	&v60_device::bam2PCDoubleDisplacement32,
+	&v60_device::bam2Error2
 };
 
-static UINT32 (*const AMTable2_G6[8])(v60_state *) =
+const v60_device::am_func v60_device::s_AMTable2_G6[8] =
 {
-	am2DisplacementIndexed8,
-	am2DisplacementIndexed16,
-	am2DisplacementIndexed32,
-	am2RegisterIndirectIndexed,
-	am2DisplacementIndirectIndexed8,
-	am2DisplacementIndirectIndexed16,
-	am2DisplacementIndirectIndexed32,
-	am2Group7a
+	&v60_device::am2DisplacementIndexed8,
+	&v60_device::am2DisplacementIndexed16,
+	&v60_device::am2DisplacementIndexed32,
+	&v60_device::am2RegisterIndirectIndexed,
+	&v60_device::am2DisplacementIndirectIndexed8,
+	&v60_device::am2DisplacementIndirectIndexed16,
+	&v60_device::am2DisplacementIndirectIndexed32,
+	&v60_device::am2Group7a
 };
 
-static UINT32 (*const BAMTable2_G6[8])(v60_state *) =
+const v60_device::am_func v60_device::s_BAMTable2_G6[8] =
 {
-	bam2DisplacementIndexed8,
-	bam2DisplacementIndexed16,
-	bam2DisplacementIndexed32,
-	bam2RegisterIndirectIndexed,
-	bam2DisplacementIndirectIndexed8,
-	bam2DisplacementIndirectIndexed16,
-	bam2DisplacementIndirectIndexed32,
-	bam2Group7a
+	&v60_device::bam2DisplacementIndexed8,
+	&v60_device::bam2DisplacementIndexed16,
+	&v60_device::bam2DisplacementIndexed32,
+	&v60_device::bam2RegisterIndirectIndexed,
+	&v60_device::bam2DisplacementIndirectIndexed8,
+	&v60_device::bam2DisplacementIndirectIndexed16,
+	&v60_device::bam2DisplacementIndirectIndexed32,
+	&v60_device::bam2Group7a
 };
 
 
 
 
-static UINT32 am2Group6(v60_state *cpustate)
+UINT32 v60_device::am2Group6()
 {
-	cpustate->modval2 = OpRead8(cpustate, cpustate->modadd + 1);
-	return AMTable2_G6[cpustate->modval2 >> 5](cpustate);
+	m_modval2 = OpRead8(m_modadd + 1);
+	return (this->*s_AMTable2_G6[m_modval2 >> 5])();
 }
-static UINT32 bam2Group6(v60_state *cpustate)
+UINT32 v60_device::bam2Group6()
 {
-	cpustate->modval2 = OpRead8(cpustate, cpustate->modadd + 1);
-	return BAMTable2_G6[cpustate->modval2 >> 5](cpustate);
-}
-
-static UINT32 am2Group7(v60_state *cpustate)
-{
-	return AMTable2_G7[cpustate->modval & 0x1F](cpustate);
-}
-static UINT32 bam2Group7(v60_state *cpustate)
-{
-	return BAMTable2_G7[cpustate->modval & 0x1F](cpustate);
+	m_modval2 = OpRead8(m_modadd + 1);
+	return (this->*s_BAMTable2_G6[m_modval2 >> 5])();
 }
 
+UINT32 v60_device::am2Group7()
+{
+	return (this->*s_AMTable2_G7[m_modval & 0x1F])();
+}
+UINT32 v60_device::bam2Group7()
+{
+	return (this->*s_BAMTable2_G7[m_modval & 0x1F])();
+}
 
-static UINT32 (*const AMTable2[2][8])(v60_state *) =
+
+const v60_device::am_func v60_device::s_AMTable2[2][8] =
 {
 	{
-		am2Displacement8,
-		am2Displacement16,
-		am2Displacement32,
-		am2RegisterIndirect,
-		am2DisplacementIndirect8,
-		am2DisplacementIndirect16,
-		am2DisplacementIndirect32,
-		am2Group7
+		&v60_device::am2Displacement8,
+		&v60_device::am2Displacement16,
+		&v60_device::am2Displacement32,
+		&v60_device::am2RegisterIndirect,
+		&v60_device::am2DisplacementIndirect8,
+		&v60_device::am2DisplacementIndirect16,
+		&v60_device::am2DisplacementIndirect32,
+		&v60_device::am2Group7
 	},
 
 	{
-		am2DoubleDisplacement8,
-		am2DoubleDisplacement16,
-		am2DoubleDisplacement32,
-		am2Register,
-		am2Autoincrement,
-		am2Autodecrement,
-		am2Group6,
-		am2Error1
+		&v60_device::am2DoubleDisplacement8,
+		&v60_device::am2DoubleDisplacement16,
+		&v60_device::am2DoubleDisplacement32,
+		&v60_device::am2Register,
+		&v60_device::am2Autoincrement,
+		&v60_device::am2Autodecrement,
+		&v60_device::am2Group6,
+		&v60_device::am2Error1
 	}
 };
 
-static UINT32 (*const BAMTable2[2][8])(v60_state *) =
+const v60_device::am_func v60_device::s_BAMTable2[2][8] =
 {
 	{
-		bam2Displacement8,
-		bam2Displacement16,
-		bam2Displacement32,
-		bam2RegisterIndirect,
-		bam2DisplacementIndirect8,
-		bam2DisplacementIndirect16,
-		bam2DisplacementIndirect32,
-		bam2Group7
+		&v60_device::bam2Displacement8,
+		&v60_device::bam2Displacement16,
+		&v60_device::bam2Displacement32,
+		&v60_device::bam2RegisterIndirect,
+		&v60_device::bam2DisplacementIndirect8,
+		&v60_device::bam2DisplacementIndirect16,
+		&v60_device::bam2DisplacementIndirect32,
+		&v60_device::bam2Group7
 	},
 
 	{
-		bam2DoubleDisplacement8,
-		bam2DoubleDisplacement16,
-		bam2DoubleDisplacement32,
-		bam2Error6,
-		bam2Autoincrement,
-		bam2Autodecrement,
-		bam2Group6,
-		bam2Error1
+		&v60_device::bam2DoubleDisplacement8,
+		&v60_device::bam2DoubleDisplacement16,
+		&v60_device::bam2DoubleDisplacement32,
+		&v60_device::bam2Error6,
+		&v60_device::bam2Autoincrement,
+		&v60_device::bam2Autodecrement,
+		&v60_device::bam2Group6,
+		&v60_device::bam2Error1
 	}
 };
