@@ -85,7 +85,7 @@ void zsg2_device::device_start()
 
 	memset(&m_chan, 0, sizeof(m_chan));
 
-	m_stream = stream_alloc(0, 2, clock() / 128);
+	m_stream = stream_alloc(0, 2, clock() / 192);
 
 	m_mem_base = *region();
 	m_mem_size = region()->bytes();
