@@ -54,6 +54,7 @@ mn10200_device::mn10200_device(const machine_config &mconfig, const char *tag, d
 void mn10200_device::device_start()
 {
 	m_p4 = 0xf;
+	m_irq_semaphore = false;
 
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
@@ -218,6 +219,7 @@ void mn10200_device::device_reset()
 
 void mn10200_device::take_irq(int level, int group)
 {
+	m_irq_semaphore = true;
 	m_cycles -= 7;
 
 	write_mem24(m_a[3] - 4, m_pc);
@@ -226,12 +228,18 @@ void mn10200_device::take_irq(int level, int group)
 	change_pc(0x80008);
 	m_psw = (m_psw & 0xf0ff) | (level << 8);
 	m_iagr = group;
+	
+	m_irq_semaphore = false;
 }
 
-bool mn10200_device::check_irq()
+void mn10200_device::check_irq()
 {
+	// don't recurse
+	if (m_irq_semaphore)
+		return;
+
 	if (!m_nmicr && !(m_psw & FLAG_IE))
-		return false;
+		return;
 	
 	int level = m_psw >> 8 & 7;
 	int group = 0;
@@ -253,10 +261,8 @@ bool mn10200_device::check_irq()
 		take_irq(0, 0);
 	else if (group)
 		take_irq(level, group);
-	else
-		return false;
 	
-	return true;
+	return;
 }
 
 void mn10200_device::check_ext_irq()
@@ -366,6 +372,12 @@ void mn10200_device::refresh_timer(int tmr)
 	}
 }
 
+void mn10200_device::refresh_all_timers()
+{
+	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
+		refresh_timer(tmr);
+}
+
 TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
 {
 	int tmr = param;
@@ -378,12 +390,6 @@ TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
 	
 	// refresh this timer
 	refresh_timer(tmr);
-}
-
-void mn10200_device::refresh_all_timers()
-{
-	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
-		refresh_timer(tmr);
 }
 
 

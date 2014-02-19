@@ -143,6 +143,7 @@ private:
 
 	UINT8 m_ddr[8];
 
+	bool m_irq_semaphore;
 	attotime m_sysclock_base;
 	int m_cycles;
 
@@ -165,7 +166,7 @@ private:
 	inline void change_pc(UINT32 pc) { m_pc = pc & 0xffffff; }
 
 	void take_irq(int level, int group);
-	bool check_irq();
+	void check_irq();
 	void check_ext_irq();
 	void refresh_timer(int tmr);
 	void refresh_all_timers();
