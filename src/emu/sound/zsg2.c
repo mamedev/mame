@@ -201,7 +201,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				continue;
 			
 			m_chan[ch].step_ptr += m_chan[ch].step;
-			if (m_chan[ch].step_ptr & 0x80000)
+			if (m_chan[ch].step_ptr & 0x40000)
 			{
 				m_chan[ch].step_ptr &= 0xffff;
 				if (++m_chan[ch].cur_pos > m_chan[ch].end_pos)
