@@ -101,6 +101,7 @@
   - Hooked CRTC properly.
   - Adjusted the screen size and visible area according to CRTC values.
   - Adjusted the screen pos 8 pixels, to get a bit centered.
+  - Fixed palette to 8 colors.
   - Added technical notes.
  
   [2014-02-17]
@@ -211,7 +212,7 @@ TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
 
 void jubilee_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jubilee_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jubilee_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -427,26 +428,26 @@ GFXDECODE_END
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	false,      /* show border area */
-	-8,0,0,0,    /* visarea adjustment */
-	8,          /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
+	false,        /* show border area */
+	-8, 0, 0, 0,  /* visarea adjustment */
+	8,            /* number of pixels per video memory address */
+	NULL,         /* before pixel update callback */
+	NULL,         /* row update callback */
+	NULL,         /* after pixel update callback */
+	DEVCB_NULL,   /* callback for display state changes */
+	DEVCB_NULL,   /* callback for cursor state changes */
+	DEVCB_NULL,   /* HSYNC callback */
+	DEVCB_NULL,   /* VSYNC callback */
+	NULL          /* update address callback */
 };
 
 static TMS9980A_CONFIG( cpuconf )
 {
 	DEVCB_NULL,
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,     // Hold acknowledge
-	DEVCB_NULL      // DBIN
+	DEVCB_NULL,     /* Instruction acquisition */
+	DEVCB_NULL,     /* Clock out */
+	DEVCB_NULL,     /* Hold acknowledge */
+	DEVCB_NULL      /* DBIN */
 };
 
 /*************************
@@ -470,7 +471,7 @@ static MACHINE_CONFIG_START( jubileep, jubilee_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jubilee_state, screen_update_jubileep)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jubileep)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(8)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
