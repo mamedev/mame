@@ -54,7 +54,6 @@ mn10200_device::mn10200_device(const machine_config &mconfig, const char *tag, d
 void mn10200_device::device_start()
 {
 	m_p4 = 0xf;
-	m_irq_semaphore = false;
 
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
@@ -136,7 +135,7 @@ void mn10200_device::device_start()
 	save_item(NAME(m_extmdh));
 	save_item(NAME(m_icrl));
 	save_item(NAME(m_icrh));
-	save_item(NAME(m_ddr));
+	save_item(NAME(m_possible_irq));
 
 	// register for debugger
 	state_add( MN10200_PC,    "PC",    m_pc ).mask(0xffffff).formatstr("%06X");
@@ -212,6 +211,8 @@ void mn10200_device::device_reset()
 	for (int i = 0; i < 2; i++)
 		for (int address = 0xfc04; address < 0x10000; address++)
 			write_mem16(address, 0);
+
+	m_possible_irq = false;
 }
 
 
@@ -219,7 +220,6 @@ void mn10200_device::device_reset()
 
 void mn10200_device::take_irq(int level, int group)
 {
-	m_irq_semaphore = true;
 	m_cycles -= 7;
 
 	write_mem24(m_a[3] - 4, m_pc);
@@ -228,16 +228,10 @@ void mn10200_device::take_irq(int level, int group)
 	change_pc(0x80008);
 	m_psw = (m_psw & 0xf0ff) | (level << 8);
 	m_iagr = group;
-	
-	m_irq_semaphore = false;
 }
 
 void mn10200_device::check_irq()
 {
-	// don't recurse
-	if (m_irq_semaphore)
-		return;
-
 	if (!m_nmicr && !(m_psw & FLAG_IE))
 		return;
 	
@@ -274,7 +268,7 @@ void mn10200_device::check_ext_irq()
 			m_icrl[8] |= (1 << (4 + i));
 	}
 	
-	check_irq();
+	m_possible_irq = true;
 }
 
 void mn10200_device::execute_set_input(int irqnum, int state)
@@ -315,7 +309,7 @@ void mn10200_device::execute_set_input(int irqnum, int state)
 	if (active)
 	{
 		m_icrl[8] |= (1 << (4 + irqnum));
-		check_irq();
+		m_possible_irq = true;
 	}
 }
 
@@ -346,7 +340,7 @@ int mn10200_device::timer_tick_simple(int tmr)
 	{
 		// trigger irq
 		m_icrl[1 + (tmr >> 2)] |= (1 << (4 + (tmr & 3)));
-		check_irq();
+		m_possible_irq = true;
 
 		return 0;
 	}
@@ -480,16 +474,20 @@ void mn10200_device::do_branch(bool state)
 
 void mn10200_device::execute_run()
 {
-	bool possible_irq = false;
-	UINT8 op;
-
 	while (m_cycles > 0)
 	{
+
+	// internal peripheral, external pin, or prev instruction may have changed irq state
+	while (m_possible_irq)
+	{
+		m_possible_irq = false;
+		check_irq();
+	}
 
 	debugger_instruction_hook(this, m_pc);
 
 	m_cycles -= 1;
-	op = read_arg8(m_pc);
+	UINT8 op = read_arg8(m_pc);
 	m_pc += 1;
 
 	// main opcodes
@@ -713,7 +711,7 @@ void mn10200_device::execute_run()
 			m_psw = read_mem16(m_a[3]);
 			change_pc(read_mem24(m_a[3] + 2));
 			m_a[3] += 6;
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 
 		// cmp imm16, an
@@ -753,7 +751,7 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 
 
@@ -839,7 +837,7 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0xf0, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 		}
 		break;
@@ -970,7 +968,7 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0xf2, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 		}
 		break;
@@ -1130,7 +1128,7 @@ void mn10200_device::execute_run()
 		case 0xd0: case 0xd4: case 0xd8: case 0xdc:
 			m_cycles -= 1;
 			m_psw = m_d[op>>2&3];
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 
 		// mov mdr, dn
@@ -1150,7 +1148,7 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0xf3, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 		}
 		break;
@@ -1316,7 +1314,7 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0xf4, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 		}
 		m_pc += 3;
@@ -1477,7 +1475,7 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0xf5, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 		}
 		m_pc += 1;
@@ -1524,7 +1522,7 @@ void mn10200_device::execute_run()
 		case 0x14:
 			m_cycles -= 1;
 			m_psw |= read_arg16(m_pc);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 
 		// add imm16, dn
@@ -1624,20 +1622,13 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0xf7, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 		}
 		m_pc += 2;
 		break;
 
 	} // end main switch
-
-	// instruction may have changed irq state
-	if (possible_irq)
-	{
-		check_irq();
-		possible_irq = false;
-	}
 
 	} // end loop
 }
@@ -1690,7 +1681,7 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 		case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
 		case 0x04d: case 0x04f: case 0x051: case 0x053: case 0x055:
 			m_icrh[(offset & 0x3f) >> 1] = data;
-			check_irq();
+			m_possible_irq = true;
 			break;
 
 		// external irq control

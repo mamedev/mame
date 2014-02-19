@@ -143,7 +143,7 @@ private:
 
 	UINT8 m_ddr[8];
 
-	bool m_irq_semaphore;
+	bool m_possible_irq;
 	attotime m_sysclock_base;
 	int m_cycles;
 
