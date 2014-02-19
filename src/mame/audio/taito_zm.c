@@ -171,7 +171,7 @@ MACHINE_CONFIG_FRAGMENT( taito_zoom_sound )
 
 	/* basic machine hardware */
 	MCFG_TAITO_ZOOM_ADD("taito_zoom")
-	MCFG_CPU_ADD("mn10200", MN10200, XTAL_25MHz/2)
+	MCFG_CPU_ADD("mn10200", MN1020012A, XTAL_25MHz/2)
 	MCFG_CPU_PROGRAM_MAP(taitozoom_mn_map)
 	MCFG_CPU_IO_MAP(taitozoom_mn_io_map)
 

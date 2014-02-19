@@ -33,14 +33,14 @@ enum mn10200_flag
 	FLAG_D15 = 0x8000  // ?
 };
 
-const device_type MN10200 = &device_creator<mn10200_device>;
+const device_type MN1020012A = &device_creator<mn10200_device>;
 
 static ADDRESS_MAP_START( mn1020012_internal_map, AS_PROGRAM, 16, mn10200_device )
 	AM_RANGE(0x00fc00, 0x00ffff) AM_READWRITE8(io_control_r, io_control_w, 0xffff)
 ADDRESS_MAP_END
 
 mn10200_device::mn10200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, MN10200, "MN10200", tag, owner, clock, "mn10200", __FILE__),
+	: cpu_device(mconfig, MN1020012A, "MN1020012A", tag, owner, clock, "mn1020012a", __FILE__),
 	m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(mn1020012_internal_map)),
 	m_io_config("data", ENDIANNESS_LITTLE, 8, 8, 0)
 {

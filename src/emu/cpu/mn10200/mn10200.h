@@ -48,7 +48,7 @@ enum
 };
 
 
-extern const device_type MN10200;
+extern const device_type MN1020012A;
 
 
 #define MN10200_NUM_PRESCALERS (2)

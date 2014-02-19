@@ -93,6 +93,7 @@ public:
 	DECLARE_MACHINE_RESET(coh1000c);
 	DECLARE_MACHINE_RESET(coh1000ta);
 	DECLARE_MACHINE_RESET(coh1000tb);
+	DECLARE_MACHINE_RESET(coh1002tb);
 	DECLARE_MACHINE_RESET(coh1002e);
 	DECLARE_MACHINE_RESET(bam2);
 	DECLARE_MACHINE_RESET(coh1001l);
@@ -1205,7 +1206,19 @@ MACHINE_RESET_MEMBER(zn_state,coh1000tb)
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() ); /* banked game rom */
 }
 
-static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_2mb_vram)
+static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_1mb_vram)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(coh1000tb_map)
+
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000tb)
+	MCFG_NVRAM_ADD_1FILL("fm1208s")
+
+	MCFG_MB3773_ADD("mb3773")
+
+	MCFG_FRAGMENT_ADD(taito_zoom_sound)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(coh1002tb, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000tb_map)
 
@@ -4799,9 +4812,9 @@ GAME( 1996, ftimpact,  ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Tait
 GAME( 1996, ftimpactu, ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, ftimpactj, ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, ftimpcta,  taitofx1, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact A (Ver 2.00J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, gdarius,   gdarius2, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, gdariusb,  gdarius2, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, gdarius2,  taitofx1, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, gdarius,   gdarius2, coh1002tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, gdariusb,  gdarius2, coh1002tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, gdarius2,  taitofx1, coh1002tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Eighting / Raizing */
 
