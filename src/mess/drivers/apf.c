@@ -325,10 +325,10 @@ READ8_MEMBER( apf_state::apf_wd179x_data_r)
 static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
 	AM_RANGE( 0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x2000, 0x3fff) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE( 0x4000, 0x47ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE( 0x4000, 0x4fff) AM_MIRROR(0x1000) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x6800, 0x7fff) AM_ROM AM_REGION("cart", 0x2000)
 	AM_RANGE( 0x8000, 0x9fff) AM_ROM AM_REGION("cart", 0)
-	AM_RANGE( 0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE( 0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
@@ -633,12 +633,16 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START(apfm1000)
-	ROM_REGION(0x0800,"roms", 0)
+	ROM_REGION(0x1000,"roms", 0)
 	ROM_SYSTEM_BIOS( 0, "0", "Standard" )
 	ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "trash", "Trash II" )
-	ROMX_LOAD("trash-ii.bin", 0x0000, 0x0800, CRC(3bd8640a) SHA1(da4cd8163990adbc5acd3eab604b41e1066bb832), ROM_BIOS(2) )
-	ROM_IGNORE(0x0800)
+	ROM_RELOAD(0x0800, 0x0800)
+
+	ROM_SYSTEM_BIOS( 1, "trash", "Trash II" ) // In Rocket Patrol, the ships are replaced by garbage trucks
+	ROMX_LOAD("trash-ii.bin", 0x0000, 0x1000, CRC(3bd8640a) SHA1(da4cd8163990adbc5acd3eab604b41e1066bb832), ROM_BIOS(2) )
+
+	ROM_SYSTEM_BIOS( 2, "mod", "Mod Bios" ) // (c) 1982 W.Lunquist - In Basic, CALL 18450 to get a machine-language monitor
+	ROMX_LOAD("mod_bios.bin", 0x0000, 0x1000, CRC(f320aba6) SHA1(9442349fca8b001a5765e2fe8b84db4ece7886c1), ROM_BIOS(3) )
 
 	ROM_REGION(0x3800,"cart", ROMREGION_ERASEFF)
 	ROM_CART_LOAD("cart", 0x0000, 0x3800, ROM_OPTIONAL)
