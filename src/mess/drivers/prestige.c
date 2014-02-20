@@ -544,7 +544,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 199?, glcolor,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader Color (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1994, glcolor,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader Color (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1997, gl6000sl,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6000SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1998, gl7007sl,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader 7007SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1998, prestige,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "PreComputer Prestige Elite",       GAME_NOT_WORKING | GAME_NO_SOUND)
