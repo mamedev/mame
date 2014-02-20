@@ -29,6 +29,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
+#if 0
 INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
@@ -41,6 +42,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, c
 		logerror( "%08x: %s", machine.device("maincpu")->safe_pc(), buf );
 	}
 }
+#endif
 
 #define VC2_VIDENTRY        m_VC2.nRegister[0x00]
 #define VC2_CURENTRY        m_VC2.nRegister[0x01]

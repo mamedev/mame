@@ -238,6 +238,7 @@ static DISCRETE_SOUND_START( osi600_discrete_interface )
 	DISCRETE_OUTPUT(NODE_04, 100)
 DISCRETE_SOUND_END
 
+#if 0
 static const discrete_dac_r1_ladder osi600c_dac =
 {
 	8,          // size of ladder
@@ -247,6 +248,7 @@ static const discrete_dac_r1_ladder osi600c_dac =
 	0,          // no rGnd
 	CAP_U(33)   // C63
 };
+#endif
 
 static DISCRETE_SOUND_START( osi600c_discrete_interface )
 	DISCRETE_INPUT_DATA(NODE_01)

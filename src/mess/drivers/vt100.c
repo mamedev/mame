@@ -595,6 +595,7 @@ ROM_START( vt100 ) // This is from the schematics at http://www.bitsavers.org/pd
 	ROM_LOAD_OPTIONAL("23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional ?word processing? alternate character set rom
 ROM_END
 
+#if 0
 ROM_START( vt100wp ) // This is from the schematics at http://www.bitsavers.org/pdf/dec/terminal/vt100/MP00633_VT100_Mar80.pdf
 // This is the standard vt100 cpu board, with the ?word processing? romset, included in the VT1xx-CE kit?
 // the vt103 can also use this rom set (-04 and -05 revs have it by default, -05 rev also has the optional alt charset rom by default)
@@ -686,6 +687,7 @@ ROM_START( vt103 ) // This is from the schematics at http://www.bitsavers.org/pd
 	ROM_REGION(0x80000, "lsi11cpu", 0) // rom for the LSI-11 cpu board
 	ROM_LOAD_OPTIONAL( "unknown.bin", 0x00000, 0x80000, NO_DUMP)
 ROM_END
+#endif
 
 ROM_START( vt105 ) // This is from anecdotal evidence and vt100.net, as the vt105 schematics are not scanned
 // This is the standard VT100 cpu board with the 'normal' roms (but later rev of eprom 0) populated but with a
@@ -702,6 +704,7 @@ ROM_START( vt105 ) // This is from anecdotal evidence and vt100.net, as the vt10
 	ROM_LOAD_OPTIONAL( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
 
+#if 0
 ROM_START( vt110 )
 // This is the standard VT100 cpu board with the 'normal' roms (but later rev of eprom 0) populated but with a
 // DECDataway DPM01 board, which adds 4 or 5 special network-addressable 50ohm? current loop serial lines
@@ -766,6 +769,7 @@ ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
 	ROM_LOAD_OPTIONAL( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
+#endif
 
 ROM_START( vt102 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 mainboard
 // has integrated STP and AVO both populated

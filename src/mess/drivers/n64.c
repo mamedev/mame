@@ -136,6 +136,7 @@ static INPUT_PORTS_START( n64 )
 
 INPUT_PORTS_END
 
+#if 0
 /* ?? */
 static const mips3_config config =
 {
@@ -143,6 +144,7 @@ static const mips3_config config =
 	8192,               /* data cache size */
 	62500000            /* system clock */
 };
+#endif
 
 void n64_mess_state::mempak_format(UINT8* pak)
 {

@@ -3,13 +3,13 @@
 #include "includes/pocketc.h"
 #include "includes/pc1251.h"
 
-static const POCKETC_FIGURE busy={
+static const POCKETC_FIGURE /*busy={
 	"11  1 1  11 1 1",
 	"1 1 1 1 1   1 1",
 	"11  1 1  1  1 1",
 	"1 1 1 1   1  1",
 	"11   1  11   1e"
-}, def={
+},*/ def={
 	"11  111 111",
 	"1 1 1   1",
 	"1 1 111 11",
@@ -21,13 +21,13 @@ static const POCKETC_FIGURE busy={
 	" 1  111 1 11   1",
 	"  1 1 1 1 1    1",
 	"11  1 1 1 1    1e"
-}, hyp={
+}, /*hyp={
 	"1 1 1 1 11",
 	"1 1 1 1 1 1",
 	"111 1 1 11",
 	"1 1  1  1",
 	"1 1  1  1e"
-}, de={
+},*/ de={
 	"11  111",
 	"1 1 1",
 	"1 1 111",
@@ -45,7 +45,7 @@ static const POCKETC_FIGURE busy={
 	"11  111 1 1",
 	"1 1 1 1 1 1",
 	"1 1 1 1 11e"
-}, braces={
+}, /*braces={
 	" 1 1",
 	"1   1",
 	"1   1",
@@ -63,7 +63,7 @@ static const POCKETC_FIGURE busy={
 	"111",
 	"1",
 	"111e"
-}, run={
+},*/ run={
 	"11  1 1 1  1",
 	"1 1 1 1 11 1",
 	"11  1 1 1 11",
@@ -75,7 +75,7 @@ static const POCKETC_FIGURE busy={
 	"11  11  1 1",
 	"1   1 1 1 1",
 	"1   1 1  1e"
-}, japan={
+}, /*japan={
 	"  1  1  11   1  1  1",
 	"  1 1 1 1 1 1 1 11 1",
 	"  1 111 11  111 1 11",
@@ -87,7 +87,7 @@ static const POCKETC_FIGURE busy={
 	" 1  1 1 1",
 	"  1 1 1 1",
 	"11  1 1 111e"
-}, rsv={
+},*/ rsv={
 	"11   11 1   1",
 	"1 1 1   1   1",
 	"11   1   1 1",

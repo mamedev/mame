@@ -533,6 +533,7 @@ static const cassette_interface apf_cassette_interface =
 	NULL
 };
 
+#if 0
 static LEGACY_FLOPPY_OPTIONS_START(apfimag)
 	LEGACY_FLOPPY_OPTION(apfimag, "apd", "APF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
@@ -554,6 +555,7 @@ static const floppy_interface apfimag_floppy_interface =
 	NULL,
 	NULL
 };
+#endif
 
 static const mc6847_interface apf_mc6847_intf =
 {

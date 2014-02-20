@@ -277,12 +277,13 @@ INTERRUPT_GEN_MEMBER(gmaster_state::gmaster_interrupt)
 	m_maincpu->set_input_line(UPD7810_INTFE1, ASSERT_LINE);
 }
 
-
+#if 0
 static const UPD7810_CONFIG config = {
 //  TYPE_78C10, // 78c11 in handheld
 	TYPE_7810, // temporarily until 7810 core fixes synchronized
 	NULL
 };
+#endif
 
 
 static MACHINE_CONFIG_START( gmaster, gmaster_state )

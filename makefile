@@ -559,7 +559,8 @@ CCOMFLAGS += \
 	-Wno-constant-logical-operand \
 	-Wno-format-security \
 	-Wno-shift-count-overflow \
-	-Wno-self-assign-field
+	-Wno-self-assign-field \
+	-Wno-inline-new-delete
 endif
 
 ifdef SANITIZE

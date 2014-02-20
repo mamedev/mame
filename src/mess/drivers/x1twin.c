@@ -439,7 +439,6 @@ static const z80sio_interface sio_intf =
 	DEVCB_NULL,                 /* transmit handler */
 	DEVCB_NULL                  /* receive handler */
 };
-#endif
 
 
 static Z80DART_INTERFACE( sio_intf )
@@ -464,6 +463,7 @@ static Z80DART_INTERFACE( sio_intf )
 	DEVCB_NULL,
 	DEVCB_NULL
 };
+#endif
 
 
 static const z80_daisy_config x1_daisy[] =

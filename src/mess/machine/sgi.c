@@ -11,6 +11,7 @@
 
 #define VERBOSE_LEVEL ( 2 )
 
+#if 0
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
@@ -23,6 +24,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 		logerror( "%08x: %s", (unsigned) machine.device("maincpu")->safe_pc(), buf );
 	}
 }
+#endif
 
 struct MC_t
 {

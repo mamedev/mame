@@ -1823,6 +1823,7 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 	m_fdc->dden_w(BIT(data, 7));
 }
 
+#if 0
 static const ay8910_interface stbook_psg_intf =
 {
 	AY8910_SINGLE_OUTPUT,
@@ -1832,6 +1833,7 @@ static const ay8910_interface stbook_psg_intf =
 	DEVCB_DRIVER_MEMBER(stbook_state, psg_pa_w),
 	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 };
+#endif
 
 
 //-------------------------------------------------
@@ -1860,6 +1862,7 @@ static ACIA6850_INTERFACE( acia_ikbd_intf )
 };
 
 
+#if 0
 //-------------------------------------------------
 //  ACIA6850_INTERFACE( stbook_acia_ikbd_intf )
 //-------------------------------------------------
@@ -1872,6 +1875,7 @@ static ACIA6850_INTERFACE( stbook_acia_ikbd_intf )
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(st_state, acia_ikbd_irq_w)
 };
+#endif
 
 
 //-------------------------------------------------
@@ -1945,6 +1949,7 @@ static MC68901_INTERFACE( atariste_mfp_intf )
 
 // TODO power alarms (i7_w)
 
+#if 0
 static MC68901_INTERFACE( stbook_mfp_intf )
 {
 	Y1,                                                 /* timer clock */
@@ -1958,6 +1963,7 @@ static MC68901_INTERFACE( stbook_mfp_intf )
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd)
 };
+#endif
 
 void st_state::fdc_intrq_w(bool state)
 {
@@ -2857,6 +2863,7 @@ ROM_END
 //  ROM( stacy )
 //-------------------------------------------------
 
+#if 0
 ROM_START( stacy )
 	ROM_REGION16_BE( 0x30000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
@@ -2868,6 +2875,7 @@ ROM_START( stacy )
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
+#endif
 
 
 //-------------------------------------------------
@@ -3179,6 +3187,7 @@ ROM_END
 //  ROM( stbook )
 //-------------------------------------------------
 
+#if 0
 ROM_START( stbook )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos208", "TOS 2.08" )
@@ -3190,12 +3199,14 @@ ROM_START( stbook )
 	ROM_REGION( 0x1000, COP888_TAG, 0 )
 	ROM_LOAD( "cop888c0.u703", 0x0000, 0x1000, NO_DUMP )
 ROM_END
+#endif
 
 
 //-------------------------------------------------
 //  ROM( stpad )
 //-------------------------------------------------
 
+#if 0
 ROM_START( stpad )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos205", "TOS 2.05" )
@@ -3204,6 +3215,7 @@ ROM_START( stpad )
 	ROM_REGION( 0x20000, "cart", ROMREGION_ERASE00 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x20000, ROM_MIRROR | ROM_OPTIONAL )
 ROM_END
+#endif
 
 
 //-------------------------------------------------
@@ -3300,6 +3312,7 @@ ROM_END
 //  ROM( fx1 )
 //-------------------------------------------------
 
+#if 0
 ROM_START( fx1 )
 	ROM_REGION16_BE( 0x40000, M68000_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos207", "TOS 2.07" )
@@ -3311,6 +3324,7 @@ ROM_START( fx1 )
 	ROM_REGION( 0x1000, HD6301V1_TAG, 0 )
 	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
+#endif
 
 
 //-------------------------------------------------

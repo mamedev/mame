@@ -3,6 +3,7 @@
 #include "machine/ram.h"
 
 
+#if 0
 /* 16 colours, + 1 for border */
 static const unsigned short pcw16_colour_table[PCW16_NUM_COLOURS] =
 {
@@ -10,6 +11,7 @@ static const unsigned short pcw16_colour_table[PCW16_NUM_COLOURS] =
 	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
 	29, 30, 31
 };
+#endif
 
 static const rgb_t pcw16_palette[PCW16_NUM_COLOURS] =
 {

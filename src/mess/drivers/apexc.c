@@ -518,10 +518,12 @@ static const rgb_t apexc_palette[] =
 	rgb_t(50, 0, 0)
 };
 
+#if 0
 static const unsigned short apexc_colortable[] =
 {
 	0, 1
 };
+#endif
 
 #define APEXC_PALETTE_SIZE ARRAY_LENGTH(apexc_palette)
 #define APEXC_COLORTABLE_SIZE sizeof(apexc_colortable)/2
@@ -556,7 +558,7 @@ static const rectangle teletyper_scroll_clear_window(
 	teletyper_window_offset_x,  teletyper_window_offset_x+teletyper_window_width-1, /* min_x, max_x */
 	teletyper_window_offset_y+teletyper_window_height-teletyper_scroll_step,    teletyper_window_offset_y+teletyper_window_height-1 /* min_y, max_y */
 );
-static const int var_teletyper_scroll_step = - teletyper_scroll_step;
+//static const int var_teletyper_scroll_step = - teletyper_scroll_step;
 
 void apexc_state::palette_init()
 {

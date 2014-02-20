@@ -60,7 +60,7 @@
 #define INT_BINT1           0x4000
 #define INT_RS232_RXRDY     0x8000
 
-static const int INT_LEVEL[] = { 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5 };
+//static const int INT_LEVEL[] = { 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5 };
 
 /***************************************************************************
     READ/WRITE HANDLERS
