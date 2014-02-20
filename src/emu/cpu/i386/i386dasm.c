@@ -1960,6 +1960,7 @@ INLINE UINT8 FETCH(void)
 	return *opcode_ptr++;
 }
 
+#if 0
 INLINE UINT16 FETCH16(void)
 {
 	UINT16 d;
@@ -1970,6 +1971,7 @@ INLINE UINT16 FETCH16(void)
 	pc += 2;
 	return d;
 }
+#endif
 
 INLINE UINT32 FETCH32(void)
 {

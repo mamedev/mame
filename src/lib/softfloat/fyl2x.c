@@ -75,6 +75,7 @@ INLINE flag extractFloatx80Sign( floatx80 a )
 
 }
 
+#if 0
 /*----------------------------------------------------------------------------
 | Takes extended double-precision floating-point  NaN  `a' and returns the
 | appropriate NaN result. If `a' is a signaling NaN, the invalid exception
@@ -90,6 +91,7 @@ INLINE floatx80 propagateFloatx80NaNOneArg(floatx80 a)
 
 	return a;
 }
+#endif
 
 /*----------------------------------------------------------------------------
 | Normalizes the subnormal extended double-precision floating-point value

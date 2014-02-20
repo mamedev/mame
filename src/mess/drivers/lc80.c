@@ -284,6 +284,7 @@ static Z80PIO_INTERFACE( pio2_intf )
 	DEVCB_NULL                      /* portB ready active callback */
 };
 
+#if 0
 /* Z80 Daisy Chain */
 
 static const z80_daisy_config lc80_daisy_chain[] =
@@ -293,6 +294,7 @@ static const z80_daisy_config lc80_daisy_chain[] =
 	{ Z80PIO1_TAG },
 	{ NULL }
 };
+#endif
 
 /* Machine Initialization */
 

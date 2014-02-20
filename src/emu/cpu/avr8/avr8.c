@@ -165,7 +165,7 @@ enum
 	WGM5_FAST_PWM_OCR
 };
 
-static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
+//static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 
 #define SREG_R(b) ((m_r[AVR8_REGIDX_SREG] & (1 << (b))) >> (b))
 #define SREG_W(b,v) m_r[AVR8_REGIDX_SREG] = (m_r[AVR8_REGIDX_SREG] & ~(1 << (b))) | ((v) << (b))

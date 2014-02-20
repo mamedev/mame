@@ -36,12 +36,12 @@ enum
 };
 
 const int ICW_ENABLE_INT    = 0x80;
-const int ICW_AND_OR        = 0x40;
-const int ICW_AND           = 0x40;
-const int ICW_OR            = 0x00;
-const int ICW_HIGH_LOW      = 0x20;
-const int ICW_HIGH          = 0x20;
-const int ICW_LOW           = 0x00;
+//const int ICW_AND_OR        = 0x40;
+//const int ICW_AND           = 0x40;
+//const int ICW_OR            = 0x00;
+//const int ICW_HIGH_LOW      = 0x20;
+//const int ICW_HIGH          = 0x20;
+//const int ICW_LOW           = 0x00;
 const int ICW_MASK_FOLLOWS  = 0x10;
 
 

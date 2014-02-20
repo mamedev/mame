@@ -274,6 +274,7 @@ struct line_aa_step
 	float       weight;                 // weight contribution
 };
 
+#if 0
 static const line_aa_step line_aa_1step[] =
 {
 	{  0.00f,  0.00f,  1.00f  },
@@ -288,6 +289,7 @@ static const line_aa_step line_aa_4step[] =
 	{  0.00f,  0.25f,  0.25f  },
 	{ 0 }
 };
+#endif
 
 //============================================================
 //  INLINES

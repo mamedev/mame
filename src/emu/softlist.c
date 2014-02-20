@@ -151,6 +151,7 @@ INLINE void unknown_attribute(software_list *swlist, const char *attrname)
 
 
 
+#if 0
 /*-------------------------------------------------
     unknown_attribute_value
 -------------------------------------------------*/
@@ -164,6 +165,7 @@ INLINE void unknown_attribute_value(software_list *swlist,
 		XML_GetCurrentLineNumber(swlist->state.parser),
 		XML_GetCurrentColumnNumber(swlist->state.parser));
 }
+#endif
 
 
 /*-------------------------------------------------
@@ -1298,6 +1300,7 @@ const char *software_list_get_description(const software_list *swlist)
 }
 
 
+#if 0
 /*-------------------------------------------------
  software_list_find_by_number
  -------------------------------------------------*/
@@ -1315,6 +1318,7 @@ INLINE software_info *software_list_find_by_number(software_list *swlist, int nu
 
 	return cur_info;
 }
+#endif
 
 
 /*-------------------------------------------------

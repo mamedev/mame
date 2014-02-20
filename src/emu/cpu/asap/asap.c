@@ -27,7 +27,7 @@ const UINT32 PS_NFLAG           = 0x00000008;
 const UINT32 PS_IFLAG           = 0x00000010;
 const UINT32 PS_PFLAG           = 0x00000020;
 
-const int EXCEPTION_RESET       = 0;
+//const int EXCEPTION_RESET       = 0;
 const int EXCEPTION_TRAP0       = 1;
 const int EXCEPTION_TRAPF       = 2;
 const int EXCEPTION_INTERRUPT   = 3;

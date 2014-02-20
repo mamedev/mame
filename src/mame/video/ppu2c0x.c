@@ -440,6 +440,7 @@ void ppu2c0x_device::init_palette_rgb( running_machine &machine, int first_entry
 	/* color tables are modified at run-time, and are initialized on 'ppu2c0x_reset' */
 }
 
+#if 0
 /* the charlayout we use for the chargen */
 static const gfx_layout ppu_charlayout =
 {
@@ -451,6 +452,7 @@ static const gfx_layout ppu_charlayout =
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	16*8    /* every char takes 16 consecutive bytes */
 };
+#endif
 
 /*************************************
  *

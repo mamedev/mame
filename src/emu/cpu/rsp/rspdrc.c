@@ -2116,6 +2116,7 @@ INLINE UINT16 SATURATE_ACCUM1(rsp_state *rsp, int accum, UINT16 negative, UINT16
 	return 0;
 }
 
+#if 0
 INLINE UINT16 C_SATURATE_ACCUM1(UINT16 *h, UINT16 *m, int accum, UINT16 negative, UINT16 positive)
 {
 	// Return negative if H<0 && (H!=0xffff || M >= 0)
@@ -2161,6 +2162,7 @@ INLINE UINT16 C_SATURATE_ACCUM1(UINT16 *h, UINT16 *m, int accum, UINT16 negative
 
 	return 0;
 }
+#endif
 
 #if USE_SIMD
 #define WRITEBACK_RESULT() { \

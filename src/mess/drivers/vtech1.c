@@ -1046,6 +1046,7 @@ ROM_START( laser110 )
 	ROM_CART_LOAD("cart",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
+#if 0
 /* The VZ-200 sold in Germany and the Netherlands came with BASIC V1.1, which
    is currently not dumped. */
 ROM_START( vz200de )
@@ -1054,6 +1055,7 @@ ROM_START( vz200de )
 	ROM_LOAD("vtechv11.u10",   0x2000, 0x2000, NO_DUMP)
 	ROM_CART_LOAD("cart",  0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
+#endif
 
 #define rom_las110de    rom_laser110
 #define rom_laser200    rom_laser110
