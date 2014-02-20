@@ -78,8 +78,8 @@ void ata_hle_device::device_start()
 	m_dasp_handler.resolve_safe();
 	m_pdiag_handler.resolve_safe();
 
-	m_buffer = auto_alloc_array(machine(), UINT8, sector_length());
-	save_pointer(NAME(m_buffer), sector_length());
+	m_buffer.resize(sector_length());
+	save_item(NAME(m_buffer));
 	save_item(NAME(m_buffer_offset));
 	save_item(NAME(m_error));
 	save_item(NAME(m_feature));

@@ -194,13 +194,9 @@ debug_view::debug_view(running_machine &machine, debug_view_type type, debug_vie
 		m_update_level(0),
 		m_update_pending(true),
 		m_osd_update_pending(true),
-		m_viewdata(NULL),
-		m_viewdata_size(0),
+		m_viewdata(m_visible.y * m_visible.x),
 		m_machine(machine)
 {
-	// allocate memory for the buffer
-	m_viewdata_size = m_visible.y * m_visible.x;
-	m_viewdata = auto_alloc_array(machine, debug_view_char, m_viewdata_size);
 }
 
 
@@ -230,13 +226,7 @@ void debug_view::end_update()
 			m_osd_update_pending = true;
 
 			// resize the viewdata if needed
-			int size = m_visible.x * m_visible.y;
-			if (size > m_viewdata_size)
-			{
-				m_viewdata_size = size;
-				auto_free(machine(), m_viewdata);
-				m_viewdata = auto_alloc_array(machine(), debug_view_char, m_viewdata_size);
-			}
+			m_viewdata.resize(m_visible.x * m_visible.y);
 
 			// update the view
 			view_update();

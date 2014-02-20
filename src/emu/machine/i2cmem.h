@@ -147,7 +147,7 @@ protected:
 	int m_shift;
 	int m_devsel;
 	int m_byteaddr;
-	UINT8 *m_page;
+	dynamic_buffer m_page;
 	int m_page_offset;
 };
 

@@ -91,9 +91,6 @@ s2636_device::s2636_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, S2636, "Signetics 2636", tag, owner, clock, "s2636", __FILE__),
 		device_video_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
-		m_work_ram(NULL),
-		m_bitmap(NULL),
-		m_collision_bitmap(NULL),
 		m_channel(NULL),
 		m_size(0),
 		m_pos(0),
@@ -134,15 +131,15 @@ void s2636_device::device_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_work_ram = auto_alloc_array_clear(machine(), UINT8, m_work_ram_size);
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
-	m_collision_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+	m_work_ram.resize_and_clear(m_work_ram_size);
+	m_bitmap.resize(width, height);
+	m_collision_bitmap.resize(width, height);
 
 	save_item(NAME(m_x_offset));
 	save_item(NAME(m_y_offset));
-	save_pointer(NAME(m_work_ram), m_work_ram_size);
-	save_item(NAME(*m_bitmap));
-	save_item(NAME(*m_collision_bitmap));
+	save_item(NAME(m_work_ram));
+	save_item(NAME(m_bitmap));
+	save_item(NAME(m_collision_bitmap));
 
 
 	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this);
@@ -232,7 +229,7 @@ int s2636_device::check_collision( int spriteno1, int spriteno2, const rectangle
 
 	/* TODO: does not check shadow sprites yet */
 
-	m_collision_bitmap->fill(0, cliprect);
+	m_collision_bitmap.fill(0, cliprect);
 
 	if ((attr1[0x0a] != 0xff) && (attr2[0x0a] != 0xff))
 	{
@@ -247,7 +244,7 @@ int s2636_device::check_collision( int spriteno1, int spriteno2, const rectangle
 		int expand2 = (m_work_ram[0xc0] >> (spriteno2 << 1)) & 0x03;
 
 		/* draw first sprite */
-		draw_sprite(attr1, 1, y1, x1, expand1, FALSE, *m_collision_bitmap, cliprect);
+		draw_sprite(attr1, 1, y1, x1, expand1, FALSE, m_collision_bitmap, cliprect);
 
 		/* get fingerprint */
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
@@ -256,11 +253,11 @@ int s2636_device::check_collision( int spriteno1, int spriteno2, const rectangle
 				if (!cliprect.contains(x, y))
 					continue;
 
-				checksum = checksum + m_collision_bitmap->pix16(y, x);
+				checksum = checksum + m_collision_bitmap.pix16(y, x);
 			}
 
 		/* black out second sprite */
-		draw_sprite(attr2, 0, y2, x2, expand2, FALSE, *m_collision_bitmap, cliprect);
+		draw_sprite(attr2, 0, y2, x2, expand2, FALSE, m_collision_bitmap, cliprect);
 
 		/* remove fingerprint */
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
@@ -269,7 +266,7 @@ int s2636_device::check_collision( int spriteno1, int spriteno2, const rectangle
 				if (!cliprect.contains(x, y))
 					continue;
 
-				checksum = checksum - m_collision_bitmap->pix16(y, x);
+				checksum = checksum - m_collision_bitmap.pix16(y, x);
 			}
 	}
 
@@ -289,7 +286,7 @@ bitmap_ind16 &s2636_device::update( const rectangle &cliprect )
 	UINT8 collision = 0;
 	int spriteno;
 
-	m_bitmap->fill(0, cliprect);
+	m_bitmap.fill(0, cliprect);
 
 	for (spriteno = 0; spriteno < 4; spriteno++)
 	{
@@ -306,7 +303,7 @@ bitmap_ind16 &s2636_device::update( const rectangle &cliprect )
 		color = (m_work_ram[0xc1 + (spriteno >> 1)] >> ((spriteno & 1) ? 0 : 3)) & 0x07;
 		expand = (m_work_ram[0xc0] >> (spriteno << 1)) & 0x03;
 
-		draw_sprite(attr, color, y, x, expand, TRUE, *m_bitmap, cliprect);
+		draw_sprite(attr, color, y, x, expand, TRUE, m_bitmap, cliprect);
 
 		/* bail if no shadow sprites */
 		if ((attr[0x0b] == 0xff) || (attr[0x0d] == 0xfe))
@@ -318,7 +315,7 @@ bitmap_ind16 &s2636_device::update( const rectangle &cliprect )
 		{
 			y = y + SPRITE_HEIGHT + attr[0x0d];
 
-			draw_sprite(attr, color, y, x, expand, TRUE, *m_bitmap, cliprect);
+			draw_sprite(attr, color, y, x, expand, TRUE, m_bitmap, cliprect);
 		}
 	}
 
@@ -332,7 +329,7 @@ bitmap_ind16 &s2636_device::update( const rectangle &cliprect )
 
 	m_work_ram[0xcb] = collision;
 
-	return *m_bitmap;
+	return m_bitmap;
 }
 
 

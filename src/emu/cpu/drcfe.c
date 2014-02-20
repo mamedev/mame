@@ -57,7 +57,7 @@ drc_frontend::drc_frontend(device_t &cpu, UINT32 window_start, UINT32 window_end
 		m_pageshift(m_cpudevice.space_config(AS_PROGRAM)->m_page_shift),
 		m_desc_live_list(cpu.machine().respool()),
 		m_desc_allocator(cpu.machine().respool()),
-		m_desc_array(window_end + window_start + 2, true)
+		m_desc_array(window_end + window_start + 2, 0)
 {
 }
 

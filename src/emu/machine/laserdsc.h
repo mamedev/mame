@@ -322,7 +322,7 @@ private:
 
 	// audio data
 	sound_stream *      m_stream;
-	INT16 *             m_audiobuffer[2];       // buffer for audio samples
+	dynamic_array<INT16> m_audiobuffer[2];      // buffer for audio samples
 	UINT32              m_audiobufsize;         // size of buffer
 	UINT32              m_audiobufin;           // input index
 	UINT32              m_audiobufout;          // output index

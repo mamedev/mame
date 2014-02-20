@@ -104,9 +104,8 @@ private:
 	int                 m_divider1, m_divider2; // left and right divider columns
 	int                 m_divider3;             // comment divider column
 	debug_view_expression m_expression;         // expression-related information
-	debug_view_xy       m_allocated;            // allocated rows/columns
-	offs_t *            m_byteaddress;          // addresses of the instructions
-	char *              m_dasm;                 // disassembled instructions
+	dynamic_array<offs_t> m_byteaddress;        // addresses of the instructions
+	dynamic_array<char> m_dasm;                 // disassembled instructions
 
 	// constants
 	static const int DEFAULT_DASM_LINES = 1000;

@@ -66,8 +66,8 @@ private:
 
 	void network_irq_clear();
 
-	UINT32 *m_ram;
 	device_t *m_cpu;
+	UINT32 m_ram[0x2000];
 };
 
 

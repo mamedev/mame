@@ -173,7 +173,7 @@ private:
 	simple_list<component> m_complist;      // list of components
 	int                 m_defstate;         // default state of this element
 	int                 m_maxstate;         // maximum state value for all components
-	texture *           m_elemtex;          // array of element textures used for managing the scaled bitmaps
+	dynamic_array<texture> m_elemtex;       // array of element textures used for managing the scaled bitmaps
 };
 
 

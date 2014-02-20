@@ -60,9 +60,9 @@ protected:
 
 private:
 	// internal state
-	UINT8     *m_work_ram;
-	bitmap_ind16 *m_bitmap;
-	bitmap_ind16 *m_collision_bitmap;
+	dynamic_buffer m_work_ram;
+	bitmap_ind16 m_bitmap;
+	bitmap_ind16 m_collision_bitmap;
 
 	sound_stream *m_channel;
 	UINT8 m_reg[1];

@@ -844,8 +844,8 @@ void laserdisc_device::init_audio()
 	// allocate audio buffers
 	m_audiomaxsamples = ((UINT64)m_samplerate * 1000000 + m_fps_times_1million - 1) / m_fps_times_1million;
 	m_audiobufsize = m_audiomaxsamples * 4;
-	m_audiobuffer[0] = auto_alloc_array(machine(), INT16, m_audiobufsize);
-	m_audiobuffer[1] = auto_alloc_array(machine(), INT16, m_audiobufsize);
+	m_audiobuffer[0].resize(m_audiobufsize);
+	m_audiobuffer[1].resize(m_audiobufsize);
 }
 
 

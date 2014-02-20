@@ -54,9 +54,8 @@ struct cheat_map
 struct cheat_system
 {
 	char        cpu;
-	UINT64      length;
 	UINT8       width;
-	cheat_map * cheatmap;
+	dynamic_array<cheat_map> cheatmap;
 	UINT8       undo;
 	UINT8       signed_cheat;
 	UINT8       swapped_cheat;
@@ -419,8 +418,6 @@ void debug_command_init(running_machine &machine)
 
 static void debug_command_exit(running_machine &machine)
 {
-	if (cheat.length)
-		auto_free(machine, cheat.cheatmap);
 }
 
 
@@ -2041,11 +2038,7 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 	if (ref == 0)
 	{
 		/* initialize new cheat system */
-		if (cheat.cheatmap != NULL)
-			auto_free(machine, cheat.cheatmap);
-		cheat.cheatmap = auto_alloc_array(machine, cheat_map, real_length);
-
-		cheat.length = real_length;
+		cheat.cheatmap.resize(real_length);
 		cheat.undo = 0;
 		cheat.cpu = (params > 3) ? *param[3] : '0';
 	}
@@ -2061,14 +2054,8 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 		if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, AS_PROGRAM, space))
 			return;
 
-		cheat_map *newmap = auto_alloc_array(machine, cheat_map, cheat.length + real_length);
-		for (UINT64 item = 0; item < cheat.length; item++)
-			newmap[item] = cheat.cheatmap[item];
-		auto_free(machine, cheat.cheatmap);
-		cheat.cheatmap = newmap;
-
-		active_cheat = cheat.length;
-		cheat.length += real_length;
+		active_cheat = cheat.cheatmap.count();
+		cheat.cheatmap.resize_keep(cheat.cheatmap.count() + real_length);
 	}
 
 	/* initialize cheatmap in the selected space */
@@ -2162,7 +2149,7 @@ static void execute_cheatnext(running_machine &machine, int ref, int params, con
 	cheat.undo++;
 
 	/* execute the search */
-	for (cheatindex = 0; cheatindex < cheat.length; cheatindex += 1)
+	for (cheatindex = 0; cheatindex < cheat.cheatmap.count(); cheatindex += 1)
 		if (cheat.cheatmap[cheatindex].state == 1)
 		{
 			UINT64 cheat_value = cheat_read_extended(&cheat, *space, cheat.cheatmap[cheatindex].offset);
@@ -2307,7 +2294,7 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 	}
 
 	/* write the cheat list */
-	for (cheatindex = 0; cheatindex < cheat.length; cheatindex += 1)
+	for (cheatindex = 0; cheatindex < cheat.cheatmap.count(); cheatindex += 1)
 	{
 		if (cheat.cheatmap[cheatindex].state == 1)
 		{
@@ -2343,7 +2330,7 @@ static void execute_cheatundo(running_machine &machine, int ref, int params, con
 
 	if (cheat.undo > 0)
 	{
-		for (cheatindex = 0; cheatindex < cheat.length; cheatindex += 1)
+		for (cheatindex = 0; cheatindex < cheat.cheatmap.count(); cheatindex += 1)
 		{
 			if (cheat.cheatmap[cheatindex].undo == cheat.undo)
 			{

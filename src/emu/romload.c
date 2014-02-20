@@ -715,7 +715,6 @@ static int read_rom_data(romload_private *romdata, const rom_entry *parent_regio
 	int numgroups = (numbytes + groupsize - 1) / groupsize;
 	UINT8 *base = romdata->region->base() + ROM_GETOFFSET(romp);
 	UINT32 tempbufsize;
-	UINT8 *tempbuf;
 	int i;
 
 	LOG(("Loading ROM data: offs=%X len=%X mask=%02X group=%d skip=%d reverse=%d\n", ROM_GETOFFSET(romp), numbytes, datamask, groupsize, skip, reversed));
@@ -738,7 +737,7 @@ static int read_rom_data(romload_private *romdata, const rom_entry *parent_regio
 
 	/* use a temporary buffer for complex loads */
 	tempbufsize = MIN(TEMPBUFFER_MAX_SIZE, numbytes);
-	tempbuf = auto_alloc_array(romdata->machine(), UINT8, tempbufsize);
+	dynamic_buffer tempbuf(tempbufsize);
 
 	/* chunky reads for complex loads */
 	skip += groupsize;
@@ -813,7 +812,6 @@ static int read_rom_data(romload_private *romdata, const rom_entry *parent_regio
 				}
 		}
 	}
-	auto_free(romdata->machine(), tempbuf);
 
 	LOG(("  All done\n"));
 	return ROM_GETLENGTH(romp);
