@@ -2246,6 +2246,7 @@ static const gfx_layout galaxold_spritelayout =
 	32*8
 };
 
+#if 0
 static const gfx_layout pacmanbl_spritelayout =
 {
 	16,16,
@@ -2258,6 +2259,7 @@ static const gfx_layout pacmanbl_spritelayout =
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
 	32*8
 };
+#endif
 
 static const gfx_layout _4in1_charlayout =
 {

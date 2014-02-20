@@ -589,8 +589,10 @@ static INPUT_PORTS_START( csplayh5 )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+#if 0
 static GFXDECODE_START( csplayh5 )
 GFXDECODE_END
+#endif
 
 static Z80CTC_INTERFACE( ctc_intf )
 {

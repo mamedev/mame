@@ -987,9 +987,11 @@ ROM_START( pongf ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
+#if PONGD
 ROM_START( pongd ) /* dummy to satisfy game entry*/
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
+#endif
 
 GAME( 1972, pong,  0, pong, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E) external", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING)
 GAME( 1972, pongf,  0, pongf, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E)", GAME_SUPPORTS_SAVE )

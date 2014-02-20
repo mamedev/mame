@@ -5164,6 +5164,7 @@ ROM_START( sc2ofool4 )
 	sc2_ofool_sound
 ROM_END
 
+#if 0
 ROM_START( sc2ofool5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fools6ac.bin", 0x0000, 0x010000, CRC(5fe48a02) SHA1(fd5b07a58567e0c5eb75bf1526a853b3a60ddfa9) )
@@ -5171,6 +5172,7 @@ ROM_START( sc2ofool5 )
 	sc2_ofool_matrix
 	sc2_ofool_sound
 ROM_END
+#endif
 
 
 

@@ -26,6 +26,7 @@ INLINE void configure_filter(filter_state *state, double r, double c)
 	state->exponent = 1.0 - exp(-1.0 / (r * c * 2000000/8));
 }
 
+#if 0
 INLINE double step_rc_filter(filter_state *state, double input)
 {
 	state->capval += (input - state->capval) * state->exponent;
@@ -38,6 +39,7 @@ INLINE double step_cr_filter(filter_state *state, double input)
 	state->capval += (input - state->capval) * state->exponent;
 	return result;
 }
+#endif
 
 
 /*************************************

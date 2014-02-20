@@ -398,6 +398,7 @@ ROM_START(panthera)
 	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
 
+#if 0
 ROM_START(panther7)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u2g807dc.bin", 0x2000, 0x1000, CRC(f8a687b3) SHA1(ba7747c04a5967df760ace102e47c91d42e07a12))
@@ -418,6 +419,7 @@ ROM_START(panther7)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
+#endif
 
 /*-------------------------------------------------------------------
 / Pink Panther
@@ -444,6 +446,7 @@ ROM_START(pnkpnthr)
 	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
 
+#if 0
 ROM_START(pnkpntr7)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u2g807dc.bin", 0x2000, 0x1000, CRC(f8a687b3) SHA1(ba7747c04a5967df760ace102e47c91d42e07a12))
@@ -464,6 +467,7 @@ ROM_START(pnkpntr7)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
+#endif
 
 /*-------------------------------------------------------------------
 / Star Race
@@ -502,6 +506,7 @@ ROM_START(starrace)
 	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
 
+#if 0
 ROM_START(starrac7)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u2g807dc.bin", 0x2000, 0x1000, CRC(f8a687b3) SHA1(ba7747c04a5967df760ace102e47c91d42e07a12))
@@ -534,6 +539,7 @@ ROM_START(starrac7)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
+#endif
 
 /*-------------------------------------------------------------------
 / The Amazing Spider-Man

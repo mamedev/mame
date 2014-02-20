@@ -1376,6 +1376,7 @@ I8255A_INTERFACE( stratgyx_ppi_1_intf )
 	DEVCB_NULL                              /* Port C write */
 };
 
+#if 0
 I8255A_INTERFACE( scramble_protection_ppi_1_intf )
 {
 	DEVCB_NULL,                             /* Port A read */
@@ -1385,6 +1386,7 @@ I8255A_INTERFACE( scramble_protection_ppi_1_intf )
 	DEVCB_DRIVER_MEMBER(scramble_state, scramble_protection_r), /* Port C read */
 	DEVCB_DRIVER_MEMBER(scramble_state, scramble_protection_w)  /* Port C write */
 };
+#endif
 
 I8255A_INTERFACE( mrkougar_ppi_1_intf )
 {

@@ -1944,6 +1944,7 @@ static const stepper_interface barcrest_opto2_interface =
 	2
 };
 
+#if 0
 static const stepper_interface barcrest_opto3_interface =
 {
 	BARCREST_48STEP_REEL,
@@ -1952,6 +1953,7 @@ static const stepper_interface barcrest_opto3_interface =
 	0x00,
 	2
 };
+#endif
 
 static const stepper_interface bwb_opto1_interface =
 {

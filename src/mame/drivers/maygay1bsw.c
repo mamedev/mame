@@ -412,8 +412,10 @@ ROM_START( m1cluedob2 ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    
 ROM_START( m1cluedob2p )    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa5-303", 0x0000, 0x010000, CRC(e0eb84c2) SHA1(3c2db9d41b9c561a483293f2258b654547d937d4) )   m1_cluedo_sound ROM_END_M1A_MCU //pbu 2.1 BwB 1995
 ROM_START( m1cluedob1 ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa5-326", 0x0000, 0x010000, CRC(0ace83db) SHA1(3387ac8583bc4ba7933abe001bc64a2b06a5451f) )   m1_cluedo_sound ROM_END_M1A_MCU //nbu 1.1 BwB 1995 (newer) cl_x6___.2o1
 ROM_START( m1cluedob1p )    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa5-327", 0x0000, 0x010000, CRC(e2261e3d) SHA1(50be56d1c28a31fcdb12a83c230a983bd6c60f62) )   m1_cluedo_sound ROM_END_M1A_MCU //pbu 1.1 BwB 1995 (newer)cl_x6_d_.2o1
+#if 0
 ROM_START( m1cluedobi2 )    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa5-328", 0x0000, 0x010000, CRC(7aa2e6bd) SHA1(82752cd0e89d487016ccb50e55d2d7e11e5bb0ad) )   m1_cluedo_sound ROM_END_M1A_MCU //nbu 2.1 BwB 1995 (IoM) clix6___.2o1
 ROM_START( m1cluedobi2p )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa5-329", 0x0000, 0x010000, CRC(924a7b5b) SHA1(102fba24040c9f968f80747b830fda05444c69aa) )   m1_cluedo_sound ROM_END_M1A_MCU //pbu 2.1 BwB 1995 (IoM) clix6_d_.2o1
+#endif
 ROM_START( m1cluedob2h )    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "clu5p8", 0x0000, 0x010000, CRC(fb6c6527) SHA1(e42683512c537d653593c67a8d238069ac2f2d0e) )    m1_cluedo_sound ROM_END_M1A_MCU //nbu 2.0 - nop'd copyright string
 ROM_START( m1cluedob1h )    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "clu55", 0x0000, 0x010000, CRC(c852a989) SHA1(ff79e65f80d4230a0e0f9e87a9dcc544a5197a1a) ) m1_cluedo_sound ROM_END_M1A_MCU //nbu 1.0 - nop'd copyright string
 
