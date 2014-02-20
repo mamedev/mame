@@ -31,7 +31,7 @@ private:
 	// internal helpers
 	static inline bool is_opaque(float alpha) { return (alpha >= (_NoDestRead ? 0.5f : 1.0f)); }
 	static inline bool is_transparent(float alpha) { return (alpha < (_NoDestRead ? 0.5f : 0.0001f)); }
-	static inline rgb_t apply_intensity(int intensity, rgb_t color) { return color * intensity; }
+	static inline rgb_t apply_intensity(int intensity, rgb_t color) { return color.scale8(intensity); }
 	static inline float round_nearest(float f) { return floor(f + 0.5f); }
 
 	// destination pixels are written based on the values of the template parameters
