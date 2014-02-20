@@ -197,6 +197,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	MCFG_SCREEN_UPDATE_DRIVER(b2m_state, screen_update_b2m)
 
 	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(b2m_state, b2m)
 
 	MCFG_PIT8253_ADD( "pit8253", b2m_pit8253_intf )
 

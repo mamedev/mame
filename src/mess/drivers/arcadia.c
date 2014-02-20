@@ -541,6 +541,7 @@ static MACHINE_CONFIG_START( arcadia, arcadia_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",arcadia ,"palette")
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(arcadia_palette))
+	MCFG_PALETTE_INIT_OWNER(arcadia_state, arcadia)
 
 
 	/* sound hardware */

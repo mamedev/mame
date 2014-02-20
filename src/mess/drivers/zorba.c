@@ -375,7 +375,7 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_SCREEN_UPDATE_DRIVER(zorba_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 276)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 275)
-	MCFG_PALETTE_LENGTH(3)
+	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OVERRIDE(zorba_state, zorba)
 
 	/* sound hardware */

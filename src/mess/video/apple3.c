@@ -82,7 +82,7 @@ PALETTE_INIT_MEMBER(apple3_state, apple3)
 
 	for (i = 0; i < 32; i++)
 	{
-		palette_set_color_rgb(machine(), i,
+		m_palette->set_pen_color(i,
 			apple3_palette[(3*i)]*17,
 			apple3_palette[(3*i)+1]*17,
 			apple3_palette[(3*i)+2]*17);

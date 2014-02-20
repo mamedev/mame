@@ -268,6 +268,7 @@ static MACHINE_CONFIG_START( hr16, alesis_state )
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_INIT_OWNER(alesis_state, alesis)
 
 	MCFG_CASSETTE_ADD( "cassette", hr16_cassette_interface )
 

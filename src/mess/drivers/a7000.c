@@ -297,7 +297,7 @@ UINT32 a7000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 				for(x=0;x<x_size;x+=8)
 				{
 					for(xi=0;xi<8;xi++)
-						bitmap.pix32(y+y_start, x+xi+x_start) = m_palette->pen((vram[count)>>(xi))&1];
+						bitmap.pix32(y+y_start, x+xi+x_start) = m_palette->pen((vram[count]>>(xi))&1);
 
 					count++;
 				}
@@ -311,7 +311,7 @@ UINT32 a7000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 				for(x=0;x<x_size;x+=4)
 				{
 					for(xi=0;xi<4;xi++)
-						bitmap.pix32(y+y_start, x+xi+x_start) = m_palette->pen((vram[count)>>(xi*2))&3];
+						bitmap.pix32(y+y_start, x+xi+x_start) = m_palette->pen((vram[count]>>(xi*2))&3);
 
 					count++;
 				}
@@ -325,7 +325,7 @@ UINT32 a7000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 				for(x=0;x<x_size;x+=2)
 				{
 					for(xi=0;xi<2;xi++)
-						bitmap.pix32(y+y_start, x+xi+x_start) = m_palette->pen((vram[count)>>(xi*4))&0xf];
+						bitmap.pix32(y+y_start, x+xi+x_start) = m_palette->pen((vram[count]>>(xi*4))&0xf);
 
 					count++;
 				}
@@ -338,7 +338,7 @@ UINT32 a7000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			{
 				for(x=0;x<x_size;x++)
 				{
-					bitmap.pix32(y+y_start, x+x_start) = m_palette->pen((vram[count))&0xff];
+					bitmap.pix32(y+y_start, x+x_start) = m_palette->pen((vram[count])&0xff);
 
 					count++;
 				}

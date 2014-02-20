@@ -332,7 +332,7 @@ static MACHINE_CONFIG_START( sbrain, sbrain_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sbrain_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_amber)
 
 	/* sound hardware */

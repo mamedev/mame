@@ -131,7 +131,7 @@ static MACHINE_CONFIG_START( jonos, jonos_state )
 	MCFG_SCREEN_SIZE(640, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 299)
 	MCFG_GFXDECODE_ADD("gfxdecode",jonos,"palette")
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 MACHINE_CONFIG_END
 

@@ -308,7 +308,7 @@ static MACHINE_CONFIG_START( molecula, molecula_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",molecula,"palette")
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -168,7 +168,7 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pv1000);
 	UINT32 screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
 	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
@@ -464,6 +464,8 @@ static MACHINE_CONFIG_START( pv1000, pv1000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pv1000_state, screen_update_pv1000)
 
 	MCFG_PALETTE_ADD( "palette", 8 )
+	MCFG_PALETTE_INIT_OWNER(pv1000_state, pv1000)
+	
 	MCFG_GFXDECODE_ADD("gfxdecode",pv1000 ,"palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

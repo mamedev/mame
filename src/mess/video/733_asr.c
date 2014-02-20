@@ -288,7 +288,7 @@ static void asr_linefeed(device_t *device)
 	for (y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
 	{
 		extract_scanline8(*asr->bitmap, asr_window_offset_x, y+asr_scroll_step, asr_window_width, buf);
-		draw_scanline8(*asr->bitmap, asr_window_offset_x, y, asr_window_width, buf, device->machine().pens);
+		draw_scanline8(*asr->bitmap, asr_window_offset_x, y, asr_window_width, buf, device->m_palette->pens());
 	}
 
 	const rectangle asr_scroll_clear_window(

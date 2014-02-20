@@ -88,6 +88,7 @@ static MACHINE_CONFIG_START( lynx, lynx_state )
 	MCFG_DEFAULT_LAYOUT(layout_lynx)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_PALETTE_INIT_OWNER(lynx_state, lynx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

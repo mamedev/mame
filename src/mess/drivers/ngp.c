@@ -837,7 +837,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ngp, ngp_common )
 
-	MCFG_PALETTE_LENGTH( 8 )
+	MCFG_PALETTE_ADD("palette",  8 )
 
 	MCFG_K1GE_ADD( "k1ge", XTAL_6_144MHz, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 
@@ -856,7 +856,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ngpc, ngp_common )
 
-	MCFG_PALETTE_LENGTH( 4096 )
+	MCFG_PALETTE_ADD("palette",  4096 )
 
 	MCFG_K2GE_ADD( "k1ge", XTAL_6_144MHz, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 

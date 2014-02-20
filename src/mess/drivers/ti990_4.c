@@ -263,10 +263,10 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 
 #if VIDEO_911
 	MCFG_GFXDECODE_ADD("gfxdecode",vdt911,"palette")
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 #else
 	MCFG_GFXDECODE_ADD("gfxdecode",asr733,"palette")
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 #endif
 
 #if VIDEO_911

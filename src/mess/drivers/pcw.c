@@ -1285,7 +1285,7 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw)
 
 	MCFG_PALETTE_ADD("palette", PCW_NUM_COLOURS)
-
+	MCFG_PALETTE_INIT_OWNER(pcw_state, pcw)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

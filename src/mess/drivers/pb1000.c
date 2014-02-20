@@ -52,7 +52,7 @@ public:
 	UINT16 pb1000_kb_r(running_machine &machine);
 	void kb_matrix_w(running_machine &machine, UINT8 matrix);
 	UINT16 read_touchscreen(running_machine &machine, UINT8 line);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pb1000);
 	TIMER_CALLBACK_MEMBER(keyboard_timer);
 };
 
@@ -520,6 +520,7 @@ static MACHINE_CONFIG_START( pb1000, pb1000_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 32-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(pb1000_state, pb1000)
 	MCFG_GFXDECODE_ADD("gfxdecode",pb1000 ,"palette")
 
 	MCFG_HD44352_ADD("hd44352", 910000, hd44352_pb1000_conf)

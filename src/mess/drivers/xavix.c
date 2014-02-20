@@ -160,7 +160,7 @@ static MACHINE_CONFIG_START( xavix, xavix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",xavix,"palette")
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

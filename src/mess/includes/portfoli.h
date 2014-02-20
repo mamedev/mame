@@ -108,7 +108,7 @@ public:
 
 	/* peripheral state */
 	UINT8 m_pid;                        /* peripheral identification */
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(portfolio);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);

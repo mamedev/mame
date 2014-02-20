@@ -107,7 +107,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lynx128k_irq);
 	DECLARE_DRIVER_INIT(lynx48k);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(camplynx);
 	DECLARE_MACHINE_RESET(lynx128k);
 };
 
@@ -480,6 +480,7 @@ static MACHINE_CONFIG_START( lynx48k, camplynx_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(camplynx_state, camplynx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -507,6 +508,7 @@ static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(camplynx_state, camplynx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

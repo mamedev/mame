@@ -300,7 +300,7 @@ static MACHINE_CONFIG_START( lola8a, lola8a_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_MC6845_ADD(HD46505SP_TAG, HD6845, "screen", XTAL_8MHz / 8, hd46505sp_intf) // HD6845 == HD46505S
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )

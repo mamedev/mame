@@ -89,7 +89,7 @@ public:
 		m_rtc->cs1_w(1);
 	}
 
-	PALETTE_INIT_NAME(hprot1)()
+	DECLARE_PALETTE_INIT(hprot1)
 	{
 		palette.set_pen_color(0, rgb_t(36,72,36));
 		palette.set_pen_color(1, rgb_t(2,4,2));
@@ -782,7 +782,7 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

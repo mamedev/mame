@@ -852,6 +852,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(portfolio_state, portfolio)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",portfolio,"palette")
 

@@ -1136,7 +1136,7 @@ static ADDRESS_MAP_START( supracan_mem, AS_PROGRAM, 16, supracan_state )
 	AM_RANGE( 0xe90030, 0xe9003f ) AM_WRITE( supracan_dma_channel1_w )
 
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
-	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE( 0xf40000, 0xf5ffff ) AM_READWRITE(supracan_vram_r, supracan_vram_w)
 	AM_RANGE( 0xfc0000, 0xfdffff ) AM_MIRROR(0x30000) AM_RAM /* System work ram */
 ADDRESS_MAP_END
@@ -1926,6 +1926,7 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )  /* No idea if this is correct */
 	MCFG_SCREEN_UPDATE_DRIVER(supracan_state, screen_update_supracan)
 	MCFG_PALETTE_ADD( "palette", 32768 )
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_GFXDECODE_ADD("gfxdecode",supracan,"palette")
 
 	MCFG_CARTSLOT_ADD("cart")

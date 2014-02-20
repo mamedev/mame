@@ -361,7 +361,7 @@ void pdp1_state::pdp1_typewriter_linefeed()
 	for (y=0; y<typewriter_window_height-typewriter_scroll_step; y++)
 	{
 		extract_scanline8(m_typewriter_bitmap, 0, y+typewriter_scroll_step, typewriter_window_width, buf);
-		draw_scanline8(m_typewriter_bitmap, 0, y, typewriter_window_width, buf, machine().pens);
+		draw_scanline8(m_typewriter_bitmap, 0, y, typewriter_window_width, buf, m_palette->pens());
 	}
 
 	const rectangle typewriter_scroll_clear_window(0, typewriter_window_width-1,    typewriter_window_height-typewriter_scroll_step, typewriter_window_height-1);

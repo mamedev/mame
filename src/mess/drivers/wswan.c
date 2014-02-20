@@ -143,6 +143,7 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",wswan,"palette")
 	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(wswan_state, wswan)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

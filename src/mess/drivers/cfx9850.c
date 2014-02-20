@@ -49,7 +49,7 @@ public:
 	required_shared_ptr<UINT8> m_video_ram;
 	required_shared_ptr<UINT8> m_display_ram;
 	UINT16 m_ko;                /* KO lines KO1 - KO14 */
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(cfx9850);
 	UINT32 screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -270,6 +270,7 @@ static MACHINE_CONFIG_START( cfx9850, cfx9850_state )
 
 	/* TODO: It uses a color display, but I'm being lazy here. 3 colour lcd */
 	MCFG_PALETTE_ADD( "palette", 4 )
+	MCFG_PALETTE_INIT_OWNER(cfx9850_state, cfx9850)
 MACHINE_CONFIG_END
 
 

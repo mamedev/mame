@@ -997,6 +997,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	MCFG_SCREEN_UPDATE_DRIVER(a7800_state, screen_update_a7800)
 
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(a7800_palette))
+	MCFG_PALETTE_INIT_OWNER(a7800_state, a7800)
 
 
 	/* sound hardware */

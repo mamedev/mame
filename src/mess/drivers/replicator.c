@@ -667,7 +667,7 @@ static MACHINE_CONFIG_START( replicator, replicator_state )
 	MCFG_SCREEN_SIZE(120, 18*2) //4x20 chars
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18*2-1)
 
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_GFXDECODE_ADD("gfxdecode",replicator,"palette")
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

@@ -191,6 +191,7 @@ static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_SCREEN_UPDATE_DRIVER(electron_state, screen_update_electron)
 
 	MCFG_PALETTE_ADD( "palette", 16 )
+	MCFG_PALETTE_INIT_OWNER(electron_state, electron)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 

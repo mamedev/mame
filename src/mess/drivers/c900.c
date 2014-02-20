@@ -116,7 +116,7 @@ static MACHINE_CONFIG_START( c900, c900_state )
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 	MCFG_GFXDECODE_ADD("gfxdecode",c900,"palette")
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 MACHINE_CONFIG_END
 

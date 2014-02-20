@@ -658,6 +658,7 @@ static MACHINE_CONFIG_START( z88, z88_state )
 	MCFG_SCREEN_UPDATE_DEVICE("blink", upd65031_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", Z88_NUM_COLOURS)
+	MCFG_PALETTE_INIT_OWNER(z88_state, z88)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
