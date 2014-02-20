@@ -16,9 +16,11 @@
 #include <assert.h>
 #include "osdcore.h"
 
-
+// TEMPORARY helper to catch is_pod assertions in the debugger
+#if 0
 #undef assert
 #define assert(x) do { if (!(x)) { printf("Assert: %s\n", #x); asm("int $3"); } } while (0)
+#endif
 
 // ======================> dynamic_array
 
