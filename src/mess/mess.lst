@@ -1232,8 +1232,10 @@ gl4000 // Genius Leader 4000 Quadro (Germany)
 gl4004 // Genius Leader 4004 Quadro L (Germany)
 gl5000 // Genius Leader 5000 (Germany)
 gl5005x // Genius Leader 5005X (Germany)
+prestige // PreComputer Prestige Elite
 gl6000sl // Genius Leader 6000SL (Germany)
 gl7007sl // Genius Leader 7007SL (Germany)
+glcolor  // Genius Leader Color (Germany)
 
 
 // Tangerine
@@ -2159,7 +2161,6 @@ pasopia
 pasopia7
 pasopia7lcd
 paso1600
-prestige
 smc777
 multi8
 multi16
