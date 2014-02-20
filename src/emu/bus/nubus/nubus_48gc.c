@@ -9,10 +9,10 @@
 #include "emu.h"
 #include "nubus_48gc.h"
 
+#define VRAM_SIZE  (0x200000)  // 2 megs, maxed out
+
 #define GC48_SCREEN_NAME    "48gc_screen"
 #define GC48_ROM_REGION     "48gc_rom"
-
-#define VRAM_SIZE   (0x200000)  // 2 megs, maxed out
 
 MACHINE_CONFIG_FRAGMENT( macvideo_48gc )
 	MCFG_SCREEN_ADD( GC48_SCREEN_NAME, RASTER)
@@ -111,7 +111,7 @@ void jmfb_device::device_start()
 
 //  printf("[JMFB %p] slotspace = %x\n", this, slotspace);
 
-	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
+	m_vram.resize(VRAM_SIZE);
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, 0, 0, "bank_48gc", m_vram);
 
 	m_nubus->install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(FUNC(jmfb_device::mac_48gc_r), this), write32_delegate(FUNC(jmfb_device::mac_48gc_w), this));

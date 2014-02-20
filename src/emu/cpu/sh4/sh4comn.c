@@ -1218,8 +1218,6 @@ void sh4_common_init(device_t *device)
 
 	sh4->rtc_timer = device->machine().scheduler().timer_alloc(FUNC(sh4_rtc_timer_callback), sh4);
 	sh4->rtc_timer->adjust(attotime::never);
-
-	sh4->m = auto_alloc_array(device->machine(), UINT32, 16384);
 }
 
 UINT32 sh4_getsqremap(sh4_state *sh4, UINT32 address)

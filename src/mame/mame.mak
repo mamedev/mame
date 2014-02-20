@@ -520,7 +520,6 @@ DRVLIBS += \
 	$(MAMEOBJ)/cinemat.a \
 	$(MAMEOBJ)/comad.a \
 	$(MAMEOBJ)/cvs.a \
-	$(MAMEOBJ)/dataeast.a \
 	$(MAMEOBJ)/dgrm.a \
 	$(MAMEOBJ)/dooyong.a \
 	$(MAMEOBJ)/dynax.a \

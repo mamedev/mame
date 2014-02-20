@@ -344,7 +344,6 @@ void device_nubus_card_interface::install_bank(offs_t start, offs_t end, offs_t 
 void device_nubus_card_interface::install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb, bool reverse_rom)
 {
 	bool inverted = false;
-	UINT8 *newrom = NULL;
 
 	astring tempstring;
 	UINT8 *rom = device().machine().root_device().memregion(dev->subtag(tempstring, romregion))->base();
@@ -384,75 +383,75 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 	switch (byteLanes)
 	{
 		case 0x0f:  // easy case: all 4 lanes (still must scramble for 32-bit BE bus though)
-			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen);
+			m_declaration_rom.resize(romlen);
 			for (int i = 0; i < romlen; i++)
 			{
-				newrom[BYTE4_XOR_BE(i)] = rom[i];
+				m_declaration_rom[BYTE4_XOR_BE(i)] = rom[i];
 			}
 			break;
 
 		case 0xe1:  // lane 0 only
-			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*4);
+			m_declaration_rom.resize_and_clear(romlen*4);
 			for (int i = 0; i < romlen; i++)
 			{
-				newrom[BYTE4_XOR_BE(i*4)] = rom[i];
+				m_declaration_rom[BYTE4_XOR_BE(i*4)] = rom[i];
 			}
 			romlen *= 4;
 			break;
 
 		case 0xd2:  // lane 1 only
-			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*4);
+			m_declaration_rom.resize_and_clear(romlen*4);
 			for (int i = 0; i < romlen; i++)
 			{
-				newrom[BYTE4_XOR_BE((i*4)+1)] = rom[i];
+				m_declaration_rom[BYTE4_XOR_BE((i*4)+1)] = rom[i];
 			}
 			romlen *= 4;
 			break;
 
 		case 0xb4:  // lane 2 only
-			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*4);
+			m_declaration_rom.resize_and_clear(romlen*4);
 			for (int i = 0; i < romlen; i++)
 			{
-				newrom[BYTE4_XOR_BE((i*4)+2)] = rom[i];
+				m_declaration_rom[BYTE4_XOR_BE((i*4)+2)] = rom[i];
 			}
 			romlen *= 4;
 			break;
 
 		case 0x78:  // lane 3 only
-			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*4);
+			m_declaration_rom.resize_and_clear(romlen*4);
 			for (int i = 0; i < romlen; i++)
 			{
-				newrom[BYTE4_XOR_BE((i*4)+3)] = rom[i];
+				m_declaration_rom[BYTE4_XOR_BE((i*4)+3)] = rom[i];
 			}
 			romlen *= 4;
 			break;
 
 		case 0xc3:  // lanes 0, 1
-			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*2);
+			m_declaration_rom.resize_and_clear(romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
-				newrom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
-				newrom[BYTE4_XOR_BE((i*4)+1)] = rom[(i*2)+1];
+				m_declaration_rom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
+				m_declaration_rom[BYTE4_XOR_BE((i*4)+1)] = rom[(i*2)+1];
 			}
 			romlen *= 2;
 			break;
 
 		case 0xa5:  // lanes 0, 2
-			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*2);
+			m_declaration_rom.resize_and_clear(romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
-				newrom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
-				newrom[BYTE4_XOR_BE((i*4)+2)] = rom[(i*2)+1];
+				m_declaration_rom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
+				m_declaration_rom[BYTE4_XOR_BE((i*4)+2)] = rom[(i*2)+1];
 			}
 			romlen *= 2;
 			break;
 
 		case 0x3c:  // lanes 2,3
-			newrom = auto_alloc_array_clear(device().machine(), UINT8, romlen*2);
+			m_declaration_rom.resize_and_clear(romlen*2);
 			for (int i = 0; i < romlen/2; i++)
 			{
-				newrom[BYTE4_XOR_BE((i*4)+2)] = rom[(i*2)];
-				newrom[BYTE4_XOR_BE((i*4)+3)] = rom[(i*2)+1];
+				m_declaration_rom[BYTE4_XOR_BE((i*4)+2)] = rom[(i*2)];
+				m_declaration_rom[BYTE4_XOR_BE((i*4)+3)] = rom[(i*2)+1];
 			}
 			romlen *= 2;
 			break;
@@ -467,7 +466,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 	{
 		for (int i = 0; i < romlen; i++)
 		{
-			newrom[i] ^= 0xff;
+			m_declaration_rom[i] ^= 0xff;
 		}
 	}
 
@@ -480,10 +479,10 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 //  printf("Installing ROM at %x, length %x\n", addr, romlen);
 	if (mirror_all_mb)  // mirror the declaration ROM across all 16 megs of the slot space
 	{
-		m_nubus->install_bank(addr, addr+romlen-1, 0, 0x00f00000, bankname, newrom);
+		m_nubus->install_bank(addr, addr+romlen-1, 0, 0x00f00000, bankname, m_declaration_rom);
 	}
 	else
 	{
-		m_nubus->install_bank(addr, addr+romlen-1, 0, 0, bankname, newrom);
+		m_nubus->install_bank(addr, addr+romlen-1, 0, 0, bankname, m_declaration_rom);
 	}
 }

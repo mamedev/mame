@@ -214,7 +214,7 @@ ATTR_COLD void netlist_parser::verror(pstring msg, int line_num, pstring line)
 }
 
 
-void netlist_parser::parse(const char *buf, const pstring nlname)
+bool netlist_parser::parse(const char *buf, const pstring nlname)
 {
     m_buf = buf;
 
@@ -249,7 +249,10 @@ void netlist_parser::parse(const char *buf, const pstring nlname)
         token_t token = get_token();
 
         if (token.is_type(ENDOFFILE))
-            error("EOF while searching for <%s>", nlname.cstr());
+        {
+            return false;
+            //error("EOF while searching for <%s>", nlname.cstr());
+        }
 
         if (token.is(m_tok_NETLIST_END))
         {
@@ -272,7 +275,7 @@ void netlist_parser::parse(const char *buf, const pstring nlname)
             if (name.str() == nlname || nlname == "")
             {
                 parse_netlist(name.str());
-                return;
+                return true;
             } else
                 in_nl = true;
         }

@@ -294,7 +294,7 @@ drcuml_block::drcuml_block(drcuml_state &drcuml, UINT32 maxinst)
 		m_next(NULL),
 		m_nextinst(0),
 		m_maxinst(maxinst * 3/2),
-		m_inst(auto_alloc_array(drcuml.device().machine(), instruction, m_maxinst)),
+		m_inst(m_maxinst),
 		m_inuse(false)
 {
 }
@@ -306,8 +306,6 @@ drcuml_block::drcuml_block(drcuml_state &drcuml, UINT32 maxinst)
 
 drcuml_block::~drcuml_block()
 {
-	// free the instruction list
-	auto_free(m_drcuml.device().machine(), m_inst);
 }
 
 

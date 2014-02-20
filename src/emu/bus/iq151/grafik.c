@@ -57,8 +57,6 @@ iq151_grafik_device::iq151_grafik_device(const machine_config &mconfig, const ch
 
 void iq151_grafik_device::device_start()
 {
-	// allocate the videoram
-	m_videoram = (UINT8*)auto_alloc_array_clear(machine(), UINT8, 0x4000);
 }
 
 //-------------------------------------------------
@@ -73,7 +71,7 @@ void iq151_grafik_device::device_reset()
 	if (screen->visible_area().max_x < 64*8-1)
 		screen->set_visible_area(0, 64*8-1, 0, 32*8-1);
 
-	memset(m_videoram, 0x00, 0x4000);
+	memset(m_videoram, 0x00, sizeof(m_videoram));
 }
 
 //-------------------------------------------------

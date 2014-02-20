@@ -2,7 +2,7 @@
  * MUL* and MULU* do not set OV correctly
  * DIVX: the second operand should be treated as dword instead of word
  * GETATE, GETPTE and GETRA should not be used
- * UPDPSW: cpustate->_CY and cpustate->_OV must be cleared or unchanged? I suppose
+ * UPDPSW: _CY and _OV must be cleared or unchanged? I suppose
  *   cleared, like TEST being done on the mask operand.
  * MOVT: I cannot understand exactly what happens to the result
  *   when an overflow occurs
@@ -13,161 +13,161 @@
 
 
 /*
- *  Macro to access data in operands decoded with ReadAMAddress(cpustate)
+ *  Macro to access data in operands decoded with ReadAMAddress()
  */
 
-#define F12LOADOPBYTE(cs, num)                          \
-	if ((cs)->flag##num)                                \
-		appb = (UINT8)(cs)->reg[(cs)->op##num];         \
+#define F12LOADOPBYTE(num)                          \
+	if (m_flag##num)                                \
+		appb = (UINT8)m_reg[m_op##num];         \
 	else                                                \
-		appb = (cs)->program->read_byte((cs)->op##num);
+		appb = m_program->read_byte(m_op##num);
 
-#define F12LOADOPHALF(cs, num)                          \
-	if ((cs)->flag##num)                                \
-		apph = (UINT16)(cs)->reg[(cs)->op##num];        \
+#define F12LOADOPHALF(num)                          \
+	if (m_flag##num)                                \
+		apph = (UINT16)m_reg[m_op##num];        \
 	else                                                \
-		apph = (cs)->program->read_word_unaligned((cs)->op##num);
+		apph = m_program->read_word_unaligned(m_op##num);
 
-#define F12LOADOPWORD(cs, num)                          \
-	if ((cs)->flag##num)                                \
-		appw = (cs)->reg[(cs)->op##num];                \
+#define F12LOADOPWORD(num)                          \
+	if (m_flag##num)                                \
+		appw = m_reg[m_op##num];                \
 	else                                                \
-		appw = (cs)->program->read_dword_unaligned((cs)->op##num);
+		appw = m_program->read_dword_unaligned(m_op##num);
 
-#define F12STOREOPBYTE(cs, num)                         \
-	if ((cs)->flag##num)                                \
-		SETREG8((cs)->reg[(cs)->op##num], appb);        \
+#define F12STOREOPBYTE(num)                         \
+	if (m_flag##num)                                \
+		SETREG8(m_reg[m_op##num], appb);        \
 	else                                                \
-		(cs)->program->write_byte((cs)->op##num, appb);
+		m_program->write_byte(m_op##num, appb);
 
-#define F12STOREOPHALF(cs, num)                         \
-	if ((cs)->flag##num)                                \
-		SETREG16((cs)->reg[(cs)->op##num], apph);       \
+#define F12STOREOPHALF(num)                         \
+	if (m_flag##num)                                \
+		SETREG16(m_reg[m_op##num], apph);       \
 	else                                                \
-		(cs)->program->write_word_unaligned((cs)->op##num, apph);
+		m_program->write_word_unaligned(m_op##num, apph);
 
-#define F12STOREOPWORD(cs, num)                         \
-	if ((cs)->flag##num)                                \
-		(cs)->reg[(cs)->op##num] = appw;                \
+#define F12STOREOPWORD(num)                         \
+	if (m_flag##num)                                \
+		m_reg[m_op##num] = appw;                \
 	else                                                \
-		(cs)->program->write_dword_unaligned((cs)->op##num, appw);
+		m_program->write_dword_unaligned(m_op##num, appw);
 
-#define F12LOADOP1BYTE(cs)  F12LOADOPBYTE(cs, 1)
-#define F12LOADOP1HALF(cs)  F12LOADOPHALF(cs, 1)
-#define F12LOADOP1WORD(cs)  F12LOADOPWORD(cs, 1)
+#define F12LOADOP1BYTE()  F12LOADOPBYTE(1)
+#define F12LOADOP1HALF()  F12LOADOPHALF(1)
+#define F12LOADOP1WORD()  F12LOADOPWORD(1)
 
-#define F12LOADOP2BYTE(cs)  F12LOADOPBYTE(cs, 2)
-#define F12LOADOP2HALF(cs)  F12LOADOPHALF(cs, 2)
-#define F12LOADOP2WORD(cs)  F12LOADOPWORD(cs, 2)
+#define F12LOADOP2BYTE()  F12LOADOPBYTE(2)
+#define F12LOADOP2HALF()  F12LOADOPHALF(2)
+#define F12LOADOP2WORD()  F12LOADOPWORD(2)
 
-#define F12STOREOP1BYTE(cs)  F12STOREOPBYTE(cs, 1)
-#define F12STOREOP1HALF(cs)  F12STOREOPHALF(cs, 1)
-#define F12STOREOP1WORD(cs)  F12STOREOPWORD(cs, 1)
+#define F12STOREOP1BYTE()  F12STOREOPBYTE(1)
+#define F12STOREOP1HALF()  F12STOREOPHALF(1)
+#define F12STOREOP1WORD()  F12STOREOPWORD(1)
 
-#define F12STOREOP2BYTE(cs)  F12STOREOPBYTE(cs, 2)
-#define F12STOREOP2HALF(cs)  F12STOREOPHALF(cs, 2)
-#define F12STOREOP2WORD(cs)  F12STOREOPWORD(cs, 2)
+#define F12STOREOP2BYTE()  F12STOREOPBYTE(2)
+#define F12STOREOP2HALF()  F12STOREOPHALF(2)
+#define F12STOREOP2WORD()  F12STOREOPWORD(2)
 
-#define F12END(cs)                                  \
-	return (cs)->amlength1 + (cs)->amlength2 + 2;
+#define F12END()                                  \
+	return m_amlength1 + m_amlength2 + 2;
 
 
 // Decode the first operand of the instruction and prepare
 // writing to the second operand.
-static void F12DecodeFirstOperand(v60_state *cpustate, UINT32 (*DecodeOp1)(v60_state *), UINT8 dim1)
+void v60_device::F12DecodeFirstOperand(am_func DecodeOp1, UINT8 dim1)
 {
-	cpustate->instflags = OpRead8(cpustate, cpustate->PC + 1);
+	m_instflags = OpRead8(PC + 1);
 
 	// Check if F1 or F2
-	if (cpustate->instflags & 0x80)
+	if (m_instflags & 0x80)
 	{
-		cpustate->moddim = dim1;
-		cpustate->modm = cpustate->instflags & 0x40;
-		cpustate->modadd = cpustate->PC + 2;
-		cpustate->amlength1 = DecodeOp1(cpustate);
-		cpustate->op1 = cpustate->amout;
-		cpustate->flag1 = cpustate->amflag;
+		m_moddim = dim1;
+		m_modm = m_instflags & 0x40;
+		m_modadd = PC + 2;
+		m_amlength1 = (this->*DecodeOp1)();
+		m_op1 = m_amout;
+		m_flag1 = m_amflag;
 	}
 	else
 	{
 		// Check D flag
-		if (cpustate->instflags & 0x20)
+		if (m_instflags & 0x20)
 		{
-			cpustate->moddim = dim1;
-			cpustate->modm = cpustate->instflags & 0x40;
-			cpustate->modadd = cpustate->PC + 2;
-			cpustate->amlength1 = DecodeOp1(cpustate);
-			cpustate->op1 = cpustate->amout;
-			cpustate->flag1 = cpustate->amflag;
+			m_moddim = dim1;
+			m_modm = m_instflags & 0x40;
+			m_modadd = PC + 2;
+			m_amlength1 = (this->*DecodeOp1)();
+			m_op1 = m_amout;
+			m_flag1 = m_amflag;
 		}
 		else
 		{
-			if (DecodeOp1 == ReadAM)
+			if (DecodeOp1 == &v60_device::ReadAM)
 			{
 				switch (dim1)
 				{
 				case 0:
-					cpustate->op1 = (UINT8)cpustate->reg[cpustate->instflags & 0x1F];
+					m_op1 = (UINT8)m_reg[m_instflags & 0x1F];
 					break;
 				case 1:
-					cpustate->op1 = (UINT16)cpustate->reg[cpustate->instflags & 0x1F];
+					m_op1 = (UINT16)m_reg[m_instflags & 0x1F];
 					break;
 				case 2:
-					cpustate->op1 = cpustate->reg[cpustate->instflags & 0x1F];
+					m_op1 = m_reg[m_instflags & 0x1F];
 					break;
 				}
 
-				cpustate->flag1 = 0;
+				m_flag1 = 0;
 			}
 			else
 			{
-				cpustate->flag1 = 1;
-				cpustate->op1 = cpustate->instflags & 0x1F;
+				m_flag1 = 1;
+				m_op1 = m_instflags & 0x1F;
 			}
 
-			cpustate->amlength1 = 0;
+			m_amlength1 = 0;
 		}
 	}
 }
 
-static void F12WriteSecondOperand(v60_state *cpustate, UINT8 dim2)
+void v60_device::F12WriteSecondOperand(UINT8 dim2)
 {
-	cpustate->moddim = dim2;
+	m_moddim = dim2;
 
 	// Check if F1 or F2
-	if (cpustate->instflags & 0x80)
+	if (m_instflags & 0x80)
 	{
-		cpustate->modm = cpustate->instflags & 0x20;
-		cpustate->modadd = cpustate->PC + 2 + cpustate->amlength1;
-		cpustate->moddim = dim2;
-		cpustate->amlength2 = WriteAM(cpustate);
+		m_modm = m_instflags & 0x20;
+		m_modadd = PC + 2 + m_amlength1;
+		m_moddim = dim2;
+		m_amlength2 = WriteAM();
 	}
 	else
 	{
 		// Check D flag
-		if (cpustate->instflags & 0x20)
+		if (m_instflags & 0x20)
 		{
 			switch (dim2)
 			{
 			case 0:
-				SETREG8(cpustate->reg[cpustate->instflags & 0x1F], cpustate->modwritevalb);
+				SETREG8(m_reg[m_instflags & 0x1F], m_modwritevalb);
 				break;
 			case 1:
-				SETREG16(cpustate->reg[cpustate->instflags & 0x1F], cpustate->modwritevalh);
+				SETREG16(m_reg[m_instflags & 0x1F], m_modwritevalh);
 				break;
 			case 2:
-				cpustate->reg[cpustate->instflags & 0x1F] = cpustate->modwritevalw;
+				m_reg[m_instflags & 0x1F] = m_modwritevalw;
 				break;
 			}
 
-			cpustate->amlength2 = 0;
+			m_amlength2 = 0;
 		}
 		else
 		{
-			cpustate->modm = cpustate->instflags & 0x40;
-			cpustate->modadd = cpustate->PC + 2;
-			cpustate->moddim = dim2;
-			cpustate->amlength2 = WriteAM(cpustate);
+			m_modm = m_instflags & 0x40;
+			m_modadd = PC + 2;
+			m_moddim = dim2;
+			m_amlength2 = WriteAM();
 		}
 	}
 }
@@ -175,1202 +175,1202 @@ static void F12WriteSecondOperand(v60_state *cpustate, UINT8 dim2)
 
 
 // Decode both format 1 / 2 operands
-static void F12DecodeOperands(v60_state *cpustate, UINT32 (*DecodeOp1)(v60_state *), UINT8 dim1, UINT32 (*DecodeOp2)(v60_state *), UINT8 dim2)
+void v60_device::F12DecodeOperands(am_func DecodeOp1, UINT8 dim1, am_func DecodeOp2, UINT8 dim2)
 {
-	UINT8 _if12 = OpRead8(cpustate, cpustate->PC + 1);
+	UINT8 _if12 = OpRead8(PC + 1);
 
 	// Check if F1 or F2
 	if (_if12 & 0x80)
 	{
-		cpustate->moddim = dim1;
-		cpustate->modm = _if12 & 0x40;
-		cpustate->modadd = cpustate->PC + 2;
-		cpustate->amlength1 = DecodeOp1(cpustate);
-		cpustate->op1 = cpustate->amout;
-		cpustate->flag1 = cpustate->amflag;
+		m_moddim = dim1;
+		m_modm = _if12 & 0x40;
+		m_modadd = PC + 2;
+		m_amlength1 = (this->*DecodeOp1)();
+		m_op1 = m_amout;
+		m_flag1 = m_amflag;
 
-		cpustate->moddim = dim2;
-		cpustate->modm = _if12 & 0x20;
-		cpustate->modadd = cpustate->PC + 2 + cpustate->amlength1;
-		cpustate->amlength2 = DecodeOp2(cpustate);
-		cpustate->op2 = cpustate->amout;
-		cpustate->flag2 = cpustate->amflag;
+		m_moddim = dim2;
+		m_modm = _if12 & 0x20;
+		m_modadd = PC + 2 + m_amlength1;
+		m_amlength2 = (this->*DecodeOp2)();
+		m_op2 = m_amout;
+		m_flag2 = m_amflag;
 	}
 	else
 	{
 		// Check D flag
 		if (_if12 & 0x20)
 		{
-			if (DecodeOp2 == ReadAMAddress)
+			if (DecodeOp2 == &v60_device::ReadAMAddress)
 			{
-				cpustate->op2 = _if12 & 0x1F;
-				cpustate->flag2 = 1;
+				m_op2 = _if12 & 0x1F;
+				m_flag2 = 1;
 			}
 			else
 			{
 				switch (dim2)
 				{
 				case 0:
-					cpustate->op2 = (UINT8)cpustate->reg[_if12 & 0x1F];
+					m_op2 = (UINT8)m_reg[_if12 & 0x1F];
 					break;
 				case 1:
-					cpustate->op2 = (UINT16)cpustate->reg[_if12 & 0x1F];
+					m_op2 = (UINT16)m_reg[_if12 & 0x1F];
 					break;
 				case 2:
-					cpustate->op2 = cpustate->reg[_if12 & 0x1F];
+					m_op2 = m_reg[_if12 & 0x1F];
 					break;
 				}
 			}
 
-			cpustate->amlength2 = 0;
+			m_amlength2 = 0;
 
-			cpustate->moddim = dim1;
-			cpustate->modm = _if12 & 0x40;
-			cpustate->modadd = cpustate->PC + 2;
-			cpustate->amlength1 = DecodeOp1(cpustate);
-			cpustate->op1 = cpustate->amout;
-			cpustate->flag1 = cpustate->amflag;
+			m_moddim = dim1;
+			m_modm = _if12 & 0x40;
+			m_modadd = PC + 2;
+			m_amlength1 = (this->*DecodeOp1)();
+			m_op1 = m_amout;
+			m_flag1 = m_amflag;
 		}
 		else
 		{
-			if (DecodeOp1 == ReadAMAddress)
+			if (DecodeOp1 == &v60_device::ReadAMAddress)
 			{
-				cpustate->op1 = _if12 & 0x1F;
-				cpustate->flag1 = 1;
+				m_op1 = _if12 & 0x1F;
+				m_flag1 = 1;
 			}
 			else
 			{
 				switch (dim1)
 				{
 				case 0:
-					cpustate->op1 = (UINT8)cpustate->reg[_if12 & 0x1F];
+					m_op1 = (UINT8)m_reg[_if12 & 0x1F];
 					break;
 				case 1:
-					cpustate->op1 = (UINT16)cpustate->reg[_if12 & 0x1F];
+					m_op1 = (UINT16)m_reg[_if12 & 0x1F];
 					break;
 				case 2:
-					cpustate->op1 = cpustate->reg[_if12 & 0x1F];
+					m_op1 = m_reg[_if12 & 0x1F];
 					break;
 				}
 			}
-			cpustate->amlength1 = 0;
+			m_amlength1 = 0;
 
-			cpustate->moddim = dim2;
-			cpustate->modm = _if12 & 0x40;
-			cpustate->modadd = cpustate->PC + 2 + cpustate->amlength1;
-			cpustate->amlength2 = DecodeOp2(cpustate);
-			cpustate->op2 = cpustate->amout;
-			cpustate->flag2 = cpustate->amflag;
+			m_moddim = dim2;
+			m_modm = _if12 & 0x40;
+			m_modadd = PC + 2 + m_amlength1;
+			m_amlength2 = (this->*DecodeOp2)();
+			m_op2 = m_amout;
+			m_flag2 = m_amflag;
 		}
 	}
 }
 
-static UINT32 opADDB(v60_state *cpustate) /* TRUSTED (C too!)*/
+UINT32 v60_device::opADDB() /* TRUSTED (C too!)*/
 {
 	UINT8 appb;
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	ADDB(appb, (UINT8)cpustate->op1);
+	ADDB(appb, (UINT8)m_op1);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opADDH(v60_state *cpustate) /* TRUSTED (C too!)*/
+UINT32 v60_device::opADDH() /* TRUSTED (C too!)*/
 {
 	UINT16 apph;
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	ADDW(apph, (UINT16)cpustate->op1);
+	ADDW(apph, (UINT16)m_op1);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opADDW(v60_state *cpustate) /* TRUSTED (C too!) */
+UINT32 v60_device::opADDW() /* TRUSTED (C too!) */
 {
 	UINT32 appw;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	ADDL(appw, (UINT32)cpustate->op1);
+	ADDL(appw, (UINT32)m_op1);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opADDCB(v60_state *cpustate)
+UINT32 v60_device::opADDCB()
 {
 	UINT8 appb, temp;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	temp = ((UINT8)cpustate->op1 + (cpustate->_CY?1:0));
+	temp = ((UINT8)m_op1 + (_CY?1:0));
 	ADDB(appb, temp);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opADDCH(v60_state *cpustate)
+UINT32 v60_device::opADDCH()
 {
 	UINT16 apph, temp;
 
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	temp = ((UINT16)cpustate->op1 + (cpustate->_CY?1:0));
+	temp = ((UINT16)m_op1 + (_CY?1:0));
 	ADDW(apph, temp);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opADDCW(v60_state *cpustate)
+UINT32 v60_device::opADDCW()
 {
 	UINT32 appw, temp;
 
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	temp = cpustate->op1 + (cpustate->_CY?1:0);
+	temp = m_op1 + (_CY?1:0);
 	ADDL(appw, temp);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opANDB(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opANDB() /* TRUSTED */
 {
 	UINT8 appb;
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	appb &= cpustate->op1;
-	cpustate->_OV = 0;
-	cpustate->_S = ((appb & 0x80) != 0);
-	cpustate->_Z = (appb == 0);
+	appb &= m_op1;
+	_OV = 0;
+	_S = ((appb & 0x80) != 0);
+	_Z = (appb == 0);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opANDH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opANDH() /* TRUSTED */
 {
 	UINT16 apph;
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	apph &= cpustate->op1;
-	cpustate->_OV = 0;
-	cpustate->_S = ((apph & 0x8000) != 0);
-	cpustate->_Z = (apph == 0);
+	apph &= m_op1;
+	_OV = 0;
+	_S = ((apph & 0x8000) != 0);
+	_Z = (apph == 0);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opANDW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opANDW() /* TRUSTED */
 {
 	UINT32 appw;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	appw &= cpustate->op1;
-	cpustate->_OV = 0;
-	cpustate->_S = ((appw & 0x80000000) != 0);
-	cpustate->_Z = (appw == 0);
+	appw &= m_op1;
+	_OV = 0;
+	_S = ((appw & 0x80000000) != 0);
+	_Z = (appw == 0);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opCALL(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opCALL() /* TRUSTED */
 {
-	F12DecodeOperands(cpustate, ReadAMAddress, 0,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAMAddress, 0,&v60_device::ReadAMAddress, 2);
 
-	cpustate->SP -= 4;
-	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->AP);
-	cpustate->AP = cpustate->op2;
+	SP -= 4;
+	m_program->write_dword_unaligned(SP, AP);
+	AP = m_op2;
 
-	cpustate->SP -= 4;
-	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->PC + cpustate->amlength1 + cpustate->amlength2 + 2);
-	cpustate->PC = cpustate->op1;
+	SP -= 4;
+	m_program->write_dword_unaligned(SP, PC + m_amlength1 + m_amlength2 + 2);
+	PC = m_op1;
 
 	return 0;
 }
 
-static UINT32 opCHKAR(v60_state *cpustate)
+UINT32 v60_device::opCHKAR()
 {
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAM, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAM, 0);
 
 	// No MMU and memory permissions yet @@@
-	cpustate->_Z = 1;
-	cpustate->_CY = 0;
-	cpustate->_S = 0;
+	_Z = 1;
+	_CY = 0;
+	_S = 0;
 
-	F12END(cpustate);
+	F12END();
 }
 
-static UINT32 opCHKAW(v60_state *cpustate)
+UINT32 v60_device::opCHKAW()
 {
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAM, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAM, 0);
 
 	// No MMU and memory permissions yet @@@
-	cpustate->_Z = 1;
-	cpustate->_CY = 0;
-	cpustate->_S = 0;
+	_Z = 1;
+	_CY = 0;
+	_S = 0;
 
-	F12END(cpustate);
+	F12END();
 }
 
-static UINT32 opCHKAE(v60_state *cpustate)
+UINT32 v60_device::opCHKAE()
 {
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAM, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAM, 0);
 
 	// No MMU and memory permissions yet @@@
-	cpustate->_Z = 1;
-	cpustate->_CY = 0;
-	cpustate->_S = 0;
+	_Z = 1;
+	_CY = 0;
+	_S = 0;
 
-	F12END(cpustate);
+	F12END();
 }
 
-static UINT32 opCHLVL(v60_state *cpustate)
+UINT32 v60_device::opCHLVL()
 {
 	UINT32 oldPSW;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAM, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAM, 0);
 
-	if (cpustate->op1 > 3)
+	if (m_op1 > 3)
 	{
-		fatalerror("Illegal data field on opCHLVL, cpustate->PC=%x\n", cpustate->PC);
+		fatalerror("Illegal data field on opCHLVL, PC=%x\n", PC);
 	}
 
-	oldPSW = v60_update_psw_for_exception(cpustate, 0, cpustate->op1);
+	oldPSW = v60_update_psw_for_exception(0, m_op1);
 
-	cpustate->SP -= 4;
-	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->op2);
+	SP -= 4;
+	m_program->write_dword_unaligned(SP, m_op2);
 
-	cpustate->SP -= 4;
-	cpustate->program->write_dword_unaligned(cpustate->SP, EXCEPTION_CODE_AND_SIZE(0x1800 + cpustate->op1 * 0x100, 8));
+	SP -= 4;
+	m_program->write_dword_unaligned(SP, EXCEPTION_CODE_AND_SIZE(0x1800 + m_op1 * 0x100, 8));
 
-	cpustate->SP -= 4;
-	cpustate->program->write_dword_unaligned(cpustate->SP, oldPSW);
+	SP -= 4;
+	m_program->write_dword_unaligned(SP, oldPSW);
 
-	cpustate->SP -= 4;
-	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->PC + cpustate->amlength1 + cpustate->amlength2 + 2);
+	SP -= 4;
+	m_program->write_dword_unaligned(SP, PC + m_amlength1 + m_amlength2 + 2);
 
-	cpustate->PC = GETINTVECT(cpustate, 24 + cpustate->op1);
+	PC = GETINTVECT(24 + m_op1);
 
 	return 0;
 }
 
-static UINT32 opCLR1(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opCLR1() /* TRUSTED */
 {
 	UINT32 appw;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	cpustate->_CY = ((appw & (1 << cpustate->op1)) != 0);
-	cpustate->_Z = !(cpustate->_CY);
+	_CY = ((appw & (1 << m_op1)) != 0);
+	_Z = !(_CY);
 
-	appw &= ~(1 << cpustate->op1);
+	appw &= ~(1 << m_op1);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opCMPB(v60_state *cpustate) /* TRUSTED (C too!) */
+UINT32 v60_device::opCMPB() /* TRUSTED (C too!) */
 {
 	UINT8 appb;
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAM, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAM, 0);
 
-	appb = (UINT8)cpustate->op2;
-	SUBB(appb, (UINT8)cpustate->op1);
+	appb = (UINT8)m_op2;
+	SUBB(appb, (UINT8)m_op1);
 
-	F12END(cpustate);
+	F12END();
 }
 
-static UINT32 opCMPH(v60_state *cpustate) /* TRUSTED (C too!) */
+UINT32 v60_device::opCMPH() /* TRUSTED (C too!) */
 {
 	UINT16 apph;
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAM, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAM, 1);
 
-	apph = (UINT16)cpustate->op2;
-	SUBW(apph, (UINT16)cpustate->op1);
+	apph = (UINT16)m_op2;
+	SUBW(apph, (UINT16)m_op1);
 
-	F12END(cpustate);
+	F12END();
 }
 
 
-static UINT32 opCMPW(v60_state *cpustate) /* TRUSTED (C too!)*/
+UINT32 v60_device::opCMPW() /* TRUSTED (C too!)*/
 {
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAM, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAM, 2);
 
-	SUBL(cpustate->op2, (UINT32)cpustate->op1);
+	SUBL(m_op2, (UINT32)m_op1);
 
-	F12END(cpustate);
+	F12END();
 }
 
-static UINT32 opDIVB(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opDIVB() /* TRUSTED */
 {
 	UINT8 appb;
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	cpustate->_OV = ((appb == 0x80) && (cpustate->op1 == 0xFF));
-	if (cpustate->op1 && !cpustate->_OV)
-		appb= (INT8)appb / (INT8)cpustate->op1;
-	cpustate->_Z = (appb == 0);
-	cpustate->_S = ((appb & 0x80) != 0);
+	_OV = ((appb == 0x80) && (m_op1 == 0xFF));
+	if (m_op1 && !_OV)
+		appb= (INT8)appb / (INT8)m_op1;
+	_Z = (appb == 0);
+	_S = ((appb & 0x80) != 0);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opDIVH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opDIVH() /* TRUSTED */
 {
 	UINT16 apph;
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	cpustate->_OV = ((apph == 0x8000) && (cpustate->op1 == 0xFFFF));
-	if (cpustate->op1 && !cpustate->_OV)
-		apph = (INT16)apph / (INT16)cpustate->op1;
-	cpustate->_Z = (apph == 0);
-	cpustate->_S = ((apph & 0x8000) != 0);
+	_OV = ((apph == 0x8000) && (m_op1 == 0xFFFF));
+	if (m_op1 && !_OV)
+		apph = (INT16)apph / (INT16)m_op1;
+	_Z = (apph == 0);
+	_S = ((apph & 0x8000) != 0);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opDIVW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opDIVW() /* TRUSTED */
 {
 	UINT32 appw;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	cpustate->_OV = ((appw == 0x80000000) && (cpustate->op1 == 0xFFFFFFFF));
-	if (cpustate->op1 && !cpustate->_OV)
-		appw = (INT32)appw / (INT32)cpustate->op1;
-	cpustate->_Z = (appw == 0);
-	cpustate->_S = ((appw & 0x80000000) != 0);
+	_OV = ((appw == 0x80000000) && (m_op1 == 0xFFFFFFFF));
+	if (m_op1 && !_OV)
+		appw = (INT32)appw / (INT32)m_op1;
+	_Z = (appw == 0);
+	_S = ((appw & 0x80000000) != 0);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opDIVX(v60_state *cpustate)
+UINT32 v60_device::opDIVX()
 {
 	UINT32 a, b;
 	INT64 dv;
 
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 3);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 3);
 
-	if (cpustate->flag2)
+	if (m_flag2)
 	{
-		a = cpustate->reg[cpustate->op2 & 0x1F];
-		b = cpustate->reg[(cpustate->op2 & 0x1F) + 1];
+		a = m_reg[m_op2 & 0x1F];
+		b = m_reg[(m_op2 & 0x1F) + 1];
 	}
 	else
 	{
-		a = cpustate->program->read_dword_unaligned(cpustate->op2);
-		b = cpustate->program->read_dword_unaligned(cpustate->op2 + 4);
+		a = m_program->read_dword_unaligned(m_op2);
+		b = m_program->read_dword_unaligned(m_op2 + 4);
 	}
 
 	dv = ((UINT64)b << 32) | ((UINT64)a);
 
-	a = dv / (INT64)((INT32)cpustate->op1);
-	b = dv % (INT64)((INT32)cpustate->op1);
+	a = dv / (INT64)((INT32)m_op1);
+	b = dv % (INT64)((INT32)m_op1);
 
-	cpustate->_S = ((a & 0x80000000) != 0);
-	cpustate->_Z = (a == 0);
+	_S = ((a & 0x80000000) != 0);
+	_Z = (a == 0);
 
-	if (cpustate->flag2)
+	if (m_flag2)
 	{
-		cpustate->reg[cpustate->op2 & 0x1F] = a;
-		cpustate->reg[(cpustate->op2 & 0x1F) + 1] = b;
+		m_reg[m_op2 & 0x1F] = a;
+		m_reg[(m_op2 & 0x1F) + 1] = b;
 	}
 	else
 	{
-		cpustate->program->write_dword_unaligned(cpustate->op2, a);
-		cpustate->program->write_dword_unaligned(cpustate->op2 + 4, b);
+		m_program->write_dword_unaligned(m_op2, a);
+		m_program->write_dword_unaligned(m_op2 + 4, b);
 	}
 
-	F12END(cpustate);
+	F12END();
 }
 
-static UINT32 opDIVUX(v60_state *cpustate)
+UINT32 v60_device::opDIVUX()
 {
 	UINT32 a, b;
 	UINT64 dv;
 
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 3);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 3);
 
-	if (cpustate->flag2)
+	if (m_flag2)
 	{
-		a = cpustate->reg[cpustate->op2 & 0x1F];
-		b = cpustate->reg[(cpustate->op2 & 0x1F) + 1];
+		a = m_reg[m_op2 & 0x1F];
+		b = m_reg[(m_op2 & 0x1F) + 1];
 	}
 	else
 	{
-		a = cpustate->program->read_dword_unaligned(cpustate->op2);
-		b = cpustate->program->read_dword_unaligned(cpustate->op2 + 4);
+		a = m_program->read_dword_unaligned(m_op2);
+		b = m_program->read_dword_unaligned(m_op2 + 4);
 	}
 
 	dv = (UINT64)(((UINT64)b << 32) | (UINT64)a);
-	a = (UINT32)(dv / (UINT64)cpustate->op1);
-	b = (UINT32)(dv % (UINT64)cpustate->op1);
+	a = (UINT32)(dv / (UINT64)m_op1);
+	b = (UINT32)(dv % (UINT64)m_op1);
 
-	cpustate->_S = ((a & 0x80000000) != 0);
-	cpustate->_Z = (a == 0);
+	_S = ((a & 0x80000000) != 0);
+	_Z = (a == 0);
 
-	if (cpustate->flag2)
+	if (m_flag2)
 	{
-		cpustate->reg[cpustate->op2 & 0x1F] = a;
-		cpustate->reg[(cpustate->op2 & 0x1F) + 1] = b;
+		m_reg[m_op2 & 0x1F] = a;
+		m_reg[(m_op2 & 0x1F) + 1] = b;
 	}
 	else
 	{
-		cpustate->program->write_dword_unaligned(cpustate->op2, a);
-		cpustate->program->write_dword_unaligned(cpustate->op2 + 4, b);
+		m_program->write_dword_unaligned(m_op2, a);
+		m_program->write_dword_unaligned(m_op2 + 4, b);
 	}
 
-	F12END(cpustate);
+	F12END();
 }
 
 
-static UINT32 opDIVUB(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opDIVUB() /* TRUSTED */
 {
 	UINT8 appb;
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	cpustate->_OV = 0;
-	if (cpustate->op1)  appb /= (UINT8)cpustate->op1;
-	cpustate->_Z = (appb == 0);
-	cpustate->_S = ((appb & 0x80) != 0);
+	_OV = 0;
+	if (m_op1)  appb /= (UINT8)m_op1;
+	_Z = (appb == 0);
+	_S = ((appb & 0x80) != 0);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opDIVUH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opDIVUH() /* TRUSTED */
 {
 	UINT16 apph;
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	cpustate->_OV = 0;
-	if (cpustate->op1)  apph /= (UINT16)cpustate->op1;
-	cpustate->_Z = (apph == 0);
-	cpustate->_S = ((apph & 0x8000) != 0);
+	_OV = 0;
+	if (m_op1)  apph /= (UINT16)m_op1;
+	_Z = (apph == 0);
+	_S = ((apph & 0x8000) != 0);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opDIVUW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opDIVUW() /* TRUSTED */
 {
 	UINT32 appw;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	cpustate->_OV = 0;
-	if (cpustate->op1)  appw /= cpustate->op1;
-	cpustate->_Z = (appw == 0);
-	cpustate->_S = ((appw & 0x80000000) != 0);
+	_OV = 0;
+	if (m_op1)  appw /= m_op1;
+	_Z = (appw == 0);
+	_S = ((appw & 0x80000000) != 0);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opINB(v60_state *cpustate)
+UINT32 v60_device::opINB()
 {
-	F12DecodeFirstOperand(cpustate, ReadAMAddress, 0);
-	cpustate->modwritevalb = cpustate->io->read_byte(cpustate->op1);
+	F12DecodeFirstOperand(&v60_device::ReadAMAddress, 0);
+	m_modwritevalb = m_io->read_byte(m_op1);
 
-	if ( cpustate->stall_io )
+	if ( m_stall_io )
 	{
-		cpustate->stall_io = 0;
+		m_stall_io = 0;
 		return 0;
 	}
 
-	F12WriteSecondOperand(cpustate, 0);
-	F12END(cpustate);
+	F12WriteSecondOperand(0);
+	F12END();
 }
 
-static UINT32 opINH(v60_state *cpustate)
+UINT32 v60_device::opINH()
 {
-	F12DecodeFirstOperand(cpustate, ReadAMAddress, 1);
-	cpustate->modwritevalh = cpustate->io->read_word_unaligned(cpustate->op1);
+	F12DecodeFirstOperand(&v60_device::ReadAMAddress, 1);
+	m_modwritevalh = m_io->read_word_unaligned(m_op1);
 
-	if ( cpustate->stall_io )
+	if ( m_stall_io )
 	{
-		cpustate->stall_io = 0;
+		m_stall_io = 0;
 		return 0;
 	}
 
-	F12WriteSecondOperand(cpustate, 1);
-	F12END(cpustate);
+	F12WriteSecondOperand(1);
+	F12END();
 }
 
-static UINT32 opINW(v60_state *cpustate)
+UINT32 v60_device::opINW()
 {
-	F12DecodeFirstOperand(cpustate, ReadAMAddress, 2);
-	cpustate->modwritevalw = cpustate->io->read_dword_unaligned(cpustate->op1);
+	F12DecodeFirstOperand(&v60_device::ReadAMAddress, 2);
+	m_modwritevalw = m_io->read_dword_unaligned(m_op1);
 
-	if ( cpustate->stall_io )
+	if ( m_stall_io )
 	{
-		cpustate->stall_io = 0;
+		m_stall_io = 0;
 		return 0;
 	}
 
-	F12WriteSecondOperand(cpustate, 2);
-	F12END(cpustate);
+	F12WriteSecondOperand(2);
+	F12END();
 }
 
-static UINT32 opLDPR(v60_state *cpustate)
+UINT32 v60_device::opLDPR()
 {
-	F12DecodeOperands(cpustate, ReadAMAddress, 2,ReadAM, 2);
-	if (cpustate->op2 <= 28)
+	F12DecodeOperands(&v60_device::ReadAMAddress, 2,&v60_device::ReadAM, 2);
+	if (m_op2 <= 28)
 	{
-		if (cpustate->flag1 &&(!(OpRead8(cpustate, cpustate->PC + 1)&0x80 && OpRead8(cpustate, cpustate->PC + 2) == 0xf4 ) ))
-			cpustate->reg[cpustate->op2 + 36] = cpustate->reg[cpustate->op1];
+		if (m_flag1 &&(!(OpRead8(PC + 1)&0x80 && OpRead8(PC + 2) == 0xf4 ) ))
+			m_reg[m_op2 + 36] = m_reg[m_op1];
 		else
-			cpustate->reg[cpustate->op2 + 36] = cpustate->op1;
+			m_reg[m_op2 + 36] = m_op1;
 	}
 	else
 	{
-		fatalerror("Invalid operand on LDPR cpustate->PC=%x\n", cpustate->PC);
+		fatalerror("Invalid operand on LDPR PC=%x\n", PC);
 	}
-	F12END(cpustate);
+	F12END();
 }
 
-static UINT32 opLDTASK(v60_state *cpustate)
+UINT32 v60_device::opLDTASK()
 {
 	int i;
-	F12DecodeOperands(cpustate, ReadAMAddress, 2,ReadAM, 2);
+	F12DecodeOperands(&v60_device::ReadAMAddress, 2,&v60_device::ReadAM, 2);
 
-	v60WritePSW(cpustate, v60ReadPSW(cpustate) & 0xefffffff);
+	v60WritePSW(v60ReadPSW() & 0xefffffff);
 
-	cpustate->TR = cpustate->op2;
+	TR = m_op2;
 
-	cpustate->TKCW = cpustate->program->read_dword_unaligned(cpustate->op2);
-	cpustate->op2 += 4;
-	if(cpustate->SYCW & 0x100) {
-		cpustate->L0SP = cpustate->program->read_dword_unaligned(cpustate->op2);
-		cpustate->op2 += 4;
+	TKCW = m_program->read_dword_unaligned(m_op2);
+	m_op2 += 4;
+	if(SYCW & 0x100) {
+		L0SP = m_program->read_dword_unaligned(m_op2);
+		m_op2 += 4;
 	}
-	if(cpustate->SYCW & 0x200) {
-		cpustate->L1SP = cpustate->program->read_dword_unaligned(cpustate->op2);
-		cpustate->op2 += 4;
+	if(SYCW & 0x200) {
+		L1SP = m_program->read_dword_unaligned(m_op2);
+		m_op2 += 4;
 	}
-	if(cpustate->SYCW & 0x400) {
-		cpustate->L2SP = cpustate->program->read_dword_unaligned(cpustate->op2);
-		cpustate->op2 += 4;
+	if(SYCW & 0x400) {
+		L2SP = m_program->read_dword_unaligned(m_op2);
+		m_op2 += 4;
 	}
-	if(cpustate->SYCW & 0x800) {
-		cpustate->L3SP = cpustate->program->read_dword_unaligned(cpustate->op2);
-		cpustate->op2 += 4;
+	if(SYCW & 0x800) {
+		L3SP = m_program->read_dword_unaligned(m_op2);
+		m_op2 += 4;
 	}
 
-	v60ReloadStack(cpustate);
+	v60ReloadStack();
 
 	// 31 registers supported, _not_ 32
 	for(i = 0; i < 31; i++)
-		if(cpustate->op1 & (1 << i)) {
-			cpustate->reg[i] = cpustate->program->read_dword_unaligned(cpustate->op2);
-			cpustate->op2 += 4;
+		if(m_op1 & (1 << i)) {
+			m_reg[i] = m_program->read_dword_unaligned(m_op2);
+			m_op2 += 4;
 		}
 
 	// #### Ignore the virtual addressing crap.
 
-	F12END(cpustate);
+	F12END();
 }
 
-static UINT32 opMOVD(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opMOVD() /* TRUSTED */
 {
 	UINT32 a, b;
 
-	F12DecodeOperands(cpustate, ReadAMAddress, 3,ReadAMAddress, 3);
+	F12DecodeOperands(&v60_device::ReadAMAddress, 3,&v60_device::ReadAMAddress, 3);
 
-	if (cpustate->flag1)
+	if (m_flag1)
 	{
-		a = cpustate->reg[cpustate->op1 & 0x1F];
-		b = cpustate->reg[(cpustate->op1 & 0x1F) + 1];
+		a = m_reg[m_op1 & 0x1F];
+		b = m_reg[(m_op1 & 0x1F) + 1];
 	}
 	else
 	{
-		a = cpustate->program->read_dword_unaligned(cpustate->op1);
-		b = cpustate->program->read_dword_unaligned(cpustate->op1 + 4);
+		a = m_program->read_dword_unaligned(m_op1);
+		b = m_program->read_dword_unaligned(m_op1 + 4);
 	}
 
-	if (cpustate->flag2)
+	if (m_flag2)
 	{
-		cpustate->reg[cpustate->op2 & 0x1F] = a;
-		cpustate->reg[(cpustate->op2 & 0x1F) + 1] = b;
+		m_reg[m_op2 & 0x1F] = a;
+		m_reg[(m_op2 & 0x1F) + 1] = b;
 	}
 	else
 	{
-		cpustate->program->write_dword_unaligned(cpustate->op2, a);
-		cpustate->program->write_dword_unaligned(cpustate->op2 + 4, b);
+		m_program->write_dword_unaligned(m_op2, a);
+		m_program->write_dword_unaligned(m_op2 + 4, b);
 	}
 
-	F12END(cpustate);
+	F12END();
 }
 
-static UINT32 opMOVB(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opMOVB() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 0);
-	cpustate->modwritevalb = (UINT8)cpustate->op1;
-	F12WriteSecondOperand(cpustate, 0);
-	F12END(cpustate);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 0);
+	m_modwritevalb = (UINT8)m_op1;
+	F12WriteSecondOperand(0);
+	F12END();
 }
 
-static UINT32 opMOVH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opMOVH() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 1);
-	cpustate->modwritevalh = (UINT16)cpustate->op1;
-	F12WriteSecondOperand(cpustate, 1);
-	F12END(cpustate);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 1);
+	m_modwritevalh = (UINT16)m_op1;
+	F12WriteSecondOperand(1);
+	F12END();
 }
 
-static UINT32 opMOVW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opMOVW() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 2);
-	cpustate->modwritevalw = cpustate->op1;
-	F12WriteSecondOperand(cpustate, 2);
-	F12END(cpustate);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 2);
+	m_modwritevalw = m_op1;
+	F12WriteSecondOperand(2);
+	F12END();
 }
 
-static UINT32 opMOVEAB(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opMOVEAB() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAMAddress, 0);
-	cpustate->modwritevalw = cpustate->op1;
-	F12WriteSecondOperand(cpustate, 2);
-	F12END(cpustate);
+	F12DecodeFirstOperand(&v60_device::ReadAMAddress, 0);
+	m_modwritevalw = m_op1;
+	F12WriteSecondOperand(2);
+	F12END();
 }
 
-static UINT32 opMOVEAH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opMOVEAH() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAMAddress, 1);
-	cpustate->modwritevalw = cpustate->op1;
-	F12WriteSecondOperand(cpustate, 2);
-	F12END(cpustate);
+	F12DecodeFirstOperand(&v60_device::ReadAMAddress, 1);
+	m_modwritevalw = m_op1;
+	F12WriteSecondOperand(2);
+	F12END();
 }
 
-static UINT32 opMOVEAW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opMOVEAW() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAMAddress, 2);
-	cpustate->modwritevalw = cpustate->op1;
-	F12WriteSecondOperand(cpustate, 2);
-	F12END(cpustate);
+	F12DecodeFirstOperand(&v60_device::ReadAMAddress, 2);
+	m_modwritevalw = m_op1;
+	F12WriteSecondOperand(2);
+	F12END();
 }
 
-static UINT32 opMOVSBH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opMOVSBH() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 0);
-	cpustate->modwritevalh = (INT8)(cpustate->op1 & 0xFF);
-	F12WriteSecondOperand(cpustate, 1);
-	F12END(cpustate);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 0);
+	m_modwritevalh = (INT8)(m_op1 & 0xFF);
+	F12WriteSecondOperand(1);
+	F12END();
 }
 
-static UINT32 opMOVSBW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opMOVSBW() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 0);
-	cpustate->modwritevalw = (INT8)(cpustate->op1 & 0xFF);
-	F12WriteSecondOperand(cpustate, 2);
-	F12END(cpustate);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 0);
+	m_modwritevalw = (INT8)(m_op1 & 0xFF);
+	F12WriteSecondOperand(2);
+	F12END();
 }
 
-static UINT32 opMOVSHW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opMOVSHW() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 1);
-	cpustate->modwritevalw = (INT16)(cpustate->op1 & 0xFFFF);
-	F12WriteSecondOperand(cpustate, 2);
-	F12END(cpustate);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 1);
+	m_modwritevalw = (INT16)(m_op1 & 0xFFFF);
+	F12WriteSecondOperand(2);
+	F12END();
 }
 
-static UINT32 opMOVTHB(v60_state *cpustate)
+UINT32 v60_device::opMOVTHB()
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 1);
-	cpustate->modwritevalb = (UINT8)(cpustate->op1 & 0xFF);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 1);
+	m_modwritevalb = (UINT8)(m_op1 & 0xFF);
 
 	// Check for overflow: the truncated bits must match the sign
 	//  of the result, otherwise overflow
-	if (((cpustate->modwritevalb & 0x80) == 0x80 && ((cpustate->op1 & 0xFF00) == 0xFF00)) ||
-			((cpustate->modwritevalb & 0x80) == 0 && ((cpustate->op1 & 0xFF00) == 0x0000)))
-		cpustate->_OV = 0;
+	if (((m_modwritevalb & 0x80) == 0x80 && ((m_op1 & 0xFF00) == 0xFF00)) ||
+			((m_modwritevalb & 0x80) == 0 && ((m_op1 & 0xFF00) == 0x0000)))
+		_OV = 0;
 	else
-		cpustate->_OV = 1;
+		_OV = 1;
 
-	F12WriteSecondOperand(cpustate, 0);
-	F12END(cpustate);
+	F12WriteSecondOperand(0);
+	F12END();
 }
 
-static UINT32 opMOVTWB(v60_state *cpustate)
+UINT32 v60_device::opMOVTWB()
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 2);
-	cpustate->modwritevalb = (UINT8)(cpustate->op1 & 0xFF);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 2);
+	m_modwritevalb = (UINT8)(m_op1 & 0xFF);
 
 	// Check for overflow: the truncated bits must match the sign
 	//  of the result, otherwise overflow
-	if (((cpustate->modwritevalb & 0x80) == 0x80 && ((cpustate->op1 & 0xFFFFFF00) == 0xFFFFFF00)) ||
-			((cpustate->modwritevalb & 0x80) == 0 && ((cpustate->op1 & 0xFFFFFF00) == 0x00000000)))
-		cpustate->_OV = 0;
+	if (((m_modwritevalb & 0x80) == 0x80 && ((m_op1 & 0xFFFFFF00) == 0xFFFFFF00)) ||
+			((m_modwritevalb & 0x80) == 0 && ((m_op1 & 0xFFFFFF00) == 0x00000000)))
+		_OV = 0;
 	else
-		cpustate->_OV = 1;
+		_OV = 1;
 
-	F12WriteSecondOperand(cpustate, 0);
-	F12END(cpustate);
+	F12WriteSecondOperand(0);
+	F12END();
 }
 
-static UINT32 opMOVTWH(v60_state *cpustate)
+UINT32 v60_device::opMOVTWH()
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 2);
-	cpustate->modwritevalh = (UINT16)(cpustate->op1 & 0xFFFF);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 2);
+	m_modwritevalh = (UINT16)(m_op1 & 0xFFFF);
 
 	// Check for overflow: the truncated bits must match the sign
 	//  of the result, otherwise overflow
-	if (((cpustate->modwritevalh & 0x8000) == 0x8000 && ((cpustate->op1 & 0xFFFF0000) == 0xFFFF0000)) ||
-			((cpustate->modwritevalh & 0x8000) == 0 && ((cpustate->op1 & 0xFFFF0000) == 0x00000000)))
-		cpustate->_OV = 0;
+	if (((m_modwritevalh & 0x8000) == 0x8000 && ((m_op1 & 0xFFFF0000) == 0xFFFF0000)) ||
+			((m_modwritevalh & 0x8000) == 0 && ((m_op1 & 0xFFFF0000) == 0x00000000)))
+		_OV = 0;
 	else
-		cpustate->_OV = 1;
+		_OV = 1;
 
-	F12WriteSecondOperand(cpustate, 1);
-	F12END(cpustate);
+	F12WriteSecondOperand(1);
+	F12END();
 }
 
 
-static UINT32 opMOVZBH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opMOVZBH() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 0);
-	cpustate->modwritevalh = (UINT16)cpustate->op1;
-	F12WriteSecondOperand(cpustate, 1);
-	F12END(cpustate);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 0);
+	m_modwritevalh = (UINT16)m_op1;
+	F12WriteSecondOperand(1);
+	F12END();
 }
 
-static UINT32 opMOVZBW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opMOVZBW() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 0);
-	cpustate->modwritevalw = cpustate->op1;
-	F12WriteSecondOperand(cpustate, 2);
-	F12END(cpustate);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 0);
+	m_modwritevalw = m_op1;
+	F12WriteSecondOperand(2);
+	F12END();
 }
 
-static UINT32 opMOVZHW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opMOVZHW() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 1);
-	cpustate->modwritevalw = cpustate->op1;
-	F12WriteSecondOperand(cpustate, 2);
-	F12END(cpustate);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 1);
+	m_modwritevalw = m_op1;
+	F12WriteSecondOperand(2);
+	F12END();
 }
 
-static UINT32 opMULB(v60_state *cpustate)
+UINT32 v60_device::opMULB()
 {
 	UINT8 appb;
 	UINT32 tmp;
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
 	// @@@ OV not set!!
-	tmp = (INT8)appb * (INT32)(INT8)cpustate->op1;
+	tmp = (INT8)appb * (INT32)(INT8)m_op1;
 	appb = tmp;
-	cpustate->_Z = (appb == 0);
-	cpustate->_S = ((appb & 0x80) != 0);
-	cpustate->_OV = ((tmp >> 8) != 0);
+	_Z = (appb == 0);
+	_S = ((appb & 0x80) != 0);
+	_OV = ((tmp >> 8) != 0);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opMULH(v60_state *cpustate)
+UINT32 v60_device::opMULH()
 {
 	UINT16 apph;
 	UINT32 tmp;
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
 	// @@@ OV not set!!
-	tmp = (INT16)apph * (INT32)(INT16)cpustate->op1;
+	tmp = (INT16)apph * (INT32)(INT16)m_op1;
 	apph = tmp;
-	cpustate->_Z = (apph == 0);
-	cpustate->_S = ((apph & 0x8000) != 0);
-	cpustate->_OV = ((tmp >> 16) != 0);
+	_Z = (apph == 0);
+	_S = ((apph & 0x8000) != 0);
+	_OV = ((tmp >> 16) != 0);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opMULW(v60_state *cpustate)
+UINT32 v60_device::opMULW()
 {
 	UINT32 appw;
 	UINT64 tmp;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
 	// @@@ OV not set!!
-	tmp = (INT32)appw * (INT64)(INT32)cpustate->op1;
+	tmp = (INT32)appw * (INT64)(INT32)m_op1;
 	appw = tmp;
-	cpustate->_Z = (appw == 0);
-	cpustate->_S = ((appw & 0x80000000) != 0);
-	cpustate->_OV = ((tmp >> 32) != 0);
+	_Z = (appw == 0);
+	_S = ((appw & 0x80000000) != 0);
+	_OV = ((tmp >> 32) != 0);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opMULUB(v60_state *cpustate)
+UINT32 v60_device::opMULUB()
 {
 	UINT8 appb;
 	UINT32 tmp;
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
 	// @@@ OV not set!!
-	tmp = appb * (UINT8)cpustate->op1;
+	tmp = appb * (UINT8)m_op1;
 	appb = tmp;
-	cpustate->_Z = (appb == 0);
-	cpustate->_S = ((appb & 0x80) != 0);
-	cpustate->_OV = ((tmp >> 8) != 0);
+	_Z = (appb == 0);
+	_S = ((appb & 0x80) != 0);
+	_OV = ((tmp >> 8) != 0);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opMULUH(v60_state *cpustate)
+UINT32 v60_device::opMULUH()
 {
 	UINT16 apph;
 	UINT32 tmp;
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
 	// @@@ OV not set!!
-	tmp = apph * (UINT16)cpustate->op1;
+	tmp = apph * (UINT16)m_op1;
 	apph = tmp;
-	cpustate->_Z = (apph == 0);
-	cpustate->_S = ((apph & 0x8000) != 0);
-	cpustate->_OV = ((tmp >> 16) != 0);
+	_Z = (apph == 0);
+	_S = ((apph & 0x8000) != 0);
+	_OV = ((tmp >> 16) != 0);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opMULUW(v60_state *cpustate)
+UINT32 v60_device::opMULUW()
 {
 	UINT32 appw;
 	UINT64 tmp;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
 	// @@@ OV not set!!
-	tmp = (UINT64)appw * (UINT64)cpustate->op1;
+	tmp = (UINT64)appw * (UINT64)m_op1;
 	appw = tmp;
-	cpustate->_Z = (appw == 0);
-	cpustate->_S = ((appw & 0x80000000) != 0);
-	cpustate->_OV = ((tmp >> 32) != 0);
+	_Z = (appw == 0);
+	_S = ((appw & 0x80000000) != 0);
+	_OV = ((tmp >> 32) != 0);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opNEGB(v60_state *cpustate) /* TRUSTED  (C too!)*/
+UINT32 v60_device::opNEGB() /* TRUSTED  (C too!)*/
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 0);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 0);
 
-	cpustate->modwritevalb = 0;
-	SUBB(cpustate->modwritevalb, (INT8)cpustate->op1);
+	m_modwritevalb = 0;
+	SUBB(m_modwritevalb, (INT8)m_op1);
 
-	F12WriteSecondOperand(cpustate, 0);
-	F12END(cpustate);
+	F12WriteSecondOperand(0);
+	F12END();
 }
 
-static UINT32 opNEGH(v60_state *cpustate) /* TRUSTED  (C too!)*/
+UINT32 v60_device::opNEGH() /* TRUSTED  (C too!)*/
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 1);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 1);
 
-	cpustate->modwritevalh = 0;
-	SUBW(cpustate->modwritevalh, (INT16)cpustate->op1);
+	m_modwritevalh = 0;
+	SUBW(m_modwritevalh, (INT16)m_op1);
 
-	F12WriteSecondOperand(cpustate, 1);
-	F12END(cpustate);
+	F12WriteSecondOperand(1);
+	F12END();
 }
 
-static UINT32 opNEGW(v60_state *cpustate) /* TRUSTED  (C too!)*/
+UINT32 v60_device::opNEGW() /* TRUSTED  (C too!)*/
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 2);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 2);
 
-	cpustate->modwritevalw = 0;
-	SUBL(cpustate->modwritevalw, (INT32)cpustate->op1);
+	m_modwritevalw = 0;
+	SUBL(m_modwritevalw, (INT32)m_op1);
 
-	F12WriteSecondOperand(cpustate, 2);
-	F12END(cpustate);
+	F12WriteSecondOperand(2);
+	F12END();
 }
 
-static UINT32 opNOTB(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opNOTB() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 0);
-	cpustate->modwritevalb=~cpustate->op1;
+	F12DecodeFirstOperand(&v60_device::ReadAM, 0);
+	m_modwritevalb=~m_op1;
 
-	cpustate->_OV = 0;
-	cpustate->_S = ((cpustate->modwritevalb & 0x80) != 0);
-	cpustate->_Z = (cpustate->modwritevalb == 0);
+	_OV = 0;
+	_S = ((m_modwritevalb & 0x80) != 0);
+	_Z = (m_modwritevalb == 0);
 
-	F12WriteSecondOperand(cpustate, 0);
-	F12END(cpustate);
+	F12WriteSecondOperand(0);
+	F12END();
 }
 
-static UINT32 opNOTH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opNOTH() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 1);
-	cpustate->modwritevalh=~cpustate->op1;
+	F12DecodeFirstOperand(&v60_device::ReadAM, 1);
+	m_modwritevalh=~m_op1;
 
-	cpustate->_OV = 0;
-	cpustate->_S = ((cpustate->modwritevalh & 0x8000) != 0);
-	cpustate->_Z = (cpustate->modwritevalh == 0);
+	_OV = 0;
+	_S = ((m_modwritevalh & 0x8000) != 0);
+	_Z = (m_modwritevalh == 0);
 
-	F12WriteSecondOperand(cpustate, 1);
-	F12END(cpustate);
+	F12WriteSecondOperand(1);
+	F12END();
 }
 
-static UINT32 opNOTW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opNOTW() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 2);
-	cpustate->modwritevalw=~cpustate->op1;
+	F12DecodeFirstOperand(&v60_device::ReadAM, 2);
+	m_modwritevalw=~m_op1;
 
-	cpustate->_OV = 0;
-	cpustate->_S = ((cpustate->modwritevalw & 0x80000000) != 0);
-	cpustate->_Z = (cpustate->modwritevalw == 0);
+	_OV = 0;
+	_S = ((m_modwritevalw & 0x80000000) != 0);
+	_Z = (m_modwritevalw == 0);
 
-	F12WriteSecondOperand(cpustate, 2);
-	F12END(cpustate);
+	F12WriteSecondOperand(2);
+	F12END();
 }
 
-static UINT32 opNOT1(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opNOT1() /* TRUSTED */
 {
 	UINT32 appw;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	cpustate->_CY = ((appw & (1 << cpustate->op1)) != 0);
-	cpustate->_Z = !(cpustate->_CY);
+	_CY = ((appw & (1 << m_op1)) != 0);
+	_Z = !(_CY);
 
-	if (cpustate->_CY)
-		appw &= ~(1 << cpustate->op1);
+	if (_CY)
+		appw &= ~(1 << m_op1);
 	else
-		appw |= (1 << cpustate->op1);
+		appw |= (1 << m_op1);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opORB(v60_state *cpustate) /* TRUSTED  (C too!)*/
+UINT32 v60_device::opORB() /* TRUSTED  (C too!)*/
 {
 	UINT8 appb;
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	ORB(appb, (UINT8)cpustate->op1);
+	ORB(appb, (UINT8)m_op1);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opORH(v60_state *cpustate) /* TRUSTED (C too!)*/
+UINT32 v60_device::opORH() /* TRUSTED (C too!)*/
 {
 	UINT16 apph;
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	ORW(apph, (UINT16)cpustate->op1);
+	ORW(apph, (UINT16)m_op1);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opORW(v60_state *cpustate) /* TRUSTED (C too!) */
+UINT32 v60_device::opORW() /* TRUSTED (C too!) */
 {
 	UINT32 appw;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	ORL(appw, (UINT32)cpustate->op1);
+	ORL(appw, (UINT32)m_op1);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opOUTB(v60_state *cpustate)
+UINT32 v60_device::opOUTB()
 {
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 2);
-	cpustate->io->write_byte(cpustate->op2,(UINT8)cpustate->op1);
-	F12END(cpustate);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 2);
+	m_io->write_byte(m_op2,(UINT8)m_op1);
+	F12END();
 }
 
-static UINT32 opOUTH(v60_state *cpustate)
+UINT32 v60_device::opOUTH()
 {
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 2);
-	cpustate->io->write_word_unaligned(cpustate->op2,(UINT16)cpustate->op1);
-	F12END(cpustate);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 2);
+	m_io->write_word_unaligned(m_op2,(UINT16)m_op1);
+	F12END();
 }
 
-static UINT32 opOUTW(v60_state *cpustate)
+UINT32 v60_device::opOUTW()
 {
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
-	cpustate->io->write_dword_unaligned(cpustate->op2, cpustate->op1);
-	F12END(cpustate);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
+	m_io->write_dword_unaligned(m_op2, m_op1);
+	F12END();
 }
 
-static UINT32 opREMB(v60_state *cpustate)
+UINT32 v60_device::opREMB()
 {
 	UINT8 appb;
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	cpustate->_OV = 0;
-	if (cpustate->op1)
-		appb= (INT8)appb % (INT8)cpustate->op1;
-	cpustate->_Z = (appb == 0);
-	cpustate->_S = ((appb & 0x80) != 0);
+	_OV = 0;
+	if (m_op1)
+		appb= (INT8)appb % (INT8)m_op1;
+	_Z = (appb == 0);
+	_S = ((appb & 0x80) != 0);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opREMH(v60_state *cpustate)
+UINT32 v60_device::opREMH()
 {
 	UINT16 apph;
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	cpustate->_OV = 0;
-	if (cpustate->op1)
-		apph = (INT16)apph % (INT16)cpustate->op1;
-	cpustate->_Z = (apph == 0);
-	cpustate->_S = ((apph & 0x8000) != 0);
+	_OV = 0;
+	if (m_op1)
+		apph = (INT16)apph % (INT16)m_op1;
+	_Z = (apph == 0);
+	_S = ((apph & 0x8000) != 0);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opREMW(v60_state *cpustate)
+UINT32 v60_device::opREMW()
 {
 	UINT32 appw;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	cpustate->_OV = 0;
-	if (cpustate->op1)
-		appw = (INT32)appw % (INT32)cpustate->op1;
-	cpustate->_Z = (appw == 0);
-	cpustate->_S = ((appw & 0x80000000) != 0);
+	_OV = 0;
+	if (m_op1)
+		appw = (INT32)appw % (INT32)m_op1;
+	_Z = (appw == 0);
+	_S = ((appw & 0x80000000) != 0);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opREMUB(v60_state *cpustate)
+UINT32 v60_device::opREMUB()
 {
 	UINT8 appb;
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	cpustate->_OV = 0;
-	if (cpustate->op1)
-		appb %= (UINT8)cpustate->op1;
-	cpustate->_Z = (appb == 0);
-	cpustate->_S = ((appb & 0x80) != 0);
+	_OV = 0;
+	if (m_op1)
+		appb %= (UINT8)m_op1;
+	_Z = (appb == 0);
+	_S = ((appb & 0x80) != 0);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opREMUH(v60_state *cpustate)
+UINT32 v60_device::opREMUH()
 {
 	UINT16 apph;
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	cpustate->_OV = 0;
-	if (cpustate->op1)
-		apph %= (UINT16)cpustate->op1;
-	cpustate->_Z = (apph == 0);
-	cpustate->_S = ((apph & 0x8000) != 0);
+	_OV = 0;
+	if (m_op1)
+		apph %= (UINT16)m_op1;
+	_Z = (apph == 0);
+	_S = ((apph & 0x8000) != 0);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opREMUW(v60_state *cpustate)
+UINT32 v60_device::opREMUW()
 {
 	UINT32 appw;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	cpustate->_OV = 0;
-	if (cpustate->op1)
-		appw %= cpustate->op1;
-	cpustate->_Z = (appw == 0);
-	cpustate->_S = ((appw & 0x80000000) != 0);
+	_OV = 0;
+	if (m_op1)
+		appw %= m_op1;
+	_Z = (appw == 0);
+	_S = ((appw & 0x80000000) != 0);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opROTB(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opROTB() /* TRUSTED */
 {
 	UINT8 appb;
 	INT8 i, count;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	count = (INT8)(cpustate->op1 & 0xFF);
+	count = (INT8)(m_op1 & 0xFF);
 	if (count > 0)
 	{
 		for (i = 0;i < count;i++)
 			appb = (appb << 1) | ((appb & 0x80) >> 7);
 
-		cpustate->_CY = (appb & 0x1) != 0;
+		_CY = (appb & 0x1) != 0;
 	}
 	else if (count < 0)
 	{
@@ -1378,35 +1378,35 @@ static UINT32 opROTB(v60_state *cpustate) /* TRUSTED */
 		for (i = 0;i < count;i++)
 			appb = (appb >> 1) | ((appb & 0x1) << 7);
 
-		cpustate->_CY = (appb & 0x80) != 0;
+		_CY = (appb & 0x80) != 0;
 	}
 	else
-		cpustate->_CY = 0;
+		_CY = 0;
 
-	cpustate->_OV = 0;
-	cpustate->_S = (appb & 0x80) != 0;
-	cpustate->_Z = (appb == 0);
+	_OV = 0;
+	_S = (appb & 0x80) != 0;
+	_Z = (appb == 0);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opROTH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opROTH() /* TRUSTED */
 {
 	UINT16 apph;
 	INT8 i, count;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	count = (INT8)(cpustate->op1 & 0xFF);
+	count = (INT8)(m_op1 & 0xFF);
 	if (count > 0)
 	{
 		for (i = 0;i < count;i++)
 			apph = (apph << 1) | ((apph & 0x8000) >> 15);
 
-		cpustate->_CY = (apph & 0x1) != 0;
+		_CY = (apph & 0x1) != 0;
 	}
 	else if (count < 0)
 	{
@@ -1414,35 +1414,35 @@ static UINT32 opROTH(v60_state *cpustate) /* TRUSTED */
 		for (i = 0;i < count;i++)
 			apph = (apph >> 1) | ((apph & 0x1) << 15);
 
-		cpustate->_CY = (apph & 0x8000) != 0;
+		_CY = (apph & 0x8000) != 0;
 	}
 	else
-		cpustate->_CY = 0;
+		_CY = 0;
 
-	cpustate->_OV = 0;
-	cpustate->_S = (apph & 0x8000) != 0;
-	cpustate->_Z = (apph == 0);
+	_OV = 0;
+	_S = (apph & 0x8000) != 0;
+	_Z = (apph == 0);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opROTW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opROTW() /* TRUSTED */
 {
 	UINT32 appw;
 	INT8 i, count;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	count = (INT8)(cpustate->op1 & 0xFF);
+	count = (INT8)(m_op1 & 0xFF);
 	if (count > 0)
 	{
 		for (i = 0;i < count;i++)
 			appw = (appw << 1) | ((appw & 0x80000000) >> 31);
 
-		cpustate->_CY = (appw & 0x1) != 0;
+		_CY = (appw & 0x1) != 0;
 	}
 	else if (count < 0)
 	{
@@ -1450,36 +1450,36 @@ static UINT32 opROTW(v60_state *cpustate) /* TRUSTED */
 		for (i = 0;i < count;i++)
 			appw = (appw >> 1) | ((appw & 0x1) << 31);
 
-		cpustate->_CY = (appw & 0x80000000) != 0;
+		_CY = (appw & 0x80000000) != 0;
 	}
 	else
-		cpustate->_CY = 0;
+		_CY = 0;
 
-	cpustate->_OV = 0;
-	cpustate->_S = (appw & 0x80000000) != 0;
-	cpustate->_Z = (appw == 0);
+	_OV = 0;
+	_S = (appw & 0x80000000) != 0;
+	_Z = (appw == 0);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opROTCB(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opROTCB() /* TRUSTED */
 {
 	UINT8 appb;
 	INT8 i, cy, count;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
-	NORMALIZEFLAGS(cpustate);
+	F12LOADOP2BYTE();
+	NORMALIZEFLAGS();
 
-	count = (INT8)(cpustate->op1 & 0xFF);
+	count = (INT8)(m_op1 & 0xFF);
 	if (count > 0)
 	{
 		for (i = 0;i < count;i++)
 		{
-			cy = cpustate->_CY;
-			cpustate->_CY = (UINT8)((appb & 0x80) >> 7);
+			cy = _CY;
+			_CY = (UINT8)((appb & 0x80) >> 7);
 			appb = (appb << 1) | cy;
 		}
 	}
@@ -1488,39 +1488,39 @@ static UINT32 opROTCB(v60_state *cpustate) /* TRUSTED */
 		count=-count;
 		for (i = 0;i < count;i++)
 		{
-			cy = cpustate->_CY;
-			cpustate->_CY = (appb & 1);
+			cy = _CY;
+			_CY = (appb & 1);
 			appb = (appb >> 1) | (cy << 7);
 		}
 	}
 	else
-		cpustate->_CY = 0;
+		_CY = 0;
 
-	cpustate->_OV = 0;
-	cpustate->_S = (appb & 0x80) != 0;
-	cpustate->_Z = (appb == 0);
+	_OV = 0;
+	_S = (appb & 0x80) != 0;
+	_Z = (appb == 0);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opROTCH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opROTCH() /* TRUSTED */
 {
 	UINT16 apph;
 	INT8 i, cy, count;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
-	NORMALIZEFLAGS(cpustate);
+	F12LOADOP2HALF();
+	NORMALIZEFLAGS();
 
-	count = (INT8)(cpustate->op1 & 0xFF);
+	count = (INT8)(m_op1 & 0xFF);
 	if (count > 0)
 	{
 		for (i = 0;i < count;i++)
 		{
-			cy = cpustate->_CY;
-			cpustate->_CY = (UINT8)((apph & 0x8000) >> 15);
+			cy = _CY;
+			_CY = (UINT8)((apph & 0x8000) >> 15);
 			apph = (apph << 1) | cy;
 		}
 	}
@@ -1529,39 +1529,39 @@ static UINT32 opROTCH(v60_state *cpustate) /* TRUSTED */
 		count=-count;
 		for (i = 0;i < count;i++)
 		{
-			cy = cpustate->_CY;
-			cpustate->_CY = (UINT8)(apph & 1);
+			cy = _CY;
+			_CY = (UINT8)(apph & 1);
 			apph = (apph >> 1) | ((UINT16)cy << 15);
 		}
 	}
 	else
-		cpustate->_CY = 0;
+		_CY = 0;
 
-	cpustate->_OV = 0;
-	cpustate->_S = (apph & 0x8000) != 0;
-	cpustate->_Z = (apph == 0);
+	_OV = 0;
+	_S = (apph & 0x8000) != 0;
+	_Z = (apph == 0);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opROTCW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opROTCW() /* TRUSTED */
 {
 	UINT32 appw;
 	INT8 i, cy, count;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
-	NORMALIZEFLAGS(cpustate);
+	F12LOADOP2WORD();
+	NORMALIZEFLAGS();
 
-	count = (INT8)(cpustate->op1 & 0xFF);
+	count = (INT8)(m_op1 & 0xFF);
 	if (count > 0)
 	{
 		for (i = 0;i < count;i++)
 		{
-			cy = cpustate->_CY;
-			cpustate->_CY = (UINT8)((appw & 0x80000000) >> 31);
+			cy = _CY;
+			_CY = (UINT8)((appw & 0x80000000) >> 31);
 			appw = (appw << 1) | cy;
 		}
 	}
@@ -1570,146 +1570,146 @@ static UINT32 opROTCW(v60_state *cpustate) /* TRUSTED */
 		count=-count;
 		for (i = 0;i < count;i++)
 		{
-			cy = cpustate->_CY;
-			cpustate->_CY = (UINT8)(appw & 1);
+			cy = _CY;
+			_CY = (UINT8)(appw & 1);
 			appw = (appw >> 1) | ((UINT32)cy << 31);
 		}
 	}
 	else
-		cpustate->_CY = 0;
+		_CY = 0;
 
-	cpustate->_OV = 0;
-	cpustate->_S = (appw & 0x80000000) != 0;
-	cpustate->_Z = (appw == 0);
+	_OV = 0;
+	_S = (appw & 0x80000000) != 0;
+	_Z = (appw == 0);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opRVBIT(v60_state *cpustate)
+UINT32 v60_device::opRVBIT()
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 0);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 0);
 
-	cpustate->modwritevalb =(UINT8)
-								(((cpustate->op1 & (1 << 0)) << 7) |
-									((cpustate->op1 & (1 << 1)) << 5) |
-									((cpustate->op1 & (1 << 2)) << 3) |
-									((cpustate->op1 & (1 << 3)) << 1) |
-									((cpustate->op1 & (1 << 4)) >> 1) |
-									((cpustate->op1 & (1 << 5)) >> 3) |
-									((cpustate->op1 & (1 << 6)) >> 5) |
-									((cpustate->op1 & (1 << 7)) >> 7));
+	m_modwritevalb =(UINT8)
+								(((m_op1 & (1 << 0)) << 7) |
+									((m_op1 & (1 << 1)) << 5) |
+									((m_op1 & (1 << 2)) << 3) |
+									((m_op1 & (1 << 3)) << 1) |
+									((m_op1 & (1 << 4)) >> 1) |
+									((m_op1 & (1 << 5)) >> 3) |
+									((m_op1 & (1 << 6)) >> 5) |
+									((m_op1 & (1 << 7)) >> 7));
 
-	F12WriteSecondOperand(cpustate, 0);
-	F12END(cpustate);
+	F12WriteSecondOperand(0);
+	F12END();
 }
 
-static UINT32 opRVBYT(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opRVBYT() /* TRUSTED */
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 2);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 2);
 
-	cpustate->modwritevalw = ((cpustate->op1 & 0x000000FF) << 24) |
-									((cpustate->op1 & 0x0000FF00) << 8)  |
-									((cpustate->op1 & 0x00FF0000) >> 8)  |
-									((cpustate->op1 & 0xFF000000) >> 24);
+	m_modwritevalw = ((m_op1 & 0x000000FF) << 24) |
+									((m_op1 & 0x0000FF00) << 8)  |
+									((m_op1 & 0x00FF0000) >> 8)  |
+									((m_op1 & 0xFF000000) >> 24);
 
-	F12WriteSecondOperand(cpustate, 2);
-	F12END(cpustate);
+	F12WriteSecondOperand(2);
+	F12END();
 }
 
-static UINT32 opSET1(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opSET1() /* TRUSTED */
 {
 	UINT32 appw;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	cpustate->_CY = ((appw & (1 << cpustate->op1)) != 0);
-	cpustate->_Z = !(cpustate->_CY);
+	_CY = ((appw & (1 << m_op1)) != 0);
+	_Z = !(_CY);
 
-	appw |= (1 << cpustate->op1);
+	appw |= (1 << m_op1);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
 
-static UINT32 opSETF(v60_state *cpustate)
+UINT32 v60_device::opSETF()
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 0);
+	F12DecodeFirstOperand(&v60_device::ReadAM, 0);
 
 	// Normalize the flags
-	NORMALIZEFLAGS(cpustate);
+	NORMALIZEFLAGS();
 
-	switch (cpustate->op1 & 0xF)
+	switch (m_op1 & 0xF)
 	{
 	case 0:
-		if (!cpustate->_OV) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if (!_OV) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	case 1:
-		if (cpustate->_OV) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if (_OV) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	case 2:
-		if (!cpustate->_CY) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if (!_CY) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	case 3:
-		if (cpustate->_CY) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if (_CY) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	case 4:
-		if (!cpustate->_Z) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if (!_Z) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	case 5:
-		if (cpustate->_Z) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if (_Z) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	case 6:
-		if (!(cpustate->_CY | cpustate->_Z)) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if (!(_CY | _Z)) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	case 7:
-		if ((cpustate->_CY | cpustate->_Z)) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if ((_CY | _Z)) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	case 8:
-		if (!cpustate->_S) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if (!_S) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	case 9:
-		if (cpustate->_S) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if (_S) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	case 10:
-		cpustate->modwritevalb = 1;
+		m_modwritevalb = 1;
 		break;
 	case 11:
-		cpustate->modwritevalb = 0;
+		m_modwritevalb = 0;
 		break;
 	case 12:
-		if (!(cpustate->_S^cpustate->_OV)) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if (!(_S^_OV)) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	case 13:
-		if ((cpustate->_S^cpustate->_OV)) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if ((_S^_OV)) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	case 14:
-		if (!((cpustate->_S^cpustate->_OV)|cpustate->_Z)) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if (!((_S^_OV)|_Z)) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	case 15:
-		if (((cpustate->_S^cpustate->_OV)|cpustate->_Z)) cpustate->modwritevalb = 0;
-		else cpustate->modwritevalb = 1;
+		if (((_S^_OV)|_Z)) m_modwritevalb = 0;
+		else m_modwritevalb = 1;
 		break;
 	}
 
-	F12WriteSecondOperand(cpustate, 0);
+	F12WriteSecondOperand(0);
 
-	F12END(cpustate);
+	F12END();
 }
 
 /*
@@ -1719,8 +1719,8 @@ static UINT32 opSETF(v60_state *cpustate)
     tmp <<= count; \
     tmp -= 1; \
     tmp <<= (bitsize - (count)); \
-    cpustate->_OV = (((val) & tmp) != tmp); \
-    cpustate->_CY = (((val) & (1 << (count - 1))) != 0); \
+    _OV = (((val) & tmp) != tmp); \
+    _CY = (((val) & (1 << (count - 1))) != 0); \
 }
 */
 
@@ -1734,39 +1734,39 @@ static UINT32 opSETF(v60_state *cpustate)
 		tmp = ((1 << (count)) - 1); \
 	tmp <<= (bitsize - (count)); \
 	if (((val) >> (bitsize - 1)) & 1) \
-		cpustate->_OV = (((val) & tmp) != tmp); \
+		_OV = (((val) & tmp) != tmp); \
 	else \
-		cpustate->_OV = (((val) & tmp) != 0); \
+		_OV = (((val) & tmp) != 0); \
 }
 
 #define SHIFTLEFT_CY(val, count, bitsize) \
-	cpustate->_CY = (UINT8)(((val) >> (bitsize - count)) & 1);
+	_CY = (UINT8)(((val) >> (bitsize - count)) & 1);
 
 
 
 #define SHIFTARITHMETICRIGHT_OV(val, count, bitsize) \
-	cpustate->_OV = 0;
+	_OV = 0;
 
 #define SHIFTARITHMETICRIGHT_CY(val, count, bitsize) \
-	cpustate->_CY = (UINT8)(((val) >> (count - 1)) & 1);
+	_CY = (UINT8)(((val) >> (count - 1)) & 1);
 
 
 
-static UINT32 opSHAB(v60_state *cpustate)
+UINT32 v60_device::opSHAB()
 {
 	UINT8 appb;
 	INT8 count;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	count = (INT8)(cpustate->op1 & 0xFF);
+	count = (INT8)(m_op1 & 0xFF);
 
 	// Special case: destination unchanged, flags set
 	if (count == 0)
 	{
-		cpustate->_CY = cpustate->_OV = 0;
+		_CY = _OV = 0;
 		SetSZPF_Byte(appb);
 	}
 	else if (count > 0)
@@ -1800,27 +1800,27 @@ static UINT32 opSHAB(v60_state *cpustate)
 		SetSZPF_Byte(appb);
 	}
 
-//  mame_printf_debug("SHAB: %x cpustate->_CY: %d cpustate->_Z: %d cpustate->_OV: %d cpustate->_S: %d\n", appb, cpustate->_CY, cpustate->_Z, cpustate->_OV, cpustate->_S);
+//  mame_printf_debug("SHAB: %x _CY: %d _Z: %d _OV: %d _S: %d\n", appb, _CY, _Z, _OV, _S);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opSHAH(v60_state *cpustate)
+UINT32 v60_device::opSHAH()
 {
 	UINT16 apph;
 	INT8 count;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	count = (INT8)(cpustate->op1 & 0xFF);
+	count = (INT8)(m_op1 & 0xFF);
 
 	// Special case: destination unchanged, flags set
 	if (count == 0)
 	{
-		cpustate->_CY = cpustate->_OV = 0;
+		_CY = _OV = 0;
 		SetSZPF_Word(apph);
 	}
 	else if (count > 0)
@@ -1854,27 +1854,27 @@ static UINT32 opSHAH(v60_state *cpustate)
 		SetSZPF_Word(apph);
 	}
 
-//  mame_printf_debug("SHAH: %x >> %d = %x cpustate->_CY: %d cpustate->_Z: %d cpustate->_OV: %d cpustate->_S: %d\n", oldval, count, apph, cpustate->_CY, cpustate->_Z, cpustate->_OV, cpustate->_S);
+//  mame_printf_debug("SHAH: %x >> %d = %x _CY: %d _Z: %d _OV: %d _S: %d\n", oldval, count, apph, _CY, _Z, _OV, _S);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opSHAW(v60_state *cpustate)
+UINT32 v60_device::opSHAW()
 {
 	UINT32 appw;
 	INT8 count;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	count = (INT8)(cpustate->op1 & 0xFF);
+	count = (INT8)(m_op1 & 0xFF);
 
 	// Special case: destination unchanged, flags set
 	if (count == 0)
 	{
-		cpustate->_CY = cpustate->_OV = 0;
+		_CY = _OV = 0;
 		SetSZPF_Long(appw);
 	}
 	else if (count > 0)
@@ -1908,31 +1908,31 @@ static UINT32 opSHAW(v60_state *cpustate)
 		SetSZPF_Long(appw);
 	}
 
-//  mame_printf_debug("SHAW: %x >> %d = %x cpustate->_CY: %d cpustate->_Z: %d cpustate->_OV: %d cpustate->_S: %d\n", oldval, count, appw, cpustate->_CY, cpustate->_Z, cpustate->_OV, cpustate->_S);
+//  mame_printf_debug("SHAW: %x >> %d = %x _CY: %d _Z: %d _OV: %d _S: %d\n", oldval, count, appw, _CY, _Z, _OV, _S);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
 
-static UINT32 opSHLB(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opSHLB() /* TRUSTED */
 {
 	UINT8 appb;
 	INT8 count;
 	UINT32 tmp;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	count = (INT8)(cpustate->op1 & 0xFF);
+	count = (INT8)(m_op1 & 0xFF);
 	if (count > 0)
 	{
 		// left shift flags:
 		// carry gets the last bit shifted out,
 		// overflow is always CLEARed
 
-		cpustate->_OV = 0;  // default to no overflow
+		_OV = 0;  // default to no overflow
 
 		// now handle carry
 		tmp = appb & 0xff;
@@ -1950,7 +1950,7 @@ static UINT32 opSHLB(v60_state *cpustate) /* TRUSTED */
 		if (count == 0)
 		{
 			// special case: clear carry and overflow, do nothing else
-			cpustate->_CY = cpustate->_OV = 0;
+			_CY = _OV = 0;
 			SetSZPF_Byte(appb); // doc. is unclear if this is true...
 		}
 		else
@@ -1960,31 +1960,31 @@ static UINT32 opSHLB(v60_state *cpustate) /* TRUSTED */
 			// overflow always cleared
 			tmp = appb & 0xff;
 			tmp >>= ((-count) - 1);
-			cpustate->_CY = (UINT8)(tmp & 0x1);
-			cpustate->_OV = 0;
+			_CY = (UINT8)(tmp & 0x1);
+			_OV = 0;
 
 			appb >>= -count;
 			SetSZPF_Byte(appb);
 		}
 	}
 
-//  mame_printf_debug("SHLB: %x cpustate->_CY: %d cpustate->_Z: %d cpustate->_OV: %d cpustate->_S: %d\n", appb, cpustate->_CY, cpustate->_Z, cpustate->_OV, cpustate->_S);
+//  mame_printf_debug("SHLB: %x _CY: %d _Z: %d _OV: %d _S: %d\n", appb, _CY, _Z, _OV, _S);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opSHLH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opSHLH() /* TRUSTED */
 {
 	UINT16 apph;
 	INT8 count;
 	UINT32 tmp;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	count = (INT8)(cpustate->op1 & 0xFF);
+	count = (INT8)(m_op1 & 0xFF);
 //  mame_printf_debug("apph: %x count: %d  ", apph, count);
 	if (count > 0)
 	{
@@ -1992,7 +1992,7 @@ static UINT32 opSHLH(v60_state *cpustate) /* TRUSTED */
 		// carry gets the last bit shifted out,
 		// overflow is always CLEARed
 
-		cpustate->_OV = 0;
+		_OV = 0;
 
 		// now handle carry
 		tmp = apph & 0xffff;
@@ -2010,7 +2010,7 @@ static UINT32 opSHLH(v60_state *cpustate) /* TRUSTED */
 		if (count == 0)
 		{
 			// special case: clear carry and overflow, do nothing else
-			cpustate->_CY = cpustate->_OV = 0;
+			_CY = _OV = 0;
 			SetSZPF_Word(apph); // doc. is unclear if this is true...
 		}
 		else
@@ -2020,38 +2020,38 @@ static UINT32 opSHLH(v60_state *cpustate) /* TRUSTED */
 			// overflow always cleared
 			tmp = apph & 0xffff;
 			tmp >>= ((-count) - 1);
-			cpustate->_CY = (UINT8)(tmp & 0x1);
-			cpustate->_OV = 0;
+			_CY = (UINT8)(tmp & 0x1);
+			_OV = 0;
 
 			apph >>= -count;
 			SetSZPF_Word(apph);
 		}
 	}
 
-//  mame_printf_debug("SHLH: %x cpustate->_CY: %d cpustate->_Z: %d cpustate->_OV: %d cpustate->_S: %d\n", apph, cpustate->_CY, cpustate->_Z, cpustate->_OV, cpustate->_S);
+//  mame_printf_debug("SHLH: %x _CY: %d _Z: %d _OV: %d _S: %d\n", apph, _CY, _Z, _OV, _S);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opSHLW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opSHLW() /* TRUSTED */
 {
 	UINT32 appw;
 	INT8 count;
 	UINT64 tmp;
 
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	count = (INT8)(cpustate->op1 & 0xFF);
+	count = (INT8)(m_op1 & 0xFF);
 	if (count > 0)
 	{
 		// left shift flags:
 		// carry gets the last bit shifted out,
 		// overflow is always CLEARed
 
-		cpustate->_OV = 0;
+		_OV = 0;
 
 		// now handle carry
 		tmp = appw & 0xffffffff;
@@ -2069,7 +2069,7 @@ static UINT32 opSHLW(v60_state *cpustate) /* TRUSTED */
 		if (count == 0)
 		{
 			// special case: clear carry and overflow, do nothing else
-			cpustate->_CY = cpustate->_OV = 0;
+			_CY = _OV = 0;
 			SetSZPF_Long(appw); // doc. is unclear if this is true...
 		}
 		else
@@ -2079,313 +2079,313 @@ static UINT32 opSHLW(v60_state *cpustate) /* TRUSTED */
 			// overflow always cleared
 			tmp = (UINT64)(appw & 0xffffffff);
 			tmp >>= ((-count) - 1);
-			cpustate->_CY = (UINT8)(tmp & 0x1);
-			cpustate->_OV = 0;
+			_CY = (UINT8)(tmp & 0x1);
+			_OV = 0;
 
 			appw >>= -count;
 			SetSZPF_Long(appw);
 		}
 	}
 
-//  mame_printf_debug("SHLW: %x cpustate->_CY: %d cpustate->_Z: %d cpustate->_OV: %d cpustate->_S: %d\n", appw, cpustate->_CY, cpustate->_Z, cpustate->_OV, cpustate->_S);
+//  mame_printf_debug("SHLW: %x _CY: %d _Z: %d _OV: %d _S: %d\n", appw, _CY, _Z, _OV, _S);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opSTPR(v60_state *cpustate)
+UINT32 v60_device::opSTPR()
 {
-	F12DecodeFirstOperand(cpustate, ReadAM, 2);
-	if (cpustate->op1 <= 28)
-		cpustate->modwritevalw = cpustate->reg[cpustate->op1 + 36];
+	F12DecodeFirstOperand(&v60_device::ReadAM, 2);
+	if (m_op1 <= 28)
+		m_modwritevalw = m_reg[m_op1 + 36];
 	else
 	{
-		fatalerror("Invalid operand on STPR cpustate->PC=%x\n", cpustate->PC);
+		fatalerror("Invalid operand on STPR PC=%x\n", PC);
 	}
-	F12WriteSecondOperand(cpustate, 2);
-	F12END(cpustate);
+	F12WriteSecondOperand(2);
+	F12END();
 }
 
 
-static UINT32 opSUBB(v60_state *cpustate) /* TRUSTED (C too!) */
+UINT32 v60_device::opSUBB() /* TRUSTED (C too!) */
 {
 	UINT8 appb;
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	SUBB(appb, (UINT8)cpustate->op1);
+	SUBB(appb, (UINT8)m_op1);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opSUBH(v60_state *cpustate) /* TRUSTED (C too!) */
+UINT32 v60_device::opSUBH() /* TRUSTED (C too!) */
 {
 	UINT16 apph;
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	SUBW(apph, (UINT16)cpustate->op1);
+	SUBW(apph, (UINT16)m_op1);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opSUBW(v60_state *cpustate) /* TRUSTED (C too!) */
+UINT32 v60_device::opSUBW() /* TRUSTED (C too!) */
 {
 	UINT32 appw;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	SUBL(appw, (UINT32)cpustate->op1);
+	SUBL(appw, (UINT32)m_op1);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
 
-static UINT32 opSUBCB(v60_state *cpustate)
+UINT32 v60_device::opSUBCB()
 {
 	UINT8 appb;
 	UINT8 src;
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	src = (UINT8)cpustate->op1 + (cpustate->_CY?1:0);
+	src = (UINT8)m_op1 + (_CY?1:0);
 	SUBB(appb, src);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opSUBCH(v60_state *cpustate)
+UINT32 v60_device::opSUBCH()
 {
 	UINT16 apph;
 	UINT16 src;
 
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	src = (UINT16)cpustate->op1 + (cpustate->_CY?1:0);
+	src = (UINT16)m_op1 + (_CY?1:0);
 	SUBW(apph, src);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opSUBCW(v60_state *cpustate)
+UINT32 v60_device::opSUBCW()
 {
 	UINT32 appw;
 	UINT32 src;
 
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	src = (UINT32)cpustate->op1 + (cpustate->_CY?1:0);
+	src = (UINT32)m_op1 + (_CY?1:0);
 	SUBL(appw, src);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opTEST1(v60_state *cpustate)
+UINT32 v60_device::opTEST1()
 {
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAM, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAM, 2);
 
-	cpustate->_CY = ((cpustate->op2 & (1 << cpustate->op1)) != 0);
-	cpustate->_Z = !(cpustate->_CY);
+	_CY = ((m_op2 & (1 << m_op1)) != 0);
+	_Z = !(_CY);
 
-	F12END(cpustate);
+	F12END();
 }
 
-static UINT32 opUPDPSWW(v60_state *cpustate)
+UINT32 v60_device::opUPDPSWW()
 {
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAM, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAM, 2);
 
 	/* can only modify condition code and control fields */
-	cpustate->op2 &= 0xFFFFFF;
-	cpustate->op1 &= 0xFFFFFF;
-	v60WritePSW(cpustate, (v60ReadPSW(cpustate) & (~cpustate->op2)) | (cpustate->op1 & cpustate->op2));
+	m_op2 &= 0xFFFFFF;
+	m_op1 &= 0xFFFFFF;
+	v60WritePSW((v60ReadPSW() & (~m_op2)) | (m_op1 & m_op2));
 
-	F12END(cpustate);
+	F12END();
 }
 
-static UINT32 opUPDPSWH(v60_state *cpustate)
+UINT32 v60_device::opUPDPSWH()
 {
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAM, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAM, 2);
 
 	/* can only modify condition code fields */
-	cpustate->op2 &= 0xFFFF;
-	cpustate->op1 &= 0xFFFF;
-	v60WritePSW(cpustate, (v60ReadPSW(cpustate) & (~cpustate->op2)) | (cpustate->op1 & cpustate->op2));
+	m_op2 &= 0xFFFF;
+	m_op1 &= 0xFFFF;
+	v60WritePSW((v60ReadPSW() & (~m_op2)) | (m_op1 & m_op2));
 
-	F12END(cpustate);
+	F12END();
 }
 
-static UINT32 opXCHB(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opXCHB() /* TRUSTED */
 {
 	UINT8 appb, temp;
 
-	F12DecodeOperands(cpustate, ReadAMAddress, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAMAddress, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP1BYTE(cpustate);
+	F12LOADOP1BYTE();
 	temp = appb;
-	F12LOADOP2BYTE(cpustate);
-	F12STOREOP1BYTE(cpustate);
+	F12LOADOP2BYTE();
+	F12STOREOP1BYTE();
 	appb = temp;
-	F12STOREOP2BYTE(cpustate);
+	F12STOREOP2BYTE();
 
-	F12END(cpustate)
+	F12END()
 }
 
-static UINT32 opXCHH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opXCHH() /* TRUSTED */
 {
 	UINT16 apph, temp;
 
-	F12DecodeOperands(cpustate, ReadAMAddress, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAMAddress, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP1HALF(cpustate);
+	F12LOADOP1HALF();
 	temp = apph;
-	F12LOADOP2HALF(cpustate);
-	F12STOREOP1HALF(cpustate);
+	F12LOADOP2HALF();
+	F12STOREOP1HALF();
 	apph = temp;
-	F12STOREOP2HALF(cpustate);
+	F12STOREOP2HALF();
 
-	F12END(cpustate)
+	F12END()
 }
 
-static UINT32 opXCHW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opXCHW() /* TRUSTED */
 {
 	UINT32 appw, temp;
 
-	F12DecodeOperands(cpustate, ReadAMAddress, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAMAddress, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP1WORD(cpustate);
+	F12LOADOP1WORD();
 	temp = appw;
-	F12LOADOP2WORD(cpustate);
-	F12STOREOP1WORD(cpustate);
+	F12LOADOP2WORD();
+	F12STOREOP1WORD();
 	appw = temp;
-	F12STOREOP2WORD(cpustate);
+	F12STOREOP2WORD();
 
-	F12END(cpustate)
+	F12END()
 }
 
-static UINT32 opXORB(v60_state *cpustate) /* TRUSTED (C too!) */
+UINT32 v60_device::opXORB() /* TRUSTED (C too!) */
 {
 	UINT8 appb;
-	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 0);
+	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
-	F12LOADOP2BYTE(cpustate);
+	F12LOADOP2BYTE();
 
-	XORB(appb, (UINT8)cpustate->op1);
+	XORB(appb, (UINT8)m_op1);
 
-	F12STOREOP2BYTE(cpustate);
-	F12END(cpustate);
+	F12STOREOP2BYTE();
+	F12END();
 }
 
-static UINT32 opXORH(v60_state *cpustate) /* TRUSTED (C too!) */
+UINT32 v60_device::opXORH() /* TRUSTED (C too!) */
 {
 	UINT16 apph;
-	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 1);
+	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
-	F12LOADOP2HALF(cpustate);
+	F12LOADOP2HALF();
 
-	XORW(apph, (UINT16)cpustate->op1);
+	XORW(apph, (UINT16)m_op1);
 
-	F12STOREOP2HALF(cpustate);
-	F12END(cpustate);
+	F12STOREOP2HALF();
+	F12END();
 }
 
-static UINT32 opXORW(v60_state *cpustate) /* TRUSTED (C too!) */
+UINT32 v60_device::opXORW() /* TRUSTED (C too!) */
 {
 	UINT32 appw;
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
-	F12LOADOP2WORD(cpustate);
+	F12LOADOP2WORD();
 
-	XORL(appw, (UINT32)cpustate->op1);
+	XORL(appw, (UINT32)m_op1);
 
-	F12STOREOP2WORD(cpustate);
-	F12END(cpustate);
+	F12STOREOP2WORD();
+	F12END();
 }
 
-static UINT32 opMULX(v60_state *cpustate)
+UINT32 v60_device::opMULX()
 {
 	INT32 a, b;
 	INT64 res;
 
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 3);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 3);
 
-	if (cpustate->flag2)
+	if (m_flag2)
 	{
-		a = cpustate->reg[cpustate->op2 & 0x1F];
+		a = m_reg[m_op2 & 0x1F];
 	}
 	else
 	{
-		a = cpustate->program->read_dword_unaligned(cpustate->op2);
+		a = m_program->read_dword_unaligned(m_op2);
 	}
 
-	res = (INT64)a * (INT64)(INT32)cpustate->op1;
+	res = (INT64)a * (INT64)(INT32)m_op1;
 
 	b = (INT32)((res >> 32)&0xffffffff);
 	a = (INT32)(res & 0xffffffff);
 
-	cpustate->_S = ((b & 0x80000000) != 0);
-	cpustate->_Z = (a == 0 && b == 0);
+	_S = ((b & 0x80000000) != 0);
+	_Z = (a == 0 && b == 0);
 
-	if (cpustate->flag2)
+	if (m_flag2)
 	{
-		cpustate->reg[cpustate->op2 & 0x1F] = a;
-		cpustate->reg[(cpustate->op2 & 0x1F) + 1] = b;
+		m_reg[m_op2 & 0x1F] = a;
+		m_reg[(m_op2 & 0x1F) + 1] = b;
 	}
 	else
 	{
-		cpustate->program->write_dword_unaligned(cpustate->op2, a);
-		cpustate->program->write_dword_unaligned(cpustate->op2 + 4, b);
+		m_program->write_dword_unaligned(m_op2, a);
+		m_program->write_dword_unaligned(m_op2 + 4, b);
 	}
 
-	F12END(cpustate);
+	F12END();
 }
 
-static UINT32 opMULUX(v60_state *cpustate)
+UINT32 v60_device::opMULUX()
 {
 	INT32 a, b;
 	UINT64 res;
 
-	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 3);
+	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 3);
 
-	if (cpustate->flag2)
+	if (m_flag2)
 	{
-		a = cpustate->reg[cpustate->op2 & 0x1F];
+		a = m_reg[m_op2 & 0x1F];
 	}
 	else
 	{
-		a = cpustate->program->read_dword_unaligned(cpustate->op2);
+		a = m_program->read_dword_unaligned(m_op2);
 	}
 
-	res = (UINT64)a * (UINT64)cpustate->op1;
+	res = (UINT64)a * (UINT64)m_op1;
 	b = (INT32)((res >> 32)&0xffffffff);
 	a = (INT32)(res & 0xffffffff);
 
-	cpustate->_S = ((b & 0x80000000) != 0);
-	cpustate->_Z = (a == 0 && b == 0);
+	_S = ((b & 0x80000000) != 0);
+	_Z = (a == 0 && b == 0);
 
-	if (cpustate->flag2)
+	if (m_flag2)
 	{
-		cpustate->reg[cpustate->op2 & 0x1F] = a;
-		cpustate->reg[(cpustate->op2 & 0x1F) + 1] = b;
+		m_reg[m_op2 & 0x1F] = a;
+		m_reg[(m_op2 & 0x1F) + 1] = b;
 	}
 	else
 	{
-		cpustate->program->write_dword_unaligned(cpustate->op2, a);
-		cpustate->program->write_dword_unaligned(cpustate->op2 + 4, b);
+		m_program->write_dword_unaligned(m_op2, a);
+		m_program->write_dword_unaligned(m_op2 + 4, b);
 	}
 
-	F12END(cpustate);
+	F12END();
 }

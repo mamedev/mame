@@ -28,6 +28,9 @@
     CORE STATE
 ***************************************************************************/
 
+/* Size of the memory buffer allocated for the shiftr register */
+#define SHIFTREG_SIZE           (8 * 512 * sizeof(UINT16))
+
 /* TMS34010 State */
 struct XY
 {
@@ -51,7 +54,6 @@ struct tms34010_state
 	UINT32              convsp;
 	UINT32              convdp;
 	UINT32              convmp;
-	UINT16 *            shiftreg;
 	INT32               gfxcycles;
 	UINT8               pixelshift;
 	UINT8               is_34020;
@@ -77,6 +79,7 @@ struct tms34010_state
 	} regs[31];
 
 	UINT16 IOregs[64];
+	UINT16              shiftreg[SHIFTREG_SIZE/2];
 };
 
 INLINE tms34010_state *get_safe_token(device_t *device)
@@ -649,13 +652,10 @@ static CPU_INIT( tms34010 )
 	tms->scantimer = device->machine().scheduler().timer_alloc(FUNC(scanline_callback), tms);
 	tms->scantimer->adjust(attotime::zero);
 
-	/* allocate the shiftreg */
-	tms->shiftreg = auto_alloc_array(device->machine(), UINT16, SHIFTREG_SIZE/2);
-
 	device->save_item(NAME(tms->pc));
 	device->save_item(NAME(tms->st));
 	device->save_item(NAME(tms->reset_deferred));
-	device->save_pointer(NAME(tms->shiftreg), SHIFTREG_SIZE / 2);
+	device->save_item(NAME(tms->shiftreg));
 	device->save_item(NAME(tms->IOregs));
 	device->save_item(NAME(tms->convsp));
 	device->save_item(NAME(tms->convdp));
@@ -672,7 +672,6 @@ static CPU_RESET( tms34010 )
 	tms34010_state *tms = get_safe_token(device);
 	const tms34010_config *config = tms->config;
 	screen_device *screen = tms->screen;
-	UINT16 *shiftreg = tms->shiftreg;
 	device_irq_acknowledge_callback save_irqcallback = tms->irq_callback;
 	emu_timer *save_scantimer = tms->scantimer;
 
@@ -680,7 +679,6 @@ static CPU_RESET( tms34010 )
 
 	tms->config = config;
 	tms->screen = screen;
-	tms->shiftreg = shiftreg;
 	tms->irq_callback = save_irqcallback;
 	tms->scantimer = save_scantimer;
 	tms->device = device;
@@ -714,8 +712,6 @@ static CPU_RESET( tms34020 )
 
 static CPU_EXIT( tms34010 )
 {
-	tms34010_state *tms = get_safe_token(device);
-	tms->shiftreg = NULL;
 }
 
 

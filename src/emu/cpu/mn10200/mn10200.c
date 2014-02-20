@@ -33,14 +33,14 @@ enum mn10200_flag
 	FLAG_D15 = 0x8000  // ?
 };
 
-const device_type MN10200 = &device_creator<mn10200_device>;
+const device_type MN1020012A = &device_creator<mn10200_device>;
 
 static ADDRESS_MAP_START( mn1020012_internal_map, AS_PROGRAM, 16, mn10200_device )
 	AM_RANGE(0x00fc00, 0x00ffff) AM_READWRITE8(io_control_r, io_control_w, 0xffff)
 ADDRESS_MAP_END
 
 mn10200_device::mn10200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, MN10200, "MN10200", tag, owner, clock, "mn10200", __FILE__),
+	: cpu_device(mconfig, MN1020012A, "MN1020012A", tag, owner, clock, "mn1020012a", __FILE__),
 	m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(mn1020012_internal_map)),
 	m_io_config("data", ENDIANNESS_LITTLE, 8, 8, 0)
 {
@@ -135,7 +135,7 @@ void mn10200_device::device_start()
 	save_item(NAME(m_extmdh));
 	save_item(NAME(m_icrl));
 	save_item(NAME(m_icrh));
-	save_item(NAME(m_ddr));
+	save_item(NAME(m_possible_irq));
 
 	// register for debugger
 	state_add( MN10200_PC,    "PC",    m_pc ).mask(0xffffff).formatstr("%06X");
@@ -211,6 +211,8 @@ void mn10200_device::device_reset()
 	for (int i = 0; i < 2; i++)
 		for (int address = 0xfc04; address < 0x10000; address++)
 			write_mem16(address, 0);
+
+	m_possible_irq = false;
 }
 
 
@@ -228,10 +230,10 @@ void mn10200_device::take_irq(int level, int group)
 	m_iagr = group;
 }
 
-bool mn10200_device::check_irq()
+void mn10200_device::check_irq()
 {
 	if (!m_nmicr && !(m_psw & FLAG_IE))
-		return false;
+		return;
 	
 	int level = m_psw >> 8 & 7;
 	int group = 0;
@@ -253,10 +255,8 @@ bool mn10200_device::check_irq()
 		take_irq(0, 0);
 	else if (group)
 		take_irq(level, group);
-	else
-		return false;
 	
-	return true;
+	return;
 }
 
 void mn10200_device::check_ext_irq()
@@ -268,7 +268,7 @@ void mn10200_device::check_ext_irq()
 			m_icrl[8] |= (1 << (4 + i));
 	}
 	
-	check_irq();
+	m_possible_irq = true;
 }
 
 void mn10200_device::execute_set_input(int irqnum, int state)
@@ -309,7 +309,7 @@ void mn10200_device::execute_set_input(int irqnum, int state)
 	if (active)
 	{
 		m_icrl[8] |= (1 << (4 + irqnum));
-		check_irq();
+		m_possible_irq = true;
 	}
 }
 
@@ -340,7 +340,7 @@ int mn10200_device::timer_tick_simple(int tmr)
 	{
 		// trigger irq
 		m_icrl[1 + (tmr >> 2)] |= (1 << (4 + (tmr & 3)));
-		check_irq();
+		m_possible_irq = true;
 
 		return 0;
 	}
@@ -366,6 +366,12 @@ void mn10200_device::refresh_timer(int tmr)
 	}
 }
 
+void mn10200_device::refresh_all_timers()
+{
+	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
+		refresh_timer(tmr);
+}
+
 TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
 {
 	int tmr = param;
@@ -378,12 +384,6 @@ TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
 	
 	// refresh this timer
 	refresh_timer(tmr);
-}
-
-void mn10200_device::refresh_all_timers()
-{
-	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
-		refresh_timer(tmr);
 }
 
 
@@ -474,16 +474,20 @@ void mn10200_device::do_branch(bool state)
 
 void mn10200_device::execute_run()
 {
-	bool possible_irq = false;
-	UINT8 op;
-
 	while (m_cycles > 0)
 	{
+
+	// internal peripheral, external pin, or prev instruction may have changed irq state
+	while (m_possible_irq)
+	{
+		m_possible_irq = false;
+		check_irq();
+	}
 
 	debugger_instruction_hook(this, m_pc);
 
 	m_cycles -= 1;
-	op = read_arg8(m_pc);
+	UINT8 op = read_arg8(m_pc);
 	m_pc += 1;
 
 	// main opcodes
@@ -707,7 +711,7 @@ void mn10200_device::execute_run()
 			m_psw = read_mem16(m_a[3]);
 			change_pc(read_mem24(m_a[3] + 2));
 			m_a[3] += 6;
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 
 		// cmp imm16, an
@@ -747,7 +751,7 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 
 
@@ -833,7 +837,7 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0xf0, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 		}
 		break;
@@ -964,7 +968,7 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0xf2, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 		}
 		break;
@@ -1124,7 +1128,7 @@ void mn10200_device::execute_run()
 		case 0xd0: case 0xd4: case 0xd8: case 0xdc:
 			m_cycles -= 1;
 			m_psw = m_d[op>>2&3];
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 
 		// mov mdr, dn
@@ -1144,7 +1148,7 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0xf3, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 		}
 		break;
@@ -1310,7 +1314,7 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0xf4, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 		}
 		m_pc += 3;
@@ -1471,7 +1475,7 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0xf5, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 		}
 		m_pc += 1;
@@ -1518,7 +1522,7 @@ void mn10200_device::execute_run()
 		case 0x14:
 			m_cycles -= 1;
 			m_psw |= read_arg16(m_pc);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 
 		// add imm16, dn
@@ -1618,20 +1622,13 @@ void mn10200_device::execute_run()
 
 		default:
 			illegal(0xf7, op);
-			possible_irq = true;
+			m_possible_irq = true;
 			break;
 		}
 		m_pc += 2;
 		break;
 
 	} // end main switch
-
-	// instruction may have changed irq state
-	if (possible_irq)
-	{
-		check_irq();
-		possible_irq = false;
-	}
 
 	} // end loop
 }
@@ -1684,7 +1681,7 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 		case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
 		case 0x04d: case 0x04f: case 0x051: case 0x053: case 0x055:
 			m_icrh[(offset & 0x3f) >> 1] = data;
-			check_irq();
+			m_possible_irq = true;
 			break;
 
 		// external irq control

@@ -204,12 +204,6 @@ void lc8670_cpu_device::device_start()
 	m_basetimer->adjust(attotime::from_hz(m_clocks[LC8670_SUB_CLOCK]), 0, attotime::from_hz(m_clocks[LC8670_SUB_CLOCK]));
 	m_clocktimer = timer_alloc(CLOCK_TIMER);
 
-	// alloc internal RAM
-	m_sfr = auto_alloc_array(machine(), UINT8, 0x80);
-	m_mram = auto_alloc_array(machine(), UINT8, 0x200);
-	m_xram = auto_alloc_array(machine(), UINT8, 0xc6);
-	m_vtrbf = auto_alloc_array(machine(), UINT8, 0x200);
-
 	// register state for debugger
 	state_add(LC8670_PC  , "PC"  , m_pc).callimport().callexport().formatstr("%04X");
 	state_add(LC8670_SFR + 0x00, "A"     , REG_A     ).callimport().callexport().formatstr("%02X");

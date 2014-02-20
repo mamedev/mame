@@ -1,353 +1,353 @@
 
 
-#define F2END(cs) \
-	return 2 + (cs)->amlength1 + (cs)->amlength2;
+#define F2END() \
+	return 2 + m_amlength1 + m_amlength2;
 
-#define F2LOADOPFLOAT(cs, num)                              \
-	if ((cs)->flag##num)                                    \
-		appf = u2f((cs)->reg[(cs)->op##num]);               \
+#define F2LOADOPFLOAT(num)                              \
+	if (m_flag##num)                                    \
+		appf = u2f(m_reg[m_op##num]);               \
 	else                                                    \
-		appf = u2f((cs)->program->read_dword_unaligned((cs)->op##num));
+		appf = u2f(m_program->read_dword_unaligned(m_op##num));
 
-#define F2STOREOPFLOAT(cs,num)                              \
-	if ((cs)->flag##num)                                    \
-		(cs)->reg[(cs)->op##num] = f2u(appf);               \
+#define F2STOREOPFLOAT(num)                              \
+	if (m_flag##num)                                    \
+		m_reg[m_op##num] = f2u(appf);               \
 	else                                                    \
-		(cs)->program->write_dword_unaligned((cs)->op##num, f2u(appf));
+		m_program->write_dword_unaligned(m_op##num, f2u(appf));
 
-static void F2DecodeFirstOperand(v60_state *cpustate, UINT32 (*DecodeOp1)(v60_state *), UINT8 dim1)
+void v60_device::F2DecodeFirstOperand(am_func DecodeOp1, UINT8 dim1)
 {
-	cpustate->moddim = dim1;
-	cpustate->modm = cpustate->instflags & 0x40;
-	cpustate->modadd = cpustate->PC + 2;
-	cpustate->amlength1 = DecodeOp1(cpustate);
-	cpustate->op1 = cpustate->amout;
-	cpustate->flag1 = cpustate->amflag;
+	m_moddim = dim1;
+	m_modm = m_instflags & 0x40;
+	m_modadd = PC + 2;
+	m_amlength1 = (this->*DecodeOp1)();
+	m_op1 = m_amout;
+	m_flag1 = m_amflag;
 }
 
-static void F2DecodeSecondOperand(v60_state *cpustate, UINT32 (*DecodeOp2)(v60_state *), UINT8 dim2)
+void v60_device::F2DecodeSecondOperand(am_func DecodeOp2, UINT8 dim2)
 {
-	cpustate->moddim = dim2;
-	cpustate->modm = cpustate->instflags & 0x20;
-	cpustate->modadd = cpustate->PC + 2 + cpustate->amlength1;
-	cpustate->amlength2 = DecodeOp2(cpustate);
-	cpustate->op2 = cpustate->amout;
-	cpustate->flag2 = cpustate->amflag;
+	m_moddim = dim2;
+	m_modm = m_instflags & 0x20;
+	m_modadd = PC + 2 + m_amlength1;
+	m_amlength2 = (this->*DecodeOp2)();
+	m_op2 = m_amout;
+	m_flag2 = m_amflag;
 }
 
-static void F2WriteSecondOperand(v60_state *cpustate, UINT8 dim2)
+void v60_device::F2WriteSecondOperand(UINT8 dim2)
 {
-	cpustate->moddim = dim2;
-	cpustate->modm = cpustate->instflags & 0x20;
-	cpustate->modadd = cpustate->PC + 2 + cpustate->amlength1;
-	cpustate->amlength2 = WriteAM(cpustate);
+	m_moddim = dim2;
+	m_modm = m_instflags & 0x20;
+	m_modadd = PC + 2 + m_amlength1;
+	m_amlength2 = WriteAM();
 }
 
-static UINT32 opCVTWS(v60_state *cpustate)
+UINT32 v60_device::opCVTWS()
 {
 	float val;
 
-	F2DecodeFirstOperand(cpustate, ReadAM, 2);
+	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
 
 	// Convert to float
-	val = (float)(INT32)cpustate->op1;
-	cpustate->modwritevalw = f2u(val);
+	val = (float)(INT32)m_op1;
+	m_modwritevalw = f2u(val);
 
-	cpustate->_OV = 0;
-	cpustate->_CY = (val < 0.0f);
-	cpustate->_S = ((cpustate->modwritevalw & 0x80000000) != 0);
-	cpustate->_Z = (val == 0.0f);
+	_OV = 0;
+	_CY = (val < 0.0f);
+	_S = ((m_modwritevalw & 0x80000000) != 0);
+	_Z = (val == 0.0f);
 
-	F2WriteSecondOperand(cpustate, 2);
-	F2END(cpustate);
+	F2WriteSecondOperand(2);
+	F2END();
 }
 
-static UINT32 opCVTSW(v60_state *cpustate)
+UINT32 v60_device::opCVTSW()
 {
 	float val;
 
-	F2DecodeFirstOperand(cpustate, ReadAM, 2);
+	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
 
 	// Convert to UINT32
-	val = u2f(cpustate->op1);
-	cpustate->modwritevalw = (UINT32)val;
+	val = u2f(m_op1);
+	m_modwritevalw = (UINT32)val;
 
-	cpustate->_OV = 0;
-	cpustate->_CY =(val < 0.0f);
-	cpustate->_S = ((cpustate->modwritevalw & 0x80000000) != 0);
-	cpustate->_Z = (val == 0.0f);
+	_OV = 0;
+	_CY =(val < 0.0f);
+	_S = ((m_modwritevalw & 0x80000000) != 0);
+	_Z = (val == 0.0f);
 
-	F2WriteSecondOperand(cpustate, 2);
-	F2END(cpustate);
+	F2WriteSecondOperand(2);
+	F2END();
 }
 
-static UINT32 opMOVFS(v60_state *cpustate)
+UINT32 v60_device::opMOVFS()
 {
-	F2DecodeFirstOperand(cpustate, ReadAM, 2);
-	cpustate->modwritevalw = cpustate->op1;
-	F2WriteSecondOperand(cpustate, 2);
-	F2END(cpustate);
+	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
+	m_modwritevalw = m_op1;
+	F2WriteSecondOperand(2);
+	F2END();
 }
 
-static UINT32 opNEGFS(v60_state *cpustate)
-{
-	float appf;
-
-	F2DecodeFirstOperand(cpustate, ReadAM, 2);
-	F2DecodeSecondOperand(cpustate, ReadAMAddress, 2);
-
-	appf = -u2f(cpustate->op1);
-
-	cpustate->_OV = 0;
-	cpustate->_CY = (appf < 0.0f);
-	cpustate->_S = ((f2u(appf) & 0x80000000) != 0);
-	cpustate->_Z = (appf == 0.0f);
-
-	F2STOREOPFLOAT(cpustate, 2);
-	F2END(cpustate)
-}
-
-static UINT32 opABSFS(v60_state *cpustate)
+UINT32 v60_device::opNEGFS()
 {
 	float appf;
 
-	F2DecodeFirstOperand(cpustate, ReadAM, 2);
-	F2DecodeSecondOperand(cpustate, ReadAMAddress, 2);
+	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
+	F2DecodeSecondOperand(&v60_device::ReadAMAddress, 2);
 
-	appf = u2f(cpustate->op1);
+	appf = -u2f(m_op1);
+
+	_OV = 0;
+	_CY = (appf < 0.0f);
+	_S = ((f2u(appf) & 0x80000000) != 0);
+	_Z = (appf == 0.0f);
+
+	F2STOREOPFLOAT(2);
+	F2END()
+}
+
+UINT32 v60_device::opABSFS()
+{
+	float appf;
+
+	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
+	F2DecodeSecondOperand(&v60_device::ReadAMAddress, 2);
+
+	appf = u2f(m_op1);
 
 	if(appf < 0)
 		appf = -appf;
 
-	cpustate->_OV = 0;
-	cpustate->_CY = 0;
-	cpustate->_S = ((f2u(appf) & 0x80000000) != 0);
-	cpustate->_Z = (appf == 0.0f);
+	_OV = 0;
+	_CY = 0;
+	_S = ((f2u(appf) & 0x80000000) != 0);
+	_Z = (appf == 0.0f);
 
-	F2STOREOPFLOAT(cpustate, 2);
-	F2END(cpustate)
+	F2STOREOPFLOAT(2);
+	F2END()
 }
 
-static UINT32 opADDFS(v60_state *cpustate)
+UINT32 v60_device::opADDFS()
 {
 	UINT32 appw;
 	float appf;
 
-	F2DecodeFirstOperand(cpustate, ReadAM, 2);
-	F2DecodeSecondOperand(cpustate, ReadAMAddress, 2);
+	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
+	F2DecodeSecondOperand(&v60_device::ReadAMAddress, 2);
 
-	F2LOADOPFLOAT(cpustate, 2);
+	F2LOADOPFLOAT(2);
 
-	appf += u2f(cpustate->op1);
+	appf += u2f(m_op1);
 
 	appw = f2u(appf);
-	cpustate->_OV = cpustate->_CY = 0;
-	cpustate->_S = ((appw & 0x80000000) != 0);
-	cpustate->_Z = (appw == 0);
+	_OV = _CY = 0;
+	_S = ((appw & 0x80000000) != 0);
+	_Z = (appw == 0);
 
-	F2STOREOPFLOAT(cpustate, 2);
-	F2END(cpustate)
+	F2STOREOPFLOAT(2);
+	F2END()
 }
 
-static UINT32 opSUBFS(v60_state *cpustate)
+UINT32 v60_device::opSUBFS()
 {
 	UINT32 appw;
 	float appf;
 
-	F2DecodeFirstOperand(cpustate, ReadAM, 2);
-	F2DecodeSecondOperand(cpustate, ReadAMAddress, 2);
+	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
+	F2DecodeSecondOperand(&v60_device::ReadAMAddress, 2);
 
-	F2LOADOPFLOAT(cpustate, 2);
+	F2LOADOPFLOAT(2);
 
-	appf -= u2f(cpustate->op1);
+	appf -= u2f(m_op1);
 
 	appw = f2u(appf);
-	cpustate->_OV = cpustate->_CY = 0;
-	cpustate->_S = ((appw & 0x80000000) != 0);
-	cpustate->_Z = (appw == 0);
+	_OV = _CY = 0;
+	_S = ((appw & 0x80000000) != 0);
+	_Z = (appw == 0);
 
-	F2STOREOPFLOAT(cpustate, 2);
-	F2END(cpustate)
+	F2STOREOPFLOAT(2);
+	F2END()
 }
 
-static UINT32 opMULFS(v60_state *cpustate)
+UINT32 v60_device::opMULFS()
 {
 	UINT32 appw;
 	float appf;
 
-	F2DecodeFirstOperand(cpustate, ReadAM, 2);
-	F2DecodeSecondOperand(cpustate, ReadAMAddress, 2);
+	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
+	F2DecodeSecondOperand(&v60_device::ReadAMAddress, 2);
 
-	F2LOADOPFLOAT(cpustate, 2);
+	F2LOADOPFLOAT(2);
 
-	appf *= u2f(cpustate->op1);
+	appf *= u2f(m_op1);
 
 	appw = f2u(appf);
-	cpustate->_OV = cpustate->_CY = 0;
-	cpustate->_S = ((appw & 0x80000000) != 0);
-	cpustate->_Z = (appw == 0);
+	_OV = _CY = 0;
+	_S = ((appw & 0x80000000) != 0);
+	_Z = (appw == 0);
 
-	F2STOREOPFLOAT(cpustate, 2);
-	F2END(cpustate)
+	F2STOREOPFLOAT(2);
+	F2END()
 }
 
-static UINT32 opDIVFS(v60_state *cpustate)
+UINT32 v60_device::opDIVFS()
 {
 	UINT32 appw;
 	float appf;
 
-	F2DecodeFirstOperand(cpustate, ReadAM, 2);
-	F2DecodeSecondOperand(cpustate, ReadAMAddress, 2);
+	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
+	F2DecodeSecondOperand(&v60_device::ReadAMAddress, 2);
 
-	F2LOADOPFLOAT(cpustate, 2);
+	F2LOADOPFLOAT(2);
 
-	appf /= u2f(cpustate->op1);
+	appf /= u2f(m_op1);
 
 	appw = f2u(appf);
-	cpustate->_OV = cpustate->_CY = 0;
-	cpustate->_S = ((appw & 0x80000000) != 0);
-	cpustate->_Z = (appw == 0);
+	_OV = _CY = 0;
+	_S = ((appw & 0x80000000) != 0);
+	_Z = (appw == 0);
 
-	F2STOREOPFLOAT(cpustate, 2);
-	F2END(cpustate)
+	F2STOREOPFLOAT(2);
+	F2END()
 }
 
-static UINT32 opSCLFS(v60_state *cpustate)
+UINT32 v60_device::opSCLFS()
 {
 	UINT32 appw;
 	float appf;
 
-	F2DecodeFirstOperand(cpustate, ReadAM, 1);
-	F2DecodeSecondOperand(cpustate, ReadAMAddress, 2);
+	F2DecodeFirstOperand(&v60_device::ReadAM, 1);
+	F2DecodeSecondOperand(&v60_device::ReadAMAddress, 2);
 
-	F2LOADOPFLOAT(cpustate, 2);
+	F2LOADOPFLOAT(2);
 
-	if ((INT16)cpustate->op1 < 0)
-		appf /= 1 << -(INT16)cpustate->op1;
+	if ((INT16)m_op1 < 0)
+		appf /= 1 << -(INT16)m_op1;
 	else
-		appf *= 1 << cpustate->op1;
+		appf *= 1 << m_op1;
 
 	appw = f2u(appf);
-	cpustate->_OV = cpustate->_CY = 0;
-	cpustate->_S = ((appw & 0x80000000) != 0);
-	cpustate->_Z = (appw == 0);
+	_OV = _CY = 0;
+	_S = ((appw & 0x80000000) != 0);
+	_Z = (appw == 0);
 
-	F2STOREOPFLOAT(cpustate, 2);
-	F2END(cpustate)
+	F2STOREOPFLOAT(2);
+	F2END()
 }
 
-static UINT32 opCMPF(v60_state *cpustate)
+UINT32 v60_device::opCMPF()
 {
 	float appf;
 
-	F2DecodeFirstOperand(cpustate, ReadAM, 2);
-	F2DecodeSecondOperand(cpustate, ReadAM, 2);
+	F2DecodeFirstOperand(&v60_device::ReadAM, 2);
+	F2DecodeSecondOperand(&v60_device::ReadAM, 2);
 
-	appf = u2f(cpustate->op2) - u2f(cpustate->op1);
+	appf = u2f(m_op2) - u2f(m_op1);
 
-	cpustate->_Z = (appf == 0);
-	cpustate->_S = (appf < 0);
-	cpustate->_OV = 0;
-	cpustate->_CY = 0;
+	_Z = (appf == 0);
+	_S = (appf < 0);
+	_OV = 0;
+	_CY = 0;
 
-	F2END(cpustate);
+	F2END();
 }
 
-static UINT32 op5FUNHANDLED(v60_state *cpustate)
+UINT32 v60_device::op5FUNHANDLED()
 {
-	fatalerror("Unhandled 5F opcode at %08x\n", cpustate->PC);
+	fatalerror("Unhandled 5F opcode at %08x\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 op5CUNHANDLED(v60_state *cpustate)
+UINT32 v60_device::op5CUNHANDLED()
 {
-	fatalerror("Unhandled 5C opcode at %08x\n", cpustate->PC);
+	fatalerror("Unhandled 5C opcode at %08x\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 (*const Op5FTable[32])(v60_state *) =
+const v60_device::am_func v60_device::s_Op5FTable[32] =
 {
-	opCVTWS,
-	opCVTSW,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED,
-	op5FUNHANDLED
+	&v60_device::opCVTWS,
+	&v60_device::opCVTSW,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED,
+	&v60_device::op5FUNHANDLED
 };
 
-static UINT32 (*const Op5CTable[32])(v60_state *) =
+const v60_device::am_func v60_device::s_Op5CTable[32] =
 {
-	opCMPF,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	opMOVFS,
-	opNEGFS,
-	opABSFS,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
+	&v60_device::opCMPF,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::opMOVFS,
+	&v60_device::opNEGFS,
+	&v60_device::opABSFS,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
 
-	opSCLFS,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	opADDFS,
-	opSUBFS,
-	opMULFS,
-	opDIVFS,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED,
-	op5CUNHANDLED
+	&v60_device::opSCLFS,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::opADDFS,
+	&v60_device::opSUBFS,
+	&v60_device::opMULFS,
+	&v60_device::opDIVFS,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED,
+	&v60_device::op5CUNHANDLED
 };
 
 
-static UINT32 op5F(v60_state *cpustate)
+UINT32 v60_device::op5F()
 {
-	cpustate->instflags = OpRead8(cpustate, cpustate->PC + 1);
-	return Op5FTable[cpustate->instflags & 0x1F](cpustate);
+	m_instflags = OpRead8(PC + 1);
+	return (this->*s_Op5FTable[m_instflags & 0x1F])();
 }
 
 
-static UINT32 op5C(v60_state *cpustate)
+UINT32 v60_device::op5C()
 {
-	cpustate->instflags = OpRead8(cpustate, cpustate->PC + 1);
-	return Op5CTable[cpustate->instflags & 0x1F](cpustate);
+	m_instflags = OpRead8(PC + 1);
+	return (this->*s_Op5CTable[m_instflags & 0x1F])();
 }

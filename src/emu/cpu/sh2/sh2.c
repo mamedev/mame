@@ -2170,19 +2170,12 @@ INLINE void op1111(sh2_state *sh2, UINT16 opcode)
 static CPU_RESET( sh2 )
 {
 	sh2_state *sh2 = get_safe_token(device);
-	emu_timer *tsave, *tsaved0, *tsaved1;
-	UINT32 *m;
 	int  (*dma_callback_kludge)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
 	int  (*dma_callback_fifo_data_available)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
 	int save_is_slave;
 
 	void (*f)(UINT32 data);
 	device_irq_acknowledge_callback save_irqcallback;
-
-	m = sh2->m;
-	tsave = sh2->timer;
-	tsaved0 = sh2->dma_current_active_timer[0];
-	tsaved1 = sh2->dma_current_active_timer[1];
 
 	f = sh2->ftcsr_read_callback;
 	save_irqcallback = sh2->irq_callback;
@@ -2210,10 +2203,6 @@ static CPU_RESET( sh2 )
 	sh2->irq_callback = save_irqcallback;
 	sh2->device = device;
 
-	sh2->timer = tsave;
-	sh2->dma_current_active_timer[0] = tsaved0;
-	sh2->dma_current_active_timer[1] = tsaved1;
-	sh2->m = m;
 	memset(sh2->m, 0, 0x200);
 
 	sh2->pc = RL(sh2, 0);

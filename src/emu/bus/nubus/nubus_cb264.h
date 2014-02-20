@@ -37,7 +37,7 @@ protected:
 		DECLARE_WRITE32_MEMBER(cb264_ramdac_w);
 
 public:
-		UINT8 *m_vram;
+		dynamic_buffer m_vram;
 		UINT32 m_cb264_mode, m_cb264_vbl_disable, m_cb264_toggle;
 		UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
 };

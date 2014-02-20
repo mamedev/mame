@@ -1,5 +1,6 @@
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
+#include "cpu/v60/v60.h"
 
 typedef void (*tgp_func)(running_machine &machine);
 
@@ -21,7 +22,7 @@ public:
 		m_display_list1(*this, "display_list1"),
 		m_color_xlat(*this, "color_xlat"){ }
 
-	required_device<cpu_device> m_maincpu;      // V60
+	required_device<v60_device> m_maincpu;      // V60
 	required_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
 	optional_device<dsbz80_device> m_dsbz80;    // Digital Sound Board
 	optional_device<mb86233_cpu_device> m_tgp;

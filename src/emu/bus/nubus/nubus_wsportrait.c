@@ -100,8 +100,8 @@ void nubus_wsportrait_device::device_start()
 
 	printf("[wsportrait %p] slotspace = %x\n", this, slotspace);
 
-	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
-	m_vram32 = (UINT32 *)m_vram;
+	m_vram.resize(VRAM_SIZE);
+	m_vram32 = (UINT32 *)&m_vram[0];
 
 	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_wsportrait_device::vram_r), this), write32_delegate(FUNC(nubus_wsportrait_device::vram_w), this));
 	m_nubus->install_device(slotspace+0x900000, slotspace+0x900000+VRAM_SIZE-1, read32_delegate(FUNC(nubus_wsportrait_device::vram_r), this), write32_delegate(FUNC(nubus_wsportrait_device::vram_w), this));

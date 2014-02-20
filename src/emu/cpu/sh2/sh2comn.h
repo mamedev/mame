@@ -130,7 +130,7 @@ struct sh2_state
 	address_space *program;
 	direct_read_data *direct;
 	address_space *internal;
-	UINT32  *m;
+	UINT32 m[0x200/4];
 	INT8  nmi_line_state;
 
 	UINT16  frc;

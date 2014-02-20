@@ -110,7 +110,7 @@ private:
 	UINT16  PC_debug;
 
 	// 256 bytes of onchip memory
-	UINT8*   m_onchip_memory;
+	UINT8   m_onchip_memory[256];
 
 	const address_space_config      m_program_config;
 	const address_space_config      m_io_config;

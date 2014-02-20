@@ -16,6 +16,7 @@
 #include "sha1.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
+#include "netlist/nl_parser.h"
 #include "netlist/nl_util.h"
 #include "options.h"
 
@@ -124,9 +125,12 @@ public:
     {
 
 		// read the netlist ...
-		//m_setup_func(*m_setup);
 
-		m_setup->parse(buffer);
+        netlist_sources_t sources;
+
+        sources.add(netlist_source_t(buffer));
+        sources.parse(*m_setup,"");
+		//m_setup->parse(buffer);
 		log_setup();
 
 		// start devices

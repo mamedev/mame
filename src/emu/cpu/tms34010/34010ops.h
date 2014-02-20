@@ -13,9 +13,6 @@
 #define __34010OPS_H__
 
 
-/* Size of the memory buffer allocated for the shiftr register */
-#define SHIFTREG_SIZE           (8 * 512 * sizeof(UINT16))
-
 
 
 /***************************************************************************
