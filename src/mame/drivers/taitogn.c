@@ -149,6 +149,9 @@ and brake. The trigger and wheel are self centering. If the trigger is pulled ba
 (like firing a gun) the car goes faster. If the trigger is pushed forward the car
 slows down. The controller looks a lot like the old Scalextric controllers (remember those?  :-)
 
+RC De Go! Controller Info
+-------------------------
+
 The controller is connected to the ZN2 main board to the 10 pin connector labelled
 'ANALOG'. Using two 5k-Ohm potentiometers, power (+5V) and ground are taken from the JAMMA
 edge connector or directly from the power supply. The output of the steering pot is
@@ -354,8 +357,7 @@ public:
 		m_sndflash0(*this, "sndflash0"),
 		m_sndflash1(*this, "sndflash1"),
 		m_sndflash2(*this, "sndflash2"),
-		m_has_zoom(true),
-		m_control(0xf8)
+		m_has_zoom(true)
 	{
 	}
 
@@ -572,6 +574,8 @@ void taitogn_state::machine_reset()
 {
 	// halt sound CPU since it has no valid program at start
 	m_mn10200->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	
+	m_control = 0x10;
 }
 
 DRIVER_INIT_MEMBER(taitogn_state,coh3002t_nz)
