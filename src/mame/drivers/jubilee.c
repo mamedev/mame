@@ -8,8 +8,13 @@
 
   Games running on this hardware:
 
-  * Jubilee Double-Up Poker,  198?,  Jubilee.
+  * Double-Up Poker (Jubilee),  198?,  Jubilee.
 
+
+*****************************************************************************************
+
+  You can find more about this game and the emulation evolution at
+  http://www.robertofresca.com.ar/
 
 *****************************************************************************************
 
@@ -50,20 +55,55 @@
   The crystal seems ok and this clock makes it throught to pin 34 of the MPU.
   I was expecting that PHASE 03 - pin 22, should be clocking, but it simply sits at 5v.
 
+
 *****************************************************************************************
 
   *** Game Notes ***
 
-  Just insert credits, and play. :)
+  Just insert coins, and play. You can win up to 500 credits! :)
 
   A default NVRAM is provided. Without it, the game stucks at boot with a memory error
   screen. If this happens, press the key 9 (Attendant). The game will initialize the NVRAM
   and then boots OK.
 
-  The RESET service button (key R) is just for payment purposes.
+  The RESET service button (key R) is just for clean credits purposes.
 
   The Supervisor Key (Key 0), brings a menu for bookkeeping, and replay (still can't see
   the point). The key behaves like a real lock key, with off/on status.
+
+  From the marquee: 'ALL CREDITS REDEEMABLE IN LIQUOR ONLY. NO CASH PAYMENTS'
+  So we can assume that is *exclusive* for amusement.
+  
+  From the marquee: 'MINIMUM REDEMPTION: 30 CREDITS' (to redeem LESS THAN 30 CREDITS,
+  Player must insert coins to bring total Credits to 30).
+
+  Ok... you need to have 30 or more credits to redeem. Otherwise you oddly need to insert
+  more coins to reach the minimum of 30 Credits.
+
+  To redeem credits (30 or more!):
+  1) Press the Hand Pay button (key 8). You'll get the 'Call Attendant' blinking message.
+  2) Press the Attendant button (key 9). You'll get a new message at bottom-left of the
+     screen about the amount of credits to pay.
+  3) Turn ON/OFF the Supervisor key (key 0). It will clear the credits, with a new message
+     at bottom-left of the screen about of value paid.
+
+
+  Paytable:   Play 1 to 5 coins....
+
+  +----------------+--------+--------+--------+--------+--------+
+  |     Hand       | 1 Coin | 2 Coin | 3 Coin | 4 Coin | 5 Coin |
+  +----------------+--------+--------+--------+--------+--------+
+  | Royal Flush    |  100   |  200   |  300   |  400   |  500   |
+  | Straight Flush |   70   |  140   |  210   |  280   |  350   |
+  | 4 of a Kind    |   40   |   80   |  120   |  160   |  200   |
+  | Full House     |   10   |   20   |   30   |   40   |   50   |
+  | Flush          |    7   |   14   |   21   |   28   |   35   |
+  | Straight       |    5   |   10   |   15   |   20   |   25   |
+  | 3 of a Kind    |    3   |    6   |    9   |   12   |   15   |
+  | 2 Pair         |    2   |    4   |    6   |    8   |   10   |
+  | Pair Aces      |    1   |    2   |    3   |    4   |    5   |
+  +----------------+--------+--------+--------+--------+--------+
+
 
 *****************************************************************************************
 
@@ -251,7 +291,7 @@ INTERRUPT_GEN_MEMBER(jubilee_state::jubileep_interrupt)
 /*************************
 * Memory Map Information *
 *************************/
-//59a
+
 static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
@@ -356,7 +396,7 @@ static INPUT_PORTS_START( jubileep )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BET )    PORT_NAME("Bet / Gamble")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 )   PORT_NAME("Hold 4 / Half Gamble")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )   PORT_NAME("Hold 5 / Red")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE )       PORT_NAME("Attendant Hand Pay")  PORT_CODE(KEYCODE_8) 
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE )       PORT_NAME("Hand Pay")             PORT_CODE(KEYCODE_8) 
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )   PORT_NAME("Hold 1 / Black")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )   PORT_NAME("Hold 2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 )   PORT_NAME("Hold 3")
@@ -373,7 +413,7 @@ static INPUT_PORTS_START( jubileep )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_CODE(KEYCODE_9) PORT_NAME("Attendant (to pass the memory error and hand pay)")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_CODE(KEYCODE_0) PORT_NAME("Bookkeeping")  PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_CODE(KEYCODE_0) PORT_NAME("Supervisor Key (Bookkeeping)")  PORT_TOGGLE
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
@@ -496,5 +536,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY    FULLNAME                  FLAGS */
-GAME( 198?, jubileep, 0,      jubileep, jubileep, driver_device, 0,    ROT0, "Jubilee", "Jubilee Double-Up Poker", GAME_NO_SOUND )
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY    FULLNAME                    FLAGS */
+GAME( 198?, jubileep, 0,      jubileep, jubileep, driver_device, 0,    ROT0, "Jubilee", "Double-Up Poker (Jubilee)", GAME_NO_SOUND )
