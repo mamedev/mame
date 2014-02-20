@@ -64,7 +64,7 @@ static const char pc_chd_create_optionspec[] = "H1-[16]S1-[32]-63T10/20/30/40/50
 static const char fat8_string[8]  = { 'F', 'A', 'T', ' ', ' ', ' ', ' ', ' ' };
 static const char fat12_string[8] = { 'F', 'A', 'T', '1', '2', ' ', ' ', ' ' };
 static const char fat16_string[8] = { 'F', 'A', 'T', '1', '6', ' ', ' ', ' ' };
-static const char fat32_string[8] = { 'F', 'A', 'T', '3', '2', ' ', ' ', ' ' };
+//static const char fat32_string[8] = { 'F', 'A', 'T', '3', '2', ' ', ' ', ' ' };
 
 /* imports from fat.c */
 extern void fat_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info);
