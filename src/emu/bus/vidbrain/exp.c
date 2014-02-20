@@ -39,8 +39,6 @@ const device_type VIDEOBRAIN_EXPANSION_SLOT = &device_creator<videobrain_expansi
 
 device_videobrain_expansion_card_interface::device_videobrain_expansion_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
-		m_ram(NULL),
 		m_rom_mask(0),
 		m_ram_mask(0)
 {
