@@ -2020,7 +2020,7 @@ void v99x8_device::set_mode()
 
 void v99x8_device::refresh_16(int line)
 {
-	const pen_t *pens = machine().pens;
+	const pen_t *pens = m_palette->pens();
 	int i, double_lines;
 	UINT8 col[256];
 	UINT16 *ln, *ln2 = NULL;

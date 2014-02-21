@@ -143,7 +143,7 @@ WRITE32_MEMBER(deco32_state::deco32_palette_dma_w)
 /******************************************************************************/
 
 
-INLINE void dragngun_drawgfxzoom(
+INLINE void dragngun_drawgfxzoom(dragngun_state *state,
 		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int transparent_color,
@@ -167,7 +167,7 @@ INLINE void dragngun_drawgfxzoom(
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &gfx->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+			const pen_t *pal = &state->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
 			if (sprite_screen_width && sprite_screen_height)
@@ -475,7 +475,7 @@ void dragngun_state::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rectangl
 				sprite&=0x7fff;
 
 				if (zoomx!=0x10000 || zoomy!=0x10000)
-					dragngun_drawgfxzoom(
+					dragngun_drawgfxzoom(this,
 						bitmap,cliprect,m_gfxdecode->gfx(bank),
 						sprite,
 						colour,
@@ -676,7 +676,7 @@ UINT32 deco32_state::screen_update_fghthist(screen_device &screen, bitmap_rgb32 
 */
 void deco32_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap)
 {
-	const pen_t *pens = machine().pens;
+	const pen_t *pens = m_palette->pens();
 	const pen_t *pal0 = &pens[gfx0->colorbase()];
 	const pen_t *pal1 = &pens[gfx1->colorbase()];
 	const pen_t *pal2 = &pens[m_gfxdecode->gfx((m_pri&1) ? 1 : 2)->colorbase()];

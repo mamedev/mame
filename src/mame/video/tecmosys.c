@@ -211,7 +211,7 @@ void tecmosys_state::tecmosys_tilemap_copy_to_compose(UINT16 pri)
 
 void tecmosys_state::tecmosys_do_final_mix(bitmap_rgb32 &bitmap)
 {
-	const pen_t *paldata = machine().pens;
+	const pen_t *paldata = m_palette->pens();
 	int y,x;
 	UINT16 *srcptr;
 	UINT16 *srcptr2;

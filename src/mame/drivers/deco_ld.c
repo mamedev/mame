@@ -262,7 +262,7 @@ WRITE8_MEMBER(deco_ld_state::decold_sound_cmd_w)
 /* same as Burger Time HW */
 WRITE8_MEMBER(deco_ld_state::decold_palette_w)
 {
-	paletteram_BBGGGRRR_byte_w(space, offset, ~data);
+	m_palette->write(space, offset, UINT8(~data)); 
 }
 
 /* unknown, but certainly related to audiocpu somehow */

@@ -110,7 +110,7 @@ WRITE16_MEMBER(lemmings_state::lemmings_vram_w)
 void lemmings_state::lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect)
 {
 	int y,x;
-	const pen_t *paldata = machine().pens;
+	const pen_t *paldata = m_palette->pens();
 
 	for (y=cliprect.min_y; y<cliprect.max_y;y++)
 	{

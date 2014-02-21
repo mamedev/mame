@@ -252,6 +252,7 @@ static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",bogeyman,"palette")
 	MCFG_PALETTE_ADD("palette", 16+256)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
 
 	// sound hardware

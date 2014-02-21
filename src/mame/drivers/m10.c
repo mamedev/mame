@@ -855,7 +855,7 @@ static MACHINE_CONFIG_START( m10, m10_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m10_state, screen_update_m10)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",m10,"palette")
-	MCFG_PALETTE_LENGTH(2*8)
+	MCFG_PALETTE_ADD("palette", 2*8)
 
 	MCFG_PALETTE_INIT_OVERRIDE(m10_state,m10)
 	MCFG_VIDEO_START_OVERRIDE(m10_state,m10)

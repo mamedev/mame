@@ -736,6 +736,7 @@ static MACHINE_CONFIG_START( decocass, decocass_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",decocass,"palette")
 	MCFG_PALETTE_ADD("palette", 32+2*8+2*4)
+	MCFG_PALETTE_INIT_OWNER(decocass_state, decocass)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

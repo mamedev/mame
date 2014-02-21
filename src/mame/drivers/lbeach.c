@@ -336,7 +336,7 @@ static MACHINE_CONFIG_START( lbeach, lbeach_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // needed for collision detection
 
 	MCFG_GFXDECODE_ADD("gfxdecode",lbeach,"palette")
-	MCFG_PALETTE_LENGTH(2+8+2)
+	MCFG_PALETTE_ADD("palette", 2+8+2)
 
 	/* sound hardware */
 	// ...

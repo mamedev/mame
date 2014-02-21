@@ -18,9 +18,7 @@
 
 WRITE8_MEMBER(amspdwy_state::amspdwy_paletteram_w)
 {
-	data ^= 0xff;
-	paletteram_BBGGGRRR_byte_w(space, offset, data);
-//  paletteram_RRRGGGBB_byte_w(offset, data);
+	m_palette->write(space, offset, UINT8(~data)); 
 }
 
 WRITE8_MEMBER(amspdwy_state::amspdwy_flipscreen_w)

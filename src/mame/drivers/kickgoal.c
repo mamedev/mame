@@ -488,7 +488,7 @@ static ADDRESS_MAP_START( kickgoal_program_map, AS_PROGRAM, 16, kickgoal_state )
 	AM_RANGE(0xa0c000, 0xa0ffff) AM_RAM // more tilemap?
 	AM_RANGE(0xa10000, 0xa1000f) AM_WRITEONLY AM_SHARE("scrram") /* Scroll Registers */
 	AM_RANGE(0xb00000, 0xb007ff) AM_WRITEONLY AM_SHARE("spriteram") /* Sprites */
-	AM_RANGE(0xc00000, 0xc007ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram") /* Palette */ // actionhw reads this
+	AM_RANGE(0xc00000, 0xc007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* Palette */ // actionhw reads this
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -662,6 +662,7 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",kickgoal,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,kickgoal)
 
@@ -697,6 +698,7 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",actionhw,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(kickgoal_state,actionhw)
 

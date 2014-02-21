@@ -109,7 +109,7 @@ static MACHINE_CONFIG_START( konendev, konendev_state )
 	MCFG_CPU_PROGRAM_MAP(konendev_map)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRRR_GGGGG_BBBBB)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

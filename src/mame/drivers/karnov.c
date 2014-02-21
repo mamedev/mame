@@ -804,6 +804,7 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",karnov,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INIT_OWNER(karnov_state, karnov)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 2);

@@ -1445,7 +1445,7 @@ static MACHINE_CONFIG_START( spyhuntpr, mcr3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhuntpr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",spyhuntpr,"palette")
-	MCFG_PALETTE_LENGTH(64+4)
+	MCFG_PALETTE_ADD("palette", 64+4)
 
 	MCFG_PALETTE_INIT_OVERRIDE(mcr3_state,spyhunt)
 	MCFG_VIDEO_START_OVERRIDE(mcr3_state,spyhuntpr)

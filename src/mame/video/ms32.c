@@ -464,7 +464,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 		int xx, yy;
 		int width = screen.width();
 		int height = screen.height();
-		const pen_t *paldata = machine().pens;
+		const pen_t *paldata = m_palette->pens();
 
 		UINT16* srcptr_tile;
 		UINT8* srcptr_tilepri;

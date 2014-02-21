@@ -586,7 +586,7 @@ static MACHINE_CONFIG_START( sderbya, sderby_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",sderby,"palette")
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 not verified */

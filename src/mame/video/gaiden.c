@@ -276,7 +276,7 @@ void gaiden_state::blendbitmaps(bitmap_rgb32 &dest,bitmap_ind16 &src1,bitmap_ind
 		int sx,int sy,const rectangle &cliprect)
 {
 	int y,x;
-	const pen_t *paldata = machine().pens;
+	const pen_t *paldata = m_palette->pens();
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{

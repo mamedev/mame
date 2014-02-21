@@ -1257,7 +1257,7 @@ VIDEO_START_MEMBER(segac2_state,segac2_new)
 //  and applies it's own external colour circuity
 UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *paldata = machine().pens;
+	const pen_t *paldata = m_palette->pens();
 	if (!m_segac2_enable_display)
 	{
 		bitmap.fill(m_palette->black_pen(), cliprect);

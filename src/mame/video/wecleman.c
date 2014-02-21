@@ -1021,7 +1021,7 @@ UINT32 wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rgb3
 	int cloud_sx, cloud_sy;
 	int i, j, k;
 
-	mrct = machine().pens;
+	mrct = m_palette->pens();
 
 	video_on = m_irqctrl & 0x40;
 

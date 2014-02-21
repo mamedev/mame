@@ -324,7 +324,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 {
 	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
 	const UINT32 *sprrom = (UINT32*)screen.memregion(":spr_gfx")->base();
-	const pen_t *paldata = screen.machine().pens;
+	const pen_t *paldata = state->m_palette->pens();
 
 	int miny = cliprect.min_y;
 	int maxy = cliprect.max_y;
@@ -609,7 +609,7 @@ static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM_WRITE(tilemap1_vram_w) AM_SHARE("tilemap1_vram")
 	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM_WRITE(tilemap2_vram_w) AM_SHARE("tilemap2_vram")
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram") /* 2x palettes, one for each screen */
+	AM_RANGE(0x100000, 0x107fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* 2x palettes, one for each screen */
 
 	AM_RANGE(0x110000, 0x110001) AM_WRITE8(cybertnk_sound_cmd_w,0xffff)
 	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("DSW1")  AM_WRITENOP// watchdog?
@@ -862,7 +862,7 @@ static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",cybertnk,"palette")
 	MCFG_PALETTE_ADD("palette", 0x4000)
-
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

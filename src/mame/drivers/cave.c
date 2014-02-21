@@ -2557,7 +2557,7 @@ static MACHINE_CONFIG_START( ppsatan, cave_state )
 	MCFG_TIMER_DRIVER_ADD("int_timer_right", cave_state, cave_vblank_start_right)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",ppsatan,"palette")
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_INIT_OVERRIDE(cave_state,ppsatan)
 	MCFG_DEFAULT_LAYOUT(layout_ppsatan)
 

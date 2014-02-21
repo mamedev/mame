@@ -1863,7 +1863,7 @@ WRITE32_MEMBER(namcos22_state::namcos22s_spotram_w)
 
 void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival)
 {
-	const pen_t *pens = machine().pens;
+	const pen_t *pens = m_palette->pens();
 	UINT16 *src;
 	UINT32 *dest;
 	UINT8 *pri;
@@ -1945,7 +1945,7 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 
 void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pens = machine().pens;
+	const pen_t *pens = m_palette->pens();
 	UINT16 *src;
 	UINT32 *dest;
 	UINT8 *pri;

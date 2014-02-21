@@ -63,7 +63,7 @@ WRITE8_MEMBER(bogeyman_state::bogeyman_colorram2_w)
 WRITE8_MEMBER(bogeyman_state::bogeyman_paletteram_w)
 {
 	/* RGB output is inverted */
-	paletteram_BBGGGRRR_byte_w(space, offset, ~data);
+	m_palette->write(space, offset, UINT8(~data)); 
 }
 
 TILE_GET_INFO_MEMBER(bogeyman_state::get_bg_tile_info)

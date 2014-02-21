@@ -121,7 +121,7 @@ VIDEO_START_MEMBER(rohga_state,wizdfire)
 void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int gfxregion, UINT16 pri, UINT16 primask)
 {
 	int y, x;
-	const pen_t *paldata = machine().pens;
+	const pen_t *paldata = m_palette->pens();
 	bitmap_ind16* sprite_bitmap;
 	int penbase;
 

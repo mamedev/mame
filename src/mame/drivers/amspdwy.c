@@ -275,7 +275,7 @@ static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",amspdwy,"palette")
 	MCFG_PALETTE_ADD("palette", 32)
-
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

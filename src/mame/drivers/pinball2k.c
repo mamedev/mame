@@ -145,7 +145,7 @@ void pinball2k_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	int i,j;
 	const UINT8 *dp;
 	int index = 0;
-	const pen_t *pens = gfx->machine().pens;
+	const pen_t *pens = gfx->m_palette->pens();
 
 	dp = gfx->get_data(ch);
 

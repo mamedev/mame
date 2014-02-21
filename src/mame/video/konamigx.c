@@ -853,7 +853,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_2(screen_device &screen, bi
 				int xx,yy;
 				int width = screen.width();
 				int height = screen.height();
-				const pen_t *paldata = screen.machine().pens;
+				const pen_t *paldata = screen.m_palette->pens();
 
 				// the output size of the roz layer has to be doubled horizontally
 				// so that it aligns with the sprites and normal tilemaps.  This appears
@@ -1616,7 +1616,7 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 	/* Hack! draw type-1 roz layer here for testing purposes only */
 	if (gx_specialrozenable == 1)
 	{
-		const pen_t *paldata = machine().pens;
+		const pen_t *paldata = m_palette->pens();
 
 		if ( machine().input().code_pressed(KEYCODE_W) )
 		{

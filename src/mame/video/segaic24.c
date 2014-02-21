@@ -253,7 +253,7 @@ void segas24_tile::draw_rect(screen_device &screen, bitmap_ind16 &bm, bitmap_ind
 	const UINT16 *source  = &bm.pix16(sy, sx);
 	const UINT8  *trans = &tm.pix8(sy, sx);
 	UINT32       *dest = &dm.pix32(0);
-	const pen_t  *pens   = machine().pens;
+	const pen_t  *pens   = m_palette->pens();
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
 

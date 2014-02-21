@@ -1125,7 +1125,7 @@ static void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const
 				bitmap_ind16 &bm = tilemap->pixmap();
 				int bmheight = bm.height();
 				int bmwidth = bm.width();
-				const pen_t *paldata = screen.machine().pens;
+				const pen_t *paldata = screen.m_palette->pens();
 				UINT32* dstptr;
 				UINT16* srcptr;
 				int xx,yy;
@@ -1221,7 +1221,7 @@ static void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const
 				bitmap_ind16 &bm = tilemap->pixmap();
 				int bmheight = bm.height();
 				int bmwidth = bm.width();
-				const pen_t *paldata = screen.machine().pens;
+				const pen_t *paldata = screen.m_palette->pens();
 				UINT32* dstptr;
 				UINT16* srcptr;
 				int xx,yy;
