@@ -2083,6 +2083,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/cupidon.o \
 	$(DRIVERS)/bntyhunt.o \
 	$(DRIVERS)/coolpool.o \
+	$(DRIVERS)/megaphx.o \
 	$(DRIVERS)/corona.o \
 	$(DRIVERS)/crystal.o $(VIDEO)/vrender0.o \
 	$(DRIVERS)/cubeqst.o \
