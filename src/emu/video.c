@@ -310,7 +310,7 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	png_add_text(&pnginfo, "System", text2);
 
 	// now do the actual work
-	const rgb_t *palette = (machine().palette != NULL) ? palette_entry_list_adjusted(machine().palette) : NULL;
+	const rgb_t *palette = (machine().palette != NULL) ? machine().palette->entry_list_adjusted() : NULL;
 	png_error error = png_write_bitmap(file, &pnginfo, m_snap_bitmap, machine().total_colors(), palette);
 	if (error != PNGERR_NONE)
 		mame_printf_error("Error generating PNG for snapshot: png_error = %d\n", error);
@@ -1230,7 +1230,7 @@ void video_manager::record_frame()
 			}
 
 			// write the next frame
-			const rgb_t *palette = (machine().palette != NULL) ? palette_entry_list_adjusted(machine().palette) : NULL;
+			const rgb_t *palette = (machine().palette != NULL) ? machine().palette->entry_list_adjusted() : NULL;
 			png_error error = mng_capture_frame(*m_mngfile, &pnginfo, m_snap_bitmap, machine().total_colors(), palette);
 			png_free(&pnginfo);
 			if (error != PNGERR_NONE)
@@ -1258,7 +1258,7 @@ bool video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bi
 {
 #ifdef MAME_DEBUG
 	// iterate over rows
-	int maxindex = palette_get_max_index(machine.palette);
+	int maxindex = machine.palette->max_index();
 	for (int y = 0; y < bitmap.height(); y++)
 	{
 		UINT16 *rowbase = &bitmap.pix16(y);

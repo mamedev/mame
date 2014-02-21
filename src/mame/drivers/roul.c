@@ -116,7 +116,7 @@ void roul_state::palette_init()
 		bit1 = (color_prom[0] >> 5) & 0x01;
 		r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }

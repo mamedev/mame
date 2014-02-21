@@ -889,7 +889,7 @@ void cps3_state::cps3_set_mame_colours(int colournum, UINT16 data, UINT32 fadeva
 
 	m_mame_colours[colournum] = (r << (16+3)) | (g << (8+3)) | (b << (0+3));
 
-	if (colournum<0x10000) palette_set_color(machine(),colournum,m_mame_colours[colournum]/* MAKE_RGB(r<<3,g<<3,b<<3)*/);//m_mame_colours[colournum]);
+	if (colournum<0x10000) palette_set_color(machine(),colournum,m_mame_colours[colournum]/* rgb_t(r<<3,g<<3,b<<3)*/);//m_mame_colours[colournum]);
 }
 
 
@@ -2587,7 +2587,8 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 	MCFG_NVRAM_ADD_0FILL("eeprom")
 	MCFG_PALETTE_LENGTH(0x10000) // actually 0x20000 ...
 
-
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -37,7 +37,8 @@ public:
 		m_oki(*this, "oki"),
 		m_oki1(*this, "oki1"),
 		m_eeprom(*this, "eeprom"),
-		m_rtc(*this, "rtc") { }
+		m_rtc(*this, "rtc"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	optional_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	optional_shared_ptr<UINT16> m_shared_ram16;     // Really 8 bit RAM connected to Z180
@@ -56,6 +57,7 @@ public:
 	optional_device<okim6295_device> m_oki1;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<upd4992_device> m_rtc;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT16 m_mcu_data;
 	UINT16 m_video_status;

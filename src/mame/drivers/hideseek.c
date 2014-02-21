@@ -87,7 +87,7 @@ void hideseek_state::palette_init()
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
-		palette_set_color(machine(), i, MAKE_RGB( pal5bit((i >> 10)&0x1f), pal5bit(((i >> 5))&0x1f), pal5bit((i >> 0)&0x1f)));
+		palette_set_color(machine(), i, rgb_t( pal5bit((i >> 10)&0x1f), pal5bit(((i >> 5))&0x1f), pal5bit((i >> 0)&0x1f)));
 }
 
 

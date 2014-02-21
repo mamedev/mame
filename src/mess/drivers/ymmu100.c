@@ -157,8 +157,8 @@ READ8_MEMBER(mu100_state::p2_r)
 
 void mu100_state::palette_init()
 {
-	palette_set_color(machine(), 0, MAKE_RGB(255, 255, 255));
-	palette_set_color(machine(), 1, MAKE_RGB(0, 0, 0));
+	palette_set_color(machine(), 0, rgb_t(255, 255, 255));
+	palette_set_color(machine(), 1, rgb_t(0, 0, 0));
 }
 
 static ADDRESS_MAP_START( mu100_iomap, AS_IO, 8, mu100_state )

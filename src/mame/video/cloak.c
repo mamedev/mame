@@ -80,7 +80,7 @@ void cloak_state::set_pens()
 		bit2 = (~palette_ram[i] >> 2) & 0x01;
 		b = combine_3_weights(weights, bit0, bit1, bit2);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 

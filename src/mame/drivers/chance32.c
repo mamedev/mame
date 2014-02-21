@@ -31,7 +31,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
 		m_bgram(*this, "bgram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	DECLARE_WRITE8_MEMBER(chance32_fgram_w)
 	{
@@ -63,6 +64,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

@@ -590,10 +590,10 @@ private:
 	void scanline_draw_masked_null(const UINT8 *maskptr, int mask, int value, int count, UINT8 *pri, UINT32 pcode);
 	void scanline_draw_opaque_ind16(UINT16 *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode);
 	void scanline_draw_masked_ind16(UINT16 *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, UINT8 *pri, UINT32 pcode);
-	void scanline_draw_opaque_rgb32(UINT32 *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-	void scanline_draw_masked_rgb32(UINT32 *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-	void scanline_draw_opaque_rgb32_alpha(UINT32 *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
-	void scanline_draw_masked_rgb32_alpha(UINT32 *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+	void scanline_draw_opaque_rgb32(UINT32 *dest, const UINT16 *source, int count, const rgb_t *pens, UINT8 *pri, UINT32 pcode);
+	void scanline_draw_masked_rgb32(UINT32 *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const rgb_t *pens, UINT8 *pri, UINT32 pcode);
+	void scanline_draw_opaque_rgb32_alpha(UINT32 *dest, const UINT16 *source, int count, const rgb_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+	void scanline_draw_masked_rgb32_alpha(UINT32 *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const rgb_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
 
 	// internal helpers
 	void postload();
@@ -765,7 +765,7 @@ private:
 
 // macros to help form flags for tilemap_draw
 #define TILEMAP_DRAW_CATEGORY(x)        (x)     // specify category to draw
-#define TILEMAP_DRAW_ALPHA(x)           (TILEMAP_DRAW_ALPHA_FLAG | (rgb_clamp(x) << 24))
+#define TILEMAP_DRAW_ALPHA(x)           (TILEMAP_DRAW_ALPHA_FLAG | (rgb_t::clamp(x) << 24))
 
 // function definition for a get info callback
 #define TILE_GET_INFO_MEMBER(_name)     void _name(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)

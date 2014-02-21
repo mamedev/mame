@@ -105,7 +105,7 @@ public:
 static MC6845_UPDATE_ROW( update_row )
 {
 	othello_state *state = device->machine().driver_data<othello_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	int cx, x;
 	UINT32 data_address;
 	UINT32 tmp;
@@ -130,17 +130,17 @@ void othello_state::palette_init()
 	int i;
 	for (i = 0; i < machine().total_colors(); i++)
 	{
-		palette_set_color(machine(), i, MAKE_RGB(0xff, 0x00, 0xff));
+		palette_set_color(machine(), i, rgb_t(0xff, 0x00, 0xff));
 	}
 
 	/* only colors  2,3,7,9,c,d,f are used */
-	palette_set_color(machine(), 0x02, MAKE_RGB(0x00, 0xff, 0x00));
-	palette_set_color(machine(), 0x03, MAKE_RGB(0xff, 0x7f, 0x00));
-	palette_set_color(machine(), 0x07, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 0x09, MAKE_RGB(0xff, 0x00, 0x00));
-	palette_set_color(machine(), 0x0c, MAKE_RGB(0x00, 0x00, 0xff));
-	palette_set_color(machine(), 0x0d, MAKE_RGB(0x7f, 0x7f, 0x00));
-	palette_set_color(machine(), 0x0f, MAKE_RGB(0xff, 0xff, 0xff));
+	palette_set_color(machine(), 0x02, rgb_t(0x00, 0xff, 0x00));
+	palette_set_color(machine(), 0x03, rgb_t(0xff, 0x7f, 0x00));
+	palette_set_color(machine(), 0x07, rgb_t(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 0x09, rgb_t(0xff, 0x00, 0x00));
+	palette_set_color(machine(), 0x0c, rgb_t(0x00, 0x00, 0xff));
+	palette_set_color(machine(), 0x0d, rgb_t(0x7f, 0x7f, 0x00));
+	palette_set_color(machine(), 0x0f, rgb_t(0xff, 0xff, 0xff));
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, othello_state )

@@ -92,7 +92,7 @@ void portrait_state::palette_init()
         g = (data >> 3) & 0x3;
         b = (data >> 5) & 0x7;
 
-        colortable_palette_set_color(machine().colortable, i, MAKE_RGB(pal3bit(r), pal2bit(g), pal3bit(b)));
+        colortable_palette_set_color(machine().colortable, i, rgb_t(pal3bit(r), pal2bit(g), pal3bit(b)));
 
         color_prom++;
     }
@@ -107,10 +107,10 @@ void portrait_state::palette_init()
 		g = (data >> 5) & 0x1f;
 		b = (data >> 10) & 0x1f;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b)));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(pal5bit(r), pal5bit(g), pal5bit(b)));
 
 		// ?? the lookup seems to reference 0x3f colours, unless 1 bit is priority or similar?
-		colortable_palette_set_color(machine().colortable, i+0x20, MAKE_RGB(pal5bit(r>>1), pal5bit(g>>1), pal5bit(b>>1)));
+		colortable_palette_set_color(machine().colortable, i+0x20, rgb_t(pal5bit(r>>1), pal5bit(g>>1), pal5bit(b>>1)));
 
 		color_prom++;
 	}

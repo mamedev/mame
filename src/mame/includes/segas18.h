@@ -40,7 +40,8 @@ public:
 			m_vdp_mixing(0),
 			m_mcu_data(0),
 			m_lghost_value(0),
-			m_lghost_select(0)
+			m_lghost_select(0),
+			m_gfxdecode(*this, "gfxdecode")
 	{
 		memset(m_misc_io_data, 0, sizeof(m_misc_io_data));
 		memset(m_wwally_last_x, 0, sizeof(m_wwally_last_x));
@@ -150,4 +151,6 @@ protected:
 	UINT8               m_wwally_last_y[3];
 	UINT8               m_lghost_value;
 	UINT8               m_lghost_select;
+	
+	required_device<gfxdecode_device> m_gfxdecode;
 };

@@ -198,7 +198,7 @@ pen_t get_white_pen(running_machine &machine);
 
 INLINE void palette_set_color(running_machine &machine, pen_t pen, rgb_t rgb)
 {
-	palette_entry_set_color(machine.palette, pen, rgb);
+	machine.palette->entry_set_color(pen, rgb);
 }
 
 
@@ -209,7 +209,7 @@ INLINE void palette_set_color(running_machine &machine, pen_t pen, rgb_t rgb)
 
 INLINE void palette_set_color_rgb(running_machine &machine, pen_t pen, UINT8 r, UINT8 g, UINT8 b)
 {
-	palette_entry_set_color(machine.palette, pen, MAKE_RGB(r, g, b));
+	machine.palette->entry_set_color(pen, rgb_t(r, g, b));
 }
 
 
@@ -220,7 +220,7 @@ INLINE void palette_set_color_rgb(running_machine &machine, pen_t pen, UINT8 r, 
 
 INLINE rgb_t palette_get_color(running_machine &machine, pen_t pen)
 {
-	return palette_entry_get_color(machine.palette, pen);
+	return machine.palette->entry_color(pen);
 }
 
 
@@ -231,7 +231,7 @@ INLINE rgb_t palette_get_color(running_machine &machine, pen_t pen)
 
 INLINE void palette_set_pen_contrast(running_machine &machine, pen_t pen, double bright)
 {
-	palette_entry_set_contrast(machine.palette, pen, bright);
+	machine.palette->entry_set_contrast(pen, bright);
 }
 
 
@@ -243,7 +243,7 @@ INLINE void palette_set_pen_contrast(running_machine &machine, pen_t pen, double
 INLINE void palette_set_colors(running_machine &machine, pen_t color_base, const rgb_t *colors, int color_count)
 {
 	while (color_count--)
-		palette_entry_set_color(machine.palette, color_base++, *colors++);
+		machine.palette->entry_set_color(color_base++, *colors++);
 }
 
 

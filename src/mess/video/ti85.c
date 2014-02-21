@@ -106,7 +106,7 @@ void ti85_state::palette_init()
 	for ( i = 0; i < 224; i++ )
 	{
 		r = ti85_colors[i][0]; g = ti85_colors[i][1]; b = ti85_colors[i][2];
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	for (i=0; i < 32; i++)
@@ -189,6 +189,6 @@ UINT32 ti85_state::screen_update_ti85(screen_device &screen, bitmap_ind16 &bitma
 
 PALETTE_INIT_MEMBER(ti85_state,ti82)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(160, 190, 170));
-	palette_set_color(machine(), 1, MAKE_RGB(83, 111, 138));
+	palette_set_color(machine(), 0, rgb_t(160, 190, 170));
+	palette_set_color(machine(), 1, rgb_t(83, 111, 138));
 }

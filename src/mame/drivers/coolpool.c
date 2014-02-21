@@ -71,7 +71,7 @@ static void amerdart_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int s
 		for (x = 0; x < 16; x++)
 		{
 			UINT16 pal = state->m_vram_base[x];
-			pens[x] = MAKE_RGB(pal4bit(pal >> 4), pal4bit(pal >> 8), pal4bit(pal >> 12));
+			pens[x] = rgb_t(pal4bit(pal >> 4), pal4bit(pal >> 8), pal4bit(pal >> 12));
 		}
 
 	for (x = params->heblnk; x < params->hsblnk; x += 4)

@@ -20,7 +20,8 @@ public:
 		m_williams2_tileram(*this, "williams2_tile"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_soundcpu_b(*this, "soundcpu_b") { }
+		m_soundcpu_b(*this, "soundcpu_b"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	enum
 	{
@@ -164,6 +165,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_soundcpu_b;
+	optional_device<gfxdecode_device> m_gfxdecode;
 };
 
 

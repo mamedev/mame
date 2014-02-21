@@ -32,7 +32,8 @@ public:
 		m_tc0640fio(*this, "tc0640fio"),
 		m_tc0220ioc(*this, "tc0220ioc"),
 		m_tc0510nio(*this, "tc0510nio"),
-		m_mb87078(*this, "mb87078") { }
+		m_mb87078(*this, "mb87078"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -66,6 +67,7 @@ public:
 	optional_device<tc0220ioc_device> m_tc0220ioc;
 	optional_device<tc0510nio_device> m_tc0510nio;
 	optional_device<mb87078_device> m_mb87078;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ16_MEMBER(tracky1_hi_r);

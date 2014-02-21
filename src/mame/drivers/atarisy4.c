@@ -400,7 +400,7 @@ void atarisy4_state::execute_gpu_command()
 					m_b_color_table[table_offs] = val;
 
 				/* Update */
-				palette_set_color(machine(), table_offs, MAKE_RGB(m_r_color_table[table_offs], m_g_color_table[table_offs], m_b_color_table[table_offs]));
+				palette_set_color(machine(), table_offs, rgb_t(m_r_color_table[table_offs], m_g_color_table[table_offs], m_b_color_table[table_offs]));
 
 				++table_offs;
 				++offset;

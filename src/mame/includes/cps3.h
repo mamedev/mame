@@ -20,7 +20,8 @@ public:
 		m_tilemap50_regs_base(*this, "tmap50_regs"),
 		m_fullscreenzoom(*this, "fullscreenzoom"),
 		m_0xc0000000_ram(*this, "0xc0000000_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_spriteram;
@@ -131,6 +132,7 @@ public:
 									int scalex, int scaley, bitmap_ind8 *pri_buffer, UINT32 pri_mask);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

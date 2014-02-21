@@ -53,7 +53,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_vram_fg(*this, "vrafg"),
 		m_vram_bg(*this, "vrabg"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_vram_fg;
 	required_shared_ptr<UINT16> m_vram_bg;
@@ -75,6 +76,7 @@ public:
 	UINT32 screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -793,11 +795,11 @@ void cb2001_state::palette_init()
 
 		if (length==0x400) // are the cb2001 proms dumped incorrectly?
 		{
-			if (!(i&0x20)) palette_set_color(machine(), (i&0x1f) | ((i&~0x3f)>>1), MAKE_RGB(r, g, b));
+			if (!(i&0x20)) palette_set_color(machine(), (i&0x1f) | ((i&~0x3f)>>1), rgb_t(r, g, b));
 		}
 		else
 		{
-			palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+			palette_set_color(machine(), i, rgb_t(r, g, b));
 		}
 	}
 }

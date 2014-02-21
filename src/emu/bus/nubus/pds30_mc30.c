@@ -96,8 +96,8 @@ void nubus_xceedmc30_device::device_start()
 
 //  printf("[xceedmc30 %p] slotspace = %x\n", this, slotspace);
 
-	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
-	m_vram32 = (UINT32 *)m_vram;
+	m_vram.resize(VRAM_SIZE);
+	m_vram32 = (UINT32 *)&m_vram[0];
 
 	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_xceedmc30_device::vram_r), this), write32_delegate(FUNC(nubus_xceedmc30_device::vram_w), this));
 	m_nubus->install_device(slotspace+0x800000, slotspace+0xefffff, read32_delegate(FUNC(nubus_xceedmc30_device::xceedmc30_r), this), write32_delegate(FUNC(nubus_xceedmc30_device::xceedmc30_w), this));
@@ -119,8 +119,8 @@ void nubus_xceedmc30_device::device_reset()
 	memset(m_vram, 0, VRAM_SIZE);
 	memset(m_palette, 0, sizeof(m_palette));
 
-	m_palette[0] = MAKE_RGB(255, 255, 255);
-	m_palette[0x80] = MAKE_RGB(0, 0, 0);
+	m_palette[0] = rgb_t(255, 255, 255);
+	m_palette[0x80] = rgb_t(0, 0, 0);
 }
 
 
@@ -284,7 +284,7 @@ WRITE32_MEMBER( nubus_xceedmc30_device::xceedmc30_w )
 			if (m_count == 3)
 			{
 //                printf("RAMDAC: color %02x = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
-				m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
+				m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
 				{

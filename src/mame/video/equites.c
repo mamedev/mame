@@ -16,7 +16,7 @@ PALETTE_INIT_MEMBER(equites_state,equites)
 	machine().colortable = colortable_alloc(machine(), 256);
 
 	for (i = 0; i < 256; i++)
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
 	// point to the CLUT
 	color_prom += 0x380;
@@ -36,7 +36,7 @@ PALETTE_INIT_MEMBER(equites_state,splndrbt)
 	machine().colortable = colortable_alloc(machine(), 256);
 
 	for (i = 0; i < 0x100; i++)
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
 	for (i = 0; i < 0x100; i++)
 		colortable_entry_set_value(machine().colortable, i, i);

@@ -243,7 +243,7 @@ void itgambl3_state::palette_init()
 		r = (x & 0xf)*0x11;
 		g = ((x & 0x3c)>>2)*0x11;
 		b = ((x & 0xf0)>>4)*0x11;
-		palette_set_color(machine(),x,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),x,rgb_t(r,g,b));
 	}
 }
 

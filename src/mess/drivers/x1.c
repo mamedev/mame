@@ -539,7 +539,7 @@ void x1_state::draw_gfxbitmap(running_machine &machine, bitmap_rgb32 &bitmap,con
 
 UINT32 x1_state::screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(MAKE_ARGB(0xff,0x00,0x00,0x00), cliprect);
+	bitmap.fill(rgb_t(0xff,0x00,0x00,0x00), cliprect);
 
 	/* TODO: correct calculation thru mc6845 regs */
 	m_xstart = ((mc6845_h_char_total - mc6845_h_sync_pos) * 8) / 2;
@@ -2534,7 +2534,7 @@ PALETTE_INIT_MEMBER(x1_state,x1)
 	int i;
 
 	for(i=0;i<(0x10+0x1000);i++)
-		palette_set_color(machine(), i,MAKE_RGB(0x00,0x00,0x00));
+		palette_set_color(machine(), i,rgb_t(0x00,0x00,0x00));
 }
 
 static LEGACY_FLOPPY_OPTIONS_START( x1 )

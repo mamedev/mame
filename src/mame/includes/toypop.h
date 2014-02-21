@@ -21,7 +21,8 @@ public:
 		m_namco15xx(*this, "namco"),
 		m_namco58xx(*this, "58xx"),
 		m_namco56xx_1(*this, "56xx_1"),
-		m_namco56xx_2(*this, "56xx_2") { }
+		m_namco56xx_2(*this, "56xx_2"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -35,6 +36,7 @@ public:
 	required_device<namco58xx_device> m_namco58xx;
 	required_device<namco56xx_device> m_namco56xx_1;
 	required_device<namco56xx_device> m_namco56xx_2;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	tilemap_t *m_bg_tilemap;
 

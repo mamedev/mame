@@ -20,7 +20,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_charram(*this, "charram"),
 		m_maincpu(*this, "maincpu"),
-		m_sound(*this, "snk6502") { }
+		m_sound(*this, "snk6502"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 m_sasuke_counter;
 
@@ -31,6 +32,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<snk6502_sound_device> m_sound;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	int m_charbank;
 	int m_backcolor;

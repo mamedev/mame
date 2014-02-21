@@ -57,7 +57,8 @@ public:
 		m_spriteram_1(*this, "spritera1"),
 		m_spriteram_2(*this, "spritera2"),
 		m_bgram(*this, "bgram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* devices */
 	required_device<okim6295_device> m_oki1;
@@ -81,6 +82,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

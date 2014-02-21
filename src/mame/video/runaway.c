@@ -25,7 +25,7 @@ WRITE8_MEMBER(runaway_state::runaway_paletteram_w)
 		0x47 * ((~data >> 0) & 1) +
 		0x97 * ((~data >> 1) & 1);
 
-	palette_set_color(machine(), offset, MAKE_RGB(R, G, B));
+	palette_set_color(machine(), offset, rgb_t(R, G, B));
 }
 
 

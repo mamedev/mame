@@ -79,8 +79,8 @@ PALETTE_INIT_MEMBER(galaxold_state,galaxold)
 
 
 	/* bullets - yellow and white */
-	palette_set_color(machine(),BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0xef,0x00));
-	palette_set_color(machine(),BULLETS_COLOR_BASE+1,MAKE_RGB(0xef,0xef,0xef));
+	palette_set_color(machine(),BULLETS_COLOR_BASE+0,rgb_t(0xef,0xef,0x00));
+	palette_set_color(machine(),BULLETS_COLOR_BASE+1,rgb_t(0xef,0xef,0xef));
 }
 
 PALETTE_INIT_MEMBER(galaxold_state,scrambold)
@@ -89,7 +89,7 @@ PALETTE_INIT_MEMBER(galaxold_state,scrambold)
 
 
 	/* blue background - 390 ohm resistor */
-	palette_set_color(machine(),BACKGROUND_COLOR_BASE,MAKE_RGB(0,0,0x56));
+	palette_set_color(machine(),BACKGROUND_COLOR_BASE,rgb_t(0,0,0x56));
 }
 
 
@@ -198,8 +198,8 @@ PALETTE_INIT_MEMBER(galaxold_state,darkplnt)
 
 
 	/* bullets - red and blue */
-	palette_set_color(machine(),BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0x00,0x00));
-	palette_set_color(machine(),BULLETS_COLOR_BASE+1,MAKE_RGB(0x00,0x00,0xef));
+	palette_set_color(machine(),BULLETS_COLOR_BASE+0,rgb_t(0xef,0x00,0x00));
+	palette_set_color(machine(),BULLETS_COLOR_BASE+1,rgb_t(0x00,0x00,0xef));
 }
 
 PALETTE_INIT_MEMBER(galaxold_state,minefld)
@@ -324,8 +324,8 @@ PALETTE_INIT_MEMBER(galaxold_state,dambustr)
 
 
 	/* bullets - yellow and white */
-	palette_set_color(machine(),BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0xef,0x00));
-	palette_set_color(machine(),BULLETS_COLOR_BASE+1,MAKE_RGB(0xef,0xef,0xef));
+	palette_set_color(machine(),BULLETS_COLOR_BASE+0,rgb_t(0xef,0xef,0x00));
+	palette_set_color(machine(),BULLETS_COLOR_BASE+1,rgb_t(0xef,0xef,0xef));
 
 	/*
 	Assumption (not clear from the schematics):

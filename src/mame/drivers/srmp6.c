@@ -79,7 +79,8 @@ public:
 		m_chrram(*this, "chrram"),
 		m_dmaram(*this, "dmaram"),
 		m_video_regs(*this, "video_regs"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT16* m_tileram;
 	required_shared_ptr<UINT16> m_sprram;
@@ -110,6 +111,7 @@ public:
 	void update_palette();
 	UINT32 process(UINT8 b,UINT32 dst_offset);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 #define VERBOSE 0
@@ -154,7 +156,7 @@ void srmp6_state::update_palette()
 			b += ((0x1F - b) * brg) >> 5;
 			if(b > 0x1F) b = 0x1F;
 		}
-		palette_set_color(machine(), i, MAKE_RGB(r << 3, g << 3, b << 3));
+		palette_set_color(machine(), i, rgb_t(r << 3, g << 3, b << 3));
 	}
 }
 
@@ -527,7 +529,7 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 			if(b > 0x1F) b = 0x1F;
 		}
 
-		palette_set_color(machine(), offset, MAKE_RGB(r << 3, g << 3, b << 3));
+		palette_set_color(machine(), offset, rgb_t(r << 3, g << 3, b << 3));
 	}
 }
 
@@ -677,6 +679,7 @@ static MACHINE_CONFIG_START( srmp6, srmp6_state )
 
 	MCFG_PALETTE_LENGTH(0x800)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

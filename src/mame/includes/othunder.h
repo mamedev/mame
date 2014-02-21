@@ -46,7 +46,8 @@ public:
 		m_2610_1l(*this, "2610.1l"),
 		m_2610_1r(*this, "2610.1r"),
 		m_2610_2l(*this, "2610.2l"),
-		m_2610_2r(*this, "2610.2r") { }
+		m_2610_2r(*this, "2610.2r"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -74,6 +75,8 @@ public:
 	required_device<filter_volume_device> m_2610_1r;
 	required_device<filter_volume_device> m_2610_2l;
 	required_device<filter_volume_device> m_2610_2r;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE16_MEMBER(othunder_tc0220ioc_w);
 	DECLARE_READ16_MEMBER(othunder_tc0220ioc_r);

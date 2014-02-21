@@ -93,7 +93,7 @@
     - Karateka: no sound?
     - Lovely Horror: Doesn't show kanji, tries to read it thru the 0xa9 port;
     - Madou Monogatari 1/2/3: doesn't display bitmap gfxs during gameplay;
-    - Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
+    - Quarth: title screen is broken after first attract play;
     - Princess Maker 2: mouse is buggy;
     - Princess Maker 2: screen transitions are very ugly (btanb?)
     - Puyo Puyo: beeps out when it's supposed to play samples, Not supposed to use ADPCM, is it a PIT issue?
@@ -449,7 +449,8 @@ public:
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"),
 		m_beeper(*this, "beeper"),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dmac;
@@ -747,6 +748,7 @@ public:
 	DECLARE_DRIVER_INIT(pc9801_kanji);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	inline void set_dma_channel(int channel, int state);
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -785,7 +787,7 @@ UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	pc9801_state *state = device->machine().driver_data<pc9801_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	int xi;
 	int res_x,res_y;
 	UINT8 pen;
@@ -834,6 +836,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 			{
 				if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+0))
 					bitmap.pix32(res_y*2+0, res_x) = palette[pen + colors16_mode];
+				/* TODO: it looks like that PC-98xx can only display even lines ... */
 				if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+1))
 					bitmap.pix32(res_y*2+1, res_x) = palette[pen + colors16_mode];
 			}
@@ -846,7 +849,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	pc9801_state *state = device->machine().driver_data<pc9801_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	int xi,yi;
 	int x;
 	UINT8 char_size;

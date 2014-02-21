@@ -1106,7 +1106,7 @@ WRITE16_MEMBER( segas24_state::sys16_paletteram_w )
 	g |= g >> 5;
 	b |= b >> 5;
 
-	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset, rgb_t(r, g, b));
 
 	if(data & 0x8000) {
 		r = 255-0.6*(255-r);
@@ -1117,7 +1117,7 @@ WRITE16_MEMBER( segas24_state::sys16_paletteram_w )
 		g = 0.6*g;
 		b = 0.6*b;
 	}
-	palette_set_color(machine(), offset+machine().total_colors()/2, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset+machine().total_colors()/2, rgb_t(r, g, b));
 }
 
 

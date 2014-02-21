@@ -35,11 +35,11 @@ PALETTE_INIT_MEMBER(n8080_state,helifire)
 	{
 		int level = 0xff * exp(-3 * i / 255.); /* capacitor discharge */
 
-		palette_set_color(machine(), 0x000 + 8 + i, MAKE_RGB(0x00, 0x00, level));   /* shades of blue */
-		palette_set_color(machine(), 0x100 + 8 + i, MAKE_RGB(0x00, 0xC0, level));   /* shades of blue w/ green star */
+		palette_set_color(machine(), 0x000 + 8 + i, rgb_t(0x00, 0x00, level));   /* shades of blue */
+		palette_set_color(machine(), 0x100 + 8 + i, rgb_t(0x00, 0xC0, level));   /* shades of blue w/ green star */
 
-		palette_set_color(machine(), 0x200 + 8 + i, MAKE_RGB(level, 0x00, 0x00));   /* shades of red */
-		palette_set_color(machine(), 0x300 + 8 + i, MAKE_RGB(level, 0xC0, 0x00));   /* shades of red w/ green star */
+		palette_set_color(machine(), 0x200 + 8 + i, rgb_t(level, 0x00, 0x00));   /* shades of red */
+		palette_set_color(machine(), 0x300 + 8 + i, rgb_t(level, 0xC0, 0x00));   /* shades of red w/ green star */
 	}
 }
 

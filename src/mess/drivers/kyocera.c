@@ -30,6 +30,7 @@
 
     TODO:
 
+	- bar code reader (!RxDB -> RST5.5, Hewlett-Packard HREDS-3050 interface)
     - un-Y2K-hack tandy200
     - keyboard is unresponsive for couple of seconds after boot
     - soft power on/off

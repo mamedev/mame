@@ -11,7 +11,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_sn(*this, "snsnd"),
-		m_vlm(*this, "vlm") { }
+		m_vlm(*this, "vlm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -22,6 +23,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76489a_device> m_sn;
 	required_device<vlm5030_device> m_vlm;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;

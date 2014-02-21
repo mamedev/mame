@@ -73,7 +73,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki") { }
+		m_oki(*this, "oki"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT16 m_x;
 	required_shared_ptr<UINT32> m_spriteram;
@@ -86,6 +87,7 @@ public:
 	INTERRUPT_GEN_MEMBER(feversoc_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -133,13 +135,13 @@ WRITE32_MEMBER(feversoc_state::fs_paletteram_w)
 	g = ((m_generic_paletteram_32[offset] & 0x03e00000)>>16) >> 2;
 	b = ((m_generic_paletteram_32[offset] & 0x7c000000)>>16) >> 7;
 
-	palette_set_color(machine(),offset*2+0,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset*2+0,rgb_t(r,g,b));
 
 	r = (m_generic_paletteram_32[offset] & 0x001f) << 3;
 	g = (m_generic_paletteram_32[offset] & 0x03e0) >> 2;
 	b = (m_generic_paletteram_32[offset] & 0x7c00) >> 7;
 
-	palette_set_color(machine(),offset*2+1,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset*2+1,rgb_t(r,g,b));
 }
 
 READ32_MEMBER(feversoc_state::in0_r)

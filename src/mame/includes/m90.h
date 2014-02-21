@@ -9,7 +9,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_audio(*this, "m72") { }
+		m_audio(*this, "m72"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_video_data;
 	optional_shared_ptr<UINT16> m_spriteram;
@@ -17,6 +18,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<m72_audio_device> m_audio;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT16 m_video_control_data[8];
 	tilemap_t *m_pf1_layer;

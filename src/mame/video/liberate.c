@@ -271,9 +271,9 @@ PALETTE_INIT_MEMBER(liberate_state,liberate)
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		color_prom++;
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 	}
-	palette_set_color(machine(),32,MAKE_RGB(0,0,0)); /* Allocate black for when no background is displayed */
+	palette_set_color(machine(),32,rgb_t(0,0,0)); /* Allocate black for when no background is displayed */
 }
 
 /***************************************************************************/

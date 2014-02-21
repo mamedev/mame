@@ -19,7 +19,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_bmcu(*this, "bmcu"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_charram;
@@ -49,6 +50,7 @@ public:
 	required_device<cpu_device> m_mcu;
 	required_device<buggychl_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);

@@ -74,7 +74,8 @@ public:
 		m_textram(*this, "textram"),
 		m_spritebank(*this, "spritebank"),
 		m_maincpu(*this, "maincpu"),
-		m_t5182(*this, "t5182") { }
+		m_t5182(*this, "t5182"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -83,6 +84,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<t5182_device> m_t5182;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	tilemap_t *m_bgtilemap;
 	tilemap_t *m_infotilemap_2;
@@ -144,7 +146,7 @@ void panicr_state::palette_init()
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */

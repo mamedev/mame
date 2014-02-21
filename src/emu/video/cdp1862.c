@@ -64,7 +64,7 @@ inline void cdp1862_device::initialize_palette()
 		g = (i & 1) ? luma : 0;
 		b = (i & 2) ? luma : 0;
 
-		m_palette[i] = MAKE_RGB(r, g, b);
+		m_palette[i] = rgb_t(r, g, b);
 	}
 }
 

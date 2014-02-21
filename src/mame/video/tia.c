@@ -26,16 +26,16 @@ static void extend_palette(running_machine &machine) {
 	for( i = 0; i < 128; i ++ )
 	{
 		rgb_t   new_rgb = palette_get_color( machine, i );
-		UINT8   new_r = RGB_RED( new_rgb );
-		UINT8   new_g = RGB_GREEN( new_rgb );
-		UINT8   new_b = RGB_BLUE( new_rgb );
+		UINT8   new_r =  new_rgb .r();
+		UINT8   new_g =  new_rgb .g();
+		UINT8   new_b =  new_rgb .b();
 
 		for ( j = 0; j < 128; j++ )
 		{
 			rgb_t   old_rgb = palette_get_color( machine, j );
-			UINT8   old_r = RGB_RED( old_rgb );
-			UINT8   old_g = RGB_GREEN( old_rgb );
-			UINT8   old_b = RGB_BLUE( old_rgb );
+			UINT8   old_r =  old_rgb .r();
+			UINT8   old_g =  old_rgb .g();
+			UINT8   old_b =  old_rgb .b();
 
 			palette_set_color_rgb(machine, ( ( i + 1 ) << 7 ) | j,
 				( new_r + old_r ) / 2,

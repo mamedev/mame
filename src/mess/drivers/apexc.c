@@ -17,7 +17,8 @@ class apexc_state : public driver_device
 public:
 	apexc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT32 m_panel_data_reg;    /* value of a data register on the control panel which can
                                 be edited - the existence of this register is a personnal
@@ -45,6 +46,7 @@ public:
 	void apexc_teletyper_linefeed();
 	void apexc_teletyper_putchar(int character);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 void apexc_state::machine_start()
@@ -510,10 +512,10 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
 static const rgb_t apexc_palette[] =
 {
-	RGB_WHITE,
-	RGB_BLACK,
-	MAKE_RGB(255, 0, 0),
-	MAKE_RGB(50, 0, 0)
+	rgb_t::white,
+	rgb_t::black,
+	rgb_t(255, 0, 0),
+	rgb_t(50, 0, 0)
 };
 
 static const unsigned short apexc_colortable[] =

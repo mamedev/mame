@@ -88,7 +88,7 @@ void naughtyb_state::palette_init()
 		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
 		b = combine_2_weights(weights, bit0, bit1);
 
-		palette_set_color(machine(), BITSWAP8(i,5,7,6,2,1,0,4,3), MAKE_RGB(r, g, b));
+		palette_set_color(machine(), BITSWAP8(i,5,7,6,2,1,0,4,3), rgb_t(r, g, b));
 	}
 }
 

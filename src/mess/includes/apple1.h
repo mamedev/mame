@@ -35,7 +35,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_vh_clrscrn_pressed;
 	int m_kbd_data;
@@ -82,6 +83,7 @@ public:
 	attotime apple1_vh_dsp_time_to_ready();
 	DECLARE_SNAPSHOT_LOAD_MEMBER( apple1 );
 	required_device<ram_device> m_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

@@ -4,6 +4,8 @@
 
 ***************************************************************************/
 
+#include "video/bufsprite.h"
+
 class galivan_state : public driver_device
 {
 public:
@@ -11,12 +13,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
-//  UINT8 *     m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_device<buffered_spriteram8_device> m_spriteram;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
@@ -24,7 +26,6 @@ public:
 	UINT16       m_scrollx;
 	UINT16       m_scrolly;
 	UINT8       m_galivan_scrollx[2],m_galivan_scrolly[2];
-	UINT8       m_flipscreen;
 	UINT8       m_write_layers;
 	UINT8       m_layers;
 	UINT8       m_ninjemak_dispdisable;
@@ -61,4 +62,5 @@ public:
 	UINT32 screen_update_ninjemak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

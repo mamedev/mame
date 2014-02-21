@@ -211,7 +211,7 @@ void isa8_mda_device::device_reset()
 static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 {
 	isa8_mda_device *mda  = downcast<isa8_mda_device *>(device->owner());
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -285,7 +285,7 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 static MC6845_UPDATE_ROW( mda_text_blink_update_row )
 {
 	isa8_mda_device *mda  = downcast<isa8_mda_device *>(device->owner());
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -608,7 +608,7 @@ void isa8_hercules_device::device_reset()
 static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 {
 	isa8_hercules_device *herc  = downcast<isa8_hercules_device *>(device->owner());
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  gfx_base = ( ( herc->m_mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( ra & 0x03 ) << 13 );
 	int i;

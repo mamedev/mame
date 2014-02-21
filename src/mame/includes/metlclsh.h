@@ -14,7 +14,8 @@ public:
 		m_bgram(*this, "bgram"),
 		m_scrollx(*this, "scrollx"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"){ }
+		m_subcpu(*this, "sub"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_fgram;
@@ -34,6 +35,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(metlclsh_cause_irq);
 	DECLARE_WRITE8_MEMBER(metlclsh_ack_nmi);
 	DECLARE_WRITE8_MEMBER(metlclsh_cause_nmi2);

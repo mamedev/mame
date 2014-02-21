@@ -95,7 +95,7 @@ void nubus_cb264_device::device_start()
 
 //  printf("[cb264 %p] slotspace = %x\n", this, slotspace);
 
-	m_vram = auto_alloc_array(machine(), UINT8, VRAM_SIZE);
+	m_vram.resize(VRAM_SIZE);
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, 0, 0, "bank_cb264", m_vram);
 
 	m_nubus->install_device(slotspace+0xff6000, slotspace+0xff60ff, read32_delegate(FUNC(nubus_cb264_device::cb264_r), this), write32_delegate(FUNC(nubus_cb264_device::cb264_w), this));
@@ -203,7 +203,7 @@ UINT32 nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		case 4: // 24 bpp
 		case 7: // ???
 			{
-				UINT32 *vram32 = (UINT32 *)m_vram;
+				UINT32 *vram32 = (UINT32 *)&m_vram[0];
 
 				for (y = 0; y < 480; y++)
 				{
@@ -281,7 +281,7 @@ WRITE32_MEMBER( nubus_cb264_device::cb264_ramdac_w )
 
 			if (m_count == 3)
 			{
-				m_palette[m_clutoffs] = MAKE_RGB(m_colors[0], m_colors[1], m_colors[2]);
+				m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				m_count = 0;
 			}

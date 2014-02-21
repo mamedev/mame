@@ -52,6 +52,6 @@ void pk8020_state::palette_init()
 {
 	int i;
 	for(i=0;i<16;i++) {
-		palette_set_color( machine(), i, MAKE_RGB(i*0x10,i*0x10,i*0x10) );
+		palette_set_color( machine(), i, rgb_t(i*0x10,i*0x10,i*0x10) );
 	}
 }

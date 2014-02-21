@@ -106,7 +106,8 @@ public:
 		m_cram(*this, "cram"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
-		m_oki(*this, "oki") { }
+		m_oki(*this, "oki"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_main;
 	required_shared_ptr<UINT8> m_vram;
@@ -126,6 +127,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 TILE_GET_INFO_MEMBER(spool99_state::get_spool99_tile_info)

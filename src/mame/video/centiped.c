@@ -234,7 +234,7 @@ WRITE8_MEMBER(centiped_state::centiped_paletteram_w)
 			else if (g) g = 0xc0;
 		}
 
-		color = MAKE_RGB(r, g, b);
+		color = rgb_t(r, g, b);
 
 		/* character colors, set directly */
 		if ((offset & 0x08) == 0)
@@ -306,7 +306,7 @@ PALETTE_INIT_MEMBER(centiped_state,warlords)
 			r = g = b = grey;
 		}
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 
@@ -360,7 +360,7 @@ void centiped_state::milliped_set_color(offs_t offset, UINT8 data)
 	bit2 = (~data >> 2) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	color = MAKE_RGB(r, g, b);
+	color = rgb_t(r, g, b);
 
 	/* character colors, set directly */
 	if (offset < 0x10)

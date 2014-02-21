@@ -286,7 +286,8 @@ public:
 		m_ay1(*this, "ay1"),
 		m_ay2(*this, "ay2"),
 		m_samples(*this, "samples"),
-		m_mkiv_vram(*this, "mkiv_vram") { }
+		m_mkiv_vram(*this, "mkiv_vram"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc146818_device> m_rtc;
@@ -295,6 +296,7 @@ public:
 	required_device<samples_device> m_samples;
 	
 	required_shared_ptr<UINT8> m_mkiv_vram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	
 	int m_rtc_address_strobe;
 	int m_rtc_data_strobe;
@@ -1624,7 +1626,7 @@ void aristmk4_state::palette_init()
 		bit2 = (color_prom[0] >> 7) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
@@ -1763,7 +1765,7 @@ PALETTE_INIT_MEMBER(aristmk4_state,lions)
 		bit1 = (i >> 5) & 0x01;
 		r = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 

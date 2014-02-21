@@ -8,7 +8,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
 		m_eeprom(*this, "eeprom"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	UINT16   *m_paletteram[2];
@@ -118,4 +119,5 @@ public:
 	inline void fromanc4_vram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int layer );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

@@ -25,7 +25,8 @@ public:
 		m_k053252(*this, "k053252"),
 		m_k056832(*this, "k056832"),
 		m_k053936_1(*this, "k053936_1"),
-		m_k053936_2(*this, "k053936_2") { }
+		m_k053936_2(*this, "k053936_2"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg1_videoram;
@@ -51,6 +52,8 @@ public:
 	required_device<k056832_device> m_k056832;
 	required_device<k053936_device> m_k053936_1;
 	required_device<k053936_device> m_k053936_2;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_READ16_MEMBER(dbzcontrol_r);
 	DECLARE_WRITE16_MEMBER(dbzcontrol_w);
 	DECLARE_WRITE16_MEMBER(dbz_sound_command_w);

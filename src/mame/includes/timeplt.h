@@ -16,7 +16,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2")
+		m_spriteram2(*this, "spriteram2"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -28,6 +29,8 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_spriteram2;
 
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 

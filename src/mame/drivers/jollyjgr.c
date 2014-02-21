@@ -112,7 +112,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_bitmap(*this, "bitmap"),
 		m_bulletram(*this, "bulletram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -145,6 +146,7 @@ public:
 	INTERRUPT_GEN_MEMBER(jollyjgr_interrupt);
 	void draw_bitmap( bitmap_ind16 &bitmap );
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -434,7 +436,7 @@ void jollyjgr_state::palette_init()
 		bit1 = BIT(*color_prom, 7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), i, rgb_t(r,g,b));
 		color_prom++;
 	}
 

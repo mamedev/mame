@@ -29,7 +29,7 @@ PALETTE_INIT_MEMBER(quasar_state,quasar)
 	/* standard 1 bit per color palette (background and sprites) */
 	for (i = 0; i < 8; i++)
 	{
-		rgb_t color = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		rgb_t color = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 		colortable_palette_set_color(machine().colortable, i, color);
 	}
 
@@ -58,18 +58,18 @@ PALETTE_INIT_MEMBER(quasar_state,quasar)
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
 		/* intensity 0 */
-		colortable_palette_set_color(machine().colortable, 0x100 + i, RGB_BLACK);
+		colortable_palette_set_color(machine().colortable, 0x100 + i, rgb_t::black);
 
 		/* intensity 1 */
-		color = MAKE_RGB(r >> 2, g >> 2, b >> 2);
+		color = rgb_t(r >> 2, g >> 2, b >> 2);
 		colortable_palette_set_color(machine().colortable, 0x200 + i, color);
 
 		/* intensity 2 */
-		color = MAKE_RGB((r >> 2) + (r >> 3), (g >> 2) + (g >> 3), (b >> 2) + (b >> 2));
+		color = rgb_t((r >> 2) + (r >> 3), (g >> 2) + (g >> 3), (b >> 2) + (b >> 2));
 		colortable_palette_set_color(machine().colortable, 0x300 + i, color);
 
 		/* intensity 3 */
-		color = MAKE_RGB(r >> 1, g >> 1, b >> 1);
+		color = rgb_t(r >> 1, g >> 1, b >> 1);
 		colortable_palette_set_color(machine().colortable, 0x400 + i, color);
 	}
 

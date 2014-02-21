@@ -260,7 +260,7 @@ void qix_state::set_pen(int offs)
 	b = table[(bits << 2) | intensity];
 
 	/* update the palette */
-	m_pens[offs] = MAKE_RGB(r, g, b);
+	m_pens[offs] = rgb_t(r, g, b);
 }
 
 

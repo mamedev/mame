@@ -330,7 +330,7 @@ UINT32 m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	bg_r = m_phase & 1 ? 0xdf : 0;
 	bg_g = m_phase & 2 ? 0xdf : 0;
 	bg_b = m_phase & 4 ? 0xdf : 0;
-	bitmap.fill(MAKE_ARGB(0xff,bg_r,bg_g,bg_b),cliprect);
+	bitmap.fill(rgb_t(0xff,bg_r,bg_g,bg_b),cliprect);
 
 	for(y=0;y<12;y++)
 	{

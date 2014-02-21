@@ -12,7 +12,8 @@ public:
 		m_spriteram(*this, "spriteram", 0),
 		m_spriteram2(*this, "spriteram2", 0),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")  { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode")  { }
 
 	/* memory pointers */
 //  UINT8 *    m_spriteram;   // currently directly used in a 16bit map...
@@ -66,4 +67,5 @@ public:
 	void borntofi_adpcm_int( msm5205_device *device, int voice );
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

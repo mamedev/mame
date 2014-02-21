@@ -891,9 +891,9 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
 	for (x = 0; x < palette_length; x++)
 	{
 		rgb_t color = palette[x];
-		pnginfo->palette[3 * x + 0] = RGB_RED(color);
-		pnginfo->palette[3 * x + 1] = RGB_GREEN(color);
-		pnginfo->palette[3 * x + 2] = RGB_BLUE(color);
+		pnginfo->palette[3 * x + 0] = color.r();
+		pnginfo->palette[3 * x + 1] = color.g();
+		pnginfo->palette[3 * x + 2] = color.b();
 	}
 
 	/* allocate memory for the image */
@@ -958,9 +958,9 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
 			for (x = 0; x < pnginfo->width; x++)
 			{
 				rgb_t color = palette[*src16++];
-				*dst++ = RGB_RED(color);
-				*dst++ = RGB_GREEN(color);
-				*dst++ = RGB_BLUE(color);
+				*dst++ = color.r();
+				*dst++ = color.g();
+				*dst++ = color.b();
 			}
 		}
 
@@ -970,10 +970,10 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
 			UINT32 *src32 = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y));
 			for (x = 0; x < pnginfo->width; x++)
 			{
-				UINT32 raw = *src32++;
-				*dst++ = RGB_RED(raw);
-				*dst++ = RGB_GREEN(raw);
-				*dst++ = RGB_BLUE(raw);
+				rgb_t raw = *src32++;
+				*dst++ = raw.r();
+				*dst++ = raw.g();
+				*dst++ = raw.b();
 			}
 		}
 
@@ -983,11 +983,11 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t &
 			UINT32 *src32 = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y));
 			for (x = 0; x < pnginfo->width; x++)
 			{
-				UINT32 raw = *src32++;
-				*dst++ = RGB_RED(raw);
-				*dst++ = RGB_GREEN(raw);
-				*dst++ = RGB_BLUE(raw);
-				*dst++ = RGB_ALPHA(raw);
+				rgb_t raw = *src32++;
+				*dst++ = raw.r();
+				*dst++ = raw.g();
+				*dst++ = raw.b();
+				*dst++ = raw.a();
 			}
 		}
 
@@ -1060,7 +1060,7 @@ handle_error:
 }
 
 
-png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const UINT32 *palette)
+png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
 {
 	png_info pnginfo;
 	png_error error;
@@ -1117,7 +1117,7 @@ png_error mng_capture_start(core_file *fp, bitmap_t &bitmap, double rate)
 	return PNGERR_NONE;
 }
 
-png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const UINT32 *palette)
+png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette)
 {
 	return write_png_stream(fp, info, bitmap, palette_length, palette);
 }

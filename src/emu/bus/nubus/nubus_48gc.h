@@ -39,7 +39,7 @@ protected:
 		DECLARE_WRITE32_MEMBER(mac_48gc_w);
 
 public:
-		UINT8  *m_vram;
+		dynamic_buffer m_vram;
 		UINT32 m_mode, m_vbl_disable, m_toggle, m_stride, m_base;
 		UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
 		UINT32 m_registers[0x100];

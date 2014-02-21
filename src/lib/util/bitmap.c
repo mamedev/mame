@@ -271,14 +271,14 @@ void bitmap_t::set_palette(palette_t *palette)
 	// first dereference any existing palette
 	if (m_palette != NULL)
 	{
-		palette_deref(m_palette);
+		m_palette->deref();
 		m_palette = NULL;
 	}
 
 	// then reference any new palette
 	if (palette != NULL)
 	{
-		palette_ref(palette);
+		palette->ref();
 		m_palette = palette;
 	}
 }

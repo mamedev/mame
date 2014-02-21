@@ -37,7 +37,8 @@ public:
 		m_igs_palette32(*this, "igs_palette32"),
 		m_igs_tx_videoram(*this, "igs_tx_videoram"),
 		m_igs_bg_videoram(*this, "igs_bg_videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT32> m_igs_mainram;
 	required_shared_ptr<UINT32> m_igs_cg_videoram;
@@ -72,6 +73,7 @@ public:
 	void sdwx_gfx_decrypt();
 	void pgm_create_dummy_internal_arm_region();
 	required_device<cpu_device> m_maincpu;
+	optional_device<gfxdecode_device> m_gfxdecode;
 };
 
 

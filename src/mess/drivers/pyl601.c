@@ -385,7 +385,7 @@ void pyl601_state::video_start()
 static MC6845_UPDATE_ROW( pyl601_update_row )
 {
 	pyl601_state *state = device->machine().driver_data<pyl601_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 *charrom = state->memregion("chargen")->base();
 
 	int column, bit, i;
@@ -428,7 +428,7 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 static MC6845_UPDATE_ROW( pyl601a_update_row )
 {
 	pyl601_state *state = device->machine().driver_data<pyl601_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 *charrom = state->memregion("chargen")->base();
 
 	int column, bit, i;

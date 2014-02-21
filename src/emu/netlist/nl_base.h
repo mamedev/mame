@@ -1358,5 +1358,4 @@ private:
 };
 
 
-
 #endif /* NLBASE_H_ */

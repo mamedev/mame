@@ -46,13 +46,15 @@ public:
 	murogmbl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video(*this, "video"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_video;
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_murogmbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -77,7 +79,7 @@ void murogmbl_state::palette_init()
 		bit2 = (color_prom[0] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }

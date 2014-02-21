@@ -88,7 +88,7 @@ static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 {
 	int i;
 	sm1800_state *state = device->machine().driver_data<sm1800_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 *charmap = state->memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp)
@@ -145,9 +145,9 @@ I8255A_INTERFACE( sm1800_ppi8255_interface )
 
 void sm1800_state::palette_init()
 {
-	palette_set_color(machine(), 0, RGB_BLACK); // black
+	palette_set_color(machine(), 0, rgb_t::black); // black
 	palette_set_color_rgb(machine(), 1, 0xa0, 0xa0, 0xa0); // white
-	palette_set_color(machine(), 2, RGB_WHITE); // highlight
+	palette_set_color(machine(), 2, rgb_t::white); // highlight
 }
 
 
@@ -183,8 +183,9 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_GFXDECODE_ADD("gfxdecode", sm1800)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", sm1800)
 	MCFG_PALETTE_LENGTH(3)
 
 	/* Devices */

@@ -49,7 +49,7 @@ void tankbatt_state::palette_init()
 		b = RES_1 * bit3;
 		if (bit3) b += RES_2 * bit0;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	for (i = 0; i < 0x200; i += 2)

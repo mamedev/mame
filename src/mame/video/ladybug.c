@@ -66,7 +66,7 @@ static void palette_init_common( running_machine &machine, const UINT8 *color_pr
 		bit1 = (~color_prom[i] >> b_bit1) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine.colortable, i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -127,7 +127,7 @@ PALETTE_INIT_MEMBER(ladybug_state,sraider)
 		bit0 = ((i - 0x20) >> 0) & 0x01;
 		r = 0x47 * bit0;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	for (i = 0x60; i < 0x80; i++)
@@ -333,7 +333,7 @@ UINT32 ladybug_state::screen_update_sraider(screen_device &screen, bitmap_ind16 
 		redclash_draw_stars(bitmap, cliprect, 0x60, 1, 0x00, 0xd8);
 
 	// draw the gridlines
-	colortable_palette_set_color(machine().colortable, 0x40, MAKE_RGB(m_grid_color & 0x40 ? 0xff : 0,
+	colortable_palette_set_color(machine().colortable, 0x40, rgb_t(m_grid_color & 0x40 ? 0xff : 0,
 																				m_grid_color & 0x20 ? 0xff : 0,
 																				m_grid_color & 0x10 ? 0xff : 0));
 	m_grid_tilemap->draw(screen, bitmap, cliprect, 0, flip_screen());

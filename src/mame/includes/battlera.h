@@ -7,7 +7,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_control_port_select;
 	int m_msm5205next;
@@ -49,4 +50,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(battlera_adpcm_int);
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

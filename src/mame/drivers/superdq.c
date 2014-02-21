@@ -34,7 +34,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") ,
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	UINT8 m_ld_in_latch;
@@ -55,6 +56,7 @@ public:
 	UINT32 screen_update_superdq(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superdq_vblank);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 TILE_GET_INFO_MEMBER(superdq_state::get_tile_info)
@@ -120,7 +122,7 @@ void superdq_state::palette_init()
 		bit1 = (color_prom[i] >> 0) & 0x01;
 		b = combine_2_weights(bweights, bit1, bit0);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 
@@ -168,9 +170,9 @@ WRITE8_MEMBER(superdq_state::superdq_io_w)
 	{
 		int index = black_color_entries[i];
 		if (data & 0x80)
-			palette_set_color(machine(), index, palette_get_color(machine(), index) & MAKE_ARGB(0,255,255,255));
+			palette_set_color(machine(), index, palette_get_color(machine(), index) & rgb_t(0,255,255,255));
 		else
-			palette_set_color(machine(), index, palette_get_color(machine(), index) | MAKE_ARGB(255,0,0,0));
+			palette_set_color(machine(), index, palette_get_color(machine(), index) | rgb_t(255,0,0,0));
 	}
 
 	/*

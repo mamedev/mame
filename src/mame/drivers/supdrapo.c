@@ -75,7 +75,8 @@ public:
 		m_col_line(*this, "col_line"),
 		m_videoram(*this, "videoram"),
 		m_char_bank(*this, "char_bank"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_col_line;
 	required_shared_ptr<UINT8> m_videoram;
@@ -95,6 +96,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_supdrapo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -157,7 +159,7 @@ void supdrapo_state::palette_init()
 		bit2 = (color_prom[0x100] >> 1) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }

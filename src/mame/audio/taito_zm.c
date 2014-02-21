@@ -25,6 +25,7 @@ and a Zoom Corp. ZFX-2 DSP instead of the TMS57002.
 
 TODO:
 - add TMS57002
+- global volume regs
 - a lot more
 
 ***************************************************************************/
@@ -43,7 +44,7 @@ const device_type TAITO_ZOOM = &device_creator<taito_zoom_device>;
 taito_zoom_device::taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TAITO_ZOOM, "Taito Zoom Sound System", tag, owner, clock, "taito_zoom", __FILE__),
 	m_soundcpu(*this, ":mn10200"),
-	m_control(0),
+	m_reg_address(0),
 	m_tms_ctrl(0)
 {
 }
@@ -57,7 +58,7 @@ void taito_zoom_device::device_start()
 	m_snd_shared_ram = auto_alloc_array_clear(machine(), UINT8, 0x100);
 	
 	// register for savestates
-	save_item(NAME(m_control));
+	save_item(NAME(m_reg_address));
 	save_item(NAME(m_tms_ctrl));
 	save_pointer(NAME(m_snd_shared_ram), 0x100);
 }
@@ -68,6 +69,7 @@ void taito_zoom_device::device_start()
 
 void taito_zoom_device::device_reset()
 {
+	m_reg_address = 0;
 }
 
 
@@ -136,18 +138,26 @@ READ16_MEMBER(taito_zoom_device::sound_irq_r)
 	return 0;
 }
 
-WRITE16_MEMBER(taito_zoom_device::global_volume_w)
+WRITE16_MEMBER(taito_zoom_device::reg_data_w)
 {
-	// TODO
-	// m_control d0 selects left/right speaker volume (zsg2+dsp)
+	switch (m_reg_address)
+	{
+		case 0x04:
+			// zsg2+dsp global volume ch0
+			break;
+		
+		case 0x05:
+			// zsg2+dsp global volume ch1
+			break;
+
+		default:
+			break;
+	}
 }
 
-WRITE16_MEMBER(taito_zoom_device::reset_control_w)
+WRITE16_MEMBER(taito_zoom_device::reg_address_w)
 {
-	// d2: reset sound cpu?
-	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
-
-	m_control = data;
+	m_reg_address = data & 0xff;
 }
 
 
@@ -161,7 +171,7 @@ MACHINE_CONFIG_FRAGMENT( taito_zoom_sound )
 
 	/* basic machine hardware */
 	MCFG_TAITO_ZOOM_ADD("taito_zoom")
-	MCFG_CPU_ADD("mn10200", MN10200, XTAL_25MHz/2)
+	MCFG_CPU_ADD("mn10200", MN1020012A, XTAL_25MHz/2)
 	MCFG_CPU_PROGRAM_MAP(taitozoom_mn_map)
 	MCFG_CPU_IO_MAP(taitozoom_mn_io_map)
 

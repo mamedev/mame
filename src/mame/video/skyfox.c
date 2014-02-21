@@ -114,13 +114,13 @@ void skyfox_state::palette_init()
 		bit3 = (color_prom[i + 2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 
 	/* Grey scale for the background??? */
 	for (i = 0; i < 256; i++)
 	{
-		palette_set_color(machine(),i + 256, MAKE_RGB(i, i, i));
+		palette_set_color(machine(),i + 256, rgb_t(i, i, i));
 	}
 }
 

@@ -41,7 +41,7 @@ PALETTE_INIT_MEMBER(madalien_state,madalien)
 		if (BIT(color_prom[i], 5))
 			b += 0xc0;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	for (i = 0; i < 0x10; i++)

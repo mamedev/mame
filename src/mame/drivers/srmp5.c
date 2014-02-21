@@ -229,7 +229,7 @@ READ32_MEMBER(srmp5_state::srmp5_palette_r)
 WRITE32_MEMBER(srmp5_state::srmp5_palette_w)
 {
 	COMBINE_DATA(&m_palram[offset]);
-	palette_set_color(machine(), offset, MAKE_RGB(data << 3 & 0xFF, data >> 2 & 0xFF, data >> 7 & 0xFF));
+	palette_set_color(machine(), offset, rgb_t(data << 3 & 0xFF, data >> 2 & 0xFF, data >> 7 & 0xFF));
 }
 WRITE32_MEMBER(srmp5_state::bank_w)
 {

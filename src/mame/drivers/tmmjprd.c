@@ -43,7 +43,8 @@ public:
 			m_spriteregs(*this, "spriteregs"),
 			m_spriteram(*this, "spriteram") ,
 		m_maincpu(*this, "maincpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr_array<UINT32, 4> m_tilemap_regs;
 	required_shared_ptr<UINT32> m_spriteregs;
@@ -79,6 +80,7 @@ public:
 	void tmmjprd_do_blit();
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -631,7 +633,7 @@ WRITE32_MEMBER(tmmjprd_state::tmmjprd_paletteram_dword_w)
 	r = ((m_generic_paletteram_32[offset] & 0x0000ff00) >>8);
 	g = ((m_generic_paletteram_32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,rgb_t(r,g,b));
 }
 
 

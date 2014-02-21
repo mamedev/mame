@@ -60,7 +60,8 @@ public:
 		m_reel2_ram(*this, "reel2_ram"),
 		m_reel3_ram(*this, "reel3_ram"),
 		m_fg_tile_ram(*this, "fg_tile_ram"),
-		m_fg_color_ram(*this, "fg_color_ram"){ }
+		m_fg_color_ram(*this, "fg_color_ram"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_bg_scroll2;
@@ -70,6 +71,7 @@ public:
 	required_shared_ptr<UINT8> m_reel3_ram;
 	required_shared_ptr<UINT8> m_fg_tile_ram;
 	required_shared_ptr<UINT8> m_fg_color_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	int m_exp_bank;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_reel1_tilemap;

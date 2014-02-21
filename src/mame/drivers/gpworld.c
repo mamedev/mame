@@ -58,7 +58,8 @@ public:
 		m_sprite_ram(*this, "sprite_ram"),
 		m_palette_ram(*this, "palette_ram"),
 		m_tile_ram(*this, "tile_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 m_nmi_enable;
 	UINT8 m_start_lamp;
@@ -83,6 +84,7 @@ public:
 	inline void draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip);
 	void gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -305,7 +307,7 @@ WRITE8_MEMBER(gpworld_state::palette_write)
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
-	palette_set_color(machine(), (pal_index & 0xffe) >> 1, MAKE_ARGB(a, r, g, b));
+	palette_set_color(machine(), (pal_index & 0xffe) >> 1, rgb_t(a, r, g, b));
 }
 
 /* PROGRAM MAP */

@@ -18,7 +18,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 *m_videoram;
 	int m_laser_latch;
@@ -81,6 +82,7 @@ public:
 	void laser_get_track();
 	void laser_put_track();
 	device_t *laser_file();
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

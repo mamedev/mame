@@ -486,7 +486,7 @@ void device_execute_interface::interface_pre_start()
 	m_driver_irq.bind_relative_to(device());
 
 	// fill in the initial states
-	execute_interface_iterator iter(device().machine().root_device());
+	device_iterator iter(device().machine().root_device());
 	int index = iter.indexof(*this);
 	m_suspend = SUSPEND_REASON_RESET;
 	m_profiler = profile_type(index + PROFILER_DEVICE_FIRST);

@@ -116,13 +116,13 @@ static const UINT8 crosshair_raw_top[] =
 /* per-player colors */
 static const rgb_t crosshair_colors[] =
 {
-	MAKE_RGB(0x40,0x40,0xff),
-	MAKE_RGB(0xff,0x40,0x40),
-	MAKE_RGB(0x40,0xff,0x40),
-	MAKE_RGB(0xff,0xff,0x40),
-	MAKE_RGB(0xff,0x40,0xff),
-	MAKE_RGB(0x40,0xff,0xff),
-	MAKE_RGB(0xff,0xff,0xff)
+	rgb_t(0x40,0x40,0xff),
+	rgb_t(0xff,0x40,0x40),
+	rgb_t(0x40,0xff,0x40),
+	rgb_t(0xff,0xff,0x40),
+	rgb_t(0xff,0x40,0xff),
+	rgb_t(0x40,0xff,0xff),
+	rgb_t(0xff,0xff,0xff)
 };
 
 
@@ -181,7 +181,7 @@ static void create_bitmap(running_machine &machine, int player)
 	{
 		/* allocate a blank bitmap to start with */
 		global.bitmap[player]->allocate(CROSSHAIR_RAW_SIZE, CROSSHAIR_RAW_SIZE);
-		global.bitmap[player]->fill(MAKE_ARGB(0x00,0xff,0xff,0xff));
+		global.bitmap[player]->fill(rgb_t(0x00,0xff,0xff,0xff));
 
 		/* extract the raw source data to it */
 		for (y = 0; y < CROSSHAIR_RAW_SIZE / 2; y++)
@@ -193,7 +193,7 @@ static void create_bitmap(running_machine &machine, int player)
 			/* extract to two rows simultaneously */
 			for (x = 0; x < CROSSHAIR_RAW_SIZE; x++)
 				if ((crosshair_raw_top[y * CROSSHAIR_RAW_ROWBYTES + x / 8] << (x % 8)) & 0x80)
-					dest0[x] = dest1[x] = MAKE_ARGB(0xff,0x00,0x00,0x00) | color;
+					dest0[x] = dest1[x] = rgb_t(0xff,0x00,0x00,0x00) | color;
 		}
 	}
 
@@ -394,7 +394,7 @@ void crosshair_render(screen_device &screen)
 			/* add a quad assuming a 4:3 screen (this is not perfect) */
 			screen.container().add_quad(global.x[player] - 0.03f, global.y[player] - 0.04f,
 										global.x[player] + 0.03f, global.y[player] + 0.04f,
-										MAKE_ARGB(0xc0, global.fade, global.fade, global.fade),
+										rgb_t(0xc0, global.fade, global.fade, global.fade),
 										global.texture[player], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 }

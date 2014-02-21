@@ -12,7 +12,8 @@ public:
 		m_tileram(*this, "tileram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"){ }
+		m_subcpu(*this, "sub"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_tileram;
@@ -27,6 +28,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(battlane_cpu_command_w);
 	DECLARE_WRITE8_MEMBER(battlane_palette_w);
 	DECLARE_WRITE8_MEMBER(battlane_scrollx_w);

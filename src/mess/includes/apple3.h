@@ -96,7 +96,7 @@ public:
 	UINT8 *apple3_get_zpa_addr(offs_t offset);
 	void apple3_update_memory();
 	void apple3_via_out(UINT8 *var, UINT8 data);
-	UINT8 *apple3_get_indexed_addr(offs_t offset, bool is_write);
+	UINT8 *apple3_get_indexed_addr(offs_t offset);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_c040_tick);
 	DECLARE_PALETTE_INIT(apple3);
 	void apple3_irq_update();
@@ -123,13 +123,12 @@ private:
 
 	bool m_sync;
 	bool m_rom_has_been_disabled;
-	UINT8 m_indir_opcode;
-	int m_indir_count;
 	int m_cnxx_slot;
+	UINT8 m_indir_bank;
 
 	UINT8 *m_bank2, *m_bank3, *m_bank4, *m_bank5, *m_bank8, *m_bank9;
 	UINT8 *m_bank10, *m_bank11;
-	UINT8 *m_bank6, *m_bank7;
+	UINT8 *m_bank6, *m_bank7rd, *m_bank7wr;
 	int m_speaker_state;
 	int m_c040_time;
 	UINT16 m_lastchar, m_strobe;

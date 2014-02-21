@@ -19,7 +19,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_flipscreen(*this, "flipscreen"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	/* devices/memory pointers */
@@ -32,6 +33,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_flipscreen;
 	required_shared_ptr<UINT8> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	tilemap_t *m_tilemap;
 	UINT8 m_master_nmi_mask;

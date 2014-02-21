@@ -257,7 +257,7 @@ static void palette_handler(running_machine &machine, render_container *containe
 {
 	int total = state->palette.which ? colortable_palette_get_size(machine.colortable) : machine.total_colors();
 	const char *title = state->palette.which ? "COLORTABLE" : "PALETTE";
-	const rgb_t *raw_color = palette_entry_list_raw(machine.palette);
+	const rgb_t *raw_color = machine.palette->entry_list_raw();
 	render_font *ui_font = machine.ui().get_font();
 	float cellwidth, cellheight;
 	float chwidth, chheight;
@@ -780,14 +780,14 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
 
 static void gfxset_draw_item(running_machine &machine, gfx_element *gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate)
 {
-	static const pen_t default_palette[] =
+	static const rgb_t default_palette[] =
 	{
-		MAKE_RGB(0,0,0), MAKE_RGB(0,0,255), MAKE_RGB(0,255,0), MAKE_RGB(0,255,255),
-		MAKE_RGB(255,0,0), MAKE_RGB(255,0,255), MAKE_RGB(255,255,0), MAKE_RGB(255,255,255)
+		rgb_t(0,0,0), rgb_t(0,0,255), rgb_t(0,255,0), rgb_t(0,255,255),
+		rgb_t(255,0,0), rgb_t(255,0,255), rgb_t(255,255,0), rgb_t(255,255,255)
 	};
 	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx->height() : gfx->width();
 	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx->width() : gfx->height();
-	const rgb_t *palette = (machine.total_colors() != 0) ? palette_entry_list_raw(machine.palette) : NULL;
+	const rgb_t *palette = (machine.total_colors() != 0) ? machine.palette->entry_list_raw() : NULL;
 	UINT32 palette_mask = ~0;
 	int x, y;
 

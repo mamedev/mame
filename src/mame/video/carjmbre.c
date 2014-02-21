@@ -37,7 +37,7 @@ void carjmbre_state::palette_init()
 
 	rgb = compute_res_net_all(machine(), color_prom, &carjmbre_decode_info, &carjmbre_net_info);
 	palette_set_colors(machine(), 0, rgb, 64);
-	palette_normalize_range(machine().palette, 0, 63, 0, 255);
+	machine().palette->normalize_range(0, 63);
 	auto_free(machine(), rgb);
 }
 
@@ -64,7 +64,7 @@ WRITE8_MEMBER(carjmbre_state::carjmbre_bgcolor_w)
 		else
 			// restore to initial state (black)
 			for (i = 0; i < 64; i += 4)
-				palette_set_color(machine(), i, RGB_BLACK);
+				palette_set_color(machine(), i, rgb_t::black);
 	}
 }
 

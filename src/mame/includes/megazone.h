@@ -18,7 +18,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_daccpu(*this, "daccpu"){ }
+		m_daccpu(*this, "daccpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_scrolly;
@@ -40,6 +41,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_daccpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8         m_irq_mask;
 	DECLARE_WRITE8_MEMBER(megazone_i8039_irq_w);

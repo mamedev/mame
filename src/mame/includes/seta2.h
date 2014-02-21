@@ -17,7 +17,8 @@ public:
 		m_funcube_leds(*this, "funcube_leds"),
 		m_x1(*this, "x1snd"),
 		m_oki(*this, "oki"),
-		m_eeprom(*this, "eeprom"){ }
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<tmp68301_device> m_tmp68301;
@@ -32,6 +33,7 @@ public:
 	optional_device<x1_010_device> m_x1;
 	optional_device<okim9810_device> m_oki;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	int m_xoffset;
 	int m_yoffset;

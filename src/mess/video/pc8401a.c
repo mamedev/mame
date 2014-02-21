@@ -5,8 +5,8 @@
 
 PALETTE_INIT_MEMBER(pc8401a_state,pc8401a)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(39, 108, 51));
-	palette_set_color(machine(), 1, MAKE_RGB(16, 37, 84));
+	palette_set_color(machine(), 0, rgb_t(39, 108, 51));
+	palette_set_color(machine(), 1, rgb_t(16, 37, 84));
 }
 
 void pc8401a_state::video_start()

@@ -72,22 +72,22 @@ ADDRESS_MAP_END
 */
 static const rgb_t tms9928a_palette[TMS9928A_PALETTE_SIZE] =
 {
-	RGB_BLACK,
-	RGB_BLACK,
-	MAKE_RGB(33, 200, 66),
-	MAKE_RGB(94, 220, 120),
-	MAKE_RGB(84, 85, 237),
-	MAKE_RGB(125, 118, 252),
-	MAKE_RGB(212, 82, 77),
-	MAKE_RGB(66, 235, 245),
-	MAKE_RGB(252, 85, 84),
-	MAKE_RGB(255, 121, 120),
-	MAKE_RGB(212, 193, 84),
-	MAKE_RGB(230, 206, 128),
-	MAKE_RGB(33, 176, 59),
-	MAKE_RGB(201, 91, 186),
-	MAKE_RGB(204, 204, 204),
-	RGB_WHITE
+	rgb_t::black,
+	rgb_t::black,
+	rgb_t(33, 200, 66),
+	rgb_t(94, 220, 120),
+	rgb_t(84, 85, 237),
+	rgb_t(125, 118, 252),
+	rgb_t(212, 82, 77),
+	rgb_t(66, 235, 245),
+	rgb_t(252, 85, 84),
+	rgb_t(255, 121, 120),
+	rgb_t(212, 193, 84),
+	rgb_t(230, 206, 128),
+	rgb_t(33, 176, 59),
+	rgb_t(201, 91, 186),
+	rgb_t(204, 204, 204),
+	rgb_t::white
 };
 
 tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva, bool is_99, const char *shortname, const char *source)
@@ -176,7 +176,7 @@ void tms9928a_device::update_backdrop()
 {
 	// update backdrop colour to transparent if EXTVID bit is set
 	if ((m_Regs[7] & 15) == 0)
-		m_palette[0] = MAKE_ARGB(m_Regs[0] & 1 ? 0 : 255,0,0,0);
+		m_palette[0] = rgb_t(m_Regs[0] & 1 ? 0 : 255,0,0,0);
 }
 
 

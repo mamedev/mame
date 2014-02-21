@@ -93,7 +93,7 @@ void ui_menu::init(running_machine &machine)
 		int alpha = 0xff;
 		if (x < 25) alpha = 0xff * x / 25;
 		if (x > 256 - 25) alpha = 0xff * (255 - x) / 25;
-		hilight_bitmap->pix32(0, x) = MAKE_ARGB(alpha,0xff,0xff,0xff);
+		hilight_bitmap->pix32(0, x) = rgb_t(alpha,0xff,0xff,0xff);
 	}
 	hilight_texture = machine.render().texture_alloc();
 	hilight_texture->set_bitmap(*hilight_bitmap, hilight_bitmap->cliprect(), TEXFORMAT_ARGB32);
@@ -1072,7 +1072,7 @@ void ui_menu::render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const 
 	int x, y;
 
 	// start with all-transparent 
-	dest.fill(MAKE_ARGB(0x00,0x00,0x00,0x00));
+	dest.fill(rgb_t(0x00,0x00,0x00,0x00));
 
 	// render from the tip to the bottom 
 	for (y = 0; y < height; y++)
@@ -1097,14 +1097,14 @@ void ui_menu::render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const 
 			if (x == 0)
 			{
 				dalpha = MIN(0xff, linewidth);
-				target[x] = MAKE_ARGB(dalpha,0xff,0xff,0xff);
+				target[x] = rgb_t(dalpha,0xff,0xff,0xff);
 			}
 
 			// remaining columns consume two pixels, one on each side 
 			else
 			{
 				dalpha = MIN(0x1fe, linewidth);
-				target[x] = target[-x] = MAKE_ARGB(dalpha/2,0xff,0xff,0xff);
+				target[x] = target[-x] = rgb_t(dalpha/2,0xff,0xff,0xff);
 			}
 
 			// account for the weight we consumed */

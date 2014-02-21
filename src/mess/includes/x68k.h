@@ -52,7 +52,8 @@ public:
 			m_tvram32(*this, "tvram32"),
 		m_maincpu(*this, "maincpu"),
 		m_okim6258(*this, "okim6258"),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<mc68901_device> m_mfpdev;
 	required_device<rp5c15_device> m_rtc;
@@ -310,6 +311,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6258_device> m_okim6258;
 	required_device<ram_device> m_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	bitmap_ind16* x68k_get_gfx_page(int pri,int type);
 	attotime prescale(int val);
 	void mfp_trigger_irq(int irq);

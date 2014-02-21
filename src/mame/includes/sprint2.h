@@ -28,7 +28,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_discrete(*this, "discrete") { }
+		m_discrete(*this, "discrete"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_attract;
 	int m_steering[2];
@@ -76,6 +77,7 @@ public:
 	int service_mode();
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /*----------- defined in audio/sprint2.c -----------*/

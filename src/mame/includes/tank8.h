@@ -39,7 +39,8 @@ public:
 		m_pos_d_ram(*this, "pos_d_ram"),
 		m_team(*this, "team"),
 		m_maincpu(*this, "maincpu"),
-		m_discrete(*this, "discrete") { }
+		m_discrete(*this, "discrete"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_collision_index;
 	required_shared_ptr<UINT8> m_video_ram;
@@ -76,6 +77,7 @@ public:
 	void tank8_set_collision(int index);
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

@@ -79,7 +79,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_vram1(*this, "vram1"),
 		m_vram2(*this, "vram2"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;
@@ -105,6 +106,7 @@ public:
 	UINT32 screen_update_pipeline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -382,7 +384,7 @@ void pipeline_state::palette_init()
 		r*=36;
 		g*=36;
 		b*=85;
-		palette_set_color(machine(), 0x100+i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), 0x100+i, rgb_t(r, g, b));
 	}
 }
 

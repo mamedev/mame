@@ -800,7 +800,7 @@ rgb_t cobra_renderer::texture_fetch(UINT32 *texture, int u, int v, int width, in
 		int g = (texel & 0x0f00) >> 4;
 		int b = (texel & 0x00f0) >> 0;
 		int a = (texel & 0x000f) | ((texel & 0x000f) << 4);
-		color = MAKE_ARGB(a, r, g, b);
+		color = rgb_t(a, r, g, b);
 	}
 	else
 	{
@@ -808,7 +808,7 @@ rgb_t cobra_renderer::texture_fetch(UINT32 *texture, int u, int v, int width, in
 		int g = (texel & 0x07c0) >> 3;
 		int b = (texel & 0x003e) << 2;
 		int a = (texel & 0x0001) ? 0xff : 0;
-		color = MAKE_ARGB(a, r, g, b);
+		color = rgb_t(a, r, g, b);
 	}
 
 	return color;
@@ -886,7 +886,7 @@ void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent,
 
 #endif
 
-			int a = RGB_ALPHA(texel);
+			int a = texel.a();
 
 			if (a != 0 || !alpha_test)
 			{
@@ -894,9 +894,9 @@ void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent,
 				UINT32 goug = (int)(gg);
 				UINT32 goub = (int)(gb);
 
-				int r = (RGB_RED(texel) * gour) >> 8;
-				int g = (RGB_GREEN(texel) * goug) >> 8;
-				int b = (RGB_BLUE(texel) * goub) >> 8;
+				int r = (texel.r() * gour) >> 8;
+				int g = (texel.g() * goug) >> 8;
+				int b = (texel.b() * goub) >> 8;
 
 				if (a != 0xff)
 				{

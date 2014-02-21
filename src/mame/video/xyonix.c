@@ -26,7 +26,7 @@ void xyonix_state::palette_init()
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 	}
 }
 

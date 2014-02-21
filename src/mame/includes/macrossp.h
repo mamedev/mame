@@ -29,7 +29,8 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_mainram(*this, "mainram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -67,6 +68,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE32_MEMBER(paletteram32_macrossp_w);
 	DECLARE_READ32_MEMBER(macrossp_soundstatus_r);
 	DECLARE_WRITE32_MEMBER(macrossp_soundcmd_w);

@@ -144,7 +144,7 @@ UINT32 kangaroo_state::screen_update_kangaroo(screen_device &screen, bitmap_rgb3
 
 	/* build up the pens arrays */
 	for (x = 0; x < 8; x++)
-		pens[x] = MAKE_RGB(pal1bit(x >> 2), pal1bit(x >> 1), pal1bit(x >> 0));
+		pens[x] = rgb_t(pal1bit(x >> 2), pal1bit(x >> 1), pal1bit(x >> 0));
 
 	/* iterate over pixels */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)

@@ -47,7 +47,7 @@ void grchamp_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 1;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		m_bgcolor[i] = MAKE_RGB(r, g, b);
+		m_bgcolor[i] = rgb_t(r, g, b);
 	}
 }
 
@@ -346,14 +346,14 @@ UINT32 grchamp_state::screen_update_grchamp(screen_device &screen, bitmap_rgb32 
 {
 	static const rgb_t objpix_lookup[8] =
 	{
-		MAKE_RGB(0,0,0),
-		MAKE_RGB(0,0,RGB_MAX),
-		MAKE_RGB(0,RGB_MAX,0),
-		MAKE_RGB(0,RGB_MAX,RGB_MAX),
-		MAKE_RGB(RGB_MAX,0,0),
-		MAKE_RGB(RGB_MAX,0,RGB_MAX),
-		MAKE_RGB(RGB_MAX,RGB_MAX,0),
-		MAKE_RGB(RGB_MAX,RGB_MAX,RGB_MAX)
+		rgb_t(0,0,0),
+		rgb_t(0,0,RGB_MAX),
+		rgb_t(0,RGB_MAX,0),
+		rgb_t(0,RGB_MAX,RGB_MAX),
+		rgb_t(RGB_MAX,0,0),
+		rgb_t(RGB_MAX,0,RGB_MAX),
+		rgb_t(RGB_MAX,RGB_MAX,0),
+		rgb_t(RGB_MAX,RGB_MAX,RGB_MAX)
 	};
 
 	const UINT8 *amedata = memregion("gfx5")->base();
@@ -523,11 +523,11 @@ mame_printf_debug("Collide bg/object @ (%d,%d)\n", x, y);
 
 			/* in which case it's black */
 			else
-				finalpix = MAKE_RGB(0,0,0);
+				finalpix = rgb_t(0,0,0);
 
 			/* if the headlamp is visible, adjust the brightness */
 			if (headbit)
-				finalpix += MAKE_RGB(64,64,64);
+				finalpix += rgb_t(64,64,64);
 
 			dest[x] = finalpix;
 		}

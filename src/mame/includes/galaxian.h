@@ -50,7 +50,8 @@ public:
 			m_ppi8255_1(*this, "ppi8255_1"),
 			m_ppi8255_2(*this, "ppi8255_2"),
 			m_spriteram(*this, "spriteram"),
-			m_videoram(*this, "videoram") { }
+			m_videoram(*this, "videoram"),
+			m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -65,6 +66,7 @@ public:
 	optional_device<i8255_device>  m_ppi8255_2;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	int m_bullets_base;
 	int m_sprites_base;

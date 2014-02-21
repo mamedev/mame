@@ -35,7 +35,7 @@ void mz_state::palette_init()
 	machine().colortable = colortable_alloc(machine(), 8);
 
 	for (i = 0; i < 8; i++)
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB((i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00, (i & 1) ? 0xff : 0x00));
+		colortable_palette_set_color(machine().colortable, i, rgb_t((i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00, (i & 1) ? 0xff : 0x00));
 
 	for (i = 0; i < 256; i++)
 	{

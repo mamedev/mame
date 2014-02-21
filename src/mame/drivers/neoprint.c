@@ -37,13 +37,15 @@ public:
 		m_npvidregs(*this, "npvidregs"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_upd4990a(*this, "upd4990a") { }
+		m_upd4990a(*this, "upd4990a"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_npvidram;
 	required_shared_ptr<UINT16> m_npvidregs;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<upd4990a_old_device> m_upd4990a;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 m_audio_result;
 	UINT8 m_bank_val;
@@ -269,7 +271,7 @@ WRITE16_MEMBER(neoprint_state::nprsp_palette_w)
 
 		pal_entry = ((offset & 0xfffe) >> 1) + ((offset & 0x20000) ? 0x8000 : 0);
 
-		palette_set_color(machine(), pal_entry, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), pal_entry, rgb_t(r,g,b));
 	}
 }
 

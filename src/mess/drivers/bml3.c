@@ -586,7 +586,7 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( update_row )
 {
 	bml3_state *state = device->machine().driver_data<bml3_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	// The MB-6890 has a 5-bit colour RAM region.  The meaning of the bits are:
 	// 0: blue
 	// 1: red

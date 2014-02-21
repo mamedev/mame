@@ -11,7 +11,8 @@ public:
 		m_vctrl_0(*this, "vctrl_0"),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
 
@@ -22,6 +23,8 @@ public:
 	required_shared_ptr<UINT16> m_vram_0;
 	required_shared_ptr<UINT16> m_vram_1;
 	required_shared_ptr<UINT16> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	UINT16 *m_vctrl_1;
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;

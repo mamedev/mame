@@ -19,7 +19,8 @@ public:
 		m_bwp3_rombase(*this, "bwp3_rombase"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bwp1_sharedram1;
@@ -54,6 +55,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(bwp12_sharedram1_w);
 	DECLARE_WRITE8_MEMBER(bwp3_u8F_w);
 	DECLARE_WRITE8_MEMBER(bwp3_nmimask_w);

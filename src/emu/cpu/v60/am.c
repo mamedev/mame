@@ -1,7 +1,7 @@
 
 // NOTE for bit string / field addressing
 // ************************************
-// cpustate->moddim must be passed as 10 for bit string instructions,
+// m_moddim must be passed as 10 for bit string instructions,
 // and as 11 for bit field instructions
 
 
@@ -14,69 +14,69 @@
 
 /*
   Input:
-  cpustate->modadd
-    cpustate->moddim
+  m_modadd
+    m_moddim
 
   Output:
-    cpustate->amout
+    m_amout
     amLength
 */
 
-static UINT32 ReadAM(v60_state *cpustate)
+UINT32 v60_device::ReadAM()
 {
-	cpustate->modm = cpustate->modm?1:0;
-	cpustate->modval = OpRead8(cpustate, cpustate->modadd);
-	return AMTable1[cpustate->modm][cpustate->modval >> 5](cpustate);
+	m_modm = m_modm?1:0;
+	m_modval = OpRead8(m_modadd);
+	return (this->*s_AMTable1[m_modm][m_modval >> 5])();
 }
 
-static UINT32 BitReadAM(v60_state *cpustate)
+UINT32 v60_device::BitReadAM()
 {
-	cpustate->modm = cpustate->modm?1:0;
-	cpustate->modval = OpRead8(cpustate, cpustate->modadd);
-	return BAMTable1[cpustate->modm][cpustate->modval >> 5](cpustate);
+	m_modm = m_modm?1:0;
+	m_modval = OpRead8(m_modadd);
+	return (this->*s_BAMTable1[m_modm][m_modval >> 5])();
 }
 
 
 
 /*
   Input:
-  cpustate->modadd
-    cpustate->moddim
+  m_modadd
+    m_moddim
 
   Output:
-    cpustate->amout
-    cpustate->amflag
+    m_amout
+    m_amflag
     amLength
 */
 
-static UINT32 ReadAMAddress(v60_state *cpustate)
+UINT32 v60_device::ReadAMAddress()
 {
-	cpustate->modm = cpustate->modm?1:0;
-	cpustate->modval = OpRead8(cpustate, cpustate->modadd);
-	return AMTable2[cpustate->modm][cpustate->modval >> 5](cpustate);
+	m_modm = m_modm?1:0;
+	m_modval = OpRead8(m_modadd);
+	return (this->*s_AMTable2[m_modm][m_modval >> 5])();
 }
 
-static UINT32 BitReadAMAddress(v60_state *cpustate)
+UINT32 v60_device::BitReadAMAddress()
 {
-	cpustate->modm = cpustate->modm?1:0;
-	cpustate->modval = OpRead8(cpustate, cpustate->modadd);
-	return BAMTable2[cpustate->modm][cpustate->modval >> 5](cpustate);
+	m_modm = m_modm?1:0;
+	m_modval = OpRead8(m_modadd);
+	return (this->*s_BAMTable2[m_modm][m_modval >> 5])();
 }
 
 /*
   Input:
-  cpustate->modadd
-    cpustate->moddim
-    cpustate->modwritevalb / H/W
+  m_modadd
+    m_moddim
+    m_modwritevalb / H/W
 
   Output:
-    cpustate->amout
+    m_amout
     amLength
 */
 
-static UINT32 WriteAM(v60_state *cpustate)
+UINT32 v60_device::WriteAM()
 {
-	cpustate->modm = cpustate->modm?1:0;
-	cpustate->modval = OpRead8(cpustate, cpustate->modadd);
-	return AMTable3[cpustate->modm][cpustate->modval >> 5](cpustate);
+	m_modm = m_modm?1:0;
+	m_modval = OpRead8(m_modadd);
+	return (this->*s_AMTable3[m_modm][m_modval >> 5])();
 }

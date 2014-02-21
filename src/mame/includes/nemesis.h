@@ -29,7 +29,8 @@ public:
 		m_filter4(*this, "filter4"),
 		m_k007232(*this, "k007232"),
 		m_k005289(*this, "k005289"),
-		m_vlm(*this, "vlm") { }
+		m_vlm(*this, "vlm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_charram;
@@ -74,6 +75,8 @@ public:
 	optional_device<k007232_device> m_k007232;
 	optional_device<k005289_device> m_k005289;
 	optional_device<vlm5030_device> m_vlm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE16_MEMBER(gx400_irq1_enable_word_w);
 	DECLARE_WRITE16_MEMBER(gx400_irq2_enable_word_w);
 	DECLARE_WRITE16_MEMBER(gx400_irq4_enable_word_w);

@@ -110,7 +110,7 @@ WRITE16_MEMBER( toobin_state::toobin_paletteram_w )
 		if (green) green += 38;
 		if (blue) blue += 38;
 
-		palette_set_color(machine(), offset & 0x3ff, MAKE_RGB(red, green, blue));
+		palette_set_color(machine(), offset & 0x3ff, rgb_t(red, green, blue));
 		if (!(newword & 0x8000))
 			palette_set_pen_contrast(machine(), offset & 0x3ff, m_brightness);
 		else
@@ -223,7 +223,7 @@ UINT32 toobin_state::screen_update_toobin(screen_device &screen, bitmap_rgb32 &b
 
 	/* draw and merge the MO */
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	const rgb_t *palette = palette_entry_list_adjusted(machine().palette);
+	const rgb_t *palette = machine().palette->entry_list_adjusted();
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32 *dest = &bitmap.pix32(y);

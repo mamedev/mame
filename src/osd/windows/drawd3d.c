@@ -164,7 +164,7 @@ INLINE UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
 	if (b < 0) b = 0;
 	else if (b > 255) b = 255;
 
-	return MAKE_ARGB(0xff, r, g, b);
+	return rgb_t(0xff, r, g, b);
 }
 
 //============================================================
@@ -520,12 +520,12 @@ void texture_manager::create_resources()
 	render_load_png(m_vector_bitmap, file, NULL, "vector.png");
 	if (m_vector_bitmap.valid())
 	{
-		m_vector_bitmap.fill(MAKE_ARGB(0xff,0xff,0xff,0xff));
+		m_vector_bitmap.fill(rgb_t(0xff,0xff,0xff,0xff));
 		render_load_png(m_vector_bitmap, file, NULL, "vector.png", true);
 	}
 
 	m_default_bitmap.allocate(8, 8);
-	m_default_bitmap.fill(MAKE_ARGB(0xff,0xff,0xff,0xff));
+	m_default_bitmap.fill(rgb_t(0xff,0xff,0xff,0xff));
 
 	if (m_default_bitmap.valid())
 	{
@@ -2269,18 +2269,18 @@ INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_
 	{
 		if (xborderpix)
 		{
-			UINT32 srcpix = *src;
-			*dst++ = 0xff000000 | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
+			rgb_t srcpix = *src;
+			*dst++ = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
 		}
 		for (x = 0; x < width; x++)
 		{
-			UINT32 srcpix = *src++;
-			*dst++ = 0xff000000 | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
+			rgb_t srcpix = *src++;
+			*dst++ = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
 		}
 		if (xborderpix)
 		{
-			UINT32 srcpix = *--src;
-			*dst++ = 0xff000000 | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
+			rgb_t srcpix = *--src;
+			*dst++ = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
 		}
 	}
 
@@ -2313,18 +2313,18 @@ INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb
 	{
 		if (xborderpix)
 		{
-			UINT32 srcpix = *src;
-			*dst++ = (srcpix & 0xff000000) | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
+			rgb_t srcpix = *src;
+			*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
 		}
 		for (x = 0; x < width; x++)
 		{
-			UINT32 srcpix = *src++;
-			*dst++ = (srcpix & 0xff000000) | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
+			rgb_t srcpix = *src++;
+			*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
 		}
 		if (xborderpix)
 		{
-			UINT32 srcpix = *--src;
-			*dst++ = (srcpix & 0xff000000) | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
+			rgb_t srcpix = *--src;
+			*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
 		}
 	}
 

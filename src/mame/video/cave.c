@@ -186,7 +186,7 @@ void cave_state::set_pens(int chip)
 	{
 		UINT16 data = m_paletteram[chip][m_palette_map[chip][pen]];
 
-		rgb_t color = MAKE_RGB(pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
+		rgb_t color = rgb_t(pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
 
 		palette_set_color(machine(), pen, color);
 	}

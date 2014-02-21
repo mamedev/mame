@@ -301,7 +301,7 @@ void galaxian_state::palette_init()
 		bit1 = BIT(color_prom[i],7);
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), i, rgb_t(r,g,b));
 	}
 
 	/*
@@ -350,13 +350,13 @@ void galaxian_state::palette_init()
 		b = starmap[(bit1 << 1) | bit0];
 
 		/* set the RGB color */
-		m_star_color[i] = MAKE_RGB(r, g, b);
+		m_star_color[i] = rgb_t(r, g, b);
 	}
 
 	/* default bullet colors are white for the first 7, and yellow for the last one */
 	for (i = 0; i < 7; i++)
-		m_bullet_color[i] = MAKE_RGB(0xff,0xff,0xff);
-	m_bullet_color[7] = MAKE_RGB(0xff,0xff,0x00);
+		m_bullet_color[i] = rgb_t(0xff,0xff,0xff);
+	m_bullet_color[7] = rgb_t(0xff,0xff,0x00);
 }
 
 PALETTE_INIT_MEMBER(galaxian_state,moonwar)
@@ -364,7 +364,7 @@ PALETTE_INIT_MEMBER(galaxian_state,moonwar)
 	galaxian_state::palette_init();
 
 	/* wire mod to connect the bullet blue output to the 220 ohm resistor */
-	m_bullet_color[7] = MAKE_RGB(0xef,0xef,0x97);
+	m_bullet_color[7] = rgb_t(0xef,0xef,0x97);
 }
 
 /*************************************
@@ -899,7 +899,7 @@ void galaxian_state::stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, UINT3
 void galaxian_state::galaxian_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* erase the background to black first */
-	bitmap.fill(RGB_BLACK, cliprect);
+	bitmap.fill(rgb_t::black, cliprect);
 
 	/* update the star origin to the current frame */
 	stars_update_origin();
@@ -927,7 +927,7 @@ void galaxian_state::background_draw_colorsplit(bitmap_rgb32 &bitmap, const rect
 		rectangle draw = cliprect;
 		draw.max_x = MIN(draw.max_x, split_flipped * GALAXIAN_XSCALE - 1);
 		if (draw.min_x <= draw.max_x)
-			bitmap.fill(RGB_BLACK, draw);
+			bitmap.fill(rgb_t::black, draw);
 
 		draw = cliprect;
 		draw.min_x = MAX(draw.min_x, split_flipped * GALAXIAN_XSCALE);
@@ -944,7 +944,7 @@ void galaxian_state::background_draw_colorsplit(bitmap_rgb32 &bitmap, const rect
 		draw = cliprect;
 		draw.min_x = MAX(draw.min_x, split * GALAXIAN_XSCALE);
 		if (draw.min_x <= draw.max_x)
-			bitmap.fill(RGB_BLACK, draw);
+			bitmap.fill(rgb_t::black, draw);
 	}
 }
 
@@ -978,7 +978,7 @@ void galaxian_state::scramble_draw_stars(bitmap_rgb32 &bitmap, const rectangle &
 void galaxian_state::scramble_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* blue background - 390 ohm resistor */
-	bitmap.fill(m_background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK, cliprect);
+	bitmap.fill(m_background_enable ? rgb_t(0,0,0x56) : rgb_t::black, cliprect);
 
 	scramble_draw_stars(bitmap, cliprect, 256);
 }
@@ -987,7 +987,7 @@ void galaxian_state::scramble_draw_background(bitmap_rgb32 &bitmap, const rectan
 void galaxian_state::anteater_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* blue background, horizontal split as seen on flyer and real cabinet */
-	background_draw_colorsplit(bitmap, cliprect, m_background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK, 56, 256-56);
+	background_draw_colorsplit(bitmap, cliprect, m_background_enable ? rgb_t(0,0,0x56) : rgb_t::black, 56, 256-56);
 
 	scramble_draw_stars(bitmap, cliprect, 256);
 }
@@ -996,7 +996,7 @@ void galaxian_state::anteater_draw_background(bitmap_rgb32 &bitmap, const rectan
 void galaxian_state::jumpbug_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* blue background - 390 ohm resistor */
-	bitmap.fill(m_background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK, cliprect);
+	bitmap.fill(m_background_enable ? rgb_t(0,0,0x56) : rgb_t::black, cliprect);
 
 	/* render stars same as scramble but nothing in the status area */
 	scramble_draw_stars(bitmap, cliprect, 240);
@@ -1012,7 +1012,7 @@ void galaxian_state::turtles_draw_background(bitmap_rgb32 &bitmap, const rectang
 	        GREEN - 470 ohm resistor
 	        BLUE  - 390 ohm resistor
 	*/
-	bitmap.fill(MAKE_RGB(m_background_red * 0x55, m_background_green * 0x47, m_background_blue * 0x55), cliprect);
+	bitmap.fill(rgb_t(m_background_red * 0x55, m_background_green * 0x47, m_background_blue * 0x55), cliprect);
 }
 
 
@@ -1020,7 +1020,7 @@ void galaxian_state::frogger_draw_background(bitmap_rgb32 &bitmap, const rectang
 {
 	/* color split point verified on real machine */
 	/* hmmm, according to schematics it is at 128+8; which is right? */
-	background_draw_colorsplit(bitmap, cliprect, MAKE_RGB(0,0,0x47), 128+8, 128-8);
+	background_draw_colorsplit(bitmap, cliprect, rgb_t(0,0,0x47), 128+8, 128-8);
 }
 
 
@@ -1068,7 +1068,7 @@ void galaxian_state::amidar_draw_background(bitmap_rgb32 &bitmap, const rectangl
 			UINT8 red = ((~prom[x] & 0x02) && m_background_red) ? 0x7c : 0x00;
 			UINT8 green = ((~prom[x] & 0x02) && m_background_green) ? 0x3c : 0x00;
 			UINT8 blue = ((~prom[x] & 0x01) && m_background_blue) ? 0x47 : 0x00;
-			bitmap.fill(MAKE_RGB(red, green, blue, draw));
+			bitmap.fill(rgb_t(red, green, blue, draw));
 		}
 }
 #endif
@@ -1126,23 +1126,23 @@ void galaxian_state::mshuttle_draw_bullet(bitmap_rgb32 &bitmap, const rectangle 
 	*/
 	static const rgb_t colors[8] =
 	{
-		MAKE_RGB(0xff,0xff,0xff),
-		MAKE_RGB(0xff,0xff,0x00),
-		MAKE_RGB(0x00,0xff,0xff),
-		MAKE_RGB(0x00,0xff,0x00),
-		MAKE_RGB(0xff,0x00,0xff),
-		MAKE_RGB(0xff,0x00,0x00),
-		MAKE_RGB(0x00,0x00,0xff),
-		MAKE_RGB(0x00,0x00,0x00)
+		rgb_t(0xff,0xff,0xff),
+		rgb_t(0xff,0xff,0x00),
+		rgb_t(0x00,0xff,0xff),
+		rgb_t(0x00,0xff,0x00),
+		rgb_t(0xff,0x00,0xff),
+		rgb_t(0xff,0x00,0x00),
+		rgb_t(0x00,0x00,0xff),
+		rgb_t(0x00,0x00,0x00)
 	};
 	--x;
-	galaxian_draw_pixel(bitmap, cliprect, y, x, ((x & 0x40) == 0) ? colors[(x >> 2) & 7] : MAKE_RGB(0xff,0x00,0xff));
+	galaxian_draw_pixel(bitmap, cliprect, y, x, ((x & 0x40) == 0) ? colors[(x >> 2) & 7] : rgb_t(0xff,0x00,0xff));
 	--x;
-	galaxian_draw_pixel(bitmap, cliprect, y, x, ((x & 0x40) == 0) ? colors[(x >> 2) & 7] : MAKE_RGB(0xff,0x00,0xff));
+	galaxian_draw_pixel(bitmap, cliprect, y, x, ((x & 0x40) == 0) ? colors[(x >> 2) & 7] : rgb_t(0xff,0x00,0xff));
 	--x;
-	galaxian_draw_pixel(bitmap, cliprect, y, x, ((x & 0x40) == 0) ? colors[(x >> 2) & 7] : MAKE_RGB(0xff,0x00,0xff));
+	galaxian_draw_pixel(bitmap, cliprect, y, x, ((x & 0x40) == 0) ? colors[(x >> 2) & 7] : rgb_t(0xff,0x00,0xff));
 	--x;
-	galaxian_draw_pixel(bitmap, cliprect, y, x, ((x & 0x40) == 0) ? colors[(x >> 2) & 7] : MAKE_RGB(0xff,0x00,0xff));
+	galaxian_draw_pixel(bitmap, cliprect, y, x, ((x & 0x40) == 0) ? colors[(x >> 2) & 7] : rgb_t(0xff,0x00,0xff));
 }
 
 
@@ -1154,7 +1154,7 @@ void galaxian_state::scramble_draw_bullet(bitmap_rgb32 &bitmap, const rectangle 
 	    rendered as yellow.
 	*/
 	x -= 6;
-	galaxian_draw_pixel(bitmap, cliprect, y, x, MAKE_RGB(0xff,0xff,0x00));
+	galaxian_draw_pixel(bitmap, cliprect, y, x, rgb_t(0xff,0xff,0x00));
 }
 
 
@@ -1162,10 +1162,10 @@ void galaxian_state::theend_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &c
 {
 	/* Same as galaxian except blue/green are swapped */
 	x -= 4;
-	galaxian_draw_pixel(bitmap, cliprect, y, x++, MAKE_RGB(RGB_RED(m_bullet_color[offs]), RGB_BLUE(m_bullet_color[offs]), RGB_GREEN(m_bullet_color[offs])));
-	galaxian_draw_pixel(bitmap, cliprect, y, x++, MAKE_RGB(RGB_RED(m_bullet_color[offs]), RGB_BLUE(m_bullet_color[offs]), RGB_GREEN(m_bullet_color[offs])));
-	galaxian_draw_pixel(bitmap, cliprect, y, x++, MAKE_RGB(RGB_RED(m_bullet_color[offs]), RGB_BLUE(m_bullet_color[offs]), RGB_GREEN(m_bullet_color[offs])));
-	galaxian_draw_pixel(bitmap, cliprect, y, x++, MAKE_RGB(RGB_RED(m_bullet_color[offs]), RGB_BLUE(m_bullet_color[offs]), RGB_GREEN(m_bullet_color[offs])));
+	galaxian_draw_pixel(bitmap, cliprect, y, x++, rgb_t(m_bullet_color[offs].r(), m_bullet_color[offs].b(), m_bullet_color[offs].g()));
+	galaxian_draw_pixel(bitmap, cliprect, y, x++, rgb_t(m_bullet_color[offs].r(), m_bullet_color[offs].b(), m_bullet_color[offs].g()));
+	galaxian_draw_pixel(bitmap, cliprect, y, x++, rgb_t(m_bullet_color[offs].r(), m_bullet_color[offs].b(), m_bullet_color[offs].g()));
+	galaxian_draw_pixel(bitmap, cliprect, y, x++, rgb_t(m_bullet_color[offs].r(), m_bullet_color[offs].b(), m_bullet_color[offs].g()));
 }
 
 

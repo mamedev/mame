@@ -122,9 +122,9 @@ void skydiver_state::palette_init()
 
 		switch (colortable_source[i])
 		{
-		case 0:   color = RGB_BLACK; break;
-		case 1:   color = RGB_WHITE; break;
-		default:  color = MAKE_RGB(0xa0, 0xa0, 0xa0); break; /* grey */
+		case 0:   color = rgb_t::black; break;
+		case 1:   color = rgb_t::white; break;
+		default:  color = rgb_t(0xa0, 0xa0, 0xa0); break; /* grey */
 		}
 
 		palette_set_color(machine(), i, color);

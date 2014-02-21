@@ -334,18 +334,18 @@ int voodoo_update(device_t *device, bitmap_rgb32 &bitmap, const rectangle &clipr
 			{
 				/* treat X as a 5-bit value, scale up to 8 bits, and linear interpolate for red/blue */
 				y = (x << 3) | (x >> 2);
-				rtable[x] = (RGB_RED(v->fbi.clut[y >> 3]) * (8 - (y & 7)) + RGB_RED(v->fbi.clut[(y >> 3) + 1]) * (y & 7)) >> 3;
-				btable[x] = (RGB_BLUE(v->fbi.clut[y >> 3]) * (8 - (y & 7)) + RGB_BLUE(v->fbi.clut[(y >> 3) + 1]) * (y & 7)) >> 3;
+				rtable[x] = (v->fbi.clut[y >> 3].r() * (8 - (y & 7)) + v->fbi.clut[(y >> 3) + 1].r() * (y & 7)) >> 3;
+				btable[x] = (v->fbi.clut[y >> 3].b() * (8 - (y & 7)) + v->fbi.clut[(y >> 3) + 1].b() * (y & 7)) >> 3;
 
 				/* treat X as a 6-bit value with LSB=0, scale up to 8 bits, and linear interpolate */
 				y = (x * 2) + 0;
 				y = (y << 2) | (y >> 4);
-				gtable[x*2+0] = (RGB_GREEN(v->fbi.clut[y >> 3]) * (8 - (y & 7)) + RGB_GREEN(v->fbi.clut[(y >> 3) + 1]) * (y & 7)) >> 3;
+				gtable[x*2+0] = (v->fbi.clut[y >> 3].g() * (8 - (y & 7)) + v->fbi.clut[(y >> 3) + 1].g() * (y & 7)) >> 3;
 
 				/* treat X as a 6-bit value with LSB=1, scale up to 8 bits, and linear interpolate */
 				y = (x * 2) + 1;
 				y = (y << 2) | (y >> 4);
-				gtable[x*2+1] = (RGB_GREEN(v->fbi.clut[y >> 3]) * (8 - (y & 7)) + RGB_GREEN(v->fbi.clut[(y >> 3) + 1]) * (y & 7)) >> 3;
+				gtable[x*2+1] = (v->fbi.clut[y >> 3].g() * (8 - (y & 7)) + v->fbi.clut[(y >> 3) + 1].g() * (y & 7)) >> 3;
 			}
 		}
 
@@ -360,18 +360,18 @@ int voodoo_update(device_t *device, bitmap_rgb32 &bitmap, const rectangle &clipr
 			{
 				/* treat X as a 5-bit value, scale up to 8 bits */
 				y = (x << 3) | (x >> 2);
-				rtable[x] = bypass ? y : RGB_RED(v->fbi.clut[which * 256 + y]);
-				btable[x] = bypass ? y : RGB_BLUE(v->fbi.clut[which * 256 + y]);
+				rtable[x] = bypass ? y : v->fbi.clut[which * 256 + y].r();
+				btable[x] = bypass ? y : v->fbi.clut[which * 256 + y].b();
 
 				/* treat X as a 6-bit value with LSB=0, scale up to 8 bits */
 				y = (x * 2) + 0;
 				y = (y << 2) | (y >> 4);
-				gtable[x*2+0] = bypass ? y : RGB_GREEN(v->fbi.clut[which * 256 + y]);
+				gtable[x*2+0] = bypass ? y : v->fbi.clut[which * 256 + y].g();
 
 				/* treat X as a 6-bit value with LSB=1, scale up to 8 bits, and linear interpolate */
 				y = (x * 2) + 1;
 				y = (y << 2) | (y >> 4);
-				gtable[x*2+1] = bypass ? y : RGB_GREEN(v->fbi.clut[which * 256 + y]);
+				gtable[x*2+1] = bypass ? y : v->fbi.clut[which * 256 + y].g();
 			}
 		}
 
@@ -381,7 +381,7 @@ int voodoo_update(device_t *device, bitmap_rgb32 &bitmap, const rectangle &clipr
 			int r = rtable[(x >> 11) & 0x1f];
 			int g = gtable[(x >> 5) & 0x3f];
 			int b = btable[x & 0x1f];
-			v->fbi.pen[x] = MAKE_RGB(r, g, b);
+			v->fbi.pen[x] = rgb_t(r, g, b);
 		}
 
 		/* no longer dirty */
@@ -487,13 +487,13 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem)
 	if (v->type <= TYPE_VOODOO_2)
 	{
 		for (pen = 0; pen < 32; pen++)
-			v->fbi.clut[pen] = MAKE_ARGB(pen, pal5bit(pen), pal5bit(pen), pal5bit(pen));
-		v->fbi.clut[32] = MAKE_ARGB(32,0xff,0xff,0xff);
+			v->fbi.clut[pen] = rgb_t(pen, pal5bit(pen), pal5bit(pen), pal5bit(pen));
+		v->fbi.clut[32] = rgb_t(32,0xff,0xff,0xff);
 	}
 	else
 	{
 		for (pen = 0; pen < 512; pen++)
-			v->fbi.clut[pen] = MAKE_RGB(pen,pen,pen);
+			v->fbi.clut[pen] = rgb_t(pen,pen,pen);
 	}
 
 	/* allocate a VBLANK timer */
@@ -520,18 +520,18 @@ static void init_tmu_shared(tmu_shared_state *s)
 
 		/* 8-bit RGB (3-3-2) */
 		EXTRACT_332_TO_888(val, r, g, b);
-		s->rgb332[val] = MAKE_ARGB(0xff, r, g, b);
+		s->rgb332[val] = rgb_t(0xff, r, g, b);
 
 		/* 8-bit alpha */
-		s->alpha8[val] = MAKE_ARGB(val, val, val, val);
+		s->alpha8[val] = rgb_t(val, val, val, val);
 
 		/* 8-bit intensity */
-		s->int8[val] = MAKE_ARGB(0xff, val, val, val);
+		s->int8[val] = rgb_t(0xff, val, val, val);
 
 		/* 8-bit alpha, intensity */
 		a = ((val >> 0) & 0xf0) | ((val >> 4) & 0x0f);
 		r = ((val << 4) & 0xf0) | ((val << 0) & 0x0f);
-		s->ai44[val] = MAKE_ARGB(a, r, r, r);
+		s->ai44[val] = rgb_t(a, r, r, r);
 	}
 
 	/* build static 16-bit texel tables */
@@ -541,15 +541,15 @@ static void init_tmu_shared(tmu_shared_state *s)
 
 		/* table 10 = 16-bit RGB (5-6-5) */
 		EXTRACT_565_TO_888(val, r, g, b);
-		s->rgb565[val] = MAKE_ARGB(0xff, r, g, b);
+		s->rgb565[val] = rgb_t(0xff, r, g, b);
 
 		/* table 11 = 16 ARGB (1-5-5-5) */
 		EXTRACT_1555_TO_8888(val, a, r, g, b);
-		s->argb1555[val] = MAKE_ARGB(a, r, g, b);
+		s->argb1555[val] = rgb_t(a, r, g, b);
 
 		/* table 12 = 16-bit ARGB (4-4-4-4) */
 		EXTRACT_4444_TO_8888(val, a, r, g, b);
-		s->argb4444[val] = MAKE_ARGB(a, r, g, b);
+		s->argb4444[val] = rgb_t(a, r, g, b);
 	}
 }
 
@@ -1205,7 +1205,7 @@ static void ncc_table_write(ncc_table *n, offs_t regnum, UINT32 data)
 			int r = ((data >> 10) & 0xfc) | ((data >> 16) & 0x03);
 			int g = ((data >>  4) & 0xfc) | ((data >> 10) & 0x03);
 			int b = ((data <<  2) & 0xfc) | ((data >>  4) & 0x03);
-			n->palettea[index] = MAKE_ARGB(a, r, g, b);
+			n->palettea[index] = rgb_t(a, r, g, b);
 		}
 
 		/* this doesn't dirty the table or go to the registers, so bail */
@@ -1274,7 +1274,7 @@ static void ncc_table_update(ncc_table *n)
 		CLAMP(b, 0, 255);
 
 		/* fill in the table */
-		n->texel[i] = MAKE_ARGB(0xff, r, g, b);
+		n->texel[i] = rgb_t(0xff, r, g, b);
 	}
 
 	/* no longer dirty */
@@ -1777,15 +1777,15 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 				{
 					if (command & (3 << 10))
 					{
-						UINT32 argb = *src++;
+						rgb_t argb = *src++;
 						if (command & (1 << 10))
 						{
-							svert.r = RGB_RED(argb);
-							svert.g = RGB_GREEN(argb);
-							svert.b = RGB_BLUE(argb);
+							svert.r = argb.r();
+							svert.g = argb.g();
+							svert.b = argb.b();
 						}
 						if (command & (1 << 11))
-							svert.a = RGB_ALPHA(argb);
+							svert.a = argb.a();
 					}
 				}
 
@@ -2450,10 +2450,11 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 		case sARGB:
 			if (chips & 1)
 			{
-				v->reg[sAlpha].f = RGB_ALPHA(data);
-				v->reg[sRed].f = RGB_RED(data);
-				v->reg[sGreen].f = RGB_GREEN(data);
-				v->reg[sBlue].f = RGB_BLUE(data);
+				rgb_t rgbdata(data);
+				v->reg[sAlpha].f = rgbdata.a();
+				v->reg[sRed].f = rgbdata.r();
+				v->reg[sGreen].f = rgbdata.g();
+				v->reg[sBlue].f = rgbdata.b();
 			}
 			break;
 

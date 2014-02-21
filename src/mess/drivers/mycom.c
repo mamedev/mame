@@ -130,7 +130,7 @@ void mycom_state::video_start()
 static MC6845_UPDATE_ROW( mycom_update_row )
 {
 	mycom_state *state = device->machine().driver_data<mycom_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx=0,z;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

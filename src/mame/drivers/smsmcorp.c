@@ -495,7 +495,7 @@ void smsmfg_state::palette_init()
 
 	for (i = 0; i < 8; i++ )
 	{
-		palette_set_color(machine(), i, MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i)));
+		palette_set_color(machine(), i, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i)));
 	}
 }
 

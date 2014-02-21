@@ -238,8 +238,8 @@ WRITE8_MEMBER(nitedrvr_state::nitedrvr_out1_w)
 		m_crash_data_en = 1;
 		m_crash_data = 0x0f;
 		/* Invert video */
-		palette_set_color(machine(), 1, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-		palette_set_color(machine(), 0, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+		palette_set_color(machine(), 1, rgb_t(0x00,0x00,0x00)); /* BLACK */
+		palette_set_color(machine(), 0, rgb_t(0xff,0xff,0xff)); /* WHITE */
 	}
 	discrete_sound_w(m_discrete, space, NITEDRVR_BANG_DATA, m_crash_data_en ? m_crash_data : 0);    // Crash Volume
 }
@@ -258,14 +258,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_state::nitedrvr_crash_toggle_callback)
 		if (m_crash_data & 0x01)
 		{
 			/* Invert video */
-			palette_set_color(machine(), 1, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-			palette_set_color(machine(), 0, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+			palette_set_color(machine(), 1, rgb_t(0x00,0x00,0x00)); /* BLACK */
+			palette_set_color(machine(), 0, rgb_t(0xff,0xff,0xff)); /* WHITE */
 		}
 		else
 		{
 			/* Normal video */
-			palette_set_color(machine(), 0, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-			palette_set_color(machine(), 1, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+			palette_set_color(machine(), 0, rgb_t(0x00,0x00,0x00)); /* BLACK */
+			palette_set_color(machine(), 1, rgb_t(0xff,0xff,0xff)); /* WHITE */
 		}
 	}
 }

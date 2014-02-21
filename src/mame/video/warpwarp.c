@@ -13,9 +13,9 @@
 
 static const rgb_t geebee_palette[] =
 {
-	MAKE_RGB(0x00,0x00,0x00), /* black */
-	MAKE_RGB(0xff,0xff,0xff), /* white */
-	MAKE_RGB(0x7f,0x7f,0x7f)  /* grey  */
+	rgb_t(0x00,0x00,0x00), /* black */
+	rgb_t(0xff,0xff,0xff), /* white */
+	rgb_t(0x7f,0x7f,0x7f)  /* grey  */
 };
 
 PALETTE_INIT_MEMBER(warpwarp_state,geebee)
@@ -95,11 +95,11 @@ PALETTE_INIT_MEMBER(warpwarp_state,warpwarp)
 		bit1 = (i >> 7) & 0x01;
 		b = combine_2_weights(weights_tiles_b, bit0, bit1);
 
-		palette_set_color(machine(), (i * 2) + 0, RGB_BLACK);
-		palette_set_color(machine(), (i * 2) + 1, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), (i * 2) + 0, rgb_t::black);
+		palette_set_color(machine(), (i * 2) + 1, rgb_t(r, g, b));
 	}
 
-	palette_set_color(machine(), 0x200, MAKE_RGB(weight_ball[0], weight_ball[0], weight_ball[0]));
+	palette_set_color(machine(), 0x200, rgb_t(weight_ball[0], weight_ball[0], weight_ball[0]));
 }
 
 

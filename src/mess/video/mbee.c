@@ -419,7 +419,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr )
 MC6845_UPDATE_ROW( mbee_update_row )
 {
 	mbee_state *state = device->machine().driver_data<mbee_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -458,7 +458,7 @@ MC6845_UPDATE_ROW( mbee_update_row )
 MC6845_UPDATE_ROW( mbeeic_update_row )
 {
 	mbee_state *state = device->machine().driver_data<mbee_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx,fg,bg;
 	UINT16 mem,x,col;
 	UINT16 colourm = (state->m_08 & 0x0e) << 7;
@@ -502,7 +502,7 @@ MC6845_UPDATE_ROW( mbeeic_update_row )
 MC6845_UPDATE_ROW( mbeeppc_update_row )
 {
 	mbee_state *state = device->machine().driver_data<mbee_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 gfx,fg,bg;
 	UINT16 mem,x,col,chr;
 	UINT32 *p = &bitmap.pix32(y);
@@ -574,7 +574,7 @@ PALETTE_INIT_MEMBER(mbee_state,mbeeic)
 		r = level[((i>>0)&1)|((i>>2)&2)];
 		g = level[((i>>1)&1)|((i>>3)&2)];
 		b = level[((i>>2)&1)|((i>>4)&2)];
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 
 	/* set up foreground palette (64-95) by reading the prom */
@@ -584,7 +584,7 @@ PALETTE_INIT_MEMBER(mbee_state,mbeeic)
 		r = level[((k>>2)&1)|((k>>4)&2)];
 		g = level[((k>>1)&1)|((k>>3)&2)];
 		b = level[((k>>0)&1)|((k>>2)&2)];
-		palette_set_color(machine(), i|64, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i|64, rgb_t(r, g, b));
 	}
 }
 
@@ -602,7 +602,7 @@ PALETTE_INIT_MEMBER(mbee_state,mbeepc85b)
 		r = level[((i>>0)&1)|((i>>2)&2)];
 		g = level[((i>>1)&1)|((i>>3)&2)];
 		b = level[((i>>2)&1)|((i>>4)&2)];
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 
 	level[2] = 0xff;
@@ -614,7 +614,7 @@ PALETTE_INIT_MEMBER(mbee_state,mbeepc85b)
 		r = level[((k>>2)&1)|((k>>4)&2)];
 		g = level[((k>>1)&1)|((k>>3)&2)];
 		b = level[((k>>0)&1)|((k>>2)&2)];
-		palette_set_color(machine(), i|64, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i|64, rgb_t(r, g, b));
 	}
 }
 
@@ -630,7 +630,7 @@ PALETTE_INIT_MEMBER(mbee_state,mbeeppc)
 		r = (i & 1) ? 0xc0 : 0;
 		g = (i & 2) ? 0xc0 : 0;
 		b = (i & 4) ? 0xc0 : 0;
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 
 	/* set up 8 high intensity colours */
@@ -639,6 +639,6 @@ PALETTE_INIT_MEMBER(mbee_state,mbeeppc)
 		r = (i & 1) ? 0xff : 0;
 		g = (i & 2) ? 0xff : 0;
 		b = (i & 4) ? 0xff : 0;
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }

@@ -160,6 +160,7 @@ public:
 	const char *m_nubus_tag, *m_nubus_slottag;
 	int m_slot;
 	device_nubus_card_interface *m_next;
+	dynamic_buffer m_declaration_rom;
 };
 
 #endif  /* __NUBUS_H__ */

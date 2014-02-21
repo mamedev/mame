@@ -18,7 +18,8 @@ public:
 	mgolf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
@@ -34,6 +35,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(mgolf_vram_w);
 	DECLARE_READ8_MEMBER(mgolf_wram_r);
 	DECLARE_READ8_MEMBER(mgolf_dial_r);
@@ -282,10 +285,10 @@ INPUT_PORTS_END
 
 void mgolf_state::palette_init()
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0x80, 0x80, 0x80));
-	palette_set_color(machine(), 1, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 2, MAKE_RGB(0x80, 0x80, 0x80));
-	palette_set_color(machine(), 3, MAKE_RGB(0xff, 0xff, 0xff));
+	palette_set_color(machine(), 0, rgb_t(0x80, 0x80, 0x80));
+	palette_set_color(machine(), 1, rgb_t(0x00, 0x00, 0x00));
+	palette_set_color(machine(), 2, rgb_t(0x80, 0x80, 0x80));
+	palette_set_color(machine(), 3, rgb_t(0xff, 0xff, 0xff));
 }
 
 static const gfx_layout tile_layout =

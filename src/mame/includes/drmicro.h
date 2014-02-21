@@ -11,7 +11,8 @@ public:
 	drmicro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_msm(*this, "msm"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	UINT8 *        m_videoram;
@@ -40,4 +41,5 @@ public:
 	INTERRUPT_GEN_MEMBER(drmicro_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(pcm_w);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

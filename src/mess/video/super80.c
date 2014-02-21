@@ -58,7 +58,7 @@ void super80_state::palette_set_colors_rgb(const UINT8 *colors)
 	while (color_count--)
 	{
 		r = *colors++; g = *colors++; b = *colors++;
-		palette_set_color(machine(), 15-color_count, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), 15-color_count, rgb_t(r, g, b));
 	}
 }
 
@@ -389,7 +389,7 @@ UINT32 super80_state::screen_update_super80v(screen_device &screen, bitmap_rgb32
 MC6845_UPDATE_ROW( super80v_update_row )
 {
 	super80_state *state = device->machine().driver_data<super80_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,col,gfx,fg,bg=0;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

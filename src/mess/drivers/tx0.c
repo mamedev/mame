@@ -263,7 +263,7 @@ void tx0_state::palette_init()
 		g = (int) ((g1*cur_level_1 + g2*cur_level_2) + .5);
 		b = (int) ((b1*cur_level_1 + b2*cur_level_2) + .5);
 		/* write color in palette */
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 		/* apply decay for next iteration */
 		cur_level_1 *= decay_1;
 		cur_level_2 *= decay_2;
@@ -283,13 +283,13 @@ void tx0_state::palette_init()
 	    mame_printf_debug("File %s line %d: Please take higher value for pen_crt_num_levels or smaller value for decay\n", __FILE__, __LINE__);*/
 #endif
 #endif
-	colortable_palette_set_color(machine().colortable, 0, MAKE_RGB(0, 0, 0));
+	colortable_palette_set_color(machine().colortable, 0, rgb_t(0, 0, 0));
 
 	/* load static palette */
 	for ( i = 0; i < 6; i++ )
 	{
 		r = tx0_colors[i*3]; g = tx0_colors[i*3+1]; b = tx0_colors[i*3+2];
-		colortable_palette_set_color(machine().colortable, pen_crt_num_levels + i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, pen_crt_num_levels + i, rgb_t(r, g, b));
 	}
 
 	/* copy colortable to palette */

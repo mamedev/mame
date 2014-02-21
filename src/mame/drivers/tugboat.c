@@ -39,10 +39,13 @@ public:
 	tugboat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, "ram") { }
+		m_ram(*this, "ram"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	UINT8 m_hd46505_0_reg[18];
 	UINT8 m_hd46505_1_reg[18];
 	int m_reg0;
@@ -98,7 +101,7 @@ void tugboat_state::palette_init()
 		g = brt * ((color_prom[i] >> 1) & 0x01);
 		b = brt * ((color_prom[i] >> 2) & 0x01);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 	}
 }
 

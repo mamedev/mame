@@ -69,13 +69,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rtc(*this, RP5C15_TAG),
 		m_pit(*this, "pit"),
-		m_beeper(*this, "beeper")
+		m_beeper(*this, "beeper"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<rp5c15_device> m_rtc;
 	required_device<pit8253_device> m_pit;
 	required_device<beep_device> m_beeper;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 *m_main_ram;
 	UINT8 *m_ipl_rom;

@@ -2,13 +2,13 @@
 #define __VECTOR__
 
 #define VECTOR_COLOR111(c) \
-	MAKE_RGB(pal1bit((c) >> 2), pal1bit((c) >> 1), pal1bit((c) >> 0))
+	rgb_t(pal1bit((c) >> 2), pal1bit((c) >> 1), pal1bit((c) >> 0))
 
 #define VECTOR_COLOR222(c) \
-	MAKE_RGB(pal2bit((c) >> 4), pal2bit((c) >> 2), pal2bit((c) >> 0))
+	rgb_t(pal2bit((c) >> 4), pal2bit((c) >> 2), pal2bit((c) >> 0))
 
 #define VECTOR_COLOR444(c) \
-	MAKE_RGB(pal4bit((c) >> 8), pal4bit((c) >> 4), pal4bit((c) >> 0))
+	rgb_t(pal4bit((c) >> 8), pal4bit((c) >> 4), pal4bit((c) >> 0))
 
 
 /* The vertices are buffered here */

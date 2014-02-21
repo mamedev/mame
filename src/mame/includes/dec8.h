@@ -25,7 +25,8 @@ public:
 		m_spritegen_krn(*this, "spritegen_krn"),
 		m_spritegen_mxc(*this, "spritegen_mxc"),
 		m_videoram(*this, "videoram"),
-		m_bg_data(*this, "bg_data") { }
+		m_bg_data(*this, "bg_data"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -42,6 +43,8 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_bg_data;
+	
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 *  m_pf1_data;
 	UINT8 *  m_row;

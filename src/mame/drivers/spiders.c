@@ -343,7 +343,7 @@ static MC6845_BEGIN_UPDATE( begin_update )
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		state->m_pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		state->m_pens[i] = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
 
 	return state->m_pens;

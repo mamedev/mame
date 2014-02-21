@@ -1573,7 +1573,7 @@ void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y
 {
 	int sx;
 
-	for (sx = 0; sx < m_pitch * 2; sx++)
+	for (sx = 0; sx < 80; sx++)
 	{
 		if((sx << 3) < m_aw * 16 && y < m_al)
 			m_display_cb(this, bitmap, y, sx << 3, addr);
@@ -1600,17 +1600,21 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 
 		if (im || force_bitmap)
 		{
-			get_graphics_partition(area, &sad, &len, &im, &wd);
+			//get_graphics_partition(area, &sad, &len, &im, &wd);
 
-			if(area >= 2) // TODO: correct?
+			if(area >= 3) // TODO: most likely to be correct, Quarth (PC-98xx) definitely draws with area 2. We might see an area 3 someday ...
 				break;
 
 			for (y = 0; y < len; y++)
 			{
+				/* TODO: again correct?
+				         Quarth (PC-98xx) doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
+				         Xevious (PC-98xx) wants the pitch to be fixed at 80, and wants bsy to be /1
+				         Dragon Buster (PC-98xx) contradicts with Xevious with regards of the pitch tho ... */
 				addr = ((sad << 1) & 0x3ffff) + (y * m_pitch * 2);
 
 				if (m_display_cb)
-					draw_graphics_line(bitmap, addr, y + bsy, wd);
+					draw_graphics_line(bitmap, addr, y + bsy/((m_pitch == 40)+1), wd);
 			}
 		}
 		else

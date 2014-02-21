@@ -320,7 +320,7 @@ void ssingles_state::video_start()
 		int i;
 		for(i=0;i<NUM_PENS;++i)
 		{
-			m_pens[i]=MAKE_RGB(ssingles_colors[3*i], ssingles_colors[3*i+1], ssingles_colors[3*i+2]);
+			m_pens[i]=rgb_t(ssingles_colors[3*i], ssingles_colors[3*i+1], ssingles_colors[3*i+2]);
 		}
 	}
 }

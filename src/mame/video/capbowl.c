@@ -117,7 +117,7 @@ READ8_MEMBER(capbowl_state::bowlrama_blitter_r)
 
 inline rgb_t capbowl_state::pen_for_pixel( UINT8 *src, UINT8 pix )
 {
-	return MAKE_RGB(pal4bit(src[(pix << 1) + 0] >> 0),
+	return rgb_t(pal4bit(src[(pix << 1) + 0] >> 0),
 					pal4bit(src[(pix << 1) + 1] >> 4),
 					pal4bit(src[(pix << 1) + 1] >> 0));
 }

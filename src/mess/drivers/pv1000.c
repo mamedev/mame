@@ -143,7 +143,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "pv1000_sound"),
-		m_p_videoram(*this, "p_videoram")
+		m_p_videoram(*this, "p_videoram"),
+		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
 	DECLARE_WRITE8_MEMBER(pv1000_io_w);
@@ -172,6 +173,7 @@ public:
 	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
 	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pv1000_cart );
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

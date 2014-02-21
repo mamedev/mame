@@ -39,8 +39,6 @@ const device_type VIDEOBRAIN_EXPANSION_SLOT = &device_creator<videobrain_expansi
 
 device_videobrain_expansion_card_interface::device_videobrain_expansion_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
-		m_ram(NULL),
 		m_rom_mask(0),
 		m_ram_mask(0)
 {
@@ -63,9 +61,9 @@ device_videobrain_expansion_card_interface::~device_videobrain_expansion_card_in
 
 UINT8* device_videobrain_expansion_card_interface::videobrain_rom_pointer(running_machine &machine, size_t size)
 {
-	if (m_rom == NULL)
+	if (m_rom.count() == 0)
 	{
-		m_rom = auto_alloc_array(machine, UINT8, size);
+		m_rom.resize(size);
 
 		m_rom_mask = size - 1;
 	}
@@ -80,9 +78,9 @@ UINT8* device_videobrain_expansion_card_interface::videobrain_rom_pointer(runnin
 
 UINT8* device_videobrain_expansion_card_interface::videobrain_ram_pointer(running_machine &machine, size_t size)
 {
-	if (m_ram == NULL)
+	if (m_ram.count() == 0)
 	{
-		m_ram = auto_alloc_array(machine, UINT8, size);
+		m_ram.resize(size);
 
 		m_ram_mask = size - 1;
 	}

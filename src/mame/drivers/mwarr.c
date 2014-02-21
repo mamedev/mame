@@ -62,7 +62,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_mwarr_ram(*this, "mwarr_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_oki2(*this, "oki2") { }
+		m_oki2(*this, "oki2"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
@@ -105,6 +106,7 @@ public:
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki2;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

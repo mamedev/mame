@@ -24,7 +24,8 @@ public:
 			m_z80_mainram(*this, "z80_mainram"),
 			m_mainram(*this, "sram"),
 			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu")
+			m_soundcpu(*this, "soundcpu"),
+			m_gfxdecode(*this, "gfxdecode")
 		{
 			m_irq4_disabled = 0;
 		}
@@ -51,6 +52,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 	device_t *m_ics;
 
 	/* used by rendering */

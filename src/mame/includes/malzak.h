@@ -16,13 +16,15 @@ public:
 			m_s2636_0(*this, "s2636_0"),
 			m_s2636_1(*this, "s2636_1"),
 			m_trom(*this, "saa5050"),
-			m_videoram(*this, "videoram") { }
+			m_videoram(*this, "videoram"),
+			m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s2636_device> m_s2636_0;
 	required_device<s2636_device> m_s2636_1;
 	required_device<saa5050_device> m_trom;
 	required_shared_ptr<UINT8> m_videoram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* misc */
 //  int playfield_x[256];

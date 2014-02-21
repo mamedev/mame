@@ -89,7 +89,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_spr(*this, "spr"),
-		m_vregs(*this, "vregs")
+		m_vregs(*this, "vregs"),
+		m_gfxdecode(*this, "gfxdecode")
 
 	{
 		tilemap_base[0] = 0xf0000;
@@ -106,6 +107,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_spr;
 	required_shared_ptr<UINT16> m_vregs;
+	optional_device<gfxdecode_device> m_gfxdecode;
 
 	UINT16* m_vram;
 	UINT16* m_vram_rearranged;
@@ -653,6 +655,8 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz/16)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

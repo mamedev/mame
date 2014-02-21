@@ -272,8 +272,8 @@ UINT32 senjyo_state::screen_update_senjyo(screen_device &screen, bitmap_ind16 &b
 
 
 	/* two colors for the radar dots (verified on the real board) */
-	palette_set_color(machine(),512,MAKE_RGB(0xff,0x00,0x00));  /* red for enemies */
-	palette_set_color(machine(),513,MAKE_RGB(0xff,0xff,0x00));  /* yellow for player */
+	palette_set_color(machine(),512,rgb_t(0xff,0x00,0x00));  /* red for enemies */
+	palette_set_color(machine(),513,rgb_t(0xff,0xff,0x00));  /* yellow for player */
 
 	{
 		int flip = flip_screen();

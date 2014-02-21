@@ -66,7 +66,8 @@ public:
 		m_gms_vidram(*this, "gms_vidram"),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_gms_vidram2;
 	required_shared_ptr<UINT16> m_gms_vidram;
@@ -86,6 +87,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

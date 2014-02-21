@@ -467,7 +467,7 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 	texinfo.osddata = m_osddata;
 
 	// are we scaler-free? if so, just return the source bitmap
-	const rgb_t *palbase = (m_format == TEXFORMAT_PALETTE16 || m_format == TEXFORMAT_PALETTEA16) ? palette_entry_list_adjusted(m_bitmap->palette()) : NULL;
+	const rgb_t *palbase = (m_format == TEXFORMAT_PALETTE16 || m_format == TEXFORMAT_PALETTEA16) ? m_bitmap->palette()->entry_list_adjusted() : NULL;
 	if (m_scaler == NULL || (m_bitmap != NULL && swidth == dwidth && sheight == dheight))
 	{
 		// add a reference and set up the source bitmap
@@ -554,7 +554,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 
 			// if no adjustment necessary, return the raw palette
 			assert(m_bitmap->palette() != NULL);
-			adjusted = palette_entry_list_adjusted(m_bitmap->palette());
+			adjusted = m_bitmap->palette()->entry_list_adjusted();
 			if (!container.has_brightness_contrast_gamma_changes())
 				return adjusted;
 
@@ -564,7 +564,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 				return adjusted;
 
 			// otherwise, ensure we have memory allocated and compute the adjusted result ourself
-			numentries = palette_get_num_colors(m_bitmap->palette()) * palette_get_num_groups(m_bitmap->palette());
+			numentries = m_bitmap->palette()->num_colors() * m_bitmap->palette()->num_groups();
 			if (m_bcglookup == NULL || m_bcglookup_entries < numentries)
 			{
 				rgb_t *newlookup = auto_alloc_array(m_manager->machine(), rgb_t, numentries);
@@ -575,10 +575,10 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 			}
 			for (int index = 0; index < numentries; index++)
 			{
-				UINT8 r = container.apply_brightness_contrast_gamma(RGB_RED(adjusted[index]));
-				UINT8 g = container.apply_brightness_contrast_gamma(RGB_GREEN(adjusted[index]));
-				UINT8 b = container.apply_brightness_contrast_gamma(RGB_BLUE(adjusted[index]));
-				m_bcglookup[index] = MAKE_ARGB(RGB_ALPHA(adjusted[index]), r, g, b);
+				UINT8 r = container.apply_brightness_contrast_gamma(adjusted[index].r());
+				UINT8 g = container.apply_brightness_contrast_gamma(adjusted[index].g());
+				UINT8 b = container.apply_brightness_contrast_gamma(adjusted[index].b());
+				m_bcglookup[index] = rgb_t(adjusted[index].a(), r, g, b);
 			}
 			return m_bcglookup;
 
@@ -620,7 +620,7 @@ render_container::render_container(render_manager &manager, screen_device *scree
 {
 	// all palette entries are opaque by default
 	for (int color = 0; color < ARRAY_LENGTH(m_bcglookup); color++)
-		m_bcglookup[color] = MAKE_ARGB(0xff,0x00,0x00,0x00);
+		m_bcglookup[color] = rgb_t(0xff,0x00,0x00,0x00);
 
 	// make sure it is empty
 	empty();
@@ -637,7 +637,7 @@ render_container::render_container(render_manager &manager, screen_device *scree
 
 	// allocate a client to the main palette
 	if (manager.machine().palette != NULL)
-		m_palclient = palette_client_alloc(manager.machine().palette);
+		m_palclient = global_alloc(palette_client(*manager.machine().palette));
 	recompute_lookups();
 }
 
@@ -655,8 +655,7 @@ render_container::~render_container()
 	m_manager.texture_free(m_overlaytexture);
 
 	// release our palette client
-	if (m_palclient != NULL)
-		palette_client_free(m_palclient);
+	global_free(m_palclient);
 }
 
 
@@ -772,7 +771,7 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 	{
 		case TEXFORMAT_PALETTE16:
 		case TEXFORMAT_PALETTEA16:
-			return (palette != NULL && palette == palette_client_get_palette(m_palclient)) ? m_bcglookup : NULL;
+			return (palette != NULL && palette == &m_palclient->palette()) ? m_bcglookup : NULL;
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
@@ -824,10 +823,10 @@ render_container::item &render_container::add_generic(UINT8 type, float x0, floa
 	newitem->m_bounds.y0 = y0;
 	newitem->m_bounds.x1 = x1;
 	newitem->m_bounds.y1 = y1;
-	newitem->m_color.r = (float)RGB_RED(argb) * (1.0f / 255.0f);
-	newitem->m_color.g = (float)RGB_GREEN(argb) * (1.0f / 255.0f);
-	newitem->m_color.b = (float)RGB_BLUE(argb) * (1.0f / 255.0f);
-	newitem->m_color.a = (float)RGB_ALPHA(argb) * (1.0f / 255.0f);
+	newitem->m_color.r = (float)argb.r() * (1.0f / 255.0f);
+	newitem->m_color.g = (float)argb.g() * (1.0f / 255.0f);
+	newitem->m_color.b = (float)argb.b() * (1.0f / 255.0f);
+	newitem->m_color.a = (float)argb.a() * (1.0f / 255.0f);
 	newitem->m_flags = 0;
 	newitem->m_internal = 0;
 	newitem->m_width = 0;
@@ -858,17 +857,17 @@ void render_container::recompute_lookups()
 	// recompute the palette entries
 	if (m_palclient != NULL)
 	{
-		palette_t *palette = palette_client_get_palette(m_palclient);
-		const pen_t *adjusted_palette = palette_entry_list_adjusted(palette);
-		int colors = palette_get_num_colors(palette) * palette_get_num_groups(palette);
+		palette_t &palette = m_palclient->palette();
+		const rgb_t *adjusted_palette = palette.entry_list_adjusted();
+		int colors = palette.num_colors() * palette.num_groups();
 
 		for (int i = 0; i < colors; i++)
 		{
-			pen_t newval = adjusted_palette[i];
+			rgb_t newval = adjusted_palette[i];
 			m_bcglookup[i] = (newval & 0xff000000) |
-										m_bcglookup256[0x200 + RGB_RED(newval)] |
-										m_bcglookup256[0x100 + RGB_GREEN(newval)] |
-										m_bcglookup256[0x000 + RGB_BLUE(newval)];
+										m_bcglookup256[0x200 + newval.r()] |
+										m_bcglookup256[0x100 + newval.g()] |
+										m_bcglookup256[0x000 + newval.b()];
 		}
 	}
 }
@@ -887,13 +886,13 @@ void render_container::update_palette()
 
 	// get the dirty list
 	UINT32 mindirty, maxdirty;
-	const UINT32 *dirty = palette_client_get_dirty_list(m_palclient, &mindirty, &maxdirty);
+	const UINT32 *dirty = m_palclient->dirty_list(mindirty, maxdirty);
 
 	// iterate over dirty items and update them
 	if (dirty != NULL)
 	{
-		palette_t *palette = palette_client_get_palette(m_palclient);
-		const pen_t *adjusted_palette = palette_entry_list_adjusted(palette);
+		palette_t &palette = m_palclient->palette();
+		const rgb_t *adjusted_palette = palette.entry_list_adjusted();
 
 		// loop over chunks of 32 entries, since we can quickly examine 32 at a time
 		for (UINT32 entry32 = mindirty / 32; entry32 <= maxdirty / 32; entry32++)
@@ -908,9 +907,9 @@ void render_container::update_palette()
 						UINT32 finalentry = entry32 * 32 + entry;
 						rgb_t newval = adjusted_palette[finalentry];
 						m_bcglookup[finalentry] = (newval & 0xff000000) |
-														m_bcglookup256[0x200 + RGB_RED(newval)] |
-														m_bcglookup256[0x100 + RGB_GREEN(newval)] |
-														m_bcglookup256[0x000 + RGB_BLUE(newval)];
+														m_bcglookup256[0x200 + newval.r()] |
+														m_bcglookup256[0x100 + newval.g()] |
+														m_bcglookup256[0x000 + newval.b()];
 					}
 		}
 	}

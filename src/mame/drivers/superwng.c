@@ -37,7 +37,8 @@ public:
 		m_videoram_bg(*this, "videorabg"),
 		m_videoram_fg(*this, "videorafg"),
 		m_colorram_bg(*this, "colorrabg"),
-		m_colorram_fg(*this, "colorrafg")
+		m_colorram_fg(*this, "colorrafg"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -46,6 +47,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram_fg;
 	required_shared_ptr<UINT8> m_colorram_bg;
 	required_shared_ptr<UINT8> m_colorram_fg;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 m_tile_bank;
 	UINT8 m_sound_byte;
@@ -195,7 +197,7 @@ void superwng_state::palette_init()
 		bit1 = BIT(*ptr, 7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 		++ptr;
 	}
 }

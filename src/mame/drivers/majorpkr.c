@@ -463,7 +463,8 @@ public:
 	majorpkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			oki(*this, "oki") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_mux_data;
 	int m_palette_bank;
@@ -496,6 +497,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -588,7 +590,7 @@ WRITE8_MEMBER(majorpkr_state::paletteram_w)
 
 	offset >>= 1;
 	int color = m_generic_paletteram_8[m_palette_bank * 0x800 + offset * 2] + m_generic_paletteram_8[m_palette_bank * 0x800 + offset * 2 + 1] * 256;
-	palette_set_color(machine(), offset + m_palette_bank * 256 * 4, MAKE_RGB(pal5bit(color >> 5), pal5bit(color >> 10), pal5bit(color)));
+	palette_set_color(machine(), offset + m_palette_bank * 256 * 4, rgb_t(pal5bit(color >> 5), pal5bit(color >> 10), pal5bit(color)));
 }
 
 

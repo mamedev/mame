@@ -85,6 +85,12 @@
 
 #include <time.h>
 
+#ifdef SDLMAME_EMSCRIPTEN
+#include <emscripten.h>
+
+void js_set_main_loop(running_machine * machine);
+#endif
+
 
 
 //**************************************************************************
@@ -95,41 +101,6 @@
 static char giant_string_buffer[65536] = { 0 };
 
 
-
-//**************************************************************************
-//  JAVASCRIPT PORT-SPECIFIC
-//**************************************************************************
-
-#ifdef SDLMAME_EMSCRIPTEN
-#include <emscripten.h>
-
-static running_machine * jsmess_machine;
-
-void js_main_loop() {
-	device_scheduler * scheduler;
-	scheduler = &(jsmess_machine->scheduler());
-	attotime stoptime = scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60));
-	while (scheduler->time() < stoptime) {
-		scheduler->timeslice();
-	}
-}
-
-void js_set_main_loop(running_machine * machine) {
-	jsmess_machine = machine;
-	EM_ASM (
-		JSMESS.running = true;
-	);
-	emscripten_set_main_loop(&js_main_loop, 0, 1);
-}
-
-running_machine * js_get_machine() {
-	return jsmess_machine;
-}
-
-ui_manager * js_get_ui() {
-	return &(jsmess_machine->ui());
-}
-#endif
 
 //**************************************************************************
 //  RUNNING MACHINE
@@ -1402,3 +1373,44 @@ void system_time::full_time::set(struct tm &t)
 	day     = t.tm_yday;
 	is_dst  = t.tm_isdst;
 }
+
+
+
+//**************************************************************************
+//  JAVASCRIPT PORT-SPECIFIC
+//**************************************************************************
+
+#ifdef SDLMAME_EMSCRIPTEN
+
+static running_machine * jsmess_machine;
+
+void js_main_loop() {
+	device_scheduler * scheduler;
+	scheduler = &(jsmess_machine->scheduler());
+	attotime stoptime = scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60));
+	while (scheduler->time() < stoptime) {
+		scheduler->timeslice();
+	}
+}
+
+void js_set_main_loop(running_machine * machine) {
+	jsmess_machine = machine;
+	EM_ASM (
+		JSMESS.running = true;
+	);
+	emscripten_set_main_loop(&js_main_loop, 0, 1);
+}
+
+running_machine * js_get_machine() {
+	return jsmess_machine;
+}
+
+ui_manager * js_get_ui() {
+	return &(jsmess_machine->ui());
+}
+
+sound_manager * js_get_sound() {
+	return &(jsmess_machine->sound());
+}
+
+#endif /* SDLMAME_EMSCRIPTEN */

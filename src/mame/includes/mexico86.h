@@ -12,7 +12,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
 		m_mcu(*this, "mcu"),
-		m_ymsnd(*this, "ymsnd")
+		m_ymsnd(*this, "ymsnd"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -45,6 +46,7 @@ public:
 	optional_device<cpu_device> m_subcpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<ym2203_device> m_ymsnd;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* queue */
 	UINT8 m_queue[64];

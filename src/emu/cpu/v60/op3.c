@@ -1,639 +1,639 @@
-static UINT32 opINCB(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opINCB() /* TRUSTED */
 {
 	UINT8 appb;
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 0;
+	m_modadd = PC + 1;
+	m_moddim = 0;
 
-	cpustate->amlength1 = ReadAMAddress(cpustate);
+	m_amlength1 = ReadAMAddress();
 
-	if (cpustate->amflag)
-		appb = (UINT8)cpustate->reg[cpustate->amout];
+	if (m_amflag)
+		appb = (UINT8)m_reg[m_amout];
 	else
-		appb = cpustate->program->read_byte(cpustate->amout);
+		appb = m_program->read_byte(m_amout);
 
 	ADDB(appb, 1);
 
-	if (cpustate->amflag)
-		SETREG8(cpustate->reg[cpustate->amout], appb);
+	if (m_amflag)
+		SETREG8(m_reg[m_amout], appb);
 	else
-		cpustate->program->write_byte(cpustate->amout, appb);
+		m_program->write_byte(m_amout, appb);
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opINCH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opINCH() /* TRUSTED */
 {
 	UINT16 apph;
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 1;
+	m_modadd = PC + 1;
+	m_moddim = 1;
 
-	cpustate->amlength1 = ReadAMAddress(cpustate);
+	m_amlength1 = ReadAMAddress();
 
-	if (cpustate->amflag)
-		apph = (UINT16)cpustate->reg[cpustate->amout];
+	if (m_amflag)
+		apph = (UINT16)m_reg[m_amout];
 	else
-		apph = cpustate->program->read_word_unaligned(cpustate->amout);
+		apph = m_program->read_word_unaligned(m_amout);
 
 	ADDW(apph, 1);
 
-	if (cpustate->amflag)
-		SETREG16(cpustate->reg[cpustate->amout], apph);
+	if (m_amflag)
+		SETREG16(m_reg[m_amout], apph);
 	else
-		cpustate->program->write_word_unaligned(cpustate->amout, apph);
+		m_program->write_word_unaligned(m_amout, apph);
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opINCW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opINCW() /* TRUSTED */
 {
 	UINT32 appw;
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 2;
+	m_modadd = PC + 1;
+	m_moddim = 2;
 
-	cpustate->amlength1 = ReadAMAddress(cpustate);
+	m_amlength1 = ReadAMAddress();
 
-	if (cpustate->amflag)
-		appw = cpustate->reg[cpustate->amout];
+	if (m_amflag)
+		appw = m_reg[m_amout];
 	else
-		appw = cpustate->program->read_dword_unaligned(cpustate->amout);
+		appw = m_program->read_dword_unaligned(m_amout);
 
 	ADDL(appw, 1);
 
-	if (cpustate->amflag)
-		cpustate->reg[cpustate->amout] = appw;
+	if (m_amflag)
+		m_reg[m_amout] = appw;
 	else
-		cpustate->program->write_dword_unaligned(cpustate->amout, appw);
+		m_program->write_dword_unaligned(m_amout, appw);
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opDECB(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opDECB() /* TRUSTED */
 {
 	UINT8 appb;
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 0;
+	m_modadd = PC + 1;
+	m_moddim = 0;
 
-	cpustate->amlength1 = ReadAMAddress(cpustate);
+	m_amlength1 = ReadAMAddress();
 
-	if (cpustate->amflag)
-		appb = (UINT8)cpustate->reg[cpustate->amout];
+	if (m_amflag)
+		appb = (UINT8)m_reg[m_amout];
 	else
-		appb = cpustate->program->read_byte(cpustate->amout);
+		appb = m_program->read_byte(m_amout);
 
 	SUBB(appb, 1);
 
-	if (cpustate->amflag)
-		SETREG8(cpustate->reg[cpustate->amout], appb);
+	if (m_amflag)
+		SETREG8(m_reg[m_amout], appb);
 	else
-		cpustate->program->write_byte(cpustate->amout, appb);
+		m_program->write_byte(m_amout, appb);
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opDECH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opDECH() /* TRUSTED */
 {
 	UINT16 apph;
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 1;
+	m_modadd = PC + 1;
+	m_moddim = 1;
 
-	cpustate->amlength1 = ReadAMAddress(cpustate);
+	m_amlength1 = ReadAMAddress();
 
-	if (cpustate->amflag)
-		apph = (UINT16)cpustate->reg[cpustate->amout];
+	if (m_amflag)
+		apph = (UINT16)m_reg[m_amout];
 	else
-		apph = cpustate->program->read_word_unaligned(cpustate->amout);
+		apph = m_program->read_word_unaligned(m_amout);
 
 	SUBW(apph, 1);
 
-	if (cpustate->amflag)
-		SETREG16(cpustate->reg[cpustate->amout], apph);
+	if (m_amflag)
+		SETREG16(m_reg[m_amout], apph);
 	else
-		cpustate->program->write_word_unaligned(cpustate->amout, apph);
+		m_program->write_word_unaligned(m_amout, apph);
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opDECW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opDECW() /* TRUSTED */
 {
 	UINT32 appw;
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 2;
+	m_modadd = PC + 1;
+	m_moddim = 2;
 
-	cpustate->amlength1 = ReadAMAddress(cpustate);
+	m_amlength1 = ReadAMAddress();
 
-	if (cpustate->amflag)
-		appw = cpustate->reg[cpustate->amout];
+	if (m_amflag)
+		appw = m_reg[m_amout];
 	else
-		appw = cpustate->program->read_dword_unaligned(cpustate->amout);
+		appw = m_program->read_dword_unaligned(m_amout);
 
 	SUBL(appw, 1);
 
-	if (cpustate->amflag)
-		cpustate->reg[cpustate->amout] = appw;
+	if (m_amflag)
+		m_reg[m_amout] = appw;
 	else
-		cpustate->program->write_dword_unaligned(cpustate->amout, appw);
+		m_program->write_dword_unaligned(m_amout, appw);
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opJMP(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opJMP() /* TRUSTED */
 {
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 0;
+	m_modadd = PC + 1;
+	m_moddim = 0;
 
 	// Read the address of the operand
-	ReadAMAddress(cpustate);
+	ReadAMAddress();
 
 	// It cannot be a register!!
-	assert(cpustate->amflag == 0);
+	assert(m_amflag == 0);
 
 	// Jump there
-	cpustate->PC = cpustate->amout;
+	PC = m_amout;
 
 	return 0;
 }
 
-static UINT32 opJSR(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opJSR() /* TRUSTED */
 {
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 0;
+	m_modadd = PC + 1;
+	m_moddim = 0;
 
 	// Read the address of the operand
-	cpustate->amlength1 = ReadAMAddress(cpustate);
+	m_amlength1 = ReadAMAddress();
 
 	// It cannot be a register!!
-	assert(cpustate->amflag == 0);
+	assert(m_amflag == 0);
 
 	// Save NextPC into the stack
-	cpustate->SP -= 4;
-	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->PC + cpustate->amlength1 + 1);
+	SP -= 4;
+	m_program->write_dword_unaligned(SP, PC + m_amlength1 + 1);
 
 	// Jump there
-	cpustate->PC = cpustate->amout;
+	PC = m_amout;
 
 	return 0;
 }
 
-static UINT32 opPREPARE(v60_state *cpustate)    /* somewhat TRUSTED */
+UINT32 v60_device::opPREPARE()    /* somewhat TRUSTED */
 {
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 2;
+	m_modadd = PC + 1;
+	m_moddim = 2;
 
 	// Read the operand
-	cpustate->amlength1 = ReadAM(cpustate);
+	m_amlength1 = ReadAM();
 
 	// step 1: save frame pointer on the stack
-	cpustate->SP -= 4;
-	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->FP);
+	SP -= 4;
+	m_program->write_dword_unaligned(SP, FP);
 
-	// step 2: cpustate->FP = new cpustate->SP
-	cpustate->FP = cpustate->SP;
+	// step 2: FP = new SP
+	FP = SP;
 
-	// step 3: cpustate->SP -= operand
-	cpustate->SP -= cpustate->amout;
+	// step 3: SP -= operand
+	SP -= m_amout;
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opRET(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opRET() /* TRUSTED */
 {
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 2;
+	m_modadd = PC + 1;
+	m_moddim = 2;
 
 	// Read the operand
-	ReadAM(cpustate);
+	ReadAM();
 
 	// Read return address from stack
-	cpustate->PC = cpustate->program->read_dword_unaligned(cpustate->SP);
-	cpustate->SP +=4;
+	PC = m_program->read_dword_unaligned(SP);
+	SP +=4;
 
-	// Restore cpustate->AP from stack
-	cpustate->AP = cpustate->program->read_dword_unaligned(cpustate->SP);
-	cpustate->SP +=4;
+	// Restore AP from stack
+	AP = m_program->read_dword_unaligned(SP);
+	SP +=4;
 
 	// Skip stack frame
-	cpustate->SP += cpustate->amout;
+	SP += m_amout;
 
 	return 0;
 }
 
-static UINT32 opTRAP(v60_state *cpustate)
+UINT32 v60_device::opTRAP()
 {
 	UINT32 oldPSW;
 
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 0;
+	m_modadd = PC + 1;
+	m_moddim = 0;
 
 	// Read the operand
-	cpustate->amlength1 = ReadAM(cpustate);
+	m_amlength1 = ReadAM();
 
 	// Normalize the flags
-	NORMALIZEFLAGS(cpustate);
+	NORMALIZEFLAGS();
 
-	switch ((cpustate->amout >> 4) & 0xF)
+	switch ((m_amout >> 4) & 0xF)
 	{
 	case 0:
-		if (!cpustate->_OV) return cpustate->amlength1 + 1;
+		if (!_OV) return m_amlength1 + 1;
 		else break;
 	case 1:
-		if (cpustate->_OV) return cpustate->amlength1 + 1;
+		if (_OV) return m_amlength1 + 1;
 		else break;
 	case 2:
-		if (!cpustate->_CY) return cpustate->amlength1 + 1;
+		if (!_CY) return m_amlength1 + 1;
 		else break;
 	case 3:
-		if (cpustate->_CY) return cpustate->amlength1 + 1;
+		if (_CY) return m_amlength1 + 1;
 		else break;
 	case 4:
-		if (!cpustate->_Z) return cpustate->amlength1 + 1;
+		if (!_Z) return m_amlength1 + 1;
 		else break;
 	case 5:
-		if (cpustate->_Z) return cpustate->amlength1 + 1;
+		if (_Z) return m_amlength1 + 1;
 		else break;
 	case 6:
-		if (!(cpustate->_CY | cpustate->_Z)) return cpustate->amlength1 + 1;
+		if (!(_CY | _Z)) return m_amlength1 + 1;
 		else break;
 	case 7:
-		if ((cpustate->_CY | cpustate->_Z)) return cpustate->amlength1 + 1;
+		if ((_CY | _Z)) return m_amlength1 + 1;
 		else break;
 	case 8:
-		if (!cpustate->_S) return cpustate->amlength1 + 1;
+		if (!_S) return m_amlength1 + 1;
 		else break;
 	case 9:
-		if (cpustate->_S) return cpustate->amlength1 + 1;
+		if (_S) return m_amlength1 + 1;
 		else break;
 	case 10:
 		break;
 	case 11:
-		return cpustate->amlength1 + 1;
+		return m_amlength1 + 1;
 	case 12:
-		if (!(cpustate->_S^cpustate->_OV)) return cpustate->amlength1 + 1;
+		if (!(_S^_OV)) return m_amlength1 + 1;
 		else break;
 	case 13:
-		if ((cpustate->_S^cpustate->_OV)) return cpustate->amlength1 + 1;
+		if ((_S^_OV)) return m_amlength1 + 1;
 		else break;
 	case 14:
-		if (!((cpustate->_S^cpustate->_OV)|cpustate->_Z)) return cpustate->amlength1 + 1;
+		if (!((_S^_OV)|_Z)) return m_amlength1 + 1;
 		else break;
 	case 15:
-		if (((cpustate->_S^cpustate->_OV)|cpustate->_Z)) return cpustate->amlength1 + 1;
+		if (((_S^_OV)|_Z)) return m_amlength1 + 1;
 		else break;
 	}
 
-	oldPSW = v60_update_psw_for_exception(cpustate, 0, 0);
+	oldPSW = v60_update_psw_for_exception(0, 0);
 
 	// Issue the software trap with interrupts
-	cpustate->SP -= 4;
-	cpustate->program->write_dword_unaligned(cpustate->SP, EXCEPTION_CODE_AND_SIZE(0x3000 + 0x100 * (cpustate->amout & 0xF), 4));
+	SP -= 4;
+	m_program->write_dword_unaligned(SP, EXCEPTION_CODE_AND_SIZE(0x3000 + 0x100 * (m_amout & 0xF), 4));
 
-	cpustate->SP -= 4;
-	cpustate->program->write_dword_unaligned(cpustate->SP, oldPSW);
+	SP -= 4;
+	m_program->write_dword_unaligned(SP, oldPSW);
 
-	cpustate->SP -= 4;
-	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->PC + cpustate->amlength1 + 1);
+	SP -= 4;
+	m_program->write_dword_unaligned(SP, PC + m_amlength1 + 1);
 
-	cpustate->PC = GETINTVECT(cpustate, 48 + (cpustate->amout & 0xF));
+	PC = GETINTVECT(48 + (m_amout & 0xF));
 
 	return 0;
 }
 
-static UINT32 opRETIU(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opRETIU() /* TRUSTED */
 {
 	UINT32 newPSW;
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 1;
+	m_modadd = PC + 1;
+	m_moddim = 1;
 
 	// Read the operand
-	ReadAM(cpustate);
+	ReadAM();
 
-	// Restore cpustate->PC and cpustate->PSW from stack
-	cpustate->PC = cpustate->program->read_dword_unaligned(cpustate->SP);
-	cpustate->SP += 4;
+	// Restore PC and PSW from stack
+	PC = m_program->read_dword_unaligned(SP);
+	SP += 4;
 
-	newPSW = cpustate->program->read_dword_unaligned(cpustate->SP);
-	cpustate->SP += 4;
+	newPSW = m_program->read_dword_unaligned(SP);
+	SP += 4;
 
 	// Destroy stack frame
-	cpustate->SP += cpustate->amout;
+	SP += m_amout;
 
-	v60WritePSW(cpustate, newPSW);
+	v60WritePSW(newPSW);
 
 	return 0;
 }
 
-static UINT32 opRETIS(v60_state *cpustate)
+UINT32 v60_device::opRETIS()
 {
 	UINT32 newPSW;
 
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 1;
+	m_modadd = PC + 1;
+	m_moddim = 1;
 
 	// Read the operand
-	ReadAM(cpustate);
+	ReadAM();
 
-	// Restore cpustate->PC and cpustate->PSW from stack
-	cpustate->PC = cpustate->program->read_dword_unaligned(cpustate->SP);
-	cpustate->SP += 4;
+	// Restore PC and PSW from stack
+	PC = m_program->read_dword_unaligned(SP);
+	SP += 4;
 
-	newPSW = cpustate->program->read_dword_unaligned(cpustate->SP);
-	cpustate->SP += 4;
+	newPSW = m_program->read_dword_unaligned(SP);
+	SP += 4;
 
 	// Destroy stack frame
-	cpustate->SP += cpustate->amout;
+	SP += m_amout;
 
-	v60WritePSW(cpustate, newPSW);
+	v60WritePSW(newPSW);
 
 	return 0;
 }
 
-static UINT32 opSTTASK(v60_state *cpustate)
+UINT32 v60_device::opSTTASK()
 {
 	int i;
 	UINT32 adr;
 
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 2;
+	m_modadd = PC + 1;
+	m_moddim = 2;
 
-	cpustate->amlength1 = ReadAM(cpustate);
+	m_amlength1 = ReadAM();
 
-	adr = cpustate->TR;
+	adr = TR;
 
-	v60WritePSW(cpustate, v60ReadPSW(cpustate) | 0x10000000);
-	v60SaveStack(cpustate);
+	v60WritePSW(v60ReadPSW() | 0x10000000);
+	v60SaveStack();
 
-	cpustate->program->write_dword_unaligned(adr, cpustate->TKCW);
+	m_program->write_dword_unaligned(adr, TKCW);
 	adr += 4;
-	if(cpustate->SYCW & 0x100) {
-		cpustate->program->write_dword_unaligned(adr, cpustate->L0SP);
+	if(SYCW & 0x100) {
+		m_program->write_dword_unaligned(adr, L0SP);
 		adr += 4;
 	}
-	if(cpustate->SYCW & 0x200) {
-		cpustate->program->write_dword_unaligned(adr, cpustate->L1SP);
+	if(SYCW & 0x200) {
+		m_program->write_dword_unaligned(adr, L1SP);
 		adr += 4;
 	}
-	if(cpustate->SYCW & 0x400) {
-		cpustate->program->write_dword_unaligned(adr, cpustate->L2SP);
+	if(SYCW & 0x400) {
+		m_program->write_dword_unaligned(adr, L2SP);
 		adr += 4;
 	}
-	if(cpustate->SYCW & 0x800) {
-		cpustate->program->write_dword_unaligned(adr, cpustate->L3SP);
+	if(SYCW & 0x800) {
+		m_program->write_dword_unaligned(adr, L3SP);
 		adr += 4;
 	}
 
 	// 31 registers supported, _not_ 32
 	for(i = 0; i < 31; i++)
-		if(cpustate->amout & (1 << i)) {
-			cpustate->program->write_dword_unaligned(adr, cpustate->reg[i]);
+		if(m_amout & (1 << i)) {
+			m_program->write_dword_unaligned(adr, m_reg[i]);
 			adr += 4;
 		}
 
 	// #### Ignore the virtual addressing crap.
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opGETPSW(v60_state *cpustate)
+UINT32 v60_device::opGETPSW()
 {
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 2;
-	cpustate->modwritevalw = v60ReadPSW(cpustate);
+	m_modadd = PC + 1;
+	m_moddim = 2;
+	m_modwritevalw = v60ReadPSW();
 
-	// Write cpustate->PSW to the operand
-	cpustate->amlength1 = WriteAM(cpustate);
+	// Write PSW to the operand
+	m_amlength1 = WriteAM();
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opTASI(v60_state *cpustate)
+UINT32 v60_device::opTASI()
 {
 	UINT8 appb;
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 0;
+	m_modadd = PC + 1;
+	m_moddim = 0;
 
 	// Load the address of the operand
-	cpustate->amlength1 = ReadAMAddress(cpustate);
+	m_amlength1 = ReadAMAddress();
 
 	// Load UINT8 from the address
-	if (cpustate->amflag)
-		appb = (UINT8)cpustate->reg[cpustate->amout & 0x1F];
+	if (m_amflag)
+		appb = (UINT8)m_reg[m_amout & 0x1F];
 	else
-		appb = cpustate->program->read_byte(cpustate->amout);
+		appb = m_program->read_byte(m_amout);
 
 	// Set the flags for SUB appb, FF
 	SUBB(appb, 0xff);
 
 	// Write FF in the operand
-	if (cpustate->amflag)
-		SETREG8(cpustate->reg[cpustate->amout & 0x1F], 0xFF);
+	if (m_amflag)
+		SETREG8(m_reg[m_amout & 0x1F], 0xFF);
 	else
-		cpustate->program->write_byte(cpustate->amout, 0xFF);
+		m_program->write_byte(m_amout, 0xFF);
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opCLRTLB(v60_state *cpustate)
+UINT32 v60_device::opCLRTLB()
 {
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 2;
+	m_modadd = PC + 1;
+	m_moddim = 2;
 
 	// Read the operand
-	cpustate->amlength1 = ReadAM(cpustate);
+	m_amlength1 = ReadAM();
 
 	// @@@ TLB not yet emulated
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opPOPM(v60_state *cpustate)
+UINT32 v60_device::opPOPM()
 {
 	int i;
 
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 2;
+	m_modadd = PC + 1;
+	m_moddim = 2;
 
 	// Read the bit register list
-	cpustate->amlength1 = ReadAM(cpustate);
+	m_amlength1 = ReadAM();
 
 	for (i = 0;i < 31;i++)
-		if (cpustate->amout & (1 << i))
+		if (m_amout & (1 << i))
 		{
-			cpustate->reg[i] = cpustate->program->read_dword_unaligned(cpustate->SP);
-			cpustate->SP += 4;
+			m_reg[i] = m_program->read_dword_unaligned(SP);
+			SP += 4;
 		}
 
-	if (cpustate->amout & (1 << 31))
+	if (m_amout & (1 << 31))
 	{
-		v60WritePSW(cpustate, (v60ReadPSW(cpustate) & 0xffff0000) | cpustate->program->read_word_unaligned(cpustate->SP));
-		cpustate->SP += 4;
+		v60WritePSW((v60ReadPSW() & 0xffff0000) | m_program->read_word_unaligned(SP));
+		SP += 4;
 	}
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opPUSHM(v60_state *cpustate)
+UINT32 v60_device::opPUSHM()
 {
 	int i;
 
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 2;
+	m_modadd = PC + 1;
+	m_moddim = 2;
 
 	// Read the bit register list
-	cpustate->amlength1 = ReadAM(cpustate);
+	m_amlength1 = ReadAM();
 
-	if (cpustate->amout & (1 << 31))
+	if (m_amout & (1 << 31))
 	{
-		cpustate->SP -= 4;
-		cpustate->program->write_dword_unaligned(cpustate->SP, v60ReadPSW(cpustate));
+		SP -= 4;
+		m_program->write_dword_unaligned(SP, v60ReadPSW());
 	}
 
 	for (i = 0;i < 31;i++)
-		if (cpustate->amout & (1 << (30 - i)))
+		if (m_amout & (1 << (30 - i)))
 		{
-			cpustate->SP -= 4;
-			cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->reg[(30 - i)]);
+			SP -= 4;
+			m_program->write_dword_unaligned(SP, m_reg[(30 - i)]);
 		}
 
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opTESTB(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opTESTB() /* TRUSTED */
 {
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 0;
+	m_modadd = PC + 1;
+	m_moddim = 0;
 
 	// Read the operand
-	cpustate->amlength1 = ReadAM(cpustate);
+	m_amlength1 = ReadAM();
 
-	cpustate->_Z = (cpustate->amout == 0);
-	cpustate->_S = ((cpustate->amout & 0x80) != 0);
-	cpustate->_CY = 0;
-	cpustate->_OV = 0;
+	_Z = (m_amout == 0);
+	_S = ((m_amout & 0x80) != 0);
+	_CY = 0;
+	_OV = 0;
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opTESTH(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opTESTH() /* TRUSTED */
 {
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 1;
+	m_modadd = PC + 1;
+	m_moddim = 1;
 
 	// Read the operand
-	cpustate->amlength1 = ReadAM(cpustate);
+	m_amlength1 = ReadAM();
 
-	cpustate->_Z = (cpustate->amout == 0);
-	cpustate->_S = ((cpustate->amout & 0x8000) != 0);
-	cpustate->_CY = 0;
-	cpustate->_OV = 0;
+	_Z = (m_amout == 0);
+	_S = ((m_amout & 0x8000) != 0);
+	_CY = 0;
+	_OV = 0;
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opTESTW(v60_state *cpustate) /* TRUSTED */
+UINT32 v60_device::opTESTW() /* TRUSTED */
 {
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 2;
+	m_modadd = PC + 1;
+	m_moddim = 2;
 
 	// Read the operand
-	cpustate->amlength1 = ReadAM(cpustate);
+	m_amlength1 = ReadAM();
 
-	cpustate->_Z = (cpustate->amout == 0);
-	cpustate->_S = ((cpustate->amout & 0x80000000) != 0);
-	cpustate->_CY = 0;
-	cpustate->_OV = 0;
+	_Z = (m_amout == 0);
+	_S = ((m_amout & 0x80000000) != 0);
+	_CY = 0;
+	_OV = 0;
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opPUSH(v60_state *cpustate)
+UINT32 v60_device::opPUSH()
 {
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 2;
+	m_modadd = PC + 1;
+	m_moddim = 2;
 
-	cpustate->amlength1 = ReadAM(cpustate);
+	m_amlength1 = ReadAM();
 
-	cpustate->SP-=4;
-	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->amout);
+	SP-=4;
+	m_program->write_dword_unaligned(SP, m_amout);
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
-static UINT32 opPOP(v60_state *cpustate)
+UINT32 v60_device::opPOP()
 {
-	cpustate->modadd = cpustate->PC + 1;
-	cpustate->moddim = 2;
-	cpustate->modwritevalw = cpustate->program->read_dword_unaligned(cpustate->SP);
-	cpustate->SP +=4;
-	cpustate->amlength1 = WriteAM(cpustate);
+	m_modadd = PC + 1;
+	m_moddim = 2;
+	m_modwritevalw = m_program->read_dword_unaligned(SP);
+	SP +=4;
+	m_amlength1 = WriteAM();
 
-	return cpustate->amlength1 + 1;
+	return m_amlength1 + 1;
 }
 
 
-static UINT32 opINCB_0(v60_state *cpustate) { cpustate->modm = 0; return opINCB(cpustate); }
-static UINT32 opINCB_1(v60_state *cpustate) { cpustate->modm = 1; return opINCB(cpustate); }
-static UINT32 opINCH_0(v60_state *cpustate) { cpustate->modm = 0; return opINCH(cpustate); }
-static UINT32 opINCH_1(v60_state *cpustate) { cpustate->modm = 1; return opINCH(cpustate); }
-static UINT32 opINCW_0(v60_state *cpustate) { cpustate->modm = 0; return opINCW(cpustate); }
-static UINT32 opINCW_1(v60_state *cpustate) { cpustate->modm = 1; return opINCW(cpustate); }
+UINT32 v60_device::opINCB_0() { m_modm = 0; return opINCB(); }
+UINT32 v60_device::opINCB_1() { m_modm = 1; return opINCB(); }
+UINT32 v60_device::opINCH_0() { m_modm = 0; return opINCH(); }
+UINT32 v60_device::opINCH_1() { m_modm = 1; return opINCH(); }
+UINT32 v60_device::opINCW_0() { m_modm = 0; return opINCW(); }
+UINT32 v60_device::opINCW_1() { m_modm = 1; return opINCW(); }
 
-static UINT32 opDECB_0(v60_state *cpustate) { cpustate->modm = 0; return opDECB(cpustate); }
-static UINT32 opDECB_1(v60_state *cpustate) { cpustate->modm = 1; return opDECB(cpustate); }
-static UINT32 opDECH_0(v60_state *cpustate) { cpustate->modm = 0; return opDECH(cpustate); }
-static UINT32 opDECH_1(v60_state *cpustate) { cpustate->modm = 1; return opDECH(cpustate); }
-static UINT32 opDECW_0(v60_state *cpustate) { cpustate->modm = 0; return opDECW(cpustate); }
-static UINT32 opDECW_1(v60_state *cpustate) { cpustate->modm = 1; return opDECW(cpustate); }
+UINT32 v60_device::opDECB_0() { m_modm = 0; return opDECB(); }
+UINT32 v60_device::opDECB_1() { m_modm = 1; return opDECB(); }
+UINT32 v60_device::opDECH_0() { m_modm = 0; return opDECH(); }
+UINT32 v60_device::opDECH_1() { m_modm = 1; return opDECH(); }
+UINT32 v60_device::opDECW_0() { m_modm = 0; return opDECW(); }
+UINT32 v60_device::opDECW_1() { m_modm = 1; return opDECW(); }
 
-static UINT32 opJMP_0(v60_state *cpustate) { cpustate->modm = 0; return opJMP(cpustate); }
-static UINT32 opJMP_1(v60_state *cpustate) { cpustate->modm = 1; return opJMP(cpustate); }
+UINT32 v60_device::opJMP_0() { m_modm = 0; return opJMP(); }
+UINT32 v60_device::opJMP_1() { m_modm = 1; return opJMP(); }
 
-static UINT32 opJSR_0(v60_state *cpustate) { cpustate->modm = 0; return opJSR(cpustate); }
-static UINT32 opJSR_1(v60_state *cpustate) { cpustate->modm = 1; return opJSR(cpustate); }
+UINT32 v60_device::opJSR_0() { m_modm = 0; return opJSR(); }
+UINT32 v60_device::opJSR_1() { m_modm = 1; return opJSR(); }
 
-static UINT32 opPREPARE_0(v60_state *cpustate) { cpustate->modm = 0; return opPREPARE(cpustate); }
-static UINT32 opPREPARE_1(v60_state *cpustate) { cpustate->modm = 1; return opPREPARE(cpustate); }
+UINT32 v60_device::opPREPARE_0() { m_modm = 0; return opPREPARE(); }
+UINT32 v60_device::opPREPARE_1() { m_modm = 1; return opPREPARE(); }
 
-static UINT32 opRET_0(v60_state *cpustate) { cpustate->modm = 0; return opRET(cpustate); }
-static UINT32 opRET_1(v60_state *cpustate) { cpustate->modm = 1; return opRET(cpustate); }
+UINT32 v60_device::opRET_0() { m_modm = 0; return opRET(); }
+UINT32 v60_device::opRET_1() { m_modm = 1; return opRET(); }
 
-static UINT32 opTRAP_0(v60_state *cpustate) { cpustate->modm = 0; return opTRAP(cpustate); }
-static UINT32 opTRAP_1(v60_state *cpustate) { cpustate->modm = 1; return opTRAP(cpustate); }
+UINT32 v60_device::opTRAP_0() { m_modm = 0; return opTRAP(); }
+UINT32 v60_device::opTRAP_1() { m_modm = 1; return opTRAP(); }
 
-static UINT32 opRETIU_0(v60_state *cpustate) { cpustate->modm = 0; return opRETIU(cpustate); }
-static UINT32 opRETIU_1(v60_state *cpustate) { cpustate->modm = 1; return opRETIU(cpustate); }
+UINT32 v60_device::opRETIU_0() { m_modm = 0; return opRETIU(); }
+UINT32 v60_device::opRETIU_1() { m_modm = 1; return opRETIU(); }
 
-static UINT32 opRETIS_0(v60_state *cpustate) { cpustate->modm = 0; return opRETIS(cpustate); }
-static UINT32 opRETIS_1(v60_state *cpustate) { cpustate->modm = 1; return opRETIS(cpustate); }
+UINT32 v60_device::opRETIS_0() { m_modm = 0; return opRETIS(); }
+UINT32 v60_device::opRETIS_1() { m_modm = 1; return opRETIS(); }
 
-static UINT32 opGETPSW_0(v60_state *cpustate) { cpustate->modm = 0; return opGETPSW(cpustate); }
-static UINT32 opGETPSW_1(v60_state *cpustate) { cpustate->modm = 1; return opGETPSW(cpustate); }
+UINT32 v60_device::opGETPSW_0() { m_modm = 0; return opGETPSW(); }
+UINT32 v60_device::opGETPSW_1() { m_modm = 1; return opGETPSW(); }
 
-static UINT32 opTASI_0(v60_state *cpustate) { cpustate->modm = 0; return opTASI(cpustate); }
-static UINT32 opTASI_1(v60_state *cpustate) { cpustate->modm = 1; return opTASI(cpustate); }
+UINT32 v60_device::opTASI_0() { m_modm = 0; return opTASI(); }
+UINT32 v60_device::opTASI_1() { m_modm = 1; return opTASI(); }
 
-static UINT32 opCLRTLB_0(v60_state *cpustate) { cpustate->modm = 0; return opCLRTLB(cpustate); }
-static UINT32 opCLRTLB_1(v60_state *cpustate) { cpustate->modm = 1; return opCLRTLB(cpustate); }
+UINT32 v60_device::opCLRTLB_0() { m_modm = 0; return opCLRTLB(); }
+UINT32 v60_device::opCLRTLB_1() { m_modm = 1; return opCLRTLB(); }
 
-static UINT32 opPOPM_0(v60_state *cpustate) { cpustate->modm = 0; return opPOPM(cpustate); }
-static UINT32 opPOPM_1(v60_state *cpustate) { cpustate->modm = 1; return opPOPM(cpustate); }
+UINT32 v60_device::opPOPM_0() { m_modm = 0; return opPOPM(); }
+UINT32 v60_device::opPOPM_1() { m_modm = 1; return opPOPM(); }
 
-static UINT32 opPUSHM_0(v60_state *cpustate) { cpustate->modm = 0; return opPUSHM(cpustate); }
-static UINT32 opPUSHM_1(v60_state *cpustate) { cpustate->modm = 1; return opPUSHM(cpustate); }
+UINT32 v60_device::opPUSHM_0() { m_modm = 0; return opPUSHM(); }
+UINT32 v60_device::opPUSHM_1() { m_modm = 1; return opPUSHM(); }
 
-static UINT32 opTESTB_0(v60_state *cpustate) { cpustate->modm = 0; return opTESTB(cpustate); }
-static UINT32 opTESTB_1(v60_state *cpustate) { cpustate->modm = 1; return opTESTB(cpustate); }
+UINT32 v60_device::opTESTB_0() { m_modm = 0; return opTESTB(); }
+UINT32 v60_device::opTESTB_1() { m_modm = 1; return opTESTB(); }
 
-static UINT32 opTESTH_0(v60_state *cpustate) { cpustate->modm = 0; return opTESTH(cpustate); }
-static UINT32 opTESTH_1(v60_state *cpustate) { cpustate->modm = 1; return opTESTH(cpustate); }
+UINT32 v60_device::opTESTH_0() { m_modm = 0; return opTESTH(); }
+UINT32 v60_device::opTESTH_1() { m_modm = 1; return opTESTH(); }
 
-static UINT32 opTESTW_0(v60_state *cpustate) { cpustate->modm = 0; return opTESTW(cpustate); }
-static UINT32 opTESTW_1(v60_state *cpustate) { cpustate->modm = 1; return opTESTW(cpustate); }
+UINT32 v60_device::opTESTW_0() { m_modm = 0; return opTESTW(); }
+UINT32 v60_device::opTESTW_1() { m_modm = 1; return opTESTW(); }
 
-static UINT32 opPUSH_0(v60_state *cpustate) { cpustate->modm = 0; return opPUSH(cpustate); }
-static UINT32 opPUSH_1(v60_state *cpustate) { cpustate->modm = 1; return opPUSH(cpustate); }
+UINT32 v60_device::opPUSH_0() { m_modm = 0; return opPUSH(); }
+UINT32 v60_device::opPUSH_1() { m_modm = 1; return opPUSH(); }
 
-static UINT32 opPOP_0(v60_state *cpustate) { cpustate->modm = 0; return opPOP(cpustate); }
-static UINT32 opPOP_1(v60_state *cpustate) { cpustate->modm = 1; return opPOP(cpustate); }
+UINT32 v60_device::opPOP_0() { m_modm = 0; return opPOP(); }
+UINT32 v60_device::opPOP_1() { m_modm = 1; return opPOP(); }
 
-static UINT32 opSTTASK_0(v60_state *cpustate) { cpustate->modm = 0; return opSTTASK(cpustate); }
-static UINT32 opSTTASK_1(v60_state *cpustate) { cpustate->modm = 1; return opSTTASK(cpustate); }
+UINT32 v60_device::opSTTASK_0() { m_modm = 0; return opSTTASK(); }
+UINT32 v60_device::opSTTASK_1() { m_modm = 1; return opSTTASK(); }

@@ -426,6 +426,7 @@ public:
 	optional_device<okim6295_device> m_oki;
 
 	optional_device<atari_sound_comm_device> m_soundcomm;
+	optional_device<gfxdecode_device> m_gfxdecode;
 };
 
 

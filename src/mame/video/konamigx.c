@@ -1679,7 +1679,7 @@ UINT32 konamigx_state::screen_update_konamigx_left(screen_device &screen, bitmap
 				g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
 				b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 
-				palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+				palette_set_color(machine(),offset,rgb_t(r,g,b));
 			}
 		}
 
@@ -1724,7 +1724,7 @@ UINT32 konamigx_state::screen_update_konamigx_right(screen_device &screen, bitma
 				g = (m_subpaletteram32[offset] >> 8) & 0xff;
 				b = (m_subpaletteram32[offset] >> 0) & 0xff;
 
-				palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+				palette_set_color(machine(),offset,rgb_t(r,g,b));
 			}
 		}
 
@@ -1746,7 +1746,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_palette_w)
 	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
 	b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,rgb_t(r,g,b));
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1762,7 +1762,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_palette2_w)
 
 	offset += (0x8000/4);
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,rgb_t(r,g,b));
 }
 #endif
 

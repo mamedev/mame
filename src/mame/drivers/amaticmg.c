@@ -431,7 +431,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_attr(*this, "attr"),
 		m_vram(*this, "vram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_attr;
 	required_shared_ptr<UINT8> m_vram;
@@ -458,6 +459,7 @@ public:
 	void encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddress);
 	void decrypt(int key1, int key2);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -539,7 +541,7 @@ void amaticmg_state::palette_init()
 		bit2 = (color_prom[0] >> 5) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }

@@ -1356,7 +1356,8 @@ public:
 		m_textram(*this, "textram"),
 		m_czattr(*this, "czattr"),
 		m_gmen_sh2(*this, "gmen_sh2"),
-		m_gmen_sh2_shared(*this, "gmen_sh2_shared")
+		m_gmen_sh2_shared(*this, "gmen_sh2_shared"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -1371,6 +1372,7 @@ public:
 	optional_shared_ptr<UINT32> m_czattr;
 	optional_device<cpu_device> m_gmen_sh2;
 	optional_shared_ptr<UINT32> m_gmen_sh2_shared;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	c404_t m_c404;
 	c361_t m_c361;
@@ -2091,7 +2093,7 @@ void namcos23_state::update_mixer()
 	// 0a - background color blue
 	// 1b - text layer palette base
 	// 1f - layer enable (d0: polygons, d1: sprites, d2: text)
-	m_c404.bgcolor = MAKE_RGB(nthword(m_gammaram,0x08), nthword(m_gammaram,0x09), nthword(m_gammaram,0x0a));
+	m_c404.bgcolor = rgb_t(nthword(m_gammaram,0x08), nthword(m_gammaram,0x09), nthword(m_gammaram,0x0a));
 	m_c404.palbase = nthword(m_gammaram, 0x1b) << 8 & 0x7f00;
 	m_c404.layer = nthword(m_gammaram, 0x1f) & 0xff;
 }
@@ -2107,7 +2109,7 @@ WRITE32_MEMBER(namcos23_state::s23_paletteram_w)
 		int r = nthbyte(m_generic_paletteram_32, which|0x00001);
 		int g = nthbyte(m_generic_paletteram_32, which|0x10001);
 		int b = nthbyte(m_generic_paletteram_32, which|0x20001);
-		palette_set_color(machine(), which/2, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), which/2, rgb_t(r,g,b));
 	}
 }
 

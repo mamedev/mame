@@ -328,18 +328,18 @@ GFXDECODE_END
 
 void zx_state::palette_init()
 {
-	palette_set_color(machine(),0,RGB_WHITE); /* white */
-	palette_set_color(machine(),1,RGB_BLACK); /* black */
-	palette_set_color(machine(),2,RGB_BLACK); /* black */
-	palette_set_color(machine(),3,RGB_WHITE); /* white */
+	palette_set_color(machine(),0,rgb_t::white); /* white */
+	palette_set_color(machine(),1,rgb_t::black); /* black */
+	palette_set_color(machine(),2,rgb_t::black); /* black */
+	palette_set_color(machine(),3,rgb_t::white); /* white */
 }
 
 PALETTE_INIT_MEMBER(zx_state,ts1000)
 {
-	palette_set_color(machine(),0,MAKE_RGB(64, 244, 244)); /* cyan */
-	palette_set_color(machine(),1,RGB_BLACK); /* black */
-	palette_set_color(machine(),2,RGB_BLACK); /* black */
-	palette_set_color(machine(),3,MAKE_RGB(64, 244, 244)); /* cyan */
+	palette_set_color(machine(),0,rgb_t(64, 244, 244)); /* cyan */
+	palette_set_color(machine(),1,rgb_t::black); /* black */
+	palette_set_color(machine(),2,rgb_t::black); /* black */
+	palette_set_color(machine(),3,rgb_t(64, 244, 244)); /* cyan */
 }
 
 

@@ -45,7 +45,7 @@ void popper_state::palette_init()
 
 	rgb = compute_res_net_all(machine(), color_prom, &popper_decode_info, &popper_net_info);
 	palette_set_colors(machine(), 0, rgb, 64);
-	palette_normalize_range(machine().palette, 0, 63, 0, 255);
+	machine().palette->normalize_range(0, 63);
 	auto_free(machine(), rgb);
 }
 

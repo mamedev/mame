@@ -424,12 +424,14 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_crtc(*this, "crtc"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_WRITE8_MEMBER(avt_6845_address_w);
 	DECLARE_WRITE8_MEMBER(avt_6845_data_w);
@@ -576,9 +578,9 @@ void avt_state::palette_init()
 
 		/* hack to switch cyan->magenta for highlighted background */
 		if (j == 0x40)
-			palette_set_color(machine(), j, MAKE_RGB(g, r, b)); // Why this one has R-G swapped?...
+			palette_set_color(machine(), j, rgb_t(g, r, b)); // Why this one has R-G swapped?...
 		else
-			palette_set_color(machine(), j, MAKE_RGB(r, g, b));
+			palette_set_color(machine(), j, rgb_t(r, g, b));
 	}
 }
 

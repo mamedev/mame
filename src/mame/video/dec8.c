@@ -97,7 +97,7 @@ PALETTE_INIT_MEMBER(dec8_state,ghostb)
 		bit3 = (color_prom[i + machine().total_colors()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 

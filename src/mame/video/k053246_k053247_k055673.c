@@ -786,12 +786,12 @@ void k053247_device::zdrawgfxzoom32GP(
 							src_fx += src_fdx;
 							src_x >>= FP;
 							if (eax < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
-							eax = dst_ptr[ecx];
+							rgb_t pix = dst_ptr[ecx];
 							szbuf_ptr[ecx*2] = z8;
 							szbuf_ptr[ecx*2+1] = p8;
 
 							// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
-							dst_ptr[ecx] = shd_base[rgb_to_rgb15(eax)];
+							dst_ptr[ecx] = shd_base[pix.as_rgb15()];
 							//dst_ptr[ecx] =(eax>>3&0x001f);lend_r32( eax, 0x00000000, 128);
 						}
 						while (++ecx);
@@ -923,12 +923,12 @@ void k053247_device::zdrawgfxzoom32GP(
 							eax = *src_ptr;
 							src_ptr += src_fdx;
 							if (eax < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
-							eax = dst_ptr[ecx];
+							rgb_t pix = dst_ptr[ecx];
 							szbuf_ptr[ecx*2] = z8;
 							szbuf_ptr[ecx*2+1] = p8;
 
 							// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
-							dst_ptr[ecx] = shd_base[rgb_to_rgb15(eax)];
+							dst_ptr[ecx] = shd_base[pix.as_rgb15()];
 						}
 						while (++ecx);
 

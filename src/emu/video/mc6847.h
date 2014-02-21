@@ -296,10 +296,10 @@ protected:
 	emu_timer *setup_timer(device_timer_id id, double offset, double period);
 
 	// converts to B&W
-	static pixel_t black_and_white(pixel_t color)
+	static pixel_t black_and_white(rgb_t color)
 	{
-		UINT8 average_color = (RGB_RED(color) + RGB_GREEN(color) + RGB_BLUE(color)) / 3;
-		return MAKE_RGB(average_color, average_color, average_color);
+		UINT8 average_color = (color.r() + color.g() + color.b()) / 3;
+		return rgb_t(average_color, average_color, average_color);
 	}
 
 	// changes the geometry

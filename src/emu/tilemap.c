@@ -213,9 +213,9 @@ inline void tilemap_t::scanline_draw_masked_ind16(UINT16 *dest, const UINT16 *so
 //  RGB bitmap
 //-------------------------------------------------
 
-inline void tilemap_t::scanline_draw_opaque_rgb32(UINT32 *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+inline void tilemap_t::scanline_draw_opaque_rgb32(UINT32 *dest, const UINT16 *source, int count, const rgb_t *pens, UINT8 *pri, UINT32 pcode)
 {
-	const pen_t *clut = &pens[pcode >> 16];
+	const rgb_t *clut = &pens[pcode >> 16];
 
 	// priority case
 	if ((pcode & 0xffff) != 0xff00)
@@ -241,9 +241,9 @@ inline void tilemap_t::scanline_draw_opaque_rgb32(UINT32 *dest, const UINT16 *so
 //  RGB bitmap using a mask
 //-------------------------------------------------
 
-inline void tilemap_t::scanline_draw_masked_rgb32(UINT32 *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+inline void tilemap_t::scanline_draw_masked_rgb32(UINT32 *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const rgb_t *pens, UINT8 *pri, UINT32 pcode)
 {
-	const pen_t *clut = &pens[pcode >> 16];
+	const rgb_t *clut = &pens[pcode >> 16];
 
 	// priority case
 	if ((pcode & 0xffff) != 0xff00)
@@ -271,9 +271,9 @@ inline void tilemap_t::scanline_draw_masked_rgb32(UINT32 *dest, const UINT16 *so
 //  32bpp RGB bitmap with alpha blending
 //-------------------------------------------------
 
-inline void tilemap_t::scanline_draw_opaque_rgb32_alpha(UINT32 *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
+inline void tilemap_t::scanline_draw_opaque_rgb32_alpha(UINT32 *dest, const UINT16 *source, int count, const rgb_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
-	const pen_t *clut = &pens[pcode >> 16];
+	const rgb_t *clut = &pens[pcode >> 16];
 
 	// priority case
 	if ((pcode & 0xffff) != 0xff00)
@@ -300,9 +300,9 @@ inline void tilemap_t::scanline_draw_opaque_rgb32_alpha(UINT32 *dest, const UINT
 //  blending
 //-------------------------------------------------
 
-inline void tilemap_t::scanline_draw_masked_rgb32_alpha(UINT32 *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
+inline void tilemap_t::scanline_draw_masked_rgb32_alpha(UINT32 *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const rgb_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
-	const pen_t *clut = &pens[pcode >> 16];
+	const rgb_t *clut = &pens[pcode >> 16];
 
 	// priority case
 	if ((pcode & 0xffff) != 0xff00)
@@ -1183,7 +1183,7 @@ void tilemap_t::draw_instance(_BitmapClass &dest, const blit_parameters &blit, i
 			x_end = MIN(x_end, x2);
 
 			// if we're rendering something, compute the pointers
-			const rgb_t *clut = (dest.palette() != NULL) ? palette_entry_list_raw(dest.palette()) : machine().pens;
+			const rgb_t *clut = (dest.palette() != NULL) ? dest.palette()->entry_list_raw() : reinterpret_cast<const rgb_t *>(machine().pens);
 			if (prev_trans != WHOLLY_TRANSPARENT)
 			{
 				const UINT16 *source0 = source_baseaddr + x_start;
@@ -1277,7 +1277,7 @@ void tilemap_t::draw_roz_core(_BitmapClass &destbitmap, const blit_parameters &b
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound)
 {
 	// pre-cache all the inner loop values
-	const rgb_t *clut = ((destbitmap.palette() != NULL) ? palette_entry_list_raw(destbitmap.palette()) : machine().pens) + (blit.tilemap_priority_code >> 16);
+	const rgb_t *clut = ((destbitmap.palette() != NULL) ? destbitmap.palette()->entry_list_raw() : reinterpret_cast<const rgb_t *>(machine().pens)) + (blit.tilemap_priority_code >> 16);
 	bitmap_ind8 &priority_bitmap = *blit.priority;
 	const int xmask = m_pixmap.width() - 1;
 	const int ymask = m_pixmap.height() - 1;

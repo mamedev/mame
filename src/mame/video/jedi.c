@@ -81,7 +81,7 @@ void jedi_state::get_pens(pen_t *pens)
 		bits = (color >> 0) & 7;
 		b = 5 * bits * intensity;
 
-		pens[offs] = MAKE_RGB(r, g, b);
+		pens[offs] = rgb_t(r, g, b);
 	}
 }
 
@@ -325,7 +325,7 @@ UINT32 jedi_state::screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitma
 {
 	/* if no video, clear it all to black */
 	if (*m_video_off & 0x01)
-		bitmap.fill(RGB_BLACK, cliprect);
+		bitmap.fill(rgb_t::black, cliprect);
 	else
 	{
 		/* draw the background/text layers, followed by the sprites

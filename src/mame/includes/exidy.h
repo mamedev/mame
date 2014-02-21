@@ -45,7 +45,8 @@ public:
 		m_characterram(*this, "characterram"),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
-		m_samples(*this, "samples") { }
+		m_samples(*this, "samples"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 
 	required_shared_ptr<UINT8> m_videoram;
@@ -61,6 +62,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<dac_device> m_dac;
 	optional_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 m_last_dial;
 	UINT8 m_collision_mask;

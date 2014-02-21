@@ -218,7 +218,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 			palette_set_color_rgb(machine(),i,r,g,b);
 		}
 
-	palette_normalize_range(machine().palette, 0, 255, 0, 255);
+	machine().palette->normalize_range(0, 255);
 
 	color_prom += 512;
 	/* color_prom now points to the beginning of the character color codes */
@@ -257,7 +257,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong4b)
 			palette_set_color_rgb(machine(),i,r,g,b);
 		}
 
-	palette_normalize_range(machine().palette, 0, 255, 0, 255);
+	machine().palette->normalize_range(0, 255);
 
 	color_prom += 256;
 	/* color_prom now points to the beginning of the character color codes */
@@ -321,7 +321,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp)
 		palette_set_color_rgb(machine(),RADARSCP_GRID_COL_OFFSET + i,r,g,b);
 	}
 
-	palette_normalize_range(machine().palette, 0, RADARSCP_GRID_COL_OFFSET+7, 0, 255);
+	machine().palette->normalize_range(0, RADARSCP_GRID_COL_OFFSET+7);
 
 	color_prom += 256;
 	/* color_prom now points to the beginning of the character color codes */
@@ -383,7 +383,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 
 		palette_set_color_rgb(machine(),RADARSCP_GRID_COL_OFFSET + i,r,g,b);
 	}
-	palette_normalize_range(machine().palette, 0, RADARSCP_GRID_COL_OFFSET+7, 0, 255);
+	machine().palette->normalize_range(0, RADARSCP_GRID_COL_OFFSET+7);
 
 	color_prom += 512;
 	/* color_prom now points to the beginning of the character color codes */
@@ -434,7 +434,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong3)
 
 	rgb = compute_res_net_all(machine(), color_prom, &dkong3_decode_info, &dkong3_net_info);
 	palette_set_colors(machine(), 0, rgb, 256);
-	palette_normalize_range(machine().palette, 0, 255, 0, 255);
+	machine().palette->normalize_range(0, 255);
 	auto_free(machine(), rgb);
 
 	color_prom += 1024;

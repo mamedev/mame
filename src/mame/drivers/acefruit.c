@@ -23,12 +23,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	emu_timer *m_refresh_timer;
 	DECLARE_WRITE8_MEMBER(acefruit_colorram_w);
 	DECLARE_WRITE8_MEMBER(acefruit_coin_w);
@@ -283,24 +285,24 @@ WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
 void acefruit_state::palette_init()
 {
 	/* sprites */
-	palette_set_color( machine(), 0, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 1, MAKE_RGB(0x00, 0x00, 0xff) );
-	palette_set_color( machine(), 2, MAKE_RGB(0x00, 0xff, 0x00) );
-	palette_set_color( machine(), 3, MAKE_RGB(0xff, 0x7f, 0x00) );
-	palette_set_color( machine(), 4, MAKE_RGB(0xff, 0x00, 0x00) );
-	palette_set_color( machine(), 5, MAKE_RGB(0xff, 0xff, 0x00) );
-	palette_set_color( machine(), 6, MAKE_RGB(0xff, 0xff, 0xff) );
-	palette_set_color( machine(), 7, MAKE_RGB(0x7f, 0x3f, 0x1f) );
+	palette_set_color( machine(), 0, rgb_t(0x00, 0x00, 0x00) );
+	palette_set_color( machine(), 1, rgb_t(0x00, 0x00, 0xff) );
+	palette_set_color( machine(), 2, rgb_t(0x00, 0xff, 0x00) );
+	palette_set_color( machine(), 3, rgb_t(0xff, 0x7f, 0x00) );
+	palette_set_color( machine(), 4, rgb_t(0xff, 0x00, 0x00) );
+	palette_set_color( machine(), 5, rgb_t(0xff, 0xff, 0x00) );
+	palette_set_color( machine(), 6, rgb_t(0xff, 0xff, 0xff) );
+	palette_set_color( machine(), 7, rgb_t(0x7f, 0x3f, 0x1f) );
 
 	/* tiles */
-	palette_set_color( machine(), 8, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 9, MAKE_RGB(0xff, 0xff, 0xff) );
-	palette_set_color( machine(), 10, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 11, MAKE_RGB(0x00, 0x00, 0xff) );
-	palette_set_color( machine(), 12, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 13, MAKE_RGB(0x00, 0xff, 0x00) );
-	palette_set_color( machine(), 14, MAKE_RGB(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 15, MAKE_RGB(0xff, 0x00, 0x00) );
+	palette_set_color( machine(), 8, rgb_t(0x00, 0x00, 0x00) );
+	palette_set_color( machine(), 9, rgb_t(0xff, 0xff, 0xff) );
+	palette_set_color( machine(), 10, rgb_t(0x00, 0x00, 0x00) );
+	palette_set_color( machine(), 11, rgb_t(0x00, 0x00, 0xff) );
+	palette_set_color( machine(), 12, rgb_t(0x00, 0x00, 0x00) );
+	palette_set_color( machine(), 13, rgb_t(0x00, 0xff, 0x00) );
+	palette_set_color( machine(), 14, rgb_t(0x00, 0x00, 0x00) );
+	palette_set_color( machine(), 15, rgb_t(0xff, 0x00, 0x00) );
 }
 
 static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )

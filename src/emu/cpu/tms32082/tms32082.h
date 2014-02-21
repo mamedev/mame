@@ -125,7 +125,7 @@ protected:
 	UINT32 m_epc;
 	UINT32 m_eip;
 
-	UINT32 *m_param_ram;
+	UINT32 m_param_ram[0x800];
 
 	int m_icount;
 

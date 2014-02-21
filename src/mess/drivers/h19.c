@@ -321,7 +321,7 @@ void h19_state::video_start()
 static MC6845_UPDATE_ROW( h19_update_row )
 {
 	h19_state *state = device->machine().driver_data<h19_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

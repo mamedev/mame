@@ -439,8 +439,8 @@ GFXDECODE_END
 
 void blockade_state::palette_init()
 {
-	palette_set_color(machine(),0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-	palette_set_color(machine(),1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+	palette_set_color(machine(),0,rgb_t(0x00,0x00,0x00)); /* BLACK */
+	palette_set_color(machine(),1,rgb_t(0xff,0xff,0xff)); /* WHITE */
 }
 
 

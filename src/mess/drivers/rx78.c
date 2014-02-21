@@ -230,7 +230,7 @@ WRITE8_MEMBER( rx78_state::vdp_reg_w )
 		g = (res & 0x22) == 0x22 ? 0xff : ((res & 0x22) == 0x02 ? 0x7f : 0x00);
 		b = (res & 0x44) == 0x44 ? 0xff : ((res & 0x44) == 0x04 ? 0x7f : 0x00);
 
-		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), i, rgb_t(r,g,b));
 	}
 }
 
@@ -242,7 +242,7 @@ WRITE8_MEMBER( rx78_state::vdp_bg_reg_w )
 	g = (data & 0x22) == 0x22 ? 0xff : ((data & 0x22) == 0x02 ? 0x7f : 0x00);
 	b = (data & 0x44) == 0x44 ? 0xff : ((data & 0x44) == 0x04 ? 0x7f : 0x00);
 
-	palette_set_color(machine(), 0x10, MAKE_RGB(r,g,b));
+	palette_set_color(machine(), 0x10, rgb_t(r,g,b));
 }
 
 WRITE8_MEMBER( rx78_state::vdp_pri_mask_w )

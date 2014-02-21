@@ -17,7 +17,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_dsp(*this, "dsp") { }
+		m_dsp(*this, "dsp"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_colorram1;
 	required_shared_ptr<UINT16> m_colorram2;
@@ -154,6 +155,7 @@ public:
 	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_dsp;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 class toaplan1_rallybik_state : public toaplan1_state

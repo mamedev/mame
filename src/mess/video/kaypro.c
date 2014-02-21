@@ -11,9 +11,9 @@
 
 PALETTE_INIT_MEMBER(kaypro_state,kaypro)
 {
-	palette_set_color(machine(), 0, RGB_BLACK); /* black */
-	palette_set_color(machine(), 1, MAKE_RGB(0, 220, 0)); /* green */
-	palette_set_color(machine(), 2, MAKE_RGB(0, 110, 0)); /* low intensity green */
+	palette_set_color(machine(), 0, rgb_t::black); /* black */
+	palette_set_color(machine(), 1, rgb_t(0, 220, 0)); /* green */
+	palette_set_color(machine(), 2, rgb_t(0, 110, 0)); /* low intensity green */
 }
 
 UINT32 kaypro_state::screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -137,7 +137,7 @@ UINT32 kaypro_state::screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 
 MC6845_UPDATE_ROW( kaypro2x_update_row )
 {
 	kaypro_state *state = device->machine().driver_data<kaypro_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT32 *p = &bitmap.pix32(y);
 	UINT16 x;
 	UINT8 gfx,fg,bg;

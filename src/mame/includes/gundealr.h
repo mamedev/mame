@@ -13,7 +13,8 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_rambase(*this, "rambase"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_paletteram;
@@ -46,4 +47,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(gundealr_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(yamyam_mcu_sim);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

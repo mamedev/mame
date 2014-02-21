@@ -36,8 +36,8 @@ static const unsigned short pcw_colour_table[PCW_NUM_COLOURS] =
 /* black/white */
 static const rgb_t pcw_palette[PCW_NUM_COLOURS] =
 {
-	MAKE_RGB(0x000, 0x000, 0x000),
-	MAKE_RGB(0x0ff, 0x0ff, 0x0ff)
+	rgb_t(0x000, 0x000, 0x000),
+	rgb_t(0x0ff, 0x0ff, 0x0ff)
 };
 
 

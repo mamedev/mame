@@ -1824,8 +1824,8 @@ void gfx_element::prio_zoom_transpen_additive(bitmap_rgb32 &dest, const rectangl
 	DRAWGFXZOOM_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32, UINT8);
 }
 
-//#define MAKE_ARGB_RGB(a, rgb) MAKE_ARGB(a, RGB_RED(rgb), RGB_GREEN(rgb), RGB_BLUE(rgb))
-#define MAKE_ARGB_RGB(a, rgb)   ((((rgb_t)(a) & 0xff) << 24) | ((rgb) & 0xffffff))
+//#define MAKE_ARGB_RGB(a, rgb) rgb_t(a, rgb.r(), rgb.g(), rgb.b())
+#define MAKE_ARGB_RGB(a, rgb)   rgb_t(rgb).set_a(a)
 
 // combine in 'alpha' when copying to store in ARGB
 #define PIXEL_OP_REMAP_TRANS0_ALPHASTORE32(DEST, PRIORITY, SOURCE)                                  \

@@ -12,7 +12,8 @@ public:
 		m_back_data(*this, "back_data"),
 		m_fore_data(*this, "fore_data"),
 		m_maincpu(*this, "maincpu"),
-		m_seibu_sound(*this, "seibu_sound") { }
+		m_seibu_sound(*this, "seibu_sound"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_scroll_ram;
@@ -22,6 +23,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<seibu_sound_device> m_seibu_sound;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	tilemap_t *m_bg_layer;
 	tilemap_t *m_fg_layer;

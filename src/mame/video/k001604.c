@@ -249,7 +249,7 @@ void k001604_device::draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cli
 	int ex = cliprect.max_x;
 	int ey = cliprect.max_y;
 
-	const rgb_t *clut = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *clut = bitmap.palette()->entry_list_raw();
 
 	int window_x, window_y, window_xmask, window_ymask;
 

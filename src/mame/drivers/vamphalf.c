@@ -82,7 +82,8 @@ public:
 			m_qs1000(*this, "qs1000"),
 			m_oki(*this, "oki"),
 			m_oki2(*this, "oki_2"),
-			m_eeprom(*this, "eeprom") {
+			m_eeprom(*this, "eeprom"),
+			m_gfxdecode(*this, "gfxdecode") {
 			m_has_extra_gfx = 0;
 		}
 
@@ -96,6 +97,7 @@ public:
 	optional_device<okim6295_device> m_oki;
 	optional_device<okim6295_device> m_oki2;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 	
 	int m_flip_bit;
 	int m_flipscreen;
@@ -2755,7 +2757,7 @@ GAME( 2000, misncrfta,misncrft, misncrft, common, vamphalf_state,   misncrft, RO
 GAME( 2000, mrdig,    0,        mrdig,    common, vamphalf_state,   mrdig,    ROT0,   "Sun",               "Mr. Dig", 0 )
 GAME( 2001, dtfamily, 0,        coolmini, common, vamphalf_state,   dtfamily, ROT0,   "SemiCom",           "Diet Family", 0 )
 GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, vamphalf_state, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
-GAME( 2001, mrkicker, 0,        mrkicker, finalgdr, vamphalf_state, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", GAME_NOT_WORKING ) // game stops booting / working properly after you get a high score, or if you don't have a default eeprom with 'valid data.  It's never worked properly, CPU core issue?
+GAME( 2001, mrkicker, 0,        mrkicker, finalgdr, vamphalf_state, mrkicker, ROT0,   "SemiCom",           "Mr. Kicker", 0 ) // game still doesn't boot without a default valid eeprom, but no longer seems to fail after you get a high score (since eeprom rewrite)
 GAME( 2001, toyland,  0,        coolmini, common, vamphalf_state,   toyland,  ROT0,   "SemiCom",           "Toy Land Adventure", 0 )
 GAME( 2001, wivernwg, 0,        wyvernwg, common, vamphalf_state,   wyvernwg, ROT270, "SemiCom",            "Wivern Wings", GAME_IMPERFECT_SOUND )
 GAME( 2001, wyvernwg, wivernwg, wyvernwg, common, vamphalf_state,   wyvernwg, ROT270, "SemiCom (Game Vision license)", "Wyvern Wings (set 1)", GAME_IMPERFECT_SOUND )

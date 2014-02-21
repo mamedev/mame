@@ -9,7 +9,8 @@ public:
 		m_warpwarp_sound(*this, "warpwarp_custom"),
 		m_geebee_sound(*this, "geebee_custom"),
 		m_geebee_videoram(*this, "geebee_videoram"),
-		m_videoram(*this, "videoram")
+		m_videoram(*this, "videoram"),
+		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -17,6 +18,7 @@ public:
 	optional_device<geebee_sound_device> m_geebee_sound;
 	optional_shared_ptr<UINT8> m_geebee_videoram;
 	optional_shared_ptr<UINT8> m_videoram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	int m_geebee_bgw;
 	int m_ball_on;
 	int m_ball_h;

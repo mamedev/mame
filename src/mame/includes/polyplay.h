@@ -10,7 +10,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_characterram(*this, "characterram"),
 		m_maincpu(*this, "maincpu"),
-		m_samples(*this, "samples") { }
+		m_samples(*this, "samples"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	int m_freq1;
@@ -40,6 +41,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(polyplay_timer_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

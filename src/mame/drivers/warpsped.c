@@ -93,7 +93,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_workram(*this, "workram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t   *m_text_tilemap;
@@ -109,6 +110,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_warpspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 WRITE8_MEMBER(warpspeed_state::warpspeed_hardware_w)
@@ -292,8 +294,8 @@ GFXDECODE_END
 void warpspeed_state::palette_init()
 {
 	// tilemaps
-	palette_set_color(machine(),0,RGB_BLACK); /* black */
-	palette_set_color(machine(),1,RGB_WHITE); /* white */
+	palette_set_color(machine(),0,rgb_t::black); /* black */
+	palette_set_color(machine(),1,rgb_t::white); /* white */
 
 	// circles
 	for ( int i = 0; i < 8; i++ )

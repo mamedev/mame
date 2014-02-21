@@ -33,7 +33,8 @@ public:
 		m_io_service(*this, "SERVICE"),
 		m_io_paddle(*this, "PADDLE"),
 		m_io_trackx(*this, "TRACKX"),
-		m_io_tracky(*this, "TRACKY")
+		m_io_tracky(*this, "TRACKY"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -176,4 +177,5 @@ protected:
 	optional_ioport m_io_paddle;
 	optional_ioport m_io_trackx;
 	optional_ioport m_io_tracky;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

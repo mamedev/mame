@@ -44,7 +44,8 @@ public:
 		m_row6(*this, "ROW6"),
 		m_row7(*this, "ROW7"),
 		m_row8(*this, "ROW8"),
-		m_row9(*this, "ROW9") { }
+		m_row9(*this, "ROW9"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_cram;
@@ -88,6 +89,7 @@ protected:
 	required_ioport m_row7;
 	required_ioport m_row8;
 	required_ioport m_row9;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

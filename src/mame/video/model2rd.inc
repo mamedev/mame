@@ -95,7 +95,7 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 	tb = colortable_b[BYTE_XOR_LE(luma)] & 0xff;
 
 	/* build the final color */
-	color = MAKE_RGB(tr, tg, tb);
+	color = rgb_t(tr, tg, tb);
 
 	for(x = extent->startx; x < extent->stopx; x++)
 #if defined(MODEL2_CHECKER)
@@ -188,7 +188,7 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 		tg = colortable_g[BYTE_XOR_LE(luma)] & 0xff;
 		tb = colortable_b[BYTE_XOR_LE(luma)] & 0xff;
 
-		p[x] = MAKE_RGB(tr, tg, tb);
+		p[x] = rgb_t(tr, tg, tb);
 	}
 }
 

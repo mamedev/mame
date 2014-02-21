@@ -112,7 +112,8 @@ public:
 			m_ms32_bg0_scroll(*this, "bg0_scroll"),
 			m_ms32_tx1_scroll(*this, "tx1_scroll"),
 			m_ms32_bg1_scroll(*this, "bg1_scroll") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];
@@ -166,6 +167,7 @@ public:
 	void irq_raise(int level);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -364,7 +366,7 @@ void bnstars_state::update_color(int color, int screen)
 	g = ((m_ms32_pal_ram[screen][color*2] & 0x00ff) >>0 );
 	b = ((m_ms32_pal_ram[screen][color*2+1] & 0x00ff) >>0 );
 
-	palette_set_color(machine(),color+screen*0x8000,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),color+screen*0x8000,rgb_t(r,g,b));
 }
 
 WRITE32_MEMBER(bnstars_state::ms32_pal0_ram_w)

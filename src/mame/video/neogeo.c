@@ -131,7 +131,7 @@ pen_t neogeo_state::get_pen( UINT16 data )
 							(data >>  0) & 0x01,
 							(data >> 12) & 0x01);
 
-	return MAKE_RGB(r, g, b);
+	return rgb_t(r, g, b);
 }
 
 

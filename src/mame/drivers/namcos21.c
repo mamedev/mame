@@ -1641,6 +1641,7 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_namcos21)
 
 	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 

@@ -378,7 +378,7 @@ namcos2_state::update_palette()
 			int r = m_paletteram[offset | 0x0000] & 0x00ff;
 			int g = m_paletteram[offset | 0x0800] & 0x00ff;
 			int b = m_paletteram[offset | 0x1000] & 0x00ff;
-			palette_set_color(machine(),pen++,MAKE_RGB(r,g,b));
+			palette_set_color(machine(),pen++,rgb_t(r,g,b));
 			offset++;
 		}
 	}

@@ -25,7 +25,7 @@ void usgames_state::palette_init()
 		g = 0x7f * g * (i + 1);
 		b = 0x7f * b * (i + 1);
 
-		palette_set_color(machine(),j,MAKE_RGB(r, g, b));
+		palette_set_color(machine(),j,rgb_t(r, g, b));
 	}
 }
 

@@ -18,7 +18,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_dac(*this, "dac"),
-		m_samples(*this, "samples")
+		m_samples(*this, "samples"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -62,6 +63,7 @@ public:
 	optional_device<s2650_device> m_audiocpu;
 	optional_device<dac_device> m_dac;
 	optional_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

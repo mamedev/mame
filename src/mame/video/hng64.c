@@ -356,11 +356,11 @@ static void transition_control(running_machine &machine, bitmap_rgb32 &bitmap, c
 		{
 			for (j = cliprect.min_y; j < cliprect.max_y; j++)
 			{
-				UINT32* thePixel = &bitmap.pix32(j, i);
+				rgb_t* thePixel = reinterpret_cast<rgb_t *>(&bitmap.pix32(j, i));
 
-				finR = (INT32)RGB_RED(*thePixel);
-				finG = (INT32)RGB_GREEN(*thePixel);
-				finB = (INT32)RGB_BLUE(*thePixel);
+				finR = (INT32)thePixel->r();
+				finG = (INT32)thePixel->g();
+				finB = (INT32)thePixel->b();
 
 #if 0
 				// Apply the darkening pass (0x07)...
@@ -368,9 +368,9 @@ static void transition_control(running_machine &machine, bitmap_rgb32 &bitmap, c
 				colorScaleG = 1.0f - (float)((hng64_tcram[0x00000007] >> 8)  & 0xff) / 255.0f;
 				colorScaleB = 1.0f - (float)((hng64_tcram[0x00000007] >> 16) & 0xff) / 255.0f;
 
-				finR = ((float)RGB_RED(*thePixel)   * colorScaleR);
-				finG = ((float)RGB_GREEN(*thePixel) * colorScaleG);
-				finB = ((float)RGB_BLUE(*thePixel)  * colorScaleB);
+				finR = ((float)thePixel->r()   * colorScaleR);
+				finG = ((float)thePixel->g() * colorScaleG);
+				finB = ((float)thePixel->b()  * colorScaleB);
 
 
 				// Apply the lightening pass (0x0a)...
@@ -416,7 +416,7 @@ static void transition_control(running_machine &machine, bitmap_rgb32 &bitmap, c
 				if (finG < 0) finG = 0;
 				if (finB < 0) finB = 0;
 
-				*thePixel = MAKE_ARGB(255, (UINT8)finR, (UINT8)finG, (UINT8)finB);
+				*thePixel = rgb_t(255, (UINT8)finR, (UINT8)finG, (UINT8)finB);
 			}
 		}
 	}
@@ -2521,7 +2521,7 @@ void hng64_state::clear3d()
 	for (i = 0; i < (visarea.max_x)*(visarea.max_y); i++)
 	{
 		m_depthBuffer3d[i] = 100.0f;
-		m_colorBuffer3d[i] = MAKE_ARGB(0, 0, 0, 0);
+		m_colorBuffer3d[i] = rgb_t(0, 0, 0, 0);
 	}
 
 	// Set some matrices to the identity...
@@ -2855,7 +2855,7 @@ static void DrawWireframe(running_machine &machine, struct polygon *p)
 	{
 		// mame_printf_debug("now drawing : %f %f %f, %f %f %f\n", p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[j].clipCoords[2], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[2]);
 		// mame_printf_debug("%f %f %f %f\n", p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1]);
-		UINT32 color = MAKE_ARGB((UINT8)255, (UINT8)255, (UINT8)0, (UINT8)0);
+		UINT32 color = rgb_t((UINT8)255, (UINT8)255, (UINT8)0, (UINT8)0);
 		drawline2d(machine, p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1], color);
 	}
 
@@ -2923,13 +2923,13 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine &machine,
 			if ((prOptions.debugColor & 0xff000000) == 0x01000000)
 			{
 				// UV COLOR MODE
-				*cb = MAKE_ARGB(255, (UINT8)(s_coord*255.0f), (UINT8)(t_coord*255.0f), (UINT8)(0));
+				*cb = rgb_t(255, (UINT8)(s_coord*255.0f), (UINT8)(t_coord*255.0f), (UINT8)(0));
 				*db = z_start;
 			}
 			else if ((prOptions.debugColor & 0xff000000) == 0x02000000)
 			{
 				// Lit
-				*cb = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
+				*cb = rgb_t(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
 				*db = z_start;
 			}
 			else if ((prOptions.debugColor & 0xff000000) == 0xff000000)
@@ -2971,26 +2971,26 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine &machine,
 				{
 					// The color out of the texture
 					paletteEntry %= prOptions.palPageSize;
-					UINT32 color = machine.pens[prOptions.palOffset + paletteEntry];
+					rgb_t color = machine.pens[prOptions.palOffset + paletteEntry];
 
 					// Apply the lighting
 					float rIntensity = (r_start/w_start) / 255.0f;
 					float gIntensity = (g_start/w_start) / 255.0f;
 					float bIntensity = (b_start/w_start) / 255.0f;
-					float red   = RGB_RED(color)   * rIntensity;
-					float green = RGB_GREEN(color) * gIntensity;
-					float blue  = RGB_BLUE(color)  * bIntensity;
+					float red   = color.r()   * rIntensity;
+					float green = color.g() * gIntensity;
+					float blue  = color.b()  * bIntensity;
 
 					// Clamp and finalize
-					red = RGB_RED(color) + red;
-					green = RGB_GREEN(color) + green;
-					blue = RGB_BLUE(color) + blue;
+					red = color.r() + red;
+					green = color.g() + green;
+					blue = color.b() + blue;
 
 					if (red >= 255) red = 255;
 					if (green >= 255) green = 255;
 					if (blue >= 255) blue = 255;
 
-					color = MAKE_ARGB(255, (UINT8)red, (UINT8)green, (UINT8)blue);
+					color = rgb_t(255, (UINT8)red, (UINT8)green, (UINT8)blue);
 
 					*cb = color;
 					*db = z_start;

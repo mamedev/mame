@@ -9,7 +9,8 @@ public:
 		m_sprite_priority(*this, "sprite_priority"),
 		m_sharedram(*this, "sharedram"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_bg1videoram;
 	required_shared_ptr<UINT8> m_bg2videoram;
@@ -46,4 +47,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

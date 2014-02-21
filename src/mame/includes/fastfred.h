@@ -16,7 +16,8 @@ public:
 			m_spriteram(*this, "spriteram"),
 			m_attributesram(*this, "attributesram"),
 			m_background_color(*this, "bgcolor"),
-			m_imago_fg_videoram(*this, "imago_fg_vram") { }
+			m_imago_fg_videoram(*this, "imago_fg_vram"),
+			m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 m_imago_sprites[0x800*3];
 	UINT16 m_imago_sprites_address;
@@ -27,6 +28,7 @@ public:
 	required_shared_ptr<UINT8> m_attributesram;
 	optional_shared_ptr<UINT8> m_background_color;
 	optional_shared_ptr<UINT8> m_imago_fg_videoram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	UINT16 m_charbank;
 	UINT8 m_colorbank;
 	tilemap_t *m_bg_tilemap;

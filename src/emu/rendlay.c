@@ -822,14 +822,14 @@ void layout_element::component::draw_rect(bitmap_argb32 &dest, const rectangle &
 			// if we're translucent, add in the destination pixel contribution
 			if (inva > 0)
 			{
-				UINT32 dpix = dest.pix32(y, x);
-				finalr += (RGB_RED(dpix) * inva) >> 8;
-				finalg += (RGB_GREEN(dpix) * inva) >> 8;
-				finalb += (RGB_BLUE(dpix) * inva) >> 8;
+				rgb_t dpix = dest.pix32(y, x);
+				finalr += (dpix.r() * inva) >> 8;
+				finalg += (dpix.g() * inva) >> 8;
+				finalb += (dpix.b() * inva) >> 8;
 			}
 
 			// store the target pixel, dividing the RGBA values by the overall scale factor
-			dest.pix32(y, x) = MAKE_ARGB(0xff, finalr, finalg, finalb);
+			dest.pix32(y, x) = rgb_t(finalr, finalg, finalb);
 		}
 	}
 }
@@ -875,14 +875,14 @@ void layout_element::component::draw_disk(bitmap_argb32 &dest, const rectangle &
 			// if we're translucent, add in the destination pixel contribution
 			if (inva > 0)
 			{
-				UINT32 dpix = dest.pix32(y, x);
-				finalr += (RGB_RED(dpix) * inva) >> 8;
-				finalg += (RGB_GREEN(dpix) * inva) >> 8;
-				finalb += (RGB_BLUE(dpix) * inva) >> 8;
+				rgb_t dpix = dest.pix32(y, x);
+				finalr += (dpix.r() * inva) >> 8;
+				finalg += (dpix.g() * inva) >> 8;
+				finalb += (dpix.b() * inva) >> 8;
 			}
 
 			// store the target pixel, dividing the RGBA values by the overall scale factor
-			dest.pix32(y, x) = MAKE_ARGB(0xff, finalr, finalg, finalb);
+			dest.pix32(y, x) = rgb_t(finalr, finalg, finalb);
 		}
 	}
 }
@@ -958,15 +958,15 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 					int effx = curx + x + chbounds.min_x;
 					if (effx >= bounds.min_x && effx <= bounds.max_x)
 					{
-						UINT32 spix = RGB_ALPHA(src[x]);
+						UINT32 spix = rgb_t(src[x]).a();
 						if (spix != 0)
 						{
-							UINT32 dpix = d[effx];
+							rgb_t dpix = d[effx];
 							UINT32 ta = (a * (spix + 1)) >> 8;
-							UINT32 tr = (r * ta + RGB_RED(dpix) * (0x100 - ta)) >> 8;
-							UINT32 tg = (g * ta + RGB_GREEN(dpix) * (0x100 - ta)) >> 8;
-							UINT32 tb = (b * ta + RGB_BLUE(dpix) * (0x100 - ta)) >> 8;
-							d[effx] = MAKE_ARGB(0xff, tr, tg, tb);
+							UINT32 tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
+							UINT32 tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
+							UINT32 tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
+							d[effx] = rgb_t(tr, tg, tb);
 						}
 					}
 				}
@@ -1072,7 +1072,7 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 								int effx = x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-									UINT32 spix = RGB_ALPHA(src[x]);
+									UINT32 spix = rgb_t(src[x]).a();
 									if (spix != 0)
 									{
 										d[effx] = src[x];
@@ -1110,15 +1110,15 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 								int effx = curx + x + chbounds.min_x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-									UINT32 spix = RGB_ALPHA(src[x]);
+									UINT32 spix = rgb_t(src[x]).a();
 									if (spix != 0)
 									{
-										UINT32 dpix = d[effx];
+										rgb_t dpix = d[effx];
 										UINT32 ta = (a * (spix + 1)) >> 8;
-										UINT32 tr = (r * ta + RGB_RED(dpix) * (0x100 - ta)) >> 8;
-										UINT32 tg = (g * ta + RGB_GREEN(dpix) * (0x100 - ta)) >> 8;
-										UINT32 tb = (b * ta + RGB_BLUE(dpix) * (0x100 - ta)) >> 8;
-										d[effx] = MAKE_ARGB(0xff, tr, tg, tb);
+										UINT32 tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
+										UINT32 tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
+										UINT32 tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
+										d[effx] = rgb_t(tr, tg, tb);
 									}
 								}
 							}
@@ -1166,7 +1166,7 @@ void layout_element::component::load_bitmap()
 		m_bitmap[0].fill(0);
 		for (int step = 0; step < 100; step += 25)
 			for (int line = 0; line < 100; line++)
-				m_bitmap[0].pix32((step + line) % 100, line % 100) = MAKE_ARGB(0xff,0xff,0xff,0xff);
+				m_bitmap[0].pix32((step + line) % 100, line % 100) = rgb_t(0xff,0xff,0xff,0xff);
 
 		// log an error
 		if (!m_alphafile[0])
@@ -1205,8 +1205,8 @@ void layout_element::component::load_reel_bitmap(int number)
 
 void layout_element::component::draw_led7seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern)
 {
-	const rgb_t onpen = MAKE_ARGB(0xff,0xff,0xff,0xff);
-	const rgb_t offpen = MAKE_ARGB(0xff,0x20,0x20,0x20);
+	const rgb_t onpen = rgb_t(0xff,0xff,0xff,0xff);
+	const rgb_t offpen = rgb_t(0xff,0x20,0x20,0x20);
 
 	// sizes for computation
 	int bmwidth = 250;
@@ -1216,7 +1216,7 @@ void layout_element::component::draw_led7seg(bitmap_argb32 &dest, const rectangl
 
 	// allocate a temporary bitmap for drawing
 	bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight);
-	tempbitmap.fill(MAKE_ARGB(0xff,0x00,0x00,0x00));
+	tempbitmap.fill(rgb_t(0xff,0x00,0x00,0x00));
 
 	// top bar
 	draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2, segwidth, (pattern & (1 << 0)) ? onpen : offpen);
@@ -1256,8 +1256,8 @@ void layout_element::component::draw_led7seg(bitmap_argb32 &dest, const rectangl
 
 void layout_element::component::draw_led14seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern)
 {
-	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
-	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
+	const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
+	const rgb_t offpen = rgb_t(0xff, 0x20, 0x20, 0x20);
 
 	// sizes for computation
 	int bmwidth = 250;
@@ -1267,7 +1267,7 @@ void layout_element::component::draw_led14seg(bitmap_argb32 &dest, const rectang
 
 	// allocate a temporary bitmap for drawing
 	bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight);
-	tempbitmap.fill(MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
+	tempbitmap.fill(rgb_t(0xff, 0x00, 0x00, 0x00));
 
 	// top bar
 	draw_segment_horizontal(tempbitmap,
@@ -1358,8 +1358,8 @@ void layout_element::component::draw_led14seg(bitmap_argb32 &dest, const rectang
 
 void layout_element::component::draw_led14segsc(bitmap_argb32 &dest, const rectangle &bounds, int pattern)
 {
-	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
-	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
+	const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
+	const rgb_t offpen = rgb_t(0xff, 0x20, 0x20, 0x20);
 
 	// sizes for computation
 	int bmwidth = 250;
@@ -1369,7 +1369,7 @@ void layout_element::component::draw_led14segsc(bitmap_argb32 &dest, const recta
 
 	// allocate a temporary bitmap for drawing, adding some extra space for the tail
 	bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight + segwidth);
-	tempbitmap.fill(MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
+	tempbitmap.fill(rgb_t(0xff, 0x00, 0x00, 0x00));
 
 	// top bar
 	draw_segment_horizontal(tempbitmap,
@@ -1468,8 +1468,8 @@ void layout_element::component::draw_led14segsc(bitmap_argb32 &dest, const recta
 
 void layout_element::component::draw_led16seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern)
 {
-	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
-	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
+	const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
+	const rgb_t offpen = rgb_t(0xff, 0x20, 0x20, 0x20);
 
 	// sizes for computation
 	int bmwidth = 250;
@@ -1479,7 +1479,7 @@ void layout_element::component::draw_led16seg(bitmap_argb32 &dest, const rectang
 
 	// allocate a temporary bitmap for drawing
 	bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight);
-	tempbitmap.fill(MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
+	tempbitmap.fill(rgb_t(0xff, 0x00, 0x00, 0x00));
 
 	// top-left bar
 	draw_segment_horizontal_caps(tempbitmap,
@@ -1580,8 +1580,8 @@ void layout_element::component::draw_led16seg(bitmap_argb32 &dest, const rectang
 
 void layout_element::component::draw_led16segsc(bitmap_argb32 &dest, const rectangle &bounds, int pattern)
 {
-	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
-	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
+	const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
+	const rgb_t offpen = rgb_t(0xff, 0x20, 0x20, 0x20);
 
 	// sizes for computation
 	int bmwidth = 250;
@@ -1591,7 +1591,7 @@ void layout_element::component::draw_led16segsc(bitmap_argb32 &dest, const recta
 
 	// allocate a temporary bitmap for drawing
 	bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight + segwidth);
-	tempbitmap.fill(MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
+	tempbitmap.fill(rgb_t(0xff, 0x00, 0x00, 0x00));
 
 	// top-left bar
 	draw_segment_horizontal_caps(tempbitmap,
@@ -1701,8 +1701,8 @@ void layout_element::component::draw_led16segsc(bitmap_argb32 &dest, const recta
 
 void layout_element::component::draw_dotmatrix(int dots, bitmap_argb32 &dest, const rectangle &bounds, int pattern)
 {
-	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
-	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
+	const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
+	const rgb_t offpen = rgb_t(0xff, 0x20, 0x20, 0x20);
 
 	// sizes for computation
 	int bmheight = 300;
@@ -1710,7 +1710,7 @@ void layout_element::component::draw_dotmatrix(int dots, bitmap_argb32 &dest, co
 
 	// allocate a temporary bitmap for drawing
 	bitmap_argb32 tempbitmap(dotwidth*dots, bmheight);
-	tempbitmap.fill(MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
+	tempbitmap.fill(rgb_t(0xff, 0x00, 0x00, 0x00));
 
 	for (int i = 0; i < dots; i++)
 		draw_segment_decimal(tempbitmap, ((dotwidth/2 )+ (i * dotwidth)), bmheight/2, dotwidth, (pattern & (1 << i))?onpen:offpen);

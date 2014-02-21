@@ -63,7 +63,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_color_ram(*this, "color_ram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* video-related */
 	tilemap_t  *m_m14_tilemap;
@@ -75,6 +76,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(m14_vram_w);
 	DECLARE_WRITE8_MEMBER(m14_cram_w);
 	DECLARE_READ8_MEMBER(m14_rng_r);
@@ -109,9 +112,9 @@ void m14_state::palette_init()
 		rgb_t color;
 
 		if (i & 0x01)
-			color = MAKE_RGB(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 3));
+			color = rgb_t(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 3));
 		else
-			color = (i & 0x10) ? RGB_WHITE : RGB_BLACK;
+			color = (i & 0x10) ? rgb_t::white : rgb_t::black;
 
 		palette_set_color(machine(), i, color);
 	}

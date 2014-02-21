@@ -252,7 +252,7 @@ WRITE8_MEMBER( unior_state::scroll_w )
 static I8275_DISPLAY_PIXELS(display_pixels)
 {
 	unior_state *state = device->machine().driver_data<unior_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 gfx = state->m_p_chargen[(linecount & 7) | (charcode << 3)];
 	if (vsp)
 		gfx = 0;
@@ -280,9 +280,9 @@ static const i8275_interface crtc_intf =
 
 static const rgb_t unior_palette[3] =
 {
-	MAKE_RGB(0x00, 0x00, 0x00), // black
-	MAKE_RGB(0xa0, 0xa0, 0xa0), // white
-	MAKE_RGB(0xff, 0xff, 0xff)  // highlight
+	rgb_t(0x00, 0x00, 0x00), // black
+	rgb_t(0xa0, 0xa0, 0xa0), // white
+	rgb_t(0xff, 0xff, 0xff)  // highlight
 };
 
 PALETTE_INIT_MEMBER(unior_state,unior)

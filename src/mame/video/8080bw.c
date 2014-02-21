@@ -48,7 +48,7 @@ void _8080bw_state::invadpt2_get_pens( pen_t *pens )
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
+		pens[i] = rgb_t(pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
 	}
 }
 
@@ -57,11 +57,11 @@ void _8080bw_state::sflush_get_pens( pen_t *pens )
 {
 	offs_t i;
 
-	pens[0] = MAKE_RGB(0x80, 0x80, 0xff);
+	pens[0] = rgb_t(0x80, 0x80, 0xff);
 
 	for (i = 1; i < NUM_PENS; i++)
 	{
-		pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
+		pens[i] = rgb_t(pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
 	}
 }
 
@@ -72,7 +72,7 @@ void _8080bw_state::cosmo_get_pens( pen_t *pens )
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		pens[i] = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
 }
 
@@ -451,7 +451,7 @@ UINT32 _8080bw_state::screen_update_sflush(screen_device &screen, bitmap_rgb32 &
 
 UINT32 _8080bw_state::screen_update_shuttlei(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
+	pen_t pens[2] = { rgb_t::black, rgb_t::white };
 	offs_t offs;
 
 	for (offs = 0; offs < m_main_ram.bytes(); offs++)
@@ -479,7 +479,7 @@ UINT32 _8080bw_state::screen_update_shuttlei(screen_device &screen, bitmap_rgb32
 
 UINT32 _8080bw_state::screen_update_spacecom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
+	pen_t pens[2] = { rgb_t::black, rgb_t::white };
 	offs_t offs;
 
 	for (offs = 0; offs < 0x1c00; offs++)

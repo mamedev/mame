@@ -47,7 +47,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
-		m_ay8910(*this, "ay8910")
+		m_ay8910(*this, "ay8910"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -90,6 +91,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<ay8910_device> m_ay8910;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	void cgenie_offset_xy();
 	int cgenie_get_register(int indx);

@@ -16,7 +16,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_ym2151(*this, "ymsnd") { }
+		m_ym2151(*this, "ymsnd"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -36,6 +37,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<ym2151_device> m_ym2151;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_READ8_MEMBER(amspdwy_wheel_0_r);
 	DECLARE_READ8_MEMBER(amspdwy_wheel_1_r);
 	DECLARE_WRITE8_MEMBER(amspdwy_sound_w);

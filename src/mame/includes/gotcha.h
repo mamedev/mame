@@ -17,7 +17,8 @@ public:
 		m_sprgen(*this, "spritegen"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki") { }
+		m_oki(*this, "oki"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_fgvideoram;
@@ -52,4 +53,5 @@ public:
 	inline void get_tile_info( tile_data &tileinfo, int tile_index ,UINT16 *vram, int color_offs);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

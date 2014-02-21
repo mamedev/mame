@@ -282,7 +282,7 @@ static void do_blit_zoom32(wecleman_state *state, _BitmapClass &bitmap, const re
 						if (pix != 0xa)
 							dst_ptr[sx] = pal_base[pix];
 						else
-							dst_ptr[sx] = (dst_ptr[sx] >> 1) & MAKE_RGB(0x7f,0x7f,0x7f);
+							dst_ptr[sx] = (dst_ptr[sx] >> 1) & rgb_t(0x7f,0x7f,0x7f);
 					}
 					src_fpx += src_fdx;
 				}
@@ -737,7 +737,7 @@ static void draw_cloud(bitmap_rgb32 &bitmap,
 						dg = (state->m_t32x32pm[dg - sg + alpha] >> 5) + dg;
 						db = (state->m_t32x32pm[db - sb + alpha] >> 5) + db;
 
-						dst_ptr[tx] = MAKE_RGB(pal5bit(db), pal5bit(dg), pal5bit(dr));
+						dst_ptr[tx] = rgb_t(pal5bit(db), pal5bit(dg), pal5bit(dr));
 					}
 					dst_ptr += bitmap.rowpixels();
 				}

@@ -20,7 +20,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
-		m_discrete(*this, "discrete") { }
+		m_discrete(*this, "discrete"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8       m_cpu0_out[16];
 	UINT8       m_cpu1_out[16];
@@ -84,6 +85,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /* Discrete Sound Input Nodes */

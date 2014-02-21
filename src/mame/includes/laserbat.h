@@ -21,7 +21,8 @@ public:
 		m_s2636_1(*this, "s2636_1"),
 		m_s2636_2(*this, "s2636_2"),
 		m_s2636_3(*this, "s2636_3"),
-		m_sn(*this, "snsnd")
+		m_sn(*this, "snsnd"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -33,6 +34,7 @@ public:
 	required_device<s2636_device> m_s2636_2;
 	required_device<s2636_device> m_s2636_3;
 	optional_device<sn76477_device> m_sn;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;

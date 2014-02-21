@@ -75,7 +75,7 @@ void crgolf_state::get_pens( pen_t *pens )
 		bit1 = (data >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		pens[offs] = MAKE_RGB(r, g, b);
+		pens[offs] = rgb_t(r, g, b);
 	}
 }
 

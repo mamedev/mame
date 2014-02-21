@@ -525,7 +525,7 @@ WRITE32_MEMBER(hng64_state::hng64_pal_w)
 	g = ((paletteram[offset] & 0x0000ff00) >>8);
 	r = ((paletteram[offset] & 0x00ff0000) >>16);
 	//a = ((paletteram[offset] & 0xff000000) >>24);
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,rgb_t(r,g,b));
 }
 
 READ32_MEMBER(hng64_state::hng64_sysregs_r)

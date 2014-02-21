@@ -111,7 +111,7 @@ WRITE16_MEMBER( vindictr_state::vindictr_paletteram_w )
 		int g = ((data >> 4) & 15) * i;
 		int b = ((data >> 0) & 15) * i;
 
-		palette_set_color(machine(),offset + c*2048,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),offset + c*2048,rgb_t(r,g,b));
 	}
 }
 

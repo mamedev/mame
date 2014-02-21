@@ -17,7 +17,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
 		m_d7756(*this, "d7756"),
-		m_samples(*this, "samples")
+		m_samples(*this, "samples"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -26,6 +27,7 @@ public:
 	required_shared_ptr<UINT8> m_colorram;
 	optional_device<upd7756_device> m_d7756;
 	optional_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 m_control;
 	UINT8 m_sample;

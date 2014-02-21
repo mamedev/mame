@@ -152,7 +152,7 @@ Apple IIc (Original Memory Expansion)
 Identical to IIc except for:
 
 Support for Memory Expansion Board (mapped to slot 4)
-This card can provide up to 1 MB of RAM in increments of 256 MB
+This card can provide up to 1 MB of RAM in increments of 256 KB
 The firmware in ROM sees the extra RAM as a RAMdisk
 
 Since the expansion is mapped to slot 4, mouse is now mapped to slot 7
@@ -912,22 +912,22 @@ INPUT_PORTS_END
  */
 static const rgb_t apple2_palette[] =
 {
-	RGB_BLACK,
-	MAKE_RGB(0xE3, 0x1E, 0x60), /* Dark Red */
-	MAKE_RGB(0x60, 0x4E, 0xBD), /* Dark Blue */
-	MAKE_RGB(0xFF, 0x44, 0xFD), /* Purple */
-	MAKE_RGB(0x00, 0xA3, 0x60), /* Dark Green */
-	MAKE_RGB(0x9C, 0x9C, 0x9C), /* Dark Gray */
-	MAKE_RGB(0x14, 0xCF, 0xFD), /* Medium Blue */
-	MAKE_RGB(0xD0, 0xC3, 0xFF), /* Light Blue */
-	MAKE_RGB(0x60, 0x72, 0x03), /* Brown */
-	MAKE_RGB(0xFF, 0x6A, 0x3C), /* Orange */
-	MAKE_RGB(0x9C, 0x9C, 0x9C), /* Light Grey */
-	MAKE_RGB(0xFF, 0xA0, 0xD0), /* Pink */
-	MAKE_RGB(0x14, 0xF5, 0x3C), /* Light Green */
-	MAKE_RGB(0xD0, 0xDD, 0x8D), /* Yellow */
-	MAKE_RGB(0x72, 0xFF, 0xD0), /* Aquamarine */
-	RGB_WHITE
+	rgb_t::black,
+	rgb_t(0xE3, 0x1E, 0x60), /* Dark Red */
+	rgb_t(0x60, 0x4E, 0xBD), /* Dark Blue */
+	rgb_t(0xFF, 0x44, 0xFD), /* Purple */
+	rgb_t(0x00, 0xA3, 0x60), /* Dark Green */
+	rgb_t(0x9C, 0x9C, 0x9C), /* Dark Gray */
+	rgb_t(0x14, 0xCF, 0xFD), /* Medium Blue */
+	rgb_t(0xD0, 0xC3, 0xFF), /* Light Blue */
+	rgb_t(0x60, 0x72, 0x03), /* Brown */
+	rgb_t(0xFF, 0x6A, 0x3C), /* Orange */
+	rgb_t(0x9C, 0x9C, 0x9C), /* Light Grey */
+	rgb_t(0xFF, 0xA0, 0xD0), /* Pink */
+	rgb_t(0x14, 0xF5, 0x3C), /* Light Green */
+	rgb_t(0xD0, 0xDD, 0x8D), /* Yellow */
+	rgb_t(0x72, 0xFF, 0xD0), /* Aquamarine */
+	rgb_t::white
 };
 
 /* Initialize the palette */
@@ -994,6 +994,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("aesms", A2BUS_AESMS)    /* Applied Engineering Super Music Synthesizer */
 	SLOT_INTERFACE("ultraterm", A2BUS_ULTRATERM)    /* Videx UltraTerm (original) */
 	SLOT_INTERFACE("ultratermenh", A2BUS_ULTRATERMENH)    /* Videx UltraTerm (enhanced //e) */
+	SLOT_INTERFACE("aevm80", A2BUS_VTC2)    /* Applied Engineering ViewMaster 80 */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)
@@ -1312,17 +1313,23 @@ ROM_START( agat9 )
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD( "agathe9.fnt", 0x0000, 0x0800, CRC(8c55c984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594))
 ROM_END
+
+/*
+    J-Plus ROM numbers confirmed by:
+	http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Computers/Apple%20II/Apple%20II%20j-plus/Photos/Apple%20II%20j-plus%20-%20Motherboard.jpg
+*/
+
 ROM_START(apple2jp)
 	ROM_REGION(0x0800,"gfx1",0)
-	ROM_LOAD ( "a2jp.chr", 0x0000, 0x0800, BAD_DUMP CRC(487104b5) SHA1(0a382be58db5215c4a3de53b19a72fab660d5da2)) // not confirmed as the actual rom on motherboard
+	ROM_LOAD ( "a2jp.chr", 0x0000, 0x0800, CRC(487104b5) SHA1(0a382be58db5215c4a3de53b19a72fab660d5da2))
 
 	ROM_REGION(0x4700,"maincpu",0)
-	ROM_LOAD ( "a2p.d0", 0x1000, 0x0800, BAD_DUMP CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e)) // not confirmed as the actual rom on motherboard
-	ROM_LOAD ( "a2p.d8", 0x1800, 0x0800, BAD_DUMP CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5)) // not confirmed as the actual rom on motherboard
-	ROM_LOAD ( "a2p.e0", 0x2000, 0x0800, BAD_DUMP CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7)) // not confirmed as the actual rom on motherboard
-	ROM_LOAD ( "a2p.e8", 0x2800, 0x0800, BAD_DUMP CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9)) // not confirmed as the actual rom on motherboard
-	ROM_LOAD ( "a2p.f0", 0x3000, 0x0800, BAD_DUMP CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581)) // not confirmed as the actual rom on motherboard
-	ROM_LOAD ( "a2jp.f8", 0x3800, 0x0800, CRC(6ea8379b) SHA1(00a75ae3b58e1917ad640249366f654608589cf4))
+	ROM_LOAD ( "341-0011.d0", 0x1000, 0x0800, BAD_DUMP CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
+	ROM_LOAD ( "341-0012.d8", 0x1800, 0x0800, BAD_DUMP CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
+	ROM_LOAD ( "341-0013.e0", 0x2000, 0x0800, BAD_DUMP CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
+	ROM_LOAD ( "341-0014.e8", 0x2800, 0x0800, BAD_DUMP CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
+	ROM_LOAD ( "341-0015.f0", 0x3000, 0x0800, BAD_DUMP CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581))
+	ROM_LOAD ( "341-0047.f8", 0x3800, 0x0800, CRC(6ea8379b) SHA1(00a75ae3b58e1917ad640249366f654608589cf4))
 ROM_END
 
 ROM_START(ace100)
@@ -1428,6 +1435,9 @@ ROM_START(tk2000)
 
 	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD( "tk2000.rom",   0x000000, 0x004000, CRC(dfdbacc3) SHA1(bb37844c31616046630868a4399ee3d55d6df277) )
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // probably not this machine's actual ROM
 ROM_END
 
 ROM_START(prav8c)
@@ -1436,8 +1446,13 @@ ROM_START(prav8c)
 	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "prom_cd.d46", 0x0000, 0x2000, CRC(195d0b48) SHA1(f8c4f3722159081f6950207f03bc85da30980c08))
 	ROM_LOAD ( "prom_ef.d41", 0x2000, 0x2000, CRC(ec6aa2f6) SHA1(64bce893ebf0e22cd8f22436b97ef1bfeddf692f))
+
+	// contains slot firmware for slots 1, 2, and 6 (6 is the usual Disk II f/w)
 	ROM_REGION(0x2000,"unknown",0)
 	ROM_LOAD ( "eprom.d38", 0x0000, 0x2000, CRC(c8d00b19) SHA1(13d156957ea68d0e7bc4be57cb1580c8b1399981))
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // we don't know what this machine used
 ROM_END
 
 ROM_START(apple2c0)
@@ -1447,6 +1462,9 @@ ROM_START(apple2c0)
 
 	ROM_REGION(0x8700,"maincpu",0)
 	ROM_LOAD("3420033a.256", 0x0000, 0x8000, CRC(c8b979b3) SHA1(10767e96cc17bad0970afda3a4146564e6272ba1))
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
 ROM_END
 
 ROM_START(apple2c3)
@@ -1456,6 +1474,9 @@ ROM_START(apple2c3)
 
 	ROM_REGION(0x8700,"maincpu",0)
 	ROM_LOAD("342-0445-a.256", 0x0000, 0x8000, CRC(bc5a79ff) SHA1(5338d9baa7ae202457b6500fde5883dbdc86e5d3))
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
 ROM_END
 
 ROM_START(apple2c4)
@@ -1465,6 +1486,9 @@ ROM_START(apple2c4)
 
 	ROM_REGION(0x8700,"maincpu",0)
 	ROM_LOAD("3410445b.256", 0x0000, 0x8000, CRC(06f53328) SHA1(015061597c4cda7755aeb88b735994ffd2f235ca))
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
 ROM_END
 
 ROM_START(las3000)
@@ -1593,7 +1617,7 @@ COMP( 1977, apple2,   0,        0,        apple2,      apple2, driver_device,   
 COMP( 1979, apple2p,  apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][+", GAME_SUPPORTS_SAVE )
 COMP( 1982, prav82,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 82", GAME_SUPPORTS_SAVE )
 COMP( 1985, prav8m,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 8M", GAME_SUPPORTS_SAVE )
-COMP( 1980, apple2jp, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][j+", GAME_SUPPORTS_SAVE )
+COMP( 1980, apple2jp, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][ J-Plus", GAME_SUPPORTS_SAVE )
 COMP( 1982, ace100,   apple2,   0,        apple2,      apple2e, driver_device,  0,        "Franklin Computer", "Franklin Ace 100", GAME_SUPPORTS_SAVE )
 COMP( 1983, apple2e,  0,        apple2,   apple2e,     apple2e, driver_device,  0,        "Apple Computer",    "Apple //e", GAME_SUPPORTS_SAVE )
 COMP( 1983, apple2euk,apple2e, 	0,        apple2e,     apple2euk,driver_device, 0,        "Apple Computer",    "Apple //e (UK)", GAME_SUPPORTS_SAVE )

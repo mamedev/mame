@@ -15,7 +15,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -62,4 +63,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(msmint);
 	required_device<cpu_device> m_maincpu;
 	optional_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

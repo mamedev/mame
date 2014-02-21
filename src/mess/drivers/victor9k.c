@@ -268,7 +268,7 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 {
 	victor9k_state *state = device->machine().driver_data<victor9k_state>();
 	address_space &program = state->m_maincpu->space(AS_PROGRAM);
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 
 	if (BIT(ma, 13))
 	{

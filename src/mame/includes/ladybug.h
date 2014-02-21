@@ -15,7 +15,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
 		m_grid_data(*this, "grid_data"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -45,6 +46,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_READ8_MEMBER(sraider_sound_low_r);
 	DECLARE_READ8_MEMBER(sraider_sound_high_r);
 	DECLARE_WRITE8_MEMBER(sraider_sound_low_w);

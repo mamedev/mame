@@ -824,8 +824,8 @@ void windows_osd_interface::font_close(osd_font font)
 //-------------------------------------------------
 //  font_get_bitmap - allocate and populate a
 //  BITMAP_FORMAT_ARGB32 bitmap containing the
-//  pixel values MAKE_ARGB(0xff,0xff,0xff,0xff)
-//  or MAKE_ARGB(0x00,0xff,0xff,0xff) for each
+//  pixel values rgb_t(0xff,0xff,0xff,0xff)
+//  or rgb_t(0x00,0xff,0xff,0xff) for each
 //  pixel of a black & white font
 //-------------------------------------------------
 
@@ -947,7 +947,7 @@ bool windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, b
 			for (int x = 0; x < bitmap.width(); x++)
 			{
 				int effx = x + actbounds.min_x;
-				dstrow[x] = ((srcrow[effx / 8] << (effx % 8)) & 0x80) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
+				dstrow[x] = ((srcrow[effx / 8] << (effx % 8)) & 0x80) ? rgb_t(0xff,0xff,0xff,0xff) : rgb_t(0x00,0xff,0xff,0xff);
 			}
 		}
 

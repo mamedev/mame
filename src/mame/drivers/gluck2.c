@@ -206,7 +206,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"){ }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
@@ -219,6 +220,7 @@ public:
 	DECLARE_PALETTE_INIT(gluck2);
 	UINT32 screen_update_gluck2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -301,7 +303,7 @@ PALETTE_INIT_MEMBER(gluck2_state, gluck2)
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 
 	}
 }

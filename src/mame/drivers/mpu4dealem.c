@@ -22,7 +22,8 @@ class mpu4dealem_state : public mpu4_state
 public:
 	mpu4dealem_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mpu4_state(mconfig, type, tag),
-			m_dealem_videoram(*this, "dealem_videoram")
+			m_dealem_videoram(*this, "dealem_videoram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -31,6 +32,7 @@ public:
 	DECLARE_PALETTE_INIT(dealem);
 	UINT32 screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -107,7 +109,7 @@ PALETTE_INIT_MEMBER(mpu4dealem_state,dealem)
 		bit1 = BIT(*color_prom,7);
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 		color_prom++;
 	}
 }

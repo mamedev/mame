@@ -59,6 +59,8 @@ private:
 		UINT32 loop_pos;
 		UINT32 page;
 		UINT16 vol;
+		UINT8 panl;
+		UINT8 panr;
 	};
 
 	zchan m_chan[48];

@@ -28,7 +28,8 @@ public:
 			m_colorram(*this, "colorram"),
 			m_tileram(*this, "tileram"),
 			m_objectram(*this, "objectram"),
-			m_paletteram(*this, "paletteram")
+			m_paletteram(*this, "paletteram"),
+			m_gfxdecode(*this, "gfxdecode")
 	{
 		m_type1_map = 0;
 	}
@@ -48,6 +49,7 @@ public:
 	required_shared_ptr<UINT8> m_tileram;
 	required_shared_ptr<UINT8> m_objectram;
 	required_shared_ptr<UINT8> m_paletteram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	size_t    m_bgvideoram_size;
 
 	/* video-related */

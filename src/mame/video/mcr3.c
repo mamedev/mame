@@ -75,14 +75,14 @@ PALETTE_INIT_MEMBER(mcr3_state,spyhunt)
 
 	for (i = 0; i < machine().total_colors(); i++)
 	{
-		palette_set_color(machine(),i,RGB_BLACK); /* black */
+		palette_set_color(machine(),i,rgb_t::black); /* black */
 	}
 
 	/* alpha colors are hard-coded */
-	palette_set_color(machine(),4*16+0,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine(),4*16+1,MAKE_RGB(0x00,0xff,0x00));
-	palette_set_color(machine(),4*16+2,MAKE_RGB(0x00,0x00,0xff));
-	palette_set_color(machine(),4*16+3,MAKE_RGB(0xff,0xff,0xff));
+	palette_set_color(machine(),4*16+0,rgb_t(0x00,0x00,0x00));
+	palette_set_color(machine(),4*16+1,rgb_t(0x00,0xff,0x00));
+	palette_set_color(machine(),4*16+2,rgb_t(0x00,0x00,0xff));
+	palette_set_color(machine(),4*16+3,rgb_t(0xff,0xff,0xff));
 }
 
 
@@ -166,7 +166,7 @@ WRITE8_MEMBER(mcr3_state::spyhuntpr_paletteram_w)
 	int g = (data & 0x38) >> 3;
 	int b = (data & 0xc0) >> 6;
 
-	palette_set_color(machine(), offset^0xf, MAKE_RGB(r<<5,g<<5,b<<6));
+	palette_set_color(machine(), offset^0xf, rgb_t(r<<5,g<<5,b<<6));
 }
 
 

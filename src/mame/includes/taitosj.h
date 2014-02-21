@@ -22,7 +22,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
-		m_dac(*this, "dac") { }
+		m_dac(*this, "dac"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	typedef void (taitosj_state::*copy_layer_func_t)(bitmap_ind16 &,
 									const rectangle &, int, int *, rectangle *);
@@ -124,4 +125,5 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<dac_device> m_dac;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

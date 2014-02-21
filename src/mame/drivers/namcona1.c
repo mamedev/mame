@@ -954,6 +954,7 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcona1_state, screen_update_namcona1)
 
 	MCFG_PALETTE_LENGTH(0x2000)
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

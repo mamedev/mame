@@ -110,10 +110,10 @@ void darkmist_state::set_pens()
 		int g = pal4bit(m_generic_paletteram_8[i | 0x000] >> 4);
 		int b = pal4bit(m_generic_paletteram_8[i | 0x000] >> 0);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
-	colortable_palette_set_color(machine().colortable, 0x100, RGB_BLACK);
+	colortable_palette_set_color(machine().colortable, 0x100, rgb_t::black);
 }
 
 

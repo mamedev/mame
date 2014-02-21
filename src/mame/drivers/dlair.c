@@ -57,7 +57,8 @@ public:
 			m_22vp932(*this, "ld_22vp932") ,
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_beeper(*this, "beeper")    { }
+		m_beeper(*this, "beeper"),
+		m_gfxdecode(*this, "gfxdecode")    { }
 
 	void laserdisc_data_w(UINT8 data)
 	{
@@ -124,6 +125,7 @@ public:
 	DECLARE_READ16_MEMBER(serial_receive);
 	required_device<cpu_device> m_maincpu;
 	optional_device<beep_device> m_beeper;
+	optional_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -222,7 +224,7 @@ PALETTE_INIT_MEMBER(dlair_state,dleuro)
 
 	for (i = 0; i < 8; i++)
 	{
-		palette_set_color(machine(), 2 * i + 0, MAKE_RGB(0, 0, 0));
+		palette_set_color(machine(), 2 * i + 0, rgb_t(0, 0, 0));
 		palette_set_color_rgb(machine(), 2 * i + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
 }

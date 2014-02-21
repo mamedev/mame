@@ -15,7 +15,7 @@ I8275_DISPLAY_PIXELS(radio86_display_pixels)
 {
 	radio86_state *state = device->machine().driver_data<radio86_state>();
 	int i;
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	const UINT8 *charmap = state->m_charmap;
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
@@ -37,7 +37,7 @@ I8275_DISPLAY_PIXELS(mikrosha_display_pixels)
 {
 	radio86_state *state = device->machine().driver_data<radio86_state>();
 	int i;
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	const UINT8 *charmap = state->m_charmap + (state->m_mikrosha_font_page & 1) * 0x400;
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
@@ -58,7 +58,7 @@ I8275_DISPLAY_PIXELS(apogee_display_pixels)
 {
 	radio86_state *state = device->machine().driver_data<radio86_state>();
 	int i;
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	const UINT8 *charmap = state->m_charmap + (gpa & 1) * 0x400;
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
@@ -79,7 +79,7 @@ I8275_DISPLAY_PIXELS(partner_display_pixels)
 {
 	radio86_state *state = device->machine().driver_data<radio86_state>();
 	int i;
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	const UINT8 *charmap = state->m_charmap + 0x400 * (gpa * 2 + hlgt);
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
@@ -97,9 +97,9 @@ I8275_DISPLAY_PIXELS(partner_display_pixels)
 }
 
 static const rgb_t radio86_palette[3] = {
-	MAKE_RGB(0x00, 0x00, 0x00), // black
-	MAKE_RGB(0xa0, 0xa0, 0xa0), // white
-	MAKE_RGB(0xff, 0xff, 0xff)  // highlight
+	rgb_t(0x00, 0x00, 0x00), // black
+	rgb_t(0xa0, 0xa0, 0xa0), // white
+	rgb_t(0xff, 0xff, 0xff)  // highlight
 };
 
 PALETTE_INIT_MEMBER(radio86_state,radio86)

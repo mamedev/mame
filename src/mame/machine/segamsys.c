@@ -524,7 +524,7 @@ static void vdp_data_w(address_space &space, UINT8 data, struct sms_vdp* chip)
 					r = (palword & 0x000f)>>0;
 					g = (palword & 0x00f0)>>4;
 					b = (palword & 0x0f00)>>8;
-					rgb_t rgb = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
+					rgb_t rgb = rgb_t(pal4bit(r), pal4bit(g), pal4bit(b));
 					//palette_set_color(space.machine(),(chip->addr_reg&0x3e)/2, rgb);
 					chip->cram_mamecolours[(chip->addr_reg&0x3e)/2]=rgb;
 				}
@@ -540,7 +540,7 @@ static void vdp_data_w(address_space &space, UINT8 data, struct sms_vdp* chip)
 				r = (data & 0x03)>>0;
 				g = (data & 0x0c)>>2;
 				b = (data & 0x30)>>4;
-				rgb_t rgb = MAKE_RGB(pal2bit(r), pal2bit(g), pal2bit(b));
+				rgb_t rgb = rgb_t(pal2bit(r), pal2bit(g), pal2bit(b));
 				//palette_set_color(space.machine(),chip->addr_reg&0x1f, rgb);
 				chip->cram_mamecolours[chip->addr_reg&0x1f]=rgb;
 			}

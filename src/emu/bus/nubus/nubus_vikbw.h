@@ -37,7 +37,7 @@ protected:
 		DECLARE_WRITE32_MEMBER(viking_disable_w);
 
 public:
-		UINT8 *m_vram;
+		dynamic_buffer m_vram;
 		UINT32 m_vbl_disable, m_palette[2];
 };
 

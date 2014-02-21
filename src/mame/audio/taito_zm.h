@@ -13,8 +13,8 @@ public:
 
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_READ16_MEMBER(sound_irq_r);
-	DECLARE_WRITE16_MEMBER(global_volume_w);
-	DECLARE_WRITE16_MEMBER(reset_control_w);
+	DECLARE_WRITE16_MEMBER(reg_data_w);
+	DECLARE_WRITE16_MEMBER(reg_address_w);
 
 	DECLARE_READ8_MEMBER(shared_ram_r);
 	DECLARE_WRITE8_MEMBER(shared_ram_w);
@@ -32,7 +32,7 @@ private:
 	required_device<mn10200_device> m_soundcpu;
 	
 	// internal state
-	UINT16 m_control;
+	UINT16 m_reg_address;
 	UINT8 m_tms_ctrl;
 	UINT8* m_snd_shared_ram;
 };

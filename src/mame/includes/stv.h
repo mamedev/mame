@@ -22,7 +22,8 @@ public:
 			m_slave(*this, "slave"),
 			m_audiocpu(*this, "audiocpu"),
 			m_scudsp(*this, "scudsp"),
-			m_eeprom(*this, "eeprom")
+			m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -148,6 +149,7 @@ public:
 	required_device<m68000_base_device> m_audiocpu;
 	required_device<scudsp_cpu_device> m_scudsp;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_VIDEO_START(stv_vdp2);
@@ -350,7 +352,7 @@ public:
 	void stv_vdp2_draw_mosaic(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 is_roz);
 	void stv_vdp2_fade_effects( void );
 	void stv_vdp2_compute_color_offset( int *r, int *g, int *b, int cor );
-	void stv_vdp2_compute_color_offset_UINT32(UINT32 *rgb, int cor);
+	void stv_vdp2_compute_color_offset_UINT32(rgb_t *rgb, int cor);
 	void stv_vdp2_check_fade_control_for_layer( void );
 
 	void stv_vdp2_draw_line(bitmap_rgb32 &bitmap, const rectangle &cliprect);

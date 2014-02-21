@@ -40,7 +40,8 @@ public:
 		m_vpos_ram(*this, "vpos_ram"),
 		m_obj_ram(*this, "obj_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_discrete(*this, "discrete") { }
+		m_discrete(*this, "discrete"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_analog_in_select;
 	int m_attract;
@@ -100,6 +101,7 @@ public:
 	int circle_collision(const rectangle &rect);
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /*----------- defined in audio/starshp1.c -----------*/

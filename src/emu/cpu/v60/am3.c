@@ -2,150 +2,150 @@
 // AM3 Functions (for ReadAM)
 // **************************
 
-static UINT32 am3Register(v60_state *cpustate)
+UINT32 v60_device::am3Register()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		SETREG8(cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		SETREG8(m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		SETREG16(cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalh);
+		SETREG16(m_reg[m_modval & 0x1F], m_modwritevalh);
 		break;
 	case 2:
-		cpustate->reg[cpustate->modval & 0x1F] = cpustate->modwritevalw;
+		m_reg[m_modval & 0x1F] = m_modwritevalw;
 		break;
 	}
 
 	return 1;
 }
 
-static UINT32 am3RegisterIndirect(v60_state *cpustate)
+UINT32 v60_device::am3RegisterIndirect()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_reg[m_modval & 0x1F], m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_reg[m_modval & 0x1F], m_modwritevalw);
 		break;
 	}
 
 	return 1;
 }
 
-static UINT32 am3RegisterIndirectIndexed(v60_state *cpustate)
+UINT32 v60_device::am3RegisterIndirectIndexed()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->reg[cpustate->modval2 & 0x1F] + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(m_reg[m_modval2 & 0x1F] + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_reg[m_modval2 & 0x1F] + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_reg[m_modval2 & 0x1F] + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
 	return 2;
 }
 
-static UINT32 am3Autoincrement(v60_state *cpustate)
+UINT32 v60_device::am3Autoincrement()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
-		cpustate->reg[cpustate->modval & 0x1F] += 1;
+		m_program->write_byte(m_reg[m_modval & 0x1F], m_modwritevalb);
+		m_reg[m_modval & 0x1F] += 1;
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalh);
-		cpustate->reg[cpustate->modval & 0x1F] += 2;
+		m_program->write_word_unaligned(m_reg[m_modval & 0x1F], m_modwritevalh);
+		m_reg[m_modval & 0x1F] += 2;
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalw);
-		cpustate->reg[cpustate->modval & 0x1F] += 4;
+		m_program->write_dword_unaligned(m_reg[m_modval & 0x1F], m_modwritevalw);
+		m_reg[m_modval & 0x1F] += 4;
 		break;
 	}
 
 	return 1;
 }
 
-static UINT32 am3Autodecrement(v60_state *cpustate)
+UINT32 v60_device::am3Autodecrement()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->reg[cpustate->modval & 0x1F] -= 1;
-		cpustate->program->write_byte(cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_reg[m_modval & 0x1F] -= 1;
+		m_program->write_byte(m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->reg[cpustate->modval & 0x1F] -= 2;
-		cpustate->program->write_word_unaligned(cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalh);
+		m_reg[m_modval & 0x1F] -= 2;
+		m_program->write_word_unaligned(m_reg[m_modval & 0x1F], m_modwritevalh);
 		break;
 	case 2:
-		cpustate->reg[cpustate->modval & 0x1F] -= 4;
-		cpustate->program->write_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalw);
+		m_reg[m_modval & 0x1F] -= 4;
+		m_program->write_dword_unaligned(m_reg[m_modval & 0x1F], m_modwritevalw);
 		break;
 	}
 
 	return 1;
 }
 
-static UINT32 am3Displacement8(v60_state *cpustate)
+UINT32 v60_device::am3Displacement8()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1), cpustate->modwritevalb);
+		m_program->write_byte(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1), m_modwritevalw);
 		break;
 	}
 
 	return 2;
 }
 
-static UINT32 am3Displacement16(v60_state *cpustate)
+UINT32 v60_device::am3Displacement16()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1), cpustate->modwritevalb);
+		m_program->write_byte(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1), m_modwritevalw);
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 am3Displacement32(v60_state *cpustate)
+UINT32 v60_device::am3Displacement32()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1), cpustate->modwritevalb);
+		m_program->write_byte(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1), m_modwritevalw);
 		break;
 	}
 
@@ -153,54 +153,54 @@ static UINT32 am3Displacement32(v60_state *cpustate)
 }
 
 
-static UINT32 am3DisplacementIndexed8(v60_state *cpustate)
+UINT32 v60_device::am3DisplacementIndexed8()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 am3DisplacementIndexed16(v60_state *cpustate)
+UINT32 v60_device::am3DisplacementIndexed16()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
 	return 4;
 }
 
-static UINT32 am3DisplacementIndexed32(v60_state *cpustate)
+UINT32 v60_device::am3DisplacementIndexed32()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
@@ -208,162 +208,162 @@ static UINT32 am3DisplacementIndexed32(v60_state *cpustate)
 }
 
 
-static UINT32 am3PCDisplacement8(v60_state *cpustate)
+UINT32 v60_device::am3PCDisplacement8()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1), cpustate->modwritevalb);
+		m_program->write_byte(PC + (INT8)OpRead8(m_modadd + 1), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1), cpustate->modwritevalh);
+		m_program->write_word_unaligned(PC + (INT8)OpRead8(m_modadd + 1), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1), m_modwritevalw);
 		break;
 	}
 
 	return 2;
 }
 
-static UINT32 am3PCDisplacement16(v60_state *cpustate)
+UINT32 v60_device::am3PCDisplacement16()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1), cpustate->modwritevalb);
+		m_program->write_byte(PC + (INT16)OpRead16(m_modadd + 1), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1), cpustate->modwritevalh);
+		m_program->write_word_unaligned(PC + (INT16)OpRead16(m_modadd + 1), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1), m_modwritevalw);
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 am3PCDisplacement32(v60_state *cpustate)
+UINT32 v60_device::am3PCDisplacement32()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1), cpustate->modwritevalb);
+		m_program->write_byte(PC + OpRead32(m_modadd + 1), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1), cpustate->modwritevalh);
+		m_program->write_word_unaligned(PC + OpRead32(m_modadd + 1), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(PC + OpRead32(m_modadd + 1), m_modwritevalw);
 		break;
 	}
 
 	return 5;
 }
 
-static UINT32 am3PCDisplacementIndexed8(v60_state *cpustate)
+UINT32 v60_device::am3PCDisplacementIndexed8()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(PC + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(PC + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 am3PCDisplacementIndexed16(v60_state *cpustate)
+UINT32 v60_device::am3PCDisplacementIndexed16()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(PC + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(PC + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
 	return 4;
 }
 
-static UINT32 am3PCDisplacementIndexed32(v60_state *cpustate)
+UINT32 v60_device::am3PCDisplacementIndexed32()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(PC + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(PC + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(PC + OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 am3DisplacementIndirect8(v60_state *cpustate)
+UINT32 v60_device::am3DisplacementIndirect8()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1)), cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1)), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1)), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1)), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1)), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1)), m_modwritevalw);
 		break;
 	}
 
 	return 2;
 }
 
-static UINT32 am3DisplacementIndirect16(v60_state *cpustate)
+UINT32 v60_device::am3DisplacementIndirect16()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1)), cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1)), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1)), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1)), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1)), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1)), m_modwritevalw);
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 am3DisplacementIndirect32(v60_state *cpustate)
+UINT32 v60_device::am3DisplacementIndirect32()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1)), cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1)), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1)), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1)), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1)), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1)), m_modwritevalw);
 		break;
 	}
 
@@ -371,108 +371,108 @@ static UINT32 am3DisplacementIndirect32(v60_state *cpustate)
 }
 
 
-static UINT32 am3DisplacementIndirectIndexed8(v60_state *cpustate)
+UINT32 v60_device::am3DisplacementIndirectIndexed8()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 am3DisplacementIndirectIndexed16(v60_state *cpustate)
+UINT32 v60_device::am3DisplacementIndirectIndexed16()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
 	return 4;
 }
 
-static UINT32 am3DisplacementIndirectIndexed32(v60_state *cpustate)
+UINT32 v60_device::am3DisplacementIndirectIndexed32()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(m_reg[m_modval2 & 0x1F] + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 am3PCDisplacementIndirect8(v60_state *cpustate)
+UINT32 v60_device::am3PCDisplacementIndirect8()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1)), cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1)), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1)), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1)), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1)), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1)), m_modwritevalw);
 		break;
 	}
 
 	return 2;
 }
 
-static UINT32 am3PCDisplacementIndirect16(v60_state *cpustate)
+UINT32 v60_device::am3PCDisplacementIndirect16()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1)), cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1)), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1)), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1)), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1)), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1)), m_modwritevalw);
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 am3PCDisplacementIndirect32(v60_state *cpustate)
+UINT32 v60_device::am3PCDisplacementIndirect32()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1)), cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1)), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1)), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1)), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1)), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1)), m_modwritevalw);
 		break;
 	}
 
@@ -480,54 +480,54 @@ static UINT32 am3PCDisplacementIndirect32(v60_state *cpustate)
 }
 
 
-static UINT32 am3PCDisplacementIndirectIndexed8(v60_state *cpustate)
+UINT32 v60_device::am3PCDisplacementIndirectIndexed8()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 am3PCDisplacementIndirectIndexed16(v60_state *cpustate)
+UINT32 v60_device::am3PCDisplacementIndirectIndexed16()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
 	return 4;
 }
 
-static UINT32 am3PCDisplacementIndirectIndexed32(v60_state *cpustate)
+UINT32 v60_device::am3PCDisplacementIndirectIndexed32()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
@@ -535,54 +535,54 @@ static UINT32 am3PCDisplacementIndirectIndexed32(v60_state *cpustate)
 }
 
 
-static UINT32 am3DoubleDisplacement8(v60_state *cpustate)
+UINT32 v60_device::am3DoubleDisplacement8()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1)) + (INT8)OpRead8(cpustate, cpustate->modadd + 2), cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1)) + (INT8)OpRead8(m_modadd + 2), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1)) + (INT8)OpRead8(cpustate, cpustate->modadd + 2), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1)) + (INT8)OpRead8(m_modadd + 2), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate, cpustate->modadd + 1)) + (INT8)OpRead8(cpustate, cpustate->modadd + 2), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT8)OpRead8(m_modadd + 1)) + (INT8)OpRead8(m_modadd + 2), m_modwritevalw);
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 am3DoubleDisplacement16(v60_state *cpustate)
+UINT32 v60_device::am3DoubleDisplacement16()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1)) + (INT16)OpRead16(cpustate, cpustate->modadd + 3), cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1)) + (INT16)OpRead16(m_modadd + 3), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1)) + (INT16)OpRead16(cpustate, cpustate->modadd + 3), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1)) + (INT16)OpRead16(m_modadd + 3), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate, cpustate->modadd + 1)) + (INT16)OpRead16(cpustate, cpustate->modadd + 3), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + (INT16)OpRead16(m_modadd + 1)) + (INT16)OpRead16(m_modadd + 3), m_modwritevalw);
 		break;
 	}
 
 	return 5;
 }
 
-static UINT32 am3DoubleDisplacement32(v60_state *cpustate)
+UINT32 v60_device::am3DoubleDisplacement32()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1)) + OpRead32(cpustate, cpustate->modadd + 5), cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1)) + OpRead32(m_modadd + 5), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1)) + OpRead32(cpustate, cpustate->modadd + 5), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1)) + OpRead32(m_modadd + 5), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate, cpustate->modadd + 1)) + OpRead32(cpustate, cpustate->modadd + 5), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(m_reg[m_modval & 0x1F] + OpRead32(m_modadd + 1)) + OpRead32(m_modadd + 5), m_modwritevalw);
 		break;
 	}
 
@@ -590,141 +590,141 @@ static UINT32 am3DoubleDisplacement32(v60_state *cpustate)
 }
 
 
-static UINT32 am3PCDoubleDisplacement8(v60_state *cpustate)
+UINT32 v60_device::am3PCDoubleDisplacement8()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1)) + (INT8)OpRead8(cpustate, cpustate->modadd + 2), cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1)) + (INT8)OpRead8(m_modadd + 2), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1)) + (INT8)OpRead8(cpustate, cpustate->modadd + 2), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1)) + (INT8)OpRead8(m_modadd + 2), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + (INT8)OpRead8(cpustate, cpustate->modadd + 1)) + (INT8)OpRead8(cpustate, cpustate->modadd + 2), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(PC + (INT8)OpRead8(m_modadd + 1)) + (INT8)OpRead8(m_modadd + 2), m_modwritevalw);
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 am3PCDoubleDisplacement16(v60_state *cpustate)
+UINT32 v60_device::am3PCDoubleDisplacement16()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1)) + (INT16)OpRead16(cpustate, cpustate->modadd + 3), cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1)) + (INT16)OpRead16(m_modadd + 3), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1)) + (INT16)OpRead16(cpustate, cpustate->modadd + 3), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1)) + (INT16)OpRead16(m_modadd + 3), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + (INT16)OpRead16(cpustate, cpustate->modadd + 1)) + (INT16)OpRead16(cpustate, cpustate->modadd + 3), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(PC + (INT16)OpRead16(m_modadd + 1)) + (INT16)OpRead16(m_modadd + 3), m_modwritevalw);
 		break;
 	}
 
 	return 5;
 }
 
-static UINT32 am3PCDoubleDisplacement32(v60_state *cpustate)
+UINT32 v60_device::am3PCDoubleDisplacement32()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1)) + OpRead32(cpustate, cpustate->modadd + 5), cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1)) + OpRead32(m_modadd + 5), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1)) + OpRead32(cpustate, cpustate->modadd + 5), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1)) + OpRead32(m_modadd + 5), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(cpustate->PC + OpRead32(cpustate, cpustate->modadd + 1)) + OpRead32(cpustate, cpustate->modadd + 5), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(PC + OpRead32(m_modadd + 1)) + OpRead32(m_modadd + 5), m_modwritevalw);
 		break;
 	}
 
 	return 9;
 }
 
-static UINT32 am3DirectAddress(v60_state *cpustate)
+UINT32 v60_device::am3DirectAddress()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(OpRead32(cpustate, cpustate->modadd + 1), cpustate->modwritevalb);
+		m_program->write_byte(OpRead32(m_modadd + 1), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(OpRead32(cpustate, cpustate->modadd + 1), cpustate->modwritevalh);
+		m_program->write_word_unaligned(OpRead32(m_modadd + 1), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 1), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(OpRead32(m_modadd + 1), m_modwritevalw);
 		break;
 	}
 
 	return 5;
 }
 
-static UINT32 am3DirectAddressIndexed(v60_state *cpustate)
+UINT32 v60_device::am3DirectAddressIndexed()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2, cpustate->modwritevalh);
+		m_program->write_word_unaligned(OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 2, m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4, cpustate->modwritevalw);
+		m_program->write_dword_unaligned(OpRead32(m_modadd + 2) + m_reg[m_modval & 0x1F] * 4, m_modwritevalw);
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 am3DirectAddressDeferred(v60_state *cpustate)
+UINT32 v60_device::am3DirectAddressDeferred()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 1)), cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(OpRead32(m_modadd + 1)), m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 1)), cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(OpRead32(m_modadd + 1)), m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 1)), cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(OpRead32(m_modadd + 1)), m_modwritevalw);
 		break;
 	}
 
 	return 5;
 }
 
-static UINT32 am3DirectAddressDeferredIndexed(v60_state *cpustate)
+UINT32 v60_device::am3DirectAddressDeferredIndexed()
 {
-	switch (cpustate->moddim)
+	switch (m_moddim)
 	{
 	case 0:
-		cpustate->program->write_byte(cpustate->program->read_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalb);
+		m_program->write_byte(m_program->read_dword_unaligned(OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F], m_modwritevalb);
 		break;
 	case 1:
-		cpustate->program->write_word_unaligned(cpustate->program->read_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalh);
+		m_program->write_word_unaligned(m_program->read_dword_unaligned(OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F], m_modwritevalh);
 		break;
 	case 2:
-		cpustate->program->write_dword_unaligned(cpustate->program->read_dword_unaligned(OpRead32(cpustate, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F], cpustate->modwritevalw);
+		m_program->write_dword_unaligned(m_program->read_dword_unaligned(OpRead32(m_modadd + 2)) + m_reg[m_modval & 0x1F], m_modwritevalw);
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 am3Immediate(v60_state *cpustate)
+UINT32 v60_device::am3Immediate()
 {
-	fatalerror("CPU - AM3 - IMM (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - AM3 - IMM (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 am3ImmediateQuick(v60_state *cpustate)
+UINT32 v60_device::am3ImmediateQuick()
 {
-	fatalerror("CPU - AM3 - IMMQ (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - AM3 - IMMQ (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
@@ -733,152 +733,152 @@ static UINT32 am3ImmediateQuick(v60_state *cpustate)
 // AM3 Tables (for ReadAMAddress)
 // ******************************
 
-static UINT32 am3Error1(v60_state *cpustate)
+UINT32 v60_device::am3Error1()
 {
-	fatalerror("CPU - AM3 - 1 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - AM3 - 1 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 am3Error2(v60_state *cpustate)
+UINT32 v60_device::am3Error2()
 {
-	fatalerror("CPU - AM3 - 2 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - AM3 - 2 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 #ifdef UNUSED_FUNCTION
-static UINT32 am3Error3(v60_state *cpustate)
+UINT32 v60_device::am3Error3()
 {
-	fatalerror("CPU - AM3 - 3 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - AM3 - 3 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 #endif
 
-static UINT32 am3Error4(v60_state *cpustate)
+UINT32 v60_device::am3Error4()
 {
-	fatalerror("CPU - AM3 - 4 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - AM3 - 4 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 am3Error5(v60_state *cpustate)
+UINT32 v60_device::am3Error5()
 {
-	fatalerror("CPU - AM3 - 5 (cpustate->PC=%06x)\n", cpustate->PC);
+	fatalerror("CPU - AM3 - 5 (PC=%06x)\n", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 (*const AMTable3_G7a[16])(v60_state *) =
+const v60_device::am_func v60_device::s_AMTable3_G7a[16] =
 {
-	am3PCDisplacementIndexed8,
-	am3PCDisplacementIndexed16,
-	am3PCDisplacementIndexed32,
-	am3DirectAddressIndexed,
-	am3Error5,
-	am3Error5,
-	am3Error5,
-	am3Error5,
-	am3PCDisplacementIndirectIndexed8,
-	am3PCDisplacementIndirectIndexed16,
-	am3PCDisplacementIndirectIndexed32,
-	am3DirectAddressDeferredIndexed,
-	am3Error5,
-	am3Error5,
-	am3Error5,
-	am3Error5
+	&v60_device::am3PCDisplacementIndexed8,
+	&v60_device::am3PCDisplacementIndexed16,
+	&v60_device::am3PCDisplacementIndexed32,
+	&v60_device::am3DirectAddressIndexed,
+	&v60_device::am3Error5,
+	&v60_device::am3Error5,
+	&v60_device::am3Error5,
+	&v60_device::am3Error5,
+	&v60_device::am3PCDisplacementIndirectIndexed8,
+	&v60_device::am3PCDisplacementIndirectIndexed16,
+	&v60_device::am3PCDisplacementIndirectIndexed32,
+	&v60_device::am3DirectAddressDeferredIndexed,
+	&v60_device::am3Error5,
+	&v60_device::am3Error5,
+	&v60_device::am3Error5,
+	&v60_device::am3Error5
 };
 
-static UINT32 am3Group7a(v60_state *cpustate)
+UINT32 v60_device::am3Group7a()
 {
-	if (!(cpustate->modval2 & 0x10))
-		return am3Error4(cpustate);
+	if (!(m_modval2 & 0x10))
+		return am3Error4();
 
-	return AMTable3_G7a[cpustate->modval2 & 0xF](cpustate);
+	return (this->*s_AMTable3_G7a[m_modval2 & 0xF])();
 }
 
-static UINT32 (*const AMTable3_G7[32])(v60_state *) =
+const v60_device::am_func v60_device::s_AMTable3_G7[32] =
 {
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3ImmediateQuick,
-	am3PCDisplacement8,
-	am3PCDisplacement16,
-	am3PCDisplacement32,
-	am3DirectAddress,
-	am3Immediate,
-	am3Error2,
-	am3Error2,
-	am3Error2,
-	am3PCDisplacementIndirect8,
-	am3PCDisplacementIndirect16,
-	am3PCDisplacementIndirect32,
-	am3DirectAddressDeferred,
-	am3PCDoubleDisplacement8,
-	am3PCDoubleDisplacement16,
-	am3PCDoubleDisplacement32,
-	am3Error2
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3ImmediateQuick,
+	&v60_device::am3PCDisplacement8,
+	&v60_device::am3PCDisplacement16,
+	&v60_device::am3PCDisplacement32,
+	&v60_device::am3DirectAddress,
+	&v60_device::am3Immediate,
+	&v60_device::am3Error2,
+	&v60_device::am3Error2,
+	&v60_device::am3Error2,
+	&v60_device::am3PCDisplacementIndirect8,
+	&v60_device::am3PCDisplacementIndirect16,
+	&v60_device::am3PCDisplacementIndirect32,
+	&v60_device::am3DirectAddressDeferred,
+	&v60_device::am3PCDoubleDisplacement8,
+	&v60_device::am3PCDoubleDisplacement16,
+	&v60_device::am3PCDoubleDisplacement32,
+	&v60_device::am3Error2
 };
 
-static UINT32 (*const AMTable3_G6[8])(v60_state *) =
+const v60_device::am_func v60_device::s_AMTable3_G6[8] =
 {
-	am3DisplacementIndexed8,
-	am3DisplacementIndexed16,
-	am3DisplacementIndexed32,
-	am3RegisterIndirectIndexed,
-	am3DisplacementIndirectIndexed8,
-	am3DisplacementIndirectIndexed16,
-	am3DisplacementIndirectIndexed32,
-	am3Group7a
+	&v60_device::am3DisplacementIndexed8,
+	&v60_device::am3DisplacementIndexed16,
+	&v60_device::am3DisplacementIndexed32,
+	&v60_device::am3RegisterIndirectIndexed,
+	&v60_device::am3DisplacementIndirectIndexed8,
+	&v60_device::am3DisplacementIndirectIndexed16,
+	&v60_device::am3DisplacementIndirectIndexed32,
+	&v60_device::am3Group7a
 };
 
 
 
 
-static UINT32 am3Group6(v60_state *cpustate)
+UINT32 v60_device::am3Group6()
 {
-	cpustate->modval2 = OpRead8(cpustate, cpustate->modadd + 1);
-	return AMTable3_G6[cpustate->modval2 >> 5](cpustate);
-}
-
-
-static UINT32 am3Group7(v60_state *cpustate)
-{
-	return AMTable3_G7[cpustate->modval & 0x1F](cpustate);
+	m_modval2 = OpRead8(m_modadd + 1);
+	return (this->*s_AMTable3_G6[m_modval2 >> 5])();
 }
 
 
+UINT32 v60_device::am3Group7()
+{
+	return (this->*s_AMTable3_G7[m_modval & 0x1F])();
+}
 
-static UINT32 (*const AMTable3[2][8])(v60_state *) =
+
+
+const v60_device::am_func v60_device::s_AMTable3[2][8] =
 {
 	{
-		am3Displacement8,
-		am3Displacement16,
-		am3Displacement32,
-		am3RegisterIndirect,
-		am3DisplacementIndirect8,
-		am3DisplacementIndirect16,
-		am3DisplacementIndirect32,
-		am3Group7
+		&v60_device::am3Displacement8,
+		&v60_device::am3Displacement16,
+		&v60_device::am3Displacement32,
+		&v60_device::am3RegisterIndirect,
+		&v60_device::am3DisplacementIndirect8,
+		&v60_device::am3DisplacementIndirect16,
+		&v60_device::am3DisplacementIndirect32,
+		&v60_device::am3Group7
 	},
 
 	{
-		am3DoubleDisplacement8,
-		am3DoubleDisplacement16,
-		am3DoubleDisplacement32,
-		am3Register,
-		am3Autoincrement,
-		am3Autodecrement,
-		am3Group6,
-		am3Error1
+		&v60_device::am3DoubleDisplacement8,
+		&v60_device::am3DoubleDisplacement16,
+		&v60_device::am3DoubleDisplacement32,
+		&v60_device::am3Register,
+		&v60_device::am3Autoincrement,
+		&v60_device::am3Autodecrement,
+		&v60_device::am3Group6,
+		&v60_device::am3Error1
 	}
 };

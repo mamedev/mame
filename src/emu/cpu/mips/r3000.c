@@ -254,8 +254,8 @@ void r3000_device::device_start()
 	}
 
 	// allocate cache memory
-	m_icache = auto_alloc_array(machine(), UINT32, m_icache_size/4);
-	m_dcache = auto_alloc_array(machine(), UINT32, m_dcache_size/4);
+	m_icache.resize(m_icache_size/4);
+	m_dcache.resize(m_dcache_size/4);
 
 	m_cache = m_dcache;
 	m_cache_size = m_dcache_size;
@@ -354,8 +354,8 @@ void r3000_device::device_start()
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_op));
 	save_item(NAME(m_interrupt_cycles));
-	save_pointer(NAME(m_icache), m_icache_size/4);
-	save_pointer(NAME(m_dcache), m_dcache_size/4);
+	save_item(NAME(m_icache));
+	save_item(NAME(m_dcache));
 }
 
 

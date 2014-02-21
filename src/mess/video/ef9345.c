@@ -206,7 +206,7 @@ void ef9345_device::draw_char_40(UINT8 *c, UINT16 x, UINT16 y)
 	if (y * 10 >= m_screen->height() || x * 8 >= m_screen->width())
 		return;
 
-	const rgb_t *palette = palette_entry_list_raw(m_screen_out.palette());
+	const rgb_t *palette = m_screen_out.palette()->entry_list_raw();
 	for(int i = 0; i < 10; i++)
 		for(int j = 0; j < 8; j++)
 				m_screen_out.pix32(y * 10 + i, x * 8 + j)  = palette[c[8 * i + j] & 0x07];
@@ -219,7 +219,7 @@ void ef9345_device::draw_char_80(UINT8 *c, UINT16 x, UINT16 y)
 	if (y * 10 >= m_screen->height() || x * 6 >= m_screen->width())
 		return;
 
-	const rgb_t *palette = palette_entry_list_raw(m_screen_out.palette());
+	const rgb_t *palette = m_screen_out.palette()->entry_list_raw();
 	for(int i = 0; i < 10; i++)
 		for(int j = 0; j < 6; j++)
 				m_screen_out.pix32(y * 10 + i, x * 6 + j)  = palette[c[6 * i + j] & 0x07];

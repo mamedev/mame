@@ -16,11 +16,11 @@ void mermaid_state::palette_init()
 		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
 		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	/* blue background */
-	colortable_palette_set_color(machine().colortable, 0x40, MAKE_RGB(0, 0, 0xff));
+	colortable_palette_set_color(machine().colortable, 0x40, rgb_t(0, 0, 0xff));
 
 	/* char/sprite palette */
 	for (i = 0; i < 0x40; i++)
@@ -47,11 +47,11 @@ PALETTE_INIT_MEMBER(mermaid_state,rougien)
 		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
 		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	/* blue background */
-	colortable_palette_set_color(machine().colortable, 0x40, MAKE_RGB(0, 0, 0));
+	colortable_palette_set_color(machine().colortable, 0x40, rgb_t(0, 0, 0));
 
 	/* char/sprite palette */
 	for (i = 0; i < 0x40; i++)

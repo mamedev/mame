@@ -159,9 +159,9 @@ public:
 	casloopy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bios_rom(*this, "bios_rom"),
-		m_vregs(*this, "vregs")
-		,
-		m_maincpu(*this, "maincpu") { }
+		m_vregs(*this, "vregs"),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT32> m_bios_rom;
 	required_shared_ptr<UINT32> m_vregs;
@@ -186,6 +186,7 @@ public:
 	DECLARE_READ8_MEMBER(casloopy_bitmap_r);
 	DECLARE_WRITE8_MEMBER(casloopy_bitmap_w);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -251,7 +252,7 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 	r = pal5bit((m_vregs[0x4/4] >> 10) & 0x1f);
 	g = pal5bit((m_vregs[0x4/4] >> 5) & 0x1f);
 	b = pal5bit((m_vregs[0x4/4] >> 0) & 0x1f);
-	palette_set_color(machine(),0x100,MAKE_RGB(r^0xff,g^0xff,b^0xff));
+	palette_set_color(machine(),0x100,rgb_t(r^0xff,g^0xff,b^0xff));
 	bitmap.fill( 0x100 ,cliprect);
 	#endif
 
@@ -491,6 +492,8 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update_casloopy)
 
 	MCFG_PALETTE_LENGTH(512)
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("ic1,bin")

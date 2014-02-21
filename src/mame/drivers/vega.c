@@ -104,12 +104,14 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_i8255(*this, "ppi8255"),
 	m_ins8154(*this, "ins8154"),
-	m_ay8910(*this, "ay8910") {}
+	m_ay8910(*this, "ay8910"),
+	m_gfxdecode(*this, "gfxdecode") {}
 
 	required_device<cpu_device>     m_maincpu;
 	required_device<i8255_device>   m_i8255;
 	required_device<ins8154_device> m_ins8154;
 	required_device<ay8910_device>  m_ay8910;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	int m_p2_data;
 	int m_ext_offset_w;
@@ -484,8 +486,8 @@ void vega_state::palette_init()
 	int i;
 	for(i=0;i<8;++i)
 	{
-		palette_set_color( machine(),2*i, MAKE_RGB(0x00, 0x00, 0x00) );
-		palette_set_color( machine(),2*i+1, MAKE_RGB( (i&1)?0xff:0x00, (i&2)?0xff:0x00, (i&4)?0xff:0x00) );
+		palette_set_color( machine(),2*i, rgb_t(0x00, 0x00, 0x00) );
+		palette_set_color( machine(),2*i+1, rgb_t( (i&1)?0xff:0x00, (i&2)?0xff:0x00, (i&4)?0xff:0x00) );
 	}
 }
 

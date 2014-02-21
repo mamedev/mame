@@ -41,10 +41,10 @@ void bsktball_state::palette_init()
 
 	machine().colortable = colortable_alloc(machine(), 4);
 
-	colortable_palette_set_color(machine().colortable,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-	colortable_palette_set_color(machine().colortable,1,MAKE_RGB(0x80,0x80,0x80)); /* LIGHT GREY */
-	colortable_palette_set_color(machine().colortable,2,MAKE_RGB(0x50,0x50,0x50)); /* DARK GREY */
-	colortable_palette_set_color(machine().colortable,3,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+	colortable_palette_set_color(machine().colortable,0,rgb_t(0x00,0x00,0x00)); /* BLACK */
+	colortable_palette_set_color(machine().colortable,1,rgb_t(0x80,0x80,0x80)); /* LIGHT GREY */
+	colortable_palette_set_color(machine().colortable,2,rgb_t(0x50,0x50,0x50)); /* DARK GREY */
+	colortable_palette_set_color(machine().colortable,3,rgb_t(0xff,0xff,0xff)); /* WHITE */
 
 	/* playfield */
 	for (i = 0; i < 2; i++)

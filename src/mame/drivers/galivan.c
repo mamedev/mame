@@ -317,24 +317,22 @@ static INPUT_PORTS_START( ninjemak )
 INPUT_PORTS_END
 
 
-#define CHARLAYOUT(NUM) static const gfx_layout charlayout_##NUM =  \
-{                                                                   \
-	8,8,    /* 8*8 characters */                                    \
-	NUM,    /* NUM characters */                                    \
-	4,  /* 4 bits per pixel */                                      \
-	{ 0, 1, 2, 3 },                                                 \
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },                     \
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },             \
-	32*8    /* every char takes 32 consecutive bytes */             \
-}
 
-CHARLAYOUT(512);
-CHARLAYOUT(1024);
+static const gfx_layout charlayout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0, 1, 2, 3 },
+	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8
+};
 
 static const gfx_layout tilelayout =
 {
 	16,16,
-	1024,
+	RGN_FRAC(1,1),
 	4,
 	{ 0, 1, 2, 3 },
 	{ 4,0,12,8,20,16,28,24,36,32,44,40,52,48,60,56 },
@@ -343,33 +341,23 @@ static const gfx_layout tilelayout =
 	16*16*4
 };
 
-#define SPRITELAYOUT(NUM) static const gfx_layout spritelayout_##NUM =  \
-{                                                                       \
-	16,16,  /* 16*16 sprites */                                         \
-	NUM,    /* NUM sprites */                                           \
-	4,  /* 4 bits per pixel */                                          \
-	{ 0, 1, 2, 3 },                                                     \
-	{ 1*4, 0*4, 1*4+NUM*64*8, 0*4+NUM*64*8, 3*4, 2*4, 3*4+NUM*64*8, 2*4+NUM*64*8,           \
-			5*4, 4*4, 5*4+NUM*64*8, 4*4+NUM*64*8, 7*4, 6*4, 7*4+NUM*64*8, 6*4+NUM*64*8 },   \
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,                   \
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },     \
-	64*8    /* every sprite takes 64 consecutive bytes */               \
-}
-
-SPRITELAYOUT(512);
-SPRITELAYOUT(1024);
-
+static const gfx_layout spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	4,
+	{ 0, 1, 2, 3 },
+	{ 1*4, 0*4, RGN_FRAC(1,2)+1*4, RGN_FRAC(1,2)+0*4, 3*4, 2*4, RGN_FRAC(1,2)+3*4, RGN_FRAC(1,2)+2*4,
+			5*4, 4*4, RGN_FRAC(1,2)+5*4, RGN_FRAC(1,2)+4*4, 7*4, 6*4, RGN_FRAC(1,2)+7*4, RGN_FRAC(1,2)+6*4},
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	64*8
+};
 
 static GFXDECODE_START( galivan )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_512,            0,   8 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,             8*16,  16 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_512, 8*16+16*16, 256 )
-GFXDECODE_END
-
-static GFXDECODE_START( ninjemak )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1024,            0,   8 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,              8*16,  16 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_1024, 8*16+16*16, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,            0,   8 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         8*16,  16 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 8*16+16*16, 256 )
 GFXDECODE_END
 
 
@@ -384,7 +372,6 @@ MACHINE_START_MEMBER(galivan_state,galivan)
 	/* register for saving */
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
-	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_write_layers));
 	save_item(NAME(m_layers));
 }
@@ -399,7 +386,6 @@ MACHINE_START_MEMBER(galivan_state,ninjemak)
 	/* register for saving */
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
-	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_ninjemak_dispdisable));
 }
 
@@ -412,7 +398,6 @@ MACHINE_RESET_MEMBER(galivan_state,galivan)
 	m_write_layers = 0;
 	m_galivan_scrollx[0] = m_galivan_scrollx[1] = 0;
 	m_galivan_scrolly[0] = m_galivan_scrolly[1] = 0;
-	m_flipscreen = 0;
 }
 
 MACHINE_RESET_MEMBER(galivan_state,ninjemak)
@@ -421,7 +406,6 @@ MACHINE_RESET_MEMBER(galivan_state,ninjemak)
 
 	m_scrollx = 0;
 	m_scrolly = 0;
-	m_flipscreen = 0;
 	m_ninjemak_dispdisable = 0;
 }
 
@@ -442,12 +426,15 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,galivan)
 
 	/* video hardware */
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_galivan)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", galivan)
 	MCFG_PALETTE_LENGTH(8*16+16*16+256*16)
@@ -484,14 +471,17 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,ninjemak)
 
 	/* video hardware */
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_ninjemak)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ninjemak)
+	MCFG_GFXDECODE_ADD("gfxdecode", galivan)
 	MCFG_PALETTE_LENGTH(8*16+16*16+256*16)
 
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)

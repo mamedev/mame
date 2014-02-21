@@ -34,7 +34,8 @@ public:
 		m_out_ram(*this, "out_ram"),
 		m_color_ram(*this, "color_ram"),
 		m_fix_ram(*this, "fix_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 m_nmi_enable;
 
@@ -63,6 +64,7 @@ public:
 	void astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	void astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /* VIDEO GOODS */
@@ -224,7 +226,7 @@ WRITE8_MEMBER(segald_state::astron_COLOR_write)
 	b = (highBits & 0x0f);
 	a = (highBits & 0x80) ? 0 : 255;
 
-	palette_set_color(machine(), palIndex, MAKE_ARGB(a, r, g, b));
+	palette_set_color(machine(), palIndex, rgb_t(a, r, g, b));
 	logerror("COLOR write : 0x%04x @   0x%04x [0x%x]\n", data, offset, space.device().safe_pc());
 }
 

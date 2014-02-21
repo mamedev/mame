@@ -30,7 +30,8 @@ public:
 		m_ppi(*this, "ppi8255"),
 		m_cassette(*this, "cassette"),
 		m_centronics(*this, "centronics"),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_mz700;                /* 1 if running on an mz700 */
 
@@ -110,6 +111,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	optional_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

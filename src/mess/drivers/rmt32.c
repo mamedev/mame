@@ -323,8 +323,8 @@ WRITE8_MEMBER(mt32_state::so_w)
 
 void mt32_state::palette_init()
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0, 0, 0));
-	palette_set_color(machine(), 1, MAKE_RGB(0, 255, 0));
+	palette_set_color(machine(), 0, rgb_t(0, 0, 0));
+	palette_set_color(machine(), 1, rgb_t(0, 255, 0));
 }
 
 static ADDRESS_MAP_START( mt32_map, AS_PROGRAM, 8, mt32_state )

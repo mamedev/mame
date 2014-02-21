@@ -30,9 +30,9 @@ inline UINT8* z88_state::convert_address(UINT32 offset)
 // Initialise the palette
 void z88_state::palette_init()
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92,  83,  88));
-	palette_set_color(machine(), 2, MAKE_RGB(122, 126, 129));
+	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
+	palette_set_color(machine(), 1, rgb_t(92,  83,  88));
+	palette_set_color(machine(), 2, rgb_t(122, 126, 129));
 }
 
 /* temp - change to gfxelement structure */

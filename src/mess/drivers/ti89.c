@@ -510,8 +510,8 @@ UINT32 ti68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void ti68k_state::palette_init()
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
+	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
 }
 
 static MACHINE_CONFIG_START( ti89, ti68k_state )

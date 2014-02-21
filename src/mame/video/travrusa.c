@@ -69,7 +69,7 @@ void travrusa_state::palette_init()
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	for (i = 0x80; i < 0x90; i++)
@@ -95,7 +95,7 @@ void travrusa_state::palette_init()
 		bit2 = (color_prom[(i - 0x80) + 0x200] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -145,7 +145,7 @@ PALETTE_INIT_MEMBER(travrusa_state,shtrider)
 		bit2 = (color_prom[i + 0x100] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	for (i = 0x80; i < 0x90; i++)
@@ -171,7 +171,7 @@ PALETTE_INIT_MEMBER(travrusa_state,shtrider)
 		bit2 = (color_prom[(i - 0x80) + 0x200] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */

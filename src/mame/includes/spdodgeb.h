@@ -10,7 +10,8 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_msm1(*this, "msm1"),
-		m_msm2(*this, "msm2"){ }
+		m_msm2(*this, "msm2"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_toggle;
 	int m_adpcm_pos[2];
@@ -62,4 +63,5 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm1;
 	required_device<msm5205_device> m_msm2;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

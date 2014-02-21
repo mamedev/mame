@@ -36,7 +36,8 @@ class drw80pkr_state : public driver_device
 public:
 	drw80pkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_t0;
@@ -73,6 +74,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -372,7 +374,7 @@ void drw80pkr_state::palette_init()
 		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
 		b = tb - (i * (tb / 5));
 
-		palette_set_color(machine(), j, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), j, rgb_t(r, g, b));
 	}
 }
 

@@ -25,7 +25,8 @@ public:
 
 	pc1251_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 m_outa;
 	UINT8 m_outb;
@@ -47,6 +48,7 @@ public:
 	virtual void machine_start();
 	DECLARE_MACHINE_START(pc1260);
 	required_device<sc61860_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

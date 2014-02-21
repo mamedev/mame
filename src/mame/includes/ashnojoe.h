@@ -20,7 +20,8 @@ public:
 		m_tilemap_reg(*this, "tilemap_reg"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	UINT16 *    m_tileram_1;
@@ -82,4 +83,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ashnojoe_vclk_cb);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

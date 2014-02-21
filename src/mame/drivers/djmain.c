@@ -95,7 +95,7 @@ WRITE32_MEMBER(djmain_state::paletteram32_w)
 	g = (data >>  8) & 0xff;
 	b = (data >> 16) & 0xff;
 
-	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset, rgb_t(r, g, b));
 }
 
 

@@ -56,7 +56,7 @@ WRITE16_MEMBER(lemmings_state::lemmings_palette_24bit_w)
 	g = (m_paletteram[offset + 1] >> 8) & 0xff;
 	r = (m_paletteram[offset + 1] >> 0) & 0xff;
 
-	palette_set_color(machine(), offset / 2, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset / 2, rgb_t(r, g, b));
 }
 
 void lemmings_state::lemmings_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )

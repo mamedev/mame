@@ -19,7 +19,7 @@
 #define DKGRAY  5
 #define BLUE    6
 #define LTBLUE  7
-#define BROWN   8
+#define BROWN   8   					   
 #define ORANGE  9
 #define GRAY    10
 #define PINK    11
@@ -31,6 +31,7 @@
 // derived from the IIgs palette then adjusted to match Sara
 static const unsigned char apple3_palette[] =
 {
+	// text colors, which don't match the Apple II palette
 	0x0, 0x0, 0x0,  /* Black         $0 */
 	0x5, 0x0, 0x5,  /* Magenta       $1 */
 	0x0, 0x0, 0x9,  /* Dark Blue     $2 */
@@ -46,7 +47,25 @@ static const unsigned char apple3_palette[] =
 	0x1, 0xD, 0x0,  /* Light Green   $C */
 	0xe, 0xe, 0x0,  /* Yellow        $D */
 	0x4, 0xe, 0xd,  /* Cyan          $E */
+	0xF, 0xF, 0xF,  /* White         $F */
+	// graphics colors, which *are* Apple II order
+	0x0, 0x0, 0x0,  /* Black         $0 */
+	0xD, 0x0, 0x3,  /* Deep Red      $1 */
+	0x0, 0x0, 0x9,  /* Dark Blue     $2 */
+	0xD, 0x2, 0xD,  /* Purple        $3 */
+	0x0, 0x7, 0x2,  /* Dark Green    $4 */
+	0x5, 0x5, 0x5,  /* Dark Gray     $5 */
+	0x2, 0x2, 0xF,  /* Medium Blue   $6 */
+	0x6, 0xA, 0xF,  /* Light Blue    $7 */
+	0x8, 0x5, 0x0,  /* Brown         $8 */
+	0xF, 0x6, 0x0,  /* Orange        $9 */
+	0xA, 0xA, 0xA,  /* Light Gray    $A */
+	0xF, 0x9, 0x8,  /* Pink          $B */
+	0x1, 0xD, 0x0,  /* Light Green   $C */
+	0xF, 0xF, 0x0,  /* Yellow        $D */
+	0x4, 0xF, 0x9,  /* Aquamarine    $E */
 	0xF, 0xF, 0xF   /* White         $F */
+
 };
 
 static const UINT32 text_map[] =
@@ -61,7 +80,7 @@ PALETTE_INIT_MEMBER(apple3_state, apple3)
 {
 	int i;
 
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < 32; i++)
 	{
 		palette_set_color_rgb(machine(), i,
 			apple3_palette[(3*i)]*17,
@@ -257,18 +276,6 @@ void apple3_state::apple3_video_graphics_hgr(bitmap_ind16 &bitmap)
 	}
 }
 
-
-
-UINT8 apple3_state::swap_bits(UINT8 b)
-{
-	return (b & 0x08 ? 0x01 : 0x00)
-		|  (b & 0x04 ? 0x02 : 0x00)
-		|  (b & 0x02 ? 0x04 : 0x00)
-		|  (b & 0x01 ? 0x08 : 0x00);
-}
-
-
-
 void apple3_state::apple3_video_graphics_chgr(bitmap_ind16 &bitmap)
 {
 	/* color hi-res mode: 280x192x16 */
@@ -296,8 +303,8 @@ void apple3_state::apple3_video_graphics_chgr(bitmap_ind16 &bitmap)
 
 		for (i = 0; i < 40; i++)
 		{
-			bgcolor = swap_bits((*col_info >> 0) & 0x0F);
-			fgcolor = swap_bits((*col_info >> 4) & 0x0F);
+			bgcolor = ((*col_info >> 0) & 0x0F) + 16;
+			fgcolor = ((*col_info >> 4) & 0x0F) + 16;
 
 			b = *pix_info;
 

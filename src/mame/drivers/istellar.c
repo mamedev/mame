@@ -35,7 +35,8 @@ public:
 		m_tile_control_ram(*this, "tile_ctrl_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<UINT8> m_tile_ram;
@@ -59,6 +60,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_callback_istellar);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -302,7 +304,7 @@ void istellar_state::palette_init()
 		bit3 = (color_prom[i+0x200] >> 3) & 0x01;
 		b = (0x8f * bit3) + (0x43 * bit2) + (0x1f * bit1) + (0x0e * bit0);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 	}
 }
 

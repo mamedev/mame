@@ -32,7 +32,7 @@ public:
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	if800_state *state = device->machine().driver_data<if800_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 
 	int xi,gfx;
 	UINT8 pen;

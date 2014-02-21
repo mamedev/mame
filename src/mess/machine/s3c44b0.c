@@ -309,7 +309,7 @@ rgb_t s3c44b0_device::lcd_get_color_stn_04(UINT8 data)
 {
 	UINT8 r, g, b;
 	r = g = b = BITS(data, 3, 0) << 4;
-	return MAKE_RGB(r, g, b);
+	return rgb_t(r, g, b);
 }
 
 UINT8 s3c44b0_device::lcd_get_color_stn_08_r(UINT8 data)
@@ -523,7 +523,7 @@ UINT32 s3c44b0_device::video_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				UINT8 *vram = m_lcd.bitmap + y * (m_lcd.hpos_max - m_lcd.hpos_min + 1);
 				for (int x = 0; x < screen.width(); x++)
 				{
-					*scanline++ = MAKE_RGB(vram[0], vram[1], vram[2]);
+					*scanline++ = rgb_t(vram[0], vram[1], vram[2]);
 					vram += 3;
 				}
 			}

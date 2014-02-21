@@ -53,7 +53,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu") ,
 		m_maincpu(*this, "maincpu"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* video-related */
 	UINT8    m_ram_bank;
@@ -95,6 +96,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -166,7 +168,7 @@ UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind1
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(machine(), i / 2, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i / 2, rgb_t(r, g, b));
 	}
 
 	for (i = 0; i < 0x800; i += 2)
@@ -179,7 +181,7 @@ UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind1
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(machine(), (i / 2) + 0x400, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), (i / 2) + 0x400, rgb_t(r, g, b));
 	}
 
 	bitmap.fill(0x3ff, cliprect);

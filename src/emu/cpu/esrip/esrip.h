@@ -195,7 +195,7 @@ protected:
 
 	UINT8   m_optable[65536];
 
-	UINT16  *m_ipt_ram;
+	dynamic_array<UINT16> m_ipt_ram;
 	UINT8   *m_lbrm;
 
 	address_space *m_program;

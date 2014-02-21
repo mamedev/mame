@@ -197,6 +197,10 @@ const pc_format::format pc_format::formats[] = {
 		floppy_image::FF_35,  floppy_image::DSHD, floppy_image::MFM,
 		1000, 18, 80, 2, 512, {}, 1, {}, 80, 50, 22, 108
 	},
+	{   /* Microsoft DMF 1680K 3 1/2 inch high density - gaps unverified */
+		floppy_image::FF_35,  floppy_image::DSHD, floppy_image::MFM,
+		1000, 21, 80, 2, 512, {}, 1, {}, 80, 50, 22, 0xc
+	},
 	{   /* 2880K 3 1/2 inch extended density - gaps unverified */
 		floppy_image::FF_35,  floppy_image::DSED, floppy_image::MFM,
 			500, 36, 80, 2, 512, {}, 1, {}, 80, 50, 41, 80

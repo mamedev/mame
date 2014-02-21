@@ -18,7 +18,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k007342(*this, "k007342"),
 		m_k007420(*this, "k007420"),
-		m_vlm(*this, "vlm") { }
+		m_vlm(*this, "vlm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_paletteram;
@@ -33,6 +34,8 @@ public:
 	required_device<k007342_device> m_k007342;
 	required_device<k007420_device> m_k007420;
 	required_device<vlm5030_device> m_vlm;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(rockrage_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(rockrage_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(rockrage_vreg_w);

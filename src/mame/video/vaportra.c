@@ -29,7 +29,7 @@ void vaportra_state::update_24bitcol( int offset )
 	g = (m_generic_paletteram_16[offset] >> 8) & 0xff;
 	b = (m_generic_paletteram2_16[offset] >> 0) & 0xff;
 
-	palette_set_color(machine(), offset, MAKE_RGB(r,g,b));
+	palette_set_color(machine(), offset, rgb_t(r,g,b));
 }
 
 WRITE16_MEMBER(vaportra_state::vaportra_palette_24bit_rg_w)

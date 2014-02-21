@@ -60,7 +60,7 @@ inline rgb_t gp32_state::s3c240x_get_color_5551( UINT16 data)
 	g = BITS( data, 10, 6) << 3;
 	b = BITS( data, 5, 1) << 3;
 	i = BIT( data, 1) << 2;
-	return MAKE_RGB( r | i, g | i, b | i);
+	return rgb_t( r | i, g | i, b | i);
 }
 
 void gp32_state::s3c240x_lcd_dma_reload()

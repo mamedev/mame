@@ -184,17 +184,17 @@ void m62_state::m62_amplify_contrast(palette_t *palette, UINT32 numcolors)
 {
 	// m62 palette is very dark, so amplify default contrast
 	UINT32 i, ymax=1;
-	if (!numcolors) numcolors = palette_get_num_colors(palette);
+	if (!numcolors) numcolors = palette->num_colors();
 
 	// find maximum brightness
 	for (i=0;i < numcolors;i++)
 	{
-		rgb_t rgb = palette_entry_get_color(palette,i);
-		UINT32 y = 299 * RGB_RED(rgb) + 587 * RGB_GREEN(rgb) + 114 * RGB_BLUE(rgb);
+		rgb_t rgb = palette->entry_color(i);
+		UINT32 y = 299 * rgb.r() + 587 * rgb.g() + 114 * rgb.b();
 		ymax = MAX(ymax, y);
 	}
 
-	palette_set_contrast(palette, 255000.0/ymax);
+	palette->set_contrast(255000.0/ymax);
 }
 
 void m62_state::palette_init()

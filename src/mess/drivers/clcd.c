@@ -91,8 +91,8 @@ public:
 
 	void palette_init()
 	{
-		palette_set_color(machine(), 0, MAKE_RGB(36,72,36));
-		palette_set_color(machine(), 1, MAKE_RGB(2,4,2));
+		palette_set_color(machine(), 0, rgb_t(36,72,36));
+		palette_set_color(machine(), 1, rgb_t(2,4,2));
 	}
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -791,7 +791,7 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 
 	MCFG_RAM_ADD("ram")
 	MCFG_RAM_DEFAULT_VALUE(0)
-	MCFG_RAM_EXTRA_OPTIONS("32k,64k,128k")
+	MCFG_RAM_EXTRA_OPTIONS("32k,64k")
 	MCFG_RAM_DEFAULT_SIZE("128k")
 	MCFG_NVRAM_HANDLER(clcd)
 MACHINE_CONFIG_END

@@ -50,11 +50,13 @@ public:
 	sbowling_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	int m_bgmap;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	int m_sbw_system;
 	tilemap_t *m_sb_tilemap;
@@ -372,7 +374,7 @@ void sbowling_state::palette_init()
 		bit2 = (color_prom[i+0x400] >> 3) & 0x01;
 		r = (int)(outputs_r[ (bit0<<0) | (bit1<<1) | (bit2<<2) ] + 0.5);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 	}
 }
 

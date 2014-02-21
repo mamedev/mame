@@ -106,7 +106,8 @@ public:
 		m_blitterregs(*this, "blitterregs"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT32> m_viewregs0;
 	required_shared_ptr<UINT32> m_viewregs6;
@@ -153,6 +154,7 @@ public:
 	void rabbit_do_blit();
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -520,7 +522,7 @@ WRITE32_MEMBER(rabbit_state::rabbit_paletteram_dword_w)
 	r = ((m_generic_paletteram_32[offset] & 0x0000ff00) >>8);
 	g = ((m_generic_paletteram_32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,rgb_t(r,g,b));
 }
 
 READ32_MEMBER(rabbit_state::rabbit_tilemap0_r)

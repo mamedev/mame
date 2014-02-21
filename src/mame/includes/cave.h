@@ -42,7 +42,8 @@ public:
 			m_int_timer(*this, "int_timer"),
 			m_int_timer_left(*this, "int_timer_left"),
 			m_int_timer_right(*this, "int_timer_right"),
-			m_eeprom(*this, "eeprom") { }
+			m_eeprom(*this, "eeprom"),
+			m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	optional_shared_ptr_array<UINT16, 4> m_videoregs;
@@ -235,6 +236,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 	void update_irq_state();
 	void unpack_sprites(const char *region);
 	void ddonpach_unpack_sprites(const char *region);

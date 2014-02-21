@@ -4,14 +4,14 @@
 
 PALETTE_INIT_MEMBER(kc85_state,kc85)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
+	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
 }
 
 PALETTE_INIT_MEMBER(tandy200_state,tandy200)
 {
-	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
-	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
+	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
+	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
 }
 
 UINT32 kc85_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

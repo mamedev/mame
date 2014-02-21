@@ -46,24 +46,24 @@ void hec2hrp_state::Init_Hector_Palette()
 	hector_color[3] = 3; // Ecriture de choix (jaune)
 
 	// Color initialisation : full lightning
-	palette_set_color( machine(), 0,MAKE_RGB(000,000,000));//Noir
-	palette_set_color( machine(), 1,MAKE_RGB(255,000,000));//Rouge
-	palette_set_color( machine(), 2,MAKE_RGB(000,255,000));//Vert
-	palette_set_color( machine(), 3,MAKE_RGB(255,255,000));//Jaune
-	palette_set_color( machine(), 4,MAKE_RGB(000,000,255));//Bleu
-	palette_set_color( machine(), 5,MAKE_RGB(255,000,255));//Magneta
-	palette_set_color( machine(), 6,MAKE_RGB(000,255,255));//Cyan
-	palette_set_color( machine(), 7,MAKE_RGB(255,255,255));//Blanc
+	palette_set_color( machine(), 0,rgb_t(000,000,000));//Noir
+	palette_set_color( machine(), 1,rgb_t(255,000,000));//Rouge
+	palette_set_color( machine(), 2,rgb_t(000,255,000));//Vert
+	palette_set_color( machine(), 3,rgb_t(255,255,000));//Jaune
+	palette_set_color( machine(), 4,rgb_t(000,000,255));//Bleu
+	palette_set_color( machine(), 5,rgb_t(255,000,255));//Magneta
+	palette_set_color( machine(), 6,rgb_t(000,255,255));//Cyan
+	palette_set_color( machine(), 7,rgb_t(255,255,255));//Blanc
 	// 1/2 lightning
 
-	palette_set_color( machine(), 8,MAKE_RGB(000,000,000));//Noir
-	palette_set_color( machine(), 9,MAKE_RGB(128,000,000));//Rouge
-	palette_set_color( machine(),10,MAKE_RGB(000,128,000));//Vert
-	palette_set_color( machine(),11,MAKE_RGB(128,128,000));//Jaune
-	palette_set_color( machine(),12,MAKE_RGB(000,000,128));//Bleu
-	palette_set_color( machine(),13,MAKE_RGB(128,000,128));//Magneta
-	palette_set_color( machine(),14,MAKE_RGB(000,128,128));//Cyan
-	palette_set_color( machine(),15,MAKE_RGB(128,128,128));//Blanc
+	palette_set_color( machine(), 8,rgb_t(000,000,000));//Noir
+	palette_set_color( machine(), 9,rgb_t(128,000,000));//Rouge
+	palette_set_color( machine(),10,rgb_t(000,128,000));//Vert
+	palette_set_color( machine(),11,rgb_t(128,128,000));//Jaune
+	palette_set_color( machine(),12,rgb_t(000,000,128));//Bleu
+	palette_set_color( machine(),13,rgb_t(128,000,128));//Magneta
+	palette_set_color( machine(),14,rgb_t(000,128,128));//Cyan
+	palette_set_color( machine(),15,rgb_t(128,128,128));//Blanc
 }
 
 void hec2hrp_state::hector_hr(bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram)

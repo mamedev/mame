@@ -305,7 +305,8 @@ class dwarfd_state : public driver_device
 public:
 	dwarfd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
+		m_maincpu(*this,"maincpu"),
+		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
 	/* video-related */
@@ -333,6 +334,8 @@ public:
 	UINT8    m_videobuf[0x8000];
 
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(i8275_preg_w);
 	DECLARE_READ8_MEMBER(i8275_preg_r);
 	DECLARE_WRITE8_MEMBER(i8275_creg_w);
@@ -986,12 +989,12 @@ void dwarfd_state::palette_init()
 		int b = machine().rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 	}
-	palette_set_color(machine(), 8, MAKE_RGB(255, 255, 0));
-	palette_set_color(machine(), 12, MAKE_RGB(127, 127, 255));
-	palette_set_color(machine(), 4, MAKE_RGB(0, 255, 0));
-	palette_set_color(machine(), 6, MAKE_RGB(255, 0, 0));
+	palette_set_color(machine(), 8, rgb_t(255, 255, 0));
+	palette_set_color(machine(), 12, rgb_t(127, 127, 255));
+	palette_set_color(machine(), 4, rgb_t(0, 255, 0));
+	palette_set_color(machine(), 6, rgb_t(255, 0, 0));
 }
 
 static const ay8910_interface ay8910_config =

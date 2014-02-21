@@ -205,7 +205,7 @@ void enigma2_state::get_pens(pen_t *pens)
 	for (i = 0; i < NUM_PENS; i++)
 	{
 		/* this color gun arrengement is supported by the flyer screenshot */
-		pens[i] = MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		pens[i] = rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 	}
 }
 
@@ -334,7 +334,7 @@ UINT32 enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb32
 			video_data = video_data >> 1;
 		}
 
-		pen = bit ? RGB_WHITE : RGB_BLACK;
+		pen = bit ? rgb_t::white : rgb_t::black;
 		bitmap.pix32(bitmap_y, x) = pen;
 
 		/* next pixel */

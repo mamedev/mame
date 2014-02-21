@@ -41,7 +41,8 @@ public:
 			m_laserdisc(*this, "laserdisc") ,
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_control_ram(*this, "tile_ctrl_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<UINT8> m_tile_ram;
@@ -58,6 +59,7 @@ public:
 	UINT32 screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_esh);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -267,11 +269,11 @@ void esh_state::palette_init()
 		bit2 = (color_prom[i+0x100] >> 6) & 0x01;
 		b = (0x97 * bit2) + (0x47 * bit1) + (0x21 * bit0);
 
-		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,rgb_t(r,g,b));
 	}
 
 	/* make color 0 transparent */
-	palette_set_color(machine(), 0, MAKE_ARGB(0,0,0,0));
+	palette_set_color(machine(), 0, rgb_t(0,0,0,0));
 }
 
 static const gfx_layout esh_gfx_layout =

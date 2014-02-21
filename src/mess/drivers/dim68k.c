@@ -225,7 +225,7 @@ void dim68k_state::video_start()
 MC6845_UPDATE_ROW( dim68k_update_row )
 {
 	dim68k_state *state = device->machine().driver_data<dim68k_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 chr,gfx,x,xx,inv;
 	UINT16 chr16=0x2020; // set to spaces if screen is off
 	UINT32 *p = &bitmap.pix32(y);

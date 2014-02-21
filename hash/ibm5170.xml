@@ -2937,6 +2937,130 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="win95">
+		<description>Windows 95</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="boot.img" size="1474560" crc="c3bcf726" sha1="42ac1dd43185826c8f8025d5639022973adc946a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="8ff5ea31" sha1="a8102a27e58c73f2470c780934cd665960890f6f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk02.img" size="1720320" crc="866bbcd1" sha1="9ad21e5f2db7f8b92d0ab99e5b0925f05af70660" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk03.img" size="1720320" crc="ac65eecd" sha1="67897e7553e37367851642d67e6d900e394472cc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk04.img" size="1720320" crc="b09d3d29" sha1="2aa14ea591144364b47d47e62627ede0c3186391" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk05.img" size="1720320" crc="afd146fc" sha1="e69bbb63241e9688357bb025bb0376a721a9e2c5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk06.img" size="1720320" crc="8d1f3521" sha1="9c751f18a96cfaad702a1e08b5018cd578e6a291" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk07.img" size="1720320" crc="390bee24" sha1="5ae20a3fb5e677c7cbdf87c94f4e740ffdb064c9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk08.img" size="1720320" crc="9335db0f" sha1="1fc2d1197c8e6154dce91ce7dc8d24908c7f7bdd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk09.img" size="1720320" crc="03cc2de2" sha1="ae5a85fc77bf487c9fa80668ac282e47f204f558" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk10.img" size="1720320" crc="84e8ad0f" sha1="08c230dc3bcdaaf81822a90d732d405bef0af465" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk11.img" size="1720320" crc="ad4e8fbd" sha1="3f68420495e3fd619ef4281309ce74d8813eddc2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk12.img" size="1720320" crc="d4b88fc6" sha1="d2e3c8c214b788bd4e23b882e5995f6e6217cae6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk13.img" size="1720320" crc="898b67c4" sha1="6d4e54f58225927f5212a53d118be476f5342a70" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="naslite">
+		<description>NASLite NAS Server Operating System (v1.x)</description>
+		<year>2004</year>
+		<publisher>Server Elements</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="NASLite-FTP v1.1" />
+			<dataarea name="flop" size="1763328">
+				<rom name="naslite-ftp-v1.1.img" size="1763328" crc="b8677a3f" sha1="f1b3b6e11ae0f6d2a6092fe3f7a59affebaf9468" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="NASLite-FTPG v1.1" />
+			<dataarea name="flop" size="1763328">
+				<rom name="naslite-ftpg-v1.1.img" size="1763328" crc="cbe53dd4" sha1="ff4bb09ea4125597cbe055923111ae0219340fb8" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="NASLite-NFS v1.0" />
+			<dataarea name="flop" size="1763328">
+				<rom name="naslite-nfs-v1.0.img" size="1763328" crc="4eb327ee" sha1="dea54f8373ef15bd4088c68ba4456c7f6381df07" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="NASLite-NFSG v1.1" />
+			<dataarea name="flop" size="1763328">
+				<rom name="naslite-nfsg-v1.1.img" size="1763328" crc="a9290112" sha1="824ef40f29d638f78cb929d32a344ddbb1b6b6a0" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="NASLite-SMB v1.3" />
+			<dataarea name="flop" size="1763328">
+				<rom name="naslite-smb-v1.3.img" size="1763328" crc="207ef71e" sha1="5b7814d700596223f812e17a1fe2ac1d716a9f23" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="NASLite-SMBG v1.4" />
+			<dataarea name="flop" size="1763328">
+				<rom name="naslite-smbg-v1.4.img.img" size="1763328" crc="bfdbca0a" sha1="7a975040a2c50c20efa6f0fa63dc15f9f17338e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Driver Disks -->
 
 	<software name="scrlmous">

@@ -848,7 +848,7 @@ UINT32 mac_state::screen_update_macsonora(screen_device &screen, bitmap_rgb32 &b
 				for (x = 0; x < hres; x++)
 				{
 					pixels = vram16[(y * stride) + (x^1)];
-					*scanline++ = MAKE_RGB(((pixels>>10) & 0x1f)<<3, ((pixels>>5) & 0x1f)<<3, (pixels & 0x1f)<<3);
+					*scanline++ = rgb_t(((pixels>>10) & 0x1f)<<3, ((pixels>>5) & 0x1f)<<3, (pixels & 0x1f)<<3);
 				}
 			}
 		}
@@ -1030,8 +1030,8 @@ WRITE32_MEMBER(mac_state::dafb_dac_w)
 
 			if (m_rbv_count == 3)
 			{
-				palette_set_color(space.machine(), m_rbv_clutoffs, MAKE_RGB(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
-				m_rbv_palette[m_rbv_clutoffs] = MAKE_RGB(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
+				palette_set_color(space.machine(), m_rbv_clutoffs, rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
+				m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
 				m_rbv_clutoffs++;
 				m_rbv_count = 0;
 			}
@@ -1238,7 +1238,7 @@ WRITE32_MEMBER(mac_state::macwd_w)
 				if (m_rbv_count == 3)
 				{
 //                    printf("RAMDAC: color %d = %02x %02x %02x\n", m_rbv_clutoffs, m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
-					m_rbv_palette[m_rbv_clutoffs] = MAKE_RGB(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
+					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
 					m_rbv_clutoffs++;
 					m_rbv_count = 0;
 				}

@@ -23,7 +23,8 @@ public:
 		m_sprgen(*this, "spritegen"),
 		m_eeprom(*this, "eeprom"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") {
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") {
 		m_tilemap0_color = 0;
 		m_tilemap1_color = 0;
 	}
@@ -71,4 +72,5 @@ public:
 	static UINT16 hedpanic_pri_callback(UINT16 x);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

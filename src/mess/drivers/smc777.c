@@ -55,7 +55,8 @@ public:
 	m_crtc(*this, "crtc"),
 	m_fdc(*this, "fdc"),
 	m_sn(*this, "sn1"),
-	m_beeper(*this, "beeper")
+	m_beeper(*this, "beeper"),
+	m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -125,6 +126,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(smc777_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(smc777_fdc_drq_w);
 	void check_floppy_inserted();
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -1088,6 +1090,8 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 
 	MCFG_PALETTE_LENGTH(0x20) // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 
 	MCFG_MB8876_ADD("fdc",smc777_mb8876_interface)

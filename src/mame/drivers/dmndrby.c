@@ -68,7 +68,8 @@ public:
 		m_dderby_vidchars(*this, "vidchars"),
 		m_dderby_vidattribs(*this, "vidattribs"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_scroll_ram;
 	required_shared_ptr<UINT8> m_sprite_ram;
@@ -89,6 +90,7 @@ public:
 	INTERRUPT_GEN_MEMBER(dderby_timer_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -491,7 +493,7 @@ void dmndrby_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */

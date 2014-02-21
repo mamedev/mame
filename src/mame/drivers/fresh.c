@@ -37,7 +37,8 @@ public:
 		m_attr_2_videoram(*this, "attr_videoram_2"),
 		m_paletteram_1(*this, "paletteram_1"),
 		m_paletteram_2(*this, "paletteram_2"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_2_tilemap;
@@ -100,6 +101,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_fresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -152,7 +154,7 @@ void fresh_state::update_palette( int offset )
 	UINT16 pal1 = m_paletteram_1[offset];
 	UINT8 pal2 = m_paletteram_2[offset];
 
-	palette_set_color(machine(),offset,MAKE_RGB(pal1&0xff,(pal1>>8)&0xff,pal2));
+	palette_set_color(machine(),offset,rgb_t(pal1&0xff,(pal1>>8)&0xff,pal2));
 }
 
 WRITE16_MEMBER(fresh_state::fresh_paletteram_1_w)

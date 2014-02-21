@@ -2784,14 +2784,13 @@ static MACHINE_CONFIG_START( realpunc, taitob_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
+	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_realpunc)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,realpunc)
-	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_realpunc)
 
 	MCFG_HD63484_ADD("hd63484", realpunc_hd63484_intf)
 

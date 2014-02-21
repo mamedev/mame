@@ -13,7 +13,7 @@
 #define BG_TYPE(n) (((m_vidregs[6] << (8*n)) & 0x7f000000 ) >> 24)
 #define BG_LINE(n) (((m_vidregs[6] << (8*n)) & 0x80000000 ) ? 1:0)
 
-#define BG_TRANSPEN MAKE_ARGB(0x00,0xff,0x00,0xff) // used for representing transparency in temporary bitmaps
+#define BG_TRANSPEN rgb_t(0x00,0xff,0x00,0xff) // used for representing transparency in temporary bitmaps
 
 #define SPRITE_PRI(n) (((m_vidregs[2] << (4*n)) & 0xf0000000 ) >> 28)
 
@@ -30,7 +30,8 @@ public:
 		m_vidregs(*this, "vidregs"),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
-		m_eeprom(*this, "eeprom"){ }
+		m_eeprom(*this, "eeprom"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_device<buffered_spriteram32_device> m_spriteram;
@@ -50,6 +51,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_WRITE32_MEMBER(psikyosh_irqctrl_w);
 	DECLARE_WRITE32_MEMBER(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);

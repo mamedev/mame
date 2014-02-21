@@ -31,7 +31,7 @@ private:
 	// internal helpers
 	static inline bool is_opaque(float alpha) { return (alpha >= (_NoDestRead ? 0.5f : 1.0f)); }
 	static inline bool is_transparent(float alpha) { return (alpha < (_NoDestRead ? 0.5f : 0.0001f)); }
-	static inline rgb_t apply_intensity(int intensity, rgb_t color) { return MAKE_RGB((RGB_RED(color) * intensity) >> 8, (RGB_GREEN(color) * intensity) >> 8, (RGB_BLUE(color) * intensity) >> 8); }
+	static inline rgb_t apply_intensity(int intensity, rgb_t color) { return color.scale8(intensity); }
 	static inline float round_nearest(float f) { return floor(f + 0.5f); }
 
 	// destination pixels are written based on the values of the template parameters
@@ -119,7 +119,7 @@ private:
 		UINT32 b = (common + 516 * cb - 13696);
 
 		// Now clamp and shift back
-		return MAKE_RGB(clamp16_shift8(r), clamp16_shift8(g), clamp16_shift8(b));
+		return rgb_t(clamp16_shift8(r), clamp16_shift8(g), clamp16_shift8(b));
 	}
 
 
@@ -359,7 +359,7 @@ private:
 		int y2 = int(prim.bounds.y1 * 65536.0f);
 
 		// handle color and intensity
-		UINT32 col = MAKE_RGB(int(255.0f * prim.color.r * prim.color.a), int(255.0f * prim.color.g * prim.color.a), int(255.0f * prim.color.b * prim.color.a));
+		UINT32 col = rgb_t(int(255.0f * prim.color.r * prim.color.a), int(255.0f * prim.color.g * prim.color.a), int(255.0f * prim.color.b * prim.color.a));
 
 		if (PRIMFLAG_GET_ANTIALIAS(prim.flags))
 		{

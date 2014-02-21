@@ -18,7 +18,8 @@ public:
 	buster_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT8> m_vram;
 	DECLARE_READ8_MEMBER(test_r);
@@ -26,6 +27,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -329,7 +331,7 @@ void buster_state::palette_init()
 
 	/* RGB format */
 	for(i=0;i<8;i++)
-		palette_set_color(machine(), i, MAKE_RGB(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
+		palette_set_color(machine(), i, rgb_t(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
 }
 
 static MACHINE_CONFIG_START( buster, buster_state )

@@ -41,12 +41,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
-		m_main_ram(*this, "main_ram")
+		m_main_ram(*this, "main_ram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
 	required_shared_ptr<UINT8> m_main_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	tilemap_t *m_tilemap;
 	UINT32 m_clocks;
@@ -85,8 +87,8 @@ void quizshow_state::palette_init()
 {
 	machine().colortable = colortable_alloc(machine(), 2);
 
-	colortable_palette_set_color(machine().colortable, 0, RGB_BLACK);
-	colortable_palette_set_color(machine().colortable, 1, RGB_WHITE);
+	colortable_palette_set_color(machine().colortable, 0, rgb_t::black);
+	colortable_palette_set_color(machine().colortable, 1, rgb_t::white);
 
 	// normal, blink/off, invert, blink+invert
 	const int lut_pal[16] = {

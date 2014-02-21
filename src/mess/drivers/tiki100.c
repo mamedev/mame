@@ -394,7 +394,7 @@ INPUT_PORTS_END
 
 UINT32 tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT16 addr = (m_scroll << 7);
 	int sx, y, pixel, mode = (m_mode >> 4) & 0x03;
 

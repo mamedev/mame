@@ -99,7 +99,8 @@ public:
 		m_seibu_sound(*this, "seibu_sound"),
 		m_txram(*this, "txram"),
 		m_mainram(*this, "mainram"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -107,6 +108,7 @@ public:
 	required_shared_ptr<UINT8> m_txram;
 	optional_shared_ptr<UINT8> m_mainram;
 	optional_shared_ptr<UINT8> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	tilemap_t *m_txtilemap;
 	int m_coin_stat;
@@ -199,7 +201,7 @@ UINT32 cshooter_state::screen_update_airraid(screen_device &screen, bitmap_ind16
 		int g = m_generic_paletteram_8[i] >> 4;
 		int b = m_generic_paletteram2_8[i] & 0xf;
 
-		rgb_t color = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
+		rgb_t color = rgb_t(pal4bit(r), pal4bit(g), pal4bit(b));
 		colortable_palette_set_color(machine().colortable, i, color);
 	}
 

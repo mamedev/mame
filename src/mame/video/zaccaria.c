@@ -61,7 +61,7 @@ void zaccaria_state::palette_init()
 		  black anyway.
 		 */
 		if (((i % 64) / 8) == 0)
-			colortable_palette_set_color(machine().colortable, i, RGB_BLACK);
+			colortable_palette_set_color(machine().colortable, i, rgb_t::black);
 		else
 		{
 			int bit0, bit1, bit2;
@@ -84,7 +84,7 @@ void zaccaria_state::palette_init()
 			bit1 = (color_prom[i + 0x200] >> 0) & 0x01;
 			b = combine_2_weights(weights_b, bit0, bit1);
 
-			colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+			colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 		}
 	}
 

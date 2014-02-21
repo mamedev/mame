@@ -49,7 +49,8 @@ public:
 			m_floppy2(*this, "upd765a:2"),
 			m_floppy3(*this, "upd765a:3"),
 			m_video_ram(*this, "video_ram"),
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_gfxdecode(*this, "gfxdecode")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -84,13 +85,14 @@ public:
 	virtual void palette_init();
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<ram_device> m_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 /* TODO */
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	a5105_state *state = device->machine().driver_data<a5105_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 
 	int xi,gfx;
 	UINT8 pen;
@@ -108,7 +110,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	a5105_state *state = device->machine().driver_data<a5105_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	int x;
 	int xi,yi;
 	int tile,color;
@@ -525,7 +527,7 @@ void a5105_state::palette_init()
 		g = i & 2 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
 		b = i & 1 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
 
-		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), i, rgb_t(r,g,b));
 	}
 }
 

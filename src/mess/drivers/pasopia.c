@@ -86,7 +86,7 @@ void pasopia_state::video_start()
 MC6845_UPDATE_ROW( pasopia_update_row )
 {
 	pasopia_state *state = device->machine().driver_data<pasopia_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	UINT8 *m_p_chargen = state->memregion("chargen")->base();
 	UINT8 chr,gfx,fg=7,bg=0; // colours need to be determined
 	UINT16 mem,x;

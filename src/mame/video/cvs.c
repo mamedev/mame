@@ -74,7 +74,7 @@ void cvs_state::set_pens(  )
 		int g = pal3bit(~m_palette_ram[i] >> 2);
 		int b = pal3bit(~m_palette_ram[i] >> 5);
 
-		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
 	}
 }
 

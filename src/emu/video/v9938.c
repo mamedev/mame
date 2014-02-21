@@ -312,7 +312,7 @@ PALETTE_INIT_MEMBER(v9958_device, v9958)
 			pal[i*3+0] = r;
 			pal[i*3+1] = g;
 			pal[i*3+2] = b;
-			palette_set_color(machine(), i+512, MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b)));
+			palette_set_color(machine(), i+512, rgb_t(pal5bit(r), pal5bit(g), pal5bit(b)));
 			v99x8_device::s_pal_indYJK[y | j << 5 | k << (5 + 6)] = i + 512;
 			i++;
 		}

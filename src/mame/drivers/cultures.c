@@ -26,7 +26,8 @@ public:
 		m_bg1_regs_y(*this, "bg1_regs_y"),
 		m_bg2_regs_x(*this, "bg2_regs_x"),
 		m_bg2_regs_y(*this, "bg2_regs_y"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8     m_paletteram[0x4000];
 	/* memory pointers */
@@ -60,6 +61,7 @@ public:
 	UINT32 screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cultures_interrupt);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

@@ -319,7 +319,8 @@ public:
 		m_io_an5(*this, "AN5"),
 		m_io_an6(*this, "AN6"),
 		m_io_an7(*this, "AN7"),
-		m_io_config(*this, "CONFIG")
+		m_io_config(*this, "CONFIG"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -362,6 +363,7 @@ public:
 	required_ioport m_io_an6;
 	required_ioport m_io_an7;
 	required_ioport m_io_config;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	bitmap_ind16 m_temp_bitmap_sprites;
 	bitmap_ind16 m_temp_bitmap_sprites2;
@@ -778,7 +780,7 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 		bg_r = (((m_pen_fill[which] >> 16) & 0x7f) << 1) | (((m_pen_fill[which] >> 16) & 0x80) >> 7);
 		bg_g = (((m_pen_fill[which] >> 8) & 0x7f) << 1) | (((m_pen_fill[which] >> 8) & 0x80) >> 7);
 		bg_b = (((m_pen_fill[which] >> 0) & 0x7f) << 1) | (((m_pen_fill[which] >> 0) & 0x80) >> 7);
-		bitmap.fill(MAKE_ARGB(0xff,bg_r,bg_g,bg_b),cliprect);
+		bitmap.fill(rgb_t(0xff,bg_r,bg_g,bg_b),cliprect);
 #endif
 
 		bg_r = (((m_pen_fill[which] >> 16) & 0x78) >> 2) | (((m_pen_fill[which] >> 16) & 0x80) >> 7);

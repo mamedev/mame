@@ -29,7 +29,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_sprite_position(*this, "spritepos"),
-		m_samples(*this, "samples")
+		m_samples(*this, "samples"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	/* device/memory pointers */
@@ -46,6 +47,8 @@ public:
 	required_shared_ptr<UINT8> m_sprite_position;
 
 	required_device<samples_device> m_samples;
+	
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 *     m_buckrog_bitmap_ram;
 

@@ -40,7 +40,8 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "subcpu"){ }
+		m_subcpu(*this, "subcpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -69,6 +70,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	DECLARE_WRITE8_MEMBER(zerotrgt_vregs_w);
 	DECLARE_WRITE8_MEMBER(cntsteer_vregs_w);
 	DECLARE_WRITE8_MEMBER(cntsteer_foreground_vram_w);
@@ -126,7 +129,7 @@ PALETTE_INIT_MEMBER(cntsteer_state,zerotrgt)
 		bit2 = (color_prom[i + 256] >> 2) & 0x01;
 		b = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 
-		palette_set_color(machine(), i, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), i, rgb_t(r,g,b));
 	}
 }
 

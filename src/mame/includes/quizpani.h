@@ -9,13 +9,15 @@ public:
 		m_nmk112(*this, "nmk112"),
 		m_scrollreg(*this, "scrollreg"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_txt_videoram(*this, "txt_videoram") { }
+		m_txt_videoram(*this, "txt_videoram"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<nmk112_device> m_nmk112;
 	required_shared_ptr<UINT16> m_scrollreg;
 	required_shared_ptr<UINT16> m_bg_videoram;
 	required_shared_ptr<UINT16> m_txt_videoram;
+	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_txt_tilemap;
 	int m_bgbank;

@@ -82,7 +82,8 @@ public:
 		m_oki(*this, "oki"),
 		m_m48t35(*this,"m48t35"),
 		m_msm_1(*this, "msm1"),
-		m_msm_2(*this, "msm2") { }
+		m_msm_2(*this, "msm2"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	// cps1
@@ -175,6 +176,7 @@ public:
 	optional_device<m48t35_device> m_m48t35;
 	optional_device<msm5205_device> m_msm_1;    // fcrash
 	optional_device<msm5205_device> m_msm_2;    // fcrash
+	required_device<gfxdecode_device> m_gfxdecode;
 	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
 	DECLARE_READ16_MEMBER(cps1_in1_r);
 	DECLARE_READ16_MEMBER(cps1_in2_r);

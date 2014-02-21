@@ -300,7 +300,7 @@ WRITE32_MEMBER(macrossp_state::paletteram32_macrossp_w)
 	g = ((m_paletteram[offset] & 0x00ff0000) >>16);
 	r = ((m_paletteram[offset] & 0xff000000) >>24);
 
-	palette_set_color(machine(), offset, MAKE_RGB(r,g,b));
+	palette_set_color(machine(), offset, rgb_t(r,g,b));
 }
 
 
@@ -361,7 +361,7 @@ void macrossp_state::update_colors(  )
 		else
 			r -= m_fade_effect;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 

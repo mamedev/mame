@@ -83,8 +83,13 @@ public:
 	gei_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac") { }
+		m_dac(*this, "dac"),
+		m_ticket(*this, "ticket") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
+	optional_device<ticket_dispenser_device> m_ticket;
+	
 	virtual void video_start();
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -137,8 +142,6 @@ public:
 	virtual void palette_init();
 	DECLARE_PALETTE_INIT(quizvid);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
 };
 
 
@@ -176,7 +179,7 @@ void gei_state::palette_init()
 
 	for (i = 0; i < 8; i++ )
 	{
-		palette_set_color(machine(), i, MAKE_RGB(pal1bit(i >> 2), pal1bit(i), pal1bit(i >> 1)));
+		palette_set_color(machine(), i, rgb_t(pal1bit(i >> 2), pal1bit(i), pal1bit(i >> 1)));
 	}
 }
 
@@ -186,7 +189,7 @@ PALETTE_INIT_MEMBER(gei_state,quizvid)
 
 	for (i = 0; i < 8; i++ )
 	{
-		palette_set_color(machine(), i, MAKE_RGB(pal1bit(i >> 1), pal1bit(i), pal1bit(i >> 2)));
+		palette_set_color(machine(), i, rgb_t(pal1bit(i >> 1), pal1bit(i), pal1bit(i >> 2)));
 	}
 }
 
@@ -224,7 +227,8 @@ WRITE8_MEMBER(gei_state::sound_w)
 	set_led_status(machine(), 9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
-	machine().device<ticket_dispenser_device>("ticket")->write(machine().driver_data()->generic_space(), 0, (data & 0x20)<< 2);
+	if (m_ticket != NULL)
+		m_ticket->write(machine().driver_data()->generic_space(), 0, (data & 0x20)<< 2);
 
 	/* bit 6 enables NMI */
 	m_nmi_mask = data & 0x40;
@@ -1215,9 +1219,6 @@ static MACHINE_CONFIG_DERIVED( jokpokera, getrivia )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gselect_map)
-
-	MCFG_DEVICE_REMOVE("ppi8255_0")
-	MCFG_I8255A_ADD( "ppi8255_0", gselect_ppi8255_0_intf )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( amuse, getrivia )

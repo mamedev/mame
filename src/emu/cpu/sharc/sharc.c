@@ -287,7 +287,6 @@ void adsp21062_device::device_start()
 
 	build_opcode_table();
 
-	m_internal_ram = auto_alloc_array(machine(), UINT16, 2 * 0x10000);      // 2x 128KB
 	m_internal_ram_block0 = &m_internal_ram[0];
 	m_internal_ram_block1 = &m_internal_ram[0x20000/2];
 

@@ -18,11 +18,11 @@
 
 UINT32 malzak_state::screen_update_malzak(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	const rgb_t *palette = bitmap.palette()->entry_list_raw();
 	int sx, sy;
 	int x,y;
 
-	bitmap.fill(RGB_BLACK);
+	bitmap.fill(rgb_t::black);
 
 	m_trom->screen_update(screen, bitmap, cliprect);
 

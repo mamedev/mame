@@ -378,7 +378,6 @@ protected:
 public:
 	// generic devices
 	optional_device<screen_device> m_screen;
-	optional_device<gfxdecode_device> m_gfxdecode;
 
 	// generic pointers
 	optional_shared_ptr<UINT8> m_generic_paletteram_8;

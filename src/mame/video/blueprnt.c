@@ -42,7 +42,7 @@ void blueprnt_state::palette_init()
 		g = ((pen >> 2) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
 		b = ((pen >> 1) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 

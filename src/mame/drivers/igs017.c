@@ -63,7 +63,8 @@ public:
 		m_bg_videoram(*this, "bg_videoram", 0),
 		m_oki(*this, "oki"),
 		m_igs025(*this,"igs025"),
-		m_igs022(*this,"igs022")
+		m_igs022(*this,"igs022"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	int m_input_addr;
@@ -74,8 +75,8 @@ public:
 	required_device<okim6295_device> m_oki;
 	optional_device<igs025_device> m_igs025; // Mj Shuang Long Qiang Zhu 2
 	optional_device<igs022_device> m_igs022; // Mj Shuang Long Qiang Zhu 2
-
-		void igs025_to_igs022_callback( void );
+	required_device<gfxdecode_device> m_gfxdecode;
+	void igs025_to_igs022_callback( void );
 
 	int m_toggle;
 	int m_debug_addr;

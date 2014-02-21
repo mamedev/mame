@@ -225,7 +225,8 @@ public:
 	coinmvga_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_vram;
 	struct { int r,g,b,offs,offs_internal; } m_bgpal, m_fgpal;
@@ -240,6 +241,7 @@ public:
 	UINT32 screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -313,7 +315,7 @@ WRITE16_MEMBER(coinmvga_state::ramdac_bg_w)
 				break;
 			case 2:
 				m_bgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(machine(), m_bgpal.offs, MAKE_RGB(m_bgpal.r, m_bgpal.g, m_bgpal.b));
+				palette_set_color(machine(), m_bgpal.offs, rgb_t(m_bgpal.r, m_bgpal.g, m_bgpal.b));
 				m_bgpal.offs_internal = 0;
 				m_bgpal.offs++;
 				break;
@@ -343,7 +345,7 @@ WRITE16_MEMBER(coinmvga_state::ramdac_fg_w)
 				break;
 			case 2:
 				m_fgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(machine(), 0x100+m_fgpal.offs, MAKE_RGB(m_fgpal.r, m_fgpal.g, m_fgpal.b));
+				palette_set_color(machine(), 0x100+m_fgpal.offs, rgb_t(m_fgpal.r, m_fgpal.g, m_fgpal.b));
 				m_fgpal.offs_internal = 0;
 				m_fgpal.offs++;
 				break;

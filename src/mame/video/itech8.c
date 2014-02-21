@@ -556,7 +556,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(itech8_state::grmatch_palette_update)
 			{
 				UINT8 data0 = base[x * 2 + 0];
 				UINT8 data1 = base[x * 2 + 1];
-				m_grmatch_palette[page][x] = MAKE_RGB(pal4bit(data0 >> 0), pal4bit(data1 >> 4), pal4bit(data1 >> 0));
+				m_grmatch_palette[page][x] = rgb_t(pal4bit(data0 >> 0), pal4bit(data1 >> 4), pal4bit(data1 >> 0));
 			}
 		}
 	}

@@ -73,7 +73,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_fdc(*this, "upd765"),
 		m_dmac(*this, "dmac"),
-		m_palram(*this, "palram"){ }
+		m_palram(*this, "palram"),
+		m_gfxdecode(*this, "gfxdecode"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;
@@ -181,6 +182,7 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

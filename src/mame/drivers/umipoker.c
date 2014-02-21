@@ -34,7 +34,8 @@ public:
 		m_vram_2(*this, "vra2"),
 		m_vram_3(*this, "vra3"),
 		m_z80_wram(*this, "z80_wram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT16> m_vram_0;
 	required_shared_ptr<UINT16> m_vram_1;
@@ -72,6 +73,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_umipoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_0)

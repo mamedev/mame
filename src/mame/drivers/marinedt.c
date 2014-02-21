@@ -103,7 +103,8 @@ public:
 	marinedt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_tx_tileram(*this, "tx_tileram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_tx_tileram;
@@ -155,6 +156,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_marinedt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -478,7 +480,7 @@ bit0 = 0;
 //      *(palette++) = 0x92 * bit0 + 0x46 * bit1 + 0x27 * bit2;
 		b = 0x27 * bit0 + 0x46 * bit1 + 0x92 * bit2;
 
-		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, rgb_t(r, g, b));
 	}
 }
 

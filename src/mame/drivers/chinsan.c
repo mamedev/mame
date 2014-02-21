@@ -54,7 +54,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_video(*this, "video"),
 		m_maincpu(*this, "maincpu"),
-		m_adpcm(*this, "adpcm") { }
+		m_adpcm(*this, "adpcm"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video;
@@ -81,6 +82,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(chin_adpcm_int);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

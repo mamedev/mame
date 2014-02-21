@@ -48,7 +48,8 @@ public:
 			m_atomicp_sound_count(0),
 			m_hwc_input_value(0),
 			m_mj_input_num(0),
-			m_mj_last_val(0)
+			m_mj_last_val(0),
+			m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	// memory mapping
@@ -199,6 +200,8 @@ protected:
 	UINT8               m_hwc_input_value;
 	UINT8               m_mj_input_num;
 	UINT8               m_mj_last_val;
+	
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

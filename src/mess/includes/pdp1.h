@@ -234,7 +234,8 @@ class pdp1_state : public driver_device
 public:
 	pdp1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	pdp1_reset_param_t m_reset_param;
 	int m_io_status;
@@ -297,5 +298,6 @@ public:
 	void drum_write(int field, int position, UINT32 data);
 	void pdp1_keyboard();
 	void pdp1_lightpen();
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 #endif /* PDP1_H_ */

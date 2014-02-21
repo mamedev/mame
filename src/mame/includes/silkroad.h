@@ -11,7 +11,8 @@ public:
 		m_sprram(*this, "sprram"),
 		m_regs(*this, "regs"),
 		m_maincpu(*this, "maincpu"),
-		m_oki1(*this, "oki1") { }
+		m_oki1(*this, "oki1"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_shared_ptr<UINT32> m_vidram;
 	required_shared_ptr<UINT32> m_vidram2;
@@ -35,4 +36,5 @@ public:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki1;
+	required_device<gfxdecode_device> m_gfxdecode;
 };

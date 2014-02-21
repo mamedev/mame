@@ -135,7 +135,8 @@ public:
 			m_oki_2(*this, "oki2") ,
 		m_workram(*this, "workram"),
 		m_vram(*this, "vram"),
-		m_paletteram(*this, "paletteram"){ }
+		m_paletteram(*this, "paletteram"),
+		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* devices */
 	required_device<e132xt_device> m_maincpu;
@@ -146,6 +147,8 @@ public:
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_vram;
 	required_shared_ptr<UINT32> m_paletteram;
+	
+	required_device<gfxdecode_device> m_gfxdecode;
 //  UINT32 *  m_nvram;    // currently this uses generic nvram handling
 
 	/* video-related */

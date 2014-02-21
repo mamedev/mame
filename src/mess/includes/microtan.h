@@ -34,7 +34,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
 		m_via6522_0(*this, "via6522_0"),
-		m_via6522_1(*this, "via6522_1")
+		m_via6522_1(*this, "via6522_1"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	required_shared_ptr<UINT8> m_videoram;
@@ -81,6 +82,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<via6522_device> m_via6522_0;
 	required_device<via6522_device> m_via6522_1;
+	required_device<gfxdecode_device> m_gfxdecode;
 	UINT8 read_dsw();
 	void microtan_set_irq_line();
 	void store_key(int key);

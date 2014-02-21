@@ -93,6 +93,7 @@ public:
 	DECLARE_MACHINE_RESET(coh1000c);
 	DECLARE_MACHINE_RESET(coh1000ta);
 	DECLARE_MACHINE_RESET(coh1000tb);
+	DECLARE_MACHINE_RESET(coh1002tb);
 	DECLARE_MACHINE_RESET(coh1002e);
 	DECLARE_MACHINE_RESET(bam2);
 	DECLARE_MACHINE_RESET(coh1001l);
@@ -1186,8 +1187,8 @@ static ADDRESS_MAP_START(coh1000tb_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb00000, 0x1fb003ff) AM_READWRITE8(fx1b_fram_r, fx1b_fram_w, 0x00ff00ff)
 	AM_RANGE(0x1fb40000, 0x1fb40003) AM_WRITE8(bank_coh1000t_w, 0x000000ff)
-	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, global_volume_w, 0x0000ffff)
-	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reset_control_w, 0xffff0000)
+	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reg_data_w, 0x0000ffff)
+	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reg_address_w, 0xffff0000)
 	AM_RANGE(0x1fba0000, 0x1fba0003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, sound_irq_w, 0x0000ffff)
 	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_DEVREAD16("taito_zoom", taito_zoom_device, sound_irq_r, 0x0000ffff)
 	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0x00ff00ff) // M66220FP for comm with the MN10200
@@ -1205,7 +1206,19 @@ MACHINE_RESET_MEMBER(zn_state,coh1000tb)
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() ); /* banked game rom */
 }
 
-static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_2mb_vram)
+static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_1mb_vram)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(coh1000tb_map)
+
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000tb)
+	MCFG_NVRAM_ADD_1FILL("fm1208s")
+
+	MCFG_MB3773_ADD("mb3773")
+
+	MCFG_FRAGMENT_ADD(taito_zoom_sound)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(coh1002tb, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000tb_map)
 
@@ -4799,9 +4812,9 @@ GAME( 1996, ftimpact,  ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Tait
 GAME( 1996, ftimpactu, ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, ftimpactj, ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, ftimpcta,  taitofx1, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact A (Ver 2.00J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, gdarius,   gdarius2, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, gdariusb,  gdarius2, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, gdarius2,  taitofx1, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, gdarius,   gdarius2, coh1002tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, gdariusb,  gdarius2, coh1002tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, gdarius2,  taitofx1, coh1002tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Eighting / Raizing */
 

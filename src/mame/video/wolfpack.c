@@ -15,19 +15,19 @@ void wolfpack_state::palette_init()
 	/* allocate the colortable */
 	machine().colortable = colortable_alloc(machine(), 8);
 
-	colortable_palette_set_color(machine().colortable, 0, MAKE_RGB(0x00, 0x00, 0x00));
-	colortable_palette_set_color(machine().colortable, 1, MAKE_RGB(0xc1, 0xc1, 0xc1));
-	colortable_palette_set_color(machine().colortable, 2, MAKE_RGB(0x81, 0x81, 0x81));
-	colortable_palette_set_color(machine().colortable, 3, MAKE_RGB(0x48, 0x48, 0x48));
+	colortable_palette_set_color(machine().colortable, 0, rgb_t(0x00, 0x00, 0x00));
+	colortable_palette_set_color(machine().colortable, 1, rgb_t(0xc1, 0xc1, 0xc1));
+	colortable_palette_set_color(machine().colortable, 2, rgb_t(0x81, 0x81, 0x81));
+	colortable_palette_set_color(machine().colortable, 3, rgb_t(0x48, 0x48, 0x48));
 
 	for (i = 0; i < 4; i++)
 	{
 		rgb_t color = colortable_palette_get_color(machine().colortable, i);
 
 		colortable_palette_set_color(machine().colortable, 4 + i,
-										MAKE_RGB(RGB_RED(color)   < 0xb8 ? RGB_RED(color)   + 0x48 : 0xff,
-												RGB_GREEN(color) < 0xb8 ? RGB_GREEN(color) + 0x48 : 0xff,
-												RGB_BLUE(color)  < 0xb8 ? RGB_BLUE(color)  + 0x48 : 0xff));
+										rgb_t(color.r()   < 0xb8 ? color.r()   + 0x48 : 0xff,
+												color.g() < 0xb8 ? color.g() + 0x48 : 0xff,
+												color.b()  < 0xb8 ? color.b()  + 0x48 : 0xff));
 	}
 
 	colortable_entry_set_value(machine().colortable, 0x00, 0);
@@ -245,8 +245,8 @@ UINT32 wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_ind1
 	if (m_ship_size & 0x40) color += 0x3a;
 	if (m_ship_size & 0x80) color += 0x48;
 
-	colortable_palette_set_color(machine().colortable, 3, MAKE_RGB(color,color,color));
-	colortable_palette_set_color(machine().colortable, 7, MAKE_RGB(color < 0xb8 ? color + 0x48 : 0xff,
+	colortable_palette_set_color(machine().colortable, 3, rgb_t(color,color,color));
+	colortable_palette_set_color(machine().colortable, 7, rgb_t(color < 0xb8 ? color + 0x48 : 0xff,
 																			color < 0xb8 ? color + 0x48 : 0xff,
 																			color < 0xb8 ? color + 0x48 : 0xff));
 

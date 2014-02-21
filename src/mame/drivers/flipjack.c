@@ -96,7 +96,8 @@ public:
 		m_crtc(*this, "crtc"),
 		m_fbram(*this, "fb_ram"),
 		m_vram(*this, "vram"),
-		m_cram(*this, "cram")
+		m_cram(*this, "cram"),
+		m_gfxdecode(*this, "gfxdecode")
 	{
 		m_soundlatch = 0;
 		m_bank = 0;
@@ -110,6 +111,8 @@ public:
 	required_shared_ptr<UINT8> m_fbram;
 	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_cram;
+	
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT8 m_soundlatch;
 	UINT8 m_bank;

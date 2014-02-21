@@ -124,11 +124,12 @@ public:
 	// construction/destruction
 	namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	// read/write handlers
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
+	
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;	
 
 	// C45 Land (Road) Emulation
 	void set_transparent_color(pen_t pen) { m_transparent_color = pen; }
@@ -142,9 +143,8 @@ protected:
 	// internal helpers
 	TILE_GET_INFO_MEMBER( get_road_info );
 
-	// internal state
+	// internal state	
 	pen_t           m_transparent_color;
-	gfx_element *   m_gfx;
 	tilemap_t *     m_tilemap;
 	UINT16          m_ram[0x20000/2]; // at 0x880000 in Final Lap; at 0xa00000 in Lucky&Wild
 
@@ -155,10 +155,6 @@ protected:
 
 // device type definition
 extern const device_type NAMCO_C45_ROAD;
-
-#define MCFG_NAMCO_C45_ROAD_GFXDECODE(_gfxtag) \
-	namco_c45_road_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
 
 /*----------- defined in drivers/namcoic.c -----------*/
 
