@@ -3328,6 +3328,7 @@ src/lib/util/pool.h svneol=native#text/plain
 src/lib/util/sha1.c svneol=native#text/plain
 src/lib/util/sha1.h svneol=native#text/plain
 src/lib/util/simple_set.h svneol=native#text/plain
+src/lib/util/tagmap.c svneol=native#text/plain
 src/lib/util/tagmap.h svneol=native#text/plain
 src/lib/util/un7z.c svneol=native#text/plain
 src/lib/util/un7z.h svneol=native#text/plain
