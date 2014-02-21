@@ -24,9 +24,8 @@ and a Zoom Corp. ZFX-2 DSP instead of the TMS57002.
 
 
 TODO:
-- add TMS57002
-- global volume regs
-- a lot more
+- add DSP, sound is tinny without it
+- howcome taito fx1b sounds worse than gnet? especially raystorm
 
 ***************************************************************************/
 
@@ -44,6 +43,7 @@ const device_type TAITO_ZOOM = &device_creator<taito_zoom_device>;
 taito_zoom_device::taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TAITO_ZOOM, "Taito Zoom Sound System", tag, owner, clock, "taito_zoom", __FILE__),
 	m_soundcpu(*this, ":mn10200"),
+	m_zsg2(*this, ":zsg2"),
 	m_reg_address(0),
 	m_tms_ctrl(0)
 {
@@ -143,11 +143,17 @@ WRITE16_MEMBER(taito_zoom_device::reg_data_w)
 	switch (m_reg_address)
 	{
 		case 0x04:
-			// zsg2+dsp global volume ch0
+			// zsg2+dsp global volume left
+			if (data & 0xc0c0)
+				popmessage("ZOOM gain L %04X, contact MAMEdev", data);
+			m_zsg2->set_output_gain(0, (data & 0x3f) / 63.0);
 			break;
 		
 		case 0x05:
-			// zsg2+dsp global volume ch1
+			// zsg2+dsp global volume right
+			if (data & 0xc0c0)
+				popmessage("ZOOM gain R %04X, contact MAMEdev", data);
+			m_zsg2->set_output_gain(1, (data & 0x3f) / 63.0);
 			break;
 
 		default:
