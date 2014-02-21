@@ -28,7 +28,6 @@ public:
 protected:
 	// internal state
 	UINT8 *m_rom;
-	UINT32 m_rom_size;
 	// ROM is accessed via two 16K banks, but only the first one can be switched
 	UINT8 m_bank;
 };

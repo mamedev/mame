@@ -34,12 +34,14 @@
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MCFG_COM8116_ADD(_tag, _clock, _fx4, _fr, _ft) \
-	MCFG_DEVICE_ADD(_tag, COM8116, _clock) \
-	downcast<com8116_device *>(device)->set_fx4_callback(DEVCB2_##_fx4); \
-	downcast<com8116_device *>(device)->set_fr_callback(DEVCB2_##_fr); \
-	downcast<com8116_device *>(device)->set_ft_callback(DEVCB2_##_ft);
+#define MCFG_COM8116_FX4_HANDLER(_devcb) \
+	devcb = &com8116_device::set_fx4_handler(*device, DEVCB2_##_devcb);
 
+#define MCFG_COM8116_FR_HANDLER(_devcb) \
+	devcb = &com8116_device::set_ft_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_COM8116_FT_HANDLER(_devcb) \
+	devcb = &com8116_device::set_ft_handler(*device, DEVCB2_##_devcb);
 
 
 ///*************************************************************************
@@ -54,9 +56,9 @@ public:
 	// construction/destruction
 	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _fx4> void set_fx4_callback(_fx4 fx4) { m_write_fx4.set_callback(fx4); }
-	template<class _fr> void set_fr_callback(_fr fr) { m_write_fr.set_callback(fr); }
-	template<class _ft> void set_ft_callback(_ft ft) { m_write_ft.set_callback(ft); }
+	template<class _Object> static devcb2_base &set_fx4_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_fx4_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_fr_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_fr_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_ft_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_ft_handler.set_callback(object); }
 
 	void str_w(UINT8 data);
 	DECLARE_WRITE8_MEMBER( str_w );
@@ -81,13 +83,14 @@ private:
 		TIMER_FT
 	};
 
-	devcb2_write_line   m_write_fx4;
-	devcb2_write_line   m_write_fr;
-	devcb2_write_line   m_write_ft;
+	devcb2_write_line   m_fx4_handler;
+	devcb2_write_line   m_fr_handler;
+	devcb2_write_line   m_ft_handler;
 
-	int m_fr;                       // receiver frequency
-	int m_ft;                       // transmitter frequency
-
+	int m_fx4;
+	int m_fr;
+	int m_ft;
+	
 	const int *m_fr_divisors;
 	const int *m_ft_divisors;
 
@@ -100,7 +103,5 @@ private:
 
 // device type definition
 extern const device_type COM8116;
-
-
 
 #endif

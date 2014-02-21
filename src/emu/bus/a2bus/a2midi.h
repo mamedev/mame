@@ -31,7 +31,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( ptm_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( midi_rx_w );
+	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
 
 protected:
 	virtual void device_start();

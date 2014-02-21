@@ -58,6 +58,7 @@ ___________________________________________________________________________
 #include "cpu/m6809/m6809.h"
 #include "video/awpvid.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "machine/meters.h"
 #include "machine/roc10937.h"  // vfd
 #include "machine/steppers.h" // stepper motor
@@ -70,10 +71,12 @@ ___________________________________________________________________________
 class bfmsys85_state : public driver_device
 {
 public:
-	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_vfd(*this, "vfd"),
-			m_maincpu(*this, "maincpu") { }
+	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag),
+		m_vfd(*this, "vfd"),
+		m_maincpu(*this, "maincpu"),
+		m_acia6850_0(*this, "acia6850_0")
+	{
+	}
 
 	optional_device<roc10937_t> m_vfd;
 	int m_mmtr_latch;
@@ -107,6 +110,7 @@ public:
 	DECLARE_READ8_MEMBER(triac_r);
 	DECLARE_READ_LINE_MEMBER(sys85_data_r);
 	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
+	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_DRIVER_INIT(decode);
 	DECLARE_DRIVER_INIT(nodecode);
 	virtual void machine_start();
@@ -114,6 +118,7 @@ public:
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	int b85_find_project_string( );
 	required_device<cpu_device> m_maincpu;
+	required_device<acia6850_device> m_acia6850_0;
 };
 
 #define MASTER_CLOCK    (XTAL_4MHz)
@@ -128,14 +133,13 @@ WRITE_LINE_MEMBER(bfmsys85_state::sys85_data_w)
 	m_sys85_data_line_t = state;
 }
 
-static ACIA6850_INTERFACE( m6809_acia_if )
+
+WRITE_LINE_MEMBER(bfmsys85_state::write_acia_clock)
 {
-	500000,
-	500000,
-	DEVCB_DRIVER_LINE_MEMBER(bfmsys85_state,sys85_data_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
+	m_acia6850_0->write_txc(state);
+	m_acia6850_0->write_rxc(state);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////
 // called if board is reset ///////////////////////////////////////////////
@@ -392,11 +396,11 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, bfmsys85_state )
 	AM_RANGE(0x3001, 0x3001) AM_READNOP //sound latch
 	AM_RANGE(0x3200, 0x3200) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 
-	AM_RANGE(0x3402, 0x3402) AM_DEVWRITE("acia6850_0", acia6850_device, control_write)
-	AM_RANGE(0x3403, 0x3403) AM_DEVWRITE("acia6850_0", acia6850_device, data_write)
+	AM_RANGE(0x3402, 0x3402) AM_DEVWRITE("acia6850_0", acia6850_device, control_w)
+	AM_RANGE(0x3403, 0x3403) AM_DEVWRITE("acia6850_0", acia6850_device, data_w)
 
-	AM_RANGE(0x3406, 0x3406) AM_DEVREAD("acia6850_0", acia6850_device, status_read)
-	AM_RANGE(0x3407, 0x3407) AM_DEVREAD("acia6850_0", acia6850_device, data_read)
+	AM_RANGE(0x3406, 0x3406) AM_DEVREAD("acia6850_0", acia6850_device, status_r)
+	AM_RANGE(0x3407, 0x3407) AM_DEVREAD("acia6850_0", acia6850_device, data_r)
 
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(mux_enable_w)     // mux enable
 
@@ -413,7 +417,11 @@ static MACHINE_CONFIG_START( bfmsys85, bfmsys85_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfmsys85_state, timer_irq,  1000)              // generate 1000 IRQ's per second
 	MCFG_MSC1937_ADD("vfd",0,RIGHT_TO_LEFT)
 
-	MCFG_ACIA6850_ADD("acia6850_0", m6809_acia_if)
+	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bfmsys85_state,sys85_data_w))
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bfmsys85_state, write_acia_clock))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd",AY8912, MASTER_CLOCK/4)          // add AY8912 soundchip

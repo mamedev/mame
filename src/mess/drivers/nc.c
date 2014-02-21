@@ -97,7 +97,6 @@
 #include "emuopts.h"
 #include "cpu/z80/z80.h"
 #include "includes/nc.h"
-#include "machine/i8251.h"  /* for NC100 uart */
 #include "machine/mc146818.h"   /* for NC200 real time clock */
 #include "machine/rp5c01.h" /* for NC100 real time clock */
 #include "machine/upd765.h"     /* for NC200 disk drive interface */
@@ -683,28 +682,22 @@ WRITE8_MEMBER(nc_state::nc_sound_w)
 	}
 }
 
-static const unsigned long baud_rate_table[]=
+static const int baud_rate_table[]=
 {
-	150,
-	300,
-	600,
-	1200,
-	2400,
-	4800,
-	9600,
-	19200
+	128, //150
+	64, //300
+	32, //600
+	16, //1200
+	8, //2400
+	4, //4800
+	2, //9600
+	1, //19200
 };
 
-TIMER_CALLBACK_MEMBER(nc_state::nc_serial_timer_callback)
+WRITE_LINE_MEMBER(nc_state::write_uart_clock)
 {
-	i8251_device *uart = machine().device<i8251_device>("uart");
-
-	/// TODO: double timer rate to provide correct duty cycle
-	uart->write_txc(1);
-	uart->write_rxc(1);
-
-	uart->write_txc(0);
-	uart->write_rxc(0);
+	m_uart->write_txc(state);
+	m_uart->write_rxc(state);
 }
 
 WRITE8_MEMBER(nc_state::nc_uart_control_w)
@@ -722,7 +715,7 @@ WRITE8_MEMBER(nc_state::nc_uart_control_w)
 		}
 	}
 
-	m_serial_timer->adjust(attotime::zero, 0, attotime::from_hz(baud_rate_table[(data & 0x07)]));
+	m_uart_clock->set_clock_scale((double)1 / baud_rate_table[(data & 0x07)]);
 
 	m_uart_control = data;
 }
@@ -849,9 +842,6 @@ void nc_state::machine_start()
 	/* keyboard timer */
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_keyboard_timer_callback),this));
 	m_keyboard_timer->adjust(attotime::from_msec(10));
-
-	/* serial timer */
-	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_serial_timer_callback),this));
 }
 
 
@@ -1190,7 +1180,6 @@ MACHINE_START_MEMBER(nc_state,nc200)
 	m_keyboard_timer->adjust(attotime::from_msec(10));
 
 	/* serial timer */
-	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_serial_timer_callback),this));
 	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(nc_state::nc200_fdc_interrupt), this));
 }
 
@@ -1442,7 +1431,6 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_CPU_IO_MAP(nc100_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -1453,7 +1441,6 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 
 	MCFG_PALETTE_LENGTH(NC_NUM_COLOURS)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1473,6 +1460,9 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(nc_state,nc100_rxrdy_callback))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(nc_state,nc100_txrdy_callback))
+
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 19200)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(nc_state, write_uart_clock))
 
 	/* rtc */
 	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)

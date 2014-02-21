@@ -14,6 +14,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "machine/i8271.h"
@@ -30,8 +31,8 @@
 class bbc_state : public driver_device
 {
 public:
-	bbc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bbc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_mc6845(*this, "mc6845"),
@@ -41,15 +42,12 @@ public:
 		m_tms(*this, "tms5220"),
 		m_cassette(*this, "cassette"),
 		m_acia(*this, "acia6850"),
+		m_acia_clock(*this, "acia_clock"),
 		m_rs232(*this, RS232_TAG),
 		m_via6522_0(*this, "via6522_0"),
 		m_via6522_1(*this, "via6522_1"),
 		m_upd7002(*this, "upd7002"),
 		m_i8271(*this, "i8271"),
-		m_ACCCON_IRR(CLEAR_LINE),
-		m_via_system_irq(CLEAR_LINE),
-		m_via_user_irq(CLEAR_LINE),
-		m_acia_irq(CLEAR_LINE),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_user1(*this, "user1"),
 		m_region_user2(*this, "user2"),
@@ -60,23 +58,134 @@ public:
 		m_bank5(*this, "bank5"),
 		m_bank6(*this, "bank6"),
 		m_bank7(*this, "bank7"),
-		m_bank8(*this, "bank8") { }
+		m_bank8(*this, "bank8"),
+		m_ACCCON_IRR(CLEAR_LINE),
+		m_via_system_irq(CLEAR_LINE),
+		m_via_user_irq(CLEAR_LINE),
+		m_acia_irq(CLEAR_LINE)
+	{
+	}
 
+	DECLARE_WRITE8_MEMBER(bbc_page_selecta_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorya1_w);
+	DECLARE_WRITE8_MEMBER(bbc_page_selectb_w);
+	DECLARE_WRITE8_MEMBER(bbc_memoryb3_w);
+	DECLARE_WRITE8_MEMBER(bbc_memoryb4_w);
+	DECLARE_WRITE8_MEMBER(bbc_page_selectbp_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybp1_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybp2_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybp4_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybp4_128_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybp6_128_w);
+	DECLARE_READ8_MEMBER(bbcm_ACCCON_read);
+	DECLARE_WRITE8_MEMBER(bbcm_ACCCON_write);
+	DECLARE_WRITE8_MEMBER(page_selectbm_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybm1_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybm2_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybm4_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybm5_w);
+	DECLARE_WRITE8_MEMBER(bbc_memorybm7_w);
+	DECLARE_READ8_MEMBER(bbcm_r);
+	DECLARE_WRITE8_MEMBER(bbcm_w);
+	DECLARE_WRITE8_MEMBER(bbc_SerialULA_w);
+	DECLARE_READ8_MEMBER(bbc_i8271_read);
+	DECLARE_WRITE8_MEMBER(bbc_i8271_write);
+	DECLARE_WRITE8_MEMBER(bbc_wd177x_status_w);
+	DECLARE_READ8_MEMBER(bbc_wd1770_read);
+	DECLARE_WRITE8_MEMBER(bbc_wd1770_write);
+	DECLARE_WRITE8_MEMBER(bbc_opus_status_w);
+	DECLARE_READ8_MEMBER(bbc_opus_read);
+	DECLARE_WRITE8_MEMBER(bbc_opus_write);
+	DECLARE_READ8_MEMBER(bbcm_wd1770_read);
+	DECLARE_WRITE8_MEMBER(bbcm_wd1770_write);
+	DECLARE_READ8_MEMBER(bbcm_wd1770l_read);
+	DECLARE_WRITE8_MEMBER(bbcm_wd1770l_write);
+	DECLARE_READ8_MEMBER(bbc_disc_r);
+	DECLARE_WRITE8_MEMBER(bbc_disc_w);
+	DECLARE_WRITE8_MEMBER(bbc_videoULA_w);
+	DECLARE_WRITE8_MEMBER(bbc_6845_w);
+	DECLARE_READ8_MEMBER(bbc_6845_r);
+	DECLARE_READ8_MEMBER(bbc_fe_r);
+	DECLARE_DIRECT_UPDATE_MEMBER(bbcbp_direct_handler);
+	DECLARE_DIRECT_UPDATE_MEMBER(bbcm_direct_handler);
+	DECLARE_DRIVER_INIT(bbc);
+	DECLARE_DRIVER_INIT(bbcm);
+	DECLARE_MACHINE_START(bbca);
+	DECLARE_MACHINE_RESET(bbca);
+	DECLARE_VIDEO_START(bbca);
+	DECLARE_MACHINE_START(bbcb);
+	DECLARE_MACHINE_RESET(bbcb);
+	DECLARE_VIDEO_START(bbcb);
+	DECLARE_MACHINE_START(bbcbp);
+	DECLARE_MACHINE_RESET(bbcbp);
+	DECLARE_VIDEO_START(bbcbp);
+	DECLARE_MACHINE_START(bbcm);
+	DECLARE_MACHINE_RESET(bbcm);
+	DECLARE_VIDEO_START(bbcm);
+	DECLARE_PALETTE_INIT(bbc);
+	UINT32 screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(bbcb_vsync);
+	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
+	INTERRUPT_GEN_MEMBER(bbcm_keyscan);
+	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
+	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	DECLARE_WRITE_LINE_MEMBER(bbcb_acia6850_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(econet_clk_w);
+	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_porta);
+	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_portb);
+	DECLARE_READ8_MEMBER(bbcb_via_system_read_porta);
+	DECLARE_READ8_MEMBER(bbcb_via_system_read_portb);
+	DECLARE_WRITE_LINE_MEMBER(bbcb_via_system_irq_w);
+	DECLARE_READ8_MEMBER(bbcb_via_user_read_portb);
+	DECLARE_WRITE8_MEMBER(bbcb_via_user_write_portb);
+	DECLARE_WRITE_LINE_MEMBER(bbcb_via_user_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(bbc_vsync);
+	void update_acia_rxd();
+	void update_acia_dcd();
+	void update_acia_cts();
+	DECLARE_WRITE_LINE_MEMBER(bbc_rts_w);
+	DECLARE_WRITE_LINE_MEMBER(bbc_txd_w);
+	DECLARE_WRITE_LINE_MEMBER(write_rxd_serial);
+	DECLARE_WRITE_LINE_MEMBER(write_dcd_serial);
+	DECLARE_WRITE_LINE_MEMBER(write_cts_serial);
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	
+	DECLARE_WRITE_LINE_MEMBER(bbc_i8271_interrupt);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcb_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcm_cart );
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<mc6845_device> m_mc6845;
 	optional_device<mc6854_device> m_adlc;
 	optional_device<sn76489_device> m_sn;
+public: // HACK FOR MC6845
 	required_device<saa5050_device> m_trom;
 	optional_device<tms5220_device> m_tms;
 	optional_device<cassette_image_device> m_cassette;
-	optional_device<acia6850_device> m_acia;
+	required_device<acia6850_device> m_acia;
+	required_device<clock_device> m_acia_clock;
 	optional_device<rs232_port_device> m_rs232;
 	required_device<via6522_device> m_via6522_0;
 	optional_device<via6522_device> m_via6522_1;
 	optional_device<upd7002_device> m_upd7002;
 	optional_device<i8271_device> m_i8271;
 
+	required_memory_region m_region_maincpu;
+	required_memory_region m_region_user1;
+	optional_memory_region m_region_user2;
+	required_memory_bank m_bank1; // bbca bbcb bbcbp bbcbp128 bbcm
+	optional_memory_bank m_bank2; //           bbcbp bbcbp128 bbcm
+	optional_memory_bank m_bank3; // bbca bbcb
+	required_memory_bank m_bank4; // bbca bbcb bbcbp bbcbp128 bbcm
+	optional_memory_bank m_bank5; //                          bbcm
+	optional_memory_bank m_bank6; //           bbcbp bbcbp128
+	required_memory_bank m_bank7; // bbca bbcb bbcbp bbcbp128 bbcm
+	optional_memory_bank m_bank8; //                          bbcm
 
 	void check_interrupts();
 
@@ -272,108 +381,6 @@ public:
 	int *m_videoULA_pallet_lookup;
 
 	void (*m_draw_function)(running_machine &machine);
-	DECLARE_WRITE8_MEMBER(bbc_page_selecta_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorya1_w);
-	DECLARE_WRITE8_MEMBER(bbc_page_selectb_w);
-	DECLARE_WRITE8_MEMBER(bbc_memoryb3_w);
-	DECLARE_WRITE8_MEMBER(bbc_memoryb4_w);
-	DECLARE_WRITE8_MEMBER(bbc_page_selectbp_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp1_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp2_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp4_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp4_128_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp6_128_w);
-	DECLARE_READ8_MEMBER(bbcm_ACCCON_read);
-	DECLARE_WRITE8_MEMBER(bbcm_ACCCON_write);
-	DECLARE_WRITE8_MEMBER(page_selectbm_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybm1_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybm2_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybm4_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybm5_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybm7_w);
-	DECLARE_READ8_MEMBER(bbcm_r);
-	DECLARE_WRITE8_MEMBER(bbcm_w);
-	DECLARE_WRITE8_MEMBER(bbc_SerialULA_w);
-	DECLARE_READ8_MEMBER(bbc_i8271_read);
-	DECLARE_WRITE8_MEMBER(bbc_i8271_write);
-	DECLARE_WRITE8_MEMBER(bbc_wd177x_status_w);
-	DECLARE_READ8_MEMBER(bbc_wd1770_read);
-	DECLARE_WRITE8_MEMBER(bbc_wd1770_write);
-	DECLARE_WRITE8_MEMBER(bbc_opus_status_w);
-	DECLARE_READ8_MEMBER(bbc_opus_read);
-	DECLARE_WRITE8_MEMBER(bbc_opus_write);
-	DECLARE_READ8_MEMBER(bbcm_wd1770_read);
-	DECLARE_WRITE8_MEMBER(bbcm_wd1770_write);
-	DECLARE_READ8_MEMBER(bbcm_wd1770l_read);
-	DECLARE_WRITE8_MEMBER(bbcm_wd1770l_write);
-	DECLARE_READ8_MEMBER(bbc_disc_r);
-	DECLARE_WRITE8_MEMBER(bbc_disc_w);
-	DECLARE_WRITE8_MEMBER(bbc_videoULA_w);
-	DECLARE_WRITE8_MEMBER(bbc_6845_w);
-	DECLARE_READ8_MEMBER(bbc_6845_r);
-	DECLARE_READ8_MEMBER(bbc_fe_r);
-	DECLARE_DIRECT_UPDATE_MEMBER(bbcbp_direct_handler);
-	DECLARE_DIRECT_UPDATE_MEMBER(bbcm_direct_handler);
-	DECLARE_DRIVER_INIT(bbc);
-	DECLARE_DRIVER_INIT(bbcm);
-	DECLARE_MACHINE_START(bbca);
-	DECLARE_MACHINE_RESET(bbca);
-	DECLARE_VIDEO_START(bbca);
-	DECLARE_MACHINE_START(bbcb);
-	DECLARE_MACHINE_RESET(bbcb);
-	DECLARE_VIDEO_START(bbcb);
-	DECLARE_MACHINE_START(bbcbp);
-	DECLARE_MACHINE_RESET(bbcbp);
-	DECLARE_VIDEO_START(bbcbp);
-	DECLARE_MACHINE_START(bbcm);
-	DECLARE_MACHINE_RESET(bbcm);
-	DECLARE_VIDEO_START(bbcm);
-	DECLARE_PALETTE_INIT(bbc);
-	UINT32 screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(bbcb_vsync);
-	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
-	INTERRUPT_GEN_MEMBER(bbcm_keyscan);
-	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
-	DECLARE_WRITE_LINE_MEMBER(bbcb_acia6850_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(econet_clk_w);
-	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_porta);
-	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_portb);
-	DECLARE_READ8_MEMBER(bbcb_via_system_read_porta);
-	DECLARE_READ8_MEMBER(bbcb_via_system_read_portb);
-	DECLARE_WRITE_LINE_MEMBER(bbcb_via_system_irq_w);
-	DECLARE_READ8_MEMBER(bbcb_via_user_read_portb);
-	DECLARE_WRITE8_MEMBER(bbcb_via_user_write_portb);
-	DECLARE_WRITE_LINE_MEMBER(bbcb_via_user_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(bbc_vsync);
-	void update_acia_rxd();
-	void update_acia_dcd();
-	void update_acia_cts();
-	DECLARE_WRITE_LINE_MEMBER(bbc_rts_w);
-	DECLARE_WRITE_LINE_MEMBER(bbc_txd_w);
-	DECLARE_WRITE_LINE_MEMBER(write_rxd_serial);
-	DECLARE_WRITE_LINE_MEMBER(write_dcd_serial);
-	DECLARE_WRITE_LINE_MEMBER(write_cts_serial);
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	
-	DECLARE_WRITE_LINE_MEMBER(bbc_i8271_interrupt);
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcb_cart );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcm_cart );
-
-protected:
-	required_memory_region m_region_maincpu;
-	required_memory_region m_region_user1;
-	optional_memory_region m_region_user2;
-	required_memory_bank m_bank1; // bbca bbcb bbcbp bbcbp128 bbcm
-	optional_memory_bank m_bank2; //           bbcbp bbcbp128 bbcm
-	optional_memory_bank m_bank3; // bbca bbcb
-	required_memory_bank m_bank4; // bbca bbcb bbcbp bbcbp128 bbcm
-	optional_memory_bank m_bank5; //                          bbcm
-	optional_memory_bank m_bank6; //           bbcbp bbcbp128
-	required_memory_bank m_bank7; // bbca bbcb bbcbp bbcbp128 bbcm
-	optional_memory_bank m_bank8; //                          bbcm
 
 	void bbcbp_setvideoshadow(int vdusel);
 	void common_init(int memorySize);
@@ -396,7 +403,6 @@ protected:
 	void MC6850_Receive_Clock(int new_clock);
 	void BBC_Cassette_motor(unsigned char status);
 	void bbc_update_fdq_int(int state);
-public:
 	unsigned int calculate_video_address(int ma,int ra);
 };
 

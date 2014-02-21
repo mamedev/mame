@@ -575,9 +575,9 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
 			if ((myo - 0x08) & 1)
-				return m_acia->status_read(space,0);
+				return m_acia->status_r(space,0);
 			else
-				return m_acia->data_read(space,0);
+				return m_acia->data_r(space,0);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;                                /* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f)) return m_upd7002->read(space, myo-0x18);    /* A to D converter */
@@ -609,9 +609,9 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 		if ((myo>=0x08) && (myo<=0x0f))
 		{
 			if ((myo - 0x08) & 1)
-				m_acia->control_write(space, 0, data);
+				m_acia->control_w(space, 0, data);
 			else
-				m_acia->data_write(space, 0, data);
+				m_acia->data_w(space, 0, data);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) bbc_SerialULA_w(space, myo-0x10, data);     /* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f)) m_upd7002->write(space, myo-0x18, data);    /* A to D converter */
@@ -1200,7 +1200,8 @@ void bbc_state::MC6850_Receive_Clock(int new_clock)
 	//
 	for (int i = 0; i < 16; i++ )
 	{
-		m_acia->rx_clock_in();
+		m_acia->write_rxc(1);
+		m_acia->write_rxc(0);
 	}
 }
 
@@ -1322,7 +1323,7 @@ WRITE_LINE_MEMBER( bbc_state::write_rxd_serial )
 
 void bbc_state::update_acia_rxd()
 {
-	m_acia->write_rx(( m_serproc_data & 0x40 ) ? m_rxd_serial : m_rxd_cass);
+	m_acia->write_rxd(( m_serproc_data & 0x40 ) ? m_rxd_serial : m_rxd_cass);
 }
 
 
@@ -1421,14 +1422,14 @@ WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 {
 	static const int serial_clocks[8] =
 	{
-		XTAL_16MHz / 13 / 1,    // 000
-		XTAL_16MHz / 13 / 16,   // 001
-		XTAL_16MHz / 13 / 4,    // 010
-		XTAL_16MHz / 13 / 128,  // 011
-		XTAL_16MHz / 13 / 2,    // 100
-		XTAL_16MHz / 13 / 64,   // 101
-		XTAL_16MHz / 13 / 8,    // 110
-		XTAL_16MHz / 13 / 256   // 111
+		1,    // 000
+		16,   // 001
+		4,    // 010
+		128,  // 011
+		2,    // 100
+		64,   // 101
+		8,    // 110
+		256   // 111
 	};
 
 	m_serproc_data = data;
@@ -1438,17 +1439,15 @@ WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 	BBC_Cassette_motor(m_serproc_data & 0x80);
 
 	// Set transmit clock rate
-	m_acia->set_tx_clock( serial_clocks[ data & 0x07 ] );
+	m_acia_clock->set_clock_scale( (double) 1 / serial_clocks[ data & 0x07 ] );
+}
 
-	if ( data & 0x40 )
-	{
-		// Set receive clock rate
-		m_acia->set_rx_clock( serial_clocks[ ( data >> 3 ) & 0x07 ] );
-	}
-	else
-	{
-		m_acia->set_rx_clock( 0 );
-	}
+WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
+{
+	m_acia->write_txc(state);
+	
+	if (m_serproc_data & 0x40)
+		m_acia->write_rxc(state);
 }
 
 /**************************************

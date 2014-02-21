@@ -21,6 +21,7 @@
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "machine/keyboard.h"
 
 #define KEYBOARD_TAG "keyboard"
@@ -28,21 +29,28 @@
 class mx2178_state : public driver_device
 {
 public:
-	mx2178_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mx2178_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_acia(*this, "acia")
 	{
 	}
 
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+
 	const UINT8 *m_p_chargen;
 	required_shared_ptr<UINT8> m_p_videoram;
+
+protected:
+	virtual void machine_reset();
+
 private:
 	UINT8 m_term_data;
-	virtual void machine_reset();
 	required_device<z80_device> m_maincpu;
+	required_device<acia6850_device> m_acia;
 };
 
 static ADDRESS_MAP_START(mx2178_mem, AS_PROGRAM, 8, mx2178_state)
@@ -57,8 +65,8 @@ static ADDRESS_MAP_START(mx2178_io, AS_IO, 8, mx2178_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	//AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("acia", acia6850_device, status_read, control_write)
-	//AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("acia", acia6850_device, data_read, data_write)
+	//AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
+	//AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
 	AM_RANGE(0xa0, 0xa1) AM_READ(keyin_r)
 ADDRESS_MAP_END
 
@@ -89,21 +97,6 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(mx2178_state, kbd_put)
 };
-
-//-------------------------------------------------
-//  ACIA6850_INTERFACE( acia0_intf )
-//-------------------------------------------------
-
-#if 0
-static ACIA6850_INTERFACE( acia_intf )
-{
-	614400,
-	614400,
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
-};
-#endif
 
 static MC6845_UPDATE_ROW( update_row )
 {
@@ -171,6 +164,12 @@ void mx2178_state::machine_reset()
 	m_p_chargen = memregion("chargen")->base();
 }
 
+WRITE_LINE_MEMBER(mx2178_state::write_acia_clock)
+{
+	m_acia->write_txc(state);
+	m_acia->write_rxc(state);
+}
+
 static MACHINE_CONFIG_START( mx2178, mx2178_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18869600/5) // guess
@@ -190,12 +189,16 @@ static MACHINE_CONFIG_START( mx2178, mx2178_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 18869600 / 8, crtc_interface) // clk unknown
+
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+
+	/// TODO: hook up acia to keyboard and memory map
+
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
-	//MCFG_ACIA6850_ADD("acia", acia_intf)
-	//MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	//MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rx))
-	//MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_dcd))
-	//MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 614400)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(mx2178_state, write_acia_clock))
+
 MACHINE_CONFIG_END
 
 /* ROM definition */

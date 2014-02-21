@@ -57,69 +57,35 @@
 class newbrain_state : public driver_device
 {
 public:
-	newbrain_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_copcpu(*this, COP420_TAG),
-			m_cassette1(*this, "cassette"),
-			m_cassette2(*this, "cassette2"),
-			m_rom(*this, Z80_TAG),
-			m_eim_rom(*this, "eim"),
-			m_char_rom(*this, "chargen"),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3"),
-			m_y4(*this, "Y4"),
-			m_y5(*this, "Y5"),
-			m_y6(*this, "Y6"),
-			m_y7(*this, "Y7"),
-			m_y8(*this, "Y8"),
-			m_y9(*this, "Y9"),
-			m_y10(*this, "Y10"),
-			m_y11(*this, "Y11"),
-			m_y12(*this, "Y12"),
-			m_y13(*this, "Y13"),
-			m_y14(*this, "Y14"),
-			m_y15(*this, "Y15")
-	{ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_copcpu;
-	required_device<cassette_image_device> m_cassette1;
-	required_device<cassette_image_device> m_cassette2;
-	required_memory_region m_rom;
-	optional_memory_region m_eim_rom;
-	required_memory_region m_char_rom;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_y10;
-	required_ioport m_y11;
-	required_ioport m_y12;
-	required_ioport m_y13;
-	required_ioport m_y14;
-	required_ioport m_y15;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void machine_start();
-	virtual void machine_reset();
-
-	virtual void video_start();
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	enum
+	newbrain_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, Z80_TAG),
+		m_copcpu(*this, COP420_TAG),
+		m_cassette1(*this, "cassette"),
+		m_cassette2(*this, "cassette2"),
+		m_rom(*this, Z80_TAG),
+		m_eim_rom(*this, "eim"),
+		m_char_rom(*this, "chargen"),
+		m_y0(*this, "Y0"),
+		m_y1(*this, "Y1"),
+		m_y2(*this, "Y2"),
+		m_y3(*this, "Y3"),
+		m_y4(*this, "Y4"),
+		m_y5(*this, "Y5"),
+		m_y6(*this, "Y6"),
+		m_y7(*this, "Y7"),
+		m_y8(*this, "Y8"),
+		m_y9(*this, "Y9"),
+		m_y10(*this, "Y10"),
+		m_y11(*this, "Y11"),
+		m_y12(*this, "Y12"),
+		m_y13(*this, "Y13"),
+		m_y14(*this, "Y14"),
+		m_y15(*this, "Y15")
 	{
-		TIMER_ID_RESET,
-		TIMER_ID_PWRUP
-	};
+	}
+
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( enrg1_w );
 	DECLARE_WRITE8_MEMBER( a_enrg1_w );
@@ -146,12 +112,52 @@ public:
 	DECLARE_READ8_MEMBER( cop_r );
 	DECLARE_WRITE8_MEMBER( cop_w );
 
+	INTERRUPT_GEN_MEMBER(newbrain_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(cop_regint_tick);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	virtual void video_start();
+
+	enum
+	{
+		TIMER_ID_RESET,
+		TIMER_ID_PWRUP
+	};
+
 	void check_interrupt();
 	void bankswitch();
 	void tvram_w(UINT8 data, int a6);
 	inline int get_reset_t();
 	inline int get_pwrup_t();
 	void screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_copcpu;
+	required_device<cassette_image_device> m_cassette1;
+	required_device<cassette_image_device> m_cassette2;
+	required_memory_region m_rom;
+	optional_memory_region m_eim_rom;
+	required_memory_region m_char_rom;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
+	required_ioport m_y8;
+	required_ioport m_y9;
+	required_ioport m_y10;
+	required_ioport m_y11;
+	required_ioport m_y12;
+	required_ioport m_y13;
+	required_ioport m_y14;
+	required_ioport m_y15;
 
 	// processor state
 	int m_pwrup;            // power up
@@ -194,9 +200,6 @@ public:
 	int m_copstate;
 	int m_copbytes;
 	int m_copregint;
-
-	INTERRUPT_GEN_MEMBER(newbrain_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(cop_regint_tick);
 };
 
 class newbrain_eim_state : public newbrain_state
@@ -241,8 +244,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( acia_tx );
 	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
 	DECLARE_WRITE_LINE_MEMBER( adc_eoc_w );
 

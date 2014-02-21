@@ -23,69 +23,63 @@
 
 // ======================> isa8_ibm_mfc_device
 
-class isa8_ibm_mfc_device :
-		public device_t,
-		public device_isa8_card_interface
+class isa8_ibm_mfc_device : public device_t,
+	public device_isa8_card_interface
 {
 public:
+	// Construction/destruction
+	isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-		// Construction/destruction
-		isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	DECLARE_READ8_MEMBER( ppi0_i_a );
+	DECLARE_WRITE8_MEMBER( ppi0_o_b );
+	DECLARE_READ8_MEMBER( ppi0_i_c );
+	DECLARE_WRITE8_MEMBER( ppi0_o_c );
 
-		// Optional information overrides
-		virtual machine_config_constructor  device_mconfig_additions() const;
-		virtual ioport_constructor          device_input_ports() const;
+	DECLARE_WRITE8_MEMBER( ppi1_o_a );
+	DECLARE_READ8_MEMBER( ppi1_i_b );
 
-		DECLARE_READ8_MEMBER( ppi0_i_a );
-		DECLARE_WRITE8_MEMBER( ppi0_o_b );
-		DECLARE_READ8_MEMBER( ppi0_i_c );
-		DECLARE_WRITE8_MEMBER( ppi0_o_c );
+	DECLARE_WRITE8_MEMBER( ppi1_o_c );
 
-		DECLARE_WRITE8_MEMBER( ppi1_o_a );
-		DECLARE_READ8_MEMBER( ppi1_i_b );
+	DECLARE_READ8_MEMBER( ibm_mfc_r );
+	DECLARE_WRITE8_MEMBER( ibm_mfc_w );
 
-		DECLARE_WRITE8_MEMBER( ppi1_o_c );
+	DECLARE_WRITE_LINE_MEMBER( d8253_clk0_out );
+	DECLARE_WRITE_LINE_MEMBER( d8253_clk1_out );
+	DECLARE_WRITE_LINE_MEMBER( d8253_clk2_out );
 
-		DECLARE_READ8_MEMBER( ibm_mfc_r );
-		DECLARE_WRITE8_MEMBER( ibm_mfc_w );
+	DECLARE_WRITE_LINE_MEMBER( write_usart_clock );
 
-		DECLARE_WRITE_LINE_MEMBER( d8253_clk0_out );
-		DECLARE_WRITE_LINE_MEMBER( d8253_clk1_out );
-		DECLARE_WRITE_LINE_MEMBER( d8253_clk2_out );
-
-		DECLARE_WRITE_LINE_MEMBER( ibm_mfc_ym_irq );
-
-		void                            set_z80_interrupt(int src, int state);
+	DECLARE_WRITE_LINE_MEMBER( ibm_mfc_ym_irq );
 
 protected:
+	// Device-level overrides
+	virtual void                    device_start();
+	virtual void                    device_reset();
 
-		// Device-level overrides
-		virtual void                    device_start();
-		virtual void                    device_reset();
-		virtual void                    device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual machine_config_constructor  device_mconfig_additions() const;
+	virtual ioport_constructor          device_input_ports() const;
 
-		virtual const rom_entry*        device_rom_region() const;
+	virtual const rom_entry*        device_rom_region() const;
 
 private:
-		void                            set_pc_interrupt(int src, int state);
-		void                            update_pc_interrupts(void);
-		void                            update_z80_interrupts(void);
+	void                            set_z80_interrupt(int src, int state);
+	void                            set_pc_interrupt(int src, int state);
+	void                            update_pc_interrupts(void);
+	void                            update_z80_interrupts(void);
 
-		UINT8                           m_tcr;
-		UINT8                           m_pc_ppi_c;
-		UINT8                           m_z80_ppi_c;
+	UINT8                           m_tcr;
+	UINT8                           m_pc_ppi_c;
+	UINT8                           m_z80_ppi_c;
 
-		UINT8                           m_pc_irq_state;
-		UINT8                           m_z80_irq_state;
+	UINT8                           m_pc_irq_state;
+	UINT8                           m_z80_irq_state;
 
-		emu_timer                       *m_serial_timer;
-
-		required_device<cpu_device>     m_cpu;
-		required_device<ym2151_device>  m_ym2151;
-		required_device<pit8253_device> m_d8253;
-		required_device<i8251_device>   m_d71051;
-		required_device<i8255_device>   m_d71055c_0;
-		required_device<i8255_device>   m_d71055c_1;
+	required_device<cpu_device>     m_cpu;
+	required_device<ym2151_device>  m_ym2151;
+	required_device<pit8253_device> m_d8253;
+	required_device<i8251_device>   m_d71051;
+	required_device<i8255_device>   m_d71055c_0;
+	required_device<i8255_device>   m_d71055c_1;
 };
 
 

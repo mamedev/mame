@@ -96,8 +96,8 @@ enum to7_io_dev
 class thomson_state : public driver_device
 {
 public:
-	thomson_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	thomson_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mc6854(*this, "mc6854"),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
@@ -113,7 +113,10 @@ public:
 		m_mea8000(*this, "mea8000"),
 		m_ram(*this, RAM_TAG),
 		m_mc6846(*this, "mc6846"),
-		m_mc6843(*this, "mc6843") { }
+		m_mc6843(*this, "mc6843"),
+		m_acia6850(*this, "acia6850")
+	{
+	}
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( to7_cartridge );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mo5_cartridge );
@@ -138,6 +141,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( to7_io_cb2_out );
 	DECLARE_WRITE_LINE_MEMBER( to7_modem_cb );
 	DECLARE_WRITE_LINE_MEMBER( to7_modem_tx_w );
+	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
 	DECLARE_READ8_MEMBER( to7_modem_mea8000_r );
 	DECLARE_WRITE8_MEMBER( to7_modem_mea8000_w );
 	DECLARE_READ8_MEMBER( to7_game_porta_in );
@@ -331,6 +335,7 @@ protected:
 	required_device<ram_device> m_ram;
 	optional_device<mc6846_device> m_mc6846;
 	optional_device<mc6843_device> m_mc6843;
+	optional_device<acia6850_device> m_acia6850;
 
 	/* bank logging and optimisations */
 	int m_old_cart_bank;
@@ -562,7 +567,6 @@ protected:
 
 extern const mc6846_interface to7_timer;
 extern const mea8000_interface to7_speech;
-extern const acia6850_interface to7_modem;
 extern const mc6846_interface to770_timer;
 extern const mc6846_interface to9_timer;
 

@@ -48,15 +48,16 @@ X - Test off-board memory banks
 class pulsar_state : public driver_device
 {
 public:
-	pulsar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_dart(*this, "z80dart")
-		, m_brg(*this, "brg")
-		, m_fdc (*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_rtc(*this, "rtc")
-	{ }
+	pulsar_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_dart(*this, "z80dart"),
+		m_brg(*this, "brg"),
+		m_fdc (*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_rtc(*this, "rtc")
+	{
+	}
 
 	DECLARE_DRIVER_INIT(pulsar);
 	DECLARE_MACHINE_RESET(pulsar);
@@ -258,14 +259,18 @@ static MACHINE_CONFIG_START( pulsar, pulsar_state )
 	/* Devices */
 	MCFG_I8255_ADD( "ppi", ppi_intf )
 	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
-	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, WRITELINE(pulsar_state, fr_w), WRITELINE(pulsar_state, ft_w))
+
 	MCFG_Z80DART_ADD("z80dart",  XTAL_4MHz, dart_intf )
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("z80dart", z80dart_device, ctsa_w))
-
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
+
+	MCFG_DEVICE_ADD("brg", COM8116, XTAL_5_0688MHz)
+	MCFG_COM8116_FR_HANDLER(WRITELINE(pulsar_state, fr_w))
+	MCFG_COM8116_FT_HANDLER(WRITELINE(pulsar_state, ft_w))
+
 	MCFG_FD1797x_ADD("fdc", XTAL_4MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

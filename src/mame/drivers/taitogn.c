@@ -481,12 +481,15 @@ WRITE16_MEMBER(taitogn_state::gn_1fb70000_w)
 
 READ16_MEMBER(taitogn_state::hack1_r)
 {
-	switch(offset)
+	switch (offset)
 	{
-	case 0:
-		m_v = m_v ^ 8;
-		// Probably something to do with MCU
-		return m_v;
+		case 0:
+			m_v = m_v ^ 8;
+			// Probably something to do with MCU
+			return m_v;
+		
+		default:
+			break;
 	}
 
 	return 0;
@@ -539,12 +542,15 @@ READ8_MEMBER(taitogn_state::coin_r)
 /* mahjong panel handler (for Usagi & Mahjong Oh) */
 READ8_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 {
-	switch(m_coin_info & 0xcc)
+	switch (m_coin_info & 0xcc)
 	{
 		case 0x04: return ioport("KEY0")->read();
 		case 0x08: return ioport("KEY1")->read();
 		case 0x40: return ioport("KEY2")->read();
 		case 0x80: return ioport("KEY3")->read();
+		
+		default:
+			break;
 	}
 
 	/* mux disabled */
@@ -554,13 +560,17 @@ READ8_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 READ32_MEMBER(taitogn_state::zsg2_ext_r)
 {
 	offset *= 2;
-	
-	if (offset < 0x100000)
-		return m_sndflash0->read(offset) | m_sndflash0->read(offset | 1) << 16;
-	else if (offset < 0x200000)
-		return m_sndflash1->read(offset & 0xfffff) | m_sndflash0->read((offset & 0xfffff) | 1) << 16;
-	else
-		return m_sndflash2->read(offset & 0xfffff) | m_sndflash0->read((offset & 0xfffff) | 1) << 16;
+
+	switch (offset & 0x300000)
+	{
+		case 0x000000: return m_sndflash0->read(offset) | m_sndflash0->read(offset | 1) << 16;
+		case 0x100000: return m_sndflash1->read(offset & 0xfffff) | m_sndflash1->read((offset & 0xfffff) | 1) << 16;
+		case 0x200000: return m_sndflash2->read(offset & 0xfffff) | m_sndflash2->read((offset & 0xfffff) | 1) << 16;
+
+		default:
+			break;
+	}
+	return 0;
 }
 
 // Init and reset

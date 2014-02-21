@@ -46,8 +46,7 @@
 datach_cart_interface::datach_cart_interface(const machine_config &mconfig, device_t &device)
 					: device_slot_card_interface(mconfig, device),
 						m_i2cmem(*this, "i2cmem"),
-						m_rom(NULL),
-						m_rom_size(0)
+						m_rom(NULL)
 {
 }
 
@@ -171,7 +170,7 @@ const device_type NES_DATACH_ROM = &device_creator<nes_datach_rom_device>;
 const device_type NES_DATACH_24C01 = &device_creator<nes_datach_24c01_device>;
 
 nes_datach_rom_device::nes_datach_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: device_t(mconfig, type, name, tag, owner, clock, "nes_datach_24c01", __FILE__),
+					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						datach_cart_interface( mconfig, *this )
 {
 }

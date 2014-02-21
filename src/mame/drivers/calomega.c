@@ -648,7 +648,6 @@
 #include "cpu/m6502/m65c02.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
-#include "machine/6850acia.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "includes/calomega.h"
@@ -658,16 +657,12 @@
 *               Read/Write Handlers               *
 **************************************************/
 
-WRITE_LINE_MEMBER(calomega_state::tx_rx_clk)
+WRITE_LINE_MEMBER(calomega_state::update_aciabaud_scale)
 {
-	int trx_clk;
 	UINT8 dsw2 = ioport("SW2")->read();
-	trx_clk = UART_CLOCK * dsw2 / 128;
-	acia6850_device *acia = machine().device<acia6850_device>("acia6850_0");
-	acia->set_rx_clock(trx_clk);
-	acia->set_tx_clock(trx_clk);
-}
 
+	m_aciabaud->set_clock_scale((double)dsw2 / 128);
+}
 
 READ8_MEMBER(calomega_state::s903_mux_port_r)
 {
@@ -840,8 +835,8 @@ static ADDRESS_MAP_START( sys903_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x08d0, 0x08d0) AM_DEVREADWRITE("acia6850_0", acia6850_device, status_read, control_write)
-	AM_RANGE(0x08d1, 0x08d1) AM_DEVREADWRITE("acia6850_0", acia6850_device, data_read, data_write)
+	AM_RANGE(0x08d0, 0x08d0) AM_DEVREADWRITE("acia6850_0", acia6850_device, status_r, control_w)
+	AM_RANGE(0x08d1, 0x08d1) AM_DEVREADWRITE("acia6850_0", acia6850_device, data_r, data_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x1800, 0x3fff) AM_ROM
@@ -2556,20 +2551,18 @@ GFXDECODE_END
 *                 ACIA Interface                 *
 *************************************************/
 
-WRITE_LINE_MEMBER(calomega_state::acia_tx_w)
+WRITE_LINE_MEMBER(calomega_state::write_acia_tx)
 {
 	m_tx_line = state;
 }
 
-static ACIA6850_INTERFACE( acia6850_intf )
+WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
 {
-	UART_CLOCK,
-	UART_CLOCK,
-	DEVCB_DRIVER_LINE_MEMBER(calomega_state,acia_tx_w), /*&tx_line,*/
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(calomega_state,tx_rx_clk)
-};
+	m_acia6850_0->write_txc(state);
+	m_acia6850_0->write_rxc(state);
 
+	update_aciabaud_scale(0);
+}
 
 /*************************************************
 *                Sound Interfaces                *
@@ -2668,7 +2661,11 @@ static MACHINE_CONFIG_START( sys903, calomega_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* acia */
-	MCFG_ACIA6850_ADD("acia6850_0", acia6850_intf)
+	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(calomega_state, write_acia_tx))
+
+	MCFG_DEVICE_ADD("4024", CLOCK, UART_CLOCK)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(calomega_state, write_acia_clock))
 MACHINE_CONFIG_END
 
 

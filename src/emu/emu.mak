@@ -192,6 +192,7 @@ EMUDRIVEROBJS = \
 EMUMACHINEOBJS = \
 	$(EMUMACHINE)/bcreader.o    \
 	$(EMUMACHINE)/buffer.o      \
+	$(EMUMACHINE)/clock.o       \
 	$(EMUMACHINE)/generic.o     \
 	$(EMUMACHINE)/keyboard.o    \
 	$(EMUMACHINE)/laserdsc.o    \

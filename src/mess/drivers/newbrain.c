@@ -1009,8 +1009,8 @@ static ADDRESS_MAP_START( newbrain_ei_io_map, AS_IO, 8, newbrain_eim_state )
 	AM_RANGE(0x15, 0x15) AM_MIRROR(0xff00) AM_READ(st1_r)
 	AM_RANGE(0x16, 0x16) AM_MIRROR(0xff00) AM_READ(st2_r)
 	AM_RANGE(0x17, 0x17) AM_MIRROR(0xff00) AM_READWRITE(usbs_r, usbs_w)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, status_read, control_write)
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, data_read, data_write)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, status_r, control_w)
+	AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, data_r, data_w)
 	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE(paging_w)
 ADDRESS_MAP_END
@@ -1163,30 +1163,9 @@ WRITE_LINE_MEMBER( newbrain_eim_state::acia_interrupt )
 	m_aciaint = state;
 }
 
-static ACIA6850_INTERFACE( acia_intf )
-{
-	0,
-	0,
-	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, acia_tx),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, acia_interrupt)
-};
-
 WRITE_LINE_MEMBER( newbrain_eim_state::fdc_interrupt )
 {
 	m_fdc_int = state;
-}
-
-WRITE_LINE_MEMBER( newbrain_eim_state::ctc_z0_w )
-{
-	/* connected to the ACIA receive clock */
-	if (state) m_acia->rx_clock_in();
-}
-
-WRITE_LINE_MEMBER( newbrain_eim_state::ctc_z1_w )
-{
-	/* connected to the ACIA transmit clock */
-	if (state) m_acia->tx_clock_in();
 }
 
 WRITE_LINE_MEMBER( newbrain_eim_state::ctc_z2_w )
@@ -1199,8 +1178,8 @@ WRITE_LINE_MEMBER( newbrain_eim_state::ctc_z2_w )
 static Z80CTC_INTERFACE( newbrain_ctc_intf )
 {
 	DEVCB_NULL,             /* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, ctc_z0_w), /* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, ctc_z1_w), /* ZC/TO1 callback */
+	DEVCB_DEVICE_LINE_MEMBER(MC6850_TAG, acia6850_device, write_rxc), /* ZC/TO0 callback */
+	DEVCB_DEVICE_LINE_MEMBER(MC6850_TAG, acia6850_device, write_txc), /* ZC/TO1 callback */
 	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, ctc_z2_w)  /* ZC/TO2 callback */
 };
 
@@ -1404,7 +1383,11 @@ static MACHINE_CONFIG_DERIVED_CLASS( newbrain_eim, newbrain_a, newbrain_eim_stat
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/8, newbrain_ctc_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_c2", newbrain_eim_state, ctc_c2_tick, attotime::from_hz(XTAL_16MHz/4/13))
 	MCFG_ADC0808_ADD(ADC0809_TAG, 500000, adc_intf)
-	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
+
+	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(newbrain_eim_state, acia_tx))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(newbrain_eim_state, acia_interrupt))
+
 	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

@@ -4084,15 +4084,14 @@
 	</software>
 
 	<software name="bignfo">
-		<description>Big Nose Freaks Out (Aladdin Deck Enhancer &amp; regular cart) (USA)</description>
+		<description>Big Nose Freaks Out (USA)</description>
 		<year>1992</year>
 		<publisher>Camerica</publisher>
-		<info name="serial" value="COBIC-7413-BFO-ALGN"/>
+		<info name="serial" value="CAM-BFO"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bf9093" />
-			<feature name="pcb" value="CAMERICA-ALGN" /> <!-- also found with CAMERICA-BF9093 pcb -->
+			<feature name="pcb" value="CAMERICA-BF9093" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="aladdin" />
 			<dataarea name="prg" size="262144">
 				<rom name="icros7413bfo" size="262144" crc="ccdcbfc6" sha1="00dfb78ac0e10f46bede9850636e2f3c6a305858" offset="00000" />
 			</dataarea>
@@ -8544,25 +8543,6 @@
 		</part>
 	</software>
 
-	<software name="dizzyadv">
-		<description>Dizzy The Adventurer (Aladdin Deck Enhancer) (USA)</description>
-		<year>1991</year>
-		<publisher>Camerica</publisher>
-		<info name="serial" value="COBIC-74xx-DA-ALGN"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bf9093" />
-			<feature name="pcb" value="CAMERICA-ALGN" />
-			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="aladdin" />
-			<dataarea name="prg" size="131072">
-				<rom name="dizzy the adventurer daca7d" size="131072" crc="db99d0cb" sha1="5a4ef3b2f5880d3b4609ae4f3381d688b3a02cac" offset="00000" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dokiyuen" cloneof="trollscl">
 		<description>Doki! Doki! Yuuenchi - Crazyland Daisakusen (Jpn)</description>
 		<year>1991</year>
@@ -12076,11 +12056,11 @@
 		</part>
 	</software>
 
-	<software name="advdizzy">
+	<software name="fntdizzy">
 		<description>The Fantastic Adventures of Dizzy (USA)</description>
 		<year>1991</year>
 		<publisher>Camerica</publisher>
-		<info name="serial" value="COBIC-7404-DZ"/>
+		<info name="serial" value="CAM-DZ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bf9093" />
 			<feature name="pcb" value="CAMERICA-BF9093" />
@@ -12090,28 +12070,6 @@
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="advdizzya" cloneof="advdizzy">
-		<description>The Fantastic Adventures of Dizzy (Aladdin Deck Enhancer) (USA)</description>
-		<year>1991</year>
-		<publisher>Camerica</publisher>
-		<info name="serial" value="COBIC-7404-DZ"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bf9093" />
-			<feature name="pcb" value="CAMERICA-ALGN" />
-			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="aladdin" />
-			<dataarea name="prg" size="262144">
-				<rom name="fantastic adv of dizzy dz7a47" size="262144" crc="f732c8fd" sha1="102bd0c46c5718c979eb1ac387dade6f6eb70ee4" offset="00000" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram2" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -21363,16 +21321,15 @@
 		</part>
 	</software>
 
-	<software name="linuscc">
-		<description>Linus Spacehead's Cosmic Crusade (Aladdin Deck Enhancer &amp; regular cart) (USA)</description>
+	<software name="linuscc" cloneof="cosmic">
+		<description>Linus Spacehead's Cosmic Crusade (USA)</description>
 		<year>1992</year>
 		<publisher>Camerica</publisher>
 		<info name="serial" value="COBIC-7415-LN-ALGN"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bf9093" />
-			<feature name="pcb" value="CAMERICA-ALGN" /> <!-- also found with CAMERICA-BF9093 pcb -->
+			<feature name="pcb" value="CAMERICA-BF9093" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="aladdin" />
 			<dataarea name="prg" size="262144">
 				<rom name="icros74151-ln" size="262144" crc="9e379698" sha1="52621d0e0782cd94b588b50860a6de3da94f2e63" offset="00000" />
 			</dataarea>
@@ -24084,33 +24041,6 @@
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="micromacua" cloneof="micromac">
-		<description>Micro Machines (Aladdin Deck Enhancer) (USA)</description>
-		<year>1992</year>
-		<publisher>Camerica</publisher>
-		<info name="serial" value="COBIC-7403-MM"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bf9093" />
-			<feature name="pcb" value="CAMERICA-ALGN" />
-			<feature name="peripheral" value="aladdin" />
-			<feature name="pcb_model" value="ALGNV1-1" />
-			<feature name="u1_cart" value="U1 PRG" />
-			<feature name="u1_aladdin" value="U1 VRAM" />
-			<feature name="u2_aladdin" value="U2 CIC" />
-			<feature name="u3_aladdin" value="U3 MMC" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="262144">
-				<rom name="micro machine mmd27f.u1" size="262144" crc="24ba12dd" sha1="c7fd43041fc139dc8440c95c28a0115dc79e2691" offset="00000" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram2" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -29166,15 +29096,14 @@
 	</software>
 
 	<software name="quatradv">
-		<description>Quattro Adventure (Aladdin Deck Enhancer &amp; regular cart) (USA)</description>
+		<description>Quattro Adventure (USA)</description>
 		<year>1991</year>
 		<publisher>Camerica</publisher>
-		<info name="serial" value="COBIC-7406-QA-ALGQ"/>
+		<info name="serial" value="CAM-QA"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bf9096" />
-			<feature name="pcb" value="CAMERICA-ALGQ" /> <!-- also found with CAMERICA-BF9096 pcb -->
+			<feature name="pcb" value="CAMERICA-BF9096" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="aladdin" />
 			<dataarea name="prg" size="262144">
 				<rom name="cobic 7406 qa" size="262144" crc="b89888c9" sha1="06990c8573128e5548c5dcd39479fabf67234926" offset="00000" />
 			</dataarea>
@@ -29188,7 +29117,7 @@
 		<description>Quattro Arcade (USA)</description>
 		<year>1992</year>
 		<publisher>Camerica</publisher>
-		<info name="serial" value="COBIC-74xx-QR"/>
+		<info name="serial" value="CAM-QR"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bf9096" />
 			<feature name="pcb" value="CAMERICA-BF9096" />
@@ -29203,17 +29132,16 @@
 	</software>
 
 	<software name="quatrspt" cloneof="supsport">
-		<description>Quattro Sports (Aladdin Deck Enhancer &amp; regular cart) (USA)</description>
+		<description>Quattro Sports (USA)</description>
 		<year>1991</year>
 		<publisher>Camerica</publisher>
-		<info name="serial" value="COBIC-7408-QS-ALGQ"/>
+		<info name="serial" value="CAM-QS"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bf9096" />
-			<feature name="pcb" value="CAMERICA-ALGQ" /> <!-- also found with CAMERICA-BF9096 pcb -->
+			<feature name="pcb" value="CAMERICA-BF9096" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="aladdin" />
 			<dataarea name="prg" size="262144">
-				<rom name="cobic 7408-qs" size="262144" crc="cccaf368" sha1="29599ea4a52b88c06b80aa0bab987e6eb329e707" offset="00000" />
+				<rom name="cobic 7405-qs" size="262144" crc="cccaf368" sha1="29599ea4a52b88c06b80aa0bab987e6eb329e707" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -77036,8 +76964,9 @@ to check why this is different -->
 		</part>
 	</software>
 
+<!-- Pegasus was a Polish NES clone -->
 	<software name="mc_pega4" supported="partial">
-		<description>Pegasus 4 in 1</description>
+		<description>Pegasus 4 in 1 ~ Golden Four (Pol)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -77053,8 +76982,9 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_pega5" supported="partial">
-		<description>Pegasus 5 in 1 (Golden Five)</description>
+<!-- Pegasus was a Polish NES clone -->
+	<software name="mc_pega5">
+		<description>Pegasus 5 in 1 ~ Golden Five (Pol)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78300,6 +78230,29 @@ that the real dumps might surface -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="datach" />
 			<feature name="pcb" value="BANDAI-DATACH" />
+			<!-- This is a fake and unused PRG dataarea to avoid changing the loading routines for the moment-->
+			<dataarea name="prg" size="32768">
+				<rom value="0xff" size="32768" offset="0" loadflag="fill" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Romless passthrough cart for the unit containing VRAM + protection bypass chip + subslot -->
+	<software name="ade">
+		<description>Aladdin Deck Enhancer (USA)</description>
+		<year>1991</year>
+		<publisher>Camerica</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ade" />
+			<feature name="pcb_model" value="ALGNV1-1" />
+			<feature name="u1" value="U1 VRAM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="u3" value="U3 MMC" />
+			<feature name="mirroring" value="vertical" />
 			<!-- This is a fake and unused PRG dataarea to avoid changing the loading routines for the moment-->
 			<dataarea name="prg" size="32768">
 				<rom value="0xff" size="32768" offset="0" loadflag="fill" />

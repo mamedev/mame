@@ -17,8 +17,8 @@
 #include "emu.h"
 #include "isa_ibm_mfc.h"
 #include "cpu/z80/z80.h"
+#include "machine/clock.h"
 #include "machine/pit8253.h"
-#include "sound/speaker.h"
 
 
 //-------------------------------------------------
@@ -295,14 +295,10 @@ static const struct pit8253_interface d8253_intf =
 //  uPD71051 USART
 //-------------------------------------------------
 
-void isa8_ibm_mfc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+WRITE_LINE_MEMBER( isa8_ibm_mfc_device::write_usart_clock )
 {
-	/// TODO: double timer frequency to get correct duty cycle
-	m_d71051->write_txc(1);
-	m_d71051->write_rxc(1);
-
-	m_d71051->write_txc(0);
-	m_d71051->write_rxc(0);
+	m_d71051->write_txc(state);
+	m_d71051->write_rxc(state);
 }
 
 //-------------------------------------------------
@@ -329,6 +325,9 @@ static MACHINE_CONFIG_FRAGMENT( ibm_mfc )
 	MCFG_I8255_ADD("d71055c_1", d71055c_1_intf)
 
 	MCFG_DEVICE_ADD("d71051", I8251, 0)
+
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL_4MHz / 8) // 500KHz
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(isa8_ibm_mfc_device, write_usart_clock))
 
 	MCFG_PIT8253_ADD("d8253", d8253_intf)
 
@@ -501,10 +500,6 @@ void isa8_ibm_mfc_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_device(0x2a20, 0x2a20 + 15, 0, 0, read8_delegate(FUNC(isa8_ibm_mfc_device::ibm_mfc_r), this), write8_delegate(FUNC(isa8_ibm_mfc_device::ibm_mfc_w), this));
-
-	// Create a 500KHz timer for the USART
-	m_serial_timer = timer_alloc();
-	m_serial_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_4MHz / 8));
 }
 
 

@@ -360,6 +360,7 @@ ToDo:
 // Includes
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/clock.h"
 #include "machine/n68681.h"
 #include "machine/6850acia.h"
 #include "machine/6522via.h"
@@ -379,7 +380,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		//m_nvram(*this, "nvram"), // merge with svram?
 		m_duart(*this, "duartn68681"),
-		m_acia(*this, "acia6850"),
+		m_acia6850(*this, "acia6850"),
 		m_via0(*this, "via6522_0"),
 		m_via1(*this, "via6522_1"),
 		//m_speaker(*this, "speaker"),
@@ -400,7 +401,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	//optional_device<nvram_device> m_nvram;
 	optional_device<duartn68681_device> m_duart; // only cat uses this
-	optional_device<acia6850_device> m_acia; // only swyft uses this
+	optional_device<acia6850_device> m_acia6850; // only swyft uses this
 	optional_device<via6522_device> m_via0; // only swyft uses this
 	optional_device<via6522_device> m_via1; // only swyft uses this
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
@@ -477,6 +478,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via1_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_int_w);
+
+	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
 	UINT8 m_duart_inp;
 	/* gate array 2 has a 16-bit counter inside which counts at 10mhz and
@@ -1246,7 +1249,7 @@ static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 8, cat_state)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_MIRROR(0xF00000) // 64 KB ROM
 	AM_RANGE(0x040000, 0x07ffff) AM_RAM AM_MIRROR(0xF00000) AM_SHARE("p_swyft_vram") // 256 KB RAM
 	AM_RANGE(0x0d0000, 0x0d000f) AM_READ(swyft_d0000) AM_MIRROR(0xF00000) // status of something? reads from d0000, d0004, d0008, d000a, d000e
-	AM_RANGE(0x0e1000, 0x0e1000) AM_DEVWRITE("acia6850", acia6850_device, control_write) AM_MIRROR(0xF00000) // 6850 ACIA lives here
+	AM_RANGE(0x0e1000, 0x0e1000) AM_DEVWRITE("acia6850", acia6850_device, control_w) AM_MIRROR(0xF00000) // 6850 ACIA lives here
 	AM_RANGE(0x0e2000, 0x0e2fff) AM_READWRITE(swyft_via0_r, swyft_via0_w) AM_MIRROR(0xF00000)// io area with selector on a9 a8 a7 a6?
 	AM_RANGE(0x0e4000, 0x0e4fff) AM_READWRITE(swyft_via1_r, swyft_via1_w) AM_MIRROR(0xF00000)
 ADDRESS_MAP_END
@@ -1296,15 +1299,6 @@ UINT32 cat_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bitma
 	}
 	return 0;
 }
-
-static const acia6850_interface swyft_acia_config =
-{
-	3579545, // guess
-	3579545, // guess
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 READ8_MEMBER( cat_state::swyft_d0000 )
 {
@@ -1447,6 +1441,12 @@ WRITE_LINE_MEMBER ( cat_state::via1_int_w )
 	logerror(" VIA1: INT output set to %d!\n", state);
 }
 
+WRITE_LINE_MEMBER( cat_state::write_acia_clock )
+{
+	m_acia6850->write_txc(state);
+	m_acia6850->write_rxc(state);
+}
+
 static MACHINE_CONFIG_START( swyft, cat_state )
 
 	/* basic machine hardware */
@@ -1469,7 +1469,11 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,swyft)
 
-	MCFG_ACIA6850_ADD("acia6850", swyft_acia_config) // unknown clock
+	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 3579545) // guess
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(cat_state, write_acia_clock))
+
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL_15_8976MHz/16) // unknown clock, GUESSED
 	MCFG_VIA6522_READPA_HANDLER(READ8(cat_state, via0_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(cat_state, via0_pb_r))

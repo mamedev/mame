@@ -173,6 +173,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "formats/basicdsk.h"
 
 #include "machine/i8251.h"
+#include "machine/clock.h"
 #include "machine/dec_lk201.h"
 #include "machine/nvram.h"
 
@@ -183,17 +184,17 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 class rainbow_state : public driver_device
 {
 public:
-	rainbow_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_inp1(*this, "W13"),
-			m_inp2(*this, "W14"),
-			m_inp3(*this, "W15"),
-			m_inp4(*this, "W18"),
-			m_inp5(*this, "BUNDLE OPTION"),
-			m_inp6(*this, "FLOPPY CONTROLLER"),
-			m_inp7(*this, "GRAPHICS OPTION"),
-			m_inp8(*this, "MEMORY PRESENT"),
-			m_inp9(*this, "MONITOR TYPE"),
+	rainbow_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_inp1(*this, "W13"),
+		m_inp2(*this, "W14"),
+		m_inp3(*this, "W15"),
+		m_inp4(*this, "W18"),
+		m_inp5(*this, "BUNDLE OPTION"),
+		m_inp6(*this, "FLOPPY CONTROLLER"),
+		m_inp7(*this, "GRAPHICS OPTION"),
+		m_inp8(*this, "MEMORY PRESENT"),
+		m_inp9(*this, "MONITOR TYPE"),
 
 		m_crtc(*this, "vt100_video"),
 		m_i8088(*this, "maincpu"),
@@ -207,31 +208,9 @@ public:
 		m_p_nvram(*this, "nvram"),
 
 		m_shared(*this, "sh_ram"),
-		m_maincpu(*this, "maincpu") { }
-
-	required_ioport m_inp1;
-	required_ioport m_inp2;
-	required_ioport m_inp3;
-	required_ioport m_inp4;
-	required_ioport m_inp5;
-	required_ioport m_inp6;
-	required_ioport m_inp7;
-	required_ioport m_inp8;
-	required_ioport m_inp9;
-
-	required_device<rainbow_video_device> m_crtc;
-	required_device<cpu_device> m_i8088;
-	required_device<cpu_device> m_z80;
-	required_device<fd1793_device> m_fdc;
-	required_device<i8251_device> m_kbd8251;
-	required_device<lk201_device> m_lk201;
-	required_shared_ptr<UINT8> m_p_ram;
-	required_shared_ptr<UINT8> m_p_vol_ram;
-	required_shared_ptr<UINT8> m_p_nvram;
-	required_shared_ptr<UINT8> m_shared;
-	UINT8 m_diagnostic;
-
-	virtual void machine_start();
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	DECLARE_READ8_MEMBER(read_video_ram_r);
 	DECLARE_WRITE8_MEMBER(clear_video_interrupt);
@@ -269,6 +248,37 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_txready_w);
 
+	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
+	TIMER_DEVICE_CALLBACK_MEMBER(motor_tick);
+
+protected:
+	virtual void machine_start();
+
+private:
+	required_ioport m_inp1;
+	required_ioport m_inp2;
+	required_ioport m_inp3;
+	required_ioport m_inp4;
+	required_ioport m_inp5;
+	required_ioport m_inp6;
+	required_ioport m_inp7;
+	required_ioport m_inp8;
+	required_ioport m_inp9;
+
+	required_device<rainbow_video_device> m_crtc;
+	required_device<cpu_device> m_i8088;
+	required_device<cpu_device> m_z80;
+	required_device<fd1793_device> m_fdc;
+	required_device<i8251_device> m_kbd8251;
+	required_device<lk201_device> m_lk201;
+	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<UINT8> m_p_vol_ram;
+	required_shared_ptr<UINT8> m_p_nvram;
+	required_shared_ptr<UINT8> m_shared;
+	required_device<cpu_device> m_maincpu;
+
 	bool m_SCREEN_BLANK;
 
 	int INT88, INTZ80;
@@ -284,7 +294,8 @@ public:
 	int MOTOR_DISABLE_counter;
 
 	int COLD_BOOT;
-private:
+	UINT8 m_diagnostic;
+
 	UINT8 m_z80_private[0x800];     // Z80 private 2K
 	UINT8 m_z80_mailbox, m_8088_mailbox;
 
@@ -293,12 +304,6 @@ private:
 
 	int m_unit;
 	device_t *m_image[4];
-
-public:
-	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -1031,15 +1036,14 @@ WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
 	update_kbd_irq();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::keyboard_tick)
+DECLARE_WRITE_LINE_MEMBER(rainbow_state::write_keyboard_clock)
 {
-	/// TODO: double clock speed to get correct duty cycle
-	m_kbd8251->write_txc(1);
-	m_kbd8251->write_rxc(1);
+	m_kbd8251->write_txc(state);
+	m_kbd8251->write_rxc(state);
+}
 
-	m_kbd8251->write_txc(0);
-	m_kbd8251->write_rxc(0);
-
+TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::motor_tick)
+{
 	if (MOTOR_DISABLE_counter)
 		MOTOR_DISABLE_counter--;
 
@@ -1148,7 +1152,10 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
 	MCFG_LK201_TX_HANDLER(DEVWRITELINE("kbdser", i8251_device, write_rxd))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", rainbow_state, keyboard_tick, attotime::from_hz(4800*16))	// 8251 is set to /16 on the clock input
+	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800*16) // 8251 is set to /16 on the clock input
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(rainbow_state, write_keyboard_clock))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", rainbow_state, motor_tick, attotime::from_hz(4800*16))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

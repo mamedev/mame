@@ -799,7 +799,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 					src++;
 					dst++;
 				}
-#ifdef DEBUG
+#ifdef MAME_DEBUG
 					logerror( "DMA  src:%X dst:%X length:%d\n", src, dst, length );
 #endif
 				m_ws_portram[0x40] = src & 0xFF;

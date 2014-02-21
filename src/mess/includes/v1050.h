@@ -10,6 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
 #include "bus/centronics/ctronics.h"
+#include "machine/clock.h"
 #include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -39,8 +40,8 @@
 #define I8255A_M6502_TAG        "u101"
 #define H46505_TAG              "u75"
 #define CENTRONICS_TAG          "centronics"
-#define TIMER_KB_TAG            "timer_kb"
-#define TIMER_SIO_TAG           "timer_sio"
+#define CLOCK_KB_TAG            "keyboard_clock"
+#define CLOCK_SIO_TAG           "sio_clock"
 #define TIMER_ACK_TAG           "timer_ack"
 #define TIMER_RST_TAG           "timer_rst"
 #define SASIBUS_TAG             "sasi"
@@ -78,7 +79,7 @@ public:
 		m_floppy1(*this, MB8877_TAG":1"),
 		m_floppy2(*this, MB8877_TAG":2"),
 		m_floppy3(*this, MB8877_TAG":3"),
-		m_timer_sio(*this, TIMER_SIO_TAG),
+		m_clock_sio(*this, CLOCK_SIO_TAG),
 		m_timer_ack(*this, TIMER_ACK_TAG),
 		m_timer_rst(*this, TIMER_RST_TAG),
 		m_sasibus(*this, SASIBUS_TAG ":host"),
@@ -89,33 +90,6 @@ public:
 		m_rtc_ppi_pc(0)
 	{
 	}
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<i8214_device> m_pic;
-	required_device<msm58321_device> m_rtc;
-	required_device<i8251_device> m_uart_kb;
-	required_device<i8251_device> m_uart_sio;
-	required_device<mb8877_t> m_fdc;
-	required_device<mc6845_device> m_crtc;
-	required_device<centronics_device> m_centronics;
-	required_device<ram_device> m_ram;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-	required_device<timer_device> m_timer_sio;
-	required_device<timer_device> m_timer_ack;
-	required_device<timer_device> m_timer_rst;
-	required_device<scsicb_device> m_sasibus;
-	required_memory_region m_rom;
-	required_shared_ptr<UINT8> m_video_ram;
-	optional_shared_ptr<UINT8> m_attr_ram;
-
-	virtual void machine_start();
-	virtual void machine_reset();
-
-	virtual void video_start();
 
 	DECLARE_READ8_MEMBER( kb_data_r );
 	DECLARE_READ8_MEMBER( kb_status_r );
@@ -156,14 +130,57 @@ public:
 	WRITE_LINE_MEMBER( rtc_ppi_pa_1_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 1)) | ((state & 1) << 1); }
 	WRITE_LINE_MEMBER( rtc_ppi_pa_2_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 2)) | ((state & 1) << 2); }
 	WRITE_LINE_MEMBER( rtc_ppi_pa_3_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 3)) | ((state & 1) << 3); }
-	UINT8 m_rtc_ppi_pa;
 	WRITE_LINE_MEMBER( rtc_ppi_pc_3_w ){ m_rtc_ppi_pc = (m_rtc_ppi_pc & ~(1 << 3)) | ((state & 1) << 3); }
-	UINT8 m_rtc_ppi_pc;
 
+	TIMER_DEVICE_CALLBACK_MEMBER(v1050_keyboard_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(sasi_ack_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(sasi_rst_tick);
+	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
+	DECLARE_WRITE_LINE_MEMBER(write_sio_clock);
+	DECLARE_WRITE_LINE_MEMBER(pic_int_w);
+	DECLARE_WRITE8_MEMBER(disp_ppi_pc_w);
+	DECLARE_WRITE8_MEMBER(m6502_ppi_pc_w);
+	DECLARE_READ8_MEMBER(misc_ppi_pc_r);
+	IRQ_CALLBACK_MEMBER(v1050_int_ack);
+
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+
+protected:
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	virtual void video_start();
+
+private:
 	void bankswitch();
 	void update_fdc();
 	void set_interrupt(UINT8 mask, int state);
 	void scan_keyboard();
+	void set_baud_sel(int sel);
+
+public: // HACK for MC6845
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<i8214_device> m_pic;
+	required_device<msm58321_device> m_rtc;
+	required_device<i8251_device> m_uart_kb;
+	required_device<i8251_device> m_uart_sio;
+	required_device<mb8877_t> m_fdc;
+	required_device<mc6845_device> m_crtc;
+	required_device<centronics_device> m_centronics;
+	required_device<ram_device> m_ram;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	required_device<clock_device> m_clock_sio;
+	required_device<timer_device> m_timer_ack;
+	required_device<timer_device> m_timer_rst;
+	required_device<scsicb_device> m_sasibus;
+	required_memory_region m_rom;
+	required_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<UINT8> m_attr_ram;
 
 	// interrupt state
 	UINT8 m_int_mask;           // interrupt mask
@@ -191,19 +208,8 @@ public:
 	// sasi state
 	UINT8 data_out;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(v1050_keyboard_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(sasi_ack_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(sasi_rst_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(kb_8251_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(sio_8251_tick);
-	DECLARE_WRITE_LINE_MEMBER(pic_int_w);
-	DECLARE_WRITE8_MEMBER(disp_ppi_pc_w);
-	DECLARE_WRITE8_MEMBER(m6502_ppi_pc_w);
-	DECLARE_READ8_MEMBER(misc_ppi_pc_r);
-	IRQ_CALLBACK_MEMBER(v1050_int_ack);
-
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	UINT8 m_rtc_ppi_pa;
+	UINT8 m_rtc_ppi_pc;
 
 	int m_centronics_busy;
 	int m_centronics_perror;

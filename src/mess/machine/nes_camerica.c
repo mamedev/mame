@@ -9,11 +9,14 @@
 
  Here we emulate the following PCBs
 
- * Camerica BF9093, BF9097, BF909X & ALGNV11 [mapper 71, two variants]
- * Camerica BF9096 & ALGQV11 Boards [mapper 232]
+ * Camerica BF9093, BF9097, BF909X [mapper 71, two variants]
+ * Camerica BF9096 Boards [mapper 232]
  * Camerica Golden Five [mapper 104]
 
+ Aladdin Deck Enhancer pass-thru cart and the corresponding minicarts 
+ (ALGNV11 & ALGQV11 PCBs) are emulated in a separate source file.
 
+ 
  TODO:
  - check what causes flickering from PPU in Fire Hawk, Poogie and Big Nose (same PPU issue as Back to
    Future 2&3?)
@@ -77,8 +80,8 @@ void nes_bf9093_device::pcb_reset()
 void nes_bf9096_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_latch1));
-	save_item(NAME(m_latch2));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_bank_base));
 }
 
 void nes_bf9096_device::pcb_reset()
@@ -86,9 +89,10 @@ void nes_bf9096_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	chr8(0, m_chr_source);
 
-	m_latch1 = 0x18;
-	m_latch2 = 0x00;
-	set_prg();
+	m_latch = 0x00;
+	m_bank_base = 0x0c;
+	prg16_89ab(m_bank_base | m_latch);
+	prg16_cdef(m_bank_base | 3);
 }
 
 void nes_golden5_device::device_start()
@@ -100,11 +104,12 @@ void nes_golden5_device::device_start()
 void nes_golden5_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0x00);
-	prg16_cdef(0x0f);
 	chr8(0, m_chr_source);
 
-	m_latch = 0;
+	m_latch = 0x00;
+	m_bank_base = 0x00;
+	prg16_89ab(m_bank_base | m_latch);
+	prg16_cdef(m_bank_base | 0x0f);
 }
 
 
@@ -158,8 +163,8 @@ WRITE8_MEMBER(nes_bf9093_device::write_h)
 
  Games: Quattro Adventure, Quattro Arcade, Quattro Sports
 
- Writes to 0x8000-0x9fff set prg block to (data&0x18)>>1,
- writes to 0xa000-0xbfff set prg page to data&3. selected
+ Writes to 0x8000-0xbfff set prg block to (data&0x18)>>1,
+ writes to 0xc000-0xffff set prg page to data&3. selected
  prg are: prg16_89ab = block|page, prg_cdef = 3|page.
  For more info on the hardware to bypass the NES lockout, see
  Kevtris' Camerica Mappers documentation.
@@ -170,22 +175,21 @@ WRITE8_MEMBER(nes_bf9093_device::write_h)
 
  -------------------------------------------------*/
 
-void nes_bf9096_device::set_prg()
-{
-	prg16_89ab((m_latch2 & 0x03) | ((m_latch1 & 0x18) >> 1));
-	prg16_cdef(0x03 | ((m_latch1 & 0x18) >> 1));
-}
-
 WRITE8_MEMBER(nes_bf9096_device::write_h)
 {
 	LOG_MMC(("bf9096 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset < 0x2000)
-		m_latch1 = data;
+	if (offset < 0x4000)
+	{
+		m_bank_base = ((data >> 3) & 3) << 2;
+		prg16_89ab(m_bank_base | m_latch);
+		prg16_cdef(m_bank_base | 3);
+	}
 	else
-		m_latch2 = data;
-
-	set_prg();
+	{
+		m_latch = data & 3;
+		prg16_89ab(m_bank_base | m_latch);
+	}	
 }
 
 /*-------------------------------------------------
@@ -208,15 +212,15 @@ WRITE8_MEMBER(nes_golden5_device::write_h)
 	{
 		if (data & 0x08)
 		{
-			m_latch = ((data & 0x07) << 4) | (m_latch & 0x0f);
-			prg16_89ab(m_latch);
-			prg16_cdef(((data & 0x07) << 4) | 0x0f);
+			m_bank_base = (data & 0x07) << 4;
+			prg16_89ab(m_bank_base | m_latch);
+			prg16_cdef(m_bank_base | 0x0f);
 		}
 
 	}
 	else
 	{
-		m_latch = (m_latch & 0x70) | (data & 0x0f);
-		prg16_89ab(m_latch);
+		m_latch = data & 0x0f;
+		prg16_89ab(m_bank_base | m_latch);
 	}
 }

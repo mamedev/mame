@@ -488,7 +488,7 @@ static GROM_CONFIG(grom2_config)
 	MCFG_DEVICE_ADD(#_tag "2", GROM, 0) \
 	MCFG_DEVICE_CONFIG(_config##2)
 
-#define GROM_LIBRARY_CONFIG(_conf, _region) \
+#define GROM_LIBRARY_CONFIG8(_conf, _region) \
 static GROM_CONFIG(_conf##0) \
 {   false, 0, _region, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
 static GROM_CONFIG(_conf##1) \
@@ -506,9 +506,17 @@ static GROM_CONFIG(_conf##6) \
 static GROM_CONFIG(_conf##7) \
 {   false, 7, _region, 0xe000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ };
 
-GROM_LIBRARY_CONFIG(pascal1, region_gromlib1)
-GROM_LIBRARY_CONFIG(pascal2, region_gromlib2)
-GROM_LIBRARY_CONFIG(pascal3, region_gromlib3)
+#define GROM_LIBRARY_CONFIG3(_conf, _region) \
+static GROM_CONFIG(_conf##0) \
+{   false, 0, _region, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
+static GROM_CONFIG(_conf##1) \
+{   false, 1, _region, 0x2000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
+static GROM_CONFIG(_conf##2) \
+{   false, 2, _region, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
+
+GROM_LIBRARY_CONFIG8(pascal1, region_gromlib1)
+GROM_LIBRARY_CONFIG8(pascal2, region_gromlib2)
+GROM_LIBRARY_CONFIG3(pascal3, region_gromlib3)
 
 static GROMPORT_CONFIG(console_cartslot)
 {

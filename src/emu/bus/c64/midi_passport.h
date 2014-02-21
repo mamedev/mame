@@ -27,7 +27,7 @@
 // ======================> c64_passport_midi_cartridge_device
 
 class c64_passport_midi_cartridge_device : public device_t,
-											public device_c64_expansion_card_interface
+	public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -38,7 +38,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( ptm_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( midi_rx_w );
+	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
 
 protected:
 	// device-level overrides

@@ -30,6 +30,7 @@
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "machine/i8251.h"
+#include "machine/clock.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
@@ -44,7 +45,6 @@ public:
 	enum
 	{
 		TIMER_SYSTEM,
-		TIMER_SERIAL,
 		TIMER_ALPHATRO_BEEP_OFF
 	};
 
@@ -68,13 +68,13 @@ public:
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
+	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
 	TIMER_DEVICE_CALLBACK_MEMBER(alphatro_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(alphatro_p);
 
 	required_shared_ptr<UINT8> m_p_ram;
 	required_shared_ptr<UINT8> m_p_videoram;
 	emu_timer* m_sys_timer;
-	emu_timer* m_serial_timer;  // for the usart
 	UINT8 *m_p_chargen;
 	virtual void video_start();
 	virtual void machine_start();
@@ -127,14 +127,6 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_SYSTEM:
 		m_timer_bit ^= 0x80;
 		break;
-	case TIMER_SERIAL:
-		/// TODO: double timer frequency for correct duty cycle
-		m_usart->write_txc(1);
-		m_usart->write_rxc(1);
-
-		m_usart->write_txc(0);
-		m_usart->write_rxc(0);
-		break;
 	case TIMER_ALPHATRO_BEEP_OFF:
 		m_beep->set_state(0);
 		break;
@@ -146,6 +138,12 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 WRITE_LINE_MEMBER( alphatro_state::txdata_callback )
 {
 	m_cass_state = state;
+}
+
+WRITE_LINE_MEMBER( alphatro_state::write_usart_clock )
+{
+	m_usart->write_txc(state);
+	m_usart->write_rxc(state);
 }
 
 void alphatro_state::video_start()
@@ -359,7 +357,6 @@ GFXDECODE_END
 void alphatro_state::machine_start()
 {
 	m_sys_timer = timer_alloc(TIMER_SYSTEM);
-	m_serial_timer = timer_alloc(TIMER_SERIAL);
 }
 
 void alphatro_state::machine_reset()
@@ -372,7 +369,6 @@ void alphatro_state::machine_reset()
 
 	// probably not correct, exact meaning of port is unknown, vblank/vsync is too slow.
 	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));
-	m_serial_timer->adjust(attotime::from_hz(19225),0,attotime::from_hz(19225));  // USART clock - this value loads a real tape
 	m_timer_bit = 0;
 	m_cass_state = 1;
 	m_cass_data[0] = 0;
@@ -475,7 +471,10 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8, alphatro_crtc6845_interface) // clk unknown
 
 	MCFG_DEVICE_ADD("usart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(alphatro_state,txdata_callback))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(alphatro_state, txdata_callback))
+
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19225) // USART clock - this value loads a real tape
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(alphatro_state, write_usart_clock))
 
 	MCFG_CASSETTE_ADD("cassette", alphatro_cassette_interface)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("alphatro_c", alphatro_state, alphatro_c, attotime::from_hz(4800))

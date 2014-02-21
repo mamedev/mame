@@ -32,8 +32,8 @@
 class vt100_state : public driver_device
 {
 public:
-	vt100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	vt100_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "vt100_video"),
 		m_speaker(*this, "beeper"),
@@ -438,8 +438,9 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
 
-	MCFG_COM8116_ADD(COM5016T_TAG, XTAL_5_0688MHz, NULL, DEVWRITELINE("i8251", i8251_device, write_rxc), DEVWRITELINE("i8251", i8251_device, write_txc))
-
+	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

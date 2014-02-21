@@ -774,21 +774,17 @@ WRITE_LINE_MEMBER( thomson_state::to7_modem_tx_w )
 	m_to7_modem_tx = state;
 }
 
-ACIA6850_INTERFACE( to7_modem )
+
+WRITE_LINE_MEMBER( thomson_state::write_acia_clock )
 {
-	1200,
-	1200, /* 1200 bauds, might be divided by 16 */
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, to7_modem_tx_w), /*&to7_modem_tx,*/
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, to7_modem_cb)
-};
-
-
+	m_acia6850->write_txc(state);
+	m_acia6850->write_rxc(state);
+}
 
 void thomson_state::to7_modem_reset()
 {
 	LOG (( "to7_modem_reset called\n" ));
-	m_acia->write_rx(0);
+	m_acia->write_rxd(0);
 	m_to7_modem_tx = 0;
 	/* pia_reset() is called in machine_reset */
 	/* acia_6850 has no reset (?) */
@@ -813,9 +809,9 @@ const mea8000_interface to7_speech = { "speech", DEVCB_NULL };
 READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 {
 	if ( space.debugger_access() )
-		{
+	{
 		return 0;
-		}
+	}
 
 	if ( ioport("mconfig")->read() & 1 )
 	{
@@ -823,10 +819,16 @@ READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 	}
 	else
 	{
-		switch (offset) {
-		case 0: return m_acia->status_read(space, offset );
-		case 1: return m_acia->data_read(space, offset );
-		default: return 0;
+		switch (offset)
+		{
+		case 0:
+			return m_acia->status_r(space, offset );
+
+		case 1:
+			return m_acia->data_r(space, offset );
+
+		default:
+			return 0;
 		}
 	}
 }
@@ -841,9 +843,15 @@ WRITE8_MEMBER( thomson_state::to7_modem_mea8000_w )
 	}
 	else
 	{
-		switch (offset) {
-		case 0: m_acia->control_write( space, offset, data );
-		case 1: m_acia->data_write( space, offset, data );
+		switch (offset)
+		{
+		case 0:
+			m_acia->control_w( space, offset, data );
+			break;
+
+		case 1:
+			m_acia->data_w( space, offset, data );
+			break;
 		}
 	}
 }

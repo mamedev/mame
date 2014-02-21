@@ -2195,7 +2195,7 @@ static void build_optable(running_machine &machine)
 									length += ((flags & OF_SIZEMASK) == OF_LONG) ? 2 : 1;
 
 								/* make sure we match the disassembler */
-								#ifdef DEBUG
+								#ifdef MAME_DEBUG
 								{
 									char dummybuffer[40];
 									UINT8 instrbuffer[10];

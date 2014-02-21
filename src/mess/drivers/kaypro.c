@@ -226,7 +226,8 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, NULL, NULL)  // WD1943, SMC8116
+	MCFG_DEVICE_ADD("brg", COM8116, XTAL_5_0688MHz) // WD1943, SMC8116
+
 	MCFG_Z80PIO_ADD( "z80pio_g", 2500000, kayproii_pio_g_intf )
 	MCFG_Z80PIO_ADD( "z80pio_s", 2500000, kayproii_pio_s_intf )
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )  /* start at 300 baud */
@@ -281,7 +282,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, NULL, NULL)  // WD1943, SMC8116
+	MCFG_DEVICE_ADD("brg", COM8116, XTAL_5_0688MHz) // WD1943, SMC8116
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
 	MCFG_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )   /* extra sio for modem and printer */
 	MCFG_FD1793x_ADD("fdc", XTAL_16MHz / 16)

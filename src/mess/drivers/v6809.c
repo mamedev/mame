@@ -52,6 +52,7 @@ ToDo:
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
+#include "machine/clock.h"
 #include "video/mc6845.h"
 #include "machine/6850acia.h"
 #include "machine/mm58274c.h"
@@ -72,7 +73,9 @@ public:
 		m_crtc(*this, "crtc"),
 		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
-		m_speaker(*this, "speaker")
+		m_speaker(*this, "speaker"),
+		m_acia0(*this, "acia0"),
+		m_acia1(*this, "acia1")
 	{
 	}
 
@@ -84,10 +87,13 @@ public:
 	DECLARE_WRITE8_MEMBER(v6809_address_w);
 	DECLARE_WRITE8_MEMBER(v6809_register_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_MACHINE_RESET(v6809);
+
 	UINT8 *m_p_videoram;
 	const UINT8 *m_p_chargen;
 	UINT16 m_video_address;
+
 private:
 	bool m_speaker_en;
 	UINT8 m_video_index;
@@ -99,6 +105,8 @@ private:
 	required_device<mb8876_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<acia6850_device> m_acia0;
+	required_device<acia6850_device> m_acia1;
 };
 
 
@@ -108,10 +116,10 @@ static ADDRESS_MAP_START(v6809_mem, AS_PROGRAM, 8, v6809_state)
 	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0xfe) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(v6809_address_w)
 	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0xfe) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(v6809_register_w)
 	AM_RANGE(0xf200, 0xf200) AM_MIRROR(0xff) AM_WRITE(videoram_w)
-	AM_RANGE(0xf504, 0xf504) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, status_read, control_write) // modem
-	AM_RANGE(0xf505, 0xf505) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, data_read, data_write)
-	AM_RANGE(0xf50c, 0xf50c) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, status_read, control_write) // printer
-	AM_RANGE(0xf50d, 0xf50d) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, data_read, data_write)
+	AM_RANGE(0xf504, 0xf504) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, status_r, control_w) // modem
+	AM_RANGE(0xf505, 0xf505) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, data_r, data_w)
+	AM_RANGE(0xf50c, 0xf50c) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w) // printer
+	AM_RANGE(0xf50d, 0xf50d) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
 	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x3c) AM_DEVREADWRITE("fdc", mb8876_t, read, write)
 	AM_RANGE(0xf640, 0xf64f) AM_MIRROR(0x30) AM_DEVREADWRITE("rtc", mm58274c_device, read, write)
 	AM_RANGE(0xf680, 0xf683) AM_MIRROR(0x3c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
@@ -248,6 +256,14 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 	DEVCB_DRIVER_MEMBER(v6809_state, kbd_put)
 };
 
+WRITE_LINE_MEMBER( v6809_state::write_acia_clock )
+{
+	m_acia0->write_txc(state);
+	m_acia0->write_rxc(state);
+	m_acia1->write_txc(state);
+	m_acia1->write_rxc(state);
+}
+
 READ8_MEMBER( v6809_state::pb_r )
 {
 	UINT8 ret = m_term_data;
@@ -296,15 +312,6 @@ static const ptm6840_interface mc6840_intf =
 		DEVCB_DRIVER_LINE_MEMBER(v6809_state, speaker_w),
 		DEVCB_DRIVER_LINE_MEMBER(v6809_state, speaker_en_w) },
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
-};
-
-static ACIA6850_INTERFACE( mc6850_intf )
-{
-	10,
-	10,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
 };
 
 static SLOT_INTERFACE_START( v6809_floppies )
@@ -366,8 +373,14 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
 
 	MCFG_PTM6840_ADD("ptm", mc6840_intf)
-	MCFG_ACIA6850_ADD("acia0", mc6850_intf)
-	MCFG_ACIA6850_ADD("acia1", mc6850_intf)
+
+	MCFG_DEVICE_ADD("acia0", ACIA6850, 0)
+
+	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 10)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(v6809_state, write_acia_clock))
+
 	MCFG_MM58274C_ADD("rtc", rtc_intf)
 	MCFG_MB8876x_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats)

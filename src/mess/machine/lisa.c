@@ -243,8 +243,9 @@ void lisa_state::COPS_queue_data(const UINT8 *data, int len)
 			m_fifo_size++;
 		}
 
-		/*logerror("COPS_queue_data : trying to send data to VIA\n");*/
-		COPS_send_data_if_possible();
+		// do not try to send immediately here, the VIA is set to latch mode so
+		// sending too soon after a command can result in the DDR not yet being
+		// returned to input and the first byte gets trashed
 	}
 }
 

@@ -130,9 +130,6 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(ht68k_mem)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681", duartn68681_device, rx_a_w))
-
 	/* video hardware */
 	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8MHz / 2 )
 	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
@@ -141,6 +138,9 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(ht68k_state, duart_txb))
 	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(ht68k_state, duart_input))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(ht68k_state, duart_output))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681", duartn68681_device, rx_a_w))
 
 	MCFG_WD1770x_ADD("wd1770", XTAL_8MHz )
 

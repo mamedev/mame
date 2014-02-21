@@ -566,9 +566,12 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_B_TAG, i8251_device, write_dsr))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 
+	MCFG_DEVICE_ADD(COM5016_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_COM8116_FR_HANDLER(WRITELINE(xor100_state, com5016_fr_w))
+	MCFG_COM8116_FT_HANDLER(WRITELINE(xor100_state, com5016_ft_w))
+
 	MCFG_I8255A_ADD(I8255A_TAG, printer_8255_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
-	MCFG_COM8116_ADD(COM5016_TAG, XTAL_5_0688MHz, NULL, WRITELINE(xor100_state, com5016_fr_w), WRITELINE(xor100_state, com5016_ft_w))
 	MCFG_FD1795x_ADD(WD1795_TAG, XTAL_8MHz/4)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":0", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":1", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)

@@ -184,6 +184,7 @@ static const discrete_lfsr_desc dkong_lfsr =
 
 static const double dkong_diode_mix_table[2] = {DK_1N5553_V, DK_1N5553_V * 2};
 
+#if !DK_USE_CUSTOM
 static const discrete_mixer_desc dkong_rc_jump_desc =
 {
 	DISC_MIXER_IS_RESISTOR,
@@ -207,6 +208,7 @@ static const discrete_mixer_desc dkong_rc_walk_desc =
 	0,
 	0, 1
 };
+#endif
 
 static const discrete_mixer_desc dkong_mixer_desc =
 {

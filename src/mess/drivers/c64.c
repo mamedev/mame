@@ -48,7 +48,7 @@ QUICKLOAD_LOAD_MEMBER( c64_state, cbm_c64 )
 
 void c64_state::check_interrupts()
 {
-	int restore = m_restore ? !BIT(m_restore->read(), 0) : CLEAR_LINE;
+	int restore = 0; // TODO: push restore m_restore ? !BIT(m_restore->read(), 0) : CLEAR_LINE;
 
 	int irq = m_cia1_irq || m_vic_irq || m_exp_irq;
 	int nmi = m_cia2_irq || restore || m_exp_nmi;

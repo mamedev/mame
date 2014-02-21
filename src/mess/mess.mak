@@ -1536,6 +1536,7 @@ $(MESSOBJ)/nintendo.a:          \
 	$(MESS_MACHINE)/nes_mmc3_clones.o  \
 	$(MESS_MACHINE)/nes_mmc5.o  \
 	$(MESS_MACHINE)/nes_act53.o  \
+	$(MESS_MACHINE)/nes_aladdin.o  \
 	$(MESS_MACHINE)/nes_ave.o  \
 	$(MESS_MACHINE)/nes_bandai.o  \
 	$(MESS_MACHINE)/nes_benshieng.o  \

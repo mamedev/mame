@@ -59,8 +59,8 @@ static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
-	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE(ACIA6850_TAG, acia6850_device, status_read, control_write)
-	AM_RANGE(0xe011, 0xe011) AM_DEVREADWRITE(ACIA6850_TAG, acia6850_device, data_read, data_write)
+	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE(ACIA6850_TAG, acia6850_device, status_r, control_w)
+	AM_RANGE(0xe011, 0xe011) AM_DEVREADWRITE(ACIA6850_TAG, acia6850_device, data_r, data_w)
 	AM_RANGE(0xe100, 0xe10f) AM_DEVREADWRITE(VIA6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0xe110, 0xe11f) AM_DEVREADWRITE(VIA6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0xe130, 0xe133) AM_DEVREADWRITE(ACIA6551_TAG,  mos6551_device, read, write)
@@ -77,15 +77,6 @@ static ADDRESS_MAP_START(ec65k_mem, AS_PROGRAM, 8, ec65_state)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-
-static ACIA6850_INTERFACE( ec65_acia_intf )
-{
-	0,
-	0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 /* Input ports */
 static INPUT_PORTS_START( ec65 )
@@ -219,7 +210,8 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 
 	/* devices */
 	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
-	MCFG_ACIA6850_ADD(ACIA6850_TAG, ec65_acia_intf)
+
+	MCFG_DEVICE_ADD(ACIA6850_TAG, ACIA6850, 0)
 
 	MCFG_DEVICE_ADD(VIA6522_0_TAG, VIA6522, XTAL_4MHz / 4)
 
