@@ -242,6 +242,7 @@ static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",pcktgal,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(pcktgal_state, pcktgal)
 
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)

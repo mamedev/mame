@@ -204,7 +204,7 @@ static MACHINE_CONFIG_START( tryout, tryout_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tryout,"palette")
 	MCFG_PALETTE_ADD("palette", 0x20)
-
+	MCFG_PALETTE_INIT_OWNER(tryout_state, tryout)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

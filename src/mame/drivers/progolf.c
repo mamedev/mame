@@ -89,7 +89,7 @@ public:
 	DECLARE_WRITE8_MEMBER(progolf_videoram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(progolf);
 	UINT32 screen_update_progolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -441,6 +441,7 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",progolf,"palette")
 	MCFG_PALETTE_ADD("palette", 32*3)
+	MCFG_PALETTE_INIT_OWNER(progolf_state, progolf)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 3000000/4, mc6845_intf) /* hand tuned to get ~57 fps */
 

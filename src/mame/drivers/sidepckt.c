@@ -381,6 +381,7 @@ static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",sidepckt,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(sidepckt_state, sidepckt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
