@@ -217,6 +217,7 @@ static MACHINE_CONFIG_START( dai, dai_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",dai,"palette")
 	MCFG_PALETTE_ADD("palette", sizeof (dai_palette) / 3)
+	MCFG_PALETTE_INIT_OWNER(dai_state, dai)
 
 
 	/* sound hardware */

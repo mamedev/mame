@@ -187,7 +187,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_DRIVER_INIT(replicator);
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(replicator);
 };
 
 void replicator_state::machine_start()
@@ -668,6 +668,7 @@ static MACHINE_CONFIG_START( replicator, replicator_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18*2-1)
 
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(replicator_state, replicator)
 	MCFG_GFXDECODE_ADD("gfxdecode",replicator,"palette")
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

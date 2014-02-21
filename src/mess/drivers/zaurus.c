@@ -1446,7 +1446,6 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 #define VERBOSE_LEVEL ( 5 )
@@ -1728,10 +1727,6 @@ void zaurus_state::machine_reset()
 {
 }
 
-
-PALETTE_INIT_MEMBER(zaurus_state, zaurus)
-{
-}
 
 /* TODO: Hack */
 TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)

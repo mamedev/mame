@@ -277,7 +277,7 @@ PALETTE_INIT_MEMBER(p1_state, p1)
 
 	for ( i = 0; i < CGA_PALETTE_SETS * 16; i++ )
 	{
-		palette_set_color_rgb( machine(), i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
+		palette.set_pen_color(i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
 	}
 }
 

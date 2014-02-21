@@ -36,7 +36,7 @@ public:
 	required_device<intelfsh8_device> m_flash;
 	required_device<speaker_sound_device> m_speaker;
 
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(svmu);
 	virtual void machine_reset();
 
 	DECLARE_WRITE8_MEMBER(page_w);
@@ -315,6 +315,7 @@ static MACHINE_CONFIG_START( svmu, svmu_state )
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", lc8670_cpu_device, screen_update)
 	MCFG_DEFAULT_LAYOUT(layout_svmu)
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(svmu_state, svmu)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

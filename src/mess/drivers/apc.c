@@ -160,7 +160,6 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 	inline void set_dma_channel(int channel, int state);
 };
 
@@ -775,10 +774,6 @@ void apc_state::machine_reset()
 	m_keyb.sig = 0;
 }
 
-
-PALETTE_INIT_MEMBER(apc_state, apc)
-{
-}
 
 static UPD7220_INTERFACE( hgdc_1_intf )
 {

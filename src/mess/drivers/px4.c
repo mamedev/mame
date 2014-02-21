@@ -201,7 +201,7 @@ public:
 	DECLARE_DRIVER_INIT(px4);
 	DECLARE_DRIVER_INIT(px4p);
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(px4);
 	DECLARE_MACHINE_START(px4_ramdisk);
 	DECLARE_PALETTE_INIT(px4p);
 	UINT32 screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1397,6 +1397,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_DEFAULT_LAYOUT(layout_px4)
 
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(px4_state, px4)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1455,6 +1456,7 @@ static MACHINE_CONFIG_DERIVED( px4p, px4 )
 	MCFG_MACHINE_START_OVERRIDE(px4_state, px4_ramdisk)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(px4_state, px4p)
 
 	MCFG_CARTSLOT_ADD("ramdisk")

@@ -40,7 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rt1715_rom_disable);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(rt1715);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 };
@@ -349,6 +349,7 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",rt1715,"palette")
 	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(rt1715_state, rt1715)
 
 	MCFG_I8275_ADD("a26", rt1715_i8275_intf)
 	MCFG_Z80CTC_ADD("a30", XTAL_10MHz/4 /* ? */, rt1715_ctc_intf)

@@ -247,7 +247,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pc6001);
 	DECLARE_MACHINE_RESET(pc6001m2);
 	DECLARE_PALETTE_INIT(pc6001m2);
 	DECLARE_MACHINE_RESET(pc6001sr);
@@ -2330,6 +2330,7 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 
 
 	MCFG_PALETTE_ADD("palette", 16+4)
+	MCFG_PALETTE_INIT_OWNER(pc6001_state, pc6001)
 
 	MCFG_I8255_ADD( "ppi8255", pc6001_ppi8255_interface )
 	/* uart */

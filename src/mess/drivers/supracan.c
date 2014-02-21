@@ -209,7 +209,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(supracan);
 	UINT32 screen_update_supracan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(supracan_irq);
 	INTERRUPT_GEN_MEMBER(supracan_sound_irq);
@@ -1927,6 +1927,8 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(supracan_state, screen_update_supracan)
 	MCFG_PALETTE_ADD( "palette", 32768 )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_INIT_OWNER(supracan_state, supracan)
+	
 	MCFG_GFXDECODE_ADD("gfxdecode",supracan,"palette")
 
 	MCFG_CARTSLOT_ADD("cart")

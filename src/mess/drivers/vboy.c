@@ -211,7 +211,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(vboy);
 	UINT32 screen_update_vboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_vboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_main_tick);
@@ -1431,6 +1431,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_vboy)
 	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(vboy_state, vboy)
 
 	/* Left screen */
 	MCFG_SCREEN_ADD("3dleft", RASTER)

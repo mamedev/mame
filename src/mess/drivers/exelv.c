@@ -103,7 +103,7 @@ public:
 	/* mailbox data */
 	UINT8   m_wx318;    /* data of 74ls374 labeled wx318 */
 	UINT8   m_wx319;    /* data of 74sl374 labeled wx319 */
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(exelv);
 	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
 };
 
@@ -536,6 +536,7 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
 #endif
 	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(exelv_state, exelv)
 
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -578,6 +579,7 @@ static MACHINE_CONFIG_START( exeltel, exelv_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
 #endif
 	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(exelv_state, exelv)
 
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */

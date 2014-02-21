@@ -301,7 +301,7 @@ static MACHINE_CONFIG_START( ssystem3, ssystem3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ssystem3_state, screen_update_ssystem3)
 
 	MCFG_PALETTE_ADD("palette", 242 + 32768)
-
+	MCFG_PALETTE_INIT_OWNER(ssystem3_state, ssystem3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -80,6 +80,7 @@ static MACHINE_CONFIG_START( advision, advision_state )
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(advision_state, advision)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

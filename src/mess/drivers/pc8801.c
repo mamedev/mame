@@ -468,13 +468,12 @@ public:
 	void fdc_irq_w(bool state);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
+	DECLARE_PALETTE_INIT(pc8801);
 protected:
 
 	virtual void video_start();
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
 public:
 	DECLARE_MACHINE_RESET(pc8801_clock_speed);
 	DECLARE_MACHINE_RESET(pc8801_dic);
@@ -2671,6 +2670,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",pc8801 ,"palette")
 	MCFG_PALETTE_ADD("palette", 0x10)
+	MCFG_PALETTE_INIT_OWNER(pc8801_state, pc8801)
 
 //  MCFG_VIDEO_START_OVERRIDE(pc8801_state,pc8801)
 

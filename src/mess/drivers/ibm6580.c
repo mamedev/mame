@@ -59,9 +59,9 @@ UINT32 ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 PALETTE_INIT_MEMBER( ibm6580_state, ibm6580 )
 {
-	palette_set_color_rgb( machine(), 0, 0, 0, 0 ); /* Black */
-	palette_set_color_rgb( machine(), 1, 0, 255, 0 );   /* Full */
-	palette_set_color_rgb( machine(), 2, 0, 128, 0 );   /* Dimmed */
+	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
+	palette.set_pen_color(1, 0, 255, 0 );   /* Full */
+	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
 }
 
 void ibm6580_state::machine_reset()

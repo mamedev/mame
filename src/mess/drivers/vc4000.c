@@ -425,7 +425,7 @@ static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vc4000_state, screen_update_vc4000)
 
 	MCFG_PALETTE_ADD("palette", 8)
-
+	MCFG_PALETTE_INIT_OWNER(vc4000_state, vc4000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -196,7 +196,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(mt32);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -360,6 +360,7 @@ static MACHINE_CONFIG_START( mt32, mt32_state )
 	MCFG_SCREEN_SIZE(20*6-1, (20*6-1)*3/4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 20*6-2, 0, (20*6-1)*3/4-1)
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(mt32_state, mt32)
 
 	MCFG_SED1200D0A_ADD( "lcd" )
 

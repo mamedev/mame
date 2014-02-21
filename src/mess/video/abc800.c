@@ -16,7 +16,7 @@
 #define VERTICAL_PORCH_HACK     29
 
 
-static const rgb_t PALETTE[] =
+static const rgb_t PALETTE_ABC[] =
 {
 	rgb_t::black,
 	rgb_t(0xff, 0x00, 0x00), // red
@@ -106,11 +106,11 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 					if (black || opaque)
 					{
-						bitmap.pix32(y, x) = PALETTE[color];
-						bitmap.pix32(y, x + 1) = PALETTE[color];
+						bitmap.pix32(y, x) = PALETTE_ABC[color];
+						bitmap.pix32(y, x + 1) = PALETTE_ABC[color];
 
-						bitmap.pix32(y + 1, x) = PALETTE[color];
-						bitmap.pix32(y + 1, x + 1) = PALETTE[color];
+						bitmap.pix32(y + 1, x) = PALETTE_ABC[color];
+						bitmap.pix32(y + 1, x + 1) = PALETTE_ABC[color];
 					}
 				}
 

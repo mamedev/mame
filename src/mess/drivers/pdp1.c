@@ -1963,7 +1963,7 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",pdp1,"palette")
 	MCFG_PALETTE_ADD("palette", pen_crt_num_levels + sizeof(pdp1_colors) / 3 + sizeof(pdp1_palette))
-
+	MCFG_PALETTE_INIT_OWNER(pdp1_state, pdp1)
 MACHINE_CONFIG_END
 
 /*

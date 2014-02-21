@@ -189,7 +189,7 @@ PALETTE_INIT_MEMBER(lola8a_state, lola8a)
 	int i;
 
 	for(i=0;i<8;i++) {
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 	}
 }
 

@@ -56,7 +56,7 @@ static const rgb_t tim100_palette[3] = {
 
 void tim100_state::machine_reset()
 {
-	palette.set_pen_colors(0, tim100_palette, ARRAY_LENGTH(tim100_palette));
+	m_palette->set_pen_colors(0, tim100_palette, ARRAY_LENGTH(tim100_palette));
 }
 
 const gfx_layout tim100_charlayout =

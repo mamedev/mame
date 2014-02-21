@@ -236,23 +236,23 @@ void x1_state::x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int 
 
 	if(width && height)
 	{
-		bitmap.pix32(y+0+m_ystart, x+0+m_xstart) = machine.pens[pen];
-		bitmap.pix32(y+0+m_ystart, x+1+m_xstart) = machine.pens[pen];
-		bitmap.pix32(y+1+m_ystart, x+0+m_xstart) = machine.pens[pen];
-		bitmap.pix32(y+1+m_ystart, x+1+m_xstart) = machine.pens[pen];
+		bitmap.pix32(y+0+m_ystart, x+0+m_xstart) = m_palette->pen(pen);
+		bitmap.pix32(y+0+m_ystart, x+1+m_xstart) = m_palette->pen(pen);
+		bitmap.pix32(y+1+m_ystart, x+0+m_xstart) = m_palette->pen(pen);
+		bitmap.pix32(y+1+m_ystart, x+1+m_xstart) = m_palette->pen(pen);
 	}
 	else if(width)
 	{
-		bitmap.pix32(y+m_ystart, x+0+m_xstart) = machine.pens[pen];
-		bitmap.pix32(y+m_ystart, x+1+m_xstart) = machine.pens[pen];
+		bitmap.pix32(y+m_ystart, x+0+m_xstart) = m_palette->pen(pen);
+		bitmap.pix32(y+m_ystart, x+1+m_xstart) = m_palette->pen(pen);
 	}
 	else if(height)
 	{
-		bitmap.pix32(y+0+m_ystart, x+m_xstart) = machine.pens[pen];
-		bitmap.pix32(y+1+m_ystart, x+m_xstart) = machine.pens[pen];
+		bitmap.pix32(y+0+m_ystart, x+m_xstart) = m_palette->pen(pen);
+		bitmap.pix32(y+1+m_ystart, x+m_xstart) = m_palette->pen(pen);
 	}
 	else
-		bitmap.pix32(y+m_ystart, x+m_xstart) = machine.pens[pen];
+		bitmap.pix32(y+m_ystart, x+m_xstart) = m_palette->pen(pen);
 }
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])

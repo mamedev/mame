@@ -185,7 +185,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(mz2500);
 	UINT32 screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mz2500_vbl);
 	DECLARE_READ8_MEMBER(mz2500_wd17xx_r);
@@ -2163,6 +2163,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mz2500_state, screen_update_mz2500)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(mz2500_state, mz2500)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",mz2500,"palette")
 

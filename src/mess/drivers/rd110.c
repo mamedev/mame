@@ -58,7 +58,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(d110);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -241,6 +241,7 @@ static MACHINE_CONFIG_START( d110, d110_state )
 	MCFG_SCREEN_SIZE(16*6-1, (16*6-1)*3/4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 16*6-2, 0, (16*6-1)*3/4-1)
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(d110_state, d110)
 
 	MCFG_MSM6222B_01_ADD( "lcd" )
 

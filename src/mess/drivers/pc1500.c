@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER( port_c_w );
 
 	DECLARE_READ8_MEMBER( pc1500_kb_r );
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pc1500);
 };
 
 static ADDRESS_MAP_START( pc1500_mem , AS_PROGRAM, 8, pc1500_state)
@@ -288,6 +288,7 @@ static MACHINE_CONFIG_START( pc1500, pc1500_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 156-1, 0, 7-1)
 	MCFG_DEFAULT_LAYOUT(layout_pc1500)
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(pc1500_state, pc1500)
 
 	MCFG_LH5810_ADD("lh5810", lh5810_pc1500_config)
 

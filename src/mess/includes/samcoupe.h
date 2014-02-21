@@ -109,7 +109,7 @@ public:
 	DECLARE_READ8_MEMBER(samcoupe_attributes_r);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(samcoupe);
 	INTERRUPT_GEN_MEMBER(samcoupe_frame_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_CALLBACK_MEMBER(samcoupe_mouse_reset);

@@ -335,7 +335,7 @@ public:
 	/* Banking */
 	UINT8   m_bank[8];
 	UINT8   *m_bank_base[8];
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(nakajies);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
 };
@@ -751,6 +751,7 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MCFG_GFXDECODE_ADD("gfxdecode",wales210,"palette")
 	MCFG_PALETTE_ADD( "palette", 2 )
+	MCFG_PALETTE_INIT_OWNER(nakajies_state, nakajies)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound */

@@ -794,6 +794,7 @@ static MACHINE_CONFIG_START( px8, px8_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",px8,"palette")
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(px8_state, px8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -273,7 +273,7 @@ static MACHINE_CONFIG_START( channelf, channelf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 
 	MCFG_PALETTE_ADD("palette", 8)
-
+	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -299,7 +299,7 @@ static MACHINE_CONFIG_START( sabavdpl, channelf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 
 	MCFG_PALETTE_ADD("palette", 8)
-
+	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -326,7 +326,7 @@ static MACHINE_CONFIG_START( channlf2, channelf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 
 	MCFG_PALETTE_ADD("palette", 8)
-
+	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -353,7 +353,7 @@ static MACHINE_CONFIG_START( sabavpl2, channelf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 
 	MCFG_PALETTE_ADD("palette", 8)
-
+	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

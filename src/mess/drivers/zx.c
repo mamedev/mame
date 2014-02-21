@@ -399,7 +399,7 @@ static MACHINE_CONFIG_START( zx80, zx_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",zx80,"palette")
 	MCFG_PALETTE_ADD("palette", 4)
-
+	MCFG_PALETTE_INIT_OWNER(zx_state,zx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -427,7 +427,7 @@ static MACHINE_CONFIG_DERIVED( zx81, zx80 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ts1000, zx81 )
-
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(zx_state,ts1000)
 MACHINE_CONFIG_END
 

@@ -147,7 +147,7 @@ public:
 	int m_DrawInterlace;
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(dgn);
 	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b0_w);
 	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b1_w);
 	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b2_w);

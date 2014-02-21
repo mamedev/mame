@@ -149,7 +149,7 @@ void rainbow_video_device::device_reset()
 	MHFU_counter = 0; // **** MHFU: OFF ON COLD BOOT ! ****
 
 	// (rest of the palette is set in the main program)
-	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00); // black
+	m_palette->set_pen_color(0, 0x00, 0x00, 0x00); // black
 
 	m_height = 24;  // <---- DEC-100
 	m_height_MAX = 48;
@@ -749,21 +749,21 @@ void rainbow_video_device::palette_select ( int choice )
 	{
 			default:
 			case 0x01:
-						palette_set_color_rgb(machine(), 1, 0xff-100, 0xff-100, 0xff-100);  // WHITE (dim)
-						palette_set_color_rgb(machine(), 2, 0xff-50, 0xff-50, 0xff-50);     // WHITE NORMAL
-						palette_set_color_rgb(machine(), 3, 0xff, 0xff, 0xff);              // WHITE (brighter)
+						m_palette->set_pen_color(1, 0xff-100, 0xff-100, 0xff-100);  // WHITE (dim)
+						m_palette->set_pen_color(2, 0xff-50, 0xff-50, 0xff-50);     // WHITE NORMAL
+						m_palette->set_pen_color(3, 0xff, 0xff, 0xff);              // WHITE (brighter)
 						break;
 
 			case 0x02:
-						palette_set_color_rgb(machine(), 1, 0 , 205 -50, 100 - 50);        // GREEN (dim)
-						palette_set_color_rgb(machine(), 2, 0 , 205,     100     );        // GREEN (NORMAL)
-						palette_set_color_rgb(machine(), 3, 0,  205 +50, 100 + 50);        // GREEN (brighter)
+						m_palette->set_pen_color(1, 0 , 205 -50, 100 - 50);        // GREEN (dim)
+						m_palette->set_pen_color(2, 0 , 205,     100     );        // GREEN (NORMAL)
+						m_palette->set_pen_color(3, 0,  205 +50, 100 + 50);        // GREEN (brighter)
 						break;
 
 			case 0x03:
-						palette_set_color_rgb(machine(), 1, 213 - 47, 146 - 47, 82 - 47); // AMBER (dim)
-						palette_set_color_rgb(machine(), 2, 213,      146,      82     ); // AMBER (NORMAL)
-						palette_set_color_rgb(machine(), 3, 255,      193,      129    ); // AMBER (brighter)
+						m_palette->set_pen_color(1, 213 - 47, 146 - 47, 82 - 47); // AMBER (dim)
+						m_palette->set_pen_color(2, 213,      146,      82     ); // AMBER (NORMAL)
+						m_palette->set_pen_color(3, 255,      193,      129    ); // AMBER (brighter)
 						break;
 	}
 }

@@ -242,7 +242,7 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 	MCFG_SCREEN_VBLANK_DRIVER(mbc55x_state, screen_eof_mbc55x)
 
 	MCFG_PALETTE_ADD("palette", SCREEN_NO_COLOURS * 3)
-
+	MCFG_PALETTE_INIT_OWNER(mbc55x_state, mbc55x)
 //  MCFG_SCREEN_SIZE(650, 260)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 

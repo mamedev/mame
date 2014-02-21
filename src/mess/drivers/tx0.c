@@ -1597,7 +1597,7 @@ static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tx0,"palette")
 	MCFG_PALETTE_ADD("palette", pen_crt_num_levels + sizeof(tx0_colors) / 3 + sizeof(tx0_palette))
-
+	MCFG_PALETTE_INIT_OWNER(tx0_state, tx0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tx0_8kw, tx0_64kw )

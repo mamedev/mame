@@ -20,7 +20,7 @@ public:
 	{ }
 
 	virtual void machine_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(gmaster);
 
 	DECLARE_READ8_MEMBER(gmaster_io_r);
 	DECLARE_WRITE8_MEMBER(gmaster_io_w);
@@ -300,6 +300,7 @@ static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gmaster_state, screen_update_gmaster)
 
 	MCFG_PALETTE_ADD("palette", sizeof(gmaster_palette)/sizeof(gmaster_palette[0]))
+	MCFG_PALETTE_INIT_OWNER(gmaster_state, gmaster)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

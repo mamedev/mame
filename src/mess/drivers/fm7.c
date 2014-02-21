@@ -2050,7 +2050,7 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD("palette", 8)
-
+	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
 
 	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
 
@@ -2099,7 +2099,7 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD("palette", 8)
-
+	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
 
 	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
 
@@ -2148,7 +2148,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD("palette", 8 + 4096)
-
+	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
 
 	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
 
@@ -2201,7 +2201,7 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD("palette", 8)
-
+	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
 
 	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
 
@@ -2248,7 +2248,7 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
 	MCFG_PALETTE_ADD("palette", 8)
-
+	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
 
 	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
 

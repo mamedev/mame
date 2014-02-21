@@ -508,7 +508,7 @@ PALETTE_INIT_MEMBER(samcoupe_state, samcoupe)
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
-	machine().palette->normalize_range(0, 127);
+	palette.palette()->normalize_range(0, 127);
 }
 
 
@@ -552,6 +552,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_SCREEN_UPDATE_DRIVER(samcoupe_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 128)
+	MCFG_PALETTE_INIT_OWNER(samcoupe_state, samcoupe)
 
 	/* devices */
 	MCFG_CENTRONICS_ADD("lpt1", centronics_printers, "image")

@@ -667,7 +667,7 @@ SLOT_INTERFACE_END
 
 
 
-static const unsigned char palette[] =
+static const unsigned char palette_gb[] =
 {
 	/* Simple black and white palette */
 	/*  0xFF,0xFF,0xFF,
@@ -696,13 +696,13 @@ static const unsigned char palette_megaduck[] = {
 PALETTE_INIT_MEMBER(gb_state, gb)
 {
 	for (int i = 0; i < 4; i++)
-		palette.set_pen_color(i, palette[i * 3 + 0], palette[i * 3 + 1], palette[i * 3 + 2]);
+		palette.set_pen_color(i, palette_gb[i * 3 + 0], palette_gb[i * 3 + 1], palette_gb[i * 3 + 2]);
 }
 
 PALETTE_INIT_MEMBER(gb_state, gbp)
 {
 	for (int i = 0; i < 4; i++)
-		palette.set_pen_color(i, palette[(i + 4) * 3 + 0], palette[(i + 4) * 3 + 1], palette[(i + 4) * 3 + 2]);
+		palette.set_pen_color(i, palette_gb[(i + 4) * 3 + 0], palette_gb[(i + 4) * 3 + 1], palette_gb[(i + 4) * 3 + 2]);
 }
 
 PALETTE_INIT_MEMBER(gb_state, sgb)

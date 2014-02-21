@@ -338,6 +338,7 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",dgnbeta,"palette")
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(dgnbeta_palette) / 3)
+	MCFG_PALETTE_INIT_OWNER(dgn_beta_state, dgn)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
 	/* PIA 0 at $FC20-$FC23 I46 */

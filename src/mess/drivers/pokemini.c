@@ -66,7 +66,7 @@ public:
 	virtual void machine_start();
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pokemini);
 	TIMER_CALLBACK_MEMBER(pokemini_seconds_timer_callback);
 	TIMER_CALLBACK_MEMBER(pokemini_256hz_timer_callback);
 	TIMER_CALLBACK_MEMBER(pokemini_timer1_callback);
@@ -1791,6 +1791,7 @@ static MACHINE_CONFIG_START( pokemini, pokemini_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_ADD( "palette", 4 )
+	MCFG_PALETTE_INIT_OWNER(pokemini_state, pokemini)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

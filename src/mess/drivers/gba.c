@@ -2258,6 +2258,7 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_PALETTE_INIT_OWNER(gba_state, gba)
 
 	MCFG_SPEAKER_STANDARD_STEREO("spkleft", "spkright")
 	MCFG_SOUND_ADD("custom", GAMEBOY, 0)

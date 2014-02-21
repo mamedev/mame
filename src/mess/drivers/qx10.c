@@ -141,7 +141,7 @@ public:
 		UINT8 rx;
 	}m_rs232c;
 
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(qx10);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	IRQ_CALLBACK_MEMBER(irq_callback);
@@ -861,6 +861,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_GFXDECODE_ADD("gfxdecode",qx10,"palette")
 	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(qx10_state, qx10)
 
 	/* Devices */
 	MCFG_PIT8253_ADD("pit8253_1", qx10_pit8253_1_config)
