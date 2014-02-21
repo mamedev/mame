@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 
 	AM_RANGE(0x300000, 0x30000f) AM_RAM // ??
 
-	AM_RANGE(0x330000, 0x330bff) AM_RAM_WRITE(paletteram_xbgr_word_be_w) AM_SHARE("paletteram") // extra colours?
+	AM_RANGE(0x330000, 0x330bff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // extra colours?
 ADDRESS_MAP_END
 
 
@@ -342,6 +342,8 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldx)
 
 	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(XBGR)
+
 	MCFG_GFXDECODE_ADD("gfxdecode",pktgaldx,"palette")
 
 	MCFG_DECOCOMN_ADD("deco_common")
@@ -386,6 +388,8 @@ static MACHINE_CONFIG_START( pktgaldb, pktgaldx_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldb)
 
 	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(XBGR)
+	
 	MCFG_GFXDECODE_ADD("gfxdecode",bootleg,"palette")
 
 	/* sound hardware */

@@ -233,7 +233,7 @@ WRITE16_MEMBER(itech32_state::timekill_intensity_w)
 		double intensity = (double)(data & 0xff) / (double)0x60;
 		int i;
 		for (i = 0; i < 8192; i++)
-			palette_set_pen_contrast(machine(), i, intensity);
+			m_palette->set_pen_contrast(i, intensity);
 	}
 }
 

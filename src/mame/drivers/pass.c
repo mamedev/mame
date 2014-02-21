@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( pass_map, AS_PROGRAM, 16, pass_state )
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(pass_bg_videoram_w) AM_SHARE("bg_videoram") // Background
 	AM_RANGE(0x210000, 0x213fff) AM_RAM_WRITE(pass_fg_videoram_w) AM_SHARE("fg_videoram") // Foreground
-	AM_RANGE(0x220000, 0x2203ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x220000, 0x2203ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x230000, 0x230001) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x230100, 0x230101) AM_READ_PORT("DSW")
 	AM_RANGE(0x230200, 0x230201) AM_READ_PORT("INPUTS")
@@ -252,6 +252,7 @@ static MACHINE_CONFIG_START( pass, pass_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pass_state, screen_update_pass)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_GFXDECODE_ADD("gfxdecode",pass,"palette")
 
 

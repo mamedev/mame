@@ -191,7 +191,7 @@ WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
 	brightness = (double)(data & 0xff);
 	for (i = 0; i < 0x800; i++)
 	{
-		palette_set_pen_contrast(machine(), i, brightness/255);
+		m_palette->set_pen_contrast(i, brightness/255);
 	}
 }
 

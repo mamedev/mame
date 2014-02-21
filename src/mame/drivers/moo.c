@@ -342,7 +342,7 @@ static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  /* Graphic planes */
 	AM_RANGE(0x1a2000, 0x1a3fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  /* Graphic planes mirror */
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_DEVREAD("k056832", k056832_device, rom_word_r)   /* Passthrough to tile roms */
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 #if MOO_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD("k056832", k056832_device, word_r)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVREAD("k053246", k053247_device, k053246_reg_word_r)
@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( moobl_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w) /* Graphic planes */
 	AM_RANGE(0x1a2000, 0x1a3fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  /* Graphic planes mirror */
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_DEVREAD("k056832", k056832_device, rom_word_r)   /* Passthrough to tile roms */
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bucky_map, AS_PROGRAM, 16, moo_state )
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( bucky_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  /* Graphic planes mirror */
 	AM_RANGE(0x184000, 0x187fff) AM_RAM                         /* extra tile RAM? */
 	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD("k056832", k056832_device, rom_word_r)   /* Passthrough to tile roms */
-	AM_RANGE(0x1b0000, 0x1b3fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1b0000, 0x1b3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x23ffff) AM_ROM                         /* data */
 #if MOO_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD("k056832", k056832_device, word_r)
@@ -586,6 +586,7 @@ static MACHINE_CONFIG_START( moo, moo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(moo_state, screen_update_moo)
 
 	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(XRGB)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
@@ -634,6 +635,7 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(moo_state, screen_update_moo)
 
 	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(XRGB)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
@@ -667,6 +669,7 @@ static MACHINE_CONFIG_DERIVED( bucky, moo )
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(XRGB)
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,bucky)
 MACHINE_CONFIG_END

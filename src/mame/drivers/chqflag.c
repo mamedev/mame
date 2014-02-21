@@ -96,7 +96,7 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 
 		/* only affect the background */
 		for (i = 512; i < 1024; i++)
-			palette_set_pen_contrast(machine(), i, brt);
+			m_palette->set_pen_contrast(i, brt);
 	}
 
 //if ((data & 0xf8) && (data & 0xf8) != 0x88)

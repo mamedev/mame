@@ -361,7 +361,7 @@ static ADDRESS_MAP_START( opwolf_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0x0ff802, 0x0ff803) AM_WRITE(opwolf_cchip_status_w)
 	AM_RANGE(0x0ffc00, 0x0ffc01) AM_WRITE(opwolf_cchip_bank_w)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)          /* dip switches */
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)  // usually 0x4, changes when you fire
 	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)     /* lightgun, read at $11e0/6 */
@@ -382,7 +382,7 @@ static ADDRESS_MAP_START( opwolfb_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0x0f0008, 0x0f000b) AM_READ(opwolf_in_r)           /* coins and buttons */
 	AM_RANGE(0x0ff000, 0x0fffff) AM_READWRITE(cchip_r,cchip_w)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)          /* dip switches */
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(opwolf_spritectrl_w)  // usually 0x4, changes when you fire
 	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)     /* lightgun, read at $11e0/6 */
@@ -737,6 +737,7 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",opwolf,"palette")
 	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	MCFG_PC080SN_ADD("pc080sn", opwolf_pc080sn_intf)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
@@ -793,6 +794,7 @@ static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for t
 
 	MCFG_GFXDECODE_ADD("gfxdecode",opwolfb,"palette")
 	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	MCFG_PC080SN_ADD("pc080sn", opwolf_pc080sn_intf)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")

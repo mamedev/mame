@@ -653,7 +653,7 @@ WRITE32_MEMBER(tmmjprd_state::tmmjprd_brt_1_w)
 	{
 		m_old_brt1 = brt;
 		for (i = bank; i < 0x800+bank; i++)
-			palette_set_pen_contrast(machine(), i, brt);
+			m_palette->set_pen_contrast(i, brt);
 	}
 }
 
@@ -671,7 +671,7 @@ WRITE32_MEMBER(tmmjprd_state::tmmjprd_brt_2_w)
 	{
 		m_old_brt2 = brt;
 		for (i = bank; i < 0x800+bank; i++)
-			palette_set_pen_contrast(machine(), i, brt);
+			m_palette->set_pen_contrast(i, brt);
 	}
 }
 

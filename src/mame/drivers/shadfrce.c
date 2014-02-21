@@ -271,7 +271,7 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_sound_brt_w)
 		double brt = (data & 0xff) / 255.0;
 
 		for (i = 0; i < 0x4000; i++)
-			palette_set_pen_contrast(machine(), i, brt);
+			m_palette->set_pen_contrast(i, brt);
 	}
 }
 

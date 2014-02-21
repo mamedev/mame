@@ -253,7 +253,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_screen1_brt_w)
 			int i;
 
 			for (i = 0; i < 0x800; i++)
-				palette_set_pen_contrast(machine(), i, brt1);
+				m_palette->set_pen_contrast(i, brt1);
 
 			m_oldbrt1 = brt1;
 		}
@@ -283,7 +283,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_screen2_brt_w)
 			int i;
 
 			for (i = 0x800; i < 0x1000; i++)
-				palette_set_pen_contrast(machine(), i, brt2);
+				m_palette->set_pen_contrast(i, brt2);
 
 			m_oldbrt2 = brt2;
 		}

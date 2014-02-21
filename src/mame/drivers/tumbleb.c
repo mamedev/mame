@@ -654,7 +654,7 @@ static ADDRESS_MAP_START( fncywld_main_map, AS_PROGRAM, 16, tumbleb_state )
 #endif
 	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
 	AM_RANGE(0x100004, 0x100005) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x140000, 0x140fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram") /* sprites */
 	AM_RANGE(0x160800, 0x16080f) AM_WRITEONLY /* goes slightly past the end of spriteram? */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
@@ -2065,7 +2065,7 @@ static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tumbleb,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)	
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
@@ -2179,7 +2179,7 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",fncywld,"palette")
 	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,fncywld)
 

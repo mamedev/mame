@@ -966,7 +966,7 @@ static ADDRESS_MAP_START( qzquest_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
@@ -982,7 +982,7 @@ static ADDRESS_MAP_START( pulirula_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE("tc0430grw", tc0280grd_device, tc0430grw_ctrl_word_w)
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* ??? */
 	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_SHARE("sprite_ext")
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
@@ -1010,7 +1010,7 @@ static ADDRESS_MAP_START( qzchikyu_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
@@ -1125,7 +1125,7 @@ static ADDRESS_MAP_START( driftout_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE("tc0430grw", tc0280grd_device, tc0430grw_word_r, tc0430grw_word_w)    /* ROZ tilemap */
 	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE("tc0430grw", tc0280grd_device, tc0430grw_ctrl_word_w)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
@@ -1142,7 +1142,7 @@ static ADDRESS_MAP_START( driveout_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE("tc0430grw", tc0280grd_device, tc0430grw_word_r, tc0430grw_word_w)    /* ROZ tilemap */
 	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE("tc0430grw", tc0280grd_device, tc0430grw_ctrl_word_w)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
@@ -3030,6 +3030,7 @@ static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",taitof2,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_default)
 
@@ -3433,6 +3434,7 @@ static MACHINE_CONFIG_DERIVED( metalb, taito_f2_tc0510nio )
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", deadconx)
 	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_metalb)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_metalb)
@@ -3625,6 +3627,7 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",pivot,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dondokod)
 
@@ -3677,6 +3680,7 @@ static MACHINE_CONFIG_START( driveout, taitof2_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",pivot,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_driftout)
 

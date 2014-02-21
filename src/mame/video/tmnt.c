@@ -724,15 +724,15 @@ UINT32 tmnt_state::screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitm
 
 		// dim all colors before it
 		for (i = 0; i < cb; i++)
-			palette_set_pen_contrast(machine(), i, brt);
+			m_palette->set_pen_contrast(i, brt);
 
 		// reset all colors in range
 		for (i = cb; i < ce; i++)
-			palette_set_pen_contrast(machine(), i, 1.0);
+			m_palette->set_pen_contrast(i, 1.0);
 
 		// dim all colors after it
 		for (i = ce; i < 2048; i++)
-			palette_set_pen_contrast(machine(), i, brt);
+			m_palette->set_pen_contrast(i, brt);
 
 		// toggle shadow/highlight
 		if (~m_dim_c & 0x10)

@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pipedrm_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -662,6 +662,7 @@ static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",pipedrm,"palette")
 	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
@@ -707,6 +708,7 @@ static MACHINE_CONFIG_START( hatris, pipedrm_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",hatris,"palette")
 	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,hatris)
 

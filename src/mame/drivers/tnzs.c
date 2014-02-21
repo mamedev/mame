@@ -757,7 +757,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tnzs_state )
 	/* arknoid2, extrmatn, plumppop and drtoppel have PROMs instead of RAM */
 	/* drtoppel writes here anyway! (maybe leftover from tests during development) */
 	/* so the handler is patched out in init_drtopple() */
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu0_type2, AS_PROGRAM, 8, tnzs_state )
@@ -1629,6 +1629,7 @@ static MACHINE_CONFIG_START( arknoid2, tnzs_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tnzs,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_PALETTE_INIT_OWNER(tnzs_state,arknoid2)
 
@@ -1671,7 +1672,7 @@ static MACHINE_CONFIG_START( drtoppel, tnzs_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tnzs,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
-
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_INIT_OWNER(tnzs_state,arknoid2)
 
 	/* sound hardware */
@@ -1716,7 +1717,7 @@ static MACHINE_CONFIG_START( tnzs, tnzs_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tnzs,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
-
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1757,6 +1758,7 @@ static MACHINE_CONFIG_START( insectx, tnzs_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",insectx,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1797,6 +1799,7 @@ static MACHINE_CONFIG_START( kageki, tnzs_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tnzs,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1847,6 +1850,7 @@ static MACHINE_CONFIG_START( tnzsb, tnzs_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tnzs,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1908,6 +1912,7 @@ static MACHINE_CONFIG_START( jpopnics, tnzs_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tnzs,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

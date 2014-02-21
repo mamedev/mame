@@ -199,7 +199,7 @@ WRITE16_MEMBER(pzletime_state::video_regs_w)
 		{
 			for (i = 0; i < 0x300; i++)
 			{
-				palette_set_pen_contrast(machine(), i, (double)0x8000/(double)m_video_regs[0]);
+				m_palette->set_pen_contrast(i, (double)0x8000/(double)m_video_regs[0]);
 			}
 		}
 	}
@@ -209,7 +209,7 @@ WRITE16_MEMBER(pzletime_state::video_regs_w)
 		{
 			for (i = 0x300; i < 32768 + 0x300; i++)
 			{
-				palette_set_pen_contrast(machine(), i, (double)0x8000/(double)m_video_regs[1]);
+				m_palette->set_pen_contrast(i, (double)0x8000/(double)m_video_regs[1]);
 			}
 		}
 	}
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( pzletime_map, AS_PROGRAM, 16, pzletime_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x700000, 0x700005) AM_RAM_WRITE(video_regs_w) AM_SHARE("video_regs")
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x900000, 0x9005ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x900000, 0x9005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa00007) AM_RAM AM_SHARE("tilemap_regs")
 	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_SHARE("bg_videoram")
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(mid_videoram_w) AM_SHARE("mid_videoram")
@@ -339,6 +339,7 @@ static MACHINE_CONFIG_START( pzletime, pzletime_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pzletime_state, screen_update_pzletime)
 	MCFG_GFXDECODE_ADD("gfxdecode",pzletime,"palette")
 	MCFG_PALETTE_ADD("palette", 0x300 + 32768)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 
