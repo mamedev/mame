@@ -13,114 +13,70 @@
 
 #include "emu.h"
 
+#define MCFG_ACIA6850_TXD_HANDLER(_devcb) \
+	devcb = &acia6850_device::set_txd_handler(*device, DEVCB2_##_devcb);
 
+#define MCFG_ACIA6850_RTS_HANDLER(_devcb) \
+	devcb = &acia6850_device::set_rts_handler(*device, DEVCB2_##_devcb);
 
-/***************************************************************************
-    EXTERNAL MACROS
-***************************************************************************/
+#define MCFG_ACIA6850_IRQ_HANDLER(_devcb) \
+	devcb = &acia6850_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
-#define ACIA6850_STATUS_RDRF    0x01
-#define ACIA6850_STATUS_TDRE    0x02
-#define ACIA6850_STATUS_DCD     0x04
-#define ACIA6850_STATUS_CTS     0x08
-#define ACIA6850_STATUS_FE      0x10
-#define ACIA6850_STATUS_OVRN    0x20
-#define ACIA6850_STATUS_PE      0x40
-#define ACIA6850_STATUS_IRQ     0x80
-
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_ACIA6850_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, ACIA6850, 0) \
-	acia6850_device::static_set_interface(*device, _interface);
-
-#define ACIA6850_INTERFACE(_name) \
-	const acia6850_interface(_name) =
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-
-// ======================> acia6850_interface
-
-struct acia6850_interface
-{
-	int m_tx_clock;
-	int m_rx_clock;
-
-	devcb_write_line    m_out_tx_cb;
-	devcb_write_line    m_out_rts_cb;
-	devcb_write_line    m_out_irq_cb;
-};
-
-
-
-// ======================> acia6850_device
-
-class acia6850_device :  public device_t,
-							public acia6850_interface
+class acia6850_device :  public device_t
 {
 public:
 	// construction/destruction
 	acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	static void static_set_interface(device_t &device, const acia6850_interface &interface);
+	template<class _Object> static devcb2_base &set_txd_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_txd_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_rts_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_rts_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_irq_handler.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER( control_write );
-	DECLARE_READ8_MEMBER( status_read );
-	DECLARE_WRITE8_MEMBER( data_write );
-	DECLARE_READ8_MEMBER( data_read );
+	DECLARE_WRITE8_MEMBER( control_w );
+	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_WRITE8_MEMBER( data_w );
+	DECLARE_READ8_MEMBER( data_r );
 
-	DECLARE_WRITE_LINE_MEMBER( write_rx );
-	DECLARE_WRITE_LINE_MEMBER( write_dcd );
 	DECLARE_WRITE_LINE_MEMBER( write_cts );
-
-	void tx_clock_in();
-	void rx_clock_in();
-
-	void set_rx_clock(int clock);
-	void set_tx_clock(int clock);
-
-	void receive_data(UINT8 data);
-
-	UINT8 get_status() { return m_status; }  // returns current status without mangling it
+	DECLARE_WRITE_LINE_MEMBER( write_dcd );
+	DECLARE_WRITE_LINE_MEMBER( write_rxd );
+	DECLARE_WRITE_LINE_MEMBER( write_rxc );
+	DECLARE_WRITE_LINE_MEMBER( write_txc );
 
 protected:
+	acia6850_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	virtual void update_irq();
+	int calculate_txirq();
+	int calculate_rxirq();
 
 private:
+	void output_txd(int txd);
+	void output_rts(int txd);
+	void output_irq(int irq);
+
 	enum
 	{
-		TIMER_ID_TRANSMIT,
-		TIMER_ID_RECEIVE
+		ACIA6850_STATUS_RDRF = 0x01,
+		ACIA6850_STATUS_TDRE = 0x02,
+		ACIA6850_STATUS_DCD = 0x04,
+		ACIA6850_STATUS_CTS = 0x08,
+		ACIA6850_STATUS_FE = 0x10,
+		ACIA6850_STATUS_OVRN = 0x20,
+		ACIA6850_STATUS_PE = 0x40,
+		ACIA6850_STATUS_IRQ = 0x80
 	};
-
-	void check_interrupts();
-	void check_dcd_input();
-
-	void tx_tick();
-	void transmit_event();
-
-	void rx_tick();
-	void receive_event();
 
 	enum serial_state
 	{
 		START,
 		DATA,
 		PARITY,
-		STOP,
-		STOP2,
+		STOP
 	};
 
 	enum parity_type
@@ -130,61 +86,59 @@ private:
 		EVEN
 	};
 
-	devcb_resolved_write_line   m_out_tx_func;
-	devcb_resolved_write_line   m_out_rts_func;
-	devcb_resolved_write_line   m_out_irq_func;
+	enum dcd_irq_state
+	{
+		DCD_IRQ_NONE = 0,
+		DCD_IRQ_READ_DATA,
+		DCD_IRQ_READ_STATUS,
+	};
 
-	UINT8       m_ctrl;
-	UINT8       m_status;
+	devcb2_write_line m_txd_handler;
+	devcb2_write_line m_rts_handler;
+	devcb2_write_line m_irq_handler;
 
-	UINT8       m_tdr;
-	UINT8       m_rdr;
-	UINT8       m_rx_shift;
-	UINT8       m_tx_shift;
+	UINT8 m_status;
+	UINT8 m_tdr;
+	UINT8 m_rdr;
 
-	UINT8       m_rx_counter;
-	UINT8       m_tx_counter;
+	bool m_first_master_reset;
+	int m_dcd_irq_pending;
+	bool m_overrun_pending;
 
-	int         m_divide;
+	int m_divide;
+	int m_bits;
+	int m_stopbits;
+	int m_parity;
+	int m_brk;
 
-	// Counters
-	int         m_tx_bits;
-	int         m_rx_bits;
-	int         m_tx_parity;
-	int         m_rx_parity;
+	int m_rts;
+	int m_dcd;
+	int m_irq;
 
-	// TX/RX state
-	int         m_bits;
-	parity_type m_parity;
-	int         m_stopbits;
-	int         m_tx_int;
+	int m_txc;
+	int m_txd;
+	int m_tx_state;
+	int m_tx_bits;
+	int m_tx_shift;
+	int m_tx_parity;
+	int m_tx_counter;
+	int m_tx_irq_enable;
 
-	// Signals
-	int         m_overrun;
-	int         m_reset;
-	int         m_rts;
-	int         m_brk;
-	int         m_first_reset;
-	int         m_status_read;
-	serial_state m_rx_state;
-	serial_state m_tx_state;
-	int         m_irq;
-	bool        m_dcd_triggered;
-	int         m_rxd;
-	int         m_dcd;
-	int         m_cts;
+	int m_rxc;
+	int m_rxd;
+	int m_rx_state;
+	int m_rx_bits;
+	int m_rx_shift;
+	int m_rx_parity;
+	int m_rx_counter;
+	int m_rx_irq_enable;
 
-	emu_timer   *m_rx_timer;
-	emu_timer   *m_tx_timer;
-
-	static const int ACIA6850_DIVIDE[3];
-	static const int ACIA6850_WORD[8][3];
+	static const int counter_divide_select[4];
+	static const int word_select[8][3];
+	static const int transmitter_control[4][3];
 };
-
 
 // device type definition
 extern const device_type ACIA6850;
-
-
 
 #endif /* __ACIA6850_H__ */

@@ -80,8 +80,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mirage_via_write_porta);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_portb);
 
-	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
-
 	UINT8 m_l_segs, m_r_segs;
 	int   m_l_hi, m_r_hi;
 };
@@ -93,11 +91,6 @@ FLOPPY_FORMATS_END
 static SLOT_INTERFACE_START( ensoniq_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
-
-WRITE_LINE_MEMBER(mirage_state::acia_irq_w)
-{
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
-}
 
 void mirage_state::fdc_intrq_w(bool state)
 {
@@ -138,8 +131,8 @@ static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 8, mirage_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("sndbank")  // 32k window on 128k of wave RAM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM         // main RAM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM         // expansion RAM
-	AM_RANGE(0xe100, 0xe100) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
-	AM_RANGE(0xe101, 0xe101) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
+	AM_RANGE(0xe100, 0xe100) AM_DEVREADWRITE("acia6850", acia6850_device, status_r, control_w)
+	AM_RANGE(0xe101, 0xe101) AM_DEVREADWRITE("acia6850", acia6850_device, data_r, data_w)
 	AM_RANGE(0xe200, 0xe2ff) AM_DEVREADWRITE("via6522", via6522_device, read, write)
 	AM_RANGE(0xe400, 0xe4ff) AM_NOP
 	AM_RANGE(0xe800, 0xe803) AM_DEVREADWRITE("wd1772", wd1772_t, read, write)
@@ -221,15 +214,6 @@ WRITE8_MEMBER(mirage_state::mirage_via_write_portb)
 	}
 }
 
-static ACIA6850_INTERFACE( mirage_acia6850_interface )
-{
-	0,              // tx clock
-	0,              // rx clock
-	DEVCB_NULL,         // rx out
-	DEVCB_NULL,         // rts out
-	DEVCB_DRIVER_LINE_MEMBER(mirage_state, acia_irq_w)
-};
-
 static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_CPU_ADD("maincpu", M6809E, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mirage_map)
@@ -246,7 +230,8 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mirage_state, mirage_via_write_portb))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
-	MCFG_ACIA6850_ADD("acia6850", mirage_acia6850_interface)
+	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
+	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809e_device, firq_line))
 
 	MCFG_WD1772x_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", mirage_state::floppy_formats)

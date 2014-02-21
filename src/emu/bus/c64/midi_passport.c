@@ -10,6 +10,7 @@
 **********************************************************************/
 
 #include "midi_passport.h"
+#include "machine/clock.h"
 #include "bus/midi/midi.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
@@ -52,26 +53,12 @@ static const ptm6840_interface ptm_intf =
 };
 
 
-//-------------------------------------------------
-//  ACIA6850_INTERFACE( acia_intf )
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::acia_irq_w )
 {
 	m_acia_irq = state;
 
 	m_slot->irq_w(m_ptm_irq || m_acia_irq);
 }
-
-static ACIA6850_INTERFACE( acia_intf )
-{
-	500000,
-	0,          // rx clock (we manually clock rx)
-	DEVCB_DEVICE_LINE_MEMBER("mdout", midi_port_device, write_txd),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_passport_midi_cartridge_device, acia_irq_w)
-};
-
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( midiin_slot )
@@ -81,14 +68,10 @@ static SLOT_INTERFACE_START( midiin_slot )
 	SLOT_INTERFACE("midiin", MIDIIN_PORT)
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::midi_rx_w )
+WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::write_acia_clock )
 {
-	m_acia->write_rx(state);
-
-	for (int i = 0; i < 16; i++)    // divider is set to 16
-	{
-		m_acia->rx_clock_in();
-	}
+	m_acia->write_txc(state);
+	m_acia->write_rxc(state);
 }
 
 
@@ -106,13 +89,19 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_passport_midi )
-	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
+	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(c64_passport_midi_cartridge_device, acia_irq_w))
+
 	MCFG_PTM6840_ADD(MC6840_TAG, ptm_intf)
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, c64_passport_midi_cartridge_device, midi_rx_w))
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(MC6850_TAG, acia6850_device, write_rxd))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) /// TODO: work out if the clock should come from the 6840
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(c64_passport_midi_cartridge_device, write_acia_clock))
 MACHINE_CONFIG_END
 
 
@@ -186,11 +175,11 @@ UINT8 c64_passport_midi_cartridge_device::c64_cd_r(address_space &space, offs_t 
 			break;
 
 		case 8:
-			data = m_acia->status_read(space, 0);
+			data = m_acia->status_r(space, 0);
 			break;
 
 		case 9:
-			data = m_acia->data_read(space, 0);
+			data = m_acia->data_r(space, 0);
 			break;
 		}
 	}
@@ -215,11 +204,11 @@ void c64_passport_midi_cartridge_device::c64_cd_w(address_space &space, offs_t o
 			break;
 
 		case 8:
-			m_acia->control_write(space, 0, data);
+			m_acia->control_w(space, 0, data);
 			break;
 
 		case 9:
-			m_acia->data_write(space, 0, data);
+			m_acia->data_w(space, 0, data);
 			break;
 
 		case 0x30:

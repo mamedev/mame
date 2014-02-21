@@ -215,6 +215,7 @@ PRINT FRE(0)
 
 
 #include "includes/osi.h"
+#include "machine/clock.h"
 
 /* Sound */
 
@@ -457,8 +458,8 @@ static ADDRESS_MAP_START( osi600_mem, AS_PROGRAM, 8, sb2m600_state )
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(keyboard_r, keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_read, control_write)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, data_read, data_write)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_r, control_w)
+	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, data_r, data_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -468,8 +469,8 @@ static ADDRESS_MAP_START( uk101_mem, AS_PROGRAM, 8, uk101_state )
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xd400, 0xd7ff) AM_NOP  // bios sets this to spaces at boot
 	AM_RANGE(0xdc00, 0xdfff) AM_READ(keyboard_r) AM_WRITE(keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_device, status_read, control_write)
-	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_device, data_read, data_write)
+	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_device, status_r, control_w)
+	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("acia_0", acia6850_device, data_r, data_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -483,8 +484,8 @@ static ADDRESS_MAP_START( c1p_mem, AS_PROGRAM, 8, c1p_state )
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("color_ram")
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(ctrl_w)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(keyboard_r, keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_read, control_write)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, data_read, data_write)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_r, control_w)
+	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, data_r, data_w)
 	AM_RANGE(0xf7c0, 0xf7c0) AM_WRITE(osi630_sound_w)
 	AM_RANGE(0xf7e0, 0xf7e0) AM_WRITE(osi630_ctrl_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
@@ -494,8 +495,8 @@ static ADDRESS_MAP_START( c1pmf_mem, AS_PROGRAM, 8, c1pmf_state )
 	AM_RANGE(0x0000, 0x4fff) AM_RAMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("pia_0", pia6821_device, read, write) // FDC
-	AM_RANGE(0xc010, 0xc010) AM_DEVREADWRITE("acia_1", acia6850_device, status_read, control_write)
-	AM_RANGE(0xc011, 0xc011) AM_DEVREADWRITE("acia_1", acia6850_device, data_read, data_write)
+	AM_RANGE(0xc010, 0xc010) AM_DEVREADWRITE("acia_1", acia6850_device, status_r, control_w)
+	AM_RANGE(0xc011, 0xc011) AM_DEVREADWRITE("acia_1", acia6850_device, data_r, data_w)
 	AM_RANGE(0xc704, 0xc707) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
 	AM_RANGE(0xc708, 0xc70b) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
 	AM_RANGE(0xc70c, 0xc70f) AM_DEVREADWRITE("pia_3", pia6821_device, read, write)
@@ -503,8 +504,8 @@ static ADDRESS_MAP_START( c1pmf_mem, AS_PROGRAM, 8, c1pmf_state )
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("color_ram")
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(ctrl_w)
 	AM_RANGE(0xdf00, 0xdf00) AM_READWRITE(keyboard_r, keyboard_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_read, control_write)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, data_read, data_write)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("acia_0", acia6850_device, status_r, control_w)
+	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("acia_0", acia6850_device, data_r, data_w)
 	AM_RANGE(0xf7c0, 0xf7c0) AM_WRITE(osi630_sound_w)
 	AM_RANGE(0xf7e0, 0xf7e0) AM_WRITE(osi630_ctrl_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
@@ -614,42 +615,18 @@ INPUT_PORTS_END
 
 /* Machine Start */
 
-TIMER_DEVICE_CALLBACK_MEMBER( sb2m600_state::tape_tick )
+WRITE_LINE_MEMBER( sb2m600_state::write_cassette_clock )
 {
-	m_acia_0->write_rx((m_cassette->input() > 0.0) ? 1 : 0);
+	m_acia_0->write_rxd((m_cassette->input() > 0.0) ? 1 : 0);
+
+	m_acia_0->write_txc(state);
+	m_acia_0->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER( sb2m600_state::cassette_tx )
 {
 	m_cassette->output(state ? +1.0 : -1.0);
 }
-
-static ACIA6850_INTERFACE( osi600_acia_intf )
-{
-	X1/32,
-	X1/32,
-	DEVCB_DRIVER_LINE_MEMBER(sb2m600_state, cassette_tx),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static ACIA6850_INTERFACE( uk101_acia_intf )
-{
-	500000, //
-	500000, //
-	DEVCB_DRIVER_LINE_MEMBER(sb2m600_state, cassette_tx),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static ACIA6850_INTERFACE( osi470_acia_intf )
-{
-	0,              // clocked in from the floppy drive
-	XTAL_4MHz/8,    // 250 kHz
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 void sb2m600_state::machine_start()
 {
@@ -767,11 +744,14 @@ static MACHINE_CONFIG_START( osi600, sb2m600_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cassette ACIA */
-	MCFG_ACIA6850_ADD("acia_0", osi600_acia_intf)
+	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(sb2m600_state, cassette_tx))
+
+	MCFG_DEVICE_ADD("cassette_clock", CLOCK, X1/32)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sb2m600_state, write_cassette_clock))
 
 	/* cassette */
 	MCFG_CASSETTE_ADD("cassette", default_cassette_interface)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", sb2m600_state, tape_tick, attotime::from_hz(44100))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -789,11 +769,14 @@ static MACHINE_CONFIG_START( uk101, uk101_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", osi)
 
 	/* cassette ACIA */
-	MCFG_ACIA6850_ADD("acia_0", uk101_acia_intf)
+	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(sb2m600_state, cassette_tx))
+
+	MCFG_DEVICE_ADD("cassette_clock", CLOCK, 500000)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sb2m600_state, write_cassette_clock))
 
 	/* cassette */
 	MCFG_CASSETTE_ADD("cassette", default_cassette_interface)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", sb2m600_state, tape_tick, attotime::from_hz(44100))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -823,11 +806,14 @@ static MACHINE_CONFIG_START( c1p, c1p_state )
 	MCFG_DEVICE_ADD("pia_3", PIA6821, 0)
 
 	/* cassette ACIA */
-	MCFG_ACIA6850_ADD("acia_0", osi600_acia_intf)
+	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(sb2m600_state, cassette_tx))
+
+	MCFG_DEVICE_ADD("cassette_clock", CLOCK, X1/32)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sb2m600_state, write_cassette_clock))
 
 	/* cassette */
 	MCFG_CASSETTE_ADD("cassette", default_cassette_interface)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", sb2m600_state, tape_tick, attotime::from_hz(44100))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -846,7 +832,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( c1pmf, c1p, c1pmf_state )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(c1pmf_state, osi470_pia_cb2_w))
 
 	/* floppy ACIA */
-	MCFG_ACIA6850_ADD("acia_1", osi470_acia_intf)
+	MCFG_DEVICE_ADD("acia_1", ACIA6850, 0)
+
+	MCFG_DEVICE_ADD("floppy_clock", CLOCK, XTAL_4MHz/8) // 250 kHz
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia_1", acia6850_device, write_txc))
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, osi_floppy_interface)
 

@@ -176,8 +176,8 @@ static ADDRESS_MAP_START( tek4051_mem, AS_PROGRAM, 8, tek4051_state )
 	AM_RANGE(0x87b0, 0x87b3) AM_DEVREADWRITE(MC6820_GPIB_TAG, pia6821_device, read, write)
 	AM_RANGE(0x87c0, 0x87c0) AM_MIRROR(0x03) AM_WRITE(lbs_w)
 //  AM_RANGE(0x87c0, 0x87c3) AM_DEVREADWRITE(MC6820_COM_TAG, pia6821_device, read, write)
-//  AM_RANGE(0x87c4, 0x87c4) AM_MIRROR(0x02) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, status_read, control_write)
-//  AM_RANGE(0x87c5, 0x87c5) AM_MIRROR(0x02) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, data_read, data_write)
+//  AM_RANGE(0x87c4, 0x87c4) AM_MIRROR(0x02) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, status_r, control_w)
+//  AM_RANGE(0x87c5, 0x87c5) AM_MIRROR(0x02) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, data_r, data_w)
 //  AM_RANGE(0x87c8, 0x87cb) XPC2
 //  AM_RANGE(0x87cc, 0x87cf) XPC3
 //  AM_RANGE(0x87d0, 0x87d3) XPC4
@@ -913,10 +913,8 @@ WRITE8_MEMBER( tek4051_state::com_pia_pb_w )
 	case 3: div = 2; break;
 	}
 
-	int clock = osc / div;
-
-	m_acia->set_tx_clock(clock);
-	m_acia->set_rx_clock(clock);
+	m_acia_clock->set_unscaled_clock(osc);
+	m_acia_clock->set_clock_scale((double) 1 / div);
 }
 
 WRITE_LINE_MEMBER( tek4051_state::com_pia_irqa_w )
@@ -932,25 +930,17 @@ WRITE_LINE_MEMBER( tek4051_state::com_pia_irqb_w )
 }
 
 
-//-------------------------------------------------
-//  ACIA6850_INTERFACE( acia_intf )
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( tek4051_state::acia_irq_w )
 {
 	m_acia_irq = state;
 	update_irq();
 }
 
-static ACIA6850_INTERFACE( acia_intf )
+WRITE_LINE_MEMBER( tek4051_state::write_acia_clock )
 {
-	0,
-	0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, acia_irq_w)
-};
-
+	m_acia->write_txc(state);
+	m_acia->write_rxc(state);
+}
 
 
 //**************************************************************************
@@ -1086,7 +1076,11 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(tek4051_state, com_pia_irqa_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(tek4051_state, com_pia_irqb_w))
 
-	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
+	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(tek4051_state, acia_irq_w))
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 38400)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(tek4051_state, write_acia_clock))
 
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_EOI_CALLBACK(DEVWRITELINE(MC6820_GPIB_TAG, pia6821_device, ca1_w))

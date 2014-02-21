@@ -75,6 +75,7 @@ Things to be looked at:
 /* Components */
 #include "sound/ay8910.h"
 #include "sound/votrax.h"
+#include "machine/clock.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/i8251.h"
@@ -104,7 +105,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_pb_w);
 	DECLARE_WRITE8_MEMBER(ppi_pc_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(serial_tick);
+	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	IRQ_CALLBACK_MEMBER(irq_ack);
 private:
 	UINT8 m_term_data;
@@ -288,14 +289,10 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_DRIVER_MEMBER(votrpss_state, kbd_put)
 };
 
-TIMER_DEVICE_CALLBACK_MEMBER( votrpss_state::serial_tick )
+DECLARE_WRITE_LINE_MEMBER( votrpss_state::write_uart_clock )
 {
-	/// TODO: double timer frequency for correct duty cycle
-	m_uart->write_rxc(1);
-	m_uart->write_txc(1);
-
-	m_uart->write_rxc(0);
-	m_uart->write_txc(0);
+	m_uart->write_txc(state);
+	m_uart->write_rxc(state);
 }
 
 /******************************************************************************
@@ -323,19 +320,20 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", serial_port_device, tx))
-	//MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	//MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
+
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(votrpss_state, write_uart_clock))
 
 	MCFG_PIT8253_ADD( "pit", pit_intf)
 	MCFG_I8255_ADD("ppi", ppi_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", votrpss_state, irq_timer, attotime::from_msec(10))
-
-	/* Serial components - comment out if not needed */
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("serial", votrpss_state, serial_tick, attotime::from_hz(153600))
-	//MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	//MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart", i8251_device, write_rx))
-	//MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
 MACHINE_CONFIG_END
 
 

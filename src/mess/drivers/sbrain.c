@@ -45,20 +45,21 @@ To Do:
 class sbrain_state : public driver_device
 {
 public:
-	sbrain_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_p_videoram(*this, "videoram")
-		, m_maincpu(*this, "maincpu")
-		, m_subcpu(*this, "subcpu")
-		, m_beep(*this, "beeper")
-		, m_brg(*this, "brg")
-		, m_u0(*this, "uart0")
-		, m_u1(*this, "uart1")
-		, m_ppi(*this, "ppi")
-		, m_fdc (*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
-	{ }
+	sbrain_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_p_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
+		m_beep(*this, "beeper"),
+		m_brg(*this, "brg"),
+		m_u0(*this, "uart0"),
+		m_u1(*this, "uart1"),
+		m_ppi(*this, "ppi"),
+		m_fdc (*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1")
+	{
+	}
 
 public:
 	const UINT8 *m_p_chargen;
@@ -347,7 +348,10 @@ static MACHINE_CONFIG_START( sbrain, sbrain_state )
 
 	MCFG_DEVICE_ADD("uart1", I8251, 0)
 
-	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, WRITELINE(sbrain_state, fr_w), WRITELINE(sbrain_state, ft_w))
+	MCFG_DEVICE_ADD("brg", COM8116, XTAL_5_0688MHz)
+	MCFG_COM8116_FR_HANDLER(WRITELINE(sbrain_state, fr_w))
+	MCFG_COM8116_FT_HANDLER(WRITELINE(sbrain_state, ft_w))
+
 	MCFG_FD1791x_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

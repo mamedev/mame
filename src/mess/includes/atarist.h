@@ -236,7 +236,7 @@ public:
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
 
-	DECLARE_WRITE_LINE_MEMBER( midi_rx_w );
+	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
 
 	void toggle_dma_fifo();
 	void flush_dma_fifo();
