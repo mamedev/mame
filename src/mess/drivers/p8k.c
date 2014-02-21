@@ -771,6 +771,7 @@ static const z80_daisy_config p8k_16_daisy_chain[] =
 
 
 
+#if 0
 /* F4 Character Displayer */
 static const gfx_layout p8k_charlayout =
 {
@@ -788,6 +789,7 @@ static const gfx_layout p8k_charlayout =
 static GFXDECODE_START( p8k )
 	GFXDECODE_ENTRY( "chargen", 0x0000, p8k_charlayout, 0, 1 )
 GFXDECODE_END
+#endif
 
 
 /***************************************************************************

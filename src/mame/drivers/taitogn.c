@@ -143,14 +143,15 @@ Some of the cards are made in separate pieces and can be opened. However some
 are encased in a single-piece steel shell and opening it up destroys the card.
 Some of the later games came packaged as a Compact Flash card and a PCMCIA to CF
 adapter, however these cards were also locked the same as the older type.
+
+RC De Go! Controller Info
+-------------------------
+
 The game uses an analog wheel (5k potentiometer) in the shape of a hand-held
 control unit and a trigger (another 5k potentiometer) used for acceleration
 and brake. The trigger and wheel are self centering. If the trigger is pulled back
 (like firing a gun) the car goes faster. If the trigger is pushed forward the car
 slows down. The controller looks a lot like the old Scalextric controllers (remember those?  :-)
-
-RC De Go! Controller Info
--------------------------
 
 The controller is connected to the ZN2 main board to the 10 pin connector labelled
 'ANALOG'. Using two 5k-Ohm potentiometers, power (+5V) and ground are taken from the JAMMA

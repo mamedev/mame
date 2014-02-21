@@ -333,8 +333,6 @@ render_texture::render_texture()
 		m_next(NULL),
 		m_bitmap(NULL),
 		m_format(TEXFORMAT_ARGB32),
-		m_bcglookup(NULL),
-		m_bcglookup_entries(0),
 		m_osddata(~0L),
 		m_scaler(NULL),
 		m_param(NULL),
@@ -394,11 +392,6 @@ void render_texture::release()
 	m_sbounds.set(0, -1, 0, -1);
 	m_format = TEXFORMAT_ARGB32;
 	m_curseq = 0;
-
-	// free any B/C/G lookup tables
-	auto_free(m_manager->machine(), m_bcglookup);
-	m_bcglookup = NULL;
-	m_bcglookup_entries = 0;
 }
 
 
@@ -565,14 +558,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 
 			// otherwise, ensure we have memory allocated and compute the adjusted result ourself
 			numentries = m_bitmap->palette()->num_colors() * m_bitmap->palette()->num_groups();
-			if (m_bcglookup == NULL || m_bcglookup_entries < numentries)
-			{
-				rgb_t *newlookup = auto_alloc_array(m_manager->machine(), rgb_t, numentries);
-				memcpy(newlookup, m_bcglookup, m_bcglookup_entries * sizeof(rgb_t));
-				auto_free(m_manager->machine(), m_bcglookup);
-				m_bcglookup = newlookup;
-				m_bcglookup_entries = numentries;
-			}
+			m_bcglookup.resize(numentries);
 			for (int index = 0; index < numentries; index++)
 			{
 				UINT8 r = container.apply_brightness_contrast_gamma(adjusted[index].r());

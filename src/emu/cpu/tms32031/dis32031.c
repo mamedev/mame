@@ -30,6 +30,7 @@
     CODE CODE
 ***************************************************************************/
 
+#if 0
 INLINE char *signed_16bit(INT16 val)
 {
 	static char temp[10];
@@ -39,6 +40,7 @@ INLINE char *signed_16bit(INT16 val)
 		sprintf(temp, "$%x", val);
 	return temp;
 }
+#endif
 
 static const char *const regname[32] =
 {

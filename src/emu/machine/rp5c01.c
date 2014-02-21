@@ -67,7 +67,7 @@ static const int REGISTER_WRITE_MASK[2][16] =
 
 
 // days per month
-static const int DAYS_PER_MONTH[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+//static const int DAYS_PER_MONTH[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 
 // modes

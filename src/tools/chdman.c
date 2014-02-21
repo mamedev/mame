@@ -415,11 +415,7 @@ public:
 				if (averr != AVHERR_NONE)
 					report_error(1, "Error assembling data for frame %d", framenum);
 				if (m_rawdata.count() < m_info.bytes_per_frame)
-				{
-					UINT32 delta = m_info.bytes_per_frame - m_rawdata.count();
-					m_rawdata.resize(m_info.bytes_per_frame, true);
-					memset(&m_rawdata[m_info.bytes_per_frame - delta], 0, delta);
-				}
+					m_rawdata.resize_keep_and_clear_new(m_info.bytes_per_frame);
 
 				// copy to the destination
 				UINT64 start_offset = UINT64(framenum) * UINT64(m_info.bytes_per_frame);

@@ -85,7 +85,7 @@ private:
 	UINT8 m_year;
 	UINT8 m_century;
 
-	UINT8 *m_data;
+	dynamic_buffer m_data;
 	UINT8 *m_default_data;
 
 protected:

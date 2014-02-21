@@ -86,7 +86,7 @@ protected:
 	UINT16 m_flash_page_index;
 
 
-	UINT8* m_flashwritemap;
+	dynamic_buffer m_flashwritemap;
 
 	UINT8 m_last_flash_cmd;
 

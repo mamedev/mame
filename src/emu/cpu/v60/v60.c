@@ -2,6 +2,9 @@
 // Undiscover the beast!
 // Main hacking and coding by Farfetch'd
 // Portability fixes by Richter Belmont
+//
+// Emulation for the NEC V60 (uPD70615) and V70 (uPD70632) CPUs
+//
 
 #include "emu.h"
 #include "debugger.h"

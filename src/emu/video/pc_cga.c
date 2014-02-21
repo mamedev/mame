@@ -775,6 +775,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row )
  * are the same size as the normal colour ones.
  */
 
+#if 0
 static const UINT8 yc_lut2[4] = { 0, 182, 71, 255 };
 
 static const UINT8 yc_lut[16][8] =
@@ -797,6 +798,7 @@ static const UINT8 yc_lut[16][8] =
 	{ 3, 3, 3, 3, 2, 2, 2, 2 }, /* yellow */
 	{ 3, 3, 3, 3, 3, 3, 3, 3 }, /* white */
 };
+#endif
 
 static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
 {

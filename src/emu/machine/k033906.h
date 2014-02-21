@@ -63,12 +63,13 @@ private:
 	void k033906_reg_w(int reg, UINT32 data);
 
 	/* i/o lines */
-	UINT32 *     m_reg;
-	UINT32 *     m_ram;
 
 	int          m_reg_set; // 1 = access reg / 0 = access ram
 
 	device_t *m_voodoo;
+
+	UINT32       m_reg[256];
+	UINT32       m_ram[32768];
 };
 
 

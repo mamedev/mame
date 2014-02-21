@@ -25,7 +25,7 @@
 //**************************************************************************
 
 // align all allocated memory to this size
-const int memory_align = 16;
+//const int memory_align = 16;
 
 // number of memory_entries to allocate in a block
 const int memory_block_alloc_chunk = 256;

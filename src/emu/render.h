@@ -454,8 +454,7 @@ private:
 	bitmap_t *          m_bitmap;                   // pointer to the original bitmap
 	rectangle           m_sbounds;                  // source bounds within the bitmap
 	texture_format      m_format;                   // format of the texture data
-	rgb_t *             m_bcglookup;                // dynamically allocated B/C/G lookup table
-	UINT32              m_bcglookup_entries;        // number of B/C/G lookup entries allocated
+	dynamic_array<rgb_t> m_bcglookup;               // dynamically allocated B/C/G lookup table
 	UINT64              m_osddata;                  // aux data to pass to osd
 
 	// scaling state (ARGB32 only)

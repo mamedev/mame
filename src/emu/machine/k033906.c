@@ -56,13 +56,10 @@ void k033906_device::device_start()
 {
 	m_voodoo = machine().device(m_voodoo_tag);
 
-	m_reg = auto_alloc_array(machine(), UINT32, 256);
-	m_ram = auto_alloc_array(machine(), UINT32, 32768);
-
 	m_reg_set = 0;
 
-	save_pointer(NAME(m_reg), 256);
-	save_pointer(NAME(m_ram), 32768);
+	save_item(NAME(m_reg));
+	save_item(NAME(m_ram));
 	save_item(NAME(m_reg_set));
 }
 

@@ -93,6 +93,7 @@ static const char *const vidc20_regnames[] =
 	"Data Control"                      // F
 };
 
+#if 0
 static const char *const vidc20_horz_regnames[] =
 {
 	"Horizontal Cycle",                 // 0x80 HCR
@@ -112,6 +113,7 @@ static const char *const vidc20_horz_regnames[] =
 	"Horizontal <UNDEFINED>",           // 0x8e
 	"Horizontal <UNDEFINED>"            // 0x8f
 };
+#endif
 
 #define HCR  0
 #define HSWR 1
@@ -122,6 +124,7 @@ static const char *const vidc20_horz_regnames[] =
 #define HCSR 6
 #define HIR  7
 
+#if 0
 static const char *const vidc20_vert_regnames[] =
 {
 	"Vertical Cycle",                   // 0x90 VCR
@@ -141,6 +144,7 @@ static const char *const vidc20_vert_regnames[] =
 	"Horizontal <UNDEFINED>",           // 0x9e
 	"Horizontal <UNDEFINED>"            // 0x9f
 };
+#endif
 
 #define VCR  0
 #define VSWR 1

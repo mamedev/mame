@@ -1441,12 +1441,14 @@ GAME_CUSTOM( 199?, ec_unk5__c,  ec_unk5,    "v1.1non_protocol.hex", 0x0000, 0x02
 ********************************************************************************************************************/
 
 // these are scrambled roms using 'MAB' hw.
+#if 0
 ROM_START( ec_bar7 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "b7tok.bin", 0x0000, 0x020000, CRC(c3913709) SHA1(73024a3bbfbe13477e4daae78f54c694d112b936) )
 	ROM_REGION( 0x200000, "altrevs", 0 )
 	ROM_LOAD( "bar7", 0x0000, 0x008000, CRC(ce0429bc) SHA1(d9cda09589a6e7c72c4d777de2964abe6b4e18c3) ) //?
 ROM_END
+#endif
 
 ROM_START( ec_barxmab )
 	ROM_REGION( 0x200000, "maincpu", 0 )

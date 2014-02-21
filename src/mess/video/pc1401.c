@@ -92,7 +92,7 @@ static const POCKETC_FIGURE busy={
 	"111",
 	"1",
 	"111e"
-}, run={
+}/*, run={
 	"11  1 1 1  1",
 	"1 1 1 1 11 1",
 	"11  1 1 1 11",
@@ -122,7 +122,7 @@ static const POCKETC_FIGURE busy={
 	"11   1   1 1",
 	"1 1   1  1 1",
 	"1 1 11    1e"
-};
+}*/;
 
 #define DOWN 57
 #define RIGHT 114

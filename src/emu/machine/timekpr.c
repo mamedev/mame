@@ -226,7 +226,7 @@ void timekeeper_device::device_start()
 	m_month = make_bcd( systime.local_time.month + 1 );
 	m_year = make_bcd( systime.local_time.year % 100 );
 	m_century = make_bcd( systime.local_time.year / 100 );
-	m_data = auto_alloc_array( machine(), UINT8, m_size );
+	m_data.resize( m_size );
 
 	m_default_data = *region();
 	if (m_default_data)
@@ -243,7 +243,7 @@ void timekeeper_device::device_start()
 	save_item( NAME(m_month) );
 	save_item( NAME(m_year) );
 	save_item( NAME(m_century) );
-	save_pointer( NAME(m_data), m_size );
+	save_item( NAME(m_data) );
 
 	emu_timer *timer = timer_alloc();
 	timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
@@ -402,7 +402,7 @@ void timekeeper_device::nvram_default()
 	}
 	else
 	{
-		memset( m_data, 0xff, m_size );
+		m_data.clear( 0xff );
 	}
 
 	if ( m_offset_flags >= 0 )

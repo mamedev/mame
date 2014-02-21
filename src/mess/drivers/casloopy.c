@@ -446,7 +446,7 @@ void casloopy_state::machine_reset()
 
 }
 
-
+#if 0
 static const gfx_layout casloopy_4bpp_layoutROM =
 {
 	8,8,
@@ -458,6 +458,7 @@ static const gfx_layout casloopy_4bpp_layoutROM =
 	4*8*8
 };
 
+
 static const gfx_layout casloopy_8bpp_layoutROM =
 {
 	8,8,
@@ -468,6 +469,7 @@ static const gfx_layout casloopy_8bpp_layoutROM =
 	{ STEP8(0, 8*8) },
 	8*8*8
 };
+#endif
 
 
 

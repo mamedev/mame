@@ -200,15 +200,15 @@ enum
 
 // interrupt enable register bits
 const int IE_VERTICAL_RETRACE           = 0x40;
-const int IE_LIGHT_PEN                  = 0x20;
-const int IE_FRAME_TIMER                = 0x01;
+//const int IE_LIGHT_PEN                  = 0x20;
+//const int IE_FRAME_TIMER                = 0x01;
 
 // status register bits
 const int STATUS_INTERRUPT_PENDING      = 0x80;
-const int STATUS_VERTICAL_RETRACE       = 0x40;
+//const int STATUS_VERTICAL_RETRACE       = 0x40;
 const int STATUS_LIGHT_PEN_UPDATE       = 0x20;
-const int STATUS_ODD_EVEN               = 0x04;
-const int STATUS_FRAME_TIMER_OCCURRED   = 0x01;
+//const int STATUS_ODD_EVEN               = 0x04;
+//const int STATUS_FRAME_TIMER_OCCURRED   = 0x01;
 
 
 

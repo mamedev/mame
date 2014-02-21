@@ -780,6 +780,7 @@ INLINE float finvsqrt(float number)
 	return y;
 }
 
+#if 0
 INLINE void normalize_vec3(VECTOR3 *v)
 {
 	float l = finvsqrt(*v[0] * *v[0] + *v[1] * *v[1] + *v[2] * *v[2]);
@@ -787,6 +788,7 @@ INLINE void normalize_vec3(VECTOR3 *v)
 	*v[1] *= l;
 	*v[2] *= l;
 }
+#endif
 
 INLINE float clamp_pos(float v)
 {

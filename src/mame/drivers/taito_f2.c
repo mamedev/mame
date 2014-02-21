@@ -2869,6 +2869,7 @@ static const tc0100scn_interface finalb_tc0100scn_intf =
 	0, 0
 };
 
+#if 0
 static const tc0100scn_interface ninjak_tc0100scn_intf =
 {
 	1, 2,       /* gfxnum, txnum */
@@ -2877,6 +2878,7 @@ static const tc0100scn_interface ninjak_tc0100scn_intf =
 	1, 2,       /* flip_text_xoff, flip_text_yoff */
 	0, 0
 };
+#endif
 
 static const tc0100scn_interface qzchikyu_tc0100scn_intf =
 {

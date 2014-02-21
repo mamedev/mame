@@ -343,6 +343,9 @@ ARCHFLAGS = -DWORDS_BIGENDIAN=0
 endif
 
 FLACOPTS=-DFLAC__NO_ASM -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H=0 -DFLAC__HAS_OGG=0 -Wno-unused-function $(ARCHFLAGS) -O0
+ifneq (,$(findstring clang,$(CC)))
+	FLACOPTS += -Wno-unused-const-variable
+endif
 
 LIBFLACOBJS = \
 	$(LIBOBJ)/libflac/bitmath.o \

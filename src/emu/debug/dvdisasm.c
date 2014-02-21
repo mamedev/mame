@@ -53,10 +53,7 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 		m_divider1(0),
 		m_divider2(0),
 		m_divider3(0),
-		m_expression(machine),
-		m_allocated(0,0),
-		m_byteaddress(NULL),
-		m_dasm(NULL)
+		m_expression(machine)
 {
 	// fail if no available sources
 	enumerate_sources();
@@ -83,8 +80,6 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 
 debug_view_disasm::~debug_view_disasm()
 {
-	auto_free(machine(), m_byteaddress);
-	auto_free(machine(), m_dasm);
 }
 
 
@@ -172,7 +167,7 @@ void debug_view_disasm::view_char(int chval)
 			offs_t pc = source.m_space.address_to_byte(source.m_device.safe_pc()) & source.m_space.logbytemask();
 
 			// figure out which row the pc is on
-			for (int curline = 0; curline < m_allocated.y; curline++)
+			for (int curline = 0; curline < m_byteaddress.count(); curline++)
 				if (m_byteaddress[curline] == pc)
 					m_cursor.y = curline;
 			break;
@@ -364,22 +359,14 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 	else
 		m_total.x = m_divider2 + 1;
 
-	// reallocate memory if we don't have enough
-	if (m_allocated.x < m_total.x || m_allocated.y < m_total.y)
-	{
-		// update our values
-		m_allocated = m_total;
+	// allocate address array
+	m_byteaddress.resize(m_total.y);
 
-		// allocate address array
-		auto_free(machine(), m_byteaddress);
-		m_byteaddress = auto_alloc_array(machine(), offs_t, m_allocated.y);
-
-		// allocate disassembly buffer
-		auto_free(machine(), m_dasm);
-		m_dasm = auto_alloc_array(machine(), char, m_allocated.x * m_allocated.y);
-	}
+	// allocate disassembly buffer
+	m_dasm.resize(m_total.x * m_total.y);
 
 	// iterate over lines
+	int row_width = m_total.x;
 	for (int line = 0; line < lines; line++)
 	{
 		// convert PC to a byte offset
@@ -387,10 +374,10 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 
 		// save a copy of the previous line as a backup if we're only doing one line
 		int instr = startline + line;
-		char *destbuf = &m_dasm[instr * m_allocated.x];
+		char *destbuf = &m_dasm[instr * row_width];
 		char oldbuf[100];
 		if (lines == 1)
-			strncpy(oldbuf, destbuf, MIN(sizeof(oldbuf), m_allocated.x));
+			strncpy(oldbuf, destbuf, MIN(sizeof(oldbuf), row_width));
 
 		// convert back and set the address of this instruction
 		m_byteaddress[instr] = pcbyte;
@@ -425,7 +412,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 		{
 			// get the bytes
 			numbytes = source.m_space.address_to_byte(numbytes) & source.m_space.logbytemask();
-			generate_bytes(pcbyte, numbytes, minbytes, &destbuf[m_divider2], m_allocated.x - m_divider2, m_right_column == DASM_RIGHTCOL_ENCRYPTED);
+			generate_bytes(pcbyte, numbytes, minbytes, &destbuf[m_divider2], row_width - m_divider2, m_right_column == DASM_RIGHTCOL_ENCRYPTED);
 		}
 		else if (m_right_column == DASM_RIGHTCOL_COMMENTS)
 		{
@@ -433,11 +420,11 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 			offs_t comment_address = source.m_space.byte_to_address(m_byteaddress[instr]);
 			const char *text = source.m_device.debug()->comment_text(comment_address);
 			if (text != NULL)
-				sprintf(&destbuf[m_divider2], "// %.*s", m_allocated.x - m_divider2 - 1, text);
+				sprintf(&destbuf[m_divider2], "// %.*s", row_width - m_divider2 - 1, text);
 		}
 
 		// see if the line changed at all
-		if (lines == 1 && strncmp(oldbuf, destbuf, MIN(sizeof(oldbuf), m_allocated.x)) != 0)
+		if (lines == 1 && strncmp(oldbuf, destbuf, MIN(sizeof(oldbuf), row_width)) != 0)
 			changed = true;
 	}
 
@@ -477,12 +464,12 @@ void debug_view_disasm::view_update()
 
 		// see if the new result is an address we already have
 		UINT32 row;
-		for (row = 0; row < m_allocated.y; row++)
+		for (row = 0; row < m_byteaddress.count(); row++)
 			if (m_byteaddress[row] == resultbyte)
 				break;
 
 		// if we didn't find it, or if it's really close to the bottom, recompute
-		if (row == m_allocated.y || row >= m_total.y - m_visible.y)
+		if (row == m_byteaddress.count() || row >= m_total.y - m_visible.y)
 			m_recompute = true;
 
 		// otherwise, if it's not visible, adjust the view so it is
@@ -504,7 +491,7 @@ recompute:
 	if (m_recompute)
 	{
 		// recompute the view
-		if (m_byteaddress != NULL && m_last_change_count != source.m_device.debug()->comment_change_count())
+		if (m_byteaddress.count() > 0 && m_last_change_count != source.m_device.debug()->comment_change_count())
 		{
 			// smoosh us against the left column, but not the top row
 			m_topleft.x = 0;
@@ -533,7 +520,7 @@ recompute:
 		for (UINT32 row = 0; row < m_visible.y; row++)
 		{
 			UINT32 effrow = m_topleft.y + row;
-			if (effrow >= m_allocated.y)
+			if (effrow >= m_byteaddress.count())
 				break;
 			if (pcbyte == m_byteaddress[effrow])
 			{
@@ -555,6 +542,7 @@ recompute:
 
 	// loop over visible rows
 	debug_view_char *dest = m_viewdata;
+	int row_width = m_dasm.count() / m_byteaddress.count();
 	for (UINT32 row = 0; row < m_visible.y; row++)
 	{
 		UINT32 effrow = m_topleft.y + row;
@@ -562,7 +550,7 @@ recompute:
 
 		// if this visible row is valid, add it to the buffer
 		UINT8 attrib = DCA_NORMAL;
-		if (effrow < m_allocated.y)
+		if (effrow < m_byteaddress.count())
 		{
 			// if we're on the line with the PC, recompute and hilight it
 			if (pcbyte == m_byteaddress[effrow])
@@ -585,7 +573,7 @@ recompute:
 				attrib |= DCA_VISITED;
 
 			// get the effective string
-			const char *data = &m_dasm[effrow * m_allocated.x];
+			const char *data = &m_dasm[effrow * row_width];
 			UINT32 len = (UINT32)strlen(data);
 
 			// copy data

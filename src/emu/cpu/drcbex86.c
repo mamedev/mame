@@ -108,8 +108,8 @@ const UINT32 PTYPE_M    = 1 << parameter::PTYPE_MEMORY;
 const UINT32 PTYPE_I    = 1 << parameter::PTYPE_IMMEDIATE;
 const UINT32 PTYPE_R    = 1 << parameter::PTYPE_INT_REGISTER;
 const UINT32 PTYPE_F    = 1 << parameter::PTYPE_FLOAT_REGISTER;
-const UINT32 PTYPE_MI   = PTYPE_M | PTYPE_I;
-const UINT32 PTYPE_RI   = PTYPE_R | PTYPE_I;
+//const UINT32 PTYPE_MI   = PTYPE_M | PTYPE_I;
+//const UINT32 PTYPE_RI   = PTYPE_R | PTYPE_I;
 const UINT32 PTYPE_MR   = PTYPE_M | PTYPE_R;
 const UINT32 PTYPE_MRI  = PTYPE_M | PTYPE_R | PTYPE_I;
 const UINT32 PTYPE_MF   = PTYPE_M | PTYPE_F;
@@ -137,7 +137,7 @@ const UINT32 PTYPE_MF   = PTYPE_M | PTYPE_F;
 drcbe_x86::opcode_generate_func drcbe_x86::s_opcode_table[OP_MAX];
 
 // size-to-mask table
-static const UINT64 size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
+//static const UINT64 size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
 
 // register mapping tables
 static const UINT8 int_register_map[REG_I_COUNT] =

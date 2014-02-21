@@ -1326,7 +1326,7 @@ void natural_keyboard::internal_post(unicode_char ch)
 	// add to the buffer, resizing if necessary
 	m_buffer[m_bufend++] = ch;
 	if ((m_bufend + 1) % m_buffer.count() == m_bufbegin)
-		m_buffer.resize(m_buffer.count() + KEY_BUFFER_SIZE, true);
+		m_buffer.resize_keep(m_buffer.count() + KEY_BUFFER_SIZE);
 	m_bufend %= m_buffer.count();
 }
 

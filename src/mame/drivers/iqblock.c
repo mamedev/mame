@@ -247,6 +247,7 @@ static const gfx_layout tilelayout2 =
 	32*16
 };
 
+#if 0
 static const gfx_layout tilelayout3 =
 {
 	8,32,
@@ -260,6 +261,7 @@ static const gfx_layout tilelayout3 =
 		24*16, 25*16, 26*16, 27*16, 28*16, 29*16, 30*16, 31*16 },
 	32*16
 };
+#endif
 
 static GFXDECODE_START( iqblock )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout1, 0, 16 )    /* only odd color codes are used */

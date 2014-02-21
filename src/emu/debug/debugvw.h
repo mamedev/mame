@@ -244,8 +244,7 @@ protected:
 	UINT8                   m_update_level;     // update level; updates when this hits 0
 	bool                    m_update_pending;   // true if there is a pending update
 	bool                    m_osd_update_pending; // true if there is a pending update
-	debug_view_char *       m_viewdata;         // current array of view data
-	int                     m_viewdata_size;    // number of elements of the viewdata array
+	dynamic_array<debug_view_char> m_viewdata;  // current array of view data
 
 private:
 	running_machine &       m_machine;          // machine associated with this view

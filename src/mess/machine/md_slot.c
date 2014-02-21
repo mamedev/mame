@@ -403,33 +403,33 @@ int base_md_cart_slot_device::load_list()
 /* code taken directly from GoodGEN by Cowering */
 static int genesis_is_SMD(unsigned char *buf, unsigned int len)
 {
-	if (buf[0x2080] == 'S' && buf[0x80] == 'E' && buf[0x2081] == 'G' && buf[0x81] == 'A')
+	if (len > 0x2081 && buf[0x2080] == 'S' && buf[0x80] == 'E' && buf[0x2081] == 'G' && buf[0x81] == 'A')
 		return 1;
 
 	/* aq quiz */
-	if (!strncmp("UZ(-01  ", (const char *) &buf[0xf0], 8))
+	if (len > (0xf0 + 8) && !strncmp("UZ(-01  ", (const char *) &buf[0xf0], 8))
 		return 1;
 
 	/* Phelios USA redump */
 	/* target earth */
 	/* klax (namcot) */
-	if (buf[0x2080] == ' ' && buf[0x0080] == 'S' && buf[0x2081] == 'E' && buf[0x0081] == 'G')
+	if (len > 0x2081 && buf[0x2080] == ' ' && buf[0x0080] == 'S' && buf[0x2081] == 'E' && buf[0x0081] == 'G')
 		return 1;
 
 	/* jap baseball 94 */
-	if (!strncmp("OL R-AEAL", (const char *) &buf[0xf0], 9))
+	if (len > (0xf0 + 9) && !strncmp("OL R-AEAL", (const char *) &buf[0xf0], 9))
 		return 1;
 
 	/* devilish Mahjong Tower */
-	if (!strncmp("optrEtranet", (const char *) &buf[0xf3], 11))
+	if (len > (0xf3 + 11) && !strncmp("optrEtranet", (const char *) &buf[0xf3], 11))
 		return 1;
 
 	/* golden axe 2 beta */
-	if (buf[0x0100] == 0x3c && buf[0x0101] == 0 && buf[0x0102] == 0 && buf[0x0103] == 0x3c)
+	if (len > 0x0103 && buf[0x0100] == 0x3c && buf[0x0101] == 0 && buf[0x0102] == 0 && buf[0x0103] == 0x3c)
 		return 1;
 
 	/* omega race */
-	if (!strncmp("OEARC   ", (const char *) &buf[0x90], 8))
+	if (len > (0x90 + 8) && !strncmp("OEARC   ", (const char *) &buf[0x90], 8))
 		return 1;
 
 	/* budokan beta */
@@ -437,15 +437,15 @@ static int genesis_is_SMD(unsigned char *buf, unsigned int len)
 		return 1;
 
 	/* cdx pro 1.8 bios */
-	if (!strncmp("so fCXP", (const char *) &buf[0x2c0], 7))
+	if (len > (0x2c0 + 7) && !strncmp("so fCXP", (const char *) &buf[0x2c0], 7))
 		return 1;
 
 	/* ishido (hacked) */
-	if (!strncmp("sio-Wyo ", (const char *) &buf[0x0090], 8))
+	if (len > (0x90 + 8) && !strncmp("sio-Wyo ", (const char *) &buf[0x0090], 8))
 		return 1;
 
 	/* onslaught */
-	if (!strncmp("SS  CAL ", (const char *) &buf[0x0088], 8))
+	if (len > (0x88 + 8) && !strncmp("SS  CAL ", (const char *) &buf[0x0088], 8))
 		return 1;
 
 	/* tram terror pirate */
@@ -453,7 +453,7 @@ static int genesis_is_SMD(unsigned char *buf, unsigned int len)
 		return 1;
 
 	/* breath of fire 3 chinese */
-	if (buf[0x0007] == 0x1c && buf[0x0008] == 0x0a && buf[0x0009] == 0xb8 && buf[0x000a] == 0x0a)
+	if (len > 0xa && buf[0x0007] == 0x1c && buf[0x0008] == 0x0a && buf[0x0009] == 0xb8 && buf[0x000a] == 0x0a)
 		return 1;
 
 	/*tetris pirate */

@@ -133,6 +133,7 @@ ROM_START(lynx)
 	ROM_REGION(0x100000, "user1", ROMREGION_ERASEFF)
 ROM_END
 
+#if 0
 ROM_START(lynx2)
 	ROM_REGION(0x200,"maincpu", 0)
 	ROM_LOAD("lynx2.bin", 0, 0x200, NO_DUMP)
@@ -141,6 +142,7 @@ ROM_START(lynx2)
 
 	ROM_REGION(0x100000, "user1", ROMREGION_ERASEFF)
 ROM_END
+#endif
 
 
 QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )

@@ -94,6 +94,7 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 //  ACIA6850_INTERFACE( acia0_intf )
 //-------------------------------------------------
 
+#if 0
 static ACIA6850_INTERFACE( acia_intf )
 {
 	614400,
@@ -102,6 +103,7 @@ static ACIA6850_INTERFACE( acia_intf )
 	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
 };
+#endif
 
 static MC6845_UPDATE_ROW( update_row )
 {

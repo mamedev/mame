@@ -598,7 +598,7 @@ private:
 	address_space &         m_space;                // which address space are we associated with?
 	offs_t                  m_bytestart, m_byteend; // byte-normalized start/end for verifying a match
 	UINT8 *                 m_data;                 // pointer to the data for this block
-	UINT8 *                 m_allocated;            // pointer to the actually allocated block
+	dynamic_buffer          m_allocated;            // pointer to the actually allocated block
 };
 
 
@@ -700,8 +700,7 @@ private:
 	offs_t                  m_bytestart;            // byte-adjusted start offset
 	offs_t                  m_byteend;              // byte-adjusted end offset
 	int                     m_curentry;             // current entry
-	bank_entry *            m_entry;                // array of entries (dynamically allocated)
-	int                     m_entry_count;          // number of allocated entries
+	dynamic_array<bank_entry> m_entry;              // array of entries (dynamically allocated)
 	astring                 m_name;                 // friendly name for this bank
 	astring                 m_tag;                  // tag for this bank
 	simple_list<bank_reference> m_reflist;          // linked list of address spaces referencing this bank

@@ -100,6 +100,7 @@ void photon2_state::video_start()
 	m_spectrum_flash_invert = 0;
 }
 
+#if 0
 /* return the color to be used inverting FLASHing colors if necessary */
 INLINE unsigned char get_display_color (unsigned char color, int invert)
 {
@@ -108,6 +109,7 @@ INLINE unsigned char get_display_color (unsigned char color, int invert)
 	else
 			return color;
 }
+#endif
 
 /* Code to change the FLASH status every 25 frames. Note this must be
    independent of frame skip etc. */

@@ -67,10 +67,12 @@ const micropolis_interface default_micropolis_interface =
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
+#if 0
 const micropolis_interface default_micropolis_interface_2_drives =
 {
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, { FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
+#endif
 
 
 /***************************************************************************

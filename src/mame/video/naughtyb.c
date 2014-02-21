@@ -11,6 +11,7 @@
 #include "includes/naughtyb.h"
 
 
+#if 0
 static const res_net_decode_info naughtyb_decode_info =
 {
 	2,      /*  two proms          */
@@ -31,6 +32,7 @@ static const res_net_info naughtyb_net_info =
 		{ RES_NET_AMP_NONE, 130, 270, 2, { 270, 1 } }  /* no resistor for bit1 */
 	}
 };
+#endif
 
 /***************************************************************************
 

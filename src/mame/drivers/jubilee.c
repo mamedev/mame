@@ -29,7 +29,7 @@
 
   1x TMS9980 CPU
   1x MC6845P CRTC
-  
+
   1x TC5517AP-2 (2048 words x 8 bits Asynchronous CMOS Static RAM), tied to a battery.
   1x 2114       (1024 words x 4 bits RAM)
 
@@ -41,7 +41,7 @@
 
 
   From some forums...
-  
+
   The memory chips on board are the toshiba TC5517ap powered via the Lithium cell and
   the 2114 find the 74148 or 74ls148, all 9980 cpu's use one, pin3 will generate a reset.
   The 5517 ram is compatible with 6116 or 2018.
@@ -73,7 +73,7 @@
 
   From the marquee: 'ALL CREDITS REDEEMABLE IN LIQUOR ONLY. NO CASH PAYMENTS'
   So we can assume that is *exclusive* for amusement.
-  
+
   From the marquee: 'MINIMUM REDEMPTION: 30 CREDITS' (to redeem LESS THAN 30 CREDITS,
   Player must insert coins to bring total Credits to 30).
 
@@ -140,7 +140,7 @@
 
   DRIVER UPDATES:
 
- 
+
   [2014-02-19]
 
   - Added a default clean NVRAM.
@@ -192,7 +192,7 @@
 
 #define MASTER_CLOCK    XTAL_6MHz              /* confirmed */
 #define CPU_CLOCK      (MASTER_CLOCK / 2)      /* guess */
-#define CRTC_CLOCK     (MASTER_CLOCK / 4)      /* guess */
+#define CRTC_CLOCK     (MASTER_CLOCK / 8)      /* guess */
 
 #include "emu.h"
 #include "cpu/tms9900/tms9980a.h"
@@ -266,6 +266,7 @@ TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
 void jubilee_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jubilee_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_scrolldx(8, 0); /* guess */
 }
 
 UINT32 jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -312,8 +313,8 @@ static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 
 /*  CRTC address: $3E01; register: $3E03
     CRTC registers: 2f 20 25 64 26 00 20 23 00 07 00 00 00
-    screen total: (0x2f+1)*8 (0x26+1)*8  ---> 384 x 312
-    visible area: 0x20 0x20  ---------------> 256 x 256
+    screen total: (0x2f+1)*8 (0x26+1)*(0x07+1) ---> 384 x 312
+    visible area: 0x20 0x20  ---------------------> 256 x 256
 */
 ADDRESS_MAP_END
 
@@ -437,7 +438,7 @@ static const gfx_layout tilelayout =
 	8, 8,
 	0x100,
 	3,
-	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* bitplanes are separated */
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), 0 },    /* bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -449,10 +450,10 @@ static const gfx_layout tilelayout =
 ******************************/
 
 static GFXDECODE_START( jubileep )		/* 4 different graphics banks */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x0800, tilelayout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x1800, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x0800, tilelayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x1800, tilelayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -463,7 +464,7 @@ GFXDECODE_END
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,        /* show border area */
-	-8, 0, 0, 0,  /* visarea adjustment */
+	0, 0, 0, 0,   /* visarea adjustment */
 	8,            /* number of pixels per video memory address */
 	NULL,         /* before pixel update callback */
 	NULL,         /* row update callback */
@@ -523,9 +524,9 @@ ROM_START( jubileep )
 	ROM_LOAD( "3_ic57.bin", 0x2000, 0x1000, CRC(c9ae423d) SHA1(8321e3e6fd60d92202b0c7b47e2a333a567b5c22) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "ic49.bin",   0x0000, 0x2000, CRC(ec65d259) SHA1(9e82e4043cbea26b91965a19507a5f00dc3ba01a) )
-	ROM_LOAD( "ic48.bin",   0x2000, 0x2000, CRC(74e9ffd9) SHA1(7349fea72a349a58014b795ec6c29647e7159d39) )
-	ROM_LOAD( "ic47.bin",   0x4000, 0x2000, CRC(55dc8482) SHA1(53f22bd66e5fcad5e2397998bc58109c3c19af96) )
+	ROM_LOAD( "ic47.bin",   0x0000, 0x2000, CRC(55dc8482) SHA1(53f22bd66e5fcad5e2397998bc58109c3c19af96) ) /* red */
+	ROM_LOAD( "ic48.bin",   0x2000, 0x2000, CRC(74e9ffd9) SHA1(7349fea72a349a58014b795ec6c29647e7159d39) ) /* green */
+	ROM_LOAD( "ic49.bin",   0x4000, 0x2000, CRC(ec65d259) SHA1(9e82e4043cbea26b91965a19507a5f00dc3ba01a) ) /* blue */
 
 	ROM_REGION( 0x0800, "videoworkram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jubileep_videoworkram.bin", 0x0000, 0x0800, CRC(595bf2b3) SHA1(ae311873b15d8cebfb6ef6a80f27fafc9544178c) )

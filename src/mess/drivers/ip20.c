@@ -581,11 +581,13 @@ static INPUT_PORTS_START( ip204415 )
 	PORT_BIT ( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+#if 0
 static const mips3_config config =
 {
 	32768,  /* code cache size */
 	32768   /* data cache size */
 };
+#endif
 
 static MACHINE_CONFIG_START( ip204415, ip20_state )
 	MCFG_CPU_ADD( "maincpu", R4600BE, 50000000*3 )

@@ -1298,6 +1298,7 @@ ROM_START( tonto )
 ROM_END
 
 
+#if 0
 //-------------------------------------------------
 //  ROM( megaopd )
 //-------------------------------------------------
@@ -1322,6 +1323,7 @@ ROM_START( megaopd )
 	ROM_LOAD( "rompack-4.rom", 0x018000, 0x008000, NO_DUMP )
 	ROM_LOAD( "rompack-5.rom", 0x020000, 0x008000, NO_DUMP )
 ROM_END
+#endif
 
 
 

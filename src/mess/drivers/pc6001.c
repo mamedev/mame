@@ -2248,6 +2248,7 @@ PALETTE_INIT_MEMBER(pc6001_state,pc6001m2)
 		palette_set_color(machine(), i,mk2_defcolors[i-0x10]);
 }
 
+#if 0
 static const cassette_interface pc6001_cassette_interface =
 {
 	pc6001_cassette_formats,
@@ -2256,6 +2257,7 @@ static const cassette_interface pc6001_cassette_interface =
 	NULL,
 	NULL
 };
+#endif
 
 DEVICE_IMAGE_LOAD_MEMBER( pc6001_state,pc6001_cass )
 {

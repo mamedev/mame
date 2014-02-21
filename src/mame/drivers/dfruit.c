@@ -400,13 +400,13 @@ static MACHINE_CONFIG_START( dfruit, dfruit_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dfruit_state, screen_update)
 	MCFG_SCREEN_VBLANK_DRIVER(dfruit_state, screen_eof)
 
+	MCFG_GFXDECODE_ADD("gfxdecode",  dfruit )
+	MCFG_PALETTE_LENGTH(0x100)
+	
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
 	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
 	
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
-	
-	MCFG_GFXDECODE_ADD("gfxdecode",  dfruit )
-	MCFG_PALETTE_LENGTH(0x100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

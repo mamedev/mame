@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Harriet (c) 1990 Quadtel
+    Harriet (c) 1990 Quantel
 
     TODO:
     - PCB pics would be very useful
@@ -232,4 +232,4 @@ ROM_START( harriet )
 	ROM_LOAD16_BYTE( "harriet 36-74c.tdb v5.01 hibyte 2a0c.bin", 0x0000, 0x4000, CRC(a61f441d) SHA1(76af6eddd5c042f1b2eef590eb822379944b9b28) )
 ROM_END
 
-GAME( 1990, harriet,  0,   harriet,  harriet, driver_device,  0,       ROT0, "Quadtel",      "Harriet", GAME_IS_SKELETON )
+GAME( 1990, harriet,  0,   harriet,  harriet, driver_device,  0,       ROT0, "Quantel",      "Harriet", GAME_IS_SKELETON )

@@ -445,6 +445,7 @@ static Z80SIO_INTERFACE( osbexec_sio_config )
 };
 
 
+#if 0
 static const wd17xx_interface osbexec_wd17xx_interface =
 {
 	DEVCB_NULL,
@@ -452,6 +453,7 @@ static const wd17xx_interface osbexec_wd17xx_interface =
 	DEVCB_NULL,
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
+#endif
 
 
 /*

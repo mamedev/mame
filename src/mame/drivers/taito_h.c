@@ -603,6 +603,7 @@ static const gfx_layout tilelayout =
 	16*16
 };
 
+#if 0
 static const gfx_layout charlayout =
 {
 	8, 8,   /* 8x8 pixels */
@@ -613,6 +614,7 @@ static const gfx_layout charlayout =
 	{ 16*0, 16*1, 16*2, 16*3, 16*4, 16*5, 16*6, 16*7 },
 	16*8
 };
+#endif
 
 
 static GFXDECODE_START( syvalion )
