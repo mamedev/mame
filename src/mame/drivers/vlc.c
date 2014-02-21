@@ -398,6 +398,7 @@ static MSM6242_INTERFACE( nevada_rtc_intf )
 /***************************************************************************/
 /*********************    SOUND SECTION     ********************************/
 /***************************************************************************/
+#if 0
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -409,6 +410,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL,
 	DEVCB_NULL
 };
+#endif
 
 /***************************************************************************/
 READ16_MEMBER(nevada_state::io_board_r)

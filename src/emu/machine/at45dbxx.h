@@ -68,12 +68,12 @@ protected:
 	void write_byte(UINT8 data);
 
 	// internal state
-	UINT8 *     m_data;
+	dynamic_buffer m_data;
 	UINT32      m_size;
 	UINT8       m_mode;
 	UINT8       m_status;
-	UINT8 *     m_buffer1;
-	//UINT8 *     m_buffer2;
+	dynamic_buffer m_buffer1;
+	//dynamic_buffer m_buffer2;
 	UINT8       m_si_byte;
 	UINT8       m_si_bits;
 	UINT8       m_so_byte;

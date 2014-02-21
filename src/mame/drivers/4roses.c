@@ -358,6 +358,7 @@ static const ay8910_interface ay8910_intf =
 };
 
 
+#if 0
 /************************
 *    CRTC Interface    *
 ************************/
@@ -376,6 +377,7 @@ static MC6845_INTERFACE( mc6845_intf )
 	DEVCB_NULL, /* VSYNC callback */
 	NULL        /* update address callback */
 };
+#endif
 
 
 /**************************

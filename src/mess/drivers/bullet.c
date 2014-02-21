@@ -892,6 +892,7 @@ WRITE8_MEMBER( bulletf_state::dma_mreq_w )
 	m_ram->pointer()[(DMB6 << 16) | offset] = data;
 }
 
+#if 0
 static Z80DMA_INTERFACE( bulletf_dma_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
@@ -902,6 +903,7 @@ static Z80DMA_INTERFACE( bulletf_dma_intf )
 	DEVCB_DRIVER_MEMBER(bullet_state, io_read_byte),
 	DEVCB_DRIVER_MEMBER(bullet_state, io_write_byte)
 };
+#endif
 
 
 //-------------------------------------------------

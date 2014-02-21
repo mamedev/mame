@@ -1827,11 +1827,13 @@ static mpu4_chr_table blank_data[72] = {
 };
 
 
+#if 0
 static const bwb_chr_table prizeinv_data1[5] = {
 //This is all wrong, but without BwB Vid booting,
 //I can't find the right values. These should be close though
 	{0x67},{0x17},{0x0f},{0x24},{0x3c},
 };
+#endif
 
 static mpu4_chr_table prizeinv_data[8] = {
 {0xEF, 0x02},{0x81, 0x00},{0xCE, 0x00},{0x00, 0x2e},

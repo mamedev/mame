@@ -33,14 +33,14 @@
 // these are the bits of the incoming commands to the CTC
 const int INTERRUPT         = 0x80;
 const int INTERRUPT_ON      = 0x80;
-const int INTERRUPT_OFF     = 0x00;
+//const int INTERRUPT_OFF     = 0x00;
 
 const int MODE              = 0x40;
 const int MODE_TIMER        = 0x00;
 const int MODE_COUNTER      = 0x40;
 
 const int PRESCALER         = 0x20;
-const int PRESCALER_256     = 0x20;
+//const int PRESCALER_256     = 0x20;
 const int PRESCALER_16      = 0x00;
 
 const int EDGE              = 0x10;
@@ -49,14 +49,14 @@ const int EDGE_RISING       = 0x10;
 
 const int TRIGGER           = 0x08;
 const int TRIGGER_AUTO      = 0x00;
-const int TRIGGER_CLOCK     = 0x08;
+//const int TRIGGER_CLOCK     = 0x08;
 
 const int CONSTANT          = 0x04;
 const int CONSTANT_LOAD     = 0x04;
-const int CONSTANT_NONE     = 0x00;
+//const int CONSTANT_NONE     = 0x00;
 
 const int RESET             = 0x02;
-const int RESET_CONTINUE    = 0x00;
+//const int RESET_CONTINUE    = 0x00;
 const int RESET_ACTIVE      = 0x02;
 
 const int CONTROL           = 0x01;

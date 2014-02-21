@@ -152,7 +152,7 @@ private:
 	// internal state
 
 	UINT8           m_index;
-	UINT8          *m_data;
+	dynamic_buffer  m_data;
 
 	attotime        m_last_refresh;
 

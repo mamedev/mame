@@ -18,11 +18,13 @@ void nc_state::video_start()
 {
 }
 
+#if 0
 /* two colours */
 static const unsigned short nc_colour_table[NC_NUM_COLOURS] =
 {
 	0, 1,2,3
 };
+#endif
 
 /* black/white */
 static const rgb_t nc_palette[NC_NUM_COLOURS] =

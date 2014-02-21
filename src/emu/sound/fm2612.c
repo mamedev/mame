@@ -1010,11 +1010,13 @@ INLINE UINT8 FM_STATUS_FLAG(FM_ST *ST)
 	}
 	return ST->status;
 }
+#if 0
 INLINE void FM_BUSY_SET(FM_ST *ST,int busyclock )
 {
 	TIME_TYPE expiry_period = MULTIPLY_TIME_BY_INT(attotime::from_hz(ST->clock), busyclock * ST->timer_prescaler);
 	ST->busy_expiry_time = ADD_TIMES(FM_GET_TIME_NOW(&ST->device->machine()), expiry_period);
 }
+#endif
 #else
 #define FM_STATUS_FLAG(ST) ((ST)->status)
 #define FM_BUSY_SET(ST,bclock) {}

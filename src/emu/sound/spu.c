@@ -126,7 +126,7 @@ enum srrr_flags
 	srrr_rr_mask=0x1f
 };
 
-static const unsigned int sound_buffer_size=65536*4,
+static const unsigned int /*sound_buffer_size=65536*4,*/
 													xa_sector_size=(18*28*8)<<1,
 													xa_buffer_sectors=16,
 													cdda_sector_size=2352,
@@ -136,7 +136,7 @@ static const unsigned int sound_buffer_size=65536*4,
 													spu_ram_size=512*1024,
 													spu_infinity=0xffffffff,
 
-													output_buffer_size=65536/8,
+													output_buffer_size=65536/8/*,
 
 													sample_loop_cache_pool_size=64,
 													sample_loop_cache_extend_size=64,
@@ -144,7 +144,7 @@ static const unsigned int sound_buffer_size=65536*4,
 													sample_cache_extend_size=64,
 
 													stream_marker_pool_size=64,
-													stream_marker_extend_size=64;
+													stream_marker_extend_size=64*/;
 
 //
 //

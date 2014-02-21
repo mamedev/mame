@@ -1134,6 +1134,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row )
 }
 
 
+#if 0
 /* The hi-res graphics mode on a colour composite monitor
  *
  * The different scaling factors mean that the '160x200' versions of screens
@@ -1162,6 +1163,7 @@ static const UINT8 yc_lut[16][8] =
 	{ 3, 3, 3, 3, 2, 2, 2, 2 }, /* yellow */
 	{ 3, 3, 3, 3, 3, 3, 3, 3 }, /* white */
 };
+#endif
 
 static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
 {

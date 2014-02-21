@@ -50,12 +50,19 @@ private:
 	class glyph
 	{
 	public:
+		glyph()
+			: width(0),
+			  xoffs(0), yoffs(0),
+			  bmwidth(0), bmheight(0),
+			  rawdata(NULL),
+			  texture(NULL) { }
+	
 		INT32               width;              // width from this character to the next
 		INT32               xoffs, yoffs;       // X and Y offset from baseline to top,left of bitmap
 		INT32               bmwidth, bmheight;  // width and height of bitmap
 		const char *        rawdata;            // pointer to the raw data for this one
-		bitmap_argb32       bitmap;             // pointer to the bitmap containing the raw data
 		render_texture *    texture;            // pointer to a texture for rendering and sizing
+		bitmap_argb32       bitmap;             // pointer to the bitmap containing the raw data
 	};
 
 	// internal format
@@ -81,8 +88,8 @@ private:
 	int                 m_height;           // height of the font, from ascent to descent
 	int                 m_yoffs;            // y offset from baseline to descent
 	float               m_scale;            // 1 / height precomputed
-	glyph *             m_glyphs[256];      // array of glyph subtables
-	const char *        m_rawdata;          // pointer to the raw data for the font
+	dynamic_array<glyph> m_glyphs[256];     // array of glyph subtables
+	dynamic_array<char> m_rawdata;          // pointer to the raw data for the font
 	UINT64              m_rawsize;          // size of the raw font data
 	osd_font            m_osdfont;          // handle to the OSD font
 

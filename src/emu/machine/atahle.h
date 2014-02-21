@@ -174,7 +174,7 @@ protected:
 
 	attotime MINIMUM_COMMAND_TIME;
 
-	UINT8 *m_buffer;
+	dynamic_buffer m_buffer;
 	UINT16 m_buffer_offset;
 	UINT16 m_buffer_size;
 	UINT8 m_error;

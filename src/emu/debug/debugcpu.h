@@ -366,8 +366,7 @@ private:
 		address_space *     m_space;                    // space where the access occurred
 		UINT32              m_count;                    // number of hits
 	};
-	hotspot_entry *         m_hotspots;                 // hotspot list
-	int                     m_hotspot_count;            // number of hotspots
+	dynamic_array<hotspot_entry> m_hotspots;            // hotspot list
 	int                     m_hotspot_threshhold;       // threshhold for the number of hits to print
 
 	// pc tracking

@@ -204,6 +204,7 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
 }
 
 
+#if 0
 /*-------------------------------------------------
     is_nan_double - is a double value a NaN
 -------------------------------------------------*/
@@ -214,6 +215,7 @@ INLINE int is_nan_double(double x)
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
 			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) );
 }
+#endif
 
 
 /*-------------------------------------------------
@@ -230,6 +232,7 @@ INLINE int is_qnan_double(double x)
 }
 
 
+#if 0
 /*-------------------------------------------------
     is_snan_double - is a double value a
     signaling NaN
@@ -242,6 +245,7 @@ INLINE int is_snan_double(double x)
 			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) &&
 			((xi & U64(0x0008000000000000)) == DOUBLE_ZERO) );
 }
+#endif
 
 
 /*-------------------------------------------------

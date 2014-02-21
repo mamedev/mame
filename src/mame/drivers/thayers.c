@@ -486,11 +486,13 @@ WRITE8_MEMBER(thayers_state::den2_w)
 
 #define SSI263_CLOCK (XTAL_4MHz/2)
 
+#if 0
 static const char SSI263_PHONEMES[0x40][5] =
 {
 	"PA", "E", "E1", "Y", "YI", "AY", "IE", "I", "A", "AI", "EH", "EH1", "AE", "AE1", "AH", "AH1", "W", "O", "OU", "OO", "IU", "IU1", "U", "U1", "UH", "UH1", "UH2", "UH3", "ER", "R", "R1", "R2",
 	"L", "L1", "LF", "W", "B", "D", "KV", "P", "T", "K", "HV", "HVC", "HF", "HFC", "HN", "Z", "S", "J", "SCH", "V", "F", "THV", "TH", "M", "N", "NG", ":A", ":OH", ":U", ":UH", "E2", "LB"
 };
+#endif
 
 WRITE8_MEMBER(thayers_state::ssi263_register_w)
 {

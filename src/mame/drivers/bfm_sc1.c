@@ -1342,6 +1342,7 @@ ROM_END
 
 
 
+#if 0
 ROM_START( sc1barcdb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "barcode.p2", 0x0000, 0x8000, CRC(44b79b14) SHA1(ec0745be0dde818c673c62ca584e22871a73e66e) )
@@ -1351,6 +1352,7 @@ ROM_START( sc1barcdb )
 	ROM_LOAD( "barsnd1.bin", 0x00000, 0x10000, CRC(c9de8ff4) SHA1(c3e77e84d4ecc1c779929a96d1c445a1af24865b) )
 	ROM_LOAD( "barsnd2.bin", 0x10000, 0x10000, CRC(56af984a) SHA1(aebd30f3ca767dc5fc77fb01765833ee627a5aee) )
 ROM_END
+#endif
 
 ROM_START( sc1bigmt )
 	ROM_REGION( 0x10000, "maincpu", 0 )

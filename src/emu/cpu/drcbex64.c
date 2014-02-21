@@ -198,8 +198,8 @@ const UINT32 PTYPE_M    = 1 << parameter::PTYPE_MEMORY;
 const UINT32 PTYPE_I    = 1 << parameter::PTYPE_IMMEDIATE;
 const UINT32 PTYPE_R    = 1 << parameter::PTYPE_INT_REGISTER;
 const UINT32 PTYPE_F    = 1 << parameter::PTYPE_FLOAT_REGISTER;
-const UINT32 PTYPE_MI   = PTYPE_M | PTYPE_I;
-const UINT32 PTYPE_RI   = PTYPE_R | PTYPE_I;
+//const UINT32 PTYPE_MI   = PTYPE_M | PTYPE_I;
+//const UINT32 PTYPE_RI   = PTYPE_R | PTYPE_I;
 const UINT32 PTYPE_MR   = PTYPE_M | PTYPE_R;
 const UINT32 PTYPE_MRI  = PTYPE_M | PTYPE_R | PTYPE_I;
 const UINT32 PTYPE_MF   = PTYPE_M | PTYPE_F;
@@ -248,7 +248,7 @@ inline x86_memref drcbe_x64::MABS(const void *ptr)
 drcbe_x64::opcode_generate_func drcbe_x64::s_opcode_table[OP_MAX];
 
 // size-to-mask table
-static const UINT64 size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
+//static const UINT64 size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
 
 // register mapping tables
 static const UINT8 int_register_map[REG_I_COUNT] =
@@ -286,6 +286,7 @@ static const UINT8 condition_map[uml::COND_MAX - uml::COND_Z] =
 	x64emit::COND_GE,   // COND_GE,          requires SV
 };
 
+#if 0
 // rounding mode mapping table
 static const UINT8 fprnd_map[4] =
 {
@@ -294,6 +295,7 @@ static const UINT8 fprnd_map[4] =
 	FPRND_UP,       // ROUND_CEIL,    round up
 	FPRND_DOWN      // ROUND_FLOOR    round down
 };
+#endif
 
 
 

@@ -1205,6 +1205,7 @@ static const wd17xx_interface mz2500_mb8877a_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
+#if 0
 static LEGACY_FLOPPY_OPTIONS_START( mz2500 )
 	LEGACY_FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
@@ -1213,6 +1214,7 @@ static LEGACY_FLOPPY_OPTIONS_START( mz2500 )
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
+#endif
 
 static const floppy_interface mz2500_floppy_interface =
 {

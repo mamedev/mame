@@ -590,7 +590,7 @@ READ8_MEMBER(a1200_state::a1200_cia_0_portA_r)
 	return ret;
 }
 
-
+#if 0
 static const legacy_mos6526_interface a1200_cia_0_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_0_irq),                                    /* irq_func */
@@ -614,6 +614,7 @@ static const legacy_mos6526_interface a1200_cia_1_intf =
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER("fdc", amiga_fdc, ciaaprb_w)            /* port B */
 };
+#endif
 
 
 static SLOT_INTERFACE_START( amiga_floppies )

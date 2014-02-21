@@ -26,7 +26,7 @@ static const INT64 MAX_48 = (S64(1) << 47) - 1;
 static inline INT32 SX(INT32 x) { return IS_NEGATIVE(x) ? x | 0xff000000 : x & 0x00ffffff; }
 static inline INT32 SC(INT32 x) { return x & 0x00ffffff; }
 static inline INT64 SX64(INT64 x) { return (x & S64(0x0000800000000000)) ? x | S64(0xffff000000000000) : x & S64(0x0000ffffffffffff); }
-static inline INT64 SC64(INT64 x) { return x & S64(0x0000ffffffffffff); }
+//static inline INT64 SC64(INT64 x) { return x & S64(0x0000ffffffffffff); }
 
 #define VERBOSE 0
 #define VERBOSE_EXEC 0

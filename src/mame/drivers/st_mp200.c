@@ -103,6 +103,7 @@ ROM_END
 /*--------------------------------
 / Cue (Proto - Never released)
 /-------------------------------*/
+#if 0
 ROM_START(cue)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpu_u1.716", 0x1000, 0x0800, NO_DUMP)
@@ -111,6 +112,7 @@ ROM_START(cue)
 	ROM_LOAD( "cpu_u6.716", 0x5800, 0x0800, NO_DUMP)
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
+#endif
 
 /*--------------------------------
 / Dragonfist

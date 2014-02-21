@@ -1470,6 +1470,7 @@ READ8_MEMBER(pc8801_state::pc8801_crtc_status_r)
 	return m_crtc.status;
 }
 
+#if 0
 static const char *const crtc_command[] =
 {
 	"Reset / Stop Display",             // 0
@@ -1481,6 +1482,7 @@ static const char *const crtc_command[] =
 	"Reset Counters",                   // 6
 	"Read Status"                       // 7
 };
+#endif
 
 WRITE8_MEMBER(pc8801_state::pc88_crtc_cmd_w)
 {
@@ -2257,6 +2259,7 @@ static SLOT_INTERFACE_START( pc88_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
+#if 0
 /* Cassette Configuration */
 
 static const cassette_interface pc88_cassette_interface =
@@ -2267,6 +2270,7 @@ static const cassette_interface pc88_cassette_interface =
 	"pc8801_cass",
 	NULL
 };
+#endif
 
 #ifdef USE_PROPER_I8214
 void pc8801_state::pc8801_raise_irq(UINT8 irq,UINT8 state)

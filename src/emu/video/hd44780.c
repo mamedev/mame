@@ -388,6 +388,14 @@ WRITE8_MEMBER(hd44780_device::control_write)
 	{
 		m_active_ram = DDRAM;
 		m_ac = m_ir & 0x7f;
+
+		if (m_num_line == 2 && m_ac > 0x27 && m_ac < 0x40)
+			m_ac = 0x40 + (m_ac - 0x28);
+		else if (m_num_line == 2 && m_ac > 0x67)
+			m_ac = 0x00 + (m_ac - 0x68);
+		else if (m_num_line == 1 && m_ac > 0x4f)
+			m_ac = 0x00 + (m_ac - 0x50);
+
 		set_busy_flag(37);
 
 		if (LOG) logerror("HD44780 '%s': set DDRAM address %x\n", tag(), m_ac);

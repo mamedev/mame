@@ -34,6 +34,7 @@
 
 #include "formats/d88_dsk.h"
 #include "formats/pc_dsk.h"
+#include "formats/naslite_dsk.h"
 
 #include "formats/ap_dsk35.h"
 #include "formats/ap2_dsk.h"

@@ -74,8 +74,12 @@
 
     2014/01/02 Robert Tuccitto  Corrected joystick buttons assignment & minor
                                 palette notes cleanup.
-    2014/01/09 Robert Tuccitto  Positional description for difficulty
-                                switches added. 
+    
+	2014/01/09 Robert Tuccitto  Positional description for difficulty
+	                            switches added.
+	
+	2014/02/15 Robert Tuccitto  Added more details and clarification
+	                            regarding the potentiometer.
 ***************************************************************************/
 
 #include "emu.h"
@@ -171,12 +175,46 @@ depending on how poor or well it handles the signal conversion and its
 calibration) on a modern flat panel display, as opposed to 'gold' (~-33
 degrees) on a CRT.
 
-The system's pot adjustment manually manipulates the ratio of blue to
-green/blue to red, while the system 'warming-up' causes the palette phase
-shift to go higher in degrees.
+The potentiometer (pot adjustment) for the 7800 modifies the delay line 
+regarding colors it will exhibit and is extremely sensitive.  The slightest 
+turn can have a significant impact.  
 
-At power on, the system's phase shift appears as low as ~23 degrees and
-after a considerable consistent runtime, can be as high as ~28 degrees.
+A system whose potentiometer is not properly calibrated via 
+'CPS 7800 Diagnostic Test Cartridge' or/and just slightly off from the 
+desired factory settings may exhibit consequences such as too much blue in 
+place of green (Pot adjusted slightly too far left) or washed out reddish 
+tones in place of where most other systems display a darker reddish tones 
+(Pot adjusted slightly too far right).  
+
+This is a result of the phase shifting of lesser degrees (Pot adjusted more 
+to the left) or phase shifting of greater degrees (Pot adjusted more to the 
+right). 
+
+Turning the pot adjustment to the right, it can be observed that the values 
+of the higher end of the scale will match the lower end of the scale.  
+For example, after some turning to the right, the values of Dx, Ex, Fx, 
+can be set to match 1x, 2x, 3x.  
+
+After further turning to the right, now the palette can be brought to make 
+Ax, Bx, Cx, Dx, Ex, Fx will match 1x, 2x, 3x, 4x, 5x, 6x.  
+
+Ultimately though, too much turning to the right results in all colors being 
+wiped from the scale, excluding the hue begin point 1x (Which remains 
+unchanged while tweaking the potentiometer either left or right).
+
+Continuously turning the pot adjustment to the left, red and blue become the 
+most dominant two colors encompassing the palette with only a slight 
+influence of green at the highest end of the palette (Fx), once turned all 
+the way leftward.
+
+The degree range for adjustment of the phase shifting on the 7800 appears 
+to be as low as approximately 15 degrees when tuned all the way left, and 
+seems to be able to achieve as high as approximately 45 degrees when turned 
+right before losing all color (Excluding 1x) from the palette scale.
+
+For even a properly calibrated system at power on, the system's phase 
+shift appears as low as ~23 degrees and after a considerable consistent 
+runtime ('warm-up'), can be as high as ~28 degrees.
 
 In general, the low end of ~23 degrees lasts for maybe several seconds,
 whereas higher values such as ~25-27 degrees is the most dominant during

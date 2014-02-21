@@ -145,7 +145,7 @@ void at28c16_device::nvram_default()
 
 void at28c16_device::nvram_read( emu_file &file )
 {
-	UINT8 *buffer = auto_alloc_array( machine(), UINT8, AT28C16_TOTAL_BYTES );
+	dynamic_buffer buffer( AT28C16_TOTAL_BYTES );
 
 	file.read( buffer, AT28C16_TOTAL_BYTES );
 
@@ -153,8 +153,6 @@ void at28c16_device::nvram_read( emu_file &file )
 	{
 		m_addrspace[ 0 ]->write_byte( offs, buffer[ offs ] );
 	}
-
-	auto_free( machine(), buffer );
 }
 
 //-------------------------------------------------
@@ -164,7 +162,7 @@ void at28c16_device::nvram_read( emu_file &file )
 
 void at28c16_device::nvram_write( emu_file &file )
 {
-	UINT8 *buffer = auto_alloc_array( machine(), UINT8, AT28C16_TOTAL_BYTES );
+	dynamic_buffer buffer ( AT28C16_TOTAL_BYTES );
 
 	for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
 	{
@@ -172,8 +170,6 @@ void at28c16_device::nvram_write( emu_file &file )
 	}
 
 	file.write( buffer, AT28C16_TOTAL_BYTES );
-
-	auto_free( machine(), buffer );
 }
 
 

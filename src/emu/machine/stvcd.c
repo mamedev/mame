@@ -1429,9 +1429,7 @@ void saturn_state::stvcd_reset( void )
 	cd_stat |= CD_STAT_PERI;
 	cur_track = 0xff;
 
-	if (curdir != (direntryT *)NULL)
-		auto_free(machine(), curdir);
-	curdir = (direntryT *)NULL;     // no directory yet
+	curdir.reset();
 
 	xfertype = XFERTYPE_INVALID;
 	xfertype32 = XFERTYPE32_INVALID;
@@ -2167,12 +2165,7 @@ void saturn_state::make_dir_current(UINT32 fad)
 		}
 	}
 
-	if (curdir != (direntryT *)NULL)
-	{
-		auto_free(machine(), curdir);
-	}
-
-	curdir = auto_alloc_array(machine(), direntryT, numentries);
+	curdir.resize(numentries);
 	curentry = curdir;
 	numfiles = numentries;
 
@@ -2243,11 +2236,7 @@ void saturn_state::make_dir_current(UINT32 fad)
 
 void saturn_state::stvcd_exit( void )
 {
-	if (curdir != (direntryT *)NULL)
-	{
-		auto_free(machine(), curdir);
-		curdir = (direntryT *)NULL;
-	}
+	curdir.reset();
 
 	if (cdrom)
 	{

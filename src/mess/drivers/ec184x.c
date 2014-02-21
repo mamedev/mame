@@ -138,6 +138,7 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 	m_memory.enable[offset] = data;
 }
 
+#if 0
 const struct pit8253_interface ec1841_pit8253_config =
 {
 	{
@@ -156,6 +157,7 @@ const struct pit8253_interface ec1841_pit8253_config =
 		}
 	}
 };
+#endif
 
 
 DRIVER_INIT_MEMBER( ec184x_state, ec184x )

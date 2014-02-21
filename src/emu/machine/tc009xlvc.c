@@ -256,21 +256,20 @@ static const gfx_layout char_layout =
 
 void tc0091lvc_device::device_start()
 {
-	m_palette_ram = auto_alloc_array_clear(machine(), UINT8, 0x200);
-	m_vregs = auto_alloc_array_clear(machine(), UINT8, 0x100);
-	m_bitmap_ram = auto_alloc_array_clear(machine(), UINT8, 0x20000);
+	memset(m_palette_ram, 0, sizeof(m_palette_ram));
+	memset(m_vregs, 0, sizeof(m_palette_ram));
+	memset(m_bitmap_ram, 0, sizeof(m_palette_ram));
+	memset(m_pcg_ram, 0, sizeof(m_pcg_ram));
+	memset(m_sprram_buffer, 0, sizeof(m_sprram_buffer));
 
 	// note, the way tiles are addressed suggests that 0x0000-0x3fff of this might be usable,
 	//       but we don't map it anywhere, so the first tiles are always blank at the moment.
-	m_pcg_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
-
 	m_pcg1_ram = m_pcg_ram + 0x4000;
 	m_pcg2_ram = m_pcg_ram + 0xc000;
 	m_vram0 = m_pcg_ram + 0x8000;
 	m_vram1 = m_pcg_ram + 0x9000;
 	m_tvram = m_pcg_ram + 0xa000;
 	m_sprram = m_pcg_ram + 0xb000;
-	m_sprram_buffer = auto_alloc_array_clear(machine(), UINT8, 0x400);
 
 	tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_tx_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 	bg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0091lvc_device::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);

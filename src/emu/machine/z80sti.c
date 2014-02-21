@@ -46,12 +46,12 @@ const device_type Z80STI = &device_creator<z80sti_device>;
 //**************************************************************************
 
 // timer C/D control register
-const int TCDC_TARS  = 0x80;
-const int TCDC_TBRS  = 0x08;
+//const int TCDC_TARS  = 0x80;
+//const int TCDC_TBRS  = 0x08;
 
 // interrupt vector register
-const int PVR_ISE    = 0x08;
-const int PVR_VR4    = 0x10;
+//const int PVR_ISE    = 0x08;
+//const int PVR_VR4    = 0x10;
 
 // general purpose I/O interrupt levels
 const int z80sti_device::INT_LEVEL_GPIP[] =

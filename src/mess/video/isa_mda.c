@@ -42,6 +42,7 @@ static const unsigned char mda_palette[4][3] =
 
 static MC6845_UPDATE_ROW( mda_update_row );
 
+#if 0
 /* F4 Character Displayer */
 static const gfx_layout pc_16_charlayout =
 {
@@ -73,6 +74,7 @@ static GFXDECODE_START( pcmda )
 	GFXDECODE_ENTRY( "mda:gfx1", 0x0000, pc_16_charlayout, 1, 1 )
 	GFXDECODE_ENTRY( "mda:gfx1", 0x1000, pc_8_charlayout, 1, 1 )
 GFXDECODE_END
+#endif
 
 
 static MC6845_INTERFACE( mc6845_mda_intf )
@@ -507,9 +509,11 @@ static MC6845_INTERFACE( mc6845_hercules_intf )
 	NULL
 };
 
+#if 0
 static GFXDECODE_START( pcherc )
 	GFXDECODE_ENTRY( "hercules:gfx1", 0x0000, pc_16_charlayout, 1, 1 )
 GFXDECODE_END
+#endif
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_hercules )
 	MCFG_SCREEN_ADD( HERCULES_SCREEN_NAME, RASTER)

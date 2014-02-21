@@ -76,12 +76,12 @@ at45db161_device::at45db161_device(const machine_config &mconfig, const char *ta
 void at45db041_device::device_start()
 {
 	m_size = num_pages() * page_size();
-	m_data = auto_alloc_array(machine(), UINT8, m_size);
-	m_buffer1 = auto_alloc_array(machine(), UINT8, page_size());
-	//m_buffer2 = auto_alloc_array(machine(), UINT8, page_size());
+	m_data.resize(m_size);
+	m_buffer1.resize(page_size());
+	//m_buffer2.resize(page_size());
 
 	// data
-	save_pointer(NAME(m_data), m_size);
+	save_item(NAME(m_data));
 	// pins
 	save_item(NAME(m_pin.cs));
 	save_item(NAME(m_pin.sck));
@@ -134,7 +134,7 @@ void at45db041_device::device_reset()
 
 void at45db041_device::nvram_default()
 {
-	memset(m_data, 0xff, m_size);
+	m_data.clear(0xff);
 
 	if (region() != NULL)
 	{
@@ -284,7 +284,7 @@ void at45db041_device::write_byte(UINT8 data)
 					byte = flash_get_byte_addr();
 					_logerror( 1, ("at45dbxx opcode %02X - main memory page program through buffer 1 [%04X/%04X]\n",opcode, page, byte));
 					flash_set_io(m_buffer1, page_size(), byte);
-					memset( m_buffer1, 0xFF, page_size());
+					m_buffer1.clear(0xFF);
 					m_mode = FLASH_MODE_SI;
 					m_cmd.size = 8;
 				}

@@ -197,6 +197,7 @@ WRITE_LINE_MEMBER(ggconnie_state::pce_irq_changed)
 }
 
 
+#if 0
 static const huc6270_interface pce_huc6270_config =
 {
 	0x10000,
@@ -211,6 +212,7 @@ static const huc6260_interface pce_huc6260_config =
 	DEVCB_DEVICE_LINE_MEMBER( "huc6270", huc6270_device, vsync_changed ),
 	DEVCB_DEVICE_LINE_MEMBER( "huc6270", huc6270_device, hsync_changed )
 };
+#endif
 
 
 static const huc6270_interface sgx_huc6270_0_config =

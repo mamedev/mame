@@ -500,16 +500,11 @@ void sound_stream::allocate_resample_buffers()
 	if (m_resample_bufalloc < bufsize)
 	{
 		// this becomes the new allocation size
-		int oldsize = m_resample_bufalloc;
 		m_resample_bufalloc = bufsize;
 
 		// iterate over outputs and realloc their buffers
 		for (int inputnum = 0; inputnum < m_input.count(); inputnum++)
-		{
-			stream_input &input = m_input[inputnum];
-			input.m_resample.resize(m_resample_bufalloc, true);
-			memset(&input.m_resample[oldsize], 0, (m_resample_bufalloc - oldsize) * sizeof(stream_sample_t));
-		}
+			m_input[inputnum].m_resample.resize_keep_and_clear_new(m_resample_bufalloc);
 	}
 }
 
@@ -526,16 +521,11 @@ void sound_stream::allocate_output_buffers()
 	if (m_output_bufalloc < bufsize)
 	{
 		// this becomes the new allocation size
-		int oldsize = m_output_bufalloc;
 		m_output_bufalloc = bufsize;
 
 		// iterate over outputs and realloc their buffers
 		for (int outputnum = 0; outputnum < m_output.count(); outputnum++)
-		{
-			stream_output &output = m_output[outputnum];
-			output.m_buffer.resize(m_output_bufalloc, true);
-			memset(&output.m_buffer[oldsize], 0, (m_output_bufalloc - oldsize) * sizeof(stream_sample_t));
-		}
+			m_output[outputnum].m_buffer.resize_keep_and_clear_new(m_output_bufalloc);
 	}
 }
 

@@ -27,11 +27,13 @@ void pcw_state::video_start()
 	m_prn_output->fill(1, rect);
 }
 
+#if 0
 /* two colours */
 static const unsigned short pcw_colour_table[PCW_NUM_COLOURS] =
 {
 	0, 1
 };
+#endif
 
 /* black/white */
 static const rgb_t pcw_palette[PCW_NUM_COLOURS] =

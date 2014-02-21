@@ -38,8 +38,8 @@ const UINT32 LEAD_OUT_MIN_SIZE_IN_UM = 2000;        // 2 mm
 
 // the track pitch is defined as a range; we pick a nominal pitch
 // that ensures we can fit 54,000 tracks
-const UINT32 MIN_TRACK_PITCH_IN_NM = 1400;          // 1.4 um
-const UINT32 MAX_TRACK_PITCH_IN_NM = 2000;          // 2 um
+//const UINT32 MIN_TRACK_PITCH_IN_NM = 1400;          // 1.4 um
+//const UINT32 MAX_TRACK_PITCH_IN_NM = 2000;          // 2 um
 const UINT32 NOMINAL_TRACK_PITCH_IN_NM = (PROGRAM_MAX_RADIUS_IN_UM - PROGRAM_MIN_RADIUS_IN_UM) * 1000 / 54000;
 
 // we simulate extra lead-in and lead-out tracks
@@ -844,8 +844,8 @@ void laserdisc_device::init_audio()
 	// allocate audio buffers
 	m_audiomaxsamples = ((UINT64)m_samplerate * 1000000 + m_fps_times_1million - 1) / m_fps_times_1million;
 	m_audiobufsize = m_audiomaxsamples * 4;
-	m_audiobuffer[0] = auto_alloc_array(machine(), INT16, m_audiobufsize);
-	m_audiobuffer[1] = auto_alloc_array(machine(), INT16, m_audiobufsize);
+	m_audiobuffer[0].resize(m_audiobufsize);
+	m_audiobuffer[1].resize(m_audiobufsize);
 }
 
 

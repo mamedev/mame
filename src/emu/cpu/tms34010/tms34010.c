@@ -1169,6 +1169,7 @@ UINT32 tms34010_device::tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bitm
     I/O REGISTER WRITES
 ***************************************************************************/
 
+#if 0
 static const char *const ioreg_name[] =
 {
 	"HESYNC", "HEBLNK", "HSBLNK", "HTOTAL",
@@ -1181,6 +1182,7 @@ static const char *const ioreg_name[] =
 	"RESERVED", "RESERVED", "RESERVED", "DPYTAP",
 	"HCOUNT", "VCOUNT", "DPYADR", "REFCNT"
 };
+#endif
 
 WRITE16_HANDLER( tms34010_io_register_w )
 {
@@ -1302,6 +1304,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 }
 
 
+#if 0
 static const char *const ioreg020_name[] =
 {
 	"VESYNC", "HESYNC", "VEBLNK", "HEBLNK",
@@ -1324,6 +1327,7 @@ static const char *const ioreg020_name[] =
 	"IHOST1L", "IHOST1H", "IHOST2L", "IHOST2H",
 	"IHOST3L", "IHOST3H", "IHOST4L", "IHOST4H"
 };
+#endif
 
 WRITE16_HANDLER( tms34020_io_register_w )
 {

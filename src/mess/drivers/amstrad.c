@@ -777,6 +777,7 @@ static const ay8910_interface ay8912_interface =
 	DEVCB_NULL                  /* portB write */
 };
 
+#if 0
 
 static const gfx_layout asic_sprite_layout =
 {
@@ -792,6 +793,7 @@ static const gfx_layout asic_sprite_layout =
 static GFXDECODE_START( asic_sprite )
 	GFXDECODE_ENTRY( "user1", 0, asic_sprite_layout, 32, 1 )
 GFXDECODE_END
+#endif
 
 
 

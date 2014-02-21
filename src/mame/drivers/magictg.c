@@ -879,12 +879,14 @@ INPUT_PORTS_END
  *
  *************************************/
 
+#if 0
 /* TODO: Unknown */
 static const mips3_config config =
 {
 	16384,              /* code cache size */
 	16384               /* data cache size */
 };
+#endif
 
 static const adsp21xx_config adsp_config =
 {

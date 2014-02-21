@@ -404,8 +404,7 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 		m_machine(machine),
 		m_complist(machine.respool()),
 		m_defstate(0),
-		m_maxstate(0),
-		m_elemtex(NULL)
+		m_maxstate(0)
 {
 	// extract the name
 	const char *name = xml_get_attribute_string_with_subst(machine, elemnode, "name", NULL);
@@ -470,7 +469,7 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 	}
 
 	// allocate an array of element textures for the states
-	m_elemtex = auto_alloc_array(machine, texture, m_maxstate + 1);
+	m_elemtex.resize(m_maxstate + 1);
 }
 
 
@@ -480,8 +479,6 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 
 layout_element::~layout_element()
 {
-	// loop over all states and free their textures
-	auto_free(machine(), m_elemtex);
 }
 
 

@@ -37,7 +37,7 @@ fifo7200_device::fifo7200_device(const machine_config &mconfig, const char *tag,
 void fifo7200_device::device_start()
 {
 	assert(m_ram_size > 1 && ~m_ram_size & 1);
-	m_buffer = auto_alloc_array(machine(), UINT16, m_ram_size);
+	m_buffer.resize(m_ram_size);
 
 	// resolve callbacks
 	m_ef_handler.resolve();
@@ -59,7 +59,7 @@ void fifo7200_device::device_start()
 void fifo7200_device::device_reset()
 {
 	// master reset
-	memset(m_buffer, 0, m_ram_size * sizeof(UINT16));
+	m_buffer.clear();
 	m_read_ptr = 0;
 	m_write_ptr = 0;
 

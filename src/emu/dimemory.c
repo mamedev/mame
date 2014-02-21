@@ -24,7 +24,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-const int TRIGGER_SUSPENDTIME = -4000;
+//const int TRIGGER_SUSPENDTIME = -4000;
 
 
 

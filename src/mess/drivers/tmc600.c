@@ -302,6 +302,7 @@ MACHINE_CONFIG_END
 
 /* ROMs */
 
+#if 0
 ROM_START( tmc600s1 )
 	ROM_REGION( 0x5000, CDP1802_TAG, 0 )
 	ROM_LOAD( "sb20",       0x0000, 0x1000, NO_DUMP )
@@ -313,6 +314,7 @@ ROM_START( tmc600s1 )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "chargen",    0x0000, 0x1000, NO_DUMP )
 ROM_END
+#endif
 
 ROM_START( tmc600s2 )
 	ROM_REGION( 0x5000, CDP1802_TAG, 0 )

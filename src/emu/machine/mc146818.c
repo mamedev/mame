@@ -56,7 +56,7 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 
 void mc146818_device::device_start()
 {
-	m_data= auto_alloc_array(machine(), UINT8, data_size());
+	m_data.resize(data_size());
 	m_last_refresh = machine().time();
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
 	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
@@ -194,7 +194,7 @@ void mc146818_device::nvram_default()
 	}
 	else
 	{
-		memset(m_data, 0, data_size());
+		m_data.clear();
 	}
 
 	set_base_datetime();

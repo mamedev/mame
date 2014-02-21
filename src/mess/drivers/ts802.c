@@ -228,6 +228,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_DRIVER_MEMBER(ts802_state, kbd_put)
 };
 
+#if 0
 // not correct
 static const z80_daisy_config daisy_chain_intf[] =
 {
@@ -237,6 +238,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ "z80ctc" },
 	{ NULL }
 };
+#endif
 
 DRIVER_INIT_MEMBER( ts802_state, ts802 )
 {

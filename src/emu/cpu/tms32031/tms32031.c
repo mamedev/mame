@@ -67,9 +67,9 @@ const int LVFLAG    = 0x0020;
 const int LUFFLAG   = 0x0040;
 const int OVMFLAG   = 0x0080;
 const int RMFLAG    = 0x0100;
-const int CFFLAG    = 0x0400;
-const int CEFLAG    = 0x0800;
-const int CCFLAG    = 0x1000;
+//const int CFFLAG    = 0x0400;
+//const int CEFLAG    = 0x0800;
+//const int CCFLAG    = 0x1000;
 const int GIEFLAG   = 0x2000;
 
 

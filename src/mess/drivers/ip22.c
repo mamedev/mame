@@ -1619,11 +1619,13 @@ INTERRUPT_GEN_MEMBER(ip22_state::ip22_vbl)
 	}
 }
 
+#if 0
 static const mips3_config config =
 {
 	32768,  /* code cache size */
 	32768   /* data cache size */
 };
+#endif
 
 static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_CPU_ADD( "maincpu", R5000BE, 50000000*3 )

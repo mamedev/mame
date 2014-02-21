@@ -3252,6 +3252,7 @@ static void geforce_pci_w(device_t *busdevice, device_t *device, int function, i
  * ohci usb controller placeholder
  */
 
+#ifdef LOG_OHCI
 static const char *const usbregnames[]={
 	"HcRevision",
 	"HcControl",
@@ -3276,6 +3277,7 @@ static const char *const usbregnames[]={
 	"HcRhStatus",
 	"HcRhPortStatus[1]"
 };
+#endif
 
 READ32_MEMBER( chihiro_state::usbctrl_r )
 {

@@ -375,6 +375,7 @@ UINT8 cbm_common_cia0_port_b_r( device_t *device, UINT8 output_a )
 
 ***********************************************/
 
+#if 0
 const cassette_interface cbm_cassette_interface =
 {
 	cbm_cassette_formats,
@@ -383,6 +384,7 @@ const cassette_interface cbm_cassette_interface =
 	NULL,
 	NULL
 };
+#endif
 
 
 /*UINT8 *c65_basic; */

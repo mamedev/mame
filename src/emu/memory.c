@@ -619,7 +619,7 @@ public:
 	}
 
 	// enable watchpoints by swapping in the watchpoint table
-	void enable_watchpoints(bool enable = true) { m_live_lookup = enable ? s_watchpoint_table : m_table; }
+	void enable_watchpoints(bool enable = true) { m_live_lookup = enable ? s_watchpoint_table : &m_table[0]; }
 
 	// table mapping helpers
 	void map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT16 staticentry);
@@ -651,7 +651,7 @@ protected:
 	UINT16 *subtable_ptr(UINT16 entry) { return &m_table[level2_index(entry, 0)]; }
 
 	// internal state
-	UINT16 *                m_table;                    // pointer to base of table
+	dynamic_array<UINT16>   m_table;                    // pointer to base of table
 	UINT16 *                m_live_lookup;              // current lookup
 	address_space &         m_space;                    // pointer back to the space
 	bool                    m_large;                    // large memory model?
@@ -669,7 +669,7 @@ protected:
 		UINT32              m_checksum;                 // checksum over all the bytes
 		UINT32              m_usecount;                 // number of times this has been used
 	};
-	subtable_data *         m_subtable;                 // info about each subtable
+	dynamic_array<subtable_data> m_subtable;            // info about each subtable
 	UINT16                  m_subtable_alloc;           // number of subtables allocated
 
 	// static global read-only watchpoint table
@@ -2899,11 +2899,11 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 //-------------------------------------------------
 
 address_table::address_table(address_space &space, bool large)
-	: m_table(auto_alloc_array(space.machine(), UINT16, 1 << LEVEL1_BITS)),
+	: m_table(1 << LEVEL1_BITS),
 		m_live_lookup(m_table),
 		m_space(space),
 		m_large(large),
-		m_subtable(auto_alloc_array(space.machine(), subtable_data, SUBTABLE_COUNT)),
+		m_subtable(SUBTABLE_COUNT),
 		m_subtable_alloc(0)
 {
 	// make our static table all watchpoints
@@ -2932,8 +2932,6 @@ address_table::address_table(address_space &space, bool large)
 
 address_table::~address_table()
 {
-	auto_free(m_space.machine(), m_table);
-	auto_free(m_space.machine(), m_subtable);
 }
 
 
@@ -3494,16 +3492,13 @@ UINT16 address_table::subtable_alloc()
 				// if this is past our allocation budget, allocate some more
 				if (subindex >= m_subtable_alloc)
 				{
-					UINT32 oldsize = (1 << LEVEL1_BITS) + (m_subtable_alloc << level2_bits());
 					m_subtable_alloc += SUBTABLE_ALLOC;
 					UINT32 newsize = (1 << LEVEL1_BITS) + (m_subtable_alloc << level2_bits());
 
-					UINT16 *newtable = auto_alloc_array_clear(m_space.machine(), UINT16, newsize);
-					memcpy(newtable, m_table, 2*oldsize);
-					if (m_live_lookup == m_table)
-						m_live_lookup = newtable;
-					auto_free(m_space.machine(), m_table);
-					m_table = newtable;
+					bool was_live = (m_live_lookup == m_table);
+					m_table.resize_keep_and_clear_new(newsize);
+					if (was_live)
+						m_live_lookup = m_table;
 				}
 				// bump the usecount and return
 				m_subtable[subindex].m_usecount++;
@@ -4081,8 +4076,7 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 		m_space(space),
 		m_bytestart(bytestart),
 		m_byteend(byteend),
-		m_data(reinterpret_cast<UINT8 *>(memory)),
-		m_allocated(NULL)
+		m_data(reinterpret_cast<UINT8 *>(memory))
 {
 	VPRINTF(("block_allocate('%s',%s,%08X,%08X,%p)\n", space.device().tag(), space.name(), bytestart, byteend, memory));
 
@@ -4091,11 +4085,14 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 	{
 		offs_t length = byteend + 1 - bytestart;
 		if (length < 4096)
-			m_allocated = m_data = auto_alloc_array_clear(space.machine(), UINT8, length);
+		{
+			m_allocated.resize_and_clear(length);
+			m_data = m_allocated;
+		}
 		else
 		{
-			m_allocated = auto_alloc_array_clear(space.machine(), UINT8, length + 0xfff);
-			m_data = reinterpret_cast<UINT8 *>((reinterpret_cast<FPTR>(m_allocated) + 0xfff) & ~0xfff);
+			m_allocated.resize_and_clear(length + 0xfff);
+			m_data = reinterpret_cast<UINT8 *>((reinterpret_cast<FPTR>(&m_allocated[0]) + 0xfff) & ~0xfff);
 		}
 	}
 
@@ -4125,8 +4122,6 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 
 memory_block::~memory_block()
 {
-	if (m_allocated != NULL)
-		auto_free(machine(), m_allocated);
 }
 
 
@@ -4148,9 +4143,7 @@ memory_bank::memory_bank(address_space &space, int index, offs_t bytestart, offs
 		m_anonymous(tag == NULL),
 		m_bytestart(bytestart),
 		m_byteend(byteend),
-		m_curentry(BANK_ENTRY_UNSPECIFIED),
-		m_entry(NULL),
-		m_entry_count(0)
+		m_curentry(BANK_ENTRY_UNSPECIFIED)
 {
 	// generate an internal tag if we don't have one
 	if (tag == NULL)
@@ -4264,7 +4257,7 @@ void memory_bank::set_entry(int entrynum)
 	// validate
 	if (m_anonymous)
 		throw emu_fatalerror("memory_bank::set_entry called for anonymous bank");
-	if (entrynum < 0 || entrynum >= m_entry_count)
+	if (entrynum < 0 || entrynum >= m_entry.count())
 		throw emu_fatalerror("memory_bank::set_entry called with out-of-range entry %d", entrynum);
 	if (m_entry[entrynum].m_raw == NULL)
 		throw emu_fatalerror("memory_bank::set_entry called for bank '%s' with invalid bank entry %d", m_tag.cstr(), entrynum);
@@ -4286,17 +4279,8 @@ void memory_bank::set_entry(int entrynum)
 
 void memory_bank::expand_entries(int entrynum)
 {
-	int newcount = entrynum + 1;
-
 	// allocate a new array and copy from the old one; zero out the new entries
-	bank_entry *newentry = auto_alloc_array(machine(), bank_entry, newcount);
-	memcpy(newentry, m_entry, sizeof(m_entry[0]) * m_entry_count);
-	memset(&newentry[m_entry_count], 0, (newcount - m_entry_count) * sizeof(m_entry[0]));
-
-	// free the old array and set the updated values
-	auto_free(machine(), m_entry);
-	m_entry = newentry;
-	m_entry_count = newcount;
+	m_entry.resize_keep_and_clear_new(entrynum + 1);
 }
 
 
@@ -4311,7 +4295,7 @@ void memory_bank::configure_entry(int entrynum, void *base)
 		throw emu_fatalerror("memory_bank::configure_entry called with out-of-range entry %d", entrynum);
 
 	// if we haven't allocated this many entries yet, expand our array
-	if (entrynum >= m_entry_count)
+	if (entrynum >= m_entry.count())
 		expand_entries(entrynum);
 
 	// set the entry
@@ -4347,7 +4331,7 @@ void memory_bank::configure_decrypted_entry(int entrynum, void *base)
 		throw emu_fatalerror("memory_bank::configure_decrypted_entry called with out-of-range entry %d", entrynum);
 
 	// if we haven't allocated this many entries yet, expand our array
-	if (entrynum >= m_entry_count)
+	if (entrynum >= m_entry.count())
 		expand_entries(entrynum);
 
 	// set the entry

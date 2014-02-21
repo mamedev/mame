@@ -182,6 +182,7 @@ UINT32 jupiter3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
+#if 0
 static const floppy_interface jupiter_floppy_interface =
 {
 	DEVCB_NULL,
@@ -194,6 +195,7 @@ static const floppy_interface jupiter_floppy_interface =
 	NULL,
 	NULL
 };
+#endif
 
 static const wd17xx_interface fdc_intf =
 {

@@ -140,6 +140,7 @@ INLINE void set_UINT16BE(UINT16BE *word, UINT16 data)
 	word->bytes[1] = data & 0xff;
 }
 
+#if 0
 INLINE UINT32 get_UINT24BE(UINT24BE word)
 {
 	return (word.bytes[0] << 16) | (word.bytes[1] << 8) | word.bytes[2];
@@ -151,6 +152,7 @@ INLINE void set_UINT24BE(UINT24BE *word, UINT32 data)
 	word->bytes[1] = (data >> 8) & 0xff;
 	word->bytes[2] = data & 0xff;
 }
+#endif
 
 INLINE UINT32 get_UINT32BE(UINT32BE word)
 {

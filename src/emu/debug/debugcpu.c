@@ -1628,8 +1628,6 @@ device_debug::device_debug(device_t &device)
 		m_bplist(NULL),
 		m_rplist(NULL),
 		m_trace(NULL),
-		m_hotspots(NULL),
-		m_hotspot_count(0),
 		m_hotspot_threshhold(0),
 		m_track_pc_set(),
 		m_track_pc(false),
@@ -1983,7 +1981,7 @@ void device_debug::memory_read_hook(address_space &space, offs_t address, UINT64
 	watchpoint_check(space, WATCHPOINT_READ, address, 0, mem_mask);
 
 	// check hotspots
-	if (m_hotspots != NULL)
+	if (m_hotspots.count() > 0)
 		hotspot_check(space, address);
 }
 
@@ -2548,18 +2546,15 @@ void device_debug::registerpoint_enable_all(bool enable)
 void device_debug::hotspot_track(int numspots, int threshhold)
 {
 	// if we already have tracking enabled, kill it
-	auto_free(m_device.machine(), m_hotspots);
-	m_hotspots = NULL;
+	m_hotspots.reset();
 
 	// only start tracking if we have a non-zero count
 	if (numspots > 0)
 	{
 		// allocate memory for hotspots
-		m_hotspots = auto_alloc_array(m_device.machine(), hotspot_entry, numspots);
-		memset(m_hotspots, 0xff, sizeof(*m_hotspots) * numspots);
+		m_hotspots.resize_and_clear(numspots, 0xff);
 
 		// fill in the info
-		m_hotspot_count = numspots;
 		m_hotspot_threshhold = threshhold;
 	}
 
@@ -2960,7 +2955,7 @@ void device_debug::watchpoint_update_flags(address_space &space)
 {
 	// if hotspots are enabled, turn on all reads
 	bool enableread = false;
-	if (m_hotspots != NULL)
+	if (m_hotspots.count() > 0)
 		enableread = true;
 
 	// see if there are any enabled breakpoints
@@ -3077,20 +3072,20 @@ void device_debug::hotspot_check(address_space &space, offs_t address)
 
 	// see if we have a match in our list
 	int hotindex;
-	for (hotindex = 0; hotindex < m_hotspot_count; hotindex++)
+	for (hotindex = 0; hotindex < m_hotspots.count(); hotindex++)
 		if (m_hotspots[hotindex].m_access == address && m_hotspots[hotindex].m_pc == curpc && m_hotspots[hotindex].m_space == &space)
 			break;
 
 	// if we didn't find any, make a new entry
-	if (hotindex == m_hotspot_count)
+	if (hotindex == m_hotspots.count())
 	{
 		// if the bottom of the list is over the threshhold, print it
-		hotspot_entry &spot = m_hotspots[m_hotspot_count - 1];
+		hotspot_entry &spot = m_hotspots[m_hotspots.count() - 1];
 		if (spot.m_count > m_hotspot_threshhold)
 			debug_console_printf(space.machine(), "Hotspot @ %s %08X (PC=%08X) hit %d times (fell off bottom)\n", space.name(), spot.m_access, spot.m_pc, spot.m_count);
 
 		// move everything else down and insert this one at the top
-		memmove(&m_hotspots[1], &m_hotspots[0], sizeof(m_hotspots[0]) * (m_hotspot_count - 1));
+		memmove(&m_hotspots[1], &m_hotspots[0], sizeof(m_hotspots[0]) * (m_hotspots.count() - 1));
 		m_hotspots[0].m_access = address;
 		m_hotspots[0].m_pc = curpc;
 		m_hotspots[0].m_space = &space;

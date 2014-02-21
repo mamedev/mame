@@ -31,6 +31,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_lcdc(*this, "hd44780"),
 			m_beep(*this, "beeper"),
+			m_bank0(*this, "bank0"),
 			m_bank1(*this, "bank1"),
 			m_bank2(*this, "bank2")
 		{ }
@@ -38,6 +39,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<hd44780_device> m_lcdc;
 	required_device<beep_device> m_beep;
+	optional_memory_bank m_bank0;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
 
@@ -50,6 +52,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	DECLARE_READ8_MEMBER( key_matrix_r );
 	DECLARE_WRITE8_MEMBER( key_matrix_w );
+	DECLARE_WRITE8_MEMBER( rombank0_w );
 	DECLARE_WRITE8_MEMBER( rombank1_w );
 	DECLARE_WRITE8_MEMBER( rombank2_w );
 	DECLARE_READ8_MEMBER( beep_r );
@@ -70,6 +73,16 @@ public:
 	required_device<sed1520_device> m_lcdc_l;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
+
+class gl4004_state : public pc2000_state
+{
+public:
+	gl4004_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc2000_state(mconfig, type, tag)
+		{ }
+
+	virtual void machine_start();
 };
 
 class pc1000_state : public pc2000_state
@@ -114,9 +127,14 @@ WRITE8_MEMBER( pc2000_state::key_matrix_w )
 	m_mux_data = data;
 }
 
+WRITE8_MEMBER( pc2000_state::rombank0_w )
+{
+	m_bank0->set_entry(data & 0x1f);
+}
+
 WRITE8_MEMBER( pc2000_state::rombank1_w )
 {
-	m_bank1->set_entry(data & 0x0f);
+	m_bank1->set_entry(data & 0x1f);
 }
 
 WRITE8_MEMBER( pc2000_state::rombank2_w )
@@ -124,7 +142,7 @@ WRITE8_MEMBER( pc2000_state::rombank2_w )
 	if (data & 0x80)
 		m_bank2->set_entry(data & 0x8f);   //cartridge
 	else
-		m_bank2->set_entry(data & 0x0f);
+		m_bank2->set_entry(data & 0x1f);
 }
 
 READ8_MEMBER( pc2000_state::beep_r )
@@ -140,7 +158,7 @@ WRITE8_MEMBER( pc2000_state::beep_w )
 
 static ADDRESS_MAP_START(pc2000_mem, AS_PROGRAM, 8, pc2000_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("bios", 0x00000)
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank0")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")    //0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x59 0x45, if it succeeds a jump at 0x8004 occurs
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -149,6 +167,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc2000_io , AS_IO, 8, pc2000_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITE(rombank0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(rombank1_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(rombank2_w)
 	AM_RANGE(0x0a, 0x0b) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
@@ -695,14 +714,27 @@ void pc2000_state::machine_start()
 	UINT8 *bios = memregion("bios")->base();
 	UINT8 *cart = memregion("cart")->base();
 
+	m_bank0->configure_entries(0, 0x10, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x10, bios, 0x4000);
 	m_bank2->configure_entries(0, 0x10, bios, 0x4000);
+	m_bank2->configure_entries(0x80, 0x10, cart, 0x4000);
+}
+
+void gl4004_state::machine_start()
+{
+	UINT8 *bios = memregion("bios")->base();
+	UINT8 *cart = memregion("cart")->base();
+
+	m_bank0->configure_entries(0, 0x20, bios, 0x4000);
+	m_bank1->configure_entries(0, 0x20, bios, 0x4000);
+	m_bank2->configure_entries(0, 0x20, bios, 0x4000);
 	m_bank2->configure_entries(0x80, 0x10, cart, 0x4000);
 }
 
 void pc2000_state::machine_reset()
 {
 	//set the initial bank
+	m_bank0->set_entry(0);
 	m_bank1->set_entry(0);
 	m_bank2->set_entry(0);
 }
@@ -813,7 +845,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( gl3000s, pc2000, gl3000s_state )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gl3000s)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gl4000, pc2000 )
+static MACHINE_CONFIG_DERIVED_CLASS( gl4000, pc2000, gl4004_state )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(120, 36) // 4x20 chars
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 36-1)

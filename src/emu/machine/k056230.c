@@ -64,9 +64,7 @@ void k056230_device::device_start()
 		m_cpu = NULL;
 	}
 
-	m_ram = auto_alloc_array(machine(), UINT32, 0x2000);
-
-	save_pointer(NAME(m_ram), 0x2000);
+	save_item(NAME(m_ram));
 }
 
 

@@ -143,6 +143,10 @@ Some of the cards are made in separate pieces and can be opened. However some
 are encased in a single-piece steel shell and opening it up destroys the card.
 Some of the later games came packaged as a Compact Flash card and a PCMCIA to CF
 adapter, however these cards were also locked the same as the older type.
+
+RC De Go! Controller Info
+-------------------------
+
 The game uses an analog wheel (5k potentiometer) in the shape of a hand-held
 control unit and a trigger (another 5k potentiometer) used for acceleration
 and brake. The trigger and wheel are self centering. If the trigger is pulled back
@@ -354,8 +358,7 @@ public:
 		m_sndflash0(*this, "sndflash0"),
 		m_sndflash1(*this, "sndflash1"),
 		m_sndflash2(*this, "sndflash2"),
-		m_has_zoom(true),
-		m_control(0xf8)
+		m_has_zoom(true)
 	{
 	}
 
@@ -572,6 +575,8 @@ void taitogn_state::machine_reset()
 {
 	// halt sound CPU since it has no valid program at start
 	m_mn10200->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	
+	m_control = 0x10;
 }
 
 DRIVER_INIT_MEMBER(taitogn_state,coh3002t_nz)

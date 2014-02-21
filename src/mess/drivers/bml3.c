@@ -959,6 +959,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_c )
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
+#if 0
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -968,6 +969,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL, // write A
 	DEVCB_NULL  // write B
 };
+#endif
 
 static const struct bml3bus_interface bml3bus_intf =
 {

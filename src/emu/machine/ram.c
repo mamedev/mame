@@ -34,7 +34,6 @@ ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t 
 	: device_t(mconfig, RAM, "RAM", tag, owner, clock, "ram", __FILE__)
 {
 	m_size = 0;
-	m_pointer = NULL;
 	m_default_size = NULL;
 	m_extra_options = NULL;
 	m_default_value = 0xCD;
@@ -62,14 +61,11 @@ void ram_device::device_start()
 		m_size = default_size();
 
 	/* allocate space for the ram */
-	m_pointer = auto_alloc_array(machine(), UINT8, m_size);
-
-	/* reset ram to the default value */
-	memset(m_pointer, m_default_value, m_size);
+	m_pointer.resize_and_clear(m_size, m_default_value);
 
 	/* register for state saving */
 	save_item(NAME(m_size));
-	save_pointer(NAME(m_pointer), m_size);
+	save_item(NAME(m_pointer));
 }
 
 

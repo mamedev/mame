@@ -330,6 +330,7 @@ MACHINE_CONFIG_END
 
 
 
+#if 0
 static const gfx_layout pc1512_charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
@@ -346,6 +347,7 @@ static const gfx_layout pc1512_charlayout =
 static GFXDECODE_START( pc1512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc1512_charlayout, 3, 1 )
 GFXDECODE_END
+#endif
 
 static MACHINE_CONFIG_START( ppc512, amstrad_pc_state )
 	/* basic machine hardware */

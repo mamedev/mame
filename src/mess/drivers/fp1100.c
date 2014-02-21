@@ -299,6 +299,7 @@ void fp1100_state::machine_reset()
 	}
 }
 
+#if 0
 static const gfx_layout fp1100_chars_8x8 =
 {
 	8,8,
@@ -309,6 +310,7 @@ static const gfx_layout fp1100_chars_8x8 =
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
 };
+#endif
 
 static GFXDECODE_START( fp1100 )
 	//GFXDECODE_ENTRY( "chargen", 0x0000, fp1100_chars_8x8, 0, 1 )

@@ -120,10 +120,7 @@ void i2cmem_device::device_config_complete()
 
 void i2cmem_device::device_start()
 {
-	if( m_page_size > 0 )
-	{
-		m_page = auto_alloc_array( machine(), UINT8, m_page_size );
-	}
+	m_page.resize( m_page_size );
 
 	save_item( NAME(m_scl) );
 	save_item( NAME(m_sdaw) );
@@ -137,7 +134,7 @@ void i2cmem_device::device_start()
 	save_item( NAME(m_shift) );
 	save_item( NAME(m_devsel) );
 	save_item( NAME(m_byteaddr) );
-	save_pointer( NAME(m_page), m_page_size );
+	save_item( NAME(m_page) );
 }
 
 
@@ -205,7 +202,7 @@ void i2cmem_device::nvram_default()
 void i2cmem_device::nvram_read( emu_file &file )
 {
 	int i2cmem_bytes = m_data_size;
-	UINT8 *buffer = auto_alloc_array( machine(), UINT8, i2cmem_bytes );
+	dynamic_buffer buffer ( i2cmem_bytes );
 
 	file.read( buffer, i2cmem_bytes );
 
@@ -213,8 +210,6 @@ void i2cmem_device::nvram_read( emu_file &file )
 	{
 		m_addrspace[ 0 ]->write_byte( offs, buffer[ offs ] );
 	}
-
-	auto_free( machine(), buffer );
 }
 
 //-------------------------------------------------
@@ -225,7 +220,7 @@ void i2cmem_device::nvram_read( emu_file &file )
 void i2cmem_device::nvram_write( emu_file &file )
 {
 	int i2cmem_bytes = m_data_size;
-	UINT8 *buffer = auto_alloc_array( machine(), UINT8, i2cmem_bytes );
+	dynamic_buffer buffer ( i2cmem_bytes );
 
 	for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
 	{
@@ -233,8 +228,6 @@ void i2cmem_device::nvram_write( emu_file &file )
 	}
 
 	file.write( buffer, i2cmem_bytes );
-
-	auto_free( machine(), buffer );
 }
 
 

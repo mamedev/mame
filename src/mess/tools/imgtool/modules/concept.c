@@ -33,6 +33,7 @@ INLINE UINT16 get_UINT16xE(int little_endian, UINT16xE word)
 	return little_endian ? (word.bytes[0] | (word.bytes[1] << 8)) : ((word.bytes[0] << 8) | word.bytes[1]);
 }
 
+#if 0
 /*
     set_UINT16xE
 
@@ -56,6 +57,7 @@ INLINE void set_UINT16xE(int little_endian, UINT16xE *word, UINT16 data)
 		word->bytes[1] = data & 0xff;
 	}
 }
+#endif
 
 /*
     Disk structure:

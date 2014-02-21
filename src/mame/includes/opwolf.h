@@ -44,6 +44,8 @@ public:
 	int          m_opwolf_gun_yoffs;
 
 	/* c-chip */
+	emu_timer   *m_cchip_timer;
+
 	int          m_opwolf_region;
 
 	UINT8        m_current_bank;
