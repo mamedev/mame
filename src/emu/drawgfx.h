@@ -462,6 +462,8 @@ public:
 
 	gfx_element * gfx(int index) { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index]; }	
 	gfx_element ** gfx() { return m_gfx; }	
+	
+	palette_device * palette() { return m_palette; }	
 
 	void set_gfx(int index, gfx_element * val) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index] = val; }	
 protected:

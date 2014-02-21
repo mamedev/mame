@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( wheelrun_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE(0x30000, 0x3ffff) AM_ROM
 	AM_RANGE(0x70000, 0x7ffff) AM_ROM
 
-	AM_RANGE(0x52000, 0x521ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w   ) AM_SHARE( "paletteram"    )
+	AM_RANGE(0x52000, 0x521ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x53000, 0x53000) AM_READ_PORT( "53000" ) AM_WRITE(borntofi_nmi_enable_w )
 	AM_RANGE(0x53001, 0x53001) AM_READ_PORT( "53001" )

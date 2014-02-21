@@ -197,7 +197,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mjtensin_rtc_irq);
 	DECLARE_DRIVER_INIT(janptr96);
 	DECLARE_DRIVER_INIT(ippatsu);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(royalmah);
 	DECLARE_PALETTE_INIT(mjderngr);
 	UINT32 screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(suzume_irq);
@@ -3235,6 +3235,7 @@ static MACHINE_CONFIG_START( royalmah, royalmah_state )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 16*2)
+	MCFG_PALETTE_INIT_OWNER(royalmah_state,royalmah)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(256, 256)

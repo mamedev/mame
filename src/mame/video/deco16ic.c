@@ -512,7 +512,7 @@ void deco16ic_device::custom_tilemap_draw(
 
 			if ((flags & TILEMAP_DRAW_OPAQUE) || (p & trans_mask))
 			{
-				bitmap.pix(y, x) = m_palette->pen(p);
+				bitmap.pix(y, x) = m_gfxdecode->palette()->pen(p);
 				if (screen.priority().valid())
 				{
 					UINT8 *pri = &screen.priority().pix8(y);

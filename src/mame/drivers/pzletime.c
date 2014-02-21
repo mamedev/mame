@@ -64,7 +64,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pzletime);
 	UINT32 screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -340,6 +340,8 @@ static MACHINE_CONFIG_START( pzletime, pzletime_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",pzletime,"palette")
 	MCFG_PALETTE_ADD("palette", 0x300 + 32768)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_INIT_OWNER(pzletime_state, pzletime)
+	
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 
