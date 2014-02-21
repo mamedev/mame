@@ -71,7 +71,6 @@ private:
 	required_device<acia6850_device> m_acia;
 	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_term_data;
-	bool m_term_key;
 };
 
 
