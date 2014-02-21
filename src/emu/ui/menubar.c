@@ -731,15 +731,15 @@ rgb_t ui_menubar::adjust_color(rgb_t color)
 	switch(m_menubar_visibility)
 	{
 		case MENUBAR_VISIBILITY_INVISIBLE:
-			color = MAKE_ARGB(0, 0, 0, 0);
+			color = rgb_t(0, 0, 0, 0);
 			break;
 
 		case MENUBAR_VISIBILITY_TRANSLUCENT:
-			color = MAKE_ARGB(
-				RGB_ALPHA(color) / 4,
-				RGB_RED(color),
-				RGB_GREEN(color),
-				RGB_BLUE(color));
+			color = rgb_t(
+				color.a() / 4,
+				color.r(),
+				color.g(),
+				color.b());
 			break;
 		
 		case MENUBAR_VISIBILITY_VISIBLE:
