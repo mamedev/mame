@@ -714,9 +714,6 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 	// These are set every frame
 	m_cchip_ram[0x64] = 0;
 	m_cchip_ram[0x66] = 0;
-
-	// Pulse the timer
-	timer_set(attotime::from_hz(60), TIMER_CCHIP);
 }
 
 /*************************************
@@ -756,5 +753,6 @@ void opwolf_state::opwolf_cchip_init(  )
 	m_cchip_coins_for_credit[1] = 1;
 	m_cchip_credits_for_coin[1] = 1;
 
-	timer_set(attotime::from_hz(60), TIMER_CCHIP);
+	m_cchip_timer = timer_alloc(TIMER_CCHIP);
+	m_cchip_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
