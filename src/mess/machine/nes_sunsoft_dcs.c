@@ -37,8 +37,7 @@
 
 ntb_cart_interface::ntb_cart_interface(const machine_config &mconfig, device_t &device)
 					: device_slot_card_interface(mconfig, device),
-						m_rom(NULL),
-						m_rom_size(0)
+						m_rom(NULL)
 {
 }
 
@@ -89,17 +88,17 @@ bool nes_ntb_slot_device::call_load()
 
 		if (software_entry() == NULL)
 		{
-			if (length() != 0x8000)
+			if (length() != 0x4000)
 				return IMAGE_INIT_FAIL;
 
-			fread(&ROM, 0x8000);
+			fread(&ROM, 0x4000);
 		}
 		else
 		{
-			if (get_software_region_length("rom") != 0x8000)
+			if (get_software_region_length("rom") != 0x4000)
 				return IMAGE_INIT_FAIL;
 
-			memcpy(ROM, get_software_region("rom"), 0x8000);
+			memcpy(ROM, get_software_region("rom"), 0x4000);
 		}
 	}
 
@@ -125,7 +124,7 @@ const char * nes_ntb_slot_device::get_default_card_software(const machine_config
 //-----------------------------------------------
 
 ROM_START( ntb_rom )
-	ROM_REGION(0x8000, "ntbrom", ROMREGION_ERASEFF)
+	ROM_REGION(0x4000, "ntbrom", ROMREGION_ERASEFF)
 ROM_END
 
 const device_type NES_NTB_ROM = &device_creator<nes_ntb_rom_device>;

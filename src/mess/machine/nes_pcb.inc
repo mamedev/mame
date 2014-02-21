@@ -100,6 +100,7 @@ static const nes_pcb pcb_list[] =
 	{ "bf9093",           CAMERICA_BF9093 },
 	{ "bf9096",           CAMERICA_BF9096 },
 	{ "goldenfive",       CAMERICA_GOLDENFIVE },
+	{ "ade"   ,           CAMERICA_ALADDIN },
 	{ "cne_decathl",      CNE_DECATHLON },
 	{ "cne_fsb",          CNE_FSB },
 	{ "cne_shlz",         CNE_SHLZ },

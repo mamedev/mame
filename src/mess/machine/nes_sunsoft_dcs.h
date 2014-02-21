@@ -20,14 +20,13 @@ public:
 	virtual ~ntb_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read) { return m_rom[offset & (m_rom_size - 1)]; }
+	virtual DECLARE_READ8_MEMBER(read) { return m_rom[offset]; }
 
 	UINT8 *get_cart_base() { return m_rom; }
 
 protected:
 	// internal state
 	UINT8 *m_rom;
-	UINT32 m_rom_size;
 };
 
 // ======================> nes_ntb_slot_device

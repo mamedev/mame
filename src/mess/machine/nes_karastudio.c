@@ -53,8 +53,7 @@
 
 kstudio_cart_interface::kstudio_cart_interface(const machine_config &mconfig, device_t &device)
 					: device_slot_card_interface(mconfig, device),
-					m_rom(NULL),
-					m_rom_size(0)
+					m_rom(NULL)
 {
 }
 

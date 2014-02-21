@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="nes_ade" description="Nintendo Entertainment System - Aladdin Deck Enhancer cartridges">
+
+<!--
+
+TODO: Investigate European Codemasters Plug-Thru games (see e.g. Super Sports Challenge) which are still in the main nes.xml list
+
+-->
+
+	<software name="dizzyadv">
+		<description>Dizzy The Adventurer (USA)</description>
+		<year>1991</year>
+		<publisher>Camerica</publisher>
+		<info name="serial" value="ALG-DA"/>
+		<part name="cart" interface="ade_cart">
+			<feature name="slot" value="algn" />
+			<dataarea name="rom" size="131072">
+				<rom name="dizzy the adventurer daca7d.u1" size="131072" crc="db99d0cb" sha1="5a4ef3b2f5880d3b4609ae4f3381d688b3a02cac" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bignfo" supported="partial">
+		<description>Big Nose Freaks Out (USA)</description>
+		<year>1992</year>
+		<publisher>Camerica</publisher>
+		<info name="serial" value="ALG-BFO"/>
+		<part name="cart" interface="ade_cart">
+			<feature name="slot" value="algn" />
+			<dataarea name="rom" size="262144">
+				<rom name="icros7413bfo.u1" size="262144" crc="ccdcbfc6" sha1="00dfb78ac0e10f46bede9850636e2f3c6a305858" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fntdizzy">
+		<description>The Fantastic Adventures of Dizzy (USA)</description>
+		<year>1991</year>
+		<publisher>Camerica</publisher>
+		<info name="serial" value="ALG-DZ"/>
+		<part name="cart" interface="ade_cart">
+			<feature name="slot" value="algn" />
+			<dataarea name="rom" size="262144">
+				<rom name="fantastic adv of dizzy dz7a47.u1" size="262144" crc="f732c8fd" sha1="102bd0c46c5718c979eb1ac387dade6f6eb70ee4" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="linuscc">
+		<description>Linus Spacehead's Cosmic Crusade (USA)</description>
+		<year>1992</year>
+		<publisher>Camerica</publisher>
+		<info name="serial" value="ALG-LN"/>
+		<part name="cart" interface="ade_cart">
+			<feature name="slot" value="algn" />
+			<dataarea name="rom" size="262144">
+				<rom name="icros74151-ln.u1" size="262144" crc="9e379698" sha1="52621d0e0782cd94b588b50860a6de3da94f2e63" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micromac">
+		<description>Micro Machines (USA)</description>
+		<year>1992</year>
+		<publisher>Camerica</publisher>
+		<info name="serial" value="ALG-MM"/>
+		<part name="cart" interface="ade_cart">
+			<feature name="slot" value="algn" />
+			<dataarea name="rom" size="262144">
+				<rom name="micro machine mmd27f.u1" size="262144" crc="24ba12dd" sha1="c7fd43041fc139dc8440c95c28a0115dc79e2691" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quatradv">
+		<description>Quattro Adventure (USA)</description>
+		<year>1991</year>
+		<publisher>Camerica</publisher>
+		<info name="serial" value="ALG-QA"/>
+		<part name="cart" interface="ade_cart">
+			<feature name="slot" value="algq" />
+			<dataarea name="rom" size="262144">
+				<rom name="cobic 7406 qa.u1" size="262144" crc="b89888c9" sha1="06990c8573128e5548c5dcd39479fabf67234926" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quatrspt">
+		<description>Quattro Sports (USA)</description>
+		<year>1991</year>
+		<publisher>Camerica</publisher>
+		<info name="serial" value="ALG-QS"/>
+		<part name="cart" interface="ade_cart">
+			<feature name="slot" value="algq" />
+			<dataarea name="rom" size="262144">
+				<rom name="cobic 7408-qs.u1" size="262144" crc="cccaf368" sha1="29599ea4a52b88c06b80aa0bab987e6eb329e707" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -36,6 +36,7 @@
 #include "machine/nes_taito.h"
 // unlicensed/bootleg/pirate PCBs
 #include "machine/nes_act53.h"
+#include "machine/nes_aladdin.h"
 #include "machine/nes_ave.h"
 #include "machine/nes_benshieng.h"
 #include "machine/nes_camerica.h"

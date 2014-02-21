@@ -813,6 +813,7 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("bf9093",           NES_BF9093)
 	SLOT_INTERFACE_INTERNAL("bf9096",           NES_BF9096)
 	SLOT_INTERFACE_INTERNAL("goldenfive",       NES_GOLDEN5)
+	SLOT_INTERFACE_INTERNAL("ade",				NES_ALADDIN)
 	SLOT_INTERFACE_INTERNAL("cne_decathl",      NES_CNE_DECATHL)
 	SLOT_INTERFACE_INTERNAL("cne_fsb",          NES_CNE_FSB)
 	SLOT_INTERFACE_INTERNAL("cne_shlz",         NES_CNE_SHLZ)
@@ -1070,6 +1071,7 @@ static MACHINE_CONFIG_START( nes, nes_state )
 
 	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_crt_interface, nes_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "nes")
+	MCFG_SOFTWARE_LIST_ADD("ade_list", "nes_ade")         // Camerica/Codemasters Aladdin Deck Enhancer mini-carts
 	MCFG_SOFTWARE_LIST_ADD("ntb_list", "nes_ntbrom")      // Sunsoft Nantettate! Baseball mini-carts
 	MCFG_SOFTWARE_LIST_ADD("kstudio_list", "nes_kstudio") // Bandai Karaoke Studio expansion carts
 	MCFG_SOFTWARE_LIST_ADD("datach_list", "nes_datach")   // Bandai Datach Joint ROM System mini-carts
