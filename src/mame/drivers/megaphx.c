@@ -95,9 +95,6 @@ static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
 	AM_RANGE(0x040000, 0x040007) AM_READWRITE(tms_host_r, tms_host_w)
 
 	AM_RANGE(0x050002, 0x050003) AM_READ(megaphx_50002_r)
-//	AM_RANGE(0x050000, 0x050001) AM_DEVWRITE8("ramdac",ramdac_device,index_w,0x00ff)
-//	AM_RANGE(0x050002, 0x050003) AM_DEVREADWRITE8("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
-//	AM_RANGE(0x050006, 0x050007) AM_DEVWRITE8("ramdac",ramdac_device,index_r_w,0x00ff)
 
 	AM_RANGE(0x060004, 0x060005) AM_READ(megaphx_60004_r)
 	AM_RANGE(0x060006, 0x060007) AM_WRITENOP
@@ -110,10 +107,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megaphx_tms_map, AS_PROGRAM, 16, megaphx_state )
 
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM // vram?
-	AM_RANGE(0x00100000, 0x002fffff) AM_RAM AM_SHARE("vram") // vram?
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram") // vram?
+	AM_RANGE(0x00100000, 0x002fffff) AM_RAM  // vram?
 	AM_RANGE(0x00300000, 0x003fffff) AM_RAM
-	AM_RANGE(0x04000000, 0x040000ff) AM_WRITENOP
+//	AM_RANGE(0x04000000, 0x040000ff) AM_WRITENOP
+
+	AM_RANGE(0x04000000, 0x0400000f) AM_DEVWRITE8("ramdac",ramdac_device,index_w,0x00ff)
+	AM_RANGE(0x04000010, 0x0400001f) AM_DEVREADWRITE8("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
+	AM_RANGE(0x04000030, 0x0400003f) AM_DEVWRITE8("ramdac",ramdac_device,index_r_w,0x00ff)
+
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
@@ -176,8 +178,8 @@ static const tms34010_config tms_config_megaphx =
 {
 	TRUE,                          /* halt on reset */
 	"screen",                       /* the screen operated on */
-	XTAL_40MHz/6,                   /* pixel clock */
-	1,                              /* pixels per clock */
+	XTAL_40MHz/12,                   /* pixel clock */
+	2,                              /* pixels per clock */
 	NULL,                           /* scanline callback (indexed16) */
 	megaphx_scanline,              /* scanline callback (rgb32) */
 	m68k_gen_int,                   /* generate interrupt */
@@ -221,7 +223,7 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 //	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/6, 424, 0, 320, 262, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/12, 424, 0, 320, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
 	MCFG_PALETTE_LENGTH(256)
