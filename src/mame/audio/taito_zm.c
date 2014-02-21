@@ -70,6 +70,8 @@ void taito_zoom_device::device_start()
 void taito_zoom_device::device_reset()
 {
 	m_reg_address = 0;
+	
+	m_zsg2->reset();
 }
 
 

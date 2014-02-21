@@ -429,6 +429,8 @@ WRITE8_MEMBER(taitogn_state::control_w)
 		if (~data & m_control & 0x10)
 		{
 			logerror("control_w Zoom reset\n");
+			
+			m_zoom->reset();
 
 			// assume that this also readys the sound flash chips
 			m_pgmflash->write(0, 0xff);
