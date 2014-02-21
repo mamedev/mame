@@ -212,12 +212,7 @@ UINT32 gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_ind1
 }
 
 /* This is called whenever the T0 pin switches state */
-int gamepock_io_callback( device_t *device, int ioline, int state )
+WRITE_LINE_MEMBER(gamepock_state::gamepock_to_w)
 {
-	gamepock_state *driver_state = device->machine().driver_data<gamepock_state>();
-	if ( ioline == UPD7810_TO )
-	{
-		driver_state->m_speaker->level_w(state & 1);
-	}
-	return 0;
+	m_speaker->level_w(state & 1);
 }

@@ -36,11 +36,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gamepock_cart);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	DECLARE_WRITE_LINE_MEMBER(gamepock_to_w);
+
 };
-
-
-/*----------- defined in machine/gamepock.c -----------*/
-
-int gamepock_io_callback( device_t *device, int ioline, int state );
 
 #endif

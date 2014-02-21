@@ -265,24 +265,15 @@ WRITE_LINE_MEMBER(metro_state::ymf278b_interrupt)
 
 ***************************************************************************/
 
-static int metro_io_callback( device_t *device, int ioline, int state )
+READ_LINE_MEMBER(metro_state::metro_rxd_r)
 {
-	metro_state *driver_state = device->machine().driver_data<metro_state>();
-	address_space &space = driver_state->m_maincpu->space(AS_PROGRAM);
-	UINT8 data = 0;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	UINT8 data = soundlatch_byte_r(space, 0);
 
-	switch (ioline)
-	{
-		case UPD7810_RXD:   /* read the RxD line */
-			data = driver_state->soundlatch_byte_r(space, 0);
-			state = data & 1;
-			driver_state->soundlatch_byte_w(space, 0, data >> 1);
-			break;
-		default:
-			logerror("upd7810 ioline %d not handled\n", ioline);
-	}
+	soundlatch_byte_w(space, 0, data >> 1);
 
-	return state;
+	return data & 1;
+
 }
 
 WRITE16_MEMBER(metro_state::metro_soundlatch_w)
@@ -3559,12 +3550,6 @@ MACHINE_RESET_MEMBER(metro_state,metro)
 }
 
 
-static const UPD7810_CONFIG metro_cpu_config =
-{
-	TYPE_7810,
-	metro_io_callback
-};
-
 static MACHINE_CONFIG_START( balcube, metro_state )
 
 	/* basic machine hardware */
@@ -3738,7 +3723,7 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
-	MCFG_CPU_CONFIG(metro_cpu_config)
+	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
 
@@ -3780,7 +3765,7 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_CPU_CONFIG(metro_cpu_config)
+	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
@@ -3821,7 +3806,7 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_CPU_CONFIG(metro_cpu_config)
+	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
@@ -3862,7 +3847,7 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_CPU_CONFIG(metro_cpu_config)
+	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
@@ -3903,7 +3888,7 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_CPU_CONFIG(metro_cpu_config)
+	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
@@ -3943,7 +3928,7 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_CPU_CONFIG(metro_cpu_config)
+	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
@@ -4125,7 +4110,7 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_CPU_CONFIG(metro_cpu_config)
+	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
@@ -4166,7 +4151,7 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_CPU_CONFIG(metro_cpu_config)
+	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
@@ -4207,7 +4192,7 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)     /* Not confiremd */
-	MCFG_CPU_CONFIG(metro_cpu_config)
+	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
 
@@ -4249,7 +4234,7 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_CPU_CONFIG(metro_cpu_config)
+	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 
@@ -4290,7 +4275,7 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_CPU_CONFIG(metro_cpu_config)
+	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(metro_sound_io_map)
 

@@ -431,19 +431,6 @@ INPUT_PORTS_END
 
 
 /******************************************************************************
- CPU config
-******************************************************************************/
-
-
-static const UPD7810_CONFIG ex800_cpu_config =
-{
-	TYPE_7810,
-	0
-};
-
-
-
-/******************************************************************************
  Machine Drivers
 ******************************************************************************/
 
@@ -451,7 +438,6 @@ static const UPD7810_CONFIG ex800_cpu_config =
 static MACHINE_CONFIG_START( ex800, ex800_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", UPD7810, 12000000)  /* 12 MHz? */
-	MCFG_CPU_CONFIG(ex800_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(ex800_mem)
 	MCFG_CPU_IO_MAP(ex800_io)
 
