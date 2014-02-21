@@ -24,7 +24,7 @@
 #define OVERLAY_CURSOR_BLINK        BIT(m_roll_overlay[0], 12)
 #define OVERLAY_CHARACTER_BLINK     BIT(m_roll_overlay[0], 11)
 
-static const rgb_t PALETTE[] =
+static const rgb_t PALETTE_CGC[] =
 {
 	rgb_t::black,
 	rgb_t(0x00, 0x00, 0xff),
@@ -152,18 +152,18 @@ void cgc7900_state::draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap)
 				{
 					if (!OVERLAY_CURSOR_BLINK || m_blink)
 					{
-						bitmap.pix32(y, (sx * 8) + x) = PALETTE[7];
+						bitmap.pix32(y, (sx * 8) + x) = PALETTE_CGC[7];
 					}
 				}
 				else
 				{
 					if (BIT(data, x) && (!OVERLAY_CHARACTER_BLINK || m_blink))
 					{
-						if (OVERLAY_VF) bitmap.pix32(y, (sx * 8) + x) = PALETTE[fg];
+						if (OVERLAY_VF) bitmap.pix32(y, (sx * 8) + x) = PALETTE_CGC[fg];
 					}
 					else
 					{
-						if (OVERLAY_VB) bitmap.pix32(y, (sx * 8) + x) = PALETTE[bg];
+						if (OVERLAY_VB) bitmap.pix32(y, (sx * 8) + x) = PALETTE_CGC[bg];
 					}
 				}
 			}

@@ -287,7 +287,7 @@ static const rgb_t unior_palette[3] =
 
 PALETTE_INIT_MEMBER(unior_state,unior)
 {
-	palette_set_colors(machine(), 0, unior_palette, ARRAY_LENGTH(unior_palette));
+	palette.set_pen_colors(0, unior_palette, ARRAY_LENGTH(unior_palette));
 }
 
 
@@ -457,7 +457,7 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode",unior,"palette")
 	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OVERRIDE(unior_state,unior)
+	MCFG_PALETTE_INIT_OWNER(unior_state,unior)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

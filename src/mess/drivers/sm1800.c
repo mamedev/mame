@@ -41,7 +41,7 @@ public:
 	DECLARE_READ8_MEMBER(sm1800_8255_portc_r);
 	UINT8 m_irq_state;
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(sm1800);
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);
 };
@@ -185,9 +185,9 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(sm1800_state, sm1800)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",sm1800,"palette")
-	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_GFXDECODE_ADD("gfxdecode",sm1800,"palette")	
 
 	/* Devices */
 	MCFG_I8255_ADD ("i8255", sm1800_ppi8255_interface )

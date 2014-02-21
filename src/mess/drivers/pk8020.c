@@ -218,6 +218,7 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",pk8020,"palette")
 	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(pk8020_state, pk8020)
 
 
 	MCFG_I8255_ADD( "ppi8255_1", pk8020_ppi8255_interface_1 )

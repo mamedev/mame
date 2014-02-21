@@ -315,6 +315,7 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	// video
 	MCFG_HD66421_ADD("hd66421")
 	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(cybiko_state, cybiko)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	// sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")

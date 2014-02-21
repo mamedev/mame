@@ -31,7 +31,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lviv_io_w);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(lviv);
 	UINT32 screen_update_lviv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(lviv_ppi_0_porta_r);
 	DECLARE_READ8_MEMBER(lviv_ppi_0_portb_r);

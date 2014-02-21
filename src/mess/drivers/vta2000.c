@@ -34,10 +34,10 @@ public:
 	const UINT8 *m_p_chargen;
 	UINT32 screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<UINT8> m_p_videoram;
+	DECLARE_PALETTE_INIT(vta2000);
 private:
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -171,6 +171,7 @@ static MACHINE_CONFIG_START( vta2000, vta2000_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*12-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vta2000_state, screen_update_vta2000)
 	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(vta2000_state, vta2000)
 	MCFG_GFXDECODE_ADD("gfxdecode",vta2000,"palette")
 MACHINE_CONFIG_END
 

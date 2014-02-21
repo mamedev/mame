@@ -88,7 +88,7 @@ public:
 	DECLARE_DRIVER_INIT(cybiko);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(cybiko);
 	void machine_stop_cybiko();
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cybiko );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cybikoxt );
