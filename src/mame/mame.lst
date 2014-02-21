@@ -3756,7 +3756,7 @@ aquarush        // 2000.02 Aqua Rush (AQ1/VER.A1, Japan)
 golgo13         // 2000.03 Golgo 13 (GLG1/VER.A, Japan)
 sws2000         // 2000.03 Super World Stadium 2000 (SS01/VER.A, Japan)
 truckk          // 2000.06 Truck Kyousoukyoku (Metro)
-				// 2000.07 Kart Duel
+kartduel		// 2000.07 Kart Duel
 				// 2000.08 Teknowerk
 g13knd          // 2000.10 Golgo 13 Kiseki no Dandou (GLS1/VER.A, Japan)
 sws2001         // 2001.04 Super World Stadium 2001 (SS11/VER.A, Japan)
@@ -5898,8 +5898,9 @@ dragngunj       // MAR (c) 1992 Data East Corporation (Japan)
 wizdfire        // MAS (c) 1992 Data East Corporation (Over Sea)
 wizdfireu       // MAS (c) 1992 Data East Corporation (US)
 darkseal2       // MAS (c) 1992 Data East Corporation (Japan)
-funkyjet        // MAT (c) 1992 Mitchell
-funkyjetj       // MAT (c) 1992 Mitchell
+funkyjet        // MAT (c) 1992 Data East (Mitchell license) (World, Rev 1)
+funkyjeta       // MAT (c) 1992 Data East (Mitchell license) (World) - Rev unverified
+funkyjetj       // MAT (c) 1992 Data East (Mitchell license) (Japan, Rev 2)
 				// MAU ??
 nitrobal        // MAV (c) 1992 Data East Corporation (US)
 gunball         // MAV (c) 1992 Data East Corporation (Japan)

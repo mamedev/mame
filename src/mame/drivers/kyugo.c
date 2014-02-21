@@ -500,7 +500,6 @@ void kyugo_state::machine_start()
 	save_item(NAME(m_scroll_y));
 	save_item(NAME(m_bgpalbank));
 	save_item(NAME(m_fgcolor));
-	save_item(NAME(m_flipscreen));
 }
 
 void kyugo_state::machine_reset()
@@ -515,7 +514,6 @@ void kyugo_state::machine_reset()
 	m_scroll_y = 0;
 	m_bgpalbank = 0;
 	m_fgcolor = 0;
-	m_flipscreen = 0;
 }
 
 INTERRUPT_GEN_MEMBER(kyugo_state::vblank_irq)

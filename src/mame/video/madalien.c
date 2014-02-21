@@ -136,18 +136,12 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 
 	m_tilemap_fg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_tilemap_fg->set_transparent_pen(0);
-	m_tilemap_fg->set_scrolldx(0, 0x50);
-	m_tilemap_fg->set_scrolldy(0, 0x20);
 
 	for (i = 0; i < 4; i++)
 	{
 		m_tilemap_edge1[i] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
-		m_tilemap_edge1[i]->set_scrolldx(0, 0x50);
-		m_tilemap_edge1[i]->set_scrolldy(0, 0x20);
 
 		m_tilemap_edge2[i] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
-		m_tilemap_edge2[i]->set_scrolldx(0, 0x50);
-		m_tilemap_edge2[i]->set_scrolldy(0, m_screen->height() - 256);
 	}
 
 	m_headlight_bitmap = auto_bitmap_ind16_alloc(machine(), 128, 128);

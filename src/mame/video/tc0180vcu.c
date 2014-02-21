@@ -66,10 +66,6 @@ void tc0180vcu_device::device_start()
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
 
-	m_tilemap[0]->set_scrolldx(0, 24 * 8);
-	m_tilemap[1]->set_scrolldx(0, 24 * 8);
-	m_tilemap[2]->set_scrolldx(0, 24 * 8);
-
 	m_ram = auto_alloc_array_clear(machine(), UINT16, TC0180VCU_RAM_SIZE / 2);
 	m_scrollram = auto_alloc_array_clear(machine(), UINT16, TC0180VCU_SCROLLRAM_SIZE / 2);
 

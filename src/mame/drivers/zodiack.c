@@ -547,14 +547,12 @@ void zodiack_state::machine_start()
 {
 	save_item(NAME(m_sound_nmi_enabled));
 	save_item(NAME(m_main_nmi_enabled));
-	save_item(NAME(m_flipscreen));
 }
 
 void zodiack_state::machine_reset()
 {
 	m_sound_nmi_enabled = 0;
 	m_main_nmi_enabled = 0;
-	m_flipscreen = 0;
 }
 
 

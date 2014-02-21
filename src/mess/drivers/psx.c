@@ -585,8 +585,11 @@ ROM_START( psj )
 	ROM_SYSTEM_BIOS( 6, "4.0j", "SCPH-7000/SCPH-7500/SCPH-9000 (Version 4.0 08/18/97 J)" ) // 29051997
 	ROMX_LOAD( "ps-40j.bin",    0x0000000, 0x080000, CRC(ec541cd0) SHA1(77b10118d21ac7ffa9b35f9c4fd814da240eb3e9), ROM_BIOS(7) )
 
-	ROM_SYSTEM_BIOS( 7, "4.3j", "SCPH-100 (Version 4.3 03/11/00 J)" ) // 04121995
-	ROMX_LOAD( "psone-43j.bin", 0x0000000, 0x080000, CRC(f2af798b) SHA1(339a48f4fcf63e10b5b867b8c93cfd40945faf6c), ROM_BIOS(8) )
+	ROM_SYSTEM_BIOS( 7, "4.1a", "SCPH-7000W (Version 4.1 11/14/97 A)" ) // 04121995
+	ROMX_LOAD( "ps-41a(w).bin", 0x0000000, 0x080000, CRC(b7c43dad) SHA1(1b0dbdb23da9dc0776aac58d0755dc80fea20975), ROM_BIOS(8) )
+
+	ROM_SYSTEM_BIOS( 8, "4.3j", "SCPH-100 (Version 4.3 03/11/00 J)" ) // 04121995
+	ROMX_LOAD( "psone-43j.bin", 0x0000000, 0x080000, CRC(f2af798b) SHA1(339a48f4fcf63e10b5b867b8c93cfd40945faf6c), ROM_BIOS(9) )
 ROM_END
 
 ROM_START( psu )
@@ -663,7 +666,7 @@ SCPH-103
 Holes in version numbers:
 
 Version 2.0 J
-Version 4.1 J
+Version 4.1 J (SCPH7000W uses 4.1 A)
 Version 4.2 J
 Version 4.4 J
 Version 4.5 J
