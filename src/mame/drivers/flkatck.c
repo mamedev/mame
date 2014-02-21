@@ -282,7 +282,29 @@ ROM_START( flkatck )
 	ROM_LOAD( "mask2m.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) )
 ROM_END
 
+// identical to flkatck except for the board / ROM type configuration
+ROM_START( flkatcka )
+	ROM_REGION( 0x18000, "maincpu", 0 )     /* 6309 code */
+	ROM_LOAD( "669_p01.16c", 0x010000, 0x006000, CRC(c5cd2807) SHA1(22ddd911a23954ff2d52552e07323f5f0ddaeead) ) /* banked ROM */
+	ROM_CONTINUE(            0x006000, 0x00a000 )           /* fixed ROM */
 
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* 64k for the SOUND CPU */
+	ROM_LOAD( "669_m02.16b", 0x000000, 0x008000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 ) /* tiles + sprites */ // same data as above set, on PWB 450593 sub-board instead.
+	ROM_LOAD16_BYTE( "669_f03a.4b",   0x000001, 0x010000, CRC(f0ed4c1e) SHA1(58efe3cd81054d22de54a7d195aa3b865bde4a01) ) 
+	ROM_LOAD16_BYTE( "669_f03e.4d",   0x000000, 0x010000, CRC(95a57a26) SHA1(c8aa30c2c734c0740630b1b04ae43c69931cc7c1) ) 
+	ROM_LOAD16_BYTE( "669_f03b.5b",   0x020001, 0x010000, CRC(e2593f3c) SHA1(aa0f6d04015650eaef17c4a39f228eaccf9a2948) ) 
+	ROM_LOAD16_BYTE( "669_f03f.5d",   0x020000, 0x010000, CRC(c6c9903e) SHA1(432ad6d03992499cc533273226944a666b40fa58) ) 
+	ROM_LOAD16_BYTE( "669_f03c.6b",   0x040001, 0x010000, CRC(47be92dd) SHA1(9ccc62d7d42fccbd5ad60e35e3a0478a04405cf1) ) 
+	ROM_LOAD16_BYTE( "669_f03g.6d",   0x040000, 0x010000, CRC(70d35fbd) SHA1(21384f738684c5da4a7a84a1c9aa173fffddf47a) ) 
+	ROM_LOAD16_BYTE( "669_f03d.7b",   0x060001, 0x010000, CRC(18d48f9e) SHA1(b95e38aa813e0f3a0dc6bd45fdb4bf71f7e2066c) ) 
+	ROM_LOAD16_BYTE( "669_f03h.7d",   0x060000, 0x010000, CRC(abfe76e7) SHA1(f8661f189308e83056ec442fa6c936efff67ba0a) ) 
+
+	ROM_REGION( 0x040000, "k007232", 0 ) /* 007232 data (chip 1) */
+	ROM_LOAD( "mask2m.11a",  0x000000, 0x040000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) )
+ROM_END
 
 GAME( 1987, mx5000,  0,      flkatck, flkatck, driver_device, 0, ROT90, "Konami", "MX5000", GAME_SUPPORTS_SAVE )
 GAME( 1987, flkatck, mx5000, flkatck, flkatck, driver_device, 0, ROT90, "Konami", "Flak Attack (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, flkatcka,mx5000, flkatck, flkatck, driver_device, 0, ROT90, "Konami", "Flak Attack (Japan, PWB 450593 sub-board)", GAME_SUPPORTS_SAVE )

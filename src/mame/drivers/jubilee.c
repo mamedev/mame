@@ -1,4 +1,4 @@
-/******************************************************************************
+/****************************************************************************************
 
   Jubilee Double-Up Poker
   -----------------------
@@ -11,40 +11,71 @@
   * Double-Up Poker,  198?,  Jubilee.
 
 
-*******************************************************************************
-
+*****************************************************************************************
 
   Hardware Notes:
   ---------------
 
-  1x TMS9980
-  1x M6845
+  PCB etched:
 
-  Unknown Xtal
+  HERBER LTD
+  Jubilee Sales Pty Ltd.
+  BD No V63-261 ISS1.
+
+  1x TMS9980 CPU
+  1x MC6845P CRTC
+  
+  1x TC5517AP-2 (2048 words x 8 bits Asynchronous CMOS Static RAM)
+  1x 2114       (1024 words x 4 bits RAM)
+
+  3x 2732 labelled 1, 2 and 3.
+  3x 2764 labelled Red Blue and Green.
+
+  1x 6.0 MHz crystal.
 
 
-*******************************************************************************
+  From some forums...
+  
+  The memory chips on board are the toshiba TC5517ap powered via the Lithium cell and
+  the 2114 find the 74148 or 74ls148, all 9980 cpu's use one, pin3 will generate a reset.
+  The 5517 ram is compatible with 6116 or 2018.
 
+  The 9980 has 3 interupt inputs, but they are binary.
+  The ls148 encodes the interupts to the cpu - the highest interupt is reset.
+
+  I tried pulling pin 3 of the 74ls148 low and yes, this sets up the reset interupt
+  on pins 23, 24 and 25. The TC5517 checks out ok as a 6116.
+
+  The crystal seems ok and this clock makes it throught to pin 34 of the MPU.
+  I was expecting that PHASE 03 - pin 22, should be clocking, but it simply sits at 5v.
+
+*****************************************************************************************
 
   *** Game Notes ***
 
   Nothing, yet...
 
 
-*******************************************************************************
+*****************************************************************************************
 
   --------------------
   ***  Memory Map  ***
   --------------------
 
-  0x0000 - 0x2FFF    ; ROM space.
-  0x???? - 0x????    ; Video RAM.
+  0000-2FFF    ; ROM space.
+  3000-33FF    ; Video RAM.
+  3400-37FF    ; Working RAM.
+  3800-3BFF    ; Color (ATTR) RAM.
+  3E00-3E03    ; CRTC Controller.
 
+  CRU...
 
-*******************************************************************************
+  0080-0080    ; ??? Read.
+  00C8-00C8    ; Multiplexed Input Port
+  0CC0-0CC6    ; Input Port mux selector?
+
 
   TMS9980A memory map:
-
 
   0000-0003 ---> Reset
   0004-0007 ---> Level 1
@@ -55,11 +86,23 @@
   3FFC-3FFF ---> Load
 
 
-*******************************************************************************
-
+*****************************************************************************************
 
   DRIVER UPDATES:
 
+
+  [2014-02-17]
+
+  - Corrected the crystal value and derivate clocks via #DEFINE.
+  - Improved memory map.
+  - Hooked the CRT controller, but the init sequence seems incomplete.
+  - Created the accurate graphics banks.
+  - Found and mapped the video RAM.
+  - Hooked the ATTR RAM.
+  - Assigned the correct graphics banks to the proper drawn tiles.
+  - Find and mapped an input port.
+  - Started a preliminary workaround to demux the input port.
+  - Added technical notes.
 
   [2010-09-05]
 
@@ -73,16 +116,18 @@
 
   TODO:
 
-  - Improve the memory map.
-  - Find the correct video RAM offset.
-  - Hook the CRT controller.
+  - Improve the CRU map.
+  - Where is Coin In? Interrupts issue?
+  - Confirm the CRT controller offset.
   - Sound.
   - Check clocks on a PCB (if someday appear!)
 
 
-*******************************************************************************/
+****************************************************************************************/
 
-#define MASTER_CLOCK    XTAL_8MHz   /* guess */
+#define MASTER_CLOCK    XTAL_6MHz              /* confirmed */
+#define CPU_CLOCK      (MASTER_CLOCK / 2)      /* guess */
+#define CRTC_CLOCK     (MASTER_CLOCK / 4)      /* guess */
 
 #include "emu.h"
 #include "cpu/tms9900/tms9980a.h"
@@ -95,13 +140,19 @@ public:
 	jubilee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu") { }
 
+	UINT8 mux_sel;
+	
 	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
+	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(unk_w);
+	DECLARE_READ8_MEMBER(mux_port_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
@@ -115,21 +166,33 @@ public:
 *     Video Hardware     *
 *************************/
 
-
 WRITE8_MEMBER(jubilee_state::jubileep_videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
+WRITE8_MEMBER(jubilee_state::jubileep_colorram_w)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
 
 TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
 {
+/*  - bits -
+    7654 3210
+    ---- --xx   bank select.
+    xxxx xx--   seems unused.
+*/
+	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
+	int bank = (attr & 0x03);
+	int color = 0;						/* fixed colors: one rom for each R, G and B. */
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode,  0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
 }
-
 
 
 void jubilee_state::video_start()
@@ -167,17 +230,28 @@ INTERRUPT_GEN_MEMBER(jubilee_state::jubileep_interrupt)
 static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x30ff) AM_WRITE(jubileep_videoram_w) AM_SHARE("videoram") /* wrong... just placed somewhere */
-	AM_RANGE(0x3100, 0x3fff) AM_RAM
+	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_WRITE(jubileep_videoram_w) AM_SHARE("videoram")		/* First half of TC5517AP RAM */
+	AM_RANGE(0x3400, 0x37ff) AM_RAM															/* Second half of TC5517AP RAM */
+	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_WRITE(jubileep_colorram_w) AM_SHARE("colorram")      /* Whole 2114 RAM (attr for gfx banks 00-03) */
+
+/*	CRTC seems to be mapped here. Read 00-01 and then write on them.
+    Then does the same for 02-03. Initialization is incomplete since
+    set till register 0x0D.
+*/
+	AM_RANGE(0x3e00, 0x3e01) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)	// Incomplete... Till reg 0x0D
+	AM_RANGE(0x3e02, 0x3e03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)	// Incomplete... Till reg 0x0D
+
+/* CRTC address: $3E01; register: $3E03
+   CRTC registers: 2f 20 25 64 26 00 20 23 00 07 00 00 00
+   screen total: (0x2f+1)*8 (0x26+1)*8  ---> 384 x 312
+   visible area: 0x20 0x20  ---------------> 256 x 256
+*/
 ADDRESS_MAP_END
 
 /*
-
-  WRAM = 3400-37ff
-  VRAM = 3800-3bff?
-
-  RAM = 3c00-3fff
-
+  Video RAM =   3000-33FF
+  Working RAM = 3400-37ff
+  Color RAM =   3800-3bff (lower 4-bits)
 */
 
 /*
@@ -188,9 +262,9 @@ ADDRESS_MAP_END
 */
 READ8_MEMBER(jubilee_state::unk_r)
 {
-//  return (machine().rand() & 0xff);
+  return (machine().rand() & 0xff);
 	logerror("CRU read from address %04x\n", offset<<4);
-	return 0;
+//	return 0;
 }
 
 WRITE8_MEMBER(jubilee_state::unk_w)
@@ -207,23 +281,80 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		m_maincpu->set_input_line(INT_9980A_LEVEL1, CLEAR_LINE);
 	}
+
+	// Inputs Multiplexion...
+
+	if (((offset<<1)==0x0cc0)&&(data==1))
+	{
+		mux_sel = 1;
+	}
+
+	if (((offset<<1)==0x0cc2)&&(data==1))
+	{
+		mux_sel = 2;
+	}
+
+	if (((offset<<1)==0x0cc4)&&(data==1))
+	{
+		mux_sel = 3;
+	}
+
+	if (((offset<<1)==0x0cc6)&&(data==1))
+	{
+		mux_sel = 4;
+	}
+
+	if (((offset<<1)==0x0ccc)&&(data==1))
+	{
+		mux_sel = 5;
+	}
+
+	// suspicious... just for testing
+	if (((offset<<1)==0x0ce0)&&(data==1))
+	{
+		mux_sel = 1;
+	}
+	if (((offset<<1)==0x0ce2)&&(data==1))
+	{
+		mux_sel = 5;
+	}
+	if (((offset<<1)==0x0ce6)&&(data==1))
+	{
+		mux_sel = 1;
+	}
 }
 
+READ8_MEMBER(jubilee_state::mux_port_r)
+{
+	switch( mux_sel )
+	{
+		case 0x01: return ioport("IN0")->read();
+		case 0x02: return ioport("IN1")->read();
+		case 0x03: return ioport("IN2")->read();
+		case 0x04: return ioport("IN3")->read();
+		case 0x05: return ioport("IN4")->read();
+	//	case 0x00: return ioport("DSW0")->read();
+	}
+	return 0xff;
+}
+
+
 static ADDRESS_MAP_START( jubileep_cru_map, AS_IO, 8, jubilee_state )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(unk_r)
+//	AM_RANGE(0x0000, 0x01ff) AM_READ(unk_r)
+//	AM_RANGE(0x0080, 0x0080) AM_READ(unk_r)
+//	AM_RANGE(0x00c8, 0x00c8) AM_READ(unk_r)		// use to see the game stuff (even cards)
+//	AM_RANGE(0x00c8, 0x00c8) AM_READ_PORT("IN0")	// D0 needs to be triggered constantly to advance.
+	AM_RANGE(0x00c8, 0x00c8) AM_READ(mux_port_r)	// Multiplexed inputs?
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(unk_w)
-//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-//  AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-//  AM_RANGE(0xc8, 0xc8) AM_READ(unk_r)
 ADDRESS_MAP_END
 
 /* I/O byte R/W
 
+   0x080  R    ; Input port? polled at begining.
+   0x0C8  R    ; Input port. If you tie it to a rnd value, you can see the game running at some point.
 
-   -----------------
-
-   unknown writes:
-
+   Can't see more inputs. Maybe there is a multiplexion with these possible writes:
+   0CC0/0CC2/0CC4/0CC6
 
 */
 
@@ -233,54 +364,54 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( jubileep )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")		// bet
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN2-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN2-3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")		// attandant (to pass the memory error)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")		// service / bookeeping
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")		// deal
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
 
 	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -395,7 +526,7 @@ INPUT_PORTS_END
 static const gfx_layout tilelayout =
 {
 	8, 8,
-	RGN_FRAC(1,3),
+	0x100,
 	3,
 	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -408,8 +539,11 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( jubileep )
+static GFXDECODE_START( jubileep )		/* 4 different graphics banks */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x0800, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x1800, tilelayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -448,7 +582,7 @@ static TMS9980A_CONFIG( cpuconf )
 static MACHINE_CONFIG_START( jubileep, jubilee_state )
 
 	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MASTER_CLOCK/2, jubileep_map, jubileep_cru_map, cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, CPU_CLOCK, jubileep_map, jubileep_cru_map, cpuconf)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
 
 	/* video hardware */
@@ -463,8 +597,7 @@ static MACHINE_CONFIG_START( jubileep, jubilee_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4, mc6845_intf) /* guess */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
 MACHINE_CONFIG_END
 
@@ -490,5 +623,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME          PARENT  MACHINE   INPUT     INIT  ROT    COMPANY    FULLNAME                  FLAGS */
-GAME( 198?, jubileep,     0,      jubileep, jubileep, driver_device, 0,    ROT0, "Jubilee", "Jubilee Double-Up Poker", GAME_NO_SOUND | GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY    FULLNAME                  FLAGS */
+GAME( 198?, jubileep, 0,      jubileep, jubileep, driver_device, 0,    ROT0, "Jubilee", "Jubilee Double-Up Poker", GAME_NO_SOUND | GAME_NOT_WORKING )

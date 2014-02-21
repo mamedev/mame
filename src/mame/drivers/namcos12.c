@@ -30,11 +30,13 @@ Ehrgeiz (EG2/VER.A)                      (C) Square/Namco, 1998  COH-700     SYS
 Ehrgeiz (EG3/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
 Fighting Layer (FTL0/VER.A)              (C) Arika/Namco,  1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC037
 Ghoul Panic (OB2/VER.A)                  (C) Namco/Raizing,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC045
+Oh! Bakyuuun (OB1/VER.A)                 (C) Namco/Raizing,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC045
 Golgo 13 (GLG1/VER.A)                    (C) Raizing/Namco,1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC054
 Golgo 13 Kiseki no Dandou (GLS1/VER.A)   (C) Raizing/Namco,2000  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC059
 Kaiun Quiz (KW1/VER.A1)                  (C) Namco/Moss,   1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M10X64  KC050
 Libero Grande (LG1/VER.A)                (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC014
 Libero Grande (LG2/VER.A)                (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC014
+Mr Driller (DRI3/VER.A2)                 (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F2F   KC048
 Mr Driller (DRI1/VER.A2)                 (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F2F   KC048
 Paca Paca Passion (PPP1/VER.A2)          (C) Produce/Namco,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC038
 Paca Paca Passion Special (PSP1/VER.A)   (C) Produce/Namco,1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M5F2    KC052
@@ -73,9 +75,6 @@ http://www.bandainamcogames.co.jp/am/vg/questforfame/
 
 Kart Duel                               (C) Namco,        2000
 http://www.bandainamcogames.co.jp/am/english/aa/kartduel/
-
-Oh Bakyuuun                             (C) Namco/Raizing,1999
-http://www.8ing.net/prd/ohbakyun/index.html
 
 Soul Calibur Ver.B                      (C) Namco,        199?
 Probably doesn't exist
@@ -1406,6 +1405,7 @@ MACHINE_RESET_MEMBER(namcos12_state,namcos12)
 		strcmp( machine().system().name, "golgo13" ) == 0 ||
 		strcmp( machine().system().name, "g13knd" ) == 0 ||
 		strcmp( machine().system().name, "mrdrillr" ) == 0 ||
+		strcmp( machine().system().name, "mrdrillrj" ) == 0 ||
 		strcmp( machine().system().name, "pacapp" ) == 0 ||
 		strcmp( machine().system().name, "pacappsp" ) == 0 ||
 		strcmp( machine().system().name, "pacapp2" ) == 0 ||
@@ -1416,6 +1416,7 @@ MACHINE_RESET_MEMBER(namcos12_state,namcos12)
 		strcmp( machine().system().name, "sws2000" ) == 0 ||
 		strcmp( machine().system().name, "sws2001" ) == 0 ||
 		strcmp( machine().system().name, "truckk" ) == 0 ||
+		strcmp( machine().system().name, "ohbakyuun" ) == 0 ||
 		strcmp( machine().system().name, "ghlpanic" ) == 0 )
 	{
 		/* HACK: this is based on guesswork, it might not even be keycus. */
@@ -1938,7 +1939,23 @@ ROM_START( ghlpanic )
 	ROM_LOAD16_BYTE( "ob1rom0u.ic11",  0x0000001, 0x400000, CRC(0625db92) SHA1(b63be6e41b2c6e2194f02f0c31da1f30c4e08232) )
 
 	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
-	ROM_LOAD16_WORD_SWAP( "ob2vera.11s", 0x0000000, 0x080000, CRC(f8c459f2) SHA1(681520c891f5c8a0f321652d8834910310c88d1a) )
+	ROM_LOAD16_WORD_SWAP( "ob1vera.11s", 0x0000000, 0x080000, CRC(f8c459f2) SHA1(681520c891f5c8a0f321652d8834910310c88d1a) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "ob1wave.ic2",           0x000000, 0x800000, CRC(e7bc7202) SHA1(f0f598304866ebe62642eaac6b7d8709baa14fe1) )
+ROM_END
+
+ROM_START( ohbakyuun )
+	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "ob1vera.2l",     0x0000000, 0x200000, CRC(4cb3c25a) SHA1(18679b9ae54f2b001316d9a55065c859df292c4c) )
+	ROM_LOAD16_BYTE( "ob1vera.2p",     0x0000001, 0x200000, CRC(85abbe30) SHA1(0edfa34c45bd95882639a7d3e43bc9df3bc23586) )
+
+	ROM_REGION32_LE( 0x00800000, "user2", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "ob1rom0l.ic12",  0x0000000, 0x400000, CRC(f8b6a599) SHA1(2af3186242a8cbf14ab7532496a91041300527e9) )
+	ROM_LOAD16_BYTE( "ob1rom0u.ic11",  0x0000001, 0x400000, CRC(0625db92) SHA1(b63be6e41b2c6e2194f02f0c31da1f30c4e08232) )
+
+	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "ob1vera.11s", 0x0000000, 0x080000, CRC(f8c459f2) SHA1(681520c891f5c8a0f321652d8834910310c88d1a) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
 	ROM_LOAD( "ob1wave.ic2",           0x000000, 0x800000, CRC(e7bc7202) SHA1(f0f598304866ebe62642eaac6b7d8709baa14fe1) )
@@ -2022,8 +2039,24 @@ ROM_END
 
 ROM_START( mrdrillr )
 	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
-	ROM_LOAD16_BYTE( "dri1vera.2l",  0x0000000, 0x200000, CRC(751ca21d) SHA1(1c271bba83d387c797ce8daa43885bcb6e1a51a6) )
-	ROM_LOAD16_BYTE( "dri1vera.2p",  0x0000001, 0x200000, CRC(2a2b0704) SHA1(5a8b40c6cf0adc43ca2ee0c576ec82f314aacd2c) )
+	ROM_LOAD16_BYTE( "dri3vera2.2l",  0x0000000, 0x200000, CRC(36b9eeab) SHA1(85f5d57d4fc6160bfed49a08ad31a2cc2b4a38c5) )
+	ROM_LOAD16_BYTE( "dri3vera2.2p",  0x0000001, 0x200000, CRC(811c00d5) SHA1(627685078fceb023e8af1b7af5269f9b01a06dba) )
+
+	ROM_REGION32_LE( 0x0800000, "user2", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "dri1rom0l.6",  0x0000000, 0x400000, CRC(021bb2fa) SHA1(bfe3e46e9728d5b5a692f432515267ff8b8255e7) )
+	ROM_LOAD16_BYTE( "dri1rom0u.9",  0x0000001, 0x400000, CRC(5aae85ea) SHA1(a54dcc050c12ed3d77efc328e366e99c392eb139) )
+
+	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "dri1vera.11s", 0x0000000, 0x080000, CRC(33ea9c0e) SHA1(5018d7a1a45ec3133cd928435db8804f66321924) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "dri1wave0.5",         0x0000000, 0x800000, CRC(32928df1) SHA1(79af92a2d24a0e3d5bfe1785776b0f86a93882ce) )
+ROM_END
+
+ROM_START( mrdrillrj )
+	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "dri1vera2.2l",  0x0000000, 0x200000, CRC(751ca21d) SHA1(1c271bba83d387c797ce8daa43885bcb6e1a51a6) )
+	ROM_LOAD16_BYTE( "dri1vera2.2p",  0x0000001, 0x200000, CRC(2a2b0704) SHA1(5a8b40c6cf0adc43ca2ee0c576ec82f314aacd2c) )
 
 	ROM_REGION32_LE( 0x0800000, "user2", 0 ) /* main data */
 	ROM_LOAD16_BYTE( "dri1rom0l.6",  0x0000000, 0x400000, CRC(021bb2fa) SHA1(bfe3e46e9728d5b5a692f432515267ff8b8255e7) )
@@ -2819,8 +2852,10 @@ GAME( 1999, tektagtjc1,tektagt,  tektagt,  namcos12, namcos12_state, namcos12, R
 GAME( 1999, tektagtjb, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.B)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC044 */
 GAME( 1999, tektagtja, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.A3)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC044 */
 GAME( 1999, ghlpanic,  0,        ptblank2, ghlpanic, namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Ghoul Panic (Asia, OB2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC045 */
+GAME( 1999, ohbakyuun, ghlpanic, ptblank2, ghlpanic, namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Oh! Bakyuuun (Japan, OB1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC045 */
 GAME( 1999, pacapp2,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion 2 (Japan, PKS1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC046 */
-GAME( 1999, mrdrillr,  0,        coh700,   namcos124w,namcos12_state,namcos12,ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC048 */
+GAME( 1999, mrdrillr,  0,        coh700,   namcos124w,namcos12_state,namcos12, ROT0, "Namco",           "Mr. Driller (US, DRI3/VER.A2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC048 */
+GAME( 1999, mrdrillrj, mrdrillr, coh700,   namcos124w,namcos12_state,namcos12, ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC048 */
 GAME( 1999, kaiunqz,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC050 */
 GAME( 1999, pacappsp,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion Special (Japan, PSP1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC052 */
 GAME( 1999, aquarush,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Aqua Rush (Japan, AQ1/VER.A1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC053 */

@@ -1,10 +1,12 @@
 /**********************************************************************************
 
-  Fun World / Amatic / TAB / Impera.
+  Fun World / TAB / Impera
   Series 7000 hardware.
 
   65C02 + 2x PIAs + M6845 CRTC + AY8910
 
+  Also from Amatic, CMC, Dino4 encrypted, and Leopard 4.
+ 
   Driver by Roberto Fresca.
   Based on a preliminary work of Curt Coder & Peter Trauner.
 
@@ -42,8 +44,10 @@
   * Pot Game (Italian),                               C.M.C.,             1996.
   * Bottle 10 (Italian, set 1),                       C.M.C.,             1996.
   * Bottle 10 (Italian, set 2),                       C.M.C.,             1996.
-  * Luna Park (set 1, dual program),                  XxX.,               1998.
-  * Luna Park (set 2),                                XxX.,               1998.
+  * Luna Park (set 1, dual program),                  unknown,            1998.
+  * Luna Park (set 2, dual program),                  unknown,            1998.
+  * Luna Park (set 3),                                unknown,            1998.
+  * Crystal Colours (CMC hardware),                   J.C.D. srl,         1998.
   * Royal Card (Austrian, set 1),                     TAB Austria,        1991.
   * Royal Card (Austrian, set 2),                     TAB Austria,        1991.
   * Royal Card (Austrian/Polish, set 3),              TAB Austria,        1991.
@@ -941,6 +945,9 @@
      Both programs write to videoram either to each video RAM ranges.
   - Added proper program ROM banking and connected to DIP switch #1.
   - Added Luna Park (set 2). This one writes to normal CMC video RAM.
+  - Added Crystal Colours (CMC hardware).
+  - Added default NVRAM to Crystal Colours (CMC hardware), allowing
+     to boot with clean meters/settings.
   - Cleaned-up the machine drivers.
   - Derived clocks via #define.
   - Added technical notes.
@@ -4067,34 +4074,34 @@ ROM_END
 
 /*
   Luna Park sets...
-  
+
   This board has mirrored video RAM 4000-4FFF to 5000-5FFF,
   and color RAM 6000-6FFF to 7000-7FFF.
-  
+
   Two different programs. One in each program ROM half.
   PRG rom higher address line is connected to DIP switch #1,
   so it should have 2 games in the same PCB (2 revisions?)
-  
+
          1st half:           2nd half:
-  
+
   BE58:  LDA #$04            LDA #$00
          JSR $9DE2           JSR $9DE2
-		
+
   BE60:  LDA #$09            LDA #$00
          JSR $B25E           JSR $B25E
 
   BE73:  A5 22               A5 23
-  
+
   BEC0: '5 TIRI LIRE 500'   '10 TIRI LIRE 500'
-
   BF40:  00 00 00 00...     'wait...no coin'
-
   C3D0: 'ABILITA VINTE'     'PARTITA VINTE'
-
   DF30:  20 20 20 20 20      00 00 00 00 00
 
+  The second set, has the same programs, but the strings on the first half
+  were changed to match the second program.
+  
 */
-/* This one has mirrored video RAM 4000/5000 to 6000/7000. */
+/* The following two have mirrored video RAM 4000/5000 to 6000/7000. */
 ROM_START( lunapark )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* Two different programs. Selectable through a DIP switch */ 
 	ROM_LOAD( "lunapark-425-95n003.u2", 0x0000, 0x10000, CRC(b3a620ee) SHA1(67b3498edf7b536e22c4d97c1f6ad5a71521e68f) )
@@ -4112,20 +4119,56 @@ ROM_START( lunapark )
 	ROM_LOAD( "82s147.u25", 0x0000, 0x0200, CRC(ddb74d72) SHA1(3d5dda3a935a3100cb86017f103b855d6449f73a) )
 ROM_END
 
-/* This one hasn't mirrored video RAM, so could run in regular Cuore 1 hardware */
 ROM_START( lunaparkb )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* Two different programs. Selectable through a DIP switch */ 
+	ROM_LOAD( "lunapark-number-03_lunaparkb.u2", 0x0000, 0x10000, CRC(cb819bb7) SHA1(c7fb25eab093de2f644445a713d99ee8024d8499) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "27512.u21", 0x0000, 0x8000, CRC(d64ac315) SHA1(c67d9e67a988036844efd4f980d47a90c022ba18) )	/* only the first 2 bytes different */
+	ROM_CONTINUE(          0x0000, 0x8000)	/* Discarding 1nd half 0xff filled*/
+	ROM_LOAD( "27512.u20", 0x8000, 0x8000, CRC(7d91ce1f) SHA1(7e9bfad76f305d5787faffe3a07b218beb37fda8 ) )
+	ROM_CONTINUE(          0x8000, 0x8000)	/* Discarding 1nd half 0xff filled*/
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "lunaparkb_nvram.bin", 0x0000, 0x0800, CRC(f99e749b) SHA1(fafd4205dfaacb4c21215af6997d06ab419c9281) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.u25", 0x0000, 0x0200, CRC(ddb74d72) SHA1(3d5dda3a935a3100cb86017f103b855d6449f73a) )
+ROM_END
+
+/* This one hasn't mirrored video RAM, so could run in regular Cuore 1 hardware */
+ROM_START( lunaparkc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lunapark-number-03.u2", 0x8000, 0x8000, CRC(fdbe49c3) SHA1(a2b14a6998d5a27fba7bc360a15f17a48c91194f) )
+	ROM_LOAD( "lunapark-number-03_lunaparkc.u2", 0x8000, 0x8000, CRC(fdbe49c3) SHA1(a2b14a6998d5a27fba7bc360a15f17a48c91194f) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "lunapark-number-01.u21", 0x0000, 0x8000, CRC(ee057944) SHA1(31b76dcadf1dd5aacac1dfed0c7c9f7190797ead) )
 	ROM_LOAD( "lunapark-number-02.u20", 0x8000, 0x8000, CRC(b8795aec) SHA1(5db2e64657dee7742eb9d11e65d29c83a93332b7) )
 
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
-	ROM_LOAD( "lunaparkb_nvram.bin", 0x0000, 0x0800, CRC(005b70fc) SHA1(682c2315b4fafb6255db989f0d49255fd8d7a1a9) )
+	ROM_LOAD( "lunaparkc_nvram.bin", 0x0000, 0x0800, CRC(005b70fc) SHA1(682c2315b4fafb6255db989f0d49255fd8d7a1a9) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.u25", 0x0000, 0x0200, CRC(ddb74d72) SHA1(3d5dda3a935a3100cb86017f103b855d6449f73a) )
+ROM_END
+
+/*
+  Crystal Colours...
+  Version running in CMC hardware.
+*/
+ROM_START( crystal )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "425-1995-number-03.u2", 0x8000, 0x8000, CRC(bab1ab88) SHA1(d224f2f7cd9313f51c484d781dc278e358f1e4fd) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "425-1995-number-02.u21", 0x0000, 0x8000, CRC(1eaf1bd9) SHA1(eb392f4a8864c59c7792f905f165f543087cb4a0) )
+	ROM_LOAD( "425-1995-number-01.u20", 0x8000, 0x8000, CRC(d3972c19) SHA1(a84ae765eeae1f9d443b0c4941b6f93dcc540f8c) )
+
+	ROM_REGION( 0x0800, "nvram", 0 ) /* default NVRAM */
+	ROM_LOAD( "crystal_nvram.bin", 0x0000, 0x0800, CRC(21a712ee) SHA1(259d83b8268a93f96b53580562e9c6e835f7473e) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.u25", 0x0000, 0x0200, CRC(dd9db8bd) SHA1(6374795ae243759a887464b38ece078dc3735b6f) )
 ROM_END
 
 
@@ -5902,8 +5945,10 @@ GAMEL( 1997, tortufam,  0,        cuoreuno, cuoreuno,  driver_device,  0,       
 GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pot Game (Italian)",                              0,                       layout_jollycrd )
 GAMEL( 1996, bottle10,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 1)",                      0,                       layout_jollycrd )
 GAMEL( 1996, bottl10b,  bottle10, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 2)",                      0,                       layout_jollycrd )
-GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  driver_device,  0,        ROT0, "XxX.",            "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd )	// mirrored video RAM (4000/5000 to 6000/7000).
-GAMEL( 1998, lunaparkb, lunapark, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "XxX.",            "Luna Park (set 2)",                               0,                       layout_jollycrd )	// regular video RAM 6000/7000.
+GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  driver_device,  0,        ROT0, "<unknown>.",      "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd )	// mirrored video RAM (4000/5000 to 6000/7000).
+GAMEL( 1998, lunaparkb, lunapark, lunapark, lunapark,  driver_device,  0,        ROT0, "<unknown>.",      "Luna Park (set 2, dual program)",                 0,                       layout_jollycrd )	// mirrored video RAM (4000/5000 to 6000/7000).
+GAMEL( 1998, lunaparkc, lunapark, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "<unknown>.",      "Luna Park (set 3)",                               0,                       layout_jollycrd )	// regular video RAM 6000/7000.
+GAMEL( 1998, crystal,   0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "J.C.D. srl",      "Crystal Colours (CMC hardware)",                  0,                       layout_jollycrd )
 
 // Royal Card based...
 GAMEL( 1991, royalcrd,  0,        royalcd2, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 1)",                    0,                       layout_jollycrd )

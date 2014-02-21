@@ -17,6 +17,7 @@
 #include "machine/mos6551.h"
 #include "machine/6522via.h"
 #include "machine/kb3600.h"
+#include "machine/mm58167.h"
 #include "sound/speaker.h"
 #include "sound/dac.h"
 
@@ -45,6 +46,7 @@ public:
 		m_fdc(*this, "fdc"),
 		m_ay3600(*this, "ay3600"),
 		m_a2bus(*this, "a2bus"),
+		m_rtc(*this, "rtc"),
 		m_speaker(*this, SPEAKER_TAG),
 		m_dac(*this, DAC_TAG),
 		m_kbspecial(*this, "keyb_special")
@@ -59,6 +61,7 @@ public:
 	required_device<applefdc_base_device> m_fdc;
 	required_device<ay3600_device> m_ay3600;
 	required_device<a2bus_device> m_a2bus;
+	required_device<mm58167_device> m_rtc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<dac_device> m_dac;
 	required_ioport m_kbspecial;

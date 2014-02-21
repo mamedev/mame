@@ -1606,3 +1606,12 @@ ifneq ($(filter NCR5380N,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/ncr5380n.o
 endif
 
+#-------------------------------------------------
+#
+#@src/emu/machine/mm58167.h,MACHINES += MM58167
+#-------------------------------------------------
+
+ifneq ($(filter MM58167,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/mm58167.o
+endif
+

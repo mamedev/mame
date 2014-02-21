@@ -39,6 +39,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
@@ -47,13 +48,7 @@ private:
 	// 16 registers per channel, 48 channels
 	struct zchan
 	{
-		zchan()
-		{
-			memset(v, 0, sizeof(UINT16)*16);
-		}
-
 		UINT16 v[16];
-		
 		bool is_playing;
 		INT16 *samples;
 		UINT32 cur_pos;
@@ -63,6 +58,7 @@ private:
 		UINT32 end_pos;
 		UINT32 loop_pos;
 		UINT32 page;
+		UINT16 vol;
 	};
 
 	zchan m_chan[48];
@@ -79,8 +75,8 @@ private:
 	devcb2_read32 m_ext_read_handler;
 
 	UINT32 read_memory(UINT32 offset);
-	void chan_w(int chan, int reg, UINT16 data);
-	UINT16 chan_r(int chan, int reg);
+	void chan_w(int ch, int reg, UINT16 data);
+	UINT16 chan_r(int ch, int reg);
 	void control_w(int reg, UINT16 data);
 	UINT16 control_r(int reg);
 	INT16 *prepare_samples(UINT32 offset);

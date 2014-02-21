@@ -853,6 +853,49 @@ ROM_START( missw96 )
 	ROM_LOAD( "mw96_02.bin",  0xc0000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
 ROM_END
 
+ROM_START( missw96a )
+	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "mw96n2_10.prog2", 0x000000, 0x80000, CRC(563ce811) SHA1(4013b303dc7fdfcd2b5b91f12a950eb71b27714a) )
+	ROM_LOAD16_BYTE( "mw96n2_6.prog1",  0x000001, 0x80000, CRC(98e91a3b) SHA1(a135458e0373b528498408ac3288a01a666f3522) )
+	ROM_LOAD16_BYTE( "mw96_09.bin",  0x100000, 0x80000, CRC(7032dfdf) SHA1(53728b60d0c772f6d936be47e21b069d0a75a2b4) )
+	ROM_LOAD16_BYTE( "mw96_05.bin",  0x100001, 0x80000, CRC(91de5ab5) SHA1(d1153fa4745830d0fdd5bb311c38bf098ea29deb) )
+	ROM_LOAD16_BYTE( "mw96_08.bin",  0x200000, 0x80000, CRC(b8e66fb5) SHA1(8abc6f8d85e0ad6acbf518e11fd81debc5a90957) )
+	ROM_LOAD16_BYTE( "mw96_04.bin",  0x200001, 0x80000, CRC(e77a04f8) SHA1(e0043ec1d1bd5415c05ae93c9d785fc70174cb54) )
+	ROM_LOAD16_BYTE( "mw96_07.bin",  0x300000, 0x80000, CRC(26112ed3) SHA1(f49f92a4d1bcea322b171702591315950fbd70c6) )
+	ROM_LOAD16_BYTE( "mw96_03.bin",  0x300001, 0x80000, CRC(e9374a46) SHA1(eabfcc7cb9c9a2f932abc8103c3abfa8360dcbb5) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_LOAD( "mw96_11.bin",  0x00000, 0x80000, CRC(3983152f) SHA1(6308e936ba54e88b34253f1d4fbd44725e9d88ae) )
+
+	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "mw96_01.bin",  0x00000, 0x80000, CRC(e78a659e) SHA1(d209184c70e0d7e6d17034c6f536535cda782d42) )
+	ROM_RELOAD(               0x40000, 0x80000 )
+	ROM_LOAD( "mw96_02.bin",  0xc0000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
+ROM_END
+
+ROM_START( missw96b )
+	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "mw96n3_10.prog2", 0x000000, 0x80000, CRC(67bde86b) SHA1(7457a4c130a9ab1c75645e2a662a87af3fee8bba) )
+	ROM_LOAD16_BYTE( "mw96n3_6.prog1",  0x000001, 0x80000, CRC(de99cc48) SHA1(ffa2597083c412fb943724048d8d5cc7bd9be11c) )
+	ROM_LOAD16_BYTE( "mw96_09.bin",  0x100000, 0x80000, CRC(7032dfdf) SHA1(53728b60d0c772f6d936be47e21b069d0a75a2b4) )
+	ROM_LOAD16_BYTE( "mw96_05.bin",  0x100001, 0x80000, CRC(91de5ab5) SHA1(d1153fa4745830d0fdd5bb311c38bf098ea29deb) )
+	ROM_LOAD16_BYTE( "mw96_08.bin",  0x200000, 0x80000, CRC(b8e66fb5) SHA1(8abc6f8d85e0ad6acbf518e11fd81debc5a90957) )
+	ROM_LOAD16_BYTE( "mw96_04.bin",  0x200001, 0x80000, CRC(e77a04f8) SHA1(e0043ec1d1bd5415c05ae93c9d785fc70174cb54) )
+	ROM_LOAD16_BYTE( "mw96_07.bin",  0x300000, 0x80000, CRC(26112ed3) SHA1(f49f92a4d1bcea322b171702591315950fbd70c6) )
+	ROM_LOAD16_BYTE( "mw96_03.bin",  0x300001, 0x80000, CRC(e9374a46) SHA1(eabfcc7cb9c9a2f932abc8103c3abfa8360dcbb5) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_LOAD( "mw96_11.bin",  0x00000, 0x80000, CRC(3983152f) SHA1(6308e936ba54e88b34253f1d4fbd44725e9d88ae) )
+
+	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "mw96_01.bin",  0x00000, 0x80000, CRC(e78a659e) SHA1(d209184c70e0d7e6d17034c6f536535cda782d42) )
+	ROM_RELOAD(               0x40000, 0x80000 )
+	ROM_LOAD( "mw96_02.bin",  0xc0000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
+ROM_END
+
+
 ROM_START( missmw96 )
 	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "mmw96_10.bin",  0x000000, 0x80000, CRC(45ed1cd9) SHA1(a75b1b6cddde065e6d7f7355a746819c8268c24f) )
@@ -1061,16 +1104,26 @@ ROM_END
 
 GAME( 1990, galpanic, 0,        galpanic, galpanic,  driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (Unprotected)", GAME_NO_COCKTAIL )
 GAME( 1990, galpanica,galpanic, galpanica,galpanica, driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (MCU Protected)", GAME_NO_COCKTAIL )
+
 GAME( 1994, supmodel, 0,        supmodel, fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "Super Model",GAME_NO_COCKTAIL )
+
 GAME( 1995, newfant,  0,        comad,    fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1995 copyright)", GAME_NO_COCKTAIL ) // the only difference between the two is the gfx rom containing the copyright
 GAME( 1994, newfanta, newfant,  comad,    fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1994 copyright)", GAME_NO_COCKTAIL )
 GAME( 1995, fantsy95, newfant,  comad,    fantasia,  driver_device, 0, ROT90, "Hi-max Technology Inc.",   "Fantasy '95", GAME_NO_COCKTAIL )
-GAME( 1996, missw96,  0,        comad,    missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude)", GAME_NO_COCKTAIL )
+
+GAME( 1996, missw96,  0,        comad,    missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 1)", GAME_NO_COCKTAIL )
+GAME( 1996, missw96a, missw96,  comad,    missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 2)", GAME_NO_COCKTAIL )
+GAME( 1996, missw96b, missw96,  comad,    missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (set 3)", GAME_NO_COCKTAIL )
 GAME( 1996, missmw96, missw96,  comad,    missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss Mister World '96 (Nude)", GAME_NO_COCKTAIL )
+
 GAME( 1997, fantsia2, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Explicit)", GAME_NO_COCKTAIL )
 GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Less Explicit)", GAME_NO_COCKTAIL )
+
 GAME( 2002, wownfant, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "WOW New Fantasia", GAME_NO_COCKTAIL )
+
 GAME( 1996, pgalvip,  0,        galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", GAME_IMPERFECT_GRAPHICS ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
+
 GAME( 1997, pgalvipa, pgalvip,  galhustl, galhustl,  driver_device, 0, ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", 0 )
 GAME( 1997, galhustl, pgalvip,  galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International",        "Gals Hustler", 0 ) // hack of the above?
+
 GAME( 1995, zipzap,   0,        zipzap,   zipzap,    driver_device, 0, ROT90, "Barko Corp",               "Zip & Zap", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )

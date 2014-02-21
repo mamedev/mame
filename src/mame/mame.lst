@@ -1051,7 +1051,8 @@ timecrs2v4a     // April 1998
 panicprk        // May 1998
 panicprkj       // May 1998
 raceon          // Race On - September 1998
-gunwars         // September 1998
+gunwars         // September 1998 - Rev B
+gunwarsa        // September 1998 - Rev A
 aking           // Angler King - March 1999
 500gp           // March 1999
 finfurl2        // March 1999
@@ -3693,7 +3694,8 @@ primglex        // 1996.03 Prime Goal EX (Japan, PG1/VER.A)
 xevi3dg         // 1996.05 Xevious 3D/G (Japan, XV31/VER.A)
 dunkmnia        // 1996.05 Dunk Mania (Asia, DM2/VER.C)
 dunkmniajc      // 1996.05 Dunk Mania (Japan, DM1/VER.C)
-danceyes        // 1996.09 Dancing Eyes (Japan, DC1/VER.A)
+danceyes        // 1996.10 Dancing Eyes (US, DC3/VER.C)
+danceyesj       // 1996.09 Dancing Eyes (Japan, DC1/VER.A)
 pocketrc        // 1997.03 Pocket Racer (Japan, PKR1/VER.B)
 starswep        // 1997.07 Star Sweep (Japan, STP1/VER.A)
 myangel3        // 1998.03 Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)
@@ -3734,7 +3736,7 @@ ptblank2        // 1999.?? Point Blank 2 (GNB5/VER.A)
 gunbarl         // 1999.?? Gunbarl (Japan, GNB4/VER.A)
 sws99           // 1999.05 Super World Stadium '99 (Japan, SS91/VER.A3)
 ghlpanic        // 1999.?? Ghoul Panic (Asia, OB2/VER.A)
-				// 1999.07 Oh Bakyuun (Japan, OB1)
+ohbakyuun       // 1999.07 Oh! Bakyuuun (Japan, OB1/VER.A)
 pacapp2         // 1999.07 Paca Paca Passion 2 (Japan, PKS1/VER.A)
 				// 1999.07 Bust A Move 2 (Metro)
 tektagt         // 1999.?? Tekken Tag Tournament (US, TEG3/VER.C1)
@@ -3744,7 +3746,8 @@ tektagtub       // 1999.?? Tekken Tag Tournament (US, TEG3/VER.B)
 tektagtjc1      // 1999.?? Tekken Tag Tournament (Japan, TEG1/VER.C1)
 tektagtjb       // 1999.07 Tekken Tag Tournament (Japan, TEG1/VER.B)
 tektagtja       // 1999.07 Tekken Tag Tournament (Japan, TEG1/VER.A)
-mrdrillr        // 1999.11 Mr Driller (DRI1/VER.A2, Japan)
+mrdrillr        // 1999.11 Mr Driller (US, DRI3/VER.A2)
+mrdrillrj       // 1999.11 Mr Driller (Japan, DRI1/VER.A2, Japan)
 				// 1999.12 UmJammer Lammy NOW! (Japan)
 				// 1999.12 Quest for Fame (Japan)
 pacappsp        // 1999.12 Paca Paca Passion Special (PSP1/VER.A, Japan)
@@ -6172,6 +6175,7 @@ rockragea       // GX620 (c) 1986 (Prototype?)
 rockragej       // GX620 (c) 1986 (Japan)
 mx5000          // GX669 (c) 1987
 flkatck         // GX669 (c) 1987 (Japan)
+flkatcka		// GX669 (c) 1987 (Japan)
 fastlane        // GX752 (c) 1987
 tricktrp        // GX771 (c) 1987
 labyrunr        // GX771 (c) 1987 (Japan)
@@ -9074,6 +9078,8 @@ newfanta        // (c) 1995 Comad & New Japan System
 fantsy95        // (c) 1995 Hi-max Technology Inc.
 zipzap          // (c) 1995 Barko Corp
 missw96         // (c) 1996 Comad
+missw96a        // (c) 1996 Comad
+missw96b        // (c) 1996 Comad
 missmw96        // (c) 1996 Comad
 fantsia2        // (c) 1997 Comad
 fantsia2a       // (c) 1997 Comad
@@ -10421,8 +10427,10 @@ tortufam        // (c) 1997 C.M.C.
 potgame         // (c) 1996 C.M.C.
 bottle10        // (c) 1996 C.M.C.
 bottl10b        // (c) 1996 C.M.C.
-lunapark        // (c) 1998 XxX.
-lunaparkb       // (c) 1998 XxX.
+lunapark        // 1998 unknown.
+lunaparkb       // 1998 unknown.
+lunaparkc       // 1998 unknown.
+crystal         // (c) 1998 J.C.D. srl
 royalcrd        // (c) 1991 TAB-Austria
 royalcrda       // (c) 1991 TAB-Austria
 royalcrdb       // (c) 1991 TAB-Austria
@@ -11004,6 +11012,7 @@ leader          // Bootleg?
 livequiz        // (c) 1999 Andamiro
 hammer          // (c) 2000 Andamiro
 discoboy        // (c) 1993 Soft Art Co.
+discoboyp		// (c) 1993 Soft Art Co. (Promat license?)
 pangofun        // (c) 1995 InfoCube
 koikoi          // (c) 1983 Kiwako
 good            // (c) 1998

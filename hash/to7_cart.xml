@@ -381,7 +381,7 @@
 		<publisher>To Tek</publisher>
 
 		<part name="cart" interface="to7_cart">
-			<dataarea name="rom" size="4096">
+			<dataarea name="rom" size="16384">
 				<rom name="videotex interactif (1984)(to tek)(fr).m7" size="16384" crc="a887814a" sha1="1bac88a14b762b63fea5b309849d9ee0e9b518f1" offset="0x0000" />
 			</dataarea>
 		</part>

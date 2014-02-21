@@ -480,6 +480,7 @@ MACHINES += Z80PIO
 MACHINES += Z80SIO
 MACHINES += Z80STI
 MACHINES += Z8536
+MACHINES += MM58167
 
 #-------------------------------------------------
 # specify available bus cores

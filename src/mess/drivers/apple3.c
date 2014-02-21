@@ -104,9 +104,13 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	/* fdc */
 	MCFG_APPLEFDC_ADD("fdc", apple3_fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_4_DRIVES_ADD(apple3_floppy_interface,1,4)
+
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
 	MCFG_MOS6551_TYPE(MOS6551_TYPE_ROCKWELL)		// must be Rockwell or the ROM shows "ACIA" and doesn't POST
+
+	/* rtc */
+	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)

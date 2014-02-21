@@ -284,8 +284,8 @@ void apple3_state::apple3_video_graphics_chgr(bitmap_ind16 &bitmap)
 	{
 		if (m_flags & VAR_VM2)
 		{
-			pix_info = &ram[m_hgr_map[y]];
-			col_info = &ram[m_hgr_map[y] - 0x2000];
+			pix_info = &ram[m_hgr_map[y] + 0x2000];
+			col_info = &ram[m_hgr_map[y] + 0x4000];
 		}
 		else
 		{
@@ -329,8 +329,8 @@ void apple3_state::apple3_video_graphics_shgr(bitmap_ind16 &bitmap)
 	{
 		if (m_flags & VAR_VM2)
 		{
-			pix_info1 = &ram[m_hgr_map[y]];
-			pix_info2 = &ram[m_hgr_map[y] + 0x2000];
+			pix_info1 = &ram[m_hgr_map[y] + 0x2000];
+			pix_info2 = &ram[m_hgr_map[y] + 0x4000];
 		}
 		else
 		{
@@ -364,7 +364,7 @@ void apple3_state::apple3_video_graphics_shgr(bitmap_ind16 &bitmap)
 void apple3_state::apple3_video_graphics_chires(bitmap_ind16 &bitmap)
 {
 	UINT16 *pen;
-	PAIR pix;
+	UINT8 p1, p2, p3, p4;
 	int y, i;
 	UINT8 *ram = m_ram->pointer();
 
@@ -373,18 +373,28 @@ void apple3_state::apple3_video_graphics_chires(bitmap_ind16 &bitmap)
 		pen = &bitmap.pix16(y);
 		for (i = 0; i < 20; i++)
 		{
-			pix.b.l  = ram[m_hgr_map[y] - 0x2000 + (i * 2) + (m_flags & VAR_VM2 ? 1 : 0) + 0];
-			pix.b.h  = ram[m_hgr_map[y] - 0x0000 + (i * 2) + (m_flags & VAR_VM2 ? 1 : 0) + 0];
-			pix.b.h2 = ram[m_hgr_map[y] - 0x2000 + (i * 2) + (m_flags & VAR_VM2 ? 1 : 0) + 1];
-			pix.b.h3 = ram[m_hgr_map[y] - 0x0000 + (i * 2) + (m_flags & VAR_VM2 ? 1 : 0) + 1];
+			if (m_flags & VAR_VM2)
+			{
+				p1 = ram[m_hgr_map[y] + 0x2000 + (i * 2) + 0];
+				p2 = ram[m_hgr_map[y] + 0x4000 + (i * 2) + 0];
+				p3 = ram[m_hgr_map[y] + 0x2000 + (i * 2) + 1];
+				p4 = ram[m_hgr_map[y] + 0x4000 + (i * 2) + 1];
+			}
+			else
+			{
+				p1 = ram[m_hgr_map[y] - 0x2000 + (i * 2) + 0];
+				p2 = ram[m_hgr_map[y] - 0x0000 + (i * 2) + 0];
+				p3 = ram[m_hgr_map[y] - 0x2000 + (i * 2) + 1];
+				p4 = ram[m_hgr_map[y] - 0x0000 + (i * 2) + 1];
+			}
 
-			pen[ 0] = pen[ 1] = pen[ 2] = pen[ 3] = ((pix.d >>  0) & 0x0F);
-			pen[ 4] = pen[ 5] = pen[ 6] = pen[ 7] = ((pix.d >>  4) & 0x07) | ((pix.d >>  1) & 0x08);
-			pen[ 8] = pen[ 9] = pen[10] = pen[11] = ((pix.d >>  9) & 0x0F);
-			pen[12] = pen[13] = pen[14] = pen[15] = ((pix.d >> 13) & 0x03) | ((pix.d >> 14) & 0x0C);
-			pen[16] = pen[17] = pen[18] = pen[19] = ((pix.d >> 18) & 0x0F);
-			pen[20] = pen[21] = pen[22] = pen[23] = ((pix.d >> 22) & 0x01) | ((pix.d >> 23) & 0x0E);
-			pen[24] = pen[25] = pen[26] = pen[27] = ((pix.d >> 27) & 0x0F);
+			pen[ 0] = pen[ 1] = pen[ 2] = pen[ 3] = (p1 & 0x0f);
+			pen[ 4] = pen[ 5] = pen[ 6] = pen[ 7] = ((p1 >>  4) & 0x07) | ((p2 & 1) << 3);
+			pen[ 8] = pen[ 9] = pen[10] = pen[11] = ((p2 >> 1) & 0x0F);
+			pen[12] = pen[13] = pen[14] = pen[15] = ((p2 >> 5) & 0x03) | ((p3 & 3) << 2);
+			pen[16] = pen[17] = pen[18] = pen[19] = ((p3 >> 2) & 0x0F);
+			pen[20] = pen[21] = pen[22] = pen[23] = ((p3 >> 6) & 0x01) | ((p4 << 1) & 0xe);
+			pen[24] = pen[25] = pen[26] = pen[27] = ((p4 >> 3) & 0x0F);
 			pen += 28;
 		}
 	}

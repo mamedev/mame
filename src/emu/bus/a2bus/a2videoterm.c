@@ -38,6 +38,7 @@ const device_type A2BUS_IBSAP16 = &device_creator<a2bus_ap16_device>;
 const device_type A2BUS_IBSAP16ALT = &device_creator<a2bus_ap16alt_device>;
 const device_type A2BUS_VTC1 = &device_creator<a2bus_vtc1_device>;
 const device_type A2BUS_VTC2 = &device_creator<a2bus_vtc2_device>;
+const device_type A2BUS_AEVIEWMASTER80 = &device_creator<a2bus_aevm80_device>;
 
 #define VIDEOTERM_ROM_REGION  "vterm_rom"
 #define VIDEOTERM_GFX_REGION  "vterm_gfx"
@@ -122,6 +123,14 @@ ROM_START( vtc2 )
 	ROM_LOAD( "4.ic4.bin",    0x000800, 0x000800, CRC(8a497a48) SHA1(50c3df528109c65491a001ec74e50351a652c1fd) )
 ROM_END
 
+ROM_START( a2aevm80 )
+	ROM_REGION(0x800, VIDEOTERM_ROM_REGION, 0)
+	ROM_LOAD( "ae viewmaster 80 rom.bin", 0x000000, 0x000800, CRC(62a4b111) SHA1(159bf7c4add1435be215fddb648c0743fbcc49b5) ) 
+
+	ROM_REGION(0x1000, VIDEOTERM_GFX_REGION, 0)
+	ROM_LOAD( "ae viewmaster 80 video rom.bin", 0x000000, 0x000800, CRC(4801ab90) SHA1(f90658ffee7740f3cb30ecef2e151f7dc6098833) ) 
+ROM_END
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
@@ -165,6 +174,11 @@ const rom_entry *a2bus_vtc2_device::device_rom_region() const
 	return ROM_NAME( vtc2 );
 }
 
+const rom_entry *a2bus_aevm80_device::device_rom_region() const
+{
+	return ROM_NAME( a2aevm80 );
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -198,6 +212,11 @@ a2bus_vtc1_device::a2bus_vtc1_device(const machine_config &mconfig, const char *
 
 a2bus_vtc2_device::a2bus_vtc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	a2bus_videx80_device(mconfig, A2BUS_VTC2, "Unknown VideoTerm clone #2", tag, owner, clock, "a2vtc2", __FILE__)
+{
+}
+
+a2bus_aevm80_device::a2bus_aevm80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	a2bus_videx80_device(mconfig, A2BUS_AEVIEWMASTER80, "Applied Engineering Viewmaster 80", tag, owner, clock, "a2aevm80", __FILE__)
 {
 }
 

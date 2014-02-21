@@ -15,7 +15,7 @@ PROGRAM NO-93-01-14-0024
 +------------------------------------------+
 | YM3014 YM3812 10MHz            5.u94     |
 |       6116                    6.u124     |
-|       1.u45                    7.u95     |
+|400kHz 1.u45                    7.u95     |
 | M5205 2.u28                   8.u125     |
 |J     Z8400B                          6116|
 |A          6116          6116 TPC1020AFN  |
@@ -34,7 +34,7 @@ Notes:
   Yamaha YM3014/YM3812 (rebadged as 83142/5A12)
   OKI M5205
   TI TPC1020AFN-084C
-  10.000MHz & 12.000MHz OSCs
+  10.000MHz & 12.000MHz OSCs, 400KHz resonator
 
 */
 
@@ -489,12 +489,12 @@ static const msm5205_interface yunsung8_msm5205_interface =
 static MACHINE_CONFIG_START( discoboy, discoboy_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)      /* 6 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(discoboy_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", discoboy_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,10000000/2)         /* 5 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_10MHz/2)	/* 5 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(discoboy_state, nmi_line_pulse, 32*60)
 
@@ -514,11 +514,11 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 2500000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_10MHz/4)	/* 2.5 MHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) // ???? unknown
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
 	MCFG_SOUND_CONFIG(yunsung8_msm5205_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
@@ -552,6 +552,32 @@ ROM_START( discoboy )
 ROM_END
 
 
+ROM_START( discoboyp ) // all ROMs had PROMAT stickers but copyright in the game shows no indication of it
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "discob.u2",  0x00000, 0x10000, CRC(7f07afd1) SHA1(f81d38a45764289a78e9727934ccbda25933624c) )
+	ROM_LOAD( "discob.u18", 0x10000, 0x20000, CRC(05f0daaf) SHA1(8691e0afff069a589a4601fe08f96f93c3773c7d) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "discob.u28",  0x00000, 0x10000, CRC(7c2ed174) SHA1(ace209dc4cc7a4ffca062842defd84cefc5b10d2) )
+	ROM_LOAD( "discob.u45",  0x10000, 0x10000, CRC(c266c6df) SHA1(f76e38ded43f56a486cf6569c679ddb57a4165fb) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "discob.u94",   0x00000, 0x10000, CRC(c436f1e5) SHA1(511e23b85f1b4fc732bd9648c0582848c20e6378) )
+	ROM_LOAD( "discob.u124",  0x10000, 0x40000, CRC(0b0bf653) SHA1(ce609e9ee270eda6e74612ed5334fd6c3c81ef18) )
+	ROM_LOAD( "discob.u95",   0x80000, 0x10000, CRC(ddea540e) SHA1(b69b94409bb15174f7780c637b183a2563c3d6c3) )
+	ROM_LOAD( "discob.u125",  0x90000, 0x40000, CRC(fcac2cb8) SHA1(cb629b28acbb3ab42572b52ee85bf18a556b8e24) )
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_INVERT )
+	ROM_LOAD( "discob.u80",   0x000000, 0x10000, CRC(48a7ebdf) SHA1(942ddfdebb53f3f7f9256a4c8e8aa24887310775) )
+	ROM_LOAD( "discob.u50",   0x010000, 0x40000, CRC(ea7231db) SHA1(8f42e39aeda97351a5ca5e926df544bc019f178f) )
+	ROM_LOAD( "discob.u81",   0x080000, 0x10000, CRC(9ca358e1) SHA1(c711af363b466e40e514a7cec7a5098f178c3d9c) )
+	ROM_LOAD( "discob.u5",    0x090000, 0x40000, CRC(afeefecc) SHA1(9f85e0e5955876b85d91341a7fc355674c30a0bb) )
+	ROM_LOAD( "discob.u78",   0x100000, 0x10000, CRC(2b39eb08) SHA1(c275041e54d53da58730e18f5b8f6443b4301cb2) )
+	ROM_LOAD( "discob.u46",   0x110000, 0x40000, CRC(835c513b) SHA1(eab400cb9af556b2762c4bbae55a2c04a1a7d8ba) )
+	ROM_LOAD( "discob.u79",   0x180000, 0x10000, CRC(77ffc6bf) SHA1(15fd3b1d2b435d8ff7da5deaddbed7f3f9ccc609) )
+	ROM_LOAD( "discob.u49",   0x190000, 0x40000, CRC(9f884db4) SHA1(fd916b0ac54961bbd9b3f23d3ee5d35d747cbf17) )
+ROM_END
+
 DRIVER_INIT_MEMBER(discoboy_state,discoboy)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -576,4 +602,5 @@ DRIVER_INIT_MEMBER(discoboy_state,discoboy)
 }
 
 
-GAME( 1993, discoboy,  0,    discoboy, discoboy, discoboy_state, discoboy, ROT270, "Soft Art Co.", "Disco Boy", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, discoboy,  0,           discoboy, discoboy, discoboy_state, discoboy, ROT270, "Soft Art Co.", "Disco Boy",                   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, discoboyp, discoboy,    discoboy, discoboy, discoboy_state, discoboy, ROT270, "Soft Art Co.", "Disco Boy (Promat license?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

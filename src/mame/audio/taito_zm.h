@@ -32,6 +32,7 @@ private:
 	required_device<mn10200_device> m_soundcpu;
 	
 	// internal state
+	UINT16 m_control;
 	UINT8 m_tms_ctrl;
 	UINT8* m_snd_shared_ram;
 };

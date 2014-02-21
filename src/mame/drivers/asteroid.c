@@ -752,15 +752,13 @@ ROM_START( asteroid1 )
 	ROM_LOAD( "034602-01.c8",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
 
-
-
 ROM_START( asteroidb )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "035145ll.de1",  0x6800, 0x0800, CRC(605fc0f2) SHA1(8d897a3b75bd1f2537470f0a34a97a8c0853ee08) )
 	ROM_LOAD( "035144ll.c1",   0x7000, 0x0800, CRC(e106de77) SHA1(003e99d095bd4df6fae243ea1dd5b12f3eb974f1) )
 	ROM_LOAD( "035143ll.b1",   0x7800, 0x0800, CRC(6b1d8594) SHA1(ff3cd93f1bc5734bface285e442125b395602d7d) )
 	/* Vector ROM */
-	ROM_LOAD( "035127-01.np3", 0x5000, 0x0800, CRC(99699366) SHA1(9b2828fc1cef7727f65fa65e1e11e309b7c98792) )
+	ROM_LOAD( "035127-02.np3",  0x5000, 0x0800, CRC(8b71fd9e) SHA1(8cd5005e531eafa361d6b7e9eed159d164776c70) )
 
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
@@ -779,7 +777,6 @@ ROM_START( aerolitos )
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
-
 
 ROM_START( asterock )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -857,7 +854,6 @@ ROM_START( hyperspc )
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
-
 
 ROM_START( astdelux )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -941,7 +937,6 @@ ROM_START( astdelux1 )
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
-
 
 ROM_START( llander )
 	ROM_REGION( 0x8000, "maincpu", 0 )
