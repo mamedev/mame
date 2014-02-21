@@ -52,7 +52,7 @@
     Method 3 :
     * cgold2, fhunter and fhuntera ONLY:
       DIP labeled "5201-5" switch to ON
-      This allowss setup procedure to complete properly and game to play (if disabled, it acts as a 'freeze' switch and the games don't accept inputs).
+      This allows setup procedure to complete properly and game to play (if disabled, it acts as a 'freeze' switch and the games don't accept inputs).
     * Key in with the Jackpot Key followed by the Audit Key.
     * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
     * Press Service (default A) 4 times until you are in the Setup Screen, with Printer Pay Limit.
