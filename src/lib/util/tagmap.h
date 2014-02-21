@@ -15,7 +15,7 @@
 
 #include "osdcore.h"
 #include "astring.h"
-#if MAME_DEBUG
+#ifdef MAME_DEBUG
 #include "eminline.h"
 #endif
 
@@ -32,7 +32,7 @@ enum tagmap_error
 };
 
 
-#if MAME_DEBUG
+#ifdef MAME_DEBUG
 extern INT32 g_tagmap_finds;
 #endif
 
@@ -132,7 +132,7 @@ public:
 	// find by tag with precomputed hash
 	_ElementType find(const char *tag, UINT32 fullhash) const
 	{
-#if MAME_DEBUG
+#ifdef MAME_DEBUG
 		atomic_increment32(&g_tagmap_finds);
 #endif
 		for (entry_t *entry = m_table[fullhash % ARRAY_LENGTH(m_table)]; entry != NULL; entry = entry->next())
@@ -144,7 +144,7 @@ public:
 	// find by tag without checking anything but the hash
 	_ElementType find_hash_only(const char *tag) const
 	{
-#if MAME_DEBUG
+#ifdef MAME_DEBUG
 		atomic_increment32(&g_tagmap_finds);
 #endif
 		UINT32 fullhash = hash(tag);

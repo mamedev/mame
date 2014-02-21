@@ -10,6 +10,6 @@
 
 #include "tagmap.h"
 
-#if MAME_DEBUG
+#ifdef MAME_DEBUG
 INT32 g_tagmap_finds = 0;
 #endif
