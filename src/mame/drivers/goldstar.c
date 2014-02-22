@@ -7350,6 +7350,26 @@ ROM_END
 
 
 
+ROM_START( goldfrui )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c1000.u6",  0x0000, 0x10000, CRC(84b982fc) SHA1(39f401da52a9df799f3fe6bbeb7cad493911b831) )
+	ROM_CONTINUE( 0x0000, 0x10000) /* Discarding 1nd half 0xff filled*/
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c1000.u24",      0x00000, 0x20000, BAD_DUMP CRC(9642c9c2) SHA1(10fdced265ef4a9a5494d8df0432337df4ecec7f) ) //FIXED BITS (00xxxxxx)
+	
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "27c1000.u25",      0x00000, 0x08000, CRC(5ce73db6) SHA1(e93948f6a44831583e0779da3158d7b5e33bcca7) )
+	ROM_CONTINUE( 0x0000, 0x08000) /* Discarding 1nd quarter 0xff filled*/
+	ROM_CONTINUE( 0x0000, 0x08000) /* Discarding 2nd quarter 0xff filled*/
+	ROM_CONTINUE( 0x0000, 0x08000) /* Discarding 3nd quarter 0xff filled*/
+	
+	ROM_REGION( 0x40000, "oki", 0 ) // Audio ADPCM 
+	ROM_LOAD( "27c1000.u57",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
+ROM_END
+
+
+
 ROM_START( ncb3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8.512", 0x00000, 0x10000, CRC(1f669cd0) SHA1(fd394119e33c017507fde87a710577e37dcdec07) )
@@ -11812,6 +11832,7 @@ GAME(  199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device,  0,        
 GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",         0 )
 GAME(  199?, chrygld,   0,        chrygld,  chrygld,  goldstar_state, chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
 GAME(  199?, chry10,    0,        chrygld,  chry10,   goldstar_state, chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
+GAME(  199?, goldfrui,  goldstar, goldstbl, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  GAME_NOT_WORKING )
 
 // are these really dyna, or bootlegs?
 GAME(  199?, ncb3,      0,        ncb3,     ncb3,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0 )
