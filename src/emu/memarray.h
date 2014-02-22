@@ -74,9 +74,9 @@ public:
 	UINT32 read32(offs_t offset) { return reinterpret_cast<UINT32 *>(m_base)[offset]; }
 	UINT64 read64(offs_t offset) { return reinterpret_cast<UINT64 *>(m_base)[offset]; }
 	void write8(offs_t offset, UINT8 data) { reinterpret_cast<UINT8 *>(m_base)[offset] = data; }
-	void write16(offs_t offset, UINT16 data) { reinterpret_cast<UINT16 *>(m_base)[offset] = data; }
-	void write32(offs_t offset, UINT32 data) { reinterpret_cast<UINT32 *>(m_base)[offset] = data; }
-	void write64(offs_t offset, UINT64 data) { reinterpret_cast<UINT64 *>(m_base)[offset] = data; }
+	void write16(offs_t offset, UINT16 data, UINT16 mem_mask = 0xffff) { COMBINE_DATA(&reinterpret_cast<UINT16 *>(m_base)[offset]); }
+	void write32(offs_t offset, UINT32 data, UINT32 mem_mask = 0xffffffff) { COMBINE_DATA(&reinterpret_cast<UINT32 *>(m_base)[offset]); }
+	void write64(offs_t offset, UINT64 data, UINT64 mem_mask = U64(0xffffffffffffffff)) { COMBINE_DATA(&reinterpret_cast<UINT64 *>(m_base)[offset]); }
 
 private:
 	// internal read/write helpers for 1 byte entries
