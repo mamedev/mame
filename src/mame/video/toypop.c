@@ -217,6 +217,7 @@ void toypop_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
 	enum { xoffs = -31, yoffs = -8 };
+	int flip = flip_screen();
 
 	for (int offs = 0;offs < 0x80;offs += 2)
 	{
@@ -243,11 +244,10 @@ void toypop_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 			sy -= 16 * sizey;
 			sy = (sy & 0xff) - 32;  // fix wraparound
 
-			if (flip_screen())
+			if (flip)
 			{
 				flipx ^= 1;
 				flipy ^= 1;
-				sy += 40;
 			}
 
 			for (int y = 0;y <= sizey;y++)
