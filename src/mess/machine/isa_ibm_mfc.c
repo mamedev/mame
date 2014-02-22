@@ -252,21 +252,16 @@ static I8255_INTERFACE( d71055c_1_intf )
 //  D8253 PIT
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_clk0_out )
+WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_out0 )
 {
 	if (m_tcr & TCR_TAE)
 		set_pc_interrupt(PC_IRQ_TIMERA, 1);
 }
 
-WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_clk1_out )
+WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_out1 )
 {
 	if (m_tcr & TCR_TBE)
 		set_pc_interrupt(PC_IRQ_TIMERB, 1);
-}
-
-WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_clk2_out )
-{
-	m_d8253->clk1_w(state);
 }
 
 static const struct pit8253_interface d8253_intf =
@@ -275,17 +270,17 @@ static const struct pit8253_interface d8253_intf =
 		{
 			XTAL_4MHz / 8,
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, d8253_clk0_out)
+			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, d8253_out0)
 		},
 		{
 			0,
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, d8253_clk1_out)
+			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, d8253_out1)
 		},
 		{
 			XTAL_4MHz / 2,
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, d8253_clk2_out)
+			DEVCB_DEVICE_LINE_MEMBER("d8253", pit8253_device, clk1_w)
 		}
 	}
 };
