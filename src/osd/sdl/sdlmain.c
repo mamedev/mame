@@ -752,7 +752,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 		if (name.makeupper().substr(name.len()-4,4) == ".BDF" )
 			return NULL;
 
-	font_name = CFStringCreateWithCString( NULL, _name, kCFStringEncodingUTF8 );
+	font_name = CFStringCreateWithCString( NULL, name.cstr(), kCFStringEncodingUTF8 );
 
 	if( font_name != NULL )
 	{
