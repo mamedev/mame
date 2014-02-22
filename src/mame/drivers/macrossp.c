@@ -765,5 +765,5 @@ DRIVER_INIT_MEMBER(macrossp_state,quizmoon)
 #endif
 }
 
-GAME( 1996, macrossp, 0, macrossp, macrossp, macrossp_state, macrossp, ROT270, "Banpresto", "Macross Plus", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1996, macrossp, 0, macrossp, macrossp, macrossp_state, macrossp, ROT270, "MOSS / Banpresto", "Macross Plus", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1997, quizmoon, 0, quizmoon, quizmoon, macrossp_state, quizmoon, ROT0,   "Banpresto", "Quiz Bisyoujo Senshi Sailor Moon - Chiryoku Tairyoku Toki no Un", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

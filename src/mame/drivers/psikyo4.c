@@ -951,4 +951,4 @@ GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck, psikyo4_state,  hotgmck,  RO
 GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck, psikyo4_state,  hotgmck,  ROT0,   "Psikyo", "Mahjong Hot Gimmick Integral (Japan)", 0 )
 GAME( 2000, loderndf, 0,        ps4small,  loderndf, driver_device, 0,        ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. B)", 0 )
 GAME( 2000, loderndfa,loderndf, ps4small,  loderndf, driver_device, 0,        ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. A)", 0 )
-GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, driver_device, 0,        ROT0,   "Psikyo / Moss", "Quiz de Idol! Hot Debut (Japan)", 0 )
+GAME( 2000, hotdebut, 0,        ps4small,  hotdebut, driver_device, 0,        ROT0,   "MOSS / Psikyo", "Quiz de Idol! Hot Debut (Japan)", 0 )

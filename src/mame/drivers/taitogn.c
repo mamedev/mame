@@ -1060,9 +1060,9 @@ GAME( 1998, chaosheaj,chaoshea, coh3002t,    coh3002t,    driver_device, 0,     
 GAME( 1998, raycris,  taitogn,  coh3002t,    coh3002t,    driver_device, 0,           ROT0,   "Taito", "Ray Crisis (V2.03J)", GAME_IMPERFECT_SOUND )
 GAME( 1999, spuzbobl, taitogn,  coh3002t,    coh3002t,    driver_device, 0,           ROT0,   "Taito", "Super Puzzle Bobble (V2.05O)", GAME_IMPERFECT_SOUND )
 GAME( 1999, spuzboblj,spuzbobl, coh3002t,    coh3002t,    driver_device, 0,           ROT0,   "Taito", "Super Puzzle Bobble (V2.04J)", GAME_IMPERFECT_SOUND )
-GAME( 1999, gobyrc,   taitogn,  coh3002t,    coh3002t,    driver_device, 0,           ROT0,   "Taito", "Go By RC (V2.03O)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // custom inputs need calibrating, likely needs mcu emulation
+GAME( 1999, gobyrc,   taitogn,  coh3002t,    coh3002t,    driver_device, 0,           ROT0,   "Taito", "Go By RC (V2.03O)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // analog controls, needs mcu emulation
 GAME( 1999, rcdego,   gobyrc,   coh3002t,    coh3002t,    driver_device, 0,           ROT0,   "Taito", "RC De Go (V2.03J)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // "
-GAME( 1999, flipmaze, taitogn,  coh3002t,    coh3002t,    driver_device, 0,           ROT0,   "Taito / Moss", "Flip Maze (V2.04J)", GAME_IMPERFECT_SOUND )
+GAME( 1999, flipmaze, taitogn,  coh3002t,    coh3002t,    driver_device, 0,           ROT0,   "MOSS / Taito", "Flip Maze (V2.04J)", GAME_IMPERFECT_SOUND )
 GAME( 2001, shikigam, taitogn,  coh3002t,    coh3002t,    driver_device, 0,           ROT270, "Alfa System / Taito", "Shikigami no Shiro (V2.03J)", GAME_IMPERFECT_SOUND )
 GAME( 2003, sianniv,  taitogn,  coh3002t,    coh3002t,    driver_device, 0,           ROT270, "Taito", "Space Invaders Anniversary (V2.02J)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // IRQ at the wrong time
 GAME( 2003, kollon,   taitogn,  coh3002t,    coh3002t,    driver_device, 0,           ROT0,   "Taito", "Kollon (V2.04J)", GAME_IMPERFECT_SOUND )
