@@ -692,9 +692,9 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
+	MCFG_SPU_ADD("spu", XTAL_67_7376MHz/2)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
 	MCFG_FRAGMENT_ADD( taito_zoom_sound )
 	MCFG_CPU_MODIFY("mn10200")
