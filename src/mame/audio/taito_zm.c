@@ -25,7 +25,6 @@ and a Zoom Corp. ZFX-2 DSP instead of the TMS57002.
 
 TODO:
 - add DSP, sound is tinny without it
-- howcome taito fx1b sounds worse than gnet? especially raystorm
 
 ***************************************************************************/
 

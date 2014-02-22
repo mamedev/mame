@@ -45,7 +45,7 @@
     ---------------------------------------------------------
 
 TODO:
-- volume/panning is linear?
+- volume/panning is linear? volume slides are too steep
 - what is reg 0xa/0xc? seems related to volume
 - identify sample flags
 - memory reads out of range sometimes
