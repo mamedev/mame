@@ -310,13 +310,13 @@ WRITE8_MEMBER(palette_device::write)
  
 WRITE16_MEMBER(palette_device::write)
 {
-	m_paletteram.write16(offset, data);
+	m_paletteram.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
 }
 
 WRITE32_MEMBER(palette_device::write)
 {
-	m_paletteram.write32(offset, data);
+	m_paletteram.write32(offset, data, mem_mask);
 	update_for_write(offset * 4, 4);
 }
 
@@ -335,7 +335,7 @@ WRITE8_MEMBER(palette_device::write_ext)
 
 WRITE16_MEMBER(palette_device::write_ext)
 {
-	m_paletteram_ext.write16(offset, data);
+	m_paletteram_ext.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
 }
 
