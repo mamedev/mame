@@ -149,6 +149,8 @@ protected:
 	UINT8 m_blink;
 
 	UINT8 m_last_data;
+	//FIXME
+	palette_device *m_palette;
 };
 
 // device type definition

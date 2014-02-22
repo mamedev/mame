@@ -187,6 +187,8 @@ private:
 	emu_timer *m_hrtc_timer;
 	emu_timer *m_vrtc_timer;
 	emu_timer *m_drq_timer;
+	//FIXME
+	palette_device *m_palette;
 };
 
 

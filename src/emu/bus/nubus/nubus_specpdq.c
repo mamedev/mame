@@ -134,8 +134,8 @@ void nubus_specpdq_device::device_reset()
 	memset(m_vram, 0, VRAM_SIZE);
 	memset(m_palette, 0, sizeof(m_palette));
 
-	m_palette[0] = rgb_t(255, 255, 255);
-	m_palette[0x80] = rgb_t(0, 0, 0);
+	m_palette_val[0] = rgb_t(255, 255, 255);
+	m_palette_val[0x80] = rgb_t(0, 0, 0);
 }
 
 
@@ -174,14 +174,14 @@ UINT32 nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				{
 					pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = m_palette[(pixels&0x80)];
-					*scanline++ = m_palette[((pixels<<1)&0x80)];
-					*scanline++ = m_palette[((pixels<<2)&0x80)];
-					*scanline++ = m_palette[((pixels<<3)&0x80)];
-					*scanline++ = m_palette[((pixels<<4)&0x80)];
-					*scanline++ = m_palette[((pixels<<5)&0x80)];
-					*scanline++ = m_palette[((pixels<<6)&0x80)];
-					*scanline++ = m_palette[((pixels<<7)&0x80)];
+					*scanline++ = m_palette_val[(pixels&0x80)];
+					*scanline++ = m_palette_val[((pixels<<1)&0x80)];
+					*scanline++ = m_palette_val[((pixels<<2)&0x80)];
+					*scanline++ = m_palette_val[((pixels<<3)&0x80)];
+					*scanline++ = m_palette_val[((pixels<<4)&0x80)];
+					*scanline++ = m_palette_val[((pixels<<5)&0x80)];
+					*scanline++ = m_palette_val[((pixels<<6)&0x80)];
+					*scanline++ = m_palette_val[((pixels<<7)&0x80)];
 				}
 			}
 			break;
@@ -194,10 +194,10 @@ UINT32 nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				{
 					pixels = vram[(y * 512) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = m_palette[(pixels&0xc0)];
-					*scanline++ = m_palette[((pixels<<2)&0xc0)];
-					*scanline++ = m_palette[((pixels<<4)&0xc0)];
-					*scanline++ = m_palette[((pixels<<6)&0xc0)];
+					*scanline++ = m_palette_val[(pixels&0xc0)];
+					*scanline++ = m_palette_val[((pixels<<2)&0xc0)];
+					*scanline++ = m_palette_val[((pixels<<4)&0xc0)];
+					*scanline++ = m_palette_val[((pixels<<6)&0xc0)];
 				}
 			}
 			break;
@@ -211,8 +211,8 @@ UINT32 nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				{
 					pixels = vram[(y * 1024) + (BYTE4_XOR_BE(x))];
 
-					*scanline++ = m_palette[(pixels&0xf0)];
-					*scanline++ = m_palette[((pixels<<4)&0xf0)];
+					*scanline++ = m_palette_val[(pixels&0xf0)];
+					*scanline++ = m_palette_val[((pixels<<4)&0xf0)];
 				}
 			}
 			break;
@@ -225,7 +225,7 @@ UINT32 nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				for (x = 0; x < 1152; x++)
 				{
 					pixels = vram[(y * 1152) + (BYTE4_XOR_BE(x))];
-					*scanline++ = m_palette[pixels];
+					*scanline++ = m_palette_val[pixels];
 				}
 			}
 			break;
@@ -297,8 +297,8 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			if (m_count == 3)
 			{
 //              printf("RAMDAC: color %d = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
-				palette_set_color(space.machine(), m_clutoffs, rgb_t(m_colors[0], m_colors[1], m_colors[2]));
-				m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
+				m_palette->set_pen_color(m_clutoffs, rgb_t(m_colors[0], m_colors[1], m_colors[2]));
+				m_palette_val[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
 				{

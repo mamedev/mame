@@ -2413,7 +2413,7 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 
 	if( gfx )
 	{
-		const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+		const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 
 		//int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
@@ -3027,7 +3027,7 @@ void saturn_state::stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle
 							UINT32 code,UINT32 color, int flipx,int flipy,int offsx,int offsy,
 							int transparent_color, int alpha)
 {
-	const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 	int x_index_base, y_index, sx, sy, ex, ey;
 	int xinc, yinc;
@@ -3104,7 +3104,7 @@ void saturn_state::stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectan
 							UINT32 code,UINT32 color, int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 {
-	const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 	int x_index_base, y_index, sx, sy, ex, ey;
 	int xinc, yinc;
@@ -3224,9 +3224,9 @@ void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 				dot_data += pal_bank;
 
 				if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-					bitmap.pix32(ydst, xdst) = machine().pens[dot_data];
+					bitmap.pix32(ydst, xdst) = m_palette->pen(dot_data);
 				else
-					bitmap.pix32(ydst, xdst) = alpha_blend_r32(bitmap.pix32(ydst, xdst), machine().pens[dot_data], stv2_current_tilemap.alpha);
+					bitmap.pix32(ydst, xdst) = alpha_blend_r32(bitmap.pix32(ydst, xdst), m_palette->pen(dot_data), stv2_current_tilemap.alpha);
 			}
 		}
 	}
@@ -3284,9 +3284,9 @@ void saturn_state::draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 				dot_data += pal_bank;
 
 				if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-					bitmap.pix32(ydst, xdst) = machine().pens[dot_data];
+					bitmap.pix32(ydst, xdst) = m_palette->pen(dot_data);
 				else
-					bitmap.pix32(ydst, xdst) = alpha_blend_r32(bitmap.pix32(ydst, xdst), machine().pens[dot_data], stv2_current_tilemap.alpha);
+					bitmap.pix32(ydst, xdst) = alpha_blend_r32(bitmap.pix32(ydst, xdst), m_palette->pen(dot_data), stv2_current_tilemap.alpha);
 			}
 		}
 	}
@@ -3341,9 +3341,9 @@ void saturn_state::draw_11bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 				dot_data += pal_bank;
 
 				if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-					bitmap.pix32(ydst, xdst) = machine().pens[dot_data];
+					bitmap.pix32(ydst, xdst) = m_palette->pen(dot_data);
 				else
-					bitmap.pix32(ydst, xdst) = alpha_blend_r32(bitmap.pix32(ydst, xdst), machine().pens[dot_data], stv2_current_tilemap.alpha);
+					bitmap.pix32(ydst, xdst) = alpha_blend_r32(bitmap.pix32(ydst, xdst), m_palette->pen(dot_data), stv2_current_tilemap.alpha);
 			}
 		}
 	}
@@ -4348,7 +4348,7 @@ void saturn_state::stv_vdp2_draw_line(bitmap_rgb32 &bitmap, const rectangle &cli
 				pen = (gfxdata[base_offs+0]<<8)|gfxdata[base_offs+1];
 				pix = bitmap.pix32(y, x);
 
-				bitmap.pix32(y, x) = stv_add_blend(machine().pens[pen & 0x7ff],pix);
+				bitmap.pix32(y, x) = stv_add_blend(m_palette->pen(pen & 0x7ff),pix);
 			}
 		}
 	}
@@ -6205,7 +6205,7 @@ void saturn_state::stv_vdp2_fade_effects( void )
 	for(i=0;i<2048;i++)
 	{
 		/*Fade A*/
-		color = palette_get_color(machine(), i);
+		color = m_palette->pen_color(i);
 		t_r = (STV_VDP2_COAR & 0x100) ? (color.r() - (0x100 - (STV_VDP2_COAR & 0xff))) : ((STV_VDP2_COAR & 0xff) + color.r());
 		t_g = (STV_VDP2_COAG & 0x100) ? (color.g() - (0x100 - (STV_VDP2_COAG & 0xff))) : ((STV_VDP2_COAG & 0xff) + color.g());
 		t_b = (STV_VDP2_COAB & 0x100) ? (color.b() - (0x100 - (STV_VDP2_COAB & 0xff))) : ((STV_VDP2_COAB & 0xff) + color.b());
@@ -6221,7 +6221,7 @@ void saturn_state::stv_vdp2_fade_effects( void )
 		m_palette->set_pen_color(i+(2048*1),rgb_t(r,g,b));
 
 		/*Fade B*/
-		color = palette_get_color(machine(), i);
+		color = m_palette->pen_color(i);
 		t_r = (STV_VDP2_COBR & 0x100) ? (color.r() - (0xff - (STV_VDP2_COBR & 0xff))) : ((STV_VDP2_COBR & 0xff) + color.r());
 		t_g = (STV_VDP2_COBG & 0x100) ? (color.g() - (0xff - (STV_VDP2_COBG & 0xff))) : ((STV_VDP2_COBG & 0xff) + color.g());
 		t_b = (STV_VDP2_COBB & 0x100) ? (color.b() - (0xff - (STV_VDP2_COBB & 0xff))) : ((STV_VDP2_COBB & 0xff) + color.b());
@@ -6581,7 +6581,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 								pix += (STV_VDP2_SPCAOS << 8);
 								pix &= 0x7ff;
 								pix += color_offset_pal;
-								bitmap_line[x] = machine().pens[ pix ];
+								bitmap_line[x] = m_palette->pen( pix );
 							}
 						}
 
@@ -6681,15 +6681,15 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 								{
 									if ( STV_VDP2_CCMD )
 									{
-										bitmap_line[x] = stv_add_blend( bitmap_line[x], machine().pens[pix] );
+										bitmap_line[x] = stv_add_blend( bitmap_line[x], m_palette->pen(pix) );
 									}
 									else
 									{
-										bitmap_line[x] = alpha_blend_r32( bitmap_line[x], machine().pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										bitmap_line[x] = alpha_blend_r32( bitmap_line[x], m_palette->pen(pix), ((UINT16)(0x1f-ccr)*0xff)/0x1f );
 									}
 								}
 								else
-									bitmap_line[x] = machine().pens[pix];
+									bitmap_line[x] = m_palette->pen(pix);
 							}
 						}
 
@@ -6848,15 +6848,15 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 							{
 								if(double_x)
 								{
-									bitmap_line[x*2] = machine().pens[ pix ];
-									if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = machine().pens[ pix ];
-									bitmap_line[x*2+1] = machine().pens[ pix ];
-									if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = machine().pens[ pix ];
+									bitmap_line[x*2] = m_palette->pen( pix );
+									if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = m_palette->pen( pix );
+									bitmap_line[x*2+1] = m_palette->pen( pix );
+									if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = m_palette->pen( pix );
 								}
 								else
 								{
-									bitmap_line[x] = machine().pens[ pix ];
-									if ( interlace_framebuffer == 1 ) bitmap_line2[x] = machine().pens[ pix ];
+									bitmap_line[x] = m_palette->pen( pix );
+									if ( interlace_framebuffer == 1 ) bitmap_line2[x] = m_palette->pen( pix );
 								}
 							}
 							else // alpha_blend == 1
@@ -6865,30 +6865,30 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 								{
 									if(double_x)
 									{
-										bitmap_line[x*2] = stv_add_blend( bitmap_line[x*2], machine().pens[pix] );
-										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = stv_add_blend( bitmap_line2[x], machine().pens[pix] );
-										bitmap_line[x*2+1] = stv_add_blend( bitmap_line[x*2+1], machine().pens[pix] );
-										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = stv_add_blend( bitmap_line2[x], machine().pens[pix] );
+										bitmap_line[x*2] = stv_add_blend( bitmap_line[x*2], m_palette->pen(pix) );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = stv_add_blend( bitmap_line2[x], m_palette->pen(pix) );
+										bitmap_line[x*2+1] = stv_add_blend( bitmap_line[x*2+1], m_palette->pen(pix) );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = stv_add_blend( bitmap_line2[x], m_palette->pen(pix) );
 									}
 									else
 									{
-										bitmap_line[x] = stv_add_blend( bitmap_line[x], machine().pens[pix] );
-										if ( interlace_framebuffer == 1 ) bitmap_line2[x] = stv_add_blend( bitmap_line2[x], machine().pens[pix] );
+										bitmap_line[x] = stv_add_blend( bitmap_line[x], m_palette->pen(pix) );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x] = stv_add_blend( bitmap_line2[x], m_palette->pen(pix) );
 									}
 								}
 								else
 								{
 									if(double_x)
 									{
-										bitmap_line[x*2] = alpha_blend_r32( bitmap_line[x*2], machine().pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = alpha_blend_r32( bitmap_line2[x], machine().pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-										bitmap_line[x*2+1] = alpha_blend_r32( bitmap_line[x*2+1], machine().pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = alpha_blend_r32( bitmap_line2[x], machine().pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										bitmap_line[x*2] = alpha_blend_r32( bitmap_line[x*2], m_palette->pen(pix), ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2] = alpha_blend_r32( bitmap_line2[x], m_palette->pen(pix), ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										bitmap_line[x*2+1] = alpha_blend_r32( bitmap_line[x*2+1], m_palette->pen(pix), ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x*2+1] = alpha_blend_r32( bitmap_line2[x], m_palette->pen(pix), ((UINT16)(0x1f-ccr)*0xff)/0x1f );
 									}
 									else
 									{
-										bitmap_line[x] = alpha_blend_r32( bitmap_line[x], machine().pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
-										if ( interlace_framebuffer == 1 ) bitmap_line2[x] = alpha_blend_r32( bitmap_line2[x], machine().pens[pix], ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										bitmap_line[x] = alpha_blend_r32( bitmap_line[x], m_palette->pen(pix), ((UINT16)(0x1f-ccr)*0xff)/0x1f );
+										if ( interlace_framebuffer == 1 ) bitmap_line2[x] = alpha_blend_r32( bitmap_line2[x], m_palette->pen(pix), ((UINT16)(0x1f-ccr)*0xff)/0x1f );
 									}
 								}
 							}

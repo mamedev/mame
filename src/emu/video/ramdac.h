@@ -76,6 +76,8 @@ private:
 	UINT8 *m_palram;
 
 	const address_space_config      m_space_config;
+	//FIXME
+	palette_device *m_palette;
 };
 
 

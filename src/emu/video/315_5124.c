@@ -398,13 +398,13 @@ void sega315_5124_device::process_line_timer()
 		/* Draw left border */
 		rec.min_x = SEGA315_5124_LBORDER_START;
 		rec.max_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 1;
-		m_tmpbitmap.fill(machine().pens[m_current_palette[BACKDROP_COLOR]], rec);
+		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill(1, rec);
 
 		/* Draw right border */
 		rec.min_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256;
 		rec.max_x = rec.min_x + SEGA315_5124_RBORDER_WIDTH - 1;
-		m_tmpbitmap.fill(machine().pens[m_current_palette[BACKDROP_COLOR]], rec);
+		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill(1, rec);
 
 		/* Draw middle of the border */
@@ -440,13 +440,13 @@ void sega315_5124_device::process_line_timer()
 		/* Draw left border */
 		rec.min_x = SEGA315_5124_LBORDER_START;
 		rec.max_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 1;
-		m_tmpbitmap.fill(machine().pens[m_current_palette[BACKDROP_COLOR]], rec);
+		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill(1, rec);
 
 		/* Draw right border */
 		rec.min_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256;
 		rec.max_x = rec.min_x + SEGA315_5124_RBORDER_WIDTH - 1;
-		m_tmpbitmap.fill(machine().pens[m_current_palette[BACKDROP_COLOR]], rec);
+		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill(1, rec);
 
 		select_sprites( vpos - vpos_limit );
@@ -472,13 +472,13 @@ void sega315_5124_device::process_line_timer()
 		/* Draw left border */
 		rec.min_x = SEGA315_5124_LBORDER_START;
 		rec.max_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 1;
-		m_tmpbitmap.fill(machine().pens[m_current_palette[BACKDROP_COLOR]], rec);
+		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill(1, rec);
 
 		/* Draw right border */
 		rec.min_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256;
 		rec.max_x = rec.min_x + SEGA315_5124_RBORDER_WIDTH - 1;
-		m_tmpbitmap.fill(machine().pens[m_current_palette[BACKDROP_COLOR]], rec);
+		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill(1, rec);
 
 		/* Draw middle of the border */
@@ -1432,7 +1432,7 @@ void sega315_5124_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 	{
 		for (x = 0; x < 256; x++)
 		{
-			p_bitmap[x] = machine().pens[m_current_palette[BACKDROP_COLOR]];
+			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
 			p_y1[x] = 1;
 		}
 	}
@@ -1440,7 +1440,7 @@ void sega315_5124_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 	{
 		for (x = 0; x < 256; x++)
 		{
-			p_bitmap[x] = machine().pens[blitline_buffer[x]];
+			p_bitmap[x] = m_palette->pen(blitline_buffer[x]);
 			p_y1[x] = ( priority_selected[x] & 0x0f ) ? 0 : 1;
 		}
 	}
@@ -1590,10 +1590,10 @@ void sega315_5378_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 
 			for (x = 0 + 48; x < 160 + 48; x++)
 			{
-				rgb_t   c1 = machine().pens[line1[x]];
-				rgb_t   c2 = machine().pens[line2[x]];
-				rgb_t   c3 = machine().pens[line3[x]];
-				rgb_t   c4 = machine().pens[line4[x]];
+				rgb_t   c1 = m_palette->pen(line1[x]);
+				rgb_t   c2 = m_palette->pen(line2[x]);
+				rgb_t   c3 = m_palette->pen(line3[x]);
+				rgb_t   c4 = m_palette->pen(line4[x]);
 				m_tmpbitmap.pix32(pixel_plot_y, pixel_offset_x + x) =
 					rgb_t((c1.r() / 6 + c2.r() / 3 + c3.r() / 3 + c4.r() / 6 ),
 						(c1.g() / 6 + c2.g() / 3 + c3.g() / 3 + c4.g() / 6 ),
@@ -1606,7 +1606,7 @@ void sega315_5378_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 
 	for (x = 0; x < 256; x++)
 	{
-		m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x + x) = machine().pens[blitline_buffer[x]];
+		m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x + x) = m_palette->pen(blitline_buffer[x]);
 	}
 }
 

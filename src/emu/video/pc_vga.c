@@ -491,7 +491,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					{
 						if(!machine().primary_screen->visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
-						bitmapline[c+xi-(pel_shift)] = machine().pens[vga.memory[(pos & 0xffff)+((xi >> 1)*0x10000)]];
+						bitmapline[c+xi-(pel_shift)] = m_palette->pen(vga.memory[(pos & 0xffff)+((xi >> 1)*0x10000)]);
 					}
 				}
 			}
@@ -518,7 +518,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					{
 						if(!machine().primary_screen->visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
-						bitmapline[c+xi-pel_shift] = machine().pens[vga.memory[(pos+(xi >> 1)) & 0xffff]];
+						bitmapline[c+xi-pel_shift] = m_palette->pen(vga.memory[(pos+(xi >> 1)) & 0xffff]);
 					}
 				}
 			}
@@ -640,7 +640,7 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					{
 						if(!machine().primary_screen->visible_area().contains(c+xi, line + yi))
 							continue;
-						bitmapline[c+xi] = machine().pens[vga.memory[(pos+(xi))]];
+						bitmapline[c+xi] = m_palette->pen(vga.memory[(pos+(xi))]);
 					}
 				}
 			}
@@ -855,16 +855,16 @@ UINT8 vga_device::pc_vga_choosevideomode()
 		{
 			for (i=0; i<16;i++)
 			{
-				vga.pens[i] = machine().pens[(vga.attribute.data[i]&0x0f)
-											|((vga.attribute.data[0x14]&0xf)<<4)];
+				vga.pens[i] = m_palette->pen((vga.attribute.data[i]&0x0f)
+											|((vga.attribute.data[0x14]&0xf)<<4));
 			}
 		}
 		else
 		{
 			for (i=0; i<16;i++)
 			{
-				vga.pens[i]=machine().pens[(vga.attribute.data[i]&0x3f)
-											|((vga.attribute.data[0x14]&0xc)<<4)];
+				vga.pens[i]=m_palette->pen((vga.attribute.data[i]&0x3f)
+											|((vga.attribute.data[0x14]&0xc)<<4));
 			}
 		}
 
@@ -916,16 +916,16 @@ UINT8 svga_device::pc_vga_choosevideomode()
 		{
 			for (i=0; i<16;i++)
 			{
-				vga.pens[i] = machine().pens[(vga.attribute.data[i]&0x0f)
-											|((vga.attribute.data[0x14]&0xf)<<4)];
+				vga.pens[i] = m_palette->pen((vga.attribute.data[i]&0x0f)
+											|((vga.attribute.data[0x14]&0xf)<<4));
 			}
 		}
 		else
 		{
 			for (i=0; i<16;i++)
 			{
-				vga.pens[i]=machine().pens[(vga.attribute.data[i]&0x3f)
-											|((vga.attribute.data[0x14]&0xc)<<4)];
+				vga.pens[i]=m_palette->pen((vga.attribute.data[i]&0x3f)
+											|((vga.attribute.data[0x14]&0xc)<<4));
 			}
 		}
 
@@ -1064,8 +1064,8 @@ UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 		else /* TODO: other modes */
 		{
-			bg_col = screen.machine().pens[s3.cursor_bg[0]];
-			fg_col = screen.machine().pens[s3.cursor_fg[0]];
+			bg_col = m_palette->pen(s3.cursor_bg[0]);
+			fg_col = m_palette->pen(s3.cursor_fg[0]);
 		}
 
 		//popmessage("%08x %08x",(s3.cursor_bg[0])|(s3.cursor_bg[1]<<8)|(s3.cursor_bg[2]<<16)|(s3.cursor_bg[3]<<24)

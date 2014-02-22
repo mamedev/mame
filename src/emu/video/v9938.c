@@ -271,7 +271,7 @@ PALETTE_INIT_MEMBER(v9958_device, v9958)
 	UINT8 pal[19268*3];
 
 	// init v9938 512-color palette
-	PALETTE_INIT_CALL_MEMBER(v9938);
+	PALETTE_INIT_NAME(v9938)(palette);
 
 	if(palette.entries() != 19780)
 		fatalerror("V9958: not enough palette, must be 19780");

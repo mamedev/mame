@@ -58,6 +58,8 @@ private:
 	UINT8 m_option;
 	UINT8 m_attr[16];
 	UINT8 m_underline;
+	//FIXME
+	palette_device *m_palette;	
 };
 
 

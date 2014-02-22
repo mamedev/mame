@@ -181,9 +181,9 @@ wangpc_tig_device::wangpc_tig_device(const machine_config &mconfig, const char *
 void wangpc_tig_device::device_start()
 {
 	// initialize palette
-	palette_set_color_rgb(machine(), 0, 0, 0, 0);
-	palette_set_color_rgb(machine(), 1, 0, 0x80, 0);
-	palette_set_color_rgb(machine(), 2, 0, 0xff, 0);
+	m_palette->set_pen_color(0, 0, 0, 0);
+	m_palette->set_pen_color(1, 0, 0x80, 0);
+	m_palette->set_pen_color(2, 0, 0xff, 0);
 
 	// state saving
 	save_item(NAME(m_option));

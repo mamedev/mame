@@ -337,6 +337,7 @@ public:
 	rgb_t pen_color(pen_t pen) { return m_palette->entry_color(pen); }
 	double pen_contrast(pen_t pen) { return m_palette->entry_contrast(pen); } 
 	pen_t black_pen() const { return m_black_pen; }
+	pen_t white_pen() const { return m_white_pen; }
 	memory_array &basemem() { return m_paletteram; }
 	memory_array &extmem() { return m_paletteram_ext; }
 
