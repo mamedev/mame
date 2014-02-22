@@ -86,16 +86,16 @@ static const UINT16 m_p_n_prevpointlist3[] = { 2, 0, 1 };
 
 #define SINT11( x ) ( ( (INT32)( x ) << 21 ) >> 21 )
 
-#define COORD_X( a ) ( (INT16)a.w.l )
-#define COORD_Y( a ) ( (INT16)a.w.h )
+#define COORD_X( a ) ( a.sw.l )
+#define COORD_Y( a ) ( a.sw.h )
 #define SIZE_W( a ) ( a.w.l )
 #define SIZE_H( a ) ( a.w.h )
 #define BGR_C( a ) ( a.b.h3 )
 #define BGR_B( a ) ( a.b.h2 )
 #define BGR_G( a ) ( a.b.h )
 #define BGR_R( a ) ( a.b.l )
-#define TEXTURE_V( a ) ( (UINT8)a.b.h )
-#define TEXTURE_U( a ) ( (UINT8)a.b.l )
+#define TEXTURE_V( a ) ( a.b.h )
+#define TEXTURE_U( a ) ( a.b.l )
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, const char *s_fmt, ... )
 {
