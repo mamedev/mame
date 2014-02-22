@@ -59297,7 +59297,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="popeye2" supported="no">
+	<software name="popeye2" supported="partial">
 		<description>Popeye 2 - Travels In Persia ~ Aladdin III (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -59346,7 +59346,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="aladdinc" cloneof="aladdin" supported="no">
+	<software name="aladdinc" cloneof="aladdin" supported="partial">
 		<description>Aladdin (Asia, Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -59646,7 +59646,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="chinarb" cloneof="mmania7" supported="no">
+	<software name="chinarb" cloneof="mmania7" supported="partial">
 		<description>China Rabbit Baby (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -59678,7 +59678,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="contrasp" supported="no">
+	<software name="contrasp" supported="partial">
 		<description>Contra Spirits (Asia, Newer)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -59694,7 +59694,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="contraspa" cloneof="contrasp" supported="no">
+	<software name="contraspa" cloneof="contrasp" supported="partial">
 		<description>Contra Spirits (Asia, Newer, Alt)</description>
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -59710,7 +59710,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="contraspb" cloneof="contrasp" supported="no">
+	<software name="contraspb" cloneof="contrasp" supported="partial">
 		<description>Contra Spirits (Asia)</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -59727,7 +59727,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="contraspc" cloneof="contrasp" supported="no">
+	<software name="contraspc" cloneof="contrasp" supported="partial">
 		<description>Contra Spirits (Asia, Alt)</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -59743,7 +59743,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="contraspd" cloneof="contrasp" supported="no">
+	<software name="contraspd" cloneof="contrasp" supported="partial">
 		<description>Contra Spirits (Asia, Alt 2)</description>
 		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -59848,7 +59848,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dkongc4" supported="no">
+	<software name="dkongc4" supported="partial">
 		<description>Donkey Kong Country 4 ~ The Jungle Book 2 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -60201,7 +60201,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="ffight3" supported="no">
+	<software name="ffight3" supported="partial">
 		<description>Final Fight 3 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -60217,7 +60217,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="ffight3a" cloneof="ffight3" supported="no">
+	<software name="ffight3a" cloneof="ffight3" supported="partial">
 		<description>Final Fight 3 (Asia, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -60794,7 +60794,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="mmania7" supported="no">
+	<software name="mmania7" supported="partial">
 		<description>Mickey Mania 7</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -61549,7 +61549,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="smw" supported="no">
+	<software name="smw" supported="partial">
 		<description>Super Mario World (Ripped from multicart)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -61565,7 +61565,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="smwb" cloneof="smw" supported="no">
+	<software name="smwb" cloneof="smw" supported="partial">
 		<description>Super Mario World (Asia, Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -61581,7 +61581,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="smwa" cloneof="smw" supported="no">
+	<software name="smwa" cloneof="smw" supported="partial">
 		<description>Super Mario World (Asia, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -61664,7 +61664,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="ttoons6" supported="no">
+	<software name="ttoons6" supported="partial">
 		<description>Tiny Toon Adventures 6 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -69151,7 +69151,7 @@ Other
 		</part>
 	</software>
 
-	<software name="aladretj" cloneof="astyanax" supported="no">
+	<software name="aladretj" cloneof="astyanax" supported="partial">
 		<description>Aladdin - The Return of Jaffar (The Lord of King pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -70114,7 +70114,7 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="tysonpoh" cloneof="tysonpo" supported="no">
+	<software name="tysonpoh" cloneof="tysonpo" supported="partial">
 		<description>Mike Tyson's Punch-Out!! (Pirate)</description>
 		<year>19??</year>
 		<publisher>J. Y. Company</publisher>
@@ -72740,7 +72740,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mk2b" supported="no">
+	<software name="mk2b" supported="partial">
 		<description>Mortal Kombat 2 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -72821,7 +72821,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mk3sp56" supported="no">
+	<software name="mk3sp56" supported="partial">
 		<description>Mortal Kombat 3 - Special 56 Peoples (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -72987,7 +72987,7 @@ be better to redump them properly. -->
 	</software>
 
 <!-- These two might have been ripped from a 2-in-1 MK cart... to be investigated later... -->
-	<software name="mk2sp" supported="no">
+	<software name="mk2sp" supported="partial">
 		<description>Mortal Kombat II Special (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -73020,7 +73020,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mk3sp" supported="no">
+	<software name="mk3sp" supported="partial">
 		<description>Mortal Kombat III Special (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -73100,7 +73100,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="pr3" supported="no">
+	<software name="pr3" supported="partial">
 		<description>Power Rangers III (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -73116,7 +73116,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="pr4" supported="no">
+	<software name="pr4" supported="partial">
 		<description>Power Rangers IV (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -73149,7 +73149,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="ssamsho2" supported="no">
+	<software name="ssamsho2" supported="partial">
 		<description>Shin Samurai Spirits 2 - Haoumaru Jigoku Hen (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -73508,7 +73508,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="tekken2" supported="no">
+	<software name="tekken2" supported="partial">
 		<description>Tekken 2 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -75713,7 +75713,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_45" supported="no">
+	<software name="mc_45" supported="partial">
 		<description>45 in 1 (JY-120A)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -75729,14 +75729,14 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_45a" cloneof="mc_45" supported="no">
+	<software name="mc_45a" cloneof="mc_45" supported="partial">
 		<description>45 in 1 (JY-120A, Fixed?)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="jyc_a" />
+			<feature name="slot" value="jyc_c" />
 			<feature name="pcb" value="JYCOMPANY-A" />
-			<dataarea name="chr" size="2088960">
+			<dataarea name="chr" size="2097152">
 				<rom name="45 in 1 (jy-120a) (unl).chr" size="2088960" crc="d597100b" sha1="b2ba00ff5d4a049e6acdae5df0bb44a884e55507" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="2097152">

@@ -307,6 +307,30 @@ void sns_sa1_device::dma_cctype1_transfer(address_space &space)
 
 void sns_sa1_device::dma_cctype2_transfer(address_space &space)
 {
+	UINT32 address = m_dst_addr & 0x07ff;
+	int base = (m_dma_line & 1) ? 8 : 0;	// use either regs 0-7 or 8-15
+	int depth, bpp;
+
+	depth = m_dma_ccparam & 0x03;
+	if (depth > 2) depth = 2;
+	
+	bpp = 2 << (2 - depth);
+
+	address &= ~((1 << (7 - depth)) - 1);
+	address += (m_dma_line & 8) * bpp;
+	address += (m_dma_line & 7) * 2;
+	
+	for (int byte = 0; byte < bpp; byte++) 
+	{
+		UINT8 output = 0;
+		for (int bit = 0; bit < 8; bit++)
+			output |= BIT(m_brf_reg[base + bit], byte) << (7 - bit);
+
+		write_iram(address + ((byte & 6) << 3) + (byte & 1), output);
+	}
+	
+	m_dma_line++;
+	m_dma_line &= 0x0f;
 }
 
 UINT8 sns_sa1_device::read_regs(address_space &space, UINT32 offset)
@@ -629,6 +653,8 @@ void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 			// SA-1  DCNT  00h   DMA Control (W)
 //          printf("%02x to SA-1 DMA control\n", data);
 			m_dma_ctrl = data;
+			if (!BIT(m_dma_ctrl, 7))
+				m_dma_line = 0;
 			break;
 		case 0x031:
 			// Both  CDMA  00h   Character Conversion DMA Parameters (W)
