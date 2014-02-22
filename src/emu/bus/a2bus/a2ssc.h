@@ -47,6 +47,7 @@ protected:
 
 private:
 	UINT8 *m_rom;
+	bool m_started;
 };
 
 // device type definition

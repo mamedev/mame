@@ -64,7 +64,7 @@ public:
 public:
 	const UINT8 *m_p_chargen;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void palette_init_zorba();
+	DECLARE_PALETTE_INIT(zorba);
 	required_shared_ptr<const UINT8> m_p_videoram;
 	DECLARE_DRIVER_INIT(zorba);
 	DECLARE_MACHINE_RESET(zorba);
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_SCREEN_SIZE(640, 276)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 275)
 	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OVERRIDE(zorba_state, zorba)
+	MCFG_PALETTE_INIT_OWNER(zorba_state, zorba)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

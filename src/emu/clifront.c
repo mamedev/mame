@@ -276,6 +276,12 @@ int cli_frontend::execute(int argc, char **argv)
 
 	_7z_file_cache_clear();
 
+#ifdef MAME_DEBUG
+	// TODO: this will only be printed when the executable is exited and not when selecting a new set via the internal UI - it needs to be placed somewhere else where it can be printed and reset after each run (check Average Speed location)
+	if (*(m_options.command()) == 0)
+		mame_printf_info("%d tagmap lookups\n", g_tagmap_finds);
+#endif
+
 	return m_result;
 }
 

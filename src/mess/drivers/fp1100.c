@@ -316,7 +316,6 @@ static GFXDECODE_START( fp1100 )
 	//GFXDECODE_ENTRY( "chargen", 0x0000, fp1100_chars_8x8, 0, 1 )
 GFXDECODE_END
 
-static const UPD7810_CONFIG fp1100_slave_cpu_config = { TYPE_7801, NULL };
 //static const upd1771_interface scv_upd1771c_config = { DEVCB_LINE( scv_upd1771_ack_w ) };
 
 
@@ -353,7 +352,6 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_CPU_ADD( "sub", UPD7801, MAIN_CLOCK/2 )
 	MCFG_CPU_PROGRAM_MAP( fp1100_slave_map )
 	MCFG_CPU_IO_MAP( fp1100_slave_io )
-	MCFG_CPU_CONFIG( fp1100_slave_cpu_config )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

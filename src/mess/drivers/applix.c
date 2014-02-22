@@ -135,7 +135,7 @@ public:
 	UINT8 m_pa;
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(applix);
 	UINT8 m_palette_latch[4];
 	required_shared_ptr<UINT16> m_base;
 private:
@@ -871,6 +871,7 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(applix_state, applix)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

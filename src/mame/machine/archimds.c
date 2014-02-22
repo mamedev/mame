@@ -809,7 +809,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 {
 	UINT32 reg = data>>24;
 	UINT32 val = data & 0xffffff;
-	//#ifdef DEBUG
+	//#ifdef MAME_DEBUG
 	static const char *const vrnames[] =
 	{
 		"horizontal total",
@@ -896,7 +896,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 		}
 
 
-		//#ifdef DEBUG
+		//#ifdef MAME_DEBUG
 		logerror("VIDC: %s = %d\n", vrnames[(reg-0x80)/4], m_vidc_regs[reg]);
 		//#endif
 

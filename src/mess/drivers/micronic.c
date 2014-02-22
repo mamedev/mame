@@ -377,6 +377,7 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(micronic_state, micronic)
 
 	MCFG_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
 

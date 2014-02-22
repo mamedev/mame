@@ -223,6 +223,9 @@ public:
 	emu_timer                   *m_scanline_timer;      /* scanline timer */
 
 	const char        *m_cpu_tag;
+	
+	//FIXME
+	palette_device *m_palette;
 
 private:
 	static const device_timer_id TIMER_HBLANK = 0;
@@ -231,6 +234,7 @@ private:
 
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
+	
 };
 
 class ppu2c02_device : public ppu2c0x_device {

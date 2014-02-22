@@ -688,6 +688,7 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_PALETTE_ADD( "palette", 16 )
+	MCFG_PALETTE_INIT_OWNER(tvc_state, tvc)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 3125000/2, tvc_crtc6845_interface) // clk taken from schematics
 

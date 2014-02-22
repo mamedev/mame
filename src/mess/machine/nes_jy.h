@@ -20,9 +20,10 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
+	
 	virtual DECLARE_READ8_MEMBER(chr_r);
+	virtual DECLARE_READ8_MEMBER(nt_r);
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked);
 	virtual void scanline_irq(int scanline, int vblank, int blanked);
 	virtual void pcb_reset();
 
@@ -31,8 +32,6 @@ protected:
 	void update_banks(int reg);
 	void update_prg();
 	void update_chr();
-	void update_chr_latches();  // 4KB mode updates in a more complicate way...
-	void update_extra_chr();
 	void update_mirror_typea();
 	virtual void update_mirror() { update_mirror_typea(); }
 	inline UINT8 unscramble(UINT8 bank);
@@ -40,7 +39,7 @@ protected:
 	UINT8 m_mul[2];
 	UINT8 m_latch;
 	UINT8 m_reg[4];
-	UINT8 m_chr_latch[2];
+	UINT8 m_chr_latch[2];	// type C uses a more complex CHR 4K mode, and these vars are only changed for those games
 	UINT8 m_mmc_prg_bank[4];
 	UINT16 m_mmc_nt_bank[4];
 	UINT16 m_mmc_vrom_bank[8];
@@ -84,9 +83,11 @@ public:
 	// construction/destruction
 	nes_jy_typec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	virtual DECLARE_READ8_MEMBER(chr_r);
+
 protected:
 	void update_mirror_typec();
-	virtual void update_mirror() { update_mirror_typeb(); }
+	virtual void update_mirror() { update_mirror_typec(); }
 };
 
 

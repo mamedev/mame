@@ -5,12 +5,11 @@
  */
 
 
+#include "isa_gus.h"
 #include "bus/midi/midi.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
-#include "isa_gus.h"
-#include "sound/speaker.h"
-#include "machine/6850acia.h"
+#include "machine/clock.h"
 
 
 //**************************************************************************
@@ -40,6 +39,25 @@ const device_type ISA16_GUS = &device_creator<isa16_gus_device>;
 #ifdef LOG_SOUND
 FILE* f;
 #endif
+
+void gf1_device::update_irq()
+{
+	int txirq = calculate_txirq();
+
+	if (m_txirq != txirq)
+	{
+		m_txirq = txirq;
+		m_txirq_handler(!m_txirq);
+	}
+
+	int rxirq = calculate_rxirq();
+
+	if (m_rxirq != rxirq)
+	{
+		m_rxirq = rxirq;
+		m_rxirq_handler(!m_rxirq);
+	}
+}
 
 /* only the Adlib timers are implemented in hardware */
 READ8_MEMBER( gf1_device::adlib_r )
@@ -332,9 +350,11 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 //  gf1_device - constructor
 //-------------------------------------------------
 
-gf1_device::gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, GGF1, "Gravis GF1", tag, owner, clock, "gf1", __FILE__),
-		device_sound_interface( mconfig, *this )
+gf1_device::gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	acia6850_device(mconfig, GGF1, "Gravis GF1", tag, owner, clock, "gf1", __FILE__),
+	device_sound_interface( mconfig, *this ),
+	m_txirq_handler(*this),
+	m_rxirq_handler(*this)
 {
 }
 
@@ -368,6 +388,9 @@ void gf1_device::device_start()
 {
 	int i;
 	double out = (double)(1 << 13);
+
+	m_txirq_handler.resolve_safe();
+	m_rxirq_handler.resolve_safe();
 
 	// TODO: make DRAM size configurable.  Can be 256k, 512k, 768k, or 1024k
 	m_wave_ram = auto_alloc_array(machine(),UINT8,1024*1024);
@@ -1202,15 +1225,6 @@ void gf1_device::eop_w(int state)
 
 /* 16-bit ISA card device implementation */
 
-static ACIA6850_INTERFACE(gus_midi_interface)
-{
-	31250 * 16,
-	0,
-	DEVCB_DEVICE_LINE_MEMBER("mdout", midi_port_device, write_txd),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,midi_irq)
-};
-
 static SLOT_INTERFACE_START(midiin_slot)
 	SLOT_INTERFACE("midiin", MIDIIN_PORT)
 SLOT_INTERFACE_END
@@ -1238,11 +1252,18 @@ static MACHINE_CONFIG_FRAGMENT( gus_config )
 	MCFG_SOUND_CONFIG(gus_gf1_config)
 	MCFG_SOUND_ROUTE(0,"lspeaker",0.50)
 	MCFG_SOUND_ROUTE(1,"rspeaker",0.50)
-	MCFG_ACIA6850_ADD("midi",gus_midi_interface)
+
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_GF1_TXIRQ_HANDLER(WRITELINE(isa16_gus_device, midi_txirq))
+	MCFG_GF1_RXIRQ_HANDLER(WRITELINE(isa16_gus_device, midi_txirq))
+
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, isa16_gus_device, midi_rx_w))
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("gf1", acia6850_device, write_rxd))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(isa16_gus_device, write_acia_clock))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( gus_joy )
@@ -1276,16 +1297,15 @@ ioport_constructor isa16_gus_device::device_input_ports() const
 }
 
 
-isa16_gus_device::isa16_gus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, ISA16_GUS, "Gravis Ultrasound", tag, owner, clock, "isa_gus", __FILE__),
-		device_isa16_card_interface( mconfig, *this )
+isa16_gus_device::isa16_gus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, ISA16_GUS, "Gravis Ultrasound", tag, owner, clock, "isa_gus", __FILE__),
+	device_isa16_card_interface( mconfig, *this ),
+	m_gf1(*this, "gf1")
 {
 }
 
 void isa16_gus_device::device_start()
 {
-	m_gf1 = subdevice<gf1_device>("gf1");
-	m_midi = subdevice<acia6850_device>("midi");
 	set_isa_device();
 	m_isa->install_device(0x0200, 0x0201, 0, 0, read8_delegate(FUNC(isa16_gus_device::joy_r),this), write8_delegate(FUNC(isa16_gus_device::joy_w),this) );
 	m_isa->install_device(0x0220, 0x022f, 0, 0, read8_delegate(FUNC(isa16_gus_device::board_r),this), write8_delegate(FUNC(isa16_gus_device::board_w),this) );
@@ -1376,9 +1396,9 @@ READ8_MEMBER(isa16_gus_device::synth_r)
 	switch(offset)
 	{
 	case 0x00:
-		return m_midi->status_read(space,0);
+		return m_gf1->status_r(space,0);
 	case 0x01:
-		return m_midi->data_read(space,0);
+		return m_gf1->data_r(space,0);
 	case 0x02:
 	case 0x03:
 		return m_gf1->global_reg_select_r(space,offset-2);
@@ -1400,10 +1420,10 @@ WRITE8_MEMBER(isa16_gus_device::synth_w)
 	switch(offset)
 	{
 	case 0x00:
-		m_midi->control_write(space,0,data);
+		m_gf1->control_w(space,0,data);
 		break;
 	case 0x01:
-		m_midi->data_write(space,0,data);
+		m_gf1->data_w(space,0,data);
 		break;
 	case 0x02:
 	case 0x03:
@@ -1682,36 +1702,26 @@ void isa16_gus_device::reset_midi_irq(UINT8 source)
 	logerror("GUS: Reset MIDI IRQ %02x\n",source);
 }
 
-WRITE_LINE_MEMBER( isa16_gus_device::midi_irq )
+WRITE_LINE_MEMBER( isa16_gus_device::midi_txirq )
 {
-	UINT8 irq_type;
-	UINT8 st = m_midi->get_status();
-
-	if(state == ASSERT_LINE)
-	{
-		if(st & 0x01) // receive
-			irq_type = IRQ_MIDI_RECEIVE;
-		else
-			if(st & 0x02) // transmit
-				irq_type = IRQ_MIDI_TRANSMIT;
-			else
-			{
-				logerror("GUS: MIDI IRQ unknown: %02x\n",st);
-				return;  // Should never reach here...
-			}
-		set_midi_irq(irq_type);
-	}
+	if (state)
+		set_midi_irq(IRQ_MIDI_TRANSMIT);
 	else
 		reset_midi_irq(IRQ_MIDI_TRANSMIT | IRQ_MIDI_RECEIVE);
 }
 
-WRITE_LINE_MEMBER( isa16_gus_device::midi_rx_w )
+WRITE_LINE_MEMBER( isa16_gus_device::midi_rxirq )
 {
-	m_midi->write_rx(state);
-	for (int i = 0; i < 16; i++)    // divider is set to 16
-	{
-		m_midi->rx_clock_in();
-	}
+	if (state)
+		set_midi_irq(IRQ_MIDI_RECEIVE);
+	else
+		reset_midi_irq(IRQ_MIDI_TRANSMIT | IRQ_MIDI_RECEIVE);
+}
+
+WRITE_LINE_MEMBER( isa16_gus_device::write_acia_clock )
+{
+	m_gf1->write_txc(state);
+	m_gf1->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER( isa16_gus_device::nmi_w)

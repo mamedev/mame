@@ -927,7 +927,7 @@ static const rgb_t apple2_palette[] =
 	rgb_t(0x14, 0xF5, 0x3C), /* Light Green */
 	rgb_t(0xD0, 0xDD, 0x8D), /* Yellow */
 	rgb_t(0x72, 0xFF, 0xD0), /* Aquamarine */
-	rgb_t::white
+	rgb_t(0xFF, 0xFF, 0xFF)  /* White */
 };
 
 /* Initialize the palette */

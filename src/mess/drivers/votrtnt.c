@@ -33,6 +33,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "sound/votrax.h"
 #include "votrtnt.lh"
 
@@ -40,15 +41,20 @@
 class votrtnt_state : public driver_device
 {
 public:
-	votrtnt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_votrax(*this, "votrax")
-	{ }
+	votrtnt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_votrax(*this, "votrax"),
+		m_acia(*this, "acia")
+	{
+	}
 
+	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<votrax_sc01_device> m_votrax;
-	virtual void machine_reset();
+	required_device<acia6850_device> m_acia;
 };
 
 
@@ -60,8 +66,8 @@ static ADDRESS_MAP_START(6802_mem, AS_PROGRAM, 8, votrtnt_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x6fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_MIRROR(0xc00)/* RAM, 2114*2 (0x400 bytes) mirrored 4x */
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0xffe) AM_DEVREADWRITE("acia", acia6850_device, status_read, control_write)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0xffe) AM_DEVREADWRITE("acia", acia6850_device, data_read, data_write)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0xffe) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0xffe) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
 	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE("votrax", votrax_sc01_device, write) /* low 6 bits write to 6 bit input of sc-01-a; high 2 bits are ignored (but by adding a buffer chip could be made to control the inflection bits of the sc-01-a which are normally grounded on the tnt) */
 	AM_RANGE(0x6000, 0x6fff) AM_ROM /* ROM in potted block */
 ADDRESS_MAP_END
@@ -84,18 +90,12 @@ static INPUT_PORTS_START(votrtnt)
 	PORT_DIPSETTING(    0x80, "9600" )
 INPUT_PORTS_END
 
-void votrtnt_state::machine_reset()
-{
-}
 
-static ACIA6850_INTERFACE( acia_intf )
+WRITE_LINE_MEMBER(votrtnt_state::write_acia_clock)
 {
-	153600,
-	153600,
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
-	DEVCB_NULL
-};
+	m_acia->write_txc(state);
+	m_acia->write_rxc(state);
+}
 
 static struct votrax_sc01_interface votrtnt_votrax_interface =
 {
@@ -115,11 +115,16 @@ static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
 	//MCFG_DEFAULT_LAYOUT(layout_votrtnt)
 
 	/* serial hardware */
-	MCFG_ACIA6850_ADD("acia", acia_intf)
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rx))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(votrtnt_state, write_acia_clock))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

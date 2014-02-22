@@ -112,7 +112,7 @@ public:
 	DECLARE_WRITE8_MEMBER( kb_w );
 	DECLARE_READ8_MEMBER( mouse_r );
 	DECLARE_WRITE8_MEMBER( mouse_w );
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(prestige);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	IRQ_CALLBACK_MEMBER(prestige_int_ack);
 };
@@ -496,6 +496,7 @@ static MACHINE_CONFIG_START( prestige, prestige_state )
 	MCFG_DEFAULT_LAYOUT( layout_lcd )
 
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(prestige_state, prestige)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

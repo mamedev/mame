@@ -129,7 +129,8 @@ a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, const char *ta
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
 		m_dsw2(*this, "DSW2"),
-		m_acia(*this, SSC_ACIA_TAG)
+		m_acia(*this, SSC_ACIA_TAG),
+		m_started(false)
 {
 }
 
@@ -138,7 +139,8 @@ a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type ty
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
 		m_dsw2(*this, "DSW2"),
-		m_acia(*this, SSC_ACIA_TAG)
+		m_acia(*this, SSC_ACIA_TAG),
+		m_started(false)
 {
 }
 
@@ -157,6 +159,7 @@ void a2bus_ssc_device::device_start()
 
 void a2bus_ssc_device::device_reset()
 {
+	m_started = true;
 }
 
 /*-------------------------------------------------
@@ -222,15 +225,18 @@ void a2bus_ssc_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data
 
 WRITE_LINE_MEMBER( a2bus_ssc_device::acia_irq_w )
 {
-	if (!(m_dsw2->read() & 4))
+	if (m_started)
 	{
-		if (state)
+		if (!(m_dsw2->read() & 4)) 
 		{
-			raise_slot_irq();
-		}
-		else
-		{
-			lower_slot_irq();
+			if (state)
+			{
+				raise_slot_irq();
+			}
+			else
+			{
+				lower_slot_irq();
+			}
 		}
 	}
 }

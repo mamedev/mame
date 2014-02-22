@@ -335,30 +335,12 @@ WRITE_LINE_MEMBER(mpu4vid_state::m6809_acia_irq)
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
-static ACIA6850_INTERFACE( m6809_acia_if )
-{
-	0,
-	0,
-	DEVCB_DEVICE_LINE_MEMBER("acia6850_1", acia6850_device, write_rx),
-	DEVCB_DEVICE_LINE_MEMBER("acia6850_1", acia6850_device, write_dcd),
-	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m6809_acia_irq)
-};
-
 WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_irq)
 {
 	m_acia_0->write_cts(state);
 	m_m6850_irq_state = state;
 	update_mpu68_interrupts(1);
 }
-
-static ACIA6850_INTERFACE( m68k_acia_if )
-{
-	0,
-	0,
-	DEVCB_DEVICE_LINE_MEMBER("acia6850_0", acia6850_device, write_rx),
-	DEVCB_DEVICE_LINE_MEMBER("acia6850_0", acia6850_device, write_dcd),
-	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m68k_acia_irq)
-};
 
 
 WRITE_LINE_MEMBER(mpu4vid_state::cpu1_ptm_irq)
@@ -372,13 +354,10 @@ WRITE8_MEMBER(mpu4vid_state::vid_o1_callback)
 {
 	m_ptm->set_c2(data); /* this output is the clock for timer2 */
 
-	if (data)
-	{
-		m_acia_0->tx_clock_in();
-		m_acia_0->rx_clock_in();
-		m_acia_1->tx_clock_in();
-		m_acia_1->rx_clock_in();
-	}
+	m_acia_0->write_txc(data);
+	m_acia_0->write_rxc(data);
+	m_acia_1->write_txc(data);
+	m_acia_1->write_rxc(data);
 }
 
 
@@ -1330,8 +1309,8 @@ static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_read, control_write, 0xff)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_read, data_write, 0xff)
+	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0xff)
+	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0xff)
 	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0xff)
 	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE(characteriser16_r, characteriser16_w)
 ADDRESS_MAP_END
@@ -1348,8 +1327,8 @@ static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_read, control_write, 0xff)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_read, data_write, 0xff)
+	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0xff)
+	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0xff)
 	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0xff)
 	AM_RANGE(0xffa040, 0xffa04f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0xff)  // 6840PTM on sampled sound board
 	AM_RANGE(0xffa040, 0xffa04f) AM_WRITE8(ic3ss_w,0x00ff)  // 6840PTM on sampled sound board
@@ -1371,8 +1350,8 @@ static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_read, control_write, 0xff)
-	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_read, data_write, 0xff)
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0xff)
+	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0xff)
 	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0xff)
 	//AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
 ADDRESS_MAP_END
@@ -1389,8 +1368,8 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_read, control_write, 0xff)
-	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_read, data_write, 0xff)
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0xff)
+	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0xff)
 	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
 	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8("pia_ic4ss", pia6821_device, read, write, 0xff00)
 	AM_RANGE(0xe03000, 0xe0300f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0xff00)  // 6840PTM on sampled sound board
@@ -1403,8 +1382,8 @@ ADDRESS_MAP_END
 /* TODO: Fix up MPU4 map*/
 static ADDRESS_MAP_START( mpu4_6809_map, AS_PROGRAM, 8, mpu4_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("acia6850_0", acia6850_device, status_read, control_write)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_device, data_read, data_write)
+	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("acia6850_0", acia6850_device, status_r, control_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_device, data_r, data_w)
 	AM_RANGE(0x0880, 0x0881) AM_NOP //Read/write here
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_device, read, write)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)
@@ -1466,8 +1445,15 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
-	MCFG_ACIA6850_ADD("acia6850_0", m6809_acia_if)
-	MCFG_ACIA6850_ADD("acia6850_1", m68k_acia_if)
+	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_rxd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_dcd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(mpu4vid_state, m6809_acia_irq))
+
+	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_rxd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_dcd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(mpu4vid_state, m68k_acia_irq))
 
 	// for the video timing
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", mpu4vid_state, scanline_timer_callback, "screen", 0, 1)

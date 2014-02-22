@@ -555,6 +555,7 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	MCFG_SCREEN_UPDATE_DRIVER(svision_state, screen_update_svision)
 
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(svision_palette) * 3)
+	MCFG_PALETTE_INIT_OWNER(svision_state, svision )
 
 	MCFG_DEFAULT_LAYOUT(layout_svision)
 

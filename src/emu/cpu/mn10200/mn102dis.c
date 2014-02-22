@@ -20,7 +20,7 @@ static INT32 r16s(offs_t pc)
 	return (INT16)(sOpROM[pc - sBasePC] | (sOpROM[pc - sBasePC + 1]<<8));
 }
 
-static INT32 r24u(offs_t pc)
+static UINT32 r24u(offs_t pc)
 {
 	return sOpROM[pc - sBasePC] | (sOpROM[pc - sBasePC + 1]<<8) | (sOpROM[pc - sBasePC + 2]<<16);
 }
@@ -32,7 +32,7 @@ static INT32 r24s(offs_t pc)
 
 static const char *i8str(INT8 v)
 {
-	static char res[4];
+	static char res[0x10];
 	if(v>=0)
 	sprintf(res, "$%x", v);
 	else
@@ -42,7 +42,7 @@ static const char *i8str(INT8 v)
 
 static const char *i16str(INT16 v)
 {
-	static char res[6];
+	static char res[0x10];
 	if(v>=0)
 	sprintf(res, "$%x", v);
 	else
@@ -52,7 +52,7 @@ static const char *i16str(INT16 v)
 
 static const char *i24str(INT32 v)
 {
-	static char res[8];
+	static char res[0x10];
 	if(v>=0)
 	sprintf(res, "$%x", v);
 	else

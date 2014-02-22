@@ -786,6 +786,37 @@ READ8_MEMBER(v1050_state::misc_ppi_pc_r)
 	return data;
 }
 
+void v1050_state::set_baud_sel(int baud_sel)
+{
+	if (baud_sel != m_baud_sel)
+	{
+		int divider = 1;
+
+		switch (baud_sel)
+		{
+		case 0:
+			divider = 13 * 16; // 19200
+			break;
+
+		case 1:
+			divider = 13 * 8; // 38400
+			break;
+
+		case 2:
+			divider = 8; // 500000
+			break;
+
+		case 3:
+			divider = 13 * 2; // 153600
+			break;
+		}
+
+		m_clock_sio->set_clock_scale((double) 1 / divider);
+
+		m_baud_sel = baud_sel;
+	}
+}
+
 WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 {
 	/*
@@ -811,24 +842,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 	update_fdc();
 
 	// baud select
-	int baud_sel = (data >> 2) & 0x03;
-
-	if (baud_sel != m_baud_sel)
-	{
-		attotime period = attotime::never;
-
-		switch (baud_sel)
-		{
-		case 0: period = attotime::from_hz((double)XTAL_16MHz/4/13/16); break;
-		case 1: period = attotime::from_hz((double)XTAL_16MHz/4/13/8); break;
-		case 2: period = attotime::from_hz((double)XTAL_16MHz/4/8); break;
-		case 3: period = attotime::from_hz((double)XTAL_16MHz/4/13/2); break;
-		}
-
-		m_timer_sio->adjust(attotime::zero, 0, period);
-
-		m_baud_sel = baud_sel;
-	}
+	set_baud_sel((data >> 2) & 0x03);
 }
 
 static I8255A_INTERFACE( misc_ppi_intf )
@@ -931,14 +945,10 @@ static I8255A_INTERFACE( rtc_ppi_intf )
 
 // Keyboard 8251A Interface
 
-TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::kb_8251_tick)
+WRITE_LINE_MEMBER(v1050_state::write_keyboard_clock)
 {
-	/// TODO: double timer frequency for correct duty cycle
-	m_uart_kb->write_txc(1);
-	m_uart_kb->write_rxc(1);
-
-	m_uart_kb->write_txc(0);
-	m_uart_kb->write_rxc(0);
+	m_uart_kb->write_txc(state);
+	m_uart_kb->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER( v1050_state::kb_rxrdy_w )
@@ -948,14 +958,10 @@ WRITE_LINE_MEMBER( v1050_state::kb_rxrdy_w )
 
 // Serial 8251A Interface
 
-TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::sio_8251_tick)
+WRITE_LINE_MEMBER(v1050_state::write_sio_clock)
 {
-	/// TODO: double timer frequency for correct duty cycle
-	m_uart_sio->write_txc(1);
-	m_uart_sio->write_rxc(1);
-
-	m_uart_sio->write_txc(0);
-	m_uart_sio->write_rxc(0);
+	m_uart_sio->write_txc(state);
+	m_uart_sio->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER( v1050_state::sio_rxrdy_w )
@@ -1093,7 +1099,7 @@ void v1050_state::machine_reset()
 	m_bank = 0;
 	bankswitch();
 
-	m_timer_sio->adjust(attotime::zero, 0, attotime::from_hz((double)XTAL_16MHz/4/13/16));
+	set_baud_sel(0);
 
 	m_fdc->reset();
 }
@@ -1136,6 +1142,9 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(V1050_KEYBOARD_TAG, v1050_keyboard_device, si_w))
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(v1050_state, kb_rxrdy_w))
 
+	MCFG_DEVICE_ADD(CLOCK_KB_TAG, CLOCK, XTAL_16MHz/4/13/8)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(v1050_state, write_keyboard_clock))
+
 	// keyboard
 	MCFG_DEVICE_ADD(V1050_KEYBOARD_TAG, V1050_KEYBOARD, 0)
 	MCFG_V1050_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE(I8251A_KB_TAG, i8251_device, write_rxd))
@@ -1151,13 +1160,14 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_SIO_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_SIO_TAG, i8251_device, write_dsr))
 
+	MCFG_DEVICE_ADD(CLOCK_SIO_TAG, CLOCK, XTAL_16MHz/4)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(v1050_state, write_sio_clock))
+
 	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/16)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", v1050_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_KB_TAG, v1050_state, kb_8251_tick, attotime::from_hz((double)XTAL_16MHz/4/13/8))
-	MCFG_TIMER_DRIVER_ADD(TIMER_SIO_TAG, v1050_state, sio_8251_tick)
 
 	// SASI bus
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG)

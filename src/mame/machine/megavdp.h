@@ -296,7 +296,8 @@ private:
 
 	address_space *m_space68k;
 	m68000_base_device* m_cpu68k;
-
+	//FIXME
+	palette_device *m_palette;
 };
 
 

@@ -50,7 +50,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER(p1_irq_callback);
 
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(p1);
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void set_palette_luts();

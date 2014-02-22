@@ -53,6 +53,7 @@ Z - more scan lines per row (cursor is bigger)
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "video/mc6845.h"
 #include "machine/keyboard.h"
 #include "imagedev/cassette.h"
@@ -66,16 +67,18 @@ Z - more scan lines per row (cursor is bigger)
 class tavernie_state : public driver_device
 {
 public:
-	tavernie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_p_videoram(*this, "videoram")
-		, m_cass(*this, "cassette")
-		, m_pia_ivg(*this, "pia_ivg")
-		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_beep(*this, "beeper")
-		, m_maincpu(*this, "maincpu")
-	{ }
+	tavernie_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_p_videoram(*this, "videoram"),
+		m_cass(*this, "cassette"),
+		m_pia_ivg(*this, "pia_ivg"),
+		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_beep(*this, "beeper"),
+		m_maincpu(*this, "maincpu"),
+		m_acia(*this, "acia")
+	{
+	}
 
 	DECLARE_READ_LINE_MEMBER(ca1_r);
 	DECLARE_READ8_MEMBER(pa_r);
@@ -87,8 +90,11 @@ public:
 	DECLARE_WRITE8_MEMBER(ds_w);
 	DECLARE_MACHINE_RESET(cpu09);
 	DECLARE_MACHINE_RESET(ivg09);
+	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+
 	const UINT8 *m_p_chargen;
 	optional_shared_ptr<UINT8> m_p_videoram;
+
 private:
 	UINT8 m_term_data;
 	UINT8 m_pa;
@@ -98,6 +104,7 @@ private:
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<beep_device> m_beep;
 	required_device<cpu_device> m_maincpu;
+	required_device<acia6850_device> m_acia;
 };
 
 
@@ -105,8 +112,8 @@ static ADDRESS_MAP_START(cpu09_mem, AS_PROGRAM, 8, tavernie_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1fff) AM_NOP
 	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_read, control_write)
-	AM_RANGE(0xeb05, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, data_read, data_write)
+	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
+	AM_RANGE(0xeb05, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
 	AM_RANGE(0xeb08, 0xeb0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
 	AM_RANGE(0xec00, 0xefff) AM_RAM // 1Kx8 RAM MK4118
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
@@ -121,8 +128,8 @@ static ADDRESS_MAP_START(ivg09_mem, AS_PROGRAM, 8, tavernie_state)
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("fdc", fd1795_t, read, write)
 	AM_RANGE(0xe080, 0xe080) AM_WRITE(ds_w)
 	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_read, control_write)
-	AM_RANGE(0xeb05, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, data_read, data_write)
+	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
+	AM_RANGE(0xeb05, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
 	AM_RANGE(0xeb08, 0xeb0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
 	AM_RANGE(0xec00, 0xefff) AM_RAM // 1Kx8 RAM MK4118
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
@@ -299,15 +306,6 @@ static const ptm6840_interface mc6840_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
 
-static ACIA6850_INTERFACE( mc6850_intf )
-{
-	153600,
-	153600,
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_txd),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
-	DEVCB_NULL
-};
-
 WRITE8_MEMBER( tavernie_state::kbd_put )
 {
 	m_term_data = data;
@@ -319,6 +317,12 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(tavernie_state, kbd_put)
 };
+
+WRITE_LINE_MEMBER( tavernie_state::write_acia_clock )
+{
+	m_acia->write_txc(state);
+	m_acia->write_rxc(state);
+}
 
 static MACHINE_CONFIG_START( cpu09, tavernie_state )
 	/* basic machine hardware */
@@ -334,10 +338,6 @@ static MACHINE_CONFIG_START( cpu09, tavernie_state )
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rx))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
-
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(tavernie_state, pa_r))
 	MCFG_PIA_READCA1_HANDLER(READLINE(tavernie_state, ca1_r))
@@ -347,7 +347,17 @@ static MACHINE_CONFIG_START( cpu09, tavernie_state )
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
 	MCFG_PTM6840_ADD("ptm", mc6840_intf)
-	MCFG_ACIA6850_ADD("acia", mc6850_intf)
+
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(tavernie_state, write_acia_clock))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )

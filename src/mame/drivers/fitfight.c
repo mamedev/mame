@@ -262,12 +262,6 @@ INTERRUPT_GEN_MEMBER(fitfight_state::snd_irq)
 	device.execute().set_input_line(UPD7810_INTF2, HOLD_LINE);
 }
 
-static const UPD7810_CONFIG sound_cpu_config =
-{
-	TYPE_7810,
-	0
-};
-
 
 // #define PRIORITY_EASINESS_TO_PLAY
 
@@ -736,7 +730,6 @@ static MACHINE_CONFIG_START( fitfight, fitfight_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
-	MCFG_CPU_CONFIG(sound_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(snd_mem)
 	MCFG_CPU_IO_MAP(snd_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  snd_irq)

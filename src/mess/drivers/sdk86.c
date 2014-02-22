@@ -28,6 +28,7 @@ ToDo:
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8279.h"
 #include "sdk86.lh"
@@ -39,11 +40,12 @@ ToDo:
 class sdk86_state : public driver_device
 {
 public:
-	sdk86_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-			m_maincpu(*this, "maincpu"),
-			m_usart(*this, I8251_TAG)
-	{ }
+	sdk86_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu"),
+		m_usart(*this, I8251_TAG)
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
@@ -52,7 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( serial_tick );
+	DECLARE_WRITE_LINE_MEMBER( write_usart_clock );
 
 	UINT8 m_digit;
 };
@@ -129,14 +131,10 @@ READ8_MEMBER( sdk86_state::kbd_r )
 	return data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( sdk86_state::serial_tick )
+WRITE_LINE_MEMBER( sdk86_state::write_usart_clock )
 {
-	/// TODO: double timer frequency to get correct duty cycle
-	m_usart->write_rxc(1);
-	m_usart->write_txc(1);
-
-	m_usart->write_rxc(0);
-	m_usart->write_txc(0);
+	m_usart->write_txc(state);
+	m_usart->write_rxc(state);
 }
 
 static I8279_INTERFACE( sdk86_intf )
@@ -179,7 +177,8 @@ static MACHINE_CONFIG_START( sdk86, sdk86_state )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("serial", sdk86_state, serial_tick, attotime::from_hz(307200))
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, 307200)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sdk86_state, write_usart_clock))
 
 	MCFG_I8279_ADD("i8279", 2500000, sdk86_intf) // based on divider
 

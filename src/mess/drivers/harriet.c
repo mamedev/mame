@@ -43,14 +43,12 @@ public:
 	DECLARE_READ8_MEMBER(unk3_r);
 	DECLARE_READ8_MEMBER(keyboard_status_r);
 	DECLARE_WRITE8_MEMBER( kbd_put );
-
 protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 void harriet_state::video_start()
@@ -194,12 +192,6 @@ void harriet_state::machine_start()
 void harriet_state::machine_reset()
 {
 }
-
-
-PALETTE_INIT_MEMBER(harriet_state, harriet)
-{
-}
-
 
 
 static MACHINE_CONFIG_START( harriet, harriet_state )

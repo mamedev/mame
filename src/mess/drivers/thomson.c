@@ -71,6 +71,7 @@
 #include "includes/thomson.h"
 #include "machine/6821pia.h"
 #include "machine/wd17xx.h"
+#include "machine/clock.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/serial.h"
@@ -711,7 +712,12 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_TO7_IO_LINE_ADD("to7_io")
 
 /* modem */
-	MCFG_ACIA6850_ADD( "acia6850", to7_modem )
+	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(thomson_state, to7_modem_tx_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(thomson_state, to7_modem_cb))
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1200) /* 1200 bauds, might be divided by 16 */
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(thomson_state, write_acia_clock))
 
 /* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

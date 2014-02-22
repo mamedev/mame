@@ -1271,13 +1271,6 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static const UPD7810_CONFIG upd_config =
-{
-	TYPE_7810,
-	NULL    /* io_callback */
-};
-
-
 static MACHINE_CONFIG_START( reikaids, homedata_state )
 
 	/* basic machine hardware */
@@ -1286,7 +1279,6 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
 	MCFG_CPU_ADD("audiocpu", UPD7807, 8000000)  /* ??? MHz (max speed for the 7807 is 12MHz) */
-	MCFG_CPU_CONFIG(upd_config)
 	MCFG_CPU_PROGRAM_MAP(reikaids_upd7807_map)
 	MCFG_CPU_IO_MAP(reikaids_upd7807_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
@@ -1336,7 +1328,6 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
 	MCFG_CPU_ADD("audiocpu", UPD7807, 9000000)  /* 9MHz ? */
-	MCFG_CPU_CONFIG(upd_config)
 	MCFG_CPU_PROGRAM_MAP(pteacher_upd7807_map)
 	MCFG_CPU_IO_MAP(pteacher_upd7807_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)

@@ -49,6 +49,7 @@ TODO:
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
+#include "machine/clock.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
@@ -72,6 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER(h8_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(h8_inte_callback);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
+	DECLARE_WRITE_LINE_MEMBER(write_cassette_clock);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_irq_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_p);
@@ -266,15 +268,14 @@ WRITE_LINE_MEMBER( h8_state::txdata_callback )
 	m_cass_state = state;
 }
 
+WRITE_LINE_MEMBER( h8_state::write_cassette_clock )
+{
+	m_uart->write_txc(state);
+	m_uart->write_rxc(state);
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_c)
 {
-	/// TODO: double timer rate to get correct duty cycle
-	m_uart->write_rxc(1);
-	m_uart->write_txc(1);
-
-	m_uart->write_rxc(0);
-	m_uart->write_rxc(0);
-
 	m_cass_data[3]++;
 
 	if (m_cass_state)
@@ -327,7 +328,10 @@ static MACHINE_CONFIG_START( h8, h8_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(h8_state,txdata_callback))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(h8_state, txdata_callback))
+
+	MCFG_DEVICE_ADD("cassette_clock", CLOCK, 4800)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(h8_state, write_cassette_clock))
 
 	MCFG_CASSETTE_ADD("cassette", h8_cassette_interface)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_c", h8_state, h8_c, attotime::from_hz(4800))

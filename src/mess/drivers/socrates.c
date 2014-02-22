@@ -126,7 +126,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
 
-	rgb_t m_palette[256];
+	rgb_t m_palette_val[256];
 
 	UINT8 m_data[8];
 	UINT8 m_rom_bank;
@@ -163,7 +163,7 @@ public:
 	DECLARE_DRIVER_INIT(socrates);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(socrates);
 	UINT32 screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(assert_irq);
 	TIMER_CALLBACK_MEMBER(clear_speech_cb);
@@ -705,9 +705,9 @@ PALETTE_INIT_MEMBER(socrates_state, socrates)
 	int i; // iterator
 	for (i = 0; i < 256; i++)
 	{
-		m_palette[i] = socrates_create_color(i);
+		m_palette_val[i] = socrates_create_color(i);
 	}
-	palette.set_pen_colors(0, m_palette, ARRAY_LENGTH(m_palette));
+	palette.set_pen_colors(0, m_palette_val, ARRAY_LENGTH(m_palette_val));
 }
 
 void socrates_state::video_start()
@@ -1376,7 +1376,7 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
 
 	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

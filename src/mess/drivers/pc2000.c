@@ -57,7 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER( rombank2_w );
 	DECLARE_READ8_MEMBER( beep_r );
 	DECLARE_WRITE8_MEMBER( beep_w );
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pc2000);
 };
 
 class gl3000s_state : public pc2000_state
@@ -790,6 +790,7 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18-1)
 
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(pc2000_state, pc2000)
 	MCFG_GFXDECODE_ADD("gfxdecode",pc2000,"palette")
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

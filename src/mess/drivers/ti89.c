@@ -529,6 +529,7 @@ static MACHINE_CONFIG_START( ti89, ti68k_state )
 	MCFG_SCREEN_SIZE(240, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 100-1)
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(ti68k_state, ti68k)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_SHARP_UNK128MBIT_ADD("flash")  //should be LH28F320 for ti89t and v200 and LH28F160S3T for other models

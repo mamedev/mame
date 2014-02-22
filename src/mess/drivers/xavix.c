@@ -40,7 +40,6 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 void xavix_state::video_start()
@@ -139,10 +138,6 @@ void xavix_state::machine_reset()
 {
 }
 
-
-PALETTE_INIT_MEMBER(xavix_state, xavix)
-{
-}
 
 static MACHINE_CONFIG_START( xavix, xavix_state )
 

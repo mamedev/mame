@@ -1814,7 +1814,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "mxo-cg773.u75",   0x18000, 0x8000, CRC(75da0cd8) SHA1(4fb4eda9ae8e59884201368c7d8e4ff8b9967a4f) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap773.u50", 0x0000, 0x0100, CRC(0b496da9) SHA1(612363cb78f2ab5e100ca4bd0bfae6f7c3f80381) )
+	ROM_LOAD( "cap773.u50", 0x0000, 0x0100, CRC(294b7b10) SHA1(a405a4b8547b713c5c02dacb19e7354095a7b584) )
 ROM_END
 
 ROM_START( pepp0059 ) /* Normal board : Two Pair or Better (PP0059) */

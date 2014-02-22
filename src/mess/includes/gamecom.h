@@ -262,7 +262,7 @@ public:
 	DECLARE_DRIVER_INIT(gamecom);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(gamecom);
 	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
 	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);
 	TIMER_CALLBACK_MEMBER(gamecom_scanline);

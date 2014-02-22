@@ -302,6 +302,11 @@ SYMLEVEL = 1
 endif
 endif
 
+# enable symbols as it is useless without them
+ifdef SANITIZE
+SYMBOLS = 1
+endif
+
 # set the symbols level
 ifdef SYMBOLS
 ifndef SYMLEVEL

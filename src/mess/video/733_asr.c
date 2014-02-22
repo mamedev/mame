@@ -222,7 +222,8 @@ const device_type ASR733 = &device_creator<asr733_device>;
 
 asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ASR733, "733 ASR", tag, owner, clock, "asr733", __FILE__),
-		m_gfxdecode(*this)
+		m_palette(*this, "palette"),
+		m_gfxdecode(*this)		
 {
 	m_token = global_alloc_clear(asr_t);
 }
@@ -288,7 +289,7 @@ static void asr_linefeed(device_t *device)
 	for (y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
 	{
 		extract_scanline8(*asr->bitmap, asr_window_offset_x, y+asr_scroll_step, asr_window_width, buf);
-		draw_scanline8(*asr->bitmap, asr_window_offset_x, y, asr_window_width, buf, device->m_palette->pens());
+		draw_scanline8(*asr->bitmap, asr_window_offset_x, y, asr_window_width, buf,downcast<asr733_device *>(device)->m_palette->pens());
 	}
 
 	const rectangle asr_scroll_clear_window(
@@ -780,6 +781,7 @@ void asr733_keyboard(device_t *device)
 }
 
 static MACHINE_CONFIG_FRAGMENT( asr733 )
+	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(asr733_device, asr733)
 MACHINE_CONFIG_END
 

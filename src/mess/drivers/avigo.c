@@ -903,6 +903,7 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",avigo,"palette")
 	MCFG_PALETTE_ADD("palette", AVIGO_NUM_COLOURS)
+	MCFG_PALETTE_INIT_OWNER(avigo_state, avigo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

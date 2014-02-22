@@ -119,7 +119,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(smc777);
 	UINT32 screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(smc777_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
@@ -1089,6 +1089,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_SCREEN_UPDATE_DRIVER(smc777_state, screen_update_smc777)
 
 	MCFG_PALETTE_ADD("palette", 0x20) // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
+	MCFG_PALETTE_INIT_OWNER(smc777_state, smc777)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	

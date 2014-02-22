@@ -114,8 +114,8 @@ const rom_entry *interpod_device::device_rom_region() const
 static ADDRESS_MAP_START( interpod_mem, AS_PROGRAM, 8, interpod_device )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x3b80) AM_RAM // 6532
 	AM_RANGE(0x0400, 0x041f) AM_MIRROR(0x3be0) AM_DEVREADWRITE(R6532_TAG, riot6532_device, read, write)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x9ffe) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, status_read, control_write)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x9ffe) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, data_read, data_write)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x9ffe) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, status_r, control_w)
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x9ffe) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, data_r, data_w)
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0xb800) AM_ROM AM_REGION(R6502_TAG, 0)
 	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x5ff0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
 ADDRESS_MAP_END
@@ -136,20 +136,6 @@ static const riot6532_interface riot_intf =
 
 
 //-------------------------------------------------
-//  ACIA6850_INTERFACE( acia_intf )
-//-------------------------------------------------
-
-static ACIA6850_INTERFACE( acia_intf )
-{
-	0,
-	0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( interpod )
 //-------------------------------------------------
 
@@ -159,7 +145,7 @@ static MACHINE_CONFIG_FRAGMENT( interpod )
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, 1000000)
 	MCFG_RIOT6532_ADD(R6532_TAG, 1000000, riot_intf)
-	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
+	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
 
 	MCFG_CBM_IEEE488_ADD(NULL)
 MACHINE_CONFIG_END

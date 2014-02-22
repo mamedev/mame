@@ -160,7 +160,7 @@ XOR of at most two "sources bits", being source bits the bits from the previous 
 The underlying block cipher has the same structure than the one used by the CPS-2 (Capcom Play System 2) and,
 indeed, some of the used sboxes are exactly the same and appear in the same FN/round in both systems (this is not evident,
 as you need to apply a bitswapping and some XORs to the input & output of the sboxes to get the same values due). However,
-the key scheduling used by this implementation is much weaker than the CPS-2's one. Many s-boxes inputs are XORed with any
+the key scheduling used by this implementation is much weaker than the CPS-2's one. Many s-boxes inputs aren't XORed with any
 key bit.
 
 Due to the small key-length, no sophisticated attacks are needed to recover the keys; a brute-force attack knowing just

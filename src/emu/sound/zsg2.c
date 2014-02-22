@@ -44,14 +44,11 @@
 
     ---------------------------------------------------------
 
-Emulation is still preliminary.
-
 TODO:
-- channel volume, 16bits?? need to make a lookup table?
-- how does panning work? it is not simply left/right volume
-- (some) samples are in stereo format?
+- volume/panning is linear?
+- what is reg 0xa/0xc? seems related to volume
+- identify sample flags
 - memory reads out of range sometimes
-- a lot of unknowns
 
 */
 
@@ -111,6 +108,7 @@ void zsg2_device::device_start()
 		save_item(NAME(m_chan[ch].loop_pos), ch);
 		save_item(NAME(m_chan[ch].page), ch);
 		save_item(NAME(m_chan[ch].vol), ch);
+		save_item(NAME(m_chan[ch].flags), ch);
 		save_item(NAME(m_chan[ch].panl), ch);
 		save_item(NAME(m_chan[ch].panr), ch);
 	}
@@ -204,7 +202,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			if (m_chan[ch].step_ptr & 0x40000)
 			{
 				m_chan[ch].step_ptr &= 0xffff;
-				if (++m_chan[ch].cur_pos > m_chan[ch].end_pos)
+				if (++m_chan[ch].cur_pos >= m_chan[ch].end_pos)
 				{
 					// loop sample
 					m_chan[ch].cur_pos = m_chan[ch].loop_pos;
@@ -218,17 +216,14 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				m_chan[ch].samples = prepare_samples(m_chan[ch].page | m_chan[ch].cur_pos);
 			}
 			
-			INT16 sample = m_chan[ch].samples[m_chan[ch].step_ptr >> 16 & 3];
+			INT32 sample = (m_chan[ch].samples[m_chan[ch].step_ptr >> 16 & 3] * m_chan[ch].vol) >> 16;
 			
-			//sample = (sample * (m_chan[ch].vol & 0xffff)) / 0x10000;
-			if (m_chan[ch].vol == 0) sample = 0; // temp hack to prevent stuck notes
-			
-			mix_l += sample;
-			mix_r += sample;
+			mix_l += (sample * m_chan[ch].panl + sample * (0x1f - m_chan[ch].panr)) >> 5;
+			mix_r += (sample * m_chan[ch].panr + sample * (0x1f - m_chan[ch].panl)) >> 5;
 		}
 
-		outputs[0][i] = mix_l / 48;
-		outputs[1][i] = mix_r / 48;
+		outputs[0][i] = mix_l;
+		outputs[1][i] = mix_r;
 	}
 }
 
@@ -240,7 +235,7 @@ void zsg2_device::chan_w(int ch, int reg, UINT16 data)
 	switch (reg)
 	{
 		case 0x0:
-			// lo byte: always 0?
+			// lo byte: unknown, 0 on most games
 			// hi byte: start address low
 			m_chan[ch].start_pos = (m_chan[ch].start_pos & 0xff00) | (data >> 8 & 0xff);
 			break;
@@ -252,14 +247,22 @@ void zsg2_device::chan_w(int ch, int reg, UINT16 data)
 			m_chan[ch].page = data << 8 & 0xff0000;
 			break;
 		
+		case 0x2:
+			// no function? always 0
+			break;
+		
+		case 0x3:
+			// unknown, always 0x0400
+			break;
+		
 		case 0x4:
 			// frequency
-			m_chan[ch].step = data;
+			m_chan[ch].step = data + 1;
 			break;
 
 		case 0x5:
 			// lo byte: loop address low
-			// hi byte: right(?) panning (high bits always 0)
+			// hi byte: right panning (high bits always 0)
 			m_chan[ch].loop_pos = (m_chan[ch].loop_pos & 0xff00) | (data & 0xff);
 			m_chan[ch].panr = data >> 8 & 0x1f;
 			break;
@@ -271,9 +274,13 @@ void zsg2_device::chan_w(int ch, int reg, UINT16 data)
 
 		case 0x7:
 			// lo byte: loop address high
-			// hi byte: left(?) panning (high bits always 0)
+			// hi byte: left panning (high bits always 0)
 			m_chan[ch].loop_pos = (m_chan[ch].loop_pos & 0x00ff) | (data << 8 & 0xff00);
 			m_chan[ch].panl = data >> 8 & 0x1f;
+			break;
+		
+		case 0x9:
+			// no function? always 0
 			break;
 		
 		case 0xb:
@@ -282,8 +289,13 @@ void zsg2_device::chan_w(int ch, int reg, UINT16 data)
 			break;
 		
 		case 0xe:
-			// channel volume, reg 0xc is also related?
+			// volume
 			m_chan[ch].vol = data;
+			break;
+		
+		case 0xf:
+			// flags
+			m_chan[ch].flags = data;
 			break;
 		
 		default:
@@ -335,7 +347,7 @@ void zsg2_device::control_w(int reg, UINT16 data)
 
 		case 0x04: case 0x05: case 0x06:
 		{
-			// key off?
+			// key off
 			int base = (reg & 3) << 4;
 			for (int i = 0; i < 16; i++)
 			{

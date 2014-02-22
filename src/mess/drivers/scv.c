@@ -815,7 +815,6 @@ static GFXDECODE_START( scv )
 GFXDECODE_END
 
 
-static const UPD7810_CONFIG scv_cpu_config = { TYPE_7801, NULL };
 static const upd1771_interface scv_upd1771c_config = { DEVCB_DRIVER_LINE_MEMBER( scv_state, scv_upd1771_ack_w ) };
 
 
@@ -824,7 +823,6 @@ static MACHINE_CONFIG_START( scv, scv_state )
 	MCFG_CPU_ADD( "maincpu", UPD7801, XTAL_4MHz )
 	MCFG_CPU_PROGRAM_MAP( scv_mem )
 	MCFG_CPU_IO_MAP( scv_io )
-	MCFG_CPU_CONFIG( scv_cpu_config )
 
 
 	/* Video chip is EPOCH TV-1 */

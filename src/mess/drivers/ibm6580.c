@@ -28,7 +28,7 @@ public:
 	{ }
 
 	const UINT8 *m_p_chargen;
-	void palette_init_ibm6580();
+	DECLARE_PALETTE_INIT(ibm6580);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	virtual void machine_reset();
@@ -83,7 +83,7 @@ static MACHINE_CONFIG_START( ibm6580, ibm6580_state )
 	MCFG_SCREEN_SIZE(640, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OVERRIDE(ibm6580_state, ibm6580)
+	MCFG_PALETTE_INIT_OWNER(ibm6580_state, ibm6580)
 MACHINE_CONFIG_END
 
 /* ROM definition */

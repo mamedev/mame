@@ -442,6 +442,7 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",vtech2 ,"palette")
 	MCFG_PALETTE_ADD("palette", 528)
+	MCFG_PALETTE_INIT_OWNER(vtech2_state, vtech2)
 
 
 	/* sound hardware */

@@ -391,7 +391,7 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pk8000_state, screen_update_pk8000)
 
 	MCFG_PALETTE_ADD("palette", 16)
-
+	MCFG_PALETTE_INIT_OWNER(pk8000_base_state, pk8000)
 
 	MCFG_I8255_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
 	MCFG_I8255_ADD( "ppi8255_2", pk8000_ppi8255_interface_2 )

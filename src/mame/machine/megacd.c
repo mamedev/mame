@@ -1610,23 +1610,23 @@ void sega_segacd_device::device_start()
 
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0 , auto_alloc(machine(), gfx_element(machine(), m_palette, sega_16x16_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(1 , auto_alloc(machine(), gfx_element(machine(), m_palette, sega_16x16_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(2 , auto_alloc(machine(), gfx_element(machine(), m_palette, sega_16x16_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(3 , auto_alloc(machine(), gfx_element(machine(), m_palette, sega_16x16_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(4 , auto_alloc(machine(), gfx_element(machine(), m_palette, sega_16x16_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(5 , auto_alloc(machine(), gfx_element(machine(), m_palette, sega_16x16_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(6 , auto_alloc(machine(), gfx_element(machine(), m_palette, sega_16x16_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(7 , auto_alloc(machine(), gfx_element(machine(), m_palette, sega_16x16_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(0 , auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_16x16_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(1 , auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_16x16_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(2 , auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_16x16_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(3 , auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_16x16_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(4 , auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_16x16_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(5 , auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_16x16_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(6 , auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_16x16_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(7 , auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_16x16_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
 
-	m_gfxdecode->set_gfx(8 , auto_alloc(machine(), gfx_element(machine(), m_palette, sega_32x32_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(9 , auto_alloc(machine(), gfx_element(machine(), m_palette, sega_32x32_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(10, auto_alloc(machine(), gfx_element(machine(), m_palette, sega_32x32_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(11, auto_alloc(machine(), gfx_element(machine(), m_palette, sega_32x32_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(12, auto_alloc(machine(), gfx_element(machine(), m_palette, sega_32x32_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(13, auto_alloc(machine(), gfx_element(machine(), m_palette, sega_32x32_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(14, auto_alloc(machine(), gfx_element(machine(), m_palette, sega_32x32_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
-	m_gfxdecode->set_gfx(15, auto_alloc(machine(), gfx_element(machine(), m_palette, sega_32x32_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(8 , auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_32x32_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(9 , auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_32x32_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(10, auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_32x32_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(11, auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_32x32_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(12, auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_32x32_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(13, auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_32x32_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(14, auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_32x32_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
+	m_gfxdecode->set_gfx(15, auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), sega_32x32_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
 
 	segacd_stampmap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_16x16_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 	segacd_stampmap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_32x32_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 8, 8);

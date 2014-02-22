@@ -382,6 +382,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
 
 	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(oric_state, oric)
 
 
 	/* sound hardware */

@@ -408,7 +408,7 @@ void ppu2c0x_device::init_palette( running_machine &machine, int first_entry )
 					B = 255;
 
 				/* Round, and set the value */
-				palette_set_color_rgb(machine, first_entry++, floor(R + .5), floor(G + .5), floor(B + .5));
+				m_palette->set_pen_color(first_entry++, floor(R + .5), floor(G + .5), floor(B + .5));
 			}
 		}
 	}
@@ -433,7 +433,7 @@ void ppu2c0x_device::init_palette_rgb( running_machine &machine, int first_entry
 				G = ((color_emphasis & 2) ? 7 : palette_data[color_num * 3 + 1]);
 				B = ((color_emphasis & 4) ? 7 : palette_data[color_num * 3 + 2]);
 
-				palette_set_color_rgb(machine, first_entry++, pal3bit(R), pal3bit(G), pal3bit(B));
+				m_palette->set_pen_color(first_entry++, pal3bit(R), pal3bit(G), pal3bit(B));
 			}
 	}
 

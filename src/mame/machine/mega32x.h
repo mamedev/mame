@@ -183,6 +183,9 @@ private:
 	UINT16 *m_32x_display_dram, *m_32x_access_dram;
 	UINT16* m_32x_palette;
 	UINT16* m_32x_palette_lookup;
+	
+	//FIXME
+	palette_device *m_palette;
 };
 
 

@@ -135,6 +135,7 @@ void mn10200_device::device_start()
 	save_item(NAME(m_extmdh));
 	save_item(NAME(m_icrl));
 	save_item(NAME(m_icrh));
+	save_item(NAME(m_ddr));
 	save_item(NAME(m_possible_irq));
 
 	// register for debugger

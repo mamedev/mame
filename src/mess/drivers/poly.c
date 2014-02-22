@@ -35,6 +35,7 @@
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "machine/mc6854.h"
 #include "video/saa5050.h"
 #include "machine/keyboard.h"
@@ -50,20 +51,26 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_pia0(*this, "pia0"),
 		m_pia1(*this, "pia1"),
+		m_acia(*this, "acia"),
 		m_videoram(*this, "videoram")
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<pia6821_device> m_pia0;
-	required_device<pia6821_device> m_pia1;
-	required_shared_ptr<UINT8> m_videoram;
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(pia1_b_in);
 	DECLARE_READ8_MEMBER(videoram_r);
-	UINT8 m_term_data;
-	bool m_term_key;
+	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+
+protected:
 	virtual void machine_reset();
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<pia6821_device> m_pia0;
+	required_device<pia6821_device> m_pia1;
+	required_device<acia6850_device> m_acia;
+	required_shared_ptr<UINT8> m_videoram;
+	UINT8 m_term_data;
 };
 
 
@@ -73,8 +80,8 @@ static ADDRESS_MAP_START(poly_mem, AS_PROGRAM, 8, poly_state)
 	AM_RANGE(0xa000,0xcfff) AM_ROM
 	AM_RANGE(0xd000,0xdfff) AM_RAM
 	AM_RANGE(0xe000,0xe003) AM_DEVREADWRITE("pia0", pia6821_device, read, write) //video control PIA 6821
-	AM_RANGE(0xe004,0xe004) AM_DEVREADWRITE("acia", acia6850_device, status_read, control_write)
-	AM_RANGE(0xe005,0xe005) AM_DEVREADWRITE("acia", acia6850_device, data_read, data_write)
+	AM_RANGE(0xe004,0xe004) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
+	AM_RANGE(0xe005,0xe005) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
 	//AM_RANGE(0xe006, 0xe006) // baud rate controller (0=9600,2=4800,4=2400,6=1200,8=600,A=300)
 	AM_RANGE(0xe00c,0xe00f) AM_DEVREADWRITE("pia1", pia6821_device, read, write) //keyboard PIA 6821
 	AM_RANGE(0xe020,0xe027) AM_DEVREADWRITE("ptm", ptm6840_device, read, write) //timer 6840
@@ -119,15 +126,6 @@ static const ptm6840_interface poly_ptm_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
 
-static ACIA6850_INTERFACE( acia_intf )
-{
-	1,
-	1,
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, write_rts),
-	DEVCB_NULL
-};
-
 static const mc6854_interface adlc_intf =
 {
 	DEVCB_NULL,
@@ -154,6 +152,12 @@ WRITE8_MEMBER( poly_state::kbd_put )
 
 	m_pia1->cb1_w(1);
 	m_pia1->cb1_w(0);
+}
+
+WRITE_LINE_MEMBER( poly_state::write_acia_clock )
+{
+	m_acia->write_txc(state);
+	m_acia->write_rxc(state);
 }
 
 static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
@@ -193,7 +197,14 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
 	MCFG_PTM6840_ADD("ptm", poly_ptm_intf)
-	MCFG_ACIA6850_ADD("acia", acia_intf)
+
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	//MCFG_DEVICE_ADD("acia_clock", CLOCK, 1)
+	//MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(poly_state, write_acia_clock))
+
 	MCFG_MC6854_ADD("adlc", adlc_intf)
 
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)

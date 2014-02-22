@@ -37,6 +37,8 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
+public:	
+	required_device<palette_device> m_palette;
 private:
 	// internal state
 	void *m_token;

@@ -209,6 +209,7 @@ static MACHINE_CONFIG_START( pp01, pp01_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pp01_state, screen_update_pp01)
 	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(pp01_state, pp01)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

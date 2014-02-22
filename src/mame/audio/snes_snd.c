@@ -231,7 +231,7 @@ void snes_sound_device::device_reset()
 
 void snes_sound_device::dsp_reset()
 {
-#ifdef DEBUG
+#ifdef MAME_DEBUG
 	logerror("dsp_reset\n");
 #endif
 
@@ -706,7 +706,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 		if (m_dsp_regs[0x6c] & 0x40)
 		{
 			/* MUTE */
-#ifdef DEBUG
+#ifdef MAME_DEBUG
 			logerror("MUTED!\n");
 #endif
 

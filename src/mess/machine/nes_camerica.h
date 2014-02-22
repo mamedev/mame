@@ -36,8 +36,7 @@ public:
 	virtual void pcb_reset();
 
 private:
-	void set_prg();
-	UINT8 m_latch1, m_latch2;
+	UINT8 m_bank_base, m_latch;
 };
 
 
@@ -56,7 +55,7 @@ public:
 	virtual void pcb_reset();
 
 private:
-	UINT8 m_latch;
+	UINT8 m_bank_base, m_latch;
 };
 
 

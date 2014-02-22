@@ -11,6 +11,7 @@
 #include "machine/ram.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "bus/ieee488/ieee488.h"
 #include "machine/ram.h"
 #include "sound/speaker.h"
@@ -32,25 +33,28 @@
 class tek4051_state : public driver_device
 {
 public:
-	tek4051_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, MC6800_TAG),
-			m_gpib_pia(*this, MC6820_GPIB_TAG),
-			m_com_pia(*this, MC6820_COM_TAG),
-			m_acia(*this, MC6850_TAG),
-			m_gpib(*this, IEEE488_TAG),
-			m_speaker(*this, "speaker"),
-			m_ram(*this, RAM_TAG),
-			m_rom(*this, MC6800_TAG),
-			m_bsofl_rom(*this, "020_0147_00"),
-			m_bscom_rom(*this, "021_0188_00"),
-			m_special(*this, "SPECIAL")
-		{ }
+	tek4051_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, MC6800_TAG),
+		m_gpib_pia(*this, MC6820_GPIB_TAG),
+		m_com_pia(*this, MC6820_COM_TAG),
+		m_acia(*this, MC6850_TAG),
+		m_acia_clock(*this, "acia_clock"),
+		m_gpib(*this, IEEE488_TAG),
+		m_speaker(*this, "speaker"),
+		m_ram(*this, RAM_TAG),
+		m_rom(*this, MC6800_TAG),
+		m_bsofl_rom(*this, "020_0147_00"),
+		m_bscom_rom(*this, "021_0188_00"),
+		m_special(*this, "SPECIAL")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_gpib_pia;
 	required_device<pia6821_device> m_com_pia;
 	required_device<acia6850_device> m_acia;
+	required_device<clock_device> m_acia_clock;
 	required_device<ieee488_device> m_gpib;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
@@ -111,6 +115,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( com_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( com_pia_irqb_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
 
 	// interrupts
 	int m_x_pia_irqa;

@@ -59,6 +59,7 @@ private:
 		UINT32 loop_pos;
 		UINT32 page;
 		UINT16 vol;
+		UINT16 flags;
 		UINT8 panl;
 		UINT8 panr;
 	};

@@ -149,7 +149,7 @@ PALETTE_INIT_MEMBER(cave_state,sailormn)
 	   colors are actually addressable */
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x40; pen++)
-			m_palette_map[0][0x4c00 | (color << 6) | pen] = 0xc00 | ((color & 0x0f) << 6) | pen;
+			m_palette_map[0][0x4c00 + ((color << 6) | pen)] = 0xc00 | ((color & 0x0f) << 6) | pen;
 }
 
 PALETTE_INIT_MEMBER(cave_state,pwrinst2)

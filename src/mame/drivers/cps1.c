@@ -10924,7 +10924,7 @@ ROM_START( ganbare )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "gbpr2.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "gbpr2.1a",     0x0000, 0x0117, CRC(486e8ca0) SHA1(4554befd49ec322af7dadd198188255ae7c7c059) )
 	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
 

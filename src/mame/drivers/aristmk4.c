@@ -50,7 +50,10 @@
     topgear  500
 
     Method 3 :
-    * Key in with the Jackpot Key followed by the Audit Key
+    * cgold2, fhunter and fhuntera ONLY:
+      DIP labeled "5201-5" switch to ON
+      This allows setup procedure to complete properly and game to play (if disabled, it acts as a 'freeze' switch and the games don't accept inputs).
+    * Key in with the Jackpot Key followed by the Audit Key.
     * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
     * Press Service (default A) 4 times until you are in the Setup Screen, with Printer Pay Limit.
     * Press Bet 2 (default D) to change the Jackpot Win Limit. A higher value is better (3000 max)
@@ -189,8 +192,6 @@
     From these findings, it is noted that the off/off setting may in fact be the default background setting of all games.
 
     cgold, gtroppo and topgear are non-multiplier, 5 payline games, therefore, you cannot bet higher than 5 credits on these machines.
-
-    cgold2, fhunter and fhuntera need DIP 5201-5 enabled to work (if disabled, it acts as a 'freeze' switch and the games don't accept inputs).
 
     cgold can be set to credit play or coin play by toggling SW1-5. If SW1-5 is on, game is in credit mode; if SW1-5 is off, wins and remaining credits will be automatically paid out as coins.
 

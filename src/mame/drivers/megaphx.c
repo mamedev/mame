@@ -16,6 +16,7 @@
 
   Actel A1010A-PL68C  (custom blitter maybe?)
 
+  2x 8 DSW, bottom corner, away from everything..
 
  Sub / Sound board:
 
@@ -37,7 +38,7 @@
 #include "cpu/z80/z80.h"
 #include "video/ramdac.h"
 #include "machine/i8255.h"
-
+#include "machine/z80ctc.h"
 
 class megaphx_state : public driver_device
 {
@@ -46,12 +47,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_ctc(*this, "ctc")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_mainram;
 	required_shared_ptr<UINT16> m_vram;
+	required_device<z80ctc_device> m_ctc;
 
 
 	DECLARE_DRIVER_INIT(megaphx);
@@ -63,6 +66,9 @@ public:
 	DECLARE_READ16_MEMBER(tms_host_r);
 	DECLARE_WRITE16_MEMBER(tms_host_w);
 
+	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
+	DECLARE_WRITE_LINE_MEMBER(z80ctc_to1);
+	DECLARE_WRITE_LINE_MEMBER(z80ctc_to2);
 };
 
 
@@ -95,7 +101,7 @@ static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
 
 	AM_RANGE(0x040000, 0x040007) AM_READWRITE(tms_host_r, tms_host_w)
 
-//	AM_RANGE(0x050000, 0x050001) AM_WRITENOP
+	AM_RANGE(0x050000, 0x050001) AM_WRITENOP
 	AM_RANGE(0x050002, 0x050003) AM_READ_PORT("P3")
 
 
@@ -140,7 +146,7 @@ static void megaphx_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int sc
 {
 	megaphx_state *state = screen.machine().driver_data<megaphx_state>();
 
-	UINT16 *vram = &state->m_vram[(params->rowaddr << 8) & 0x1ff00];
+	UINT16 *vram = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
 
 	const pen_t *paldata = screen.machine().pens;
@@ -330,6 +336,31 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 
 
 
+WRITE_LINE_MEMBER(megaphx_state::z80ctc_to0)
+{
+	printf("z80ctc_to0 %d\n", state);
+}
+
+WRITE_LINE_MEMBER(megaphx_state::z80ctc_to1)
+{
+	printf("z80ctc_to1 %d\n", state);
+}
+
+WRITE_LINE_MEMBER(megaphx_state::z80ctc_to2)
+{
+	printf("z80ctc_to2 %d\n", state);
+}
+
+static Z80CTC_INTERFACE( z80ctc_intf )
+{
+	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),       // interrupt handler
+	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_to0),    // ZC/TO0 callback
+	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_to1),    // ZC/TO1 callback
+	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_to2)     // ZC/TO2 callback
+};
+
+
+
 static MACHINE_CONFIG_START( megaphx, megaphx_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??  can't read xtal due to reflections, CPU is an 8Mhz part
@@ -346,7 +377,7 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 	MCFG_CPU_IO_MAP(sound_io)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
-
+	MCFG_Z80CTC_ADD( "ctc", 4000000, z80ctc_intf ) // unk freq
 
 	MCFG_MACHINE_RESET_OVERRIDE(megaphx_state,megaphx)
 
@@ -366,7 +397,7 @@ DRIVER_INIT_MEMBER(megaphx_state,megaphx)
 {
 	UINT16 *src = (UINT16*)memregion( "roms67" )->base();
 	// copy vector table?
-	memcpy(m_mainram, src, 0x100);
+	memcpy(m_mainram, src, 0x10000);
 }
 
 

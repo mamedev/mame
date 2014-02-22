@@ -92,7 +92,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(mstation);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_kb_timer);
 };
@@ -528,6 +528,7 @@ static MACHINE_CONFIG_START( mstation, mstation_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 128-1)
 
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(mstation_state, mstation)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_AMD_29F080_ADD("flash0")

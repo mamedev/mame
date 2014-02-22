@@ -1055,6 +1055,7 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o \
 	$(DRIVERS)/pgm2.o \
 	$(DRIVERS)/spoker.o \
+	$(MACHINE)/igs036crypt.o \
 	$(MACHINE)/pgmcrypt.o \
 	$(MACHINE)/pgmprot_orlegend.o \
 	$(MACHINE)/pgmprot_igs027a_type1.o \

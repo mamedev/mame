@@ -561,13 +561,14 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_24MHz/4, ctc_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", super6_state, ctc_tick, attotime::from_hz(XTAL_24MHz/16))
-	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_24MHz/4, dart_intf)
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_24MHz/6, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_24MHz/4, pio_intf)
 	MCFG_WD2793x_ADD(WD2793_TAG, 1000000)
-	MCFG_COM8116_ADD(BR1945_TAG, XTAL_5_0688MHz, NULL, WRITELINE(super6_state, fr_w), DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
+
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", super6_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, NULL,    floppy_image_device::default_floppy_formats)
+
+	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_24MHz/4, dart_intf)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "serial_terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
@@ -575,6 +576,10 @@ static MACHINE_CONFIG_START( super6, super6_state )
 
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
+
+	MCFG_DEVICE_ADD(BR1945_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_COM8116_FR_HANDLER(WRITELINE(super6_state, fr_w))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

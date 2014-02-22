@@ -34,7 +34,7 @@ public:
 	UINT8 *m_video_ram;
 	UINT8 m_sysreg;
 	int m_blink;
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(ms0515);
 	UINT32 screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(ms0515_portc_w);
 };
@@ -266,6 +266,7 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ms0515_state, screen_update_ms0515)
 
 	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(ms0515_state, ms0515)
 
 	MCFG_I8255_ADD( "ppi8255_1", ms0515_ppi8255_interface_1 )
 	//MCFG_I8255_ADD( "ppi8255_2", ms0515_ppi8255_interface_2 )
