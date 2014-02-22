@@ -26,7 +26,10 @@ midi_port_device::~midi_port_device()
 void midi_port_device::device_config_complete()
 {
 	m_dev = dynamic_cast<device_midi_port_interface *>(get_card_device());
-	m_dev->set_my_port_device(this);
+	if (m_dev)
+	{
+		m_dev->set_my_port_device(this); 
+	}
 }
 
 void midi_port_device::device_start()
