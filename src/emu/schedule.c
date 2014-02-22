@@ -421,8 +421,9 @@ void device_scheduler::timeslice()
 	if (m_execute_list == NULL)
 		rebuild_execute_list();
 
-	// execute timers
-	execute_timers();
+	// if the current quantum has expired, find a new one
+	while (m_basetime >= m_quantum_list.first()->m_expire)
+		m_quantum_allocator.reclaim(m_quantum_list.detach_head());
 
 	// loop until we hit the next timer
 	while (m_basetime < m_timer_list->m_expire)
@@ -513,6 +514,9 @@ void device_scheduler::timeslice()
 		// update the base time
 		m_basetime = target;
 	}
+
+	// execute timers
+	execute_timers();
 }
 
 
@@ -867,16 +871,11 @@ emu_timer &device_scheduler::timer_list_remove(emu_timer &timer)
 
 
 //-------------------------------------------------
-//  execute_timers - execute timers and update
-//  scheduling quanta
+//  execute_timers - execute timers that are due
 //-------------------------------------------------
 
 inline void device_scheduler::execute_timers()
 {
-	// if the current quantum has expired, find a new one
-	while (m_basetime >= m_quantum_list.first()->m_expire)
-		m_quantum_allocator.reclaim(m_quantum_list.detach_head());
-
 	LOG(("execute_timers: new=%s head->expire=%s\n", m_basetime.as_string(), m_timer_list->m_expire.as_string()));
 
 	// now process any timers that are overdue
