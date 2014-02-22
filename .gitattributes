@@ -7332,6 +7332,7 @@ src/mess/drivers/phc25.c svneol=native#text/plain
 src/mess/drivers/phunsy.c svneol=native#text/plain
 src/mess/drivers/pimps.c svneol=native#text/plain
 src/mess/drivers/pipbug.c svneol=native#text/plain
+src/mess/drivers/pitagjr.c svneol=native#text/plain
 src/mess/drivers/pk8000.c svneol=native#text/plain
 src/mess/drivers/pk8020.c svneol=native#text/plain
 src/mess/drivers/plan80.c svneol=native#text/plain

@@ -1639,14 +1639,14 @@ void tilemap_device::static_set_transparent_pen(device_t &device, pen_t pen)
 
 WRITE8_HANDLER(tilemap_device::write)
 {
-	reinterpret_cast<UINT8 *>(m_basemem.base())[offset] = data;
+	m_basemem.write8(offset, data);
 	offset /= m_bytes_per_entry;
 	mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER(tilemap_device::write)
 {
-	COMBINE_DATA(&reinterpret_cast<UINT16 *>(m_basemem.base())[offset]);
+	m_basemem.write16(offset, data, mem_mask);
 	offset = offset * 2 / m_bytes_per_entry;
 	mark_tile_dirty(offset);
 	if (m_bytes_per_entry < 2)
@@ -1655,7 +1655,7 @@ WRITE16_HANDLER(tilemap_device::write)
 
 WRITE32_HANDLER(tilemap_device::write)
 {
-	COMBINE_DATA(&reinterpret_cast<UINT32 *>(m_basemem.base())[offset]);
+	m_basemem.write32(offset, data, mem_mask);
 	offset = offset * 4 / m_bytes_per_entry;
 	mark_tile_dirty(offset);
 	if (m_bytes_per_entry < 4)
@@ -1676,14 +1676,14 @@ WRITE32_HANDLER(tilemap_device::write)
 
 WRITE8_HANDLER(tilemap_device::write_ext)
 {
-	reinterpret_cast<UINT8 *>(m_extmem.base())[offset] = data;
+	m_extmem.write8(offset, data);
 	offset /= m_bytes_per_entry;
 	mark_tile_dirty(offset);
 }
 
 WRITE16_HANDLER(tilemap_device::write_ext)
 {
-	COMBINE_DATA(&reinterpret_cast<UINT16 *>(m_extmem.base())[offset]);
+	m_extmem.write16(offset, data, mem_mask);
 	offset = offset * 2 / m_bytes_per_entry;
 	mark_tile_dirty(offset);
 	if (m_bytes_per_entry < 2)
@@ -1692,7 +1692,7 @@ WRITE16_HANDLER(tilemap_device::write_ext)
 
 WRITE32_HANDLER(tilemap_device::write_ext)
 {
-	COMBINE_DATA(&reinterpret_cast<UINT32 *>(m_extmem.base())[offset]);
+	m_extmem.write32(offset, data, mem_mask);
 	offset = offset * 4 / m_bytes_per_entry;
 	mark_tile_dirty(offset);
 	if (m_bytes_per_entry < 4)
