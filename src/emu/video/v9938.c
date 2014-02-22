@@ -92,7 +92,8 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 	m_my_delta(0),
 	m_button_state(0),
 	m_vdp_ops_count(0),
-	m_vdp_engine(NULL)
+	m_vdp_engine(NULL),
+	m_palette(*this, "palette")
 {
 	static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
@@ -3259,6 +3260,7 @@ void v99x8_device::update_command()
 }
 
 static MACHINE_CONFIG_FRAGMENT( v9938 )
+	MCFG_PALETTE_ADD("palette", 19780)
 	MCFG_PALETTE_INIT_OWNER(v9938_device, v9938)
 MACHINE_CONFIG_END
 
@@ -3273,6 +3275,7 @@ machine_config_constructor v9938_device::device_mconfig_additions() const
 }
 
 static MACHINE_CONFIG_FRAGMENT( v9958 )
+	MCFG_PALETTE_ADD("palette", 19780)
 	MCFG_PALETTE_INIT_OWNER(v9958_device, v9958)
 MACHINE_CONFIG_END
 

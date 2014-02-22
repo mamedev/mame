@@ -562,12 +562,12 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cgenie, cgenie_common )
-
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(cgenie_state, cgenie )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cgenienz, cgenie_common )
-
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(cgenie_state, cgenienz )
 MACHINE_CONFIG_END
 
