@@ -146,6 +146,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 	, m_palette_offset( 0 )
 	, m_supports_224_240( false )
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
+	, m_palette(*this, "palette")
 {
 }
 
@@ -158,6 +159,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_palette_offset( palette_offset )
 	, m_supports_224_240( supports_224_240 )
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
+	, m_palette(*this, "palette")
 {
 }
 
@@ -1803,6 +1805,7 @@ void sega315_5124_device::device_reset()
 }
 
 static MACHINE_CONFIG_FRAGMENT( sega315_5124 )
+	MCFG_PALETTE_ADD("palette", SEGA315_5124_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
 MACHINE_CONFIG_END
 
@@ -1824,6 +1827,7 @@ void sega315_5378_device::device_reset()
 }
 
 static MACHINE_CONFIG_FRAGMENT( sega315_5378 )
+	MCFG_PALETTE_ADD("palette", SEGA315_5378_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(sega315_5378_device, sega315_5378)
 MACHINE_CONFIG_END
 

@@ -315,6 +315,9 @@ private:
 	UINT16 p_n_b1g1[ 0x10000 ];
 
 	devcb2_write_line m_vblank_handler;
+	//FIXME
+	palette_device *m_palette;	
+	
 };
 
 class cxd8514q_device : public psxgpu_device

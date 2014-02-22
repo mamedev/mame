@@ -167,8 +167,7 @@ protected:
 	static const device_timer_id TIMER_CHECK_HINT = 2;
 	static const device_timer_id TIMER_CHECK_VINT = 3;
 	
-	//FIXME
-	palette_device *m_palette;
+	required_device<palette_device> m_palette;
 };
 
 

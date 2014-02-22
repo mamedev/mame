@@ -30,6 +30,20 @@ sega_genesis_vdp_device::sega_genesis_vdp_device(const machine_config &mconfig, 
 {
 	m_use_alt_timing = 0;
 	m_palwrite_base = -1;
+}	
+
+static MACHINE_CONFIG_FRAGMENT( sega_genesis_vdp )
+	MCFG_PALETTE_ADD("palette", 0x200)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor sega_genesis_vdp_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( sega_genesis_vdp );
 }
 
 static TIMER_CALLBACK( megadriv_render_timer_callback )

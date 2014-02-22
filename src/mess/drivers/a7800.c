@@ -1070,6 +1070,8 @@ static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
 
 	MCFG_SCREEN_MODIFY( "screen" )
 		MCFG_SCREEN_RAW_PARAMS( 7093788, 456, 0, 320, 312, 34, 34 + 228 + 30 )
+
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(a7800_state, a7800p )
 
 	/* sound hardware */

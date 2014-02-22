@@ -27,7 +27,7 @@
 	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_START, VIDEO_START_NAME(_func));
 
 #define MCFG_PALETTE_INIT_LEGACY(_func) \
-	palette_device::static_set_init(*device, palette_init_delegate(PALETTE_INIT_NAME(_func), "palette_init_" #_func, downcast<palette_device *>(owner)));
+	palette_device::static_set_init(*device, palette_init_delegate(PALETTE_INIT_NAME(_func), "palette_init_" #_func, downcast<palette_device *>(device)));
 	
 
 
