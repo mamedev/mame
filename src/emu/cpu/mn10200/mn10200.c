@@ -2,7 +2,7 @@
     Panasonic MN10200 emulator
 
     Written by Olivier Galibert
-    MAME conversion, timers, and IRQ controller by R. Belmont
+    Peripherals and improvements by R. Belmont and hap
 
 */
 

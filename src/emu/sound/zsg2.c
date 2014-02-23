@@ -3,6 +3,7 @@
 
     Written by Olivier Galibert
     MAME conversion by R. Belmont
+    Working emulation by The Talentuous Hands Of The Popularious hap
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -46,6 +47,7 @@
 
 TODO:
 - volume/panning is linear? volume slides are too steep
+- most music sounds tinny, probably due to missing DSP?
 - what is reg 0xa/0xc? seems related to volume
 - identify sample flags
 - memory reads out of range sometimes
