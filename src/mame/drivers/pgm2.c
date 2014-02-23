@@ -36,7 +36,7 @@ Knights of Valour 3
 
 NO internal ROMs are dumped.
 
-Other games that might be on this HW
+These were only released as single board PGM2 based hardware, seen for sale in Japan for around $250-$300
 
 Jigsaw World Arena
 Puzzle of Ocha / Ochainu No Pazuru
@@ -50,6 +50,7 @@ Puzzle of Ocha / Ochainu No Pazuru
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/ymz770.h"
+#include "machine/igs036crypt.h"
 
 class pgm2_state : public driver_device
 {
@@ -224,7 +225,6 @@ ROM_START( orleg2 )
 
 	ROM_REGION( 0x800000, "user1", 0 )
 	ROM_LOAD( "xyj2_v104cn.u7",          0x00000000, 0x0800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) )
-//	ROM_LOAD( "decrypted4.bin",          0x00000000, 0x0800000, CRC(9a4101ac) SHA1(364aed3a3bee7caed598db1c5100e125adc42a79) )
 
 	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF )
 	ROM_LOAD( "ig-a_text.u4",            0x00000000, 0x0200000, CRC(fa444c32) SHA1(31e5e3efa92d52bf9ab97a0ece51e3b77f52ce8a) )
@@ -251,7 +251,6 @@ ROM_START( orleg2o )
 
 	ROM_REGION( 0x800000, "user1", 0 )
 	ROM_LOAD( "xyj2_v103cn.u7",  0x000000, 0x800000, CRC(21c1fae8) SHA1(36eeb7a5e8dc8ee7c834f3ff1173c28cf6c2f1a3) )
-//	ROM_LOAD( "decrypted3.bin",          0x00000000, 0x0800000, CRC(eec442b4) SHA1(f5f4f65702f7384e7971240b835783be24ebc723) )
 
 	ROM_REGION( 0x200000, "tiles", ROMREGION_ERASEFF )
 	ROM_LOAD( "ig-a_text.u4",            0x00000000, 0x0200000, CRC(fa444c32) SHA1(31e5e3efa92d52bf9ab97a0ece51e3b77f52ce8a) )
@@ -441,6 +440,9 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 	iga_u12_decode(src, 0x2000000, 0x4761);
 	iga_u16_decode(src, 0x2000000, 0xc79f);
 
+	igs036_decryptor decrypter(orleg2_key);
+	decrypter.decrypter_rom(memregion("user1"));
+
 	pgm_create_dummy_internal_arm_region();
 }
 
@@ -450,6 +452,9 @@ DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 
 	iga_u12_decode(src, 0x2000000, 0xa193);
 	iga_u16_decode(src, 0x2000000, 0xb780);
+
+	igs036_decryptor decrypter(kov2_key);
+	decrypter.decrypter_rom(memregion("user1"));
 
 	pgm_create_dummy_internal_arm_region();
 }
@@ -461,6 +466,9 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 	iga_u12_decode(src, 0x800000, 0x1e96);
 	iga_u16_decode(src, 0x800000, 0x869c);
 
+	igs036_decryptor decrypter(ddpdoj_key);
+	decrypter.decrypter_rom(memregion("user1"));
+
 	pgm_create_dummy_internal_arm_region();
 }
 
@@ -470,6 +478,9 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 
 	iga_u12_decode(src, 0x2000000, 0x956d);
 	iga_u16_decode(src, 0x2000000, 0x3d17);
+
+	igs036_decryptor decrypter(kov3_key);
+	decrypter.decrypter_rom(memregion("user1"));
 
 	pgm_create_dummy_internal_arm_region();
 }

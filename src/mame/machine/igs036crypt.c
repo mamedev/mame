@@ -63,6 +63,16 @@ igs036_decryptor::igs036_decryptor(const UINT16* game_key)
 {
 }
 
+void igs036_decryptor::decrypter_rom(memory_region* region)
+{
+	int size = region->bytes();
+	UINT16* rom = (UINT16*)region->base();
+	for (int i = 0; i < size / 2; i++)
+	{
+		rom[i] = decrypt(rom[i], i);
+	}
+}
+
 UINT16 igs036_decryptor::decrypt(UINT16 cipherword, int word_address)const
 {
 	// key-independent manipulation
