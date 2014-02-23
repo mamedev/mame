@@ -34,8 +34,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_planea;
 	required_shared_ptr<UINT16> m_planeb;
-	optional_device<ioport_port> m_input1;
-	optional_device<ioport_port> m_input2;
+	optional_ioport m_input1;
+	optional_ioport m_input2;
 	required_ioport m_mousex;
 	required_ioport m_mousey;
 	required_ioport m_mousebtn;
