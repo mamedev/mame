@@ -45,15 +45,17 @@ public:
 	// construction/destruction
 	memory_array();
 	memory_array(void *base, UINT32 bytes, int membits, endianness_t endianness, int bpe) { set(base, bytes, membits, endianness, bpe); }
+	template <typename _Type> memory_array(dynamic_array<_Type> &array, endianness_t endianness, int bpe) { set(array, endianness, bpe); }
 	memory_array(const address_space &space, void *base, UINT32 bytes, int bpe) { set(space, base, bytes, bpe); }
 	memory_array(const memory_share &share, int bpe) { set(share, bpe); }
-	memory_array(const memory_array &helper) { set(helper); }
+	memory_array(const memory_array &array) { set(array); }
 
 	// configuration
 	void set(void *base, UINT32 bytes, int membits, endianness_t endianness, int bpe);
+	template <typename _Type> void set(dynamic_array<_Type> &array, endianness_t endianness, int bpe) { set(&array[0], array.count(), 8*sizeof(_Type), endianness, bpe); }
 	void set(const address_space &space, void *base, UINT32 bytes, int bpe);
 	void set(const memory_share &share, int bpe);
-	void set(const memory_array &helper);
+	void set(const memory_array &array);
 
 	// getters
 	void *base() const { return m_base; }
@@ -62,9 +64,19 @@ public:
 	endianness_t endianness() const { return m_endianness; }
 	int bytes_per_entry() const { return m_bytes_per_entry; }
 
-	// readers and writers
-	UINT32 read(int index) { return (this->*m_reader)(index); }
-	void write(int index, UINT32 data) { (this->*m_writer)(index, data); }
+	// entry-level readers and writers
+	UINT32 read(int index) { return (this->*m_read_entry)(index); }
+	void write(int index, UINT32 data) { (this->*m_write_entry)(index, data); }
+	
+	// byte/word/dword-level readers and writers
+	UINT8 read8(offs_t offset) { return reinterpret_cast<UINT8 *>(m_base)[offset]; }
+	UINT16 read16(offs_t offset) { return reinterpret_cast<UINT16 *>(m_base)[offset]; }
+	UINT32 read32(offs_t offset) { return reinterpret_cast<UINT32 *>(m_base)[offset]; }
+	UINT64 read64(offs_t offset) { return reinterpret_cast<UINT64 *>(m_base)[offset]; }
+	void write8(offs_t offset, UINT8 data) { reinterpret_cast<UINT8 *>(m_base)[offset] = data; }
+	void write16(offs_t offset, UINT16 data, UINT16 mem_mask = 0xffff) { COMBINE_DATA(&reinterpret_cast<UINT16 *>(m_base)[offset]); }
+	void write32(offs_t offset, UINT32 data, UINT32 mem_mask = 0xffffffff) { COMBINE_DATA(&reinterpret_cast<UINT32 *>(m_base)[offset]); }
+	void write64(offs_t offset, UINT64 data, UINT64 mem_mask = U64(0xffffffffffffffff)) { COMBINE_DATA(&reinterpret_cast<UINT64 *>(m_base)[offset]); }
 
 private:
 	// internal read/write helpers for 1 byte entries
@@ -100,8 +112,8 @@ private:
 	int                 m_membits;
 	endianness_t        m_endianness;
 	int                 m_bytes_per_entry;
-	UINT32 (memory_array::*m_reader)(int);
-	void (memory_array::*m_writer)(int, UINT32);
+	UINT32 (memory_array::*m_read_entry)(int);
+	void (memory_array::*m_write_entry)(int, UINT32);
 };
 
 

@@ -23,6 +23,7 @@
 #include "machine/nes_jy.h"
 
 #include "cpu/m6502/m6502.h"
+#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access PPU_BOTTOM_VISIBLE_SCANLINE
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -84,8 +85,6 @@ void nes_jy_typea_device::device_start()
 	save_item(NAME(m_mmc_vrom_bank));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_chr_latch));
-	save_item(NAME(m_extra_chr_bank));
-	save_item(NAME(m_extra_chr_mask));
 	save_item(NAME(m_bank_6000));
 
 	save_item(NAME(m_irq_prescale));
@@ -116,12 +115,9 @@ void nes_jy_typea_device::pcb_reset()
 	memset(m_reg, 0, sizeof(m_reg));
 	m_chr_latch[0] = 0;
 	m_chr_latch[1] = 4;
-	m_extra_chr_bank = 0;
-	m_extra_chr_mask = 0;
 	m_bank_6000 = 0;
 
 	update_prg();
-	update_extra_chr();
 	update_chr();
 	update_mirror();
 
@@ -148,34 +144,19 @@ void nes_jy_typea_device::pcb_reset()
 
  -------------------------------------------------*/
 
-void nes_jy_typea_device::update_chr_latches()
+
+READ8_MEMBER(nes_jy_typea_device::nt_r)
 {
-	update_extra_chr();
-	chr4_0((m_mmc_vrom_bank[m_chr_latch[0]] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
-	chr4_4((m_mmc_vrom_bank[m_chr_latch[1]] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
+	int page = ((offset & 0xc00) >> 10);
+	irq_clock(0, 2);
+	return m_nt_access[page][offset & 0x3ff];
 }
 
 READ8_MEMBER(nes_jy_typea_device::chr_r)
 {
 	int bank = offset >> 10;
-	UINT8 val = m_chr_access[bank][offset & 0x3ff]; // this would be usual return value
-
-	switch (offset & 0xff8)
-	{
-		case 0xfd0:
-			m_chr_latch[BIT(offset, 12)] = (bank & 0x4);
-			if ((m_reg[0] & 0x18) == 0x08)      // 4KB mode is the only one using these latches!
-				update_chr_latches();
-			break;
-		case 0xfe8:
-			m_chr_latch[BIT(offset, 12)] = (bank & 0x4) | 0x2;
-			if ((m_reg[0] & 0x18) == 0x08)      // 4KB mode is the only one using these latches!
-				update_chr_latches();
-			break;
-	}
-
-
-	return val;
+	irq_clock(0, 2);
+	return m_chr_access[bank][offset & 0x3ff];
 }
 
 void nes_jy_typea_device::irq_clock(int mode, int blanked)
@@ -240,7 +221,7 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 
 		// if count wraps, check if IRQ is enabled
 		if (fire && m_irq_enable && !blanked)
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 
 	}
 }
@@ -253,14 +234,10 @@ void nes_jy_typea_device::device_timer(emu_timer &timer, device_timer_id id, int
 	}
 }
 
-void nes_jy_typea_device::hblank_irq(int scanline, int vblank, int blanked)
-{
-	irq_clock(blanked, 2);
-}
-
 void nes_jy_typea_device::scanline_irq(int scanline, int vblank, int blanked)
 {
-	irq_clock(blanked, 1);
+	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
+		irq_clock(blanked, 1);
 }
 
 
@@ -272,17 +249,20 @@ READ8_MEMBER(nes_jy_typea_device::read_l)
 
 	if (offset >= 0x1000 && offset < 0x1800)
 	{
-		// DSW read
+		// bit6/bit7 DSW read
+		return m_open_bus & 0x3f;
 	}
+
 	if (offset >= 0x1800)
 	{
-		if ((offset & 3) == 0)
+		if ((offset & 7) == 0)
 			return (m_mul[0] * m_mul[1]) & 0xff;
-		if ((offset & 3) == 1)
+		if ((offset & 7) == 1)
 			return ((m_mul[0] * m_mul[1]) >> 8) & 0xff;
-		if ((offset & 3) == 3)
+		if ((offset & 7) == 3)
 			return m_latch;
 	}
+
 	return m_open_bus;   // open bus
 }
 
@@ -293,11 +273,11 @@ WRITE8_MEMBER(nes_jy_typea_device::write_l)
 
 	if (offset >= 0x1800)
 	{
-		if ((offset & 3) == 0)
+		if ((offset & 7) == 0)
 			m_mul[0] = data;
-		if ((offset & 3) == 1)
+		if ((offset & 7) == 1)
 			m_mul[1] = data;
-		if ((offset & 3) == 3)
+		if ((offset & 7) == 3)
 			m_latch = data;
 	}
 }
@@ -327,89 +307,87 @@ void nes_jy_typea_device::update_prg()
 	switch (m_reg[0] & 0x03)
 	{
 		case 0: // 32KB
-			prg32((last & 0xF) | (exPrg >> 2));
+			prg32((last & 0x0f) | (exPrg >> 2));
 			m_bank_6000 = (((m_mmc_prg_bank[3] * 4) + 3) & 0x3f) | (exPrg >> 2);
 			break;
-
+			
 		case 1: // 16KB
 			prg16_89ab((m_mmc_prg_bank[1] & 0x1f) | (exPrg >> 1));
 			prg16_cdef((last & 0x1f) | (exPrg >> 1));
-			m_bank_6000 = (((m_mmc_prg_bank[3] * 2) + 1) & 0x3f) | (exPrg >> 1);
+			m_bank_6000 = (((m_mmc_prg_bank[3] * 2) + 1) & 0x1f) | (exPrg >> 1);
 			break;
-
+			
 		case 2: // 8KB
-			prg8_89((m_mmc_prg_bank[0] & 0x3f) | exPrg);
-			prg8_ab((m_mmc_prg_bank[1] & 0x3f) | exPrg);
-			prg8_cd((m_mmc_prg_bank[2] & 0x3f) | exPrg);
-			prg8_ef((last & 0x3f) | exPrg);
-			m_bank_6000 = (m_mmc_prg_bank[3] & 0x3f) | exPrg;
+			prg8_89(m_mmc_prg_bank[0] | exPrg);
+			prg8_ab(m_mmc_prg_bank[1] | exPrg);
+			prg8_cd(m_mmc_prg_bank[2] | exPrg);
+			prg8_ef(last | exPrg);
+			m_bank_6000 = m_mmc_prg_bank[3] | exPrg;
 			break;
-
+			
 		case 3: // 8KB Alt
 			prg8_89((unscramble(m_mmc_prg_bank[0]) & 0x3f) | exPrg);
 			prg8_ab((unscramble(m_mmc_prg_bank[1]) & 0x3f) | exPrg);
 			prg8_cd((unscramble(m_mmc_prg_bank[2]) & 0x3f) | exPrg);
-			prg8_ef((unscramble(last) & 0x3f) | exPrg);
+			if (m_reg[0] & 0x04)
+				prg8_ef((unscramble(m_mmc_prg_bank[3]) & 0x3f) | exPrg);
+			else
+				prg8_ef((unscramble(last) & 0x3f) | exPrg);
 			m_bank_6000 = (unscramble(m_mmc_prg_bank[3]) & 0x3f) | exPrg;
 			break;
 	}
 }
 
-void nes_jy_typea_device::update_extra_chr()
-{
-	if (m_reg[3] & 0x20)
-	{
-		//Block mode disabled
-		m_extra_chr_mask = 0xffff;
-		m_extra_chr_bank = 0;
-	}
-	else
-	{
-		// Block mode enabled: in this case lower bits select a 256KB page inside CHRROM
-		// and the low bytes of m_mmc_vrom_bank select the banks inside such a page
-		m_extra_chr_bank = ((m_reg[3] & 1) | ((m_reg[3] & 0x18) >> 2));
-		switch (m_reg[0] & 0x18)
-		{
-			case 0x00: m_extra_chr_bank <<= 5; m_extra_chr_mask = 0x1f; break;
-			case 0x08: m_extra_chr_bank <<= 6; m_extra_chr_mask = 0x3f; break;
-			case 0x10: m_extra_chr_bank <<= 7; m_extra_chr_mask = 0x7f; break;
-			case 0x18: m_extra_chr_bank <<= 8; m_extra_chr_mask = 0xff; break;
-		}
-	}
-}
-
 void nes_jy_typea_device::update_chr()
 {
-	UINT8 chr_mirror_mode = BIT(m_reg[3], 7) << 1;  // in 1KB & 2KB mode, PPU 0x800-0xfff always mirrors 0x000-0x7ff (0x1800-0x1fff not affected)
+	// in 1KB & 2KB mode, PPU 0x800-0xfff always mirrors 0x000-0x7ff (0x1800-0x1fff not affected)
+	int chr_mirror_mode = BIT(m_reg[3], 7) << 1;
 
+	// Case (m_reg[3] & 0x20 == 0)
+	// Block mode enabled: in this case lower bits select a 256KB page inside CHRROM
+	// and the low bytes of m_mmc_vrom_bank select the banks inside such a page
+
+	// docs suggest m_reg[3] & 0x1f for chr_page below, 
+	// but 45 in 1 (JY-120A) menu requires to use this (from NEStopia)
+	UINT8 chr_page = (m_reg[3] & 1) | ((m_reg[3] & 0x18) >> 2);	
+	UINT32 extra_chr_base = BIT(m_reg[3], 5) ? 0 : (chr_page * 0x100);
+	UINT32 extra_chr_mask = BIT(m_reg[3], 5) ? 0xffffff : 0xff;
+	
 	switch (m_reg[0] & 0x18)
 	{
 		case 0x00:  // 8KB
-			chr8((m_mmc_vrom_bank[0] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
+			extra_chr_base >>= 3;
+			extra_chr_mask >>= 3;
+			chr8(extra_chr_base | (m_mmc_vrom_bank[0] & extra_chr_mask), m_chr_source);
 			break;
-
+			
 		case 0x08:  // 4KB
-//          chr4_0((m_mmc_vrom_bank[m_chr_latch[0]] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
-//          chr4_4((m_mmc_vrom_bank[m_chr_latch[1]] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
-			update_chr_latches();
+			extra_chr_base >>= 2;
+			extra_chr_mask >>= 2;
+			// Type A & B games have fixed m_chr_latch[0] = 0 and m_chr_latch[1] = 4
+			// Type C games can change them at each CHR access!
+			chr4_0(extra_chr_base | (m_mmc_vrom_bank[m_chr_latch[0]] & extra_chr_mask), m_chr_source);
+			chr4_4(extra_chr_base | (m_mmc_vrom_bank[m_chr_latch[1]] & extra_chr_mask), m_chr_source);
 			break;
-
+			
 		case 0x10:  // 2KB
-			chr2_0((m_mmc_vrom_bank[0] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
-			chr2_2((m_mmc_vrom_bank[2 ^ chr_mirror_mode] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
-			chr2_4((m_mmc_vrom_bank[4] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
-			chr2_6((m_mmc_vrom_bank[6] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
+			extra_chr_base >>= 1;
+			extra_chr_mask >>= 1;
+			chr2_0(extra_chr_base | (m_mmc_vrom_bank[0] & extra_chr_mask), m_chr_source);
+			chr2_2(extra_chr_base | (m_mmc_vrom_bank[2 ^ chr_mirror_mode] & extra_chr_mask), m_chr_source);
+			chr2_4(extra_chr_base | (m_mmc_vrom_bank[4] & extra_chr_mask), m_chr_source);
+			chr2_6(extra_chr_base | (m_mmc_vrom_bank[6] & extra_chr_mask), m_chr_source);
 			break;
-
+			
 		case 0x18:  // 1KB
-			chr1_0((m_mmc_vrom_bank[0] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
-			chr1_0((m_mmc_vrom_bank[1] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
-			chr1_0((m_mmc_vrom_bank[2 ^ chr_mirror_mode] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
-			chr1_0((m_mmc_vrom_bank[3 ^ chr_mirror_mode] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
-			chr1_0((m_mmc_vrom_bank[4] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
-			chr1_0((m_mmc_vrom_bank[5] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
-			chr1_0((m_mmc_vrom_bank[6] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
-			chr1_0((m_mmc_vrom_bank[7] & m_extra_chr_mask) | m_extra_chr_bank, m_chr_source);
+			chr1_0(extra_chr_base | (m_mmc_vrom_bank[0] & extra_chr_mask), m_chr_source);
+			chr1_1(extra_chr_base | (m_mmc_vrom_bank[1] & extra_chr_mask), m_chr_source);
+			chr1_2(extra_chr_base | (m_mmc_vrom_bank[2 ^ chr_mirror_mode] & extra_chr_mask), m_chr_source);
+			chr1_3(extra_chr_base | (m_mmc_vrom_bank[3 ^ chr_mirror_mode] & extra_chr_mask), m_chr_source);
+			chr1_4(extra_chr_base | (m_mmc_vrom_bank[4] & extra_chr_mask), m_chr_source);
+			chr1_5(extra_chr_base | (m_mmc_vrom_bank[5] & extra_chr_mask), m_chr_source);
+			chr1_6(extra_chr_base | (m_mmc_vrom_bank[6] & extra_chr_mask), m_chr_source);
+			chr1_7(extra_chr_base | (m_mmc_vrom_bank[7] & extra_chr_mask), m_chr_source);
 			break;
 	}
 }
@@ -431,7 +409,6 @@ void nes_jy_typea_device::update_banks(int reg)
 	{
 		case 0:
 			update_prg();
-			update_extra_chr();
 			update_chr();
 			update_mirror();
 			break;
@@ -443,7 +420,6 @@ void nes_jy_typea_device::update_banks(int reg)
 			break;
 		case 3:
 			update_prg();
-			update_extra_chr();
 			update_chr();
 			break;
 	}
@@ -470,7 +446,6 @@ WRITE8_MEMBER(nes_jy_typea_device::write_h)
 			if ((m_mmc_vrom_bank[offset] & 0xff) != data)
 			{
 				m_mmc_vrom_bank[offset] = (m_mmc_vrom_bank[offset] & 0xff00) | data;
-				update_extra_chr();
 				update_chr();
 			}
 			break;
@@ -479,29 +454,33 @@ WRITE8_MEMBER(nes_jy_typea_device::write_h)
 			if ((m_mmc_vrom_bank[offset] & 0xff00) != (data << 8))
 			{
 				m_mmc_vrom_bank[offset] = (m_mmc_vrom_bank[offset] & 0x00ff) | (data << 8);
-				update_extra_chr();
 				update_chr();
 			}
 			break;
 		case 0x3000:
-			if ((offset & 7) < 4)
+			if (!(offset & 4))
 			{
 				offset &= 3;
 				m_mmc_nt_bank[offset] = (m_mmc_nt_bank[offset] & 0xff00) | data;
-				update_mirror();
 			}
 			else
 			{
 				offset &= 3;
 				m_mmc_nt_bank[offset] = (m_mmc_nt_bank[offset] & 0x00ff) | data << 8;
-				update_mirror();
 			}
+			update_mirror();
 			break;
 		case 0x4000:
 			switch (offset & 7)
 			{
 				case 0:
-					m_irq_enable = BIT(data, 0);
+					if (BIT(data, 0))
+						m_irq_enable = 1;
+					else
+					{
+						machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+						m_irq_enable = 0;
+					}
 					break;
 				case 1:
 					m_irq_mode = data & 3;
@@ -514,6 +493,7 @@ WRITE8_MEMBER(nes_jy_typea_device::write_h)
 						irq_timer->adjust(attotime::never);
 					break;
 				case 2:
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 					m_irq_enable = 0;
 					break;
 				case 3:
@@ -558,7 +538,7 @@ void nes_jy_typeb_device::update_mirror_typeb()
 {
 	for (int i = 0; i < 4; i++)
 	{
-		if (m_reg[0] & 0x40)    // CHRROM
+		if (BIT(m_reg[0], 6))    // CHRROM
 			set_nt_page(i, VROM, m_mmc_nt_bank[i], 0);
 		else    // might be either CHRROM or CIRAM
 		{
@@ -588,4 +568,23 @@ void nes_jy_typec_device::update_mirror_typec()
 		update_mirror_typeb();
 	else
 		update_mirror_typea();
+}
+
+READ8_MEMBER(nes_jy_typec_device::chr_r)
+{
+	int bank = offset >> 10;
+	
+	irq_clock(0, 2);
+	switch (offset & 0xff0)
+	{
+		case 0xfd0:
+			m_chr_latch[BIT(offset, 12)] = (bank & 0x4);
+			update_chr();
+			break;
+		case 0xfe0:
+			m_chr_latch[BIT(offset, 12)] = (bank & 0x4) | 0x2;
+			update_chr();
+			break;
+	}
+	return m_chr_access[bank][offset & 0x3ff];
 }

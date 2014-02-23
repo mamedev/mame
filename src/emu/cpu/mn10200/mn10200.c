@@ -2,7 +2,7 @@
     Panasonic MN10200 emulator
 
     Written by Olivier Galibert
-    MAME conversion, timers, and IRQ controller by R. Belmont
+    Peripherals and improvements by R. Belmont and hap
 
 */
 
@@ -53,11 +53,29 @@ mn10200_device::mn10200_device(const machine_config &mconfig, const char *tag, d
 
 void mn10200_device::device_start()
 {
-	m_p4 = 0xf;
-
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
 
+	// init and register for savestates
+	save_item(NAME(m_pc));
+	save_item(NAME(m_d));
+	save_item(NAME(m_a));
+	save_item(NAME(m_psw));
+	save_item(NAME(m_mdr));
+
+	// interrupts
+	memset(&m_icrl, 0, sizeof(m_icrl));
+	memset(&m_icrh, 0, sizeof(m_icrh));
+
+	save_item(NAME(m_nmicr));
+	save_item(NAME(m_iagr));
+	save_item(NAME(m_extmdl));
+	save_item(NAME(m_extmdh));
+	save_item(NAME(m_icrl));
+	save_item(NAME(m_icrh));
+	save_item(NAME(m_possible_irq));
+	
+	// timers
 	m_sysclock_base = attotime::from_hz(unscaled_clock() / 2);
 
 	for (int tmr = 0; tmr < MN10200_NUM_TIMERS_8BIT; tmr++)
@@ -66,12 +84,6 @@ void mn10200_device::device_start()
 		m_timer_timers[tmr]->adjust(attotime::never, tmr);
 	}
 
-	// zerofill, register for savestates
-	for (int i = 0; i < MN10200_NUM_IRQ_GROUPS; i++)
-	{
-		m_icrl[i] = 0;
-		m_icrh[i] = 0;
-	}
 	for (int i = 0; i < MN10200_NUM_TIMERS_8BIT; i++)
 	{
 		m_simple_timer[i].mode = 0;
@@ -82,6 +94,7 @@ void mn10200_device::device_start()
 		save_item(NAME(m_simple_timer[i].base), i);
 		save_item(NAME(m_simple_timer[i].cur), i);
 	}
+	
 	for (int i = 0; i < MN10200_NUM_PRESCALERS; i++)
 	{
 		m_prescaler[i].mode = 0;
@@ -92,6 +105,8 @@ void mn10200_device::device_start()
 		save_item(NAME(m_prescaler[i].base), i);
 		save_item(NAME(m_prescaler[i].cur), i);
 	}
+	
+	// dma
 	for (int i = 0; i < 8; i++)
 	{
 		m_dma[i].adr = 0;
@@ -108,6 +123,8 @@ void mn10200_device::device_start()
 		save_item(NAME(m_dma[i].ctrlh), i);
 		save_item(NAME(m_dma[i].irq), i);
 	}
+	
+	// serial
 	for (int i = 0; i < 2; i++)
 	{
 		m_serial[i].ctrll = 0;
@@ -118,24 +135,23 @@ void mn10200_device::device_start()
 		save_item(NAME(m_serial[i].ctrlh), i);
 		save_item(NAME(m_serial[i].buf), i);
 	}
-	for (int i = 0; i < 8; i++)
-	{
-		m_ddr[i] = 0;
-	}
+	
+	// ports
+	m_p4 = 0xf;
 
-	save_item(NAME(m_pc));
-	save_item(NAME(m_d));
-	save_item(NAME(m_a));
-	save_item(NAME(m_psw));
-	save_item(NAME(m_mdr));
-	save_item(NAME(m_nmicr));
-	save_item(NAME(m_iagr));
+	save_item(NAME(m_pplul));
+	save_item(NAME(m_ppluh));
+	save_item(NAME(m_p3md));
 	save_item(NAME(m_p4));
-	save_item(NAME(m_extmdl));
-	save_item(NAME(m_extmdh));
-	save_item(NAME(m_icrl));
-	save_item(NAME(m_icrh));
-	save_item(NAME(m_possible_irq));
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_port[i].out = 0;
+		m_port[i].dir = 0;
+
+		save_item(NAME(m_port[i].out), i);
+		save_item(NAME(m_port[i].dir), i);
+	}
 
 	// register for debugger
 	state_add( MN10200_PC,    "PC",    m_pc ).mask(0xffffff).formatstr("%06X");
@@ -1638,7 +1654,7 @@ void mn10200_device::execute_run()
 
 WRITE8_MEMBER(mn10200_device::io_control_w)
 {
-	switch(offset)
+	switch (offset)
 	{
 		case 0x000:
 			if(data & 12)
@@ -1660,7 +1676,7 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 		case 0x036: case 0x037: // Memory mode reg 3
 			break;
 
-		// 0xfc40-0xfc57: irq control
+		// irq control
 		// group 0, NMI control
 		case 0x040:
 			m_nmicr &= data; // nmi ack
@@ -1741,7 +1757,7 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 			log_event("MN102", "AN chans=0-%d current=%d", (data >> 4) & 7, data & 7);
 			break;
 
-		// 0xfe00-0xfe2f: 8-bit timers
+		// 8-bit timers
 		// timer base
 		case 0x210: case 0x211: case 0x212: case 0x213: case 0x214:
 		case 0x215: case 0x216: case 0x217: case 0x218: case 0x219:
@@ -1840,10 +1856,6 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 
 		case 0x262:
 			log_event("MN102", "Sync Output buffer = %02x", data);
-			break;
-
-		case 0x264:
-			m_io->write_byte(MN10200_PORT1, data);
 			break;
 
 		case 0x280: case 0x290: case 0x2a0: case 0x2b0: case 0x2c0: case 0x2d0: case 0x2e0: case 0x2f0:
@@ -1970,27 +1982,6 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 		case 0x28d: case 0x29d: case 0x2ad: case 0x2bd: case 0x2cd: case 0x2dd: case 0x2ed: case 0x2fd:
 			break;
 
-		case 0x3b0:
-			log_event("MN102", "Pull-ups 0-7 = -%c%c%c%c%c%c%c",
-				data & 0x40 ? '#' : '.',
-				data & 0x20 ? '#' : '.',
-				data & 0x10 ? '#' : '.',
-				data & 0x08 ? '#' : '.',
-				data & 0x04 ? '#' : '.',
-				data & 0x02 ? '#' : '.',
-				data & 0x01 ? '#' : '.');
-			break;
-
-		case 0x3b1:
-			log_event("MN102", "Pull-ups 8-f = --%c%c%c%c%c%c",
-				data & 0x20 ? '#' : '.',
-				data & 0x10 ? '#' : '.',
-				data & 0x08 ? '#' : '.',
-				data & 0x04 ? '#' : '.',
-				data & 0x02 ? '#' : '.',
-				data & 0x01 ? '#' : '.');
-			break;
-
 		case 0x3b2:
 			log_event("MN102", "Timer I/O 4-0 = %c%c%c%c%c",
 				data & 0x10 ? 'o' : 'i',
@@ -2010,41 +2001,50 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 				data & 0x01 ? 'o' : 'i');
 			break;
 
-		case 0x3c0: // port 0 data
-			m_io->write_byte(MN10200_PORT0, data);
+		// ports
+		// pull-up control
+		case 0x3b0:
+			m_pplul = data & 0x7f;
+			break;
+		case 0x3b1:
+			m_ppluh = data & 0x3f;
 			break;
 
-		case 0x3c2: // port 2 data
-			m_io->write_byte(MN10200_PORT2, data);
+		// outputs
+		case 0x3c0:
+			m_port[0].out = data;
+			m_io->write_byte(MN10200_PORT0, m_port[0].out | (m_port[0].dir ^ 0xff));
+			break;
+		case 0x264:
+			m_port[1].out = data;
+			m_io->write_byte(MN10200_PORT1, m_port[1].out | (m_port[1].dir ^ 0xff));
+			break;
+		case 0x3c2:
+			m_port[2].out = data & 0x0f;
+			m_io->write_byte(MN10200_PORT2, m_port[2].out | (m_port[2].dir ^ 0x0f));
+			break;
+		case 0x3c3:
+			m_port[3].out = data & 0x1f;
+			m_io->write_byte(MN10200_PORT3, m_port[3].out | (m_port[3].dir ^ 0x1f));
 			break;
 
-		case 0x3c3: // port 3 data
-			m_io->write_byte(MN10200_PORT3, data);
+		// directions (0=input, 1=output)
+		case 0x3e0:
+			m_port[0].dir = data;
+			break;
+		case 0x3e1:
+			m_port[1].dir = data;
+			break;
+		case 0x3e2:
+			m_port[2].dir = data & 0x0f;
+			break;
+		case 0x3e3:
+			m_port[3].dir = data & 0x1f;
 			break;
 
-		case 0x3e0: // port0 ddr
-			m_ddr[0] = data;
-			break;
-
-		case 0x3e1: // port1 ddr
-			m_ddr[1] = data;
-			break;
-
-		case 0x3e2: // port2 ddr
-			m_ddr[2] = data;
-			break;
-
-		case 0x3e3: // port3 ddr
-			m_ddr[3] = data;
-			break;
-
+		// port 3 output mode
 		case 0x3f3:
-			// log_event("MN102", "Port 3 bits 4=%s 3=%s 2=%s 1=%s 0=%s",
-			//     data & 0x10 ? data & 0x40 ? "serial_1" : "tm9" : "p34",
-			//     data & 0x08 ? data & 0x20 ? "serial_0" : "tm8" : "p33",
-			//     data & 0x04 ? "tm7" : "p32",
-			//     data & 0x04 ? "tm6" : "p31",
-			//     data & 0x04 ? "tm5" : "p30");
+			m_p3md = data & 0x7f;
 			break;
 
 
@@ -2058,7 +2058,7 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 
 READ8_MEMBER(mn10200_device::io_control_r)
 {
-	switch(offset)
+	switch (offset)
 	{
 		// active irq group
 		case 0x00e:
@@ -2066,7 +2066,7 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		case 0x00f:
 			return 0;
 
-		// 0xfc40-0xfc57: irq control
+		// irq control
 		// group 0, NMI control
 		case 0x040:
 			return m_nmicr;
@@ -2104,7 +2104,7 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		case 0x183:
 			return 0x10;
 
-		// 0xfe00-0xfe2f: 8-bit timers
+		// 8-bit timers
 		// timer counter (not accurate)
 		case 0x200: case 0x201: case 0x202: case 0x203: case 0x204:
 		case 0x205: case 0x206: case 0x207: case 0x208: case 0x209:
@@ -2132,26 +2132,57 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		case 0x22a: case 0x22b:
 			return m_prescaler[offset & 1].mode;
 
-		case 0x264: // port 1 data
-			return m_io->read_byte(MN10200_PORT1);
-
 		case 0x28c: case 0x29c: case 0x2ac: case 0x2bc: case 0x2cc: case 0x2dc: case 0x2ec: case 0x2fc:
 		{
 			int dma = (offset-0x280) >> 4;
 			return m_dma[dma].irq;
 		}
 
-		case 0x3c0: // port 0 data
-			return m_io->read_byte(MN10200_PORT0);
+		// ports
+		// pull-up control
+		case 0x3b0:
+			return m_pplul;
+		case 0x3b1:
+			return m_ppluh;
 
-		case 0x3c2: // port 2 data
-			return m_io->read_byte(MN10200_PORT2);
+		// outputs
+		case 0x3c0:
+			return m_port[0].out;
+		case 0x264:
+			return m_port[1].out;
+		case 0x3c2:
+			return m_port[2].out;
+		case 0x3c3:
+			return m_port[3].out;
 
-		case 0x3c3: // port 3 data
-			return m_io->read_byte(MN10200_PORT3);
+		// inputs
+		case 0x3d0:
+			return m_io->read_byte(MN10200_PORT0) | m_port[0].dir;
+		case 0x3d1:
+			return m_io->read_byte(MN10200_PORT1) | m_port[1].dir;
+		case 0x3d2:
+			return (m_io->read_byte(MN10200_PORT2) & 0x0f) | m_port[2].dir;
+		case 0x3d3:
+			return (m_io->read_byte(MN10200_PORT3) & 0x1f) | m_port[3].dir;
+		
+		// directions (0=input, 1=output)
+		case 0x3e0:
+			return m_port[0].dir;
+		case 0x3e1:
+			return m_port[1].dir;
+		case 0x3e2:
+			return m_port[2].dir;
+		case 0x3e3:
+			return m_port[3].dir;
+
+		// port 3 output mode
+		case 0x3f3:
+			return m_p3md;
+
 
 		default:
 			log_event("MN102", "internal_r %04x (%03x)", offset+0xfc00, adr);
+			break;
 	}
 	
 	return 0;

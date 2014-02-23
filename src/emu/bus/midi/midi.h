@@ -57,6 +57,7 @@ protected:
 
 extern const device_type MIDI_PORT;
 
-SLOT_INTERFACE_EXTERN( default_midi_devices );
+SLOT_INTERFACE_EXTERN(midiin_slot);
+SLOT_INTERFACE_EXTERN(midiout_slot);
 
 #endif

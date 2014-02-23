@@ -179,8 +179,6 @@ NOTES:
 ***************************************************************************/
 
 #include "bus/midi/midi.h"
-#include "bus/midi/midiinport.h"
-#include "bus/midi/midioutport.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/es5503.h"
 #include "machine/n68681.h"
@@ -409,7 +407,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
-	DECLARE_READ8_MEMBER(duart_input);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
 	int m_mapper_state;
@@ -537,11 +534,6 @@ WRITE_LINE_MEMBER(esq1_state::duart_irq_handler)
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 };
 
-READ8_MEMBER(esq1_state::duart_input)
-{
-	return 0;
-}
-
 WRITE8_MEMBER(esq1_state::duart_output)
 {
 	int bank = ((data >> 1) & 0x7);
@@ -584,14 +576,6 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 	}
 }
 
-static SLOT_INTERFACE_START(midiin_slot)
-	SLOT_INTERFACE("midiin", MIDIIN_PORT)
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START(midiout_slot)
-	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
-SLOT_INTERFACE_END
-
 static const esqpanel_interface esqpanel_config =
 {
 	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_b_w)
@@ -606,7 +590,6 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(esq1_state, duart_irq_handler))
 	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_a))
 	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_b))
-	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(esq1_state, duart_input))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esq1_state, duart_output))
 
 	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)

@@ -393,7 +393,6 @@ void mappy_state::mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
 	int offs;
-	enum { xoffs = 0, yoffs = 0 };
 
 	for (offs = 0;offs < 0x80;offs += 2)
 	{
@@ -407,8 +406,8 @@ void mappy_state::mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 			};
 			int sprite = spriteram[offs];
 			int color = spriteram[offs+1];
-			int sx = spriteram_2[offs+1] + 0x100 * (spriteram_3[offs+1] & 1) - 40 + xoffs;
-			int sy = 256 - spriteram_2[offs] + yoffs + 1;   // sprites are buffered and delayed by one scanline
+			int sx = spriteram_2[offs+1] + 0x100 * (spriteram_3[offs+1] & 1) - 40;
+			int sy = 256 - spriteram_2[offs] + 1;   // sprites are buffered and delayed by one scanline
 			int flipx = (spriteram_3[offs] & 0x01);
 			int flipy = (spriteram_3[offs] & 0x02) >> 1;
 			int sizex = (spriteram_3[offs] & 0x04) >> 2;

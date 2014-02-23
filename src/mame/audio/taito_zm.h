@@ -30,6 +30,7 @@ private:
 	
 	// devices/pointers
 	required_device<mn10200_device> m_soundcpu;
+	required_device<zsg2_device> m_zsg2;
 	
 	// internal state
 	UINT16 m_reg_address;

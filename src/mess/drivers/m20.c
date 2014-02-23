@@ -901,27 +901,6 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 	DEVCB_DRIVER_MEMBER(m20_state, kbd_put)
 };
 
-const struct pit8253_interface pit8253_intf =
-{
-	{
-		{
-			1230782,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(m20_state, tty_clock_tick_w)
-		},
-		{
-			1230782,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_clock_tick_w)
-		},
-		{
-			1230782,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(m20_state, timer_tick_w)
-		}
-	}
-};
-
 static SLOT_INTERFACE_START( m20_floppies )
 	SLOT_INTERFACE( "5dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -972,7 +951,14 @@ static MACHINE_CONFIG_START( m20, m20_state )
 
 	MCFG_DEVICE_ADD("i8251_2", I8251, 0)
 
-	MCFG_PIT8253_ADD("pit8253", pit8253_intf)
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(1230782)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(m20_state, tty_clock_tick_w))
+	MCFG_PIT8253_CLK1(1230782)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m20_state, kbd_clock_tick_w))
+	MCFG_PIT8253_CLK2(1230782)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(m20_state, timer_tick_w))
+
 	MCFG_PIC8259_ADD("i8259", WRITELINE(m20_state, pic_irq_line_w), VCC, NULL)
 
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)

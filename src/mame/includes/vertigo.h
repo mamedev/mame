@@ -141,5 +141,3 @@ public:
 /*----------- defined in machine/vertigo.c -----------*/
 
 void vertigo_update_irq(device_t *device);
-
-extern const struct pit8253_interface vertigo_pit8254_config;

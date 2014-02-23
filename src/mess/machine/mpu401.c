@@ -38,8 +38,6 @@
 
 #include "machine/mpu401.h"
 #include "bus/midi/midi.h"
-#include "bus/midi/midiinport.h"
-#include "bus/midi/midioutport.h"
 
 #define M6801_TAG   "mpu6801"
 #define ROM_TAG     "mpurom"
@@ -68,14 +66,6 @@ static ADDRESS_MAP_START( mpu401_io_map, AS_IO, 8, mpu401_device )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(port1_r, port1_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(port2_r, port2_w)
 ADDRESS_MAP_END
-
-static SLOT_INTERFACE_START(midiin_slot)
-	SLOT_INTERFACE("midiin", MIDIIN_PORT)
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START(midiout_slot)
-	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
-SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( mpu401 )
 	MCFG_CPU_ADD(M6801_TAG, M6801, 4000000) /* 4 MHz as per schematics */

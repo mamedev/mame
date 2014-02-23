@@ -528,27 +528,6 @@ WRITE_LINE_MEMBER( bw2_state::mtron_w )
 	if (m_floppy) m_floppy->mon_w(m_mtron);
 }
 
-static const struct pit8253_interface pit_intf =
-{
-	{
-		{
-			XTAL_16MHz/4,   // 8251 USART TXC, RXC
-			DEVCB_LINE_VCC,
-			DEVCB_DRIVER_LINE_MEMBER(bw2_state, pit_out0_w)
-		},
-		{
-			11000,      // LCD controller
-			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE_MEMBER(I8253_TAG, pit8253_device, clk2_w)
-		},
-		{
-			0,      // Floppy /MTRON
-			DEVCB_LINE_VCC,
-			DEVCB_DRIVER_LINE_MEMBER(bw2_state, mtron_w)
-		}
-	}
-};
-
 //-------------------------------------------------
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
@@ -639,7 +618,14 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_PALETTE_LENGTH(2)
 
 	// devices
-	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
+	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_16MHz/4) // 8251 USART TXC, RXC
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(bw2_state, pit_out0_w))
+	MCFG_PIT8253_CLK1(11000) // LCD controller
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(I8253_TAG, pit8253_device, write_clk2))
+	MCFG_PIT8253_CLK2(0) // Floppy /MTRON
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(bw2_state, mtron_w))
+
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, 0, SCREEN_TAG, lcdc_map)
 

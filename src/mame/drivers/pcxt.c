@@ -92,7 +92,7 @@ public:
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
-	UINT8 m_pc_spkrdata, m_pc_input;
+	UINT8 m_pc_spkrdata, m_pit_out2;
 
 	required_device<pit8253_device> m_pit8253;
 	required_device<pic8259_device> m_pic8259_1;
@@ -129,7 +129,6 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	UINT8 pcxt_speaker_get_spk();
 	void pcxt_speaker_set_spkrdata(UINT8 data);
-	void pcxt_speaker_set_input(UINT8 data);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 };
@@ -243,7 +242,7 @@ Pit8253
 // pc_speaker_get_spk, pc_speaker_set_spkrdata, and pc_speaker_set_input already exists in MESS, can the implementations be merged?
 UINT8 pcxt_state::pcxt_speaker_get_spk()
 {
-	return m_pc_spkrdata & m_pc_input;
+	return m_pc_spkrdata & m_pit_out2;
 }
 
 void pcxt_state::pcxt_speaker_set_spkrdata(UINT8 data)
@@ -252,37 +251,12 @@ void pcxt_state::pcxt_speaker_set_spkrdata(UINT8 data)
 	m_speaker->level_w(pcxt_speaker_get_spk());
 }
 
-void pcxt_state::pcxt_speaker_set_input(UINT8 data)
-{
-	m_pc_input = data ? 1 : 0;
-	m_speaker->level_w(pcxt_speaker_get_spk());
-}
-
 
 WRITE_LINE_MEMBER(pcxt_state::ibm5150_pit8253_out2_changed)
 {
-	pcxt_speaker_set_input(state);
+	m_pit_out2 = state ? 1 : 0;
+	m_speaker->level_w(pcxt_speaker_get_spk());
 }
-
-
-static const struct pit8253_interface pc_pit8253_config =
-{
-	{
-		{
-			XTAL_14_31818MHz/12,                /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir0_w)
-		}, {
-			XTAL_14_31818MHz/12,                /* dram refresh */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			XTAL_14_31818MHz/12,                /* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(pcxt_state,ibm5150_pit8253_out2_changed)
-		}
-	}
-};
 
 
 READ8_MEMBER(pcxt_state::port_a_r)
@@ -314,12 +288,11 @@ READ8_MEMBER(pcxt_state::port_b_r)
 
 READ8_MEMBER(pcxt_state::port_c_r)
 {
-	int timer2_output = m_pit8253->get_output(2);
 	if ( m_port_b_data & 0x01 )
 	{
-		m_wss2_data = ( m_wss2_data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
+		m_wss2_data = ( m_wss2_data & ~0x10 ) | ( m_pit_out2 ? 0x10 : 0x00 );
 	}
-	m_wss2_data = ( m_wss2_data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
+	m_wss2_data = ( m_wss2_data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
 
 	return m_wss2_data;//TODO
 }
@@ -330,7 +303,7 @@ READ8_MEMBER(pcxt_state::port_c_r)
 WRITE8_MEMBER(pcxt_state::port_b_w)
 {
 	/* PPI controller port B*/
-	m_pit8253->gate2_w(BIT(data, 0));
+	m_pit8253->write_gate2(BIT(data, 0));
 	pcxt_speaker_set_spkrdata( data & 0x02 );
 	m_port_b_data = data;
 // device_t *beep = machine().device<beep_device>("beep");
@@ -691,7 +664,7 @@ void pcxt_state::machine_reset()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pcxt_state::irq_callback),this));
 
 	m_pc_spkrdata = 0;
-	m_pc_input = 0;
+	m_pit_out2 = 0;
 	m_wss2_data = 0;
 	m_speaker->level_w(0);
 }
@@ -701,8 +674,12 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 	MCFG_CPU_PROGRAM_MAP(filetto_map)
 	MCFG_CPU_IO_MAP(filetto_io)
 
-
-	MCFG_PIT8253_ADD( "pit8253", pc_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_1", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pcxt_state, ibm5150_pit8253_out2_changed))
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )

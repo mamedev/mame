@@ -145,31 +145,20 @@ I8237_INTERFACE( dma2_config )
 	}
 };
 
-const struct pit8253_interface cs4031_pit_config =
-{
-	{
-		{
-			XTAL_14_31818MHz / 12,
-			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE_MEMBER("intc1", pic8259_device, ir0_w)
-		}, {
-			XTAL_14_31818MHz / 12,
-			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, ctc_out1_w)
-		}, {
-			XTAL_14_31818MHz / 12,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cs4031_device, ctc_out2_w)
-		}
-	}
-};
-
 static MACHINE_CONFIG_FRAGMENT( cs4031 )
 	MCFG_I8237_ADD("dma1", 0, dma1_config)
 	MCFG_I8237_ADD("dma2", 0, dma2_config)
 	MCFG_PIC8259_ADD("intc1", WRITELINE(cs4031_device, intc1_int_w), VCC, READ8(cs4031_device, intc1_slave_ack_r))
 	MCFG_PIC8259_ADD("intc2", DEVWRITELINE("intc1", pic8259_device, ir2_w), GND, NULL)
-	MCFG_PIT8254_ADD("ctc", cs4031_pit_config)
+
+	MCFG_DEVICE_ADD("ctc", PIT8254, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz / 12)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("intc1", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz / 12)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(cs4031_device, ctc_out1_w))
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz / 12)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(cs4031_device, ctc_out2_w))
+
 	MCFG_DS12885_ADD("rtc")
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(cs4031_device, rtc_irq_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
@@ -351,7 +340,7 @@ void cs4031_device::device_reset()
 void cs4031_device::device_reset_after_children()
 {
 	// timer 2 default state
-	m_ctc->gate2_w(1);
+	m_ctc->write_gate2(1);
 }
 
 
@@ -974,7 +963,7 @@ WRITE8_MEMBER( cs4031_device::portb_w )
 	if (!BIT(m_portb, 0))
 		m_portb |= 1 << 5;
 
-	m_ctc->gate2_w(BIT(m_portb, 0));
+	m_ctc->write_gate2(BIT(m_portb, 0));
 
 	m_write_spkr(!BIT(m_portb, 1));
 

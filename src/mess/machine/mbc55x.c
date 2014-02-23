@@ -124,29 +124,6 @@ IRQ_CALLBACK_MEMBER(mbc55x_state::mbc55x_irq_callback)
 	return m_pic->inta_r();
 }
 
-/* PIT8253 Configuration */
-
-const struct pit8253_interface mbc55x_pit8253_config =
-{
-	{
-		{
-			PIT_C0_CLOCK,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(PIC8259_TAG, pic8259_device, ir0_w)
-		},
-		{
-			PIT_C1_CLOCK,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(PIC8259_TAG, pic8259_device, ir1_w)
-		},
-		{
-			PIT_C2_CLOCK,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(mbc55x_state, pit8253_t2)
-		}
-	}
-};
-
 READ8_MEMBER(mbc55x_state::mbcpit8253_r)
 {
 	return m_pit->read(space, offset >> 1);
@@ -160,7 +137,7 @@ WRITE8_MEMBER(mbc55x_state::mbcpit8253_w)
 WRITE_LINE_MEMBER( mbc55x_state::pit8253_t2 )
 {
 	m_kb_uart->write_txc(state);
-	m_kb_uart->write_txc(state);
+	m_kb_uart->write_rxc(state);
 }
 
 /* Video ram page register */

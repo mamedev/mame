@@ -3689,25 +3689,6 @@ WRITE_LINE_MEMBER(chihiro_state::chihiro_pit8254_out2_changed)
 	//chihiro_speaker_set_input( state ? 1 : 0 );
 }
 
-static const struct pit8253_interface chihiro_pit8254_config =
-{
-	{
-		{
-			1125000,                /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(chihiro_state, chihiro_pit8254_out0_changed)
-		}, {
-			1125000,                /* (unused) dram refresh */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			1125000,                /* (unused) pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(chihiro_state, chihiro_pit8254_out2_changed)
-		}
-	}
-};
-
 /*
  * SMbus devices
  */
@@ -3970,7 +3951,14 @@ static MACHINE_CONFIG_START( chihiro_base, chihiro_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, "NV2A GeForce 3MX Integrated GPU/Northbridge", geforce_pci_r, geforce_pci_w)
 	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(chihiro_state, chihiro_pic8259_1_set_int_line), VCC, READ8(chihiro_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
-	MCFG_PIT8254_ADD( "pit8254", chihiro_pit8254_config )
+
+	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
+	MCFG_PIT8253_CLK0(1125000) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(chihiro_state, chihiro_pit8254_out0_changed))
+	MCFG_PIT8253_CLK1(1125000) /* (unused) dram refresh */
+	MCFG_PIT8253_CLK2(1125000) /* (unused) pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(chihiro_state, chihiro_pit8254_out2_changed))
+
 	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD( "ide", ide_baseboard, NULL, "bb", true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)

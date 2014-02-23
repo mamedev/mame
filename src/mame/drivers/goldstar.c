@@ -5595,6 +5595,19 @@ static const gfx_layout charlayout_chry10 =
 	32*8   /* every char takes 32 consecutive bytes */
 };
 
+
+static const gfx_layout charlayout_goldfrui =
+{
+	8,8,    /* 8*8 characters */
+	4096,    /* 4096 characters */
+	3,      /* 3 bits per pixel */
+	{ 2, 4, 6 }, /* the bitplanes are packed in one byte */
+	{ 0*8+0, 0*8+1, 2*8+0, 2*8+1, 1*8+0, 1*8+1, 3*8+0, 3*8+1 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8   /* every char takes 32 consecutive bytes */
+};
+
+
 static const gfx_layout tilelayout =
 {
 	8,32,    /* 8*32 characters */
@@ -5795,6 +5808,11 @@ GFXDECODE_END
 static GFXDECODE_START( ml )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x18000, tilelayout, 128,  8 )
+GFXDECODE_END
+
+static GFXDECODE_START( goldfrui )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout_goldfrui,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayoutbl, 128,  8 )
 GFXDECODE_END
 
 static GFXDECODE_START( chry10 )
@@ -6294,6 +6312,39 @@ static MACHINE_CONFIG_START( moonlght, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ml)
+	MCFG_PALETTE_LENGTH(256)
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( goldfrui, goldstar_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(goldstar_map)
+	MCFG_CPU_IO_MAP(goldstar_readport)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", goldfrui)
 	MCFG_PALETTE_LENGTH(256)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -7346,6 +7397,33 @@ ROM_START( moonlght )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
+ROM_END
+
+
+
+/* Gold Fruit
+
+   Graphics are packed/encoded in a different way.
+   Game rate is fixed in 40%.
+   Coin A and B are fixed to 100 credits by pulse.
+
+*/
+ROM_START( goldfrui )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c1000.u6",  0x0000, 0x10000, CRC(84b982fc) SHA1(39f401da52a9df799f3fe6bbeb7cad493911b831) )
+	ROM_CONTINUE( 0x0000, 0x10000) /* Discarding 1nd half 0xff filled*/
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c1000.u24",      0x00000, 0x20000, CRC(9642c9c2) SHA1(10fdced265ef4a9a5494d8df0432337df4ecec7f) ) //FIXED BITS (00xxxxxx)
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "27c1000.u25",      0x00000, 0x08000, CRC(5ce73db6) SHA1(e93948f6a44831583e0779da3158d7b5e33bcca7) )
+	ROM_CONTINUE( 0x0000, 0x08000) /* Discarding 1nd quarter 0xff filled*/
+	ROM_CONTINUE( 0x0000, 0x08000) /* Discarding 2nd quarter 0xff filled*/
+	ROM_CONTINUE( 0x0000, 0x08000) /* Discarding 3nd quarter 0xff filled*/
+
+	ROM_REGION( 0x40000, "oki", 0 ) // Audio ADPCM 
+	ROM_LOAD( "27c1000.u57",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
 
@@ -11812,6 +11890,7 @@ GAME(  199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device,  0,        
 GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",         0 )
 GAME(  199?, chrygld,   0,        chrygld,  chrygld,  goldstar_state, chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
 GAME(  199?, chry10,    0,        chrygld,  chry10,   goldstar_state, chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
+GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )	// maybe fullname should be 'Gold Fruit (main 40%)'
 
 // are these really dyna, or bootlegs?
 GAME(  199?, ncb3,      0,        ncb3,     ncb3,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0 )

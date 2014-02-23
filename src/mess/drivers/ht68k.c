@@ -58,7 +58,6 @@ public:
 	floppy_image_device *m_floppy;
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txb);
-	DECLARE_READ8_MEMBER(duart_input);
 	DECLARE_WRITE8_MEMBER(duart_output);
 	required_shared_ptr<UINT16> m_p_ram;
 	virtual void machine_reset();
@@ -101,11 +100,6 @@ WRITE_LINE_MEMBER(ht68k_state::duart_txb)
 	//This is the second serial channel named AUX, for modem or other serial devices.
 }
 
-READ8_MEMBER(ht68k_state::duart_input)
-{
-	return 0;
-}
-
 WRITE8_MEMBER(ht68k_state::duart_output)
 {
 	m_floppy = NULL;
@@ -136,7 +130,6 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(ht68k_state, duart_irq_handler))
 	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(ht68k_state, duart_txb))
-	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(ht68k_state, duart_input))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(ht68k_state, duart_output))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")

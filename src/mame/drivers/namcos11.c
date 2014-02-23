@@ -1627,6 +1627,6 @@ GAME( 1996, primglex,   0,        primglex,   tekken,     driver_device, 0, ROT0
 GAME( 1996, danceyes,   0,        danceyes,   namcos11,   driver_device, 0, ROT0, "Namco", "Dancing Eyes (US, DC3/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   driver_device, 0, ROT0, "Namco", "Dancing Eyes (Japan, DC1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   driver_device, 0, ROT0, "Namco", "Pocket Racer (Japan, PKR1/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, starswep,   0,        starswep,   namcos11,   driver_device, 0, ROT0, "Axela/Namco", "Star Sweep (Japan, STP1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, myangel3,   0,        myangel3,   myangel3,   driver_device, 0, ROT0, "Namco", "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, starswep,   0,        starswep,   namcos11,   driver_device, 0, ROT0, "Axela / Namco", "Star Sweep (Japan, STP1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, myangel3,   0,        myangel3,   myangel3,   driver_device, 0, ROT0, "MOSS / Namco", "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, ptblank2ua, ptblank2, ptblank2ua, ptblank2ua, driver_device, 0, ROT0, "Namco", "Point Blank 2 (US, GNB3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

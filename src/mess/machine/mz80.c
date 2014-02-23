@@ -81,16 +81,6 @@ I8255_INTERFACE( mz80k_8255_int )
 	DEVCB_DRIVER_MEMBER(mz80_state, mz80k_8255_portc_w),
 };
 
-const struct pit8253_interface mz80k_pit8253_config =
-{
-	{
-		/* clockin        gate        callback    */
-		{ XTAL_8MHz/  4,  DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(mz80_state, pit_out0_changed) },
-		{ XTAL_8MHz/256,  DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("pit8253", pit8253_device, clk2_w)   },
-		{         0,  DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(mz80_state, pit_out2_changed) },
-	}
-};
-
 READ8_MEMBER( mz80_state::mz80k_strobe_r )
 {
 	return 0x7e | (UINT8)m_mz80k_tempo_strobe;
@@ -98,5 +88,5 @@ READ8_MEMBER( mz80_state::mz80k_strobe_r )
 
 WRITE8_MEMBER( mz80_state::mz80k_strobe_w )
 {
-	m_pit->gate0_w(BIT(data, 0));
+	m_pit->write_gate0(BIT(data, 0));
 }

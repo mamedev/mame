@@ -217,6 +217,9 @@ static void listdevices()
     nt.init();
     const netlist_factory_t::list_t &list = nt.setup().factory().list();
 
+    nt.setup().start_devices();
+    nt.setup().resolve_inputs();
+
     for (int i=0; i < list.count(); i++)
     {
         pstring out = pstring::sprintf("%-20s %s(<id>", list[i]->classname().cstr(),
@@ -226,6 +229,7 @@ static void listdevices()
         net_device_t_base_factory *f = list[i];
         netlist_device_t *d = f->Create();
         d->init(nt, pstring::sprintf("dummy%d", i));
+        d->start_dev();
 
         // get the list of terminals ...
         for (int j=0; j < d->m_terminals.count(); j++)

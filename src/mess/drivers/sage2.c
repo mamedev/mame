@@ -384,34 +384,6 @@ static I8255A_INTERFACE( ppi1_intf )
 };
 
 
-//-------------------------------------------------
-//  pit8253_config pit0_intf
-//-------------------------------------------------
-
-static const struct pit8253_interface pit0_intf =
-{
-	{
-		{
-			0, // from U75 OUT0
-			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir6_w)
-		}, {
-			XTAL_16MHz/2/125,
-			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE_MEMBER(I8253_0_TAG, pit8253_device, clk2_w)
-		}, {
-			0, // from OUT2
-			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir0_w)
-		}
-	}
-};
-
-
-//-------------------------------------------------
-//  pit8253_config pit1_intf
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( sage2_state::br1_w )
 {
 	m_usart0->write_txc(state);
@@ -423,25 +395,6 @@ WRITE_LINE_MEMBER( sage2_state::br2_w )
 	m_usart1->write_txc(state);
 	m_usart1->write_rxc(state);
 }
-
-static const struct pit8253_interface pit1_intf =
-{
-	{
-		{
-			XTAL_16MHz/2/125,
-			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE_MEMBER(I8253_0_TAG, pit8253_device, clk0_w)
-		}, {
-			XTAL_16MHz/2/13,
-			DEVCB_LINE_VCC,
-			DEVCB_DRIVER_LINE_MEMBER(sage2_state, br1_w)
-		}, {
-			XTAL_16MHz/2/13,
-			DEVCB_LINE_VCC,
-			DEVCB_DRIVER_LINE_MEMBER(sage2_state, br2_w)
-		}
-	}
-};
 
 //-------------------------------------------------
 //  upd765_interface fdc_intf
@@ -516,8 +469,22 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_PIC8259_ADD(I8259_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_1), VCC, NULL)
 	MCFG_I8255A_ADD(I8255A_0_TAG, ppi0_intf)
 	MCFG_I8255A_ADD(I8255A_1_TAG, ppi1_intf)
-	MCFG_PIT8253_ADD(I8253_0_TAG, pit0_intf)
-	MCFG_PIT8253_ADD(I8253_1_TAG, pit1_intf)
+
+	MCFG_DEVICE_ADD(I8253_0_TAG, PIT8253, 0)
+	MCFG_PIT8253_CLK0(0) // from U75 OUT0
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8259_TAG, pic8259_device, ir6_w))
+	MCFG_PIT8253_CLK1(XTAL_16MHz/2/125)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(I8253_0_TAG, pit8253_device, write_clk2))
+	MCFG_PIT8253_CLK2(0) // from OUT2
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE(I8259_TAG, pic8259_device, ir0_w))
+
+	MCFG_DEVICE_ADD(I8253_1_TAG, PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_16MHz/2/125)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8253_0_TAG, pit8253_device, write_clk0))
+	MCFG_PIT8253_CLK1(XTAL_16MHz/2/13)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(sage2_state, br1_w))
+	MCFG_PIT8253_CLK2(XTAL_16MHz/2/13)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(sage2_state, br2_w))
 
 	MCFG_DEVICE_ADD(I8251_0_TAG, I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))

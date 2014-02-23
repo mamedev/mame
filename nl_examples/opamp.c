@@ -41,7 +41,7 @@ NETLIST_START(main)
     NET_C(RL.2, GND)
     NET_C(RL.1, op1.OUT)
 
-    //LOG(logX, op1.OUT)
+    LOG(logX, op1.OUT)
     //LOG(logY, clk)
 NETLIST_END()
 

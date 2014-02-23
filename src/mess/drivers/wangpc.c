@@ -881,10 +881,6 @@ static I8255A_INTERFACE( ppi_intf )
 };
 
 
-//-------------------------------------------------
-//  pit8253_config pit_intf
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( wangpc_state::pit2_w )
 {
 	if (state)
@@ -893,26 +889,6 @@ WRITE_LINE_MEMBER( wangpc_state::pit2_w )
 		check_level1_interrupts();
 	}
 }
-
-static const struct pit8253_interface pit_intf =
-{
-	{
-		{
-			500000,
-			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir0_w)
-		}, {
-			2000000,
-			DEVCB_LINE_VCC,
-			DEVCB_NULL
-		}, {
-			500000,
-			DEVCB_LINE_VCC,
-			DEVCB_DRIVER_LINE_MEMBER(wangpc_state, pit2_w)
-		}
-	}
-};
-
 
 //-------------------------------------------------
 //  IM6402_INTERFACE( uart_intf )
@@ -1189,7 +1165,14 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_AM9517A_ADD(AM9517A_TAG, 4000000, dmac_intf)
 	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
-	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
+
+	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
+	MCFG_PIT8253_CLK0(500000)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8259A_TAG, pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(2000000)
+	MCFG_PIT8253_CLK2(500000)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wangpc_state, pit2_w))
+
 	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
 	MCFG_MC2661_ADD(SCN2661_TAG, 0, epci_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)

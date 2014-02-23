@@ -33,7 +33,7 @@ Ghoul Panic (OB2/VER.A)                  (C) Namco/Raizing,1999  COH-700     SYS
 Oh! Bakyuuun (OB1/VER.A)                 (C) Namco/Raizing,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC045
 Golgo 13 (GLG1/VER.A)                    (C) Raizing/Namco,1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC054
 Golgo 13 Kiseki no Dandou (GLS1/VER.A)   (C) Raizing/Namco,2000  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC059
-Kaiun Quiz (KW1/VER.A1)                  (C) Namco/Moss,   1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M10X64  KC050
+Kaiun Quiz (KW1/VER.A1)                  (C) Namco/MOSS,   1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M10X64  KC050
 Kart Duel (KTD1/VER.A)                   (C) Namco,        2000  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F0    KC057
 Libero Grande (LG1/VER.A)                (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC014
 Libero Grande (LG2/VER.A)                (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC014
@@ -2000,8 +2000,8 @@ ROM_START( kartduel )
 	ROM_LOAD16_BYTE( "ktd1vera.2p",  0x0000001, 0x200000, CRC(f6e2581f) SHA1(06eb108c2775290590dba75f964f26443a585d70) )
 
 	ROM_REGION32_LE( 0x00800000, "user2", 0 ) /* main data */
-	ROM_LOAD16_BYTE( "kdt1rom0l.ic12", 0x000000, 0x400000, CRC(8e2d5d9e) SHA1(6f703e27a19740af4094004b783b3cc2974c3de0) )
-	ROM_LOAD16_BYTE( "kdt1rom0u.ic11", 0x000001, 0x400000, CRC(49ec5dbd) SHA1(336db6d3e361938850a9234b6b64070dbdc36d45) )
+	ROM_LOAD16_BYTE( "kdt1rom0l.ic12", 0x000000, 0x400000, BAD_DUMP CRC(8e2d5d9e) SHA1(6f703e27a19740af4094004b783b3cc2974c3de0) ) // These probably should be 64MBIT
+	ROM_LOAD16_BYTE( "kdt1rom0u.ic11", 0x000001, 0x400000, BAD_DUMP CRC(49ec5dbd) SHA1(336db6d3e361938850a9234b6b64070dbdc36d45) ) // 
 
 	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
 	ROM_LOAD16_WORD_SWAP( "ktd1vera.11s", 0x000000, 0x080000, CRC(c2ff1971) SHA1(32ee2afe08e92049d8139c9324a0ea1a3b7ee5a1) )
@@ -2864,7 +2864,7 @@ GAME( 1998, soulclbrja,soulclbr, coh700,   namcos12, namcos12_state, namcos12, R
 GAME( 1998, ehrgeiz,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (US, EG3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC021 */
 GAME( 1998, ehrgeizaa, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (Asia, EG2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC021 */
 GAME( 1998, ehrgeizja, ehrgeiz,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Square / Namco",  "Ehrgeiz (Japan, EG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC021 */
-GAME( 1998, mdhorse,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC035 */
+GAME( 1998, mdhorse,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "MOSS / Namco",    "Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC035 */
 GAME( 1998, sws98,     0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium '98 (Japan, SS81/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC0?? */
 GAME( 1998, tenkomor,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Asia, TKM2/VER.A1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC036 */
 GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12, namcos12_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC036 */

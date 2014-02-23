@@ -9453,6 +9453,7 @@ goldstbl        // (c) 198? IGS
 moonlght        // bootleg
 chry10          // bootleg
 chrygld         // bootleg
+goldfrui        // bootleg
 cabaret         // (c) 1992 AMT
 cpoker          // (c) 1993? IGS
 cpokert         // (c) 1993? Tuning
@@ -10360,6 +10361,7 @@ onetwo          // (c) 1997 Barko
 onetwoe         // (c) 1997 Barko
 1945kiii        // (c) 2000 Oriental
 witch           // (c) 1992 Excellent System
+witchb          // (c) 1992 Excellent System
 witchs          // (c) 1992 Sega / Vic Tokai license
 pbchmp95        // (c) 1995 Veltmeijer Automaten
 cardline        // (c) 199? Veltmeijer
@@ -10427,6 +10429,11 @@ pool10b         // (c) 1996 C.M.C.
 pool10c         // (c) 1996 C.M.C.
 pool10d         // (c) 1997 C.M.C.
 pool10e         // (c) 1997 C.M.C.
+pool10f         // (c) 1997 C.M.C.
+pool10g         // (c) 1996 C.M.C.
+pool10h         // (c) 1996 C.M.C.
+pool10i         // (c) 1997 C.M.C.
+royal           // 2001, hack.
 tortufam        // (c) 1997 C.M.C.
 potgame         // (c) 1996 C.M.C.
 bottle10        // (c) 1996 C.M.C.
@@ -10611,6 +10618,7 @@ bchance         // 198? Unknown
 goldnpkr        // (c) 1981 Bonanza
 goldnpkb        // (c) 1981 Bonanza
 videtron        // Unknown
+videtron2       // Unknown
 videtrna        // Unknown
 pottnpkr        // Bootleg
 potnpkra        // Bootleg in Coinmaster H/W

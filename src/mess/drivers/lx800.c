@@ -244,12 +244,6 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const UPD7810_CONFIG lx800_cpu_config =
-{
-	TYPE_7810,
-	0
-};
-
 static const e05a03_interface lx800_e05a03_intf =
 {
 	DEVCB_DRIVER_MEMBER(lx800_state, lx800_centronics_data_r),
@@ -262,7 +256,6 @@ static const e05a03_interface lx800_e05a03_intf =
 static MACHINE_CONFIG_START( lx800, lx800_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
-	MCFG_CPU_CONFIG(lx800_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(lx800_mem)
 	MCFG_CPU_IO_MAP(lx800_io)
 

@@ -920,27 +920,6 @@ WRITE_LINE_MEMBER(pk8020_state::pk8020_pit_out1)
 }
 
 
-const struct pit8253_interface pk8020_pit8253_intf =
-{
-	{
-		{
-			XTAL_20MHz / 10,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(pk8020_state,pk8020_pit_out0)
-		},
-		{
-			XTAL_20MHz / 10,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(pk8020_state,pk8020_pit_out1)
-		},
-		{
-			(XTAL_20MHz / 8) / 164,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir5_w)
-		}
-	}
-};
-
 WRITE_LINE_MEMBER(pk8020_state::pk8020_pic_set_int_line)
 {
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);

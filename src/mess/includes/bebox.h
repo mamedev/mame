@@ -101,7 +101,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bebox_ide_interrupt);
 
 	DECLARE_WRITE_LINE_MEMBER(bebox_keyboard_interrupt);
-	DECLARE_READ8_MEMBER(bebox_get_out2);
 
 	void fdc_interrupt(bool state);
 	void fdc_dma_drq(bool state);
@@ -114,7 +113,6 @@ protected:
 
 /*----------- defined in machine/bebox.c -----------*/
 
-extern const struct pit8253_interface bebox_pit8254_config;
 extern const am9517a_interface bebox_dma8237_1_config;
 extern const am9517a_interface bebox_dma8237_2_config;
 extern const ins8250_interface bebox_uart_inteface_0;

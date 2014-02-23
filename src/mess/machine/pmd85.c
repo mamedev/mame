@@ -382,35 +382,6 @@ WRITE8_MEMBER(pmd85_state::pmd85_ppi_2_portc_w)
 
 /*******************************************************************************
 
-    I/O board 8253
-    --------------
-
-    Timer 0:
-        OUT0    - external interfaces connector (K2)
-        CLK0    - external interfaces connector (K2)
-        GATE0   - external interfaces connector (K2), default = 1
-    Timer 1:
-        OUT0    - external interfaces connector (K2), i8251 (for V24 only)
-        CLK0    - hardwired to 2 MHz system clock
-        GATE0   - external interfaces connector (K2), default = 1
-    Timer 2:
-        OUT0    - unused
-        CLK0    - hardwired to 1HZ signal generator
-        GATE0   - hardwired to 5V, default = 1
-
-*******************************************************************************/
-
-const struct pit8253_interface pmd85_pit8253_interface =
-{
-	{
-		{ 0,        DEVCB_NULL,     DEVCB_NULL },
-		{ 2000000,  DEVCB_NULL,     DEVCB_NULL },
-		{ 1,        DEVCB_LINE_VCC, DEVCB_NULL }
-	}
-};
-
-/*******************************************************************************
-
     I/O board external interfaces connector (K2)
     --------------------------------------------
 

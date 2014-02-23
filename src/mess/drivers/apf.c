@@ -111,14 +111,6 @@ public:
 	DECLARE_WRITE8_MEMBER(apf_dischw_w);
 	DECLARE_READ8_MEMBER(serial_r);
 	DECLARE_WRITE8_MEMBER(serial_w);
-	DECLARE_WRITE8_MEMBER(apf_wd179x_command_w);
-	DECLARE_WRITE8_MEMBER(apf_wd179x_track_w);
-	DECLARE_WRITE8_MEMBER(apf_wd179x_sector_w);
-	DECLARE_WRITE8_MEMBER(apf_wd179x_data_w);
-	DECLARE_READ8_MEMBER(apf_wd179x_status_r);
-	DECLARE_READ8_MEMBER(apf_wd179x_track_r);
-	DECLARE_READ8_MEMBER(apf_wd179x_sector_r);
-	DECLARE_READ8_MEMBER(apf_wd179x_data_r);
 private:
 	UINT8 m_latch;
 	UINT8 m_keyboard_data;
@@ -264,9 +256,14 @@ void apf_state::machine_reset()
 WRITE8_MEMBER( apf_state::apf_dischw_w)
 {
 	/* bit 3 is index of drive to select */
-	UINT8 drive = (data>>3) & 0x01;
+	UINT8 drive = BIT(data, 3);
 
 	wd17xx_set_drive(m_fdc, drive);
+	floppy_image_legacy *floppy;
+	floppy = flopimg_get_image(floppy_get_device(machine(), drive));
+	floppy_mon_w(floppy_get_device(machine(), drive), (floppy != NULL) ? 0 : 1);
+	floppy_drive_set_ready_state(floppy_get_device(machine(), drive), (floppy != NULL) ? 1 : 0,0);
+
 
 	logerror("disc w %04x %04x\n",offset,data);
 }
@@ -282,46 +279,6 @@ WRITE8_MEMBER( apf_state::serial_w)
 	logerror("serial w %04x %04x\n",offset,data);
 }
 
-WRITE8_MEMBER( apf_state::apf_wd179x_command_w)
-{
-	wd17xx_command_w(m_fdc, space, offset,~data);
-}
-
-WRITE8_MEMBER( apf_state::apf_wd179x_track_w)
-{
-	wd17xx_track_w(m_fdc, space, offset,~data);
-}
-
-WRITE8_MEMBER( apf_state::apf_wd179x_sector_w)
-{
-	wd17xx_sector_w(m_fdc, space, offset,~data);
-}
-
-WRITE8_MEMBER( apf_state::apf_wd179x_data_w)
-{
-	wd17xx_data_w(m_fdc, space, offset,~data);
-}
-
-READ8_MEMBER( apf_state::apf_wd179x_status_r)
-{
-	return ~wd17xx_status_r(m_fdc, space, offset);
-}
-
-READ8_MEMBER( apf_state::apf_wd179x_track_r)
-{
-	return ~wd17xx_track_r(m_fdc, space, offset);
-}
-
-READ8_MEMBER( apf_state::apf_wd179x_sector_r)
-{
-	return ~wd17xx_sector_r(m_fdc, space, offset);
-}
-
-READ8_MEMBER( apf_state::apf_wd179x_data_r)
-{
-	return wd17xx_data_r(m_fdc, space, offset); // should this be inverted like the rest?
-}
-
 static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
 	AM_RANGE( 0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x2000, 0x3fff) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
@@ -334,13 +291,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
 	AM_IMPORT_FROM(apfm1000_map)
 	AM_RANGE( 0x6000, 0x63ff) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	// These need to be confirmed, then reworked to modern standards
-	//AM_RANGE( 0x6400, 0x64ff) AM_READWRITE(serial_r, serial_w)
-	//AM_RANGE( 0x6500, 0x6500) AM_READWRITE(apf_wd179x_status_r, apf_wd179x_command_w)
-	//AM_RANGE( 0x6501, 0x6501) AM_READWRITE(apf_wd179x_track_r, apf_wd179x_track_w)
-	//AM_RANGE( 0x6502, 0x6502) AM_READWRITE(apf_wd179x_sector_r, apf_wd179x_sector_w)
-	//AM_RANGE( 0x6503, 0x6503) AM_READWRITE(apf_wd179x_data_r, apf_wd179x_data_w)
-	//AM_RANGE( 0x6600, 0x6600) AM_WRITE(apf_dischw_w)
+	// These need to be confirmed, disk does not work
+	AM_RANGE( 0x6400, 0x64ff) AM_READWRITE(serial_r, serial_w)
+	AM_RANGE( 0x6500, 0x6503) AM_DEVREADWRITE_LEGACY("fdc", wd17xx_r, wd17xx_w)
+	AM_RANGE( 0x6600, 0x6600) AM_WRITE(apf_dischw_w)
 	AM_RANGE( 0xa000, 0xbfff) AM_RAM // standard
 	AM_RANGE( 0xc000, 0xdfff) AM_RAM // expansion
 ADDRESS_MAP_END
@@ -533,7 +487,6 @@ static const cassette_interface apf_cassette_interface =
 	NULL
 };
 
-#if 0
 static LEGACY_FLOPPY_OPTIONS_START(apfimag)
 	LEGACY_FLOPPY_OPTION(apfimag, "apd", "APF disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
@@ -555,7 +508,6 @@ static const floppy_interface apfimag_floppy_interface =
 	NULL,
 	NULL
 };
-#endif
 
 static const mc6847_interface apf_mc6847_intf =
 {
@@ -623,8 +575,8 @@ static MACHINE_CONFIG_DERIVED( apfimag, apfm1000 )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(apf_state, pia1_portb_w))
 
 	MCFG_CASSETTE_ADD( "cassette", apf_cassette_interface )
-	//MCFG_FD1793_ADD("fdc", default_wd17xx_interface ) // TODO confirm type
-	//MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(apfimag_floppy_interface)
+	MCFG_FD1771_ADD("fdc", default_wd17xx_interface )
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(apfimag_floppy_interface)
 MACHINE_CONFIG_END
 
 

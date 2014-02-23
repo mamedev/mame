@@ -134,7 +134,10 @@ void i2cmem_device::device_start()
 	save_item( NAME(m_shift) );
 	save_item( NAME(m_devsel) );
 	save_item( NAME(m_byteaddr) );
-	save_item( NAME(m_page) );
+	if ( m_page_size > 0 )
+	{
+		save_item( NAME(m_page) );
+	}
 }
 
 

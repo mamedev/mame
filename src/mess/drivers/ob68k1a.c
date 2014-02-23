@@ -171,14 +171,14 @@ static const ptm6840_interface ptm_intf =
 
 WRITE_LINE_MEMBER( ob68k1a_state::rx_tx_0_w )
 {
-	m_acia0->write_rxc(state);
 	m_acia0->write_txc(state);
+	m_acia0->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER( ob68k1a_state::rx_tx_1_w )
 {
-	m_acia1->write_rxc(state);
 	m_acia1->write_txc(state);
+	m_acia1->write_rxc(state);
 }
 
 

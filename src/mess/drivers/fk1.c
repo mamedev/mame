@@ -263,28 +263,6 @@ WRITE_LINE_MEMBER( fk1_state::fk1_pit_out2 )
 	logerror("WRITE_LINE_MEMBER(fk1_pit_out2)\n");
 }
 
-
-static const struct pit8253_interface fk1_pit8253_intf =
-{
-	{
-		{
-			50,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(fk1_state, fk1_pit_out0)
-		},
-		{
-			1000000,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(fk1_state, fk1_pit_out1)
-		},
-		{
-			0,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(fk1_state, fk1_pit_out2)
-		}
-	}
-};
-
 /*
     0 no interrupt allowed,
     1 allowed INTR-7,
@@ -471,7 +449,14 @@ static MACHINE_CONFIG_START( fk1, fk1_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 
-	MCFG_PIT8253_ADD( "pit8253", fk1_pit8253_intf )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(50)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(fk1_state, fk1_pit_out0))
+	MCFG_PIT8253_CLK1(1000000)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(fk1_state, fk1_pit_out1))
+	MCFG_PIT8253_CLK2(0)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(fk1_state, fk1_pit_out2))
+
 	MCFG_I8255_ADD( "ppi8255_1", fk1_ppi8255_interface_1 )
 	MCFG_I8255_ADD( "ppi8255_2", fk1_ppi8255_interface_2 )
 	MCFG_I8255_ADD( "ppi8255_3", fk1_ppi8255_interface_3 )

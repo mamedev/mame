@@ -42,9 +42,6 @@ static INPUT_PORTS_START( gamepock )
 INPUT_PORTS_END
 
 
-static const UPD7810_CONFIG gamepock_cpu_config = { TYPE_78C06, gamepock_io_callback };
-
-
 DEVICE_IMAGE_LOAD_MEMBER(gamepock_state,gamepock_cart) {
 	UINT8 *cart = memregion("user1" )->base();
 
@@ -69,7 +66,7 @@ static MACHINE_CONFIG_START( gamepock, gamepock_state )
 	MCFG_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)    /* uPD78C06AG */
 	MCFG_CPU_PROGRAM_MAP( gamepock_mem)
 	MCFG_CPU_IO_MAP( gamepock_io)
-	MCFG_CPU_CONFIG( gamepock_cpu_config )
+	MCFG_UPD7810_TO(WRITELINE(gamepock_state,gamepock_to_w))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE( 60 )

@@ -32,7 +32,7 @@ P0-136A ; KL (Namco)    1997    Kosodate Quiz My Angel 2                Namco
 P-FG-02                 1997    Reel'N Quake                            <unknown>
 P0-140B                 2000    Funcube                                 Namco
 P0-140B                 2000    Namco Stars                             Namco
-P0-142A                 1999    Puzzle De Bowling                       Nihon System / Moss
+P0-142A                 1999    Puzzle De Bowling                       MOSS / Nihon System
 P0-142A + extra parts   2000    Penguin Brothers                        Subsino
 B0-003A (or B0-003B)    2000    Deer Hunting USA                        Sammy
 B0-003A (or B0-003B)    2001    Turkey Hunting USA                      Sammy
@@ -2808,7 +2808,7 @@ ROM_END
 
                             Puzzle De Bowling (Japan)
 
-(c)1999 Nihon System / Moss
+(c)1999 MOSS / Nihon System
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
  Video: NEC DX-101 (240 Pin PQFP)
@@ -3395,14 +3395,14 @@ ROM_END
 
 
 GAME( 1994, gundamex, 0,        gundamex, gundamex, driver_device, 0,        ROT0, "Banpresto",             "Mobile Suit Gundam EX Revue",                  0 )
-GAME( 1995, grdians,  0,        grdians,  grdians, driver_device,  0,        ROT0, "Banpresto",             "Guardians / Denjin Makai II",                  GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )    // Displays (c) Winky Soft at game's end.
+GAME( 1995, grdians,  0,        grdians,  grdians,  driver_device, 0,        ROT0, "Banpresto",             "Guardians / Denjin Makai II",                  GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )    // Displays (c) Winky Soft at game's end.
 GAME( 1996, mj4simai, 0,        mj4simai, mj4simai, driver_device, 0,        ROT0, "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)", GAME_NO_COCKTAIL )
-GAME( 1996, myangel,  0,        myangel,  myangel, driver_device,  0,        ROT0, "Namco",                 "Kosodate Quiz My Angel (Japan)",               GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, myangel2, 0,        myangel2, myangel2, driver_device, 0,        ROT0, "Namco",                 "Kosodate Quiz My Angel 2 (Japan)",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, myangel,  0,        myangel,  myangel,  driver_device, 0,        ROT0, "MOSS / Namco",          "Kosodate Quiz My Angel (Japan)",               GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, myangel2, 0,        myangel2, myangel2, driver_device, 0,        ROT0, "MOSS / Namco",          "Kosodate Quiz My Angel 2 (Japan)",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, reelquak, 0,        reelquak, reelquak, driver_device, 0,        ROT0, "<unknown>",             "Reel'N Quake! (Ver. 1.05)",                    GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, pzlbowl,  0,        pzlbowl,  pzlbowl, driver_device,  0,        ROT0, "Nihon System / Moss",   "Puzzle De Bowling (Japan)",                    GAME_NO_COCKTAIL )
-GAME( 2000, penbros,  0,        penbros,  penbros, driver_device,  0,        ROT0, "Subsino",               "Penguin Brothers (Japan)",                     GAME_NO_COCKTAIL )
-GAME( 2000, namcostr, 0,        namcostr, funcube, driver_device,  0,        ROT0, "Namco",                 "Namco Stars",                                  GAME_NO_COCKTAIL | GAME_NOT_WORKING )
+GAME( 1999, pzlbowl,  0,        pzlbowl,  pzlbowl,  driver_device, 0,        ROT0, "MOSS / Nihon System",   "Puzzle De Bowling (Japan)",                    GAME_NO_COCKTAIL )
+GAME( 2000, penbros,  0,        penbros,  penbros,  driver_device, 0,        ROT0, "Subsino",               "Penguin Brothers (Japan)",                     GAME_NO_COCKTAIL )
+GAME( 2000, namcostr, 0,        namcostr, funcube,  driver_device, 0,        ROT0, "Namco",                 "Namco Stars",                                  GAME_NO_COCKTAIL | GAME_NOT_WORKING )
 GAME( 2000, deerhunt, 0,        samshoot, deerhunt, driver_device, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.3",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunta,deerhunt, samshoot, deerhunt, driver_device, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.2",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhuntb,deerhunt, samshoot, deerhunt, driver_device, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.0",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
@@ -3410,12 +3410,12 @@ GAME( 2000, deerhuntc,deerhunt, samshoot, deerhunt, driver_device, 0,        ROT
 GAME( 2000, deerhuntd,deerhunt, samshoot, deerhunt, driver_device, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V2",                          GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunte,deerhunt, samshoot, deerhunt, driver_device, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V1",                          GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2001, turkhunt, 0,        samshoot, turkhunt, driver_device, 0,        ROT0, "Sammy USA Corporation", "Turkey Hunting USA V1.0",                      GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, wschamp,  0,        samshoot, wschamp, driver_device,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.00",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, wschampa, wschamp,  samshoot, wschamp, driver_device,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, wschampb, wschamp,  samshoot, wschamp, driver_device,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.00",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2002, trophyh,  0,        samshoot, trophyh, driver_device,  0,        ROT0, "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, funcube,  0,        funcube,  funcube, seta2_state,  funcube,  ROT0, "Namco",                 "Funcube (v1.5)",                               GAME_NO_COCKTAIL )
-GAME( 2001, funcube2, 0,        funcube2, funcube, seta2_state,  funcube2, ROT0, "Namco",                 "Funcube 2 (v1.1)",                             GAME_NO_COCKTAIL )
-GAME( 2001, funcube3, 0,        funcube3, funcube, seta2_state,  funcube3, ROT0, "Namco",                 "Funcube 3 (v1.1)",                             GAME_NO_COCKTAIL )
-GAME( 2001, funcube4, 0,        funcube2, funcube, seta2_state,  funcube2, ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NO_COCKTAIL )
-GAME( 2002, funcube5, 0,        funcube2, funcube, seta2_state,  funcube2, ROT0, "Namco",                 "Funcube 5 (v1.0)",                             GAME_NO_COCKTAIL )
+GAME( 2001, wschamp,  0,        samshoot, wschamp,  driver_device, 0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.00",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, wschampa, wschamp,  samshoot, wschamp,  driver_device, 0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, wschampb, wschamp,  samshoot, wschamp,  driver_device, 0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.00",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2002, trophyh,  0,        samshoot, trophyh,  driver_device, 0,        ROT0, "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, funcube,  0,        funcube,  funcube,  seta2_state,   funcube,  ROT0, "Namco",                 "Funcube (v1.5)",                               GAME_NO_COCKTAIL )
+GAME( 2001, funcube2, 0,        funcube2, funcube,  seta2_state,   funcube2, ROT0, "Namco",                 "Funcube 2 (v1.1)",                             GAME_NO_COCKTAIL )
+GAME( 2001, funcube3, 0,        funcube3, funcube,  seta2_state,   funcube3, ROT0, "Namco",                 "Funcube 3 (v1.1)",                             GAME_NO_COCKTAIL )
+GAME( 2001, funcube4, 0,        funcube2, funcube,  seta2_state,   funcube2, ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NO_COCKTAIL )
+GAME( 2002, funcube5, 0,        funcube2, funcube,  seta2_state,   funcube2, ROT0, "Namco",                 "Funcube 5 (v1.0)",                             GAME_NO_COCKTAIL )

@@ -7,15 +7,14 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(msx)
-    /* Standard stuff */
+    /* The BJT is used as an amplifier. RESCHED_LOOPS must be relatively high to
+     * allow Newton-Raphson to finish. */
 
-    CLOCK(clk)
-    PARAM(clk.FREQ, 1000) // 1000 Hz
-    SOLVER(Solver)
-    PARAM(Solver.FREQ, 48000)
+    CLOCK(clk, 1000) // 1000 Hz
+    SOLVER(Solver, 48000)
     PARAM(Solver.ACCURACY, 1e-5)
-    PARAM(Solver.CONVERG, 0.3)
-    PARAM(Solver.RESCHED_LOOPS, 80)
+    //PARAM(Solver.CONVERG, 0.3)
+    PARAM(Solver.RESCHED_LOOPS, 150)
 
     RES(RAY8910, 2345)     // Max Voltage
 
@@ -58,7 +57,7 @@ NETLIST_START(msx)
     NET_C(R8.1, T2.E)
     NET_C(R8.2, GND)
 
-    LOG(logB, T2.B)
+    //LOG(logB, T2.B)
     LOG(logC, T2.C)
 
 NETLIST_END()

@@ -649,7 +649,7 @@ void sdl_osd_interface::init(running_machine &machine)
 		osd_num_processors = atoi(stemp);
 		if (osd_num_processors < 1)
 		{
-			mame_printf_warning("Warning: numprocessors < 1 doesn't make much sense. Assuming auto ...\n");
+			mame_printf_warning("numprocessors < 1 doesn't make much sense. Assuming auto ...\n");
 			osd_num_processors = 0;
 		}
 	}
@@ -752,7 +752,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 		if (name.makeupper().substr(name.len()-4,4) == ".BDF" )
 			return NULL;
 
-	font_name = CFStringCreateWithCString( NULL, _name, kCFStringEncodingUTF8 );
+	font_name = CFStringCreateWithCString( NULL, name.cstr(), kCFStringEncodingUTF8 );
 
 	if( font_name != NULL )
 	{
@@ -770,7 +770,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 
 	if (!ct_font)
 	{
-		printf("WARNING: Couldn't find/open font %s, using MAME default\n", name.cstr());
+		mame_printf_verbose("Couldn't find/open font %s, using MAME default\n", name.cstr());
 		return NULL;
 	}
 
@@ -1077,7 +1077,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	{
 		if (!BDF_Check_Magic(name))
 		{
-			printf("WARNING: font %s, is not TrueType or BDF, using MAME default\n", name.cstr());
+			mame_printf_verbose("font %s is not TrueType or BDF, using MAME default\n", name.cstr());
 		}
 		return NULL;
 	}
@@ -1094,7 +1094,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	style |= strike ? TTF_STYLE_STRIKETHROUGH : 0;
 #else
 	if (strike)
-		mame_printf_warning("Ignoring strikethrough for SDL_TTF with version less 2.0.10\n");
+		mame_printf_warning("Ignoring strikethrough for SDL_TTF older than 2.0.10\n");
 #endif // PATCHLEVEL
 	TTF_SetFontStyle(font, style);
 

@@ -241,7 +241,6 @@ void kbdc8042_device::device_start()
 	m_input_buffer_full_func.resolve(m_input_buffer_full_cb, *this);
 	m_output_buffer_empty_func.resolve(m_output_buffer_empty_cb, *this);
 	m_speaker_func.resolve(m_speaker_cb, *this);
-	m_getout2_func.resolve(m_getout2_cb, *this);
 	machine().scheduler().timer_pulse(attotime::from_hz(60), timer_expired_delegate(FUNC(kbdc8042_device::kbdc8042_time),this));
 	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_AT);
 	at_keyboard_set_scan_code_set(1);
@@ -399,7 +398,7 @@ READ8_MEMBER(kbdc8042_device::data_r)
 		break;
 
 	case 2:
-		if (m_getout2_func(0))
+		if (m_out2)
 			data |= 0x20;
 		else
 			data &= ~0x20;
@@ -621,4 +620,9 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 		m_sending = 1;
 		break;
 	}
+}
+
+WRITE_LINE_MEMBER(kbdc8042_device::write_out2)
+{
+	m_out2 = state;
 }

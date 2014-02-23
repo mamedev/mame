@@ -193,25 +193,6 @@ IRQ_CALLBACK_MEMBER( votrpss_state::irq_ack )
 	return 0x38;
 }
 
-static const struct pit8253_interface pit_intf =
-{
-	{
-		{
-			XTAL_8MHz,                /* Timer 0: baud rate gen for 8251 */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			XTAL_8MHz / 256,                /* Timer 1: Pitch */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			XTAL_8MHz / 4096,                /* Timer 2: Volume */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
 READ8_MEMBER( votrpss_state::ppi_pa_r )
 {
 	UINT8 ret = m_term_data;
@@ -328,10 +309,12 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(votrpss_state, write_uart_clock))
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_8MHz) /* Timer 0: baud rate gen for 8251 */
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(votrpss_state, write_uart_clock))
+	MCFG_PIT8253_CLK1(XTAL_8MHz / 256) /* Timer 1: Pitch */
+	MCFG_PIT8253_CLK2(XTAL_8MHz / 4096) /* Timer 2: Volume */
 
-	MCFG_PIT8253_ADD( "pit", pit_intf)
 	MCFG_I8255_ADD("ppi", ppi_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", votrpss_state, irq_timer, attotime::from_msec(10))
 MACHINE_CONFIG_END

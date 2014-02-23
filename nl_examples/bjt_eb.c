@@ -10,13 +10,10 @@
 NETLIST_START(bjt)
     /* Standard stuff */
 
-    CLOCK(clk)
-    PARAM(clk.FREQ, 10000) // 1000 Hz
-    SOLVER(Solver)
-    PARAM(Solver.FREQ, 48000)
-    PARAM(Solver.ACCURACY, 1e-4)
-    //PARAM(Solver.ACCURACY, 1e-6)
-    PARAM(Solver.RESCHED_LOOPS, 50)
+    CLOCK(clk, 10000) // 10000 Hz
+    SOLVER(Solver, 48000)
+    PARAM(Solver.ACCURACY, 1e-6)
+    PARAM(Solver.RESCHED_LOOPS, 30)
     ANALOG_INPUT(V5, 5)
     ANALOG_INPUT(V3, 3.5)
 
@@ -39,7 +36,7 @@ NETLIST_START(bjt)
     NET_C(RCE.1, Q.C)
     NET_C(RCE.2, GND)
 
-    //LOG(logB, Q.B)
-    //LOG(logC, Q.C)
+    LOG(logB, Q.B)
+    LOG(logC, Q.C)
 
 NETLIST_END()

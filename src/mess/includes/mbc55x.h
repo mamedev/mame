@@ -172,7 +172,6 @@ extern const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3];
 
 /*----------- defined in machine/mbc55x.c -----------*/
 
-extern const struct pit8253_interface mbc55x_pit8253_config;
 extern const i8255_interface mbc55x_ppi8255_interface;
 
 

@@ -717,13 +717,6 @@ READ8_MEMBER(i8251_device::data_r)
 	return m_data;
 }
 
-
-void i8251_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
-}
-
-
 WRITE_LINE_MEMBER(i8251_device::write_rxd)
 {
 	if (state)
@@ -777,7 +770,7 @@ WRITE_LINE_MEMBER(i8251_device::write_txc)
 	{
 		m_txc = state;
 
-		if (m_txc)
-			receive_clock();
+		if (!m_txc)
+			transmit_clock();
 	}
 }

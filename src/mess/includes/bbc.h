@@ -164,7 +164,7 @@ private:
 	optional_device<mc6854_device> m_adlc;
 	optional_device<sn76489_device> m_sn;
 public: // HACK FOR MC6845
-	required_device<saa5050_device> m_trom;
+	optional_device<saa5050_device> m_trom;
 	optional_device<tms5220_device> m_tms;
 	optional_device<cassette_image_device> m_cassette;
 	required_device<acia6850_device> m_acia;

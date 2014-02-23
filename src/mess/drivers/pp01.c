@@ -221,7 +221,14 @@ static MACHINE_CONFIG_START( pp01, pp01_state )
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	// when rts and dtr are both high, the uart is being used for cassette operations
 
-	MCFG_PIT8253_ADD( "pit8253", pp01_pit8253_intf )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(0)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(pp01_state,pp01_pit_out0))
+	MCFG_PIT8253_CLK1(2000000)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pp01_state,pp01_pit_out1))
+	MCFG_PIT8253_CLK2(2000000)
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pit8253", pit8253_device, write_clk0))
+
 	MCFG_I8255A_ADD( "ppi8255", pp01_ppi8255_interface )
 
 	/* internal ram */

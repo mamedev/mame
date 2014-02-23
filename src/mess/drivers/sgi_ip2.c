@@ -9,8 +9,8 @@
         0x30000000 - 0x30017fff     ROM (3x32k)
         0x30800000 - 0x30800000     Mouse Buttons (1)
         0x31000000 - 0x31000001     Mouse Quadrature (2)
-        0x32000000 - 0x3200000f     DUART0 (?)
-        0x32800000 - 0x3280000f     DUART1 (?)
+        0x32000000 - 0x3200000f     DUART0 (serial console on channel B at 19200 baud 8N1, channel A set to 600 baud 8N1 (mouse?))
+        0x32800000 - 0x3280000f     DUART1 (printer/modem?)
         0x33000000 - 0x330007ff     SRAM (2k)
         0x34000000 - 0x34000000     Clock Control (1)
         0x35000000 - 0x35000000     Clock Data (1)
@@ -25,7 +25,6 @@
         0x3f000000 - 0x3f000001     Stack Limit (2)
 
     TODO:
-        Finish incomplete MC68681 DUART emulation
         Hook up keyboard
         Hook up mouse
         Hook up graphics
@@ -35,17 +34,14 @@
         M68K:
             6 - DUART
 
-    It is unlikely that this driver will ever be fully brought to life, as
-    it will require the M68020 core to be updated to support having opcodes
-    paused and resumed mid-instruction in order to service exceptions.
-
 ****************************************************************************/
 
 #include "emu.h"
 #include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc146818.h" /* TOD clock */
-#include "machine/68681.h" /* DUART0, DUART1 */
+#include "machine/n68681.h" /* DUART0, DUART1 */
+#include "bus/rs232/rs232.h"
 #include "machine/terminal.h"
 
 #define TERMINAL_TAG "terminal"
@@ -56,8 +52,9 @@ public:
 	sgi_ip2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG),
 		m_mainram(*this, "mainram"),
+		m_duarta(*this, "duart68681a"),
+		m_duartb(*this, "duart68681b"),
 		m_bss(*this, "bss"),
 		m_ptmap(*this, "ptmap"),
 		m_rtc(*this, "rtc")
@@ -92,12 +89,13 @@ public:
 	DECLARE_READ16_MEMBER(sgi_ip2_stklmt_r);
 	DECLARE_WRITE16_MEMBER(sgi_ip2_stklmt_w);
 	DECLARE_DRIVER_INIT(sgi_ip2);
-	INTERRUPT_GEN_MEMBER(sgi_ip2_vbl);
-	DECLARE_WRITE8_MEMBER(sgi_kbd_put);
+	DECLARE_WRITE_LINE_MEMBER(duarta_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
 	required_device<cpu_device> m_maincpu;
 protected:
-	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<UINT32> m_mainram;
+	required_device<duartn68681_device> m_duarta;
+	required_device<duartn68681_device> m_duartb;
 	required_shared_ptr<UINT32> m_bss;
 	required_shared_ptr<UINT32> m_ptmap;
 	required_device<mc146818_device> m_rtc;
@@ -362,21 +360,6 @@ WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_stklmt_w)
 	COMBINE_DATA(&m_stklmt);
 }
 
-WRITE8_MEMBER(sgi_ip2_state::sgi_kbd_put)
-{
-	duart68681_rx_data(machine().device("duart68681a"), 1, data);
-}
-
-static GENERIC_TERMINAL_INTERFACE( sgi_terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(sgi_ip2_state,sgi_kbd_put)
-};
-
-
-INTERRUPT_GEN_MEMBER(sgi_ip2_state::sgi_ip2_vbl)
-{
-}
-
 void sgi_ip2_state::machine_start()
 {
 }
@@ -397,8 +380,8 @@ static ADDRESS_MAP_START(sgi_ip2_map, AS_PROGRAM, 32, sgi_ip2_state )
 	AM_RANGE(0x30800000, 0x30800003) AM_READWRITE8(sgi_ip2_m_but_r,         sgi_ip2_m_but_w,        0xffffffff)
 	AM_RANGE(0x31000000, 0x31000003) AM_READWRITE16(sgi_ip2_m_quad_r,       sgi_ip2_m_quad_w,       0xffffffff)
 	AM_RANGE(0x31800000, 0x31800003) AM_READ16(sgi_ip2_swtch_r,                                     0xffffffff)
-	AM_RANGE(0x32000000, 0x3200000f) AM_DEVREADWRITE8_LEGACY("duart68681a",     duart68681_r,       duart68681_w, 0xffffffff)
-	AM_RANGE(0x32800000, 0x3280000f) AM_DEVREADWRITE8_LEGACY("duart68681b",     duart68681_r,       duart68681_w, 0xffffffff)
+	AM_RANGE(0x32000000, 0x3200000f) AM_DEVREADWRITE8("duart68681a", duartn68681_device, read, write, 	0xffffffff) 
+	AM_RANGE(0x32800000, 0x3280000f) AM_DEVREADWRITE8("duart68681b", duartn68681_device, read, write, 	0xffffffff) 
 	AM_RANGE(0x33000000, 0x330007ff) AM_RAM
 	AM_RANGE(0x34000000, 0x34000003) AM_READWRITE8(sgi_ip2_clock_ctl_r,     sgi_ip2_clock_ctl_w,    0xffffffff)
 	AM_RANGE(0x35000000, 0x35000003) AM_READWRITE8(sgi_ip2_clock_data_r,    sgi_ip2_clock_data_w,   0xffffffff)
@@ -417,83 +400,42 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static void duarta_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(sgi_ip2_state::duarta_irq_handler)
 {
-	sgi_ip2_state *drvstate = device->machine().driver_data<sgi_ip2_state>();
-	verboselog(device->machine(), 0, "duarta_irq_handler\n");
-	drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
 };
 
-static UINT8 duarta_input(device_t *device)
+WRITE_LINE_MEMBER(sgi_ip2_state::duartb_irq_handler)
 {
-	verboselog(device->machine(), 0, "duarta_input\n");
-	return 0;
-}
-
-static void duarta_output(device_t *device, UINT8 data)
-{
-	verboselog(device->machine(), 0, "duarta_output: RTS: %d, DTR: %d\n", data & 1, (data & 4) >> 2);
-}
-
-static void duarta_tx(device_t *device, int channel, UINT8 data)
-{
-	device_t *devconf = device->machine().device(TERMINAL_TAG);
-	verboselog(device->machine(), 0, "duarta_tx: %02x\n", data);
-	dynamic_cast<generic_terminal_device *>(devconf)->write(devconf->machine().driver_data()->generic_space(), 0, data);
-}
-
-static const duart68681_config sgi_ip2_duart68681a_config =
-{
-	duarta_irq_handler,
-	duarta_tx,
-	duarta_input,
-	duarta_output
+	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
 };
 
-static void duartb_irq_handler(device_t *device, int state, UINT8 vector)
-{
-	sgi_ip2_state *drvstate = device->machine().driver_data<sgi_ip2_state>();
-	verboselog(device->machine(), 0, "duartb_irq_handler\n");
-	drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
-};
-
-static UINT8 duartb_input(device_t *device)
-{
-	verboselog(device->machine(), 0, "duartb_input\n");
-	return 0;
-}
-
-static void duartb_output(device_t *device, UINT8 data)
-{
-	verboselog(device->machine(), 0, "duartb_output: RTS: %d, DTR: %d\n", data & 1, (data & 4) >> 2);
-}
-
-static void duartb_tx(device_t *device, int channel, UINT8 data)
-{
-	verboselog(device->machine(), 0, "duartb_tx: %02x\n", data);
-}
-
-static const duart68681_config sgi_ip2_duart68681b_config =
-{
-	duartb_irq_handler,
-	duartb_tx,
-	duartb_input,
-	duartb_output
-};
+static DEVICE_INPUT_DEFAULTS_START( ip2_terminal )
+	DEVICE_INPUT_DEFAULTS( "TERM_TXBAUD", 0xff, 0x08 ) // 19200
+	DEVICE_INPUT_DEFAULTS( "TERM_RXBAUD", 0xff, 0x08 ) // 19200
+	DEVICE_INPUT_DEFAULTS( "TERM_STARTBITS", 0xff, 0x01 ) // 1
+	DEVICE_INPUT_DEFAULTS( "TERM_DATABITS", 0xff, 0x03 ) // 8
+	DEVICE_INPUT_DEFAULTS( "TERM_PARITY", 0xff, 0x00 ) // N
+	DEVICE_INPUT_DEFAULTS( "TERM_STOPBITS", 0xff, 0x01 ) // 1
+DEVICE_INPUT_DEFAULTS_END
 
 static MACHINE_CONFIG_START( sgi_ip2, sgi_ip2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020, 16000000)
 	MCFG_CPU_PROGRAM_MAP(sgi_ip2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(TERMINAL_TAG ":" TERMINAL_SCREEN_TAG, sgi_ip2_state,  sgi_ip2_vbl)
 
+	MCFG_DUARTN68681_ADD( "duart68681a", XTAL_3_6864MHz ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(sgi_ip2_state, duarta_irq_handler)) 
+	MCFG_DUARTN68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
-	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,sgi_terminal_intf)
+	MCFG_DUARTN68681_ADD( "duart68681b", XTAL_3_6864MHz ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(sgi_ip2_state, duartb_irq_handler)) 
 
-	MCFG_DUART68681_ADD( "duart68681a", XTAL_3_6864MHz, sgi_ip2_duart68681a_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-	MCFG_DUART68681_ADD( "duart68681b", XTAL_3_6864MHz, sgi_ip2_duart68681b_config ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
 	MCFG_MC146818_ADD( "rtc", XTAL_4_194304Mhz )
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681a", duartn68681_device, rx_b_w))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", ip2_terminal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

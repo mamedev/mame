@@ -3,6 +3,7 @@
 
     Written by Olivier Galibert
     MAME conversion by R. Belmont
+    Working emulation by The Talentuous Hands Of The Popularious hap
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -44,13 +45,12 @@
 
     ---------------------------------------------------------
 
-Emulation is still preliminary.
-
 TODO:
-- channel volume, 16bits?? need to make a lookup table?
-- some samples are in stereo format?
+- volume/panning is linear? volume slides are too steep
+- most music sounds tinny, probably due to missing DSP?
+- what is reg 0xa/0xc? seems related to volume
+- identify sample flags
 - memory reads out of range sometimes
-- a lot of unknowns
 
 */
 
@@ -110,6 +110,7 @@ void zsg2_device::device_start()
 		save_item(NAME(m_chan[ch].loop_pos), ch);
 		save_item(NAME(m_chan[ch].page), ch);
 		save_item(NAME(m_chan[ch].vol), ch);
+		save_item(NAME(m_chan[ch].flags), ch);
 		save_item(NAME(m_chan[ch].panl), ch);
 		save_item(NAME(m_chan[ch].panr), ch);
 	}
@@ -217,17 +218,14 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				m_chan[ch].samples = prepare_samples(m_chan[ch].page | m_chan[ch].cur_pos);
 			}
 			
-			INT16 sample = m_chan[ch].samples[m_chan[ch].step_ptr >> 16 & 3];
-			
-			//sample = (sample * (m_chan[ch].vol & 0xffff)) / 0x10000;
-			if (m_chan[ch].vol == 0) sample = 0; // temp hack to prevent stuck notes
+			INT32 sample = (m_chan[ch].samples[m_chan[ch].step_ptr >> 16 & 3] * m_chan[ch].vol) >> 16;
 			
 			mix_l += (sample * m_chan[ch].panl + sample * (0x1f - m_chan[ch].panr)) >> 5;
 			mix_r += (sample * m_chan[ch].panr + sample * (0x1f - m_chan[ch].panl)) >> 5;
 		}
 
-		outputs[0][i] = mix_l / 48;
-		outputs[1][i] = mix_r / 48;
+		outputs[0][i] = mix_l;
+		outputs[1][i] = mix_r;
 	}
 }
 
@@ -293,8 +291,13 @@ void zsg2_device::chan_w(int ch, int reg, UINT16 data)
 			break;
 		
 		case 0xe:
-			// channel volume, reg 0xa/0xc is also related?
+			// volume
 			m_chan[ch].vol = data;
+			break;
+		
+		case 0xf:
+			// flags
+			m_chan[ch].flags = data;
 			break;
 		
 		default:
@@ -346,7 +349,7 @@ void zsg2_device::control_w(int reg, UINT16 data)
 
 		case 0x04: case 0x05: case 0x06:
 		{
-			// key off?
+			// key off
 			int base = (reg & 3) << 4;
 			for (int i = 0; i < 16; i++)
 			{

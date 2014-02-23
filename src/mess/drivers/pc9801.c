@@ -431,10 +431,11 @@ Keyboard TX commands:
 class pc9801_state : public driver_device
 {
 public:
-	pc9801_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pc9801_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dmac(*this, "i8237"),
+		m_pit8253(*this, "pit8253"),
 		m_pic1(*this, "pic8259_master"),
 		m_pic2(*this, "pic8259_slave"),
 		m_fdc_2hd(*this, "upd765_2hd"),
@@ -450,10 +451,13 @@ public:
 		m_video_ram_2(*this, "video_ram_2"),
 		m_beeper(*this, "beeper"),
 		m_ram(*this, RAM_TAG),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dmac;
+	required_device<pit8253_device> m_pit8253;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<upd765a_device> m_fdc_2hd;
@@ -537,6 +541,7 @@ public:
 	UINT8 m_sys_type;
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_irq );
+	DECLARE_WRITE_LINE_MEMBER( write_uart_clock );
 	DECLARE_READ8_MEMBER(pc9801_xx_r);
 	DECLARE_WRITE8_MEMBER(pc9801_xx_w);
 	DECLARE_READ8_MEMBER(pc9801_00_r);
@@ -1331,7 +1336,7 @@ READ8_MEMBER(pc9801_state::pc9801_70_r)
 		if(offset & 0x08)
 			printf("Read to undefined port [%02x]\n",offset+0x70);
 		else
-			return machine().device<pit8253_device>("pit8253")->read(space, (offset & 6) >> 1);
+			return m_pit8253->read(space, (offset & 6) >> 1);
 	}
 
 	return 0xff;
@@ -1349,7 +1354,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_70_w)
 	else // odd
 	{
 		if(offset < 0x08)
-			machine().device<pit8253_device>("pit8253")->write(space, (offset & 6) >> 1, data);
+			m_pit8253->write(space, (offset & 6) >> 1, data);
 		//else
 		//  printf("Write to undefined port [%02x] <- %02x\n",offset+0x70,data);
 	}
@@ -1500,6 +1505,12 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 
 		//printf("Write to undefined port [%02x) <- %02x\n",offset+0xa0,data);
 	}
+}
+
+DECLARE_WRITE_LINE_MEMBER(pc9801_state::write_uart_clock)
+{
+	m_sio->write_txc(state);
+	m_sio->write_rxc(state);
 }
 
 READ8_MEMBER(pc9801_state::pc9801_fdc_2hd_r)
@@ -2264,7 +2275,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_pit_mirror_r)
 		if(offset & 0x08)
 			printf("Read to undefined port [%02x]\n",offset+0x3fd8);
 		else
-			return machine().device<pit8253_device>("pit8253")->read(space, (offset & 6) >> 1);
+			return m_pit8253->read(space, (offset & 6) >> 1);
 	}
 
 	return 0xff;
@@ -2279,7 +2290,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_pit_mirror_w)
 	else // odd
 	{
 		if(offset < 0x08)
-			machine().device<pit8253_device>("pit8253")->write(space, (offset & 6) >> 1, data);
+			m_pit8253->write(space, (offset & 6) >> 1, data);
 		else
 			printf("Write to undefined port [%04x] <- %02x\n",offset+0x3fd8,data);
 	}
@@ -3073,44 +3084,6 @@ READ8_MEMBER(pc9801_state::get_slave_ack)
 #define MAIN_CLOCK_X1 XTAL_1_9968MHz
 #define MAIN_CLOCK_X2 XTAL_2_4576MHz
 
-static const struct pit8253_interface pc9801_pit8253_config =
-{
-	{
-		{
-			MAIN_CLOCK_X1,              /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir0_w)
-		}, {
-			MAIN_CLOCK_X1,              /* Memory Refresh */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			MAIN_CLOCK_X1,              /* RS-232c */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
-static const struct pit8253_interface pc9821_pit8253_config =
-{
-	{
-		{
-			MAIN_CLOCK_X2,              /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir0_w)
-		}, {
-			MAIN_CLOCK_X2,              /* Memory Refresh */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			MAIN_CLOCK_X2,              /* RS-232c */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
 /****************************************
 *
 * I8237 DMA interface
@@ -3694,7 +3667,13 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801f)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801f)
 
-	MCFG_PIT8253_ADD( "pit8253", pc9801_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(MAIN_CLOCK_X1) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(MAIN_CLOCK_X1) /* Memory Refresh */
+	MCFG_PIT8253_CLK2(MAIN_CLOCK_X1) /* RS-232c */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc9801_state, write_uart_clock))
+
 	MCFG_I8237_ADD("i8237", 5000000, dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc9801_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: Check ir7_w
@@ -3706,6 +3685,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_FRAGMENT_ADD(pc9801_cbus)
 	MCFG_FRAGMENT_ADD(pc9801_sasi)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
+
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
@@ -3763,7 +3743,13 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801rs)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
 
-	MCFG_PIT8253_ADD( "pit8253", pc9801_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(MAIN_CLOCK_X1) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(MAIN_CLOCK_X1) /* Memory Refresh */
+	MCFG_PIT8253_CLK2(MAIN_CLOCK_X1) /* RS-232c */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc9801_state, write_uart_clock))
+
 	MCFG_I8237_ADD("i8237", MAIN_CLOCK_X1*8, pc9801rs_dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc9801_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: Check ir7_w
@@ -3841,7 +3827,13 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9821)
 
-	MCFG_PIT8253_ADD( "pit8253", pc9821_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(MAIN_CLOCK_X2) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(MAIN_CLOCK_X2) /* Memory Refresh */
+	MCFG_PIT8253_CLK2(MAIN_CLOCK_X2) /* RS-232c */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc9801_state, write_uart_clock))
+
 	MCFG_I8237_ADD("i8237", 16000000, pc9801rs_dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc9801_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: Check ir7_w

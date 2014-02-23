@@ -302,49 +302,6 @@ static MC6845_INTERFACE( mc6845_intf )
 };
 
 
-/* TODO: clocks aren't known */
-static const struct pit8253_interface laserbas_pit8253_intf_0 =
-{
-	{
-		{
-			31250,
-			DEVCB_NULL,
-			DEVCB_NULL
-		},
-		{
-			31250,
-			DEVCB_NULL,
-			DEVCB_NULL
-		},
-		{
-			31250,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
-static const struct pit8253_interface laserbas_pit8253_intf_1 =
-{
-	{
-		{
-			31250,
-			DEVCB_NULL,
-			DEVCB_NULL
-		},
-		{
-			31250,
-			DEVCB_NULL,
-			DEVCB_NULL
-		},
-		{
-			31250,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
 static MACHINE_CONFIG_START( laserbas, laserbas_state )
 
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
@@ -353,9 +310,16 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbas_state, irq0_line_hold)
 //  MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi", laserbas_state, nmi_line_pulse, attotime::from_hz(60))
 
-	MCFG_PIT8253_ADD("pit0", laserbas_pit8253_intf_0)
-	MCFG_PIT8253_ADD("pit1", laserbas_pit8253_intf_1)
+	/* TODO: clocks aren't known */
+	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
+	MCFG_PIT8253_CLK0(31250)
+	MCFG_PIT8253_CLK1(31250)
+	MCFG_PIT8253_CLK2(31250)
 
+	MCFG_DEVICE_ADD("pit1", PIT8253, 0)
+	MCFG_PIT8253_CLK0(31250)
+	MCFG_PIT8253_CLK1(31250)
+	MCFG_PIT8253_CLK2(31250)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

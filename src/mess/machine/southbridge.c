@@ -10,25 +10,6 @@
 #include "bus/pc_kbd/keyboards.h"
 
 
-const struct pit8253_interface at_pit8254_config =
-{
-	{
-		{
-			4772720/4,              /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, at_pit8254_out0_changed)
-		}, {
-			4772720/4,              /* dram refresh */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, at_pit8254_out1_changed)
-		}, {
-			4772720/4,              /* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, at_pit8254_out2_changed)
-		}
-	}
-};
-
 I8237_INTERFACE( at_dma8237_1_config )
 {
 	DEVCB_DEVICE_LINE_MEMBER("dma8237_2",am9517a_device,dreq0_w),
@@ -102,7 +83,13 @@ static SLOT_INTERFACE_START(pc_isa_onboard)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( southbridge )
-	MCFG_PIT8254_ADD( "pit8254", at_pit8254_config )
+	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
+	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(southbridge_device, at_pit8254_out0_changed))
+	MCFG_PIT8253_CLK1(4772720/4) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(southbridge_device, at_pit8254_out1_changed))
+	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(southbridge_device, at_pit8254_out2_changed))
 
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, at_dma8237_1_config )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
@@ -234,7 +221,7 @@ void southbridge_device::device_start()
 void southbridge_device::device_reset()
 {
 	m_at_spkrdata = 0;
-	m_at_speaker_input = 0;
+	m_pit_out2 = 0;
 	m_dma_channel = -1;
 	m_cur_eop = false;
 	m_nmi_enabled = 0;
@@ -263,13 +250,7 @@ READ8_MEMBER( southbridge_device::get_slave_ack )
 void southbridge_device::at_speaker_set_spkrdata(UINT8 data)
 {
 	m_at_spkrdata = data ? 1 : 0;
-	m_speaker->level_w(m_at_spkrdata & m_at_speaker_input);
-}
-
-void southbridge_device::at_speaker_set_input(UINT8 data)
-{
-	m_at_speaker_input = data ? 1 : 0;
-	m_speaker->level_w(m_at_spkrdata & m_at_speaker_input);
+	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
 }
 
 
@@ -294,7 +275,8 @@ WRITE_LINE_MEMBER( southbridge_device::at_pit8254_out1_changed )
 
 WRITE_LINE_MEMBER( southbridge_device::at_pit8254_out2_changed )
 {
-	at_speaker_set_input( state );
+	m_pit_out2 = state ? 1 : 0;
+	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
 }
 
 /*************************************************************************
@@ -462,7 +444,7 @@ READ8_MEMBER( southbridge_device::at_portb_r )
 	/* 0x10 is the dram refresh line bit on the 5170, just a timer here, 15.085us. */
 	data |= m_refresh ? 0x10 : 0;
 
-	if (m_pit8254->get_output(2))
+	if (m_pit_out2)
 		data |= 0x20;
 	else
 		data &= ~0x20; /* ps2m30 wants this */
@@ -473,7 +455,7 @@ READ8_MEMBER( southbridge_device::at_portb_r )
 WRITE8_MEMBER( southbridge_device::at_portb_w )
 {
 	m_at_speaker = data;
-	m_pit8254->gate2_w(BIT(data, 0));
+	m_pit8254->write_gate2(BIT(data, 0));
 	at_speaker_set_spkrdata( BIT(data, 1));
 	m_channel_check = BIT(data, 3);
 	m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));

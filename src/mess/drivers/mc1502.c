@@ -107,7 +107,7 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 {
 //  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
-	machine().device<pit8253_device>("pit8253")->gate2_w(BIT(data, 0));
+	m_pit8253->write_gate2(BIT(data, 0));
 //  mc1502_speaker_set_spkrdata(BIT(data, 1));
 	m_centronics->write_strobe(BIT(data, 2));
 	m_centronics->write_autofd(BIT(data, 3));
@@ -129,16 +129,15 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_portc_w)
 //  0x10 -- SNDOUT
 READ8_MEMBER(mc1502_state::mc1502_ppi_portc_r)
 {
-	int timer2_output = machine().device<pit8253_device>("pit8253")->get_output(2);
 	int data = 0xff;
 	double tap_val = m_cassette->input();
 
-	data = ( data & ~0x40 ) | ( tap_val < 0 ? 0x40 : 0x00 ) | ( (BIT(m_ppi_portb, 7) && timer2_output) ? 0x40 : 0x00 );
-	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
-	data = ( data & ~0x10 ) | ( (BIT(m_ppi_portb, 1) && timer2_output) ? 0x10 : 0x00 );
+	data = ( data & ~0x40 ) | ( tap_val < 0 ? 0x40 : 0x00 ) | ( (BIT(m_ppi_portb, 7) && m_pit_out2) ? 0x40 : 0x00 );
+	data = ( data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
+	data = ( data & ~0x10 ) | ( (BIT(m_ppi_portb, 1) && m_pit_out2) ? 0x10 : 0x00 );
 
 //  DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
-//          data, tap_val, timer2_output, machine().describe_context()));
+//          data, tap_val, m_pit_out2, machine().describe_context()));
 	return data;
 }
 
@@ -209,34 +208,16 @@ WRITE_LINE_MEMBER(mc1502_state::mc1502_i8251_syndet)
 
 WRITE_LINE_MEMBER(mc1502_state::mc1502_pit8253_out1_changed)
 {
-	machine().device<i8251_device>("upd8251")->write_txc(state);
-	machine().device<i8251_device>("upd8251")->write_rxc(state);
+	m_upd8251->write_txc(state);
+	m_upd8251->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER(mc1502_state::mc1502_pit8253_out2_changed)
 {
+	m_pit_out2 = state;
 //  mc1502_speaker_set_input( state );
 	m_cassette->output(state ? 1 : -1);
 }
-
-const struct pit8253_interface mc1502_pit8253_config =
-{
-	{
-		{
-			XTAL_15MHz/12,              /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir0_w)
-		}, {
-			XTAL_16MHz/12,              /* serial port */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(mc1502_state,mc1502_pit8253_out1_changed)
-		}, {
-			XTAL_16MHz/12,              /* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(mc1502_state,mc1502_pit8253_out2_changed)
-		}
-	}
-};
 
 IRQ_CALLBACK_MEMBER( mc1502_state::mc1502_irq_callback )
 {
@@ -323,7 +304,13 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_MACHINE_START_OVERRIDE( mc1502_state, mc1502 )
 	MCFG_MACHINE_RESET_OVERRIDE( mc1502_state, mc1502 )
 
-	MCFG_PIT8253_ADD( "pit8253", mc1502_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_15MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_16MHz/12) /* serial port */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(mc1502_state, mc1502_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_16MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mc1502_state, mc1502_pit8253_out2_changed))
 
 	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 

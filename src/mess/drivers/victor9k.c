@@ -321,10 +321,6 @@ static MC6845_INTERFACE( hd46505s_intf )
 };
 
 
-//-------------------------------------------------
-//  pit8253_interface pit_intf
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER(victor9k_state::mux_serial_b_w)
 {
 }
@@ -332,27 +328,6 @@ WRITE_LINE_MEMBER(victor9k_state::mux_serial_b_w)
 WRITE_LINE_MEMBER(victor9k_state::mux_serial_a_w)
 {
 }
-
-static const struct pit8253_interface pit_intf =
-{
-	{
-		{
-			2500000,
-			DEVCB_LINE_VCC,
-			DEVCB_DRIVER_LINE_MEMBER(victor9k_state, mux_serial_b_w)
-		}, {
-			2500000,
-			DEVCB_LINE_VCC,
-			DEVCB_DRIVER_LINE_MEMBER(victor9k_state, mux_serial_a_w)
-		}, {
-			100000,
-			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir2_w)
-		}
-	}
-};
-
-
 
 //-------------------------------------------------
 //  PIC8259
@@ -997,7 +972,15 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE(victor9k_state, write_ndac))
 
 	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8088_TAG, INPUT_LINE_IRQ0), VCC, NULL)
-	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
+
+	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
+	MCFG_PIT8253_CLK0(2500000)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(victor9k_state, mux_serial_b_w))
+	MCFG_PIT8253_CLK1(2500000)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(victor9k_state, mux_serial_a_w))
+	MCFG_PIT8253_CLK2(100000)
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE(I8259A_TAG, pic8259_device, ir2_w))
+
 	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_30MHz/30, mpsc_intf)
 	MCFG_MC6852_ADD(MC6852_TAG, XTAL_30MHz/30, ssda_intf)
 

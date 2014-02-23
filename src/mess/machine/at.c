@@ -30,13 +30,7 @@ READ8_MEMBER( at_state::get_slave_ack )
 void at_state::at_speaker_set_spkrdata(UINT8 data)
 {
 	m_at_spkrdata = data ? 1 : 0;
-	m_speaker->level_w(m_at_spkrdata & m_at_speaker_input);
-}
-
-void at_state::at_speaker_set_input(UINT8 data)
-{
-	m_at_speaker_input = data ? 1 : 0;
-	m_speaker->level_w(m_at_spkrdata & m_at_speaker_input);
+	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
 }
 
 
@@ -55,28 +49,9 @@ WRITE_LINE_MEMBER( at_state::at_pit8254_out0_changed )
 
 WRITE_LINE_MEMBER( at_state::at_pit8254_out2_changed )
 {
-	at_speaker_set_input( state );
+	m_pit_out2 = state ? 1 : 0;
+	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
 }
-
-
-const struct pit8253_interface at_pit8254_config =
-{
-	{
-		{
-			4772720/4,              /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(at_state, at_pit8254_out0_changed)
-		}, {
-			4772720/4,              /* dram refresh */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			4772720/4,              /* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(at_state, at_pit8254_out2_changed)
-		}
-	}
-};
 
 
 /*************************************************************************
@@ -271,7 +246,7 @@ READ8_MEMBER( at_state::at_portb_r )
 	/* 0x10 is the dram refresh line bit, 15.085us. */
 	data |= (machine().time().as_ticks(110000) & 1) ? 0x10 : 0;
 
-	if (m_pit8254->get_output(2))
+	if (m_pit_out2)
 		data |= 0x20;
 	else
 		data &= ~0x20; /* ps2m30 wants this */
@@ -282,7 +257,7 @@ READ8_MEMBER( at_state::at_portb_r )
 WRITE8_MEMBER( at_state::at_portb_w )
 {
 	m_at_speaker = data;
-	m_pit8254->gate2_w(BIT(data, 0));
+	m_pit8254->write_gate2(BIT(data, 0));
 	at_speaker_set_spkrdata( BIT(data, 1));
 	m_channel_check = BIT(data, 3);
 	m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
@@ -296,7 +271,7 @@ READ8_MEMBER( at_state::ps2_portb_r )
 	/* 0x10 is the dram refresh line bit, 15.085us. */
 	data |= (machine().time().as_ticks(66291) & 1) ? 0x10 : 0;
 
-	if (m_pit8254->get_output(2))
+	if (m_pit_out2)
 		data |= 0x20;
 	else
 		data &= ~0x20; /* ps2m30 wants this */
@@ -354,7 +329,7 @@ MACHINE_START_MEMBER(at_state,at)
 MACHINE_RESET_MEMBER(at_state,at)
 {
 	m_at_spkrdata = 0;
-	m_at_speaker_input = 0;
+	m_pit_out2 = 0;
 	m_dma_channel = -1;
 	m_cur_eop = false;
 }

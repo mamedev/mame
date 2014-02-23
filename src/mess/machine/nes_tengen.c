@@ -172,19 +172,12 @@ inline void nes_tengen032_device::irq_clock(int blanked)
 		m_irq_reset = 0;
 		m_irq_count = m_irq_count_latch + 1;
 	}
-	else
-	{
-		if (!m_irq_count)
-			m_irq_count = m_irq_count_latch;
-		else
-		{
-			m_irq_count--;
-			if (m_irq_enable && !blanked && !m_irq_count)
-			{
-				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-			}
-		}
-	}
+	else if (!m_irq_count)
+		m_irq_count = m_irq_count_latch;
+
+	m_irq_count--;
+	if (m_irq_enable && !blanked && !m_irq_count)
+		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 // we use the HBLANK IRQ latch from PPU for the scanline based IRQ mode

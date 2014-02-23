@@ -102,7 +102,6 @@ protected:
 
 /*----------- defined in machine/dai.c -----------*/
 
-extern const struct pit8253_interface dai_pit8253_intf;
 extern const i8255_interface dai_ppi82555_intf;
 
 

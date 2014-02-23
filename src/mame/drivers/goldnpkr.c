@@ -985,6 +985,13 @@
   - Added technical notes.
 
 
+  [2014-02-23]
+
+  - Added a new Videotron set with cards selector.
+  - Mundial/Mondial (Italian/French): Implemented the program banking
+     properly. Now you can choose the program through a DIP switch.
+
+
   TODO:
 
   - Missing PIA connections.
@@ -1066,7 +1073,6 @@ public:
 	DECLARE_DRIVER_INIT(vkdlswwr);
 	DECLARE_DRIVER_INIT(vkdlswwv);
 	DECLARE_DRIVER_INIT(bchancep);
-	DECLARE_DRIVER_INIT(mondial);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
 	virtual void video_start();
@@ -1074,6 +1080,8 @@ public:
 	DECLARE_PALETTE_INIT(witchcrd);
 	DECLARE_VIDEO_START(wcrdxtnd);
 	DECLARE_PALETTE_INIT(wcrdxtnd);
+	DECLARE_MACHINE_START(mondial);
+	DECLARE_MACHINE_RESET(mondial);
 	UINT32 screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	optional_device<discrete_device> m_discrete;
@@ -3399,6 +3407,9 @@ static INPUT_PORTS_START( mondial )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
+	/* the following one is connected to DIP switches and is meant
+    for switch between different programs stored in different
+    halves of the program ROM */
 	PORT_START("SELDSW")
 	PORT_DIPNAME( 0x01, 0x00, "Game Selector" )
 	PORT_DIPSETTING(    0x00, "Game 1 (Italian" )
@@ -3684,6 +3695,24 @@ static const ay8910_interface ay8910_config =
 };
 
 
+/******************************************
+*          Machine Start & Reset          *
+******************************************/
+
+MACHINE_START_MEMBER(goldnpkr_state, mondial)
+{
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x4000);
+}
+
+MACHINE_RESET_MEMBER(goldnpkr_state, mondial)
+{
+	UINT8 seldsw = (ioport("SELDSW")->read() );
+	popmessage("ROM Bank: %02X", seldsw);
+
+	membank("bank1")->set_entry(seldsw);
+}
+
 /*********************************************
 *              Machine Drivers               *
 *********************************************/
@@ -3879,7 +3908,7 @@ static MACHINE_CONFIG_DERIVED( genie, goldnpkr_base )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* video hardware */
-	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
+	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state, witchcrd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3894,6 +3923,9 @@ static MACHINE_CONFIG_DERIVED( mondial, goldnpkr_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mondial_map)
+
+	MCFG_MACHINE_START_OVERRIDE(goldnpkr_state, mondial)
+	MCFG_MACHINE_RESET_OVERRIDE(goldnpkr_state, mondial)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3991,6 +4023,25 @@ ROM_START( videtron )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4.bin", 0x4000, 0x2000, CRC(0f00f87d) SHA1(3cd061463b0ed52cef88900f1d4511708588bfac) )
 	ROM_LOAD( "5.bin", 0x6000, 0x2000, CRC(395fbc5c) SHA1(f742d7a9312828997a4323ac2b957048687fbed2) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "3.bin", 0x2000, 0x0800, CRC(23e83e89) SHA1(0c6352d46e3dfe176b0e970dd163e2bc01246890) )    /* text layer */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "0.bin", 0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "1.bin", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "2.bin", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+ROM_START( videtron2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* different from videtron */
+	ROM_LOAD( "4.bin", 0x5000, 0x1000, CRC(4a7dab42) SHA1(7fcdab985b783d90879a99b2a53a6814ca4278eb) )
+	ROM_LOAD( "5.bin", 0x6000, 0x1000, CRC(c70e8127) SHA1(7db2d4a29cba7c336f254393955fad71f30a539a) )
+	ROM_LOAD( "6.bin", 0x7000, 0x1000, CRC(490c7304) SHA1(1a6c6112571fd0e35b640ed58f66582a2d99c58b) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(          0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
@@ -9674,8 +9725,8 @@ ROM_END
 */
 
 ROM_START( pokermon )
-	ROM_REGION( 0x18000, "maincpu", 0 ) /* using 1st bank program */
-	ROM_LOAD( "mbv_bi.bin",      0x10000, 0x8000, CRC(da00e08a) SHA1(98e52915178e29ab3ae674e6b895da14626d3dd8) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 2 programs, selectable via DIP switch */
+	ROM_LOAD( "mbv_bi.bin",      0x0000, 0x8000, CRC(da00e08a) SHA1(98e52915178e29ab3ae674e6b895da14626d3dd8) )
 
 	ROM_REGION( 0x18000, "gfx", 0 )
 	ROM_LOAD( "1m.bin",  0x00000, 0x4000, CRC(1b9e73ef) SHA1(fc9b67ab4c233a7e8ec8dc799732884f74166db0) )
@@ -10114,22 +10165,6 @@ DRIVER_INIT_MEMBER(goldnpkr_state, bchancep)
 }
 
 
-DRIVER_INIT_MEMBER(goldnpkr_state, mondial)
-{
-/*  Program banking..... */
-
-	UINT8 *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
-
-	membank("bank1")->set_entry(0); // for now, fixed in italian.
-
-//  UINT8 seldsw = (ioport("SELDSW")->read() );
-//  popmessage("ROM Bank: %02X", seldsw);
-//  membank("bank1")->set_entry(seldsw);
-
-}
-
-
 /*********************************************
 *                Game Drivers                *
 *********************************************/
@@ -10138,7 +10173,8 @@ DRIVER_INIT_MEMBER(goldnpkr_state, mondial)
 GAMEL( 1981, goldnpkr,  0,        goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",        0,                layout_goldnpkr )
 GAMEL( 1981, goldnpkb,  goldnpkr, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Mini Boy)",       0,                layout_goldnpkr )
 
-GAMEL( 198?, videtron,  0,        goldnpkr, videtron, driver_device,  0,        ROT0,   "<unknown>",                "Videotron Poker (cards selector)",        0,                layout_goldnpkr )
+GAMEL( 198?, videtron,  0,        goldnpkr, videtron, driver_device,  0,        ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 1)", 0,                layout_goldnpkr )
+GAMEL( 198?, videtron2, videtron, goldnpkr, videtron, driver_device,  0,        ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 2)", 0,                layout_goldnpkr )
 GAMEL( 198?, videtrna,  videtron, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "<unknown>",                "Videotron Poker (normal controls)",       0,                layout_goldnpkr )
 
 GAMEL( 198?, pottnpkr,  0,        pottnpkr, pottnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 1)",             0,                layout_goldnpkr )
@@ -10266,4 +10302,4 @@ GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, driver_device,  0,        
 GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, goldnpkr_state, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )   // encrypted.
 
 GAMEL( 198?, bchancep,  0,        bchancep, goldnpkr, goldnpkr_state, bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel hardware)", GAME_NOT_WORKING, layout_goldnpkr )
-GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, mondial,  ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",    0 )
+GAME(  1987, pokermon,  0,        mondial,  mondial,  driver_device,  0,        ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",    0 )

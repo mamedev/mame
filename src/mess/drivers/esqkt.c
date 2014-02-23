@@ -22,8 +22,6 @@
 ***************************************************************************/
 
 #include "bus/midi/midi.h"
-#include "bus/midi/midiinport.h"
-#include "bus/midi/midioutport.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/es5510/es5510.h"
 #include "sound/es5506.h"
@@ -56,7 +54,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
-	DECLARE_READ8_MEMBER(duart_input);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
 	UINT8 m_duart_io;
@@ -172,13 +169,6 @@ WRITE_LINE_MEMBER(esqkt_state::duart_irq_handler)
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 };
 
-READ8_MEMBER(esqkt_state::duart_input)
-{
-	UINT8 result = 0;   // DUART input lines are separate from the output lines
-
-	return result;
-}
-
 WRITE8_MEMBER(esqkt_state::duart_output)
 {
 	m_duart_io = data;
@@ -223,14 +213,6 @@ static const esqpanel_interface esqpanel_config =
 	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_b_w)
 };
 
-static SLOT_INTERFACE_START(midiin_slot)
-	SLOT_INTERFACE("midiin", MIDIIN_PORT)
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START(midiout_slot)
-	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
-SLOT_INTERFACE_END
-
 static MACHINE_CONFIG_START( kt, esqkt_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(kt_map)
@@ -244,7 +226,6 @@ static MACHINE_CONFIG_START( kt, esqkt_state )
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(esqkt_state, duart_irq_handler))
 	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_a))
 	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_b))
-	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(esqkt_state, duart_input))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esqkt_state, duart_output))
 	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)

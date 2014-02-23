@@ -127,8 +127,6 @@
 #include <cstdio>
 
 #include "bus/midi/midi.h"
-#include "bus/midi/midiinport.h"
-#include "bus/midi/midioutport.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/es5506.h"
 #include "sound/esqpump.h"
@@ -196,7 +194,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
-	DECLARE_READ8_MEMBER(duart_input);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
 	int m_system_type;
@@ -269,6 +266,9 @@ void esq5505_state::machine_start()
 
 void esq5505_state::machine_reset()
 {
+	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
+	floppy_image_device *floppy = con ? con->get_device() : 0;
+
 	m_rom = (UINT16 *)(void *)memregion("osrom")->base();
 	m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(esq5505_state::maincpu_irq_acknowledge_callback),this));
@@ -282,6 +282,27 @@ void esq5505_state::machine_reset()
 	m_analog_values[5] = 0xffff; // Volume control: full on.
 	m_analog_values[6] = 0x7fc0; // Battery voltage: something reasonable.
 	m_analog_values[7] = 0x5540; // vRef to check battery.
+
+	// on VFX, bit 0 is 1 for 'cartridge present'.
+	// on VFX-SD and later, bit 0 is 1 for floppy present, bit 1 is 1 for cartridge present
+	if (mame_stricmp(machine().system().name, "vfx") == 0)
+	{
+		// todo: handle VFX cart-in when we support cartridges
+		m_duart->ip0_w(ASSERT_LINE);
+	}
+	else
+	{
+		m_duart->ip1_w(CLEAR_LINE);
+
+		if (floppy)
+		{
+			m_duart->ip0_w(ASSERT_LINE);
+		}
+		else
+		{
+			m_duart->ip0_w(CLEAR_LINE);
+		}
+	}
 }
 
 void esq5505_state::update_irq_to_maincpu() {
@@ -419,33 +440,6 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 	}
 	update_irq_to_maincpu();
 };
-
-READ8_MEMBER(esq5505_state::duart_input)
-{
-	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
-	floppy_image_device *floppy = con ? con->get_device() : 0;
-	UINT8 result = 0;   // DUART input lines are separate from the output lines
-
-	// on VFX, bit 0 is 1 for 'cartridge present'.
-	// on VFX-SD and later, bit 0 is 1 for floppy present, bit 1 is 1 for cartridge present
-	if (mame_stricmp(machine().system().name, "vfx") == 0)
-	{
-		// todo: handle VFX cart-in when we support cartridges
-	}
-	else
-	{
-		if (floppy)
-		{
-			// ready_r returns true if the drive is *not* ready, false if it is
-//          if (!floppy->ready_r())
-			{
-				result |= 1;
-			}
-		}
-	}
-
-	return result;
-}
 
 WRITE8_MEMBER(esq5505_state::duart_output)
 {
@@ -634,14 +628,6 @@ static const esqpanel_interface esqpanel_config =
 	DEVCB_DRIVER_MEMBER16(esq5505_state, analog_w)
 };
 
-static SLOT_INTERFACE_START(midiin_slot)
-	SLOT_INTERFACE("midiin", MIDIIN_PORT)
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START(midiout_slot)
-	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
-SLOT_INTERFACE_END
-
 static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
@@ -655,7 +641,6 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
 	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
 	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
-	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(esq5505_state, duart_input))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esq5505_state, duart_output))
 	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
@@ -717,7 +702,6 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
 	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
 	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
-	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(esq5505_state, duart_input))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esq5505_state, duart_output))
 	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 

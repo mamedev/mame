@@ -302,7 +302,15 @@ static MACHINE_CONFIG_START( mz80k, mz80_state )
 
 	/* Devices */
 	MCFG_I8255_ADD( "ppi8255", mz80k_8255_int )
-	MCFG_PIT8253_ADD( "pit8253", mz80k_pit8253_config )
+
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_8MHz/4)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mz80_state, pit_out0_changed))
+	MCFG_PIT8253_CLK1(XTAL_8MHz/256)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pit8253", pit8253_device, write_clk2))
+	MCFG_PIT8253_CLK2(0)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mz80_state, pit_out2_changed))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tempo", mz80_state, ne555_tempo_callback, attotime::from_hz(34))
 	MCFG_CASSETTE_ADD( "cassette", mz80k_cassette_interface )
 MACHINE_CONFIG_END

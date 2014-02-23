@@ -3,23 +3,22 @@
  *
  */
 
+//  CURRENTLY BROKEN
 
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(bjt)
     /* Standard stuff */
 
-    CLOCK(clk)
-    PARAM(clk.FREQ, 1000) // 1000 Hz
-    SOLVER(Solver)
-    PARAM(Solver.FREQ, 48000)
+    CLOCK(clk, 1000) // 1000 Hz
+    SOLVER(Solver, 48000)
 
     ANALOG_INPUT(V3, 3)
     ANALOG_INPUT(STOPG, 0)
-    NET_ALIAS(SRSTQ, RYf.2)
-    NET_ALIAS(SRST, RYc.2)
+    ALIAS(SRSTQ, RYf.2)
+    ALIAS(SRST, RYc.2)
     NET_C(antenna, GND)
-    NET_ALIAS(runQ, Q1.C)
+    ALIAS(runQ, Q1.C)
 
     TTL_7404_INVERT(e4d, STOPG)
 
@@ -38,7 +37,7 @@ NETLIST_START(bjt)
     /* Antenna circuit */
     /* Also has a diode to clamp negative voltages - omitted here */
     NETDEV_QNPN(Q3, BC237B)
-    NET_ALIAS(antenna, Q3.B)
+    ALIAS(antenna, Q3.B)
     NET_C(GND, Q3.E)
     RES(RX5, 100)
     CAP(CX1, 100)

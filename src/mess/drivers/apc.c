@@ -841,24 +841,6 @@ static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8, apc_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
-static const struct pit8253_interface pit8253_config =
-{
-	{
-		{
-			MAIN_CLOCK,              /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir3_w)
-		}, {
-			MAIN_CLOCK,              /* Memory Refresh */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			MAIN_CLOCK,              /* RS-232c */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
 /*
 irq assignment:
 (note: documentation shows ODA Printer at ir7 master, but clearly everything is shifted one place due of the
@@ -1011,7 +993,12 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_CPU_PROGRAM_MAP(apc_map)
 	MCFG_CPU_IO_MAP(apc_io)
 
-	MCFG_PIT8253_ADD( "pit8253", pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(MAIN_CLOCK) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir3_w))
+	MCFG_PIT8253_CLK1(MAIN_CLOCK) /* Memory Refresh */
+	MCFG_PIT8253_CLK2(MAIN_CLOCK) /* RS-232c */
+
 	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(apc_state, apc_master_set_int_line), VCC, READ8(apc_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: check ir7_w
 	MCFG_I8237_ADD("i8237", MAIN_CLOCK, dmac_intf)

@@ -17,6 +17,7 @@
 #define MCFG_DUARTN68681_B_TX_CALLBACK(_cb) \
 	devcb = &duartn68681_device::set_b_tx_cb(*device, DEVCB2_##_cb);
 
+// deprecated: use ipX_w() instead
 #define MCFG_DUARTN68681_INPORT_CALLBACK(_cb) \
 	devcb = &duartn68681_device::set_inport_cb(*device, DEVCB2_##_cb);
 

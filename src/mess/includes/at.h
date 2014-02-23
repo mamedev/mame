@@ -131,7 +131,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(at_mc146818_irq);
 	DECLARE_WRITE8_MEMBER(write_rtc);
 	UINT8 m_at_spkrdata;
-	UINT8 m_at_speaker_input;
+	UINT8 m_pit_out2;
 	int m_dma_channel;
 	bool m_cur_eop;
 	UINT8 m_dma_offset[2][4];
@@ -144,7 +144,6 @@ public:
 	DECLARE_READ8_MEMBER(ps1_kbdc_r);
 
 	void at_speaker_set_spkrdata(UINT8 data);
-	void at_speaker_set_input(UINT8 data);
 	DECLARE_WRITE_LINE_MEMBER(at_shutdown);
 
 	UINT8 m_channel_check;
@@ -167,7 +166,6 @@ public:
 
 /*----------- defined in machine/at.c -----------*/
 
-extern const struct pit8253_interface at_pit8254_config;
 extern const am9517a_interface at_dma8237_1_config;
 extern const am9517a_interface at_dma8237_2_config;
 

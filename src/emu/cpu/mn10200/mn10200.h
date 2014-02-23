@@ -90,43 +90,56 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 7; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
+	address_space *m_program;
+	address_space *m_io;
+
+	int m_cycles;
+
 	// The UINT32s are really UINT24
 	UINT32 m_pc;
 	UINT32 m_d[4];
 	UINT32 m_a[4];
-
-	UINT8 m_p4;
-	UINT8 m_extmdl;
-	UINT8 m_extmdh;
-	UINT8 m_nmicr;
-	UINT8 m_iagr;
-	UINT8 m_icrl[MN10200_NUM_IRQ_GROUPS];
-	UINT8 m_icrh[MN10200_NUM_IRQ_GROUPS];
 	UINT16 m_psw;
 	UINT16 m_mdr;
 
-	struct {
+	// interrupts
+	UINT8 m_icrl[MN10200_NUM_IRQ_GROUPS];
+	UINT8 m_icrh[MN10200_NUM_IRQ_GROUPS];
+
+	UINT8 m_nmicr;
+	UINT8 m_iagr;
+	UINT8 m_extmdl;
+	UINT8 m_extmdh;
+	bool m_possible_irq;
+
+	// timers
+	attotime m_sysclock_base;
+	emu_timer *m_timer_timers[MN10200_NUM_TIMERS_8BIT];
+
+	struct
+	{
 		UINT8 mode;
 		UINT8 base;
 		UINT8 cur;
 	} m_simple_timer[MN10200_NUM_TIMERS_8BIT];
 
-	emu_timer *m_timer_timers[MN10200_NUM_TIMERS_8BIT];
-
-	struct {
+	struct
+	{
 		UINT8 mode;
 		UINT8 base;
 		UINT8 cur;
 	} m_prescaler[MN10200_NUM_PRESCALERS];
 
-	struct {
+	// dma
+	struct
+	{
 		UINT32 adr;
 		UINT32 count;
 		UINT16 iadr;
@@ -135,21 +148,26 @@ private:
 		UINT8 irq;
 	} m_dma[8];
 
-	struct {
+	// serial
+	struct
+	{
 		UINT8 ctrll;
 		UINT8 ctrlh;
 		UINT8 buf;
 	} m_serial[2];
+	
+	// ports
+	UINT8 m_pplul;
+	UINT8 m_ppluh;
+	UINT8 m_p3md;
+	UINT8 m_p4;
 
-	UINT8 m_ddr[8];
-
-	bool m_possible_irq;
-	attotime m_sysclock_base;
-	int m_cycles;
-
-	address_space *m_program;
-	address_space *m_io;
-
+	struct
+	{
+		UINT8 out;
+		UINT8 dir;
+	} m_port[4];
+	
 	// internal read/write
 	inline UINT8 read_arg8(UINT32 address) { return m_program->read_byte(address); }
 	inline UINT16 read_arg16(UINT32 address) { return m_program->read_byte(address) | m_program->read_byte(address + 1) << 8; }

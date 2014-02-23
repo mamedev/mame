@@ -52,7 +52,7 @@ public:
 	UINT8 m_dma_offset[2][4];
 	int m_cur_eop;
 	UINT8 m_pc_spkrdata;
-	UINT8 m_pc_input;
+	UINT8 m_pit_out2;
 	UINT8 m_pcjr_dor;
 	emu_timer *m_pcjr_watchdog;
 	UINT8 m_pcjx_1ff_count;
@@ -142,7 +142,6 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pcjr_cartridge );
 	UINT8 pc_speaker_get_spk();
 	void pc_speaker_set_spkrdata(UINT8 data);
-	void pc_speaker_set_input(UINT8 data);
 	void pcjr_keyb_init();
 	void mess_init_pc_common(void (*set_keyb_int_func)(running_machine &, int));
 	void pc_rtc_init();
@@ -174,8 +173,6 @@ void pc_set_keyb_int(running_machine &machine, int state);
 /*----------- defined in machine/pc.c -----------*/
 
 extern const struct am9517a_interface ibm5150_dma8237_config;
-extern const struct pit8253_interface ibm5150_pit8253_config;
-extern const struct pit8253_interface pcjr_pit8253_config;
 extern const ins8250_interface ibm5150_com_interface[4];
 extern const i8255_interface ibm5160_ppi8255_interface;
 extern const i8255_interface pc_ppi8255_interface;
