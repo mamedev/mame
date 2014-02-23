@@ -97,7 +97,7 @@ void duartn68681_device::device_start()
 	write_irq.resolve_safe();
 	write_a_tx.resolve_safe();
 	write_b_tx.resolve_safe();
-	read_inport.resolve_safe(0);
+	read_inport.resolve();
 	write_outport.resolve_safe();
 
 	duart_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(duartn68681_device::duart_timer_callback),this), NULL);
@@ -298,7 +298,14 @@ READ8_MEMBER( duartn68681_device::read )
 			break;
 
 		case 0x0d: /* IP */
-			r = read_inport();	// TODO: go away
+			if (!read_inport.isnull())
+			{
+				r = read_inport();	// TODO: go away
+			}
+			else
+			{
+				r = IP_last_state;
+			}
 			break; 
 
 		case 0x0e: /* Start counter command */

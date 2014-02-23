@@ -56,7 +56,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
-	DECLARE_READ8_MEMBER(duart_input);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
 	UINT8 m_duart_io;
@@ -172,13 +171,6 @@ WRITE_LINE_MEMBER(esqkt_state::duart_irq_handler)
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 };
 
-READ8_MEMBER(esqkt_state::duart_input)
-{
-	UINT8 result = 0;   // DUART input lines are separate from the output lines
-
-	return result;
-}
-
 WRITE8_MEMBER(esqkt_state::duart_output)
 {
 	m_duart_io = data;
@@ -244,7 +236,6 @@ static MACHINE_CONFIG_START( kt, esqkt_state )
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(esqkt_state, duart_irq_handler))
 	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_a))
 	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_b))
-	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(esqkt_state, duart_input))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esqkt_state, duart_output))
 	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)

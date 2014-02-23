@@ -406,7 +406,6 @@ public:
 	optional_device<via6522_device> m_via1; // only swyft uses this
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
-	DECLARE_READ8_MEMBER(cat_duart_input);
 	DECLARE_WRITE8_MEMBER(cat_duart_output);
 	//required_device<speaker_sound_device> m_speaker;
 	optional_shared_ptr<UINT16> m_svram;
@@ -993,11 +992,10 @@ TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 {
 	// This is effectively also the KTOBF line 'clock' output to the d-latch before the duart
 	// Hence, invert the d-latch on the duart's input ports.
-	// is there some way to 'strobe' the duart to tell it that its input ports just changed?
-	// with the devcb stuff, there definitely should be!
+	// n68681 now properly generates interrupts when this bit changes, the previous hack is no longer necessary.
 	m_duart_inp ^= 0x04;
+	m_duart->ip2_w((m_duart_inp>>2)&1);
 	m_6ms_counter++;
-	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE); // hack until duart ints work; as of march 2013 they do not work correctly here (they fire at the wrong rate)
 }
 
 IRQ_CALLBACK_MEMBER(cat_state::cat_int_ack)
@@ -1066,11 +1064,13 @@ UINT32 cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap,
  */
 WRITE_LINE_MEMBER(cat_state::cat_duart_irq_handler)
 {
+	int irqvector = m_duart->get_irq_vector();
+
 #ifdef DEBUG_DUART_IRQ_HANDLER
-	fprintf(stderr, "Duart IRQ handler called: state: %02X, vector: %06X\n", state, vector);
+	fprintf(stderr, "Duart IRQ handler called: state: %02X, vector: %06X\n", state, irqvector);
 #endif
 	m_duart_irq_state = state;
-	//device->m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, vector);
+	m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, irqvector);
 }
 
 WRITE_LINE_MEMBER(cat_state::cat_duart_txa)
@@ -1088,13 +1088,6 @@ WRITE_LINE_MEMBER(cat_state::cat_duart_txa)
  * IP4: Centronics BUSY
  * IP5: DSR
  */
-READ8_MEMBER(cat_state::cat_duart_input)
-{
-#ifdef DEBUG_DUART_INPUT_LINES
-	fprintf(stderr, "Duart input lines read!\n");
-#endif
-	return m_duart_inp;
-}
 
 /* mc68681 DUART Output pins:
  * OP0: RTS [using the duart builtin hardware-RTS feature?]
@@ -1138,7 +1131,6 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_DUARTN68681_ADD( "duartn68681", XTAL_19_968MHz*2/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(cat_state, cat_duart_irq_handler))
 	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
-	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(cat_state, cat_duart_input))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(cat_state, cat_duart_output))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
