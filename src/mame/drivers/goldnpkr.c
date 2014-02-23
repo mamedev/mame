@@ -4005,6 +4005,25 @@ ROM_START( videtron )
 	ROM_LOAD( "82s129.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+ROM_START( videtron2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* different from videtron */
+	ROM_LOAD( "4.bin", 0x5000, 0x1000, CRC(4a7dab42) SHA1(7fcdab985b783d90879a99b2a53a6814ca4278eb) )
+	ROM_LOAD( "5.bin", 0x6000, 0x1000, CRC(c70e8127) SHA1(7db2d4a29cba7c336f254393955fad71f30a539a) )
+	ROM_LOAD( "6.bin", 0x7000, 0x1000, CRC(490c7304) SHA1(1a6c6112571fd0e35b640ed58f66582a2d99c58b) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "3.bin", 0x2000, 0x0800, CRC(23e83e89) SHA1(0c6352d46e3dfe176b0e970dd163e2bc01246890) )    /* text layer */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "0.bin", 0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "1.bin", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "2.bin", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
 /*  Videotron Poker.
     Only program. No gfx or prom dumps...
     Normal controls.
@@ -10138,7 +10157,8 @@ DRIVER_INIT_MEMBER(goldnpkr_state, mondial)
 GAMEL( 1981, goldnpkr,  0,        goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",        0,                layout_goldnpkr )
 GAMEL( 1981, goldnpkb,  goldnpkr, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Mini Boy)",       0,                layout_goldnpkr )
 
-GAMEL( 198?, videtron,  0,        goldnpkr, videtron, driver_device,  0,        ROT0,   "<unknown>",                "Videotron Poker (cards selector)",        0,                layout_goldnpkr )
+GAMEL( 198?, videtron,  0,        goldnpkr, videtron, driver_device,  0,        ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 1)", 0,                layout_goldnpkr )
+GAMEL( 198?, videtron2, videtron, goldnpkr, videtron, driver_device,  0,        ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 2)", 0,                layout_goldnpkr )
 GAMEL( 198?, videtrna,  videtron, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "<unknown>",                "Videotron Poker (normal controls)",       0,                layout_goldnpkr )
 
 GAMEL( 198?, pottnpkr,  0,        pottnpkr, pottnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 1)",             0,                layout_goldnpkr )
