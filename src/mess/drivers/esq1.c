@@ -179,8 +179,6 @@ NOTES:
 ***************************************************************************/
 
 #include "bus/midi/midi.h"
-#include "bus/midi/midiinport.h"
-#include "bus/midi/midioutport.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/es5503.h"
 #include "machine/n68681.h"
@@ -577,14 +575,6 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 		send_through_panel((UINT8)(FPTR)0x00);
 	}
 }
-
-static SLOT_INTERFACE_START(midiin_slot)
-	SLOT_INTERFACE("midiin", MIDIIN_PORT)
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START(midiout_slot)
-	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
-SLOT_INTERFACE_END
 
 static const esqpanel_interface esqpanel_config =
 {
