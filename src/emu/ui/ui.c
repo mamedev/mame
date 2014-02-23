@@ -1536,6 +1536,19 @@ UINT32 ui_manager::ui_handler_load_save(running_machine &machine, render_contain
 
 
 //-------------------------------------------------
+//  request_quit
+//-------------------------------------------------
+
+void ui_manager::request_quit()
+{
+	if (!machine().options().confirm_quit())
+		machine().schedule_exit();
+	else
+		set_handler(handler_confirm_quit, 0);
+}
+
+
+//-------------------------------------------------
 //  handler_confirm_quit - leads the user through
 //  confirming quit emulation
 //-------------------------------------------------

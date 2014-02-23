@@ -158,7 +158,7 @@ ROM_START(eballchp)
 	ROM_LOAD("u5_snd.532", 0xf000, 0x1000, CRC(655441df) SHA1(9da5578856ded3dcdafed67679eb4c4134dc9f81))
 ROM_END
 
-#if 0
+#ifdef MISSING_GAME // same as above but with CPU2 roms as NO_DUMP
 ROM_START(eballch2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "u3_cpu.128", 0xc000, 0x4000, CRC(025f3008) SHA1(25d310f169b92ce6b348330816ddc3b5710e57da) )

@@ -1,50 +1,47 @@
 /* PGM 2 hardware.
 
- Motherboard is bare bones stuff, probably only contains the video processor, no ROMs.
+	Motherboard is bare bones stuff, and does not contain any ROMs.
+	The IGS036 used by the games is an ARM based CPU, like IGS027A used on PGM1 it has internal ROM.
+	Decryption should be correct in most cases, but the ARM mode code at the start of the external
+	ROMs is a bit weird, with many BNV instructions rather than jumps.  Maybe the ARM is customized,
+	the code has been 'NOPPED' out this way (BNV is Branch Never) or it's a different type of ARM?
 
- Makes use of internal ROM ASICS, newer than those found on the best protected PGM games.
- Games actually boot to a warning screen even if you remove all program roms!
-
- Encrypted.
-
- Likely ARM based, but until we can obtain decrypted data, we will not know for sure.
+	We need to determine where VRAM etc. map in order to attempt tests on the PCBs.
 
 
-PGM2 Motherboard Components:
+	PGM2 Motherboard Components:
 
- IS61LV25616AL(SRAM)
- IGS037(GFX PROCESSOR)
- YMZ774-S(SOUND)
- R5F21256SN(extra MCU for protection and ICcard communication)
+	 IS61LV25616AL(SRAM)
+	 IGS037(GFX PROCESSOR)
+	 YMZ774-S(SOUND)
+	 R5F21256SN(extra MCU for protection and ICcard communication)
+	  - Appears to be refered to by the games as MPU
 
-Cartridges
- IGS036 (MAIN CPU) (differs per game, internal code)
- ROMs
- Custom program ROM module (KOV3 only)
- QFP100 chip (Xlinx CPLD)
+	Cartridges
+	 IGS036 (MAIN CPU) (differs per game, internal code)
+	 ROMs
+	 Custom program ROM module (KOV3 only)
+	  - on some games ROM socket contains Flash ROM + SRAM
 
- Single PCB versions of some of the titles were also available
+	 QFP100 chip (Xlinx CPLD)
 
-Only 5 Games were released for this platform, 3 of which are just updates / re-releases of older titles!
-The platform has since been superseded by PGM3 (HD system uses flash cards etc.)
+	 Single PCB versions of some of the titles were also available
 
-Oriental Legend 2
-The King of Fighters '98 - Ultimate Match - Hero  (NOT DUMPED)
-Knights of Valour 2 New Legend
-Dodonpachi Daioujou Tamashii
-Knights of Valour 3
+	Only 5 Games were released for this platform, 3 of which are just updates / re-releases of older titles!
+	The platform has since been superseded by PGM3 (HD system uses flash cards etc.)
 
-NO internal ROMs are dumped.
+	Oriental Legend 2
+	The King of Fighters '98 - Ultimate Match - Hero  (NOT DUMPED)
+	Knights of Valour 2 New Legend
+	Dodonpachi Daioujou Tamashii
+	Knights of Valour 3
 
-These were only released as single board PGM2 based hardware, seen for sale in Japan for around $250-$300
+	These were only released as single board PGM2 based hardware, seen for sale in Japan for around $250-$300
 
-Jigsaw World Arena
-Puzzle of Ocha / Ochainu No Pazuru
+	Jigsaw World Arena
+	Puzzle of Ocha / Ochainu No Pazuru
 
 */
-
-// document these exist, but leave disabled for now, can't be doing with the drama
-// #define OTHER_PGM2_SETS 1
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
@@ -71,7 +68,7 @@ public:
 	void screen_eof_pgm2(screen_device &screen, bool state);
 	required_device<cpu_device> m_maincpu;
 
-	void pgm_create_dummy_internal_arm_region(void);
+	void pgm_create_dummy_internal_arm_region(int addr);
 };
 
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
@@ -130,6 +127,7 @@ static const gfx_layout tiles32x32x8_layout =
 	256*32
 };
 
+#if 0
 /* sprites aren't tile based, this is variable width 1bpp data, colour data is almost certainly in sprites b */
 /* there don't seem to be any indexes into the colour data, probably provided by the program, or the colour data references the bitmaps (reverse of PGM) */
 static const gfx_layout tiles32x8x1_layout =
@@ -142,20 +140,22 @@ static const gfx_layout tiles32x8x1_layout =
 	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32 },
 	8*32
 };
-
+#endif
 
 
 
 static GFXDECODE_START( pgm2 )
 	GFXDECODE_ENTRY( "tiles", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "bgtile", 0, tiles32x32x8_layout, 0, 16 )
+#if 0
 	// not tile based
 	GFXDECODE_ENTRY( "spritesa", 0, tiles32x8x1_layout, 0, 16 )
 	GFXDECODE_ENTRY( "spritesb", 0, tiles32x8x1_layout, 0, 16 )
+#endif
 GFXDECODE_END
 
 
-void pgm2_state::pgm_create_dummy_internal_arm_region(void)
+void pgm2_state::pgm_create_dummy_internal_arm_region(int addr)
 {
 	UINT16 *temp16 = (UINT16 *)memregion("maincpu")->base();
 	int i;
@@ -179,14 +179,8 @@ void pgm2_state::pgm_create_dummy_internal_arm_region(void)
 	temp16[(base) / 2] = 0x0010; base += 2;
 	temp16[(base) / 2] = 0x0000; base += 2;
 
-#if 1
-	temp16[(base) / 2] = 0x03c9; base += 2;
-	temp16[(base) / 2] = 0x0800; base += 2;
-#else
-	temp16[(base) / 2] = 0x0000; base += 2;
-	temp16[(base) / 2] = 0x0800; base += 2;
-#endif
-
+	temp16[(base) / 2] = addr&0xffff; base += 2;
+	temp16[(base) / 2] = (addr>>16)&0xffff; base += 2;
 }
 
 
@@ -194,12 +188,11 @@ void pgm2_state::pgm_create_dummy_internal_arm_region(void)
 static MACHINE_CONFIG_START( pgm2, pgm2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 20000000) // ?? unknown CPU, has internal ROM.
+	MCFG_CPU_ADD("maincpu", ARM7, 20000000) // ?? ARM baesd CPU, has internal ROM.
 	MCFG_CPU_PROGRAM_MAP(pgm2_map)
 //  MCFG_DEVICE_DISABLE()
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pgm2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -210,6 +203,7 @@ static MACHINE_CONFIG_START( pgm2, pgm2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pgm2_state, screen_update_pgm2)
 	MCFG_SCREEN_VBLANK_DRIVER(pgm2_state, screen_eof_pgm2)
 
+	MCFG_GFXDECODE_ADD("gfxdecode", pgm2)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 
@@ -350,7 +344,7 @@ ROM_START( ddpdojh )
 	ROM_LOAD16_WORD_SWAP( "ddpdoj_wave0.u12",        0x00000000, 0x1000000, CRC(2b71a324) SHA1(f69076cc561f40ca564d804bc7bd455066f8d77c) )
 ROM_END
 
-#ifdef OTHER_PGM2_SETS
+
 ROM_START( kov3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "kov3_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
@@ -381,7 +375,7 @@ ROM_START( kov3 )
 	ROM_REGION( 0x4000000, "ymz770", ROMREGION_ERASEFF ) /* ymz770 */
 	ROM_LOAD16_WORD_SWAP( "kov3_wave0.u13",              0x00000000, 0x4000000, CRC(aa639152) SHA1(2314c6bd05524525a31a2a4668a36a938b924ba4) )
 ROM_END
-#endif
+
 
 static void iga_u16_decode(UINT16 *rom, int len, int ixor)
 {
@@ -443,7 +437,7 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 	igs036_decryptor decrypter(orleg2_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region();
+	pgm_create_dummy_internal_arm_region(0x80003c9);
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
@@ -456,7 +450,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 	igs036_decryptor decrypter(kov2_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region();
+	pgm_create_dummy_internal_arm_region(0x8000000);
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
@@ -469,7 +463,7 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 	igs036_decryptor decrypter(ddpdoj_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region();
+	pgm_create_dummy_internal_arm_region(0x8000000);
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
@@ -482,19 +476,26 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 	igs036_decryptor decrypter(kov3_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region();
+	pgm_create_dummy_internal_arm_region(0x8000000);
 }
 
 
 /* PGM2 */
 GAME( 2007, orleg2,       0,         pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, China)", GAME_IS_SKELETON )
 GAME( 2007, orleg2o,      orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", GAME_IS_SKELETON )
+// should be earlier verisons too.
 
 GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", GAME_IS_SKELETON )
 GAME( 2008, kov2nlo,      kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", GAME_IS_SKELETON )
+// should be earlier verisons too.
 
+GAME( 2010, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", GAME_IS_SKELETON )
+// should be earlier verisons too.
 
-GAME( 2009, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", GAME_IS_SKELETON )
-#ifdef OTHER_PGM2_SETS
-GAME( 2009, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3,       ROT0, "IGS", "Knights of Valour 3 (V102, China)", GAME_IS_SKELETON )
-#endif
+GAME( 2011, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3,       ROT0, "IGS", "Knights of Valour 3 (V102, China)", GAME_IS_SKELETON )
+// should be earlier verisons too.
+
+// The King of Fighters '98 - Ultimate Match - Hero
+// Jigsaw World Arena
+//Puzzle of Ocha / Ochainu No Pazuru
+

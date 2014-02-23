@@ -2188,6 +2188,8 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/mpu12wbk.o \
 	$(DRIVERS)/mrjong.o $(VIDEO)/mrjong.o \
 	$(DRIVERS)/multfish.o \
+	$(DRIVERS)/multfish_boot.o \
+	$(DRIVERS)/multfish_ref.o \
 	$(DRIVERS)/murogem.o \
 	$(DRIVERS)/murogmbl.o \
 	$(DRIVERS)/neoprint.o \

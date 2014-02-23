@@ -22,10 +22,15 @@
 #include "machine/omti8621.h"
 #include "machine/sc499.h"
 #include "machine/3c505.h"
+#include "machine/6840ptm.h"
 #include "machine/68681.h"
+#include "machine/n68681.h"
 #include "machine/pc_fdc.h"
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
+#include "machine/mc146818.h"
+#include "machine/apollo_kbd.h"
+#include "machine/clock.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -123,7 +128,9 @@ public:
 			m_dma8237_1(*this, "dma8237_1"),
 			m_dma8237_2(*this, "dma8237_2"),
 			m_pic8259_master(*this, "pic8259_master"),
-			m_pic8259_slave(*this, "pic8259_slave")
+			m_pic8259_slave(*this, "pic8259_slave"),
+			m_ptm(*this, APOLLO_PTM_TAG),
+			m_sio2(*this, APOLLO_SIO2_TAG)
 			{ }
 
 	required_device<m68000_base_device> m_maincpu;
@@ -134,6 +141,8 @@ public:
 	required_device<am9517a_device> m_dma8237_2;
 	required_device<pic8259_device> m_pic8259_master;
 	required_device<pic8259_device> m_pic8259_slave;
+	required_device<ptm6840_device> m_ptm;
+	optional_device<duartn68681_device> m_sio2;
 
 	DECLARE_WRITE16_MEMBER(apollo_csr_status_register_w);
 	DECLARE_READ16_MEMBER(apollo_csr_status_register_r);
@@ -216,7 +225,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma_2_hrq_changed );
 	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_master_set_int_line );
 	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_slave_set_int_line );
+	DECLARE_WRITE_LINE_MEMBER( sio2_irq_handler );
+	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_irq_function );
+	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_timer_tick );
 	DECLARE_READ8_MEMBER( apollo_pic8259_get_slave_ack );
+
+private:
+	UINT32 ptm_counter;
 };
 
 MACHINE_CONFIG_EXTERN( apollo );
@@ -282,11 +297,6 @@ DECLARE_READ8_DEVICE_HANDLER( apollo_pic8259_master_r );
 DECLARE_WRITE8_DEVICE_HANDLER(apollo_pic8259_slave_w );
 DECLARE_READ8_DEVICE_HANDLER( apollo_pic8259_slave_r );
 
-/*----------- machine/apollo_ptm.c -----------*/
-
-DECLARE_WRITE8_DEVICE_HANDLER( apollo_ptm_w );
-DECLARE_READ8_DEVICE_HANDLER( apollo_ptm_r );
-
 /*----------- machine/apollo_rtc.c -----------*/
 
 
@@ -296,11 +306,6 @@ void apollo_sio_rx_data( device_t* device, int ch, UINT8 data );
 
 DECLARE_READ8_DEVICE_HANDLER(apollo_sio_r);
 DECLARE_WRITE8_DEVICE_HANDLER(apollo_sio_w);
-
-/*----------- machine/apollo_sio2.c -----------*/
-
-DECLARE_READ8_DEVICE_HANDLER(apollo_sio2_r);
-DECLARE_WRITE8_DEVICE_HANDLER(apollo_sio2_w);
 
 /*----------- machine/apollo_fdc.c -----------*/
 

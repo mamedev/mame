@@ -272,7 +272,7 @@ bool ui_menubar::poll_navigation_keys()
 			code_next_menu = IPT_UI_RIGHT;
 			code_child_menu = IPT_UI_DOWN;
 		}
-		else if (m_selected_item && m_selected_item->is_sub_menu())
+		else
 		{
 			// pull down menu selected
 			code_previous_menu = IPT_UI_UP;

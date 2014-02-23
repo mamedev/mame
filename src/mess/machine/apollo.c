@@ -25,22 +25,9 @@
  */
 
 #include "includes/apollo.h"
-#include "machine/apollo_kbd.h"
-#include "machine/omti8621.h"
-#include "machine/sc499.h"
-#include "machine/3c505.h"
-
-#include "machine/6840ptm.h"
-#include "machine/68681.h"
-#include "machine/am9517a.h"
-#include "machine/mc146818.h"
-#include "machine/pic8259.h"
 
 #include "machine/pc_fdc.h"
 #include "formats/apollo_dsk.h"
-
-#include "cpu/m68000/m68000.h"
-//#include "cpu/m68000/m68kcpu.h"
 
 #include "emuopts.h"
 #include "devlegcy.h"
@@ -749,35 +736,25 @@ WRITE_LINE_MEMBER( apollo_state::apollo_pic8259_slave_set_int_line ) {
 #undef VERBOSE
 #define VERBOSE 0
 
-static emu_timer* ptm_timer;
-static UINT32 ptm_counter = 0;
-
-static TIMER_CALLBACK(apollo_ptm_timer_callback)
+WRITE_LINE_MEMBER(apollo_state::apollo_ptm_timer_tick)
 {
-	ptm6840_device *device = downcast<ptm6840_device *>((device_t *) ptr);
-
-	ptm_counter++;
-	device->set_c1( 1);
-	device->set_c1( 0);
-	device->set_c2(ptm_counter & 1);
-
-	if ((ptm_counter & 1) == 0)
+	if (m_ptm->started())
 	{
-		device->set_c3((ptm_counter >> 1) & 1);
-	}
+		ptm_counter++; 
+		m_ptm->set_c1( 1);
+		m_ptm->set_c1( 0);
+		m_ptm->set_c2(ptm_counter & 1);
 
-	if (ptm_counter % 250000 == 0)
-	{
-		DLOG2(("apollo_ptm_timer_callback: %d", ptm_counter / 250000));
+		if ((ptm_counter & 1) == 0)
+		{
+			m_ptm->set_c3((ptm_counter >> 1) & 1);
+		}
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( apollo_ptm_irq_function ) {
-	DLOG1(("apollo_ptm_irq_function: state=%d", state ));
-
-//  ptm6840_device *ptm = device->machine().device<ptm6840_device>(APOLLO_PTM_TAG);
-
-	apollo_pic_set_irq_line(device, APOLLO_IRQ_PTM, state);
+WRITE_LINE_MEMBER(apollo_state::apollo_ptm_irq_function)
+{
+	apollo_pic_set_irq_line(this, APOLLO_IRQ_PTM, state);
 }
 
 //  Timer 1's input is a 250-kHz (4-microsecond period) signal.
@@ -789,41 +766,8 @@ static const ptm6840_interface apollo_ptm_config = {
 		0,
 		{ 250000, 125000, 62500 },
 		{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-		DEVCB_LINE(apollo_ptm_irq_function)
+		DEVCB_DRIVER_LINE_MEMBER(apollo_state, apollo_ptm_irq_function)
 };
-
-static DEVICE_START( apollo_ptm )
-{
-	DLOG1(("start apollo_ptm"));
-	// allocate and start ptm timer
-	ptm_timer = device->machine().scheduler().timer_alloc(FUNC(apollo_ptm_timer_callback), device);
-	ptm_timer->adjust( attotime::zero, 0, attotime::from_usec(4));
-}
-
-static DEVICE_RESET( apollo_ptm )
-{
-	DLOG1(("reset apollo_ptm"));
-	device->reset();
-}
-
-READ8_DEVICE_HANDLER(apollo_ptm_r) {
-	UINT8 data =downcast<ptm6840_device *>((device_t *) device)->read(offset / 2);
-
-	// prevent excessive logging
-	static UINT8 previous = 255;
-	if (offset / 2 != 1 || data != previous) {
-		DLOG1(("apollo_ptm_read reg %x returned %02x", offset/2, data ));
-		if (offset / 2 == 1) {
-			previous = data;
-		}
-	}
-	return data;
-}
-
-WRITE8_DEVICE_HANDLER(apollo_ptm_w) {
-	DLOG1(("apollo_ptm_write reg %x with %02x", offset/2, data ));
-	downcast<ptm6840_device *>((device_t *) device)->write(offset / 2, data);
-}
 
 //##########################################################################
 // machine/apollo_rtc.c - APOLLO DS3500 RTC MC146818
@@ -1189,94 +1133,9 @@ static DEVICE_RESET(apollo_sio)
  sio2 configuration (DN3500 only)
  -------------------------------------------------*/
 
-static void sio2_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(apollo_state::sio2_irq_handler)
 {
-	DLOG1(("sio2_irq_handler: vector=%02x", vector ));
-	apollo_pic_set_irq_line(device, APOLLO_IRQ_SIO2, state);
-}
-
-static void sio2_tx_data(device_t *device, int channel, UINT8 data)
-{
-	DLOG1(("apollo_sio2_tx_data ch=%d -> data=%02x", channel, data ));
-}
-
-static UINT8 sio2_input(device_t *device)
-{
-	UINT8 data = 0x00;
-	DLOG1(("reading 2681 input: %02x", data ));
-	return data;
-}
-
-static void sio2_output(device_t *device, UINT8 data)
-{
-	DLOG1(("writing 2681 output: %02x", data ));
-}
-
-const duart68681_config apollo_sio2_config = {
-		sio2_irq_handler,
-		sio2_tx_data,
-		sio2_input,
-		sio2_output
-};
-
-/*-------------------------------------------------
- DN3500 SIO2 at 0x10500
- -------------------------------------------------*/
-
-READ8_DEVICE_HANDLER(apollo_sio2_r)
-{
-	static const char * const duart68681_reg_read_names[0x10] = { "MRA", "SRA",
-			"BRG Test", "RHRA", "IPCR", "ISR", "CTU", "CTL", "MRB", "SRB",
-			"1X/16X Test", "RHRB", "IVR", "Input Ports", "Start Counter",
-			"Stop Counter" };
-
-	apollo_pic_set_irq_line(device, APOLLO_IRQ_SIO2, 0);
-
-	int data = duart68681_r(device, space, offset / 2);
-
-	DLOG2(("reading 2681 reg %x (%s) returned %02x",
-				offset, duart68681_reg_read_names[offset/2], data ));
-	return data;
-}
-
-WRITE8_DEVICE_HANDLER(apollo_sio2_w)
-{
-	static const char * const duart68681_reg_write_names[0x10] = { "MRA",
-			"CSRA", "CRA", "THRA", "ACR", "IMR", "CRUR", "CTLR", "MRB", "CSRB",
-			"CRB", "THRB", "IVR", "OPCR", "Set OP Bits", "Reset OP Bits" };
-
-	DLOG2(("writing 2681 reg %x (%s) with %02x", offset, duart68681_reg_write_names[(offset/2) & 15], data ));
-
-	apollo_pic_set_irq_line(device, APOLLO_IRQ_SIO2, 0);
-
-	switch (offset / 2) {
-	case 0x04: /* ACR */
-		if (data == 0x80) {
-			// FIXME: unhandled ACR value
-			// data = 0xe0;
-		}
-		break;
-	}
-
-	duart68681_w(device, space, offset / 2, data);
-}
-
-/*-------------------------------------------------
- device start callback
- -------------------------------------------------*/
-
-static DEVICE_START(apollo_sio2)
-{
-	DLOG1(("start apollo_sio2"));
-}
-
-/*-------------------------------------------------
- device reset callback
- -------------------------------------------------*/
-
-static DEVICE_RESET(apollo_sio2)
-{
-	DLOG1(("reset apollo_sio2"));
+	apollo_pic_set_irq_line(this, APOLLO_IRQ_SIO2, state);
 }
 
 //##########################################################################
@@ -1394,10 +1253,15 @@ MACHINE_CONFIG_FRAGMENT( apollo )
 	MCFG_PIC8259_ADD( APOLLO_PIC2_TAG, WRITELINE(apollo_state,apollo_pic8259_slave_set_int_line), GND, NULL)
 
 	MCFG_PTM6840_ADD(APOLLO_PTM_TAG, apollo_ptm_config)
+	MCFG_DEVICE_ADD("ptmclock", CLOCK, 250000)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(apollo_state, apollo_ptm_timer_tick))
+
 	MCFG_MC146818_ADD( APOLLO_RTC_TAG, XTAL_32_768kHz )
 	MCFG_MC146818_UTC( true )
 	MCFG_DUART68681_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz, apollo_sio_config )
-	MCFG_DUART68681_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz, apollo_sio2_config )
+
+	MCFG_DUARTN68681_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz )
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(apollo_state, sio2_irq_handler))
 
 	MCFG_PC_FDC_AT_ADD(APOLLO_FDC_TAG)
 	MCFG_FLOPPY_DRIVE_ADD(APOLLO_FDC_TAG ":0", apollo_floppies, "525hd", apollo_state::floppy_formats)
@@ -1423,9 +1287,7 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 	// motor is on, floppy disk is ready
 	fdc->fdc->ready_w(1);
 
-	device_start_apollo_ptm (machine().device(APOLLO_PTM_TAG) );
 	device_start_apollo_sio(machine().device(APOLLO_SIO_TAG));
-	device_start_apollo_sio2(machine().device(APOLLO_SIO2_TAG));
 
 	if (apollo_is_dn3000())
 	{
@@ -1442,8 +1304,8 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 	// set configuration
 	apollo_csr_set_servicemode(apollo_config(APOLLO_CONF_SERVICE_MODE));
 
-	device_reset_apollo_ptm(machine().device(APOLLO_PTM_TAG));
 	device_reset_apollo_rtc(machine().device(APOLLO_RTC_TAG));
 	device_reset_apollo_sio(machine().device(APOLLO_SIO_TAG));
-	device_reset_apollo_sio2(machine().device(APOLLO_SIO2_TAG));
+
+	ptm_counter = 0;
 }

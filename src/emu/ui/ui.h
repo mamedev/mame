@@ -167,6 +167,7 @@ public:
 	void image_handler_ingame();
 	void increase_frameskip();
 	void decrease_frameskip();
+	void request_quit();
 
 	// UI handlers
 	static UINT32 ui_handler_load_save(running_machine &machine, render_container *container, UINT32 state);
