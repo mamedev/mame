@@ -71,7 +71,7 @@ private:
 	device_rs232_port_interface *m_dev;
 };
 
-class device_rs232_port_interface: public device_slot_card_interface
+class device_rs232_port_interface : public device_slot_card_interface
 {
 	friend class rs232_port_device;
 
