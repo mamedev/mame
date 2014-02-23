@@ -173,22 +173,21 @@ The "rc" feature is used to indicate the source of the clock signal
     </software>
 -->
 
-<!--
-    <software name="sprblock">
-        <description>Super Blockbuster</description>
-        <year>1982</year>
-        <publisher>Milton Bradley</publisher>
+	<software name="sprblock">
+		<description>Super Blockbuster</description>
+		<year>1982</year>
+		<publisher>Milton Bradley</publisher>
 
-        <part name="cart" interface="microvision_cart">
-            <feature name="pcb" value="7924952D02" />
-            <feature name="paddle" value="yes" />
-            <feature name="rc" value="100pf/23.2K" />
-            <dataarea name="rom" size="2048">
-                <rom name="m34047-n2ll_4241" size="2048" crc="" sha1="" offset="0" />
-            </dataarea>
-        </part>
-    </software>
--->
+		<part name="cart" interface="microvision_cart">
+			<feature name="pla" value="1" />
+			<feature name="pcb" value="7924952D02" />
+			<feature name="paddle" value="yes" />
+			<feature name="rc" value="100pf/23.2K" />
+			<dataarea name="rom" size="2048">
+				<rom name="m34047-n2ll_4241" size="2048" crc="fcf87b73" sha1="9dd018f710cd65aebc897624f6350594669717e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="vegasslt">
 		<description>Vegas Slots</description>
