@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(bublbobl_sound_command_w)
 	AM_RANGE(0xfa03, 0xfa03) AM_WRITENOP // sound cpu reset
 	AM_RANGE(0xfa80, 0xfa80) AM_WRITENOP
@@ -477,6 +477,7 @@ static MACHINE_CONFIG_START( missb2, missb2_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",missb2,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

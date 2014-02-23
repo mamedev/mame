@@ -421,7 +421,7 @@ static MACHINE_CONFIG_START( exerion, exerion_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",exerion,"palette")
 	MCFG_PALETTE_ADD("palette", 256*3)
-
+	MCFG_PALETTE_INIT_OWNER(exerion_state, exerion)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

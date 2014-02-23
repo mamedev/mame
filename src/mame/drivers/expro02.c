@@ -181,7 +181,7 @@ public:
 	DECLARE_DRIVER_INIT(galsnew);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(expro02);
 	UINT32 screen_update_galsnew(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(expro02_scanline);
 	required_device<cpu_device> m_maincpu;
@@ -561,6 +561,7 @@ static MACHINE_CONFIG_START( galsnew, expro02_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",1x4bit_1x4bit,"palette")
 	MCFG_PALETTE_ADD("palette", 2048 + 32768)
+	MCFG_PALETTE_INIT_OWNER(expro02_state, expro02)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);

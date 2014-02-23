@@ -446,7 +446,7 @@ static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(jchan_suprnova_sprite32_1_w) AM_SHARE("spriteram_1")
 	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE(jchan_suprnova_sprite32regs_1_w) AM_SHARE("sprregs_1")
 
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // palette for sprites?
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // palette for sprites?
 
 	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE(jchan_ctrl_r, jchan_ctrl_w) AM_SHARE("ctrl")
 
@@ -599,6 +599,7 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jchan_state, screen_update_jchan)
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);

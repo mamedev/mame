@@ -87,7 +87,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(olibochu);
 	UINT32 screen_update_olibochu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(olibochu_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -470,7 +470,7 @@ static MACHINE_CONFIG_START( olibochu, olibochu_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",olibochu,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
-
+	MCFG_PALETTE_INIT_OWNER(olibochu_state, olibochu)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

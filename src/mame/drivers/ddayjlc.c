@@ -107,7 +107,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(ddayjlc);
 	UINT32 screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ddayjlc_interrupt);
 	INTERRUPT_GEN_MEMBER(ddayjlc_snd_interrupt);
@@ -534,7 +534,7 @@ static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",ddayjlc,"palette")
 	MCFG_PALETTE_ADD("palette", 0x200)
-
+	MCFG_PALETTE_INIT_OWNER(ddayjlc_state, ddayjlc)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

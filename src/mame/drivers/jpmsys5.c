@@ -132,12 +132,12 @@ WRITE16_MEMBER(jpmsys5_state::ramdac_w)
 	}
 	else if (offset == 1)
 	{
-		m_palette[m_pal_addr][m_pal_idx] = data;
+		m_palette_val[m_pal_addr][m_pal_idx] = data;
 
 		if (++m_pal_idx == 3)
 		{
 			/* Update the MAME palette */
-			m_palette->set_pen_color(m_pal_addr, pal6bit(m_palette[m_pal_addr][0]), pal6bit(m_palette[m_pal_addr][1]), pal6bit(m_palette[m_pal_addr][2]));
+			m_palette->set_pen_color(m_pal_addr, pal6bit(m_palette_val[m_pal_addr][0]), pal6bit(m_palette_val[m_pal_addr][1]), pal6bit(m_palette_val[m_pal_addr][2]));
 			m_pal_addr++;
 			m_pal_idx = 0;
 		}

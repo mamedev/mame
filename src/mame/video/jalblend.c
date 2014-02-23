@@ -96,7 +96,8 @@ void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,gfx_e
 	}
 
 	/* Start drawing */
-	if (gfx)
+	//FIXME
+/*	if (gfx)
 	{
 		const pen_t *pal = &gfx->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const UINT8 *alpha = &jal_blend_table[gfx->granularity() * (color % gfx->colors())];
@@ -110,41 +111,41 @@ void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,gfx_e
 		x_index_base = flipx ? gfx->width()-1 : 0;
 		y_index = flipy ? gfx->height()-1 : 0;
 
-		/* start coordinates */
+		// start coordinates 
 		sx = offsx;
 		sy = offsy;
 
-		/* end coordinates */
+		// end coordinates
 		ex = sx + gfx->width();
 		ey = sy + gfx->height();
 
 		if (sx < clip.min_x)
-		{ /* clip left */
+		{ // clip left
 			int pixels = clip.min_x-sx;
 			sx += pixels;
 			x_index_base += xinc*pixels;
 		}
 		if (sy < clip.min_y)
-		{ /* clip top */
+		{ // clip top
 			int pixels = clip.min_y-sy;
 			sy += pixels;
 			y_index += yinc*pixels;
 		}
-		/* NS 980211 - fixed incorrect clipping */
+		// NS 980211 - fixed incorrect clipping
 		if (ex > clip.max_x+1)
-		{ /* clip right */
+		{ // clip right
 			ex = clip.max_x+1;
 		}
 		if (ey > clip.max_y+1)
-		{ /* clip bottom */
+		{ // clip bottom
 			ey = clip.max_y+1;
 		}
 
 		if (ex > sx)
-		{ /* skip if inner loop doesn't draw anything */
+		{ // skip if inner loop doesn't draw anything
 			int x, y;
 
-			/* taken from case 7: TRANSPARENCY_ALPHARANGE */
+			// taken from case 7: TRANSPARENCY_ALPHARANGE
 			for (y = sy; y < ey; y++)
 			{
 				const UINT8 *source = source_base + y_index*gfx->rowbytes();
@@ -157,12 +158,12 @@ void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,gfx_e
 					{
 						if (alpha[c] & 8)
 						{
-							/* Comp with clamp */
+							// Comp with clamp
 							dest[x] = jal_blend_func(dest[x], pal[c], alpha[c]);
 						}
 						else
 						{
-							/* Skip the costly alpha step altogether */
+							// Skip the costly alpha step altogether
 							dest[x] = pal[c];
 						}
 					}
@@ -171,7 +172,7 @@ void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,gfx_e
 				y_index += yinc;
 			}
 		}
-	}
+	}*/
 }
 
 void jal_blend_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,

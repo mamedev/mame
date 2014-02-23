@@ -8,7 +8,7 @@ public:
 	galpani2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bg8(*this, "bg8"),
-		m_palette(*this, "palette"),
+		m_palette_val(*this, "palette"),
 		m_bg8_scrollx(*this, "bg8_scrollx"),
 		m_bg8_scrolly(*this, "bg8_scrolly"),
 		m_bg15(*this, "bg15"),
@@ -24,7 +24,7 @@ public:
 		{ }
 
 	required_shared_ptr_array<UINT16, 2> m_bg8;
-	optional_shared_ptr_array<UINT16, 2> m_palette;
+	optional_shared_ptr_array<UINT16, 2> m_palette_val;
 	required_shared_ptr_array<UINT16, 2> m_bg8_scrollx;
 	required_shared_ptr_array<UINT16, 2> m_bg8_scrolly;
 	required_shared_ptr<UINT16> m_bg15;
@@ -53,7 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER(galpani2_oki2_bank_w);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(galpani2);
 	UINT32 screen_update_galpani2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt1);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt2);

@@ -1008,7 +1008,7 @@ if ( (m_debugsprites) && ( ((attr & 0x0300)>>8) != (m_debugsprites-1) ) ) { cont
 							color,
 							flipx,flipy,
 							(sx + x * xdim) / 0x10000, (sy + y * ydim) / 0x10000,
-							xscale, yscale, m_drawmode_table, machine().shadow_table);
+							xscale, yscale, m_drawmode_table, m_palette->shadow_table());
 			}
 		}
 #ifdef MAME_DEBUG
@@ -1162,7 +1162,7 @@ if ( (m_debugsprites) && ( ((attr & 0x0300)>>8) != (m_debugsprites-1) ) ) { cont
 							color,
 							flipx,flipy,
 							(sx + x * xdim) / 0x10000, (sy + y * ydim) / 0x10000,
-							xscale, yscale, m_drawmode_table, machine().shadow_table);
+							xscale, yscale, m_drawmode_table, m_palette->shadow_table());
 			}
 		}
 #ifdef MAME_DEBUG

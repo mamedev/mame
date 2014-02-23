@@ -116,8 +116,8 @@ void jpmimpct_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int s
 	for (x = params->heblnk; x < params->hsblnk; x += 2)
 	{
 		UINT16 pixels = vram[coladdr++ & 0xff];
-		dest[x + 0] = screen.m_palette->pen(pixels & 0xff);
-		dest[x + 1] = screen.m_palette->pen(pixels >> 8);
+		dest[x + 0] = state->m_palette->pen(pixels & 0xff);
+		dest[x + 1] = state->m_palette->pen(pixels >> 8);
 	}
 }
 

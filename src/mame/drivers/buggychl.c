@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 //  AM_RANGE(0xd60b, 0xd60b) // other inputs, not used?
 	AM_RANGE(0xd610, 0xd610) AM_WRITE(sound_command_w)
 	AM_RANGE(0xd618, 0xd618) AM_WRITENOP    /* accelerator clear */
-	AM_RANGE(0xd700, 0xd7ff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd700, 0xd7ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xd840, 0xd85f) AM_WRITEONLY AM_SHARE("scrollv")
 	AM_RANGE(0xdb00, 0xdbff) AM_WRITEONLY AM_SHARE("scrollh")
 	AM_RANGE(0xdc04, 0xdc04) AM_WRITEONLY /* should be fg scroll */
@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",buggychl,"palette")
 	MCFG_PALETTE_ADD("palette", 128+128)
-
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -70,7 +70,7 @@ WRITE16_MEMBER( galpani2_state::galpani2_bg8_1_w ) { galpani2_bg8_w(offset, data
 
 inline void galpani2_state::galpani2_palette_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
 {
-	UINT16 newword = COMBINE_DATA(&m_palette[_n_][offset]);
+	UINT16 newword = COMBINE_DATA(&m_palette_val[_n_][offset]);
 	m_palette->set_pen_color( offset + 0x4000 + _n_ * 0x100, pal5bit(newword >> 5), pal5bit(newword >> 10), pal5bit(newword >> 0) );
 }
 
