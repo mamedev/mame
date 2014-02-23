@@ -153,7 +153,9 @@ class towns_state : public driver_device
 	UINT8 m_towns_scsi_control;
 	UINT8 m_towns_scsi_status;
 	UINT8 m_towns_spkrdata;
-	UINT8 m_towns_speaker_input;
+	UINT8 m_pit_out0;
+	UINT8 m_pit_out1;
+	UINT8 m_pit_out2;
 	UINT8 m_timer0;
 	UINT8 m_timer1;
 

@@ -51,14 +51,13 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) {}
 	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
 
-	void set_my_port_device(midi_port_device *parent) { m_port = parent; }
-
 protected:
 	midi_port_device *m_port;
 };
 
 extern const device_type MIDI_PORT;
 
-SLOT_INTERFACE_EXTERN( default_midi_devices );
+SLOT_INTERFACE_EXTERN(midiin_slot);
+SLOT_INTERFACE_EXTERN(midiout_slot);
 
 #endif

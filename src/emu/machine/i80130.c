@@ -97,26 +97,19 @@ const rom_entry *i80130_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  pit8253_interface pit_intf
-//-------------------------------------------------
-
-static const struct pit8253_interface pit_intf =
-{
-	{
-		{ 0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, i80130_device, systick_w) },
-		{ 0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, i80130_device, delay_w) },
-		{ 0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, i80130_device, baud_w) }
-	}
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( i80130 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( i80130 )
 	MCFG_PIC8259_ADD("pic", DEVWRITELINE(DEVICE_SELF, i80130_device, irq_w), VCC, NULL)
-	MCFG_PIT8254_ADD("pit", pit_intf)
+
+	MCFG_DEVICE_ADD("pit", PIT8254, 0)
+	MCFG_PIT8253_CLK0(0)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(i80130_device, systick_w))
+	MCFG_PIT8253_CLK1(0)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(i80130_device, delay_w))
+	MCFG_PIT8253_CLK2(0)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(i80130_device, baud_w))
 MACHINE_CONFIG_END
 
 

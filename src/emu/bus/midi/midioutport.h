@@ -19,7 +19,7 @@ public:
 	midiout_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { if (m_midiout) m_midiout->tx(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { if (started()) m_midiout->tx(state); }
 
 protected:
 	virtual void device_start() { }

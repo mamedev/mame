@@ -107,15 +107,15 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 	m_extclk = BIT(data, 1);
 
 	// m_speaker gate
-	m_pit->gate0_w(BIT(data, 2));
+	m_pit->write_gate0(BIT(data, 2));
 
 	// m_speaker data
 	m_spkrdata = BIT(data, 3);
 	speaker_update();
 
 	// refresh and baud rate clocks
-	m_pit->gate1_w(BIT(data, 4));
-	m_pit->gate2_w(BIT(data, 4));
+	m_pit->write_gate1(BIT(data, 4));
+	m_pit->write_gate2(BIT(data, 4));
 
 	// FDC reset
 	if(BIT(data, 5))
@@ -428,25 +428,6 @@ WRITE_LINE_MEMBER( tandy2k_state::rfrqpulse_w )
 {
 }
 
-static const struct pit8253_interface pit_intf =
-{
-	{
-		{
-			XTAL_16MHz/16,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, outspkr_w)
-		}, {
-			XTAL_16MHz/8,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, intbrclk_w)
-		}, {
-			XTAL_16MHz/8,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, rfrqpulse_w)
-		}
-	}
-};
-
 // Intel 8255A Interface
 
 WRITE_LINE_MEMBER( tandy2k_state::write_centronics_ack )
@@ -708,7 +689,14 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_dsr))
 
-	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
+	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_16MHz/16)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(tandy2k_state, outspkr_w))
+	MCFG_PIT8253_CLK1(XTAL_16MHz/8)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(tandy2k_state, intbrclk_w))
+	MCFG_PIT8253_CLK2(XTAL_16MHz/8)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tandy2k_state, rfrqpulse_w))
+
 	MCFG_PIC8259_ADD(I8259A_0_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w), VCC, NULL)
 	MCFG_PIC8259_ADD(I8259A_1_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w), VCC, NULL)
 	MCFG_I8272A_ADD(I8272A_TAG, true)

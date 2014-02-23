@@ -49,25 +49,6 @@ WRITE_LINE_MEMBER( p1_state::p1_pit8253_out2_changed )
 	m_speaker->level_w(m_p1_spkrdata & m_p1_input);
 }
 
-const struct pit8253_interface p1_pit8253_config =
-{
-	{
-		{
-			XTAL_15MHz/12,              /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir0_w)
-		}, {
-			XTAL_15MHz/12,              /* keyboard poll -- XXX edge or level triggered? */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir6_w)
-		}, {
-			XTAL_15MHz/12,              /* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_pit8253_out2_changed)
-		}
-	}
-};
-
 // Keyboard (via PPI)
 
 WRITE8_MEMBER(p1_state::p1_ppi_porta_w)
@@ -137,7 +118,7 @@ READ8_MEMBER(p1_state::p1_ppi2_portc_r)
 
 WRITE8_MEMBER(p1_state::p1_ppi2_portb_w)
 {
-	m_pit8253->gate2_w(BIT(data, 0));
+	m_pit8253->write_gate2(BIT(data, 0));
 	p1_speaker_set_spkrdata( data & 0x02 );
 }
 
@@ -301,7 +282,13 @@ static MACHINE_CONFIG_START( poisk1, p1_state )
 	MCFG_MACHINE_START_OVERRIDE( p1_state, poisk1 )
 	MCFG_MACHINE_RESET_OVERRIDE( p1_state, poisk1 )
 
-	MCFG_PIT8253_ADD( "pit8253", p1_pit8253_config )
+	MCFG_DEVICE_ADD( "pit8253", PIT8253 ,0)
+	MCFG_PIT8253_CLK0(XTAL_15MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_15MHz/12) /* keyboard poll -- XXX edge or level triggered? */
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir6_w))
+	MCFG_PIT8253_CLK2(XTAL_15MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(p1_state, p1_pit8253_out2_changed))
 
 	MCFG_PIC8259_ADD( "pic8259", INPUTLINE(":maincpu", 0), VCC, NULL )
 

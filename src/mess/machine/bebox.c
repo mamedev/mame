@@ -681,28 +681,6 @@ WRITE_LINE_MEMBER(bebox_state::bebox_timer0_w)
 }
 
 
-const struct pit8253_interface bebox_pit8254_config =
-{
-	{
-		{
-			4772720/4,              /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_timer0_w)
-		},
-		{
-			4772720/4,              /* dram refresh */
-			DEVCB_NULL,
-			DEVCB_NULL
-		},
-		{
-			4772720/4,              /* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
-
 /*************************************
  *
  *  Flash ROM

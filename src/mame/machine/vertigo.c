@@ -22,28 +22,6 @@
 
 /* Result of the last ADC channel sampled */
 
-/* 8254 timer config */
-const struct pit8253_interface vertigo_pit8254_config =
-{
-	{
-		{
-			240000,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(vertigo_state,v_irq4_w)
-		}, {
-			240000,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(vertigo_state,v_irq3_w)
-		}, {
-			240000,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
-
-
 /*************************************
  *
  *  IRQ handling. The priority encoder

@@ -159,27 +159,6 @@ WRITE_LINE_MEMBER(pp01_state::pp01_pit_out1)
 {
 }
 
-const struct pit8253_interface pp01_pit8253_intf =
-{
-	{
-		{
-			0,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(pp01_state,pp01_pit_out0)
-		},
-		{
-			2000000,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(pp01_state,pp01_pit_out1)
-		},
-		{
-			2000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pit8253", pit8253_device, clk0_w)
-		}
-	}
-};
-
 READ8_MEMBER(pp01_state::pp01_8255_porta_r)
 {
 	return m_video_scroll;

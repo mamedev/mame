@@ -805,7 +805,13 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out2_changed))
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
@@ -920,7 +926,13 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 	MCFG_MACHINE_START_OVERRIDE(europc_pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(europc_pc_state,pc)
 
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out2_changed))
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
@@ -1000,7 +1012,13 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 	MCFG_MACHINE_START_OVERRIDE(tandy_pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out2_changed))
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
@@ -1069,7 +1087,13 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 	MCFG_MACHINE_START_OVERRIDE(tandy_pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(tandy_pc_state,tandy1000rl)
 
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out2_changed))
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
@@ -1139,7 +1163,13 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out2_changed))
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
@@ -1224,7 +1254,17 @@ static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pcjr)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pcjr)
 
-	MCFG_PIT8253_ADD( "pit8253", pcjr_pit8253_config )
+/*
+  On the PC Jr the input for clock 1 seems to be selectable
+  based on bit 4(/5?) written to output port A0h. This is not
+  supported yet.
+ */
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12)
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out2_changed))
 
 	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pc_state,pcjr_pic8259_set_int_line), VCC, NULL )
 
@@ -1314,7 +1354,17 @@ static MACHINE_CONFIG_START( asst128, pc_state )
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
-	MCFG_PIT8253_ADD( "pit8253", pcjr_pit8253_config )
+/*
+  On the PC Jr the input for clock 1 seems to be selectable
+  based on bit 4(/5?) written to output port A0h. This is not
+  supported yet.
+ */
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12)
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out2_changed))
 
 	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
@@ -1375,7 +1425,13 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out2_changed))
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
@@ -1438,7 +1494,13 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out2_changed))
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
@@ -1501,7 +1563,13 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out2_changed))
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
@@ -1564,7 +1632,13 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out2_changed))
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
@@ -1627,7 +1701,13 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
-	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc_state, ibm5150_pit8253_out2_changed))
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 

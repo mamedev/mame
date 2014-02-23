@@ -1410,12 +1410,12 @@ WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
 
 WRITE8_MEMBER(mz2500_state::timer_w)
 {
-	m_pit->gate0_w(1);
-	m_pit->gate1_w(1);
-	m_pit->gate0_w(0);
-	m_pit->gate1_w(0);
-	m_pit->gate0_w(1);
-	m_pit->gate1_w(1);
+	m_pit->write_gate0(1);
+	m_pit->write_gate1(1);
+	m_pit->write_gate0(0);
+	m_pit->write_gate1(0);
+	m_pit->write_gate0(1);
+	m_pit->write_gate1(1);
 }
 
 
@@ -2081,27 +2081,6 @@ WRITE_LINE_MEMBER(mz2500_state::pit8253_clk0_irq)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,m_irq_vector[1]);
 }
 
-static const struct pit8253_interface mz2500_pit8253_intf =
-{
-	{
-		{
-			31250,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(mz2500_state, pit8253_clk0_irq)
-		},
-		{
-			0,
-			DEVCB_NULL,
-			DEVCB_NULL
-		},
-		{
-			16, //CH2, trusted, used by Super MZ demo / The Black Onyx and a bunch of others (TODO: timing of this)
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pit", pit8253_device, clk1_w)
-		}
-	}
-};
-
 WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
 {
 	/* TODO: doesn't work yet */
@@ -2151,7 +2130,13 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
 	MCFG_Z80SIO0_ADD( "z80sio", 6000000, mz2500_sio_intf )
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
-	MCFG_PIT8253_ADD("pit", mz2500_pit8253_intf)
+
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(31250)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mz2500_state, pit8253_clk0_irq))
+	MCFG_PIT8253_CLK1(0)
+	MCFG_PIT8253_CLK2(16) //CH2, trusted, used by Super MZ demo / The Black Onyx and a bunch of others (TODO: timing of this)
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pit", pit8253_device, write_clk1))
 
 	MCFG_MB8877_ADD("mb8877a",mz2500_mb8877a_interface)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mz2500_floppy_interface)

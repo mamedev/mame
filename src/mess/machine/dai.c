@@ -80,27 +80,6 @@ I8255A_INTERFACE( dai_ppi82555_intf )
 	DEVCB_NULL  /* Port C write */
 };
 
-const struct pit8253_interface dai_pit8253_intf =
-{
-	{
-		{
-			2000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("custom", dai_sound_device, set_input_ch0),
-		},
-		{
-			2000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("custom", dai_sound_device, set_input_ch1),
-		},
-		{
-			2000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("custom", dai_sound_device, set_input_ch2),
-		}
-	}
-};
-
 IRQ_CALLBACK_MEMBER(dai_state::int_ack)
 {
 	return m_tms5501->get_vector();

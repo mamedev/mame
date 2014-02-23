@@ -168,7 +168,7 @@ WRITE8_MEMBER( europc_pc_state::europc_pio_w )
 		m_port61=data;
 //      if (data == 0x30) pc1640.port62 = (pc1640.port65 & 0x10) >> 4;
 //      else if (data == 0x34) pc1640.port62 = pc1640.port65 & 0xf;
-		space.machine().device<pit8253_device>("pit8253")->gate2_w(BIT(data, 0));
+		m_pit8253->write_gate2(BIT(data, 0));
 		pc_speaker_set_spkrdata(BIT(data, 1));
 		pc_keyb_set_clock(BIT(data, 6));
 		break;
@@ -191,7 +191,7 @@ READ8_MEMBER( europc_pc_state::europc_pio_r )
 		data = m_port61;
 		break;
 	case 2:
-		if (space.machine().device<pit8253_device>("pit8253")->get_output(2))
+		if (m_pit_out2)
 			data |= 0x20;
 		break;
 	}

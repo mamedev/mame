@@ -1747,31 +1747,6 @@ WRITE_LINE_MEMBER(pc88va_state::pc88va_pit_out0_changed)
 	}
 }
 
-static const struct pit8253_interface pc88va_pit8253_config =
-{
-	{
-		{
-			/* general purpose timer 1 */
-			8000000,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(pc88va_state, pc88va_pit_out0_changed)
-		},
-		{
-			/* BEEP frequency setting */
-			8000000,
-			DEVCB_NULL,
-			DEVCB_NULL
-		},
-		{
-			/* RS232C baud rate setting  */
-			8000000,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
-
 void pc88va_state::fdc_drq(bool state)
 {
 	printf("%02x DRQ\n",state);
@@ -1895,7 +1870,11 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88va_floppies, "525hd", pc88va_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")
 
-	MCFG_PIT8253_ADD("pit8253",pc88va_pit8253_config)
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(8000000) /* general purpose timer 1 */
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(pc88va_state, pc88va_pit_out0_changed))
+	MCFG_PIT8253_CLK1(8000000) /* BEEP frequency setting */
+	MCFG_PIT8253_CLK2(8000000) /* RS232C baud rate setting */
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym", YM2203, 3993600) //unknown clock / divider

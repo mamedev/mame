@@ -145,25 +145,6 @@ static DEVICE_INPUT_DEFAULTS_START( isbc286_terminal )
 	DEVICE_INPUT_DEFAULTS( "TERM_STOPBITS", 0xff, 0x01 ) // 1
 DEVICE_INPUT_DEFAULTS_END
 
-static const struct pit8253_interface isbc86_pit_config =
-{
-	{
-		{
-			XTAL_22_1184MHz/18,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic_0", pic8259_device, ir0_w)
-		}, {
-			XTAL_22_1184MHz/18,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			XTAL_22_1184MHz/18,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(isbc_state, isbc86_tmr2_w)
-		}
-	}
-};
-
 WRITE_LINE_MEMBER( isbc_state::isbc86_tmr2_w )
 {
 	m_uart8251->write_rxc(state);
@@ -187,25 +168,6 @@ READ8_MEMBER( isbc_state::get_slave_ack )
 
 	return 0x00;
 }
-
-static const struct pit8253_interface isbc286_pit_config =
-{
-	{
-		{
-			XTAL_22_1184MHz/18,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic_0", pic8259_device, ir0_w)
-		}, {
-			XTAL_22_1184MHz/18,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("uart8274", z80dart_device, rxtxcb_w)
-		}, {
-			XTAL_22_1184MHz/18,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(isbc_state, isbc286_tmr2_w)
-		}
-	}
-};
 
 WRITE_LINE_MEMBER( isbc_state::isbc286_tmr2_w )
 {
@@ -274,7 +236,14 @@ static MACHINE_CONFIG_START( isbc86, isbc_state )
 	MCFG_CPU_PROGRAM_MAP(isbc86_mem)
 	MCFG_CPU_IO_MAP(isbc_io)
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NULL)
-	MCFG_PIT8253_ADD("pit", isbc86_pit_config)
+
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_22_1184MHz/18)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_22_1184MHz/18)
+	MCFG_PIT8253_CLK2(XTAL_22_1184MHz/18)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc86_tmr2_w))
+
 	MCFG_I8255A_ADD("ppi", isbc86_ppi_interface)
 
 	MCFG_DEVICE_ADD("uart8251", I8251, 0)
@@ -310,7 +279,15 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_CPU_IO_MAP(isbc286_io)
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, READ8(isbc_state, get_slave_ack))
 	MCFG_PIC8259_ADD("pic_1", DEVWRITELINE("pic_0", pic8259_device, ir7_w), GND, NULL)
-	MCFG_PIT8254_ADD("pit", isbc286_pit_config)
+
+	MCFG_DEVICE_ADD("pit", PIT8254, 0)
+	MCFG_PIT8253_CLK0(XTAL_22_1184MHz/18)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_22_1184MHz/18)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxtxcb_w))
+	MCFG_PIT8253_CLK2(XTAL_22_1184MHz/18)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc286_tmr2_w))
+
 	MCFG_I8255A_ADD("ppi", isbc286_ppi_interface)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")

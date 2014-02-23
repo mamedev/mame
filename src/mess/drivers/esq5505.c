@@ -127,8 +127,6 @@
 #include <cstdio>
 
 #include "bus/midi/midi.h"
-#include "bus/midi/midiinport.h"
-#include "bus/midi/midioutport.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/es5506.h"
 #include "sound/esqpump.h"
@@ -629,14 +627,6 @@ static const esqpanel_interface esqpanel_config =
 	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_b_w),
 	DEVCB_DRIVER_MEMBER16(esq5505_state, analog_w)
 };
-
-static SLOT_INTERFACE_START(midiin_slot)
-	SLOT_INTERFACE("midiin", MIDIIN_PORT)
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START(midiout_slot)
-	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
-SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)

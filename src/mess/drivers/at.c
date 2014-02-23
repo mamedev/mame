@@ -336,7 +336,12 @@ static MACHINE_CONFIG_FRAGMENT( at_motherboard )
 	MCFG_MACHINE_START_OVERRIDE(at_state, at )
 	MCFG_MACHINE_RESET_OVERRIDE(at_state, at )
 
-	MCFG_PIT8254_ADD( "pit8254", at_pit8254_config )
+	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
+	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(at_state, at_pit8254_out0_changed))
+	MCFG_PIT8253_CLK1(4772720/4) /* dram refresh */
+	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(at_state, at_pit8254_out2_changed))
 
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, at_dma8237_1_config )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )

@@ -9,8 +9,6 @@
 #include "a2midi.h"
 #include "machine/clock.h"
 #include "bus/midi/midi.h"
-#include "bus/midi/midiinport.h"
-#include "bus/midi/midioutport.h"
 
 
 /***************************************************************************
@@ -33,14 +31,6 @@ static struct ptm6840_interface ptm_interface =
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, a2bus_midi_device, ptm_irq_w)
 };
-
-static SLOT_INTERFACE_START(midiin_slot)
-	SLOT_INTERFACE("midiin", MIDIIN_PORT)
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START(midiout_slot)
-	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
-SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( midi )
 	MCFG_PTM6840_ADD(MIDI_PTM_TAG, ptm_interface)

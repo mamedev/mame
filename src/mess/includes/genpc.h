@@ -60,7 +60,7 @@ public:
 	int m_dma_channel;
 	UINT8 m_dma_offset[4];
 	UINT8 m_pc_spkrdata;
-	UINT8 m_pc_input;
+	UINT8 m_pit_out2;
 	bool m_cur_eop;
 
 	UINT8 m_nmi_enabled;

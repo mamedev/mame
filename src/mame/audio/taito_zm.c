@@ -117,6 +117,7 @@ ADDRESS_MAP_START( taitozoom_mn_map, AS_PROGRAM, 16, driver_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( taitozoom_mn_io_map, AS_IO, 8, driver_device )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(MN10200_PORT1, MN10200_PORT1) AM_DEVREADWRITE("taito_zoom", taito_zoom_device, tms_ctrl_r, tms_ctrl_w)
 ADDRESS_MAP_END
 

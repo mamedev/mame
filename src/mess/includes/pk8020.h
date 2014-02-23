@@ -96,6 +96,5 @@ protected:
 extern const i8255_interface pk8020_ppi8255_interface_1;
 extern const i8255_interface pk8020_ppi8255_interface_2;
 extern const i8255_interface pk8020_ppi8255_interface_3;
-extern const struct pit8253_interface pk8020_pit8253_intf;
 
 #endif /* pk8020_H_ */

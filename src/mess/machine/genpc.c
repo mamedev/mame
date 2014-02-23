@@ -190,7 +190,7 @@ I8237_INTERFACE( pc_dma8237_config )
 WRITE_LINE_MEMBER(ibm5160_mb_device::pc_speaker_set_spkrdata)
 {
 	m_pc_spkrdata = state ? 1 : 0;
-	m_speaker->level_w(m_pc_spkrdata & m_pc_input);
+	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
 
 
@@ -214,29 +214,10 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out1_changed )
 
 WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out2_changed )
 {
-	m_pc_input = state ? 1 : 0;
-	m_speaker->level_w(m_pc_spkrdata & m_pc_input);
+	m_pit_out2 = state ? 1 : 0;
+	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
 
-
-const struct pit8253_interface pc_pit8253_config =
-{
-	{
-		{
-			XTAL_14_31818MHz/12,                /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir0_w)
-		}, {
-			XTAL_14_31818MHz/12,                /* dram refresh */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_pit8253_out1_changed)
-		}, {
-			XTAL_14_31818MHz/12,                /* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_pit8253_out2_changed)
-		}
-	}
-};
 
 /**********************************************************
  *
@@ -370,7 +351,6 @@ READ8_MEMBER (ibm5160_mb_device::pc_ppi_porta_r)
 
 READ8_MEMBER ( ibm5160_mb_device::pc_ppi_portc_r )
 {
-	int timer2_output = m_pit8253->get_output(2);
 	int data=0xff;
 
 	data&=~0x80; // no parity error
@@ -391,9 +371,9 @@ READ8_MEMBER ( ibm5160_mb_device::pc_ppi_portc_r )
 
 	if ( m_ppi_portb & 0x01 )
 	{
-		data = ( data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
+		data = ( data & ~0x10 ) | ( m_pit_out2 ? 0x10 : 0x00 );
 	}
-	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
+	data = ( data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
 
 	return data;
 }
@@ -406,7 +386,7 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_ppi_portb_w )
 	m_ppi_portc_switch_high = data & 0x08;
 	m_ppi_keyboard_clear = data & 0x80;
 	m_ppi_keyb_clock = data & 0x40;
-	m_pit8253->gate2_w(BIT(data, 0));
+	m_pit8253->write_gate2(BIT(data, 0));
 	pc_speaker_set_spkrdata( data & 0x02 );
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
@@ -492,7 +472,13 @@ const device_type IBM5160_MOTHERBOARD = &device_creator<ibm5160_mb_device>;
 //**************************************************************************
 
 static MACHINE_CONFIG_FRAGMENT( ibm5160_mb_config )
-	MCFG_PIT8253_ADD( "pit8253", pc_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(ibm5160_mb_device, pc_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ibm5160_mb_device, pc_pit8253_out2_changed))
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, pc_dma8237_config )
 
@@ -685,7 +671,7 @@ void ibm5160_mb_device::device_reset()
 	m_u73_q2 = 0;
 	m_out1 = 2; // initial state of pit output is undefined
 	m_pc_spkrdata = 0;
-	m_pc_input = 0;
+	m_pit_out2 = 0;
 	m_dma_channel = -1;
 	m_cur_eop = false;
 	memset(m_dma_offset,0,sizeof(m_dma_offset));
@@ -807,7 +793,6 @@ READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
 
 READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 {
-	int timer2_output = m_pit8253->get_output(2);
 	int data=0xff;
 
 	data&=~0x80; // no parity error
@@ -865,10 +850,10 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 	{
 		if ( m_ppi_portb & 0x01 )
 		{
-			data = ( data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
+			data = ( data & ~0x10 ) | ( m_pit_out2 ? 0x10 : 0x00 );
 		}
 	}
-	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
+	data = ( data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
 
 	return data;
 }
@@ -881,7 +866,7 @@ WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
 	m_ppi_portc_switch_high = data & 0x08;
 	m_ppi_keyboard_clear = data & 0x80;
 	m_ppi_keyb_clock = data & 0x40;
-	m_pit8253->gate2_w(BIT(data, 0));
+	m_pit8253->write_gate2(BIT(data, 0));
 	pc_speaker_set_spkrdata( data & 0x02 );
 
 	m_cassette->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
@@ -992,7 +977,7 @@ WRITE8_MEMBER( ec1841_mb_device::pc_ppi_portb_w )
 	m_ppi_portc_switch_high = data & 0x04;
 	m_ppi_keyboard_clear = data & 0x80;
 	m_ppi_keyb_clock = data & 0x40;
-	m_pit8253->gate2_w(BIT(data, 0));
+	m_pit8253->write_gate2(BIT(data, 0));
 	pc_speaker_set_spkrdata( data & 0x02 );
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
@@ -1010,7 +995,6 @@ WRITE8_MEMBER( ec1841_mb_device::pc_ppi_portb_w )
 
 READ8_MEMBER ( ec1841_mb_device::pc_ppi_portc_r )
 {
-	int timer2_output = m_pit8253->get_output(2);
 	int data=0xff;
 
 	data&=~0x80; // no parity error
@@ -1021,7 +1005,7 @@ READ8_MEMBER ( ec1841_mb_device::pc_ppi_portc_r )
 		data = (data & 0xf0) | (ioport("SA2")->read() & 0x0f);
 	}
 
-	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
+	data = ( data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
 
 	return data;
 }

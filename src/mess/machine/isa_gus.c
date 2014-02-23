@@ -7,8 +7,6 @@
 
 #include "isa_gus.h"
 #include "bus/midi/midi.h"
-#include "bus/midi/midiinport.h"
-#include "bus/midi/midioutport.h"
 #include "machine/clock.h"
 
 
@@ -1224,14 +1222,6 @@ void gf1_device::eop_w(int state)
 
 
 /* 16-bit ISA card device implementation */
-
-static SLOT_INTERFACE_START(midiin_slot)
-	SLOT_INTERFACE("midiin", MIDIIN_PORT)
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START(midiout_slot)
-	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
-SLOT_INTERFACE_END
 
 static const gf1_interface gus_gf1_config =
 {

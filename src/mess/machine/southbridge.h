@@ -111,7 +111,7 @@ public:
 		DECLARE_WRITE8_MEMBER(pc_dma_write_word);
 protected:
 		UINT8 m_at_spkrdata;
-		UINT8 m_at_speaker_input;
+		UINT8 m_pit_out2;
 		int m_dma_channel;
 		bool m_cur_eop;
 		UINT8 m_dma_offset[2][4];
@@ -120,7 +120,6 @@ protected:
 		UINT8 m_at_speaker;
 		bool m_refresh;
 		void at_speaker_set_spkrdata(UINT8 data);
-		void at_speaker_set_input(UINT8 data);
 
 		UINT8 m_channel_check;
 		UINT8 m_nmi_enabled;

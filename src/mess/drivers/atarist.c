@@ -3,8 +3,6 @@
 #include "includes/atarist.h"
 #include "machine/clock.h"
 #include "bus/midi/midi.h"
-#include "bus/midi/midiinport.h"
-#include "bus/midi/midioutport.h"
 #include "video/atarist.h"
 
 /*
@@ -1953,25 +1951,6 @@ static RP5C15_INTERFACE( rtc_intf )
 	DEVCB_NULL,
 	DEVCB_NULL
 };
-
-
-//-------------------------------------------------
-//  SLOT_INTERFACE( midiin_slot )
-//-------------------------------------------------
-
-static SLOT_INTERFACE_START( midiin_slot )
-	SLOT_INTERFACE("midiin", MIDIIN_PORT)
-SLOT_INTERFACE_END
-
-
-//-------------------------------------------------
-//  SLOT_INTERFACE( midiout_slot )
-//-------------------------------------------------
-
-static SLOT_INTERFACE_START( midiout_slot )
-	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
-SLOT_INTERFACE_END
-
 
 
 //**************************************************************************

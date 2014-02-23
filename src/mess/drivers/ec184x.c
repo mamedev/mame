@@ -138,28 +138,6 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 	m_memory.enable[offset] = data;
 }
 
-#if 0
-const struct pit8253_interface ec1841_pit8253_config =
-{
-	{
-		{
-			XTAL_4MHz/4,                /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir0_w)
-		}, {
-			XTAL_4MHz/4,                /* dram refresh */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_pit8253_out1_changed)
-		}, {
-			XTAL_4MHz/4,                /* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_pit8253_out2_changed)
-		}
-	}
-};
-#endif
-
-
 DRIVER_INIT_MEMBER( ec184x_state, ec184x )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);

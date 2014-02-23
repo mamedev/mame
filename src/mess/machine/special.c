@@ -151,9 +151,9 @@ void special_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		break;
 	case TIMER_PIT8253_GATES:
 	{
-		m_pit->gate0_w(0);
-		m_pit->gate1_w(0);
-		m_pit->gate2_w(0);
+		m_pit->write_gate0(0);
+		m_pit->write_gate1(0);
+		m_pit->write_gate2(0);
 		break;
 	}
 	default:
@@ -250,28 +250,6 @@ WRITE_LINE_MEMBER( special_state::specimx_pit8253_out2_changed )
 	m_specimx_audio->set_input( 2, state );
 }
 
-
-
-const struct pit8253_interface specimx_pit8253_intf =
-{
-	{
-		{
-			2000000,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(special_state, specimx_pit8253_out0_changed)
-		},
-		{
-			2000000,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(special_state, specimx_pit8253_out1_changed)
-		},
-		{
-			2000000,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(special_state, specimx_pit8253_out2_changed)
-		}
-	}
-};
 
 MACHINE_START_MEMBER(special_state,specimx)
 {

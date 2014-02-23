@@ -369,12 +369,12 @@ WRITE8_MEMBER(mz2000_state::mz2000_fdc_w)
 
 WRITE8_MEMBER(mz2000_state::timer_w)
 {
-	m_pit8253->gate0_w(1);
-	m_pit8253->gate1_w(1);
-	m_pit8253->gate0_w(0);
-	m_pit8253->gate1_w(0);
-	m_pit8253->gate0_w(1);
-	m_pit8253->gate1_w(1);
+	m_pit8253->write_gate0(1);
+	m_pit8253->write_gate1(1);
+	m_pit8253->write_gate0(0);
+	m_pit8253->write_gate1(0);
+	m_pit8253->write_gate0(1);
+	m_pit8253->write_gate1(1);
 }
 
 WRITE8_MEMBER(mz2000_state::mz2000_tvram_attr_w)
@@ -827,31 +827,6 @@ static const floppy_interface mz2000_floppy_interface =
 	NULL
 };
 
-/* PIT8253 Interface */
-
-/* TODO: clocks aren't known */
-static const struct pit8253_interface mz2000_pit8253_intf =
-{
-	{
-		{
-			31250,
-			DEVCB_NULL,
-			DEVCB_NULL
-		},
-		{
-			31250, /* needed by "Art Magic" to boot */
-			DEVCB_NULL,
-			DEVCB_NULL
-		},
-		{
-			31250,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
-
 static const cassette_interface mz2000_cassette_interface =
 {
 	mz700_cassette_formats,
@@ -870,7 +845,12 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 
 	MCFG_I8255_ADD( "i8255_0", ppi8255_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", MASTER_CLOCK, mz2000_pio1_intf )
-	MCFG_PIT8253_ADD("pit", mz2000_pit8253_intf)
+
+	/* TODO: clocks aren't known */
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(31250)
+	MCFG_PIT8253_CLK1(31250) /* needed by "Art Magic" to boot */
+	MCFG_PIT8253_CLK2(31250)
 
 	MCFG_MB8877_ADD("mb8877a",mz2000_mb8877a_interface)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(mz2000_floppy_interface)

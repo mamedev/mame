@@ -2,6 +2,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/mc146818.h"
+#include "machine/8042kbdc.h"
 
 class pcat_base_state : public driver_device
 {
@@ -14,7 +15,10 @@ public:
 		m_pic8259_1(*this, "pic8259_1"),
 		m_pic8259_2(*this, "pic8259_2"),
 		m_pit8254(*this, "pit8254"),
-		m_mc146818(*this, "rtc") { }
+		m_mc146818(*this, "rtc"),
+		m_kbdc(*this, "kbdc")
+	{
+	}
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -25,6 +29,7 @@ public:
 	required_device<pic8259_device> m_pic8259_2;
 	required_device<pit8254_device> m_pit8254;
 	required_device<mc146818_device> m_mc146818;
+	required_device<kbdc8042_device> m_kbdc;
 
 	DECLARE_READ8_MEMBER(at_dma8237_2_r);
 	DECLARE_WRITE8_MEMBER(at_dma8237_2_w);
@@ -39,12 +44,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
 	DECLARE_READ8_MEMBER( get_slave_ack );
-	DECLARE_WRITE_LINE_MEMBER( at_pit8254_out0_changed );
 	DECLARE_WRITE_LINE_MEMBER( at_pit8254_out2_changed );
-	DECLARE_READ8_MEMBER(get_out2);
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
+	int m_pit_out2;
 };
 
 ADDRESS_MAP_EXTERN(pcat32_io_common, 32);

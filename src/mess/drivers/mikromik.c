@@ -558,10 +558,6 @@ static I8237_INTERFACE( dmac_intf )
 };
 
 
-//-------------------------------------------------
-//  pit8253_config pit_intf
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( mm1_state::itxc_w )
 {
 	if (!m_intc)
@@ -583,26 +579,6 @@ WRITE_LINE_MEMBER( mm1_state::auxc_w )
 	m_mpsc->txcb_w(state);
 	m_mpsc->rxcb_w(state);
 }
-
-static const struct pit8253_interface pit_intf =
-{
-	{
-		{
-			XTAL_6_144MHz/2/2,
-			DEVCB_LINE_VCC,
-			DEVCB_DRIVER_LINE_MEMBER(mm1_state, itxc_w)
-		}, {
-			XTAL_6_144MHz/2/2,
-			DEVCB_LINE_VCC,
-			DEVCB_DRIVER_LINE_MEMBER(mm1_state, irxc_w)
-		}, {
-			XTAL_6_144MHz/2/2,
-			DEVCB_LINE_VCC,
-			DEVCB_DRIVER_LINE_MEMBER(mm1_state, auxc_w)
-		}
-	}
-};
-
 
 //-------------------------------------------------
 //  UPD7201_INTERFACE( mpsc_intf )
@@ -749,7 +725,15 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	// peripheral hardware
 	MCFG_I8212_ADD(I8212_TAG, iop_intf)
 	MCFG_I8237_ADD(I8237_TAG, XTAL_6_144MHz/2, dmac_intf)
-	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
+
+	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_6_144MHz/2/2)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mm1_state, itxc_w))
+	MCFG_PIT8253_CLK1(XTAL_6_144MHz/2/2)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(mm1_state, irxc_w))
+	MCFG_PIT8253_CLK2(XTAL_6_144MHz/2/2)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mm1_state, auxc_w))
+
 	MCFG_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2 */ true, true)
 	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mpsc_intf)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats)

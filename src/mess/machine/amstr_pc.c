@@ -183,7 +183,7 @@ WRITE8_MEMBER( amstrad_pc_state::pc1640_port60_w )
 		m_port61=data;
 		if (data==0x30) m_port62=(m_port65&0x10)>>4;
 		else if (data==0x34) m_port62=m_port65&0xf;
-		machine().device<pit8253_device>("pit8253")->gate2_w(BIT(data, 0));
+		m_pit8253->write_gate2(BIT(data, 0));
 		pc_speaker_set_spkrdata( data & 0x02 );
 		pc_keyb_set_clock(data&0x40);
 		break;
@@ -221,7 +221,7 @@ READ8_MEMBER( amstrad_pc_state::pc1640_port60_r )
 
 	case 2:
 		data = m_port62;
-		if (machine().device<pit8253_device>("pit8253")->get_output(2))
+		if (m_pit_out2)
 			data |= 0x20;
 		break;
 	}

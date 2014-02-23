@@ -264,27 +264,6 @@ WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_out1 )
 		set_pc_interrupt(PC_IRQ_TIMERB, 1);
 }
 
-static const struct pit8253_interface d8253_intf =
-{
-	{
-		{
-			XTAL_4MHz / 8,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, d8253_out0)
-		},
-		{
-			0,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, d8253_out1)
-		},
-		{
-			XTAL_4MHz / 2,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("d8253", pit8253_device, clk1_w)
-		}
-	}
-};
-
 
 //-------------------------------------------------
 //  uPD71051 USART
@@ -324,7 +303,13 @@ static MACHINE_CONFIG_FRAGMENT( ibm_mfc )
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL_4MHz / 8) // 500KHz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(isa8_ibm_mfc_device, write_usart_clock))
 
-	MCFG_PIT8253_ADD("d8253", d8253_intf)
+	MCFG_DEVICE_ADD("d8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_4MHz / 8)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(isa8_ibm_mfc_device, d8253_out0))
+	MCFG_PIT8253_CLK1(0)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(isa8_ibm_mfc_device, d8253_out1))
+	MCFG_PIT8253_CLK2(XTAL_4MHz / 2)
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("d8253", pit8253_device, write_clk1))
 
 	MCFG_SPEAKER_STANDARD_STEREO("ymleft", "ymright")
 	MCFG_YM2151_ADD("ym2151", XTAL_4MHz)

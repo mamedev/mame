@@ -510,34 +510,11 @@ WRITE_LINE_MEMBER( compis_state::tmr2_w )
 }
 
 
-//-------------------------------------------------
-//  pit8253_interface pit_intf
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( compis_state::tmr3_w )
-{
-	m_mpsc->rxtxcb_w(state);
-}
-
-WRITE_LINE_MEMBER( compis_state::tmr4_w )
-{
-}
-
 WRITE_LINE_MEMBER( compis_state::tmr5_w )
 {
 	m_mpsc->rxca_w(state);
 	m_mpsc->txca_w(state);
 }
-
-static const struct pit8253_interface pit_intf =
-{
-	{
-		{ XTAL_16MHz/8, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(compis_state, tmr3_w) },
-		{ XTAL_16MHz/8, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(compis_state, tmr4_w) },
-		{ XTAL_16MHz/8, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(compis_state, tmr5_w) }
-	}
-};
-
 
 //-------------------------------------------------
 //  I8255A_INTERFACE( ppi_intf )
@@ -751,7 +728,14 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	//MCFG_I80130_SYSTICK_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir3_w))
 	MCFG_I80130_DELAY_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir7_w))
 	MCFG_I80130_BAUD_CALLBACK(DEVWRITELINE(DEVICE_SELF, compis_state, tmr2_w))
-	MCFG_PIT8253_ADD(I8253_TAG, pit_intf )
+
+	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_16MHz/8)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8274_TAG, i8274_device, rxtxcb_w))
+	MCFG_PIT8253_CLK1(XTAL_16MHz/8)
+	MCFG_PIT8253_CLK2(XTAL_16MHz/8)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(compis_state, tmr5_w))
+
 	MCFG_I8255_ADD(I8255_TAG, ppi_intf )
 
 	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)

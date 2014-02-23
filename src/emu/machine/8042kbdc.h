@@ -42,7 +42,6 @@ struct kbdc8042_interface
 	devcb_write_line    m_output_buffer_empty_cb;
 
 	devcb_write8        m_speaker_cb;
-	devcb_read8         m_getout2_cb;
 };
 
 // ======================> kbdc8042_device
@@ -57,12 +56,15 @@ public:
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
 
+	DECLARE_WRITE_LINE_MEMBER( write_out2 );
+
 	void at_8042_set_outport(UINT8 data, int initial);
 	TIMER_CALLBACK_MEMBER( kbdc8042_time );
 	TIMER_CALLBACK_MEMBER( kbdc8042_clr_int );
 	void at_8042_receive(UINT8 data);
 	void at_8042_check_keyboard();
 	void at_8042_clear_keyboard_received();
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -88,6 +90,7 @@ protected:
 	int m_status_read_mode;
 
 	int m_speaker;
+	int m_out2;
 
 	/* temporary hack */
 	int m_offset1;
@@ -100,7 +103,6 @@ protected:
 	devcb_resolved_write_line   m_output_buffer_empty_func;
 
 	devcb_resolved_write8       m_speaker_func;
-	devcb_resolved_read8        m_getout2_func;
 };
 
 // device type definition

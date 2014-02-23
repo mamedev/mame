@@ -12,8 +12,6 @@
 #include "midi_namesoft.h"
 #include "machine/clock.h"
 #include "bus/midi/midi.h"
-#include "bus/midi/midiinport.h"
-#include "bus/midi/midioutport.h"
 
 
 
@@ -37,28 +35,11 @@ WRITE_LINE_MEMBER( c64_namesoft_midi_cartridge_device::acia_irq_w )
 	m_slot->nmi_w(state);
 }
 
-//-------------------------------------------------
-//  SLOT_INTERFACE( midiin_slot )
-//-------------------------------------------------
-
-static SLOT_INTERFACE_START( midiin_slot )
-	SLOT_INTERFACE("midiin", MIDIIN_PORT)
-SLOT_INTERFACE_END
-
 WRITE_LINE_MEMBER( c64_namesoft_midi_cartridge_device::write_acia_clock )
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);
 }
-
-
-//-------------------------------------------------
-//  SLOT_INTERFACE( midiout_slot )
-//-------------------------------------------------
-
-static SLOT_INTERFACE_START( midiout_slot )
-	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
-SLOT_INTERFACE_END
 
 
 //-------------------------------------------------

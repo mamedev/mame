@@ -153,7 +153,6 @@ protected:
 
 /*----------- defined in machine/pmd85.c -----------*/
 
-extern const struct pit8253_interface pmd85_pit8253_interface;
 extern const i8255_interface pmd85_ppi8255_interface[4];
 extern const i8255_interface alfa_ppi8255_interface[3];
 extern const i8255_interface mato_ppi8255_interface;

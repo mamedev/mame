@@ -10,9 +10,6 @@
 ***************************************************************************/
 
 #include "isa_sblaster.h"
-#include "bus/midi/midi.h"
-#include "bus/midi/midiinport.h"
-#include "bus/midi/midioutport.h"
 #include "sound/speaker.h"
 #include "sound/3812intf.h"
 #include "sound/262intf.h"
@@ -62,14 +59,6 @@ static const int m_cmd_fifo_length[256] =
 };
 
 static const int protection_magic[4] = { 0x96, 0xa5, 0x69, 0x5a };
-
-static SLOT_INTERFACE_START(midiin_slot)
-	SLOT_INTERFACE("midiin", MIDIIN_PORT)
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START(midiout_slot)
-	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
-SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

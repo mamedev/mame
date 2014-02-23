@@ -158,7 +158,6 @@ NOTES (2011-08-08)
 ********************************************************************************/
 
 #include "includes/sorcerer.h"
-#include "bus/centronics/covox.h"
 
 static ADDRESS_MAP_START( sorcerer_mem, AS_PROGRAM, 8, sorcerer_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -399,9 +398,9 @@ static const ay31015_config sorcerer_ay31015_config =
 
 static const cassette_interface sorcerer_cassette_interface =
 {
-	cassette_default_formats,
+	sorcerer_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
 	"sorcerer_cass",
 	NULL
 };

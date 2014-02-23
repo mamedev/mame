@@ -212,7 +212,7 @@ protected:
 	bool m_cur_eop;
 	UINT8 m_dma_offset[4];
 	UINT8 m_pc_spkrdata;
-	UINT8 m_pc_input;
+	UINT8 m_pit_out2;
 
 	int m_ppi_portc_switch_high;
 	int m_ppi_speaker;
@@ -683,7 +683,7 @@ void pasogo_state::machine_reset()
 	m_u73_q2 = 0;
 	m_out1 = 2; // initial state of pit output is undefined
 	m_pc_spkrdata = 0;
-	m_pc_input = 0;
+	m_pit_out2 = 0;
 	m_dma_channel = -1;
 	m_cur_eop = false;
 }
@@ -692,7 +692,7 @@ void pasogo_state::machine_reset()
 WRITE_LINE_MEMBER(pasogo_state::speaker_set_spkrdata)
 {
 	m_pc_spkrdata = state ? 1 : 0;
-	m_speaker->level_w(m_pc_spkrdata & m_pc_input);
+	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
 
 
@@ -710,29 +710,9 @@ WRITE_LINE_MEMBER( pasogo_state::pit8253_out1_changed )
 
 WRITE_LINE_MEMBER( pasogo_state::pit8253_out2_changed )
 {
-	m_pc_input = state ? 1 : 0;
-	m_speaker->level_w(m_pc_spkrdata & m_pc_input);
+	m_pit_out2 = state ? 1 : 0;
+	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
-
-
-static const pit8253_interface pc_pit8254_config =
-{
-	{
-		{
-			4772720/4,              /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir0_w)
-		}, {
-			4772720/4,              /* dram refresh */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(pasogo_state, pit8253_out1_changed)
-		}, {
-			4772720/4,              /* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(pasogo_state, pit8253_out2_changed)
-		}
-	}
-};
 
 
 READ8_MEMBER( pasogo_state::page_r )
@@ -906,7 +886,6 @@ READ8_MEMBER (pasogo_state::ppi_porta_r)
 
 READ8_MEMBER ( pasogo_state::ppi_portc_r )
 {
-	int timer2_output = m_pit8253->get_output(2);
 	int data=0xff;
 
 	data&=~0x80; // no parity error
@@ -925,9 +904,9 @@ READ8_MEMBER ( pasogo_state::ppi_portc_r )
 
 	if ( m_ppi_portb & 0x01 )
 	{
-		data = ( data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
+		data = ( data & ~0x10 ) | ( m_pit_out2 ? 0x10 : 0x00 );
 	}
-	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
+	data = ( data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
 
 	return data;
 }
@@ -940,7 +919,7 @@ WRITE8_MEMBER( pasogo_state::ppi_portb_w )
 	m_ppi_portc_switch_high = data & 0x08;
 	m_ppi_keyboard_clear = data & 0x80;
 	m_ppi_keyb_clock = data & 0x40;
-	m_pit8253->gate2_w(BIT(data, 0));
+	m_pit8253->write_gate2(BIT(data, 0));
 	speaker_set_spkrdata( data & 0x02 );
 
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
@@ -980,7 +959,13 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_CPU_IO_MAP( pasogo_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
 
-	MCFG_PIT8254_ADD( "pit8254", pc_pit8254_config )
+	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
+	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(4772720/4) /* dram refresh */
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pasogo_state, pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pasogo_state, pit8253_out2_changed))
 
 	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pasogo_state, pasogo_pic8259_set_int_line), VCC, NULL )
 

@@ -12,7 +12,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	WRITE_LINE_MEMBER( read ) { output_rxd(state); } /// HACK for DEVCB
-	virtual WRITE_LINE_MEMBER( input_txd ) { m_bitbanger->output(state); }
+	virtual WRITE_LINE_MEMBER( input_txd ) { if (started()) m_bitbanger->output(state); }
 
 protected:
 	virtual void device_start() {}

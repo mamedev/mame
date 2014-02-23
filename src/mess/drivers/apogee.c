@@ -178,25 +178,6 @@ WRITE_LINE_MEMBER(apogee_state::pit8253_out2_changed)
 	m_speaker->level_w(m_out0+m_out1+m_out2);
 }
 
-const struct pit8253_interface apogee_pit8253_config =
-{
-	{
-		{
-			XTAL_16MHz/9,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(apogee_state,pit8253_out0_changed)
-		}, {
-			XTAL_16MHz/9,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(apogee_state,pit8253_out1_changed)
-		}, {
-			XTAL_16MHz/9,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(apogee_state,pit8253_out2_changed)
-		}
-	}
-};
-
 
 /* F4 Character Displayer */
 static const gfx_layout apogee_charlayout =
@@ -224,7 +205,13 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 	MCFG_CPU_PROGRAM_MAP(apogee_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(apogee_state, radio86 )
 
-	MCFG_PIT8253_ADD( "pit8253", apogee_pit8253_config )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_16MHz/9)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(apogee_state,pit8253_out0_changed))
+	MCFG_PIT8253_CLK1(XTAL_16MHz/9)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(apogee_state,pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(XTAL_16MHz/9)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(apogee_state,pit8253_out2_changed))
 
 	MCFG_I8255_ADD( "ppi8255_1", radio86_ppi8255_interface_1 )
 

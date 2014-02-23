@@ -137,7 +137,6 @@ public:
 	DECLARE_READ32_MEMBER(hpc3_unkpbus0_r);
 	DECLARE_WRITE32_MEMBER(hpc3_unkpbus0_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
-	DECLARE_READ8_MEMBER(ip22_get_out2);
 	DECLARE_DRIVER_INIT(ip225015);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -182,26 +181,6 @@ inline void ATTR_PRINTF(3,4) ip22_state::verboselog(int n_level, const char *s_f
 	}
 }
 
-
-
-static const struct pit8253_interface ip22_pit8254_config =
-{
-	{
-		{
-			1000000,                /* Timer 0: 1MHz */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			1000000,                /* Timer 1: 1MHz */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			1000000,                /* Timer 2: 1MHz */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
 
 #define RTC_DAY     state->m_RTC.nRAM[0x09]
 #define RTC_HOUR    state->m_RTC.nRAM[0x08]
@@ -1504,11 +1483,6 @@ static const struct WD33C93interface wd33c93_intf =
 	DEVCB_DRIVER_LINE_MEMBER(ip22_state,scsi_irq)      /* command completion IRQ */
 };
 
-READ8_MEMBER(ip22_state::ip22_get_out2)
-{
-	return m_pit->get_output(2);
-}
-
 void ip22_state::machine_start()
 {
 	sgi_mc_init(machine());
@@ -1526,8 +1500,7 @@ static const struct kbdc8042_interface at8042 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ip22_state,ip22_get_out2)
+	DEVCB_NULL
 };
 
 DRIVER_INIT_MEMBER(ip22_state,ip225015)
@@ -1637,7 +1610,11 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_NVRAM_ADD_0FILL("nvram_user")
 
-	MCFG_PIT8254_ADD( "pit8254", ip22_pit8254_config )
+	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
+	MCFG_PIT8253_CLK0(1000000)
+	MCFG_PIT8253_CLK1(1000000)
+	MCFG_PIT8253_CLK2(1000000)
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbdc", kbdc8042_device, write_out2))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

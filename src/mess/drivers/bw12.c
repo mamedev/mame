@@ -469,27 +469,6 @@ WRITE_LINE_MEMBER( bw12_state::pit_out2_w )
 	m_pit_out2 = state;
 }
 
-static const struct pit8253_interface pit_intf =
-{
-	{
-		{
-			XTAL_1_8432MHz,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(bw12_state, pit_out0_w)
-		},
-		{
-			XTAL_1_8432MHz,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, rxtxcb_w)
-		},
-		{
-			XTAL_1_8432MHz,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(bw12_state, pit_out2_w)
-		}
-	}
-};
-
 /* AY-5-3600-PRO-002 Interface */
 
 READ_LINE_MEMBER( bw12_state::ay3600_shift_r )
@@ -630,7 +609,15 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE(Z80_TAG, z80_device, irq_line))
 
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
-	MCFG_PIT8253_ADD(PIT8253_TAG, pit_intf)
+
+	MCFG_DEVICE_ADD(PIT8253_TAG, PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_1_8432MHz)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(bw12_state, pit_out0_w))
+	MCFG_PIT8253_CLK1(XTAL_1_8432MHz)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
+	MCFG_PIT8253_CLK2(XTAL_1_8432MHz)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(bw12_state, pit_out2_w))
+
 	MCFG_DEVICE_ADD(AY3600PRO002_TAG, AY3600, 0)
 	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
 	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))

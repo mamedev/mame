@@ -23,6 +23,7 @@ public:
 	mc1502_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_upd8251(*this, "upd8251"),
 		m_pic8259(*this, "pic8259"),
 		m_pit8253(*this, "pit8253"),
 		m_ppi8255n1(*this, "ppi8255n1"),
@@ -34,6 +35,7 @@ public:
 		m_ram(*this, RAM_TAG) { }
 
 	required_device<cpu_device>  m_maincpu;
+	required_device<i8251_device> m_upd8251;		
 	required_device<pic8259_device>  m_pic8259;
 	required_device<pit8253_device>  m_pit8253;
 	required_device<i8255_device>  m_ppi8255n1;
@@ -73,6 +75,9 @@ public:
 	DECLARE_READ8_MEMBER(mc1502_kppi_porta_r);
 	DECLARE_WRITE8_MEMBER(mc1502_kppi_portb_w);
 	DECLARE_WRITE8_MEMBER(mc1502_kppi_portc_w);
+
+private:
+	int m_pit_out2;
 
 /*
     TIMER_CALLBACK_MEMBER(fdc_motor_callback);

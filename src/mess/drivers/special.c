@@ -384,7 +384,14 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_PIT8253_ADD( "pit8253", specimx_pit8253_intf )
+	MCFG_DEVICE_ADD( "pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(2000000)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(special_state, specimx_pit8253_out0_changed))
+	MCFG_PIT8253_CLK1(2000000)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(special_state, specimx_pit8253_out1_changed))
+	MCFG_PIT8253_CLK2(2000000)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(special_state, specimx_pit8253_out2_changed))
+
 	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
 	MCFG_CASSETTE_ADD( "cassette", special_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","special_cass")

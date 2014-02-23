@@ -206,15 +206,6 @@ WRITE_LINE_MEMBER( apricot_state::timer_out2 )
 	}
 }
 
-static const struct pit8253_interface apricot_pit8253_intf =
-{
-	{
-		{ XTAL_4MHz / 16, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER("ic31", pic8259_device, ir6_w) },
-		{ XTAL_4MHz / 2,  DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(apricot_state, timer_out1) },
-		{ XTAL_4MHz / 2,  DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(apricot_state, timer_out2) }
-	}
-};
-
 static Z80SIO_INTERFACE( apricot_z80sio_intf )
 {
 	0, 0,
@@ -417,7 +408,15 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	// devices
 	MCFG_I8255A_ADD("ic17", apricot_i8255a_intf)
 	MCFG_PIC8259_ADD("ic31", INPUTLINE("ic91", 0), VCC, NULL)
-	MCFG_PIT8253_ADD("ic16", apricot_pit8253_intf)
+
+	MCFG_DEVICE_ADD("ic16", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_4MHz / 16)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("ic31", pic8259_device, ir6_w))
+	MCFG_PIT8253_CLK1(XTAL_4MHz / 2)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(apricot_state, timer_out1))
+	MCFG_PIT8253_CLK2(XTAL_4MHz / 2)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(apricot_state, timer_out2))
+
 	MCFG_Z80SIO0_ADD("ic15", XTAL_15MHz / 6, apricot_z80sio_intf)
 
 	// rs232 port
