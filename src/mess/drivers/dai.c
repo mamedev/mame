@@ -202,8 +202,13 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	MCFG_CPU_IO_MAP(dai_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-
-	MCFG_PIT8253_ADD( "pit8253", dai_pit8253_intf )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(2000000)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("custom", dai_sound_device, set_input_ch0))
+	MCFG_PIT8253_CLK1(2000000)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("custom", dai_sound_device, set_input_ch1))
+	MCFG_PIT8253_CLK2(2000000)
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("custom", dai_sound_device, set_input_ch2))
 
 	MCFG_I8255_ADD( "ppi8255", dai_ppi82555_intf )
 

@@ -437,30 +437,6 @@ static APRICOT_KEYBOARD_INTERFACE( kb_intf )
 */
 
 //-------------------------------------------------
-//  pit8253_config pit_intf
-//-------------------------------------------------
-
-static const struct pit8253_interface pit_intf =
-{
-	{
-		{
-			2000000,
-			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir0_w)
-		}, {
-			2000000,
-			DEVCB_LINE_VCC,
-			DEVCB_NULL
-		}, {
-			2000000,
-			DEVCB_LINE_VCC,
-			DEVCB_NULL
-		}
-	}
-};
-
-
-//-------------------------------------------------
 //  I8237_INTERFACE( dmac_intf )
 //-------------------------------------------------
 
@@ -639,7 +615,13 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_APRICOT_KEYBOARD_ADD(kb_intf)
 	MCFG_I8237_ADD(I8237_TAG, 250000, dmac_intf)
 	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
-	MCFG_PIT8253_ADD(I8253A5_TAG, pit_intf)
+
+	MCFG_DEVICE_ADD(I8253A5_TAG, PIT8253, 0)
+	MCFG_PIT8253_CLK0(2000000)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8259A_TAG, pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(2000000)
+	MCFG_PIT8253_CLK2(2000000)
+
 	MCFG_Z80SIO0_ADD(Z80SIO0_TAG, 2500000, sio_intf)
 	MCFG_WD2797x_ADD(WD2797_TAG, 2000000)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", fp_floppies, "35dd", floppy_image_device::default_floppy_formats)

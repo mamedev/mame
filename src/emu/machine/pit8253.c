@@ -22,6 +22,13 @@
 #include "machine/pit8253.h"
 
 
+/* device types */
+enum
+{
+	TYPE_PIT8253 = 0,
+	TYPE_PIT8254
+};
+
 
 /***************************************************************************
 
@@ -38,60 +45,61 @@
 
 
 const device_type PIT8253 = &device_creator<pit8253_device>;
+
+
+pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, PIT8253, "Intel PIT8253", tag, owner, clock, "pit8253", __FILE__),
+	m_out0_handler(*this),
+	m_out1_handler(*this),
+	m_out2_handler(*this)
+{
+	m_timers[0].gate = 1;
+	m_timers[1].gate = 1;
+	m_timers[2].gate = 1;
+}
+
+pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_out0_handler(*this),
+	m_out1_handler(*this),
+	m_out2_handler(*this)
+{
+	m_timers[0].gate = 1;
+	m_timers[1].gate = 1;
+	m_timers[2].gate = 1;
+}
+
+
 const device_type PIT8254 = &device_creator<pit8254_device>;
 
-
-pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, PIT8253, "Intel PIT8253", tag, owner, clock, "pit8253", __FILE__)
-{
-}
-
-pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-				: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-{
-}
-
 pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: pit8253_device(mconfig, PIT8254, "Intel PIT8254", tag, owner, clock, "pit8254", __FILE__)
+	: pit8253_device(mconfig, PIT8254, "Intel PIT8254", tag, owner, clock, "pit8254", __FILE__)
 {
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pit8253_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const pit8253_interface *intf = reinterpret_cast<const pit8253_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<pit8253_interface *>(this) = *intf;
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pit8253_device::common_start( int device_type )
+void pit8253_device::device_start()
 {
-	m_device_type = device_type;
+	m_timers[0].clockin = m_clk0;
+	m_timers[1].clockin = m_clk1;
+	m_timers[2].clockin = m_clk2;
+
+	m_out0_handler.resolve();
+	m_out1_handler.resolve();
+	m_out2_handler.resolve();
 
 	/* register for state saving */
 	for (int timerno = 0; timerno < PIT8253_MAX_TIMER; timerno++)
 	{
-		pit8253_timer *timer = get_timer(timerno);
+		pit8253_timer *timer = &m_timers[timerno];
 
 		/* initialize timer */
-		timer->clockin = m_intf_timer[timerno].clockin;
 		timer->updatetimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pit8253_device::update_timer_cb),this));
 		timer->updatetimer->adjust(attotime::never, timerno);
-
-		/* resolve callbacks */
-		timer->in_gate_func.resolve(m_intf_timer[timerno].in_gate_func, *this);
-		timer->out_out_func.resolve(m_intf_timer[timerno].out_out_func, *this);
 
 		/* set up state save values */
 		save_item(NAME(timer->clockin), timerno);
@@ -116,17 +124,6 @@ void pit8253_device::common_start( int device_type )
 }
 
 
-void pit8253_device::device_start()
-{
-	common_start(TYPE_PIT8253);
-}
-
-void pit8254_device::device_start()
-{
-	common_start(TYPE_PIT8254);
-}
-
-
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
@@ -135,7 +132,7 @@ void pit8253_device::device_reset()
 {
 	for (int i = 0; i < PIT8253_MAX_TIMER; i++)
 	{
-		pit8253_timer *timer = get_timer(i);
+		pit8253_timer *timer = &m_timers[i];
 		/* According to Intel's 8254 docs, the state of a timer is undefined
 		 until the first mode control word is written. Here we define this
 		 undefined behaviour */
@@ -144,11 +141,6 @@ void pit8253_device::device_reset()
 		timer->rmsb = timer->wmsb = 0;
 		timer->count = timer->value = timer->latch = 0;
 		timer->lowcount = 0;
-
-		if (!timer->in_gate_func.isnull())
-			timer->gate = timer->in_gate_func();
-		else
-			timer->gate = 1;
 
 		timer->output = 2;  /* output is undetermined */
 		timer->latched_count = 0;
@@ -186,10 +178,7 @@ pit8253_timer *pit8253_device::get_timer(int which)
 
 int pit8253_device::pit8253_gate(pit8253_timer *timer)
 {
-	if (!timer->in_gate_func.isnull())
-		return timer->in_gate_func();
-	else
-		return timer->gate;
+	return timer->gate;
 }
 
 
@@ -294,7 +283,21 @@ void pit8253_device::set_output(pit8253_timer *timer, int output)
 	if (output != timer->output)
 	{
 		timer->output = output;
-		timer->out_out_func(timer->output);
+
+		switch (timer->index)
+		{
+		case 0:
+			m_out0_handler(output);
+			break;
+
+		case 1:
+			m_out1_handler(output);
+			break;
+
+		case 2:
+			m_out2_handler(output);
+			break;
+		}
 	}
 }
 
@@ -743,7 +746,8 @@ void pit8253_device::update(pit8253_timer *timer)
 
 TIMER_CALLBACK_MEMBER( pit8253_device::update_timer_cb )
 {
-	pit8253_timer *timer = get_timer(param);
+	pit8253_timer *timer = &m_timers[param];
+
 	LOG2(("pit8253: output_changed(): timer %d\n", param));
 
 	update(timer);
@@ -921,10 +925,30 @@ void pit8253_device::readback(pit8253_timer *timer, int command)
 }
 
 
+void pit8253_device::readback_command(UINT8 data)
+{
+	/* Readback command. Illegal on 8253 */
+	/* Todo: find out what (if anything) the 8253 hardware actually does here. */
+}
+
+void pit8254_device::readback_command(UINT8 data)
+{
+	LOG1(("pit8253: write(): readback %02x\n", data & 0x3f));
+
+	/* Bit 0 of data must be 0. Todo: find out what the hardware does if it isn't. */
+	int read_command = (data >> 4) & 3;
+	if ((data & 2) != 0)
+		readback(get_timer(0), read_command);
+	if ((data & 4) != 0)
+		readback(get_timer(1), read_command);
+	if ((data & 8) != 0)
+		readback(get_timer(2), read_command);
+}
+
+
 WRITE8_MEMBER( pit8253_device::write )
 {
 	pit8253_timer *timer = get_timer(offset);
-	int read_command;
 
 	LOG2(("pit8253: write(): offset=%d data=0x%02x\n", offset, data));
 
@@ -934,21 +958,7 @@ WRITE8_MEMBER( pit8253_device::write )
 		timer = get_timer((data >> 6) & 3);
 		if (timer == NULL)
 		{
-			/* Readback command. Illegal on 8253 */
-			/* Todo: find out what (if anything) the 8253 hardware actually does here. */
-			if (m_device_type == TYPE_PIT8254)
-			{
-				LOG1(("pit8253: write(): readback %02x\n", data & 0x3f));
-
-				/* Bit 0 of data must be 0. Todo: find out what the hardware does if it isn't. */
-				read_command = (data >> 4) & 3;
-				if ((data & 2) != 0)
-					readback(get_timer(0), read_command);
-				if ((data & 4) != 0)
-					readback(get_timer(1), read_command);
-				if ((data & 8) != 0)
-					readback(get_timer(2), read_command);
-			}
+			readback_command(data);
 			return;
 		}
 
@@ -1053,46 +1063,37 @@ void pit8253_device::gate_w(int gate, int state)
 	if (timer == NULL)
 		return;
 
-	if (!timer->in_gate_func.isnull())
+	if (state != timer->gate)
 	{
-		logerror("pit8253_gate_w: write has no effect because a read handler is already defined!\n");
-	}
-	else
-	{
-		if (state != timer->gate)
-		{
-			int mode = CTRL_MODE(timer->control);
+		int mode = CTRL_MODE(timer->control);
 
-			update(timer);
-			timer->gate = state;
-			if (state != 0 && ( mode == 1 || mode == 2 || mode == 5 ))
-			{
-				timer->phase = 1;
-			}
-			update(timer);
+		update(timer);
+		timer->gate = state;
+		if (state != 0 && ( mode == 1 || mode == 2 || mode == 5 ))
+		{
+			timer->phase = 1;
 		}
+		update(timer);
 	}
 }
 
-WRITE_LINE_MEMBER( pit8253_device::gate0_w ) { gate_w(0, state); }
-WRITE_LINE_MEMBER( pit8253_device::gate1_w ) { gate_w(1, state); }
-WRITE_LINE_MEMBER( pit8253_device::gate2_w ) { gate_w(2, state); }
+WRITE_LINE_MEMBER( pit8253_device::write_gate0 )
+{
+	gate_w(0, state);
+}
+
+WRITE_LINE_MEMBER( pit8253_device::write_gate1 )
+{
+	gate_w(1, state);
+}
+
+WRITE_LINE_MEMBER( pit8253_device::write_gate2 )
+{
+	gate_w(2, state);
+}
 
 
 /* ----------------------------------------------------------------------- */
-
-int pit8253_device::get_output(int timerno)
-{
-	pit8253_timer *timer = get_timer(timerno);
-	int result;
-
-	update(timer);
-	result = timer->output;
-	LOG2(("pit8253_get_output(): PIT timer=%d result=%d\n", timerno, result));
-	return result;
-}
-
-
 
 void pit8253_device::set_clockin(int timerno, double new_clockin)
 {
@@ -1121,6 +1122,17 @@ void pit8253_device::set_clock_signal(int timerno, int state)
 	timer->clock = state;
 }
 
-WRITE_LINE_MEMBER( pit8253_device::clk0_w ) { set_clock_signal(0, state); }
-WRITE_LINE_MEMBER( pit8253_device::clk1_w ) { set_clock_signal(1, state); }
-WRITE_LINE_MEMBER( pit8253_device::clk2_w ) { set_clock_signal(2, state); }
+WRITE_LINE_MEMBER( pit8253_device::write_clk0 )
+{
+	set_clock_signal(0, state);
+}
+
+WRITE_LINE_MEMBER( pit8253_device::write_clk1 )
+{
+	set_clock_signal(1, state);
+}
+
+WRITE_LINE_MEMBER( pit8253_device::write_clk2 )
+{
+	set_clock_signal(2, state);
+}

@@ -552,7 +552,30 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 
-	MCFG_PIT8253_ADD( "pit8253", pmd85_pit8253_interface )
+/*******************************************************************************
+
+    I/O board 8253
+    --------------
+
+    Timer 0:
+        OUT0    - external interfaces connector (K2)
+        CLK0    - external interfaces connector (K2)
+        GATE0   - external interfaces connector (K2), default = 1
+    Timer 1:
+        OUT1    - external interfaces connector (K2), i8251 (for V24 only)
+        CLK1    - hardwired to 2 MHz system clock
+        GATE1   - external interfaces connector (K2), default = 1
+    Timer 2:
+        OUT2    - unused
+        CLK2    - hardwired to 1HZ signal generator
+        GATE2   - hardwired to 5V, default = 1
+
+*******************************************************************************/
+
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(0)
+	MCFG_PIT8253_CLK1(2000000)
+	MCFG_PIT8253_CLK2(1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

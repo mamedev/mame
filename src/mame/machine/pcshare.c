@@ -15,7 +15,6 @@
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
-#include "machine/8042kbdc.h"
 #include "machine/mc146818.h"
 #include "machine/idectrl.h"
 
@@ -157,47 +156,19 @@ IRQ_CALLBACK_MEMBER(pcat_base_state::irq_callback)
 	return m_pic8259_1->acknowledge();
 }
 
-WRITE_LINE_MEMBER( pcat_base_state::at_pit8254_out0_changed )
-{
-	m_pic8259_1->ir0_w(state);
-}
-
 
 WRITE_LINE_MEMBER( pcat_base_state::at_pit8254_out2_changed )
 {
+	m_pit_out2 = state;
 	//at_speaker_set_input( state ? 1 : 0 );
+	m_kbdc->write_out2(state);
 }
-
-
-static const struct pit8253_interface at_pit8254_config =
-{
-	{
-		{
-			4772720/4,              /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(pcat_base_state, at_pit8254_out0_changed)
-		}, {
-			4772720/4,              /* dram refresh */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			4772720/4,              /* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(pcat_base_state, at_pit8254_out2_changed)
-		}
-	}
-};
 
 /*************************************************************
  *
  * Keyboard
  *
  *************************************************************/
-
-READ8_MEMBER(pcat_base_state::get_out2)
-{
-	return m_pit8254->get_output(2);
-}
 
 static const struct kbdc8042_interface at8042 =
 {
@@ -207,8 +178,7 @@ static const struct kbdc8042_interface at8042 =
 	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
 	DEVCB_NULL,
 
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pcat_base_state,get_out2)
+	DEVCB_NULL
 };
 
 ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, pcat_base_state )
@@ -227,7 +197,14 @@ MACHINE_CONFIG_FRAGMENT(pcat_common)
 	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
-	MCFG_PIT8254_ADD( "pit8254", at_pit8254_config )
+
+	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
+	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_1", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(4772720/4) /* dram refresh */
+	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pcat_base_state, at_pit8254_out2_changed))
+
 	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir0_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)

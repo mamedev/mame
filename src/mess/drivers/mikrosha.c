@@ -155,27 +155,6 @@ WRITE_LINE_MEMBER(mikrosha_state::mikrosha_pit_out2)
 {
 }
 
-static const struct pit8253_interface mikrosha_pit8253_intf =
-{
-	{
-		{
-			0,
-			DEVCB_NULL,
-			DEVCB_NULL
-		},
-		{
-			0,
-			DEVCB_NULL,
-			DEVCB_NULL
-		},
-		{
-			2000000,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(mikrosha_state, mikrosha_pit_out2)
-		}
-	}
-};
-
 /* F4 Character Displayer */
 static const gfx_layout mikrosha_charlayout =
 {
@@ -208,7 +187,11 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 
 	MCFG_I8275_ADD  ( "i8275", mikrosha_i8275_interface)
 
-	MCFG_PIT8253_ADD( "pit8253", mikrosha_pit8253_intf )
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(0)
+	MCFG_PIT8253_CLK1(0)
+	MCFG_PIT8253_CLK2(2000000)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mikrosha_state, mikrosha_pit_out2))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

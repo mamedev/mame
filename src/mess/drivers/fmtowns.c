@@ -759,7 +759,7 @@ WRITE8_MEMBER(towns_state::towns_keyboard_w)
  */
 UINT8 towns_state::speaker_get_spk()
 {
-	return m_towns_spkrdata & m_towns_speaker_input;
+	return m_towns_spkrdata & m_pit_out2;
 }
 
 
@@ -770,19 +770,13 @@ void towns_state::speaker_set_spkrdata(UINT8 data)
 }
 
 
-void towns_state::speaker_set_input(UINT8 data)
-{
-	m_towns_speaker_input = data ? 1 : 0;
-	m_speaker->level_w(speaker_get_spk());
-}
-
 READ8_MEMBER(towns_state::towns_port60_r)
 {
 	UINT8 val = 0x00;
 
-	if (m_pit->get_output(0))
+	if (m_pit_out0)
 		val |= 0x01;
-	if (m_pit->get_output(1))
+	if (m_pit_out1)
 		val |= 0x02;
 
 	val |= (m_towns_timer_mask & 0x07) << 2;
@@ -2097,7 +2091,7 @@ WRITE_LINE_MEMBER(towns_state::towns_pic_irq)
 
 WRITE_LINE_MEMBER(towns_state::towns_pit_out0_changed)
 {
-	pic8259_device* dev = m_pic_master;
+	m_pit_out0 = state;
 
 	if(m_towns_timer_mask & 0x01)
 	{
@@ -2107,12 +2101,12 @@ WRITE_LINE_MEMBER(towns_state::towns_pit_out0_changed)
 	else
 		m_timer0 = 0;
 
-	dev->ir0_w(m_timer0 || m_timer1);
+	m_pic_master->ir0_w(m_timer0 || m_timer1);
 }
 
 WRITE_LINE_MEMBER(towns_state::towns_pit_out1_changed)
 {
-	pic8259_device* dev = m_pic_master;
+	m_pit_out1 = state;
 
 	if(m_towns_timer_mask & 0x02)
 	{
@@ -2122,12 +2116,13 @@ WRITE_LINE_MEMBER(towns_state::towns_pit_out1_changed)
 	else
 		m_timer1 = 0;
 
-	dev->ir0_w(m_timer0 || m_timer1);
+	m_pic_master->ir0_w(m_timer0 || m_timer1);
 }
 
 WRITE_LINE_MEMBER( towns_state::pit_out2_changed )
 {
-	speaker_set_input(state);
+	m_pit_out2 = state ? 1 : 0;
+	m_speaker->level_w(speaker_get_spk());
 }
 
 static ADDRESS_MAP_START(towns_mem, AS_PROGRAM, 32, towns_state)
@@ -2635,48 +2630,6 @@ void towns_state::machine_reset()
 	m_towns_freerun_counter->adjust(attotime::zero,0,attotime::from_usec(1));
 }
 
-static const struct pit8253_interface towns_pit8253_config =
-{
-	{
-		{
-			307200,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(towns_state,towns_pit_out0_changed)
-		},
-		{
-			307200,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(towns_state,towns_pit_out1_changed)
-		},
-		{
-			307200,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(towns_state,pit_out2_changed)
-		}
-	}
-};
-
-static const struct pit8253_interface towns_pit8253_config_2 =
-{
-	{
-		{
-			307200,
-			DEVCB_NULL,
-			DEVCB_NULL  // reserved
-		},
-		{
-			307200,
-			DEVCB_NULL,
-			DEVCB_NULL  // RS-232
-		},
-		{
-			307200,
-			DEVCB_NULL,
-			DEVCB_NULL  // reserved
-		}
-	}
-};
-
 READ8_MEMBER(towns_state::get_slave_ack)
 {
 	if (offset==7) { // IRQ = 7
@@ -2796,8 +2749,18 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND,0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_PIT8253_ADD("pit", towns_pit8253_config)
-	MCFG_PIT8253_ADD("pit2", towns_pit8253_config_2)
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(307200)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(towns_state, towns_pit_out0_changed))
+	MCFG_PIT8253_CLK1(307200)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(towns_state, towns_pit_out1_changed))
+	MCFG_PIT8253_CLK2(307200)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(towns_state, pit_out2_changed))
+
+	MCFG_DEVICE_ADD("pit2", PIT8253, 0)
+	MCFG_PIT8253_CLK0(307200) // reserved
+	MCFG_PIT8253_CLK1(307200) // RS-232
+	MCFG_PIT8253_CLK2(307200) // reserved
 
 	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(towns_state,towns_pic_irq), VCC, READ8(towns_state,get_slave_ack))
 

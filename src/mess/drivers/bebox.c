@@ -155,11 +155,6 @@ WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
 	m_pic8259_1->ir1_w(state);
 }
 
-READ8_MEMBER(bebox_state::bebox_get_out2)
-{
-	return m_pit8254->get_output(2);
-}
-
 static const struct kbdc8042_interface bebox_8042_interface =
 {
 	KBDC8042_STANDARD,
@@ -168,8 +163,7 @@ static const struct kbdc8042_interface bebox_8042_interface =
 	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_keyboard_interrupt),
 	DEVCB_NULL,
 
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bebox_state,bebox_get_out2)
+	DEVCB_NULL
 };
 
 static SLOT_INTERFACE_START( pci_devices )
@@ -187,7 +181,12 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_PIT8254_ADD( "pit8254", bebox_pit8254_config )
+	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
+	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(bebox_state, bebox_timer0_w))
+	MCFG_PIT8253_CLK1(4772720/4) /* dram refresh */
+	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbdc", kbdc8042_device, write_out2))
 
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, bebox_dma8237_1_config )
 

@@ -146,31 +146,11 @@ WRITE_LINE_MEMBER(b2m_state::bm2_pit_out1)
 	m_speaker->level_w(state);
 }
 
-const struct pit8253_interface b2m_pit8253_intf =
-{
-	{
-		{
-			0,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir1_w)
-		},
-		{
-			2000000,
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(b2m_state,bm2_pit_out1)
-		},
-		{
-			2000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pit8253", pit8253_device, clk0_w)
-		}
-	}
-};
-
 WRITE8_MEMBER(b2m_state::b2m_8255_porta_w)
 {
 	m_b2m_8255_porta = data;
 }
+
 WRITE8_MEMBER(b2m_state::b2m_8255_portb_w)
 {
 	m_b2m_video_scroll = data;

@@ -181,7 +181,7 @@ WRITE8_MEMBER( tandy_pc_state::tandy1000_pio_w )
 	{
 	case 1:
 		m_tandy_ppi_portb = data;
-		space.machine().device<pit8253_device>("pit8253")->gate2_w(BIT(data, 0));
+		m_pit8253->write_gate2(BIT(data, 0));
 		pc_speaker_set_spkrdata( data & 0x02 );
 		// sx enables keyboard from bit 3, others bit 6, hopefully theres no conflict
 		pc_keyb_set_clock(data&0x48);

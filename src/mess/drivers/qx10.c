@@ -504,40 +504,6 @@ WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
 }
 
 /*
-    Timer 0
-    Counter CLK                         Gate                    OUT             Operation
-    0       Keyboard clock (1200bps)    Memory register D0      Speaker timer   Speaker timer (100ms)
-    1       Keyboard clock (1200bps)    +5V                     8259A (10E) IR5 Software timer
-    2       Clock 1,9668MHz             Memory register D7      8259 (12E) IR1  Software timer
-*/
-
-static const struct pit8253_interface qx10_pit8253_1_config =
-{
-	{
-		{ 1200,         DEVCB_NULL,     DEVCB_NULL },
-		{ 1200,         DEVCB_LINE_VCC, DEVCB_NULL },
-		{ MAIN_CLK / 8, DEVCB_NULL,     DEVCB_NULL },
-	}
-};
-
-/*
-    Timer 1
-    Counter CLK                 Gate        OUT                 Operation
-    0       Clock 1,9668MHz     +5V         Speaker frequency   1kHz
-    1       Clock 1,9668MHz     +5V         Keyboard clock      1200bps (Clock / 1664)
-    2       Clock 1,9668MHz     +5V         RS-232C baud rate   9600bps (Clock / 208)
-*/
-static const struct pit8253_interface qx10_pit8253_2_config =
-{
-	{
-		{ MAIN_CLK / 8, DEVCB_LINE_VCC, DEVCB_NULL },
-		{ MAIN_CLK / 8, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(qx10_state, keyboard_clk) },
-		{ MAIN_CLK / 8, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER("upd7201", z80dart_device, rxtxcb_w) },
-	}
-};
-
-
-/*
     Master PIC8259
     IR0     Power down detection interrupt
     IR1     Software timer #1 interrupt
@@ -863,8 +829,34 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_PALETTE_LENGTH(8)
 
 	/* Devices */
-	MCFG_PIT8253_ADD("pit8253_1", qx10_pit8253_1_config)
-	MCFG_PIT8253_ADD("pit8253_2", qx10_pit8253_2_config)
+
+/*
+    Timer 0
+    Counter CLK                         Gate                    OUT             Operation
+    0       Keyboard clock (1200bps)    Memory register D0      Speaker timer   Speaker timer (100ms)
+    1       Keyboard clock (1200bps)    +5V                     8259A (10E) IR5 Software timer
+    2       Clock 1,9668MHz             Memory register D7      8259 (12E) IR1  Software timer
+*/
+
+	MCFG_DEVICE_ADD("pit8253_1", PIT8253, 0)
+	MCFG_PIT8253_CLK0(1200)
+	MCFG_PIT8253_CLK1(1200)
+	MCFG_PIT8253_CLK2(MAIN_CLK / 8)
+
+/*
+    Timer 1
+    Counter CLK                 Gate        OUT                 Operation
+    0       Clock 1,9668MHz     +5V         Speaker frequency   1kHz
+    1       Clock 1,9668MHz     +5V         Keyboard clock      1200bps (Clock / 1664)
+    2       Clock 1,9668MHz     +5V         RS-232C baud rate   9600bps (Clock / 208)
+*/
+	MCFG_DEVICE_ADD("pit8253_2", PIT8253, 0)
+	MCFG_PIT8253_CLK0(MAIN_CLK / 8)
+	MCFG_PIT8253_CLK1(MAIN_CLK / 8)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(qx10_state, keyboard_clk))
+	MCFG_PIT8253_CLK2(MAIN_CLK / 8)
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("upd7201", z80dart_device, rxtxcb_w))
+
 	MCFG_PIC8259_ADD("pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(qx10_state, get_slave_ack))
 	MCFG_PIC8259_ADD("pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL)
 	MCFG_UPD7201_ADD("upd7201", MAIN_CLK/4, qx10_upd7201_interface)

@@ -96,26 +96,32 @@ WRITE_LINE_MEMBER(leland_80186_sound_device::pit0_2_w)
 {
 	set_clock_line(2, state);
 }
+
 WRITE_LINE_MEMBER(leland_80186_sound_device::pit1_0_w)
 {
 	set_clock_line(3, state);
 }
+
 WRITE_LINE_MEMBER(leland_80186_sound_device::pit1_1_w)
 {
 	set_clock_line(4, state);
 }
+
 WRITE_LINE_MEMBER(leland_80186_sound_device::pit1_2_w)
 {
 	set_clock_line(5, state);
 }
+
 WRITE_LINE_MEMBER(leland_80186_sound_device::pit2_0_w)
 {
 	set_clock_line(5, state);
 }
+
 WRITE_LINE_MEMBER(leland_80186_sound_device::i80186_tmr0_w)
 {
 	set_clock_line(6, state);
 }
+
 WRITE_LINE_MEMBER(leland_80186_sound_device::i80186_tmr1_w)
 {
 	if(state)
@@ -128,108 +134,27 @@ WRITE_LINE_MEMBER(leland_80186_sound_device::i80186_tmr1_w)
 	}
 	set_clock_line(7, state);
 }
-const struct pit8253_interface leland_pit0_interface =
-{
-	{
-		{
-			4000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(":audiocpu", i80186_cpu_device, drq0_w)
-		}, {
-			4000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(":audiocpu", i80186_cpu_device, drq1_w)
-		}, {
-			4000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, leland_80186_sound_device, pit0_2_w)
-		}
-	}
-};
-
-const struct pit8253_interface leland_pit1_interface =
-{
-	{
-		{
-			4000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, leland_80186_sound_device, pit1_0_w)
-		}, {
-			4000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, leland_80186_sound_device, pit1_1_w)
-		}, {
-			4000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, leland_80186_sound_device, pit1_2_w)
-		}
-	}
-};
-
-const struct pit8253_interface redline_pit0_interface =
-{
-	{
-		{
-			7000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(":audiocpu", i80186_cpu_device, drq0_w)
-		}, {
-			7000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(":audiocpu", i80186_cpu_device, drq1_w)
-		}, {
-			7000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, leland_80186_sound_device, pit0_2_w)
-		}
-	}
-};
-
-const struct pit8253_interface redline_pit1_interface =
-{
-	{
-		{
-			7000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, leland_80186_sound_device, pit1_0_w)
-		}, {
-			7000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, leland_80186_sound_device, pit1_1_w)
-		}, {
-			7000000,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
-const struct pit8253_interface redline_pit2_interface =
-{
-	{
-		{
-			7000000,
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, leland_80186_sound_device, pit2_0_w)
-		}, {
-			7000000,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			7000000,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
 
 static MACHINE_CONFIG_FRAGMENT( leland_80186_sound )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.00)
 
-	MCFG_PIT8254_ADD("pit0", leland_pit0_interface)
-	MCFG_PIT8254_ADD("pit1", leland_pit1_interface)
+	MCFG_DEVICE_ADD("pit0", PIT8254, 0)
+	MCFG_PIT8253_CLK0(4000000)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("audiocpu", i80186_cpu_device, drq0_w))
+	MCFG_PIT8253_CLK1(4000000)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("audiocpu", i80186_cpu_device, drq1_w))
+	MCFG_PIT8253_CLK2(4000000)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit0_2_w))
+
+	MCFG_DEVICE_ADD("pit1", PIT8254, 0)
+	MCFG_PIT8253_CLK0(4000000)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(leland_80186_sound_device, pit1_0_w))
+	MCFG_PIT8253_CLK1(4000000)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(leland_80186_sound_device, pit1_1_w))
+	MCFG_PIT8253_CLK2(4000000)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit1_2_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( redline_80186_sound )
@@ -237,9 +162,23 @@ static MACHINE_CONFIG_FRAGMENT( redline_80186_sound )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.00)
 
-	MCFG_PIT8254_ADD("pit0", redline_pit0_interface)
-	MCFG_PIT8254_ADD("pit1", redline_pit1_interface)
-	MCFG_PIT8254_ADD("pit2", redline_pit2_interface)
+	MCFG_DEVICE_ADD("pit0", PIT8254, 0)
+	MCFG_PIT8253_CLK0(7000000)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("audiocpu", i80186_cpu_device, drq0_w))
+	MCFG_PIT8253_CLK1(7000000)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("audiocpu", i80186_cpu_device, drq1_w))
+	MCFG_PIT8253_CLK2(7000000)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit0_2_w))
+
+	MCFG_DEVICE_ADD("pit1", PIT8254, 0)
+	MCFG_PIT8253_CLK0(7000000)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(leland_80186_sound_device, pit1_0_w))
+	MCFG_PIT8253_CLK1(7000000)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(leland_80186_sound_device, pit1_1_w))
+
+	MCFG_DEVICE_ADD("pit2", PIT8254, 0)
+	MCFG_PIT8253_CLK0(7000000)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(leland_80186_sound_device, pit1_2_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( ataxx_80186_sound )
@@ -247,7 +186,13 @@ static MACHINE_CONFIG_FRAGMENT( ataxx_80186_sound )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.00)
 
-	MCFG_PIT8254_ADD("pit0", leland_pit0_interface)
+	MCFG_DEVICE_ADD("pit0", PIT8254, 0)
+	MCFG_PIT8253_CLK0(4000000)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("audiocpu", i80186_cpu_device, drq0_w))
+	MCFG_PIT8253_CLK1(4000000)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("audiocpu", i80186_cpu_device, drq1_w))
+	MCFG_PIT8253_CLK2(4000000)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit0_2_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( wsf_80186_sound )
@@ -260,7 +205,13 @@ static MACHINE_CONFIG_FRAGMENT( wsf_80186_sound )
 	MCFG_SOUND_ROUTE(0, "speaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.40)
 
-	MCFG_PIT8254_ADD("pit0", leland_pit0_interface)
+	MCFG_DEVICE_ADD("pit0", PIT8254, 0)
+	MCFG_PIT8253_CLK0(4000000)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("audiocpu", i80186_cpu_device, drq0_w))
+	MCFG_PIT8253_CLK1(4000000)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("audiocpu", i80186_cpu_device, drq1_w))
+	MCFG_PIT8253_CLK2(4000000)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit0_2_w))
 MACHINE_CONFIG_END
 
 machine_config_constructor leland_80186_sound_device::device_mconfig_additions() const

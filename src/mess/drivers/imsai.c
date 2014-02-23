@@ -12,7 +12,6 @@
 
     ToDo:
     - Banking
-    - Connect PIT to UART clock.
     - Dipswitches
 
 ****************************************************************************/
@@ -41,6 +40,8 @@ public:
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
+
 private:
 	UINT8 m_term_data;
 	virtual void machine_reset();
@@ -94,28 +95,15 @@ WRITE8_MEMBER( imsai_state::kbd_put )
 	m_term_data = data;
 }
 
+WRITE_LINE_MEMBER(imsai_state::write_uart_clock)
+{
+	m_uart->write_txc(state);
+	m_uart->write_rxc(state);
+}
+
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
 	DEVCB_DRIVER_MEMBER(imsai_state, kbd_put)
-};
-
-static const struct pit8253_interface pit_intf =
-{
-	{
-		{
-			XTAL_6MHz / 3,                /* Timer 0: baud rate gen for 8251 */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			XTAL_6MHz / 3,                /* Timer 1: user */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			XTAL_6MHz / 3,                /* Timer 2: user */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
 };
 
 WRITE8_MEMBER( imsai_state::control_w )
@@ -138,7 +126,12 @@ static MACHINE_CONFIG_START( imsai, imsai_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_PIT8253_ADD( "pit", pit_intf)
+
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_6MHz / 3) /* Timer 0: baud rate gen for 8251 */
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(imsai_state, write_uart_clock))
+	MCFG_PIT8253_CLK1(XTAL_6MHz / 3) /* Timer 1: user */
+	MCFG_PIT8253_CLK2(XTAL_6MHz / 3) /* Timer 2: user */
 MACHINE_CONFIG_END
 
 /* ROM definition */

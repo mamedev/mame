@@ -354,7 +354,14 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("other", mz_state, ne556_other_callback, attotime::from_hz(34.5))
 
 	/* devices */
-	MCFG_PIT8253_ADD("pit8253", mz700_pit8253_config)
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_17_73447MHz/20)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mz_state, pit_out0_changed))
+	MCFG_PIT8253_CLK1(15611.0)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pit8253", pit8253_device, write_clk2))
+	MCFG_PIT8253_CLK2(0)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mz_state, pit_irq_2))
+
 	MCFG_I8255_ADD("ppi8255", mz700_ppi8255_interface)
 	MCFG_TTL74145_ADD("ls145", default_ttl74145)
 
@@ -388,8 +395,9 @@ static MACHINE_CONFIG_DERIVED( mz800, mz700 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mz800_cass")
 
 	/* devices */
-	MCFG_DEVICE_REMOVE("pit8253")
-	MCFG_PIT8253_ADD("pit8253", mz800_pit8253_config)
+	MCFG_DEVICE_MODIFY("pit8253")
+	MCFG_PIT8253_CLK0(XTAL_17_73447MHz/16)
+
 	MCFG_Z80PIO_ADD("z80pio", XTAL_17_73447MHz/5, mz800_z80pio_config)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")

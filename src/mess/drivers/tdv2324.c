@@ -236,54 +236,6 @@ UINT32 tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //**************************************************************************
 
 //-------------------------------------------------
-//  pit8253_config pit0_intf
-//-------------------------------------------------
-
-static const struct pit8253_interface pit0_intf =
-{
-	{
-		{
-			0,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			0,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			0,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
-
-//-------------------------------------------------
-//  pit8253_config pit1_intf
-//-------------------------------------------------
-
-static const struct pit8253_interface pit1_intf =
-{
-	{
-		{
-			0,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			0,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			0,
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
-
-//-------------------------------------------------
 //  Z80SIO_INTERFACE( sio_intf )
 //-------------------------------------------------
 
@@ -367,8 +319,11 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 
 	// devices
 	MCFG_PIC8259_ADD(P8259A_TAG, NULL, VCC, NULL)
-	MCFG_PIT8253_ADD(P8253_5_0_TAG, pit0_intf)
-	MCFG_PIT8253_ADD(P8253_5_1_TAG, pit1_intf)
+
+	MCFG_DEVICE_ADD(P8253_5_0_TAG, PIT8253, 0)
+
+	MCFG_DEVICE_ADD(P8253_5_1_TAG, PIT8253, 0)
+
 	MCFG_Z80SIO2_ADD(MK3887N4_TAG, 8000000/2, sio_intf)
 	MCFG_FD1797x_ADD(FD1797PL02_TAG, 8000000/4)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)

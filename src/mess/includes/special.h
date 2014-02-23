@@ -154,7 +154,6 @@ protected:
 
 /*----------- defined in machine/special.c -----------*/
 
-extern const struct pit8253_interface specimx_pit8253_intf;
 extern const i8255_interface specialist_ppi8255_interface;
 extern const i8255_interface specimx_ppi8255_interface;
 

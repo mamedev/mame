@@ -117,8 +117,6 @@ public:
 
 /*----------- defined in machine/mz700.c -----------*/
 
-extern const struct pit8253_interface mz700_pit8253_config;
-extern const struct pit8253_interface mz800_pit8253_config;
 extern const i8255_interface mz700_ppi8255_interface;
 extern const z80pio_interface mz800_z80pio_config;
 

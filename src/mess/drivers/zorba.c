@@ -248,25 +248,6 @@ WRITE8_MEMBER( zorba_state::pia0_porta_w )
 	m_floppy1->get_device()->mon_w(BIT(data, 4));
 }
 
-static const struct pit8253_interface pit_intf =
-{
-	{
-		{
-			XTAL_24MHz / 3,                /* Timer 0: ? */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			XTAL_24MHz / 3,                /* Timer 1: ? */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			XTAL_24MHz / 3,                /* Timer 2: ? */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
 PALETTE_INIT_MEMBER( zorba_state, zorba )
 {
 	palette_set_color_rgb( machine(), 0, 0, 0, 0 ); /* Black */
@@ -403,7 +384,11 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 // IEEE488 interface
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
-	MCFG_PIT8254_ADD( "pit", pit_intf)
+	MCFG_DEVICE_ADD("pit", PIT8254, 0)
+	MCFG_PIT8253_CLK0(XTAL_24MHz / 3) /* Timer 0: ? */
+	MCFG_PIT8253_CLK1(XTAL_24MHz / 3) /* Timer 1: ? */
+	MCFG_PIT8253_CLK2(XTAL_24MHz / 3) /* Timer 2: ? */
+
 	MCFG_I8275_ADD("crtc", XTAL_14_31818MHz/7, 8, zorba_update_chr, DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_FD1793x_ADD("fdc", XTAL_24MHz / 24)

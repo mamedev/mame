@@ -45,30 +45,6 @@ I8255_INTERFACE( mz700_ppi8255_interface )
 };
 
 
-
-
-
-const struct pit8253_interface mz700_pit8253_config =
-{
-	{
-		/* clockin             gate            callback */
-		{ XTAL_17_73447MHz/20, DEVCB_NULL,     DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_out0_changed) },
-		{             15611.0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER("pit8253", pit8253_device, clk2_w)   },
-		{                   0, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_irq_2)        },
-	}
-};
-
-const struct pit8253_interface mz800_pit8253_config =
-{
-	{
-		/* clockin             gate            callback */
-		{ XTAL_17_73447MHz/16, DEVCB_NULL,     DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_out0_changed) },
-		{             15611.0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER("pit8253", pit8253_device, clk2_w)   },
-		{                   0, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_irq_2)        },
-	}
-};
-
-
 /***************************************************************************
     INITIALIZATIoN
 ***************************************************************************/
@@ -125,7 +101,7 @@ READ8_MEMBER(mz_state::mz700_e008_r)
 
 WRITE8_MEMBER(mz_state::mz700_e008_w)
 {
-	m_pit->gate0_w(BIT(data, 0));
+	m_pit->write_gate0(BIT(data, 0));
 }
 
 

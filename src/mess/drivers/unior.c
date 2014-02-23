@@ -49,15 +49,18 @@ ToDo:
 class unior_state : public driver_device
 {
 public:
-	unior_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_pit(*this, "pit")
-		, m_dma(*this, "dma")
-	{ }
+	unior_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_pit(*this, "pit"),
+		m_dma(*this, "dma"),
+		m_uart(*this, "uart")
+	{
+	}
 
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);
+	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	DECLARE_READ8_MEMBER(ppi0_b_r);
 	DECLARE_WRITE8_MEMBER(ppi0_b_w);
 	DECLARE_READ8_MEMBER(ppi1_a_r);
@@ -78,6 +81,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8257_device> m_dma;
+	required_device<i8251_device> m_uart;
 };
 
 static ADDRESS_MAP_START( unior_mem, AS_PROGRAM, 8, unior_state )
@@ -293,37 +297,16 @@ PALETTE_INIT_MEMBER(unior_state,unior)
 
 /*************************************************
 
-    i8253
-
-*************************************************/
-
-static const struct pit8253_interface pit_intf =
-{
-	{
-		{
-			XTAL_20MHz / 9, // unknown frequency
-			DEVCB_LINE_VCC,
-			DEVCB_NULL  // looks like vertical or horizontal sync pulses
-		},
-		{
-			XTAL_16MHz / 9, // unknown frequency
-			DEVCB_LINE_VCC,
-			DEVCB_NULL          // UART transmit/receive clock
-		},
-		{
-			XTAL_16MHz / 9 / 64, // unknown frequency
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("speaker", speaker_sound_device, level_w)
-		}
-	}
-};
-
-
-/*************************************************
-
     i8255
 
 *************************************************/
+
+
+WRITE_LINE_MEMBER(unior_state::write_uart_clock)
+{
+	m_uart->write_txc(state);
+	m_uart->write_rxc(state);
+}
 
 READ8_MEMBER( unior_state::ppi0_b_r )
 {
@@ -377,7 +360,7 @@ d7 = not used
 WRITE8_MEMBER( unior_state::ppi1_c_w )
 {
 	m_4e = data;
-	m_pit->gate2_w(BIT(data, 4));
+	m_pit->write_gate2(BIT(data, 4));
 }
 
 // ports a & b are for the keyboard
@@ -466,7 +449,14 @@ static MACHINE_CONFIG_START( unior, unior_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_PIT8253_ADD( "pit", pit_intf )
+
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_20MHz / 9) // unknown frequency, looks like vertical or horizontal sync pulses
+	MCFG_PIT8253_CLK1(XTAL_16MHz / 9) // unknown frequency
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(unior_state, write_uart_clock))
+	MCFG_PIT8253_CLK2(XTAL_16MHz / 9 / 64) // unknown frequency
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+
 	MCFG_I8255_ADD( "ppi0", ppi0_intf )
 	MCFG_I8255_ADD( "ppi1", ppi1_intf )
 	MCFG_I8257_ADD("dma", XTAL_20MHz / 9, dma_intf) // unknown clock
