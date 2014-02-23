@@ -5164,15 +5164,6 @@ ROM_START( sc2ofool4 )
 	sc2_ofool_sound
 ROM_END
 
-#if 0
-ROM_START( sc2ofool5 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fools6ac.bin", 0x0000, 0x010000, CRC(5fe48a02) SHA1(fd5b07a58567e0c5eb75bf1526a853b3a60ddfa9) )
-
-	sc2_ofool_matrix
-	sc2_ofool_sound
-ROM_END
-#endif
 
 
 
@@ -6713,52 +6704,193 @@ ROM_START( sc2payr )
 	/* missing */
 ROM_END
 
+/* this might be for the concept title ec_bar7 */
+#define sc2_bar7_sound \
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "b7snd1.bin", 0x0000, 0x00ff28, CRC(27efbf06) SHA1(735ffb552aacebe46405828b87de947b99edc4ea) )
+
+
 ROM_START( sc2bar7 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b7code.bin", 0x0000, 0x010000, CRC(bf8dbb1f) SHA1(fb07fbd1cc48bd0a6712ac9b71dcb8202720f86b) )
-
-	ROM_REGION( 0x200000, "altrevs", ROMREGION_ERASE00 )
-	ROM_LOAD( "bar73v1", 0x0000, 0x010000, CRC(2cc8dad8) SHA1(c3cce5e9ae032a6797828c8d42948ad749a03777) )
-	ROM_LOAD( "bar72v5", 0x0000, 0x010000, CRC(6a9ce006) SHA1(c2b1efcdc576ea49243852f8a65c89fbca0ba7a4) )
-	ROM_LOAD( "1v9.bin", 0x0000, 0x010000, CRC(f2aacd4d) SHA1(c6386de65cacbfb877ead00ee48d7cf9d43e61b0) )
-	ROM_LOAD( "1v9p.bin", 0x0000, 0x010000, CRC(d7d38831) SHA1(5053b7e586b95d5e0853a506bb3df9203672469c) )
-	ROM_LOAD( "2v0.bin", 0x0000, 0x010000, CRC(c5226f5d) SHA1(157b744b56a04f507798e857001b2e8255f2a3d9) )
-	ROM_LOAD( "2v2.bin", 0x0000, 0x010000, CRC(0e7c9399) SHA1(9892313a4c8c7e8cca0f580ac6a2ad62fdf1ad1b) )
-	ROM_LOAD( "2v3.bin", 0x0000, 0x010000, CRC(11fed7c4) SHA1(9164a81933fae960ba06d2b5aa5c47125db80fb7) )
-	ROM_LOAD( "2v4.bin", 0x0000, 0x010000, CRC(26ddef97) SHA1(ab42a3b328c78257e4a207be0ab4e643c5c07b23) )
-	ROM_LOAD( "2v6.bin", 0x0000, 0x010000, CRC(5842d19c) SHA1(a764a899745cf5a81f7c62ff8339c0847a7f8d50) )
-	ROM_LOAD( "b7tok.bin", 0x0000, 0x020000, CRC(c3913709) SHA1(73024a3bbfbe13477e4daae78f54c694d112b936) )
-	ROM_LOAD( "bar7", 0x008000, 0x008000, CRC(ce0429bc) SHA1(d9cda09589a6e7c72c4d777de2964abe6b4e18c3) )
-	ROM_LOAD( "bar71v7", 0x0000, 0x010000, CRC(c3e01545) SHA1(4a4c06226587acb0875e6d19985916469b2eaa23) )
-	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "b7snd1.bin", 0x0000, 0x00ff28, CRC(27efbf06) SHA1(735ffb552aacebe46405828b87de947b99edc4ea) )
+	sc2_bar7_sound
 ROM_END
+
+ROM_START( sc2bar7a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bar73v1", 0x0000, 0x010000, CRC(2cc8dad8) SHA1(c3cce5e9ae032a6797828c8d42948ad749a03777) )
+	sc2_bar7_sound
+ROM_END
+
+ROM_START( sc2bar7b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bar72v5", 0x0000, 0x010000, CRC(6a9ce006) SHA1(c2b1efcdc576ea49243852f8a65c89fbca0ba7a4) )
+	sc2_bar7_sound
+ROM_END
+
+ROM_START( sc2bar7c )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1v9.bin", 0x0000, 0x010000, CRC(f2aacd4d) SHA1(c6386de65cacbfb877ead00ee48d7cf9d43e61b0) )
+	sc2_bar7_sound
+ROM_END
+
+ROM_START( sc2bar7d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1v9p.bin", 0x0000, 0x010000, CRC(d7d38831) SHA1(5053b7e586b95d5e0853a506bb3df9203672469c) )
+	sc2_bar7_sound
+ROM_END
+
+ROM_START( sc2bar7e )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2v0.bin", 0x0000, 0x010000, CRC(c5226f5d) SHA1(157b744b56a04f507798e857001b2e8255f2a3d9) )
+	sc2_bar7_sound
+ROM_END
+
+ROM_START( sc2bar7f )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2v2.bin", 0x0000, 0x010000, CRC(0e7c9399) SHA1(9892313a4c8c7e8cca0f580ac6a2ad62fdf1ad1b) )
+	sc2_bar7_sound
+ROM_END
+
+ROM_START( sc2bar7g )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2v3.bin", 0x0000, 0x010000, CRC(11fed7c4) SHA1(9164a81933fae960ba06d2b5aa5c47125db80fb7) )
+	sc2_bar7_sound
+ROM_END
+
+ROM_START( sc2bar7h )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2v4.bin", 0x0000, 0x010000, CRC(26ddef97) SHA1(ab42a3b328c78257e4a207be0ab4e643c5c07b23) )
+	sc2_bar7_sound
+ROM_END
+
+ROM_START( sc2bar7i )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2v6.bin", 0x0000, 0x010000, CRC(5842d19c) SHA1(a764a899745cf5a81f7c62ff8339c0847a7f8d50) )
+	sc2_bar7_sound
+ROM_END
+
+ROM_START( sc2bar7j )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bar7", 0x008000, 0x008000, CRC(ce0429bc) SHA1(d9cda09589a6e7c72c4d777de2964abe6b4e18c3) )
+	sc2_bar7_sound
+ROM_END
+
+ROM_START( sc2bar7k )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bar71v7", 0x0000, 0x010000, CRC(c3e01545) SHA1(4a4c06226587acb0875e6d19985916469b2eaa23) )
+	sc2_bar7_sound
+ROM_END
+
+
+#define sc2_bbar7_sound \
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "bb7snd", 0x0000, 0x080000, CRC(044c4ad5) SHA1(3d5e2e268bc2a4bac8df60e7d29b883f3d2fe61d) ) //Seems bad (loads of 00)
+
 
 ROM_START( sc2bbar7 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bb71v11.lit", 0x0000, 0x010000, CRC(4ba2cbbc) SHA1(6767d5935e12586a6bbd213e999940e3990af007) )
-
-	ROM_REGION( 0x200000, "altrevs", ROMREGION_ERASE00 )
-	ROM_LOAD( "bb7cz10", 0x0000, 0x010000, CRC(672f262f) SHA1(8d4ebf6df585ec34a6142175ab114367029b2cd8) )
-	ROM_LOAD( "bb7v1", 0x0000, 0x020000, CRC(dee2e740) SHA1(e5bd24cb0722d2aec3ac2799f66cf5c8dd7ddd74) )
-	ROM_LOAD( "big16a.bin", 0x0000, 0x010000, CRC(4fd95f69) SHA1(424c074efaccb2ad2bf4c97fdd37d9fa01c0a411) )
-	ROM_LOAD( "big16b.bin", 0x0000, 0x010000, CRC(4604a0ff) SHA1(55d95ce2be1ef01fdeae7d727682989744da863d) )
-	ROM_LOAD( "big16c.bin", 0x0000, 0x010000, CRC(f93eab19) SHA1(488c722d55c354923dc302558f28b58b1e71a64e) )
-	ROM_LOAD( "bigb713a.bin", 0x0000, 0x010000, CRC(39792e6c) SHA1(5288cdd5d03314b07fa02d1c14c2d37068ba947e) )
-	ROM_LOAD( "bigb713b.bin", 0x0000, 0x010000, CRC(7471adcd) SHA1(99369d9063c1bbe10ca7994b7d7936bbefc3c9ee) )
-	ROM_LOAD( "bigb713c.bin", 0x0000, 0x010000, CRC(a4185331) SHA1(b501e7046ac4a7ea91b7e3b1ee56e57a3321d988) )
-	ROM_LOAD( "bigb714a.bin", 0x0000, 0x010000, CRC(dbe28212) SHA1(eae79d4b671c5e9ac02ff71acdc45159a3ddc6a2) )
-	ROM_LOAD( "bigb714b.bin", 0x0000, 0x010000, CRC(f59500b2) SHA1(90eb80249d1c1798922c0e39053b6839027cd20d) )
-	ROM_LOAD( "bigb714c.bin", 0x0000, 0x010000, CRC(7d0fe1ab) SHA1(bcbdef94dc984560cede1249cc21803141539717) )
-	ROM_LOAD( "bigb71v11.bin", 0x0000, 0x010000, CRC(7151e450) SHA1(4348c2cc3de96e28326325b4ae81b9cd20cda2cb) )
-	ROM_LOAD( "bigx.bin", 0x0000, 0x008000, CRC(d6b6996b) SHA1(5226fc89e892ce0b3884bea0d220e3835dbb6c17) )
-	ROM_LOAD( "bigx003.bin", 0x0000, 0x008000, CRC(638391f3) SHA1(8b34282c1d96d929f6e193486ddb6f348330d08c) )
-	ROM_LOAD( "bigx007.bin", 0x0000, 0x008000, CRC(ac618c9d) SHA1(27813c09493f3a8d8fbf4a976ce1f5573c65a24d) )
-	ROM_LOAD( "podbig7.bin", 0x0000, 0x010000, CRC(44c76818) SHA1(eb467c8bb1a9347c7537ef0c6b664620e0d5f015) )
-
-	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "bb7snd", 0x0000, 0x080000, CRC(044c4ad5) SHA1(3d5e2e268bc2a4bac8df60e7d29b883f3d2fe61d) ) //Seems bad (loads of 00)
+	sc2_bbar7_sound
 ROM_END
+
+ROM_START( sc2bbar7a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bb7cz10", 0x0000, 0x010000, CRC(672f262f) SHA1(8d4ebf6df585ec34a6142175ab114367029b2cd8) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7b ) // might be an electrocoin hw set
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "bb7v1", 0x0000, 0x020000, CRC(dee2e740) SHA1(e5bd24cb0722d2aec3ac2799f66cf5c8dd7ddd74) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7c )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "big16a.bin", 0x0000, 0x010000, CRC(4fd95f69) SHA1(424c074efaccb2ad2bf4c97fdd37d9fa01c0a411) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "big16b.bin", 0x0000, 0x010000, CRC(4604a0ff) SHA1(55d95ce2be1ef01fdeae7d727682989744da863d) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7e )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "big16c.bin", 0x0000, 0x010000, CRC(f93eab19) SHA1(488c722d55c354923dc302558f28b58b1e71a64e) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7f )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bigb713a.bin", 0x0000, 0x010000, CRC(39792e6c) SHA1(5288cdd5d03314b07fa02d1c14c2d37068ba947e) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7g )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bigb713b.bin", 0x0000, 0x010000, CRC(7471adcd) SHA1(99369d9063c1bbe10ca7994b7d7936bbefc3c9ee) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7h )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bigb713c.bin", 0x0000, 0x010000, CRC(a4185331) SHA1(b501e7046ac4a7ea91b7e3b1ee56e57a3321d988) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7i )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bigb714a.bin", 0x0000, 0x010000, CRC(dbe28212) SHA1(eae79d4b671c5e9ac02ff71acdc45159a3ddc6a2) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7j )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bigb714b.bin", 0x0000, 0x010000, CRC(f59500b2) SHA1(90eb80249d1c1798922c0e39053b6839027cd20d) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7k )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bigb714c.bin", 0x0000, 0x010000, CRC(7d0fe1ab) SHA1(bcbdef94dc984560cede1249cc21803141539717) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7l )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bigb71v11.bin", 0x0000, 0x010000, CRC(7151e450) SHA1(4348c2cc3de96e28326325b4ae81b9cd20cda2cb) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7m )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bigx.bin", 0x0000, 0x008000, CRC(d6b6996b) SHA1(5226fc89e892ce0b3884bea0d220e3835dbb6c17) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7n )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bigx003.bin", 0x0000, 0x008000, CRC(638391f3) SHA1(8b34282c1d96d929f6e193486ddb6f348330d08c) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7o )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bigx007.bin", 0x0000, 0x008000, CRC(ac618c9d) SHA1(27813c09493f3a8d8fbf4a976ce1f5573c65a24d) )
+	sc2_bbar7_sound
+ROM_END
+
+ROM_START( sc2bbar7p )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "podbig7.bin", 0x0000, 0x010000, CRC(44c76818) SHA1(eb467c8bb1a9347c7537ef0c6b664620e0d5f015) )
+	sc2_bbar7_sound
+ROM_END
+
+
 
 ROM_START( sc2flutr )
 	//This is weird, it looks like the sc2 board is some sort of master controller for linked machines (serial connection)?.
@@ -8553,8 +8685,37 @@ GAME( 199?, sc2callp    , sc2call   ,  scorpion2        , drwho     , bfm_sc2_st
 GAME( 199?, sc2callc    , 0         ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Global",   "It's Your Call (Club?) (Global) (v1.6) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2callcp   , sc2callc  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Global",   "It's Your Call (Club?) (Global) (v1.6 Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2bar7     , 0         ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Bar 7 (Concept)", GAME_FLAGS)
-GAME( 199?, sc2bbar7    , 0         ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept)", GAME_FLAGS)
+GAME( 199?, sc2bar7     , 0         ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Bar 7 (Concept) (set 1)", GAME_FLAGS)
+GAME( 199?, sc2bar7a    , sc2bar7   ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Bar 7 (Concept) (set 2)", GAME_FLAGS)
+GAME( 199?, sc2bar7b    , sc2bar7   ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Bar 7 (Concept) (set 3)", GAME_FLAGS)
+GAME( 199?, sc2bar7c    , sc2bar7   ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Bar 7 (Concept) (set 4)", GAME_FLAGS)
+GAME( 199?, sc2bar7d    , sc2bar7   ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Bar 7 (Concept) (set 5)", GAME_FLAGS)
+GAME( 199?, sc2bar7e    , sc2bar7   ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Bar 7 (Concept) (set 6)", GAME_FLAGS)
+GAME( 199?, sc2bar7f    , sc2bar7   ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Bar 7 (Concept) (set 7)", GAME_FLAGS)
+GAME( 199?, sc2bar7g    , sc2bar7   ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Bar 7 (Concept) (set 8)", GAME_FLAGS)
+GAME( 199?, sc2bar7h    , sc2bar7   ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Bar 7 (Concept) (set 9)", GAME_FLAGS)
+GAME( 199?, sc2bar7i    , sc2bar7   ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Bar 7 (Concept) (set 10)", GAME_FLAGS)
+GAME( 199?, sc2bar7j    , sc2bar7   ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Bar 7 (Concept) (set 11)", GAME_FLAGS)
+GAME( 199?, sc2bar7k    , sc2bar7   ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Bar 7 (Concept) (set 12)", GAME_FLAGS)
+
+GAME( 199?, sc2bbar7    , 0         ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 1)", GAME_FLAGS)
+GAME( 199?, sc2bbar7a   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 2)", GAME_FLAGS)
+GAME( 199?, sc2bbar7b   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 3)", GAME_FLAGS)
+GAME( 199?, sc2bbar7c   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 4)", GAME_FLAGS)
+GAME( 199?, sc2bbar7d   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 5)", GAME_FLAGS)
+GAME( 199?, sc2bbar7e   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 6)", GAME_FLAGS)
+GAME( 199?, sc2bbar7f   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 7)", GAME_FLAGS)
+GAME( 199?, sc2bbar7g   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 8)", GAME_FLAGS)
+GAME( 199?, sc2bbar7h   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 9)", GAME_FLAGS)
+GAME( 199?, sc2bbar7i   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 10)", GAME_FLAGS)
+GAME( 199?, sc2bbar7j   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 11)", GAME_FLAGS)
+GAME( 199?, sc2bbar7k   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 12)", GAME_FLAGS)
+GAME( 199?, sc2bbar7l   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 13)", GAME_FLAGS)
+GAME( 199?, sc2bbar7m   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 14)", GAME_FLAGS)
+GAME( 199?, sc2bbar7n   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 15)", GAME_FLAGS)
+GAME( 199?, sc2bbar7o   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 16)", GAME_FLAGS)
+GAME( 199?, sc2bbar7p   , sc2bbar7  ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Big Bar 7 (Concept) (set 17)", GAME_FLAGS)
+
 GAME( 199?, sc2flutr    , 0         ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Flutter (Concept)", GAME_FLAGS) // not a game, but a link unit?
 GAME( 199?, sc2smnud    , 0         ,  scorpion2        , drwho     , bfm_sc2_state, drwho      , 0,         "Concept",   "Super Multi Nudger (Concept)", GAME_FLAGS)
 

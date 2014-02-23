@@ -9657,7 +9657,8 @@ orleg2          // (c) 2007
 orleg2o         //
 kov2nl          // (c) 2008
 kov2nlo         //
-ddpdojh
+ddpdojh			//
+kov3			//
 
 // IGS PC based HW
 speeddrv        // (c) 2004
@@ -14619,7 +14620,34 @@ sc2cvega3
 sc2cvega3p
 sc2cvega4p
 sc2bar7     // Bar 7 (Concept)
+sc2bar7a
+sc2bar7b
+sc2bar7c
+sc2bar7d
+sc2bar7e
+sc2bar7f
+sc2bar7g
+sc2bar7h
+sc2bar7i
+sc2bar7j
+sc2bar7k
 sc2bbar7    // Big Bar 7 (Concept)
+sc2bbar7a
+sc2bbar7b
+sc2bbar7c
+sc2bbar7d
+sc2bbar7e
+sc2bbar7f
+sc2bbar7g
+sc2bbar7h
+sc2bbar7i
+sc2bbar7j
+sc2bbar7k
+sc2bbar7l
+sc2bbar7m
+sc2bbar7n
+sc2bbar7o
+sc2bbar7p
 sc2flutr    // Flutter (Concept)
 sc2sghst    // Super Ghost (Concept)
 sc2smnud    // Super Multi Nudge (Concept)
@@ -29392,6 +29420,7 @@ ec_multb    // Multi Bar (Concept - Electrocoin)
 ec_casmb    // Casino Multi Bar (Concept - Electrocoin)
 ec_supmb    // Super Multi Bar (Concept - Electrocoin)
 ec_stkex    // Stake X (Concept - Electrocoin)
+ec_bar7		// Bar 7 (Concept)
 ec_fltr     // Flutter (Concept)
 ec_gold7    // Golden 7 (Concept)
 ec_mgbel    // Megabell (Concept)

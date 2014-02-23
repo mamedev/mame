@@ -398,7 +398,7 @@ ROM_START(panthera)
 	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
 
-#if 0
+#ifdef MISSING_GAME // all missing games are using a similar set of ROMs.
 ROM_START(panther7)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u2g807dc.bin", 0x2000, 0x1000, CRC(f8a687b3) SHA1(ba7747c04a5967df760ace102e47c91d42e07a12))
@@ -446,7 +446,7 @@ ROM_START(pnkpnthr)
 	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
 
-#if 0
+#ifdef MISSING_GAME // all missing games are using a similar set of ROMs.
 ROM_START(pnkpntr7)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u2g807dc.bin", 0x2000, 0x1000, CRC(f8a687b3) SHA1(ba7747c04a5967df760ace102e47c91d42e07a12))
@@ -506,7 +506,7 @@ ROM_START(starrace)
 	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
 
-#if 0
+#ifdef MISSING_GAME // all missing games are using a similar set of ROMs.
 ROM_START(starrac7)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u2g807dc.bin", 0x2000, 0x1000, CRC(f8a687b3) SHA1(ba7747c04a5967df760ace102e47c91d42e07a12))
