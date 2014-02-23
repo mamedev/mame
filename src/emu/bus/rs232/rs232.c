@@ -80,9 +80,6 @@ WRITE_LINE_MEMBER( rs232_port_device::write_rts )
 		return m_dev->input_rts(state);
 }
 
-#include "null_modem.h"
-#include "terminal.h"
-
 device_rs232_port_interface::device_rs232_port_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
 {
@@ -92,6 +89,9 @@ device_rs232_port_interface::device_rs232_port_interface(const machine_config &m
 device_rs232_port_interface::~device_rs232_port_interface()
 {
 }
+
+#include "null_modem.h"
+#include "terminal.h"
 
 SLOT_INTERFACE_START( default_rs232_devices )
 	SLOT_INTERFACE("serial_terminal", SERIAL_TERMINAL)
