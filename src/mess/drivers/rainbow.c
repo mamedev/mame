@@ -248,6 +248,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_txready_w);
 
+	DECLARE_WRITE_LINE_MEMBER(irq_hi_w);
+
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
@@ -257,6 +259,15 @@ protected:
 	virtual void machine_start();
 
 private:
+	enum
+	{
+		IRQ_8088_MAILBOX = 0,	// vector 0x27/a7
+		IRQ_8088_VBL,			// vector 0x20/a0
+		IRQ_8088_KBD,			// vector 0x26/a6
+
+		IRQ_8088_MAX
+	};
+
 	required_ioport m_inp1;
 	required_ioport m_inp2;
 	required_ioport m_inp3;
@@ -278,6 +289,10 @@ private:
 	required_shared_ptr<UINT8> m_p_nvram;
 	required_shared_ptr<UINT8> m_shared;
 	required_device<cpu_device> m_maincpu;
+
+	void raise_8088_irq(int ref);
+	void lower_8088_irq(int ref);
+	void update_8088_irqs();
 
 	bool m_SCREEN_BLANK;
 
@@ -304,6 +319,9 @@ private:
 
 	int m_unit;
 	device_t *m_image[4];
+
+	int m_irq_high;
+	UINT32 m_irq_mask;
 };
 
 
@@ -324,6 +342,8 @@ void rainbow_state::machine_start()
 	save_item(NAME(m_zflip));
 	save_item(NAME(m_kbd_tx_ready));
 	save_item(NAME(m_kbd_rx_ready));
+	save_item(NAME(m_irq_high));
+	save_item(NAME(m_irq_mask));
 
 #ifdef FORCE_RAINBOW_100_LOGO
 	UINT8 *rom = memregion("maincpu")->base();
@@ -531,6 +551,7 @@ void rainbow_state::machine_reset()
 	m_kbd8251->write_cts(1);
 
 	m_KBD = 0;
+	m_irq_high = 0;
 
 	// RESET ALL LEDs
 	output_set_value("led1", 1);
@@ -549,7 +570,7 @@ void rainbow_state::machine_reset()
 
 	MOTOR_DISABLE_counter = 2; // soon resets drv.LEDs
 	m_unit = 0;
-
+	m_irq_mask = 0;
 }
 
 UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -600,6 +621,39 @@ WRITE8_MEMBER(rainbow_state::floating_bus_w)
 		space.write_byte(offset,data);
 }
 
+// interrupt handling and arbitration.  priorities currently unknown.
+void rainbow_state::update_8088_irqs()
+{
+	static const int vectors[] = { 0x27, 0x20, 0x26 };
+
+	if (m_irq_mask != 0)
+	{
+		for (int i = 0; i < IRQ_8088_MAX; i++)
+		{
+			if (m_irq_mask & (1<<i))
+			{
+				m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, vectors[i] | m_irq_high);
+				break;
+			}
+		}
+	}
+	else
+	{
+		m_i8088->set_input_line(INPUT_LINE_INT0, CLEAR_LINE);  
+	}
+}
+
+void rainbow_state::raise_8088_irq(int ref)
+{
+	m_irq_mask |= (1<<ref);
+	update_8088_irqs();
+}
+
+void rainbow_state::lower_8088_irq(int ref)
+{
+	m_irq_mask &= ~(1<<ref);
+	update_8088_irqs();
+}
 
 READ8_MEMBER(rainbow_state::share_z80_r)
 {
@@ -728,7 +782,7 @@ WRITE8_MEMBER(rainbow_state::comm_control_w)
 READ8_MEMBER(rainbow_state::i8088_latch_r)
 {
 //    printf("Read %02x from 8088 mailbox\n", m_8088_mailbox);
-	m_i8088->set_input_line(INPUT_LINE_INT0, CLEAR_LINE);
+	lower_8088_irq(IRQ_8088_MAILBOX);
 
 	INT88 = false; // BISLANG:  INTZ80 = false; //
 	return m_8088_mailbox;
@@ -760,7 +814,7 @@ READ8_MEMBER(rainbow_state::z80_latch_r)
 WRITE8_MEMBER(rainbow_state::z80_latch_w)
 {
 	//    printf("%02x to 8088 mailbox\n", data);
-	m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, 0x27);
+	raise_8088_irq(IRQ_8088_MAILBOX);
 	m_8088_mailbox = data;
 
 	INT88 = true;
@@ -938,12 +992,12 @@ READ8_MEMBER( rainbow_state::read_video_ram_r )
 
 INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
 {
-	device.execute().set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, 0x20);
+	raise_8088_irq(IRQ_8088_VBL);
 }
 
 WRITE8_MEMBER( rainbow_state::clear_video_interrupt )
 {
-	m_i8088->set_input_line(INPUT_LINE_INT0, CLEAR_LINE);
+	lower_8088_irq(IRQ_8088_VBL);
 }
 
 READ8_MEMBER( rainbow_state::diagnostic_r )
@@ -1007,11 +1061,11 @@ void rainbow_state::update_kbd_irq()
 {
 	if ((m_kbd_rx_ready) || (m_kbd_tx_ready))
 	{
-		m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, 0x26);
+		raise_8088_irq(IRQ_8088_KBD);
 	}
 	else
 	{
-		m_i8088->set_input_line(INPUT_LINE_INT0, CLEAR_LINE);
+		lower_8088_irq(IRQ_8088_KBD);
 	}
 }
 
@@ -1036,7 +1090,7 @@ WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
 	update_kbd_irq();
 }
 
-DECLARE_WRITE_LINE_MEMBER(rainbow_state::write_keyboard_clock)
+WRITE_LINE_MEMBER(rainbow_state::write_keyboard_clock)
 {
 	m_kbd8251->write_txc(state);
 	m_kbd8251->write_rxc(state);
@@ -1066,6 +1120,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::motor_tick)
 
 	if (m_beep_counter > 0)
 			m_beep_counter--;
+}
+
+// on 100-B, DTR from the keyboard 8051 controls bit 7 of IRQ vectors
+WRITE_LINE_MEMBER(rainbow_state::irq_hi_w)
+{
+	m_irq_high = (state == ASSERT_LINE) ? 0x80 : 0;
 }
 
 static const vt_video_interface video_interface =
@@ -1146,6 +1206,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 
 	MCFG_DEVICE_ADD("kbdser", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(rainbow_state, kbd_tx))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(rainbow_state, irq_hi_w))
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(rainbow_state, kbd_rxready_w))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(rainbow_state, kbd_txready_w))
 
