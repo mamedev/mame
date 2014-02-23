@@ -90,14 +90,13 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
-
+	DECLARE_PALETTE_INIT(dblcrown);
 protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 void dblcrown_state::video_start()
@@ -576,6 +575,7 @@ static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",dblcrown,"palette")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(dblcrown_state, dblcrown)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

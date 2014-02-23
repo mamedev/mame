@@ -204,7 +204,7 @@ static MACHINE_CONFIG_START( gotya, gotya_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",gotya,"palette")
 	MCFG_PALETTE_ADD("palette", 16*4)
-
+	MCFG_PALETTE_INIT_OWNER(gotya_state, gotya)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

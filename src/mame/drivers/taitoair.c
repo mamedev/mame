@@ -719,7 +719,7 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",airsys,"palette")
 
-	MCG_PALETTE_ADD_INIT_BLACK("palette", 512*16+512*16)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512*16+512*16)
 
 	MCFG_TC0080VCO_ADD("tc0080vco", airsys_tc0080vco_intf)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")

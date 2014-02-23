@@ -186,6 +186,7 @@ static MACHINE_CONFIG_START( xorworld, xorworld_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",xorworld,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(xorworld_state, xorworld)
 
 
 	// sound hardware

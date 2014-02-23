@@ -332,7 +332,7 @@ UINT32 lordgun_state::screen_update_lordgun(screen_device &screen, bitmap_ind16 
 
 	if (m_whitescreen)
 	{
-		bitmap.fill(get_white_pen(machine()), cliprect);
+		bitmap.fill(m_palette->white_pen(), cliprect);
 		return 0;
 	}
 

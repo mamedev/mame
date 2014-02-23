@@ -857,7 +857,7 @@ static MACHINE_CONFIG_START( m10, m10_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",m10,"palette")
 	MCFG_PALETTE_ADD("palette", 2*8)
 
-	MCFG_PALETTE_INIT_OVERRIDE(m10_state,m10)
+	MCFG_PALETTE_INIT_OWNER(m10_state,m10)
 	MCFG_VIDEO_START_OVERRIDE(m10_state,m10)
 
 	/* 74LS123 */

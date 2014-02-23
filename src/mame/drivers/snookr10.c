@@ -1043,6 +1043,7 @@ static MACHINE_CONFIG_START( snookr10, snookr10_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",snookr10,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(snookr10_state, snookr10)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

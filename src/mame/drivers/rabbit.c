@@ -908,7 +908,7 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 20*16-1, 32*16, 48*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rabbit_state, screen_update_rabbit)
 
-	MCG_PALETTE_ADD_INIT_BLACK("palette", 0x4000)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

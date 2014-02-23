@@ -40,7 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 	DECLARE_WRITE8_MEMBER(ym2151_data_latch_w);
 	DECLARE_WRITE8_MEMBER(sound_slave_dac_w);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(exterm);
 	TIMER_CALLBACK_MEMBER(sound_delayed_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(master_sound_nmi_callback);
 	required_device<cpu_device> m_maincpu;

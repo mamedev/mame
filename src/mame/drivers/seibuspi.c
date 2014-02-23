@@ -1847,7 +1847,7 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",spi,"palette")
 
-	MCG_PALETTE_ADD_INIT_BLACK("palette", 6144)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1945,7 +1945,7 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",spi,"palette")
 
-	MCG_PALETTE_ADD_INIT_BLACK("palette", 6144)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1998,7 +1998,7 @@ static MACHINE_CONFIG_START( sys386f, seibuspi_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",sys386f,"palette")
 
-	MCG_PALETTE_ADD_INIT_BLACK("palette", 8192)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, sys386f)
 

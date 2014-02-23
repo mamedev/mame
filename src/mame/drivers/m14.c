@@ -90,7 +90,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(m14);
 	UINT32 screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m14_irq);
 };
@@ -348,6 +348,7 @@ static MACHINE_CONFIG_START( m14, m14_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m14_state, screen_update_m14)
 	MCFG_GFXDECODE_ADD("gfxdecode",m14,"palette")
 	MCFG_PALETTE_ADD("palette", 0x20)
+	MCFG_PALETTE_INIT_OWNER(m14_state, m14)
 
 
 	/* sound hardware */

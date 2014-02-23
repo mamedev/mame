@@ -31,7 +31,7 @@ public:
 	TILE_GET_INFO_MEMBER(yard_get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(yard_tilemap_scan_rows);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(m58);
 	UINT32 screen_update_yard(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_panel( bitmap_ind16 &bitmap, const rectangle &cliprect );

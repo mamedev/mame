@@ -240,7 +240,7 @@ static MACHINE_CONFIG_START( sbugger, sbugger_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sbugger_state, screen_update_sbugger)
 
 	MCFG_PALETTE_ADD("palette", 512)
-
+	MCFG_PALETTE_INIT_OWNER(sbugger_state, sbugger)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

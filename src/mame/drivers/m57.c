@@ -242,7 +242,7 @@ static MACHINE_CONFIG_START( m57, m57_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",m57,"palette")
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
-
+	MCFG_PALETTE_INIT_OWNER(m57_state, m57)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(m52_sound_c_audio)

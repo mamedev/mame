@@ -17,7 +17,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sbugger_interrupt);
 	TILE_GET_INFO_MEMBER(get_sbugger_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(sbugger);
 	UINT32 screen_update_sbugger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

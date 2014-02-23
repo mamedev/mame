@@ -61,7 +61,7 @@ static ADDRESS_MAP_START( quizpani_map, AS_PROGRAM, 16, quizpani_state )
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(quizpani_tilesbank_w)
 	AM_RANGE(0x104000, 0x104001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x104020, 0x104027) AM_DEVWRITE("nmk112", nmk112_device, okibank_lsb_w)
-	AM_RANGE(0x108000, 0x1083ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x108000, 0x1083ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x108400, 0x1085ff) AM_WRITENOP
 	AM_RANGE(0x10c000, 0x10c007) AM_RAM AM_SHARE("scrollreg")
 	AM_RANGE(0x10c008, 0x10c403) AM_WRITENOP
@@ -201,6 +201,7 @@ static MACHINE_CONFIG_START( quizpani, quizpani_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",quizpani,"palette")
 	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

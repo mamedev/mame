@@ -948,7 +948,7 @@ static MACHINE_CONFIG_START( ldrun, m62_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",ldrun,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
-
+	MCFG_PALETTE_INIT_OWNER(m62_state,m62)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(m62_audio)

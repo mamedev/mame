@@ -356,7 +356,7 @@ void igs017_state::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect, i
 	if ( addr + dimx * dimy >= m_sprites_gfx_size )
 		return;
 
-	gfx_element gfx(machine(), m_sprites_gfx + addr, dimx, dimy, dimx, 0x100, 32);
+	gfx_element gfx(machine(), m_palette, m_sprites_gfx + addr, dimx, dimy, dimx, 0x100, 32);
 
 	gfx.transpen(bitmap,cliprect,
 				0, color,
@@ -1878,7 +1878,7 @@ static ADDRESS_MAP_START( spkrform_io, AS_IO, 8, igs017_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_le_w ) AM_SHARE("paletteram")
+	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
 
 	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD("ppi8255", i8255_device, read)
@@ -3848,7 +3848,7 @@ static MACHINE_CONFIG_START( spkrform, igs017_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",igs017,"palette")
 	MCFG_PALETTE_ADD("palette", 0x100*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 
 	/* sound hardware */

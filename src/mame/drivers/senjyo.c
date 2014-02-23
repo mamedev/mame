@@ -575,7 +575,7 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",senjyo,"palette")
 
-	MCG_PALETTE_ADD_INIT_BLACK("palette", 512+2)  /* 512 real palette + 2 for the radar */
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512+2)  /* 512 real palette + 2 for the radar */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

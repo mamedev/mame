@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( metlclsh_master_map, AS_PROGRAM, 8, metlclsh_state )
 	AM_RANGE(0xc0c2, 0xc0c2) AM_WRITE(metlclsh_cause_irq)           // cause irq on cpu #2
 	AM_RANGE(0xc0c3, 0xc0c3) AM_WRITE(metlclsh_ack_nmi)             // nmi ack
 /**/AM_RANGE(0xc800, 0xc82f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-/**/AM_RANGE(0xcc00, 0xcc2f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette_ext")
+/**/AM_RANGE(0xcc00, 0xcc2f) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 /**/AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(metlclsh_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym2", ym3526_device, write)

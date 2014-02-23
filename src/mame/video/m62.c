@@ -210,7 +210,7 @@ PALETTE_INIT_MEMBER(m62_state, m62)
 	palette.set_pen_colors(0x100, rgb, 0x100);
 	auto_free(machine(), rgb);
 
-	m62_amplify_contrast(machine().palette,0);
+	m62_amplify_contrast(palette.palette(),0);
 
 	/* we'll need this at run time */
 	m_sprite_height_prom = color_prom + 0x600;
@@ -230,7 +230,7 @@ PALETTE_INIT_MEMBER(m62_state,lotlot)
 	palette.set_pen_colors(0x180, rgb, 0x180);
 	auto_free(machine(), rgb);
 
-	m62_amplify_contrast(machine().palette,0);
+	m62_amplify_contrast(palette.palette(),0);
 
 	/* we'll need this at run time */
 	m_sprite_height_prom = color_prom + 0x900;
@@ -251,7 +251,7 @@ PALETTE_INIT_MEMBER(m62_state,battroad)
 	palette.set_pen_colors(0x100, rgb, 0x100);
 	auto_free(machine(), rgb);
 
-	m62_amplify_contrast(machine().palette,0x200);
+	m62_amplify_contrast(palette.palette(),0x200);
 
 	// custom palette for foreground
 	rgb = compute_res_net_all(machine(), color_prom, &battroad_char_decode_info, &battroad_char_net_info);
@@ -276,7 +276,7 @@ PALETTE_INIT_MEMBER(m62_state,spelunk2)
 	palette.set_pen_colors(0x200, rgb, 0x100);
 	auto_free(machine(), rgb);
 
-	m62_amplify_contrast(machine().palette,0);
+	m62_amplify_contrast(palette.palette(),0);
 
 	/* we'll need this at run time */
 	m_sprite_height_prom = color_prom + 0x700;

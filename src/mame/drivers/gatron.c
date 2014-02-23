@@ -571,6 +571,7 @@ static MACHINE_CONFIG_START( gat, gatron_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",gat,"palette")
 	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(gatron_state, gatron)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

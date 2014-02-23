@@ -460,6 +460,7 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2048+32768)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_INIT_OWNER(exterm_state, exterm)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(40000000/8, 318, 0, 256, 264, 0, 240)
