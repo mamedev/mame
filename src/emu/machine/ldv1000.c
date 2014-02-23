@@ -326,8 +326,8 @@ void pioneer_ldv1000_device::player_vsync(const vbi_metadata &vbi, int fieldnum,
 {
 	// generate interrupts if we hit the edges
 	slider_position sliderpos = get_slider_position();
-	m_z80_ctc->trigger(1, sliderpos == SLIDER_MINIMUM);
-	m_z80_ctc->trigger(2, sliderpos == SLIDER_MAXIMUM);
+	m_z80_ctc->trg1(sliderpos == SLIDER_MINIMUM);
+	m_z80_ctc->trg2(sliderpos == SLIDER_MAXIMUM);
 
 	// signal VSYNC and set a timer to turn it off
 	m_vsync = true;

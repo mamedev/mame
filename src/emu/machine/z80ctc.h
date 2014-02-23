@@ -71,14 +71,6 @@ public:
 	// construction/destruction
 	z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// state getters
-	attotime period(int ch) const { return m_channel[ch].period(); }
-
-	// I/O operations
-	UINT8 read(int ch) { return m_channel[ch].read(); }
-	void write(int ch, UINT8 data) { m_channel[ch].write(data); }
-	void trigger(int ch, UINT8 data) { m_channel[ch].trigger(data); }
-
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -87,7 +79,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( trg2 );
 	DECLARE_WRITE_LINE_MEMBER( trg3 );
 
-private:
+protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
@@ -98,6 +90,7 @@ private:
 	virtual int z80daisy_irq_ack();
 	virtual void z80daisy_irq_reti();
 
+private:
 	// internal helpers
 	void interrupt_check();
 	void timercallback(int chanindex);
