@@ -251,8 +251,8 @@ bool ui_menubar::event_loop()
 
 bool ui_menubar::poll_navigation_keys()
 {
-	int code_previous_menu;
-	int code_next_menu;
+	int code_previous_menu = IPT_INVALID;
+	int code_next_menu = IPT_INVALID;
 	int code_child_menu = IPT_INVALID;
 	int code_parent_menu = IPT_INVALID;
 	int code_previous_peer = IPT_INVALID;
@@ -261,24 +261,29 @@ bool ui_menubar::poll_navigation_keys()
 		? IPT_UI_SELECT
 		: IPT_INVALID;
 
-	if (!m_selected_item || !m_selected_item->is_sub_menu())
+	// are we navigating the menu?
+	if (m_selected_item != NULL)
 	{
-		// no pull down menu selected
-		code_previous_menu = IPT_UI_LEFT;
-		code_next_menu = IPT_UI_RIGHT;
-		code_child_menu = IPT_UI_DOWN;
-	}
-	else
-	{
-		// pull down menu selected
-		code_previous_menu = IPT_UI_UP;
-		code_next_menu = IPT_UI_DOWN;
-		if (m_selected_item->child())
-			code_child_menu = IPT_UI_SELECT;
-		code_previous_peer = IPT_UI_LEFT;
-		code_next_peer = IPT_UI_RIGHT;
-		if (m_selected_item->parent()->is_sub_menu())
-			code_parent_menu = IPT_UI_LEFT;
+		// if so, are we in a pull down menu?
+		if (!m_selected_item->is_sub_menu())
+		{
+			// no pull down menu selected
+			code_previous_menu = IPT_UI_LEFT;
+			code_next_menu = IPT_UI_RIGHT;
+			code_child_menu = IPT_UI_DOWN;
+		}
+		else if (m_selected_item && m_selected_item->is_sub_menu())
+		{
+			// pull down menu selected
+			code_previous_menu = IPT_UI_UP;
+			code_next_menu = IPT_UI_DOWN;
+			if (m_selected_item->child())
+				code_child_menu = IPT_UI_SELECT;
+			code_previous_peer = IPT_UI_LEFT;
+			code_next_peer = IPT_UI_RIGHT;
+			if (m_selected_item->parent()->is_sub_menu())
+				code_parent_menu = IPT_UI_LEFT;
+		}
 	}
 
 	bool result = true;
