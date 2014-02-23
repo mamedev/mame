@@ -738,7 +738,7 @@ WRITE_LINE_MEMBER( apollo_state::apollo_pic8259_slave_set_int_line ) {
 
 WRITE_LINE_MEMBER(apollo_state::apollo_ptm_timer_tick)
 {
-	if (m_ptm->started())
+	if ((state) && (m_ptm->started()))
 	{
 		ptm_counter++; 
 		m_ptm->set_c1( 1);
