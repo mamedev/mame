@@ -124,9 +124,7 @@ WRITE8_MEMBER(bking_state::bking_cont1_w)
 
 	coin_lockout_global_w(machine(), ~data & 0x01);
 
-	flip_screen_set_no_update(data & 0x04);
-
-	machine().tilemap().set_flip_all(flip_screen() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	flip_screen_set(data & 0x04);
 
 	m_controller = data & 0x02;
 

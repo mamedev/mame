@@ -783,6 +783,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",mbeeic,"palette")
+	
 	MCFG_PALETTE_ADD("palette", 96)
 	MCFG_PALETTE_INIT_OWNER(mbee_state,mbeeic)
 
@@ -820,6 +821,7 @@ static MACHINE_CONFIG_DERIVED( mbeepc85, mbeeic )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeepc85b, mbeepc85 )
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(mbee_state,mbeepc85b)
 MACHINE_CONFIG_END
 
@@ -829,6 +831,7 @@ static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MCFG_CPU_IO_MAP(mbeeppc_io)
 	MCFG_VIDEO_START_OVERRIDE(mbee_state,mbeeppc)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", mbeeppc)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(mbee_state,mbeeppc)
 	MCFG_DEVICE_REMOVE("crtc")

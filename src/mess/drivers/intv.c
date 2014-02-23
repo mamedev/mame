@@ -878,6 +878,7 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode",intvkbd,"palette")
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
 	
 	MCFG_SCREEN_MODIFY("screen")

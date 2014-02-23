@@ -1,5 +1,5 @@
 
-#define vdt911_chr_region "gfx1"
+#define vdt911_chr_region ":gfx1"
 
 enum
 {
@@ -52,9 +52,6 @@ public:
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
 	
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -73,8 +70,6 @@ extern const device_type VDT911;
 	MCFG_DEVICE_ADD(_tag, VDT911, 0) \
 	MCFG_DEVICE_CONFIG(_intf)
 
-#define MCFG_VDT911_VIDEO_GFXDECODE(_gfxtag) \
-	vdt911_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 	DECLARE_READ8_DEVICE_HANDLER(vdt911_cru_r);
 DECLARE_WRITE8_DEVICE_HANDLER(vdt911_cru_w);

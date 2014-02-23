@@ -890,6 +890,29 @@ ROM_START( witch )
 ROM_END
 
 
+/* Witch (With ranking) */
+ROM_START( witchb )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "x.u5", 0x10000, 0x20000, CRC(d0818777) SHA1(a6232fef84bec3cfb4a6122a48e96e7b7950e013) )
+	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "6.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "3.u3", 0x00000, 0x20000,  CRC(7007ced4) SHA1(6a0aac3ff9a4d5360c8ba1142f010add1b430ada) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "5.a1", 0x00000, 0x40000,  CRC(fc37a9c2) SHA1(940d8c53d47eaa93a85a91e4ecb92fc4912d331d) )
+
+	ROM_REGION( 0x40000, "essnd", 0 )
+	ROM_LOAD( "1.v10", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) )
+
+	ROM_REGION( 0x100, "prom", 0 )
+	ROM_LOAD( "tbp24s10n.10k", 0x000, 0x100, CRC(ee7b9d8f) SHA1(3a7b75befab83bc37e4e403ad3632841c2d37707) ) /* Currently unused, unknown use */
+ROM_END
+
+
 ROM_START( witchs ) /* this set has (c)1992 Sega / Vic Tokai in the roms */
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "rom.u5", 0x10000, 0x20000, CRC(348fccb8) SHA1(947defd86c4a597fbfb9327eec4903aa779b3788) )
@@ -942,6 +965,7 @@ DRIVER_INIT_MEMBER(witch_state,witch)
 	m_bank = -1;
 }
 
-GAME( 1992, witch,    0,     witch, witch, witch_state, witch, ROT0, "Excellent System",     "Witch", 0 )
+GAME( 1992, witch,    0,     witch, witch, witch_state, witch, ROT0, "Excellent System",     "Witch",                0 )
+GAME( 1992, witchb,   witch, witch, witch, witch_state, witch, ROT0, "Excellent System",     "Witch (With ranking)", 0 )
 GAME( 1992, witchs,   witch, witch, witch, witch_state, witch, ROT0, "Sega / Vic Tokai",     "Witch (Sega License)", 0 )
-GAME( 1995, pbchmp95, witch, witch, witch, witch_state, witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95", 0 )
+GAME( 1995, pbchmp95, witch, witch, witch, witch_state, witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95",    0 )

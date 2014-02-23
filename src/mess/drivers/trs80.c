@@ -676,6 +676,7 @@ static MACHINE_CONFIG_DERIVED( lnw80, model1 )
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode",lnw80)
 	
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(trs80_state,lnw80)
 	MCFG_SCREEN_MODIFY("screen")

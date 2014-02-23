@@ -943,6 +943,7 @@ static MACHINE_CONFIG_DERIVED( kccomp, amstrad )
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state,kccomp)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,kccomp)
 
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,kccomp)
 MACHINE_CONFIG_END
 

@@ -294,6 +294,7 @@ void huc6260_device::device_reset()
 }
 
 static MACHINE_CONFIG_FRAGMENT( huc6260 )
+	MCFG_PALETTE_ADD("palette",  HUC6260_PALETTE_SIZE )
 	MCFG_PALETTE_INIT_OWNER(huc6260_device, huc6260)
 MACHINE_CONFIG_END
 

@@ -1219,6 +1219,7 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
@@ -1667,6 +1668,7 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 256)
 
 	// IIci only has slots c/d/e
@@ -1696,6 +1698,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_NUBUS_SLOT_REMOVE("nb9")

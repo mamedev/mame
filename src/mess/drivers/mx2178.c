@@ -184,7 +184,6 @@ static MACHINE_CONFIG_START( mx2178, mx2178_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_GFXDECODE_ADD("gfxdecode",mx2178,"palette")
-	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* Devices */

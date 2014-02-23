@@ -272,19 +272,9 @@ const device_type VDT911 = &device_creator<vdt911_device>;
 
 vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VDT911, "911 VDT", tag, owner, clock, "vdt911", __FILE__),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this, "gfxdecode")
 {
 	m_token = global_alloc_clear(vdt_t);
-}
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void vdt911_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<vdt911_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -722,7 +712,10 @@ void vdt911_keyboard(device_t *device)
 }
 
 static MACHINE_CONFIG_FRAGMENT( vdt911 )
+	MCFG_PALETTE_ADD("palette", 8)	
 	MCFG_PALETTE_INIT_OWNER(vdt911_device, vdt911)
+
+	MCFG_GFXDECODE_ADD("gfxdecode",vdt911,"palette")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

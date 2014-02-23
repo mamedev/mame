@@ -104,6 +104,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tek4109a, tek4107a )
 	/* video hardware */
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 4096)
 MACHINE_CONFIG_END
 

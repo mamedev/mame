@@ -795,6 +795,8 @@ static MACHINE_CONFIG_DERIVED( supergb, gameboy )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
@@ -810,6 +812,8 @@ static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state, gbpocket)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, gbpocket)
+	
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbp)
 
 	MCFG_DEVICE_REMOVE("lcd")
@@ -824,6 +828,7 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gameboy )
 	MCFG_MACHINE_START_OVERRIDE(gb_state,gbc)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state,gbc)
 
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gbc)
 
@@ -863,6 +868,7 @@ static MACHINE_CONFIG_START( megaduck, megaduck_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_GFXDECODE_ADD("gfxdecode",gb,"palette")
+	
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(megaduck_state,megaduck)
 

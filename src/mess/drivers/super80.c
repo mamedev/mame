@@ -696,6 +696,8 @@ static MACHINE_CONFIG_DERIVED( super80m, super80 )
 	MCFG_CPU_PROGRAM_MAP(super80m_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", super80m)
+	
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
 

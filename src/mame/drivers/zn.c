@@ -1207,6 +1207,8 @@ MACHINE_RESET_MEMBER(zn_state,coh1000tb)
 }
 
 static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_1mb_vram)
+
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000tb_map)
 
@@ -1214,11 +1216,19 @@ static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_1mb_vram)
 	MCFG_NVRAM_ADD_1FILL("fm1208s")
 
 	MCFG_MB3773_ADD("mb3773")
+
+	/* sound hardware */
+	MCFG_SOUND_MODIFY("spu")
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
 	MCFG_FRAGMENT_ADD(taito_zoom_sound)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(coh1002tb, zn1_2mb_vram)
+
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000tb_map)
 
@@ -1226,6 +1236,12 @@ static MACHINE_CONFIG_DERIVED(coh1002tb, zn1_2mb_vram)
 	MCFG_NVRAM_ADD_1FILL("fm1208s")
 
 	MCFG_MB3773_ADD("mb3773")
+
+	/* sound hardware */
+	MCFG_SOUND_MODIFY("spu")
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
 	MCFG_FRAGMENT_ADD(taito_zoom_sound)
 MACHINE_CONFIG_END
