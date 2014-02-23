@@ -1525,10 +1525,8 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 
 	if (ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
-		if (!machine.options().confirm_quit())
-			machine.schedule_exit();
-		else
-			return machine.ui().set_handler(handler_confirm_quit, 0);
+		machine.ui().request_quit();
+		return 0;
 	}
 
 	// turn on menus if requested 
@@ -1691,6 +1689,19 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 	// remove the pause and reset the state 
 	machine.resume();
 	return UI_HANDLER_CANCEL;
+}
+
+
+//-------------------------------------------------
+//  request_quit
+//-------------------------------------------------
+
+void ui_manager::request_quit()
+{
+	if (!machine().options().confirm_quit())
+		machine().schedule_exit();
+	else
+		set_handler(handler_confirm_quit, 0);
 }
 
 
