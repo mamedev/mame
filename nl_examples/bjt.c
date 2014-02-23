@@ -9,10 +9,8 @@
 NETLIST_START(bjt)
     /* Standard stuff */
 
-    CLOCK(clk)
-    PARAM(clk.FREQ, 1000) // 1000 Hz
-    SOLVER(Solver)
-    PARAM(Solver.FREQ, 48000)
+    CLOCK(clk, 1000) // 1000 Hz
+    SOLVER(Solver, 48000)
     ANALOG_INPUT(V5, 5)
     ANALOG_INPUT(V3, 3.5)
 

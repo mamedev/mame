@@ -5,7 +5,7 @@
 
 #include "netlist/devices/net_lib.h"
 
-NETLIST_START(ne555_astable)
+NETLIST_START(ls629)
 
     /*
      * Astable ne555
@@ -14,8 +14,7 @@ NETLIST_START(ne555_astable)
 
     /* Standard stuff */
 
-    SOLVER(Solver)
-    PARAM(Solver.FREQ, 48000)
+    SOLVER(Solver, 48000)
 
     ANALOG_INPUT(V5, 5)  // 5V
     ANALOG_INPUT(VF, 2.5)  // 5V
@@ -28,6 +27,6 @@ NETLIST_START(ne555_astable)
     NET_C(VF, OSC.FC)
     NET_C(GND, OSC.ENQ)
 
-    //LOG(log2, OSC.Y)
+    LOG(log2, OSC.Y)
 
 NETLIST_END()

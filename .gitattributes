@@ -363,6 +363,7 @@ nl_examples/msx_mixer_stage.c svneol=native#text/plain
 nl_examples/ne555_astable.c svneol=native#text/plain
 nl_examples/opamp.c svneol=native#text/plain
 nl_examples/sn74ls629_osc.c svneol=native#text/plain
+nl_examples/tdice.c svneol=native#text/plain
 nl_examples/test.c svneol=native#text/plain
 nl_examples/todo.c svneol=native#text/plain
 nl_examples/vccs.c svneol=native#text/plain

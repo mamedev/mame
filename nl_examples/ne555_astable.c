@@ -14,8 +14,7 @@ NETLIST_START(ne555_astable)
 
     /* Standard stuff */
 
-    SOLVER(Solver)
-    PARAM(Solver.FREQ, 48000)
+    SOLVER(Solver, 48000)
 
     ANALOG_INPUT(V5, 5)  // 5V
 
