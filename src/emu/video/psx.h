@@ -303,7 +303,7 @@ private:
 
 	devcb2_write_line m_vblank_handler;
 
-#if defined( DEBUG_VIEWER )
+#if defined(DEBUG_VIEWER) && DEBUG_VIEWER
 	void DebugMeshInit( void );
 	void DebugMesh( int n_coordx, int n_coordy );
 	void DebugMeshEnd( void );
