@@ -17,8 +17,10 @@ ATTR_COLD void pstate_manager_t::save_state_ptr(const pstring &stname, const pst
 	pstring fullname = stname;
 	ATTR_UNUSED  pstring ts[] = {
 			"NOT_SUPPORTED",
+            "DT_CUSTOM",
 			"DT_DOUBLE",
 			"DT_INT64",
+            "DT_INT16",
 			"DT_INT8",
 			"DT_INT",
 			"DT_BOOLEAN"

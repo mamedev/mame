@@ -440,6 +440,9 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 			case DT_INT64:
 				save_pointer((INT64 *) s->m_ptr, s->m_name, s->m_count);
 				break;
+            case DT_INT16:
+                save_pointer((INT16 *) s->m_ptr, s->m_name, s->m_count);
+                break;
 			case DT_INT8:
 				save_pointer((INT8 *) s->m_ptr, s->m_name, s->m_count);
 				break;

@@ -586,8 +586,6 @@ public:
     ATTR_HOT inline void inc_active();
     ATTR_HOT inline void dec_active();
 
-    ATTR_HOT inline const int active_count() const { return m_active; }
-
     ATTR_HOT inline const netlist_sig_t Q() const
     {
         assert(family() == LOGIC);
@@ -647,7 +645,7 @@ public:
 
 protected:  //FIXME: needed by current solver code
 
-    UINT32 m_num_cons;
+    UINT16 m_num_cons;
 
 public:
     hybrid_t m_last;
@@ -673,11 +671,9 @@ protected:
 
 
 private:
-    ATTR_HOT void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask) const;
-
     netlist_time m_time;
     INT32        m_active;
-    UINT32       m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
+    UINT8        m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
     netlist_core_terminal_t * RESTRICT m_railterminal;
 };
@@ -693,6 +689,7 @@ class netlist_output_t : public netlist_core_terminal_t
 public:
 
     ATTR_COLD netlist_output_t(const type_t atype, const family_t afamily);
+    ATTR_COLD virtual ~netlist_output_t() {}
 
     ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname);
     ATTR_COLD virtual void reset()
@@ -1223,13 +1220,12 @@ ATTR_HOT inline void netlist_input_t::activate_lh()
 
 ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time delay)
 {
-    if (is_queued())
+    if (is_queued() || m_num_cons == 0)
         return;
     m_time = netlist().time() + delay;
-    m_in_queue = (m_active > 0) ? 1 : 0;     /* queued ? */
+    m_in_queue = (m_active > 0);     /* queued ? */
     if (m_in_queue)
     {
-        //m_in_queue = 1;     /* pending */
         netlist().push_to_queue(this, m_time);
     }
 }
@@ -1238,11 +1234,14 @@ ATTR_HOT inline void netlist_net_t::inc_active()
 {
     m_active++;
 
-    if (USE_DEACTIVE_DEVICE && m_active == 1 && m_in_queue > 0)
+    if (USE_DEACTIVE_DEVICE)
     {
-        m_last = m_cur;
-        railterminal().netdev().inc_active();
-        m_cur = m_new;
+        if (m_active == 1 && m_in_queue > 0)
+        {
+            m_last = m_cur;
+            railterminal().netdev().inc_active();
+            m_cur = m_new;
+        }
     }
 
     if (m_active == 1 && m_in_queue == 0)
@@ -1263,9 +1262,11 @@ ATTR_HOT inline void netlist_net_t::inc_active()
 ATTR_HOT inline void netlist_net_t::dec_active()
 {
     m_active--;
-    if (USE_DEACTIVE_DEVICE && (m_active == 0))
-        railterminal().netdev().dec_active();
-
+    if (USE_DEACTIVE_DEVICE)
+    {
+        if (m_active == 0)
+            railterminal().netdev().dec_active();
+    }
 }
 
 ATTR_HOT inline const netlist_sig_t netlist_logic_input_t::Q() const

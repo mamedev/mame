@@ -123,29 +123,26 @@ public:
 		}
 	#endif
 
-	virtual void update()
-	{
-		static const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
-		int pos = -1;
+    virtual void update()
+    {
+        static const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
 
-		for (int i = 0; i< _numdev; i++)
-		{
-			this->m_i[i].activate();
-			if (INPLOGIC(this->m_i[i]) == _check)
-			{
-				OUTLOGIC(this->m_Q, _check ^ (1 ^ _invert), times[_check]);// ? 15000 : 22000);
-				pos = i;
-				break;
-			}
-		}
-		if (pos >= 0)
-		{
-			for (int i = 0; i < _numdev; i++)
-				if (i != pos)
-					this->m_i[i].inactivate();
-		} else
-			OUTLOGIC(this->m_Q,_check ^ (_invert), times[1-_check]);// ? 22000 : 15000);
-	}
+        for (int i = 0; i< _numdev; i++)
+        {
+            this->m_i[i].activate();
+            if (INPLOGIC(this->m_i[i]) == _check)
+            {
+                for (int j = 0; j < i; j++)
+                    this->m_i[j].inactivate();
+                for (int j = i + 1; j < _numdev; j++)
+                    this->m_i[j].inactivate();
+
+                OUTLOGIC(this->m_Q, _check ^ (1 ^ _invert), times[_check]);// ? 15000 : 22000);
+                return;
+            }
+        }
+        OUTLOGIC(this->m_Q,_check ^ (_invert), times[1-_check]);// ? 22000 : 15000);
+    }
 
 public:
 	netlist_ttl_input_t m_i[_numdev];
@@ -178,7 +175,7 @@ public:
     }
 
 	#if (USE_DEACTIVE_DEVICE)
-		ATTR_HOT void inc_active()
+		ATTR_HOT virtual void inc_active()
 		{
 			if (++m_active == 1)
 			{
@@ -186,7 +183,7 @@ public:
 			}
 		}
 
-		ATTR_HOT void dec_active()
+		ATTR_HOT virtual void dec_active()
 		{
 			if (--m_active == 0)
 			{
@@ -196,14 +193,14 @@ public:
 		}
 	#endif
 
-
 	ATTR_HOT ATTR_ALIGN void update()
 	{
-		static const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
+		static const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
 
-		int res = _invert ^ 1 ^_check;
 		m_i[0].activate();
 		m_i[1].activate();
+#if 0
+        UINT8 res = _invert ^ 1 ^_check;
 		if (INPLOGIC(m_i[0]) ^ _check)
 		{
 			if (INPLOGIC(m_i[1]) ^ _check)
@@ -216,7 +213,24 @@ public:
 			if (INPLOGIC(m_i[1]) ^ _check)
 				m_i[1].inactivate();
 		}
-		OUTLOGIC(m_Q, res, times[(res & 1) ^ 1]);// ? 22000 : 15000);
+        OUTLOGIC(m_Q, res, times[res & 1]);// ? 22000 : 15000);
+#else
+		UINT8 val = (INPLOGIC(m_i[0]) ^ _check) | ((INPLOGIC(m_i[1]) ^ _check) << 1);
+        UINT8 res = _invert ^ 1 ^_check;
+		switch (val)
+		{
+		    case 1:
+                m_i[0].inactivate();
+                break;
+		    case 2:
+		        m_i[1].inactivate();
+		        break;
+            case 3:
+                res = _invert ^ _check;
+                break;
+		}
+        OUTLOGIC(m_Q, res, times[res]);// ? 22000 : 15000);
+#endif
 	}
 
 public:
