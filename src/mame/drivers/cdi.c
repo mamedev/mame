@@ -375,11 +375,10 @@ struct cdrom_interface cdi_cdrom =
 // Standard CD-i system, with CD-ROM image device (MESS) and Software List (MESS)
 static MACHINE_CONFIG_DERIVED( cdi_base, cdi )
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdi )
-
-	MCFG_CDROM_ADD( "cdrom", cdi_cdrom )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cdimono1, cdi_base )
+	MCFG_CDROM_ADD( "cdrom", cdi_cdrom )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
 MACHINE_CONFIG_END
 
