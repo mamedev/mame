@@ -5,6 +5,16 @@
 	Decryption should be correct in most cases, but the ARM mode code at the start of the external
 	ROMs is a bit weird, with many BNV instructions rather than jumps.  Maybe the ARM is customized,
 	the code has been 'NOPPED' out this way (BNV is Branch Never) or it's a different type of ARM?
+	 
+	 - Some of the THUMB code looks like THUMB2 code
+	  eg 
+	    f004 BL (HI) 00004000
+		e51f B #fffffa3e
+		0434 LSL R4, R6, 16
+		0000 LSL R0, R0, 0
+
+		should be a 32-bit branch instruction with the 2nd dword used as data.
+
 
 	We need to determine where VRAM etc. map in order to attempt tests on the PCBs.
 
@@ -74,6 +84,8 @@ public:
 static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM //AM_REGION("user1", 0x00000) // internal ROM
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("user1", 0) // not 100% sure it maps here.
+	AM_RANGE(0xffff0000, 0xffffffff) AM_RAM
+
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pgm2 )
@@ -188,7 +200,7 @@ void pgm2_state::pgm_create_dummy_internal_arm_region(int addr)
 static MACHINE_CONFIG_START( pgm2, pgm2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 20000000) // ?? ARM baesd CPU, has internal ROM.
+	MCFG_CPU_ADD("maincpu", ARM9, 20000000) // ?? ARM baesd CPU, has internal ROM.
 	MCFG_CPU_PROGRAM_MAP(pgm2_map)
 //  MCFG_DEVICE_DISABLE()
 
@@ -450,7 +462,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 	igs036_decryptor decrypter(kov2_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region(0x8000000);
+	pgm_create_dummy_internal_arm_region(0x8000069);
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
@@ -463,7 +475,7 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 	igs036_decryptor decrypter(ddpdoj_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region(0x8000000);
+	pgm_create_dummy_internal_arm_region(0x80003c9);
 }
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
@@ -476,7 +488,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kov3)
 	igs036_decryptor decrypter(kov3_key);
 	decrypter.decrypter_rom(memregion("user1"));
 
-	pgm_create_dummy_internal_arm_region(0x8000000);
+	pgm_create_dummy_internal_arm_region(0x80003c9);
 }
 
 
