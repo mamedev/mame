@@ -2031,12 +2031,16 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 		// directions (0=input, 1=output)
 		case 0x3e0:
 			m_port[0].dir = data;
+			break;
 		case 0x3e1:
 			m_port[1].dir = data;
+			break;
 		case 0x3e2:
 			m_port[2].dir = data & 0x0f;
+			break;
 		case 0x3e3:
 			m_port[3].dir = data & 0x1f;
+			break;
 
 		// port 3 output mode
 		case 0x3f3:
@@ -2138,10 +2142,8 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		// pull-up control
 		case 0x3b0:
 			return m_pplul;
-			break;
 		case 0x3b1:
 			return m_ppluh;
-			break;
 
 		// outputs
 		case 0x3c0:
@@ -2176,11 +2178,11 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		// port 3 output mode
 		case 0x3f3:
 			return m_p3md;
-			break;
 
 
 		default:
 			log_event("MN102", "internal_r %04x (%03x)", offset+0xfc00, adr);
+			break;
 	}
 	
 	return 0;
