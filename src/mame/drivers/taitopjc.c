@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 
 	/* TMS320C53 DSP */
 
-	MCFG_CPU_ADD("mn10200", MN1020012A, XTAL_40MHz/4) /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
+	MCFG_CPU_ADD("mn10200", MN1020012A, 10000000) /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
 	MCFG_CPU_PROGRAM_MAP(mn10200_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
