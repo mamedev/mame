@@ -18,7 +18,6 @@
 #include "machine/6821pia.h"
 #include "imagedev/flopdrv.h"
 #include "formats/atari_dsk.h"
-#include "devlegcy.h"
 
 #define VERBOSE_SERIAL  0
 #define VERBOSE_CHKSUM  0
