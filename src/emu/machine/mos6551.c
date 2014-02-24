@@ -148,10 +148,7 @@ void mos6551_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void mos6551_device::tra_callback()
 {
-	if (m_txd_handler.isnull())
-		transmit_register_send_bit();
-	else
-		m_txd_handler(transmit_register_get_data_bit());
+	m_txd_handler(transmit_register_get_data_bit());
 }
 
 
@@ -176,16 +173,6 @@ void mos6551_device::tra_complete()
 
 
 //-------------------------------------------------
-//  rcv_callback -
-//-------------------------------------------------
-
-void mos6551_device::rcv_callback()
-{
-	receive_register_update_bit(get_in_data_bit());
-}
-
-
-//-------------------------------------------------
 //  rcv_complete -
 //-------------------------------------------------
 
@@ -205,16 +192,6 @@ void mos6551_device::rcv_complete()
 		m_st |= ST_IRQ;
 		m_irq_handler(ASSERT_LINE);
 	}
-}
-
-
-//-------------------------------------------------
-//  input_callback -
-//-------------------------------------------------
-
-void mos6551_device::input_callback(UINT8 state)
-{
-	m_input_state = state;
 }
 
 
@@ -261,21 +238,9 @@ void mos6551_device::update_serial()
 		}
 	}
 
-	if (m_cmd & CMD_DTR)
-		m_connection_state |= DTR;
-	else
-		m_connection_state &= ~DTR;
 
-	m_dtr_handler((m_connection_state & DTR) ? 0 : 1);
-
-	if ((m_cmd & CMD_TC_MASK) == CMD_TC_RTS_HI)
-		m_connection_state &= ~RTS;
-	else
-		m_connection_state |= RTS;
-
-	m_rts_handler((m_connection_state & RTS) ? 0 : 1);
-
-	serial_connection_out();
+	m_dtr_handler(!(m_cmd & CMD_DTR));
+	m_rts_handler(!((m_cmd & CMD_TC_MASK) == CMD_TC_RTS_HI));
 }
 
 

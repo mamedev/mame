@@ -15,7 +15,6 @@ public:
 	ioport_constructor device_input_ports() const;
 
 	template<class _Object> static devcb2_base &static_set_tx_callback(device_t &device, _Object object) { return downcast<midi_keyboard_device &>(device).m_out_tx_func.set_callback(object); }
-	void input_callback(UINT8 state) { m_input_state = state; }
 
 protected:
 	void device_start();

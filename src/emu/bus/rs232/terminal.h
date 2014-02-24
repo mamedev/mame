@@ -25,7 +25,6 @@ protected:
 	virtual void tra_callback();
 	virtual void tra_complete();
 	virtual void rcv_complete();
-	virtual void input_callback(UINT8 state) { m_input_state = state; }
 	virtual void send_key(UINT8 code);
 
 private:

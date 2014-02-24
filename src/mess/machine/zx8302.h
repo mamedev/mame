@@ -130,7 +130,6 @@ protected:
 	virtual void tra_complete();
 	virtual void rcv_callback();
 	virtual void rcv_complete();
-	virtual void input_callback(UINT8 state);
 
 	inline void trigger_interrupt(UINT8 line);
 	inline void transmit_ipc_data();
@@ -205,6 +204,7 @@ private:
 	devcb_resolved_write_line   m_out_raw2_func;
 	devcb_resolved_read_line    m_in_raw2_func;
 
+	int m_rs232_rx;
 	int m_dtr1;
 	int m_cts2;
 

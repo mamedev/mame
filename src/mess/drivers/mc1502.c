@@ -7,11 +7,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "includes/mc1502.h"
+#include "bus/rs232/rs232.h"
 
 #include "cpu/i86/i86.h"
-#include "imagedev/serial.h"
 #include "machine/kb_7007_3.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
@@ -40,11 +39,6 @@ static const cassette_interface mc1502_cassette_interface =
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
 	NULL,
 	NULL
-};
-
-static const serial_image_interface mc1502_serial =
-{
-	9600, 8, device_serial_interface::STOP_BITS_1, device_serial_interface::PARITY_NONE, 1, "upd8251"
 };
 
 // Timer
@@ -318,12 +312,17 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_I8255_ADD( "ppi8255n2", mc1502_ppi8255_interface_2 )
 
 	MCFG_DEVICE_ADD( "upd8251", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("irps", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("irps", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("irps", rs232_port_device, write_rts))
 	/* XXX RxD data are accessible via PPI port C, bit 7 */
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w)) /* default handler does nothing */
 	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 	MCFG_I8251_SYNDET_HANDLER(WRITELINE(mc1502_state, mc1502_i8251_syndet))
 
-	MCFG_SERIAL_ADD( "irps", mc1502_serial )
+	MCFG_RS232_PORT_ADD("irps", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd8251", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("upd8251", i8251_device, write_dsr))
 
 	MCFG_ISA8_BUS_ADD("isa", ":maincpu", mc1502_isabus_intf)
 	MCFG_ISA8_SLOT_ADD("isa", "isa1", mc1502_isa8_cards, "fdc", false)

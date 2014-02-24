@@ -121,7 +121,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tbi_w );
 
 	DECLARE_WRITE_LINE_MEMBER( write_rx );
-	DECLARE_WRITE_LINE_MEMBER( write_dsr );
 
 protected:
 	// device-level overrides
@@ -134,7 +133,6 @@ protected:
 	virtual void tra_callback();
 	virtual void tra_complete();
 	virtual void rcv_complete();
-	virtual void input_callback(UINT8 state);
 
 	void check_interrupts();
 	void take_interrupt(UINT16 mask);

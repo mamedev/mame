@@ -100,7 +100,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( fe_r ) { return m_fe; }
 	DECLARE_READ_LINE_MEMBER( oe_r ) { return m_oe; }
 
-	DECLARE_WRITE_LINE_MEMBER( write_rx );
+	DECLARE_WRITE_LINE_MEMBER( write_rri ); // receiver register input
 	DECLARE_WRITE_LINE_MEMBER( rrc_w );
 	DECLARE_WRITE_LINE_MEMBER( trc_w );
 	DECLARE_WRITE_LINE_MEMBER( rrd_w );
@@ -126,7 +126,6 @@ protected:
 	virtual void tra_complete();
 	virtual void rcv_callback();
 	virtual void rcv_complete();
-	virtual void input_callback(UINT8 state);
 
 private:
 	inline void set_dr(int state);

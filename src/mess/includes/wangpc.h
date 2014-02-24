@@ -30,47 +30,48 @@
 #define UPD765_TAG      "upd765"
 #define CENTRONICS_TAG  "centronics"
 #define RS232_TAG       "rs232"
+#define WANGPC_KEYBOARD_TAG "wangpckb"
 
 class wangpc_state : public driver_device
 {
 public:
 	// constructor
-	wangpc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, I8086_TAG),
-			m_dmac(*this, AM9517A_TAG),
-			m_pic(*this, I8259A_TAG),
-			m_ppi(*this, I8255A_TAG),
-			m_pit(*this, I8253_TAG),
-			m_uart(*this, IM6402_TAG),
-			m_epci(*this, SCN2661_TAG),
-			m_fdc(*this, UPD765_TAG),
-			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, UPD765_TAG ":0:525dd"),
-			m_floppy1(*this, UPD765_TAG ":1:525dd"),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_cent_data_in(*this, "cent_data_in"),
-			m_cent_data_out(*this, "cent_data_out"),
-			m_kb(*this, WANGPC_KEYBOARD_TAG),
-			m_bus(*this, WANGPC_BUS_TAG),
-			m_sw(*this, "SW"),
-			m_timer2_irq(1),
-			m_centronics_ack(1),
-			m_dav(1),
-			m_dma_eop(1),
-			m_uart_dr(0),
-			m_uart_tbre(0),
-			m_fpu_irq(0),
-			m_bus_irq2(0),
-			m_enable_eop(0),
-			m_disable_dreq2(0),
-			m_fdc_drq(0),
-			m_fdc_dd0(0),
-			m_fdc_dd1(0),
-			m_fdc_tc(0),
-			m_ds1(false),
-			m_ds2(false)
-	{ }
+	wangpc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, I8086_TAG),
+		m_dmac(*this, AM9517A_TAG),
+		m_pic(*this, I8259A_TAG),
+		m_ppi(*this, I8255A_TAG),
+		m_pit(*this, I8253_TAG),
+		m_uart(*this, IM6402_TAG),
+		m_epci(*this, SCN2661_TAG),
+		m_fdc(*this, UPD765_TAG),
+		m_ram(*this, RAM_TAG),
+		m_floppy0(*this, UPD765_TAG ":0:525dd"),
+		m_floppy1(*this, UPD765_TAG ":1:525dd"),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_cent_data_in(*this, "cent_data_in"),
+		m_cent_data_out(*this, "cent_data_out"),
+		m_bus(*this, WANGPC_BUS_TAG),
+		m_sw(*this, "SW"),
+		m_timer2_irq(1),
+		m_centronics_ack(1),
+		m_dav(1),
+		m_dma_eop(1),
+		m_uart_dr(0),
+		m_uart_tbre(0),
+		m_fpu_irq(0),
+		m_bus_irq2(0),
+		m_enable_eop(0),
+		m_disable_dreq2(0),
+		m_fdc_drq(0),
+		m_fdc_dd0(0),
+		m_fdc_dd1(0),
+		m_fdc_tc(0),
+		m_ds1(false),
+		m_ds2(false)
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dmac;
@@ -86,7 +87,6 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<input_buffer_device> m_cent_data_in;
 	required_device<output_latch_device> m_cent_data_out;
-	required_device<wangpc_keyboard_device> m_kb;
 	required_device<wangpcbus_device> m_bus;
 	required_ioport m_sw;
 

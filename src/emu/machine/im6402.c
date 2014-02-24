@@ -164,8 +164,6 @@ void im6402_device::device_reset()
 	transmit_register_reset();
 
 	m_out_tro_func(1);
-	set_out_data_bit(1);
-	serial_connection_out();
 
 	m_rrc_count = 0;
 	m_trc_count = 0;
@@ -191,10 +189,7 @@ void im6402_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void im6402_device::tra_callback()
 {
-	if (m_out_tro_func.isnull())
-		transmit_register_send_bit();
-	else
-		m_out_tro_func(transmit_register_get_data_bit());
+	m_out_tro_func(transmit_register_get_data_bit());
 }
 
 
@@ -222,7 +217,6 @@ void im6402_device::tra_complete()
 
 void im6402_device::rcv_callback()
 {
-	receive_register_update_bit(get_in_data_bit());
 }
 
 
@@ -243,19 +237,6 @@ void im6402_device::rcv_complete()
 	}
 
 	set_dr(ASSERT_LINE);
-}
-
-
-//-------------------------------------------------
-//  input_callback -
-//-------------------------------------------------
-
-void im6402_device::input_callback(UINT8 state)
-{
-	m_input_state = state;
-
-	rx_clock_w(1); // HACK for Wang PC keyboard
-	rx_clock_w(0);
 }
 
 
@@ -439,14 +420,10 @@ WRITE_LINE_MEMBER( im6402_device::epe_w )
 	m_epe = state;
 }
 
-WRITE_LINE_MEMBER(im6402_device::write_rx)
+WRITE_LINE_MEMBER(im6402_device::write_rri)
 {
-	if (state)
-	{
-		input_callback(m_input_state | RX);
-	}
-	else
-	{
-		input_callback(m_input_state & ~RX);
-	}
+	// HACK derive clock from data line as wangpckb sends bytes instantly to make up for mcs51 serial implementation
+	receive_register_update_bit(state);
+	rx_clock_w(1);
+	rx_clock_w(0);
 }

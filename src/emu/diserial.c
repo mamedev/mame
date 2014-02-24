@@ -9,8 +9,6 @@
 
 device_serial_interface::device_serial_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device),
-	m_input_state(0),
-	m_connection_state(0),
 	m_start_bit_hack_for_external_clocks(false),
 	m_df_start_bit_count(0),
 	m_df_word_length(0),
@@ -28,8 +26,7 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 	m_tra_rate(attotime::never),
 	m_rcv_line(0),
 	m_tra_clock_state(false),
-	m_rcv_clock_state(false),
-	m_other_connection(NULL)
+	m_rcv_clock_state(false)
 {
 	/* if sum of all bits in the byte is even, then the data
 	has even parity, otherwise it has odd parity */
@@ -422,58 +419,6 @@ UINT8 device_serial_interface::transmit_register_get_data_bit()
 	return bit;
 }
 
-UINT8 device_serial_interface::transmit_register_send_bit()
-{
-	UINT8 data = transmit_register_get_data_bit();
-
-	/* set tx data bit */
-	m_connection_state &= ~TX;
-	m_connection_state|=(data<<5);
-
-	/* state out through connection */
-	serial_connection_out();
-
-	return data;
-}
-
-
-
-/* this converts state at this end to a state the other end can accept */
-/* e.g. CTS at this end becomes RTS at other end.
-        RTS at this end becomes CTS at other end.
-        TX at this end becomes RX at other end.
-        RX at this end becomes TX at other end.
-        etc
-
-        The same thing is done inside the serial null-terminal lead */
-
-static UINT8 serial_connection_spin_bits(UINT8 input_status)
-{
-	return
-		/* cts -> rts */
-		(((input_status & 0x01)<<1) |
-		/* rts -> cts */
-		((input_status>>1) & 0x01) |
-		/* dsr -> dtr */
-		(((input_status>>2) & 0x01)<<3) |
-		/* dtr -> dsr */
-		(((input_status>>3) & 0x01)<<2) |
-		/* rx -> tx */
-		(((input_status>>4) & 0x01)<<5) |
-		/* tx -> rx */
-		(((input_status>>5) & 0x01)<<4));
-}
-
-void device_serial_interface::serial_connection_out()
-{
-	if (m_other_connection!=NULL)
-	{
-		UINT8 state_at_other_end = serial_connection_spin_bits(m_connection_state);
-
-		m_other_connection->input_callback(state_at_other_end);
-	}
-}
-
 bool device_serial_interface::is_receive_register_full()
 {
 	return m_rcv_flags & RECEIVE_REGISTER_FULL;
@@ -482,26 +427,6 @@ bool device_serial_interface::is_receive_register_full()
 bool device_serial_interface::is_transmit_register_empty()
 {
 	return m_tra_flags & TRANSMIT_REGISTER_EMPTY;
-}
-
-void device_serial_interface::set_other_connection(device_serial_interface *other_connection)
-{
-	m_other_connection = other_connection;
-}
-
-/* join two serial connections together */
-void device_serial_interface::connect(device_serial_interface *other_connection)
-{
-	/* both connections should have their in connection setup! */
-	/* the in connection is the callback they use to update their state based
-	on the output from the other side */
-	set_other_connection(other_connection);
-	other_connection->set_other_connection(this);
-
-	/* let b know the state of a */
-	serial_connection_out();
-	/* let a know the state of b */
-	other_connection->serial_connection_out();
 }
 
 const char *device_serial_interface::parity_tostring(parity_t parity)

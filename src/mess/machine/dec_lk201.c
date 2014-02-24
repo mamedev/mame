@@ -505,11 +505,7 @@ void lk201_device::tra_complete()
 
 void lk201_device::tra_callback()
 {
-	m_tx_handler(transmit_register_send_bit());
-}
-
-void lk201_device::input_callback(UINT8 state)
-{
+	m_tx_handler(transmit_register_get_data_bit());
 }
 
 void lk201_device::update_interrupts()

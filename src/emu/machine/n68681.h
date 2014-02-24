@@ -50,7 +50,6 @@ public:
 	virtual void rcv_complete();    // Rx completed receiving byte
 	virtual void tra_complete();    // Tx completed sending byte
 	virtual void tra_callback();    // Tx send bit
-	void input_callback(UINT8 state);
 
 	UINT8 read_chan_reg(int reg);
 	void write_chan_reg(int reg, UINT8 data);

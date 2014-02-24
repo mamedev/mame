@@ -92,7 +92,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( rxrdy_r );
 	DECLARE_READ_LINE_MEMBER( txemt_r );
 
-	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_signal = state; device_serial_interface::rx_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( rx_w ) { device_serial_interface::rx_w(state); }
 
 protected:
 	// device-level overrides
@@ -104,9 +104,7 @@ protected:
 	// device_serial_interface overrides
 	virtual void tra_callback();
 	virtual void tra_complete();
-	virtual void rcv_callback();
 	virtual void rcv_complete();
-	virtual void input_callback(UINT8 state);
 
 private:
 	devcb_resolved_read_line    m_in_rxd_func;
@@ -126,7 +124,6 @@ private:
 	UINT8 m_sr;
 	UINT8 m_mr[2];
 	UINT8 m_sync[3];
-	UINT8 m_signal;
 
 	int m_mode_index;
 	int m_sync_index;

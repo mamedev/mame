@@ -95,7 +95,3 @@ void midiout_device::rcv_complete()    // Rx completed receiving byte
 		osd_write_midi_channel(m_midi, data);
 	}
 }
-
-void midiout_device::input_callback(UINT8 state)
-{
-}

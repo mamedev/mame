@@ -732,10 +732,6 @@ void duart68681_channel::tra_callback()
 	}
 }
 
-void duart68681_channel::input_callback(UINT8 state)
-{
-}
-
 void duart68681_channel::update_interrupts()
 {
 	if (rx_enabled)
