@@ -47,7 +47,7 @@ protected:
 
 		UINT8 alu_op( UINT8 data, UINT8 latch_data );
 
-		//FIXME
+		//Micko:FIXME
 		palette_device *m_palette;
 public:
 		crtc_ega_device *m_crtc_ega;

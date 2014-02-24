@@ -75,7 +75,7 @@ protected:
 	UINT8 m_frequency;
 	UINT8 m_interlaced;
 
-	//FIXME
+	//Micko:FIXME
 	palette_device *m_palette;
 };
 

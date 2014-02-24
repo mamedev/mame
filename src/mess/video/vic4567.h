@@ -241,7 +241,7 @@ private:
 	UINT8 m_palette_green[0x100];
 	UINT8 m_palette_blue[0x100];
 	int m_palette_dirty;
-	//FIXME
+	//Micko:FIXME
 	palette_device *m_palette;
 };
 

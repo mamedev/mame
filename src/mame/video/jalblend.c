@@ -96,7 +96,7 @@ void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,gfx_e
 	}
 
 	/* Start drawing */
-	//FIXME
+	//Micko:FIXME
 /*	if (gfx)
 	{
 		const pen_t *pal = &gfx->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));

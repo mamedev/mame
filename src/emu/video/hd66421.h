@@ -69,7 +69,7 @@ protected:
 private:
 	UINT8 m_cmd, m_reg[32];
 	int m_x, m_y;
-	//FIXME
+	//Micko:FIXME
 	palette_device *m_palette;
 };
 

@@ -190,7 +190,7 @@ protected:
 	} vga;
 
 	emu_timer *m_vblank_timer;
-	//FIXME
+	//Micko:FIXME
 	palette_device *m_palette;
 };
 

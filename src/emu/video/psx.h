@@ -312,7 +312,7 @@ private:
 	int DebugTextureDisplay( bitmap_ind16 &bitmap );
 
 	psx_gpu_debug m_debug;
-	//FIXME
+	//Micko:FIXME
 	palette_device *m_palette;
 #endif
 };

@@ -149,7 +149,7 @@ protected:
 	UINT8 m_blink;
 
 	UINT8 m_last_data;
-	//FIXME
+	//Micko:FIXME
 	palette_device *m_palette;
 };
 

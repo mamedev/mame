@@ -224,7 +224,7 @@ public:
 
 	const char        *m_cpu_tag;
 	
-	//FIXME
+	//Micko:FIXME
 	palette_device *m_palette;
 
 private:
