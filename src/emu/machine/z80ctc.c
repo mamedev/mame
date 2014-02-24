@@ -92,7 +92,7 @@ z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, dev
 
 READ8_MEMBER( z80ctc_device::read )
 {
-	return read(offset & 3);
+	return m_channel[offset & 3].read();
 }
 
 
@@ -102,7 +102,7 @@ READ8_MEMBER( z80ctc_device::read )
 
 WRITE8_MEMBER( z80ctc_device::write )
 {
-	write(offset & 3, data);
+	m_channel[offset & 3].write(data);
 }
 
 
@@ -111,10 +111,10 @@ WRITE8_MEMBER( z80ctc_device::write )
 //  trigger
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80ctc_device::trg0 ) { trigger(0, state); }
-WRITE_LINE_MEMBER( z80ctc_device::trg1 ) { trigger(1, state); }
-WRITE_LINE_MEMBER( z80ctc_device::trg2 ) { trigger(2, state); }
-WRITE_LINE_MEMBER( z80ctc_device::trg3 ) { trigger(3, state); }
+WRITE_LINE_MEMBER( z80ctc_device::trg0 ) { m_channel[0].trigger(state); }
+WRITE_LINE_MEMBER( z80ctc_device::trg1 ) { m_channel[1].trigger(state); }
+WRITE_LINE_MEMBER( z80ctc_device::trg2 ) { m_channel[2].trigger(state); }
+WRITE_LINE_MEMBER( z80ctc_device::trg3 ) { m_channel[3].trigger(state); }
 
 
 //-------------------------------------------------

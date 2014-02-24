@@ -26,58 +26,53 @@
 #undef putchar
 #endif
 
-#define TX_FIFO_SIZE 128
-
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_APOLLO_KBD_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, APOLLO_KBD, 0) \
-	apollo_kbd_device::static_set_interface(*device, _interface);
+#define MCFG_APOLLO_KBD_TX_CALLBACK(_cb) \
+	devcb = &apollo_kbd_device::set_tx_cb(*device, DEVCB2_##_cb);
+
+#define MCFG_APOLLO_KBD_GERMAN_CALLBACK(_cb) \
+	devcb = &apollo_kbd_device::set_german_cb(*device, DEVCB2_##_cb);
 
 INPUT_PORTS_EXTERN(apollo_kbd);
-
-//**************************************************************************
-// Keyboard READ/WRITE
-//**************************************************************************
-
-void apollo_kbd_getchar(device_t *device, UINT8 data);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> apollo_kbd_interface
-
-struct apollo_kbd_interface
-{
-	devcb_write8 apollo_kbd_putchar_cb;
-	devcb_read8 apollo_kbd_has_beeper_cb;
-	devcb_read8 apollo_kbd_is_german_cb;
-};
-
-#define APOLLO_KBD_INTERFACE(name) const struct apollo_kbd_interface (name)
-
 // ======================> apollo_kbd_device
 
-class apollo_kbd_device :   public device_t, public apollo_kbd_interface
+class apollo_kbd_device :   public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
 	apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// static configuration helpers
-	static void static_set_interface(device_t &device, const apollo_kbd_interface &interface);
+	template<class _Object> static devcb2_base &set_tx_cb(device_t &device, _Object object) { return downcast<apollo_kbd_device &>(device).m_tx_w.set_callback(object); }
+	template<class _Object> static devcb2_base &set_german_cb(device_t &device, _Object object) { return downcast<apollo_kbd_device &>(device).m_german_r.set_callback(object); }
 
-	void getchar(UINT8 data);
+	devcb2_write_line m_tx_w;
+	devcb2_read_line m_german_r;
 
 private:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// serial overrides
+	virtual void rcv_complete();    // Rx completed receiving byte
+	virtual void tra_complete();    // Tx completed sending byte
+	virtual void tra_callback();    // Tx send bit
+	void input_callback(UINT8 state);
+
+	TIMER_CALLBACK_MEMBER( kbd_scan_timer );
 
 	const char *cpu_context() ;
+
+	void kgetchar(UINT8 data);
 
 	int keyboard_is_german();
 
@@ -127,59 +122,16 @@ private:
 		int m_tx_pending;  // mouse data packet is pending
 	};
 
-	/* Transmitter fifo */
-	class tx_fifo
-	{
-	public:
-		tx_fifo();
-		void start(apollo_kbd_device *device);
-		void reset();
-		UINT8 getchar();
-		void putchar(UINT8 data);
-		int putdata(const UINT8 *data, int data_length);
-		void flush();
+	static const int XMIT_RING_SIZE = 64;
 
-	private:
-		void timer_callback();
-		static TIMER_CALLBACK( static_timer_callback );
+	UINT8 m_xmitring[XMIT_RING_SIZE];
+	int m_xmit_read, m_xmit_write;
+	bool m_tx_busy;
 
-		apollo_kbd_device *m_device; // pointer back to our device
-
-		UINT16 m_baud_rate;
-
-		UINT16 fifo[TX_FIFO_SIZE];
-		UINT16 m_read_ptr;
-		UINT16 m_write_ptr;
-		UINT16 m_char_count;
-		UINT16 m_tx_pending;
-		emu_timer *m_timer;
-	};
-
-	// the keyboard tty
-	class keyboard_tty
-	{
-	public:
-		keyboard_tty();
-		void start(apollo_kbd_device *device);
-		void reset();
-		int isConnected();
-		int getchar();
-		void putchar(UINT8 data);
-	private:
-		apollo_kbd_device *m_device; // pointer back to our device
-#if defined(KBD_TTY_NAME)
-		const char *m_tty_name;
-		int m_tty_fd; /* File descriptor of keyboard tty */
-#endif
-		int m_connected;
-	};
-
-//  const apollo_kbd_interface &m_config;
+	void xmit_char(UINT8 data);
 
 	beeper  m_beeper;
 	mouse   m_mouse;
-	tx_fifo m_tx_fifo;
-	keyboard_tty  m_keyboard_tty;
 
 	apollo_kbd_device *m_device; // pointer to myself (nasty: used for cpu_context)
 
@@ -202,10 +154,6 @@ private:
 	UINT16 m_last_pressed;  // last key pressed, for repeat key handling
 	int m_keytime[0x80];    // time until next key press (1 ms)
 	UINT8 m_keyon[0x80];    // is 1 if key is pressed
-
-	devcb_resolved_write8 m_putchar;
-	devcb_resolved_read8 m_has_beeper;
-	devcb_resolved_read8 m_is_german;
 
 	static UINT16 m_code_table[];
 };

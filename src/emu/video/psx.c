@@ -110,7 +110,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 	}
 }
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 
 void psxgpu_device::DebugMeshInit( void )
 {
@@ -433,7 +433,7 @@ void psxgpu_device::updatevisiblearea()
 		break;
 	}
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.b_mesh || m_debug.b_texture )
 	{
 		n_screenheight = 1024;
@@ -457,7 +457,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 
 	m_n_gputype = n_gputype;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	DebugMeshInit();
 #endif
 
@@ -618,7 +618,7 @@ UINT32 psxgpu_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 	int n_overscantop;
 	int n_overscanleft;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( DebugMeshDisplay( bitmap, cliprect ) )
 	{
 		return 0;
@@ -1389,7 +1389,7 @@ void psxgpu_device::FlatPolygon( int n_points )
 
 	UINT16 *p_vram;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 1 )
 	{
 		return;
@@ -1542,7 +1542,7 @@ void psxgpu_device::FlatTexturedPolygon( int n_points )
 	UINT16 *p_vram;
 	UINT32 n_bgr;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 2 )
 	{
 		return;
@@ -1741,7 +1741,7 @@ void psxgpu_device::GouraudPolygon( int n_points )
 
 	UINT16 *p_vram;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 3 )
 	{
 		return;
@@ -1952,7 +1952,7 @@ void psxgpu_device::GouraudTexturedPolygon( int n_points )
 	UINT16 *p_vram;
 	UINT32 n_bgr;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 4 )
 	{
 		return;
@@ -2189,7 +2189,7 @@ void psxgpu_device::MonochromeLine( void )
 	UINT32 n_b;
 	UINT16 *p_vram;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 5 )
 	{
 		return;
@@ -2293,7 +2293,7 @@ void psxgpu_device::GouraudLine( void )
 	PAIR n_cb2;
 	UINT16 *p_vram;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 6 )
 	{
 		return;
@@ -2393,7 +2393,7 @@ void psxgpu_device::FrameBufferRectangleDraw( void )
 	INT16 n_x;
 	UINT16 *p_vram;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 7 )
 	{
 		return;
@@ -2455,7 +2455,7 @@ void psxgpu_device::FlatRectangle( void )
 	INT32 n_h;
 	UINT16 *p_vram;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 8 )
 	{
 		return;
@@ -2525,7 +2525,7 @@ void psxgpu_device::FlatRectangle8x8( void )
 	INT32 n_h;
 	UINT16 *p_vram;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 9 )
 	{
 		return;
@@ -2595,7 +2595,7 @@ void psxgpu_device::FlatRectangle16x16( void )
 	INT32 n_h;
 	UINT16 *p_vram;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 10 )
 	{
 		return;
@@ -2676,7 +2676,7 @@ void psxgpu_device::FlatTexturedRectangle( void )
 	UINT16 *p_clut;
 	UINT16 n_bgr;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 11 )
 	{
 		return;
@@ -2779,7 +2779,7 @@ void psxgpu_device::Sprite8x8( void )
 	UINT16 *p_clut;
 	UINT16 n_bgr;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 12 )
 	{
 		return;
@@ -2882,7 +2882,7 @@ void psxgpu_device::Sprite16x16( void )
 	UINT16 *p_clut;
 	UINT16 n_bgr;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 13 )
 	{
 		return;
@@ -2960,7 +2960,7 @@ void psxgpu_device::Dot( void )
 	UINT32 n_b;
 	UINT16 *p_vram;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 14 )
 	{
 		return;
@@ -2999,7 +2999,7 @@ void psxgpu_device::MoveImage( void )
 	INT16 n_dstx;
 	UINT16 *p_vram;
 
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 	if( m_debug.n_skip == 15 )
 	{
 		return;
@@ -3745,7 +3745,7 @@ void psxgpu_device::vblank(screen_device &screen, bool vblank_state)
 {
 	if( vblank_state )
 	{
-#if defined( DEBUG_VIEWER )
+#if DEBUG_VIEWER
 		DebugCheckKeys();
 #endif
 

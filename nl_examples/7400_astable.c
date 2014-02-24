@@ -14,9 +14,8 @@ NETLIST_START(7400_astable)
 
     /* Standard stuff */
 
-    SOLVER(Solver)
-    PARAM(Solver.FREQ, 48000)
-    PARAM(Solver.ACCURACY, 1e-4)
+    SOLVER(Solver, 48000)
+    PARAM(Solver.ACCURACY, 1e-5)
 
     // astable NAND Multivibrator ==> f ~ 1.0 / (3 * R * C)
     RES(R1, 4700)

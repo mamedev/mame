@@ -146,7 +146,6 @@ private:
 	int m_count;
 	_ListClass * m_list;
 	int m_num_elements;
-	//_ListClass m_list[_NumElements];
 };
 
 // ----------------------------------------------------------------------------------------
@@ -164,9 +163,9 @@ public:
 	public:
 		ATTR_HOT inline entry_t()
 		: m_time(), m_object() {}
-		ATTR_HOT inline entry_t(const _Time atime, _Element elem) : m_time(atime), m_object(elem) {}
-		ATTR_HOT inline _Time time() const { return m_time; }
-		ATTR_HOT inline _Element object() const { return m_object; }
+		ATTR_HOT inline entry_t(const _Time atime, const _Element elem) : m_time(atime), m_object(elem) {}
+		ATTR_HOT inline const _Time time() const { return m_time; }
+		ATTR_HOT inline const _Element object() const { return m_object; }
 
 	private:
 		_Time m_time;
@@ -183,7 +182,7 @@ public:
 	ATTR_HOT inline bool is_empty() const { return (m_end == &m_list[0]); }
 	ATTR_HOT inline bool is_not_empty() const { return (m_end > &m_list[0]); }
 
-	ATTR_HOT ATTR_ALIGN void push(const entry_t &e)
+	ATTR_HOT ATTR_ALIGN inline void push(const entry_t &e)
 	{
         entry_t * RESTRICT i = m_end++;
         while ((i > &m_list[0]) && (e.time() > (i - 1)->time()) )
@@ -197,7 +196,7 @@ public:
 		assert(m_end - m_list < _Size);
 	}
 
-	ATTR_HOT inline entry_t pop()
+	ATTR_HOT inline const entry_t &pop()
 	{
 		return *--m_end;
 	}

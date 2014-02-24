@@ -7,6 +7,7 @@ class igs036_decryptor
 {
 public:
 	igs036_decryptor(const UINT16* game_key);
+	void decrypter_rom(memory_region* region);
 	UINT16 decrypt(UINT16 cipherword, int word_address)const;
 	UINT16 deobfuscate(UINT16 cipherword, int word_address)const;
 	

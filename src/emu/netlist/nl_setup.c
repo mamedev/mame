@@ -539,13 +539,13 @@ void netlist_setup_t::connect(netlist_core_terminal_t &t1_in, netlist_core_termi
 
 	if (t1.isType(netlist_core_terminal_t::OUTPUT) && t2.isType(netlist_core_terminal_t::INPUT))
 	{
-		if (t2.has_net())
+		if (t2.has_net() && t2.net().isRailNet())
 			netlist().error("Input %s already connected\n", t2.name().cstr());
 		connect_input_output(dynamic_cast<netlist_input_t &>(t2), dynamic_cast<netlist_output_t &>(t1));
 	}
 	else if (t1.isType(netlist_core_terminal_t::INPUT) && t2.isType(netlist_core_terminal_t::OUTPUT))
 	{
-		if (t1.has_net())
+		if (t1.has_net()  && t1.net().isRailNet())
 		    netlist().error("Input %s already connected\n", t1.name().cstr());
 		connect_input_output(dynamic_cast<netlist_input_t &>(t1), dynamic_cast<netlist_output_t &>(t2));
 	}

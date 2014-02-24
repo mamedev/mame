@@ -460,8 +460,8 @@ ROM_START(hotdoggn)
 	ROM_RELOAD(0x1800, 0x0800)
 ROM_END
 
-#if 0
-ROM_START(hotdoggb)
+#ifdef MISSING_GAME
+ROM_START(hotdoggb) // check to see if this is the same as above but with a different split
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "hotd2732.u2", 0x1000, 0x0800, CRC(709305ee) SHA1(37d5e681a1a2b8b2782dae3007db3e5036003e00))
 	ROM_CONTINUE( 0x5000, 0x0800)

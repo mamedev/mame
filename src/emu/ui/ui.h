@@ -157,6 +157,7 @@ public:
 	void image_handler_ingame();
 	void increase_frameskip();
 	void decrease_frameskip();
+	void request_quit();
 
 	// print the game info string into a buffer
 	astring &game_info_astring(astring &string);

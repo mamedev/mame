@@ -239,6 +239,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
             m_time = m_stop;
 
     } else {
+#if 0
         netlist_net_t &mcQ = m_mainclock->m_Q.net();
         const netlist_time inc = m_mainclock->m_inc;
 
@@ -266,6 +267,43 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
 
             add_to_stat(m_perf_out_processed, 1);
         }
+#else
+        netlist_net_t &mcQ = m_mainclock->m_Q.net();
+        const netlist_time inc = m_mainclock->m_inc;
+        netlist_time mc_time = mcQ.time();
+        netlist_time cur_time = m_time;
+
+        while (cur_time < m_stop)
+        {
+            if (m_queue.is_not_empty())
+            {
+                while (m_queue.peek().time() > mc_time)
+                {
+                    cur_time = mc_time;
+                    mc_time += inc;
+                    m_time = cur_time;
+                    NETLIB_NAME(mainclock)::mc_update(mcQ);
+                }
+
+                const netlist_queue_t::entry_t &e = m_queue.pop();
+                cur_time = e.time();
+                m_time = cur_time;
+                e.object()->update_devs();
+            } else {
+                cur_time = mc_time;
+                mc_time += inc;
+                m_time = cur_time;
+                NETLIB_NAME(mainclock)::mc_update(mcQ);
+            }
+            if (FATAL_ERROR_AFTER_NS)
+                if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
+                    error("Stopped");
+
+            add_to_stat(m_perf_out_processed, 1);
+        }
+        mcQ.set_time(mc_time);
+        m_time = cur_time;
+#endif
     }
 }
 
@@ -533,7 +571,7 @@ ATTR_COLD void netlist_net_t::register_con(netlist_core_terminal_t &terminal)
 		m_active++;
 }
 
-ATTR_HOT inline void netlist_net_t::update_dev(const netlist_core_terminal_t *inp, const UINT32 mask) const
+ATTR_HOT inline static void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask)
 {
 	if ((inp->state() & mask) != 0)
 	{
@@ -548,7 +586,6 @@ ATTR_HOT inline void netlist_net_t::update_dev(const netlist_core_terminal_t *in
 ATTR_HOT inline void netlist_net_t::update_devs()
 {
 	assert(m_num_cons != 0);
-
 	assert(this->isRailNet());
 
 	static const UINT32 masks[4] = { 1, 5, 3, 1 };
@@ -559,6 +596,7 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 
     netlist_core_terminal_t *p = m_head;
 
+#if 1
     switch (m_num_cons)
     {
     case 2:
@@ -574,8 +612,15 @@ ATTR_HOT inline void netlist_net_t::update_devs()
             p = p->m_update_list_next;
         } while (p != NULL);
         break;
-    }
 
+#else
+    while (p != NULL)
+    {
+        update_dev(p, mask);
+        p = p->m_update_list_next;
+    }
+#endif
+    }
     m_last = m_cur;
 }
 
@@ -780,12 +825,20 @@ ATTR_COLD double netlist_param_model_t::model_value(const pstring &entity, const
 // mainclock
 // ----------------------------------------------------------------------------------------
 
+#if 0
 ATTR_HOT inline void NETLIB_NAME(mainclock)::mc_update(netlist_net_t &net, const netlist_time curtime)
 {
 	net.m_new.Q ^= 1;
 	net.set_time(curtime);
 	net.update_devs();
 }
+#else
+ATTR_HOT inline void NETLIB_NAME(mainclock)::mc_update(netlist_net_t &net)
+{
+    net.m_new.Q ^= 1;
+    net.update_devs();
+}
+#endif
 
 NETLIB_START(mainclock)
 {
