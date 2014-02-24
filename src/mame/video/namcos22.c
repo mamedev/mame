@@ -282,7 +282,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 	extra.fadefactor = 0;
 	extra.fogfactor = 0;
 
-	extra.pens = &screen.m_palette->pen((color & 0x7f) << 8);
+	extra.pens = &m_state.m_palette->pen((color & 0x7f) << 8);
 	extra.primap = &screen.priority();
 	extra.bn = node->data.quad.texturebank;
 	extra.flags = flags;
@@ -528,7 +528,7 @@ void namcos22_renderer::poly3d_drawsprite(
 		extra.line_modulo = gfx->rowbytes();
 		extra.flipx = flipx;
 		extra.flipy = flipy;
-		extra.pens = &gfx->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color & 0x7f));
+		extra.pens = &m_state.m_palette->pen(gfx->colorbase() + gfx->granularity() * (color & 0x7f));
 		extra.primap = &screen.priority();
 		extra.source = gfx->get_data(code % gfx->elements());
 
@@ -2323,7 +2323,7 @@ UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb3
 	screen.priority().fill(0, cliprect);
 
 	// background color
-	bitmap.fill(screen.m_palette->pen(0x7fff), cliprect);
+	bitmap.fill(m_palette->pen(0x7fff), cliprect);
 
 	// layers
 	draw_polygons(bitmap);

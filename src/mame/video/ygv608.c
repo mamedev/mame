@@ -1217,7 +1217,7 @@ WRITE16_MEMBER( ygv608_device::write )
 			if (++p3_state == 3)
 			{
 				p3_state = 0;
-				m_palette->set_pen_color(m_regs.s.cc,
+				m_gfxdecode->palette()->set_pen_color(m_regs.s.cc,
 					pal6bit(m_colour_palette[m_regs.s.cc][0]),
 					pal6bit(m_colour_palette[m_regs.s.cc][1]),
 					pal6bit(m_colour_palette[m_regs.s.cc][2]) );

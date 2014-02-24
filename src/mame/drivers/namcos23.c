@@ -2013,7 +2013,7 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 			p->front = !(h & 0x00000001);
 			p->rd.machine = &machine();
 			p->rd.texture_lookup = render_texture_lookup_nocache_point;
-			p->rd.pens = machine().pens + (color << 8);
+			p->rd.pens = m_palette->pens() + (color << 8);
 			render.poly_count++;
 		}
 

@@ -391,7 +391,7 @@ void namcos2_state::draw_sprite_init()
 	/* set table for sprite color == 0x0f */
 	for( int i = 0; i<16*256; i++ )
 	{
-		machine().shadow_table[i] = i+0x2000;
+		m_palette->shadow_table()[i] = i+0x2000;
 	}
 }
 

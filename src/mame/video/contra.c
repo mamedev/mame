@@ -290,7 +290,7 @@ void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	else
 		source = m_buffered_spriteram_2;
 
-	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(bank), machine().colortable, source, base_color, 40, 0, priority_bitmap, (UINT32)-1);
+	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(bank), m_palette, source, base_color, 40, 0, priority_bitmap, (UINT32)-1);
 }
 
 UINT32 contra_state::screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

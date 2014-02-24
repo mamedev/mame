@@ -203,7 +203,7 @@ static MACHINE_CONFIG_START( sspeedr, sspeedr_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",sspeedr,"palette")
 	MCFG_PALETTE_ADD("palette", 16)
-
+	MCFG_PALETTE_INIT_OWNER(sspeedr_state, sspeedr)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

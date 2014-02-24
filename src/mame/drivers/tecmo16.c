@@ -383,7 +383,7 @@ static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tecmo16,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
+	MCFG_PALETTE_INIT_OWNER(driver_device, all_black)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 

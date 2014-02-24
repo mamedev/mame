@@ -478,6 +478,7 @@ static MACHINE_CONFIG_START( timeplt, timeplt_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",timeplt,"palette")
 	MCFG_PALETTE_ADD("palette", 32*4+64*4)
+	MCFG_PALETTE_INIT_OWNER(timeplt_state, timeplt)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(timeplt_sound)

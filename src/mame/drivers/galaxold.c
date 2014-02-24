@@ -2642,7 +2642,7 @@ static MACHINE_CONFIG_START( hexpoola, galaxold_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 
-	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,rockclim)
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
 	/* sound hardware */

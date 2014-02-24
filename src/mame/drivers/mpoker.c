@@ -200,7 +200,7 @@ public:
 	DECLARE_WRITE8_MEMBER(outport7_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(mpoker);
 	UINT32 screen_update_mpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -605,7 +605,7 @@ static MACHINE_CONFIG_START( mpoker, mpoker_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",mpoker,"palette")
 	MCFG_PALETTE_ADD("palette", 0x200)
-
+	MCFG_PALETTE_INIT_OWNER(mpoker_state, mpoker)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")

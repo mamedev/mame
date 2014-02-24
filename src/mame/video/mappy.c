@@ -531,7 +531,7 @@ UINT32 mappy_state::screen_update_superpac(screen_device &screen, bitmap_ind16 &
 		for (x = 0;x < sprite_bitmap.width();x++)
 		{
 			int spr_entry = sprite_bitmap.pix16(y, x);
-			int spr_pen = colortable_entry_get_value(machine().colortable, spr_entry);
+			int spr_pen = m_palette->pen_indirect(spr_entry);
 			if (spr_pen == 0 || spr_pen == 1)
 				bitmap.pix16(y, x) = spr_entry;
 		}

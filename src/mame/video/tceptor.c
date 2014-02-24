@@ -77,7 +77,7 @@ PALETTE_INIT_MEMBER(tceptor_state, tceptor)
 	/* tceptor2: only 0x23 */
 	memset(m_is_mask_spr, 0, sizeof m_is_mask_spr);
 	for (i = 0; i < 0x400; i++)
-		if (colortable_entry_get_value(machine().colortable, i | 0x400) == SPR_MASK_COLOR)
+		if (m_palette->pen_indirect(i | 0x400) == SPR_MASK_COLOR)
 			m_is_mask_spr[i >> 4] = 1;
 }
 
@@ -382,13 +382,13 @@ void tceptor_state::video_start()
 	/* allocate temp bitmaps */
 	m_2dscreen->register_screen_bitmap(m_temp_bitmap);
 
-	m_c45_road->set_transparent_color(colortable_entry_get_value(machine().colortable, 0xfff));
+	m_c45_road->set_transparent_color(m_palette->pen_indirect(0xfff));
 
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,  8, 8, 34, 28);
 
 	m_tx_tilemap->set_scrollx(0, -2*8);
 	m_tx_tilemap->set_scrolly(0, 0);
-	palette.configure_tilemap_groups(*m_tx_tilemap, *m_gfxdecode->gfx(0), 7);
+	m_palette->configure_tilemap_groups(*m_tx_tilemap, *m_gfxdecode->gfx(0), 7);
 
 	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
@@ -496,7 +496,7 @@ void tceptor_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-				if (colortable_entry_get_value(machine().colortable, bitmap.pix16(y, x)) == SPR_MASK_COLOR)
+				if (m_palette->pen_indirect(bitmap.pix16(y, x)) == SPR_MASK_COLOR)
 					// restore pixel
 					bitmap.pix16(y, x) = m_temp_bitmap.pix16(y, x);
 	}

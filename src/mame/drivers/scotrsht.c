@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( scotrsht, scotrsht_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",scotrsht,"palette")
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
-
+	MCFG_PALETTE_INIT_OWNER(scotrsht_state, scotrsht)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

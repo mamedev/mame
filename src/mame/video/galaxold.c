@@ -85,7 +85,7 @@ PALETTE_INIT_MEMBER(galaxold_state,galaxold)
 
 PALETTE_INIT_MEMBER(galaxold_state,scrambold)
 {
-	PALETTE_INIT_CALL_MEMBER(galaxold);
+	PALETTE_INIT_NAME(galaxold)(palette);
 
 
 	/* blue background - 390 ohm resistor */
@@ -99,7 +99,7 @@ PALETTE_INIT_MEMBER(galaxold_state,stratgyx)
 	int i;
 
 
-	PALETTE_INIT_CALL_MEMBER(galaxold);
+	PALETTE_INIT_NAME(galaxold)(palette);
 
 
 	/*  The background color generator is connected this way:
@@ -208,7 +208,7 @@ PALETTE_INIT_MEMBER(galaxold_state,minefld)
 	int i;
 
 
-	PALETTE_INIT_CALL_MEMBER(galaxold);
+	PALETTE_INIT_NAME(galaxold)(palette);
 
 
 	/* set up background colors */
@@ -240,7 +240,7 @@ PALETTE_INIT_MEMBER(galaxold_state,rescue)
 	int i;
 
 
-	PALETTE_INIT_CALL_MEMBER(galaxold);
+	PALETTE_INIT_NAME(galaxold)(palette);
 
 
 	/* set up background colors */
@@ -262,7 +262,7 @@ PALETTE_INIT_MEMBER(galaxold_state,mariner)
 	int i;
 
 
-	PALETTE_INIT_CALL_MEMBER(galaxold);
+	PALETTE_INIT_NAME(galaxold)(palette);
 
 
 	/* set up background colors */
@@ -352,7 +352,7 @@ PALETTE_INIT_MEMBER(galaxold_state,turtles)
 	int i;
 
 
-	PALETTE_INIT_CALL_MEMBER(galaxold);
+	PALETTE_INIT_NAME(galaxold)(palette);
 
 
 	/*  The background color generator is connected this way:
@@ -1349,7 +1349,7 @@ void galaxold_state::galaxold_init_stars(int colors_offset)
 		g = map[bits];
 		bits = (i >> 4) & 0x03;
 		b = map[bits];
-		palette.set_pen_color(colors_offset+i,r,g,b);
+		m_palette->set_pen_color(colors_offset+i,r,g,b);
 	}
 
 

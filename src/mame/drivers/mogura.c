@@ -32,7 +32,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_mogura_tile_info);
 	virtual void machine_start();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(mogura);
 	UINT32 screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -214,6 +214,7 @@ static MACHINE_CONFIG_START( mogura, mogura_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",mogura,"palette")
 	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(mogura_state, mogura)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

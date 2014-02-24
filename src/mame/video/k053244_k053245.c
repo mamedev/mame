@@ -123,7 +123,7 @@ void k05324x_device::device_start()
 		fatalerror("Unsupported plane_order\n");
 	}
 
-	if (VERBOSE && !(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(m_gfxdecode->palette()->shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* deinterleave the graphics, if needed */
@@ -535,7 +535,7 @@ void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 							fx,fy,
 							sx,sy,
 							priority_bitmap,pri,
-							drawmode_table,machine().shadow_table);
+							drawmode_table,m_gfxdecode->palette()->shadow_table());
 				}
 				else
 				{
@@ -546,7 +546,7 @@ void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 							sx,sy,
 							(zw << 16) / 16,(zh << 16) / 16,
 							priority_bitmap,pri,
-							drawmode_table,machine().shadow_table);
+							drawmode_table,m_gfxdecode->palette()->shadow_table());
 
 				}
 			}
@@ -783,7 +783,7 @@ void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const re
 							fx,fy,
 							sx,sy,
 							priority_bitmap,pri,
-							drawmode_table,machine().shadow_table);
+							drawmode_table,m_gfxdecode->palette()->shadow_table());
 				}
 				else
 				{
@@ -794,7 +794,7 @@ void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const re
 							sx,sy,
 							(zw << 16) / 16,(zh << 16) / 16,
 							priority_bitmap,pri,
-							drawmode_table,machine().shadow_table);
+							drawmode_table,m_gfxdecode->palette()->shadow_table());
 
 				}
 			}

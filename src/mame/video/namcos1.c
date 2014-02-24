@@ -150,10 +150,10 @@ void namcos1_state::video_start()
 
 	/* all palette entries are not affected by shadow sprites... */
 	for (i = 0;i < 0x2000;i++)
-		machine().shadow_table[i] = i;
+		m_palette->shadow_table()[i] = i;
 	/* ... except for tilemap colors */
 	for (i = 0x0800;i < 0x1000;i++)
-		machine().shadow_table[i] = i + 0x0800;
+		m_palette->shadow_table()[i] = i + 0x0800;
 
 	memset(m_playfield_control, 0, sizeof(m_playfield_control));
 	m_copy_sprites = 0;
@@ -210,7 +210,7 @@ WRITE8_HANDLER( namcos1_paletteram_w )
 		r = state->m_paletteram[offset];
 		g = state->m_paletteram[offset + 0x0800];
 		b = state->m_paletteram[offset + 0x1000];
-		m_palette->set_pen_color(color,rgb_t(r,g,b));
+		state->m_palette->set_pen_color(color,rgb_t(r,g,b));
 	}
 	else
 	{
@@ -353,7 +353,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 					sx & 0x1ff,
 					((sy + 16) & 0xff) - 16,
 					screen.priority(), pri_mask,
-					state->m_drawmode_table, screen.machine().shadow_table);
+					state->m_drawmode_table, state->m_palette->shadow_table());
 
 		source -= 0x10;
 	}

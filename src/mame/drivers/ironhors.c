@@ -387,7 +387,7 @@ static MACHINE_CONFIG_START( ironhors, ironhors_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",ironhors,"palette")
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
-
+	MCFG_PALETTE_INIT_OWNER(ironhors_state, ironhors)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

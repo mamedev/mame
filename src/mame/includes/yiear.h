@@ -42,7 +42,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(yiear);
 	UINT32 screen_update_yiear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(yiear_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(yiear_nmi_interrupt);

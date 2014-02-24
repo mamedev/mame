@@ -231,8 +231,8 @@ UINT8 mermaid_state::collision_check( rectangle& rect )
 	for (y = rect.min_y; y <= rect.max_y; y++)
 		for (x = rect.min_x; x <= rect.max_x; x++)
 		{
-			UINT16 a = colortable_entry_get_value(machine().colortable, m_helper.pix16(y, x)) & 0x3f;
-			UINT16 b = colortable_entry_get_value(machine().colortable, m_helper2.pix16(y, x)) & 0x3f;
+			UINT16 a = m_palette->pen_indirect(m_helper.pix16(y, x)) & 0x3f;
+			UINT16 b = m_palette->pen_indirect(m_helper2.pix16(y, x)) & 0x3f;
 
 			if (b)
 				if (a)

@@ -107,7 +107,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_warpspeed_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_warpspeed_starfield_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(warpspeed);
 	UINT32 screen_update_warpspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -323,6 +323,7 @@ static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",warpspeed,"palette")
 	MCFG_PALETTE_ADD("palette", 2+8)
+	MCFG_PALETTE_INIT_OWNER(warpspeed_state, warpspeed)
 MACHINE_CONFIG_END
 
 ROM_START( warpsped )

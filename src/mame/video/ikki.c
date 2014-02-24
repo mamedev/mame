@@ -104,7 +104,7 @@ void ikki_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		{
 			UINT16 pen = m_sprite_bitmap.pix16(y, x);
 
-			if (colortable_entry_get_value(machine().colortable, pen) != 0x100)
+			if (m_palette->pen_indirect(pen) != 0x100)
 				bitmap.pix16(y, x) = pen;
 		}
 	}

@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( finalizr, finalizr_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",finalizr,"palette")
 	MCFG_PALETTE_ADD("palette", 2*16*16)
-
+	MCFG_PALETTE_INIT_OWNER(finalizr_state, finalizr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

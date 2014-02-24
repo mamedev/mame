@@ -274,14 +274,14 @@ public:
 				color = 0;
 				shadow = -1;
 				whichtable = shadowmode_table;
-				palette_set_shadow_mode(machine(), 0);
+				m_gfxdecode->palette()->set_shadow_mode(0);
 			}
 			else
 			{
 				if (shdmask >= 0)
 				{
 					shadow = (color & K053247_CUSTOMSHADOW) ? (color >> K053247_SHDSHIFT) : (shadow >> 10);
-					if (shadow &= 3) palette_set_shadow_mode(machine(), (shadow - 1) & shdmask);
+					if (shadow &= 3) m_gfxdecode->palette()->set_shadow_mode((shadow - 1) & shdmask);
 				}
 				else
 					shadow = 0;
@@ -415,7 +415,7 @@ public:
 								fx,fy,
 								sx,sy,
 								m_screen->priority(),primask,
-								whichtable,machine().shadow_table);
+								whichtable,m_gfxdecode->palette()->shadow_table());
 					}
 					else
 					{
@@ -426,7 +426,7 @@ public:
 								sx,sy,
 								(zw << 16) >> 4,(zh << 16) >> 4,
 								m_screen->priority(),primask,
-								whichtable,machine().shadow_table);
+								whichtable,m_gfxdecode->palette()->shadow_table());
 					}
 
 					if (mirrory && height == 1)  /* Simpsons shadows */
@@ -439,7 +439,7 @@ public:
 									fx,!fy,
 									sx,sy,
 									m_screen->priority(),primask,
-									whichtable,machine().shadow_table);
+									whichtable,m_gfxdecode->palette()->shadow_table());
 						}
 						else
 						{
@@ -450,7 +450,7 @@ public:
 									sx,sy,
 									(zw << 16) >> 4,(zh << 16) >> 4,
 									m_screen->priority(),primask,
-									whichtable,machine().shadow_table);
+									whichtable,m_gfxdecode->palette()->shadow_table());
 						}
 					}
 				}

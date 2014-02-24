@@ -5170,6 +5170,7 @@ static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode",galaxian,"palette")
 	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART)
@@ -5291,6 +5292,7 @@ static MACHINE_CONFIG_DERIVED( gmgalax, galaxian )
 	/* banked video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gmgalax)
 	MCFG_PALETTE_ADD("palette", 64)
+	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)
 MACHINE_CONFIG_END
 
 
@@ -6054,7 +6056,7 @@ void galaxian_state::tenspot_set_game_bank(running_machine& machine, int bank, i
 	dstregion = machine.root_device().memregion("proms")->base();
 	memcpy(dstregion, srcregion, 0x20);
 
-	PALETTE_INIT_CALL(galaxian_state, galaxian);
+	PALETTE_INIT_NAME(galaxian)(m_palette);
 }
 
 DRIVER_INIT_MEMBER(galaxian_state,tenspot)

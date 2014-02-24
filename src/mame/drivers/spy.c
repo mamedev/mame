@@ -58,7 +58,7 @@ WRITE8_MEMBER(spy_state::spy_bankedram1_w)
 {
 	if (m_rambank & 1)
 	{
-		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space,offset,data);
+		m_palette->write(space,offset,data);
 	}
 	else if (m_rambank & 2)
 	{
@@ -527,8 +527,6 @@ static MACHINE_CONFIG_START( spy, spy_state )
 
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -538,6 +536,7 @@ static MACHINE_CONFIG_START( spy, spy_state )
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K052109_ADD("k052109", spy_k052109_intf)

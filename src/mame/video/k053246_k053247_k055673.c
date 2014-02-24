@@ -358,9 +358,9 @@ void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const re
 
 	    VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
 	*/
-	if (machine().config().m_video_attributes & VIDEO_HAS_SHADOWS)
+	if (m_gfxdecode->palette()->shadows_enabled())
 	{
-		if (sizeof(typename _BitmapClass::pixel_t) == 4 && (machine().config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
+		if (sizeof(typename _BitmapClass::pixel_t) == 4 && (m_gfxdecode->palette()->hilights_enabled()))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -571,8 +571,8 @@ void k053247_device::zdrawgfxzoom32GP(
 	src_fh    = 16;
 	src_base  = m_gfx->get_data(code % m_gfx->elements());
 
-	pal_base  = m_gfx->machine().pens + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
-	shd_base  = m_gfx->machine().shadow_table;
+	pal_base  = m_gfxdecode->palette()->pens() + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
+	shd_base  = m_gfxdecode->palette()->shadow_table();
 
 	dst_ptr   = &bitmap.pix32(0);
 	dst_pitch = bitmap.rowpixels();
@@ -1097,12 +1097,12 @@ void k053247_device::device_start()
 	{
 		if (m_screen->format() == BITMAP_FORMAT_RGB32)
 		{
-			if ((machine().config().m_video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
+			if (!m_gfxdecode->palette()->shadows_enabled() || !m_gfxdecode->palette()->hilights_enabled())
 				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
 		}
 		else
 		{
-			if (!(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
+			if (!(m_gfxdecode->palette()->shadows_enabled()))
 				popmessage("driver should use VIDEO_HAS_SHADOWS");
 		}
 	}
@@ -1299,7 +1299,7 @@ void k053247_device::alt_k055673_vh_start(running_machine &machine, const char *
 		fatalerror("Unsupported layout\n");
 	}
 
-	if (VERBOSE && !(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(m_gfxdecode->palette()->shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	m_dx = dx;

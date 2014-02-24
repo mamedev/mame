@@ -1016,7 +1016,7 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",namcos86,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-
+	MCFG_PALETTE_INIT_OWNER(namcos86_state, namcos86)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

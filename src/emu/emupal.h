@@ -340,6 +340,8 @@ public:
 	pen_t white_pen() const { return m_white_pen; }
 	memory_array &basemem() { return m_paletteram; }
 	memory_array &extmem() { return m_paletteram_ext; }
+	bool shadows_enabled() { return m_enable_shadows; }
+	bool hilights_enabled() { return m_enable_hilights; }
 
 	// setters
 	void set_pen_color(pen_t pen, rgb_t rgb) { m_palette->entry_set_color(pen, rgb); }
@@ -391,7 +393,9 @@ protected:
 	void allocate_shadow_tables();
 	
 	void update_for_write(offs_t byte_offset, int bytes_modified);
+public:	// needed by konamigx
 	void set_shadow_dRGB32(int mode, int dr, int dg, int db, bool noclip);
+protected:
 	void configure_rgb_shadows(int mode, float factor);
 	
 private:

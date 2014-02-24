@@ -1855,7 +1855,7 @@ static MACHINE_CONFIG_START( vsnes_bootleg, vsnes_state )
 
 	MCFG_PALETTE_ADD("palette", 8*4*16)
 
-	MCFG_PALETTE_INIT_OVERRIDE(vsnes_state,vsnes)
+	MCFG_PALETTE_INIT_OWNER(vsnes_state,vsnes)
 	MCFG_VIDEO_START_OVERRIDE(vsnes_state,vsnes)
 
 	MCFG_PPU2C04_ADD("ppu1", vsnes_ppu_interface_1)

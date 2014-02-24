@@ -323,7 +323,7 @@ void cclimber_state::swimmer_set_background_pen()
 	bit2 = (*m_swimmer_background_color >> 2) & 0x01;
 	b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-	palette.set_pen_color(CCLIMBER_BG_PEN, rgb_t(r, g, b));
+	m_palette->set_pen_color(CCLIMBER_BG_PEN, rgb_t(r, g, b));
 }
 
 

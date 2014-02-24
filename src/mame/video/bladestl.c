@@ -31,7 +31,7 @@ static void set_pens( running_machine &machine )
 
 		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine.colortable, i >> 1, color);
+		state->m_palette->set_indirect_color(i >> 1, color);
 	}
 }
 

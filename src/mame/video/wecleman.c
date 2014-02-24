@@ -75,7 +75,7 @@ struct sprite
 static void get_sprite_info(running_machine &machine)
 {
 	wecleman_state *state = machine.driver_data<wecleman_state>();
-	const pen_t *base_pal = machine.pens;
+	const pen_t *base_pal = state->m_palette->pens();
 	UINT8 *base_gfx = state->memregion("gfx1")->base();
 	int gfx_max     = state->memregion("gfx1")->bytes();
 
@@ -565,7 +565,7 @@ static void wecleman_draw_road(running_machine &machine, bitmap_rgb32 &bitmap, c
 	int scrollx, sy, sx;
 	int mdy, tdy, i;
 
-	rgb_ptr = machine.pens;
+	rgb_ptr = state->m_palette->pens();
 
 	if (priority == 0x02)
 	{
@@ -689,7 +689,7 @@ static void draw_cloud(bitmap_rgb32 &bitmap,
 
 	dst_base = &bitmap.pix32(y0+dy, x0+dx);
 
-	pal_base = gfx->machine().pens + pal_offset * gfx->granularity();
+	pal_base = state->m_palette->pens() + pal_offset * gfx->granularity();
 
 	alpha <<= 6;
 

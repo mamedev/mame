@@ -648,6 +648,7 @@ static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",lazercmd,"palette")
 	MCFG_PALETTE_ADD("palette", 5)
+	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -679,6 +680,7 @@ static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",lazercmd,"palette")
 	MCFG_PALETTE_ADD("palette", 5)
+	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -710,6 +712,7 @@ static MACHINE_CONFIG_START( bbonk, lazercmd_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",lazercmd,"palette")
 	MCFG_PALETTE_ADD("palette", 5)
+	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

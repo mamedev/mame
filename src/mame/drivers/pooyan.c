@@ -199,7 +199,7 @@ static MACHINE_CONFIG_START( pooyan, pooyan_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",pooyan,"palette")
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-
+	MCFG_PALETTE_INIT_OWNER(pooyan_state, pooyan)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(timeplt_sound)

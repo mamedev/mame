@@ -199,7 +199,7 @@ static MACHINE_CONFIG_START( sbasketb, sbasketb_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",sbasketb,"palette")
 	MCFG_PALETTE_ADD("palette", 16*16+16*16*16)
-
+	MCFG_PALETTE_INIT_OWNER(sbasketb_state, sbasketb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

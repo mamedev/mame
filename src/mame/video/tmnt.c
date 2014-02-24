@@ -736,9 +736,9 @@ UINT32 tmnt_state::screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitm
 
 		// toggle shadow/highlight
 		if (~m_dim_c & 0x10)
-			palette_set_shadow_mode(machine(), 1);
+			m_palette->set_shadow_mode(1);
 		else
-			palette_set_shadow_mode(machine(), 0);
+			m_palette->set_shadow_mode(0);
 	}
 
 	screen_update_lgtnfght(screen, bitmap, cliprect);

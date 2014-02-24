@@ -318,10 +318,10 @@ void rallyx_state::rallyx_video_start_common(  )
 	m_radary = m_radarx + 0x800;
 
 	for (i = 0; i < 16; i++)
-		machine().shadow_table[i] = i + 16;
+		m_palette->shadow_table()[i] = i + 16;
 
 	for (i = 16; i < 32; i++)
-		machine().shadow_table[i] = i;
+		m_palette->shadow_table()[i] = i;
 
 	for (i = 0; i < 3; i++)
 		m_drawmode_table[i] = DRAWMODE_SHADOW;
@@ -422,7 +422,7 @@ void rallyx_state::plot_star( bitmap_ind16 &bitmap, const rectangle &cliprect, i
 	if (flip_screen_y())
 		y = 255 - y;
 
-	if (colortable_entry_get_value(machine().colortable, bitmap.pix16(y, x) % 0x144) == 0)
+	if (m_palette->pen_indirect(bitmap.pix16(y, x) % 0x144) == 0)
 		bitmap.pix16(y, x) = STARS_COLOR_BASE + color;
 }
 
@@ -516,7 +516,7 @@ void rallyx_state::rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &c
 					0,
 					0,0,
 					x,y,
-					m_drawmode_table,machine().shadow_table);
+					m_drawmode_table,m_palette->shadow_table());
 	}
 }
 
@@ -544,7 +544,7 @@ void rallyx_state::jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &
 					0,
 					0,0,
 					x,y,
-					m_drawmode_table,machine().shadow_table);
+					m_drawmode_table,m_palette->shadow_table());
 	}
 }
 
@@ -580,7 +580,7 @@ void rallyx_state::locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle 
 					0,
 					0,0,
 					x,y,
-					m_drawmode_table,machine().shadow_table);
+					m_drawmode_table,m_palette->shadow_table());
 	}
 }
 

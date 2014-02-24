@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( jackal, jackal_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",jackal,"palette")
 	MCFG_PALETTE_ADD("palette", 0x300)
-
+	MCFG_PALETTE_INIT_OWNER(jackal_state, jackal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

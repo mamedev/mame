@@ -311,7 +311,7 @@ static MACHINE_CONFIG_START( tp84, tp84_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tp84,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-
+	MCFG_PALETTE_INIT_OWNER(tp84_state, tp84)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

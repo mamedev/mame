@@ -45,7 +45,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(baraduke);
 	UINT32 screen_update_baraduke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_baraduke(screen_device &screen, bool state);
 	void scroll_w(address_space &space, int layer, int offset, int data);

@@ -397,7 +397,7 @@ static MACHINE_CONFIG_START( baraduke, baraduke_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",baraduke,"palette")
 	MCFG_PALETTE_ADD("palette", 2048)
-
+	MCFG_PALETTE_INIT_OWNER(baraduke_state, baraduke)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

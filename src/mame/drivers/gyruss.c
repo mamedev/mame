@@ -536,7 +536,7 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",gyruss,"palette")
 	MCFG_PALETTE_ADD("palette", 16*4+16*16)
-
+	MCFG_PALETTE_INIT_OWNER(gyruss_state, gyruss)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( circusc, circusc_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",circusc,"palette")
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-
+	MCFG_PALETTE_INIT_OWNER(circusc_state, circusc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

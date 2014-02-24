@@ -82,7 +82,7 @@ void konami_decode_gfx(running_machine &machine, gfxdecode_device * gfxdecode, i
 
 	memcpy(&gl, layout, sizeof(gl));
 	gl.total = total;
-	gfxdecode->set_gfx(gfx_index, auto_alloc(machine, gfx_element(machine, gl, data, machine.total_colors() >> bpp, 0)));
+	gfxdecode->set_gfx(gfx_index, auto_alloc(machine, gfx_element(machine, *gfxdecode->palette(), gl, data, gfxdecode->palette()->entries() >> bpp, 0)));
 }
 
 

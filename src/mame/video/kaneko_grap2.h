@@ -86,7 +86,8 @@ protected:
 
 private:
 
-
+	//Micko:FIXME
+	palette_device *m_palette;
 };
 
 

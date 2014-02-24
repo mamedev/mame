@@ -201,7 +201,7 @@ static MACHINE_CONFIG_START( labyrunr, labyrunr_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",labyrunr,"palette")
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)
-
+	MCFG_PALETTE_INIT_OWNER(labyrunr_state, labyrunr)
 
 	MCFG_K007121_ADD("k007121")
 	MCFG_K051733_ADD("k051733")

@@ -40,7 +40,7 @@
 PALETTE_INIT_MEMBER(timeplt_state, timeplt)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	rgb_t palette[32];
+	rgb_t palette_val[32];
 	int i;
 
 	for (i = 0; i < 32; i++)
@@ -66,7 +66,7 @@ PALETTE_INIT_MEMBER(timeplt_state, timeplt)
 		bit4 = (color_prom[i + 0 * 32] >> 7) & 0x01;
 		b = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
 
-		palette[i] = rgb_t(r, g, b);
+		palette_val[i] = rgb_t(r, g, b);
 	}
 
 	color_prom += 2*32;
@@ -75,11 +75,11 @@ PALETTE_INIT_MEMBER(timeplt_state, timeplt)
 
 	/* sprites */
 	for (i = 0; i < 64 * 4; i++)
-		palette.set_pen_color(32 * 4 + i, palette[*color_prom++ & 0x0f]);
+		palette.set_pen_color(32 * 4 + i, palette_val[*color_prom++ & 0x0f]);
 
 	/* characters */
 	for (i = 0; i < 32 * 4; i++)
-		palette.set_pen_color(i, palette[(*color_prom++ & 0x0f) + 0x10]);
+		palette.set_pen_color(i, palette_val[(*color_prom++ & 0x0f) + 0x10]);
 }
 
 

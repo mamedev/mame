@@ -295,7 +295,7 @@ static MACHINE_CONFIG_START( tankbatt, tankbatt_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tankbatt,"palette")
 	MCFG_PALETTE_ADD("palette", 256*2)
-
+	MCFG_PALETTE_INIT_OWNER(tankbatt_state, tankbatt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

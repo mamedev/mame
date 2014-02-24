@@ -153,7 +153,7 @@ WRITE16_MEMBER(kaneko_grap2_device::galpani3_regs1_go_w)
 
 void kaneko_grap2_device::set_color_555_gp3(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
-	palette_set_color_rgb(machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+	m_palette->set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
 WRITE16_MEMBER(kaneko_grap2_device::galpani3_framebuffer1_palette_w)

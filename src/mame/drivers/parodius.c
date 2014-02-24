@@ -43,9 +43,9 @@ WRITE8_MEMBER(parodius_state::bankedram_w)
 	if (m_videobank & 0x01)
 	{
 		if (m_videobank & 0x04)
-			paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset + 0x0800, data);
+			m_palette->write(space, offset + 0x0800, data);
 		else
-			paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
+			m_palette->write(space, offset, data);
 	}
 	else
 		m_ram[offset] = data;
@@ -295,6 +295,7 @@ static MACHINE_CONFIG_START( parodius, parodius_state )
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K052109_ADD("k052109", parodius_k052109_intf)

@@ -387,7 +387,7 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 {
 	if (m_cur_control2 & 0x10)  // RAM enable
 	{
-		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
+		m_palette->write(space, offset, data);
 	}
 	else
 	{
@@ -478,7 +478,7 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 // use one more palette entry for the BG color
 WRITE8_MEMBER(lethal_state::le_bgcolor_w)
 {
-	paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, 0x3800 + offset, data);
+	m_palette->write(space, 0x3800 + offset, data);
 }
 
 READ8_MEMBER(lethal_state::guns_r)
@@ -729,6 +729,7 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 
 	MCFG_PALETTE_ADD("palette", 7168+1)
 	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_K056832_ADD("k056832", lethalen_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")

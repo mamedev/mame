@@ -36,7 +36,7 @@ PALETTE_INIT_MEMBER(namcos86_state, namcos86)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-	rgb_t palette[512];
+	rgb_t palette_val[512];
 
 	for (i = 0;i < 512;i++)
 	{
@@ -58,7 +58,7 @@ PALETTE_INIT_MEMBER(namcos86_state, namcos86)
 		bit3 = (color_prom[512] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette[i] = rgb_t(r,g,b);
+		palette_val[i] = rgb_t(r,g,b);
 		color_prom++;
 	}
 
@@ -67,11 +67,11 @@ PALETTE_INIT_MEMBER(namcos86_state, namcos86)
 
 	/* tiles lookup table */
 	for (i = 0;i < 2048;i++)
-		palette.set_pen_color(i, palette[*color_prom++]);
+		palette.set_pen_color(i, palette_val[*color_prom++]);
 
 	/* sprites lookup table */
 	for (i = 0;i < 2048;i++)
-		palette.set_pen_color(2048 + i, palette[256 + *color_prom++]);
+		palette.set_pen_color(2048 + i, palette_val[256 + *color_prom++]);
 
 	/* color_prom now points to the beginning of the tile address decode PROM */
 

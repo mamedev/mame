@@ -361,7 +361,7 @@ PALETTE_INIT_MEMBER(galaxian_state, galaxian)
 
 PALETTE_INIT_MEMBER(galaxian_state,moonwar)
 {
-	PALETTE_INIT_CALL(galaxian_state, galaxian);
+	PALETTE_INIT_NAME(galaxian)(palette);
 
 	/* wire mod to connect the bullet blue output to the 220 ohm resistor */
 	m_bullet_color[7] = rgb_t(0xef,0xef,0x97);

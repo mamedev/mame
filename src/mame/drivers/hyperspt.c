@@ -309,7 +309,7 @@ static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",hyperspt,"palette")
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-
+	MCFG_PALETTE_INIT_OWNER(hyperspt_state, hyperspt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( yiear, yiear_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",yiear,"palette")
 	MCFG_PALETTE_ADD("palette", 32)
-
+	MCFG_PALETTE_INIT_OWNER(yiear_state, yiear)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

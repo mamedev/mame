@@ -125,7 +125,7 @@ PALETTE_INIT_MEMBER(pacland_state, pacland)
 		/* iterate over all palette entries except the last one */
 		for (palentry = 0; palentry < 0x100; palentry++)
 		{
-			UINT32 mask = palette.set_pen_indirect(m_gfxdecode->gfx(2), i, palentry);
+			UINT32 mask = palette.transpen_mask(*m_gfxdecode->gfx(2), i, palentry);
 
 			/* transmask[0] is a mask that is used to draw only high priority sprite pixels; thus, pens
 			   $00-$7F are opaque, and others are transparent */

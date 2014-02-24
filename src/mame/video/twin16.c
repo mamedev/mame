@@ -311,7 +311,7 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
 
 								if (pdest[sx]<priority) {
 									if (shadow) {
-										dest[sx] = machine().shadow_table[dest[sx]];
+										dest[sx] = m_palette->shadow_table()[dest[sx]];
 										pdest[sx]|=TWIN16_SPRITE_CAST_SHADOW;
 									}
 									else {
@@ -320,7 +320,7 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
 								}
 								else if (!shadow && pdest[sx]&TWIN16_SPRITE_CAST_SHADOW && (pdest[sx]&0xf)<priority) {
 									// shadow cast onto sprite below, evident in devilw lava level
-									dest[sx] = machine().shadow_table[pal_base + pen];
+									dest[sx] = m_palette->shadow_table()[pal_base + pen];
 									pdest[sx]^=TWIN16_SPRITE_CAST_SHADOW;
 								}
 

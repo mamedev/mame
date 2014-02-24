@@ -272,8 +272,6 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.17)             /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -283,6 +281,7 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 	MCFG_K052109_ADD("k052109", crimfght_k052109_intf)
@@ -395,7 +394,7 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 	if (lines & 0x20)
 	{
 		device->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x03ff, "bank3");
-		device->memory().space(AS_PROGRAM).install_write_handler(0x0000, 0x03ff, write8_delegate(FUNC(crimfght_state::paletteram_xBBBBBGGGGGRRRRR_byte_be_w), state));
+		device->memory().space(AS_PROGRAM).install_write_handler(0x0000, 0x03ff, write8_delegate(FUNC(palette_device::write), state->m_palette.target()));
 		state->membank("bank3")->set_base(state->m_generic_paletteram_8);
 	}
 	else

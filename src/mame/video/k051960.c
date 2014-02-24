@@ -181,7 +181,7 @@ void k051960_device::device_start()
 		fatalerror("Unknown plane_order\n");
 	}
 
-	if (VERBOSE && !(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(m_gfxdecode->palette()->shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* deinterleave the graphics, if needed */
@@ -518,14 +518,14 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 								flipx,flipy,
 								sx & 0x1ff,sy,
 								priority_bitmap,pri,
-								drawmode_table,machine().shadow_table);
+								drawmode_table,m_gfxdecode->palette()->shadow_table());
 					else
 						m_gfx->transtable(bitmap,cliprect,
 								c,
 								color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
-								drawmode_table,machine().shadow_table);
+								drawmode_table,m_gfxdecode->palette()->shadow_table());
 				}
 			}
 		}
@@ -562,7 +562,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 								sx & 0x1ff,sy,
 								(zw << 16) / 16,(zh << 16) / 16,
 								priority_bitmap,pri,
-								drawmode_table,machine().shadow_table);
+								drawmode_table,m_gfxdecode->palette()->shadow_table());
 					else
 						m_gfx->zoom_transtable(bitmap,cliprect,
 								c,
@@ -570,7 +570,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 								flipx,flipy,
 								sx & 0x1ff,sy,
 								(zw << 16) / 16,(zh << 16) / 16,
-								drawmode_table,machine().shadow_table);
+								drawmode_table,m_gfxdecode->palette()->shadow_table());
 				}
 			}
 		}

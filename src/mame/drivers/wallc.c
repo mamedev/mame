@@ -71,7 +71,7 @@ public:
 	DECLARE_DRIVER_INIT(sidam);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(wallc);
 	UINT32 screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -319,7 +319,7 @@ static MACHINE_CONFIG_START( wallc, wallc_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",wallc,"palette")
 	MCFG_PALETTE_ADD("palette", 32)
-
+	MCFG_PALETTE_INIT_OWNER(wallc_state, wallc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

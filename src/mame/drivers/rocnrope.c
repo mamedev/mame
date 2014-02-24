@@ -209,7 +209,7 @@ static MACHINE_CONFIG_START( rocnrope, rocnrope_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",rocnrope,"palette")
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-
+	MCFG_PALETTE_INIT_OWNER(rocnrope_state, rocnrope)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(timeplt_sound)

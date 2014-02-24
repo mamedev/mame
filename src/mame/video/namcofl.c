@@ -67,7 +67,7 @@ static void namcofl_install_palette(running_machine &machine)
 
 			for( byte_offset=0; byte_offset<4; byte_offset++ )
 			{
-				palette_set_color_rgb( machine, pen++, r&0xff, g&0xff, b&0xff);
+				state->m_palette->set_pen_color(pen++, r&0xff, g&0xff, b&0xff);
 				r>>=8; g>>=8; b>>=8;
 			}
 		}

@@ -2558,7 +2558,7 @@ static MACHINE_CONFIG_START( ppsatan, cave_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",ppsatan,"palette")
 	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_PALETTE_INIT_OVERRIDE(cave_state,ppsatan)
+	MCFG_PALETTE_INIT_OWNER(cave_state,ppsatan)
 	MCFG_DEFAULT_LAYOUT(layout_ppsatan)
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
