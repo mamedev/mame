@@ -30,12 +30,11 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_APOLLO_KBD_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, APOLLO_KBD, 0) \
-	apollo_kbd_device::static_set_interface(*device, _interface);
-
 #define MCFG_APOLLO_KBD_TX_CALLBACK(_cb) \
 	devcb = &apollo_kbd_device::set_tx_cb(*device, DEVCB2_##_cb);
+
+#define MCFG_APOLLO_KBD_GERMAN_CALLBACK(_cb) \
+	devcb = &apollo_kbd_device::set_german_cb(*device, DEVCB2_##_cb);
 
 INPUT_PORTS_EXTERN(apollo_kbd);
 
@@ -43,30 +42,19 @@ INPUT_PORTS_EXTERN(apollo_kbd);
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> apollo_kbd_interface
-
-struct apollo_kbd_interface
-{
-	devcb_read8 apollo_kbd_has_beeper_cb;
-	devcb_read8 apollo_kbd_is_german_cb;
-};
-
-#define APOLLO_KBD_INTERFACE(name) const struct apollo_kbd_interface (name)
-
 // ======================> apollo_kbd_device
 
-class apollo_kbd_device :   public device_t, public device_serial_interface, public apollo_kbd_interface
+class apollo_kbd_device :   public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
 	apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// static configuration helpers
-	static void static_set_interface(device_t &device, const apollo_kbd_interface &interface);
-
 	template<class _Object> static devcb2_base &set_tx_cb(device_t &device, _Object object) { return downcast<apollo_kbd_device &>(device).m_tx_w.set_callback(object); }
+	template<class _Object> static devcb2_base &set_german_cb(device_t &device, _Object object) { return downcast<apollo_kbd_device &>(device).m_german_r.set_callback(object); }
 
 	devcb2_write_line m_tx_w;
+	devcb2_read_line m_german_r;
 
 private:
 	// device-level overrides
@@ -134,8 +122,6 @@ private:
 		int m_tx_pending;  // mouse data packet is pending
 	};
 
-//  const apollo_kbd_interface &m_config;
-
 	static const int XMIT_RING_SIZE = 64;
 
 	UINT8 m_xmitring[XMIT_RING_SIZE];
@@ -168,10 +154,6 @@ private:
 	UINT16 m_last_pressed;  // last key pressed, for repeat key handling
 	int m_keytime[0x80];    // time until next key press (1 ms)
 	UINT8 m_keyon[0x80];    // is 1 if key is pressed
-
-	devcb_resolved_write8 m_putchar;
-	devcb_resolved_read8 m_has_beeper;
-	devcb_resolved_read8 m_is_german;
 
 	static UINT16 m_code_table[];
 };

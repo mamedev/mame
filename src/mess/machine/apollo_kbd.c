@@ -65,20 +65,9 @@ const device_type APOLLO_KBD = &device_creator<apollo_kbd_device>;
 apollo_kbd_device::apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, APOLLO_KBD, "Apollo Keyboard", tag, owner, clock, "apollo_kbd", __FILE__),
 	device_serial_interface(mconfig, *this),
-	m_tx_w(*this)
+	m_tx_w(*this),
+	m_german_r(*this)
 {
-	memset(static_cast<apollo_kbd_interface *>(this), 0, sizeof(apollo_kbd_interface));
-}
-
-//-------------------------------------------------
-//  static_set_interface - set the interface struct
-//-------------------------------------------------
-
-void apollo_kbd_device::static_set_interface(device_t &device, const apollo_kbd_interface &interface)
-{
-	apollo_kbd_device &kbd = downcast<apollo_kbd_device &>(device);
-
-	static_cast<apollo_kbd_interface &>(kbd) = interface;
 }
 
 //-------------------------------------------------
@@ -91,9 +80,7 @@ void apollo_kbd_device::device_start()
 	LOG1(("start apollo_kbd"));
 
 	m_tx_w.resolve_safe();
-
-	m_has_beeper.resolve(apollo_kbd_has_beeper_cb, *this);
-	m_is_german.resolve(apollo_kbd_is_german_cb, *this);
+	m_german_r.resolve_safe(0);
 
 	m_beeper.start(this);
 	m_mouse.start(this);
@@ -214,8 +201,7 @@ void apollo_kbd_device::beeper::on()
 
 int apollo_kbd_device::beeper::keyboard_has_beeper()
 {
-	return !m_device->m_has_beeper.isnull() ?
-			m_device->m_has_beeper(0) : 0;
+	return true;	// driver has no facility to return false here, so go with it
 }
 
 void apollo_kbd_device::beeper::beeper_callback()
@@ -333,8 +319,7 @@ void apollo_kbd_device::mouse::read_mouse()
 
 int apollo_kbd_device::keyboard_is_german()
 {
-	return !m_is_german.isnull() ?
-			m_is_german(0) : 0;
+	return (m_german_r() == ASSERT_LINE) ? true : false;
 }
 
 void apollo_kbd_device::set_mode(UINT16 mode)
