@@ -184,7 +184,7 @@
 	MCFG_DEVICE_ADD(_tag, PALETTE, 0) \
 	MCFG_PALETTE_ENTRIES(_entries) \
 
-#define MCG_PALETTE_ADD_INIT_BLACK(_tag, _entries) \
+#define MCFG_PALETTE_ADD_INIT_BLACK(_tag, _entries) \
 	MCFG_PALETTE_ADD(_tag, _entries) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_all_black), downcast<palette_device *>(device)));
 
