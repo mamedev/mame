@@ -115,8 +115,6 @@ static int node_type;
 // FIXME: value of ram_config_byte must match with default/selected RAM size
 static UINT8 ram_config_byte;
 
-static device_t *dsp_terminal = NULL;
-
 static UINT32 log_line_counter = 0;
 
 /***************************************************************************
@@ -735,9 +733,9 @@ static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x010100, 0x0101ff) AM_READWRITE16(apollo_csr_control_register_r, apollo_csr_control_register_w, 0xffffffff)
 		AM_RANGE(0x010200, 0x0102ff) AM_READWRITE8(cache_status_register_r, cache_control_register_w, 0xffffffff )
 		AM_RANGE(0x010300, 0x0103ff) AM_READWRITE8(task_alias_register_r , task_alias_register_w , 0xffffffff )
-		AM_RANGE(0x010400, 0x0104ff) AM_DEVREADWRITE8_LEGACY(APOLLO_SIO_TAG, apollo_sio_r, apollo_sio_w, 0xffffffff )
-		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, duartn68681_device, read, write, 0xffffffff )
-		AM_RANGE(0x010800, 0x0108ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0xffffffff )
+		AM_RANGE(0x010400, 0x0104ff) AM_DEVREADWRITE8(APOLLO_SIO_TAG, duartn68681_device, read, write, 0x00ff00ff )
+		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, duartn68681_device, read, write, 0x00ff00ff )
+		AM_RANGE(0x010800, 0x0108ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0x00ff00ff )
 		AM_RANGE(0x010900, 0x0109ff) AM_READWRITE8(apollo_rtc_r, apollo_rtc_w, 0xffffffff )
 		AM_RANGE(0x010c00, 0x010cff) AM_READWRITE8(/*"dma1",*/apollo_dma_1_r, apollo_dma_1_w, 0xffffffff )
 		AM_RANGE(0x010d00, 0x010dff) AM_READWRITE8(/*"dma2",*/apollo_dma_2_r, apollo_dma_2_w, 0xffffffff )
@@ -786,9 +784,9 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x010100, 0x0101ff) AM_READWRITE16(apollo_csr_control_register_r, apollo_csr_control_register_w, 0xffffffff)
 		AM_RANGE(0x010200, 0x0102ff) AM_READWRITE8(cache_status_register_r, cache_control_register_w, 0xffffffff )
 		AM_RANGE(0x010300, 0x0103ff) AM_READWRITE8(task_alias_register_r , task_alias_register_w , 0xffffffff )
-		AM_RANGE(0x010400, 0x0104ff) AM_DEVREADWRITE8_LEGACY(APOLLO_SIO_TAG, apollo_sio_r, apollo_sio_w, 0xffffffff )
-		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, duartn68681_device, read, write, 0xffffffff )
-		AM_RANGE(0x010800, 0x0108ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0xffffffff )
+		AM_RANGE(0x010400, 0x0104ff) AM_DEVREADWRITE8(APOLLO_SIO_TAG, duartn68681_device, read, write, 0x00ff00ff ) 
+		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, duartn68681_device, read, write, 0x00ff00ff )
+		AM_RANGE(0x010800, 0x0108ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0x00ff00ff )     
 		AM_RANGE(0x010900, 0x0109ff) AM_READWRITE8(apollo_rtc_r, apollo_rtc_w, 0xffffffff )
 		AM_RANGE(0x010c00, 0x010cff) AM_READWRITE8(/*"dma1",*/apollo_dma_1_r, apollo_dma_1_w, 0xffffffff )
 		AM_RANGE(0x010d00, 0x010dff) AM_READWRITE8(/*"dma2",*/apollo_dma_2_r, apollo_dma_2_w, 0xffffffff )
@@ -831,8 +829,8 @@ static ADDRESS_MAP_START(dn3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x000000, 0x007fff) AM_WRITE(apollo_rom_w)
 		AM_RANGE(0x008000, 0x0080ff) AM_READWRITE16(apollo_csr_status_register_r, apollo_csr_status_register_w, 0xffffffff)
 		AM_RANGE(0x008100, 0x0081ff) AM_READWRITE16(apollo_csr_control_register_r, apollo_csr_control_register_w, 0xffffffff)
-		AM_RANGE(0x008400, 0x0087ff) AM_DEVREADWRITE8_LEGACY(APOLLO_SIO_TAG, apollo_sio_r, apollo_sio_w, 0xffffffff )
-		AM_RANGE(0x008800, 0x0088ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0xffffffff )
+		AM_RANGE(0x008400, 0x0087ff) AM_DEVREADWRITE8(APOLLO_SIO_TAG, duartn68681_device, read, write, 0x00ff00ff ) 
+		AM_RANGE(0x008800, 0x0088ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0x00ff00ff )
 		AM_RANGE(0x008900, 0x0089ff) AM_READWRITE8(apollo_rtc_r, apollo_rtc_w, 0xffffffff )
 
 		AM_RANGE(0x009000, 0x0090ff) AM_READWRITE8(/*"dma1",*/apollo_dma_1_r, apollo_dma_1_w, 0xffffffff )
@@ -872,8 +870,8 @@ static ADDRESS_MAP_START(dsp3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x000000, 0x007fff) AM_WRITE(apollo_rom_w)
 		AM_RANGE(0x008000, 0x0080ff) AM_READWRITE16(apollo_csr_status_register_r, apollo_csr_status_register_w, 0xffffffff)
 		AM_RANGE(0x008100, 0x0081ff) AM_READWRITE16(apollo_csr_control_register_r, apollo_csr_control_register_w, 0xffffffff)
-		AM_RANGE(0x008400, 0x0087ff) AM_DEVREADWRITE8_LEGACY(APOLLO_SIO_TAG, apollo_sio_r, apollo_sio_w, 0xffffffff )
-		AM_RANGE(0x008800, 0x0088ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0xffffffff )
+		AM_RANGE(0x008400, 0x0087ff) AM_DEVREADWRITE8(APOLLO_SIO_TAG, duartn68681_device, read, write, 0x00ff00ff ) 
+		AM_RANGE(0x008800, 0x0088ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0x00ff00ff )
 		AM_RANGE(0x008900, 0x0089ff) AM_READWRITE8(apollo_rtc_r, apollo_rtc_w, 0xffffffff )
 
 		AM_RANGE(0x009000, 0x0090ff) AM_READWRITE8(/*"dma1",*/apollo_dma_1_r, apollo_dma_1_w, 0xffffffff )
@@ -916,9 +914,9 @@ static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x010100, 0x0101ff) AM_READWRITE16(apollo_csr_control_register_r, apollo_csr_control_register_w, 0xffffffff)
 		AM_RANGE(0x010200, 0x0102ff) AM_READWRITE8(cache_status_register_r, cache_control_register_w, 0xffffffff )
 		AM_RANGE(0x010300, 0x0103ff) AM_READWRITE8(task_alias_register_r , task_alias_register_w , 0xffffffff )
-		AM_RANGE(0x010400, 0x0104ff) AM_DEVREADWRITE8_LEGACY(APOLLO_SIO_TAG, apollo_sio_r, apollo_sio_w, 0xffffffff )
-		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, duartn68681_device, read, write, 0xffffffff )
-		AM_RANGE(0x010800, 0x0108ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0xffffffff )
+		AM_RANGE(0x010400, 0x0104ff) AM_DEVREADWRITE8(APOLLO_SIO_TAG, duartn68681_device, read, write, 0x00ff00ff ) 
+		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, duartn68681_device, read, write, 0x00ff00ff )
+		AM_RANGE(0x010800, 0x0108ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0x00ff00ff )     
 		AM_RANGE(0x010900, 0x0109ff) AM_READWRITE8(apollo_rtc_r, apollo_rtc_w, 0xffffffff )
 		AM_RANGE(0x010c00, 0x010cff) AM_READWRITE8(/*"dma1",*/apollo_dma_1_r, apollo_dma_1_w, 0xffffffff )
 		AM_RANGE(0x010d00, 0x010dff) AM_READWRITE8(/*"dma2",*/apollo_dma_2_r, apollo_dma_2_w, 0xffffffff )
@@ -970,9 +968,9 @@ static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x010100, 0x0101ff) AM_READWRITE16(apollo_csr_control_register_r, apollo_csr_control_register_w, 0xffffffff)
 		AM_RANGE(0x010200, 0x0102ff) AM_READWRITE8(cache_status_register_r, cache_control_register_w, 0xffffffff )
 		AM_RANGE(0x010300, 0x0103ff) AM_READWRITE8(task_alias_register_r , task_alias_register_w , 0xffffffff )
-		AM_RANGE(0x010400, 0x0104ff) AM_DEVREADWRITE8_LEGACY(APOLLO_SIO_TAG, apollo_sio_r, apollo_sio_w, 0xffffffff )
-		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, duartn68681_device, read, write, 0xffffffff )
-		AM_RANGE(0x010800, 0x0108ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0xffffffff )
+		AM_RANGE(0x010400, 0x0104ff) AM_DEVREADWRITE8(APOLLO_SIO_TAG, duartn68681_device, read, write, 0x00ff00ff ) 
+		AM_RANGE(0x010500, 0x0105ff) AM_DEVREADWRITE8(APOLLO_SIO2_TAG, duartn68681_device, read, write, 0x00ff00ff )
+		AM_RANGE(0x010800, 0x0108ff) AM_DEVREADWRITE8(APOLLO_PTM_TAG, ptm6840_device, read, write, 0x00ff00ff )     
 		AM_RANGE(0x010900, 0x0109ff) AM_READWRITE8(apollo_rtc_r, apollo_rtc_w, 0xffffffff )
 		AM_RANGE(0x010c00, 0x010cff) AM_READWRITE8(/*"dma1",*/apollo_dma_1_r, apollo_dma_1_w, 0xffffffff )
 		AM_RANGE(0x010d00, 0x010dff) AM_READWRITE8(/*"dma2",*/apollo_dma_2_r, apollo_dma_2_w, 0xffffffff )
@@ -1112,7 +1110,6 @@ DRIVER_INIT_MEMBER(apollo_state,dsp3500)
 	DRIVER_INIT_CALL( dn3500 );
 //  MLOG1(("driver_init_dsp3500"));
 	node_type = NODE_TYPE_DSP3500;
-	dsp_terminal = machine().device(TERMINAL_TAG);
 }
 
 DRIVER_INIT_MEMBER(apollo_state,dn3000)
@@ -1132,7 +1129,6 @@ DRIVER_INIT_MEMBER(apollo_state,dsp3000)
 	DRIVER_INIT_CALL( dn3000 );
 //  MLOG1(("driver_init_dsp3000"));
 	node_type = NODE_TYPE_DSP3000;
-	dsp_terminal = machine().device(TERMINAL_TAG);
 }
 
 DRIVER_INIT_MEMBER(apollo_state,dn5500)
@@ -1152,7 +1148,6 @@ DRIVER_INIT_MEMBER(apollo_state,dsp5500)
 	DRIVER_INIT_CALL( dn5500 );
 //  MLOG1(("driver_init_dsp5500"));
 	node_type = NODE_TYPE_DSP5500;
-	dsp_terminal = machine().device(TERMINAL_TAG);
 }
 
 /***************************************************************************
@@ -1168,12 +1163,6 @@ static INPUT_PORTS_START( dsp3500 )
 	PORT_INCLUDE(apollo_config)
 INPUT_PORTS_END
 
-WRITE8_MEMBER( apollo_state::apollo_kbd_putchar ) {
-	// put keyboard character to the keyboard sio
-//  DLOG1(("apollo_kbd_putchar: 0x%02x", data));
-	apollo_sio_rx_data(machine().device(APOLLO_SIO_TAG), 0, data);
-}
-
 READ8_MEMBER( apollo_state::apollo_kbd_has_beeper ) {
 	return 1; // apollo_config(APOLLO_CONF_KBD_BEEPER);
 }
@@ -1183,31 +1172,9 @@ READ8_MEMBER( apollo_state::apollo_kbd_is_german ) {
 }
 
 static APOLLO_KBD_INTERFACE( apollo_kbd_config ) = {
-	DEVCB_DRIVER_MEMBER(apollo_state, apollo_kbd_putchar),
 	DEVCB_DRIVER_MEMBER(apollo_state, apollo_kbd_has_beeper),
 	DEVCB_DRIVER_MEMBER(apollo_state, apollo_kbd_is_german)
 };
-
-WRITE8_MEMBER( apollo_state::terminal_kbd_putchar ) {
-	// put input character from terminal to the RS232 sio (i.e. sio1)
-	//DLOG1(("terminal_kbd_putchar: 0x%02x", data));
-	// FIXME: as of mess0145u1, terminal.c will append a null character after each input character
-	if (data != 0)
-	{
-		apollo_sio_rx_data(machine().device(APOLLO_SIO_TAG), 1, data);
-	}
-}
-
-static GENERIC_TERMINAL_INTERFACE( apollo_terminal_config ) {
-	DEVCB_DRIVER_MEMBER(apollo_state, terminal_kbd_putchar)
-};
-
-void apollo_terminal_write(UINT8 data) {
-	if (dsp_terminal != NULL) {
-		// output data to the terminal emulator
-		dynamic_cast<generic_terminal_device *>(dsp_terminal)->write(dsp_terminal->machine().driver_data()->generic_space(), 0, data);
-	}
-}
 
 /***************************************************************************
  MACHINE DRIVERS
@@ -1218,7 +1185,6 @@ static MACHINE_CONFIG_START( dn3500, apollo_state )
 	MCFG_CPU_ADD(MAINCPU, M68030, 25000000) /* 25 MHz 68030 */
 	MCFG_CPU_PROGRAM_MAP(dn3500_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
 
 	MCFG_FRAGMENT_ADD( apollo )
 
@@ -1233,26 +1199,39 @@ static MACHINE_CONFIG_START( dn3500, apollo_state )
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dsp3500, dn3500 )
-	// strange: MCFG_CPU_PROGRAM_MAP will fail w/o MCFG_CPU_REPLACE
-	MCFG_CPU_REPLACE(MAINCPU, M68030, 25000000) /* 25 MHz 68030 */
+static MACHINE_CONFIG_START( dsp3500, apollo_state )
+	MCFG_CPU_ADD(MAINCPU, M68030, 25000000) /* 25 MHz 68030 */
 	MCFG_CPU_PROGRAM_MAP(dsp3500_map)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	MCFG_FRAGMENT_ADD( apollo_terminal )
+
+	/* keyboard beeper */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* internal ram */
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("8M")
+	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M")
+
 	/* terminal hardware */
 	MCFG_DEFAULT_LAYOUT( layout_apollo_dsp )
-//  MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, apollo_terminal_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dn3500_19i, dn3500 )
 	/* video hardware 19" monochrome */
 	MCFG_APOLLO_MONO19I_ADD(APOLLO_SCREEN_TAG)
 	MCFG_APOLLO_KBD_ADD( APOLLO_KBD_TAG, apollo_kbd_config )
+	MCFG_APOLLO_KBD_TX_CALLBACK(DEVWRITELINE(APOLLO_SIO_TAG, duartn68681_device, rx_a_w)) 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dn3500_15i, dn3500 )
 	/* video hardware is 15" monochrome or color */
 	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
 	MCFG_APOLLO_KBD_ADD( APOLLO_KBD_TAG, apollo_kbd_config )
+	MCFG_APOLLO_KBD_TX_CALLBACK(DEVWRITELINE(APOLLO_SIO_TAG, duartn68681_device, rx_a_w)) 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dn3000, dn3500 )
@@ -1264,54 +1243,77 @@ static MACHINE_CONFIG_DERIVED( dn3000, dn3500 )
 	MCFG_RAM_EXTRA_OPTIONS("4M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dsp3000, dn3000 )
-	// strange: MCFG_CPU_PROGRAM_MAP will fail w/o MCFG_CPU_REPLACE
-	MCFG_CPU_REPLACE(MAINCPU, M68020PMMU, 12000000) /* 12 MHz */
+static MACHINE_CONFIG_START( dsp3000, apollo_state )
+	MCFG_CPU_ADD(MAINCPU, M68020PMMU, 12000000) /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(dsp3000_map)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	MCFG_FRAGMENT_ADD( apollo_terminal )
+
+	/* keyboard beeper */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* internal ram */
+	MCFG_RAM_ADD("messram")
+	MCFG_RAM_DEFAULT_SIZE("8M")
+	MCFG_RAM_EXTRA_OPTIONS("4M")
+
+	MCFG_DEVICE_REMOVE( APOLLO_SIO2_TAG )
+	MCFG_RAM_MODIFY("messram")
+
 	/* terminal hardware */
 	MCFG_DEFAULT_LAYOUT( layout_apollo_dsp )
-//  MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, apollo_terminal_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dn3000_19i, dn3000 )
 	/* video hardware 19" monochrome */
 	MCFG_APOLLO_MONO19I_ADD(APOLLO_SCREEN_TAG)
 	MCFG_APOLLO_KBD_ADD( APOLLO_KBD_TAG, apollo_kbd_config )
+	MCFG_APOLLO_KBD_TX_CALLBACK(DEVWRITELINE(APOLLO_SIO_TAG, duartn68681_device, rx_a_w)) 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dn3000_15i, dn3000 )
 	/* video hardware 15" monochrome */
 	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
 	MCFG_APOLLO_KBD_ADD( APOLLO_KBD_TAG, apollo_kbd_config )
+	MCFG_APOLLO_KBD_TX_CALLBACK(DEVWRITELINE(APOLLO_SIO_TAG, duartn68681_device, rx_a_w)) 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dn5500, dn3500 )
 	MCFG_CPU_REPLACE(MAINCPU, M68040, 25000000) /* 25 MHz */
 	MCFG_CPU_PROGRAM_MAP(dn5500_map)
-
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dsp5500, dn5500 )
-	// strange: MCFG_CPU_PROGRAM_MAP will fail w/o MCFG_CPU_REPLACE
-	MCFG_CPU_REPLACE(MAINCPU, M68040, 25000000) /* 25 MHz */
+static MACHINE_CONFIG_START( dsp5500, apollo_state )
+	MCFG_CPU_ADD(MAINCPU, M68040, 25000000) /* 25 MHz */
 	MCFG_CPU_PROGRAM_MAP(dsp5500_map)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	MCFG_FRAGMENT_ADD(apollo_terminal)
+
+	/* keyboard beeper */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
 	/* terminal hardware */
 	MCFG_DEFAULT_LAYOUT( layout_apollo_dsp )
-//  MCFG_FRAGMENT_ADD( generic_terminal )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, apollo_terminal_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dn5500_19i, dn5500 )
 	/* video hardware 19" monochrome */
 	MCFG_APOLLO_MONO19I_ADD(APOLLO_SCREEN_TAG)
 	MCFG_APOLLO_KBD_ADD( APOLLO_KBD_TAG, apollo_kbd_config )
+	MCFG_APOLLO_KBD_TX_CALLBACK(DEVWRITELINE(APOLLO_SIO_TAG, duartn68681_device, rx_a_w)) 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dn5500_15i, dn5500 )
 	/* video hardware 15" monochrome */
 	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
 	MCFG_APOLLO_KBD_ADD( APOLLO_KBD_TAG, apollo_kbd_config )
+	MCFG_APOLLO_KBD_TX_CALLBACK(DEVWRITELINE(APOLLO_SIO_TAG, duartn68681_device, rx_a_w)) 
 MACHINE_CONFIG_END
 
 /***************************************************************************
