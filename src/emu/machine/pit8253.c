@@ -88,9 +88,9 @@ void pit8253_device::device_start()
 	m_timers[1].clockin = m_clk1;
 	m_timers[2].clockin = m_clk2;
 
-	m_out0_handler.resolve();
-	m_out1_handler.resolve();
-	m_out2_handler.resolve();
+	m_out0_handler.resolve_safe();
+	m_out1_handler.resolve_safe();
+	m_out2_handler.resolve_safe();
 
 	/* register for state saving */
 	for (int timerno = 0; timerno < PIT8253_MAX_TIMER; timerno++)
