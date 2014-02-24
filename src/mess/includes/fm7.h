@@ -130,7 +130,15 @@ public:
 		m_ym(*this, "ym"),
 		m_psg(*this, "psg"),
 		m_centronics(*this, "centronics"),
-		m_cent_data_out(*this, "cent_data_out")
+		m_cent_data_out(*this, "cent_data_out"),
+		m_kanji(*this, "kanji1"),
+		m_key1(*this, "key1"),
+		m_key2(*this, "key2"),
+		m_key3(*this, "key3"),
+		m_keymod(*this, "key_modifiers"),
+		m_joy1(*this, "joy1"),
+		m_joy2(*this, "joy2"),
+		m_dsw(*this, "DSW")
 	{
 	}
 
@@ -289,6 +297,7 @@ public:
 	optional_device<ay8910_device> m_psg;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
+
 	void fm7_alu_mask_write(UINT32 offset, int bank, UINT8 dat);
 	void fm7_alu_function_compare(UINT32 offset);
 	void fm7_alu_function_pset(UINT32 offset);
@@ -318,6 +327,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+
+	optional_memory_region m_kanji;
+	required_ioport m_key1;
+	required_ioport m_key2;
+	required_ioport m_key3;
+	required_ioport m_keymod;
+	required_ioport m_joy1;
+	required_ioport m_joy2;
+	required_ioport m_dsw;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
