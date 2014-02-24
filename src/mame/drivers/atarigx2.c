@@ -157,6 +157,56 @@ WRITE32_MEMBER(atarigx2_state::atarigx2_protection_w)
 	}
 }
 
+/********************
+
+The following pseudocode reproduces almost exactly (there are just 3 or 4 bits of divergence)
+the 0x200 values in the table below below under the "initialization" region. The function
+ftest4 must be called by throwing away the 17 lower bits on the first element of the pair
+(  ftest4(lookup_table[i][0]>>17)  ). In other words, the 16 bits value in the RHS is
+function of m_last_write_offset (see the protection code below the table). It's unclear how
+this should be generalized to cover other regions of the table, and the scarcity of data
+in those regions precludes applying the same kind of analysis.
+
+int parameters3[16][2] = {
+	{0x003a, 0x0032},
+	{0x0076, 0x0064},
+	{0x00ee, 0x00c8},
+	{0x01dc, 0x0190},
+	{0x01b0, 0x012A},
+	{0x0168, 0x005C},
+	{0x00d8, 0x00b8},
+	{0x01b0, 0x0172},
+	{0x016a, 0x00ee},
+	{0x00de, 0x01de},
+	{0x01be, 0x01b6},
+	{0x0174, 0x0164},
+	{0x00e2, 0x00c0},
+	{0x01c6, 0x0180},
+	{0x0186, 0x010a},
+	{0x0104, 0x001c}
+};
+
+// every output bit is a linear function on the input bits except by
+// a quadratic term always involving bit #0 of the input
+UINT32 ftest4(UINT32 num)
+{
+	UINT32 accum = 0;
+	
+	for (int i=0; i<16; ++i)
+	{
+		int b1 = weight(num&parameters3[i][0])&1;  // <- linear function (parameters3[i][0] acts as a mask determining which bits are added)
+		int b2 = weight(num&parameters3[i][1])&1;  // <- idem
+		b2 &= BIT(num, 0);                         // quadratic term
+		int b3 = b1 ^ b2;
+		
+		accum ^= (b3 << i);
+	}
+	
+	return accum;
+}
+
+*********************/
+
 READ32_MEMBER(atarigx2_state::atarigx2_protection_r)
 {
 	static const UINT32 lookup_table[][2] =
