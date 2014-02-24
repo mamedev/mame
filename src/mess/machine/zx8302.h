@@ -140,8 +140,7 @@ private:
 	{
 		TIMER_BAUDX4 = 0,
 		TIMER_RTC,
-		TIMER_GAP,
-		TIMER_IPC
+		TIMER_GAP
 	};
 
 	enum
@@ -218,10 +217,11 @@ private:
 	UINT8 m_status;                 // status register
 
 	// IPC communication state
-	int m_comdata;                  // communication data
+	int m_comdata_from_ipc;			// pending data from IPC->68000
+	int m_comdata_to_cpu;			// communication data IPC->68000
+	int m_comdata_to_ipc;			// communication data 68000->IPC
 	int m_comctl;                   // communication control
 	int m_ipc_state;                // communication state
-	int m_ipc_rx;                   // receiving data from IPC
 	int m_ipc_busy;                 // IPC busy
 	int m_baudx4;                   // IPC baud x4
 
@@ -233,7 +233,6 @@ private:
 	emu_timer *m_baudx4_timer;      // baud x4 timer
 	emu_timer *m_rtc_timer;         // real time clock timer
 	emu_timer *m_gap_timer;         // microdrive gap timer
-	emu_timer *m_ipc_timer;         // delayed IPC command timer
 };
 
 

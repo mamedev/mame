@@ -144,7 +144,7 @@ public:
 	/* IPC state */
 	UINT8 m_keylatch;
 	int m_ipl;
-	int m_comdata;
+	int m_comdata_to_ipc;
 	int m_baudx4;
 
 	// Trump card & Sandy superdisk
