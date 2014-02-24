@@ -183,7 +183,6 @@ private:
 	UINT8 m_tb;
 	UINT8 m_mr;
 
-	int m_rcv;
 	int m_sens;
 	int m_xi7;
 
