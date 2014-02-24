@@ -93,7 +93,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(jangou);
 	DECLARE_MACHINE_START(jngolady);
 	DECLARE_MACHINE_RESET(jngolady);
 	DECLARE_MACHINE_START(common);
@@ -998,7 +998,7 @@ static MACHINE_CONFIG_START( jangou, jangou_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jangou_state, screen_update_jangou)
 
 	MCFG_PALETTE_ADD("palette", 32)
-
+	MCFG_PALETTE_INIT_OWNER(jangou_state, jangou)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

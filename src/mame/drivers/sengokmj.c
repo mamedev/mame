@@ -296,7 +296,7 @@ void sengokmj_state::video_start()
 
 UINT32 sengokmj_state::screen_update_sengokmj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(screen.m_palette->pen(0x7ff), cliprect); //black pen
+	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
 	/* TODO: offsetted? */
 	m_sc0_tilemap->set_scrollx(0, (SEIBU_CRTC_SC0_SX + 128) & 0x1ff );

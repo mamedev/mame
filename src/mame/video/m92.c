@@ -138,8 +138,7 @@ READ16_MEMBER(m92_state::m92_paletteram_r)
 
 WRITE16_MEMBER(m92_state::m92_paletteram_w)
 {
-	//Micko:FIXME
-	//paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset + 0x400 * m_palette_bank, data, mem_mask);
+	m_palette->write(space, offset + 0x400 * m_palette_bank, data, mem_mask);
 }
 
 /*****************************************************************************/

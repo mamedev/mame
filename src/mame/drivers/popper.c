@@ -354,7 +354,7 @@ static MACHINE_CONFIG_START( popper, popper_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",popper,"palette")
 	MCFG_PALETTE_ADD("palette", 64)
-
+	MCFG_PALETTE_INIT_OWNER(popper_state, popper)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -215,10 +215,10 @@ void gpworld_state::gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &
 					}
 
 					/* Daphne says "don't draw the pixel if it's black". */
-					draw_pixel(bitmap,cliprect,x+0,y,palette_get_color(machine(), pixel1 + (sprite_color*0x10 + 0x200)),flip);
-					draw_pixel(bitmap,cliprect,x+1,y,palette_get_color(machine(), pixel2 + (sprite_color*0x10 + 0x200)),flip);
-					draw_pixel(bitmap,cliprect,x+2,y,palette_get_color(machine(), pixel3 + (sprite_color*0x10 + 0x200)),flip);
-					draw_pixel(bitmap,cliprect,x+3,y,palette_get_color(machine(), pixel4 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+0,y,m_palette->pen_color(pixel1 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+1,y,m_palette->pen_color(pixel2 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+2,y,m_palette->pen_color(pixel3 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+3,y,m_palette->pen_color(pixel4 + (sprite_color*0x10 + 0x200)),flip);
 
 					x += 4;
 

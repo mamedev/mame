@@ -37,7 +37,7 @@ PALETTE_INIT_MEMBER(carjmbre_state, carjmbre)
 
 	rgb = compute_res_net_all(machine(), color_prom, &carjmbre_decode_info, &carjmbre_net_info);
 	palette.set_pen_colors(0, rgb, 64);
-	machine().palette->normalize_range(0, 63);
+	palette.palette()->normalize_range(0, 63);
 	auto_free(machine(), rgb);
 }
 
@@ -60,7 +60,7 @@ WRITE8_MEMBER(carjmbre_state::carjmbre_bgcolor_w)
 		m_bgcolor = data;
 		if (data & 3)
 			for (i = 0; i < 64; i += 4)
-				m_palette->set_pen_color(data));
+				m_palette->set_pen_color(i, data);
 		else
 			// restore to initial state (black)
 			for (i = 0; i < 64; i += 4)

@@ -43,7 +43,6 @@ protected:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 
@@ -78,10 +77,6 @@ void segajw_state::machine_start()
 
 
 void segajw_state::machine_reset()
-{
-}
-
-PALETTE_INIT_MEMBER(segajw_state, segajw)
 {
 }
 

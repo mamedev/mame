@@ -295,7 +295,7 @@ static MACHINE_CONFIG_START( wiping, wiping_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",wiping,"palette")
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
-
+	MCFG_PALETTE_INIT_OWNER(wiping_state, wiping)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

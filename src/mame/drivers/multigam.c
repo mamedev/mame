@@ -186,7 +186,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(multigam);
 	DECLARE_MACHINE_START(multigm3);
 	DECLARE_MACHINE_RESET(multigm3);
 	DECLARE_MACHINE_START(supergm3);
@@ -1260,7 +1260,7 @@ static MACHINE_CONFIG_START( multigam, multigam_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",multigam,"palette")
 	MCFG_PALETTE_ADD("palette", 8*4*16)
-
+	MCFG_PALETTE_INIT_OWNER(multigam_state, multigam)
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)
 	MCFG_PPU2C0X_SET_NMI(multigam_state, ppu_irq)

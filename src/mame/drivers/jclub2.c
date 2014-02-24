@@ -306,8 +306,8 @@ WRITE32_MEMBER(darkhors_state::darkhors_eeprom_w)
 
 WRITE32_MEMBER(darkhors_state::paletteram32_xBBBBBGGGGGRRRRR_dword_w)
 {
-	if (ACCESSING_BITS_16_31)   paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset*2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_BITS_0_15)    paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset*2+1, data, mem_mask);
+	if (ACCESSING_BITS_16_31)   m_palette->write(space, offset*2, data >> 16, mem_mask >> 16);
+	if (ACCESSING_BITS_0_15)    m_palette->write(space, offset*2+1, data, mem_mask);
 }
 
 WRITE32_MEMBER(darkhors_state::darkhors_input_sel_w)

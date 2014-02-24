@@ -179,7 +179,7 @@ static MACHINE_CONFIG_START( suprloco, suprloco_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",suprloco,"palette")
 	MCFG_PALETTE_ADD("palette", 512+256)
-
+	MCFG_PALETTE_INIT_OWNER(suprloco_state, suprloco)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

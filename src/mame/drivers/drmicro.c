@@ -260,7 +260,7 @@ static MACHINE_CONFIG_START( drmicro, drmicro_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",drmicro,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
-
+	MCFG_PALETTE_INIT_OWNER(drmicro_state, drmicro)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

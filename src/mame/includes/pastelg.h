@@ -45,7 +45,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_hackbusyflag_r);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pastelg);
 	UINT32 screen_update_pastelg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int pastelg_blitter_src_addr_r(address_space &space);
 	void pastelg_vramflip();

@@ -222,7 +222,7 @@ WRITE16_MEMBER(seibuspi_state::sprite_dma_start_w)
 
 void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
 {
-	const pen_t *pens = &gfx->m_palette->pen(gfx->colorbase());
+	const pen_t *pens = &m_palette->pen(gfx->colorbase());
 	const UINT8 *dp;
 	int i, j;
 	int x1, x2;

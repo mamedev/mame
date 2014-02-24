@@ -52,7 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_WRITE8_MEMBER(port3_w);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(monzagp);
 	UINT32 screen_update_monzagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -270,6 +270,7 @@ static MACHINE_CONFIG_START( monzagp, monzagp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(monzagp_state, screen_update_monzagp)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(monzagp_state, monzagp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",monzagp,"palette")
 MACHINE_CONFIG_END

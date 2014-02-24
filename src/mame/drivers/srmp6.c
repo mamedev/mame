@@ -504,7 +504,7 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 	INT8 r, g, b;
 	int brg = m_brightness - 0x60;
 
-	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
+	m_palette->write(space, offset, data, mem_mask);
 
 	if(brg)
 	{
@@ -678,6 +678,7 @@ static MACHINE_CONFIG_START( srmp6, srmp6_state )
 	MCFG_SCREEN_UPDATE_DRIVER(srmp6_state, screen_update_srmp6)
 
 	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
 

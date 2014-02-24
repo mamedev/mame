@@ -135,7 +135,7 @@ static MACHINE_CONFIG_START( gomoku, gomoku_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",gomoku,"palette")
 	MCFG_PALETTE_ADD("palette", 64)
-
+	MCFG_PALETTE_INIT_OWNER(gomoku_state, gomoku)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

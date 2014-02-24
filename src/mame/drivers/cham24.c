@@ -94,7 +94,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(cham24);
 	UINT32 screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cham24_set_mirroring( int mirroring );
 	void ppu_irq(int *ppu_regs);
@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( cham24, cham24_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",cham24,"palette")
 	MCFG_PALETTE_ADD("palette", 8*4*16)
-
+	MCFG_PALETTE_INIT_OWNER(cham24_state, cham24)
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)
 	MCFG_PPU2C0X_SET_NMI(cham24_state, ppu_irq)

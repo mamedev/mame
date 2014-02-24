@@ -156,8 +156,8 @@ public:
 
 
 	/* routines */
-	void init_palette( running_machine &machine, int first_entry );
-	void init_palette_rgb( running_machine &machine, int first_entry );
+	void init_palette( palette_device &palette, int first_entry );
+	void init_palette_rgb( palette_device &palette, int first_entry );
 
 	void draw_background( UINT8 *line_priority );
 	void draw_sprites( UINT8 *line_priority );
@@ -224,9 +224,6 @@ public:
 
 	const char        *m_cpu_tag;
 	
-	//Micko:FIXME
-	palette_device *m_palette;
-
 private:
 	static const device_timer_id TIMER_HBLANK = 0;
 	static const device_timer_id TIMER_NMI = 1;

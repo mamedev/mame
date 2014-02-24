@@ -1829,6 +1829,7 @@ static MACHINE_CONFIG_START( rallybik, toaplan1_rallybik_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",rallybik,"palette")
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_rallybik_state,rallybik)
 
@@ -1866,6 +1867,7 @@ static MACHINE_CONFIG_START( truxton, toaplan1_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",toaplan1,"palette")
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -1903,6 +1905,7 @@ static MACHINE_CONFIG_START( hellfire, toaplan1_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",toaplan1,"palette")
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -1940,6 +1943,7 @@ static MACHINE_CONFIG_START( zerowing, toaplan1_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",toaplan1,"palette")
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -1981,6 +1985,7 @@ static MACHINE_CONFIG_START( demonwld, toaplan1_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",toaplan1,"palette")
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -2016,6 +2021,7 @@ static MACHINE_CONFIG_START( samesame, toaplan1_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",toaplan1,"palette")
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -2053,6 +2059,7 @@ static MACHINE_CONFIG_START( outzone, toaplan1_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",toaplan1,"palette")
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -2088,6 +2095,7 @@ static MACHINE_CONFIG_START( vimana, toaplan1_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",toaplan1,"palette")
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 

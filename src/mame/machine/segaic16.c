@@ -84,7 +84,7 @@ READ16_MEMBER( sega_16bit_common_base::open_bus_r )
 //  for each input value 0-31
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER(sega_16bit_common_base, sega)
+void sega_16bit_common_base::palette_init()
 {
 	//
 	//  Color generation details
@@ -157,9 +157,9 @@ WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
 	int b = ((newval >> 14) & 0x01) | ((newval >> 7) & 0x1e);
 
 	// normal colors
-	palette.set_pen_color(offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
-	palette.set_pen_color(offset + 1 * m_palette_entries, m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
-	palette.set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
+	m_palette->set_pen_color(offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
+	m_palette->set_pen_color(offset + 1 * m_palette_entries, m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
+	m_palette->set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
 }
 
 

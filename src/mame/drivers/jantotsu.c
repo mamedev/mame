@@ -133,7 +133,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(jantotsu);
 	UINT32 screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(jan_adpcm_int);
 	required_device<cpu_device> m_maincpu;
@@ -520,7 +520,7 @@ static MACHINE_CONFIG_START( jantotsu, jantotsu_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jantotsu_state, screen_update_jantotsu)
 
 	MCFG_PALETTE_ADD("palette", 0x20)
-
+	MCFG_PALETTE_INIT_OWNER(jantotsu_state, jantotsu)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

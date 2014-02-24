@@ -157,7 +157,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(vega);
 	UINT32 screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -852,6 +852,7 @@ static MACHINE_CONFIG_START( vega, vega_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vega_state, screen_update_vega)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(vega_state, vega)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",test_decode,"palette")
 

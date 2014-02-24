@@ -29,7 +29,7 @@ PALETTE_INIT_MEMBER(n8080_state,helifire)
 {
 	int i;
 
-	PALETTE_INIT_CALL_MEMBER(n8080);
+	PALETTE_INIT_NAME(n8080)(palette);
 
 	for (i = 0; i < 0x100; i++)
 	{

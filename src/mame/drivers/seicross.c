@@ -420,7 +420,7 @@ static MACHINE_CONFIG_START( nvram, seicross_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",seicross,"palette")
 	MCFG_PALETTE_ADD("palette", 64)
-
+	MCFG_PALETTE_INIT_OWNER(seicross_state, seicross)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

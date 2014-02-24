@@ -218,7 +218,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 			palette.set_pen_color(i,r,g,b);
 		}
 
-	machine().palette->normalize_range(0, 255);
+	palette.palette()->normalize_range(0, 255);
 
 	color_prom += 512;
 	/* color_prom now points to the beginning of the character color codes */
@@ -257,7 +257,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong4b)
 			palette.set_pen_color(i,r,g,b);
 		}
 
-	machine().palette->normalize_range(0, 255);
+	palette.palette()->normalize_range(0, 255);
 
 	color_prom += 256;
 	/* color_prom now points to the beginning of the character color codes */
@@ -321,7 +321,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp)
 		palette.set_pen_color(RADARSCP_GRID_COL_OFFSET + i,r,g,b);
 	}
 
-	machine().palette->normalize_range(0, RADARSCP_GRID_COL_OFFSET+7);
+	palette.palette()->normalize_range(0, RADARSCP_GRID_COL_OFFSET+7);
 
 	color_prom += 256;
 	/* color_prom now points to the beginning of the character color codes */
@@ -383,7 +383,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 
 		palette.set_pen_color(RADARSCP_GRID_COL_OFFSET + i,r,g,b);
 	}
-	machine().palette->normalize_range(0, RADARSCP_GRID_COL_OFFSET+7);
+	palette.palette()->normalize_range(0, RADARSCP_GRID_COL_OFFSET+7);
 
 	color_prom += 512;
 	/* color_prom now points to the beginning of the character color codes */
@@ -434,7 +434,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong3)
 
 	rgb = compute_res_net_all(machine(), color_prom, &dkong3_decode_info, &dkong3_net_info);
 	palette.set_pen_colors(0, rgb, 256);
-	machine().palette->normalize_range(0, 255);
+	palette.palette()->normalize_range(0, 255);
 	auto_free(machine(), rgb);
 
 	color_prom += 1024;
@@ -899,10 +899,10 @@ void dkong_state::check_palette()
 			switch (newset)
 			{
 				case DKONG_RADARSCP_CONVERSION:
-					PALETTE_INIT_CALL_MEMBER(radarscp);
+					PALETTE_INIT_NAME(radarscp)(m_palette);
 					break;
 				case DKONG_BOARD:
-					PALETTE_INIT_CALL_MEMBER(dkong2b);
+					PALETTE_INIT_NAME(dkong2b)(m_palette);
 					break;
 			}
 		}

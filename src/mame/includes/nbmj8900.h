@@ -37,7 +37,7 @@ public:
 	bitmap_ind16 m_tmpbitmap1;
 	UINT8 *m_videoram0;
 	UINT8 *m_videoram1;
-	UINT8 *m_palette;
+	UINT8 *m_palette_ptr;
 	UINT8 *m_clut;
 	int m_flipscreen_old;
 	DECLARE_READ8_MEMBER(nbmj8900_palette_type1_r);

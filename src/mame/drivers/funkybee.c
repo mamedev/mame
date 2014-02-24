@@ -307,7 +307,7 @@ static MACHINE_CONFIG_START( funkybee, funkybee_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",funkybee,"palette")
 	MCFG_PALETTE_ADD("palette", 32)
-
+	MCFG_PALETTE_INIT_OWNER(funkybee_state, funkybee)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -731,6 +731,7 @@ static MACHINE_CONFIG_START( wiz, wiz_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",wiz,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(wiz_state, wiz)
 
 
 	/* sound hardware */

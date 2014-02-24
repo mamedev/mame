@@ -77,7 +77,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(chinsan);
 	UINT32 screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(chin_adpcm_int);
 	required_device<cpu_device> m_maincpu;
@@ -614,7 +614,7 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",chinsan,"palette")
 	MCFG_PALETTE_ADD("palette", 0x100)
-
+	MCFG_PALETTE_INIT_OWNER(chinsan_state, chinsan)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

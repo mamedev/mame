@@ -45,7 +45,7 @@ PALETTE_INIT_MEMBER(popper_state, popper)
 
 	rgb = compute_res_net_all(machine(), color_prom, &popper_decode_info, &popper_net_info);
 	palette.set_pen_colors(0, rgb, 64);
-	machine().palette->normalize_range(0, 63);
+	palette.palette()->normalize_range(0, 63);
 	auto_free(machine(), rgb);
 }
 

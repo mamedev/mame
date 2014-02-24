@@ -188,7 +188,7 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",mustache,"palette")
 	MCFG_PALETTE_ADD("palette", 8*16+16*8)
-
+	MCFG_PALETTE_INIT_OWNER(mustache_state, mustache)
 
 	/* sound hardware */
 	MCFG_SEIBU_SOUND_ADD("seibu_sound") // for seibu_sound_decrypt on the MAIN cpu (not sound)

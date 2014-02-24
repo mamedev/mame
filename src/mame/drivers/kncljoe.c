@@ -287,7 +287,7 @@ static MACHINE_CONFIG_START( kncljoe, kncljoe_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",kncljoe,"palette")
 	MCFG_PALETTE_ADD("palette", 16*8+16*8)
-
+	MCFG_PALETTE_INIT_OWNER(kncljoe_state, kncljoe)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

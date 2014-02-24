@@ -131,7 +131,7 @@ WRITE16_MEMBER(legionna_state::denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w)
 {
 	offset^=1;
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	paletteram_xBBBBBGGGGGRRRRR_word_w(space,offset,data,mem_mask);
+	m_palette->write(space,offset,data,mem_mask);
 }
 
 static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16, legionna_state )

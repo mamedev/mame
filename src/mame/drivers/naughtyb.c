@@ -434,7 +434,7 @@ static MACHINE_CONFIG_START( naughtyb, naughtyb_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",naughtyb,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
 
 	/* sound hardware */
 	/* uses the TMS3615NS for sound */
@@ -466,6 +466,7 @@ static MACHINE_CONFIG_START( popflame, naughtyb_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",naughtyb,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
 
 
 	/* sound hardware */

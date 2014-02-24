@@ -947,6 +947,7 @@ static MACHINE_CONFIG_START( root, zaxxon_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode",zaxxon,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(zaxxon_state, zaxxon)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
@@ -1007,6 +1008,8 @@ static MACHINE_CONFIG_DERIVED( congo, root )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(zaxxon_state, zaxxon)
+	
 	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,congo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_congo)

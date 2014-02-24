@@ -548,7 +548,7 @@ static MACHINE_CONFIG_START( marineb, marineb_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",marineb,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_PALETTE_INIT_OWNER(marineb_state, marineb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

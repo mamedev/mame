@@ -116,7 +116,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(famibox);
 	UINT32 screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(famicombox_attract_timer_callback);
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
@@ -593,6 +593,7 @@ static MACHINE_CONFIG_START( famibox, famibox_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",famibox,"palette")
 	MCFG_PALETTE_ADD("palette", 8*4*16)
+	MCFG_PALETTE_INIT_OWNER(famibox_state, famibox)
 
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)

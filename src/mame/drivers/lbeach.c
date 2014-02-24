@@ -71,7 +71,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(lbeach);
 	UINT32 screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -83,28 +83,28 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(lbeach_state, lebeach)
+PALETTE_INIT_MEMBER(lbeach_state, lbeach)
 {
 	// tiles
-	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00);
-	palette_set_color_rgb(machine(), 1, 0xc0, 0xc0, 0xc0);
+	palette.set_pen_color(0, 0x00, 0x00, 0x00);
+	palette.set_pen_color(1, 0xc0, 0xc0, 0xc0);
 
 	// road
-	palette_set_color_rgb(machine(), 2, 0x00, 0x00, 0x00);
-	palette_set_color_rgb(machine(), 3, 0xff, 0xff, 0xff);
+	palette.set_pen_color(2, 0x00, 0x00, 0x00);
+	palette.set_pen_color(3, 0xff, 0xff, 0xff);
 
-	palette_set_color_rgb(machine(), 4, 0x80, 0x80, 0x80);
-	palette_set_color_rgb(machine(), 5, 0xff, 0xff, 0xff);
+	palette.set_pen_color(4, 0x80, 0x80, 0x80);
+	palette.set_pen_color(5, 0xff, 0xff, 0xff);
 
-	palette_set_color_rgb(machine(), 6, 0x00, 0x00, 0x00);
-	palette_set_color_rgb(machine(), 7, 0x80, 0x80, 0x80);
+	palette.set_pen_color(6, 0x00, 0x00, 0x00);
+	palette.set_pen_color(7, 0x80, 0x80, 0x80);
 
-	palette_set_color_rgb(machine(), 8, 0x80, 0x80, 0x80);
-	palette_set_color_rgb(machine(), 9, 0xff, 0xff, 0xff);
+	palette.set_pen_color(8, 0x80, 0x80, 0x80);
+	palette.set_pen_color(9, 0xff, 0xff, 0xff);
 
 	// player car
-	palette_set_color_rgb(machine(), 10, 0x00, 0x00, 0x00);
-	palette_set_color_rgb(machine(), 11, 0xff, 0xff, 0xff);
+	palette.set_pen_color(10, 0x00, 0x00, 0x00);
+	palette.set_pen_color(11, 0xff, 0xff, 0xff);
 }
 
 
@@ -337,7 +337,7 @@ static MACHINE_CONFIG_START( lbeach, lbeach_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",lbeach,"palette")
 	MCFG_PALETTE_ADD("palette", 2+8+2)
-
+	MCFG_PALETTE_INIT_OWNER(lbeach_state, lbeach)
 	/* sound hardware */
 	// ...
 MACHINE_CONFIG_END

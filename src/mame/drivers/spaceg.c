@@ -190,7 +190,7 @@ public:
 	required_shared_ptr<UINT8> m_io9401;
 	DECLARE_WRITE8_MEMBER(zvideoram_w);
 	DECLARE_READ8_MEMBER(spaceg_colorram_r);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(spaceg);
 	UINT32 screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
@@ -424,6 +424,7 @@ static MACHINE_CONFIG_START( spaceg, spaceg_state )
 	MCFG_SCREEN_UPDATE_DRIVER(spaceg_state, screen_update_spaceg)
 
 	MCFG_PALETTE_ADD("palette", 16+128-16)
+	MCFG_PALETTE_INIT_OWNER(spaceg_state, spaceg)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")

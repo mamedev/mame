@@ -334,7 +334,7 @@ void goodejan_state::video_start()
 
 UINT32 goodejan_state::screen_update_goodejan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(screen.m_palette->pen(0x7ff), cliprect); //black pen
+	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
 	m_sc0_tilemap->set_scrollx(0, (SEIBU_CRTC_SC0_SX) & 0x1ff );
 	m_sc0_tilemap->set_scrolly(0, (SEIBU_CRTC_SC0_SY) & 0x1ff );

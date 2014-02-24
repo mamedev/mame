@@ -21,7 +21,7 @@ void nes_state::video_start()
 
 PALETTE_INIT_MEMBER(nes_state, nes)
 {
-	m_ppu->init_palette(machine(), 0);
+	m_ppu->init_palette(palette, 0);
 }
 
 

@@ -196,7 +196,7 @@ static MACHINE_CONFIG_START( kopunch, kopunch_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",kopunch,"palette")
 	MCFG_PALETTE_ADD("palette", 8)
-
+	MCFG_PALETTE_INIT_OWNER(kopunch_state, kopunch)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

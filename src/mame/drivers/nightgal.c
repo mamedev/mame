@@ -103,7 +103,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(nightgal);
 	UINT32 screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -924,7 +924,7 @@ static MACHINE_CONFIG_START( royalqn, nightgal_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nightgal_state, screen_update_nightgal)
 
 	MCFG_PALETTE_ADD("palette", 0x10)
-
+	MCFG_PALETTE_INIT_OWNER(nightgal_state, nightgal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

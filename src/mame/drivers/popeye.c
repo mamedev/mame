@@ -392,7 +392,7 @@ static MACHINE_CONFIG_START( skyskipr, popeye_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",popeye,"palette")
 	MCFG_PALETTE_ADD("palette", 16+16*2+64*4)
-
+	MCFG_PALETTE_INIT_OWNER(popeye_state, popeye)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

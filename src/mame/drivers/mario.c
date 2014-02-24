@@ -354,7 +354,7 @@ static MACHINE_CONFIG_START( mario_base, mario_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mario_state, screen_update_mario)
 	MCFG_GFXDECODE_ADD("gfxdecode",mario,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
-
+	MCFG_PALETTE_INIT_OWNER(mario_state, mario)
 
 MACHINE_CONFIG_END
 

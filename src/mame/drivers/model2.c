@@ -438,18 +438,18 @@ MACHINE_RESET_MEMBER(model2_state,model2c)
 	m_dsp_type = DSP_TYPE_TGPX4;
 }
 
-static void chcolor(running_machine &machine, pen_t color, UINT16 data)
+static void chcolor(palette_device &palette, pen_t color, UINT16 data)
 {
-	palette_set_color_rgb(machine, color, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	palette.set_pen_color(color, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
 WRITE32_MEMBER(model2_state::pal32_w)
 {
 	COMBINE_DATA(m_paletteram32 + offset);
 	if(ACCESSING_BITS_0_15)
-		chcolor(machine(), offset * 2, m_paletteram32[offset]);
+		chcolor(m_palette, offset * 2, m_paletteram32[offset]);
 	if(ACCESSING_BITS_16_31)
-		chcolor(machine(), offset * 2 + 1, m_paletteram32[offset] >> 16);
+		chcolor(m_palette, offset * 2 + 1, m_paletteram32[offset] >> 16);
 }
 
 WRITE32_MEMBER(model2_state::ctrl0_w)
