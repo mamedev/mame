@@ -293,7 +293,7 @@ void netlist_parser::parse_netlist(const pstring &nlname)
             return;
 
         require_token(m_tok_param_left);
-        NL_VERBOSE_OUT(("Parser: Device: %s\n", n.cstr()));
+        NL_VERBOSE_OUT(("Parser: Device: %s\n", token.str().cstr()));
 
         if (token.is(m_tok_ALIAS))
             net_alias();
@@ -425,7 +425,7 @@ void netlist_parser::device(const pstring &dev_type)
     {
         pstring paramfq = devname + "." + def_params[cnt];
 
-        NL_VERBOSE_OUT(("Defparam: %s\n", def_param.cstr()));
+        NL_VERBOSE_OUT(("Defparam: %s\n", paramfq.cstr()));
         require_token(m_tok_comma);
         tok = get_token();
         if (tok.is_type(STRING))
