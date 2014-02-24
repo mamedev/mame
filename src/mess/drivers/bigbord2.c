@@ -112,7 +112,11 @@ public:
 		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1"),
-		m_beeper(*this, "beeper")
+		m_beeper(*this, "beeper"),
+		m_dsw(*this, "DSW"),
+		m_bankr(*this, "bankr"),
+		m_bankv(*this, "bankv"),
+		m_banka(*this, "banka")
 	{
 	}
 
@@ -156,6 +160,10 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<beep_device> m_beeper;
+	required_ioport m_dsw;
+	required_memory_bank m_bankr;
+	required_memory_bank m_bankv;
+	required_memory_bank m_banka;
 };
 
 /* Status port
@@ -170,7 +178,7 @@ private:
 
 READ8_MEMBER( bigbord2_state::portc4_r )
 {
-	UINT8 ret = m_term_status | 3 | (m_c8[6]<<2) | ioport("DSW")->read();
+	UINT8 ret = m_term_status | 3 | (m_c8[6]<<2) | m_dsw->read();
 	m_term_status = 0;
 	return ret;
 }
@@ -281,9 +289,9 @@ WRITE8_MEMBER( bigbord2_state::portc8_w )
 	{
 		case 0:
 			// memory bank
-			membank("bankr")->set_entry(m_c8[0]);
-			membank("bankv")->set_entry(m_c8[0]);
-			membank("banka")->set_entry(m_c8[0]);
+			m_bankr->set_entry(m_c8[0]);
+			m_bankv->set_entry(m_c8[0]);
+			m_banka->set_entry(m_c8[0]);
 			break;
 		case 1:
 			// side select
@@ -544,9 +552,9 @@ void bigbord2_state::machine_reset()
 		m_c8[i] = 0;
 	m_beeper->set_state(0);
 	m_beeper->set_frequency(950); // actual frequency is unknown
-	membank("bankr")->set_entry(0);
-	membank("bankv")->set_entry(0);
-	membank("banka")->set_entry(0);
+	m_bankr->set_entry(0);
+	m_bankv->set_entry(0);
+	m_banka->set_entry(0);
 }
 
 DRIVER_INIT_MEMBER(bigbord2_state,bigbord2)
@@ -554,9 +562,9 @@ DRIVER_INIT_MEMBER(bigbord2_state,bigbord2)
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 	m_io = &m_maincpu->space(AS_IO);
 	UINT8 *RAM = memregion(Z80_TAG)->base();
-	membank("bankr")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
-	membank("bankv")->configure_entries(0, 2, &RAM[0x6000], 0x10000);
-	membank("banka")->configure_entries(0, 2, &RAM[0x7000], 0x10000);
+	m_bankr->configure_entries(0, 2, &RAM[0x0000], 0x10000);
+	m_bankv->configure_entries(0, 2, &RAM[0x6000], 0x10000);
+	m_banka->configure_entries(0, 2, &RAM[0x7000], 0x10000);
 	m_fdc->setup_intrq_cb(mb8877_t::line_cb(FUNC(bigbord2_state::fdc_intrq_w), this));
 	m_fdc->setup_drq_cb(mb8877_t::line_cb(FUNC(bigbord2_state::fdc_drq_w), this));
 }
