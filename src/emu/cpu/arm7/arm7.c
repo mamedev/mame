@@ -514,7 +514,8 @@ void arm7_cpu_device::device_start()
 
 	m_icountptr = &m_icount;
 
-	state_add(STATE_GENPC, "curpc", m_pc).callexport().formatstr("%08X");
+	state_add( ARM7_PC,    "PC", m_pc).callexport().formatstr("%08X");
+	state_add(STATE_GENPC, "GENPC", m_pc).callexport().noshow();
 	/* registers shared by all operating modes */
 	state_add( ARM7_R0,    "R0",   m_r[ 0]).formatstr("%08X");
 	state_add( ARM7_R1,    "R1",   m_r[ 1]).formatstr("%08X");
