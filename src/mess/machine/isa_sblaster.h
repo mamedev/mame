@@ -132,7 +132,6 @@ protected:
 		virtual void rcv_complete();    // Rx completed receiving byte
 		virtual void tra_complete();    // Tx completed sending byte
 		virtual void tra_callback();    // Tx send bit
-		void input_callback(UINT8 state) {}
 
 		static const int MIDI_RING_SIZE = 2048;
 

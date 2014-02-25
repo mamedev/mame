@@ -70,7 +70,11 @@ duartn68681_device::duartn68681_device(const machine_config &mconfig, const char
 	write_a_tx(*this),
 	write_b_tx(*this),
 	read_inport(*this),
-	write_outport(*this)
+	write_outport(*this),
+	ip3clk(0),
+	ip4clk(0),
+	ip5clk(0),
+	ip6clk(0)
 {
 }
 
@@ -295,6 +299,10 @@ READ8_MEMBER( duartn68681_device::read )
 		case 0x09: /* SRB */
 		case 0x0b: /* RHRB */
 			r = m_chanB->read_chan_reg(offset & 3);
+			break;
+
+		case 0x0a: /* 1X/16X Test */
+			r = 0x61;	// the old 68681 returned this and it makes Apollo happy
 			break;
 
 		case 0x0d: /* IP */
@@ -633,6 +641,8 @@ void duart68681_channel::device_reset()
 	write_CR(0x30); // reset Tx
 	write_CR(0x40); // reset errors
 
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+
 	tx_baud_rate = rx_baud_rate = 0;
 	CSR = 0;
 }
@@ -647,7 +657,7 @@ void duart68681_channel::rcv_complete()
 {
 	receive_register_extract();
 
-//  printf("ch %d rcv complete\n", m_ch);
+//	printf("%s ch %d rcv complete\n", tag(), m_ch);
 
 	if ( rx_enabled )
 	{
@@ -669,7 +679,7 @@ void duart68681_channel::rcv_complete()
 
 void duart68681_channel::tra_complete()
 {
-//  printf("ch %d Tx complete\n", m_ch);
+//	printf("%s ch %d Tx complete\n", tag(), m_ch);
 	tx_ready = 1;
 	SR |= STATUS_TRANSMITTER_READY;
 
@@ -706,7 +716,7 @@ void duart68681_channel::tra_callback()
 	if ((MR2&0xC0) != 0x80)
 	{
 		int bit = transmit_register_get_data_bit();
-	//  printf("ch %d transmit %d\n", m_ch, bit);
+//		printf("%s ch %d transmit %d\n", tag(), m_ch, bit);
 		if (m_ch == 0)
 		{
 			m_uart->write_a_tx(bit);
@@ -720,10 +730,6 @@ void duart68681_channel::tra_callback()
 	{
 		transmit_register_get_data_bit();
 	}
-}
-
-void duart68681_channel::input_callback(UINT8 state)
-{
 }
 
 void duart68681_channel::update_interrupts()
@@ -834,7 +840,8 @@ UINT8 duart68681_channel::read_rx_fifo()
 	if ( rx_fifo_num == 0 )
 	{
 		LOG(( "68681 channel: rx fifo underflow\n" ));
-		return 0x0;
+		update_interrupts();
+		return 0;
 	}
 
 	rv = rx_fifo[rx_fifo_read_ptr++];
@@ -896,7 +903,7 @@ void duart68681_channel::write_chan_reg(int reg, UINT8 data)
 		CSR = data;
 		tx_baud_rate = m_uart->calc_baud(m_ch, data & 0xf);
 		rx_baud_rate = m_uart->calc_baud(m_ch, (data>>4) & 0xf);
-//		printf("ch %d CSR %02x Tx baud %d Rx baud %d\n", m_ch, data, tx_baud_rate, rx_baud_rate);
+//		printf("%s ch %d CSR %02x Tx baud %d Rx baud %d\n", tag(), m_ch, data, tx_baud_rate, rx_baud_rate);
 		set_rcv_rate(rx_baud_rate);
 		set_tra_rate(tx_baud_rate);
 		break;
@@ -979,7 +986,7 @@ void duart68681_channel::recalc_framing()
 			break;
 	}
 
-	//printf("ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
+//	printf("%s ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", tag(), m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
 
 	set_data_frame(1, (MR1 & 3)+5, parity, stopbits);
 }
@@ -1071,7 +1078,7 @@ void duart68681_channel::write_TX(UINT8 data)
          printf("Write %02x to TX when TX not ready!\n", data);
     }*/
 
-//	printf("ch %d Tx %02x\n", m_ch, data);
+//	printf("%s ch %d Tx %02x\n", tag(), m_ch, data);
 
 	tx_ready = 0;
 	SR &= ~STATUS_TRANSMITTER_READY;

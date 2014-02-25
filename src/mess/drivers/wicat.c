@@ -314,7 +314,7 @@ void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		poll_kb();
 		break;
 	case KB_SERIAL_TIMER:
-		m_videouart->write_rx((m_kb_data >> (m_kb_bit)) & 0x01);
+		m_videouart->write_rri((m_kb_data >> (m_kb_bit)) & 0x01);
 		m_kb_bit++;
 		if(m_kb_bit > 10)
 		{

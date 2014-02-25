@@ -40,6 +40,7 @@ public:
 
 	ATTR_COLD netlist_list_t &operator=(const netlist_list_t &rhs)
 	{
+	    this->reset();
 		for (int i=0; i<rhs.count(); i++)
 		{
 			this->add(rhs[i]);

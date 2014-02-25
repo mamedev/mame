@@ -918,9 +918,9 @@ WRITE_LINE_MEMBER( wangpc_state::uart_tbre_w )
 
 static IM6402_INTERFACE( uart_intf )
 {
-	0, // HACK should be 62500*16
+	0, // HACK for wangpckb in IM6402 derives clocks from data line
 	62500*16,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(WANGPC_KEYBOARD_TAG, wangpc_keyboard_device, write_rxd),
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, uart_dr_w),
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, uart_tbre_w),
 	DEVCB_NULL
@@ -1061,9 +1061,6 @@ void wangpc_state::machine_start()
 	// register CPU IRQ callback
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(wangpc_state::wangpc_irq_callback),this));
 
-	// connect serial keyboard
-	m_uart->connect(m_kb);
-
 	// connect floppy callbacks
 	m_floppy0->setup_load_cb(floppy_image_device::load_cb(FUNC(wangpc_state::on_disk0_load), this));
 	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(FUNC(wangpc_state::on_disk0_unload), this));
@@ -1190,9 +1187,10 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCN2661_TAG,mc2661_device,rx_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCN2661_TAG, mc2661_device, rx_w))
 
-	MCFG_WANGPC_KEYBOARD_ADD()
+	MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0)
+	MCFG_WANGPCKB_TXD_HANDLER(DEVWRITELINE(IM6402_TAG, im6402_device, write_rri))
 
 	// bus
 	MCFG_WANGPC_BUS_ADD(bus_intf)

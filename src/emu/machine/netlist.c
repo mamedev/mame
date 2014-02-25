@@ -261,7 +261,7 @@ void netlist_mame_stream_output_t::custom_netlist_additions(netlist_setup_t &set
 // netlist_mame_t
 // ----------------------------------------------------------------------------------------
 
-void netlist_mame_t::vfatalerror(const loglevel_e level, const char *format, va_list ap) const
+void netlist_mame_t::verror(const loglevel_e level, const char *format, va_list ap) const
 {
     pstring errstr = pstring(format).vprintf(ap);
 

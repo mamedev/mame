@@ -22,6 +22,10 @@
  * - http://www.bitsavers.org/pdf/apollo/008778-03_DOMAIN_Series_3000_4000_Technical_Reference_Aug87.pdf
  * - http://www.freescale.com/files/32bit/doc/inactive/MC68681UM.pdf
  *
+ *  SIO usage:
+ *  	SIO: ch A keyboard, ch B serial console
+ *		SIO2: modem/printer?
+ *
  */
 
 #include "includes/apollo.h"
@@ -191,10 +195,10 @@ static UINT16 cpu_control_register = 0x0000;
   apollo_csr_get/set_servicemode
  -------------------------------------------------*/
 
-static int apollo_csr_get_servicemode()
+/*static int apollo_csr_get_servicemode()
 {
 	return cpu_status_register & APOLLO_CSR_SR_SERVICE ? 0 : 1;
-}
+}*/
 
 static void apollo_csr_set_servicemode(int mode)
 {
@@ -738,7 +742,7 @@ WRITE_LINE_MEMBER( apollo_state::apollo_pic8259_slave_set_int_line ) {
 
 WRITE_LINE_MEMBER(apollo_state::apollo_ptm_timer_tick)
 {
-	if (m_ptm->started())
+	if ((state) && (m_ptm->started()))
 	{
 		ptm_counter++; 
 		m_ptm->set_c1( 1);
@@ -780,7 +784,8 @@ static const ptm6840_interface apollo_ptm_config = {
  DN3000/DN3500 Realtime Calendar MC146818 at 0x8900/0x10900
  ***************************************************************************/
 
-static DEVICE_RESET( apollo_rtc ) {
+static DEVICE_RESET( apollo_rtc ) 
+{
 	address_space &space = device->machine().device(MAINCPU)->memory().space(AS_PROGRAM);
 	apollo_state *state = device->machine().driver_data<apollo_state>();
 	UINT8 year = state->apollo_rtc_r(space, 9);
@@ -802,9 +807,8 @@ static DEVICE_RESET( apollo_rtc ) {
 
 WRITE8_MEMBER(apollo_state::apollo_rtc_w)
 {
-	mc146818_device *rtc = machine().device<mc146818_device> (APOLLO_RTC_TAG);
-	rtc->write(space, 0, offset);
-	rtc->write(space, 1, data);
+	m_rtc->write(space, 0, offset);
+	m_rtc->write(space, 1, data);
 	if (offset >= 0x0b && offset <= 0x0c)
 	{
 		SLOG2(("writing MC146818 at offset %02x = %02x", offset, data));
@@ -814,9 +818,8 @@ WRITE8_MEMBER(apollo_state::apollo_rtc_w)
 READ8_MEMBER(apollo_state::apollo_rtc_r)
 {
 	UINT8 data;
-	mc146818_device *rtc = machine().device<mc146818_device> (APOLLO_RTC_TAG);
-	rtc->write(space, 0, offset);
-	data = rtc->read(space, 1);
+	m_rtc->write(space, 0, offset);
+	data = m_rtc->read(space, 1);
 	if (offset >= 0x0b && offset <= 0x0c)
 	{
 		SLOG2(("reading MC146818 at offset %02x = %02x", offset, data));
@@ -841,297 +844,29 @@ static TIMER_CALLBACK( apollo_rtc_timer )
 // machine/apollo_sio.c - APOLLO DS3500 SIO
 //##########################################################################
 
-#undef VERBOSE
-#define VERBOSE 0
-
-#define SIO_SLEEP_DELAY_TIME 30000 // ms
-
-static int isInitialized = 0;
-static int input_from_stdin = 0;
-
-static UINT8 sio_input_data = 0xff;
-static UINT8 sio_output_data = 0xff;
-
-static emu_timer *kbd_timer;
-static int sleep_time = 0;
-
-static int sio_irq_line = 0;
-
-static UINT8 sio_csrb = 0;
-
-/*-------------------------------------------------
- sio_sleep - sleep to reduce the CPU usage
- -------------------------------------------------*/
-
-// we reduce the CPU usage, if SRB is being polled for input
-// but only as long as the transmitter is empty and ready
-// and the initial delay time has passed w/o IO
-
-static void sio_sleep(int delay) {
-	if (!apollo_config(APOLLO_CONF_IDLE_SLEEP)) {
-		// nothing to do; sleeping is not enabled
-	} else if (delay <= 0) {
-		//reset the sleep delay time
-		if (sleep_time > 0) {
-			LOG2(("sio_sleep: sleeping stopped"))
-			sleep_time = 0;
-		}
-	} else if (sleep_time < delay) {
-		// sleep delay pending (i.e. don't sleep)
-		sleep_time++;
-	} else {
-		if (sleep_time == delay) {
-			LOG2(("sio_sleep: sleeping started after %d ms",sleep_time));
-			sleep_time++;
-		}
-		// Note: ticks_per_second/100 will sleep for 6 ms (= 4-10 ms)
-		osd_sleep(osd_ticks_per_second() / 50);
-	}
+WRITE_LINE_MEMBER(apollo_state::sio_irq_handler)
+{
+	apollo_pic_set_irq_line(this, APOLLO_IRQ_SIO1, state);
 }
 
-/*-------------------------------------------------
- apollo_sio_rx_data - get character from keyboard/stdin
- -------------------------------------------------*/
-
-void apollo_sio_rx_data(device_t* device, int ch, UINT8 data) {
-	// omit logging for channel 1
-	if (ch == 0) {
-		DLOG1(("apollo_sio_rx_data ch=%d <- data=%02x", ch, data ));
-	}
-
-	if (ch == 1 && !isInitialized && data == '\r' && apollo_csr_get_servicemode()) {
-		// force baudrate recognition
-		data = 0xff;
-		isInitialized = 1;
-	}
-
-	duart68681_rx_data(device, ch, data);
-}
-
-/*-------------------------------------------------
- apollo_sio_tx_data - put character to display/stdout
- -------------------------------------------------*/
-
-static void apollo_sio_tx_data(device_t *device, int channel, UINT8 data) {
-	if (channel == 0) {
-		DLOG1(("apollo_sio_tx_data ch=%d -> data=%02x", channel, data ));
-		device_t *keyboard = device->machine().device( APOLLO_KBD_TAG );
-		if (keyboard != NULL) {
-			apollo_kbd_getchar(keyboard, data);
-		}
-	} else if (channel == 1) {
-		DLOG2(("apollo_sio_tx_data ch=%d -> data=%02x", channel, data ));
-
-		if (data != '\r') {
-			// output data to stdout
-			putchar(data);
-			fflush(stdout);
-
-			if (apollo_is_dsp3x00()) {
-				// output data to terminal emulator
-				apollo_terminal_write(data);
-			}
-		}
-	}
-}
-
-/*-------------------------------------------------
- sio configuration
- -------------------------------------------------*/
-
-static void sio_irq_handler(device_t *device, int state, UINT8 vector) {
-	DLOG2(("sio_irq_handler: vector=%02x", vector ));
-	apollo_pic_set_irq_line(device, APOLLO_IRQ_SIO1, state);
-	sio_irq_line = 1;
-}
-
-static UINT8 sio_input(device_t *device) {
-	// necessary for DN3000?
-	// sio_input_data = sio_input_data ? 0 : 0x0f;
-	DLOG2(("reading 2681 input: %02x", sio_input_data ));
-	return sio_input_data;
-}
-
-static void sio_output(device_t *device, UINT8 data) {
-	DLOG1(("writing 2681 output: %02x", data ));
-
-	if ((data & 0x80) != (sio_output_data & 0x80)) {
-		apollo_pic_set_irq_line(device, APOLLO_IRQ_DIAG, (data & 0x80) ? 1 : 0);
+WRITE8_MEMBER(apollo_state::sio_output)
+{
+	if ((data & 0x80) != (sio_output_data & 0x80)) 
+	{
+		apollo_pic_set_irq_line(this, APOLLO_IRQ_DIAG, (data & 0x80) ? 1 : 0);
 		sio_output_data = data;
 	}
 }
-
-const duart68681_config apollo_sio_config = {
-		sio_irq_handler,
-		apollo_sio_tx_data,
-		sio_input,
-		sio_output
-};
-
-/*-------------------------------------------------
- DN3000/DS3500 SIO at 0x8400/0x10400
- -------------------------------------------------*/
-
-READ8_DEVICE_HANDLER(apollo_sio_r) {
-	static int last_read8_offset[2] = { -1, -1 };
-	static int last_read8_value[2] = { -1, -1 };
-
-	static const char * const duart68681_reg_read_names[0x10] = { "MRA", "SRA",
-			"BRG Test", "RHRA", "IPCR", "ISR", "CTU", "CTL", "MRB", "SRB",
-			"1X/16X Test", "RHRB", "IVR", "Input Ports", "Start Counter",
-			"Stop Counter" };
-
-	int data = duart68681_r(device, space, offset / 2);
-
-	if (sio_irq_line) {
-		apollo_pic_set_irq_line(device, APOLLO_IRQ_SIO1, 0);
-		sio_irq_line = 0;
-	}
-
-	switch (offset / 2) {
-	case 0x0b: /* RHRB */
-		if (data == 0x0d && sio_csrb == 0x77) {
-			// special for MD command SK (Select keyboard) with baudrate set to 2000
-			data = 0xff;
-		}
-		break;
-	}
-
-	// omit logging if sio is being polled from the boot rom
-	if ((offset != last_read8_offset[1] || data != last_read8_value[1])
-			&& (offset != last_read8_offset[0] || data != last_read8_value[0])) {
-		last_read8_offset[0] = last_read8_offset[1];
-		last_read8_value[0] = last_read8_value[1];
-		last_read8_offset[1] = offset;
-		last_read8_value[1] = data;
-		DLOG2(("reading 2681 reg %x (%s) returned %02x",
-				offset, duart68681_reg_read_names[offset/2], data ));
-	}
-
-	return data;
-}
-
-WRITE8_DEVICE_HANDLER(apollo_sio_w)
-{
-	static const char * const duart68681_reg_write_names[0x10] = { "MRA",
-			"CSRA", "CRA", "THRA", "ACR", "IMR", "CRUR", "CTLR", "MRB", "CSRB",
-			"CRB", "THRB", "IVR", "OPCR", "Set OP Bits", "Reset OP Bits" };
-
-	if (sio_irq_line) {
-		apollo_pic_set_irq_line(device, APOLLO_IRQ_SIO1, 0);
-		sio_irq_line = 0;
-	}
-
-	// don't log THRB
-	if (offset != 0x17) {
-		DLOG2(("writing 2681 reg %x (%s) with %02x", offset, duart68681_reg_write_names[(offset/2) & 15], data ));
-	}
-
-	switch (offset / 2) {
-	case 0x09: /* CSRB */
-		// remember CSRB to handle MD command SK on DSP3x00
-		sio_csrb = data;
-		break;
-	case 0x0b: /* THRB */
-		// stop sleeping
-		sio_sleep(0);
-		break;
-	case 0x0d: /* OPCR */
-		if ((data & 0x0c) == 0x04) {
-			// Unhandled OPCR value; used for RAM refresh circuit
-			// ignore value; omit error message
-			data &= ~0x0c;
-		}
-		break;
-	}
-	duart68681_w(device, space, offset / 2, data);
-}
-
-/*-------------------------------------------------
- kbd tty timer callback
- -------------------------------------------------*/
-
-static TIMER_CALLBACK(kbd_timer_callback)
-{
-#if defined(APOLLO_FOR_LINUX)
-	device_t *device = (device_t *) ptr;
-	address_space &space = device->machine().device(MAINCPU)->memory().space(AS_PROGRAM);
-	UINT8 data;
-
-#define SRA 0x01
-#define SRB 0x09
-
-	if (!(duart68681_r(device, space, SRB) & 0x02))
-	{
-		// Channel B FIFO not yet full (STATUS_FIFO_FULL)
-		if (read(STDIN_FILENO, &data, 1) == 1)
-		{
-			apollo_sio_rx_data(device, 1, data == '\n' ? '\r' : data);
-			input_from_stdin = 1;
-			// stop sleeping to reduce CPU usage
-			sio_sleep(0);
-		}
-		else if (input_from_stdin && (duart68681_r(device, space, SRB) & 0x0c) == 0x0c)
-		{
-			// we reduce the CPU usage, if SRB is being polled for input
-			// but only as long as the transmitter is empty and ready
-			// and the initial delay time has has passed
-			sio_sleep(SIO_SLEEP_DELAY_TIME);
-		}
-	}
-#endif
-
 	// The counter/timer on the SIO chip is used for the refresh count.
 	// This is set up in the timer mode to  produce a square wave output on output OP3.
 	// The period of the output is 15 microseconds.
 
 	// toggle memory refresh counter
-	sio_input_data ^= 0x01;
-}
-
-/*-------------------------------------------------
- device start callback
- -------------------------------------------------*/
-
-static DEVICE_START(apollo_sio)
-{
-	kbd_timer = device->machine().scheduler().timer_alloc(FUNC(kbd_timer_callback), device);
-}
-
-/*-------------------------------------------------
- device reset callback
- -------------------------------------------------*/
-
-static DEVICE_RESET(apollo_sio)
-{
-	DLOG1(("reset apollo_sio"));
-
-	isInitialized = 0;
-	input_from_stdin = 0;
-	sleep_time = 0;
-	sio_input_data = apollo_get_ram_config_byte();
-	sio_output_data = 0xff;
-
-#if defined(APOLLO_FOR_LINUX)
-	// FIXME: unavailable in mingw
-	// set stdin to nonblocking to allow polling in sio_poll_rxb
-	fcntl(STDIN_FILENO, F_SETFL, fcntl(STDIN_FILENO, F_GETFL) | O_NONBLOCK);
-#endif
-
-	// start the keyboard timer
-	kbd_timer->adjust( attotime::zero, 0, attotime::from_msec(1));
-}
+//	sio_input_data ^= 0x01;
 
 //##########################################################################
 // machine/apollo_sio2.c - APOLLO DS3500 SIO2
 //##########################################################################
-
-#undef VERBOSE
-#define VERBOSE 0
-
-/*-------------------------------------------------
- sio2 configuration (DN3500 only)
- -------------------------------------------------*/
 
 WRITE_LINE_MEMBER(apollo_state::sio2_irq_handler)
 {
@@ -1243,7 +978,7 @@ static const sc499_interface apollo_ctape_config = {
 #undef VERBOSE
 #define VERBOSE 0
 
-MACHINE_CONFIG_FRAGMENT( apollo )
+MACHINE_CONFIG_FRAGMENT( common )
 	// configuration MUST be reset first !
 	MCFG_DEVICE_ADD(APOLLO_CONF_TAG, APOLLO_CONF, 0)
 
@@ -1258,7 +993,6 @@ MACHINE_CONFIG_FRAGMENT( apollo )
 
 	MCFG_MC146818_ADD( APOLLO_RTC_TAG, XTAL_32_768kHz )
 	MCFG_MC146818_UTC( true )
-	MCFG_DUART68681_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz, apollo_sio_config )
 
 	MCFG_DUARTN68681_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz )
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(apollo_state, sio2_irq_handler))
@@ -1269,6 +1003,39 @@ MACHINE_CONFIG_FRAGMENT( apollo )
 	MCFG_OMTI8621_ADD(APOLLO_WDC_TAG, apollo_wdc_config)
 	MCFG_SC499_ADD(APOLLO_CTAPE_TAG, apollo_ctape_config)
 	MCFG_THREECOM3C505_ADD(APOLLO_ETH_TAG, apollo_3c505_config)
+MACHINE_CONFIG_END
+
+// for machines with the keyboard and a graphics head
+MACHINE_CONFIG_FRAGMENT( apollo )
+	MCFG_FRAGMENT_ADD(common)
+
+	MCFG_DUARTN68681_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
+	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output)) 
+	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE(APOLLO_KBD_TAG, apollo_kbd_device, rx_w))
+MACHINE_CONFIG_END
+
+static DEVICE_INPUT_DEFAULTS_START( apollo_terminal )
+	DEVICE_INPUT_DEFAULTS( "TERM_TXBAUD", 0xff, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_RXBAUD", 0xff, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_STARTBITS", 0xff, 0x01 ) // 1
+	DEVICE_INPUT_DEFAULTS( "TERM_DATABITS", 0xff, 0x03 ) // 8
+	DEVICE_INPUT_DEFAULTS( "TERM_PARITY", 0xff, 0x00 ) // N
+	DEVICE_INPUT_DEFAULTS( "TERM_STOPBITS", 0xff, 0x01 ) // 1
+DEVICE_INPUT_DEFAULTS_END
+
+// for headless machines using a serial console
+MACHINE_CONFIG_FRAGMENT( apollo_terminal )
+	MCFG_FRAGMENT_ADD(common)
+
+	MCFG_DUARTN68681_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
+	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output)) 
+	MCFG_DUARTN68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(APOLLO_SIO_TAG, duartn68681_device, rx_b_w))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", apollo_terminal)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(apollo_state,apollo)
@@ -1287,8 +1054,6 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 	// motor is on, floppy disk is ready
 	fdc->fdc->ready_w(1);
 
-	device_start_apollo_sio(machine().device(APOLLO_SIO_TAG));
-
 	if (apollo_is_dn3000())
 	{
 		//MLOG1(("faking mc146818 interrupts (DN3000 only)"));
@@ -1305,7 +1070,7 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 	apollo_csr_set_servicemode(apollo_config(APOLLO_CONF_SERVICE_MODE));
 
 	device_reset_apollo_rtc(machine().device(APOLLO_RTC_TAG));
-	device_reset_apollo_sio(machine().device(APOLLO_SIO_TAG));
 
 	ptm_counter = 0;
+	sio_output_data = 0xff;
 }

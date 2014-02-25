@@ -43,7 +43,7 @@ void netlist_queue_t::on_pre_save()
 {
 	NL_VERBOSE_OUT(("on_pre_save\n"));
 	m_qsize = this->count();
-	NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist->time().as_double(), qsize));
+	NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist.time().as_double(), m_qsize));
 	for (int i = 0; i < m_qsize; i++ )
 	{
 		m_times[i] =  this->listptr()[i].time().as_raw();
@@ -58,12 +58,12 @@ void netlist_queue_t::on_pre_save()
 void netlist_queue_t::on_post_load()
 {
 	this->clear();
-	NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist->time().as_double(), qsize));
+	NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist.time().as_double(), m_qsize));
 	for (int i = 0; i < m_qsize; i++ )
 	{
 		netlist_net_t *n = m_netlist.find_net(&(m_name[i][0]));
-		NL_VERBOSE_OUT(("Got %s ==> %p\n", qtemp[i].m_name, n));
-		NL_VERBOSE_OUT(("schedule time %f (%f)\n", n->time().as_double(), qtemp[i].m_time.as_double()));
+		//NL_VERBOSE_OUT(("Got %s ==> %p\n", qtemp[i].m_name, n));
+		//NL_VERBOSE_OUT(("schedule time %f (%f)\n", n->time().as_double(), qtemp[i].m_time.as_double()));
 		this->push(netlist_queue_t::entry_t(netlist_time::from_raw(m_times[i]), n));
 	}
 }
@@ -311,7 +311,7 @@ ATTR_COLD void netlist_base_t::error(const char *format, ...) const
 {
 	va_list ap;
 	va_start(ap, format);
-	vfatalerror(NL_ERROR, format, ap);
+	verror(NL_ERROR, format, ap);
 	va_end(ap);
 }
 
@@ -319,7 +319,7 @@ ATTR_COLD void netlist_base_t::warning(const char *format, ...) const
 {
     va_list ap;
     va_start(ap, format);
-    vfatalerror(NL_WARNING, format, ap);
+    verror(NL_WARNING, format, ap);
     va_end(ap);
 }
 
@@ -327,7 +327,7 @@ ATTR_COLD void netlist_base_t::log(const char *format, ...) const
 {
     va_list ap;
     va_start(ap, format);
-    vfatalerror(NL_LOG, format, ap);
+    verror(NL_LOG, format, ap);
     va_end(ap);
 }
 

@@ -150,7 +150,6 @@ public:
 	virtual void tra_complete();
 	virtual void rcv_callback();
 	virtual void rcv_complete();
-	virtual void input_callback(UINT8 state);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -164,6 +163,7 @@ public:
 
 	int m_sio_pin;
 
+	int m_serial_rx;
 	int m_rs232_dcd;
 	int m_rs232_cts;
 
@@ -671,14 +671,8 @@ WRITE8_MEMBER( px4_state::px4_spur_w )
 
 WRITE_LINE_MEMBER( px4_state::serial_rx_w )
 {
-	// synchronize to the start bit
+	m_serial_rx = state;
 	device_serial_interface::rx_w(state);
-
-	// update line state
-	if (state)
-		input_callback(m_input_state | RX);
-	else
-		input_callback(m_input_state & ~RX);
 }
 
 WRITE_LINE_MEMBER( px4_state::sio_rx_w )
@@ -726,7 +720,6 @@ void px4_state::tra_callback()
 		{
 			// transmit break
 			txd_w(0);
-			set_out_data_bit(0);
 		}
 		else
 		{
@@ -738,7 +731,6 @@ void px4_state::tra_callback()
 	{
 		// transmit mark
 		txd_w(1);
-		set_out_data_bit(1);
 	}
 }
 
@@ -762,7 +754,7 @@ void px4_state::rcv_callback()
 	if (ART_RX_ENABLED)
 	{
 		// receive data
-		receive_register_update_bit(get_in_data_bit());
+		receive_register_update_bit(m_serial_rx);
 	}
 }
 
@@ -781,11 +773,6 @@ void px4_state::rcv_complete()
 	m_artsr |= ART_RXRDY;
 	m_isr |= INT1_ART;
 	gapnit_interrupt();
-}
-
-void px4_state::input_callback(UINT8 state)
-{
-	m_input_state = state;
 }
 
 // helper function to write to selected serial port
@@ -899,7 +886,7 @@ READ8_MEMBER( px4_state::px4_iostr_r )
 	data |= !m_sio_pin << 2;
 
 	// serial data
-	data |= get_in_data_bit() << 3;
+	data |= m_serial_rx << 3;
 
 	// rs232 status
 	data |= !m_rs232_dcd << 4;

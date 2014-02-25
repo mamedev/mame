@@ -219,10 +219,7 @@ void z80sti_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void z80sti_device::tra_callback()
 {
-	if (m_out_so_func.isnull())
-		transmit_register_send_bit();
-	else
-		m_out_so_func(transmit_register_get_data_bit());
+	m_out_so_func(transmit_register_get_data_bit());
 }
 
 
@@ -237,32 +234,12 @@ void z80sti_device::tra_complete()
 
 
 //-------------------------------------------------
-//  rcv_callback -
-//-------------------------------------------------
-
-void z80sti_device::rcv_callback()
-{
-	receive_register_update_bit(get_in_data_bit());
-}
-
-
-//-------------------------------------------------
 //  rcv_complete -
 //-------------------------------------------------
 
 void z80sti_device::rcv_complete()
 {
 	// TODO
-}
-
-
-//-------------------------------------------------
-//  input_callback -
-//-------------------------------------------------
-
-void z80sti_device::input_callback(UINT8 state)
-{
-	m_input_state = state;
 }
 
 

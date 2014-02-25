@@ -1408,7 +1408,7 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IM6402_TAG, im6402_device, write_rx))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IM6402_TAG, im6402_device, write_rri))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(kc85_state, write_centronics_busy))
@@ -1454,7 +1454,7 @@ static MACHINE_CONFIG_START( pc8201, pc8201_state )
 	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IM6402_TAG, im6402_device, write_rx))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IM6402_TAG, im6402_device, write_rri))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(kc85_state, write_centronics_busy))
@@ -1512,7 +1512,7 @@ static MACHINE_CONFIG_START( trsm100, trsm100_state )
 	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IM6402_TAG, im6402_device, write_rx))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(IM6402_TAG, im6402_device, write_rri))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
 	MCFG_CASSETTE_ADD("cassette", kc85_cassette_interface)

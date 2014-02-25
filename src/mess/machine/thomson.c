@@ -622,31 +622,6 @@ READ8_MEMBER( thomson_state::to7_sys_portb_in )
    because the Data Transmit Ready bit is shared in an incompatible way!
 */
 
-WRITE_LINE_MEMBER(thomson_state::write_centronics_perror)
-{
-	m_centronics_perror = state;
-}
-
-/* test whether a parallel or a serial device is connected: both cannot
-   be exploited at the same time!
-*/
-to7_io_dev thomson_state::to7_io_mode()
-{
-	if (m_centronics_perror == TRUE)
-		return TO7_IO_CENTRONICS;
-	else if ( m_serial->exists())
-		return TO7_IO_RS232;
-	return TO7_IO_NONE;
-}
-
-
-
-WRITE_LINE_MEMBER( thomson_state::to7_io_ack )
-{
-	m_pia_io->cb1_w( state);
-	//LOG_IO (( "%f to7_io_ack: CENTRONICS new state $%02X (ack=%i)\n", machine().time().as_double(), data, ack ));
-}
-
 const device_type TO7_IO_LINE = &device_creator<to7_io_line_device>;
 
 //-------------------------------------------------
@@ -655,91 +630,100 @@ const device_type TO7_IO_LINE = &device_creator<to7_io_line_device>;
 
 to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TO7_IO_LINE, "T07 Serial source", tag, owner, clock, "to7_io_line", __FILE__),
-		device_serial_interface(mconfig, *this)
+	m_pia_io(*this, THOM_PIA_IO),
+	m_rs232(*this, "rs232"),
+	m_last_low(0)
 {
+}
+
+static MACHINE_CONFIG_FRAGMENT( to7_io_line )
+	/// THIS PIO is part of CC 90-232 expansion
+	MCFG_DEVICE_ADD(THOM_PIA_IO, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(to7_io_line_device, porta_in))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(to7_io_line_device, porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("^", thomson_state, thom_firq_1))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("^", thomson_state, thom_firq_1))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(to7_io_line_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(to7_io_line_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(to7_io_line_device, write_dsr))
+
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(THOM_PIA_IO, pia6821_device, cb1_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(to7_io_line_device, write_centronics_busy))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
+MACHINE_CONFIG_END
+
+machine_config_constructor to7_io_line_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( to7_io_line );
 }
 
 void to7_io_line_device::device_start()
 {
+	m_rs232->write_dtr(0);
 }
 
 WRITE8_MEMBER( to7_io_line_device::porta_out )
 {
-	int tx  = data & 1;
-	int dtr = ( data & 2 ) ? 1 : 0;
+	int txd = (data >> 0) & 1;
+	int rts = (data >> 1) & 1;
 
-	LOG_IO(( "%s %f to7_io_porta_out: tx=%i, dtr=%i\n",  machine().describe_context(), machine().time().as_double(), tx, dtr ));
-	if ( dtr )
-		m_connection_state |=  device_serial_interface::DTR;
-	else
-		m_connection_state &= ~device_serial_interface::DTR;
+	LOG_IO(( "%s %f to7_io_porta_out: txd=%i, rts=%i\n",  machine().describe_context(), machine().time().as_double(), txd, rts ));
 
-	set_out_data_bit(tx);
-	serial_connection_out();
+	m_rs232->write_txd(txd);
+	m_rs232->write_rts(rts);
 }
 
+
+
+WRITE_LINE_MEMBER(to7_io_line_device::write_rxd )
+{
+	m_rxd = state;
+}
+
+WRITE_LINE_MEMBER(to7_io_line_device::write_dsr )
+{
+	if (!state) m_last_low = 0;
+
+	m_dsr = state;
+}
+
+WRITE_LINE_MEMBER(to7_io_line_device::write_cts )
+{
+	m_pia_io->ca1_w(state);
+	m_cts = state;
+}
+
+WRITE_LINE_MEMBER(to7_io_line_device::write_centronics_busy )
+{
+	if (!state) m_last_low = 1;
+
+	m_centronics_busy = state;
+}
 
 
 READ8_MEMBER( to7_io_line_device::porta_in )
 {
-	thomson_state *state = machine().driver_data<thomson_state>();
-	int cts = 1;
-	int dsr = ( m_input_state & device_serial_interface::DSR ) ? 0 : 1;
-	int rd  = get_in_data_bit();
+	LOG_IO(( "%s %f to7_io_porta_in: select=%i cts=%i, dsr=%i, rd=%i\n", machine().describe_context(), machine().time().as_double(), m_centronics_busy, m_cts, m_dsr, m_rxd ));
 
-	if ( state->to7_io_mode() == TO7_IO_RS232 )
-		cts = m_input_state & device_serial_interface::CTS ? 0 : 1;
+	/// HACK: without high impedance we can't tell whether a device is driving a line high or if it's being pulled up.
+	/// so assume the last device to drive it low is active.
+	int dsr;
+	if (m_last_low == 0)
+		dsr = m_dsr;
 	else
-		cts = !state->m_centronics_busy;
+		dsr = !m_centronics_busy;
 
-	LOG_IO(( "%s %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", machine().describe_context(), machine().time().as_double(), machine().driver_data<thomson_state>()->to7_io_mode(), cts, dsr, rd ));
-
-	return (dsr ? 0x20 : 0) | (cts ? 0x40 : 0) | (rd ? 0x80: 0);
+	return (0x1f /* not required when converted to write_pa */) | (m_cts << 5) | (dsr << 6) | (m_rxd << 7);
 }
 
 
-
-WRITE8_MEMBER( thomson_state::to7_io_portb_out )
-{
-	LOG_IO(( "$%04x %f to7_io_portb_out: CENTRONICS set data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), data ));
-
-	/* set 8-bit data */
-	m_cent_data_out->write(data);
-}
-
-
-
-WRITE_LINE_MEMBER( thomson_state::to7_io_cb2_out )
-{
-	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", m_maincpu->pc(), machine().time().as_double(), state ));
-
-	/* send STROBE to printer */
-	m_centronics->write_strobe(state);
-}
-
-
-void to7_io_line_device::input_callback(UINT8 state)
-{
-	m_input_state = state;
-
-	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", machine().time().as_double(), (state & device_serial_interface::CTS) ? 1 : 0, (state & device_serial_interface::DSR) ? 1 : 0, (int)get_in_data_bit() ));
-}
-
-
-
-void to7_io_line_device::device_reset()
-{
-	pia6821_device *io_pia = machine().device<pia6821_device>(THOM_PIA_IO);
-
-	LOG (( "to7_io_reset called\n" ));
-
-	if (io_pia) io_pia->set_port_a_z_mask(0x03 );
-	m_input_state = device_serial_interface::CTS;
-	m_connection_state &= ~device_serial_interface::DTR;
-	m_connection_state |=  device_serial_interface::RTS;  /* always ready to send */
-	set_out_data_bit(1);
-	serial_connection_out();
-}
 
 /* ------------ RF 57-932 RS232 extension ------------ */
 

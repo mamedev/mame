@@ -162,7 +162,7 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 	data |= m_ser2->rxd_r();
 
 	// COMDATA
-	data |= m_comdata << 7;
+	data |= m_comdata_to_ipc << 7;
 
 	return data;
 }
@@ -214,8 +214,6 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 	m_ser2->write_dtr(!BIT(data, 5));
 
 	// COMDATA
-	m_comdata = BIT(data, 7);
-
 	m_zx8302->comdata_w(BIT(data, 7));
 }
 
@@ -355,7 +353,7 @@ void ql_state::sandy_set_control(UINT8 data)
 		wd17xx_set_drive(m_fdc,1);
 
 	wd17xx_set_side(m_fdc,(data & SANDY_SIDE_MASK) >> SANDY_SIDE_SHIFT);
-	if (data & SANDY_SIDE_MASK)
+	if ((data & SANDY_SIDE_MASK) & (LOG_DISK_READ | LOG_DISK_WRITE))
 	{
 		logerror("Accessing side 1\n");
 	}
@@ -730,9 +728,10 @@ WRITE_LINE_MEMBER( ql_state::ql_baudx4_w )
 	m_baudx4 = state;
 }
 
+// CPU to IPC
 WRITE_LINE_MEMBER( ql_state::ql_comdata_w )
 {
-	m_comdata = state;
+	m_comdata_to_ipc = state;
 }
 
 WRITE_LINE_MEMBER( ql_state::zx8302_mdselck_w )
@@ -906,7 +905,7 @@ void ql_state::machine_start()
 	// register for state saving
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_ipl));
-	save_item(NAME(m_comdata));
+	save_item(NAME(m_comdata_to_ipc));
 	save_item(NAME(m_baudx4));
 	save_item(NAME(m_printer_char));
 	save_item(NAME(m_disk_io_byte));

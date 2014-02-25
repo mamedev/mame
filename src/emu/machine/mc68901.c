@@ -492,10 +492,7 @@ void mc68901_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void mc68901_device::tra_callback()
 {
-	if (m_out_so_func.isnull())
-		transmit_register_send_bit();
-	else
-		m_out_so_func(transmit_register_get_data_bit());
+	m_out_so_func(transmit_register_get_data_bit());
 }
 
 
@@ -543,16 +540,6 @@ void mc68901_device::rcv_complete()
 		
 	m_receive_pending = 1;
 	rx_buffer_full();
-}
-
-
-//-------------------------------------------------
-//  input_callback -
-//-------------------------------------------------
-
-void mc68901_device::input_callback(UINT8 state)
-{
-	m_input_state = state;
 }
 
 
@@ -1154,16 +1141,4 @@ WRITE_LINE_MEMBER( mc68901_device::tbi_w )
 WRITE_LINE_MEMBER(mc68901_device::write_rx)
 {
 	device_serial_interface::rx_w(state);
-}
-
-WRITE_LINE_MEMBER(mc68901_device::write_dsr)
-{
-	if (state)
-	{
-		input_callback(m_input_state | DSR);
-	}
-	else
-	{
-		input_callback(m_input_state & ~DSR);
-	}
 }

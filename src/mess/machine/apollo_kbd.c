@@ -16,16 +16,6 @@
 #include "machine/apollo_kbd.h"
 #include "sound/beep.h"
 
-#if defined(APOLLO_FOR_LINUX)
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-// on linux we may attach a real Apollo keyboard at /dev/ttyS0
-#include <termios.h>
-#include <sys/ioctl.h>
-#define KBD_TTY_NAME "/dev/ttyS0"
-#endif
-
 #define LOG(x)  { logerror ("%s apollo_kbd: ", m_device->cpu_context()); logerror x; logerror ("\n"); }
 #define LOG1(x) { if (VERBOSE > 0) LOG(x)}
 #define LOG2(x) { if (VERBOSE > 1) LOG(x)}
@@ -73,20 +63,11 @@ const device_type APOLLO_KBD = &device_creator<apollo_kbd_device>;
 //-------------------------------------------------
 
 apollo_kbd_device::apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, APOLLO_KBD, "Apollo Keyboard", tag, owner, clock, "apollo_kbd", __FILE__)
+	: device_t(mconfig, APOLLO_KBD, "Apollo Keyboard", tag, owner, clock, "apollo_kbd", __FILE__),
+	device_serial_interface(mconfig, *this),
+	m_tx_w(*this),
+	m_german_r(*this)
 {
-	memset(static_cast<apollo_kbd_interface *>(this), 0, sizeof(apollo_kbd_interface));
-}
-
-//-------------------------------------------------
-//  static_set_interface - set the interface struct
-//-------------------------------------------------
-
-void apollo_kbd_device::static_set_interface(device_t &device, const apollo_kbd_interface &interface)
-{
-	apollo_kbd_device &kbd = downcast<apollo_kbd_device &>(device);
-
-	static_cast<apollo_kbd_interface &>(kbd) = interface;
 }
 
 //-------------------------------------------------
@@ -98,14 +79,11 @@ void apollo_kbd_device::device_start()
 	m_device = this;
 	LOG1(("start apollo_kbd"));
 
-	m_putchar.resolve(apollo_kbd_putchar_cb, *this);
-	m_has_beeper.resolve(apollo_kbd_has_beeper_cb, *this);
-	m_is_german.resolve(apollo_kbd_is_german_cb, *this);
+	m_tx_w.resolve_safe();
+	m_german_r.resolve_safe(0);
 
 	m_beeper.start(this);
 	m_mouse.start(this);
-	m_tx_fifo.start(this);
-	m_keyboard_tty.start(this);
 
 	m_io_keyboard1 = machine().root_device().ioport("keyboard1");
 	m_io_keyboard2 = machine().root_device().ioport("keyboard2");
@@ -115,7 +93,7 @@ void apollo_kbd_device::device_start()
 	m_io_mouse2 = machine().root_device().ioport("mouse2");
 	m_io_mouse3 = machine().root_device().ioport("mouse3");
 
-	m_timer = machine().scheduler().timer_alloc(FUNC(static_poll_callback), this);
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apollo_kbd_device::kbd_scan_timer), this));
 }
 
 //-------------------------------------------------
@@ -128,8 +106,6 @@ void apollo_kbd_device::device_reset()
 
 	m_beeper.reset();
 	m_mouse.reset();
-	m_tx_fifo.reset();
-	m_keyboard_tty.reset();
 
 	// init keyboard
 	m_loopback_mode = 1;
@@ -142,6 +118,19 @@ void apollo_kbd_device::device_reset()
 
 	// start timer
 	m_timer->adjust( attotime::zero, 0, attotime::from_msec(5)); // every 5ms
+
+	// keyboard comms is at 8E1, 1200 baud
+	set_data_frame(1, 8, PARITY_EVEN, STOP_BITS_1);
+	set_rcv_rate(1200);
+	set_tra_rate(1200);
+
+	m_tx_busy = false;
+	m_xmit_read = m_xmit_write = 0;
+}
+
+void apollo_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 /***************************************************************************
@@ -212,8 +201,7 @@ void apollo_kbd_device::beeper::on()
 
 int apollo_kbd_device::beeper::keyboard_has_beeper()
 {
-	return !m_device->m_has_beeper.isnull() ?
-			m_device->m_has_beeper(0) : 0;
+	return true;	// driver has no facility to return false here, so go with it
 }
 
 void apollo_kbd_device::beeper::beeper_callback()
@@ -311,238 +299,18 @@ void apollo_kbd_device::mouse::read_mouse()
 				mouse_data_size = 3;
 			}
 
-			if (m_device->m_tx_fifo.putdata(mouse_data, mouse_data_size))
+			for (int md = 0; md < mouse_data_size; md++)
 			{
-				// mouse data submitted; update current mouse state
-				m_last_b = b;
-				m_last_x += dx;
-				m_last_y += dy;
+				m_device->xmit_char(mouse_data[md]);
 			}
+
+			// mouse data submitted; update current mouse state
+			m_last_b = b;
+			m_last_x += dx;
+			m_last_y += dy;
 			m_tx_pending = 100; // mouse data packet will take 40 ms
 		}
 	}
-}
-
-//**************************************************************************
-//  tx fifo
-//**************************************************************************
-
-apollo_kbd_device::tx_fifo::tx_fifo() :
-	m_device(NULL),
-	m_timer(NULL)
-{
-}
-
-void apollo_kbd_device::tx_fifo::start(apollo_kbd_device *device)
-{
-	m_device = device;
-	LOG2(("start apollo_kbd::tx_fifo"));
-	m_timer = m_device->machine().scheduler().timer_alloc(FUNC(static_timer_callback), this);
-}
-
-void apollo_kbd_device::tx_fifo::reset()
-{
-	LOG2(("reset apollo_kbd::tx_fifo"));
-
-	memset(fifo, 0, sizeof(fifo));
-	m_read_ptr = 0;
-	m_write_ptr = 0;
-	m_char_count = 0;
-	m_tx_pending = 0;
-	m_baud_rate = 1200;
-
-	// reset timer
-	m_timer->adjust(attotime::never, 0);
-}
-
-UINT8 apollo_kbd_device::tx_fifo::getchar()
-{
-	UINT8 data;
-
-	if (m_char_count == 0)
-	{
-		LOG(("apollo_kbd FIFO underflow"));
-		data = 0x0;
-	}
-	else
-	{
-		data = fifo[m_read_ptr++];
-		if (m_read_ptr == TX_FIFO_SIZE)
-		{
-			m_read_ptr = 0;
-		}
-		m_char_count--;
-	}
-	return data;
-}
-
-void apollo_kbd_device::tx_fifo::putchar(UINT8 data)
-{
-	if (m_char_count >= TX_FIFO_SIZE)
-	{
-		LOG(("apollo_kbd FIFO overflow"));
-	}
-	else
-	{
-		fifo[m_write_ptr++] = data;
-		if (m_write_ptr == TX_FIFO_SIZE)
-		{
-			m_write_ptr = 0;
-		}
-		m_char_count++;
-		if ( m_tx_pending == 0)
-		{
-			flush();
-		}
-	}
-}
-
-int apollo_kbd_device::tx_fifo::putdata(const UINT8 *data, int data_length)
-{
-	if (m_char_count + data_length >= TX_FIFO_SIZE-5)
-	{
-		// tx fifo is full
-		return 0;
-	}
-	else
-	{
-		while (data_length-- > 0) {
-			putchar(*data++);
-		}
-		return 1;
-	}
-}
-
-void apollo_kbd_device::tx_fifo::flush()
-{
-	if (m_char_count > 0)
-	{
-		m_tx_pending = 1;
-
-		if (!m_device->m_putchar.isnull())
-			m_device->m_putchar(0, getchar());
-		// 11 = one start, 8 data, one parity (even), one stop bit
-		m_timer->adjust(attotime::from_hz(m_baud_rate / 11), 0);
-	}
-	else
-	{
-		m_tx_pending = 0;
-//      m_timer->adjust(attotime::never, 0);
-	}
-}
-
-void apollo_kbd_device::tx_fifo::timer_callback()
-{
-	flush();
-}
-
-TIMER_CALLBACK( apollo_kbd_device::tx_fifo::static_timer_callback )
-{
-	reinterpret_cast<apollo_kbd_device::tx_fifo *> (ptr)->timer_callback();
-}
-
-//**************************************************************************
-//  Real Apollo keyboard connected at the keyboard tty (i.e. /dev/ttyS0)
-//**************************************************************************
-
-apollo_kbd_device::keyboard_tty::keyboard_tty() :
-	m_device(NULL),
-#if defined(KBD_TTY_NAME)
-	m_tty_name(NULL),
-	m_tty_fd(-1),
-#endif
-	m_connected(0)
-{
-}
-
-void apollo_kbd_device::keyboard_tty::start(apollo_kbd_device *device)
-{
-	m_device = device;
-	LOG2(("start apollo_kbd::keyboard_tty"));
-#if defined(KBD_TTY_NAME)
-	m_tty_name = KBD_TTY_NAME;
-#endif
-}
-
-void apollo_kbd_device::keyboard_tty::reset()
-{
-	LOG2(("reset apollo_kbd::keyboard_tty"));
-
-	m_connected = 0;
-
-#if defined(KBD_TTY_NAME)
-		/* Open the tty line */
-	m_tty_fd = open(m_tty_name, 2);
-	if (m_tty_fd < 0)
-	{
-		LOG1(("failed to open %s", m_tty_name));
-	}
-	else
-	{
-		int serial;
-		struct termios tty_mode;
-
-		// set nonblocking mode
-		fcntl(m_tty_fd, F_SETFL, fcntl(m_tty_fd, F_GETFL) | O_NONBLOCK);
-
-		tcgetattr(m_tty_fd, &tty_mode);
-		tty_mode.c_iflag = INPCK;
-		tty_mode.c_oflag = 0;
-		tty_mode.c_cflag = B1200 | CS8 | CREAD | HUPCL | PARENB | CLOCAL;
-		tty_mode.c_lflag = 0;
-		tty_mode.c_cc[VTIME] = 0;
-		tty_mode.c_cc[VMIN] = 1;
-		tcsetattr(m_tty_fd, TCSANOW, &tty_mode);
-
-		ioctl(m_tty_fd, TIOCMGET, &serial);
-
-		if ((serial & TIOCM_RTS) && !(serial & TIOCM_CTS))
-		{
-			// Apollo keyboard not connected
-			close(m_tty_fd);
-			m_tty_fd = -1;
-			m_connected = 0;
-		}
-		else
-		{
-			LOG1(("opened %s with RTS=%d CTS=%d", m_tty_name,
-				serial & TIOCM_RTS ? 1 : 0, serial & TIOCM_CTS ? 1 : 0 ));
-		}
-	}
-#endif
-}
-
-int apollo_kbd_device::keyboard_tty::isConnected()
-{
-	return m_connected;
-}
-
-int apollo_kbd_device::keyboard_tty::getchar()
-{
-#if defined(KBD_TTY_NAME)
-	UINT8 data;
-	if (m_tty_fd < 0 || read(m_tty_fd, &data, 1) != 1) {
-		return -1;
-	} else {
-		LOG2(("keyboard_tty::getchar <---- %02x", data))
-		m_connected = 1;
-		return data;
-	}
-#else
-	return -1;
-#endif
-}
-
-void apollo_kbd_device::keyboard_tty::putchar(UINT8 data)
-{
-#if defined(KBD_TTY_NAME)
-	if (isConnected() && m_tty_fd >= 0 ) {
-		while (write(m_tty_fd, &data, 1) != 1) {
-			LOG(("keyboard_tty::putchar data=%02x errno=%d", data, errno ));
-		}
-		LOG2(("keyboard_tty::putchar -> %02x", data));
-	}
-#endif
 }
 
 /*-------------------------------------------------
@@ -551,29 +319,68 @@ void apollo_kbd_device::keyboard_tty::putchar(UINT8 data)
 
 int apollo_kbd_device::keyboard_is_german()
 {
-	return !m_is_german.isnull() ?
-			m_is_german(0) : 0;
+	return (m_german_r() == ASSERT_LINE) ? true : false;
 }
-
-/*-------------------------------------------------
- putchar - put keyboard char to sio
- -------------------------------------------------*/
 
 void apollo_kbd_device::set_mode(UINT16 mode)
 {
-	putchar(0xff);
-	putchar(mode);
+	xmit_char(0xff);
+	xmit_char(mode);
 	m_mode = mode;
 }
 
-/*-------------------------------------------------
- putchar - put keyboard char to sio
- -------------------------------------------------*/
-
-void apollo_kbd_device::putchar(const UINT8 data)
+void apollo_kbd_device::tra_complete()    // Tx completed sending byte
 {
-	LOG1(("putchar(%d) -> %02x", m_mode, data));
-	m_tx_fifo.putchar(data);
+	// is there more waiting to send?
+	if (m_xmit_read != m_xmit_write)
+	{
+		transmit_register_setup(m_xmitring[m_xmit_read++]);
+		if (m_xmit_read >= XMIT_RING_SIZE)
+		{
+			m_xmit_read = 0;
+		}
+	}
+	else
+	{
+		m_tx_busy = false;
+	}
+}
+
+void apollo_kbd_device::rcv_complete()    // Rx completed receiving byte
+{
+	receive_register_extract();
+	UINT8 data = get_received_char();
+
+	kgetchar(data);
+}
+
+void apollo_kbd_device::tra_callback()    // Tx send bit
+{
+	int bit = transmit_register_get_data_bit();
+	m_tx_w(bit);
+}
+
+void apollo_kbd_device::input_callback(UINT8 state)
+{
+}
+
+void apollo_kbd_device::xmit_char(UINT8 data)
+{
+	// if tx is busy it'll pick this up automatically when it completes
+	if (!m_tx_busy)
+	{
+		m_tx_busy = true;
+		transmit_register_setup(data);
+	}
+	else
+	{
+		// tx is busy, it'll pick this up next time
+		m_xmitring[m_xmit_write++] = data;
+		if (m_xmit_write >= XMIT_RING_SIZE)
+		{
+			m_xmit_write = 0;
+		}
+	}
 }
 
 /*-------------------------------------------------
@@ -583,13 +390,14 @@ void apollo_kbd_device::putchar(const UINT8 data)
 void apollo_kbd_device::putdata(const UINT8 *data, int data_length)
 {
 	// send data only if no real Apollo keyboard has been connected
-	if (!m_keyboard_tty.isConnected())
+	if (m_mode > KBD_MODE_1_KEYSTATE)
 	{
-		if (m_mode > KBD_MODE_1_KEYSTATE)
-		{
-			set_mode(KBD_MODE_1_KEYSTATE);
-		}
-		m_tx_fifo.putdata(data, data_length);
+		set_mode(KBD_MODE_1_KEYSTATE);
+	}
+
+	for (int i = 0; i < data_length; i++)
+	{
+		xmit_char(data[i]);
 	}
 }
 
@@ -602,25 +410,11 @@ void apollo_kbd_device::putstring(const char *data)
 	putdata((UINT8 *) data, strlen(data));
 }
 
-/*-------------------------------------------------
- apollo_kbd_getchar - get char from sio line
- -------------------------------------------------*/
-
-void apollo_kbd_getchar(device_t *device, UINT8 data)
-{
-	downcast<apollo_kbd_device *> (device)->getchar(data);
-}
-
-void apollo_kbd_device::getchar(UINT8 data)
+void apollo_kbd_device::kgetchar(UINT8 data)
 {
 	static const UINT8 ff1116_data[] = { 0x00, 0xff, 0x00 };
 
 	LOG1(("getchar <- %02x", data));
-
-	if (m_keyboard_tty.isConnected())
-	{
-		m_keyboard_tty.putchar(data);
-	}
 
 	if (data == 0xff)
 	{
@@ -811,10 +605,10 @@ int apollo_kbd_device::push_scancode(UINT8 code, UINT8 repeat)
 
 		if (key_code & 0xff00)
 		{
-			putchar(key_code >> 8);
+			xmit_char(key_code >> 8);
 			n_chars++;
 		}
-		putchar(key_code & 0xff);
+		xmit_char(key_code & 0xff);
 		n_chars++;
 	}
 	return n_chars;
@@ -867,13 +661,8 @@ void apollo_kbd_device::scan_keyboard()
 	}
 }
 
-void apollo_kbd_device::poll_callback()
+TIMER_CALLBACK_MEMBER(apollo_kbd_device::kbd_scan_timer)
 {
-	int data;
-	while ((data = m_keyboard_tty.getchar()) >= 0)
-	{
-		putchar(data);
-	}
 	scan_keyboard();
 
 	// Note: we omit extra traffic while keyboard is in Compatibility mode
@@ -881,11 +670,6 @@ void apollo_kbd_device::poll_callback()
 	{
 		m_mouse.read_mouse();
 	}
-}
-
-TIMER_CALLBACK( apollo_kbd_device::static_poll_callback )
-{
-	reinterpret_cast<apollo_kbd_device *> (ptr)->poll_callback();
 }
 
 UINT16 apollo_kbd_device::m_code_table[] = {

@@ -82,6 +82,7 @@ const device_type ATMEL_29C010 = &device_creator<atmel_29c010_device>;
 const device_type AMD_29F010 = &device_creator<amd_29f010_device>;
 const device_type AMD_29F040 = &device_creator<amd_29f040_device>;
 const device_type AMD_29F080 = &device_creator<amd_29f080_device>;
+const device_type AMD_29LV200T = &device_creator<amd_29lv200t_device>;
 const device_type FUJITSU_29F016A = &device_creator<fujitsu_29f016a_device>;
 const device_type FUJITSU_29DL16X = &device_creator<fujitsu_29dl16x_device>;
 const device_type INTEL_E28F400B = &device_creator<intel_e28f400b_device>;
@@ -209,6 +210,13 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_AMD;
 		m_device_id = 0xd5;
 		map = ADDRESS_MAP_NAME( memory_map8_8Mb );
+		break;
+	case FLASH_AMD_29LV200T:
+		m_bits = 8;
+		m_size = 0x40000;
+		m_maker_id = MFG_AMD;
+		m_device_id = 0x3b;
+		map = ADDRESS_MAP_NAME( memory_map8_2Mb );
 		break;
 	case FLASH_INTEL_28F320J3D:
 		m_bits = 16;
@@ -361,6 +369,9 @@ amd_29f040_device::amd_29f040_device(const machine_config &mconfig, const char *
 
 amd_29f080_device::amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, AMD_29F080, "AMD 29F080 Flash", tag, owner, clock, FLASH_AMD_29F080, "amd_29f080", __FILE__) { }
+
+amd_29lv200t_device::amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh8_device(mconfig, AMD_29LV200T, "AMD 29LV200T Flash", tag, owner, clock, FLASH_AMD_29LV200T, "amd_29lv200t", __FILE__) { }
 
 intel_e28f008sa_device::intel_e28f008sa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, INTEL_E28F008SA, "Intel E28F008SA Flash", tag, owner, clock, FLASH_INTEL_E28F008SA, "intel_e28f008sa", __FILE__) { }
@@ -539,9 +550,10 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 		data = m_status;
 		break;
 	case FM_READAMDID3:
-		if (m_maker_id == MFG_FUJITSU && m_device_id == 0x35)
+		if ((m_maker_id == MFG_FUJITSU && m_device_id == 0x35) || (m_maker_id == MFG_AMD && m_device_id == 0x3b))
 		{
-			//used in Fujitsu 29DL16X 8bits mode
+			// used in Fujitsu 29DL16X 8bits mode
+			// used in AMD 29LV200 8bits mode
 			switch (address)
 			{
 				case 0: data = m_maker_id; break;

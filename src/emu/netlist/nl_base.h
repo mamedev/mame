@@ -1118,7 +1118,7 @@ protected:
     };
 
     // any derived netlist must override this ...
-    ATTR_COLD ATTR_NORETURN virtual void vfatalerror(const loglevel_e level,
+    ATTR_COLD virtual void verror(const loglevel_e level,
             const char *format, va_list ap) const = 0;
 
     /* from netlist_object */

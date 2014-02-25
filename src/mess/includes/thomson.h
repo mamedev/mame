@@ -10,6 +10,7 @@
 #define _THOMSON_H_
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/mc6846.h"
@@ -85,14 +86,6 @@ struct thom_vsignal {
 };
 
 
-enum to7_io_dev
-{
-	TO7_IO_NONE,
-	TO7_IO_CENTRONICS,
-	TO7_IO_RS232
-};
-
-
 class thomson_state : public driver_device
 {
 public:
@@ -106,9 +99,7 @@ public:
 		m_centronics(*this, "centronics"),
 		m_cent_data_out(*this, "cent_data_out"),
 		m_pia_sys(*this, THOM_PIA_SYS),
-		m_pia_io(*this, THOM_PIA_IO),
 		m_pia_game(*this, THOM_PIA_GAME),
-		m_serial(*this, "cc90232"),
 		m_acia(*this, "acia6850"),
 		m_mea8000(*this, "mea8000"),
 		m_ram(*this, RAM_TAG),
@@ -136,9 +127,6 @@ public:
 	DECLARE_WRITE8_MEMBER( to7_sys_portb_out );
 	DECLARE_READ8_MEMBER( to7_sys_porta_in );
 	DECLARE_READ8_MEMBER( to7_sys_portb_in );
-	DECLARE_WRITE_LINE_MEMBER( to7_io_ack );
-	DECLARE_WRITE8_MEMBER( to7_io_portb_out );
-	DECLARE_WRITE_LINE_MEMBER( to7_io_cb2_out );
 	DECLARE_WRITE_LINE_MEMBER( to7_modem_cb );
 	DECLARE_WRITE_LINE_MEMBER( to7_modem_tx_w );
 	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
@@ -249,7 +237,6 @@ public:
 	DECLARE_WRITE8_MEMBER( mo5nr_sys_porta_out );
 	DECLARE_MACHINE_RESET( mo5nr );
 	DECLARE_MACHINE_START( mo5nr );
-	to7_io_dev to7_io_mode();
 
 	TIMER_CALLBACK_MEMBER( thom_lightpen_step );
 	TIMER_CALLBACK_MEMBER( thom_scanline_start );
@@ -327,9 +314,7 @@ protected:
 	optional_device<centronics_device> m_centronics;
 	optional_device<output_latch_device> m_cent_data_out;
 	required_device<pia6821_device> m_pia_sys;
-	optional_device<pia6821_device> m_pia_io;
 	required_device<pia6821_device> m_pia_game;
-	required_device<device_image_interface> m_serial;
 	required_device<acia6850_device> m_acia;
 	required_device<mea8000_device> m_mea8000;
 	required_device<ram_device> m_ram;
@@ -621,24 +606,36 @@ extern const mc6846_interface to9p_timer;
 #define THOM_VMODE_NB         12
 
 
-class to7_io_line_device :  public device_t,
-							public device_serial_interface
+class to7_io_line_device : public device_t
 {
 public:
 	// construction/destruction
 	to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	virtual void input_callback(UINT8 state);
 
 	/* read data register */
 	DECLARE_READ8_MEMBER(porta_in);
 
 	/* write data register */
 	DECLARE_WRITE8_MEMBER(porta_out);
+
+	DECLARE_WRITE_LINE_MEMBER(write_rxd);
+	DECLARE_WRITE_LINE_MEMBER(write_cts);
+	DECLARE_WRITE_LINE_MEMBER(write_dsr);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
+	machine_config_constructor device_mconfig_additions() const;
+
+private:
+	required_device<pia6821_device> m_pia_io;
+	required_device<rs232_port_device> m_rs232;
+	int m_last_low;
+	int m_centronics_busy;
+	int m_rxd;
+	int m_cts;
+	int m_dsr;
 };
 
 extern const device_type TO7_IO_LINE;

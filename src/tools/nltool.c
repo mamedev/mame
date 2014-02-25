@@ -156,7 +156,7 @@ public:
     pstring m_logs;
 protected:
 
-	void vfatalerror(const loglevel_e level, const char *format, va_list ap) const
+	void verror(const loglevel_e level, const char *format, va_list ap) const
 	{
 	    switch (level)
 	    {

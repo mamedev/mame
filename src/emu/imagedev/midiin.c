@@ -176,7 +176,3 @@ void midiin_device::xmit_char(UINT8 data)
 		}
 	}
 }
-
-void midiin_device::input_callback(UINT8 state)
-{
-}

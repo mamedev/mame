@@ -77,9 +77,6 @@ NETLIB_START(SN74LS629)
     register_sub(m_R_FC,  "R_FC");
     register_sub(m_R_RNG,  "R_RNG");
 
-    m_R_FC.set_R(90000.0);
-    m_R_RNG.set_R(90000.0);
-
     register_input("ENQ", m_ENQ);
     register_input("RNG",    m_RNG);
     register_input("FC",     m_FC);
@@ -95,6 +92,8 @@ NETLIB_START(SN74LS629)
 
 NETLIB_RESET(SN74LS629)
 {
+    m_R_FC.set_R(90000.0);
+    m_R_RNG.set_R(90000.0);
     m_clock.reset();
 }
 
