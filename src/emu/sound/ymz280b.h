@@ -55,6 +55,7 @@ private:
 	struct YMZ280BVoice
 	{
 		UINT8 playing;          /* 1 if we are actively playing */
+		bool ended;             /* indicate voice has ended in case samples_left is 0 */
 
 		UINT8 keyon;            /* 1 if the key is on */
 		UINT8 looping;          /* 1 if looping is enabled */
