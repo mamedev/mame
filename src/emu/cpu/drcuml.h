@@ -110,7 +110,7 @@ public:
 
 	// instruction appending
 	uml::instruction &append();
-	void append_comment(const char *format, ...);
+	void append_comment(const char *format, ...) ATTR_PRINTF(2,3);
 
 	// this class is thrown if abort() is called
 	class abort_compilation : public emu_exception
@@ -194,7 +194,7 @@ public:
 
 	// logging
 	bool logging() const { return (m_umllog != NULL); }
-	void log_printf(const char *format, ...);
+	void log_printf(const char *format, ...) ATTR_PRINTF(2,3);
 	void log_flush() { if (logging()) fflush(m_umllog); }
 
 private:

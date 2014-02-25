@@ -60,7 +60,7 @@
 #define ENABLE_VERBOSE_LOG (0)
 
 #if ENABLE_VERBOSE_LOG
-INLINE void verboselog(UINT16 pc, int n_level, const char *s_fmt, ...)
+INLINE void ATTR_PRINTF(3,4) verboselog(UINT16 pc, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -73,7 +73,7 @@ INLINE void verboselog(UINT16 pc, int n_level, const char *s_fmt, ...)
 	}
 }
 #else
-#define verboselog(x,y,z,...)
+#define verboselog(x,y,z, ...)
 #endif
 
 //**************************************************************************

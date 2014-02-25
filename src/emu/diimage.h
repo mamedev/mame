@@ -163,7 +163,7 @@ public:
 
 	const char *error();
 	void seterror(image_error_t err, const char *message);
-	void message(const char *format, ...);
+	void message(const char *format, ...) ATTR_PRINTF(2,3);
 
 	bool exists() { return m_image_name; }
 	const char *filename() { if (!m_image_name) return NULL; else return m_image_name; }

@@ -73,7 +73,7 @@ static const char *const phasenames[] =
 
 #define LOGLEVEL            0
 
-#define LOG(level,...)      if(LOGLEVEL>=level) logerror(__VA_ARGS__)
+#define LOG(level, ...)     if(LOGLEVEL>=level) logerror(__VA_ARGS__)
 
 void scsihle_device::scsi_out_req_delay(UINT8 state)
 {

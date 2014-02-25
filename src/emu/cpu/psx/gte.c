@@ -11,7 +11,7 @@
 #include "gte.h"
 
 #if 0
-void ATTR_PRINTF(2,3) GTELOG( UINT32 pc, const char *a,...)
+void ATTR_PRINTF(2,3) GTELOG( UINT32 pc, const char *a, ...)
 {
 	va_list va;
 	char s_text[ 1024 ];

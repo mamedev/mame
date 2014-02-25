@@ -62,7 +62,7 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_RWTS18_FORMAT,
 };
 
-void CLIB_DECL logerror(const char *format, ...)
+void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
 {
 	va_list arg;
 	va_start(arg, format);

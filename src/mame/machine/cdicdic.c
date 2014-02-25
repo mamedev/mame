@@ -31,7 +31,7 @@ TODO:
 const device_type MACHINE_CDICDIC = &device_creator<cdicdic_device>;
 
 #if ENABLE_VERBOSE_LOG
-INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
+INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -44,7 +44,7 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 	}
 }
 #else
-#define verboselog(x,y,z,...)
+#define verboselog(x,y,z, ...)
 #endif
 
 #define CDIC_SECTOR_SYNC        0

@@ -174,9 +174,9 @@ static const int CPU_FREQ[16] =
 
 #define ENABLE_VERBOSE_LOG  (0)
 
-#if ENABLE_VERBOSE_LOG
 inline void ATTR_PRINTF(3,4) pockstat_state::verboselog( int n_level, const char *s_fmt, ... )
 {
+#if ENABLE_VERBOSE_LOG
 	if( VERBOSE_LEVEL >= n_level )
 	{
 		va_list v;
@@ -186,10 +186,8 @@ inline void ATTR_PRINTF(3,4) pockstat_state::verboselog( int n_level, const char
 		va_end( v );
 		logerror( "%s: %s", machine().describe_context(), buf );
 	}
-}
-#else
-#define verboselog(x,y,z,...)
 #endif
+}
 
 #define PS_INT_BTN_ACTION       0x00000001 // "Action button"
 #define PS_INT_BTN_RIGHT        0x00000002 // "Right button"

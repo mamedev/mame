@@ -198,7 +198,7 @@ int cli_frontend::execute(int argc, char **argv)
 			if (!found)
 			{
 				software_display_matches(config,m_options, NULL,m_options.software_name());
-				throw emu_fatalerror(MAMERR_FATALERROR, "");
+				throw emu_fatalerror(MAMERR_FATALERROR, NULL);
 			}
 		}
 		// parse the command line, adding any system-specific options
@@ -1592,11 +1592,11 @@ void cli_frontend::romident(const char *filename)
 	if (ident.matches() == ident.total())
 		return;
 	else if (ident.matches() == ident.total() - ident.nonroms())
-		throw emu_fatalerror(MAMERR_IDENT_NONROMS, "");
+		throw emu_fatalerror(MAMERR_IDENT_NONROMS, NULL);
 	else if (ident.matches() > 0)
-		throw emu_fatalerror(MAMERR_IDENT_PARTIAL, "");
+		throw emu_fatalerror(MAMERR_IDENT_PARTIAL, NULL);
 	else
-		throw emu_fatalerror(MAMERR_IDENT_NONE, "");
+		throw emu_fatalerror(MAMERR_IDENT_NONE, NULL);
 }
 
 

@@ -375,11 +375,11 @@ static const namco_interface namco_config =
 static MACHINE_CONFIG_START( baraduke, baraduke_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,49152000/32)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(baraduke_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", baraduke_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("mcu", HD63701,49152000/8)
+	MCFG_CPU_ADD("mcu", HD63701, XTAL_49_152MHz/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", baraduke_state,  irq0_line_hold)
@@ -388,10 +388,7 @@ static MACHINE_CONFIG_START( baraduke, baraduke_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.606060)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 0, 36*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(baraduke_state, screen_update_baraduke)
 	MCFG_SCREEN_VBLANK_DRIVER(baraduke_state, screen_eof_baraduke)
 
@@ -402,7 +399,7 @@ static MACHINE_CONFIG_START( baraduke, baraduke_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
+	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL_49_152MHz/2048)
 	MCFG_SOUND_CONFIG(namco_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

@@ -4309,7 +4309,7 @@ public:
 	void process(int samples);
 
 	/* access to the discrete_logging facility */
-	void CLIB_DECL ATTR_PRINTF(2,3) discrete_log(const char *text, ...) const;
+	void CLIB_DECL discrete_log(const char *text, ...) const ATTR_PRINTF(2,3);
 
 	/* get pointer to a info struct node ref */
 	const double *node_output_ptr(int onode);

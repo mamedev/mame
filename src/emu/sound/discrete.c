@@ -464,7 +464,7 @@ const double *discrete_device::node_output_ptr(int onode)
 //  discrete_log: Debug logging
 //-------------------------------------------------
 
-void CLIB_DECL ATTR_PRINTF(2,3) discrete_device::discrete_log(const char *text, ...) const
+void CLIB_DECL discrete_device::discrete_log(const char *text, ...) const
 {
 	if (DISCRETE_DEBUGLOG)
 	{

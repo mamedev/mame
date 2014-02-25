@@ -151,7 +151,7 @@ void legacy_cpu_device::device_start()
 		if (string != NULL && string[0] != 0)
 		{
 			astring flagstr;
-			flagstr.printf("%%%ds", strlen(string));
+			flagstr.printf("%%%"SIZETFMT"s", strlen(string));
 			state_add(STATE_GENFLAGS, "GENFLAGS", m_state_io).callimport().callexport().formatstr(flagstr).noshow();
 		}
 	}

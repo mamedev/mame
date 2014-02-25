@@ -123,7 +123,10 @@ void baraduke_state::video_start()
 	m_bg_tilemap[0]->set_transparent_pen(7);
 	m_bg_tilemap[1]->set_transparent_pen(7);
 
-	m_tx_tilemap->set_scrolldx(0,512-288);
+	m_bg_tilemap[0]->set_scrolldx(-26, -227+26);
+	m_bg_tilemap[1]->set_scrolldx(-24, -227+24);
+	m_bg_tilemap[0]->set_scrolldy(-9, 9);
+	m_bg_tilemap[1]->set_scrolldy(-9, 9);	
 	m_tx_tilemap->set_scrolldy(16,16);
 }
 
@@ -284,14 +287,12 @@ void baraduke_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void baraduke_state::set_scroll(int layer)
 {
-	static const int xdisp[2] = { 26, 24 };
-	int scrollx, scrolly;
+	int scrollx = m_xscroll[layer];
+	int scrolly = m_yscroll[layer];
 
-	scrollx = m_xscroll[layer] + xdisp[layer];
-	scrolly = m_yscroll[layer] + 9;
 	if (flip_screen())
 	{
-		scrollx = -scrollx + 3;
+		scrollx = -scrollx;
 		scrolly = -scrolly;
 	}
 
@@ -306,9 +307,7 @@ UINT32 baraduke_state::screen_update_baraduke(screen_device &screen, bitmap_ind1
 	int back;
 
 	/* flip screen is embedded in the sprite control registers */
-	/* can't use flip_screen_set() because the visible area is asymmetrical */
-	flip_screen_set_no_update(spriteram[0x07f6] & 0x01);
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	flip_screen_set(spriteram[0x07f6] & 0x01);
 	set_scroll(0);
 	set_scroll(1);
 

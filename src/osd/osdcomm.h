@@ -164,6 +164,12 @@ __extension__ typedef signed long long      INT64;
 #define I64FMT   "ll"
 #endif
 
+#if defined(_MSVC_VER) || defined(__MINGW32__)
+#define SIZETFMT   "I64u"
+#else
+#define SIZETFMT   "zu"
+#endif
+
 
 /* Highly useful macro for compile-time knowledge of an array size */
 #define ARRAY_LENGTH(x)     (sizeof(x) / sizeof(x[0]))

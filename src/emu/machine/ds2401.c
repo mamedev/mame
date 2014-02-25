@@ -11,7 +11,7 @@
 
 #define VERBOSE_LEVEL 0
 
-inline void ATTR_PRINTF(3,4) ds2401_device::verboselog(int n_level, const char *s_fmt, ...)
+inline void ds2401_device::verboselog(int n_level, const char *s_fmt, ...)
 {
 	if(VERBOSE_LEVEL >= n_level)
 	{

@@ -301,7 +301,7 @@ class emu_exception : public std::exception { };
 class emu_fatalerror : public emu_exception
 {
 public:
-	emu_fatalerror(const char *format, ...)
+	emu_fatalerror(const char *format, ...) ATTR_PRINTF(2,3)
 		: code(0)
 	{
 		va_list ap;
@@ -318,7 +318,7 @@ public:
 		osd_break_into_debugger(text);
 	}
 
-	emu_fatalerror(int _exitcode, const char *format, ...)
+	emu_fatalerror(int _exitcode, const char *format, ...) ATTR_PRINTF(3,4)
 		: code(_exitcode)
 	{
 		va_list ap;

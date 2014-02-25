@@ -47,11 +47,7 @@ public:
 	netlist_param_double_t m_freq;
 	netlist_time m_inc;
 
-#if 0
-    ATTR_HOT inline static void mc_update(netlist_net_t &net, const netlist_time curtime);
-#else
     ATTR_HOT inline static void mc_update(netlist_net_t &net);
-#endif
 );
 
 // ----------------------------------------------------------------------------------------

@@ -37,7 +37,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ...);
+	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	void lcd_spi_reset( );
 	void lcd_spi_init( );
 	void lcd_spi_line_w( int line, int data);
@@ -58,7 +58,7 @@ enum
 	LCD_SPI_LINE_3
 };
 
-inline void ATTR_PRINTF(3,4) hp49gp_state::verboselog( int n_level, const char *s_fmt, ...)
+inline void hp49gp_state::verboselog(int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{

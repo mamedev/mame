@@ -89,7 +89,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(palmz22_input_changed);
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ...);
+	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	DECLARE_WRITE8_MEMBER( s3c2410_nand_command_w );
 	DECLARE_WRITE8_MEMBER( s3c2410_nand_address_w );
 	DECLARE_READ8_MEMBER( s3c2410_nand_data_r );
@@ -102,7 +102,7 @@ public:
 };
 
 
-inline void ATTR_PRINTF(3,4) palmz22_state::verboselog( int n_level, const char *s_fmt, ...)
+inline void palmz22_state::verboselog(int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{

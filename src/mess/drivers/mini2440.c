@@ -39,7 +39,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ...);
+	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	DECLARE_READ32_MEMBER(s3c2440_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c2440_gpio_port_w);
 	DECLARE_READ32_MEMBER(s3c2440_core_pin_r);
@@ -52,7 +52,7 @@ public:
 
 };
 
-inline void ATTR_PRINTF(3,4) mini2440_state::verboselog( int n_level, const char *s_fmt, ...)
+inline void mini2440_state::verboselog(int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{

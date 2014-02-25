@@ -162,7 +162,7 @@ protected:
 	void vii_blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 bitmap_addr, UINT16 *regs);
 	void vii_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 base_addr);
 	void vii_blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth);
-	inline void verboselog(int n_level, const char *s_fmt, ...);
+	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	inline UINT8 expand_rgb5_to_rgb8(UINT8 val);
 	inline UINT8 vii_mix_channel(UINT8 a, UINT8 b);
 	void vii_mix_pixel(UINT32 offset, UINT16 rgb);
@@ -188,9 +188,9 @@ enum
 
 #define ENABLE_VERBOSE_LOG (1)
 
-#if ENABLE_VERBOSE_LOG
 inline void vii_state::verboselog(int n_level, const char *s_fmt, ...)
 {
+#if ENABLE_VERBOSE_LOG
 	if( VERBOSE_LEVEL >= n_level )
 	{
 		va_list v;
@@ -199,10 +199,8 @@ inline void vii_state::verboselog(int n_level, const char *s_fmt, ...)
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
 	}
-}
-#else
-#define verboselog(x,y,z,...)
 #endif
+}
 
 /*************************
 *     Video Hardware     *

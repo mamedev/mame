@@ -218,7 +218,7 @@ public:
 	TIMER_CALLBACK_MEMBER(supracan_line_off_callback);
 	TIMER_CALLBACK_MEMBER(supracan_video_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(supracan_cart);
-	inline void verboselog(const char *tag, int n_level, const char *s_fmt, ...);
+	inline void verboselog(const char *tag, int n_level, const char *s_fmt, ...) ATTR_PRINTF(4,5);
 	int supracan_tilemap_get_region(int layer);
 	void supracan_tilemap_get_info_common(int layer, tile_data &tileinfo, int count);
 	void supracan_tilemap_get_info_roz(int layer, tile_data &tileinfo, int count);
@@ -231,9 +231,9 @@ public:
 
 
 
-#if ENABLE_VERBOSE_LOG
 inline void supracan_state::verboselog(const char *tag, int n_level, const char *s_fmt, ...)
 {
+#if ENABLE_VERBOSE_LOG
 	if( VERBOSE_LEVEL >= n_level )
 	{
 		va_list v;
@@ -243,11 +243,8 @@ inline void supracan_state::verboselog(const char *tag, int n_level, const char 
 		va_end( v );
 		logerror( "%06x: %s: %s", machine().device(tag)->safe_pc(), tag, buf );
 	}
-}
-
-#else
-#define verboselog(w,x,y,z,...)
 #endif
+}
 
 int supracan_state::supracan_tilemap_get_region(int layer)
 {

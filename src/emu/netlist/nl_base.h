@@ -1058,9 +1058,9 @@ public:
 
     ATTR_COLD netlist_net_t *find_net(const pstring &name);
 
-    ATTR_COLD void error(const char *format, ...) const;
-    ATTR_COLD void warning(const char *format, ...) const;
-    ATTR_COLD void log(const char *format, ...) const;
+    ATTR_COLD void error(const char *format, ...) const ATTR_PRINTF(2,3);
+    ATTR_COLD void warning(const char *format, ...) const ATTR_PRINTF(2,3);
+    ATTR_COLD void log(const char *format, ...) const ATTR_PRINTF(2,3);
 
     template<class _C>
     netlist_list_t<_C *> get_device_list()

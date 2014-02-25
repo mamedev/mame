@@ -72,6 +72,12 @@ static const char g_version[] = "4.90";
 /* ============================= CONFIGURATION ============================ */
 /* ======================================================================== */
 
+#if defined(__GNUC__) && (__GNUC__ >= 3)
+#define ATTR_PRINTF(x,y)        __attribute__((format(printf, x, y)))
+#else
+#define ATTR_PRINTF(x,y)
+#endif
+
 #define M68K_MAX_PATH 1024
 #define M68K_MAX_DIR  1024
 
@@ -218,8 +224,8 @@ struct replace_struct
 
 
 /* Function Prototypes */
-static void error_exit(const char* fmt, ...);
-static void perror_exit(const char* fmt, ...);
+static void error_exit(const char* fmt, ...) ATTR_PRINTF(1,2);
+static void perror_exit(const char* fmt, ...) ATTR_PRINTF(1,2);
 static int check_strsncpy(char* dst, char* src, int maxlength);
 static int check_atoi(char* str, int *result);
 static int skip_spaces(char* str);
