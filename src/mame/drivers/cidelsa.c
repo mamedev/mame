@@ -25,7 +25,7 @@ static COSMAC_INTERFACE( cidelsa_cdp1802_config )
 	DEVCB_DRIVER_LINE_MEMBER(cidelsa_state, q_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };

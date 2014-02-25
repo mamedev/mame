@@ -460,45 +460,6 @@ READ_LINE_MEMBER( comx35_state::ef4_r )
 	return m_exp->ef4_r(); // | (m_cassette->input() > 0.0f);
 }
 
-static COSMAC_SC_WRITE( comx35_sc_w )
-{
-	comx35_state *state = device->machine().driver_data<comx35_state>();
-
-	switch (sc)
-	{
-	case COSMAC_STATE_CODE_S0_FETCH:
-		// not connected
-		break;
-
-	case COSMAC_STATE_CODE_S1_EXECUTE:
-		// every other S1 triggers a DMAOUT request
-		if (state->m_dma)
-		{
-			state->m_dma = 0;
-
-			if (!state->m_iden)
-			{
-				state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAOUT, ASSERT_LINE);
-			}
-		}
-		else
-		{
-			state->m_dma = 1;
-		}
-		break;
-
-	case COSMAC_STATE_CODE_S2_DMA:
-		// DMA acknowledge clears the DMAOUT request
-		state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
-		break;
-
-	case COSMAC_STATE_CODE_S3_INTERRUPT:
-		// interrupt acknowledge clears the INT request
-		state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, CLEAR_LINE);
-		break;
-	}
-}
-
 WRITE_LINE_MEMBER( comx35_state::q_w )
 {
 	m_q = state;
@@ -516,6 +477,43 @@ WRITE_LINE_MEMBER( comx35_state::q_w )
 	m_exp->q_w(state);
 }
 
+WRITE8_MEMBER( comx35_state::sc_w )
+{
+	switch (data)
+	{
+	case COSMAC_STATE_CODE_S0_FETCH:
+		// not connected
+		break;
+
+	case COSMAC_STATE_CODE_S1_EXECUTE:
+		// every other S1 triggers a DMAOUT request
+		if (m_dma)
+		{
+			m_dma = 0;
+
+			if (!m_iden)
+			{
+				m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAOUT, ASSERT_LINE);
+			}
+		}
+		else
+		{
+			m_dma = 1;
+		}
+		break;
+
+	case COSMAC_STATE_CODE_S2_DMA:
+		// DMA acknowledge clears the DMAOUT request
+		m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		break;
+
+	case COSMAC_STATE_CODE_S3_INTERRUPT:
+		// interrupt acknowledge clears the INT request
+		m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, CLEAR_LINE);
+		break;
+	}
+}
+
 static COSMAC_INTERFACE( cosmac_intf )
 {
 	DEVCB_LINE_VCC,                                 // wait
@@ -527,7 +525,7 @@ static COSMAC_INTERFACE( cosmac_intf )
 	DEVCB_DRIVER_LINE_MEMBER(comx35_state, q_w),    // Q
 	DEVCB_NULL,                                     // DMA in
 	DEVCB_NULL,                                     // DMA out
-	comx35_sc_w,                                    // SC
+	DEVCB_DRIVER_MEMBER(comx35_state, sc_w),        // SC
 	DEVCB_NULL,                                     // TPA
 	DEVCB_NULL                                      // TPB
 };

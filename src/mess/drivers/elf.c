@@ -149,23 +149,6 @@ READ_LINE_MEMBER( elf2_state::ef4_r )
 	return INPUT;
 }
 
-static COSMAC_SC_WRITE( elf2_sc_w )
-{
-	elf2_state *state = device->machine().driver_data<elf2_state>();
-
-	switch (sc)
-	{
-	case COSMAC_STATE_CODE_S2_DMA:
-	case COSMAC_STATE_CODE_S3_INTERRUPT:
-		/* clear DMAIN */
-		state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
-		break;
-
-	default:
-		break;
-	}
-}
-
 WRITE_LINE_MEMBER( elf2_state::q_w )
 {
 	output_set_led_value(0, state);
@@ -174,6 +157,21 @@ WRITE_LINE_MEMBER( elf2_state::q_w )
 READ8_MEMBER( elf2_state::dma_r )
 {
 	return m_data;
+}
+
+WRITE8_MEMBER( elf2_state::sc_w )
+{
+	switch (data)
+	{
+	case COSMAC_STATE_CODE_S2_DMA:
+	case COSMAC_STATE_CODE_S3_INTERRUPT:
+		/* clear DMAIN */
+		m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
+		break;
+
+	default:
+		break;
+	}
 }
 
 static COSMAC_INTERFACE( elf2_config )
@@ -187,7 +185,7 @@ static COSMAC_INTERFACE( elf2_config )
 	DEVCB_DRIVER_LINE_MEMBER(elf2_state, q_w),
 	DEVCB_DRIVER_MEMBER(elf2_state, dma_r),
 	DEVCB_DEVICE_MEMBER(CDP1861_TAG, cdp1861_device, dma_w),
-	elf2_sc_w,
+	DEVCB_DRIVER_MEMBER(elf2_state, sc_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
