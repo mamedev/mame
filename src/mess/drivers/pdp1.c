@@ -1821,7 +1821,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 		}
 		if (control_transitions & pdp1_start_nobrk)
 		{
-			pdp1_pulse_start_clear(m_maincpu);    /* pulse Start Clear line */
+			m_maincpu->pulse_start_clear();    /* pulse Start Clear line */
 			m_maincpu->set_state_int(PDP1_EXD, m_maincpu->state_int(PDP1_EXTEND_SW));
 			m_maincpu->set_state_int(PDP1_SBM, (UINT64)0);
 			m_maincpu->set_state_int(PDP1_OV, (UINT64)0);
@@ -1830,7 +1830,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 		}
 		if (control_transitions & pdp1_start_brk)
 		{
-			pdp1_pulse_start_clear(m_maincpu);    /* pulse Start Clear line */
+			m_maincpu->pulse_start_clear();    /* pulse Start Clear line */
 			m_maincpu->set_state_int(PDP1_EXD, m_maincpu->state_int(PDP1_EXTEND_SW));
 			m_maincpu->set_state_int(PDP1_SBM, 1);
 			m_maincpu->set_state_int(PDP1_OV, (UINT64)0);
@@ -1850,7 +1850,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 		}
 		if (control_transitions & pdp1_examine)
 		{
-			pdp1_pulse_start_clear(m_maincpu);    /* pulse Start Clear line */
+			m_maincpu->pulse_start_clear();    /* pulse Start Clear line */
 			m_maincpu->set_state_int(PDP1_PC, m_maincpu->state_int(PDP1_TA));
 			m_maincpu->set_state_int(PDP1_MA, m_maincpu->state_int(PDP1_PC));
 			m_maincpu->set_state_int(PDP1_IR, LAC); /* this instruction is actually executed */
@@ -1860,7 +1860,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 		}
 		if (control_transitions & pdp1_deposit)
 		{
-			pdp1_pulse_start_clear(m_maincpu);    /* pulse Start Clear line */
+			m_maincpu->pulse_start_clear();    /* pulse Start Clear line */
 			m_maincpu->set_state_int(PDP1_PC, m_maincpu->state_int(PDP1_TA));
 			m_maincpu->set_state_int(PDP1_MA, m_maincpu->state_int(PDP1_PC));
 			m_maincpu->set_state_int(PDP1_AC, m_maincpu->state_int(PDP1_TW));
@@ -1871,7 +1871,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 		}
 		if (control_transitions & pdp1_read_in)
 		{   /* set cpu to read instructions from perforated tape */
-			pdp1_pulse_start_clear(m_maincpu);    /* pulse Start Clear line */
+			m_maincpu->pulse_start_clear();    /* pulse Start Clear line */
 			m_maincpu->set_state_int(PDP1_PC, (  m_maincpu->state_int(PDP1_TA) & 0170000)
 										|  (m_maincpu->state_int(PDP1_PC) & 0007777));  /* transfer ETA to EPC */
 			/*m_maincpu->set_state_int(PDP1_MA, m_maincpu->state_int(PDP1_PC));*/
