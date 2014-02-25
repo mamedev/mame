@@ -570,6 +570,7 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",galpanic,"palette")
 	MCFG_PALETTE_ADD("palette", 1024 + 32768)
+	MCFG_PALETTE_INIT_OWNER(galpanic_state,galpanic)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", galpanic_pandora_config)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
@@ -580,7 +581,6 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 
 
 
-	MCFG_PALETTE_INIT_OWNER(galpanic_state,galpanic)
 	MCFG_VIDEO_START_OVERRIDE(galpanic_state,galpanic)
 
 	/* sound hardware */

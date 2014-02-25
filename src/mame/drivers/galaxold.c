@@ -2347,12 +2347,12 @@ static MACHINE_CONFIG_START( galaxold_base, galaxold_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode",galaxian,"palette")
 	MCFG_PALETTE_ADD("palette", 32+2+64)        /* 32 for the characters, 2 for the bullets, 64 for the stars */
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,galaxold)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 
-	MCFG_PALETTE_INIT_OWNER(galaxold_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,galaxold)
 
 	/* sound hardware */
@@ -2403,6 +2403,7 @@ static MACHINE_CONFIG_DERIVED( scramblb, galaxian )
 	MCFG_CPU_PROGRAM_MAP(scramblb_map)
 
 	/* video hardware */
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
@@ -2417,6 +2418,7 @@ static MACHINE_CONFIG_DERIVED( scramb2, galaxian )
 	MCFG_CPU_PROGRAM_MAP(scramb2_map)
 
 	/* video hardware */
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
@@ -2431,6 +2433,7 @@ static MACHINE_CONFIG_DERIVED( scrambler, galaxian )
 	MCFG_CPU_PROGRAM_MAP(scrambler_map)
 
 	/* video hardware */
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
@@ -2445,6 +2448,7 @@ static MACHINE_CONFIG_DERIVED( guttang, galaxian )
 	MCFG_CPU_PROGRAM_MAP(guttang_map)
 
 	/* video hardware */
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
 //  MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
@@ -2498,6 +2502,7 @@ static MACHINE_CONFIG_DERIVED( rockclim, galaxian )
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,rockclim)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 64+64+2)    /* 64 colors only, but still uses bullets so we need to keep the palette big */
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
@@ -2517,8 +2522,9 @@ static MACHINE_CONFIG_DERIVED( ozon1, galaxold_base )
 	MCFG_MACHINE_RESET_REMOVE()
 
 	/* video hardware */
-	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ozon1)
 	MCFG_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
@@ -2541,11 +2547,11 @@ static MACHINE_CONFIG_START( drivfrcg, galaxold_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
-
+	
 	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_GFXDECODE_ADD("gfxdecode",gmgalax,"palette")
-
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
+
+	MCFG_GFXDECODE_ADD("gfxdecode",gmgalax,"palette")
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,drivfrcg)
 
@@ -2612,12 +2618,12 @@ static MACHINE_CONFIG_START( racknrol, galaxold_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode",galaxian,"palette")
 	MCFG_PALETTE_ADD("palette", 32)
-
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 
-	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
 	/* sound hardware */
@@ -2637,12 +2643,12 @@ static MACHINE_CONFIG_START( hexpoola, galaxold_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",galaxian,"palette")
 	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxold_state, screen_update_galaxold)
 
-	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
 	/* sound hardware */

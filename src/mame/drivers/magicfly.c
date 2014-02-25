@@ -983,6 +983,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( bchance, magicfly )
 
 	/* video hardware */
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(magicfly_state, bchance)
 
 MACHINE_CONFIG_END

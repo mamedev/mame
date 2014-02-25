@@ -425,6 +425,7 @@ static MACHINE_CONFIG_DERIVED( popeyebl, popeye )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(popeyebl_map)
 
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(popeye_state,popeyebl)
 MACHINE_CONFIG_END
 

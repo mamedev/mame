@@ -492,6 +492,7 @@ static MACHINE_CONFIG_DERIVED( pleiads, phoenix )
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pleiads)
 
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,pleiads)
 
 	/* sound hardware */

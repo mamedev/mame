@@ -329,6 +329,7 @@ static MACHINE_CONFIG_DERIVED( shtrider, travrusa )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(travrusa_state,shtrider)
 MACHINE_CONFIG_END
 

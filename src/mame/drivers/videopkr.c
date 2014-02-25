@@ -1316,6 +1316,7 @@ static MACHINE_CONFIG_DERIVED( babypkr, videopkr )
 	MCFG_SCREEN_SIZE(32*16, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(5*16, 31*16-1, 3*8, 29*8-1)
 
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(videopkr_state,babypkr)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", videodad)
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
@@ -1331,6 +1332,7 @@ static MACHINE_CONFIG_DERIVED( fortune1, videopkr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(CPU_CLOCK_ALT)
 
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(videopkr_state,fortune1)
 MACHINE_CONFIG_END
 

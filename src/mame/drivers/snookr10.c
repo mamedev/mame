@@ -1058,6 +1058,7 @@ static MACHINE_CONFIG_DERIVED( apple10, snookr10 )
 	MCFG_CPU_MODIFY("maincpu")
 
 	/* video hardware */
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(snookr10_state, apple10)
 	MCFG_VIDEO_START_OVERRIDE(snookr10_state, apple10)
 
@@ -1077,6 +1078,7 @@ static MACHINE_CONFIG_DERIVED( crystalc, snookr10 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(crystalc_map)
 
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(snookr10_state, crystalc)
 	MCFG_VIDEO_START_OVERRIDE(snookr10_state, crystalc)
 

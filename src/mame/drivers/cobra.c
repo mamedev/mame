@@ -3213,8 +3213,8 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
-	MCFG_PALETTE_ADD("palette", 65536)
 	MCFG_SCREEN_UPDATE_DRIVER(cobra_state, screen_update_cobra)
+	MCFG_PALETTE_ADD("palette", 65536)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

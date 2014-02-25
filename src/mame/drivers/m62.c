@@ -985,6 +985,7 @@ static MACHINE_CONFIG_DERIVED( battroad, ldrun )
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_battroad)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", battroad)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 544)
 
 	MCFG_PALETTE_INIT_OWNER(m62_state,battroad)

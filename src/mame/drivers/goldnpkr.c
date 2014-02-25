@@ -3790,6 +3790,7 @@ static MACHINE_CONFIG_DERIVED( witchcrd, goldnpkr_base )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* video hardware */
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state,witchcrd)
 
 	/* sound hardware */
@@ -3813,6 +3814,7 @@ static MACHINE_CONFIG_DERIVED( wcfalcon, goldnpkr_base )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, wcfalcon_snd_w)) /* port A out, custom handler due to address + data are muxed */
 
 	/* video hardware */
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state,witchcrd)
 
 	/* sound hardware */
@@ -3835,6 +3837,7 @@ static MACHINE_CONFIG_DERIVED( wildcard, goldnpkr_base )
 
 	/* video hardware */
 //  MCFG_GFXDECODE_MODIFY("gfxdecode", wildcard)
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state,witchcrd)
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
@@ -3858,6 +3861,7 @@ static MACHINE_CONFIG_DERIVED( wcrdxtnd, goldnpkr_base )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", wcrdxtnd)
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state,wcrdxtnd)
 	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wcrdxtnd)
 
@@ -3887,6 +3891,7 @@ static MACHINE_CONFIG_DERIVED( wildcrdb, goldnpkr_base )
 
 	/* video hardware */
 //  MCFG_GFXDECODE_MODIFY("gfxdecode", wildcard)
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state,witchcrd)
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
@@ -3909,6 +3914,7 @@ static MACHINE_CONFIG_DERIVED( genie, goldnpkr_base )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* video hardware */
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state,witchcrd)
 
 	/* sound hardware */

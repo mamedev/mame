@@ -1065,6 +1065,7 @@ static MACHINE_CONFIG_DERIVED( kingdrbb, kingdrby )
 	MCFG_CPU_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(slave_1986_map)
 
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrbb)
 
 	MCFG_DEVICE_REMOVE("ppi8255_0")
@@ -1080,6 +1081,7 @@ static MACHINE_CONFIG_DERIVED( cowrace, kingdrbb )
 	MCFG_CPU_IO_MAP(cowrace_sound_io)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cowrace)
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

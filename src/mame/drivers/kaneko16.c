@@ -1635,6 +1635,7 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",1x4bit_1x4bit,"palette")
 	MCFG_PALETTE_ADD("palette", 2048 + 32768)   /* 32768 static colors for the bg */
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	MCFG_PALETTE_INIT_OWNER(kaneko16_berlwall_state,berlwall)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
@@ -1645,8 +1646,6 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 	kaneko16_sprite_device::set_altspacing(*device, 1);
 	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
-
-	MCFG_PALETTE_INIT_OWNER(kaneko16_berlwall_state,berlwall)
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_berlwall_state,berlwall)
 
 	/* sound hardware */

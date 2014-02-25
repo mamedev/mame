@@ -469,6 +469,7 @@ static MACHINE_CONFIG_DERIVED( rougien, mermaid )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rougien_map)
 
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(mermaid_state,rougien)
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, 384000)

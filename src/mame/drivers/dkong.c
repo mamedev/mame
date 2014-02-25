@@ -1761,6 +1761,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( dkong3b, dkongjr )
 
 	/* basic machine hardware */
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong3)
 MACHINE_CONFIG_END
 

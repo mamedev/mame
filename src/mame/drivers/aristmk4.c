@@ -1772,6 +1772,7 @@ PALETTE_INIT_MEMBER(aristmk4_state,lions)
 }
 
 static MACHINE_CONFIG_DERIVED( 86lions, aristmk4 )
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(aristmk4_state,lions)
 MACHINE_CONFIG_END
 

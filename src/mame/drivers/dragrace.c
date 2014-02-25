@@ -339,6 +339,7 @@ static MACHINE_CONFIG_START( dragrace, dragrace_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dragrace_state, screen_update_dragrace)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",dragrace,"palette")
+	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(dragrace_state, dragrace)
 
 	/* sound hardware */

@@ -6680,12 +6680,12 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",ncb3,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)

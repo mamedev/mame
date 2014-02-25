@@ -5618,6 +5618,7 @@ static MACHINE_CONFIG_DERIVED( moonwar, scobra )
 	MCFG_I8255A_ADD( "ppi8255_0", moonwar_ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", konami_ppi8255_1_intf )
 
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(galaxian_state,moonwar) // bullets are less yellow
 MACHINE_CONFIG_END
 

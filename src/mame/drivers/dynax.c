@@ -4455,6 +4455,7 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 	MCFG_DEFAULT_LAYOUT(layout_dualhuov)
 
 	MCFG_SCREEN_ADD("top", RASTER)
@@ -4471,7 +4472,6 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_jantouki_bottom)
 
-	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,jantouki)
 
 	/* sound hardware */
@@ -4497,6 +4497,7 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( janyuki, jantouki )
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(dynax_state,janyuki)         // static palette
 MACHINE_CONFIG_END
 

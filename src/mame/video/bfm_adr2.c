@@ -119,7 +119,7 @@ bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char 
 	: device_t(mconfig, BFM_ADDER2, "BFM ADDER2", tag, owner, clock, "bfm_adder2", __FILE__),
 		m_cpu(*this, "adder2"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "^^palette")
+		m_palette(*this, "palette")
 {
 }
 

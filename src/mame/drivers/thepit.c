@@ -769,6 +769,7 @@ static MACHINE_CONFIG_DERIVED( suprmous, intrepid )
 	/* basic machine hardware */
 
 	/* video hardware */
+	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(thepit_state,suprmous)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", suprmous)
 MACHINE_CONFIG_END
