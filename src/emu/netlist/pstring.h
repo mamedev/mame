@@ -167,7 +167,7 @@ public:
 	pstring vprintf(va_list args) const;
 
 	// static
-	static pstring sprintf(const char *format, ...);
+	static pstring sprintf(const char *format, ...) ATTR_PRINTF(1,2);
 	static void resetmem();
 
 protected:

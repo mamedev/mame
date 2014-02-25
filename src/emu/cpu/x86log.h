@@ -35,7 +35,7 @@ x86log_context *x86log_create_context(const char *filename);
 void x86log_free_context(x86log_context *log);
 
 /* add a comment associated with a given code pointer */
-void x86log_add_comment(x86log_context *log, x86code *base, const char *format, ...) ATTR_PRINTF(3, 4);
+void x86log_add_comment(x86log_context *log, x86code *base, const char *format, ...) ATTR_PRINTF(3,4);
 
 /* mark a given range as data for logging purposes */
 void x86log_mark_as_data(x86log_context *log, x86code *base, x86code *end, int size);
@@ -44,7 +44,7 @@ void x86log_mark_as_data(x86log_context *log, x86code *base, x86code *end, int s
 void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *start, x86code *stop);
 
 /* manually printf information to the log file */
-void x86log_printf(x86log_context *log, const char *format, ...) ATTR_PRINTF(2, 3);
+void x86log_printf(x86log_context *log, const char *format, ...) ATTR_PRINTF(2,3);
 
 
 #endif  /* __X86LOG_H__ */

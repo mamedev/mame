@@ -132,7 +132,7 @@ public:
 	UINT32 write(const void *buffer, UINT32 length);
 	int puts(const char *s);
 	int vprintf(const char *fmt, va_list va);
-	int printf(const char *fmt, ...);
+	int printf(const char *fmt, ...) ATTR_PRINTF(2,3);
 
 private:
 	bool compressed_file_ready(void);

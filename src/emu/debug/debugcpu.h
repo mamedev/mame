@@ -205,7 +205,7 @@ public:
 	void go_exception(int exception);
 	void go_milliseconds(UINT64 milliseconds);
 	void go_next_device();
-	void halt_on_next_instruction(const char *fmt, ...);
+	void halt_on_next_instruction(const char *fmt, ...) ATTR_PRINTF(2,3);
 
 	// breakpoints
 	breakpoint *breakpoint_first() const { return m_bplist; }
@@ -263,7 +263,7 @@ public:
 
 	// tracing
 	void trace(FILE *file, bool trace_over, const char *action);
-	void trace_printf(const char *fmt, ...);
+	void trace_printf(const char *fmt, ...) ATTR_PRINTF(2,3);
 	void trace_flush() { if (m_trace != NULL) m_trace->flush(); }
 
 	void reset_transient_flag() { m_flags &= ~DEBUG_FLAG_TRANSIENT; }
