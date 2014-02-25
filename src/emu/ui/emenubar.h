@@ -46,6 +46,7 @@ private:
 	void bitbanger_control(bitbanger_device *image);
 	void load(device_image_interface *image);
 	bool has_images();
+	void set_throttle_rate(float throttle_rate);
 
 	// template methods
 	template<class _Menu>

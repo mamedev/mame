@@ -282,7 +282,7 @@ void ui_emu_menubar::build_options_menu()
 			item = menu_text;
 		}
 
-		menu_item &menu = throttle_menu.append(item, &video_manager::set_throttle_rate, machine().video(), throttle_rates[i]);
+		menu_item &menu = throttle_menu.append(item, &ui_emu_menubar::set_throttle_rate, *this, throttle_rates[i]);
 		menu.set_checked(machine().video().throttle_rate() == throttle_rates[i]);
 	}
 
@@ -597,4 +597,16 @@ bool ui_emu_menubar::has_images()
 {
 	image_interface_iterator iter(machine().root_device());
 	return iter.first() != NULL;
+}
+
+
+//-------------------------------------------------
+//  set_throttle_rate
+//-------------------------------------------------
+
+void ui_emu_menubar::set_throttle_rate(float throttle_rate)
+{
+	machine().video().set_throttled(throttle_rate != 0.0);
+	if (throttle_rate != 0.0)
+		machine().video().set_throttle_rate(throttle_rate);
 }
