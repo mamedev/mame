@@ -230,7 +230,7 @@ static MACHINE_CONFIG_START( xyonix, xyonix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",xyonix,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_PALETTE_INIT_OWNER(xyonix_state, xyonix)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

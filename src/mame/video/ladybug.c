@@ -63,7 +63,7 @@ static void palette_init_common( palette_device &palette, const UINT8 *color_pro
 		bit1 = (~color_prom[i] >> b_bit1) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine.colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -73,7 +73,7 @@ static void palette_init_common( palette_device &palette, const UINT8 *color_pro
 	for (i = 0; i < 0x20; i++)
 	{
 		UINT8 ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites */
@@ -82,10 +82,10 @@ static void palette_init_common( palette_device &palette, const UINT8 *color_pro
 		UINT8 ctabentry = color_prom[(i - 0x20) >> 1];
 
 		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 0) & 0x0f, 7,6,5,4,0,1,2,3);
-		colortable_entry_set_value(machine.colortable, i + 0x00, ctabentry);
+		palette.set_pen_indirect(i + 0x00, ctabentry);
 
 		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 4) & 0x0f, 7,6,5,4,0,1,2,3);
-		colortable_entry_set_value(machine.colortable, i + 0x20, ctabentry);
+		palette.set_pen_indirect(i + 0x20, ctabentry);
 	}
 }
 

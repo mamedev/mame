@@ -122,7 +122,7 @@ public:
 	DECLARE_DRIVER_INIT(cyclemb);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(cyclemb);
 	UINT32 screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -918,7 +918,7 @@ static MACHINE_CONFIG_START( cyclemb, cyclemb_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",cyclemb,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_PALETTE_INIT_OWNER(cyclemb_state, cyclemb)
 
 
 	/* sound hardware */

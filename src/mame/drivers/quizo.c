@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_DRIVER_INIT(quizo);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(quizo);
 	UINT32 screen_update_quizo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
@@ -221,6 +221,7 @@ static MACHINE_CONFIG_START( quizo, quizo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(quizo_state, screen_update_quizo)
 
 	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(quizo_state, quizo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

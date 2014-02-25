@@ -52,7 +52,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(superdq);
 	UINT32 screen_update_superdq(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superdq_vblank);
 	required_device<cpu_device> m_maincpu;
@@ -170,9 +170,9 @@ WRITE8_MEMBER(superdq_state::superdq_io_w)
 	{
 		int index = black_color_entries[i];
 		if (data & 0x80)
-			m_palette->set_pen_color(index) & rgb_t(0,255,255,255));
+			m_palette->set_pen_color(index, m_palette->pen_color(index) & rgb_t(0,255,255,255));
 		else
-			m_palette->set_pen_color(index) | rgb_t(255,0,0,0));
+			m_palette->set_pen_color(index, m_palette->pen_color(index) | rgb_t(255,0,0,0));
 	}
 
 	/*
@@ -337,7 +337,7 @@ static MACHINE_CONFIG_START( superdq, superdq_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",superdq,"palette")
 	MCFG_PALETTE_ADD("palette", 32)
-
+	MCFG_PALETTE_INIT_OWNER(superdq_state, superdq)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

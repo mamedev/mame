@@ -196,7 +196,7 @@ static MACHINE_CONFIG_START( mrjong, mrjong_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",mrjong,"palette")
 	MCFG_PALETTE_ADD("palette", 4*32)
-
+	MCFG_PALETTE_INIT_OWNER(mrjong_state, mrjong)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

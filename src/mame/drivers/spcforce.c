@@ -280,6 +280,7 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",spcforce,"palette")
 	MCFG_PALETTE_ADD("palette", sizeof(colortable_source) / sizeof(colortable_source[0]))
+	MCFG_PALETTE_INIT_OWNER(spcforce_state, spcforce)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

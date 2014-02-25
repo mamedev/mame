@@ -128,7 +128,7 @@ public:
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(vpoker);
 	UINT32 screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -675,7 +675,7 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",vpoker,"palette")
 	MCFG_PALETTE_ADD("palette", 8)
-
+	MCFG_PALETTE_INIT_OWNER(vpoker_state, vpoker)
 
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("6840ptm", ptm_intf)

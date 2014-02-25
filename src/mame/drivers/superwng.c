@@ -74,7 +74,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(superwng);
 	UINT32 screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
@@ -482,6 +482,7 @@ static MACHINE_CONFIG_START( superwng, superwng_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",superwng,"palette")
 
 	MCFG_PALETTE_ADD("palette", 0x40)
+	MCFG_PALETTE_INIT_OWNER(superwng_state, superwng)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

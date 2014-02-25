@@ -116,7 +116,7 @@ public:
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(statriv2);
 	DECLARE_VIDEO_START(vertical);
 	UINT32 screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
@@ -627,7 +627,7 @@ static MACHINE_CONFIG_START( statriv2, statriv2_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",horizontal,"palette")
 	MCFG_PALETTE_ADD("palette", 2*64)
-
+	MCFG_PALETTE_INIT_OWNER(statriv2_state, statriv2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -506,7 +506,7 @@ UINT32 mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			{
 				dot|= m_vregs[1] << 4;
 
-				bitmap.pix32(y,x) = machine().pens[dot];
+				bitmap.pix32(y,x) = m_palette->pen(dot);
 			}
 		}
 	}

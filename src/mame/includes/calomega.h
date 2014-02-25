@@ -44,10 +44,9 @@ public:
 	DECLARE_DRIVER_INIT(jjpoker);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	UINT32 screen_update_calomega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
+	DECLARE_PALETTE_INIT(calomega);
 protected:
 	virtual void video_start();
-	virtual void palette_init();
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(update_aciabaud);

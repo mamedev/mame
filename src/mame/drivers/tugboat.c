@@ -59,7 +59,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(tugboat);
 	UINT32 screen_update_tugboat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
 		int addr,int gfx0,int gfx1,int transparency);
@@ -362,6 +362,7 @@ static MACHINE_CONFIG_START( tugboat, tugboat_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tugboat,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(tugboat_state, tugboat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

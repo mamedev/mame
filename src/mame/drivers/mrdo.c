@@ -178,7 +178,7 @@ static MACHINE_CONFIG_START( mrdo, mrdo_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",mrdo,"palette")
 	MCFG_PALETTE_ADD("palette", 64*4+16*4)
-
+	MCFG_PALETTE_INIT_OWNER(mrdo_state, mrdo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

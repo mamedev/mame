@@ -252,6 +252,7 @@ static MACHINE_CONFIG_START( tinvader, zac2650_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tinvader,"palette")
 	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(zac2650_state, zac2650)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

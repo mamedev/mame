@@ -346,7 +346,7 @@ public:
 	DECLARE_DRIVER_INIT(fortecar);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(fortecar);
 	UINT32 screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -700,7 +700,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",fortecar,"palette")
 	MCFG_PALETTE_ADD("palette", 0x200)
-
+	MCFG_PALETTE_INIT_OWNER(fortecar_state, fortecar)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)    /* 1.5 MHz, measured */
 

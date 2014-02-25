@@ -280,7 +280,7 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",sprcros2,"palette")
 	MCFG_PALETTE_ADD("palette", 768)
-
+	MCFG_PALETTE_INIT_OWNER(sprcros2_state, sprcros2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

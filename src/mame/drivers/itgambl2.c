@@ -69,7 +69,7 @@ public:
 	int m_start_offs;
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(itgambl2);
 	UINT32 screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
@@ -280,6 +280,7 @@ static MACHINE_CONFIG_START( itgambl2, itgambl2_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",itgambl2,"palette")
 	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(itgambl2_state, itgambl2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

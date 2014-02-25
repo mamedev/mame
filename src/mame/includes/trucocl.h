@@ -30,7 +30,7 @@ public:
 	DECLARE_DRIVER_INIT(trucocl);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(trucocl);
 	UINT32 screen_update_trucocl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(trucocl_interrupt);
 	required_device<cpu_device> m_maincpu;

@@ -149,7 +149,7 @@ static void megaphx_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int sc
 	UINT16 *vram = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
 
-	const pen_t *paldata = screen.machine().pens;
+	const pen_t *paldata = state->m_palette->pens();
 
 	int coladdr = params->coladdr;
 	int x;
@@ -387,7 +387,7 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/12, 424, 0, 320, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 

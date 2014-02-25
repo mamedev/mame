@@ -239,7 +239,7 @@ static MACHINE_CONFIG_START( rollrace, rollrace_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",rollrace,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_PALETTE_INIT_OWNER(rollrace_state, rollrace)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

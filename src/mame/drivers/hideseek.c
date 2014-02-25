@@ -41,7 +41,7 @@ public:
 
 	DECLARE_DRIVER_INIT(hideseek);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(hideseek);
 	UINT32 screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 };
@@ -108,6 +108,7 @@ static MACHINE_CONFIG_START( hideseek, hideseek_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hideseek_state, screen_update_hideseek)
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_PALETTE_INIT_OWNER(hideseek_state, hideseek)
 	MCFG_GFXDECODE_ADD("gfxdecode",hideseek,"palette")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")

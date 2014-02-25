@@ -768,6 +768,7 @@ static MACHINE_CONFIG_START( ladybug, ladybug_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",ladybug,"palette")
 	MCFG_PALETTE_ADD("palette", 4*8+4*16)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_PALETTE_INIT_OWNER(ladybug_state,ladybug)
 	MCFG_VIDEO_START_OVERRIDE(ladybug_state,ladybug)
@@ -809,6 +810,7 @@ static MACHINE_CONFIG_START( sraider, ladybug_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",sraider,"palette")
 	MCFG_PALETTE_ADD("palette", 4*8+4*16+32+2)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_PALETTE_INIT_OWNER(ladybug_state,sraider)
 	MCFG_VIDEO_START_OVERRIDE(ladybug_state,sraider)

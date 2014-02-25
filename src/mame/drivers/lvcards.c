@@ -478,7 +478,7 @@ static MACHINE_CONFIG_START( lvcards, lvcards_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",lvcards,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_PALETTE_INIT_OWNER(lvcards_state, lvcards)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

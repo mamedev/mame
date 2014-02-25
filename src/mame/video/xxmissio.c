@@ -43,7 +43,7 @@ READ8_MEMBER(xxmissio_state::xxmissio_bgram_r)
 
 WRITE8_MEMBER(xxmissio_state::xxmissio_paletteram_w)
 {
-	paletteram_BBGGRRII_byte_w(space,offset,data);
+	m_palette->write(space,offset,data);
 }
 
 /****************************************************************************/

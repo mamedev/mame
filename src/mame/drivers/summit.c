@@ -33,7 +33,7 @@ public:
 	required_shared_ptr<UINT8> m_vram;
 	DECLARE_WRITE8_MEMBER(out_w);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(summit);
 	UINT32 screen_update_summit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( summit, summit_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",summit,"palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_PALETTE_INIT_OWNER(summit_state, summit)
 MACHINE_CONFIG_END
 
 

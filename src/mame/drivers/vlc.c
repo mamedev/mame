@@ -179,7 +179,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	virtual void video_start();
 	UINT32 screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(nevada);
 
 	DECLARE_WRITE_LINE_MEMBER(duart18_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart39_irq_handler);
@@ -633,6 +633,7 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",nevada,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(nevada_state, nevada)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK, mc6845_intf)
 

@@ -151,7 +151,7 @@ static MACHINE_CONFIG_START( trucocl, trucocl_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",trucocl,"palette")
 	MCFG_PALETTE_ADD("palette", 32)
-
+	MCFG_PALETTE_INIT_OWNER(trucocl_state, trucocl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

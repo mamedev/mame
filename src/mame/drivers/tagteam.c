@@ -222,7 +222,7 @@ static MACHINE_CONFIG_START( tagteam, tagteam_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tagteam,"palette")
 	MCFG_PALETTE_ADD("palette", 32)
-
+	MCFG_PALETTE_INIT_OWNER(tagteam_state, tagteam)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

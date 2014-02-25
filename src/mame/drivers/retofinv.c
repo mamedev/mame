@@ -371,7 +371,7 @@ static MACHINE_CONFIG_START( retofinv, retofinv_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",retofinv,"palette")
 	MCFG_PALETTE_ADD("palette", 256*2+64*16+64*16)
-
+	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

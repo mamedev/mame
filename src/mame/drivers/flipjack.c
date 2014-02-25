@@ -126,7 +126,7 @@ public:
 	DECLARE_READ8_MEMBER(flipjack_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(flipjack_portc_w);
 	virtual void machine_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(flipjack);
 	UINT32 screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
@@ -504,6 +504,7 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",flipjack,"palette")
 
 	MCFG_PALETTE_ADD("palette", 128+8)
+	MCFG_PALETTE_INIT_OWNER(flipjack_state, flipjack)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

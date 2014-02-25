@@ -169,7 +169,7 @@ public:
 	DECLARE_WRITE8_MEMBER(miniboy7_colorram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(miniboy7);
 	UINT32 screen_update_miniboy7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -451,6 +451,7 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",miniboy7,"palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(miniboy7_state, miniboy7)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/12, mc6845_intf) /* guess */
 

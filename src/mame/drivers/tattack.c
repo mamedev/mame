@@ -38,7 +38,7 @@ public:
 	DECLARE_DRIVER_INIT(tattack);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(tattack);
 	UINT32 screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -217,7 +217,7 @@ static MACHINE_CONFIG_START( tattack, tattack_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tattack,"palette")
 	MCFG_PALETTE_ADD("palette", 16)
-
+	MCFG_PALETTE_INIT_OWNER(tattack_state, tattack)
 
 	/* sound hardware */
 	/* Discrete ???? */

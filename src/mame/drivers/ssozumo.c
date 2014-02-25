@@ -206,7 +206,7 @@ static MACHINE_CONFIG_START( ssozumo, ssozumo_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",ssozumo,"palette")
 	MCFG_PALETTE_ADD("palette", 64 + 16)
-
+	MCFG_PALETTE_INIT_OWNER(ssozumo_state, ssozumo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

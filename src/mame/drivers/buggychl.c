@@ -411,6 +411,7 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",buggychl,"palette")
 	MCFG_PALETTE_ADD("palette", 128+128)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	MCFG_PALETTE_INIT_OWNER(buggychl_state, buggychl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

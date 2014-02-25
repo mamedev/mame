@@ -52,18 +52,18 @@ WRITE8_MEMBER(nova2001_state::ninjakun_paletteram_w)
 {
 	int i;
 
-	paletteram_BBGGRRII_byte_w(space,offset,data);
+	m_palette->write(space,offset,data);
 
 	// expand the sprite palette to full length
 	if (offset < 16)
 	{
-		paletteram_BBGGRRII_byte_w(space, 0x200 + offset * 16 + 1, data);
+		m_palette->write(space, 0x200 + offset * 16 + 1, data);
 
 		if (offset != 1)
 		{
 			for (i = 0; i < 16; i++)
 			{
-				paletteram_BBGGRRII_byte_w(space, 0x200 + offset + i * 16, data);
+				m_palette->write(space, 0x200 + offset + i * 16, data);
 			}
 		}
 	}

@@ -133,7 +133,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay1_sel);
 	DECLARE_WRITE8_MEMBER(ay2_sel);
 	DECLARE_DRIVER_INIT(mirax);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(mirax);
 	virtual void sound_start();
 	UINT32 screen_update_mirax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mirax_vblank_irq);
@@ -477,6 +477,7 @@ static MACHINE_CONFIG_START( mirax, mirax_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mirax_state, screen_update_mirax)
 
 	MCFG_PALETTE_ADD("palette", 0x40)
+	MCFG_PALETTE_INIT_OWNER(mirax_state, mirax)
 	MCFG_GFXDECODE_ADD("gfxdecode",mirax,"palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

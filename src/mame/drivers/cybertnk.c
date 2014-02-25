@@ -489,7 +489,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 
 
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(state->m_palette->black_pen(), cliprect);
 
 
 	draw_road(screen,bitmap,cliprect,screen_shift, 0x00);

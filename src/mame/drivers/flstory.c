@@ -1087,6 +1087,7 @@ static MACHINE_CONFIG_START( flstory, flstory_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",flstory,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
@@ -1144,6 +1145,7 @@ static MACHINE_CONFIG_START( onna34ro, flstory_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",flstory,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
@@ -1201,6 +1203,7 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",flstory,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,victnine)
 
@@ -1264,6 +1267,7 @@ static MACHINE_CONFIG_START( rumba, flstory_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",flstory,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,rumba)
 

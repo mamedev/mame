@@ -576,7 +576,7 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",zaccaria,"palette")
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
-
+	MCFG_PALETTE_INIT_OWNER(zaccaria_state, zaccaria)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

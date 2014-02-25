@@ -256,6 +256,7 @@ static MACHINE_CONFIG_START( dogfgt, dogfgt_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",dogfgt,"palette")
 	MCFG_PALETTE_ADD("palette", 16+64)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	MCFG_PALETTE_INIT_OWNER(dogfgt_state, dogfgt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

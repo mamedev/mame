@@ -244,7 +244,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(smsmfg);
 	DECLARE_MACHINE_START(sureshot);
 	UINT32 screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -583,7 +583,7 @@ static MACHINE_CONFIG_START( sms, smsmfg_state )
 	MCFG_SCREEN_UPDATE_DRIVER(smsmfg_state, screen_update_sms)
 
 	MCFG_PALETTE_ADD("palette", 8)
-
+	MCFG_PALETTE_INIT_OWNER(smsmfg_state, smsmfg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

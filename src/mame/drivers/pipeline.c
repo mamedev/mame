@@ -102,7 +102,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pipeline);
 	UINT32 screen_update_pipeline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
 	required_device<cpu_device> m_maincpu;
@@ -420,7 +420,7 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",pipeline,"palette")
 
 	MCFG_PALETTE_ADD("palette", 0x100+0x100)
-
+	MCFG_PALETTE_INIT_OWNER(pipeline_state, pipeline)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -153,7 +153,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(marinedt);
 	UINT32 screen_update_marinedt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -686,7 +686,7 @@ static MACHINE_CONFIG_START( marinedt, marinedt_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",marinedt,"palette")
 	MCFG_PALETTE_ADD("palette", 64)
-
+	MCFG_PALETTE_INIT_OWNER(marinedt_state, marinedt)
 
 	/* sound hardware */
 	//discrete sound

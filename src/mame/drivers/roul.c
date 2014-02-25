@@ -85,7 +85,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_latch_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(roul);
 	UINT32 screen_update_roul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -303,7 +303,7 @@ static MACHINE_CONFIG_START( roul, roul_state )
 	MCFG_SCREEN_UPDATE_DRIVER(roul_state, screen_update_roul)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-
+	MCFG_PALETTE_INIT_OWNER(roul_state, roul)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 1000000)

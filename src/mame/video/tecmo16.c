@@ -196,7 +196,7 @@ WRITE16_MEMBER(tecmo16_state::tecmo16_scroll_char_y_w)
 /******************************************************************************/
 
 /* mix & blend the paletted 16-bit tile and sprite bitmaps into an RGB 32-bit bitmap */
-static void blendbitmaps(running_machine &machine,
+static void blendbitmaps(palette_device &palette,
 		bitmap_rgb32 &dest,bitmap_ind16 &src1,bitmap_ind16 &src2,bitmap_ind16 &src3,
 		int sx,int sy,const rectangle &clip)
 {
@@ -224,7 +224,7 @@ static void blendbitmaps(running_machine &machine,
 	if (sy > ey) return;
 
 	{
-		const pen_t *paldata = machine.pens;
+		const pen_t *paldata = palette.pens();
 		UINT32 *end;
 
 		UINT16 *sd1 = &src1.pix16(0);
@@ -326,6 +326,6 @@ UINT32 tecmo16_state::screen_update_tecmo16(screen_device &screen, bitmap_rgb32 
 	tecmo16_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), m_game_is_riot, m_flipscreen);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(m_palette, bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
 	return 0;
 }

@@ -41,7 +41,7 @@ public:
 	DECLARE_READ8_MEMBER(horse_input_r);
 	DECLARE_WRITE8_MEMBER(horse_output_w);
 	DECLARE_WRITE_LINE_MEMBER(horse_timer_out);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(horse);
 	UINT32 screen_update_horse(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(horse_interrupt);
 	required_device<cpu_device> m_maincpu;
@@ -221,6 +221,7 @@ static MACHINE_CONFIG_START( horse, horse_state )
 	MCFG_SCREEN_UPDATE_DRIVER(horse_state, screen_update_horse)
 
 	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(horse_state, horse)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

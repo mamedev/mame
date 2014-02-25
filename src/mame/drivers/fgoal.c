@@ -379,7 +379,7 @@ static MACHINE_CONFIG_START( fgoal, fgoal_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",fgoal,"palette")
 	MCFG_PALETTE_ADD("palette", 128 + 16 + 1)
-
+	MCFG_PALETTE_INIT_OWNER(fgoal_state, fgoal)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

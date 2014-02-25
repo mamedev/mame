@@ -74,7 +74,7 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_bg_hshift_w)
 
 WRITE8_MEMBER(tiamc1_state::tiamc1_palette_w)
 {
-	m_palette->set_pen_color(offset, m_palette[data]);
+	m_palette->set_pen_color(offset, m_palette_ptr[data]);
 }
 
 PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
@@ -93,7 +93,7 @@ PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
 	int r, g, b, ir, ig, ib;
 	float tcol;
 
-	m_palette = auto_alloc_array(machine(), rgb_t, 256);
+	m_palette_ptr = auto_alloc_array(machine(), rgb_t, 256);
 
 	for (col = 0; col < 256; col++) {
 		ir = (col >> 3) & 7;
@@ -106,7 +106,7 @@ PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
 		tcol = 255.0f * b_v[ib] / b_v[0];
 		b = 255 - (((int)tcol) & 255);
 
-		m_palette[col] = rgb_t(r,g,b);
+		m_palette_ptr[col] = rgb_t(r,g,b);
 	}
 }
 

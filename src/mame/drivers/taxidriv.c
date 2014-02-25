@@ -422,6 +422,7 @@ static MACHINE_CONFIG_START( taxidriv, taxidriv_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",taxidriv,"palette")
 	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(taxidriv_state, taxidriv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

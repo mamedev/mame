@@ -55,7 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_line_w);
 	DECLARE_DRIVER_INIT(esh);
 	virtual void machine_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(esh);
 	UINT32 screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_esh);
 	required_device<cpu_device> m_maincpu;
@@ -334,6 +334,7 @@ static MACHINE_CONFIG_START( esh, esh_state )
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(esh_state, esh)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",esh,"palette")
 

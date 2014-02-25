@@ -359,6 +359,7 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",malzak,"palette")
 	MCFG_PALETTE_ADD("palette", 128)
+	MCFG_PALETTE_INIT_OWNER(malzak_state, malzak)
 
 	MCFG_S2636_ADD("s2636_0", malzac_s2636_0_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

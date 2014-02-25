@@ -645,7 +645,7 @@ WRITE16_MEMBER(lockon_state::lockon_fb_clut_w)
 {
 	rgb_t color;
 
-	color = palette_get_color(machine(), 0x300 + (data & 0xff));
+	color = m_palette->pen_color(0x300 + (data & 0xff));
 	m_palette->set_pen_color(0x400 + offset, color);
 }
 

@@ -280,10 +280,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
 	UINT32 screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void peplus_load_superdata(const char *bank_name);
-	void peplus_init();
+	DECLARE_PALETTE_INIT(peplus);
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -591,7 +590,7 @@ READ8_MEMBER(peplus_state::peplus_sf000_r)
 /* Last Color in Every Palette is bgcolor */
 READ8_MEMBER(peplus_state::peplus_bgcolor_r)
 {
-	return palette_get_color(machine(), 15); // Return bgcolor from First Palette
+	return m_palette->pen_color(15); // Return bgcolor from First Palette
 }
 
 READ8_MEMBER(peplus_state::peplus_dropdoor_r)
@@ -1346,6 +1345,7 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",peplus,"palette")
 	MCFG_PALETTE_ADD("palette", 16*16*2)
+	MCFG_PALETTE_INIT_OWNER(peplus_state, peplus)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", MC6845_CLOCK, mc6845_intf)
 	MCFG_X2404P_ADD("i2cmem")

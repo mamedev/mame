@@ -66,7 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8088_common_w);
 
 	DECLARE_WRITE_LINE_MEMBER(meyc8088_sound_out);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(meyc8088);
 	UINT32 screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_meyc8088(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
@@ -393,6 +393,7 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 	MCFG_SCREEN_VBLANK_DRIVER(meyc8088_state, screen_eof_meyc8088)
 
 	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(meyc8088_state, meyc8088)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

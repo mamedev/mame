@@ -74,7 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(controls_r);
 	TILE_GET_INFO_MEMBER(get_sb_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(sbowling);
 	UINT32 screen_update_sbowling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(sbw_interrupt);
 };
@@ -394,6 +394,7 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",sbowling,"palette")
 
 	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_INIT_OWNER(sbowling_state, sbowling)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

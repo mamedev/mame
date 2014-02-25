@@ -462,6 +462,7 @@ static MACHINE_CONFIG_START( thedeep, thedeep_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",thedeep,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(thedeep_state, thedeep)
 
 
 	/* sound hardware */

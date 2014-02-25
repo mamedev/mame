@@ -71,7 +71,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(drw80pkr);
 	UINT32 screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( drw80pkr, drw80pkr_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",drw80pkr,"palette")
 	MCFG_PALETTE_ADD("palette", 16*16)
-
+	MCFG_PALETTE_INIT_OWNER(drw80pkr_state, drw80pkr)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

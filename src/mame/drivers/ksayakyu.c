@@ -289,7 +289,7 @@ static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",ksayakyu,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_PALETTE_INIT_OWNER(ksayakyu_state, ksayakyu)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

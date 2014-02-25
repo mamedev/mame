@@ -451,7 +451,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(amaticmg);
 	DECLARE_PALETTE_INIT(amaticmg2);
 	UINT32 screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -885,7 +885,7 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",amaticmg,"palette")
 
 	MCFG_PALETTE_ADD("palette", 0x200)
-
+	MCFG_PALETTE_INIT_OWNER(amaticmg_state, amaticmg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -916,8 +916,8 @@ static MACHINE_CONFIG_DERIVED( amaticmg2, amaticmg )
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", amaticmg2)
-	MCFG_PALETTE_INIT_OWNER(amaticmg_state,amaticmg2)
 	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_PALETTE_INIT_OWNER(amaticmg_state,amaticmg2)
 MACHINE_CONFIG_END
 
 

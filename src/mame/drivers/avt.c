@@ -445,7 +445,7 @@ public:
 	DECLARE_WRITE8_MEMBER(debug_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(avt);
 	UINT32 screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(avt_vblank_irq);
 };
@@ -909,7 +909,7 @@ static MACHINE_CONFIG_START( avt, avt_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",avt,"palette")
 
 	MCFG_PALETTE_ADD("palette", 8*16)
-
+	MCFG_PALETTE_INIT_OWNER(avt_state, avt)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)    /* guess */
 

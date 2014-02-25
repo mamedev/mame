@@ -1274,6 +1274,7 @@ static MACHINE_CONFIG_START( noraut_base, norautp_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",norautp,"palette")
 
 	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(norautp_state, norautp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

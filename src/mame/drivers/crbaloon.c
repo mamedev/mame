@@ -371,6 +371,7 @@ static MACHINE_CONFIG_START( crbaloon, crbaloon_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",crbaloon,"palette")
 	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(crbaloon_state, crbaloon)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

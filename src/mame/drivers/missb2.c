@@ -141,15 +141,15 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-INLINE void bg_changecolor_RRRRGGGGBBBBxxxx( running_machine &machine, pen_t color, int data )
+INLINE void bg_changecolor_RRRRGGGGBBBBxxxx( palette_device &palette, pen_t color, int data )
 {
-	palette_set_color_rgb(machine, color + 256, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
+	palette.set_pen_color(color + 256, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
 WRITE8_MEMBER(missb2_state::bg_paletteram_RRRRGGGGBBBBxxxx_be_w)
 {
 	m_bg_paletteram[offset] = data;
-	bg_changecolor_RRRRGGGGBBBBxxxx(machine(), offset / 2, m_bg_paletteram[offset | 1] | (m_bg_paletteram[offset & ~1] << 8));
+	bg_changecolor_RRRRGGGGBBBBxxxx(m_palette, offset / 2, m_bg_paletteram[offset | 1] | (m_bg_paletteram[offset & ~1] << 8));
 }
 
 WRITE8_MEMBER(missb2_state::missb2_bg_bank_w)

@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( mouser, mouser_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",mouser,"palette")
 	MCFG_PALETTE_ADD("palette", 64)
-
+	MCFG_PALETTE_INIT_OWNER(mouser_state, mouser)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

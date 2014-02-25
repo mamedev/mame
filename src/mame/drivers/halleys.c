@@ -265,7 +265,7 @@ public:
 	DECLARE_DRIVER_INIT(halleys);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(halleys);
 	UINT32 screen_update_halleys(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_benberob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(blitter_reset);
@@ -1982,7 +1982,7 @@ static MACHINE_CONFIG_START( halleys, halleys_state )
 	MCFG_SCREEN_UPDATE_DRIVER(halleys_state, screen_update_halleys)
 
 	MCFG_PALETTE_ADD("palette", PALETTE_SIZE)
-
+	MCFG_PALETTE_INIT_OWNER(halleys_state, halleys)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

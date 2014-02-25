@@ -34,7 +34,7 @@ public:
 	DECLARE_DRIVER_INIT(poker72);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(poker72);
 	UINT32 screen_update_poker72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -371,7 +371,7 @@ static MACHINE_CONFIG_START( poker72, poker72_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",poker72,"palette")
 	MCFG_PALETTE_ADD("palette", 0xe00)
-
+	MCFG_PALETTE_INIT_OWNER(poker72_state, poker72)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

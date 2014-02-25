@@ -53,7 +53,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pitnrun);
 	UINT32 screen_update_pitnrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pitnrun_nmi_source);
 	TIMER_CALLBACK_MEMBER(pitnrun_mcu_real_data_r);

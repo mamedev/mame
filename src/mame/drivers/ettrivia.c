@@ -61,7 +61,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(ettrivia);
 	UINT32 screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ettrivia_interrupt);
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, UINT8 *vidram, int gfx_code);
@@ -320,7 +320,7 @@ static MACHINE_CONFIG_START( ettrivia, ettrivia_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",ettrivia,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_PALETTE_INIT_OWNER(ettrivia_state, ettrivia)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

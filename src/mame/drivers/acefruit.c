@@ -42,7 +42,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_payout_r);
 	DECLARE_DRIVER_INIT(sidewndr);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(acefruit);
 	UINT32 screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(acefruit_vblank);
 	void acefruit_update_irq(int vpos);
@@ -615,6 +615,7 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	MCFG_SCREEN_UPDATE_DRIVER(acefruit_state, screen_update_acefruit)
 
 	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(acefruit_state, acefruit)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

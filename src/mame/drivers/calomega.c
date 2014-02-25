@@ -2650,7 +2650,7 @@ static MACHINE_CONFIG_START( sys903, calomega_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",calomega,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-
+	MCFG_PALETTE_INIT_OWNER(calomega_state, calomega)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK, mc6845_intf) /* 6845 @ CPU clock */
 

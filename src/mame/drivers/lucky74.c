@@ -1553,7 +1553,7 @@ static MACHINE_CONFIG_START( lucky74, lucky74_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",lucky74,"palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
-
+	MCFG_PALETTE_INIT_OWNER(lucky74_state, lucky74)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

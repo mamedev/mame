@@ -363,7 +363,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(videopkr);
 	DECLARE_VIDEO_START(vidadcba);
 	DECLARE_PALETTE_INIT(babypkr);
 	DECLARE_PALETTE_INIT(fortune1);
@@ -1265,6 +1265,7 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",videopkr,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(videopkr_state, videopkr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

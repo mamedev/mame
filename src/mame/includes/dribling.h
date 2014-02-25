@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(shr_w);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(dribling);
 	UINT32 screen_update_dribling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(dribling_irq_gen);
 };

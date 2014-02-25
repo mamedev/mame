@@ -561,7 +561,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, superqix_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, superqix_state )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_byte_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0000, 0x01ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(pbillian_from_mcu_r)
@@ -574,7 +574,7 @@ static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, superqix_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotsmash_port_map, AS_IO, 8, superqix_state )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_byte_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0000, 0x01ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(hotsmash_from_mcu_r)
@@ -587,7 +587,7 @@ static ADDRESS_MAP_START( hotsmash_port_map, AS_IO, 8, superqix_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_byte_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0000, 0x00ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x0405, 0x0405) AM_DEVREAD("ay2", ay8910_device, data_r)
@@ -1007,6 +1007,7 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",pbillian,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,pbillian)
 
@@ -1041,6 +1042,7 @@ static MACHINE_CONFIG_START( hotsmash, superqix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",pbillian,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,pbillian)
 
@@ -1079,6 +1081,7 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",sqix,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 
@@ -1122,6 +1125,7 @@ static MACHINE_CONFIG_START( sqixbl, superqix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",sqix,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(BBGGRRII)
 
 	MCFG_VIDEO_START_OVERRIDE(superqix_state,superqix)
 

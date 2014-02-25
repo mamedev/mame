@@ -74,7 +74,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(koikoi);
 	UINT32 screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -377,7 +377,7 @@ static MACHINE_CONFIG_START( koikoi, koikoi_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",koikoi,"palette")
 	MCFG_PALETTE_ADD("palette", 8*32)
-
+	MCFG_PALETTE_INIT_OWNER(koikoi_state, koikoi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

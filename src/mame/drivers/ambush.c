@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( ambush, ambush_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",ambush,"palette")
 	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_PALETTE_INIT_OWNER(ambush_state, ambush)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

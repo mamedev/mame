@@ -63,7 +63,7 @@ public:
 
 	required_shared_ptr<UINT8> m_tileram;
 	DECLARE_READ8_MEMBER(unknown_r);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(carrera);
 	UINT32 screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -348,7 +348,8 @@ static MACHINE_CONFIG_START( carrera, carrera_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",carrera,"palette")
 	MCFG_PALETTE_ADD("palette", 32)
-
+	MCFG_PALETTE_INIT_OWNER(carrera_state, carrera)
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

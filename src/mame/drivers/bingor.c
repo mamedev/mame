@@ -517,7 +517,7 @@ READ16_MEMBER(bingor_state::test_r)
 static ADDRESS_MAP_START( bingor_map, AS_PROGRAM, 16, bingor_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x90000, 0x9ffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0xa0300, 0xa031f) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBIIII_word_w) AM_SHARE("paletteram") //wrong
+	AM_RANGE(0xa0300, 0xa031f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") //wrong
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_SHARE("blit_ram")
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -643,7 +643,7 @@ static MACHINE_CONFIG_START( bingor, bingor_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bingor_state, screen_update_bingor)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBIIII)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SAA1099_ADD("saa", 6000000 )

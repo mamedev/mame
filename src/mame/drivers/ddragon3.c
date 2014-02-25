@@ -271,7 +271,7 @@ READ16_MEMBER(wwfwfest_state::wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r)
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
-	paletteram_xxxxBBBBGGGGRRRR_word_w (space, offset, data, mem_mask);
+	m_palette->write(space, offset, data, mem_mask);
 }
 
 /*- Priority Control -*/
@@ -908,6 +908,7 @@ static MACHINE_CONFIG_START( wwfwfest, wwfwfest_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",wwfwfest,"palette")
 	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

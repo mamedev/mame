@@ -42,7 +42,7 @@ public:
 
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
+	DECLARE_PALETTE_INIT(cesclassic);
 protected:
 
 	// devices
@@ -53,7 +53,6 @@ protected:
 	// driver_device overrides
 	virtual void video_start();
 
-	virtual void palette_init();
 };
 
 
@@ -260,6 +259,7 @@ static MACHINE_CONFIG_START( cesclassic, cesclassic_state )
 	MCFG_DEFAULT_LAYOUT( layout_lcd )
 
 	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(cesclassic_state, cesclassic)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_OKIM6295_ADD("oki", 24000000/16, OKIM6295_PIN7_LOW)

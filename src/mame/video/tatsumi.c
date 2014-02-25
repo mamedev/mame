@@ -254,7 +254,7 @@ INLINE void roundupt_drawgfxzoomrotate(tatsumi_state *state,
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &gfx->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+			const pen_t *pal = &state->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const UINT8 *shadow_pens = state->m_shadow_pen_array + (gfx->granularity() * (color % gfx->colors()));
 			const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
@@ -684,6 +684,7 @@ static void draw_sprites(running_machine &machine, _BitmapClass &bitmap, const r
 
 static void draw_sky(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect, int palette_base, int start_offset)
 {
+	tatsumi_state *state = machine.driver_data<tatsumi_state>();
 	// all todo
 	int x,y;
 
@@ -699,7 +700,7 @@ start_offset-=48;
 			if (col<palette_base) col=palette_base;
 			if (col>palette_base+127) col=palette_base+127;
 
-			bitmap.pix32(y, x) = machine.pens[col];
+			bitmap.pix32(y, x) = state->m_palette->pen(col);
 		}
 	}
 }
@@ -831,9 +832,9 @@ offset is from last pixel of first road segment?
 			int col = linedata[0]&0xf;
 			UINT8 shadow=shadow_bitmap.pix8(y, x);
 			if (shadow)
-				bitmap.pix32(y, x) = machine.pens[768 + pal*16 + col];
+				bitmap.pix32(y, x) = state->m_palette->pen(768 + pal*16 + col);
 			else
-				bitmap.pix32(y, x) = machine.pens[256 + pal*16 + col];
+				bitmap.pix32(y, x) = state->m_palette->pen(256 + pal*16 + col);
 		}
 
 		/* If startpos is negative, clip it and adjust the sampling position accordingly */
@@ -855,9 +856,9 @@ offset is from last pixel of first road segment?
 			//  col=linedata[0x7f]&0xf;
 
 			if (shadow)
-				bitmap.pix32(y, x) = machine.pens[768 + pal*16 + col];
+				bitmap.pix32(y, x) = state->m_palette->pen(768 + pal*16 + col);
 			else
-				bitmap.pix32(y, x) = machine.pens[256 + pal*16 + col];
+				bitmap.pix32(y, x) = state->m_palette->pen(256 + pal*16 + col);
 
 			samplePos+=step;
 		}
@@ -886,9 +887,9 @@ offset is from last pixel of first road segment?
 			//  col=linedata[0x7f]&0xf;
 
 			if (shadow)
-				bitmap.pix32(y, x) = machine.pens[768 + pal*16 + col + 32];
+				bitmap.pix32(y, x) = state->m_palette->pen(768 + pal*16 + col + 32);
 			else
-				bitmap.pix32(y, x) = machine.pens[256 + pal*16 + col + 32];
+				bitmap.pix32(y, x) = state->m_palette->pen(256 + pal*16 + col + 32);
 		}
 
 		if (endPos<0) {
@@ -910,9 +911,9 @@ offset is from last pixel of first road segment?
 				col=linedata[0x7f + 0x200]&0xf;
 
 			if (shadow)
-				bitmap.pix32(y, x) = machine.pens[768 + pal*16 + col + 32];
+				bitmap.pix32(y, x) = state->m_palette->pen(768 + pal*16 + col + 32);
 			else
-				bitmap.pix32(y, x) = machine.pens[256 + pal*16 + col + 32];
+				bitmap.pix32(y, x) = state->m_palette->pen(256 + pal*16 + col + 32);
 
 			samplePos+=step;
 		}
@@ -932,22 +933,22 @@ static void update_cluts(running_machine &machine, int fake_palette_offset, int 
 	const UINT8* bank1=state->m_rom_clut0;
 	const UINT8* bank2=state->m_rom_clut1;
 	for (i=0; i<length; i+=8) {
-		palette_set_color(machine,fake_palette_offset+i+0,palette_get_color(machine,bank1[1]+object_base));
+		state->m_palette->set_pen_color(fake_palette_offset+i+0,state->m_palette->pen_color(bank1[1]+object_base));
 		state->m_shadow_pen_array[i+0]=(bank1[1]==255);
-		palette_set_color(machine,fake_palette_offset+i+1,palette_get_color(machine,bank1[0]+object_base));
+		state->m_palette->set_pen_color(fake_palette_offset+i+1,state->m_palette->pen_color(bank1[0]+object_base));
 		state->m_shadow_pen_array[i+1]=(bank1[0]==255);
-		palette_set_color(machine,fake_palette_offset+i+2,palette_get_color(machine,bank1[3]+object_base));
+		state->m_palette->set_pen_color(fake_palette_offset+i+2,state->m_palette->pen_color(bank1[3]+object_base));
 		state->m_shadow_pen_array[i+2]=(bank1[3]==255);
-		palette_set_color(machine,fake_palette_offset+i+3,palette_get_color(machine,bank1[2]+object_base));
+		state->m_palette->set_pen_color(fake_palette_offset+i+3,state->m_palette->pen_color(bank1[2]+object_base));
 		state->m_shadow_pen_array[i+3]=(bank1[2]==255);
 
-		palette_set_color(machine,fake_palette_offset+i+4,palette_get_color(machine,bank2[1]+object_base));
+		state->m_palette->set_pen_color(fake_palette_offset+i+4,state->m_palette->pen_color(bank2[1]+object_base));
 		state->m_shadow_pen_array[i+4]=(bank2[1]==255);
-		palette_set_color(machine,fake_palette_offset+i+5,palette_get_color(machine,bank2[0]+object_base));
+		state->m_palette->set_pen_color(fake_palette_offset+i+5,state->m_palette->pen_color(bank2[0]+object_base));
 		state->m_shadow_pen_array[i+5]=(bank2[0]==255);
-		palette_set_color(machine,fake_palette_offset+i+6,palette_get_color(machine,bank2[3]+object_base));
+		state->m_palette->set_pen_color(fake_palette_offset+i+6,state->m_palette->pen_color(bank2[3]+object_base));
 		state->m_shadow_pen_array[i+6]=(bank2[3]==255);
-		palette_set_color(machine,fake_palette_offset+i+7,palette_get_color(machine,bank2[2]+object_base));
+		state->m_palette->set_pen_color(fake_palette_offset+i+7,state->m_palette->pen_color(bank2[2]+object_base));
 		state->m_shadow_pen_array[i+7]=(bank2[2]==255);
 
 		bank1+=4;
@@ -963,6 +964,7 @@ static void draw_bg(running_machine &machine, bitmap_rgb32 &dst, tilemap_t *src,
 	    Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
 	    from sets of 8 bit palettes!
 	*/
+	tatsumi_state *state = machine.driver_data<tatsumi_state>();
 	const UINT8* tile_cluts = machine.root_device().memregion("gfx4")->base();
 	const bitmap_ind16 &src_bitmap = src->pixmap();
 	int src_y_mask=ysize-1;
@@ -987,7 +989,7 @@ static void draw_bg(running_machine &machine, bitmap_rgb32 &dst, tilemap_t *src,
 			ppp=pp + ((p&0x78)<<5);
 
 			if ((p&0x7)!=0 || ((p&0x7)==0 && (pp&0x7)!=0)) // Transparent pixels are set by both the tile pixel data==0 AND colour palette==0
-				dst.pix32(y, x) = machine.pens[ppp];
+				dst.pix32(y, x) = state->m_palette->pen(ppp);
 		}
 	}
 }

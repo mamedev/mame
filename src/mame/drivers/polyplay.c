@@ -287,7 +287,7 @@ static MACHINE_CONFIG_START( polyplay, polyplay_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",polyplay,"palette")
 	MCFG_PALETTE_ADD("palette", 10)
-
+	MCFG_PALETTE_INIT_OWNER(polyplay_state, polyplay)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

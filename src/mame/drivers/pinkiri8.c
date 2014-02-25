@@ -330,7 +330,7 @@ UINT32 pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind1
 		int r = (val & 0x001f) >> 0;
 		int g = (val & 0x03e0) >> 5;
 		int b = (val & 0x7c00) >> 10;
-		palette_set_color_rgb(machine(), pen, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color(pen, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 
 
@@ -358,7 +358,7 @@ UINT32 pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind1
 #endif
 
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	draw_background(bitmap, cliprect);
 

@@ -51,7 +51,7 @@ public:
 
 	required_shared_ptr<UINT8> m_video;
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(murogmbl);
 	UINT32 screen_update_murogmbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -202,7 +202,7 @@ static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(murogmbl_state, screen_update_murogmbl)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-
+	MCFG_PALETTE_INIT_OWNER(murogmbl_state, murogmbl)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac1")

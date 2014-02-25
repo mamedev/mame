@@ -55,7 +55,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(sound_latch_state_r);
 	virtual void machine_start();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(dcheese);
 	UINT32 screen_update_dcheese(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(dcheese_vblank);
 	void dcheese_signal_irq(int which);

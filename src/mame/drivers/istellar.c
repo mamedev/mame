@@ -55,7 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_2_ldp_write);
 	DECLARE_DRIVER_INIT(istellar);
 	virtual void machine_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(istellar);
 	UINT32 screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_istellar);
 	required_device<cpu_device> m_maincpu;
@@ -359,6 +359,7 @@ static MACHINE_CONFIG_START( istellar, istellar_state )
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(istellar_state, istellar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",istellar,"palette")
 

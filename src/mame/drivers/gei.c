@@ -139,7 +139,7 @@ public:
 	DECLARE_READ8_MEMBER(portC_r);
 	DECLARE_DRIVER_INIT(geimulti);
 	DECLARE_DRIVER_INIT(setbank);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(gei);
 	DECLARE_PALETTE_INIT(quizvid);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
@@ -1165,6 +1165,7 @@ static MACHINE_CONFIG_START( getrivia, gei_state )
 	MCFG_SCREEN_VISIBLE_AREA(48, 511-48, 16, 255-16)
 
 	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(gei_state, gei)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

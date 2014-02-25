@@ -1186,7 +1186,7 @@ static MACHINE_CONFIG_START( ampoker2, ampoker2_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",ampoker2,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
-
+	MCFG_PALETTE_INIT_OWNER(ampoker2_state, ampoker2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

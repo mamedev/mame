@@ -790,3 +790,16 @@ void palette_device::palette_init_RRRRRGGGGGGBBBBB(palette_device &palette)
 	for (i = 0; i < 0x10000; i++)
 		palette.set_pen_color(i, rgb_t(pal5bit(i >> 11), pal6bit(i >> 5), pal5bit(i >> 0)));
 }
+
+
+rgb_t raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder(UINT32 raw)
+{
+	//Micko:FIXME
+	return rgb_t(0, 0, 0);
+}
+
+rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_decoder(UINT32 raw)
+{
+	//Micko:FIXME
+	return rgb_t(0, 0, 0);
+}

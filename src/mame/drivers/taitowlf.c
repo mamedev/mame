@@ -57,7 +57,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	#if !ENABLE_VGA
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(taitowlf);
 	#endif
 	UINT32 screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void intel82439tx_init();
@@ -386,8 +386,9 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_SCREEN_UPDATE_DRIVER(taitowlf_state, screen_update_taitowlf)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(taitowlf_state, taitowlf)
 	#endif
 MACHINE_CONFIG_END
 

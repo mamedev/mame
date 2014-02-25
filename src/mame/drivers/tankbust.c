@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( tankbust, tankbust_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",tankbust ,"palette")
 
 	MCFG_PALETTE_ADD( "palette", 128 )
-
+	MCFG_PALETTE_INIT_OWNER(tankbust_state, tankbust)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

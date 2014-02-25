@@ -176,7 +176,7 @@ public:
 	DECLARE_DRIVER_INIT(wildpkr);
 	virtual void machine_start();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(wildpkr);
 	UINT32 screen_update_wildpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
@@ -292,7 +292,7 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_PALETTE_INIT_OWNER(wildpkr_state, wildpkr)
 
 MACHINE_CONFIG_END
 

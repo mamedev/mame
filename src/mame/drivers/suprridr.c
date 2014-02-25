@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( suprridr, suprridr_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",suprridr,"palette")
 	MCFG_PALETTE_ADD("palette", 96)
-
+	MCFG_PALETTE_INIT_OWNER(suprridr_state, suprridr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

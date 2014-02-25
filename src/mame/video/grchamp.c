@@ -12,7 +12,7 @@
 #define RGB_MAX     191
 
 
-PALETTE_INIT_MEMBER(grchamp_state, grchamp)
+void grchamp_state::palette_generate()
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 100, 270, 470 };
@@ -98,6 +98,7 @@ TILEMAP_MAPPER_MEMBER(grchamp_state::get_memory_offset)
 
 void grchamp_state::video_start()
 {
+	palette_generate();
 	m_work_bitmap.allocate(32,32);
 
 	/* allocate tilemaps for each of the three sections */

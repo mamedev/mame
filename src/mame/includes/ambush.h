@@ -26,7 +26,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ambush_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(ambush);
 	UINT32 screen_update_ambush(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	required_device<cpu_device> m_maincpu;

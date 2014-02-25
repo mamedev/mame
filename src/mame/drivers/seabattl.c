@@ -91,7 +91,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(seabattl);
 	UINT32 screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	bool m_waveenable;
 	UINT8 m_collision;
@@ -546,6 +546,7 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",seabattl,"palette")
 	MCFG_PALETTE_ADD("palette", 26)
+	MCFG_PALETTE_INIT_OWNER(seabattl_state, seabattl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

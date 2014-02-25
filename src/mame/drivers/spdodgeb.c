@@ -430,7 +430,7 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",spdodgeb,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-
+	MCFG_PALETTE_INIT_OWNER(spdodgeb_state, spdodgeb)
 
 
 	/* sound hardware */

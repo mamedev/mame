@@ -96,9 +96,9 @@ WRITE8_MEMBER(flstory_state::flstory_videoram_w)
 WRITE8_MEMBER(flstory_state::flstory_palette_w)
 {
 	if (offset & 0x100)
-		paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w(space, (offset & 0xff) + (m_palette_bank << 8),data);
+		m_palette->write(space, (offset & 0xff) + (m_palette_bank << 8),data);
 	else
-		paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w(space, (offset & 0xff) + (m_palette_bank << 8),data);
+		m_palette->write(space, (offset & 0xff) + (m_palette_bank << 8),data);
 }
 
 READ8_MEMBER(flstory_state::flstory_palette_r)

@@ -98,7 +98,7 @@ public:
 	DECLARE_WRITE8_MEMBER(n7751_rom_control_w);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(othello);
 };
 
 
@@ -435,6 +435,7 @@ static MACHINE_CONFIG_START( othello, othello_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x10)
+	MCFG_PALETTE_INIT_OWNER(othello_state, othello)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 1000000 /* ? MHz */, h46505_intf)   /* H46505 @ CPU clock */
 

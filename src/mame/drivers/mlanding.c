@@ -223,7 +223,7 @@ UINT32 mlanding_state::screen_update_mlanding(screen_device &screen, bitmap_ind1
 
 		for (UINT32 x = cliprect.min_x; x <= cliprect.max_x; ++x)
 		{
-			*dst++ = m_palette->pen(*src++ & 0x3fff);
+			*dst++ = pens[*src++ & 0x3fff];
 		}
 	}
 

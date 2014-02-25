@@ -91,6 +91,8 @@ private:
 	double m_weights_r[2];
 	double m_weights_g[3];
 	double m_weights_b[3];
+	//Micko:FIXME
+	palette_device *m_palette;
 };
 
 

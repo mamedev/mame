@@ -351,7 +351,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(dwarfd);
 	UINT32 screen_update_dwarfd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(dwarfd_interrupt);
 	void drawCrt( bitmap_rgb32 &bitmap,const rectangle &cliprect );
@@ -1071,7 +1071,7 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",dwarfd,"palette")
 	MCFG_PALETTE_ADD("palette", 0x100)
-
+	MCFG_PALETTE_INIT_OWNER(dwarfd_state, dwarfd)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
