@@ -14,7 +14,7 @@
 
 #define VERBOSE_LEVEL   (0)
 
-INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
+INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{
@@ -978,11 +978,11 @@ WRITE16_MEMBER( mc68328_device::write )
 			break;
 
 		case 0x310:
-			verboselog(machine(), 2, "mc68328_w: IPR(16) = %04x (Ignored)\n");
+			verboselog(machine(), 2, "mc68328_w: IPR(16) = %04x (Ignored)\n", data);
 			break;
 
 		case 0x312:
-			verboselog(machine(), 2, "mc68328_w: IPR(0) = %04x (Ignored)\n");
+			verboselog(machine(), 2, "mc68328_w: IPR(0) = %04x (Ignored)\n", data);
 			break;
 
 		case 0x400:
@@ -1544,7 +1544,7 @@ WRITE16_MEMBER( mc68328_device::write )
 			{
 				verboselog(machine(), 2, "mc68328_w: LVPW = %02x\n", data & 0x00ff);
 				m_regs.lvpw = data & 0x00ff;
-				verboselog(machine(), 3, "              Page Width: %d or %d\n", (m_regs.lvpw + 1) * ((m_regs.lpicf & 0x01) ? 8 : 16));
+				verboselog(machine(), 3, "              Page Width: %d\n", (m_regs.lvpw + 1) * ((m_regs.lpicf & 0x01) ? 8 : 16));
 			}
 			else
 			{

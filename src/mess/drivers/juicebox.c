@@ -50,7 +50,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ...);
+	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	void smc_reset( );
 	void smc_init( );
 	UINT8 smc_read( );
@@ -60,7 +60,7 @@ public:
 	DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
 };
 
-inline void ATTR_PRINTF(3,4)  juicebox_state::verboselog( int n_level, const char *s_fmt, ...)
+inline void juicebox_state::verboselog(int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{
