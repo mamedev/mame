@@ -144,6 +144,7 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
+	palette_device &palette() { return m_palette; }
 	UINT16 width() const { return m_width; }
 	UINT16 height() const { return m_height; }
 	UINT32 elements() const { return m_total_elements; }

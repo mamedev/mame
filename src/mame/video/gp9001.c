@@ -825,7 +825,7 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 
 					{
 						int yy, xx;
-						const pen_t *paldata = &m_gfxdecode->palette()->pen(gfx->colorbase() + gfx->granularity() * color);
+						const pen_t *paldata = &gfx->palette().pen(gfx->colorbase() + gfx->granularity() * color);
 						const UINT8* srcdata = gfx->get_data(sprite);
 						int count = 0;
 						int ystart, yend, yinc;
