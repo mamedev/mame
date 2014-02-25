@@ -202,9 +202,7 @@ WRITE8_MEMBER(pacland_state::pacland_subreset_w)
 WRITE8_MEMBER(pacland_state::pacland_flipscreen_w)
 {
 	int bit = !BIT(offset,11);
-	/* can't use flip_screen_set() because the visible area is asymmetrical */
-	flip_screen_set_no_update(bit);
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	flip_screen_set(bit);
 }
 
 
@@ -439,10 +437,7 @@ static MACHINE_CONFIG_START( pacland, pacland_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.606060)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(3*8, 39*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 3*8, 39*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(pacland_state, screen_update_pacland)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pacland)
