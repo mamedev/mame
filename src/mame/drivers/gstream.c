@@ -174,6 +174,7 @@ public:
 	int       m_oki_bank_1;
 	int       m_oki_bank_2;
 	int		  m_toggle;
+	int		  m_xoffset;
 
 	DECLARE_WRITE32_MEMBER(gstream_palette_w);
 	DECLARE_WRITE32_MEMBER(gstream_vram_w);
@@ -778,13 +779,13 @@ void gstream_state::draw_bg_gstream(bitmap_rgb32 &bitmap, const rectangle &clipr
 			int vram_data = (ram[(basex&0x0f)+((basey&0x0f)*0x10)]);
 			int pal = (vram_data & 0xc0000000) >> 30;
 			int code = (vram_data & 0x0fff0000) >> 16;
-
+			
 			pal += palbase;
 
 			if (m_gfxdecode->gfx(map+5))
-				drawgfx_transpen_x2222(bitmap,cliprect,m_gfxdecode->gfx(map),m_gfxdecode->gfx(map+5),code,0,0,0,(x*32)-(scrollx&0x1f)-2,(y*32)-(scrolly&0x1f),0);
+				drawgfx_transpen_x2222(bitmap,cliprect,m_gfxdecode->gfx(map),m_gfxdecode->gfx(map+5),code,0,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
 			else
-				m_gfxdecode->gfx(map)->transpen(bitmap,cliprect,code,pal,0,0,(x*32)-(scrollx&0x1f)-2,(y*32)-(scrolly&0x1f),0);
+				m_gfxdecode->gfx(map)->transpen(bitmap,cliprect,code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
 
 			basex++;
 		}
@@ -832,18 +833,18 @@ UINT32 gstream_state::screen_update_gstream(screen_device &screen, bitmap_rgb32 
 
 		if (m_gfxdecode->gfx(4))
 		{
-			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, col, 0, 0, x - 2, y, 0);
-			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, col, 0, 0, x - 2, y-0x100, 0);
-			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, col, 0, 0, x - 2 - 0x200, y, 0);
-			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, col, 0, 0, x - 2 - 0x200 , y-0x100, 0);
+			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, col, 0, 0, x - m_xoffset, y, 0);
+			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, col, 0, 0, x - m_xoffset, y-0x100, 0);
+			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, col, 0, 0, x - m_xoffset - 0x200, y, 0);
+			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, col, 0, 0, x - m_xoffset - 0x200 , y-0x100, 0);
 
 		}
 		else
 		{
-			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - 2, y, 0);
-			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - 2, y-0x100, 0);
-			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - 2 - 0x200, y, 0);
-			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - 2 - 0x200, y-0x100, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y-0x100, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y-0x100, 0);
 
 		}
 	}
@@ -1072,6 +1073,8 @@ READ32_MEMBER(gstream_state::x2222_speedup_r)
 DRIVER_INIT_MEMBER(gstream_state,gstream)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(FUNC(gstream_state::gstream_speedup_r), this));
+
+	m_xoffset = 2;
 }
 
 
@@ -1103,6 +1106,8 @@ DRIVER_INIT_MEMBER(gstream_state,x2222)
 	rearrange_tile_data(memregion("bg1")->base(), (UINT32*)memregion("gfx2")->base(), (UINT32*)memregion("gfx2_lower")->base());
 	rearrange_tile_data(memregion("bg2")->base(), (UINT32*)memregion("gfx3")->base(), (UINT32*)memregion("gfx3_lower")->base());
 	rearrange_tile_data(memregion("bg3")->base(), (UINT32*)memregion("gfx4")->base(), (UINT32*)memregion("gfx4_lower")->base());
+
+	m_xoffset = 0;
 }
 
 
