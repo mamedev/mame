@@ -168,7 +168,7 @@ UINT32 lastfght_state::screen_update_lastfght(screen_device &screen, bitmap_ind1
 		{
 			for (x = 0; x < 512; x++)
 			{
-				data = (((count & 0xf) == 0) && ((count & 0x1e00) == 0)) ? get_white_pen(machine()) : gfxdata[count];   // white grid or data
+				data = (((count & 0xf) == 0) && ((count & 0x1e00) == 0)) ? m_palette->white_pen() : gfxdata[count];   // white grid or data
 				bitmap.pix16(y, x) = data;
 				count++;
 			}
