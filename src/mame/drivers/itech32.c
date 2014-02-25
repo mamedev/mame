@@ -1708,6 +1708,7 @@ static MACHINE_CONFIG_DERIVED( bloodstm, timekill )
 	MCFG_CPU_PROGRAM_MAP(bloodstm_map)
 
 	/* video hardware */
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32768)
 MACHINE_CONFIG_END
 

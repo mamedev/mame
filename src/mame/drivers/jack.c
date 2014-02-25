@@ -976,6 +976,7 @@ static MACHINE_CONFIG_DERIVED( joinem, jack )
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", joinem)
 
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(jack_state,joinem)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)

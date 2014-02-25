@@ -1622,6 +1622,7 @@ static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_cischeat)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cischeat)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32*16 * 3 + 64*16 * 2 + 128*16) /* scroll 0,1,2; road 0,1; sprites */
 
 	MCFG_VIDEO_START_OVERRIDE(cischeat_state,cischeat)
@@ -1648,6 +1649,7 @@ static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", f1gpstar)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 16*16 * 3 + 64*16 * 2 + 128*16) /* scroll 0,1,2; road 0,1; sprites */
 
 	MCFG_VIDEO_START_OVERRIDE(cischeat_state,f1gpstar)

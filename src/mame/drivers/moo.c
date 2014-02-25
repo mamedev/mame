@@ -668,6 +668,7 @@ static MACHINE_CONFIG_DERIVED( bucky, moo )
 	MCFG_K053246_ADD("k053246", bucky_k053247_intf)     // diff x offset
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	/* video hardware */
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XRGB)
 

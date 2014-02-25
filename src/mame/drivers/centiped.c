@@ -1825,6 +1825,7 @@ static MACHINE_CONFIG_DERIVED( milliped, centiped )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", milliped)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 4*4+4*4*4*4*4)
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,milliped)
@@ -1861,6 +1862,7 @@ static MACHINE_CONFIG_DERIVED( warlords, centiped )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", warlords)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 8*4+8*4)
 
 	MCFG_PALETTE_INIT_OWNER(centiped_state,warlords)

@@ -1290,6 +1290,7 @@ static MACHINE_CONFIG_DERIVED( astrocade_16color_base, astrocade_base )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_PALETTE_INIT_OWNER(astrocde_state,profpac)

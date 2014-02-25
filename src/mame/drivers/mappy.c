@@ -1879,6 +1879,7 @@ static MACHINE_CONFIG_DERIVED( todruaga, digdug2 )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", todruaga)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 64*4+64*16)
 MACHINE_CONFIG_END
 

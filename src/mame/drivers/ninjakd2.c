@@ -1006,6 +1006,7 @@ static MACHINE_CONFIG_DERIVED( robokid, mnight )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", robokid)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 0x400)  // RAM is this large, but still only 0x300 colors used
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 

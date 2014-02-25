@@ -506,6 +506,7 @@ static MACHINE_CONFIG_DERIVED( rmhaisei, rmhaihai )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", themj)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
@@ -521,6 +522,7 @@ static MACHINE_CONFIG_DERIVED( themj, rmhaihai )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", themj)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 

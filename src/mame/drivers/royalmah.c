@@ -3346,6 +3346,7 @@ static MACHINE_CONFIG_DERIVED( mjderngr, dondenmj )
 	MCFG_CPU_IO_MAP(mjderngr_iomap)
 
 	/* video hardware */
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 16*32)
 	MCFG_PALETTE_INIT_OWNER(royalmah_state,mjderngr)
 MACHINE_CONFIG_END

@@ -750,6 +750,7 @@ static MACHINE_CONFIG_DERIVED( navarone, geebee )
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 2k)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 2*2)
 
 	MCFG_PALETTE_INIT_OWNER(warpwarp_state,navarone)
@@ -769,8 +770,8 @@ static MACHINE_CONFIG_START( bombbee, warpwarp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update_geebee)
 
 	MCFG_GFXDECODE_ADD("gfxdecode",color,"palette")
+	
 	MCFG_PALETTE_ADD("palette", 2*256+1)
-
 	MCFG_PALETTE_INIT_OWNER(warpwarp_state,warpwarp)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,warpwarp)
 

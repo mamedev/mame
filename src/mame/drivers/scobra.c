@@ -784,6 +784,7 @@ static MACHINE_CONFIG_DERIVED( rescue, type1 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32+64+2+128)    /* 32 for characters, 64 for stars, 2 for bullets, 128 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,rescue)
@@ -797,6 +798,7 @@ static MACHINE_CONFIG_DERIVED( minefld, type1 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32+64+2+256)    /* 32 for characters, 64 for stars, 2 for bullets, 256 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,minefld)
@@ -831,6 +833,7 @@ static MACHINE_CONFIG_DERIVED( stratgyx, type2 )
 	MCFG_I8255A_ADD( "ppi8255_1", stratgyx_ppi_1_intf )
 
 	/* video hardware */
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,stratgyx)
@@ -843,6 +846,7 @@ static MACHINE_CONFIG_DERIVED( darkplnt, type2 )
 	/* basic machine hardware */
 
 	/* video hardware */
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32+64+2) /* 32 for characters, 64 (buffer) for stars, 2 for bullets */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,darkplnt)

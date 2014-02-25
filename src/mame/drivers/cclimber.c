@@ -1040,6 +1040,7 @@ static MACHINE_CONFIG_DERIVED( yamato, root )
 	MCFG_CPU_IO_MAP(yamato_audio_portmap)
 
 	/* video hardware */
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 16*4+8*4+256)
 	MCFG_PALETTE_INIT_OWNER(cclimber_state,yamato)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1064,6 +1065,7 @@ static MACHINE_CONFIG_DERIVED( toprollr, cclimber )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", toprollr)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32*5)
 	MCFG_PALETTE_INIT_OWNER(cclimber_state,toprollr)
 

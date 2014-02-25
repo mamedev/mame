@@ -3210,6 +3210,7 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV3, NBMJDRV1 )
 	/* basic machine hardware */
 
 	/* video hardware */
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state,nbmj9195_nb22090)

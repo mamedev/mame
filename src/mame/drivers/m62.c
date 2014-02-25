@@ -1044,6 +1044,8 @@ static MACHINE_CONFIG_DERIVED( lotlot, ldrun )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", lotlot)
+	
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_PALETTE_INIT_OWNER(m62_state,lotlot)
@@ -1092,6 +1094,7 @@ static MACHINE_CONFIG_DERIVED( spelunk2, ldrun )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spelunk2)
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_PALETTE_INIT_OWNER(m62_state,spelunk2)

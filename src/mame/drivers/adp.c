@@ -734,6 +734,7 @@ static MACHINE_CONFIG_DERIVED( funland, fashiong )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(funland_mem)
 
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
 MACHINE_CONFIG_END
 

@@ -1457,7 +1457,7 @@ void namco_c45_road_device::device_start()
 }
 
 MACHINE_CONFIG_FRAGMENT( namco_c45_road )
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty,"^palette")
 MACHINE_CONFIG_END
 //-------------------------------------------------
 //  device_mconfig_additions - return a pointer to
