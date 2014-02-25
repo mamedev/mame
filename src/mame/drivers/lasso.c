@@ -498,7 +498,7 @@ static MACHINE_CONFIG_START( base, lasso_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",lasso,"palette")
 	MCFG_PALETTE_ADD("palette", 0x40)
-
+	MCFG_PALETTE_INIT_OWNER(lasso_state, lasso)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -550,6 +550,7 @@ static MACHINE_CONFIG_DERIVED( wwjgtin, base )
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_wwjgtin)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", wwjgtin) // Has 1 additional layer
 	MCFG_PALETTE_ADD("palette", 0x40 + 16*16)
+	MCFG_PALETTE_INIT_OWNER(lasso_state, lasso)
 
 	MCFG_PALETTE_INIT_OWNER(lasso_state,wwjgtin)
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,wwjgtin)

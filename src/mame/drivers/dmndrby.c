@@ -84,7 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	TILE_GET_INFO_MEMBER(get_dmndrby_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(dmndrby);
 	UINT32 screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(dderby_irq);
 	INTERRUPT_GEN_MEMBER(dderby_timer_irq);
@@ -538,7 +538,7 @@ static MACHINE_CONFIG_START( dderby, dmndrby_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",dmndrby,"palette")
 	MCFG_PALETTE_ADD("palette", 0x300)
-
+	MCFG_PALETTE_INIT_OWNER(dmndrby_state, dmndrby)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

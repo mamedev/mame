@@ -211,7 +211,7 @@ static MACHINE_CONFIG_START( hanaawas, hanaawas_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",hanaawas,"palette")
 	MCFG_PALETTE_ADD("palette", 32*8)
-
+	MCFG_PALETTE_INIT_OWNER(hanaawas_state, hanaawas)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

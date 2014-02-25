@@ -353,7 +353,7 @@ static MACHINE_CONFIG_START( strnskil, strnskil_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",strnskil,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-
+	MCFG_PALETTE_INIT_OWNER(strnskil_state, strnskil)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

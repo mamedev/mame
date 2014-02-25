@@ -185,23 +185,23 @@ VIDEO_START_MEMBER(snk_state,snk_3bpp_shadow)
 {
 	int i;
 
-	if(!(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if(!(m_palette->shadows_enabled()))
 		fatalerror("driver should use VIDEO_HAS_SHADOWS\n");
 
 	/* prepare shadow draw table */
 	for(i = 0; i <= 5; i++) m_drawmode_table[i] = DRAWMODE_SOURCE;
-	m_drawmode_table[6] = (machine().config().m_video_attributes & VIDEO_HAS_SHADOWS) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+	m_drawmode_table[6] = (m_palette->shadows_enabled()) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 	m_drawmode_table[7] = DRAWMODE_NONE;
 
 	for (i = 0x000;i < 0x400;i++)
-		machine().shadow_table[i] = i | 0x200;
+		m_palette->shadow_table()[i] = i | 0x200;
 }
 
 VIDEO_START_MEMBER(snk_state,snk_4bpp_shadow)
 {
 	int i;
 
-	if(!(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if(!(m_palette->shadows_enabled()))
 		fatalerror("driver should use VIDEO_HAS_SHADOWS\n");
 
 	/* prepare shadow draw table */
@@ -211,10 +211,10 @@ VIDEO_START_MEMBER(snk_state,snk_4bpp_shadow)
 
 	/* all palette entries are not affected by shadow sprites... */
 	for (i = 0x000;i < 0x400;i++)
-		machine().shadow_table[i] = i;
+		m_palette->shadow_table()[i] = i;
 	/* ... except for tilemap colors */
 	for (i = 0x200;i < 0x300;i++)
-		machine().shadow_table[i] = i + 0x100;
+		m_palette->shadow_table()[i] = i + 0x100;
 }
 
 
@@ -696,7 +696,7 @@ static void marvins_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 			color,
 			flipx, flipy,
 			sx, sy,
-			state->m_drawmode_table, machine.shadow_table);
+			state->m_drawmode_table, state->m_palette->shadow_table());
 
 		source+=4;
 	}
@@ -762,7 +762,7 @@ void snk_state::tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				color,
 				xflip,yflip,
 				sx,sy,
-				m_drawmode_table, machine().shadow_table);
+				m_drawmode_table, m_palette->shadow_table());
 	}
 }
 
@@ -809,7 +809,7 @@ static void ikari_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 				color,
 				0,0,
 				sx,sy,
-				state->m_drawmode_table, machine.shadow_table);
+				state->m_drawmode_table, state->m_palette->shadow_table());
 	}
 }
 
@@ -897,7 +897,7 @@ static void tdfever_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 				color,
 				flipx,flipy,
 				sx,sy,
-				state->m_drawmode_table, machine.shadow_table);
+				state->m_drawmode_table, state->m_palette->shadow_table());
 	}
 }
 

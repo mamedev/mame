@@ -93,7 +93,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(supdrapo);
 	UINT32 screen_update_supdrapo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",supdrapo,"palette")
 	MCFG_PALETTE_ADD("palette", 0x100)
-
+	MCFG_PALETTE_INIT_OWNER(supdrapo_state, supdrapo)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

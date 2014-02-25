@@ -101,13 +101,13 @@ PALETTE_INIT_MEMBER(lasso_state,wwjgtin)
 }
 
 
-void lasso_state::wwjgtin_set_last_four_colors( colortable_t *colortable )
+void lasso_state::wwjgtin_set_last_four_colors()
 {
 	int i;
 
 	/* the last palette entries can be changed */
 	for(i = 0; i < 3; i++)
-		colortable_palette_set_color(colortable, 0x3d + i, get_color(m_last_colors[i]));
+		m_palette->set_indirect_color(0x3d + i, get_color(m_last_colors[i]));
 }
 
 
@@ -376,7 +376,7 @@ UINT32 lasso_state::screen_update_chameleo(screen_device &screen, bitmap_ind16 &
 UINT32 lasso_state::screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_palette->set_indirect_color(0, get_color(*m_back_color));
-	wwjgtin_set_last_four_colors(machine().colortable);
+	wwjgtin_set_last_four_colors();
 
 	m_track_tilemap->set_scrollx(0, m_track_scroll[0] + m_track_scroll[1] * 256);
 	m_track_tilemap->set_scrolly(0, m_track_scroll[2] + m_track_scroll[3] * 256);

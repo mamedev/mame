@@ -78,7 +78,7 @@ void shangha3_state::video_start()
 	{
 		/* Prepare the shadow table */
 		for (i = 0;i < 128;i++)
-			machine().shadow_table[i] = i+128;
+			m_palette->shadow_table()[i] = i+128;
 	}
 }
 
@@ -225,7 +225,7 @@ if (zoomx <= 1 && zoomy <= 1)
 			flipx,flipy,
 			sx,sy,
 			0x1000000,0x1000000,
-			drawmode_table,machine().shadow_table);
+			drawmode_table,m_palette->shadow_table());
 else
 {
 				w = (sizex+15)/16;
@@ -238,7 +238,7 @@ else
 							flipx,flipy,
 							sx + 16*x,sy,
 							(0x200-zoomx)*0x100,(0x200-zoomy)*0x100,
-							drawmode_table,machine().shadow_table);
+							drawmode_table,m_palette->shadow_table());
 
 					if ((code & 0x000f) == 0x0f)
 						code = (code + 0x100) & 0xfff0;

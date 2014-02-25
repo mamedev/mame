@@ -403,6 +403,7 @@ static MACHINE_CONFIG_START( mainsnk, mainsnk_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",mainsnk,"palette")
 	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_INIT_OWNER(mainsnk_state, mainsnk)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -1076,7 +1076,7 @@ static MACHINE_CONFIG_START( 40love, fortyl_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",40love,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-
+	MCFG_PALETTE_INIT_OWNER(fortyl_state, fortyl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1131,7 +1131,7 @@ static MACHINE_CONFIG_START( undoukai, fortyl_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",40love,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-
+	MCFG_PALETTE_INIT_OWNER(fortyl_state, fortyl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

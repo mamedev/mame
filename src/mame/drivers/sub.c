@@ -137,7 +137,7 @@ public:
 	DECLARE_WRITE8_MEMBER(subm_to_sound_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(sub);
 	UINT32 screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(subm_sound_irq);
 	required_device<cpu_device> m_maincpu;
@@ -453,7 +453,7 @@ static MACHINE_CONFIG_START( sub, sub_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",sub,"palette")
 	MCFG_PALETTE_ADD("palette", 0x400)
-
+	MCFG_PALETTE_INIT_OWNER(sub_state, sub)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

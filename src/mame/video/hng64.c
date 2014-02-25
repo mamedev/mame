@@ -676,7 +676,8 @@ do {                                                                            
 static void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound)
 {
-	const pen_t *clut = &screen.m_palette->pen(blit->tilemap_priority_code >> 16);
+	hng64_state *state = screen.machine().driver_data<hng64_state>();
+	const pen_t *clut = &state->m_palette->pen(blit->tilemap_priority_code >> 16);
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	bitmap_rgb32 &destbitmap = *blit->bitmap;
 	bitmap_ind16 &srcbitmap = tmap->pixmap();
@@ -1125,7 +1126,7 @@ static void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const
 				bitmap_ind16 &bm = tilemap->pixmap();
 				int bmheight = bm.height();
 				int bmwidth = bm.width();
-				const pen_t *paldata = screen.m_palette->pens();
+				const pen_t *paldata = state->m_palette->pens();
 				UINT32* dstptr;
 				UINT16* srcptr;
 				int xx,yy;
@@ -1221,7 +1222,7 @@ static void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const
 				bitmap_ind16 &bm = tilemap->pixmap();
 				int bmheight = bm.height();
 				int bmwidth = bm.width();
-				const pen_t *paldata = screen.m_palette->pens();
+				const pen_t *paldata = state->m_palette->pens();
 				UINT32* dstptr;
 				UINT16* srcptr;
 				int xx,yy;
@@ -1347,7 +1348,7 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	}
 #endif
 
-	bitmap.fill(hng64_tcram[0x50/4] & 0x10000 ? m_palette->black_pen() : screen.m_palette->pen(0), cliprect); //FIXME: Is the register correct? check with HW tests
+	bitmap.fill(hng64_tcram[0x50/4] & 0x10000 ? m_palette->black_pen() : m_palette->pen(0), cliprect); //FIXME: Is the register correct? check with HW tests
 	screen.priority().fill(0x00, cliprect);
 
 	if (m_screen_dis)
@@ -2971,7 +2972,7 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine &machine,
 				{
 					// The color out of the texture
 					paletteEntry %= prOptions.palPageSize;
-					rgb_t color = machine.pens[prOptions.palOffset + paletteEntry];
+					rgb_t color = state->m_palette->pen(prOptions.palOffset + paletteEntry);
 
 					// Apply the lighting
 					float rIntensity = (r_start/w_start) / 255.0f;

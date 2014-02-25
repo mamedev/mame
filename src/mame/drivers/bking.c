@@ -482,6 +482,7 @@ static MACHINE_CONFIG_START( bking, bking_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",bking,"palette")
 	MCFG_PALETTE_ADD("palette", 4*8+4*4+4*2+4*2)
+	MCFG_PALETTE_INIT_OWNER(bking_state, bking)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

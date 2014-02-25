@@ -64,7 +64,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(lasso);
 	DECLARE_MACHINE_START(wwjgtin);
 	DECLARE_MACHINE_RESET(wwjgtin);
 	DECLARE_VIDEO_START(wwjgtin);
@@ -74,7 +74,7 @@ public:
 	UINT32 screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	rgb_t get_color( int data );
-	void wwjgtin_set_last_four_colors( colortable_t *colortable );
+	void wwjgtin_set_last_four_colors();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int reverse );
 	void draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

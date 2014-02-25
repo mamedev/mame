@@ -665,7 +665,7 @@ PALETTE_INIT_MEMBER(seta_state,setaroul)
 	m_gfxdecode->gfx(0)->set_granularity(16);
 	m_gfxdecode->gfx(1)->set_granularity(16);
 
-	PALETTE_INIT_CALL_MEMBER(inttoote);
+	PALETTE_INIT_NAME(inttoote)(palette);
 }
 
 PALETTE_INIT_MEMBER(seta_state,usclssic)
@@ -706,7 +706,7 @@ void seta_state::set_pens()
 
 		rgb_t color = rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
-		if (machine().colortable != NULL)
+		if (m_palette->indirect_entries() != 0)
 			m_palette->set_indirect_color(i, color);
 		else
 			m_palette->set_pen_color(i, color);
@@ -720,7 +720,7 @@ void seta_state::set_pens()
 
 			rgb_t color = rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
-			if (machine().colortable != NULL)
+			if (m_palette->indirect_entries() != 0)
 				m_palette->set_indirect_color(i + m_paletteram.bytes() / 2, color);
 			else
 				m_palette->set_pen_color(i + m_paletteram.bytes() / 2, color);
