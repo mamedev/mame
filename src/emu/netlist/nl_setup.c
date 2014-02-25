@@ -259,10 +259,10 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 			}
 			break;
 		case netlist_terminal_t::DEVICE:
-			netlist().error("Device registration not yet supported - \n", name.cstr());
+			netlist().error("Device registration not yet supported - %s\n", name.cstr());
 			break;
 		case netlist_terminal_t::NETLIST:
-			netlist().error("Netlist registration not yet supported - \n", name.cstr());
+			netlist().error("Netlist registration not yet supported - %s\n", name.cstr());
 			break;
 	}
 }
