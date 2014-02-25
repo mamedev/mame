@@ -13,15 +13,12 @@
 #include "cdp1871.h"
 
 
-// device type definition
-const device_type CDP1871 = &device_creator<cdp1871_device>;
-
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-static const UINT8 CDP1871_KEY_CODES[4][11][8] =
+const UINT8 cdp1871_device::key_codes[4][11][8] =
 {
 	// normal
 	{
@@ -87,6 +84,14 @@ static const UINT8 CDP1871_KEY_CODES[4][11][8] =
 
 
 //**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type CDP1871 = &device_creator<cdp1871_device>;
+
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -94,42 +99,34 @@ static const UINT8 CDP1871_KEY_CODES[4][11][8] =
 //  cdp1871_device - constructor
 //-------------------------------------------------
 
-cdp1871_device::cdp1871_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CDP1871, "RCA CDP1871", tag, owner, clock, "cdp1871", __FILE__),
-		m_inhibit(false),
-		m_sense(0),
-		m_drive(0),
-		m_da(0),
-		m_next_da(CLEAR_LINE),
-		m_rpt(0),
-		m_next_rpt(CLEAR_LINE)
+cdp1871_device::cdp1871_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, CDP1871, "RCA CDP1871", tag, owner, clock, "cdp1871", __FILE__),
+	m_read_d1(*this),
+	m_read_d2(*this),
+	m_read_d3(*this),
+	m_read_d4(*this),
+	m_read_d5(*this),
+	m_read_d6(*this),
+	m_read_d7(*this),
+	m_read_d8(*this),
+	m_read_d9(*this),
+	m_read_d10(*this),
+	m_read_d11(*this),
+	m_write_da(*this),
+	m_write_rpt(*this),
+	m_inhibit(false),
+	m_sense(0),
+	m_drive(0),
+	m_shift(0),
+	m_shift_latch(0),
+	m_control(0),
+	m_control_latch(0),
+	m_alpha(0),
+	m_da(0),
+	m_next_da(CLEAR_LINE),
+	m_rpt(0),
+	m_next_rpt(CLEAR_LINE)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cdp1871_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const cdp1871_interface *intf = reinterpret_cast<const cdp1871_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<cdp1871_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&out_da_cb, 0, sizeof(out_da_cb));
-		memset(&out_rpt_cb, 0, sizeof(out_rpt_cb));
-		// m_in_d_cb[]
-		memset(&in_shift_cb, 0, sizeof(in_shift_cb));
-		memset(&in_control_cb, 0, sizeof(in_control_cb));
-		memset(&in_alpha_cb, 0, sizeof(in_alpha_cb));
-	}
 }
 
 
@@ -140,22 +137,19 @@ void cdp1871_device::device_config_complete()
 void cdp1871_device::device_start()
 {
 	// resolve callbacks
-	m_out_da_func.resolve(out_da_cb, *this);
-	m_out_rpt_func.resolve(out_rpt_cb, *this);
-	m_in_d_func[0].resolve(in_d1_cb, *this);
-	m_in_d_func[1].resolve(in_d2_cb, *this);
-	m_in_d_func[2].resolve(in_d3_cb, *this);
-	m_in_d_func[3].resolve(in_d4_cb, *this);
-	m_in_d_func[4].resolve(in_d5_cb, *this);
-	m_in_d_func[5].resolve(in_d6_cb, *this);
-	m_in_d_func[6].resolve(in_d7_cb, *this);
-	m_in_d_func[7].resolve(in_d8_cb, *this);
-	m_in_d_func[8].resolve(in_d9_cb, *this);
-	m_in_d_func[9].resolve(in_d10_cb, *this);
-	m_in_d_func[10].resolve(in_d11_cb, *this);
-	m_in_shift_func.resolve(in_shift_cb, *this);
-	m_in_control_func.resolve(in_control_cb, *this);
-	m_in_alpha_func.resolve(in_alpha_cb, *this);
+	m_read_d1.resolve_safe(0xff);
+	m_read_d2.resolve_safe(0xff);
+	m_read_d3.resolve_safe(0xff);
+	m_read_d4.resolve_safe(0xff);
+	m_read_d5.resolve_safe(0xff);
+	m_read_d6.resolve_safe(0xff);
+	m_read_d7.resolve_safe(0xff);
+	m_read_d8.resolve_safe(0xff);
+	m_read_d9.resolve_safe(0xff);
+	m_read_d10.resolve_safe(0xff);
+	m_read_d11.resolve_safe(0xff);
+	m_write_da.resolve_safe();
+	m_write_rpt.resolve_safe();
 
 	// set initial values
 	change_output_lines();
@@ -169,7 +163,10 @@ void cdp1871_device::device_start()
 	save_item(NAME(m_sense));
 	save_item(NAME(m_drive));
 	save_item(NAME(m_shift));
+	save_item(NAME(m_shift_latch));
 	save_item(NAME(m_control));
+	save_item(NAME(m_control_latch));
+	save_item(NAME(m_alpha));
 	save_item(NAME(m_da));
 	save_item(NAME(m_next_da));
 	save_item(NAME(m_rpt));
@@ -199,14 +196,14 @@ void cdp1871_device::change_output_lines()
 	{
 		m_da = m_next_da;
 
-		m_out_da_func(m_da);
+		m_write_da(m_da);
 	}
 
 	if (m_next_rpt != m_rpt)
 	{
 		m_rpt = m_next_rpt;
 
-		m_out_rpt_func(m_rpt);
+		m_write_rpt(m_rpt);
 	}
 }
 
@@ -244,14 +241,26 @@ void cdp1871_device::detect_keypress()
 {
 	UINT8 data = 0;
 
-	data = m_in_d_func[m_drive](0);
+	switch (m_drive) {
+	case 0: data = m_read_d1(0); break;
+	case 1: data = m_read_d2(0); break;
+	case 2: data = m_read_d3(0); break;
+	case 3: data = m_read_d4(0); break;
+	case 4: data = m_read_d5(0); break;
+	case 5: data = m_read_d6(0); break;
+	case 6: data = m_read_d7(0); break;
+	case 7: data = m_read_d8(0); break;
+	case 8: data = m_read_d9(0); break;
+	case 9: data = m_read_d10(0); break;
+	case 10: data = m_read_d11(0); break;
+	}
 
 	if (data == (1 << m_sense))
 	{
 		if (!m_inhibit)
 		{
-			m_shift = m_in_shift_func();
-			m_control = m_in_control_func();
+			m_shift_latch = m_shift;
+			m_control_latch = m_control;
 			m_inhibit = true;
 			m_next_da = ASSERT_LINE;
 		}
@@ -269,38 +278,17 @@ void cdp1871_device::detect_keypress()
 
 
 //-------------------------------------------------
-//  data_r - keyboard data read
+//  read - keyboard data read
 //-------------------------------------------------
 
-READ8_MEMBER( cdp1871_device::data_r )
+READ8_MEMBER( cdp1871_device::read )
 {
 	int table = 0;
-	int alpha = m_in_alpha_func();
 
-	if (m_control) table = 3; else if (m_shift) table = 2; else if (alpha) table = 1;
+	if (m_control_latch) table = 3; else if (m_shift_latch) table = 2; else if (m_alpha) table = 1;
 
 	// reset DA on next TPB
 	m_next_da = CLEAR_LINE;
 
-	return CDP1871_KEY_CODES[table][m_drive][m_sense];
-}
-
-
-//-------------------------------------------------
-//  da_r - data available
-//-------------------------------------------------
-
-READ_LINE_MEMBER( cdp1871_device::da_r )
-{
-	return m_da;
-}
-
-
-//-------------------------------------------------
-//  rpt_r - keyboard repeat
-//-------------------------------------------------
-
-READ_LINE_MEMBER( cdp1871_device::rpt_r )
-{
-	return m_rpt;
+	return key_codes[table][m_drive][m_sense];
 }
