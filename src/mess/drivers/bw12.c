@@ -586,7 +586,8 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",bw12,"palette")
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("dummy_palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",bw12,"dummy_palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/8, bw12_mc6845_interface)
 

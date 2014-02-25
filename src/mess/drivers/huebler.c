@@ -402,7 +402,8 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_SCREEN_UPDATE_DRIVER(amu880_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",amu880,"palette")
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("dummy_palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",amu880,"dummy_palette")
 
 	/* devices */
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_10MHz/4, ctc_intf)

@@ -40,7 +40,8 @@ static GFXDECODE_START( video64 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_FRAGMENT( video64 )
-	MCFG_GFXDECODE_ADD("gfxdecode",video64,"palette")
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("dummy_palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",video64,"dummy_palette")
 MACHINE_CONFIG_END
 
 //**************************************************************************

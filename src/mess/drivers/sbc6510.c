@@ -311,7 +311,8 @@ static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	MCFG_CPU_DATA_MAP(sbc6510_video_data)
 	MCFG_CPU_IO_MAP(sbc6510_video_io)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",sbc6510,"palette")
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("dummy_palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",sbc6510,"dummy_palette")
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
