@@ -875,7 +875,7 @@ static MACHINE_CONFIG_START( lastday, dooyong_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",lastday,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,lastday)
 
@@ -920,7 +920,7 @@ static MACHINE_CONFIG_START( gulfstrm, dooyong_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",lastday,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,gulfstrm)
 
@@ -954,7 +954,7 @@ static MACHINE_CONFIG_START( pollux, dooyong_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",lastday,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,pollux)
 
@@ -987,7 +987,7 @@ static MACHINE_CONFIG_START( bluehawk, dooyong_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",bluehawk,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,bluehawk)
 
@@ -1050,7 +1050,7 @@ static MACHINE_CONFIG_START( primella, dooyong_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",primella,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,primella)
 
@@ -1093,7 +1093,7 @@ static MACHINE_CONFIG_START( rshark, dooyong_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",rshark,"palette")
 	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,rshark)
 
@@ -1124,7 +1124,7 @@ static MACHINE_CONFIG_START( superx, dooyong_state ) // dif mem map
 
 	MCFG_GFXDECODE_ADD("gfxdecode",rshark,"palette")
 	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,rshark)
 
@@ -1155,7 +1155,7 @@ static MACHINE_CONFIG_START( popbingo, dooyong_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",popbingo,"palette")
 	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_state,popbingo)
 

@@ -3030,7 +3030,7 @@ static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",taitof2,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_default)
 
@@ -3059,6 +3059,8 @@ static MACHINE_CONFIG_DERIVED( taito_f2_tc0510nio, taito_f2 )
 	/* basic machine hardware */
 
 	MCFG_TC0510NIO_ADD("tc0510nio", taitof2_io510_intf)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 MACHINE_CONFIG_END
 
 
@@ -3628,7 +3630,7 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",pivot,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dondokod)
 

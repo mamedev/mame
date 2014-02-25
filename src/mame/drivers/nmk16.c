@@ -3937,7 +3937,7 @@ static MACHINE_CONFIG_START( acrobatm, nmk16_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",macross,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 

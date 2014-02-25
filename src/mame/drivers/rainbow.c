@@ -712,7 +712,7 @@ static MACHINE_CONFIG_START( jumping, rbisland_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",jumping,"palette")
 	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(rbisland_state,jumping)
 

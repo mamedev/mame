@@ -715,7 +715,7 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",midas,"palette")
 	MCFG_PALETTE_ADD("palette", 0x10000)
-
+	MCFG_PALETTE_FORMAT(XRGB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -2009,7 +2009,7 @@ static MACHINE_CONFIG_START( rastsag2, taitob_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
@@ -2055,7 +2055,7 @@ static MACHINE_CONFIG_START( masterw, taitob_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
@@ -2081,6 +2081,9 @@ static MACHINE_CONFIG_DERIVED( tetrist, rastsag2 ) /* Nastar conversion kit with
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tetrist_map)
+	
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 MACHINE_CONFIG_END
 
 
@@ -2117,7 +2120,7 @@ static MACHINE_CONFIG_START( ashura, taitob_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
@@ -2209,7 +2212,7 @@ static MACHINE_CONFIG_START( hitice, taitob_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,hitice)
 	MCFG_VIDEO_RESET_OVERRIDE(taitob_state,hitice)
@@ -2261,7 +2264,7 @@ static MACHINE_CONFIG_START( rambo3p, taitob_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",rambo3,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
@@ -2754,7 +2757,7 @@ static MACHINE_CONFIG_START( sbm, taitob_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 

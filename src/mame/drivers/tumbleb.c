@@ -2237,7 +2237,7 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",tumbleb,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
@@ -2341,7 +2341,7 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",suprtrio,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,suprtrio)
 

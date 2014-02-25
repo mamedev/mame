@@ -1309,6 +1309,7 @@ WRITE_LINE_MEMBER(dec0_state::sound_irq2)
 static MACHINE_CONFIG_START( dec0_base, dec0_state )
 	MCFG_GFXDECODE_ADD("gfxdecode",dec0,"palette")
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,0,0);
