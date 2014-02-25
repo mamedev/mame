@@ -375,10 +375,7 @@ UINT32 namcos1_state::screen_update_namcos1(screen_device &screen, bitmap_ind16 
 	rectangle new_clip = cliprect;
 
 	/* flip screen is embedded in the sprite control registers */
-	/* can't use flip_screen_set() because the visible area is asymmetrical */
-	flip_screen_set_no_update(m_spriteram[0x0ff6] & 1);
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-
+	flip_screen_set(m_spriteram[0x0ff6] & 1);
 
 	/* background color */
 	bitmap.fill(get_black_pen(machine()), cliprect);
