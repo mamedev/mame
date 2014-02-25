@@ -187,7 +187,6 @@ void mc2661_device::device_reset()
 
 	m_mode_index = 0;
 	m_sync_index = 0;
-	m_signal = 0;
 
 	m_out_txd_func(1);
 	m_out_rxrdy_func(CLEAR_LINE);
@@ -206,10 +205,7 @@ void mc2661_device::device_reset()
 
 void mc2661_device::tra_callback()
 {
-	if (m_out_txd_func.isnull())
-		transmit_register_send_bit();
-	else
-		m_out_txd_func(transmit_register_get_data_bit());
+	m_out_txd_func(transmit_register_get_data_bit());
 }
 
 
@@ -226,16 +222,6 @@ void mc2661_device::tra_complete()
 
 
 //-------------------------------------------------
-//  rcv_callback -
-//-------------------------------------------------
-
-void mc2661_device::rcv_callback()
-{
-	receive_register_update_bit(m_signal);
-}
-
-
-//-------------------------------------------------
 //  rcv_complete -
 //-------------------------------------------------
 
@@ -246,16 +232,6 @@ void mc2661_device::rcv_complete()
 	m_rhr = get_received_char();
 	m_sr |= STATUS_RXRDY;
 	m_out_rxrdy_func(ASSERT_LINE);
-}
-
-
-//-------------------------------------------------
-//  input_callback -
-//-------------------------------------------------
-
-void mc2661_device::input_callback(UINT8 state)
-{
-	m_input_state = state;
 }
 
 

@@ -80,13 +80,13 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	void update_rx_ready();
 	void update_tx_ready();
 	void update_tx_empty();
 	void transmit_clock();
 	void receive_clock();
-	virtual void input_callback(UINT8 state);
 
 	enum
 	{
@@ -117,6 +117,9 @@ private:
 	/* mode byte - bit definitions depend on mode - e.g. synchronous, asynchronous */
 	UINT8 m_mode_byte;
 
+	int m_cts;
+	int m_dsr;
+	int m_rxd;
 	int m_rxc;
 	int m_txc;
 	int m_rxc_count;

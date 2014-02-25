@@ -620,21 +620,16 @@ void z80dart_channel::tra_callback()
 	{
 		// transmit mark
 		m_out_txd_func(1);
-		set_out_data_bit(1);
 	}
 	else if (m_wr[5] & WR5_SEND_BREAK)
 	{
 		// transmit break
 		m_out_txd_func(0);
-		set_out_data_bit(0);
 	}
 	else if (!is_transmit_register_empty())
 	{
 		// transmit data
-		if (m_out_txd_func.isnull())
-			transmit_register_send_bit();
-		else
-			m_out_txd_func(transmit_register_get_data_bit());
+		m_out_txd_func(transmit_register_get_data_bit());
 	}
 }
 
@@ -661,13 +656,11 @@ void z80dart_channel::tra_complete()
 	{
 		// transmit break
 		m_out_txd_func(0);
-		set_out_data_bit(0);
 	}
 	else
 	{
 		// transmit mark
 		m_out_txd_func(1);
-		set_out_data_bit(1);
 	}
 
 	// if transmit buffer is empty
@@ -691,7 +684,7 @@ void z80dart_channel::rcv_callback()
 {
 	if (m_wr[3] & WR3_RX_ENABLE)
 	{
-		receive_register_update_bit(get_in_data_bit());
+		receive_register_update_bit(m_rxd);
 	}
 }
 
@@ -704,23 +697,6 @@ void z80dart_channel::rcv_complete()
 {
 	receive_register_extract();
 	receive_data(get_received_char());
-}
-
-
-//-------------------------------------------------
-//  input_callback -
-//-------------------------------------------------
-
-void z80dart_channel::input_callback(UINT8 state)
-{
-	UINT8 changed = m_input_state ^ state;
-
-	m_input_state = state;
-
-	if (changed & CTS)
-	{
-		cts_w(state);
-	}
 }
 
 
@@ -1340,13 +1316,6 @@ void z80dart_channel::set_dtr(int state)
 	m_dtr = state;
 
 	m_out_dtr_func(m_dtr);
-
-	if (state)
-		m_connection_state &= ~DTR;
-	else
-		m_connection_state |= DTR;
-
-	serial_connection_out();
 }
 
 
@@ -1357,13 +1326,6 @@ void z80dart_channel::set_dtr(int state)
 void z80dart_channel::set_rts(int state)
 {
 	m_out_rts_func(state);
-
-	if (state)
-		m_connection_state &= ~RTS;
-	else
-		m_connection_state |= RTS;
-
-	serial_connection_out();
 }
 
 
@@ -1373,12 +1335,6 @@ void z80dart_channel::set_rts(int state)
 
 WRITE_LINE_MEMBER(z80dart_channel::write_rx)
 {
-	if (state)
-	{
-		input_callback(m_input_state | RX);
-	}
-	else
-	{
-		input_callback(m_input_state & ~RX);
-	}
+	m_rxd = state;
+	device_serial_interface::rx_w(state);
 }

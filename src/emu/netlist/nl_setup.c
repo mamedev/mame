@@ -208,7 +208,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 					{
 						case netlist_param_t::DOUBLE:
 						{
-							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", temp.cstr(), val->cstr()));
+							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val.cstr()));
 							double vald = 0;
 							if (sscanf(val.cstr(), "%lf", &vald) != 1)
 								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
@@ -218,7 +218,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 						case netlist_param_t::INTEGER:
 						case netlist_param_t::LOGIC:
 						{
-							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val->cstr()));
+							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val.cstr()));
 							double vald = 0;
 							if (sscanf(val.cstr(), "%lf", &vald) != 1)
 								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
@@ -533,7 +533,7 @@ static netlist_core_terminal_t &resolve_proxy(netlist_core_terminal_t &term)
 
 void netlist_setup_t::connect(netlist_core_terminal_t &t1_in, netlist_core_terminal_t &t2_in)
 {
-	NL_VERBOSE_OUT(("Connecting %s to %s\n", t1.name().cstr(), t2.name().cstr()));
+	NL_VERBOSE_OUT(("Connecting %s to %s\n", t1_in.name().cstr(), t2_in.name().cstr()));
 	netlist_core_terminal_t &t1 = resolve_proxy(t1_in);
 	netlist_core_terminal_t &t2 = resolve_proxy(t2_in);
 
@@ -577,7 +577,8 @@ void netlist_setup_t::resolve_inputs()
 {
     bool has_twoterms = false;
 
-	netlist().log("Resolving inputs ...");
+    netlist().log("Resolving inputs ...");
+
 	for (const link_t *entry = m_links.first(); entry != NULL; entry = m_links.next(entry))
 	{
 		const pstring t1s = entry->e1;
@@ -588,6 +589,7 @@ void netlist_setup_t::resolve_inputs()
 		connect(*t1, *t2);
 	}
 
+	//netlist().log("printing outputs ...");
 	/* print all outputs */
 	for (tagmap_terminal_t::entry_t *entry = m_terminals.first(); entry != NULL; entry = m_terminals.next(entry))
 	{

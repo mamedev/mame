@@ -180,12 +180,7 @@ void esqpanel_device::tra_complete()    // Tx completed sending byte
 
 void esqpanel_device::tra_callback()    // Tx send bit
 {
-	int bit = transmit_register_get_data_bit();
-	m_out_tx_func(bit);
-}
-
-void esqpanel_device::input_callback(UINT8 state)
-{
+	m_out_tx_func(transmit_register_get_data_bit());
 }
 
 void esqpanel_device::xmit_char(UINT8 data)

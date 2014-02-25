@@ -822,7 +822,7 @@ READ8_MEMBER(fm7_state::fm77av_boot_mode_r)
 {
 	UINT8 ret = 0xff;
 
-	if(ioport("DSW")->read() & 0x02)
+	if(m_dsw->read() & 0x02)
 		ret &= ~0x01;
 
 	return ret;
@@ -887,7 +887,7 @@ void fm7_state::fm7_update_psg()
 				break;
 			case 0x09:
 				// Joystick port read
-				m_psg_data = ioport("joy1")->read();
+				m_psg_data = m_joy1->read();
 				break;
 		}
 	}
@@ -956,12 +956,12 @@ READ8_MEMBER(fm7_state::fm7_fmirq_r)
 
 READ8_MEMBER(fm7_state::fm77av_joy_1_r)
 {
-	return ioport("joy1")->read();
+	return m_joy1->read();
 }
 
 READ8_MEMBER(fm7_state::fm77av_joy_2_r)
 {
-	return ioport("joy2")->read();
+	return m_joy2->read();
 }
 
 READ8_MEMBER(fm7_state::fm7_unknown_r)
@@ -1176,7 +1176,7 @@ WRITE8_MEMBER(fm7_state::fm7_mmr_w)
  */
 READ8_MEMBER(fm7_state::fm7_kanji_r)
 {
-	UINT8* KROM = memregion("kanji1")->base();
+	UINT8* KROM = m_kanji->base();
 	UINT32 addr = m_kanji_address << 1;
 
 	switch(offset)
@@ -1253,16 +1253,16 @@ void fm7_state::key_press(UINT16 scancode)
 
 void fm7_state::fm7_keyboard_poll_scan()
 {
-	static const char *const portnames[3] = { "key1","key2","key3" };
+	ioport_port* portnames[3] = { m_key1, m_key2, m_key3 };
 	int bit = 0;
 	int x,y;
 	UINT32 keys;
-	UINT32 modifiers = ioport("key_modifiers")->read();
+	UINT32 modifiers = m_keymod->read();
 	static const UINT16 modscancodes[6] = { 0x52, 0x53, 0x54, 0x55, 0x56, 0x5a };
 
 	for(x=0;x<3;x++)
 	{
-		keys = ioport(portnames[x])->read();
+		keys = portnames[x]->read();
 
 		for(y=0;y<32;y++)  // loop through each bit in the port
 		{
@@ -1298,14 +1298,14 @@ void fm7_state::fm7_keyboard_poll_scan()
 
 TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
 {
-	static const char *const portnames[3] = { "key1","key2","key3" };
+	ioport_port* portnames[3] = { m_key1, m_key2, m_key3 };
 	int x,y;
 	int bit = 0;
 	int mod = 0;
 	UINT32 keys;
-	UINT32 modifiers = ioport("key_modifiers")->read();
+	UINT32 modifiers = m_keymod->read();
 
-	if(ioport("key3")->read() & 0x40000)
+	if(m_key3->read() & 0x40000)
 	{
 		m_break_flag = 1;
 		m_maincpu->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
@@ -1334,7 +1334,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
 
 	for(x=0;x<3;x++)
 	{
-		keys = ioport(portnames[x])->read();
+		keys = portnames[x]->read();
 
 		for(y=0;y<32;y++)  // loop through each bit in the port
 		{
@@ -1921,7 +1921,7 @@ void fm7_state::machine_reset()
 		m_init_rom_en = 0;
 	if(m_type == SYS_FM7)
 	{
-		if(!(ioport("DSW")->read() & 0x02))
+		if(!(m_dsw->read() & 0x02))
 		{
 			m_basic_rom_en = 0;  // disabled for DOS mode
 			membank("bank1")->set_base(RAM+0x08000);
@@ -1947,7 +1947,7 @@ void fm7_state::machine_reset()
 	// set boot mode (FM-7 only, AV and later has boot RAM instead)
 	if(m_type == SYS_FM7)
 	{
-		if(!(ioport("DSW")->read() & 0x02))
+		if(!(m_dsw->read() & 0x02))
 		{  // DOS mode
 			membank("bank17")->set_base(memregion("dos")->base());
 		}

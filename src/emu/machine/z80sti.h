@@ -189,9 +189,7 @@ private:
 	// device_serial_interface overrides
 	virtual void tra_callback();
 	virtual void tra_complete();
-	virtual void rcv_callback();
 	virtual void rcv_complete();
-	virtual void input_callback(UINT8 state);
 
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state();

@@ -99,9 +99,7 @@ protected:
 	// device_serial_interface overrides
 	virtual void tra_callback();
 	virtual void tra_complete();
-	virtual void rcv_callback();
 	virtual void rcv_complete();
-	virtual void input_callback(UINT8 state);
 
 	enum
 	{

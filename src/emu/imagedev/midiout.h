@@ -58,7 +58,6 @@ protected:
 
 	// serial overrides
 	virtual void rcv_complete();    // Rx completed receiving byte
-	void input_callback(UINT8 state);
 
 private:
 	osd_midi_device *m_midi;

@@ -76,7 +76,6 @@ public:
 	device_serial_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_serial_interface();
 
-	void connect(device_serial_interface *other_connection);
 	DECLARE_WRITE_LINE_MEMBER(rx_w);
 	DECLARE_WRITE_LINE_MEMBER(tx_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(rx_clock_w);
@@ -103,14 +102,8 @@ protected:
 	void transmit_register_add_bit(int bit);
 	void transmit_register_setup(UINT8 data_byte);
 	UINT8 transmit_register_get_data_bit();
-	UINT8 transmit_register_send_bit();
 
 	UINT8 serial_helper_get_parity(UINT8 data) { return m_serial_parity_table[data]; }
-
-	UINT8 get_in_data_bit()  { return ((m_input_state & RX)>>4) & 1; }
-	void set_out_data_bit(UINT8 data)  { m_connection_state &= ~TX; m_connection_state |=(data<<5); }
-
-	void serial_connection_out();
 
 	bool is_receive_register_full();
 	bool is_transmit_register_empty();
@@ -121,12 +114,6 @@ protected:
 
 	UINT8 get_received_char() { return m_rcv_byte_received; }
 
-	void set_other_connection(device_serial_interface *other_connection);
-
-	virtual void input_callback(UINT8 state) = 0;
-
-	UINT8 m_input_state;
-	UINT8 m_connection_state;
 	virtual void tra_callback() { }
 	virtual void rcv_callback() { receive_register_update_bit(m_rcv_line); }
 	virtual void tra_complete() { }
@@ -190,8 +177,6 @@ private:
 	UINT8 m_rcv_line;
 
 	int m_tra_clock_state, m_rcv_clock_state;
-
-	device_serial_interface *m_other_connection;
 
 	void tra_edge();
 	void rcv_edge();

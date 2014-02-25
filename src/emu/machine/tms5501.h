@@ -95,9 +95,7 @@ protected:
 	// device_serial_interface overrides
 	virtual void tra_callback();
 	virtual void tra_complete();
-	virtual void rcv_callback();
 	virtual void rcv_complete();
-	virtual void input_callback(UINT8 state);
 
 	DECLARE_READ8_MEMBER( rb_r );
 	DECLARE_READ8_MEMBER( xi_r );
@@ -185,7 +183,6 @@ private:
 	UINT8 m_tb;
 	UINT8 m_mr;
 
-	int m_rcv;
 	int m_sens;
 	int m_xi7;
 

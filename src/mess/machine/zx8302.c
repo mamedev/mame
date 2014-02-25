@@ -313,7 +313,7 @@ void zx8302_device::rcv_callback()
 	switch (m_tcr & MODE_MASK)
 	{
 	case MODE_NET:
-		receive_register_update_bit(get_in_data_bit());
+		receive_register_update_bit(m_rs232_rx);
 		break;
 	}
 }
@@ -326,16 +326,6 @@ void zx8302_device::rcv_callback()
 void zx8302_device::rcv_complete()
 {
 	// TODO
-}
-
-
-//-------------------------------------------------
-//  input_callback -
-//-------------------------------------------------
-
-void zx8302_device::input_callback(UINT8 state)
-{
-	m_input_state = state;
 }
 
 
@@ -624,14 +614,8 @@ WRITE_LINE_MEMBER( zx8302_device::extint_w )
 
 WRITE_LINE_MEMBER( zx8302_device::write_netin )
 {
-	if (state)
-	{
-		input_callback(m_input_state | RX);
-	}
-	else
-	{
-		input_callback(m_input_state & ~RX);
-	}
+	m_rs232_rx = state;
+	device_serial_interface::rx_w(state);
 }
 
 WRITE_LINE_MEMBER( zx8302_device::write_dtr1 )

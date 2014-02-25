@@ -57,9 +57,11 @@ public:
 		m_ppi(*this, "ppi"),
 		m_fdc (*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1")
-	{
-	}
+		m_floppy1(*this, "fdc:1"),
+		m_vs(*this, "VS"),
+		m_bankr0(*this, "bankr0"),
+		m_bankw0(*this, "bankw0"),
+		m_bank2(*this, "bank2")	{}
 
 public:
 	const UINT8 *m_p_chargen;
@@ -93,6 +95,10 @@ private:
 	required_device<fd1791_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	required_ioport m_vs;
+	required_memory_bank m_bankr0;
+	required_memory_bank m_bankw0;
+	required_memory_bank m_bank2;
 };
 
 static ADDRESS_MAP_START( sbrain_mem, AS_PROGRAM, 8, sbrain_state )
@@ -205,7 +211,7 @@ d7 : cpu2 /busak line
 */
 READ8_MEMBER( sbrain_state::ppi_pb_r )
 {
-	return m_portb | 0x50 | ioport("VS")->read() | (BIT(m_port08, 0) << 5) | ((UINT8)BIT(m_portc, 5) << 7);
+	return m_portb | 0x50 | m_vs->read() | (BIT(m_port08, 0) << 5) | ((UINT8)BIT(m_portc, 5) << 7);
 }
 
 WRITE8_MEMBER( sbrain_state::ppi_pb_w )
@@ -232,8 +238,8 @@ WRITE8_MEMBER( sbrain_state::ppi_pc_w )
 {
 	m_portc = data;
 	m_beep->set_state(BIT(data, 6));
-	membank("bankr0")->set_entry(BIT(data, 2));
-	membank("bank2")->set_entry(BIT(data, 4));
+	m_bankr0->set_entry(BIT(data, 2));
+	m_bank2->set_entry(BIT(data, 4));
 
 	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -249,11 +255,11 @@ DRIVER_INIT_MEMBER( sbrain_state, sbrain )
 	UINT8 *main = memregion("maincpu")->base();
 	UINT8 *sub = memregion("subcpu")->base();
 
-	membank("bankr0")->configure_entry(0, &main[0x0000]);
-	membank("bankr0")->configure_entry(1, &sub[0x0000]);
-	membank("bankw0")->configure_entry(0, &main[0x0000]);
-	membank("bank2")->configure_entry(0, &sub[0x8000]);
-	membank("bank2")->configure_entry(1, &main[0x8000]);
+	m_bankr0->configure_entry(0, &main[0x0000]);
+	m_bankr0->configure_entry(1, &sub[0x0000]);
+	m_bankw0->configure_entry(0, &main[0x0000]);
+	m_bank2->configure_entry(0, &sub[0x8000]);
+	m_bank2->configure_entry(1, &main[0x8000]);
 }
 
 static SLOT_INTERFACE_START( sbrain_floppies )
@@ -274,9 +280,9 @@ MACHINE_RESET_MEMBER( sbrain_state, sbrain )
 {
 	m_beep->set_frequency(800);
 	m_p_chargen = memregion("chargen")->base();
-	membank("bankr0")->set_entry(1); // point at rom
-	membank("bankw0")->set_entry(0); // always write to ram
-	membank("bank2")->set_entry(1); // point at maincpu bank
+	m_bankr0->set_entry(1); // point at rom
+	m_bankw0->set_entry(0); // always write to ram
+	m_bank2->set_entry(1); // point at maincpu bank
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // hold subcpu in reset
 }
 

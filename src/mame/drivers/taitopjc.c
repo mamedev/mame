@@ -57,6 +57,7 @@
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/tlcs900/tlcs900.h"
+#include "cpu/mn10200/mn10200.h"
 
 static UINT32 jc_char_ram[0x2000];
 static UINT32 jc_tile_ram[0x4000];
@@ -70,7 +71,12 @@ class taitopjc_state : public driver_device
 public:
 	taitopjc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "mn10200")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 
 	DECLARE_READ64_MEMBER(video_r);
 	DECLARE_WRITE64_MEMBER(video_w);
@@ -81,9 +87,9 @@ public:
 	DECLARE_WRITE8_MEMBER(tlcs_common_w);
 	DECLARE_READ8_MEMBER(tlcs_sound_r);
 	DECLARE_WRITE8_MEMBER(tlcs_sound_w);
+	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_taitopjc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
 };
 
 void taitopjc_state::video_start()
@@ -383,10 +389,20 @@ static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
 ADDRESS_MAP_END
 
+ADDRESS_MAP_START( mn10200_map, AS_PROGRAM, 16, driver_device )
+	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mn10200", 0)
+ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( taitopjc )
 INPUT_PORTS_END
+
+
+void taitopjc_state::machine_reset()
+{
+	// halt sound CPU since we don't emulate this yet
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
 
 
 static const powerpc_config ppc603e_config =
@@ -407,7 +423,9 @@ static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_CPU_PROGRAM_MAP(tlcs900h_mem)
 
 	/* TMS320C53 DSP */
-	/* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
+
+	MCFG_CPU_ADD("mn10200", MN1020012A, 10000000) /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
+	MCFG_CPU_PROGRAM_MAP(mn10200_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -437,7 +455,7 @@ ROM_START( optiger )
 	ROM_LOAD16_BYTE( "e63-28-1_0.59", 0x000000, 0x020000, CRC(ef41ffaf) SHA1(419621f354f548180d37961b861304c469e43a65) )
 	ROM_LOAD16_BYTE( "e63-27-1_1.58", 0x000001, 0x020000, CRC(facc17a7) SHA1(40d69840cfcfe5a509d69824c2994de56a3c6ece) )
 
-	ROM_REGION( 0x80000, "unk1", 0 )
+	ROM_REGION( 0x80000, "mn10200", 0 )
 	ROM_LOAD16_BYTE( "e63-17-1_s-l.18", 0x000000, 0x040000, CRC(2a063d5b) SHA1(a2b2fe4d8bad1aef7d9dcc0be607cc4e5bc4f0eb) )
 	ROM_LOAD16_BYTE( "e63-18-1_s-h.19", 0x000001, 0x040000, CRC(2f590881) SHA1(7fb827a676f45b24380558b0068b76cb858314f6) )
 

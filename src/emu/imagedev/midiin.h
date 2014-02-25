@@ -64,7 +64,6 @@ protected:
 	// serial overrides
 	virtual void tra_complete();    // Tx completed sending byte
 	virtual void tra_callback();    // Tx send bit
-	void input_callback(UINT8 state);
 
 private:
 	static const int XMIT_RING_SIZE = (8192*4*4);

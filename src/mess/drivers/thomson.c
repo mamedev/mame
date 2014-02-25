@@ -69,12 +69,12 @@
 */
 
 #include "includes/thomson.h"
+#include "bus/rs232/rs232.h"
 #include "machine/6821pia.h"
 #include "machine/wd17xx.h"
 #include "machine/clock.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/flopdrv.h"
-#include "imagedev/serial.h"
 #include "formats/basicdsk.h"
 #include "machine/ram.h"
 
@@ -308,7 +308,7 @@ static ADDRESS_MAP_START ( to7, AS_PROGRAM, 8, thomson_state )
 	AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
 	AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
 	AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE(to7_floppy_r, to7_floppy_w )
-	AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE( "pia_2", pia6821_device, read_alt, write_alt )
+	AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE( "to7_io:pia_2", pia6821_device, read_alt, write_alt )
 	AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
 	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
 	AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt )
@@ -603,21 +603,6 @@ const cassette_interface mo5_cassette_interface =
 	NULL
 };
 
-const serial_image_interface to7_cc90232_config =
-{
-	2400, 7, device_serial_interface::STOP_BITS_2, device_serial_interface::PARITY_NONE, 1, "to7_io"
-};
-
-const serial_image_interface to7_rf57932_config =
-{
-	2400, 7, device_serial_interface::STOP_BITS_2, device_serial_interface::PARITY_NONE, 1, "acia"
-};
-
-const serial_image_interface to7_modem_config =
-{
-	2400, 7, device_serial_interface::STOP_BITS_2, device_serial_interface::PARITY_NONE, 1, NULL
-};
-
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_START( to7, thomson_state )
@@ -652,14 +637,6 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_SOUND_ADD ( "speech", DAC, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* speech synthesis */
 
-/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(thomson_state, to7_io_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(thomson_state, write_centronics_perror))
-
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-
 /* cassette */
 	MCFG_CASSETTE_ADD( "cassette", to7_cassette_interface )
 
@@ -687,14 +664,6 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(thomson_state, thom_firq_1))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_firq_1))
 
-	MCFG_DEVICE_ADD(THOM_PIA_IO, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(DEVREAD8("to7_io", to7_io_line_device, porta_in))
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("to7_io", to7_io_line_device, porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to7_io_portb_out))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, to7_io_cb2_out))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(thomson_state, thom_firq_1))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_firq_1))
-
 	MCFG_DEVICE_ADD(THOM_PIA_GAME, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to7_game_porta_in))
 	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, to7_game_portb_in))
@@ -707,11 +676,19 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 
 /* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
+	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
-/* to7 serial io line */
+	/// 2400 7N2
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, rxd_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, dsr_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", mos6551_device, cts_w))
+
+/* TODO: CONVERT THIS TO A SLOT DEVICE */
 	MCFG_TO7_IO_LINE_ADD("to7_io")
 
-/* modem */
+/* TODO: MOVE THIS TO A MODEM SLOT DEVICE */
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(thomson_state, to7_modem_tx_w))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(thomson_state, to7_modem_cb))
@@ -731,10 +708,6 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("40K")
 	MCFG_RAM_EXTRA_OPTIONS("24K,48K")
-
-	MCFG_SERIAL_ADD("cc90232", to7_cc90232_config)
-	MCFG_SERIAL_ADD("rf57932", to7_rf57932_config)
-	MCFG_SERIAL_ADD("modem"  , to7_modem_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( t9000, to7 )
@@ -1450,15 +1423,6 @@ static MACHINE_CONFIG_DERIVED( to9, to7 )
 	MCFG_PIA_CB2_HANDLER(NULL)
 	MCFG_PIA_IRQA_HANDLER(NULL)
 
-	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
-
-	MCFG_DEVICE_MODIFY("centronics")
-	MCFG_CENTRONICS_ACK_HANDLER(NULL)
-	MCFG_CENTRONICS_BUSY_HANDLER(NULL)
-	MCFG_CENTRONICS_PERROR_HANDLER(NULL)
-
-	MCFG_DEVICE_REMOVE("cent_data_out")
-
 	MCFG_MC6846_MODIFY( "mc6846", to9_timer )
 
 
@@ -1678,12 +1642,8 @@ static MACHINE_CONFIG_DERIVED( to8, to7 )
 	MCFG_PIA_CB2_HANDLER(NULL)
 	MCFG_PIA_IRQA_HANDLER(NULL)
 
-	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
-
-	MCFG_DEVICE_MODIFY("centronics")
-	MCFG_CENTRONICS_ACK_HANDLER(NULL)
-	MCFG_CENTRONICS_PERROR_HANDLER(NULL)
-	MCFG_DEVICE_REMOVE("cent_data_out")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
 
 	MCFG_MC6846_MODIFY( "mc6846", to8_timer )
 
@@ -1835,12 +1795,8 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 	MCFG_PIA_IRQA_HANDLER(NULL)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_firq_1))
 
-	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
-
-	MCFG_DEVICE_MODIFY("centronics")
-	MCFG_CENTRONICS_ACK_HANDLER(NULL)
-	MCFG_CENTRONICS_PERROR_HANDLER(NULL)
-	MCFG_DEVICE_REMOVE("cent_data_out")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
 
 	MCFG_MC6846_MODIFY( "mc6846", to9p_timer )
 
@@ -2179,15 +2135,14 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* differs from TO */
 
-	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
-
 	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_game_cb2_out))
 
-	MCFG_DEVICE_MODIFY("centronics")
-	MCFG_CENTRONICS_ACK_HANDLER(NULL)
-	MCFG_CENTRONICS_PERROR_HANDLER(NULL)
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("m5,rom")
@@ -2417,17 +2372,15 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* differs from TO */
 
-	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
-
 	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))
 
-	MCFG_DEVICE_MODIFY("centronics")
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(NULL)
-	MCFG_CENTRONICS_PERROR_HANDLER(NULL)
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
 
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("m5,rom")

@@ -70,7 +70,6 @@ tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, d
 	m_rr(0),
 	m_tb(0),
 	m_mr(0),
-	m_rcv(1),
 	m_sens(0),
 	m_xi7(0)
 {
@@ -118,8 +117,6 @@ void tms5501_device::device_reset()
 	transmit_register_reset();
 
 	m_write_xmt(1);
-	set_out_data_bit(1);
-	serial_connection_out();
 
 	check_interrupt();
 }
@@ -168,10 +165,7 @@ void tms5501_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void tms5501_device::tra_callback()
 {
-	if (m_write_xmt.isnull())
-		transmit_register_send_bit();
-	else
-		m_write_xmt(transmit_register_get_data_bit());
+	m_write_xmt(transmit_register_get_data_bit());
 }
 
 
@@ -189,16 +183,6 @@ void tms5501_device::tra_complete()
 
 		set_interrupt(IRQ_TB);
 	}
-}
-
-
-//-------------------------------------------------
-//  rcv_callback -
-//-------------------------------------------------
-
-void tms5501_device::rcv_callback()
-{
-	receive_register_update_bit(m_rcv);
 }
 
 
@@ -229,16 +213,6 @@ void tms5501_device::rcv_complete()
 	m_sta &= ~(STA_SBD | STA_FBD);
 
 	set_interrupt(IRQ_RB);
-}
-
-
-//-------------------------------------------------
-//  input_callback -
-//-------------------------------------------------
-
-void tms5501_device::input_callback(UINT8 state)
-{
-	m_input_state = state;
 }
 
 
@@ -317,8 +291,6 @@ WRITE8_MEMBER( tms5501_device::cmd_w )
 		transmit_register_reset();
 
 		m_write_xmt(1);
-		set_out_data_bit(1);
-		serial_connection_out();
 
 		m_irq = 0;
 		set_interrupt(IRQ_TB);
@@ -335,8 +307,6 @@ WRITE8_MEMBER( tms5501_device::cmd_w )
 		transmit_register_reset();
 
 		m_write_xmt(0);
-		set_out_data_bit(0);
-		serial_connection_out();
 	}
 }
 
@@ -444,8 +414,6 @@ WRITE8_MEMBER( tms5501_device::tmr_w )
 
 WRITE_LINE_MEMBER( tms5501_device::rcv_w )
 {
-	m_rcv = state;
-
 	device_serial_interface::rx_w(state);
 
 	if (is_receive_register_synchronized())
