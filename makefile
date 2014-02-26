@@ -583,6 +583,12 @@ ifneq (,$(findstring clang,$(CC)))
 CCOMFLAGS += -fsanitize-memory-track-origins -fPIE
 endif
 endif
+ifneq (,$(findstring undefined,$(SANITIZE)))
+ifneq (,$(findstring clang,$(CC)))
+# TODO: check if linker is clang++
+CCOMFLAGS += -fno-sanitize=alignment
+endif
+endif
 endif
 
 #-------------------------------------------------
