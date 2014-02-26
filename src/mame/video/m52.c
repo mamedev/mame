@@ -408,7 +408,7 @@ UINT32 m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap,
 		clip = cliprect;
 #endif
 
-		 m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,clip,
+		m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,clip,
 			code, color, flipx, flipy, sx, sy,
 			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512 + 32));
 	}
