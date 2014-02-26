@@ -219,6 +219,7 @@ private:
 	void finalize_init(running_machine &machine);
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 public:
 
 	// todo: collapse these into above

@@ -186,7 +186,7 @@ void sidearms_state::draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &
 		}
 
 		
-			gfx->transpen(bitmap,cliprect,
+			gfx->transpen(m_palette,bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			x, y, 15);

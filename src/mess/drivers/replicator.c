@@ -669,7 +669,7 @@ static MACHINE_CONFIG_START( replicator, replicator_state )
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(replicator_state, replicator)
-	MCFG_GFXDECODE_ADD("gfxdecode",replicator,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",replicator)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_HD44780_ADD("hd44780")

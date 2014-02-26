@@ -223,7 +223,7 @@ UINT32 murogem_state::screen_update_murogem(screen_device &screen, bitmap_ind16 
 			int tileno = m_videoram[count]&0x3f;
 			int attr = m_videoram[count+0x400]&0x0f;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,tileno,attr,0,0,xx*8,yy*8,0);
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,tileno,attr,0,0,xx*8,yy*8,0);
 
 			count++;
 
@@ -264,7 +264,7 @@ static MACHINE_CONFIG_START( murogem, murogem_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(murogem_state, screen_update_murogem)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",murogem,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",murogem)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(murogem_state, murogem)
 

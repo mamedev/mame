@@ -201,7 +201,7 @@ static MACHINE_CONFIG_START( thoop2, thoop2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(thoop2_state, screen_update_thoop2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",thoop2,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",thoop2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

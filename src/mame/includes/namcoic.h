@@ -150,6 +150,7 @@ protected:
 
 	static const gfx_layout s_tile_layout;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

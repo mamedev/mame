@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( fcombat, fcombat_state )
 	MCFG_SCREEN_RAW_PARAMS(FCOMBAT_PIXEL_CLOCK, FCOMBAT_HTOTAL, FCOMBAT_HBEND, FCOMBAT_HBSTART, FCOMBAT_VTOTAL, FCOMBAT_VBEND, FCOMBAT_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(fcombat_state, screen_update_fcombat)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",fcombat,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",fcombat)
 	MCFG_PALETTE_ADD("palette", 256*3)
 	MCFG_PALETTE_INIT_OWNER(fcombat_state, fcombat)
 

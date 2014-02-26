@@ -421,7 +421,7 @@ void mappy_state::mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
+					m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect,
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
@@ -498,7 +498,7 @@ void mappy_state::phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cli
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
+					m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect,
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,

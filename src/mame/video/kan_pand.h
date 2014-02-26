@@ -55,6 +55,7 @@ private:
 	int             m_clear_bitmap;
 	int             m_bg_pen; // might work some other way..
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type KANEKO_PANDORA;

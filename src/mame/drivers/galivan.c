@@ -436,7 +436,7 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_galivan)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",galivan,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",galivan)
 	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
 	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)
 	
@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_ninjemak)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galivan,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",galivan)
 	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
 	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)
 

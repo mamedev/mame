@@ -182,7 +182,7 @@ void midas_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			UINT16 code     =   codes[y*2];
 			UINT16 attr     =   codes[y*2+1];
 
-			 m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
+			 m_gfxdecode->gfx(0)->zoom_transpen(m_palette,bitmap,cliprect,
 							code,
 							attr >> 8,
 							attr & 1, attr & 2,
@@ -713,7 +713,7 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",midas,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",midas)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -746,7 +746,7 @@ static MACHINE_CONFIG_START( hammer, midas_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",midas,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",midas)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(XRGB)
 

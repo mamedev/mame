@@ -495,7 +495,7 @@ static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update_mlc)
 	MCFG_SCREEN_VBLANK_DRIVER(deco_mlc_state, screen_eof_mlc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",deco_mlc,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",deco_mlc)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
@@ -528,7 +528,7 @@ static MACHINE_CONFIG_START( mlc, deco_mlc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update_mlc)
 	MCFG_SCREEN_VBLANK_DRIVER(deco_mlc_state, screen_eof_mlc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",deco_mlc,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",deco_mlc)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 

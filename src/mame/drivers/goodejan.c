@@ -307,11 +307,11 @@ void goodejan_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		for (ax=0; ax<dx; ax++)
 			for (ay=0; ay<dy; ay++) {
 				if (!fx)
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+ax*16,y+ay*16,15);
 				else
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,15);
 			}
@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",goodejan,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",goodejan)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

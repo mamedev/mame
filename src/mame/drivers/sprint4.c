@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( sprint4, sprint4_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sprint4_state, screen_update_sprint4)
 	MCFG_SCREEN_VBLANK_DRIVER(sprint4_state, screen_eof_sprint4)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",sprint4,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",sprint4)
 	MCFG_PALETTE_ADD("palette", 10)
 	MCFG_PALETTE_INIT_OWNER(sprint4_state, sprint4)
 

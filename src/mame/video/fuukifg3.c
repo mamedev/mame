@@ -218,7 +218,7 @@ void fuuki32_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 			for (x = xstart; x != xend; x += xinc)
 			{
 				if (xzoom == (16*8) && yzoom == (16*8))
-					gfx->prio_transpen(bitmap,cliprect,
+					gfx->prio_transpen(m_palette,bitmap,cliprect,
 									code++,
 									attr & 0x3f,
 									flipx, flipy,
@@ -226,7 +226,7 @@ void fuuki32_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 									priority_bitmap,
 									pri_mask,15 );
 				else
-					gfx->prio_zoom_transpen(bitmap,cliprect,
+					gfx->prio_zoom_transpen(m_palette,bitmap,cliprect,
 									code++,
 									attr & 0x3f,
 									flipx, flipy,

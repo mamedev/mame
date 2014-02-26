@@ -2151,7 +2151,7 @@ static MACHINE_CONFIG_START( cuebrick, tmnt_state )
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,cuebrick)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	MCFG_K052109_ADD("k052109", cuebrick_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K051960_ADD("k051960", cuebrick_k051960_intf)
@@ -2195,7 +2195,7 @@ static MACHINE_CONFIG_START( mia, tmnt_state )
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,mia)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	MCFG_K052109_ADD("k052109", mia_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K051960_ADD("k051960", mia_k051960_intf)
@@ -2252,7 +2252,7 @@ static MACHINE_CONFIG_START( tmnt, tmnt_state )
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,tmnt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	MCFG_K052109_ADD("k052109", tmnt_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K051960_ADD("k051960", tmnt_k051960_intf)
@@ -2307,7 +2307,7 @@ static MACHINE_CONFIG_START( punkshot, tmnt_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	MCFG_K052109_ADD("k052109", tmnt_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K051960_ADD("k051960", punkshot_k051960_intf)
@@ -2356,7 +2356,7 @@ static MACHINE_CONFIG_START( lgtnfght, tmnt_state )
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	MCFG_K052109_ADD("k052109", tmnt_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K053245_ADD("k053245", lgtnfght_k05324x_intf)
@@ -2410,7 +2410,7 @@ static MACHINE_CONFIG_START( blswhstl, tmnt_state )
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state, blswhstl )
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	MCFG_K052109_ADD("k052109", blswhstl_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K053245_ADD("k053245", blswhstl_k05324x_intf)
@@ -2472,7 +2472,7 @@ static MACHINE_CONFIG_START( glfgreat, tmnt_state )
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_glfgreat)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",glfgreat,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",glfgreat)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -2536,7 +2536,7 @@ static MACHINE_CONFIG_START( prmrsocr, tmnt_state )
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_glfgreat)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",glfgreat,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",glfgreat)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -2599,7 +2599,7 @@ static MACHINE_CONFIG_START( tmnt2, tmnt_state )
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	MCFG_K052109_ADD("k052109", tmnt_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K053245_ADD("k053245", lgtnfght_k05324x_intf)
@@ -2652,7 +2652,7 @@ static MACHINE_CONFIG_START( ssriders, tmnt_state )
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	MCFG_K052109_ADD("k052109", tmnt_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K053245_ADD("k053245", lgtnfght_k05324x_intf)
@@ -2699,7 +2699,7 @@ static MACHINE_CONFIG_START( sunsetbl, tmnt_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	MCFG_K052109_ADD("k052109", sunsetbl_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K053245_ADD("k053245", lgtnfght_k05324x_intf)
@@ -2743,7 +2743,7 @@ static MACHINE_CONFIG_START( thndrx2, tmnt_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	MCFG_K052109_ADD("k052109", tmnt_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K051960_ADD("k051960", thndrx2_k051960_intf)

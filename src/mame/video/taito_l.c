@@ -256,7 +256,7 @@ void taitol_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

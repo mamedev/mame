@@ -531,7 +531,7 @@ static void draw_tilemap(vega_state *state, screen_device& screen, bitmap_ind16&
 				{
 					//for(int x=0;x<4;++x)
 					{
-						state->m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, num, 0, 1,flip?1:0,  x*4+x0-offset_x, (flip?(3-y):y)*8+y0-offset_y, 0);
+						state->m_gfxdecode->gfx(1)->transpen(state->m_palette,bitmap,cliprect, num, 0, 1,flip?1:0,  x*4+x0-offset_x, (flip?(3-y):y)*8+y0-offset_y, 0);
 						++num;
 					}
 				}
@@ -580,7 +580,7 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 
 			//  if(color==0) color=0xf;
 
-				  m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, character, color, 0, 0, x*7, y*10,0);
+				  m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, character, color, 0, 0, x*7, y*10,0);
 
 				++idx;
 			}
@@ -601,7 +601,7 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 			{
 				//for(int x=0;x<4;++x)
 				{
-					  m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, num, 0, 1, flip?1:0, x*4+x0, (flip?(3-y):y)*8+y0, 0);
+					  m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect, num, 0, 1, flip?1:0, x*4+x0, (flip?(3-y):y)*8+y0, 0);
 					++num;
 				}
 			}
@@ -641,7 +641,7 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 
 				for(int y=0;y<4;++y)
 				{
-					  m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, strip_num, 0, !xor_line, 0, x*4+x0, y*8+y0, 0);
+					  m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect, strip_num, 0, !xor_line, 0, x*4+x0, y*8+y0, 0);
 					++strip_num;
 				}
 			}
@@ -854,7 +854,7 @@ static MACHINE_CONFIG_START( vega, vega_state )
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(vega_state, vega)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",test_decode,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",test_decode)
 
 	/* sound hardware */
 

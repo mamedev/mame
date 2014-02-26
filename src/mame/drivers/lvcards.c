@@ -476,7 +476,7 @@ static MACHINE_CONFIG_START( lvcards, lvcards_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lvcards_state, screen_update_lvcards)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",lvcards,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",lvcards)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(lvcards_state, lvcards)
 

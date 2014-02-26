@@ -181,7 +181,8 @@ deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag,
 	m_pf12_last_small(0),
 	m_pf12_last_big(0),
 	m_pf1_8bpp_mode(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this),
+	m_palette(*this)
 {
 }
 
@@ -512,7 +513,7 @@ void deco16ic_device::custom_tilemap_draw(
 
 			if ((flags & TILEMAP_DRAW_OPAQUE) || (p & trans_mask))
 			{
-				bitmap.pix(y, x) = m_gfxdecode->palette()->pen(p);
+				bitmap.pix(y, x) = m_palette->pen(p);
 				if (screen.priority().valid())
 				{
 					UINT8 *pri = &screen.priority().pix8(y);

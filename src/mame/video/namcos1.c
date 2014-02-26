@@ -345,7 +345,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 
 		gfx->set_source_clip(tx, sizex, ty, sizey);
 		if (color != 0x7f)
-			gfx->prio_transpen(bitmap,cliprect,
+			gfx->prio_transpen(state->m_palette,bitmap,cliprect,
 					sprite,
 					color,
 					flipx,flipy,
@@ -354,7 +354,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 					screen.priority(), pri_mask,
 					0xf);
 		else
-			gfx->prio_transtable(bitmap,cliprect,
+			gfx->prio_transtable(state->m_palette,bitmap,cliprect,
 					sprite,
 					color,
 					flipx,flipy,

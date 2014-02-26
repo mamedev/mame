@@ -344,7 +344,7 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",pktgaldx,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",pktgaldx)
 
 	MCFG_DECOCOMN_ADD("deco_common")
 
@@ -390,7 +390,7 @@ static MACHINE_CONFIG_START( pktgaldb, pktgaldx_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode",bootleg,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",bootleg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

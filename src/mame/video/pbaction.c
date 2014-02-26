@@ -115,7 +115,7 @@ void pbaction_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx((spriteram[offs] & 0x80) ? 3 : 2)->transpen(bitmap,cliprect, /* normal or double size */
+		m_gfxdecode->gfx((spriteram[offs] & 0x80) ? 3 : 2)->transpen(m_palette,bitmap,cliprect, /* normal or double size */
 				spriteram[offs],
 				spriteram[offs + 1] & 0x0f,
 				flipx,flipy,

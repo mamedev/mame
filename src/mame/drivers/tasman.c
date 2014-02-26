@@ -71,7 +71,7 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 			UINT32 tile = m_vram[count] & 0xffff;
 
 			if(m_screen->visible_area().contains(x*8, y*8))
-				gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
+				gfx->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x*8,y*8);
 
 			count++;
 		}
@@ -86,7 +86,7 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 			UINT32 tile = m_vram[count] & 0xffff;
 
 			if(m_screen->visible_area().contains(x*8, y*8))
-				gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,y*8,0);
+				gfx->transpen(m_palette,bitmap,cliprect,tile,0,0,0,x*8,y*8,0);
 
 			count++;
 		}
@@ -618,7 +618,7 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_K055673_ADD_NOINTF("k055673")
 	MCFG_K055673_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode",tasman,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",tasman)
 
 	MCFG_K056832_ADD("k056832", k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")

@@ -62,6 +62,7 @@ public:
 
 	tilemap_t      *m_tilemap[2];
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type PC080SN;

@@ -346,7 +346,7 @@ void m63_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		}
 
 		
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -355,7 +355,7 @@ void m63_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (sx > 0xf0)
 		{
 			
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx - 0x100, sy, 0);
@@ -774,7 +774,7 @@ static MACHINE_CONFIG_START( m63, m63_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",m63,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",m63)
 	MCFG_PALETTE_ADD("palette", 256+4)
 
 	MCFG_PALETTE_INIT_OWNER(m63_state,m63)
@@ -818,7 +818,7 @@ static MACHINE_CONFIG_START( fghtbskt, m63_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",fghtbskt,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",fghtbskt)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 

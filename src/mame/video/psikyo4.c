@@ -114,7 +114,7 @@ void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			{
 				for (i = xstart; i != xend; i += xinc)
 				{
-					 gfx->transpen(bitmap,cliprect, tnum + loopnum, colr, flipx, flipy, xpos + 16 * i, ypos + 16 * j, 0);
+					 gfx->transpen(m_palette,bitmap,cliprect, tnum + loopnum, colr, flipx, flipy, xpos + 16 * i, ypos + 16 * j, 0);
 					loopnum++;
 				}
 			}

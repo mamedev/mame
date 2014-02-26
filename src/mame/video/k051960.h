@@ -71,6 +71,7 @@ private:
 
 	int      m_k051937_counter;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	int k051960_fetchromdata( int byte );
 };

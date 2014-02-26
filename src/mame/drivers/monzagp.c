@@ -104,7 +104,7 @@ UINT32 monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind16 
 	{
 		for(x=0;x<256;x++)
 		{
-			m_gfxdecode->gfx(m_bank&1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(m_bank&1)->transpen(m_palette,bitmap,cliprect,
 				m_vram[y*m_screenw+x],
 				//(m_vram[y*m_screenw+x]&0x3f)+(m_bank>>1)*64,
 				0,
@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( monzagp, monzagp_state )
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(monzagp_state, monzagp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",monzagp,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",monzagp)
 MACHINE_CONFIG_END
 
 ROM_START( monzagp )

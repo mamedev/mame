@@ -46,7 +46,8 @@ k001005_device::k001005_device(const machine_config &mconfig, const char *tag, d
 		m_bitmap_page(0),
 		m_poly(NULL),
 		m_prev_poly_type(0),
-		m_gfxrom(NULL)
+		m_gfxrom(NULL),
+		m_palette(*this)
 {
 		m_ram[0] = 0;
 		m_ram[1] = 0;

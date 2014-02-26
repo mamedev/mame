@@ -641,7 +641,7 @@ static MACHINE_CONFIG_START( meadows, meadows_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",meadows,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",meadows)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* audio hardware */
@@ -670,7 +670,7 @@ static MACHINE_CONFIG_START( minferno, meadows_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 24*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",minferno,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",minferno)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* audio hardware */
@@ -698,7 +698,7 @@ static MACHINE_CONFIG_START( bowl3d, meadows_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",meadows,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",meadows)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* audio hardware */

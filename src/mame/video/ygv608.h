@@ -374,6 +374,7 @@ private:
 	UINT8 m_screen_resize;  // screen requires resize
 	UINT8 m_tilemap_resize; // tilemap requires resize
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 // device type definition

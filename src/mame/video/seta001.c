@@ -31,7 +31,8 @@ const device_type SETA001_SPRITE = &device_creator<seta001_device>;
 
 seta001_device::seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SETA001_SPRITE, "seta001_device", tag, owner, clock, "seta001", __FILE__),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this),
+		m_palette(*this)
 {
 }
 
@@ -288,28 +289,28 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 			color   =   ( color >> (16-5) ) % total_color_codes;
 			code &= 0x3fff;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff),((sy) & 0x0ff),
 					transpen);
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff)-512,((sy) & 0x0ff),
 					transpen);
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
 					((sx) & 0x1ff),((sy) & 0x0ff)-256,
 					transpen);
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
@@ -377,7 +378,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -385,7 +386,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
 
 		/* wrap around x */
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -393,7 +394,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
 
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -401,7 +402,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 				max_y - ((sy + yoffs) & 0x0ff)-256,m_transpen);
 
 		/* wrap around x */
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

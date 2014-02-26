@@ -426,7 +426,7 @@ UINT32 aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_ind1
 								// as we only update the background, not the entire display.
 			flipx = ((m_mkiv_vram[count]) & 0x04);
 			flipy = ((m_mkiv_vram[count]) & 0x08);
-			gfx->opaque(bitmap,cliprect,tile,color,flipx,flipy,(38-x-1)<<3,(27-y-1)<<3);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,color,flipx,flipy,(38-x-1)<<3,(27-y-1)<<3);
 			count+=2;
 		}
 	}
@@ -1699,7 +1699,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 216-1)    /* from the crtc registers... updated by crtc */
 	MCFG_SCREEN_UPDATE_DRIVER(aristmk4_state, screen_update_aristmk4)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",aristmk4,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",aristmk4)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(aristmk4_state, aristmk4)
 

@@ -21,7 +21,7 @@ UINT32 copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_ind1
 		sx = 31 - (offs % 32);
 		sy = offs / 32;
 
-		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,
 				m_videoram[offs] & 0x3f,0,
 				0,0,
 				8*sx,8*sy);
@@ -30,25 +30,25 @@ UINT32 copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_ind1
 
 	/* Draw the cars. Positioning was based on a screen shot */
 	if (m_cary[0])
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				m_carimage[0],0,
 				1,0,
 				0xe4,256 - m_cary[0],0);
 
 	if (m_cary[1])
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				m_carimage[1],0,
 				1,0,
 				0xc4,256 - m_cary[1],0);
 
 	if (m_cary[2])
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				m_carimage[2],0,
 				0,0,
 				0x24,256 - m_cary[2],0);
 
 	if (m_cary[3])
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				m_carimage[3],0,
 				0,0,
 				0x04,256 - m_cary[3],0);
@@ -77,7 +77,7 @@ UINT32 copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_ind1
 			{
 				/* We've hit a truck's back end, so draw the truck.  The front
 				   end may be off the top of the screen, but we don't care. */
-				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 						0,0,
 						0,0,
 						0x80,256 - (y + 31),0);
@@ -89,7 +89,7 @@ UINT32 copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_ind1
 			{
 				/* We missed a truck's back end (it was off the bottom of the
 				   screen) but have hit its front end, so draw the truck. */
-				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 						0,0,
 						0,0,
 						0x80,256 - y,0);

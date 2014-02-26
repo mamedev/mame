@@ -40,8 +40,7 @@ static GFXDECODE_START( video64 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_FRAGMENT( video64 )
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("dummy_palette")
-	MCFG_GFXDECODE_ADD("gfxdecode",video64,"dummy_palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",video64)
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -74,7 +73,7 @@ void iq151_video64_device::device_start()
 	m_videoram = (UINT8*)memregion("videoram")->base();
 	m_chargen = (UINT8*)memregion("chargen")->base();
 
-	m_gfxdecode->set_gfx(0,auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), iq151_video64_charlayout, m_chargen, 1, 0)));
+	m_gfxdecode->set_gfx(0,auto_alloc(machine(), gfx_element(machine(), iq151_video64_charlayout, m_chargen, 1, 0)));
 }
 
 //-------------------------------------------------

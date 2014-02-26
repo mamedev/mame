@@ -46,7 +46,7 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_w)
 		g |= ((i & 2) >> 1);
 		r |= (i & 1);
 
-		m_gfxdecode->palette()->set_pen_color(offset / 2, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color(offset / 2, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -168,7 +168,8 @@ tc0091lvc_device::tc0091lvc_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, TC0091LVC, "TC0091LVC", tag, owner, clock, "tc0091lvc", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("tc0091lvc", ENDIANNESS_LITTLE, 8,20, 0, NULL, *ADDRESS_MAP_NAME(tc0091lvc_map8)),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this),
+		m_palette(*this)
 {
 }
 
@@ -289,7 +290,7 @@ void tc0091lvc_device::device_start()
 
 	//printf("m_gfx_index %d\n", m_gfx_index);
 
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), char_layout, (UINT8 *)m_pcg_ram, m_gfxdecode->palette()->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), char_layout, (UINT8 *)m_pcg_ram, m_palette->entries() / 16, 0)));
 }
 
 void tc0091lvc_device::device_reset()
@@ -328,7 +329,7 @@ void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap
 			fy = !fy;
 		}
 
-		gfx->prio_transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,screen.priority(),(col & 0x08) ? 0xaa : 0x00,0);
+		gfx->prio_transpen(m_palette,bitmap,cliprect,spr_offs,col,fx,fy,x,y,screen.priority(),(col & 0x08) ? 0xaa : 0x00,0);
 	}
 }
 
@@ -338,7 +339,7 @@ UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	int x,y;
 	UINT8 global_flip;
 
-	bitmap.fill(m_gfxdecode->palette()->black_pen(), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if((m_vregs[4] & 0x20) == 0)
 		return 0;
@@ -359,7 +360,7 @@ UINT32 tc0091lvc_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				res_y = (global_flip) ? 256-y : y;
 
 				if(screen.visible_area().contains(res_x, res_y))
-					bitmap.pix16(res_y, res_x) = m_gfxdecode->palette()->pen(m_bitmap_ram[count]);
+					bitmap.pix16(res_y, res_x) = m_palette->pen(m_bitmap_ram[count]);
 
 				count++;
 			}

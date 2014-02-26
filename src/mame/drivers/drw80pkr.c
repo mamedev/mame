@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( drw80pkr, drw80pkr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 27*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drw80pkr_state, screen_update_drw80pkr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",drw80pkr,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",drw80pkr)
 	MCFG_PALETTE_ADD("palette", 16*16)
 	MCFG_PALETTE_INIT_OWNER(drw80pkr_state, drw80pkr)
 

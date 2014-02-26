@@ -435,7 +435,7 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 
 			for (i = 0; i <= dy; i++)
 			{
-				gfx->prio_transpen(bitmap,
+				gfx->prio_transpen(m_palette,bitmap,
 							cliprect,
 							source[2]+i,
 							color,
@@ -444,7 +444,7 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 							screen.priority(),pri_mask,0 );
 
 				/* wrap around x */
-				gfx->prio_transpen(bitmap,
+				gfx->prio_transpen(m_palette,bitmap,
 							cliprect,
 							source[2]+i,
 							color,
@@ -453,7 +453,7 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 							screen.priority(),pri_mask,0 );
 
 				/* wrap around y */
-				gfx->prio_transpen(bitmap,
+				gfx->prio_transpen(m_palette,bitmap,
 							cliprect,
 							source[2]+i,
 							color,
@@ -462,7 +462,7 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 							screen.priority(),pri_mask,0 );
 
 				/* wrap around x & y */
-				gfx->prio_transpen(bitmap,
+				gfx->prio_transpen(m_palette,bitmap,
 							cliprect,
 							source[2]+i,
 							color,
@@ -562,7 +562,7 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	MCFG_SCREEN_VISIBLE_AREA(8+1, 48*8-1-8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mwarr_state, screen_update_mwarr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",mwarr,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",mwarr)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

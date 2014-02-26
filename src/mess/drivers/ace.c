@@ -741,7 +741,7 @@ static MACHINE_CONFIG_START( ace, ace_state )
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode",ace,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",ace)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -177,7 +177,7 @@ void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				xx = w;
 				do
 				{
-					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 							code,
 							color,
 							flipx, flipy,
@@ -619,7 +619,7 @@ static MACHINE_CONFIG_START( acommand, acommand_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(acommand_state, screen_update_acommand)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",acommand,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",acommand)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 

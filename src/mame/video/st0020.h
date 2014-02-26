@@ -43,6 +43,7 @@ private:
 	DECLARE_READ16_MEMBER(st0020_blit_r);
 	DECLARE_WRITE16_MEMBER(st0020_blit_w);
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 #define ST0020_ST0032_BYTESWAP_DATA \

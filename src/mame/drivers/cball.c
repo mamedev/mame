@@ -76,7 +76,7 @@ UINT32 cball_state::screen_update_cball(screen_device &screen, bitmap_ind16 &bit
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw sprite */
-	 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+	 m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 		m_video_ram[0x399] >> 4,
 		0,
 		0, 0,
@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( cball, cball_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(cball_state, screen_update_cball)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cball,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",cball)
 	MCFG_PALETTE_ADD("palette", 6)
 	MCFG_PALETTE_INIT_OWNER(cball_state, cball)
 

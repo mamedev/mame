@@ -116,7 +116,7 @@ UINT32 chinsan_state::screen_update_chinsan(screen_device &screen, bitmap_ind16 
 			int tileno, colour;
 			tileno = m_video[count] | (m_video[count + 0x800] << 8);
 			colour = m_video[count + 0x1000] >> 3;
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tileno,colour,0,0,x*8,y*8);
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tileno,colour,0,0,x*8,y*8);
 			count++;
 		}
 	}
@@ -612,7 +612,7 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_SCREEN_VISIBLE_AREA(24, 512-24-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(chinsan_state, screen_update_chinsan)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",chinsan,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",chinsan)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(chinsan_state, chinsan)
 

@@ -226,8 +226,8 @@ void casloopy_state::video_start()
 	for(int i=0;i<0x10000;i++)
 		m_vram[i] = i & 0xff;
 
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), m_palette, casloopy_4bpp_layout, m_vram, 0x10, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+1, auto_alloc(machine(), gfx_element(machine(), m_palette, casloopy_8bpp_layout, m_vram, 1, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), casloopy_4bpp_layout, m_vram, 0x10, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+1, auto_alloc(machine(), gfx_element(machine(), casloopy_8bpp_layout, m_vram, 1, 0)));
 }
 
 UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -265,7 +265,7 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 
 			tile &= 0x7ff; //???
 
-			gfx->transpen(bitmap,cliprect,tile,7,0,0,x*8,y*8,0xffffffff);
+			gfx->transpen(m_palette,bitmap,cliprect,tile,7,0,0,x*8,y*8,0xffffffff);
 
 			count+=2;
 		}
@@ -495,7 +495,7 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 
 	MCFG_PALETTE_ADD("palette", 512)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("ic1,bin")

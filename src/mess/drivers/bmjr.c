@@ -361,7 +361,7 @@ static MACHINE_CONFIG_START( bmjr, bmjr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bmjr_state, screen_update_bmjr)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(bmjr_state, bmjr)
-	MCFG_GFXDECODE_ADD("gfxdecode",bmjr,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",bmjr)
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

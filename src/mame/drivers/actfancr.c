@@ -325,7 +325,7 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update_actfancr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",actfan,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",actfan)
 
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -379,7 +379,7 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update_actfancr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",triothep,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",triothep)
 
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)

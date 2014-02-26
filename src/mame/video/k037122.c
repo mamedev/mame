@@ -20,7 +20,8 @@ k037122_device::k037122_device(const machine_config &mconfig, const char *tag, d
 	m_char_ram(NULL),
 	m_reg(NULL),
 	m_gfx_index(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this),
+	m_palette(*this)
 {
 }
 
@@ -61,7 +62,7 @@ void k037122_device::device_start()
 	m_layer[0]->set_transparent_pen(0);
 	m_layer[1]->set_transparent_pen(0);
 
-	m_gfxdecode->set_gfx(m_gfx_index,auto_alloc_clear(machine(), gfx_element(machine(), *m_gfxdecode->palette(), k037122_char_layout, (UINT8*)m_char_ram, m_gfxdecode->palette()->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index,auto_alloc_clear(machine(), gfx_element(machine(), k037122_char_layout, (UINT8*)m_char_ram, m_palette->entries() / 16, 0)));
 
 	save_pointer(NAME(m_reg), 0x400 / 4);
 	save_pointer(NAME(m_char_ram), 0x200000 / 4);
@@ -137,7 +138,7 @@ void k037122_device::update_palette_color( UINT32 palette_base, int color )
 {
 	UINT32 data = m_tile_ram[(palette_base / 4) + color];
 
-	m_gfxdecode->palette()->set_pen_color(color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
+	m_palette->set_pen_color(color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
 }
 
 READ32_MEMBER( k037122_device::sram_r )

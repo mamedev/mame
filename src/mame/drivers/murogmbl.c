@@ -112,7 +112,7 @@ UINT32 murogmbl_state::screen_update_murogmbl(screen_device &screen, bitmap_ind1
 		for (x = 0; x < 32; x++)
 		{
 			int tile = m_video[count];
-			 gfx->opaque(bitmap,cliprect, tile, 0, 0, 0, x * 8, y * 8);
+			 gfx->opaque(m_palette,bitmap,cliprect, tile, 0, 0, 0, x * 8, y * 8);
 
 			count++;
 		}
@@ -190,7 +190,7 @@ static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 	MCFG_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
 	MCFG_CPU_PROGRAM_MAP(murogmbl_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",murogmbl,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",murogmbl)
 
 
 	/* video hardware */

@@ -462,7 +462,7 @@ static MACHINE_CONFIG_START( cop01, cop01_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cop01,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",cop01)
 	MCFG_PALETTE_ADD("palette", 16+8*16+16*16)
 	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)
 
@@ -500,7 +500,7 @@ static MACHINE_CONFIG_START( mightguy, cop01_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cop01,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",cop01)
 	MCFG_PALETTE_ADD("palette", 16+8*16+16*16)
 	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)
 

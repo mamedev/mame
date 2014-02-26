@@ -31,8 +31,7 @@ private:
 	UINT16 *     m_ram;
 	int          m_type;
 	int          m_addr;
-	//Micko:FIXME
-	palette_device *m_palette;	
+	required_device<palette_device> m_palette;	
 };
 
 extern const device_type TC0110PCR;

@@ -123,7 +123,7 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 			UINT16 tile = ((m_vram[count])|(m_vram[count+1]<<8)) & 0xfff;
 			UINT8 col = (m_vram[count+1] >> 4);
 
-			gfx_2->opaque(bitmap,cliprect,tile,col,0,0,x*16,y*16);
+			gfx_2->opaque(m_palette,bitmap,cliprect,tile,col,0,0,x*16,y*16);
 
 			count+=2;
 		}
@@ -138,7 +138,7 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 			UINT16 tile = ((m_vram[count])|(m_vram[count+1]<<8)) & 0xfff;
 			UINT8 col = (m_vram[count+1] >> 4); // ok?
 
-			gfx->transpen(bitmap,cliprect,tile,col,0,0,x*8,y*8,0);
+			gfx->transpen(m_palette,bitmap,cliprect,tile,col,0,0,x*8,y*8,0);
 
 			count+=2;
 		}
@@ -572,7 +572,7 @@ static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",dblcrown,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",dblcrown)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(dblcrown_state, dblcrown)

@@ -141,7 +141,7 @@ WRITE8_MEMBER(spdodgeb_state::spdodgeb_videoram_w)
 
 ***************************************************************************/
 
-#define DRAW_SPRITE( order, sx, sy ) gfx->transpen(bitmap,\
+#define DRAW_SPRITE( order, sx, sy ) gfx->transpen(m_palette,bitmap,\
 					cliprect, \
 					(which+order),color+ 8 * m_sprite_palbank,flipx,flipy,sx,sy,0);
 

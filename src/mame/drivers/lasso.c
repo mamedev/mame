@@ -496,7 +496,7 @@ static MACHINE_CONFIG_START( base, lasso_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_lasso)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",lasso,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",lasso)
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(lasso_state, lasso)
 

@@ -107,7 +107,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_mda )
 
 	MCFG_MC6845_ADD( MDA_MC6845_NAME, MC6845, MDA_SCREEN_NAME, MDA_CLOCK/9, mc6845_mda_intf)
 
-	//MCFG_GFXDECODE_ADD("gfxdecode",pcmda,"palette")
+	//MCFG_GFXDECODE_ADD("gfxdecode",pcmda)
 
 	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_mda_device, pc_cpu_line))
@@ -155,13 +155,15 @@ const rom_entry *isa8_mda_device::device_rom_region() const
 
 isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_MDA, "IBM Monochrome Display and Printer Adapter", tag, owner, clock, "isa_ibm_mda", __FILE__),
-		device_isa8_card_interface(mconfig, *this)
+		device_isa8_card_interface(mconfig, *this),
+		m_palette(*this, "palette")
 {
 }
 
 isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_isa8_card_interface(mconfig, *this)
+		device_isa8_card_interface(mconfig, *this),
+		m_palette(*this, "palette")
 {
 }
 
@@ -524,7 +526,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_hercules )
 
 	MCFG_MC6845_ADD( HERCULES_MC6845_NAME, MC6845, HERCULES_SCREEN_NAME, MDA_CLOCK/9, mc6845_hercules_intf)
 
-	//MCFG_GFXDECODE_ADD("gfxdecode",pcherc,"palette")
+	//MCFG_GFXDECODE_ADD("gfxdecode",pcherc)
 
 	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_mda_device, pc_cpu_line))

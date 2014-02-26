@@ -49,6 +49,7 @@ private:
 	UINT16 *   m_ram;
 	UINT16 *   m_ram_buffered;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type PC090OJ;

@@ -206,7 +206,7 @@ WRITE16_MEMBER(shangha3_state::shangha3_blitter_go_w)
 						if (flipy) dy = sy + sizey-15 - dy;
 						else dy = sy + dy;
 
-						m_gfxdecode->gfx(0)->transpen(rawbitmap,myclip,
+						m_gfxdecode->gfx(0)->transpen(m_palette,rawbitmap,myclip,
 								(tile & 0x0fff) | (code & 0xf000),
 								(tile >> 12) | (color & 0x70),
 								flipx,flipy,
@@ -219,7 +219,7 @@ WRITE16_MEMBER(shangha3_state::shangha3_blitter_go_w)
 				int w;
 
 if (zoomx <= 1 && zoomy <= 1)
-	m_gfxdecode->gfx(0)->zoom_transtable(rawbitmap,myclip,
+	m_gfxdecode->gfx(0)->zoom_transtable(m_palette,rawbitmap,myclip,
 			code,
 			color,
 			flipx,flipy,
@@ -232,7 +232,7 @@ else
 
 				for (x = 0;x < w;x++)
 				{
-					m_gfxdecode->gfx(0)->zoom_transtable(rawbitmap,myclip,
+					m_gfxdecode->gfx(0)->zoom_transtable(m_palette,rawbitmap,myclip,
 							code,
 							color,
 							flipx,flipy,

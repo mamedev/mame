@@ -986,7 +986,7 @@ void smc777_state::machine_start()
 	save_pointer(NAME(m_gvram), 0x8000);
 	save_pointer(NAME(m_pcg), 0x800);
 
-	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), m_palette, smc777_charlayout, (UINT8 *)m_pcg, 8, 0)));
+	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), smc777_charlayout, (UINT8 *)m_pcg, 8, 0)));
 }
 
 void smc777_state::machine_reset()
@@ -1091,7 +1091,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_PALETTE_ADD("palette", 0x20) // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
 	MCFG_PALETTE_INIT_OWNER(smc777_state, smc777)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 

@@ -191,7 +191,7 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 		{
 			int tile = m_videoram[count];
 			int attr = m_videoram2[count];
-			 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, attr, 0, 0, x * 8, y * 8);
+			 m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect, tile, attr, 0, 0, x * 8, y * 8);
 			count++;
 		}
 	}
@@ -203,7 +203,7 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 		{
 			int tile = m_videoram[count];
 			int attr = m_videoram2[count];
-			 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, tile, attr, 0, 0, x * 8, y * 8, 0xf);
+			 m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, tile, attr, 0, 0, x * 8, y * 8, 0xf);
 			count++;
 		}
 	}
@@ -291,7 +291,7 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 					tile_flipy = !tile_flipy;
 				}
 
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 							(tile & 0x1fff) + bank*0x4000,
 							attr,
 							tile_flipx, tile_flipy,
@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( go2000, go2000_state )
 	MCFG_CPU_IO_MAP(go2000_sound_io)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode",go2000,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",go2000)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -1730,7 +1730,7 @@ static MACHINE_CONFIG_START( default, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",namcos2,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",namcos2)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1804,7 +1804,7 @@ static MACHINE_CONFIG_START( gollygho, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",namcos2,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",namcos2)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1851,7 +1851,7 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_finallap)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",finallap,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",finallap)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1902,7 +1902,7 @@ static MACHINE_CONFIG_START( sgunner, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",sgunner,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",sgunner)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1956,7 +1956,7 @@ static MACHINE_CONFIG_START( sgunner2, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",sgunner,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",sgunner)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -2005,7 +2005,7 @@ static MACHINE_CONFIG_START( luckywld, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_luckywld)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",luckywld,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",luckywld)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -2056,7 +2056,7 @@ static MACHINE_CONFIG_START( metlhawk, namcos2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_metlhawk)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",metlhawk,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",metlhawk)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()

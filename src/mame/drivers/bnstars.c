@@ -499,7 +499,7 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 			pri_mask = 0xfe;
 
 		gfx->set_source_clip(tx, xsize, ty, ysize);
-		gfx->prio_zoom_transpen(bitmap,cliprect,
+		gfx->prio_zoom_transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,
@@ -1389,7 +1389,7 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode",bnstars,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",bnstars)
 	MCFG_PALETTE_ADD("palette", 0x8000*2)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)

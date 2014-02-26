@@ -451,7 +451,7 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mcatadv_state, screen_update_mcatadv)
 	MCFG_SCREEN_VBLANK_DRIVER(mcatadv_state, screen_eof_mcatadv)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",mcatadv,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",mcatadv)
 	MCFG_PALETTE_ADD("palette", 0x2000/2)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 

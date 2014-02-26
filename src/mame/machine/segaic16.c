@@ -46,7 +46,8 @@ sega_16bit_common_base::sega_16bit_common_base(const machine_config &mconfig, de
 	: driver_device(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
 		m_open_bus_recurse(false),
-		m_palette_entries(0)
+		m_palette_entries(0),
+		m_palette(*this, "palette")
 {
 	palette_init();
 }

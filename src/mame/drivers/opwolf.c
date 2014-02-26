@@ -735,7 +735,7 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(opwolf_state, screen_update_opwolf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",opwolf,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",opwolf)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -792,7 +792,7 @@ static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for t
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(opwolf_state, screen_update_opwolf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",opwolfb,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",opwolfb)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 

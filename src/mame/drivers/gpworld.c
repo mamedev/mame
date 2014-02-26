@@ -110,7 +110,7 @@ void gpworld_state::gpworld_draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cli
 		{
 			int current_screen_character = (characterY*64) + characterX;
 
-			 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, m_tile_ram[current_screen_character],
+			 m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, m_tile_ram[current_screen_character],
 					characterY, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
@@ -496,7 +496,7 @@ static MACHINE_CONFIG_START( gpworld, gpworld_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode",gpworld,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",gpworld)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	/* sound hardware */

@@ -274,7 +274,7 @@ void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
 		color = spriteram[offs+1] & 0x0f;
 		sprite = spriteram[offs+0] | (*m_spritebank << 8);
 
-		m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transmask(m_palette,bitmap,cliprect,
 				sprite,
 				color,flipx,flipy,x,y,
 				m_palette->transpen_mask(*m_gfxdecode->gfx(2), color, 0));
@@ -621,7 +621,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update_panicr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",panicr,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",panicr)
 	MCFG_PALETTE_ADD("palette", 256*4)
 	MCFG_PALETTE_INIT_OWNER(panicr_state, panicr)
 

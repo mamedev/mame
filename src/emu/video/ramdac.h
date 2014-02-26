@@ -75,9 +75,8 @@ private:
 	UINT8 m_int_index[2];
 	UINT8 *m_palram;
 
-	const address_space_config      m_space_config;
-	//Micko:FIXME
-	palette_device *m_palette;
+	const address_space_config      m_space_config;	
+	required_device<palette_device> m_palette;
 };
 
 

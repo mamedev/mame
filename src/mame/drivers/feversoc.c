@@ -120,7 +120,7 @@ UINT32 feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind1
 
 		for(dx=0;dx<w;dx++)
 			for(dy=0;dy<h;dy++)
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),0x3f);
+				m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),0x3f);
 	}
 
 	return 0;
@@ -274,7 +274,7 @@ static MACHINE_CONFIG_START( feversoc, feversoc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1) //dynamic resolution?
 	MCFG_SCREEN_UPDATE_DRIVER(feversoc_state, screen_update_feversoc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",feversoc,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",feversoc)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 

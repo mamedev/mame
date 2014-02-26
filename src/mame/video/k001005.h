@@ -80,8 +80,7 @@ private:
 	int m_prev_poly_type;
 
 	UINT8 *m_gfxrom;
-	//Micko:FIXME
-	palette_device *m_palette;	
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type K001005;

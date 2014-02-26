@@ -838,7 +838,7 @@ static MACHINE_CONFIG_START( liberate, liberate_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_liberate)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",liberate,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",liberate)
 	MCFG_PALETTE_ADD("palette", 33)
 	MCFG_PALETTE_INIT_OWNER(liberate_state,liberate)
 
@@ -917,7 +917,7 @@ static MACHINE_CONFIG_START( prosport, liberate_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosport)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",prosport,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",prosport)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosport)

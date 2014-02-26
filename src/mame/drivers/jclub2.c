@@ -220,7 +220,7 @@ void darkhors_state::draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle
 		sy  =   -sy;
 		sy  +=  0xf8;
 
-		 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code/2, color,
 					flipx,  flipy,  sx, sy, 0);
 	}
@@ -702,7 +702,7 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_darkhors)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",darkhors,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",darkhors)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state,darkhors)
@@ -743,7 +743,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_jclub2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	
 	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
@@ -814,7 +814,7 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 	st0020_device::set_is_jclub2o(*device, 1);

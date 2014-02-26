@@ -547,7 +547,7 @@ static MACHINE_CONFIG_START( gyrodine, kyugo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kyugo_state, screen_update_kyugo)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",kyugo,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",kyugo)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 
 	/* sound hardware */

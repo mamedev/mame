@@ -561,7 +561,7 @@ void coolridr_state::video_start()
 	m_screen->register_screen_bitmap(m_screen1_bitmap);
 	m_screen->register_screen_bitmap(m_screen2_bitmap);
 
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), m_palette, h1_tile_layout, m_h1_pcg, 8, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), h1_tile_layout, m_h1_pcg, 8, 0)));
 }
 
 /*
@@ -3601,7 +3601,7 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode",coolridr,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",coolridr)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

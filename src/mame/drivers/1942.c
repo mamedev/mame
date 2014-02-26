@@ -540,7 +540,7 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode",1942,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",1942)
 	
 	MCFG_PALETTE_ADD("palette", 64*4+4*32*8+16*16)
 	MCFG_PALETTE_INIT_OWNER(_1942_state, 1942)
@@ -599,7 +599,7 @@ static MACHINE_CONFIG_START( 1942p, _1942_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode",1942p,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",1942p)
 	MCFG_PALETTE_ADD("palette", 0x500)
 	MCFG_PALETTE_INIT_OWNER(_1942_state, 1942p)
 	MCFG_VIDEO_START_OVERRIDE(_1942_state,c1942p)

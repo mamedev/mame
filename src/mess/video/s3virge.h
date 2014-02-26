@@ -38,8 +38,6 @@ private:
 	virtual void s3_define_video_mode(void);
 	virtual void s3_crtc_reg_write(UINT8 index, UINT8 data);
 	// has no 8514/A device
-	//Micko:FIXME
-	palette_device *m_palette;	
 };
 
 // device type definition

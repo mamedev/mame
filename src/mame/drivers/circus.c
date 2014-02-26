@@ -292,7 +292,7 @@ static MACHINE_CONFIG_START( circus, circus_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_circus)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",circus, "palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",circus)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
@@ -324,7 +324,7 @@ static MACHINE_CONFIG_START( robotbwl, circus_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_robotbwl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",robotbwl, "palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",robotbwl)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( crash, circus_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_crash)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",circus, "palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",circus)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
@@ -394,7 +394,7 @@ static MACHINE_CONFIG_START( ripcord, circus_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_ripcord)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",circus, "palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",circus)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

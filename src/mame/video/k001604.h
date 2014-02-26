@@ -48,6 +48,7 @@ private:
 	UINT32 *       m_char_ram;
 	UINT32 *       m_reg;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	TILEMAP_MAPPER_MEMBER(scan_layer_8x8_0_size0);
 	TILEMAP_MAPPER_MEMBER(scan_layer_8x8_0_size1);

@@ -283,7 +283,7 @@ static MACHINE_CONFIG_START( dcon, dcon_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",dcon,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -310,7 +310,7 @@ static MACHINE_CONFIG_START( sdgndmps, dcon_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",dcon,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

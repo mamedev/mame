@@ -813,7 +813,7 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 	MCFG_TC0220IOC_ADD("tc0220ioc", ninjaw_io_intf)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode",ninjaw,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",ninjaw)
 	MCFG_PALETTE_ADD("palette", 4096*3)
 	MCFG_DEFAULT_LAYOUT(layout_darius)
 
@@ -896,7 +896,7 @@ static MACHINE_CONFIG_START( darius2, ninjaw_state )
 	MCFG_TC0220IOC_ADD("tc0220ioc", ninjaw_io_intf)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode",ninjaw,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",ninjaw)
 	MCFG_PALETTE_ADD("palette", 4096*3)
 	MCFG_DEFAULT_LAYOUT(layout_darius)
 

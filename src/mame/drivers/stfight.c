@@ -561,7 +561,7 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 	MCFG_SCREEN_UPDATE_DRIVER(stfight_state, screen_update_stfight)
 	MCFG_VIDEO_START_OVERRIDE(stfight_state,stfight)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",stfight,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",stfight)
 	MCFG_PALETTE_ADD("palette", 16*4+16*16+16*16+16*16)
 	MCFG_PALETTE_INIT_OWNER(stfight_state, stfight)
 

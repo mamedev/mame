@@ -153,7 +153,7 @@ static MACHINE_CONFIG_START( xavix, xavix_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",xavix,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",xavix)
 
 	MCFG_PALETTE_ADD("palette", 16)
 

@@ -23,7 +23,7 @@ protected:
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
-
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type DECO_MXC06;

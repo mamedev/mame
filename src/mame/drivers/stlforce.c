@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( stlforce, stlforce_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 47*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stlforce_state, screen_update_stlforce)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",stlforce,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",stlforce)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

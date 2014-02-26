@@ -1077,7 +1077,7 @@ static MACHINE_CONFIG_START( legionna, legionna_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_legionna)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",legionna,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",legionna)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1107,7 +1107,7 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_legionna)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",heatbrl,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",heatbrl)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -1138,7 +1138,7 @@ static MACHINE_CONFIG_START( godzilla, legionna_state )
 	MCFG_SCREEN_RAW_PARAMS(14318180/2,442,0,320,262,0,224) // ~61 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",heatbrl,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",heatbrl)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -1168,7 +1168,7 @@ static MACHINE_CONFIG_START( denjinmk, legionna_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",heatbrl,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",heatbrl)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -1198,7 +1198,7 @@ static MACHINE_CONFIG_START( grainbow, legionna_state )
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 42*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_grainbow)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",grainbow,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",grainbow)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -1229,7 +1229,7 @@ static MACHINE_CONFIG_START( cupsoc, legionna_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_grainbow)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cupsoc,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",cupsoc)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -1268,7 +1268,7 @@ static MACHINE_CONFIG_START( cupsocbl, legionna_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_grainbow)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",heatbrl_csb,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",heatbrl_csb)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

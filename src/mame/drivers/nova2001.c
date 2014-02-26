@@ -692,7 +692,7 @@ static MACHINE_CONFIG_START( nova2001, nova2001_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_nova2001)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",nova2001,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",nova2001)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(BBGGRRII)
 
@@ -734,7 +734,7 @@ static MACHINE_CONFIG_START( ninjakun, nova2001_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_ninjakun)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",ninjakun,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",ninjakun)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(BBGGRRII)
 
@@ -767,7 +767,7 @@ static MACHINE_CONFIG_START( pkunwar, nova2001_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_pkunwar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",pkunwar,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",pkunwar)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(BBGGRRII)
 
@@ -807,7 +807,7 @@ static MACHINE_CONFIG_START( raiders5, nova2001_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nova2001_state, screen_update_raiders5)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",raiders5,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",raiders5)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(BBGGRRII)
 

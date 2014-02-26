@@ -121,7 +121,7 @@ UINT32 lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap,
 
 			/* Somewhere there's a flag that offsets the tilemap by 0x100*x */
 			/* Palette is likely set somewhere as well (tile_control_ram?) */
-			 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			 m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					m_tile_ram[current_screen_character],
 					0,
 					0, 0, charx*8, chary*8, 0);
@@ -382,7 +382,7 @@ static MACHINE_CONFIG_START( lgp, lgp_state )
 	MCFG_PALETTE_ADD("palette", 256)
 	/* MCFG_PALETTE_INIT_OWNER(lgp_state,lgp) */
 
-	MCFG_GFXDECODE_ADD("gfxdecode",lgp,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",lgp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

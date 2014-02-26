@@ -1311,7 +1311,8 @@ namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, cons
 	: device_t(mconfig, NAMCO_C45_ROAD, "Namco C45 Road", tag, owner, clock, "namco_c45_road", __FILE__),
 		m_transparent_color(~0),
 		m_tilemap(NULL),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this)
 {
 }
 
@@ -1410,7 +1411,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 			while (numpixels-- > 0)
 			{
 				int pen = source_gfx[sourcex >> 16];
-				if (m_gfxdecode->palette()->pen_indirect(pen) != m_transparent_color)
+				if (m_palette->pen_indirect(pen) != m_transparent_color)
 				{
 					if (clut != NULL)
 						pen = (pen & ~0xff) | clut[pen & 0xff];
@@ -1442,7 +1443,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 void namco_c45_road_device::device_start()
 {
 	// create a gfx_element describing the road graphics
-	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), *m_gfxdecode->palette(), s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], 0x3f, 0xf00)));
+	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], 0x3f, 0xf00)));
 
 	// create a tilemap for the road
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),
@@ -1450,7 +1451,7 @@ void namco_c45_road_device::device_start()
 }
 
 MACHINE_CONFIG_FRAGMENT( namco_c45_road )
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"^palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 MACHINE_CONFIG_END
 //-------------------------------------------------
 //  device_mconfig_additions - return a pointer to

@@ -60,6 +60,7 @@ struct asr_t
 
 	bitmap_ind16 *bitmap;
 	gfxdecode_device *m_gfxdecode;
+	palette_device *m_palette;
 };
 
 enum
@@ -90,7 +91,7 @@ static const gfx_layout fontlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-GFXDECODE_START( asr733 )
+static GFXDECODE_START( asr733 )
 	GFXDECODE_ENTRY( asr733_chr_region, 0, fontlayout, 0, 1 )
 GFXDECODE_END
 
@@ -223,21 +224,10 @@ const device_type ASR733 = &device_creator<asr733_device>;
 asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ASR733, "733 ASR", tag, owner, clock, "asr733", __FILE__),
 		m_palette(*this, "palette"),
-		m_gfxdecode(*this)		
+		m_gfxdecode(*this, "gfxdecode")		
 {
 	m_token = global_alloc_clear(asr_t);
 }
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void asr733_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<asr733_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -257,6 +247,7 @@ void asr733_device::device_start()
 {
 	asr_t *asr = get_safe_token(this);
 	asr->m_gfxdecode = m_gfxdecode;
+	asr->m_palette = m_palette;
 	DEVICE_START_NAME( asr733 )(this);
 }
 
@@ -276,7 +267,7 @@ static void asr_draw_char(device_t *device, int character, int x, int y, int col
 {
 	asr_t *asr = get_safe_token(device);
 
-	 asr->m_gfxdecode->gfx(0)->opaque(*asr->bitmap,asr->bitmap->cliprect(), character-32, color, 0, 0,
+	 asr->m_gfxdecode->gfx(0)->opaque(*asr->m_palette,*asr->bitmap,asr->bitmap->cliprect(), character-32, color, 0, 0,
 				x+1, y);
 }
 
@@ -781,6 +772,8 @@ void asr733_keyboard(device_t *device)
 }
 
 static MACHINE_CONFIG_FRAGMENT( asr733 )
+	MCFG_GFXDECODE_ADD("gfxdecode",asr733)
+
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(asr733_device, asr733)
 MACHINE_CONFIG_END

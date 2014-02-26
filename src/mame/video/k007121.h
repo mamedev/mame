@@ -25,6 +25,7 @@ private:
 	// internal state
 	UINT8    m_ctrlram[8];
 	int      m_flipscreen;
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type K007121;

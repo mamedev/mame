@@ -166,7 +166,7 @@ void tsamurai_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		if( flip_screen() )
 		{
-			gfx->transpen(bitmap,cliprect,
+			gfx->transpen(m_palette,bitmap,cliprect,
 				sprite_number&0x7f,
 				color,
 				1,(sprite_number&0x80)?0:1,
@@ -174,7 +174,7 @@ void tsamurai_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 		else
 		{
-			gfx->transpen(bitmap,cliprect,
+			gfx->transpen(m_palette,bitmap,cliprect,
 				sprite_number&0x7f,
 				color,
 				0,sprite_number&0x80,

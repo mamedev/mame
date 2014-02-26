@@ -102,13 +102,13 @@ void goindol_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			palette = sprite_ram[offs + 2] >> 3;
 
 			
-						m_gfxdecode->gfx(gfxbank)->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(gfxbank)->transpen(m_palette,bitmap,cliprect,
 						tile,
 						palette,
 						flip_screen(),flip_screen(),
 						sx,sy, 0);
 			
-						m_gfxdecode->gfx(gfxbank)->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(gfxbank)->transpen(m_palette,bitmap,cliprect,
 						tile+1,
 						palette,
 						flip_screen(),flip_screen(),

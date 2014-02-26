@@ -85,9 +85,7 @@ protected:
 	virtual void device_reset();
 
 private:
-
-	//Micko:FIXME
-	palette_device *m_palette;
+	required_device<palette_device> m_palette;
 };
 
 

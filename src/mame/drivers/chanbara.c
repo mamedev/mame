@@ -191,18 +191,18 @@ void chanbara_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			{
 				if (!flipy)
 				{
-					 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy-16, 0);
-					 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code+1, color, flipx, flipy, sx, sy, 0);
+					 m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy-16, 0);
+					 m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code+1, color, flipx, flipy, sx, sy, 0);
 				}
 				else
 				{
-					 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
-					 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code+1, color, flipx, flipy, sx, sy-16, 0);
+					 m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+					 m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code+1, color, flipx, flipy, sx, sy-16, 0);
 				}
 			}
 			else
 			{
-				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+				 m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
 			}
 		}
 	}
@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( chanbara, chanbara_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",chanbara,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",chanbara)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(chanbara_state, chanbara)

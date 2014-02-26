@@ -728,7 +728,7 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE_ADD("gfxdecode",atarisy1,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",atarisy1)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)

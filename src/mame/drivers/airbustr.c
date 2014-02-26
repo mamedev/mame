@@ -636,7 +636,7 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(airbustr_state, screen_update_airbustr)
 	MCFG_SCREEN_VBLANK_DRIVER(airbustr_state, screen_eof_airbustr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",airbustr,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",airbustr)
 	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", airbustr_pandora_config)

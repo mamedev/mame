@@ -717,7 +717,7 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
-	MCFG_GFXDECODE_ADD("gfxdecode",lethal,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",lethal)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

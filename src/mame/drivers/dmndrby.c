@@ -383,13 +383,13 @@ can we draw it with the tilemap? maybe not, the layout is a litle strange
 			int chr = m_racetrack_tilemap_rom[off];
 			int col = m_racetrack_tilemap_rom[off+0x2000]&0x1f;
 			int flipx = m_racetrack_tilemap_rom[off+0x2000]&0x40;
-			track->opaque(bitmap,cliprect,chr,col,flipx,0,y*16+scrolly,x*16);
+			track->opaque(m_palette,bitmap,cliprect,chr,col,flipx,0,y*16+scrolly,x*16);
 			// draw another bit of track
 			// a rubbish way of doing it
 			chr = m_racetrack_tilemap_rom[off-0x100];
 			col = m_racetrack_tilemap_rom[off+0x1f00]&0x1f;
 			flipx = m_racetrack_tilemap_rom[off+0x1f00]&0x40;
-			track->opaque(bitmap,cliprect,chr,col,flipx,0,y*16-256+scrolly,x*16);
+			track->opaque(m_palette,bitmap,cliprect,chr,col,flipx,0,y*16-256+scrolly,x*16);
 			off++;
 		}
 	}
@@ -419,13 +419,13 @@ wouldnt like to say its the most effective way though...
 		for (a=0;a<8 ;a++)
 		{
 			for(b=0;b<7;b++) {
-				sprites->transpen(bitmap,cliprect,anim+a*8+b,col,0,0,sprx+a*8,spry+b*8,0);
+				sprites->transpen(m_palette,bitmap,cliprect,anim+a*8+b,col,0,0,sprx+a*8,spry+b*8,0);
 			}
 		}
 		// draw the horse number
 		a=3;
 		b=3;
-		sprites->transpen(bitmap,cliprect,anim+horse,col,0,0,sprx+a*8,spry+b*8,0);
+		sprites->transpen(m_palette,bitmap,cliprect,anim+horse,col,0,0,sprx+a*8,spry+b*8,0);
 
 
 	}
@@ -442,7 +442,7 @@ wouldnt like to say its the most effective way though...
 			tileno|=(bank<<8);
 			color=((m_dderby_vidattribs[count])&0x1f);
 
-			gfx->transpen(bitmap,cliprect,tileno,color,0,0,x*8,y*8,(tileno == 0x38) ? 0 : -1);
+			gfx->transpen(m_palette,bitmap,cliprect,tileno,color,0,0,x*8,y*8,(tileno == 0x38) ? 0 : -1);
 
 			count++;
 		}
@@ -536,7 +536,7 @@ static MACHINE_CONFIG_START( dderby, dmndrby_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dmndrby_state, screen_update_dderby)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",dmndrby,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",dmndrby)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_INIT_OWNER(dmndrby_state, dmndrby)
 

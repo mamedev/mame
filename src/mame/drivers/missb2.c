@@ -68,7 +68,7 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_ind16 &b
 	//popmessage("%02x",(*m_bgvram) & 0x1f);
 	for (bg_offs = ((*m_bgvram) << 4); bg_offs < (((*m_bgvram) << 4) | 0xf); bg_offs++)
 	{
-		m_gfxdecode->gfx(1)->opaque(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->opaque(m_palette,bitmap,cliprect,
 				bg_offs,
 				1,
 				0,0,
@@ -128,7 +128,7 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_ind16 &b
 					flipy = !flipy;
 				}
 
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 						code,
 						0,
 						flipx,flipy,
@@ -475,7 +475,7 @@ static MACHINE_CONFIG_START( missb2, missb2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(missb2_state, screen_update_missb2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",missb2,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",missb2)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 

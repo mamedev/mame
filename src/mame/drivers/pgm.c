@@ -528,7 +528,7 @@ MACHINE_CONFIG_FRAGMENT( pgmbase )
 	MCFG_SCREEN_UPDATE_DRIVER(pgm_state, screen_update_pgm)
 	MCFG_SCREEN_VBLANK_DRIVER(pgm_state, screen_eof_pgm)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",pgm,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",pgm)
 	MCFG_PALETTE_ADD("palette", 0x1200/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -4025,7 +4025,7 @@ void pgm_state::expand_32x32x5bpp()
 
 	glcopy.total = (gfx2_size_needed / glcopy.charincrement)*8;
 
-	m_gfxdecode->set_gfx(1, auto_alloc(machine(), gfx_element(machine(), m_palette, glcopy, (UINT8 *)dst, 32, 0x400)));
+	m_gfxdecode->set_gfx(1, auto_alloc(machine(), gfx_element(machine(), glcopy, (UINT8 *)dst, 32, 0x400)));
 
 
 }

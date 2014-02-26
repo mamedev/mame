@@ -105,7 +105,7 @@ void cninja_state::cninjabl_draw_sprites( screen_device &screen, bitmap_ind16 &b
 
 		while (multi >= 0)
 		{
-			m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(3)->prio_transpen(m_palette,bitmap,cliprect,
 					sprite - multi * inc,
 					colour,
 					fx,fy,

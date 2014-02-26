@@ -120,7 +120,7 @@ void drtomy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 				ex = xflip ? (spr_size - 1 - x) : x;
 				ey = yflip ? (spr_size - 1 - y) : y;
 
-				gfx->transpen(bitmap,cliprect,number + x_offset[ex] + y_offset[ey],
+				gfx->transpen(m_palette,bitmap,cliprect,number + x_offset[ex] + y_offset[ey],
 						color,xflip,yflip,
 						sx-0x09+x*8,sy+y*8,0);
 			}
@@ -310,7 +310,7 @@ static MACHINE_CONFIG_START( drtomy, drtomy_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drtomy_state, screen_update_drtomy)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",drtomy,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",drtomy)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

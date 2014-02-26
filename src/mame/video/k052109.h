@@ -90,6 +90,7 @@ private:
 	INT32    m_dx[3], m_dy[3];
 	UINT8    m_romsubbank, m_scrollctrl;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);

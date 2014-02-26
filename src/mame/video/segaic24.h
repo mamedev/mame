@@ -54,6 +54,7 @@ private:
 
 	static const gfx_layout char_layout;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	void tile_info(int offset, tile_data &tileinfo, tilemap_memory_index tile_index);
 	TILE_GET_INFO_MEMBER(tile_info_0s);

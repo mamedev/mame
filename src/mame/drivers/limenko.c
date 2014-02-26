@@ -467,7 +467,7 @@ void limenko_state::draw_sprites(UINT32 *sprites, const rectangle &cliprect, int
 			continue;
 
 		/* prepare GfxElement on the fly */
-		gfx_element gfx(machine(), m_palette, gfxdata, width, height, width, 0, 256);
+		gfx_element gfx(machine(), gfxdata, width, height, width, m_palette->entries(), 0, 256);
 
 		draw_single_sprite(m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y,pri);
 
@@ -766,7 +766,7 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",limenko,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",limenko)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
@@ -797,7 +797,7 @@ static MACHINE_CONFIG_START( spotty, limenko_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",limenko,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",limenko)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 

@@ -221,7 +221,7 @@ void ddribble_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 					ey = flipy ? (height - 1 - y) : y;
 
 					
-						gfx->transpen(bitmap,cliprect,
+						gfx->transpen(m_palette,bitmap,cliprect,
 						(number)+x_offset[ex]+y_offset[ey],
 						color,
 						flipx, flipy,

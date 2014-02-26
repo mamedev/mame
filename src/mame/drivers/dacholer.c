@@ -151,7 +151,7 @@ void dacholer_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		 m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 				code,
 				0,
 				flipx,flipy,
@@ -672,7 +672,7 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(dacholer_state, dacholer)
-	MCFG_GFXDECODE_ADD("gfxdecode",dacholer,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",dacholer)
 
 
 	/* sound hardware */

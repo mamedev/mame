@@ -183,7 +183,7 @@ static MACHINE_CONFIG_START( blstroid, blstroid_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE_ADD("gfxdecode",blstroid,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",blstroid)
 	
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)

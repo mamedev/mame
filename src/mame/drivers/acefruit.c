@@ -130,7 +130,7 @@ UINT32 acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_ind1
 
 			if( color < 0x4 )
 			{
-				 m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, code, color, 0, 0, col * 16, row * 8 );
+				 m_gfxdecode->gfx(1)->opaque(m_palette,bitmap,cliprect, code, color, 0, 0, col * 16, row * 8 );
 			}
 			else if( color >= 0x5 && color <= 0x7 )
 			{
@@ -604,7 +604,7 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	MCFG_CPU_IO_MAP(acefruit_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",acefruit,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",acefruit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

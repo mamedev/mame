@@ -188,15 +188,15 @@ void cyclemb_state::cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 
 			if(flip_screen())
 			{
-				gfx->opaque(bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx,256-(y*8));
+				gfx->opaque(m_palette,bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx,256-(y*8));
 				/* wrap-around */
-				gfx->opaque(bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx+512,256-(y*8));
+				gfx->opaque(m_palette,bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx+512,256-(y*8));
 			}
 			else
 			{
-				gfx->opaque(bitmap,cliprect,tile,color,0,0,(x*8)-scrollx,(y*8));
+				gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,(x*8)-scrollx,(y*8));
 				/* wrap-around */
-				gfx->opaque(bitmap,cliprect,tile,color,0,0,(x*8)-scrollx+512,(y*8));
+				gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,(x*8)-scrollx+512,(y*8));
 			}
 
 			count++;
@@ -257,7 +257,7 @@ void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			fx = !fx;
 			fy = !fy;
 		}
-		m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		m_gfxdecode->gfx(region)->transpen(m_palette,bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 }
 
@@ -295,9 +295,9 @@ void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 				scrolly = m_vram[(x-32)*64+1];
 
 
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx,((y*8)-scrolly)&0xff);
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx-480,((y*8)-scrolly)&0xff);
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx+480,((y*8)-scrolly)&0xff);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8+scrollx,((y*8)-scrolly)&0xff);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8+scrollx-480,((y*8)-scrolly)&0xff);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8+scrollx+480,((y*8)-scrolly)&0xff);
 
 
 		}
@@ -353,7 +353,7 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			fx = !fx;
 			fy = !fy;
 		}
-		m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		m_gfxdecode->gfx(region)->transpen(m_palette,bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 }
 
@@ -916,7 +916,7 @@ static MACHINE_CONFIG_START( cyclemb, cyclemb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_cyclemb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cyclemb,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",cyclemb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(cyclemb_state, cyclemb)
 

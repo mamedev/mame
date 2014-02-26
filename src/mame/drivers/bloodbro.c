@@ -477,7 +477,7 @@ static MACHINE_CONFIG_START( bloodbro, bloodbro_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",bloodbro,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",bloodbro)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

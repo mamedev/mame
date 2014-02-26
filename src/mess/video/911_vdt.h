@@ -17,8 +17,6 @@ enum
 	vdt911_chr_region_len   = vdt911_japanese_chr_offset+256*vdt911_single_char_len
 };
 
-GFXDECODE_EXTERN( vdt911 );
-
 enum vdt911_screen_size_t { char_960, char_1920 };
 enum vdt911_model_t
 {
@@ -61,6 +59,7 @@ private:
 	// internal state
 	void *m_token;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type VDT911;

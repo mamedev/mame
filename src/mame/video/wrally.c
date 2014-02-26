@@ -126,7 +126,7 @@ void wrally_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		}
 
 		if (!color_effect) {
-			gfx->transpen(bitmap,cliprect,number,
+			gfx->transpen(m_palette,bitmap,cliprect,number,
 					0x20 + color,xflip,yflip,
 					sx - 0x0f,sy,0);
 		} else {

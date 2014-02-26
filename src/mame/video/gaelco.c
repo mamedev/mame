@@ -166,7 +166,7 @@ void gaelco_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 				ex = xflip ? (spr_size - 1 - x) : x;
 				ey = yflip ? (spr_size - 1 - y) : y;
 
-				gfx->prio_transpen(bitmap,cliprect,number + x_offset[ex] + y_offset[ey],
+				gfx->prio_transpen(m_palette,bitmap,cliprect,number + x_offset[ex] + y_offset[ey],
 						color,xflip,yflip,
 						sx-0x0f+x*8,sy+y*8,
 						screen.priority(),pri_mask,0);

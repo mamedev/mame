@@ -523,7 +523,7 @@ UINT32 avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap,
 			UINT16 tile = m_videoram[count] | ((m_colorram[count] & 1) << 8);
 			UINT8 color = (m_colorram[count] & 0xf0) >> 4;
 
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8,(y*8));
+			gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8,(y*8));
 
 			count++;
 		}
@@ -906,7 +906,7 @@ static MACHINE_CONFIG_START( avt, avt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* 240x224 (through CRTC) */
 	MCFG_SCREEN_UPDATE_DRIVER(avt_state, screen_update_avt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",avt,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",avt)
 
 	MCFG_PALETTE_ADD("palette", 8*16)
 	MCFG_PALETTE_INIT_OWNER(avt_state, avt)

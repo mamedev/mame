@@ -51,7 +51,8 @@ const device_type YGV608 = &device_creator<ygv608_device>;
 
 ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
 	: device_t(mconfig, YGV608, "YGV608", tag, owner, clock, "ygv608", __FILE__),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this),
+	m_palette(*this)
 {
 }
 
@@ -606,20 +607,20 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		logerror( "SZ_8X8: sprite=%d\n", code );
 		code = 0;
 		}
-		m_gfxdecode->gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_8X8_4BIT)->transpen(m_palette,bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x10000,
 			color,
 			flipx,flipy,
 			sx,sy,0x00);
 		// redraw with wrap-around
 		if( sx > 512-8 )
-		m_gfxdecode->gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_8X8_4BIT)->transpen(m_palette,bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x10000,
 			color,
 			flipx,flipy,
 			sx-512,sy,0x00);
 		if( sy > 512-8 )
-		m_gfxdecode->gfx(GFX_8X8_4BIT)->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_8X8_4BIT)->transpen(m_palette,bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x10000,
 			color,
 			flipx,flipy,
@@ -636,20 +637,20 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		logerror( "SZ_8X8: sprite=%d\n", code );
 		code = 0;
 		}
-		m_gfxdecode->gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_16X16_4BIT)->transpen(m_palette,bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x4000,
 			color,
 			flipx,flipy,
 			sx,sy,0x00);
 		// redraw with wrap-around
 		if( sx > 512-16 )
-		m_gfxdecode->gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_16X16_4BIT)->transpen(m_palette,bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x4000,
 			color,
 			flipx,flipy,
 			sx-512,sy,0x00);
 		if( sy > 512-16 )
-		m_gfxdecode->gfx(GFX_16X16_4BIT)->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_16X16_4BIT)->transpen(m_palette,bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x4000,
 			color,
 			flipx,flipy,
@@ -666,20 +667,20 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		logerror( "SZ_32X32: sprite=%d\n", code );
 	code = 0;
 		}
-		m_gfxdecode->gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_32X32_4BIT)->transpen(m_palette,bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x1000,
 			color,
 			flipx,flipy,
 			sx,sy,0x00);
 		// redraw with wrap-around
 		if( sx > 512-32 )
-		m_gfxdecode->gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_32X32_4BIT)->transpen(m_palette,bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x1000,
 			color,
 			flipx,flipy,
 			sx-512,sy,0x00);
 		if( sy > 512-32 )
-		m_gfxdecode->gfx(GFX_32X32_4BIT)->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_32X32_4BIT)->transpen(m_palette,bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x1000,
 			color,
 			flipx,flipy,
@@ -696,20 +697,20 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		logerror( "SZ_64X64: sprite=%d\n", code );
 		code = 0;
 		}
-		m_gfxdecode->gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_64X64_4BIT)->transpen(m_palette,bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x400,
 			color,
 			flipx,flipy,
 			sx,sy,0x00);
 		// redraw with wrap-around
 		if( sx > 512-64 )
-		m_gfxdecode->gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_64X64_4BIT)->transpen(m_palette,bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x400,
 			color,
 			flipx,flipy,
 			sx-512,sy,0x00);
 		if( sy > 512-64 )
-		m_gfxdecode->gfx(GFX_64X64_4BIT)->transpen(bitmap,spriteClip,
+		m_gfxdecode->gfx(GFX_64X64_4BIT)->transpen(m_palette,bitmap,spriteClip,
 			code+m_namcond1_gfxbank*0x400,
 			color,
 			flipx,flipy,
@@ -1217,7 +1218,7 @@ WRITE16_MEMBER( ygv608_device::write )
 			if (++p3_state == 3)
 			{
 				p3_state = 0;
-				m_gfxdecode->palette()->set_pen_color(m_regs.s.cc,
+				m_palette->set_pen_color(m_regs.s.cc,
 					pal6bit(m_colour_palette[m_regs.s.cc][0]),
 					pal6bit(m_colour_palette[m_regs.s.cc][1]),
 					pal6bit(m_colour_palette[m_regs.s.cc][2]) );

@@ -117,6 +117,7 @@ public:
 
 	const char *m_memory_region;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	/* alt implementation - to be collapsed */
 	void alt_k055673_vh_start(running_machine &machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
@@ -248,7 +249,7 @@ public:
 
 		if (gx_objzbuf && gx_shdzbuf) /* GX  */
 		{
-			k053247_draw_yxloop_gx( bitmap, cliprect,
+			k053247_draw_yxloop_gx(bitmap, cliprect,
 				code,
 				color,
 				height, width,
@@ -274,14 +275,14 @@ public:
 				color = 0;
 				shadow = -1;
 				whichtable = shadowmode_table;
-				m_gfxdecode->palette()->set_shadow_mode(0);
+				m_palette->set_shadow_mode(0);
 			}
 			else
 			{
 				if (shdmask >= 0)
 				{
 					shadow = (color & K053247_CUSTOMSHADOW) ? (color >> K053247_SHDSHIFT) : (shadow >> 10);
-					if (shadow &= 3) m_gfxdecode->palette()->set_shadow_mode((shadow - 1) & shdmask);
+					if (shadow &= 3) m_palette->set_shadow_mode((shadow - 1) & shdmask);
 				}
 				else
 					shadow = 0;
@@ -291,7 +292,7 @@ public:
 
 			drawmode_table[m_gfx->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
-			k053247_draw_yxloop_gx( bitmap, cliprect,
+			k053247_draw_yxloop_gx(bitmap, cliprect,
 				code,
 				color,
 				height, width,
@@ -313,7 +314,7 @@ public:
 
 
 	template<class _BitmapClass>
-	void k053247_draw_yxloop_gx( _BitmapClass &bitmap, const rectangle &cliprect,
+	void k053247_draw_yxloop_gx(_BitmapClass &bitmap, const rectangle &cliprect,
 		int code,
 		int color,
 		int height, int width,
@@ -409,48 +410,48 @@ public:
 				{
 					if (nozoom)
 					{
-						m_gfx->prio_transtable(bitmap,cliprect,
+						m_gfx->prio_transtable(m_palette,bitmap,cliprect,
 								tempcode,
 								color,
 								fx,fy,
 								sx,sy,
 								m_screen->priority(),primask,
-								whichtable,m_gfxdecode->palette()->shadow_table());
+								whichtable,m_palette->shadow_table());
 					}
 					else
 					{
-						m_gfx->prio_zoom_transtable(bitmap,cliprect,
+						m_gfx->prio_zoom_transtable(m_palette,bitmap,cliprect,
 								tempcode,
 								color,
 								fx,fy,
 								sx,sy,
 								(zw << 16) >> 4,(zh << 16) >> 4,
 								m_screen->priority(),primask,
-								whichtable,m_gfxdecode->palette()->shadow_table());
+								whichtable,m_palette->shadow_table());
 					}
 
 					if (mirrory && height == 1)  /* Simpsons shadows */
 					{
 						if (nozoom)
 						{
-							m_gfx->prio_transtable(bitmap,cliprect,
+							m_gfx->prio_transtable(m_palette,bitmap,cliprect,
 									tempcode,
 									color,
 									fx,!fy,
 									sx,sy,
 									m_screen->priority(),primask,
-									whichtable,m_gfxdecode->palette()->shadow_table());
+									whichtable,m_palette->shadow_table());
 						}
 						else
 						{
-							m_gfx->prio_zoom_transtable(bitmap,cliprect,
+							m_gfx->prio_zoom_transtable(m_palette,bitmap,cliprect,
 									tempcode,
 									color,
 									fx,!fy,
 									sx,sy,
 									(zw << 16) >> 4,(zh << 16) >> 4,
 									m_screen->priority(),primask,
-									whichtable,m_gfxdecode->palette()->shadow_table());
+									whichtable,m_palette->shadow_table());
 						}
 					}
 				}

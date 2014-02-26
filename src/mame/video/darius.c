@@ -75,7 +75,7 @@ void darius_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 			if (curx > 900) curx -= 1024;
 			if (cury > 400) cury -= 512;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code, color,
 					flipx, flipy,
 					curx, cury, 0);

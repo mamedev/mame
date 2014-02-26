@@ -391,7 +391,7 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sbowling_state, screen_update_sbowling)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",sbowling,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",sbowling)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_INIT_OWNER(sbowling_state, sbowling)

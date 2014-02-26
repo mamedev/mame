@@ -32,6 +32,7 @@ private:
 
 	int          m_flipscreen;    // current code uses the 7342 flipscreen!!
 	UINT8        m_regs[8];   // current code uses the 7342 regs!! (only [2])
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type K007420;

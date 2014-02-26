@@ -229,7 +229,7 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*16, 16*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(microtan_state, screen_update_microtan)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",microtan,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",microtan)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

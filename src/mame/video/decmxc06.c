@@ -50,7 +50,8 @@ const device_type DECO_MXC06 = &device_creator<deco_mxc06_device>;
 deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO_MXC06, "decmxc06_device", tag, owner, clock, "deco_mxc06", __FILE__),
 		m_gfxregion(0),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this),
+		m_palette(*this)
 {
 }
 
@@ -157,7 +158,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 
 					if (draw)
 					{
-						m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(m_gfxregion)->transpen(m_palette,bitmap,cliprect,
 							code - y * incy,
 							color & col_mask,
 							flipx,flipy,
@@ -197,7 +198,7 @@ void deco_mxc06_device::draw_sprites_bootleg( running_machine &machine, bitmap_i
 
 		sx -= 0x100;
 
-		m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_gfxregion)->transpen(m_palette,bitmap,cliprect,
 			code,
 			color & col_mask,
 			flipx,flipy,

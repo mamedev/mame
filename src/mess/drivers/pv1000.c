@@ -354,12 +354,12 @@ UINT32 pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &b
 			if ( tile < 0xe0 || m_force_pattern )
 			{
 				tile += ( m_pcg_bank << 8);
-				 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
+				 m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
 			}
 			else
 			{
 				tile -= 0xe0;
-				 m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
+				 m_gfxdecode->gfx(1)->opaque(m_palette,bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
 			}
 		}
 	}
@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( pv1000, pv1000_state )
 	MCFG_PALETTE_ADD( "palette", 8 )
 	MCFG_PALETTE_INIT_OWNER(pv1000_state, pv1000)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode",pv1000 ,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",pv1000 )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD( "pv1000_sound", PV1000, 17897725 )

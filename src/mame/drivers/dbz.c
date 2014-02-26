@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dbz_state, screen_update_dbz)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",dbz,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",dbz)
 
 	MCFG_PALETTE_ADD("palette", 0x4000/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)

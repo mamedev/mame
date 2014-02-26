@@ -148,6 +148,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info_b);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info_b);
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type DECO16IC;

@@ -263,7 +263,7 @@ static MACHINE_CONFIG_START( lemmings, lemmings_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lemmings_state, screen_update_lemmings)
 	MCFG_SCREEN_VBLANK_DRIVER(lemmings_state, screen_eof_lemmings)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",lemmings,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",lemmings)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 

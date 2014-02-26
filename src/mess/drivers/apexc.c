@@ -588,7 +588,7 @@ void apexc_state::apexc_draw_led(bitmap_ind16 &bitmap, int x, int y, int state)
 /* write a single char on screen */
 void apexc_state::apexc_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color)
 {
-	 m_gfxdecode->gfx(0)->transpen(bitmap,bitmap.cliprect(), character-32, color, 0, 0,
+	 m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,bitmap.cliprect(), character-32, color, 0, 0,
 				x+1, y, 0);
 }
 
@@ -889,7 +889,7 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 	MCFG_SCREEN_UPDATE_DRIVER(apexc_state, screen_update_apexc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",apexc,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",apexc)
 	MCFG_PALETTE_ADD("palette", APEXC_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(apexc_state, apexc)
 

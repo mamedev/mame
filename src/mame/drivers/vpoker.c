@@ -154,7 +154,7 @@ UINT32 vpoker_state::screen_update_vpoker(screen_device &screen, bitmap_ind16 &b
 		{
 			int tile = videoram[count];
 			//int colour = tile>>12;
-			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*16,y*16);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x*16,y*16);
 
 			count++;
 		}
@@ -673,7 +673,7 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vpoker_state, screen_update_vpoker)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",vpoker,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",vpoker)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(vpoker_state, vpoker)
 

@@ -638,7 +638,7 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo_state, screen_update_tecmo)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",tecmo,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",tecmo)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
@@ -698,7 +698,7 @@ static MACHINE_CONFIG_START( backfirt, tecmo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tecmo_state, screen_update_tecmo)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",tecmo,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",tecmo)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 

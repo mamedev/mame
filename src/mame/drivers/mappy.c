@@ -1719,7 +1719,7 @@ static MACHINE_CONFIG_FRAGMENT( superpac_common )
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,superpac)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode",superpac,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",superpac)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,superpac)
 
@@ -1799,7 +1799,7 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_NAMCO56XX_ADD("namcoio_2", intf1_interleave)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode",phozon,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",phozon)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,phozon)
 
@@ -1836,7 +1836,7 @@ static MACHINE_CONFIG_FRAGMENT( mappy_common )
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,mappy)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode",mappy,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",mappy)
 	MCFG_PALETTE_ADD("palette", 64*4+16*16)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,mappy)
 

@@ -219,7 +219,8 @@ sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type
 		m_master_cpu(*this, "32x_master_sh2"),
 		m_slave_cpu(*this, "32x_slave_sh2"),
 		m_lch_pwm(*this, "lch_pwm"),
-		m_rch_pwm(*this, "rch_pwm")
+		m_rch_pwm(*this, "rch_pwm"),
+		m_palette(*this)
 {
 }
 

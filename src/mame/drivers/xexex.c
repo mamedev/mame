@@ -571,7 +571,7 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	MCFG_K056832_ADD("k056832", xexex_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K053246_ADD("k053246", xexex_k053246_intf)

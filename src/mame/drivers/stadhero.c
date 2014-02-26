@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( stadhero, stadhero_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stadhero_state, screen_update_stadhero)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",stadhero,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",stadhero)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

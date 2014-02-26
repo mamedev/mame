@@ -50,7 +50,7 @@ public:
 
 
 
-#define DRAW_TILE(machine, offset, transparency)  m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,\
+#define DRAW_TILE(machine, offset, transparency)  m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,\
 					(m_videoram[index+offset] | (m_colorram[index+offset]<<8))&0x3fff,\
 					(m_colorram[index+offset]&0x80)>>7,\
 					0,0,\
@@ -232,7 +232,7 @@ static MACHINE_CONFIG_START( cardline, cardline_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cardline_state, screen_update_cardline)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cardline,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",cardline)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(cardline_state, cardline)
 

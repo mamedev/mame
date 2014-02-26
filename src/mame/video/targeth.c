@@ -116,7 +116,7 @@ void targeth_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		int xflip = attr & 0x20;
 		int yflip = attr & 0x40;
 
-		gfx->transpen(bitmap,cliprect,number,
+		gfx->transpen(m_palette,bitmap,cliprect,number,
 				0x20 + color,xflip,yflip,
 				sx - 0x0f,sy,0);
 	}

@@ -238,11 +238,11 @@ void blackt96_state::draw_strip(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 		if (tile&0x2000)
 		{
-			gfxbg->transpen(bitmap,cliprect,tile&0x1fff,colour>>4,flipx,0,xx,yy+y*16,0);
+			gfxbg->transpen(m_palette,bitmap,cliprect,tile&0x1fff,colour>>4,flipx,0,xx,yy+y*16,0);
 		}
 		else
 		{
-			gfxspr->transpen(bitmap,cliprect,tile&0x1fff,colour,flipx,0,xx,yy+y*16,0);
+			gfxspr->transpen(m_palette,bitmap,cliprect,tile&0x1fff,colour,flipx,0,xx,yy+y*16,0);
 		}
 	}
 }
@@ -275,7 +275,7 @@ UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind1
 		{
 			UINT16 tile = (m_tilemapram[count*2]&0xff);
 			tile += m_txt_bank * 0x100;
-			gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,-16+y*8,0);
+			gfx->transpen(m_palette,bitmap,cliprect,tile,0,0,0,x*8,-16+y*8,0);
 			count++;
 		}
 	}
@@ -602,7 +602,7 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 	MCFG_CPU_ADD("audiocpu", PIC16C57, 8000000) /* ? */
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",blackt96,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",blackt96)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

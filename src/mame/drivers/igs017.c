@@ -356,9 +356,9 @@ void igs017_state::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect, i
 	if ( addr + dimx * dimy >= m_sprites_gfx_size )
 		return;
 
-	gfx_element gfx(machine(), m_palette, m_sprites_gfx + addr, dimx, dimy, dimx, 0x100, 32);
+	gfx_element gfx(machine(), m_sprites_gfx + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
 
-	gfx.transpen(bitmap,cliprect,
+	gfx.transpen(m_palette, bitmap,cliprect,
 				0, color,
 				flipx, flipy,
 				sx, sy, 0x1f    );
@@ -3497,7 +3497,7 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",igs017,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",igs017)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3562,7 +3562,7 @@ static MACHINE_CONFIG_START( mgcs, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",igs017_flipped,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",igs017_flipped)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3604,7 +3604,7 @@ static MACHINE_CONFIG_START( lhzb2, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",igs017_swapped,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",igs017_swapped)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3648,7 +3648,7 @@ static MACHINE_CONFIG_START( lhzb2a, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",igs017_swapped,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",igs017_swapped)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3680,7 +3680,7 @@ static MACHINE_CONFIG_START( slqz2, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",igs017,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",igs017)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3727,7 +3727,7 @@ static MACHINE_CONFIG_START( sdmg2, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",igs017,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",igs017)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3779,7 +3779,7 @@ static MACHINE_CONFIG_START( mgdha, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",igs017_swapped,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",igs017_swapped)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3811,7 +3811,7 @@ static MACHINE_CONFIG_START( tjsb, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",igs017,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",igs017)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3846,7 +3846,7 @@ static MACHINE_CONFIG_START( spkrform, igs017_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",igs017,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",igs017)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

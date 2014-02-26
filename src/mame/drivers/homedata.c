@@ -1240,7 +1240,7 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mrokumei)
 	MCFG_SCREEN_VBLANK_DRIVER(homedata_state, screen_eof_homedata)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",mrokumei,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",mrokumei)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,mrokumei)
@@ -1297,7 +1297,7 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_reikaids)
 	MCFG_SCREEN_VBLANK_DRIVER(homedata_state, screen_eof_homedata)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",reikaids,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",reikaids)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,reikaids)
@@ -1347,7 +1347,7 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_pteacher)
 	MCFG_SCREEN_VBLANK_DRIVER(homedata_state, screen_eof_homedata)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",pteacher,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",pteacher)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,pteacher)
@@ -1509,7 +1509,7 @@ static MACHINE_CONFIG_START( mirderby, homedata_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mirderby)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",mirderby,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",mirderby)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,mirderby)

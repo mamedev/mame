@@ -501,7 +501,7 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 	MCFG_K052109_ADD("k052109", vendetta_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K053246_ADD("k053246", vendetta_k053246_intf)

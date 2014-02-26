@@ -546,7 +546,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update_slapshot)
 	MCFG_SCREEN_VBLANK_DRIVER(slapshot_state, screen_eof_taito_no_buffer)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",slapshot,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",slapshot)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 
@@ -593,7 +593,7 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update_slapshot)
 	MCFG_SCREEN_VBLANK_DRIVER(slapshot_state, screen_eof_taito_no_buffer)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",slapshot,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",slapshot)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 

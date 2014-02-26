@@ -263,7 +263,7 @@ UINT32 carrera_state::screen_update_carrera(screen_device &screen, bitmap_ind16 
 		{
 			int tile = m_tileram[count&0x7ff] | m_tileram[(count&0x7ff)+0x800]<<8;
 
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x*8,y*8);
 			count++;
 		}
 	}
@@ -346,7 +346,7 @@ static MACHINE_CONFIG_START( carrera, carrera_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16, mc6845_intf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",carrera,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",carrera)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(carrera_state, carrera)
 	

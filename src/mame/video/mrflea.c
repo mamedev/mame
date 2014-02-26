@@ -55,12 +55,12 @@ void mrflea_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		int ypos = source[0] - 16 + 3;
 		int tile_number = source[2] + source[3] * 0x100;
 
-		gfx->transpen(bitmap,clip,
+		gfx->transpen(m_palette,bitmap,clip,
 			tile_number,
 			0, /* color */
 			0,0, /* no flip */
 			xpos,ypos,0 );
-		gfx->transpen(bitmap,clip,
+		gfx->transpen(m_palette,bitmap,clip,
 			tile_number,
 			0, /* color */
 			0,0, /* no flip */
@@ -89,7 +89,7 @@ void mrflea_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipr
 			int tile_number = base + source[0] + source[0x400] * 0x100;
 			source++;
 			
-				gfx->opaque(bitmap,cliprect,
+				gfx->opaque(m_palette,bitmap,cliprect,
 				tile_number,
 				0, /* color */
 				0,0, /* no flip */

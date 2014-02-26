@@ -85,20 +85,20 @@ rgb_t jal_blend_func(rgb_t dest, rgb_t addMe, UINT8 alpha)
 }
 
 template<class _BitmapClass>
-void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
+void jal_blend_drawgfx_common(palette_device &palette,_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 {
 	if (jal_blend_table == NULL)
 	{
-		gfx->transpen(dest_bmp,clip,code,color,flipx,flipy,offsx,offsy,transparent_color);
+		gfx->transpen(palette,dest_bmp,clip,code,color,flipx,flipy,offsx,offsy,transparent_color);
 		return;
 	}
 
 	/* Start drawing */
 	if (gfx)
 	{
-		const pen_t *pal = &gfx->palette().pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+		const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const UINT8 *alpha = &jal_blend_table[gfx->granularity() * (color % gfx->colors())];
 		const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 		int x_index_base, y_index, sx, sy, ex, ey;
@@ -174,11 +174,11 @@ void jal_blend_drawgfx_common(_BitmapClass &dest_bmp,const rectangle &clip,gfx_e
 	}
 }
 
-void jal_blend_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+void jal_blend_drawgfx(palette_device &palette,bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
-{ jal_blend_drawgfx_common(dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color); }
-void jal_blend_drawgfx(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+{ jal_blend_drawgfx_common(palette,dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color); }
+void jal_blend_drawgfx(palette_device &palette,bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 							UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
-{ jal_blend_drawgfx_common(dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color); }
+{ jal_blend_drawgfx_common(palette,dest_bmp, clip, gfx, code, color, flipx, flipy, offsx, offsy, transparent_color); }

@@ -546,7 +546,7 @@ static MACHINE_CONFIG_START( marineb, marineb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_marineb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",marineb,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",marineb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(marineb_state, marineb)
 

@@ -39,7 +39,7 @@ UINT32 spcforce_state::screen_update_spcforce(screen_device &screen, bitmap_ind1
 			sy = 248 - sy;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code, col,
 				flip, flip,
 				sx, sy,0);

@@ -625,7 +625,7 @@ static MACHINE_CONFIG_START( slotcarn, slotcarn_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",slotcarn,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",slotcarn)
 	MCFG_PALETTE_ADD("palette", 0x400)
 
 	/* sound hardware */

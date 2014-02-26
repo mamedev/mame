@@ -2028,7 +2028,7 @@ static MACHINE_CONFIG_START( seta2, seta2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update_seta2)
 	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof_seta2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",seta2,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",seta2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2229,7 +2229,7 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update_seta2)
 	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof_seta2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",funcube,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",funcube)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2281,7 +2281,7 @@ static MACHINE_CONFIG_START( namcostr, seta2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update_seta2)
 	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof_seta2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",funcube,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",funcube)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

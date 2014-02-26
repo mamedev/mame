@@ -873,7 +873,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode",darius,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",darius)
 	MCFG_PALETTE_ADD("palette", 4096*2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_DEFAULT_LAYOUT(layout_darius)

@@ -3717,7 +3717,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
-	MCFG_GFXDECODE_ADD("gfxdecode",pc9801,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3787,7 +3787,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 
 	MCFG_PALETTE_ADD("palette", 16+16)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
-	MCFG_GFXDECODE_ADD("gfxdecode",pc9801,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3871,7 +3871,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 
 	MCFG_PALETTE_ADD("palette", 16+16+256)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
-	MCFG_GFXDECODE_ADD("gfxdecode",pc9801,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -680,7 +680,8 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag,
 		device_t(mconfig, ISA8_CGA, "IBM Color/Graphics Monitor Adapter", tag, owner, clock, "cga", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_cga_config(*this, "cga_config"),
-		m_vram_size( 0x4000 )
+		m_vram_size( 0x4000 ),
+		m_palette(*this, "palette")
 {
 	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x1800;
 	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x1000;
@@ -692,7 +693,8 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
 		m_cga_config(*this, "cga_config"),
-		m_vram_size( 0x4000 )
+		m_vram_size( 0x4000 ),
+		m_palette(*this, "palette")
 {
 	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x1800;
 	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x1000;

@@ -682,8 +682,7 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("dummy_palette")
-	MCFG_GFXDECODE_ADD("gfxdecode",grchamp,"dummy_palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",grchamp)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)

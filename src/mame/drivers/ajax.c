@@ -230,7 +230,7 @@ static MACHINE_CONFIG_START( ajax, ajax_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",empty)
 
 	MCFG_K052109_ADD("k052109", ajax_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")

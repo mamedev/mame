@@ -36,6 +36,7 @@ private:
 
 	int            m_gfx_index;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	TILE_GET_INFO_MEMBER(tile_info_layer0);
 	TILE_GET_INFO_MEMBER(tile_info_layer1);

@@ -2526,7 +2526,7 @@ MACHINE_START_MEMBER(x1_state,x1)
 	save_pointer(NAME(m_emm_ram), 0x1000000);
 	save_pointer(NAME(m_pcg_ram), 0x1800);
 
-	m_gfxdecode->set_gfx(3, auto_alloc(machine(), gfx_element(machine(), m_palette, x1_pcg_8x8, (UINT8 *)m_pcg_ram, 1, 0)));
+	m_gfxdecode->set_gfx(3, auto_alloc(machine(), gfx_element(machine(), x1_pcg_8x8, (UINT8 *)m_pcg_ram, 1, 0)));
 }
 
 PALETTE_INIT_MEMBER(x1_state,x1)
@@ -2587,7 +2587,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1_state,x1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",x1,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",x1)
 
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 

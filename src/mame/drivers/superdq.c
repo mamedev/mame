@@ -335,7 +335,7 @@ static MACHINE_CONFIG_START( superdq, superdq_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode",superdq,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",superdq)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(superdq_state, superdq)
 

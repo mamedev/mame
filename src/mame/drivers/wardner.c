@@ -416,7 +416,7 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wardner_state, screen_update_toaplan0)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram8", buffered_spriteram8_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",wardner,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",wardner)
 	MCFG_PALETTE_ADD("palette", 1792)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

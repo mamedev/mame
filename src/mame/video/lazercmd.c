@@ -67,7 +67,7 @@ UINT32 lazercmd_state::screen_update_lazercmd(screen_device &screen, bitmap_ind1
 		sx *= HORZ_CHR;
 		sy *= VERT_CHR;
 
-		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,
 				m_videoram[i], video_inverted ? 1 : 0,
 				0,0,
 				sx,sy);

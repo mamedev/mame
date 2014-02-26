@@ -1578,7 +1578,7 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_bigrun)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",bigrun,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",bigrun)
 	MCFG_PALETTE_ADD("palette", 16*16 * 3 + 64*16 * 2 + 64*16)  /* scroll 0,1,2; road 0,1; sprites */
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
@@ -1714,7 +1714,7 @@ static MACHINE_CONFIG_START( scudhamm, cischeat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",scudhamm,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",scudhamm)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16+128*16)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 

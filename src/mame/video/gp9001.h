@@ -111,6 +111,7 @@ private:
 	void gp9001_scroll_reg_select_w( offs_t offset, UINT16 data, UINT16 mem_mask );
 	void gp9001_scroll_reg_data_w(offs_t offset, UINT16 data, UINT16 mem_mask);
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type GP9001_VDP;

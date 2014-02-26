@@ -152,7 +152,7 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
 				transpen = 1;
 			}
 
-			m_gfxdecode->gfx(rgn)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(rgn)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					0,0,
@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( tugboat, tugboat_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8,31*8-1,2*8,30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tugboat_state, screen_update_tugboat)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",tugboat,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",tugboat)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tugboat_state, tugboat)
 

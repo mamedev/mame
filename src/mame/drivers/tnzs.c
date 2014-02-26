@@ -1627,7 +1627,7 @@ static MACHINE_CONFIG_START( arknoid2, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",tnzs,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",tnzs)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1670,7 +1670,7 @@ static MACHINE_CONFIG_START( drtoppel, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",tnzs,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",tnzs)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_INIT_OWNER(tnzs_state,arknoid2)
@@ -1715,7 +1715,7 @@ static MACHINE_CONFIG_START( tnzs, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",tnzs,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",tnzs)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1756,7 +1756,7 @@ static MACHINE_CONFIG_START( insectx, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",insectx,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",insectx)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1797,7 +1797,7 @@ static MACHINE_CONFIG_START( kageki, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",tnzs,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",tnzs)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1848,7 +1848,7 @@ static MACHINE_CONFIG_START( tnzsb, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",tnzs,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",tnzs)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1910,7 +1910,7 @@ static MACHINE_CONFIG_START( jpopnics, tnzs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",tnzs,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",tnzs)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

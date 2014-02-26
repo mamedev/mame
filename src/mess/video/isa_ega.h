@@ -47,8 +47,6 @@ protected:
 
 		UINT8 alu_op( UINT8 data, UINT8 latch_data );
 
-		//Micko:FIXME
-		palette_device *m_palette;
 public:
 		crtc_ega_device *m_crtc_ega;
 
@@ -98,6 +96,7 @@ public:
 		UINT8   m_vsync;
 		UINT8   m_vblank;
 		UINT8   m_display_enable;
+		required_device<palette_device> m_palette;	
 };
 
 

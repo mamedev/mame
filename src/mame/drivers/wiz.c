@@ -729,7 +729,7 @@ static MACHINE_CONFIG_START( wiz, wiz_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_wiz)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",wiz,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",wiz)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(wiz_state, wiz)
 

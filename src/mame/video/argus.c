@@ -840,7 +840,7 @@ void argus_state::argus_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &clip
 			}
 
 			if (priority != pri)
-				jal_blend_drawgfx(
+				jal_blend_drawgfx(m_palette,
 							bitmap,cliprect,m_gfxdecode->gfx(0),
 							tile,
 							color,
@@ -968,7 +968,7 @@ void argus_state::valtric_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 				flipy = !flipy;
 			}
 
-			jal_blend_drawgfx(
+			jal_blend_drawgfx(m_palette,
 						bitmap,cliprect,m_gfxdecode->gfx(0),
 						tile,
 						color,
@@ -1019,7 +1019,7 @@ void argus_state::butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 
 			if ((offs >= 0x100 && offs <= 0x2ff) || (offs >= 0x400 && offs <= 0x57f))
 			{
-				jal_blend_drawgfx(
+				jal_blend_drawgfx(m_palette,
 							bitmap,cliprect,m_gfxdecode->gfx(0),
 							tile,
 							color,
@@ -1033,7 +1033,7 @@ void argus_state::butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 				{
 					td = (fx) ? (1 - i) : i;
 
-					jal_blend_drawgfx(
+					jal_blend_drawgfx(m_palette,
 								bitmap,cliprect,m_gfxdecode->gfx(0),
 								tile + td,
 								color,
@@ -1053,7 +1053,7 @@ void argus_state::butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 						else
 							td = (fx) ? (i * 2) + 1 - j : i * 2 + j;
 
-						jal_blend_drawgfx(
+						jal_blend_drawgfx(m_palette,
 									bitmap,cliprect,m_gfxdecode->gfx(0),
 									tile + td,
 									color,
@@ -1074,7 +1074,7 @@ void argus_state::butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 						else
 							td = (fx) ? (i * 4) + 3 - j : i * 4 + j;
 
-						jal_blend_drawgfx(
+						jal_blend_drawgfx(m_palette,
 									bitmap,cliprect,m_gfxdecode->gfx(0),
 									tile + td,
 									color,

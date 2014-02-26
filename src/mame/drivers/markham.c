@@ -193,7 +193,7 @@ static MACHINE_CONFIG_START( markham, markham_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(markham_state, screen_update_markham)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",markham,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",markham)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(markham_state, markham)
 

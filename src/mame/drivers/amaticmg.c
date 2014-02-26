@@ -488,7 +488,7 @@ UINT32 amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind1
 			/* TODO: this looks so out of place ... */
 			color = (m_attr[count]&0xf0)>>3;
 
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*4,y*8);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*4,y*8);
 			count++;
 		}
 	}
@@ -512,7 +512,7 @@ UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind
 			tile += ((m_attr[count]&0xff)<<8);
 			color = 0;
 
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*4,y*8);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*4,y*8);
 			count++;
 		}
 	}
@@ -882,7 +882,7 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",amaticmg,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",amaticmg)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(amaticmg_state, amaticmg)

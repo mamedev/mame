@@ -2319,14 +2319,14 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                    \
 {                                                                   \
 	if (flip_screen())                                           \
-		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
+		m_gfxdecode->gfx(2)->prio_transpen(m_palette,bitmap,\
 				cliprect,                            \
 				CODE,                                               \
 				COLOR,                                              \
 				!(FLIPX),!(FLIPY),                                  \
 				512-16-(SX),256-16-(SY),    screen.priority(),0x02,15);                   \
 	else                                                            \
-		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
+		m_gfxdecode->gfx(2)->prio_transpen(m_palette,bitmap,\
 				cliprect,                            \
 				CODE,                                               \
 				COLOR,                                              \
@@ -2552,14 +2552,14 @@ void cps_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                                    \
 {                                                                                   \
 	if (flip_screen())                                                           \
-		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
+		m_gfxdecode->gfx(2)->prio_transpen(m_palette,bitmap,\
 				cliprect,                                            \
 				CODE,                                                               \
 				COLOR,                                                              \
 				!(FLIPX),!(FLIPY),                                                  \
 				512-16-(SX),256-16-(SY), screen.priority(),primasks[priority],15);                 \
 	else                                                                            \
-		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
+		m_gfxdecode->gfx(2)->prio_transpen(m_palette,bitmap,\
 				cliprect,                                            \
 				CODE,                                                               \
 				COLOR,                                                              \

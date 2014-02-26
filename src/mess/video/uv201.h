@@ -154,9 +154,6 @@ private:
 	emu_timer *m_timer_y_even;
 	emu_timer *m_timer_hblank_on;
 	emu_timer *m_timer_hblank_off;
-	
-	//Micko:FIXME
-	palette_device *m_palette;
 };
 
 

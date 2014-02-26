@@ -681,7 +681,7 @@ static MACHINE_CONFIG_START( bbusters, bbusters_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bbusters_state, screen_update_bbuster)
 	MCFG_SCREEN_VBLANK_DRIVER(bbusters_state, screen_eof_bbuster)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",bbusters,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",bbusters)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -720,7 +720,7 @@ static MACHINE_CONFIG_START( mechatt, bbusters_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bbusters_state, screen_update_mechatt)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",mechatt,"palette")
+	MCFG_GFXDECODE_ADD("gfxdecode",mechatt)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
