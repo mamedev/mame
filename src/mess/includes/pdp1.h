@@ -7,6 +7,7 @@
 #ifndef PDP1_H_
 #define PDP1_H_
 
+#include "cpu/pdp1/pdp1.h"
 #include "video/crt.h"
 
 /* defines for each bit and mask in input port "CSW" */
@@ -271,7 +272,7 @@ public:
 	TIMER_CALLBACK_MEMBER(dpy_callback);
 	TIMER_CALLBACK_MEMBER(il_timer_callback);
 	void pdp1_machine_stop();
-	required_device<cpu_device> m_maincpu;
+	required_device<pdp1_device> m_maincpu;
 	inline void pdp1_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void pdp1_plot(int x, int y);
 	void pdp1_draw_led(bitmap_ind16 &bitmap, int x, int y, int state);

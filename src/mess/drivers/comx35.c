@@ -260,7 +260,7 @@ READ8_MEMBER( comx35_state::io_r )
 
 	if (offset == 3)
 	{
-		data = m_kbe->data_r(space, 0);
+		data = m_kbe->read(space, 0);
 	}
 
 	return data;
@@ -413,8 +413,8 @@ static INPUT_PORTS_START( comx35 )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("MODIFIERS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CNTL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_WRITE_LINE_DEVICE_MEMBER(CDP1871_TAG, cdp1871_device, shift_w)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CNTL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL)) PORT_WRITE_LINE_DEVICE_MEMBER(CDP1871_TAG, cdp1871_device, control_w)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RESET")
@@ -460,45 +460,6 @@ READ_LINE_MEMBER( comx35_state::ef4_r )
 	return m_exp->ef4_r(); // | (m_cassette->input() > 0.0f);
 }
 
-static COSMAC_SC_WRITE( comx35_sc_w )
-{
-	comx35_state *state = device->machine().driver_data<comx35_state>();
-
-	switch (sc)
-	{
-	case COSMAC_STATE_CODE_S0_FETCH:
-		// not connected
-		break;
-
-	case COSMAC_STATE_CODE_S1_EXECUTE:
-		// every other S1 triggers a DMAOUT request
-		if (state->m_dma)
-		{
-			state->m_dma = 0;
-
-			if (!state->m_iden)
-			{
-				state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAOUT, ASSERT_LINE);
-			}
-		}
-		else
-		{
-			state->m_dma = 1;
-		}
-		break;
-
-	case COSMAC_STATE_CODE_S2_DMA:
-		// DMA acknowledge clears the DMAOUT request
-		state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
-		break;
-
-	case COSMAC_STATE_CODE_S3_INTERRUPT:
-		// interrupt acknowledge clears the INT request
-		state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, CLEAR_LINE);
-		break;
-	}
-}
-
 WRITE_LINE_MEMBER( comx35_state::q_w )
 {
 	m_q = state;
@@ -516,6 +477,43 @@ WRITE_LINE_MEMBER( comx35_state::q_w )
 	m_exp->q_w(state);
 }
 
+WRITE8_MEMBER( comx35_state::sc_w )
+{
+	switch (data)
+	{
+	case COSMAC_STATE_CODE_S0_FETCH:
+		// not connected
+		break;
+
+	case COSMAC_STATE_CODE_S1_EXECUTE:
+		// every other S1 triggers a DMAOUT request
+		if (m_dma)
+		{
+			m_dma = 0;
+
+			if (!m_iden)
+			{
+				m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAOUT, ASSERT_LINE);
+			}
+		}
+		else
+		{
+			m_dma = 1;
+		}
+		break;
+
+	case COSMAC_STATE_CODE_S2_DMA:
+		// DMA acknowledge clears the DMAOUT request
+		m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		break;
+
+	case COSMAC_STATE_CODE_S3_INTERRUPT:
+		// interrupt acknowledge clears the INT request
+		m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, CLEAR_LINE);
+		break;
+	}
+}
+
 static COSMAC_INTERFACE( cosmac_intf )
 {
 	DEVCB_LINE_VCC,                                 // wait
@@ -527,44 +525,9 @@ static COSMAC_INTERFACE( cosmac_intf )
 	DEVCB_DRIVER_LINE_MEMBER(comx35_state, q_w),    // Q
 	DEVCB_NULL,                                     // DMA in
 	DEVCB_NULL,                                     // DMA out
-	comx35_sc_w,                                    // SC
+	DEVCB_DRIVER_MEMBER(comx35_state, sc_w),        // SC
 	DEVCB_NULL,                                     // TPA
 	DEVCB_NULL                                      // TPB
-};
-
-
-//-------------------------------------------------
-//  CDP1871_INTERFACE( kbc_intf )
-//-------------------------------------------------
-
-READ_LINE_MEMBER( comx35_state::shift_r )
-{
-	return BIT(m_modifiers->read(), 0);
-}
-
-READ_LINE_MEMBER( comx35_state::control_r )
-{
-	return BIT(m_modifiers->read(), 1);
-}
-
-static CDP1871_INTERFACE( kbc_intf )
-{
-	DEVCB_INPUT_PORT("D1"),
-	DEVCB_INPUT_PORT("D2"),
-	DEVCB_INPUT_PORT("D3"),
-	DEVCB_INPUT_PORT("D4"),
-	DEVCB_INPUT_PORT("D5"),
-	DEVCB_INPUT_PORT("D6"),
-	DEVCB_INPUT_PORT("D7"),
-	DEVCB_INPUT_PORT("D8"),
-	DEVCB_INPUT_PORT("D9"),
-	DEVCB_INPUT_PORT("D10"),
-	DEVCB_INPUT_PORT("D11"),
-	DEVCB_DRIVER_LINE_MEMBER(comx35_state, shift_r),
-	DEVCB_DRIVER_LINE_MEMBER(comx35_state, control_r),
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF3),
-	DEVCB_NULL // polled
 };
 
 
@@ -677,7 +640,19 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_FRAGMENT_ADD(comx35_pal_video)
 
 	// peripheral hardware
-	MCFG_CDP1871_ADD(CDP1871_TAG, kbc_intf, CDP1869_CPU_CLK_PAL / 8)
+	MCFG_DEVICE_ADD(CDP1871_TAG, CDP1871, CDP1869_CPU_CLK_PAL/8)
+	MCFG_CDP1871_D1_CALLBACK(IOPORT("D1"))
+	MCFG_CDP1871_D2_CALLBACK(IOPORT("D2"))
+	MCFG_CDP1871_D3_CALLBACK(IOPORT("D3"))
+	MCFG_CDP1871_D4_CALLBACK(IOPORT("D4"))
+	MCFG_CDP1871_D5_CALLBACK(IOPORT("D5"))
+	MCFG_CDP1871_D6_CALLBACK(IOPORT("D6"))
+	MCFG_CDP1871_D7_CALLBACK(IOPORT("D7"))
+	MCFG_CDP1871_D8_CALLBACK(IOPORT("D8"))
+	MCFG_CDP1871_D9_CALLBACK(IOPORT("D9"))
+	MCFG_CDP1871_D10_CALLBACK(IOPORT("D10"))
+	MCFG_CDP1871_D11_CALLBACK(IOPORT("D11"))
+	MCFG_CDP1871_DA_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF3))
 	MCFG_QUICKLOAD_ADD("quickload", comx35_state, comx35_comx, "comx", 0)
 	MCFG_CASSETTE_ADD("cassette", cassette_intf)
 
@@ -708,7 +683,19 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_FRAGMENT_ADD(comx35_ntsc_video)
 
 	// peripheral hardware
-	MCFG_CDP1871_ADD(CDP1871_TAG, kbc_intf, CDP1869_CPU_CLK_NTSC / 8)
+	MCFG_DEVICE_ADD(CDP1871_TAG, CDP1871, CDP1869_CPU_CLK_PAL/8)
+	MCFG_CDP1871_D1_CALLBACK(IOPORT("D1"))
+	MCFG_CDP1871_D2_CALLBACK(IOPORT("D2"))
+	MCFG_CDP1871_D3_CALLBACK(IOPORT("D3"))
+	MCFG_CDP1871_D4_CALLBACK(IOPORT("D4"))
+	MCFG_CDP1871_D5_CALLBACK(IOPORT("D5"))
+	MCFG_CDP1871_D6_CALLBACK(IOPORT("D6"))
+	MCFG_CDP1871_D7_CALLBACK(IOPORT("D7"))
+	MCFG_CDP1871_D8_CALLBACK(IOPORT("D8"))
+	MCFG_CDP1871_D9_CALLBACK(IOPORT("D9"))
+	MCFG_CDP1871_D10_CALLBACK(IOPORT("D10"))
+	MCFG_CDP1871_D11_CALLBACK(IOPORT("D11"))
+	MCFG_CDP1871_DA_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF3))
 	MCFG_QUICKLOAD_ADD("quickload", comx35_state, comx35_comx, "comx", 0)
 	MCFG_CASSETTE_ADD("cassette", cassette_intf)
 

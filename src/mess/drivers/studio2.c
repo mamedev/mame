@@ -427,7 +427,7 @@ static COSMAC_INTERFACE( studio2_cosmac_intf )
 	DEVCB_DRIVER_LINE_MEMBER(studio2_state, q_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER(CDP1861_TAG, cdp1861_device, dma_w),
-	NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -461,7 +461,7 @@ static COSMAC_INTERFACE( visicom_cosmac_intf )
 	DEVCB_DRIVER_LINE_MEMBER(studio2_state, q_w),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(visicom_state, dma_w),
-	NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -487,7 +487,7 @@ static COSMAC_INTERFACE( mpt02_cosmac_intf )
 	DEVCB_DRIVER_LINE_MEMBER(studio2_state, q_w),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(mpt02_state, dma_w),
-	NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };

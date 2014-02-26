@@ -25,6 +25,13 @@ class NETLIB_NAME(solver);
 
 /* FIXME: these should become proper devices */
 
+struct netlist_solver_parameters_t
+{
+    double m_accuracy;
+    double m_convergence_factor;
+    int m_resched_loops;
+};
+
 class netlist_matrix_solver_t
 {
 public:
@@ -53,9 +60,7 @@ public:
 	ATTR_HOT inline const NETLIB_NAME(solver) &owner() const;
 	ATTR_COLD virtual void reset();
 
-	double m_accuracy;
-	double m_convergence_factor;
-	int m_resched_loops;
+	netlist_solver_parameters_t m_params;
 
 protected:
 	netlist_net_t::list_t m_nets;
@@ -120,9 +125,7 @@ public:
     ATTR_COLD virtual void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner)
     {
         netlist_matrix_solver_t::setup(nets, owner);
-        m_fallback.m_accuracy = m_accuracy;
-        m_fallback.m_convergence_factor = m_convergence_factor;
-        m_fallback.m_resched_loops = m_resched_loops;
+        m_fallback.m_params = m_params;
         m_fallback.setup(nets, owner);
     }
 

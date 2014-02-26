@@ -373,7 +373,7 @@ void cosmac_device::device_start()
 	m_out_q_func.resolve(m_out_q_cb, *this);
 	m_in_dma_func.resolve(m_in_dma_cb, *this);
 	m_out_dma_func.resolve(m_out_dma_cb, *this);
-	m_out_sc_func = m_out_sc_cb;
+	m_out_sc_func.resolve(m_out_sc_cb, *this);
 	m_out_tpa_func.resolve(m_out_tpa_cb, *this);
 	m_out_tpb_func.resolve(m_out_tpb_cb, *this);
 
@@ -843,10 +843,7 @@ inline void cosmac_device::sample_ef_lines()
 
 inline void cosmac_device::output_state_code()
 {
-	if (m_out_sc_func != NULL)
-	{
-		m_out_sc_func(this, COSMAC_STATE_CODE[m_state]);
-	}
+	m_out_sc_func(0, COSMAC_STATE_CODE[m_state]);
 }
 
 

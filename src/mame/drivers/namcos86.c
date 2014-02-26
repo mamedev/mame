@@ -989,15 +989,15 @@ static const namco_interface namco_config =
 static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu1", M6809, 49152000/32)
+	MCFG_CPU_ADD("cpu1", M6809, XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("cpu2", M6809, 49152000/32)
+	MCFG_CPU_ADD("cpu2", M6809, XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(hopmappy_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("mcu", HD63701, 49152000/8)    /* or compatible 6808 with extra instructions */
+	MCFG_CPU_ADD("mcu", HD63701, XTAL_49_152MHz/8)    /* or compatible 6808 with extra instructions */
 	MCFG_CPU_PROGRAM_MAP(hopmappy_mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_hold)   /* ??? */
@@ -1007,10 +1007,7 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.606060)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(3 + 8*8, 3 + 44*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 3+8*8, 3+44*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos86_state, screen_update_namcos86)
 	MCFG_SCREEN_VBLANK_DRIVER(namcos86_state, screen_eof_namcos86)
 
@@ -1025,7 +1022,7 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.0)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)   /* only right channel is connected */
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
+	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL_49_152MHz/2048)
 	MCFG_SOUND_CONFIG(namco_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

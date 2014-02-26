@@ -19,49 +19,49 @@
 #define NET_STR(_x) # _x
 
 #define NET_MODEL(_model)                                                           \
-	netlist.register_model(_model);
+	setup.register_model(_model);
 
 #define ALIAS(_alias, _name)                                                        \
-	netlist.register_alias(# _alias, # _name);
+	setup.register_alias(# _alias, # _name);
 
-#define NET_NEW(_type)  netlist.factory().new_device_by_classname(NETLIB_NAME_STR(_type), netlist)
+#define NET_NEW(_type)  setup.factory().new_device_by_classname(NETLIB_NAME_STR(_type), setup)
 
 #define NET_REGISTER_DEV(_type, _name)                                              \
-		netlist.register_dev(NET_NEW(_type), # _name);
+		setup.register_dev(NET_NEW(_type), # _name);
 
 #define NET_REMOVE_DEV(_name)                                                       \
-		netlist.remove_dev(# _name);
+		setup.remove_dev(# _name);
 
 #define NET_REGISTER_SIGNAL(_type, _name)                                           \
 		NET_REGISTER_DEV(_type ## _ ## sig, _name)
 
 #define NET_CONNECT(_name, _input, _output)                                         \
-		netlist.register_link(# _name "." # _input, # _output);
+		setup.register_link(# _name "." # _input, # _output);
 
 #define NET_C(_input, _output)                                                      \
-		netlist.register_link(NET_STR(_input) , NET_STR(_output));
+		setup.register_link(NET_STR(_input) , NET_STR(_output));
 
 #define PARAM(_name, _val)                                                          \
-		netlist.register_param(# _name, _val);
+		setup.register_param(# _name, _val);
 
 #define NETDEV_PARAMI(_name, _param, _val)                                          \
-		netlist.register_param(# _name "." # _param, _val);
+		setup.register_param(# _name "." # _param, _val);
 
 #define NETLIST_NAME(_name) netlist ## _ ## _name
 
 #define NETLIST_START(_name)                                                        \
-ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist)                        \
+ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &setup)                          \
 {
 
 #define NETLIST_END()  }
 
 #define INCLUDE(_name)                                                              \
-		NETLIST_NAME(_name)(netlist);
+		NETLIST_NAME(_name)(setup);
 
 #define SUBMODEL(_name, _model)                                                     \
-        netlist.namespace_push(# _name);                                            \
-        NETLIST_NAME(_model)(netlist);                                              \
-        netlist.namespace_pop();
+        setup.namespace_push(# _name);                                              \
+        NETLIST_NAME(_model)(setup);                                                \
+        setup.namespace_pop();
 
 // ----------------------------------------------------------------------------------------
 // FIXME: Clean this up

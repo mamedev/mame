@@ -474,13 +474,6 @@ READ_LINE_MEMBER( vip_state::ef4_r )
 	return m_byteio_ef4 || m_exp_ef4;
 }
 
-static COSMAC_SC_WRITE( vip_sc_w )
-{
-	vip_state *state = device->machine().driver_data<vip_state>();
-
-	state->m_exp->sc_w(sc);
-}
-
 WRITE_LINE_MEMBER( vip_state::q_w )
 {
 	// sound output
@@ -508,6 +501,11 @@ WRITE8_MEMBER( vip_state::dma_w )
 	m_exp->dma_w(space, offset, data);
 }
 
+WRITE8_MEMBER( vip_state::sc_w )
+{
+    m_exp->sc_w(data);
+}
+
 static COSMAC_INTERFACE( cosmac_intf )
 {
 	DEVCB_LINE_VCC,
@@ -519,7 +517,7 @@ static COSMAC_INTERFACE( cosmac_intf )
 	DEVCB_DRIVER_LINE_MEMBER(vip_state, q_w),
 	DEVCB_DRIVER_MEMBER(vip_state, dma_r),
 	DEVCB_DRIVER_MEMBER(vip_state, dma_w),
-	vip_sc_w,
+	DEVCB_DRIVER_MEMBER(vip_state, sc_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
