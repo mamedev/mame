@@ -52,17 +52,15 @@ inline render_font::glyph &render_font::get_char(unicode_char chnum)
 	static glyph dummy_glyph;
 
 	// grab the table; if none, return the dummy character
-	glyph *glyphtable = m_glyphs[chnum / 256];
-	if (glyphtable == NULL && m_format == FF_OSD)
+	if (m_glyphs[chnum / 256].count() == 0 && m_format == FF_OSD)
 	{
 		m_glyphs[chnum / 256].resize(256);
-		glyphtable = m_glyphs[chnum / 256];
 	}
-	if (glyphtable == NULL)
+	if (m_glyphs[chnum / 256].count() == 0)
 		return dummy_glyph;
 
 	// if the character isn't generated yet, do it now
-	glyph &gl = glyphtable[chnum % 256];
+	glyph &gl = m_glyphs[chnum / 256][chnum % 256];
 	if (!gl.bitmap.valid())
 		char_expand(chnum, gl);
 
@@ -403,7 +401,8 @@ bool render_font::load_cached_bdf(const char *filename)
 			// if that worked, we're done
 			if (result)
 			{
-				m_rawdata.reset();
+			    // don't do that - glyphs data point into this array ...
+			    // m_rawdata.reset();
 				return true;
 			}
 		}
@@ -638,10 +637,9 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 	int numchars = 0;
 	for (int chnum = 0; chnum < 65536; chnum++)
 	{
-		glyph *chtable = m_glyphs[chnum / 256];
-		if (chtable != NULL)
+		if (m_glyphs[chnum / 256].count() > 0)
 		{
-			glyph &gl = chtable[chnum % 256];
+			glyph &gl = m_glyphs[chnum / 256][chnum % 256];
 			if (gl.width > 0)
 				numchars++;
 		}
