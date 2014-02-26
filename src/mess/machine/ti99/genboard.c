@@ -1594,11 +1594,11 @@ void geneve_keyboard_device::device_start()
 
 void geneve_keyboard_device::device_reset()
 {
+	m_key_in_buffer = false;
 	reset_line(CLEAR_LINE);
 	m_key_queue_length = 0;
 	m_key_reset = true;
 	m_keyboard_clock = false;
-	m_key_in_buffer = false;
 	m_keep_keybuf = false;
 	m_timer->adjust(attotime::from_usec(1), 0, attotime::from_hz(120));
 }
