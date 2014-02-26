@@ -1,7 +1,7 @@
 /********************************************************************
 
     G-Stream (c)2002 Oriental Soft Japan
-	X2222 (prototype) (c)2000 Oriental
+	X2222 (prototype) (c)2000 Oriental Soft
 
 	---
 	X2222 has corrupt boss graphics because the program roms we use don't match the sprite roms.
@@ -1111,5 +1111,5 @@ DRIVER_INIT_MEMBER(gstream_state,x2222)
 }
 
 
-GAME( 2002, gstream, 0, gstream, gstream, gstream_state, gstream, ROT270, "Oriental Soft", "G-Stream G2020", GAME_SUPPORTS_SAVE )
+GAME( 2002, gstream, 0, gstream, gstream, gstream_state, gstream, ROT270, "Oriental Soft Japan", "G-Stream G2020", GAME_SUPPORTS_SAVE )
 GAME( 2000, x2222,   0, x2222,   x2222,   gstream_state, x2222,   ROT270, "Oriental Soft", "X2222 (prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
