@@ -1,8 +1,27 @@
 /* Megaphoenix
+ 
+  trivia: Test mode graphics are the same as Little Robin(?!)
+
 */
 
-
 /*
+
+ need to work out what rand() bits are
+  - game is very timing sensitive, to get all the gfx to copy i'm having to OC the 68k x 16 and it still glitches (phoenix ship is broken, round 4 gfx don't copy properly)
+    probably due to above or irq handling
+  - where should roms 6/7 map, they contain the 68k vectors, but the game expects RAM at 0, and it doesn't seem to read any of the other data from those roms.. they contain
+    a cross hatch pattern amongst other things?
+
+
+  'SYS' port - is it a serial port from an IO / protection chip? one bit has multiple meanings.
+  
+  - sound..
+
+  /
+
+
+  --
+
 
   Chips of note
 
@@ -96,20 +115,21 @@ WRITE16_MEMBER(megaphx_state::tms_host_w)
 
 
 static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
-//	AM_RANGE(0x000000, 0x0000ff) AM_ROM
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("mainram") // we copy the vectors from roms 6+7 to ram here, but where do the rest of those roms map?
+	AM_RANGE(0x000000, 0x0013ff) AM_RAM AM_SHARE("mainram") // maps over part of the rom??
+
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("roms67", 0x00000) // or the rom doesn't map here? it contains the service mode grid amongst other things..
 
 	AM_RANGE(0x040000, 0x040007) AM_READWRITE(tms_host_r, tms_host_w)
 
-	AM_RANGE(0x050000, 0x050001) AM_WRITENOP
-	AM_RANGE(0x050002, 0x050003) AM_READ_PORT("P3")
+	AM_RANGE(0x050000, 0x050001) AM_WRITENOP // z80 comms?
+	AM_RANGE(0x050002, 0x050003) AM_READ_PORT("P3") // z80 comms?
 
 
 	AM_RANGE(0x060000, 0x060007) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
 	
-	AM_RANGE(0x800000, 0x83ffff) AM_ROM  AM_REGION("roms01", 0x00000)
-	AM_RANGE(0x840000, 0x87ffff) AM_ROM  AM_REGION("roms23", 0x00000)
-	AM_RANGE(0x880000, 0x8bffff) AM_ROM  AM_REGION("roms45", 0x00000)
+	AM_RANGE(0x800000, 0x83ffff) AM_ROM  AM_REGION("roms01", 0x00000) // code + bg gfx are in here
+	AM_RANGE(0x840000, 0x87ffff) AM_ROM  AM_REGION("roms23", 0x00000) // bg gfx are in here
+	AM_RANGE(0x880000, 0x8bffff) AM_ROM  AM_REGION("roms45", 0x00000) // bg gfx + title screen in here
 
 ADDRESS_MAP_END
 
@@ -138,6 +158,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io, AS_IO, 8, megaphx_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_RAM
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x31, 0x31) AM_READNOP
 ADDRESS_MAP_END
 
@@ -204,48 +225,32 @@ static const tms34010_config tms_config_megaphx =
 
 
 static INPUT_PORTS_START( megaphx )
-	PORT_START("P0")
-	PORT_DIPNAME( 0x0001, 0x0001, "0" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("P0") // verified in test mode
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // shield
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // unused ? (in test mode)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) // test mode
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) // test mode
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 
-	PORT_START("P1")
-	PORT_DIPNAME( 0x0001, 0x0001, "2" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("P1") // verified in test mode
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // shield
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) // unused ? (in test mode)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) // test mode
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) // test mode
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
 
-	PORT_START("P2")
+	PORT_START("SYS") // some kind of serial port, or multiplexed port?
 	PORT_DIPNAME( 0x0001, 0x0001, "4" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) ) // must be 'on' to boot, but is also p2 start? multiplexed?
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) ) // must be 'on' to boot, but is also p1 and p2 start in test mode? multiplexed?
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
@@ -265,7 +270,7 @@ static INPUT_PORTS_START( megaphx )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("P3")
+	PORT_START("P3") // not dips according to service mode.. maybe comms with Z80?
 	PORT_DIPNAME( 0x0001, 0x0001,"X")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -330,7 +335,7 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 	DEVCB_NULL,                     /* Port A write */
 	DEVCB_INPUT_PORT("P1"),        /* Port B read */
 	DEVCB_NULL,                     /* Port B write */
-	DEVCB_INPUT_PORT("P2"),        /* Port C read */
+	DEVCB_INPUT_PORT("SYS"),        /* Port C read */
 	DEVCB_NULL                      /* Port C write */
 };
 
@@ -359,11 +364,19 @@ static Z80CTC_INTERFACE( z80ctc_intf )
 	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_to2)     // ZC/TO2 callback
 };
 
+// just for debug.. so we can see what is in each of the roms
+static GFXLAYOUT_RAW( megaphxlay, 336, 1, 336*8, 336*8 )
 
+static GFXDECODE_START( megaphx )
+	GFXDECODE_ENTRY( "roms01", 0, megaphxlay,     0x0000, 1 )
+	GFXDECODE_ENTRY( "roms23", 0, megaphxlay,     0x0000, 1 )
+	GFXDECODE_ENTRY( "roms45", 0, megaphxlay,     0x0000, 1 )
+	GFXDECODE_ENTRY( "roms67", 0, megaphxlay,     0x0000, 1 )
+GFXDECODE_END
 
 static MACHINE_CONFIG_START( megaphx, megaphx_state )
 
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??  can't read xtal due to reflections, CPU is an 8Mhz part
+	MCFG_CPU_ADD("maincpu", M68000, 8000000*16) // ??  can't read xtal due to reflections, CPU is an 8Mhz part  // CLEARLY the 'rand' flags have more meaning (but don't seem to be vblank) I shouldn't have to do a *16 on the 68k clock just to get all the gfx!
 	MCFG_CPU_PROGRAM_MAP(megaphx_68k_map)
 //	MCFG_CPU_VBLANK_INT_DRIVER("screen", megaphx_state,  irq6_line_hold)
 
@@ -384,10 +397,12 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 //	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/12, 424, 0, 320, 262, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/12, 424, 0, 338-1, 262, 0, 246-1)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
 	MCFG_PALETTE_LENGTH(256)
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", megaphx)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
@@ -396,8 +411,8 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(megaphx_state,megaphx)
 {
 	UINT16 *src = (UINT16*)memregion( "roms67" )->base();
-	// copy vector table?
-	memcpy(m_mainram, src, 0x10000);
+	// copy vector table? - it must be writable because the game write the irq vector..
+	memcpy(m_mainram, src, 0x80);
 }
 
 
