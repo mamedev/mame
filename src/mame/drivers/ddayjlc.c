@@ -408,7 +408,7 @@ UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 
 
 		code = (code & 0x7f) | ((flags & 0x30) << 3);
 
-		 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, code, color, xflip, yflip, x, y, 0);
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, code, color, xflip, yflip, x, y, 0);
 	}
 
 	{
@@ -419,9 +419,9 @@ UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 
 			{
 				c = m_videoram[y * 32 + x];
 				if (x > 1 && x < 30)
-					 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
+					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
 				else
-					 m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
+					m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
 			}
 	}
 	return 0;

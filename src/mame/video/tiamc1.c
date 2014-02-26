@@ -167,7 +167,7 @@ void tiamc1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		spritecode = m_spriteram_n[offs] ^ 0xff;
 
 		if (!(m_spriteram_a[offs] & 0x01))
-			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				spritecode,
 				0,
 				flipx, flipy,

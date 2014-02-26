@@ -589,7 +589,7 @@ UINT32 norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 
 				int tile = m_np_vram[count] & 0x3f;
 				int colour = (m_np_vram[count] & 0xc0) >> 6;
 
-				 m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, colour, 0, 0, (x * 32) + 8, y * 32);
+				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, colour, 0, 0, (x * 32) + 8, y * 32);
 
 				count+=2;
 			}
@@ -601,7 +601,7 @@ UINT32 norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 
 				int tile = m_np_vram[count] & 0x3f;
 				int colour = (m_np_vram[count] & 0xc0) >> 6;
 
-				 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, colour, 0, 0, x * 16, y * 32);
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, colour, 0, 0, x * 16, y * 32);
 
 				count++;
 			}

@@ -494,7 +494,7 @@ UINT32 btime_state::screen_update_bnj(screen_device &screen, bitmap_ind16 &bitma
 				sy = 256 - sy;
 			}
 
-			 m_gfxdecode->gfx(2)->opaque(*m_background_bitmap,m_background_bitmap->cliprect(),
+			m_gfxdecode->gfx(2)->opaque(*m_background_bitmap,m_background_bitmap->cliprect(),
 					(m_bnj_backgroundram[offs] >> 4) + ((offs & 0x80) >> 3) + 32,
 					0,
 					flip_screen(), flip_screen(),
@@ -540,7 +540,7 @@ UINT32 btime_state::screen_update_cookrace(screen_device &screen, bitmap_ind16 &
 			sy = 33 - sy;
 		}
 
-		 m_gfxdecode->gfx(2)->opaque(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->opaque(bitmap,cliprect,
 				m_bnj_backgroundram[offs],
 				0,
 				flip_screen(), flip_screen(),

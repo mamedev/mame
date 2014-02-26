@@ -317,7 +317,7 @@ void travrusa_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		 m_gfxdecode->gfx(1)->transpen(bitmap,clip,
+		m_gfxdecode->gfx(1)->transpen(bitmap,clip,
 				code,
 				attr & 0x0f,
 				flipx, flipy,

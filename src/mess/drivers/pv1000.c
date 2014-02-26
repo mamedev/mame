@@ -354,12 +354,12 @@ UINT32 pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &b
 			if ( tile < 0xe0 || m_force_pattern )
 			{
 				tile += ( m_pcg_bank << 8);
-				 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
 			}
 			else
 			{
 				tile -= 0xe0;
-				 m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
+				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
 			}
 		}
 	}

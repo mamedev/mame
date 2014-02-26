@@ -145,7 +145,7 @@ UINT32 carjmbre_state::screen_update_carjmbre(screen_device &screen, bitmap_ind1
 				flipy = !flipy;
 			}
 
-			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					m_spriteram[troffs + 1],
 					m_spriteram[troffs + 2] & 0xf,
 					flipx,flipy,

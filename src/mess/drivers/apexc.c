@@ -588,7 +588,7 @@ void apexc_state::apexc_draw_led(bitmap_ind16 &bitmap, int x, int y, int state)
 /* write a single char on screen */
 void apexc_state::apexc_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color)
 {
-	 m_gfxdecode->gfx(0)->transpen(bitmap,bitmap.cliprect(), character-32, color, 0, 0,
+	m_gfxdecode->gfx(0)->transpen(bitmap,bitmap.cliprect(), character-32, color, 0, 0,
 				x+1, y, 0);
 }
 

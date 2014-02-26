@@ -439,7 +439,7 @@ UINT32 centiped_state::screen_update_centiped(screen_device &screen, bitmap_ind1
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		 m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip, code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
+		m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip, code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
 	}
 	return 0;
 }
@@ -484,7 +484,7 @@ UINT32 centiped_state::screen_update_warlords(screen_device &screen, bitmap_ind1
 			flipx = !flipx;
 		}
 
-		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
 	}
 	return 0;
 }
@@ -515,7 +515,7 @@ UINT32 centiped_state::screen_update_bullsdrt(screen_device &screen, bitmap_ind1
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		 m_gfxdecode->gfx(1)->transpen(bitmap,spriteclip, code, color & 0x3f, 1, flipy, x, y, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap,spriteclip, code, color & 0x3f, 1, flipy, x, y, 0);
 	}
 	return 0;
 }
@@ -552,7 +552,7 @@ UINT32 centiped_state::screen_update_milliped(screen_device &screen, bitmap_ind1
 			flipy = !flipy;
 		}
 
-		 m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip, code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
+		m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip, code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
 	}
 	return 0;
 }

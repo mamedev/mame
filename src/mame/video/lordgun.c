@@ -273,7 +273,7 @@ void lordgun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		{
 			for (x = x0; x != x1; x += dx)
 			{
-				 m_gfxdecode->gfx(4)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(4)->transpen(bitmap,cliprect,
 									code, color + pri * 0x800/0x40,
 									flipx, flipy,
 									sx + x * 0x10, sy + y * 0x10,

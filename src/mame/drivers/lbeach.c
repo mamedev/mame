@@ -148,7 +148,7 @@ UINT32 lbeach_state::screen_update_lbeach(screen_device &screen, bitmap_ind16 &b
 	int sprite_y = 160;
 
 	m_colmap_car.fill(0, cliprect);
-	 m_gfxdecode->gfx(2)->transpen(m_colmap_car,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
+	m_gfxdecode->gfx(2)->transpen(m_colmap_car,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
 	bitmap_ind16 &fg_bitmap = m_fg_tilemap->pixmap();
 
 	m_collision_bg_car = 0;
@@ -167,7 +167,7 @@ UINT32 lbeach_state::screen_update_lbeach(screen_device &screen, bitmap_ind16 &b
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// draw player car
-	 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
+	m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
 
 	return 0;
 }

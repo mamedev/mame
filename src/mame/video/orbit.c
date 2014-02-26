@@ -69,7 +69,7 @@ void orbit_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		hpos <<= 1;
 		vpos <<= 1;
 
-		 m_gfxdecode->gfx(layout)->zoom_transpen(bitmap,cliprect, code, 0, flip_x, flip_y,
+		m_gfxdecode->gfx(layout)->zoom_transpen(bitmap,cliprect, code, 0, flip_x, flip_y,
 			hpos, vpos, zoom_x, zoom_y, 0);
 	}
 }

@@ -644,7 +644,7 @@ void segag80r_state::draw_videoram(bitmap_ind16 &bitmap, const rectangle &clipre
 			UINT8 tile = videoram[offs];
 
 			/* draw the tile */
-			 m_gfxdecode->gfx(0)->transmask(bitmap,cliprect, tile, tile >> 4, m_video_flip, m_video_flip, x*8, y*8, transparent_pens[tile >> 4]);
+			m_gfxdecode->gfx(0)->transmask(bitmap,cliprect, tile, tile >> 4, m_video_flip, m_video_flip, x*8, y*8, transparent_pens[tile >> 4]);
 		}
 	}
 }

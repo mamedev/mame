@@ -123,7 +123,7 @@ void vroulet_state::video_start()
 UINT32 vroulet_state::screen_update_vroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, 0x320, 1, 0, 0,
+	m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, 0x320, 1, 0, 0,
 		m_ball[1], m_ball[0] - 12, 0);
 	return 0;
 }

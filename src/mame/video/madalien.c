@@ -148,8 +148,8 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 
 	m_gfxdecode->gfx(0)->set_source(m_charram);
 
-	 m_gfxdecode->gfx(2)->opaque(*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 0, 0x00, 0x00);
-	 m_gfxdecode->gfx(2)->opaque(*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 1, 0x00, 0x40);
+	m_gfxdecode->gfx(2)->opaque(*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 0, 0x00, 0x00);
+	m_gfxdecode->gfx(2)->opaque(*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 1, 0x00, 0x40);
 }
 
 

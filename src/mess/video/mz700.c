@@ -62,7 +62,7 @@ UINT32 mz_state::screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap
 		color = m_colorram[offs];
 		code = videoram[offs] | (color & 0x80) << 1;
 
-		 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, code, color, 0, 0, sx, sy);
+		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, code, color, 0, 0, sx, sy);
 	}
 
 	return 0;

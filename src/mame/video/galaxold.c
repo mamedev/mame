@@ -1700,7 +1700,7 @@ void galaxold_state::draw_sprites(bitmap_ind16 &bitmap, UINT8 *spriteram, size_t
 		if (offs < 3*4)  sy++;
 
 
-		 m_gfxdecode->gfx(1)->transpen(bitmap,m_flipscreen_x ? spritevisibleareaflipx : spritevisiblearea,
+		m_gfxdecode->gfx(1)->transpen(bitmap,m_flipscreen_x ? spritevisibleareaflipx : spritevisiblearea,
 				code,color,
 				flipx,flipy,
 				sx,sy,0);

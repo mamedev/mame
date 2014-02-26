@@ -175,7 +175,7 @@ void superqix_state::pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			sy = 240 - sy;
 		}
 
-		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flip_screen(), flip_screen(),
@@ -206,7 +206,7 @@ void superqix_state::superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle 
 			flipy = !flipy;
 		}
 
-		 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,

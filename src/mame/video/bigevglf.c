@@ -74,7 +74,7 @@ void bigevglf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		sx = m_spriteram2[i + 3];
 		sy = 200 - m_spriteram2[i];
 		for (j = 0; j < 16; j++)
-			 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				m_spriteram1[(code << 4) + j] + ((m_spriteram1[0x400 + (code << 4) + j] & 0xf) << 8),
 				m_spriteram2[i + 2] & 0xf,
 				0,0,

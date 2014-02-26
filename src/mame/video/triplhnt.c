@@ -72,7 +72,7 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		/* render sprite to auxiliary bitmap */
 
-		 m_gfxdecode->gfx(m_sprite_zoom)->opaque(m_helper,cliprect,
+		m_gfxdecode->gfx(m_sprite_zoom)->opaque(m_helper,cliprect,
 			2 * code + m_sprite_bank, 0, code & 8, 0,
 			rect.min_x, rect.min_y);
 

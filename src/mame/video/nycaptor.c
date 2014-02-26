@@ -173,7 +173,7 @@ void nycaptor_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipx = BIT(m_spriteram[offs + 1], 6);
 			flipy = BIT(m_spriteram[offs + 1], 7);
 
-			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 					pal,
 					flipx,flipy,
@@ -182,7 +182,7 @@ void nycaptor_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			if (m_spriteram[offs + 3] > 240)
 			{
 				sx = (m_spriteram[offs + 3] - 256);
-				 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 					pal,
 					flipx,flipy,

@@ -212,7 +212,7 @@ void cloak_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			flipy = !flipy;
 		}
 
-		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, 0, flipx, flipy,   sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, 0, flipx, flipy,   sx, sy, 0);
 	}
 }
 

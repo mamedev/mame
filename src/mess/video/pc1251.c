@@ -125,14 +125,14 @@ UINT32 pc1251_state::screen_update_pc1251(screen_device &screen, bitmap_ind16 &b
 	for (x=RIGHT,y=DOWN, i=0; i<60; x+=3)
 	{
 		for (j=0; j<5; j++, i++, x+=3)
-			 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],
 					PC1251_CONTRAST,0,0,
 					x,y);
 	}
 	for (i=0x7b; i>=0x40; x+=3)
 	{
 		for (j=0; j<5; j++, i--, x+=3)
-			 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],
 					PC1251_CONTRAST,0,0,
 					x,y);
 	}

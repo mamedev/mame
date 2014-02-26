@@ -213,7 +213,7 @@ void popper_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect 
 				flipy = !flipy;
 			}
 
-			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					m_spriteram[offs + 1],
 					(m_spriteram[offs + 2] & 0x0f),
 					flipx,flipy,

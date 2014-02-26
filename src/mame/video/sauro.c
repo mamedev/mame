@@ -128,7 +128,7 @@ void sauro_state::sauro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 			sy = 240 - sy;
 		}
 
-		 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,

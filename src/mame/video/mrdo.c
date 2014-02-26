@@ -242,7 +242,7 @@ void mrdo_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 	{
 		if (spriteram[offs + 1] != 0)
 		{
-			 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					spriteram[offs], spriteram[offs + 2] & 0x0f,
 					spriteram[offs + 2] & 0x10, spriteram[offs + 2] & 0x20,
 					spriteram[offs + 3], 256 - spriteram[offs + 1], 0);

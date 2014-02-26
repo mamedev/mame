@@ -137,7 +137,7 @@ UINT32 matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind1
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		 m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap,m_tmpbitmap->cliprect(),
+		m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap,m_tmpbitmap->cliprect(),
 				m_videoram[offs] + ((m_colorram[offs] & 0x08) << 5),
 				(m_colorram[offs] & 0x30) >> 4,
 				0,sy >= 16, /* flip horizontally tiles on the right half of the bitmap */
@@ -150,7 +150,7 @@ UINT32 matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind1
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		 m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap2,m_tmpbitmap2->cliprect(),
+		m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap2,m_tmpbitmap2->cliprect(),
 				m_videoram3[offs] + ((m_colorram3[offs] & 0x08) << 5),
 				(m_colorram3[offs] & 0x30) >> 4,
 				0,sy >= 16, /* flip horizontally tiles on the right half of the bitmap */
@@ -172,7 +172,7 @@ UINT32 matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind1
 	{
 		if (spriteram[offs] & 0x01)
 		{
-			 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					spriteram[offs + 1] + ((spriteram[offs] & 0xf0) << 4),
 					(spriteram[offs] & 0x08) >> 3,
 					spriteram[offs] & 0x04, spriteram[offs] & 0x02,
@@ -208,7 +208,7 @@ UINT32 matmania_state::screen_update_maniach(screen_device &screen, bitmap_ind16
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		 m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap,m_tmpbitmap->cliprect(),
+		m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap,m_tmpbitmap->cliprect(),
 				m_videoram[offs] + ((m_colorram[offs] & 0x03) << 8),
 				(m_colorram[offs] & 0x30) >> 4,
 				0,sy >= 16, /* flip horizontally tiles on the right half of the bitmap */
@@ -221,7 +221,7 @@ UINT32 matmania_state::screen_update_maniach(screen_device &screen, bitmap_ind16
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		 m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap2,m_tmpbitmap2->cliprect(),
+		m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap2,m_tmpbitmap2->cliprect(),
 				m_videoram3[offs] + ((m_colorram3[offs] & 0x03) << 8),
 				(m_colorram3[offs] & 0x30) >> 4,
 				0,sy >= 16, /* flip horizontally tiles on the right half of the bitmap */

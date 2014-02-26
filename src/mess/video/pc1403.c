@@ -159,37 +159,37 @@ UINT32 pc1403_state::screen_update_pc1403(screen_device &screen, bitmap_ind16 &b
 	{
 		for (x=m_RIGHT, y=m_DOWN, i=0; i<6*5; x+=2) {
 			for (j=0; j<5; j++, i++, x+=2)
-			 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],CONTRAST,0,0,
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=9*5; i<12*5; x+=2)
 		{
 			for (j=0; j<5; j++, i++, x+=2)
-			 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],CONTRAST,0,0,
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=6*5; i<9*5; x+=2)
 		{
 			for (j=0; j<5; j++, i++, x+=2)
-			 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],CONTRAST,0,0,
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=0x7b-3*5; i>0x7b-6*5; x+=2)
 		{
 			for (j=0; j<5; j++, i--, x+=2)
-				 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],CONTRAST,0,0,
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=0x7b; i>0x7b-3*5; x+=2)
 		{
 			for (j=0; j<5; j++, i--, x+=2)
-			 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],CONTRAST,0,0,
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 		for (i=0x7b-6*5; i>0x7b-12*5; x+=2)
 		{
 			for (j=0; j<5; j++, i--, x+=2)
-			 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],CONTRAST,0,0,
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, m_reg[i],CONTRAST,0,0,
 				x,y);
 		}
 	}

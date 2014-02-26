@@ -182,7 +182,7 @@ void midas_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			UINT16 code     =   codes[y*2];
 			UINT16 attr     =   codes[y*2+1];
 
-			 m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
 							code,
 							attr >> 8,
 							attr & 1, attr & 2,
