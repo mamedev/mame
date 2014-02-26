@@ -5,6 +5,7 @@
 
 #include "nld_solver.h"
 #include "nld_twoterm.h"
+#include "../nl_lists.h"
 
 #if HAS_OPENMP
 #include "omp.h"
@@ -19,73 +20,73 @@
 
 ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &aowner)
 {
- 	m_owner = &aowner;
+    m_owner = &aowner;
 
-	NL_VERBOSE_OUT(("New solver setup\n"));
+    NL_VERBOSE_OUT(("New solver setup\n"));
 
-	for (netlist_net_t * const * pn = nets.first(); pn != NULL; pn = nets.next(pn))
-	{
-		NL_VERBOSE_OUT(("setting up net\n"));
+    for (netlist_net_t * const * pn = nets.first(); pn != NULL; pn = nets.next(pn))
+    {
+        NL_VERBOSE_OUT(("setting up net\n"));
 
-	    m_nets.add(*pn);
+        m_nets.add(*pn);
 
-	    (*pn)->m_solver = this;
+        (*pn)->m_solver = this;
 
-		for (netlist_core_terminal_t *p = (*pn)->m_head; p != NULL; p = p->m_update_list_next)
-		{
-		    NL_VERBOSE_OUT(("%s %s %d\n", p->name().cstr(), (*pn)->name().cstr(), (int) (*pn)->isRailNet()));
-			switch (p->type())
-			{
-				case netlist_terminal_t::TERMINAL:
-					switch (p->netdev().family())
-					{
-						case netlist_device_t::CAPACITOR:
-							if (!m_steps.contains(&p->netdev()))
-								m_steps.add(&p->netdev());
-							break;
-						case netlist_device_t::BJT_EB:
+        for (netlist_core_terminal_t *p = (*pn)->m_head; p != NULL; p = p->m_update_list_next)
+        {
+            NL_VERBOSE_OUT(("%s %s %d\n", p->name().cstr(), (*pn)->name().cstr(), (int) (*pn)->isRailNet()));
+            switch (p->type())
+            {
+                case netlist_terminal_t::TERMINAL:
+                    switch (p->netdev().family())
+                    {
+                        case netlist_device_t::CAPACITOR:
+                            if (!m_steps.contains(&p->netdev()))
+                                m_steps.add(&p->netdev());
+                            break;
+                        case netlist_device_t::BJT_EB:
                         case netlist_device_t::DIODE:
-						//case netlist_device_t::VCVS:
-						case netlist_device_t::BJT_SWITCH:
+                        //case netlist_device_t::VCVS:
+                        case netlist_device_t::BJT_SWITCH:
                             NL_VERBOSE_OUT(("found BJT/Diode\n"));
-							if (!m_dynamic.contains(&p->netdev()))
-								m_dynamic.add(&p->netdev());
-							break;
-						default:
-							break;
-					}
-					{
-	                    netlist_terminal_t *pterm = static_cast<netlist_terminal_t *>(p);
-	                    if (pterm->m_otherterm->net().isRailNet())
-	                        (*pn)->m_rails.add(pterm);
-	                    else
-	                        (*pn)->m_terms.add(pterm);
-					}
-					NL_VERBOSE_OUT(("Added terminal\n"));
-					break;
-				case netlist_terminal_t::INPUT:
-					if (!m_inps.contains(p))
-						m_inps.add(p);
-					NL_VERBOSE_OUT(("Added input\n"));
-					break;
-				default:
-					owner().netlist().error("unhandled element found\n");
-					break;
-			}
-		}
+                            if (!m_dynamic.contains(&p->netdev()))
+                                m_dynamic.add(&p->netdev());
+                            break;
+                        default:
+                            break;
+                    }
+                    {
+                        netlist_terminal_t *pterm = static_cast<netlist_terminal_t *>(p);
+                        if (pterm->m_otherterm->net().isRailNet())
+                            (*pn)->m_rails.add(pterm);
+                        else
+                            (*pn)->m_terms.add(pterm);
+                    }
+                    NL_VERBOSE_OUT(("Added terminal\n"));
+                    break;
+                case netlist_terminal_t::INPUT:
+                    if (!m_inps.contains(p))
+                        m_inps.add(p);
+                    NL_VERBOSE_OUT(("Added input\n"));
+                    break;
+                default:
+                    owner().netlist().error("unhandled element found\n");
+                    break;
+            }
+        }
         NL_VERBOSE_OUT(("added net with %d populated connections (%d railnets)\n", (*pn)->m_terms.count(), (*pn)->m_rails.count()));
-	}
+    }
 }
 
-ATTR_HOT ATTR_HOT inline void netlist_matrix_solver_t::update_inputs()
+ATTR_HOT void netlist_matrix_solver_t::update_inputs()
 {
-	for (netlist_core_terminal_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
-	{
-	    if ((*p)->net().m_last.Analog != (*p)->net().m_cur.Analog)
-	    {
-	        (*p)->netdev().update_dev();
-	    }
-	}
+    for (netlist_core_terminal_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
+    {
+        if ((*p)->net().m_last.Analog != (*p)->net().m_cur.Analog)
+        {
+            (*p)->netdev().update_dev();
+        }
+    }
     for (netlist_core_terminal_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
     {
         (*p)->net().m_last.Analog = (*p)->net().m_cur.Analog;
@@ -94,7 +95,7 @@ ATTR_HOT ATTR_HOT inline void netlist_matrix_solver_t::update_inputs()
 }
 
 
-ATTR_HOT ATTR_HOT inline void netlist_matrix_solver_t::update_dynamic()
+ATTR_HOT void netlist_matrix_solver_t::update_dynamic()
 {
     /* update all non-linear devices  */
     for (netlist_core_device_t * const *p = m_dynamic.first(); p != NULL; p = m_dynamic.next(p))
@@ -109,7 +110,7 @@ ATTR_HOT ATTR_HOT inline void netlist_matrix_solver_t::update_dynamic()
         }
 }
 
-void netlist_matrix_solver_t::schedule()
+ATTR_HOT void netlist_matrix_solver_t::schedule()
 {
     if (!solve())
     {
@@ -131,14 +132,14 @@ ATTR_COLD void netlist_matrix_solver_t::reset()
     m_last_step = netlist_time::zero;
 }
 
-ATTR_HOT inline void netlist_matrix_solver_t::step(const netlist_time delta)
+ATTR_HOT void netlist_matrix_solver_t::step(const netlist_time delta)
 {
     const double dd = delta.as_double();
     for (int k=0; k < m_steps.count(); k++)
         m_steps[k]->step_time(dd);
 }
 
-ATTR_HOT inline bool netlist_matrix_solver_t::solve()
+ATTR_HOT bool netlist_matrix_solver_t::solve()
 {
     int  resched_cnt = 0;
 
@@ -162,14 +163,14 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
             update_dynamic();
             this_resched = solve_non_dynamic();
             resched_cnt += this_resched;
-        } while (this_resched > 1 && resched_cnt < m_resched_loops);
+        } while (this_resched > 1 && resched_cnt < m_params.m_resched_loops);
     }
     else
     {
         resched_cnt = solve_non_dynamic();
         //printf("resched_cnt %d %d\n", resched_cnt, m_resched_loops);
     }
-    return (resched_cnt >= m_resched_loops);
+    return (resched_cnt >= m_params.m_resched_loops);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -240,7 +241,7 @@ ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::setup(netlist_ne
 }
 
 template <int m_N, int _storage_N>
-ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE(
+ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE(
         double (* RESTRICT A)[_storage_N],
         double (* RESTRICT RHS))
 {
@@ -282,7 +283,7 @@ ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE(
 }
 
 template <int m_N, int _storage_N>
-ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
+ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
         double (* RESTRICT A)[_storage_N],
         double (* RESTRICT RHS),
         double (* RESTRICT x))
@@ -324,11 +325,14 @@ ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
        {
            double f1 = A[j][i] * f;
 
-           for (int k = i; k < N(); k++)
+           if (f1 != 0.0)
            {
-               A[j][k] -= A[i][k] * f1;
+               for (int k = i; k < N(); k++)
+               {
+                   A[j][k] -= A[i][k] * f1;
+               }
+               RHS[j] -= RHS[i] * f1;
            }
-           RHS[j] -= RHS[i] * f1;
        }
     }
     /* back substitution */
@@ -353,7 +357,7 @@ ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 }
 
 template <int m_N, int _storage_N>
-ATTR_HOT inline double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
+ATTR_HOT double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
         const double (* RESTRICT RHS),
         const double (* RESTRICT V))
 {
@@ -370,7 +374,7 @@ ATTR_HOT inline double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
 }
 
 template <int m_N, int _storage_N>
-ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
+ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
         const double (* RESTRICT RHS),
         const double (* RESTRICT V))
 {
@@ -404,7 +408,7 @@ ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(
 
         store(RHS, new_v);
 
-        if (err > this->m_accuracy * this->m_accuracy)
+        if (err > this->m_params.m_accuracy * this->m_params.m_accuracy)
         {
             return 2;
         }
@@ -419,7 +423,7 @@ ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(
 // netlist_matrix_solver - Direct1
 // ----------------------------------------------------------------------------------------
 
-ATTR_HOT inline int netlist_matrix_solver_direct1_t::solve_non_dynamic()
+ATTR_HOT int netlist_matrix_solver_direct1_t::solve_non_dynamic()
 {
 #if 1
 
@@ -454,7 +458,7 @@ ATTR_HOT inline int netlist_matrix_solver_direct1_t::solve_non_dynamic()
 
     net->m_cur.Analog = net->m_new.Analog = new_val;
 
-    if (is_dynamic() && (cerr  > m_accuracy * m_accuracy))
+    if (is_dynamic() && (cerr  > m_params.m_accuracy * m_params.m_accuracy))
     {
         return 2;
     }
@@ -491,7 +495,7 @@ ATTR_HOT int netlist_matrix_solver_direct2_t::solve_non_dynamic()
     {
         double err = delta(RHS, new_val);
         store(RHS, new_val);
-        if (err > m_accuracy * m_accuracy)
+        if (err > m_params.m_accuracy * m_params.m_accuracy)
             return 2;
         else
             return 1;
@@ -505,7 +509,7 @@ ATTR_HOT int netlist_matrix_solver_direct2_t::solve_non_dynamic()
 // ----------------------------------------------------------------------------------------
 
 template <int m_N, int _storage_N>
-ATTR_HOT inline int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dynamic()
+ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dynamic()
 {
     bool resched = false;
 
@@ -547,7 +551,7 @@ ATTR_HOT inline int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve
             RHS_t += terms[i]->m_Idr;
         }
 
-        gabs_t *= m_convergence_factor;
+        gabs_t *= m_params.m_convergence_factor;
         if (gabs_t > gtot_t)
         {
             // Actually 1.0 / g_tot  * g_tot / (gtot_t + gabs_t)
@@ -589,13 +593,13 @@ ATTR_HOT inline int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve
 
             net->m_cur.Analog = net->m_new.Analog = new_val;
         }
-        if (resched || cerr / m_nets.count() > m_accuracy * m_accuracy)
+        if (resched || cerr / m_nets.count() > m_params.m_accuracy * m_params.m_accuracy)
         {
             resched = true;
             //last_resched_net = net;
         }
         resched_cnt++;
-    } while (resched && (resched_cnt < m_resched_loops / 3 ));
+    } while (resched && (resched_cnt < m_params.m_resched_loops / 3 ));
 
     if (resched)
         return m_fallback.solve_non_dynamic();
@@ -611,64 +615,64 @@ typedef netlist_net_t::list_t  *net_groups_t;
 
 ATTR_COLD static bool already_processed(net_groups_t groups, int &cur_group, netlist_net_t *net)
 {
-	if (net->isRailNet())
-		return true;
-	for (int i = 0; i <= cur_group; i++)
-	{
-		if (groups[i].contains(net))
-			return true;
-	}
-	return false;
+    if (net->isRailNet())
+        return true;
+    for (int i = 0; i <= cur_group; i++)
+    {
+        if (groups[i].contains(net))
+            return true;
+    }
+    return false;
 }
 
 ATTR_COLD static void process_net(net_groups_t groups, int &cur_group, netlist_net_t *net)
 {
-	if (net->m_head == NULL)
-		return;
+    if (net->m_head == NULL)
+        return;
     /* add the net */
-	SOLVER_VERBOSE_OUT(("add %d - %s\n", cur_group, net->name().cstr()));
-	groups[cur_group].add(net);
-	for (netlist_core_terminal_t *p = net->m_head; p != NULL; p = p->m_update_list_next)
-	{
-	    SOLVER_VERBOSE_OUT(("terminal %s\n", p->name().cstr()));
-		if (p->isType(netlist_terminal_t::TERMINAL))
-		{
-		    SOLVER_VERBOSE_OUT(("isterminal\n"));
-			netlist_terminal_t *pt = static_cast<netlist_terminal_t *>(p);
-			netlist_net_t *other_net = &pt->m_otherterm->net();
-			if (!already_processed(groups, cur_group, other_net))
-				process_net(groups, cur_group, other_net);
-		}
-	}
+    SOLVER_VERBOSE_OUT(("add %d - %s\n", cur_group, net->name().cstr()));
+    groups[cur_group].add(net);
+    for (netlist_core_terminal_t *p = net->m_head; p != NULL; p = p->m_update_list_next)
+    {
+        SOLVER_VERBOSE_OUT(("terminal %s\n", p->name().cstr()));
+        if (p->isType(netlist_terminal_t::TERMINAL))
+        {
+            SOLVER_VERBOSE_OUT(("isterminal\n"));
+            netlist_terminal_t *pt = static_cast<netlist_terminal_t *>(p);
+            netlist_net_t *other_net = &pt->m_otherterm->net();
+            if (!already_processed(groups, cur_group, other_net))
+                process_net(groups, cur_group, other_net);
+        }
+    }
 }
 
 
 NETLIB_START(solver)
 {
-	register_output("Q_sync", m_Q_sync);
-	register_output("Q_step", m_Q_step);
-	//register_input("FB", m_feedback);
+    register_output("Q_sync", m_Q_sync);
+    register_output("Q_step", m_Q_step);
+    //register_input("FB", m_feedback);
 
-	register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_NS(5).as_double());
-	m_nt_sync_delay = m_sync_delay.Value();
+    register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_NS(5).as_double());
+    m_nt_sync_delay = m_sync_delay.Value();
 
-	register_param("FREQ", m_freq, 48000.0);
-	m_inc = netlist_time::from_hz(m_freq.Value());
+    register_param("FREQ", m_freq, 48000.0);
+    m_inc = netlist_time::from_hz(m_freq.Value());
 
-	register_param("ACCURACY", m_accuracy, 1e-7);
-	register_param("CONVERG", m_convergence, 0.3);
+    register_param("ACCURACY", m_accuracy, 1e-7);
+    register_param("CONVERG", m_convergence, 0.3);
     register_param("RESCHED_LOOPS", m_resched_loops, 35);
     register_param("PARALLEL", m_parallel, 0);
 
-	// internal staff
+    // internal staff
 
-	register_input("FB_sync", m_fb_sync);
-	register_input("FB_step", m_fb_step);
+    register_input("FB_sync", m_fb_sync);
+    register_input("FB_step", m_fb_step);
 
-	connect(m_fb_sync, m_Q_sync);
-	connect(m_fb_step, m_Q_step);
+    connect(m_fb_sync, m_Q_sync);
+    connect(m_fb_step, m_Q_step);
 
-	save(NAME(m_last_step));
+    save(NAME(m_last_step));
 
 }
 
@@ -682,26 +686,26 @@ NETLIB_RESET(solver)
 
 NETLIB_UPDATE_PARAM(solver)
 {
-	m_inc = netlist_time::from_hz(m_freq.Value());
+    m_inc = netlist_time::from_hz(m_freq.Value());
 }
 
 NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 {
-	netlist_matrix_solver_t * const *e = m_mat_solvers.first();
-	while (e != NULL)
-	{
-		netlist_matrix_solver_t * const *en = m_mat_solvers.next(e);
-		delete *e;
-		e = en;
-	}
+    netlist_matrix_solver_t * const *e = m_mat_solvers.first();
+    while (e != NULL)
+    {
+        netlist_matrix_solver_t * const *en = m_mat_solvers.next(e);
+        delete *e;
+        e = en;
+    }
 
 }
 
 NETLIB_UPDATE(solver)
 {
-	netlist_time now = netlist().time();
-	netlist_time delta = now - m_last_step;
-	bool do_full = false;
+    netlist_time now = netlist().time();
+    netlist_time delta = now - m_last_step;
+    bool do_full = false;
     bool global_resched = false;
     bool this_resched[100];
     int t_cnt = m_mat_solvers.count();
@@ -749,17 +753,17 @@ NETLIB_UPDATE(solver)
         }
     }
 
-	if (global_resched)
-	{
-	    netlist().warning("Gobal reschedule .. Consider increasing RESCHED_LOOPS");
-		schedule();
-	}
-	else
-	{
-		/* step circuit */
-		if (!m_Q_step.net().is_queued())
-			m_Q_step.net().push_to_queue(m_inc);
-	}
+    if (global_resched)
+    {
+        netlist().warning("Gobal reschedule .. Consider increasing RESCHED_LOOPS");
+        schedule();
+    }
+    else
+    {
+        /* step circuit */
+        if (!m_Q_step.net().is_queued())
+            m_Q_step.net().push_to_queue(m_inc);
+    }
 
 }
 
@@ -838,9 +842,9 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
                 break;
         }
 
-        ms->m_accuracy = m_accuracy.Value();
-        ms->m_convergence_factor = m_convergence.Value();
-        ms->m_resched_loops = m_resched_loops.Value();
+        ms->m_params.m_accuracy = m_accuracy.Value();
+        ms->m_params.m_convergence_factor = m_convergence.Value();
+        ms->m_params.m_resched_loops = m_resched_loops.Value();
         ms->setup(groups[i], *this);
         m_mat_solvers.add(ms);
         SOLVER_VERBOSE_OUT(("%d ==> %d nets %s\n", i, groups[i].count(), (*groups[i].first())->m_head->name().cstr()));

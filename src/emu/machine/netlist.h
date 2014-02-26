@@ -98,7 +98,7 @@
 // ----------------------------------------------------------------------------------------
 
 #define NETLIST_MEMREGION(_name)                                                    \
-		netlist.parse((char *)downcast<netlist_mame_t &>(netlist.netlist()).machine().root_device().memregion(_name)->base());
+		setup.parse((char *)downcast<netlist_mame_t &>(setup.netlist()).machine().root_device().memregion(_name)->base());
 
 #define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
     void _name(const double data, const attotime &time)

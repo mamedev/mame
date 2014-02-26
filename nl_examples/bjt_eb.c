@@ -36,7 +36,7 @@ NETLIST_START(bjt)
     NET_C(RCE.1, Q.C)
     NET_C(RCE.2, GND)
 
-    LOG(logB, Q.B)
-    LOG(logC, Q.C)
+    //LOG(logB, Q.B)
+    //LOG(logC, Q.C)
 
 NETLIST_END()

@@ -13,7 +13,7 @@ NETLIST_START(vccs)
     PARAM(Solver.ACCURACY, 1e-12)
     PARAM(Solver.RESCHED_LOOPS, 10000)
 
-    NETDEV_VCCS(VV)
+    VCCS(VV)
     PARAM(VV.G, 100)  // typical OP-AMP amplification
     RES(R2, 1)
 
