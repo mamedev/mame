@@ -165,7 +165,11 @@ __extension__ typedef signed long long      INT64;
 #endif
 
 #if defined(_MSVC_VER) || defined(__MINGW32__)
+#ifdef PTR64
 #define SIZETFMT   "I64u"
+#else
+#define SIZETFMT   "u"
+#endif
 #else
 #define SIZETFMT   "zu"
 #endif
