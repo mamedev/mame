@@ -2316,7 +2316,6 @@ chd_file_compressor::chd_file_compressor()
 		m_write_hunk(0)
 {
 	// zap arrays
-	memset(m_work_item, 0, sizeof(m_work_item));
 	memset(m_codecs, 0, sizeof(m_codecs));
 
 	// allocate work queues
