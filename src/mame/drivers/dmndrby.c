@@ -536,7 +536,7 @@ static MACHINE_CONFIG_START( dderby, dmndrby_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dmndrby_state, screen_update_dderby)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",dmndrby)
+	MCFG_GFXDECODE_ADD("gfxdecode", dmndrby)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_INIT_OWNER(dmndrby_state, dmndrby)
 

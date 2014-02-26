@@ -2317,7 +2317,7 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 //  MCFG_CPU_ADD("subcpu", I8049, 7987200)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode",pc6001m2)
+	MCFG_GFXDECODE_ADD("gfxdecode", pc6001m2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

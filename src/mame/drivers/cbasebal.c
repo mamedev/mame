@@ -270,7 +270,7 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(cbasebal_state, screen_update_cbasebal)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cbasebal)
+	MCFG_GFXDECODE_ADD("gfxdecode", cbasebal)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)

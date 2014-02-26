@@ -947,7 +947,7 @@ static MACHINE_CONFIG_START( ninjakd2, ninjakd2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_ninjakd2)
 	MCFG_SCREEN_VBLANK_DRIVER(ninjakd2_state, screen_eof_ninjakd2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",ninjakd2)
+	MCFG_GFXDECODE_ADD("gfxdecode", ninjakd2)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 

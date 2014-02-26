@@ -684,7 +684,7 @@ static MACHINE_CONFIG_START( marinedt, marinedt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(marinedt_state, screen_update_marinedt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",marinedt)
+	MCFG_GFXDECODE_ADD("gfxdecode", marinedt)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(marinedt_state, marinedt)
 

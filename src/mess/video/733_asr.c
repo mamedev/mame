@@ -772,7 +772,7 @@ void asr733_keyboard(device_t *device)
 }
 
 static MACHINE_CONFIG_FRAGMENT( asr733 )
-	MCFG_GFXDECODE_ADD("gfxdecode",asr733)
+	MCFG_GFXDECODE_ADD("gfxdecode", asr733)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(asr733_device, asr733)

@@ -762,7 +762,7 @@ static MACHINE_CONFIG_START( jingbell, igs009_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs009_state, screen_update_jingbell)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",jingbell)
+	MCFG_GFXDECODE_ADD("gfxdecode", jingbell)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

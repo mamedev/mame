@@ -532,7 +532,7 @@ static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddayjlc_state, screen_update_ddayjlc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",ddayjlc)
+	MCFG_GFXDECODE_ADD("gfxdecode", ddayjlc)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(ddayjlc_state, ddayjlc)
 

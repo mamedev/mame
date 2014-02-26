@@ -502,7 +502,7 @@ static MACHINE_CONFIG_START( powerbal, powerbal_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",powerbal)
+	MCFG_GFXDECODE_ADD("gfxdecode", powerbal)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( magicstk, powerbal_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",powerbal)
+	MCFG_GFXDECODE_ADD("gfxdecode", powerbal)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)

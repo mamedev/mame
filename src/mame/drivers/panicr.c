@@ -621,7 +621,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update_panicr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",panicr)
+	MCFG_GFXDECODE_ADD("gfxdecode", panicr)
 	MCFG_PALETTE_ADD("palette", 256*4)
 	MCFG_PALETTE_INIT_OWNER(panicr_state, panicr)
 

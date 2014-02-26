@@ -1326,7 +1326,7 @@ static MACHINE_CONFIG_START( pspikes, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",pspikes)
+	MCFG_GFXDECODE_ADD("gfxdecode", pspikes)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1369,7 +1369,7 @@ static MACHINE_CONFIG_START( spikes91, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 320-1, 0*8+4, 224+4-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_spikes91)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",spikes91)
+	MCFG_GFXDECODE_ADD("gfxdecode", spikes91)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1402,7 +1402,7 @@ static MACHINE_CONFIG_START( pspikesb, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikesb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",pspikesb)
+	MCFG_GFXDECODE_ADD("gfxdecode", pspikesb)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1433,7 +1433,7 @@ static MACHINE_CONFIG_START( pspikesc, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_pspikes)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",pspikes)
+	MCFG_GFXDECODE_ADD("gfxdecode", pspikes)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1474,7 +1474,7 @@ static MACHINE_CONFIG_START( karatblz, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 45*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_karatblz)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",turbofrc)
+	MCFG_GFXDECODE_ADD("gfxdecode", turbofrc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1524,7 +1524,7 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 45*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_spinlbrk)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",turbofrc)
+	MCFG_GFXDECODE_ADD("gfxdecode", turbofrc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1575,7 +1575,7 @@ static MACHINE_CONFIG_START( turbofrc, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_turbofrc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",turbofrc)
+	MCFG_GFXDECODE_ADD("gfxdecode", turbofrc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1626,7 +1626,7 @@ static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+12, 40*8-1+12, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_turbofrc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",aerofgtb)
+	MCFG_GFXDECODE_ADD("gfxdecode", aerofgtb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1677,7 +1677,7 @@ static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerofgt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",aerofgt)
+	MCFG_GFXDECODE_ADD("gfxdecode", aerofgt)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1721,7 +1721,7 @@ static MACHINE_CONFIG_START( aerfboot, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+12, 40*8-1+12, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerfboot)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",aerfboot)
+	MCFG_GFXDECODE_ADD("gfxdecode", aerfboot)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1753,7 +1753,7 @@ static MACHINE_CONFIG_START( aerfboo2, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+12, 40*8-1+12, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_aerfboo2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",aerfboo2)
+	MCFG_GFXDECODE_ADD("gfxdecode", aerfboo2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1787,7 +1787,7 @@ static MACHINE_CONFIG_START( wbbc97, aerofgt_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8+14, 44*8-1+4, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_wbbc97)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",wbbc97)
+	MCFG_GFXDECODE_ADD("gfxdecode", wbbc97)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( chanbara, chanbara_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",chanbara)
+	MCFG_GFXDECODE_ADD("gfxdecode", chanbara)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(chanbara_state, chanbara)

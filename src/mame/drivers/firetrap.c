@@ -650,7 +650,7 @@ static MACHINE_CONFIG_START( firetrap, firetrap_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",firetrap)
+	MCFG_GFXDECODE_ADD("gfxdecode", firetrap)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
 
@@ -686,7 +686,7 @@ static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",firetrap)
+	MCFG_GFXDECODE_ADD("gfxdecode", firetrap)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
 

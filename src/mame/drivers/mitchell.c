@@ -1090,7 +1090,7 @@ static MACHINE_CONFIG_START( mgakuen, mitchell_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",mgakuen)
+	MCFG_GFXDECODE_ADD("gfxdecode", mgakuen)
 	
 	MCFG_PALETTE_ADD("palette", 1024)   /* less colors than the others */
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1129,7 +1129,7 @@ static MACHINE_CONFIG_START( pang, mitchell_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",mitchell)
+	MCFG_GFXDECODE_ADD("gfxdecode", mitchell)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1235,7 +1235,7 @@ static MACHINE_CONFIG_START( mstworld, mitchell_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",mstworld)
+	MCFG_GFXDECODE_ADD("gfxdecode", mstworld)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1268,7 +1268,7 @@ static MACHINE_CONFIG_START( marukin, mitchell_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",marukin)
+	MCFG_GFXDECODE_ADD("gfxdecode", marukin)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1321,7 +1321,7 @@ static MACHINE_CONFIG_START( pkladiesbl, mitchell_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",pkladiesbl)
+	MCFG_GFXDECODE_ADD("gfxdecode", pkladiesbl)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)

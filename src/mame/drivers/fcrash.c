@@ -1489,7 +1489,7 @@ static MACHINE_CONFIG_START( fcrash, cps_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cps1)
+	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
@@ -1547,7 +1547,7 @@ static MACHINE_CONFIG_START( kodb, cps_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cps1)
+	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
@@ -1587,7 +1587,7 @@ static MACHINE_CONFIG_START( sf2mdt, cps_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cps1)
+	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
@@ -1630,7 +1630,7 @@ static MACHINE_CONFIG_START( knightsb, cps_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cps1)
+	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
@@ -1969,7 +1969,7 @@ static MACHINE_CONFIG_START( dinopic, cps_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cps1)
+	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
@@ -2121,7 +2121,7 @@ static MACHINE_CONFIG_START( sgyxz, cps_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
-	MCFG_GFXDECODE_ADD("gfxdecode",cps1)
+	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
@@ -2214,7 +2214,7 @@ static MACHINE_CONFIG_START( punipic, cps_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cps1)
+	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
@@ -2400,7 +2400,7 @@ static MACHINE_CONFIG_START( sf2m1, cps_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2, 518, 64, 448, 259, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
-	MCFG_GFXDECODE_ADD("gfxdecode",cps1)
+	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
@@ -2604,7 +2604,7 @@ static MACHINE_CONFIG_START( slampic, cps_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cps1)
+	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)

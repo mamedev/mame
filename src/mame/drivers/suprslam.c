@@ -313,7 +313,7 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_CPU_IO_MAP(sound_io_map)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode",suprslam)
+	MCFG_GFXDECODE_ADD("gfxdecode", suprslam)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 

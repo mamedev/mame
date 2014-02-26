@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( ltcasino, ltcasino_state )
 	MCFG_SCREEN_VISIBLE_AREA(6*8, 58*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ltcasino_state, screen_update_ltcasino)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",ltcasino)
+	MCFG_GFXDECODE_ADD("gfxdecode", ltcasino)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 

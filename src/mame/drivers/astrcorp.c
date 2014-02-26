@@ -493,7 +493,7 @@ static MACHINE_CONFIG_START( showhand, astrocorp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",astrocorp)
+	MCFG_GFXDECODE_ADD("gfxdecode", astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
@@ -544,7 +544,7 @@ static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x200-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",astrocorp)
+	MCFG_GFXDECODE_ADD("gfxdecode", astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)

@@ -766,7 +766,7 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",limenko)
+	MCFG_GFXDECODE_ADD("gfxdecode", limenko)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
@@ -797,7 +797,7 @@ static MACHINE_CONFIG_START( spotty, limenko_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",limenko)
+	MCFG_GFXDECODE_ADD("gfxdecode", limenko)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 

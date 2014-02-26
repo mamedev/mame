@@ -451,7 +451,7 @@ static MACHINE_CONFIG_START( flyball, flyball_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(flyball_state, screen_update_flyball)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",flyball)
+	MCFG_GFXDECODE_ADD("gfxdecode", flyball)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(flyball_state, flyball)
 

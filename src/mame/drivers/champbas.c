@@ -620,7 +620,7 @@ static MACHINE_CONFIG_START( talbot, champbas_state )
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
 	MCFG_SCREEN_VBLANK_DRIVER(champbas_state, screen_eof_champbas)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",talbot)
+	MCFG_GFXDECODE_ADD("gfxdecode", talbot)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
@@ -655,7 +655,7 @@ static MACHINE_CONFIG_START( champbas, champbas_state )
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
 	MCFG_SCREEN_VBLANK_DRIVER(champbas_state, screen_eof_champbas)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",champbas)
+	MCFG_GFXDECODE_ADD("gfxdecode", champbas)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
@@ -712,7 +712,7 @@ static MACHINE_CONFIG_START( exctsccr, champbas_state )
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_exctsccr)
 	MCFG_SCREEN_VBLANK_DRIVER(champbas_state, screen_eof_champbas)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",exctsccr)
+	MCFG_GFXDECODE_ADD("gfxdecode", exctsccr)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_PALETTE_INIT_OWNER(champbas_state,exctsccr)
@@ -763,7 +763,7 @@ static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_exctsccr)
 	MCFG_SCREEN_VBLANK_DRIVER(champbas_state, screen_eof_champbas)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",exctsccr)
+	MCFG_GFXDECODE_ADD("gfxdecode", exctsccr)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_PALETTE_INIT_OWNER(champbas_state,exctsccr)

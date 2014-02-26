@@ -596,7 +596,7 @@ static MACHINE_CONFIG_START( tmspoker, tmspoker_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tmspoker_state, screen_update_tmspoker)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",tmspoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", tmspoker)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tmspoker_state, tmspoker)

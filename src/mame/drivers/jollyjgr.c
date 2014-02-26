@@ -664,7 +664,7 @@ static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jollyjgr_state, screen_update_jollyjgr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",jollyjgr)
+	MCFG_GFXDECODE_ADD("gfxdecode", jollyjgr)
 	MCFG_PALETTE_ADD("palette", 32+8) /* 32 for tilemap and sprites + 8 for the bitmap */
 	MCFG_PALETTE_INIT_OWNER(jollyjgr_state, jollyjgr)
 

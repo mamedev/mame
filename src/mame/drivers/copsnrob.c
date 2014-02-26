@@ -256,7 +256,7 @@ static MACHINE_CONFIG_START( copsnrob, copsnrob_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 26*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(copsnrob_state, screen_update_copsnrob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",copsnrob)
+	MCFG_GFXDECODE_ADD("gfxdecode", copsnrob)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */

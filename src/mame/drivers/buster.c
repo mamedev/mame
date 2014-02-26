@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( buster, buster_state )
 	MCFG_SCREEN_UPDATE_DRIVER(buster_state, screen_update_buster)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_3_579545MHz/4, mc6845_intf) //unknown clock / type
 
-	MCFG_GFXDECODE_ADD("gfxdecode",buster)
+	MCFG_GFXDECODE_ADD("gfxdecode", buster)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(buster_state, buster)
 

@@ -307,7 +307,7 @@ static MACHINE_CONFIG_START( molecula, molecula_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",molecula)
+	MCFG_GFXDECODE_ADD("gfxdecode", molecula)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(molecula_state, molecula)

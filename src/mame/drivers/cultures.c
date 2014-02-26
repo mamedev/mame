@@ -413,7 +413,7 @@ static MACHINE_CONFIG_START( cultures, cultures_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cultures_state, screen_update_cultures)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",culture)
+	MCFG_GFXDECODE_ADD("gfxdecode", culture)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 
 

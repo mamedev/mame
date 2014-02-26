@@ -904,7 +904,7 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cntsteer)
+	MCFG_GFXDECODE_ADD("gfxdecode", cntsteer)
 	MCFG_PALETTE_ADD("palette", 256)
 //  MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)
 
@@ -951,7 +951,7 @@ static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_zerotrgt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",zerotrgt)
+	MCFG_GFXDECODE_ADD("gfxdecode", zerotrgt)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)

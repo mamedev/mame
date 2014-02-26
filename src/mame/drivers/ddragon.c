@@ -982,7 +982,7 @@ static MACHINE_CONFIG_START( ddragon, ddragon_state )
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode",ddragon)
+	MCFG_GFXDECODE_ADD("gfxdecode", ddragon)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -1046,7 +1046,7 @@ static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode",ddragon)
+	MCFG_GFXDECODE_ADD("gfxdecode", ddragon)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -1093,7 +1093,7 @@ static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 	MCFG_MACHINE_RESET_OVERRIDE(ddragon_state,ddragon)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode",ddragon)
+	MCFG_GFXDECODE_ADD("gfxdecode", ddragon)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

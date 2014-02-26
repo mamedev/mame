@@ -580,7 +580,7 @@ static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",sengokmj)
+	MCFG_GFXDECODE_ADD("gfxdecode", sengokmj)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

@@ -1476,7 +1476,7 @@ static MACHINE_CONFIG_START( scramble, scramble_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",scramble)
+	MCFG_GFXDECODE_ADD("gfxdecode", scramble)
 	MCFG_PALETTE_ADD("palette", 32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scramble_state,scrambold)
@@ -1723,7 +1723,7 @@ static MACHINE_CONFIG_START( ad2083, scramble_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(scramble_state, screen_update_galaxold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",ad2083)
+	MCFG_GFXDECODE_ADD("gfxdecode", ad2083)
 	MCFG_PALETTE_ADD("palette", 32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scramble_state,turtles)

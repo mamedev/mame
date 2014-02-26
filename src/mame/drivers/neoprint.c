@@ -479,7 +479,7 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_UPD4990A_OLD_ADD("upd4990a")
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode",neoprint)
+	MCFG_GFXDECODE_ADD("gfxdecode", neoprint)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -519,7 +519,7 @@ static MACHINE_CONFIG_START( nprsp, neoprint_state )
 	MCFG_UPD4990A_OLD_ADD("upd4990a")
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode",neoprint)
+	MCFG_GFXDECODE_ADD("gfxdecode", neoprint)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

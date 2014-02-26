@@ -3601,7 +3601,7 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode",coolridr)
+	MCFG_GFXDECODE_ADD("gfxdecode", coolridr)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

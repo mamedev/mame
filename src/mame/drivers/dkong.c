@@ -1667,7 +1667,7 @@ static MACHINE_CONFIG_START( dkong_base, dkong_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",dkong)
+	MCFG_GFXDECODE_ADD("gfxdecode", dkong)
 	MCFG_PALETTE_ADD("palette", DK2B_PALETTE_LENGTH)
 
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong2b)
@@ -1732,7 +1732,7 @@ static MACHINE_CONFIG_START( dkong3, dkong_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",dkong)	
+	MCFG_GFXDECODE_ADD("gfxdecode", dkong)	
 	MCFG_PALETTE_ADD("palette", DK3_PALETTE_LENGTH)
 
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong3)

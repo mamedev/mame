@@ -1700,7 +1700,7 @@ static MACHINE_CONFIG_START( gegege, sigmab98_state )
 	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0,0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",sigmab98)
+	MCFG_GFXDECODE_ADD("gfxdecode", sigmab98)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1741,7 +1741,7 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 	MCFG_SCREEN_VBLANK_DRIVER(sigmab98_state, screen_eof_sammymdl)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",sigmab98)
+	MCFG_GFXDECODE_ADD("gfxdecode", sigmab98)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

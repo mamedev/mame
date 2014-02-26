@@ -310,7 +310,7 @@ static MACHINE_CONFIG_START( binbug, binbug_state )
 	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
-	MCFG_GFXDECODE_ADD("gfxdecode",dg640)
+	MCFG_GFXDECODE_ADD("gfxdecode", dg640)
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
 
 	/* Keyboard */
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( dg680, dg680_state )
 	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
-	MCFG_GFXDECODE_ADD("gfxdecode",dg640)
+	MCFG_GFXDECODE_ADD("gfxdecode", dg640)
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
 
 	/* Keyboard */

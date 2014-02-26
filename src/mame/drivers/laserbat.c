@@ -722,7 +722,7 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state, screen_update_laserbat)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",laserbat)
+	MCFG_GFXDECODE_ADD("gfxdecode", laserbat)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_S2636_ADD("s2636_1", s2636_1_config)
@@ -770,7 +770,7 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state, screen_update_laserbat)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",laserbat)
+	MCFG_GFXDECODE_ADD("gfxdecode", laserbat)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_S2636_ADD("s2636_1", s2636_1_config)

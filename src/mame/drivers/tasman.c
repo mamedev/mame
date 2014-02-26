@@ -618,7 +618,7 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_K055673_ADD_NOINTF("k055673")
 	MCFG_K055673_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode",tasman)
+	MCFG_GFXDECODE_ADD("gfxdecode", tasman)
 
 	MCFG_K056832_ADD("k056832", k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")

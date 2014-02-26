@@ -1184,7 +1184,7 @@ static MACHINE_CONFIG_START( ampoker2, ampoker2_state )
 	MCFG_SCREEN_VISIBLE_AREA(20*8, 56*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ampoker2_state, screen_update_ampoker2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",ampoker2)
+	MCFG_GFXDECODE_ADD("gfxdecode", ampoker2)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(ampoker2_state, ampoker2)
 

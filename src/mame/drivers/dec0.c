@@ -1307,7 +1307,7 @@ WRITE_LINE_MEMBER(dec0_state::sound_irq2)
 
 
 static MACHINE_CONFIG_START( dec0_base, dec0_state )
-	MCFG_GFXDECODE_ADD("gfxdecode",dec0)
+	MCFG_GFXDECODE_ADD("gfxdecode", dec0)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -1431,7 +1431,7 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_GFXDECODE_ADD("gfxdecode",automat)
+	MCFG_GFXDECODE_ADD("gfxdecode", automat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1487,7 +1487,7 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_GFXDECODE_ADD("gfxdecode",secretab)
+	MCFG_GFXDECODE_ADD("gfxdecode", secretab)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

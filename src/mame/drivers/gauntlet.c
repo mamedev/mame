@@ -509,7 +509,7 @@ static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE_ADD("gfxdecode",gauntlet)
+	MCFG_GFXDECODE_ADD("gfxdecode", gauntlet)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)

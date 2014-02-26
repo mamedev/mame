@@ -1926,7 +1926,7 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(supracan_state, supracan)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode",supracan)
+	MCFG_GFXDECODE_ADD("gfxdecode", supracan)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")

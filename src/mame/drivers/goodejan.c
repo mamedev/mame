@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",goodejan)
+	MCFG_GFXDECODE_ADD("gfxdecode", goodejan)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

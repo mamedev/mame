@@ -2007,7 +2007,7 @@ static MACHINE_CONFIG_START( rastsag2, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	
@@ -2053,7 +2053,7 @@ static MACHINE_CONFIG_START( masterw, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -2118,7 +2118,7 @@ static MACHINE_CONFIG_START( ashura, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -2164,7 +2164,7 @@ static MACHINE_CONFIG_START( crimec, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -2210,7 +2210,7 @@ static MACHINE_CONFIG_START( hitice, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -2262,7 +2262,7 @@ static MACHINE_CONFIG_START( rambo3p, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",rambo3)
+	MCFG_GFXDECODE_ADD("gfxdecode", rambo3)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -2308,7 +2308,7 @@ static MACHINE_CONFIG_START( rambo3, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -2358,7 +2358,7 @@ static MACHINE_CONFIG_START( pbobble, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -2408,7 +2408,7 @@ static MACHINE_CONFIG_START( spacedx, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -2454,7 +2454,7 @@ static MACHINE_CONFIG_START( spacedxo, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -2504,7 +2504,7 @@ static MACHINE_CONFIG_START( qzshowby, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -2550,7 +2550,7 @@ static MACHINE_CONFIG_START( viofight, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -2601,7 +2601,7 @@ static MACHINE_CONFIG_START( silentd, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -2647,7 +2647,7 @@ static MACHINE_CONFIG_START( selfeena, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -2702,7 +2702,7 @@ static MACHINE_CONFIG_START( ryujin, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -2755,7 +2755,7 @@ static MACHINE_CONFIG_START( sbm, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_taitob)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -2806,7 +2806,7 @@ static MACHINE_CONFIG_START( realpunc, taitob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitob_state, screen_update_realpunc)
 	MCFG_SCREEN_VBLANK_DRIVER(taitob_state, screen_eof_taitob)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",taito_b)
+	MCFG_GFXDECODE_ADD("gfxdecode", taito_b)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 

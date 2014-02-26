@@ -1027,7 +1027,7 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START_OVERRIDE(cvs_state,cvs)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cvs)
+	MCFG_GFXDECODE_ADD("gfxdecode", cvs)
 
 	MCFG_PALETTE_ADD("palette", (256+4)*8+8+1)
 	MCFG_PALETTE_INIT_OWNER(cvs_state,cvs)

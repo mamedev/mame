@@ -169,7 +169,7 @@ static MACHINE_CONFIG_START( klax, klax_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_GFXDECODE_ADD("gfxdecode",klax)
+	MCFG_GFXDECODE_ADD("gfxdecode", klax)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, klax_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,32)

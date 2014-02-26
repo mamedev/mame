@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1056-1, 0, 302-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dai_state, screen_update_dai)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",dai)
+	MCFG_GFXDECODE_ADD("gfxdecode", dai)
 	MCFG_PALETTE_ADD("palette", sizeof (dai_palette) / 3)
 	MCFG_PALETTE_INIT_OWNER(dai_state, dai)
 

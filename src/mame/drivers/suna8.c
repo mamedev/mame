@@ -1840,7 +1840,7 @@ static MACHINE_CONFIG_START( hardhead, suna8_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",suna8)
+	MCFG_GFXDECODE_ADD("gfxdecode", suna8)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -1902,7 +1902,7 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",suna8)
+	MCFG_GFXDECODE_ADD("gfxdecode", suna8)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -1963,7 +1963,7 @@ static MACHINE_CONFIG_START( brickzn, suna8_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",suna8)
+	MCFG_GFXDECODE_ADD("gfxdecode", suna8)
 	MCFG_PALETTE_ADD("palette", 256 * 2)    // 2 x Palette RAM
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -2066,7 +2066,7 @@ static MACHINE_CONFIG_START( starfigh, suna8_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",suna8)
+	MCFG_GFXDECODE_ADD("gfxdecode", suna8)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -2114,7 +2114,7 @@ static MACHINE_CONFIG_START( sparkman, suna8_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",suna8_x2)    // 2 sprite "chips"
+	MCFG_GFXDECODE_ADD("gfxdecode", suna8_x2)    // 2 sprite "chips"
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 

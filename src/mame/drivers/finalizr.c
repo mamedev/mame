@@ -270,7 +270,7 @@ static MACHINE_CONFIG_START( finalizr, finalizr_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 35*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(finalizr_state, screen_update_finalizr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",finalizr)
+	MCFG_GFXDECODE_ADD("gfxdecode", finalizr)
 	MCFG_PALETTE_ADD("palette", 2*16*16)
 	MCFG_PALETTE_INIT_OWNER(finalizr_state, finalizr)
 

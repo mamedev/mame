@@ -264,7 +264,7 @@ static MACHINE_CONFIG_START( murogem, murogem_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(murogem_state, screen_update_murogem)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",murogem)
+	MCFG_GFXDECODE_ADD("gfxdecode", murogem)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(murogem_state, murogem)
 

@@ -802,7 +802,7 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(karnov_state, screen_update_karnov)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",karnov)
+	MCFG_GFXDECODE_ADD("gfxdecode", karnov)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(karnov_state, karnov)
 
@@ -845,7 +845,7 @@ static MACHINE_CONFIG_START( wndrplnt, karnov_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(karnov_state, screen_update_karnov)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",karnov)
+	MCFG_GFXDECODE_ADD("gfxdecode", karnov)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)

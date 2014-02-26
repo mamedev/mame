@@ -773,7 +773,7 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 
 	MCFG_VIDEO_START_OVERRIDE(zr107_state,zr107)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	
 	MCFG_K056832_ADD("k056832", zr107_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
@@ -836,7 +836,7 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 
 	MCFG_VIDEO_START_OVERRIDE(zr107_state,jetwave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	
 	MCFG_K001604_ADD("k001604", jetwave_k001604_intf)
 	MCFG_K001604_GFXDECODE("gfxdecode")

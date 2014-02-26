@@ -830,7 +830,7 @@ static MACHINE_CONFIG_START( scv, scv_state )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_14_31818MHz/2, 456, 24, 24+192, 262, 23, 23+222 )  /* TODO: Verify */
 	MCFG_SCREEN_UPDATE_DRIVER(scv_state, screen_update_scv)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",scv)
+	MCFG_GFXDECODE_ADD("gfxdecode", scv)
 	MCFG_PALETTE_ADD( "palette", 16 )
 	MCFG_PALETTE_INIT_OWNER(scv_state, scv)
 

@@ -627,7 +627,7 @@ static MACHINE_CONFIG_START( fresh, fresh_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fresh_state, screen_update_fresh)
 
 	MCFG_PALETTE_ADD("palette", 0x1000) // or 0xc00
-	MCFG_GFXDECODE_ADD("gfxdecode",fresh)
+	MCFG_GFXDECODE_ADD("gfxdecode", fresh)
 
 	/* sound hw? */
 MACHINE_CONFIG_END

@@ -40,7 +40,7 @@ static GFXDECODE_START( video32 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_FRAGMENT( video32 )
-	MCFG_GFXDECODE_ADD("gfxdecode",video32)
+	MCFG_GFXDECODE_ADD("gfxdecode", video32)
 MACHINE_CONFIG_END
 
 //**************************************************************************

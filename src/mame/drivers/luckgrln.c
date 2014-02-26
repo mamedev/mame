@@ -1013,7 +1013,7 @@ static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(luckgrln_state, screen_update_luckgrln)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",luckgrln)
+	MCFG_GFXDECODE_ADD("gfxdecode", luckgrln)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 

@@ -718,7 +718,7 @@ static MACHINE_CONFIG_FRAGMENT( vdt911 )
 	MCFG_PALETTE_ADD("palette", 8)	
 	MCFG_PALETTE_INIT_OWNER(vdt911_device, vdt911)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",vdt911)
+	MCFG_GFXDECODE_ADD("gfxdecode", vdt911)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

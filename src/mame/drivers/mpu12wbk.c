@@ -532,7 +532,7 @@ static MACHINE_CONFIG_START( mpu12wbk, mpu12wbk_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)    /* Driven by MC6845, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(mpu12wbk_state, screen_update_mpu12wbk)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",mpu12wbk)
+	MCFG_GFXDECODE_ADD("gfxdecode", mpu12wbk)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(mpu12wbk_state, mpu12wbk)
 

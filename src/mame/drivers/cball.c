@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( cball, cball_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(cball_state, screen_update_cball)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",cball)
+	MCFG_GFXDECODE_ADD("gfxdecode", cball)
 	MCFG_PALETTE_ADD("palette", 6)
 	MCFG_PALETTE_INIT_OWNER(cball_state, cball)
 

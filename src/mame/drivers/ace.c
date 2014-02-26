@@ -351,7 +351,7 @@ static MACHINE_CONFIG_START( ace, aceal_state )
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aceal_state, screen_update_ace)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",ace)
+	MCFG_GFXDECODE_ADD("gfxdecode", ace)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */

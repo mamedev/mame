@@ -750,7 +750,7 @@ static MACHINE_CONFIG_START( magic10, magic10_state )
 	MCFG_SCREEN_UPDATE_DRIVER(magic10_state, screen_update_magic10)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_GFXDECODE_ADD("gfxdecode",magic10)
+	MCFG_GFXDECODE_ADD("gfxdecode", magic10)
 
 
 	/* sound hardware */

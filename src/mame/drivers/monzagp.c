@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( monzagp, monzagp_state )
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(monzagp_state, monzagp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",monzagp)
+	MCFG_GFXDECODE_ADD("gfxdecode", monzagp)
 MACHINE_CONFIG_END
 
 ROM_START( monzagp )

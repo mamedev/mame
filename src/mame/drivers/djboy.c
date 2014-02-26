@@ -580,7 +580,7 @@ static MACHINE_CONFIG_START( djboy, djboy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(djboy_state, screen_update_djboy)
 	MCFG_SCREEN_VBLANK_DRIVER(djboy_state, screen_eof_djboy)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",djboy)
+	MCFG_GFXDECODE_ADD("gfxdecode", djboy)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", djboy_pandora_config)

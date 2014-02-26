@@ -473,7 +473,7 @@ static MACHINE_CONFIG_START( blockade, blockade_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blockade_state, screen_update_blockade)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",blockade)
+	MCFG_GFXDECODE_ADD("gfxdecode", blockade)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 

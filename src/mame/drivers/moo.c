@@ -592,7 +592,7 @@ static MACHINE_CONFIG_START( moo, moo_state )
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K053246_ADD("k053246", moo_k053247_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K056832_ADD("k056832", moo_k056832_intf)
@@ -641,7 +641,7 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K053246_ADD("k053246", moo_k053247_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K056832_ADD("k056832", moo_k056832_intf)

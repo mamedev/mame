@@ -336,7 +336,7 @@ static MACHINE_CONFIG_START( esh, esh_state )
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(esh_state, esh)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",esh)
+	MCFG_GFXDECODE_ADD("gfxdecode", esh)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

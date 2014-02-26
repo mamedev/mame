@@ -999,7 +999,7 @@ static MACHINE_CONFIG_START( common, vamphalf_state )
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode",vamphalf)
+	MCFG_GFXDECODE_ADD("gfxdecode", vamphalf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( sound_ym_oki )
@@ -1131,7 +1131,7 @@ static MACHINE_CONFIG_START( aoh, vamphalf_state )
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode",vamphalf)
+	MCFG_GFXDECODE_ADD("gfxdecode", vamphalf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

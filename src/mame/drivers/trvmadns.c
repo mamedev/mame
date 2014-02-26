@@ -386,7 +386,7 @@ static MACHINE_CONFIG_START( trvmadns, trvmadns_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trvmadns_state, screen_update_trvmadns)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",trvmadns)
+	MCFG_GFXDECODE_ADD("gfxdecode", trvmadns)
 	MCFG_PALETTE_ADD("palette", 16)
 
 

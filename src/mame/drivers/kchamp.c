@@ -421,7 +421,7 @@ static MACHINE_CONFIG_START( kchampvs, kchamp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchampvs)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",kchamp)
+	MCFG_GFXDECODE_ADD("gfxdecode", kchamp)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
 
@@ -469,7 +469,7 @@ static MACHINE_CONFIG_START( kchamp, kchamp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchamp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",kchamp)
+	MCFG_GFXDECODE_ADD("gfxdecode", kchamp)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
 
