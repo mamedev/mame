@@ -67,7 +67,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
-		m_ctc(*this, "ctc")
+		m_ctc(*this, "ctc"),
+		port_c_value(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -85,9 +86,17 @@ public:
 	DECLARE_READ16_MEMBER(tms_host_r);
 	DECLARE_WRITE16_MEMBER(tms_host_w);
 
+	DECLARE_READ16_MEMBER(megaphx_0x050002_r);
+	DECLARE_WRITE16_MEMBER(megaphx_0x050000_w);
+
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_to1);
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_to2);
+
+	DECLARE_READ8_MEMBER(port_c_r);
+	DECLARE_WRITE8_MEMBER(port_c_w);
+
+	UINT8 port_c_value;
 };
 
 
@@ -112,6 +121,20 @@ WRITE16_MEMBER(megaphx_state::tms_host_w)
 	tms34010_host_w(machine().device("tms"), offset, data);
 }
 
+READ16_MEMBER(megaphx_state::megaphx_0x050002_r)
+{
+	int pc = machine().device("maincpu")->safe_pc();
+
+	logerror("(%06x) megaphx_0x050002_r (from z80?) %04x\n", pc, mem_mask);
+	return ioport("P3")->read();
+}
+
+WRITE16_MEMBER(megaphx_state::megaphx_0x050000_w)
+{
+	int pc = machine().device("maincpu")->safe_pc();
+
+	logerror("(%06x) megaphx_0x050000_w (to z80?) %04x %04x\n", pc, data, mem_mask);
+}
 
 
 static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
@@ -121,8 +144,8 @@ static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
 
 	AM_RANGE(0x040000, 0x040007) AM_READWRITE(tms_host_r, tms_host_w)
 
-	AM_RANGE(0x050000, 0x050001) AM_WRITENOP // z80 comms?
-	AM_RANGE(0x050002, 0x050003) AM_READ_PORT("P3") // z80 comms?
+	AM_RANGE(0x050000, 0x050001) AM_WRITE(megaphx_0x050000_w) // z80 comms?
+	AM_RANGE(0x050002, 0x050003) AM_READ(megaphx_0x050002_r) // z80 comms?
 
 
 	AM_RANGE(0x060000, 0x060007) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
@@ -329,14 +352,47 @@ static RAMDAC_INTERFACE( ramdac_intf )
 	1
 };
 
+
+READ8_MEMBER(megaphx_state::port_c_r)
+{
+	// it isn't a simple multiplex on this value.
+	//printf("read port c - write value was %02x\n", port_c_value);
+	int pc = machine().device("maincpu")->safe_pc();
+
+	logerror("(%06x) port_c_r (thru 8255)\n", pc);
+	
+	return ioport("SYS")->read();
+}
+
+
+WRITE8_MEMBER(megaphx_state::port_c_w)
+{
+	int pc = machine().device("maincpu")->safe_pc();
+
+
+	if((data != 0x0f) &&
+	   (data != 0x4f) &&
+	   (data != 0x8f) &&
+	   (data != 0x9f) &&
+	   (data != 0xcf) &&
+   	   (data != 0xdf) &&
+	   (data != 0xff))
+			printf("(%06x) port_c_w (thru 8255) %02x\n", pc, data);
+
+	logerror("(%06x) port_c_w (thru 8255) %02x\n", pc, data);
+
+	port_c_value = (data & 0xf0) >> 4;
+}
+
+
 static I8255A_INTERFACE( ppi8255_intf_0 )
 {
 	DEVCB_INPUT_PORT("P0"),        /* Port A read */
 	DEVCB_NULL,                     /* Port A write */
 	DEVCB_INPUT_PORT("P1"),        /* Port B read */
 	DEVCB_NULL,                     /* Port B write */
-	DEVCB_INPUT_PORT("SYS"),        /* Port C read */
-	DEVCB_NULL                      /* Port C write */
+	DEVCB_DRIVER_MEMBER(megaphx_state,port_c_r),        /* Port C read */
+	DEVCB_DRIVER_MEMBER(megaphx_state,port_c_w),        /* Port C write */
 };
 
 
