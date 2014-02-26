@@ -6349,6 +6349,8 @@ static MACHINE_CONFIG_START( goldfrui, goldstar_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", goldfrui, "palette")
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
+
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -7119,7 +7121,7 @@ static MACHINE_CONFIG_START( unkch, goldstar_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",unkch,"palette")
 	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	//MCFG_NVRAM_HANDLER(goldstar)
 

@@ -2166,7 +2166,7 @@ static MACHINE_CONFIG_START( crimec, taitob_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
 
@@ -2310,7 +2310,7 @@ static MACHINE_CONFIG_START( rambo3, taitob_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
@@ -2552,7 +2552,7 @@ static MACHINE_CONFIG_START( viofight, taitob_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
@@ -2808,7 +2808,7 @@ static MACHINE_CONFIG_START( realpunc, taitob_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode",taito_b,"palette")
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,realpunc)
 

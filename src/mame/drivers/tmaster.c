@@ -931,6 +931,7 @@ static MACHINE_CONFIG_START( tm, tmaster_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tmaster_state, screen_update_tmaster)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(tmaster_state,tmaster)
 
