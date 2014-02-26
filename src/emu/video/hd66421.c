@@ -120,7 +120,8 @@ hd66421_device::hd66421_device(const machine_config &mconfig, const char *tag, d
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(hd66421)),
 		m_cmd(0),
 		m_x(0),
-		m_y(0)
+		m_y(0),
+		m_palette(*this, "palette")
 {
 	for (int i = 0; i < 32; i++)
 	{
@@ -253,4 +254,32 @@ UINT32 hd66421_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 	}
 
 	return 0;
+}
+
+PALETTE_INIT_MEMBER(hd66421_device, hd66421)
+{
+	// init palette
+	for (int i = 0; i < 4; i++)
+	{
+		palette.set_pen_color(i, rgb_t::white);
+#ifndef HD66421_BRIGHTNESS_DOES_NOT_WORK
+		palette.set_pen_contrast(i, 1.0 * i / (4 - 1));
+#endif
+	}
+}
+
+
+static MACHINE_CONFIG_FRAGMENT( hd66421 )
+	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(hd66421_device, hd66421)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor hd66421_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( hd66421 );
 }

@@ -47,14 +47,16 @@ const device_type RAINBOW_VIDEO = &device_creator<rainbow_video_device>;
 
 vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_video_interface(mconfig, *this)
+						device_video_interface(mconfig, *this),
+						m_palette(*this, "palette")
 {
 }
 
 
 vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, VT100_VIDEO, "VT100 Video", tag, owner, clock, "vt100_video", __FILE__),
-						device_video_interface(mconfig, *this)
+						device_video_interface(mconfig, *this),
+						m_palette(*this, "palette")
 {
 }
 
@@ -809,4 +811,32 @@ int rainbow_video_device::MHFU(int ASK)
 TIMER_CALLBACK_MEMBER( vt100_video_device::lba7_change )
 {
 	m_lba7 = (m_lba7) ? 0 : 1;
+}
+
+static MACHINE_CONFIG_FRAGMENT( vt100_video )
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor vt100_video_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( vt100_video );
+}
+
+static MACHINE_CONFIG_FRAGMENT( rainbow_video )
+	MCFG_PALETTE_ADD("palette", 4)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor rainbow_video_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( rainbow_video );
 }

@@ -132,7 +132,6 @@ public:
 	DECLARE_READ8_MEMBER( sid_potx_r );
 	DECLARE_READ8_MEMBER( sid_poty_r );
 	DECLARE_MACHINE_START(c65);
-	DECLARE_PALETTE_INIT(c65);
 	UINT32 screen_update_c65(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vic3_raster_irq);
 	INTERRUPT_GEN_MEMBER(c65_frame_interrupt);

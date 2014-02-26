@@ -144,7 +144,8 @@ const device_type VIC3 = &device_creator<vic3_device>;
 
 vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 			: device_t(mconfig, VIC3, "4567 VIC III", tag, owner, clock, "vic3", __FILE__),
-				device_video_interface(mconfig, *this)
+				device_video_interface(mconfig, *this),
+				m_palette(*this, "palette")
 {
 }
 
@@ -2056,4 +2057,19 @@ UINT32 vic3_device::video_update( bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
+}
+
+
+static MACHINE_CONFIG_FRAGMENT( vic3 )
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor vic3_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( vic3 );
 }

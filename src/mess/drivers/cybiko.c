@@ -281,22 +281,6 @@ static INPUT_PORTS_START( cybikoxt )
 INPUT_PORTS_END
 
 ////////////////////
-// PALETTE INIT   //
-////////////////////
-
-PALETTE_INIT_MEMBER(cybiko_state, cybiko)
-{
-	// init palette
-	for (int i = 0; i < 4; i++)
-	{
-		palette.set_pen_color(i, rgb_t::white);
-#ifndef HD66421_BRIGHTNESS_DOES_NOT_WORK
-		palette.set_pen_contrast(i, 1.0 * i / (4 - 1));
-#endif
-	}
-}
-
-////////////////////
 // MACHINE DRIVER //
 ////////////////////
 
@@ -314,8 +298,6 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 
 	// video
 	MCFG_HD66421_ADD("hd66421")
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(cybiko_state, cybiko)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	// sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")
