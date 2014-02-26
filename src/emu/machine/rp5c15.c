@@ -342,7 +342,7 @@ READ8_MEMBER( rp5c15_device::read )
 		break;
 
 	default:
-		data = m_reg[m_mode & MODE_MASK][offset];
+		data = m_reg[m_mode & MODE_MASK][offset & 0x0f];
 		break;
 	}
 
@@ -358,8 +358,6 @@ READ8_MEMBER( rp5c15_device::read )
 
 WRITE8_MEMBER( rp5c15_device::write )
 {
-	int mode = m_mode & MODE_MASK;
-
 	switch (offset & 0x0f)
 	{
 	case REGISTER_MODE:
@@ -401,6 +399,8 @@ WRITE8_MEMBER( rp5c15_device::write )
 		break;
 
 	default:
+	{
+		int mode = m_mode & MODE_MASK;
 		switch (mode)
 		{
 		case MODE00:
@@ -467,5 +467,6 @@ WRITE8_MEMBER( rp5c15_device::write )
 
 		if (LOG) logerror("RP5C15 '%s' Register %u Write %02x\n", tag(), offset & 0x0f, data);
 		break;
+	}
 	}
 }
