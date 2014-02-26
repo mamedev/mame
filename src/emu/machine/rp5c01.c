@@ -364,7 +364,7 @@ READ8_MEMBER( rp5c01_device::read )
 		{
 		case MODE00:
 		case MODE01:
-			data = m_reg[m_mode & MODE_MASK][offset];
+			data = m_reg[m_mode & MODE_MASK][offset & 0x0f];
 			break;
 
 		case BLOCK10:
