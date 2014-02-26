@@ -1491,7 +1491,7 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mazerbla_state,  irq0_line_hold)
 
 	/* synchronization forced on the fly */
-	MCFG_MB_VCU_ADD("vcu",SOUND_CLOCK/4,vcu_interface)
+	MCFG_MB_VCU_ADD("vcu",SOUND_CLOCK/4,vcu_interface,"palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1528,7 +1528,7 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
     */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mazerbla_state,  irq0_line_hold)
 
-	MCFG_MB_VCU_ADD("vcu",SOUND_CLOCK/4,vcu_interface)
+	MCFG_MB_VCU_ADD("vcu",SOUND_CLOCK/4,vcu_interface,"palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

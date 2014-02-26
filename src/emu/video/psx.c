@@ -360,7 +360,7 @@ int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
 				}
 				p_n_interleave[ n_x ] = p_p_vram[ n_yi ][ n_xi ];
 			}
-			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, m_palette->pens() );
+			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, screen->palette()->pens() );
 		}
 	}
 	return m_debug.b_texture;

@@ -235,8 +235,8 @@ sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const ch
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
+//  static_set_palette_tag: Set the tag of the
+//  palette device
 //-------------------------------------------------
 
 void sega_32x_device::static_set_palette_tag(device_t &device, const char *tag)

@@ -32,6 +32,17 @@ TODO:
 // device type definition
 const device_type MB_VCU = &device_creator<mb_vcu_device>;
 
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void mb_vcu_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<mb_vcu_device &>(device).m_palette.set_tag(tag);
+}
+
+
 static ADDRESS_MAP_START( mb_vcu_vram, AS_0, 8, mb_vcu_device )
 	AM_RANGE(0x00000,0x7ffff) AM_RAM // enough for a 256x256x4 x 2 pages of framebuffer with 4 layers (TODO: doubled for simplicity)
 ADDRESS_MAP_END
@@ -144,7 +155,8 @@ mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, dev
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_vram)),
-		m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_pal_ram))
+		m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_pal_ram)),
+		m_palette(*this)
 {
 }
 

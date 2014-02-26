@@ -38,6 +38,16 @@ void segas24_tile::static_set_gfxdecode_tag(device_t &device, const char *tag)
 	downcast<segas24_tile &>(device).m_gfxdecode.set_tag(tag);
 }
 
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void segas24_tile::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<segas24_tile &>(device).m_palette.set_tag(tag);
+}
+
 
 void segas24_tile::static_set_tile_mask(device_t &device, UINT16 _tile_mask)
 {

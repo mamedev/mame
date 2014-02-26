@@ -106,8 +106,6 @@ private:
 	// timers
 	emu_timer *m_busy_timer;
 	emu_timer *m_blink_timer;
-	//Micko:FIXME
-	palette_device *m_palette;
 };
 
 // device type definition

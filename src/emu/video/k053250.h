@@ -49,8 +49,6 @@ private:
 	static void pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *palette, UINT8 *source,
 									const rectangle &cliprect, int linepos, int scroll, int zoom,
 									UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, bitmap_ind8 &priority, UINT8 pri);
-	//Micko:FIXME
-	palette_device *m_palette;									
 };
 
 extern const device_type K053250;

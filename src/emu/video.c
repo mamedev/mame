@@ -1230,10 +1230,10 @@ void video_manager::record_frame()
 			}
 
 			// write the next frame
-//			const rgb_t *palette = (machine().palette != NULL) ? machine().palette->entry_list_adjusted() : NULL;
-			//png_error error = mng_capture_frame(*m_mngfile, &pnginfo, m_snap_bitmap, m_palette->entries(), palette);
-			//png_free(&pnginfo);
-			//if (error != PNGERR_NONE)
+			const rgb_t *palette = (machine().primary_screen->palette() != NULL) ? machine().primary_screen->palette()->palette()->entry_list_adjusted() : NULL;
+			png_error error = mng_capture_frame(*m_mngfile, &pnginfo, m_snap_bitmap, machine().primary_screen->palette()->entries(), palette);
+			png_free(&pnginfo);
+			if (error != PNGERR_NONE)
 			{
 				g_profiler.stop();
 				return end_recording();
@@ -1246,33 +1246,6 @@ void video_manager::record_frame()
 	}
 	g_profiler.stop();
 }
-
-
-//-------------------------------------------------
-//  video_assert_out_of_range_pixels - assert if
-//  any pixels in the given bitmap contain an
-//  invalid palette index
-//-------------------------------------------------
-
-bool video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bitmap)
-{
-#ifdef MAME_DEBUG
-	// iterate over rows
-	int maxindex = 256;//machine.palette->max_index();
-	for (int y = 0; y < bitmap.height(); y++)
-	{
-		UINT16 *rowbase = &bitmap.pix16(y);
-		for (int x = 0; x < bitmap.width(); x++)
-			if (rowbase[x] > maxindex)
-			{
-				osd_break_into_debugger("Out of range pixel");
-				return true;
-			}
-	}
-#endif
-	return false;
-}
-
 
 //-------------------------------------------------
 //	toggle_throttle

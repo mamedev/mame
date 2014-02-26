@@ -15,6 +15,9 @@
 #define MCFG_S24TILE_DEVICE_GFXDECODE(_gfxtag) \
 	segas24_tile::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 	
+#define MCFG_S24TILE_DEVICE_PALETTE(_palette_tag) \
+	segas24_tile::static_set_palette_tag(*device, "^" _palette_tag);
+	
 class segas24_tile : public device_t
 {
 	friend class segas24_tile_config;
@@ -24,6 +27,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void static_set_tile_mask(device_t &device, UINT16 tile_mask);
 
 	DECLARE_READ16_MEMBER(tile_r);
