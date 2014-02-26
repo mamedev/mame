@@ -288,9 +288,13 @@ void screen_device::device_start()
 	// if we have a palette and it's not started, wait for it
 	if (m_palette != NULL && !m_palette->started())
 		throw device_missing_dependencies();
-		
+
 	// configure bitmap formats and allocate screen bitmaps
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
+
+	if (m_palette == NULL && texformat == TEXFORMAT_PALETTE16)
+		throw emu_fatalerror("Screen does not have palette defined\n");
+	
 	for (int index = 0; index < ARRAY_LENGTH(m_bitmap); index++)
 	{
 		m_bitmap[index].set_format(format(), texformat);
@@ -1410,7 +1414,7 @@ crt_monitor::crt_monitor(void)
 	set_param(m_param);
 	m_horz_pixel = 0;
 	m_vert_pixel = 0;
-	resize(288*11/8 * 3, 288*11/8 * 3 / 4 * 3);
+//	resize(288*11/8 * 3, 288*11/8 * 3 / 4 * 3);
 
 }
 
