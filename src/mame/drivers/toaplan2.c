@@ -338,7 +338,6 @@ Notes:
 To Do / Unknowns:
     - Whoopee/Teki Paki sometimes tests bit 5 of the region jumper port
         just after testing for vblank. Why?
-    - Implement the line position table in all games that have a top text layer, not just batrider.
     - Priority problem on 2nd player side of selection screen in Fixeight bootleg.
     - Fixeight bootleg text in sound check mode does not display properly
         with the CPU set to 10MHz (ok at 16MHz). Possible error in video_count_r routine.
@@ -1078,8 +1077,7 @@ static ADDRESS_MAP_START( truxton2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x200000, 0x20000d) AM_DEVREADWRITE("gp9001vdp0", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_SHARE("txvideoram16")
-	AM_RANGE(0x402000, 0x4021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_SHARE("txvram_offs")
-	AM_RANGE(0x402200, 0x402fff) AM_RAM
+	AM_RANGE(0x402000, 0x402fff) AM_RAM AM_SHARE("txvram_offs")
 	AM_RANGE(0x403000, 0x4031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_SHARE("txscrollram16")
 	AM_RANGE(0x403200, 0x403fff) AM_RAM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM_WRITE(toaplan2_tx_gfxram16_w) AM_SHARE("tx_gfxram16")
@@ -1146,7 +1144,7 @@ static ADDRESS_MAP_START( fixeight_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_SHARE("txvideoram16")
-	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_SHARE("txvram_offs")
+	AM_RANGE(0x502000, 0x5021ff) AM_RAM AM_SHARE("txvram_offs")
 	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_SHARE("txscrollram16")
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(toaplan2_tx_gfxram16_w) AM_SHARE("tx_gfxram16")
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(fixeight_subcpu_ctrl_w)
@@ -1168,8 +1166,6 @@ static ADDRESS_MAP_START( fixeightbl_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_SHARE("txvideoram16")
-	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_SHARE("txvram_offs")
-	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_SHARE("txscrollram16")
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
 	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("maincpu", 0x80000)
 ADDRESS_MAP_END
@@ -1282,8 +1278,7 @@ static ADDRESS_MAP_START( mahoudai_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x401000, 0x4017ff) AM_RAM                         // Unused palette RAM
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_SHARE("txvideoram16")
-	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_SHARE("txvram_offs")
-	AM_RANGE(0x502200, 0x502fff) AM_RAM
+	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_SHARE("txvram_offs")
 	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_SHARE("txscrollram16")
 	AM_RANGE(0x503200, 0x503fff) AM_RAM
 ADDRESS_MAP_END
@@ -1306,8 +1301,7 @@ static ADDRESS_MAP_START( shippumd_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x401000, 0x4017ff) AM_RAM                         // Unused palette RAM
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_SHARE("txvideoram16")
-	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_SHARE("txvram_offs")
-	AM_RANGE(0x502200, 0x502fff) AM_RAM
+	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_SHARE("txvram_offs")
 	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_SHARE("txscrollram16")
 	AM_RANGE(0x503200, 0x503fff) AM_RAM
 ADDRESS_MAP_END
@@ -1328,8 +1322,7 @@ static ADDRESS_MAP_START( bgaregga_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_SHARE("txvideoram16")
-	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_SHARE("txvram_offs")
-	AM_RANGE(0x502200, 0x502fff) AM_RAM
+	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_SHARE("txvram_offs")
 	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_SHARE("txscrollram16")
 	AM_RANGE(0x503200, 0x503fff) AM_RAM
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(bgaregga_soundlatch_w)
@@ -1341,7 +1334,7 @@ static ADDRESS_MAP_START( batrider_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_SHARE("txvideoram16")
 	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x203000, 0x2031ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_SHARE("txvram_offs")
+	AM_RANGE(0x203000, 0x2031ff) AM_RAM AM_SHARE("txvram_offs")
 	AM_RANGE(0x203200, 0x2033ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_SHARE("txscrollram16")
 	AM_RANGE(0x203400, 0x207fff) AM_RAM AM_SHARE("mainram16")
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM
@@ -1371,7 +1364,7 @@ static ADDRESS_MAP_START( bbakraid_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_SHARE("txvideoram16")
 	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x203000, 0x2031ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_SHARE("txvram_offs")
+	AM_RANGE(0x203000, 0x2031ff) AM_RAM AM_SHARE("txvram_offs")
 	AM_RANGE(0x203200, 0x2033ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_SHARE("txscrollram16")
 	AM_RANGE(0x203400, 0x207fff) AM_RAM AM_SHARE("mainram16")
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM
@@ -3608,7 +3601,7 @@ static MACHINE_CONFIG_START( fixeightbl, toaplan2_state )
 	//MCFG_SCREEN_REFRESH_RATE(60)
 	//MCFG_SCREEN_SIZE(432, 262)
 	//MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_truxton2)
+	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_bootleg)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fixeightbl)
@@ -3898,7 +3891,7 @@ static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_27MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono",1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -3965,6 +3958,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bgareggabl, bgaregga )
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgareggabl)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_bootleg)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( batrider, toaplan2_state )
@@ -3991,7 +3987,7 @@ static MACHINE_CONFIG_START( batrider, toaplan2_state )
 	//MCFG_SCREEN_REFRESH_RATE(60)
 	//MCFG_SCREEN_SIZE(432, 262)
 	//MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_batrider)
+	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_truxton2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", batrider)
 	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
@@ -4044,7 +4040,7 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 	//MCFG_SCREEN_REFRESH_RATE(60)
 	//MCFG_SCREEN_SIZE(432, 262)
 	//MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_batrider)
+	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_truxton2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", batrider)
 	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
