@@ -506,22 +506,6 @@ WRITE8_MEMBER( vip_state::sc_w )
     m_exp->sc_w(data);
 }
 
-static COSMAC_INTERFACE( cosmac_intf )
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(vip_state, clear_r),
-	DEVCB_DRIVER_LINE_MEMBER(vip_state, ef1_r),
-	DEVCB_DRIVER_LINE_MEMBER(vip_state, ef2_r),
-	DEVCB_DRIVER_LINE_MEMBER(vip_state, ef3_r),
-	DEVCB_DRIVER_LINE_MEMBER(vip_state, ef4_r),
-	DEVCB_DRIVER_LINE_MEMBER(vip_state, q_w),
-	DEVCB_DRIVER_MEMBER(vip_state, dma_r),
-	DEVCB_DRIVER_MEMBER(vip_state, dma_w),
-	DEVCB_DRIVER_MEMBER(vip_state, sc_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  CDP1861_INTERFACE( vdc_intf )
@@ -742,7 +726,16 @@ static MACHINE_CONFIG_START( vip, vip_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_52128MHz/2)
 	MCFG_CPU_PROGRAM_MAP(vip_mem)
 	MCFG_CPU_IO_MAP(vip_io)
-	MCFG_CPU_CONFIG(cosmac_intf)
+    MCFG_COSMAC_WAIT_CALLBACK(VCC)
+    MCFG_COSMAC_CLEAR_CALLBACK(READLINE(vip_state, clear_r))
+    MCFG_COSMAC_EF1_CALLBACK(READLINE(vip_state, ef1_r))
+    MCFG_COSMAC_EF2_CALLBACK(READLINE(vip_state, ef2_r))
+    MCFG_COSMAC_EF3_CALLBACK(READLINE(vip_state, ef3_r))
+    MCFG_COSMAC_EF4_CALLBACK(READLINE(vip_state, ef4_r))
+    MCFG_COSMAC_Q_CALLBACK(WRITELINE(vip_state, q_w))
+    MCFG_COSMAC_DMAR_CALLBACK(READ8(vip_state, dma_r))
+    MCFG_COSMAC_DMAW_CALLBACK(WRITE8(vip_state, dma_w))
+    MCFG_COSMAC_SC_CALLBACK(WRITE8(vip_state, sc_w))
 
 	// video hardware
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_52128MHz/2)

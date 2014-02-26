@@ -182,7 +182,7 @@ READ8_MEMBER( msm5832_device::data_r )
 		{
 			// TODO reference output
 		}
-		else if(m_address == 0x0d || m_address == 0x0e)  // Otrona Attache CP/M BIOS checks these unused registers to detect it
+		else if (m_address > REGISTER_Y10) // Otrona Attache CP/M BIOS checks these unused registers to detect it
 		{
 			data = 0x0f;
 		}
@@ -206,7 +206,7 @@ WRITE8_MEMBER( msm5832_device::data_w )
 {
 	if (LOG) logerror("MSM5832 '%s' Register Write %01x: %01x\n", tag(), m_address, data & 0x0f);
 
-	if (m_cs && m_write)
+	if (m_cs && m_write && m_address <= REGISTER_Y10)
 	{
 		m_reg[m_address] = data & 0x0f;
 

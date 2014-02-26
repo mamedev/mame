@@ -574,16 +574,6 @@ void memory_entry::report_unfreed()
 					fprintf(stderr, "--- memory leak warning ---\n");
 				total += entry->m_size;
 				fprintf(stderr, "#%06d, nofree %d bytes (%s:%d)\n", (UINT32)entry->m_id, static_cast<UINT32>(entry->m_size), entry->m_file, (int)entry->m_line);
-                char * p = static_cast<char *>(entry->m_base);
-				for (int i = 0; i< entry->m_size; i++)
-				{
-				    char c = p[i];
-				    if (c>=32 && c<127)
-				        fprintf(stderr, "%c", c);
-				    else
-				        fprintf(stderr, ".");
-				}
-				fprintf(stderr,"\n");
 			}
 
 	release_lock();

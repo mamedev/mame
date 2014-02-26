@@ -174,22 +174,6 @@ WRITE8_MEMBER( elf2_state::sc_w )
 	}
 }
 
-static COSMAC_INTERFACE( elf2_config )
-{
-	DEVCB_DRIVER_LINE_MEMBER(elf2_state, wait_r),
-	DEVCB_DRIVER_LINE_MEMBER(elf2_state, clear_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(elf2_state, ef4_r),
-	DEVCB_DRIVER_LINE_MEMBER(elf2_state, q_w),
-	DEVCB_DRIVER_MEMBER(elf2_state, dma_r),
-	DEVCB_DEVICE_MEMBER(CDP1861_TAG, cdp1861_device, dma_w),
-	DEVCB_DRIVER_MEMBER(elf2_state, sc_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* MM74C923 Interface */
 
 WRITE_LINE_MEMBER( elf2_state::da_w )
@@ -285,7 +269,13 @@ static MACHINE_CONFIG_START( elf2, elf2_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(elf2_mem)
 	MCFG_CPU_IO_MAP(elf2_io)
-	MCFG_CPU_CONFIG(elf2_config)
+	MCFG_COSMAC_WAIT_CALLBACK(READLINE(elf2_state, wait_r))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(elf2_state, clear_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(elf2_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(elf2_state, q_w))
+	MCFG_COSMAC_DMAR_CALLBACK(READ8(elf2_state, dma_r))
+	MCFG_COSMAC_DMAW_CALLBACK(DEVWRITE8(CDP1861_TAG, cdp1861_device, dma_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(elf2_state, sc_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_elf2 )

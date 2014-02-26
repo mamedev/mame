@@ -14,22 +14,6 @@ WRITE_LINE_MEMBER( cidelsa_state::q_w )
 	m_cdp1802_q = state;
 }
 
-static COSMAC_INTERFACE( cidelsa_cdp1802_config )
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(cidelsa_state, clear_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(cidelsa_state, q_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* Sound Interface */
 
 WRITE8_MEMBER( draco_state::sound_bankswitch_w )
@@ -464,7 +448,10 @@ static MACHINE_CONFIG_START( destryer, cidelsa_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
 	MCFG_CPU_PROGRAM_MAP(destryer_map)
 	MCFG_CPU_IO_MAP(destryer_io_map)
-	MCFG_CPU_CONFIG(cidelsa_cdp1802_config)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(cidelsa_state, clear_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(cidelsa_state, q_w))
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound and video hardware */
@@ -476,7 +463,10 @@ static MACHINE_CONFIG_START( destryera, cidelsa_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
 	MCFG_CPU_PROGRAM_MAP(destryera_map)
 	MCFG_CPU_IO_MAP(destryer_io_map)
-	MCFG_CPU_CONFIG(cidelsa_cdp1802_config)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(cidelsa_state, clear_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(cidelsa_state, q_w))
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound and video hardware */
@@ -488,7 +478,10 @@ static MACHINE_CONFIG_START( altair, cidelsa_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, ALTAIR_CHR1)
 	MCFG_CPU_PROGRAM_MAP(altair_map)
 	MCFG_CPU_IO_MAP(altair_io_map)
-	MCFG_CPU_CONFIG(cidelsa_cdp1802_config)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(cidelsa_state, clear_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(cidelsa_state, q_w))
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* input/output hardware */
@@ -506,7 +499,10 @@ static MACHINE_CONFIG_START( draco, draco_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, DRACO_CHR1)
 	MCFG_CPU_PROGRAM_MAP(draco_map)
 	MCFG_CPU_IO_MAP(draco_io_map)
-	MCFG_CPU_CONFIG(cidelsa_cdp1802_config)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(cidelsa_state, clear_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(cidelsa_state, q_w))
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_CPU_ADD(COP402N_TAG, COP402, DRACO_SND_CHR1)

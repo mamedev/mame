@@ -769,6 +769,7 @@ void mainboard8_device::device_reset()
 	m_CRUS = true;
 	m_PTGE = false;
 	m_waitcount = 0;
+	m_hexbus_selected = false;
 
 	// Clean mapper
 	for (int i=0; i < 16; i++) m_pas_offset[i] = 0;

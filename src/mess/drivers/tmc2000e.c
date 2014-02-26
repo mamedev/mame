@@ -253,21 +253,6 @@ WRITE8_MEMBER( tmc2000e_state::dma_w )
 	m_cti->dma_w(space, offset, data);
 }
 
-static COSMAC_INTERFACE( tmc2000e_config )
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(tmc2000e_state, clear_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tmc2000e_state, ef2_r),
-	DEVCB_DRIVER_LINE_MEMBER(tmc2000e_state, ef3_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tmc2000e_state, q_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tmc2000e_state, dma_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 /* Machine Initialization */
 
@@ -311,7 +296,12 @@ static MACHINE_CONFIG_START( tmc2000e, tmc2000e_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc2000e_map)
 	MCFG_CPU_IO_MAP(tmc2000e_io_map)
-	MCFG_CPU_CONFIG(tmc2000e_config)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(tmc2000e_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(tmc2000e_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(tmc2000e_state, ef3_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(tmc2000e_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(tmc2000e_state, dma_w))
 
 	// video hardware
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)

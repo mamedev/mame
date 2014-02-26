@@ -586,7 +586,7 @@ endif
 ifneq (,$(findstring undefined,$(SANITIZE)))
 ifneq (,$(findstring clang,$(CC)))
 # TODO: check if linker is clang++
-CCOMFLAGS += -fno-sanitize=alignment
+CCOMFLAGS += -fno-sanitize=alignment -fno-sanitize=function -fno-sanitize=shift -fno-sanitize=null -fno-sanitize=signed-integer-overflow -fno-sanitize=vptr -fno-sanitize=float-cast-overflow -fno-sanitize=integer-divide-by-zero -fno-sanitize=float-divide-by-zero
 endif
 endif
 endif

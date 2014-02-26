@@ -494,22 +494,6 @@ WRITE_LINE_MEMBER( tmc1800_state::q_w )
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
-static COSMAC_INTERFACE( tmc1800_config )
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(tmc1800_state, clear_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tmc1800_state, ef2_r),
-	DEVCB_DRIVER_LINE_MEMBER(tmc1800_state, ef3_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tmc1800_state, q_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(CDP1861_TAG, cdp1861_device, dma_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 // Oscom 1000B
 
 READ_LINE_MEMBER( osc1000b_state::clear_r )
@@ -531,22 +515,6 @@ WRITE_LINE_MEMBER( osc1000b_state::q_w )
 {
 	m_cassette->output(state ? 1.0 : -1.0);
 }
-
-static COSMAC_INTERFACE( osc1000b_config )
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(osc1000b_state, clear_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(osc1000b_state, ef2_r),
-	DEVCB_DRIVER_LINE_MEMBER(osc1000b_state, ef3_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(osc1000b_state, q_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 // Telmac 2000
 
@@ -587,22 +555,6 @@ WRITE8_MEMBER( tmc2000_state::dma_w )
 	m_cti->dma_w(space, offset, data);
 }
 
-static COSMAC_INTERFACE( tmc2000_config )
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(tmc2000_state, clear_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tmc2000_state, ef2_r),
-	DEVCB_DRIVER_LINE_MEMBER(tmc2000_state, ef3_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tmc2000_state, q_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tmc2000_state, dma_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 // OSCOM Nano
 
 READ_LINE_MEMBER( nano_state::clear_r )
@@ -639,22 +591,6 @@ WRITE_LINE_MEMBER( nano_state::q_w )
 	/* tape output */
 	m_cassette->output(state ? 1.0 : -1.0);
 }
-
-static COSMAC_INTERFACE( nano_config )
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(nano_state, clear_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(nano_state, ef2_r),
-	DEVCB_DRIVER_LINE_MEMBER(nano_state, ef3_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(nano_state, q_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(CDP1864_TAG, cdp1864_device, dma_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 /* Machine Initialization */
 
@@ -788,7 +724,12 @@ static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc1800_map)
 	MCFG_CPU_IO_MAP(tmc1800_io_map)
-	MCFG_CPU_CONFIG(tmc1800_config)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(tmc1800_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(tmc1800_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(tmc1800_state, ef3_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(tmc1800_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(DEVWRITE8(CDP1861_TAG, cdp1861_device, dma_w))
 
 	// video hardware
 	MCFG_FRAGMENT_ADD(tmc1800_video)
@@ -814,7 +755,11 @@ static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(osc1000b_map)
 	MCFG_CPU_IO_MAP(osc1000b_io_map)
-	MCFG_CPU_CONFIG(osc1000b_config)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(osc1000b_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(osc1000b_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(osc1000b_state, ef3_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(osc1000b_state, q_w))
 
 	// video hardware
 	MCFG_FRAGMENT_ADD(osc1000b_video)
@@ -840,7 +785,12 @@ static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc2000_map)
 	MCFG_CPU_IO_MAP(tmc2000_io_map)
-	MCFG_CPU_CONFIG(tmc2000_config)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(tmc2000_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(tmc2000_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(tmc2000_state, ef3_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(tmc2000_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(tmc2000_state, dma_w))
 
 	// video hardware
 	MCFG_FRAGMENT_ADD(tmc2000_video)
@@ -860,7 +810,12 @@ static MACHINE_CONFIG_START( nano, nano_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(nano_map)
 	MCFG_CPU_IO_MAP(nano_io_map)
-	MCFG_CPU_CONFIG(nano_config)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(nano_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(nano_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(nano_state, ef3_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(nano_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(DEVWRITE8(CDP1864_TAG, cdp1864_device, dma_w))
 
 	// video hardware
 	MCFG_FRAGMENT_ADD(nano_video)

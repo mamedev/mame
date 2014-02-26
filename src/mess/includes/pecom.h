@@ -50,7 +50,7 @@ public:
 	TIMER_CALLBACK_MEMBER(reset_tick);
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_READ_LINE_MEMBER(ef2_r);
-	DECLARE_WRITE_LINE_MEMBER(pecom64_q_w);
+	DECLARE_WRITE_LINE_MEMBER(q_w);
 	DECLARE_WRITE8_MEMBER( sc_w );
 	DECLARE_WRITE_LINE_MEMBER(pecom_prd_w);
 
@@ -64,9 +64,6 @@ protected:
 	required_ioport m_io_cnt;
 	ioport_port *m_io_ports[26];
 };
-
-/*----------- defined in machine/pecom.c -----------*/
-extern const cosmac_interface pecom64_cdp1802_config;
 
 /* ---------- defined in video/pecom.c ---------- */
 
