@@ -1445,8 +1445,6 @@ static void tgp_scan(running_machine &machine)
 
 VIDEO_START_MEMBER(model1_state,model1)
 {
-	m_paletteram16 = m_generic_paletteram_16;
-
 	m_view = auto_alloc_clear(machine(), struct view);
 
 	m_poly_rom = (UINT32 *)memregion("user1")->base();
