@@ -360,7 +360,21 @@ READ8_MEMBER( rp5c01_device::read )
 		break;
 
 	default:
-		data = m_reg[m_mode & MODE_MASK][offset];
+		switch (m_mode & MODE_MASK)
+		{
+		case MODE00:
+		case MODE01:
+			data = m_reg[m_mode & MODE_MASK][offset];
+			break;
+
+		case BLOCK10:
+			data = m_ram[offset & 0x0f];
+			break;
+
+		case BLOCK11:
+			data = m_ram[offset & 0x0f] >> 4;
+			break;
+		}
 		break;
 	}
 
@@ -376,8 +390,6 @@ READ8_MEMBER( rp5c01_device::read )
 
 WRITE8_MEMBER( rp5c01_device::write )
 {
-	int mode = m_mode & MODE_MASK;
-
 	switch (offset & 0x0f)
 	{
 	case REGISTER_MODE:
@@ -419,11 +431,11 @@ WRITE8_MEMBER( rp5c01_device::write )
 		break;
 
 	default:
-		switch (mode)
+		switch (m_mode & MODE_MASK)
 		{
 		case MODE00:
 		case MODE01:
-			m_reg[mode][offset & 0x0f] = data & REGISTER_WRITE_MASK[mode][offset & 0x0f];
+			m_reg[m_mode & MODE_MASK][offset & 0x0f] = data & REGISTER_WRITE_MASK[m_mode & MODE_MASK][offset & 0x0f];
 
 			set_time(false, read_counter(REGISTER_1_YEAR), read_counter(REGISTER_1_MONTH), read_counter(REGISTER_1_DAY), m_reg[MODE00][REGISTER_DAY_OF_THE_WEEK],
 				read_counter(REGISTER_1_HOUR), read_counter(REGISTER_1_MINUTE), read_counter(REGISTER_1_SECOND));
