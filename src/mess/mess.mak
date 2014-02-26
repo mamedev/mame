@@ -2428,6 +2428,7 @@ $(MESS_DRIVERS)/mpf1.o:     $(MESS_LAYOUT)/mpf1.lh \
 $(MESS_VIDEO)/newbrain.o:   $(MESS_LAYOUT)/newbrain.lh
 $(MAME_DRIVERS)/neogeo.o:   $(MAME_LAYOUT)/neogeo.lh
 $(MESS_DRIVERS)/pc1500.o:   $(MESS_LAYOUT)/pc1500.lh
+$(MESS_DRIVERS)/pc2000.o:   $(MESS_LAYOUT)/gl3000s.lh
 $(MESS_VIDEO)/pc8401a.o:    $(MESS_LAYOUT)/pc8500.lh
 $(MESS_DRIVERS)/pcw.o:      $(MESS_LAYOUT)/pcw.lh
 $(MESS_DRIVERS)/pmi80.o:    $(MESS_LAYOUT)/pmi80.lh
