@@ -416,22 +416,6 @@ WRITE_LINE_MEMBER( studio2_state::q_w )
 	m_beeper->set_state(state);
 }
 
-static COSMAC_INTERFACE( studio2_cosmac_intf )
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(studio2_state, clear_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(studio2_state, ef3_r),
-	DEVCB_DRIVER_LINE_MEMBER(studio2_state, ef4_r),
-	DEVCB_DRIVER_LINE_MEMBER(studio2_state, q_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(CDP1861_TAG, cdp1861_device, dma_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 WRITE8_MEMBER( visicom_state::dma_w )
 {
 	int sx = m_screen->hpos() + 4;
@@ -450,22 +434,6 @@ WRITE8_MEMBER( visicom_state::dma_w )
 	}
 }
 
-static COSMAC_INTERFACE( visicom_cosmac_intf )
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(studio2_state, clear_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(studio2_state, ef3_r),
-	DEVCB_DRIVER_LINE_MEMBER(studio2_state, ef4_r),
-	DEVCB_DRIVER_LINE_MEMBER(studio2_state, q_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(visicom_state, dma_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 WRITE8_MEMBER( mpt02_state::dma_w )
 {
 	UINT8 addr = ((offset & 0xe0) >> 2) | (offset & 0x07);
@@ -475,22 +443,6 @@ WRITE8_MEMBER( mpt02_state::dma_w )
 	m_cti->con_w(0); // HACK
 	m_cti->dma_w(space, offset, data);
 }
-
-static COSMAC_INTERFACE( mpt02_cosmac_intf )
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(studio2_state, clear_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(studio2_state, ef3_r),
-	DEVCB_DRIVER_LINE_MEMBER(studio2_state, ef4_r),
-	DEVCB_DRIVER_LINE_MEMBER(studio2_state, q_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mpt02_state, dma_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 /* Machine Initialization */
 
@@ -578,7 +530,12 @@ static MACHINE_CONFIG_START( studio2, studio2_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, 1760000) /* the real clock is derived from an oscillator circuit */
 	MCFG_CPU_PROGRAM_MAP(studio2_map)
 	MCFG_CPU_IO_MAP(studio2_io_map)
-	MCFG_CPU_CONFIG(studio2_cosmac_intf)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(studio2_state, clear_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(studio2_state, ef3_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(studio2_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(studio2_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(DEVWRITE8(CDP1861_TAG, cdp1861_device, dma_w))
 
 	/* video hardware */
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, 1760000)
@@ -597,7 +554,12 @@ static MACHINE_CONFIG_START( visicom, visicom_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(visicom_map)
 	MCFG_CPU_IO_MAP(visicom_io_map)
-	MCFG_CPU_CONFIG(visicom_cosmac_intf)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(visicom_state, clear_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(visicom_state, ef3_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(visicom_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(visicom_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(visicom_state, dma_w))
 
 	/* video hardware */
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_579545MHz/2)
@@ -624,7 +586,12 @@ static MACHINE_CONFIG_START( mpt02, mpt02_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, CDP1864_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mpt02_map)
 	MCFG_CPU_IO_MAP(mpt02_io_map)
-	MCFG_CPU_CONFIG(mpt02_cosmac_intf)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(mpt02_state, clear_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(mpt02_state, ef3_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(mpt02_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(mpt02_state, q_w))
+	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(mpt02_state, dma_w))
 
 	/* video hardware */
 	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, CDP1864_CLOCK)

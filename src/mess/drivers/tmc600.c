@@ -218,22 +218,6 @@ WRITE_LINE_MEMBER( tmc600_state::q_w )
 	m_cassette->output(state ? +1.0 : -1.0);
 }
 
-static COSMAC_INTERFACE( cosmac_intf )
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(tmc600_state, clear_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tmc600_state, ef2_r),
-	DEVCB_DRIVER_LINE_MEMBER(tmc600_state, ef3_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tmc600_state, q_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* Machine Initialization */
 
 void tmc600_state::machine_start()
@@ -282,7 +266,11 @@ static MACHINE_CONFIG_START( tmc600, tmc600_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, 3579545)  // ???
 	MCFG_CPU_PROGRAM_MAP(tmc600_map)
 	MCFG_CPU_IO_MAP(tmc600_io_map)
-	MCFG_CPU_CONFIG(cosmac_intf)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(tmc600_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(tmc600_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(tmc600_state, ef3_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(tmc600_state, q_w))
 
 	// sound and video hardware
 	MCFG_FRAGMENT_ADD(tmc600_video)

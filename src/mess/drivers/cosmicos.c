@@ -449,23 +449,6 @@ WRITE8_MEMBER( cosmicos_state::sc_w )
 	m_sc1 = sc1;
 }
 
-static COSMAC_INTERFACE( cosmicos_config )
-{
-	DEVCB_DRIVER_LINE_MEMBER(cosmicos_state, wait_r),
-	DEVCB_DRIVER_LINE_MEMBER(cosmicos_state, clear_r),
-	DEVCB_DRIVER_LINE_MEMBER(cosmicos_state, ef1_r),
-	DEVCB_DRIVER_LINE_MEMBER(cosmicos_state, ef2_r),
-	DEVCB_DRIVER_LINE_MEMBER(cosmicos_state, ef3_r),
-	DEVCB_DRIVER_LINE_MEMBER(cosmicos_state, ef4_r),
-	DEVCB_DRIVER_LINE_MEMBER(cosmicos_state, q_w),
-	DEVCB_DRIVER_MEMBER(cosmicos_state, dma_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(cosmicos_state, sc_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 /* Machine Initialization */
 
 void cosmicos_state::machine_start()
@@ -538,7 +521,15 @@ static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(cosmicos_mem)
 	MCFG_CPU_IO_MAP(cosmicos_io)
-	MCFG_CPU_CONFIG(cosmicos_config)
+	MCFG_COSMAC_WAIT_CALLBACK(READLINE(cosmicos_state, wait_r))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(cosmicos_state, clear_r))
+	MCFG_COSMAC_EF1_CALLBACK(READLINE(cosmicos_state, ef1_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(cosmicos_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(cosmicos_state, ef3_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(cosmicos_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(cosmicos_state, q_w))
+	MCFG_COSMAC_DMAR_CALLBACK(READ8(cosmicos_state, dma_r))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(cosmicos_state, sc_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_cosmicos )
