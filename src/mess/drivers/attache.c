@@ -242,9 +242,9 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	// Graphics output (if enabled)
 	if(m_gfx_enabled)
 	{
-		for(y=0;y<bitmap.height()/10;y++)
+		for(y=0;y<(bitmap.height()-1)/10;y++)
 		{
-			for(x=0;x<bitmap.width()/8;x++)
+			for(x=0;x<(bitmap.width()-1)/8;x++)
 			{
 				// graphics pixels use half the clock of text, so 4 graphics pixels per character
 				for(scan=0;scan<10;scan+=2)
@@ -274,9 +274,9 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		bitmap.fill(0);
 
 	// Text output
-	for(y=0;y<bitmap.height()/10;y++)  // lines
+	for(y=0;y<(bitmap.height()-1)/10;y++)  // lines
 	{
-		for(x=0;x<bitmap.width()/8;x++)  // columns
+		for(x=0;x<(bitmap.width()-1)/8;x++)  // columns
 		{
 			UINT8 ch = m_char_ram[(y*128)+x];
 			if(m_attr_ram[(y*128)+x] & 0x10) // double-size
