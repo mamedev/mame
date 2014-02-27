@@ -138,7 +138,7 @@ Dip locations verified with Service Mode.
 
 READ16_MEMBER(crshrace_state::extrarom1_r)
 {
-	UINT8 *rom = memregion("user1")->base();
+	UINT8 *rom = m_user1_region->base();
 
 	offset *= 2;
 
@@ -147,7 +147,7 @@ READ16_MEMBER(crshrace_state::extrarom1_r)
 
 READ16_MEMBER(crshrace_state::extrarom2_r)
 {
-	UINT8 *rom = memregion("user2")->base();
+	UINT8 *rom = m_user2_region->base();
 
 	offset *= 2;
 
@@ -156,7 +156,7 @@ READ16_MEMBER(crshrace_state::extrarom2_r)
 
 WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 0x03);
+	m_bank1->set_entry(data & 0x03);
 }
 
 WRITE16_MEMBER(crshrace_state::sound_command_w)
@@ -433,7 +433,7 @@ static const k053936_interface crshrace_k053936_intf =
 
 void crshrace_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
+	m_bank1->configure_entries(0, 4, m_audiocpu_region->base() + 0x10000, 0x8000);
 
 	save_item(NAME(m_roz_bank));
 	save_item(NAME(m_gfxctrl));

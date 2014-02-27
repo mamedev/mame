@@ -10,6 +10,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram1(*this, "videoram1"),
 		m_videoram2(*this, "videoram2"),
+		m_bank1(*this, "bank1"),
+		m_user1_region(*this, "user1"),
+		m_user2_region(*this, "user2"),
+		m_audiocpu_region(*this, "audiocpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k053936(*this, "k053936"),
 		m_spriteram(*this, "spriteram"),
@@ -21,6 +25,13 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram1;
 	required_shared_ptr<UINT16> m_videoram2;
+	
+	required_memory_bank m_bank1;
+	
+	required_memory_region m_user1_region;
+	required_memory_region m_user2_region;
+	required_memory_region m_audiocpu_region;
+	
 	required_device<z80_device> m_audiocpu;
 	required_device<k053936_device> m_k053936;
 	required_device<buffered_spriteram16_device> m_spriteram;
