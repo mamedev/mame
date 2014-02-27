@@ -656,7 +656,7 @@ static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
 	MCFG_PALETTE_ADD("palette", 256)
 
 
-	MCFG_S3C2410_ADD("s3c2410", 12000000, bballoon_s3c2410_intf)
+	MCFG_S3C2410_ADD("s3c2410", 12000000, bballoon_s3c2410_intf, "palette")
 
 //  MCFG_NAND_ADD("nand", 0xEC, 0x75)
 //  MCFG_DEVICE_CONFIG(bballoon_nand_intf)

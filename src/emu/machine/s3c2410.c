@@ -73,9 +73,20 @@ DEVICE_START( s3c2410 )
 const device_type S3C2410 = &device_creator<s3c2410_device>;
 
 s3c2410_device::s3c2410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, S3C2410, "Samsung S3C2410", tag, owner, clock, "s3c2410", __FILE__)
+		: device_t(mconfig, S3C2410, "Samsung S3C2410", tag, owner, clock, "s3c2410", __FILE__),
+		m_palette(*this)
 {
 	m_token = global_alloc_clear(s3c24xx_t);
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void s3c2410_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<s3c2410_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -94,6 +105,8 @@ void s3c2410_device::device_config_complete()
 
 void s3c2410_device::device_start()
 {
+	s3c24xx_t *s3c24xx = get_token(this);
+	s3c24xx->m_palette = m_palette;
 	DEVICE_START_NAME( s3c2410 )(this);
 }
 

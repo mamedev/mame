@@ -253,7 +253,7 @@ static MACHINE_CONFIG_START( mini2440, mini2440_state )
 	MCFG_SOUND_ADD("dac2", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_S3C2440_ADD("s3c2440", 12000000, mini2440_s3c2440_intf)
+	MCFG_S3C2440_ADD("s3c2440", 12000000, mini2440_s3c2440_intf, "palette")
 
 	MCFG_NAND_ADD("nand", mini2440_nand_intf)
 MACHINE_CONFIG_END

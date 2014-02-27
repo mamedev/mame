@@ -310,7 +310,7 @@ static MACHINE_CONFIG_START( hp49gp, hp49gp_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 
-	MCFG_S3C2410_ADD("s3c2410", 12000000, hp49gp_s3c2410_intf)
+	MCFG_S3C2410_ADD("s3c2410", 12000000, hp49gp_s3c2410_intf, "palette")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( hp49gp )
