@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="lev1" defstate="0">
+		<text string="1" state="1">
+			<color red="0.36" green="0.32" blue="0.34" />
+		</text>
+	</element>
+	<element name="lev2" defstate="0">
+		<text string="2" state="1">
+			<color red="0.36" green="0.32" blue="0.34" />
+		</text>
+	</element>
+	<element name="lev3" defstate="0">
+		<text string="3" state="1">
+			<color red="0.36" green="0.32" blue="0.34" />
+		</text>
+	</element>
+	<element name="lev4" defstate="0">
+		<text string="4" state="1">
+			<color red="0.36" green="0.32" blue="0.34" />
+		</text>
+	</element>
+	<element name="disk" defstate="0">
+		<disk state="1">
+			<color red="0.36" green="0.32" blue="0.34" />
+		</disk>
+	</element>
+	<element name="rect" defstate="0">
+		<rect state="1">
+			<color red="0.36" green="0.32" blue="0.34" />
+		</rect>
+	</element>
+	<element name="digit">
+		<led7seg>
+			<color red="1" green="1" blue="1" />
+		</led7seg>
+	</element>
+
+	<view name="Default Layout">
+		<bezel name="LEV1" element="lev1">
+			<bounds x="36" y="2" width="3" height="4" />
+		</bezel>
+		<bezel name="LEV2" element="lev2">
+			<bounds x="38" y="2" width="3" height="4" />
+		</bezel>
+		<bezel name="LEV3" element="lev3">
+			<bounds x="40" y="2" width="3" height="4" />
+		</bezel>
+		<bezel name="LEV4" element="lev4">
+			<bounds x="42" y="2" width="3" height="4" />
+		</bezel>
+
+		<bezel name="TICK0" element="rect">
+			<bounds x="49" y="2" width="2" height="1" />
+		</bezel>
+		<bezel name="TICK1" element="rect">
+			<bounds x="49" y="3" width="2" height="1" />
+		</bezel>
+		<bezel name="TICK2" element="rect">
+			<bounds x="49" y="4" width="2" height="1" />
+		</bezel>
+		<bezel name="TICK3" element="rect">
+			<bounds x="49" y="5" width="2" height="1" />
+		</bezel>
+		<bezel name="TICK4" element="rect">
+			<bounds x="47" y="5" width="2" height="1" />
+		</bezel>
+		<bezel name="TICK5" element="rect">
+			<bounds x="47" y="4" width="2" height="1" />
+		</bezel>
+		<bezel name="TICK6" element="rect">
+			<bounds x="47" y="3" width="2" height="1" />
+		</bezel>
+		<bezel name="TICK7" element="rect">
+			<bounds x="47" y="2" width="2" height="1" />
+		</bezel>
+
+		<bezel name="TRY1" element="disk">
+			<bounds x="69" y="3" width="3" height="3" />
+		</bezel>
+		<bezel name="TRY2" element="disk">
+			<bounds x="73" y="3" width="3" height="3" />
+		</bezel>
+		<bezel name="TRY3" element="disk">
+			<bounds x="71" y="0" width="3" height="3" />
+		</bezel>
+
+		<bezel name="CASS" element="rect">
+			<bounds x="80" y="2" width="4" height="4" />
+		</bezel>
+
+		<bezel name="TIME0" element="digit">
+			<bounds x="62" y="2" width="3" height="4" />
+		</bezel>
+		<bezel name="TIME1" element="digit">
+			<bounds x="58" y="2" width="3" height="4" />
+		</bezel>
+		<bezel name="TIME2" element="digit">
+			<bounds x="54" y="2" width="3" height="4" />
+		</bezel>
+
+		<bezel name="P10" element="digit">
+			<bounds x="28" y="2" width="3" height="4" />
+		</bezel>
+		<bezel name="P11" element="digit">
+			<bounds x="24" y="2" width="3" height="4" />
+		</bezel>
+		<bezel name="P12" element="digit">
+			<bounds x="20" y="2" width="3" height="4" />
+		</bezel>
+
+		<bezel name="P20" element="digit">
+			<bounds x="116" y="2" width="3" height="4" />
+		</bezel>
+		<bezel name="P21" element="digit">
+			<bounds x="112" y="2" width="3" height="4" />
+		</bezel>
+		<bezel name="P22" element="digit">
+			<bounds x="108" y="2" width="3" height="4" />
+		</bezel>
+
+		<screen index="0">
+			<bounds x="0" y="0" width="120" height="24" />
+		</screen>
+	</view>
+</mamelayout>

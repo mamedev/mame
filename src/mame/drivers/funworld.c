@@ -24,6 +24,8 @@
   * Jolly Card (Italian, blue TAB board, encrypted),  bootleg,            199?.
   * Jolly Card (Italian, encrypted bootleg, set 1),   bootleg,            1990.
   * Jolly Card (Italian, encrypted bootleg, set 2),   bootleg,            1993.
+  * Jolly Card (Italian, different colors, set 1),    bootleg,            1990.
+  * Jolly Card (Italian, different colors, set 2),    bootleg,            1990.
   * Super Joly 2000 - 3x,                             M.P.                1985.
   * Jolly Card (Austrian, Fun World, bootleg),        Inter Games,        1986.
   * Jolly Card (Spanish, blue TAB board, encrypted),  TAB Austria,        1992.
@@ -59,6 +61,7 @@
   * Royal Card (Austrian, set 4),                     TAB Austria,        1991.
   * Royal Card (Austrian, set 5),                     TAB Austria,        1991.
   * Royal Card (Austrian, set 6),                     TAB Austria,        1991.
+  * Royal Card (Austrian, set 7, CMC C1030 HW),       bootleg,            1991.
   * Royal Card (TAB original),                        TAB Austria,        1991.
   * Royal Card (Slovak, encrypted),                   Evona Electronic,   1991.
   * Royal Card Professional 2.0,                      Digital Dreams,     1993.
@@ -957,13 +960,20 @@
   - Derived clocks via #define.
   - Added technical notes.
 
+  [2014/02/26]
+  - Added Jolly Card (Italian, different colors, set 1).
+    This set is running in a modified hardware with a big CPLD.
+  - Added Jolly Card (Italian, different colors, set 2).
+  - Added Royal Card (Austrian, set 7).
+    These are running in bootleg hardware.
+  - Added technical notes.
+
 
   *** TO DO ***
 
   - Figure out the royalcdc, jokercrd, multiwin and powercrd encryption.
   - Figure out the remaining PIA connections for almost all games.
   - Fix Saloon and move it to its own driver.
-  - Fix the imperfect sound in Magic Card II.
   - Reverse-engineering the boot code of Jolly Card Professional 2.0,
      and Royal Card Professional 2.0 to get the proper codes to boot.
   - Analyze the unknown writes to $2000/$4000 in some games.
@@ -3433,6 +3443,64 @@ ROM_START( jolycdic )   /* another bootleg PCB, encrypted graphics */
 ROM_END
 
 
+/* Jolly Card Italian bootleg...
+
+   This PCB has an Altera EP910PC CPLD on board
+
+   to init nvram dsw must be
+   ON OFF OFF OFF OFF OFF OFF
+
+   then service1+service2 and reset,
+   then another reset.
+   
+   Q is remote (x100)
+   W is payout.
+*/
+ROM_START( jolycdid )   /* Altera EP910PC CPLD */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "5.cpu", 0x8000, 0x8000, CRC(56158851) SHA1(abf1daad1198dcc017352742e3c00d57e8955bd4) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "7.bin", 0x0000, 0x8000, CRC(a4452751) SHA1(a0b32a8801ebaee7ede7873b244f1a424433fe94) )
+	ROM_CONTINUE( 0x0000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+	ROM_LOAD( "6.bin", 0x8000, 0x8000, CRC(8b64d4c6) SHA1(8106cba31cd3fbda0855e6070182d248e3d52495) )
+	ROM_CONTINUE( 0x8000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "jolycdid_nvram.bin", 0x0000, 0x0800, CRC(6eb66015) SHA1(39490cf5d404c9e9fb58439f6d9876a3e9b29ba0) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(fc9a8aa3) SHA1(6f0a98bd0c7a64281bb1cce35de11b76978d7123) )
+ROM_END
+
+
+/*  Jolly Card Italian bootleg...
+
+   to init nvram dsw must be
+   OFF ON ON ON ON ON ON ON
+
+   then service1+service2 and reset,
+   then another reset.
+   
+   This set has spam graphics, but seems
+   used by another program.
+ 
+*/
+ROM_START( jolycdie )   /* Bootleg PCB, NON encrypted graphics */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "aic.cpu", 0x8000, 0x8000, CRC(56158851) SHA1(abf1daad1198dcc017352742e3c00d57e8955bd4) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "c.bin", 0x0000, 0x8000, CRC(eff5362c) SHA1(1c9a48866dc5ee37fad6d68465f326d243c821c3) )
+	ROM_LOAD( "b.bin", 0x8000, 0x8000, CRC(98309e14) SHA1(0d3e3766768fafc728a08668ad693f950d1fabab) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "jolycdie_nvram.bin", 0x0000, 0x0800, CRC(1b2fba44) SHA1(be5c956517072581edaebe9ae440a542964c8490) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(fc9a8aa3) SHA1(6f0a98bd0c7a64281bb1cce35de11b76978d7123) )
+ROM_END
+
 ROM_START( sjcd2kx3 )   /* Super Joly 2000 3x */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sj3.bin", 0x8000, 0x8000, CRC(c530b518) SHA1(36934d8e1e2cb2f71eb44a05b86ec970c9f398cd) )
@@ -4582,6 +4650,21 @@ ROM_START( royalcrdf )  /* encrypted program rom */
 	ROM_LOAD( "2-peel18cv8p.bin", 0x0400, 0x0155, NO_DUMP ) /* not present in the set */
 ROM_END
 
+
+ROM_START( royalcrdg )   /* CMC C1030 PCB, EP910EC-30 CPLD, NON encrypted graphics */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3.cpu", 0x8000, 0x8000, CRC(829a6a1d) SHA1(b7064e4d60e33d0875eb73525230ea3b99f10542) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(85e77661) SHA1(7d7a765c1bfcfeb9eb91d2519b22d734f20eab24) )
+	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "royalcrdg_nvram.bin", 0x0000, 0x0800, CRC(853c7da9) SHA1(e275b22a9f470672bfc71425fcc44f547ba38b6d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(a762ee84) SHA1(40883a7c0f4365e2725eb0b29d45467e1b7a1a31) )
+ROM_END
 
 
 ROM_START( royalcrdp )
@@ -6088,6 +6171,8 @@ GAMEL( 1993, jolyccrb,  jollycrd, cuoreuno, jolycdcr,  driver_device,  0,       
 GAMEL( 1985, sjcd2kx3,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0,                       layout_jollycrd )
 GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "Inter Games",     "Jolly Card (Austrian, Fun World, bootleg)",       GAME_NOT_WORKING )
 GAMEL( 1992, jolycdsp,  jollycrd, cuoreuno, jolycdit,  funworld_state, ctunk,    ROT0, "TAB Austria",     "Jolly Card (Spanish, blue TAB board, encrypted)", 0,                       layout_royalcrd )
+GAMEL( 1990, jolycdid,  jollycrd, cuoreuno, jolycdcr,  driver_device,  0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 1)",   0,                       layout_jollycrd )	// italian, CPLD, different colors.
+GAMEL( 1990, jolycdie,  jollycrd, cuoreuno, jolycdib,  driver_device,  0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 2)",   0,                       layout_jollycrd ) // not from TAB blue PCB
 
 // Bonus Card based...
 GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           GAME_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background
@@ -6127,6 +6212,7 @@ GAMEL( 1991, royalcrdd, royalcrd, royalcd1, royalcrd,  driver_device,  0,       
 GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 6)",                    0,                       layout_jollycrd )
 GAMEL( 1991, royalcrdt, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (TAB original)",                       0,                       layout_jollycrd )
 GAME(  1991, royalcrdf, royalcrd, royalcd1, royalcrd,  funworld_state, royalcdc, ROT0, "Evona Electronic","Royal Card (Slovak, encrypted)",                  GAME_NOT_WORKING )
+GAMEL( 1990, royalcrdg, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "bootleg",         "Royal Card (Austrian, set 7, CMC C1030 HW)",      0,                       layout_jollycrd ) // big CPLD
 GAME(  1993, royalcrdp, royalcrd, cuoreuno, royalcrd,  driver_device,  0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    0 )
 GAMEL( 199?, witchryl,  0,        witchryl, witchryl,  driver_device,  0,        ROT0, "Video Klein",     "Witch Royal (Export version 2.1)",                0,                       layout_jollycrd )
 

@@ -372,6 +372,11 @@ READ8_MEMBER( asc_device::read )
 		m_regs[0x2f] = m_incr[3];
 	}
 
+	if (offset > 0x800)
+	{
+		return 0xff;
+	}
+
 	return m_regs[offset-0x800];
 }
 
@@ -582,6 +587,9 @@ WRITE8_MEMBER( asc_device::write )
 				break;
 		}
 
-		m_regs[offset-0x800] = data;
+		if (offset < 0x800)
+		{
+			m_regs[offset-0x800] = data;
+		}
 	}
 }

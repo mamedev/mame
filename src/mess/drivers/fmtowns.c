@@ -22,8 +22,7 @@
     released in 1993
 
 
-    Issues: i386 protected mode is far from complete.
-            Video emulation is far from complete.
+    Issues: Video emulation is far from complete.
 
 */
 
@@ -218,8 +217,10 @@ void towns_state::init_serial_rom(running_machine &machine)
 	// TODO: init serial ROM contents
 	int x;
 	static const UINT8 code[8] = { 0x04,0x65,0x54,0xA4,0x95,0x45,0x35,0x5F };
-	UINT8* srom = m_serial->base();
+	UINT8* srom = NULL;
 
+	if(m_serial)
+		srom = m_serial->base();
 	memset(m_towns_serial_rom,0,256/8);
 
 	if(srom)

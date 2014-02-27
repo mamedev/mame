@@ -1225,7 +1225,7 @@ ROM_START(apple2) /* the classic, non-autoboot apple2 with integer basic in rom.
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD ( "a2.chr", 0x0000, 0x0800, BAD_DUMP CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659)) /* current dump is 341-0036 which is the appleII+ character generator, not the original appleII one, whose rom number is not yet known! */
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD_OPTIONAL ( "341-0016-00.d0", 0x1000, 0x0800, CRC(4234e88a) SHA1(c9a81d704dc2f0c3416c20f9c4ab71fedda937ed)) /* 341-0016: Programmer's Aid #1 D0 */
 
 /* The area $D800-$DFFF in Apple II is reserved for 3rd party add-ons:
@@ -1251,7 +1251,7 @@ ROM_START(apple2p) /* the autoboot apple2+ with applesoft (microsoft-written) ba
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD ( "341-0036.chr", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "341-0011.d0", 0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
 	ROM_LOAD ( "341-0012.d8", 0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
 	ROM_LOAD ( "341-0013.e0", 0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
@@ -1264,7 +1264,7 @@ ROM_START(prav82)
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD ( "pravetz82.chr", 0x0000, 0x0800, BAD_DUMP CRC(8C55C984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594)) // Taken from Agat computer
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "pravetz82.d0", 0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
 	ROM_LOAD ( "pravetz82.d8", 0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
 	ROM_LOAD ( "pravetz82.e0", 0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
@@ -1276,7 +1276,7 @@ ROM_END
 ROM_START(prav8m)
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD ( "pravetz8m.chr", 0x0000, 0x0800, BAD_DUMP CRC(8C55C984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594)) // Taken from Agat computer
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "pravetz8m.d0", 0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
 	ROM_LOAD ( "pravetz8m.d8", 0x1800, 0x0800, CRC(654b6f7b) SHA1(f7b1457b48fe6974c4de7e976df3a8fca6b7b661))
 	ROM_LOAD ( "pravetz8m.e0", 0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
@@ -1323,7 +1323,7 @@ ROM_START(apple2jp)
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD ( "a2jp.chr", 0x0000, 0x0800, CRC(487104b5) SHA1(0a382be58db5215c4a3de53b19a72fab660d5da2))
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "341-0011.d0", 0x1000, 0x0800, BAD_DUMP CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
 	ROM_LOAD ( "341-0012.d8", 0x1800, 0x0800, BAD_DUMP CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
 	ROM_LOAD ( "341-0013.e0", 0x2000, 0x0800, BAD_DUMP CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
@@ -1336,7 +1336,7 @@ ROM_START(ace100)
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD ( "ace100.chr", 0x0000, 0x0800, BAD_DUMP CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659)) // copy of a2.chr - real Ace chr is undumped
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "ace100.rom", 0x1000, 0x3000, CRC(9d5ec94f) SHA1(8f2b3f2561788bebc7a805f620ec9e7ade973460))
 ROM_END
 
@@ -1345,7 +1345,7 @@ ROM_START(apple2e)
 	ROM_LOAD ( "342-0133-a.chr", 0x0000, 0x1000,CRC(b081df66) SHA1(7060de104046736529c1e8a687a0dd7b84f8c51b))
 	ROM_LOAD ( "342-0133-a.chr", 0x1000, 0x1000,CRC(b081df66) SHA1(7060de104046736529c1e8a687a0dd7b84f8c51b))
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "342-0135-b.64", 0x0000, 0x2000, CRC(e248835e) SHA1(523838c19c79f481fa02df56856da1ec3816d16e))
 	ROM_LOAD ( "342-0134-a.64", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54))
 
@@ -1357,7 +1357,7 @@ ROM_START(apple2euk)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "341-0160-a.chr", 0x0000, 0x2000, CRC(9be77112) SHA1(48aafa9a72002c495bc1f3d28150630ff89ca47e) )
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "342-0135-b.64", 0x0000, 0x2000, CRC(e248835e) SHA1(523838c19c79f481fa02df56856da1ec3816d16e))
 	ROM_LOAD ( "342-0134-a.64", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54))
 
@@ -1370,7 +1370,7 @@ ROM_START(mprof3)
 	ROM_LOAD ( "mpf3.chr", 0x0000, 0x1000,CRC(2597bc19) SHA1(e114dcbb512ec24fb457248c1b53cbd78039ed20))
 	ROM_LOAD ( "mpf3.chr", 0x1000, 0x1000,CRC(2597bc19) SHA1(e114dcbb512ec24fb457248c1b53cbd78039ed20))
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "mpf3-cd.rom", 0x0000, 0x2000, CRC(5b662e06) SHA1(aa0db775ca78986480829fcc10f00e57629e1a7c))
 	ROM_LOAD ( "mpf3-ef.rom", 0x2000, 0x2000, CRC(2c5e8b92) SHA1(befeb03e04b7c3ef36ef5829948a53880df85e92))
 
@@ -1383,7 +1383,7 @@ ROM_START(apple2ee)
 	ROM_LOAD ( "342-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 	ROM_LOAD ( "342-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "342-0304-a.e10", 0x0000, 0x2000, CRC(443aa7c4) SHA1(3aecc56a26134df51e65e17f33ae80c1f1ac93e6)) /* PCB: "CD ROM // 342-0304", 2364 mask rom */
 	ROM_LOAD ( "342-0303-a.e8", 0x2000, 0x2000, CRC(95e10034) SHA1(afb09bb96038232dc757d40c0605623cae38088e)) /* PCB: "EF ROM // 342-0303", 2364 mask rom */
 
@@ -1395,7 +1395,7 @@ ROM_START(apple2eeuk)
 	ROM_REGION(0x2000, "gfx1", 0)
 	ROM_LOAD( "342-0273-a.chr", 0x0000, 0x2000, CRC(9157085a) SHA1(85479a509d6c8176949a5b20720567b7022aa631) )
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "342-0304-a.e10", 0x0000, 0x2000, CRC(443aa7c4) SHA1(3aecc56a26134df51e65e17f33ae80c1f1ac93e6)) /* PCB: "CD ROM // 342-0304", 2364 mask rom */
 	ROM_LOAD ( "342-0303-a.e8", 0x2000, 0x2000, CRC(95e10034) SHA1(afb09bb96038232dc757d40c0605623cae38088e)) /* PCB: "EF ROM // 342-0303", 2364 mask rom */
 
@@ -1408,7 +1408,7 @@ ROM_START(apple2ep)
 	ROM_LOAD ( "342-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 	ROM_LOAD ( "342-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ("32-0349-b.128", 0x0000, 0x4000, CRC(1d70b193) SHA1(b8ea90abe135a0031065e01697c4a3a20d51198b)) /* should rom name be 342-0349-b? */
 
 	ROM_REGION( 0x800, "keyboard", 0 )
@@ -1460,7 +1460,7 @@ ROM_START(apple2c0)
 	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
-	ROM_REGION(0x8700,"maincpu",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("3420033a.256", 0x0000, 0x8000, CRC(c8b979b3) SHA1(10767e96cc17bad0970afda3a4146564e6272ba1))
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
@@ -1472,7 +1472,7 @@ ROM_START(apple2c3)
 	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
-	ROM_REGION(0x8700,"maincpu",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("342-0445-a.256", 0x0000, 0x8000, CRC(bc5a79ff) SHA1(5338d9baa7ae202457b6500fde5883dbdc86e5d3))
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
@@ -1484,7 +1484,7 @@ ROM_START(apple2c4)
 	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
-	ROM_REGION(0x8700,"maincpu",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("3410445b.256", 0x0000, 0x8000, CRC(06f53328) SHA1(015061597c4cda7755aeb88b735994ffd2f235ca))
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
@@ -1506,7 +1506,7 @@ ROM_START(laser128)
 	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
 	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
 
-	ROM_REGION(0x8700,"maincpu",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("laser128.256", 0x0000, 0x8000, CRC(39E59ED3) SHA1(CBD2F45C923725BFD57F8548E65CC80B13BC18DA))
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
@@ -1518,7 +1518,7 @@ ROM_START(las128ex)
 	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
 	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
 
-	ROM_REGION(0x8700,"maincpu",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("las128ex.256", 0x0000, 0x8000, CRC(B67C8BA1) SHA1(8BD5F82A501B1CF9D988C7207DA81E514CA254B0))
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
@@ -1544,7 +1544,7 @@ ROM_START(apple2cp)
 	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000,CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
 
-	ROM_REGION(0x8700,"maincpu",0)
+	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD("341-0625-a.256", 0x0000, 0x8000, CRC(0b996420) SHA1(1a27ae26966bbafd825d08ad1a24742d3e33557c))
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
@@ -1556,7 +1556,7 @@ ROM_START(ivelultr)
 	ROM_LOAD( "ultra.chr", 0x0000, 0x1000,CRC(fed62c85) SHA1(479fb3f38a3f7332cef2e8c4856871afe8dc6017))
 	ROM_LOAD( "ultra.chr", 0x1000, 0x1000,CRC(fed62c85) SHA1(479fb3f38a3f7332cef2e8c4856871afe8dc6017))
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD( "ultra1.bin", 0x2000, 0x1000, CRC(8ab49c1c) SHA1(b41da28a40c3a22bc10a954a86716a1a2bae04a4))
 	ROM_CONTINUE(0x1000, 0x1000)
 	ROM_LOAD( "ultra2.bin", 0x3000, 0x1000, CRC(1ac1e17e) SHA1(a5b8adec37da91970c303905b5e2c4d1b715ee4e))
@@ -1569,7 +1569,7 @@ ROM_START(space84)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "space 84 mobo chargen.bin", 0x0000, 0x2000, CRC(ceb98990) SHA1(8b2758da611bcfdd3d144edabc63ef1df2ca787b) )
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD ( "341-0011.d0",  0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
 	ROM_LOAD ( "341-0012.d8",  0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
 	ROM_LOAD ( "341-0013.e0",  0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
@@ -1581,7 +1581,7 @@ ROM_START(am64)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "gm-2716.bin",  0x0000, 0x0800, CRC(863e657f) SHA1(cc954204c503bc545ec0d08862483aaad83805d5) )
 
-	ROM_REGION(0x4700,"maincpu",0)
+	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD( "am64-27128.bin", 0x0000, 0x4000, CRC(f25cdc7b) SHA1(235e72b77695938a9df8781f5bea3cbbbe1f4c76) )
 
 	ROM_REGION(0x2000, "spares", 0)
@@ -1633,7 +1633,7 @@ COMP( 1989, prav8c,   apple2c,  0,        apple2c,     apple2e, driver_device,  
 COMP( 1983, las3000,  apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Video Technology",  "Laser 3000",    GAME_NOT_WORKING )
 COMP( 1987, laser128, apple2c,  0,        laser128,    apple2e, driver_device,  0,        "Video Technology",  "Laser 128 (version 4.2)", GAME_NOT_WORKING )
 COMP( 1988, las128ex, apple2c,  0,        laser128,    apple2e, driver_device,  0,        "Video Technology",  "Laser 128ex (version 4.5)", GAME_NOT_WORKING )
-// TODO: add las128e2
+// TODO: add laser128ex2
 COMP( 1985, apple2c0, apple2c,  0,        apple2c_iwm, apple2e, driver_device,  0,        "Apple Computer",    "Apple //c (UniDisk 3.5)", GAME_SUPPORTS_SAVE )
 COMP( 1986, apple2c3, apple2c,  0,        apple2c_iwm, apple2e, driver_device,  0,        "Apple Computer",    "Apple //c (Original Memory Expansion)", GAME_SUPPORTS_SAVE )
 COMP( 1986, apple2c4, apple2c,  0,        apple2c_iwm, apple2e, driver_device,  0,        "Apple Computer",    "Apple //c (rev 4)", GAME_NOT_WORKING )

@@ -824,7 +824,8 @@ void z80dart_channel::control_write(UINT8 data)
 	LOG(("Z80DART \"%s\" Channel %c : Control Register Write '%02x'\n", m_owner->tag(), 'A' + m_index, data));
 
 	// write data to selected register
-	m_wr[reg] = data;
+	if (reg < 6)
+		m_wr[reg] = data;
 
 	if (reg != 0)
 	{
