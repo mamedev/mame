@@ -477,7 +477,8 @@ static MACHINE_CONFIG_START( timeplt, timeplt_state )
 	MCFG_SCREEN_UPDATE_DRIVER(timeplt_state, screen_update_timeplt)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", timeplt)
-	MCFG_PALETTE_LENGTH(32*4+64*4)
+	MCFG_PALETTE_ADD("palette", 32*4+64*4)
+	MCFG_PALETTE_INIT_OWNER(timeplt_state, timeplt)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(timeplt_sound)

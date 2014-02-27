@@ -108,7 +108,7 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_paletteram_w)
 	g = (g << 1) + ((m_generic_paletteram_8[offset + 0x400] >> 5) & 0x01);
 	b = (b << 1) + ((m_generic_paletteram_8[offset + 0x400] >> 6) & 0x01);
 
-	palette_set_color_rgb(machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	m_palette->set_pen_color(offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 
@@ -227,7 +227,7 @@ void gladiatr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 				int t = tile_offset[ey][ex] + tile_number;
 
-				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 						t,
 						color,
 						xflip, yflip,
@@ -293,6 +293,6 @@ UINT32 gladiatr_state::screen_update_gladiatr(screen_device &screen, bitmap_ind1
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	}
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect );
+		bitmap.fill(m_palette->black_pen(), cliprect );
 	return 0;
 }

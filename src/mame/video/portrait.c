@@ -72,14 +72,11 @@ void portrait_state::video_start()
 
 
 
-void portrait_state::palette_init()
+PALETTE_INIT_MEMBER(portrait_state, portrait)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	UINT8* lookup = memregion("tileattr")->base();
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x40);
 
 /*
     for (i = 0;i < 0x40;i++)
@@ -92,7 +89,7 @@ void portrait_state::palette_init()
         g = (data >> 3) & 0x3;
         b = (data >> 5) & 0x7;
 
-        colortable_palette_set_color(machine().colortable, i, rgb_t(pal3bit(r), pal2bit(g), pal3bit(b)));
+        palette.set_indirect_color(i, rgb_t(pal3bit(r), pal2bit(g), pal3bit(b)));
 
         color_prom++;
     }
@@ -107,10 +104,10 @@ void portrait_state::palette_init()
 		g = (data >> 5) & 0x1f;
 		b = (data >> 10) & 0x1f;
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(pal5bit(r), pal5bit(g), pal5bit(b)));
+		palette.set_indirect_color(i, rgb_t(pal5bit(r), pal5bit(g), pal5bit(b)));
 
 		// ?? the lookup seems to reference 0x3f colours, unless 1 bit is priority or similar?
-		colortable_palette_set_color(machine().colortable, i+0x20, rgb_t(pal5bit(r>>1), pal5bit(g>>1), pal5bit(b>>1)));
+		palette.set_indirect_color(i+0x20, rgb_t(pal5bit(r>>1), pal5bit(g>>1), pal5bit(b>>1)));
 
 		color_prom++;
 	}
@@ -120,7 +117,7 @@ void portrait_state::palette_init()
 	for (i = 0;i < 0x800;i++)
 	{
 		UINT8 ctabentry = lookup[i]&0x3f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -174,7 +171,7 @@ void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		}
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				tilenum,color,
 				0,fy,
 				sx,sy,7);

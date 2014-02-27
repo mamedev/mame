@@ -781,7 +781,7 @@ void pc9801_state::video_start()
 
 UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	/* graphics */
 	m_hgdc2->screen_update(screen, bitmap, cliprect);
@@ -1462,8 +1462,8 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 				pal_entry = (((offset & 4) >> 1) | ((offset & 2) << 1)) >> 1;
 				pal_entry ^= 3;
 
-				palette_set_color_rgb(machine(), (pal_entry)|4|8, pal1bit((data & 0x2) >> 1), pal1bit((data & 4) >> 2), pal1bit((data & 1) >> 0));
-				palette_set_color_rgb(machine(), (pal_entry)|8, pal1bit((data & 0x20) >> 5), pal1bit((data & 0x40) >> 6), pal1bit((data & 0x10) >> 4));
+				m_palette->set_pen_color((pal_entry)|4|8, pal1bit((data & 0x2) >> 1), pal1bit((data & 4) >> 2), pal1bit((data & 1) >> 0));
+				m_palette->set_pen_color((pal_entry)|8, pal1bit((data & 0x20) >> 5), pal1bit((data & 0x40) >> 6), pal1bit((data & 0x10) >> 4));
 				return;
 			}
 			default:
@@ -2213,7 +2213,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_a0_w)
 			case 0x0e: m_analog16.b[m_analog16.pal_entry] = data & 0xf; break;
 		}
 
-		palette_set_color_rgb(machine(), (m_analog16.pal_entry)+0x10,
+		m_palette->set_pen_color((m_analog16.pal_entry)+0x10,
 												pal4bit(m_analog16.r[m_analog16.pal_entry]),
 												pal4bit(m_analog16.g[m_analog16.pal_entry]),
 												pal4bit(m_analog16.b[m_analog16.pal_entry]));
@@ -2598,7 +2598,7 @@ WRITE8_MEMBER(pc9801_state::pc9821_a0_w)
 			case 0x0e: m_analog256.b[m_analog256.pal_entry] = data & 0xff; break;
 		}
 
-		palette_set_color_rgb(machine(), (m_analog256.pal_entry)+0x20,
+		m_palette->set_pen_color((m_analog256.pal_entry)+0x20,
 												m_analog256.r[m_analog256.pal_entry],
 												m_analog256.g[m_analog256.pal_entry],
 												m_analog256.b[m_analog256.pal_entry]);
@@ -3403,9 +3403,9 @@ PALETTE_INIT_MEMBER(pc9801_state,pc9801)
 	int i;
 
 	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
-	for(i=8;i<machine().total_colors();i++)
-		palette_set_color_rgb(machine(), i, pal1bit(0), pal1bit(0), pal1bit(0));
+		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+	for(i=8;i<palette.entries();i++)
+		palette.set_pen_color(i, pal1bit(0), pal1bit(0), pal1bit(0));
 }
 
 IRQ_CALLBACK_MEMBER(pc9801_state::irq_callback)
@@ -3715,8 +3715,8 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_UPD7220_ADD("upd7220_chr", 5000000/2, hgdc_1_intf, upd7220_1_map)
 	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
 
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(pc9801_state,pc9801)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
 	MCFG_GFXDECODE_ADD("gfxdecode", pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3785,8 +3785,8 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_UPD7220_ADD("upd7220_chr", 5000000/2, hgdc_1_intf, upd7220_1_map)
 	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
 
-	MCFG_PALETTE_LENGTH(16+16)
-	MCFG_PALETTE_INIT_OVERRIDE(pc9801_state,pc9801)
+	MCFG_PALETTE_ADD("palette", 16+16)
+	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
 	MCFG_GFXDECODE_ADD("gfxdecode", pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3869,8 +3869,8 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_UPD7220_ADD("upd7220_chr", 5000000/2, hgdc_1_intf, upd7220_1_map)
 	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
 
-	MCFG_PALETTE_LENGTH(16+16+256)
-	MCFG_PALETTE_INIT_OVERRIDE(pc9801_state,pc9801)
+	MCFG_PALETTE_ADD("palette", 16+16+256)
+	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
 	MCFG_GFXDECODE_ADD("gfxdecode", pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

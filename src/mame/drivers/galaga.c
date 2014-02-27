@@ -1696,9 +1696,9 @@ static MACHINE_CONFIG_START( bosco, bosco_state )
 	MCFG_SCREEN_VBLANK_DRIVER(bosco_state, screen_eof_bosco)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bosco)
-	MCFG_PALETTE_LENGTH(64*4+64*4+4+64)
+	MCFG_PALETTE_ADD("palette", 64*4+64*4+4+64)
 
-	MCFG_PALETTE_INIT_OVERRIDE(bosco_state,bosco)
+	MCFG_PALETTE_INIT_OWNER(bosco_state,bosco)
 	MCFG_VIDEO_START_OVERRIDE(bosco_state,bosco)
 
 	/* sound hardware */
@@ -1752,9 +1752,9 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	MCFG_SCREEN_VBLANK_DRIVER(galaga_state, screen_eof_galaga)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", galaga)
-	MCFG_PALETTE_LENGTH(64*4+64*4+64)
+	MCFG_PALETTE_ADD("palette", 64*4+64*4+64)
 
-	MCFG_PALETTE_INIT_OVERRIDE(galaga_state,galaga)
+	MCFG_PALETTE_INIT_OWNER(galaga_state,galaga)
 	MCFG_VIDEO_START_OVERRIDE(galaga_state,galaga)
 
 	/* sound hardware */
@@ -1829,9 +1829,9 @@ static MACHINE_CONFIG_START( xevious, xevious_state )
 	MCFG_SCREEN_UPDATE_DRIVER(xevious_state, screen_update_xevious)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", xevious)
-	MCFG_PALETTE_LENGTH(128*4+64*8+64*2)
+	MCFG_PALETTE_ADD("palette", 128*4+64*8+64*2)
 
-	MCFG_PALETTE_INIT_OVERRIDE(xevious_state,xevious)
+	MCFG_PALETTE_INIT_OWNER(xevious_state,xevious)
 	MCFG_VIDEO_START_OVERRIDE(xevious_state,xevious)
 
 	/* sound hardware */
@@ -1872,7 +1872,8 @@ static MACHINE_CONFIG_DERIVED( battles, xevious )
 	MCFG_MACHINE_RESET_OVERRIDE(xevious_state,battles)
 
 	/* video hardware */
-	MCFG_PALETTE_INIT_OVERRIDE(xevious_state,battles)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(xevious_state,battles)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("discrete")
@@ -1918,9 +1919,9 @@ static MACHINE_CONFIG_START( digdug, digdug_state )
 	MCFG_SCREEN_UPDATE_DRIVER(digdug_state, screen_update_digdug)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", digdug)
-	MCFG_PALETTE_LENGTH(16*2+64*4+64*4)
+	MCFG_PALETTE_ADD("palette", 16*2+64*4+64*4)
 
-	MCFG_PALETTE_INIT_OVERRIDE(digdug_state,digdug)
+	MCFG_PALETTE_INIT_OWNER(digdug_state,digdug)
 	MCFG_VIDEO_START_OVERRIDE(digdug_state,digdug)
 
 	/* sound hardware */

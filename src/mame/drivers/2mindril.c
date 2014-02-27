@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16, _2mindril_state )
 	AM_RANGE(0x430000, 0x43ffff) AM_READWRITE(f3_pivot_r,f3_pivot_w)
 	AM_RANGE(0x460000, 0x46000f) AM_WRITE(f3_control_0_w)
 	AM_RANGE(0x460010, 0x46001f) AM_WRITE(f3_control_1_w)
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x502022, 0x502023) AM_WRITENOP //countinously switches between 0 and 2
 	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8("ymsnd", ym2610_device, read, write, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_READWRITE(drill_irq_r,drill_irq_w)
@@ -463,7 +463,8 @@ static MACHINE_CONFIG_START( drill, _2mindril_state )
 	MCFG_SCREEN_UPDATE_DRIVER(_2mindril_state, screen_update_f3)
 	MCFG_SCREEN_VBLANK_DRIVER(_2mindril_state, screen_eof_f3)
 
-	MCFG_PALETTE_LENGTH(0x2000)
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(_2mindril_state,f3)
 

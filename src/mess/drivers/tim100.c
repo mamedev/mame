@@ -56,7 +56,7 @@ static const rgb_t tim100_palette[3] = {
 
 void tim100_state::machine_reset()
 {
-	palette_set_colors(machine(), 0, tim100_palette, ARRAY_LENGTH(tim100_palette));
+	m_palette->set_pen_colors(0, tim100_palette, ARRAY_LENGTH(tim100_palette));
 }
 
 const gfx_layout tim100_charlayout =
@@ -130,11 +130,11 @@ static MACHINE_CONFIG_START( tim100, tim100_state )
 	MCFG_SCREEN_SIZE(40*16, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*16-1, 0, 16*16-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",  tim100 )
+	MCFG_GFXDECODE_ADD("gfxdecode", tim100 )
 
 	MCFG_I8275_ADD  ( "i8276", tim100_i8276_interface)
 
-	MCFG_PALETTE_LENGTH(3)
+	MCFG_PALETTE_ADD("palette", 3)
 
 	MCFG_DEVICE_ADD("uart_u17", I8251, 0)
 	MCFG_DEVICE_ADD("uart_u18", I8251, 0)

@@ -71,7 +71,7 @@ UINT32 chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		{
 			int tile = ((m_vram[count+1]<<8) | m_vram[count]) & 0xffff;
 
-			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*4,y*8);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x*4,y*8);
 			count+=2;
 		}
 	}
@@ -218,9 +218,9 @@ static MACHINE_CONFIG_START( chsuper, chsuper_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", chsuper)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

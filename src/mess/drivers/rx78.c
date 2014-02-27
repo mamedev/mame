@@ -230,7 +230,7 @@ WRITE8_MEMBER( rx78_state::vdp_reg_w )
 		g = (res & 0x22) == 0x22 ? 0xff : ((res & 0x22) == 0x02 ? 0x7f : 0x00);
 		b = (res & 0x44) == 0x44 ? 0xff : ((res & 0x44) == 0x04 ? 0x7f : 0x00);
 
-		palette_set_color(machine(), i, rgb_t(r,g,b));
+		m_palette->set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 
@@ -242,7 +242,7 @@ WRITE8_MEMBER( rx78_state::vdp_bg_reg_w )
 	g = (data & 0x22) == 0x22 ? 0xff : ((data & 0x22) == 0x02 ? 0x7f : 0x00);
 	b = (data & 0x44) == 0x44 ? 0xff : ((data & 0x44) == 0x04 ? 0x7f : 0x00);
 
-	palette_set_color(machine(), 0x10, rgb_t(r,g,b));
+	m_palette->set_pen_color(0x10, rgb_t(r,g,b));
 }
 
 WRITE8_MEMBER( rx78_state::vdp_pri_mask_w )
@@ -469,7 +469,7 @@ static MACHINE_CONFIG_START( rx78, rx78_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rx78_state, screen_update)
 	MCFG_SCREEN_SIZE(192, 184)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
-	MCFG_PALETTE_LENGTH(16+1) //+1 for the background color
+	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
 	MCFG_GFXDECODE_ADD("gfxdecode", rx78)
 
 	MCFG_CARTSLOT_ADD("cart")

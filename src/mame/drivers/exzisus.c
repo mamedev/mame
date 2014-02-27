@@ -287,9 +287,7 @@ static MACHINE_CONFIG_START( exzisus, exzisus_state )
 	MCFG_SCREEN_UPDATE_DRIVER(exzisus_state, screen_update_exzisus)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", exzisus)
-	MCFG_PALETTE_LENGTH(1024)
-
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 1024)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

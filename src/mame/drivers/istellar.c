@@ -55,7 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_2_ldp_write);
 	DECLARE_DRIVER_INIT(istellar);
 	virtual void machine_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(istellar);
 	UINT32 screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_istellar);
 	required_device<cpu_device> m_maincpu;
@@ -84,7 +84,7 @@ UINT32 istellar_state::screen_update_istellar(screen_device &screen, bitmap_rgb3
 			int tile = m_tile_ram[x+y*32];
 			int attr = m_tile_control_ram[x+y*32];
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,tile,attr & 0x0f,0, 0, x*8, y*8, 0);
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,tile,attr & 0x0f,0, 0, x*8, y*8, 0);
 		}
 	}
 
@@ -271,12 +271,12 @@ static INPUT_PORTS_START( istellar )
 	/* SERVICE might be hanging out back here */
 INPUT_PORTS_END
 
-void istellar_state::palette_init()
+PALETTE_INIT_MEMBER(istellar_state, istellar)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int r,g,b;
 		int bit0,bit1,bit2,bit3;
@@ -304,7 +304,7 @@ void istellar_state::palette_init()
 		bit3 = (color_prom[i+0x200] >> 3) & 0x01;
 		b = (0x8f * bit3) + (0x43 * bit2) + (0x1f * bit1) + (0x0e * bit0);
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -358,7 +358,8 @@ static MACHINE_CONFIG_START( istellar, istellar_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(istellar_state, istellar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", istellar)
 

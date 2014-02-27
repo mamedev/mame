@@ -205,8 +205,8 @@ static MACHINE_CONFIG_START( ssozumo, ssozumo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ssozumo_state, screen_update_ssozumo)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ssozumo)
-	MCFG_PALETTE_LENGTH(64 + 16)
-
+	MCFG_PALETTE_ADD("palette", 64 + 16)
+	MCFG_PALETTE_INIT_OWNER(ssozumo_state, ssozumo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

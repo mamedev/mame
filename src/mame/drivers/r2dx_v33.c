@@ -165,7 +165,7 @@ void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+ax*16,y+ay*16,15);
 					}
@@ -175,7 +175,7 @@ void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+ax*16,y+(dy-ay-1)*16,15);
 					}
@@ -188,7 +188,7 @@ void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+(dx-ax-1)*16,y+ay*16,15);
 					}
@@ -198,7 +198,7 @@ void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+(dx-ax-1)*16,y+(dy-ay-1)*16,15);
 					}
@@ -222,7 +222,7 @@ void r2dx_v33_state::video_start()
 
 UINT32 r2dx_v33_state::screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -434,7 +434,7 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_SHARE("tx_vram")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000 )
@@ -507,7 +507,7 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_SHARE("tx_vram")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000 )
@@ -711,8 +711,8 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update_rdx_v33)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", rdx_v33)
-	MCFG_PALETTE_LENGTH(2048)
-
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -741,8 +741,8 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update_rdx_v33)
 	MCFG_GFXDECODE_ADD("gfxdecode", rdx_v33)
-	MCFG_PALETTE_LENGTH(2048)
-
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 //  SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)

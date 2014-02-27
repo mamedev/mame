@@ -303,7 +303,7 @@ static MACHINE_CONFIG_START( palmz22, palmz22_state )
 	MCFG_CPU_ADD("maincpu", ARM920T, 266000000)
 	MCFG_CPU_PROGRAM_MAP(palmz22_map)
 
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD("palette", 32768)
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -315,7 +315,7 @@ static MACHINE_CONFIG_START( palmz22, palmz22_state )
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
 
 
-	MCFG_S3C2410_ADD("s3c2410", 12000000, palmz22_s3c2410_intf)
+	MCFG_S3C2410_ADD("s3c2410", 12000000, palmz22_s3c2410_intf, "palette")
 
 	MCFG_NAND_ADD("nand", palmz22_nand_intf)
 MACHINE_CONFIG_END

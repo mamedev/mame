@@ -19,6 +19,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
@@ -62,6 +63,7 @@ public:
 
 	tilemap_t      *m_tilemap[2];
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type PC080SN;
@@ -72,5 +74,8 @@ extern const device_type PC080SN;
 
 #define MCFG_PC080SN_GFXDECODE(_gfxtag) \
 	pc080sn_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_PC080SN_PALETTE(_palette_tag) \
+	pc080sn_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

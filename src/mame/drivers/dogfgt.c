@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dogfgt_state )
 	AM_RANGE(0x1830, 0x1830) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1830, 0x1830) AM_WRITE(dogfgt_soundlatch_w)
 	AM_RANGE(0x1840, 0x1840) AM_WRITE(dogfgt_soundcontrol_w)
-	AM_RANGE(0x1870, 0x187f) AM_WRITE(paletteram_BBGGGRRR_byte_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1870, 0x187f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(dogfgt_bitmapram_r, dogfgt_bitmapram_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -254,7 +254,9 @@ static MACHINE_CONFIG_START( dogfgt, dogfgt_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dogfgt_state, screen_update_dogfgt)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dogfgt)
-	MCFG_PALETTE_LENGTH(16+64)
+	MCFG_PALETTE_ADD("palette", 16+64)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	MCFG_PALETTE_INIT_OWNER(dogfgt_state, dogfgt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

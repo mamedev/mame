@@ -76,13 +76,13 @@ void konamid_rom_deinterleave_4(running_machine &machine, const char *mem_region
 }
 
 
-void konami_decode_gfx(running_machine &machine, gfxdecode_device * gfxdecode, int gfx_index, UINT8 *data, UINT32 total, const gfx_layout *layout, int bpp)
+void konami_decode_gfx(running_machine &machine, gfxdecode_device * gfxdecode, palette_device &palette, int gfx_index, UINT8 *data, UINT32 total, const gfx_layout *layout, int bpp)
 {
 	gfx_layout gl;
 
 	memcpy(&gl, layout, sizeof(gl));
 	gl.total = total;
-	gfxdecode->set_gfx(gfx_index, auto_alloc(machine, gfx_element(machine, gl, data, machine.total_colors() >> bpp, 0)));
+	gfxdecode->set_gfx(gfx_index, auto_alloc(machine, gfx_element(machine, gl, data, palette.entries() >> bpp, 0)));
 }
 
 

@@ -623,8 +623,8 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_SCREEN_UPDATE_DRIVER( thomson_state, screen_update_thom )
 	MCFG_SCREEN_VBLANK_DRIVER( thomson_state, thom_vblank )
 
-	MCFG_PALETTE_LENGTH ( 4097 ) /* 12-bit color + transparency */
-	MCFG_PALETTE_INIT_OVERRIDE(thomson_state, thom)
+	MCFG_PALETTE_ADD ( "palette", 4097 ) /* 12-bit color + transparency */
+	MCFG_PALETTE_INIT_OWNER(thomson_state, thom)
 	MCFG_VIDEO_START_OVERRIDE( thomson_state, thom )
 	MCFG_DEFAULT_LAYOUT( layout_thomson )
 

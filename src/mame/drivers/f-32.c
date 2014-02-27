@@ -149,8 +149,7 @@ static MACHINE_CONFIG_START( mosaicf2, mosaicf2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(mosaicf2_state, screen_update_mosaicf2)
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRRR_GGGGG_BBBBB)
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

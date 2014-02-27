@@ -76,8 +76,7 @@ static MACHINE_CONFIG_START( gamepock, gamepock_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_PALETTE_LENGTH( 2 )
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

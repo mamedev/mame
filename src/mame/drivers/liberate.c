@@ -839,8 +839,8 @@ static MACHINE_CONFIG_START( liberate, liberate_state )
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_liberate)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", liberate)
-	MCFG_PALETTE_LENGTH(33)
-	MCFG_PALETTE_INIT_OVERRIDE(liberate_state,liberate)
+	MCFG_PALETTE_ADD("palette", 33)
+	MCFG_PALETTE_INIT_OWNER(liberate_state,liberate)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,liberate)
 
@@ -918,7 +918,7 @@ static MACHINE_CONFIG_START( prosport, liberate_state )
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosport)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", prosport)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosport)
 

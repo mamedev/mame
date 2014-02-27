@@ -181,14 +181,14 @@ public:
 	DECLARE_DRIVER_INIT(galsnew);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(expro02);
 	UINT32 screen_update_galsnew(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(expro02_scanline);
 	required_device<cpu_device> m_maincpu;
 };
 
 
-void expro02_state::palette_init()
+PALETTE_INIT_MEMBER(expro02_state, expro02)
 {
 	int i;
 
@@ -196,7 +196,7 @@ void expro02_state::palette_init()
 
 	/* initialize 555 RGB lookup */
 	for (i = 0; i < 32768; i++)
-		palette_set_color_rgb(machine(),2048 + i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+		palette.set_pen_color(2048 + i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
 UINT32 expro02_state::screen_update_galsnew(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -418,7 +418,7 @@ WRITE16_MEMBER(expro02_state::galsnew_6295_bankswitch_w)
 WRITE16_MEMBER(expro02_state::galsnew_paletteram_w)
 {
 	data = COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	palette_set_color_rgb(machine(),offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
+	m_palette->set_pen_color(offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 
@@ -560,7 +560,8 @@ static MACHINE_CONFIG_START( galsnew, expro02_state )
 	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_galsnew)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 1x4bit_1x4bit)
-	MCFG_PALETTE_LENGTH(2048 + 32768)
+	MCFG_PALETTE_ADD("palette", 2048 + 32768)
+	MCFG_PALETTE_INIT_OWNER(expro02_state, expro02)
 
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);

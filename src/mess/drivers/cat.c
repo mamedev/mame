@@ -1126,8 +1126,7 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 672-1, 0, 344-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cat_state, screen_update_cat)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
@@ -1463,8 +1462,7 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 242-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cat_state, screen_update_swyft)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,swyft)
 

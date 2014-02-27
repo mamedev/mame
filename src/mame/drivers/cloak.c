@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( cloak, cloak_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cloak_state, screen_update_cloak)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cloak)
-	MCFG_PALETTE_LENGTH(64)
+	MCFG_PALETTE_ADD("palette", 64)
 
 
 	/* sound hardware */

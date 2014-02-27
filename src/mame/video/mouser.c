@@ -16,12 +16,12 @@
 #include "emu.h"
 #include "includes/mouser.h"
 
-void mouser_state::palette_init()
+PALETTE_INIT_MEMBER(mouser_state, mouser)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -40,7 +40,7 @@ void mouser_state::palette_init()
 		bit1 = BIT(*color_prom, 7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 		color_prom++;
 	}
 }
@@ -90,7 +90,7 @@ UINT32 mouser_state::screen_update_mouser(screen_device &screen, bitmap_ind16 &b
 		/* Note: this is _not_ dependant on flipping */
 		color_offs = offs % 32 + ((256 + 8 * (offs / 32) - spriteram[offs % 32] )% 256) / 8 * 32;
 
-		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,
 				m_videoram[offs] | (m_colorram[color_offs] >> 5) * 256 | ((m_colorram[color_offs] >> 4) & 1) * 512,
 				m_colorram[color_offs]%16,
 				flip_screen_x(),flip_screen_y(),
@@ -121,7 +121,7 @@ UINT32 mouser_state::screen_update_mouser(screen_device &screen, bitmap_ind16 &b
 		}
 
 		if (BIT(spriteram[offs + 1], 4))
-			m_gfxdecode->gfx(1+((spriteram[offs+1]&0x20)>>5))->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1+((spriteram[offs+1]&0x20)>>5))->transpen(m_palette,bitmap,cliprect,
 					spriteram[offs]&0x3f,
 					spriteram[offs+1]%16,
 					flipx,flipy,
@@ -150,7 +150,7 @@ UINT32 mouser_state::screen_update_mouser(screen_device &screen, bitmap_ind16 &b
 		}
 
 		if (BIT(spriteram[offs + 1], 4))
-			m_gfxdecode->gfx(1+((spriteram[offs+1]&0x20)>>5))->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1+((spriteram[offs+1]&0x20)>>5))->transpen(m_palette,bitmap,cliprect,
 					spriteram[offs]&0x3f,
 					spriteram[offs+1]%16,
 					flipx,flipy,

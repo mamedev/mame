@@ -50,7 +50,7 @@ WRITE16_MEMBER(lordgun_state::lordgun_paletteram_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	for (int pri = 0; pri < 8; pri++)
-		palette_set_color_rgb(machine(), offset+0x800*pri, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
+		m_palette->set_pen_color(offset+0x800*pri, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
 }
 
 
@@ -273,7 +273,7 @@ void lordgun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		{
 			for (x = x0; x != x1; x += dx)
 			{
-				m_gfxdecode->gfx(4)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(4)->transpen(m_palette,bitmap,cliprect,
 									code, color + pri * 0x800/0x40,
 									flipx, flipy,
 									sx + x * 0x10, sy + y * 0x10,
@@ -332,7 +332,7 @@ UINT32 lordgun_state::screen_update_lordgun(screen_device &screen, bitmap_ind16 
 
 	if (m_whitescreen)
 	{
-		bitmap.fill(get_white_pen(machine()), cliprect);
+		bitmap.fill(m_palette->white_pen(), cliprect);
 		return 0;
 	}
 

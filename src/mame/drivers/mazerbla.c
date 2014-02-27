@@ -221,7 +221,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(mazerbla);
 	UINT32 screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
@@ -251,7 +251,7 @@ public:
 
 ***************************************************************************/
 
-void mazerbla_state::palette_init()
+PALETTE_INIT_MEMBER(mazerbla_state, mazerbla)
 {
 	static const int resistances_r[2]  = { 4700, 2200 };
 	static const int resistances_gb[3] = { 10000, 4700, 2200 };
@@ -328,7 +328,7 @@ WRITE8_MEMBER(mazerbla_state::cfb_backgnd_color_w)
 		bit0 = BIT(data, 0);
 		b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
 
-		palette_set_color(machine(), 255, rgb_t(r, g, b));
+		m_palette->set_pen_color(255, rgb_t(r, g, b));
 		//logerror("background color (port 01) write=%02x\n",data);
 	}
 }
@@ -674,7 +674,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 						b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
 
 						if ((x + y * 16) < 255)//keep color 255 free for use as background color
-							palette_set_color(machine(), x + y * 16, rgb_t(r, g, b));
+							m_palette->set_pen_color(x + y * 16, rgb_t(r, g, b));
 
 						m_lookup_ram[lookup_offs + x + y * 16] = colour;
 					}
@@ -1491,7 +1491,7 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mazerbla_state,  irq0_line_hold)
 
 	/* synchronization forced on the fly */
-	MCFG_MB_VCU_ADD("vcu",SOUND_CLOCK/4,vcu_interface)
+	MCFG_MB_VCU_ADD("vcu",SOUND_CLOCK/4,vcu_interface,"palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1501,9 +1501,9 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mazerbla_state, screen_update_mazerbla)
 
-	MCFG_PALETTE_LENGTH(256+1)
-
-
+	MCFG_PALETTE_ADD("palette", 256+1)
+	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)
+	
 	/* sound hardware */
 MACHINE_CONFIG_END
 
@@ -1528,7 +1528,7 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
     */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mazerbla_state,  irq0_line_hold)
 
-	MCFG_MB_VCU_ADD("vcu",SOUND_CLOCK/4,vcu_interface)
+	MCFG_MB_VCU_ADD("vcu",SOUND_CLOCK/4,vcu_interface,"palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1539,8 +1539,8 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mazerbla_state, screen_update_mazerbla)
 	MCFG_SCREEN_VBLANK_DRIVER(mazerbla_state, screen_eof)
 
-	MCFG_PALETTE_LENGTH(256+1)
-
+	MCFG_PALETTE_ADD("palette", 256+1)
+	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

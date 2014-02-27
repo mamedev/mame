@@ -134,7 +134,7 @@ void gp32_state::s3c240x_lcd_render_01( )
 		UINT32 data = s3c240x_lcd_dma_read();
 		for (j = 0; j < 32; j++)
 		{
-			*scanline++ = palette_get_color( machine(), (data >> 31) & 0x01);
+			*scanline++ = m_palette->pen_color((data >> 31) & 0x01);
 			data = data << 1;
 			m_s3c240x_lcd.hpos++;
 			if (m_s3c240x_lcd.hpos >= (m_s3c240x_lcd.pagewidth_max << 4))
@@ -157,7 +157,7 @@ void gp32_state::s3c240x_lcd_render_02( )
 		UINT32 data = s3c240x_lcd_dma_read();
 		for (j = 0; j < 16; j++)
 		{
-			*scanline++ = palette_get_color( machine(), (data >> 30) & 0x03);
+			*scanline++ = m_palette->pen_color((data >> 30) & 0x03);
 			data = data << 2;
 			m_s3c240x_lcd.hpos++;
 			if (m_s3c240x_lcd.hpos >= (m_s3c240x_lcd.pagewidth_max << 3))
@@ -180,7 +180,7 @@ void gp32_state::s3c240x_lcd_render_04( )
 		UINT32 data = s3c240x_lcd_dma_read( );
 		for (j = 0; j < 8; j++)
 		{
-			*scanline++ = palette_get_color( machine(), (data >> 28) & 0x0F);
+			*scanline++ = m_palette->pen_color((data >> 28) & 0x0F);
 			data = data << 4;
 			m_s3c240x_lcd.hpos++;
 			if (m_s3c240x_lcd.hpos >= (m_s3c240x_lcd.pagewidth_max << 2))
@@ -203,7 +203,7 @@ void gp32_state::s3c240x_lcd_render_08( )
 		UINT32 data = s3c240x_lcd_dma_read();
 		for (j = 0; j < 4; j++)
 		{
-			*scanline++ = palette_get_color( machine(), (data >> 24) & 0xFF);
+			*scanline++ = m_palette->pen_color((data >> 24) & 0xFF);
 			data = data << 8;
 			m_s3c240x_lcd.hpos++;
 			if (m_s3c240x_lcd.hpos >= (m_s3c240x_lcd.pagewidth_max << 1))
@@ -387,7 +387,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_lcd_palette_w)
 	{
 		verboselog( machine(), 0, "s3c240x_lcd_palette_w: unknown mask %08x\n", mem_mask);
 	}
-	palette_set_color( machine(), offset, s3c240x_get_color_5551( data & 0xFFFF));
+	m_palette->set_pen_color( offset, s3c240x_get_color_5551( data & 0xFFFF));
 }
 
 // CLOCK & POWER MANAGEMENT
@@ -1678,7 +1678,7 @@ static MACHINE_CONFIG_START( gp32, gp32_state )
 	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
 	MCFG_CPU_PROGRAM_MAP(gp32_map)
 
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD("palette", 32768)
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

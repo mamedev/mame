@@ -460,8 +460,8 @@ static MACHINE_CONFIG_START( skykid, skykid_state )
 	MCFG_SCREEN_UPDATE_DRIVER(skykid_state, screen_update_skykid)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", skykid)
-	MCFG_PALETTE_LENGTH(64*4+128*4+64*8)
-
+	MCFG_PALETTE_ADD("palette", 64*4+128*4+64*8)
+	MCFG_PALETTE_INIT_OWNER(skykid_state, skykid)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

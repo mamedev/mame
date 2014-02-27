@@ -1027,9 +1027,9 @@ static MACHINE_CONFIG_DERIVED( panic, cosmic )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", panic)
-	MCFG_PALETTE_LENGTH(16+8*4)
+	MCFG_PALETTE_ADD("palette", 16+8*4)
 
-	MCFG_PALETTE_INIT_OVERRIDE(cosmic_state,panic)
+	MCFG_PALETTE_INIT_OWNER(cosmic_state,panic)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_panic)
 
@@ -1052,9 +1052,9 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", cosmica)
-	MCFG_PALETTE_LENGTH(8+16*4)
+	MCFG_PALETTE_ADD("palette", 8+16*4)
 
-	MCFG_PALETTE_INIT_OVERRIDE(cosmic_state,cosmica)
+	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmica)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_cosmica)
 
@@ -1097,9 +1097,9 @@ static MACHINE_CONFIG_START( cosmicg, cosmic_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_cosmicg)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_PALETTE_INIT_OVERRIDE(cosmic_state,cosmicg)
+	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmicg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1120,9 +1120,9 @@ static MACHINE_CONFIG_DERIVED( magspot, cosmic )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", panic)
-	MCFG_PALETTE_LENGTH(16+8*4)
+	MCFG_PALETTE_ADD("palette", 16+8*4)
 
-	MCFG_PALETTE_INIT_OVERRIDE(cosmic_state,magspot)
+	MCFG_PALETTE_INIT_OWNER(cosmic_state,magspot)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_magspot)
 
@@ -1152,9 +1152,9 @@ static MACHINE_CONFIG_DERIVED( nomnlnd, cosmic )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", panic)
-	MCFG_PALETTE_LENGTH(16+8*4)
+	MCFG_PALETTE_ADD("palette", 16+8*4)
 
-	MCFG_PALETTE_INIT_OVERRIDE(cosmic_state,nomnlnd)
+	MCFG_PALETTE_INIT_OWNER(cosmic_state,nomnlnd)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_nomnlnd)
 

@@ -513,8 +513,8 @@ static MACHINE_CONFIG_START( lockon, lockon_state )
 	MCFG_SCREEN_VBLANK_DRIVER(lockon_state, screen_eof_lockon)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", lockon)
-	MCFG_PALETTE_LENGTH(1024 + 2048)
-
+	MCFG_PALETTE_ADD("palette", 1024 + 2048)
+	MCFG_PALETTE_INIT_OWNER(lockon_state, lockon)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -92,7 +92,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(compucolor2);
 	
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -442,7 +442,7 @@ void compucolor2_state::machine_reset()
 	m_rs232->write_dtr(1);
 }
 
-void compucolor2_state::palette_init()
+PALETTE_INIT_MEMBER(compucolor2_state, compucolor2)
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -456,6 +456,9 @@ static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 	MCFG_CPU_PROGRAM_MAP(compucolor2_mem)
 	MCFG_CPU_IO_MAP(compucolor2_io)
 
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(compucolor2_state, compucolor2)
+	
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

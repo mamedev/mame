@@ -252,7 +252,8 @@ static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pitnrun_state, screen_update_pitnrun)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pitnrun)
-	MCFG_PALETTE_LENGTH(32*3)
+	MCFG_PALETTE_ADD("palette", 32*3)
+	MCFG_PALETTE_INIT_OWNER(pitnrun_state, pitnrun)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

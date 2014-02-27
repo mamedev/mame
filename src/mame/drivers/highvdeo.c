@@ -172,12 +172,12 @@ UINT32 highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb3
 			color = ((m_blit_ram[count]) & 0x00ff)>>0;
 
 			if(cliprect.contains((x*2)+0, y))
-				bitmap.pix32(y, (x*2)+0) = machine().pens[color];
+				bitmap.pix32(y, (x*2)+0) = m_palette->pen(color);
 
 			color = ((m_blit_ram[count]) & 0xff00)>>8;
 
 			if(cliprect.contains((x*2)+1, y))
-				bitmap.pix32(y, (x*2)+1) = machine().pens[color];
+				bitmap.pix32(y, (x*2)+1) = m_palette->pen(color);
 
 			count++;
 		}
@@ -257,7 +257,7 @@ WRITE16_MEMBER(highvdeo_state::tv_vcf_paletteram_w)
 					break;
 				case 2:
 					m_pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(machine(), m_pal.offs, rgb_t(m_pal.r, m_pal.g, m_pal.b));
+					m_palette->set_pen_color(m_pal.offs, rgb_t(m_pal.r, m_pal.g, m_pal.b));
 					m_pal.offs_internal = 0;
 					m_pal.offs++;
 					break;
@@ -441,7 +441,7 @@ WRITE16_MEMBER(highvdeo_state::tv_tcf_paletteram_w)
 	g = (color >> 3) & 0xf8;
 	b = (color << 3) & 0xf8;
 
-	palette_set_color_rgb(machine(), offset, r, g, b);
+	m_palette->set_pen_color(offset, r, g, b);
 }
 
 WRITE16_MEMBER(highvdeo_state::tv_tcf_bankselect_w)
@@ -1086,7 +1086,7 @@ static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(highvdeo_state, screen_update_tourvisn)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(highvdeo_state,tourvisn)
 
@@ -1160,7 +1160,7 @@ static MACHINE_CONFIG_START( brasil, highvdeo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
 	MCFG_SCREEN_UPDATE_DRIVER(highvdeo_state, screen_update_brasil)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(highvdeo_state,tourvisn)
 

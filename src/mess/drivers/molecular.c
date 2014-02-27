@@ -88,6 +88,8 @@ public:
 
 	UINT8 app_ram_enable;
 	UINT8 file_ram_enable;
+	
+	DECLARE_PALETTE_INIT(molecula);
 
 protected:
 	// driver_device overrides
@@ -95,7 +97,6 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 void molecula_state::video_start()
@@ -277,7 +278,7 @@ void molecula_state::machine_reset()
 }
 
 
-void molecula_state::palette_init()
+PALETTE_INIT_MEMBER(molecula_state, molecula)
 {
 }
 
@@ -308,7 +309,8 @@ static MACHINE_CONFIG_START( molecula, molecula_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", molecula)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(molecula_state, molecula)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

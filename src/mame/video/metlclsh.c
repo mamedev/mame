@@ -201,15 +201,15 @@ void metlclsh_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		{
 			if (sizey)
 			{
-				gfx->transpen(bitmap,cliprect, code & ~1, color, flipx,flipy,
+				gfx->transpen(m_palette,bitmap,cliprect, code & ~1, color, flipx,flipy,
 						sx, sy + (flipy ? 0 : -16) + wrapy,0);
 
-				gfx->transpen(bitmap,cliprect, code |  1, color, flipx,flipy,
+				gfx->transpen(m_palette,bitmap,cliprect, code |  1, color, flipx,flipy,
 						sx,sy + (flipy ? -16 : 0) + wrapy,0);
 			}
 			else
 			{
-				gfx->transpen(bitmap,cliprect, code, color, flipx,flipy,
+				gfx->transpen(m_palette,bitmap,cliprect, code, color, flipx,flipy,
 						sx,sy + wrapy,0);
 			}
 		}

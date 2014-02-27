@@ -93,7 +93,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(dacholer);
 	UINT32 screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -151,7 +151,7 @@ void dacholer_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 				code,
 				0,
 				flipx,flipy,
@@ -607,7 +607,7 @@ void dacholer_state::machine_reset()
 }
 
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-void dacholer_state::palette_init()
+PALETTE_INIT_MEMBER(dacholer_state, dacholer)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -621,7 +621,7 @@ void dacholer_state::palette_init()
 			2, resistances_b,  weights_b,  0, 0,
 			0, 0, 0, 0, 0);
 
-	for (i = 0;i < machine().total_colors(); i++)
+	for (i = 0;i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -643,7 +643,7 @@ void dacholer_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -670,7 +670,8 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(dacholer_state, screen_update_dacholer)
 
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(dacholer_state, dacholer)
 	MCFG_GFXDECODE_ADD("gfxdecode", dacholer)
 
 

@@ -65,7 +65,7 @@ UINT32 calomega_state::screen_update_calomega(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void calomega_state::palette_init()
+PALETTE_INIT_MEMBER(calomega_state, calomega)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 /*  prom bits
@@ -80,7 +80,7 @@ void calomega_state::palette_init()
 	/* 00000BGR */
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -97,6 +97,6 @@ void calomega_state::palette_init()
 		b = bit2 * 0xff;
 
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }

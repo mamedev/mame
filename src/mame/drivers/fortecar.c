@@ -346,7 +346,7 @@ public:
 	DECLARE_DRIVER_INIT(fortecar);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(fortecar);
 	UINT32 screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -375,7 +375,7 @@ UINT32 fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind1
 			if(bpp)
 				color&=0x3;
 
-			m_gfxdecode->gfx(bpp)->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
+			m_gfxdecode->gfx(bpp)->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8,y*8);
 			count++;
 
 		}
@@ -384,7 +384,7 @@ UINT32 fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void fortecar_state::palette_init()
+PALETTE_INIT_MEMBER(fortecar_state, fortecar)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 /* Video resistors...
@@ -431,7 +431,7 @@ R = 82 Ohms Pull Down.
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -699,8 +699,8 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_V3021_ADD("rtc")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fortecar)
-	MCFG_PALETTE_LENGTH(0x200)
-
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(fortecar_state, fortecar)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)    /* 1.5 MHz, measured */
 

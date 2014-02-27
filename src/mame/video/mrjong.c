@@ -16,13 +16,10 @@
 
 ***************************************************************************/
 
-void mrjong_state::palette_init()
+PALETTE_INIT_MEMBER(mrjong_state, mrjong)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x10);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x10; i++)
@@ -48,7 +45,7 @@ void mrjong_state::palette_init()
 		bit2 = BIT(color_prom[i], 7);
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -58,7 +55,7 @@ void mrjong_state::palette_init()
 	for (i = 0; i < 0x80; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -133,7 +130,7 @@ void mrjong_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				sprt,
 				color,
 				flipx, flipy,

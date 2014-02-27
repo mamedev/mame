@@ -208,7 +208,8 @@ gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *ta
 		device_memory_interface(mconfig, *this),
 		m_space_config("gp9001vdp", ENDIANNESS_BIG, 16,14, 0, NULL, *ADDRESS_MAP_NAME(gp9001vdp_map)),
 		m_gfxregion(0),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this),
+		m_palette(*this)
 {
 }
 
@@ -815,7 +816,7 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 					else       sx = sx_base + dim_x;
 
 					/*
-					gfx->transpen(bitmap,cliprect,sprite,
+					gfx->transpen(m_palette,bitmap,cliprect,sprite,
 					    color,
 					    flipx,flipy,
 					    sx,sy,0);
@@ -825,7 +826,7 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 
 					{
 						int yy, xx;
-						const pen_t *paldata = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * color];
+						const pen_t *paldata = &m_palette->pen(gfx->colorbase() + gfx->granularity() * color);
 						const UINT8* srcdata = gfx->get_data(sprite);
 						int count = 0;
 						int ystart, yend, yinc;
@@ -976,4 +977,14 @@ void gp9001vdp_device::gp9001_screen_eof(void)
 {
 	/** Shift sprite RAM buffers  ***  Used to fix sprite lag **/
 	if (sp.use_sprite_buffer) memcpy(sp.vram16_buffer,sp.vram16,GP9001_SPRITERAM_SIZE);
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void gp9001vdp_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<gp9001vdp_device &>(device).m_palette.set_tag(tag);
 }

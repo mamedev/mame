@@ -110,7 +110,7 @@ READ8_MEMBER(tankbust_state::debug_output_area_r)
 
 
 
-void tankbust_state::palette_init()
+PALETTE_INIT_MEMBER(tankbust_state, tankbust)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -155,7 +155,7 @@ void tankbust_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		r = 0x55 * bit0 + 0xaa * bit1;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -346,10 +346,10 @@ static MACHINE_CONFIG_START( tankbust, tankbust_state )
 //  MCFG_SCREEN_VISIBLE_AREA  (  0*8, 64*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(tankbust_state, screen_update_tankbust)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",  tankbust )
+	MCFG_GFXDECODE_ADD("gfxdecode", tankbust )
 
-	MCFG_PALETTE_LENGTH( 128 )
-
+	MCFG_PALETTE_ADD( "palette", 128 )
+	MCFG_PALETTE_INIT_OWNER(tankbust_state, tankbust)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

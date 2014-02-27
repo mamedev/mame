@@ -299,8 +299,7 @@ static MACHINE_CONFIG_START( beehive, beehive_state )
 	MCFG_SCREEN_UPDATE_DRIVER(beehive_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -164,7 +164,7 @@ void othunder_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			}
 			else
 			{
-				m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->zoom_transpen(m_palette,bitmap,cliprect,
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
@@ -182,7 +182,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	{
 		sprite_ptr--;
 
-		m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,

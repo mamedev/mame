@@ -18,9 +18,7 @@
 
 WRITE8_MEMBER(amspdwy_state::amspdwy_paletteram_w)
 {
-	data ^= 0xff;
-	paletteram_BBGGGRRR_byte_w(space, offset, data);
-//  paletteram_RRRGGGBB_byte_w(offset, data);
+	m_palette->write(space, offset, UINT8(~data)); 
 }
 
 WRITE8_MEMBER(amspdwy_state::amspdwy_flipscreen_w)
@@ -122,7 +120,7 @@ void amspdwy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 //              code + ((attr & 0x18)<<5),
 				code + ((attr & 0x08)<<5),
 				attr,

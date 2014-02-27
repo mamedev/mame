@@ -236,23 +236,23 @@ void x1_state::x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int 
 
 	if(width && height)
 	{
-		bitmap.pix32(y+0+m_ystart, x+0+m_xstart) = machine.pens[pen];
-		bitmap.pix32(y+0+m_ystart, x+1+m_xstart) = machine.pens[pen];
-		bitmap.pix32(y+1+m_ystart, x+0+m_xstart) = machine.pens[pen];
-		bitmap.pix32(y+1+m_ystart, x+1+m_xstart) = machine.pens[pen];
+		bitmap.pix32(y+0+m_ystart, x+0+m_xstart) = m_palette->pen(pen);
+		bitmap.pix32(y+0+m_ystart, x+1+m_xstart) = m_palette->pen(pen);
+		bitmap.pix32(y+1+m_ystart, x+0+m_xstart) = m_palette->pen(pen);
+		bitmap.pix32(y+1+m_ystart, x+1+m_xstart) = m_palette->pen(pen);
 	}
 	else if(width)
 	{
-		bitmap.pix32(y+m_ystart, x+0+m_xstart) = machine.pens[pen];
-		bitmap.pix32(y+m_ystart, x+1+m_xstart) = machine.pens[pen];
+		bitmap.pix32(y+m_ystart, x+0+m_xstart) = m_palette->pen(pen);
+		bitmap.pix32(y+m_ystart, x+1+m_xstart) = m_palette->pen(pen);
 	}
 	else if(height)
 	{
-		bitmap.pix32(y+0+m_ystart, x+m_xstart) = machine.pens[pen];
-		bitmap.pix32(y+1+m_ystart, x+m_xstart) = machine.pens[pen];
+		bitmap.pix32(y+0+m_ystart, x+m_xstart) = m_palette->pen(pen);
+		bitmap.pix32(y+1+m_ystart, x+m_xstart) = m_palette->pen(pen);
 	}
 	else
-		bitmap.pix32(y+m_ystart, x+m_xstart) = machine.pens[pen];
+		bitmap.pix32(y+m_ystart, x+m_xstart) = m_palette->pen(pen);
 }
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -1204,7 +1204,7 @@ void x1_state::set_current_palette()
 		g = ((m_x_g)>>(addr)) & 1;
 		b = ((m_x_b)>>(addr)) & 1;
 
-		palette_set_color_rgb(machine(), addr|8, pal1bit(r), pal1bit(g), pal1bit(b));
+		m_palette->set_pen_color(addr|8, pal1bit(r), pal1bit(g), pal1bit(b));
 	}
 }
 
@@ -1221,7 +1221,7 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 	g = m_pal_4096[pal_entry+(2<<12)];
 	b = m_pal_4096[pal_entry+(0<<12)];
 
-	palette_set_color_rgb(machine(), pal_entry+16, pal3bit(r), pal3bit(g), pal3bit(b));
+	m_palette->set_pen_color(pal_entry+16, pal3bit(r), pal3bit(g), pal3bit(b));
 }
 
 /* Note: docs claims that reading the palette ports makes the value to change somehow in X1 mode ...
@@ -1402,7 +1402,7 @@ WRITE8_MEMBER( x1_state::x1turbo_txpal_w )
 		g = (data & 0x30) >> 4;
 		b = (data & 0x03) >> 0;
 
-		palette_set_color_rgb(machine(), offset, pal2bit(r), pal2bit(g), pal2bit(b));
+		m_palette->set_pen_color(offset, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
 }
 
@@ -2471,7 +2471,7 @@ MACHINE_RESET_MEMBER(x1_state,x1)
 
 	/* Reinitialize palette here if there's a soft reset for the Turbo PAL stuff*/
 	for(i=0;i<0x10;i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 
 	m_ram_bank = 0;
 //  m_old_vpos = -1;
@@ -2534,7 +2534,7 @@ PALETTE_INIT_MEMBER(x1_state,x1)
 	int i;
 
 	for(i=0;i<(0x10+0x1000);i++)
-		palette_set_color(machine(), i,rgb_t(0x00,0x00,0x00));
+		palette.set_pen_color(i,rgb_t(0x00,0x00,0x00));
 }
 
 static LEGACY_FLOPPY_OPTIONS_START( x1 )
@@ -2584,8 +2584,8 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(x1_state, screen_update_x1)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", (VDP_CLOCK/48), mc6845_intf) //unknown divider
-	MCFG_PALETTE_LENGTH(0x10+0x1000)
-	MCFG_PALETTE_INIT_OVERRIDE(x1_state,x1)
+	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
+	MCFG_PALETTE_INIT_OWNER(x1_state,x1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", x1)
 

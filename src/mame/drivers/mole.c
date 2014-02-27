@@ -75,7 +75,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(mole);
 	UINT32 screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -88,12 +88,12 @@ public:
  *
  *************************************/
 
-void mole_state::palette_init()
+PALETTE_INIT_MEMBER(mole_state, mole)
 {
 	int i;
 
 	for (i = 0; i < 8; i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
+		palette.set_pen_color(i, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
 }
 
 TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
@@ -331,8 +331,8 @@ static MACHINE_CONFIG_START( mole, mole_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mole_state, screen_update_mole)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mole)
-	MCFG_PALETTE_LENGTH(8)
-
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(mole_state, mole)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

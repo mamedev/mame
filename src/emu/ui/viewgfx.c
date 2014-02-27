@@ -152,9 +152,11 @@ static void ui_gfx_exit(running_machine &machine)
 bool ui_gfx_is_relevant(running_machine &machine)
 {
 	gfxdecode_device_iterator gfx_deviter(machine.root_device());
+	palette_device_iterator pal_deviter(machine.root_device());
 
-	return machine.total_colors() != 0
-		|| machine.colortable != NULL
+	palette_device *palette = pal_deviter.first();
+	
+	return ((palette !=NULL) && (palette->entries() > 0))
 		|| gfx_deviter.first() != NULL
 		|| machine.tilemap().count() != 0;
 }
@@ -168,7 +170,9 @@ UINT32 ui_gfx_ui_handler(running_machine &machine, render_container *container, 
 {
 	ui_gfx_state *state = &ui_gfx;
 	gfxdecode_device_iterator gfx_deviter(machine.root_device());
-
+	palette_device_iterator pal_deviter(machine.root_device());
+	palette_device *palette = pal_deviter.first();
+	
 	// if we have nothing, implicitly cancel
 	if (!ui_gfx_is_relevant(machine))
 		goto cancel;
@@ -183,7 +187,7 @@ again:
 	{
 		case 0:
 			// if we have a palette, display it 
-			if (machine.total_colors() > 0)
+			if (palette->entries() > 0)
 			{
 				palette_handler(machine, container, state);
 				break;
@@ -255,9 +259,12 @@ cancel:
 
 static void palette_handler(running_machine &machine, render_container *container, ui_gfx_state *state)
 {
-	int total = state->palette.which ? colortable_palette_get_size(machine.colortable) : machine.total_colors();
+	palette_device_iterator pal_deviter(machine.root_device());
+	palette_device *palette = pal_deviter.first();
+
+	int total = state->palette.which ? palette->indirect_entries() : palette->entries();
 	const char *title = state->palette.which ? "COLORTABLE" : "PALETTE";
-	const rgb_t *raw_color = machine.palette->entry_list_raw();
+	const rgb_t *raw_color = palette->palette()->entry_list_raw();;
 	render_font *ui_font = machine.ui().get_font();
 	float cellwidth, cellheight;
 	float chwidth, chheight;
@@ -356,7 +363,7 @@ static void palette_handler(running_machine &machine, render_container *containe
 			int index = state->palette.offset + y * state->palette.count + x;
 			if (index < total)
 			{
-				pen_t pen = state->palette.which ? colortable_palette_get_color(machine.colortable, index) : raw_color[index];
+				pen_t pen = state->palette.which ? palette->indirect_color(index) : raw_color[index];
 				container->add_rect(cellboxbounds.x0 + x * cellwidth, cellboxbounds.y0 + y * cellheight,
 									cellboxbounds.x0 + (x + 1) * cellwidth, cellboxbounds.y0 + (y + 1) * cellheight,
 									0xff000000 | pen, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -375,6 +382,9 @@ static void palette_handler(running_machine &machine, render_container *containe
 
 static void palette_handle_keys(running_machine &machine, ui_gfx_state *state)
 {
+	palette_device_iterator pal_deviter(machine.root_device());
+	palette_device *palette = pal_deviter.first();
+
 	int rowcount, screencount;
 	int total;
 
@@ -399,11 +409,11 @@ static void palette_handle_keys(running_machine &machine, ui_gfx_state *state)
 	// clamp within range 
 	if (state->palette.which < 0)
 		state->palette.which = 0;
-	if (state->palette.which > (int)(machine.colortable != NULL))
-		state->palette.which = (int)(machine.colortable != NULL);
+	if (state->palette.which > (int)(palette->indirect_entries() > 0))
+		state->palette.which = (int)(palette->indirect_entries() > 0);
 
 	// cache some info in locals 
-	total = state->palette.which ? colortable_palette_get_size(machine.colortable) : machine.total_colors();
+	total = state->palette.which ? palette->indirect_entries() : palette->entries();
 
 	// determine number of entries per row and total 
 	rowcount = state->palette.count;
@@ -787,7 +797,7 @@ static void gfxset_draw_item(running_machine &machine, gfx_element *gfx, int ind
 	};
 	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx->height() : gfx->width();
 	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx->width() : gfx->height();
-	const rgb_t *palette = (machine.total_colors() != 0) ? machine.palette->entry_list_raw() : NULL;
+	const rgb_t *palette = (machine.first_screen()->palette()->entries() != 0) ? machine.first_screen()->palette()->palette()->entry_list_raw() : NULL;
 	UINT32 palette_mask = ~0;
 	int x, y;
 
@@ -1059,7 +1069,7 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state *state,
 
 		// allocate new stuff 
 		state->bitmap = global_alloc(bitmap_rgb32(width, height));
-		state->bitmap->set_palette(machine.palette);
+		state->bitmap->set_palette(machine.first_screen()->palette()->palette());
 		state->texture = machine.render().texture_alloc();
 		state->texture->set_bitmap(*state->bitmap, state->bitmap->cliprect(), TEXFORMAT_RGB32);
 
@@ -1071,7 +1081,7 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state *state,
 	if (state->bitmap_dirty)
 	{
 		tilemap_t *tilemap = machine.tilemap().find(state->tilemap.which);
-		tilemap->draw_debug(*state->bitmap, state->tilemap.xoffs, state->tilemap.yoffs);
+		tilemap->draw_debug(*machine.first_screen(), *state->bitmap, state->tilemap.xoffs, state->tilemap.yoffs);
 
 		// reset the texture to force an update 
 		state->texture->set_bitmap(*state->bitmap, state->bitmap->cliprect(), TEXFORMAT_RGB32);

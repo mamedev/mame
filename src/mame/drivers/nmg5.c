@@ -354,7 +354,7 @@ WRITE8_MEMBER(nmg5_state::oki_banking_w)
 static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x180002, 0x180003) AM_WRITENOP
@@ -374,7 +374,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pclubys_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x440000, 0x4407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x460000, 0x4607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x480000, 0x480001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x480002, 0x480003) AM_WRITENOP
@@ -1020,8 +1020,8 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nmg5_state, screen_update_nmg5)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nmg5)
-	MCFG_PALETTE_LENGTH(0x400)
-
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 1);
@@ -1029,6 +1029,7 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	decospr_device::set_flipallx(*device, 1);
 	decospr_device::set_offsets(*device, 0,8);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 
 	/* sound hardware */

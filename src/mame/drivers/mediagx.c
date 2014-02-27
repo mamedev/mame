@@ -227,7 +227,7 @@ void mediagx_state::video_start()
 	int i;
 	for (i=0; i < 16; i++)
 	{
-		palette_set_color(machine(), i, cga_palette[i]);
+		m_palette->set_pen_color(i, cga_palette[i]);
 	}
 }
 
@@ -236,7 +236,7 @@ void mediagx_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, g
 	int i,j;
 	const UINT8 *dp;
 	int index = 0;
-	const pen_t *pens = gfx->machine().pens;
+	const pen_t *pens = &m_palette->pen(0);
 
 	dp = gfx->get_data(ch);
 
@@ -888,7 +888,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	MCFG_TIMER_DRIVER_ADD("sound_timer", mediagx_state, sound_timer_callback)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -898,7 +898,8 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mediagx_state, screen_update_mediagx)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", CGA)
-	MCFG_PALETTE_LENGTH(256)
+
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -108,7 +108,7 @@ void pushman_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, sprite,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, sprite,
 				color, flipx, flipy, x, y, 15);
 	}
 }

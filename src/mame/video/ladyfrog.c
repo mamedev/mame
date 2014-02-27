@@ -44,9 +44,9 @@ READ8_MEMBER(ladyfrog_state::ladyfrog_videoram_r)
 WRITE8_MEMBER(ladyfrog_state::ladyfrog_palette_w)
 {
 	if (offset & 0x100)
-		paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w(space, (offset & 0xff) + (m_palette_bank << 8), data);
+		m_palette->write(space, (offset & 0xff) + (m_palette_bank << 8), data);
 	else
-		paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w(space, (offset & 0xff) + (m_palette_bank << 8), data);
+		m_palette->write(space, (offset & 0xff) + (m_palette_bank << 8), data);
 }
 
 READ8_MEMBER(ladyfrog_state::ladyfrog_palette_r)
@@ -104,7 +104,7 @@ void ladyfrog_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			sy = 238 - m_spriteram[offs + 0];
 			flipx = ((m_spriteram[offs + 1] & 0x40)>>6);
 			flipy = ((m_spriteram[offs + 1] & 0x80)>>7);
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					code,
 					pal,
 					flipx,flipy,
@@ -113,7 +113,7 @@ void ladyfrog_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			if (m_spriteram[offs + 3] > 240)
 			{
 				sx = (m_spriteram[offs + 3] - 256);
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 						code,
 						pal,
 						flipx,flipy,

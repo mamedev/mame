@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 16, miragemi_state )
 	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_SHARE("pf2_rowscroll")
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x130000, 0x1307ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x130000, 0x1307ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x14000f) AM_DEVREADWRITE8("oki_sfx", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x150000, 0x15000f) AM_DEVREADWRITE8("oki_bgm", okim6295_device, read, write, 0x00ff)
 //  AM_RANGE(0x140006, 0x140007) AM_READ(random_readers)
@@ -334,14 +334,17 @@ static MACHINE_CONFIG_START( mirage, miragemi_state )
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mirage)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DECO16IC_ADD("tilegen1", mirage_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 	
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

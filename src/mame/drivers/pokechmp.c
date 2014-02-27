@@ -92,8 +92,8 @@ static ADDRESS_MAP_START( pokechmp_map, AS_PROGRAM, 8, pokechmp_state )
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE(pokechmp_bank_w)
 
 	/* Extra on Poke Champ (not on Pocket Gal) */
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w) AM_SHARE("paletteram")
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("fixed")
@@ -221,8 +221,8 @@ static MACHINE_CONFIG_START( pokechmp, pokechmp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pokechmp_state, screen_update_pokechmp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pokechmp)
-	MCFG_PALETTE_LENGTH(0x400)
-
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

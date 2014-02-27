@@ -449,7 +449,7 @@ static MACHINE_CONFIG_START( sharkatt, thief_state )
 
 	MCFG_TMS9927_ADD("tms", MASTER_CLOCK/4, tms9927_intf)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 
 	/* sound hardware */
@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( thief, thief_state )
 
 	MCFG_TMS9927_ADD("tms", MASTER_CLOCK/4, tms9927_intf)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 
 	/* sound hardware */
@@ -519,7 +519,7 @@ static MACHINE_CONFIG_START( natodef, thief_state )
 
 	MCFG_TMS9927_ADD("tms", MASTER_CLOCK/4, tms9927_intf)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 
 	/* sound hardware */

@@ -21,7 +21,7 @@
 
 ***************************************************************************/
 
-void pandoras_state::palette_init()
+PALETTE_INIT_MEMBER(pandoras_state, pandoras)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -34,9 +34,6 @@ void pandoras_state::palette_init()
 			3, &resistances_rg[0], rweights, 1000, 0,
 			3, &resistances_rg[0], gweights, 1000, 0,
 			2, &resistances_b[0],  bweights, 1000, 0);
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -61,7 +58,7 @@ void pandoras_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -71,14 +68,14 @@ void pandoras_state::palette_init()
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* characters */
 	for (i = 0x100; i < 0x200; i++)
 	{
 		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -159,12 +156,12 @@ void pandoras_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int nflipx = sr[offs + 3] & 0x40;
 		int nflipy = sr[offs + 3] & 0x80;
 
-		m_gfxdecode->gfx(0)->transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transmask(m_palette,bitmap,cliprect,
 			sr[offs + 2],
 			color,
 			!nflipx,!nflipy,
 			sx,sy,
-			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(0), color, 0));
+			m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0));
 	}
 }
 

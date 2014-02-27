@@ -282,7 +282,7 @@ WRITE8_MEMBER(skylncr_state::skylncr_paletteram_w)
 		g = (g << 2) | (g >> 4);
 		b = (b << 2) | (b >> 4);
 
-		palette_set_color(machine(), m_color / 3, rgb_t(r, g, b));
+		m_palette->set_pen_color(m_color / 3, rgb_t(r, g, b));
 		m_color = (m_color + 1) % (0x100 * 3);
 	}
 }
@@ -305,7 +305,7 @@ WRITE8_MEMBER(skylncr_state::skylncr_paletteram2_w)
 		g = (g << 2) | (g >> 4);
 		b = (b << 2) | (b >> 4);
 
-		palette_set_color(machine(), 0x100 + m_color2 / 3, rgb_t(r, g, b));
+		m_palette->set_pen_color(0x100 + m_color2 / 3, rgb_t(r, g, b));
 		m_color2 = (m_color2 + 1) % (0x100 * 3);
 	}
 }
@@ -730,7 +730,7 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(skylncr_state, screen_update_skylncr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", skylncr)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 
 	/* sound hardware */

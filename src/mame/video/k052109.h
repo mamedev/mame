@@ -23,6 +23,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	/*
 	You don't have to decode the graphics: the vh_start() routines will do that
@@ -90,6 +91,7 @@ private:
 	INT32    m_dx[3], m_dy[3];
 	UINT8    m_romsubbank, m_scrollctrl;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
@@ -107,5 +109,8 @@ extern const device_type K052109;
 
 #define MCFG_K052109_GFXDECODE(_gfxtag) \
 	k052109_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_K052109_PALETTE(_palette_tag) \
+	k052109_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

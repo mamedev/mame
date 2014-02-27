@@ -29,7 +29,7 @@
 
 ***************************************************************************/
 
-static void palette_init_common( running_machine &machine, const UINT8 *color_prom, int colortable_size,
+static void palette_init_common( palette_device &palette, const UINT8 *color_prom, int colortable_size,
 								int r_bit0, int r_bit1, int g_bit0, int g_bit1, int b_bit0, int b_bit1 )
 {
 	static const int resistances[2] = { 470, 220 };
@@ -41,9 +41,6 @@ static void palette_init_common( running_machine &machine, const UINT8 *color_pr
 			2, resistances, rweights, 470, 0,
 			2, resistances, gweights, 470, 0,
 			2, resistances, bweights, 470, 0);
-
-	/* allocate the colortable */
-	machine.colortable = colortable_alloc(machine, colortable_size);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -66,7 +63,7 @@ static void palette_init_common( running_machine &machine, const UINT8 *color_pr
 		bit1 = (~color_prom[i] >> b_bit1) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine.colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -76,7 +73,7 @@ static void palette_init_common( running_machine &machine, const UINT8 *color_pr
 	for (i = 0; i < 0x20; i++)
 	{
 		UINT8 ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
-		colortable_entry_set_value(machine.colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites */
@@ -85,10 +82,10 @@ static void palette_init_common( running_machine &machine, const UINT8 *color_pr
 		UINT8 ctabentry = color_prom[(i - 0x20) >> 1];
 
 		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 0) & 0x0f, 7,6,5,4,0,1,2,3);
-		colortable_entry_set_value(machine.colortable, i + 0x00, ctabentry);
+		palette.set_pen_indirect(i + 0x00, ctabentry);
 
 		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 4) & 0x0f, 7,6,5,4,0,1,2,3);
-		colortable_entry_set_value(machine.colortable, i + 0x20, ctabentry);
+		palette.set_pen_indirect(i + 0x20, ctabentry);
 	}
 }
 
@@ -96,7 +93,7 @@ static void palette_init_common( running_machine &machine, const UINT8 *color_pr
 PALETTE_INIT_MEMBER(ladybug_state,ladybug)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	palette_init_common(machine(), color_prom, 0x20, 0, 5, 2, 6, 4, 7);
+	palette_init_common(palette, color_prom, 0x20, 0, 5, 2, 6, 4, 7);
 }
 
 PALETTE_INIT_MEMBER(ladybug_state,sraider)
@@ -105,7 +102,7 @@ PALETTE_INIT_MEMBER(ladybug_state,sraider)
 	int i;
 
 	/* the resistor net may be probably different than Lady Bug */
-	palette_init_common(machine(), color_prom, 0x41, 3, 0, 5, 4, 7, 6);
+	palette_init_common(palette, color_prom, 0x41, 3, 0, 5, 4, 7, 6);
 
 	/* star colors */
 	for (i = 0x20; i < 0x40; i++)
@@ -127,14 +124,14 @@ PALETTE_INIT_MEMBER(ladybug_state,sraider)
 		bit0 = ((i - 0x20) >> 0) & 0x01;
 		r = 0x47 * bit0;
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	for (i = 0x60; i < 0x80; i++)
-		colortable_entry_set_value(machine().colortable, i, (i - 0x60) + 0x20);
+		palette.set_pen_indirect(i, (i - 0x60) + 0x20);
 
 	/* stationary part of grid */
-	colortable_entry_set_value(machine().colortable, 0x81, 0x40);
+	palette.set_pen_indirect(0x81, 0x40);
 }
 
 WRITE8_MEMBER(ladybug_state::ladybug_videoram_w)
@@ -256,14 +253,14 @@ void ladybug_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (spriteram[offs + i] & 0x80)
 			{
 				if (spriteram[offs + i] & 0x40) /* 16x16 */
-					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 							(spriteram[offs + i + 1] >> 2) + 4 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
 							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,
 							spriteram[offs + i + 3],
 							offs / 4 - 8 + (spriteram[offs + i] & 0x0f),0);
 				else    /* 8x8 */
-					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 							spriteram[offs + i + 1] + 16 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
 							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,
@@ -333,7 +330,7 @@ UINT32 ladybug_state::screen_update_sraider(screen_device &screen, bitmap_ind16 
 		redclash_draw_stars(bitmap, cliprect, 0x60, 1, 0x00, 0xd8);
 
 	// draw the gridlines
-	colortable_palette_set_color(machine().colortable, 0x40, rgb_t(m_grid_color & 0x40 ? 0xff : 0,
+	m_palette->set_indirect_color(0x40, rgb_t(m_grid_color & 0x40 ? 0xff : 0,
 																				m_grid_color & 0x20 ? 0xff : 0,
 																				m_grid_color & 0x10 ? 0xff : 0));
 	m_grid_tilemap->draw(screen, bitmap, cliprect, 0, flip_screen());

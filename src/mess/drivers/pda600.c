@@ -215,8 +215,7 @@ static MACHINE_CONFIG_START( pda600, pda600_state )
 	MCFG_SCREEN_UPDATE_DRIVER( pda600_state, screen_update )
 	MCFG_GFXDECODE_ADD("gfxdecode", pda600)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")

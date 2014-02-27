@@ -32,13 +32,13 @@ void wiz_state::video_start()
   bit 0 -- 1  kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-void wiz_state::palette_init()
+PALETTE_INIT_MEMBER(wiz_state, wiz)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -48,18 +48,18 @@ void wiz_state::palette_init()
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		bit3 = (color_prom[0] >> 3) & 0x01;
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
-		bit0 = (color_prom[machine().total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[machine().total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[machine().total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[machine().total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[palette.entries()] >> 0) & 0x01;
+		bit1 = (color_prom[palette.entries()] >> 1) & 0x01;
+		bit2 = (color_prom[palette.entries()] >> 2) & 0x01;
+		bit3 = (color_prom[palette.entries()] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
-		bit0 = (color_prom[2*machine().total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine().total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine().total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine().total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[2*palette.entries()] >> 0) & 0x01;
+		bit1 = (color_prom[2*palette.entries()] >> 1) & 0x01;
+		bit2 = (color_prom[2*palette.entries()] >> 2) & 0x01;
+		bit3 = (color_prom[2*palette.entries()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 
 		color_prom++;
 	}
@@ -124,7 +124,7 @@ void wiz_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		if (m_flipx) sx = 31 - sx;
 
 
-		m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(bank)->transpen(m_palette,bitmap,cliprect,
 			videoram[offs],
 			col + 8 * m_palette_bank,
 			m_flipx,m_flipy,
@@ -162,7 +162,7 @@ void wiz_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		if (m_flipx) sx = 31 - sx;
 
 
-		m_gfxdecode->gfx(m_char_bank[1])->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_char_bank[1])->transpen(m_palette,bitmap,cliprect,
 			m_videoram2[offs],
 			col + 8 * m_palette_bank,
 			m_flipx,m_flipy,
@@ -187,7 +187,7 @@ void wiz_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, UIN
 		if ( m_flipx) sx = 240 - sx;
 		if (!m_flipy) sy = 240 - sy;
 
-		m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(bank)->transpen(m_palette,bitmap,cliprect,
 				sprite_ram[offs + 1],
 				(sprite_ram[offs + 2] & 0x07) + 8 * m_palette_bank,
 				m_flipx,m_flipy,

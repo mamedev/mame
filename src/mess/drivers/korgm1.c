@@ -157,7 +157,7 @@ void korgm1_state::machine_reset()
 }
 
 
-void korgm1_state::palette_init()
+PALETTE_INIT_MEMBER(korgm1_state, korgm1)
 {
 }
 
@@ -179,7 +179,7 @@ static MACHINE_CONFIG_START( korgm1, korgm1_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", korgm1)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

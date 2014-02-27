@@ -485,9 +485,8 @@ static MACHINE_CONFIG_START( rmhaihai, rmhaihai_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rmhaihai_state, screen_update_rmhaihai)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", rmhaihai)
-	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -507,7 +506,8 @@ static MACHINE_CONFIG_DERIVED( rmhaisei, rmhaihai )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", themj)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( themj, rmhaihai )
@@ -522,7 +522,8 @@ static MACHINE_CONFIG_DERIVED( themj, rmhaihai )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", themj)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
 

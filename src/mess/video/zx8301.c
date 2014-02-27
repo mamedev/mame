@@ -35,7 +35,7 @@
 static const int ZX8301_COLOR_MODE4[] = { 0, 2, 4, 7 };
 
 
-static const rgb_t PALETTE[] =
+static const rgb_t PALETTE_ZX8301[] =
 {
 	rgb_t(0x00, 0x00, 0x00), // black
 	rgb_t(0x00, 0x00, 0xff), // blue
@@ -281,7 +281,7 @@ void zx8301_device::draw_line_mode4(bitmap_rgb32 &bitmap, int y, UINT16 da)
 			int green = BIT(byte_high, 7);
 			int color = (green << 1) | red;
 
-			bitmap.pix32(y, x++) = PALETTE[ZX8301_COLOR_MODE4[color]];
+			bitmap.pix32(y, x++) = PALETTE_ZX8301[ZX8301_COLOR_MODE4[color]];
 
 			byte_high <<= 1;
 			byte_low <<= 1;
@@ -317,8 +317,8 @@ void zx8301_device::draw_line_mode8(bitmap_rgb32 &bitmap, int y, UINT16 da)
 				color = 0;
 			}
 
-			bitmap.pix32(y, x++) = PALETTE[color];
-			bitmap.pix32(y, x++) = PALETTE[color];
+			bitmap.pix32(y, x++) = PALETTE_ZX8301[color];
+			bitmap.pix32(y, x++) = PALETTE_ZX8301[color];
 
 			byte_high <<= 2;
 			byte_low <<= 2;

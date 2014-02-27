@@ -122,7 +122,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	int banksel;
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(sanremo);
 	UINT32 screen_update_sanremo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -161,15 +161,15 @@ UINT32 sanremo_state::screen_update_sanremo(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-void sanremo_state::palette_init()
+PALETTE_INIT_MEMBER(sanremo_state, sanremo)
 {
 	int index;
 
 	for (index = 0; index < 0x8; index++)
-		palette_set_color_rgb(machine(), index, pal1bit((index >> 0)&1), pal1bit((index >> 1)&1), pal1bit((index >> 2)&1));
+		palette.set_pen_color(index, rgb_t(pal1bit((index >> 0)&1), pal1bit((index >> 1)&1), pal1bit((index >> 2)&1)));
 
 	for (index = 0x8; index < 0x10; index++)
-		palette_set_color_rgb(machine(), index, pal2bit((index >> 0)&1), pal2bit((index >> 1)&1), pal2bit((index >> 2)&1));
+		palette.set_pen_color(index, rgb_t(pal2bit((index >> 0)&1), pal2bit((index >> 1)&1), pal2bit((index >> 2)&1)));
 }
 
 
@@ -401,7 +401,8 @@ static MACHINE_CONFIG_START( sanremo, sanremo_state )
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sanremo)
-	MCFG_PALETTE_LENGTH(0x10)
+	MCFG_PALETTE_ADD("palette", 0x10)
+	MCFG_PALETTE_INIT_OWNER(sanremo_state, sanremo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

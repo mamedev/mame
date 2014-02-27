@@ -44,7 +44,7 @@ UINT32 snowbros_state::screen_update_honeydol(screen_device &screen, bitmap_ind1
 			sy = y;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				tile,
 				tilecolour,
 				flipx, flipy,
@@ -78,7 +78,7 @@ UINT32 snowbros_state::screen_update_honeydol(screen_device &screen, bitmap_ind1
 		tilecolour = (tilecolour&0x03f0) >> 4;
 		tilecolour ^=0x3f; // unusual, but correct..
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				tile,
 				tilecolour,
 				flipx, flipy,
@@ -133,7 +133,7 @@ UINT32 snowbros_state::screen_update_twinadv(screen_device &screen, bitmap_ind16
 		tilecolour = (tilecolour&0x00f0) >> 4;
 		tilecolour ^=0xf; // unusual, but correct..
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				tile,
 				tilecolour,
 				flipx, flipy,
@@ -148,7 +148,7 @@ UINT32 snowbros_state::screen_update_wintbob(screen_device &screen, bitmap_ind16
 	UINT16 *spriteram16 = m_bootleg_spriteram16;
 	int offs;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	for (offs = 0;offs < m_bootleg_spriteram16.bytes()/2;offs += 8)
 	{
@@ -175,7 +175,7 @@ UINT32 snowbros_state::screen_update_wintbob(screen_device &screen, bitmap_ind16
 
 		if ((xpos > -16) && (ypos > 0) && (xpos < 256) && (ypos < 240) && (disbl !=2))
 		{
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					tilen,
 					colr,
 					flipx, flipy,
@@ -215,7 +215,7 @@ UINT32 snowbros_state::screen_update_snowbro3(screen_device &screen, bitmap_ind1
 
 	/* This clears & redraws the entire screen each pass */
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	for (offs = 0;offs < m_bootleg_spriteram16.bytes()/2;offs += 8)
 	{
@@ -263,7 +263,7 @@ UINT32 snowbros_state::screen_update_snowbro3(screen_device &screen, bitmap_ind1
 			tilecolour = 0x10;
 		}
 
-	gfx->transpen(bitmap,cliprect,
+	gfx->transpen(m_palette,bitmap,cliprect,
 				tile,
 				(tilecolour & 0xf0) >> 4,
 				flipx, flipy,

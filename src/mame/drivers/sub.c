@@ -137,7 +137,7 @@ public:
 	DECLARE_WRITE8_MEMBER(subm_to_sound_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(sub);
 	UINT32 screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(subm_sound_irq);
 	required_device<cpu_device> m_maincpu;
@@ -167,8 +167,8 @@ UINT32 sub_state::screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap,
 			tile += (m_attr[count]&0xe0)<<3;
 			col = (m_attr[count]&0x1f);
 
-			gfx->opaque(bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
-			gfx->opaque(bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
 
 			count++;
 		}
@@ -200,7 +200,7 @@ UINT32 sub_state::screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap,
 			if(fx) { x = 0xe0 - x; }
 			fy = (spriteram_2[i+0] & 0x40) ? 0 : 1;
 
-			gfx_1->transpen(bitmap,cliprect,spr_offs,col,0,fy,x,y,0);
+			gfx_1->transpen(m_palette,bitmap,cliprect,spr_offs,col,0,fy,x,y,0);
 		}
 	}
 
@@ -220,8 +220,8 @@ UINT32 sub_state::screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap,
 
 			if(x >= 28)
 			{
-				gfx->opaque(bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
-				gfx->opaque(bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
+				gfx->opaque(m_palette,bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
+				gfx->opaque(m_palette,bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
 			}
 
 			count++;
@@ -394,14 +394,11 @@ static GFXDECODE_START( sub )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x32_layout, 0, 0x80 )
 GFXDECODE_END
 
-void sub_state::palette_init()
+PALETTE_INIT_MEMBER(sub_state, sub)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	UINT8* lookup = memregion("proms2")->base();
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	for (i = 0;i < 0x100;i++)
 	{
@@ -410,8 +407,8 @@ void sub_state::palette_init()
 		g = (color_prom[0x100] >> 0);
 		b = (color_prom[0x200] >> 0);
 
-		//colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
-		colortable_palette_set_color(machine().colortable, i, rgb_t(pal4bit(r), pal4bit(g), pal4bit(b)));
+		//palette.set_indirect_color(i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(pal4bit(r), pal4bit(g), pal4bit(b)));
 
 		color_prom++;
 	}
@@ -420,7 +417,7 @@ void sub_state::palette_init()
 	for (i = 0;i < 0x400;i++)
 	{
 		UINT8 ctabentry = lookup[i+0x400] | (lookup[i+0x000] << 4);
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 }
@@ -455,8 +452,8 @@ static MACHINE_CONFIG_START( sub, sub_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sub_state, screen_update_sub)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sub)
-	MCFG_PALETTE_LENGTH(0x400)
-
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_INIT_OWNER(sub_state, sub)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

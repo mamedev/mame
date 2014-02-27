@@ -64,7 +64,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 WRITE16_MEMBER(hyprduel_state::hyprduel_paletteram_w)
 {
 	data = COMBINE_DATA(&m_paletteram[offset]);
-	palette_set_color_rgb(machine(), offset, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
+	m_palette->set_pen_color(offset, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
 }
 
 
@@ -552,9 +552,9 @@ void hyprduel_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 				if ((gfxstart + width * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element gfx(machine(), base_gfx8 + gfxstart, width, height, width, 0, 256);
+				gfx_element gfx(machine(), base_gfx8 + gfxstart, width, height, width, m_palette->entries(), 0, 256);
 
-				gfx.prio_zoom_transpen(bitmap,cliprect,
+				gfx.prio_zoom_transpen(m_palette, bitmap,cliprect,
 								0,
 								color_start >> 4,
 								flipx, flipy,
@@ -568,9 +568,9 @@ void hyprduel_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 				if ((gfxstart + width / 2 * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element gfx(machine(), base_gfx4 + 2 * gfxstart, width, height, width, 0, 16);
+				gfx_element gfx(machine(), base_gfx4 + 2 * gfxstart, width, height, width, m_palette->entries(), 0, 16);
 
-				gfx.prio_zoom_transpen(bitmap,cliprect,
+				gfx.prio_zoom_transpen(m_palette, bitmap,cliprect,
 								0,
 								color + color_start,
 								flipx, flipy,

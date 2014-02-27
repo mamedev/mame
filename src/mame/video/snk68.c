@@ -168,7 +168,7 @@ WRITE16_MEMBER(snk68_state::pow_paletteram16_word_w)
 	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01) ;
 	b = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01) ;
 
-	palette_set_color_rgb(machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	m_palette->set_pen_color(offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 
@@ -246,7 +246,7 @@ void snk68_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					fy = !fy;
 				}
 
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 						tile,
 						color,
 						fx, fy,

@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( go2000_map, AS_PROGRAM, 16, go2000_state )
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW")
 	AM_RANGE(0x620002, 0x620003) AM_WRITE(sound_cmd_w)
@@ -191,7 +191,7 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 		{
 			int tile = m_videoram[count];
 			int attr = m_videoram2[count];
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, attr, 0, 0, x * 8, y * 8);
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect, tile, attr, 0, 0, x * 8, y * 8);
 			count++;
 		}
 	}
@@ -203,7 +203,7 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 		{
 			int tile = m_videoram[count];
 			int attr = m_videoram2[count];
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, tile, attr, 0, 0, x * 8, y * 8, 0xf);
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, tile, attr, 0, 0, x * 8, y * 8, 0xf);
 			count++;
 		}
 	}
@@ -291,7 +291,7 @@ UINT32 go2000_state::screen_update_go2000(screen_device &screen, bitmap_ind16 &b
 					tile_flipy = !tile_flipy;
 				}
 
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 							(tile & 0x1fff) + bank*0x4000,
 							attr,
 							tile_flipx, tile_flipy,
@@ -340,7 +340,8 @@ static MACHINE_CONFIG_START( go2000, go2000_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(go2000_state, screen_update_go2000)
 
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

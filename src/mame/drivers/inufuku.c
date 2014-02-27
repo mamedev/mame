@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 	AM_RANGE(0x200000, 0x200001) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x280000, 0x280001) AM_WRITE(inufuku_soundcommand_w)   // sound command
 
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram_xGGGGGBBBBBRRRRR_word_w) AM_SHARE("paletteram")                        // palette ram
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")                        // palette ram
 	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_SHARE("bg_rasterram")                                  // bg raster ram
 	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_SHARE("bg_videoram")     // bg ram
 	AM_RANGE(0x402000, 0x403fff) AM_READWRITE(inufuku_tx_videoram_r, inufuku_tx_videoram_w) AM_SHARE("tx_videoram")     // text ram
@@ -392,10 +392,11 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( inufuku_state, inufuku_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", inufuku)
-	MCFG_PALETTE_LENGTH(4096)
-
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -204,7 +204,7 @@ UINT32 galaxi_state::screen_update_galaxi(screen_device &screen, bitmap_ind16 &b
 #endif
 
 	if (layers_ctrl & 1)    m_bg1_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	else                bitmap.fill(get_black_pen(machine()), cliprect);
+	else                bitmap.fill(m_palette->black_pen(), cliprect);
 	if (layers_ctrl & 2)    m_bg2_tmap->draw(screen, bitmap, cliprect, 0, 0);
 	if (layers_ctrl & 4)    m_bg3_tmap->draw(screen, bitmap, cliprect, 0, 0);
 	if (layers_ctrl & 8)    m_bg4_tmap->draw(screen, bitmap, cliprect, 0, 0);
@@ -292,7 +292,7 @@ static ADDRESS_MAP_START( galaxi_map, AS_PROGRAM, 16, galaxi_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(galaxi_fg_w ) AM_SHARE("fg_ram")
 	AM_RANGE(0x102000, 0x1047ff) AM_READNOP // unknown
 
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x300000, 0x3007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(galaxi_500000_w)
@@ -419,7 +419,8 @@ static MACHINE_CONFIG_START( galaxi, galaxi_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galaxi_state, screen_update_galaxi)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", galaxi)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */

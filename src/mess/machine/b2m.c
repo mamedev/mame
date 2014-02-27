@@ -275,9 +275,9 @@ WRITE8_MEMBER(b2m_state::b2m_palette_w)
 	m_b2m_color[offset & 3] = data;
 
 	if (ioport("MONITOR")->read()==1) {
-		palette_set_color_rgb(machine(),offset, r, g, b);
+		m_palette->set_pen_color(offset, r, g, b);
 	} else {
-		palette_set_color_rgb(machine(),offset, bw, bw, bw);
+		m_palette->set_pen_color(offset, bw, bw, bw);
 	}
 }
 

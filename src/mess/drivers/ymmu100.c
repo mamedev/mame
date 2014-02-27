@@ -100,8 +100,6 @@ public:
 	DECLARE_READ8_MEMBER(p1_r);
 	DECLARE_WRITE8_MEMBER(p2_w);
 	DECLARE_READ8_MEMBER(p2_r);
-
-	virtual void palette_init();
 };
 
 
@@ -155,12 +153,6 @@ READ8_MEMBER(mu100_state::p2_r)
 	return cur_p2;
 }
 
-void mu100_state::palette_init()
-{
-	palette_set_color(machine(), 0, rgb_t(255, 255, 255));
-	palette_set_color(machine(), 1, rgb_t(0, 0, 0));
-}
-
 static ADDRESS_MAP_START( mu100_iomap, AS_IO, 8, mu100_state )
 	AM_RANGE(H8_PORT_1,  H8_PORT_1)  AM_READWRITE(p1_r, p1_w)
 	AM_RANGE(H8_PORT_2,  H8_PORT_2)  AM_READWRITE(p2_r, p2_w)
@@ -181,7 +173,7 @@ static MACHINE_CONFIG_START( mu100, mu100_state )
 	MCFG_SCREEN_UPDATE_DEVICE("lcd", hd44780_device, screen_update)
 	MCFG_SCREEN_SIZE(20*6, 4*9)
 	MCFG_SCREEN_VISIBLE_AREA(0, 20*6-1, 0, 4*9-1)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD_WHITE_AND_BLACK("palette")
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

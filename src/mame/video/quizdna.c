@@ -127,7 +127,7 @@ WRITE8_MEMBER(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)
 	g = ((d0 >> 3) & 0x1e) | ((d1 >> 5) & 1);
 	b = ((d0 << 1) & 0x1e) | ((d1 >> 6) & 1);
 
-	palette_set_color_rgb(machine(),offs/2,pal5bit(r),pal5bit(g),pal5bit(b));
+	m_palette->set_pen_color(offs/2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 void quizdna_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -172,7 +172,7 @@ void quizdna_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		{
 			y &= 0x1ff;
 
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 					code ^ i,
 					col,
 					fx,fy,
@@ -192,6 +192,6 @@ UINT32 quizdna_state::screen_update_quizdna(screen_device &screen, bitmap_ind16 
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	return 0;
 }

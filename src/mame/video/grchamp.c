@@ -12,7 +12,7 @@
 #define RGB_MAX     191
 
 
-void grchamp_state::palette_init()
+void grchamp_state::palette_generate()
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 100, 270, 470 };
@@ -98,6 +98,7 @@ TILEMAP_MAPPER_MEMBER(grchamp_state::get_memory_offset)
 
 void grchamp_state::video_start()
 {
+	palette_generate();
 	m_work_bitmap.allocate(32,32);
 
 	/* allocate tilemaps for each of the three sections */
@@ -110,8 +111,8 @@ void grchamp_state::video_start()
 #if 0
 int grchamp_state::collision_check(grchamp_state *state, bitmap_ind16 &bitmap, int which )
 {
-	int bgcolor = machine().pens[0];
-	int sprite_transp = machine().pens[0x24];
+	int bgcolor = m_palette->pen(0);
+	int sprite_transp = m_palette->pen(0x24);
 	const rectangle &visarea = m_screen->visible_area();
 	int y0 = 240 - m_cpu0_out[3];
 	int x0 = 256 - m_cpu0_out[2];
@@ -123,7 +124,7 @@ int grchamp_state::collision_check(grchamp_state *state, bitmap_ind16 &bitmap, i
 	{
 		/* draw the current player sprite into a work bitmap */
 		
-			m_gfxdecode->gfx(4)->opaque(m_work_bitmap,
+			m_gfxdecode->gfx(4)->opaque(m_palette,m_work_bitmap,
 			m_work_bitmap.cliprect(),
 			m_cpu0_out[4]&0xf,
 			1, /* color */
@@ -189,7 +190,7 @@ void grchamp_state::draw_sprites(grchamp_state *state, bitmap_ind16 &bitmap, con
 		int color = source[2];
 		int code = source[1);
 		
-			gfx->transpen(bitmap,cliprect,
+			gfx->transpen(m_palette,bitmap,cliprect,
 			bank + (code & 0x3f),
 			color,
 			code & 0x40,

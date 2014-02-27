@@ -41,7 +41,7 @@ public:
 	DECLARE_READ8_MEMBER(horse_input_r);
 	DECLARE_WRITE8_MEMBER(horse_output_w);
 	DECLARE_WRITE_LINE_MEMBER(horse_timer_out);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(horse);
 	UINT32 screen_update_horse(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(horse_interrupt);
 	required_device<cpu_device> m_maincpu;
@@ -55,11 +55,11 @@ public:
 
 ***************************************************************************/
 
-void horse_state::palette_init()
+PALETTE_INIT_MEMBER(horse_state, horse)
 {
 	// palette is simply 3bpp
 	for (int i = 0; i < 8; i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 
 UINT32 horse_state::screen_update_horse(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -220,7 +220,8 @@ static MACHINE_CONFIG_START( horse, horse_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(horse_state, screen_update_horse)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(horse_state, horse)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

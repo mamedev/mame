@@ -407,8 +407,7 @@ static MACHINE_CONFIG_START( irisha, irisha_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(irisha_state, screen_update_irisha)
 	MCFG_GFXDECODE_ADD("gfxdecode", irisha)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

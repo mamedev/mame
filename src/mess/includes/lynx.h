@@ -128,7 +128,7 @@ public:
 	UINT16 m_granularity;
 	int m_sign_AB;
 	int m_sign_CD;
-	UINT32 m_palette[0x10];
+	UINT32 m_lynx_palette[0x10];
 	int m_rotate;
 	UINT8 m_memory_config;
 
@@ -154,7 +154,7 @@ public:
 	void lynx_timer_write(int which, int offset, UINT8 data);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(lynx);
 	void sound_cb();
 	TIMER_CALLBACK_MEMBER(lynx_blitter_timer);
 	TIMER_CALLBACK_MEMBER(lynx_timer_shot);

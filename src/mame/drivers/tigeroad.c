@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tigeroad_state )
 	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(tigeroad_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITEONLY    /* fe800e = watchdog or IRQ acknowledge */
-	AM_RANGE(0xff8200, 0xff867f) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xff8200, 0xff867f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("ram16")
 ADDRESS_MAP_END
 
@@ -535,8 +535,9 @@ static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tigeroad)
-	MCFG_PALETTE_LENGTH(576)
 
+	MCFG_PALETTE_ADD("palette", 576)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

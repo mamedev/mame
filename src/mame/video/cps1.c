@@ -2113,7 +2113,7 @@ VIDEO_START_MEMBER(cps_state,cps)
 	cps1_update_transmasks();
 
 	for (i = 0; i < cps1_palette_entries * 16; i++)
-		palette_set_color(machine(), i, rgb_t(0,0,0));
+		m_palette->set_pen_color(i, rgb_t(0,0,0));
 
 	m_buffered_obj = auto_alloc_array_clear(machine(), UINT16, m_obj_size / 2);
 
@@ -2232,7 +2232,7 @@ void cps_state::cps1_build_palette( const UINT16* const palette_base )
 				g = ((palette >> 4) & 0x0f) * 0x11 * bright / 0x2d;
 				b = ((palette >> 0) & 0x0f) * 0x11 * bright / 0x2d;
 
-				palette_set_color (machine(), 0x200 * page + offset, rgb_t(r, g, b));
+				m_palette->set_pen_color (0x200 * page + offset, rgb_t(r, g, b));
 			}
 		}
 		else
@@ -2319,14 +2319,14 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                    \
 {                                                                   \
 	if (flip_screen())                                           \
-		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
+		m_gfxdecode->gfx(2)->prio_transpen(m_palette,bitmap,\
 				cliprect,                            \
 				CODE,                                               \
 				COLOR,                                              \
 				!(FLIPX),!(FLIPY),                                  \
 				512-16-(SX),256-16-(SY),    screen.priority(),0x02,15);                   \
 	else                                                            \
-		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
+		m_gfxdecode->gfx(2)->prio_transpen(m_palette,bitmap,\
 				cliprect,                            \
 				CODE,                                               \
 				COLOR,                                              \
@@ -2552,14 +2552,14 @@ void cps_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                                    \
 {                                                                                   \
 	if (flip_screen())                                                           \
-		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
+		m_gfxdecode->gfx(2)->prio_transpen(m_palette,bitmap,\
 				cliprect,                                            \
 				CODE,                                                               \
 				COLOR,                                                              \
 				!(FLIPX),!(FLIPY),                                                  \
 				512-16-(SX),256-16-(SY), screen.priority(),primasks[priority],15);                 \
 	else                                                                            \
-		m_gfxdecode->gfx(2)->prio_transpen(bitmap,\
+		m_gfxdecode->gfx(2)->prio_transpen(m_palette,bitmap,\
 				cliprect,                                            \
 				CODE,                                                               \
 				COLOR,                                                              \
@@ -2855,7 +2855,7 @@ UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap
 		// Maybe Capcom changed the background handling due to the problems that
 		// it caused on several monitors (because the background extended into the
 		// blanking area instead of going black, causing the monitor to clip).
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	}
 
 	cps1_render_stars(screen, bitmap, cliprect);

@@ -40,7 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rt1715_rom_disable);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(rt1715);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 };
@@ -172,11 +172,11 @@ static const i8275_interface rt1715_i8275_intf =
     PALETTE
 ***************************************************************************/
 
-void rt1715_state::palette_init()
+PALETTE_INIT_MEMBER(rt1715_state, rt1715)
 {
-	palette_set_color(machine(), 0, rgb_t(0x00, 0x00, 0x00)); /* black */
-	palette_set_color(machine(), 1, rgb_t(0x00, 0x7f, 0x00)); /* low intensity */
-	palette_set_color(machine(), 2, rgb_t(0x00, 0xff, 0x00)); /* high intensitiy */
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); /* black */
+	palette.set_pen_color(1, rgb_t(0x00, 0x7f, 0x00)); /* low intensity */
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); /* high intensitiy */
 }
 
 
@@ -348,7 +348,8 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", rt1715)
-	MCFG_PALETTE_LENGTH(3)
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(rt1715_state, rt1715)
 
 	MCFG_I8275_ADD("a26", rt1715_i8275_intf)
 	MCFG_Z80CTC_ADD("a30", XTAL_10MHz/4 /* ? */, rt1715_ctc_intf)

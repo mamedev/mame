@@ -446,7 +446,7 @@ static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
 	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* sound hardware */
@@ -489,7 +489,7 @@ static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
 	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* sound hardware */
@@ -544,7 +544,7 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
 	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* sound hardware */
@@ -594,7 +594,7 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
 	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* sound hardware */
@@ -641,8 +641,7 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
 	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
 
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* sound hardware */
@@ -693,7 +692,7 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
 	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* sound hardware */

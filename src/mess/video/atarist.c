@@ -64,7 +64,7 @@ inline pen_t st_state::shift_mode_0()
 	m_shifter_rr[2] <<= 1;
 	m_shifter_rr[3] <<= 1;
 
-	return machine().pens[color];
+	return m_palette->pen(color);
 }
 
 
@@ -88,7 +88,7 @@ inline pen_t st_state::shift_mode_1()
 		m_shifter_shift = 0;
 	}
 
-	return machine().pens[color];
+	return m_palette->pen(color);
 }
 
 
@@ -125,7 +125,7 @@ inline pen_t st_state::shift_mode_2()
 		break;
 	}
 
-	return machine().pens[color];
+	return m_palette->pen(color);
 }
 
 
@@ -155,7 +155,7 @@ void st_state::shifter_tick()
 		break;
 
 	default:
-		pen = get_black_pen(machine());
+		pen = m_palette->black_pen();
 		break;
 	}
 
@@ -277,7 +277,7 @@ void st_state::glue_tick()
 		break;
 
 	default:
-		pen = get_black_pen(machine());
+		pen = m_palette->black_pen();
 		break;
 	}
 }
@@ -443,7 +443,7 @@ WRITE16_MEMBER( st_state::shifter_palette_w )
 	m_shifter_palette[offset] = data;
 	//  logerror("SHIFTER Palette[%x] = %x\n", offset, data);
 
-	palette_set_color_rgb(machine(), offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
+	m_palette->set_pen_color(offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
 }
 
 
@@ -539,7 +539,7 @@ WRITE16_MEMBER( ste_state::shifter_palette_w )
 	m_shifter_palette[offset] = data;
 	logerror("SHIFTER palette %x = %x\n", offset, data);
 
-	palette_set_color_rgb(machine(), offset, r, g, b);
+	m_palette->set_pen_color(offset, r, g, b);
 }
 
 

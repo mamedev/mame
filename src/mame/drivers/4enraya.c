@@ -301,13 +301,13 @@ void _4enraya_state::machine_reset()
 	m_last_snd_ctrl = 0;
 }
 
-void _4enraya_state::palette_init()
+PALETTE_INIT_MEMBER(_4enraya_state, _4enraya)
 {
 	int i;
 
 	/* RGB format */
 	for(i=0;i<8;i++)
-		palette_set_color(machine(), i, rgb_t(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
+		m_palette->set_pen_color(i, rgb_t(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
 }
 
 static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
@@ -329,8 +329,8 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 4enraya)
 
-	MCFG_PALETTE_LENGTH(8)
-
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(_4enraya_state, _4enraya)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

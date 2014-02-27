@@ -185,7 +185,7 @@ PALETTE_INIT_MEMBER(m10_state,m10)
 		else
 			color = rgb_t::black;
 
-		palette_set_color(machine(), i, color);
+		palette.set_pen_color(i, color);
 	}
 }
 
@@ -855,9 +855,9 @@ static MACHINE_CONFIG_START( m10, m10_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m10_state, screen_update_m10)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", m10)
-	MCFG_PALETTE_LENGTH(2*8)
+	MCFG_PALETTE_ADD("palette", 2*8)
 
-	MCFG_PALETTE_INIT_OVERRIDE(m10_state,m10)
+	MCFG_PALETTE_INIT_OWNER(m10_state,m10)
 	MCFG_VIDEO_START_OVERRIDE(m10_state,m10)
 
 	/* 74LS123 */
@@ -900,9 +900,9 @@ static MACHINE_CONFIG_START( m15, m10_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m10_state, screen_update_m15)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
-	MCFG_PALETTE_LENGTH(2*8)
+	MCFG_PALETTE_ADD("palette", 2*8)
 
-	MCFG_PALETTE_INIT_OVERRIDE(m10_state,m10)
+	MCFG_PALETTE_INIT_OWNER(m10_state,m10)
 	MCFG_VIDEO_START_OVERRIDE(m10_state, m15 )
 
 	/* sound hardware */

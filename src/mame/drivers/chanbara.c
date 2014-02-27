@@ -95,25 +95,25 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(chanbara);
 	UINT32 screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 };
 
 
-void chanbara_state::palette_init()
+PALETTE_INIT_MEMBER(chanbara_state, chanbara)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i, red, green, blue;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		red = color_prom[i];
-		green = color_prom[machine().total_colors() + i];
-		blue = color_prom[2 * machine().total_colors() + i];
+		green = color_prom[palette.entries() + i];
+		blue = color_prom[2 * palette.entries() + i];
 
-		palette_set_color_rgb(machine(), i, pal4bit(red << 1), pal4bit(green << 1), pal4bit(blue << 1));
+		palette.set_pen_color(i, pal4bit(red << 1), pal4bit(green << 1), pal4bit(blue << 1));
 	}
 }
 
@@ -191,18 +191,18 @@ void chanbara_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			{
 				if (!flipy)
 				{
-					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy-16, 0);
-					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code+1, color, flipx, flipy, sx, sy, 0);
+					m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy-16, 0);
+					m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code+1, color, flipx, flipy, sx, sy, 0);
 				}
 				else
 				{
-					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
-					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code+1, color, flipx, flipy, sx, sy-16, 0);
+					m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+					m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code+1, color, flipx, flipy, sx, sy-16, 0);
 				}
 			}
 			else
 			{
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
 			}
 		}
 	}
@@ -410,8 +410,9 @@ static MACHINE_CONFIG_START( chanbara, chanbara_state )
 	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", chanbara)
-	MCFG_PALETTE_LENGTH(256)
 
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(chanbara_state, chanbara)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

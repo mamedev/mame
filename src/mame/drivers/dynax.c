@@ -325,7 +325,7 @@ WRITE8_MEMBER(dynax_state::hnoridur_palette_w)
 		int r = BITSWAP8((x >>  0) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
 		int g = BITSWAP8((x >>  5) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
 		int b = BITSWAP8((x >> 10) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
-		palette_set_color_rgb(machine(), 256 * m_palbank + offset, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color(256 * m_palbank + offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -358,7 +358,7 @@ WRITE8_MEMBER(dynax_state::yarunara_palette_w)
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0) >> 3) | ((br & 0xe0) >> 5);
-		palette_set_color_rgb(machine(), 256 * m_palbank + ((offset & 0x0f) | ((offset & 0x1e0) >> 1)), pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color(256 * m_palbank + ((offset & 0x0f) | ((offset & 0x1e0) >> 1)), pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -385,7 +385,7 @@ WRITE8_MEMBER(dynax_state::nanajign_palette_w)
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0) >> 3) | ((br & 0xe0) >> 5);
-		palette_set_color_rgb(machine(), 256 * m_palbank + offset, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color(256 * m_palbank + offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -1211,7 +1211,7 @@ WRITE8_MEMBER(dynax_state::tenkai_palette_w)
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0) >> 3) | ((br & 0xe0) >> 5);
-		palette_set_color_rgb(machine(), 256 * m_palbank + ((offset & 0xf) | ((offset & 0x1e0) >> 1)), pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color(256 * m_palbank + ((offset & 0xf) | ((offset & 0x1e0) >> 1)), pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -4103,9 +4103,9 @@ static MACHINE_CONFIG_START( hanamai, dynax_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16+8, 255-8)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hanamai)
 
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_PALETTE_INIT_OVERRIDE(dynax_state,sprtmtch)            // static palette
+	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,hanamai)
 
 	/* sound hardware */
@@ -4161,7 +4161,7 @@ static MACHINE_CONFIG_START( hnoridur, dynax_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
 
-	MCFG_PALETTE_LENGTH(16*256)
+	MCFG_PALETTE_ADD("palette", 16*256)
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,hnoridur)
 
@@ -4206,7 +4206,7 @@ static MACHINE_CONFIG_START( hjingi, dynax_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
 
-	MCFG_PALETTE_LENGTH(16*256)
+	MCFG_PALETTE_ADD("palette", 16*256)
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,hnoridur)
 
@@ -4261,9 +4261,9 @@ static MACHINE_CONFIG_START( sprtmtch, dynax_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_sprtmtch)
 
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_PALETTE_INIT_OVERRIDE(dynax_state,sprtmtch)            // static palette
+	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,sprtmtch)
 
 	/* sound hardware */
@@ -4304,9 +4304,9 @@ static MACHINE_CONFIG_START( mjfriday, dynax_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_mjdialq2)
 
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 
-	MCFG_PALETTE_INIT_OVERRIDE(dynax_state,sprtmtch)            // static palette
+	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjdialq2)
 
 	/* sound hardware */
@@ -4454,7 +4454,8 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 	MCFG_DEFAULT_LAYOUT(layout_dualhuov)
 
 	MCFG_SCREEN_ADD("top", RASTER)
@@ -4471,7 +4472,6 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_jantouki_bottom)
 
-	MCFG_PALETTE_INIT_OVERRIDE(dynax_state,sprtmtch)            // static palette
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,jantouki)
 
 	/* sound hardware */
@@ -4497,7 +4497,8 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( janyuki, jantouki )
-	MCFG_PALETTE_INIT_OVERRIDE(dynax_state,janyuki)         // static palette
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(dynax_state,janyuki)         // static palette
 MACHINE_CONFIG_END
 
 
@@ -4660,7 +4661,7 @@ static MACHINE_CONFIG_START( tenkai, dynax_state )
 	MCFG_SCREEN_VISIBLE_AREA(4, 512-1, 4, 255-8-4)  // hide first 4 horizontal pixels (see scroll of gal 4 in test mode)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
 
-	MCFG_PALETTE_LENGTH(16*256)
+	MCFG_PALETTE_ADD("palette", 16*256)
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 
@@ -4679,8 +4680,9 @@ static MACHINE_CONFIG_START( tenkai, dynax_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( majrjhdx, tenkai )
-	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT_OVERRIDE(dynax_state,sprtmtch)            // static palette
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -4727,8 +4729,8 @@ static MACHINE_CONFIG_START( gekisha, dynax_state )
 	MCFG_SCREEN_VISIBLE_AREA(2, 256-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_mjdialq2)
 
-	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT_OVERRIDE(dynax_state,sprtmtch)            // static palette
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjdialq2)
 
 	/* sound hardware */

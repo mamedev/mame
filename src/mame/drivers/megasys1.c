@@ -178,7 +178,7 @@ static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("DSW")
 	AM_RANGE(0x080008, 0x080009) AM_READ(soundlatch2_word_r)    /* from sound cpu */
 	AM_RANGE(0x084000, 0x0843ff) AM_RAM_WRITE(megasys1_vregs_A_w) AM_SHARE("vregs")
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x08e000, 0x08ffff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x044000, 0x0443ff) AM_RAM_WRITE(megasys1_vregs_A_w) AM_SHARE("vregs")
-	AM_RANGE(0x048000, 0x0487ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x048000, 0x0487ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x04e000, 0x04ffff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0x050000, 0x053fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
 	AM_RANGE(0x054000, 0x057fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
@@ -282,7 +282,7 @@ static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
 	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_SHARE("scrollram.2")
-	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0d8000, 0x0d8001) AM_READWRITE(ip_select_r,ip_select_w)
 	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM AM_SHARE("ram") //0x1f****, Cybattler reads attract mode inputs at 0x1d****
 ADDRESS_MAP_END
@@ -303,7 +303,7 @@ static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x0ca000, 0x0cbfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_SHARE("scrollram.1")
 	AM_RANGE(0x0d4000, 0x0d7fff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_SHARE("scrollram.2")
-	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_RAM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_SHARE("scrollram.0")
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("SYSTEM")
@@ -1477,9 +1477,9 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof_megasys1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ABC)
-	MCFG_PALETTE_LENGTH(1024)
-
-	MCFG_PALETTE_INIT_OVERRIDE(megasys1_state,megasys1)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	/* sound hardware */
@@ -1537,9 +1537,9 @@ static MACHINE_CONFIG_START( system_Bbl, megasys1_state )
 	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof_megasys1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ABC)
-	MCFG_PALETTE_LENGTH(1024)
-
-	MCFG_PALETTE_INIT_OVERRIDE(megasys1_state,megasys1)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	/* sound hardware */
@@ -1609,9 +1609,9 @@ static MACHINE_CONFIG_START( system_D, megasys1_state )
 	MCFG_SCREEN_VBLANK_DRIVER(megasys1_state, screen_eof_megasys1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ABC)
-	MCFG_PALETTE_LENGTH(1024)
-
-	MCFG_PALETTE_INIT_OVERRIDE(megasys1_state,megasys1)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
 	/* sound hardware */
@@ -1668,7 +1668,8 @@ static MACHINE_CONFIG_START( system_Z, megasys1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update_megasys1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", Z)
-	MCFG_PALETTE_LENGTH(768)
+	MCFG_PALETTE_ADD("palette", 768)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 

@@ -219,7 +219,8 @@ sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type
 		m_master_cpu(*this, "32x_master_sh2"),
 		m_slave_cpu(*this, "32x_slave_sh2"),
 		m_lch_pwm(*this, "lch_pwm"),
-		m_rch_pwm(*this, "rch_pwm")
+		m_rch_pwm(*this, "rch_pwm"),
+		m_palette(*this)
 {
 }
 
@@ -231,6 +232,16 @@ sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, const 
 sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_32x_device(mconfig, SEGA_32X_PAL, "sega_32x_pal", tag, owner, clock, "sega_32x_pal", __FILE__)
 {
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void sega_32x_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<sega_32x_device &>(device).m_palette.set_tag(tag);
 }
 
 TIMER_CALLBACK( _32x_pwm_callback );
@@ -256,7 +267,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_palette_w )
 
 	m_32x_palette_lookup[offset] = (r << 10) | (g << 5) | (b << 0) | (p << 15);
 
-	palette_set_color_rgb(space.machine(),offset+0x40,pal5bit(r),pal5bit(g),pal5bit(b));
+	m_palette->set_pen_color(offset+0x40,pal5bit(r),pal5bit(g),pal5bit(b));
 
 }
 

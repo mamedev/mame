@@ -355,7 +355,7 @@ static MACHINE_CONFIG_START( powerins, powerins_state )
 	MCFG_SCREEN_UPDATE_DRIVER(powerins_state, screen_update_powerins)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", powerins)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */

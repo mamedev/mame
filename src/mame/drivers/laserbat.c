@@ -521,7 +521,7 @@ UINT32 laserbat_state::screen_update_laserbat(screen_device &screen, bitmap_ind1
 	}
 
 	if (m_sprite_enable)
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				m_sprite_code,
 				m_sprite_color,
 				0,0,
@@ -723,7 +723,7 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state, screen_update_laserbat)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", laserbat)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_S2636_ADD("s2636_1", s2636_1_config)
 	MCFG_S2636_ADD("s2636_2", s2636_2_config)
@@ -771,7 +771,7 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state, screen_update_laserbat)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", laserbat)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_S2636_ADD("s2636_1", s2636_1_config)
 	MCFG_S2636_ADD("s2636_2", s2636_2_config)

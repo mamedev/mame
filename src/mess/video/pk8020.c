@@ -48,10 +48,10 @@ UINT32 pk8020_state::screen_update_pk8020(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-void pk8020_state::palette_init()
+PALETTE_INIT_MEMBER(pk8020_state, pk8020)
 {
 	int i;
 	for(i=0;i<16;i++) {
-		palette_set_color( machine(), i, rgb_t(i*0x10,i*0x10,i*0x10) );
+		m_palette->set_pen_color( i, rgb_t(i*0x10,i*0x10,i*0x10) );
 	}
 }

@@ -1828,7 +1828,8 @@ static MACHINE_CONFIG_START( rallybik, toaplan1_rallybik_state )
 	MCFG_TOAPLAN_SCU_GFXDECODE("gfxdecode")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", rallybik)
-	MCFG_PALETTE_LENGTH((64*16)+(64*16))
+	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_rallybik_state,rallybik)
 
@@ -1865,7 +1866,8 @@ static MACHINE_CONFIG_START( truxton, toaplan1_state )
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_state, screen_eof_toaplan1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", toaplan1)
-	MCFG_PALETTE_LENGTH((64*16)+(64*16))
+	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -1902,7 +1904,8 @@ static MACHINE_CONFIG_START( hellfire, toaplan1_state )
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_state, screen_eof_toaplan1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", toaplan1)
-	MCFG_PALETTE_LENGTH((64*16)+(64*16))
+	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -1939,7 +1942,8 @@ static MACHINE_CONFIG_START( zerowing, toaplan1_state )
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_state, screen_eof_toaplan1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", toaplan1)
-	MCFG_PALETTE_LENGTH((64*16)+(64*16))
+	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -1980,7 +1984,8 @@ static MACHINE_CONFIG_START( demonwld, toaplan1_state )
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_state, screen_eof_toaplan1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", toaplan1)
-	MCFG_PALETTE_LENGTH((64*16)+(64*16))
+	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -2015,7 +2020,8 @@ static MACHINE_CONFIG_START( samesame, toaplan1_state )
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_state, screen_eof_samesame)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", toaplan1)
-	MCFG_PALETTE_LENGTH((64*16)+(64*16))
+	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -2052,7 +2058,8 @@ static MACHINE_CONFIG_START( outzone, toaplan1_state )
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_state, screen_eof_toaplan1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", toaplan1)
-	MCFG_PALETTE_LENGTH((64*16)+(64*16))
+	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -2087,7 +2094,8 @@ static MACHINE_CONFIG_START( vimana, toaplan1_state )
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_state, screen_eof_toaplan1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", toaplan1)
-	MCFG_PALETTE_LENGTH((64*16)+(64*16))
+	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,toaplan1)
 

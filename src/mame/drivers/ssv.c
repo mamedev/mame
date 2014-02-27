@@ -2593,7 +2593,7 @@ static MACHINE_CONFIG_START( ssv, ssv_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_ssv)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ssv)
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2642,6 +2642,7 @@ static MACHINE_CONFIG_DERIVED( gdfs, ssv )
 
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 	MCFG_ST0020_SPRITES_GFXDECODE("gfxdecode")
+	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gdfs)
 	MCFG_VIDEO_START_OVERRIDE(ssv_state,gdfs)

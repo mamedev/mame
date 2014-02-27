@@ -59,7 +59,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(tugboat);
 	UINT32 screen_update_tugboat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
 		int addr,int gfx0,int gfx1,int transparency);
@@ -86,12 +86,12 @@ void tugboat_state::video_start()
 
 /*  there isn't the usual resistor array anywhere near the color prom,
     just four 1k resistors. */
-void tugboat_state::palette_init()
+PALETTE_INIT_MEMBER(tugboat_state, tugboat)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int r,g,b,brt;
 
@@ -101,7 +101,7 @@ void tugboat_state::palette_init()
 		g = brt * ((color_prom[i] >> 1) & 0x01);
 		b = brt * ((color_prom[i] >> 2) & 0x01);
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -152,7 +152,7 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
 				transpen = 1;
 			}
 
-			m_gfxdecode->gfx(rgn)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(rgn)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					0,0,
@@ -361,7 +361,8 @@ static MACHINE_CONFIG_START( tugboat, tugboat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tugboat_state, screen_update_tugboat)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tugboat)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(tugboat_state, tugboat)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

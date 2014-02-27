@@ -356,7 +356,7 @@ WRITE32_MEMBER(psikyosh_state::paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dwo
 	g = ((m_paletteram[offset] & 0x00ff0000) >>16);
 	r = ((m_paletteram[offset] & 0xff000000) >>24);
 
-	palette_set_color(machine(), offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
 WRITE32_MEMBER(psikyosh_state::psikyosh_vidregs_w)
@@ -802,7 +802,7 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram32_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", psikyosh)
-	MCFG_PALETTE_LENGTH(0x5000/4)
+	MCFG_PALETTE_ADD("palette", 0x5000/4)
 
 
 	/* sound hardware */

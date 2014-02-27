@@ -220,7 +220,7 @@ void darkhors_state::draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle
 		sy  =   -sy;
 		sy  +=  0xf8;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code/2, color,
 					flipx,  flipy,  sx, sy, 0);
 	}
@@ -251,7 +251,7 @@ UINT32 darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_ind1
 	}
 #endif
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_tmap->set_scrollx(0, (m_tmapscroll[0] >> 16) - 5);
 	m_tmap->set_scrolly(0, (m_tmapscroll[0] & 0xffff) - 0xff );
@@ -306,8 +306,8 @@ WRITE32_MEMBER(darkhors_state::darkhors_eeprom_w)
 
 WRITE32_MEMBER(darkhors_state::paletteram32_xBBBBBGGGGGRRRRR_dword_w)
 {
-	if (ACCESSING_BITS_16_31)   paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset*2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_BITS_0_15)    paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset*2+1, data, mem_mask);
+	if (ACCESSING_BITS_16_31)   m_palette->write(space, offset*2, data >> 16, mem_mask >> 16);
+	if (ACCESSING_BITS_0_15)    m_palette->write(space, offset*2+1, data, mem_mask);
 }
 
 WRITE32_MEMBER(darkhors_state::darkhors_input_sel_w)
@@ -703,7 +703,7 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_darkhors)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", darkhors)
-	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_PALETTE_ADD("palette", 0x10000)
 
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state,darkhors)
 
@@ -750,8 +750,9 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	st0020_device::set_is_st0032(*device, 1);
 	st0020_device::set_is_jclub2o(*device, 1); // offsets
 	MCFG_ST0020_SPRITES_GFXDECODE("gfxdecode")
+	MCFG_ST0020_SPRITES_PALETTE("palette")
 
-	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_PALETTE_ADD("palette", 0x10000)
 
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state,jclub2)
 MACHINE_CONFIG_END
@@ -812,13 +813,14 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_jclub2o)
 
-	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_PALETTE_ADD("palette", 0x10000)
 	
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 	st0020_device::set_is_jclub2o(*device, 1);
 	MCFG_ST0020_SPRITES_GFXDECODE("gfxdecode")
+	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state,jclub2o)
 

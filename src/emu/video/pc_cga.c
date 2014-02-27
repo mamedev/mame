@@ -206,8 +206,8 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_cga )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE_STATIC( mc6845_cga )
 
-	MCFG_PALETTE_LENGTH(/* CGA_PALETTE_SETS * 16*/ 65536 )
-	MCFG_PALETTE_INIT(pc_cga)
+	MCFG_PALETTE_ADD("palette", /* CGA_PALETTE_SETS * 16*/ 65536 )
+	MCFG_PALETTE_INIT_LEGACY(pc_cga)
 
 	MCFG_MC6845_ADD(CGA_MC6845_NAME, MC6845, CGA_SCREEN_NAME, XTAL_14_31818MHz/8, mc6845_cga_intf)
 
@@ -231,8 +231,8 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_mc1502 )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz,912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE_STATIC( cga_poisk2 )
 
-	MCFG_PALETTE_LENGTH(/* CGA_PALETTE_SETS * 16*/ 65536 )
-	MCFG_PALETTE_INIT(pc_cga)
+	MCFG_PALETTE_ADD("palette", /* CGA_PALETTE_SETS * 16*/ 65536 )
+	MCFG_PALETTE_INIT_LEGACY(pc_cga)
 
 	MCFG_MC6845_ADD(CGA_MC6845_NAME, MC6845, CGA_SCREEN_NAME, XTAL_16MHz/8, mc6845_cga_intf)
 
@@ -292,7 +292,7 @@ static PALETTE_INIT( pc_cga )
 
 	for ( i = 0; i < CGA_PALETTE_SETS * 16; i++ )
 	{
-		palette_set_color_rgb( machine, i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
+		palette.set_pen_color(i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
 	}
 
 	i = 0x8000;
@@ -302,7 +302,7 @@ static PALETTE_INIT( pc_cga )
 		{
 			for ( b = 0; b < 32; b++ )
 			{
-				palette_set_color_rgb( machine, i, r << 3, g << 3, b << 3 );
+				palette.set_pen_color(i, r << 3, g << 3, b << 3 );
 				i++;
 			}
 		}

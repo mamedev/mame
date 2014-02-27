@@ -325,7 +325,7 @@ WRITE16_MEMBER(playmark_state::bigtwin_paletteram_w)
 	g |= ((val & 0x04) >> 2);
 	b |= ((val & 0x02) >> 1);
 
-	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE16_MEMBER(playmark_state::bigtwin_scroll_w)
@@ -435,7 +435,7 @@ void playmark_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		if(!pri && (color & 0x0c) == 0x0c)
 			pri = 2;
 
-		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->prio_transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx,0,
@@ -473,7 +473,7 @@ void playmark_state::bigtwinb_draw_sprites( screen_device &screen, bitmap_ind16 
 		code = spriteram[offs + 2] >> codeshift;
 		color = ((spriteram[offs + 1] & 0xf000) >> 12);
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx,0,
@@ -545,7 +545,7 @@ UINT32 playmark_state::screen_update_bigtwinb(screen_device &screen, bitmap_ind1
 		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	return 0;
 }
 
@@ -599,6 +599,6 @@ UINT32 playmark_state::screen_update_hrdtimes(screen_device &screen, bitmap_ind1
 		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	return 0;
 }

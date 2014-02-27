@@ -87,7 +87,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(olibochu);
 	UINT32 screen_update_olibochu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(olibochu_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -97,12 +97,12 @@ public:
 
 
 
-void olibochu_state::palette_init()
+PALETTE_INIT_MEMBER(olibochu_state, olibochu)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		UINT8 pen;
 		int bit0, bit1, bit2, r, g, b;
@@ -131,7 +131,7 @@ void olibochu_state::palette_init()
 		bit1 = BIT(color_prom[pen], 7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -199,7 +199,7 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 
 		
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -225,7 +225,7 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 
 		
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -469,8 +469,8 @@ static MACHINE_CONFIG_START( olibochu, olibochu_state )
 	MCFG_SCREEN_UPDATE_DRIVER(olibochu_state, screen_update_olibochu)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", olibochu)
-	MCFG_PALETTE_LENGTH(512)
-
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(olibochu_state, olibochu)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

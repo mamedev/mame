@@ -708,8 +708,8 @@ static MACHINE_CONFIG_START( tx1, tx1_state )
 
 	MCFG_I8255A_ADD("ppi8255", tx1_ppi8255_intf)
 
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(tx1_state,tx1)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(tx1_state,tx1)
 
 	MCFG_DEFAULT_LAYOUT(layout_triphsxs)
 
@@ -776,8 +776,8 @@ static MACHINE_CONFIG_START( buggyboy, tx1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_buggyboy_right)
 	MCFG_SCREEN_VBLANK_DRIVER(tx1_state, screen_eof_buggyboy)
 
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(tx1_state,buggyboy)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggyboy)
 
 	MCFG_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
@@ -818,8 +818,8 @@ static MACHINE_CONFIG_START( buggybjr, tx1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tx1_state, screen_update_buggybjr)
 	MCFG_SCREEN_VBLANK_DRIVER(tx1_state, screen_eof_buggyboy)
 
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(tx1_state,buggyboy)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggybjr)
 
 	MCFG_SPEAKER_STANDARD_STEREO("frontleft", "frontright")

@@ -312,7 +312,8 @@ static MACHINE_CONFIG_START( poisk1, p1_state )
 	MCFG_SCREEN_UPDATE_DRIVER( p1_state, screen_update )
 
 	/* XXX verify palette */
-	MCFG_PALETTE_LENGTH( CGA_PALETTE_SETS * 16 )
+	MCFG_PALETTE_ADD("palette",  CGA_PALETTE_SETS * 16 )
+	MCFG_PALETTE_INIT_OWNER(p1_state, p1)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

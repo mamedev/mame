@@ -1278,7 +1278,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(taitojc_state, screen_update_taitojc)
 
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD("palette", 32768)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_en_sound)

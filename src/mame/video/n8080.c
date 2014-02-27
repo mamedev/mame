@@ -21,7 +21,7 @@ PALETTE_INIT_MEMBER(n8080_state,n8080)
 	int i;
 
 	for (i = 0; i < 8; i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		palette.set_pen_color(i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 }
 
 
@@ -29,17 +29,17 @@ PALETTE_INIT_MEMBER(n8080_state,helifire)
 {
 	int i;
 
-	PALETTE_INIT_CALL_MEMBER(n8080);
+	PALETTE_INIT_NAME(n8080)(palette);
 
 	for (i = 0; i < 0x100; i++)
 	{
 		int level = 0xff * exp(-3 * i / 255.); /* capacitor discharge */
 
-		palette_set_color(machine(), 0x000 + 8 + i, rgb_t(0x00, 0x00, level));   /* shades of blue */
-		palette_set_color(machine(), 0x100 + 8 + i, rgb_t(0x00, 0xC0, level));   /* shades of blue w/ green star */
+		palette.set_pen_color(0x000 + 8 + i, rgb_t(0x00, 0x00, level));   /* shades of blue */
+		palette.set_pen_color(0x100 + 8 + i, rgb_t(0x00, 0xC0, level));   /* shades of blue w/ green star */
 
-		palette_set_color(machine(), 0x200 + 8 + i, rgb_t(level, 0x00, 0x00));   /* shades of red */
-		palette_set_color(machine(), 0x300 + 8 + i, rgb_t(level, 0xC0, 0x00));   /* shades of red w/ green star */
+		palette.set_pen_color(0x200 + 8 + i, rgb_t(level, 0x00, 0x00));   /* shades of red */
+		palette.set_pen_color(0x300 + 8 + i, rgb_t(level, 0xC0, 0x00));   /* shades of red w/ green star */
 	}
 }
 
@@ -364,7 +364,7 @@ void n8080_state::screen_eof_helifire(screen_device &screen, bool state)
 				}
 			}
 
-			palette_set_color_rgb(machine(),i,
+			m_palette->set_pen_color(i,
 				R ? 255 : 0,
 				G ? 255 : 0,
 				B ? 255 : 0);

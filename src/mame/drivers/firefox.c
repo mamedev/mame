@@ -229,7 +229,7 @@ UINT32 firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 
 	int sprite;
 	int gfxtop = screen.visible_area().min_y;
 
-	bitmap.fill(palette_get_color(machine(), 256), cliprect);
+	bitmap.fill(m_palette->pen_color(256), cliprect);
 
 	for( sprite = 0; sprite < 32; sprite++ )
 	{
@@ -249,7 +249,7 @@ UINT32 firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 
 				int flipx = flags & 0x20;
 				int code = sprite_data[ 15 - row ] + ( 256 * ( ( flags >> 6 ) & 3 ) );
 
-				m_gfxdecode->gfx( 1 )->transpen(bitmap,cliprect, code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), 0 );
+				m_gfxdecode->gfx( 1 )->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), 0 );
 			}
 		}
 	}
@@ -273,7 +273,7 @@ void firefox_state::set_rgba( int start, int index, unsigned char *palette_ram )
 	int b = palette_ram[ index + 512 ];
 	int a = ( b & 3 ) * 0x55;
 
-	palette_set_color( machine(), start + index, rgb_t( a, r, g, b ) );
+	m_palette->set_pen_color( start + index, rgb_t( a, r, g, b ) );
 }
 
 WRITE8_MEMBER(firefox_state::tile_palette_w)
@@ -722,7 +722,7 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", firefox)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 
 
 	MCFG_LASERDISC_22VP931_ADD("laserdisc")

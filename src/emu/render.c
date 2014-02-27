@@ -612,18 +612,18 @@ render_container::render_container(render_manager &manager, screen_device *scree
 	empty();
 
 	// if we have a screen, read and apply the options
-	if (screen != NULL)
+	if (m_screen != NULL)
 	{
 		// set the initial orientation and brightness/contrast/gamma
 		m_user.m_orientation = manager.machine().system().flags & ORIENTATION_MASK;
 		m_user.m_brightness = manager.machine().options().brightness();
 		m_user.m_contrast = manager.machine().options().contrast();
 		m_user.m_gamma = manager.machine().options().gamma();
+		// allocate a client to the main palette
+		if (m_screen->palette() != NULL)
+			m_palclient = global_alloc(palette_client(*m_screen->palette()->palette()));
 	}
 
-	// allocate a client to the main palette
-	if (manager.machine().palette != NULL)
-		m_palclient = global_alloc(palette_client(*manager.machine().palette));
 	recompute_lookups();
 }
 

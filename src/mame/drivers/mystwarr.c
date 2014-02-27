@@ -318,7 +318,7 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x600000, 0x601fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w)
 	AM_RANGE(0x602000, 0x603fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read(essential)
 	AM_RANGE(0x680000, 0x683fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 #if MW_DEBUG
 	AM_RANGE(0x480000, 0x4800ff) AM_DEVREAD("k055555", k055555_device, k055555_word_r)
 	AM_RANGE(0x482010, 0x48201f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
@@ -359,7 +359,7 @@ static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x302000, 0x303fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read/write (essential)
 	AM_RANGE(0x310000, 0x311fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREAD("k053250_1", k053250_device, rom_r)
-	AM_RANGE(0x330000, 0x331fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x330000, 0x331fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 #if MW_DEBUG
 	AM_RANGE(0x240000, 0x240007) AM_DEVREAD("k055673", k055673_device, k053246_reg_word_r)
 	AM_RANGE(0x244010, 0x24401f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x302000, 0x303fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read(essential)
 	AM_RANGE(0x304000, 0x3041ff) AM_RAM
 	AM_RANGE(0x310000, 0x311fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
-	AM_RANGE(0x330000, 0x331fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x330000, 0x331fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 #if MW_DEBUG
 	AM_RANGE(0x240000, 0x240007) AM_DEVREAD("k055673", k055673_device, k053246_reg_word_r)
 	AM_RANGE(0x244010, 0x24401f) AM_DEVREAD("k055673", k055673_device, k053247_reg_word_r)
@@ -489,7 +489,7 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x41c000, 0x41c01f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)              // CCU
 	AM_RANGE(0x41e000, 0x41e007) AM_DEVWRITE("k056832", k056832_device,b_word_w)              // VSCCS
 	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(k053247_martchmp_word_r,k053247_martchmp_word_w) AM_SHARE("spriteram")    // sprite RAM
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")                     // palette RAM
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")                     // palette RAM
 	AM_RANGE(0x680000, 0x681fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM
 	AM_RANGE(0x682000, 0x683fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read/write (essential)
 	AM_RANGE(0x700000, 0x703fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)          // tile ROM readback
@@ -509,7 +509,7 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(k053247_scattered_word_r,k053247_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x410000, 0x411fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM
 	AM_RANGE(0x412000, 0x413fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read/write (essential)
-	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x420000, 0x421fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x430000, 0x430007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
 	AM_RANGE(0x440000, 0x443fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
 	AM_RANGE(0x450000, 0x45000f) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
@@ -556,7 +556,7 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(k053247_scattered_word_r,k053247_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x410000, 0x411fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w)     // tilemap RAM
 	AM_RANGE(0x412000, 0x413fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w)     // tilemap RAM mirror read / write (essential)
-	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x420000, 0x421fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x430000, 0x430007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
 	AM_RANGE(0x440000, 0x441fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
 	AM_RANGE(0x450000, 0x45000f) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)
@@ -1046,7 +1046,7 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,mystwarr)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
@@ -1056,14 +1056,20 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_mystwarr)
 
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(XRGB)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
+
 	
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K056832_ADD_NOINTF("k056832"/*, mystwarr_k056832_intf*/)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K055555_ADD("k055555")
 	MCFG_K055673_ADD_NOINTF("k055673")
 	MCFG_K055673_GFXDECODE("gfxdecode")
+	MCFG_K055673_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,mystwarr)
 
@@ -1195,7 +1201,12 @@ static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
 	MCFG_DEVICE_REMOVE("k053252")
 	MCFG_K053252_ADD("k053252", 16000000/2, martchmp_k053252_intf)
 
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(XRGB)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,martchmp)
 

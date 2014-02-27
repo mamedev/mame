@@ -477,8 +477,8 @@ static MACHINE_CONFIG_START( lvcards, lvcards_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lvcards_state, screen_update_lvcards)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", lvcards)
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(lvcards_state, lvcards)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -507,7 +507,8 @@ static MACHINE_CONFIG_DERIVED( ponttehk, lvcards )
 	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
 
 	// video hardware
-	MCFG_PALETTE_INIT_OVERRIDE(lvcards_state,ponttehk)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(lvcards_state,ponttehk)
 MACHINE_CONFIG_END
 
 ROM_START( lvpoker )

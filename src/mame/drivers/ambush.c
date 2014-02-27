@@ -243,8 +243,8 @@ static MACHINE_CONFIG_START( ambush, ambush_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update_ambush)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ambush)
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(ambush_state, ambush)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

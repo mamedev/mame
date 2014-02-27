@@ -80,7 +80,7 @@ void cloak_state::set_pens()
 		bit2 = (~palette_ram[i] >> 2) & 0x01;
 		b = combine_3_weights(weights, bit0, bit1, bit2);
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -212,7 +212,7 @@ void cloak_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, 0, flipx, flipy,   sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, 0, flipx, flipy,   sx, sy, 0);
 	}
 }
 

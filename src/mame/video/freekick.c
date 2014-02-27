@@ -51,7 +51,7 @@ void freekick_state::gigas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -85,7 +85,7 @@ void freekick_state::pbillrd_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -120,7 +120,7 @@ void freekick_state::freekick_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

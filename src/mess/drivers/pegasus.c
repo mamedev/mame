@@ -478,8 +478,7 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_SCREEN_SIZE(32*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
 	MCFG_GFXDECODE_ADD("gfxdecode", pegasus)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

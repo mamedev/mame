@@ -6,15 +6,15 @@
 PALETTE_INIT_MEMBER(vsnes_state,vsnes)
 {
 	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu1");
-	ppu->init_palette_rgb(machine(), 0 );
+	ppu->init_palette_rgb(palette, 0 );
 }
 
 PALETTE_INIT_MEMBER(vsnes_state,vsdual)
 {
 	ppu2c0x_device *ppu1 = machine().device<ppu2c0x_device>("ppu1");
 	ppu2c0x_device *ppu2 = machine().device<ppu2c0x_device>("ppu2");
-	ppu1->init_palette_rgb(machine(), 0 );
-	ppu2->init_palette_rgb(machine(), 8*4*16 );
+	ppu1->init_palette_rgb(palette, 0 );
+	ppu2->init_palette_rgb(palette, 8*4*16 );
 }
 
 void vsnes_state::ppu_irq_1(int *ppu_regs)

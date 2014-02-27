@@ -89,7 +89,7 @@ void pirates_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		ypos = 0xf2 - ypos;
 
-		gfx->transpen(bitmap,cliprect,
+		gfx->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

@@ -292,9 +292,8 @@ static MACHINE_CONFIG_START( homez80, homez80_state )
 	MCFG_SCREEN_UPDATE_DRIVER(homez80_state, screen_update)
 	MCFG_SCREEN_SIZE(344, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 344-1, 0, 32*8-1)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
-	MCFG_GFXDECODE_ADD("gfxdecode",  homez80 )
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", homez80 )
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -347,23 +347,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Graphics definitions
- *
- *************************************/
-
-PALETTE_INIT_MEMBER(c65_state,c65)
-{
-	int i;
-
-	for ( i = 0; i < 0x100; i++ )
-	{
-		palette_set_color_rgb(machine(), i, 0, 0, 0);
-	}
-}
-
-
-/*************************************
- *
  *  Sound definitions
  *
  *************************************/
@@ -581,9 +564,6 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_SCREEN_SIZE(525 * 2, 520 * 2)
 	MCFG_SCREEN_VISIBLE_AREA(VIC6567_STARTVISIBLECOLUMNS ,(VIC6567_STARTVISIBLECOLUMNS + VIC6567_VISIBLECOLUMNS - 1) * 2, VIC6567_STARTVISIBLELINES, VIC6567_STARTVISIBLELINES + VIC6567_VISIBLELINES - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(c65_state, screen_update_c65)
-
-	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT_OVERRIDE(c65_state, c65 )
 
 	MCFG_VIC3_ADD("vic3", c65_vic3_ntsc_intf)
 

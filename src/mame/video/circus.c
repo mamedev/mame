@@ -80,7 +80,7 @@ void circus_state::draw_sprite_collision( bitmap_ind16 &bitmap, const rectangle 
 					if (pixel)
 					{
 						collision |= bitmap.pix16(dy, dx);
-						bitmap.pix16(dy, dx) = machine().pens[pixel];
+						bitmap.pix16(dy, dx) = m_palette->pen(pixel);
 					}
 				}
 			}
@@ -168,7 +168,7 @@ void circus_state::robotbwl_draw_bowling_alley( bitmap_ind16 &bitmap, const rect
 
 void circus_state::robotbwl_draw_ball( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	m_gfxdecode->gfx(1)->transpen(bitmap,/* Y is horizontal position */
+	m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,/* Y is horizontal position */
 			cliprect,
 			m_clown_z,
 			0,
@@ -187,7 +187,7 @@ UINT32 circus_state::screen_update_robotbwl(screen_device &screen, bitmap_ind16 
 
 void circus_state::crash_draw_car( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	m_gfxdecode->gfx(1)->transpen(bitmap,/* Y is horizontal position */
+	m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,/* Y is horizontal position */
 		cliprect,
 		m_clown_z,
 		0,

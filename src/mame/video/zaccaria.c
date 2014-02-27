@@ -33,7 +33,7 @@ Here's the hookup from the proms (82s131) to the r-g-b-outputs
 
 
 ***************************************************************************/
-void zaccaria_state::palette_init()
+PALETTE_INIT_MEMBER(zaccaria_state, zaccaria)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i, j, k;
@@ -47,9 +47,6 @@ void zaccaria_state::palette_init()
 								2, resistances_b,  weights_b,  470, 0,
 								0, 0, 0, 0, 0);
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x200);
-
 	for (i = 0; i < 0x200; i++)
 	{
 		/*
@@ -61,7 +58,7 @@ void zaccaria_state::palette_init()
 		  black anyway.
 		 */
 		if (((i % 64) / 8) == 0)
-			colortable_palette_set_color(machine().colortable, i, rgb_t::black);
+			palette.set_indirect_color(i, rgb_t::black);
 		else
 		{
 			int bit0, bit1, bit2;
@@ -84,7 +81,7 @@ void zaccaria_state::palette_init()
 			bit1 = (color_prom[i + 0x200] >> 0) & 0x01;
 			b = combine_2_weights(weights_b, bit0, bit1);
 
-			colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+			palette.set_indirect_color(i, rgb_t(r, g, b));
 		}
 	}
 
@@ -96,13 +93,13 @@ void zaccaria_state::palette_init()
 		for (j = 0;j < 4;j++)
 			for (k = 0;k < 8;k++)
 				/* swap j and k to make the colors sequential */
-				colortable_entry_set_value(machine().colortable, 0 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j);
+				palette.set_pen_indirect(0 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j);
 
 	for (i = 0;i < 8;i++)
 		for (j = 0;j < 4;j++)
 			for (k = 0;k < 8;k++)
 				/* swap j and k to make the colors sequential */
-				colortable_entry_set_value(machine().colortable, 256 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j+1);
+				palette.set_pen_indirect(256 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j+1);
 }
 
 
@@ -233,7 +230,7 @@ void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				(spriteram[offs + o1] & 0x3f) + (spriteram[offs + o2] & 0xc0),
 				((spriteram[offs + o2] & 0x07) << 2) | color,
 				flipx,flipy,sx,sy,0);

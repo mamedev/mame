@@ -1846,8 +1846,8 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", spi)
-	MCFG_PALETTE_LENGTH(6144)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
+
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1944,8 +1944,8 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", spi)
-	MCFG_PALETTE_LENGTH(6144)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
+
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1997,8 +1997,8 @@ static MACHINE_CONFIG_START( sys386f, seibuspi_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sys386f)
-	MCFG_PALETTE_LENGTH(8192)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
+
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, sys386f)
 

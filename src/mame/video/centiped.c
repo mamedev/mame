@@ -238,7 +238,7 @@ WRITE8_MEMBER(centiped_state::centiped_paletteram_w)
 
 		/* character colors, set directly */
 		if ((offset & 0x08) == 0)
-			palette_set_color(machine(), offset & 0x03, color);
+			m_palette->set_pen_color(offset & 0x03, color);
 
 		/* sprite colors - set all the applicable ones */
 		else
@@ -250,13 +250,13 @@ WRITE8_MEMBER(centiped_state::centiped_paletteram_w)
 			for (i = 0; i < 0x100; i += 4)
 			{
 				if (offset == ((i >> 2) & 0x03))
-					palette_set_color(machine(), i + 4 + 1, color);
+					m_palette->set_pen_color(i + 4 + 1, color);
 
 				if (offset == ((i >> 4) & 0x03))
-					palette_set_color(machine(), i + 4 + 2, color);
+					m_palette->set_pen_color(i + 4 + 2, color);
 
 				if (offset == ((i >> 6) & 0x03))
-					palette_set_color(machine(), i + 4 + 3, color);
+					m_palette->set_pen_color(i + 4 + 3, color);
 			}
 		}
 	}
@@ -281,7 +281,7 @@ PALETTE_INIT_MEMBER(centiped_state,warlords)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		UINT8 pen;
 		int r, g, b;
@@ -306,7 +306,7 @@ PALETTE_INIT_MEMBER(centiped_state,warlords)
 			r = g = b = grey;
 		}
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -364,7 +364,7 @@ void centiped_state::milliped_set_color(offs_t offset, UINT8 data)
 
 	/* character colors, set directly */
 	if (offset < 0x10)
-		palette_set_color(machine(), offset, color);
+		m_palette->set_pen_color(offset, color);
 
 	/* sprite colors - set all the applicable ones */
 	else
@@ -378,13 +378,13 @@ void centiped_state::milliped_set_color(offs_t offset, UINT8 data)
 		for (i = (base << 6); i < (base << 6) + 0x100; i += 4)
 		{
 			if (offset == ((i >> 2) & 0x03))
-				palette_set_color(machine(), i + 0x10 + 1, color);
+				m_palette->set_pen_color(i + 0x10 + 1, color);
 
 			if (offset == ((i >> 4) & 0x03))
-				palette_set_color(machine(), i + 0x10 + 2, color);
+				m_palette->set_pen_color(i + 0x10 + 2, color);
 
 			if (offset == ((i >> 6) & 0x03))
-				palette_set_color(machine(), i + 0x10 + 3, color);
+				m_palette->set_pen_color(i + 0x10 + 3, color);
 		}
 	}
 }
@@ -439,7 +439,7 @@ UINT32 centiped_state::screen_update_centiped(screen_device &screen, bitmap_ind1
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip, code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
+		m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,spriteclip, code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
 	}
 	return 0;
 }
@@ -484,7 +484,7 @@ UINT32 centiped_state::screen_update_warlords(screen_device &screen, bitmap_ind1
 			flipx = !flipx;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
 	}
 	return 0;
 }
@@ -515,7 +515,7 @@ UINT32 centiped_state::screen_update_bullsdrt(screen_device &screen, bitmap_ind1
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,spriteclip, code, color & 0x3f, 1, flipy, x, y, 0);
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,spriteclip, code, color & 0x3f, 1, flipy, x, y, 0);
 	}
 	return 0;
 }
@@ -552,7 +552,7 @@ UINT32 centiped_state::screen_update_milliped(screen_device &screen, bitmap_ind1
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip, code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
+		m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,spriteclip, code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
 	}
 	return 0;
 }

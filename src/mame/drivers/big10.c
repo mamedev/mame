@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( big10, big10_state )
 	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
 
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

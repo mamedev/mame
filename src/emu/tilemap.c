@@ -948,7 +948,7 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 		int scrolly = effective_colscroll(0, height);
 		for (int ypos = scrolly - m_height; ypos <= blit.cliprect.max_y; ypos += m_height)
 			for (int xpos = scrollx - m_width; xpos <= blit.cliprect.max_x; xpos += m_width)
-				draw_instance(dest, blit, xpos, ypos);
+				draw_instance(screen, dest, blit, xpos, ypos);
 	}
 
 	// scrolling rows + vertical scroll
@@ -985,7 +985,7 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 
 				// iterate over X to handle wraparound
 				for (int xpos = scrollx - m_width; xpos <= original_cliprect.max_x; xpos += m_width)
-					draw_instance(dest, blit, xpos, ypos);
+					draw_instance(screen, dest, blit, xpos, ypos);
 			}
 		}
 	}
@@ -1021,7 +1021,7 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 
 				// iterate over Y to handle wraparound
 				for (int ypos = scrolly - m_height; ypos <= original_cliprect.max_y; ypos += m_height)
-					draw_instance(dest, blit, xpos, ypos);
+					draw_instance(screen, dest, blit, xpos, ypos);
 			}
 		}
 	}
@@ -1073,7 +1073,7 @@ g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	pixmap();
 
 	// then do the roz copy
-	draw_roz_core(dest, blit, startx, starty, incxx, incxy, incyx, incyy, wraparound);
+	draw_roz_core(screen, dest, blit, startx, starty, incxx, incxy, incyx, incyy, wraparound);
 g_profiler.stop();
 }
 
@@ -1095,7 +1095,7 @@ void tilemap_t::draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectan
 //-------------------------------------------------
 
 template<class _BitmapClass>
-void tilemap_t::draw_instance(_BitmapClass &dest, const blit_parameters &blit, int xpos, int ypos)
+void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const blit_parameters &blit, int xpos, int ypos)
 {
 	// clip destination coordinates to the tilemap
 	// note that x2/y2 are exclusive, not inclusive
@@ -1183,7 +1183,7 @@ void tilemap_t::draw_instance(_BitmapClass &dest, const blit_parameters &blit, i
 			x_end = MIN(x_end, x2);
 
 			// if we're rendering something, compute the pointers
-			const rgb_t *clut = (dest.palette() != NULL) ? dest.palette()->entry_list_raw() : reinterpret_cast<const rgb_t *>(machine().pens);
+			const rgb_t *clut = (dest.palette() != NULL) ? dest.palette()->entry_list_raw() : reinterpret_cast<const rgb_t *>(screen.palette()->pens());
 			if (prev_trans != WHOLLY_TRANSPARENT)
 			{
 				const UINT16 *source0 = source_baseaddr + x_start;
@@ -1273,11 +1273,11 @@ do {                                                                        \
 } while (0)
 
 template<class _BitmapClass>
-void tilemap_t::draw_roz_core(_BitmapClass &destbitmap, const blit_parameters &blit,
+void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, const blit_parameters &blit,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound)
 {
 	// pre-cache all the inner loop values
-	const rgb_t *clut = ((destbitmap.palette() != NULL) ? destbitmap.palette()->entry_list_raw() : reinterpret_cast<const rgb_t *>(machine().pens)) + (blit.tilemap_priority_code >> 16);
+	const rgb_t *clut = ((destbitmap.palette() != NULL) ? destbitmap.palette()->entry_list_raw() : reinterpret_cast<const rgb_t *>(screen.palette()->pens())) + (blit.tilemap_priority_code >> 16);
 	bitmap_ind8 &priority_bitmap = *blit.priority;
 	const int xmask = m_pixmap.width() - 1;
 	const int ymask = m_pixmap.height() - 1;
@@ -1441,7 +1441,7 @@ void tilemap_t::draw_roz_core(_BitmapClass &destbitmap, const blit_parameters &b
 //  rowscroll and with fixed parameters
 //-------------------------------------------------
 
-void tilemap_t::draw_debug(bitmap_rgb32 &dest, UINT32 scrollx, UINT32 scrolly)
+void tilemap_t::draw_debug(screen_device &screen, bitmap_rgb32 &dest, UINT32 scrollx, UINT32 scrolly)
 {
 	// set up for the blit, using hard-coded parameters (no priority, etc)
 	blit_parameters blit;
@@ -1458,7 +1458,7 @@ void tilemap_t::draw_debug(bitmap_rgb32 &dest, UINT32 scrollx, UINT32 scrolly)
 	// iterate to handle wraparound
 	for (int ypos = scrolly - m_height; ypos <= blit.cliprect.max_y; ypos += m_height)
 		for (int xpos = scrollx - m_width; xpos <= blit.cliprect.max_x; xpos += m_width)
-			draw_instance(dest, blit, xpos, ypos);
+			draw_instance(screen, dest, blit, xpos, ypos);
 }
 
 

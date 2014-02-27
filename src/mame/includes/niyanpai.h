@@ -41,7 +41,7 @@ public:
 	bitmap_ind16 m_tmpbitmap[VRAM_MAX];
 	UINT16 *m_videoram[VRAM_MAX];
 	UINT16 *m_videoworkram[VRAM_MAX];
-	UINT16 *m_palette;
+	UINT16 *m_palette_ptr;
 	UINT8 *m_clut[VRAM_MAX];
 	int m_flipscreen_old[VRAM_MAX];
 	DECLARE_READ8_MEMBER(niyanpai_sound_r);

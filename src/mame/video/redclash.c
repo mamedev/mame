@@ -23,9 +23,6 @@ PALETTE_INIT_MEMBER(ladybug_state,redclash)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x40);
-
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
 	{
@@ -47,7 +44,7 @@ PALETTE_INIT_MEMBER(ladybug_state,redclash)
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = 0x47 * bit0 + 0x97 * bit1;
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* star colors */
@@ -70,7 +67,7 @@ PALETTE_INIT_MEMBER(ladybug_state,redclash)
 		bit0 = ((i - 0x20) >> 0) & 0x01;
 		r = 0x47 * bit0;
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -80,7 +77,7 @@ PALETTE_INIT_MEMBER(ladybug_state,redclash)
 	for (i = 0; i < 0x20; i++)
 	{
 		UINT8 ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites */
@@ -89,15 +86,15 @@ PALETTE_INIT_MEMBER(ladybug_state,redclash)
 		UINT8 ctabentry = color_prom[(i - 0x20) >> 1];
 
 		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 0) & 0x0f, 7,6,5,4,0,1,2,3);
-		colortable_entry_set_value(machine().colortable, i + 0x00, ctabentry);
+		palette.set_pen_indirect(i + 0x00, ctabentry);
 
 		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 4) & 0x0f, 7,6,5,4,0,1,2,3);
-		colortable_entry_set_value(machine().colortable, i + 0x20, ctabentry);
+		palette.set_pen_indirect(i + 0x20, ctabentry);
 	}
 
 	/* stars */
 	for (i = 0x60; i < 0x80; i++)
-		colortable_entry_set_value(machine().colortable, i, (i - 0x60) + 0x20);
+		palette.set_pen_indirect(i, (i - 0x60) + 0x20);
 }
 
 WRITE8_HANDLER( ladybug_state::redclash_videoram_w )
@@ -196,13 +193,13 @@ void ladybug_state::redclash_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 					{
 						int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
 
-						m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect,
 								code,
 								color,
 								0,0,
 								sx,sy - 16,0);
 						/* wraparound */
-						m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect,
 								code,
 								color,
 								0,0,
@@ -216,7 +213,7 @@ void ladybug_state::redclash_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 							int code = ((spriteram[offs + i + 1] & 0xf8) >> 3) + ((m_gfxbank & 1) << 5);
 							int bank = (spriteram[offs + i + 1] & 0x02) >> 1;
 
-							m_gfxdecode->gfx(4+bank)->transpen(bitmap,cliprect,
+							m_gfxdecode->gfx(4+bank)->transpen(m_palette,bitmap,cliprect,
 									code,
 									color,
 									0,0,
@@ -226,7 +223,7 @@ void ladybug_state::redclash_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 						{
 							int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
 
-							m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+							m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 									code,
 									color,
 									0,0,
@@ -235,7 +232,7 @@ void ladybug_state::redclash_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 						break;
 
 					case 1: /* 8x8 */
-						m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 								spriteram[offs + i + 1],// + 4 * (spriteram[offs + i + 2] & 0x10),
 								color,
 								0,0,
@@ -405,7 +402,7 @@ void ladybug_state::screen_eof_redclash(screen_device &screen, bool state)
 
 UINT32 ladybug_state::screen_update_redclash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	redclash_draw_stars(bitmap, cliprect, 0x60, 0, 0x00, 0xff);
 	redclash_draw_sprites(bitmap, cliprect);
 	redclash_draw_bullets(bitmap, cliprect);

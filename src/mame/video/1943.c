@@ -45,13 +45,10 @@ other 2 bits (output & 0x0c) unknown
 
 ***************************************************************************/
 
-void _1943_state::palette_init()
+PALETTE_INIT_MEMBER(_1943_state,1943)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	for (i = 0; i < 0x100; i++)
 	{
@@ -79,7 +76,7 @@ void _1943_state::palette_init()
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -89,7 +86,7 @@ void _1943_state::palette_init()
 	for (i = 0x00; i < 0x80; i++)
 	{
 		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x40;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* foreground tiles use colors 0x00-0x3f */
@@ -97,7 +94,7 @@ void _1943_state::palette_init()
 	{
 		UINT8 ctabentry = ((color_prom[0x200 + (i - 0x080)] & 0x03) << 4) |
 							((color_prom[0x100 + (i - 0x080)] & 0x0f) << 0);
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* background tiles also use colors 0x00-0x3f */
@@ -105,7 +102,7 @@ void _1943_state::palette_init()
 	{
 		UINT8 ctabentry = ((color_prom[0x400 + (i - 0x180)] & 0x03) << 4) |
 							((color_prom[0x300 + (i - 0x180)] & 0x0f) << 0);
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites use colors 0x80-0xff
@@ -115,7 +112,7 @@ void _1943_state::palette_init()
 	{
 		UINT8 ctabentry = ((color_prom[0x600 + (i - 0x280)] & 0x07) << 4) |
 							((color_prom[0x500 + (i - 0x280)] & 0x0f) << 0) | 0x80;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -203,7 +200,7 @@ void _1943_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_1943_state::c1943_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_1943_state::c1943_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, m_gfxdecode->gfx(1), 0x0f);
+	m_palette->configure_tilemap_groups(*m_bg_tilemap, *m_gfxdecode->gfx(1), 0x0f);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_char_on));
@@ -234,12 +231,12 @@ void _1943_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		if (priority)
 		{
 			if (color != 0x0a && color != 0x0b)
-				m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, code, color, flip_screen(), flip_screen(), sx, sy, 0);
+				m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect, code, color, flip_screen(), flip_screen(), sx, sy, 0);
 		}
 		else
 		{
 			if (color == 0x0a || color == 0x0b)
-				m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, code, color, flip_screen(), flip_screen(), sx, sy, 0);
+				m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect, code, color, flip_screen(), flip_screen(), sx, sy, 0);
 		}
 	}
 }
@@ -253,7 +250,7 @@ UINT32 _1943_state::screen_update_1943(screen_device &screen, bitmap_ind16 &bitm
 	if (m_bg2_on)
 		m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if (m_obj_on)
 		draw_sprites(bitmap, cliprect, 0);

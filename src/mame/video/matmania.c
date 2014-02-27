@@ -41,7 +41,7 @@
   bit 0 -- 2.2kohm resistor  -- BLUE
 
 ***************************************************************************/
-void matmania_state::palette_init()
+PALETTE_INIT_MEMBER(matmania_state, matmania)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -66,7 +66,7 @@ void matmania_state::palette_init()
 		bit3 = BIT(color_prom[64], 3);
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 		color_prom++;
 	}
 }
@@ -103,7 +103,7 @@ WRITE8_MEMBER(matmania_state::matmania_paletteram_w)
 	bit3 = BIT(val, 3);
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(machine(),offs2 + 64,rgb_t(r,g,b));
+	m_palette->set_pen_color(offs2 + 64,rgb_t(r,g,b));
 }
 
 
@@ -137,7 +137,7 @@ UINT32 matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind1
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap,m_tmpbitmap->cliprect(),
+		m_gfxdecode->gfx(1)->opaque(m_palette,*m_tmpbitmap,m_tmpbitmap->cliprect(),
 				m_videoram[offs] + ((m_colorram[offs] & 0x08) << 5),
 				(m_colorram[offs] & 0x30) >> 4,
 				0,sy >= 16, /* flip horizontally tiles on the right half of the bitmap */
@@ -150,7 +150,7 @@ UINT32 matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind1
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap2,m_tmpbitmap2->cliprect(),
+		m_gfxdecode->gfx(1)->opaque(m_palette,*m_tmpbitmap2,m_tmpbitmap2->cliprect(),
 				m_videoram3[offs] + ((m_colorram3[offs] & 0x08) << 5),
 				(m_colorram3[offs] & 0x30) >> 4,
 				0,sy >= 16, /* flip horizontally tiles on the right half of the bitmap */
@@ -172,7 +172,7 @@ UINT32 matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind1
 	{
 		if (spriteram[offs] & 0x01)
 		{
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 					spriteram[offs + 1] + ((spriteram[offs] & 0xf0) << 4),
 					(spriteram[offs] & 0x08) >> 3,
 					spriteram[offs] & 0x04, spriteram[offs] & 0x02,
@@ -187,7 +187,7 @@ UINT32 matmania_state::screen_update_matmania(screen_device &screen, bitmap_ind1
 		int sx = 31 - offs / 32;
 		int sy = offs % 32;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				m_videoram2[offs] + 256 * (m_colorram2[offs] & 0x07),
 				(m_colorram2[offs] & 0x30) >> 4,
 				0,0,
@@ -208,7 +208,7 @@ UINT32 matmania_state::screen_update_maniach(screen_device &screen, bitmap_ind16
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap,m_tmpbitmap->cliprect(),
+		m_gfxdecode->gfx(1)->opaque(m_palette,*m_tmpbitmap,m_tmpbitmap->cliprect(),
 				m_videoram[offs] + ((m_colorram[offs] & 0x03) << 8),
 				(m_colorram[offs] & 0x30) >> 4,
 				0,sy >= 16, /* flip horizontally tiles on the right half of the bitmap */
@@ -221,7 +221,7 @@ UINT32 matmania_state::screen_update_maniach(screen_device &screen, bitmap_ind16
 		int sx = 15 - offs / 32;
 		int sy = offs % 32;
 
-		m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap2,m_tmpbitmap2->cliprect(),
+		m_gfxdecode->gfx(1)->opaque(m_palette,*m_tmpbitmap2,m_tmpbitmap2->cliprect(),
 				m_videoram3[offs] + ((m_colorram3[offs] & 0x03) << 8),
 				(m_colorram3[offs] & 0x30) >> 4,
 				0,sy >= 16, /* flip horizontally tiles on the right half of the bitmap */
@@ -245,7 +245,7 @@ UINT32 matmania_state::screen_update_maniach(screen_device &screen, bitmap_ind16
 	{
 		if (spriteram[offs] & 0x01)
 		{
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 					spriteram[offs+1] + ((spriteram[offs] & 0xf0) << 4),
 					(spriteram[offs] & 0x08) >> 3,
 					spriteram[offs] & 0x04,spriteram[offs] & 0x02,
@@ -260,7 +260,7 @@ UINT32 matmania_state::screen_update_maniach(screen_device &screen, bitmap_ind16
 		int sx = 31 - offs / 32;
 		int sy = offs % 32;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				m_videoram2[offs] + 256 * (m_colorram2[offs] & 0x07),
 				(m_colorram2[offs] & 0x30) >> 4,
 				0,0,

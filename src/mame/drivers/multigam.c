@@ -186,7 +186,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(multigam);
 	DECLARE_MACHINE_START(multigm3);
 	DECLARE_MACHINE_RESET(multigm3);
 	DECLARE_MACHINE_START(supergm3);
@@ -1145,9 +1145,9 @@ static const nesapu_interface multigam_interface_1 =
 	"maincpu"
 };
 
-void multigam_state::palette_init()
+PALETTE_INIT_MEMBER(multigam_state, multigam)
 {
-	m_ppu->init_palette(machine(), 0);
+	m_ppu->init_palette(palette, 0);
 }
 
 void multigam_state::ppu_irq(int *ppu_regs)
@@ -1259,8 +1259,8 @@ static MACHINE_CONFIG_START( multigam, multigam_state )
 	MCFG_SCREEN_UPDATE_DRIVER(multigam_state, screen_update_multigam)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", multigam)
-	MCFG_PALETTE_LENGTH(8*4*16)
-
+	MCFG_PALETTE_ADD("palette", 8*4*16)
+	MCFG_PALETTE_INIT_OWNER(multigam_state, multigam)
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)
 	MCFG_PPU2C0X_SET_NMI(multigam_state, ppu_irq)

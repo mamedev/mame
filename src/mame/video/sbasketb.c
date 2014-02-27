@@ -26,7 +26,7 @@
 
 ***************************************************************************/
 
-void sbasketb_state::palette_init()
+PALETTE_INIT_MEMBER(sbasketb_state, sbasketb)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2000, 1000, 470, 220 };
@@ -38,9 +38,6 @@ void sbasketb_state::palette_init()
 			4, resistances, rweights, 1000, 0,
 			4, resistances, gweights, 1000, 0,
 			4, resistances, bweights, 1000, 0);
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -69,7 +66,7 @@ void sbasketb_state::palette_init()
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table,*/
@@ -79,7 +76,7 @@ void sbasketb_state::palette_init()
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0xf0;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites use colors 0-256 (?) in 16 banks */
@@ -90,7 +87,7 @@ void sbasketb_state::palette_init()
 		for (j = 0; j < 0x10; j++)
 		{
 			UINT8 ctabentry = (j << 4) | (color_prom[i + 0x100] & 0x0f);
-			colortable_entry_set_value(machine().colortable, 0x100 + ((j << 8) | i), ctabentry);
+			palette.set_pen_indirect(0x100 + ((j << 8) | i), ctabentry);
 		}
 	}
 }
@@ -158,7 +155,7 @@ void sbasketb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			}
 
 			
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code, color,
 				flipx, flipy,
 				sx, sy, 0);

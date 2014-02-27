@@ -190,6 +190,7 @@ protected:
 	} vga;
 
 	emu_timer *m_vblank_timer;
+	required_device<palette_device> m_palette;
 };
 
 

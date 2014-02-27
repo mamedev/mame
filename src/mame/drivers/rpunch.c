@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rpunch_state )
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_SHARE("bitmapram")
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x080000, 0x083fff) AM_RAM_WRITE(rpunch_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(rpunch_scrollreg_w)
 	AM_RANGE(0x0c0008, 0x0c0009) AM_WRITE(rpunch_crtc_data_w)
 	AM_RANGE(0x0c000c, 0x0c000d) AM_WRITE(rpunch_videoreg_w)
@@ -491,7 +491,8 @@ static MACHINE_CONFIG_START( rpunch, rpunch_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", rpunch)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */
@@ -526,7 +527,8 @@ static MACHINE_CONFIG_START( svolleybl, rpunch_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", svolleybl)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */

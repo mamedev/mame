@@ -280,10 +280,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
 	UINT32 screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void peplus_load_superdata(const char *bank_name);
-	void peplus_init();
+	DECLARE_PALETTE_INIT(peplus);
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -347,7 +346,7 @@ WRITE8_MEMBER(peplus_state::peplus_bgcolor_w)
 {
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < m_palette->entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -369,7 +368,7 @@ WRITE8_MEMBER(peplus_state::peplus_bgcolor_w)
 		bit2 = 0;
 		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
-		palette_set_color(machine(), (15 + (i*16)), rgb_t(r, g, b));
+		m_palette->set_pen_color((15 + (i*16)), rgb_t(r, g, b));
 	}
 }
 
@@ -591,7 +590,7 @@ READ8_MEMBER(peplus_state::peplus_sf000_r)
 /* Last Color in Every Palette is bgcolor */
 READ8_MEMBER(peplus_state::peplus_bgcolor_r)
 {
-	return palette_get_color(machine(), 15); // Return bgcolor from First Palette
+	return m_palette->pen_color(15); // Return bgcolor from First Palette
 }
 
 READ8_MEMBER(peplus_state::peplus_dropdoor_r)
@@ -998,7 +997,7 @@ UINT32 peplus_state::screen_update_peplus(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-void peplus_state::palette_init()
+PALETTE_INIT_MEMBER(peplus_state, peplus)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	UINT32 proms_size = memregion("proms")->bytes();
@@ -1010,7 +1009,7 @@ void peplus_state::palette_init()
 */
 	int i;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -1032,7 +1031,7 @@ void peplus_state::palette_init()
 		bit2 = 0;
 		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -1345,7 +1344,8 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	MCFG_SCREEN_UPDATE_DRIVER(peplus_state, screen_update_peplus)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", peplus)
-	MCFG_PALETTE_LENGTH(16*16*2)
+	MCFG_PALETTE_ADD("palette", 16*16*2)
+	MCFG_PALETTE_INIT_OWNER(peplus_state, peplus)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", MC6845_CLOCK, mc6845_intf)
 	MCFG_X2404P_ADD("i2cmem")

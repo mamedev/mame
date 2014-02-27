@@ -625,7 +625,7 @@ VIDEO_START_MEMBER(pgm_state,pgm)
 	m_bg_tilemap->set_scroll_rows(16 * 32);
 
 	for (i = 0; i < 0x1200 / 2; i++)
-		palette_set_color(machine(), i, rgb_t(0, 0, 0));
+		m_palette->set_pen_color(i, rgb_t(0, 0, 0));
 
 	m_spritebufferram = auto_alloc_array_clear(machine(), UINT16, 0xa00/2);
 

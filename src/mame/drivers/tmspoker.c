@@ -233,7 +233,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(tmspoker);
 	UINT32 screen_update_tmspoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(tmspoker_interrupt);
 	required_device<cpu_device> m_maincpu;
@@ -276,7 +276,7 @@ UINT32 tmspoker_state::screen_update_tmspoker(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void tmspoker_state::palette_init()
+PALETTE_INIT_MEMBER(tmspoker_state, tmspoker)
 {
 }
 
@@ -598,7 +598,8 @@ static MACHINE_CONFIG_START( tmspoker, tmspoker_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tmspoker)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(tmspoker_state, tmspoker)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4, mc6845_intf) /* guess */
 

@@ -164,7 +164,7 @@ void taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 						}
 
 						
-									m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
+									m_gfxdecode->gfx(0)->zoom_transpen(m_palette,bitmap,cliprect,
 									tile,
 									color,
 									flipx, flipy,

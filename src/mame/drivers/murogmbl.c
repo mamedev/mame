@@ -51,14 +51,14 @@ public:
 
 	required_shared_ptr<UINT8> m_video;
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(murogmbl);
 	UINT32 screen_update_murogmbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
-void murogmbl_state::palette_init()
+PALETTE_INIT_MEMBER(murogmbl_state, murogmbl)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
@@ -79,7 +79,7 @@ void murogmbl_state::palette_init()
 		bit2 = (color_prom[0] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
@@ -112,7 +112,7 @@ UINT32 murogmbl_state::screen_update_murogmbl(screen_device &screen, bitmap_ind1
 		for (x = 0; x < 32; x++)
 		{
 			int tile = m_video[count];
-			 gfx->opaque(bitmap,cliprect, tile, 0, 0, 0, x * 8, y * 8);
+			 gfx->opaque(m_palette,bitmap,cliprect, tile, 0, 0, 0, x * 8, y * 8);
 
 			count++;
 		}
@@ -201,8 +201,8 @@ static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(murogmbl_state, screen_update_murogmbl)
 
-	MCFG_PALETTE_LENGTH(0x100)
-
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(murogmbl_state, murogmbl)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac1")

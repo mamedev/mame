@@ -44,9 +44,9 @@ static const rgb_t pcw_palette[PCW_NUM_COLOURS] =
 
 
 /* Initialise the palette */
-void pcw_state::palette_init()
+PALETTE_INIT_MEMBER(pcw_state, pcw)
 {
-	palette_set_colors(machine(), 0, pcw_palette, ARRAY_LENGTH(pcw_palette));
+	palette.set_pen_colors(0, pcw_palette, ARRAY_LENGTH(pcw_palette));
 }
 
 /***************************************************************************

@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( triforce_base, triforce_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(triforce_state, screen_update_triforce)
 
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_ADD("palette", 65536)
 
 MACHINE_CONFIG_END
 

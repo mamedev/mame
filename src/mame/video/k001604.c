@@ -20,7 +20,8 @@ k001604_device::k001604_device(const machine_config &mconfig, const char *tag, d
 	m_tile_ram(NULL),
 	m_char_ram(NULL),
 	m_reg(NULL),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this),
+	m_palette(*this)
 {
 	m_gfx_index[0] = 0;
 	m_gfx_index[1] = 0;
@@ -119,8 +120,8 @@ void k001604_device::device_start()
 	m_layer_8x8[0]->set_transparent_pen(0);
 	m_layer_8x8[1]->set_transparent_pen(0);
 
-	m_gfxdecode->set_gfx(m_gfx_index[0], auto_alloc_clear(machine(), gfx_element(machine(), k001604_char_layout_layer_8x8, (UINT8*)&m_char_ram[0], machine().total_colors() / 16, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index[1], auto_alloc_clear(machine(), gfx_element(machine(), k001604_char_layout_layer_16x16, (UINT8*)&m_char_ram[0], machine().total_colors() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index[0], auto_alloc_clear(machine(), gfx_element(machine(), k001604_char_layout_layer_8x8, (UINT8*)&m_char_ram[0], m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index[1], auto_alloc_clear(machine(), gfx_element(machine(), k001604_char_layout_layer_16x16, (UINT8*)&m_char_ram[0], m_palette->entries() / 16, 0)));
 
 	save_pointer(NAME(m_reg), 0x400 / 4);
 	save_pointer(NAME(m_char_ram), 0x200000 / 4);
@@ -430,4 +431,14 @@ WRITE32_MEMBER( k001604_device::reg_w )
 	{
 		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, space.device().safe_pc());
 	}
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void k001604_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<k001604_device &>(device).m_palette.set_tag(tag);
 }

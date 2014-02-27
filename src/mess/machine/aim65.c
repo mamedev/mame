@@ -399,7 +399,7 @@ SCREEN_UPDATE( aim65 )
 
 			for (b = 0; b<10; b++)
 			{
-				pen = screen.machine().pens[BIT(data, 0) ? 2 : 0];
+				pen = screen.m_palette->pen(BIT(data, 0) ? 2 : 0);
 				plot_pixel(bitmap,700 - ((b * 10) + x), y, pen);
 				data >>= 1;
 			}

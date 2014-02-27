@@ -29,9 +29,9 @@ static const UINT16 colormap[] = {
 };
 
 /* Initialise the palette */
-void channelf_state::palette_init()
+PALETTE_INIT_MEMBER(channelf_state, channelf)
 {
-	palette_set_colors(machine(), 0, channelf_palette, ARRAY_LENGTH(channelf_palette));
+	palette.set_pen_colors(0, channelf_palette, ARRAY_LENGTH(channelf_palette));
 }
 
 void channelf_state::video_start()

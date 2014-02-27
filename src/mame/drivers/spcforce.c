@@ -238,7 +238,7 @@ static const int colortable_source[] =
 	0, 2, 3, 4, 5, 6, 7, 0
 };
 
-void spcforce_state::palette_init()
+PALETTE_INIT_MEMBER(spcforce_state, spcforce)
 {
 	int i;
 
@@ -247,7 +247,7 @@ void spcforce_state::palette_init()
 		int data = colortable_source[i];
 		rgb_t color = rgb_t(pal1bit(data >> 0), pal1bit(data >> 1), pal1bit(data >> 2));
 
-		palette_set_color(machine(), i, color);
+		palette.set_pen_color(i, color);
 	}
 }
 
@@ -279,7 +279,8 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 	MCFG_SCREEN_UPDATE_DRIVER(spcforce_state, screen_update_spcforce)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", spcforce)
-	MCFG_PALETTE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
+	MCFG_PALETTE_ADD("palette", sizeof(colortable_source) / sizeof(colortable_source[0]))
+	MCFG_PALETTE_INIT_OWNER(spcforce_state, spcforce)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

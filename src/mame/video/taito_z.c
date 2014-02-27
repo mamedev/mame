@@ -221,7 +221,7 @@ void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
@@ -318,7 +318,7 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 					flipy = !flipy;
 				}
 
-				m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,
@@ -361,7 +361,7 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 					flipy = !flipy;
 				}
 
-				m_gfxdecode->gfx(2)->prio_zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(2)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,
@@ -404,7 +404,7 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 					flipy = !flipy;
 				}
 
-				m_gfxdecode->gfx(2)->prio_zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(2)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,
@@ -500,7 +500,7 @@ void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
@@ -604,7 +604,7 @@ void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &b
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
@@ -698,7 +698,7 @@ void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,
@@ -792,7 +792,7 @@ void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,

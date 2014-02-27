@@ -48,7 +48,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmimpct_bt477_w)
 
 			if (++*addr_cnt == 3)
 			{
-				palette_set_color(machine(), m_bt477.address, rgb_t(color[0], color[1], color[2]));
+				m_palette->set_pen_color(m_bt477.address, rgb_t(color[0], color[1], color[2]));
 				*addr_cnt = 0;
 
 				/* Address register increments */
@@ -116,8 +116,8 @@ void jpmimpct_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int s
 	for (x = params->heblnk; x < params->hsblnk; x += 2)
 	{
 		UINT16 pixels = vram[coladdr++ & 0xff];
-		dest[x + 0] = screen.machine().pens[pixels & 0xff];
-		dest[x + 1] = screen.machine().pens[pixels >> 8];
+		dest[x + 0] = state->m_palette->pen(pixels & 0xff);
+		dest[x + 1] = state->m_palette->pen(pixels >> 8);
 	}
 }
 

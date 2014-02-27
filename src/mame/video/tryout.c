@@ -9,12 +9,12 @@
 #include "includes/tryout.h"
 
 
-void tryout_state::palette_init()
+PALETTE_INIT_MEMBER(tryout_state, tryout)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -34,7 +34,7 @@ void tryout_state::palette_init()
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -209,17 +209,17 @@ void tryout_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		/* Double Height */
 		if(spriteram[offs] & 0x10)
 		{
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y + inc,0);
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				sprite+1,
 				color,fx,fy,x,y,0);
 		}
 		else
 		{
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y,0);
 		}
@@ -246,7 +246,7 @@ UINT32 tryout_state::screen_update_tryout(screen_device &screen, bitmap_ind16 &b
 	if(!(m_gfx_control[0] & 0x8)) // screen disable
 	{
 		/* TODO: Color might be different, needs a video from an original pcb. */
-		bitmap.fill(machine().pens[0x10], cliprect);
+		bitmap.fill(m_palette->pen(0x10), cliprect);
 	}
 	else
 	{

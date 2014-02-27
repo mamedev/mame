@@ -110,7 +110,7 @@ void gpworld_state::gpworld_draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cli
 		{
 			int current_screen_character = (characterY*64) + characterX;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, m_tile_ram[current_screen_character],
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, m_tile_ram[current_screen_character],
 					characterY, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
@@ -125,7 +125,7 @@ void gpworld_state::draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,in
 	}
 
 	if (cliprect.contains(x, y))
-		bitmap.pix32(y, x) = machine().pens[color];
+		bitmap.pix32(y, x) = m_palette->pen(color);
 }
 
 void gpworld_state::gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -215,10 +215,10 @@ void gpworld_state::gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &
 					}
 
 					/* Daphne says "don't draw the pixel if it's black". */
-					draw_pixel(bitmap,cliprect,x+0,y,palette_get_color(machine(), pixel1 + (sprite_color*0x10 + 0x200)),flip);
-					draw_pixel(bitmap,cliprect,x+1,y,palette_get_color(machine(), pixel2 + (sprite_color*0x10 + 0x200)),flip);
-					draw_pixel(bitmap,cliprect,x+2,y,palette_get_color(machine(), pixel3 + (sprite_color*0x10 + 0x200)),flip);
-					draw_pixel(bitmap,cliprect,x+3,y,palette_get_color(machine(), pixel4 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+0,y,m_palette->pen_color(pixel1 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+1,y,m_palette->pen_color(pixel2 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+2,y,m_palette->pen_color(pixel3 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+3,y,m_palette->pen_color(pixel4 + (sprite_color*0x10 + 0x200)),flip);
 
 					x += 4;
 
@@ -307,7 +307,7 @@ WRITE8_MEMBER(gpworld_state::palette_write)
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
-	palette_set_color(machine(), (pal_index & 0xffe) >> 1, rgb_t(a, r, g, b));
+	m_palette->set_pen_color((pal_index & 0xffe) >> 1, rgb_t(a, r, g, b));
 }
 
 /* PROGRAM MAP */
@@ -497,7 +497,7 @@ static MACHINE_CONFIG_START( gpworld, gpworld_state )
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gpworld)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -15,7 +15,7 @@ public:
 	_88games_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_banked_rom(*this, "banked_rom"),
-		m_paletteram_1000(*this, "paletteram_1000"),
+		m_paletteram_1000(*this, "palette"),
 		m_ram(*this, "ram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k052109(*this, "k052109"),

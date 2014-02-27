@@ -160,7 +160,7 @@ void pasopia7_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &clipr
 
 					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-					bitmap.pix16(y+yi, x+xi) = machine().pens[color];
+					bitmap.pix16(y+yi, x+xi) = m_palette->pen(color);
 				}
 				count+=8;
 			}
@@ -192,7 +192,7 @@ void pasopia7_state::draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &clipre
 					int pen;
 					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
 
-					bitmap.pix16(y*8+yi, x*8+xi) = machine().pens[pen];
+					bitmap.pix16(y*8+yi, x*8+xi) = m_palette->pen(pen);
 				}
 			}
 
@@ -216,7 +216,7 @@ void pasopia7_state::draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &clipre
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							bitmap.pix16(y*8-yc+7, x*8+xc) = machine().pens[7];
+							bitmap.pix16(y*8-yc+7, x*8+xc) = m_palette->pen(7);
 						}
 					}
 				}
@@ -257,7 +257,7 @@ void pasopia7_state::draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cli
 
 						pen =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-						bitmap.pix16(y*8+yi, x*8+xi) = machine().pens[pen];
+						bitmap.pix16(y*8+yi, x*8+xi) = m_palette->pen(pen);
 					}
 				}
 				else
@@ -269,7 +269,7 @@ void pasopia7_state::draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cli
 						int pen;
 						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
 
-						bitmap.pix16(y*8+yi, x*8+xi) = machine().pens[pen];
+						bitmap.pix16(y*8+yi, x*8+xi) = m_palette->pen(pen);
 					}
 				}
 			}
@@ -294,7 +294,7 @@ void pasopia7_state::draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cli
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							bitmap.pix16(y*8-yc+7, x*8+xc) = machine().pens[7];
+							bitmap.pix16(y*8-yc+7, x*8+xc) = m_palette->pen(7);
 						}
 					}
 				}
@@ -309,7 +309,7 @@ UINT32 pasopia7_state::screen_update_pasopia7(screen_device &screen, bitmap_ind1
 {
 	int width;
 
-	bitmap.fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	width = m_x_width ? 80 : 40;
 
@@ -956,7 +956,7 @@ PALETTE_INIT_MEMBER(pasopia7_state,p7_raster)
 	int i;
 
 	for( i = 0; i < 8; i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
 /* TODO: palette values are mostly likely to be wrong in there */
@@ -964,10 +964,10 @@ PALETTE_INIT_MEMBER(pasopia7_state,p7_lcd)
 {
 	int i;
 
-	palette_set_color_rgb(machine(), 0, 0xa0, 0xa8, 0xa0);
+	palette.set_pen_color(0, 0xa0, 0xa8, 0xa0);
 
 	for( i = 1; i < 8; i++)
-		palette_set_color_rgb(machine(), i, 0x30, 0x38, 0x10);
+		palette.set_pen_color(i, 0x30, 0x38, 0x10);
 }
 
 void pasopia7_state::fdc_irq(bool state)
@@ -1015,9 +1015,9 @@ static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 32-1)
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT_OVERRIDE(pasopia7_state,p7_raster)
-	MCFG_GFXDECODE_ADD("gfxdecode",  pasopia7 )
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(pasopia7_state,p7_raster)
+	MCFG_GFXDECODE_ADD("gfxdecode", pasopia7 )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", VDP_CLOCK, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
 MACHINE_CONFIG_END
@@ -1031,9 +1031,9 @@ static MACHINE_CONFIG_DERIVED( p7_lcd, p7_base )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT_OVERRIDE(pasopia7_state,p7_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode",  pasopia7 )
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(pasopia7_state,p7_lcd)
+	MCFG_GFXDECODE_ADD("gfxdecode", pasopia7 )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", LCD_CLOCK, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_DEFAULT_LAYOUT( layout_lcd )

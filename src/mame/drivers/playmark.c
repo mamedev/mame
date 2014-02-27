@@ -250,7 +250,7 @@ static ADDRESS_MAP_START( wbeachvl_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x71001a, 0x71001b) AM_READ_PORT("P4")
 //  AM_RANGE(0x71001c, 0x71001d) AM_READ(playmark_snd_status???)
 //  AM_RANGE(0x71001e, 0x71001f) AM_WRITENOP//playmark_snd_command_w },
-	AM_RANGE(0x780000, 0x780fff) AM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x780000, 0x780fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1059,7 +1059,8 @@ static MACHINE_CONFIG_START( bigtwin, playmark_state )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_bigtwin)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", playmark)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwin)
 
@@ -1093,7 +1094,8 @@ static MACHINE_CONFIG_START( bigtwinb, playmark_state )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_bigtwinb)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bigtwinb)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwinb)
 
@@ -1130,7 +1132,8 @@ static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_wbeachvl)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", wbeachvl)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,wbeachvl)
 
@@ -1164,7 +1167,8 @@ static MACHINE_CONFIG_START( excelsr, playmark_state )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_excelsr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", excelsr)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,excelsr)
 
@@ -1201,7 +1205,8 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", hrdtimes)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,hotmind)
 
@@ -1239,7 +1244,8 @@ static MACHINE_CONFIG_START( hrdtimes, playmark_state )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", hrdtimes)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,hrdtimes)
 

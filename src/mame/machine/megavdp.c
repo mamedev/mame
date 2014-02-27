@@ -30,6 +30,20 @@ sega_genesis_vdp_device::sega_genesis_vdp_device(const machine_config &mconfig, 
 {
 	m_use_alt_timing = 0;
 	m_palwrite_base = -1;
+}	
+
+static MACHINE_CONFIG_FRAGMENT( sega_genesis_vdp )
+	MCFG_PALETTE_ADD("palette", 0x200)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor sega_genesis_vdp_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( sega_genesis_vdp );
 }
 
 static TIMER_CALLBACK( megadriv_render_timer_callback )
@@ -251,9 +265,9 @@ void sega_genesis_vdp_device::write_cram_value(int offset, int data)
 		b = ((data >> 9)&0x07);
 		if (m_palwrite_base != -1)
 		{
-			palette_set_color_rgb(machine(),offset + m_palwrite_base ,pal3bit(r),pal3bit(g),pal3bit(b));
-			palette_set_color_rgb(machine(),offset + m_palwrite_base + 0x40 ,pal3bit(r>>1),pal3bit(g>>1),pal3bit(b>>1));
-			palette_set_color_rgb(machine(),offset + m_palwrite_base + 0x80 ,pal3bit((r>>1)|0x4),pal3bit((g>>1)|0x4),pal3bit((b>>1)|0x4));
+			m_palette->set_pen_color(offset + m_palwrite_base ,pal3bit(r),pal3bit(g),pal3bit(b));
+			m_palette->set_pen_color(offset + m_palwrite_base + 0x40 ,pal3bit(r>>1),pal3bit(g>>1),pal3bit(b>>1));
+			m_palette->set_pen_color(offset + m_palwrite_base + 0x80 ,pal3bit((r>>1)|0x4),pal3bit((g>>1)|0x4),pal3bit((b>>1)|0x4));
 		}
 		megadrive_vdp_palette_lookup[offset] = (b<<2) | (g<<7) | (r<<12);
 		megadrive_vdp_palette_lookup_sprite[offset] = (b<<2) | (g<<7) | (r<<12);

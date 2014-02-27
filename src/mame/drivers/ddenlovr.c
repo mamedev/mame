@@ -1654,7 +1654,7 @@ WRITE8_MEMBER(ddenlovr_state::rongrong_palette_w)
 	/* what were they smoking??? */
 	b = ((d1 & 0xe0) >> 5) | (d2 & 0xc0) >> 3;
 
-	palette_set_color_rgb(machine(), indx, pal5bit(r), pal5bit(g), pal5bit(b));
+	m_palette->set_pen_color(indx, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE16_MEMBER(ddenlovr_state::ddenlovr_palette_w)
@@ -2711,7 +2711,7 @@ WRITE8_MEMBER(ddenlovr_state::hanakanz_palette_w)
 		int g = m_ddenlovr_blit_latch & 0x1f;
 		int r = data & 0x1f;
 		int b = ((data & 0xe0) >> 5) | ((m_ddenlovr_blit_latch & 0x60) >> 2);
-		palette_set_color_rgb(machine(), (m_palette_index++) & 0x1ff, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color((m_palette_index++) & 0x1ff, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -2919,7 +2919,7 @@ WRITE8_MEMBER(ddenlovr_state::mjchuuka_palette_w)
 		int r = (rgb >> 0) & 0x1f;
 		int g = (rgb >> 8) & 0x1f;
 		int b = ((rgb >> 5) & 0x07) | ((rgb & 0x6000) >> 10);
-		palette_set_color_rgb(machine(), (m_palette_index++) & 0x1ff, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color((m_palette_index++) & 0x1ff, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -4226,7 +4226,7 @@ static MACHINE_CONFIG_START( htengoku, ddenlovr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+8, 256-1-8)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_htengoku)
 
-	MCFG_PALETTE_LENGTH(16*256)
+	MCFG_PALETTE_ADD("palette", 16*256)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,htengoku)
@@ -9443,7 +9443,7 @@ static MACHINE_CONFIG_START( ddenlovr, ddenlovr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -9574,7 +9574,7 @@ static MACHINE_CONFIG_START( quizchq, ddenlovr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -9661,7 +9661,7 @@ static MACHINE_CONFIG_START( mmpanic, ddenlovr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-16+5-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mmpanic)  // extra layers
@@ -9741,7 +9741,7 @@ static MACHINE_CONFIG_START( hanakanz, ddenlovr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-11-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
@@ -9785,7 +9785,7 @@ static MACHINE_CONFIG_START( kotbinyo, ddenlovr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1-1, 1+4, 256-15-1+4)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
@@ -10186,7 +10186,7 @@ static MACHINE_CONFIG_START( jongtei, ddenlovr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 5, 256-11-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around
@@ -10227,7 +10227,7 @@ static MACHINE_CONFIG_START( sryudens, ddenlovr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+5, 256-12-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
@@ -10272,7 +10272,7 @@ static MACHINE_CONFIG_START( janshinp, ddenlovr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+5, 256-12-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -10346,7 +10346,7 @@ static MACHINE_CONFIG_START( seljan2, ddenlovr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+5, 256-12-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
@@ -10393,7 +10393,7 @@ static MACHINE_CONFIG_START( daimyojn, ddenlovr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1-1, 1, 256-15-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,hanakanz) // blitter commands in the roms are shuffled around

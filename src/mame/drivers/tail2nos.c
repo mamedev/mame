@@ -41,7 +41,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(tail2nos_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(tail2nos_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
@@ -243,11 +243,13 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tail2nos_state, screen_update_tail2nos)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tail2nos)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	MCFG_K051316_ADD("k051316", tail2nos_k051316_intf)
 	MCFG_K051316_GFXDECODE("gfxdecode")
+	MCFG_K051316_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -379,23 +379,21 @@ static const rgb_t vt_colors[] =
 
 
 /* Initialise the palette */
-void vtech2_state::palette_init()
+PALETTE_INIT_MEMBER(vtech2_state, vtech2)
 {
 	int i;
 
-	machine().colortable = colortable_alloc(machine(), 16);
-
 	for ( i = 0; i < 16; i++ )
-		colortable_palette_set_color(machine().colortable, i, vt_colors[i]);
+		palette.set_indirect_color(i, vt_colors[i]);
 
 	for (i = 0; i < 256; i++)
 	{
-		colortable_entry_set_value(machine().colortable, 2*i, i&15);
-		colortable_entry_set_value(machine().colortable, 2*i+1, i>>4);
+		palette.set_pen_indirect(2*i, i&15);
+		palette.set_pen_indirect(2*i+1, i>>4);
 	}
 
 	for (i = 0; i < 16; i++)
-		colortable_entry_set_value(machine().colortable, 512+i, i);
+		palette.set_pen_indirect(512+i, i);
 }
 
 INTERRUPT_GEN_MEMBER(vtech2_state::vtech2_interrupt)
@@ -442,8 +440,9 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 88*8-1, 0*8, 24*8+32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vtech2_state, screen_update_laser)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",  vtech2 )
-	MCFG_PALETTE_LENGTH(528)
+	MCFG_GFXDECODE_ADD("gfxdecode", vtech2 )
+	MCFG_PALETTE_ADD("palette", 528)
+	MCFG_PALETTE_INIT_OWNER(vtech2_state, vtech2)
 
 
 	/* sound hardware */

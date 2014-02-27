@@ -45,7 +45,7 @@ PALETTE_INIT_MEMBER(clshroad_state,clshroad)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	for (i = 0;i < 256;i++)
-		palette_set_color_rgb(machine(),i,  pal4bit(color_prom[i + 256 * 0]),
+		palette.set_pen_color(i,  pal4bit(color_prom[i + 256 * 0]),
 										pal4bit(color_prom[i + 256 * 1]),
 										pal4bit(color_prom[i + 256 * 2]));
 }
@@ -55,9 +55,6 @@ PALETTE_INIT_MEMBER(clshroad_state,firebatl)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
-
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
 	{
@@ -65,20 +62,20 @@ PALETTE_INIT_MEMBER(clshroad_state,firebatl)
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
 	color_prom += 0x300;
 
 	for (i = 0; i < 0x200; i++)
-		colortable_entry_set_value(machine().colortable, i, i & 0xff);
+		palette.set_pen_indirect(i, i & 0xff);
 
 	for (i = 0x200; i < 0x300; i++)
 	{
 		UINT8 ctabentry = ((color_prom[(i - 0x200) + 0x000] & 0x0f) << 4) |
 							(color_prom[(i - 0x200) + 0x100] & 0x0f);
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -224,7 +221,7 @@ VIDEO_START_MEMBER(clshroad_state,firebatl)
 	m_tilemap_0b->set_scrolldx(-0x30, -0xb5);
 
 	m_tilemap_0b->set_transparent_pen(0 );
-	colortable_configure_tilemap_groups(machine().colortable, m_tilemap_1, m_gfxdecode->gfx(2), 0x0f);
+	m_palette->configure_tilemap_groups(*m_tilemap_1, *m_gfxdecode->gfx(2), 0x0f);
 }
 
 VIDEO_START_MEMBER(clshroad_state,clshroad)
@@ -303,7 +300,7 @@ void clshroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code,
 				attr & 0x0f,
 				flipx,flipy,

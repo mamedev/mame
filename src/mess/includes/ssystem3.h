@@ -47,7 +47,7 @@ public:
 	lcd_t m_lcd;
 	DECLARE_DRIVER_INIT(ssystem3);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(ssystem3);
 	UINT32 screen_update_ssystem3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(ssystem3_via_write_a);
 	DECLARE_READ8_MEMBER(ssystem3_via_read_a);

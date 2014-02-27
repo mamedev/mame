@@ -284,8 +284,8 @@ static MACHINE_CONFIG_START( yiear, yiear_state )
 	MCFG_SCREEN_UPDATE_DRIVER(yiear_state, screen_update_yiear)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", yiear)
-	MCFG_PALETTE_LENGTH(32)
-
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(yiear_state, yiear)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -351,12 +351,12 @@ static const unsigned char svisionn_palette[] =
 	245, 249, 248
 };
 
-void svision_state::palette_init()
+PALETTE_INIT_MEMBER(svision_state, svision)
 {
 	int i;
 
 	for( i = 0; i < sizeof(svision_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine(), i, svision_palette[i*3], svision_palette[i*3+1], svision_palette[i*3+2] );
+		palette.set_pen_color(i, svision_palette[i*3], svision_palette[i*3+1], svision_palette[i*3+2] );
 	}
 }
 PALETTE_INIT_MEMBER(svision_state,svisionn)
@@ -364,7 +364,7 @@ PALETTE_INIT_MEMBER(svision_state,svisionn)
 	int i;
 
 	for ( i = 0; i < sizeof(svisionn_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine(), i, svisionn_palette[i*3], svisionn_palette[i*3+1], svisionn_palette[i*3+2] );
+		palette.set_pen_color(i, svisionn_palette[i*3], svisionn_palette[i*3+1], svisionn_palette[i*3+2] );
 	}
 }
 PALETTE_INIT_MEMBER(svision_state,svisionp)
@@ -372,7 +372,7 @@ PALETTE_INIT_MEMBER(svision_state,svisionp)
 	int i;
 
 	for ( i = 0; i < sizeof(svisionn_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine(), i, svisionp_palette[i*3], svisionp_palette[i*3+1], svisionp_palette[i*3+2] );
+		palette.set_pen_color(i, svisionp_palette[i*3], svisionp_palette[i*3+1], svisionp_palette[i*3+2] );
 	}
 }
 
@@ -433,7 +433,7 @@ UINT32 svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32 &
 	}
 	else
 	{
-		bitmap.plot_box(3, 0, 162, 159, machine().pens[PALETTE_START]);
+		bitmap.plot_box(3, 0, 162, 159, m_palette->pen(PALETTE_START));
 	}
 	return 0;
 }
@@ -554,7 +554,8 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	MCFG_SCREEN_VISIBLE_AREA(3+0, 3+160-1, 0, 160-1)
 	MCFG_SCREEN_UPDATE_DRIVER(svision_state, screen_update_svision)
 
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(svision_palette) * 3)
+	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(svision_palette) * 3)
+	MCFG_PALETTE_INIT_OWNER(svision_state, svision )
 
 	MCFG_DEFAULT_LAYOUT(layout_svision)
 
@@ -584,7 +585,8 @@ static MACHINE_CONFIG_DERIVED( svisionp, svision )
 	MCFG_CPU_CLOCK(4430000)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_PALETTE_INIT_OVERRIDE(svision_state, svisionp )
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(svision_state, svisionp )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svisionn, svision )
@@ -592,7 +594,8 @@ static MACHINE_CONFIG_DERIVED( svisionn, svision )
 	MCFG_CPU_CLOCK(3560000/*?*/)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_PALETTE_INIT_OVERRIDE(svision_state, svisionn )
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(svision_state, svisionn )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tvlinkp, svisionp )

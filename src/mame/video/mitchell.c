@@ -39,12 +39,14 @@ VIDEO_START_MEMBER(mitchell_state,pang)
 	m_bg_tilemap->set_transparent_pen(15);
 
 	/* OBJ RAM */
-	m_objram = auto_alloc_array_clear(machine(), UINT8, m_videoram.bytes());
+	m_objram.resize(m_videoram.bytes());
 
 	/* Palette RAM */
-	m_generic_paletteram_8.allocate(2 * machine().total_colors());
+	m_paletteram.resize(2 * m_palette->entries());
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_LITTLE, 2);
 
-	save_pointer(NAME(m_objram), m_videoram.bytes());
+	save_item(NAME(m_objram));
+	save_item(NAME(m_paletteram));
 }
 
 
@@ -238,28 +240,12 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 
 WRITE8_MEMBER(mitchell_state::pang_paletteram_w)
 {
-	if (m_paletteram_bank)
-		paletteram_xxxxRRRRGGGGBBBB_byte_le_w(space, offset + 0x800, data);
-	else
-		paletteram_xxxxRRRRGGGGBBBB_byte_le_w(space, offset, data);
+	m_palette->write(space, offset + (m_paletteram_bank ? 0x800 : 0x000), data);
 }
 
 READ8_MEMBER(mitchell_state::pang_paletteram_r)
 {
-	if (m_paletteram_bank)
-		return m_generic_paletteram_8[offset + 0x800];
-
-	return m_generic_paletteram_8[offset];
-}
-
-WRITE8_MEMBER(mitchell_state::mgakuen_paletteram_w)
-{
-	paletteram_xxxxRRRRGGGGBBBB_byte_le_w(space, offset, data);
-}
-
-READ8_MEMBER(mitchell_state::mgakuen_paletteram_r)
-{
-	return m_generic_paletteram_8[offset];
+	return m_palette->basemem().read8(offset + (m_paletteram_bank ? 0x800 : 0x000));
 }
 
 
@@ -289,7 +275,7 @@ void mitchell_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			sx = 496 - sx;
 			sy = 240 - sy;
 		}
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					m_flipscreen, m_flipscreen,

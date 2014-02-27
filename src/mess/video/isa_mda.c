@@ -103,7 +103,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_mda )
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( MDA_MC6845_NAME, mc6845_device, screen_update )
 
-	MCFG_PALETTE_LENGTH( 4 )
+	MCFG_PALETTE_ADD( "palette", 4 )
 
 	MCFG_MC6845_ADD( MDA_MC6845_NAME, MC6845, MDA_SCREEN_NAME, MDA_CLOCK/9, mc6845_mda_intf)
 
@@ -155,13 +155,15 @@ const rom_entry *isa8_mda_device::device_rom_region() const
 
 isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_MDA, "IBM Monochrome Display and Printer Adapter", tag, owner, clock, "isa_ibm_mda", __FILE__),
-		device_isa8_card_interface(mconfig, *this)
+		device_isa8_card_interface(mconfig, *this),
+		m_palette(*this, "palette")
 {
 }
 
 isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_isa8_card_interface(mconfig, *this)
+		device_isa8_card_interface(mconfig, *this),
+		m_palette(*this, "palette")
 {
 }
 
@@ -178,7 +180,7 @@ void isa8_mda_device::device_start()
 
 	/* Initialise the mda palette */
 	for(int i = 0; i < (sizeof(mda_palette) / 3); i++)
-		palette_set_color_rgb(machine(), i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);
+		m_palette->set_pen_color(i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);
 }
 
 //-------------------------------------------------
@@ -520,7 +522,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_hercules )
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( HERCULES_MC6845_NAME, mc6845_device, screen_update )
 
-	MCFG_PALETTE_LENGTH( 4 )
+	MCFG_PALETTE_ADD( "palette", 4 )
 
 	MCFG_MC6845_ADD( HERCULES_MC6845_NAME, MC6845, HERCULES_SCREEN_NAME, MDA_CLOCK/9, mc6845_hercules_intf)
 
@@ -586,7 +588,7 @@ void isa8_hercules_device::device_start()
 
 	/* Initialise the mda palette */
 	for(int i = 0; i < (sizeof(mda_palette) / 3); i++)
-		palette_set_color_rgb(machine(), i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);
+		m_palette->set_pen_color(i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);
 }
 
 //-------------------------------------------------

@@ -73,7 +73,7 @@ UINT32 rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &bit
 
 	/* Draw playfields */
 	screen.priority().fill(0, cliprect);
-	bitmap.fill(machine().pens[768], cliprect);
+	bitmap.fill(m_palette->pen(768), cliprect);
 
 	switch (priority & 3)
 	{
@@ -121,7 +121,7 @@ VIDEO_START_MEMBER(rohga_state,wizdfire)
 void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int gfxregion, UINT16 pri, UINT16 primask)
 {
 	int y, x;
-	const pen_t *paldata = machine().pens;
+	const pen_t *paldata = m_palette->pens();
 	bitmap_ind16* sprite_bitmap;
 	int penbase;
 
@@ -179,7 +179,7 @@ UINT32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
-	bitmap.fill(machine().pens[512], cliprect);
+	bitmap.fill(m_palette->pen(512), cliprect);
 
 	m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0600, 0x0600, 0x400, 0x1ff);
@@ -216,7 +216,7 @@ UINT32 rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
-	bitmap.fill(machine().pens[512], cliprect);
+	bitmap.fill(m_palette->pen(512), cliprect);
 	screen.priority().fill(0);
 
 	/* pf3 and pf4 are combined into a single 8bpp bitmap */

@@ -16,24 +16,24 @@
 ******************************************************************************/
 READ8_MEMBER(nbmj9195_state::nbmj9195_palette_r)
 {
-	return m_palette[offset];
+	return m_palette_ptr[offset];
 }
 
 WRITE8_MEMBER(nbmj9195_state::nbmj9195_palette_w)
 {
 	int r, g, b;
 
-	m_palette[offset] = data;
+	m_palette_ptr[offset] = data;
 
 	if (offset & 1)
 	{
 		offset &= 0x1fe;
 
-		r = ((m_palette[offset + 0] & 0x0f) >> 0);
-		g = ((m_palette[offset + 0] & 0xf0) >> 4);
-		b = ((m_palette[offset + 1] & 0x0f) >> 0);
+		r = ((m_palette_ptr[offset + 0] & 0x0f) >> 0);
+		g = ((m_palette_ptr[offset + 0] & 0xf0) >> 4);
+		b = ((m_palette_ptr[offset + 1] & 0x0f) >> 0);
 
-		palette_set_color_rgb(machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+		m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
@@ -56,7 +56,7 @@ WRITE8_MEMBER(nbmj9195_state::nbmj9195_nb22090_palette_w)
 	g = m_nb22090_palette[(0x100 + (offs_h * 0x300) + offs_l)];
 	b = m_nb22090_palette[(0x200 + (offs_h * 0x300) + offs_l)];
 
-	palette_set_color(machine(), ((offs_h * 0x100) + offs_l), rgb_t(r, g, b));
+	m_palette->set_pen_color(((offs_h * 0x100) + offs_l), rgb_t(r, g, b));
 }
 
 /******************************************************************************
@@ -384,7 +384,7 @@ VIDEO_START_MEMBER(nbmj9195_state,nbmj9195_1layer)
 
 	m_screen->register_screen_bitmap(m_tmpbitmap[0]);
 	m_videoram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
-	m_palette = auto_alloc_array(machine(), UINT8, 0x200);
+	m_palette_ptr = auto_alloc_array(machine(), UINT8, 0x200);
 	m_clut[0] = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;
 	m_nb19010_busyflag = 1;
@@ -400,7 +400,7 @@ void nbmj9195_state::video_start()
 	m_screen->register_screen_bitmap(m_tmpbitmap[1]);
 	m_videoram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
 	m_videoram[1] = auto_alloc_array_clear(machine(), UINT16, width * height);
-	m_palette = auto_alloc_array(machine(), UINT8, 0x200);
+	m_palette_ptr = auto_alloc_array(machine(), UINT8, 0x200);
 	m_clut[0] = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_clut[1] = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_scanline[0] = m_scanline[1] = SCANLINE_MIN;

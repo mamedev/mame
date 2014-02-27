@@ -41,7 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(spcforce_soundtrigger_w);
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
 	DECLARE_WRITE8_MEMBER(spcforce_flip_screen_w);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(spcforce);
 	UINT32 screen_update_spcforce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;

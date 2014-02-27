@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wrally_vram_w) AM_SHARE("videoram")   /* encrypted Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_RAM AM_SHARE("vregs")                                   /* Video Registers */
 	AM_RANGE(0x10800c, 0x10800d) AM_WRITENOP                                                /* CLR INT Video */
-	AM_RANGE(0x200000, 0x203fff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_word_w) AM_SHARE("paletteram")    /* Palette */
+	AM_RANGE(0x200000, 0x203fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                               /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
@@ -258,7 +258,8 @@ static MACHINE_CONFIG_START( wrally, wrally_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wrally_state, screen_update_wrally)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", wrally)
-	MCFG_PALETTE_LENGTH(1024*8)
+	MCFG_PALETTE_ADD("palette", 1024*8)
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 
 	/* sound hardware */

@@ -29,7 +29,7 @@ UINT32 pktgaldx_state::screen_update_pktgaldb(screen_device &screen, bitmap_ind1
 	int tileno;
 	int colour;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	/* the bootleg seems to treat the tilemaps as sprites */
 	for (offset = 0; offset < 0x1600 / 2; offset += 8)
@@ -43,7 +43,7 @@ UINT32 pktgaldx_state::screen_update_pktgaldb(screen_device &screen, bitmap_ind1
 		y &= 0x1ff;
 		y -= 8;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, tileno ^ 0x1000, colour, 0, 0, x, y, 0);
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, tileno ^ 0x1000, colour, 0, 0, x, y, 0);
 	}
 
 	for (offset = 0x1600/2; offset < 0x2000 / 2; offset += 8)
@@ -57,7 +57,7 @@ UINT32 pktgaldx_state::screen_update_pktgaldb(screen_device &screen, bitmap_ind1
 		y &= 0x1ff;
 		y -= 8;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, tileno ^ 0x4000, colour, 0, 0, x, y, 0);
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, tileno ^ 0x4000, colour, 0, 0, x, y, 0);
 	}
 
 	for (offset = 0x2000/2; offset < 0x4000 / 2; offset += 8)
@@ -71,7 +71,7 @@ UINT32 pktgaldx_state::screen_update_pktgaldb(screen_device &screen, bitmap_ind1
 		y &= 0x1ff;
 		y -= 8;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, tileno ^ 0x3000, colour, 0, 0, x, y, 0);
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, tileno ^ 0x3000, colour, 0, 0, x, y, 0);
 	}
 
 	return 0;

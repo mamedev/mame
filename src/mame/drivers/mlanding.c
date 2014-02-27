@@ -214,7 +214,7 @@ void mlanding_state::machine_reset()
 
 UINT32 mlanding_state::screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pens = machine().pens;
+	const pen_t *pens = m_palette->pens();
 
 	for (UINT32 y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
@@ -726,7 +726,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("sub_com_ram")
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(dma_start_w)
 	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(dma_stop_w)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x240004, 0x240005) AM_READNOP // Watchdog
 	AM_RANGE(0x240006, 0x240007) AM_READ(input_r)
 	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(power_ram_r, power_ram_w)
@@ -993,7 +993,8 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 	MCFG_SCREEN_RAW_PARAMS(16000000, 640, 0, 512, 462, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(mlanding_state, screen_update_mlanding)
 
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

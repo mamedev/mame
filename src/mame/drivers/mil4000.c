@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( mil4000_map, AS_PROGRAM, 16, mil4000_state )
 	AM_RANGE(0x708010, 0x708011) AM_NOP //touch screen
 	AM_RANGE(0x70801e, 0x70801f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x780000, 0x780fff) AM_RAM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x780000, 0x780fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram") // 2x CY62256L-70 (U7 & U8).
 
 ADDRESS_MAP_END
@@ -405,8 +405,8 @@ static MACHINE_CONFIG_START( mil4000, mil4000_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mil4000_state, screen_update_mil4000)
 
-	MCFG_PALETTE_LENGTH(0x800)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x800)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mil4000)
 

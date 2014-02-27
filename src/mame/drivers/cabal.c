@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0xc0000, 0xc0001) AM_WRITE(track_reset_w)
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabal_sound_irq_trigger_word_w) // fix coin insertion
 	AM_RANGE(0xe8000, 0xe800d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 ADDRESS_MAP_END
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(cabalbl_sndcmd_w)
 	AM_RANGE(0xe8004, 0xe8005) AM_READ(soundlatch2_word_r)
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabalbl_sound_irq_trigger_word_w)
@@ -489,8 +489,8 @@ static MACHINE_CONFIG_START( cabal, cabal_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update_cabal)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cabal)
-	MCFG_PALETTE_LENGTH(1024)
-
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
 	MCFG_SEIBU_SOUND_ADD("seibu_sound")
@@ -546,8 +546,8 @@ static MACHINE_CONFIG_START( cabalbl, cabal_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update_cabal)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cabal)
-	MCFG_PALETTE_LENGTH(1024)
-
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

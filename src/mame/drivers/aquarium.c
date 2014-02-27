@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aquarium_state )
 	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(aquarium_bak_videoram_w) AM_SHARE("bak_videoram")
 	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE(aquarium_txt_videoram_w) AM_SHARE("txt_videoram")
 	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP        /* probably not used */
 	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
@@ -316,8 +316,8 @@ static MACHINE_CONFIG_START( aquarium, aquarium_state )
 	MCFG_SCREEN_UPDATE_DRIVER(aquarium_state, screen_update_aquarium)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", aquarium)
-	MCFG_PALETTE_LENGTH(0x1000/2)
-
+	MCFG_PALETTE_ADD("palette", 0x1000/2)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -77,7 +77,7 @@ void segald_state::astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &
 		for (characterY = 0; characterY < 32; characterY++)
 		{
 			int current_screen_character = (characterY*32) + characterX;
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, m_fix_ram[current_screen_character],
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, m_fix_ram[current_screen_character],
 					1, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
@@ -226,7 +226,7 @@ WRITE8_MEMBER(segald_state::astron_COLOR_write)
 	b = (highBits & 0x0f);
 	a = (highBits & 0x80) ? 0 : 255;
 
-	palette_set_color(machine(), palIndex, rgb_t(a, r, g, b));
+	m_palette->set_pen_color(palIndex, rgb_t(a, r, g, b));
 	logerror("COLOR write : 0x%04x @   0x%04x [0x%x]\n", data, offset, space.device().safe_pc());
 }
 
@@ -379,7 +379,7 @@ static MACHINE_CONFIG_START( astron, segald_state )
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", segald)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardare */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

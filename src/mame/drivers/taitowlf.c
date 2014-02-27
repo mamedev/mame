@@ -57,7 +57,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	#if !ENABLE_VGA
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(taitowlf);
 	#endif
 	UINT32 screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void intel82439tx_init();
@@ -69,7 +69,7 @@ UINT32 taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb3
 	int x,y,count;
 	const UINT8 *blit_ram = m_region_user5->base();
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	count = (0);
 
@@ -82,7 +82,7 @@ UINT32 taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb3
 			color = (blit_ram[count] & 0xff);
 
 			if(cliprect.contains(x+0, y))
-				bitmap.pix32(y, x+0) = machine().pens[color];
+				bitmap.pix32(y, x+0) = m_palette->pen(color);
 
 			count++;
 		}
@@ -352,13 +352,13 @@ void taitowlf_state::machine_reset()
 
 #if !ENABLE_VGA
 /* debug purpose*/
-void taitowlf_state::palette_init()
+PALETTE_INIT_MEMBER(taitowlf_state, taitowlf)
 {
-	palette_set_color(machine(),0x70,rgb_t(0xff,0xff,0xff));
-	palette_set_color(machine(),0x71,rgb_t(0xff,0xff,0xff));
-	palette_set_color(machine(),0x01,rgb_t(0x55,0x00,0x00));
-	palette_set_color(machine(),0x10,rgb_t(0xaa,0x00,0x00));
-	palette_set_color(machine(),0x00,rgb_t(0x00,0x00,0x00));
+	palette.set_pen_color(0x70,rgb_t(0xff,0xff,0xff));
+	palette.set_pen_color(0x71,rgb_t(0xff,0xff,0xff));
+	palette.set_pen_color(0x01,rgb_t(0x55,0x00,0x00));
+	palette.set_pen_color(0x10,rgb_t(0xaa,0x00,0x00));
+	palette.set_pen_color(0x00,rgb_t(0x00,0x00,0x00));
 }
 #endif
 
@@ -386,8 +386,9 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_PALETTE_LENGTH(256)
 	MCFG_SCREEN_UPDATE_DRIVER(taitowlf_state, screen_update_taitowlf)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(taitowlf_state, taitowlf)
 	#endif
 MACHINE_CONFIG_END
 

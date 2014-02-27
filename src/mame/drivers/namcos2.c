@@ -1724,8 +1724,6 @@ static MACHINE_CONFIG_START( default, namcos2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
@@ -1733,7 +1731,9 @@ static MACHINE_CONFIG_START( default, namcos2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", namcos2)
-	MCFG_PALETTE_LENGTH(0x2000)
+
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1798,8 +1798,6 @@ static MACHINE_CONFIG_START( gollygho, namcos2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
@@ -1807,7 +1805,9 @@ static MACHINE_CONFIG_START( gollygho, namcos2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", namcos2)
-	MCFG_PALETTE_LENGTH(0x2000)
+
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1845,8 +1845,6 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
@@ -1854,11 +1852,14 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_finallap)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", finallap)
-	MCFG_PALETTE_LENGTH(0x2000)
+
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finallap)
 
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
+	MCFG_NAMCO_C45_ROAD_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1896,8 +1897,6 @@ static MACHINE_CONFIG_START( sgunner, namcos2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
@@ -1905,7 +1904,9 @@ static MACHINE_CONFIG_START( sgunner, namcos2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sgunner)
-	MCFG_PALETTE_LENGTH(0x2000)
+
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
@@ -1950,8 +1951,6 @@ static MACHINE_CONFIG_START( sgunner2, namcos2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
@@ -1959,7 +1958,9 @@ static MACHINE_CONFIG_START( sgunner2, namcos2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sgunner)
-	MCFG_PALETTE_LENGTH(0x2000)
+
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
@@ -1999,8 +2000,6 @@ static MACHINE_CONFIG_START( luckywld, namcos2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
@@ -2008,11 +2007,14 @@ static MACHINE_CONFIG_START( luckywld, namcos2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_luckywld)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", luckywld)
-	MCFG_PALETTE_LENGTH(0x2000)
+
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
 
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
+	MCFG_NAMCO_C45_ROAD_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2050,8 +2052,6 @@ static MACHINE_CONFIG_START( metlhawk, namcos2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
@@ -2059,7 +2059,9 @@ static MACHINE_CONFIG_START( metlhawk, namcos2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_metlhawk)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", metlhawk)
-	MCFG_PALETTE_LENGTH(0x2000)
+
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)
 

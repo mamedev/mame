@@ -360,7 +360,7 @@ UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		for(int x = 0; x < 80; x++ )
 		{
 			UINT8 code = m_vram[x + y*128];
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,  code , 0, 0,0, x*8,y*16);
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,  code , 0, 0,0, x*8,y*16);
 		}
 	}
 
@@ -626,8 +626,7 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", itt3030)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* internal ram */
 	MCFG_RAM_ADD("mainram")

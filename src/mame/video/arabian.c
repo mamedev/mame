@@ -20,7 +20,7 @@
  *
  *************************************/
 
-void arabian_state::palette_init()
+PALETTE_INIT_MEMBER(arabian_state, arabian)
 {
 	int i;
 
@@ -139,7 +139,7 @@ void arabian_state::palette_init()
 
 		b = (bhi * 192) + (bbase * 63);
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -365,7 +365,7 @@ WRITE8_MEMBER(arabian_state::arabian_videoram_w)
 
 UINT32 arabian_state::screen_update_arabian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pens = &machine().pens[(m_video_control >> 3) << 8];
+	const pen_t *pens = &m_palette->pen((m_video_control >> 3) << 8);
 	int y;
 
 	/* render the screen from the bitmap */

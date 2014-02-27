@@ -860,8 +860,6 @@ static MACHINE_CONFIG_START( rallyx, rallyx_state )
 	MCFG_MACHINE_RESET_OVERRIDE(rallyx_state,rallyx)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.606060)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -870,9 +868,11 @@ static MACHINE_CONFIG_START( rallyx, rallyx_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_rallyx)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", rallyx)
-	MCFG_PALETTE_LENGTH(64*4+4)
 
-	MCFG_PALETTE_INIT_OVERRIDE(rallyx_state,rallyx)
+	MCFG_PALETTE_ADD("palette", 64*4+4)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+
+	MCFG_PALETTE_INIT_OWNER(rallyx_state,rallyx)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,rallyx)
 
 	/* sound hardware */
@@ -898,8 +898,6 @@ static MACHINE_CONFIG_START( jungler, rallyx_state )
 	MCFG_MACHINE_RESET_OVERRIDE(rallyx_state,rallyx)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
@@ -908,9 +906,11 @@ static MACHINE_CONFIG_START( jungler, rallyx_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_jungler)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jungler)
-	MCFG_PALETTE_LENGTH(64*4+4+64)
 
-	MCFG_PALETTE_INIT_OVERRIDE(rallyx_state,jungler)
+	MCFG_PALETTE_ADD("palette", 64*4+4+64)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+
+	MCFG_PALETTE_INIT_OWNER(rallyx_state,jungler)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,jungler)
 
 	/* sound hardware */

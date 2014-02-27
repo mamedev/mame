@@ -351,7 +351,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(dwarfd);
 	UINT32 screen_update_dwarfd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(dwarfd_interrupt);
 	void drawCrt( bitmap_rgb32 &bitmap,const rectangle &cliprect );
@@ -837,7 +837,7 @@ void dwarfd_state::drawCrt( bitmap_rgb32 &bitmap,const rectangle &cliprect )
 				else
 					b = 1;
 			}
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				tile + (m_bank + bank2) * 128,
 				0,
 				0, 0,
@@ -849,7 +849,7 @@ void dwarfd_state::drawCrt( bitmap_rgb32 &bitmap,const rectangle &cliprect )
 
 UINT32 dwarfd_state::screen_update_dwarfd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	drawCrt(bitmap, cliprect);
 	return 0;
 }
@@ -978,7 +978,7 @@ static GFXDECODE_START( dwarfd )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout3, 0, 16 )
 GFXDECODE_END
 
-void dwarfd_state::palette_init()
+PALETTE_INIT_MEMBER(dwarfd_state, dwarfd)
 {
 	int i;
 
@@ -989,12 +989,12 @@ void dwarfd_state::palette_init()
 		int b = machine().rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
-	palette_set_color(machine(), 8, rgb_t(255, 255, 0));
-	palette_set_color(machine(), 12, rgb_t(127, 127, 255));
-	palette_set_color(machine(), 4, rgb_t(0, 255, 0));
-	palette_set_color(machine(), 6, rgb_t(255, 0, 0));
+	palette.set_pen_color(8, rgb_t(255, 255, 0));
+	palette.set_pen_color(12, rgb_t(127, 127, 255));
+	palette.set_pen_color(4, rgb_t(0, 255, 0));
+	palette.set_pen_color(6, rgb_t(255, 0, 0));
 }
 
 static const ay8910_interface ay8910_config =
@@ -1070,8 +1070,8 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dwarfd_state, screen_update_dwarfd)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dwarfd)
-	MCFG_PALETTE_LENGTH(0x100)
-
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(dwarfd_state, dwarfd)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)

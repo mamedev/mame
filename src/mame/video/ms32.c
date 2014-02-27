@@ -142,7 +142,7 @@ void ms32_state::update_color(int color)
 		b = ((m_palram[color*2+1] & 0x00ff) >>0 );
 	}
 
-	palette_set_color(machine(),color,rgb_t(r,g,b));
+	m_palette->set_pen_color(color,rgb_t(r,g,b));
 }
 
 WRITE32_MEMBER(ms32_state::ms32_brightness_w)
@@ -464,7 +464,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 		int xx, yy;
 		int width = screen.width();
 		int height = screen.height();
-		const pen_t *paldata = machine().pens;
+		const pen_t *paldata = m_palette->pens();
 
 		UINT16* srcptr_tile;
 		UINT8* srcptr_tilepri;

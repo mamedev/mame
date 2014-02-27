@@ -7,6 +7,8 @@ public:
 	// construction/destruction
 	bfm_adder2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	static void static_set_palette_tag(device_t &device, const char *tag);
+	
 	TILE_GET_INFO_MEMBER( get_tile0_info );
 	TILE_GET_INFO_MEMBER( get_tile1_info );
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -60,6 +62,7 @@ private:
 
 	optional_device<cpu_device> m_cpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 // device type definition
@@ -72,5 +75,8 @@ extern const device_type BFM_ADDER2;
 
 #define MCFG_BFM_ADDER2_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, BFM_ADDER2, 0)
+
+#define MCFG_BFM_ADDER2_PALETTE(_palette_tag) \
+	bfm_adder2_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

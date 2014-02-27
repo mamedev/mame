@@ -172,8 +172,8 @@ UINT32 mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &b
 				pen |= ((gvram[count+0xc000] >> (xi)) & 1) ? 4 : 0; //G
 				pen &= m_gvram_mask;
 
-				bitmap.pix16(y*2+0, x+xi) = machine().pens[pen];
-				bitmap.pix16(y*2+1, x+xi) = machine().pens[pen];
+				bitmap.pix16(y*2+0, x+xi) = m_palette->pen(pen);
+				bitmap.pix16(y*2+1, x+xi) = m_palette->pen(pen);
 			}
 			count++;
 		}
@@ -213,27 +213,27 @@ UINT32 mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &b
 						{
 							if(m_width80 == 0)
 							{
-								bitmap.pix16(res_y, res_x*2+0) = machine().pens[pen];
-								bitmap.pix16(res_y, res_x*2+1) = machine().pens[pen];
+								bitmap.pix16(res_y, res_x*2+0) = m_palette->pen(pen);
+								bitmap.pix16(res_y, res_x*2+1) = m_palette->pen(pen);
 							}
 							else
 							{
-								bitmap.pix16(res_y, res_x) = machine().pens[pen];
+								bitmap.pix16(res_y, res_x) = m_palette->pen(pen);
 							}
 						}
 						else
 						{
 							if(m_width80 == 0)
 							{
-								bitmap.pix16(res_y*2+0, res_x*2+0) = machine().pens[pen];
-								bitmap.pix16(res_y*2+0, res_x*2+1) = machine().pens[pen];
-								bitmap.pix16(res_y*2+1, res_x*2+0) = machine().pens[pen];
-								bitmap.pix16(res_y*2+1, res_x*2+1) = machine().pens[pen];
+								bitmap.pix16(res_y*2+0, res_x*2+0) = m_palette->pen(pen);
+								bitmap.pix16(res_y*2+0, res_x*2+1) = m_palette->pen(pen);
+								bitmap.pix16(res_y*2+1, res_x*2+0) = m_palette->pen(pen);
+								bitmap.pix16(res_y*2+1, res_x*2+1) = m_palette->pen(pen);
 							}
 							else
 							{
-								bitmap.pix16(res_y*2+0, res_x) = machine().pens[pen];
-								bitmap.pix16(res_y*2+1, res_x) = machine().pens[pen];
+								bitmap.pix16(res_y*2+0, res_x) = m_palette->pen(pen);
+								bitmap.pix16(res_y*2+1, res_x) = m_palette->pen(pen);
 							}
 						}
 					}
@@ -573,7 +573,7 @@ void mz2000_state::machine_reset()
 			g = (m_color_mode) ? (i & 4)>>2 : ((i) ? 1 : 0);
 			b = (m_color_mode) ? (i & 1)>>0 : 0;
 
-			palette_set_color_rgb(machine(), i,pal1bit(r),pal1bit(g),pal1bit(b));
+			m_palette->set_pen_color(i,pal1bit(r),pal1bit(g),pal1bit(b));
 		}
 	}
 }
@@ -868,7 +868,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mz2000_state, screen_update_mz2000)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mz2000)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

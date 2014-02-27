@@ -454,10 +454,10 @@ static void draw_quads(model1_state *state, bitmap_rgb32 &bitmap, const rectangl
 
 		fill_quad(bitmap, view, q);
 #if 0
-		draw_line(bitmap, get_black_pen(screen.machine()), q->p[0]->s.x, q->p[0]->s.y, q->p[1]->s.x, q->p[1]->s.y);
-		draw_line(bitmap, get_black_pen(screen.machine()), q->p[1]->s.x, q->p[1]->s.y, q->p[2]->s.x, q->p[2]->s.y);
-		draw_line(bitmap, get_black_pen(screen.machine()), q->p[2]->s.x, q->p[2]->s.y, q->p[3]->s.x, q->p[3]->s.y);
-		draw_line(bitmap, get_black_pen(screen.machine()), q->p[3]->s.x, q->p[3]->s.y, q->p[0]->s.x, q->p[0]->s.y);
+		draw_line(bitmap, m_palette->black_pen(), q->p[0]->s.x, q->p[0]->s.y, q->p[1]->s.x, q->p[1]->s.y);
+		draw_line(bitmap, m_palette->black_pen(), q->p[1]->s.x, q->p[1]->s.y, q->p[2]->s.x, q->p[2]->s.y);
+		draw_line(bitmap, m_palette->black_pen(), q->p[2]->s.x, q->p[2]->s.y, q->p[3]->s.x, q->p[3]->s.y);
+		draw_line(bitmap, m_palette->black_pen(), q->p[3]->s.x, q->p[3]->s.y, q->p[0]->s.x, q->p[0]->s.y);
 #endif
 	}
 
@@ -1445,8 +1445,6 @@ static void tgp_scan(running_machine &machine)
 
 VIDEO_START_MEMBER(model1_state,model1)
 {
-	m_paletteram16 = m_generic_paletteram_16;
-
 	m_view = auto_alloc_clear(machine(), struct view);
 
 	m_poly_rom = (UINT32 *)memregion("user1")->base();
@@ -1515,7 +1513,7 @@ UINT32 model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 &b
 	view->ayys = sin(view->ayy);
 
 	screen.priority().fill(0);
-	bitmap.fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	segas24_tile *tile = machine().device<segas24_tile>("tile");
 	tile->draw(screen, bitmap, cliprect, 6, 0, 0);

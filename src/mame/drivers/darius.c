@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( darius_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0xd20000, 0xd20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
 	AM_RANGE(0xd40000, 0xd40003) AM_DEVWRITE("pc080sn", pc080sn_device, xscroll_word_w)
 	AM_RANGE(0xd50000, 0xd50003) AM_DEVWRITE("pc080sn", pc080sn_device, ctrl_word_w)
-	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")/* palette */
+	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* palette */
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("fg_ram")
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( darius_cpub_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM             /* local RAM */
 	AM_RANGE(0xc00000, 0xc0007f) AM_WRITE(darius_ioc_w) /* only writes $c00050 (?) */
-	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w)
+	AM_RANGE(0xd80000, 0xd80fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("fg_ram")
@@ -874,7 +874,8 @@ static MACHINE_CONFIG_START( darius, darius_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", darius)
-	MCFG_PALETTE_LENGTH(4096*2)
+	MCFG_PALETTE_ADD("palette", 4096*2)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_DEFAULT_LAYOUT(layout_darius)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
@@ -901,6 +902,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 
 	MCFG_PC080SN_ADD("pc080sn", darius_pc080sn_intf)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	MCFG_PC080SN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

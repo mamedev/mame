@@ -45,15 +45,12 @@ void dday_state::start_countdown_timer()
 
 ***************************************************************************/
 
-void dday_state::palette_init()
+PALETTE_INIT_MEMBER(dday_state, dday)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	palette_set_shadow_factor(machine(), 1.0 / 8);
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
+	palette.set_shadow_factor(1.0 / 8);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -62,85 +59,85 @@ void dday_state::palette_init()
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* HACK!!! This table is handgenerated, but it matches the screenshot.
 	   I have no clue how it really works */
-	colortable_entry_set_value(machine().colortable, 0*8+0+0, 0x00);
-	colortable_entry_set_value(machine().colortable, 0*8+0+1, 0x01);
-	colortable_entry_set_value(machine().colortable, 0*8+0+2, 0x15);
-	colortable_entry_set_value(machine().colortable, 0*8+0+3, 0x02);
-	colortable_entry_set_value(machine().colortable, 0*8+4+0, 0x00);
-	colortable_entry_set_value(machine().colortable, 0*8+4+1, 0x01);
-	colortable_entry_set_value(machine().colortable, 0*8+4+2, 0x15);
-	colortable_entry_set_value(machine().colortable, 0*8+4+3, 0x02);
+	palette.set_pen_indirect(0*8+0+0, 0x00);
+	palette.set_pen_indirect(0*8+0+1, 0x01);
+	palette.set_pen_indirect(0*8+0+2, 0x15);
+	palette.set_pen_indirect(0*8+0+3, 0x02);
+	palette.set_pen_indirect(0*8+4+0, 0x00);
+	palette.set_pen_indirect(0*8+4+1, 0x01);
+	palette.set_pen_indirect(0*8+4+2, 0x15);
+	palette.set_pen_indirect(0*8+4+3, 0x02);
 
-	colortable_entry_set_value(machine().colortable, 1*8+0+0, 0x04);
-	colortable_entry_set_value(machine().colortable, 1*8+0+1, 0x05);
-	colortable_entry_set_value(machine().colortable, 1*8+0+2, 0x03);
-	colortable_entry_set_value(machine().colortable, 1*8+0+3, 0x07);
-	colortable_entry_set_value(machine().colortable, 1*8+4+0, 0x04);
-	colortable_entry_set_value(machine().colortable, 1*8+4+1, 0x05);
-	colortable_entry_set_value(machine().colortable, 1*8+4+2, 0x03);
-	colortable_entry_set_value(machine().colortable, 1*8+4+3, 0x07);
+	palette.set_pen_indirect(1*8+0+0, 0x04);
+	palette.set_pen_indirect(1*8+0+1, 0x05);
+	palette.set_pen_indirect(1*8+0+2, 0x03);
+	palette.set_pen_indirect(1*8+0+3, 0x07);
+	palette.set_pen_indirect(1*8+4+0, 0x04);
+	palette.set_pen_indirect(1*8+4+1, 0x05);
+	palette.set_pen_indirect(1*8+4+2, 0x03);
+	palette.set_pen_indirect(1*8+4+3, 0x07);
 
-	colortable_entry_set_value(machine().colortable, 2*8+0+0, 0x08);
-	colortable_entry_set_value(machine().colortable, 2*8+0+1, 0x15);
-	colortable_entry_set_value(machine().colortable, 2*8+0+2, 0x0a);
-	colortable_entry_set_value(machine().colortable, 2*8+0+3, 0x03);
-	colortable_entry_set_value(machine().colortable, 2*8+4+0, 0x08);
-	colortable_entry_set_value(machine().colortable, 2*8+4+1, 0x15);
-	colortable_entry_set_value(machine().colortable, 2*8+4+2, 0x0a);
-	colortable_entry_set_value(machine().colortable, 2*8+4+3, 0x03);
+	palette.set_pen_indirect(2*8+0+0, 0x08);
+	palette.set_pen_indirect(2*8+0+1, 0x15);
+	palette.set_pen_indirect(2*8+0+2, 0x0a);
+	palette.set_pen_indirect(2*8+0+3, 0x03);
+	palette.set_pen_indirect(2*8+4+0, 0x08);
+	palette.set_pen_indirect(2*8+4+1, 0x15);
+	palette.set_pen_indirect(2*8+4+2, 0x0a);
+	palette.set_pen_indirect(2*8+4+3, 0x03);
 
-	colortable_entry_set_value(machine().colortable, 3*8+0+0, 0x08);
-	colortable_entry_set_value(machine().colortable, 3*8+0+1, 0x15);
-	colortable_entry_set_value(machine().colortable, 3*8+0+2, 0x0a);
-	colortable_entry_set_value(machine().colortable, 3*8+0+3, 0x03);
-	colortable_entry_set_value(machine().colortable, 3*8+4+0, 0x08);
-	colortable_entry_set_value(machine().colortable, 3*8+4+1, 0x15);
-	colortable_entry_set_value(machine().colortable, 3*8+4+2, 0x0a);
-	colortable_entry_set_value(machine().colortable, 3*8+4+3, 0x03);
+	palette.set_pen_indirect(3*8+0+0, 0x08);
+	palette.set_pen_indirect(3*8+0+1, 0x15);
+	palette.set_pen_indirect(3*8+0+2, 0x0a);
+	palette.set_pen_indirect(3*8+0+3, 0x03);
+	palette.set_pen_indirect(3*8+4+0, 0x08);
+	palette.set_pen_indirect(3*8+4+1, 0x15);
+	palette.set_pen_indirect(3*8+4+2, 0x0a);
+	palette.set_pen_indirect(3*8+4+3, 0x03);
 
-	colortable_entry_set_value(machine().colortable, 4*8+0+0, 0x10);
-	colortable_entry_set_value(machine().colortable, 4*8+0+1, 0x11);
-	colortable_entry_set_value(machine().colortable, 4*8+0+2, 0x12);
-	colortable_entry_set_value(machine().colortable, 4*8+0+3, 0x07);
-	colortable_entry_set_value(machine().colortable, 4*8+4+0, 0x10);
-	colortable_entry_set_value(machine().colortable, 4*8+4+1, 0x11);
-	colortable_entry_set_value(machine().colortable, 4*8+4+2, 0x12);
-	colortable_entry_set_value(machine().colortable, 4*8+4+3, 0x07);
+	palette.set_pen_indirect(4*8+0+0, 0x10);
+	palette.set_pen_indirect(4*8+0+1, 0x11);
+	palette.set_pen_indirect(4*8+0+2, 0x12);
+	palette.set_pen_indirect(4*8+0+3, 0x07);
+	palette.set_pen_indirect(4*8+4+0, 0x10);
+	palette.set_pen_indirect(4*8+4+1, 0x11);
+	palette.set_pen_indirect(4*8+4+2, 0x12);
+	palette.set_pen_indirect(4*8+4+3, 0x07);
 
-	colortable_entry_set_value(machine().colortable, 5*8+0+0, 0x1d);
-	colortable_entry_set_value(machine().colortable, 5*8+0+1, 0x15);
-	colortable_entry_set_value(machine().colortable, 5*8+0+2, 0x16);
-	colortable_entry_set_value(machine().colortable, 5*8+0+3, 0x1b);
-	colortable_entry_set_value(machine().colortable, 5*8+4+0, 0x1d);
-	colortable_entry_set_value(machine().colortable, 5*8+4+1, 0x15);
-	colortable_entry_set_value(machine().colortable, 5*8+4+2, 0x16);
-	colortable_entry_set_value(machine().colortable, 5*8+4+3, 0x1b);
+	palette.set_pen_indirect(5*8+0+0, 0x1d);
+	palette.set_pen_indirect(5*8+0+1, 0x15);
+	palette.set_pen_indirect(5*8+0+2, 0x16);
+	palette.set_pen_indirect(5*8+0+3, 0x1b);
+	palette.set_pen_indirect(5*8+4+0, 0x1d);
+	palette.set_pen_indirect(5*8+4+1, 0x15);
+	palette.set_pen_indirect(5*8+4+2, 0x16);
+	palette.set_pen_indirect(5*8+4+3, 0x1b);
 
-	colortable_entry_set_value(machine().colortable, 6*8+0+0, 0x1d);
-	colortable_entry_set_value(machine().colortable, 6*8+0+1, 0x15);
-	colortable_entry_set_value(machine().colortable, 6*8+0+2, 0x1a);
-	colortable_entry_set_value(machine().colortable, 6*8+0+3, 0x1b);
-	colortable_entry_set_value(machine().colortable, 6*8+4+0, 0x1d);
-	colortable_entry_set_value(machine().colortable, 6*8+4+1, 0x15);
-	colortable_entry_set_value(machine().colortable, 6*8+4+2, 0x1a);
-	colortable_entry_set_value(machine().colortable, 6*8+4+3, 0x1b);
+	palette.set_pen_indirect(6*8+0+0, 0x1d);
+	palette.set_pen_indirect(6*8+0+1, 0x15);
+	palette.set_pen_indirect(6*8+0+2, 0x1a);
+	palette.set_pen_indirect(6*8+0+3, 0x1b);
+	palette.set_pen_indirect(6*8+4+0, 0x1d);
+	palette.set_pen_indirect(6*8+4+1, 0x15);
+	palette.set_pen_indirect(6*8+4+2, 0x1a);
+	palette.set_pen_indirect(6*8+4+3, 0x1b);
 
-	colortable_entry_set_value(machine().colortable, 7*8+0+0, 0x1d);
-	colortable_entry_set_value(machine().colortable, 7*8+0+1, 0x02);
-	colortable_entry_set_value(machine().colortable, 7*8+0+2, 0x04);
-	colortable_entry_set_value(machine().colortable, 7*8+0+3, 0x1b);
-	colortable_entry_set_value(machine().colortable, 7*8+4+0, 0x1d);
-	colortable_entry_set_value(machine().colortable, 7*8+4+1, 0x02);
-	colortable_entry_set_value(machine().colortable, 7*8+4+2, 0x04);
-	colortable_entry_set_value(machine().colortable, 7*8+4+3, 0x1b);
+	palette.set_pen_indirect(7*8+0+0, 0x1d);
+	palette.set_pen_indirect(7*8+0+1, 0x02);
+	palette.set_pen_indirect(7*8+0+2, 0x04);
+	palette.set_pen_indirect(7*8+0+3, 0x1b);
+	palette.set_pen_indirect(7*8+4+0, 0x1d);
+	palette.set_pen_indirect(7*8+4+1, 0x02);
+	palette.set_pen_indirect(7*8+4+2, 0x04);
+	palette.set_pen_indirect(7*8+4+3, 0x1b);
 }
 
 
@@ -315,7 +312,7 @@ UINT32 dday_state::screen_update_dday(screen_device &screen, bitmap_ind16 &bitma
 				UINT16 src_pixel = m_main_bitmap.pix16(y, x);
 
 				if (sl_bitmap.pix16(y, x) == 0xff)
-					src_pixel += machine().total_colors();
+					src_pixel += m_palette->entries();
 
 				bitmap.pix16(y, x) = src_pixel;
 			}

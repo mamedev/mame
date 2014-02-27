@@ -356,7 +356,7 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 	linedata_offs += line_start * linedata_adv;     // pre-advance line info offset for the clipped region
 
 	// load physical palette base
-	pal_base = machine().pens + (colorbase << 4) % machine().total_colors();
+	pal_base = screen->palette()->pens() + (colorbase << 4) % screen->palette()->entries();
 
 	// walk the target bitmap within the visible area vertically or horizontally, one line at a time
 	for (line_pos=line_start; line_pos <= line_end; linedata_offs += linedata_adv, line_pos++)

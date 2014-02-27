@@ -184,8 +184,7 @@ static MACHINE_CONFIG_START( mx2178, mx2178_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_GFXDECODE_ADD("gfxdecode", mx2178)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 18869600 / 8, crtc_interface) // clk unknown

@@ -46,7 +46,7 @@ WRITE32_MEMBER(taitojc_state::taitojc_palette_w)
 	g = (color >> 16) & 0xff;
 	b = (color >>  0) & 0xff;
 
-	palette_set_color(machine(),offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
 READ32_MEMBER(taitojc_state::taitojc_tile_r)
@@ -315,7 +315,7 @@ void taitojc_state::video_start()
 	m_tile_ram = auto_alloc_array_clear(machine(), UINT32, 0x4000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), taitojc_char_layout, (UINT8 *)m_char_ram, machine().total_colors() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), taitojc_char_layout, (UINT8 *)m_char_ram, m_palette->entries() / 16, 0)));
 
 	m_texture = auto_alloc_array(machine(), UINT8, 0x400000);
 

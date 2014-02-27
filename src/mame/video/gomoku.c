@@ -18,13 +18,13 @@
 
 ******************************************************************************/
 
-void gomoku_state::palette_init()
+PALETTE_INIT_MEMBER(gomoku_state, gomoku)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	int bit0, bit1, bit2, r, g, b;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		/* red component */
 		bit0 = (*color_prom >> 0) & 0x01;
@@ -42,7 +42,7 @@ void gomoku_state::palette_init()
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(),i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }

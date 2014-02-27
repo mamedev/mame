@@ -2537,7 +2537,7 @@ static MACHINE_CONFIG_START( gionbana, nbmj8891_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 8, 248-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nbmj8891_state, screen_update_nbmj8891)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	/* sound hardware */

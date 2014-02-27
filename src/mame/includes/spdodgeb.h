@@ -51,7 +51,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(spdodgeb);
 	UINT32 screen_update_spdodgeb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(spdodgeb_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );

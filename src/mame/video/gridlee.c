@@ -20,14 +20,14 @@
  *
  *************************************/
 
-void gridlee_state::palette_init()
+PALETTE_INIT_MEMBER(gridlee_state, gridlee)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
-		palette_set_color_rgb(machine(),i,pal4bit(color_prom[0x0000]),pal4bit(color_prom[0x0800]),pal4bit(color_prom[0x1000]));
+		palette.set_pen_color(i,pal4bit(color_prom[0x0000]),pal4bit(color_prom[0x0800]),pal4bit(color_prom[0x1000]));
 		color_prom++;
 	}
 }
@@ -132,7 +132,7 @@ WRITE8_MEMBER(gridlee_state::gridlee_palette_select_w)
 
 UINT32 gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pens = &machine().pens[m_palettebank_vis * 32];
+	const pen_t *pens = &m_palette->pen(m_palettebank_vis * 32);
 	UINT8 *gfx;
 	int x, y, i;
 

@@ -209,8 +209,8 @@ WRITE32_MEMBER(psikyo4_state::ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_
 	g = ((m_paletteram[offset] & 0x00ff0000) >> 16);
 	r = ((m_paletteram[offset] & 0xff000000) >> 24);
 
-	palette_set_color(machine(), offset, rgb_t(r, g, b));
-	palette_set_color(machine(), offset + 0x800, rgb_t(r, g, b)); // For screen 2
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset + 0x800, rgb_t(r, g, b)); // For screen 2
 }
 
 WRITE32_MEMBER(psikyo4_state::ps4_bgpen_1_dword_w)
@@ -222,7 +222,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_bgpen_1_dword_w)
 	g = ((m_bgpen_1[0] & 0x00ff0000) >>16);
 	r = ((m_bgpen_1[0] & 0xff000000) >>24);
 
-	palette_set_color(machine(), 0x1000, rgb_t(r, g, b)); // Clear colour for screen 1
+	m_palette->set_pen_color(0x1000, rgb_t(r, g, b)); // Clear colour for screen 1
 }
 
 WRITE32_MEMBER(psikyo4_state::ps4_bgpen_2_dword_w)
@@ -234,7 +234,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_bgpen_2_dword_w)
 	g = ((m_bgpen_2[0] & 0x00ff0000) >>16);
 	r = ((m_bgpen_2[0] & 0xff000000) >>24);
 
-	palette_set_color(machine(), 0x1001, rgb_t(r, g, b)); // Clear colour for screen 2
+	m_palette->set_pen_color(0x1001, rgb_t(r, g, b)); // Clear colour for screen 2
 }
 
 WRITE32_MEMBER(psikyo4_state::ps4_screen1_brt_w)
@@ -253,7 +253,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_screen1_brt_w)
 			int i;
 
 			for (i = 0; i < 0x800; i++)
-				palette_set_pen_contrast(machine(), i, brt1);
+				m_palette->set_pen_contrast(i, brt1);
 
 			m_oldbrt1 = brt1;
 		}
@@ -283,7 +283,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_screen2_brt_w)
 			int i;
 
 			for (i = 0x800; i < 0x1000; i++)
-				palette_set_pen_contrast(machine(), i, brt2);
+				m_palette->set_pen_contrast(i, brt2);
 
 			m_oldbrt2 = brt2;
 		}
@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( ps4big, psikyo4_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", ps4)
-	MCFG_PALETTE_LENGTH((0x2000/4)*2 + 2) /* 0x2000/4 for each screen. 1 for each screen clear colour */
+	MCFG_PALETTE_ADD("palette", (0x2000/4)*2 + 2) /* 0x2000/4 for each screen. 1 for each screen clear colour */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)

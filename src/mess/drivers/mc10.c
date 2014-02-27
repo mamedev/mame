@@ -541,7 +541,7 @@ static MACHINE_CONFIG_START( alice32, mc10_state )
 	MCFG_SCREEN_UPDATE_DEVICE("ef9345", ef9345_device, screen_update)
 	MCFG_SCREEN_SIZE(336, 270)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_EF9345_ADD("ef9345", "screen")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("alice32_sl", mc10_state, alice32_scanline, "screen", 0, 10)

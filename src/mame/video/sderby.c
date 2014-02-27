@@ -76,7 +76,7 @@ void sderby_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,i
 		code = spriteram16[offs+2] >> codeshift;
 		color = (spriteram16[offs+1] & 0x3e00) >> 9;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color/colordiv+48,
 				flipx,0,

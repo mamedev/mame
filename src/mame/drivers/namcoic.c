@@ -275,8 +275,8 @@ void namcos2_shared_state::zdrawgfxzoom(
 	{
 		if( gfx )
 		{
-			int shadow_offset = (gfx->machine().config().m_video_attributes&VIDEO_HAS_SHADOWS)?gfx->machine().total_colors():0;
-			const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+			int shadow_offset = (m_palette->shadows_enabled())?m_palette->entries():0;
+			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 			int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
 			int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
@@ -1311,7 +1311,8 @@ namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, cons
 	: device_t(mconfig, NAMCO_C45_ROAD, "Namco C45 Road", tag, owner, clock, "namco_c45_road", __FILE__),
 		m_transparent_color(~0),
 		m_tilemap(NULL),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this)
 {
 }
 
@@ -1410,7 +1411,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 			while (numpixels-- > 0)
 			{
 				int pen = source_gfx[sourcex >> 16];
-				if (colortable_entry_get_value(machine().colortable, pen) != m_transparent_color)
+				if (m_palette->pen_indirect(pen) != m_transparent_color)
 				{
 					if (clut != NULL)
 						pen = (pen & ~0xff) | clut[pen & 0xff];
@@ -1484,4 +1485,14 @@ TILE_GET_INFO_MEMBER( namco_c45_road_device::get_road_info )
 	int tile = data & 0x3ff;
 	int color = data >> 10;
 	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void namco_c45_road_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<namco_c45_road_device &>(device).m_palette.set_tag(tag);
 }

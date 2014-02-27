@@ -32,6 +32,17 @@ TODO:
 // device type definition
 const device_type MB_VCU = &device_creator<mb_vcu_device>;
 
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void mb_vcu_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<mb_vcu_device &>(device).m_palette.set_tag(tag);
+}
+
+
 static ADDRESS_MAP_START( mb_vcu_vram, AS_0, 8, mb_vcu_device )
 	AM_RANGE(0x00000,0x7ffff) AM_RAM // enough for a 256x256x4 x 2 pages of framebuffer with 4 layers (TODO: doubled for simplicity)
 ADDRESS_MAP_END
@@ -72,7 +83,7 @@ WRITE8_MEMBER( mb_vcu_device::mb_vcu_paletteram_w )
 	bit0 = (m_palram[offset] >> 0) & 0x01;
 	b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
 
-	palette_set_color(machine(), offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
 //-------------------------------------------------
@@ -144,7 +155,8 @@ mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, dev
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_vram)),
-		m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_pal_ram))
+		m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_pal_ram)),
+		m_palette(*this)
 {
 }
 
@@ -470,7 +482,7 @@ WRITE8_MEMBER( mb_vcu_device::background_color_w )
 	bit0 = (m_bk_color >> 0) & 0x01;
 	b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
 
-	palette_set_color(machine(), 0x100, rgb_t(r, g, b));
+	m_palette->set_pen_color(0x100, rgb_t(r, g, b));
 }
 
 READ8_MEMBER( mb_vcu_device::status_r )
@@ -506,7 +518,7 @@ UINT32 mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			{
 				dot|= m_vregs[1] << 4;
 
-				bitmap.pix32(y,x) = machine().pens[dot];
+				bitmap.pix32(y,x) = m_palette->pen(dot);
 			}
 		}
 	}

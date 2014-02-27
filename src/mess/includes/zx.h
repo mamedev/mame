@@ -75,7 +75,7 @@ public:
 	DECLARE_DRIVER_INIT(zx);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(zx);
 	DECLARE_PALETTE_INIT(ts1000);
 	DECLARE_MACHINE_RESET(pc8300);
 	DECLARE_MACHINE_RESET(pow3000);

@@ -567,8 +567,8 @@ static MACHINE_CONFIG_START( liblrabl, toypop_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toypop_state, screen_update_toypop)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", toypop)
-	MCFG_PALETTE_LENGTH(128*4+64*4+16*2)
-
+	MCFG_PALETTE_ADD("palette", 128*4+64*4+16*2)
+	MCFG_PALETTE_INIT_OWNER(toypop_state, toypop)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

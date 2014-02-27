@@ -455,7 +455,7 @@ static MACHINE_CONFIG_START( quizdna, quizdna_state )
 	MCFG_SCREEN_UPDATE_DRIVER(quizdna_state, screen_update_quizdna)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", quizdna)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */

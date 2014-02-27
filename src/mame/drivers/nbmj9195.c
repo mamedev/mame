@@ -3179,7 +3179,7 @@ static MACHINE_CONFIG_START( NBMJDRV1, nbmj9195_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nbmj9195_state, screen_update_nbmj9195)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	/* sound hardware */
@@ -3210,7 +3210,8 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV3, NBMJDRV1 )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state,nbmj9195_nb22090)
 	MCFG_SCREEN_MODIFY("screen")

@@ -47,7 +47,6 @@ public:
 	DECLARE_WRITE16_MEMBER(clk_w);
 	DECLARE_DRIVER_INIT(galaxygame);
 	virtual void machine_reset();
-	virtual void palette_init();
 	UINT32 screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxygame_irq);
 	IRQ_CALLBACK_MEMBER(galaxygame_irq_callback);
@@ -173,7 +172,7 @@ WRITE16_MEMBER(galaxygame_state::ke_w)
 
 UINT32 galaxygame_state::screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	for (int i = 0; i < m_point_display_list_index; i++ )
 	{
 		bitmap.pix16(m_point_display_list[i].x >> 7, m_point_display_list[i].y >> 7) = 1;
@@ -291,12 +290,6 @@ static ADDRESS_MAP_START( galaxygame_map, AS_PROGRAM, 16, galaxygame_state )
 ADDRESS_MAP_END
 
 
-void galaxygame_state::palette_init()
-{
-	palette_set_color(machine(),0,rgb_t::black); /* black */
-	palette_set_color(machine(),1,rgb_t::white); /* white */
-}
-
 IRQ_CALLBACK_MEMBER(galaxygame_state::galaxygame_irq_callback)
 {
 	device.execute().set_input_line(0, CLEAR_LINE);
@@ -337,7 +330,7 @@ static MACHINE_CONFIG_START( galaxygame, galaxygame_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 511)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxygame_state, screen_update_galaxygame)
 
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 MACHINE_CONFIG_END
 

@@ -87,7 +87,7 @@ public:
 	UINT8 *               m_bios;
 	UINT8 *               m_ram_base;
 	z88cart_slot_device * m_carts[4];
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(z88);
 };
 
 #endif /* Z88_H_ */

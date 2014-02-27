@@ -23,8 +23,19 @@ tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, TC0110PCR, "Taito TC0110PCR", tag, owner, clock, "tc0110pcr", __FILE__),
 		m_ram(NULL),
 		m_type(0),
-		m_addr(0)
+		m_addr(0),
+		m_palette(*this)
 {
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void tc0110pcr_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<tc0110pcr_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -108,7 +119,7 @@ void tc0110pcr_device::restore_colors()
 			}
 		}
 
-		palette_set_color(machine(), i + (m_pal_offs << 12), rgb_t(r, g, b));
+		m_palette->set_pen_color(i + (m_pal_offs << 12), rgb_t(r, g, b));
 	}
 }
 
@@ -139,7 +150,7 @@ WRITE16_MEMBER(tc0110pcr_device::word_w )
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			palette_set_color_rgb(space.machine(), m_addr, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+			m_palette->set_pen_color(m_addr, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 			break;
 
 		default:
@@ -160,7 +171,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_word_w )
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			palette_set_color_rgb(space.machine(), m_addr + (m_pal_offs << 12), pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+			m_palette->set_pen_color(m_addr + (m_pal_offs << 12), pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 			break;
 
 		default:
@@ -183,7 +194,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_rbswap_word_w )
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			palette_set_color_rgb(space.machine(), m_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+			m_palette->set_pen_color(m_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 			break;
 
 		default:
@@ -206,7 +217,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_4bpg_word_w )
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			palette_set_color_rgb(space.machine(), m_addr, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
+			m_palette->set_pen_color(m_addr, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
 			break;
 
 		default:

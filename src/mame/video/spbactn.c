@@ -3,12 +3,12 @@
 #include "includes/spbactn.h"
 
 
-static void blendbitmaps(running_machine &machine,
+static void blendbitmaps(palette_device &palette,
 		bitmap_rgb32 &dest,bitmap_ind16 &src1,bitmap_ind16 &src2,
 		const rectangle &cliprect)
 {
 	int y,x;
-	const pen_t *paldata = machine.pens;
+	const pen_t *paldata = palette.pens();
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -168,7 +168,7 @@ int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const
 	spbactn_draw_sprites(screen, m_gfxdecode, m_tile_bitmap_fg, cliprect, 3, alt_sprites, m_spvideoram);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, cliprect);
+	blendbitmaps(m_palette, bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, cliprect);
 	return 0;
 }
 

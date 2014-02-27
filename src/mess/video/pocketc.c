@@ -33,18 +33,16 @@ PALETTE_INIT( pocketc )
 {
 	UINT8 i=0, r, b, g, color_count = 6;
 
-	machine.colortable = colortable_alloc(machine, color_count);
-
 	while (color_count--)
 	{
 		r = pocketc_palette[i++]; g = pocketc_palette[i++]; b = pocketc_palette[i++];
-		colortable_palette_set_color(machine.colortable, 5 - color_count, rgb_t(r, g, b));
+		palette.set_indirect_color(5 - color_count, rgb_t(r, g, b));
 	}
 
 	for( i = 0; i < 8; i++ )
 	{
-		colortable_entry_set_value(machine.colortable, i*2, pocketc_colortable[i][0]);
-		colortable_entry_set_value(machine.colortable, i*2+1, pocketc_colortable[i][1]);
+		palette.set_indirect_color(i*2, pocketc_colortable[i][0]);
+		palette.set_indirect_color(i*2+1, pocketc_colortable[i][1]);
 	}
 }
 

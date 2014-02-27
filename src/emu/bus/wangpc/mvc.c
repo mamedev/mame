@@ -49,7 +49,7 @@
 #define ATTR_SUBSCRIPT      BIT(attr, 6)
 #define ATTR_SUPERSCRIPT    BIT(attr, 7)
 
-static const rgb_t PALETTE[] =
+static const rgb_t PALETTE_MVC[] =
 {
 	rgb_t::black,
 	rgb_t(0x00, 0x80, 0x00),
@@ -81,7 +81,7 @@ void wangpc_mvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 			int x = (sx * 16) + bit;
 			int color = BIT(data, 15);
 
-			bitmap.pix32(y, x) = PALETTE[color];
+			bitmap.pix32(y, x) = PALETTE_MVC[color];
 
 			data <<= 1;
 		}
@@ -117,7 +117,7 @@ void wangpc_mvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 			int color = ((BIT(data, 9) & !ATTR_BLANK) ^ ATTR_REVERSE);
 
 			if ((color | bitmap.pix32(y, x)) & ATTR_BOLD) color = 2;
-			if (color) bitmap.pix32(y, x) = PALETTE[color];
+			if (color) bitmap.pix32(y, x) = PALETTE_MVC[color];
 
 			data <<= 1;
 		}

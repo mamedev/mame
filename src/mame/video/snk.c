@@ -53,7 +53,7 @@ PALETTE_INIT_MEMBER(snk_state,tnk3)
 		bit3 = (color_prom[i + num_colors] >> 1) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -185,23 +185,23 @@ VIDEO_START_MEMBER(snk_state,snk_3bpp_shadow)
 {
 	int i;
 
-	if(!(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if(!(m_palette->shadows_enabled()))
 		fatalerror("driver should use VIDEO_HAS_SHADOWS\n");
 
 	/* prepare shadow draw table */
 	for(i = 0; i <= 5; i++) m_drawmode_table[i] = DRAWMODE_SOURCE;
-	m_drawmode_table[6] = (machine().config().m_video_attributes & VIDEO_HAS_SHADOWS) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+	m_drawmode_table[6] = (m_palette->shadows_enabled()) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 	m_drawmode_table[7] = DRAWMODE_NONE;
 
 	for (i = 0x000;i < 0x400;i++)
-		machine().shadow_table[i] = i | 0x200;
+		m_palette->shadow_table()[i] = i | 0x200;
 }
 
 VIDEO_START_MEMBER(snk_state,snk_4bpp_shadow)
 {
 	int i;
 
-	if(!(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if(!(m_palette->shadows_enabled()))
 		fatalerror("driver should use VIDEO_HAS_SHADOWS\n");
 
 	/* prepare shadow draw table */
@@ -211,10 +211,10 @@ VIDEO_START_MEMBER(snk_state,snk_4bpp_shadow)
 
 	/* all palette entries are not affected by shadow sprites... */
 	for (i = 0x000;i < 0x400;i++)
-		machine().shadow_table[i] = i;
+		m_palette->shadow_table()[i] = i;
 	/* ... except for tilemap colors */
 	for (i = 0x200;i < 0x300;i++)
-		machine().shadow_table[i] = i + 0x100;
+		m_palette->shadow_table()[i] = i + 0x100;
 }
 
 
@@ -691,12 +691,12 @@ static void marvins_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		if (sx > 512-16) sx -= 512;
 		if (sy > 256-16) sy -= 256;
 
-		gfx->transtable(bitmap,cliprect,
+		gfx->transtable(state->m_palette,bitmap,cliprect,
 			tile_number,
 			color,
 			flipx, flipy,
 			sx, sy,
-			state->m_drawmode_table, machine.shadow_table);
+			state->m_drawmode_table, state->m_palette->shadow_table());
 
 		source+=4;
 	}
@@ -757,12 +757,12 @@ void snk_state::tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		if (sx > 512-size) sx -= 512;
 		if (sy > (m_yscroll_mask+1)-size) sy -= (m_yscroll_mask+1);
 
-		gfx->transtable(bitmap,cliprect,
+		gfx->transtable(m_palette,bitmap,cliprect,
 				tile_number,
 				color,
 				xflip,yflip,
 				sx,sy,
-				m_drawmode_table, machine().shadow_table);
+				m_drawmode_table, m_palette->shadow_table());
 	}
 }
 
@@ -804,12 +804,12 @@ static void ikari_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 		if (sx > 512-size) sx -= 512;
 		if (sy > 512-size) sy -= 512;
 
-		gfx->transtable(bitmap,cliprect,
+		gfx->transtable(state->m_palette,bitmap,cliprect,
 				tile_number,
 				color,
 				0,0,
 				sx,sy,
-				state->m_drawmode_table, machine.shadow_table);
+				state->m_drawmode_table, state->m_palette->shadow_table());
 	}
 }
 
@@ -892,12 +892,12 @@ static void tdfever_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		if (sx > 512-size) sx -= 512;
 		if (sy > 512-size) sy -= 512;
 
-		gfx->transtable(bitmap,cliprect,
+		gfx->transtable(state->m_palette,bitmap,cliprect,
 				tile_number,
 				color,
 				flipx,flipy,
 				sx,sy,
-				state->m_drawmode_table, machine.shadow_table);
+				state->m_drawmode_table, state->m_palette->shadow_table());
 	}
 }
 

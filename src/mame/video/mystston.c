@@ -110,7 +110,7 @@ void mystston_state::set_palette()
 		bit1 = (data >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -197,7 +197,7 @@ void mystston_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				flipy = !flipy;
 			}
 
-			 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
+			 gfx->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
 		}
 	}
 }
@@ -312,7 +312,7 @@ MACHINE_CONFIG_FRAGMENT( mystston_video )
 	MCFG_VIDEO_RESET_OVERRIDE(mystston_state,mystston)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mystston)
-	MCFG_PALETTE_LENGTH(0x40)
+	MCFG_PALETTE_ADD("palette", 0x40)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)

@@ -41,7 +41,7 @@ WRITE8_MEMBER(battlane_state::battlane_palette_w)
 	bit2 = (~data >> 7) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	palette_set_color(machine(), offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
 WRITE8_MEMBER(battlane_state::battlane_scrollx_w)
@@ -181,7 +181,7 @@ void battlane_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			}
 
 			
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,
@@ -192,7 +192,7 @@ void battlane_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 				dy = flipy ? 16 : -16;
 
 				
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code + 1,
 					color,
 					flipx, flipy,

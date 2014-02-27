@@ -469,8 +469,6 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,pzlestar)
 
-	MCFG_PALETTE_LENGTH(19780)
-
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)
 
@@ -499,7 +497,7 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,sexyboom)
 
-	MCFG_PALETTE_LENGTH(19780)
+	MCFG_PALETTE_ADD("palette", 19780)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3580000)

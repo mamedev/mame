@@ -28,11 +28,11 @@ inline UINT8* z88_state::convert_address(UINT32 offset)
 ***************************************************************************/
 
 // Initialise the palette
-void z88_state::palette_init()
+PALETTE_INIT_MEMBER(z88_state, z88)
 {
-	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
-	palette_set_color(machine(), 1, rgb_t(92,  83,  88));
-	palette_set_color(machine(), 2, rgb_t(122, 126, 129));
+	m_palette->set_pen_color(0, rgb_t(138, 146, 148));
+	m_palette->set_pen_color(1, rgb_t(92,  83,  88));
+	m_palette->set_pen_color(2, rgb_t(122, 126, 129));
 }
 
 /* temp - change to gfxelement structure */

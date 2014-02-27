@@ -195,12 +195,12 @@ UINT32 calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind16 
 		if (m_sprites[x + 1] & 0x10)
 		{
 				/* 32x32 sprites */
-			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
+			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect, tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
 		}
 		else
 		{
 			/* 16x16 sprites */
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, tileno, color, flipx, flipy, xpos, ypos - 15, 0);
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect, tileno, color, flipx, flipy, xpos, ypos - 15, 0);
 		}
 	}
 	return 0;
@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_ram_w) AM_SHARE("fg_ram")
 	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0xdc00, 0xdcff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xdc00, 0xdcff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xde00, 0xde00) AM_WRITE(bg_bank_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("P2")
@@ -460,8 +460,8 @@ static MACHINE_CONFIG_START( calorie, calorie_state )
 	MCFG_SCREEN_UPDATE_DRIVER(calorie_state, screen_update_calorie)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", calorie)
-	MCFG_PALETTE_LENGTH(0x100)
-
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

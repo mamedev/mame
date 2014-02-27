@@ -35,33 +35,31 @@
  *
  *************************************/
 
-void bsktball_state::palette_init()
+PALETTE_INIT_MEMBER(bsktball_state, bsktball)
 {
 	int i;
 
-	machine().colortable = colortable_alloc(machine(), 4);
-
-	colortable_palette_set_color(machine().colortable,0,rgb_t(0x00,0x00,0x00)); /* BLACK */
-	colortable_palette_set_color(machine().colortable,1,rgb_t(0x80,0x80,0x80)); /* LIGHT GREY */
-	colortable_palette_set_color(machine().colortable,2,rgb_t(0x50,0x50,0x50)); /* DARK GREY */
-	colortable_palette_set_color(machine().colortable,3,rgb_t(0xff,0xff,0xff)); /* WHITE */
+	palette.set_indirect_color(0,rgb_t(0x00,0x00,0x00)); /* BLACK */
+	palette.set_indirect_color(1,rgb_t(0x80,0x80,0x80)); /* LIGHT GREY */
+	palette.set_indirect_color(2,rgb_t(0x50,0x50,0x50)); /* DARK GREY */
+	palette.set_indirect_color(3,rgb_t(0xff,0xff,0xff)); /* WHITE */
 
 	/* playfield */
 	for (i = 0; i < 2; i++)
 	{
-		colortable_entry_set_value(machine().colortable, i*4 + 0, 1);
-		colortable_entry_set_value(machine().colortable, i*4 + 1, 3 * i);
-		colortable_entry_set_value(machine().colortable, i*4 + 2, 3 * i);
-		colortable_entry_set_value(machine().colortable, i*4 + 3, 3 * i);
+		palette.set_pen_indirect(i*4 + 0, 1);
+		palette.set_pen_indirect(i*4 + 1, 3 * i);
+		palette.set_pen_indirect(i*4 + 2, 3 * i);
+		palette.set_pen_indirect(i*4 + 3, 3 * i);
 	}
 
 	/* motion */
 	for (i = 0; i < 4*4*4; i++)
 	{
-		colortable_entry_set_value(machine().colortable, 2*4 + i*4 + 0, 1);
-		colortable_entry_set_value(machine().colortable, 2*4 + i*4 + 1, (i >> 2) & 3);
-		colortable_entry_set_value(machine().colortable, 2*4 + i*4 + 2, (i >> 0) & 3);
-		colortable_entry_set_value(machine().colortable, 2*4 + i*4 + 3, (i >> 4) & 3);
+		palette.set_pen_indirect(2*4 + i*4 + 0, 1);
+		palette.set_pen_indirect(2*4 + i*4 + 1, (i >> 2) & 3);
+		palette.set_pen_indirect(2*4 + i*4 + 2, (i >> 0) & 3);
+		palette.set_pen_indirect(2*4 + i*4 + 3, (i >> 4) & 3);
 	}
 }
 
@@ -259,8 +257,8 @@ static MACHINE_CONFIG_START( bsktball, bsktball_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bsktball_state, screen_update_bsktball)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bsktball)
-	MCFG_PALETTE_LENGTH(2*4 + 4*4*4*4)
-
+	MCFG_PALETTE_ADD("palette", 2*4 + 4*4*4*4)
+	MCFG_PALETTE_INIT_OWNER(bsktball_state, bsktball)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

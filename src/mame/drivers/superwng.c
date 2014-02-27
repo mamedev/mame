@@ -74,7 +74,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(superwng);
 	UINT32 screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
@@ -155,7 +155,7 @@ UINT32 superwng_state::screen_update_superwng(screen_device &screen, bitmap_ind1
 		int sy = m_colorram_bg[i];
 		int color = m_colorram_bg[i + 1] & 0xf;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 						code,
 						color,
 						flip, flip,
@@ -174,12 +174,12 @@ static const UINT8 superwng_colors[]= /* temporary */
 	0x00, 0xc0, 0x07, 0x3f, 0x00, 0x1f, 0x3f, 0xff, 0x00, 0x86, 0x05, 0xff, 0x00, 0xc0, 0xe8, 0xff
 };
 
-void superwng_state::palette_init()
+PALETTE_INIT_MEMBER(superwng_state, superwng)
 {
 	int i;
 	const UINT8 * ptr=superwng_colors;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -197,7 +197,7 @@ void superwng_state::palette_init()
 		bit1 = BIT(*ptr, 7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 		++ptr;
 	}
 }
@@ -481,7 +481,8 @@ static MACHINE_CONFIG_START( superwng, superwng_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", superwng)
 
-	MCFG_PALETTE_LENGTH(0x40)
+	MCFG_PALETTE_ADD("palette", 0x40)
+	MCFG_PALETTE_INIT_OWNER(superwng_state, superwng)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

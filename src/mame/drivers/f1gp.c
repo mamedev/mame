@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                                                         // WORK RAM-1
 	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")       // DUAL RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")         // CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")    // PALETTE
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(f1gp_gfxctrl_w)
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( f1gp2_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                                                             // WORK RAM-1
 	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")           // DUAL RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")             // CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")            // PALETTE
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")            // PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(f1gp2_gfxctrl_w)
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
 	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
@@ -462,19 +462,22 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", f1gp)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, f1gp_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 	
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, f1gp_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp)
 
@@ -517,7 +520,8 @@ static MACHINE_CONFIG_START( f1gpb, f1gp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gpb)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", f1gp)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gpb)
 
@@ -547,6 +551,7 @@ static MACHINE_CONFIG_DERIVED( f1gp2, f1gp )
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( f1gp_state, f1gp2_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
 	MCFG_DEVICE_REMOVE("k053936")
 	MCFG_K053936_ADD("k053936", f1gp2_k053936_intf)

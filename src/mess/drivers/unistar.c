@@ -21,7 +21,7 @@ public:
 
 	virtual void machine_reset();
 	virtual void video_start();
-	void palette_init_unistar();
+	DECLARE_PALETTE_INIT(unistar);
 	UINT32 screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	const UINT8 *m_p_chargen;
 private:
@@ -54,9 +54,9 @@ void unistar_state::machine_reset()
 
 PALETTE_INIT_MEMBER( unistar_state, unistar )
 {
-	palette_set_color_rgb( machine(), 0, 0, 0, 0 ); /* Black */
-	palette_set_color_rgb( machine(), 1, 0, 255, 0 );   /* Full */
-	palette_set_color_rgb( machine(), 2, 0, 128, 0 );   /* Dimmed */
+	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
+	palette.set_pen_color(1, 0, 255, 0 );   /* Full */
+	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
 }
 
 void unistar_state::video_start()
@@ -100,8 +100,8 @@ static MACHINE_CONFIG_START( unistar, unistar_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(unistar_state, screen_update_unistar)
 	MCFG_GFXDECODE_ADD("gfxdecode", unistar)
-	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT_OVERRIDE(unistar_state, unistar)
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(unistar_state, unistar)
 MACHINE_CONFIG_END
 
 /* ROM definition */

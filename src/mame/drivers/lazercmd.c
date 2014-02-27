@@ -593,15 +593,15 @@ static GFXDECODE_START( lazercmd )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 2 )
 GFXDECODE_END
 
-void lazercmd_state::palette_init()
+PALETTE_INIT_MEMBER(lazercmd_state, lazercmd)
 {
-	palette_set_color(machine(), 0, rgb_t(0xb0, 0xb0, 0xb0)); /* white */
-	palette_set_color(machine(), 1, rgb_t(0x00, 0x00, 0x00)); /* black */
+	palette.set_pen_color(0, rgb_t(0xb0, 0xb0, 0xb0)); /* white */
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); /* black */
 
-	palette_set_color(machine(), 2, rgb_t(0x00, 0x00, 0x00)); /* black */
-	palette_set_color(machine(), 3, rgb_t(0xb0, 0xb0, 0xb0)); /* white */
+	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x00)); /* black */
+	palette.set_pen_color(3, rgb_t(0xb0, 0xb0, 0xb0)); /* white */
 
-	palette_set_color(machine(), 4, rgb_t(0xff, 0xff, 0xff)); /* bright white */
+	palette.set_pen_color(4, rgb_t(0xff, 0xff, 0xff)); /* bright white */
 }
 
 
@@ -647,7 +647,8 @@ static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", lazercmd)
-	MCFG_PALETTE_LENGTH(5)
+	MCFG_PALETTE_ADD("palette", 5)
+	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -678,7 +679,8 @@ static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", lazercmd)
-	MCFG_PALETTE_LENGTH(5)
+	MCFG_PALETTE_ADD("palette", 5)
+	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -709,7 +711,8 @@ static MACHINE_CONFIG_START( bbonk, lazercmd_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", lazercmd)
-	MCFG_PALETTE_LENGTH(5)
+	MCFG_PALETTE_ADD("palette", 5)
+	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

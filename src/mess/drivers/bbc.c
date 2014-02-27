@@ -300,7 +300,7 @@ static const rgb_t bbc_palette[8]=
 
 PALETTE_INIT_MEMBER(bbc_state, bbc)
 {
-	palette_set_colors(machine(), 0, bbc_palette, ARRAY_LENGTH(bbc_palette));
+	palette.set_pen_colors(0, bbc_palette, ARRAY_LENGTH(bbc_palette));
 }
 
 
@@ -699,9 +699,9 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
 
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(bbc_state, bbc)
-	MCFG_SAA5050_ADD("saa5050", XTAL_12MHz/2, trom_intf)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(bbc_state,bbc)
+	MCFG_SAA5050_ADD("saa505x", XTAL_12MHz/2, trom_intf)
 
 	/* crtc */
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000, bbc_mc6845_intf)
@@ -909,9 +909,9 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(bbc_state, bbc)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(bbc_state,bbc)
 
 	MCFG_SAA5050_ADD("saa5050", XTAL_12MHz/2, trom_intf)
 

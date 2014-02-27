@@ -142,11 +142,11 @@ static INPUT_PORTS_START( osborne1 )
 INPUT_PORTS_END
 
 
-void osborne1_state::palette_init()
+PALETTE_INIT_MEMBER(osborne1_state, osborne1)
 {
-	palette_set_color_rgb( machine(), 0, 0, 0, 0 ); /* Black */
-	palette_set_color_rgb( machine(), 1, 0, 255, 0 );   /* Full */
-	palette_set_color_rgb( machine(), 2, 0, 128, 0 );   /* Dimmed */
+	palette.set_pen_color( 0, 0, 0, 0 ); /* Black */
+	palette.set_pen_color( 1, 0, 255, 0 );   /* Full */
+	palette.set_pen_color( 2, 0, 128, 0 );   /* Dimmed */
 }
 
 
@@ -243,7 +243,8 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(osborne1_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 512, 0, 416, 260, 0, 240 )
 	MCFG_GFXDECODE_ADD("gfxdecode", osborne1)
-	MCFG_PALETTE_LENGTH( 3 )
+	MCFG_PALETTE_ADD( "palette", 3 )
+	MCFG_PALETTE_INIT_OWNER(osborne1_state, osborne1)
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD( "beeper", BEEP, 0 )

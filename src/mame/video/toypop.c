@@ -18,11 +18,9 @@
 
 ***************************************************************************/
 
-void toypop_state::palette_init()
+PALETTE_INIT_MEMBER(toypop_state, toypop)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 256);
 
 	for (int i = 0;i < 256;i++)
 	{
@@ -47,7 +45,7 @@ void toypop_state::palette_init()
 		bit3 = (color_prom[i+0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r,g,b));
 	}
 
 	for (int i = 0;i < 256;i++)
@@ -55,17 +53,17 @@ void toypop_state::palette_init()
 		UINT8 entry;
 
 		// characters
-		colortable_entry_set_value(machine().colortable, i + 0*256, (color_prom[i + 0x300] & 0x0f) | 0x70);
-		colortable_entry_set_value(machine().colortable, i + 1*256, (color_prom[i + 0x300] & 0x0f) | 0xf0);
+		palette.set_pen_indirect(i + 0*256, (color_prom[i + 0x300] & 0x0f) | 0x70);
+		palette.set_pen_indirect(i + 1*256, (color_prom[i + 0x300] & 0x0f) | 0xf0);
 		// sprites
 		entry = color_prom[i + 0x500];
-		colortable_entry_set_value(machine().colortable, i + 2*256, entry);
+		palette.set_pen_indirect(i + 2*256, entry);
 	}
 	for (int i = 0;i < 16;i++)
 	{
 		// background
-		colortable_entry_set_value(machine().colortable, i + 3*256 + 0*16, 0x60 + i);
-		colortable_entry_set_value(machine().colortable, i + 3*256 + 1*16, 0xe0 + i);
+		palette.set_pen_indirect(i + 3*256 + 0*16, 0x60 + i);
+		palette.set_pen_indirect(i + 3*256 + 1*16, 0xe0 + i);
 	}
 }
 
@@ -254,12 +252,12 @@ void toypop_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 			{
 				for (int x = 0;x <= sizex;x++)
 				{
-					m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
+					m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect,
 						sprite + gfx_offs[y ^ (sizey & flipy)][x ^ (sizex & flipx)],
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0xff));
+						m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0xff));
 				}
 			}
 		}

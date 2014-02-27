@@ -194,8 +194,8 @@ static MACHINE_CONFIG_START( markham, markham_state )
 	MCFG_SCREEN_UPDATE_DRIVER(markham_state, screen_update_markham)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", markham)
-	MCFG_PALETTE_LENGTH(1024)
-
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INIT_OWNER(markham_state, markham)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

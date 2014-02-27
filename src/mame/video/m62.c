@@ -197,20 +197,20 @@ void m62_state::m62_amplify_contrast(palette_t *palette, UINT32 numcolors)
 	palette->set_contrast(255000.0/ymax);
 }
 
-void m62_state::palette_init()
+PALETTE_INIT_MEMBER(m62_state, m62)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &m62_tile_decode_info, &m62_tile_net_info);
-	palette_set_colors(machine(), 0x000, rgb, 0x100);
+	palette.set_pen_colors(0x000, rgb, 0x100);
 	auto_free(machine(), rgb);
 
 	rgb = compute_res_net_all(machine(), color_prom, &m62_sprite_decode_info, &m62_sprite_net_info);
-	palette_set_colors(machine(), 0x100, rgb, 0x100);
+	palette.set_pen_colors(0x100, rgb, 0x100);
 	auto_free(machine(), rgb);
 
-	m62_amplify_contrast(machine().palette,0);
+	m62_amplify_contrast(palette.palette(),0);
 
 	/* we'll need this at run time */
 	m_sprite_height_prom = color_prom + 0x600;
@@ -223,14 +223,14 @@ PALETTE_INIT_MEMBER(m62_state,lotlot)
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &lotlot_tile_decode_info, &m62_tile_net_info);
-	palette_set_colors(machine(), 0x000, rgb, 0x180);
+	palette.set_pen_colors(0x000, rgb, 0x180);
 	auto_free(machine(), rgb);
 
 	rgb = compute_res_net_all(machine(), color_prom, &lotlot_sprite_decode_info, &m62_sprite_net_info);
-	palette_set_colors(machine(), 0x180, rgb, 0x180);
+	palette.set_pen_colors(0x180, rgb, 0x180);
 	auto_free(machine(), rgb);
 
-	m62_amplify_contrast(machine().palette,0);
+	m62_amplify_contrast(palette.palette(),0);
 
 	/* we'll need this at run time */
 	m_sprite_height_prom = color_prom + 0x900;
@@ -244,18 +244,18 @@ PALETTE_INIT_MEMBER(m62_state,battroad)
 
 	// m62 palette
 	rgb = compute_res_net_all(machine(), color_prom, &m62_tile_decode_info, &m62_tile_net_info);
-	palette_set_colors(machine(), 0x000, rgb, 0x100);
+	palette.set_pen_colors(0x000, rgb, 0x100);
 	auto_free(machine(), rgb);
 
 	rgb = compute_res_net_all(machine(), color_prom, &m62_sprite_decode_info, &m62_sprite_net_info);
-	palette_set_colors(machine(), 0x100, rgb, 0x100);
+	palette.set_pen_colors(0x100, rgb, 0x100);
 	auto_free(machine(), rgb);
 
-	m62_amplify_contrast(machine().palette,0x200);
+	m62_amplify_contrast(palette.palette(),0x200);
 
 	// custom palette for foreground
 	rgb = compute_res_net_all(machine(), color_prom, &battroad_char_decode_info, &battroad_char_net_info);
-	palette_set_colors(machine(), 0x200, rgb, 0x020);
+	palette.set_pen_colors(0x200, rgb, 0x020);
 	auto_free(machine(), rgb);
 
 	/* we'll need this at run time */
@@ -269,14 +269,14 @@ PALETTE_INIT_MEMBER(m62_state,spelunk2)
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &spelunk2_tile_decode_info, &m62_tile_net_info);
-	palette_set_colors(machine(), 0x000, rgb, 0x200);
+	palette.set_pen_colors(0x000, rgb, 0x200);
 	auto_free(machine(), rgb);
 
 	rgb = compute_res_net_all(machine(), color_prom, &spelunk2_sprite_decode_info, &m62_sprite_net_info);
-	palette_set_colors(machine(), 0x200, rgb, 0x100);
+	palette.set_pen_colors(0x200, rgb, 0x100);
 	auto_free(machine(), rgb);
 
-	m62_amplify_contrast(machine().palette,0);
+	m62_amplify_contrast(palette.palette(),0);
 
 	/* we'll need this at run time */
 	m_sprite_height_prom = color_prom + 0x700;
@@ -391,7 +391,7 @@ void m62_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, i
 
 			do
 			{
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 						code + i * incr,col,
 						flipx,flipy,
 						sx,sy + 16 * i,0);
@@ -556,11 +556,11 @@ UINT32 m62_state::screen_update_ldrun3(screen_device &screen, bitmap_ind16 &bitm
 
 		my_cliprect.min_y = 0 * 8;
 		my_cliprect.max_y = 1 * 8 - 1;
-		bitmap.fill(get_black_pen(machine()), my_cliprect);
+		bitmap.fill(m_palette->black_pen(), my_cliprect);
 
 		my_cliprect.min_y = 31 * 8;
 		my_cliprect.max_y = 32 * 8 - 1;
-		bitmap.fill(get_black_pen(machine()), my_cliprect);
+		bitmap.fill(m_palette->black_pen(), my_cliprect);
 	}
 
 	return 0;

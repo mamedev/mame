@@ -2,7 +2,7 @@
 #include "includes/mainsnk.h"
 
 
-void mainsnk_state::palette_init()
+PALETTE_INIT_MEMBER(mainsnk_state, mainsnk)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -30,7 +30,7 @@ void mainsnk_state::palette_init()
 		bit3 = (color_prom[i + num_colors] >> 1) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -148,7 +148,7 @@ void mainsnk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		gfx->transpen(bitmap,cliprect,
+		gfx->transpen(m_palette,bitmap,cliprect,
 			tile_number,
 			color,
 			flipx,flipy,

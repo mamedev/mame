@@ -312,8 +312,8 @@ void rabbit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 		if(xpos&0x800)xpos-=0x1000;
 
-		gfx->transpen(*m_sprite_bitmap,m_sprite_clip,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0x20-8/*-(m_spriteregs[0]&0x00000fff)*/,ypos-24/*-((m_spriteregs[1]&0x0fff0000)>>16)*/,15);
-//      gfx->transpen(bitmap,cliprect,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0xa0-8/*-(m_spriteregs[0]&0x00000fff)*/,ypos-24+0x80/*-((m_spriteregs[1]&0x0fff0000)>>16)*/,0);
+		gfx->transpen(m_palette,*m_sprite_bitmap,m_sprite_clip,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0x20-8/*-(m_spriteregs[0]&0x00000fff)*/,ypos-24/*-((m_spriteregs[1]&0x0fff0000)>>16)*/,15);
+//      gfx->transpen(m_palette,bitmap,cliprect,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0xa0-8/*-(m_spriteregs[0]&0x00000fff)*/,ypos-24+0x80/*-((m_spriteregs[1]&0x0fff0000)>>16)*/,0);
 
 
 		source-=2;
@@ -479,7 +479,7 @@ UINT32 rabbit_state::screen_update_rabbit(screen_device &screen, bitmap_ind16 &b
 {
 	int prilevel;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 //  popmessage("%08x %08x", m_viewregs0[0], m_viewregs0[1]);
 //  popmessage("%08x %08x %08x %08x %08x %08x", m_tilemap_regs[0][0],m_tilemap_regs[0][1],m_tilemap_regs[0][2],m_tilemap_regs[0][3],m_tilemap_regs[0][4],m_tilemap_regs[0][5]);
@@ -522,7 +522,7 @@ WRITE32_MEMBER(rabbit_state::rabbit_paletteram_dword_w)
 	r = ((m_generic_paletteram_32[offset] & 0x0000ff00) >>8);
 	g = ((m_generic_paletteram_32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(machine(),offset,rgb_t(r,g,b));
+	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
 READ32_MEMBER(rabbit_state::rabbit_tilemap0_r)
@@ -908,9 +908,7 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 20*16-1, 32*16, 48*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rabbit_state, screen_update_rabbit)
 
-	MCFG_PALETTE_LENGTH(0x4000)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
-
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

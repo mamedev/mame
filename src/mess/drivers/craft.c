@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( craft, craft_state )
 	MCFG_SCREEN_SIZE(635, 525)
 	MCFG_SCREEN_VISIBLE_AREA(47, 526, 36, 515)
 	MCFG_SCREEN_UPDATE_DRIVER(craft_state, screen_update_craft)
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("avr8")

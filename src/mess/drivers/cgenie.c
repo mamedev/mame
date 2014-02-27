@@ -447,32 +447,28 @@ PALETTE_INIT_MEMBER(cgenie_state,cgenie)
 {
 	UINT8 i, r, g, b;
 
-	machine().colortable = colortable_alloc(machine(), 49);
-
 	for ( i = 0; i < 49; i++ )
 	{
 		r = cgenie_colors[i*3]; g = cgenie_colors[i*3+1]; b = cgenie_colors[i*3+2];
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	for(i=0; i<108; i++)
-		colortable_entry_set_value(machine().colortable, i, cgenie_palette[i]);
+		palette.set_pen_indirect(i, cgenie_palette[i]);
 }
 
 PALETTE_INIT_MEMBER(cgenie_state,cgenienz)
 {
 	UINT8 i, r, g, b;
 
-	machine().colortable = colortable_alloc(machine(), 49);
-
 	for ( i = 0; i < 49; i++ )
 	{
 		r = cgenienz_colors[i*3]; g = cgenienz_colors[i*3+1]; b = cgenienz_colors[i*3+2];
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	for(i=0; i<108; i++)
-		colortable_entry_set_value(machine().colortable, i, cgenie_palette[i]);
+		palette.set_pen_indirect(i, cgenie_palette[i]);
 }
 
 static const ay8910_interface cgenie_ay8910_interface =
@@ -536,8 +532,8 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1,0*8,32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cgenie_state, screen_update_cgenie)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",  cgenie )
-	MCFG_PALETTE_LENGTH(108)
+	MCFG_GFXDECODE_ADD("gfxdecode", cgenie )
+	MCFG_PALETTE_ADD("palette", 108)
 
 	// Actually the video is driven by an HD46505 clocked at XTAL_17_73447MHz/16
 
@@ -566,13 +562,13 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cgenie, cgenie_common )
-
-	MCFG_PALETTE_INIT_OVERRIDE(cgenie_state, cgenie )
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(cgenie_state, cgenie )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cgenienz, cgenie_common )
-
-	MCFG_PALETTE_INIT_OVERRIDE(cgenie_state, cgenienz )
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(cgenie_state, cgenienz )
 MACHINE_CONFIG_END
 
 /***************************************************************************

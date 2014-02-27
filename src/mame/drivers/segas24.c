@@ -1106,7 +1106,7 @@ WRITE16_MEMBER( segas24_state::sys16_paletteram_w )
 	g |= g >> 5;
 	b |= b >> 5;
 
-	palette_set_color(machine(), offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 
 	if(data & 0x8000) {
 		r = 255-0.6*(255-r);
@@ -1117,7 +1117,7 @@ WRITE16_MEMBER( segas24_state::sys16_paletteram_w )
 		g = 0.6*g;
 		b = 0.6*b;
 	}
-	palette_set_color(machine(), offset+machine().total_colors()/2, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset+m_palette->entries()/2, rgb_t(r, g, b));
 }
 
 
@@ -1946,6 +1946,7 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_S24TILE_DEVICE_ADD("tile", 0xfff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
+	MCFG_S24TILE_DEVICE_PALETTE("palette")
 	MCFG_S24SPRITE_DEVICE_ADD("sprite")
 	MCFG_S24MIXER_DEVICE_ADD("mixer")
 
@@ -1953,7 +1954,7 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
 	MCFG_SCREEN_UPDATE_DRIVER(segas24_state, screen_update_system24)
 
-	MCFG_PALETTE_LENGTH(8192*2)
+	MCFG_PALETTE_ADD("palette", 8192*2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

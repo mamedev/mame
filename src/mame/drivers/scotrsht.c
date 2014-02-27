@@ -197,8 +197,8 @@ static MACHINE_CONFIG_START( scotrsht, scotrsht_state )
 	MCFG_SCREEN_UPDATE_DRIVER(scotrsht_state, screen_update_scotrsht)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", scotrsht)
-	MCFG_PALETTE_LENGTH(16*8*16+16*8*16)
-
+	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
+	MCFG_PALETTE_INIT_OWNER(scotrsht_state, scotrsht)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

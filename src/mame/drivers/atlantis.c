@@ -154,8 +154,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(atlantis_state, screen_update_mwskins)
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, BBBBB_GGGGG_RRRRR)
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR("palette")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(dcs2_audio_denver)

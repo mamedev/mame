@@ -684,32 +684,30 @@ static GFXDECODE_START( decocass )
 	GFXDECODE_ENTRY( NULL, 0xd800, objlayout,       48, 4 )  /* object */
 GFXDECODE_END
 
-void decocass_state::palette_init()
+PALETTE_INIT_MEMBER(decocass_state, decocass)
 {
 	int i;
 
-	machine().colortable = colortable_alloc(machine(), 32);
-
 	/* set up 32 colors 1:1 pens */
 	for (i = 0; i < 32; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* setup straight/flipped colors for background tiles (D7 of color_center_bot ?) */
 	for (i = 0; i < 8; i++)
 	{
-		colortable_entry_set_value(machine().colortable, 32+i, 3*8+i);
-		colortable_entry_set_value(machine().colortable, 40+i, 3*8+((i << 1) & 0x04) + ((i >> 1) & 0x02) + (i & 0x01));
+		palette.set_pen_indirect(32+i, 3*8+i);
+		palette.set_pen_indirect(40+i, 3*8+((i << 1) & 0x04) + ((i >> 1) & 0x02) + (i & 0x01));
 	}
 
 	/* setup 4 colors for 1bpp object */
-	colortable_entry_set_value(machine().colortable, 48+0*2+0, 0);
-	colortable_entry_set_value(machine().colortable, 48+0*2+1, 25); /* testtape red from 4th palette section? */
-	colortable_entry_set_value(machine().colortable, 48+1*2+0, 0);
-	colortable_entry_set_value(machine().colortable, 48+1*2+1, 28); /* testtape blue from 4th palette section? */
-	colortable_entry_set_value(machine().colortable, 48+2*2+0, 0);
-	colortable_entry_set_value(machine().colortable, 48+2*2+1, 26); /* testtape green from 4th palette section? */
-	colortable_entry_set_value(machine().colortable, 48+3*2+0, 0);
-	colortable_entry_set_value(machine().colortable, 48+3*2+1, 23); /* ???? */
+	palette.set_pen_indirect(48+0*2+0, 0);
+	palette.set_pen_indirect(48+0*2+1, 25); /* testtape red from 4th palette section? */
+	palette.set_pen_indirect(48+1*2+0, 0);
+	palette.set_pen_indirect(48+1*2+1, 28); /* testtape blue from 4th palette section? */
+	palette.set_pen_indirect(48+2*2+0, 0);
+	palette.set_pen_indirect(48+2*2+1, 26); /* testtape green from 4th palette section? */
+	palette.set_pen_indirect(48+3*2+0, 0);
+	palette.set_pen_indirect(48+3*2+1, 23); /* ???? */
 }
 
 
@@ -737,7 +735,8 @@ static MACHINE_CONFIG_START( decocass, decocass_state )
 	MCFG_SCREEN_UPDATE_DRIVER(decocass_state, screen_update_decocass)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", decocass)
-	MCFG_PALETTE_LENGTH(32+2*8+2*4)
+	MCFG_PALETTE_ADD("palette", 32+2*8+2*4)
+	MCFG_PALETTE_INIT_OWNER(decocass_state, decocass)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

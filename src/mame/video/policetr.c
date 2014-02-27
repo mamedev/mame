@@ -330,7 +330,7 @@ WRITE32_MEMBER(policetr_state::policetr_palette_data_w)
 		m_palette_data[m_palette_index] = (data >> 16) & 0xff;
 		if (++m_palette_index == 3)
 		{
-			palette_set_color(machine(), m_palette_offset, rgb_t(m_palette_data[0], m_palette_data[1], m_palette_data[2]));
+			m_palette->set_pen_color(m_palette_offset, rgb_t(m_palette_data[0], m_palette_data[1], m_palette_data[2]));
 			m_palette_index = 0;
 		}
 	}

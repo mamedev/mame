@@ -279,8 +279,8 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sprcros2_state, screen_update_sprcros2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sprcros2)
-	MCFG_PALETTE_LENGTH(768)
-
+	MCFG_PALETTE_ADD("palette", 768)
+	MCFG_PALETTE_INIT_OWNER(sprcros2_state, sprcros2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

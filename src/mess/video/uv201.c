@@ -83,7 +83,7 @@
 	((_y >= cliprect.min_y) && (_y <= cliprect.max_y))
 
 #define DRAW_PIXEL(_scanline, _dot) \
-	if (IS_VISIBLE(_scanline)) bitmap.pix32((_scanline), HSYNC_WIDTH + HFP_WIDTH + _dot) = m_palette[pixel];
+	if (IS_VISIBLE(_scanline)) bitmap.pix32((_scanline), HSYNC_WIDTH + HFP_WIDTH + _dot) = m_palette_val[pixel];
 
 
 
@@ -248,14 +248,14 @@ void uv201_device::initialize_palette()
 			onvalue = onhiintensity;
 		}
 
-		m_palette[offset + 0] = rgb_t(offvalue, offvalue, offvalue); // black
-		m_palette[offset + 1] = rgb_t(onvalue, offvalue, offvalue); // red
-		m_palette[offset + 2] = rgb_t(offvalue, onvalue, offvalue); // green
-		m_palette[offset + 3] = rgb_t(onvalue, onvalue, offvalue); // red-green
-		m_palette[offset + 4] = rgb_t(offvalue, offvalue, onvalue); // blue
-		m_palette[offset + 5] = rgb_t(onvalue, offvalue, onvalue); // red-blue
-		m_palette[offset + 6] = rgb_t(offvalue, onvalue, onvalue); // green-blue
-		m_palette[offset + 7] = rgb_t(onvalue, onvalue, onvalue); // white
+		m_palette_val[offset + 0] = rgb_t(offvalue, offvalue, offvalue); // black
+		m_palette_val[offset + 1] = rgb_t(onvalue, offvalue, offvalue); // red
+		m_palette_val[offset + 2] = rgb_t(offvalue, onvalue, offvalue); // green
+		m_palette_val[offset + 3] = rgb_t(onvalue, onvalue, offvalue); // red-green
+		m_palette_val[offset + 4] = rgb_t(offvalue, offvalue, onvalue); // blue
+		m_palette_val[offset + 5] = rgb_t(onvalue, offvalue, onvalue); // red-blue
+		m_palette_val[offset + 6] = rgb_t(offvalue, onvalue, onvalue); // green-blue
+		m_palette_val[offset + 7] = rgb_t(onvalue, onvalue, onvalue); // white
 	}
 }
 
@@ -507,7 +507,7 @@ READ_LINE_MEMBER( uv201_device::kbd_r )
 
 UINT32 uv201_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(rgb_t(0x00,0x00,0x00), cliprect);
 
 	if (!(m_cmd & COMMAND_ENB))
 	{

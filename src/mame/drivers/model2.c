@@ -438,18 +438,18 @@ MACHINE_RESET_MEMBER(model2_state,model2c)
 	m_dsp_type = DSP_TYPE_TGPX4;
 }
 
-static void chcolor(running_machine &machine, pen_t color, UINT16 data)
+static void chcolor(palette_device &palette, pen_t color, UINT16 data)
 {
-	palette_set_color_rgb(machine, color, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	palette.set_pen_color(color, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
 WRITE32_MEMBER(model2_state::pal32_w)
 {
 	COMBINE_DATA(m_paletteram32 + offset);
 	if(ACCESSING_BITS_0_15)
-		chcolor(machine(), offset * 2, m_paletteram32[offset]);
+		chcolor(m_palette, offset * 2, m_paletteram32[offset]);
 	if(ACCESSING_BITS_16_31)
-		chcolor(machine(), offset * 2 + 1, m_paletteram32[offset] >> 16);
+		chcolor(m_palette, offset * 2 + 1, m_paletteram32[offset] >> 16);
 }
 
 WRITE32_MEMBER(model2_state::ctrl0_w)
@@ -1973,6 +1973,7 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
+	MCFG_S24TILE_DEVICE_PALETTE("palette")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
@@ -1983,7 +1984,7 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
@@ -2025,6 +2026,7 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
+	MCFG_S24TILE_DEVICE_PALETTE("palette")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
@@ -2035,7 +2037,7 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
@@ -2129,6 +2131,7 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
+	MCFG_S24TILE_DEVICE_PALETTE("palette")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
@@ -2139,7 +2142,7 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
@@ -2178,6 +2181,7 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
+	MCFG_S24TILE_DEVICE_PALETTE("palette")
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
@@ -2188,7 +2192,7 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 

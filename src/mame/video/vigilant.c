@@ -56,7 +56,7 @@ void vigilant_state::update_background()
 		{
 			for( col=0; col<512; col+=32 )
 			{
-				m_gfxdecode->gfx(2)->opaque(*m_bg_bitmap,
+				m_gfxdecode->gfx(2)->opaque(m_palette,*m_bg_bitmap,
 						m_bg_bitmap->cliprect(),
 						charcode,
 						row < 128 ? 0 : 1,
@@ -98,7 +98,7 @@ WRITE8_MEMBER(vigilant_state::vigilant_paletteram_w)
 	g = (m_generic_paletteram_8[bank + offset + 0x100] << 3) & 0xFF;
 	b = (m_generic_paletteram_8[bank + offset + 0x200] << 3) & 0xFF;
 
-	palette_set_color(machine(), (bank >> 2) + offset,rgb_t(r,g,b));
+	m_palette->set_pen_color((bank >> 2) + offset,rgb_t(r,g,b));
 }
 
 
@@ -181,7 +181,7 @@ void vigilant_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &clip
 				{
 					sx = (sx + scroll) & 0x1ff;
 
-					m_gfxdecode->gfx(0)->transmask(bitmap,bottomvisiblearea,
+					m_gfxdecode->gfx(0)->transmask(m_palette,bitmap,bottomvisiblearea,
 							tile_number,
 							color,
 							0,0,
@@ -194,7 +194,7 @@ void vigilant_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &clip
 			if (sy >= 48)
 				sx = (sx + scroll) & 0x1ff;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					tile_number,
 					color,
 					0,0,
@@ -248,7 +248,7 @@ void vigilant_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 			if (flipy) c += h-1-y;
 			else c += y;
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					c,
 					color,
 					flipx,flipy,
@@ -270,7 +270,7 @@ UINT32 vigilant_state::screen_update_kikcubic(screen_device &screen, bitmap_ind1
 		int color = (attributes & 0xF0) >> 4;
 		int tile_number = videoram[offs] | ((attributes & 0x0F) << 8);
 
-		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,
 				tile_number,
 				color,
 				0,0,
@@ -295,13 +295,13 @@ UINT32 vigilant_state::screen_update_vigilant(screen_device &screen, bitmap_ind1
 		g = (m_generic_paletteram_8[0x500 + 16 * m_rear_color + i] << 3) & 0xFF;
 		b = (m_generic_paletteram_8[0x600 + 16 * m_rear_color + i] << 3) & 0xFF;
 
-		palette_set_color(machine(),512 + i,rgb_t(r,g,b));
+		m_palette->set_pen_color(512 + i,rgb_t(r,g,b));
 
 		r = (m_generic_paletteram_8[0x400 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
 		g = (m_generic_paletteram_8[0x500 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
 		b = (m_generic_paletteram_8[0x600 + 16 * m_rear_color + 32 + i] << 3) & 0xFF;
 
-		palette_set_color(machine(),512 + 16 + i,rgb_t(r,g,b));
+		m_palette->set_pen_color(512 + 16 + i,rgb_t(r,g,b));
 	}
 
 	if (m_rear_disable)  /* opaque foreground */

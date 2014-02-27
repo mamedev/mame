@@ -106,8 +106,8 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_t1000 )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE_DEVICE( T1000_MC6845_NAME, mc6845_device, screen_update )
 
-	MCFG_PALETTE_LENGTH( 32 )
-	MCFG_PALETTE_INIT_OVERRIDE(pc_t1t_device, pcjr)
+	MCFG_PALETTE_ADD( "palette", 32 )
+	MCFG_PALETTE_INIT_OWNER(pc_t1t_device, pcjr)
 
 	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, T1000_SCREEN_NAME, XTAL_14_31818MHz/8, mc6845_t1000_intf)
 MACHINE_CONFIG_END
@@ -139,8 +139,8 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_pcjr )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE_DEVICE( T1000_MC6845_NAME, mc6845_device, screen_update )
 
-	MCFG_PALETTE_LENGTH( 32 )
-	MCFG_PALETTE_INIT_OVERRIDE(pc_t1t_device, pcjr)
+	MCFG_PALETTE_ADD( "palette", 32 )
+	MCFG_PALETTE_INIT_OWNER(pc_t1t_device, pcjr)
 
 	MCFG_MC6845_ADD(T1000_MC6845_NAME, MC6845, T1000_SCREEN_NAME, XTAL_14_31818MHz/16, mc6845_pcjr_intf)
 MACHINE_CONFIG_END
@@ -171,11 +171,11 @@ PALETTE_INIT_MEMBER( pc_t1t_device, pcjr )
 
 	/* colors */
 	for(i = 0; i < 16; i++)
-		palette_set_color_rgb(machine(), i, tga_palette[i][0], tga_palette[i][1], tga_palette[i][2]);
+		palette.set_pen_color(i, tga_palette[i][0], tga_palette[i][1], tga_palette[i][2]);
 
 	/* b/w mode shades */
 	for(i = 0; i < 16; i++)
-		palette_set_color_rgb( machine(), 16+i, ( i << 4 ) | i, ( i << 4 ) | i, ( i << 4 ) | i );
+		palette.set_pen_color(16+i, ( i << 4 ) | i, ( i << 4 ) | i, ( i << 4 ) | i );
 }
 
 

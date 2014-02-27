@@ -123,7 +123,7 @@ void oneshot_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			for (blocky = 0; blocky < ysize; blocky++)
 			{
 				
-						gfx->transpen(
+						gfx->transpen(m_palette,
 						bitmap,
 						cliprect,
 						num + (blocky * xsize) + blockx,
@@ -132,7 +132,7 @@ void oneshot_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 						xpos + blockx * 8, ypos + blocky * 8, 0);
 
 				
-						gfx->transpen(
+						gfx->transpen(m_palette,
 						bitmap,
 						cliprect,
 						num + (blocky * xsize) + blockx,
@@ -148,7 +148,7 @@ void oneshot_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 UINT32 oneshot_state::screen_update_oneshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_mid_tilemap->set_scrollx(0, m_scroll[0] - 0x1f5);
 	m_mid_tilemap->set_scrolly(0, m_scroll[1]);
@@ -163,7 +163,7 @@ UINT32 oneshot_state::screen_update_oneshot(screen_device &screen, bitmap_ind16 
 
 UINT32 oneshot_state::screen_update_maddonna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_mid_tilemap->set_scrolly(0, m_scroll[1]); // other registers aren't used so we don't know which layers they relate to
 

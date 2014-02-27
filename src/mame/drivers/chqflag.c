@@ -46,7 +46,7 @@ WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 	if (data & 0x20)
 	{
 		space.install_read_bank(0x1800, 0x1fff, "bank5");
-		space.install_write_handler(0x1800, 0x1fff, write8_delegate(FUNC(driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_be_w),this));
+		space.install_write_handler(0x1800, 0x1fff, write8_delegate(FUNC(palette_device::write),m_palette.target()));
 		membank("bank5")->set_base(m_generic_paletteram_8);
 
 		if (m_k051316_readroms)
@@ -83,9 +83,9 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 	/* the headlight (which have the shadow bit set) become highlights */
 	/* Maybe one of the bits inverts the SHAD line while the other darkens the background. */
 	if (data & 0x08)
-		palette_set_shadow_factor(machine(), 1 / PALETTE_DEFAULT_SHADOW_FACTOR);
+		m_palette->set_shadow_factor(1 / PALETTE_DEFAULT_SHADOW_FACTOR);
 	else
-		palette_set_shadow_factor(machine(), PALETTE_DEFAULT_SHADOW_FACTOR);
+		m_palette->set_shadow_factor(PALETTE_DEFAULT_SHADOW_FACTOR);
 
 	if ((data & 0x80) != m_last_vreg)
 	{
@@ -96,7 +96,7 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 
 		/* only affect the background */
 		for (i = 512; i < 1024; i++)
-			palette_set_pen_contrast(machine(), i, brt);
+			m_palette->set_pen_contrast(i, brt);
 	}
 
 //if ((data & 0xf8) && (data & 0xf8) != 0x88)
@@ -338,8 +338,6 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	//TODO: Vsync 59.17hz Hsync 15.13 / 15.19khz
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -348,15 +346,20 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(chqflag_state, screen_update_chqflag)
 
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K051960_ADD("k051960", chqflag_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
+	MCFG_K051960_PALETTE("palette")
 	MCFG_K051316_ADD("k051316_1", chqflag_k051316_intf_1)
 	MCFG_K051316_GFXDECODE("gfxdecode")
+	MCFG_K051316_PALETTE("palette")
 	MCFG_K051316_ADD("k051316_2", chqflag_k051316_intf_2)
 	MCFG_K051316_GFXDECODE("gfxdecode")
+	MCFG_K051316_PALETTE("palette")
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */

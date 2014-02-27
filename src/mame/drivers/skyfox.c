@@ -249,8 +249,8 @@ static MACHINE_CONFIG_START( skyfox, skyfox_state )
 	MCFG_SCREEN_UPDATE_DRIVER(skyfox_state, screen_update_skyfox)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", skyfox)
-	MCFG_PALETTE_LENGTH(256+256)    /* 256 static colors (+256 for the background??) */
-
+	MCFG_PALETTE_ADD("palette", 256+256)    /* 256 static colors (+256 for the background??) */
+	MCFG_PALETTE_INIT_OWNER(skyfox_state, skyfox)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

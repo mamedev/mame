@@ -5169,7 +5169,8 @@ static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", galaxian)
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART)
@@ -5290,7 +5291,9 @@ static MACHINE_CONFIG_DERIVED( gmgalax, galaxian )
 
 	/* banked video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gmgalax)
-	MCFG_PALETTE_LENGTH(64)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 64)
+	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)
 MACHINE_CONFIG_END
 
 
@@ -5616,7 +5619,8 @@ static MACHINE_CONFIG_DERIVED( moonwar, scobra )
 	MCFG_I8255A_ADD( "ppi8255_0", moonwar_ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", konami_ppi8255_1_intf )
 
-	MCFG_PALETTE_INIT_OVERRIDE(galaxian_state,moonwar) // bullets are less yellow
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(galaxian_state,moonwar) // bullets are less yellow
 MACHINE_CONFIG_END
 
 
@@ -6054,7 +6058,7 @@ void galaxian_state::tenspot_set_game_bank(running_machine& machine, int bank, i
 	dstregion = machine.root_device().memregion("proms")->base();
 	memcpy(dstregion, srcregion, 0x20);
 
-	galaxian_state::palette_init();
+	PALETTE_INIT_NAME(galaxian)(m_palette);
 }
 
 DRIVER_INIT_MEMBER(galaxian_state,tenspot)

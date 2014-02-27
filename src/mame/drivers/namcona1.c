@@ -944,8 +944,6 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(2400))
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -953,7 +951,8 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 38*8-1-8, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcona1_state, screen_update_namcona1)
 
-	MCFG_PALETTE_LENGTH(0x2000)
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 
 	/* sound hardware */

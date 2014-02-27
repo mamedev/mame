@@ -322,8 +322,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, chinagat_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(ddragon_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(ddragon_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x3000, 0x317f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w) AM_SHARE("paletteram")
-	AM_RANGE(0x3400, 0x357f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
+	AM_RANGE(0x3000, 0x317f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3400, 0x357f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette_ext")
 	AM_RANGE(0x3800, 0x397f) AM_WRITE_BANK("bank3") AM_SHARE("spriteram")
 	AM_RANGE(0x3e00, 0x3e04) AM_WRITE(chinagat_interrupt_w)
 	AM_RANGE(0x3e06, 0x3e06) AM_WRITEONLY AM_SHARE("scrolly_lo")
@@ -588,7 +588,8 @@ static MACHINE_CONFIG_START( chinagat, chinagat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", chinagat)
-	MCFG_PALETTE_LENGTH(384)
+	MCFG_PALETTE_ADD("palette", 384)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 
@@ -632,7 +633,8 @@ static MACHINE_CONFIG_START( saiyugoub1, chinagat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", chinagat)
-	MCFG_PALETTE_LENGTH(384)
+	MCFG_PALETTE_ADD("palette", 384)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 
@@ -673,7 +675,8 @@ static MACHINE_CONFIG_START( saiyugoub2, chinagat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", chinagat)
-	MCFG_PALETTE_LENGTH(384)
+	MCFG_PALETTE_ADD("palette", 384)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
 

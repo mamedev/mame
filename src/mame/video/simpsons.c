@@ -97,7 +97,7 @@ void simpsons_state::simpsons_video_banking( int bank )
 	if (bank & 1)
 	{
 		space.install_read_bank(0x0000, 0x0fff, "bank5");
-		space.install_write_handler(0x0000, 0x0fff, write8_delegate(FUNC(simpsons_state::paletteram_xBBBBBGGGGGRRRRR_byte_be_w), this));
+		space.install_write_handler(0x0000, 0x0fff, write8_delegate(FUNC(palette_device::write), m_palette.target()));
 		membank("bank5")->set_base(m_generic_paletteram_8);
 	}
 	else

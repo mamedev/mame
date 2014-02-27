@@ -107,7 +107,7 @@ WRITE8_MEMBER(speedspn_state::oki_banking_w)
 
 static ADDRESS_MAP_START( speedspn_map, AS_PROGRAM, 8, speedspn_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_le_w) AM_SHARE("paletteram") /* RAM COLOUR */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* RAM COLOUR */
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(speedspn_attram_w) AM_SHARE("attram")
 	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(speedspn_vidram_r,speedspn_vidram_w)  /* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
@@ -286,8 +286,8 @@ static MACHINE_CONFIG_START( speedspn, speedspn_state )
 	MCFG_SCREEN_UPDATE_DRIVER(speedspn_state, screen_update_speedspn)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", speedspn)
-	MCFG_PALETTE_LENGTH(0x400)
-
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

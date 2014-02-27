@@ -10,13 +10,10 @@
 #include "includes/retofinv.h"
 
 
-void retofinv_state::palette_init()
+PALETTE_INIT_MEMBER(retofinv_state, retofinv)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -25,7 +22,7 @@ void retofinv_state::palette_init()
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -42,14 +39,14 @@ void retofinv_state::palette_init()
 		else
 			ctabentry = 0;
 
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites and bg tiles */
 	for (i = 0; i < 0x800; i++)
 	{
 		UINT8 ctabentry = BITSWAP8(color_prom[i],4,5,6,7,3,2,1,0);
-		colortable_entry_set_value(machine().colortable, i + 0x200, ctabentry);
+		palette.set_pen_indirect(i + 0x200, ctabentry);
 	}
 }
 
@@ -107,7 +104,7 @@ void retofinv_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(retofinv_state::bg_get_tile_info),this),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),this),8,8,36,28);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(retofinv_state::fg_get_tile_info),this),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),this),8,8,36,28);
 
-	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, m_gfxdecode->gfx(0), 0);
+	m_palette->configure_tilemap_groups(*m_fg_tilemap, *m_gfxdecode->gfx(0), 0);
 }
 
 
@@ -206,12 +203,12 @@ void retofinv_state::draw_sprites(bitmap_ind16 &bitmap)
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				m_gfxdecode->gfx(1)->transmask(bitmap,spritevisiblearea,
+				m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,spritevisiblearea,
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,
 					sx + 16*x,sy + 16*y,
-					colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0xff));
+					m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0xff));
 			}
 		}
 	}

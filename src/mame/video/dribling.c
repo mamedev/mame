@@ -17,7 +17,7 @@
  *
  *************************************/
 
-void dribling_state::palette_init()
+PALETTE_INIT_MEMBER(dribling_state, dribling)
 {
 	const UINT8 *prom = memregion("proms")->base() + 0x400;
 	int i;
@@ -32,7 +32,7 @@ void dribling_state::palette_init()
 		g *= 0x55;
 		b *= 0xff;
 
-		palette_set_color(machine(), i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 

@@ -695,6 +695,7 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", xerox820)
 
 	/* devices */
@@ -746,6 +747,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820ii_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", xerox820ii)
 
 	/* sound hardware */

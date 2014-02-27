@@ -27,7 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(speedatk_6845_w);
 	DECLARE_WRITE8_MEMBER(speedatk_output_w);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(speedatk);
 	UINT32 screen_update_speedatk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT8 iox_key_matrix_calc(UINT8 p_side);
 	required_device<cpu_device> m_maincpu;

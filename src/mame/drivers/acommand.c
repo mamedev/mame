@@ -177,7 +177,7 @@ void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				xx = w;
 				do
 				{
-					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 							code,
 							color,
 							flipx, flipy,
@@ -470,7 +470,7 @@ static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
 	AM_RANGE(0x082208, 0x082209) AM_WRITE(ac_unk2_w)
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(ac_bgvram_w) AM_SHARE("ac_bgvram")
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(ac_txvram_w) AM_SHARE("ac_txvram")
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
 	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0f9000, 0x0fffff) AM_RAM
@@ -620,8 +620,8 @@ static MACHINE_CONFIG_START( acommand, acommand_state )
 	MCFG_SCREEN_UPDATE_DRIVER(acommand_state, screen_update_acommand)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", acommand)
-	MCFG_PALETTE_LENGTH(0x4000)
-
+	MCFG_PALETTE_ADD("palette", 0x4000)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

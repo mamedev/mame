@@ -82,7 +82,7 @@ static MACHINE_CONFIG_START( ddz, ddz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ddz_state, screen_update_ddz)
 	MCFG_SCREEN_VBLANK_DRIVER(ddz_state, screen_eof_ddz)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

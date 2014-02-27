@@ -387,7 +387,7 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 {
 	if (m_cur_control2 & 0x10)  // RAM enable
 	{
-		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
+		m_palette->write(space, offset, data);
 	}
 	else
 	{
@@ -478,7 +478,7 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 // use one more palette entry for the BG color
 WRITE8_MEMBER(lethal_state::le_bgcolor_w)
 {
-	paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, 0x3800 + offset, data);
+	m_palette->write(space, 0x3800 + offset, data);
 }
 
 READ8_MEMBER(lethal_state::guns_r)
@@ -720,8 +720,6 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", lethal)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -729,12 +727,16 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_SCREEN_VISIBLE_AREA(216, 504-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lethal_state, screen_update_lethalen)
 
-	MCFG_PALETTE_LENGTH(7168+1)
+	MCFG_PALETTE_ADD("palette", 7168+1)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_K056832_ADD("k056832", lethalen_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K053244_ADD("k053244", lethalen_k05324x_intf)
 	MCFG_K053244_GFXDECODE("gfxdecode")
+	MCFG_K053244_PALETTE("palette")
 	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
@@ -754,6 +756,7 @@ static MACHINE_CONFIG_DERIVED( lethalej, lethalen )
 	MCFG_DEVICE_REMOVE("k053244")
 	MCFG_K053244_ADD("k053244", lethalej_k05324x_intf)
 	MCFG_K053244_GFXDECODE("gfxdecode")
+	MCFG_K053244_PALETTE("palette")
 MACHINE_CONFIG_END
 
 ROM_START( lethalen )   // US version UAE

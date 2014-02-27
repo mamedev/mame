@@ -28,7 +28,7 @@ WRITE8_MEMBER(nbmj8991_state::nbmj8991_palette_type1_w)
 	g = ((m_generic_paletteram_8[offset + 1] & 0xf0) >> 4);
 	b = ((m_generic_paletteram_8[offset + 1] & 0x0f) >> 0);
 
-	palette_set_color_rgb(machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 WRITE8_MEMBER(nbmj8991_state::nbmj8991_palette_type2_w)
@@ -45,7 +45,7 @@ WRITE8_MEMBER(nbmj8991_state::nbmj8991_palette_type2_w)
 	g = (((m_generic_paletteram_8[offset + 0] & 0x03) << 3) | ((m_generic_paletteram_8[offset + 1] & 0xe0) >> 5));
 	b = ((m_generic_paletteram_8[offset + 1] & 0x1f) >> 0);
 
-	palette_set_color_rgb(machine(), (offset / 2), pal5bit(r), pal5bit(g), pal5bit(b));
+	m_palette->set_pen_color((offset / 2), pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_MEMBER(nbmj8991_state::nbmj8991_palette_type3_w)
@@ -62,7 +62,7 @@ WRITE8_MEMBER(nbmj8991_state::nbmj8991_palette_type3_w)
 	g = ((m_generic_paletteram_8[offset + 0] & 0xf0) >> 4);
 	b = ((m_generic_paletteram_8[offset + 0] & 0x0f) >> 0);
 
-	palette_set_color_rgb(machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 /******************************************************************************

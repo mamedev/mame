@@ -166,7 +166,7 @@ static MACHINE_CONFIG_START( timetrv, timetrv_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
 	MCFG_SCREEN_UPDATE_DRIVER(timetrv_state, screen_update_timetrv)
 
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

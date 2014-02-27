@@ -1241,9 +1241,9 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	MCFG_SCREEN_VBLANK_DRIVER(homedata_state, screen_eof_homedata)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mrokumei)
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_PALETTE_INIT_OVERRIDE(homedata_state,mrokumei)
+	MCFG_PALETTE_INIT_OWNER(homedata_state,mrokumei)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mrokumei)
 
 	/* sound hardware */
@@ -1298,9 +1298,9 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	MCFG_SCREEN_VBLANK_DRIVER(homedata_state, screen_eof_homedata)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", reikaids)
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_PALETTE_INIT_OVERRIDE(homedata_state,reikaids)
+	MCFG_PALETTE_INIT_OWNER(homedata_state,reikaids)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,reikaids)
 
 	/* sound hardware */
@@ -1348,9 +1348,9 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	MCFG_SCREEN_VBLANK_DRIVER(homedata_state, screen_eof_homedata)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pteacher)
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_PALETTE_INIT_OVERRIDE(homedata_state,pteacher)
+	MCFG_PALETTE_INIT_OWNER(homedata_state,pteacher)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,pteacher)
 
 	/* sound hardware */
@@ -1510,9 +1510,9 @@ static MACHINE_CONFIG_START( mirderby, homedata_state )
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mirderby)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mirderby)
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_PALETTE_INIT_OVERRIDE(homedata_state,mirderby)
+	MCFG_PALETTE_INIT_OWNER(homedata_state,mirderby)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mirderby)
 
 	/* sound hardware */

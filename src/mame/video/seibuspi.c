@@ -199,8 +199,8 @@ WRITE32_MEMBER(seibuspi_state::palette_dma_start_w)
 		if (m_palette_ram[i] != color)
 		{
 			m_palette_ram[i] = color;
-			palette_set_color_rgb(machine(), (i * 2), pal5bit(m_palette_ram[i] >> 0), pal5bit(m_palette_ram[i] >> 5), pal5bit(m_palette_ram[i] >> 10));
-			palette_set_color_rgb(machine(), (i * 2) + 1, pal5bit(m_palette_ram[i] >> 16), pal5bit(m_palette_ram[i] >> 21), pal5bit(m_palette_ram[i] >> 26));
+			m_palette->set_pen_color((i * 2), pal5bit(m_palette_ram[i] >> 0), pal5bit(m_palette_ram[i] >> 5), pal5bit(m_palette_ram[i] >> 10));
+			m_palette->set_pen_color((i * 2) + 1, pal5bit(m_palette_ram[i] >> 16), pal5bit(m_palette_ram[i] >> 21), pal5bit(m_palette_ram[i] >> 26));
 		}
 	}
 }
@@ -222,7 +222,7 @@ WRITE16_MEMBER(seibuspi_state::sprite_dma_start_w)
 
 void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
 {
-	const pen_t *pens = &gfx->machine().pens[gfx->colorbase()];
+	const pen_t *pens = &m_palette->pen(gfx->colorbase());
 	const UINT8 *dp;
 	int i, j;
 	int x1, x2;
@@ -457,11 +457,11 @@ void seibuspi_state::combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &clip
 				UINT8 alpha = m_alpha_table[pen];
 				if (alpha)
 				{
-					*d = alpha_blend_r32(*d, machine().pens[pen], 0x7f);
+					*d = alpha_blend_r32(*d, m_palette->pen(pen), 0x7f);
 				}
 				else
 				{
-					*d = machine().pens[pen];
+					*d = m_palette->pen(pen);
 				}
 			}
 			++d;

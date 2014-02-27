@@ -43,7 +43,7 @@ static const gfx_layout fontlayout_8bit =
 	10*8            /* every char takes 10 consecutive bytes */
 };
 
-GFXDECODE_START( vdt911 )
+static GFXDECODE_START( vdt911 )
 	/* array must use same order as vdt911_model_t!!! */
 	/* US */
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_US_chr_offset, fontlayout_7bit, 0, 4 )
@@ -112,6 +112,7 @@ struct vdt_t
 	int last_modifier_state;
 	char foreign_mode;
 	gfxdecode_device * m_gfxdecode;
+	palette_device * m_palette;
 };
 
 /*
@@ -136,16 +137,14 @@ PALETTE_INIT_MEMBER(vdt911_device, vdt911)
 {
 	UINT8 i, r, g, b;
 
-	machine().colortable = colortable_alloc(machine(), 3);
-
 	for ( i = 0; i < 3; i++ )
 	{
 		r = vdt911_colors[i*3]; g = vdt911_colors[i*3+1]; b = vdt911_colors[i*3+2];
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	for(i=0;i<8;i++)
-		colortable_entry_set_value(machine().colortable, i, vdt911_palette[i]);
+		palette.set_pen_indirect(i, vdt911_palette[i]);
 }
 
 /*
@@ -274,19 +273,10 @@ const device_type VDT911 = &device_creator<vdt911_device>;
 
 vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VDT911, "911 VDT", tag, owner, clock, "vdt911", __FILE__),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this, "gfxdecode"),		
+		m_palette(*this, "palette")
 {
 	m_token = global_alloc_clear(vdt_t);
-}
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void vdt911_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<vdt911_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -307,6 +297,7 @@ void vdt911_device::device_start()
 {
 	vdt_t *vdt = get_safe_token(this);
 	vdt->m_gfxdecode = m_gfxdecode;
+	vdt->m_palette = m_palette;
 	DEVICE_START_NAME( vdt911 )(this);
 }
 
@@ -555,7 +546,7 @@ void vdt911_refresh(device_t *device, bitmap_ind16 &bitmap, const rectangle &cli
 
 				address++;
 
-				 gfx->opaque(bitmap,cliprect, cur_char, color, 0, 0,
+				 gfx->opaque(*vdt->m_palette,bitmap,cliprect, cur_char, color, 0, 0,
 						x+j*7, y+i*10);
 			}
 		}
@@ -724,7 +715,10 @@ void vdt911_keyboard(device_t *device)
 }
 
 static MACHINE_CONFIG_FRAGMENT( vdt911 )
-	MCFG_PALETTE_INIT_OVERRIDE(vdt911_device, vdt911)
+	MCFG_PALETTE_ADD("palette", 8)	
+	MCFG_PALETTE_INIT_OWNER(vdt911_device, vdt911)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", vdt911)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

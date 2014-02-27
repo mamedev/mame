@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(blmbycar_state, screen_update_blmbycar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", blmbycar)
-	MCFG_PALETTE_LENGTH(0x300)
+	MCFG_PALETTE_ADD("palette", 0x300)
 
 
 	/* sound hardware */
@@ -405,7 +405,7 @@ static MACHINE_CONFIG_START( watrball, blmbycar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(blmbycar_state, screen_update_blmbycar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", blmbycar)
-	MCFG_PALETTE_LENGTH(0x300)
+	MCFG_PALETTE_ADD("palette", 0x300)
 
 
 	/* sound hardware */

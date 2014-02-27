@@ -66,7 +66,7 @@ public:
 
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(ie15);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
@@ -613,10 +613,10 @@ static GFXDECODE_START( ie15 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ie15_charlayout, 0, 1 )
 GFXDECODE_END
 
-void ie15_state::palette_init()
+PALETTE_INIT_MEMBER(ie15_state, ie15)
 {
-	palette_set_color(machine(), 0, rgb_t::black); // black
-	palette_set_color_rgb(machine(), 1, 0x00, 0xc0, 0x00); // green
+	palette.set_pen_color(0, rgb_t::black); // black
+	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
 }
 
 static MACHINE_CONFIG_START( ie15, ie15_state )
@@ -634,7 +634,8 @@ static MACHINE_CONFIG_START( ie15, ie15_state )
 		IE15_HORZ_START+IE15_DISP_HORZ,IE15_TOTAL_VERT,IE15_VERT_START,
 		IE15_VERT_START+IE15_DISP_VERT);
 	MCFG_GFXDECODE_ADD("gfxdecode", ie15)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(ie15_state, ie15)
 
 	/* Devices */
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)

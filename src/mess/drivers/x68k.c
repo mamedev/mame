@@ -970,7 +970,7 @@ WRITE16_MEMBER(x68k_state::x68k_vid_w)
 	{
 		COMBINE_DATA(m_video.gfx_pal+offset);
 		val = m_video.gfx_pal[offset];
-		palette_set_color_rgb(machine(),offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		m_palette->set_pen_color(offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
@@ -978,7 +978,7 @@ WRITE16_MEMBER(x68k_state::x68k_vid_w)
 	{
 		COMBINE_DATA(m_video.text_pal+(offset-0x100));
 		val = m_video.text_pal[offset-0x100];
-		palette_set_color_rgb(machine(),offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		m_palette->set_pen_color(offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
@@ -1951,8 +1951,8 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_SCREEN_UPDATE_DRIVER(x68k_state, screen_update_x68000)
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 
-	MCFG_PALETTE_LENGTH(65536)
-	MCFG_PALETTE_INIT_OVERRIDE(x68k_state, x68000 )
+	MCFG_PALETTE_ADD("palette", 65536)
+	MCFG_PALETTE_INIT_OWNER(x68k_state, x68000 )
 
 	MCFG_VIDEO_START_OVERRIDE(x68k_state, x68000 )
 

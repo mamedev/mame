@@ -259,14 +259,14 @@ static GFXDECODE_START( malzak )
 GFXDECODE_END
 
 
-void malzak_state::palette_init()
+PALETTE_INIT_MEMBER(malzak_state, malzak)
 {
 	int i;
 
 	for (i = 0; i < 8 * 8; i++)
 	{
-		palette_set_color_rgb(machine(), i * 2 + 0, pal1bit(i >> 3), pal1bit(i >> 4), pal1bit(i >> 5));
-		palette_set_color_rgb(machine(), i * 2 + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		palette.set_pen_color(i * 2 + 0, pal1bit(i >> 3), pal1bit(i >> 4), pal1bit(i >> 5));
+		palette.set_pen_color(i * 2 + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
 }
 
@@ -358,7 +358,8 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_SCREEN_UPDATE_DRIVER(malzak_state, screen_update_malzak)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", malzak)
-	MCFG_PALETTE_LENGTH(128)
+	MCFG_PALETTE_ADD("palette", 128)
+	MCFG_PALETTE_INIT_OWNER(malzak_state, malzak)
 
 	MCFG_S2636_ADD("s2636_0", malzac_s2636_0_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

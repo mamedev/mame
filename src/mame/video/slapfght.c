@@ -163,7 +163,7 @@ void slapfght_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				sx = buffered_spriteram[offs+1] + 3;
 				sy = buffered_spriteram[offs+3] - 1;
 			}
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				buffered_spriteram[offs],
 				((buffered_spriteram[offs+2] >> 1) & 3) |
 					((buffered_spriteram[offs+2] << 2) & 4) | (m_slapfight_palette_bank << 3),
@@ -220,13 +220,13 @@ UINT32 slapfght_state::screen_update_slapfight(screen_device &screen, bitmap_ind
 	for (offs = 0;offs < m_spriteram->bytes();offs += 4)
 	{
 		if (m_flipscreen)
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 				buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2),
 				(buffered_spriteram[offs+2] & 0x1e) >> 1,
 				1,1,
 				288-(buffered_spriteram[offs+1] + ((buffered_spriteram[offs+2] & 0x01) << 8)) +18,240-buffered_spriteram[offs+3],0);
 		else
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 				buffered_spriteram[offs] + ((buffered_spriteram[offs+2] & 0xc0) << 2),
 				(buffered_spriteram[offs+2] & 0x1e) >> 1,
 				0,0,

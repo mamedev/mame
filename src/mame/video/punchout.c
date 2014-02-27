@@ -322,7 +322,7 @@ void punchout_state::punchout_copy_top_palette(int bank)
 		g = 255 - pal4bit(color_prom[i + 0x200 + base]);
 		b = 255 - pal4bit(color_prom[i + 0x400 + base]);
 
-		palette_set_color(machine(), i ^ m_palette_reverse_top, rgb_t(r, g, b));
+		m_palette->set_pen_color(i ^ m_palette_reverse_top, rgb_t(r, g, b));
 	}
 }
 
@@ -341,7 +341,7 @@ void punchout_state::punchout_copy_bot_palette(int bank)
 		g = 255 - pal4bit(color_prom[i + 0x200 + base]);
 		b = 255 - pal4bit(color_prom[i + 0x400 + base]);
 
-		palette_set_color(machine(), (i ^ m_palette_reverse_bot) + 0x100, rgb_t(r, g, b));
+		m_palette->set_pen_color((i ^ m_palette_reverse_bot) + 0x100, rgb_t(r, g, b));
 	}
 }
 

@@ -107,7 +107,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(ddayjlc);
 	UINT32 screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ddayjlc_interrupt);
 	INTERRUPT_GEN_MEMBER(ddayjlc_snd_interrupt);
@@ -408,7 +408,7 @@ UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 
 
 		code = (code & 0x7f) | ((flags & 0x30) << 3);
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, code, color, xflip, yflip, x, y, 0);
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, code, color, xflip, yflip, x, y, 0);
 	}
 
 	{
@@ -419,9 +419,9 @@ UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 
 			{
 				c = m_videoram[y * 32 + x];
 				if (x > 1 && x < 30)
-					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
+					m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
 				else
-					m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
+					m_gfxdecode->gfx(1)->opaque(m_palette,bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
 			}
 	}
 	return 0;
@@ -483,7 +483,7 @@ void ddayjlc_state::machine_reset()
 	}
 }
 
-void ddayjlc_state::palette_init()
+PALETTE_INIT_MEMBER(ddayjlc_state, ddayjlc)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
@@ -506,7 +506,7 @@ void ddayjlc_state::palette_init()
 		bit2 = (val >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -533,8 +533,8 @@ static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ddayjlc_state, screen_update_ddayjlc)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ddayjlc)
-	MCFG_PALETTE_LENGTH(0x200)
-
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(ddayjlc_state, ddayjlc)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

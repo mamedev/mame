@@ -22,7 +22,7 @@ public:
 
 public:
 	virtual void machine_reset();
-	void palette_init_cdc721();
+	DECLARE_PALETTE_INIT(cdc721);
 	const UINT8 *m_p_chargen;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<const UINT8> m_p_videoram;
@@ -71,9 +71,9 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER( cdc721_state, cdc721 )
 {
-	palette_set_color_rgb( machine(), 0, 0, 0, 0 ); /* Black */
-	palette_set_color_rgb( machine(), 1, 0, 255, 0 );   /* Full */
-	palette_set_color_rgb( machine(), 2, 0, 128, 0 );   /* Dimmed */
+	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
+	palette.set_pen_color(1, 0, 255, 0 );   /* Full */
+	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
 }
 
 UINT32 cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -122,8 +122,8 @@ static MACHINE_CONFIG_START( cdc721, cdc721_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cdc721_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
-	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT_OVERRIDE(cdc721_state, cdc721)
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(cdc721_state, cdc721)
 	MCFG_GFXDECODE_ADD("gfxdecode", cdc721)
 MACHINE_CONFIG_END
 

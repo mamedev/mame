@@ -122,7 +122,7 @@ public:
 	DECLARE_DRIVER_INIT(cyclemb);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(cyclemb);
 	UINT32 screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -134,7 +134,7 @@ public:
 
 
 
-void cyclemb_state::palette_init()
+PALETTE_INIT_MEMBER(cyclemb_state, cyclemb)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
@@ -157,7 +157,7 @@ void cyclemb_state::palette_init()
 		bit2 = (val >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -188,15 +188,15 @@ void cyclemb_state::cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 
 			if(flip_screen())
 			{
-				gfx->opaque(bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx,256-(y*8));
+				gfx->opaque(m_palette,bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx,256-(y*8));
 				/* wrap-around */
-				gfx->opaque(bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx+512,256-(y*8));
+				gfx->opaque(m_palette,bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx+512,256-(y*8));
 			}
 			else
 			{
-				gfx->opaque(bitmap,cliprect,tile,color,0,0,(x*8)-scrollx,(y*8));
+				gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,(x*8)-scrollx,(y*8));
 				/* wrap-around */
-				gfx->opaque(bitmap,cliprect,tile,color,0,0,(x*8)-scrollx+512,(y*8));
+				gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,(x*8)-scrollx+512,(y*8));
 			}
 
 			count++;
@@ -257,7 +257,7 @@ void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			fx = !fx;
 			fy = !fy;
 		}
-		m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		m_gfxdecode->gfx(region)->transpen(m_palette,bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 }
 
@@ -295,9 +295,9 @@ void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 				scrolly = m_vram[(x-32)*64+1];
 
 
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx,((y*8)-scrolly)&0xff);
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx-480,((y*8)-scrolly)&0xff);
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx+480,((y*8)-scrolly)&0xff);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8+scrollx,((y*8)-scrolly)&0xff);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8+scrollx-480,((y*8)-scrolly)&0xff);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8+scrollx+480,((y*8)-scrolly)&0xff);
 
 
 		}
@@ -353,7 +353,7 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			fx = !fx;
 			fy = !fy;
 		}
-		m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		m_gfxdecode->gfx(region)->transpen(m_palette,bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 }
 
@@ -917,8 +917,8 @@ static MACHINE_CONFIG_START( cyclemb, cyclemb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_cyclemb)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cyclemb)
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(cyclemb_state, cyclemb)
 
 
 	/* sound hardware */
@@ -937,7 +937,7 @@ static MACHINE_CONFIG_DERIVED( skydest, cyclemb )
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_skydest)
 
-//  MCFG_PALETTE_INIT_OVERRIDE(cyclemb_state,skydest)
+//  MCFG_PALETTE_INIT_OWNER(cyclemb_state,skydest)
 MACHINE_CONFIG_END
 
 /***************************************************************************

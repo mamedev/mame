@@ -440,13 +440,14 @@ SCREEN_UPDATE_IND16( pce )
 
 static void draw_black_line(running_machine &machine, int line)
 {
+	driver_device *state = machine.driver_data<driver_device>();
 	int i;
 
 	/* our line buffer */
 	UINT16 *line_buffer = &vce.bmp->pix16(line);
 
 	for( i=0; i< VDC_WPF; i++ )
-		line_buffer[i] = get_black_pen( machine );
+		line_buffer[i] = state->m_palette->black_pen();
 }
 
 static void draw_overscan_line(int line)
@@ -636,8 +637,8 @@ PALETTE_INIT( vce )
 		int g = (( i >> 6) & 7) << 5;
 		int b = (( i     ) & 7) << 5;
 		int y = ( (  66 * r + 129 * g +  25 * b + 128) >> 8) +  16;
-		palette_set_color_rgb(machine, i, r, g, b);
-		palette_set_color_rgb(machine, 512+i, y, y, y);
+		palette.set_pen_color(i, r, g, b);
+		palette.set_pen_color(512+i, y, y, y);
 	}
 }
 

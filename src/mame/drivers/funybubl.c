@@ -234,7 +234,7 @@ static MACHINE_CONFIG_START( funybubl, funybubl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(funybubl_state, screen_update_funybubl)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", funybubl)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_PALETTE_ADD("palette", 0x400)
 
 
 	/* sound hardware */

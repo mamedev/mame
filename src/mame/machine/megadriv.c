@@ -1016,8 +1016,6 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 
 	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
 
-	MCFG_PALETTE_LENGTH(0x200)
-
 	MCFG_VIDEO_START_OVERRIDE(md_base_state,megadriv)
 
 	/* sound hardware */
@@ -1065,7 +1063,7 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SCREEN_UPDATE_DRIVER(md_base_state,screen_update_megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_VBLANK_DRIVER(md_base_state,screen_eof_megadriv) /* Used to Sync the timing */
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_VIDEO_START_OVERRIDE(md_base_state,megadriv)
 

@@ -74,7 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(controls_r);
 	TILE_GET_INFO_MEMBER(get_sb_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(sbowling);
 	UINT32 screen_update_sbowling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(sbw_interrupt);
 };
@@ -338,7 +338,7 @@ static GFXDECODE_START( sbowling )
 GFXDECODE_END
 
 
-void sbowling_state::palette_init()
+PALETTE_INIT_MEMBER(sbowling_state, sbowling)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -353,7 +353,7 @@ void sbowling_state::palette_init()
 		3,  resistances_rg, outputs_g,  0,  100,
 		2,  resistances_b,  outputs_b,  0,  100);
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -374,7 +374,7 @@ void sbowling_state::palette_init()
 		bit2 = (color_prom[i+0x400] >> 3) & 0x01;
 		r = (int)(outputs_r[ (bit0<<0) | (bit1<<1) | (bit2<<2) ] + 0.5);
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -393,7 +393,8 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sbowling)
 
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_INIT_OWNER(sbowling_state, sbowling)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

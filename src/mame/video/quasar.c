@@ -23,14 +23,11 @@ PALETTE_INIT_MEMBER(quasar_state,quasar)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x500);
-
 	/* standard 1 bit per color palette (background and sprites) */
 	for (i = 0; i < 8; i++)
 	{
 		rgb_t color = rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
-		colortable_palette_set_color(machine().colortable, i, color);
+		palette.set_indirect_color(i, color);
 	}
 
 	/* effects color map */
@@ -58,35 +55,35 @@ PALETTE_INIT_MEMBER(quasar_state,quasar)
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
 		/* intensity 0 */
-		colortable_palette_set_color(machine().colortable, 0x100 + i, rgb_t::black);
+		palette.set_indirect_color(0x100 + i, rgb_t::black);
 
 		/* intensity 1 */
 		color = rgb_t(r >> 2, g >> 2, b >> 2);
-		colortable_palette_set_color(machine().colortable, 0x200 + i, color);
+		palette.set_indirect_color(0x200 + i, color);
 
 		/* intensity 2 */
 		color = rgb_t((r >> 2) + (r >> 3), (g >> 2) + (g >> 3), (b >> 2) + (b >> 2));
-		colortable_palette_set_color(machine().colortable, 0x300 + i, color);
+		palette.set_indirect_color(0x300 + i, color);
 
 		/* intensity 3 */
 		color = rgb_t(r >> 1, g >> 1, b >> 1);
-		colortable_palette_set_color(machine().colortable, 0x400 + i, color);
+		palette.set_indirect_color(0x400 + i, color);
 	}
 
 	// Address 0-2 from graphic rom
 	//         3-5 from color ram
 	//         6-8 from sprite chips (Used for priority)
 	for (i = 0; i < 0x200; i++)
-		colortable_entry_set_value(machine().colortable, i, color_prom[i] & 0x07);
+		palette.set_pen_indirect(i, color_prom[i] & 0x07);
 
 	/* background for collision */
 	for (i = 1; i < 8; i++)
-		colortable_entry_set_value(machine().colortable, 0x200 + i, 7);
-	colortable_entry_set_value(machine().colortable, 0x200, 0);
+		palette.set_pen_indirect(0x200 + i, 7);
+	palette.set_pen_indirect(0x200, 0);
 
 	/* effects */
 	for (i = 0; i < 0x400; i++)
-		colortable_entry_set_value(machine().colortable, 0x208 + i, 0x100 + i);
+		palette.set_pen_indirect(0x208 + i, 0x100 + i);
 }
 
 
@@ -124,7 +121,7 @@ UINT32 quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 &b
 				bitmap.pix16(y + oy, x + ox) = forecolor;
 
 		/* Main Screen */
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code,
 				m_color_ram[offs] & 0x3f,
 				0,0,
@@ -134,7 +131,7 @@ UINT32 quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 &b
 		/* background for Collision Detection (it can only hit certain items) */
 		if((m_color_ram[offs] & 7) == 0)
 		{
-			m_gfxdecode->gfx(0)->opaque(m_collision_background,cliprect,
+			m_gfxdecode->gfx(0)->opaque(m_palette,m_collision_background,cliprect,
 					code,
 					64,
 					0,0,
@@ -188,7 +185,7 @@ UINT32 quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 &b
 					bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel);
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(machine().colortable, m_collision_background.pix16(y, x)))
+					if (m_palette->pen_indirect(m_collision_background.pix16(y, x)))
 					{
 						if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x01;
 						if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x02;

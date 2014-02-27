@@ -218,15 +218,15 @@ void ddragon3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			for (count=0;count<chain;count++) {
 				if (flip_screen()) {
 					if (!flipy) {
-						gfx->transpen(bitmap,cliprect,number+count,colourbank,flipx,flipy,xpos,ypos+(16*(chain-1))-(16*count),0);
+						gfx->transpen(m_palette,bitmap,cliprect,number+count,colourbank,flipx,flipy,xpos,ypos+(16*(chain-1))-(16*count),0);
 					} else {
-						gfx->transpen(bitmap,cliprect,number+count,colourbank,flipx,flipy,xpos,ypos+16*count,0);
+						gfx->transpen(m_palette,bitmap,cliprect,number+count,colourbank,flipx,flipy,xpos,ypos+16*count,0);
 					}
 				} else {
 					if (flipy) {
-						gfx->transpen(bitmap,cliprect,number+count,colourbank,flipx,flipy,xpos,ypos-(16*(chain-1))+(16*count),0);
+						gfx->transpen(m_palette,bitmap,cliprect,number+count,colourbank,flipx,flipy,xpos,ypos-(16*(chain-1))+(16*count),0);
 					} else {
-						gfx->transpen(bitmap,cliprect,number+count,colourbank,flipx,flipy,xpos,ypos-16*count,0);
+						gfx->transpen(m_palette,bitmap,cliprect,number+count,colourbank,flipx,flipy,xpos,ypos-16*count,0);
 					}
 				}
 			}

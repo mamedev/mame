@@ -300,7 +300,7 @@ WRITE32_MEMBER(ssfindo_state::FIFO_w)
 
 	if(!(data>>28))
 	{
-		palette_set_color_rgb(machine(), m_PS7500_FIFO[1]&0xff, data&0xff,(data>>8)&0xff,(data>>16)&0xff);
+		m_palette->set_pen_color(m_PS7500_FIFO[1]&0xff, data&0xff,(data>>8)&0xff,(data>>16)&0xff);
 		m_PS7500_FIFO[1]++; //autoinc
 	}
 }
@@ -774,7 +774,7 @@ static MACHINE_CONFIG_START( ssfindo, ssfindo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(ssfindo_state, screen_update_ssfindo)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ppcar, ssfindo )

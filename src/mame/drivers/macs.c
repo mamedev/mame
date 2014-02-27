@@ -494,7 +494,7 @@ static MACHINE_CONFIG_START( macs, macs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(st0016_state, screen_update_st0016)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", macs)
-	MCFG_PALETTE_LENGTH(16*16*4+1)
+	MCFG_PALETTE_ADD("palette", 16*16*4+1)
 
 	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
 

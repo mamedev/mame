@@ -89,10 +89,10 @@ public:
 		m_rtc->cs1_w(1);
 	}
 
-	void palette_init()
+	DECLARE_PALETTE_INIT(hprot1)
 	{
-		palette_set_color(machine(), 0, rgb_t(36,72,36));
-		palette_set_color(machine(), 1, rgb_t(2,4,2));
+		palette.set_pen_color(0, rgb_t(36,72,36));
+		palette.set_pen_color(1, rgb_t(2,4,2));
 	}
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -782,7 +782,7 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

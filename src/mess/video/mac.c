@@ -58,17 +58,17 @@ Apple color FPD      01           11           10   (FPD = Full Page Display)
 
 PALETTE_INIT_MEMBER(mac_state,mac)
 {
-	palette_set_color_rgb(machine(), 0, 0xff, 0xff, 0xff);
-	palette_set_color_rgb(machine(), 1, 0x00, 0x00, 0x00);
+	palette.set_pen_color(0, 0xff, 0xff, 0xff);
+	palette.set_pen_color(1, 0x00, 0x00, 0x00);
 }
 
 // 4-level grayscale
 PALETTE_INIT_MEMBER(mac_state,macgsc)
 {
-	palette_set_color_rgb(machine(), 0, 0xff, 0xff, 0xff);
-	palette_set_color_rgb(machine(), 1, 0x7f, 0x7f, 0x7f);
-	palette_set_color_rgb(machine(), 2, 0x3f, 0x3f, 0x3f);
-	palette_set_color_rgb(machine(), 3, 0x00, 0x00, 0x00);
+	palette.set_pen_color(0, 0xff, 0xff, 0xff);
+	palette.set_pen_color(1, 0x7f, 0x7f, 0x7f);
+	palette.set_pen_color(2, 0x3f, 0x3f, 0x3f);
+	palette.set_pen_color(3, 0x00, 0x00, 0x00);
 }
 
 VIDEO_START_MEMBER(mac_state,mac)
@@ -1030,7 +1030,7 @@ WRITE32_MEMBER(mac_state::dafb_dac_w)
 
 			if (m_rbv_count == 3)
 			{
-				palette_set_color(space.machine(), m_rbv_clutoffs, rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
+				m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
 				m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
 				m_rbv_clutoffs++;
 				m_rbv_count = 0;

@@ -286,7 +286,7 @@ WRITE32_MEMBER(nwktr_state::paletteram32_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
-	palette_set_color_rgb(machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_0)
@@ -299,7 +299,7 @@ UINT32 nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bit
 {
 	device_t *voodoo = machine().device("voodoo");
 
-	bitmap.fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
@@ -770,12 +770,13 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_nwktr)
 
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_ADD("palette", 65536)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	
 	MCFG_K001604_ADD("k001604", racingj_k001604_intf)
 	MCFG_K001604_GFXDECODE("gfxdecode")
+	MCFG_K001604_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -792,6 +793,7 @@ static MACHINE_CONFIG_DERIVED( thrilld, nwktr )
 	MCFG_DEVICE_REMOVE("k001604")
 	MCFG_K001604_ADD("k001604", thrilld_k001604_intf)
 	MCFG_K001604_GFXDECODE("gfxdecode")
+	MCFG_K001604_PALETTE("palette")
 MACHINE_CONFIG_END
 
 /*****************************************************************************/

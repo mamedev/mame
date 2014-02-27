@@ -561,8 +561,8 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_SCREEN_UPDATE_DRIVER(x1twin_state, screen_update_x1pce)
 
 	MCFG_MC6845_ADD("crtc", H46505, "x1_screen", (VDP_CLOCK/48), mc6845_intf) //unknown divider
-	MCFG_PALETTE_LENGTH(0x10+0x1000)
-	MCFG_PALETTE_INIT_OVERRIDE(x1twin_state,x1)
+	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
+	MCFG_PALETTE_INIT_OWNER(x1twin_state,x1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", x1)
 

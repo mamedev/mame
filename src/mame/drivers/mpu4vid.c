@@ -482,10 +482,10 @@ VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index+0, auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), machine().total_colors() / 16, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+1, auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_8x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), machine().total_colors() / 16, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+2, auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_16x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), machine().total_colors() / 16, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+3, auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_16x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), machine().total_colors() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+0, auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+1, auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_8x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+2, auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_16x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+3, auto_alloc(machine(), gfx_element(machine(), mpu4_vid_char_16x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), m_palette->entries() / 16, 0)));
 
 	m_scn2674->init_stuff();
 
@@ -533,7 +533,7 @@ WRITE16_MEMBER(mpu4vid_state::ef9369_w )
 			col = pal.clut[entry] & 0xfff;
 
 			/* Update the MAME palette */
-			palette_set_color_rgb(space.machine(), entry, pal4bit(col >> 8), pal4bit(col >> 4), pal4bit(col >> 0));
+			m_palette->set_pen_color(entry, pal4bit(col >> 8), pal4bit(col >> 4), pal4bit(col >> 0));
 		}
 
 			/* Address register auto-increment */
@@ -604,7 +604,7 @@ WRITE16_MEMBER(mpu4vid_state::bt471_w )
 
 			if (++*addr_cnt == 3)
 			{
-				palette_set_color(space.machine(), bt471.address, rgb_t(color[0], color[1], color[2]));
+				m_palette->set_pen_color(bt471.address, rgb_t(color[0], color[1], color[2]));
 				*addr_cnt = 0;
 
 				/* Address register increments */
@@ -1426,6 +1426,7 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 
 	MCFG_SCN2674_VIDEO_ADD("scn2674_vid", 0, WRITELINE(mpu4vid_state, update_mpu68_interrupts));
 	MCFG_SCN2674_GFXDECODE("gfxdecode")
+	MCFG_SCN2674_PALETTE("palette")
 
 	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
 	MCFG_CPU_PROGRAM_MAP(mpu4_68k_map)
@@ -1436,7 +1437,7 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4vid_state,mpu4_vid)
 	MCFG_VIDEO_START_OVERRIDE (mpu4vid_state,mpu4_vid)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_PTM6840_ADD("6840ptm_68k", ptm_vid_intf)
 	/* Present on all video cards */

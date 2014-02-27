@@ -58,7 +58,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(d110);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -195,10 +195,10 @@ WRITE8_MEMBER(d110_state::so_w)
 	//  logerror("so: rw=%d bank=%d led=%d\n", (data >> 3) & 1, (data >> 1) & 3, data & 1);
 }
 
-void d110_state::palette_init()
+PALETTE_INIT_MEMBER(d110_state, d110)
 {
-	palette_set_color(machine(), 0, rgb_t(0, 255, 0));
-	palette_set_color(machine(), 1, rgb_t(0, 0, 0));
+	palette.set_pen_color(0, rgb_t(0, 255, 0));
+	palette.set_pen_color(1, rgb_t(0, 0, 0));
 }
 
 static ADDRESS_MAP_START( d110_map, AS_PROGRAM, 8, d110_state )
@@ -240,7 +240,8 @@ static MACHINE_CONFIG_START( d110, d110_state )
 //  MCFG_SCREEN_SIZE(20*6-1, 2*9-1)
 	MCFG_SCREEN_SIZE(16*6-1, (16*6-1)*3/4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 16*6-2, 0, (16*6-1)*3/4-1)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(d110_state, d110)
 
 	MCFG_MSM6222B_01_ADD( "lcd" )
 

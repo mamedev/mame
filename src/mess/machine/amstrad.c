@@ -200,13 +200,13 @@ static const rgb_t amstrad_green_palette[32] =
 /* Initialise the palette */
 PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc)
 {
-	palette_set_colors(machine(), 0, amstrad_palette, ARRAY_LENGTH(amstrad_palette));
+	palette.set_pen_colors(0, amstrad_palette, ARRAY_LENGTH(amstrad_palette));
 }
 
 
 PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc_green)
 {
-	palette_set_colors(machine(), 0, amstrad_green_palette, ARRAY_LENGTH(amstrad_green_palette));
+	palette.set_pen_colors(0, amstrad_green_palette, ARRAY_LENGTH(amstrad_green_palette));
 }
 
 
@@ -301,7 +301,7 @@ PALETTE_INIT_MEMBER(amstrad_state,kccomp)
 
 	for (i=0; i<32; i++)
 	{
-		palette_set_color_rgb(machine(), i,
+		palette.set_pen_color(i,
 			kccomp_get_colour_element((color_prom[i]>>2) & 0x03),
 			kccomp_get_colour_element((color_prom[i]>>4) & 0x03),
 			kccomp_get_colour_element((color_prom[i]>>0) & 0x03));
@@ -319,7 +319,7 @@ PALETTE_INIT_MEMBER(amstrad_state,amstrad_plus)
 {
 	int i;
 
-	palette_set_colors(machine(), 0, amstrad_palette, ARRAY_LENGTH(amstrad_palette) / 3);
+	palette.set_pen_colors(0, amstrad_palette, ARRAY_LENGTH(amstrad_palette) / 3);
 	for ( i = 0; i < 0x1000; i++ )
 	{
 		int r, g, b;
@@ -332,7 +332,7 @@ PALETTE_INIT_MEMBER(amstrad_state,amstrad_plus)
 		g = ( g << 4 ) | ( g );
 		b = ( b << 4 ) | ( b );
 
-		palette_set_color_rgb(machine(), i, r, g, b);
+		palette.set_pen_color(i, r, g, b);
 	}
 }
 
@@ -356,7 +356,7 @@ PALETTE_INIT_MEMBER(amstrad_state,aleste)
 		g = (g << 6);
 		b = (b << 6);
 
-		palette_set_color_rgb(machine(), i, r, g, b);
+		palette.set_pen_color(i, r, g, b);
 	}
 
 	/* MSX colour palette is 6-bit RGB */
@@ -372,7 +372,7 @@ PALETTE_INIT_MEMBER(amstrad_state,aleste)
 		g = (g << 6);
 		b = (b << 6);
 
-		palette_set_color_rgb(machine(), i+32, r, g, b);
+		palette.set_pen_color(i+32, r, g, b);
 	}
 }
 

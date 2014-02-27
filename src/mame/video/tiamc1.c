@@ -74,10 +74,10 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_bg_hshift_w)
 
 WRITE8_MEMBER(tiamc1_state::tiamc1_palette_w)
 {
-	palette_set_color(machine(), offset, m_palette[data]);
+	m_palette->set_pen_color(offset, m_palette_ptr[data]);
 }
 
-void tiamc1_state::palette_init()
+PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
 {
 	// Voltage computed by Proteus
 	//static const float g_v[8]={1.05f,0.87f,0.81f,0.62f,0.44f,0.25f,0.19f,0.00f};
@@ -93,7 +93,7 @@ void tiamc1_state::palette_init()
 	int r, g, b, ir, ig, ib;
 	float tcol;
 
-	m_palette = auto_alloc_array(machine(), rgb_t, 256);
+	m_palette_ptr = auto_alloc_array(machine(), rgb_t, 256);
 
 	for (col = 0; col < 256; col++) {
 		ir = (col >> 3) & 7;
@@ -106,7 +106,7 @@ void tiamc1_state::palette_init()
 		tcol = 255.0f * b_v[ib] / b_v[0];
 		b = 255 - (((int)tcol) & 255);
 
-		m_palette[col] = rgb_t(r,g,b);
+		m_palette_ptr[col] = rgb_t(r,g,b);
 	}
 }
 
@@ -167,7 +167,7 @@ void tiamc1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		spritecode = m_spriteram_n[offs] ^ 0xff;
 
 		if (!(m_spriteram_a[offs] & 0x01))
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				spritecode,
 				0,
 				flipx, flipy,

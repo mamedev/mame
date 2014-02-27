@@ -19,8 +19,6 @@ PALETTE_INIT_MEMBER(bosco_state,bosco)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	machine().colortable = colortable_alloc(machine(), 32+64);
-
 	/* core palette */
 	for (i = 0;i < 32;i++)
 	{
@@ -40,7 +38,7 @@ PALETTE_INIT_MEMBER(bosco_state,bosco)
 		bit2 = ((*color_prom) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable,i,rgb_t(r,g,b));
+		palette.set_indirect_color(i,rgb_t(r,g,b));
 		color_prom++;
 	}
 
@@ -57,24 +55,24 @@ PALETTE_INIT_MEMBER(bosco_state,bosco)
 		bits = (i >> 4) & 0x03;
 		b = map[bits];
 
-		colortable_palette_set_color(machine().colortable,32 + i,rgb_t(r,g,b));
+		palette.set_indirect_color(32 + i,rgb_t(r,g,b));
 	}
 
 	/* characters / sprites */
 	for (i = 0;i < 64*4;i++)
 	{
-		colortable_entry_set_value(machine().colortable, i, (color_prom[i] & 0x0f) + 0x10); /* chars */
-		colortable_entry_set_value(machine().colortable, i+64*4, color_prom[i] & 0x0f); /* sprites */
+		palette.set_pen_indirect(i, (color_prom[i] & 0x0f) + 0x10); /* chars */
+		palette.set_pen_indirect(i+64*4, color_prom[i] & 0x0f); /* sprites */
 	}
 
 	/* bullets lookup table */
 	/* they use colors 28-31, I think - PAL 5A controls it */
 	for (i = 0;i < 4;i++)
-		colortable_entry_set_value(machine().colortable, 64*4+64*4+i, 31-i);
+		palette.set_pen_indirect(64*4+64*4+i, 31-i);
 
 	/* now the stars */
 	for (i = 0;i < 64;i++)
-		colortable_entry_set_value(machine().colortable, 64*4+64*4+4+i, 32 + i);
+		palette.set_pen_indirect(64*4+64*4+4+i, 32 + i);
 }
 
 
@@ -127,8 +125,8 @@ VIDEO_START_MEMBER(bosco_state,bosco)
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bosco_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bosco_state::fg_get_tile_info),this),tilemap_mapper_delegate(FUNC(bosco_state::fg_tilemap_scan),this),  8,8, 8,32);
 
-	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, m_gfxdecode->gfx(0), 0x1f);
-	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, m_gfxdecode->gfx(0), 0x1f);
+	m_palette->configure_tilemap_groups(*m_bg_tilemap, *m_gfxdecode->gfx(0), 0x1f);
+	m_palette->configure_tilemap_groups(*m_fg_tilemap, *m_gfxdecode->gfx(0), 0x1f);
 
 	m_bg_tilemap->set_scrolldx(3,3);
 
@@ -197,12 +195,12 @@ void bosco_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 		if (flip) sx += 32-2;
 
-		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect,
 				(spriteram[offs] & 0xfc) >> 2,
 				color,
 				flipx,flipy,
 				sx,sy,
-				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0x0f));
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0x0f));
 	}
 }
 
@@ -222,7 +220,7 @@ void bosco_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 			y += 2;
 		}
 
-		m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transmask(m_palette,bitmap,cliprect,
 				((m_bosco_radarattr[offs] & 0x0e) >> 1) ^ 0x07,
 				0,
 				!flip,!flip,
@@ -283,7 +281,7 @@ UINT32 bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &bit
 		fg_clip.min_x = 28*8;
 	}
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	draw_stars(bitmap,cliprect,flip);
 
 	m_bg_tilemap->draw(screen, bitmap, bg_clip, 0,0);

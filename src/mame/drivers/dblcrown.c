@@ -90,14 +90,13 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
-
+	DECLARE_PALETTE_INIT(dblcrown);
 protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 void dblcrown_state::video_start()
@@ -124,7 +123,7 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 			UINT16 tile = ((m_vram[count])|(m_vram[count+1]<<8)) & 0xfff;
 			UINT8 col = (m_vram[count+1] >> 4);
 
-			gfx_2->opaque(bitmap,cliprect,tile,col,0,0,x*16,y*16);
+			gfx_2->opaque(m_palette,bitmap,cliprect,tile,col,0,0,x*16,y*16);
 
 			count+=2;
 		}
@@ -139,7 +138,7 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 			UINT16 tile = ((m_vram[count])|(m_vram[count+1]<<8)) & 0xfff;
 			UINT8 col = (m_vram[count+1] >> 4); // ok?
 
-			gfx->transpen(bitmap,cliprect,tile,col,0,0,x*8,y*8,0);
+			gfx->transpen(m_palette,bitmap,cliprect,tile,col,0,0,x*8,y*8,0);
 
 			count+=2;
 		}
@@ -194,7 +193,7 @@ WRITE8_MEMBER( dblcrown_state::palette_w)
 	b = ((datax)&0x0f00)>>8;
 	/* TODO: remaining bits */
 
-	palette_set_color_rgb(machine(), offset, pal4bit(r), pal4bit(g), pal4bit(b));
+	m_palette->set_pen_color(offset, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 
@@ -510,7 +509,7 @@ void dblcrown_state::machine_reset()
 }
 
 
-void dblcrown_state::palette_init()
+PALETTE_INIT_MEMBER(dblcrown_state, dblcrown)
 {
 }
 
@@ -575,7 +574,8 @@ static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dblcrown)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(dblcrown_state, dblcrown)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

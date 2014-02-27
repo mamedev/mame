@@ -91,7 +91,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(seabattl);
 	UINT32 screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	bool m_waveenable;
 	UINT8 m_collision;
@@ -105,24 +105,24 @@ public:
 
 ***************************************************************************/
 
-void seabattl_state::palette_init()
+PALETTE_INIT_MEMBER(seabattl_state, seabattl)
 {
 	// sprites (m.obj) + s2636
 	for (int i = 0; i < 8; i++)
 	{
-		palette_set_color(machine(), i, rgb_t((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
+		palette.set_pen_color(i, rgb_t((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
 	}
 
 	// scr
 	for (int i = 0; i < 8; i++)
 	{
-		palette_set_color(machine(), 8 + 2 * i + 0, rgb_t::black);
-		palette_set_color(machine(), 8 + 2 * i + 1, rgb_t((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
+		palette.set_pen_color(8 + 2 * i + 0, rgb_t::black);
+		palette.set_pen_color(8 + 2 * i + 1, rgb_t((i & 1) ? 0xff : 0x00, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00));
 	}
 
 	// wave
-	palette_set_color(machine(), 24, rgb_t::black);
-	palette_set_color(machine(), 25, rgb_t(0x00, 0xff, 0xff)); // cyan
+	palette.set_pen_color(24, rgb_t::black);
+	palette.set_pen_color(25, rgb_t(0x00, 0xff, 0xff)); // cyan
 }
 
 TILE_GET_INFO_MEMBER(seabattl_state::get_bg_tile_info)
@@ -156,7 +156,7 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 		{
 			for ( x = 0; x < 32; x++ )
 			{
-				m_gfxdecode->gfx(2)->opaque(bitmap,cliprect, (y & 0x0f) + (((x & 0x0f) + ((screen.frame_number() & 0xe0) >> 4)) << 4), 0, 0, 0, x*8, y*8 );
+				m_gfxdecode->gfx(2)->opaque(m_palette,bitmap,cliprect, (y & 0x0f) + (((x & 0x0f) + ((screen.frame_number() & 0xe0) >> 4)) << 4), 0, 0, 0, x*8, y*8 );
 			}
 		}
 	}
@@ -180,7 +180,7 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 			int x = ((offset & 0x0f) << 4) - ((m_objram[offset] & 0xf0) >> 4);
 			int y = (offset & 0xf0);
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, code, 0, 0, 0, x, y, 0);
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, code, 0, 0, 0, x, y, 0);
 		}
 	}
 
@@ -545,7 +545,8 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seabattl_state, screen_update_seabattl)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", seabattl)
-	MCFG_PALETTE_LENGTH(26)
+	MCFG_PALETTE_ADD("palette", 26)
+	MCFG_PALETTE_INIT_OWNER(seabattl_state, seabattl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

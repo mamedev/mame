@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 	AM_RANGE(0x160000, 0x160007) AM_DEVWRITE("k056832", k056832_device, b_word_w)                                    // VSCCS (board dependent)
 	AM_RANGE(0x170000, 0x170001) AM_WRITENOP                                                // Watchdog
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("workram")                 // Main RAM.  Spec. 180000-1803ff, 180400-187fff
-	AM_RANGE(0x190000, 0x190fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x190000, 0x190fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVWRITE("k056832", k056832_device, word_w)
 	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(sound_cmd_w)
@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -347,13 +347,17 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gijoe_state, screen_update_gijoe)
 
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K056832_ADD("k056832", gijoe_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K053246_ADD("k053246", gijoe_k053247_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
+	MCFG_K053246_PALETTE("palette")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

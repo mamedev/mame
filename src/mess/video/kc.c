@@ -50,7 +50,7 @@ static const UINT8 kc85_palette[KC85_PALETTE_SIZE * 3] =
 PALETTE_INIT_MEMBER(kc_state,kc85)
 {
 	for (int i = 0; i < sizeof(kc85_palette) / 3; i++ )
-		palette_set_color_rgb(machine(), i, kc85_palette[i*3], kc85_palette[i*3+1], kc85_palette[i*3+2]);
+		palette.set_pen_color(i, kc85_palette[i*3], kc85_palette[i*3+1], kc85_palette[i*3+2]);
 }
 
 /* set new blink state */

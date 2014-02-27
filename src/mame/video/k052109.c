@@ -152,7 +152,8 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 	//m_dx[3], m_dy[3],
 	m_romsubbank(0),
 	m_scrollctrl(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this),
+	m_palette(*this)
 {
 }
 
@@ -164,6 +165,17 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 void k052109_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<k052109_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void k052109_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<k052109_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -224,12 +236,12 @@ void k052109_device::device_start()
 	{
 	case NORMAL_PLANE_ORDER:
 		total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / 32;
-		konami_decode_gfx(machine(), m_gfxdecode, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout, 4);
+		konami_decode_gfx(machine(), m_gfxdecode, m_palette, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout, 4);
 		break;
 
 	case GRADIUS3_PLANE_ORDER:
 		total = 0x1000;
-		konami_decode_gfx(machine(), m_gfxdecode, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout_gradius3, 4);
+		konami_decode_gfx(machine(), m_gfxdecode, m_palette, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout_gradius3, 4);
 		break;
 
 	default:

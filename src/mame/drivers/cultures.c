@@ -152,7 +152,7 @@ WRITE8_MEMBER(cultures_state::bg0_videoram_w)
 		g = ((datax >> 3) & 0x1e) | ((datax & 0x2000) ? 0x1 : 0);
 		b = ((datax << 1) & 0x1e) | ((datax & 0x1000) ? 0x1 : 0);
 
-		palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 	else
 	{
@@ -414,7 +414,7 @@ static MACHINE_CONFIG_START( cultures, cultures_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cultures_state, screen_update_cultures)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", culture)
-	MCFG_PALETTE_LENGTH(0x2000)
+	MCFG_PALETTE_ADD("palette", 0x2000)
 
 
 	/* sound hardware */

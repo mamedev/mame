@@ -43,7 +43,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(arabian);
 	UINT32 screen_update_arabian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blit_area( UINT8 plane, UINT16 src, UINT8 x, UINT8 y, UINT8 sx, UINT8 sy );
 	required_device<cpu_device> m_maincpu;

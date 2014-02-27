@@ -1527,7 +1527,7 @@ static MACHINE_CONFIG_START( namcos21, namcos21_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_namcos21)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", namcos21)
-	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
+	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
@@ -1582,7 +1582,7 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_namcos21)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", namcos21)
-	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
+	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)
 
@@ -1640,7 +1640,7 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_SCREEN_VISIBLE_AREA(0,495,0,479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_namcos21)
 
-	MCFG_PALETTE_LENGTH(NAMCOS21_NUM_COLORS)
+	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos21_state,namcos21)

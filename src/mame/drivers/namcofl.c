@@ -599,7 +599,7 @@ static MACHINE_CONFIG_START( namcofl, namcofl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, NAMCOFL_HBSTART-1, 0, NAMCOFL_VBSTART-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcofl_state, screen_update_namcofl)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 2)
 

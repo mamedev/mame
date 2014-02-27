@@ -26,7 +26,7 @@
 
 ***************************************************************************/
 
-void mikie_state::palette_init()
+PALETTE_INIT_MEMBER(mikie_state, mikie)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
@@ -38,9 +38,6 @@ void mikie_state::palette_init()
 			4, resistances, rweights, 470, 0,
 			4, resistances, gweights, 470, 0,
 			4, resistances, bweights, 470, 0);
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -69,7 +66,7 @@ void mikie_state::palette_init()
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table,*/
@@ -83,7 +80,7 @@ void mikie_state::palette_init()
 		for (j = 0; j < 8; j++)
 		{
 			UINT8 ctabentry = (j << 5) | ((~i & 0x100) >> 4) | (color_prom[i] & 0x0f);
-			colortable_entry_set_value(machine().colortable, ((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
+			m_palette->set_pen_indirect(((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
 		}
 	}
 }
@@ -160,7 +157,7 @@ void mikie_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		}
 
 		
-			m_gfxdecode->gfx(gfxbank)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(gfxbank)->transpen(m_palette,bitmap,cliprect,
 			code, color,
 			flipx,flipy,
 			sx,sy, 0);

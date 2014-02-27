@@ -14,7 +14,7 @@ WRITE8_MEMBER(playch10_state::playch10_videoram_w)
 	}
 }
 
-void playch10_state::palette_init()
+PALETTE_INIT_MEMBER(playch10_state, playch10)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
@@ -50,12 +50,12 @@ void playch10_state::palette_init()
 
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 
 		color_prom++;
 	}
 
-	ppu->init_palette_rgb(machine(), 256);
+	ppu->init_palette_rgb(palette, 256);
 }
 
 void playch10_state::ppu_irq(int *ppu_regs)

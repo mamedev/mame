@@ -628,7 +628,7 @@ static MACHINE_CONFIG_FRAGMENT( cga )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE_DEVICE( DEVICE_SELF, isa8_cga_device, screen_update )
 
-	MCFG_PALETTE_LENGTH(/* CGA_PALETTE_SETS * 16*/ 65536 )
+	MCFG_PALETTE_ADD("palette", /* CGA_PALETTE_SETS * 16*/ 65536 )
 
 	MCFG_MC6845_ADD(CGA_MC6845_NAME, MC6845, CGA_SCREEN_NAME, XTAL_14_31818MHz/8, mc6845_cga_intf)
 MACHINE_CONFIG_END
@@ -680,7 +680,8 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag,
 		device_t(mconfig, ISA8_CGA, "IBM Color/Graphics Monitor Adapter", tag, owner, clock, "cga", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_cga_config(*this, "cga_config"),
-		m_vram_size( 0x4000 )
+		m_vram_size( 0x4000 ),
+		m_palette(*this, "palette")
 {
 	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x1800;
 	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x1000;
@@ -692,7 +693,8 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
 		m_cga_config(*this, "cga_config"),
-		m_vram_size( 0x4000 )
+		m_vram_size( 0x4000 ),
+		m_palette(*this, "palette")
 {
 	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x1800;
 	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x1000;
@@ -719,7 +721,7 @@ void isa8_cga_device::device_start()
 
 	for ( i = 0; i < CGA_PALETTE_SETS * 16; i++ )
 	{
-		palette_set_color_rgb( machine(), i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
+		m_palette->set_pen_color( i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
 	}
 
 	i = 0x8000;
@@ -729,7 +731,7 @@ void isa8_cga_device::device_start()
 		{
 			for ( int b = 0; b < 32; b++ )
 			{
-				palette_set_color_rgb( machine(), i, r << 3, g << 3, b << 3 );
+				m_palette->set_pen_color( i, r << 3, g << 3, b << 3 );
 				i++;
 			}
 		}

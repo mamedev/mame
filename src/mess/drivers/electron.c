@@ -44,9 +44,9 @@ static const rgb_t electron_palette[8]=
 	rgb_t(0x000,0x000,0x000)
 };
 
-void electron_state::palette_init()
+PALETTE_INIT_MEMBER(electron_state, electron)
 {
-	palette_set_colors(machine(), 0, electron_palette, ARRAY_LENGTH(electron_palette));
+	palette.set_pen_colors(0, electron_palette, ARRAY_LENGTH(electron_palette));
 }
 
 static ADDRESS_MAP_START(electron_mem, AS_PROGRAM, 8, electron_state )
@@ -190,7 +190,8 @@ static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 256-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(electron_state, screen_update_electron)
 
-	MCFG_PALETTE_LENGTH( 16 )
+	MCFG_PALETTE_ADD( "palette", 16 )
+	MCFG_PALETTE_INIT_OWNER(electron_state, electron)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 

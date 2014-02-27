@@ -8,29 +8,26 @@
 #include "includes/sprint2.h"
 
 
-void sprint2_state::palette_init()
+PALETTE_INIT_MEMBER(sprint2_state, sprint2)
 {
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 4);
+	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
+	palette.set_indirect_color(1, rgb_t(0x5b, 0x5b, 0x5b));
+	palette.set_indirect_color(2, rgb_t(0xa4, 0xa4, 0xa4));
+	palette.set_indirect_color(3, rgb_t(0xff, 0xff, 0xff));
 
-	colortable_palette_set_color(machine().colortable, 0, rgb_t(0x00, 0x00, 0x00));
-	colortable_palette_set_color(machine().colortable, 1, rgb_t(0x5b, 0x5b, 0x5b));
-	colortable_palette_set_color(machine().colortable, 2, rgb_t(0xa4, 0xa4, 0xa4));
-	colortable_palette_set_color(machine().colortable, 3, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_indirect(0x0, 1);   /* black playfield */
+	palette.set_pen_indirect(0x1, 0);
+	palette.set_pen_indirect(0x2, 1);   /* white playfield */
+	palette.set_pen_indirect(0x3, 3);
 
-	colortable_entry_set_value(machine().colortable, 0x0, 1);   /* black playfield */
-	colortable_entry_set_value(machine().colortable, 0x1, 0);
-	colortable_entry_set_value(machine().colortable, 0x2, 1);   /* white playfield */
-	colortable_entry_set_value(machine().colortable, 0x3, 3);
-
-	colortable_entry_set_value(machine().colortable, 0x4, 1);   /* car #1 */
-	colortable_entry_set_value(machine().colortable, 0x5, 3);
-	colortable_entry_set_value(machine().colortable, 0x6, 1);   /* car #2 */
-	colortable_entry_set_value(machine().colortable, 0x7, 0);
-	colortable_entry_set_value(machine().colortable, 0x8, 1);   /* car #3 */
-	colortable_entry_set_value(machine().colortable, 0x9, 2);
-	colortable_entry_set_value(machine().colortable, 0xa, 1);   /* car #4 */
-	colortable_entry_set_value(machine().colortable, 0xb, 2);
+	palette.set_pen_indirect(0x4, 1);   /* car #1 */
+	palette.set_pen_indirect(0x5, 3);
+	palette.set_pen_indirect(0x6, 1);   /* car #2 */
+	palette.set_pen_indirect(0x7, 0);
+	palette.set_pen_indirect(0x8, 1);   /* car #3 */
+	palette.set_pen_indirect(0x9, 2);
+	palette.set_pen_indirect(0xa, 1);   /* car #4 */
+	palette.set_pen_indirect(0xb, 2);
 }
 
 
@@ -77,7 +74,7 @@ WRITE8_MEMBER(sprint2_state::sprint2_video_ram_w)
 }
 
 
-UINT8 sprint2_state::collision_check(colortable_t *colortable, rectangle& rect)
+UINT8 sprint2_state::collision_check(rectangle& rect)
 {
 	UINT8 data = 0;
 
@@ -87,7 +84,7 @@ UINT8 sprint2_state::collision_check(colortable_t *colortable, rectangle& rect)
 	for (y = rect.min_y; y <= rect.max_y; y++)
 		for (x = rect.min_x; x <= rect.max_x; x++)
 		{
-			UINT16 a = colortable_entry_get_value(colortable, m_helper.pix16(y, x));
+			UINT16 a = m_palette->pen_indirect(m_helper.pix16(y, x));
 
 			if (a == 0)
 				data |= 0x40;
@@ -125,7 +122,7 @@ UINT32 sprint2_state::screen_update_sprint2(screen_device &screen, bitmap_ind16 
 
 	for (i = 0; i < 4; i++)
 	{
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 			get_sprite_code(video_ram, i),
 			i,
 			0, 0,
@@ -169,21 +166,21 @@ void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 
 			m_bg_tilemap->draw(screen, m_helper, rect, 0, 0);
 
-			m_gfxdecode->gfx(1)->transpen(m_helper,rect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,m_helper,rect,
 				get_sprite_code(video_ram, i),
 				0,
 				0, 0,
 				get_sprite_x(video_ram, i),
 				get_sprite_y(video_ram, i), 1);
 
-			m_collision[i] |= collision_check(machine().colortable, rect);
+			m_collision[i] |= collision_check(rect);
 
 			/* check for sprite-sprite collisions */
 
 			for (j = 0; j < 4; j++)
 				if (j != i)
 				{
-					m_gfxdecode->gfx(1)->transpen(m_helper,rect,
+					m_gfxdecode->gfx(1)->transpen(m_palette,m_helper,rect,
 						get_sprite_code(video_ram, j),
 						1,
 						0, 0,
@@ -191,14 +188,14 @@ void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 						get_sprite_y(video_ram, j), 0);
 				}
 
-			m_gfxdecode->gfx(1)->transpen(m_helper,rect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,m_helper,rect,
 				get_sprite_code(video_ram, i),
 				0,
 				0, 0,
 				get_sprite_x(video_ram, i),
 				get_sprite_y(video_ram, i), 1);
 
-			m_collision[i] |= collision_check(machine().colortable, rect);
+			m_collision[i] |= collision_check(rect);
 		}
 	}
 }

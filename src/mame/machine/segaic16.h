@@ -74,6 +74,7 @@ protected:
 	UINT8       m_palette_normal[32];       // RGB translations for normal pixels
 	UINT8       m_palette_shadow[32];       // RGB translations for shadowed pixels
 	UINT8       m_palette_hilight[32];      // RGB translations for hilighted pixels
+	required_device<palette_device> m_palette;
 };
 
 

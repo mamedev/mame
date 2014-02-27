@@ -86,7 +86,7 @@ WRITE16_MEMBER(powerins_state::powerins_paletteram16_w)
 	int g = ((newword >>  7) & 0x1E ) | ((newword >> 2) & 0x01);
 	int b = ((newword >>  3) & 0x1E ) | ((newword >> 1) & 0x01);
 
-	palette_set_color_rgb( machine(),offset, pal5bit(r),pal5bit(g),pal5bit(b) );
+	m_palette->set_pen_color( offset, pal5bit(r),pal5bit(g),pal5bit(b) );
 }
 
 
@@ -297,7 +297,7 @@ void powerins_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 		{
 			for (y = 0 ; y < dimy ; y++)
 			{
-				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 						code,
 						color,
 						flipx, flipy,

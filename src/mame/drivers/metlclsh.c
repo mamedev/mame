@@ -65,8 +65,8 @@ static ADDRESS_MAP_START( metlclsh_master_map, AS_PROGRAM, 8, metlclsh_state )
 	AM_RANGE(0xc080, 0xc080) AM_WRITENOP                            // ? 0
 	AM_RANGE(0xc0c2, 0xc0c2) AM_WRITE(metlclsh_cause_irq)           // cause irq on cpu #2
 	AM_RANGE(0xc0c3, 0xc0c3) AM_WRITE(metlclsh_ack_nmi)             // nmi ack
-/**/AM_RANGE(0xc800, 0xc82f) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w) AM_SHARE("paletteram")
-/**/AM_RANGE(0xcc00, 0xcc2f) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
+/**/AM_RANGE(0xc800, 0xc82f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+/**/AM_RANGE(0xcc00, 0xcc2f) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 /**/AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(metlclsh_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym2", ym3526_device, write)
@@ -289,8 +289,8 @@ static MACHINE_CONFIG_START( metlclsh, metlclsh_state )
 	MCFG_SCREEN_UPDATE_DRIVER(metlclsh_state, screen_update_metlclsh)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", metlclsh)
-	MCFG_PALETTE_LENGTH(3 * 16)
-
+	MCFG_PALETTE_ADD("palette", 3 * 16)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

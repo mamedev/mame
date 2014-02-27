@@ -63,10 +63,10 @@ public:
 	//DECLARE_WRITE8_MEMBER(henry_io_w);
 	DECLARE_READ8_MEMBER(henry_io_r);
 	DECLARE_DRIVER_INIT(hprot1);
+	DECLARE_PALETTE_INIT(hprot1);
 private:
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };
@@ -210,10 +210,10 @@ WRITE8_MEMBER(hprot1_state::henry_io_w)
 }
 */
 
-void hprot1_state::palette_init()
+PALETTE_INIT_MEMBER(hprot1_state, hprot1)
 {
-	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
-	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 static const gfx_layout henry_prot_charlayout =
@@ -245,7 +245,8 @@ static MACHINE_CONFIG_START( hprot1, hprot1_state )
 	MCFG_SCREEN_SIZE(6*16, 9*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(hprot1_state, hprot1)
 	MCFG_GFXDECODE_ADD("gfxdecode", hprot1)
 
 	MCFG_HD44780_ADD("hd44780")

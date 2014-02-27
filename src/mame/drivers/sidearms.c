@@ -71,8 +71,8 @@ READ8_MEMBER(sidearms_state::turtship_ports_r)
 static ADDRESS_MAP_START( sidearms_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_lo_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_hi_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("SYSTEM") AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1") AM_WRITE(sidearms_bankswitch_w)
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("P2") AM_WRITE(watchdog_reset_w)
@@ -94,8 +94,8 @@ static ADDRESS_MAP_START( turtship_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_lo_w) AM_SHARE("paletteram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_hi_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xe800, 0xe807) AM_READ(turtship_ports_r)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xe801, 0xe801) AM_WRITE(sidearms_bankswitch_w)
@@ -141,8 +141,8 @@ WRITE8_MEMBER(sidearms_state::whizz_bankswitch_w)
 static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_lo_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_hi_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW0") AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("DSW1") AM_WRITE(whizz_bankswitch_w)
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("DSW2") AM_WRITE(watchdog_reset_w)
@@ -623,8 +623,9 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sidearms)
-	MCFG_PALETTE_LENGTH(1024)
 
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -667,7 +668,9 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update_sidearms)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", turtship)
-	MCFG_PALETTE_LENGTH(1024)
+
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -713,7 +716,9 @@ static MACHINE_CONFIG_START( whizz, sidearms_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", turtship)
-	MCFG_PALETTE_LENGTH(1024)
+	
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

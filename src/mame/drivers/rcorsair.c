@@ -144,7 +144,7 @@ static MACHINE_CONFIG_START( rcorsair, rcorsair_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", rcorsair)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 
 ROM_START( rcorsair )

@@ -246,12 +246,12 @@ WRITE32_MEMBER(gstream_state::gstream_palette_w)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 
-	palette_set_color_rgb(machine(), offset * 2, pal5bit(m_paletteram[offset] >> (0 + 16)),
+	m_palette->set_pen_color(offset * 2, pal5bit(m_paletteram[offset] >> (0 + 16)),
 									pal5bit(m_paletteram[offset] >> (6 + 16)),
 									pal5bit(m_paletteram[offset] >> (11 + 16)));
 
 
-	palette_set_color_rgb(machine(),offset * 2 + 1,pal5bit(m_paletteram[offset] >> (0)),
+	m_palette->set_pen_color(offset * 2 + 1,pal5bit(m_paletteram[offset] >> (0)),
 									pal5bit(m_paletteram[offset] >> (6)),
 									pal5bit(m_paletteram[offset] >> (11)));
 }
@@ -785,7 +785,7 @@ void gstream_state::draw_bg_gstream(bitmap_rgb32 &bitmap, const rectangle &clipr
 			if (m_gfxdecode->gfx(map+5))
 				drawgfx_transpen_x2222(bitmap,cliprect,m_gfxdecode->gfx(map),m_gfxdecode->gfx(map+5),code,0,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
 			else
-				m_gfxdecode->gfx(map)->transpen(bitmap,cliprect,code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
+				m_gfxdecode->gfx(map)->transpen(m_palette,bitmap,cliprect,code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
 
 			basex++;
 		}
@@ -841,10 +841,10 @@ UINT32 gstream_state::screen_update_gstream(screen_device &screen, bitmap_rgb32 
 		}
 		else
 		{
-			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y, 0);
-			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y-0x100, 0);
-			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y, 0);
-			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y-0x100, 0);
+			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y, 0);
+			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y-0x100, 0);
+			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y, 0);
+			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y-0x100, 0);
 
 		}
 	}
@@ -895,8 +895,8 @@ static MACHINE_CONFIG_START( gstream, gstream_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update_gstream)
 
-	MCFG_PALETTE_LENGTH(0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
-	MCFG_GFXDECODE_ADD("gfxdecode",gstream)
+	MCFG_PALETTE_ADD("palette", 0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
+	MCFG_GFXDECODE_ADD("gfxdecode", gstream)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -927,8 +927,8 @@ static MACHINE_CONFIG_START( x2222, gstream_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update_gstream)
 
-	MCFG_PALETTE_LENGTH(0x1000 + 0x400 + 0x400 + 0x400) // doesn't use a palette, but keep fake gfxdecode happy
-	MCFG_GFXDECODE_ADD("gfxdecode",x2222)
+	MCFG_PALETTE_ADD("palette", 0x1000 + 0x400 + 0x400 + 0x400) // doesn't use a palette, but keep fake gfxdecode happy
+	MCFG_GFXDECODE_ADD("gfxdecode", x2222)
 
 	// unknown sound hw (no sound roms dumped)
 

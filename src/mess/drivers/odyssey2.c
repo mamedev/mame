@@ -64,7 +64,7 @@ public:
 	DECLARE_DRIVER_INIT(odyssey2);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(odyssey2);
 	UINT32 screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(the_voice_lrq_callback);
 	DECLARE_WRITE_LINE_MEMBER(irq_callback);
@@ -111,7 +111,7 @@ public:
 	required_device<i8243_device> m_i8243;
 	required_device<ef9340_1_device> m_ef9340_1;
 
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(g7400);
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_WRITE8_MEMBER(p2_write);
@@ -264,16 +264,16 @@ const UINT8 odyssey2_colors[] =
 };
 
 
-void odyssey2_state::palette_init()
+PALETTE_INIT_MEMBER(odyssey2_state, odyssey2)
 {
 	for ( int i = 0; i < 16; i++ )
 	{
-		palette_set_color_rgb( machine(), i, odyssey2_colors[i*3], odyssey2_colors[i*3+1], odyssey2_colors[i*3+2] );
+		palette.set_pen_color( i, odyssey2_colors[i*3], odyssey2_colors[i*3+1], odyssey2_colors[i*3+2] );
 	}
 }
 
 
-void g7400_state::palette_init()
+PALETTE_INIT_MEMBER(g7400_state, g7400)
 {
 	const UINT8 g7400_colors[] =
 	{
@@ -299,7 +299,7 @@ void g7400_state::palette_init()
 
 	for ( int i = 0; i < 16; i++ )
 	{
-		palette_set_color_rgb( machine(), i, g7400_colors[i*3], g7400_colors[i*3+1], g7400_colors[i*3+2] );
+		palette.set_pen_color( i, g7400_colors[i*3], g7400_colors[i*3+1], g7400_colors[i*3+2] );
 	}
 }
 
@@ -776,8 +776,9 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_7_15909MHz/2 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",  odyssey2 )
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE_ADD("gfxdecode", odyssey2 )
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -805,8 +806,9 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_17_73447MHz/5 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",  odyssey2 )
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE_ADD("gfxdecode", odyssey2 )
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -833,8 +835,9 @@ static MACHINE_CONFIG_START( g7400, g7400_state )
 	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",  odyssey2 )
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE_ADD("gfxdecode", odyssey2 )
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
 	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(g7400_state,i8243_port_w))
 
@@ -867,8 +870,9 @@ static MACHINE_CONFIG_START( odyssey3, g7400_state )
 	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",  odyssey2 )
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE_ADD("gfxdecode", odyssey2 )	
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
 	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(g7400_state,i8243_port_w))
 

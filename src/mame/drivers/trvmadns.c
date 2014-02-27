@@ -207,7 +207,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_palette_w)
 	r = (((datax & 0x0038)>>3) | ((datax & 0x0400)>>7)) ^ 0xf;
 	g = (((datax & 0x01c0)>>6) | ((datax & 0x0800)>>8)) ^ 0xf;
 
-	palette_set_color_rgb(machine(), offset, pal4bit(r), pal4bit(g), pal4bit(b));
+	m_palette->set_pen_color(offset, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 
@@ -340,7 +340,7 @@ UINT32 trvmadns_state::screen_update_trvmadns(screen_device &screen, bitmap_ind1
 			int flipy = attr & 2;
 
 			if(!(attr & 0x20))
-				gfx->opaque(bitmap,cliprect,tile,color,flipx,flipy,(x*8),(y*8));
+				gfx->opaque(m_palette,bitmap,cliprect,tile,color,flipx,flipy,(x*8),(y*8));
 			count++;
 		}
 	}
@@ -358,7 +358,7 @@ UINT32 trvmadns_state::screen_update_trvmadns(screen_device &screen, bitmap_ind1
 			int flipy = attr & 2;
 
 			if(attr & 0x20)
-				gfx->transpen(bitmap,cliprect,tile,color,flipx,flipy,(x*8),(y*8),1);
+				gfx->transpen(m_palette,bitmap,cliprect,tile,color,flipx,flipy,(x*8),(y*8),1);
 			count++;
 		}
 	}
@@ -387,7 +387,7 @@ static MACHINE_CONFIG_START( trvmadns, trvmadns_state )
 	MCFG_SCREEN_UPDATE_DRIVER(trvmadns_state, screen_update_trvmadns)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", trvmadns)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 
 	/* sound hardware */

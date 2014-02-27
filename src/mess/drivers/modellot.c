@@ -166,10 +166,9 @@ static MACHINE_CONFIG_START( modellot, modellot_state )
 	MCFG_SCREEN_SIZE(64*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(modellot_state, screen_update_modellot)
-	MCFG_GFXDECODE_ADD("gfxdecode",  modellot )
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
-
+	MCFG_GFXDECODE_ADD("gfxdecode", modellot )
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	
 	/* Devices */
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END

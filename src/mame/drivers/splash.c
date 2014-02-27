@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( splash_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM                                                 /* Work RAM */
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")/* Palette is xRRRRxGGGGxBBBBx */
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* Palette is xRRRRxGGGGxBBBBx */
 	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_SHARE("spriteram")                       /* Sprite RAM */
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                                                 /* Work RAM */
 ADDRESS_MAP_END
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( roldfrog_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM                                                 /* Work RAM */
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")/* Palette is xRRRRxGGGGxBBBBx */
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* Palette is xRRRRxGGGGxBBBBx */
 	AM_RANGE(0xa00000, 0xa00001) AM_READ(roldfrog_bombs_r)
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_SHARE("spriteram")                       /* Sprite RAM */
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITEONLY AM_SHARE("bitmap_mode")           /* Bitmap Mode? */
@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_WRITENOP
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")/* Palette is xRRRRxGGGGxBBBBx */
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* Palette is xRRRRxGGGGxBBBBx */
 	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(spr_read, spr_write) AM_SHARE("spriteram")        /* Sprite RAM */
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM  AM_MASK(0xffff) /* there's fe0000 <-> ff0000 compare */                /* Work RAM */
 ADDRESS_MAP_END
@@ -503,7 +503,8 @@ static MACHINE_CONFIG_START( splash, splash_state )
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update_splash)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", splash)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
@@ -556,7 +557,8 @@ static MACHINE_CONFIG_START( roldfrog, splash_state )
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update_splash)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", splash)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
@@ -634,7 +636,8 @@ static MACHINE_CONFIG_START( funystrp, splash_state )
 	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update_funystrp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", splash)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, funystrp )

@@ -265,7 +265,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(geniusiq);
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER(input_r);
@@ -316,10 +316,10 @@ public:
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-void geniusiq_state::palette_init()
+PALETTE_INIT_MEMBER(geniusiq_state, geniusiq)
 {
 	// shades need to be verified
-	const UINT8 palette[] =
+	const UINT8 palette_val[] =
 	{
 		0x00, 0x00, 0x00,    // Black?? (used in the cursor for transparency)
 		0xff, 0xff, 0xff,    // White
@@ -339,8 +339,8 @@ void geniusiq_state::palette_init()
 		0xff, 0x00, 0xff     // Pink
 	};
 
-	for (int i=0; i<ARRAY_LENGTH(palette)/3; i++)
-		palette_set_color_rgb(machine(), i, palette[i*3], palette[i*3+1], palette[i*3+2]);
+	for (int i=0; i<ARRAY_LENGTH(palette_val)/3; i++)
+		palette.set_pen_color(i, palette_val[i*3], palette_val[i*3+1], palette_val[i*3+2]);
 }
 
 UINT32 gl8008cx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -810,7 +810,8 @@ static MACHINE_CONFIG_START( iq128, geniusiq_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER( geniusiq_state, screen_update )
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(geniusiq_state, geniusiq)
 
 	/* internal flash */
 	MCFG_AMD_29F010_ADD("flash")

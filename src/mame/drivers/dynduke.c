@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dynduke)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	// sound hardware

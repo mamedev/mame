@@ -91,7 +91,7 @@ PALETTE_INIT_MEMBER(kaneko16_berlwall_state,berlwall)
 
 	/* initialize 555 RGB lookup */
 	for (i = 0; i < 32768; i++)
-		palette_set_color_rgb(machine(),2048 + i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+		palette.set_pen_color(2048 + i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
 VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)

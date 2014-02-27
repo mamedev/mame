@@ -27,7 +27,7 @@
 
 ***************************************************************************/
 
-void pooyan_state::palette_init()
+PALETTE_INIT_MEMBER(pooyan_state, pooyan)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -40,9 +40,6 @@ void pooyan_state::palette_init()
 			3, resistances_rg, rweights, 1000, 0,
 			3, resistances_rg, gweights, 1000, 0,
 			2, resistances_b,  bweights, 1000, 0);
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -67,7 +64,7 @@ void pooyan_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -77,14 +74,14 @@ void pooyan_state::palette_init()
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites */
 	for (i = 0x100; i < 0x200; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -171,12 +168,12 @@ void pooyan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		int flipy = spriteram_2[offs] & 0x80;
 
 		
-			m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect,
 			code,
 			color,
 			flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0));
+			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0));
 	}
 }
 

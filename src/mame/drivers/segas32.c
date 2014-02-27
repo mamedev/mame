@@ -2344,7 +2344,7 @@ static MACHINE_CONFIG_START( system32, segas32_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", segas32)
-	MCFG_PALETTE_LENGTH(0x4000)
+	MCFG_PALETTE_ADD("palette", 0x4000)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -2401,7 +2401,7 @@ static MACHINE_CONFIG_START( multi32, segas32_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", segas32)
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

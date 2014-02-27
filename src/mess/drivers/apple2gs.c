@@ -143,11 +143,11 @@ PALETTE_INIT_MEMBER(apple2gs_state,apple2gs)
 {
 	int i;
 
-	PALETTE_INIT_CALL_MEMBER(apple2);
+	PALETTE_INIT_NAME(apple2)(palette);
 
 	for (i = 0; i < 16; i++)
 	{
-		palette_set_color_rgb(machine(), i,
+		palette.set_pen_color(i,
 			apple2gs_palette[(3*i)]*17,
 			apple2gs_palette[(3*i)+1]*17,
 			apple2gs_palette[(3*i)+2]*17);
@@ -344,13 +344,13 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_SCREEN_VISIBLE_AREA(0,703,0,230)
 	MCFG_SCREEN_UPDATE_DRIVER(apple2gs_state, screen_update_apple2gs)
 
-	MCFG_PALETTE_LENGTH( 16+256 )
-	MCFG_GFXDECODE_ADD("gfxdecode",  apple2gs )
+	MCFG_PALETTE_ADD( "palette", 16+256 )
+	MCFG_PALETTE_INIT_OWNER(apple2gs_state, apple2gs )
+	MCFG_GFXDECODE_ADD("gfxdecode", apple2gs )
 
 	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gs )
 	MCFG_MACHINE_RESET_OVERRIDE(apple2gs_state, apple2gs )
 
-	MCFG_PALETTE_INIT_OVERRIDE(apple2gs_state, apple2gs )
 	MCFG_VIDEO_START_OVERRIDE(apple2gs_state, apple2gs )
 
 	/* keyboard controller */

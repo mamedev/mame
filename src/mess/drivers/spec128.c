@@ -303,8 +303,6 @@ MACHINE_CONFIG_DERIVED( spectrum_128, spectrum )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(spectrum_state, spectrum )
 	MCFG_SCREEN_RAW_PARAMS(X1_128_SINCLAIR / 2.5f, 456, 0, 352,  311, 0, 296)
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )

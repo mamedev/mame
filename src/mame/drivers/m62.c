@@ -947,8 +947,8 @@ static MACHINE_CONFIG_START( ldrun, m62_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ldrun)
-	MCFG_PALETTE_LENGTH(512)
-
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(m62_state,m62)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(m62_audio)
@@ -985,9 +985,10 @@ static MACHINE_CONFIG_DERIVED( battroad, ldrun )
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_battroad)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", battroad)
-	MCFG_PALETTE_LENGTH(544)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 544)
 
-	MCFG_PALETTE_INIT_OVERRIDE(m62_state,battroad)
+	MCFG_PALETTE_INIT_OWNER(m62_state,battroad)
 	MCFG_VIDEO_START_OVERRIDE(m62_state,battroad)
 MACHINE_CONFIG_END
 
@@ -1043,9 +1044,11 @@ static MACHINE_CONFIG_DERIVED( lotlot, ldrun )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", lotlot)
-	MCFG_PALETTE_LENGTH(768)
+	
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 768)
 
-	MCFG_PALETTE_INIT_OVERRIDE(m62_state,lotlot)
+	MCFG_PALETTE_INIT_OWNER(m62_state,lotlot)
 	MCFG_VIDEO_START_OVERRIDE(m62_state,lotlot)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_lotlot)
@@ -1091,9 +1094,10 @@ static MACHINE_CONFIG_DERIVED( spelunk2, ldrun )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spelunk2)
-	MCFG_PALETTE_LENGTH(768)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 768)
 
-	MCFG_PALETTE_INIT_OVERRIDE(m62_state,spelunk2)
+	MCFG_PALETTE_INIT_OWNER(m62_state,spelunk2)
 	MCFG_VIDEO_START_OVERRIDE(m62_state,spelunk2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_spelunk2)

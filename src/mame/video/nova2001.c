@@ -44,7 +44,7 @@ PALETTE_INIT_MEMBER(nova2001_state,nova2001)
 		/* blue component */
 		b = (((color_prom[entry] >> 4) & 0x0c) | intensity) * 0x11;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -52,18 +52,18 @@ WRITE8_MEMBER(nova2001_state::ninjakun_paletteram_w)
 {
 	int i;
 
-	paletteram_BBGGRRII_byte_w(space,offset,data);
+	m_palette->write(space,offset,data);
 
 	// expand the sprite palette to full length
 	if (offset < 16)
 	{
-		paletteram_BBGGRRII_byte_w(space, 0x200 + offset * 16 + 1, data);
+		m_palette->write(space, 0x200 + offset * 16 + 1, data);
 
 		if (offset != 1)
 		{
 			for (i = 0; i < 16; i++)
 			{
-				paletteram_BBGGRRII_byte_w(space, 0x200 + offset + i * 16, data);
+				m_palette->write(space, 0x200 + offset + i * 16, data);
 			}
 		}
 	}
@@ -283,7 +283,7 @@ void nova2001_state::nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		 gfx->transpen(bitmap,cliprect,
+		 gfx->transpen(m_palette,bitmap,cliprect,
 				tile,
 				color,
 				flipx, flipy,
@@ -320,14 +320,14 @@ void nova2001_state::pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle 
 			flipy = !flipy;
 		}
 
-		 gfx->transpen(bitmap,cliprect,
+		 gfx->transpen(m_palette,bitmap,cliprect,
 				tile,
 				color,
 				flipx, flipy,
 				sx, sy, 0);
 
 		// there's no X MSB, so draw with wraparound (fixes title screen)
-		 gfx->transpen(bitmap,cliprect,
+		 gfx->transpen(m_palette,bitmap,cliprect,
 				tile,
 				color,
 				flipx, flipy,

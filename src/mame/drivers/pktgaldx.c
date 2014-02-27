@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 
 	AM_RANGE(0x300000, 0x30000f) AM_RAM // ??
 
-	AM_RANGE(0x330000, 0x330bff) AM_RAM_WRITE(paletteram_xbgr_word_be_w) AM_SHARE("paletteram") // extra colours?
+	AM_RANGE(0x330000, 0x330bff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // extra colours?
 ADDRESS_MAP_END
 
 
@@ -341,17 +341,21 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldx)
 
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(XBGR)
+
 	MCFG_GFXDECODE_ADD("gfxdecode", pktgaldx)
 
 	MCFG_DECOCOMN_ADD("deco_common")
 
 	MCFG_DECO16IC_ADD("tilegen1", pktgaldx_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DECO104_ADD("ioprot104")
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE(8,9,  4,5,6,7    ,1,0,3,2) // hopefully this is correct, nothing else uses this arrangement!
@@ -385,7 +389,9 @@ static MACHINE_CONFIG_START( pktgaldb, pktgaldx_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldb)
 
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(XBGR)
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", bootleg)
 
 	/* sound hardware */

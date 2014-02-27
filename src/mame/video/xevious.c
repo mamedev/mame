@@ -30,8 +30,6 @@ PALETTE_INIT_MEMBER(xevious_state,xevious)
 	int i;
 	#define TOTAL_COLORS(gfxn) (m_gfxdecode->gfx(gfxn)->colors() *m_gfxdecode->gfx(gfxn)->granularity())
 
-	machine().colortable = colortable_alloc(machine(), 128+1);
-
 	for (i = 0;i < 128;i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
@@ -55,12 +53,12 @@ PALETTE_INIT_MEMBER(xevious_state,xevious)
 		bit3 = (color_prom[2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine().colortable,i,rgb_t(r,g,b));
+		palette.set_indirect_color(i,rgb_t(r,g,b));
 		color_prom++;
 	}
 
 	/* color 0x80 is used by sprites to mark transparency */
-	colortable_palette_set_color(machine().colortable,0x80,rgb_t(0,0,0));
+	palette.set_indirect_color(0x80,rgb_t(0,0,0));
 
 	color_prom += 128;  /* the bottom part of the PROM is unused */
 	color_prom += 2*256;
@@ -69,7 +67,7 @@ PALETTE_INIT_MEMBER(xevious_state,xevious)
 	/* background tiles */
 	for (i = 0;i < TOTAL_COLORS(1);i++)
 	{
-		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(1)->colorbase() + i,
+		palette.set_pen_indirect(m_gfxdecode->gfx(1)->colorbase() + i,
 				(color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(1)] & 0x0f) << 4));
 
 		color_prom++;
@@ -81,7 +79,7 @@ PALETTE_INIT_MEMBER(xevious_state,xevious)
 	{
 		int c = (color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(2)] & 0x0f) << 4);
 
-		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(2)->colorbase() + i,
+		palette.set_pen_indirect(m_gfxdecode->gfx(2)->colorbase() + i,
 				(c & 0x80) ? (c & 0x7f) : 0x80);
 
 		color_prom++;
@@ -91,7 +89,7 @@ PALETTE_INIT_MEMBER(xevious_state,xevious)
 	/* foreground characters */
 	for (i = 0;i < TOTAL_COLORS(0);i++)
 	{
-		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(0)->colorbase() + i,
+		palette.set_pen_indirect(m_gfxdecode->gfx(0)->colorbase() + i,
 				(i % 2 != 0) ? (i / 2) : 0x80);
 	}
 }
@@ -102,8 +100,6 @@ PALETTE_INIT_MEMBER(xevious_state,battles)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	machine().colortable = colortable_alloc(machine(), 128+1);
 
 	for (i = 0;i < 128;i++)
 	{
@@ -128,12 +124,12 @@ PALETTE_INIT_MEMBER(xevious_state,battles)
 		bit3 = (color_prom[2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine().colortable,i,rgb_t(r,g,b));
+		palette.set_indirect_color(i,rgb_t(r,g,b));
 		color_prom++;
 	}
 
 	/* color 0x80 is used by sprites to mark transparency */
-	colortable_palette_set_color(machine().colortable,0x80,rgb_t(0,0,0));
+	palette.set_indirect_color(0x80,rgb_t(0,0,0));
 
 	color_prom += 128;  /* the bottom part of the PROM is unused */
 	color_prom += 2*256;
@@ -142,7 +138,7 @@ PALETTE_INIT_MEMBER(xevious_state,battles)
 	/* background tiles */
 	for (i = 0;i < TOTAL_COLORS(1);i++)
 	{
-		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(1)->colorbase() + i,
+		palette.set_pen_indirect(m_gfxdecode->gfx(1)->colorbase() + i,
 				(color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4));
 
 		color_prom++;
@@ -154,7 +150,7 @@ PALETTE_INIT_MEMBER(xevious_state,battles)
 	{
 		int c = (color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4);
 
-		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(2)->colorbase() + i,
+		palette.set_pen_indirect(m_gfxdecode->gfx(2)->colorbase() + i,
 				(c & 0x80) ? (c & 0x7f) : 0x80);
 
 		color_prom++;
@@ -163,7 +159,7 @@ PALETTE_INIT_MEMBER(xevious_state,battles)
 	/* foreground characters */
 	for (i = 0;i < TOTAL_COLORS(0);i++)
 	{
-		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(0)->colorbase() + i,
+		palette.set_pen_indirect(m_gfxdecode->gfx(0)->colorbase() + i,
 				(i % 2 != 0) ? (i / 2) : 0x80);
 	}
 }
@@ -434,41 +430,41 @@ void xevious_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				flipy = !flipy;
 			}
 
-			transmask = colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(bank), color, 0x80);
+			transmask = m_palette->transpen_mask(*m_gfxdecode->gfx(bank), color, 0x80);
 
 			if (spriteram_3[offs] & 2)  /* double height (?) */
 			{
 				if (spriteram_3[offs] & 1)  /* double width, double height */
 				{
 					code &= ~3;
-					m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
+					m_gfxdecode->gfx(bank)->transmask(m_palette,bitmap,cliprect,
 							code+3,color,flipx,flipy,
 							flipx ? sx : sx+16,flipy ? sy-16 : sy,transmask);
-					m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
+					m_gfxdecode->gfx(bank)->transmask(m_palette,bitmap,cliprect,
 							code+1,color,flipx,flipy,
 							flipx ? sx : sx+16,flipy ? sy : sy-16,transmask);
 				}
 				code &= ~2;
-				m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
+				m_gfxdecode->gfx(bank)->transmask(m_palette,bitmap,cliprect,
 						code+2,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy-16 : sy,transmask);
-				m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
+				m_gfxdecode->gfx(bank)->transmask(m_palette,bitmap,cliprect,
 						code,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy : sy-16,transmask);
 			}
 			else if (spriteram_3[offs] & 1) /* double width */
 			{
 				code &= ~1;
-				m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
+				m_gfxdecode->gfx(bank)->transmask(m_palette,bitmap,cliprect,
 						code,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy-16 : sy,transmask);
-				m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
+				m_gfxdecode->gfx(bank)->transmask(m_palette,bitmap,cliprect,
 						code+1,color,flipx,flipy,
 						flipx ? sx : sx+16,flipy ? sy-16 : sy,transmask);
 			}
 			else    /* normal */
 			{
-				m_gfxdecode->gfx(bank)->transmask(bitmap,cliprect,
+				m_gfxdecode->gfx(bank)->transmask(m_palette,bitmap,cliprect,
 						code,color,flipx,flipy,sx,sy,transmask);
 			}
 		}

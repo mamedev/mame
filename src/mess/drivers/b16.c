@@ -101,7 +101,7 @@ UINT32 b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 					pen = (gfx_rom[tile*16+yi] >> (7-xi) & 1) ? color : 0;
 
 					if(y*mc6845_tile_height < 400 && x*8+xi < 640) /* TODO: safety check */
-						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = machine().pens[pen];
+						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(pen);
 				}
 			}
 		}
@@ -313,8 +313,8 @@ static MACHINE_CONFIG_START( b16, b16_state )
 	MCFG_I8237_ADD("8237dma", XTAL_14_31818MHz/2, b16_dma8237_interface)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", b16)
-	MCFG_PALETTE_LENGTH(8)
-//  MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white) // TODO
+	MCFG_PALETTE_ADD("palette", 8)
+//  MCFG_PALETTE_INIT_STANDARD(black_and_white) // TODO
 
 MACHINE_CONFIG_END
 

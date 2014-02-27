@@ -1077,9 +1077,9 @@ MACHINE_RESET_MEMBER(polgar_state,academy)
 
 PALETTE_INIT_MEMBER(polgar_state,chess_lcd)
 {
-	// palette_set_color(machine(), 0, rgb_t(138, 146, 148)); // some think this is closer, but slightly less readable
-	palette_set_color(machine(), 0, rgb_t(255, 255, 255));
-	palette_set_color(machine(), 1, rgb_t(0, 0, 0));
+	// palette.set_pen_color(0, rgb_t(138, 146, 148)); // some think this is closer, but slightly less readable
+	palette.set_pen_color(0, rgb_t(255, 255, 255));
+	palette.set_pen_color(1, rgb_t(0, 0, 0));
 }
 
 static const gfx_layout chess_charlayout =
@@ -1521,8 +1521,8 @@ static MACHINE_CONFIG_FRAGMENT ( chess_common )
 	MCFG_SCREEN_SIZE(100, 22)
 	MCFG_SCREEN_VISIBLE_AREA(0, 100-1, 0, 22-3)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(polgar_state,chess_lcd)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(polgar_state,chess_lcd)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_GFXDECODE_ADD("gfxdecode", chess_lcd)
 

@@ -573,7 +573,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 	}
 }
 
-void tvc_state::palette_init()
+PALETTE_INIT_MEMBER(tvc_state, tvc)
 {
 	const static unsigned char tvc_palette[16][3] =
 	{
@@ -597,7 +597,7 @@ void tvc_state::palette_init()
 	int i;
 
 	for(i = 0; i < 16; i++)
-		palette_set_color_rgb(machine(), i, tvc_palette[i][0], tvc_palette[i][1], tvc_palette[i][2]);
+		palette.set_pen_color(i, tvc_palette[i][0], tvc_palette[i][1], tvc_palette[i][2]);
 }
 
 WRITE_LINE_MEMBER(tvc_state::tvc_int_ff_set)
@@ -687,7 +687,8 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 240 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_PALETTE_LENGTH( 16 )
+	MCFG_PALETTE_ADD( "palette", 16 )
+	MCFG_PALETTE_INIT_OWNER(tvc_state, tvc)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 3125000/2, tvc_crtc6845_interface) // clk taken from schematics
 

@@ -200,7 +200,7 @@ public:
 	DECLARE_WRITE8_MEMBER(outport7_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(mpoker);
 	UINT32 screen_update_mpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -224,7 +224,7 @@ UINT32 mpoker_state::screen_update_mpoker(screen_device &screen, bitmap_ind16 &b
 		{
 			UINT16 dat = m_video[count];
 			UINT16 col = m_video[count+0x400] & 0x7f;
-			gfx->opaque(bitmap,cliprect,dat,col,0,0,x*16,y*16);
+			gfx->opaque(m_palette,bitmap,cliprect,dat,col,0,0,x*16,y*16);
 			count++;
 		}
 
@@ -232,7 +232,7 @@ UINT32 mpoker_state::screen_update_mpoker(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-void mpoker_state::palette_init()
+PALETTE_INIT_MEMBER(mpoker_state, mpoker)
 {
 	int i;
 
@@ -245,7 +245,7 @@ void mpoker_state::palette_init()
 		else
 			color = rgb_t::black;
 
-		palette_set_color(machine(), i, color);
+		palette.set_pen_color(i, color);
 	}
 }
 
@@ -604,8 +604,8 @@ static MACHINE_CONFIG_START( mpoker, mpoker_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mpoker_state, screen_update_mpoker)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mpoker)
-	MCFG_PALETTE_LENGTH(0x200)
-
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(mpoker_state, mpoker)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")

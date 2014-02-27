@@ -273,7 +273,7 @@ static MACHINE_CONFIG_START( relief, relief_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE_ADD("gfxdecode", relief)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
 	MCFG_ATARI_VAD_PLAYFIELD(relief_state, get_playfield_tile_info)

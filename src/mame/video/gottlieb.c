@@ -32,7 +32,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_paletteram_w)
 
 	/* alpha is set to 0 if laserdisc video is enabled */
 	a = (m_transparent0 && offset / 2 == 0) ? 0 : 255;
-	palette_set_color(machine(), offset / 2, rgb_t(a, r, g, b));
+	m_palette->set_pen_color(offset / 2, rgb_t(a, r, g, b));
 }
 
 
@@ -210,7 +210,7 @@ void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		if (flip_screen_y()) sy = 228 - sy;
 
 		
-			m_gfxdecode->gfx(2)->transpen(bitmap,clip,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,clip,
 			code, 0,
 			flip_screen_x(), flip_screen_y(),
 			sx,sy, 0);
@@ -231,7 +231,7 @@ UINT32 gottlieb_state::screen_update_gottlieb(screen_device &screen, bitmap_rgb3
 	if (!m_background_priority)
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	else
-		bitmap.fill(machine().pens[0], cliprect);
+		bitmap.fill(m_palette->pen(0), cliprect);
 
 	/* draw the sprites */
 	draw_sprites(bitmap, cliprect);

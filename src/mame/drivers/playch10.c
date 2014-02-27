@@ -679,7 +679,8 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", playch10)
-	MCFG_PALETTE_LENGTH(256+8*4*16)
+	MCFG_PALETTE_ADD("palette", 256+8*4*16)
+	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
 	MCFG_DEFAULT_LAYOUT(layout_dualhuov)
 
 	MCFG_SCREEN_ADD("top", RASTER)

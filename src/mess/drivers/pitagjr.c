@@ -165,7 +165,7 @@ public:
 	required_memory_bank m_rombank;
 
 	virtual void machine_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pitagjr);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -186,10 +186,10 @@ void pitagjr_state::machine_start()
 	m_rombank->set_entry(1);
 }
 
-void pitagjr_state::palette_init()
+PALETTE_INIT_MEMBER(pitagjr_state, pitagjr)
 {
-	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
-	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 UINT32 pitagjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -212,7 +212,8 @@ static MACHINE_CONFIG_START( pitajr, pitagjr_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(pitagjr_state, pitagjr)
 MACHINE_CONFIG_END
 
 /* ROM definition */

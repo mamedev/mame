@@ -412,7 +412,7 @@ READ16_MEMBER(toaplan1_state::toaplan1_colorram1_r)
 WRITE16_MEMBER(toaplan1_state::toaplan1_colorram1_w)
 {
 	COMBINE_DATA(&m_colorram1[offset]);
-	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
+	m_palette->write(space, offset, data, mem_mask);
 }
 
 /* sprite palette */
@@ -424,7 +424,7 @@ READ16_MEMBER(toaplan1_state::toaplan1_colorram2_r)
 WRITE16_MEMBER(toaplan1_state::toaplan1_colorram2_w)
 {
 	COMBINE_DATA(&m_colorram2[offset]);
-	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset+(m_colorram1.bytes()/2), data, mem_mask);
+	m_palette->write(space, offset+(m_colorram1.bytes()/2), data, mem_mask);
 }
 
 READ16_MEMBER(toaplan1_state::toaplan1_spriteram16_r)

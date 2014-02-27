@@ -61,7 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(maniach_sh_command_w);
 	DECLARE_WRITE8_MEMBER(matmania_paletteram_w);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(matmania);
 	DECLARE_MACHINE_START(matmania);
 	DECLARE_MACHINE_START(maniach);
 	DECLARE_MACHINE_RESET(maniach);

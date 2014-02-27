@@ -1006,15 +1006,15 @@ define NTSC_LIGHT_ORANGE
 ***************************************************************************/
 
 /* Initialise the palette */
-void a7800_state::palette_init()
+PALETTE_INIT_MEMBER(a7800_state, a7800)
 {
-	palette_set_colors(machine(), 0, a7800_palette, ARRAY_LENGTH(a7800_palette));
+	palette.set_pen_colors(0, a7800_palette, ARRAY_LENGTH(a7800_palette));
 }
 
 
 PALETTE_INIT_MEMBER(a7800_state,a7800p)
 {
-	palette_set_colors(machine(), 0, a7800p_palette, ARRAY_LENGTH(a7800p_palette));
+	palette.set_pen_colors(0, a7800p_palette, ARRAY_LENGTH(a7800p_palette));
 }
 
 
@@ -1034,7 +1034,8 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 		MCFG_SCREEN_RAW_PARAMS( 7159090, 456, 0, 320, 262, 26, 26 + 192 + 30 )
 	MCFG_SCREEN_UPDATE_DRIVER(a7800_state, screen_update_a7800)
 
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(a7800_palette))
+	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(a7800_palette))
+	MCFG_PALETTE_INIT_OWNER(a7800_state, a7800)
 
 
 	/* sound hardware */
@@ -1069,7 +1070,9 @@ static MACHINE_CONFIG_DERIVED( a7800_pal, a7800_ntsc )
 
 	MCFG_SCREEN_MODIFY( "screen" )
 		MCFG_SCREEN_RAW_PARAMS( 7093788, 456, 0, 320, 312, 34, 34 + 228 + 30 )
-	MCFG_PALETTE_INIT_OVERRIDE(a7800_state, a7800p )
+
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(a7800_state, a7800p )
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("pokey")

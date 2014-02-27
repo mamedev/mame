@@ -315,7 +315,7 @@ UINT32 igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 &b
 
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
-				bitmap.pix16(y, x) = get_black_pen(machine());
+				bitmap.pix16(y, x) = m_palette->black_pen();
 			else
 #endif
 				bitmap.pix16(y, x) = m_layer[l][scr_addr] | (l << 8);
@@ -389,7 +389,7 @@ WRITE16_MEMBER(igs011_state::igs011_palette)
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
 	rgb = (m_generic_paletteram_16[offset & 0x7ff] & 0xff) | ((m_generic_paletteram_16[offset | 0x800] & 0xff) << 8);
-	palette_set_color_rgb(machine(),offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
+	m_palette->set_pen_color(offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
 }
 
 /***************************************************************************
@@ -3941,7 +3941,7 @@ static MACHINE_CONFIG_START( igs011_base, igs011_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs011_state, screen_update_igs011)
 
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
 //  MCFG_GFXDECODE_ADD("gfxdecode", igs011)
 
 

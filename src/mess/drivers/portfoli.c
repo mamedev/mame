@@ -651,10 +651,10 @@ INPUT_PORTS_END
 //  VIDEO
 //**************************************************************************
 
-void portfolio_state::palette_init()
+PALETTE_INIT_MEMBER(portfolio_state, portfolio)
 {
-	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
-	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 
@@ -851,7 +851,8 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(portfolio_state, portfolio)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", portfolio)
 

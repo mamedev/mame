@@ -229,7 +229,7 @@ READ32_MEMBER(srmp5_state::srmp5_palette_r)
 WRITE32_MEMBER(srmp5_state::srmp5_palette_w)
 {
 	COMBINE_DATA(&m_palram[offset]);
-	palette_set_color(machine(), offset, rgb_t(data << 3 & 0xFF, data >> 2 & 0xFF, data >> 7 & 0xFF));
+	m_palette->set_pen_color(offset, rgb_t(data << 3 & 0xFF, data >> 2 & 0xFF, data >> 7 & 0xFF));
 }
 WRITE32_MEMBER(srmp5_state::bank_w)
 {
@@ -552,9 +552,9 @@ static MACHINE_CONFIG_START( srmp5, srmp5_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp5_state, screen_update_srmp5)
 
-	MCFG_PALETTE_LENGTH(0x1800)
+	MCFG_PALETTE_ADD("palette", 0x1800)
 #ifdef DEBUG_CHAR
-	MCFG_GFXDECODE_ADD("gfxdecode",  srmp5 )
+	MCFG_GFXDECODE_ADD("gfxdecode", srmp5 )
 #endif
 	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
 

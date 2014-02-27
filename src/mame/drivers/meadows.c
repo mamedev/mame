@@ -313,19 +313,6 @@ INTERRUPT_GEN_MEMBER(meadows_state::audio_interrupt)
 
 /*************************************
  *
- *  Palette init
- *
- *************************************/
-
-void meadows_state::palette_init()
-{
-	palette_set_color(machine(), 0, rgb_t::black);
-	palette_set_color(machine(), 1, rgb_t::white);
-}
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -655,7 +642,7 @@ static MACHINE_CONFIG_START( meadows, meadows_state )
 	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", meadows)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -684,7 +671,7 @@ static MACHINE_CONFIG_START( minferno, meadows_state )
 	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", minferno)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* audio hardware */
 	// TODO
@@ -712,7 +699,7 @@ static MACHINE_CONFIG_START( bowl3d, meadows_state )
 	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", meadows)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

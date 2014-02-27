@@ -574,7 +574,7 @@ PALETTE_INIT_MEMBER(mbee_state,mbeeic)
 		r = level[((i>>0)&1)|((i>>2)&2)];
 		g = level[((i>>1)&1)|((i>>3)&2)];
 		b = level[((i>>2)&1)|((i>>4)&2)];
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
 	/* set up foreground palette (64-95) by reading the prom */
@@ -584,7 +584,7 @@ PALETTE_INIT_MEMBER(mbee_state,mbeeic)
 		r = level[((k>>2)&1)|((k>>4)&2)];
 		g = level[((k>>1)&1)|((k>>3)&2)];
 		b = level[((k>>0)&1)|((k>>2)&2)];
-		palette_set_color(machine(), i|64, rgb_t(r, g, b));
+		palette.set_pen_color(i|64, rgb_t(r, g, b));
 	}
 }
 
@@ -602,7 +602,7 @@ PALETTE_INIT_MEMBER(mbee_state,mbeepc85b)
 		r = level[((i>>0)&1)|((i>>2)&2)];
 		g = level[((i>>1)&1)|((i>>3)&2)];
 		b = level[((i>>2)&1)|((i>>4)&2)];
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
 	level[2] = 0xff;
@@ -614,7 +614,7 @@ PALETTE_INIT_MEMBER(mbee_state,mbeepc85b)
 		r = level[((k>>2)&1)|((k>>4)&2)];
 		g = level[((k>>1)&1)|((k>>3)&2)];
 		b = level[((k>>0)&1)|((k>>2)&2)];
-		palette_set_color(machine(), i|64, rgb_t(r, g, b));
+		palette.set_pen_color(i|64, rgb_t(r, g, b));
 	}
 }
 
@@ -630,7 +630,7 @@ PALETTE_INIT_MEMBER(mbee_state,mbeeppc)
 		r = (i & 1) ? 0xc0 : 0;
 		g = (i & 2) ? 0xc0 : 0;
 		b = (i & 4) ? 0xc0 : 0;
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
 	/* set up 8 high intensity colours */
@@ -639,6 +639,6 @@ PALETTE_INIT_MEMBER(mbee_state,mbeeppc)
 		r = (i & 1) ? 0xff : 0;
 		g = (i & 2) ? 0xff : 0;
 		b = (i & 4) ? 0xff : 0;
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }

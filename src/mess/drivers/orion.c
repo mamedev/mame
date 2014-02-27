@@ -111,8 +111,8 @@ static MACHINE_CONFIG_START( orion128, orion_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(orion_state, screen_update_orion128)
 
-	MCFG_PALETTE_LENGTH(18)
-	MCFG_PALETTE_INIT_OVERRIDE(orion_state, orion128 )
+	MCFG_PALETTE_ADD("palette", 18)
+	MCFG_PALETTE_INIT_OWNER(orion_state, orion128 )
 
 	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
@@ -174,8 +174,8 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(orion_state, screen_update_orion128)
 
-	MCFG_PALETTE_LENGTH(18)
-	MCFG_PALETTE_INIT_OVERRIDE(orion_state, orion128 )
+	MCFG_PALETTE_ADD("palette", 18)
+	MCFG_PALETTE_INIT_OWNER(orion_state, orion128 )
 
 	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
@@ -236,8 +236,8 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(orion_state, screen_update_orion128)
 
-	MCFG_PALETTE_LENGTH(18)
-	MCFG_PALETTE_INIT_OVERRIDE(orion_state, orion128 )
+	MCFG_PALETTE_ADD("palette", 18)
+	MCFG_PALETTE_INIT_OWNER(orion_state, orion128 )
 
 	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 

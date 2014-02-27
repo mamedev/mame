@@ -97,21 +97,19 @@ static const unsigned short ti85_palette[32][7] =
 	{ 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf }
 };
 
-void ti85_state::palette_init()
+PALETTE_INIT_MEMBER(ti85_state, ti85)
 {
 	UINT8 i, j, r, g, b;
-
-	machine().colortable = colortable_alloc(machine(), 224);
 
 	for ( i = 0; i < 224; i++ )
 	{
 		r = ti85_colors[i][0]; g = ti85_colors[i][1]; b = ti85_colors[i][2];
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	for (i=0; i < 32; i++)
 		for (j=0; j < 7; j++)
-			colortable_entry_set_value(machine().colortable, i*7+j, ti85_palette[i][j]);
+			palette.set_pen_indirect(i*7+j, ti85_palette[i][j]);
 
 	if (!strncmp(machine().system().name, "ti81", 4))
 	{
@@ -189,6 +187,6 @@ UINT32 ti85_state::screen_update_ti85(screen_device &screen, bitmap_ind16 &bitma
 
 PALETTE_INIT_MEMBER(ti85_state,ti82)
 {
-	palette_set_color(machine(), 0, rgb_t(160, 190, 170));
-	palette_set_color(machine(), 1, rgb_t(83, 111, 138));
+	palette.set_pen_color(0, rgb_t(160, 190, 170));
+	palette.set_pen_color(1, rgb_t(83, 111, 138));
 }

@@ -134,7 +134,7 @@ VIDEO_START_MEMBER(mcr_state,mcr)
 
 void mcr_state::mcr_set_color(int index, int data)
 {
-	palette_set_color_rgb(machine(), index, pal3bit(data >> 6), pal3bit(data >> 0), pal3bit(data >> 3));
+	m_palette->set_pen_color(index, pal3bit(data >> 6), pal3bit(data >> 0), pal3bit(data >> 3));
 }
 
 
@@ -151,7 +151,7 @@ void mcr_state::journey_set_color(int index, int data)
 	b = (b << 5) | (b << 1);
 
 	/* set the BG color */
-	palette_set_color(machine(), index, rgb_t(r, g, b));
+	m_palette->set_pen_color(index, rgb_t(r, g, b));
 
 	/* if this is an odd entry in the upper palette bank, the hardware */
 	/* hard-codes a low 1 bit -- this is used for better grayscales */
@@ -163,7 +163,7 @@ void mcr_state::journey_set_color(int index, int data)
 	}
 
 	/* set the FG color */
-	palette_set_color(machine(), index + 64, rgb_t(r, g, b));
+	m_palette->set_pen_color(index + 64, rgb_t(r, g, b));
 }
 
 

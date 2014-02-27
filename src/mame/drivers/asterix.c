@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, asterix_state )
 	AM_RANGE(0x180000, 0x1807ff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_word_r, k053245_word_w)
 	AM_RANGE(0x180800, 0x180fff) AM_RAM                             // extra RAM, or mirror for the above?
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_word_r, k053244_word_w)
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_lsb_r, k053244_lsb_w)
 	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("IN0")
 	AM_RANGE(0x380002, 0x380003) AM_READ_PORT("IN1")
@@ -281,8 +281,6 @@ static MACHINE_CONFIG_START( asterix, asterix_state )
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -290,13 +288,17 @@ static MACHINE_CONFIG_START( asterix, asterix_state )
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(asterix_state, screen_update_asterix)
 
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K056832_ADD("k056832", asterix_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K053244_ADD("k053244", asterix_k05324x_intf)
 	MCFG_K053244_GFXDECODE("gfxdecode")
+	MCFG_K053244_PALETTE("palette")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

@@ -109,7 +109,7 @@ WRITE16_MEMBER(micro3d_state::micro3d_clut_w)
 
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	word = m_generic_paletteram_16[offset];
-	palette_set_color_rgb(machine(), offset, pal5bit(word >> 6), pal5bit(word >> 1), pal5bit(word >> 11));
+	m_palette->set_pen_color(offset, pal5bit(word >> 6), pal5bit(word >> 1), pal5bit(word >> 11));
 }
 
 WRITE16_MEMBER(micro3d_state::micro3d_creg_w)

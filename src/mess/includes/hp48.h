@@ -69,7 +69,7 @@ public:
 	int m_cur_screen;
 	DECLARE_DRIVER_INIT(hp48);
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(hp48);
 	DECLARE_MACHINE_START(hp48gx);
 	DECLARE_MACHINE_START(hp48g);
 	DECLARE_MACHINE_START(hp48gp);

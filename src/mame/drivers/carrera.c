@@ -63,7 +63,7 @@ public:
 
 	required_shared_ptr<UINT8> m_tileram;
 	DECLARE_READ8_MEMBER(unknown_r);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(carrera);
 	UINT32 screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -263,7 +263,7 @@ UINT32 carrera_state::screen_update_carrera(screen_device &screen, bitmap_ind16 
 		{
 			int tile = m_tileram[count&0x7ff] | m_tileram[(count&0x7ff)+0x800]<<8;
 
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x*8,y*8);
 			count++;
 		}
 	}
@@ -286,7 +286,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-void carrera_state::palette_init()
+PALETTE_INIT_MEMBER(carrera_state, carrera)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int br_bit0, br_bit1, bit0, bit1, r, g, b;
@@ -307,7 +307,7 @@ void carrera_state::palette_init()
 		bit1 = (color_prom[0] >> 5) & 0x01;
 		r = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
@@ -347,8 +347,9 @@ static MACHINE_CONFIG_START( carrera, carrera_state )
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16, mc6845_intf)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", carrera)
-	MCFG_PALETTE_LENGTH(32)
-
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(carrera_state, carrera)
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -187,7 +187,7 @@ UINT32 hvyunit_state::screen_update_hvyunit(screen_device &screen, bitmap_ind16 
 
 	m_bg_tilemap->set_scrollx(0, ((m_port0_data & 0x40) << 2) + m_scrollx + SX_POS); // TODO
 	m_bg_tilemap->set_scrolly(0, ((m_port0_data & 0x80) << 1) + m_scrolly + SY_POS); // TODO
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_pandora->update(bitmap, cliprect);
 
@@ -422,8 +422,8 @@ static ADDRESS_MAP_START( slave_memory, AS_PROGRAM, 8, hvyunit_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(hu_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_split_hi_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_split_lo_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd000, 0xd1ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -668,10 +668,12 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_SCREEN_VBLANK_DRIVER(hvyunit_state, screen_eof_hvyunit)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", hvyunit)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", hvyunit_pandora_config)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	MCFG_KANEKO_PANDORA_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

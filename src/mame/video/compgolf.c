@@ -9,12 +9,12 @@
 #include "includes/compgolf.h"
 
 
-void compgolf_state::palette_init()
+PALETTE_INIT_MEMBER(compgolf_state, compgolf)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 		bit0 = (color_prom[i] >> 0) & 0x01;
@@ -30,7 +30,7 @@ void compgolf_state::palette_init()
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 
@@ -99,14 +99,14 @@ void compgolf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		fx = m_spriteram[offs] & 4;
 		fy = 0; /* ? */
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y,0);
 
 		/* Double Height */
 		if(m_spriteram[offs] & 0x10)
 		{
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				sprite + 1,
 				color, fx, fy, x, y + 16, 0);
 		}

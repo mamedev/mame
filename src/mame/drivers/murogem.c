@@ -122,7 +122,7 @@ public:
 
 	required_shared_ptr<UINT8> m_videoram;
 	DECLARE_WRITE8_MEMBER(outport_w);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(murogem);
 	UINT32 screen_update_murogem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
@@ -206,7 +206,7 @@ static GFXDECODE_START( murogem )
 GFXDECODE_END
 
 
-void murogem_state::palette_init()
+PALETTE_INIT_MEMBER(murogem_state, murogem)
 {}
 
 UINT32 murogem_state::screen_update_murogem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -223,7 +223,7 @@ UINT32 murogem_state::screen_update_murogem(screen_device &screen, bitmap_ind16 
 			int tileno = m_videoram[count]&0x3f;
 			int attr = m_videoram[count+0x400]&0x0f;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,tileno,attr,0,0,xx*8,yy*8,0);
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,tileno,attr,0,0,xx*8,yy*8,0);
 
 			count++;
 
@@ -265,7 +265,8 @@ static MACHINE_CONFIG_START( murogem, murogem_state )
 	MCFG_SCREEN_UPDATE_DRIVER(murogem_state, screen_update_murogem)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", murogem)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(murogem_state, murogem)
 
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 750000, mc6845_intf) /* ? MHz */

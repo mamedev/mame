@@ -241,7 +241,8 @@ static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pcktgal_state, screen_update_pcktgal)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pcktgal)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(pcktgal_state, pcktgal)
 
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)

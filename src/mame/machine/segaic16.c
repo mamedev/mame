@@ -46,7 +46,8 @@ sega_16bit_common_base::sega_16bit_common_base(const machine_config &mconfig, de
 	: driver_device(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
 		m_open_bus_recurse(false),
-		m_palette_entries(0)
+		m_palette_entries(0),
+		m_palette(*this, "palette")
 {
 	palette_init();
 }
@@ -157,9 +158,9 @@ WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
 	int b = ((newval >> 14) & 0x01) | ((newval >> 7) & 0x1e);
 
 	// normal colors
-	palette_set_color_rgb(machine(), offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
-	palette_set_color_rgb(machine(), offset + 1 * m_palette_entries, m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
-	palette_set_color_rgb(machine(), offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
+	m_palette->set_pen_color(offset + 0 * m_palette_entries, m_palette_normal[r],  m_palette_normal[g],  m_palette_normal[b]);
+	m_palette->set_pen_color(offset + 1 * m_palette_entries, m_palette_shadow[r],  m_palette_shadow[g],  m_palette_shadow[b]);
+	m_palette->set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
 }
 
 

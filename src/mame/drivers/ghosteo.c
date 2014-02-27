@@ -653,10 +653,10 @@ static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 
-	MCFG_S3C2410_ADD("s3c2410", 12000000, bballoon_s3c2410_intf)
+	MCFG_S3C2410_ADD("s3c2410", 12000000, bballoon_s3c2410_intf, "palette")
 
 //  MCFG_NAND_ADD("nand", 0xEC, 0x75)
 //  MCFG_DEVICE_CONFIG(bballoon_nand_intf)

@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( cdi, cdi_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 22-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cdi_state, screen_update_cdimono1_lcd)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_DEFAULT_LAYOUT(layout_cdi)
 

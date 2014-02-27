@@ -129,7 +129,7 @@ UINT32 m20_state::screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap,
 	UINT8 pen;
 	UINT32 count;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	count = (0);
 
@@ -142,7 +142,7 @@ UINT32 m20_state::screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap,
 				pen = (m_p_videoram[count]) >> (15 - i) & 1;
 
 				if (screen.visible_area().contains(x + i, y))
-					bitmap.pix32(y, x + i) = machine().pens[pen];
+					bitmap.pix32(y, x + i) = m_palette->pen(pen);
 			}
 
 			count++;
@@ -935,8 +935,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m20_state, screen_update_m20)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* Devices */
 	MCFG_FD1797x_ADD("fd1797", 1000000)

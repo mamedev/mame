@@ -217,14 +217,14 @@ static INPUT_PORTS_START( mbc55x )
 INPUT_PORTS_END
 
 
-void mbc55x_state::palette_init()
+PALETTE_INIT_MEMBER(mbc55x_state, mbc55x)
 {
 	int colourno;
 
 	logerror("initializing palette\n");
 
 	for ( colourno = 0; colourno < SCREEN_NO_COLOURS; colourno++ )
-		palette_set_color_rgb(machine(), colourno, mbc55x_palette[colourno][RED], mbc55x_palette[colourno][GREEN], mbc55x_palette[colourno][BLUE]);
+		palette.set_pen_color(colourno, mbc55x_palette[colourno][RED], mbc55x_palette[colourno][GREEN], mbc55x_palette[colourno][BLUE]);
 }
 
 
@@ -241,8 +241,8 @@ static MACHINE_CONFIG_START( mbc55x, mbc55x_state )
 	MCFG_SCREEN_UPDATE_DEVICE(VID_MC6845_NAME, mc6845_device, screen_update)
 	MCFG_SCREEN_VBLANK_DRIVER(mbc55x_state, screen_eof_mbc55x)
 
-	MCFG_PALETTE_LENGTH(SCREEN_NO_COLOURS * 3)
-
+	MCFG_PALETTE_ADD("palette", SCREEN_NO_COLOURS * 3)
+	MCFG_PALETTE_INIT_OWNER(mbc55x_state, mbc55x)
 //  MCFG_SCREEN_SIZE(650, 260)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 

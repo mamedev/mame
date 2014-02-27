@@ -329,7 +329,7 @@ PALETTE_INIT_MEMBER(homedata_state,mrokumei)
 		g = ((color >>  7) & 0x1e) | ((color >> 2) & 1);
 		b = ((color >>  3) & 0x1e) | ((color >> 1) & 1);
 
-		palette_set_color_rgb(machine(), i, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -352,7 +352,7 @@ PALETTE_INIT_MEMBER(homedata_state,reikaids)
 		r = ((color >>  7) & 0x1e) | ((color >> 2) & 1);
 		b = ((color >>  3) & 0x1e) | ((color >> 1) & 1);
 
-		palette_set_color_rgb(machine(), i, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -375,7 +375,7 @@ PALETTE_INIT_MEMBER(homedata_state,pteacher)
 		r = ((color >>  6) & 0x1f);
 		b = ((color >>  1) & 0x1f);
 
-		palette_set_color_rgb(machine(), i, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -391,7 +391,7 @@ PALETTE_INIT_MEMBER(homedata_state,mirderby)
 		g = color_prom[0x100+i];
 		b = color_prom[0x200+i];
 
-		palette_set_color_rgb(machine(),i,pal4bit(r),pal4bit(g),pal4bit(b));
+		palette.set_pen_color(i,pal4bit(r),pal4bit(g),pal4bit(b));
 	}
 }
 
@@ -798,7 +798,7 @@ UINT32 homedata_state::screen_update_mrokumei(screen_device &screen, bitmap_ind1
 	/* blank screen */
 	if (m_vreg[0x3] == 0xc1 && m_vreg[0x4] == 0xc0 && m_vreg[0x5] == 0xff)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 
@@ -860,7 +860,7 @@ UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind1
 	}
 
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	pri = (m_bank & 0x70) >> 4;
 	for (i = 0; i < 4; i++)
@@ -906,7 +906,7 @@ UINT32 homedata_state::screen_update_reikaids(screen_device &screen, bitmap_ind1
 	}
 
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	pri = (m_blitter_bank & 0x70) >> 4;
 	for (i = 0; i < 4; i++)
@@ -923,7 +923,7 @@ UINT32 homedata_state::screen_update_pteacher(screen_device &screen, bitmap_ind1
 	/* blank screen */
 	if (m_vreg[0x3] == 0xc1 && m_vreg[0x4] == 0xc0 && m_vreg[0x5] == 0xff)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 

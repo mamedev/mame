@@ -248,7 +248,7 @@ public:
 	required_shared_ptr<UINT16> m_videoram;
 	DECLARE_READ16_MEMBER(unk_r);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(goldngam);
 	UINT32 screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
@@ -283,7 +283,7 @@ UINT32 goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_ind1
 }
 
 
-void goldngam_state::palette_init()
+PALETTE_INIT_MEMBER(goldngam_state, goldngam)
 {
 }
 
@@ -571,8 +571,8 @@ static MACHINE_CONFIG_START( swisspkr, goldngam_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", goldngam)
 
-	MCFG_PALETTE_LENGTH(512)
-
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(goldngam_state, goldngam)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

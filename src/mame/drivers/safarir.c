@@ -85,7 +85,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(safarir);
 	UINT32 screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -146,14 +146,14 @@ static GFXDECODE_START( safarir )
 GFXDECODE_END
 
 
-void safarir_state::palette_init()
+PALETTE_INIT_MEMBER(safarir_state, safarir)
 {
 	int i;
 
-	for (i = 0; i < machine().total_colors() / 2; i++)
+	for (i = 0; i < palette.entries() / 2; i++)
 	{
-		palette_set_color(machine(), (i * 2) + 0, rgb_t::black);
-		palette_set_color(machine(), (i * 2) + 1, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
+		palette.set_pen_color((i * 2) + 0, rgb_t::black);
+		palette.set_pen_color((i * 2) + 1, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
 	}
 }
 
@@ -408,7 +408,9 @@ static MACHINE_CONFIG_START( safarir, safarir_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(2*8)
+	MCFG_PALETTE_ADD("palette", 2*8)
+	MCFG_PALETTE_INIT_OWNER(safarir_state, safarir)
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", safarir)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

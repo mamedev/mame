@@ -135,14 +135,14 @@ WRITE32_MEMBER( mac_state::rbv_ramdac_w )
 				// Color Classic has no MONTYPE so the default gets us 512x384, which is right
 				if ((m_montype ? m_montype->read() : 2) == 1)
 				{
-					palette_set_color(space.machine(), m_rbv_clutoffs, rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
+					m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
 					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]);
 					m_rbv_clutoffs++;
 					m_rbv_count = 0;
 				}
 				else
 				{
-					palette_set_color(space.machine(), m_rbv_clutoffs, rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
+					m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
 					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
 					m_rbv_clutoffs++;
 					m_rbv_count = 0;
@@ -171,14 +171,14 @@ WRITE32_MEMBER( mac_state::ariel_ramdac_w ) // this is for the "Ariel" style RAM
 				// Color Classic has no MONTYPE so the default gets us 512x384, which is right
 				if ((m_montype ? m_montype->read() : 2) == 1)
 				{
-					palette_set_color(space.machine(), m_rbv_clutoffs, rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
+					m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
 					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]);
 					m_rbv_clutoffs++;
 					m_rbv_count = 0;
 				}
 				else
 				{
-					palette_set_color(space.machine(), m_rbv_clutoffs, rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
+					m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
 					m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
 					m_rbv_clutoffs++;
 					m_rbv_count = 0;
@@ -934,8 +934,8 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_mac)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(mac_state,mac)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(mac_state,mac)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
 
@@ -1059,8 +1059,8 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macprtb)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(mac_state,mac)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(mac_state,mac)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
@@ -1104,7 +1104,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_CPU_ADD("maincpu", M68020PMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1219,7 +1219,8 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
@@ -1411,8 +1412,8 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macse30)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(mac_state,mac)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(mac_state,mac)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,mac)
 
@@ -1475,8 +1476,8 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macpb140)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(mac_state,mac)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(mac_state,mac)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
@@ -1555,8 +1556,8 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macpb160)
 
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(mac_state,macgsc)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(mac_state,macgsc)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macprtb)
 
@@ -1667,7 +1668,8 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	// IIci only has slots c/d/e
 	MCFG_NUBUS_SLOT_REMOVE("nb9")
@@ -1696,7 +1698,8 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_NUBUS_SLOT_REMOVE("nb9")
 	MCFG_NUBUS_SLOT_REMOVE("nba")
@@ -1747,7 +1750,7 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macsonora)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
@@ -1811,7 +1814,7 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macdafb)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macdafb)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

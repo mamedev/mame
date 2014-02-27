@@ -19,13 +19,10 @@
 **
 ***************************************************************************/
 
-void contra_state::palette_init()
+PALETTE_INIT_MEMBER(contra_state, contra)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int chip;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x80);
 
 	for (chip = 0; chip < 2; chip++)
 	{
@@ -45,7 +42,7 @@ void contra_state::palette_init()
 				else
 					ctabentry = (pal << 4) | (color_prom[(clut << 8) | i] & 0x0f);
 
-				colortable_entry_set_value(machine().colortable, (chip << 11) | (pal << 8) | i, ctabentry);
+				palette.set_pen_indirect((chip << 11) | (pal << 8) | i, ctabentry);
 			}
 		}
 	}
@@ -62,7 +59,7 @@ void contra_state::set_pens(  )
 
 		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine().colortable, i >> 1, color);
+		m_palette->set_indirect_color(i >> 1, color);
 	}
 }
 
@@ -293,7 +290,7 @@ void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	else
 		source = m_buffered_spriteram_2;
 
-	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(bank), machine().colortable, source, base_color, 40, 0, priority_bitmap, (UINT32)-1);
+	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(bank), m_palette, source, base_color, 40, 0, priority_bitmap, (UINT32)-1);
 }
 
 UINT32 contra_state::screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

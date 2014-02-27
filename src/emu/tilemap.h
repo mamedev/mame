@@ -539,7 +539,7 @@ public:
 	void draw(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority = 0, UINT8 priority_mask = 0xff);
 	void draw_roz(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, UINT32 flags, UINT8 priority = 0, UINT8 priority_mask = 0xff);
 	void draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, UINT32 flags, UINT8 priority = 0, UINT8 priority_mask = 0xff);
-	void draw_debug(bitmap_rgb32 &dest, UINT32 scrollx, UINT32 scrolly);
+	void draw_debug(screen_device &screen, bitmap_rgb32 &dest, UINT32 scrollx, UINT32 scrolly);
 
 	// mappers
 	// scan in row-major order with optional flipping
@@ -609,8 +609,8 @@ private:
 	void configure_blit_parameters(blit_parameters &blit, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask);
 	template<class _BitmapClass> void draw_common(screen_device &screen, _BitmapClass &dest, const rectangle &cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask);
 	template<class _BitmapClass> void draw_roz_common(screen_device &screen, _BitmapClass &dest, const rectangle &cliprect, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask);
-	template<class _BitmapClass> void draw_instance(_BitmapClass &dest, const blit_parameters &blit, int xpos, int ypos);
-	template<class _BitmapClass> void draw_roz_core(_BitmapClass &destbitmap, const blit_parameters &blit, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound);
+	template<class _BitmapClass> void draw_instance(screen_device &screen, _BitmapClass &dest, const blit_parameters &blit, int xpos, int ypos);
+	template<class _BitmapClass> void draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, const blit_parameters &blit, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound);
 
 	// managers and devices
 	tilemap_manager *           m_manager;              // reference to the owning manager

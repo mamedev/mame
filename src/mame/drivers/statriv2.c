@@ -116,7 +116,7 @@ public:
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(statriv2);
 	DECLARE_VIDEO_START(vertical);
 	UINT32 screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
@@ -158,14 +158,14 @@ TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
  *
  *************************************/
 
-void statriv2_state::palette_init()
+PALETTE_INIT_MEMBER(statriv2_state, statriv2)
 {
 	int i;
 
 	for (i = 0; i < 64; i++)
 	{
-		palette_set_color_rgb(machine(), 2*i+0, pal1bit(i >> 2), pal1bit(i >> 0), pal1bit(i >> 1));
-		palette_set_color_rgb(machine(), 2*i+1, pal1bit(i >> 5), pal1bit(i >> 3), pal1bit(i >> 4));
+		palette.set_pen_color(2*i+0, pal1bit(i >> 2), pal1bit(i >> 0), pal1bit(i >> 1));
+		palette.set_pen_color(2*i+1, pal1bit(i >> 5), pal1bit(i >> 3), pal1bit(i >> 4));
 	}
 }
 
@@ -205,7 +205,7 @@ WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
 UINT32 statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_tms->screen_reset())
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	else
 		m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -626,8 +626,8 @@ static MACHINE_CONFIG_START( statriv2, statriv2_state )
 	MCFG_TMS9927_ADD("tms", MASTER_CLOCK/2, tms9927_intf)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", horizontal)
-	MCFG_PALETTE_LENGTH(2*64)
-
+	MCFG_PALETTE_ADD("palette", 2*64)
+	MCFG_PALETTE_INIT_OWNER(statriv2_state, statriv2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

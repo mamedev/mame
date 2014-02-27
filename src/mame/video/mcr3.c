@@ -73,16 +73,16 @@ PALETTE_INIT_MEMBER(mcr3_state,spyhunt)
 {
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
-		palette_set_color(machine(),i,rgb_t::black); /* black */
+		palette.set_pen_color(i,rgb_t::black); /* black */
 	}
 
 	/* alpha colors are hard-coded */
-	palette_set_color(machine(),4*16+0,rgb_t(0x00,0x00,0x00));
-	palette_set_color(machine(),4*16+1,rgb_t(0x00,0xff,0x00));
-	palette_set_color(machine(),4*16+2,rgb_t(0x00,0x00,0xff));
-	palette_set_color(machine(),4*16+3,rgb_t(0xff,0xff,0xff));
+	palette.set_pen_color(4*16+0,rgb_t(0x00,0x00,0x00));
+	palette.set_pen_color(4*16+1,rgb_t(0x00,0xff,0x00));
+	palette.set_pen_color(4*16+2,rgb_t(0x00,0x00,0xff));
+	palette.set_pen_color(4*16+3,rgb_t(0xff,0xff,0xff));
 }
 
 
@@ -154,7 +154,7 @@ WRITE8_MEMBER(mcr3_state::mcr3_paletteram_w)
 	offset &= 0x7f;
 
 	/* high bit of red comes from low bit of address */
-	palette_set_color_rgb(machine(), offset / 2, pal3bit(((offset & 1) << 2) + (data >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
+	m_palette->set_pen_color(offset / 2, pal3bit(((offset & 1) << 2) + (data >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
 }
 
 WRITE8_MEMBER(mcr3_state::spyhuntpr_paletteram_w)
@@ -166,7 +166,7 @@ WRITE8_MEMBER(mcr3_state::spyhuntpr_paletteram_w)
 	int g = (data & 0x38) >> 3;
 	int b = (data & 0xc0) >> 6;
 
-	palette_set_color(machine(), offset^0xf, rgb_t(r<<5,g<<5,b<<6));
+	m_palette->set_pen_color(offset^0xf, rgb_t(r<<5,g<<5,b<<6));
 }
 
 
@@ -277,21 +277,21 @@ void mcr3_state::mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap
 		if (!mcr_cocktail_flip)
 		{
 			/* first draw the sprite, visible */
-			m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect, code, color, flipx, flipy, sx, sy,
+			m_gfxdecode->gfx(1)->prio_transmask(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy,
 					screen.priority(), 0x00, 0x0101);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
-			m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect, code, color, flipx, flipy, sx, sy,
+			m_gfxdecode->gfx(1)->prio_transmask(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy,
 					screen.priority(), 0x02, 0xfeff);
 		}
 		else
 		{
 			/* first draw the sprite, visible */
-			m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect, code, color, !flipx, !flipy, 480 - sx, 452 - sy,
+			m_gfxdecode->gfx(1)->prio_transmask(m_palette,bitmap,cliprect, code, color, !flipx, !flipy, 480 - sx, 452 - sy,
 					screen.priority(), 0x00, 0x0101);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
-			m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect, code, color, !flipx, !flipy, 480 - sx, 452 - sy,
+			m_gfxdecode->gfx(1)->prio_transmask(m_palette,bitmap,cliprect, code, color, !flipx, !flipy, 480 - sx, 452 - sy,
 					screen.priority(), 0x02, 0xfeff);
 		}
 	}

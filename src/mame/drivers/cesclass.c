@@ -42,7 +42,7 @@ public:
 
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
+	DECLARE_PALETTE_INIT(cesclassic);
 protected:
 
 	// devices
@@ -53,7 +53,6 @@ protected:
 	// driver_device overrides
 	virtual void video_start();
 
-	virtual void palette_init();
 };
 
 
@@ -65,7 +64,7 @@ UINT32 cesclassic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 {
 	int x,y,xi;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	{
 		for(y=0;y<64;y++)
@@ -80,7 +79,7 @@ UINT32 cesclassic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 					color |= (((m_vram[x+y*16])>>(15-xi)) & 1)<<1;
 
 					if((x*16+xi)<256 && ((y)+0)<256)
-						bitmap.pix32(y, x*16+xi) = machine().pens[color];
+						bitmap.pix32(y, x*16+xi) = m_palette->pen(color);
 				}
 			}
 		}
@@ -233,12 +232,12 @@ static INPUT_PORTS_START( cesclassic )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("l_lcd")
 INPUT_PORTS_END
 
-void cesclassic_state::palette_init()
+PALETTE_INIT_MEMBER(cesclassic_state, cesclassic)
 {
 	int i;
 
 	for (i = 0; i < 4; i++)
-		palette_set_color_rgb(machine(), i, pal2bit(i), 0, 0);
+		palette.set_pen_color(i, pal2bit(i), 0, 0);
 }
 
 static MACHINE_CONFIG_START( cesclassic, cesclassic_state )
@@ -259,7 +258,8 @@ static MACHINE_CONFIG_START( cesclassic, cesclassic_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 8*16*2-1, 0*8, 8*8-1)
 	MCFG_DEFAULT_LAYOUT( layout_lcd )
 
-	MCFG_PALETTE_LENGTH(4)
+	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(cesclassic_state, cesclassic)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_OKIM6295_ADD("oki", 24000000/16, OKIM6295_PIN7_LOW)

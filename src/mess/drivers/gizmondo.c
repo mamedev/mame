@@ -202,7 +202,7 @@ static MACHINE_CONFIG_START( gizmondo, gizmondo_state )
 	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
 	MCFG_CPU_PROGRAM_MAP(gizmondo_map)
 
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD("palette", 32768)
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( gizmondo, gizmondo_state )
 
 	MCFG_GF4500_ADD("gf4500")
 
-	MCFG_S3C2440_ADD("s3c2440", 12000000, gizmondo_s3c2440_intf)
+	MCFG_S3C2440_ADD("s3c2440", 12000000, gizmondo_s3c2440_intf, "palette")
 
 	MCFG_DISKONCHIP_G3_ADD("diskonchip", 64)
 

@@ -22,7 +22,7 @@
   palette decode
 ***************************************************************************/
 
-void chaknpop_state::palette_init()
+PALETTE_INIT_MEMBER(chaknpop_state, chaknpop)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -52,7 +52,7 @@ void chaknpop_state::palette_init()
 		bit2 = (col >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -199,7 +199,7 @@ void chaknpop_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 
 		
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				tile,
 				color,
 				flipx, flipy,

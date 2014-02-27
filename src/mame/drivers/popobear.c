@@ -222,7 +222,7 @@ void popobear_state::video_start()
 
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), popobear_char_layout, (UINT8 *)m_vram_rearranged, machine().total_colors() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), popobear_char_layout, (UINT8 *)m_vram_rearranged, m_palette->entries() / 16, 0)));
 
 	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
@@ -338,7 +338,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 						// colours on game over screen are still wrong without the weird param kludge above
 						if (pix&0x3f)
 						{
-							bitmap.pix16(y_draw, x_draw) = machine().pens[((pix+(add_it))&0xff)+0x100];
+							bitmap.pix16(y_draw, x_draw) = m_palette->pen(((pix+(add_it))&0xff)+0x100);
 						}
 					}
 
@@ -491,7 +491,7 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	AM_RANGE(0x480034, 0x480035) AM_RAM // coin counter or coin lockout
 	AM_RANGE(0x48003a, 0x48003b) AM_RAM //AM_READ(popo_48003a_r) AM_WRITE(popo_48003a_w)
 
-	AM_RANGE(0x480400, 0x4807ff) AM_RAM AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x480400, 0x4807ff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")
 	AM_RANGE(0x520000, 0x520001) AM_READ_PORT("IN1")
@@ -651,7 +651,9 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 
 	MCFG_SCREEN_SIZE(128*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 239)
-	MCFG_PALETTE_LENGTH(256*2)
+
+	MCFG_PALETTE_ADD("palette", 256*2)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

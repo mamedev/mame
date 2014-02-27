@@ -19,7 +19,7 @@
  *
  *************************************/
 
-void m58_state::palette_init()
+PALETTE_INIT_MEMBER(m58_state, m58)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	const UINT8 *char_lopal = color_prom + 0x000;
@@ -32,8 +32,6 @@ void m58_state::palette_init()
 	static const int resistances_2[2]  = { 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[3], scale;
 	int i;
-
-	machine().colortable = colortable_alloc(machine(), 256+256+16);
 
 	/* compute palette information for characters/radar */
 	scale = compute_resistor_weights(0, 255, -1.0,
@@ -49,7 +47,7 @@ void m58_state::palette_init()
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r,g,b));
 	}
 
 	/* radar palette */
@@ -60,7 +58,7 @@ void m58_state::palette_init()
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		colortable_palette_set_color(machine().colortable, 256+i, rgb_t(r,g,b));
+		palette.set_indirect_color(256+i, rgb_t(r,g,b));
 	}
 
 	/* compute palette information for sprites */
@@ -77,22 +75,22 @@ void m58_state::palette_init()
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		colortable_palette_set_color(machine().colortable, 256+256+i, rgb_t(r,g,b));
+		palette.set_indirect_color(256+256+i, rgb_t(r,g,b));
 	}
 
 	/* character lookup table */
 	for (i = 0; i < 256; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* radar lookup table */
 	for (i = 0; i < 256; i++)
-		colortable_entry_set_value(machine().colortable, 256+i, 256+i);
+		palette.set_pen_indirect(256+i, 256+i);
 
 	/* sprite lookup table */
 	for (i = 0; i < 256; i++)
 	{
 		UINT8 promval = sprite_table[i] & 0x0f;
-		colortable_entry_set_value(machine().colortable, 256+256+i, 256+256+promval);
+		palette.set_pen_indirect(256+256+i, 256+256+promval);
 	}
 }
 
@@ -209,7 +207,7 @@ WRITE8_MEMBER(m58_state::yard_flipscreen_w)
  *
  *************************************/
 
-#define DRAW_SPRITE(code, sy)  m_gfxdecode->gfx(1)->transmask(bitmap,cliprect, code, color, flipx, flipy, sx, sy, colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 512));
+#define DRAW_SPRITE(code, sy)  m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy, m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512));
 
 void m58_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {

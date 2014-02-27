@@ -33,7 +33,7 @@ void darkseal_state::update_24bitcol(int offset)
 	g = (m_generic_paletteram_16[offset] >> 8) & 0xff;
 	b = (m_generic_paletteram2_16[offset] >> 0) & 0xff;
 
-	palette_set_color(machine(),offset,rgb_t(r,g,b));
+	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
 WRITE16_MEMBER(darkseal_state::darkseal_palette_24bit_rg_w)
@@ -60,7 +60,7 @@ UINT32 darkseal_state::screen_update_darkseal(screen_device &screen, bitmap_ind1
 {
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf1_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf3_rowscroll);

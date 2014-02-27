@@ -2945,8 +2945,8 @@ static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fw1stpal)
 
-	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_PALETTE_INIT_OVERRIDE(funworld_state, funworld)
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(funworld_state, funworld)
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, funworld)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)    /* 2MHz, veryfied on jollycrd & royalcrd */

@@ -735,7 +735,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 
 	/* color RAM */
 	else if (offset >= 0x4b00 && offset < 0x4c00)
-		palette_set_color_rgb(machine(), offset & 7, pal1bit(~data >> 3), pal1bit(~data >> 2), pal1bit(~data >> 1));
+		m_palette->set_pen_color(offset & 7, pal1bit(~data >> 3), pal1bit(~data >> 2), pal1bit(~data >> 1));
 
 	/* watchdog */
 	else if (offset >= 0x4c00 && offset < 0x4d00)
@@ -1030,7 +1030,7 @@ static MACHINE_CONFIG_START( missile, missile_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)

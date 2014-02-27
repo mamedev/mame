@@ -59,7 +59,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pk8020);
 	UINT32 screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pk8020_interrupt);
 	DECLARE_READ8_MEMBER(pk8020_porta_r);

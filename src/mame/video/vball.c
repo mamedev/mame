@@ -75,7 +75,7 @@ void vball_state::vb_bgprombank_w( int bank )
 
 	color_prom = memregion("proms")->base() + bank*0x80;
 	for (i=0;i<128;i++, color_prom++) {
-		palette_set_color_rgb(machine(),i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
+		m_palette->set_pen_color(i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
 						pal4bit(color_prom[0x800] >> 0));
 	}
 	m_vb_bgprombank=bank;
@@ -90,7 +90,7 @@ void vball_state::vb_spprombank_w( int bank )
 
 	color_prom = memregion("proms")->base()+0x400 + bank*0x80;
 	for (i=128;i<256;i++,color_prom++)  {
-		palette_set_color_rgb(machine(),i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
+		m_palette->set_pen_color(i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
 						pal4bit(color_prom[0x800] >> 0));
 	}
 	m_vb_spprombank=bank;
@@ -101,7 +101,7 @@ void vball_state::vb_mark_all_dirty(  )
 	m_bg_tilemap->mark_all_dirty();
 }
 
-#define DRAW_SPRITE( order, sx, sy ) gfx->transpen(bitmap,\
+#define DRAW_SPRITE( order, sx, sy ) gfx->transpen(m_palette,bitmap,\
 					cliprect, \
 					(which+order),color,flipx,flipy,sx,sy,0);
 

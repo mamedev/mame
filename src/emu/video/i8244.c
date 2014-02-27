@@ -180,7 +180,7 @@ void i8244_device::device_reset()
 }
 
 
-void i8244_device::palette_init()
+PALETTE_INIT_MEMBER(i8244_device, i8244)
 {
 	static const UINT8 i8244_colors[3*16] =
 	{
@@ -204,7 +204,7 @@ void i8244_device::palette_init()
 
 	for ( int i = 0; i < 16; i++ )
 	{
-		palette_set_color_rgb( machine(), i, i8244_colors[i*3], i8244_colors[i*3+1], i8244_colors[i*3+2] );
+		palette.set_pen_color( i, i8244_colors[i*3], i8244_colors[i*3+1], i8244_colors[i*3+2] );
 	}
 }
 

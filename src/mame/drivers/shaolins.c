@@ -201,8 +201,8 @@ static MACHINE_CONFIG_START( shaolins, shaolins_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shaolins_state, screen_update_shaolins)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", shaolins)
-	MCFG_PALETTE_LENGTH(16*8*16+16*8*16)
-
+	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
+	MCFG_PALETTE_INIT_OWNER(shaolins_state, shaolins)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

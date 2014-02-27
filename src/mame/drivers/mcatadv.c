@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( mcatadv_map, AS_PROGRAM, 16, mcatadv_state )
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(mcatadv_videoram1_w) AM_SHARE("videoram1") // Tilemap 0
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(mcatadv_videoram2_w) AM_SHARE("videoram2") // Tilemap 1
 
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x602000, 0x602fff) AM_RAM // Bigger than needs to be?
 
 	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_SHARE("spriteram") // Sprites, two halves for double buffering
@@ -452,7 +452,8 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	MCFG_SCREEN_VBLANK_DRIVER(mcatadv_state, screen_eof_mcatadv)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mcatadv)
-	MCFG_PALETTE_LENGTH(0x2000/2)
+	MCFG_PALETTE_ADD("palette", 0x2000/2)
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 

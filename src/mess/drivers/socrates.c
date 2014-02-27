@@ -126,7 +126,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
 
-	rgb_t m_palette[256];
+	rgb_t m_palette_val[256];
 
 	UINT8 m_data[8];
 	UINT8 m_rom_bank;
@@ -163,7 +163,7 @@ public:
 	DECLARE_DRIVER_INIT(socrates);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(socrates);
 	UINT32 screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(assert_irq);
 	TIMER_CALLBACK_MEMBER(clear_speech_cb);
@@ -700,14 +700,14 @@ return composedcolor;
 }
 
 
-void socrates_state::palette_init()
+PALETTE_INIT_MEMBER(socrates_state, socrates)
 {
 	int i; // iterator
 	for (i = 0; i < 256; i++)
 	{
-		m_palette[i] = socrates_create_color(i);
+		m_palette_val[i] = socrates_create_color(i);
 	}
-	palette_set_colors(machine(), 0, m_palette, ARRAY_LENGTH(m_palette));
+	palette.set_pen_colors(0, m_palette_val, ARRAY_LENGTH(m_palette_val));
 }
 
 void socrates_state::video_start()
@@ -1375,8 +1375,8 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 219) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
 
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1409,7 +1409,7 @@ static MACHINE_CONFIG_START( socrates_pal, socrates_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 229) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	/* sound hardware */
@@ -1454,7 +1454,7 @@ static MACHINE_CONFIG_START( iqunlimz, iqunlim_state )
 	MCFG_SCREEN_UPDATE_DRIVER(iqunlim_state, screen_update)
 	MCFG_SCREEN_SIZE(256, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

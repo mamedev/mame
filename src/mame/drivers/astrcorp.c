@@ -149,7 +149,7 @@ void astrocorp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 				{
 					for (xwrap = 0 ; xwrap <= 0x200 ; xwrap += 0x200)
 					{
-						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 								code, 0,
 								0, 0,
 								sx + x * 16 - xwrap, sy + y * 16 - ywrap, 0xff);
@@ -166,7 +166,7 @@ UINT32 astrocorp_state::screen_update_astrocorp(screen_device &screen, bitmap_in
 	if (m_screen_enable & 1)
 		copybitmap(bitmap, m_bitmap, 0,0,0,0, cliprect);
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 
 	return 0;
 }
@@ -290,7 +290,7 @@ READ16_MEMBER(astrocorp_state::astrocorp_unk_r)
 WRITE16_MEMBER(astrocorp_state::astrocorp_palette_w)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
-	palette_set_color_rgb(machine(), offset,
+	m_palette->set_pen_color(offset,
 		pal5bit((m_paletteram[offset] >>  0) & 0x1f),
 		pal6bit((m_paletteram[offset] >>  5) & 0x3f),
 		pal5bit((m_paletteram[offset] >> 11) & 0x1f)
@@ -494,7 +494,7 @@ static MACHINE_CONFIG_START( showhand, astrocorp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", astrocorp)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
 
@@ -545,7 +545,7 @@ static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", astrocorp)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
 

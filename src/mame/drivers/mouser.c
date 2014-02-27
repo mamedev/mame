@@ -214,8 +214,8 @@ static MACHINE_CONFIG_START( mouser, mouser_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mouser_state, screen_update_mouser)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mouser)
-	MCFG_PALETTE_LENGTH(64)
-
+	MCFG_PALETTE_ADD("palette", 64)
+	MCFG_PALETTE_INIT_OWNER(mouser_state, mouser)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

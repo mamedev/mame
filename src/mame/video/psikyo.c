@@ -343,7 +343,7 @@ void psikyo_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 				int addr = (code * 2) & (TILES_LEN - 1);
 
 				if (zoomx == 32 && zoomy == 32)
-					m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_transpen(m_palette,bitmap,cliprect,
 							TILES[addr+1] * 256 + TILES[addr],
 							attr >> 8,
 							flipx, flipy,
@@ -351,7 +351,7 @@ void psikyo_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 							screen.priority(),
 							pri[(attr & 0xc0) >> 6],trans_pen);
 				else
-					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 								TILES[addr+1] * 256 + TILES[addr],
 								attr >> 8,
 								flipx, flipy,
@@ -462,7 +462,7 @@ void psikyo_state::draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bi
 				int addr = (code * 2) & (TILES_LEN-1);
 
 				if (zoomx == 32 && zoomy == 32)
-					m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_transpen(m_palette,bitmap,cliprect,
 							TILES[addr+1] * 256 + TILES[addr],
 							attr >> 8,
 							flipx, flipy,
@@ -470,7 +470,7 @@ void psikyo_state::draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bi
 							screen.priority(),
 							pri[(attr & 0xc0) >> 6],trans_pen);
 				else
-					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 								TILES[addr+1] * 256 + TILES[addr],
 								attr >> 8,
 								flipx, flipy,
@@ -655,7 +655,7 @@ UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &b
 	m_tilemap_1_size2->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 	m_tilemap_1_size3->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	screen.priority().fill(0, cliprect);
 
@@ -828,7 +828,7 @@ UINT32 psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_
 	m_tilemap_1_size2->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 	m_tilemap_1_size3->set_transparent_pen((layer1_ctrl & 8 ? 0 : 15));
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	screen.priority().fill(0, cliprect);
 

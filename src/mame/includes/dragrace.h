@@ -55,7 +55,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(dragrace);
 	UINT32 screen_update_dragrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(dragrace_frame_callback);
 	void dragrace_update_misc_flags( address_space &space );

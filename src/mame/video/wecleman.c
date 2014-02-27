@@ -75,7 +75,7 @@ struct sprite
 static void get_sprite_info(running_machine &machine)
 {
 	wecleman_state *state = machine.driver_data<wecleman_state>();
-	const pen_t *base_pal = machine.pens;
+	const pen_t *base_pal = state->m_palette->pens();
 	UINT8 *base_gfx = state->memregion("gfx1")->base();
 	int gfx_max     = state->memregion("gfx1")->bytes();
 
@@ -565,7 +565,7 @@ static void wecleman_draw_road(running_machine &machine, bitmap_rgb32 &bitmap, c
 	int scrollx, sy, sx;
 	int mdy, tdy, i;
 
-	rgb_ptr = machine.pens;
+	rgb_ptr = state->m_palette->pens();
 
 	if (priority == 0x02)
 	{
@@ -689,7 +689,7 @@ static void draw_cloud(bitmap_rgb32 &bitmap,
 
 	dst_base = &bitmap.pix32(y0+dy, x0+dx);
 
-	pal_base = gfx->machine().pens + pal_offset * gfx->granularity();
+	pal_base = state->m_palette->pens() + pal_offset * gfx->granularity();
 
 	alpha <<= 6;
 
@@ -810,7 +810,7 @@ static void hotchase_draw_road(running_machine &machine, bitmap_ind16 &bitmap, c
 
 		for (sx=0; sx<2*XSIZE; sx+=64)
 		{
-			state->m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			state->m_gfxdecode->gfx(0)->transpen(state->m_palette,bitmap,cliprect,
 					code++,
 					color,
 					0,0,
@@ -858,9 +858,9 @@ WRITE16_MEMBER(wecleman_state::hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w)
 	g = ((newword >> 3) & 0x1E ) | ((newword >> 13) & 0x01);
 	b = ((newword >> 7) & 0x1E ) | ((newword >> 14) & 0x01);
 
-	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	r>>=1; g>>=1; b>>=1;
-	palette_set_color_rgb(machine(), offset+0x800, pal5bit(r)/2, pal5bit(g)/2, pal5bit(b)/2);
+	m_palette->set_pen_color(offset+0x800, pal5bit(r)/2, pal5bit(g)/2, pal5bit(b)/2);
 }
 
 WRITE16_MEMBER(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)
@@ -869,7 +869,7 @@ WRITE16_MEMBER(wecleman_state::wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w)
 
 	// the highest nibble has some unknown functions
 //  if (newword & 0xf000) logerror("MSN set on color %03x: %1x\n", offset, newword>>12);
-	palette_set_color_rgb(machine(), offset, pal4bit(newword >> 0), pal4bit(newword >> 4), pal4bit(newword >> 8));
+	m_palette->set_pen_color(offset, pal4bit(newword >> 0), pal4bit(newword >> 4), pal4bit(newword >> 8));
 }
 
 
@@ -904,7 +904,7 @@ VIDEO_START_MEMBER(wecleman_state,wecleman)
 	m_cloud_blend = BLEND_MAX;
 	m_cloud_ds = 0;
 	m_cloud_visible = 0;
-	m_black_pen = get_black_pen(machine());
+	m_black_pen = m_palette->black_pen();
 
 	m_rgb_half     =          (UINT16*)(buffer + 0x00000);
 	m_t32x32pm     =             (int*)(buffer + 0x10020);
@@ -1001,7 +1001,7 @@ VIDEO_START_MEMBER(wecleman_state,hotchase)
 	m_gfx_bank = bank;
 	m_spr_offsx = -0xc0;
 	m_spr_offsy = 0;
-	m_black_pen = get_black_pen(machine());
+	m_black_pen = m_palette->black_pen();
 
 	m_spr_ptr_list = (struct sprite **)buffer;
 
@@ -1021,7 +1021,7 @@ UINT32 wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rgb3
 	int cloud_sx, cloud_sy;
 	int i, j, k;
 
-	mrct = machine().pens;
+	mrct = m_palette->pens();
 
 	video_on = m_irqctrl & 0x40;
 

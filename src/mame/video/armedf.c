@@ -260,7 +260,7 @@ void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,g
 							UINT32 code,UINT32 color, UINT32 clut,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 {
-	const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 	int x_index_base, y_index, sx, sy, ex, ey;
 	int xinc, yinc;

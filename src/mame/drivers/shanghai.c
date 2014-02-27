@@ -52,7 +52,7 @@ PALETTE_INIT_MEMBER(shanghai_state,shanghai)
 	int i;
 
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -73,7 +73,7 @@ PALETTE_INIT_MEMBER(shanghai_state,shanghai)
 		bit2 = (i >> 1) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -150,7 +150,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangha2_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0x04000, 0x041ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x04000, 0x041ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x09012, 0x09013) AM_READ_PORT("P2")
 	AM_RANGE(0x09014, 0x09015) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x09016, 0x0901f) AM_WRITENOP // 0x9016 is set to 0 at the boot
-	AM_RANGE(0x0a000, 0x0a1ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0a000, 0x0a1ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0b010, 0x0b01f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -453,9 +453,9 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
 	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
 
-	MCFG_PALETTE_LENGTH(256)
-
-	MCFG_PALETTE_INIT_OVERRIDE(shanghai_state,shanghai)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_INIT_OWNER(shanghai_state,shanghai)
 
 	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 
@@ -486,8 +486,8 @@ static MACHINE_CONFIG_START( shangha2, shanghai_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
 	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
 
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 
@@ -521,8 +521,8 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
 	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
 
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 

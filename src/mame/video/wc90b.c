@@ -114,7 +114,7 @@ void wc90b_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 			sy = 240 - spriteram[offs + 1];
 
-			m_gfxdecode->gfx(17)->transpen(bitmap,cliprect, code,
+			m_gfxdecode->gfx(17)->transpen(m_palette,bitmap,cliprect, code,
 					flags >> 4, /* color */
 					bank & 1,   /* flipx */
 					bank & 2,   /* flipy */

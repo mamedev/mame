@@ -536,10 +536,9 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_ind16)
 
 
-//  MCFG_GFXDECODE_ADD("gfxdecode",  skimaxx )
+//  MCFG_GFXDECODE_ADD("gfxdecode", skimaxx )
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRRR_GGGGG_BBBBB)
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

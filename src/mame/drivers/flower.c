@@ -274,7 +274,8 @@ static MACHINE_CONFIG_START( flower, flower_state )
 	MCFG_SCREEN_UPDATE_DRIVER(flower_state, screen_update_flower)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", flower)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(flower_state, flower)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -43,7 +43,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, c
 static const UINT32 timer_clks[4] = { 16777216, 16777216/64, 16777216/256, 16777216/1024 };
 
 
-void gba_state::palette_init()
+PALETTE_INIT_MEMBER(gba_state, gba)
 {
 	UINT8 r, g, b;
 	for( b = 0; b < 32; b++ )
@@ -52,7 +52,7 @@ void gba_state::palette_init()
 		{
 			for( r = 0; r < 32; r++ )
 			{
-				palette_set_color_rgb( machine(), ( b << 10 ) | ( g << 5 ) | r, pal5bit(r), pal5bit(g), pal5bit(b) );
+				palette.set_pen_color( ( b << 10 ) | ( g << 5 ) | r, pal5bit(r), pal5bit(g), pal5bit(b) );
 			}
 		}
 	}
@@ -2257,7 +2257,8 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gba_state, screen_update)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_PALETTE_INIT_OWNER(gba_state, gba)
 
 	MCFG_SPEAKER_STANDARD_STEREO("spkleft", "spkright")
 	MCFG_SOUND_ADD("custom", GAMEBOY, 0)

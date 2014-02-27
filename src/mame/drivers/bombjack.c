@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bombjack_state )
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(bombjack_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x9820, 0x987f) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITENOP
-	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0x9c00, 0x9cff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x9e00, 0x9e00) AM_WRITE(bombjack_background_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("P1")
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(irq_mask_w)
@@ -371,7 +371,8 @@ static MACHINE_CONFIG_START( bombjack, bombjack_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bombjack_state, screen_update_bombjack)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bombjack)
-	MCFG_PALETTE_LENGTH(128)
+	MCFG_PALETTE_ADD("palette", 128)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 
 	/* sound hardware */

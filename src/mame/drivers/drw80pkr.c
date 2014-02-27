@@ -71,7 +71,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(drw80pkr);
 	UINT32 screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -350,12 +350,12 @@ UINT32 drw80pkr_state::screen_update_drw80pkr(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void drw80pkr_state::palette_init()
+PALETTE_INIT_MEMBER(drw80pkr_state, drw80pkr)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int j;
 
-	for (j = 0; j < machine().total_colors(); j++)
+	for (j = 0; j < palette.entries(); j++)
 	{
 		int r, g, b, tr, tg, tb, i;
 
@@ -374,7 +374,7 @@ void drw80pkr_state::palette_init()
 		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
 		b = tb - (i * (tb / 5));
 
-		palette_set_color(machine(), j, rgb_t(r, g, b));
+		palette.set_pen_color(j, rgb_t(r, g, b));
 	}
 }
 
@@ -483,8 +483,8 @@ static MACHINE_CONFIG_START( drw80pkr, drw80pkr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(drw80pkr_state, screen_update_drw80pkr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", drw80pkr)
-	MCFG_PALETTE_LENGTH(16*16)
-
+	MCFG_PALETTE_ADD("palette", 16*16)
+	MCFG_PALETTE_INIT_OWNER(drw80pkr_state, drw80pkr)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

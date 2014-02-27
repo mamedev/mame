@@ -3171,7 +3171,7 @@ static MACHINE_CONFIG_START( cps1_10MHz, cps_state )
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
-	MCFG_PALETTE_LENGTH(0xc00)
+	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 

@@ -107,7 +107,7 @@ void suprgolf_state::video_start()
 UINT32 suprgolf_state::screen_update_suprgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count,color;
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	{
 		count = 0;
@@ -119,7 +119,7 @@ UINT32 suprgolf_state::screen_update_suprgolf(screen_device &screen, bitmap_ind1
 				color = m_bg_fb[count];
 
 				if(x <= cliprect.max_x && y <= cliprect.max_y)
-					bitmap.pix16(y, x) = machine().pens[(color & 0x7ff)];
+					bitmap.pix16(y, x) = m_palette->pen((color & 0x7ff));
 
 				count++;
 			}
@@ -136,7 +136,7 @@ UINT32 suprgolf_state::screen_update_suprgolf(screen_device &screen, bitmap_ind1
 				color = m_fg_fb[count];
 
 				if(((m_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect.max_x && y <= cliprect.max_y))
-					bitmap.pix16(y, x) = machine().pens[(color & 0x7ff)];
+					bitmap.pix16(y, x) = m_palette->pen((color & 0x7ff));
 
 				count++;
 			}
@@ -169,7 +169,7 @@ WRITE8_MEMBER(suprgolf_state::suprgolf_videoram_w)
 		g = (datax & 0x8000) ? 0 : ((datax)&0x03e0)>>5;
 		r = (datax & 0x8000) ? 0 : ((datax)&0x7c00)>>10;
 
-		palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 	else
 	{
@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suprgolf_state, screen_update_suprgolf)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", suprgolf)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

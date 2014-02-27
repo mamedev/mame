@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 	AM_RANGE(0x905f6e, 0x905f6f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(gauntlet_yscroll_w) AM_SHARE("yscroll")
 	AM_RANGE(0x905000, 0x905f7f) AM_MIRROR(0x2c8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0x905f80, 0x905fff) AM_MIRROR(0x2c8000) AM_RAM AM_SHARE("mob:slip")
-	AM_RANGE(0x910000, 0x9107ff) AM_MIRROR(0x2cf800) AM_RAM_WRITE(paletteram_IIIIRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x910000, 0x9107ff) AM_MIRROR(0x2cf800) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x930000, 0x930001) AM_MIRROR(0x2cfffe) AM_WRITE(gauntlet_xscroll_w) AM_SHARE("xscroll")
 ADDRESS_MAP_END
 
@@ -510,7 +510,9 @@ static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE_ADD("gfxdecode", gauntlet)
-	MCFG_PALETTE_LENGTH(1024)
+
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, gauntlet_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, gauntlet_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)

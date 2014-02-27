@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( drgnmst_main_map, AS_PROGRAM, 16, drgnmst_state )
 	AM_RANGE(0x800180, 0x800181) AM_WRITE(drgnmst_snd_command_w)
 	AM_RANGE(0x800188, 0x800189) AM_WRITE(drgnmst_snd_flag_w)
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITENOP
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x904000, 0x907fff) AM_RAM_WRITE(drgnmst_md_videoram_w) AM_SHARE("md_videoram")
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(drgnmst_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(drgnmst_fg_videoram_w) AM_SHARE("fg_videoram")
@@ -409,8 +409,8 @@ static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drgnmst_state, screen_update_drgnmst)
 
-	MCFG_PALETTE_LENGTH(0x2000)
-
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

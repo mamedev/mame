@@ -117,7 +117,7 @@ WRITE16_MEMBER(koftball_state::bmc_RAMDAC_offset_w)
 WRITE16_MEMBER(koftball_state::bmc_RAMDAC_color_w)
 {
 	m_colorram[m_clr_offset]=data;
-	palette_set_color_rgb(machine(),m_clr_offset/3,pal6bit(m_colorram[(m_clr_offset/3)*3]),pal6bit(m_colorram[(m_clr_offset/3)*3+1]),pal6bit(m_colorram[(m_clr_offset/3)*3+2]));
+	m_palette->set_pen_color(m_clr_offset/3,pal6bit(m_colorram[(m_clr_offset/3)*3]),pal6bit(m_colorram[(m_clr_offset/3)*3+1]),pal6bit(m_colorram[(m_clr_offset/3)*3+2]));
 	m_clr_offset=(m_clr_offset+1)%768;
 }
 
@@ -253,7 +253,7 @@ static MACHINE_CONFIG_START( koftball, koftball_state )
 	MCFG_SCREEN_UPDATE_DRIVER(koftball_state, screen_update_koftball)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 30*8-1)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", koftball)
 

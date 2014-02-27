@@ -274,8 +274,8 @@ static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(amspdwy_state, screen_update_amspdwy)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", amspdwy)
-	MCFG_PALETTE_LENGTH(32)
-
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

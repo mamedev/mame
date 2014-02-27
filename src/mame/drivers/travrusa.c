@@ -318,8 +318,8 @@ static MACHINE_CONFIG_START( travrusa, travrusa_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", travrusa)
 
-	MCFG_PALETTE_LENGTH(16*8+16*8)
-
+	MCFG_PALETTE_ADD("palette", 16*8+16*8)
+	MCFG_PALETTE_INIT_OWNER(travrusa_state, travrusa)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(m52_sound_c_audio)
@@ -329,7 +329,8 @@ static MACHINE_CONFIG_DERIVED( shtrider, travrusa )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
-	MCFG_PALETTE_INIT_OVERRIDE(travrusa_state,shtrider)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(travrusa_state,shtrider)
 MACHINE_CONFIG_END
 
 

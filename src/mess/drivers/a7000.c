@@ -204,7 +204,7 @@ WRITE32_MEMBER( a7000_state::a7000_vidc20_w )
 			g = (data & 0x00ff00) >> 8;
 			b = (data & 0xff0000) >> 16;
 
-			palette_set_color_rgb(machine(),m_vidc20_pal_index & 0xff,r,g,b);
+			m_palette->set_pen_color(m_vidc20_pal_index & 0xff,r,g,b);
 
 			/* auto-increment & wrap-around */
 			m_vidc20_pal_index++;
@@ -225,7 +225,7 @@ WRITE32_MEMBER( a7000_state::a7000_vidc20_w )
 			g = (data & 0x00ff00) >> 8;
 			b = (data & 0xff0000) >> 16;
 
-			palette_set_color_rgb(machine(),0x100,r,g,b);
+			m_palette->set_pen_color(0x100,r,g,b);
 			break;
 		case 5: // Cursor Palette Logical Colour n
 		case 6:
@@ -236,7 +236,7 @@ WRITE32_MEMBER( a7000_state::a7000_vidc20_w )
 			g = (data & 0x00ff00) >> 8;
 			b = (data & 0xff0000) >> 16;
 
-			palette_set_color_rgb(machine(),cursor_index,r,g,b);
+			m_palette->set_pen_color(cursor_index,r,g,b);
 			break;
 		case 8: // Horizontal
 			horz_reg = (data >> 24) & 0xf;
@@ -277,7 +277,7 @@ UINT32 a7000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	UINT32 count;
 	UINT8 *vram = memregion("vram")->base();
 
-	bitmap.fill(machine().pens[0x100], cliprect);
+	bitmap.fill(m_palette->pen(0x100), cliprect);
 
 	x_size = (m_vidc20_horz_reg[HDER]-m_vidc20_horz_reg[HDSR]);
 	y_size = (m_vidc20_vert_reg[VDER]-m_vidc20_vert_reg[VDSR]);
@@ -301,7 +301,7 @@ UINT32 a7000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 				for(x=0;x<x_size;x+=8)
 				{
 					for(xi=0;xi<8;xi++)
-						bitmap.pix32(y+y_start, x+xi+x_start) = machine().pens[(vram[count]>>(xi))&1];
+						bitmap.pix32(y+y_start, x+xi+x_start) = m_palette->pen((vram[count]>>(xi))&1);
 
 					count++;
 				}
@@ -315,7 +315,7 @@ UINT32 a7000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 				for(x=0;x<x_size;x+=4)
 				{
 					for(xi=0;xi<4;xi++)
-						bitmap.pix32(y+y_start, x+xi+x_start) = machine().pens[(vram[count]>>(xi*2))&3];
+						bitmap.pix32(y+y_start, x+xi+x_start) = m_palette->pen((vram[count]>>(xi*2))&3);
 
 					count++;
 				}
@@ -329,7 +329,7 @@ UINT32 a7000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 				for(x=0;x<x_size;x+=2)
 				{
 					for(xi=0;xi<2;xi++)
-						bitmap.pix32(y+y_start, x+xi+x_start) = machine().pens[(vram[count]>>(xi*4))&0xf];
+						bitmap.pix32(y+y_start, x+xi+x_start) = m_palette->pen((vram[count]>>(xi*4))&0xf);
 
 					count++;
 				}
@@ -342,7 +342,7 @@ UINT32 a7000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			{
 				for(x=0;x<x_size;x++)
 				{
-					bitmap.pix32(y+y_start, x+x_start) = machine().pens[(vram[count])&0xff];
+					bitmap.pix32(y+y_start, x+x_start) = m_palette->pen((vram[count])&0xff);
 
 					count++;
 				}
@@ -807,7 +807,7 @@ static MACHINE_CONFIG_START( a7000, a7000_state )
 	MCFG_SCREEN_SIZE(1900, 1080) //max available size
 	MCFG_SCREEN_VISIBLE_AREA(0, 1900-1, 0, 1080-1)
 	MCFG_SCREEN_UPDATE_DRIVER(a7000_state, screen_update)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a7000p, a7000 )

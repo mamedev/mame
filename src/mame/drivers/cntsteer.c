@@ -109,7 +109,7 @@ PALETTE_INIT_MEMBER(cntsteer_state,zerotrgt)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -129,7 +129,7 @@ PALETTE_INIT_MEMBER(cntsteer_state,zerotrgt)
 		bit2 = (color_prom[i + 256] >> 2) & 0x01;
 		b = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 
-		palette_set_color(machine(), i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 
@@ -217,17 +217,17 @@ void cntsteer_state::zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		{
 			if (fy)
 			{
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy - 16, 0);
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code + 1, color, fx, fy, sx, sy - 16, 0);
 			}
 			else
 			{
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy - 16, 0);
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, fx, fy, sx, sy - 16, 0);
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
 			}
 		}
 		else
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
 	}
 }
 
@@ -274,24 +274,24 @@ void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		{
 			if (fy)
 			{
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy - 16, 0);
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code + 1, color, fx, fy, sx, sy - 16, 0);
 			}
 			else
 			{
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy - 16, 0);
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, fx, fy, sx, sy - 16, 0);
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
 			}
 		}
 		else
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
 	}
 }
 
 UINT32 cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_disable_roz)
-		bitmap.fill(machine().pens[8 * m_bg_color_bank], cliprect);
+		bitmap.fill(m_palette->pen(8 * m_bg_color_bank), cliprect);
 	else
 	{
 		int p1, p2, p3, p4;
@@ -340,7 +340,7 @@ UINT32 cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind1
 UINT32 cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_disable_roz)
-		bitmap.fill(machine().pens[8 * m_bg_color_bank], cliprect);
+		bitmap.fill(m_palette->pen(8 * m_bg_color_bank), cliprect);
 	else
 	{
 		int p1, p2, p3, p4;
@@ -905,8 +905,8 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cntsteer)
-	MCFG_PALETTE_LENGTH(256)
-//  MCFG_PALETTE_INIT_OVERRIDE(cntsteer_state,zerotrgt)
+	MCFG_PALETTE_ADD("palette", 256)
+//  MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)
 
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,cntsteer)
 
@@ -952,9 +952,9 @@ static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_zerotrgt)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", zerotrgt)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_PALETTE_INIT_OVERRIDE(cntsteer_state,zerotrgt)
+	MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* sound hardware */

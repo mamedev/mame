@@ -220,10 +220,10 @@ static INPUT_PORTS_START( sr16 )
 INPUT_PORTS_END
 
 
-void alesis_state::palette_init()
+PALETTE_INIT_MEMBER(alesis_state, alesis)
 {
-	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
-	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 void alesis_state::machine_reset()
@@ -267,7 +267,8 @@ static MACHINE_CONFIG_START( hr16, alesis_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_INIT_OWNER(alesis_state, alesis)
 
 	MCFG_CASSETTE_ADD( "cassette", hr16_cassette_interface )
 
@@ -291,8 +292,6 @@ static MACHINE_CONFIG_DERIVED( sr16, hr16 )
 	MCFG_SCREEN_SIZE(6*8, 9*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*8-1, 0, 9*2-1)
 	MCFG_DEFAULT_LAYOUT(layout_sr16)
-
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	MCFG_DEVICE_MODIFY("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 8)

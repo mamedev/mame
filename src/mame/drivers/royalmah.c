@@ -197,7 +197,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mjtensin_rtc_irq);
 	DECLARE_DRIVER_INIT(janptr96);
 	DECLARE_DRIVER_INIT(ippatsu);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(royalmah);
 	DECLARE_PALETTE_INIT(mjderngr);
 	UINT32 screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(suzume_irq);
@@ -210,7 +210,7 @@ public:
 
 
 
-void royalmah_state::palette_init()
+PALETTE_INIT_MEMBER(royalmah_state, royalmah)
 {
 	offs_t i;
 	const UINT8 *prom = memregion("proms")->base();
@@ -240,7 +240,7 @@ void royalmah_state::palette_init()
 		bit2 = (data >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color_rgb(machine(),i, r,g,b);
+		palette.set_pen_color(i, r,g,b);
 	}
 }
 
@@ -259,7 +259,7 @@ PALETTE_INIT_MEMBER(royalmah_state,mjderngr)
 		UINT8 g = BITSWAP8((data >>  5) & 0x1f,7,6,5,0,1,2,3,4 );
 		UINT8 b = BITSWAP8((data >> 10) & 0x1f,7,6,5,0,1,2,3,4 );
 
-		palette_set_color_rgb(machine(),i, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -3234,7 +3234,8 @@ static MACHINE_CONFIG_START( royalmah, royalmah_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(16*2)
+	MCFG_PALETTE_ADD("palette", 16*2)
+	MCFG_PALETTE_INIT_OWNER(royalmah_state,royalmah)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(256, 256)
@@ -3345,8 +3346,9 @@ static MACHINE_CONFIG_DERIVED( mjderngr, dondenmj )
 	MCFG_CPU_IO_MAP(mjderngr_iomap)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(16*32)
-	MCFG_PALETTE_INIT_OVERRIDE(royalmah_state,mjderngr)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 16*32)
+	MCFG_PALETTE_INIT_OWNER(royalmah_state,mjderngr)
 MACHINE_CONFIG_END
 
 /* It runs in IM 2, thus needs a vector on the data bus */

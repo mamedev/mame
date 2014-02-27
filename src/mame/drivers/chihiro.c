@@ -3972,7 +3972,7 @@ static MACHINE_CONFIG_START( chihiro_base, chihiro_state )
 	MCFG_SCREEN_UPDATE_DRIVER(chihiro_state,screen_update_callback)
 	MCFG_SCREEN_VBLANK_DRIVER(chihiro_state,vblank_callback)
 
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_ADD("palette", 65536)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( chihirogd, chihiro_base )

@@ -68,13 +68,10 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 		0);
 }
 
-void darkmist_state::palette_init()
+PALETTE_INIT_MEMBER(darkmist_state, darkmist)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x101);
 
 	for (i = 0; i < 0x400; i++)
 	{
@@ -95,7 +92,7 @@ void darkmist_state::palette_init()
 			}
 		}
 
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -110,10 +107,10 @@ void darkmist_state::set_pens()
 		int g = pal4bit(m_generic_paletteram_8[i | 0x000] >> 4);
 		int b = pal4bit(m_generic_paletteram_8[i | 0x000] >> 0);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		m_palette->set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	colortable_palette_set_color(machine().colortable, 0x100, rgb_t::black);
+	m_palette->set_indirect_color(0x100, rgb_t::black);
 }
 
 
@@ -139,7 +136,7 @@ UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind1
 	m_fgtilemap->set_scrollx(0, DM_GETSCROLL(0xa));
 	m_fgtilemap->set_scrolly(0, DM_GETSCROLL(0xe));
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if(m_hw & DISPLAY_BG)
 		m_bgtilemap->draw(screen, bitmap, cliprect, 0,0);
@@ -179,7 +176,7 @@ UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind1
 			palette+=32;
 
 			
-				m_gfxdecode->gfx(2)->transpen(
+				m_gfxdecode->gfx(2)->transpen(m_palette,
 				bitmap,cliprect,
 				tile,
 				palette,

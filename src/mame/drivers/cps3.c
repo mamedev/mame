@@ -889,7 +889,7 @@ void cps3_state::cps3_set_mame_colours(int colournum, UINT16 data, UINT32 fadeva
 
 	m_mame_colours[colournum] = (r << (16+3)) | (g << (8+3)) | (b << (0+3));
 
-	if (colournum<0x10000) palette_set_color(machine(),colournum,m_mame_colours[colournum]/* rgb_t(r<<3,g<<3,b<<3)*/);//m_mame_colours[colournum]);
+	if (colournum<0x10000) m_palette->set_pen_color(colournum,m_mame_colours[colournum]/* rgb_t(r<<3,g<<3,b<<3)*/);//m_mame_colours[colournum]);
 }
 
 
@@ -904,12 +904,12 @@ void cps3_state::video_start()
 	save_pointer(NAME(m_char_ram), 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), cps3_tiles8x8_layout, (UINT8 *)m_ss_ram, machine().total_colors() / 16, 0)));
+	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), cps3_tiles8x8_layout, (UINT8 *)m_ss_ram, m_palette->entries() / 16, 0)));
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(1, auto_alloc(machine(), gfx_element(machine(), cps3_tiles16x16_layout, (UINT8 *)m_char_ram, machine().total_colors() / 64, 0)));
+	m_gfxdecode->set_gfx(1, auto_alloc(machine(), gfx_element(machine(), cps3_tiles16x16_layout, (UINT8 *)m_char_ram, m_palette->entries() / 64, 0)));
 	m_gfxdecode->gfx(1)->set_granularity(64);
 
 	//decode_charram();
@@ -1293,7 +1293,7 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 //  for (offset=0;offset<0x200;offset++)
 //  {
 //      int palreadbase = (m_ss_pal_base << 9);
-//      palette_set_color(machine(),offset,m_mame_colours[palreadbase+offset]);
+//      m_palette->set_pen_color(offset,m_mame_colours[palreadbase+offset]);
 //  }
 
 	// fg layer
@@ -2585,7 +2585,7 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 */
 
 	MCFG_NVRAM_ADD_0FILL("eeprom")
-	MCFG_PALETTE_LENGTH(0x10000) // actually 0x20000 ...
+	MCFG_PALETTE_ADD("palette", 0x10000) // actually 0x20000 ...
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	

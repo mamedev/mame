@@ -3273,7 +3273,7 @@ static MACHINE_CONFIG_START( system16b, segas16b_state )
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", segas16b)
-	MCFG_PALETTE_LENGTH(2048*3)
+	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)

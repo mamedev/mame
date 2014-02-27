@@ -113,12 +113,12 @@ void dominob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		code = m_spriteram[offs + 3] + ((m_spriteram[offs + 2] & 0x03) << 8)  ;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				2 * code,
 				((m_spriteram[offs + 2] & 0xf8) >> 3)  ,
 				flip_screen_x(),flip_screen_y(),
 				sx,sy + (flip_screen_y() ? 8 : -8),0);
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				2 * code + 1,
 				((m_spriteram[offs + 2] & 0xf8) >> 3)  ,
 				flip_screen_x(),flip_screen_y(),
@@ -138,7 +138,7 @@ UINT32 dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 
 		for (x = 0; x < 256 / 32; x++)
 		{
 			
-					m_gfxdecode->gfx(1)->opaque(bitmap,
+					m_gfxdecode->gfx(1)->opaque(m_palette,bitmap,
 					cliprect,
 					m_bgram[index] + 256 * (m_bgram[index + 1] & 0xf),
 					m_bgram[index + 1] >> 4,
@@ -153,7 +153,7 @@ UINT32 dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 
 		for (x = 0; x < 32; x++)
 		{
 			
-					m_gfxdecode->gfx(0)->transpen(bitmap,
+					m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,
 					cliprect,
 					m_videoram[(y * 32 + x) * 2 + 1] + (m_videoram[(y * 32 + x) * 2] & 7) * 256,
 					(m_videoram[(y * 32 + x) * 2] >> 3),
@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dominob_state )
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_SHARE("bgram")
 	AM_RANGE(0xf080, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -314,7 +314,8 @@ static MACHINE_CONFIG_START( dominob, dominob_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dominob_state, screen_update_dominob)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dominob)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 
 	/* sound hardware */

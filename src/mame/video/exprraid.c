@@ -109,7 +109,7 @@ void exprraid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -118,7 +118,7 @@ void exprraid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		if (attr & 0x10)
 		{
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code + 1, color,
 				flipx, flipy,
 				sx, sy + (flip_screen() ? -16 : 16), 0);

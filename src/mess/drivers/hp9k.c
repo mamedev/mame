@@ -420,8 +420,7 @@ static MACHINE_CONFIG_START( hp9k, hp9k_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hp9k_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", hp9k)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_MC6845_ADD( "mc6845", MC6845, "screen", XTAL_16MHz / 16, hp9k_mc6845_intf )
 MACHINE_CONFIG_END

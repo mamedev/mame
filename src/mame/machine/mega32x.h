@@ -37,7 +37,9 @@ public:
 	// set some variables at start, depending on region (shall be moved to a device interface?)
 	void set_framerate(int rate) { m_framerate = rate; }
 	void set_32x_pal(bool pal) { m_32x_pal = pal ? 1 : 0; }
-
+	
+	// static configuration
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	DECLARE_READ32_MEMBER( _32x_sh2_master_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_slave_4000_common_4002_r );
@@ -183,6 +185,8 @@ private:
 	UINT16 *m_32x_display_dram, *m_32x_access_dram;
 	UINT16* m_32x_palette;
 	UINT16* m_32x_palette_lookup;
+	
+	required_device<palette_device> m_palette;
 };
 
 
@@ -204,3 +208,6 @@ class sega_32x_pal_device : public sega_32x_device
 
 extern const device_type SEGA_32X_NTSC;
 extern const device_type SEGA_32X_PAL;
+
+#define MCFG_SEGA_32X_PALETTE(_palette_tag) \
+	sega_32x_device::static_set_palette_tag(*device, "^" _palette_tag);

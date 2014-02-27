@@ -47,6 +47,6 @@ public:
 	DECLARE_READ8_MEMBER(videoram_r);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(malzak);
 	UINT32 screen_update_malzak(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

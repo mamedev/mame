@@ -16,13 +16,10 @@
 
 ***************************************************************************/
 
-void gunsmoke_state::palette_init()
+PALETTE_INIT_MEMBER(gunsmoke_state, gunsmoke)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -31,7 +28,7 @@ void gunsmoke_state::palette_init()
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -41,21 +38,21 @@ void gunsmoke_state::palette_init()
 	for (i = 0; i < 0x80; i++)
 	{
 		UINT8 ctabentry = color_prom[i] | 0x40;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* background tiles use colors 0-0x3f */
 	for (i = 0x100; i < 0x200; i++)
 	{
 		UINT8 ctabentry = color_prom[i] | ((color_prom[i + 0x100] & 0x03) << 4);
-		colortable_entry_set_value(machine().colortable, i - 0x80, ctabentry);
+		palette.set_pen_indirect(i - 0x80, ctabentry);
 	}
 
 	/* sprites use colors 0x80-0xff */
 	for (i = 0x300; i < 0x400; i++)
 	{
 		UINT8 ctabentry = color_prom[i] | ((color_prom[i + 0x100] & 0x07) << 4) | 0x80;
-		colortable_entry_set_value(machine().colortable, i - 0x180, ctabentry);
+		palette.set_pen_indirect(i - 0x180, ctabentry);
 	}
 }
 
@@ -130,7 +127,7 @@ void gunsmoke_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gunsmoke_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,  32, 32, 2048, 8);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gunsmoke_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
-	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, m_gfxdecode->gfx(0), 0x4f);
+	m_palette->configure_tilemap_groups(*m_fg_tilemap, *m_gfxdecode->gfx(0), 0x4f);
 }
 
 void gunsmoke_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -162,7 +159,7 @@ void gunsmoke_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -174,7 +171,7 @@ UINT32 gunsmoke_state::screen_update_gunsmoke(screen_device &screen, bitmap_ind1
 	if (m_bgon)
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if (m_objon)
 		draw_sprites(bitmap, cliprect);

@@ -1412,7 +1412,7 @@ WRITE16_MEMBER(atarigen_state::paletteram_666_w)
 	g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
 	b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
 
-	palette_set_color_rgb(space.machine(), offset, pal6bit(r), pal6bit(g), pal6bit(b));
+	m_palette->set_pen_color(offset, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 
@@ -1436,7 +1436,7 @@ WRITE16_MEMBER(atarigen_state::expanded_paletteram_666_w)
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
 		b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
 
-		palette_set_color_rgb(space.machine(), palentry & 0x1ff, pal6bit(r), pal6bit(g), pal6bit(b));
+		m_palette->set_pen_color(palentry & 0x1ff, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 }
 
@@ -1459,7 +1459,7 @@ WRITE32_MEMBER(atarigen_state::paletteram32_666_w )
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
 		b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
 
-		palette_set_color_rgb(space.machine(), offset * 2, pal6bit(r), pal6bit(g), pal6bit(b));
+		m_palette->set_pen_color(offset * 2, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 
 	if (ACCESSING_BITS_0_15)
@@ -1470,7 +1470,7 @@ WRITE32_MEMBER(atarigen_state::paletteram32_666_w )
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
 		b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
 
-		palette_set_color_rgb(space.machine(), offset * 2 + 1, pal6bit(r), pal6bit(g), pal6bit(b));
+		m_palette->set_pen_color(offset * 2 + 1, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 }
 

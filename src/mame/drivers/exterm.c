@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16, exterm_state )
 	AM_RANGE(0x01500000, 0x0153ffff) AM_MIRROR(0xfc000000) AM_WRITE(exterm_output_port_0_w)
 	AM_RANGE(0x01580000, 0x015bffff) AM_MIRROR(0xfc000000) AM_WRITE(sound_latch_w)
 	AM_RANGE(0x015c0000, 0x015fffff) AM_MIRROR(0xfc000000) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x01800000, 0x01807fff) AM_MIRROR(0xfc7f8000) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x01800000, 0x01807fff) AM_MIRROR(0xfc7f8000) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x02800000, 0x02807fff) AM_MIRROR(0xfc7f8000) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x03000000, 0x03ffffff) AM_MIRROR(0xfc000000) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -458,7 +458,9 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 	MCFG_TIMER_DRIVER_ADD("snd_nmi_timer", exterm_state, master_sound_nmi_callback)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(2048+32768)
+	MCFG_PALETTE_ADD("palette", 2048+32768)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_INIT_OWNER(exterm_state, exterm)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(40000000/8, 318, 0, 256, 264, 0, 240)

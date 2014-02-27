@@ -115,7 +115,7 @@ UINT32 paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_ind1
 				int pen = (m_p_gvram[count] >> xi) & 1;
 
 				if(y < 475 && x*16+xi < 640) /* TODO: safety check */
-					bitmap.pix16(y, x*16+xi) = machine().pens[pen];
+					bitmap.pix16(y, x*16+xi) = m_palette->pen(pen);
 			}
 
 			count++;
@@ -144,7 +144,7 @@ UINT32 paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_ind1
 
 					if(pen != -1)
 						if(y*19 < 475 && x*8+xi < 640) /* TODO: safety check */
-							bitmap.pix16(y*19+yi, x*8+xi) = machine().pens[pen];
+							bitmap.pix16(y*19+yi, x*8+xi) = m_palette->pen(pen);
 				}
 			}
 		}
@@ -160,7 +160,7 @@ UINT32 paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_ind1
 			{
 				x = mc6845_cursor_addr % mc6845_h_display;
 				y = mc6845_cursor_addr / mc6845_h_display;
-				bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = machine().pens[7];
+				bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(7);
 			}
 		}
 	}
@@ -351,8 +351,8 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(paso1600_state, screen_update_paso1600)
 	MCFG_GFXDECODE_ADD("gfxdecode", paso1600)
-	MCFG_PALETTE_LENGTH(8)
-//  MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD("palette", 8)
+//  MCFG_PALETTE_INIT(black_and_white)
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/4, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */

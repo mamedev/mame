@@ -194,7 +194,7 @@ WRITE16_MEMBER( atarisy2_state::paletteram_w )
 	red = (color_table[(newword >> 12) & 15] * inten) >> 4;
 	green = (color_table[(newword >> 8) & 15] * inten) >> 4;
 	blue = (color_table[(newword >> 4) & 15] * inten) >> 4;
-	palette_set_color(space.machine(), offset, rgb_t(red, green, blue));
+	m_palette->set_pen_color(offset, rgb_t(red, green, blue));
 }
 
 

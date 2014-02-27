@@ -36,14 +36,14 @@ void silkroad_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		{
 			for (wcount=0;wcount<width;wcount++)
 			{
-				gfx->prio_transpen(bitmap,cliprect,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,screen.priority(),pri_mask,0);
+				gfx->prio_transpen(m_palette,bitmap,cliprect,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,screen.priority(),pri_mask,0);
 			}
 		}
 		else
 		{
 			for (wcount=width;wcount>0;wcount--)
 			{
-				gfx->prio_transpen(bitmap,cliprect,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,screen.priority(),pri_mask,0);
+				gfx->prio_transpen(m_palette,bitmap,cliprect,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,screen.priority(),pri_mask,0);
 			}
 		}
 

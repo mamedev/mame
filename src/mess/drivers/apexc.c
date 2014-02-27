@@ -34,7 +34,7 @@ public:
 	DECLARE_DRIVER_INIT(apexc);
 	virtual void machine_start();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(apexc);
 	UINT32 screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(apexc_interrupt);
 	DECLARE_READ8_MEMBER(tape_read);
@@ -560,9 +560,9 @@ static const rectangle teletyper_scroll_clear_window(
 );
 //static const int var_teletyper_scroll_step = - teletyper_scroll_step;
 
-void apexc_state::palette_init()
+PALETTE_INIT_MEMBER(apexc_state, apexc)
 {
-	palette_set_colors(machine(), 0, apexc_palette, APEXC_PALETTE_SIZE);
+	palette.set_pen_colors(0, apexc_palette, APEXC_PALETTE_SIZE);
 }
 
 void apexc_state::video_start()
@@ -588,7 +588,7 @@ void apexc_state::apexc_draw_led(bitmap_ind16 &bitmap, int x, int y, int state)
 /* write a single char on screen */
 void apexc_state::apexc_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color)
 {
-	m_gfxdecode->gfx(0)->transpen(bitmap,bitmap.cliprect(), character-32, color, 0, 0,
+	m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,bitmap.cliprect(), character-32, color, 0, 0,
 				x+1, y, 0);
 }
 
@@ -650,7 +650,7 @@ void apexc_state::apexc_teletyper_linefeed()
 	for (y=teletyper_window_offset_y; y<teletyper_window_offset_y+teletyper_window_height-teletyper_scroll_step; y++)
 	{
 		extract_scanline8(*m_bitmap, teletyper_window_offset_x, y+teletyper_scroll_step, teletyper_window_width, buf);
-		draw_scanline8(*m_bitmap, teletyper_window_offset_x, y, teletyper_window_width, buf, machine().pens);
+		draw_scanline8(*m_bitmap, teletyper_window_offset_x, y, teletyper_window_width, buf, m_palette->pens());
 	}
 
 	m_bitmap->fill(0, teletyper_scroll_clear_window);
@@ -890,7 +890,8 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(apexc_state, screen_update_apexc)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", apexc)
-	MCFG_PALETTE_LENGTH(APEXC_PALETTE_SIZE)
+	MCFG_PALETTE_ADD("palette", APEXC_PALETTE_SIZE)
+	MCFG_PALETTE_INIT_OWNER(apexc_state, apexc)
 
 
 	MCFG_APEXC_CYLINDER_ADD("cylinder")

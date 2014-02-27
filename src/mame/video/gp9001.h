@@ -39,6 +39,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void static_set_gfx_region(device_t &device, int gfxregion);
 
 	UINT16 gp9001_voffs;
@@ -111,6 +112,7 @@ private:
 	void gp9001_scroll_reg_select_w( offs_t offset, UINT16 data, UINT16 mem_mask );
 	void gp9001_scroll_reg_data_w(offs_t offset, UINT16 data, UINT16 mem_mask);
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type GP9001_VDP;
@@ -136,3 +138,7 @@ extern const device_type GP9001_VDP;
 
 #define MCFG_GP9001_VDP_GFXDECODE(_gfxtag) \
 	gp9001vdp_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_GP9001_VDP_PALETTE(_palette_tag) \
+	gp9001vdp_device::static_set_palette_tag(*device, "^" _palette_tag);
+

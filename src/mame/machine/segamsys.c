@@ -525,7 +525,7 @@ static void vdp_data_w(address_space &space, UINT8 data, struct sms_vdp* chip)
 					g = (palword & 0x00f0)>>4;
 					b = (palword & 0x0f00)>>8;
 					rgb_t rgb = rgb_t(pal4bit(r), pal4bit(g), pal4bit(b));
-					//palette_set_color(space.machine(),(chip->addr_reg&0x3e)/2, rgb);
+					//m_palette->set_pen_color((chip->addr_reg&0x3e)/2, rgb);
 					chip->cram_mamecolours[(chip->addr_reg&0x3e)/2]=rgb;
 				}
 			}
@@ -541,7 +541,7 @@ static void vdp_data_w(address_space &space, UINT8 data, struct sms_vdp* chip)
 				g = (data & 0x0c)>>2;
 				b = (data & 0x30)>>4;
 				rgb_t rgb = rgb_t(pal2bit(r), pal2bit(g), pal2bit(b));
-				//palette_set_color(space.machine(),chip->addr_reg&0x1f, rgb);
+				//m_palette->set_pen_color(chip->addr_reg&0x1f, rgb);
 				chip->cram_mamecolours[chip->addr_reg&0x1f]=rgb;
 			}
 
@@ -1727,7 +1727,7 @@ MACHINE_CONFIG_START( sms, driver_device )
 	MCFG_SCREEN_UPDATE_STATIC(megatech_md_sms) /* Copies a bitmap */
 	MCFG_SCREEN_VBLANK_STATIC(sms) /* Used to Sync the timing */
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_NVRAM_HANDLER( sms )
 

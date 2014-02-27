@@ -101,6 +101,9 @@ C102 - Controls CPU access to ROZ Memory Area.
 #define MCFG_NAMCO_C45_ROAD_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, NAMCO_C45_ROAD, 0)
 
+#define MCFG_NAMCO_C45_ROAD_PALETTE(_palette_tag) \
+	namco_c45_road_device::static_set_palette_tag(*device, "^" _palette_tag);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -124,6 +127,8 @@ public:
 	// construction/destruction
 	namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	static void static_set_palette_tag(device_t &device, const char *tag);
+	
 	// read/write handlers
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
@@ -150,6 +155,7 @@ protected:
 
 	static const gfx_layout s_tile_layout;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

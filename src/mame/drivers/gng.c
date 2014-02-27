@@ -50,8 +50,8 @@ static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P2")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3004, 0x3004) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3800, 0x38ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_split_hi_w) AM_SHARE("paletteram2")
-	AM_RANGE(0x3900, 0x39ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_split_lo_w) AM_SHARE("paletteram")
+	AM_RANGE(0x3800, 0x38ff) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x3900, 0x39ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x3b08, 0x3b09) AM_WRITE(gng_bgscrollx_w)
 	AM_RANGE(0x3b0a, 0x3b0b) AM_WRITE(gng_bgscrolly_w)
@@ -324,14 +324,14 @@ void gng_state::machine_reset()
 		         For now let's fill everything with white colors until we have better info about it */
 		for(i=0;i<0x100;i+=4)
 		{
-			m_generic_paletteram_8[i] = m_generic_paletteram2_8[i] = 0x00;
-			m_generic_paletteram_8[i+1] = m_generic_paletteram2_8[i+1] = 0x55;
-			m_generic_paletteram_8[i+2] = m_generic_paletteram2_8[i+2] = 0xaa;
-			m_generic_paletteram_8[i+3] = m_generic_paletteram2_8[i+3] = 0xff;
-			palette_set_color_rgb(machine(),i+0,0x00,0x00,0x00);
-			palette_set_color_rgb(machine(),i+1,0x55,0x55,0x55);
-			palette_set_color_rgb(machine(),i+2,0xaa,0xaa,0xaa);
-			palette_set_color_rgb(machine(),i+3,0xff,0xff,0xff);
+			m_palette->basemem().write8(i, 0x00); m_palette->extmem().write8(i, 0x00);
+			m_palette->basemem().write8(i+1, 0x55); m_palette->extmem().write8(i+1, 0x55);
+			m_palette->basemem().write8(i+2, 0xaa); m_palette->extmem().write8(i+2, 0xaa);
+			m_palette->basemem().write8(i+3, 0xff); m_palette->extmem().write8(i+3, 0xff);
+			m_palette->set_pen_color(i+0,0x00,0x00,0x00);
+			m_palette->set_pen_color(i+1,0x55,0x55,0x55);
+			m_palette->set_pen_color(i+2,0xaa,0xaa,0xaa);
+			m_palette->set_pen_color(i+3,0xff,0xff,0xff);
 		}
 	}
 }
@@ -360,8 +360,9 @@ static MACHINE_CONFIG_START( gng, gng_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gng)
-	MCFG_PALETTE_LENGTH(256)
 
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

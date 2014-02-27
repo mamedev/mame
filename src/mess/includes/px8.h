@@ -76,7 +76,7 @@ public:
 
 	/* keyboard state */
 	int m_ksc;              /* keyboard scan column */
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(px8);
 	UINT32 screen_update_px8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

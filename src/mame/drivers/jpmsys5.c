@@ -132,12 +132,12 @@ WRITE16_MEMBER(jpmsys5_state::ramdac_w)
 	}
 	else if (offset == 1)
 	{
-		m_palette[m_pal_addr][m_pal_idx] = data;
+		m_palette_val[m_pal_addr][m_pal_idx] = data;
 
 		if (++m_pal_idx == 3)
 		{
 			/* Update the MAME palette */
-			palette_set_color_rgb(machine(), m_pal_addr, pal6bit(m_palette[m_pal_addr][0]), pal6bit(m_palette[m_pal_addr][1]), pal6bit(m_palette[m_pal_addr][2]));
+			m_palette->set_pen_color(m_pal_addr, pal6bit(m_palette_val[m_pal_addr][0]), pal6bit(m_palette_val[m_pal_addr][1]), pal6bit(m_palette_val[m_pal_addr][2]));
 			m_pal_addr++;
 			m_pal_idx = 0;
 		}
@@ -156,7 +156,7 @@ UINT32 jpmsys5_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32
 
 	if (m_tms34061->m_display.blanked)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 
@@ -170,8 +170,8 @@ UINT32 jpmsys5_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32
 			UINT8 pen = src[(x-cliprect.min_x)>>1];
 
 			/* Draw two 4-bit pixels */
-			*dest++ = machine().pens[(pen >> 4) & 0xf];
-			*dest++ = machine().pens[pen & 0xf];
+			*dest++ = m_palette->pen((pen >> 4) & 0xf);
+			*dest++ = m_palette->pen(pen & 0xf);
 		}
 	}
 
@@ -665,7 +665,7 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 
 	MCFG_TMS34061_ADD("tms34061", tms34061intf)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

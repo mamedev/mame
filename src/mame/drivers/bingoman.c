@@ -254,14 +254,13 @@ public:
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
+	DECLARE_PALETTE_INIT(bingoman);
 protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 void bingoman_state::video_start()
@@ -364,7 +363,7 @@ void bingoman_state::machine_reset()
 }
 
 
-void bingoman_state::palette_init()
+PALETTE_INIT_MEMBER(bingoman_state, bingoman)
 {
 }
 
@@ -385,7 +384,8 @@ static MACHINE_CONFIG_START( bingoman, bingoman_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bingoman)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(bingoman_state, bingoman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

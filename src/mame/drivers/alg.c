@@ -104,7 +104,7 @@ VIDEO_START_MEMBER(alg_state,alg)
 	VIDEO_START_CALL_MEMBER(amiga);
 
 	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
-	palette_set_color(machine(), 4096, rgb_t(0,0,0,0));
+	m_palette->set_pen_color(4096, rgb_t(0,0,0,0));
 	amiga_set_genlock_color(machine(), 4096);
 }
 
@@ -457,8 +457,8 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	MCFG_SCREEN_SIZE(512*2, 262)
 	MCFG_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
 
-	MCFG_PALETTE_LENGTH(4097)
-	MCFG_PALETTE_INIT_OVERRIDE(alg_state,amiga)
+	MCFG_PALETTE_ADD("palette", 4097)
+	MCFG_PALETTE_INIT_OWNER(alg_state,amiga)
 
 	MCFG_VIDEO_START_OVERRIDE(alg_state,alg)
 

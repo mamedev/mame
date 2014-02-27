@@ -14,9 +14,10 @@
 
 #define S3C2410_TAG "s3c2410"
 
-#define MCFG_S3C2410_ADD(_tag, _clock, _config) \
+#define MCFG_S3C2410_ADD(_tag, _clock, _config, _palette_tag) \
 	MCFG_DEVICE_ADD(_tag, S3C2410, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_DEVICE_CONFIG(_config)	\
+	s3c2410_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #define S3C2410_INTERFACE(name) \
 	const s3c2410_interface(name) =
@@ -46,6 +47,9 @@ public:
 	s3c2410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~s3c2410_device() { global_free(m_token); }
 
+	// static configuration
+	static void static_set_palette_tag(device_t &device, const char *tag);
+
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
 	// device-level overrides
@@ -55,6 +59,7 @@ public:
 private:
 	// internal state
 	void *m_token;
+	required_device<palette_device> m_palette;
 public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
@@ -899,7 +904,7 @@ struct s3c24xx_t
 	devcb_resolved_write8 address_w;
 	devcb_resolved_read8  nand_data_r;
 	devcb_resolved_write8 nand_data_w;
-
+	palette_device *m_palette;
 };
 
 #endif

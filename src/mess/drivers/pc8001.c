@@ -352,7 +352,7 @@ INPUT_PORTS_END
 
 /* uPD3301 Interface */
 
-static const rgb_t PALETTE[] =
+static const rgb_t PALETTE_PC8001[] =
 {
 	rgb_t::black,
 	rgb_t(0x00, 0x00, 0xff),
@@ -380,7 +380,7 @@ static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 		{
 			int color = BIT(data, 7) ^ rvv;
 
-			bitmap.pix32(y, (sx * 8) + i) = PALETTE[color ? 7 : 0];
+			bitmap.pix32(y, (sx * 8) + i) = PALETTE_PC8001[color ? 7 : 0];
 
 			data <<= 1;
 		}
@@ -393,8 +393,8 @@ static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 		{
 			int color = BIT(data, 7) ^ rvv;
 
-			bitmap.pix32(y, (sx/2 * 16) + (i * 2)) = PALETTE[color ? 7 : 0];
-			bitmap.pix32(y, (sx/2 * 16) + (i * 2) + 1) = PALETTE[color ? 7 : 0];
+			bitmap.pix32(y, (sx/2 * 16) + (i * 2)) = PALETTE_PC8001[color ? 7 : 0];
+			bitmap.pix32(y, (sx/2 * 16) + (i * 2) + 1) = PALETTE_PC8001[color ? 7 : 0];
 
 			data <<= 1;
 		}

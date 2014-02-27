@@ -207,7 +207,7 @@ void blktiger_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipx = !flipx;
 		}
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flip_screen(),

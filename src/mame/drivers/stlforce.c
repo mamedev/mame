@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( stlforce_map, AS_PROGRAM, 16, stlforce_state )
 	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_SHARE("mlow_scrollram")
 	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_SHARE("mhigh_scrollram")
 	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_SHARE("vidattrram")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x105000, 0x107fff) AM_RAM /* unknown / ram */
 	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x109000, 0x11ffff) AM_RAM
@@ -201,8 +201,8 @@ static MACHINE_CONFIG_START( stlforce, stlforce_state )
 	MCFG_SCREEN_UPDATE_DRIVER(stlforce_state, screen_update_stlforce)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", stlforce)
-	MCFG_PALETTE_LENGTH(0x800)
-
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

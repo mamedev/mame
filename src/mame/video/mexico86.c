@@ -85,7 +85,7 @@ UINT32 mexico86_state::screen_update_mexico86(screen_device &screen, bitmap_ind1
 				x = (sx + xc * 8) & 0xff;
 				y = (sy + yc * 8) & 0xff;
 
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,
@@ -105,7 +105,7 @@ UINT32 mexico86_state::screen_update_kikikai(screen_device &screen, bitmap_ind16
 	int goffs, code, color, y;
 	int tx, ty;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	sx = 0;
 	for (offs = 0; offs < m_objectram.bytes(); offs += 4)
 	{
@@ -143,7 +143,7 @@ UINT32 mexico86_state::screen_update_kikikai(screen_device &screen, bitmap_ind16
 			color = (m_videoram[goffs + 1] & 0xe0) >> 5;
 			goffs += 0x40;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					0,0,
@@ -152,7 +152,7 @@ UINT32 mexico86_state::screen_update_kikikai(screen_device &screen, bitmap_ind16
 			code = m_videoram[goffs] + ((m_videoram[goffs + 1] & 0x1f) << 8);
 			color = (m_videoram[goffs + 1] & 0xe0) >> 5;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					0,0,

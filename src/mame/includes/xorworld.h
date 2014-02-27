@@ -23,7 +23,7 @@ public:
 	DECLARE_DRIVER_INIT(xorworld);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(xorworld);
 	UINT32 screen_update_xorworld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;

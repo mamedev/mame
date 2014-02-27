@@ -242,7 +242,7 @@ WRITE8_MEMBER(liberate_state::prosport_paletteram_w)
 	m_paletteram[offset] = data;
 
 	/* RGB output is inverted */
-	palette_set_color_rgb(machine(), offset, pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6));
+	m_palette->set_pen_color(offset, pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6));
 }
 
 PALETTE_INIT_MEMBER(liberate_state,liberate)
@@ -271,9 +271,9 @@ PALETTE_INIT_MEMBER(liberate_state,liberate)
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		color_prom++;
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
-	palette_set_color(machine(),32,rgb_t(0,0,0)); /* Allocate black for when no background is displayed */
+	palette.set_pen_color(32,rgb_t(0,0,0)); /* Allocate black for when no background is displayed */
 }
 
 /***************************************************************************/
@@ -332,13 +332,13 @@ void liberate_state::liberate_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 				sy2 = sy + 16;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					fx,fy,
 					sx,sy,0);
 		if (multi)
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					code+1,
 					color,
 					fx,fy,
@@ -396,13 +396,13 @@ void liberate_state::prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 			sy2 = sy + 16;
 		}
 
-		m_gfxdecode->gfx(gfx_region)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(gfx_region)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				fx,fy,
 				sx,sy,0);
 		if (multi)
-			m_gfxdecode->gfx(gfx_region)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(gfx_region)->transpen(m_palette,bitmap,cliprect,
 				code2,
 				color,
 				fx,fy,
@@ -456,13 +456,13 @@ void liberate_state::boomrang_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 			sy2 = sy + 16;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				fx,fy,
 				sx,sy,0);
 		if (multi)
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code2,
 				color,
 				fx,fy,
@@ -486,7 +486,7 @@ void liberate_state::prosoccr_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		fx = spriteram[offs + 0] & 4;
 		fy = spriteram[offs + 0] & 2;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code,
 				0,
 				fx,fy,
@@ -546,7 +546,7 @@ UINT32 liberate_state::screen_update_prosport(screen_device &screen, bitmap_ind1
 		my = (offs) % 32;
 		mx = (offs) / 32;
 
-		m_gfxdecode->gfx(gfx_region)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(gfx_region)->transpen(m_palette,bitmap,cliprect,
 				tile, 1, 0, 0, 248 - 8 * mx, 8 * my, 0);
 	}
 

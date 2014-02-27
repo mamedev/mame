@@ -1096,15 +1096,15 @@ static MACHINE_CONFIG_START( ns1, namcos1_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 9+8*8, 9+44*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos1_state, screen_update_namcos1)
 	MCFG_SCREEN_VBLANK_DRIVER(namcos1_state, screen_eof_namcos1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", namcos1)
-	MCFG_PALETTE_LENGTH(0x2000)
+
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 
 	/* sound hardware */

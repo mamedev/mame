@@ -216,8 +216,8 @@ static MACHINE_CONFIG_START( carjmbre, carjmbre_state )
 	MCFG_SCREEN_UPDATE_DRIVER(carjmbre_state, screen_update_carjmbre)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", carjmbre)
-	MCFG_PALETTE_LENGTH(64)
-
+	MCFG_PALETTE_ADD("palette", 64)
+	MCFG_PALETTE_INIT_OWNER(carjmbre_state, carjmbre)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

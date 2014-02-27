@@ -147,7 +147,7 @@ void prehisle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		if ((foreground && priority) || (!foreground && !priority))
 		{
-			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 15);
+			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy, 15);
 		}
 	}
 }

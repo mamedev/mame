@@ -123,7 +123,7 @@ WRITE8_MEMBER(lucky74_state::lucky74_bg_colorram_w)
 }
 
 
-void lucky74_state::palette_init()
+PALETTE_INIT_MEMBER(lucky74_state, lucky74)
 /*
    There are 2 states (see the technical notes).
    We're constructing a double-sized palette with one half for each state.
@@ -188,10 +188,10 @@ void lucky74_state::palette_init()
 
 
 		/* PROMs circuitry, 1st state */
-		palette_set_color(machine(), i, rgb_t(r1, g1, b1));
+		palette.set_pen_color(i, rgb_t(r1, g1, b1));
 
 		/* PROMs circuitry, 2nd state */
-		palette_set_color(machine(), i + 256, rgb_t(r2, g2, b2));
+		palette.set_pen_color(i + 256, rgb_t(r2, g2, b2));
 	}
 }
 

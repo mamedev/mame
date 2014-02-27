@@ -37,7 +37,7 @@ static ADDRESS_MAP_START( citycon_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE(soundlatch2_byte_w)
 	AM_RANGE(0x3004, 0x3005) AM_READNOP AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x3007, 0x3007) AM_READ(citycon_irq_ack_r)
-	AM_RANGE(0x3800, 0x3cff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0x3800, 0x3cff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -215,9 +215,8 @@ static MACHINE_CONFIG_START( citycon, citycon_state )
 	MCFG_SCREEN_UPDATE_DRIVER(citycon_state, screen_update_citycon)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", citycon)
-	MCFG_PALETTE_LENGTH(640+1024)   /* 640 real palette + 1024 virtual palette */
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black) /* guess */
-
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 640+1024)   /* 640 real palette + 1024 virtual palette */
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

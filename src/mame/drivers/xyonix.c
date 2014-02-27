@@ -229,8 +229,8 @@ static MACHINE_CONFIG_START( xyonix, xyonix_state )
 	MCFG_SCREEN_UPDATE_DRIVER(xyonix_state, screen_update_xyonix)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", xyonix)
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(xyonix_state, xyonix)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

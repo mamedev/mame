@@ -192,7 +192,7 @@ WRITE8_MEMBER(atetris_state::nvram_enable_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
+	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x2810, 0x281f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
@@ -209,7 +209,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( atetrisb2_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2802, 0x2802) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0x2804, 0x2804) AM_DEVWRITE("sn2", sn76496_device, write)
@@ -332,8 +332,10 @@ static MACHINE_CONFIG_START( atetris, atetris_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", atetris)
-	MCFG_PALETTE_LENGTH(256)
 
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(RRRGGGBB)
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
@@ -364,7 +366,9 @@ static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", atetris)
-	MCFG_PALETTE_LENGTH(256)
+
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(RRRGGGBB)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */

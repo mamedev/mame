@@ -59,7 +59,7 @@ PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_8bit)
 		bit2 = ((i >> 7) & 0x01);
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -76,7 +76,7 @@ PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_12bit)
 		g = ((i & 0x38) >> 2) | (((i >> 8) & 0x02) >> 1);
 		b = ((i & 0xc0) >> 4) | (((i >> 8) & 0x0c) >> 2);
 
-		palette_set_color_rgb(machine(), i, pal4bit(r), pal4bit(g), pal4bit(b));
+		palette.set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
@@ -92,7 +92,7 @@ PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_16bit)
 		g = (((i & 0x3800) >>  9) | ((i & 0x0018) >>  3));  // G 5bit
 		b = (((i & 0xc000) >> 11) | ((i & 0x00e0) >>  5));  // B 5bit
 
-		palette_set_color_rgb(machine(), i, pal6bit(r), pal5bit(g), pal5bit(b));
+		palette.set_pen_color(i, pal6bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 

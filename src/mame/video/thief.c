@@ -55,7 +55,7 @@ WRITE8_MEMBER(thief_state::thief_color_map_w){
 	int r = intensity[(data & 0x03) >> 0];
 	int g = intensity[(data & 0x0C) >> 2];
 	int b = intensity[(data & 0x30) >> 4];
-	palette_set_color( machine(),offset,rgb_t(r,g,b) );
+	m_palette->set_pen_color( offset,rgb_t(r,g,b) );
 }
 
 /***************************************************************************/
@@ -106,7 +106,7 @@ UINT32 thief_state::screen_update_thief(screen_device &screen, bitmap_ind16 &bit
 
 	if (m_tms->screen_reset())
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 

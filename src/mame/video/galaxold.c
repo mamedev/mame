@@ -70,7 +70,7 @@ PALETTE_INIT_MEMBER(galaxold_state,galaxold)
 		bit1 = BIT(*color_prom,7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color_rgb(machine(),i,r,g,b);
+		palette.set_pen_color(i,r,g,b);
 		color_prom++;
 	}
 
@@ -79,17 +79,17 @@ PALETTE_INIT_MEMBER(galaxold_state,galaxold)
 
 
 	/* bullets - yellow and white */
-	palette_set_color(machine(),BULLETS_COLOR_BASE+0,rgb_t(0xef,0xef,0x00));
-	palette_set_color(machine(),BULLETS_COLOR_BASE+1,rgb_t(0xef,0xef,0xef));
+	palette.set_pen_color(BULLETS_COLOR_BASE+0,rgb_t(0xef,0xef,0x00));
+	palette.set_pen_color(BULLETS_COLOR_BASE+1,rgb_t(0xef,0xef,0xef));
 }
 
 PALETTE_INIT_MEMBER(galaxold_state,scrambold)
 {
-	PALETTE_INIT_CALL_MEMBER(galaxold);
+	PALETTE_INIT_NAME(galaxold)(palette);
 
 
 	/* blue background - 390 ohm resistor */
-	palette_set_color(machine(),BACKGROUND_COLOR_BASE,rgb_t(0,0,0x56));
+	palette.set_pen_color(BACKGROUND_COLOR_BASE,rgb_t(0,0,0x56));
 }
 
 
@@ -99,7 +99,7 @@ PALETTE_INIT_MEMBER(galaxold_state,stratgyx)
 	int i;
 
 
-	PALETTE_INIT_CALL_MEMBER(galaxold);
+	PALETTE_INIT_NAME(galaxold)(palette);
 
 
 	/*  The background color generator is connected this way:
@@ -114,7 +114,7 @@ PALETTE_INIT_MEMBER(galaxold_state,stratgyx)
 		int g = BIT(i,1) * 0x3c;
 		int b = BIT(i,2) * 0x47;
 
-		palette_set_color_rgb(machine(),base+i,r,g,b);
+		palette.set_pen_color(base+i,r,g,b);
 	}
 }
 
@@ -145,7 +145,7 @@ PALETTE_INIT_MEMBER(galaxold_state,rockclim)
 		bit1 = BIT(*color_prom,7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color_rgb(machine(),i,r,g,b);
+		palette.set_pen_color(i,r,g,b);
 		color_prom++;
 	}
 }
@@ -192,14 +192,14 @@ PALETTE_INIT_MEMBER(galaxold_state,darkplnt)
 		bit2 = BIT(*color_prom,5);
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color_rgb(machine(),i,r,g,b);
+		palette.set_pen_color(i,r,g,b);
 		color_prom++;
 	}
 
 
 	/* bullets - red and blue */
-	palette_set_color(machine(),BULLETS_COLOR_BASE+0,rgb_t(0xef,0x00,0x00));
-	palette_set_color(machine(),BULLETS_COLOR_BASE+1,rgb_t(0x00,0x00,0xef));
+	palette.set_pen_color(BULLETS_COLOR_BASE+0,rgb_t(0xef,0x00,0x00));
+	palette.set_pen_color(BULLETS_COLOR_BASE+1,rgb_t(0x00,0x00,0xef));
 }
 
 PALETTE_INIT_MEMBER(galaxold_state,minefld)
@@ -208,7 +208,7 @@ PALETTE_INIT_MEMBER(galaxold_state,minefld)
 	int i;
 
 
-	PALETTE_INIT_CALL_MEMBER(galaxold);
+	PALETTE_INIT_NAME(galaxold)(palette);
 
 
 	/* set up background colors */
@@ -220,7 +220,7 @@ PALETTE_INIT_MEMBER(galaxold_state,minefld)
 		int r = 0;
 		int g = i;
 		int b = i * 2;
-		palette_set_color_rgb(machine(),base+i,r,g,b);
+		palette.set_pen_color(base+i,r,g,b);
 	}
 
 	/* graduated brown */
@@ -230,7 +230,7 @@ PALETTE_INIT_MEMBER(galaxold_state,minefld)
 		int r = i * 1.5;
 		int g = i * 0.75;
 		int b = i / 2;
-		palette_set_color_rgb(machine(),base+128+i,r,g,b);
+		palette.set_pen_color(base+128+i,r,g,b);
 	}
 }
 
@@ -240,7 +240,7 @@ PALETTE_INIT_MEMBER(galaxold_state,rescue)
 	int i;
 
 
-	PALETTE_INIT_CALL_MEMBER(galaxold);
+	PALETTE_INIT_NAME(galaxold)(palette);
 
 
 	/* set up background colors */
@@ -252,7 +252,7 @@ PALETTE_INIT_MEMBER(galaxold_state,rescue)
 		int r = 0;
 		int g = i;
 		int b = i * 2;
-		palette_set_color_rgb(machine(),base+i,r,g,b);
+		palette.set_pen_color(base+i,r,g,b);
 	}
 }
 
@@ -262,7 +262,7 @@ PALETTE_INIT_MEMBER(galaxold_state,mariner)
 	int i;
 
 
-	PALETTE_INIT_CALL_MEMBER(galaxold);
+	PALETTE_INIT_NAME(galaxold)(palette);
 
 
 	/* set up background colors */
@@ -282,7 +282,7 @@ PALETTE_INIT_MEMBER(galaxold_state,mariner)
 		g = 0;
 		b = 0x0e * BIT(i,0) + 0x1f * BIT(i,1) + 0x43 * BIT(i,2) + 0x8f * BIT(i,3);
 
-		palette_set_color_rgb(machine(),base+i,r,g,b);
+		palette.set_pen_color(base+i,r,g,b);
 	}
 }
 
@@ -315,7 +315,7 @@ PALETTE_INIT_MEMBER(galaxold_state,dambustr)
 		bit1 = BIT(*color_prom,7);
 		g = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color_rgb(machine(),i,r,g,b);
+		palette.set_pen_color(i,r,g,b);
 		color_prom++;
 	}
 
@@ -324,8 +324,8 @@ PALETTE_INIT_MEMBER(galaxold_state,dambustr)
 
 
 	/* bullets - yellow and white */
-	palette_set_color(machine(),BULLETS_COLOR_BASE+0,rgb_t(0xef,0xef,0x00));
-	palette_set_color(machine(),BULLETS_COLOR_BASE+1,rgb_t(0xef,0xef,0xef));
+	palette.set_pen_color(BULLETS_COLOR_BASE+0,rgb_t(0xef,0xef,0x00));
+	palette.set_pen_color(BULLETS_COLOR_BASE+1,rgb_t(0xef,0xef,0xef));
 
 	/*
 	Assumption (not clear from the schematics):
@@ -341,7 +341,7 @@ PALETTE_INIT_MEMBER(galaxold_state,dambustr)
 		int r = BIT(i,0) * 0x47;
 		int g = BIT(i,1) * 0x47;
 		int b = BIT(i,2) * 0x4f;
-		palette_set_color_rgb(machine(),base+i,r,g,b);
+		palette.set_pen_color(base+i,r,g,b);
 	}
 }
 
@@ -352,7 +352,7 @@ PALETTE_INIT_MEMBER(galaxold_state,turtles)
 	int i;
 
 
-	PALETTE_INIT_CALL_MEMBER(galaxold);
+	PALETTE_INIT_NAME(galaxold)(palette);
 
 
 	/*  The background color generator is connected this way:
@@ -367,7 +367,7 @@ PALETTE_INIT_MEMBER(galaxold_state,turtles)
 		int g = BIT(i,1) * 0x47;
 		int b = BIT(i,2) * 0x55;
 
-		palette_set_color_rgb(machine(),base+i,r,g,b);
+		palette.set_pen_color(base+i,r,g,b);
 	}
 }
 
@@ -1349,7 +1349,7 @@ void galaxold_state::galaxold_init_stars(int colors_offset)
 		g = map[bits];
 		bits = (i >> 4) & 0x03;
 		b = map[bits];
-		palette_set_color_rgb(machine(),colors_offset+i,r,g,b);
+		m_palette->set_pen_color(colors_offset+i,r,g,b);
 	}
 
 
@@ -1700,7 +1700,7 @@ void galaxold_state::draw_sprites(bitmap_ind16 &bitmap, UINT8 *spriteram, size_t
 		if (offs < 3*4)  sy++;
 
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,m_flipscreen_x ? spritevisibleareaflipx : spritevisiblearea,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,m_flipscreen_x ? spritevisibleareaflipx : spritevisiblearea,
 				code,color,
 				flipx,flipy,
 				sx,sy,0);

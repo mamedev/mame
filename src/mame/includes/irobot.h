@@ -80,7 +80,7 @@ public:
 	DECLARE_DRIVER_INIT(irobot);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(irobot);
 	UINT32 screen_update_irobot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(irobot_irvg_done_callback);

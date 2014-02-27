@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0xb14000, 0xb17fff) AM_RAM //used by histryma @0x0000b25a,b270
 	AM_RANGE(0xb18000, 0xb1bfff) AM_RAM //used by histryma @0x0000b25a,b270,b286
 
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_SHARE("spriteram")
 
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( bbprot_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_SHARE("fof_txt_tileram")
 
 	AM_RANGE(0xc00000, 0xc00fff) AM_READONLY
-	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_SHARE("spriteram")
 
@@ -744,7 +744,8 @@ static MACHINE_CONFIG_START( fitfight, fitfight_state )
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 39*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fitfight_state, screen_update_fitfight)
 
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -769,7 +770,8 @@ static MACHINE_CONFIG_START( bbprot, fitfight_state )
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 39*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fitfight_state, screen_update_fitfight)
 
-	MCFG_PALETTE_LENGTH(0x2000)
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

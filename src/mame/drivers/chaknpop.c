@@ -386,8 +386,8 @@ static MACHINE_CONFIG_START( chaknpop, chaknpop_state )
 	MCFG_SCREEN_UPDATE_DRIVER(chaknpop_state, screen_update_chaknpop)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", chaknpop)
-	MCFG_PALETTE_LENGTH(1024)
-
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INIT_OWNER(chaknpop_state, chaknpop)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -173,8 +173,7 @@ static MACHINE_CONFIG_START( mc8020, mc80_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*6-1, 0, 16*8-1)
 	MCFG_VIDEO_START_OVERRIDE(mc80_state,mc8020)
 	MCFG_SCREEN_UPDATE_DRIVER(mc80_state, screen_update_mc8020)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* Devices */
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_2_4576MHz, mc8020_z80pio_intf )
@@ -199,8 +198,7 @@ static MACHINE_CONFIG_START( mc8030, mc80_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_VIDEO_START_OVERRIDE(mc80_state,mc8030)
 	MCFG_SCREEN_UPDATE_DRIVER(mc80_state, screen_update_mc8030)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* Devices */
 	MCFG_Z80PIO_ADD( "zve_pio", XTAL_2_4576MHz, mc8030_zve_z80pio_intf )

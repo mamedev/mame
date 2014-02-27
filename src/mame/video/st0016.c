@@ -99,8 +99,8 @@ WRITE8_MEMBER(st0016_state::st0016_palette_ram_w)
 	st0016_paletteram[ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset]=data;
 	val=st0016_paletteram[color*2]+(st0016_paletteram[color*2+1]<<8);
 	if(!color)
-		palette_set_color_rgb(machine(),UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
-	palette_set_color_rgb(machine(),color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
+		m_palette->set_pen_color(UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
+	m_palette->set_pen_color(color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
 }
 
 READ8_MEMBER(st0016_state::st0016_character_ram_r)
@@ -509,7 +509,7 @@ void st0016_state::draw_bgmap(bitmap_ind16 &bitmap,const rectangle &cliprect, in
 
 					if(priority)
 					{
-						gfx->transpen(bitmap,cliprect,
+						gfx->transpen(m_palette,bitmap,cliprect,
 										code,
 										color,
 										flipx,flipy,

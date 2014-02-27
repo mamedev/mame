@@ -9,29 +9,26 @@ Atari Sprint 4 video emulation
 #include "includes/sprint4.h"
 
 
-void sprint4_state::palette_init()
+PALETTE_INIT_MEMBER(sprint4_state, sprint4)
 {
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 6);
+	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00)); /* black  */
+	palette.set_indirect_color(1, rgb_t(0xfc, 0xdf, 0x80)); /* peach  */
+	palette.set_indirect_color(2, rgb_t(0xf0, 0x00, 0xf0)); /* violet */
+	palette.set_indirect_color(3, rgb_t(0x00, 0xf0, 0x0f)); /* green  */
+	palette.set_indirect_color(4, rgb_t(0x30, 0x4f, 0xff)); /* blue   */
+	palette.set_indirect_color(5, rgb_t(0xff, 0xff, 0xff)); /* white  */
 
-	colortable_palette_set_color(machine().colortable, 0, rgb_t(0x00, 0x00, 0x00)); /* black  */
-	colortable_palette_set_color(machine().colortable, 1, rgb_t(0xfc, 0xdf, 0x80)); /* peach  */
-	colortable_palette_set_color(machine().colortable, 2, rgb_t(0xf0, 0x00, 0xf0)); /* violet */
-	colortable_palette_set_color(machine().colortable, 3, rgb_t(0x00, 0xf0, 0x0f)); /* green  */
-	colortable_palette_set_color(machine().colortable, 4, rgb_t(0x30, 0x4f, 0xff)); /* blue   */
-	colortable_palette_set_color(machine().colortable, 5, rgb_t(0xff, 0xff, 0xff)); /* white  */
+	palette.set_pen_indirect(0, 0);
+	palette.set_pen_indirect(2, 0);
+	palette.set_pen_indirect(4, 0);
+	palette.set_pen_indirect(6, 0);
+	palette.set_pen_indirect(8, 0);
 
-	colortable_entry_set_value(machine().colortable, 0, 0);
-	colortable_entry_set_value(machine().colortable, 2, 0);
-	colortable_entry_set_value(machine().colortable, 4, 0);
-	colortable_entry_set_value(machine().colortable, 6, 0);
-	colortable_entry_set_value(machine().colortable, 8, 0);
-
-	colortable_entry_set_value(machine().colortable, 1, 1);
-	colortable_entry_set_value(machine().colortable, 3, 2);
-	colortable_entry_set_value(machine().colortable, 5, 3);
-	colortable_entry_set_value(machine().colortable, 7, 4);
-	colortable_entry_set_value(machine().colortable, 9, 5);
+	palette.set_pen_indirect(1, 1);
+	palette.set_pen_indirect(3, 2);
+	palette.set_pen_indirect(5, 3);
+	palette.set_pen_indirect(7, 4);
+	palette.set_pen_indirect(9, 5);
 }
 
 
@@ -74,7 +71,7 @@ UINT32 sprint4_state::screen_update_sprint4(screen_device &screen, bitmap_ind16 
 		if (i & 1)
 			bank = 32;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 			(code >> 3) | bank,
 			(attr & 0x80) ? 4 : i,
 			0, 0,
@@ -120,7 +117,7 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 			if (i & 1)
 				bank = 32;
 
-			m_gfxdecode->gfx(1)->transpen(m_helper,rect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,m_helper,rect,
 				(code >> 3) | bank,
 				4,
 				0, 0,
@@ -129,7 +126,7 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 
 			for (y = rect.min_y; y <= rect.max_y; y++)
 				for (x = rect.min_x; x <= rect.max_x; x++)
-					if (colortable_entry_get_value(machine().colortable, m_helper.pix16(y, x)) != 0)
+					if (m_palette->pen_indirect(m_helper.pix16(y, x)) != 0)
 						m_collision[i] = 1;
 		}
 

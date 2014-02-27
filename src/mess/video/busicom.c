@@ -1845,14 +1845,14 @@ static const UINT8 color[] = { 0xFF,0xDB,0xB7,0x92,0x6E,0x49,0x25,0x00 };
 
 static const UINT8 color_red[] = { 0xb0,0xb5,0xc0,0xc5,0xd0,0xd5,0xdf };
 
-void busicom_state::palette_init()
+PALETTE_INIT_MEMBER(busicom_state, busicom)
 {
 	int i;
 	for(i=0;i<8;i++) {
-		palette_set_color( machine(), i, rgb_t(color[i],color[i],color[i]) );
+		m_palette->set_pen_color( i, rgb_t(color[i],color[i],color[i]) );
 	}
-	palette_set_color( machine(), 8, rgb_t(0xff,0xff,0xff) );
+	m_palette->set_pen_color( 8, rgb_t(0xff,0xff,0xff) );
 	for(i=0;i<7;i++) {
-		palette_set_color( machine(), i+9, rgb_t(color_red[i],0x00,0x00) );
+		m_palette->set_pen_color( i+9, rgb_t(color_red[i],0x00,0x00) );
 	}
 }

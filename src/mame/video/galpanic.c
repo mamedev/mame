@@ -17,7 +17,7 @@ PALETTE_INIT_MEMBER(galpanic_state,galpanic)
 
 	/* initialize 555 RGB lookup */
 	for (i = 0;i < 32768;i++)
-		palette_set_color_rgb(machine(),i+1024,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+		palette.set_pen_color(i+1024,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
 
@@ -39,7 +39,7 @@ WRITE16_MEMBER(galpanic_state::galpanic_paletteram_w)
 {
 	data = COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	/* bit 0 seems to be a transparency flag for the front bitmap */
-	palette_set_color_rgb(machine(),offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
+	m_palette->set_pen_color(offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 
@@ -72,7 +72,7 @@ void galpanic_state::comad_draw_sprites(bitmap_ind16 &bitmap, const rectangle &c
 		sx = (sx&0x1ff) - (sx&0x200);
 		sy = (sy&0x1ff) - (sy&0x200);
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

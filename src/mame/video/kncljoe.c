@@ -14,13 +14,10 @@ Knuckle Joe - (c) 1985 Taito Corporation
 
 ***************************************************************************/
 
-void kncljoe_state::palette_init()
+PALETTE_INIT_MEMBER(kncljoe_state, kncljoe)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x90);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x80; i++)
@@ -29,7 +26,7 @@ void kncljoe_state::palette_init()
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	for (i = 0x80; i < 0x90; i++)
@@ -55,7 +52,7 @@ void kncljoe_state::palette_init()
 		bit2 = (color_prom[(i - 0x80) + 0x300] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -63,13 +60,13 @@ void kncljoe_state::palette_init()
 
 	/* chars */
 	for (i = 0; i < 0x80; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* sprite lookup table */
 	for (i = 0x80; i < 0x100; i++)
 	{
 		UINT8 ctabentry = (color_prom[i - 0x80] & 0x0f) | 0x80;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -225,7 +222,7 @@ void kncljoe_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (sx >= 256-8)
 				sx -= 256;
 
-			gfx->transpen(bitmap,clip,
+			gfx->transpen(m_palette,bitmap,clip,
 				code,
 				color,
 				flipx,flipy,

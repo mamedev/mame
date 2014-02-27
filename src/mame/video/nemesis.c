@@ -204,7 +204,7 @@ WRITE16_MEMBER(nemesis_state::nemesis_palette_word_w)
 	bit5 = BIT(data, 14);
 	b = MULTIPLIER;
 
-	palette_set_color(machine(), offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
 WRITE16_MEMBER(nemesis_state::salamander_palette_word_w)
@@ -213,7 +213,7 @@ WRITE16_MEMBER(nemesis_state::salamander_palette_word_w)
 	offset &= ~1;
 
 	data = ((m_paletteram[offset] << 8) & 0xff00) | (m_paletteram[offset + 1] & 0xff);
-	palette_set_color_rgb(machine(), offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	m_palette->set_pen_color(offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
 
@@ -386,7 +386,7 @@ void nemesis_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 						flipy = !flipy;
 					}
 
-					m_gfxdecode->gfx(char_type)->prio_zoom_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(char_type)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,

@@ -104,7 +104,7 @@ static const rgb_t radio86_palette[3] = {
 
 PALETTE_INIT_MEMBER(radio86_state,radio86)
 {
-	palette_set_colors(machine(), 0, radio86_palette, ARRAY_LENGTH(radio86_palette));
+	palette.set_pen_colors(0, radio86_palette, ARRAY_LENGTH(radio86_palette));
 }
 
 void radio86_state::video_start()

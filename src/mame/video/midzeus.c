@@ -269,7 +269,7 @@ VIDEO_START_MEMBER(midzeus_state,midzeus)
 
 	/* initialize a 5-5-5 palette */
 	for (i = 0; i < 32768; i++)
-		palette_set_color_rgb(machine(), i, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
+		m_palette->set_pen_color(i, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
 
 	/* initialize polygon engine */
 	poly = poly_alloc(machine(), 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);

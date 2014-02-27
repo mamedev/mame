@@ -160,7 +160,7 @@ UINT32 bmcbowl_state::screen_update_bmcbowl(screen_device &screen, bitmap_ind16 
 */
 
 	int x,y,z,pixdat;
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	z=0;
 	for (y=0;y<230;y++)
@@ -231,7 +231,7 @@ WRITE16_MEMBER(bmcbowl_state::bmc_RAMDAC_offset_w)
 WRITE16_MEMBER(bmcbowl_state::bmc_RAMDAC_color_w)
 {
 	m_colorram[m_clr_offset]=data;
-	palette_set_color_rgb(machine(),m_clr_offset/3,pal6bit(m_colorram[(m_clr_offset/3)*3]),pal6bit(m_colorram[(m_clr_offset/3)*3+1]),pal6bit(m_colorram[(m_clr_offset/3)*3+2]));
+	m_palette->set_pen_color(m_clr_offset/3,pal6bit(m_colorram[(m_clr_offset/3)*3]),pal6bit(m_colorram[(m_clr_offset/3)*3+1]),pal6bit(m_colorram[(m_clr_offset/3)*3+2]));
 	m_clr_offset=(m_clr_offset+1)%768;
 }
 
@@ -481,7 +481,7 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 0*8, 29*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bmcbowl_state, screen_update_bmcbowl)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

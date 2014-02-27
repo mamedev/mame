@@ -177,7 +177,7 @@ static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0x288000, 0x288001) AM_RAM
 	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x320000, 0x3207ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x320000, 0x3207ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
 ADDRESS_MAP_END
 
@@ -386,16 +386,19 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dblewing_state, screen_update_dblewing)
 
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_GFXDECODE_ADD("gfxdecode", dblewing)
 
 	MCFG_DECO16IC_ADD("tilegen1", dblewing_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 	
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
 	decospr_device::set_pri_callback(*device, dblwings_pri_callback);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DECO104_ADD("ioprot104")
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE

@@ -153,7 +153,7 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */
 	MCFG_UPD7220_ADD("upd7220", 8000000/6, hgdc_intf, upd7220_map) // unk clock

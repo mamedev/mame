@@ -30,7 +30,7 @@ static ADDRESS_MAP_START( prehisle_map, AS_PROGRAM, 16, prehisle_state )
 	AM_RANGE(0x090000, 0x0907ff) AM_RAM_WRITE(prehisle_fg_videoram16_w) AM_SHARE("videoram")
 	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(prehisle_bg_videoram16_w) AM_SHARE("bg_videoram16")
-	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0e0000, 0x0e00ff) AM_READ(prehisle_control16_r)
 	AM_RANGE(0x0f0070, 0x0ff071) AM_WRITE(prehisle_sound16_w)
 	AM_RANGE(0x0f0000, 0x0ff0ff) AM_WRITE(prehisle_control16_w)
@@ -217,7 +217,8 @@ static MACHINE_CONFIG_START( prehisle, prehisle_state )
 	MCFG_SCREEN_UPDATE_DRIVER(prehisle_state, screen_update_prehisle)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", prehisle)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 
 	/* sound hardware */

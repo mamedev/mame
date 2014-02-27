@@ -80,7 +80,7 @@ UINT32 bublbobl_state::screen_update_bublbobl(screen_device &screen, bitmap_ind1
 					flipy = !flipy;
 				}
 
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,

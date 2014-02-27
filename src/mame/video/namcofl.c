@@ -67,7 +67,7 @@ static void namcofl_install_palette(running_machine &machine)
 
 			for( byte_offset=0; byte_offset<4; byte_offset++ )
 			{
-				palette_set_color_rgb( machine, pen++, r&0xff, g&0xff, b&0xff);
+				state->m_palette->set_pen_color(pen++, r&0xff, g&0xff, b&0xff);
 				r>>=8; g>>=8; b>>=8;
 			}
 		}
@@ -86,7 +86,7 @@ UINT32 namcofl_state::screen_update_namcofl(screen_device &screen, bitmap_ind16 
 
 	namcofl_install_palette(machine());
 
-	bitmap.fill(get_black_pen(machine()), cliprect );
+	bitmap.fill(m_palette->black_pen(), cliprect );
 
 	for( pri=0; pri<16; pri++ )
 	{

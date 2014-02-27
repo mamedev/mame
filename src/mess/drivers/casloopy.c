@@ -252,7 +252,7 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 	r = pal5bit((m_vregs[0x4/4] >> 10) & 0x1f);
 	g = pal5bit((m_vregs[0x4/4] >> 5) & 0x1f);
 	b = pal5bit((m_vregs[0x4/4] >> 0) & 0x1f);
-	palette_set_color(machine(),0x100,rgb_t(r^0xff,g^0xff,b^0xff));
+	m_palette->set_pen_color(0x100,rgb_t(r^0xff,g^0xff,b^0xff));
 	bitmap.fill( 0x100 ,cliprect);
 	#endif
 
@@ -265,7 +265,7 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 
 			tile &= 0x7ff; //???
 
-			gfx->transpen(bitmap,cliprect,tile,7,0,0,x*8,y*8,0xffffffff);
+			gfx->transpen(m_palette,bitmap,cliprect,tile,7,0,0,x*8,y*8,0xffffffff);
 
 			count+=2;
 		}
@@ -328,7 +328,7 @@ WRITE16_MEMBER(casloopy_state::casloopy_pal_w)
 	g = ((m_paletteram[offset])&0x03e0)>>5;
 	r = ((m_paletteram[offset])&0x7c00)>>10;
 
-	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 READ8_MEMBER(casloopy_state::casloopy_vram_r)
@@ -493,7 +493,7 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update_casloopy)
 
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 	
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 

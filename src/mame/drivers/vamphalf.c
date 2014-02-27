@@ -252,10 +252,10 @@ WRITE32_MEMBER(vamphalf_state::paletteram32_w)
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
 	paldata = m_generic_paletteram_32[offset] & 0xffff;
-	palette_set_color_rgb(machine(), offset*2 + 1, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	m_palette->set_pen_color(offset*2 + 1, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 
 	paldata = (m_generic_paletteram_32[offset] >> 16) & 0xffff;
-	palette_set_color_rgb(machine(), offset*2 + 0, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	m_palette->set_pen_color(offset*2 + 0, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 }
 
 READ32_MEMBER(vamphalf_state::wyvernwg_prot_r)
@@ -412,7 +412,7 @@ WRITE8_MEMBER( vamphalf_state::qs1000_p3_w )
 static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, vamphalf_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -666,7 +666,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 				y = 256 - y;
 			}
 
-			gfx->transpen(bitmap,clip,code,color,fx,fy,x,y,0);
+			gfx->transpen(state->m_palette,bitmap,clip,code,color,fx,fy,x,y,0);
 		}
 	}
 }
@@ -727,7 +727,7 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 				y = 256 - y;
 			}
 
-			gfx->transpen(bitmap,clip,code,color,fx,fy,x,y,0);
+			gfx->transpen(state->m_palette,bitmap,clip,code,color,fx,fy,x,y,0);
 		}
 	}
 }
@@ -997,7 +997,8 @@ static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_SCREEN_VISIBLE_AREA(31, 350, 16, 251)
 	MCFG_SCREEN_UPDATE_DRIVER(vamphalf_state, screen_update_common)
 
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_GFXDECODE_ADD("gfxdecode", vamphalf)
 MACHINE_CONFIG_END
 
@@ -1128,7 +1129,8 @@ static MACHINE_CONFIG_START( aoh, vamphalf_state )
 	MCFG_SCREEN_VISIBLE_AREA(64, 511-64, 16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(vamphalf_state, screen_update_aoh)
 
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_GFXDECODE_ADD("gfxdecode", vamphalf)
 
 	/* sound hardware */

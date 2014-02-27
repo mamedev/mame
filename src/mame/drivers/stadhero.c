@@ -74,7 +74,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, stadhero_state )
 	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_1_w)
 	AM_RANGE(0x260000, 0x261fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_r, pf_data_w)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READWRITE(stadhero_control_r, stadhero_control_w)
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x310000, 0x3107ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM /* Main ram */
 	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x000800) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -236,7 +236,8 @@ static MACHINE_CONFIG_START( stadhero, stadhero_state )
 	MCFG_SCREEN_UPDATE_DRIVER(stadhero_state, screen_update_stadhero)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", stadhero)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,1,1,2);
@@ -245,6 +246,7 @@ static MACHINE_CONFIG_START( stadhero, stadhero_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 2);
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	MCFG_DECO_MXC06_PALETTE("palette")
 
 
 	/* sound hardware */

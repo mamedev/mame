@@ -139,7 +139,7 @@ private:
 	devcb_resolved_write_line   m_out_hblank_func;
 	devcb_resolved_read8        m_in_db_func;
 
-	rgb_t m_palette[32];
+	rgb_t m_palette_val[32];
 	UINT8 m_ram[0x90];
 	UINT8 m_y_int;
 	UINT8 m_fmod;

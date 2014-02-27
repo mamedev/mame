@@ -277,7 +277,7 @@ static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_SHARE("cg10103_vram")
 	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_SHARE("vs920a_vram")
 	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_SHARE("lineram")
-	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x200000, 0x20000f) AM_RAM_WRITE(MB60553_0_regs_w)
 	AM_RANGE(0x200040, 0x20005f) AM_RAM
@@ -314,7 +314,7 @@ static ADDRESS_MAP_START( vgoal_map, AS_PROGRAM, 16, gstriker_state )
 	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_SHARE("cg10103_vram")
 	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_SHARE("vs920a_vram")
 	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_SHARE("lineram")
-	AM_RANGE(0x1c0000, 0x1c4fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1c0000, 0x1c4fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x20000f) AM_RAM_WRITE(MB60553_0_regs_w)
 	AM_RANGE(0x200040, 0x20005f) AM_RAM
 
@@ -553,7 +553,8 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gstriker_state, screen_update_gstriker)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gstriker)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
@@ -561,6 +562,7 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 	MCFG_VSYSTEM_SPR_SET_PALMASK(0x1f)
 	MCFG_VSYSTEM_SPR_SET_TRANSPEN(0)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(gstriker_state,gstriker)
 
@@ -602,12 +604,14 @@ static MACHINE_CONFIG_START( vgoal, gstriker_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gstriker_state, screen_update_gstriker)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gstriker)
-	MCFG_PALETTE_LENGTH(0x2000)
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_SET_PALBASE(0x00)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(gstriker_state,vgoalsoc)
 

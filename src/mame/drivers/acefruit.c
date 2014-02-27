@@ -42,7 +42,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_payout_r);
 	DECLARE_DRIVER_INIT(sidewndr);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(acefruit);
 	UINT32 screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(acefruit_vblank);
 	void acefruit_update_irq(int vpos);
@@ -130,7 +130,7 @@ UINT32 acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_ind1
 
 			if( color < 0x4 )
 			{
-				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, code, color, 0, 0, col * 16, row * 8 );
+				m_gfxdecode->gfx(1)->opaque(m_palette,bitmap,cliprect, code, color, 0, 0, col * 16, row * 8 );
 			}
 			else if( color >= 0x5 && color <= 0x7 )
 			{
@@ -282,27 +282,27 @@ WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
 	}
 }
 
-void acefruit_state::palette_init()
+PALETTE_INIT_MEMBER(acefruit_state, acefruit)
 {
 	/* sprites */
-	palette_set_color( machine(), 0, rgb_t(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 1, rgb_t(0x00, 0x00, 0xff) );
-	palette_set_color( machine(), 2, rgb_t(0x00, 0xff, 0x00) );
-	palette_set_color( machine(), 3, rgb_t(0xff, 0x7f, 0x00) );
-	palette_set_color( machine(), 4, rgb_t(0xff, 0x00, 0x00) );
-	palette_set_color( machine(), 5, rgb_t(0xff, 0xff, 0x00) );
-	palette_set_color( machine(), 6, rgb_t(0xff, 0xff, 0xff) );
-	palette_set_color( machine(), 7, rgb_t(0x7f, 0x3f, 0x1f) );
+	palette.set_pen_color( 0, rgb_t(0x00, 0x00, 0x00) );
+	palette.set_pen_color( 1, rgb_t(0x00, 0x00, 0xff) );
+	palette.set_pen_color( 2, rgb_t(0x00, 0xff, 0x00) );
+	palette.set_pen_color( 3, rgb_t(0xff, 0x7f, 0x00) );
+	palette.set_pen_color( 4, rgb_t(0xff, 0x00, 0x00) );
+	palette.set_pen_color( 5, rgb_t(0xff, 0xff, 0x00) );
+	palette.set_pen_color( 6, rgb_t(0xff, 0xff, 0xff) );
+	palette.set_pen_color( 7, rgb_t(0x7f, 0x3f, 0x1f) );
 
 	/* tiles */
-	palette_set_color( machine(), 8, rgb_t(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 9, rgb_t(0xff, 0xff, 0xff) );
-	palette_set_color( machine(), 10, rgb_t(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 11, rgb_t(0x00, 0x00, 0xff) );
-	palette_set_color( machine(), 12, rgb_t(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 13, rgb_t(0x00, 0xff, 0x00) );
-	palette_set_color( machine(), 14, rgb_t(0x00, 0x00, 0x00) );
-	palette_set_color( machine(), 15, rgb_t(0xff, 0x00, 0x00) );
+	palette.set_pen_color( 8, rgb_t(0x00, 0x00, 0x00) );
+	palette.set_pen_color( 9, rgb_t(0xff, 0xff, 0xff) );
+	palette.set_pen_color( 10, rgb_t(0x00, 0x00, 0x00) );
+	palette.set_pen_color( 11, rgb_t(0x00, 0x00, 0xff) );
+	palette.set_pen_color( 12, rgb_t(0x00, 0x00, 0x00) );
+	palette.set_pen_color( 13, rgb_t(0x00, 0xff, 0x00) );
+	palette.set_pen_color( 14, rgb_t(0x00, 0x00, 0x00) );
+	palette.set_pen_color( 15, rgb_t(0xff, 0x00, 0x00) );
 }
 
 static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )
@@ -614,7 +614,8 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(acefruit_state, screen_update_acefruit)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(acefruit_state, acefruit)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

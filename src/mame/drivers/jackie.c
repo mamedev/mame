@@ -207,7 +207,7 @@ UINT32 jackie_state::screen_update_jackie(screen_device &screen, bitmap_ind16 &b
 	int startclipmin = 0;
 	const rectangle &visarea = screen.visible_area();
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	for (i=0;i < 0x40;i++)
 	{
@@ -371,8 +371,8 @@ static ADDRESS_MAP_START( jackie_io_map, AS_IO, 8, jackie_state )
 	AM_RANGE(0x05a0, 0x05a4) AM_WRITE(jackie_unk_reg3_lo_w)
 	AM_RANGE(0x0da0, 0x0da4) AM_WRITE(jackie_unk_reg3_hi_w)
 	AM_RANGE(0x1000, 0x1107) AM_RAM AM_SHARE("bg_scroll2")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")           /* DSW2 */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")           /* DSW3 */
@@ -590,8 +590,8 @@ static MACHINE_CONFIG_START( jackie, jackie_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jackie_state, screen_update_jackie)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jackie)
-	MCFG_PALETTE_LENGTH(2048)
-
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

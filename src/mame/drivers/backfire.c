@@ -232,7 +232,7 @@ WRITE32_MEMBER(backfire_state::backfire_eeprom_w)
 WRITE32_MEMBER(backfire_state::backfire_nonbuffered_palette_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	palette_set_color_rgb(machine(),offset,pal5bit(m_generic_paletteram_32[offset] >> 0),pal5bit(m_generic_paletteram_32[offset] >> 5),pal5bit(m_generic_paletteram_32[offset] >> 10));
+	m_palette->set_pen_color(offset,pal5bit(m_generic_paletteram_32[offset] >> 0),pal5bit(m_generic_paletteram_32[offset] >> 5),pal5bit(m_generic_paletteram_32[offset] >> 10));
 }
 
 /* map 32-bit writes to 16-bit */
@@ -503,7 +503,7 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_GFXDECODE_ADD("gfxdecode", backfire)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -525,22 +525,26 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	MCFG_DECO16IC_ADD("tilegen1", backfire_deco16ic_tilegen1_intf)	
 	MCFG_DECO16IC_SET_SCREEN("lscreen")
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 	
 	MCFG_DECO16IC_ADD("tilegen2", backfire_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_SET_SCREEN("lscreen")
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	MCFG_VIDEO_SET_SCREEN("lscreen")
 	decospr_device::set_gfx_region(*device, 4);
 	decospr_device::set_pri_callback(*device, backfire_pri_callback);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	MCFG_VIDEO_SET_SCREEN("rscreen")
 	decospr_device::set_gfx_region(*device, 5);
 	decospr_device::set_pri_callback(*device, backfire_pri_callback);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 
 	/* sound hardware */

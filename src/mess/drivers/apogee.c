@@ -227,8 +227,8 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", apogee)
-	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT_OVERRIDE(apogee_state,radio86)
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(apogee_state,radio86)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")

@@ -295,8 +295,8 @@ static MACHINE_CONFIG_START( fcombat, fcombat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fcombat_state, screen_update_fcombat)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fcombat)
-	MCFG_PALETTE_LENGTH(256*3)
-
+	MCFG_PALETTE_ADD("palette", 256*3)
+	MCFG_PALETTE_INIT_OWNER(fcombat_state, fcombat)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

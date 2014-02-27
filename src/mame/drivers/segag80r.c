@@ -829,7 +829,7 @@ static MACHINE_CONFIG_START( g80r_base, segag80r_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", segag80r)
-	MCFG_PALETTE_LENGTH(64)
+	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
@@ -871,7 +871,8 @@ static MACHINE_CONFIG_DERIVED( spaceod, g80r_base )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spaceod)
-	MCFG_PALETTE_LENGTH(64+64)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 64+64)
 
 	/* sound boards */
 	MCFG_FRAGMENT_ADD(spaceod_sound_board)
@@ -887,7 +888,8 @@ static MACHINE_CONFIG_DERIVED( monsterb, g80r_base )
 
 	/* background board changes */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
-	MCFG_PALETTE_LENGTH(64+64)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 64+64)
 
 	/* sound boards */
 	MCFG_FRAGMENT_ADD(monsterb_sound_board)
@@ -900,7 +902,8 @@ static MACHINE_CONFIG_DERIVED( pignewt, g80r_base )
 
 	/* background board changes */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
-	MCFG_PALETTE_LENGTH(64+64)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 64+64)
 
 	/* sound boards */
 	MCFG_SEGAUSB_ADD("usbsnd")
@@ -918,7 +921,8 @@ static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
-	MCFG_PALETTE_LENGTH(64+64)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 64+64)
 
 	/* sound boards */
 

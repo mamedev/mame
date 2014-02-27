@@ -37,7 +37,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(ikki);
 	UINT32 screen_update_ikki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ikki_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

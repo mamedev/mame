@@ -108,7 +108,7 @@ UINT32 segaorun_state::screen_update_outrun(screen_device &screen, bitmap_ind16 
 	// if no drawing is happening, fill with black and get out
 	if (!m_segaic16vid->segaic16_display_enable)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 

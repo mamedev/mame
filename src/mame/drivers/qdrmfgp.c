@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( qdrmfgp_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("workram")                                     /* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")   /* backup ram */
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_device, word_w)                                      /* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                    /* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")                                         /* battery power & service sw */
@@ -324,7 +324,7 @@ static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x110fff) AM_RAM AM_SHARE("workram")                                     /* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")   /* backup ram */
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_device, word_w)                                      /* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0xff00)                    /* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")                                         /* battery power & service */
@@ -633,13 +633,15 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(qdrmfgp_state, screen_update_qdrmfgp)
 
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K056832_ADD("k056832", qdrmfgp_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K053252_ADD("k053252", XTAL_32MHz/4, qdrmfgp_k053252_intf)
 
 	/* sound hardware */
@@ -672,13 +674,15 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(qdrmfgp_state, screen_update_qdrmfgp)
 
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K056832_ADD("k056832", qdrmfgp2_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K053252_ADD("k053252", XTAL_32MHz/4, qdrmfgp2_k053252_intf)
 
 	/* sound hardware */

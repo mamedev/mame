@@ -502,7 +502,7 @@ static MACHINE_CONFIG_START( hikaru, hikaru_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hikaru_state, screen_update_hikaru)
 
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
 //  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

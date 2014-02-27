@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( parentj_map, AS_PROGRAM, 16, taitoo_state )
 	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(io_r, io_w) /* TC0220IOC ? */
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymsnd", ym2203_device, read, write, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( parentj )
@@ -256,7 +256,8 @@ static MACHINE_CONFIG_START( parentj, taitoo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoo_state, screen_update_parentj)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", parentj)
-	MCFG_PALETTE_LENGTH(33*16)
+	MCFG_PALETTE_ADD("palette", 33*16)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_TC0080VCO_ADD("tc0080vco", parentj_intf)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")

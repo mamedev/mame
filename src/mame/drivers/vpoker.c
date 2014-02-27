@@ -128,7 +128,7 @@ public:
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(vpoker);
 	UINT32 screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -154,7 +154,7 @@ UINT32 vpoker_state::screen_update_vpoker(screen_device &screen, bitmap_ind16 &b
 		{
 			int tile = videoram[count];
 			//int colour = tile>>12;
-			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*16,y*16);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x*16,y*16);
 
 			count++;
 		}
@@ -630,7 +630,7 @@ static GFXDECODE_START( vpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
-void vpoker_state::palette_init()
+PALETTE_INIT_MEMBER(vpoker_state, vpoker)
 {
 	int i;
 
@@ -640,7 +640,7 @@ void vpoker_state::palette_init()
 
 		color = rgb_t(pal1bit((i & 4) >> 2),pal1bit(i & 1),pal1bit((i & 2) >> 1));
 
-		palette_set_color(machine(), i, color);
+		palette.set_pen_color(i, color);
 	}
 }
 
@@ -674,8 +674,8 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vpoker_state, screen_update_vpoker)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", vpoker)
-	MCFG_PALETTE_LENGTH(8)
-
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(vpoker_state, vpoker)
 
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("6840ptm", ptm_intf)

@@ -2013,7 +2013,7 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 			p->front = !(h & 0x00000001);
 			p->rd.machine = &machine();
 			p->rd.texture_lookup = render_texture_lookup_nocache_point;
-			p->rd.pens = machine().pens + (color << 8);
+			p->rd.pens = m_palette->pens() + (color << 8);
 			render.poly_count++;
 		}
 
@@ -2109,7 +2109,7 @@ WRITE32_MEMBER(namcos23_state::s23_paletteram_w)
 		int r = nthbyte(m_generic_paletteram_32, which|0x00001);
 		int g = nthbyte(m_generic_paletteram_32, which|0x10001);
 		int b = nthbyte(m_generic_paletteram_32, which|0x20001);
-		palette_set_color(machine(), which/2, rgb_t(r,g,b));
+		m_palette->set_pen_color(which/2, rgb_t(r,g,b));
 	}
 }
 
@@ -3455,7 +3455,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update_s23)
 
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3502,7 +3502,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update_s23)
 
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", namcos23)
 
@@ -3563,7 +3563,7 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update_s23)
 
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", namcos23)
 

@@ -16,10 +16,11 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_RAMDAC_ADD(_tag,_config,_map) \
+#define MCFG_RAMDAC_ADD(_tag,_config,_map,_palette_tag) \
 	MCFG_DEVICE_ADD(_tag, RAMDAC, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)	\
+	ramdac_device::static_set_palette_tag(*device, "^" _palette_tag);	
 
 #define RAMDAC_INTERFACE(name) \
 	const ramdac_interface (name) =
@@ -44,6 +45,9 @@ class ramdac_device :   public device_t,
 public:
 	// construction/destruction
 	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	// I/O operations
 	DECLARE_READ8_MEMBER( index_r );
@@ -75,7 +79,8 @@ private:
 	UINT8 m_int_index[2];
 	UINT8 *m_palram;
 
-	const address_space_config      m_space_config;
+	const address_space_config      m_space_config;	
+	required_device<palette_device> m_palette;
 };
 
 

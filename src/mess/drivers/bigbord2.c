@@ -652,8 +652,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode", bigbord2)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* keyboard */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bigbord2_state, ctc_tick, attotime::from_hz(MAIN_CLOCK))

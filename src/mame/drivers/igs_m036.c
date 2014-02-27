@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( igs_m036, igs_m036_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_m036_state, screen_update_igs_m036)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 	/* sound hardware (OKI) */
 MACHINE_CONFIG_END
 
@@ -273,7 +273,7 @@ static MACHINE_CONFIG_START( igs_m036_tt, igs_m036_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_m036_state, screen_update_igs_m036)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 	/* sound hardware (TT5665) */
 MACHINE_CONFIG_END
 

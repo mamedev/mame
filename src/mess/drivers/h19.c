@@ -429,8 +429,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_GFXDECODE_ADD("gfxdecode", h19)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk taken from schematics
 	MCFG_INS8250_ADD( "ins8250", h19_ace_interface, XTAL_12_288MHz / 4) // 3.072mhz clock which gets divided down for the various baud rates

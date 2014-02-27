@@ -259,7 +259,7 @@ static MACHINE_CONFIG_START( battlex, battlex_state )
 	MCFG_SCREEN_UPDATE_DRIVER(battlex_state, screen_update_battlex)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", battlex)
-	MCFG_PALETTE_LENGTH(64)
+	MCFG_PALETTE_ADD("palette", 64)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

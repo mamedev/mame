@@ -178,7 +178,7 @@ void tmmjprd_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		tileno >>=1;
 
 		// 255 for 8bpp
-		gfx->transpen(bitmap,cliprect,tileno,colr,!xflip,yflip,(xpos-xoffs)-8,(ypos)-8,255);
+		gfx->transpen(m_palette,bitmap,cliprect,tileno,colr,!xflip,yflip,(xpos-xoffs)-8,(ypos)-8,255);
 	}
 }
 
@@ -306,7 +306,7 @@ UINT32 tmmjprd_state::screen_update_tmmjprd_left(screen_device &screen, bitmap_i
 {
 	UINT8* gfxroms = memregion("gfx2")->base();
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	ttmjprd_draw_tilemap(bitmap, cliprect, m_tilemap_ram[3], m_tilemap_regs[3], gfxroms );
 	draw_sprites(bitmap,cliprect, 1);
@@ -340,7 +340,7 @@ UINT32 tmmjprd_state::screen_update_tmmjprd_right(screen_device &screen, bitmap_
 {
 	UINT8* gfxroms = memregion("gfx2")->base();
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	ttmjprd_draw_tilemap(bitmap, cliprect, m_tilemap_ram[1], m_tilemap_regs[1], gfxroms );
 	draw_sprites(bitmap,cliprect, 0);
@@ -633,7 +633,7 @@ WRITE32_MEMBER(tmmjprd_state::tmmjprd_paletteram_dword_w)
 	r = ((m_generic_paletteram_32[offset] & 0x0000ff00) >>8);
 	g = ((m_generic_paletteram_32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(machine(),offset,rgb_t(r,g,b));
+	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
 
@@ -653,7 +653,7 @@ WRITE32_MEMBER(tmmjprd_state::tmmjprd_brt_1_w)
 	{
 		m_old_brt1 = brt;
 		for (i = bank; i < 0x800+bank; i++)
-			palette_set_pen_contrast(machine(), i, brt);
+			m_palette->set_pen_contrast(i, brt);
 	}
 }
 
@@ -671,7 +671,7 @@ WRITE32_MEMBER(tmmjprd_state::tmmjprd_brt_2_w)
 	{
 		m_old_brt2 = brt;
 		for (i = bank; i < 0x800+bank; i++)
-			palette_set_pen_contrast(machine(), i, brt);
+			m_palette->set_pen_contrast(i, brt);
 	}
 }
 
@@ -766,7 +766,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 //  MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update)
 //  MCFG_SCREEN_SIZE(64*16, 64*16)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)

@@ -182,7 +182,6 @@ public:
 	DECLARE_WRITE8_MEMBER(supershot_output1_w);
 	TILE_GET_INFO_MEMBER(get_supershot_text_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
 	UINT32 screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -335,12 +334,6 @@ static GFXDECODE_START( supershot )
 	GFXDECODE_ENTRY( "gfx", 0, supershot_charlayout,   0, 1  )
 GFXDECODE_END
 
-void supershot_state::palette_init()
-{
-	palette_set_color(machine(),0,rgb_t::black); /* black */
-	palette_set_color(machine(),1,rgb_t::white); /* white */
-}
-
 static MACHINE_CONFIG_START( supershot, supershot_state )
 
 	/* basic machine hardware */
@@ -357,7 +350,7 @@ static MACHINE_CONFIG_START( supershot, supershot_state )
 	MCFG_SCREEN_UPDATE_DRIVER(supershot_state, screen_update_supershot)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", supershot)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */
 	//...

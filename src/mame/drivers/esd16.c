@@ -146,7 +146,7 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 	AM_RANGE(_BASE + 0xc, _BASE + 0xd) AM_WRITENOP \
 	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITEONLY AM_SHARE("head_layersize")
 #define ESD16_PALETTE_AREA( _BASE ) \
-	AM_RANGE(_BASE + 0x000, _BASE + 0xfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(_BASE + 0x000, _BASE + 0xfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 #define ESD16_SPRITE_AREA( _BASE ) \
 	AM_RANGE(_BASE + 0x000, _BASE + 0x7ff) AM_WRITEONLY AM_SHARE("spriteram") AM_MIRROR(0x000800)
 #define ESD16_VRAM_AREA( _BASE ) \
@@ -627,9 +627,11 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 	decospr_device::set_pri_callback(*device, esd16_state::hedpanic_pri_callback);
 	decospr_device::set_flipallx(*device, 1);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", esd16)
-	MCFG_PALETTE_LENGTH(0x1000/2)
+	MCFG_PALETTE_ADD("palette", 0x1000/2)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */

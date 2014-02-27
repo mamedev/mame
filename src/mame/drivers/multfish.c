@@ -223,7 +223,7 @@ UINT32 igrosoft_gamble_state::screen_update_igrosoft_gamble(screen_device &scree
 {
 	int i;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if (!m_disp_enable) return 0;
 
@@ -290,7 +290,7 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_vid_w)
 		b = ( (coldat &0x00e0)>> (5));
 		b|= ( (coldat &0xe000)>> (8+5-3));
 
-		palette_set_color_rgb(machine(), (offset-0x4000)/2, r<<3, g<<3, b<<2);
+		m_palette->set_pen_color((offset-0x4000)/2, r<<3, g<<3, b<<2);
 	}
 	else
 	{
@@ -1065,7 +1065,7 @@ MACHINE_CONFIG_START( igrosoft_gamble, igrosoft_gamble_state )
 	MCFG_SCREEN_VISIBLE_AREA(17*16, 1024-16*7-1, 1*16, 32*16-1*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igrosoft_gamble_state, screen_update_igrosoft_gamble)
 	MCFG_GFXDECODE_ADD("gfxdecode", igrosoft_gamble)
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

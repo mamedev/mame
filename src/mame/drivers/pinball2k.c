@@ -136,7 +136,7 @@ void pinball2k_state::video_start()
 	int i;
 	for (i=0; i < 16; i++)
 	{
-		palette_set_color(machine(), i, cga_palette[i]);
+		m_palette->set_pen_color(i, cga_palette[i]);
 	}
 }
 
@@ -145,7 +145,7 @@ void pinball2k_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	int i,j;
 	const UINT8 *dp;
 	int index = 0;
-	const pen_t *pens = gfx->machine().pens;
+	const pen_t *pens = m_palette->pens();
 
 	dp = gfx->get_data(ch);
 
@@ -584,7 +584,7 @@ static MACHINE_CONFIG_START( mediagx, pinball2k_state )
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -594,7 +594,7 @@ static MACHINE_CONFIG_START( mediagx, pinball2k_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pinball2k_state, screen_update_mediagx)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", CGA)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

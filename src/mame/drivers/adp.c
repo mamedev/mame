@@ -316,7 +316,7 @@ PALETTE_INIT_MEMBER(adp_state,adp)
 {
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -337,7 +337,7 @@ PALETTE_INIT_MEMBER(adp_state,adp)
 		bit2 = (i >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 
@@ -459,7 +459,7 @@ WRITE8_MEMBER(adp_state::ramdac_io_w)
 					break;
 				case 2:
 					m_pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(machine(), m_pal.offs, rgb_t(m_pal.r, m_pal.g, m_pal.b));
+					m_palette->set_pen_color(m_pal.offs, rgb_t(m_pal.r, m_pal.g, m_pal.b));
 					m_pal.offs_internal = 0;
 					m_pal.offs++;
 					m_pal.offs&=0xff;
@@ -641,9 +641,9 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MCFG_SCREEN_UPDATE_DRIVER(adp_state, screen_update)
 
-	MCFG_PALETTE_LENGTH(0x10)
+	MCFG_PALETTE_ADD("palette", 0x10)
 
-	MCFG_PALETTE_INIT_OVERRIDE(adp_state,adp)
+	MCFG_PALETTE_INIT_OWNER(adp_state,adp)
 
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 
@@ -677,9 +677,9 @@ static MACHINE_CONFIG_START( skattv, adp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MCFG_SCREEN_UPDATE_DRIVER(adp_state, screen_update)
 
-	MCFG_PALETTE_LENGTH(0x10)
+	MCFG_PALETTE_ADD("palette", 0x10)
 
-	MCFG_PALETTE_INIT_OVERRIDE(adp_state,adp)
+	MCFG_PALETTE_INIT_OWNER(adp_state,adp)
 
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 
@@ -712,9 +712,9 @@ static MACHINE_CONFIG_START( backgamn, adp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(adp_state, screen_update)
 
-	MCFG_PALETTE_LENGTH(0x10)
+	MCFG_PALETTE_ADD("palette", 0x10)
 
-//  MCFG_PALETTE_INIT_OVERRIDE(adp_state,adp)
+//  MCFG_PALETTE_INIT_OWNER(adp_state,adp)
 
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
 
@@ -734,8 +734,8 @@ static MACHINE_CONFIG_DERIVED( funland, fashiong )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(funland_mem)
 
-	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fstation, fashiong )

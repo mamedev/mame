@@ -42,7 +42,7 @@ public:
 		dynamic_buffer m_vram;
 		UINT32 *m_vram32;
 		UINT32 m_mode, m_vbl_disable;
-		UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
+		UINT32 m_palette_val[256], m_colors[3], m_count, m_clutoffs;
 		emu_timer *m_timer;
 		astring m_assembled_tag;
 
@@ -51,6 +51,7 @@ private:
 		int m_width, m_height, m_patofsx, m_patofsy;
 		UINT32 m_vram_addr, m_vram_src;
 		UINT8 m_fillbytes[256];
+		required_device<palette_device> m_palette;	
 };
 
 

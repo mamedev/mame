@@ -69,7 +69,7 @@ public:
 	TILE_GET_INFO_MEMBER(congo_get_fg_tile_info);
 	virtual void machine_start();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(zaxxon);
 	DECLARE_VIDEO_START(razmataz);
 	DECLARE_VIDEO_START(congo);
 	UINT32 screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

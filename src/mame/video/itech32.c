@@ -233,7 +233,7 @@ WRITE16_MEMBER(itech32_state::timekill_intensity_w)
 		double intensity = (double)(data & 0xff) / (double)0x60;
 		int i;
 		for (i = 0; i < 8192; i++)
-			palette_set_pen_contrast(machine(), i, intensity);
+			m_palette->set_pen_contrast(i, intensity);
 	}
 }
 
@@ -311,7 +311,7 @@ WRITE16_MEMBER(itech32_state::timekill_paletteram_w)
 	g = m_generic_paletteram_16[offset & ~1] >> 8;
 	b = m_generic_paletteram_16[offset |  1] >> 8;
 
-	palette_set_color(machine(), offset / 2, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset / 2, rgb_t(r, g, b));
 }
 
 
@@ -328,7 +328,7 @@ WRITE16_MEMBER(itech32_state::bloodstm_paletteram_w)
 	g = m_generic_paletteram_16[offset & ~1] >> 8;
 	b = m_generic_paletteram_16[offset |  1] & 0xff;
 
-	palette_set_color(machine(), offset / 2, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset / 2, rgb_t(r, g, b));
 }
 
 
@@ -342,7 +342,7 @@ WRITE32_MEMBER(itech32_state::drivedge_paletteram_w)
 	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
 	b = (m_generic_paletteram_32[offset] >> 16) & 0xff;
 
-	palette_set_color(machine(), offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
 
@@ -356,7 +356,7 @@ WRITE32_MEMBER(itech32_state::itech020_paletteram_w)
 	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
 	b = m_generic_paletteram_32[offset] & 0xff;
 
-	palette_set_color(machine(), offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
 

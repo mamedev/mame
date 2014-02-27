@@ -35,7 +35,7 @@ public:
 	optional_device<roc10937_t> m_vfd;
 	required_ioport m_direct_port;
 
-	UINT8 m_palette[16][3];
+	UINT8 m_palette_val[16][3];
 	int m_pal_addr;
 	int m_pal_idx;
 	int m_touch_state;

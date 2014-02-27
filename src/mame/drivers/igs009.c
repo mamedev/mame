@@ -328,7 +328,7 @@ UINT32 igs009_state::screen_update_jingbell(screen_device &screen, bitmap_ind16 
 			/* draw top of screen */
 			clip.set(visarea.min_x, visarea.max_x, startclipmin, startclipmin+2);
 
-			bitmap.fill(machine().pens[rowenable], clip);
+			bitmap.fill(m_palette->pen(rowenable), clip);
 
 			if (rowenable==0)
 			{ // 0 and 1 are the same? or is there a global switchoff?
@@ -352,7 +352,7 @@ UINT32 igs009_state::screen_update_jingbell(screen_device &screen, bitmap_ind16 
 		}
 
 	}
-	else                    bitmap.fill(get_black_pen(machine()), cliprect);
+	else                    bitmap.fill(m_palette->black_pen(), cliprect);
 
 
 	if (layers_ctrl & 2)    m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -475,8 +475,8 @@ static ADDRESS_MAP_START( jingbell_portmap, AS_IO, 8, igs009_state )
 
 	AM_RANGE( 0x1000, 0x11ff ) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
 
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
-	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(gp98_reel1_ram_w )  AM_SHARE("gp98_reel1_ram")
 	AM_RANGE( 0x3400, 0x37ff ) AM_RAM_WRITE(gp98_reel2_ram_w )  AM_SHARE("gp98_reel2_ram")
@@ -763,7 +763,8 @@ static MACHINE_CONFIG_START( jingbell, igs009_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs009_state, screen_update_jingbell)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jingbell)
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 
 	/* sound hardware */

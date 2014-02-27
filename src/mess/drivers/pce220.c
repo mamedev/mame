@@ -915,8 +915,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(pce220_state::pce220_timer_callback)
 
 PALETTE_INIT_MEMBER(pce220_state,pce220)
 {
-	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
-	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 
@@ -935,8 +935,8 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
 	MCFG_SCREEN_SIZE(24*6, 4*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 24*6-1, 0, 4*8-1)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(pce220_state,pce220)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */
@@ -970,8 +970,8 @@ static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
 	MCFG_SCREEN_SIZE(144, 48)
 	MCFG_SCREEN_VISIBLE_AREA(0, 144-1, 0, 48-1)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(pce220_state,pce220)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(pce220_state,pce220)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound hardware */

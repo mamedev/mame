@@ -70,8 +70,8 @@ WRITE16_MEMBER( galpani2_state::galpani2_bg8_1_w ) { galpani2_bg8_w(offset, data
 
 inline void galpani2_state::galpani2_palette_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
 {
-	UINT16 newword = COMBINE_DATA(&m_palette[_n_][offset]);
-	palette_set_color_rgb( machine(), offset + 0x4000 + _n_ * 0x100, pal5bit(newword >> 5), pal5bit(newword >> 10), pal5bit(newword >> 0) );
+	UINT16 newword = COMBINE_DATA(&m_palette_val[_n_][offset]);
+	m_palette->set_pen_color( offset + 0x4000 + _n_ * 0x100, pal5bit(newword >> 5), pal5bit(newword >> 10), pal5bit(newword >> 0) );
 }
 
 WRITE16_MEMBER( galpani2_state::galpani2_palette_0_w ) { galpani2_palette_w(offset, data, mem_mask, 0); }
@@ -106,14 +106,14 @@ WRITE16_MEMBER( galpani2_state::galpani2_bg15_w )
 
 ***************************************************************************/
 
-void galpani2_state::palette_init()
+PALETTE_INIT_MEMBER(galpani2_state, galpani2)
 {
 	int i;
 	/* first $4200 colors are dynamic */
 
 	/* initialize 555 RGB lookup */
 	for (i = 0; i < 0x8000; i++)
-		palette_set_color_rgb(machine(),0x4200+i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+		palette.set_pen_color(0x4200+i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
 void galpani2_state::video_start()

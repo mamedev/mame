@@ -247,7 +247,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pc6001);
 	DECLARE_MACHINE_RESET(pc6001m2);
 	DECLARE_PALETTE_INIT(pc6001m2);
 	DECLARE_MACHINE_RESET(pc6001sr);
@@ -362,7 +362,7 @@ void pc6001_state::draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 					color = ((tile)>>(7-xi) & 1) ? fgcol : 0;
 
-					bitmap.pix16((y+24), (x*8+xi)+32) = machine().pens[color];
+					bitmap.pix16((y+24), (x*8+xi)+32) = m_palette->pen(color);
 				}
 			}
 			else
@@ -373,8 +373,8 @@ void pc6001_state::draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 					color = (attr & 2) ? (pen_wattr[col_setting-1][fgcol]) : (pen_gattr[col_setting-1][fgcol]);
 
-					bitmap.pix16((y+24), ((x*8+xi*2)+0)+32) = machine().pens[color];
-					bitmap.pix16((y+24), ((x*8+xi*2)+1)+32) = machine().pens[color];
+					bitmap.pix16((y+24), ((x*8+xi*2)+0)+32) = m_palette->pen(color);
+					bitmap.pix16((y+24), ((x*8+xi*2)+1)+32) = m_palette->pen(color);
 				}
 			}
 		}
@@ -407,7 +407,7 @@ void pc6001_state::draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 						color = ((tile >> i) & 3)+8;
 						color+= col_bank;
 
-						bitmap.pix16(((y*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = machine().pens[color];
+						bitmap.pix16(((y*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = m_palette->pen(color);
 					}
 				}
 			}
@@ -430,9 +430,9 @@ void pc6001_state::draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 						color = ((tile >> i) & 3)+8;
 						color+= col_bank;
 
-						bitmap.pix16((((y+0)*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = machine().pens[color];
-						bitmap.pix16((((y+1)*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = machine().pens[color];
-						bitmap.pix16((((y+2)*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = machine().pens[color];
+						bitmap.pix16((((y+0)*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = m_palette->pen(color);
+						bitmap.pix16((((y+1)*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = m_palette->pen(color);
+						bitmap.pix16((((y+2)*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = m_palette->pen(color);
 					}
 				}
 			}
@@ -467,7 +467,7 @@ void pc6001_state::draw_tile_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 			color = ((tile >> i) & 1) ? pen+8 : 0;
 
-			bitmap.pix16(((y*12+(11-yi))+24), (x*8+(7-xi))+32) = machine().pens[color];
+			bitmap.pix16(((y*12+(11-yi))+24), (x*8+(7-xi))+32) = m_palette->pen(color);
 		}
 	}
 }
@@ -503,7 +503,7 @@ void pc6001_state::draw_tile_text(bitmap_ind16 &bitmap,const rectangle &cliprect
 					color = pen ? fgcol : 0;
 			}
 
-			bitmap.pix16(((y*12+yi)+24), (x*8+xi)+32) = machine().pens[color];
+			bitmap.pix16(((y*12+yi)+24), (x*8+xi)+32) = m_palette->pen(color);
 		}
 	}
 }
@@ -525,7 +525,7 @@ void pc6001_state::draw_border(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 			else
 				color = 0; //FIXME: other modes not yet checked
 
-			bitmap.pix16(y, x) = machine().pens[color];
+			bitmap.pix16(y, x) = m_palette->pen(color);
 		}
 	}
 }
@@ -617,9 +617,9 @@ UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 
 					color |= ((pen[1] & 2) << 2);
 
 					if (cliprect.contains((x+i)*2+0, y))
-						bitmap.pix16(y, (x+i)*2+0) = machine().pens[color];
+						bitmap.pix16(y, (x+i)*2+0) = m_palette->pen(color);
 					if (cliprect.contains((x+i)*2+1, y))
-						bitmap.pix16(y, (x+i)*2+1) = machine().pens[color];
+						bitmap.pix16(y, (x+i)*2+1) = m_palette->pen(color);
 				}
 
 				count++;
@@ -665,7 +665,7 @@ UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 
 					}
 
 					if (cliprect.contains(x+i, y))
-						bitmap.pix16(y, (x+i)) = machine().pens[color];
+						bitmap.pix16(y, (x+i)) = m_palette->pen(color);
 				}
 
 				count++;
@@ -705,7 +705,7 @@ UINT32 pc6001_state::screen_update_pc6001m2(screen_device &screen, bitmap_ind16 
 						color = pen ? fgcol : bgcol;
 
 						if (cliprect.contains(x*8+xi, y*12+yi))
-							bitmap.pix16(((y*12+yi)), (x*8+xi)) = machine().pens[color];
+							bitmap.pix16(((y*12+yi)), (x*8+xi)) = m_palette->pen(color);
 					}
 				}
 			}
@@ -749,7 +749,7 @@ UINT32 pc6001_state::screen_update_pc6001sr(screen_device &screen, bitmap_ind16 
 						color = pen ? fgcol : bgcol;
 
 						if (cliprect.contains(x*8+xi, y*12+yi))
-							bitmap.pix16(((y*12+yi)), (x*8+xi)) = machine().pens[color];
+							bitmap.pix16(((y*12+yi)), (x*8+xi)) = m_palette->pen(color);
 					}
 				}
 			}
@@ -768,42 +768,42 @@ UINT32 pc6001_state::screen_update_pc6001sr(screen_device &screen, bitmap_ind16 
 				color = m_video_ram[count] & 0x0f;
 
 				if (cliprect.contains(x+0, y+0))
-					bitmap.pix16((y+0), (x+0)) = machine().pens[color+0x10];
+					bitmap.pix16((y+0), (x+0)) = m_palette->pen(color+0x10);
 
 				color = (m_video_ram[count] & 0xf0) >> 4;
 
 				if (cliprect.contains(x+1, y+0))
-					bitmap.pix16((y+0), (x+1)) = machine().pens[color+0x10];
+					bitmap.pix16((y+0), (x+1)) = m_palette->pen(color+0x10);
 
 				color = m_video_ram[count+1] & 0x0f;
 
 				if (cliprect.contains(x+2, y+0))
-					bitmap.pix16((y+0), (x+2)) = machine().pens[color+0x10];
+					bitmap.pix16((y+0), (x+2)) = m_palette->pen(color+0x10);
 
 				color = (m_video_ram[count+1] & 0xf0) >> 4;
 
 				if (cliprect.contains(x+3, y+0))
-					bitmap.pix16((y+0), (x+3)) = machine().pens[color+0x10];
+					bitmap.pix16((y+0), (x+3)) = m_palette->pen(color+0x10);
 
 				color = m_video_ram[count+2] & 0x0f;
 
 				if (cliprect.contains(x+0, y+1))
-					bitmap.pix16((y+1), (x+0)) = machine().pens[color+0x10];
+					bitmap.pix16((y+1), (x+0)) = m_palette->pen(color+0x10);
 
 				color = (m_video_ram[count+2] & 0xf0) >> 4;
 
 				if (cliprect.contains(x+1, y+1))
-					bitmap.pix16((y+1), (x+1)) = machine().pens[color+0x10];
+					bitmap.pix16((y+1), (x+1)) = m_palette->pen(color+0x10);
 
 				color = m_video_ram[count+3] & 0x0f;
 
 				if (cliprect.contains(x+2, y+1))
-					bitmap.pix16((y+1), (x+2)) = machine().pens[color+0x10];
+					bitmap.pix16((y+1), (x+2)) = m_palette->pen(color+0x10);
 
 				color = (m_video_ram[count+3] & 0xf0) >> 4;
 
 				if (cliprect.contains(x+3, y+1))
-					bitmap.pix16((y+1), (x+3)) = machine().pens[color+0x10];
+					bitmap.pix16((y+1), (x+3)) = m_palette->pen(color+0x10);
 
 
 				count+=4;
@@ -2229,12 +2229,12 @@ static const rgb_t mk2_defcolors[] =
 	rgb_t(0xff, 0xff, 0xff)  /* WHITE */
 };
 
-void pc6001_state::palette_init()
+PALETTE_INIT_MEMBER(pc6001_state, pc6001)
 {
 	int i;
 
 	for(i=0;i<8+4;i++)
-		palette_set_color(machine(), i+8,defcolors[i]);
+		palette.set_pen_color(i+8,defcolors[i]);
 }
 
 PALETTE_INIT_MEMBER(pc6001_state,pc6001m2)
@@ -2242,10 +2242,10 @@ PALETTE_INIT_MEMBER(pc6001_state,pc6001m2)
 	int i;
 
 	for(i=0;i<8;i++)
-		palette_set_color(machine(), i+8,defcolors[i]);
+		palette.set_pen_color(i+8,defcolors[i]);
 
 	for(i=0x10;i<0x20;i++)
-		palette_set_color(machine(), i,mk2_defcolors[i-0x10]);
+		palette.set_pen_color(i,mk2_defcolors[i-0x10]);
 }
 
 #if 0
@@ -2329,7 +2329,8 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 
-	MCFG_PALETTE_LENGTH(16+4)
+	MCFG_PALETTE_ADD("palette", 16+4)
+	MCFG_PALETTE_INIT_OWNER(pc6001_state, pc6001)
 
 	MCFG_I8255_ADD( "ppi8255", pc6001_ppi8255_interface )
 	/* uart */
@@ -2366,8 +2367,10 @@ static MACHINE_CONFIG_DERIVED( pc6001m2, pc6001 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001_state, screen_update_pc6001m2)
-	MCFG_PALETTE_LENGTH(16+16)
-	MCFG_PALETTE_INIT_OVERRIDE(pc6001_state,pc6001m2)
+	
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 16+16)
+	MCFG_PALETTE_INIT_OWNER(pc6001_state,pc6001m2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

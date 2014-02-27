@@ -371,9 +371,9 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0 * 8, 25 * 8 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(aquarius_state, screen_update_aquarius)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",  aquarius )
-	MCFG_PALETTE_LENGTH(512)
-
+	MCFG_GFXDECODE_ADD("gfxdecode", aquarius )
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(aquarius_state, aquarius)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

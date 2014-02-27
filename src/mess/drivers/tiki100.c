@@ -149,9 +149,9 @@ WRITE8_MEMBER( tiki100_state::video_mode_w )
 	if (BIT(data, 7))
 	{
 		int color = data & 0x0f;
-		UINT8 colordata = ~m_palette;
+		UINT8 colordata = ~m_palette_val;
 
-		palette_set_color_rgb(machine(), color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
+		m_palette->set_pen_color(color, pal3bit(colordata >> 5), pal3bit(colordata >> 2), pal2bit(colordata >> 0));
 	}
 }
 
@@ -172,7 +172,7 @@ WRITE8_MEMBER( tiki100_state::palette_w )
 
 	*/
 
-	m_palette = data;
+	m_palette_val = data;
 }
 
 WRITE8_MEMBER( tiki100_state::system_w )
@@ -685,7 +685,7 @@ void tiki100_state::machine_start()
 	save_item(NAME(m_vire));
 	save_item(NAME(m_scroll));
 	save_item(NAME(m_mode));
-	save_item(NAME(m_palette));
+	save_item(NAME(m_palette_val));
 	save_item(NAME(m_keylatch));
 }
 
@@ -713,7 +713,7 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_SCREEN_SIZE(1024, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 256-1)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 	// pixel clock 20.01782 MHz
 
 	/* devices */

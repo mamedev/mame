@@ -63,7 +63,7 @@ WRITE8_MEMBER(beezer_state::beezer_map_w)
 	bit1 = (data >> 7) & 0x01;
 	b = 0x5f * bit0 + 0xa0 * bit1;
 
-	palette_set_color(machine(), offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
 READ8_MEMBER(beezer_state::beezer_line_r)

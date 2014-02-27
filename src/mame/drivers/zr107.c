@@ -246,7 +246,7 @@ VIDEO_START_MEMBER(zr107_state,jetwave)
 
 UINT32 zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	m_k001604->draw_back_layer(bitmap, cliprect);
 
@@ -268,8 +268,8 @@ WRITE32_MEMBER(zr107_state::paletteram32_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
-	palette_set_color_rgb(machine(), (offset * 2) + 0, pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16));
-	palette_set_color_rgb(machine(), (offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	m_palette->set_pen_color((offset * 2) + 0, pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16));
+	m_palette->set_pen_color((offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 #define NUM_LAYERS  2
@@ -296,7 +296,7 @@ VIDEO_START_MEMBER(zr107_state,zr107)
 
 UINT32 zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 	K001005_draw(bitmap, cliprect);
@@ -459,7 +459,7 @@ WRITE32_MEMBER(zr107_state::jetwave_palette_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
-	palette_set_color_rgb(machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static ADDRESS_MAP_START( jetwave_map, AS_PROGRAM, 32, zr107_state )
@@ -769,7 +769,7 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(zr107_state, screen_update_zr107)
 
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_ADD("palette", 65536)
 
 	MCFG_VIDEO_START_OVERRIDE(zr107_state,zr107)
 
@@ -777,6 +777,7 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 	
 	MCFG_K056832_ADD("k056832", zr107_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))
@@ -832,7 +833,7 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(zr107_state, screen_update_jetwave)
 
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_ADD("palette", 65536)
 
 	MCFG_VIDEO_START_OVERRIDE(zr107_state,jetwave)
 
@@ -840,6 +841,7 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	
 	MCFG_K001604_ADD("k001604", jetwave_k001604_intf)
 	MCFG_K001604_GFXDECODE("gfxdecode")
+	MCFG_K001604_PALETTE("palette")
 
 	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))

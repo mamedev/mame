@@ -274,8 +274,8 @@ static MACHINE_CONFIG_START( shootout, shootout_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootout)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", shootout)
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -302,8 +302,8 @@ static MACHINE_CONFIG_START( shootouj, shootout_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootouj)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", shootout)
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

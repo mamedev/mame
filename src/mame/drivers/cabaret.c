@@ -120,7 +120,7 @@ void cabaret_state::video_start()
 
 UINT32 cabaret_state::screen_update_cabaret(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -188,8 +188,8 @@ static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8, cabaret_state )
 	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
 
-	AM_RANGE( 0x3000, 0x37ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
-	AM_RANGE( 0x3800, 0x3fff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
+	AM_RANGE( 0x3000, 0x37ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0x3800, 0x3fff ) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE( 0x1000, 0x103f ) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
 
@@ -352,8 +352,8 @@ static MACHINE_CONFIG_START( cabaret, cabaret_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cabaret_state, screen_update_cabaret)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cabaret)
-	MCFG_PALETTE_LENGTH(0x800)
-
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

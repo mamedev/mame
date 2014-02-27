@@ -12,13 +12,13 @@ WRITE8_MEMBER(subs_state::subs_invert1_w)
 {
 	if ((offset & 0x01) == 1)
 	{
-		palette_set_color(machine(), 0, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), 1, rgb_t(0xFF, 0xFF, 0xFF));
+		m_palette->set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
+		m_palette->set_pen_color(1, rgb_t(0xFF, 0xFF, 0xFF));
 	}
 	else
 	{
-		palette_set_color(machine(), 1, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), 0, rgb_t(0xFF, 0xFF, 0xFF));
+		m_palette->set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
+		m_palette->set_pen_color(0, rgb_t(0xFF, 0xFF, 0xFF));
 	}
 }
 
@@ -26,13 +26,13 @@ WRITE8_MEMBER(subs_state::subs_invert2_w)
 {
 	if ((offset & 0x01) == 1)
 	{
-		palette_set_color(machine(), 2, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), 3, rgb_t(0xFF, 0xFF, 0xFF));
+		m_palette->set_pen_color(2, rgb_t(0x00, 0x00, 0x00));
+		m_palette->set_pen_color(3, rgb_t(0xFF, 0xFF, 0xFF));
 	}
 	else
 	{
-		palette_set_color(machine(), 3, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), 2, rgb_t(0xFF, 0xFF, 0xFF));
+		m_palette->set_pen_color(3, rgb_t(0x00, 0x00, 0x00));
+		m_palette->set_pen_color(2, rgb_t(0xFF, 0xFF, 0xFF));
 	}
 }
 
@@ -74,11 +74,11 @@ UINT32 subs_state::screen_update_subs_left(screen_device &screen, bitmap_ind16 &
 
 		/* draw the left screen */
 		if ((left_enable || left_sonar_window) && (!right_sonar_window))
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,
 					charcode, 1,
 					0,0,sx,sy);
 		else
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,
 					0, 1,
 					0,0,sx,sy);
 	}
@@ -104,7 +104,7 @@ UINT32 subs_state::screen_update_subs_left(screen_device &screen, bitmap_ind16 &
 
 		/* left screen - special check for drawing right screen's sub */
 		if ((offs!=0) || (sub_enable))
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					charcode + 32 * prom_set,
 					0,
 					0,0,sx,sy,0);
@@ -154,11 +154,11 @@ UINT32 subs_state::screen_update_subs_right(screen_device &screen, bitmap_ind16 
 
 		/* draw the right screen */
 		if ((right_enable || right_sonar_window) && (!left_sonar_window))
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,
 					charcode, 0,
 					0,0,sx,sy);
 		else
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,
 					0, 0,
 					0,0,sx,sy);
 	}
@@ -183,7 +183,7 @@ UINT32 subs_state::screen_update_subs_right(screen_device &screen, bitmap_ind16 
 		charcode = (charcode >> 3) & 0x1F;
 
 		if ((offs!=1) || (sub_enable))
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					charcode + 32 * prom_set,
 					0,
 					0,0,sx,sy,0);

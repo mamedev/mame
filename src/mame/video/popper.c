@@ -38,14 +38,14 @@ static const res_net_info popper_net_info =
 	}
 };
 
-void popper_state::palette_init()
+PALETTE_INIT_MEMBER(popper_state, popper)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t   *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &popper_decode_info, &popper_net_info);
-	palette_set_colors(machine(), 0, rgb, 64);
-	machine().palette->normalize_range(0, 63);
+	palette.set_pen_colors(0, rgb, 64);
+	palette.palette()->normalize_range(0, 63);
 	auto_free(machine(), rgb);
 }
 
@@ -213,7 +213,7 @@ void popper_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect 
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					m_spriteram[offs + 1],
 					(m_spriteram[offs + 2] & 0x0f),
 					flipx,flipy,

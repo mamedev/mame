@@ -32,7 +32,7 @@ WRITE16_MEMBER(ultraman_state::sound_irq_trigger_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, ultraman_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")/* Palette */
+	AM_RANGE(0x180000, 0x183fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* Palette */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P1")
 	AM_RANGE(0x1c0004, 0x1c0005) AM_READ_PORT("P2")
@@ -217,8 +217,6 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -226,21 +224,27 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(ultraman_state, screen_update_ultraman)
 
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	
 	MCFG_K051960_ADD("k051960", ultraman_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
+	MCFG_K051960_PALETTE("palette")
 	
 	MCFG_K051316_ADD("k051316_1", ultraman_k051316_intf_0)
 	MCFG_K051316_GFXDECODE("gfxdecode")
+	MCFG_K051316_PALETTE("palette")
 	
 	MCFG_K051316_ADD("k051316_2", ultraman_k051316_intf_1)
 	MCFG_K051316_GFXDECODE("gfxdecode")
+	MCFG_K051316_PALETTE("palette")
 	
 	MCFG_K051316_ADD("k051316_3", ultraman_k051316_intf_2)
 	MCFG_K051316_GFXDECODE("gfxdecode")
+	MCFG_K051316_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

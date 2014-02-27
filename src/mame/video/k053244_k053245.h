@@ -31,6 +31,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	DECLARE_READ16_MEMBER( k053245_word_r );
 	DECLARE_WRITE16_MEMBER( k053245_word_w );
@@ -68,6 +69,7 @@ private:
 	int      m_z_rejection;
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_READ16_MEMBER( k053244_reg_word_r );    // OBJSET0 debug handler
 };
@@ -87,6 +89,9 @@ extern const device_type K053244;
 #define MCFG_K053244_GFXDECODE(_gfxtag) \
 	k05324x_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
+#define MCFG_K053244_PALETTE(_palette_tag) \
+	k05324x_device::static_set_palette_tag(*device, "^" _palette_tag);
+
 #define MCFG_K053245_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K053245, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
@@ -94,5 +99,7 @@ extern const device_type K053244;
 #define MCFG_K053245_GFXDECODE(_gfxtag) \
 	k05324x_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
+#define MCFG_K053245_PALETTE(_palette_tag) \
+	k05324x_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

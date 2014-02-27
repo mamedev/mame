@@ -16,12 +16,12 @@
 
 ***************************************************************************/
 
-void xorworld_state::palette_init()
+PALETTE_INIT_MEMBER(xorworld_state, xorworld)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine().total_colors();i++){
+	for (i = 0;i < palette.entries();i++){
 		int bit0,bit1,bit2,bit3;
 		int r,g,b;
 
@@ -32,18 +32,18 @@ void xorworld_state::palette_init()
 		bit3 = (color_prom[0] >> 3) & 0x01;
 		r = 0x0e*bit0 + 0x1e*bit1 + 0x44*bit2 + 0x8f*bit3;
 		/* green component */
-		bit0 = (color_prom[machine().total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[machine().total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[machine().total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[machine().total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[palette.entries()] >> 0) & 0x01;
+		bit1 = (color_prom[palette.entries()] >> 1) & 0x01;
+		bit2 = (color_prom[palette.entries()] >> 2) & 0x01;
+		bit3 = (color_prom[palette.entries()] >> 3) & 0x01;
 		g = 0x0e*bit0 + 0x1e*bit1 + 0x44*bit2 + 0x8f*bit3;
 		/* blue component */
-		bit0 = (color_prom[2*machine().total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine().total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine().total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine().total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[2*palette.entries()] >> 0) & 0x01;
+		bit1 = (color_prom[2*palette.entries()] >> 1) & 0x01;
+		bit2 = (color_prom[2*palette.entries()] >> 2) & 0x01;
+		bit3 = (color_prom[2*palette.entries()] >> 3) & 0x01;
 		b = 0x0e*bit0 + 0x1e * bit1 + 0x44*bit2 + 0x8f*bit3;
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 
 		color_prom++;
 	}
@@ -106,7 +106,7 @@ void xorworld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int code = (spriteram16[i+1] & 0x0ffc) >> 2;
 		int color = (spriteram16[i+1] & 0xf000) >> 12;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, 0, 0, sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, 0, 0, sx, sy, 0);
 	}
 }
 

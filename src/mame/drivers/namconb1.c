@@ -1154,7 +1154,6 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_MACHINE_START_OVERRIDE(namconb1_state,namconb)
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.7)
@@ -1163,7 +1162,10 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namconb1_state, screen_update_namconb1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", namconb1)
-	MCFG_PALETTE_LENGTH(0x2000)
+
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb1)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1186,7 +1188,6 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_MACHINE_START_OVERRIDE(namconb1_state,namconb)
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.7)
@@ -1195,7 +1196,9 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namconb1_state, screen_update_namconb2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 2)
-	MCFG_PALETTE_LENGTH(0x2000)
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

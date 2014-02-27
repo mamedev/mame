@@ -20,24 +20,24 @@ static const int nusiz[8][3] =
 	{ 1, 4, 0 }
 };
 
-static void extend_palette(running_machine &machine) {
+static void extend_palette(palette_device &palette) {
 	int i,j;
 
 	for( i = 0; i < 128; i ++ )
 	{
-		rgb_t   new_rgb = palette_get_color( machine, i );
+		rgb_t   new_rgb = palette.pen_color( i );
 		UINT8   new_r =  new_rgb .r();
 		UINT8   new_g =  new_rgb .g();
 		UINT8   new_b =  new_rgb .b();
 
 		for ( j = 0; j < 128; j++ )
 		{
-			rgb_t   old_rgb = palette_get_color( machine, j );
+			rgb_t   old_rgb = palette.pen_color( j );
 			UINT8   old_r =  old_rgb .r();
 			UINT8   old_g =  old_rgb .g();
 			UINT8   old_b =  old_rgb .b();
 
-			palette_set_color_rgb(machine, ( ( i + 1 ) << 7 ) | j,
+			palette.set_pen_color(( ( i + 1 ) << 7 ) | j,
 				( new_r + old_r ) / 2,
 				( new_g + old_g ) / 2,
 				( new_b + old_b ) / 2 );
@@ -281,13 +281,13 @@ Phase Shift 26.2
 			if (G > 1) G = 1;
 			if (B > 1) B = 1;
 
-			palette_set_color_rgb(machine(),8 * i + j,
+			palette.set_pen_color(8 * i + j,
 				(UINT8) (255 * R + 0.5),
 				(UINT8) (255 * G + 0.5),
 				(UINT8) (255 * B + 0.5));
 		}
 	}
-	extend_palette( machine() );
+	extend_palette( palette );
 }
 
 
@@ -340,13 +340,13 @@ PALETTE_INIT_MEMBER(tia_pal_video_device, tia_pal)
 			if (G > 1) G = 1;
 			if (B > 1) B = 1;
 
-			palette_set_color_rgb(machine(),8 * i + j,
+			palette.set_pen_color(8 * i + j,
 				(UINT8) (255 * R + 0.5),
 				(UINT8) (255 * G + 0.5),
 				(UINT8) (255 * B + 0.5));
 		}
 	}
-	extend_palette( machine() );
+	extend_palette( palette );
 }
 
 tia_video_device::tia_video_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
@@ -368,7 +368,8 @@ tia_pal_video_device::tia_pal_video_device(const machine_config &mconfig, const 
 }
 
 static MACHINE_CONFIG_FRAGMENT( tia_pal )
-	MCFG_PALETTE_INIT_OVERRIDE(tia_pal_video_device, tia_pal)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(tia_pal_video_device, tia_pal)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -394,7 +395,8 @@ tia_ntsc_video_device::tia_ntsc_video_device(const machine_config &mconfig, cons
 }
 
 static MACHINE_CONFIG_FRAGMENT( tia_ntsc )
-	MCFG_PALETTE_INIT_OVERRIDE(tia_ntsc_video_device, tia_ntsc)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(tia_ntsc_video_device, tia_ntsc)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

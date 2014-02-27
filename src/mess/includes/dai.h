@@ -90,7 +90,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(dai);
 	UINT32 screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void dai_update_memory(int dai_rom_bank);
 	IRQ_CALLBACK_MEMBER(int_ack);

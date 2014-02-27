@@ -61,7 +61,7 @@ public:
 	DECLARE_READ8_MEMBER(destroyr_scanline_r);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(destroyr);
 	UINT32 screen_update_destroyr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(destroyr_dial_callback);
 	TIMER_CALLBACK_MEMBER(destroyr_frame_callback);
@@ -98,7 +98,7 @@ UINT32 destroyr_state::screen_update_destroyr(screen_device &screen, bitmap_ind1
 				continue;
 		}
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, num, 0, flipx, 0, horz, 16 * i, 0);
+		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect, num, 0, flipx, 0, horz, 16 * i, 0);
 	}
 
 	/* draw alpha numerics */
@@ -108,7 +108,7 @@ UINT32 destroyr_state::screen_update_destroyr(screen_device &screen, bitmap_ind1
 		{
 			int num = m_alpha_num_ram[32 * i + j];
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, num, 0, 0, 0, 8 * j, 8 * i, 0);
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, num, 0, 0, 0, 8 * j, 8 * i, 0);
 		}
 	}
 
@@ -119,13 +119,13 @@ UINT32 destroyr_state::screen_update_destroyr(screen_device &screen, bitmap_ind1
 		int horz = 256 - m_minor_obj_ram[i + 2];
 		int vert = 256 - m_minor_obj_ram[i + 4];
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, num, 0, 0, 0, horz, vert, 0);
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, num, 0, 0, 0, horz, vert, 0);
 	}
 
 	/* draw waves */
 	for (i = 0; i < 4; i++)
 	{
-		m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, m_wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
+		m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect, m_wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
 	}
 
 	/* draw cursor */
@@ -448,16 +448,16 @@ static GFXDECODE_START( destroyr )
 GFXDECODE_END
 
 
-void destroyr_state::palette_init()
+PALETTE_INIT_MEMBER(destroyr_state, destroyr)
 {
-	palette_set_color(machine(), 0, rgb_t(0x00, 0x00, 0x00));   /* major objects */
-	palette_set_color(machine(), 1, rgb_t(0x50, 0x50, 0x50));
-	palette_set_color(machine(), 2, rgb_t(0xAF, 0xAF, 0xAF));
-	palette_set_color(machine(), 3, rgb_t(0xFF ,0xFF, 0xFF));
-	palette_set_color(machine(), 4, rgb_t(0x00, 0x00, 0x00));   /* alpha numerics, waves, minor objects */
-	palette_set_color(machine(), 5, rgb_t(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 6, rgb_t(0x00, 0x00, 0x00));   /* cursor */
-	palette_set_color(machine(), 7, rgb_t(0x78, 0x78, 0x78));
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   /* major objects */
+	palette.set_pen_color(1, rgb_t(0x50, 0x50, 0x50));
+	palette.set_pen_color(2, rgb_t(0xAF, 0xAF, 0xAF));
+	palette.set_pen_color(3, rgb_t(0xFF ,0xFF, 0xFF));
+	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0x00));   /* alpha numerics, waves, minor objects */
+	palette.set_pen_color(5, rgb_t(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(6, rgb_t(0x00, 0x00, 0x00));   /* cursor */
+	palette.set_pen_color(7, rgb_t(0x78, 0x78, 0x78));
 }
 
 
@@ -488,7 +488,8 @@ static MACHINE_CONFIG_START( destroyr, destroyr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(destroyr_state, screen_update_destroyr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", destroyr)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(destroyr_state, destroyr)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

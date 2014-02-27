@@ -26,7 +26,7 @@ WRITE8_MEMBER(jack_state::jack_colorram_w)
 WRITE8_MEMBER(jack_state::jack_paletteram_w)
 {
 	/* RGB output is inverted */
-	paletteram_BBGGGRRR_byte_w(space, offset, ~data);
+	m_palette->write(space, offset, UINT8(~data));
 }
 
 READ8_MEMBER(jack_state::jack_flipscreen_r)
@@ -89,7 +89,7 @@ void jack_state::jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipr
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -149,7 +149,7 @@ PALETTE_INIT_MEMBER(jack_state,joinem)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 		bit0 = (color_prom[i] >> 0) & 0x01;
@@ -165,7 +165,7 @@ PALETTE_INIT_MEMBER(jack_state,joinem)
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 
@@ -209,7 +209,7 @@ void jack_state::joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

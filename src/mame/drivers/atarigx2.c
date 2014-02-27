@@ -1464,7 +1464,7 @@ static MACHINE_CONFIG_START( atarigx2, atarigx2_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE_ADD("gfxdecode", atarigx2)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", 2, atarigx2_state, get_playfield_tile_info, 8,8, atarigx2_playfield_scan, 128,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, atarigx2_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)

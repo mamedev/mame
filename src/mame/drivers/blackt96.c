@@ -238,11 +238,11 @@ void blackt96_state::draw_strip(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 		if (tile&0x2000)
 		{
-			gfxbg->transpen(bitmap,cliprect,tile&0x1fff,colour>>4,flipx,0,xx,yy+y*16,0);
+			gfxbg->transpen(m_palette,bitmap,cliprect,tile&0x1fff,colour>>4,flipx,0,xx,yy+y*16,0);
 		}
 		else
 		{
-			gfxspr->transpen(bitmap,cliprect,tile&0x1fff,colour,flipx,0,xx,yy+y*16,0);
+			gfxspr->transpen(m_palette,bitmap,cliprect,tile&0x1fff,colour,flipx,0,xx,yy+y*16,0);
 		}
 	}
 }
@@ -257,7 +257,7 @@ void blackt96_state::draw_page(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	draw_page(bitmap, cliprect, 2); // bg
 	draw_page(bitmap, cliprect, 3); // lower pri sprites
@@ -275,7 +275,7 @@ UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind1
 		{
 			UINT16 tile = (m_tilemapram[count*2]&0xff);
 			tile += m_txt_bank * 0x100;
-			gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,-16+y*8,0);
+			gfx->transpen(m_palette,bitmap,cliprect,tile,0,0,0,x*8,-16+y*8,0);
 			count++;
 		}
 	}
@@ -327,7 +327,7 @@ static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 	AM_RANGE(0x207000, 0x207fff) AM_RAM_WRITE(bg_videoram7_w) AM_SHARE("spriteram7")
 
 
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") 
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
 
 ADDRESS_MAP_END
@@ -612,7 +612,8 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 256-1, 0*8, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blackt96_state, screen_update_blackt96)
 
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

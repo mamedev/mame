@@ -62,7 +62,7 @@ PALETTE_INIT_MEMBER(funworld_state,funworld)
 			2,  resistances_g,  weights_g,  100,    0);
 
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -81,7 +81,7 @@ PALETTE_INIT_MEMBER(funworld_state,funworld)
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		g = combine_2_weights(weights_g, bit0, bit1);
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 

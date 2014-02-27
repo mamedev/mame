@@ -231,7 +231,7 @@ public:
 	DECLARE_DRIVER_INIT(mpu12wbk);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(mpu12wbk);
 	UINT32 screen_update_mpu12wbk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -286,7 +286,7 @@ UINT32 mpu12wbk_state::screen_update_mpu12wbk(screen_device &screen, bitmap_ind1
 }
 
 
-void mpu12wbk_state::palette_init()
+PALETTE_INIT_MEMBER(mpu12wbk_state, mpu12wbk)
 {
 }
 
@@ -533,7 +533,8 @@ static MACHINE_CONFIG_START( mpu12wbk, mpu12wbk_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mpu12wbk_state, screen_update_mpu12wbk)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mpu12wbk)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(mpu12wbk_state, mpu12wbk)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4, mc6845_intf) /* guess */
 

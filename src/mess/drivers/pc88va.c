@@ -251,7 +251,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						pen = pen & 1 ? fg_col : (bc) ? 8 : -1;
 
 						if(pen != -1) //transparent pen
-							bitmap.pix32(yp+y_i, xp+x_i+(x_s)) = machine().pens[pen];
+							bitmap.pix32(yp+y_i, xp+x_i+(x_s)) = m_palette->pen(pen);
 					}
 					spr_count+=2;
 				}
@@ -276,7 +276,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						pen = (BITSWAP16(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (16-(x_s*8)) & 0xf;
 
 						//if(bc != -1) //transparent pen
-						bitmap.pix32(yp+y_i, xp+x_i+(x_s)) = machine().pens[pen];
+						bitmap.pix32(yp+y_i, xp+x_i+(x_s)) = m_palette->pen(pen);
 					}
 					spr_count+=2;
 				}
@@ -471,7 +471,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					if(secret) { pen = 0; } //hide text
 
 					if(pen != -1) //transparent
-						bitmap.pix32(res_y, res_x) = machine().pens[pen];
+						bitmap.pix32(res_y, res_x) = m_palette->pen(pen);
 				}
 			}
 
@@ -949,7 +949,7 @@ WRITE16_MEMBER(pc88va_state::palette_ram_w)
 	r = (m_palram[offset] & 0x03c0) >> 6;
 	g = (m_palram[offset] & 0x7800) >> 11;
 
-	palette_set_color_rgb(machine(),offset,pal4bit(r),pal4bit(g),pal4bit(b));
+	m_palette->set_pen_color(offset,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
 READ16_MEMBER(pc88va_state::sys_port4_r)
@@ -1716,7 +1716,7 @@ void pc88va_state::machine_reset()
 	{
 		UINT8 i;
 		for(i=0;i<32;i++)
-			palette_set_color_rgb(machine(),i,pal1bit((i & 2) >> 1),pal1bit((i & 4) >> 2),pal1bit(i & 1));
+			m_palette->set_pen_color(i,pal1bit((i & 2) >> 1),pal1bit((i & 4) >> 2),pal1bit(i & 1));
 	}
 
 	m_tsp.tvram_vreg_offset = 0;
@@ -1850,9 +1850,9 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pc88va_state, screen_update_pc88va)
 
-	MCFG_PALETTE_LENGTH(32)
-//  MCFG_PALETTE_INIT_OVERRIDE(pc88va_state, pc8801 )
-	MCFG_GFXDECODE_ADD("gfxdecode",  pc88va )
+	MCFG_PALETTE_ADD("palette", 32)
+//  MCFG_PALETTE_INIT_OWNER(pc88va_state, pc8801 )
+	MCFG_GFXDECODE_ADD("gfxdecode", pc88va )
 
 	MCFG_I8255_ADD( "d8255_2", master_fdd_intf )
 	MCFG_I8255_ADD( "d8255_3", r232c_ctrl_intf )

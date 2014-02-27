@@ -125,7 +125,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(imolagp);
 	UINT32 screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -136,16 +136,16 @@ public:
 
 ***************************************************************************/
 
-void imolagp_state::palette_init()
+PALETTE_INIT_MEMBER(imolagp_state, imolagp)
 {
 	// palette seems like 3bpp + intensity
 	// this still needs to be verified
 	for (int i = 0; i < 8; i++)
 	{
-		palette_set_color_rgb(machine(), i*4+0, 0, 0, 0);
-		palette_set_color_rgb(machine(), i*4+1, pal1bit(i >> 2)/2, pal1bit(i >> 1)/2, pal1bit(i >> 0)/2);
-		palette_set_color_rgb(machine(), i*4+2, 0, 0, 0);
-		palette_set_color_rgb(machine(), i*4+3, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette.set_pen_color(i*4+0, 0, 0, 0);
+		palette.set_pen_color(i*4+1, pal1bit(i >> 2)/2, pal1bit(i >> 1)/2, pal1bit(i >> 0)/2);
+		palette.set_pen_color(i*4+2, 0, 0, 0);
+		palette.set_pen_color(i*4+3, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 	}
 }
 
@@ -517,7 +517,8 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0+48,255,0+16,255)
 
 	MCFG_SCREEN_UPDATE_DRIVER(imolagp_state, screen_update_imolagp)
-	MCFG_PALETTE_LENGTH(0x20)
+	MCFG_PALETTE_ADD("palette", 0x20)
+	MCFG_PALETTE_INIT_OWNER(imolagp_state, imolagp)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	/* sound hardware */

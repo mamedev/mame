@@ -1204,7 +1204,7 @@ static MACHINE_CONFIG_START( outrun_base, segaorun_state )
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", segaorun)
-	MCFG_PALETTE_LENGTH(4096*3)
+	MCFG_PALETTE_ADD("palette", 4096*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)

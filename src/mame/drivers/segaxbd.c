@@ -1557,7 +1557,7 @@ static MACHINE_CONFIG_START( xboard, segaxbd_state )
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", segaxbd)
-	MCFG_PALETTE_LENGTH(8192*3)
+	MCFG_PALETTE_ADD("palette", 8192*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/8, 400, 0, 320, 262, 0, 224)

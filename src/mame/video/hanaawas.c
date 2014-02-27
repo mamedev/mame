@@ -15,13 +15,10 @@
 
 ***************************************************************************/
 
-void hanaawas_state::palette_init()
+PALETTE_INIT_MEMBER(hanaawas_state, hanaawas)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x10);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x10; i++)
@@ -47,7 +44,7 @@ void hanaawas_state::palette_init()
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -59,7 +56,7 @@ void hanaawas_state::palette_init()
 	{
 		int swapped_i = BITSWAP8(i,2,7,6,5,4,3,1,0);
 		UINT8 ctabentry = color_prom[swapped_i] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 

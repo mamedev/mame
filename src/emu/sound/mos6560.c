@@ -124,7 +124,7 @@
 
 
 // VICE palette
-static const rgb_t PALETTE[] =
+static const rgb_t PALETTE_MOS[] =
 {
 	rgb_t(0x00, 0x00, 0x00),
 	rgb_t(0xff, 0xff, 0xff),
@@ -177,14 +177,14 @@ void mos6560_device::draw_character( int ybegin, int yend, int ch, int yoff, int
 	{
 		code = read_videoram((m_chargenaddr + ch * m_charheight + y) & 0x3fff);
 
-		m_bitmap.pix32(y + yoff, xoff + 0) = PALETTE[color[code >> 7]];
-		m_bitmap.pix32(y + yoff, xoff + 1) = PALETTE[color[(code >> 6) & 1]];
-		m_bitmap.pix32(y + yoff, xoff + 2) = PALETTE[color[(code >> 5) & 1]];
-		m_bitmap.pix32(y + yoff, xoff + 3) = PALETTE[color[(code >> 4) & 1]];
-		m_bitmap.pix32(y + yoff, xoff + 4) = PALETTE[color[(code >> 3) & 1]];
-		m_bitmap.pix32(y + yoff, xoff + 5) = PALETTE[color[(code >> 2) & 1]];
-		m_bitmap.pix32(y + yoff, xoff + 6) = PALETTE[color[(code >> 1) & 1]];
-		m_bitmap.pix32(y + yoff, xoff + 7) = PALETTE[color[code & 1]];
+		m_bitmap.pix32(y + yoff, xoff + 0) = PALETTE_MOS[color[code >> 7]];
+		m_bitmap.pix32(y + yoff, xoff + 1) = PALETTE_MOS[color[(code >> 6) & 1]];
+		m_bitmap.pix32(y + yoff, xoff + 2) = PALETTE_MOS[color[(code >> 5) & 1]];
+		m_bitmap.pix32(y + yoff, xoff + 3) = PALETTE_MOS[color[(code >> 4) & 1]];
+		m_bitmap.pix32(y + yoff, xoff + 4) = PALETTE_MOS[color[(code >> 3) & 1]];
+		m_bitmap.pix32(y + yoff, xoff + 5) = PALETTE_MOS[color[(code >> 2) & 1]];
+		m_bitmap.pix32(y + yoff, xoff + 6) = PALETTE_MOS[color[(code >> 1) & 1]];
+		m_bitmap.pix32(y + yoff, xoff + 7) = PALETTE_MOS[color[code & 1]];
 	}
 }
 
@@ -202,13 +202,13 @@ void mos6560_device::draw_character_multi( int ybegin, int yend, int ch, int yof
 		code = read_videoram((m_chargenaddr + ch * m_charheight + y) & 0x3fff);
 
 		m_bitmap.pix32(y + yoff, xoff + 0) =
-			m_bitmap.pix32(y + yoff, xoff + 1) = PALETTE[color[code >> 6]];
+			m_bitmap.pix32(y + yoff, xoff + 1) = PALETTE_MOS[color[code >> 6]];
 		m_bitmap.pix32(y + yoff, xoff + 2) =
-			m_bitmap.pix32(y + yoff, xoff + 3) = PALETTE[color[(code >> 4) & 3]];
+			m_bitmap.pix32(y + yoff, xoff + 3) = PALETTE_MOS[color[(code >> 4) & 3]];
 		m_bitmap.pix32(y + yoff, xoff + 4) =
-			m_bitmap.pix32(y + yoff, xoff + 5) = PALETTE[color[(code >> 2) & 3]];
+			m_bitmap.pix32(y + yoff, xoff + 5) = PALETTE_MOS[color[(code >> 2) & 3]];
 		m_bitmap.pix32(y + yoff, xoff + 6) =
-			m_bitmap.pix32(y + yoff, xoff + 7) = PALETTE[color[code & 3]];
+			m_bitmap.pix32(y + yoff, xoff + 7) = PALETTE_MOS[color[code & 3]];
 	}
 }
 
@@ -230,7 +230,7 @@ void mos6560_device::drawlines( int first, int last )
 	for (line = first; (line < m_ypos) && (line < last); line++)
 	{
 		for (j = 0; j < m_total_xsize; j++)
-			m_bitmap.pix32(line, j) = PALETTE[m_framecolor];
+			m_bitmap.pix32(line, j) = PALETTE_MOS[m_framecolor];
 	}
 
 	for (vline = line - m_ypos; (line < last) && (line < m_ypos + m_ysize);)
@@ -254,7 +254,7 @@ void mos6560_device::drawlines( int first, int last )
 		{
 			for (i = ybegin; i <= yend; i++)
 				for (j = 0; j < m_xpos; j++)
-					m_bitmap.pix32(yoff + i, j) = PALETTE[m_framecolor];
+					m_bitmap.pix32(yoff + i, j) = PALETTE_MOS[m_framecolor];
 		}
 
 		for (xoff = m_xpos; (xoff < m_xpos + m_xsize) && (xoff < m_total_xsize); xoff += 8, offs++)
@@ -301,7 +301,7 @@ void mos6560_device::drawlines( int first, int last )
 		{
 			for (i = ybegin; i <= yend; i++)
 				for (j = xoff; j < m_total_xsize; j++)
-					m_bitmap.pix32(yoff + i, j) = PALETTE[m_framecolor];
+					m_bitmap.pix32(yoff + i, j) = PALETTE_MOS[m_framecolor];
 		}
 
 		if (m_matrix8x16)
@@ -318,7 +318,7 @@ void mos6560_device::drawlines( int first, int last )
 
 	for (; line < last; line++)
 		for (j = 0; j < m_total_xsize; j++)
-			m_bitmap.pix32(line, j) = PALETTE[m_framecolor];
+			m_bitmap.pix32(line, j) = PALETTE_MOS[m_framecolor];
 }
 
 

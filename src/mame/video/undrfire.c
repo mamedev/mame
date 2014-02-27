@@ -12,7 +12,7 @@ void undrfire_state::video_start()
 	m_spritelist = auto_alloc_array(machine(), struct tempsprite, 0x4000);
 
 	for (i = 0; i < 16384; i++) /* Fix later - some weird colours in places */
-		palette_set_color(machine(), i, rgb_t(0,0,0));
+		m_palette->set_pen_color(i, rgb_t(0,0,0));
 }
 
 /***************************************************************
@@ -175,7 +175,7 @@ void undrfire_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 				}
 				else
 				{
-					m_gfxdecode->gfx(sprite_ptr->gfx)->zoom_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(sprite_ptr->gfx)->zoom_transpen(m_palette,bitmap,cliprect,
 							sprite_ptr->code,
 							sprite_ptr->color,
 							sprite_ptr->flipx,sprite_ptr->flipy,
@@ -194,7 +194,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	{
 		sprite_ptr--;
 
-		m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
@@ -313,7 +313,7 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 			}
 			else
 			{
-				m_gfxdecode->gfx(sprite_ptr->gfx)->zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(sprite_ptr->gfx)->zoom_transpen(m_palette,bitmap,cliprect,
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
@@ -328,7 +328,7 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 	{
 		sprite_ptr--;
 
-		m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,

@@ -66,10 +66,10 @@ public:
 	TILE_GET_INFO_MEMBER(tank8_get_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(tank8);
 	UINT32 screen_update_tank8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_tank8(screen_device &screen, bool state);
-	void set_pens(colortable_t *colortable);
+	void set_pens();
 	inline int get_x_pos(int n);
 	inline int get_y_pos(int n);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

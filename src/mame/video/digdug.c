@@ -26,8 +26,6 @@ PALETTE_INIT_MEMBER(digdug_state,digdug)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	machine().colortable = colortable_alloc(machine(), 32);
-
 	for (i = 0;i < 32;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -44,24 +42,24 @@ PALETTE_INIT_MEMBER(digdug_state,digdug)
 		bit1 = (*color_prom >> 6) & 0x01;
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		colortable_palette_set_color(machine().colortable,i,rgb_t(r,g,b));
+		palette.set_indirect_color(i,rgb_t(r,g,b));
 		color_prom++;
 	}
 
 	/* characters - direct mapping */
 	for (i = 0; i < 16; i++)
 	{
-		colortable_entry_set_value(machine().colortable, i*2+0, 0);
-		colortable_entry_set_value(machine().colortable, i*2+1, i);
+		palette.set_pen_indirect(i*2+0, 0);
+		palette.set_pen_indirect(i*2+1, i);
 	}
 
 	/* sprites */
 	for (i = 0;i < 0x100;i++)
-		colortable_entry_set_value(machine().colortable, 16*2+i, (*color_prom++ & 0x0f) + 0x10);
+		palette.set_pen_indirect(16*2+i, (*color_prom++ & 0x0f) + 0x10);
 
 	/* bg_select */
 	for (i = 0;i < 0x100;i++)
-		colortable_entry_set_value(machine().colortable, 16*2+256+i, *color_prom++ & 0x0f);
+		palette.set_pen_indirect(16*2+256+i, *color_prom++ & 0x0f);
 }
 
 
@@ -277,14 +275,14 @@ void digdug_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 		{
 			for (x = 0;x <= size;x++)
 			{
-				UINT32 transmask = colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0x1f);
-				m_gfxdecode->gfx(1)->transmask(bitmap,visarea,
+				UINT32 transmask =  m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0x1f);
+				m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,visarea,
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
 					((sx + 16*x) & 0xff), sy + 16*y,transmask);
 				/* wraparound */
-				m_gfxdecode->gfx(1)->transmask(bitmap,visarea,
+				m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,visarea,
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,

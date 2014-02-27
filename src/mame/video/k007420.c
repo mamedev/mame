@@ -19,7 +19,8 @@ const device_type K007420 = &device_creator<k007420_device>;
 k007420_device::k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K007420, "Konami 007420", tag, owner, clock, "k007420", __FILE__),
 	m_ram(NULL),
-	m_flipscreen(0)
+	m_flipscreen(0),
+	m_palette(*this)
 	//m_regs[8],
 {
 }
@@ -182,14 +183,14 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 					else
 						c += bank;
 
-					gfx->transpen(bitmap,cliprect,
+					gfx->transpen(m_palette,bitmap,cliprect,
 						c,
 						color,
 						flipx,flipy,
 						sx,sy,0);
 
 					if (m_regs[2] & 0x80)
-						gfx->transpen(bitmap,cliprect,
+						gfx->transpen(m_palette,bitmap,cliprect,
 							c,
 							color,
 							flipx,flipy,
@@ -226,7 +227,7 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 					else
 						c += bank;
 
-					gfx->zoom_transpen(bitmap,cliprect,
+					gfx->zoom_transpen(m_palette,bitmap,cliprect,
 						c,
 						color,
 						flipx,flipy,
@@ -234,7 +235,7 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 						(zw << 16) / 8,(zh << 16) / 8,0);
 
 					if (m_regs[2] & 0x80)
-						gfx->zoom_transpen(bitmap,cliprect,
+						gfx->zoom_transpen(m_palette,bitmap,cliprect,
 							c,
 							color,
 							flipx,flipy,
@@ -258,4 +259,14 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 			m_ram[(current_sprite*8)+6], m_ram[(current_sprite*8)+7]);
 	}
 #endif
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void k007420_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<k007420_device &>(device).m_palette.set_tag(tag);
 }

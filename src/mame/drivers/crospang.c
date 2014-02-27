@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( crospang_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITENOP
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( bestri_map, AS_PROGRAM, 16, crospang_state )
 
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
 	AM_RANGE(0x270004, 0x270005) AM_WRITENOP
@@ -354,7 +354,8 @@ static MACHINE_CONFIG_START( crospang, crospang_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(crospang_state, screen_update_crospang)
 
-	MCFG_PALETTE_LENGTH(0x300)
+	MCFG_PALETTE_ADD("palette", 0x300)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_GFXDECODE_ADD("gfxdecode", crospang)
 
 
@@ -363,6 +364,7 @@ static MACHINE_CONFIG_START( crospang, crospang_state )
 	decospr_device::set_is_bootleg(*device, true);
 	decospr_device::set_offsets(*device, 5,7);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 
 	/* sound hardware */

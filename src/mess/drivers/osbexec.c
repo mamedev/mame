@@ -109,7 +109,7 @@ public:
 	DECLARE_READ8_MEMBER(osbexec_rtc_r);
 	DECLARE_DRIVER_INIT(osbexec);
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(osbexec);
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
 	DECLARE_READ8_MEMBER(osbexec_pia0_a_r);
 	DECLARE_WRITE8_MEMBER(osbexec_pia0_a_w);
@@ -307,11 +307,11 @@ static INPUT_PORTS_START( osbexec )
 INPUT_PORTS_END
 
 
-void osbexec_state::palette_init()
+PALETTE_INIT_MEMBER(osbexec_state, osbexec)
 {
-	palette_set_color_rgb( machine(), 0, 0, 0, 0 ); /* Black */
-	palette_set_color_rgb( machine(), 1, 0, 255, 0 );   /* Full */
-	palette_set_color_rgb( machine(), 2, 0, 128, 0 );   /* Dimmed */
+	palette.set_pen_color( 0, 0, 0, 0 ); /* Black */
+	palette.set_pen_color( 1, 0, 255, 0 );   /* Full */
+	palette.set_pen_color( 2, 0, 128, 0 );   /* Dimmed */
 }
 
 void osbexec_state::video_start()
@@ -611,7 +611,8 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_SCREEN_UPDATE_DRIVER(osbexec_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )    /* May not be correct */
 
-	MCFG_PALETTE_LENGTH( 3 )
+	MCFG_PALETTE_ADD( "palette", 3 )
+	MCFG_PALETTE_INIT_OWNER(osbexec_state, osbexec)
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)

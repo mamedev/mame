@@ -44,7 +44,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(suprridr);
 	UINT32 screen_update_suprridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(main_nmi_gen);
 	TIMER_CALLBACK_MEMBER(delayed_sound_w);

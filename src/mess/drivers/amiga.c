@@ -658,8 +658,8 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 	MCFG_SCREEN_RAW_PARAMS(AMIGA_68000_NTSC_CLOCK*2,228*4,214,228*4,262,34,262)
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
 
-	MCFG_PALETTE_LENGTH(4096)
-	MCFG_PALETTE_INIT_OVERRIDE(amiga_state, amiga )
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_INIT_OWNER(amiga_state, amiga )
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state,amiga)
 
@@ -865,8 +865,8 @@ static MACHINE_CONFIG_START( a1200n, a1200_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_amiga)
 
-	MCFG_PALETTE_LENGTH(4096)
-	MCFG_PALETTE_INIT_OVERRIDE(amiga_state, amiga )
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_INIT_OWNER(amiga_state, amiga )
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state,amiga)
 
@@ -972,8 +972,8 @@ static MACHINE_CONFIG_START( a3000n, amiga_state )
 //  MCFG_SCREEN_VISIBLE_AREA(214, (228*4)-1, 34, 262-1)
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
 
-	MCFG_PALETTE_LENGTH(4096)
-	MCFG_PALETTE_INIT_OVERRIDE(amiga_state, amiga )
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_INIT_OWNER(amiga_state, amiga )
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state,amiga)
 

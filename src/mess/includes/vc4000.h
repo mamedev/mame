@@ -111,7 +111,7 @@ public:
 	bitmap_ind16 *m_bitmap;
 	optional_device<cassette_image_device> m_cassette;
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(vc4000);
 	UINT32 screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vc4000_video_line);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vc4000_cart);

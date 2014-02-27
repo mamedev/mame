@@ -165,11 +165,12 @@ public:
 	static void static_set_screen_update(device_t &device, screen_update_ind16_delegate callback);
 	static void static_set_screen_update(device_t &device, screen_update_rgb32_delegate callback);
 	static void static_set_screen_vblank(device_t &device, screen_vblank_delegate callback);
+	static void static_set_palette(device_t &device, const char *palette, int base);
 
 	// information getters
 	render_container &container() const { assert(m_container != NULL); return *m_container; }
 	bitmap_ind8 &priority() { return m_priority; }
-
+	palette_device *palette() { return m_palette; }
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
 	void reset_origin(int beamy = 0, int beamx = 0);
@@ -245,6 +246,8 @@ private:
 	screen_update_ind16_delegate m_screen_update_ind16; // screen update callback (16-bit palette)
 	screen_update_rgb32_delegate m_screen_update_rgb32; // screen update callback (32-bit RGB)
 	screen_vblank_delegate m_screen_vblank;         // screen vblank callback
+	const char *		m_palette_tag;				// tag to our palette
+	int					m_palette_base;				// base of our palette
 
 	// internal state
 	render_container *  m_container;                // pointer to our container
@@ -255,6 +258,7 @@ private:
 	rectangle           m_visarea;                  // current visible area (HBLANK end/start, VBLANK end/start)
 
 	// textures and bitmaps
+	palette_device *	m_palette;					// our palette
 	texture_format      m_texformat;                // texture format
 	render_texture *    m_texture[2];               // 2x textures for the screen bitmap
 	screen_bitmap       m_bitmap[2];                // 2x bitmaps for rendering
@@ -366,6 +370,9 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 #define MCFG_SCREEN_VBLANK_DEVICE(_device, _class, _method) \
 	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)0));
+#define MCFG_SCREEN_PALETTE(_palette_tag) \
+	screen_device::static_set_palette(*device, _palette_tag, 0);
+
 
 
 //**************************************************************************

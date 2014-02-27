@@ -222,7 +222,6 @@ public:
 	DECLARE_READ8_MEMBER(mux_port_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
 	UINT32 screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
 	required_device<cpu_device> m_maincpu;
@@ -274,9 +273,6 @@ UINT32 jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_ind16
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
-
-void jubilee_state::palette_init()
-{}
 
 
 /**************************
@@ -506,7 +502,7 @@ static MACHINE_CONFIG_START( jubileep, jubilee_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jubilee_state, screen_update_jubileep)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jubileep)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette",8)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
