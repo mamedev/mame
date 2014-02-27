@@ -70,7 +70,6 @@ void ti990_10_device::device_start()
 
 void ti990_10_device::device_stop()
 {
-	int k = 0;
 	if (TRACE_SETUP) logerror("ti990_10: Deleting lookup tables\n");
 }
 
