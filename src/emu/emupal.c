@@ -1,39 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     emupal.c
 
     Palette device.
-
-****************************************************************************
-
-    Copyright Aaron Giles
-    All rights reserved.
-
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are
-    met:
-
-        * Redistributions of source code must retain the above copyright
-          notice, this list of conditions and the following disclaimer.
-        * Redistributions in binary form must reproduce the above copyright
-          notice, this list of conditions and the following disclaimer in
-          the documentation and/or other materials provided with the
-          distribution.
-        * Neither the name 'MAME' nor the names of its contributors may be
-          used to endorse or promote products derived from this software
-          without specific prior written permission.
-
-    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
-    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
-    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
 
@@ -110,8 +81,21 @@ void palette_device::static_enable_hilights(device_t &device)
 void palette_device::set_indirect_color(int index, rgb_t rgb)
 {
 	// ensure the array is expanded enough to handle the index, then set it
-	m_indirect_colors.resize(index + 1);
-	m_indirect_colors[index] = rgb;
+	m_indirect_colors.resize_keep(((index + 1 + 255) / 256) * 256);
+
+	// alpha doesn't matter
+	rgb.set_a(0);
+
+	// update if it has changed
+	if (m_indirect_colors[index] != rgb)
+	{
+		m_indirect_colors[index] = rgb;
+
+		// update the palette for any colortable entries that reference it
+		for (UINT32 pen = 0; pen < m_indirect_entry.count(); pen++)
+			if (m_indirect_entry[pen] == index)
+				m_palette->entry_set_color(pen, rgb);
+	}
 }
 
 
@@ -121,9 +105,15 @@ void palette_device::set_indirect_color(int index, rgb_t rgb)
 
 void palette_device::set_pen_indirect(pen_t pen, UINT16 index)
 {
+	assert(index < m_indirect_colors.count());
+
 	// ensure the array is expanded enough to handle the index, then set it
-	m_indirect_entry.resize(index + 1);
-	m_indirect_entry[index] = index;
+	m_indirect_entry.resize_keep(((pen + 1 + 255) / 256) * 256);
+	if (m_indirect_entry[pen] != index)
+	{
+		m_indirect_entry[pen] = index;
+		m_palette->entry_set_color(pen, m_indirect_colors[index]);
+	}
 }
 
 
