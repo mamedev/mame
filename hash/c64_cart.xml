@@ -6952,6 +6952,28 @@
 		</part>
 	</software>
 
+	<software name="instacal">
+		<description>Insta-Calc (v2.0)</description>
+		<year>1983</year>
+		<publisher>Cimarron</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="0200-0173.5" size="0x2000" crc="c3f915da" sha1="6a9d1852d6408571baf346502b47fba0ac541698" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="insta-calc version 2.0.g64" size="279582" crc="ba827aef" sha1="ddafbb0550575c1a43da66f9348135fb7f6ab899" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Dummy cartridge entries to allow requirement mappings from c64_flop -->
 
 	<software name="cpm">
