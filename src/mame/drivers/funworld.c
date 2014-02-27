@@ -61,7 +61,7 @@
   * Royal Card (Austrian, set 4),                     TAB Austria,        1991.
   * Royal Card (Austrian, set 5),                     TAB Austria,        1991.
   * Royal Card (Austrian, set 6),                     TAB Austria,        1991.
-  * Royal Card (Austrian, set 7),                     bootleg,            1991.
+  * Royal Card (Austrian, set 7, CMC C1030 HW),       bootleg,            1991.
   * Royal Card (TAB original),                        TAB Austria,        1991.
   * Royal Card (Slovak, encrypted),                   Evona Electronic,   1991.
   * Royal Card Professional 2.0,                      Digital Dreams,     1993.
@@ -4651,7 +4651,7 @@ ROM_START( royalcrdf )  /* encrypted program rom */
 ROM_END
 
 
-ROM_START( royalcrdg )   /* Bootleg PCB, EP910EC-30 CPLD, NON encrypted graphics */
+ROM_START( royalcrdg )   /* CMC C1030 PCB, EP910EC-30 CPLD, NON encrypted graphics */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.cpu", 0x8000, 0x8000, CRC(829a6a1d) SHA1(b7064e4d60e33d0875eb73525230ea3b99f10542) )
 
@@ -6212,7 +6212,7 @@ GAMEL( 1991, royalcrdd, royalcrd, royalcd1, royalcrd,  driver_device,  0,       
 GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 6)",                    0,                       layout_jollycrd )
 GAMEL( 1991, royalcrdt, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (TAB original)",                       0,                       layout_jollycrd )
 GAME(  1991, royalcrdf, royalcrd, royalcd1, royalcrd,  funworld_state, royalcdc, ROT0, "Evona Electronic","Royal Card (Slovak, encrypted)",                  GAME_NOT_WORKING )
-GAMEL( 1990, royalcrdg, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "bootleg",         "Royal Card (Austrian, set 7)",                    0,                       layout_jollycrd ) // big CPLD
+GAMEL( 1990, royalcrdg, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "bootleg",         "Royal Card (Austrian, set 7, CMC C1030 HW)",      0,                       layout_jollycrd ) // big CPLD
 GAME(  1993, royalcrdp, royalcrd, cuoreuno, royalcrd,  driver_device,  0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    0 )
 GAMEL( 199?, witchryl,  0,        witchryl, witchryl,  driver_device,  0,        ROT0, "Video Klein",     "Witch Royal (Export version 2.1)",                0,                       layout_jollycrd )
 
