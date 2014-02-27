@@ -309,7 +309,7 @@ static const cassette_interface spc1000_cassette_interface =
 // irq is inverted in emulation, so we need this trampoline
 WRITE_LINE_MEMBER( spc1000_state::irq_w )
 {
-	m_maincpu->set_input_line(0, state ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(0, state ? CLEAR_LINE : HOLD_LINE);
 }
 
 static const mc6847_interface spc1000_mc6847_intf =

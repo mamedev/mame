@@ -125,6 +125,7 @@
 #include "includes/mbee.h"
 #include "formats/dsk_dsk.h"
 #include "formats/mbee_dsk.h"
+#include "formats/mbee_cas.h"
 
 
 #define XTAL_13_5MHz 13500000
@@ -720,6 +721,15 @@ static MC6845_INTERFACE( mbee256_crtc )
 	mbee256_update_addr     /* handler to process transparent mode */
 };
 
+static const cassette_interface mbee_cassette_interface =
+{
+	mbee_cassette_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL,
+	NULL
+};
+
 static MACHINE_CONFIG_START( mbee, mbee_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 6)         /* 2 MHz */
@@ -753,14 +763,14 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 
 	/* devices */
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_12MHz / 8, mbee_crtc)
-	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com", 2)
+	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 2)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", mbee_cassette_interface )
 MACHINE_CONFIG_END
 
 
@@ -798,14 +808,14 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 
 	/* devices */
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8, mbeeic_crtc)
-	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com", 2)
+	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 2)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", mbee_cassette_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbeepc, mbeeic )

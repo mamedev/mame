@@ -776,7 +776,7 @@ DRIVER_INIT_MEMBER(mbee_state,mbeett)
     Quickload
 
     These load the standard BIN format, as well
-    as COM and MWB files.
+    as BEE, COM and MWB files.
 
 ************************************************************/
 
@@ -839,6 +839,30 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 		}
 
 		if (sw) m_maincpu->set_pc(0x100);
+	}
+	else if (!mame_stricmp(image.filetype(), "bee"))
+	{
+		/* bee files - machine-language games that start at 0900 */
+		for (i = 0; i < quickload_size; i++)
+		{
+			j = 0x900 + i;
+
+			if (image.fread(&data, 1) != 1)
+			{
+				image.message("Unexpected EOF");
+				return IMAGE_INIT_FAIL;
+			}
+
+			if ((j < m_size) || (j > 0xefff))
+				space.write_byte(j, data);
+			else
+			{
+				image.message("Not enough memory in this microbee");
+				return IMAGE_INIT_FAIL;
+			}
+		}
+
+		if (sw) m_maincpu->set_pc(0x900);
 	}
 
 	return IMAGE_INIT_PASS;
