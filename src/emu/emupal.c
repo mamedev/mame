@@ -794,12 +794,16 @@ void palette_device::palette_init_RRRRRGGGGGGBBBBB(palette_device &palette)
 
 rgb_t raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder(UINT32 raw)
 {
-	//Micko:FIXME
-	return rgb_t(0, 0, 0);
+	UINT8 r = pal5bit(((raw >> 11) & 0x1e) | ((raw >> 3) & 0x01));
+	UINT8 g = pal5bit(((raw >> 7) & 0x1e) | ((raw >> 2) & 0x01));
+	UINT8 b = pal5bit(((raw >> 3) & 0x1e) | ((raw >> 1) & 0x01));
+	return rgb_t(r, g, b);
 }
 
 rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_decoder(UINT32 raw)
 {
-	//Micko:FIXME
-	return rgb_t(0, 0, 0);
+	UINT8 r = pal5bit(((raw >> 8) & 0x1e) | ((raw >> 12) & 0x01));
+	UINT8 g = pal5bit(((raw >> 4) & 0x1e) | ((raw >> 13) & 0x01));
+	UINT8 b = pal5bit(((raw >> 0) & 0x1e) | ((raw >> 14) & 0x01));
+	return rgb_t(r, g, b);
 }
