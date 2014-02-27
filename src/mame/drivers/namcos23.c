@@ -3069,7 +3069,7 @@ static ADDRESS_MAP_START( s23iobrdiomap, AS_IO, 8, namcos23_state )
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_NOP   // unknown - used on ASCA-5 only
 	AM_RANGE(H8_PORT_9, H8_PORT_9) AM_NOP   // unknown - used on ASCA-5 only
 	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE(s23_iob_mcu_r, s23_iob_mcu_w)
-	AM_RANGE(H8_ADC_0_H, H8_ADC_3_L) //AM_READ(s23_iob_analog_r)
+	AM_RANGE(H8_ADC_0_H, H8_ADC_3_L) AM_READ(s23_iob_analog_r)
 ADDRESS_MAP_END
 
 
