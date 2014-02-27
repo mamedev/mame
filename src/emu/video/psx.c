@@ -3805,7 +3805,7 @@ MACHINE_CONFIG_FRAGMENT( psxgpu )
 	MCFG_SCREEN_UPDATE_DEVICE( DEVICE_SELF, psxgpu_device, update_screen )
 	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(FUNC(psxgpu_device::vblank), (psxgpu_device *) owner));
 
-	MCFG_PALETTE_ADD( "palette", 65536 )
+	MCFG_PALETTE_ADD( "screen:palette", 65536 )
 	MCFG_PALETTE_INIT_OWNER(psxgpu_device, psx)
 MACHINE_CONFIG_END
 
