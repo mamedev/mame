@@ -105,14 +105,19 @@ void palette_device::set_indirect_color(int index, rgb_t rgb)
 
 void palette_device::set_pen_indirect(pen_t pen, UINT16 index)
 {
-	assert(index < m_indirect_colors.count());
+	assert(pen < m_entries);
 
-	// ensure the array is expanded enough to handle the index, then set it
-	m_indirect_entry.resize_keep(((pen + 1 + 255) / 256) * 256);
+	// allocate the array if needed
+	m_indirect_entry.resize(m_entries);
+
+	// update if changed
 	if (m_indirect_entry[pen] != index)
 	{
 		m_indirect_entry[pen] = index;
-		m_palette->entry_set_color(pen, m_indirect_colors[index]);
+		
+		// permit drivers to configure the pens prior to the colors if they desire
+		if (index < m_indirect_colors.count())
+			m_palette->entry_set_color(pen, m_indirect_colors[index]);
 	}
 }
 
@@ -290,7 +295,7 @@ inline void palette_device::update_for_write(offs_t byte_offset, int bytes_modif
 	for (int index = 0; index < count; index++)
 	{
 		UINT32 data = m_paletteram.read(base + index);
-		if (m_paletteram_ext.base())
+		if (m_paletteram_ext.base() != NULL)
 			data |= m_paletteram_ext.read(base + index) << (8 * bpe);
 		set_pen_color(base + index, m_raw_to_rgb(data));
 	}
@@ -489,7 +494,7 @@ void palette_device::allocate_palette()
 
 	// set the initial colors to a standard rainbow
 	for (int index = 0; index < m_entries; index++)
-		set_pen_color(index, rgb_t(pal1bit(index >> 0), pal1bit(index >> 1), pal1bit(index >> 2)));
+		set_pen_color(index, rgbexpand<1,1,1>(index, 0, 1, 2));
 
 	// switch off the color mode
 	switch (m_format)
@@ -501,13 +506,13 @@ void palette_device::allocate_palette()
 			if (m_black_pen >= 65536)
 				m_black_pen = 0;
 			if (m_white_pen >= 65536)
-				m_white_pen = 65536;
+				m_white_pen = 65535;
 			break;
 
 		// 32-bit direct case
 		case BITMAP_FORMAT_RGB32:
-			m_black_pen = rgb_t(0x00,0x00,0x00);
-			m_white_pen = rgb_t(0xff,0xff,0xff);
+			m_black_pen = rgb_t::black;
+			m_white_pen = rgb_t::white;
 			break;
 
 		// screenless case
@@ -690,7 +695,7 @@ void palette_device::palette_init_white_and_black(palette_device &palette)
 void palette_device::palette_init_monochrome_amber(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black); // black
-	palette.set_pen_color(1, 0xf7, 0xaa, 0x00); // amber
+	palette.set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00)); // amber
 }
 
 
@@ -701,7 +706,7 @@ void palette_device::palette_init_monochrome_amber(palette_device &palette)
 void palette_device::palette_init_monochrome_green(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black); // black
-	palette.set_pen_color(1, 0x00, 0xff, 0x00); // green
+	palette.set_pen_color(1, rgb_t(0x00, 0xff, 0x00)); // green
 }
 
 
@@ -762,7 +767,7 @@ void palette_device::palette_init_RRRRRGGGGGBBBBB(palette_device &palette)
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
-		palette.set_pen_color(i, rgb_t(pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0)));
+		palette.set_pen_color(i, rgbexpand<5,5,5>(i, 10, 5, 0));
 }
 
 
@@ -771,7 +776,7 @@ void palette_device::palette_init_BBBBBGGGGGRRRRR(palette_device &palette)
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
-		palette.set_pen_color(i, rgb_t(pal5bit(i >> 0), pal5bit(i >> 5), pal5bit(i >> 10)));
+		palette.set_pen_color(i, rgbexpand<5,5,5>(i, 0, 5, 10));
 }
 
 
@@ -787,7 +792,7 @@ void palette_device::palette_init_RRRRRGGGGGGBBBBB(palette_device &palette)
 	int i;
 
 	for (i = 0; i < 0x10000; i++)
-		palette.set_pen_color(i, rgb_t(pal5bit(i >> 11), pal6bit(i >> 5), pal5bit(i >> 0)));
+		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 11, 5, 0));
 }
 
 
