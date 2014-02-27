@@ -31,6 +31,16 @@ void st0020_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 	downcast<st0020_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void st0020_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<st0020_device &>(device).m_palette.set_tag(tag);
+}
+
 void st0020_device::set_is_st0032(device_t &device, int is_st0032)
 {
 	st0020_device &dev = downcast<st0020_device &>(device);

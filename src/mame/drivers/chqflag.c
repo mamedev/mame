@@ -353,10 +353,13 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K051960_ADD("k051960", chqflag_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
+	MCFG_K051960_PALETTE("palette")
 	MCFG_K051316_ADD("k051316_1", chqflag_k051316_intf_1)
 	MCFG_K051316_GFXDECODE("gfxdecode")
+	MCFG_K051316_PALETTE("palette")
 	MCFG_K051316_ADD("k051316_2", chqflag_k051316_intf_2)
 	MCFG_K051316_GFXDECODE("gfxdecode")
+	MCFG_K051316_PALETTE("palette")
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */

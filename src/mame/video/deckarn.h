@@ -9,6 +9,7 @@ public:
 	
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_gfx_region(device_t &device, int region);
 
 protected:
@@ -25,3 +26,6 @@ extern const device_type DECO_KARNOVSPRITES;
 
 #define MCFG_DECO_KARNOVSPRITES_GFXDECODE(_gfxtag) \
 	deco_karnovsprites_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_DECO_KARNOVSPRITES_PALETTE(_palette_tag) \
+	deco_karnovsprites_device::static_set_palette_tag(*device, "^" _palette_tag);

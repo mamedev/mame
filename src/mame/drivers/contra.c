@@ -207,7 +207,9 @@ static MACHINE_CONFIG_START( contra, contra_state )
 	MCFG_PALETTE_INIT_OWNER(contra_state, contra)
 
 	MCFG_K007121_ADD("k007121_1")
+	MCFG_K007121_PALETTE("palette")
 	MCFG_K007121_ADD("k007121_2")
+	MCFG_K007121_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

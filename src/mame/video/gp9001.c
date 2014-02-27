@@ -978,3 +978,13 @@ void gp9001vdp_device::gp9001_screen_eof(void)
 	/** Shift sprite RAM buffers  ***  Used to fix sprite lag **/
 	if (sp.use_sprite_buffer) memcpy(sp.vram16_buffer,sp.vram16,GP9001_SPRITERAM_SIZE);
 }
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void gp9001vdp_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<gp9001vdp_device &>(device).m_palette.set_tag(tag);
+}

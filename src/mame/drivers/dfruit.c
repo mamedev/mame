@@ -405,6 +405,7 @@ static MACHINE_CONFIG_START( dfruit, dfruit_state )
 	
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
 	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
+	MCFG_TC0091LVC_PALETTE("palette")
 	
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 

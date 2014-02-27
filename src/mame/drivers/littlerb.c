@@ -952,7 +952,7 @@ static MACHINE_CONFIG_START( littlerb, littlerb_state )
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 //  MCFG_PALETTE_INIT_OWNER(littlerb_state,littlerb)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")

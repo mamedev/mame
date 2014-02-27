@@ -1379,7 +1379,7 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 
 	MCFG_PALETTE_ADD("palette", 0x100*2) // *2 for priority workaraound / custom drawing
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 
 	/* Parrot 3 seems fine at 1 Mhz, but Double Challenge isn't? */

@@ -49,6 +49,17 @@ void vsystem_spr2_device::static_set_gfxdecode_tag(device_t &device, const char 
 	downcast<vsystem_spr2_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void vsystem_spr2_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<vsystem_spr2_device &>(device).m_palette.set_tag(tag);
+}
+
+
 void vsystem_spr2_device::set_tile_indirect_cb(device_t &device,vsystem_tile2_indirection_delegate newtilecb)
 {
 	vsystem_spr2_device &dev = downcast<vsystem_spr2_device &>(device);

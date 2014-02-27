@@ -289,7 +289,7 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wildpkr_state, screen_update_wildpkr)
 
 //  MCFG_HD63484_ADD("hd63484", wildpkr_hd63484_intf)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(wildpkr_state, wildpkr)

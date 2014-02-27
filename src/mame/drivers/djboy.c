@@ -585,6 +585,7 @@ static MACHINE_CONFIG_START( djboy, djboy_state )
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", djboy_pandora_config)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	MCFG_KANEKO_PANDORA_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

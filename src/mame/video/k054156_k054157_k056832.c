@@ -231,6 +231,16 @@ void k056832_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 
 
 //-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void k056832_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<k056832_device &>(device).m_palette.set_tag(tag);
+}
+
+//-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete

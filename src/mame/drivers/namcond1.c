@@ -326,6 +326,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 
 	MCFG_YGV608_ADD("ygv608")
 	MCFG_YGV608_GFXDECODE("gfxdecode")
+	MCFG_YGV608_PALETTE("palette")
 MACHINE_CONFIG_END
 
 ROM_START( ncv1 )

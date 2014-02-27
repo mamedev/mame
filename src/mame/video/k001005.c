@@ -931,3 +931,13 @@ void k001005_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 		}
 	}
 }
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void k001005_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<k001005_device &>(device).m_palette.set_tag(tag);
+}

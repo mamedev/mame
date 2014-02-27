@@ -888,7 +888,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	MCFG_TIMER_DRIVER_ADD("sound_timer", mediagx_state, sound_timer_callback)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

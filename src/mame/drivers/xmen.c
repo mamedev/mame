@@ -365,8 +365,10 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K052109_ADD("k052109", xmen_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
+	MCFG_K052109_PALETTE("palette")
 	MCFG_K053246_ADD("k053246", xmen_k053246_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
+	MCFG_K053246_PALETTE("palette")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
@@ -429,9 +431,11 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K052109_ADD("k052109", xmen_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
+	MCFG_K052109_PALETTE("palette")
 	MCFG_K053246_ADD("k053246", xmen6p_k053246_intf)	
 	MCFG_K053246_SET_SCREEN("screen")
 	MCFG_K053246_GFXDECODE("gfxdecode")
+	MCFG_K053246_PALETTE("palette")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

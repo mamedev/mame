@@ -697,6 +697,7 @@ static MACHINE_CONFIG_START( othunder, othunder_state )
 	MCFG_TC0100SCN_ADD("tc0100scn", othunder_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0110PCR_ADD("tc0110pcr", othunder_tc0110pcr_intf)
+	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

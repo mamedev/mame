@@ -1757,14 +1757,17 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 
 	MCFG_DECO16IC_ADD("tilegen1", captaven_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 	
 	MCFG_DECO16IC_ADD("tilegen2", captaven_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_pri_callback(*device, captaven_pri_callback);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, deco32_sound_cb)
@@ -1829,13 +1832,16 @@ static MACHINE_CONFIG_START( fghthist, deco32_state ) /* DE-0380-2 PCB */
 
 	MCFG_DECO16IC_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 	
 	MCFG_DECO16IC_ADD("tilegen2", fghthist_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_PORTA_CALLBACK( deco32_state, port_a_fghthist )
@@ -1888,13 +1894,16 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
 
 	MCFG_DECO16IC_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 	
 	MCFG_DECO16IC_ADD("tilegen2", fghthist_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_PORTA_CALLBACK( deco32_state, port_a_fghthist )
@@ -2009,9 +2018,11 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 
 	MCFG_DECO16IC_ADD("tilegen1", dragngun_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 	
 	MCFG_DECO16IC_ADD("tilegen2", dragngun_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2094,9 +2105,11 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 
 	MCFG_DECO16IC_ADD("tilegen1", lockload_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 	
 	MCFG_DECO16IC_ADD("tilegen2", lockload_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2182,17 +2195,21 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 
 	MCFG_DECO16IC_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 	
 	MCFG_DECO16IC_ADD("tilegen2", tattass_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 4);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tattass)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2231,17 +2248,21 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 
 	MCFG_DECO16IC_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 	
 	MCFG_DECO16IC_ADD("tilegen2", tattass_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 4);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nslasher)
 	MCFG_PALETTE_ADD("palette", 2048)

@@ -416,6 +416,7 @@ static MACHINE_CONFIG_START( bishi, bishi_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K056832_ADD("k056832", bishi_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K054338_ADD("k054338", bishi_k054338_intf)
 	MCFG_K055555_ADD("k055555")
 

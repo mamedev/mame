@@ -61,6 +61,16 @@ void ygv608_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 	downcast<ygv608_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void ygv608_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<ygv608_device &>(device).m_palette.set_tag(tag);
+}
+
 void ygv608_device::set_gfxbank(UINT8 gfxbank)
 {
 	m_namcond1_gfxbank = gfxbank;	

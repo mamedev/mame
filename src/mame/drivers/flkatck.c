@@ -234,6 +234,7 @@ static MACHINE_CONFIG_START( flkatck, flkatck_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_K007121_ADD("k007121")
+	MCFG_K007121_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

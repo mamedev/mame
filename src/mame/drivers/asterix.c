@@ -295,8 +295,10 @@ static MACHINE_CONFIG_START( asterix, asterix_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K056832_ADD("k056832", asterix_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K053244_ADD("k053244", asterix_k05324x_intf)
 	MCFG_K053244_GFXDECODE("gfxdecode")
+	MCFG_K053244_PALETTE("palette")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

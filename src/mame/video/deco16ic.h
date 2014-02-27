@@ -42,6 +42,7 @@ public:
 	
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	
 
 	DECLARE_WRITE16_MEMBER( pf1_data_w );
@@ -167,5 +168,8 @@ extern const device_type DECO16IC;
 
 #define MCFG_DECO16IC_GFXDECODE(_gfxtag) \
 	deco16ic_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_DECO16IC_PALETTE(_palette_tag) \
+	deco16ic_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

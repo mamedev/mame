@@ -3140,6 +3140,7 @@ static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3184,6 +3185,7 @@ static MACHINE_CONFIG_START( ghox, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3272,9 +3274,11 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 	
 	MCFG_DEVICE_ADD_VDP1
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3321,6 +3325,7 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3361,6 +3366,7 @@ static MACHINE_CONFIG_START( kbash2, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3398,6 +3404,7 @@ static MACHINE_CONFIG_START( truxton2, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,truxton2)
 
@@ -3456,6 +3463,7 @@ static MACHINE_CONFIG_START( pipibibs, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3500,6 +3508,7 @@ static MACHINE_CONFIG_START( pipibibsbl, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3579,6 +3588,7 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,truxton2)
 
@@ -3619,6 +3629,7 @@ static MACHINE_CONFIG_START( fixeightbl, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,fixeightbl)
 
@@ -3659,6 +3670,7 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3700,9 +3712,11 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 	
 	MCFG_DEVICE_ADD_VDP1
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3740,6 +3754,7 @@ static MACHINE_CONFIG_START( pwrkick, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3773,6 +3788,7 @@ static MACHINE_CONFIG_START( othldrby, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3809,6 +3825,7 @@ static MACHINE_CONFIG_START( snowbro2, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3855,6 +3872,7 @@ static MACHINE_CONFIG_START( mahoudai, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgaregga)
 
@@ -3901,6 +3919,7 @@ static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgaregga)
 
@@ -3958,6 +3977,7 @@ static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgaregga)
 
@@ -4013,6 +4033,7 @@ static MACHINE_CONFIG_START( batrider, toaplan2_state )
 
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,batrider)
 
@@ -4066,6 +4087,7 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_DEVICE_ADD_VDP0
 	MCFG_GP9001_VDP_GFXDECODE("gfxdecode")
+	MCFG_GP9001_VDP_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,batrider)
 

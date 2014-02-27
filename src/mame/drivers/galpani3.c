@@ -515,12 +515,15 @@ static MACHINE_CONFIG_START( galpani3, galpani3_state )
 
 	MCFG_DEVICE_ADD("grap2_0", KANEKO_GRAP2, 0)
 	kaneko_grap2_device::set_chipnum(*device, 0);
+	MCFG_KANEKO_GRAP2_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("grap2_1", KANEKO_GRAP2, 0)
 	kaneko_grap2_device::set_chipnum(*device, 1);
+	MCFG_KANEKO_GRAP2_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("grap2_2", KANEKO_GRAP2, 0)
 	kaneko_grap2_device::set_chipnum(*device, 2);
+	MCFG_KANEKO_GRAP2_PALETTE("palette")
 
 
 	/* sound hardware */

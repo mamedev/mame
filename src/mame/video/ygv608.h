@@ -288,6 +288,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_READ16_MEMBER( read );
@@ -390,5 +391,8 @@ extern const device_type YGV608;
 
 #define MCFG_YGV608_GFXDECODE(_gfxtag) \
 	ygv608_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_YGV608_PALETTE(_palette_tag) \
+	ygv608_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

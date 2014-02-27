@@ -64,6 +64,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	void clear_all();
 
@@ -506,6 +507,9 @@ extern const device_type K055673;
 #define MCFG_K053246_GFXDECODE(_gfxtag) \
 	k053247_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
+#define MCFG_K053246_PALETTE(_palette_tag) \
+	k053247_device::static_set_palette_tag(*device, "^" _palette_tag);
+
 
 #define MCFG_K055673_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K055673, 0) \
@@ -518,6 +522,9 @@ extern const device_type K055673;
 
 #define MCFG_K055673_GFXDECODE(_gfxtag) \
 	k055673_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_K055673_PALETTE(_palette_tag) \
+	k055673_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 
 /* old non-device stuff */

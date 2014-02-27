@@ -335,6 +335,7 @@ static MACHINE_CONFIG_START( dreambal, dreambal_state )
 
 	MCFG_DECO16IC_ADD("tilegen1", dreambal_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -641,6 +641,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K056832_ADD("k056832", qdrmfgp_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K053252_ADD("k053252", XTAL_32MHz/4, qdrmfgp_k053252_intf)
 
 	/* sound hardware */
@@ -681,6 +682,7 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K056832_ADD("k056832", qdrmfgp2_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K053252_ADD("k053252", XTAL_32MHz/4, qdrmfgp2_k053252_intf)
 
 	/* sound hardware */

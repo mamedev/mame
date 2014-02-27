@@ -271,6 +271,7 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_K007342_GFXDECODE("gfxdecode")
 	
 	MCFG_K007420_ADD("k007420", rockrage_k007420_intf)
+	MCFG_K007420_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", rockrage)
 	MCFG_PALETTE_ADD("palette", 64 + 2*16*16)

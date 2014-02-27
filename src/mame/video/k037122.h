@@ -11,6 +11,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void static_set_gfx_index(device_t &device, int index) { downcast<k037122_device &>(device).m_gfx_index = index; }
 
 	void tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
@@ -52,4 +53,8 @@ extern const device_type K037122;
 
 #define MCFG_K037122_GFXDECODE(_gfxtag) \
 	k037122_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_K037122_PALETTE(_palette_tag) \
+	k037122_device::static_set_palette_tag(*device, "^" _palette_tag);
+
 #endif

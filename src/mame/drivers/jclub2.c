@@ -750,6 +750,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	st0020_device::set_is_st0032(*device, 1);
 	st0020_device::set_is_jclub2o(*device, 1); // offsets
 	MCFG_ST0020_SPRITES_GFXDECODE("gfxdecode")
+	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
 
@@ -819,6 +820,7 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 	st0020_device::set_is_jclub2o(*device, 1);
 	MCFG_ST0020_SPRITES_GFXDECODE("gfxdecode")
+	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state,jclub2o)
 

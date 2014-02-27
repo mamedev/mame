@@ -331,6 +331,7 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( suprslam_state, suprslam_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
 	MCFG_K053936_ADD("k053936", suprslam_k053936_intf)
 

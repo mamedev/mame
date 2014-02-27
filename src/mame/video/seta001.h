@@ -8,6 +8,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	DECLARE_WRITE8_MEMBER( spritebgflag_w8 );
 
@@ -83,3 +84,6 @@ extern const device_type SETA001_SPRITE;
 
 #define MCFG_SETA001_SPRITE_GFXDECODE(_gfxtag) \
 	seta001_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_SETA001_SPRITE_PALETTE(_palette_tag) \
+	seta001_device::static_set_palette_tag(*device, "^" _palette_tag);

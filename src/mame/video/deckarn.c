@@ -122,3 +122,13 @@ void deco_karnovsprites_device::draw_sprites( running_machine &machine, bitmap_i
 				colour,fx,fy,x,y+16,0);
 	}
 }
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void deco_karnovsprites_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<deco_karnovsprites_device &>(device).m_palette.set_tag(tag);
+}

@@ -3233,6 +3233,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K001604_ADD("k001604", cobra_k001604_intf)     // on the LAN board in Racing Jam DX
 	MCFG_K001604_GFXDECODE("gfxdecode")
+	MCFG_K001604_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("cobra_jvs_host", COBRA_JVS_HOST, 4000000)
 	MCFG_JVS_DEVICE_ADD("cobra_jvs", COBRA_JVS, "cobra_jvs_host")

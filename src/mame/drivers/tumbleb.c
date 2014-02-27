@@ -2062,6 +2062,7 @@ static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_is_bootleg(*device, true);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -2099,6 +2100,7 @@ static MACHINE_CONFIG_START( tumbleb2, tumbleb_state )
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_is_bootleg(*device, true);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -2139,6 +2141,7 @@ static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_is_bootleg(*device, true);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -2176,6 +2179,7 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 	decospr_device::set_is_bootleg(*device, true);
 	decospr_device::set_transpen(*device, 15);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fncywld)
 	MCFG_PALETTE_ADD("palette", 0x800)
@@ -2234,6 +2238,7 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_is_bootleg(*device, true);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -2338,6 +2343,7 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_is_bootleg(*device, true);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", suprtrio)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -2375,6 +2381,7 @@ static MACHINE_CONFIG_START( pangpang, tumbleb_state )
 	decospr_device::set_gfx_region(*device, 3);
 	decospr_device::set_is_bootleg(*device, true);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)

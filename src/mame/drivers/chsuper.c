@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( chsuper, chsuper_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", chsuper)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

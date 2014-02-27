@@ -1486,3 +1486,13 @@ TILE_GET_INFO_MEMBER( namco_c45_road_device::get_road_info )
 	int color = data >> 10;
 	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
 }
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void namco_c45_road_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<namco_c45_road_device &>(device).m_palette.set_tag(tag);
+}

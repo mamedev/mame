@@ -1426,6 +1426,7 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 
 	MCFG_SCN2674_VIDEO_ADD("scn2674_vid", 0, WRITELINE(mpu4vid_state, update_mpu68_interrupts));
 	MCFG_SCN2674_GFXDECODE("gfxdecode")
+	MCFG_SCN2674_PALETTE("palette")
 
 	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
 	MCFG_CPU_PROGRAM_MAP(mpu4_68k_map)

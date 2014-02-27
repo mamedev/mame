@@ -28,6 +28,16 @@ void kaneko_grap2_device::set_chipnum(device_t &device, int chipnum)
 	dev.m_chipnum = chipnum;
 }
 
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void kaneko_grap2_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<kaneko_grap2_device &>(device).m_palette.set_tag(tag);
+}
+
 
 void kaneko_grap2_device::device_start()
 {

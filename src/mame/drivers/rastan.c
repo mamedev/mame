@@ -406,8 +406,10 @@ static MACHINE_CONFIG_START( rastan, rastan_state )
 
 	MCFG_PC080SN_ADD("pc080sn", rastan_pc080sn_intf)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	MCFG_PC080SN_PALETTE("palette")
 	MCFG_PC090OJ_ADD("pc090oj", rastan_pc090oj_intf)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
+	MCFG_PC090OJ_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

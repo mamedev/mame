@@ -10,6 +10,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);	
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_gfx_region(device_t &device, int gfxregion);
 	static void set_pri_callback(device_t &device, decospr_priority_callback_func callback);
 	static void set_col_callback(device_t &device, decospr_colour_callback_func callback);
@@ -85,3 +86,7 @@ extern const device_type DECO_SPRITE;
 
 #define MCFG_DECO_SPRITE_GFXDECODE(_gfxtag) \
 	decospr_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_DECO_SPRITE_PALETTE(_palette_tag) \
+	decospr_device::static_set_palette_tag(*device, "^" _palette_tag);
+

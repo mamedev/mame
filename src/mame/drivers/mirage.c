@@ -339,10 +339,12 @@ static MACHINE_CONFIG_START( mirage, miragemi_state )
 
 	MCFG_DECO16IC_ADD("tilegen1", mirage_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 	
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

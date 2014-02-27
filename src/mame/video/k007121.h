@@ -8,6 +8,8 @@ public:
 	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k007121_device() {}
 
+	static void static_set_palette_tag(device_t &device, const char *tag);
+	
 	DECLARE_READ8_MEMBER( ctrlram_r );
 	DECLARE_WRITE8_MEMBER( ctrl_w );
 
@@ -32,5 +34,8 @@ extern const device_type K007121;
 
 #define MCFG_K007121_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, K007121, 0)
+
+#define MCFG_K007121_PALETTE(_palette_tag) \
+	k007121_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

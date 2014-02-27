@@ -452,8 +452,10 @@ static MACHINE_CONFIG_START( mainevt, mainevt_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K052109_ADD("k052109", mainevt_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
+	MCFG_K052109_PALETTE("palette")
 	MCFG_K051960_ADD("k051960", mainevt_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
+	MCFG_K051960_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -513,8 +515,10 @@ static MACHINE_CONFIG_START( devstors, mainevt_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K052109_ADD("k052109", dv_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
+	MCFG_K052109_PALETTE("palette")
 	MCFG_K051960_ADD("k051960", dv_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
+	MCFG_K051960_PALETTE("palette")
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */

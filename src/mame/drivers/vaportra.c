@@ -261,13 +261,16 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 
 	MCFG_DECO16IC_ADD("tilegen1", vaportra_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DECO16IC_ADD("tilegen2", vaportra_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 4);
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	MCFG_DECO_MXC06_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

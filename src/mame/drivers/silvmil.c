@@ -332,6 +332,7 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	decospr_device::set_is_bootleg(*device, true);
 	decospr_device::set_offsets(*device, 5,7);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

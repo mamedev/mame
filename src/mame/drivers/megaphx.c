@@ -460,7 +460,7 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 	
 	MCFG_GFXDECODE_ADD("gfxdecode", megaphx)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 MACHINE_CONFIG_END
 

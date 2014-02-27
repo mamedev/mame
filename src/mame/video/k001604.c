@@ -432,3 +432,13 @@ WRITE32_MEMBER( k001604_device::reg_w )
 		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, space.device().safe_pc());
 	}
 }
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void k001604_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<k001604_device &>(device).m_palette.set_tag(tag);
+}

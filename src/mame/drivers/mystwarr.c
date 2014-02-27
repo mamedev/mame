@@ -1065,9 +1065,11 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K056832_ADD_NOINTF("k056832"/*, mystwarr_k056832_intf*/)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K055555_ADD("k055555")
 	MCFG_K055673_ADD_NOINTF("k055673")
 	MCFG_K055673_GFXDECODE("gfxdecode")
+	MCFG_K055673_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,mystwarr)
 

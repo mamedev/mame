@@ -189,7 +189,7 @@ static MACHINE_CONFIG_START( rltennis, rltennis_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -18,6 +18,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
@@ -60,5 +61,8 @@ extern const device_type PC090OJ;
 
 #define MCFG_PC090OJ_GFXDECODE(_gfxtag) \
 	pc090oj_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_PC090OJ_PALETTE(_palette_tag) \
+	pc090oj_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

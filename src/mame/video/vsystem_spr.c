@@ -95,6 +95,15 @@ void vsystem_spr_device::static_set_gfxdecode_tag(device_t &device, const char *
 	downcast<vsystem_spr_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void vsystem_spr_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<vsystem_spr_device &>(device).m_palette.set_tag(tag);
+}
 
 UINT32 vsystem_spr_device::tile_callback_noindirect(UINT32 tile)
 {

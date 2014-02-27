@@ -350,10 +350,12 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 
 	MCFG_DECO16IC_ADD("tilegen1", pktgaldx_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DECO104_ADD("ioprot104")
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE(8,9,  4,5,6,7    ,1,0,3,2) // hopefully this is correct, nothing else uses this arrangement!

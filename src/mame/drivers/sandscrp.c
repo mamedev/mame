@@ -523,6 +523,7 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", sandscrp_pandora_config)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	MCFG_KANEKO_PANDORA_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

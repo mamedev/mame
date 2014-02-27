@@ -1324,6 +1324,7 @@ static MACHINE_CONFIG_START( dec0_base, dec0_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 3);
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	MCFG_DECO_MXC06_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0)
 MACHINE_CONFIG_END
@@ -1429,6 +1430,7 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 3);
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	MCFG_DECO_MXC06_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_GFXDECODE_ADD("gfxdecode", automat)
@@ -1485,6 +1487,8 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 3);
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	MCFG_DECO_MXC06_PALETTE("palette")
+	
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_GFXDECODE_ADD("gfxdecode", secretab)

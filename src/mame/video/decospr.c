@@ -621,3 +621,13 @@ void decospr_device::inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const 
 		}
 	}
 }
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void decospr_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<decospr_device &>(device).m_palette.set_tag(tag);
+}

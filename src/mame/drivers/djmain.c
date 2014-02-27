@@ -1425,6 +1425,7 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 
 	MCFG_K056832_ADD("k056832", djmain_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K055555_ADD("k055555")
 
 	/* sound hardware */

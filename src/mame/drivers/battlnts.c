@@ -263,6 +263,7 @@ static MACHINE_CONFIG_START( battlnts, battlnts_state )
 	MCFG_K007342_GFXDECODE("gfxdecode")
 	
 	MCFG_K007420_ADD("k007420", bladestl_k007420_intf)
+	MCFG_K007420_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -342,6 +342,7 @@ static MACHINE_CONFIG_START( bladestl, bladestl_state )
 	MCFG_K007342_GFXDECODE("gfxdecode")
 	
 	MCFG_K007420_ADD("k007420", bladestl_k007420_intf)
+	MCFG_K007420_PALETTE("palette")
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */

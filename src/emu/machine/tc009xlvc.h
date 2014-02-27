@@ -19,6 +19,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	
 	DECLARE_READ8_MEMBER( vregs_r );
 	DECLARE_WRITE8_MEMBER( vregs_w );
@@ -87,6 +88,9 @@ extern const device_type TC0091LVC;
 
 #define MCFG_TC0091LVC_GFXDECODE(_gfxtag) \
 	tc0091lvc_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_TC0091LVC_PALETTE(_palette_tag) \
+	tc0091lvc_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 
 #endif

@@ -641,6 +641,7 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", airbustr_pandora_config)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
+	MCFG_KANEKO_PANDORA_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

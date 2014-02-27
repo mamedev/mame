@@ -8,6 +8,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_is_st0032(device_t &device, int is_st0032);
 	static void set_is_jclub2o(device_t &device, int is_jclub2o);
 
@@ -55,3 +56,5 @@ extern const device_type ST0020_SPRITES;
 #define MCFG_ST0020_SPRITES_GFXDECODE(_gfxtag) \
 	st0020_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
+#define MCFG_ST0020_SPRITES_PALETTE(_palette_tag) \
+	st0020_device::static_set_palette_tag(*device, "^" _palette_tag);

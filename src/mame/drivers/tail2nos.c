@@ -249,6 +249,7 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 
 	MCFG_K051316_ADD("k051316", tail2nos_k051316_intf)
 	MCFG_K051316_GFXDECODE("gfxdecode")
+	MCFG_K051316_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

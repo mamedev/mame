@@ -216,3 +216,13 @@ void deco_mxc06_device::device_start()
 void deco_mxc06_device::device_reset()
 {
 }
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void deco_mxc06_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<deco_mxc06_device &>(device).m_palette.set_tag(tag);
+}

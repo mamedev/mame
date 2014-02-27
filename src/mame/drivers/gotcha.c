@@ -284,6 +284,7 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	decospr_device::set_is_bootleg(*device, true);
 	decospr_device::set_offsets(*device, 5,-1); // aligned to 2nd instruction screen in attract
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

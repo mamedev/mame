@@ -902,6 +902,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 
 	MCFG_PC080SN_ADD("pc080sn", darius_pc080sn_intf)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	MCFG_PC080SN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
