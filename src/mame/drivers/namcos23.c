@@ -1359,7 +1359,9 @@ public:
 		m_gmen_sh2_shared(*this, "gmen_sh2_shared"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lightx(*this, "LIGHTX"),
-		m_lighty(*this, "LIGHTY")
+		m_lighty(*this, "LIGHTY"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -1377,6 +1379,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_ioport m_lightx;
 	optional_ioport m_lighty;
+	required_ioport m_p1;
+	required_ioport m_p2;
 	
 	c404_t m_c404;
 	c361_t m_c361;
@@ -2555,7 +2559,7 @@ WRITE16_MEMBER(namcos23_state::s23_ctl_w)
 
 		case 2: case 3:
 			// These may be coming from another CPU, in particular the I/O one
-			m_ctl_inp_buffer[offset-2] = ioport(offset == 2 ? "P1" : "P2")->read();
+			m_ctl_inp_buffer[offset-2] = (offset == 2 ? m_p1 : m_p2)->read();
 			break;
 		case 5:
 			if(m_ctl_vbl_active)
