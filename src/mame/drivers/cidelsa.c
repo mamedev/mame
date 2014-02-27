@@ -136,47 +136,6 @@ WRITE8_MEMBER( draco_state::out1_w )
 	m_sound = (data & 0xe0) >> 5;
 }
 
-static CDP1852_INTERFACE( cidelsa_cdp1852_in0_intf )
-{
-	CDP1852_MODE_INPUT,
-	DEVCB_INPUT_PORT("IN0"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static CDP1852_INTERFACE( cidelsa_cdp1852_in1_intf )
-{
-	CDP1852_MODE_INPUT,
-	DEVCB_INPUT_PORT("IN1"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static CDP1852_INTERFACE( cidelsa_cdp1852_in2_intf )
-{
-	CDP1852_MODE_INPUT,
-	DEVCB_INPUT_PORT("IN2"),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static CDP1852_INTERFACE( altair_cdp1852_out1_intf )
-{
-	CDP1852_MODE_OUTPUT,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(cidelsa_state, altair_out1_w),
-	DEVCB_NULL
-};
-
-static CDP1852_INTERFACE( draco_cdp1852_out1_intf )
-{
-	CDP1852_MODE_OUTPUT,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(draco_state, out1_w),
-	DEVCB_NULL
-};
-
-
 /* Memory Maps */
 
 // Destroyer
@@ -485,10 +444,18 @@ static MACHINE_CONFIG_START( altair, cidelsa_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* input/output hardware */
-	MCFG_CDP1852_ADD("ic23", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)  /* clock is really tied to CDP1869 CMSEL (pin 37) */
-	MCFG_CDP1852_ADD("ic24", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in1_intf)
-	MCFG_CDP1852_ADD("ic25", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in2_intf)
-	MCFG_CDP1852_ADD("ic26", ALTAIR_CHR1 / 8, altair_cdp1852_out1_intf)     /* clock is CDP1802 TPB */
+	MCFG_DEVICE_ADD("ic23", CDP1852, 0) // clock is really tied to CDP1869 CMSEL (pin 37)
+	MCFG_CDP1852_MODE_CALLBACK(GND)
+	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN0"))
+	MCFG_DEVICE_ADD("ic24", CDP1852, 0)
+	MCFG_CDP1852_MODE_CALLBACK(GND)
+	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN1"))
+	MCFG_DEVICE_ADD("ic25", CDP1852, 0)
+	MCFG_CDP1852_MODE_CALLBACK(GND)
+	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("ic26", CDP1852, ALTAIR_CHR1 / 8) // clock is CDP1802 TPB
+	MCFG_CDP1852_MODE_CALLBACK(VCC)
+	MCFG_CDP1852_DO_CALLBACK(WRITE8(cidelsa_state, altair_out1_w))
 
 	/* sound and video hardware */
 	MCFG_FRAGMENT_ADD(altair_video)
@@ -511,10 +478,18 @@ static MACHINE_CONFIG_START( draco, draco_state )
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED )
 
 	/* input/output hardware */
-	MCFG_CDP1852_ADD("ic29", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)  /* clock is really tied to CDP1876 CMSEL (pin 32) */
-	MCFG_CDP1852_ADD("ic30", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in1_intf)
-	MCFG_CDP1852_ADD("ic31", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in2_intf)
-	MCFG_CDP1852_ADD("ic32", DRACO_CHR1 / 8, draco_cdp1852_out1_intf)       /* clock is CDP1802 TPB */
+	MCFG_DEVICE_ADD("ic29", CDP1852, 0) // clock is really tied to CDP1869 CMSEL (pin 37)
+	MCFG_CDP1852_MODE_CALLBACK(GND)
+	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN0"))
+	MCFG_DEVICE_ADD("ic30", CDP1852, 0)
+	MCFG_CDP1852_MODE_CALLBACK(GND)
+	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN1"))
+	MCFG_DEVICE_ADD("ic31", CDP1852, 0)
+	MCFG_CDP1852_MODE_CALLBACK(GND)
+	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("ic32", CDP1852, ALTAIR_CHR1 / 8) // clock is CDP1802 TPB
+	MCFG_CDP1852_MODE_CALLBACK(VCC)
+	MCFG_CDP1852_DO_CALLBACK(WRITE8(draco_state, out1_w))
 
 	/* sound and video hardware */
 	MCFG_FRAGMENT_ADD(draco_video)
