@@ -1357,7 +1357,9 @@ public:
 		m_czattr(*this, "czattr"),
 		m_gmen_sh2(*this, "gmen_sh2"),
 		m_gmen_sh2_shared(*this, "gmen_sh2_shared"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lightx(*this, "LIGHTX"),
+		m_lighty(*this, "LIGHTY")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -1373,7 +1375,9 @@ public:
 	optional_device<cpu_device> m_gmen_sh2;
 	optional_shared_ptr<UINT32> m_gmen_sh2_shared;
 	required_device<gfxdecode_device> m_gfxdecode;
-
+	optional_ioport m_lightx;
+	optional_ioport m_lighty;
+	
 	c404_t m_c404;
 	c361_t m_c361;
 	c417_t m_c417;
@@ -3065,7 +3069,7 @@ static ADDRESS_MAP_START( s23iobrdiomap, AS_IO, 8, namcos23_state )
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_NOP   // unknown - used on ASCA-5 only
 	AM_RANGE(H8_PORT_9, H8_PORT_9) AM_NOP   // unknown - used on ASCA-5 only
 	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE(s23_iob_mcu_r, s23_iob_mcu_w)
-	AM_RANGE(H8_ADC_0_H, H8_ADC_3_L) AM_READ(s23_iob_analog_r)
+	AM_RANGE(H8_ADC_0_H, H8_ADC_3_L) //AM_READ(s23_iob_analog_r)
 ADDRESS_MAP_END
 
 
@@ -3074,8 +3078,8 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(namcos23_state::s23_iob_gun_r)
 {
-	UINT16 xpos = ioport("LIGHTX")->read();
-	UINT16 ypos = ioport("LIGHTY")->read();
+	UINT16 xpos = m_lightx->read();
+	UINT16 ypos = m_lighty->read();
 	// ypos is not completely understood yet, there should be a difference between case 1/4 and 2/5
 
 	switch(offset)
