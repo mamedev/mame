@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 /*********************************************************************
 
     6850acia.c
@@ -31,14 +33,14 @@ const int acia6850_device::counter_divide_select[4] =
 const int acia6850_device::word_select[8][3] =
 {
 	// word length, parity, stop bits
-	{ 7+1, EVEN, 2 },
-	{ 7+1, ODD,  2 },
-	{ 7+1, EVEN, 1 },
-	{ 7+1, ODD,  1 },
-	{ 8,   NONE, 2 },
-	{ 8,   NONE, 1 },
-	{ 8+1, EVEN, 1 },
-	{ 8+1, ODD,  1 }
+	{ 7, EVEN, 2 },
+	{ 7, ODD,  2 },
+	{ 7, EVEN, 1 },
+	{ 7, ODD,  1 },
+	{ 8, NONE, 2 },
+	{ 8, NONE, 1 },
+	{ 8, EVEN, 1 },
+	{ 8, ODD,  1 }
 };
 
 const int acia6850_device::transmitter_control[4][3] =
@@ -179,11 +181,11 @@ WRITE8_MEMBER( acia6850_device::control_w )
 {
 	if (LOG) logerror("MC6850 '%s' Control: %02x\n", tag(), data);
 
-	// CR0 and CR1
+	// CR0 & CR1
 	int counter_divide_select_bits = (data >> 0) & 3;
 	m_divide = counter_divide_select[counter_divide_select_bits];
 
-	// CR2, CR3 and CR4
+	// CR2, CR3 & CR4
 	int word_select_bits = (data >> 2) & 7;
 	m_bits = word_select[word_select_bits][0];
 	m_parity = word_select[word_select_bits][1];
@@ -195,7 +197,7 @@ WRITE8_MEMBER( acia6850_device::control_w )
 	m_brk = transmitter_control[transmitter_control_bits][1];
 	m_tx_irq_enable = transmitter_control[transmitter_control_bits][2];
 
-	// Receive Interrupt Enable Bit (CR7)
+	// CR7
 	m_rx_irq_enable = (data >> 7) & 1;
 
 	if (m_divide == 0)
@@ -364,11 +366,10 @@ WRITE_LINE_MEMBER( acia6850_device::write_rxc )
 					if (m_rx_counter == m_divide)
 					{
 						m_rx_counter = 0;
-						m_rx_bits++;
 
-						if (m_rx_bits != m_bits || m_parity == NONE)
+						if (m_rx_bits < m_bits)
 						{
-							if (LOG) logerror("MC6850 '%s': RX DATA BIT %d %d\n", tag(), m_rx_bits - 1, m_rxd);
+							if (LOG) logerror("MC6850 '%s': RX DATA BIT %d %d\n", tag(), m_rx_bits, m_rxd);
 						}
 						else
 						{
@@ -377,14 +378,15 @@ WRITE_LINE_MEMBER( acia6850_device::write_rxc )
 
 						if (m_rxd)
 						{
-							m_rx_shift |= 1 << m_bits;
+							m_rx_shift |= 1 << m_rx_bits;
 						}
 
-						m_rx_shift >>= 1;
+						m_rx_bits++;
 
 						m_rx_parity ^= m_rxd;
 
-						if (m_rx_bits == m_bits)
+						if ((m_rx_bits == m_bits && m_parity == NONE) ||
+							(m_rx_bits == (m_bits + 1) && m_parity == NONE))
 						{
 							if (m_status & ACIA6850_STATUS_RDRF)
 							{
@@ -409,7 +411,7 @@ WRITE_LINE_MEMBER( acia6850_device::write_rxc )
 
 								m_rdr = m_rx_shift;
 
-								if (m_bits == 8 && m_parity != NONE)
+								if (m_bits == 7 && m_parity != NONE)
 								{
 									m_rdr &= 0x7f;
 								}
@@ -496,18 +498,20 @@ WRITE_LINE_MEMBER( acia6850_device::write_txc )
 				if (m_tx_counter == m_divide)
 				{
 					m_tx_counter = 0;
-					m_tx_bits++;
 
-					if (m_tx_bits != m_bits || m_parity == NONE)
+					if (m_tx_bits < m_bits)
 					{
-						output_txd(m_tx_shift & 1);
+						output_txd((m_tx_shift >> m_tx_bits) & 1);
+
+						m_tx_bits++;
 						m_tx_parity ^= m_txd;
-						m_tx_shift >>= 1;
 
 						if (LOG) logerror("MC6850 '%s': TX DATA BIT %d %d\n", tag(), m_tx_bits, m_txd);
 					}
-					else
+					else if (m_tx_bits == m_bits && m_parity != NONE)
 					{
+						m_tx_bits++;
+
 						/// TODO: find out if this is the correct place to calculate parity
 						if (m_parity == ODD)
 						{
@@ -518,11 +522,12 @@ WRITE_LINE_MEMBER( acia6850_device::write_txc )
 
 						if (LOG) logerror("MC6850 '%s': TX PARITY BIT %d\n", tag(), m_txd);
 					}
-
-					if (m_tx_bits == m_bits)
+					else
 					{
 						m_tx_state = STOP;
 						m_tx_bits = 0;
+
+						output_txd(1);
 					}
 				}
 				break;
@@ -533,8 +538,6 @@ WRITE_LINE_MEMBER( acia6850_device::write_txc )
 					m_tx_bits++;
 
 					if (LOG) logerror("MC6850 '%s': TX STOP BIT %d\n", tag(), m_tx_bits);
-
-					output_txd(1);
 
 					if (m_tx_bits == m_stopbits)
 					{
