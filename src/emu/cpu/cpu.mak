@@ -1879,7 +1879,6 @@ $(CPUOBJ)/tms7000/7000dasm.o:   $(CPUSRC)/tms7000/tms7000.h \
 #-------------------------------------------------
 # Texas Instruments TMS99xx series
 #@src/emu/cpu/tms9900/tms9900.h,CPUS += TMS9900
-#@src/emu/cpu/tms9900/tms9900l.h,CPUS += TMS9900
 #@src/emu/cpu/tms9900/tms9980a.h,CPUS += TMS9900
 #@src/emu/cpu/tms9900/tms9995.h,CPUS += TMS9900
 
@@ -1888,34 +1887,29 @@ $(CPUOBJ)/tms7000/7000dasm.o:   $(CPUSRC)/tms7000/tms7000.h \
 ifneq ($(filter TMS9900,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms9900
 CPUOBJS += $(CPUOBJ)/tms9900/tms9900.o
-CPUOBJS += $(CPUOBJ)/tms9900/tms9900l.o
 CPUOBJS += $(CPUOBJ)/tms9900/tms9980a.o
 CPUOBJS += $(CPUOBJ)/tms9900/tms9995.o
-CPUOBJS += $(CPUOBJ)/tms9900/ti990_10l.o
+CPUOBJS += $(CPUOBJ)/tms9900/ti990_10.o
 DASMOBJS += $(CPUOBJ)/tms9900/9900dasm.o
 endif
 
 $(CPUOBJ)/tms9900/tms9900.o:    $(CPUSRC)/tms9900/tms9900.c \
-								$(CPUSRC)/tms9900/tms9900.h
-
-$(CPUOBJ)/tms9900/tms9900l.o:   $(CPUSRC)/tms9900/tms9900l.c \
-								$(CPUSRC)/tms9900/tms9900l.h \
-								$(CPUSRC)/tms9900/99xxcore.h \
-								$(CPUSRC)/tms9900/99xxstat.h
+								$(CPUSRC)/tms9900/tms9900.h \
+								$(CPUSRC)/tms9900/tms99com.h
 
 $(CPUOBJ)/tms9900/tms9980a.o:   $(CPUSRC)/tms9900/tms9980a.c \
 								$(CPUSRC)/tms9900/tms9980a.h \
 								$(CPUSRC)/tms9900/tms9900.c \
-								$(CPUSRC)/tms9900/tms9900.h
+								$(CPUSRC)/tms9900/tms9900.h \
+								$(CPUSRC)/tms9900/tms99com.h
 
 $(CPUOBJ)/tms9900/tms9995.o:    $(CPUSRC)/tms9900/tms9995.c \
-								$(CPUSRC)/tms9900/tms9995.h
+								$(CPUSRC)/tms9900/tms9995.h \
+								$(CPUSRC)/tms9900/tms99com.h
 
-$(CPUOBJ)/tms9900/ti990_10l.o:  $(CPUSRC)/tms9900/ti990_10l.c \
-								$(CPUSRC)/tms9900/tms9900l.h \
-								$(CPUSRC)/tms9900/99xxcore.h \
-								$(CPUSRC)/tms9900/99xxstat.h
-
+$(CPUOBJ)/tms9900/ti990_10.o:  $(CPUSRC)/tms9900/ti990_10.c \
+								$(CPUSRC)/tms9900/ti990_10.h \
+								$(CPUSRC)/tms9900/tms99com.h
 
 
 #-------------------------------------------------

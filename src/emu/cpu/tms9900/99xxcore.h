@@ -1,5 +1,19 @@
 // license:MAME
 // copyright-holders:Raphael Nabet
+
+/***************************************************************************
+   Legacy TMS99xx core implementation
+
+   Please do not remove this file from the source tree, even if none of the
+   drivers make use of it anymore. It still contains documentation and
+   incomplete implementations of cores that are not (yet) used in drivers.
+
+   It need not be included in the build process, however.
+
+   Michael Zapf, February 2014
+
+***************************************************************************/
+
 /*
     99xxcore.h : generic tms99xx emulation
 
