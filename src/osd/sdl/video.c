@@ -121,7 +121,7 @@ int sdlvideo_init(running_machine &machine)
 	if (sdlwindow_init(machine))
 		return 1;
 
-	tc = machine.total_colors();
+	tc = machine.first_screen()->palette()->entries();
 
 	// create the windows
 	sdl_options &options = downcast<sdl_options &>(machine.options());
