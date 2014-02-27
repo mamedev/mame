@@ -361,7 +361,8 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
  */
 WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 {
-	COMBINE_DATA(m_crtc.reg+offset);
+	if (offset < 0x24)
+		COMBINE_DATA(m_crtc.reg+offset);
 	switch(offset)
 	{
 	case 0:
