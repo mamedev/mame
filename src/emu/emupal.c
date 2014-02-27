@@ -50,7 +50,16 @@ const device_type PALETTE = &device_creator<palette_device>;
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PALETTE, "palette", tag, owner, clock, "palette", __FILE__),
-		m_palette(NULL)
+		m_entries(0),
+		m_enable_shadows(0),
+		m_enable_hilights(0),
+		m_raw_to_rgb(raw_to_rgb_converter()),
+		m_palette(NULL),
+		m_pens(NULL),
+		m_shadow_table(NULL),
+		m_shadow_group(0),
+		m_hilight_group(0),
+		m_init(palette_init_delegate())
 {
 }
 
