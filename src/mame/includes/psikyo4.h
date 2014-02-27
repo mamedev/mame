@@ -21,7 +21,10 @@ public:
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "lpalette"),
+		m_palette2(*this, "rpalette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_spriteram;
@@ -60,8 +63,11 @@ public:
 	UINT32 screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(psikyosh_interrupt);
 	void hotgmck_pcm_bank_postload();
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 scr );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 scr, palette_device& palette);
 	void set_hotgmck_pcm_bank( int n );
 	void install_hotgmck_pcm_bank();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+	required_device<palette_device> m_palette;
+	required_device<palette_device> m_palette2;
 };
