@@ -10,10 +10,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram1(*this, "videoram1"),
 		m_videoram2(*this, "videoram2"),
-		m_bank1(*this, "bank1"),
-		m_user1_region(*this, "user1"),
-		m_user2_region(*this, "user2"),
-		m_audiocpu_region(*this, "audiocpu"),
+		m_z80bank(*this, "bank1"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k053936(*this, "k053936"),
 		m_spriteram(*this, "spriteram"),
@@ -26,11 +23,7 @@ public:
 	required_shared_ptr<UINT16> m_videoram1;
 	required_shared_ptr<UINT16> m_videoram2;
 	
-	required_memory_bank m_bank1;
-	
-	required_memory_region m_user1_region;
-	required_memory_region m_user2_region;
-	required_memory_region m_audiocpu_region;
+	required_memory_bank m_z80bank;
 	
 	required_device<z80_device> m_audiocpu;
 	required_device<k053936_device> m_k053936;
@@ -52,8 +45,6 @@ public:
 	int m_pending_command;
 
 	/* devices */
-	DECLARE_READ16_MEMBER(extrarom1_r);
-	DECLARE_READ16_MEMBER(extrarom2_r);
 	DECLARE_WRITE8_MEMBER(crshrace_sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
