@@ -466,6 +466,7 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 	MCFG_SCREEN_UPDATE_DEVICE("v9958", v9958_device, screen_update)
 	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
+	MCFG_SCREEN_PALETTE("v9958:palette")
 
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,pzlestar)
 
@@ -494,6 +495,7 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 	MCFG_SCREEN_UPDATE_DEVICE("v9958", v9958_device, screen_update)
 	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
+	MCFG_SCREEN_PALETTE("v9958:palette")
 
 	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,sexyboom)
 

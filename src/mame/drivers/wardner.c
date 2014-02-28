@@ -164,7 +164,7 @@ READ8_MEMBER( wardner_state::wardner_bank_r )
 
 		// 0xa000 - 0xafff (paletteram)
 		else if ((addr >= 0xa000) && (addr < 0xb000))
-			return m_generic_paletteram_8[addr - 0xa000];
+			return m_palette->basemem().read8(addr - 0xa000);
 
 		// 0xc000 - 0xc7ff (z80 shared ram)
 		else if ((addr >= 0xc000) && (addr < 0xc800))

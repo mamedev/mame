@@ -122,7 +122,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bishi_state::bishi_scanline)
 /* compensate for a bug in the ram/rom test */
 READ16_MEMBER(bishi_state::bishi_mirror_r)
 {
-	return m_generic_paletteram_16[offset];
+	return m_palette->basemem().read16(offset);
 }
 
 READ16_MEMBER(bishi_state::bishi_K056832_rom_r)

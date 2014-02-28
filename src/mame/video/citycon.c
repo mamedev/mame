@@ -128,7 +128,7 @@ void citycon_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 inline void citycon_state::changecolor_RRRRGGGGBBBBxxxx( int color, int indx )
 {
-	int data = m_generic_paletteram_8[2 * indx | 1] | (m_generic_paletteram_8[2 * indx] << 8);
+	int data = m_palette->basemem().read8(2 * indx | 1) | (m_palette->basemem().read8(2 * indx) << 8);
 	m_palette->set_pen_color(color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
