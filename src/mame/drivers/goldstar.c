@@ -7434,6 +7434,27 @@ ROM_START( goldfrui )
 ROM_END
 
 
+/*
+	Super Nove by Playmark
+*/
+ROM_START( super9 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "27e010.30",       0x0000, 0x20000, CRC(1aaea8d3) SHA1(71395a6d74a7cd55606daa57d17ff4628aa5f577) )
+		
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "nearcpu.bin",      0x00000, 0x20000, CRC(643cff6f) SHA1(305ca9182c3f6d69e09be38b854b3d7bdfa75439) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "27e010.29",      0x00000, 0x08000, CRC(5ea46322) SHA1(147078689f0194affcdcf0e8f8e17fe8a113a377) )
+	ROM_CONTINUE( 0x0000, 0x08000) // Discarding 1nd quarter 0xff filled
+	ROM_CONTINUE( 0x0000, 0x08000) // Discarding 2nd quarter 0xff filled
+	ROM_CONTINUE( 0x0000, 0x08000) // Discarding 3nd quarter 0xff filled
+	
+	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
+	ROM_LOAD( "27c1001.27",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
+ROM_END
+
+
 
 ROM_START( ncb3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -11898,6 +11919,7 @@ GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,        
 GAME(  199?, chrygld,   0,        chrygld,  chrygld,  goldstar_state, chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
 GAME(  199?, chry10,    0,        chrygld,  chry10,   goldstar_state, chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )	// maybe fullname should be 'Gold Fruit (main 40%)'
+GAME(  2001, super9,    goldstar, goldstbl, goldstar, driver_device,  0,         ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING)	// need to decode gfx and see the program loops/reset... 
 
 // are these really dyna, or bootlegs?
 GAME(  199?, ncb3,      0,        ncb3,     ncb3,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0 )
