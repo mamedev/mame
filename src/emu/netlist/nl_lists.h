@@ -161,17 +161,17 @@ class netlist_timed_queue
     NETLIST_PREVENT_COPYING(netlist_timed_queue)
 public:
 
-    struct entry_t
+    class entry_t
     {
     public:
         ATTR_HOT inline entry_t()
-        : m_time(), m_object() {}
-        ATTR_HOT inline entry_t(const _Time atime, const _Element elem) : m_time(atime), m_object(elem) {}
-        ATTR_HOT inline const _Time time() const { return m_time; }
+        : m_exec_time(), m_object() {}
+        ATTR_HOT inline entry_t(const _Time atime, const _Element elem) : m_exec_time(atime), m_object(elem) {}
+        ATTR_HOT inline const _Time exec_time() const { return m_exec_time; }
         ATTR_HOT inline const _Element object() const { return m_object; }
 
     private:
-        _Time m_time;
+        _Time m_exec_time;
         _Element m_object;
     };
 
@@ -188,10 +188,11 @@ public:
     ATTR_HOT ATTR_ALIGN inline void push(const entry_t &e)
     {
         entry_t * RESTRICT i = m_end++;
-        while ((i > &m_list[0]) && (e.time() > (i - 1)->time()) )
+        const _Time e_time = e.exec_time();
+        while ((i > &m_list[0]) && (e_time > (i - 1)->exec_time()) )
         {
+            *(i) = *(i-1);
             i--;
-            *(i+1) = *i;
             inc_stat(m_prof_sortmove);
         }
         *i = e;
@@ -199,14 +200,14 @@ public:
         assert(m_end - m_list < _Size);
     }
 
-    ATTR_HOT inline const entry_t &pop()
+    ATTR_HOT inline const entry_t *pop()
     {
-        return *--m_end;
+        return --m_end;
     }
 
-    ATTR_HOT inline const entry_t &peek() const
+    ATTR_HOT inline const entry_t *peek() const
     {
-        return *(m_end-1);
+        return (m_end-1);
     }
 
     ATTR_COLD void clear()

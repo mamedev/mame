@@ -74,10 +74,13 @@ NETLIB_UPDATE(9316_sub)
 	{
 		cnt = ( cnt + 1) & 0x0f;
 		update_outputs(cnt);
+        OUTLOGIC(m_RC, m_ent & (cnt == 0x0f), NLTIME_FROM_NS(20));
+#if 0
 		if (cnt == 0x0f)
 			OUTLOGIC(m_RC, m_ent, NLTIME_FROM_NS(20));
 		else if (cnt == 0)
 			OUTLOGIC(m_RC, 0, NLTIME_FROM_NS(20));
+#endif
 	}
 	else
 	{
@@ -94,25 +97,27 @@ NETLIB_UPDATE(9316)
 	sub.m_ent = INPLOGIC(m_ENT);
 	const netlist_sig_t clrq = INPLOGIC(m_CLRQ);
 
-	if ((!sub.m_loadq || (sub.m_ent & INPLOGIC(m_ENP))) & clrq)
+	if ((!sub.m_loadq | (sub.m_ent & INPLOGIC(m_ENP))) & clrq)
 	{
 		sub.m_CLK.activate_lh();
 	}
 	else
 	{
+	    UINT8 cnt = sub.m_cnt;
 		sub.m_CLK.inactivate();
-		if (!clrq & (sub.m_cnt>0))
+		if (!clrq & (cnt>0))
 		{
-			sub.m_cnt = 0;
-			sub.update_outputs(sub.m_cnt);
+			cnt = 0;
+			sub.update_outputs(cnt);
 			OUTLOGIC(sub.m_RC, 0, NLTIME_FROM_NS(20));
+			sub.m_cnt = cnt;
 			return;
 		}
 	}
 	OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == 0x0f), NLTIME_FROM_NS(20));
 }
 
-NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const UINT8 cnt))
+inline NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const UINT8 cnt))
 {
 	const netlist_time out_delay = NLTIME_FROM_NS(20);
 	OUTLOGIC(m_QA, (cnt >> 0) & 1, out_delay);
@@ -121,10 +126,10 @@ NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const UINT8 cnt))
 	OUTLOGIC(m_QD, (cnt >> 3) & 1, out_delay);
 }
 
-NETLIB_FUNC_VOID(9316_sub, update_outputs, (const UINT8 cnt))
+inline NETLIB_FUNC_VOID(9316_sub, update_outputs, (const UINT8 cnt))
 {
 	const netlist_time out_delay = NLTIME_FROM_NS(20);
-#if 0
+#if 1
 //    for (int i=0; i<4; i++)
 //        OUTLOGIC(m_Q[i], (cnt >> i) & 1, delay[i]);
 	OUTLOGIC(m_QA, (cnt >> 0) & 1, out_delay);

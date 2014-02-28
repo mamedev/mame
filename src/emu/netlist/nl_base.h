@@ -389,7 +389,7 @@ public:
 
     ATTR_COLD void set_net(netlist_net_t &anet);
     ATTR_COLD inline void clear_net() { m_net = NULL; }
-    ATTR_COLD inline bool has_net() const { return (m_net != NULL); }
+    ATTR_HOT inline bool has_net() const { return (m_net != NULL); }
     ATTR_HOT inline const netlist_net_t & RESTRICT net() const { return *m_net;}
     ATTR_HOT inline netlist_net_t & RESTRICT net() { return *m_net;}
 
@@ -575,8 +575,8 @@ public:
     /* inline not always works out */
     ATTR_HOT inline void update_devs();
 
-    ATTR_HOT inline const netlist_time time() const { return m_time; }
-    ATTR_HOT inline void set_time(const netlist_time ntime) { m_time = ntime; }
+    ATTR_HOT inline const netlist_time &time() const { return m_time; }
+    ATTR_HOT inline void set_time(const netlist_time &ntime) { m_time = ntime; }
 
     ATTR_HOT inline bool isRailNet() const { return !(m_railterminal == NULL); }
     ATTR_HOT inline const netlist_core_terminal_t & RESTRICT  railterminal() const { return *m_railterminal; }

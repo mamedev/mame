@@ -46,7 +46,7 @@ void netlist_queue_t::on_pre_save()
 	NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist.time().as_double(), m_qsize));
 	for (int i = 0; i < m_qsize; i++ )
 	{
-		m_times[i] =  this->listptr()[i].time().as_raw();
+		m_times[i] =  this->listptr()[i].exec_time().as_raw();
 		const char *p = this->listptr()[i].object()->name().cstr();
 		int n = MIN(63, strlen(p));
 		strncpy(&(m_name[i][0]), p, n);
@@ -226,9 +226,9 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
     {
         while ( (m_time < m_stop) && (m_queue.is_not_empty()))
         {
-            const netlist_queue_t::entry_t &e = m_queue.pop();
-            m_time = e.time();
-            e.object()->update_devs();
+            const netlist_queue_t::entry_t *e = m_queue.pop();
+            m_time = e->exec_time();
+            e->object()->update_devs();
 
             add_to_stat(m_perf_out_processed, 1);
             if (FATAL_ERROR_AFTER_NS)
@@ -242,24 +242,27 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
 #if 0
         netlist_net_t &mc_net = m_mainclock->m_Q.net();
         const netlist_time inc = m_mainclock->m_inc;
+        netlist_time mc_time = mc_net.time();
 
         while (m_time < m_stop)
         {
             if (m_queue.is_not_empty())
             {
-                while (m_queue.peek().time() > mc_net.time())
+                while (m_queue.peek()->exec_time() > mc_time)
                 {
-                    m_time = mc_net.time();
-                    NETLIB_NAME(mainclock)::mc_update(mc_net, m_time + inc);
+                    m_time = mc_time;
+                    mc_time += inc;
+                    NETLIB_NAME(mainclock)::mc_update(mc_net);
                 }
 
-                const netlist_queue_t::entry_t &e = m_queue.pop();
-                m_time = e.time();
-                e.object()->update_devs();
+                const netlist_queue_t::entry_t *e = m_queue.pop();
+                m_time = e->exec_time();
+                e->object()->update_devs();
 
             } else {
-                m_time = mc_net.time();
-                NETLIB_NAME(mainclock)::mc_update(mc_net, m_time + inc);
+                m_time = mc_time;
+                mc_time += inc;
+                NETLIB_NAME(mainclock)::mc_update(mc_net);
             }
             if (FATAL_ERROR_AFTER_NS)
                 if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
@@ -267,6 +270,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
 
             add_to_stat(m_perf_out_processed, 1);
         }
+        mc_net.set_time(mc_time);
 #else
         netlist_net_t &mc_net = m_mainclock->m_Q.net();
         const netlist_time inc = m_mainclock->m_inc;
@@ -277,7 +281,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
         {
             if (m_queue.is_not_empty())
             {
-                while (m_queue.peek().time() > mc_time)
+                while (m_queue.peek()->exec_time() > mc_time)
                 {
                     cur_time = mc_time;
                     mc_time += inc;
@@ -285,10 +289,10 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
                     NETLIB_NAME(mainclock)::mc_update(mc_net);
                 }
 
-                const netlist_queue_t::entry_t &e = m_queue.pop();
-                cur_time = e.time();
+                const netlist_queue_t::entry_t *e = m_queue.pop();
+                cur_time = e->exec_time();
                 m_time = cur_time;
-                e.object()->update_devs();
+                e->object()->update_devs();
             } else {
                 cur_time = mc_time;
                 mc_time += inc;
@@ -369,16 +373,15 @@ ATTR_COLD netlist_core_device_t::~netlist_core_device_t()
 
 ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
 {
-	if (inp.state() == netlist_input_t::STATE_INP_PASSIVE)
-	{
-		inp.activate();
-		const netlist_sig_t ret = inp.Q();
-		inp.inactivate();
-		return ret;
-	}
+	if (inp.state() != netlist_input_t::STATE_INP_PASSIVE)
+        return inp.Q();
 	else
-		return inp.Q();
-
+    {
+        inp.activate();
+        const netlist_sig_t ret = inp.Q();
+        inp.inactivate();
+        return ret;
+    }
 }
 
 
@@ -571,7 +574,7 @@ ATTR_COLD void netlist_net_t::register_con(netlist_core_terminal_t &terminal)
 		m_active++;
 }
 
-ATTR_HOT inline static void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask)
+ATTR_HOT ATTR_ALIGN static void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask)
 {
 	if ((inp->state() & mask) != 0)
 	{
@@ -583,7 +586,7 @@ ATTR_HOT inline static void update_dev(const netlist_core_terminal_t *inp, const
 	}
 }
 
-ATTR_HOT inline void netlist_net_t::update_devs()
+ATTR_HOT ATTR_ALIGN void netlist_net_t::update_devs()
 {
 	assert(m_num_cons != 0);
 	assert(this->isRailNet());
@@ -591,8 +594,8 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 	static const UINT32 masks[4] = { 1, 5, 3, 1 };
     const UINT32 mask = masks[ (m_last.Q  << 1) | m_new.Q ];
 
-    m_cur = m_new;
     m_in_queue = 2; /* mark as taken ... */
+    m_cur = m_new;
 
     netlist_core_terminal_t *p = m_head;
 
@@ -612,15 +615,15 @@ ATTR_HOT inline void netlist_net_t::update_devs()
             p = p->m_update_list_next;
         } while (p != NULL);
         break;
+    }
 
 #else
-    while (p != NULL)
+    do
     {
         update_dev(p, mask);
         p = p->m_update_list_next;
-    }
+    } while (p != NULL);
 #endif
-    }
     m_last = m_cur;
 }
 

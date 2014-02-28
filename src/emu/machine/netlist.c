@@ -534,7 +534,7 @@ ATTR_COLD offs_t netlist_mame_cpu_device_t::disasm_disassemble(char *buffer, off
 		//            sprintf(buffer, "%04x %02d %s", pc, relpc, netlist().queue()[netlist().queue().count() - relpc - 1].object().name().cstr());
 		int dpc = netlist().queue().count() - relpc - 1;
 		sprintf(buffer, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].object()->name().cstr(),
-				netlist().queue()[dpc].time().as_double());
+				netlist().queue()[dpc].exec_time().as_double());
 	}
 	else
 		sprintf(buffer, "%s", "");

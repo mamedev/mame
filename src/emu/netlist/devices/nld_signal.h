@@ -125,7 +125,7 @@ public:
 
     virtual void update()
     {
-        static const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
+        const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
 
         for (int i = 0; i< _numdev; i++)
         {
@@ -195,7 +195,7 @@ public:
 
 	ATTR_HOT ATTR_ALIGN void update()
 	{
-		static const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
+		const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
 
 		m_i[0].activate();
 		m_i[1].activate();
@@ -215,7 +215,7 @@ public:
 		}
         OUTLOGIC(m_Q, res, times[res & 1]);// ? 22000 : 15000);
 #else
-		UINT8 val = (INPLOGIC(m_i[0]) ^ _check) | ((INPLOGIC(m_i[1]) ^ _check) << 1);
+		const UINT8 val = (INPLOGIC(m_i[0]) ^ _check) | ((INPLOGIC(m_i[1]) ^ _check) << 1);
         UINT8 res = _invert ^ 1 ^_check;
 		switch (val)
 		{
