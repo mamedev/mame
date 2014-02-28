@@ -11,8 +11,8 @@ class toaplan1_state : public driver_device
 public:
 	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_colorram1(*this, "colorram1"),
-		m_colorram2(*this, "colorram2"),
+		m_bgpaletteram(*this, "bgpalette"),
+		m_fgpaletteram(*this, "fgpalette"),
 		m_sharedram(*this, "sharedram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
@@ -20,8 +20,8 @@ public:
 		m_dsp(*this, "dsp"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT16> m_colorram1;
-	required_shared_ptr<UINT16> m_colorram2;
+	required_shared_ptr<UINT16> m_bgpaletteram;
+	required_shared_ptr<UINT16> m_fgpaletteram;
 
 	optional_shared_ptr<UINT8> m_sharedram;
 
@@ -103,10 +103,8 @@ public:
 	DECLARE_WRITE16_MEMBER(toaplan1_fcu_flipscreen_w);
 	DECLARE_READ16_MEMBER(toaplan1_spriteram_offs_r);
 	DECLARE_WRITE16_MEMBER(toaplan1_spriteram_offs_w);
-	DECLARE_READ16_MEMBER(toaplan1_colorram1_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_colorram1_w);
-	DECLARE_READ16_MEMBER(toaplan1_colorram2_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_colorram2_w);
+	DECLARE_WRITE16_MEMBER(toaplan1_bgpalette_w);
+	DECLARE_WRITE16_MEMBER(toaplan1_fgpalette_w);
 	DECLARE_READ16_MEMBER(toaplan1_spriteram16_r);
 	DECLARE_WRITE16_MEMBER(toaplan1_spriteram16_w);
 	DECLARE_READ16_MEMBER(toaplan1_spritesizeram16_r);
@@ -139,7 +137,6 @@ public:
 
 	void demonwld_restore_dsp();
 	void toaplan1_create_tilemaps();
-	void toaplan1_paletteram_alloc();
 	void toaplan1_vram_alloc();
 	void toaplan1_spritevram_alloc();
 	void toaplan1_set_scrolls();
