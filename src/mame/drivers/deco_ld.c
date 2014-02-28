@@ -281,7 +281,7 @@ static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x1005, 0x1005) AM_READ(sound_status_r)
 	AM_RANGE(0x1006, 0x1006) AM_NOP // 6850 status
 	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // 6850 data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(decold_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(decold_palette_w) AM_SHARE("palette")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("vram0")
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("attr0")

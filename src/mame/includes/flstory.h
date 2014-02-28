@@ -103,6 +103,8 @@ public:
 	DECLARE_WRITE8_MEMBER(flstory_videoram_w);
 	DECLARE_WRITE8_MEMBER(flstory_palette_w);
 	DECLARE_READ8_MEMBER(flstory_palette_r);
+	DECLARE_WRITE8_MEMBER(flstory_palette_ext_w);
+	DECLARE_READ8_MEMBER(flstory_palette_ext_r);
 	DECLARE_WRITE8_MEMBER(flstory_gfxctrl_w);
 	DECLARE_READ8_MEMBER(victnine_gfxctrl_r);
 	DECLARE_WRITE8_MEMBER(victnine_gfxctrl_w);
