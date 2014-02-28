@@ -416,7 +416,7 @@
   Press DEAL/DRAW to exit the mode.
 
   
-  * unknown Royal Card on Dino4 hardware....
+  * Unknown Royal Card on Dino4 hardware....
   
   This one is really strange. The game is running in a Dino4 hardware, plus a daughterboard
   with a mexican Rockwell R65C02 + an unknown PLCC. The program/gfx are totally decrypted.
