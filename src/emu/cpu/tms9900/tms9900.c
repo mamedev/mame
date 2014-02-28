@@ -263,6 +263,7 @@ void tms99xx_device::device_reset()
 	m_check_ready = false;
 	m_wait_state = false;
 	ST = 0;
+	m_irq_state = false;
 }
 
 const char* tms99xx_device::s_statename[20] =
