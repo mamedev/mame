@@ -2729,7 +2729,7 @@ GAME( 199?, m4goldnn    , 0         ,  mod4oki      , mpu4      , mpu4_state, m4
 
 
 
-GAME( 198?, m4funh      , 0         , mod4oki           , mpu4  , mpu4_state, m4default         , 0,       "unknown",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)
+GAME( 198?, m4funh      , 0         , mod4oki           , mpu4  , mpu4_state, m4default         , 0,       "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)
 
 
 GAME(199?, m4sunseta    ,m4sunset   ,mod4oki    ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 1)",GAME_FLAGS )

@@ -970,4 +970,4 @@ GAME( 200?, mnumitg,  0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<un
 GAME( 200?, mclass,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Magic Class (Ver 2.2)",                 GAME_IS_SKELETON )
 GAME( 200?, europass, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Euro Pass (Ver 1.1)",                   GAME_IS_SKELETON )
 GAME( 200?, thedrink, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "The Drink",                             GAME_IS_SKELETON )
-GAME( 200?, unkh8gam, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Unknown H8 Italian Gambling game",      GAME_IS_SKELETON )
+GAME( 200?, unkh8gam, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "unknown H8 Italian Gambling game",      GAME_IS_SKELETON )

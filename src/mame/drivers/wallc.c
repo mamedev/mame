@@ -473,4 +473,4 @@ DRIVER_INIT_MEMBER(wallc_state,sidam)
 
 GAME( 1984, wallc,  0,      wallc,  wallc, wallc_state, wallc,  ROT0, "Midcoin", "Wall Crash (set 1)", 0 )
 GAME( 1984, wallca, wallc,  wallc,  wallc, wallc_state, wallca, ROT0, "Midcoin", "Wall Crash (set 2)", 0 )
-GAME( 1984, sidampkr,0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam", "Unknown Sidam Poker", GAME_NOT_WORKING )
+GAME( 1984, sidampkr,0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam", "unknown Sidam Poker", GAME_NOT_WORKING )
