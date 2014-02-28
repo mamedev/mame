@@ -1835,6 +1835,7 @@ void tmp95c063_device::device_reset()
 	{
 		m_level[i] = CLEAR_LINE;
 	}
+	m_prefetch_clear = false;
 }
 
 READ8_MEMBER( tmp95c063_device::internal_r )
