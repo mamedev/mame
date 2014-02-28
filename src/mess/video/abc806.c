@@ -505,7 +505,7 @@ UINT32 abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	screen.set_visible_area(0, 767, 0, 311);
 
 	// clear screen
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(rgb_t::black, cliprect);
 
 	if (!m_txoff)
 	{

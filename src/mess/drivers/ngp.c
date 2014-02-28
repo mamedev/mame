@@ -839,6 +839,9 @@ static MACHINE_CONFIG_DERIVED( ngp, ngp_common )
 
 	MCFG_K1GE_ADD( "k1ge", XTAL_6_144MHz, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_PALETTE("k1ge:palette")
+	
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,ngp,npc,ngc")
 	MCFG_CARTSLOT_NOT_MANDATORY
@@ -855,6 +858,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( ngpc, ngp_common )
 	MCFG_K2GE_ADD( "k1ge", XTAL_6_144MHz, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_PALETTE("k1ge:palette")
+	
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,ngp,npc,ngc")
 	MCFG_CARTSLOT_NOT_MANDATORY

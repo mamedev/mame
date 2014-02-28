@@ -709,6 +709,9 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type
 
 void isa8_cga_device::device_start()
 {
+	if (m_palette != NULL && !m_palette->started())
+		throw device_missing_dependencies();
+
 	set_isa_device();
 	m_vram = auto_alloc_array(machine(), UINT8, m_vram_size);
 	m_update_row = NULL;
@@ -843,7 +846,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row )
 	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
 	int i;
 	running_machine &machine = device->machine();
 
@@ -884,7 +887,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_comp_grey_update_row )
 	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
 	int i;
 	running_machine &machine = device->machine();
 
@@ -924,7 +927,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row )
 	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
 	int i;
 	running_machine &machine = device->machine();
 
@@ -964,7 +967,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row )
 	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
 	int i;
 	running_machine &machine = device->machine();
 
@@ -1009,7 +1012,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row_si )
 	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
 	int i;
 	running_machine &machine = device->machine();
 
@@ -1062,7 +1065,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row )
 	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
 	int i;
 	running_machine &machine = device->machine();
 
@@ -1111,7 +1114,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row )
 	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
 	int i;
 	running_machine &machine = device->machine();
 
@@ -1172,7 +1175,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
 	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
 	int i;
 	running_machine &machine = device->machine();
 
@@ -1217,7 +1220,7 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row )
 	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
 	int i;
 	running_machine &machine = device->machine();
 
@@ -1254,7 +1257,7 @@ static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row )
 	isa8_cga_device *cga  = downcast<isa8_cga_device *>(device->owner());
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
 	UINT8   fg = cga->m_color_select & 0x0F;
 	int i;
 	running_machine &machine = device->machine();
@@ -1724,7 +1727,7 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 	isa8_cga_pc1512_device *cga  = downcast<isa8_cga_pc1512_device *>(device->owner());
 	UINT8 *videoram = cga->m_vram + cga->m_start_offset;
 	UINT32  *p = &bitmap.pix32(y);
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = cga->m_palette->palette()->entry_list_raw();
 	UINT16  offset_base = ra << 13;
 	int j;
 	running_machine &machine = device->machine();
@@ -2088,7 +2091,7 @@ void isa8_wyse700_device::device_reset()
 UINT32 isa8_wyse700_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_control & 0x08) {
-		const rgb_t *palette = bitmap.palette()->entry_list_raw();
+		const rgb_t *palette = m_palette->palette()->entry_list_raw();
 		UINT8 fg = m_color_select & 0x0F;
 		UINT32 addr = 0;
 		for (int y = 0; y < 800; y++) {

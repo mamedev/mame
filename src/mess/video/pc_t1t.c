@@ -34,7 +34,8 @@ pc_t1t_device::pc_t1t_device(const machine_config &mconfig, device_type type, co
 	m_address_data_ff(0),
 	m_display_enable(0),
 	m_vsync(0),
-	m_palette_base(0)
+	m_palette_base(0),
+	m_palette(*this,"palette")
 {
 }
 
@@ -182,7 +183,7 @@ PALETTE_INIT_MEMBER( pc_t1t_device, pcjr )
 static MC6845_UPDATE_ROW( t1000_text_inten_update_row )
 {
 	pc_t1t_device    *t1t  = downcast<pc_t1t_device *>(device->owner());
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = t1t->m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
@@ -216,7 +217,7 @@ static MC6845_UPDATE_ROW( t1000_text_inten_update_row )
 static MC6845_UPDATE_ROW( t1000_text_blink_update_row )
 {
 	pc_t1t_device    *t1t  = downcast<pc_t1t_device *>(device->owner());
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = t1t->m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
@@ -258,7 +259,7 @@ static MC6845_UPDATE_ROW( t1000_text_blink_update_row )
 static MC6845_UPDATE_ROW( pcjx_text_update_row )
 {
 	pcvideo_pcjr_device    *pcjx  = downcast<pcvideo_pcjr_device *>(device->owner());
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = pcjx->m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
@@ -300,7 +301,7 @@ static MC6845_UPDATE_ROW( pcjx_text_update_row )
 static MC6845_UPDATE_ROW( t1000_gfx_4bpp_update_row )
 {
 	pc_t1t_device    *t1t  = downcast<pc_t1t_device *>(device->owner());
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = t1t->m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT8   *vid = t1t->m_displayram + ( ra << 13 );
 	int i;
@@ -328,7 +329,7 @@ static MC6845_UPDATE_ROW( t1000_gfx_4bpp_update_row )
 static MC6845_UPDATE_ROW( t1000_gfx_2bpp_update_row )
 {
 	pc_t1t_device    *t1t  = downcast<pc_t1t_device *>(device->owner());
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = t1t->m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT8   *vid = t1t->m_displayram + ( ra << 13 );
 	int i;
@@ -356,7 +357,7 @@ static MC6845_UPDATE_ROW( t1000_gfx_2bpp_update_row )
 static MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row )
 {
 	pcvideo_pcjr_device    *pcjr  = downcast<pcvideo_pcjr_device *>(device->owner());
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = pcjr->m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT8   *vid = pcjr->m_displayram + ( ra << 13 );
 	int i;
@@ -382,7 +383,7 @@ static MC6845_UPDATE_ROW( pcjr_gfx_2bpp_high_update_row )
 static MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row )
 {
 	pc_t1t_device    *t1t  = downcast<pc_t1t_device *>(device->owner());
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = t1t->m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT8   *vid = t1t->m_displayram + ( ra << 13 );
 	int i;
@@ -410,7 +411,7 @@ static MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row )
 static MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row )
 {
 	pc_t1t_device    *t1t  = downcast<pc_t1t_device *>(device->owner());
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = t1t->m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT8   *vid = t1t->m_displayram + ( ra << 13 );
 	UINT8   fg = t1t->m_palette_base + t1t->m_reg.data[0x11];

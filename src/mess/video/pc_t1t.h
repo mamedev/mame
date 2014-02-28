@@ -71,6 +71,7 @@ public:
 	int bank_r(void);
 
 	DECLARE_READ8_MEMBER( read );
+	required_device<palette_device> m_palette;
 };
 
 class pcvideo_t1000_device :  public pc_t1t_device

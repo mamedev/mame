@@ -586,6 +586,9 @@ isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type
 
 void isa8_ega_device::device_start()
 {
+	if (m_palette != NULL && !m_palette->started())
+		throw device_missing_dependencies();
+
 	astring tempstring;
 
 	set_isa_device();

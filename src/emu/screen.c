@@ -276,6 +276,8 @@ void screen_device::device_start()
 	if (m_palette_tag != NULL)
 		m_palette = siblingdevice<palette_device>(m_palette_tag);
 	if (m_palette == NULL)
+		m_palette = siblingdevice<palette_device>("palette");
+	if (m_palette == NULL)
 		m_palette = subdevice<palette_device>("palette");
 	if (m_palette == NULL)
 		m_palette = subdevice<palette_device>(":palette");
