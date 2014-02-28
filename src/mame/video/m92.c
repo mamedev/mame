@@ -133,7 +133,7 @@ WRITE16_MEMBER(m92_state::m92_videocontrol_w)
 
 READ16_MEMBER(m92_state::m92_paletteram_r)
 {
-	return m_generic_paletteram_16[offset + 0x400 * m_palette_bank];
+	return m_palette->basemem().read16(offset + 0x400 * m_palette_bank);
 }
 
 WRITE16_MEMBER(m92_state::m92_paletteram_w)
