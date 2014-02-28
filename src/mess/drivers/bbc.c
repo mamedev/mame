@@ -701,7 +701,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(bbc_state,bbc)
-	MCFG_SAA5050_ADD("saa505x", XTAL_12MHz/2, trom_intf)
+	MCFG_SAA5050_ADD("saa5050", XTAL_12MHz/2, trom_intf)
 
 	/* crtc */
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000, bbc_mc6845_intf)
