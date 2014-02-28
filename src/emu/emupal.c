@@ -81,10 +81,10 @@ void palette_device::static_enable_hilights(device_t &device)
 void palette_device::set_indirect_color(int index, rgb_t rgb)
 {
 	// ensure the array is expanded enough to handle the index, then set it
-	m_indirect_colors.resize_keep(((index + 1 + 255) / 256) * 256);
+	m_indirect_colors.resize_keep_and_clear_new(((index + 1 + 255) / 256) * 256);
 
 	// alpha doesn't matter
-	rgb.set_a(0);
+	rgb.set_a(255);
 
 	// update if it has changed
 	if (m_indirect_colors[index] != rgb)
@@ -110,15 +110,11 @@ void palette_device::set_pen_indirect(pen_t pen, UINT16 index)
 	// allocate the array if needed
 	m_indirect_entry.resize(m_entries);
 
-	// update if changed
-	if (m_indirect_entry[pen] != index)
-	{
-		m_indirect_entry[pen] = index;
-		
-		// permit drivers to configure the pens prior to the colors if they desire
-		if (index < m_indirect_colors.count())
-			m_palette->entry_set_color(pen, m_indirect_colors[index]);
-	}
+	m_indirect_entry[pen] = index;
+
+	// permit drivers to configure the pens prior to the colors if they desire
+	if (index < m_indirect_colors.count())
+		m_palette->entry_set_color(pen, m_indirect_colors[index]);
 }
 
 
