@@ -46,15 +46,7 @@ void tc0110pcr_device::static_set_palette_tag(device_t &device, const char *tag)
 
 void tc0110pcr_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const tc0110pcr_interface *intf = reinterpret_cast<const tc0110pcr_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<tc0110pcr_interface *>(this) = *intf;
 
-	// or initialize to defaults if none provided
-	else
-	{
-	}
 }
 
 //-------------------------------------------------
@@ -119,7 +111,7 @@ void tc0110pcr_device::restore_colors()
 			}
 		}
 
-		m_palette->set_pen_color(i + (m_pal_offs << 12), rgb_t(r, g, b));
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -166,12 +158,12 @@ WRITE16_MEMBER(tc0110pcr_device::step1_word_w )
 		case 0:
 			m_addr = data & 0xfff;
 			if (data > 0xfff)
-				logerror ("Write to palette index (color area %d) > 0xfff\n", m_pal_offs);
+				logerror ("Write to palette index > 0xfff\n");
 			break;
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			m_palette->set_pen_color(m_addr + (m_pal_offs << 12), pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+			m_palette->set_pen_color(m_addr, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 			break;
 
 		default:

@@ -813,10 +813,6 @@ static const pc090oj_interface bonzeadv_pc090oj_intf =
 	0, 0, 8, 0
 };
 
-static const tc0110pcr_interface asuka_tc0110pcr_intf =
-{
-	0
-};
 
 
 void asuka_state::machine_start()
@@ -902,7 +898,7 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_PC090OJ_PALETTE("palette")
 	MCFG_TC0100SCN_ADD("tc0100scn", asuka_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 	
 	/* sound hardware */
@@ -949,7 +945,7 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_PC090OJ_PALETTE("palette")
 	MCFG_TC0100SCN_ADD("tc0100scn", asuka_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
@@ -1004,7 +1000,7 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	MCFG_PC090OJ_PALETTE("palette")
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
@@ -1051,7 +1047,7 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_PC090OJ_PALETTE("palette")
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
@@ -1102,7 +1098,7 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_PC090OJ_PALETTE("palette")
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
@@ -1149,7 +1145,7 @@ static MACHINE_CONFIG_START( eto, asuka_state )
 	MCFG_PC090OJ_PALETTE("palette")
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0110PCR_ADD("tc0110pcr", asuka_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */

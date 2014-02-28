@@ -2975,7 +2975,6 @@ static const tc0480scp_interface metalb_tc0480scp_intf =
 	256     /* col_base */
 };
 
-static const tc0110pcr_interface taitof2_tc0110pcr_intf = { 0 };
 
 static const tc0280grd_interface taitof2_tc0280grd_intf = { 2 };
 static const tc0280grd_interface taitof2_tc0430grw_intf = { 2 };
@@ -3078,7 +3077,7 @@ static MACHINE_CONFIG_DERIVED( finalb, taito_f2_tc0220ioc )
 
 	MCFG_TC0100SCN_ADD("tc0100scn", finalb_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 MACHINE_CONFIG_END
 
@@ -3175,7 +3174,7 @@ static MACHINE_CONFIG_DERIVED( qtorimon, taito_f2_tc0220ioc )
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 MACHINE_CONFIG_END
 
@@ -3211,7 +3210,7 @@ static MACHINE_CONFIG_DERIVED( quizhq, taito_f2 )
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 MACHINE_CONFIG_END
 
@@ -3279,7 +3278,7 @@ static MACHINE_CONFIG_DERIVED( mjnquest, taito_f2 )
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 MACHINE_CONFIG_END
 

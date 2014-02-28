@@ -2993,7 +2993,6 @@ static const tc0480scp_interface taitoz_tc0480scp_intf =
 	0           /* col_base */
 };
 
-static const tc0110pcr_interface taitoz_tc0110pcr_intf = { 0 };
 
 static const tc0150rod_interface taitoz_tc0150rod_intf = { "gfx3" };
 
@@ -3093,7 +3092,7 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
@@ -3158,7 +3157,7 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 	MCFG_TC0100SCN_ADD("tc0100scn", chasehq_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
@@ -3225,7 +3224,7 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
@@ -3425,7 +3424,7 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 	MCFG_TC0100SCN_ADD("tc0100scn", chasehq_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
@@ -3492,7 +3491,7 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
@@ -3553,7 +3552,7 @@ static MACHINE_CONFIG_START( spacegun, taitoz_state )
 
 	MCFG_TC0100SCN_ADD("tc0100scn", spacegun_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */

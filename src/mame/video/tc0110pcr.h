@@ -1,13 +1,8 @@
 #ifndef _TC0110PCR_H_
 #define _TC0110PCR_H_
 
-struct tc0110pcr_interface
-{
-	int               m_pal_offs;
-};
 
-class tc0110pcr_device : public device_t,
-											public tc0110pcr_interface
+class tc0110pcr_device : public device_t
 {
 public:
 	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -38,9 +33,8 @@ private:
 
 extern const device_type TC0110PCR;
 
-#define MCFG_TC0110PCR_ADD(_tag, _interface) \
+#define MCFG_TC0110PCR_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, TC0110PCR, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
 
 #define MCFG_TC0110PCR_PALETTE(_palette_tag) \
 	tc0110pcr_device::static_set_palette_tag(*device, "^" _palette_tag);
