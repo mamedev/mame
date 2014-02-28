@@ -3227,7 +3227,7 @@ GAME( 1993, raiden2d, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT2
 GAME( 1993, raiden2e, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 6, Easy Version)",  GAME_NOT_WORKING) // rev 4
 GAME( 1993, raiden2f, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden II (set 7, US Fabtek, Easy Version)",     GAME_NOT_WORKING) //  ^
 GAME( 1993, raiden2g, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden II (set 8, US Fabtek, Easy Version)",         GAME_NOT_WORKING) // rev 3 and 4 mix?
-GAME( 1993, raiden2nl,raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 9, Holland)",         GAME_NOT_WORKING)
+GAME( 1993, raiden2nl,raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 9, The Netherlands)", GAME_NOT_WORKING)
 
 
 GAME( 1994, raidendx,  0,        raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (UK)",                   GAME_NOT_WORKING)
@@ -3236,7 +3236,7 @@ GAME( 1994, raidendxa2,raidendx, raidendx,  raidendx, raiden2_state, raidendx,  
 GAME( 1994, raidendxj, raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (Japan)",                GAME_NOT_WORKING)
 GAME( 1994, raidendxu, raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden DX (US)",                   GAME_NOT_WORKING)
 GAME( 1994, raidendxg, raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden DX (Germany)",              GAME_NOT_WORKING)
-GAME( 1994, raidendxnl,raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (Holland)",              GAME_NOT_WORKING)
+GAME( 1994, raidendxnl,raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (The Netherlands)",      GAME_NOT_WORKING)
 
 GAME( 1993, zeroteam, 0,       zeroteam, zeroteam, raiden2_state,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team USA (set 1, US, Fabtek license)", GAME_NOT_WORKING)
 GAME( 1993, zeroteama,zeroteam,zeroteam, zeroteam, raiden2_state,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2, Japan? (earlier?))", GAME_NOT_WORKING)
