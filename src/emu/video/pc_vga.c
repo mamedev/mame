@@ -2844,63 +2844,14 @@ void s3_vga_device::s3_define_video_mode()
 {
 	int divisor = 1;
 	int xtal = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
+	double freq;
 
 	if((vga.miscellaneous_output & 0xc) == 0x0c)
 	{
-		switch(s3.cr42 & 0x0f)  // TODO: confirm clock settings
-		{
-		case 0:
-			xtal = XTAL_25_1748MHz;
-			break;
-		case 1:
-			xtal = XTAL_28_63636MHz;
-			break;
-		case 2:
-			xtal = 40000000;
-			break;
-		case 3:
-			xtal = 3000000;
-			break;
-		case 4:
-			xtal = 50000000;
-			break;
-		case 5:
-			xtal = 77000000;
-			break;
-		case 6:
-			xtal = 36000000;
-			break;
-		case 7:
-			xtal = 45000000;
-			break;
-		case 8:
-			xtal = 1000000;
-			break;
-		case 9:
-			xtal = 1000000;
-			break;
-		case 10:
-			xtal = 79000000;
-			break;
-		case 11:
-			xtal = 31000000;
-			break;
-		case 12:
-			xtal = 94000000;
-			break;
-		case 13:
-			xtal = 65000000;
-			break;
-		case 14:
-			xtal = 75000000;
-			break;
-		case 15:
-			xtal = 71000000;
-			break;
-		default:
-			xtal = 1000000;
-		}
-	}
+		// DCLK calculation
+		freq = ((double)(s3.clk_pll_m+2) / (double)((s3.clk_pll_n+2)*(pow(2,s3.clk_pll_r)))) * 14.318f; // clock between XIN and XOUT
+		xtal = freq * 1000000;
+ 	}
 
 	if((s3.ext_misc_ctrl_2) >> 4)
 	{
@@ -3204,6 +3155,83 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 	}
 }
 
+UINT8 s3_vga_device::s3_seq_reg_read(UINT8 index)
+{
+	UINT8 res = 0xff;
+
+	if(index <= 0x0c)
+		res = vga.sequencer.data[index];
+	else
+	{
+		switch(index)
+		{
+		case 0x10:
+			res = s3.sr10;
+			break;
+		case 0x11:
+			res = s3.sr11;
+			break;
+		case 0x12:
+			res = s3.sr12;
+			break;
+		case 0x13:
+			res = s3.sr13;
+			break;
+		case 0x15:
+			res = s3.sr15;
+			break;
+		}
+	}
+
+	return res;
+}
+
+void s3_vga_device::s3_seq_reg_write(UINT8 index, UINT8 data)
+{
+	if(index <= 0x0c)
+	{
+		vga.sequencer.data[vga.sequencer.index] = data;
+		seq_reg_write(vga.sequencer.index,data);
+	}
+	else
+	{
+		switch(index)
+		{
+		// Memory CLK PLL
+		case 0x10:
+			s3.sr10 = data;
+			break;
+		case 0x11:
+			s3.sr11 = data;
+			break;
+		// Video CLK PLL
+		case 0x12:
+			s3.sr12 = data;
+			break;
+		case 0x13:
+			s3.sr13 = data;
+			break;
+		case 0x15:
+			if(data & 0x02)  // load DCLK frequency (would normally have a small variable delay)
+			{
+				s3.clk_pll_n = s3.sr12 & 0x1f;
+				s3.clk_pll_r = (s3.sr12 & 0x60) >> 5;
+				s3.clk_pll_m = s3.sr13 & 0x7f;
+				s3_define_video_mode();
+			}
+			if(data & 0x20)  // immediate DCLK/MCLK load
+			{
+				s3.clk_pll_n = s3.sr12 & 0x1f;
+				s3.clk_pll_r = (s3.sr12 & 0x60) >> 5;
+				s3.clk_pll_m = s3.sr13 & 0x7f;
+				s3_define_video_mode();
+			}
+			s3.sr15 = data;
+		}
+	}
+}
+
+
 
 READ8_MEMBER(s3_vga_device::port_03b0_r)
 {
@@ -3248,6 +3276,9 @@ READ8_MEMBER(s3_vga_device::port_03c0_r)
 
 	switch(offset)
 	{
+		case 5:
+			res = s3_seq_reg_read(vga.sequencer.index);
+			break;
 		default:
 			res = vga_device::port_03c0_r(space,offset,mem_mask);
 			break;
@@ -3260,6 +3291,9 @@ WRITE8_MEMBER(s3_vga_device::port_03c0_w)
 {
 	switch(offset)
 	{
+		case 5:
+			s3_seq_reg_write(vga.sequencer.index,data);
+			break;
 		default:
 			vga_device::port_03c0_w(space,offset,data,mem_mask);
 			break;
