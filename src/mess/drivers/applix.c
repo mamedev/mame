@@ -135,7 +135,7 @@ public:
 	UINT8 m_pa;
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(applix);
 	UINT8 m_palette_latch[4];
 	required_shared_ptr<UINT16> m_base;
 private:
@@ -734,7 +734,7 @@ static SLOT_INTERFACE_START( applix_floppies )
 SLOT_INTERFACE_END
 
 
-void applix_state::palette_init()
+PALETTE_INIT_MEMBER(applix_state, applix)
 { // shades need to be verified - the names on the right are from the manual
 	const UINT8 colors[16*3] = {
 	0x00, 0x00, 0x00,   //  0 Black
@@ -759,7 +759,7 @@ void applix_state::palette_init()
 	for (i = 0; i < 48; color_count++)
 	{
 		r = colors[i++]; g = colors[i++]; b = colors[i++];
-		palette_set_color(machine(), color_count, rgb_t(r, g, b));
+		palette.set_pen_color(color_count, rgb_t(r, g, b));
 	}
 }
 
@@ -870,7 +870,8 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(applix_state, applix)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

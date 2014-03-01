@@ -76,7 +76,7 @@ void ninjaw_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		cury = y;
 		code = tilenum;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code, color,
 				flipx, flipy,
 				curx, cury, 0);
@@ -109,7 +109,7 @@ UINT32 ninjaw_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, 
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 
 	/* Sprites can be under/over the layer below text layer */
 	draw_sprites(bitmap, cliprect, 1, xoffs, 8); // draw sprites with priority 1 which are under the mid layer

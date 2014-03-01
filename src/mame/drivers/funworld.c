@@ -86,7 +86,7 @@
   * Fun World Quiz (Austrian),                        Fun World,          198?.
   * Witch Royal (Export version 2.1),                 Video Klein,        199?.
   * Novo Play Multi Card / Club Card,                 Admiral/Novomatic,  1986.
-  * Unknown encrypted Royal Card (Dino4 HW),          unknown,            1998.
+  * unknown encrypted Royal Card (Dino4 HW),          unknown,            1998.
   * China Town (Ver 1B, Dino4 HW),                    unknown,            1998.
 
 ***********************************************************************************
@@ -2945,8 +2945,8 @@ static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fw1stpal)
 
-	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_PALETTE_INIT_OVERRIDE(funworld_state, funworld)
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(funworld_state, funworld)
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, funworld)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)    /* 2MHz, veryfied on jollycrd & royalcrd */
@@ -5586,7 +5586,7 @@ ROM_END
 
 
 /*
-Unknown encrypted Royal Card
+unknown encrypted Royal Card
 Dino4 hardware with daughterboard (CPU+PLCC)
 
 1x Rockwell R65C02P4 CPU (11450-14 Mexico 9802 B54074-2)
@@ -6193,14 +6193,14 @@ GAMEL( 1997, pool10f,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,       
 GAMEL( 1996, pool10g,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 6)",                        0,                       layout_jollycrd )
 GAMEL( 1996, pool10h,   pool10,   cuoreuno, pool10,    driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 7)",                        0,                       layout_jollycrd )
 GAMEL( 1997, pool10i,   pool10,   cuoreuno, pool10,    driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 8)",                        0,                       layout_jollycrd )
-GAMEL( 2001, royal,     pool10,   royalcd1, royal,     driver_device,  0,        ROT0, "<unknown>.",      "Royal (Pool 10 hack)",                            0,                       layout_jollycrd )
+GAMEL( 2001, royal,     pool10,   royalcd1, royal,     driver_device,  0,        ROT0, "<unknown>",       "Royal (Pool 10 hack)",                            0,                       layout_jollycrd )
 GAMEL( 1997, tortufam,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Tortuga Family (Italian)",                        0,                       layout_jollycrd )
 GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pot Game (Italian)",                              0,                       layout_jollycrd )
 GAMEL( 1996, bottle10,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 1)",                      0,                       layout_jollycrd )
 GAMEL( 1996, bottl10b,  bottle10, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 2)",                      0,                       layout_jollycrd )
-GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  driver_device,  0,        ROT0, "<unknown>.",      "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd )	// mirrored video RAM (4000/5000 to 6000/7000).
-GAMEL( 1998, lunaparkb, lunapark, lunapark, lunapark,  driver_device,  0,        ROT0, "<unknown>.",      "Luna Park (set 2, dual program)",                 0,                       layout_jollycrd )	// mirrored video RAM (4000/5000 to 6000/7000).
-GAMEL( 1998, lunaparkc, lunapark, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "<unknown>.",      "Luna Park (set 3)",                               0,                       layout_jollycrd )	// regular video RAM 6000/7000.
+GAMEL( 1998, lunapark,  0,        lunapark, lunapark,  driver_device,  0,        ROT0, "<unknown>",       "Luna Park (set 1, dual program)",                 0,                       layout_jollycrd )	// mirrored video RAM (4000/5000 to 6000/7000).
+GAMEL( 1998, lunaparkb, lunapark, lunapark, lunapark,  driver_device,  0,        ROT0, "<unknown>",       "Luna Park (set 2, dual program)",                 0,                       layout_jollycrd )	// mirrored video RAM (4000/5000 to 6000/7000).
+GAMEL( 1998, lunaparkc, lunapark, cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "<unknown>",       "Luna Park (set 3)",                               0,                       layout_jollycrd )	// regular video RAM 6000/7000.
 GAMEL( 1998, crystal,   0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "J.C.D. srl",      "Crystal Colours (CMC hardware)",                  0,                       layout_jollycrd )
 
 // Royal Card based...
@@ -6249,7 +6249,7 @@ GAMEL( 1993, jolycdic,  jollycrd, cuoreuno, jolycdic,  funworld_state, tabblue, 
 
 // Dino 4 encrypted hardware...
 GAMEL( 1997, pool10e,   pool10,   cuoreuno, cuoreuno,  funworld_state, dino4,    ROT0, "C.M.C.",          "Pool 10 (Italian, Dino 4 hardware, encrypted)",   0,                       layout_jollycrd )
-GAME(  1998, rcdino4,   0,        cuoreuno, cuoreuno,  funworld_state, rcdino4,  ROT0, "<unknown>",       "Unknown encrypted Royal Card (Dino4 HW)",         GAME_NOT_WORKING )
+GAME(  1998, rcdino4,   0,        cuoreuno, cuoreuno,  funworld_state, rcdino4,  ROT0, "<unknown>",       "unknown encrypted Royal Card (Dino4 HW)",         GAME_NOT_WORKING )
 GAMEL( 1998, chinatow,  0,        chinatow, chinatow,  funworld_state, rcdino4,  ROT0, "<unknown>",       "China Town (Ver 1B, Dino4 HW)",                   0,                       layout_jollycrd )
 
 // MCU based games...

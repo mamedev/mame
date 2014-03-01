@@ -638,8 +638,7 @@ static MACHINE_CONFIG_START( base, freekick_state )
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_pbillrd)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", freekick)
-	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x200)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

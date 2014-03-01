@@ -8,55 +8,52 @@ Atari Tank 8 video emulation
 #include "includes/tank8.h"
 
 
-void tank8_state::palette_init()
+PALETTE_INIT_MEMBER(tank8_state, tank8)
 {
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x0a);
-
-	colortable_palette_set_color(machine().colortable, 8, rgb_t(0x00, 0x00, 0x00));
-	colortable_palette_set_color(machine().colortable, 9, rgb_t(0xff, 0xff, 0xff));
+	palette.set_indirect_color(8, rgb_t(0x00, 0x00, 0x00));
+	palette.set_indirect_color(9, rgb_t(0xff, 0xff, 0xff));
 
 	for (i = 0; i < 8; i++)
 	{
-		colortable_entry_set_value(machine().colortable, 2 * i + 0, 8);
-		colortable_entry_set_value(machine().colortable, 2 * i + 1, i);
+		palette.set_pen_indirect(2 * i + 0, 8);
+		palette.set_pen_indirect(2 * i + 1, i);
 	}
 
 	/* walls */
-	colortable_entry_set_value(machine().colortable, 0x10, 8);
-	colortable_entry_set_value(machine().colortable, 0x11, 9);
+	palette.set_pen_indirect(0x10, 8);
+	palette.set_pen_indirect(0x11, 9);
 
 	/* mines */
-	colortable_entry_set_value(machine().colortable, 0x12, 8);
-	colortable_entry_set_value(machine().colortable, 0x13, 9);
+	palette.set_pen_indirect(0x12, 8);
+	palette.set_pen_indirect(0x13, 9);
 }
 
 
-void tank8_state::set_pens(colortable_t *colortable)
+void tank8_state::set_pens()
 {
 	if (*m_team & 0x01)
 	{
-		colortable_palette_set_color(colortable, 0, rgb_t(0xff, 0x00, 0x00)); /* red     */
-		colortable_palette_set_color(colortable, 1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
-		colortable_palette_set_color(colortable, 2, rgb_t(0xff, 0xff, 0x00)); /* yellow  */
-		colortable_palette_set_color(colortable, 3, rgb_t(0x00, 0xff, 0x00)); /* green   */
-		colortable_palette_set_color(colortable, 4, rgb_t(0xff, 0x00, 0xff)); /* magenta */
-		colortable_palette_set_color(colortable, 5, rgb_t(0xe0, 0xc0, 0x70)); /* puce    */
-		colortable_palette_set_color(colortable, 6, rgb_t(0x00, 0xff, 0xff)); /* cyan    */
-		colortable_palette_set_color(colortable, 7, rgb_t(0xff, 0xaa, 0xaa)); /* pink    */
+		m_palette->set_indirect_color(0, rgb_t(0xff, 0x00, 0x00)); /* red     */
+		m_palette->set_indirect_color(1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+		m_palette->set_indirect_color(2, rgb_t(0xff, 0xff, 0x00)); /* yellow  */
+		m_palette->set_indirect_color(3, rgb_t(0x00, 0xff, 0x00)); /* green   */
+		m_palette->set_indirect_color(4, rgb_t(0xff, 0x00, 0xff)); /* magenta */
+		m_palette->set_indirect_color(5, rgb_t(0xe0, 0xc0, 0x70)); /* puce    */
+		m_palette->set_indirect_color(6, rgb_t(0x00, 0xff, 0xff)); /* cyan    */
+		m_palette->set_indirect_color(7, rgb_t(0xff, 0xaa, 0xaa)); /* pink    */
 	}
 	else
 	{
-		colortable_palette_set_color(colortable, 0, rgb_t(0xff, 0x00, 0x00)); /* red     */
-		colortable_palette_set_color(colortable, 2, rgb_t(0xff, 0x00, 0x00)); /* red     */
-		colortable_palette_set_color(colortable, 4, rgb_t(0xff, 0x00, 0x00)); /* red     */
-		colortable_palette_set_color(colortable, 6, rgb_t(0xff, 0x00, 0x00)); /* red     */
-		colortable_palette_set_color(colortable, 1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
-		colortable_palette_set_color(colortable, 3, rgb_t(0x00, 0x00, 0xff)); /* blue    */
-		colortable_palette_set_color(colortable, 5, rgb_t(0x00, 0x00, 0xff)); /* blue    */
-		colortable_palette_set_color(colortable, 7, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+		m_palette->set_indirect_color(0, rgb_t(0xff, 0x00, 0x00)); /* red     */
+		m_palette->set_indirect_color(2, rgb_t(0xff, 0x00, 0x00)); /* red     */
+		m_palette->set_indirect_color(4, rgb_t(0xff, 0x00, 0x00)); /* red     */
+		m_palette->set_indirect_color(6, rgb_t(0xff, 0x00, 0x00)); /* red     */
+		m_palette->set_indirect_color(1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+		m_palette->set_indirect_color(3, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+		m_palette->set_indirect_color(5, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+		m_palette->set_indirect_color(7, rgb_t(0x00, 0x00, 0xff)); /* blue    */
 	}
 }
 
@@ -136,7 +133,7 @@ void tank8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int x = get_x_pos(i);
 		int y = get_y_pos(i);
 
-		m_gfxdecode->gfx((code & 0x04) ? 2 : 3)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx((code & 0x04) ? 2 : 3)->transpen(m_palette,bitmap,cliprect,
 			code & 0x03,
 			i,
 			code & 0x10,
@@ -181,7 +178,7 @@ void tank8_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 UINT32 tank8_state::screen_update_tank8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(machine().colortable);
+	set_pens();
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);

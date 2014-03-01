@@ -126,7 +126,7 @@ static MACHINE_CONFIG_START( nexus3d, nexus3d_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nexus3d_state, screen_update_nexus3d)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_SERFLASH_ADD("flash")
 

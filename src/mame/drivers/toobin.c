@@ -218,7 +218,7 @@ static MACHINE_CONFIG_START( toobin, toobin_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toobin_state, screen_update_toobin)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", toobin)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(toobin_state,toobin)
 

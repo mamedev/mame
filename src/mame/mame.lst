@@ -3306,8 +3306,9 @@ msha            // 24/10/1995 (c) 1995 (Asia)
 mshh            // 17/11/1995 (c) 1995 (Hispanic)
 mshb            // 17/11/1995 (c) 1995 (Brazil)
 19xx            // 07/12/1995 (c) 1996 (USA)
-19xxj           // 25/12/1995 (c) 1996 (Japan)
-19xxjr1         // 07/12/1995 (c) 1996 (Japan)
+19xxj			// 04/01/1996 (c) 1996 (Japan)
+19xxjr1         // 25/12/1995 (c) 1996 (Japan)
+19xxjr2         // 07/12/1995 (c) 1996 (Japan)
 19xxa           // 07/12/1995 (c) 1996 (Asia)
 19xxh           // 18/12/1995 (c) 1996 (Hispanic)
 19xxb           // 18/12/1995 (c) 1996 (Brazil)
@@ -3381,6 +3382,7 @@ mshvsfb1        // 25/06/1997 (c) 1997 (Brazil)
 csclub          // 17/10/1997 (c) 1997 (Euro)
 csclub1         // 22/07/1997 (c) 1997 (Euro)
 csclubj         // 22/07/1997 (c) 1997 (Japan)
+csclubjy        // 22/07/1997 (c) 1997 (Japan)
 cscluba         // 22/07/1997 (c) 1997 (Asia)
 csclubh         // 22/07/1997 (c) 1997 (Hispanic)
 sgemf           // 04/09/1997 (c) 1997 (USA)
@@ -9458,6 +9460,7 @@ moonlght        // bootleg
 chry10          // bootleg
 chrygld         // bootleg
 goldfrui        // bootleg
+super9          // (c) 2001 Playmark
 cabaret         // (c) 1992 AMT
 cpoker          // (c) 1993? IGS
 cpokert         // (c) 1993? Tuning
@@ -11055,7 +11058,8 @@ filetto         // (c) 1990 Novamatic
 quizo           // (c) 1985 Seoul Coin Corp.
 quizoa          // (c) 1985 Seoul Coin Corp.
 gstream         // (c) 2002, Oriental Soft Japan
-x2222			// (c) 2000, Oriental Soft Japan
+x2222			// (c) 2000, Oriental Soft
+x2222o			// (c) 2000, Oriental Soft
 miniboy7        // (c) 1983, Bonanza Enterprises
 miniboy7a       // (c) 1983, Bonanza Enterprises
 miniboy7b       // (c) 1983, Bonanza Enterprises

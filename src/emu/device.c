@@ -275,7 +275,7 @@ void device_t::set_unscaled_clock(UINT32 clock)
 {
 	m_unscaled_clock = clock;
 	m_clock = m_unscaled_clock * m_clock_scale;
-	m_attoseconds_per_clock = HZ_TO_ATTOSECONDS(m_clock);
+	m_attoseconds_per_clock = (m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(m_clock);
 	notify_clock_changed();
 }
 
@@ -289,7 +289,7 @@ void device_t::set_clock_scale(double clockscale)
 {
 	m_clock_scale = clockscale;
 	m_clock = m_unscaled_clock * m_clock_scale;
-	m_attoseconds_per_clock = HZ_TO_ATTOSECONDS(m_clock);
+	m_attoseconds_per_clock = (m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(m_clock);
 	notify_clock_changed();
 }
 

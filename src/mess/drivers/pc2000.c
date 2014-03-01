@@ -50,7 +50,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	DECLARE_READ8_MEMBER( key_matrix_r );
 	DECLARE_WRITE8_MEMBER( key_matrix_w );
 	DECLARE_WRITE8_MEMBER( rombank0_w );
@@ -58,7 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER( rombank2_w );
 	DECLARE_READ8_MEMBER( beep_r );
 	DECLARE_WRITE8_MEMBER( beep_w );
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pc2000);
 };
 
 class gl3000s_state : public pc2000_state
@@ -734,34 +733,6 @@ static INPUT_PORTS_START( gl3000s )
 	PORT_BIT(0xe1, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-DEVICE_IMAGE_LOAD_MEMBER(pc2000_state, cart_load)
-{
-	UINT8 *cart = memregion("cart")->base();
-
-	if (image.software_entry() == NULL)
-	{
-		UINT32 size = MIN(image.length(), memregion("cart")->bytes());
-
-		if (image.fread(cart, size) != size)
-			return IMAGE_INIT_FAIL;
-	}
-	else
-	{
-		UINT32 size = MIN(image.get_software_region_length("rom"), memregion("cart")->bytes());
-		const char *pcb_type = image.get_feature("pcb_type");
-
-		if (pcb_type && !strcmp(pcb_type, "allgeme2"))
-			memcpy(cart, image.get_software_region("rom"), size >> 1);
-		else if (pcb_type && !strcmp(pcb_type, "ftrivia"))
-			memcpy(cart, image.get_software_region("rom") + (1<<16), size >> 1);
-		else
-			memcpy(cart, image.get_software_region("rom"), size);
-	}
-
-	return IMAGE_INIT_PASS;
-}
-
-
 void pc2000_state::machine_start()
 {
 	UINT8 *bios = memregion("bios")->base();
@@ -803,10 +774,10 @@ void pc1000_state::machine_reset()
 	m_bank1->set_entry(0);
 }
 
-void pc2000_state::palette_init()
+PALETTE_INIT_MEMBER(pc2000_state, pc2000)
 {
-	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
-	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 static const gfx_layout hd44780_charlayout =
@@ -824,8 +795,6 @@ static GFXDECODE_START( pc2000 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( gl3000s )
-GFXDECODE_END
 
 static MACHINE_CONFIG_START( pc2000, pc2000_state )
 	/* basic machine hardware */
@@ -842,7 +811,8 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
 	MCFG_SCREEN_SIZE(120, 18) //2x20 chars
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18-1)
 
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(pc2000_state, pc2000)
 	MCFG_GFXDECODE_ADD("gfxdecode", pc2000)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
@@ -856,13 +826,13 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_INTERFACE("pc1000_cart")
-	MCFG_CARTSLOT_LOAD(pc2000_state, cart_load)
+	MCFG_CARTSLOT_INTERFACE("genius_cart")
 	MCFG_CARTSLOT_NOT_MANDATORY
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gl2000, pc2000 )
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cart_list", "misterx")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "gl2000")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
 static HD44780_PIXEL_UPDATE(gl4000_pixel_update)
@@ -897,7 +867,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( gl3000s, pc2000, gl3000s_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_gl3000s)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gl3000s)
+	MCFG_DEVICE_REMOVE("gfxdecode")
+
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( gl4000, pc2000, gl4004_state )
@@ -908,6 +881,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( gl4000, pc2000, gl4004_state )
 	MCFG_DEVICE_MODIFY("hd44780")
 	MCFG_HD44780_LCD_SIZE(4, 20)
 	MCFG_HD44780_PIXEL_UPDATE_CB(gl4000_pixel_update)
+
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( misterx, pc2000, pc1000_state )
@@ -927,8 +903,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( misterx, pc2000, pc1000_state )
 	MCFG_HD44780_PIXEL_UPDATE_CB(pc1000_pixel_update)
 
 	MCFG_CARTSLOT_MODIFY("cart")
-	MCFG_CARTSLOT_INTERFACE("pc1000_cart")
-	MCFG_CARTSLOT_LOAD(pc1000_state, cart_load)
+	MCFG_CARTSLOT_INTERFACE("genius_cart")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "misterx")
@@ -1012,6 +987,7 @@ ROM_START( misterx )
 	ROM_LOAD( "27-00882-001.bin", 0x000000, 0x020000, CRC(30e0dc94) SHA1(2f4675746a41399b3d9e3e8001a9b4a0dcc5b620))
 
 	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 
@@ -1027,4 +1003,4 @@ COMP( 1994, gl4000,   0,       0,     gl4000,    pc2000, driver_device,   0,  "V
 COMP( 1996, gl4004,   0,       0,     gl4000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 4004 Quadro L (Germany)", GAME_NOT_WORKING)
 COMP( 1997, gl5000,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 5000 (Germany)", GAME_IS_SKELETON)
 COMP( 1997, gl5005x,  0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 5005X (Germany)", GAME_IS_SKELETON)
-COMP( 1993, gln,      0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader Notebook", GAME_NOT_WORKING)
+COMP( 1993, gln,      0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader Notebook", GAME_IS_SKELETON)

@@ -85,8 +85,8 @@ PALETTE_INIT_MEMBER(fuuki16_state,fuuki16)
 
 	/* The game does not initialise the palette at startup. It should
 	   be totally black */
-	for (pen = 0; pen < machine().total_colors(); pen++)
-		palette_set_color(machine(),pen,rgb_t(0,0,0));
+	for (pen = 0; pen < palette.entries(); pen++)
+		palette.set_pen_color(pen,rgb_t(0,0,0));
 }
 #endif
 
@@ -196,7 +196,7 @@ void fuuki16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 			for (x = xstart; x != xend; x += xinc)
 			{
 				if (xzoom == (16*8) && yzoom == (16*8))
-					gfx->prio_transpen(bitmap,cliprect,
+					gfx->prio_transpen(m_palette,bitmap,cliprect,
 									code++,
 									attr & 0x3f,
 									flipx, flipy,
@@ -204,7 +204,7 @@ void fuuki16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 									priority_bitmap,
 									pri_mask,15 );
 				else
-					gfx->prio_zoom_transpen(bitmap,cliprect,
+					gfx->prio_zoom_transpen(m_palette,bitmap,cliprect,
 									code++,
 									attr & 0x3f,
 									flipx, flipy,

@@ -195,8 +195,8 @@ UINT32 atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rgb3
 		{
 			UINT16 data = *src++;
 
-			*dest++ = machine().pens[data & 0xff];
-			*dest++ = machine().pens[data >> 8];
+			*dest++ = m_palette->pen(data & 0xff);
+			*dest++ = m_palette->pen(data >> 8);
 		}
 	}
 	return 0;
@@ -400,7 +400,7 @@ void atarisy4_state::execute_gpu_command()
 					m_b_color_table[table_offs] = val;
 
 				/* Update */
-				palette_set_color(machine(), table_offs, rgb_t(m_r_color_table[table_offs], m_g_color_table[table_offs], m_b_color_table[table_offs]));
+				m_palette->set_pen_color(table_offs, rgb_t(m_r_color_table[table_offs], m_g_color_table[table_offs], m_b_color_table[table_offs]));
 
 				++table_offs;
 				++offset;
@@ -753,7 +753,7 @@ static MACHINE_CONFIG_START( atarisy4, atarisy4_state )
 	MCFG_SCREEN_RAW_PARAMS(32000000/2, 660, 0, 512, 404, 0, 384)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_UPDATE_DRIVER(atarisy4_state, screen_update_atarisy4)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 MACHINE_CONFIG_END
 

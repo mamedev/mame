@@ -1125,6 +1125,6 @@ GAME(1993,  tftc_104,       tftc_303,   de_3_dmd2,   de_3, de_3_state,   de_3,  
 GAME(1991,  tmnt_104,       0,          de_3_dmd1,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Teenage Mutant Ninja Turtles (1.04)",      GAME_IS_SKELETON_MECHANICAL)
 GAME(1991,  tmnt_103,       tmnt_104,   de_3_dmd1,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "Teenage Mutant Ninja Turtles (1.03)",      GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  tomy_400,       0,          de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "The Who's Tommy Pinball Wizard (4.00)",                GAME_IS_SKELETON_MECHANICAL)
-GAME(1994,  tomy_h30,       tomy_400,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "The Who's Tommy Pinball Wizard (3.00 Holland)",        GAME_IS_SKELETON_MECHANICAL)
+GAME(1994,  tomy_h30,       tomy_400,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "The Who's Tommy Pinball Wizard (3.00, The Netherlands)", GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  wwfr_106,       0,          de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "WWF Royal Rumble (1.06)",              GAME_IS_SKELETON_MECHANICAL)
 GAME(1994,  wwfr_103,       wwfr_106,   de_3_dmd2,   de_3, de_3_state,   de_3,   ROT0,   "Data East",    "WWF Royal Rumble (1.03)",              GAME_IS_SKELETON_MECHANICAL)

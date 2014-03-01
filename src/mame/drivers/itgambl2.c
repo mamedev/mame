@@ -69,7 +69,7 @@ public:
 	int m_start_offs;
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(itgambl2);
 	UINT32 screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
@@ -118,7 +118,7 @@ UINT32 itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rgb3
 
 	popmessage("%d %d %04x",m_test_x,m_test_y,m_start_offs);
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	count = (m_start_offs);
 
@@ -131,7 +131,7 @@ UINT32 itgambl2_state::screen_update_itgambl2(screen_device &screen, bitmap_rgb3
 			color = (blit_ram[count] & 0xff)>>0;
 
 			if(cliprect.contains(x, y))
-				bitmap.pix32(y, x) = machine().pens[color];
+				bitmap.pix32(y, x) = m_palette->pen(color);
 
 			count++;
 		}
@@ -246,7 +246,7 @@ void itgambl2_state::machine_reset()
 }
 
 /* default 444 palette for debug purpose*/
-void itgambl2_state::palette_init()
+PALETTE_INIT_MEMBER(itgambl2_state, itgambl2)
 {
 	int x,r,g,b;
 
@@ -255,7 +255,7 @@ void itgambl2_state::palette_init()
 		r = (x & 0xf)*0x10;
 		g = ((x & 0x3c)>>2)*0x10;
 		b = ((x & 0xf0)>>4)*0x10;
-		palette_set_color(machine(),x,rgb_t(r,g,b));
+		palette.set_pen_color(x,rgb_t(r,g,b));
 	}
 }
 
@@ -279,7 +279,8 @@ static MACHINE_CONFIG_START( itgambl2, itgambl2_state )
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", itgambl2)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(itgambl2_state, itgambl2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -969,4 +970,4 @@ GAME( 200?, mnumitg,  0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<un
 GAME( 200?, mclass,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Magic Class (Ver 2.2)",                 GAME_IS_SKELETON )
 GAME( 200?, europass, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Euro Pass (Ver 1.1)",                   GAME_IS_SKELETON )
 GAME( 200?, thedrink, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "The Drink",                             GAME_IS_SKELETON )
-GAME( 200?, unkh8gam, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Unknown H8 Italian Gambling game",      GAME_IS_SKELETON )
+GAME( 200?, unkh8gam, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "unknown H8 Italian Gambling game",      GAME_IS_SKELETON )

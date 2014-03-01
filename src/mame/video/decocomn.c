@@ -74,7 +74,7 @@ WRITE16_MEMBER( decocomn_device::nonbuffered_palette_w )
 	g = (state->m_generic_paletteram_16[offset + 1] >> 8) & 0xff;
 	r = (state->m_generic_paletteram_16[offset + 1] >> 0) & 0xff;
 
-	palette_set_color(space.machine(), offset / 2, rgb_t(r,g,b));
+	state->m_palette->set_pen_color(offset / 2, rgb_t(r,g,b));
 }
 
 WRITE16_MEMBER( decocomn_device::buffered_palette_w )
@@ -90,7 +90,7 @@ WRITE16_MEMBER( decocomn_device::palette_dma_w )
 {
 	driver_device *state = space.machine().driver_data();
 
-	const int m = space.machine().total_colors();
+	const int m = state->m_palette->entries();
 	int r, g, b, i;
 
 	for (i = 0; i < m; i++)
@@ -103,7 +103,7 @@ WRITE16_MEMBER( decocomn_device::palette_dma_w )
 			g = (state->m_generic_paletteram_16[i * 2 + 1] >> 8) & 0xff;
 			r = (state->m_generic_paletteram_16[i * 2 + 1] >> 0) & 0xff;
 
-			palette_set_color(space.machine(), i, rgb_t(r,g,b));
+			state->m_palette->set_pen_color(i, rgb_t(r,g,b));
 		}
 	}
 }

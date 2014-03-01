@@ -220,7 +220,7 @@ void tecmo_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const
 				{
 					int sx = xpos + 8*(flipx?(size-1-x):x);
 					int sy = ypos + 8*(flipy?(size-1-y):y);
-					m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
 							code + layout[y][x],
 							flags & 0xf,
 							flipx,flipy,

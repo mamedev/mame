@@ -377,7 +377,7 @@ static MACHINE_CONFIG_START( beathead, beathead_state )
 	MCFG_SCREEN_UPDATE_DRIVER(beathead_state, screen_update)
 	MCFG_SCREEN_SIZE(42*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD("palette", 32768)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

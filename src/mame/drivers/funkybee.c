@@ -306,8 +306,8 @@ static MACHINE_CONFIG_START( funkybee, funkybee_state )
 	MCFG_SCREEN_UPDATE_DRIVER(funkybee_state, screen_update_funkybee)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", funkybee)
-	MCFG_PALETTE_LENGTH(32)
-
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(funkybee_state, funkybee)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

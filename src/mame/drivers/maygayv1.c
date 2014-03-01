@@ -323,7 +323,7 @@ UINT32 maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_ind1
 	/* If screen output is disabled, fill with black */
 	if (!(VREG(VCR0) & VCR0_DEN))
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 
@@ -465,7 +465,7 @@ void maygayv1_state::screen_eof_maygayv1(screen_device &screen, bool state)
 			for (i = 0; i < 16; ++i)
 			{
 				UINT16 entry = *palbase++;
-				palette_set_color_rgb(machine(), entry & 0xf, pal4bit(entry >> 12), pal4bit(entry >> 8), pal4bit(entry >> 4));
+				m_palette->set_pen_color(entry & 0xf, pal4bit(entry >> 12), pal4bit(entry >> 8), pal4bit(entry >> 4));
 			}
 		}
 	}
@@ -1032,7 +1032,7 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(maygayv1_state, screen_update_maygayv1)
 	MCFG_SCREEN_VBLANK_DRIVER(maygayv1_state, screen_eof_maygayv1)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_DUARTN68681_ADD("duart68681", DUART_CLOCK)
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(maygayv1_state, duart_irq_handler))

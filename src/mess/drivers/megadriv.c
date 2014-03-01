@@ -504,6 +504,7 @@ static MACHINE_CONFIG_START( genesis_32x, md_cons_state )
 	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
 
 	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
+	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
@@ -537,6 +538,7 @@ static MACHINE_CONFIG_START( mdj_32x, md_cons_state )
 	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
 
 	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
+	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
@@ -570,6 +572,7 @@ static MACHINE_CONFIG_START( md_32x, md_cons_state )
 	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
 
 	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0)
+	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
@@ -645,6 +648,7 @@ static MACHINE_CONFIG_START( genesis_scd, md_cons_state )
 	MCFG_SEGACD_GFXDECODE("gfxdecode")
 	
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+
 	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")

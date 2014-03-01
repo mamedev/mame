@@ -481,8 +481,9 @@ WRITE8_MEMBER( vboysnd_device::write )
 			break;
 
 		case SxEV0:
-			if (snd_channel[channel].playing)
-				snd_channel[channel].envelope = ((UINT8)mgetb(m_aram+SxEV0b+i)) >> 4;
+			if (channel < 5)
+				if (snd_channel[channel].playing)
+					snd_channel[channel].envelope = ((UINT8)mgetb(m_aram+SxEV0b+i)) >> 4;
 			break;
 	}
 }

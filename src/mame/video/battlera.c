@@ -45,7 +45,7 @@ WRITE8_MEMBER(battlera_state::battlera_palette_w)
 	if (offset%2) offset-=1;
 
 	pal_word=m_generic_paletteram_8[offset] | (m_generic_paletteram_8[offset+1]<<8);
-	palette_set_color_rgb(machine(), offset/2, pal3bit(pal_word >> 3), pal3bit(pal_word >> 6), pal3bit(pal_word >> 0));
+	m_palette->set_pen_color(offset/2, pal3bit(pal_word >> 3), pal3bit(pal_word >> 6), pal3bit(pal_word >> 0));
 }
 
 /******************************************************************************/
@@ -272,14 +272,14 @@ void battlera_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &clip,int
 		if (fy) { my += 16*(cgy-1); yinc = -16; } /* Swap tile order on Y flips */
 
 		for (i=0; i<cgy; i++) {
-			m_gfxdecode->gfx(1)->transpen(bitmap,clip,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,clip,
 				code,
 				colour,
 				fx,fy,
 				mx,my,0);
 
 			if (cgx)
-				m_gfxdecode->gfx(1)->transpen(bitmap,clip,
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,clip,
 						code2,
 						colour,
 						fx,fy,
@@ -318,17 +318,17 @@ UINT32 battlera_state::screen_update_battlera(screen_device &screen, bitmap_ind1
 		/* If this tile was changed OR tilemap was changed, redraw */
 		if (m_vram_dirty[offs/2]) {
 			m_vram_dirty[offs/2]=0;
-			m_gfxdecode->gfx(0)->opaque(*m_tile_bitmap,m_tile_bitmap->cliprect(),
+			m_gfxdecode->gfx(0)->opaque(m_palette,*m_tile_bitmap,m_tile_bitmap->cliprect(),
 					code,
 					m_HuC6270_vram[offs] >> 4,
 					0,0,
 					8*mx,8*my);
-			m_gfxdecode->gfx(2)->opaque(*m_front_bitmap,m_tile_bitmap->cliprect(),
+			m_gfxdecode->gfx(2)->opaque(m_palette,*m_front_bitmap,m_tile_bitmap->cliprect(),
 					0,
 					0,  /* fill the spot with pen 256 */
 					0,0,
 					8*mx,8*my);
-			m_gfxdecode->gfx(0)->transmask(*m_front_bitmap,m_tile_bitmap->cliprect(),
+			m_gfxdecode->gfx(0)->transmask(m_palette,*m_front_bitmap,m_tile_bitmap->cliprect(),
 					code,
 					m_HuC6270_vram[offs] >> 4,
 					0,0,

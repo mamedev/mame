@@ -26,7 +26,7 @@
 #define VERTICAL_PORCH_HACK     27
 
 
-static const rgb_t PALETTE[] =
+static const rgb_t PALETTE_ABC[] =
 {
 	rgb_t::black, // black
 	rgb_t(0xff, 0x00, 0x00), // red
@@ -329,11 +329,11 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 		{
 			int color = BIT(chargen_data, 7) ? fg_color : bg_color;
 
-			bitmap.pix32(y, x++) = PALETTE[color];
+			bitmap.pix32(y, x++) = PALETTE_ABC[color];
 
 			if (e5 || e6)
 			{
-				bitmap.pix32(y, x++) = PALETTE[color];
+				bitmap.pix32(y, x++) = PALETTE_ABC[color];
 			}
 
 			chargen_data <<= 1;
@@ -448,7 +448,7 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 				if (BIT(dot, 15) || (bitmap.pix32(y, x) == rgb_t::black))
 				{
-					bitmap.pix32(y, x) = PALETTE[(dot >> 12) & 0x07];
+					bitmap.pix32(y, x) = PALETTE_ABC[(dot >> 12) & 0x07];
 				}
 
 				dot <<= 4;
@@ -505,7 +505,7 @@ UINT32 abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	screen.set_visible_area(0, 767, 0, 311);
 
 	// clear screen
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(rgb_t::black, cliprect);
 
 	if (!m_txoff)
 	{

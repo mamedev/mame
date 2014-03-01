@@ -326,20 +326,20 @@ GFXDECODE_END
 /* Palette Initialization */
 
 
-void zx_state::palette_init()
+PALETTE_INIT_MEMBER(zx_state, zx)
 {
-	palette_set_color(machine(),0,rgb_t::white); /* white */
-	palette_set_color(machine(),1,rgb_t::black); /* black */
-	palette_set_color(machine(),2,rgb_t::black); /* black */
-	palette_set_color(machine(),3,rgb_t::white); /* white */
+	palette.set_pen_color(0,rgb_t::white); /* white */
+	palette.set_pen_color(1,rgb_t::black); /* black */
+	palette.set_pen_color(2,rgb_t::black); /* black */
+	palette.set_pen_color(3,rgb_t::white); /* white */
 }
 
 PALETTE_INIT_MEMBER(zx_state,ts1000)
 {
-	palette_set_color(machine(),0,rgb_t(64, 244, 244)); /* cyan */
-	palette_set_color(machine(),1,rgb_t::black); /* black */
-	palette_set_color(machine(),2,rgb_t::black); /* black */
-	palette_set_color(machine(),3,rgb_t(64, 244, 244)); /* cyan */
+	palette.set_pen_color(0,rgb_t(64, 244, 244)); /* cyan */
+	palette.set_pen_color(1,rgb_t::black); /* black */
+	palette.set_pen_color(2,rgb_t::black); /* black */
+	palette.set_pen_color(3,rgb_t(64, 244, 244)); /* cyan */
 }
 
 
@@ -398,8 +398,8 @@ static MACHINE_CONFIG_START( zx80, zx_state )
 	MCFG_SCREEN_VBLANK_DRIVER(zx_state, screen_eof_zx)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", zx80)
-	MCFG_PALETTE_LENGTH(4)
-
+	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(zx_state,zx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -427,8 +427,8 @@ static MACHINE_CONFIG_DERIVED( zx81, zx80 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ts1000, zx81 )
-
-	MCFG_PALETTE_INIT_OVERRIDE(zx_state,ts1000)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(zx_state,ts1000)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ts1500, ts1000 )

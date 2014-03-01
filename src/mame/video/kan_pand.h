@@ -30,6 +30,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	DECLARE_WRITE8_MEMBER ( spriteram_w );
 	DECLARE_READ8_MEMBER( spriteram_r );
@@ -55,6 +56,7 @@ private:
 	int             m_clear_bitmap;
 	int             m_bg_pen; // might work some other way..
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type KANEKO_PANDORA;
@@ -70,5 +72,8 @@ extern const device_type KANEKO_PANDORA;
 
 #define MCFG_KANEKO_PANDORA_GFXDECODE(_gfxtag) \
 	kaneko_pandora_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_KANEKO_PANDORA_PALETTE(_palette_tag) \
+	kaneko_pandora_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif /* __KAN_PAND_H__ */

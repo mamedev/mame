@@ -714,7 +714,7 @@ static MACHINE_CONFIG_START( sslam, sslam_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sslam_state, screen_update_sslam)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sslam)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 	MCFG_VIDEO_START_OVERRIDE(sslam_state,sslam)
 
@@ -744,7 +744,7 @@ static MACHINE_CONFIG_START( powerbls, sslam_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sslam_state, screen_update_powerbls)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", powerbls)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_VIDEO_START_OVERRIDE(sslam_state,powerbls)
 

@@ -143,7 +143,7 @@ void discoboy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			}
 		}
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipscreen,0,
@@ -168,7 +168,7 @@ UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind1
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(machine(), i / 2, rgb_t(r, g, b));
+		m_palette->set_pen_color(i / 2, rgb_t(r, g, b));
 	}
 
 	for (i = 0; i < 0x800; i += 2)
@@ -181,7 +181,7 @@ UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind1
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(machine(), (i / 2) + 0x400, rgb_t(r, g, b));
+		m_palette->set_pen_color((i / 2) + 0x400, rgb_t(r, g, b));
 	}
 
 	bitmap.fill(0x3ff, cliprect);
@@ -200,7 +200,7 @@ UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind1
 					tileno = 0x2000 + (tileno & 0x1fff) + 0x0000;
 			}
 
-			m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tileno, m_ram_att[count / 2], 0, 0, x*8, y*8);
+			m_gfxdecode->gfx(1)->opaque(m_palette,bitmap,cliprect, tileno, m_ram_att[count / 2], 0, 0, x*8, y*8);
 			count += 2;
 		}
 	}
@@ -510,7 +510,7 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(discoboy_state, screen_update_discoboy)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", discoboy)
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 
 	/* sound hardware */

@@ -575,7 +575,7 @@ static MACHINE_CONFIG_START( ssingles, ssingles_state )
 	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_PALETTE_LENGTH(4) //guess
+	MCFG_PALETTE_ADD("palette", 4) //guess
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ssingles)
 

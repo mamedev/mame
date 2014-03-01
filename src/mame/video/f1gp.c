@@ -210,7 +210,7 @@ UINT32 f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitma
 UINT32 f1gp_state::screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_gfxctrl & 4)  /* blank screen */
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	else
 	{
 		switch (m_gfxctrl & 3)
@@ -294,7 +294,7 @@ void f1gp_state::f1gpb_draw_sprites( screen_device &screen,bitmap_ind16 &bitmap,
 			gfx = 0;
 		}
 
-		m_gfxdecode->gfx(1 + gfx)->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1 + gfx)->prio_transpen(m_palette,bitmap,cliprect,
 			code,
 			color,
 			flipx,flipy,
@@ -303,7 +303,7 @@ void f1gp_state::f1gpb_draw_sprites( screen_device &screen,bitmap_ind16 &bitmap,
 			pri ? 0 : 0x2,15);
 
 		// wrap around x
-		m_gfxdecode->gfx(1 + gfx)->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1 + gfx)->prio_transpen(m_palette,bitmap,cliprect,
 			code,
 			color,
 			flipx,flipy,

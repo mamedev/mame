@@ -1,11 +1,41 @@
-/******************************************************************************
+/***************************************************************************
 
     emupal.h
 
-    Emulator palette handling functions.
+    Palette device.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+****************************************************************************
 
     There are several levels of abstraction in the way MAME handles the palette,
     and several display modes which can be used by the drivers.
@@ -72,13 +102,13 @@
     Shadows(Highlights) Quick Reference
     -----------------------------------
 
-    1) declare MCFG_VIDEO_ATTRIBUTES( ... VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS ... )
+    1) declare MCFG_VIDEO_ATTRIBUTES( ... )
 
     2) make a pen table fill with DRAWMODE_NONE, DRAWMODE_SOURCE or DRAWMODE_SHADOW
 
     3) (optional) set shadow darkness or highlight brightness by
-        palette_set_shadow_factor(0.0-1.0) or
-        palette_set_highlight_factor(1.0-n.n)
+        set_shadow_factor(0.0-1.0) or
+        _set_highlight_factor(1.0-n.n)
 
     4) before calling drawgfx use
         palette_set_shadow_mode(0) to arm shadows or
@@ -99,152 +129,327 @@
 #define __EMUPAL_H__
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
 #define PALETTE_DEFAULT_SHADOW_FACTOR (0.6)
 #define PALETTE_DEFAULT_HIGHLIGHT_FACTOR (1/PALETTE_DEFAULT_SHADOW_FACTOR)
 
+#define PALETTE_INIT_NAME(_Name) palette_init_##_Name
+#define DECLARE_PALETTE_INIT(_Name) void PALETTE_INIT_NAME(_Name)(palette_device &palette)
+#define PALETTE_INIT(_Name) void PALETTE_INIT_NAME(_Name)(palette_device &dummy, palette_device &palette)
+#define PALETTE_INIT_MEMBER(_Class, _Name) void _Class::PALETTE_INIT_NAME(_Name)(palette_device &palette)
 
+// standard 3-3-2 formats
+#define PALETTE_FORMAT_BBGGGRRR raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 0,3,6>)
+#define PALETTE_FORMAT_RRRGGGBB raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 5,2,0>)
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+// standard 2-2-2-2 formats
+#define PALETTE_FORMAT_BBGGRRII raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_irgb_decoder<2,2,2,2, 0,2,4,6>)
 
-class colortable_t;
+// standard 4-4-4 formats
+#define PALETTE_FORMAT_xxxxBBBBGGGGRRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 0,4,8>)
+#define PALETTE_FORMAT_xxxxBBBBRRRRGGGG raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 4,0,8>)
+#define PALETTE_FORMAT_xxxxRRRRBBBBGGGG raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 8,0,4>)
+#define PALETTE_FORMAT_xxxxRRRRGGGGBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 8,4,0>)
+#define PALETTE_FORMAT_RRRRGGGGBBBBxxxx raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 12,8,4>)
 
+// standard 4-4-4-4 formats
+#define PALETTE_FORMAT_IIIIRRRRGGGGBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_irgb_decoder<4,4,4,4, 12,8,4,0>)
+#define PALETTE_FORMAT_RRRRGGGGBBBBIIII raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_irgb_decoder<4,4,4,4, 0,12,8,4>)
 
+// standard 5-5-5 formats
+#define PALETTE_FORMAT_xBBBBBGGGGGRRRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 0,5,10>)
+#define PALETTE_FORMAT_xBBBBBRRRRRGGGGG raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 5,0,10>)
+#define PALETTE_FORMAT_xRRRRRGGGGGBBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>)
+#define PALETTE_FORMAT_xGGGGGRRRRRBBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 5,10,0>)
+#define PALETTE_FORMAT_xGGGGGBBBBBRRRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 0,10,5>)
+#define PALETTE_FORMAT_RRRRRGGGGGBBBBBx raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 11,6,1>)
+#define PALETTE_FORMAT_GGGGGRRRRRBBBBBx raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 6,11,1>)
+#define PALETTE_FORMAT_RRRRGGGGBBBBRGBx raw_to_rgb_converter(2, &raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder)
+#define PALETTE_FORMAT_xRGBRRRRGGGGBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_decoder)
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-
-/* ----- initialization and configuration ----- */
-
-/* palette initialization that takes place before the display is created */
-void palette_init(running_machine &machine);
-
-
-
-/* ----- shadow/hilight configuration ----- */
-
-/* set the global shadow brightness factor */
-void palette_set_shadow_factor(running_machine &machine, double factor);
-
-/* set the global highlight brightness factor */
-void palette_set_highlight_factor(running_machine &machine, double factor);
-
-
-
-/* ----- shadow table configuration ----- */
-
-/* select 1 of 4 different live shadow tables */
-void palette_set_shadow_mode(running_machine &machine, int mode);
-
-/* configure delta RGB values for 1 of 4 shadow tables */
-void palette_set_shadow_dRGB32(running_machine &machine, int mode, int dr, int dg, int db, int noclip);
-
-
-
-/* ----- colortable management ----- */
-
-/* allocate a new colortable with the given number of entries */
-colortable_t *colortable_alloc(running_machine &machine, UINT32 palettesize);
-
-/* set the value of a colortable entry */
-void colortable_entry_set_value(colortable_t *ctable, UINT32 entry, UINT16 value);
-
-/* return the value of a colortable entry */
-UINT16 colortable_entry_get_value(colortable_t *ctable, UINT32 entry);
-
-/* change the color of a colortable palette entry */
-void colortable_palette_set_color(colortable_t *ctable, UINT32 entry, rgb_t color);
-
-/* return the color of a colortable palette entry */
-rgb_t colortable_palette_get_color(colortable_t *ctable, UINT32 entry);
-
-/* return a 32-bit transparency mask for a given gfx element and color */
-UINT32 colortable_get_transpen_mask(colortable_t *ctable, gfx_element *gfx, int color, int transcolor);
-
-/* configure groups in a tilemap to represent transparency based on colortable entries (each group maps to a gfx color) */
-void colortable_configure_tilemap_groups(colortable_t *ctable, tilemap_t *tmap, gfx_element *gfx, int transcolor);
-
-/* return the number of entries in a colortable */
-UINT32 colortable_palette_get_size(colortable_t *ctable);
+// standard 8-8-8 formats
+#define PALETTE_FORMAT_XRGB raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 16,8,0>)
+#define PALETTE_FORMAT_XBGR raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 0,8,16>)
 
 
 
-/* ----- utilities ----- */
+//**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
 
-/* return the pen for a fixed black color */
-pen_t get_black_pen(running_machine &machine);
+#define MCFG_PALETTE_ADD(_tag, _entries) \
+	MCFG_DEVICE_ADD(_tag, PALETTE, 0) \
+	MCFG_PALETTE_ENTRIES(_entries) \
 
-/* return the pen for a fixed white color */
-pen_t get_white_pen(running_machine &machine);
+#define MCFG_PALETTE_ADD_INIT_BLACK(_tag, _entries) \
+	MCFG_PALETTE_ADD(_tag, _entries) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_all_black), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_MODIFY MCFG_DEVICE_MODIFY
+
+
+#define MCFG_PALETTE_INIT_OWNER(_class, _method) \
+	palette_device::static_set_init(*device, palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, downcast<_class *>(owner)));
+#define MCFG_PALETTE_INIT_DEVICE(_tag, _class, _method) \
+	palette_device::static_set_init(*device, palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, _tag));
+
+#define MCFG_PALETTE_FORMAT(_format) \
+	palette_device::static_set_format(*device, PALETTE_FORMAT_##_format);
+
+#define MCFG_PALETTE_ENDIANNESS(_endianness) \
+	palette_device::static_set_endianness(*device, _endianness);
+
+#define MCFG_PALETTE_ENTRIES(_entries) \
+	palette_device::static_set_entries(*device, _entries);
+
+#define MCFG_PALETTE_ENABLE_SHADOWS() \
+	palette_device::static_enable_shadows(*device);
+
+#define MCFG_PALETTE_ENABLE_HILIGHTS() \
+	palette_device::static_enable_hilights(*device);
+
+
+// standard palettes
+#define MCFG_PALETTE_ADD_BLACK_AND_WHITE(_tag) \
+	MCFG_PALETTE_ADD(_tag, 2) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_black_and_white), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_WHITE_AND_BLACK(_tag) \
+	MCFG_PALETTE_ADD(_tag, 2) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_white_and_black), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_MONOCHROME_AMBER(_tag) \
+	MCFG_PALETTE_ADD(_tag, 2) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_amber), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_MONOCHROME_GREEN(_tag) \
+	MCFG_PALETTE_ADD(_tag, 2) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_green), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB(_tag) \
+	MCFG_PALETTE_ADD(_tag, 32768) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR(_tag) \
+	MCFG_PALETTE_ADD(_tag, 32768) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_BBBBBGGGGGRRRRR), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB(_tag) \
+	MCFG_PALETTE_ADD(_tag, 65536) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGGBBBBB), downcast<palette_device *>(device)));
+
+
+// other standard palettes
+#define MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS(_tag, _entries) \
+	MCFG_PALETTE_ADD(_tag, _entries) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_HARDCODED(_tag, _array) \
+	MCFG_PALETTE_ADD(_tag, sizeof(_array) / 3) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
 
 
 
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-/*-------------------------------------------------
-    palette_set_color - set a single palette
-    entry
--------------------------------------------------*/
+typedef device_delegate<void (palette_device &)> palette_init_delegate;
 
-INLINE void palette_set_color(running_machine &machine, pen_t pen, rgb_t rgb)
+
+// ======================> raw_to_rgb_converter
+
+class raw_to_rgb_converter
 {
-	machine.palette->entry_set_color(pen, rgb);
-}
+	// helper function
+	typedef rgb_t (*raw_to_rgb_func)(UINT32 raw);
+
+public:
+	// constructor
+	raw_to_rgb_converter(int bytes_per_entry = 0, raw_to_rgb_func func = NULL)
+		: m_bytes_per_entry(bytes_per_entry),
+		  m_func(func) { }
+	
+	// getters
+	int bytes_per_entry() const { return m_bytes_per_entry; }
+	
+	// helpers
+	rgb_t operator()(UINT32 raw) const { return (*m_func)(raw); }
+
+	// generic raw-to-RGB conversion helpers
+	template<int _RedBits, int _GreenBits, int _BlueBits, int _RedShift, int _GreenShift, int _BlueShift>
+	static rgb_t standard_rgb_decoder(UINT32 raw)
+	{
+		UINT8 r = palexpand<_RedBits>(raw >> _RedShift);
+		UINT8 g = palexpand<_GreenBits>(raw >> _GreenShift);
+		UINT8 b = palexpand<_BlueBits>(raw >> _BlueShift);
+		return rgb_t(r, g, b);
+	}
+	template<int _IntBits, int _RedBits, int _GreenBits, int _BlueBits, int _IntShift, int _RedShift, int _GreenShift, int _BlueShift>
+	static rgb_t standard_irgb_decoder(UINT32 raw)
+	{
+		UINT8 i = palexpand<_IntBits>(raw >> _IntShift);
+		UINT8 r = (i * palexpand<_RedBits>(raw >> _RedShift)) >> 8;
+		UINT8 g = (i * palexpand<_GreenBits>(raw >> _GreenShift)) >> 8;
+		UINT8 b = (i * palexpand<_BlueBits>(raw >> _BlueShift)) >> 8;
+		return rgb_t(r, g, b);
+	}
+	
+	// other standard decoders
+	static rgb_t RRRRGGGGBBBBRGBx_decoder(UINT32 raw);	// bits 3/2/1 are LSb
+	static rgb_t xRGBRRRRGGGGBBBB_decoder(UINT32 raw);	// bits 14/13/12 are LSb
+
+private:
+	// internal data
+	int					m_bytes_per_entry;
+	raw_to_rgb_func		m_func;
+};
 
 
-/*-------------------------------------------------
-    palette_set_color_rgb - set a single palette
-    entry with individual R,G,B components
--------------------------------------------------*/
+// ======================> palette_device
 
-INLINE void palette_set_color_rgb(running_machine &machine, pen_t pen, UINT8 r, UINT8 g, UINT8 b)
+// device type definition
+extern const device_type PALETTE;
+
+class palette_device : 	public device_t
 {
-	machine.palette->entry_set_color(pen, rgb_t(r, g, b));
-}
+	static const int MAX_SHADOW_PRESETS = 4;
+
+public:
+	// construction/destruction
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration
+	static void static_set_init(device_t &device, palette_init_delegate init);
+	static void static_set_format(device_t &device, raw_to_rgb_converter raw_to_rgb);
+	static void static_set_endianness(device_t &device, endianness_t endianness);
+	static void static_set_entries(device_t &device, int entries);
+	static void static_enable_shadows(device_t &device);
+	static void static_enable_hilights(device_t &device);
+	
+	// getters
+	int entries() const { return m_entries; }
+	int indirect_entries() const { return m_indirect_entry.count(); }
+	palette_t *palette() const { return m_palette; }
+	const pen_t &pen(int index) const { return m_pens[index]; }
+	const pen_t *pens() const { return m_pens; }
+	pen_t *shadow_table() const { return m_shadow_table; }
+	rgb_t pen_color(pen_t pen) { return m_palette->entry_color(pen); }
+	double pen_contrast(pen_t pen) { return m_palette->entry_contrast(pen); } 
+	pen_t black_pen() const { return m_black_pen; }
+	pen_t white_pen() const { return m_white_pen; }
+	memory_array &basemem() { return m_paletteram; }
+	memory_array &extmem() { return m_paletteram_ext; }
+	bool shadows_enabled() { return m_enable_shadows; }
+	bool hilights_enabled() { return m_enable_hilights; }
+
+	// setters
+	void set_pen_color(pen_t pen, rgb_t rgb) { m_palette->entry_set_color(pen, rgb); }
+	void set_pen_color(pen_t pen, UINT8 r, UINT8 g, UINT8 b) { m_palette->entry_set_color(pen, rgb_t(r, g, b)); }
+	void set_pen_colors(pen_t color_base, const rgb_t *colors, int color_count) { while (color_count--) set_pen_color(color_base++, *colors++); }
+	void set_pen_contrast(pen_t pen, double bright) { m_palette->entry_set_contrast(pen, bright); }
+
+	// indirection (aka colortables)
+	UINT16 pen_indirect(int index) const { return m_indirect_entry[index]; }
+	rgb_t indirect_color(int index) const { return m_indirect_colors[index]; }
+	void set_indirect_color(int index, rgb_t rgb);
+	void set_pen_indirect(pen_t pen, UINT16 index);
+	UINT32 transpen_mask(gfx_element &gfx, int color, int transcolor);
+	void configure_tilemap_groups(tilemap_t &tmap, gfx_element &gfx, int transcolor);
+
+	// shadow config
+	void set_shadow_factor(double factor) { assert(m_shadow_group != 0); m_palette->group_set_contrast(m_shadow_group, factor); }
+	void set_highlight_factor(double factor) { assert(m_hilight_group != 0); m_palette->group_set_contrast(m_hilight_group, factor); }
+	void set_shadow_mode(int mode) { assert(mode >= 0 && mode < MAX_SHADOW_PRESETS); m_shadow_table = m_shadow_tables[mode].base; }
+	
+	// generic read/write handlers
+	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_WRITE8_MEMBER(write_ext);
+	DECLARE_WRITE16_MEMBER(write);
+	DECLARE_WRITE16_MEMBER(write_ext);
+	DECLARE_WRITE32_MEMBER(write);
+
+	// generic palette init routines
+	void palette_init_all_black(palette_device &palette);
+	void palette_init_black_and_white(palette_device &palette);
+	void palette_init_white_and_black(palette_device &palette);
+	void palette_init_monochrome_amber(palette_device &palette);
+	void palette_init_monochrome_green(palette_device &palette);
+	void palette_init_RRRRGGGGBBBB_proms(palette_device &palette);
+	void palette_init_RRRRRGGGGGBBBBB(palette_device &palette);
+	void palette_init_BBBBBGGGGGRRRRR(palette_device &palette);
+	void palette_init_RRRRRGGGGGGBBBBB(palette_device &palette);
+	
+protected:
+	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const;
+	virtual void device_start();
+	virtual void device_pre_save();
+	virtual void device_post_load();
+	virtual void device_stop();
+
+	void allocate_palette();
+	void allocate_color_tables();
+	void allocate_shadow_tables();
+	
+	void update_for_write(offs_t byte_offset, int bytes_modified);
+public:	// needed by konamigx
+	void set_shadow_dRGB32(int mode, int dr, int dg, int db, bool noclip);
+protected:
+	void configure_rgb_shadows(int mode, float factor);
+	
+private:
+	// configuration state
+	int					m_entries;				// number of entries in the palette
+	bool				m_enable_shadows;		// are shadows enabled?
+	bool				m_enable_hilights;		// are hilights enabled?
+
+	// palette RAM
+	raw_to_rgb_converter m_raw_to_rgb;			// format of palette RAM
+	endianness_t		m_endianness;			// endianness of palette RAM
+	bool				m_endianness_supplied;	// endianness supplied in static config
+	memory_array		m_paletteram;			// base memory
+	memory_array		m_paletteram_ext;		// extended memory
+
+	// internal state
+	palette_t *			m_palette;				// the palette itself
+	const pen_t *       m_pens; 				// remapped palette pen numbers
+	bitmap_format       m_format;				// format assumed for palette data
+	pen_t *             m_shadow_table;			// table for looking up a shadowed pen
+	UINT32              m_shadow_group;			// index of the shadow group, or 0 if none
+	UINT32              m_hilight_group;		// index of the hilight group, or 0 if none
+	pen_t               m_white_pen;			// precomputed white pen value
+	pen_t               m_black_pen;			// precomputed black pen value
+	
+	// indirection state
+	dynamic_array<rgb_t> m_indirect_colors;		// actual colors set for indirection
+	dynamic_array<UINT16> m_indirect_entry;		// indirection values
+
+	struct shadow_table_data
+	{
+		pen_t *            base;               // pointer to the base of the table
+		INT16              dr;                 // delta red value
+		INT16              dg;                 // delta green value
+		INT16              db;                 // delta blue value
+		bool               noclip;             // clip?
+	};
+	shadow_table_data   m_shadow_tables[MAX_SHADOW_PRESETS]; // array of shadow table data
+
+	dynamic_array<pen_t> m_save_pen;           // pens for save/restore
+	dynamic_array<float> m_save_contrast;      // brightness for save/restore
+	
+	dynamic_array<pen_t> m_pen_array;
+	dynamic_array<pen_t> m_shadow_array;
+	dynamic_array<pen_t> m_hilight_array;
+	palette_init_delegate m_init;
+};
+
+// device type iterator
+typedef device_type_iterator<&device_creator<palette_device>, palette_device> palette_device_iterator;
 
 
-/*-------------------------------------------------
-    palette_get_color - return a single palette
-    entry
--------------------------------------------------*/
-
-INLINE rgb_t palette_get_color(running_machine &machine, pen_t pen)
-{
-	return machine.palette->entry_color(pen);
-}
-
-
-/*-------------------------------------------------
-    palette_set_pen_contrast - set the per-pen
-    contrast factor
--------------------------------------------------*/
-
-INLINE void palette_set_pen_contrast(running_machine &machine, pen_t pen, double bright)
-{
-	machine.palette->entry_set_contrast(pen, bright);
-}
-
-
-/*-------------------------------------------------
-    palette_set_colors - set multiple palette
-    entries from an array of rgb_t values
--------------------------------------------------*/
-
-INLINE void palette_set_colors(running_machine &machine, pen_t color_base, const rgb_t *colors, int color_count)
-{
-	while (color_count--)
-		machine.palette->entry_set_color(color_base++, *colors++);
-}
-
-
-#endif  /* __PALETTE_H__ */
+#endif  // __EMUPAL_H__

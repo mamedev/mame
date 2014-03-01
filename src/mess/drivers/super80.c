@@ -649,8 +649,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", super80)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
@@ -697,8 +696,10 @@ static MACHINE_CONFIG_DERIVED( super80m, super80 )
 	MCFG_CPU_PROGRAM_MAP(super80m_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", super80m)
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(super80_state,super80m)
+	
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80m)
@@ -721,8 +722,8 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80v)
 	MCFG_SCREEN_VBLANK_DRIVER(super80_state, screen_eof_super80m)
 
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(super80_state,super80m)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
 

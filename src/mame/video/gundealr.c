@@ -92,7 +92,7 @@ WRITE8_MEMBER(gundealr_state::gundealr_paletteram_w)
 	b = (val >> 4) & 0x0f;
 	/* TODO: the bottom 4 bits are used as well, but I'm not sure about the meaning */
 
-	palette_set_color_rgb(machine(), offset / 2, pal4bit(r), pal4bit(g), pal4bit(b));
+	m_palette->set_pen_color(offset / 2, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 WRITE8_MEMBER(gundealr_state::gundealr_fg_scroll_w)

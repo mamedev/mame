@@ -38,7 +38,7 @@ PALETTE_INIT_MEMBER(btime_state,btime)
 	/* This function is also used by Eggs. */
 	if (color_prom == 0) return;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -58,7 +58,7 @@ PALETTE_INIT_MEMBER(btime_state,btime)
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 
@@ -84,7 +84,7 @@ PALETTE_INIT_MEMBER(btime_state,lnc)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -104,7 +104,7 @@ PALETTE_INIT_MEMBER(btime_state,lnc)
 		bit2 = (color_prom[i] >> 0) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 
@@ -140,7 +140,7 @@ WRITE8_MEMBER(btime_state::btime_paletteram_w)
 {
 	m_paletteram[offset] = data;
 	/* RGB output is inverted */
-	paletteram_BBGGGRRR_byte_w(space, offset, ~data);
+	m_palette->write(space, offset, UINT8(~data));
 }
 
 WRITE8_MEMBER(btime_state::lnc_videoram_w)
@@ -310,7 +310,7 @@ void btime_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, U
 			y = 33 - y;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flip_screen(),flip_screen(),
@@ -351,7 +351,7 @@ void btime_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 		y = y - sprite_y_adjust;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				sprite_ram[offs + interleave],
 				color,
 				flipx,flipy,
@@ -360,7 +360,7 @@ void btime_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		y = y + (flip_screen() ? -256 : 256);
 
 		// Wrap around
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				sprite_ram[offs + interleave],
 				color,
 				flipx,flipy,
@@ -398,7 +398,7 @@ void btime_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipre
 				y = 256 - y;
 			}
 
-			m_gfxdecode->gfx(2)->opaque(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->opaque(m_palette,bitmap,cliprect,
 					gfx[tileoffset + offs],
 					color,
 					flip_screen(),flip_screen(),
@@ -494,7 +494,7 @@ UINT32 btime_state::screen_update_bnj(screen_device &screen, bitmap_ind16 &bitma
 				sy = 256 - sy;
 			}
 
-			m_gfxdecode->gfx(2)->opaque(*m_background_bitmap,m_background_bitmap->cliprect(),
+			m_gfxdecode->gfx(2)->opaque(m_palette,*m_background_bitmap,m_background_bitmap->cliprect(),
 					(m_bnj_backgroundram[offs] >> 4) + ((offs & 0x80) >> 3) + 32,
 					0,
 					flip_screen(), flip_screen(),
@@ -540,7 +540,7 @@ UINT32 btime_state::screen_update_cookrace(screen_device &screen, bitmap_ind16 &
 			sy = 33 - sy;
 		}
 
-		m_gfxdecode->gfx(2)->opaque(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->opaque(m_palette,bitmap,cliprect,
 				m_bnj_backgroundram[offs],
 				0,
 				flip_screen(), flip_screen(),

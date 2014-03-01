@@ -185,7 +185,7 @@ static MACHINE_CONFIG_START( ct486, ct486_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// video hardware
-	MCFG_PALETTE_LENGTH(256) // todo: really needed?
+	MCFG_PALETTE_ADD("palette", 256) // todo: really needed?
 MACHINE_CONFIG_END
 
 

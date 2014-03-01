@@ -39,7 +39,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
+	virtual void device_reset();	
 public:
 	int m_framecnt;
 
@@ -51,6 +51,7 @@ public:
 	UINT8   m_hsync;
 	UINT8   *m_videoram;
 	UINT8   m_pixel;
+	required_device<palette_device> m_palette;
 };
 
 

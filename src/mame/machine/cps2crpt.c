@@ -861,6 +861,7 @@ static const struct game_keys keys_table[] =
 	{ "19xxa",    { 0xcce74cf5,0xb7da3711 }, 0x200000 },    // 0C81 0095 1101  cmpi.l  #$00951101,D1
 	{ "19xxj",    { 0x00115df8,0x000ff87e }, 0x200000 },    // 0C81 0095 1101  cmpi.l  #$00951101,D1
 	{ "19xxjr1",  { 0x00115df8,0x000ff87e }, 0x200000 },    // 0C81 0095 1101  cmpi.l  #$00951101,D1
+	{ "19xxjr2",  { 0x00115df8,0x000ff87e }, 0x200000 },    // 0C81 0095 1101  cmpi.l  #$00951101,D1
 	{ "19xxh",    { 0x5d49bafa,0xf7216c9f }, 0x200000 },    // 0C81 0095 1101  cmpi.l  #$00951101,D1
 	{ "19xxb",    { 0xe5f9476a,0x2dfb623f }, 0x200000 },    // 0C81 0095 1101  cmpi.l  #$00951101,D1
 	{ "ddsom",    { 0x87889abc,0xd81f5f63 }, 0x100000 },    // 0C81 1966 0419  cmpi.l  #$19660419,D1
@@ -917,6 +918,7 @@ static const struct game_keys keys_table[] =
 	{ "csclub1",  { 0x662e9fa0,0x4210e7c1 }, 0x200000 },    // 0C81 0097 0310  cmpi.l  #$00970310,D1
 	{ "cscluba",  { 0x1366de2a,0x9ab42937 }, 0x200000 },    // 0C81 0097 0310  cmpi.l  #$00970310,D1
 	{ "csclubj",  { 0x4a2d0be5,0x56c013c0 }, 0x200000 },    // 0C81 0097 0310  cmpi.l  #$00970310,D1
+	{ "csclubjy", { 0x4a2d0be5,0x56c013c0 }, 0x200000 },    // 0C81 0097 0310  cmpi.l  #$00970310,D1
 	{ "csclubh",  { 0xf014a8a7,0x2e7794d0 }, 0x200000 },    // 0C81 0097 0310  cmpi.l  #$00970310,D1
 	{ "mshvsf",   { 0x1384ae60,0x9cd725bf }, 0x100000 },    // 0C81 1972 1027  cmpi.l  #$19721027,D1
 	{ "mshvsfu",  { 0xa36d4971,0xcef51b28 }, 0x100000 },    // 0C81 1972 1027  cmpi.l  #$19721027,D1

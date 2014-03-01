@@ -93,7 +93,7 @@ WRITE8_MEMBER(cloud9_state::cloud9_paletteram_w)
 	bit2 = (~b >> 2) & 0x01;
 	b = combine_3_weights(m_bweights, bit0, bit1, bit2);
 
-	palette_set_color(machine(), offset & 0x3f, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset & 0x3f, rgb_t(r, g, b));
 }
 
 
@@ -238,7 +238,7 @@ UINT32 cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 &b
 {
 	UINT8 *spriteaddr = m_spriteram;
 	int flip = m_video_control[5] ? 0xff : 0x00;    /* PLAYER2 */
-	pen_t black = get_black_pen(machine());
+	pen_t black = m_palette->black_pen();
 	int x, y, offs;
 
 	/* draw the sprites */
@@ -253,9 +253,9 @@ UINT32 cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 &b
 			int which = spriteaddr[offs + 0x20];
 			int color = 0;
 
-			m_gfxdecode->gfx(0)->transpen(m_spritebitmap,cliprect, which, color, xflip, yflip, x, y, 0);
+			m_gfxdecode->gfx(0)->transpen(m_palette,m_spritebitmap,cliprect, which, color, xflip, yflip, x, y, 0);
 			if (x >= 256 - 16)
-				m_gfxdecode->gfx(0)->transpen(m_spritebitmap,cliprect, which, color, xflip, yflip, x - 256, y, 0);
+				m_gfxdecode->gfx(0)->transpen(m_palette,m_spritebitmap,cliprect, which, color, xflip, yflip, x - 256, y, 0);
 		}
 
 	/* draw the bitmap to the screen, looping over Y */

@@ -61,7 +61,7 @@ void warriorb_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		if (x > 0x3c0) x -= 0x400;
 		if (y > 0x180) y -= 0x200;
 
-		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->prio_transpen(m_palette,bitmap,cliprect,
 					tilenum,
 					color,
 					flipx,flipy,
@@ -99,7 +99,7 @@ UINT32 warriorb_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 
 	// draw middle layer
 	tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 1);

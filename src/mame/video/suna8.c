@@ -174,7 +174,7 @@ WRITE8_MEMBER( suna8_state::brickzn_banked_paletteram_w )
 		b   =   (rgb >>  4) & 0x0f;
 	}
 
-	palette_set_color_rgb(machine(),offset/2,pal4bit(r),pal4bit(g),pal4bit(b));
+	m_palette->set_pen_color(offset/2,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
 
@@ -378,7 +378,7 @@ void suna8_state::draw_normal_sprites(bitmap_ind16 &bitmap,const rectangle &clip
 					sy = max_y - sy;    tile_flipy = !tile_flipy;
 				}
 
-				m_gfxdecode->gfx(which)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(which)->transpen(m_palette,bitmap,cliprect,
 							tile + (attr & 0x3)*0x100 + gfxbank,
 							(((attr >> 2) & 0xf) | colorbank) + 0x10 * m_palettebank,    // hardhea2 player2
 							tile_flipx, tile_flipy,
@@ -442,7 +442,7 @@ void suna8_state::draw_text_sprites(bitmap_ind16 &bitmap,const rectangle &clipre
 					sy = max_y - sy;    flipy = !flipy;
 				}
 
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 							tile + (attr & 0x3)*0x100 + bank,
 							(attr >> 2) & 0xf,
 							flipx, flipy,

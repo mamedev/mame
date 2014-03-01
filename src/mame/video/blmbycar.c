@@ -45,7 +45,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 WRITE16_MEMBER(blmbycar_state::blmbycar_palette_w)
 {
 	data = COMBINE_DATA(&m_paletteram[offset]);
-	palette_set_color_rgb( machine(), offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
+	m_palette->set_pen_color( offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 }
 
 
@@ -191,7 +191,7 @@ void blmbycar_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 		x   = (x & 0x1ff) - 0x10;
 		y   = 0xf0 - ((y & 0xff)  - (y & 0x100));
 
-		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->prio_transpen(m_palette,bitmap,cliprect,
 					code,
 					0x20 + (attr & 0xf),
 					flipx, flipy,

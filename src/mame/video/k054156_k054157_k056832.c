@@ -214,7 +214,8 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_uses_tile_banks(0),
 	m_cur_tile_bank(0),
 	m_k055555(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this),
+	m_palette(*this)
 {
 }
 
@@ -228,6 +229,16 @@ void k056832_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 	downcast<k056832_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void k056832_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<k056832_device &>(device).m_palette.set_tag(tag);
+}
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -2126,37 +2137,37 @@ void k056832_device::create_gfx(running_machine &machine, const char *gfx_memory
 	{
 		case K056832_BPP_4:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*4);
-			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout4, 4);
+			konami_decode_gfx(machine, m_gfxdecode, m_palette, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout4, 4);
 			break;
 
 		case K056832_BPP_5:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*5);
-			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout5, 5);
+			konami_decode_gfx(machine, m_gfxdecode, m_palette, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout5, 5);
 			break;
 
 		case K056832_BPP_6:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*6);
-			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout6, 6);
+			konami_decode_gfx(machine, m_gfxdecode, m_palette, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout6, 6);
 			break;
 
 		case K056832_BPP_8:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 8);
+			konami_decode_gfx(machine, m_gfxdecode, m_palette, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8, 8);
 			break;
 
 		case K056832_BPP_8LE:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8le, 8);
+			konami_decode_gfx(machine, m_gfxdecode, m_palette, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8le, 8);
 			break;
 
 		case K056832_BPP_8TASMAN:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*8);
-			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8_tasman, 8);
+			konami_decode_gfx(machine, m_gfxdecode, m_palette, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout8_tasman, 8);
 			break;
 
 		case K056832_BPP_4dj:
 			total = machine.root_device().memregion(gfx_memory_region)->bytes() / (i*4);
-			konami_decode_gfx(machine, m_gfxdecode, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout4dj, 4);
+			konami_decode_gfx(machine, m_gfxdecode, m_palette, gfx_index, machine.root_device().memregion(gfx_memory_region)->base(), total, &charlayout4dj, 4);
 			break;
 
 		default:

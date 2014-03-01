@@ -228,8 +228,9 @@ static MACHINE_CONFIG_START( vulgus, vulgus_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vulgus_state, screen_update_vulgus)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", vulgus)
-	MCFG_PALETTE_LENGTH(64*4+16*16+4*32*8)
 
+	MCFG_PALETTE_ADD("palette", 64*4+16*16+4*32*8)
+	MCFG_PALETTE_INIT_OWNER(vulgus_state, vulgus)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -17,7 +17,7 @@
  *
  *************************************/
 
-void m52_state::palette_init()
+PALETTE_INIT_MEMBER(m52_state, m52)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	const UINT8 *char_pal = color_prom + 0x000;
@@ -28,8 +28,6 @@ void m52_state::palette_init()
 	static const int resistances_2[2]  = { 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[3], scale;
 	int i;
-
-	machine().colortable = colortable_alloc(machine(), 512 + 32 + 32);
 
 	/* compute palette information for characters/backgrounds */
 	scale = compute_resistor_weights(0, 255, -1.0,
@@ -45,7 +43,7 @@ void m52_state::palette_init()
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r,g,b));
 	}
 
 	/* background palette */
@@ -56,7 +54,7 @@ void m52_state::palette_init()
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
 
-		colortable_palette_set_color(machine().colortable, 512+i, rgb_t(r,g,b));
+		palette.set_indirect_color(512+i, rgb_t(r,g,b));
 	}
 
 	/* compute palette information for sprites */
@@ -73,18 +71,18 @@ void m52_state::palette_init()
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		colortable_palette_set_color(machine().colortable, 512 + 32 + i, rgb_t(r,g,b));
+		palette.set_indirect_color(512 + 32 + i, rgb_t(r,g,b));
 	}
 
 	/* character lookup table */
 	for (i = 0; i < 512; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* sprite lookup table */
 	for (i = 0; i < 16 * 4; i++)
 	{
 		UINT8 promval = sprite_table[(i & 3) | ((i & ~3) << 1)];
-		colortable_entry_set_value(machine().colortable, 512 + i, 512 + 32 + promval);
+		palette.set_pen_indirect(512 + i, 512 + 32 + promval);
 	}
 
 	/* background */
@@ -93,18 +91,18 @@ void m52_state::palette_init()
 	/* xbb00: mountains */
 	/* 0xxbb: hills */
 	/* 1xxbb: city */
-	colortable_entry_set_value(machine().colortable, 512+16*4+0*4+0, 512);
-	colortable_entry_set_value(machine().colortable, 512+16*4+0*4+1, 512+4);
-	colortable_entry_set_value(machine().colortable, 512+16*4+0*4+2, 512+8);
-	colortable_entry_set_value(machine().colortable, 512+16*4+0*4+3, 512+12);
-	colortable_entry_set_value(machine().colortable, 512+16*4+1*4+0, 512);
-	colortable_entry_set_value(machine().colortable, 512+16*4+1*4+1, 512+1);
-	colortable_entry_set_value(machine().colortable, 512+16*4+1*4+2, 512+2);
-	colortable_entry_set_value(machine().colortable, 512+16*4+1*4+3, 512+3);
-	colortable_entry_set_value(machine().colortable, 512+16*4+2*4+0, 512);
-	colortable_entry_set_value(machine().colortable, 512+16*4+2*4+1, 512+16+1);
-	colortable_entry_set_value(machine().colortable, 512+16*4+2*4+2, 512+16+2);
-	colortable_entry_set_value(machine().colortable, 512+16*4+2*4+3, 512+16+3);
+	palette.set_pen_indirect(512+16*4+0*4+0, 512);
+	palette.set_pen_indirect(512+16*4+0*4+1, 512+4);
+	palette.set_pen_indirect(512+16*4+0*4+2, 512+8);
+	palette.set_pen_indirect(512+16*4+0*4+3, 512+12);
+	palette.set_pen_indirect(512+16*4+1*4+0, 512);
+	palette.set_pen_indirect(512+16*4+1*4+1, 512+1);
+	palette.set_pen_indirect(512+16*4+1*4+2, 512+2);
+	palette.set_pen_indirect(512+16*4+1*4+3, 512+3);
+	palette.set_pen_indirect(512+16*4+2*4+0, 512);
+	palette.set_pen_indirect(512+16*4+2*4+1, 512+16+1);
+	palette.set_pen_indirect(512+16*4+2*4+2, 512+16+2);
+	palette.set_pen_indirect(512+16*4+2*4+3, 512+16+3);
 }
 
 
@@ -308,7 +306,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	ypos = ypos + (22 - 8);
 
 	
-		m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(image)->transpen(m_palette,bitmap,cliprect,
 		0, 0,
 		flip_screen(),
 		flip_screen(),
@@ -316,7 +314,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		ypos, 0);
 
 	
-		m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(image)->transpen(m_palette,bitmap,cliprect,
 		0, 0,
 		flip_screen(),
 		flip_screen(),
@@ -410,9 +408,9 @@ UINT32 m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap,
 		clip = cliprect;
 #endif
 
-		m_gfxdecode->gfx(1)->transmask(bitmap,clip,
+		m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,clip,
 			code, color, flipx, flipy, sx, sy,
-			colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 512 + 32));
+			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512 + 32));
 	}
 	return 0;
 }

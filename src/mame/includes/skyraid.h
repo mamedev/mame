@@ -27,7 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(skyraid_offset_w);
 	DECLARE_WRITE8_MEMBER(skyraid_scroll_w);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(skyraid);
 	UINT32 screen_update_skyraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(skyraid_sound_w);
 	void draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect);

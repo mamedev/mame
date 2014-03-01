@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( laserbas_io, AS_IO, 8, laserbas_state )
 	AM_RANGE(0x20, 0x23) AM_WRITE(out_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("pit0", pit8253_device, read, write)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("pit1", pit8253_device, read, write)
-	AM_RANGE(0x80, 0x9f) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
+	AM_RANGE(0x80, 0x9f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( laserbas )
@@ -330,7 +330,8 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 3000000/4, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
 
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_FORMAT(RRRGGGBB)
 MACHINE_CONFIG_END
 
 /*

@@ -767,9 +767,10 @@ static MACHINE_CONFIG_START( ladybug, ladybug_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ladybug_state, screen_update_ladybug)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ladybug)
-	MCFG_PALETTE_LENGTH(4*8+4*16)
+	MCFG_PALETTE_ADD("palette", 4*8+4*16)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_PALETTE_INIT_OVERRIDE(ladybug_state,ladybug)
+	MCFG_PALETTE_INIT_OWNER(ladybug_state,ladybug)
 	MCFG_VIDEO_START_OVERRIDE(ladybug_state,ladybug)
 
 	/* sound hardware */
@@ -808,9 +809,10 @@ static MACHINE_CONFIG_START( sraider, ladybug_state )
 	MCFG_SCREEN_VBLANK_DRIVER(ladybug_state, screen_eof_sraider)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sraider)
-	MCFG_PALETTE_LENGTH(4*8+4*16+32+2)
+	MCFG_PALETTE_ADD("palette", 4*8+4*16+32+2)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_PALETTE_INIT_OVERRIDE(ladybug_state,sraider)
+	MCFG_PALETTE_INIT_OWNER(ladybug_state,sraider)
 	MCFG_VIDEO_START_OVERRIDE(ladybug_state,sraider)
 
 	/* sound hardware */

@@ -73,7 +73,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_bg_w)
 }
 
 
-static void coinmstr_set_pal(running_machine &machine, UINT32 paldat, int col)
+static void coinmstr_set_pal(palette_device &palette, UINT32 paldat, int col)
 {
 	col = col *4;
 
@@ -97,10 +97,10 @@ static void coinmstr_set_pal(running_machine &machine, UINT32 paldat, int col)
 		b3 = (paldat & 0x0001) >> 0 ;
 
 
-		palette_set_color_rgb(machine, col+0, (b0 * 255) << 5, (g0 * 255) << 5, (r0 * 255) << 5);
-		palette_set_color_rgb(machine, col+2, (b1 * 255) << 5, (g1 * 255) << 5, (r1 * 255) << 5);
-		palette_set_color_rgb(machine, col+1, (b2 * 255) << 5, (g2 * 255) << 5, (r2 * 255) << 5);
-		palette_set_color_rgb(machine, col+3, (b3 * 255) << 5, (g3 * 255) << 5, (r3 * 255) << 5);
+		palette.set_pen_color(col+0, (b0 * 255) << 5, (g0 * 255) << 5, (r0 * 255) << 5);
+		palette.set_pen_color(col+2, (b1 * 255) << 5, (g1 * 255) << 5, (r1 * 255) << 5);
+		palette.set_pen_color(col+1, (b2 * 255) << 5, (g2 * 255) << 5, (r2 * 255) << 5);
+		palette.set_pen_color(col+3, (b3 * 255) << 5, (g3 * 255) << 5, (r3 * 255) << 5);
 
 	}
 }
@@ -116,7 +116,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr1_w)
 		UINT32  paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
-		coinmstr_set_pal(machine(), paldata, offset - 0x240);
+		coinmstr_set_pal(m_palette, paldata, offset - 0x240);
 
 	}
 }
@@ -131,7 +131,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr2_w)
 		UINT32  paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
-		coinmstr_set_pal(machine(), paldata, offset - 0x240);
+		coinmstr_set_pal(m_palette, paldata, offset - 0x240);
 
 	}
 }
@@ -1169,7 +1169,7 @@ static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(coinmstr_state, screen_update_coinmstr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", coinmstr)
-	MCFG_PALETTE_LENGTH(46*32*4)
+	MCFG_PALETTE_ADD("palette", 46*32*4)
 
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 14000000 / 16, h46505_intf)

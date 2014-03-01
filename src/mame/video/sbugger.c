@@ -37,7 +37,7 @@ UINT32 sbugger_state::screen_update_sbugger(screen_device &screen, bitmap_ind16 
 }
 
 /* not right but so we can see things ok */
-void sbugger_state::palette_init()
+PALETTE_INIT_MEMBER(sbugger_state, sbugger)
 {
 	/* just some random colours for now */
 	int i;
@@ -49,8 +49,8 @@ void sbugger_state::palette_init()
 		int b = machine().rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
-		palette_set_color(machine(),i*2+1,rgb_t(r,g,b));
-		palette_set_color(machine(),i*2,rgb_t(0,0,0));
+		palette.set_pen_color(i*2+1,rgb_t(r,g,b));
+		palette.set_pen_color(i*2,rgb_t(0,0,0));
 
 	}
 

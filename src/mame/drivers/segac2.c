@@ -219,7 +219,7 @@ WRITE16_MEMBER(segac2_state::palette_w )
 	b = ((newword >> 7) & 0x1e) | ((newword >> 14) & 0x01);
 
 	/* set the color */
-	palette_set_color_rgb(space.machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 
 //  megadrive_vdp_palette_lookup[offset] = (b) | (g << 5) | (r << 10);
 //  megadrive_vdp_palette_lookup_sprite[offset] = (b) | (g << 5) | (r << 10);
@@ -227,13 +227,13 @@ WRITE16_MEMBER(segac2_state::palette_w )
 	tmpr = r >> 1;
 	tmpg = g >> 1;
 	tmpb = b >> 1;
-	palette_set_color_rgb(space.machine(), offset + 0x800, pal5bit(tmpr), pal5bit(tmpg), pal5bit(tmpb));
+	m_palette->set_pen_color(offset + 0x800, pal5bit(tmpr), pal5bit(tmpg), pal5bit(tmpb));
 
 	// how is it calculated on c2?
 	tmpr = tmpr | 0x10;
 	tmpg = tmpg | 0x10;
 	tmpb = tmpb | 0x10;
-	palette_set_color_rgb(space.machine(), offset + 0x1000, pal5bit(tmpr), pal5bit(tmpg), pal5bit(tmpb));
+	m_palette->set_pen_color(offset + 0x1000, pal5bit(tmpr), pal5bit(tmpg), pal5bit(tmpb));
 }
 
 
@@ -1257,10 +1257,10 @@ VIDEO_START_MEMBER(segac2_state,segac2_new)
 //  and applies it's own external colour circuity
 UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *paldata = machine().pens;
+	const pen_t *paldata = m_palette->pens();
 	if (!m_segac2_enable_display)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 
@@ -1376,7 +1376,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(segac2_state, screen_update_segac2_new)
 	MCFG_SCREEN_VBLANK_DRIVER(segac2_state, screen_eof_megadriv )
 
-	MCFG_PALETTE_LENGTH(2048*3)
+	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	MCFG_VIDEO_START_OVERRIDE(segac2_state,segac2_new)
 

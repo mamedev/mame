@@ -13,19 +13,17 @@ PALETTE_INIT_MEMBER(equites_state,equites)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	machine().colortable = colortable_alloc(machine(), 256);
-
 	for (i = 0; i < 256; i++)
-		colortable_palette_set_color(machine().colortable, i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
+		palette.set_indirect_color(i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
 	// point to the CLUT
 	color_prom += 0x380;
 
 	for (i = 0; i < 256; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	for (i = 0; i < 0x80; i++)
-		colortable_entry_set_value(machine().colortable, i + 0x100, color_prom[i]);
+		palette.set_pen_indirect(i + 0x100, color_prom[i]);
 }
 
 PALETTE_INIT_MEMBER(equites_state,splndrbt)
@@ -33,25 +31,23 @@ PALETTE_INIT_MEMBER(equites_state,splndrbt)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	machine().colortable = colortable_alloc(machine(), 256);
+	for (i = 0; i < 0x100; i++)
+		palette.set_indirect_color(i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
 	for (i = 0; i < 0x100; i++)
-		colortable_palette_set_color(machine().colortable, i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
-
-	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	// point to the bg CLUT
 	color_prom += 0x300;
 
 	for (i = 0; i < 0x80; i++)
-		colortable_entry_set_value(machine().colortable, i + 0x100, color_prom[i] + 0x10);
+		palette.set_pen_indirect(i + 0x100, color_prom[i] + 0x10);
 
 	// point to the sprite CLUT
 	color_prom += 0x100;
 
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine().colortable, i + 0x180, color_prom[i]);
+		palette.set_pen_indirect(i + 0x180, color_prom[i]);
 }
 
 
@@ -136,7 +132,7 @@ VIDEO_START_MEMBER(equites_state,splndrbt)
 	m_fg_tilemap->set_scrolldx(8, -8);
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::splndrbt_bg_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, m_gfxdecode->gfx(1), 0x10);
+	m_palette->configure_tilemap_groups(*m_bg_tilemap, *m_gfxdecode->gfx(1), 0x10);
 }
 
 
@@ -259,7 +255,7 @@ void equites_state::equites_draw_sprites_block( bitmap_ind16 &bitmap, const rect
 			int color = (~attr & 0xf000) >> 12;
 			int sx = (m_spriteram[offs] & 0xff00) >> 8;
 			int sy = (m_spriteram[offs] & 0x00ff);
-			int transmask = colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(2), color, 0);
+			int transmask = m_palette->transpen_mask(*m_gfxdecode->gfx(2), color, 0);
 
 			if (flip_screen())
 			{
@@ -275,7 +271,7 @@ void equites_state::equites_draw_sprites_block( bitmap_ind16 &bitmap, const rect
 			// sprites are 16x14 centered in a 16x16 square, so skip the first line
 			sy += 1;
 
-			m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transmask(m_palette,bitmap,cliprect,
 					tile,
 					color,
 					fx, fy,
@@ -338,12 +334,12 @@ void equites_state::splndrbt_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 		int sx = data2 & 0x00ff;
 		int sy = m_spriteram_2[offs + 0] & 0x00ff;
 		int scalex = m_spriteram_2[offs + 1] & 0x000f;
-		int transmask = colortable_get_transpen_mask(machine().colortable, gfx, color, 0);
+		int transmask = m_palette->transpen_mask(*gfx, color, 0);
 
 //      const UINT8 * const xromline = xrom + (scalex << 4);
 		const UINT8 * const yromline = yrom + (scaley << 4) + (15 - scaley);
 		const UINT8* const srcgfx = gfx->get_data(tile);
-		const pen_t *paldata = &machine().pens[gfx->colorbase() + gfx->granularity() * color];
+		const pen_t *paldata = &m_palette->pen(gfx->colorbase() + gfx->granularity() * color);
 		int x,yy;
 
 		sy += 16;

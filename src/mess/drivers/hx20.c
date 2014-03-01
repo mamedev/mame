@@ -760,10 +760,10 @@ WRITE_LINE_MEMBER( hx20_state::rtc_irq_w )
 //  VIDEO
 //**************************************************************************
 
-void hx20_state::palette_init()
+PALETTE_INIT_MEMBER(hx20_state, hx20)
 {
-	palette_set_color_rgb(machine(), 0, 0xa5, 0xad, 0xa5);
-	palette_set_color_rgb(machine(), 1, 0x31, 0x39, 0x10);
+	palette.set_pen_color(0, 0xa5, 0xad, 0xa5);
+	palette.set_pen_color(1, 0x31, 0x39, 0x10);
 }
 
 
@@ -832,7 +832,8 @@ static MACHINE_CONFIG_START( hx20, hx20_state )
 	MCFG_SCREEN_SIZE(120, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hx20_state, screen_update)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(hx20_state, hx20)
 	MCFG_UPD7227_ADD(UPD7227_0_TAG, 0, 0)
 	MCFG_UPD7227_ADD(UPD7227_1_TAG, 40, 0)
 	MCFG_UPD7227_ADD(UPD7227_2_TAG, 80, 0)

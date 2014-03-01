@@ -35,12 +35,12 @@
 
 ***************************************************************************/
 
-void karnov_state::palette_init()
+PALETTE_INIT_MEMBER(karnov_state, karnov)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -54,13 +54,13 @@ void karnov_state::palette_init()
 		bit2 = (color_prom[0] >> 6) & 0x01;
 		bit3 = (color_prom[0] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[machine().total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[machine().total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[machine().total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[machine().total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[palette.entries()] >> 0) & 0x01;
+		bit1 = (color_prom[palette.entries()] >> 1) & 0x01;
+		bit2 = (color_prom[palette.entries()] >> 2) & 0x01;
+		bit3 = (color_prom[palette.entries()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
@@ -99,10 +99,10 @@ void karnov_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipr
 		color = tile >> 12;
 		tile = tile & 0x7ff;
 		if (m_flipscreen)
-			m_gfxdecode->gfx(1)->opaque(*m_bitmap_f,m_bitmap_f->cliprect(),tile,
+			m_gfxdecode->gfx(1)->opaque(m_palette,*m_bitmap_f,m_bitmap_f->cliprect(),tile,
 				color, fx, fy, 496-16*mx,496-16*my);
 		else
-			m_gfxdecode->gfx(1)->opaque(*m_bitmap_f,m_bitmap_f->cliprect(),tile,
+			m_gfxdecode->gfx(1)->opaque(m_palette,*m_bitmap_f,m_bitmap_f->cliprect(),tile,
 				color, fx, fy, 16*mx,16*my);
 	}
 

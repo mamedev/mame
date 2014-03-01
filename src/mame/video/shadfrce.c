@@ -129,10 +129,10 @@ void shadfrce_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		height++;
 		if (enable) {
 			for (hcount=0;hcount<height;hcount++) {
-				gfx->prio_transpen(bitmap,cliprect,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16,screen.priority(),pri_mask,0);
-				gfx->prio_transpen(bitmap,cliprect,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16,screen.priority(),pri_mask,0);
-				gfx->prio_transpen(bitmap,cliprect,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16+0x200,screen.priority(),pri_mask,0);
-				gfx->prio_transpen(bitmap,cliprect,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16+0x200,screen.priority(),pri_mask,0);
+				gfx->prio_transpen(m_palette,bitmap,cliprect,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16,screen.priority(),pri_mask,0);
+				gfx->prio_transpen(m_palette,bitmap,cliprect,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16,screen.priority(),pri_mask,0);
+				gfx->prio_transpen(m_palette,bitmap,cliprect,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16+0x200,screen.priority(),pri_mask,0);
+				gfx->prio_transpen(m_palette,bitmap,cliprect,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16+0x200,screen.priority(),pri_mask,0);
 			}
 		}
 		source-=8;
@@ -152,7 +152,7 @@ UINT32 shadfrce_state::screen_update_shadfrce(screen_device &screen, bitmap_ind1
 	}
 	else
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	}
 
 	return 0;

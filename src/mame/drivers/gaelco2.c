@@ -171,7 +171,7 @@ static MACHINE_CONFIG_START( maniacsq, gaelco2_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 0x0080000)
-	MCFG_PALETTE_LENGTH(4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -291,7 +291,7 @@ static MACHINE_CONFIG_START( bang, gaelco2_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 0x0200000)
-	MCFG_PALETTE_LENGTH(4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -532,7 +532,7 @@ static MACHINE_CONFIG_START( alighunt, gaelco2_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 0x0400000)
-	MCFG_PALETTE_LENGTH(4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -765,7 +765,7 @@ static MACHINE_CONFIG_START( touchgo, gaelco2_state )
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_GFXDECODE_ADD("gfxdecode", 0x0400000)
-	MCFG_PALETTE_LENGTH(4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
@@ -968,7 +968,7 @@ static MACHINE_CONFIG_START( snowboar, gaelco2_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 0x0400000)
-	MCFG_PALETTE_LENGTH(4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -1200,7 +1200,7 @@ static MACHINE_CONFIG_START( wrally2, gaelco2_state )
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_GFXDECODE_ADD("gfxdecode", 0x0200000)
-	MCFG_PALETTE_LENGTH(4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)

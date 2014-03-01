@@ -470,7 +470,7 @@ UINT32 bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 &b
 {
 	int x,y,count;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	count = (0x2000/2);
 
@@ -483,22 +483,22 @@ UINT32 bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 &b
 			color = (m_blit_ram[count] & 0xf000)>>12;
 
 			if(cliprect.contains(x+3, y))
-				bitmap.pix32(y, x+3) = machine().pens[color];
+				bitmap.pix32(y, x+3) = m_palette->pen(color);
 
 			color = (m_blit_ram[count] & 0x0f00)>>8;
 
 			if(cliprect.contains(x+2, y))
-				bitmap.pix32(y, x+2) = machine().pens[color];
+				bitmap.pix32(y, x+2) = m_palette->pen(color);
 
 			color = (m_blit_ram[count] & 0x00f0)>>4;
 
 			if(cliprect.contains(x+1, y))
-				bitmap.pix32(y, x+1) = machine().pens[color];
+				bitmap.pix32(y, x+1) = m_palette->pen(color);
 
 			color = (m_blit_ram[count] & 0x000f)>>0;
 
 			if(cliprect.contains(x+0, y))
-				bitmap.pix32(y, x+0) = machine().pens[color];
+				bitmap.pix32(y, x+0) = m_palette->pen(color);
 
 			count++;
 		}
@@ -517,7 +517,7 @@ READ16_MEMBER(bingor_state::test_r)
 static ADDRESS_MAP_START( bingor_map, AS_PROGRAM, 16, bingor_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x90000, 0x9ffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0xa0300, 0xa031f) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBIIII_word_w) AM_SHARE("paletteram") //wrong
+	AM_RANGE(0xa0300, 0xa031f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") //wrong
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_SHARE("blit_ram")
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -642,8 +642,8 @@ static MACHINE_CONFIG_START( bingor, bingor_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bingor_state, screen_update_bingor)
 
-	MCFG_PALETTE_LENGTH(0x100)
-
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBIIII)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SAA1099_ADD("saa", 6000000 )

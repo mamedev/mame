@@ -23,7 +23,7 @@
 
 ***************************************************************************/
 
-void kingofb_state::palette_init_common( const UINT8 *color_prom, void (kingofb_state::*get_rgb_data)(const UINT8 *, int, int *, int *, int *) )
+void kingofb_state::palette_init_common( palette_device &palette, const UINT8 *color_prom, void (kingofb_state::*get_rgb_data)(const UINT8 *, int, int *, int *, int *) )
 {
 	static const int resistances[4] = { 1500, 750, 360, 180 };
 	static const int resistances_fg[1] = { 51 };
@@ -41,9 +41,6 @@ void kingofb_state::palette_init_common( const UINT8 *color_prom, void (kingofb_
 						4, resistances, rweights, 470, 0,
 						4, resistances, gweights, 470, 0,
 						4, resistances, bweights, 470, 0);
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x108);
 
 	for (i = 0; i < 0x100; i++)
 	{
@@ -74,7 +71,7 @@ void kingofb_state::palette_init_common( const UINT8 *color_prom, void (kingofb_
 		bit3 = (b_data >> 3) & 0x01;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* the foreground chars directly map to primary colors */
@@ -91,16 +88,16 @@ void kingofb_state::palette_init_common( const UINT8 *color_prom, void (kingofb_
 		/* blue component */
 		b = (((i - 0x100) >> 0) & 0x01) * bweights_fg[0];
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	for (i = 0x101; i < 0x110; i += 2)
 	{
 		UINT16 ctabentry = ((i - 0x101) >> 1) | 0x100;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -124,13 +121,13 @@ void kingofb_state::ringking_get_rgb_data( const UINT8 *color_prom, int i, int *
 PALETTE_INIT_MEMBER(kingofb_state,kingofb)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	palette_init_common(color_prom, &kingofb_state::kingofb_get_rgb_data);
+	palette_init_common(palette, color_prom, &kingofb_state::kingofb_get_rgb_data);
 }
 
 PALETTE_INIT_MEMBER(kingofb_state,ringking)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	palette_init_common(color_prom, &kingofb_state::ringking_get_rgb_data);
+	palette_init_common(palette, color_prom, &kingofb_state::ringking_get_rgb_data);
 }
 
 WRITE8_MEMBER(kingofb_state::kingofb_videoram_w)
@@ -232,7 +229,7 @@ void kingofb_state::kingofb_draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(2 + bank)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2 + bank)->transpen(m_palette,bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -289,7 +286,7 @@ void kingofb_state::ringking_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(2 + bank)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2 + bank)->transpen(m_palette,bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);

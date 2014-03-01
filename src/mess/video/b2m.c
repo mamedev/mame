@@ -52,7 +52,7 @@ static const rgb_t b2m_palette[4] = {
 	rgb_t(0x00, 0x00, 0x00), // 3
 };
 
-void b2m_state::palette_init()
+PALETTE_INIT_MEMBER(b2m_state, b2m)
 {
-	palette_set_colors(machine(), 0, b2m_palette, ARRAY_LENGTH(b2m_palette));
+	palette.set_pen_colors(0, b2m_palette, ARRAY_LENGTH(b2m_palette));
 }

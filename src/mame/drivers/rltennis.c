@@ -185,11 +185,11 @@ static MACHINE_CONFIG_START( rltennis, rltennis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0,319, 0, 239)
 
 	MCFG_SCREEN_UPDATE_DRIVER(rltennis_state, screen_update_rltennis)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

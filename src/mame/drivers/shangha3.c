@@ -127,7 +127,7 @@ WRITE16_MEMBER(shangha3_state::shangha3_irq_ack_w)
 
 static ADDRESS_MAP_START( shangha3_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x200008, 0x200009) AM_WRITE(shangha3_blitter_go_w)
@@ -145,7 +145,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( heberpop_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("DSW")
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( blocken_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x10000a, 0x10000b) AM_READNOP AM_WRITE(shangha3_irq_ack_w) // r -> unknown purpose (value doesn't matter, left-over?)
 	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(blocken_coinctrl_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(heberpop_sound_command_w)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
@@ -478,8 +478,6 @@ static MACHINE_CONFIG_START( shangha3, shangha3_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -490,8 +488,10 @@ static MACHINE_CONFIG_START( shangha3, shangha3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
-	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -517,8 +517,6 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 	MCFG_CPU_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -529,8 +527,10 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
-	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -557,8 +557,6 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 	MCFG_CPU_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -569,8 +567,10 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
-	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -15,7 +15,7 @@
  *
  *************************************/
 
-void zaxxon_state::palette_init()
+PALETTE_INIT_MEMBER(zaxxon_state, zaxxon)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
@@ -29,7 +29,7 @@ void zaxxon_state::palette_init()
 			2,  &resistances[1], bweights, 470, 0);
 
 	/* initialize the palette with these colors */
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;
@@ -51,7 +51,7 @@ void zaxxon_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the character color codes */
@@ -353,7 +353,7 @@ void zaxxon_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 
 	/* if not enabled, fill the background with black */
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 }
 
 
@@ -428,10 +428,10 @@ void zaxxon_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		int sx = find_minimum_x(spriteram[offs + 3], flip);
 
 		/* draw with 256 pixel offsets to ensure we wrap properly */
-		 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
-		 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy - 0x100, 0);
-		 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, sx - 0x100, sy, 0);
-		 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, sx - 0x100, sy - 0x100, 0);
+		 gfx->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+		 gfx->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy - 0x100, 0);
+		 gfx->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx - 0x100, sy, 0);
+		 gfx->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx - 0x100, sy - 0x100, 0);
 	}
 }
 

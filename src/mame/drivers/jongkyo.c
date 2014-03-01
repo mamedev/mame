@@ -59,7 +59,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(jongkyo);
 	UINT32 screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
@@ -441,7 +441,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void jongkyo_state::palette_init()
+PALETTE_INIT_MEMBER(jongkyo_state, jongkyo)
 {
 	int i;
 	UINT8* proms = memregion("proms")->base();
@@ -453,7 +453,7 @@ void jongkyo_state::palette_init()
 		int g = (data  >> 3) & 0x07;
 		int b = (data  >> 6) & 0x03;
 
-			palette_set_color_rgb(machine(), i, r << 5, g << 5, b << 6 );
+			palette.set_pen_color(i, r << 5, g << 5, b << 6 );
 
 	}
 }
@@ -513,8 +513,8 @@ static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 8, 256-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jongkyo_state, screen_update_jongkyo)
 
-	MCFG_PALETTE_LENGTH(0x100)
-
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(jongkyo_state, jongkyo)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, JONGKYO_CLOCK/8)

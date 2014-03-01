@@ -405,8 +405,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x3a0d, 0x3a0d) AM_WRITE(xain_flipscreen_w)
 	AM_RANGE(0x3a0e, 0x3a0e) AM_WRITE(xain_68705_w)
 	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(xainCPUA_bankswitch_w)
-	AM_RANGE(0x3c00, 0x3dff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w) AM_SHARE("paletteram")
-	AM_RANGE(0x3e00, 0x3fff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
+	AM_RANGE(0x3c00, 0x3dff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3e00, 0x3fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -595,8 +595,8 @@ static MACHINE_CONFIG_START( xsleena, xain_state )
 	MCFG_SCREEN_UPDATE_DRIVER(xain_state, screen_update_xain)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", xain)
-	MCFG_PALETTE_LENGTH(512)
-
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

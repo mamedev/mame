@@ -298,7 +298,7 @@ WRITE32_MEMBER(polygonet_state::plygonet_palette_w)
 	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
 	b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 
-	palette_set_color(machine(),offset,rgb_t(r,g,b));
+	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
 
@@ -676,7 +676,7 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 	MCFG_SCREEN_VISIBLE_AREA(64, 64+368-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(polygonet_state, screen_update_polygonet)
 
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD("palette", 32768)
 
 	MCFG_K053936_ADD("k053936", polygonet_k053936_intf)
 

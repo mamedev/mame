@@ -155,13 +155,13 @@ void vastar_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 			if (!flip_screen())
 				sy = 224 - sy;
 
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 					code/2,
 					color,
 					flipx,flipy,
 					sx,sy,0);
 			/* redraw with wraparound */
-			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 					code/2,
 					color,
 					flipx,flipy,
@@ -172,7 +172,7 @@ void vastar_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 			if (!flip_screen())
 				sy = 240 - sy;
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,

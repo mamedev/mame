@@ -1722,9 +1722,9 @@ static MACHINE_CONFIG_START( vsnes, vsnes_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vsnes_state, screen_update_vsnes)
 
-	MCFG_PALETTE_LENGTH(8*4*16)
+	MCFG_PALETTE_ADD("palette", 8*4*16)
 
-	MCFG_PALETTE_INIT_OVERRIDE(vsnes_state,vsnes)
+	MCFG_PALETTE_INIT_OWNER(vsnes_state,vsnes)
 	MCFG_VIDEO_START_OVERRIDE(vsnes_state,vsnes)
 
 	MCFG_PPU2C04_ADD("ppu1", vsnes_ppu_interface_1)
@@ -1787,7 +1787,9 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(2*8*4*16)
+	MCFG_PALETTE_ADD("palette", 2*8*4*16)
+	MCFG_PALETTE_INIT_OWNER(vsnes_state,vsdual)
+
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("screen1", RASTER)
@@ -1802,7 +1804,6 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vsnes_state, screen_update_vsnes_bottom)
 
-	MCFG_PALETTE_INIT_OVERRIDE(vsnes_state,vsdual)
 	MCFG_VIDEO_START_OVERRIDE(vsnes_state,vsdual)
 
 	MCFG_PPU2C04_ADD("ppu1", vsnes_ppu_interface_1)
@@ -1853,9 +1854,9 @@ static MACHINE_CONFIG_START( vsnes_bootleg, vsnes_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vsnes_state, screen_update_vsnes)
 
-	MCFG_PALETTE_LENGTH(8*4*16)
+	MCFG_PALETTE_ADD("palette", 8*4*16)
 
-	MCFG_PALETTE_INIT_OVERRIDE(vsnes_state,vsnes)
+	MCFG_PALETTE_INIT_OWNER(vsnes_state,vsnes)
 	MCFG_VIDEO_START_OVERRIDE(vsnes_state,vsnes)
 
 	MCFG_PPU2C04_ADD("ppu1", vsnes_ppu_interface_1)

@@ -311,7 +311,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	MCFG_SCREEN_UPDATE_DEVICE("ygv608", ygv608_device, update_screen)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", namcond1)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -326,6 +326,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 
 	MCFG_YGV608_ADD("ygv608")
 	MCFG_YGV608_GFXDECODE("gfxdecode")
+	MCFG_YGV608_PALETTE("palette")
 MACHINE_CONFIG_END
 
 ROM_START( ncv1 )

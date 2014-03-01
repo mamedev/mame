@@ -22,6 +22,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	/*
 	The callback is passed:
@@ -53,6 +54,7 @@ private:
 	tilemap_t  *m_tmap;
 	UINT8    m_ctrlram[16];
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	void get_tile_info( tile_data &tileinfo, int tile_index );
@@ -66,4 +68,7 @@ extern const device_type K051316;
 
 #define MCFG_K051316_GFXDECODE(_gfxtag) \
 	k051316_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+	
+#define MCFG_K051316_PALETTE(_palette_tag) \
+	k051316_device::static_set_palette_tag(*device, "^" _palette_tag);
 #endif

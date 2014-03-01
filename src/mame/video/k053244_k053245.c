@@ -50,7 +50,8 @@ k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, d
 	m_rombank(0),
 	m_ramsize(0),
 	m_z_rejection(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this),
+	m_palette(*this)
 {
 }
 
@@ -64,6 +65,15 @@ void k05324x_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 	downcast<k05324x_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void k05324x_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<k05324x_device &>(device).m_palette.set_tag(tag);
+}
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -116,14 +126,14 @@ void k05324x_device::device_start()
 	{
 	case NORMAL_PLANE_ORDER:
 		total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / 128;
-		konami_decode_gfx(machine(), m_gfxdecode, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &spritelayout, 4);
+		konami_decode_gfx(machine(), m_gfxdecode, m_palette, m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &spritelayout, 4);
 		break;
 
 	default:
 		fatalerror("Unsupported plane_order\n");
 	}
 
-	if (VERBOSE && !(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(m_palette->shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* deinterleave the graphics, if needed */
@@ -529,24 +539,24 @@ void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					m_gfx->prio_transtable(bitmap,cliprect,
+					m_gfx->prio_transtable(m_palette,bitmap,cliprect,
 							c,
 							color,
 							fx,fy,
 							sx,sy,
 							priority_bitmap,pri,
-							drawmode_table,machine().shadow_table);
+							drawmode_table,m_palette->shadow_table());
 				}
 				else
 				{
-					m_gfx->prio_zoom_transtable(bitmap,cliprect,
+					m_gfx->prio_zoom_transtable(m_palette,bitmap,cliprect,
 							c,
 							color,
 							fx,fy,
 							sx,sy,
 							(zw << 16) / 16,(zh << 16) / 16,
 							priority_bitmap,pri,
-							drawmode_table,machine().shadow_table);
+							drawmode_table,m_palette->shadow_table());
 
 				}
 			}
@@ -777,24 +787,24 @@ void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const re
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					m_gfxdecode->gfx(0)->prio_transtable(bitmap,cliprect, /* hardcoded to 0 (decoded 6bpp gfx) for le */
+					m_gfxdecode->gfx(0)->prio_transtable(m_palette,bitmap,cliprect, /* hardcoded to 0 (decoded 6bpp gfx) for le */
 							c,
 							color,
 							fx,fy,
 							sx,sy,
 							priority_bitmap,pri,
-							drawmode_table,machine().shadow_table);
+							drawmode_table,m_palette->shadow_table());
 				}
 				else
 				{
-					m_gfxdecode->gfx(0)->prio_zoom_transtable(bitmap,cliprect,  /* hardcoded to 0 (decoded 6bpp gfx) for le */
+					m_gfxdecode->gfx(0)->prio_zoom_transtable(m_palette,bitmap,cliprect,  /* hardcoded to 0 (decoded 6bpp gfx) for le */
 							c,
 							color,
 							fx,fy,
 							sx,sy,
 							(zw << 16) / 16,(zh << 16) / 16,
 							priority_bitmap,pri,
-							drawmode_table,machine().shadow_table);
+							drawmode_table,m_palette->shadow_table());
 
 				}
 			}

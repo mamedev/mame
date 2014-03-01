@@ -198,8 +198,8 @@ static MACHINE_CONFIG_START( pooyan, pooyan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pooyan_state, screen_update_pooyan)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pooyan)
-	MCFG_PALETTE_LENGTH(16*16+16*16)
-
+	MCFG_PALETTE_ADD("palette", 16*16+16*16)
+	MCFG_PALETTE_INIT_OWNER(pooyan_state, pooyan)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(timeplt_sound)

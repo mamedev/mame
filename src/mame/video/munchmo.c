@@ -2,12 +2,12 @@
 #include "includes/munchmo.h"
 
 
-void munchmo_state::palette_init()
+PALETTE_INIT_MEMBER(munchmo_state, munchmo)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -26,7 +26,7 @@ void munchmo_state::palette_init()
 		bit1 = BIT(color_prom[i], 7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -64,7 +64,7 @@ void munchmo_state::draw_status( bitmap_ind16 &bitmap, const rectangle &cliprect
 		for (sy = 0; sy < 256; sy += 8)
 		{
 			
-				gfx->opaque(bitmap,cliprect,
+				gfx->opaque(m_palette,bitmap,cliprect,
 				*source++,
 				0, /* color */
 				0,0, /* no flip */
@@ -94,7 +94,7 @@ void munchmo_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clip
 		{
 			for (col = 0; col < 4; col++)
 			{
-				 gfx->opaque(*m_tmpbitmap,m_tmpbitmap->cliprect(),
+				 gfx->opaque(m_palette,*m_tmpbitmap,m_tmpbitmap->cliprect(),
 					rom[col + tile_number * 4 + row * 0x400],
 					m_palette_bank,
 					0,0, /* flip */
@@ -135,7 +135,7 @@ void munchmo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			{
 				sx = (sx >> 1) | (tile_number & 0x80);
 				sx = 2 * ((- 32 - scroll - sx) & 0xff) + xadjust;
-				 gfx->transpen(bitmap,cliprect,
+				 gfx->transpen(m_palette,bitmap,cliprect,
 					0x7f - (tile_number & 0x7f),
 					color_base - (attributes & 0x03),
 					0,0,                            /* no flip */

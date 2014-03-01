@@ -72,8 +72,8 @@ static ADDRESS_MAP_START( blktiger_map, AS_PROGRAM, 8, blktiger_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(blktiger_txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_lo_w) AM_SHARE("paletteram")
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_hi_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -329,8 +329,9 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", blktiger)
-	MCFG_PALETTE_LENGTH(1024)
 
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 

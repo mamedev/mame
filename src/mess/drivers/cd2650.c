@@ -292,8 +292,7 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	MCFG_SCREEN_SIZE(640, 160)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 159)
 	MCFG_GFXDECODE_ADD("gfxdecode", cd2650)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", cd2650_state, cd2650, "pgm", 1)

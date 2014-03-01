@@ -71,7 +71,7 @@
 #include "includes/ampoker2.h"
 
 
-void ampoker2_state::palette_init()
+PALETTE_INIT_MEMBER(ampoker2_state, ampoker2)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 /*    - bits -
@@ -89,7 +89,7 @@ void ampoker2_state::palette_init()
 			2,  resistances_b,  weights_b,  0,  0);
 
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -108,7 +108,7 @@ void ampoker2_state::palette_init()
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		r = combine_3_weights(weights_r, bit0, bit1, bit2);
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 

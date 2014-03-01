@@ -154,14 +154,14 @@ void namcos1_state::video_start()
 	memset(m_paletteram, 0, 0x8000);
 	memset(m_cus116, 0, 0x10);
 	for (i = 0; i < 0x2000; i++)
-		palette_set_color(machine(), i, rgb_t(0, 0, 0));
+		m_palette->set_pen_color(i, rgb_t(0, 0, 0));
 
 	/* all palette entries are not affected by shadow sprites... */
 	for (i = 0;i < 0x2000;i++)
-		machine().shadow_table[i] = i;
+		m_palette->shadow_table()[i] = i;
 	/* ... except for tilemap colors */
 	for (i = 0x0800;i < 0x1000;i++)
-		machine().shadow_table[i] = i + 0x0800;
+		m_palette->shadow_table()[i] = i + 0x0800;
 
 	memset(m_playfield_control, 0, sizeof(m_playfield_control));
 	m_copy_sprites = 0;
@@ -218,7 +218,7 @@ WRITE8_HANDLER( namcos1_paletteram_w )
 		r = state->m_paletteram[offset];
 		g = state->m_paletteram[offset + 0x0800];
 		b = state->m_paletteram[offset + 0x1000];
-		palette_set_color(space.machine(),color,rgb_t(r,g,b));
+		state->m_palette->set_pen_color(color,rgb_t(r,g,b));
 	}
 	else
 	{
@@ -345,7 +345,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 
 		gfx->set_source_clip(tx, sizex, ty, sizey);
 		if (color != 0x7f)
-			gfx->prio_transpen(bitmap,cliprect,
+			gfx->prio_transpen(state->m_palette,bitmap,cliprect,
 					sprite,
 					color,
 					flipx,flipy,
@@ -354,14 +354,14 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 					screen.priority(), pri_mask,
 					0xf);
 		else
-			gfx->prio_transtable(bitmap,cliprect,
+			gfx->prio_transtable(state->m_palette,bitmap,cliprect,
 					sprite,
 					color,
 					flipx,flipy,
 					sx & 0x1ff,
 					((sy + 16) & 0xff) - 16,
 					screen.priority(), pri_mask,
-					state->m_drawmode_table, screen.machine().shadow_table);
+					state->m_drawmode_table, state->m_palette->shadow_table());
 
 		source -= 0x10;
 	}
@@ -378,7 +378,7 @@ UINT32 namcos1_state::screen_update_namcos1(screen_device &screen, bitmap_ind16 
 	flip_screen_set(m_spriteram[0x0ff6] & 1);
 
 	/* background color */
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
 	i = ((m_cus116[0] << 8) | m_cus116[1]) - 1;         // min x

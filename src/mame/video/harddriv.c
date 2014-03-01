@@ -241,7 +241,7 @@ WRITE16_MEMBER( harddriv_state::hdgsp_control_hi_w )
 			break;
 
 		case 0x04:
-			if (space.machine().total_colors() >= 256 * 8)
+			if (m_palette->entries() >= 256 * 8)
 				update_palette_bank(space.machine(), (m_gfx_palettebank & ~4) | (val << 2));
 			break;
 
@@ -330,7 +330,7 @@ INLINE void gsp_palette_change(running_machine &machine, int offset)
 	int red = (state->m_gsp_paletteram_lo[offset] >> 8) & 0xff;
 	int green = state->m_gsp_paletteram_lo[offset] & 0xff;
 	int blue = state->m_gsp_paletteram_hi[offset] & 0xff;
-	palette_set_color(machine, offset, rgb_t(red, green, blue));
+	state->m_palette->set_pen_color(offset, rgb_t(red, green, blue));
 }
 
 

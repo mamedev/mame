@@ -160,7 +160,7 @@ update_palette( running_machine &machine )
 		g = data1&0xff;
 		b = data2&0xff;
 
-		palette_set_color( machine,i, rgb_t(r,g,b) );
+		state->m_palette->set_pen_color(i, rgb_t(r,g,b) );
 	}
 } /* update_palette */
 

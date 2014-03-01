@@ -35,7 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(photon2_misc_w);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(photon2);
 	UINT32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_spectrum(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
@@ -89,9 +89,9 @@ static const rgb_t spectrum_palette[16] = {
 };
 
 /* Initialise the palette */
-void photon2_state::palette_init()
+PALETTE_INIT_MEMBER(photon2_state, photon2)
 {
-	palette_set_colors(machine(), 0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
+	palette.set_pen_colors(0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
 }
 
 void photon2_state::video_start()
@@ -336,8 +336,8 @@ static MACHINE_CONFIG_START( photon2, photon2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(photon2_state, screen_update_spectrum)
 	MCFG_SCREEN_VBLANK_DRIVER(photon2_state, screen_eof_spectrum)
 
-	MCFG_PALETTE_LENGTH(16)
-
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(photon2_state, photon2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

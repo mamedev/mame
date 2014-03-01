@@ -32,11 +32,11 @@ PALETTE_INIT_MEMBER(galaxia_state,galaxia)
 	};
 
 	for (int i = 0; i < 0x18; i++)
-		palette_set_color_rgb(machine(), i, pal1bit(lut_clr[i] >> 0), pal1bit(lut_clr[i] >> 1), pal1bit(lut_clr[i] >> 2));
+		palette.set_pen_color(i, pal1bit(lut_clr[i] >> 0), pal1bit(lut_clr[i] >> 1), pal1bit(lut_clr[i] >> 2));
 
 	// stars/bullets
-	palette_set_color_rgb(machine(), STAR_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
-	palette_set_color_rgb(machine(), BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
+	palette.set_pen_color(STAR_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
+	palette.set_pen_color(BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
 }
 
 PALETTE_INIT_MEMBER(galaxia_state,astrowar)
@@ -47,16 +47,16 @@ PALETTE_INIT_MEMBER(galaxia_state,astrowar)
 	for (int i = 0; i < 8; i++)
 	{
 		// background
-		palette_set_color_rgb(machine(), i*2, 0, 0, 0);
-		palette_set_color_rgb(machine(), i*2 + 1, pal1bit(lut_clr[i] >> 0), pal1bit(lut_clr[i] >> 1), pal1bit(lut_clr[i] >> 2));
+		palette.set_pen_color(i*2, 0, 0, 0);
+		palette.set_pen_color(i*2 + 1, pal1bit(lut_clr[i] >> 0), pal1bit(lut_clr[i] >> 1), pal1bit(lut_clr[i] >> 2));
 
 		// sprites
-		palette_set_color_rgb(machine(), i | SPRITE_PEN_BASE, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		palette.set_pen_color(i | SPRITE_PEN_BASE, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
 
 	// stars/bullets
-	palette_set_color_rgb(machine(), STAR_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
-	palette_set_color_rgb(machine(), BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
+	palette.set_pen_color(STAR_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
+	palette.set_pen_color(BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
 }
 
 TILE_GET_INFO_MEMBER(galaxia_state::get_galaxia_bg_tile_info)

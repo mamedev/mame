@@ -45,6 +45,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// internal state
 	void recompute_parameters();
@@ -75,6 +76,7 @@ protected:
 	UINT8 m_frequency;
 	UINT8 m_interlaced;
 
+	required_device<palette_device> m_palette;
 };
 
 
@@ -91,6 +93,7 @@ public:
 protected:
 	virtual void display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type);
 	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 extern const device_type VT100_VIDEO;

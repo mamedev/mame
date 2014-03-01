@@ -1752,7 +1752,7 @@ static MACHINE_CONFIG_START( centiped_base, centiped_state )
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_centiped)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", centiped)
-	MCFG_PALETTE_LENGTH(4+4*4*4*4)
+	MCFG_PALETTE_ADD("palette", 4+4*4*4*4)
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,centiped)
 
@@ -1825,7 +1825,8 @@ static MACHINE_CONFIG_DERIVED( milliped, centiped )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", milliped)
-	MCFG_PALETTE_LENGTH(4*4+4*4*4*4*4)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 4*4+4*4*4*4*4)
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,milliped)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1861,9 +1862,10 @@ static MACHINE_CONFIG_DERIVED( warlords, centiped )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", warlords)
-	MCFG_PALETTE_LENGTH(8*4+8*4)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 8*4+8*4)
 
-	MCFG_PALETTE_INIT_OVERRIDE(centiped_state,warlords)
+	MCFG_PALETTE_INIT_OWNER(centiped_state,warlords)
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,warlords)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_warlords)
@@ -1902,7 +1904,7 @@ static MACHINE_CONFIG_START( bullsdrt, centiped_state )
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_bullsdrt)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", centiped)
-	MCFG_PALETTE_LENGTH(4+4*4*4*4)
+	MCFG_PALETTE_ADD("palette", 4+4*4*4*4)
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,bullsdrt)
 

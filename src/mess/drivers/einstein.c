@@ -445,8 +445,8 @@ MACHINE_RESET_MEMBER(einstein_state,einstein2)
 	einstein_state::machine_reset();
 
 	/* 80 column card palette */
-	palette_set_color(machine(), TMS9928A_PALETTE_SIZE, rgb_t::black);
-	palette_set_color(machine(), TMS9928A_PALETTE_SIZE + 1, rgb_t(0, 224, 0));
+	m_palette->set_pen_color(TMS9928A_PALETTE_SIZE, rgb_t::black);
+	m_palette->set_pen_color(TMS9928A_PALETTE_SIZE + 1, rgb_t(0, 224, 0));
 }
 
 MACHINE_START_MEMBER(einstein_state,einstein2)
@@ -823,7 +823,7 @@ static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 	MCFG_GFXDECODE_ADD("gfxdecode", einstei2)
 
 	/* 2 additional colors for the 80 column screen */
-	MCFG_PALETTE_LENGTH(TMS9928A_PALETTE_SIZE + 2)
+	MCFG_PALETTE_ADD("palette", TMS9928A_PALETTE_SIZE + 2)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "80column", XTAL_X002 / 4, einstein_crtc6845_interface)
 MACHINE_CONFIG_END

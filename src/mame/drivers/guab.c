@@ -228,7 +228,7 @@ WRITE16_MEMBER(guab_state::ef9369_w)
 			col = pal.clut[entry] & 0xfff;
 
 			/* Update the MAME palette */
-			palette_set_color_rgb(machine(), entry, pal4bit(col >> 0), pal4bit(col >> 4), pal4bit(col >> 8));
+			m_palette->set_pen_color(entry, pal4bit(col >> 0), pal4bit(col >> 4), pal4bit(col >> 8));
 		}
 
 			/* Address register auto-increment */
@@ -265,7 +265,7 @@ UINT32 guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitma
 	/* If blanked, fill with black */
 	if (m_tms34061->m_display.blanked)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 
@@ -279,8 +279,8 @@ UINT32 guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitma
 			UINT8 pen = src[x >> 1];
 
 			/* Draw two 4-bit pixels */
-			*dest++ = machine().pens[pen >> 4];
-			*dest++ = machine().pens[pen & 0x0f];
+			*dest++ = m_palette->pen(pen >> 4);
+			*dest++ = m_palette->pen(pen & 0x0f);
 		}
 	}
 
@@ -805,7 +805,7 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(guab_state, screen_update_guab)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_TMS34061_ADD("tms34061", tms34061intf)
 

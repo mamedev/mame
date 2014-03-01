@@ -11,7 +11,7 @@ WRITE16_MEMBER(dynduke_state::dynduke_paletteram_w)
 
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	color=m_generic_paletteram_16[offset];
-	palette_set_color_rgb(machine(),offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
+	m_palette->set_pen_color(offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
 }
 
 WRITE16_MEMBER(dynduke_state::dynduke_background_w)
@@ -157,7 +157,7 @@ void dynduke_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,
 			if (fy) fy=0; else fy=1;
 		}
 
-		m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y,15);
 	}
@@ -173,7 +173,7 @@ void dynduke_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 	/* if we're disabled, don't draw */
 	if (!m_back_enable)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return;
 	}
 

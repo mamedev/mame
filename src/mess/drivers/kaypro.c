@@ -210,8 +210,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kayproii)
 	MCFG_GFXDECODE_ADD("gfxdecode", kayproii)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -265,8 +264,8 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kaypro2x)
 	MCFG_GFXDECODE_ADD("gfxdecode", kaypro2x)
-	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT_OVERRIDE(kaypro_state,kaypro)
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(kaypro_state,kaypro)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

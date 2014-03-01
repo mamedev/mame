@@ -1561,7 +1561,7 @@ static MACHINE_CONFIG_START( nemesis, nemesis_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
@@ -1612,7 +1612,7 @@ static MACHINE_CONFIG_START( gx400, nemesis_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
@@ -1665,7 +1665,7 @@ static MACHINE_CONFIG_START( konamigt, nemesis_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
@@ -1716,7 +1716,7 @@ static MACHINE_CONFIG_START( rf2_gx400, nemesis_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
@@ -1771,7 +1771,7 @@ static MACHINE_CONFIG_START( salamand, nemesis_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
@@ -1817,7 +1817,7 @@ static MACHINE_CONFIG_START( blkpnthr, nemesis_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
@@ -1859,7 +1859,7 @@ static MACHINE_CONFIG_START( citybomb, nemesis_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
@@ -1905,7 +1905,7 @@ static MACHINE_CONFIG_START( nyanpani, nemesis_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
@@ -1949,7 +1949,7 @@ static MACHINE_CONFIG_START( hcrash, nemesis_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */
@@ -2701,7 +2701,7 @@ static MACHINE_CONFIG_START( bubsys, nemesis_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */

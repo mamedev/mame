@@ -567,10 +567,10 @@ SLOT_INTERFACE_END
 //**************************************************************************
 
 
-void bw2_state::palette_init()
+PALETTE_INIT_MEMBER(bw2_state, bw2)
 {
-	palette_set_color_rgb(machine(), 0, 0xa5, 0xad, 0xa5);
-	palette_set_color_rgb(machine(), 1, 0x31, 0x39, 0x10);
+	palette.set_pen_color(0, 0xa5, 0xad, 0xa5);
+	palette.set_pen_color(1, 0x31, 0x39, 0x10);
 }
 
 
@@ -615,7 +615,8 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_SCREEN_UPDATE_DEVICE( MSM6255_TAG, msm6255_device, screen_update )
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(bw2_state, bw2)
 
 	// devices
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)

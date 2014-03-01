@@ -132,7 +132,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(decocass);
 	DECLARE_MACHINE_RESET(ctsttape);
 	DECLARE_MACHINE_RESET(cprogolfj);
 	DECLARE_MACHINE_RESET(cdsteljn);

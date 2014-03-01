@@ -53,10 +53,13 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_yoffset(0.0f),
 		m_xscale(1.0f),
 		m_yscale(1.0f),
+		m_palette_tag(NULL),
+		m_palette_base(0),
 		m_container(NULL),
 		m_width(100),
 		m_height(100),
 		m_visarea(0, 99, 0, 99),
+		m_palette(NULL),
 		m_curbitmap(0),
 		m_curtexture(0),
 		m_changed(true),
@@ -213,6 +216,19 @@ void screen_device::static_set_screen_vblank(device_t &device, screen_vblank_del
 
 
 //-------------------------------------------------
+//  static_set_palette - set the screen palette
+//  configuration
+//-------------------------------------------------
+
+void screen_device::static_set_palette(device_t &device, const char *palette, int base)
+{
+	screen_device &screen = downcast<screen_device &>(device);
+	screen.m_palette_tag = palette;
+	screen.m_palette_base = base;
+}
+
+
+//-------------------------------------------------
 //  device_validity_check - verify device
 //  configuration
 //-------------------------------------------------
@@ -237,6 +253,10 @@ void screen_device::device_validity_check(validity_checker &valid) const
 	// check for zero frame rate
 	if (m_refresh == 0)
 		mame_printf_error("Invalid (zero) refresh rate\n");
+	
+	// check for valid palette
+	if (m_palette_tag != NULL && siblingdevice(m_palette_tag) == NULL)
+		mame_printf_error("Unable to location specified palette '%s'\n", m_palette_tag);
 }
 
 
@@ -250,9 +270,28 @@ void screen_device::device_start()
 	m_screen_update_ind16.bind_relative_to(*owner());
 	m_screen_update_rgb32.bind_relative_to(*owner());
 	m_screen_vblank.bind_relative_to(*owner());
+	
+	// find our palette: first find the specified device, otherwise look for a subdevice 
+	// named 'palette'; finally, look for a global 'palette' at the root
+	if (m_palette_tag != NULL)
+		m_palette = siblingdevice<palette_device>(m_palette_tag);
+	if (m_palette == NULL)
+		m_palette = siblingdevice<palette_device>("palette");
+	if (m_palette == NULL)
+		m_palette = subdevice<palette_device>("palette");
+	if (m_palette == NULL)
+		m_palette = subdevice<palette_device>(":palette");
+
+	// if we have a palette and it's not started, wait for it
+	if (m_palette != NULL && !m_palette->started())
+		throw device_missing_dependencies();
 
 	// configure bitmap formats and allocate screen bitmaps
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
+
+	if (m_palette == NULL && texformat == TEXFORMAT_PALETTE16)
+		throw emu_fatalerror("Screen does not have palette defined\n");
+	
 	for (int index = 0; index < ARRAY_LENGTH(m_bitmap); index++)
 	{
 		m_bitmap[index].set_format(format(), texformat);
@@ -495,6 +534,11 @@ void screen_device::realloc_screen_bitmaps()
 		item->m_bitmap.resize(effwidth, effheight);
 
 	// re-set up textures
+	if (m_palette != NULL)
+	{
+		m_bitmap[0].set_palette(m_palette->palette());
+		m_bitmap[1].set_palette(m_palette->palette());
+	}
 	m_texture[0]->set_bitmap(m_bitmap[0], m_visarea, m_bitmap[0].texformat());
 	m_texture[1]->set_bitmap(m_bitmap[1], m_visarea, m_bitmap[1].texformat());
 }
@@ -752,7 +796,8 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 
 	// if allocating now, just do it
 	bitmap.allocate(width(), height());
-	bitmap.set_palette(machine().palette);
+	if (m_palette != NULL)
+		bitmap.set_palette(m_palette->palette());
 }
 
 
@@ -880,7 +925,7 @@ void screen_device::update_burnin()
 			{
 				UINT64 *dst = &m_burnin.pix64(y);
 				const UINT16 *src = &srcbitmap.pix16(srcy >> 16);
-				const rgb_t *palette = machine().palette->entry_list_adjusted();
+				const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
 				for (x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 				{
 					rgb_t pixel = palette[src[srcx >> 16]];

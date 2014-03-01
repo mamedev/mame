@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
 	AM_RANGE(0x60000, 0x67fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x70000, 0x77fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x80000, 0x827ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x90000, 0x90001) AM_READ_PORT("IN0")
 	AM_RANGE(0x90010, 0x90011) AM_READ_PORT("IN1")
 	AM_RANGE(0x90020, 0x90021) AM_READ_PORT("SYSTEM")
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( spbactnp_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
 	AM_RANGE(0x60000, 0x67fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x70000, 0x77fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_word_w) AM_SHARE("paletteram")   // yes R and G are swapped vs. the released version
+	AM_RANGE(0x80000, 0x827ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")   // yes R and G are swapped vs. the released version
 
 	AM_RANGE(0x90002, 0x90003) AM_WRITE( spbatnp_90002_w )
 	AM_RANGE(0x90006, 0x90007) AM_WRITE( spbatnp_90006_w )
@@ -427,8 +427,8 @@ static MACHINE_CONFIG_START( spbactn, spbactn_state )
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactn)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", spbactn)
-	MCFG_PALETTE_LENGTH(0x2800/2)
-
+	MCFG_PALETTE_ADD("palette", 0x2800/2)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -469,8 +469,8 @@ static MACHINE_CONFIG_START( spbactnp, spbactn_state )
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactnp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", spbactnp)
-	MCFG_PALETTE_LENGTH(0x2800/2)
-
+	MCFG_PALETTE_ADD("palette", 0x2800/2)
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware  - different? */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

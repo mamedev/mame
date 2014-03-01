@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x314000, 0x314001) AM_WRITENOP                                        // ? flip backgrounds ?
 	AM_RANGE(0x318000, 0x318001) AM_READWRITE(galpani2_eeprom_r, galpani2_eeprom_w) // EEPROM
 	AM_RANGE(0x380000, 0x387fff) AM_RAM                                             // Palette?
-	AM_RANGE(0x388000, 0x38ffff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram" )   // Palette
+	AM_RANGE(0x388000, 0x38ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")   // Palette
 	AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP                                        // ? at startup of service mode
 
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM_WRITE(galpani2_bg8_0_w) AM_SHARE("bg8.0")    // Background 0
@@ -628,7 +628,9 @@ static MACHINE_CONFIG_START( galpani2, galpani2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galpani2_state, screen_update_galpani2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", galpani2)
-	MCFG_PALETTE_LENGTH(0x4000 + 0x200 + 0x8000)    // sprites, bg8, bg15
+	MCFG_PALETTE_ADD("palette", 0x4000 + 0x200 + 0x8000)    // sprites, bg8, bg15
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	MCFG_PALETTE_INIT_OWNER(galpani2_state, galpani2)
 
 	MCFG_DEVICE_ADD_KC002_SPRITES
 	kaneko16_sprite_device::set_offsets(*device, 0x10000 - 0x16c0 + 0xc00, 0);

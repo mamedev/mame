@@ -75,7 +75,7 @@ READ8_MEMBER(bottom9_state::bottom9_bankedram2_r)
 	if (m_k052109_selected)
 		return k052109_051960_r(space, offset + 0x2000);
 	else
-		return m_generic_paletteram_8[offset];
+		return m_palette->basemem().read8(offset);
 }
 
 WRITE8_MEMBER(bottom9_state::bottom9_bankedram2_w)
@@ -83,7 +83,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram2_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset + 0x2000, data);
 	else
-		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
+		m_palette->write(space, offset, data);
 }
 
 WRITE8_MEMBER(bottom9_state::bankswitch_w)
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bottom9_state )
 	AM_RANGE(0x1fd3, 0x1fd3) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1fe0, 0x1fe0) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1ff0, 0x1fff) AM_DEVWRITE("k051316", k051316_device, ctrl_w)
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_SHARE("paletteram")
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_SHARE("palette")
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
@@ -340,8 +340,6 @@ static MACHINE_CONFIG_START( bottom9, bottom9_state )
 
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -349,15 +347,20 @@ static MACHINE_CONFIG_START( bottom9, bottom9_state )
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(bottom9_state, screen_update_bottom9)
 
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K052109_ADD("k052109", bottom9_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
+	MCFG_K052109_PALETTE("palette")
 	MCFG_K051960_ADD("k051960", bottom9_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
+	MCFG_K051960_PALETTE("palette")
 	MCFG_K051316_ADD("k051316", bottom9_k051316_intf)
 	MCFG_K051316_GFXDECODE("gfxdecode")
+	MCFG_K051316_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

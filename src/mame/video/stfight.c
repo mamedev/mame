@@ -30,40 +30,37 @@
 
  */
 
-void stfight_state::palette_init()
+PALETTE_INIT_MEMBER(stfight_state, stfight)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* text uses colors 0xc0-0xcf */
 	for (i = 0; i < 0x40; i++)
 	{
 		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0xc0;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* fg uses colors 0x40-0x7f */
 	for (i = 0x40; i < 0x140; i++)
 	{
 		UINT8 ctabentry = (color_prom[i + 0x1c0] & 0x0f) | ((color_prom[i + 0x0c0] & 0x03) << 4) | 0x40;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* bg uses colors 0-0x3f */
 	for (i = 0x140; i < 0x240; i++)
 	{
 		UINT8 ctabentry = (color_prom[i + 0x2c0] & 0x0f) | ((color_prom[i + 0x1c0] & 0x03) << 4);
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* bg uses colors 0x80-0xbf */
 	for (i = 0x240; i < 0x340; i++)
 	{
 		UINT8 ctabentry = (color_prom[i + 0x3c0] & 0x0f) | ((color_prom[i + 0x2c0] & 0x03) << 4) | 0x80;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -77,7 +74,7 @@ void stfight_state::set_pens()
 		UINT16 data = m_generic_paletteram_8[i] | (m_generic_paletteram2_8[i] << 8);
 		rgb_t color = rgb_t(pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 
-		colortable_palette_set_color(machine().colortable, i, color);
+		m_palette->set_indirect_color(i, color);
 	}
 }
 
@@ -176,7 +173,7 @@ VIDEO_START_MEMBER(stfight_state,stfight)
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
 
 	m_fg_tilemap->set_transparent_pen(0x0f);
-	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, m_gfxdecode->gfx(0), 0xcf);
+	m_palette->configure_tilemap_groups(*m_tx_tilemap, *m_gfxdecode->gfx(0), 0xcf);
 }
 
 VIDEO_START_MEMBER(stfight_state,cshooter)
@@ -186,7 +183,7 @@ VIDEO_START_MEMBER(stfight_state,cshooter)
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_cshooter_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
 
 	m_fg_tilemap->set_transparent_pen(0x0f);
-	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, m_gfxdecode->gfx(0), 0xcf);
+	m_palette->configure_tilemap_groups(*m_tx_tilemap, *m_gfxdecode->gfx(0), 0xcf);
 }
 
 
@@ -306,7 +303,7 @@ void stfight_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 			code = m_sprite_base + m_sprite_ram[offs];
 
-			m_gfxdecode->gfx(4)->prio_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(4)->prio_transpen(m_palette,bitmap,cliprect,
 						code,
 						color,
 						flipx,flip_screen(),
@@ -355,10 +352,10 @@ void stfight_state::cshooter_draw_sprites(screen_device &screen, bitmap_ind16 &b
 		tile_low += (tile_low > 0x9) ? 0x37 : 0x30;
 		tile_high += (tile_high > 0x9) ? 0x37 : 0x30;
 
-		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect, tile_high << 1, color, flipx, 0, m_sprite_ram[i+3],m_sprite_ram[i+2],screen.priority(),pri ? 0x02 : 0,0x00);
-		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect, tile_high << 1, color, flipx, 0, m_sprite_ram[i+3]+8,m_sprite_ram[i+2],screen.priority(),pri ? 0x02 : 0,0x00);
-		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect, tile_low << 1, color, flipx, 0, m_sprite_ram[i+3]+8,m_sprite_ram[i+2]+8,screen.priority(),pri ? 0x02 : 0,0x00);
-		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect, tile_low << 1, color, flipx, 0, m_sprite_ram[i+3],m_sprite_ram[i+2]+8,screen.priority(),pri ? 0x02 : 0,0x00);
+		m_gfxdecode->gfx(0)->prio_transpen(m_palette,bitmap,cliprect, tile_high << 1, color, flipx, 0, m_sprite_ram[i+3],m_sprite_ram[i+2],screen.priority(),pri ? 0x02 : 0,0x00);
+		m_gfxdecode->gfx(0)->prio_transpen(m_palette,bitmap,cliprect, tile_high << 1, color, flipx, 0, m_sprite_ram[i+3]+8,m_sprite_ram[i+2],screen.priority(),pri ? 0x02 : 0,0x00);
+		m_gfxdecode->gfx(0)->prio_transpen(m_palette,bitmap,cliprect, tile_low << 1, color, flipx, 0, m_sprite_ram[i+3]+8,m_sprite_ram[i+2]+8,screen.priority(),pri ? 0x02 : 0,0x00);
+		m_gfxdecode->gfx(0)->prio_transpen(m_palette,bitmap,cliprect, tile_low << 1, color, flipx, 0, m_sprite_ram[i+3],m_sprite_ram[i+2]+8,screen.priority(),pri ? 0x02 : 0,0x00);
 	}
 }
 

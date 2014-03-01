@@ -25,7 +25,7 @@ WRITE8_MEMBER(runaway_state::runaway_paletteram_w)
 		0x47 * ((~data >> 0) & 1) +
 		0x97 * ((~data >> 1) & 1);
 
-	palette_set_color(machine(), offset, rgb_t(R, G, B));
+	m_palette->set_pen_color(offset, rgb_t(R, G, B));
 }
 
 
@@ -101,13 +101,13 @@ UINT32 runaway_state::screen_update_runaway(screen_device &screen, bitmap_ind16 
 
 		code |= (m_sprite_ram[i + 0x30] << 2) & 0x1c0;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 			code,
 			0,
 			flipx, flipy,
 			x, 240 - y, 0);
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 			code,
 			0,
 			flipx, flipy,
@@ -135,13 +135,13 @@ UINT32 runaway_state::screen_update_qwak(screen_device &screen, bitmap_ind16 &bi
 
 		code |= (m_sprite_ram[i + 0x30] << 2) & 0x1c0;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 			code,
 			0,
 			flipx, flipy,
 			x, 240 - y, 0);
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 			code,
 			0,
 			flipx, flipy,

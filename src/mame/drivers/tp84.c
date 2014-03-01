@@ -310,8 +310,8 @@ static MACHINE_CONFIG_START( tp84, tp84_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tp84_state, screen_update_tp84)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tp84)
-	MCFG_PALETTE_LENGTH(4096)
-
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_INIT_OWNER(tp84_state, tp84)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

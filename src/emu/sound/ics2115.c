@@ -110,6 +110,7 @@ void ics2115_device::device_reset()
 	m_osc_select = 0;
 	m_reg_select = 0;
 	m_vmode = 0;
+	m_irq_on = false;
 	memset(m_voice, 0, sizeof(m_voice));
 	for(int i = 0; i < 2; ++i)
 	{

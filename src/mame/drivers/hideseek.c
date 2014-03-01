@@ -41,7 +41,7 @@ public:
 
 	DECLARE_DRIVER_INIT(hideseek);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(hideseek);
 	UINT32 screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 };
@@ -82,12 +82,12 @@ static GFXDECODE_START( hideseek )
 GFXDECODE_END
 
 
-void hideseek_state::palette_init()
+PALETTE_INIT_MEMBER(hideseek_state, hideseek)
 {
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
-		palette_set_color(machine(), i, rgb_t( pal5bit((i >> 10)&0x1f), pal5bit(((i >> 5))&0x1f), pal5bit((i >> 0)&0x1f)));
+		palette.set_pen_color(i, rgb_t( pal5bit((i >> 10)&0x1f), pal5bit(((i >> 5))&0x1f), pal5bit((i >> 0)&0x1f)));
 }
 
 
@@ -107,7 +107,8 @@ static MACHINE_CONFIG_START( hideseek, hideseek_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hideseek_state, screen_update_hideseek)
 
-	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_PALETTE_INIT_OWNER(hideseek_state, hideseek)
 	MCFG_GFXDECODE_ADD("gfxdecode", hideseek)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")

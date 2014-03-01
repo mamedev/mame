@@ -23,11 +23,11 @@
 
 ***************************************************************************/
 
-void crbaloon_state::palette_init()
+PALETTE_INIT_MEMBER(crbaloon_state, crbaloon)
 {
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		UINT8 pen;
 		int h, r, g, b;
@@ -42,7 +42,7 @@ void crbaloon_state::palette_init()
 		g = h * ((~pen >> 1) & 1);
 		b = h * ((~pen >> 2) & 1);
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

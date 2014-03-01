@@ -125,7 +125,7 @@ public:
 	DECLARE_DRIVER_INIT(cshooter);
 	TILE_GET_INFO_MEMBER(get_cstx_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(cshooter);
 	DECLARE_MACHINE_RESET(cshooter);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -133,21 +133,18 @@ public:
 };
 
 
-void cshooter_state::palette_init()
+PALETTE_INIT_MEMBER(cshooter_state, cshooter)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	// allocate the colortable
-	machine().colortable = colortable_alloc(machine(), 0x100);
-
 	// text uses colors 0xc0-0xdf
 	for (i = 0; i < 0x40; i++)
-		colortable_entry_set_value(machine().colortable, i, (color_prom[i] & 0x1f) | 0xc0);
+		palette.set_pen_indirect(i, (color_prom[i] & 0x1f) | 0xc0);
 
 	// rest is still unknown..
 	for (i = 0x40; i < 0x100; i++)
-		colortable_entry_set_value(machine().colortable, i, color_prom[i]);
+		palette.set_pen_indirect(i, color_prom[i]);
 }
 
 TILE_GET_INFO_MEMBER(cshooter_state::get_cstx_tile_info)
@@ -185,10 +182,10 @@ void cshooter_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		tile_low += (tile_low > 0x9) ? 0x37 : 0x30;
 		tile_high += (tile_high > 0x9) ? 0x37 : 0x30;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, tile_high << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2],0);
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, tile_high << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2],0);
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, tile_low << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2]+8,0);
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, tile_low << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2]+8,0);
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, tile_high << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2],0);
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, tile_high << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2],0);
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, tile_low << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2]+8,0);
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, tile_low << 1, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2]+8,0);
 	}
 }
 
@@ -202,7 +199,7 @@ UINT32 cshooter_state::screen_update_airraid(screen_device &screen, bitmap_ind16
 		int b = m_generic_paletteram2_8[i] & 0xf;
 
 		rgb_t color = rgb_t(pal4bit(r), pal4bit(g), pal4bit(b));
-		colortable_palette_set_color(machine().colortable, i, color);
+		m_palette->set_indirect_color(i, color);
 	}
 
 	bitmap.fill(0x80, cliprect); // temp
@@ -453,7 +450,8 @@ static MACHINE_CONFIG_START( airraid, cshooter_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cshooter_state, screen_update_airraid)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cshooter)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(cshooter_state, cshooter)
 
 	/* sound hardware */
 	SEIBU_AIRRAID_SOUND_SYSTEM_YM2151_INTERFACE(XTAL_14_31818MHz/4)

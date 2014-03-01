@@ -268,9 +268,9 @@ static MACHINE_CONFIG_START( dambustr, dambustr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dambustr_state, screen_update_dambustr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dambustr)
-	MCFG_PALETTE_LENGTH(32+2+64+8)      /* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
+	MCFG_PALETTE_ADD("palette", 32+2+64+8)      /* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
 
-	MCFG_PALETTE_INIT_OVERRIDE(dambustr_state,dambustr)
+	MCFG_PALETTE_INIT_OWNER(dambustr_state,dambustr)
 	MCFG_VIDEO_START_OVERRIDE(dambustr_state,dambustr)
 
 	/* sound hardware */

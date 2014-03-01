@@ -43,7 +43,7 @@ READ8_MEMBER(xxmissio_state::xxmissio_bgram_r)
 
 WRITE8_MEMBER(xxmissio_state::xxmissio_paletteram_w)
 {
-	paletteram_BBGGRRII_byte_w(space,offset,data);
+	m_palette->write(space,offset,data);
 }
 
 /****************************************************************************/
@@ -110,14 +110,14 @@ void xxmissio_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		px &= 0x1ff;
 
-		gfx->transpen(bitmap,cliprect,
+		gfx->transpen(m_palette,bitmap,cliprect,
 			chr,
 			col,
 			fx,fy,
 			px,py,0);
 
 		if (px>0x1e0)
-			gfx->transpen(bitmap,cliprect,
+			gfx->transpen(m_palette,bitmap,cliprect,
 				chr,
 				col,
 				fx,fy,

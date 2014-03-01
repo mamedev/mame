@@ -220,7 +220,7 @@ WRITE8_MEMBER( cgenie_state::cgenie_port_ff_w )
 				b = 15;
 			}
 		}
-		palette_set_color_rgb(machine(), 0, r, g, b);
+		m_palette->set_pen_color(0, r, g, b);
 	}
 
 	/* character mode changed ? */

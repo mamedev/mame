@@ -667,7 +667,7 @@ SLOT_INTERFACE_END
 
 
 
-static const unsigned char palette[] =
+static const unsigned char palette_gb[] =
 {
 	/* Simple black and white palette */
 	/*  0xFF,0xFF,0xFF,
@@ -696,13 +696,13 @@ static const unsigned char palette_megaduck[] = {
 PALETTE_INIT_MEMBER(gb_state, gb)
 {
 	for (int i = 0; i < 4; i++)
-		palette_set_color_rgb(machine(), i, palette[i * 3 + 0], palette[i * 3 + 1], palette[i * 3 + 2]);
+		palette.set_pen_color(i, palette_gb[i * 3 + 0], palette_gb[i * 3 + 1], palette_gb[i * 3 + 2]);
 }
 
 PALETTE_INIT_MEMBER(gb_state, gbp)
 {
 	for (int i = 0; i < 4; i++)
-		palette_set_color_rgb(machine(), i, palette[(i + 4) * 3 + 0], palette[(i + 4) * 3 + 1], palette[(i + 4) * 3 + 2]);
+		palette.set_pen_color(i, palette_gb[(i + 4) * 3 + 0], palette_gb[(i + 4) * 3 + 1], palette_gb[(i + 4) * 3 + 2]);
 }
 
 PALETTE_INIT_MEMBER(gb_state, sgb)
@@ -714,7 +714,7 @@ PALETTE_INIT_MEMBER(gb_state, sgb)
 		r = (i & 0x1F) << 3;
 		g = ((i >> 5) & 0x1F) << 3;
 		b = ((i >> 10) & 0x1F) << 3;
-		palette_set_color_rgb(machine(), i, r, g, b);
+		palette.set_pen_color(i, r, g, b);
 	}
 }
 
@@ -727,14 +727,14 @@ PALETTE_INIT_MEMBER(gb_state, gbc)
 		r = (i & 0x1F) << 3;
 		g = ((i >> 5) & 0x1F) << 3;
 		b = ((i >> 10) & 0x1F) << 3;
-		palette_set_color_rgb(machine(), i, r, g, b);
+		palette.set_pen_color(i, r, g, b);
 	}
 }
 
 PALETTE_INIT_MEMBER(megaduck_state, megaduck)
 {
 	for (int i = 0; i < 4; i++)
-		palette_set_color_rgb(machine(), i, palette_megaduck[i * 3 + 0], palette_megaduck[i * 3 + 1], palette_megaduck[i * 3 + 2]);
+		palette.set_pen_color(i, palette_megaduck[i * 3 + 0], palette_megaduck[i * 3 + 1], palette_megaduck[i * 3 + 2]);
 }
 
 
@@ -761,8 +761,8 @@ static MACHINE_CONFIG_START( gameboy, gb_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gb)
-	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT_OVERRIDE(gb_state,gb)
+	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(gb_state,gb)
 
 	MCFG_GB_LCD_DMG_ADD( "lcd" )
 
@@ -795,8 +795,10 @@ static MACHINE_CONFIG_DERIVED( supergb, gameboy )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_PALETTE_LENGTH(32768)
-	MCFG_PALETTE_INIT_OVERRIDE(gb_state,sgb)
+	
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_PALETTE_INIT_OWNER(gb_state,sgb)
 
 	MCFG_DEVICE_REMOVE("lcd")
 	MCFG_GB_LCD_SGB_ADD( "lcd" )
@@ -810,7 +812,9 @@ static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state, gbpocket)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, gbpocket)
-	MCFG_PALETTE_INIT_OVERRIDE(gb_state,gbp)
+	
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(gb_state,gbp)
 
 	MCFG_DEVICE_REMOVE("lcd")
 	MCFG_GB_LCD_MGB_ADD( "lcd" )
@@ -824,8 +828,9 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gameboy )
 	MCFG_MACHINE_START_OVERRIDE(gb_state,gbc)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state,gbc)
 
-	MCFG_PALETTE_LENGTH(32768)
-	MCFG_PALETTE_INIT_OVERRIDE(gb_state,gbc)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_PALETTE_INIT_OWNER(gb_state,gbc)
 
 	MCFG_DEVICE_REMOVE("lcd")
 	MCFG_GB_LCD_CGB_ADD( "lcd" )
@@ -863,8 +868,9 @@ static MACHINE_CONFIG_START( megaduck, megaduck_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_GFXDECODE_ADD("gfxdecode", gb)
-	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT_OVERRIDE(megaduck_state,megaduck)
+	
+	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(megaduck_state,megaduck)
 
 	MCFG_GB_LCD_DMG_ADD( "lcd" )
 

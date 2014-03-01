@@ -651,7 +651,8 @@ static MACHINE_CONFIG_START( firetrap, firetrap_state )
 	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", firetrap)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -686,7 +687,8 @@ static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
 	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", firetrap)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -36,9 +36,6 @@ PALETTE_INIT_MEMBER(fastfred_state,fastfred)
 			4, resistances, gweights, 470, 0,
 			4, resistances, bweights, 470, 0);
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
-
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
 	{
@@ -66,12 +63,12 @@ PALETTE_INIT_MEMBER(fastfred_state,fastfred)
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* characters and sprites use the same palette */
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 }
 
 /***************************************************************************
@@ -277,7 +274,7 @@ void fastfred_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,flip_screen_x() ? spritevisibleareaflipx : spritevisiblearea,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,flip_screen_x() ? spritevisibleareaflipx : spritevisiblearea,
 				code,
 				m_colorbank | (m_spriteram[offs + 2] & 0x07),
 				flipx,flipy,
@@ -346,8 +343,8 @@ VIDEO_START_MEMBER(fastfred_state,imago)
 	m_stars_on = 1;
 
 	/* web colors */
-	palette_set_color(machine(),256+64+0,rgb_t(0x50,0x00,0x00));
-	palette_set_color(machine(),256+64+1,rgb_t(0x00,0x00,0x00));
+	m_palette->set_pen_color(256+64+0,rgb_t(0x50,0x00,0x00));
+	m_palette->set_pen_color(256+64+1,rgb_t(0x00,0x00,0x00));
 }
 
 UINT32 fastfred_state::screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

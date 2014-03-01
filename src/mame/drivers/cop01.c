@@ -463,8 +463,8 @@ static MACHINE_CONFIG_START( cop01, cop01_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cop01)
-	MCFG_PALETTE_LENGTH(16+8*16+16*16)
-
+	MCFG_PALETTE_ADD("palette", 16+8*16+16*16)
+	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -501,8 +501,8 @@ static MACHINE_CONFIG_START( mightguy, cop01_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cop01)
-	MCFG_PALETTE_LENGTH(16+8*16+16*16)
-
+	MCFG_PALETTE_ADD("palette", 16+8*16+16*16)
+	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

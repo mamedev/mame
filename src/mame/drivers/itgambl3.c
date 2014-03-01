@@ -57,7 +57,7 @@ public:
 	int m_start_offs;
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(itgambl3);
 	UINT32 screen_update_itgambl3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
@@ -106,7 +106,7 @@ UINT32 itgambl3_state::screen_update_itgambl3(screen_device &screen, bitmap_rgb3
 
 	popmessage("%d %d %04x",m_test_x,m_test_y,m_start_offs);
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	count = (m_start_offs);
 
@@ -119,7 +119,7 @@ UINT32 itgambl3_state::screen_update_itgambl3(screen_device &screen, bitmap_rgb3
 			color = (blit_ram[count] & 0xff)>>0;
 
 			if(cliprect.contains(x, y))
-				bitmap.pix32(y, x) = machine().pens[color];
+				bitmap.pix32(y, x) = m_palette->pen(color);
 
 			count++;
 		}
@@ -234,7 +234,7 @@ void itgambl3_state::machine_reset()
 }
 
 /* default 444 palette for debug purpose*/
-void itgambl3_state::palette_init()
+PALETTE_INIT_MEMBER(itgambl3_state, itgambl3)
 {
 	int x,r,g,b;
 
@@ -243,7 +243,7 @@ void itgambl3_state::palette_init()
 		r = (x & 0xf)*0x11;
 		g = ((x & 0x3c)>>2)*0x11;
 		b = ((x & 0xf0)>>4)*0x11;
-		palette_set_color(machine(),x,rgb_t(r,g,b));
+		palette.set_pen_color(x,rgb_t(r,g,b));
 	}
 }
 
@@ -268,7 +268,8 @@ static MACHINE_CONFIG_START( itgambl3, itgambl3_state )
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", itgambl3)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(itgambl3_state, itgambl3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

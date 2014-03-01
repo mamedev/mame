@@ -34,30 +34,20 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define CDP1852_CLOCK_HIGH  0
-
-#define CDP1852_MODE_INPUT \
-	DEVCB_LINE_GND
-
-#define CDP1852_MODE_OUTPUT \
-	DEVCB_LINE_VCC
-
-
-
-//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_CDP1852_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, CDP1852, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_CDP1852_MODE_CALLBACK(_read) \
+	devcb = &cdp1852_device::set_mode_rd_callback(*device, DEVCB2_##_read);
 
+#define MCFG_CDP1852_SR_CALLBACK(_write) \
+	devcb = &cdp1852_device::set_sr_wr_callback(*device, DEVCB2_##_write);
 
-#define CDP1852_INTERFACE(name) \
-	const cdp1852_interface (name)=
+#define MCFG_CDP1852_DI_CALLBACK(_read) \
+	devcb = &cdp1852_device::set_data_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_CDP1852_DO_CALLBACK(_write) \
+	devcb = &cdp1852_device::set_data_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -65,46 +55,35 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> cdp1852_interface
-
-struct cdp1852_interface
-{
-	devcb_read_line         m_in_mode_cb;
-
-	devcb_read8             m_in_data_cb;
-	devcb_write8            m_out_data_cb;
-
-	devcb_write_line        m_out_sr_cb;
-};
-
-
 // ======================> cdp1852_device
 
-class cdp1852_device :  public device_t,
-						public cdp1852_interface
+class cdp1852_device :  public device_t
 {
 public:
 	// construction/destruction
 	cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_mode_rd_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_read_mode.set_callback(object); }
+	template<class _Object> static devcb2_base &set_sr_wr_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_write_sr.set_callback(object); }
+	template<class _Object> static devcb2_base &set_data_rd_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_read_data.set_callback(object); }
+	template<class _Object> static devcb2_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<cdp1852_device &>(device).m_write_data.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	int get_mode();
-	inline void set_sr_line(int state);
+	void set_sr_line(int state);
 
-	devcb_resolved_read_line    m_in_mode_func;
-	devcb_resolved_write_line   m_out_sr_func;
-	devcb_resolved_read8        m_in_data_func;
-	devcb_resolved_write8       m_out_data_func;
+	devcb2_read_line    m_read_mode;
+	devcb2_write_line   m_write_sr;
+	devcb2_read8        m_read_data;
+	devcb2_write8       m_write_data;
 
 	int m_new_data;             // new data written
 	UINT8 m_data;               // data latch

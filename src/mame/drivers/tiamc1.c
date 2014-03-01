@@ -236,8 +236,8 @@ static MACHINE_CONFIG_START( tiamc1, tiamc1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_tiamc1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tiamc1)
-	MCFG_PALETTE_LENGTH(16)
-
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(tiamc1_state, tiamc1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

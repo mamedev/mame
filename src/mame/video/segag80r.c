@@ -101,7 +101,7 @@ void segag80r_state::g80_set_palette_entry(int entry, UINT8 data)
 	bit1 = (b >> 1) & 0x01;
 	b = combine_2_weights(m_bweights, bit0, bit1);
 
-	palette_set_color(machine(), entry, rgb_t(r, g, b));
+	m_palette->set_pen_color(entry, rgb_t(r, g, b));
 }
 
 
@@ -143,7 +143,7 @@ void segag80r_state::spaceod_bg_init_palette()
 		bit1 = (b >> 1) & 0x01;
 		b = combine_2_weights(tbweights, bit0, bit1);
 
-		palette_set_color(machine(), 64 + i, rgb_t(r, g, b));
+		m_palette->set_pen_color(64 + i, rgb_t(r, g, b));
 	}
 }
 
@@ -644,7 +644,7 @@ void segag80r_state::draw_videoram(bitmap_ind16 &bitmap, const rectangle &clipre
 			UINT8 tile = videoram[offs];
 
 			/* draw the tile */
-			m_gfxdecode->gfx(0)->transmask(bitmap,cliprect, tile, tile >> 4, m_video_flip, m_video_flip, x*8, y*8, transparent_pens[tile >> 4]);
+			m_gfxdecode->gfx(0)->transmask(m_palette,bitmap,cliprect, tile, tile >> 4, m_video_flip, m_video_flip, x*8, y*8, transparent_pens[tile >> 4]);
 		}
 	}
 }

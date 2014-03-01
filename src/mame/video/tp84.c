@@ -41,7 +41,7 @@
             220 ohm
             100 ohm
 */
-void tp84_state::palette_init()
+PALETTE_INIT_MEMBER(tp84_state, tp84)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 1000, 470, 220, 100 };
@@ -53,9 +53,6 @@ void tp84_state::palette_init()
 			4, resistances, weights, 470, 0,
 			0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0);
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -84,7 +81,7 @@ void tp84_state::palette_init()
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = combine_4_weights(weights, bit0, bit1, bit2, bit3);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -98,7 +95,7 @@ void tp84_state::palette_init()
 		for (j = 0; j < 8; j++)
 		{
 			UINT8 ctabentry = ((~i & 0x100) >> 1) | (j << 4) | (color_prom[i] & 0x0f);
-			colortable_entry_set_value(machine().colortable, ((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
+			palette.set_pen_indirect(((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
 		}
 	}
 }
@@ -164,8 +161,8 @@ void tp84_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int flip_x = ~m_spriteram[offs + 2] & 0x40;
 		int flip_y =  m_spriteram[offs + 2] & 0x80;
 
-		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect, code, color, flip_x, flip_y, x, y,
-				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, palette_base));
+		m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect, code, color, flip_x, flip_y, x, y,
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, palette_base));
 
 	}
 }

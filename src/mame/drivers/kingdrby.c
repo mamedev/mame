@@ -223,13 +223,13 @@ void kingdrby_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,spr_offs++,colour,1,0,((x+16*w)-(dx+1)*16),(y+dy*16),0);
+					m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,spr_offs++,colour,1,0,((x+16*w)-(dx+1)*16),(y+dy*16),0);
 		}
 		else
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,spr_offs++,colour,0,0,(x+dx*16),(y+dy*16),0);
+					m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,spr_offs++,colour,0,0,(x+dx*16),(y+dy*16),0);
 		}
 	}
 }
@@ -980,7 +980,7 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
 		bit2 = (color_prom[0] >> 5) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
@@ -1013,7 +1013,7 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 		bit2 = (prom[i] >> 5) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -1041,8 +1041,8 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", kingdrby)
-	MCFG_PALETTE_LENGTH(0x200)
-	MCFG_PALETTE_INIT_OVERRIDE(kingdrby_state,kingdrby)
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -1065,7 +1065,8 @@ static MACHINE_CONFIG_DERIVED( kingdrbb, kingdrby )
 	MCFG_CPU_MODIFY("slave")
 	MCFG_CPU_PROGRAM_MAP(slave_1986_map)
 
-	MCFG_PALETTE_INIT_OVERRIDE(kingdrby_state,kingdrbb)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrbb)
 
 	MCFG_DEVICE_REMOVE("ppi8255_0")
 	MCFG_DEVICE_REMOVE("ppi8255_1")
@@ -1080,7 +1081,8 @@ static MACHINE_CONFIG_DERIVED( cowrace, kingdrbb )
 	MCFG_CPU_IO_MAP(cowrace_sound_io)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cowrace)
-	MCFG_PALETTE_INIT_OVERRIDE(kingdrby_state,kingdrby)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 

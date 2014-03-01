@@ -61,7 +61,7 @@ inline int astrocde_state::mame_vpos_to_astrocade_vpos(int scanline)
  *
  *************************************/
 
-void astrocde_state::palette_init()
+PALETTE_INIT_MEMBER(astrocde_state, astrocde)
 {
 	/*
 	    The Astrocade has a 256 color palette: 32 colors with 8 luminance
@@ -104,7 +104,7 @@ void astrocde_state::palette_init()
 			g = MIN(g, 255);
 			b = MAX(b, 0);
 			b = MIN(b, 255);
-			palette_set_color(machine(), color * 16 + luma, rgb_t(r, g, b));
+			palette.set_pen_color(color * 16 + luma, rgb_t(r, g, b));
 		}
 	}
 }
@@ -150,7 +150,7 @@ PALETTE_INIT_MEMBER(astrocde_state,profpac)
 		bit3 = (i >> 11) & 0x01;
 		r = combine_4_weights(weights, bit0, bit1, bit2, bit3);
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

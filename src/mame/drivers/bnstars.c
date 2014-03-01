@@ -366,7 +366,7 @@ void bnstars_state::update_color(int color, int screen)
 	g = ((m_ms32_pal_ram[screen][color*2] & 0x00ff) >>0 );
 	b = ((m_ms32_pal_ram[screen][color*2+1] & 0x00ff) >>0 );
 
-	palette_set_color(machine(),color+screen*0x8000,rgb_t(r,g,b));
+	m_palette->set_pen_color(color+screen*0x8000,rgb_t(r,g,b));
 }
 
 WRITE32_MEMBER(bnstars_state::ms32_pal0_ram_w)
@@ -499,7 +499,7 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 			pri_mask = 0xfe;
 
 		gfx->set_source_clip(tx, xsize, ty, ysize);
-		gfx->prio_zoom_transpen(bitmap,cliprect,
+		gfx->prio_zoom_transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,
@@ -1390,7 +1390,7 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bnstars)
-	MCFG_PALETTE_LENGTH(0x8000*2)
+	MCFG_PALETTE_ADD("palette", 0x8000*2)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 

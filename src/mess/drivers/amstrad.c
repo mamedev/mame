@@ -295,11 +295,11 @@ INPUT_CHANGED_MEMBER(amstrad_state::cpc_monitor_changed)
 {
 	if ( (m_io_green_display->read()) & 0x01 )
 	{
-		PALETTE_INIT_CALL_MEMBER( amstrad_cpc_green );
+		PALETTE_INIT_NAME( amstrad_cpc_green )(m_palette);
 	}
 	else
 	{
-		PALETTE_INIT_CALL_MEMBER( amstrad_cpc );
+		PALETTE_INIT_NAME( amstrad_cpc )(m_palette);
 	}
 }
 
@@ -893,8 +893,8 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	MCFG_PALETTE_LENGTH(32)
-	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,amstrad_cpc)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_cpc)
 
 	MCFG_MC6845_ADD( "mc6845", MC6845, NULL, XTAL_16MHz / 16, amstrad_mc6845_intf )
 
@@ -943,7 +943,8 @@ static MACHINE_CONFIG_DERIVED( kccomp, amstrad )
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state,kccomp)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,kccomp)
 
-	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,kccomp)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(amstrad_state,kccomp)
 MACHINE_CONFIG_END
 
 
@@ -968,8 +969,8 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	MCFG_PALETTE_LENGTH(4096)
-	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,amstrad_plus)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
 
 	MCFG_MC6845_ADD( "mc6845", MC6845, NULL, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
 
@@ -1028,8 +1029,8 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	MCFG_PALETTE_LENGTH(4096)
-	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,amstrad_plus)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
 
 	MCFG_MC6845_ADD( "mc6845", MC6845, NULL, XTAL_40MHz / 40, amstrad_plus_mc6845_intf )
 
@@ -1056,8 +1057,10 @@ static MACHINE_CONFIG_DERIVED( aleste, amstrad )
 	MCFG_SOUND_REPLACE("ay", AY8912, XTAL_16MHz / 16)
 	MCFG_SOUND_CONFIG(ay8912_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_PALETTE_LENGTH(32+64)
-	MCFG_PALETTE_INIT_OVERRIDE(amstrad_state,aleste)
+	
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 32+64)
+	MCFG_PALETTE_INIT_OWNER(amstrad_state,aleste)
 	MCFG_MC146818_ADD( "rtc", XTAL_4_194304Mhz )
 
 	MCFG_DEVICE_REMOVE("upd765")

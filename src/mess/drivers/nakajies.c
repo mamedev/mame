@@ -335,7 +335,7 @@ public:
 	/* Banking */
 	UINT8   m_bank[8];
 	UINT8   *m_bank_base[8];
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(nakajies);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
 };
@@ -697,10 +697,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::kb_timer)
 }
 
 
-void nakajies_state::palette_init()
+PALETTE_INIT_MEMBER(nakajies_state, nakajies)
 {
-	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
-	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 
@@ -750,7 +750,8 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MCFG_SCREEN_SIZE( 80 * 6, 8 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
 	MCFG_GFXDECODE_ADD("gfxdecode", wales210)
-	MCFG_PALETTE_LENGTH( 2 )
+	MCFG_PALETTE_ADD( "palette", 2 )
+	MCFG_PALETTE_INIT_OWNER(nakajies_state, nakajies)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* sound */

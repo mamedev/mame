@@ -374,7 +374,7 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
 	MCFG_VIDEO_START_OVERRIDE(special_state,special)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_special)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -425,8 +425,10 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_specimx)
 	MCFG_VIDEO_START_OVERRIDE(special_state,specimx)
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(special_state, specimx )
+	
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(special_state, specimx )
 
 	/* audio hardware */
 	MCFG_SOUND_ADD("custom", SPECIMX, 0)
@@ -461,8 +463,8 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
 	MCFG_VIDEO_START_OVERRIDE(special_state,erik)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_erik)
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT_OVERRIDE(special_state,erik)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(special_state,erik)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

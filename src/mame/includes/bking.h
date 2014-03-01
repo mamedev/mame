@@ -92,7 +92,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(bking);
 	DECLARE_MACHINE_START(bking3);
 	DECLARE_MACHINE_RESET(bking3);
 	DECLARE_MACHINE_RESET(common);

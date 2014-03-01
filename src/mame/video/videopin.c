@@ -68,7 +68,7 @@ UINT32 videopin_state::screen_update_videopin(screen_device &screen, bitmap_ind1
 				{
 					for (j = 0; j < 2; j++)
 					{
-						m_gfxdecode->gfx(1)->transpen(bitmap,rect,
+						m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,rect,
 							0, 0,
 							0, 0,
 							x + 16 * i,

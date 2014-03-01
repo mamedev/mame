@@ -53,7 +53,7 @@ static ADDRESS_MAP_START( goal92_map, AS_PROGRAM, 16, goal92_state )
 	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(goal92_foreground_w) AM_SHARE("fg_data")
 	AM_RANGE(0x101800, 0x101fff) AM_RAM // it has tiles for clouds, but they aren't used
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(goal92_text_w) AM_SHARE("tx_data")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x104000, 0x13ffff) AM_RAM
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140800, 0x140801) AM_WRITENOP
@@ -324,8 +324,8 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 	MCFG_SCREEN_VBLANK_DRIVER(goal92_state, screen_eof_goal92)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", goal92)
-	MCFG_PALETTE_LENGTH(128*16)
-
+	MCFG_PALETTE_ADD("palette", 128*16)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

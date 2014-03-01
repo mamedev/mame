@@ -1094,7 +1094,7 @@ PALETTE_INIT_MEMBER(thomson_state, thom)
 		UINT8 g = 255. * pow( ((i>> 4) & 15) / 15., gamma );
 		UINT8 b = 255. * pow( ((i >> 8) & 15) / 15., gamma );
 		/* UINT8 alpha = i & 0x1000 ? 0 : 255;  TODO: transparency */
-		palette_set_color_rgb(machine(),  i, r, g, b );
+		palette.set_pen_color(i, r, g, b );
 	}
 }
 

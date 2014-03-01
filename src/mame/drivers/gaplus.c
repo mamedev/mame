@@ -596,7 +596,8 @@ static MACHINE_CONFIG_START( gaplus, gaplus_state )
 	MCFG_SCREEN_VBLANK_DRIVER(gaplus_state, screen_eof_gaplus)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gaplus)
-	MCFG_PALETTE_LENGTH(64*4+64*8)
+	MCFG_PALETTE_ADD("palette", 64*4+64*8)
+	MCFG_PALETTE_INIT_OWNER(gaplus_state, gaplus)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -456,9 +456,9 @@ static MACHINE_CONFIG_DERIVED( appoooh, appoooh_common )
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_appoooh)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", appoooh)
-	MCFG_PALETTE_LENGTH(32*8+32*8)
+	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
-	MCFG_PALETTE_INIT_OVERRIDE(appoooh_state,appoooh)
+	MCFG_PALETTE_INIT_OWNER(appoooh_state,appoooh)
 	MCFG_VIDEO_START_OVERRIDE(appoooh_state,appoooh)
 MACHINE_CONFIG_END
 
@@ -474,9 +474,9 @@ static MACHINE_CONFIG_DERIVED( robowres, appoooh_common )
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_robowres)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", robowres)
-	MCFG_PALETTE_LENGTH(32*8+32*8)
+	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
-	MCFG_PALETTE_INIT_OVERRIDE(appoooh_state,robowres)
+	MCFG_PALETTE_INIT_OWNER(appoooh_state,robowres)
 	MCFG_VIDEO_START_OVERRIDE(appoooh_state,appoooh)
 MACHINE_CONFIG_END
 

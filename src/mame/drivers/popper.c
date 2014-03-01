@@ -353,8 +353,8 @@ static MACHINE_CONFIG_START( popper, popper_state )
 	MCFG_SCREEN_UPDATE_DRIVER(popper_state, screen_update_popper)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", popper)
-	MCFG_PALETTE_LENGTH(64)
-
+	MCFG_PALETTE_ADD("palette", 64)
+	MCFG_PALETTE_INIT_OWNER(popper_state, popper)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

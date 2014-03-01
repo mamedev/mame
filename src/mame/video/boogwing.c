@@ -21,7 +21,7 @@ void boogwing_state::video_start()
 void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int y, x;
-	const pen_t *paldata = machine().pens;
+	const pen_t *paldata = &m_palette->pen(0);
 	bitmap_ind16 *sprite_bitmap1, *sprite_bitmap2;
 	bitmap_ind8* priority_bitmap;
 
@@ -190,7 +190,7 @@ UINT32 boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rgb3
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
 	/* Draw playfields */
-	bitmap.fill(machine().pens[0x400], cliprect); /* pen not confirmed */
+	bitmap.fill(m_palette->pen(0x400), cliprect); /* pen not confirmed */
 	screen.priority().fill(0);
 
 	// bit&0x8 is definitely some kind of palette effect

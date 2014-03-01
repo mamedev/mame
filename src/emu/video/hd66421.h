@@ -48,12 +48,14 @@ public:
 	DECLARE_WRITE8_MEMBER( reg_idx_w );
 	DECLARE_READ8_MEMBER( reg_dat_r );
 	DECLARE_WRITE8_MEMBER( reg_dat_w );
+	DECLARE_PALETTE_INIT(hd66421);
 
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// device_config_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
@@ -69,6 +71,7 @@ protected:
 private:
 	UINT8 m_cmd, m_reg[32];
 	int m_x, m_y;
+	required_device<palette_device> m_palette;
 };
 
 

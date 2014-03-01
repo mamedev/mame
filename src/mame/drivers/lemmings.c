@@ -56,7 +56,7 @@ WRITE16_MEMBER(lemmings_state::lemmings_palette_24bit_w)
 	g = (m_paletteram[offset + 1] >> 8) & 0xff;
 	r = (m_paletteram[offset + 1] >> 0) & 0xff;
 
-	palette_set_color(machine(), offset / 2, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset / 2, rgb_t(r, g, b));
 }
 
 void lemmings_state::lemmings_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
@@ -264,16 +264,18 @@ static MACHINE_CONFIG_START( lemmings, lemmings_state )
 	MCFG_SCREEN_VBLANK_DRIVER(lemmings_state, screen_eof_lemmings)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", lemmings)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 1);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 0);
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR

@@ -160,7 +160,7 @@ UINT32 pcxt_state::screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &b
 						color |= ((bg_rom[y*320/8+x+(pen_i*0x20000)+yi*0x400+m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
 
 					if(cliprect.contains(x*8+xi, y*8+yi))
-						bitmap.pix32(y*8+yi, x*8+xi) = machine().pens[color];
+						bitmap.pix32(y*8+yi, x*8+xi) = m_palette->pen(color);
 				}
 			}
 		}

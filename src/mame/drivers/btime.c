@@ -190,7 +190,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(btime_state::audio_nmi_gen)
 
 static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_WRITE(btime_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_WRITE(btime_paletteram_w) AM_SHARE("palette")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
@@ -225,7 +225,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_WRITE(btime_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_WRITE(btime_paletteram_w) AM_SHARE("palette")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
@@ -302,7 +302,7 @@ static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x5200, 0x53ff) AM_RAM
 	AM_RANGE(0x5400, 0x5400) AM_WRITE(bnj_scroll1_w)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(bnj_scroll2_w)
-	AM_RANGE(0x5c00, 0x5c0f) AM_RAM_WRITE(btime_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x5c00, 0x5c0f) AM_RAM_WRITE(btime_paletteram_w) AM_SHARE("palette")
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1318,9 +1318,11 @@ static MACHINE_CONFIG_START( btime, btime_state )
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", btime)
-	MCFG_PALETTE_LENGTH(16)
+	
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(btime_state,btime)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
-	MCFG_PALETTE_INIT_OVERRIDE(btime_state,btime)
 	MCFG_VIDEO_START_OVERRIDE(btime_state,btime)
 
 	/* sound hardware */
@@ -1355,7 +1357,6 @@ static MACHINE_CONFIG_DERIVED( cookrace, btime )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cookrace)
-	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_cookrace)
@@ -1372,9 +1373,11 @@ static MACHINE_CONFIG_DERIVED( lnc, btime )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", lnc)
-	MCFG_PALETTE_LENGTH(8)
 
-	MCFG_PALETTE_INIT_OVERRIDE(btime_state,lnc)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(8)
+	MCFG_PALETTE_INIT_OWNER(btime_state,lnc)
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_lnc)
 MACHINE_CONFIG_END
@@ -1409,7 +1412,6 @@ static MACHINE_CONFIG_DERIVED( bnj, btime )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bnj)
-	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,bnj)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1434,9 +1436,11 @@ static MACHINE_CONFIG_DERIVED( zoar, btime )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", zoar)
-	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_DEVICE_MODIFY("screen")
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(64)
+
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_zoar)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
 
@@ -1462,7 +1466,9 @@ static MACHINE_CONFIG_DERIVED( disco, btime )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", disco)
-	MCFG_PALETTE_LENGTH(32)
+
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(32)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_disco)

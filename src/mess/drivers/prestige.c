@@ -112,7 +112,7 @@ public:
 	DECLARE_WRITE8_MEMBER( kb_w );
 	DECLARE_READ8_MEMBER( mouse_r );
 	DECLARE_WRITE8_MEMBER( mouse_w );
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(prestige);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	IRQ_CALLBACK_MEMBER(prestige_int_ack);
 };
@@ -442,10 +442,10 @@ void prestige_state::machine_start()
 	m_vram = ram;
 }
 
-void prestige_state::palette_init()
+PALETTE_INIT_MEMBER(prestige_state, prestige)
 {
-	palette_set_color(machine(), 0, rgb_t(39, 108, 51));
-	palette_set_color(machine(), 1, rgb_t(16, 37, 84));
+	palette.set_pen_color(0, rgb_t(39, 108, 51));
+	palette.set_pen_color(1, rgb_t(16, 37, 84));
 }
 
 UINT32 prestige_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -495,17 +495,30 @@ static MACHINE_CONFIG_START( prestige, prestige_state )
 
 	MCFG_DEFAULT_LAYOUT( layout_lcd )
 
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(prestige_state, prestige)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_INTERFACE("prestige_cart")
+	MCFG_CARTSLOT_INTERFACE("genius_cart")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( gl6000sl, prestige )
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "gl6000sl")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( gl7007sl, prestige )
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -529,8 +542,8 @@ ROM_START( prestige )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "27-6020-02.u2", 0x00000, 0x100000, CRC(6bb6db14) SHA1(5d51fc3fd799e7f01ee99c453f9005fb07747b1e) )
 
-	ROM_REGION( 0x8000, "cart", ROMREGION_ERASE )
-	ROM_CART_LOAD( "cart", 0, 0x8000, 0 )
+	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
 ROM_START( glcolor )
@@ -545,6 +558,6 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1994, glcolor,   0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader Color (Germany)",    GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1997, gl6000sl,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6000SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1998, gl7007sl,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "Genius Leader 7007SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1997, gl6000sl,  0,       0,  gl6000sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 6000SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1998, gl7007sl,  0,       0,  gl7007sl,   prestige, driver_device,     0,  "VTech",   "Genius Leader 7007SL (Germany)",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1998, prestige,  0,       0,  prestige,   prestige, driver_device,     0,  "VTech",   "PreComputer Prestige Elite",       GAME_NOT_WORKING | GAME_NO_SOUND)

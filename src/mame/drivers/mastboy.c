@@ -506,7 +506,7 @@ UINT32 mastboy_state::screen_update_mastboy(screen_device &screen, bitmap_ind16 
 	{
 		int coldat = m_colram[i+1] |  (m_colram[i+0]<<8);
 
-		palette_set_color_rgb(machine(),i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
+		m_palette->set_pen_color(i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
 	}
 
 	for (y=0;y<32;y++)
@@ -529,7 +529,7 @@ UINT32 mastboy_state::screen_update_mastboy(screen_device &screen, bitmap_ind16 
 			}
 
 
-			gfx->opaque(bitmap,cliprect,tileno,attr,0,0,x*8,y*8);
+			gfx->opaque(m_palette,bitmap,cliprect,tileno,attr,0,0,x*8,y*8);
 
 			count+=4;
 
@@ -903,7 +903,7 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mastboy_state, screen_update_mastboy)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mastboy)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 	// sound hardware

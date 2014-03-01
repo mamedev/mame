@@ -83,7 +83,7 @@ public:
 	DECLARE_READ8_MEMBER(debug_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(nsmpoker);
 	virtual void machine_reset();
 	UINT32 screen_update_nsmpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nsmpoker_interrupt);
@@ -141,7 +141,7 @@ UINT32 nsmpoker_state::screen_update_nsmpoker(screen_device &screen, bitmap_ind1
 }
 
 
-void nsmpoker_state::palette_init()
+PALETTE_INIT_MEMBER(nsmpoker_state, nsmpoker)
 {
 }
 
@@ -432,8 +432,8 @@ static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nsmpoker)
 
-	MCFG_PALETTE_LENGTH(8)
-
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(nsmpoker_state, nsmpoker)
 
 MACHINE_CONFIG_END
 

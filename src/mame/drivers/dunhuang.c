@@ -177,7 +177,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	switch (m_layers)
 	{
@@ -403,7 +403,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_paldata_w)
 {
 	m_paldata[m_paloffs] = data;
 
-	palette_set_color_rgb( machine(), m_paloffs/3,
+	m_palette->set_pen_color( m_paloffs/3,
 		pal6bit(m_paldata[(m_paloffs/3)*3+0]),
 		pal6bit(m_paldata[(m_paloffs/3)*3+1]),
 		pal6bit(m_paldata[(m_paloffs/3)*3+2])
@@ -835,7 +835,7 @@ static MACHINE_CONFIG_START( dunhuang, dunhuang_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dunhuang_state, screen_update_dunhuang)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dunhuang)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 	/* sound hardware */

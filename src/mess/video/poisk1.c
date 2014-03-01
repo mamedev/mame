@@ -269,7 +269,7 @@ POISK1_UPDATE_ROW( p1_state::poisk1_gfx_1bpp_update_row )
 }
 
 /* Initialise the cga palette */
-void p1_state::palette_init()
+PALETTE_INIT_MEMBER(p1_state, p1)
 {
 	int i;
 
@@ -277,7 +277,7 @@ void p1_state::palette_init()
 
 	for ( i = 0; i < CGA_PALETTE_SETS * 16; i++ )
 	{
-		palette_set_color_rgb( machine(), i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
+		palette.set_pen_color(i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
 	}
 }
 

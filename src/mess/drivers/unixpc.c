@@ -212,8 +212,7 @@ static MACHINE_CONFIG_START( unixpc, unixpc_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_unixpc)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

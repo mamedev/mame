@@ -84,7 +84,7 @@ public:
 	DECLARE_DRIVER_INIT(a7800_ntsc);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(a7800);
 	DECLARE_PALETTE_INIT(a7800p);
 	UINT32 screen_update_a7800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(a7800_interrupt);

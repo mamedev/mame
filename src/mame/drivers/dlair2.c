@@ -45,13 +45,14 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(dlair2_timer_irq);
+	DECLARE_PALETTE_INIT(dlair2);
+
 protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 void dlair2_state::video_start()
@@ -157,7 +158,7 @@ void dlair2_state::machine_reset()
 {
 }
 
-void dlair2_state::palette_init()
+PALETTE_INIT_MEMBER(dlair2_state, dlair2)
 {
 }
 
@@ -184,7 +185,8 @@ static MACHINE_CONFIG_START( dlair2, dlair2_state )
 
 //  MCFG_GFXDECODE_ADD("gfxdecode", dlair2)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(dlair2_state, dlair2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

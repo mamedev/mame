@@ -94,7 +94,7 @@ static void namconb1_install_palette(running_machine &machine)
 
 			for( byte_offset=0; byte_offset<4; byte_offset++ )
 			{
-				palette_set_color_rgb( machine, pen++, r>>24, g>>24, b>>24 );
+				state->m_palette->set_pen_color(pen++, r>>24, g>>24, b>>24 );
 				r<<=8; g<<=8; b<<=8;
 			}
 		}
@@ -146,7 +146,7 @@ UINT32 namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind1
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
 
-	bitmap.fill(get_black_pen(machine()), cliprect );
+	bitmap.fill(m_palette->black_pen(), cliprect );
 
 	video_update_common( screen, bitmap, clip, 0 );
 
@@ -183,7 +183,7 @@ UINT32 namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_ind1
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
 
-	bitmap.fill(get_black_pen(machine()), cliprect );
+	bitmap.fill(m_palette->black_pen(), cliprect );
 
 	if( memcmp(m_tilemap_tile_bank,m_tilebank32,sizeof(m_tilemap_tile_bank))!=0 )
 	{

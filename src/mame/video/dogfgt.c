@@ -11,7 +11,7 @@
 
 ***************************************************************************/
 
-void dogfgt_state::palette_init()
+PALETTE_INIT_MEMBER(dogfgt_state, dogfgt)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -37,7 +37,7 @@ void dogfgt_state::palette_init()
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i + 16, rgb_t(r,g,b));
+		palette.set_pen_color(i + 16, rgb_t(r,g,b));
 		color_prom++;
 	}
 }
@@ -192,7 +192,7 @@ void dogfgt_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect 
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					m_spriteram[offs + 1] + ((m_spriteram[offs] & 0x30) << 4),
 					(m_spriteram[offs] & 0x08) >> 3,
 					flipx,flipy,

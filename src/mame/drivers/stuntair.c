@@ -153,12 +153,12 @@ PALETTE_INIT_MEMBER(stuntair_state, stuntair)
 		int g = (data&0x38)>>3;
 		int r = (data&0x07)>>0;
 
-		palette_set_color(machine(),i,rgb_t(r<<5,g<<5,b<<6));
+		palette.set_pen_color(i,rgb_t(r<<5,g<<5,b<<6));
 	}
 
 	// just set the FG layer to black and white
-	palette_set_color(machine(),0x100,rgb_t(0x00,0x00,0x00));
-	palette_set_color(machine(),0x101,rgb_t(0xff,0xff,0xff));
+	palette.set_pen_color(0x100,rgb_t(0x00,0x00,0x00));
+	palette.set_pen_color(0x101,rgb_t(0xff,0xff,0xff));
 }
 
 
@@ -213,7 +213,7 @@ void stuntair_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		y = 240 - y;
 
-		gfx->transpen(bitmap,cliprect,tile,colour,flipx,flipy,x,y,0);
+		gfx->transpen(m_palette,bitmap,cliprect,tile,colour,flipx,flipy,x,y,0);
 	}
 }
 
@@ -541,9 +541,9 @@ static MACHINE_CONFIG_START( stuntair, stuntair_state )
 	MCFG_SCREEN_UPDATE_DRIVER(stuntair_state, screen_update_stuntair)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", stuntair)
-	MCFG_PALETTE_LENGTH(0x100+2)
+	MCFG_PALETTE_ADD("palette", 0x100+2)
 
-	MCFG_PALETTE_INIT_OVERRIDE(stuntair_state, stuntair)
+	MCFG_PALETTE_INIT_OWNER(stuntair_state, stuntair)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono") // stereo?

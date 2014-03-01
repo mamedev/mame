@@ -424,7 +424,7 @@ UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb3
 	int x,y;
 	UINT32 count;
 
-	bitmap.fill(get_black_pen(machine()), cliprect); //TODO
+	bitmap.fill(m_palette->black_pen(), cliprect); //TODO
 
 	if(!(SCC_DE_VREG)) //display enable
 		return 0;
@@ -442,22 +442,22 @@ UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb3
 				color = ((m_magicram[count]) & 0x000f)>>0;
 
 				if(cliprect.contains((x*4)+3, y))
-					bitmap.pix32(y, (x*4)+3) = machine().pens[color];
+					bitmap.pix32(y, (x*4)+3) = m_palette->pen(color);
 
 				color = ((m_magicram[count]) & 0x00f0)>>4;
 
 				if(cliprect.contains((x*4)+2, y))
-					bitmap.pix32(y, (x*4)+2) = machine().pens[color];
+					bitmap.pix32(y, (x*4)+2) = m_palette->pen(color);
 
 				color = ((m_magicram[count]) & 0x0f00)>>8;
 
 				if(cliprect.contains((x*4)+1, y))
-					bitmap.pix32(y, (x*4)+1) = machine().pens[color];
+					bitmap.pix32(y, (x*4)+1) = m_palette->pen(color);
 
 				color = ((m_magicram[count]) & 0xf000)>>12;
 
 				if(cliprect.contains((x*4)+0, y))
-					bitmap.pix32(y, (x*4)+0) = machine().pens[color];
+					bitmap.pix32(y, (x*4)+0) = m_palette->pen(color);
 
 				count++;
 			}
@@ -474,12 +474,12 @@ UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb3
 				color = ((m_magicram[count]) & 0x00ff)>>0;
 
 				if(cliprect.contains((x*2)+1, y))
-					bitmap.pix32(y, (x*2)+1) = machine().pens[color];
+					bitmap.pix32(y, (x*2)+1) = m_palette->pen(color);
 
 				color = ((m_magicram[count]) & 0xff00)>>8;
 
 				if(cliprect.contains((x*2)+0, y))
-					bitmap.pix32(y, (x*2)+0) = machine().pens[color];
+					bitmap.pix32(y, (x*2)+0) = m_palette->pen(color);
 
 				count++;
 			}
@@ -522,7 +522,7 @@ WRITE16_MEMBER(magicard_state::paletteram_io_w)
 					break;
 				case 2:
 					m_pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(machine(), m_pal.offs, rgb_t(m_pal.r, m_pal.g, m_pal.b));
+					m_palette->set_pen_color(m_pal.offs, rgb_t(m_pal.r, m_pal.g, m_pal.b));
 					m_pal.offs_internal = 0;
 					m_pal.offs++;
 					break;
@@ -733,7 +733,7 @@ static MACHINE_CONFIG_START( magicard, magicard_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1) //dynamic resolution,TODO
 	MCFG_SCREEN_UPDATE_DRIVER(magicard_state, screen_update_magicard)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 
 

@@ -95,7 +95,7 @@ WRITE32_MEMBER(djmain_state::paletteram32_w)
 	g = (data >>  8) & 0xff;
 	b = (data >> 16) & 0xff;
 
-	palette_set_color(machine(), offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
 
@@ -1420,11 +1420,12 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 	MCFG_SCREEN_VISIBLE_AREA(12, 512-12-1, 0, 384-1)
 	MCFG_SCREEN_UPDATE_DRIVER(djmain_state, screen_update_djmain)
 
-	MCFG_PALETTE_LENGTH(0x4440/4)
+	MCFG_PALETTE_ADD("palette", 0x4440/4)
 	MCFG_GFXDECODE_ADD("gfxdecode", djmain)
 
 	MCFG_K056832_ADD("k056832", djmain_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K055555_ADD("k055555")
 
 	/* sound hardware */

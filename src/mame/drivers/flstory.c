@@ -84,7 +84,8 @@ static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
+	AM_RANGE(0xdd00, 0xddff) AM_READWRITE(flstory_palette_r, flstory_palette_w) AM_SHARE("palette")
+	AM_RANGE(0xde00, 0xdeff) AM_READWRITE(flstory_palette_ext_r, flstory_palette_ext_w) AM_SHARE("palette_ext")
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
@@ -110,7 +111,8 @@ static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
+	AM_RANGE(0xdd00, 0xddff) AM_READWRITE(flstory_palette_r, flstory_palette_w) AM_SHARE("palette")
+	AM_RANGE(0xde00, 0xdeff) AM_READWRITE(flstory_palette_ext_r, flstory_palette_ext_w) AM_SHARE("palette_ext")
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
@@ -145,7 +147,8 @@ static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
+	AM_RANGE(0xdd00, 0xddff) AM_READWRITE(flstory_palette_r, flstory_palette_w) AM_SHARE("palette")
+	AM_RANGE(0xde00, 0xdeff) AM_READWRITE(flstory_palette_ext_r, flstory_palette_ext_w) AM_SHARE("palette_ext")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
 
@@ -352,7 +355,8 @@ static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 //  AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
+	AM_RANGE(0xdd00, 0xddff) AM_READWRITE(flstory_palette_r, flstory_palette_w) AM_SHARE("palette")
+	AM_RANGE(0xde00, 0xdeff) AM_READWRITE(flstory_palette_ext_r, flstory_palette_ext_w) AM_SHARE("palette_ext")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
 
@@ -1086,7 +1090,8 @@ static MACHINE_CONFIG_START( flstory, flstory_state )
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_flstory)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", flstory)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
@@ -1143,7 +1148,8 @@ static MACHINE_CONFIG_START( onna34ro, flstory_state )
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_flstory)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", flstory)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 
@@ -1200,7 +1206,8 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_victnine)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", flstory)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,victnine)
 
@@ -1263,7 +1270,8 @@ static MACHINE_CONFIG_START( rumba, flstory_state )
 	MCFG_SCREEN_UPDATE_DRIVER(flstory_state, screen_update_rumba)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", flstory)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,rumba)
 

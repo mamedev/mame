@@ -84,7 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	TILE_GET_INFO_MEMBER(get_dmndrby_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(dmndrby);
 	UINT32 screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(dderby_irq);
 	INTERRUPT_GEN_MEMBER(dderby_timer_irq);
@@ -364,7 +364,7 @@ UINT32 dmndrby_state::screen_update_dderby(screen_device &screen, bitmap_ind16 &
 	gfx_element *sprites = m_gfxdecode->gfx(1);
 	gfx_element *track = m_gfxdecode->gfx(2);
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 
 /* Draw racetrack
@@ -383,13 +383,13 @@ can we draw it with the tilemap? maybe not, the layout is a litle strange
 			int chr = m_racetrack_tilemap_rom[off];
 			int col = m_racetrack_tilemap_rom[off+0x2000]&0x1f;
 			int flipx = m_racetrack_tilemap_rom[off+0x2000]&0x40;
-			track->opaque(bitmap,cliprect,chr,col,flipx,0,y*16+scrolly,x*16);
+			track->opaque(m_palette,bitmap,cliprect,chr,col,flipx,0,y*16+scrolly,x*16);
 			// draw another bit of track
 			// a rubbish way of doing it
 			chr = m_racetrack_tilemap_rom[off-0x100];
 			col = m_racetrack_tilemap_rom[off+0x1f00]&0x1f;
 			flipx = m_racetrack_tilemap_rom[off+0x1f00]&0x40;
-			track->opaque(bitmap,cliprect,chr,col,flipx,0,y*16-256+scrolly,x*16);
+			track->opaque(m_palette,bitmap,cliprect,chr,col,flipx,0,y*16-256+scrolly,x*16);
 			off++;
 		}
 	}
@@ -419,13 +419,13 @@ wouldnt like to say its the most effective way though...
 		for (a=0;a<8 ;a++)
 		{
 			for(b=0;b<7;b++) {
-				sprites->transpen(bitmap,cliprect,anim+a*8+b,col,0,0,sprx+a*8,spry+b*8,0);
+				sprites->transpen(m_palette,bitmap,cliprect,anim+a*8+b,col,0,0,sprx+a*8,spry+b*8,0);
 			}
 		}
 		// draw the horse number
 		a=3;
 		b=3;
-		sprites->transpen(bitmap,cliprect,anim+horse,col,0,0,sprx+a*8,spry+b*8,0);
+		sprites->transpen(m_palette,bitmap,cliprect,anim+horse,col,0,0,sprx+a*8,spry+b*8,0);
 
 
 	}
@@ -442,7 +442,7 @@ wouldnt like to say its the most effective way though...
 			tileno|=(bank<<8);
 			color=((m_dderby_vidattribs[count])&0x1f);
 
-			gfx->transpen(bitmap,cliprect,tileno,color,0,0,x*8,y*8,(tileno == 0x38) ? 0 : -1);
+			gfx->transpen(m_palette,bitmap,cliprect,tileno,color,0,0,x*8,y*8,(tileno == 0x38) ? 0 : -1);
 
 			count++;
 		}
@@ -453,7 +453,7 @@ wouldnt like to say its the most effective way though...
 }
 
 // copied from elsewhere. surely incorrect
-void dmndrby_state::palette_init()
+PALETTE_INIT_MEMBER(dmndrby_state, dmndrby)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -466,9 +466,6 @@ void dmndrby_state::palette_init()
 			3, &resistances_rg[0], rweights, 470, 0,
 			3, &resistances_rg[0], gweights, 470, 0,
 			2, &resistances_b[0],  bweights, 470, 0);
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -493,7 +490,7 @@ void dmndrby_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -503,7 +500,7 @@ void dmndrby_state::palette_init()
 	for (i = 0x000; i < 0x300; i++)
 	{
 		UINT8 ctabentry = color_prom[i];
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -540,8 +537,8 @@ static MACHINE_CONFIG_START( dderby, dmndrby_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dmndrby_state, screen_update_dderby)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dmndrby)
-	MCFG_PALETTE_LENGTH(0x300)
-
+	MCFG_PALETTE_ADD("palette", 0x300)
+	MCFG_PALETTE_INIT_OWNER(dmndrby_state, dmndrby)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

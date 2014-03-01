@@ -58,8 +58,6 @@ public:
 	required_shared_ptr<UINT8> m_cus_ram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-//  UINT8 *  m_paletteram;    // currently this uses generic palette handling
-//  UINT8 *  m_paletteram_2;  // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -246,8 +244,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, albazg_state )
 	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE(prot_lock_w)
 	AM_RANGE(0xa7ff, 0xa7ff) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_SHARE("cus_ram")
-	AM_RANGE(0xb000, 0xb07f) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_split_lo_w) AM_SHARE("paletteram")
-	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_split_hi_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xb000, 0xb07f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb080, 0xb0ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(yumefuda_vram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(yumefuda_cram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
@@ -405,8 +403,9 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/16, mc6845_intf)   /* hand tuned to get ~60 fps */
 
-	MCFG_GFXDECODE_ADD("gfxdecode",  yumefuda )
-	MCFG_PALETTE_LENGTH(0x80)
+	MCFG_GFXDECODE_ADD("gfxdecode", yumefuda )
+	MCFG_PALETTE_ADD("palette", 0x80)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */

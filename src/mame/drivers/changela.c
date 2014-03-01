@@ -510,7 +510,7 @@ static MACHINE_CONFIG_START( changela, changela_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(changela_state, screen_update_changela)
 
-	MCFG_PALETTE_LENGTH(0x40)
+	MCFG_PALETTE_ADD("palette", 0x40)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

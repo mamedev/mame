@@ -297,5 +297,17 @@ inline void save_manager::save_item(const char *module, const char *tag, int ind
 	save_memory(module, tag, index, name, &value[0], sizeof(UINT64), value.count());
 }
 
+template<>
+inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<float> &value, const char *name)
+{
+	save_memory(module, tag, index, name, &value[0], sizeof(float), value.count());
+}
+
+template<>
+inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<double> &value, const char *name)
+{
+	save_memory(module, tag, index, name, &value[0], sizeof(double), value.count());
+}
+
 
 #endif  /* __SAVE_H__ */

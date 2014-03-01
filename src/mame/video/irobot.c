@@ -37,7 +37,7 @@
 
 ***************************************************************************/
 
-void irobot_state::palette_init()
+PALETTE_INIT_MEMBER(irobot_state, irobot)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -53,7 +53,7 @@ void irobot_state::palette_init()
 
 		int swapped_i = BITSWAP8(i,7,6,5,4,3,0,1,2);
 
-		palette_set_color(machine(), swapped_i + 64, rgb_t(r, g, b));
+		palette.set_pen_color(swapped_i + 64, rgb_t(r, g, b));
 	}
 }
 
@@ -72,7 +72,7 @@ WRITE8_MEMBER(irobot_state::irobot_paletteram_w)
 	g = 12 * bits * intensity;
 	bits = (color >> 7) & 0x03;
 	r = 12 * bits * intensity;
-	palette_set_color(machine(),(offset >> 1) & 0x3F,rgb_t(r,g,b));
+	m_palette->set_pen_color((offset >> 1) & 0x3F,rgb_t(r,g,b));
 }
 
 
@@ -360,7 +360,7 @@ UINT32 irobot_state::screen_update_irobot(screen_device &screen, bitmap_ind16 &b
 			int code = videoram[offs] & 0x3f;
 			int color = ((videoram[offs] & 0xc0) >> 6) | (m_alphamap >> 3);
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code, color,
 					0,0,
 					8*x,8*y,0);

@@ -40,7 +40,6 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 void xavix_state::video_start()
@@ -140,10 +139,6 @@ void xavix_state::machine_reset()
 }
 
 
-void xavix_state::palette_init()
-{
-}
-
 static MACHINE_CONFIG_START( xavix, xavix_state )
 
 	/* basic machine hardware */
@@ -160,7 +155,7 @@ static MACHINE_CONFIG_START( xavix, xavix_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", xavix)
 
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

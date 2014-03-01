@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xybots_state )
 	AM_RANGE(0xff9000, 0xffadff) AM_MIRROR(0x7f8000) AM_RAM
 	AM_RANGE(0xffae00, 0xffafff) AM_MIRROR(0x7f8000) AM_RAM AM_SHARE("mob")
 	AM_RANGE(0xffb000, 0xffbfff) AM_MIRROR(0x7f8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
-	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x7f8800) AM_RAM_WRITE(paletteram_IIIIRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x7f8800) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
 	AM_RANGE(0xffe000, 0xffe0ff) AM_MIRROR(0x7f8000) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
 	AM_RANGE(0xffe100, 0xffe1ff) AM_MIRROR(0x7f8000) AM_READ_PORT("FFE100")
@@ -191,7 +191,9 @@ static MACHINE_CONFIG_START( xybots, xybots_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE_ADD("gfxdecode", xybots)
-	MCFG_PALETTE_LENGTH(1024)
+	
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, xybots_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, xybots_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)

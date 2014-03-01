@@ -332,8 +332,8 @@ static MACHINE_CONFIG_START( espial, espial_state )
 	MCFG_SCREEN_UPDATE_DRIVER(espial_state, screen_update_espial)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", espial)
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(espial_state, espial)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -235,8 +235,8 @@ private:
 		void (v99x8_device::*draw_sprite_16)(const pen_t *, UINT16*, UINT8*);
 		void (v99x8_device::*draw_sprite_16s)(const pen_t *, UINT16*, UINT8*);
 	} ;
-	static const v99x8_mode s_modes[];
-
+	static const v99x8_mode s_modes[];	
+	required_device<palette_device> m_palette;
 protected:
 	static UINT16 s_pal_indYJK[0x20000];
 };

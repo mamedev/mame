@@ -166,7 +166,7 @@ UINT32 mjsister_state::screen_update_mjsister(screen_device &screen, bitmap_ind1
 		copybitmap_trans(bitmap, *m_tmpbitmap1, flip, flip, 2, 0, cliprect, 0);
 	}
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	return 0;
 }
 
@@ -527,8 +527,7 @@ static MACHINE_CONFIG_START( mjsister, mjsister_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255+4, 8, 247)
 	MCFG_SCREEN_UPDATE_DRIVER(mjsister_state, screen_update_mjsister)
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 
 
 	/* sound hardware */

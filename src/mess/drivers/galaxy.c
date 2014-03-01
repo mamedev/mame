@@ -199,8 +199,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", galaxy)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 
 	/* snapshot */
@@ -235,8 +234,7 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 
 	/* snapshot */

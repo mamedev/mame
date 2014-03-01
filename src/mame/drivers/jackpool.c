@@ -70,7 +70,7 @@ UINT32 jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_ind1
 				int tile = (m_vram[count+(0x2000/2)] & 0x7fff);
 				int attr = (m_vram[count+(0x2000/2)+0x800] & 0x1f00)>>8;
 
-				gfx->opaque(bitmap,cliprect,tile,attr,0,0,x*8,y*8);
+				gfx->opaque(m_palette,bitmap,cliprect,tile,attr,0,0,x*8,y*8);
 				count++;
 			}
 		}
@@ -87,7 +87,7 @@ UINT32 jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_ind1
 					int attr = (m_vram[count+0x800] & 0x1f00)>>8;
 					int t_pen = (m_vram[count+0x800] & 0x1000);
 
-					gfx->transpen(bitmap,cliprect,tile,attr,0,0,x*8,y*8,(t_pen) ? 0 : -1);
+					gfx->transpen(m_palette,bitmap,cliprect,tile,attr,0,0,x*8,y*8,(t_pen) ? 0 : -1);
 				}
 
 				count++;
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( jackpool_mem, AS_PROGRAM, 16, jackpool_state )
 	AM_RANGE(0x340000, 0x347fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x348000, 0x34ffff) AM_RAM //<- vram banks 2 & 3?
 
-	AM_RANGE(0x360000, 0x3603ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x360000, 0x3603ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x380000, 0x380061) AM_READWRITE(jackpool_io_r,jackpool_io_w) AM_SHARE("io")//AM_READ(jackpool_io_r)
 
 	AM_RANGE(0x800000, 0x80000f) AM_READ(jackpool_ff_r) AM_WRITENOP //UART
@@ -279,8 +279,8 @@ static MACHINE_CONFIG_START( jackpool, jackpool_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_PALETTE_LENGTH(0x200)
-
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

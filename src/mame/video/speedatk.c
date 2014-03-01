@@ -8,13 +8,10 @@
 #include "video/mc6845.h"
 
 
-void speedatk_state::palette_init()
+PALETTE_INIT_MEMBER(speedatk_state, speedatk)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x10);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x10; i++)
@@ -40,7 +37,7 @@ void speedatk_state::palette_init()
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -49,7 +46,7 @@ void speedatk_state::palette_init()
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -102,7 +99,7 @@ UINT32 speedatk_state::screen_update_speedatk(screen_device &screen, bitmap_ind1
 			color = m_colorram[count] & 0x1f;
 			region = (m_colorram[count] & 0x10) >> 4;
 
-			m_gfxdecode->gfx(region)->opaque(bitmap,cliprect,tile,color,m_flip_scr,m_flip_scr,x*8,y*8);
+			m_gfxdecode->gfx(region)->opaque(m_palette,bitmap,cliprect,tile,color,m_flip_scr,m_flip_scr,x*8,y*8);
 
 			count = (m_flip_scr) ? count-1 : count+1;
 			count&=0x3ff;

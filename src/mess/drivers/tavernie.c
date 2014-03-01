@@ -373,8 +373,7 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 	MCFG_SCREEN_SIZE(80*8, 25*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*10-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_DEFAULT_LAYOUT(layout_tavernie)
 
 	/* sound hardware */

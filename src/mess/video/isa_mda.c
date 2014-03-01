@@ -42,7 +42,6 @@ static const unsigned char mda_palette[4][3] =
 
 static MC6845_UPDATE_ROW( mda_update_row );
 
-#if 0
 /* F4 Character Displayer */
 static const gfx_layout pc_16_charlayout =
 {
@@ -71,10 +70,9 @@ static const gfx_layout pc_8_charlayout =
 };
 
 static GFXDECODE_START( pcmda )
-	GFXDECODE_ENTRY( "mda:gfx1", 0x0000, pc_16_charlayout, 1, 1 )
-	GFXDECODE_ENTRY( "mda:gfx1", 0x1000, pc_8_charlayout, 1, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 1, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout, 1, 1 )
 GFXDECODE_END
-#endif
 
 
 static MC6845_INTERFACE( mc6845_mda_intf )
@@ -101,13 +99,13 @@ WRITE_LINE_MEMBER(isa8_mda_device::pc_cpu_line)
 MACHINE_CONFIG_FRAGMENT( pcvideo_mda )
 	MCFG_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
-	MCFG_SCREEN_UPDATE_DEVICE( MDA_MC6845_NAME, mc6845_device, screen_update )
+	MCFG_SCREEN_UPDATE_DEVICE( MDA_MC6845_NAME, mc6845_device, screen_update )	
 
-	MCFG_PALETTE_LENGTH( 4 )
+	MCFG_PALETTE_ADD( "palette", 4 )
 
 	MCFG_MC6845_ADD( MDA_MC6845_NAME, MC6845, MDA_SCREEN_NAME, MDA_CLOCK/9, mc6845_mda_intf)
 
-	//MCFG_GFXDECODE_ADD("gfxdecode", pcmda)
+	MCFG_GFXDECODE_ADD("gfxdecode", pcmda)
 
 	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_mda_device, pc_cpu_line))
@@ -155,13 +153,15 @@ const rom_entry *isa8_mda_device::device_rom_region() const
 
 isa8_mda_device::isa8_mda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_MDA, "IBM Monochrome Display and Printer Adapter", tag, owner, clock, "isa_ibm_mda", __FILE__),
-		device_isa8_card_interface(mconfig, *this)
+		device_isa8_card_interface(mconfig, *this),
+		m_palette(*this, "palette")
 {
 }
 
 isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_isa8_card_interface(mconfig, *this)
+		device_isa8_card_interface(mconfig, *this),
+		m_palette(*this, "palette")
 {
 }
 
@@ -171,14 +171,17 @@ isa8_mda_device::isa8_mda_device(const machine_config &mconfig, device_type type
 
 void isa8_mda_device::device_start()
 {
+	if (m_palette != NULL && !m_palette->started())
+		throw device_missing_dependencies();
+
 	set_isa_device();
 	m_videoram = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_mda_device::io_read), this ), write8_delegate( FUNC(isa8_mda_device::io_write), this ) );
 	m_isa->install_bank(0xb0000, 0xb0fff, 0, 0x07000, "bank_mda", m_videoram);
 
 	/* Initialise the mda palette */
-	for(int i = 0; i < (sizeof(mda_palette) / 3); i++)
-		palette_set_color_rgb(machine(), i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);
+	for(int i = 0; i < 4; i++)
+		m_palette->set_pen_color(i, rgb_t(mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]));
 }
 
 //-------------------------------------------------
@@ -213,7 +216,7 @@ void isa8_mda_device::device_reset()
 static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 {
 	isa8_mda_device *mda  = downcast<isa8_mda_device *>(device->owner());
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = mda->m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -287,7 +290,7 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row )
 static MC6845_UPDATE_ROW( mda_text_blink_update_row )
 {
 	isa8_mda_device *mda  = downcast<isa8_mda_device *>(device->owner());
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = mda->m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -509,22 +512,20 @@ static MC6845_INTERFACE( mc6845_hercules_intf )
 	NULL
 };
 
-#if 0
 static GFXDECODE_START( pcherc )
-	GFXDECODE_ENTRY( "hercules:gfx1", 0x0000, pc_16_charlayout, 1, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 1, 1 )
 GFXDECODE_END
-#endif
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_hercules )
 	MCFG_SCREEN_ADD( HERCULES_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( HERCULES_MC6845_NAME, mc6845_device, screen_update )
 
-	MCFG_PALETTE_LENGTH( 4 )
+	MCFG_PALETTE_ADD( "palette", 4 )
 
 	MCFG_MC6845_ADD( HERCULES_MC6845_NAME, MC6845, HERCULES_SCREEN_NAME, MDA_CLOCK/9, mc6845_hercules_intf)
 
-	//MCFG_GFXDECODE_ADD("gfxdecode", pcherc)
+	MCFG_GFXDECODE_ADD("gfxdecode", pcherc)
 
 	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
 	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_mda_device, pc_cpu_line))
@@ -579,6 +580,9 @@ isa8_hercules_device::isa8_hercules_device(const machine_config &mconfig, const 
 
 void isa8_hercules_device::device_start()
 {
+	if (m_palette != NULL && !m_palette->started())
+		throw device_missing_dependencies();
+
 	m_videoram = auto_alloc_array(machine(), UINT8, 0x10000);
 	set_isa_device();
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_hercules_device::io_read), this ), write8_delegate( FUNC(isa8_hercules_device::io_write), this ) );
@@ -586,7 +590,7 @@ void isa8_hercules_device::device_start()
 
 	/* Initialise the mda palette */
 	for(int i = 0; i < (sizeof(mda_palette) / 3); i++)
-		palette_set_color_rgb(machine(), i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);
+		m_palette->set_pen_color(i, mda_palette[i][0], mda_palette[i][1], mda_palette[i][2]);
 }
 
 //-------------------------------------------------
@@ -612,7 +616,7 @@ void isa8_hercules_device::device_reset()
 static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 {
 	isa8_hercules_device *herc  = downcast<isa8_hercules_device *>(device->owner());
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = herc->m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  gfx_base = ( ( herc->m_mode_control & 0x80 ) ? 0x8000 : 0x0000 ) | ( ( ra & 0x03 ) << 13 );
 	int i;

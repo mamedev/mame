@@ -349,7 +349,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay_port_a_out);
 	DECLARE_WRITE8_MEMBER(ay_port_b_out);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(corona);
 	UINT32 screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -361,7 +361,7 @@ public:
 *               Video Hardware               *
 *********************************************/
 
-void corona_state::palette_init()
+PALETTE_INIT_MEMBER(corona_state, corona)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int bit6, bit7, bit0, bit1, r, g, b;
@@ -384,7 +384,7 @@ void corona_state::palette_init()
 		bit1 = (color_prom[0] >> 5) & 0x01;
 		r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
@@ -1380,8 +1380,8 @@ static MACHINE_CONFIG_START( winner81, corona_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 
-	MCFG_PALETTE_LENGTH(0x100)
-
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)    /* measured */
@@ -1411,8 +1411,8 @@ static MACHINE_CONFIG_START( winner82, corona_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 
-	MCFG_PALETTE_LENGTH(0x100)
-
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLK2)    /* measured */
@@ -1442,8 +1442,8 @@ static MACHINE_CONFIG_START( re800, corona_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 
-	MCFG_PALETTE_LENGTH(0x100)
-
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
@@ -1472,8 +1472,8 @@ static MACHINE_CONFIG_START( rcirulet, corona_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 
-	MCFG_PALETTE_LENGTH(0x100)
-
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
@@ -1503,8 +1503,8 @@ static MACHINE_CONFIG_START( luckyrlt, corona_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_luckyrlt)
 
-	MCFG_PALETTE_LENGTH(0x100)
-
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)

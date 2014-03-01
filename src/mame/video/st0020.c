@@ -14,7 +14,8 @@ const device_type ST0020_SPRITES = &device_creator<st0020_device>;
 
 st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ST0020_SPRITES, "st0020_device", tag, owner, clock, "st0020", __FILE__),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this),
+		m_palette(*this)
 {
 	m_is_st0032 = 0;
 	m_is_jclub2 = 0;
@@ -28,6 +29,16 @@ st0020_device::st0020_device(const machine_config &mconfig, const char *tag, dev
 void st0020_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<st0020_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void st0020_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<st0020_device &>(device).m_palette.set_tag(tag);
 }
 
 void st0020_device::set_is_st0032(device_t &device, int is_st0032)
@@ -67,7 +78,7 @@ void st0020_device::device_start()
 		if (m_gfxdecode->gfx(m_gfx_index) == 0)
 			break;
 
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), layout_16x8x8_2, (UINT8 *)m_st0020_gfxram, machine().total_colors() / 64, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), layout_16x8x8_2, (UINT8 *)m_st0020_gfxram, m_palette->entries() / 64, 0)));
 
 	m_gfxdecode->gfx(m_gfx_index)->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
@@ -382,7 +393,7 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 			{
 				for (y = ystart; y != yend; y += yinc)
 				{
-					m_gfxdecode->gfx(m_gfx_index)->zoom_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(m_gfx_index)->zoom_transpen(m_palette,bitmap,cliprect,
 									code++,
 									color,
 									flipx, flipy,

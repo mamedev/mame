@@ -1313,8 +1313,8 @@ void lynx_state::lynx_draw_line()
 		for (x = 160 - 2; x >= 0; j++, x -= 2)
 		{
 			byte = lynx_read_ram(j);
-			line[x + 1] = m_palette[(byte >> 4) & 0x0f];
-			line[x + 0] = m_palette[(byte >> 0) & 0x0f];
+			line[x + 1] = m_lynx_palette[(byte >> 4) & 0x0f];
+			line[x + 0] = m_lynx_palette[(byte >> 0) & 0x0f];
 		}
 	}
 	else
@@ -1323,8 +1323,8 @@ void lynx_state::lynx_draw_line()
 		for (x = 0; x < 160; j++, x += 2)
 		{
 			byte = lynx_read_ram(j);
-			line[x + 0] = m_palette[(byte >> 4) & 0x0f];
-			line[x + 1] = m_palette[(byte >> 0) & 0x0f];
+			line[x + 0] = m_lynx_palette[(byte >> 4) & 0x0f];
+			line[x + 1] = m_lynx_palette[(byte >> 0) & 0x0f];
 		}
 	}
 }
@@ -1828,10 +1828,10 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 		m_mikey.data[offset] = data;
 
 		/* RED = 0xb- & 0x0f, GREEN = 0xa- & 0x0f, BLUE = (0xb- & 0xf0) >> 4 */
-		m_palette[offset & 0x0f] = machine().pens[
+		m_lynx_palette[offset & 0x0f] = m_palette->pen(
 			((m_mikey.data[0xb0 + (offset & 0x0f)] & 0x0f)) |
 			((m_mikey.data[0xa0 + (offset & 0x0f)] & 0x0f) << 4) |
-			((m_mikey.data[0xb0 + (offset & 0x0f)] & 0xf0) << 4)];
+			((m_mikey.data[0xb0 + (offset & 0x0f)] & 0xf0) << 4));
 		break;
 
 	/* TODO: properly implement these writes */
@@ -1950,7 +1950,7 @@ void lynx_state::machine_start()
 	save_item(NAME(m_memory_config));
 	save_item(NAME(m_sign_AB));
 	save_item(NAME(m_sign_CD));
-	save_item(NAME(m_palette));
+	save_item(NAME(m_lynx_palette));
 	save_item(NAME(m_rotate));
 	// save blitter variables
 	save_item(NAME(m_blitter.screen));

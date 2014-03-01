@@ -60,6 +60,7 @@ decocass_tape_device::decocass_tape_device(const machine_config &mconfig, const 
 	: device_t(mconfig, DECOCASS_TAPE, "DECO Cassette Tape", tag, owner, clock, "decocass_tape", __FILE__),
 	m_tape_timer(NULL),
 	m_speed(0),
+	m_region(REGION_LEADER),
 	m_bitnum(0),
 	m_clockpos(0),
 	m_numclocks(0)

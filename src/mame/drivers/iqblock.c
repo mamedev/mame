@@ -129,8 +129,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, iqblock_state )
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w)
+	AM_RANGE(0x2000, 0x23ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x2800, 0x2bff) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x6000, 0x603f) AM_WRITE(iqblock_fgscroll_w)
 	AM_RANGE(0x6800, 0x69ff) AM_WRITE(iqblock_fgvideoram_w) /* initialized up to 6fff... bug or larger tilemap? */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(iqblock_bgvideoram_w)
@@ -289,8 +289,8 @@ static MACHINE_CONFIG_START( iqblock, iqblock_state )
 	MCFG_SCREEN_UPDATE_DRIVER(iqblock_state, screen_update_iqblock)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", iqblock)
-	MCFG_PALETTE_LENGTH(1024)
-
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

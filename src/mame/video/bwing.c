@@ -160,7 +160,7 @@ WRITE8_MEMBER(bwing_state::bwing_paletteram_w)
 		if (b > 0xff) b = 0xff;
 	}
 
-	palette_set_color(machine(), offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 
 	#if BW_DEBUG
 		m_paletteram[offset + 0x40] = m_palatch;
@@ -274,9 +274,9 @@ void bwing_state::draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, UINT8 
 
 		// single/double
 		if (!(attrib & 0x10))
-			 gfx->transpen(bmp,clip, code, color, fx, fy, x, y, 0);
+			 gfx->transpen(m_palette,bmp,clip, code, color, fx, fy, x, y, 0);
 		else
-			 gfx->zoom_transpen(bmp,clip, code, color, fx, fy, x, y, 1<<16, 2<<16, 0);
+			 gfx->zoom_transpen(m_palette,bmp,clip, code, color, fx, fy, x, y, 1<<16, 2<<16, 0);
 	}
 }
 
@@ -307,7 +307,7 @@ UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bit
 		m_bgmap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 
 	// draw low priority sprites
 	draw_sprites(bitmap, cliprect, m_spriteram, 0);

@@ -118,7 +118,8 @@ const device_type K007121 = &device_creator<k007121_device>;
 
 k007121_device::k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K007121, "Konami 007121", tag, owner, clock, "k007121", __FILE__),
-	m_flipscreen(0)
+	m_flipscreen(0),
+	m_palette(*this)
 {
 }
 
@@ -223,13 +224,13 @@ WRITE8_MEMBER( k007121_device::ctrl_w )
  *
  */
 
-void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, colortable_t *ctable,
+void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, palette_device *palette,
 							const UINT8 *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, UINT32 pri_mask )
 {
 	//  gfx_element *gfx = gfxs[chip];
 	int flipscreen = m_flipscreen;
 	int i, num, inc, offs[5];
-	int is_flakatck = (ctable == NULL);
+	int is_flakatck = (palette == NULL);
 
 	if (is_flakatck)
 	{
@@ -290,7 +291,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		if (is_flakatck)
 			transparent_mask = 1 << 0;
 		else
-			transparent_mask = colortable_get_transpen_mask(ctable, gfx, color, 0);
+			transparent_mask = palette->transpen_mask(*gfx, color, 0);
 
 		if (!is_flakatck || source[0x00])   /* Flak Attack needs this */
 		{
@@ -331,7 +332,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 					}
 
 					if (pri_mask != -1)
-						gfx->prio_transmask(bitmap,cliprect,
+						gfx->prio_transmask(m_palette,bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
 							color,
 							flipx,flipy,
@@ -339,7 +340,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 							priority_bitmap,pri_mask,
 							transparent_mask);
 					else
-						gfx->transmask(bitmap,cliprect,
+						gfx->transmask(m_palette,bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
 							color,
 							flipx,flipy,
@@ -351,4 +352,14 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		source += inc;
 	}
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void k007121_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<k007121_device &>(device).m_palette.set_tag(tag);
 }

@@ -482,7 +482,8 @@ static MACHINE_CONFIG_START( sliver, sliver_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 384-1-16, 0*8, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sliver_state, screen_update_sliver)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

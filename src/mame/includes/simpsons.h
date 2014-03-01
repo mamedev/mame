@@ -1,3 +1,4 @@
+#include "machine/bankdev.h"
 #include "sound/k053260.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k052109.h"
@@ -17,16 +18,15 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_bank0000(*this, "bank0000"),
+		m_bank2000(*this, "bank2000"),
 		m_k053260(*this, "k053260"),
 		m_k052109(*this, "k052109"),
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251") { }
 
 	/* memory pointers */
-	UINT8 *    m_ram;
-	UINT8 *    m_xtraram;
 	UINT16 *   m_spriteram;
-//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	int        m_sprite_colorbase;
@@ -35,12 +35,13 @@ public:
 
 	/* misc */
 	int        m_firq_enabled;
-	int        m_video_bank;
 	//int        m_nmi_enabled;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<address_map_bank_device> m_bank0000;
+	required_device<address_map_bank_device> m_bank2000;
 	required_device<k053260_device> m_k053260;
 	required_device<k052109_device> m_k052109;
 	required_device<k053247_device> m_k053246;
@@ -61,7 +62,6 @@ public:
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	DECLARE_READ8_MEMBER(simpsons_sound_r);
-	void simpsons_postload();
 	void simpsons_video_banking( int bank );
 	void sound_nmi_callback( int param );
 	void simpsons_objdma(  );

@@ -37,7 +37,7 @@ WRITE8_MEMBER(shisen_state::sichuan2_paletteram_w)
 
 	offset &= 0xff;
 
-	palette_set_color_rgb(machine(), offset, pal5bit(m_paletteram[offset + 0x000]), pal5bit(m_paletteram[offset + 0x100]), pal5bit(m_paletteram[offset + 0x200]));
+	m_palette->set_pen_color(offset, pal5bit(m_paletteram[offset + 0x000]), pal5bit(m_paletteram[offset + 0x100]), pal5bit(m_paletteram[offset + 0x200]));
 }
 
 TILE_GET_INFO_MEMBER(shisen_state::get_bg_tile_info)

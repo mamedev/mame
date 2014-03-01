@@ -117,25 +117,25 @@
  *
  *************************************/
 
-void atarifb_state::palette_init()
+PALETTE_INIT_MEMBER(atarifb_state, atarifb)
 {
 	/* chars */
-	palette_set_color(machine(), 0, rgb_t(0xff,0xff,0xff)); /* white  */
-	palette_set_color(machine(), 1, rgb_t(0x00,0x00,0x00)); /* black  */
+	palette.set_pen_color(0, rgb_t(0xff,0xff,0xff)); /* white  */
+	palette.set_pen_color(1, rgb_t(0x00,0x00,0x00)); /* black  */
 
 	/* sprites */
-	palette_set_color(machine(), 2, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine(), 3, rgb_t(0xff,0xff,0xff)); /* white  */
-	palette_set_color(machine(), 4, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine(), 5, rgb_t(0x00,0x00,0x00)); /* black  */
+	palette.set_pen_color(2, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette.set_pen_color(3, rgb_t(0xff,0xff,0xff)); /* white  */
+	palette.set_pen_color(4, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette.set_pen_color(5, rgb_t(0x00,0x00,0x00)); /* black  */
 
 	/* sprite masks */
-	palette_set_color(machine(), 6, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine(), 7, rgb_t(0x80,0x80,0x80)); /* grey  */
-	palette_set_color(machine(), 8, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine(), 9, rgb_t(0x00,0x00,0x00)); /* black  */
-	palette_set_color(machine(), 10, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine(), 11, rgb_t(0xff,0xff,0xff)); /* white  */
+	palette.set_pen_color(6, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette.set_pen_color(7, rgb_t(0x80,0x80,0x80)); /* grey  */
+	palette.set_pen_color(8, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette.set_pen_color(9, rgb_t(0x00,0x00,0x00)); /* black  */
+	palette.set_pen_color(10, rgb_t(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette.set_pen_color(11, rgb_t(0xff,0xff,0xff)); /* white  */
 }
 
 
@@ -563,8 +563,8 @@ static MACHINE_CONFIG_START( atarifb, atarifb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_atarifb)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", atarifb)
-	MCFG_PALETTE_LENGTH(12)
-
+	MCFG_PALETTE_ADD("palette", 12)
+	MCFG_PALETTE_INIT_OWNER(atarifb_state, atarifb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

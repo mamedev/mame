@@ -282,7 +282,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 	extra.fadefactor = 0;
 	extra.fogfactor = 0;
 
-	extra.pens = &screen.machine().pens[(color & 0x7f) << 8];
+	extra.pens = &m_state.m_palette->pen((color & 0x7f) << 8);
 	extra.primap = &screen.priority();
 	extra.bn = node->data.quad.texturebank;
 	extra.flags = flags;
@@ -528,7 +528,7 @@ void namcos22_renderer::poly3d_drawsprite(
 		extra.line_modulo = gfx->rowbytes();
 		extra.flipx = flipx;
 		extra.flipy = flipy;
-		extra.pens = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color & 0x7f)];
+		extra.pens = &m_state.m_palette->pen(gfx->colorbase() + gfx->granularity() * (color & 0x7f));
 		extra.primap = &screen.priority();
 		extra.source = gfx->get_data(code % gfx->elements());
 
@@ -1863,7 +1863,7 @@ WRITE32_MEMBER(namcos22_state::namcos22s_spotram_w)
 
 void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int prival)
 {
-	const pen_t *pens = machine().pens;
+	const pen_t *pens = m_palette->pens();
 	UINT16 *src;
 	UINT32 *dest;
 	UINT8 *pri;
@@ -1945,7 +1945,7 @@ void namcos22_state::namcos22s_mix_text_layer(screen_device &screen, bitmap_rgb3
 
 void namcos22_state::namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pens = machine().pens;
+	const pen_t *pens = m_palette->pens();
 	UINT16 *src;
 	UINT32 *dest;
 	UINT8 *pri;
@@ -2046,7 +2046,7 @@ void namcos22_state::update_palette()
 				int r = nthbyte(m_paletteram, which + 0x00000);
 				int g = nthbyte(m_paletteram, which + 0x08000);
 				int b = nthbyte(m_paletteram, which + 0x10000);
-				palette_set_color(machine(), which, rgb_t(r, g, b));
+				m_palette->set_pen_color(which, rgb_t(r, g, b));
 			}
 			m_dirtypal[i] = 0;
 		}
@@ -2323,7 +2323,7 @@ UINT32 namcos22_state::screen_update_namcos22(screen_device &screen, bitmap_rgb3
 	screen.priority().fill(0, cliprect);
 
 	// background color
-	bitmap.fill(screen.machine().pens[0x7fff], cliprect);
+	bitmap.fill(m_palette->pen(0x7fff), cliprect);
 
 	// layers
 	draw_polygons(bitmap);

@@ -271,11 +271,11 @@ void sengokmj_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		for (ax=0; ax<dx; ax++)
 			for (ay=0; ay<dy; ay++) {
 				if (!fx)
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+ax*16,y+ay*16,15);
 				else
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,15);
 			}
@@ -296,7 +296,7 @@ void sengokmj_state::video_start()
 
 UINT32 sengokmj_state::screen_update_sengokmj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(screen.machine().pens[0x7ff], cliprect); //black pen
+	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
 	/* TODO: offsetted? */
 	m_sc0_tilemap->set_scrollx(0, (SEIBU_CRTC_SC0_SX + 128) & 0x1ff );
@@ -372,7 +372,7 @@ static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16, sengokmj_state )
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(seibucrtc_sc1vram_w) AM_SHARE("sc1_vram")
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(seibucrtc_sc2vram_w) AM_SHARE("sc2_vram")
 	AM_RANGE(0x0d800, 0x0e7ff) AM_RAM_WRITE(seibucrtc_sc3vram_w) AM_SHARE("sc3_vram")
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM AM_SHARE("sprite_ram")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -581,7 +581,8 @@ static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sengokmj)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)

@@ -493,7 +493,7 @@ INPUT_PORTS_END
          nothing   G+4     R+4     B+4    ALL+1    G+2     R+2     B+2
 
 */
-void samcoupe_state::palette_init()
+PALETTE_INIT_MEMBER(samcoupe_state, samcoupe)
 {
 	for (int i = 0; i < 128; i++)
 	{
@@ -505,10 +505,10 @@ void samcoupe_state::palette_init()
 		g <<= 5;
 		b <<= 5;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
-	machine().palette->normalize_range(0, 127);
+	palette.palette()->normalize_range(0, 127);
 }
 
 
@@ -551,7 +551,8 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_SCREEN_RAW_PARAMS(SAMCOUPE_XTAL_X1/2, SAM_TOTAL_WIDTH, 0, SAM_BORDER_LEFT + SAM_SCREEN_WIDTH + SAM_BORDER_RIGHT, SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM)
 	MCFG_SCREEN_UPDATE_DRIVER(samcoupe_state, screen_update)
 
-	MCFG_PALETTE_LENGTH(128)
+	MCFG_PALETTE_ADD("palette", 128)
+	MCFG_PALETTE_INIT_OWNER(samcoupe_state, samcoupe)
 
 	/* devices */
 	MCFG_CENTRONICS_ADD("lpt1", centronics_printers, "image")

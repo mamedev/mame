@@ -64,7 +64,7 @@
  *
  **************************************************************************/
 
-void carpolo_state::palette_init()
+PALETTE_INIT_MEMBER(carpolo_state, carpolo)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -91,7 +91,7 @@ void carpolo_state::palette_init()
 	};
 
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		UINT8 pen, r, g, b;
 
@@ -130,7 +130,7 @@ void carpolo_state::palette_init()
 		/* blue component */
 		b = ((b_voltage[(color_prom[pen] >> 0) & 0x03] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -178,7 +178,7 @@ static void draw_alpha_line(running_machine &machine, bitmap_ind16 &bitmap, cons
 		code = state->m_alpharam[alpha_line * 32 + x] >> 2;
 		col  = state->m_alpharam[alpha_line * 32 + x] & 0x03;
 
-		state->m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		state->m_gfxdecode->gfx(2)->transpen(state->m_palette,bitmap,cliprect,
 				code,col,
 				0,0,
 				x*8,video_line*8,0);
@@ -206,13 +206,13 @@ void carpolo_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	x = 240 - x;
 	y = 240 - y;
 	
-	m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+	m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 			remapped_code, col,
 			0, flipy,
 			x, y,0);
 
 	/* draw with wrap around */
-	m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+	m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 			remapped_code, col,
 			0, flipy,
 			(INT16)x - 256, y,0);
@@ -262,14 +262,14 @@ UINT32 carpolo_state::screen_update_carpolo(screen_device &screen, bitmap_ind16 
 
 	/* left goal - position determined by bit 6 of the
 	   horizontal and vertical timing PROMs */
-	m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,
+	m_gfxdecode->gfx(1)->zoom_transpen(m_palette,bitmap,cliprect,
 				0,0,
 				0,0,
 				LEFT_GOAL_X,GOAL_Y,
 				0x20000,0x20000,0);
 
 	/* right goal */
-	m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,
+	m_gfxdecode->gfx(1)->zoom_transpen(m_palette,bitmap,cliprect,
 				0,1,
 				1,0,
 				RIGHT_GOAL_X,GOAL_Y,
@@ -358,12 +358,12 @@ int carpolo_state::check_sprite_sprite_collision(int x1, int y1, int code1, int 
 		m_sprite_sprite_collision_bitmap1->fill(0);
 		m_sprite_sprite_collision_bitmap2->fill(0);
 
-		m_gfxdecode->gfx(0)->opaque(*m_sprite_sprite_collision_bitmap1,m_sprite_sprite_collision_bitmap1->cliprect(),
+		m_gfxdecode->gfx(0)->opaque(m_palette,*m_sprite_sprite_collision_bitmap1,m_sprite_sprite_collision_bitmap1->cliprect(),
 				code1,0,
 				0,flipy1,
 				x1,y1);
 
-		m_gfxdecode->gfx(0)->opaque(*m_sprite_sprite_collision_bitmap2,m_sprite_sprite_collision_bitmap2->cliprect(),
+		m_gfxdecode->gfx(0)->opaque(m_palette,*m_sprite_sprite_collision_bitmap2,m_sprite_sprite_collision_bitmap2->cliprect(),
 				code2,0,
 				0,flipy2,
 				x2,y2);
@@ -411,12 +411,12 @@ int carpolo_state::check_sprite_left_goal_collision(int x1, int y1, int code1, i
 		m_sprite_goal_collision_bitmap1->fill(0);
 		m_sprite_goal_collision_bitmap2->fill(0);
 
-		m_gfxdecode->gfx(0)->opaque(*m_sprite_goal_collision_bitmap1,m_sprite_goal_collision_bitmap1->cliprect(),
+		m_gfxdecode->gfx(0)->opaque(m_palette,*m_sprite_goal_collision_bitmap1,m_sprite_goal_collision_bitmap1->cliprect(),
 				code1,0,
 				0,flipy1,
 				x1,y1);
 
-		m_gfxdecode->gfx(1)->zoom_transpen(*m_sprite_goal_collision_bitmap2,m_sprite_goal_collision_bitmap2->cliprect(),
+		m_gfxdecode->gfx(1)->zoom_transpen(m_palette,*m_sprite_goal_collision_bitmap2,m_sprite_goal_collision_bitmap2->cliprect(),
 					0,0,
 					0,0,
 					x2,y2,
@@ -468,12 +468,12 @@ int carpolo_state::check_sprite_right_goal_collision(int x1, int y1, int code1, 
 		m_sprite_goal_collision_bitmap1->fill(0);
 		m_sprite_goal_collision_bitmap2->fill(0);
 
-		m_gfxdecode->gfx(0)->opaque(*m_sprite_goal_collision_bitmap1,m_sprite_goal_collision_bitmap1->cliprect(),
+		m_gfxdecode->gfx(0)->opaque(m_palette,*m_sprite_goal_collision_bitmap1,m_sprite_goal_collision_bitmap1->cliprect(),
 				code1,0,
 				0,flipy1,
 				x1,y1);
 
-		m_gfxdecode->gfx(1)->zoom_transpen(*m_sprite_goal_collision_bitmap2,m_sprite_goal_collision_bitmap2->cliprect(),
+		m_gfxdecode->gfx(1)->zoom_transpen(m_palette,*m_sprite_goal_collision_bitmap2,m_sprite_goal_collision_bitmap2->cliprect(),
 					0,1,
 					1,0,
 					x2,y2,
@@ -513,7 +513,7 @@ int carpolo_state::check_sprite_border_collision(UINT8 x1, UINT8 y1, int code1, 
 	x1 = 240 - x1;
 	y1 = 240 - y1;
 
-	m_gfxdecode->gfx(0)->opaque(*m_sprite_border_collision_bitmap,m_sprite_border_collision_bitmap->cliprect(),
+	m_gfxdecode->gfx(0)->opaque(m_palette,*m_sprite_border_collision_bitmap,m_sprite_border_collision_bitmap->cliprect(),
 			code1,0,
 			0,flipy1,
 			0,0);

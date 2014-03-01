@@ -130,7 +130,7 @@ ROM15.BIN       MX29F1610, SOP44 Surface Mounted Mask ROM /
 WRITE32_MEMBER(silkroad_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	palette_set_color_rgb(machine(),offset,pal5bit(m_generic_paletteram_32[offset] >> (10+16)),pal5bit(m_generic_paletteram_32[offset] >> (5+16)),pal5bit(m_generic_paletteram_32[offset] >> (0+16)));
+	m_palette->set_pen_color(offset,pal5bit(m_generic_paletteram_32[offset] >> (10+16)),pal5bit(m_generic_paletteram_32[offset] >> (5+16)),pal5bit(m_generic_paletteram_32[offset] >> (0+16)));
 }
 
 WRITE32_MEMBER(silkroad_state::silk_6295_bank_w)
@@ -284,7 +284,7 @@ static MACHINE_CONFIG_START( silkroad, silkroad_state )
 	MCFG_SCREEN_UPDATE_DRIVER(silkroad_state, screen_update_silkroad)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", silkroad)
-	MCFG_PALETTE_LENGTH(0x2000)
+	MCFG_PALETTE_ADD("palette", 0x2000)
 
 
 	/* sound hardware */

@@ -51,7 +51,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(thedeep);
 	UINT32 screen_update_thedeep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(thedeep_mcu_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(thedeep_interrupt);

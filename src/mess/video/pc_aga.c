@@ -72,8 +72,8 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_aga )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_14_31818MHz,912,0,640,262,0,200 )
 	MCFG_SCREEN_UPDATE_DEVICE( AGA_MC6845_NAME, mc6845_device, screen_update )
 
-	MCFG_PALETTE_LENGTH( CGA_PALETTE_SETS * 16 )
-	MCFG_PALETTE_INIT( pc_aga )
+	MCFG_PALETTE_ADD( "palette", CGA_PALETTE_SETS * 16 )
+	MCFG_PALETTE_INIT_LEGACY( pc_aga )
 
 	MCFG_MC6845_ADD( AGA_MC6845_NAME, MC6845, AGA_SCREEN_NAME, XTAL_14_31818MHz/8, mc6845_aga_intf )
 
@@ -92,7 +92,7 @@ PALETTE_INIT( pc_aga )
 {
 	int i;
 	for(i = 0; i < CGA_PALETTE_SETS * 16; i++)
-		palette_set_color_rgb(machine, i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
+		palette.set_pen_color(i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
 }
 
 

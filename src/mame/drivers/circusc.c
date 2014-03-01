@@ -348,8 +348,8 @@ static MACHINE_CONFIG_START( circusc, circusc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(circusc_state, screen_update_circusc)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", circusc)
-	MCFG_PALETTE_LENGTH(16*16+16*16)
-
+	MCFG_PALETTE_ADD("palette", 16*16+16*16)
+	MCFG_PALETTE_INIT_OWNER(circusc_state, circusc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

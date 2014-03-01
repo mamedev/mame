@@ -190,7 +190,7 @@ WRITE32_MEMBER(deco_mlc_state::avengrs_palette_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	/* x bbbbb ggggg rrrrr */
-	palette_set_color_rgb(machine(),offset,pal5bit(m_generic_paletteram_32[offset] >> 0),pal5bit(m_generic_paletteram_32[offset] >> 5),pal5bit(m_generic_paletteram_32[offset] >> 10));
+	m_palette->set_pen_color(offset,pal5bit(m_generic_paletteram_32[offset] >> 0),pal5bit(m_generic_paletteram_32[offset] >> 5),pal5bit(m_generic_paletteram_32[offset] >> 10));
 }
 
 
@@ -496,7 +496,7 @@ static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
 	MCFG_SCREEN_VBLANK_DRIVER(deco_mlc_state, screen_eof_mlc)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", deco_mlc)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)
@@ -529,7 +529,7 @@ static MACHINE_CONFIG_START( mlc, deco_mlc_state )
 	MCFG_SCREEN_VBLANK_DRIVER(deco_mlc_state, screen_eof_mlc)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", deco_mlc)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)

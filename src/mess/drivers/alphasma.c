@@ -72,7 +72,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(alphasmart);
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
@@ -345,10 +345,10 @@ static INPUT_PORTS_START( alphasmart )
 	PORT_CONFSETTING (0x01, DEF_STR(Normal))
 INPUT_PORTS_END
 
-void alphasmart_state::palette_init()
+PALETTE_INIT_MEMBER(alphasmart_state, alphasmart)
 {
-	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
-	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 UINT32 alphasmart_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -397,7 +397,8 @@ static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
 	MCFG_SCREEN_UPDATE_DRIVER(alphasmart_state, screen_update)
 	MCFG_SCREEN_SIZE(6*40, 9*4)
 	MCFG_SCREEN_VISIBLE_AREA(0, (6*40)-1, 0, (9*4)-1)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(alphasmart_state, alphasmart)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

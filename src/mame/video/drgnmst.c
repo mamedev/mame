@@ -93,7 +93,7 @@ void drgnmst_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect
 				realy = ypos + incy * y;
 				realnumber = number + x + y * 16;
 
-				 gfx->transpen(bitmap,cliprect, realnumber, colr, flipx, flipy, realx, realy, 15);
+				 gfx->transpen(m_palette,bitmap,cliprect, realnumber, colr, flipx, flipy, realx, realy, 15);
 			}
 		}
 		source += 4;

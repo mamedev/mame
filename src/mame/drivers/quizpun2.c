@@ -177,9 +177,9 @@ UINT32 quizpun2_state::screen_update_quizpun2(screen_device &screen, bitmap_ind1
 #endif
 
 	if (layers_ctrl & 1)    m_bg_tmap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	else                    bitmap.fill(get_black_pen(machine()), cliprect);
+	else                    bitmap.fill(m_palette->black_pen(), cliprect);
 
-bitmap.fill(get_black_pen(machine()), cliprect);
+bitmap.fill(m_palette->black_pen(), cliprect);
 	if (layers_ctrl & 2)    m_fg_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -372,7 +372,7 @@ static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8, quizpun2_state )
 	AM_RANGE( 0xc000, 0xc7ff ) AM_RAM_WRITE(bg_ram_w ) AM_SHARE("bg_ram")   // 4 * 400
 	AM_RANGE( 0xc800, 0xcfff ) AM_RAM                                       //
 
-	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w )  AM_SHARE("paletteram")
+	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE( 0xe000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
@@ -512,7 +512,8 @@ static MACHINE_CONFIG_START( quizpun2, quizpun2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(quizpun2_state, screen_update_quizpun2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", quizpun2)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */

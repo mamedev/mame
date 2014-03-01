@@ -570,7 +570,8 @@ static MACHINE_CONFIG_START( gat, gatron_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gatron_state, screen_update_gat)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gat)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(gatron_state, gatron)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

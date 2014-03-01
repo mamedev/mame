@@ -37,12 +37,6 @@
 // indicates VIDEO_UPDATE will add container bits its
 #define VIDEO_SELF_RENDER               0x0008
 
-// automatically extend the palette creating a darker copy for shadows
-#define VIDEO_HAS_SHADOWS               0x0010
-
-// automatically extend the palette creating a brighter copy for highlights
-#define VIDEO_HAS_HIGHLIGHTS            0x0020
-
 // force VIDEO_UPDATE to be called even for skipped frames
 #define VIDEO_ALWAYS_UPDATE             0x0080
 
@@ -117,7 +111,6 @@ public:
 
 	// other parameters
 	UINT32                  m_video_attributes;         // flags describing the video system
-	UINT32                  m_total_colors;             // total number of colors in the palette
 	const char *            m_default_layout;           // default layout for this machine
 
 	// helpers during configuration; not for general use
@@ -198,8 +191,6 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 // core video parameters
 #define MCFG_VIDEO_ATTRIBUTES(_flags) \
 	config.m_video_attributes = _flags;
-#define MCFG_PALETTE_LENGTH(_length) \
-	config.m_total_colors = _length;
 #define MCFG_DEFAULT_LAYOUT(_layout) \
 	config.m_default_layout = &(_layout)[0];
 

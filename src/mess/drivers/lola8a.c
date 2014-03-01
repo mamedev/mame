@@ -41,7 +41,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(lola8a);
 	virtual void machine_reset() { m_maincpu->set_pc(0x8000); }
 
 	DECLARE_READ8_MEMBER(lola8a_port_a_r);
@@ -184,12 +184,12 @@ static INPUT_PORTS_START( lola8a )
 INPUT_PORTS_END
 
 
-void lola8a_state::palette_init()
+PALETTE_INIT_MEMBER(lola8a_state, lola8a)
 {
 	int i;
 
 	for(i=0;i<8;i++) {
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 	}
 }
 
@@ -300,7 +300,8 @@ static MACHINE_CONFIG_START( lola8a, lola8a_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_MC6845_ADD(HD46505SP_TAG, HD6845, "screen", XTAL_8MHz / 8, hd46505sp_intf) // HD6845 == HD46505S
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(lola8a_state, lola8a)
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )

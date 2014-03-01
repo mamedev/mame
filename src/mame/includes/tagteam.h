@@ -29,7 +29,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(tagteam);
 	UINT32 screen_update_tagteam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

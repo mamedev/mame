@@ -94,7 +94,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(cham24);
 	UINT32 screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cham24_set_mirroring( int mirroring );
 	void ppu_irq(int *ppu_regs);
@@ -281,9 +281,9 @@ void cham24_state::machine_reset()
 {
 }
 
-void cham24_state::palette_init()
+PALETTE_INIT_MEMBER(cham24_state, cham24)
 {
-	m_ppu->init_palette(machine(), 0);
+	m_ppu->init_palette(palette, 0);
 }
 
 void cham24_state::ppu_irq(int *ppu_regs)
@@ -358,8 +358,8 @@ static MACHINE_CONFIG_START( cham24, cham24_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cham24_state, screen_update_cham24)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cham24)
-	MCFG_PALETTE_LENGTH(8*4*16)
-
+	MCFG_PALETTE_ADD("palette", 8*4*16)
+	MCFG_PALETTE_INIT_OWNER(cham24_state, cham24)
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)
 	MCFG_PPU2C0X_SET_NMI(cham24_state, ppu_irq)

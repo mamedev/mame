@@ -55,7 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_line_w);
 	DECLARE_DRIVER_INIT(esh);
 	virtual void machine_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(esh);
 	UINT32 screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_esh);
 	required_device<cpu_device> m_maincpu;
@@ -90,7 +90,7 @@ UINT32 esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap,
 			//int blinkLine = (m_tile_control_ram[current_screen_character] & 0x40) >> 6;
 			//int blinkChar = (m_tile_control_ram[current_screen_character] & 0x80) >> 7;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					m_tile_ram[current_screen_character] + (0x100 * tileOffs),
 					palIndex,
 					0, 0, charx*8, chary*8, 0);
@@ -238,13 +238,13 @@ static INPUT_PORTS_START( esh )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-void esh_state::palette_init()
+PALETTE_INIT_MEMBER(esh_state, esh)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* Oddly enough, the top 4 bits of each byte is 0 */
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int r,g,b;
 		int bit0,bit1,bit2;
@@ -269,11 +269,11 @@ void esh_state::palette_init()
 		bit2 = (color_prom[i+0x100] >> 6) & 0x01;
 		b = (0x97 * bit2) + (0x47 * bit1) + (0x21 * bit0);
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 
 	/* make color 0 transparent */
-	palette_set_color(machine(), 0, rgb_t(0,0,0,0));
+	palette.set_pen_color(0, rgb_t(0,0,0,0));
 }
 
 static const gfx_layout esh_gfx_layout =
@@ -333,7 +333,8 @@ static MACHINE_CONFIG_START( esh, esh_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(esh_state, esh)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", esh)
 

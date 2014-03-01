@@ -107,7 +107,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_warpspeed_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_warpspeed_starfield_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(warpspeed);
 	UINT32 screen_update_warpspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -291,16 +291,16 @@ static GFXDECODE_START( warpspeed )
 	GFXDECODE_ENTRY( "gfx2", 0, warpspeed_charlayout,   0, 1  )
 GFXDECODE_END
 
-void warpspeed_state::palette_init()
+PALETTE_INIT_MEMBER(warpspeed_state, warpspeed)
 {
 	// tilemaps
-	palette_set_color(machine(),0,rgb_t::black); /* black */
-	palette_set_color(machine(),1,rgb_t::white); /* white */
+	palette.set_pen_color(0,rgb_t::black); /* black */
+	palette.set_pen_color(1,rgb_t::white); /* white */
 
 	// circles
 	for ( int i = 0; i < 8; i++ )
 	{
-		palette_set_color_rgb(machine(), 2 + i, 0xff*BIT(i,0), 0xff*BIT(i,1), 0xff*BIT(i,2));
+		palette.set_pen_color(2 + i, 0xff*BIT(i,0), 0xff*BIT(i,1), 0xff*BIT(i,2));
 	}
 }
 
@@ -322,7 +322,8 @@ static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 	MCFG_SCREEN_UPDATE_DRIVER(warpspeed_state, screen_update_warpspeed)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", warpspeed)
-	MCFG_PALETTE_LENGTH(2+8)
+	MCFG_PALETTE_ADD("palette", 2+8)
+	MCFG_PALETTE_INIT_OWNER(warpspeed_state, warpspeed)
 MACHINE_CONFIG_END
 
 ROM_START( warpsped )

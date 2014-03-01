@@ -116,7 +116,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(famibox);
 	UINT32 screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(famicombox_attract_timer_callback);
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
@@ -516,9 +516,9 @@ static const nesapu_interface famibox_interface_1 =
 	"maincpu"
 };
 
-void famibox_state::palette_init()
+PALETTE_INIT_MEMBER(famibox_state, famibox)
 {
-	m_ppu->init_palette(machine(), 0);
+	m_ppu->init_palette(palette, 0);
 }
 
 void famibox_state::ppu_irq(int *ppu_regs)
@@ -592,7 +592,8 @@ static MACHINE_CONFIG_START( famibox, famibox_state )
 	MCFG_SCREEN_UPDATE_DRIVER(famibox_state, screen_update_famibox)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", famibox)
-	MCFG_PALETTE_LENGTH(8*4*16)
+	MCFG_PALETTE_ADD("palette", 8*4*16)
+	MCFG_PALETTE_INIT_OWNER(famibox_state, famibox)
 
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)

@@ -265,11 +265,13 @@ WRITE8_MEMBER(lethal_state::control2_w)
 	/* bit 1 is cs (active low) */
 	/* bit 2 is clock (active high) */
 	/* bit 3 is "MUT" on the schematics (audio mute?) */
-	/* bit 4 bankswitches the 4800-4fff region: 0 = registers, 1 = RAM ("CBNK" on schematics) */
+	/* bit 4 bankswitches the 4800-7fff region: 0 = registers, 1 = RAM ("CBNK" on schematics) */
 	/* bit 6 is "SHD0" (some kind of shadow control) */
 	/* bit 7 is "SHD1" (ditto) */
 
 	m_cur_control2 = data;
+
+	m_bank4800->set_bank((m_cur_control2 >> 4) & 1);
 
 	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 }
@@ -300,185 +302,10 @@ WRITE8_MEMBER(lethal_state::le_bankswitch_w)
 	membank("bank1")->set_entry(data);
 }
 
-READ8_MEMBER(lethal_state::le_4800_r)
-{
-	if (m_cur_control2 & 0x10)  // RAM enable
-	{
-		return m_generic_paletteram_8[offset];
-	}
-	else
-	{
-		if (offset < 0x0800)
-		{
-			switch (offset)
-			{
-				case 0x40:
-				case 0x41:
-				case 0x42:
-				case 0x43:
-				case 0x44:
-				case 0x45:
-				case 0x46:
-				case 0x47:
-				case 0x48:
-				case 0x49:
-				case 0x4a:
-				case 0x4b:
-				case 0x4c:
-				case 0x4d:
-				case 0x4e:
-				case 0x4f:
-					return m_k053244->k053244_r(space, offset - 0x40);
-
-				case 0x80:
-				case 0x81:
-				case 0x82:
-				case 0x83:
-				case 0x84:
-				case 0x85:
-				case 0x86:
-				case 0x87:
-				case 0x88:
-				case 0x89:
-				case 0x8a:
-				case 0x8b:
-				case 0x8c:
-				case 0x8d:
-				case 0x8e:
-				case 0x8f:
-				case 0x90:
-				case 0x91:
-				case 0x92:
-				case 0x93:
-				case 0x94:
-				case 0x95:
-				case 0x96:
-				case 0x97:
-				case 0x98:
-				case 0x99:
-				case 0x9a:
-				case 0x9b:
-				case 0x9c:
-				case 0x9d:
-				case 0x9e:
-				case 0x9f:
-					return m_k054000->read(space, offset - 0x80);
-
-				case 0xca:
-					return sound_status_r(space, 0);
-			}
-		}
-		else if (offset < 0x1800)
-			return m_k053244->k053245_r(space, (offset - 0x0800) & 0x07ff);
-		else if (offset < 0x2000)
-			return m_k056832->ram_code_lo_r(space, offset - 0x1800);
-		else if (offset < 0x2800)
-			return m_k056832->ram_code_hi_r(space, offset - 0x2000);
-		else if (offset < 0x3000)
-			return m_k056832->ram_attr_lo_r(space, offset - 0x2800);
-		else // (offset < 0x3800)
-			return m_k056832->ram_attr_hi_r(space, offset - 0x3000);
-	}
-
-	return 0;
-}
-
-WRITE8_MEMBER(lethal_state::le_4800_w)
-{
-	if (m_cur_control2 & 0x10)  // RAM enable
-	{
-		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
-	}
-	else
-	{
-		if (offset < 0x0800)
-		{
-			switch (offset)
-			{
-				case 0xc6:
-					sound_cmd_w(space, 0, data);
-					break;
-
-				case 0xc7:
-					sound_irq_w(space, 0, data);
-					break;
-
-				case 0x40:
-				case 0x41:
-				case 0x42:
-				case 0x43:
-				case 0x44:
-				case 0x45:
-				case 0x46:
-				case 0x47:
-				case 0x48:
-				case 0x49:
-				case 0x4a:
-				case 0x4b:
-				case 0x4c:
-				case 0x4d:
-				case 0x4e:
-				case 0x4f:
-					m_k053244->k053244_w(space, offset - 0x40, data);
-					break;
-
-				case 0x80:
-				case 0x81:
-				case 0x82:
-				case 0x83:
-				case 0x84:
-				case 0x85:
-				case 0x86:
-				case 0x87:
-				case 0x88:
-				case 0x89:
-				case 0x8a:
-				case 0x8b:
-				case 0x8c:
-				case 0x8d:
-				case 0x8e:
-				case 0x8f:
-				case 0x90:
-				case 0x91:
-				case 0x92:
-				case 0x93:
-				case 0x94:
-				case 0x95:
-				case 0x96:
-				case 0x97:
-				case 0x98:
-				case 0x99:
-				case 0x9a:
-				case 0x9b:
-				case 0x9c:
-				case 0x9d:
-				case 0x9e:
-				case 0x9f:
-					m_k054000->write(space, offset - 0x80, data);
-					break;
-
-				default:
-					logerror("Unknown LE 48xx register write: %x to %x (PC=%x)\n", data, offset, space.device().safe_pc());
-					break;
-			}
-		}
-		else if (offset < 0x1800)
-			m_k053244->k053245_w(space, (offset - 0x0800) & 0x07ff, data);
-		else if (offset < 0x2000)
-			m_k056832->ram_code_lo_w(space, offset - 0x1800, data);
-		else if (offset < 0x2800)
-			m_k056832->ram_code_hi_w(space, offset - 0x2000, data);
-		else if (offset < 0x3000)
-			m_k056832->ram_attr_lo_w(space, offset - 0x2800, data);
-		else // (offset < 0x3800)
-			m_k056832->ram_attr_hi_w(space, offset - 0x3000, data);
-	}
-}
-
 // use one more palette entry for the BG color
 WRITE8_MEMBER(lethal_state::le_bgcolor_w)
 {
-	paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, 0x3800 + offset, data);
+	m_palette->write(space, 0x3800 + offset, data);
 }
 
 READ8_MEMBER(lethal_state::guns_r)
@@ -532,17 +359,31 @@ static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x40db, 0x40db) AM_READ(gunsaux_r)     // top X bit of guns
 	AM_RANGE(0x40dc, 0x40dc) AM_WRITE(le_bankswitch_w)
 	AM_RANGE(0x47fe, 0x47ff) AM_WRITE(le_bgcolor_w)     // BG color
-	AM_RANGE(0x4800, 0x7fff) AM_READWRITE(le_4800_r, le_4800_w) // bankswitched: RAM and registers
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank2")
+	AM_RANGE(0x4800, 0x7fff) AM_DEVICE("bank4800", address_map_bank_device, amap8)
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x38000)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bank4800_map, AS_PROGRAM, 8, lethal_state )
+	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
+	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE("k054000", k054000_device, read, write)
+	AM_RANGE(0x00c6, 0x00c6) AM_WRITE(sound_cmd_w)
+	AM_RANGE(0x00c7, 0x00c7) AM_WRITE(sound_irq_w)
+	AM_RANGE(0x00ca, 0x00ca) AM_READ(sound_status_r)
+	AM_RANGE(0x0800, 0x17ff) AM_MASK(0x07ff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
+	AM_RANGE(0x1800, 0x1fff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_lo_r, ram_code_lo_w)
+	AM_RANGE(0x2000, 0x27ff) AM_DEVREADWRITE("k056832", k056832_device, ram_code_hi_r, ram_code_hi_w)
+	AM_RANGE(0x2800, 0x2fff) AM_DEVREADWRITE("k056832", k056832_device, ram_attr_lo_r, ram_attr_lo_w)
+	AM_RANGE(0x3000, 0x37ff) AM_DEVREADWRITE("k056832", k056832_device, ram_attr_hi_r, ram_attr_hi_w)
+	AM_RANGE(0x3800, 0x7001) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // 2 extra bytes for the BG color
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( le_sound, AS_PROGRAM, 8, lethal_state )
+	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_byte_w)
 	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xfc03, 0xfc03) AM_READNOP
-	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( lethalen )
@@ -650,12 +491,8 @@ static const k054539_interface k054539_config =
 
 void lethal_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x2000);
+	membank("bank1")->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x2000);
 	membank("bank1")->set_entry(0);
-
-	m_generic_paletteram_8.allocate(0x3800 + 0x02);
 
 	save_item(NAME(m_cur_control2));
 	save_item(NAME(m_sprite_colorbase));
@@ -664,18 +501,12 @@ void lethal_state::machine_start()
 
 void lethal_state::machine_reset()
 {
-	UINT8 *prgrom = (UINT8 *)memregion("maincpu")->base();
-	int i;
-
-	membank("bank2")->set_base(&prgrom[0x48000]);
-	/* force reset again to read proper reset vector */
-	m_maincpu->reset();
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		m_layer_colorbase[i] = 0;
 
 	m_sprite_colorbase = 0;
 	m_cur_control2 = 0;
+	m_bank4800->set_bank(0);
 }
 
 static const k056832_interface lethalen_k056832_intf =
@@ -715,13 +546,17 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_CPU_ADD("soundcpu", Z80, MAIN_CLOCK/4)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(le_sound)
 
+	MCFG_DEVICE_ADD("bank4800", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank4800_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3800)
+
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", lethal)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -729,12 +564,16 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_SCREEN_VISIBLE_AREA(216, 504-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lethal_state, screen_update_lethalen)
 
-	MCFG_PALETTE_LENGTH(7168+1)
+	MCFG_PALETTE_ADD("palette", 7168+1)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_K056832_ADD("k056832", lethalen_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_PALETTE("palette")
 	MCFG_K053244_ADD("k053244", lethalen_k05324x_intf)
 	MCFG_K053244_GFXDECODE("gfxdecode")
+	MCFG_K053244_PALETTE("palette")
 	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
@@ -754,17 +593,17 @@ static MACHINE_CONFIG_DERIVED( lethalej, lethalen )
 	MCFG_DEVICE_REMOVE("k053244")
 	MCFG_K053244_ADD("k053244", lethalej_k05324x_intf)
 	MCFG_K053244_GFXDECODE("gfxdecode")
+	MCFG_K053244_PALETTE("palette")
 MACHINE_CONFIG_END
 
 ROM_START( lethalen )   // US version UAE
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD( "191uae01.u4",    0x10000,  0x40000,  CRC(dca340e3) SHA1(8efbba0e3a459bcfe23c75c584bf3a4ce25148bb) )
+	ROM_LOAD( "191uae01.u4",    0x00000,  0x40000,  CRC(dca340e3) SHA1(8efbba0e3a459bcfe23c75c584bf3a4ce25148bb) )
 
-	ROM_REGION( 0x020000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "191a02.f4", 0x000000, 0x010000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
-	ROM_RELOAD(         0x010000, 0x010000 )
+	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	/* tilemaps */
@@ -794,14 +633,13 @@ ROM_START( lethalen )   // US version UAE
 ROM_END
 
 ROM_START( lethalenj )  // Japan version JAD
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD( "191jad01.u4",    0x10000,  0x40000, CRC(160a25c0) SHA1(1d3ed5a158e461a73c079fe24a8e9d5e2a87e126) )
+	ROM_LOAD( "191jad01.u4",    0x00000,  0x40000, CRC(160a25c0) SHA1(1d3ed5a158e461a73c079fe24a8e9d5e2a87e126) )
 
-	ROM_REGION( 0x020000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "191a02.f4", 0x000000, 0x010000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
-	ROM_RELOAD(         0x010000, 0x010000 )
+	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	/* tilemaps */
@@ -831,14 +669,13 @@ ROM_START( lethalenj )  // Japan version JAD
 ROM_END
 
 ROM_START( lethalenux ) // US version ?, proto / hack?, very different to other sets
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD( "191xxx01.u4",    0x10000,  0x40000, CRC(a3b9e790) SHA1(868b422850be129952c8b11c3c4aa730d8ea1544) ) // hacked? fails rom test, verified on multiple boards
+	ROM_LOAD( "191xxx01.u4",    0x00000,  0x40000, CRC(a3b9e790) SHA1(868b422850be129952c8b11c3c4aa730d8ea1544) ) // hacked? fails rom test, verified on multiple boards
 
-	ROM_REGION( 0x020000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "191a02.f4", 0x000000, 0x010000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
-	ROM_RELOAD(         0x010000, 0x010000 )
+	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	/* tilemaps */
@@ -868,14 +705,13 @@ ROM_START( lethalenux ) // US version ?, proto / hack?, very different to other 
 ROM_END
 
 ROM_START( lethaleneab )    // Euro ver. EAB
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD( "191eab01.u4",    0x10000,  0x40000, CRC(d7ce111e) SHA1(e56137a0ba7664f09b5d05bb39ec6eb4d1e412c7) )
+	ROM_LOAD( "191eab01.u4",    0x00000,  0x40000, CRC(d7ce111e) SHA1(e56137a0ba7664f09b5d05bb39ec6eb4d1e412c7) )
 
-	ROM_REGION( 0x020000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "191a02.f4", 0x000000, 0x010000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
-	ROM_RELOAD(         0x010000, 0x010000 )
+	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	/* tilemaps */
@@ -905,14 +741,13 @@ ROM_START( lethaleneab )    // Euro ver. EAB
 ROM_END
 
 ROM_START( lethaleneae )    // Euro ver. EAE
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD( "191eae01.u4",    0x10000,  0x40000, CRC(c6a3c6ac) SHA1(96a209a3a5b4af40af36bd7090c59a74f8c8df59) )
+	ROM_LOAD( "191eae01.u4",    0x00000,  0x40000, CRC(c6a3c6ac) SHA1(96a209a3a5b4af40af36bd7090c59a74f8c8df59) )
 
-	ROM_REGION( 0x020000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "191a02.f4", 0x000000, 0x010000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
-	ROM_RELOAD(         0x010000, 0x010000 )
+	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	/* tilemaps */
@@ -942,14 +777,13 @@ ROM_START( lethaleneae )    // Euro ver. EAE
 ROM_END
 
 ROM_START( lethalenua ) // *might* be UAA (writes UA to Eeprom)
-	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	/* main program */
-	ROM_LOAD( "6_usa.u4",    0x10000,  0x40000, CRC(ab6b8f16) SHA1(8de6c429a6e71144270e79d18ad47b5aad13fe04) )
+	ROM_LOAD( "6_usa.u4",    0x00000,  0x40000, CRC(ab6b8f16) SHA1(8de6c429a6e71144270e79d18ad47b5aad13fe04) )
 
-	ROM_REGION( 0x020000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	/* Z80 sound program */
-	ROM_LOAD( "191a02.f4", 0x000000, 0x010000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
-	ROM_RELOAD(         0x010000, 0x010000 )
+	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	/* tilemaps */

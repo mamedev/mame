@@ -155,26 +155,26 @@ void bestleag_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		if(m_vregs[0x00/2] & 0x1000)
 			color &= 7;
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx, 0,
 					flipx ? (sx+16) : (sx),sy,15);
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 					code+1,
 					color,
 					flipx, 0,
 					flipx ? (sx) : (sx+16),sy,15);
 
 		/* wraparound x */
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx, 0,
 					flipx ? (sx+16 - 512) : (sx - 512),sy,15);
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 					code+1,
 					color,
 					flipx, 0,
@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( bestleag_map, AS_PROGRAM, 16, bestleag_state )
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(bestleag_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(bestleag_txram_w) AM_SHARE("txram")
 	AM_RANGE(0x0f8000, 0x0f800b) AM_RAM AM_SHARE("vregs")
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
@@ -381,8 +381,8 @@ static MACHINE_CONFIG_START( bestleag, bestleag_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bestleag_state, screen_update_bestleag)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bestleag)
-	MCFG_PALETTE_LENGTH(0x800)
-
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

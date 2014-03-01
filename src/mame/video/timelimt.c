@@ -20,11 +20,11 @@
 
 ***************************************************************************/
 
-void timelimt_state::palette_init(){
+PALETTE_INIT_MEMBER(timelimt_state, timelimt){
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -43,7 +43,7 @@ void timelimt_state::palette_init(){
 		bit1 = (*color_prom >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 		color_prom++;
 	}
 }
@@ -126,7 +126,7 @@ void timelimt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		code += ( attr & 0x80 ) ? 0x40 : 0x00;
 		code += ( attr & 0x40 ) ? 0x80 : 0x00;
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 				code,
 				attr & 7,
 				flipx,flipy,

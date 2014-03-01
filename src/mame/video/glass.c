@@ -177,7 +177,7 @@ void glass_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 		number = ((number & 0x03) << 14) | ((number & 0x0fffc) >> 2);
 
-		gfx->transpen(bitmap,cliprect,number,
+		gfx->transpen(m_palette,bitmap,cliprect,number,
 				0x10 + (color & 0x0f),xflip,yflip,
 				sx-0x0f,sy,0);
 	}
@@ -198,7 +198,7 @@ UINT32 glass_state::screen_update_glass(screen_device &screen, bitmap_ind16 &bit
 	m_pant[1]->set_scrollx(0, m_vregs[3]);
 
 	/* draw layers + sprites */
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	copybitmap(bitmap, *m_screen_bitmap, 0, 0, 0x18, 0x24, cliprect);
 	m_pant[1]->draw(screen, bitmap, cliprect, 0, 0);
 	m_pant[0]->draw(screen, bitmap, cliprect, 0, 0);

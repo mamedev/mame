@@ -80,7 +80,8 @@ pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, d
 	m_sprite_ctrl(0),
 	m_ram(NULL),
 	m_ram_buffered(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this),
+	m_palette(*this)
 {
 }
 
@@ -94,6 +95,15 @@ void pc090oj_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 	downcast<pc090oj_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void pc090oj_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<pc090oj_device &>(device).m_palette.set_tag(tag);
+}
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -231,7 +241,7 @@ void pc090oj_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		x += m_x_offset;
 		y += m_y_offset;
 
-		m_gfxdecode->gfx(m_gfxnum)->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_gfxnum)->prio_transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

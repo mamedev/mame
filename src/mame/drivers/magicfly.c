@@ -568,23 +568,23 @@ PALETTE_INIT_MEMBER(magicfly_state, magicfly)
 	for (i = 0x00; i < 0x10; i += 0x10)
 	{
 		/* 1st gfx bank */
-		palette_set_color(machine(), i + 0, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 2, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 4, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 6, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 8, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 10, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 12, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 14, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 0, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 2, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 4, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 6, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 8, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 10, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 12, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 14, rgb_t(0x00, 0x00, 0x00));
 
-		palette_set_color(machine(), i + 1, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 3, rgb_t(0xff, 0x00, 0x00));
-		palette_set_color(machine(), i + 5, rgb_t(0x00, 0xff, 0x00));
-		palette_set_color(machine(), i + 7, rgb_t(0xff, 0xff, 0x00));
-		palette_set_color(machine(), i + 9, rgb_t(0x00, 0x00, 0xff));
-		palette_set_color(machine(), i + 11, rgb_t(0xff, 0x00, 0xff));
-		palette_set_color(machine(), i + 13, rgb_t(0x00, 0xff, 0xff));
-		palette_set_color(machine(), i + 15, rgb_t(0xff, 0xff, 0xff));
+		palette.set_pen_color(i + 1, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 3, rgb_t(0xff, 0x00, 0x00));
+		palette.set_pen_color(i + 5, rgb_t(0x00, 0xff, 0x00));
+		palette.set_pen_color(i + 7, rgb_t(0xff, 0xff, 0x00));
+		palette.set_pen_color(i + 9, rgb_t(0x00, 0x00, 0xff));
+		palette.set_pen_color(i + 11, rgb_t(0xff, 0x00, 0xff));
+		palette.set_pen_color(i + 13, rgb_t(0x00, 0xff, 0xff));
+		palette.set_pen_color(i + 15, rgb_t(0xff, 0xff, 0xff));
 	}
 }
 
@@ -595,27 +595,27 @@ PALETTE_INIT_MEMBER(magicfly_state, bchance)
 	for (i = 0x00; i < 0x10; i += 0x10)
 	{
 		/* 1st gfx bank */
-		palette_set_color(machine(), i + 0, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 2, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 4, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 6, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 8, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 10, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 12, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 14, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 0, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 2, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 4, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 6, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 8, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 10, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 12, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 14, rgb_t(0x00, 0x00, 0x00));
 
-		palette_set_color(machine(), i + 1, rgb_t(0x00, 0x00, 0x00));
-		palette_set_color(machine(), i + 3, rgb_t(0xff, 0x00, 0x00));
-		palette_set_color(machine(), i + 5, rgb_t(0x00, 0xff, 0x00));
-		palette_set_color(machine(), i + 7, rgb_t(0xff, 0xff, 0x00));
-		palette_set_color(machine(), i + 9, rgb_t(0x00, 0x00, 0xff));
-		palette_set_color(machine(), i + 11, rgb_t(0xff, 0x00, 0xff));
-		palette_set_color(machine(), i + 13, rgb_t(0x00, 0xff, 0xff));
-		palette_set_color(machine(), i + 15, rgb_t(0xff, 0xff, 0xff));
+		palette.set_pen_color(i + 1, rgb_t(0x00, 0x00, 0x00));
+		palette.set_pen_color(i + 3, rgb_t(0xff, 0x00, 0x00));
+		palette.set_pen_color(i + 5, rgb_t(0x00, 0xff, 0x00));
+		palette.set_pen_color(i + 7, rgb_t(0xff, 0xff, 0x00));
+		palette.set_pen_color(i + 9, rgb_t(0x00, 0x00, 0xff));
+		palette.set_pen_color(i + 11, rgb_t(0xff, 0x00, 0xff));
+		palette.set_pen_color(i + 13, rgb_t(0x00, 0xff, 0xff));
+		palette.set_pen_color(i + 15, rgb_t(0xff, 0xff, 0xff));
 	}
 
-	palette_set_color(machine(), 0x08 , rgb_t(0xff, 0xff, 0xff));    // white for the cards back logo background.
-	palette_set_color(machine(), 0x12 , rgb_t(0x00, 0x00, 0x00));    // black for the cards corners (should be transparent)
+	palette.set_pen_color(0x08 , rgb_t(0xff, 0xff, 0xff));    // white for the cards back logo background.
+	palette.set_pen_color(0x12 , rgb_t(0x00, 0x00, 0x00));    // black for the cards corners (should be transparent)
 }
 
 
@@ -959,8 +959,8 @@ static MACHINE_CONFIG_START( magicfly, magicfly_state )
 	MCFG_SCREEN_UPDATE_DRIVER(magicfly_state, screen_update_magicfly)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", magicfly)
-	MCFG_PALETTE_LENGTH(32)
-	MCFG_PALETTE_INIT_OVERRIDE(magicfly_state, magicfly)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(magicfly_state, magicfly)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16, mc6845_intf) /* guess */
 
@@ -983,7 +983,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( bchance, magicfly )
 
 	/* video hardware */
-	MCFG_PALETTE_INIT_OVERRIDE(magicfly_state, bchance)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(magicfly_state, bchance)
 
 MACHINE_CONFIG_END
 

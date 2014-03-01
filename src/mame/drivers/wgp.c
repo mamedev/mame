@@ -644,7 +644,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wgp_state )
 	AM_RANGE(0x502000, 0x517fff) AM_READWRITE(wgp_pivram_word_r, wgp_pivram_word_w) AM_SHARE("pivram") /* piv tilemaps */
 	AM_RANGE(0x520000, 0x52001f) AM_READWRITE(wgp_piv_ctrl_word_r, wgp_piv_ctrl_word_w) AM_SHARE("piv_ctrlram")
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(rotate_port_w)    /* rotation control ? */
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 16  /* LAN areas not mapped... */, wgp_state )
@@ -990,8 +990,8 @@ static MACHINE_CONFIG_START( wgp, wgp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wgp_state, screen_update_wgp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", wgp)
-	MCFG_PALETTE_LENGTH(4096)
-
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", wgp_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")

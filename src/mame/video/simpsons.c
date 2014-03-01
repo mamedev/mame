@@ -58,55 +58,28 @@ WRITE8_MEMBER(simpsons_state::simpsons_k052109_w)
 
 READ8_MEMBER(simpsons_state::simpsons_k053247_r)
 {
-	int offs;
+	int offs = offset >> 1;
 
-	if (offset < 0x1000)
-	{
-		offs = offset >> 1;
-
-		if (offset & 1)
-			return(m_spriteram[offs] & 0xff);
-		else
-			return(m_spriteram[offs] >> 8);
-	}
+	if (offset & 1)
+		return(m_spriteram[offs] & 0xff);
 	else
-		return m_xtraram[offset - 0x1000];
+		return(m_spriteram[offs] >> 8);
 }
 
 WRITE8_MEMBER(simpsons_state::simpsons_k053247_w)
 {
-	int offs;
+	int offs = offset >> 1;
 
-	if (offset < 0x1000)
-	{
-		UINT16 *spriteram = m_spriteram;
-		offs = offset >> 1;
-
-		if (offset & 1)
-			spriteram[offs] = (spriteram[offs] & 0xff00) | data;
-		else
-			spriteram[offs] = (spriteram[offs] & 0x00ff) | (data << 8);
-	}
-	else m_xtraram[offset - 0x1000] = data;
+	if (offset & 1)
+		m_spriteram[offs] = (m_spriteram[offs] & 0xff00) | data;
+	else
+		m_spriteram[offs] = (m_spriteram[offs] & 0x00ff) | (data << 8);
 }
 
 void simpsons_state::simpsons_video_banking( int bank )
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	if (bank & 1)
-	{
-		space.install_read_bank(0x0000, 0x0fff, "bank5");
-		space.install_write_handler(0x0000, 0x0fff, write8_delegate(FUNC(simpsons_state::paletteram_xBBBBBGGGGGRRRRR_byte_be_w), this));
-		membank("bank5")->set_base(m_generic_paletteram_8);
-	}
-	else
-		space.install_readwrite_handler(0x0000, 0x0fff, read8_delegate(FUNC(k052109_device::read), (k052109_device*)m_k052109), write8_delegate(FUNC(k052109_device::write), (k052109_device*)m_k052109));
-
-	if (bank & 2)
-		space.install_readwrite_handler(0x2000, 0x3fff, read8_delegate(FUNC(simpsons_state::simpsons_k053247_r),this), write8_delegate(FUNC(simpsons_state::simpsons_k053247_w),this));
-	else
-		space.install_readwrite_handler(0x2000, 0x3fff, read8_delegate(FUNC(simpsons_state::simpsons_k052109_r),this), write8_delegate(FUNC(simpsons_state::simpsons_k052109_w),this));
+	m_bank0000->set_bank(bank & 1);
+	m_bank2000->set_bank((bank >> 1) & 1);
 }
 
 

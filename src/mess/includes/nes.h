@@ -172,7 +172,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void video_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(nes);
 	UINT32 screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(psg_4015_r);
 	DECLARE_WRITE8_MEMBER(psg_4015_w);

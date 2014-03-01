@@ -113,17 +113,11 @@ static char giant_string_buffer[65536] = { 0 };
 running_machine::running_machine(const machine_config &_config, osd_interface &osd, bool exit_to_game_select)
 	: firstcpu(NULL),
 		primary_screen(NULL),
-		palette(NULL),
-		pens(NULL),
-		colortable(NULL),
-		shadow_table(NULL),
 		debug_flags(0),
-		palette_data(NULL),
 		romload_data(NULL),
 		ui_input_data(NULL),
 		debugcpu_data(NULL),
 		generic_machine_data(NULL),
-
 		m_config(_config),
 		m_system(_config.gamedrv()),
 		m_osd(osd),
@@ -234,7 +228,6 @@ void running_machine::start()
 	config_init(*this);
 	m_input = auto_alloc(*this, input_manager(*this));
 	output_init(*this);
-	palette_init(*this);
 	m_render = auto_alloc(*this, render_manager(*this));
 	generic_machine_init(*this);
 

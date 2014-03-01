@@ -578,7 +578,7 @@ static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                             // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
 	AM_RANGE(0xc000, 0xd7ff) AM_RAM                             // RAM
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram") // Palette
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // Palette
 	AM_RANGE(0xda00, 0xda00) AM_RAM_READ(hardhead_ip_r) AM_SHARE("hardhead_ip") // Input Port Select
 	AM_RANGE(0xda80, 0xda80) AM_READ(soundlatch2_byte_r) AM_WRITE(hardhead_bankswitch_w )   // ROM Banking
 	AM_RANGE(0xdb00, 0xdb00) AM_WRITE(soundlatch_byte_w         )   // To Sound CPU
@@ -654,7 +654,7 @@ static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc280, 0xc280) AM_WRITENOP    // ? NMI Ack
 	AM_RANGE(0xc280, 0xc280) AM_READ_PORT("DSW1")               // DSW 1
 	AM_RANGE(0xc2c0, 0xc2c0) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram") // Palette
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // Palette
 	AM_RANGE(0xc800, 0xdfff) AM_RAM                                                                     // Work RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_SHARE("spriteram")                      // Sprites
 ADDRESS_MAP_END
@@ -949,7 +949,7 @@ static ADDRESS_MAP_START( hardhea2_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc533, 0xc533) AM_WRITE(hardhea2_rambank_0_w )
 	// Protection ***
 
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram") // Palette
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // Palette
 	AM_RANGE(0xc800, 0xdfff) AM_RAMBANK("bank2")                                                        // Work RAM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)           // Sprites (Banked)
 ADDRESS_MAP_END
@@ -1053,7 +1053,7 @@ static ADDRESS_MAP_START( starfigh_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(starfigh_sound_latch_w        )   // To Sound CPU (can be disabled)
 //  (c522 + R & 0x1f) write?
 
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram") // Palette
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // Palette
 	AM_RANGE(0xc800, 0xdfff) AM_RAM                                                                     // Work RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)           // Sprites (Banked)
 ADDRESS_MAP_END
@@ -1181,7 +1181,7 @@ static ADDRESS_MAP_START( sparkman_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc480, 0xc480) AM_WRITE(sparkman_coin_counter_w       )   // Coin Counter
 	AM_RANGE(0xc500, 0xc57f) AM_WRITE(starfigh_sound_latch_w        )   // To Sound CPU (can be disabled)
 
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram") // Palette
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // Palette
 	AM_RANGE(0xc800, 0xdfff) AM_RAM_WRITE(suna8_wram_w) AM_SHARE("wram")                        // RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)   // Sprites (Banked)
 ADDRESS_MAP_END
@@ -1841,7 +1841,9 @@ static MACHINE_CONFIG_START( hardhead, suna8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", suna8)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_textdim12)
 
@@ -1902,7 +1904,9 @@ static MACHINE_CONFIG_START( rranger, suna8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", suna8)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_textdim8)
 
@@ -1962,7 +1966,9 @@ static MACHINE_CONFIG_START( brickzn, suna8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", suna8)
-	MCFG_PALETTE_LENGTH(256 * 2)    // 2 x Palette RAM
+	MCFG_PALETTE_ADD("palette", 256 * 2)    // 2 x Palette RAM
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_brickzn)
 
@@ -2022,7 +2028,10 @@ static MACHINE_CONFIG_DERIVED( hardhea2, brickzn )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(suna8_state,hardhea2)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 MACHINE_CONFIG_END
 
 
@@ -2062,7 +2071,9 @@ static MACHINE_CONFIG_START( starfigh, suna8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", suna8)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_starfigh)
 
@@ -2109,7 +2120,9 @@ static MACHINE_CONFIG_START( sparkman, suna8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", suna8_x2)    // 2 sprite "chips"
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_sparkman)
 

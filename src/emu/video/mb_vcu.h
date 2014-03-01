@@ -17,9 +17,10 @@ Template for skeleton device
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MB_VCU_ADD(_tag,_freq,_config) \
+#define MCFG_MB_VCU_ADD(_tag,_freq,_config, _palette_tag) \
 	MCFG_DEVICE_ADD(_tag, MB_VCU, _freq) \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_DEVICE_CONFIG(_config)	\
+	mb_vcu_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -42,6 +43,9 @@ class mb_vcu_device : public device_t,
 public:
 	// construction/destruction
 	mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write_vregs );
@@ -91,6 +95,7 @@ private:
 	double m_weights_r[2];
 	double m_weights_g[3];
 	double m_weights_b[3];
+	required_device<palette_device> m_palette;
 };
 
 

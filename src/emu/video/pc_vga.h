@@ -190,6 +190,7 @@ protected:
 	} vga;
 
 	emu_timer *m_vblank_timer;
+	required_device<palette_device> m_palette;
 };
 
 
@@ -572,6 +573,14 @@ protected:
 		UINT8 id_low;
 		UINT8 revision;
 		UINT8 id_cr30;
+		UINT8 sr10;   // MCLK PLL
+		UINT8 sr11;   // MCLK PLL
+		UINT8 sr12;   // DCLK PLL
+		UINT8 sr13;   // DCLK PLL
+		UINT8 sr15;   // CLKSYN control 2
+		UINT8 clk_pll_r;  // individual DCLK PLL values
+		UINT8 clk_pll_m;
+		UINT8 clk_pll_n;
 
 		// data for memory-mapped I/O
 		UINT16 mmio_9ae8;
@@ -597,6 +606,8 @@ private:
 	UINT8 s3_crtc_reg_read(UINT8 index);
 	void s3_define_video_mode(void);
 	void s3_crtc_reg_write(UINT8 index, UINT8 data);
+	UINT8 s3_seq_reg_read(UINT8 index);
+	void s3_seq_reg_write(UINT8 index, UINT8 data);
 	ibm8514a_device* m_8514;
 };
 

@@ -175,7 +175,7 @@ UINT32 mbc200_state::screen_update_mbc200(screen_device &screen, bitmap_ind16 &b
 					dot = (m_vram[count] >> (7-xi)) & 1;
 
 					if(y*4+yi < 400 && x*8+xi < 640) /* TODO: safety check */
-						bitmap.pix16(y*4+yi, x*8+xi) = machine().pens[dot];
+						bitmap.pix16(y*4+yi, x*8+xi) = m_palette->pen(dot);
 				}
 
 				count++;
@@ -270,8 +270,7 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbc200_state, screen_update_mbc200)
 	MCFG_GFXDECODE_ADD("gfxdecode", mbc200)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_8MHz / 4, mbc200_crtc) // HD46505SP

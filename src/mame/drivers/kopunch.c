@@ -195,8 +195,8 @@ static MACHINE_CONFIG_START( kopunch, kopunch_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kopunch_state, screen_update_kopunch)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", kopunch)
-	MCFG_PALETTE_LENGTH(8)
-
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(kopunch_state, kopunch)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

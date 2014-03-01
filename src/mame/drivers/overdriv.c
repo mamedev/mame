@@ -152,7 +152,7 @@ WRITE16_MEMBER(overdriv_state::overdriv_cpuB_irq_y_w)
 static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM                 /* work RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITENOP            /* unknown (always 0x30) */
@@ -345,8 +345,6 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	MCFG_EEPROM_SERIAL_DATA(overdriv_default_eeprom, 128)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
@@ -355,16 +353,21 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	MCFG_SCREEN_UPDATE_DRIVER(overdriv_state, screen_update_overdriv)
 
 //  MCFG_GFXDECODE_ADD("gfxdecode", overdriv)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	
 	MCFG_K053246_ADD("k053246", overdriv_k053246_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
+	MCFG_K053246_PALETTE("palette")
 	MCFG_K051316_ADD("k051316_1", overdriv_k051316_intf_1)
 	MCFG_K051316_GFXDECODE("gfxdecode")
+	MCFG_K051316_PALETTE("palette")
 	MCFG_K051316_ADD("k051316_2", overdriv_k051316_intf_2)
 	MCFG_K051316_GFXDECODE("gfxdecode")
+	MCFG_K051316_PALETTE("palette")
 	MCFG_K053251_ADD("k053251")
 	MCFG_K053250_ADD("k053250_1", "screen", 0, 0)
 	MCFG_K053250_ADD("k053250_2", "screen", 0, 0)

@@ -540,7 +540,7 @@ void majorpkr_state::video_start()
 
 UINT32 majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	rectangle custom_clip;
 
@@ -590,7 +590,7 @@ WRITE8_MEMBER(majorpkr_state::paletteram_w)
 
 	offset >>= 1;
 	int color = m_generic_paletteram_8[m_palette_bank * 0x800 + offset * 2] + m_generic_paletteram_8[m_palette_bank * 0x800 + offset * 2 + 1] * 256;
-	palette_set_color(machine(), offset + m_palette_bank * 256 * 4, rgb_t(pal5bit(color >> 5), pal5bit(color >> 10), pal5bit(color)));
+	m_palette->set_pen_color(offset + m_palette_bank * 256 * 4, rgb_t(pal5bit(color >> 5), pal5bit(color >> 10), pal5bit(color)));
 }
 
 
@@ -1041,7 +1041,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(majorpkr_state, screen_update_majorpkr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", majorpkr)
-	MCFG_PALETTE_LENGTH(0x100 * 16)
+	MCFG_PALETTE_ADD("palette", 0x100 * 16)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf) /* verified */
 

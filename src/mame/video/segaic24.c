@@ -23,7 +23,8 @@ const device_type S24MIXER = &device_creator<segas24_mixer>;
 
 segas24_tile::segas24_tile(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, S24TILE, "S24TILE", tag, owner, clock, "segas24_tile", __FILE__),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this),
+		m_palette(*this)
 {
 }
 
@@ -35,6 +36,16 @@ segas24_tile::segas24_tile(const machine_config &mconfig, const char *tag, devic
 void segas24_tile::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<segas24_tile &>(device).m_gfxdecode.set_tag(tag);
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void segas24_tile::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<segas24_tile &>(device).m_palette.set_tag(tag);
 }
 
 
@@ -106,7 +117,7 @@ void segas24_tile::device_start()
 	memset(char_ram, 0, 0x80000);
 	memset(tile_ram, 0, 0x10000);
 
-	m_gfxdecode->set_gfx(char_gfx_index, auto_alloc(machine(), gfx_element(machine(), char_layout, (UINT8 *)char_ram, machine().total_colors() / 16, 0)));
+	m_gfxdecode->set_gfx(char_gfx_index, auto_alloc(machine(), gfx_element(machine(), char_layout, (UINT8 *)char_ram, m_palette->entries() / 16, 0)));
 
 	save_pointer(NAME(tile_ram), 0x10000/2);
 	save_pointer(NAME(char_ram), 0x80000/2);
@@ -253,7 +264,7 @@ void segas24_tile::draw_rect(screen_device &screen, bitmap_ind16 &bm, bitmap_ind
 	const UINT16 *source  = &bm.pix16(sy, sx);
 	const UINT8  *trans = &tm.pix8(sy, sx);
 	UINT32       *dest = &dm.pix32(0);
-	const pen_t  *pens   = machine().pens;
+	const pen_t  *pens   = m_palette->pens();
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
 

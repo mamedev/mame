@@ -30,9 +30,6 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i, j;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 128);
-
 	/*******************************************************
 	 * Color PROMs
 	 * Sheet 15B: middle, 136014-137,138,139
@@ -77,7 +74,7 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 		bit3 = (color_prom[0x200 + i] >> 3) & 1;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(machine().colortable,i,rgb_t(r,g,b));
+		palette.set_indirect_color(i,rgb_t(r,g,b));
 	}
 
 	/*******************************************************
@@ -88,8 +85,8 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	for (i = 0; i < 64*4; i++)
 	{
 		int color = color_prom[0x300 + i];
-		colortable_entry_set_value(machine().colortable, 0x0000 + i, (color != 15) ? (0x020 + color) : 0x2f);
-		colortable_entry_set_value(machine().colortable, 0x0100 + i, (color != 15) ? (0x060 + color) : 0x2f);
+		palette.set_pen_indirect(0x0000 + i, (color != 15) ? (0x020 + color) : 0x2f);
+		palette.set_pen_indirect(0x0100 + i, (color != 15) ? (0x060 + color) : 0x2f);
 	}
 
 	/*******************************************************
@@ -101,7 +98,7 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	for (i = 0; i < 64*4; i++)
 	{
 		int color = color_prom[0x400 + i];
-		colortable_entry_set_value(machine().colortable, 0x0200 + i, 0x000 + color);
+		palette.set_pen_indirect(0x0200 + i, 0x000 + color);
 	}
 
 	/*******************************************************
@@ -112,8 +109,8 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	for (i = 0; i < 64*16; i++)
 	{
 		int color = color_prom[0xc00 + i];
-		colortable_entry_set_value(machine().colortable, 0x0300 + i, (color != 15) ? (0x010 + color) : 0x1f);
-		colortable_entry_set_value(machine().colortable, 0x0700 + i, (color != 15) ? (0x050 + color) : 0x1f);
+		palette.set_pen_indirect(0x0300 + i, (color != 15) ? (0x010 + color) : 0x1f);
+		palette.set_pen_indirect(0x0700 + i, (color != 15) ? (0x050 + color) : 0x1f);
 	}
 
 	/*******************************************************
@@ -125,7 +122,7 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 	for (i = 0; i < 64*16; i++)
 	{
 		int color = color_prom[0x800 + i];
-		colortable_entry_set_value(machine().colortable, 0x0b00 + i, 0x040 + color);
+		palette.set_pen_indirect(0x0b00 + i, 0x040 + color);
 	}
 
 	/* 136014-142, 136014-143, 136014-144 Vertical position modifiers */
@@ -195,7 +192,7 @@ VIDEO_START_MEMBER(polepos_state,polepos)
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(polepos_state::bg_get_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,16);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(polepos_state::tx_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, m_gfxdecode->gfx(0), 0x2f);
+	m_palette->configure_tilemap_groups(*m_tx_tilemap, *m_gfxdecode->gfx(0), 0x2f);
 }
 
 
@@ -422,7 +419,7 @@ void polepos_state::zoom_sprite(bitmap_ind16 &bitmap,int big,
 	gfx_element *gfx = m_gfxdecode->gfx(big ? 3 : 2);
 	const UINT8 *gfxdata = gfx->get_data(code % gfx->elements());
 	UINT8 *scaling_rom = memregion("gfx6")->base();
-	UINT32 transmask = colortable_get_transpen_mask(machine().colortable, gfx, color, 0x1f);
+	UINT32 transmask = m_palette->transpen_mask(*gfx, color, 0x1f);
 	int coloroffs = gfx->colorbase() + color * gfx->granularity();
 	int x,y;
 

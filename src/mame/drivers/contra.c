@@ -203,11 +203,13 @@ static MACHINE_CONFIG_START( contra, contra_state )
 	MCFG_SCREEN_UPDATE_DRIVER(contra_state, screen_update_contra)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", contra)
-	MCFG_PALETTE_LENGTH(2*8*16*16)
-
+	MCFG_PALETTE_ADD("palette", 2*8*16*16)
+	MCFG_PALETTE_INIT_OWNER(contra_state, contra)
 
 	MCFG_K007121_ADD("k007121_1")
+	MCFG_K007121_PALETTE("palette")
 	MCFG_K007121_ADD("k007121_2")
+	MCFG_K007121_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

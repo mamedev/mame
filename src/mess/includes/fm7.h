@@ -268,7 +268,7 @@ public:
 	DECLARE_DRIVER_INIT(fm7);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(fm7);
 	DECLARE_MACHINE_START(fm7);
 	DECLARE_MACHINE_START(fm77av);
 	DECLARE_MACHINE_START(fm11);

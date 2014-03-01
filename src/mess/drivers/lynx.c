@@ -40,13 +40,13 @@ static INPUT_PORTS_START( lynx )
 	// power on and power off buttons
 INPUT_PORTS_END
 
-void lynx_state::palette_init()
+PALETTE_INIT_MEMBER(lynx_state, lynx)
 {
 	int i;
 
 	for (i=0; i< 0x1000; i++)
 	{
-		palette_set_color_rgb(machine(), i,
+		palette.set_pen_color(i,
 			((i >> 0) & 0x0f) * 0x11,
 			((i >> 4) & 0x0f) * 0x11,
 			((i >> 8) & 0x0f) * 0x11);
@@ -87,7 +87,8 @@ static MACHINE_CONFIG_START( lynx, lynx_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 102-1)
 	MCFG_DEFAULT_LAYOUT(layout_lynx)
 
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_PALETTE_INIT_OWNER(lynx_state, lynx)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -164,7 +164,7 @@ UINT32 pc100_state::screen_update_pc100(screen_device &screen, bitmap_ind16 &bit
 					dot |= pen[pen_i]<<pen_i;
 
 				if(y < 512 && x*16+xi < 768) /* TODO: safety check */
-					bitmap.pix16(y, x*16+xi) = machine().pens[dot];
+					bitmap.pix16(y, x*16+xi) = m_palette->pen(dot);
 			}
 
 			count++;
@@ -254,7 +254,7 @@ WRITE16_MEMBER( pc100_state::pc100_paletteram_w )
 		g = (m_palram[offset] >> 3) & 7;
 		b = (m_palram[offset] >> 6) & 7;
 
-		palette_set_color_rgb(machine(), offset, pal3bit(r),pal3bit(g),pal3bit(b));
+		m_palette->set_pen_color(offset, pal3bit(r),pal3bit(g),pal3bit(b));
 	}
 }
 
@@ -532,8 +532,8 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*4, 1024, 0, 768, 264*2, 0, 512)
 	MCFG_SCREEN_UPDATE_DRIVER(pc100_state, screen_update_pc100)
 	MCFG_GFXDECODE_ADD("gfxdecode", pc100)
-	MCFG_PALETTE_LENGTH(16)
-//  MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD("palette", 16)
+//  MCFG_PALETTE_INIT(black_and_white)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

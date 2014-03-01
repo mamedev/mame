@@ -46,6 +46,7 @@ void k056800_device::device_start()
 void k056800_device::device_reset()
 {
 	m_int_pending = false;
+	m_int_enabled = false;
 	memset(m_host_to_snd_regs, 0, sizeof(m_host_to_snd_regs));
 	memset(m_snd_to_host_regs, 0, sizeof(m_snd_to_host_regs));
 }

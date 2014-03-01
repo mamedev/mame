@@ -196,7 +196,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(mt32);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -321,10 +321,10 @@ WRITE8_MEMBER(mt32_state::so_w)
 	//  logerror("so: x1=%d bank=%d led=%d\n", (data >> 5) & 1, (data >> 1) & 3, data & 1);
 }
 
-void mt32_state::palette_init()
+PALETTE_INIT_MEMBER(mt32_state, mt32)
 {
-	palette_set_color(machine(), 0, rgb_t(0, 0, 0));
-	palette_set_color(machine(), 1, rgb_t(0, 255, 0));
+	palette.set_pen_color(0, rgb_t(0, 0, 0));
+	palette.set_pen_color(1, rgb_t(0, 255, 0));
 }
 
 static ADDRESS_MAP_START( mt32_map, AS_PROGRAM, 8, mt32_state )
@@ -359,7 +359,8 @@ static MACHINE_CONFIG_START( mt32, mt32_state )
 //  MCFG_SCREEN_SIZE(20*6-1, 9)
 	MCFG_SCREEN_SIZE(20*6-1, (20*6-1)*3/4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 20*6-2, 0, (20*6-1)*3/4-1)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(mt32_state, mt32)
 
 	MCFG_SED1200D0A_ADD( "lcd" )
 

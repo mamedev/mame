@@ -82,7 +82,7 @@ public:
 	UINT8 m_memsel[4];
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(a5105);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -516,7 +516,7 @@ static GFXDECODE_START( a5105 )
 GFXDECODE_END
 
 
-void a5105_state::palette_init()
+PALETTE_INIT_MEMBER(a5105_state, a5105)
 {
 	int i;
 	int r,g,b;
@@ -527,7 +527,7 @@ void a5105_state::palette_init()
 		g = i & 2 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
 		b = i & 1 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
 
-		palette_set_color(machine(), i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 
@@ -600,7 +600,8 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
 	MCFG_GFXDECODE_ADD("gfxdecode", a5105)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(a5105_state, a5105)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

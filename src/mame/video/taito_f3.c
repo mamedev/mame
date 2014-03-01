@@ -886,7 +886,7 @@ WRITE32_MEMBER(taito_f3_state::f3_palette_24bit_w)
 		b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 	}
 
-	palette_set_color(machine(),offset,rgb_t(r,g,b));
+	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
 /******************************************************************************/
@@ -1417,7 +1417,7 @@ INLINE void draw_scanlines(running_machine &machine,
 		int skip_layer_num)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	const pen_t *clut = &machine.pens[0];
+	const pen_t *clut = &state->m_palette->pen(0);
 	UINT32 bgcolor=clut[0];
 	int length;
 
@@ -2586,7 +2586,7 @@ INLINE void f3_drawgfx(
 
 	if( gfx )
 	{
-		const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+		const pen_t *pal = &state->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
 		{
@@ -2737,7 +2737,7 @@ INLINE void f3_drawgfxzoom(
 
 	if( gfx )
 	{
-		const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+		const pen_t *pal = &state->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
 		{

@@ -162,7 +162,7 @@ WRITE8_MEMBER(fromance_state::fromance_paletteram_w)
 
 	/* compute R,G,B */
 	palword = (m_local_paletteram[offset | 1] << 8) | m_local_paletteram[offset & ~1];
-	palette_set_color_rgb(machine(), offset / 2, pal5bit(palword >> 10), pal5bit(palword >> 5), pal5bit(palword >> 0));
+	m_palette->set_pen_color(offset / 2, pal5bit(palword >> 10), pal5bit(palword >> 5), pal5bit(palword >> 0));
 }
 
 

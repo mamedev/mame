@@ -145,7 +145,7 @@ UINT32 umipoker_state::screen_update_umipoker(screen_device &screen, bitmap_ind1
 	m_tilemap_2->set_scrolly(0, m_umipoker_scrolly[2]);
 	m_tilemap_3->set_scrolly(0, m_umipoker_scrolly[3]);
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
 	m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16, umipoker_state )
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")    // Palette
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(umipoker_vram_0_w) AM_SHARE("vra0")
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(umipoker_vram_1_w) AM_SHARE("vra1")
 	AM_RANGE(0x804000, 0x805fff) AM_RAM_WRITE(umipoker_vram_2_w) AM_SHARE("vra2")
@@ -679,7 +679,8 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", umipoker)
 
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */

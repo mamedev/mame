@@ -360,9 +360,6 @@ static MACHINE_CONFIG_FRAGMENT( at_motherboard )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	/* video hardware */
-	MCFG_PALETTE_LENGTH( 256 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ibm5170, at_state )

@@ -109,7 +109,7 @@ PALETTE_INIT_MEMBER(mpu4dealem_state,dealem)
 		bit1 = BIT(*color_prom,7);
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 		color_prom++;
 	}
 }
@@ -126,7 +126,7 @@ UINT32 mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_ind1
 		{
 			int tile = m_dealem_videoram[count + 0x1000] | (m_dealem_videoram[count] << 8);
 			count++;
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,0,0,0,x * 8,y * 8);
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x * 8,y * 8);
 		}
 	}
 
@@ -232,8 +232,8 @@ static MACHINE_CONFIG_START( dealem, mpu4dealem_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dealem)
 
-	MCFG_PALETTE_LENGTH(32)
-	MCFG_PALETTE_INIT_OVERRIDE(mpu4dealem_state,dealem)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(mpu4dealem_state,dealem)
 
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", MPU4_MASTER_CLOCK / 4 / 8, hd6845_intf) /* HD68B45 */
 MACHINE_CONFIG_END

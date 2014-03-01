@@ -217,7 +217,7 @@ void splash_state::splash_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cli
 
 		if (attr2 & 0x80) sx += 256;
 
-		gfx->transpen(bitmap,cliprect,number,
+		gfx->transpen(m_palette,bitmap,cliprect,number,
 			0x10 + (attr2 & 0x0f),attr & 0x40,attr & 0x80,
 			sx-8,sy,0);
 	}
@@ -237,7 +237,7 @@ void splash_state::funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle &c
 
 		if (attr2 & 0x80) sx += 256;
 
-		gfx->transpen(bitmap,cliprect,number,
+		gfx->transpen(m_palette,bitmap,cliprect,number,
 			(attr2 & 0x7f),attr & 0x40,attr & 0x80,
 			sx-8,sy,0);
 	}

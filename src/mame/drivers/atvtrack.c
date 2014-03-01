@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( atvtrack, atvtrack_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(atvtrack_state, screen_update_atvtrack)
 
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 MACHINE_CONFIG_END
 

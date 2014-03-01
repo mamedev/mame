@@ -715,7 +715,7 @@ static MACHINE_CONFIG_START( paradise, paradise_state )
 	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_paradise)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", paradise)
-	MCFG_PALETTE_LENGTH(0x800 + 16)
+	MCFG_PALETTE_ADD("palette", 0x800 + 16)
 
 
 	/* sound hardware */

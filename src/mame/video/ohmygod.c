@@ -90,7 +90,7 @@ void ohmygod_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			sy -= 65536;
 		flipx = sr[offs + 3] & 0x8000;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,0,

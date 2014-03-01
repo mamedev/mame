@@ -163,12 +163,12 @@ UINT32 lastfght_state::screen_update_lastfght(screen_device &screen, bitmap_ind1
 
 		count = m_base;
 
-		bitmap.fill(get_black_pen(machine()), cliprect );
+		bitmap.fill(m_palette->black_pen(), cliprect );
 		for (y = 0 ; y < 256; y++)
 		{
 			for (x = 0; x < 512; x++)
 			{
-				data = (((count & 0xf) == 0) && ((count & 0x1e00) == 0)) ? get_white_pen(machine()) : gfxdata[count];   // white grid or data
+				data = (((count & 0xf) == 0) && ((count & 0x1e00) == 0)) ? m_palette->white_pen() : gfxdata[count];   // white grid or data
 				bitmap.pix16(y, x) = data;
 				count++;
 			}
@@ -191,7 +191,7 @@ WRITE16_MEMBER(lastfght_state::colordac_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_colorram[m_clr_offset] = data;
-		palette_set_color_rgb(machine(), m_clr_offset / 3,
+		m_palette->set_pen_color(m_clr_offset / 3,
 			pal6bit(m_colorram[(m_clr_offset / 3) * 3 + 0]),
 			pal6bit(m_colorram[(m_clr_offset / 3) * 3 + 1]),
 			pal6bit(m_colorram[(m_clr_offset / 3) * 3 + 2])
@@ -573,7 +573,7 @@ static MACHINE_CONFIG_START( lastfght, lastfght_state )
 
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH( 256 )
+	MCFG_PALETTE_ADD( "palette", 256 )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE( 512, 256 )

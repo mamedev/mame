@@ -362,7 +362,7 @@ static const ay8910_interface ay8910_interface_2 =
 	DEVCB_NULL
 };
 
-void taxidriv_state::palette_init()
+PALETTE_INIT_MEMBER(taxidriv_state, taxidriv)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int bit0, bit1, r, g, b;
@@ -382,7 +382,7 @@ void taxidriv_state::palette_init()
 		bit1 = (color_prom[0] >> 5) & 0x01;
 		b = 0x55 * bit0 + 0xaa * bit1;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
@@ -421,7 +421,8 @@ static MACHINE_CONFIG_START( taxidriv, taxidriv_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taxidriv_state, screen_update_taxidriv)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", taxidriv)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(taxidriv_state, taxidriv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

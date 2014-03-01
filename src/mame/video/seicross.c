@@ -25,13 +25,13 @@
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
-void seicross_state::palette_init()
+PALETTE_INIT_MEMBER(seicross_state, seicross)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -50,7 +50,7 @@ void seicross_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -101,13 +101,13 @@ void seicross_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int x = spriteram[offs + 3];
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				(spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128,
 				spriteram[offs + 1] & 0x0f,
 				spriteram[offs] & 0x40,spriteram[offs] & 0x80,
 				x,240-spriteram[offs + 2],0);
 		if(x>0xf0)
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					(spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128,
 					spriteram[offs + 1] & 0x0f,
 					spriteram[offs] & 0x40,spriteram[offs] & 0x80,
@@ -117,13 +117,13 @@ void seicross_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	for (offs = m_spriteram2.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int x = spriteram_2[offs + 3];
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				(spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2),
 				spriteram_2[offs + 1] & 0x0f,
 				spriteram_2[offs] & 0x40,spriteram_2[offs] & 0x80,
 				x,240-spriteram_2[offs + 2],0);
 		if(x>0xf0)
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					(spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2),
 					spriteram_2[offs + 1] & 0x0f,
 					spriteram_2[offs] & 0x40,spriteram_2[offs] & 0x80,

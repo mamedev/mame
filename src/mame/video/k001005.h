@@ -27,6 +27,8 @@ public:
 	k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k001005_device() {}
 
+	static void static_set_palette_tag(device_t &device, const char *tag);
+	
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void swap_buffers();
 	void preprocess_texture_data(UINT8 *rom, int length, int gticlub);
@@ -80,6 +82,7 @@ private:
 	int m_prev_poly_type;
 
 	UINT8 *m_gfxrom;
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type K001005;
@@ -89,5 +92,7 @@ extern const device_type K001005;
 	MCFG_DEVICE_ADD(_tag, K001005, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
+#define MCFG_K001005_PALETTE(_palette_tag) \
+	k001005_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

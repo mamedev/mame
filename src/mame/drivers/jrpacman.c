@@ -301,9 +301,9 @@ static MACHINE_CONFIG_START( jrpacman, jrpacman_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jrpacman_state, screen_update_pacman)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jrpacman)
-	MCFG_PALETTE_LENGTH(128*4)
+	MCFG_PALETTE_ADD("palette", 128*4)
 
-	MCFG_PALETTE_INIT_OVERRIDE(jrpacman_state,pacman)
+	MCFG_PALETTE_INIT_OWNER(jrpacman_state,pacman)
 	MCFG_VIDEO_START_OVERRIDE(jrpacman_state,jrpacman)
 
 	/* sound hardware */

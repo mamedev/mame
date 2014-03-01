@@ -15,7 +15,7 @@ WRITE8_MEMBER(bigevglf_state::bigevglf_palette_w)
 
 	m_paletteram[offset] = data;
 	color = m_paletteram[offset & 0x3ff] | (m_paletteram[0x400 + (offset & 0x3ff)] << 8);
-	palette_set_color_rgb(machine(), offset & 0x3ff, pal4bit(color >> 4), pal4bit(color >> 0), pal4bit(color >> 8));
+	m_palette->set_pen_color(offset & 0x3ff, pal4bit(color >> 4), pal4bit(color >> 0), pal4bit(color >> 8));
 }
 
 WRITE8_MEMBER(bigevglf_state::bigevglf_gfxcontrol_w)
@@ -74,7 +74,7 @@ void bigevglf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		sx = m_spriteram2[i + 3];
 		sy = 200 - m_spriteram2[i];
 		for (j = 0; j < 16; j++)
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				m_spriteram1[(code << 4) + j] + ((m_spriteram1[0x400 + (code << 4) + j] & 0xf) << 8),
 				m_spriteram2[i + 2] & 0xf,
 				0,0,

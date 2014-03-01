@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(thoop2_vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                 /* Video Registers */
 	AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset16_w)                           /* INT 6 ACK/Watchdog timer */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")/* Palette */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                       /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
@@ -202,8 +202,8 @@ static MACHINE_CONFIG_START( thoop2, thoop2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(thoop2_state, screen_update_thoop2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", thoop2)
-	MCFG_PALETTE_LENGTH(1024)
-
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

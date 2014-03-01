@@ -1237,7 +1237,7 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE_ADD("gfxdecode", atarisy2)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, atarisy2_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, atarisy2_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,48, 0)

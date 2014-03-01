@@ -154,7 +154,7 @@ void fresh_state::update_palette( int offset )
 	UINT16 pal1 = m_paletteram_1[offset];
 	UINT8 pal2 = m_paletteram_2[offset];
 
-	palette_set_color(machine(),offset,rgb_t(pal1&0xff,(pal1>>8)&0xff,pal2));
+	m_palette->set_pen_color(offset,rgb_t(pal1&0xff,(pal1>>8)&0xff,pal2));
 }
 
 WRITE16_MEMBER(fresh_state::fresh_paletteram_1_w)
@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( fresh, fresh_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fresh_state, screen_update_fresh)
 
-	MCFG_PALETTE_LENGTH(0x1000) // or 0xc00
+	MCFG_PALETTE_ADD("palette", 0x1000) // or 0xc00
 	MCFG_GFXDECODE_ADD("gfxdecode", fresh)
 
 	/* sound hw? */

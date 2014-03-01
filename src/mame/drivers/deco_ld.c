@@ -181,7 +181,7 @@ void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		fx = (spriteram[i+0] & 0x04) ? 1 : 0;
 		fy = (spriteram[i+0] & 0x02) ? 1 : 0;
 
-		gfx->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		gfx->transpen(m_palette,bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 
 	for(i=0x3e0;i<0x400;i+=4)
@@ -196,7 +196,7 @@ void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		fx = (spriteram[i+0] & 0x04) ? 1 : 0;
 		fy = (spriteram[i+0] & 0x02) ? 1 : 0;
 
-		gfx->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		gfx->transpen(m_palette,bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 }
 
@@ -218,7 +218,7 @@ UINT32 deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb32
 			int tile = m_vram0[x+y*32] | ((attr & 3) << 8);
 			int colour = (6 & 0x7); /* TODO */
 
-			gfx->transpen(bitmap,cliprect,tile|0x400,colour,0,0,x*8,y*8,0);
+			gfx->transpen(m_palette,bitmap,cliprect,tile|0x400,colour,0,0,x*8,y*8,0);
 		}
 	}
 
@@ -230,7 +230,7 @@ UINT32 deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb32
 			int tile = m_vram1[x+y*32] | ((attr & 3) << 8);
 			int colour = (6 & 0x7); /* TODO */
 
-			gfx->transpen(bitmap,cliprect,tile,colour,0,0,x*8,y*8,0);
+			gfx->transpen(m_palette,bitmap,cliprect,tile,colour,0,0,x*8,y*8,0);
 		}
 	}
 
@@ -262,7 +262,7 @@ WRITE8_MEMBER(deco_ld_state::decold_sound_cmd_w)
 /* same as Burger Time HW */
 WRITE8_MEMBER(deco_ld_state::decold_palette_w)
 {
-	paletteram_BBGGGRRR_byte_w(space, offset, ~data);
+	m_palette->write(space, offset, UINT8(~data)); 
 }
 
 /* unknown, but certainly related to audiocpu somehow */
@@ -281,7 +281,7 @@ static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x1005, 0x1005) AM_READ(sound_status_r)
 	AM_RANGE(0x1006, 0x1006) AM_NOP // 6850 status
 	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // 6850 data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(decold_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(decold_palette_w) AM_SHARE("palette")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("vram0")
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("attr0")
@@ -479,7 +479,8 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 	MCFG_GFXDECODE_ADD("gfxdecode", rblaster)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
 	/* sound hardware */
 	/* TODO: mixing */

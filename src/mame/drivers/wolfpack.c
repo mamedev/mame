@@ -314,7 +314,8 @@ static MACHINE_CONFIG_START( wolfpack, wolfpack_state )
 	MCFG_SCREEN_VBLANK_DRIVER(wolfpack_state, screen_eof_wolfpack)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", wolfpack)
-	MCFG_PALETTE_LENGTH(12)
+	MCFG_PALETTE_ADD("palette", 12)
+	MCFG_PALETTE_INIT_OWNER(wolfpack_state, wolfpack)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */

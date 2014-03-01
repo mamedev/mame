@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x072000, 0x0727ff) AM_DEVREADWRITE("tilegen2", deco_bac06_device, pf_data_8bit_swap_r, pf_data_8bit_swap_w)
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
-	AM_RANGE(0x120000, 0x1205ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0x120000, 0x1205ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x130000, 0x130000) AM_READ_PORT("P1")
 	AM_RANGE(0x130001, 0x130001) AM_READ_PORT("P2")
 	AM_RANGE(0x130002, 0x130002) AM_READ_PORT("DSW1")
@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(actfancr_sound_w)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x130000, 0x1305ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0x130000, 0x1305ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x140001) AM_READNOP /* Value doesn't matter */
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_SHARE("main_ram") /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(triothep_control_r, triothep_control_select_w)
@@ -326,7 +326,9 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update_actfancr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", actfan)
-	MCFG_PALETTE_LENGTH(768)
+
+	MCFG_PALETTE_ADD("palette", 768)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,2,2,2);
@@ -338,6 +340,7 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 1);
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	MCFG_DECO_MXC06_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -378,7 +381,9 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update_actfancr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", triothep)
-	MCFG_PALETTE_LENGTH(768)
+
+	MCFG_PALETTE_ADD("palette", 768)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,2,2,0);
@@ -390,6 +395,7 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 1);
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	MCFG_DECO_MXC06_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

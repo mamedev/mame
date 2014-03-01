@@ -32,11 +32,11 @@ Namco System 86 Video Hardware
 
 ***************************************************************************/
 
-void namcos86_state::palette_init()
+PALETTE_INIT_MEMBER(namcos86_state, namcos86)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-	rgb_t palette[512];
+	rgb_t palette_val[512];
 
 	for (i = 0;i < 512;i++)
 	{
@@ -58,7 +58,7 @@ void namcos86_state::palette_init()
 		bit3 = (color_prom[512] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette[i] = rgb_t(r,g,b);
+		palette_val[i] = rgb_t(r,g,b);
 		color_prom++;
 	}
 
@@ -67,11 +67,11 @@ void namcos86_state::palette_init()
 
 	/* tiles lookup table */
 	for (i = 0;i < 2048;i++)
-		palette_set_color(machine(), i, palette[*color_prom++]);
+		palette.set_pen_color(i, palette_val[*color_prom++]);
 
 	/* sprites lookup table */
 	for (i = 0;i < 2048;i++)
-		palette_set_color(machine(), 2048 + i, palette[256 + *color_prom++]);
+		palette.set_pen_color(2048 + i, palette_val[256 + *color_prom++]);
 
 	/* color_prom now points to the beginning of the tile address decode PROM */
 
@@ -321,7 +321,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 		sy++;   /* sprites are buffered and delayed by one scanline */
 
 		gfx->set_source_clip(tx, sizex, ty, sizey);
-		gfx->prio_transpen(bitmap,cliprect,
+		gfx->prio_transpen(state->m_palette,bitmap,cliprect,
 				sprite,
 				color,
 				flipx,flipy,

@@ -525,7 +525,7 @@ WRITE32_MEMBER(hng64_state::hng64_pal_w)
 	g = ((paletteram[offset] & 0x0000ff00) >>8);
 	r = ((paletteram[offset] & 0x00ff0000) >>16);
 	//a = ((paletteram[offset] & 0xff000000) >>24);
-	palette_set_color(machine(),offset,rgb_t(r,g,b));
+	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
 READ32_MEMBER(hng64_state::hng64_sysregs_r)
@@ -1970,10 +1970,9 @@ static MACHINE_CONFIG_START( hng64, hng64_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(hng64_state, screen_update_hng64)
-
-	MCFG_PALETTE_LENGTH(0x1000)
-
 	MCFG_SCREEN_VBLANK_DRIVER(hng64_state, screen_eof_hng64)
+
+	MCFG_PALETTE_ADD("palette", 0x1000)
 MACHINE_CONFIG_END
 
 

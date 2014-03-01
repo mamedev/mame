@@ -254,9 +254,8 @@ static MACHINE_CONFIG_START( comquest, comquest_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*4-1, 0, 128-1)
 	MCFG_SCREEN_UPDATE_DRIVER(comquest_state, screen_update_comquest)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",  comquest )
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_GFXDECODE_ADD("gfxdecode", comquest )
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 
 	/* sound hardware */

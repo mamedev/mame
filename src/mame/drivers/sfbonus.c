@@ -1076,8 +1076,8 @@ UINT32 sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 
 	globalyscroll += 8;
 	globalxscroll += 8;
 
-	bitmap.fill(machine().pens[0], cliprect);
-	m_temp_reel_bitmap->fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
+	m_temp_reel_bitmap->fill(m_palette->pen(0), cliprect);
 
 	/* render reels to bitmap */
 	sfbonus_draw_reel_layer(screen,*m_temp_reel_bitmap,cliprect,0);
@@ -1377,9 +1377,9 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 288-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sfbonus_state, screen_update_sfbonus)
 
-	MCFG_PALETTE_LENGTH(0x100*2) // *2 for priority workaraound / custom drawing
+	MCFG_PALETTE_ADD("palette", 0x100*2) // *2 for priority workaraound / custom drawing
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 
 	/* Parrot 3 seems fine at 1 Mhz, but Double Challenge isn't? */

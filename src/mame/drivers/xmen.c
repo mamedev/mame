@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
 	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
 	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( 6p_main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
 	AM_RANGE(0x102000, 0x102fff) AM_RAM AM_SHARE("spriteramright")  /* sprites (screen 2) */
 	AM_RANGE(0x103000, 0x103fff) AM_RAM     /* 6p - a buffer? */
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
 	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053247_device, k053246_word_w) /* sprites */
 	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
@@ -352,21 +352,23 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.17)   /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )   /* correct, same issue of TMNT2 */
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K052109_ADD("k052109", xmen_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
+	MCFG_K052109_PALETTE("palette")
 	MCFG_K053246_ADD("k053246", xmen_k053246_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
+	MCFG_K053246_PALETTE("palette")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
@@ -404,8 +406,9 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -428,9 +431,11 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	MCFG_K052109_ADD("k052109", xmen_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
+	MCFG_K052109_PALETTE("palette")
 	MCFG_K053246_ADD("k053246", xmen6p_k053246_intf)	
 	MCFG_K053246_SET_SCREEN("screen")
 	MCFG_K053246_GFXDECODE("gfxdecode")
+	MCFG_K053246_PALETTE("palette")
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

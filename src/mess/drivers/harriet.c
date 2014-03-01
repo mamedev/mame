@@ -43,14 +43,12 @@ public:
 	DECLARE_READ8_MEMBER(unk3_r);
 	DECLARE_READ8_MEMBER(keyboard_status_r);
 	DECLARE_WRITE8_MEMBER( kbd_put );
-
 protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 void harriet_state::video_start()
@@ -196,12 +194,6 @@ void harriet_state::machine_reset()
 }
 
 
-void harriet_state::palette_init()
-{
-}
-
-
-
 static MACHINE_CONFIG_START( harriet, harriet_state )
 
 	/* basic machine hardware */
@@ -211,7 +203,7 @@ static MACHINE_CONFIG_START( harriet, harriet_state )
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -182,4 +182,4 @@ GAME( 1974, cleanswp,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Clean S
 GAME( 1973, vollyrmt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Volly (Ramtek) [TTL]", GAME_IS_SKELETON )
 GAME( 1974, wipeormt,  0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Wipeout (Ramtek) [TTL]", GAME_IS_SKELETON )
 
-GAME( 197?, ramtek3,   0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "Unknown Ramtek Game (Maybe Hockey?) [TTL]", GAME_IS_SKELETON )
+GAME( 197?, ramtek3,   0, ramtek, 0, driver_device,  0, ROT0, "Ramtek", "unknown Ramtek Game (Maybe Hockey?) [TTL]", GAME_IS_SKELETON )

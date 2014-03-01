@@ -86,7 +86,7 @@ void rungun_state::video_start()
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	// decode the ttl layer's gfx
-	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), charlayout, memregion("gfx3")->base(), machine().total_colors() / 16, 0)));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), charlayout, memregion("gfx3")->base(), m_palette->entries() / 16, 0)));
 	m_ttl_gfx_index = gfx_index;
 
 	// create the tilemap
@@ -99,7 +99,7 @@ void rungun_state::video_start()
 
 UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
 	m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap, 0, 0, 1);

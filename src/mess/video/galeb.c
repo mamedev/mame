@@ -36,7 +36,7 @@ UINT32 galeb_state::screen_update_galeb(screen_device &screen, bitmap_ind16 &bit
 		for(x = 0; x < 48; x++ )
 		{
 			int code = m_video_ram[15 + x + y*64];
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,  code , 0, 0,0, x*8,y*8);
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,  code , 0, 0,0, x*8,y*8);
 		}
 	}
 	return 0;

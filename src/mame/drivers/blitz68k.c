@@ -221,7 +221,7 @@ UINT32 blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rgb3
 	{
 		for(x = 0; x < 512; x++)
 		{
-			bitmap.pix32(y, x) = machine().pens[*src++];
+			bitmap.pix32(y, x) = m_palette->pen(*src++);
 		}
 	}
 
@@ -242,10 +242,10 @@ UINT32 blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bitm
 		for(x = 0; x < 512; )
 		{
 			UINT16 pen = *src++;
-			bitmap.pix32(y, x++) = machine().pens[(pen >>  8) & 0xf];
-			bitmap.pix32(y, x++) = machine().pens[(pen >> 12) & 0xf];
-			bitmap.pix32(y, x++) = machine().pens[(pen >>  0) & 0xf];
-			bitmap.pix32(y, x++) = machine().pens[(pen >>  4) & 0xf];
+			bitmap.pix32(y, x++) = m_palette->pen((pen >>  8) & 0xf);
+			bitmap.pix32(y, x++) = m_palette->pen((pen >> 12) & 0xf);
+			bitmap.pix32(y, x++) = m_palette->pen((pen >>  0) & 0xf);
+			bitmap.pix32(y, x++) = m_palette->pen((pen >>  4) & 0xf);
 		}
 	}
 
@@ -1733,11 +1733,11 @@ static MACHINE_CONFIG_START( ilpag, blitz68k_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac")
@@ -1807,10 +1807,10 @@ static MACHINE_CONFIG_START( cjffruit, blitz68k_state )
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_22_1184MHz/8, mc6845_intf_irq1)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac")
@@ -1839,10 +1839,10 @@ static MACHINE_CONFIG_START( bankrob, blitz68k_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4, mc6845_intf_irq3)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac")
@@ -1869,10 +1869,10 @@ static MACHINE_CONFIG_START( bankroba, blitz68k_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4, mc6845_intf_irq5)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k_addr_factor1)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac")
@@ -1898,10 +1898,10 @@ static MACHINE_CONFIG_START( deucesw2, blitz68k_state )
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_22_1184MHz/8, mc6845_intf_irq3)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac")
@@ -1929,10 +1929,10 @@ static MACHINE_CONFIG_START( dualgame, blitz68k_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4, mc6845_intf_irq3)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac")
@@ -1958,10 +1958,10 @@ static MACHINE_CONFIG_START( hermit, blitz68k_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_22_1184MHz/8, mc6845_intf_irq1)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac")
@@ -1992,8 +1992,8 @@ static MACHINE_CONFIG_START( maxidbl, blitz68k_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4, mc6845_intf_irq3)
 
-	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SAA1099_ADD("saa", XTAL_8MHz/2)

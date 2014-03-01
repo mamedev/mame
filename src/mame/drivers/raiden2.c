@@ -798,7 +798,7 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 
 
 				
-						gfx->transpen(
+						gfx->transpen(m_palette,
 						bitmap,
 						cliprect,
 						tile_number,
@@ -807,7 +807,7 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y,15);
 
 				
-						gfx->transpen(
+						gfx->transpen(m_palette,
 						bitmap,
 						cliprect,
 						tile_number,
@@ -816,7 +816,7 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y,15);
 
 				
-						gfx->transpen(
+						gfx->transpen(m_palette,
 						bitmap,
 						cliprect,
 						tile_number,
@@ -825,7 +825,7 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200,15);
 
 				
-						gfx->transpen(
+						gfx->transpen(m_palette,
 						bitmap,
 						cliprect,
 						tile_number,
@@ -1007,7 +1007,7 @@ VIDEO_START_MEMBER(raiden2_state,raiden2)
 
 UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	//if (!machine().input().code_pressed(KEYCODE_Q))
 	{
@@ -1482,7 +1482,7 @@ static ADDRESS_MAP_START( raiden2_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("mainbank")
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000)
@@ -1518,7 +1518,7 @@ static ADDRESS_MAP_START( zeroteam_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_SHARE("mid_data")
 	AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
-	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0e000, 0x0efff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
 
@@ -1548,7 +1548,7 @@ static ADDRESS_MAP_START( xsedae_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_SHARE("mid_data")
 	AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
-	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0e000, 0x0efff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_SHARE("sprites")
 
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
@@ -1888,7 +1888,8 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 	MCFG_GFXDECODE_ADD("gfxdecode", raiden2)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
@@ -1944,7 +1945,8 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4,546,0,40*8,264,0,32*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 	MCFG_GFXDECODE_ADD("gfxdecode", raiden2)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
@@ -3225,7 +3227,7 @@ GAME( 1993, raiden2d, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT2
 GAME( 1993, raiden2e, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 6, Easy Version)",  GAME_NOT_WORKING) // rev 4
 GAME( 1993, raiden2f, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden II (set 7, US Fabtek, Easy Version)",     GAME_NOT_WORKING) //  ^
 GAME( 1993, raiden2g, raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden II (set 8, US Fabtek, Easy Version)",         GAME_NOT_WORKING) // rev 3 and 4 mix?
-GAME( 1993, raiden2nl,raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 9, Holland)",         GAME_NOT_WORKING)
+GAME( 1993, raiden2nl,raiden2, raiden2,  raiden2, raiden2_state,  raiden2,  ROT270, "Seibu Kaihatsu",                         "Raiden II (set 9, The Netherlands)", GAME_NOT_WORKING)
 
 
 GAME( 1994, raidendx,  0,        raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (UK)",                   GAME_NOT_WORKING)
@@ -3234,7 +3236,7 @@ GAME( 1994, raidendxa2,raidendx, raidendx,  raidendx, raiden2_state, raidendx,  
 GAME( 1994, raidendxj, raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (Japan)",                GAME_NOT_WORKING)
 GAME( 1994, raidendxu, raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden DX (US)",                   GAME_NOT_WORKING)
 GAME( 1994, raidendxg, raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden DX (Germany)",              GAME_NOT_WORKING)
-GAME( 1994, raidendxnl,raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (Holland)",              GAME_NOT_WORKING)
+GAME( 1994, raidendxnl,raidendx, raidendx,  raidendx, raiden2_state, raidendx,  ROT270, "Seibu Kaihatsu",                         "Raiden DX (The Netherlands)",      GAME_NOT_WORKING)
 
 GAME( 1993, zeroteam, 0,       zeroteam, zeroteam, raiden2_state,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team USA (set 1, US, Fabtek license)", GAME_NOT_WORKING)
 GAME( 1993, zeroteama,zeroteam,zeroteam, zeroteam, raiden2_state,  zeroteam,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2, Japan? (earlier?))", GAME_NOT_WORKING)

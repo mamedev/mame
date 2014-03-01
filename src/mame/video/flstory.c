@@ -61,9 +61,6 @@ VIDEO_START_MEMBER(flstory_state,flstory)
 	m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
 	m_bg_tilemap->set_scroll_cols(32);
-
-	m_generic_paletteram_8.allocate(0x200);
-	m_generic_paletteram2_8.allocate(0x200);
 }
 
 VIDEO_START_MEMBER(flstory_state,rumba)
@@ -73,18 +70,12 @@ VIDEO_START_MEMBER(flstory_state,rumba)
 	m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
 	m_bg_tilemap->set_scroll_cols(32);
-
-	m_generic_paletteram_8.allocate(0x200);
-	m_generic_paletteram2_8.allocate(0x200);
 }
 
 VIDEO_START_MEMBER(flstory_state,victnine)
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flstory_state::victnine_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
-
-	m_generic_paletteram_8.allocate(0x200);
-	m_generic_paletteram2_8.allocate(0x200);
 }
 
 WRITE8_MEMBER(flstory_state::flstory_videoram_w)
@@ -95,18 +86,22 @@ WRITE8_MEMBER(flstory_state::flstory_videoram_w)
 
 WRITE8_MEMBER(flstory_state::flstory_palette_w)
 {
-	if (offset & 0x100)
-		paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w(space, (offset & 0xff) + (m_palette_bank << 8),data);
-	else
-		paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w(space, (offset & 0xff) + (m_palette_bank << 8),data);
+	m_palette->write(space, (offset & 0xff) + (m_palette_bank << 8),data);
 }
 
 READ8_MEMBER(flstory_state::flstory_palette_r)
 {
-	if (offset & 0x100)
-		return m_generic_paletteram2_8[ (offset & 0xff) + (m_palette_bank << 8) ];
-	else
-		return m_generic_paletteram_8  [ (offset & 0xff) + (m_palette_bank << 8) ];
+	return m_palette->basemem().read8((offset & 0xff) + (m_palette_bank << 8));
+}
+
+WRITE8_MEMBER(flstory_state::flstory_palette_ext_w)
+{
+	m_palette->write_ext(space, (offset & 0xff) + (m_palette_bank << 8),data);
+}
+
+READ8_MEMBER(flstory_state::flstory_palette_ext_r)
+{
+	return m_palette->extmem().read8((offset & 0xff) + (m_palette_bank << 8));
 }
 
 WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
@@ -187,14 +182,14 @@ void flstory_state::flstory_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 			flipx = ((m_spriteram[offs + 1] & 0x40) >> 6) ^ m_flipscreen;
 			flipy = ((m_spriteram[offs + 1] & 0x80) >> 7) ^ m_flipscreen;
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					code,
 					m_spriteram[offs + 1] & 0x0f,
 					flipx,flipy,
 					sx,sy,15);
 			/* wrap around */
 			if (sx > 240)
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 						code,
 						m_spriteram[offs + 1] & 0x0f,
 						flipx,flipy,
@@ -242,14 +237,14 @@ void flstory_state::victnine_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 			flipx = ((m_spriteram[offs + 1] & 0x40) >> 6) ^ m_flipscreen;
 			flipy = ((m_spriteram[offs + 1] & 0x80) >> 7) ^ m_flipscreen;
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					code,
 					m_spriteram[offs + 1] & 0x0f,
 					flipx,flipy,
 					sx,sy,15);
 			/* wrap around */
 			if (sx > 240)
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 						code,
 						m_spriteram[offs + 1] & 0x0f,
 						flipx,flipy,

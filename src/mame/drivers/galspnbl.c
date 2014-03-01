@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, galspnbl_state )
 	AM_RANGE(0x905000, 0x907fff) AM_WRITENOP    /* ??? */
 	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_SHARE("bgvideoram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_WRITENOP    /* more palette ? */
-	AM_RANGE(0xa01000, 0xa017ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa01000, 0xa017ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xa01800, 0xa027ff) AM_WRITENOP    /* more palette ? */
 	AM_RANGE(0xa80000, 0xa80001) AM_READ_PORT("IN0")
 	AM_RANGE(0xa80010, 0xa80011) AM_READ_PORT("IN1") AM_WRITE(soundcommand_w)
@@ -236,8 +236,10 @@ static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galspnbl_state, screen_update_galspnbl)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", galspnbl)
-	MCFG_PALETTE_LENGTH(1024 + 32768)
 
+	MCFG_PALETTE_ADD("palette", 1024 + 32768)
+	MCFG_PALETTE_INIT_OWNER(galspnbl_state, galspnbl)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

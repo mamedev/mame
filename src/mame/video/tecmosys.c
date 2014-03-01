@@ -72,7 +72,7 @@ WRITE16_MEMBER(tecmosys_state::fg_tilemap_w)
 
 inline void tecmosys_state::set_color_555_tecmo(pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
-	palette_set_color_rgb(machine(), color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+	m_palette->set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
 WRITE16_MEMBER(tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w)
@@ -211,7 +211,7 @@ void tecmosys_state::tecmosys_tilemap_copy_to_compose(UINT16 pri)
 
 void tecmosys_state::tecmosys_do_final_mix(bitmap_rgb32 &bitmap)
 {
-	const pen_t *paldata = machine().pens;
+	const pen_t *paldata = m_palette->pens();
 	int y,x;
 	UINT16 *srcptr;
 	UINT16 *srcptr2;
@@ -281,7 +281,7 @@ void tecmosys_state::tecmosys_do_final_mix(bitmap_rgb32 &bitmap)
 
 UINT32 tecmosys_state::screen_update_tecmosys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(machine().pens[0x4000], cliprect);
+	bitmap.fill(m_palette->pen(0x4000), cliprect);
 
 
 	m_bg0tilemap->set_scrolly(0, m_c80000regs[1]+16);

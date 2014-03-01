@@ -678,7 +678,7 @@ static MACHINE_CONFIG_START( splus, splus_state )   // basic machine hardware
 	MCFG_NVRAM_ADD_0FILL("cmosh")
 
 	// video hardware (ALL FAKE, NO VIDEO)
-	MCFG_PALETTE_LENGTH(16*16)
+	MCFG_PALETTE_ADD("palette", 16*16)
 	MCFG_SCREEN_ADD("scrn", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))

@@ -152,12 +152,12 @@ UINT32 hotblock_state::screen_update_hotblock(screen_device &screen, bitmap_ind1
 	int i;
 	static const int xxx = 320, yyy = 204;
 
-	bitmap.fill(get_black_pen(machine()));
+	bitmap.fill(m_palette->black_pen());
 
 	for (i = 0; i < 256; i++)
 	{
 		int dat = (m_pal[i * 2 + 1] << 8) | m_pal[i * 2];
-		palette_set_color_rgb(machine(), i, pal5bit(dat >> 0), pal5bit(dat >> 5), pal5bit(dat >> 10));
+		m_palette->set_pen_color(i, pal5bit(dat >> 0), pal5bit(dat >> 5), pal5bit(dat >> 10));
 	}
 
 	count = 0;
@@ -230,7 +230,7 @@ static MACHINE_CONFIG_START( hotblock, hotblock_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hotblock_state, screen_update_hotblock)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 
 	/* sound hardware */

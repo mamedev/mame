@@ -141,7 +141,7 @@ static MACHINE_CONFIG_START( tcl, tcl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tcl_state, screen_update_tcl)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tcl)
-	MCFG_PALETTE_LENGTH(16*16)
+	MCFG_PALETTE_ADD("palette", 16*16)
 
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )

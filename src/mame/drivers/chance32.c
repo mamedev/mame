@@ -197,7 +197,7 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 static ADDRESS_MAP_START( chance32_map, AS_PROGRAM, 8, chance32_state )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(chance32_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(chance32_bgram_w) AM_SHARE("bgram")
 ADDRESS_MAP_END
@@ -479,8 +479,8 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 12000000/16, mc6845_intf)   /* 52.786 Hz (similar to Major Poker) */
 
 	MCFG_GFXDECODE_ADD("gfxdecode", chance32)
-	MCFG_PALETTE_LENGTH(0x800)
-
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

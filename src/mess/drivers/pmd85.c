@@ -585,8 +585,8 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 288-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pmd85_state, screen_update_pmd85)
 
-	MCFG_PALETTE_LENGTH(sizeof (pmd85_palette) / 3)
-
+	MCFG_PALETTE_ADD("palette", sizeof (pmd85_palette) / 3)
+	MCFG_PALETTE_INIT_OWNER(pmd85_state, pmd85)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

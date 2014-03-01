@@ -239,7 +239,7 @@ static MACHINE_CONFIG_START( ertictac, ertictac_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1280-1, 0, 1024-1)
 	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_DAC_ADD("dac0")

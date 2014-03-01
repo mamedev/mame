@@ -3,6 +3,8 @@
     Lethal Enforcers
 
 *************************************************************************/
+
+#include "machine/bankdev.h"
 #include "sound/k054539.h"
 #include "video/konami_helper.h"
 #include "video/k054156_k054157_k056832.h"
@@ -16,10 +18,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_k054539(*this, "k054539"),
+		m_bank4800(*this, "bank4800"),
 		m_k056832(*this, "k056832"),
-		m_k053244(*this, "k053244"),
-		m_k054000(*this, "k054000") { }
+		m_k053244(*this, "k053244") { }
 
 	/* video-related */
 	int        m_layer_colorbase[4];
@@ -31,17 +32,15 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<k054539_device> m_k054539;
+	required_device<address_map_bank_device> m_bank4800;
 	required_device<k056832_device> m_k056832;
 	required_device<k05324x_device> m_k053244;
-	required_device<k054000_device> m_k054000;
+
 	DECLARE_WRITE8_MEMBER(control2_w);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(sound_irq_w);
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(le_bankswitch_w);
-	DECLARE_READ8_MEMBER(le_4800_r);
-	DECLARE_WRITE8_MEMBER(le_4800_w);
 	DECLARE_WRITE8_MEMBER(le_bgcolor_w);
 	DECLARE_READ8_MEMBER(guns_r);
 	DECLARE_READ8_MEMBER(gunsaux_r);

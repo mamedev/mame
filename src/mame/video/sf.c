@@ -164,25 +164,25 @@ void sf_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 				t = c2; c2 = c4; c4 = t;
 			}
 
-			m_gfxdecode->gfx(2)->transpen(bitmap,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,
 					cliprect,
 					sf_invert(c1),
 					color,
 					flipx,flipy,
 					sx,sy, 15);
-			m_gfxdecode->gfx(2)->transpen(bitmap,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,
 					cliprect,
 					sf_invert(c2),
 					color,
 					flipx,flipy,
 					sx+16,sy, 15);
-			m_gfxdecode->gfx(2)->transpen(bitmap,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,
 					cliprect,
 					sf_invert(c3),
 					color,
 					flipx,flipy,
 					sx,sy+16, 15);
-			m_gfxdecode->gfx(2)->transpen(bitmap,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,
 					cliprect,
 					sf_invert(c4),
 					color,
@@ -199,7 +199,7 @@ void sf_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(2)->transpen(bitmap,
+			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,
 					cliprect,
 					sf_invert(c),
 					color,

@@ -108,7 +108,7 @@ enum
 };
 
 
-static const rgb_t PALETTE[] =
+static const rgb_t PALETTE_SAA5050[] =
 {
 	rgb_t::black,
 	rgb_t(0xff, 0x00, 0x00),

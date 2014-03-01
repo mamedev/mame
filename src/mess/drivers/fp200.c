@@ -65,13 +65,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	DECLARE_READ_LINE_MEMBER(sid_r);
 
+	DECLARE_PALETTE_INIT(fp200);
 protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 void fp200_state::video_start()
@@ -561,10 +561,10 @@ void fp200_state::machine_reset()
 }
 
 
-void fp200_state::palette_init()
+PALETTE_INIT_MEMBER(fp200_state, fp200)
 {
-	palette_set_color_rgb(machine(), 0, 0xa0, 0xa8, 0xa0);
-	palette_set_color_rgb(machine(), 1, 0x30, 0x38, 0x10);
+	palette.set_pen_color(0, 0xa0, 0xa8, 0xa0);
+	palette.set_pen_color(1, 0x30, 0x38, 0x10);
 }
 
 WRITE_LINE_MEMBER( fp200_state::sod_w )
@@ -596,7 +596,8 @@ static MACHINE_CONFIG_START( fp200, fp200_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fp200)
 
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(fp200_state, fp200)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

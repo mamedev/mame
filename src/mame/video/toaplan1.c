@@ -222,13 +222,6 @@ void toaplan1_state::toaplan1_create_tilemaps()
 	m_pf4_tilemap->set_transparent_pen(0);
 }
 
-
-void toaplan1_state::toaplan1_paletteram_alloc()
-{
-	UINT32 bytes = (m_colorram1.bytes() + m_colorram2.bytes())/2;
-	m_generic_paletteram_16.allocate(bytes);
-}
-
 void toaplan1_state::toaplan1_vram_alloc()
 {
 	m_pf1_tilevram16 = auto_alloc_array_clear(machine(), UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
@@ -301,7 +294,6 @@ VIDEO_START_MEMBER(toaplan1_rallybik_state,rallybik)
 	m_spritegen->set_gfx_region(1);
 
 	toaplan1_create_tilemaps();
-	toaplan1_paletteram_alloc();
 	toaplan1_vram_alloc();
 
 	m_buffered_spriteram = auto_alloc_array_clear(machine(), UINT16, m_spriteram.bytes()/2);
@@ -325,7 +317,6 @@ VIDEO_START_MEMBER(toaplan1_rallybik_state,rallybik)
 VIDEO_START_MEMBER(toaplan1_state,toaplan1)
 {
 	toaplan1_create_tilemaps();
-	toaplan1_paletteram_alloc();
 	toaplan1_vram_alloc();
 	toaplan1_spritevram_alloc();
 
@@ -403,29 +394,20 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_spriteram_offs_w)
 }
 
 
-/* tile palette */
-READ16_MEMBER(toaplan1_state::toaplan1_colorram1_r)
+WRITE16_MEMBER(toaplan1_state::toaplan1_bgpalette_w)
 {
-	return m_colorram1[offset];
+	COMBINE_DATA(&m_bgpaletteram[offset]);
+	data = m_bgpaletteram[offset];
+	m_palette->set_pen_color(offset, pal5bit(data>>0), pal5bit(data>>5), pal5bit(data>>10));
 }
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_colorram1_w)
+WRITE16_MEMBER(toaplan1_state::toaplan1_fgpalette_w)
 {
-	COMBINE_DATA(&m_colorram1[offset]);
-	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
+	COMBINE_DATA(&m_fgpaletteram[offset]);
+	data = m_fgpaletteram[offset];
+	m_palette->set_pen_color(offset + 64*16, pal5bit(data>>0), pal5bit(data>>5), pal5bit(data>>10));
 }
 
-/* sprite palette */
-READ16_MEMBER(toaplan1_state::toaplan1_colorram2_r)
-{
-	return m_colorram2[offset];
-}
-
-WRITE16_MEMBER(toaplan1_state::toaplan1_colorram2_w)
-{
-	COMBINE_DATA(&m_colorram2[offset]);
-	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset+(m_colorram1.bytes()/2), data, mem_mask);
-}
 
 READ16_MEMBER(toaplan1_state::toaplan1_spriteram16_r)
 {

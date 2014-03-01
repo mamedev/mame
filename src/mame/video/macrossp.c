@@ -235,7 +235,7 @@ void macrossp_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 						xoffset = 0;
 						for (xcnt = 0; xcnt <= wide; xcnt++)
 						{
-							gfx->zoom_alpha(bitmap,cliprect,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
+							gfx->zoom_alpha(m_palette,bitmap,cliprect,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
 							xoffset += ((xzoom*16 + (1<<7)) >> 8);
 							loopno++;
@@ -252,7 +252,7 @@ void macrossp_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 						xoffset = 0;
 						for (xcnt = 0; xcnt <= wide; xcnt++)
 						{
-							gfx->zoom_alpha(bitmap,cliprect,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
+							gfx->zoom_alpha(m_palette,bitmap,cliprect,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
 							xoffset += ((xzoom * 16 + (1 << 7)) >> 8);
 							loopno++;
@@ -272,7 +272,7 @@ void macrossp_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 						xoffset = ((wide*xzoom*16) >> 8);
 						for (xcnt = wide; xcnt >= 0; xcnt--)
 						{
-							gfx->zoom_alpha(bitmap,cliprect,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
+							gfx->zoom_alpha(m_palette,bitmap,cliprect,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
 							xoffset -= ((xzoom * 16 + (1 << 7)) >> 8);
 							loopno++;
@@ -289,7 +289,7 @@ void macrossp_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 						xoffset = ((wide * xzoom * 16) >> 8);
 						for (xcnt = wide; xcnt >=0 ; xcnt--)
 						{
-							gfx->zoom_alpha(bitmap,cliprect,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
+							gfx->zoom_alpha(m_palette,bitmap,cliprect,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
 							xoffset -= ((xzoom * 16 + (1 << 7)) >> 8);
 							loopno++;
@@ -386,7 +386,7 @@ UINT32 macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rgb3
 {
 	int layers[3],layerpri[3];
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	layers[0] = 0;
 	layerpri[0] = (m_scra_videoregs[0] & 0x0000c000) >> 14;

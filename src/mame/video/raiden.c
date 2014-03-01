@@ -133,7 +133,7 @@ void raiden_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 			flipx = !flipx;
 		}
 
-		 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 15);
+		 gfx->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, x, y, 15);
 	}
 }
 
@@ -145,7 +145,7 @@ UINT32 raiden_state::screen_update_common(screen_device &screen, bitmap_ind16 &b
 	m_fg_layer->set_scrollx(0, scrollregs[2]);
 	m_fg_layer->set_scrolly(0, scrollregs[3]);
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	// back layer
 	if (m_bg_layer_enabled)

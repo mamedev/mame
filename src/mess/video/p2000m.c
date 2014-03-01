@@ -41,7 +41,7 @@ UINT32 p2000t_state::screen_update_p2000m(screen_device &screen, bitmap_ind16 &b
 			if (code < 32) code = 32;
 		}
 
-		m_gfxdecode->gfx(0)->zoom_opaque(bitmap,cliprect, code,
+		m_gfxdecode->gfx(0)->zoom_opaque(m_palette,bitmap,cliprect, code,
 			videoram[offs + 2048] & 0x08 ? 0 : 1, 0, 0, sx, sy, 0x20000, 0x20000);
 
 		if (videoram[offs] & 0x80)

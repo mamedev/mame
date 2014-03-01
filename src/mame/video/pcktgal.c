@@ -1,12 +1,12 @@
 #include "emu.h"
 #include "includes/pcktgal.h"
 
-void pcktgal_state::palette_init()
+PALETTE_INIT_MEMBER(pcktgal_state, pcktgal)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -20,13 +20,13 @@ void pcktgal_state::palette_init()
 		bit2 = (color_prom[i] >> 6) & 0x01;
 		bit3 = (color_prom[i] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[i + machine().total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[i + machine().total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[i + machine().total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[i + machine().total_colors()] >> 3) & 0x01;
+		bit0 = (color_prom[i + palette.entries()] >> 0) & 0x01;
+		bit1 = (color_prom[i + palette.entries()] >> 1) & 0x01;
+		bit2 = (color_prom[i + palette.entries()] >> 2) & 0x01;
+		bit3 = (color_prom[i + palette.entries()] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -54,7 +54,7 @@ void pcktgal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 				if (flipy) flipy=0; else flipy=1;
 			}
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					spriteram[offs+3] + ((spriteram[offs+1] & 1) << 8),
 					(spriteram[offs+1] & 0x70) >> 4,
 					flipx,flipy,

@@ -93,7 +93,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vvillage_lamps_w);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(caswin);
 	UINT32 screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -301,7 +301,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-void caswin_state::palette_init()
+PALETTE_INIT_MEMBER(caswin_state, caswin)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
@@ -322,7 +322,7 @@ void caswin_state::palette_init()
 		bit2 = (color_prom[0] >> 7) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
@@ -346,8 +346,8 @@ static MACHINE_CONFIG_START( vvillage, caswin_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", vvillage)
-	MCFG_PALETTE_LENGTH(0x40)
-
+	MCFG_PALETTE_ADD("palette", 0x40)
+	MCFG_PALETTE_INIT_OWNER(caswin_state, caswin)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -309,12 +309,12 @@ static const unsigned char oric_palette[8*3] =
 };
 
 /* Initialise the palette */
-void oric_state::palette_init()
+PALETTE_INIT_MEMBER(oric_state, oric)
 {
 	int i;
 
 	for ( i = 0; i < sizeof(oric_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine(), i, oric_palette[i*3], oric_palette[i*3+1], oric_palette[i*3+2]);
+		palette.set_pen_color(i, oric_palette[i*3], oric_palette[i*3+1], oric_palette[i*3+2]);
 	}
 }
 
@@ -381,7 +381,8 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(oric_state, oric)
 
 
 	/* sound hardware */

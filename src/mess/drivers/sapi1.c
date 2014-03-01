@@ -568,8 +568,7 @@ static MACHINE_CONFIG_START( sapi1, sapi1_state )
 	MCFG_SCREEN_SIZE(40*6, 24*9)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 24*9-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi1)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

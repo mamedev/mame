@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( map1, AS_PROGRAM, 8, xxmissio_state )
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 
-	AM_RANGE(0xd800, 0xdaff) AM_SHARE("paletteram") AM_RAM_WRITE(xxmissio_paletteram_w)
+	AM_RANGE(0xd800, 0xdaff) AM_SHARE("palette") AM_RAM_WRITE(xxmissio_paletteram_w)
 
 	AM_RANGE(0xe000, 0xefff) AM_SHARE("share5") AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_SHARE("share6") AM_RAM
@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( map2, AS_PROGRAM, 8, xxmissio_state )
 	AM_RANGE(0xc800, 0xcfff) AM_SHARE("bgram") AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("spriteram") AM_RAM
 
-	AM_RANGE(0xd800, 0xdaff) AM_SHARE("paletteram") AM_RAM_WRITE(xxmissio_paletteram_w)
+	AM_RANGE(0xd800, 0xdaff) AM_SHARE("palette") AM_RAM_WRITE(xxmissio_paletteram_w)
 
 	AM_RANGE(0xe000, 0xefff) AM_SHARE("share6") AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_SHARE("share5") AM_RAM
@@ -296,7 +296,8 @@ static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
 	MCFG_SCREEN_UPDATE_DRIVER(xxmissio_state, screen_update_xxmissio)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", xxmissio)
-	MCFG_PALETTE_LENGTH(768)
+	MCFG_PALETTE_ADD("palette", 768)
+	MCFG_PALETTE_FORMAT(BBGGRRII)
 
 
 	/* sound hardware */

@@ -165,9 +165,9 @@ UpdatePalette(running_machine &machine, int offset )
 	int r = (((data&0x00e0)>>5)+((data&0xe000)>>13)*2)*0xff/(0x7*3);
 	int g = (((data&0x001c)>>2)+((data&0x1c00)>>10)*2)*0xff/(0x7*3);
 	int b = (((data&0x0003)>>0)+((data&0x0300)>>8)*2)*0xff/(0x3*3);
-	palette_set_color_rgb( machine, offset+0x1000, r, g, b);
+	state->m_palette->set_pen_color(offset+0x1000, r, g, b);
 
-	palette_set_color_rgb( machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	state->m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 } /* namcona1_paletteram_w */
 
 READ16_MEMBER(namcona1_state::namcona1_paletteram_r)
@@ -291,9 +291,9 @@ void namcona1_state::video_start()
 	m_shaperam           = auto_alloc_array_clear(machine(), UINT16, 0x2000*4/2 );
 	m_cgram              = auto_alloc_array_clear(machine(), UINT16, 0x1000*0x40/2 );
 
-	m_gfxdecode->set_gfx(0, auto_alloc( machine(), gfx_element( machine(), cg_layout_8bpp, (UINT8 *)m_cgram, machine().total_colors()/256, 0 )));
-	m_gfxdecode->set_gfx(1, auto_alloc( machine(), gfx_element( machine(), cg_layout_4bpp, (UINT8 *)m_cgram, machine().total_colors()/16, 0 )));
-	m_gfxdecode->set_gfx(2, auto_alloc( machine(), gfx_element( machine(), shape_layout, (UINT8 *)m_shaperam, machine().total_colors()/2, 0 )));
+	m_gfxdecode->set_gfx(0, auto_alloc( machine(), gfx_element( machine(), cg_layout_8bpp, (UINT8 *)m_cgram, m_palette->entries()/256, 0 )));
+	m_gfxdecode->set_gfx(1, auto_alloc( machine(), gfx_element( machine(), cg_layout_4bpp, (UINT8 *)m_cgram, m_palette->entries()/16, 0 )));
+	m_gfxdecode->set_gfx(2, auto_alloc( machine(), gfx_element( machine(), shape_layout, (UINT8 *)m_shaperam, m_palette->entries()/2, 0 )));
 
 } /* namcona1_vh_start */
 
@@ -418,7 +418,7 @@ static void pdraw_tile(
 									if( (gfx_region == 0 && color == 0x0f) ||
 										(gfx_region == 1 && color == 0xff) )
 									{
-										pen_t *palette_shadow_table = screen.machine().shadow_table;
+										pen_t *palette_shadow_table = state->m_palette->shadow_table();
 										dest[x] = palette_shadow_table[dest[x]];
 									}
 									else
@@ -561,7 +561,7 @@ static void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const r
 	gfx_element *pGfx;
 
 	pGfx = state->m_gfxdecode->gfx(0);
-	paldata = &screen.machine().pens[pGfx->colorbase() + pGfx->granularity() * state->m_tilemap_palette_bank[which]];
+	paldata = &state->m_palette->pen(pGfx->colorbase() + pGfx->granularity() * state->m_tilemap_palette_bank[which]);
 
 	/* draw one scanline at a time */
 	clip.min_x = cliprect.min_x;

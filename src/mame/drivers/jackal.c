@@ -369,8 +369,8 @@ static MACHINE_CONFIG_START( jackal, jackal_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jackal_state, screen_update_jackal)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jackal)
-	MCFG_PALETTE_LENGTH(0x300)
-
+	MCFG_PALETTE_ADD("palette", 0x300)
+	MCFG_PALETTE_INIT_OWNER(jackal_state, jackal)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

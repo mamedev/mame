@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(video_w);
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(lamps_w);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(cardline);
 	UINT32 screen_update_cardline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -50,7 +50,7 @@ public:
 
 
 
-#define DRAW_TILE(machine, offset, transparency)  m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,\
+#define DRAW_TILE(machine, offset, transparency)  m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,\
 					(m_videoram[index+offset] | (m_colorram[index+offset]<<8))&0x3fff,\
 					(m_colorram[index+offset]&0x80)>>7,\
 					0,0,\
@@ -189,12 +189,12 @@ static GFXDECODE_START( cardline )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 2 )
 GFXDECODE_END
 
-void cardline_state::palette_init()
+PALETTE_INIT_MEMBER(cardline_state, cardline)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i,r,g,b,data;
 	int bit0,bit1,bit2;
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		data=color_prom[i];
 
@@ -212,7 +212,7 @@ void cardline_state::palette_init()
 		bit0 = (data >> 0) & 0x01;
 		bit1 = (data >> 1) & 0x01;
 		b = 0x55 * bit0 + 0xaa * bit1;
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -233,7 +233,8 @@ static MACHINE_CONFIG_START( cardline, cardline_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cardline_state, screen_update_cardline)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cardline)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(cardline_state, cardline)
 
 	MCFG_DEFAULT_LAYOUT(layout_cardline)
 

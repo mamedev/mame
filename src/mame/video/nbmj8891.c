@@ -16,68 +16,68 @@
 ******************************************************************************/
 READ8_MEMBER(nbmj8891_state::nbmj8891_palette_type1_r)
 {
-	return m_palette[offset];
+	return m_palette_ptr[offset];
 }
 
 WRITE8_MEMBER(nbmj8891_state::nbmj8891_palette_type1_w)
 {
 	int r, g, b;
 
-	m_palette[offset] = data;
+	m_palette_ptr[offset] = data;
 
 	if (!(offset & 1)) return;
 
 	offset &= 0x1fe;
 
-	r = ((m_palette[offset + 0] & 0x0f) >> 0);
-	g = ((m_palette[offset + 1] & 0xf0) >> 4);
-	b = ((m_palette[offset + 1] & 0x0f) >> 0);
+	r = ((m_palette_ptr[offset + 0] & 0x0f) >> 0);
+	g = ((m_palette_ptr[offset + 1] & 0xf0) >> 4);
+	b = ((m_palette_ptr[offset + 1] & 0x0f) >> 0);
 
-	palette_set_color_rgb(machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 READ8_MEMBER(nbmj8891_state::nbmj8891_palette_type2_r)
 {
-	return m_palette[offset];
+	return m_palette_ptr[offset];
 }
 
 WRITE8_MEMBER(nbmj8891_state::nbmj8891_palette_type2_w)
 {
 	int r, g, b;
 
-	m_palette[offset] = data;
+	m_palette_ptr[offset] = data;
 
 	if (!(offset & 0x100)) return;
 
 	offset &= 0x0ff;
 
-	r = ((m_palette[offset + 0x000] & 0x0f) >> 0);
-	g = ((m_palette[offset + 0x000] & 0xf0) >> 4);
-	b = ((m_palette[offset + 0x100] & 0x0f) >> 0);
+	r = ((m_palette_ptr[offset + 0x000] & 0x0f) >> 0);
+	g = ((m_palette_ptr[offset + 0x000] & 0xf0) >> 4);
+	b = ((m_palette_ptr[offset + 0x100] & 0x0f) >> 0);
 
-	palette_set_color_rgb(machine(), (offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
+	m_palette->set_pen_color((offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 READ8_MEMBER(nbmj8891_state::nbmj8891_palette_type3_r)
 {
-	return m_palette[offset];
+	return m_palette_ptr[offset];
 }
 
 WRITE8_MEMBER(nbmj8891_state::nbmj8891_palette_type3_w)
 {
 	int r, g, b;
 
-	m_palette[offset] = data;
+	m_palette_ptr[offset] = data;
 
 	if (!(offset & 1)) return;
 
 	offset &= 0x1fe;
 
-	r = ((m_palette[offset + 1] & 0x0f) >> 0);
-	g = ((m_palette[offset + 0] & 0xf0) >> 4);
-	b = ((m_palette[offset + 0] & 0x0f) >> 0);
+	r = ((m_palette_ptr[offset + 1] & 0x0f) >> 0);
+	g = ((m_palette_ptr[offset + 0] & 0xf0) >> 4);
+	b = ((m_palette_ptr[offset + 0] & 0x0f) >> 0);
 
-	palette_set_color_rgb(machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 WRITE8_MEMBER(nbmj8891_state::nbmj8891_clutsel_w)
@@ -487,7 +487,7 @@ VIDEO_START_MEMBER(nbmj8891_state,nbmj8891_1layer)
 
 	m_screen->register_screen_bitmap(m_tmpbitmap0);
 	m_videoram0 = auto_alloc_array(machine(), UINT8, width * height);
-	m_palette = auto_alloc_array(machine(), UINT8, 0x200);
+	m_palette_ptr = auto_alloc_array(machine(), UINT8, 0x200);
 	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
 	memset(m_videoram0, 0xff, (width * height * sizeof(char)));
 	m_gfxdraw_mode = 0;
@@ -505,7 +505,7 @@ void nbmj8891_state::video_start()
 	m_screen->register_screen_bitmap(m_tmpbitmap1);
 	m_videoram0 = auto_alloc_array(machine(), UINT8, width * height);
 	m_videoram1 = auto_alloc_array(machine(), UINT8, width * height);
-	m_palette = auto_alloc_array(machine(), UINT8, 0x200);
+	m_palette_ptr = auto_alloc_array(machine(), UINT8, 0x200);
 	m_clut = auto_alloc_array(machine(), UINT8, 0x800);
 	memset(m_videoram0, 0xff, (width * height * sizeof(UINT8)));
 	memset(m_videoram1, 0xff, (width * height * sizeof(UINT8)));

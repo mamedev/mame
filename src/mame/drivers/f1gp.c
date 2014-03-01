@@ -31,37 +31,9 @@
 #include "includes/f1gp.h"
 
 
-READ16_MEMBER(f1gp_state::sharedram_r)
-{
-	return m_sharedram[offset];
-}
-
-WRITE16_MEMBER(f1gp_state::sharedram_w)
-{
-	COMBINE_DATA(&m_sharedram[offset]);
-}
-
-READ16_MEMBER(f1gp_state::extrarom_r)
-{
-	UINT8 *rom = memregion("user1")->base();
-
-	offset *= 2;
-
-	return rom[offset] | (rom[offset + 1] << 8);
-}
-
-READ16_MEMBER(f1gp_state::extrarom2_r)
-{
-	UINT8 *rom = memregion("user2")->base();
-
-	offset *= 2;
-
-	return rom[offset] | (rom[offset + 1] << 8);
-}
-
 WRITE8_MEMBER(f1gp_state::f1gp_sh_bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 0x01);
+	m_z80bank->set_entry(data & 0x01);
 }
 
 
@@ -88,8 +60,8 @@ WRITE8_MEMBER(f1gp_state::pending_command_clear_w)
 
 static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x2fffff) AM_READ(extrarom_r)
-	AM_RANGE(0xa00000, 0xbfffff) AM_READ(extrarom2_r)
+	AM_RANGE(0x100000, 0x2fffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(f1gp_zoomdata_r, f1gp_zoomdata_w)
 	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_SHARE("rozvideoram")
 	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)                            /* mirror */
@@ -100,9 +72,9 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xf00000, 0xf003ff) AM_RAM AM_SHARE("spr1vram")                                // SPR-1 VRAM
 	AM_RANGE(0xf10000, 0xf103ff) AM_RAM AM_SHARE("spr2vram")                                // SPR-2 VRAM
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                                                         // WORK RAM-1
-	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")       // DUAL RAM
+	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")       // DUAL RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")         // CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")    // PALETTE
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(f1gp_gfxctrl_w)
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
@@ -117,14 +89,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( f1gp2_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x2fffff) AM_READ(extrarom_r)
+	AM_RANGE(0x100000, 0x2fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_SHARE("sprcgram")                                    // SPR-1 CG RAM + SPR-2 CG RAM
 	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_SHARE("rozvideoram")   // BACK VRAM
 	AM_RANGE(0xe00000, 0xe00fff) AM_RAM AM_SHARE("spritelist")                          // not checked + SPR-1 VRAM + SPR-2 VRAM
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                                                             // WORK RAM-1
-	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")           // DUAL RAM
+	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")           // DUAL RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")             // CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")            // PALETTE
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")            // PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(f1gp2_gfxctrl_w)
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
@@ -138,7 +110,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( f1gp_cpu2_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
-	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w)
+	AM_RANGE(0xffc000, 0xffcfff) AM_RAM  AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, f1gp_state )
@@ -182,8 +154,8 @@ WRITE16_MEMBER(f1gp_state::f1gpb_misc_w)
 
 static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x2fffff) AM_READ(extrarom_r)
-	AM_RANGE(0xa00000, 0xbfffff) AM_READ(extrarom2_r)
+	AM_RANGE(0x100000, 0x2fffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(f1gp_zoomdata_r, f1gp_zoomdata_w)
 	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_SHARE("rozvideoram")
@@ -195,9 +167,9 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xf00000, 0xf003ff) AM_RAM //unused
 	AM_RANGE(0xf10000, 0xf103ff) AM_RAM //unused
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
-	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")
+	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
@@ -214,8 +186,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( f1gpb_cpu2_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
-	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w)
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM 
+	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xfff030, 0xfff031) AM_NOP //?
 ADDRESS_MAP_END
 
@@ -417,9 +389,7 @@ MACHINE_START_MEMBER(f1gp_state,f1gpb)
 
 MACHINE_START_MEMBER(f1gp_state,f1gp)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
-
-	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
+	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x8000);
 
 	MACHINE_START_CALL_MEMBER(f1gpb);
 }
@@ -462,19 +432,22 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", f1gp)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, f1gp_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 	
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, f1gp_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp)
 
@@ -517,7 +490,8 @@ static MACHINE_CONFIG_START( f1gpb, f1gp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gpb)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", f1gp)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gpb)
 
@@ -547,6 +521,7 @@ static MACHINE_CONFIG_DERIVED( f1gp2, f1gp )
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( f1gp_state, f1gp2_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
 	MCFG_DEVICE_REMOVE("k053936")
 	MCFG_K053936_ADD("k053936", f1gp2_k053936_intf)
@@ -560,20 +535,20 @@ ROM_START( f1gp )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rom1-a.3",     0x000000, 0x20000, CRC(2d8f785b) SHA1(6eca42ad2d57a31e055496141c89cb537f284378) )
 
-	ROM_REGION( 0x200000, "user1", 0 )  /* extra ROMs mapped at 100000 */
-	ROM_LOAD16_BYTE( "rom11-a.2",    0x000000, 0x40000, CRC(53df8ea1) SHA1(25d50bb787f3bd35c9a8ae2b0ab9a21e000debb0) )
-	ROM_LOAD16_BYTE( "rom10-a.1",    0x000001, 0x40000, CRC(46a289fb) SHA1(6a8c19e08b6d836fe83378fd77fead82a0b2db7c) )
-	ROM_LOAD16_BYTE( "rom13-a.4",    0x080000, 0x40000, CRC(7d92e1fa) SHA1(c23f5beea85b0804c61ef9e7f131b186d076221f) )
-	ROM_LOAD16_BYTE( "rom12-a.3",    0x080001, 0x40000, CRC(d8c1bcf4) SHA1(d6d77354eb1ab413ba8cfa5d973cf5b0c851c23b) )
-	ROM_LOAD16_BYTE( "rom6-a.6",     0x100000, 0x40000, CRC(6d947a3f) SHA1(2cd01ee2a73ab105a45a5464a29fd75aa43ba2db) )
-	ROM_LOAD16_BYTE( "rom7-a.5",     0x100001, 0x40000, CRC(7a014ba6) SHA1(8f0abbb68100e396e5a41337254cb6bf1a2ed00b) )
-	ROM_LOAD16_BYTE( "rom9-a.8",     0x180000, 0x40000, CRC(49286572) SHA1(c5e16bd1ccd43452337a4cd76db70db079ca0706) )
-	ROM_LOAD16_BYTE( "rom8-a.7",     0x180001, 0x40000, CRC(0ed783c7) SHA1(c0c467ede51c08d84999897c6d5cc8b584b23b67) )
+	ROM_REGION16_BE( 0x200000, "user1", 0 )  /* extra ROMs mapped at 100000 */
+	ROM_LOAD16_BYTE( "rom10-a.1",    0x000000, 0x40000, CRC(46a289fb) SHA1(6a8c19e08b6d836fe83378fd77fead82a0b2db7c) )
+	ROM_LOAD16_BYTE( "rom11-a.2",    0x000001, 0x40000, CRC(53df8ea1) SHA1(25d50bb787f3bd35c9a8ae2b0ab9a21e000debb0) )
+	ROM_LOAD16_BYTE( "rom12-a.3",    0x080000, 0x40000, CRC(d8c1bcf4) SHA1(d6d77354eb1ab413ba8cfa5d973cf5b0c851c23b) )
+	ROM_LOAD16_BYTE( "rom13-a.4",    0x080001, 0x40000, CRC(7d92e1fa) SHA1(c23f5beea85b0804c61ef9e7f131b186d076221f) )
+	ROM_LOAD16_BYTE( "rom7-a.5",     0x100000, 0x40000, CRC(7a014ba6) SHA1(8f0abbb68100e396e5a41337254cb6bf1a2ed00b) )
+	ROM_LOAD16_BYTE( "rom6-a.6",     0x100001, 0x40000, CRC(6d947a3f) SHA1(2cd01ee2a73ab105a45a5464a29fd75aa43ba2db) )
+	ROM_LOAD16_BYTE( "rom8-a.7",     0x180000, 0x40000, CRC(0ed783c7) SHA1(c0c467ede51c08d84999897c6d5cc8b584b23b67) )
+	ROM_LOAD16_BYTE( "rom9-a.8",     0x180001, 0x40000, CRC(49286572) SHA1(c5e16bd1ccd43452337a4cd76db70db079ca0706) )
 
-	ROM_REGION( 0x200000, "user2", 0 )  /* extra ROMs mapped at a00000 */
+	ROM_REGION16_BE( 0x200000, "user2", 0 )  /* extra ROMs mapped at a00000 */
 											/* containing gfx data for the 053936 */
-	ROM_LOAD( "rom2-a.06",    0x000000, 0x100000, CRC(747dd112) SHA1(b9264bec61467ab256cf6cb698b6e0ea8f8006e0) )
-	ROM_LOAD( "rom3-a.05",    0x100000, 0x100000, CRC(264aed13) SHA1(6f0de860d4299befffc530b7a8f19656982a51c4) )
+	ROM_LOAD16_WORD_SWAP( "rom2-a.06",    0x000000, 0x100000, CRC(747dd112) SHA1(b9264bec61467ab256cf6cb698b6e0ea8f8006e0) )
+	ROM_LOAD16_WORD_SWAP( "rom3-a.05",    0x100000, 0x100000, CRC(264aed13) SHA1(6f0de860d4299befffc530b7a8f19656982a51c4) )
 
 	ROM_REGION( 0x20000, "sub", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rom4-a.4",     0x000000, 0x20000, CRC(8e811d36) SHA1(2b806b50a3a307a21894687f16485ace287a7c4c) )
@@ -614,17 +589,17 @@ ROM_START( f1gpb )
 	ROM_LOAD16_BYTE( "1.ic38",     0x000001, 0x20000, CRC(046dd83a) SHA1(ea65fa88f9d9a79664de666e63594a7a7de86650) )
 	ROM_LOAD16_BYTE( "7.ic39",     0x000000, 0x20000, CRC(960f5db4) SHA1(addc461538e2140afae400e8d7364d0bcc42a0cb) )
 
-	ROM_REGION( 0x200000, "user1", 0 )  /* extra ROMs mapped at 100000 */
-	ROM_LOAD16_BYTE( "2.ic48",    0x000000, 0x80000, CRC(b3b315c3) SHA1(568592e450401cd95206dbe439e565dd28499dd1) )
-	ROM_LOAD16_BYTE( "8.ic41",    0x000001, 0x80000, CRC(39af8180) SHA1(aa1577195b1463069870db2d64db3b5e61d6bbe8) )
-	ROM_LOAD16_BYTE( "3.ic165",   0x100000, 0x80000, CRC(b7295a30) SHA1(4120dda38673d59343aea0f030d2f275a0ae3d95) )
-	ROM_LOAD16_BYTE( "9.ic166",   0x100001, 0x80000, CRC(bb596d5b) SHA1(f29ed135e8f09d4a15353360a811c13aba681382) )
+	ROM_REGION16_BE( 0x200000, "user1", 0 )  /* extra ROMs mapped at 100000 */
+	ROM_LOAD16_BYTE( "8.ic41",    0x000000, 0x80000, CRC(39af8180) SHA1(aa1577195b1463069870db2d64db3b5e61d6bbe8) )
+	ROM_LOAD16_BYTE( "2.ic48",    0x000001, 0x80000, CRC(b3b315c3) SHA1(568592e450401cd95206dbe439e565dd28499dd1) )
+	ROM_LOAD16_BYTE( "9.ic166",   0x100000, 0x80000, CRC(bb596d5b) SHA1(f29ed135e8f09d4a15353360a811c13aba681382) )
+	ROM_LOAD16_BYTE( "3.ic165",   0x100001, 0x80000, CRC(b7295a30) SHA1(4120dda38673d59343aea0f030d2f275a0ae3d95) )
 
-	ROM_REGION( 0x200000, "user2", 0 )  /* extra ROMs mapped at a00000 */
-	ROM_LOAD16_BYTE( "4.ic42",    0x000000, 0x80000, CRC(5dbde98a) SHA1(536553eaad0ebfe219e44a4f50a4707209024469) )
-	ROM_LOAD16_BYTE( "10.ic43",   0x000001, 0x80000, CRC(d60e7706) SHA1(23c383e47e6600a68d6fd8bcfc9552fe0d660630) )
-	ROM_LOAD16_BYTE( "5.ic167",   0x100000, 0x80000, CRC(48c36293) SHA1(2a5d92537ba331a99697d13b4394b8d2737eeaf2) )
-	ROM_LOAD16_BYTE( "11.ic168",  0x100001, 0x80000, CRC(92a28e52) SHA1(dc203486b96fdc1930f7e63021e84f203540a64e) )
+	ROM_REGION16_BE( 0x200000, "user2", 0 )  /* extra ROMs mapped at a00000 */
+	ROM_LOAD16_BYTE( "10.ic43",   0x000000, 0x80000, CRC(d60e7706) SHA1(23c383e47e6600a68d6fd8bcfc9552fe0d660630) )
+	ROM_LOAD16_BYTE( "4.ic42",    0x000001, 0x80000, CRC(5dbde98a) SHA1(536553eaad0ebfe219e44a4f50a4707209024469) )
+	ROM_LOAD16_BYTE( "11.ic168",  0x100000, 0x80000, CRC(92a28e52) SHA1(dc203486b96fdc1930f7e63021e84f203540a64e) )
+	ROM_LOAD16_BYTE( "5.ic167",   0x100001, 0x80000, CRC(48c36293) SHA1(2a5d92537ba331a99697d13b4394b8d2737eeaf2) )
 
 	ROM_REGION( 0x20000, "sub", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "16.u7",     0x000000, 0x10000, CRC(7609d818) SHA1(eb841b8e7b34f1c677f1a79bfeda5dafc1f6849f) )
@@ -670,8 +645,8 @@ ROM_START( f1gp2 )
 	ROM_LOAD16_BYTE( "rom12.v1",     0x000000, 0x20000, CRC(c5c5f199) SHA1(56fcbf1d9b15a37204296c578e1585599f76a107) )
 	ROM_LOAD16_BYTE( "rom14.v2",     0x000001, 0x20000, CRC(dd5388e2) SHA1(66e88f86edc2407e5794519f988203a52d65636d) )
 
-	ROM_REGION( 0x200000, "user1", 0 )  /* extra ROMs mapped at 100000 */
-	ROM_LOAD( "rom2",         0x100000, 0x100000, CRC(3b0cfa82) SHA1(ea6803dd8d30aa9f3bd578e113fc26f20c640751) )
+	ROM_REGION16_BE( 0x200000, "user1", 0 )  /* extra ROMs mapped at 100000 */
+	ROM_LOAD16_WORD_SWAP( "rom2",         0x100000, 0x100000, CRC(3b0cfa82) SHA1(ea6803dd8d30aa9f3bd578e113fc26f20c640751) )
 	ROM_CONTINUE(             0x000000, 0x100000 )
 
 	ROM_REGION( 0x20000, "sub", 0 ) /* 68000 code */

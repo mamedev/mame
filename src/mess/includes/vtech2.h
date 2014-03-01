@@ -56,7 +56,7 @@ public:
 	DECLARE_DRIVER_INIT(laser);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(vtech2);
 	DECLARE_MACHINE_RESET(laser500);
 	DECLARE_MACHINE_RESET(laser700);
 	UINT32 screen_update_laser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

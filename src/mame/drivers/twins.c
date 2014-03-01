@@ -128,7 +128,7 @@ UINT32 twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bit
 	int i;
 	static const int xxx=320,yyy=204;
 
-	bitmap.fill(get_black_pen(machine()));
+	bitmap.fill(m_palette->black_pen());
 
 	for (i=0;i<0x100;i++)
 	{
@@ -144,7 +144,7 @@ UINT32 twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bit
 		b = (dat>>10) & 0x1f;
 		b = BITSWAP8(b,7,6,5,0,1,2,3,4);
 
-		palette_set_color_rgb(machine(),i, pal5bit(r),pal5bit(g),pal5bit(b));
+		m_palette->set_pen_color(i, pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 
 	count=0;
@@ -207,7 +207,7 @@ static MACHINE_CONFIG_START( twins, twins_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(twins_state,twins)
 
@@ -234,7 +234,7 @@ UINT32 twins_state::screen_update_twinsa(screen_device &screen, bitmap_ind16 &bi
 	int i;
 	static const int xxx=320,yyy=204;
 
-	bitmap.fill(get_black_pen(machine()));
+	bitmap.fill(m_palette->black_pen());
 
 	for (i=0;i<0x1000-3;i+=3)
 	{
@@ -243,7 +243,7 @@ UINT32 twins_state::screen_update_twinsa(screen_device &screen, bitmap_ind16 &bi
 		g = m_paletteram[i+1];
 		b = m_paletteram[i+2];
 
-		palette_set_color_rgb(machine(),i/3, pal6bit(r), pal6bit(g), pal6bit(b));
+		m_palette->set_pen_color(i/3, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 
 	count=0;
@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( twinsa, twins_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twinsa)
 
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 	MCFG_VIDEO_START_OVERRIDE(twins_state,twinsa)
 

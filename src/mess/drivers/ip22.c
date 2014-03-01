@@ -1624,7 +1624,7 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1279, 0, 1023)
 	MCFG_SCREEN_UPDATE_DEVICE("newport", newport_video_device, screen_update)
 
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_ADD("palette", 65536)
 
 	MCFG_NEWPORT_ADD("newport")
 

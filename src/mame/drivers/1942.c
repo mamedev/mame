@@ -191,7 +191,7 @@ WRITE8_MEMBER(_1942_state::c1942p_palette_w)
 	int g = (data & 0x38) >> 3;
 	int b = (data & 0xc0) >> 6;
 
-	colortable_palette_set_color(machine().colortable, offset, rgb_t(r<<5,g<<5,b<<6));
+	m_palette->set_indirect_color(offset, rgb_t(r<<5,g<<5,b<<6));
 }
 
 static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
@@ -541,7 +541,9 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", 1942)
-	MCFG_PALETTE_LENGTH(64*4+4*32*8+16*16)
+	
+	MCFG_PALETTE_ADD("palette", 64*4+4*32*8+16*16)
+	MCFG_PALETTE_INIT_OWNER(_1942_state, 1942)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -598,8 +600,8 @@ static MACHINE_CONFIG_START( 1942p, _1942_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", 1942p)
-	MCFG_PALETTE_LENGTH(0x500)
-	MCFG_PALETTE_INIT_OVERRIDE(_1942_state, 1942p)
+	MCFG_PALETTE_ADD("palette", 0x500)
+	MCFG_PALETTE_INIT_OWNER(_1942_state, 1942p)
 	MCFG_VIDEO_START_OVERRIDE(_1942_state,c1942p)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

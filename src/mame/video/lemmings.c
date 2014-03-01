@@ -110,7 +110,7 @@ WRITE16_MEMBER(lemmings_state::lemmings_vram_w)
 void lemmings_state::lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect)
 {
 	int y,x;
-	const pen_t *paldata = machine().pens;
+	const pen_t *paldata = m_palette->pens();
 
 	for (y=cliprect.min_y; y<cliprect.max_y;y++)
 	{
@@ -138,7 +138,7 @@ UINT32 lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rgb3
 	m_sprgen->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_1, 0x400, true);
 	m_sprgen2->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_0, 0x400, true);
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x300, 0xff);
 
 	/* Pixel layer can be windowed in hardware (two player mode) */

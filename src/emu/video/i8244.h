@@ -86,12 +86,11 @@ public:
 	template<class _Object> static devcb2_base &set_irq_cb(device_t &device, _Object object) { return downcast<i8244_device &>(device).m_irq_func.set_callback(object); }
 	template<class _Object> static devcb2_base &set_postprocess_cb(device_t &device, _Object object) { return downcast<i8244_device &>(device).m_postprocess_func.set_callback(object); }
 
-	virtual void palette_init();
-
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ_LINE_MEMBER(vblank);
 	DECLARE_READ_LINE_MEMBER(hblank);
+	DECLARE_PALETTE_INIT(i8244);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

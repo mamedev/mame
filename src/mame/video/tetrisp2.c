@@ -48,14 +48,14 @@ WRITE16_MEMBER(tetrisp2_state::tetrisp2_palette_w)
 {
 	data = COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	if ((offset & 1) == 0)
-		palette_set_color_rgb(machine(),offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
+		m_palette->set_pen_color(offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
 WRITE16_MEMBER(tetrisp2_state::rocknms_sub_palette_w)
 {
 	data = COMBINE_DATA(&m_generic_paletteram2_16[offset]);
 	if ((offset & 1) == 0)
-		palette_set_color_rgb(machine(),(0x8000 + (offset/2)),pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
+		m_palette->set_pen_color((0x8000 + (offset/2)),pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
 
@@ -383,7 +383,7 @@ static void tetrisp2_draw_sprites(  tetrisp2_state *state, _BitmapClass &bitmap,
 			if (priority_ram[(pri | 0x0a00 | 0x0000) / 2] & 0x38) primask |= 1 << 7;
 
 
-			gfx->prio_zoom_transpen(bitmap,cliprect,
+			gfx->prio_zoom_transpen(state->m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx, flipy,
@@ -591,7 +591,7 @@ UINT32 tetrisp2_state::screen_update_rocknms_left(screen_device &screen, bitmap_
 	m_tilemap_sub_rot->set_scrollx(0, m_rocknms_sub_rotregs[ 0 ] + 0x400);
 	m_tilemap_sub_rot->set_scrolly(0, m_rocknms_sub_rotregs[ 2 ] + 0x400);
 
-	bitmap.fill(machine().pens[0x0000], cliprect);
+	bitmap.fill(m_palette->pen(0x0000), cliprect);
 	screen.priority().fill(0, cliprect);
 
 	asc_pri = scr_pri = rot_pri = 0;
@@ -652,7 +652,7 @@ UINT32 tetrisp2_state::screen_update_rocknms_right(screen_device &screen, bitmap
 	m_tilemap_rot->set_scrolly(0, m_rotregs[ 2 ] + 0x400);
 
 	/* Black background color */
-	bitmap.fill(machine().pens[0x0000], cliprect);
+	bitmap.fill(m_palette->pen(0x0000), cliprect);
 	screen.priority().fill(0, cliprect);
 
 	asc_pri = scr_pri = rot_pri = 0;
@@ -788,7 +788,7 @@ WRITE16_MEMBER(stepstag_state::stepstag_palette_w)
 {
 	data = COMBINE_DATA(&m_generic_paletteram_16[offset]);
 //  if ((offset & 1) == 0)
-		palette_set_color_rgb(machine(),offset/4,
+		m_palette->set_pen_color(offset/4,
 			mypal(m_generic_paletteram_16[offset/4*4+0] & 0xff),
 			mypal(m_generic_paletteram_16[offset/4*4+1] & 0xff),
 			mypal(m_generic_paletteram_16[offset/4*4+2] & 0xff)

@@ -418,7 +418,7 @@ void wgp_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const
 					zx = x + (((k + 1) * zoomx) / 2) - curx;
 					zy = y + (((j + 1) * zoomy) / 2) - cury;
 
-					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 							code,
 							col,
 							flipx, flipy,
@@ -449,7 +449,7 @@ void wgp_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const
 					zx = x + (((k + 1) * zoomx) / 4) - curx;
 					zy = y + (((j + 1) * zoomy) / 4) - cury;
 
-					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_zoom_transpen(m_palette,bitmap,cliprect,
 							code,
 							col,
 							flipx, flipy,

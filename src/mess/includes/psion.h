@@ -68,7 +68,7 @@ public:
 	void io_rw(address_space &space, UINT16 offset);
 	DECLARE_WRITE8_MEMBER( io_w );
 	DECLARE_READ8_MEMBER( io_r );
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(psion);
 	DECLARE_INPUT_CHANGED_MEMBER(psion_on);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 

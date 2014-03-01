@@ -113,10 +113,10 @@ void neoprint_state::draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,i
 			UINT8 fx = (m_npvidram[i*2+1] & 0x0040);
 			UINT8 fy = (m_npvidram[i*2+1] & 0x0080);
 
-			gfx->transpen(bitmap,cliprect,dat,color,fx,fy,x*16+scrollx,y*16-scrolly,0);
-			gfx->transpen(bitmap,cliprect,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly,0);
-			gfx->transpen(bitmap,cliprect,dat,color,fx,fy,x*16+scrollx,y*16-scrolly-512,0);
-			gfx->transpen(bitmap,cliprect,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly-512,0);
+			gfx->transpen(m_palette,bitmap,cliprect,dat,color,fx,fy,x*16+scrollx,y*16-scrolly,0);
+			gfx->transpen(m_palette,bitmap,cliprect,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly,0);
+			gfx->transpen(m_palette,bitmap,cliprect,dat,color,fx,fy,x*16+scrollx,y*16-scrolly-512,0);
+			gfx->transpen(m_palette,bitmap,cliprect,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly-512,0);
 
 			i++;
 			//i&=0x3ff;
@@ -233,7 +233,7 @@ static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("npvidram")
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x600000, 0x600001) AM_READWRITE(neoprint_audio_result_r,audio_command_w)
 	AM_RANGE(0x600002, 0x600003) AM_READWRITE(neoprint_calendar_r,neoprint_calendar_w)
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM") AM_WRITENOP
@@ -271,7 +271,7 @@ WRITE16_MEMBER(neoprint_state::nprsp_palette_w)
 
 		pal_entry = ((offset & 0xfffe) >> 1) + ((offset & 0x20000) ? 0x8000 : 0);
 
-		palette_set_color(machine(), pal_entry, rgb_t(r,g,b));
+		m_palette->set_pen_color(pal_entry, rgb_t(r,g,b));
 	}
 }
 
@@ -488,8 +488,8 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(neoprint_state, screen_update_neoprint)
 
-	MCFG_PALETTE_LENGTH(0x10000)
-
+	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -530,8 +530,8 @@ static MACHINE_CONFIG_START( nprsp, neoprint_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(neoprint_state,nprsp)
 
-	MCFG_PALETTE_LENGTH(0x10000)
-
+	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

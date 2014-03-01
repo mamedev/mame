@@ -35,7 +35,7 @@ VIDEO_START_MEMBER(deco_mlc_state,mlc)
 }
 
 
-static void mlc_drawgfxzoomline(
+static void mlc_drawgfxzoomline(deco_mlc_state *state,
 		UINT32* dest,const rectangle &clip,gfx_element *gfx,
 		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int sx,
 		int transparent_color,int use8bpp,
@@ -93,7 +93,7 @@ static void mlc_drawgfxzoomline(
 
 		if( ex>sx )
 		{ /* skip if inner loop doesn't draw anything */
-			const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+			const pen_t *pal = &state->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const UINT8 *code_base1 = gfx->get_data(code1 % gfx->elements());
 
 			/* no alpha */
@@ -521,7 +521,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 				}
 			}
 
-			mlc_drawgfxzoomline(
+			mlc_drawgfxzoomline(this,
 							dest,user_clip,m_gfxdecode->gfx(0),
 							tile,tile2,
 							color + colorOffset,fx,realxbase,
@@ -552,7 +552,7 @@ void deco_mlc_state::screen_eof_mlc(screen_device &screen, bool state)
 UINT32 deco_mlc_state::screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 //  temp_bitmap->fill(0, cliprect);
-	bitmap.fill(machine().pens[0], cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
+	bitmap.fill(m_palette->pen(0), cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
 
 
 

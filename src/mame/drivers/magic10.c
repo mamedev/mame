@@ -155,7 +155,7 @@ WRITE16_MEMBER(magic10_state::layer2_videoram_w)
 WRITE16_MEMBER(magic10_state::paletteram_w)
 {
 	data = COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	palette_set_color_rgb( machine(), offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
+	m_palette->set_pen_color( offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 }
 
 
@@ -749,7 +749,7 @@ static MACHINE_CONFIG_START( magic10, magic10_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(magic10_state, screen_update_magic10)
 
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_GFXDECODE_ADD("gfxdecode", magic10)
 
 

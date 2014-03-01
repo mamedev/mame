@@ -186,7 +186,7 @@ GAME(198?, j_nuddup ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "J
 
 GAME(198?, j_nuddup2,j_nuddup   ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Nudge Double Up (JPM SRU, set 2)",                     GAME_IS_SKELETON_MECHANICAL )
 
-GAME(198?, j_unk    ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM?","Unknown SRU Game (JPM?)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j_unk    ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM?","unknown SRU Game (JPM?)",                     GAME_IS_SKELETON_MECHANICAL )
 
 // this one is different again?
 GAME(198?, j_plus2  ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Plus 2 (JPM)",                     GAME_IS_SKELETON_MECHANICAL )

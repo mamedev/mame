@@ -69,7 +69,7 @@ VIDEO_START_MEMBER(taitol_state,taitol)
 	m_ch1a_tilemap->set_transparent_pen(0);
 
 	for (i = 0; i < 256; i++)
-		palette_set_color(machine(), i, rgb_t(0, 0, 0));
+		m_palette->set_pen_color(i, rgb_t(0, 0, 0));
 
 	m_ch1a_tilemap->set_scrolldx(-8, -8);
 	m_bg18_tilemap->set_scrolldx(28, -11);
@@ -256,7 +256,7 @@ void taitol_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -303,7 +303,7 @@ UINT32 taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 &b
 		m_ch1a_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
-		bitmap.fill(machine().pens[0], cliprect);
+		bitmap.fill(m_palette->pen(0), cliprect);
 	return 0;
 }
 

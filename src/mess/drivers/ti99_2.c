@@ -102,7 +102,6 @@ public:
 	DECLARE_DRIVER_INIT(ti99_2_24);
 	DECLARE_DRIVER_INIT(ti99_2_32);
 	virtual void machine_reset();
-	virtual void palette_init();
 	UINT32 screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ti99_2_vblank_interrupt);
 	required_device<cpu_device> m_maincpu;
@@ -160,12 +159,6 @@ INTERRUPT_GEN_MEMBER(ti99_2_state::ti99_2_vblank_interrupt)
 */
 
 
-void ti99_2_state::palette_init()
-{
-	palette_set_color(machine(),0,rgb_t::white); /* white */
-	palette_set_color(machine(),1,rgb_t::black); /* black */
-}
-
 
 UINT32 ti99_2_state::screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -178,7 +171,7 @@ UINT32 ti99_2_state::screen_update_ti99_2(screen_device &screen, bitmap_ind16 &b
 	for (i = 0; i < 768; i++)
 	{
 		/* Is the char code masked or not ??? */
-		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, videoram[i] & 0x7F, 0,
+		m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect, videoram[i] & 0x7F, 0,
 			0, 0, sx, sy);
 
 		sx += 8;
@@ -398,7 +391,7 @@ static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ti99_2_state, screen_update_ti99_2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ti99_2)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD_WHITE_AND_BLACK("palette")
 MACHINE_CONFIG_END
 
 

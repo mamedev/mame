@@ -124,7 +124,7 @@ WRITE8_MEMBER(senjyo_state::senjyo_paletteram_w)
 	int bb = b|((b!=0)?i:0);
 
 	m_generic_paletteram_8[offset] = data;
-	palette_set_color_rgb(machine(), offset, pal4bit(rr), pal4bit(gg), pal4bit(bb) );
+	m_palette->set_pen_color(offset, pal4bit(rr), pal4bit(gg), pal4bit(bb) );
 }
 
 static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
@@ -574,8 +574,8 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(senjyo_state, screen_update_senjyo)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", senjyo)
-	MCFG_PALETTE_LENGTH(512+2)  /* 512 real palette + 2 for the radar */
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
+
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512+2)  /* 512 real palette + 2 for the radar */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

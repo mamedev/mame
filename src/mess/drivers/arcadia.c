@@ -438,17 +438,15 @@ static const unsigned short arcadia_palette[128+8] =  /* bgnd, fgnd */
 	7,0, 7,1, 7,2, 7,3, 7,4, 7,5, 7,6, 7,7
 };
 
-void arcadia_state::palette_init()
+PALETTE_INIT_MEMBER(arcadia_state, arcadia)
 {
 	int i;
 
-	machine().colortable = colortable_alloc(machine(), 8);
-
 	for (i = 0; i < 8; i++)
-		colortable_palette_set_color(machine().colortable, i, arcadia_colors[i]);
+		palette.set_indirect_color(i, arcadia_colors[i]);
 
 	for (i = 0; i < 128+8; i++)
-		colortable_entry_set_value(machine().colortable, i, arcadia_palette[i]);
+		palette.set_pen_indirect(i, arcadia_palette[i]);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( arcadia_state, arcadia_cart )
@@ -541,8 +539,9 @@ static MACHINE_CONFIG_START( arcadia, arcadia_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 2*XPOS+128-1, 0, 262-1)
 	MCFG_SCREEN_UPDATE_DRIVER(arcadia_state, screen_update_arcadia)
 
-	MCFG_GFXDECODE_ADD("gfxdecode",  arcadia )
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(arcadia_palette))
+	MCFG_GFXDECODE_ADD("gfxdecode", arcadia )
+	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(arcadia_palette))
+	MCFG_PALETTE_INIT_OWNER(arcadia_state, arcadia)
 
 
 	/* sound hardware */

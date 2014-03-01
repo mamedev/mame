@@ -1028,8 +1028,9 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	MCFG_VIDEO_START_OVERRIDE(cvs_state,cvs)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cvs)
-	MCFG_PALETTE_LENGTH((256+4)*8+8+1)
-	MCFG_PALETTE_INIT_OVERRIDE(cvs_state,cvs)
+
+	MCFG_PALETTE_ADD("palette", (256+4)*8+8+1)
+	MCFG_PALETTE_INIT_OWNER(cvs_state,cvs)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(32*8, 32*8)

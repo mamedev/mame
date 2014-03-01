@@ -10,12 +10,12 @@
 #include "includes/marineb.h"
 
 
-void marineb_state::palette_init()
+PALETTE_INIT_MEMBER(marineb_state, marineb)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -26,16 +26,16 @@ void marineb_state::palette_init()
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i + machine().total_colors()] >> 0) & 0x01;
-		bit2 = (color_prom[i + machine().total_colors()] >> 1) & 0x01;
+		bit1 = (color_prom[i + palette.entries()] >> 0) & 0x01;
+		bit2 = (color_prom[i + palette.entries()] >> 1) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		/* blue component */
 		bit0 = 0;
-		bit1 = (color_prom[i + machine().total_colors()] >> 2) & 0x01;
-		bit2 = (color_prom[i + machine().total_colors()] >> 3) & 0x01;
+		bit1 = (color_prom[i + palette.entries()] >> 2) & 0x01;
+		bit2 = (color_prom[i + palette.entries()] >> 3) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 
@@ -213,7 +213,7 @@ UINT32 marineb_state::screen_update_marineb(screen_device &screen, bitmap_ind16 
 			sx++;
 		}
 
-		m_gfxdecode->gfx(gfx)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(gfx)->transpen(m_palette,bitmap,cliprect,
 				code,
 				col,
 				flipx,flipy,
@@ -255,7 +255,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 			sx++;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code >> 2,
 				col,
 				flipx,flipy,
@@ -284,7 +284,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 
 	code >>= 4;
 
-	m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+	m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 			code,
 			col,
 			flipx,flipy,
@@ -292,7 +292,7 @@ UINT32 marineb_state::screen_update_changes(screen_device &screen, bitmap_ind16 
 
 	/* draw again for wrap around */
 
-	m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+	m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 			code,
 			col,
 			flipx,flipy,
@@ -350,7 +350,7 @@ UINT32 marineb_state::screen_update_springer(screen_device &screen, bitmap_ind16
 			sx--;
 		}
 
-		m_gfxdecode->gfx(gfx)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(gfx)->transpen(m_palette,bitmap,cliprect,
 				code,
 				col,
 				flipx,flipy,
@@ -393,7 +393,7 @@ UINT32 marineb_state::screen_update_hoccer(screen_device &screen, bitmap_ind16 &
 			flipx = !flipx;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code >> 2,
 				col,
 				flipx,flipy,
@@ -451,7 +451,7 @@ UINT32 marineb_state::screen_update_hopprobo(screen_device &screen, bitmap_ind16
 			sx--;
 		}
 
-		m_gfxdecode->gfx(gfx)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(gfx)->transpen(m_palette,bitmap,cliprect,
 				code,
 				col,
 				flipx,flipy,

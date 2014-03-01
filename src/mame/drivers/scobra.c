@@ -759,9 +759,9 @@ static MACHINE_CONFIG_START( type1, scobra_state )
 	MCFG_SCREEN_UPDATE_DRIVER(scobra_state, screen_update_galaxold)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", scobra)
-	MCFG_PALETTE_LENGTH(32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
+	MCFG_PALETTE_ADD("palette", 32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
 
-	MCFG_PALETTE_INIT_OVERRIDE(scobra_state,scrambold)
+	MCFG_PALETTE_INIT_OWNER(scobra_state,scrambold)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,scrambold)
 
 	/* sound hardware */
@@ -784,9 +784,10 @@ static MACHINE_CONFIG_DERIVED( rescue, type1 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_PALETTE_LENGTH(32+64+2+128)    /* 32 for characters, 64 for stars, 2 for bullets, 128 for background */
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 32+64+2+128)    /* 32 for characters, 64 for stars, 2 for bullets, 128 for background */
 
-	MCFG_PALETTE_INIT_OVERRIDE(scobra_state,rescue)
+	MCFG_PALETTE_INIT_OWNER(scobra_state,rescue)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,rescue)
 MACHINE_CONFIG_END
 
@@ -797,9 +798,10 @@ static MACHINE_CONFIG_DERIVED( minefld, type1 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_PALETTE_LENGTH(32+64+2+256)    /* 32 for characters, 64 for stars, 2 for bullets, 256 for background */
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 32+64+2+256)    /* 32 for characters, 64 for stars, 2 for bullets, 256 for background */
 
-	MCFG_PALETTE_INIT_OVERRIDE(scobra_state,minefld)
+	MCFG_PALETTE_INIT_OWNER(scobra_state,minefld)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,minefld)
 MACHINE_CONFIG_END
 
@@ -831,9 +833,10 @@ static MACHINE_CONFIG_DERIVED( stratgyx, type2 )
 	MCFG_I8255A_ADD( "ppi8255_1", stratgyx_ppi_1_intf )
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
-	MCFG_PALETTE_INIT_OVERRIDE(scobra_state,stratgyx)
+	MCFG_PALETTE_INIT_OWNER(scobra_state,stratgyx)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,stratgyx)
 MACHINE_CONFIG_END
 
@@ -843,9 +846,10 @@ static MACHINE_CONFIG_DERIVED( darkplnt, type2 )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(32+64+2) /* 32 for characters, 64 (buffer) for stars, 2 for bullets */
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 32+64+2) /* 32 for characters, 64 (buffer) for stars, 2 for bullets */
 
-	MCFG_PALETTE_INIT_OVERRIDE(scobra_state,darkplnt)
+	MCFG_PALETTE_INIT_OWNER(scobra_state,darkplnt)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,darkplnt)
 MACHINE_CONFIG_END
 
@@ -886,9 +890,9 @@ static MACHINE_CONFIG_START( hustler, scobra_state )
 	MCFG_SCREEN_UPDATE_DRIVER(scobra_state, screen_update_galaxold)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", scobra)
-	MCFG_PALETTE_LENGTH(32+64+2)    /* 32 for characters, 64 for stars, 2 for bullets */
+	MCFG_PALETTE_ADD("palette", 32+64+2)    /* 32 for characters, 64 for stars, 2 for bullets */
 
-	MCFG_PALETTE_INIT_OVERRIDE(scobra_state,galaxold)
+	MCFG_PALETTE_INIT_OWNER(scobra_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,scrambold)
 
 	/* sound hardware */

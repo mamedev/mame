@@ -417,8 +417,8 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(dcheese_state, screen_update_dcheese)
 
-	MCFG_PALETTE_LENGTH(65534)
-
+	MCFG_PALETTE_ADD("palette", 65534)
+	MCFG_PALETTE_INIT_OWNER(dcheese_state, dcheese)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

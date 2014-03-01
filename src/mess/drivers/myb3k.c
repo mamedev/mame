@@ -92,7 +92,7 @@ UINT32 myb3k_state::screen_update_myb3k(screen_device &screen, bitmap_ind16 &bit
 						dot = 0;
 
 					if(y*mc6845_tile_height+yi < 200 && x*8+xi < 320) /* TODO: safety check */
-						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = machine().pens[dot];
+						bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = m_palette->pen(dot);
 				}
 			}
 		}
@@ -284,8 +284,7 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(myb3k_state, screen_update_myb3k)
 	MCFG_GFXDECODE_ADD("gfxdecode", myb3k)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_3_579545MHz/4, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */

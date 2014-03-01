@@ -181,7 +181,8 @@ deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag,
 	m_pf12_last_small(0),
 	m_pf12_last_big(0),
 	m_pf1_8bpp_mode(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this),
+	m_palette(*this)
 {
 }
 
@@ -512,7 +513,7 @@ void deco16ic_device::custom_tilemap_draw(
 
 			if ((flags & TILEMAP_DRAW_OPAQUE) || (p & trans_mask))
 			{
-				bitmap.pix(y, x) = machine().pens[p];
+				bitmap.pix(y, x) = m_palette->pen(p);
 				if (screen.priority().valid())
 				{
 					UINT8 *pri = &screen.priority().pix8(y);
@@ -943,4 +944,14 @@ void deco16ic_device::tilemap_12_combine_draw(screen_device &screen, bitmap_ind1
 void deco16ic_device::tilemap_12_combine_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, UINT32 priority, int is_tattoo)
 {
 	custom_tilemap_draw(screen, bitmap, cliprect, 0, m_pf1_tilemap_16x16, 0, m_pf2_tilemap_16x16, m_pf1_rowscroll_ptr, m_pf12_control[1], m_pf12_control[2], m_pf12_control[5] & 0xff, m_pf12_control[6] & 0xff, 0xf, 4, 0xff, flags, priority, is_tattoo);
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void deco16ic_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<deco16ic_device &>(device).m_palette.set_tag(tag);
 }

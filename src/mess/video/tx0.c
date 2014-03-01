@@ -197,7 +197,7 @@ void tx0_state::tx0_draw_multipleswitch(bitmap_ind16 &bitmap, int x, int y, int 
 /* write a single char on screen */
 void tx0_state::tx0_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color)
 {
-	m_gfxdecode->gfx(0)->transpen(bitmap,bitmap.cliprect(), character-32, color, 0, 0,
+	m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,bitmap.cliprect(), character-32, color, 0, 0,
 				x+1, y, 0);
 }
 
@@ -349,7 +349,7 @@ void tx0_state::tx0_typewriter_linefeed()
 	for (y=0; y<typewriter_window_height-typewriter_scroll_step; y++)
 	{
 		extract_scanline8(m_typewriter_bitmap, 0, y+typewriter_scroll_step, typewriter_window_width, buf);
-		draw_scanline8(m_typewriter_bitmap, 0, y, typewriter_window_width, buf, machine().pens);
+		draw_scanline8(m_typewriter_bitmap, 0, y, typewriter_window_width, buf, m_palette->pens());
 	}
 
 	const rectangle typewriter_scroll_clear_window(0, typewriter_window_width-1, typewriter_window_height-typewriter_scroll_step, typewriter_window_height-1);

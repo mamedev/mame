@@ -187,7 +187,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_DRIVER_INIT(replicator);
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(replicator);
 };
 
 void replicator_state::machine_start()
@@ -622,11 +622,11 @@ const avr8_config atmega1280_config =
 	"eeprom"
 };
 
-void replicator_state::palette_init()
+PALETTE_INIT_MEMBER(replicator_state, replicator)
 {
 //These colors were picked with the color picker in Inkscape, based on a photo of the LCD used in the Replicator 1 3d printer:
-	palette_set_color(machine(), 0, rgb_t(0xCA, 0xE7, 0xEB));
-	palette_set_color(machine(), 1, rgb_t(0x78, 0xAB, 0xA8));
+	palette.set_pen_color(0, rgb_t(0xCA, 0xE7, 0xEB));
+	palette.set_pen_color(1, rgb_t(0x78, 0xAB, 0xA8));
 }
 
 static const gfx_layout hd44780_charlayout =
@@ -667,7 +667,8 @@ static MACHINE_CONFIG_START( replicator, replicator_state )
 	MCFG_SCREEN_SIZE(120, 18*2) //4x20 chars
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18*2-1)
 
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(replicator_state, replicator)
 	MCFG_GFXDECODE_ADD("gfxdecode", replicator)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

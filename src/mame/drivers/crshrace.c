@@ -136,27 +136,9 @@ Dip locations verified with Service Mode.
 #define CRSHRACE_3P_HACK    0
 
 
-READ16_MEMBER(crshrace_state::extrarom1_r)
-{
-	UINT8 *rom = memregion("user1")->base();
-
-	offset *= 2;
-
-	return rom[offset] | (rom[offset + 1] << 8);
-}
-
-READ16_MEMBER(crshrace_state::extrarom2_r)
-{
-	UINT8 *rom = memregion("user2")->base();
-
-	offset *= 2;
-
-	return rom[offset] | (rom[offset + 1] << 8);
-}
-
 WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 0x03);
+	m_z80bank->set_entry(data & 0x03);
 }
 
 WRITE16_MEMBER(crshrace_state::sound_command_w)
@@ -183,16 +165,15 @@ WRITE8_MEMBER(crshrace_state::pending_command_clear_w)
 
 static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16, crshrace_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x300000, 0x3fffff) AM_READ(extrarom1_r)
-	AM_RANGE(0x400000, 0x4fffff) AM_READ(extrarom2_r)
-	AM_RANGE(0x500000, 0x5fffff) AM_READ(extrarom2_r)   /* mirror */
+	AM_RANGE(0x300000, 0x3fffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("user2", 0) AM_MIRROR(0x100000)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0xd00000, 0xd01fff) AM_RAM_WRITE(crshrace_videoram1_w) AM_SHARE("videoram1")
 	AM_RANGE(0xe00000, 0xe01fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM
 	AM_RANGE(0xffc000, 0xffc001) AM_WRITE(crshrace_roz_bank_w)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(crshrace_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xGGGGGBBBBBRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1") AM_WRITE(crshrace_gfxctrl_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW0")
@@ -433,7 +414,7 @@ static const k053936_interface crshrace_k053936_intf =
 
 void crshrace_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
+	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
 
 	save_item(NAME(m_roz_bank));
 	save_item(NAME(m_gfxctrl));
@@ -470,12 +451,14 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 	MCFG_SCREEN_VBLANK_DRIVER(crshrace_state, screen_eof_crshrace)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", crshrace)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( crshrace_state, crshrace_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
@@ -499,11 +482,11 @@ ROM_START( crshrace )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "1",            0x000000, 0x80000, CRC(21e34fb7) SHA1(be47b4a9bce2d6ce0a127dffe032c61547b2a3c0) )
 
-	ROM_REGION( 0x100000, "user1", 0 )  /* extra ROM */
-	ROM_LOAD( "w21",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )
+	ROM_REGION16_BE( 0x100000, "user1", 0 )  /* extra ROM */
+	ROM_LOAD16_WORD_SWAP( "w21",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )
 
-	ROM_REGION( 0x100000, "user2", 0 )  /* extra ROM */
-	ROM_LOAD( "w22",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )
+	ROM_REGION16_BE( 0x100000, "user2", 0 )  /* extra ROM */
+	ROM_LOAD16_WORD_SWAP( "w22",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )
 
 	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
 	ROM_LOAD( "2",            0x00000, 0x20000, CRC(e70a900f) SHA1(edfe5df2dab5a7dccebe1a6f978144bcd516ab03) )
@@ -533,11 +516,11 @@ ROM_START( crshrace2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "01-ic10.bin",  0x000000, 0x80000, CRC(b284aacd) SHA1(f0ef279cdec30eb32e8aa8cdd51e289b70f2d6f5) )
 
-	ROM_REGION( 0x100000, "user1", 0 )  /* extra ROM */
-	ROM_LOAD( "w21",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )    // IC14.BIN
+	ROM_REGION16_BE( 0x100000, "user1", 0 )  /* extra ROM */
+	ROM_LOAD16_WORD_SWAP( "w21",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )    // IC14.BIN
 
-	ROM_REGION( 0x100000, "user2", 0 )  /* extra ROM */
-	ROM_LOAD( "w22",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )    // IC13.BIN
+	ROM_REGION16_BE( 0x100000, "user2", 0 )  /* extra ROM */
+	ROM_LOAD16_WORD_SWAP( "w22",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )    // IC13.BIN
 
 	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
 	ROM_LOAD( "2",            0x00000, 0x20000, CRC(e70a900f) SHA1(edfe5df2dab5a7dccebe1a6f978144bcd516ab03) )  // 02-IC58.BIN

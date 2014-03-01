@@ -547,8 +547,8 @@ static MACHINE_CONFIG_START( marineb, marineb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_marineb)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", marineb)
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(marineb_state, marineb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

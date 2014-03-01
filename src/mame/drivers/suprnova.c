@@ -772,7 +772,7 @@ static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_SCREEN_UPDATE_DRIVER(skns_state, screen_update_skns)
 	MCFG_SCREEN_VBLANK_DRIVER(skns_state, screen_eof_skns)
 
-	MCFG_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_GFXDECODE_ADD("gfxdecode", skns_bg)
 
 	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)

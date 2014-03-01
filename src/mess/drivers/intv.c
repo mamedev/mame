@@ -84,29 +84,27 @@ static const unsigned char intv_colors[] =
 	0xB5, 0x1A, 0x58  /* PURPLE */
 };
 
-void intv_state::palette_init()
+PALETTE_INIT_MEMBER(intv_state, intv)
 {
 	int k = 0;
 	UINT8 r, g, b;
 	/* Two copies of everything (why?) */
-
-	machine().colortable = colortable_alloc(machine(), 32);
 
 	for (int i = 0; i < 16; i++)
 	{
 		r = intv_colors[i * 3 + 0];
 		g = intv_colors[i * 3 + 1];
 		b = intv_colors[i * 3 + 2];
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
-		colortable_palette_set_color(machine().colortable, i + 16, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+		palette.set_indirect_color(i + 16, rgb_t(r, g, b));
 	}
 
 	for (int i = 0; i < 16; i++)
 	{
 		for (int j = 0; j < 16; j++)
 		{
-			colortable_entry_set_value(machine().colortable, k++, i);
-			colortable_entry_set_value(machine().colortable, k++, j);
+			palette.set_pen_indirect(k++, i);
+			palette.set_pen_indirect(k++, j);
 		}
 	}
 
@@ -114,8 +112,8 @@ void intv_state::palette_init()
 	{
 		for (int j = 16; j < 32; j++)
 		{
-			colortable_entry_set_value(machine().colortable, k++, i);
-			colortable_entry_set_value(machine().colortable, k++, j);
+			palette.set_pen_indirect(k++, i);
+			palette.set_pen_indirect(k++, j);
 		}
 	}
 }
@@ -826,7 +824,8 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_SCREEN_SIZE((STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTV_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTV_Y_SCALE)
 	MCFG_SCREEN_VISIBLE_AREA(0, (STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTV_X_SCALE-1, 0, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTV_Y_SCALE-1)
 
-	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -879,6 +878,9 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", intvkbd)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
+	
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE((STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTVKBD_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTVKBD_Y_SCALE)
 	MCFG_SCREEN_VISIBLE_AREA(0, (STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTVKBD_X_SCALE-1, 0, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTVKBD_Y_SCALE-1)

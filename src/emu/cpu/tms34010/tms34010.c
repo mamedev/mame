@@ -1069,7 +1069,7 @@ void tms34010_get_display_params(device_t *cpu, tms34010_display_params *params)
 
 UINT32 tms34010_device::tms340x0_ind16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pen_t blackpen = get_black_pen(machine());
+	pen_t blackpen = screen.palette()->black_pen();
 	tms34010_display_params params;
 	tms34010_state *tms = NULL;
 	device_t *cpu;
@@ -1118,7 +1118,7 @@ UINT32 tms34010_device::tms340x0_ind16(screen_device &screen, bitmap_ind16 &bitm
 
 UINT32 tms34010_device::tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	pen_t blackpen = get_black_pen(machine());
+	pen_t blackpen = rgb_t::black;
 	tms34010_display_params params;
 	tms34010_state *tms = NULL;
 	device_t *cpu;

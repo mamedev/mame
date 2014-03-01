@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xfd00, 0xfdff) AM_RAM_WRITE(paletteram_BBGGGRRR_byte_w) AM_SHARE("paletteram")
+	AM_RANGE(0xfd00, 0xfdff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
@@ -521,8 +521,8 @@ READ8_MEMBER(goldstar_state::unkch_unk_r)
 /* newer / more capable hw */
 static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
 
@@ -6245,7 +6245,8 @@ static MACHINE_CONFIG_START( goldstar, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", goldstar)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6279,7 +6280,8 @@ static MACHINE_CONFIG_START( goldstbl, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bl)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6312,7 +6314,8 @@ static MACHINE_CONFIG_START( moonlght, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ml)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6345,7 +6348,9 @@ static MACHINE_CONFIG_START( goldfrui, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", goldfrui)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
+
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6374,7 +6379,7 @@ PALETTE_INIT_MEMBER(goldstar_state,cm)
 
 		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 
-		palette_set_color_rgb(machine(), i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+		palette.set_pen_color(i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 }
 
@@ -6391,7 +6396,7 @@ PALETTE_INIT_MEMBER(goldstar_state,cmast91)
 		g = proms[0x100 + i] << 4;
 		r = proms[0x200 + i] << 4;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -6408,7 +6413,7 @@ PALETTE_INIT_MEMBER(goldstar_state,lucky8)
 	{
 		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 
-		palette_set_color_rgb(machine(), i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+		palette.set_pen_color(i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 
 	proms = memregion("proms2")->base();
@@ -6416,7 +6421,7 @@ PALETTE_INIT_MEMBER(goldstar_state,lucky8)
 	{
 		data = proms[i];
 
-		palette_set_color_rgb(machine(), i + 0x80, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+		palette.set_pen_color(i + 0x80, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 }
 
@@ -6443,8 +6448,8 @@ static MACHINE_CONFIG_START( chrygld, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", chry10)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6484,8 +6489,8 @@ static MACHINE_CONFIG_START( cb3c, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cb3c)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6524,8 +6529,8 @@ static MACHINE_CONFIG_START( ncb3, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -6564,8 +6569,8 @@ static MACHINE_CONFIG_START( cm, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cmbitmap)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -6604,8 +6609,8 @@ static MACHINE_CONFIG_START( cmnobmp, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cm)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -6639,8 +6644,8 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_cmast91)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cmast91)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cmast91)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cmast91)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -6677,11 +6682,12 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6716,11 +6722,11 @@ static MACHINE_CONFIG_START( bingowng, goldstar_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_bingowng)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,bingowng)
@@ -6755,11 +6761,11 @@ static MACHINE_CONFIG_START( bingownga, goldstar_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_bingowng)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bingownga)       /* GFX Decode is the only difference with the parent machine */
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,bingowng)
@@ -6788,7 +6794,7 @@ PALETTE_INIT_MEMBER(goldstar_state,magodds)
 		g = proms[0x100 + i] << 4;
 		r = proms[0x200 + i] << 4;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -6812,10 +6818,10 @@ static MACHINE_CONFIG_START( magodds, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_magical)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,magodds)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", magodds)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,magodds)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,magical)
@@ -6853,10 +6859,10 @@ static MACHINE_CONFIG_START( kkotnoli, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
@@ -6888,10 +6894,10 @@ static MACHINE_CONFIG_START( ladylinr, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6928,10 +6934,10 @@ static MACHINE_CONFIG_START( wcat3, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -6971,8 +6977,8 @@ static MACHINE_CONFIG_START( amcoe1, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cm)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -7010,8 +7016,8 @@ static MACHINE_CONFIG_START( amcoe1a, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_amcoe1a)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cm)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -7049,8 +7055,8 @@ static MACHINE_CONFIG_START( amcoe2, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cm)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -7083,8 +7089,8 @@ static MACHINE_CONFIG_START( nfm, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nfm)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -7114,7 +7120,8 @@ static MACHINE_CONFIG_START( unkch, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_unkch)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", unkch)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	//MCFG_NVRAM_HANDLER(goldstar)
 
@@ -7162,8 +7169,8 @@ static MACHINE_CONFIG_START( pkrmast, goldstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pkrmast)
-	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,cm)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
@@ -7196,10 +7203,10 @@ static MACHINE_CONFIG_START( megaline, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", megaline)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 //  MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -7424,6 +7431,30 @@ ROM_START( goldfrui )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Audio ADPCM 
 	ROM_LOAD( "27c1000.u57",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
+ROM_END
+
+
+/*
+	Super Nove by Playmark
+*/
+ROM_START( super9 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27e010.30",       0x0000, 0x10000, CRC(1aaea8d3) SHA1(71395a6d74a7cd55606daa57d17ff4628aa5f577) )
+	ROM_IGNORE(                          0x10000)	/* Discarding 2nd half */
+//	ROM_LOAD( "27e010.30",       0x0000, 0x10000, CRC(1aaea8d3) SHA1(71395a6d74a7cd55606daa57d17ff4628aa5f577) )
+//	ROM_CONTINUE(                0x0000, 0x10000)	/* Discarding 1st half */
+		
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "nearcpu.bin",      0x00000, 0x20000, CRC(643cff6f) SHA1(305ca9182c3f6d69e09be38b854b3d7bdfa75439) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "27e010.29",      0x00000, 0x08000, CRC(5ea46322) SHA1(147078689f0194affcdcf0e8f8e17fe8a113a377) )
+	ROM_CONTINUE( 0x0000, 0x08000) // Discarding 1nd quarter 0xff filled
+	ROM_CONTINUE( 0x0000, 0x08000) // Discarding 2nd quarter 0xff filled
+	ROM_CONTINUE( 0x0000, 0x08000) // Discarding 3nd quarter 0xff filled
+	
+	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
+	ROM_LOAD( "27c1001.27",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
 
@@ -11891,6 +11922,7 @@ GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,        
 GAME(  199?, chrygld,   0,        chrygld,  chrygld,  goldstar_state, chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
 GAME(  199?, chry10,    0,        chrygld,  chry10,   goldstar_state, chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )	// maybe fullname should be 'Gold Fruit (main 40%)'
+GAME(  2001, super9,    goldstar, goldstbl, goldstar, driver_device,  0,         ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING)	// need to decode gfx and see the program loops/reset... 
 
 // are these really dyna, or bootlegs?
 GAME(  199?, ncb3,      0,        ncb3,     ncb3,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0 )

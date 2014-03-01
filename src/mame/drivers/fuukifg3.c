@@ -175,7 +175,7 @@ WRITE32_MEMBER(fuuki32_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w)
 		g = (m_paletteram[offset] & 0x03e00000) >> (5 + 16);
 		b = (m_paletteram[offset] & 0x001f0000) >> (0 + 16);
 
-		palette_set_color_rgb(machine(), offset * 2, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color(offset * 2, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 
 	if(ACCESSING_BITS_0_15)
@@ -187,7 +187,7 @@ WRITE32_MEMBER(fuuki32_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w)
 		g = (m_paletteram[offset] & 0x000003e0) >> (5);
 		b = (m_paletteram[offset] & 0x0000001f) >> (0);
 
-		palette_set_color_rgb(machine(), offset * 2 + 1, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color(offset * 2 + 1, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -592,7 +592,7 @@ static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 	MCFG_SCREEN_VBLANK_DRIVER(fuuki32_state, screen_eof_fuuki32)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fuuki32)
-	MCFG_PALETTE_LENGTH(0x4000/2)
+	MCFG_PALETTE_ADD("palette", 0x4000/2)
 
 
 	/* sound hardware */

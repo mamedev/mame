@@ -58,7 +58,7 @@ void super80_state::palette_set_colors_rgb(const UINT8 *colors)
 	while (color_count--)
 	{
 		r = *colors++; g = *colors++; b = *colors++;
-		palette_set_color(machine(), 15-color_count, rgb_t(r, g, b));
+		m_palette->set_pen_color(15-color_count, rgb_t(r, g, b));
 	}
 }
 

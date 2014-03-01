@@ -422,7 +422,8 @@ static MACHINE_CONFIG_START( kchampvs, kchamp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchampvs)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", kchamp)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
 
 
 	/* sound hardware */
@@ -469,7 +470,8 @@ static MACHINE_CONFIG_START( kchamp, kchamp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchamp)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", kchamp)
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
 
 
 	/* sound hardware */

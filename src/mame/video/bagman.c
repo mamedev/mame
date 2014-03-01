@@ -57,7 +57,7 @@ PALETTE_INIT_MEMBER(bagman_state,bagman)
 			2,  resistances_b,  weights_b,  470,    0);
 
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -76,7 +76,7 @@ PALETTE_INIT_MEMBER(bagman_state,bagman)
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -123,7 +123,7 @@ void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		}
 
 		if (spriteram[offs + 2] && spriteram[offs + 3])
-			m_gfxdecode->gfx(1)->transpen(bitmap,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,
 					cliprect,
 					(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20),
 					spriteram[offs + 1] & 0x1f,

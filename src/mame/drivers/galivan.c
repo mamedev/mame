@@ -437,8 +437,9 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", galivan)
-	MCFG_PALETTE_LENGTH(8*16+16*16+256*16)
-
+	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
+	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)
+	
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
 
 	/* sound hardware */
@@ -482,7 +483,8 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", galivan)
-	MCFG_PALETTE_LENGTH(8*16+16*16+256*16)
+	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
+	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)
 
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)
 

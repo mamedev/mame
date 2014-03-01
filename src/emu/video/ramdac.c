@@ -42,8 +42,19 @@ const device_type RAMDAC = &device_creator<ramdac_device>;
 ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RAMDAC, "ramdac", tag, owner, clock, "ramdac", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(ramdac_palram))
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(ramdac_palram)),
+		m_palette(*this)
 {
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void ramdac_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<ramdac_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -198,7 +209,7 @@ WRITE8_MEMBER( ramdac_device::ramdac_rgb666_w )
 	m_palram[offset] = data & 0x3f;
 	pal_offs = (offset & 0xff);
 
-	palette_set_color_rgb(machine(),offset&0xff,pal6bit(m_palram[pal_offs|0x000]),pal6bit(m_palram[pal_offs|0x100]),pal6bit(m_palram[pal_offs|0x200]));
+	m_palette->set_pen_color(offset&0xff,pal6bit(m_palram[pal_offs|0x000]),pal6bit(m_palram[pal_offs|0x100]),pal6bit(m_palram[pal_offs|0x200]));
 }
 
 WRITE8_MEMBER( ramdac_device::ramdac_rgb888_w )
@@ -208,5 +219,5 @@ WRITE8_MEMBER( ramdac_device::ramdac_rgb888_w )
 	m_palram[offset] = data;
 	pal_offs = (offset & 0xff);
 
-	palette_set_color_rgb(machine(),offset&0xff,m_palram[pal_offs|0x000],m_palram[pal_offs|0x100],m_palram[pal_offs|0x200]);
+	m_palette->set_pen_color(offset&0xff,m_palram[pal_offs|0x000],m_palram[pal_offs|0x100],m_palram[pal_offs|0x200]);
 }

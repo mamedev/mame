@@ -2,13 +2,10 @@
 #include "includes/mermaid.h"
 
 
-void mermaid_state::palette_init()
+PALETTE_INIT_MEMBER(mermaid_state, mermaid)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x41);
 
 	for (i = 0; i < 0x40; i++)
 	{
@@ -16,21 +13,21 @@ void mermaid_state::palette_init()
 		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
 		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* blue background */
-	colortable_palette_set_color(machine().colortable, 0x40, rgb_t(0, 0, 0xff));
+	palette.set_indirect_color(0x40, rgb_t(0, 0, 0xff));
 
 	/* char/sprite palette */
 	for (i = 0; i < 0x40; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* background palette */
-	colortable_entry_set_value(machine().colortable, 0x40, 0x20);
-	colortable_entry_set_value(machine().colortable, 0x41, 0x21);
-	colortable_entry_set_value(machine().colortable, 0x42, 0x40);
-	colortable_entry_set_value(machine().colortable, 0x43, 0x21);
+	palette.set_pen_indirect(0x40, 0x20);
+	palette.set_pen_indirect(0x41, 0x21);
+	palette.set_pen_indirect(0x42, 0x40);
+	palette.set_pen_indirect(0x43, 0x21);
 }
 
 PALETTE_INIT_MEMBER(mermaid_state,rougien)
@@ -38,30 +35,27 @@ PALETTE_INIT_MEMBER(mermaid_state,rougien)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x41);
-
 	for (i = 0; i < 0x40; i++)
 	{
 		int r = 0x21 * BIT(color_prom[i], 0) + 0x47 * BIT(color_prom[i], 1) + 0x97 * BIT(color_prom[i], 2);
 		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
 		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* blue background */
-	colortable_palette_set_color(machine().colortable, 0x40, rgb_t(0, 0, 0));
+	palette.set_indirect_color(0x40, rgb_t(0, 0, 0));
 
 	/* char/sprite palette */
 	for (i = 0; i < 0x40; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* background palette */
-	colortable_entry_set_value(machine().colortable, 0x40, 0x40);
-	colortable_entry_set_value(machine().colortable, 0x41, 0x00);
-	colortable_entry_set_value(machine().colortable, 0x42, 0x00);
-	colortable_entry_set_value(machine().colortable, 0x43, 0x02);
+	palette.set_pen_indirect(0x40, 0x40);
+	palette.set_pen_indirect(0x41, 0x00);
+	palette.set_pen_indirect(0x42, 0x00);
+	palette.set_pen_indirect(0x43, 0x02);
 }
 
 
@@ -215,7 +209,7 @@ void mermaid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 
 		
-			m_gfxdecode->gfx(1)->transpen(bitmap,(flip_screen_x() ? flip_spritevisiblearea : spritevisiblearea), code, color, flipx, flipy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,(flip_screen_x() ? flip_spritevisiblearea : spritevisiblearea), code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -237,8 +231,8 @@ UINT8 mermaid_state::collision_check( rectangle& rect )
 	for (y = rect.min_y; y <= rect.max_y; y++)
 		for (x = rect.min_x; x <= rect.max_x; x++)
 		{
-			UINT16 a = colortable_entry_get_value(machine().colortable, m_helper.pix16(y, x)) & 0x3f;
-			UINT16 b = colortable_entry_get_value(machine().colortable, m_helper2.pix16(y, x)) & 0x3f;
+			UINT16 a = m_palette->pen_indirect(m_helper.pix16(y, x)) & 0x3f;
+			UINT16 b = m_palette->pen_indirect(m_helper2.pix16(y, x)) & 0x3f;
 
 			if (b)
 				if (a)
@@ -310,7 +304,7 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			m_bg_tilemap->draw(screen, m_helper, rect, 0, 0);
 
-			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(m_palette,m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
 
 			m_coll_bit2 |= collision_check(rect);
 
@@ -321,7 +315,7 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			m_fg_tilemap->draw(screen, m_helper, rect, 0, 0);
 
-			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(m_palette,m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
 
 			m_coll_bit1 |= collision_check(rect);
 
@@ -359,10 +353,10 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 						sy2 = 240 - sy2;
 					}
 
-					m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
+					m_gfxdecode->gfx(1)->transpen(m_palette,m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
 				}
 
-			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(m_palette,m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
 
 			m_coll_bit0 |= collision_check(rect);
 		}
@@ -440,10 +434,10 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 						sy2 = 240 - sy2;
 					}
 
-					m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
+					m_gfxdecode->gfx(1)->transpen(m_palette,m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
 				}
 
-			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(m_palette,m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
 
 			m_coll_bit3 |= collision_check(rect);
 		}
@@ -521,10 +515,10 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 						sy2 = 240 - sy2;
 					}
 
-					m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
+					m_gfxdecode->gfx(1)->transpen(m_palette,m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
 				}
 
-			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(m_palette,m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
 
 			m_coll_bit6 |= collision_check(rect);
 		}

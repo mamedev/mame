@@ -10,22 +10,19 @@
 #include "includes/ddribble.h"
 
 
-void ddribble_state::palette_init()
+PALETTE_INIT_MEMBER(ddribble_state, ddribble)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x40);
-
 	for (i = 0x10; i < 0x40; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* sprite #2 uses pens 0x00-0x0f */
 	for (i = 0x40; i < 0x140; i++)
 	{
 		UINT8 ctabentry = color_prom[i - 0x40] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -39,7 +36,7 @@ void ddribble_state::set_pens(  )
 		UINT16 data = m_paletteram[i | 1] | (m_paletteram[i] << 8);
 
 		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-		colortable_palette_set_color(machine().colortable, i >> 1, color);
+		m_palette->set_indirect_color(i >> 1, color);
 	}
 }
 
@@ -224,7 +221,7 @@ void ddribble_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 					ey = flipy ? (height - 1 - y) : y;
 
 					
-						gfx->transpen(bitmap,cliprect,
+						gfx->transpen(m_palette,bitmap,cliprect,
 						(number)+x_offset[ex]+y_offset[ey],
 						color,
 						flipx, flipy,

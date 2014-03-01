@@ -38,7 +38,7 @@ UINT32 sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rgb3
 
 	machine().tilemap().set_flip_all(flip_screen_x() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 

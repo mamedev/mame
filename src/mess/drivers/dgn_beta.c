@@ -277,12 +277,12 @@ static INPUT_PORTS_START( dgnbeta )
 INPUT_PORTS_END
 
 
-void dgn_beta_state::palette_init()
+PALETTE_INIT_MEMBER(dgn_beta_state, dgn)
 {
 	int i;
 
 	for ( i = 0; i < sizeof(dgnbeta_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine(), i, dgnbeta_palette[i*3], dgnbeta_palette[i*3+1], dgnbeta_palette[i*3+2]);
+		palette.set_pen_color(i, dgnbeta_palette[i*3], dgnbeta_palette[i*3+1], dgnbeta_palette[i*3+2]);
 	}
 }
 
@@ -337,7 +337,8 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", hd6845_device, screen_update )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dgnbeta)
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(dgnbeta_palette) / 3)
+	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(dgnbeta_palette) / 3)
+	MCFG_PALETTE_INIT_OWNER(dgn_beta_state, dgn)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
 	/* PIA 0 at $FC20-$FC23 I46 */

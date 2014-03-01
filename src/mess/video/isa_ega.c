@@ -472,7 +472,7 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_ega )
 	MCFG_SCREEN_RAW_PARAMS(16257000,912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE_DEVICE(EGA_CRTC_NAME, crtc_ega_device, screen_update)
 
-	MCFG_PALETTE_LENGTH( 64 )
+	MCFG_PALETTE_ADD( "palette", 64 )
 	MCFG_CRTC_EGA_ADD(EGA_CRTC_NAME, 16257000/8, crtc_ega_ega_intf)
 	MCFG_CRTC_EGA_SET_SCREEN(EGA_SCREEN_NAME)
 MACHINE_CONFIG_END
@@ -567,14 +567,16 @@ ioport_constructor isa8_ega_device::device_input_ports() const
 isa8_ega_device::isa8_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8_EGA, "IBM Enhanced Graphics Adapter", tag, owner, clock, "ega", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
-		m_misc_output(0)
+		m_misc_output(0),
+		m_palette(*this, "palette")
 {
 }
 
 isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this),
-		m_misc_output(0)
+		m_misc_output(0),
+		m_palette(*this, "palette")
 {
 }
 
@@ -584,6 +586,9 @@ isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type
 
 void isa8_ega_device::device_start()
 {
+	if (m_palette != NULL && !m_palette->started())
+		throw device_missing_dependencies();
+
 	astring tempstring;
 
 	set_isa_device();
@@ -594,7 +599,7 @@ void isa8_ega_device::device_start()
 		UINT8 g = ( ( i & 0x02 ) ? 0xAA : 0x00 ) + ( ( i & 0x10 ) ? 0x55 : 0x00 );
 		UINT8 b = ( ( i & 0x01 ) ? 0xAA : 0x00 ) + ( ( i & 0x08 ) ? 0x55 : 0x00 );
 
-		palette_set_color_rgb( machine(), i, r, g, b );
+		m_palette->set_pen_color( i, r, g, b );
 	}
 
 	UINT8   *dst = memregion(subtag(tempstring, "user2" ))->base() + 0x0000;

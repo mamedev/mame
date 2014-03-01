@@ -1809,7 +1809,7 @@ static MACHINE_CONFIG_START( nomcu, taitosj_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitosj_state, screen_update_taitosj)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", taitosj)
-	MCFG_PALETTE_LENGTH(64)
+	MCFG_PALETTE_ADD("palette", 64)
 
 
 	/* sound hardware */

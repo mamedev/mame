@@ -460,7 +460,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void video_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(rmnimbus);
 	UINT32 screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_nimbus(screen_device &screen, bool state);
 //  TIMER_CALLBACK_MEMBER(internal_timer_int);

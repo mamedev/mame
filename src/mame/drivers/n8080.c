@@ -516,8 +516,8 @@ static MACHINE_CONFIG_START( spacefev, n8080_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(n8080_state, screen_update_spacefev)
 
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT_OVERRIDE(n8080_state,n8080)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(n8080_state,n8080)
 	MCFG_VIDEO_START_OVERRIDE(n8080_state,spacefev)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst1", n8080_state, rst1_tick, "screen", 128, 256)
@@ -546,8 +546,8 @@ static MACHINE_CONFIG_START( sheriff, n8080_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(n8080_state, screen_update_sheriff)
 
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT_OVERRIDE(n8080_state,n8080)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(n8080_state,n8080)
 	MCFG_VIDEO_START_OVERRIDE(n8080_state,sheriff)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst1", n8080_state, rst1_tick, "screen", 128, 256)
@@ -589,8 +589,8 @@ static MACHINE_CONFIG_START( helifire, n8080_state )
 	MCFG_SCREEN_UPDATE_DRIVER(n8080_state, screen_update_helifire)
 	MCFG_SCREEN_VBLANK_DRIVER(n8080_state, screen_eof_helifire)
 
-	MCFG_PALETTE_LENGTH(8 + 0x400)
-	MCFG_PALETTE_INIT_OVERRIDE(n8080_state,helifire)
+	MCFG_PALETTE_ADD("palette", 8 + 0x400)
+	MCFG_PALETTE_INIT_OWNER(n8080_state,helifire)
 	MCFG_VIDEO_START_OVERRIDE(n8080_state,helifire)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst1", n8080_state, rst1_tick, "screen", 128, 256)

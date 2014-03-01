@@ -2133,7 +2133,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 /* This is a RLE-based sprite blitter (US Patent #6,141,122), very unusual from Sega... */
 void coolridr_state::blit_current_sprite(address_space &space)
 {
-//  const pen_t *clut = &machine().pens[0];
+//  const pen_t *clut = &m_palette->pen(0);
 
 	// Serialized 32-bit words in order of appearance:
 	//  0: 00000000 - unknown, 0x00000000 or 0x00000001, 0 seems to be regular sprite, 1 seems to change meaning of below, possible clip area?
@@ -3615,8 +3615,7 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_SCREEN_VISIBLE_AREA(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL)
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr2)
 
-	MCFG_PALETTE_LENGTH(0x10000)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRRR_GGGGG_BBBBB)
+	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 

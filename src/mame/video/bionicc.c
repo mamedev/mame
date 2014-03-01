@@ -142,7 +142,7 @@ WRITE16_MEMBER(bionicc_state::bionicc_paletteram_w)
 		b = b * (0x07 + bright) / 0x0e;
 	}
 
-	palette_set_color (machine(), offset, rgb_t(r, g, b));
+	m_palette->set_pen_color (offset, rgb_t(r, g, b));
 }
 
 WRITE16_MEMBER(bionicc_state::bionicc_scroll_w)
@@ -217,7 +217,7 @@ void bionicc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 				flipy = !flipy;
 			}
 
-			gfx->transpen(bitmap,cliprect,
+			gfx->transpen(m_palette,bitmap,cliprect,
 				tile_number,
 				color,
 				flipx,flipy,
@@ -228,7 +228,7 @@ void bionicc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 UINT32 bionicc_state::screen_update_bionicc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);   /* nothing in FRONT */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);

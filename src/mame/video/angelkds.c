@@ -162,7 +162,7 @@ void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		if (enable & enable_n)
 		{
 			
-					gfx->transpen(
+					gfx->transpen(m_palette,
 					bitmap,
 					cliprect,
 					tile_no,
@@ -173,7 +173,7 @@ void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			/* wraparound */
 			if (xpos > 240)
 				
-						gfx->transpen(
+						gfx->transpen(m_palette,
 						bitmap,
 						cliprect,
 						tile_no,
@@ -185,7 +185,7 @@ void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (ypos > 240)
 			{
 				
-						gfx->transpen(
+						gfx->transpen(m_palette,
 						bitmap,
 						cliprect,
 						tile_no,
@@ -196,7 +196,7 @@ void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				/* wraparound */
 				if (xpos > 240)
 					
-							gfx->transpen(
+							gfx->transpen(m_palette,
 							bitmap,
 							cliprect,
 							tile_no,
@@ -226,7 +226,7 @@ WRITE8_MEMBER(angelkds_state::angelkds_paletteram_w)
 	m_paletteram[offset] = data;
 
 	no = offset & 0xff;
-	palette_set_color_rgb(machine(), no, pal4bit(m_paletteram[no]), pal4bit(m_paletteram[no]>>4), pal4bit(m_paletteram[no + 0x100]));
+	m_palette->set_pen_color(no, pal4bit(m_paletteram[no]), pal4bit(m_paletteram[no]>>4), pal4bit(m_paletteram[no + 0x100]));
 }
 
 /*** Video Start & Update

@@ -46,7 +46,8 @@ k001005_device::k001005_device(const machine_config &mconfig, const char *tag, d
 		m_bitmap_page(0),
 		m_poly(NULL),
 		m_prev_poly_type(0),
-		m_gfxrom(NULL)
+		m_gfxrom(NULL),
+		m_palette(*this)
 {
 		m_ram[0] = 0;
 		m_ram[1] = 0;
@@ -245,7 +246,7 @@ void k001005_device::swap_buffers( )
 
 	//if (m_status == 2)
 	{
-		m_bitmap[m_bitmap_page]->fill(machine().pens[0] & 0x00ffffff, m_cliprect);
+		m_bitmap[m_bitmap_page]->fill(m_palette->pen(0) & 0x00ffffff, m_cliprect);
 		m_zbuffer->fill(0xffffffff, m_cliprect);
 	}
 }
@@ -929,4 +930,14 @@ void k001005_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 			}
 		}
 	}
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void k001005_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<k001005_device &>(device).m_palette.set_tag(tag);
 }

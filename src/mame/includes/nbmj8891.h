@@ -35,7 +35,7 @@ public:
 	bitmap_ind16 m_tmpbitmap1;
 	UINT8 *m_videoram0;
 	UINT8 *m_videoram1;
-	UINT8 *m_palette;
+	UINT8 *m_palette_ptr;
 	UINT8 *m_clut;
 	int m_param_old[0x10];
 	int m_param_cnt;

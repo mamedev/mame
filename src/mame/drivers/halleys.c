@@ -265,7 +265,7 @@ public:
 	DECLARE_DRIVER_INIT(halleys);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(halleys);
 	UINT32 screen_update_halleys(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_benberob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(blitter_reset);
@@ -1122,7 +1122,7 @@ READ8_MEMBER(halleys_state::collision_id_r)
 //**************************************************************************
 // Video Initializations and Updates
 
-void halleys_state::palette_init()
+PALETTE_INIT_MEMBER(halleys_state, halleys)
 {
 	UINT32 d, r, g, b, i, j, count;
 	UINT32 *pal_ptr = m_internal_palette;
@@ -1130,7 +1130,7 @@ void halleys_state::palette_init()
 	for (count=0; count<1024; count++)
 	{
 		pal_ptr[count] = 0;
-		palette_set_color(machine(), count, rgb_t(0, 0, 0));
+		palette.set_pen_color(count, rgb_t(0, 0, 0));
 	}
 
 	// 00-31: palette RAM(ffc0-ffdf)
@@ -1151,7 +1151,7 @@ void halleys_state::palette_init()
 			g = r + count + BG_MONO;
 			r += i;
 			pal_ptr[g] = d;
-			palette_set_color(machine(), g, rgb_t(r, r, r));
+			palette.set_pen_color(g, rgb_t(r, r, r));
 		}
 	}
 
@@ -1166,7 +1166,7 @@ void halleys_state::palette_init()
 		g = d    & 0x0c; g |= i;
 		b = d<<2 & 0x0c; b |= i;
 
-		palette_set_color_rgb(machine(), j, pal4bit(r), pal4bit(g), pal4bit(b));
+		palette.set_pen_color(j, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
@@ -1234,13 +1234,13 @@ WRITE8_MEMBER(halleys_state::halleys_paletteram_IIRRGGBB_w)
 	g = d    & 0x0c; g |= i;  g = g<<4 | g;
 	b = d<<2 & 0x0c; b |= i;  b = b<<4 | b;
 
-	palette_set_color(machine(), offset, rgb_t(r, g, b));
-	palette_set_color(machine(), offset+SP_2BACK, rgb_t(r, g, b));
-	palette_set_color(machine(), offset+SP_ALPHA, rgb_t(r, g, b));
-	palette_set_color(machine(), offset+SP_COLLD, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset+SP_2BACK, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset+SP_ALPHA, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset+SP_COLLD, rgb_t(r, g, b));
 
 	halleys_decode_rgb(&r, &g, &b, offset, 0);
-	palette_set_color(machine(), offset+0x20, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset+0x20, rgb_t(r, g, b));
 }
 
 
@@ -1943,7 +1943,7 @@ void halleys_state::machine_reset()
 	m_blitter_busy    = 0;
 	m_collision_count = 0;
 	m_stars_enabled   = 0;
-	m_bgcolor         = get_black_pen(machine());
+	m_bgcolor         = m_palette->black_pen();
 	m_fftail = m_ffhead = m_ffcount = 0;
 
 	memset(m_io_ram, 0xff, m_io_ram.bytes());
@@ -1981,8 +1981,8 @@ static MACHINE_CONFIG_START( halleys, halleys_state )
 	MCFG_SCREEN_VISIBLE_AREA(VIS_MINX, VIS_MAXX, VIS_MINY, VIS_MAXY)
 	MCFG_SCREEN_UPDATE_DRIVER(halleys_state, screen_update_halleys)
 
-	MCFG_PALETTE_LENGTH(PALETTE_SIZE)
-
+	MCFG_PALETTE_ADD("palette", PALETTE_SIZE)
+	MCFG_PALETTE_INIT_OWNER(halleys_state, halleys)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

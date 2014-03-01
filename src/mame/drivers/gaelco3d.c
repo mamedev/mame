@@ -1009,9 +1009,7 @@ static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 431)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco3d_state, screen_update_gaelco3d)
 
-	MCFG_PALETTE_LENGTH(32768)
-
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRRR_GGGGG_BBBBB)
+	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -148,7 +148,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(looping);
 	UINT32 screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(looping_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -166,7 +166,7 @@ public:
  *
  *************************************/
 
-void looping_state::palette_init()
+PALETTE_INIT_MEMBER(looping_state, looping)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
@@ -201,7 +201,7 @@ void looping_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 1;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -310,7 +310,7 @@ void looping_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -684,8 +684,9 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_SCREEN_UPDATE_DRIVER(looping_state, screen_update_looping)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", looping)
-	MCFG_PALETTE_LENGTH(32)
 
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(looping_state, looping)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

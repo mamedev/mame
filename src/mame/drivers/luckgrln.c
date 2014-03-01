@@ -367,10 +367,10 @@ UINT32 luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind1
 				if (bgenable==3) m_reel4_tilemap->draw(screen, bitmap, clip, 0, 0);
 			}
 
-			if (tileattr&0x08) m_gfxdecode->gfx(region)->transpen(bitmap,clip,tile,col,0,0,x*8,y*8, 0);
+			if (tileattr&0x08) m_gfxdecode->gfx(region)->transpen(m_palette,bitmap,clip,tile,col,0,0,x*8,y*8, 0);
 
 #else // treat it as priority flag instead (looks better in non-adult title screen - needs verifying)
-			if (!(tileattr&0x08)) m_gfxdecode->gfx(region)->transpen(bitmap,clip,tile,col,0,0,x*8,y*8, 0);
+			if (!(tileattr&0x08)) m_gfxdecode->gfx(region)->transpen(m_palette,bitmap,clip,tile,col,0,0,x*8,y*8, 0);
 
 			if (tileattr&0x04)
 			{
@@ -380,7 +380,7 @@ UINT32 luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind1
 				if (bgenable==3) m_reel4_tilemap->draw(screen, bitmap, clip, 0, 0);
 			}
 
-			if ((tileattr&0x08)) m_gfxdecode->gfx(region)->transpen(bitmap,clip,tile,col,0,0,x*8,y*8, 0);
+			if ((tileattr&0x08)) m_gfxdecode->gfx(region)->transpen(m_palette,bitmap,clip,tile,col,0,0,x*8,y*8, 0);
 #endif
 
 			count++;
@@ -470,7 +470,7 @@ WRITE8_MEMBER(luckgrln_state::palette_w)
 		g = (dat >> 5) & 0x1f;
 		b = (dat >> 10) & 0x1f;
 
-		palette_set_color_rgb(machine(), offs/2, pal5bit(r), pal5bit(g), pal5bit(b));
+		m_palette->set_pen_color(offs/2, pal5bit(r), pal5bit(g), pal5bit(b));
 
 	}
 
@@ -1014,7 +1014,7 @@ static MACHINE_CONFIG_START( luckgrln, luckgrln_state )
 	MCFG_SCREEN_UPDATE_DRIVER(luckgrln_state, screen_update_luckgrln)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", luckgrln)
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

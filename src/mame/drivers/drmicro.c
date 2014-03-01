@@ -259,8 +259,8 @@ static MACHINE_CONFIG_START( drmicro, drmicro_state )
 	MCFG_SCREEN_UPDATE_DRIVER(drmicro_state, screen_update_drmicro)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", drmicro)
-	MCFG_PALETTE_LENGTH(512)
-
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(drmicro_state, drmicro)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

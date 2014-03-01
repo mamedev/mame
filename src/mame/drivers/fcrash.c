@@ -513,7 +513,7 @@ void cps_state::fcrash_render_sprites( screen_device &screen, bitmap_ind16 &bitm
 			ypos   = 256 - ypos - 16;
 			xpos   = xpos + m_sprite_x_offset + 49;
 
-			m_gfxdecode->gfx(2)->prio_transpen(bitmap,cliprect, tileno, colour, flipx, flipy, xpos, ypos, screen.priority(), 0x02, 15);
+			m_gfxdecode->gfx(2)->prio_transpen(m_palette,bitmap,cliprect, tileno, colour, flipx, flipy, xpos, ypos, screen.priority(), 0x02, 15);
 		}
 	}
 }
@@ -571,7 +571,7 @@ void cps_state::fcrash_build_palette()
 		g = ((palette >> 4) & 0x0f) * 0x11 * bright / 0x2d;
 		b = ((palette >> 0) & 0x0f) * 0x11 * bright / 0x2d;
 
-		palette_set_color (machine(), offset, rgb_t(r, g, b));
+		m_palette->set_pen_color (offset, rgb_t(r, g, b));
 	}
 }
 
@@ -1490,7 +1490,7 @@ static MACHINE_CONFIG_START( fcrash, cps_state )
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
@@ -1548,7 +1548,7 @@ static MACHINE_CONFIG_START( kodb, cps_state )
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
-	MCFG_PALETTE_LENGTH(0xc00)
+	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
@@ -1588,7 +1588,7 @@ static MACHINE_CONFIG_START( sf2mdt, cps_state )
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
@@ -1631,7 +1631,7 @@ static MACHINE_CONFIG_START( knightsb, cps_state )
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
-	MCFG_PALETTE_LENGTH(0xc00)
+	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
@@ -1970,7 +1970,7 @@ static MACHINE_CONFIG_START( dinopic, cps_state )
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
-	MCFG_PALETTE_LENGTH(0xc00)
+	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
@@ -2122,7 +2122,7 @@ static MACHINE_CONFIG_START( sgyxz, cps_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
-	MCFG_PALETTE_LENGTH(0xc00)
+	MCFG_PALETTE_ADD("palette", 0xc00)
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
@@ -2215,7 +2215,7 @@ static MACHINE_CONFIG_START( punipic, cps_state )
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
-	MCFG_PALETTE_LENGTH(0xc00)
+	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
@@ -2401,7 +2401,7 @@ static MACHINE_CONFIG_START( sf2m1, cps_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
-	MCFG_PALETTE_LENGTH(0xc00)
+	MCFG_PALETTE_ADD("palette", 0xc00)
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 
 	/* sound hardware */
@@ -2605,7 +2605,7 @@ static MACHINE_CONFIG_START( slampic, cps_state )
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
-	MCFG_PALETTE_LENGTH(0xc00)
+	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)
 

@@ -490,7 +490,7 @@ public:
 	DECLARE_DRIVER_INIT(fclown);
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(_5clown);
 	UINT32 screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -552,7 +552,7 @@ UINT32 _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-void _5clown_state::palette_init()
+PALETTE_INIT_MEMBER(_5clown_state, _5clown)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 /*
@@ -569,7 +569,7 @@ void _5clown_state::palette_init()
 
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < m_palette->entries();i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b, bk;
 
@@ -589,7 +589,7 @@ void _5clown_state::palette_init()
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		b = bk * (bit2 * 0xff);
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -1064,8 +1064,8 @@ static MACHINE_CONFIG_START( fclown, _5clown_state )
 	MCFG_SCREEN_UPDATE_DRIVER(_5clown_state, screen_update_fclown)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fclown)
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(_5clown_state, _5clown)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16, mc6845_intf) /* guess */
 

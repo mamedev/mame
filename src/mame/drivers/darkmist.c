@@ -243,7 +243,8 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	MCFG_SCREEN_UPDATE_DRIVER(darkmist_state, screen_update_darkmist)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", darkmist)
-	MCFG_PALETTE_LENGTH(0x100*4)
+	MCFG_PALETTE_ADD("palette", 0x100*4)
+	MCFG_PALETTE_INIT_OWNER(darkmist_state, darkmist)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

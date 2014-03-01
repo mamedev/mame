@@ -92,7 +92,7 @@ void isa8_pc1640_iga_device::device_start()
 		UINT8 g = ( ( i & 0x02 ) ? 0xAA : 0x00 ) + ( ( i & 0x10 ) ? 0x55 : 0x00 );
 		UINT8 b = ( ( i & 0x01 ) ? 0xAA : 0x00 ) + ( ( i & 0x08 ) ? 0x55 : 0x00 );
 
-		palette_set_color_rgb( machine(), i, r, g, b );
+		m_palette->set_pen_color( i, r, g, b );
 	}
 
 	/* Install 256KB Video ram on our EGA card */

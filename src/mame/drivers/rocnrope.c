@@ -208,8 +208,8 @@ static MACHINE_CONFIG_START( rocnrope, rocnrope_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rocnrope_state, screen_update_rocnrope)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", rocnrope)
-	MCFG_PALETTE_LENGTH(16*16+16*16)
-
+	MCFG_PALETTE_ADD("palette", 16*16+16*16)
+	MCFG_PALETTE_INIT_OWNER(rocnrope_state, rocnrope)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(timeplt_sound)

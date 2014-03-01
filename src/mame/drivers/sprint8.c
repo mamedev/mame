@@ -465,9 +465,8 @@ static MACHINE_CONFIG_START( sprint8, sprint8_state )
 	MCFG_SCREEN_VBLANK_DRIVER(sprint8_state, screen_eof_sprint8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sprint8)
-	MCFG_PALETTE_LENGTH(36)
-
-
+	MCFG_PALETTE_ADD("palette", 36)
+	MCFG_PALETTE_INIT_OWNER(sprint8_state, sprint8)
 
 	/* sound hardware */
 	/* the proper way is to hook up 4 speakers, but they are not really

@@ -20,7 +20,8 @@ public:
 		m_mr(*this, "mr"),
 		m_display_list0(*this, "display_list0"),
 		m_display_list1(*this, "display_list1"),
-		m_color_xlat(*this, "color_xlat"){ }
+		m_color_xlat(*this, "color_xlat"),
+		m_paletteram16(*this, "palette") { }
 
 	required_device<v60_device> m_maincpu;      // V60
 	required_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
@@ -95,7 +96,7 @@ public:
 	UINT16 *m_glist;
 	int m_render_done;
 	UINT16 *m_tgp_ram;
-	UINT16 *m_paletteram16;
+	optional_shared_ptr<UINT16> m_paletteram16;
 	UINT32 *m_poly_rom;
 	UINT32 *m_poly_ram;
 	UINT16 m_lamp_state;

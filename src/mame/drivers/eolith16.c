@@ -158,7 +158,7 @@ PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 		bit1 = (c >> 7) & 0x01;
 		b = 0x55 * bit0 + 0xaa * bit1;
 
-		palette_set_color(machine(),c,rgb_t(r,g,b));
+		palette.set_pen_color(c,rgb_t(r,g,b));
 	}
 }
 
@@ -179,9 +179,9 @@ static MACHINE_CONFIG_START( eolith16, eolith16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
 	MCFG_SCREEN_UPDATE_DRIVER(eolith16_state, screen_update_eolith16)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_PALETTE_INIT_OVERRIDE(eolith16_state,eolith16)
+	MCFG_PALETTE_INIT_OWNER(eolith16_state,eolith16)
 	MCFG_VIDEO_START_OVERRIDE(eolith16_state,eolith16)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

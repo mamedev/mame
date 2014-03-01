@@ -33,7 +33,7 @@ public:
 	required_shared_ptr<UINT8> m_vram;
 	DECLARE_WRITE8_MEMBER(out_w);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(summit);
 	UINT32 screen_update_summit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -57,7 +57,7 @@ UINT32 summit_state::screen_update_summit(screen_device &screen, bitmap_ind16 &b
 		for (x=0;x<32;x++)
 		{
 			int tile = (m_vram[count] | ((m_attr[count]&1)<<8) );
-			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x*8,y*8);
 
 			count++;
 		}
@@ -295,7 +295,7 @@ static GFXDECODE_START( summit )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-void summit_state::palette_init()
+PALETTE_INIT_MEMBER(summit_state, summit)
 {
 }
 
@@ -315,8 +315,8 @@ static MACHINE_CONFIG_START( summit, summit_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", summit)
 
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(summit_state, summit)
 MACHINE_CONFIG_END
 
 

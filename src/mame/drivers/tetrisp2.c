@@ -1340,7 +1340,7 @@ static MACHINE_CONFIG_START( tetrisp2, tetrisp2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_tetrisp2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tetrisp2)
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,tetrisp2)
 
@@ -1371,7 +1371,7 @@ static MACHINE_CONFIG_START( nndmseal, tetrisp2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_tetrisp2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tetrisp2)
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,nndmseal)  // bg layer offset
 
@@ -1401,7 +1401,7 @@ static MACHINE_CONFIG_START( rockn, tetrisp2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rockntread)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tetrisp2)
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
 
@@ -1432,7 +1432,7 @@ static MACHINE_CONFIG_START( rockn2, tetrisp2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tetrisp2_state, screen_update_rockntread)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tetrisp2)
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_VIDEO_START_OVERRIDE(tetrisp2_state,rockntread)
 
@@ -1461,7 +1461,7 @@ static MACHINE_CONFIG_START( rocknms, tetrisp2_state )
 	/* video hardware */
 
 	MCFG_GFXDECODE_ADD("gfxdecode", rocknms)
-	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_DEFAULT_LAYOUT(layout_rocknms)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
@@ -1522,7 +1522,7 @@ static MACHINE_CONFIG_START( stepstag, stepstag_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stepstag_state, screen_update_stepstag_right)
 
-	MCFG_PALETTE_LENGTH(0x8000) // 0x8000 * 3 needed I guess, but it hits an assert
+	MCFG_PALETTE_ADD("palette", 0x8000) // 0x8000 * 3 needed I guess, but it hits an assert
 
 	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag )
 	MCFG_GFXDECODE_ADD("gfxdecode", stepstag)

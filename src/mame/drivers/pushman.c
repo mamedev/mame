@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( pushman_map, AS_PROGRAM, 16, pushman_state )
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(pushman_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITENOP /* ? */
 	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(pushman_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( bballs_map, AS_PROGRAM, 16, pushman_state )
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(pushman_scroll_w)
 	AM_RANGE(0xe800e, 0xe800f) AM_WRITENOP /* ? */
 	AM_RANGE(0xec000, 0xec7ff) AM_RAM_WRITE(pushman_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf8000, 0xf87ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf8000, 0xf87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfc000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -437,8 +437,9 @@ static MACHINE_CONFIG_START( pushman, pushman_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pushman_state, screen_update_pushman)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pushman)
-	MCFG_PALETTE_LENGTH(1024)
 
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -483,8 +484,9 @@ static MACHINE_CONFIG_START( bballs, pushman_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pushman_state, screen_update_pushman)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pushman)
-	MCFG_PALETTE_LENGTH(1024)
 
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

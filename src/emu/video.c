@@ -310,8 +310,9 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	png_add_text(&pnginfo, "System", text2);
 
 	// now do the actual work
-	const rgb_t *palette = (machine().palette != NULL) ? machine().palette->entry_list_adjusted() : NULL;
-	png_error error = png_write_bitmap(file, &pnginfo, m_snap_bitmap, machine().total_colors(), palette);
+	const rgb_t *palette = (screen !=NULL && screen->palette() != NULL) ? screen->palette()->palette()->entry_list_adjusted() : NULL;
+	int entries = (screen !=NULL && screen->palette() != NULL) ? screen->palette()->entries() : 0;
+	png_error error = png_write_bitmap(file, &pnginfo, m_snap_bitmap, entries, palette);
 	if (error != PNGERR_NONE)
 		mame_printf_error("Error generating PNG for snapshot: png_error = %d\n", error);
 
@@ -1230,8 +1231,8 @@ void video_manager::record_frame()
 			}
 
 			// write the next frame
-			const rgb_t *palette = (machine().palette != NULL) ? machine().palette->entry_list_adjusted() : NULL;
-			png_error error = mng_capture_frame(*m_mngfile, &pnginfo, m_snap_bitmap, machine().total_colors(), palette);
+			const rgb_t *palette = (machine().primary_screen->palette() != NULL) ? machine().primary_screen->palette()->palette()->entry_list_adjusted() : NULL;
+			png_error error = mng_capture_frame(*m_mngfile, &pnginfo, m_snap_bitmap, machine().primary_screen->palette()->entries(), palette);
 			png_free(&pnginfo);
 			if (error != PNGERR_NONE)
 			{
@@ -1246,33 +1247,6 @@ void video_manager::record_frame()
 	}
 	g_profiler.stop();
 }
-
-
-//-------------------------------------------------
-//  video_assert_out_of_range_pixels - assert if
-//  any pixels in the given bitmap contain an
-//  invalid palette index
-//-------------------------------------------------
-
-bool video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bitmap)
-{
-#ifdef MAME_DEBUG
-	// iterate over rows
-	int maxindex = machine.palette->max_index();
-	for (int y = 0; y < bitmap.height(); y++)
-	{
-		UINT16 *rowbase = &bitmap.pix16(y);
-		for (int x = 0; x < bitmap.width(); x++)
-			if (rowbase[x] > maxindex)
-			{
-				osd_break_into_debugger("Out of range pixel");
-				return true;
-			}
-	}
-#endif
-	return false;
-}
-
 
 //-------------------------------------------------
 //	toggle_throttle

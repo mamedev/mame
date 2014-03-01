@@ -66,7 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8088_common_w);
 
 	DECLARE_WRITE_LINE_MEMBER(meyc8088_sound_out);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(meyc8088);
 	UINT32 screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_meyc8088(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
@@ -119,13 +119,13 @@ static const res_net_info meyc8088_net_info =
 	}
 };
 
-void meyc8088_state::palette_init()
+PALETTE_INIT_MEMBER(meyc8088_state, meyc8088)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &meyc8088_decode_info, &meyc8088_net_info);
-	palette_set_colors(machine(), 0, rgb, 32);
+	palette.set_pen_colors(0, rgb, 32);
 	auto_free(machine(), rgb);
 }
 
@@ -392,7 +392,8 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 	MCFG_SCREEN_UPDATE_DRIVER(meyc8088_state, screen_update_meyc8088)
 	MCFG_SCREEN_VBLANK_DRIVER(meyc8088_state, screen_eof_meyc8088)
 
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(meyc8088_state, meyc8088)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

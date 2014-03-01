@@ -228,7 +228,7 @@ void ginganin_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect,
 				code & 0x3fff,
 				attr >> 12,
 				flipx, flipy,

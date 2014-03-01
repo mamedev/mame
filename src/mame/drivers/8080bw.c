@@ -1265,8 +1265,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( rollingc, mw8080bw_root, _8080bw_state )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_rollingc)
 
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(_8080bw_state, rollingc)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(_8080bw_state, rollingc)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)

@@ -727,9 +727,9 @@ static MACHINE_CONFIG_FRAGMENT( pocketc )
 	MCFG_SCREEN_VISIBLE_AREA(0, 594-1, 0, 273-1)
 //  MCFG_SCREEN_SIZE(640, 273)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 273-1)
-	MCFG_GFXDECODE_ADD("gfxdecode",  pc1401 )
-	MCFG_PALETTE_LENGTH(8*2)
-	MCFG_PALETTE_INIT( pocketc )
+	MCFG_GFXDECODE_ADD("gfxdecode", pc1401 )
+	MCFG_PALETTE_ADD("palette", 8*2)
+	MCFG_PALETTE_INIT_LEGACY( pocketc )
 
 	/* sound hardware */
 	/*MCFG_SOUND_ADD("dac", DAC, pocketc_sound_interface)*/

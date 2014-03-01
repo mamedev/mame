@@ -34,7 +34,7 @@ public:
 	DECLARE_DRIVER_INIT(poker72);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(poker72);
 	UINT32 screen_update_poker72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -62,7 +62,7 @@ UINT32 poker72_state::screen_update_poker72(screen_device &screen, bitmap_ind16 
 
 			tile|= m_tile_bank << 12;
 
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,color,fx,fy,x*8,y*8);
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tile,color,fx,fy,x*8,y*8);
 
 			count+=2;
 		}
@@ -80,7 +80,7 @@ WRITE8_MEMBER(poker72_state::poker72_paletteram_w)
 	g = m_pal[(offset & 0x3ff)+0x400] & 0x3f;
 	b = m_pal[(offset & 0x3ff)+0x800] & 0x3f;
 
-	palette_set_color_rgb( machine(), offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
+	m_palette->set_pen_color( offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 WRITE8_MEMBER(poker72_state::output_w)
@@ -322,7 +322,7 @@ static GFXDECODE_START( poker72 )
 GFXDECODE_END
 
 /* default 444 palette for debug purpose */
-void poker72_state::palette_init()
+PALETTE_INIT_MEMBER(poker72_state, poker72)
 {
 	int x,r,g,b;
 
@@ -331,7 +331,7 @@ void poker72_state::palette_init()
 		r = (x & 0xf)*0x10;
 		g = ((x & 0x3c)>>2)*0x10;
 		b = ((x & 0xf0)>>4)*0x10;
-		palette_set_color(machine(),x,rgb_t(r,g,b));
+		palette.set_pen_color(x,rgb_t(r,g,b));
 	}
 }
 
@@ -370,8 +370,8 @@ static MACHINE_CONFIG_START( poker72, poker72_state )
 	MCFG_SCREEN_UPDATE_DRIVER(poker72_state, screen_update_poker72)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", poker72)
-	MCFG_PALETTE_LENGTH(0xe00)
-
+	MCFG_PALETTE_ADD("palette", 0xe00)
+	MCFG_PALETTE_INIT_OWNER(poker72_state, poker72)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

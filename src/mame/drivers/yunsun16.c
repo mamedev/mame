@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, yunsun16_state )
 	AM_RANGE(0x800180, 0x800181) AM_WRITE(yunsun16_sound_bank_w)    // Sound
 	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITENOP    // ? 0 (during int)
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")    // Palette
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(yunsun16_vram_1_w) AM_SHARE("vram_1") // Layer 1
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(yunsun16_vram_0_w) AM_SHARE("vram_0") // Layer 0
 	AM_RANGE(0x910000, 0x910fff) AM_RAM AM_SHARE("spriteram")   // Sprites
@@ -593,7 +593,8 @@ static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", yunsun16)
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	/* sound hardware */
@@ -629,8 +630,8 @@ static MACHINE_CONFIG_START( shocking, yunsun16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", yunsun16)
-	MCFG_PALETTE_LENGTH(8192)
-
+	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

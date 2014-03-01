@@ -230,9 +230,8 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(microtan_state, screen_update_microtan)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", microtan)
-	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -122,6 +122,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	DECLARE_READ8_MEMBER(bml3_ym2203_r);
 	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
+	DECLARE_PALETTE_INIT(bml3);
 private:
 	UINT8 m_psg_latch;
 	UINT8 m_attr_latch;
@@ -139,7 +140,6 @@ private:
 	UINT8 m_cass_data[4];
 	virtual void machine_reset();
 	virtual void machine_start();
-	virtual void palette_init();
 	void m6845_change_clock(UINT8 setting);
 	UINT8 m_crtc_index;
 	UINT8 *m_extram;
@@ -770,12 +770,12 @@ INTERRUPT_GEN_MEMBER(bml3_state::bml3_timer_firq)
 	}
 }
 
-void bml3_state::palette_init()
+PALETTE_INIT_MEMBER(bml3_state, bml3)
 {
 	int i;
 
 	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 }
 
 void bml3_state::machine_start()
@@ -1000,7 +1000,8 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(bml3_state, bml3)
 
 	/* Devices */
 	// CRTC clock should be synchronous with the CPU clock.

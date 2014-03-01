@@ -15,9 +15,6 @@ PALETTE_INIT_MEMBER(combatsc_state,combatsc)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int pal;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x80);
-
 	for (pal = 0; pal < 8; pal++)
 	{
 		int i, clut;
@@ -55,7 +52,7 @@ PALETTE_INIT_MEMBER(combatsc_state,combatsc)
 			else
 				ctabentry = (pal << 4) | (color_prom[(clut << 8) | i] & 0x0f);
 
-			colortable_entry_set_value(machine().colortable, (pal << 8) | i, ctabentry);
+			palette.set_pen_indirect((pal << 8) | i, ctabentry);
 		}
 	}
 }
@@ -65,9 +62,6 @@ PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int pal;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x80);
 
 	for (pal = 0; pal < 8; pal++)
 	{
@@ -84,7 +78,7 @@ PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 				/* chars - no lookup? */
 				ctabentry = (pal << 4) | (i & 0x0f);    /* no lookup? */
 
-			colortable_entry_set_value(machine().colortable, (pal << 8) | i, ctabentry);
+			palette.set_pen_indirect((pal << 8) | i, ctabentry);
 		}
 	}
 }
@@ -100,7 +94,7 @@ void combatsc_state::set_pens(  )
 
 		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine().colortable, i >> 1, color);
+		m_palette->set_indirect_color(i >> 1, color);
 	}
 }
 
@@ -385,7 +379,7 @@ void combatsc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	address_space &space = machine().driver_data()->generic_space();
 	int base_color = (circuit * 4) * 16 + (k007121->ctrlram_r(space, 6) & 0x10) * 2;
 
-	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(circuit), machine().colortable, source, base_color, 0, 0, priority_bitmap, pri_mask);
+	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(circuit), m_palette, source, base_color, 0, 0, priority_bitmap, pri_mask);
 }
 
 
@@ -538,7 +532,7 @@ void combatsc_state::bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 //          if(m_vreg == 0x23 && (attributes & 0x02)) color += 1*16;
 //          if(m_vreg == 0x66 ) color += 2*16;
 
-			 gfx->transpen(bitmap,cliprect,
+			 gfx->transpen(m_palette,bitmap,cliprect,
 							number, color,
 							attributes & 0x10,0, /* flip */
 							x, y, 15 );

@@ -429,8 +429,8 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(spdodgeb_state, screen_update_spdodgeb)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", spdodgeb)
-	MCFG_PALETTE_LENGTH(1024)
-
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INIT_OWNER(spdodgeb_state, spdodgeb)
 
 
 	/* sound hardware */

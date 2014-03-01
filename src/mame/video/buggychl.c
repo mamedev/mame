@@ -2,13 +2,13 @@
 #include "includes/buggychl.h"
 
 
-void buggychl_state::palette_init()
+PALETTE_INIT_MEMBER(buggychl_state, buggychl)
 {
 	int i;
 
 	/* arbitrary blue shading for the sky, estimation */
 	for (i = 0; i < 128; i++)
-		palette_set_color(machine(), i + 128, rgb_t(0, 240-i, 255));
+		palette.set_pen_color(i + 128, rgb_t(0, 240-i, 255));
 }
 
 void buggychl_state::video_start()
@@ -105,7 +105,7 @@ void buggychl_state::draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (flip_screen_y())
 			sy = 31 - sy;
 
-		m_gfxdecode->gfx(0)->opaque(m_tmp_bitmap1,m_tmp_bitmap1.cliprect(),
+		m_gfxdecode->gfx(0)->opaque(m_palette,m_tmp_bitmap1,m_tmp_bitmap1.cliprect(),
 				code,
 				2,
 				flip_screen_x(),flip_screen_y(),
@@ -144,7 +144,7 @@ void buggychl_state::draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (flipy)
 			sy = 31 - sy;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code,
 				0,
 				flipx,flipy,

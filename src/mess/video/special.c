@@ -12,8 +12,8 @@
 
 VIDEO_START_MEMBER(special_state,special)
 {
-	palette_set_color(machine(),0,rgb_t::black); /* black */
-	palette_set_color(machine(),1,rgb_t::white); /* white */
+	m_palette->set_pen_color(0,rgb_t::black); /* black */
+	m_palette->set_pen_color(1,rgb_t::white); /* white */
 }
 
 UINT32 special_state::screen_update_special(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -75,7 +75,7 @@ const rgb_t specimx_palette[16] = {
 
 PALETTE_INIT_MEMBER(special_state,specimx)
 {
-	palette_set_colors(machine(), 0, specimx_palette, ARRAY_LENGTH(specimx_palette));
+	palette.set_pen_colors(0, specimx_palette, ARRAY_LENGTH(specimx_palette));
 }
 
 
@@ -115,7 +115,7 @@ static const rgb_t erik_palette[8] = {
 
 PALETTE_INIT_MEMBER(special_state,erik)
 {
-	palette_set_colors(machine(), 0, erik_palette, ARRAY_LENGTH(erik_palette));
+	palette.set_pen_colors(0, erik_palette, ARRAY_LENGTH(erik_palette));
 }
 
 

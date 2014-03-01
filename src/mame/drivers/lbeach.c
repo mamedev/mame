@@ -71,7 +71,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(lbeach);
 	UINT32 screen_update_lbeach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -83,28 +83,28 @@ public:
 
 ***************************************************************************/
 
-void lbeach_state::palette_init()
+PALETTE_INIT_MEMBER(lbeach_state, lbeach)
 {
 	// tiles
-	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00);
-	palette_set_color_rgb(machine(), 1, 0xc0, 0xc0, 0xc0);
+	palette.set_pen_color(0, 0x00, 0x00, 0x00);
+	palette.set_pen_color(1, 0xc0, 0xc0, 0xc0);
 
 	// road
-	palette_set_color_rgb(machine(), 2, 0x00, 0x00, 0x00);
-	palette_set_color_rgb(machine(), 3, 0xff, 0xff, 0xff);
+	palette.set_pen_color(2, 0x00, 0x00, 0x00);
+	palette.set_pen_color(3, 0xff, 0xff, 0xff);
 
-	palette_set_color_rgb(machine(), 4, 0x80, 0x80, 0x80);
-	palette_set_color_rgb(machine(), 5, 0xff, 0xff, 0xff);
+	palette.set_pen_color(4, 0x80, 0x80, 0x80);
+	palette.set_pen_color(5, 0xff, 0xff, 0xff);
 
-	palette_set_color_rgb(machine(), 6, 0x00, 0x00, 0x00);
-	palette_set_color_rgb(machine(), 7, 0x80, 0x80, 0x80);
+	palette.set_pen_color(6, 0x00, 0x00, 0x00);
+	palette.set_pen_color(7, 0x80, 0x80, 0x80);
 
-	palette_set_color_rgb(machine(), 8, 0x80, 0x80, 0x80);
-	palette_set_color_rgb(machine(), 9, 0xff, 0xff, 0xff);
+	palette.set_pen_color(8, 0x80, 0x80, 0x80);
+	palette.set_pen_color(9, 0xff, 0xff, 0xff);
 
 	// player car
-	palette_set_color_rgb(machine(), 10, 0x00, 0x00, 0x00);
-	palette_set_color_rgb(machine(), 11, 0xff, 0xff, 0xff);
+	palette.set_pen_color(10, 0x00, 0x00, 0x00);
+	palette.set_pen_color(11, 0xff, 0xff, 0xff);
 }
 
 
@@ -148,7 +148,7 @@ UINT32 lbeach_state::screen_update_lbeach(screen_device &screen, bitmap_ind16 &b
 	int sprite_y = 160;
 
 	m_colmap_car.fill(0, cliprect);
-	m_gfxdecode->gfx(2)->transpen(m_colmap_car,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
+	m_gfxdecode->gfx(2)->transpen(m_palette,m_colmap_car,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
 	bitmap_ind16 &fg_bitmap = m_fg_tilemap->pixmap();
 
 	m_collision_bg_car = 0;
@@ -167,7 +167,7 @@ UINT32 lbeach_state::screen_update_lbeach(screen_device &screen, bitmap_ind16 &b
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// draw player car
-	m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
+	m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect, sprite_code, 0, 0, 0, sprite_x, sprite_y, 0);
 
 	return 0;
 }
@@ -336,8 +336,8 @@ static MACHINE_CONFIG_START( lbeach, lbeach_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // needed for collision detection
 
 	MCFG_GFXDECODE_ADD("gfxdecode", lbeach)
-	MCFG_PALETTE_LENGTH(2+8+2)
-
+	MCFG_PALETTE_ADD("palette", 2+8+2)
+	MCFG_PALETTE_INIT_OWNER(lbeach_state, lbeach)
 	/* sound hardware */
 	// ...
 MACHINE_CONFIG_END

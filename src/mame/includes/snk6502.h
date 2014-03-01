@@ -39,7 +39,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	rgb_t m_palette[64];
+	rgb_t m_palette_val[64];
 
 	UINT8 m_irq_mask;
 	DECLARE_WRITE8_MEMBER(snk6502_videoram_w);

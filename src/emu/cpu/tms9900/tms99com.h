@@ -35,8 +35,7 @@
 
     In this implementation we only consider TMS9900, 9980, and 9995. The
     remaining types are implemented on an own code base as they introduce
-    significant changes (e.g. privileged mode, address mapper). For now we
-    leave the implementation of the rest up to 99xxcore.h.
+    significant changes (e.g. privileged mode, address mapper).
 */
 
 #ifndef __TMS99COMMON_H__

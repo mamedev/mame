@@ -2,7 +2,7 @@
 #include "includes/bogeyman.h"
 
 
-void bogeyman_state::palette_init()
+PALETTE_INIT_MEMBER(bogeyman_state, bogeyman)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -31,7 +31,7 @@ void bogeyman_state::palette_init()
 		bit2 = (color_prom[256] >> 3) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i + 16, rgb_t(r,g,b));
+		palette.set_pen_color(i + 16, rgb_t(r,g,b));
 		color_prom++;
 	}
 }
@@ -63,7 +63,7 @@ WRITE8_MEMBER(bogeyman_state::bogeyman_colorram2_w)
 WRITE8_MEMBER(bogeyman_state::bogeyman_paletteram_w)
 {
 	/* RGB output is inverted */
-	paletteram_BBGGGRRR_byte_w(space, offset, ~data);
+	m_palette->write(space, offset, UINT8(~data)); 
 }
 
 TILE_GET_INFO_MEMBER(bogeyman_state::get_bg_tile_info)
@@ -123,7 +123,7 @@ void bogeyman_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			}
 
 			
-				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 				code, color,
 				flipx, flipy,
 				sx, sy, 0);
@@ -131,7 +131,7 @@ void bogeyman_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			if (multi)
 			{
 				
-					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 					code + 1, color,
 					flipx, flipy,
 					sx, sy + (flip_screen() ? -16 : 16), 0);

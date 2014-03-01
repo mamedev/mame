@@ -135,7 +135,7 @@ void aeroboto_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			y = 240 - y;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				m_spriteram[offs + 1],
 				m_spriteram[offs + 2] & 0x07,
 				flip_screen(), flip_screen(),

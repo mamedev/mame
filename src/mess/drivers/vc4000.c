@@ -355,9 +355,9 @@ static const rgb_t vc4000_palette[] =
 	We can do that in the code with ^7 */
 };
 
-void vc4000_state::palette_init()
+PALETTE_INIT_MEMBER(vc4000_state, vc4000)
 {
-	palette_set_colors(machine(), 0, vc4000_palette, ARRAY_LENGTH(vc4000_palette));
+	palette.set_pen_colors(0, vc4000_palette, ARRAY_LENGTH(vc4000_palette));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( vc4000_state, vc4000_cart )
@@ -424,8 +424,8 @@ static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 184, 0, 269)
 	MCFG_SCREEN_UPDATE_DRIVER(vc4000_state, screen_update_vc4000)
 
-	MCFG_PALETTE_LENGTH(8)
-
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(vc4000_state, vc4000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

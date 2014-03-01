@@ -456,8 +456,8 @@ static MACHINE_CONFIG_START( pingpong, pingpong_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pingpong_state, screen_update_pingpong)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pingpong)
-	MCFG_PALETTE_LENGTH(64*4+64*4)
-
+	MCFG_PALETTE_ADD("palette", 64*4+64*4)
+	MCFG_PALETTE_INIT_OWNER(pingpong_state, pingpong)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

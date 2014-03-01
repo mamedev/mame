@@ -136,8 +136,8 @@ static MACHINE_CONFIG_START( cheekyms, cheekyms_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cheekyms_state, screen_update_cheekyms)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cheekyms)
-	MCFG_PALETTE_LENGTH(0xc0)
-
+	MCFG_PALETTE_ADD("palette", 0xc0)
+	MCFG_PALETTE_INIT_OWNER(cheekyms_state, cheekyms)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

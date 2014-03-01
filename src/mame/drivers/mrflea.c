@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( mrflea_master_map, AS_PROGRAM, 8, mrflea_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(mrflea_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe800, 0xe83f) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe800, 0xe83f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xec00, 0xecff) AM_RAM_WRITE(mrflea_spriteram_w) AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
@@ -368,7 +368,8 @@ static MACHINE_CONFIG_START( mrflea, mrflea_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mrflea_state, screen_update_mrflea)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mrflea)
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 
 	/* sound hardware */

@@ -237,7 +237,7 @@ public:
 	DECLARE_DRIVER_INIT(colorama);
 	DECLARE_DRIVER_INIT(cmrltv75);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(coinmvga);
 	UINT32 screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;
@@ -269,7 +269,7 @@ UINT32 coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_ind1
 		{
 			int tile = m_vram[count];
 			//int colour = tile>>12;
-			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
+			gfx->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x*8,y*8);
 
 			count++;
 		}
@@ -280,7 +280,7 @@ UINT32 coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_ind1
 }
 
 
-void coinmvga_state::palette_init()
+PALETTE_INIT_MEMBER(coinmvga_state, coinmvga)
 {
 }
 
@@ -315,7 +315,7 @@ WRITE16_MEMBER(coinmvga_state::ramdac_bg_w)
 				break;
 			case 2:
 				m_bgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(machine(), m_bgpal.offs, rgb_t(m_bgpal.r, m_bgpal.g, m_bgpal.b));
+				m_palette->set_pen_color(m_bgpal.offs, rgb_t(m_bgpal.r, m_bgpal.g, m_bgpal.b));
 				m_bgpal.offs_internal = 0;
 				m_bgpal.offs++;
 				break;
@@ -345,7 +345,7 @@ WRITE16_MEMBER(coinmvga_state::ramdac_fg_w)
 				break;
 			case 2:
 				m_fgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(machine(), 0x100+m_fgpal.offs, rgb_t(m_fgpal.r, m_fgpal.g, m_fgpal.b));
+				m_palette->set_pen_color(0x100+m_fgpal.offs, rgb_t(m_fgpal.r, m_fgpal.g, m_fgpal.b));
 				m_fgpal.offs_internal = 0;
 				m_fgpal.offs++;
 				break;
@@ -688,8 +688,8 @@ static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", coinmvga)
 
-	MCFG_PALETTE_LENGTH(512)
-
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(coinmvga_state, coinmvga)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

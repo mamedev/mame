@@ -846,7 +846,8 @@ static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nycaptor)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 
 	/* sound hardware */
@@ -904,7 +905,8 @@ static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nycaptor)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -958,7 +960,8 @@ static MACHINE_CONFIG_START( bronx, nycaptor_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nycaptor)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -356,7 +356,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                             /* work */
 	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM AM_SHARE("spriteram")           /* Sprite */
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(welltris_charvideoram_w) AM_SHARE("charvideoram")     /* Char */
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")    /* Palette */
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* Palette */
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")                 /* Bottom Controls */
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(welltris_palette_bank_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")                 /* Top Controls */
@@ -714,12 +714,14 @@ static MACHINE_CONFIG_START( welltris, welltris_state )
 	MCFG_SCREEN_UPDATE_DRIVER(welltris_state, screen_update_welltris)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", welltris)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(-1)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

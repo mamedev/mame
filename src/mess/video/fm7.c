@@ -991,7 +991,7 @@ WRITE8_MEMBER(fm7_state::fm7_palette_w)
 	if(data & 0x01)
 		b = 0xff;
 
-	palette_set_color(machine(),offset,rgb_t(r,g,b));
+	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 	m_video.fm7_pal[offset] = data & 0x07;
 }
 
@@ -1022,21 +1022,21 @@ WRITE8_MEMBER(fm7_state::fm77av_analog_palette_w)
 			break;
 		case 2:
 			m_video.fm77av_pal_b[m_video.fm77av_pal_selected] = (data & 0x0f) << 4;
-			palette_set_color(machine(),m_video.fm77av_pal_selected+8,
+			m_palette->set_pen_color(m_video.fm77av_pal_selected+8,
 				rgb_t(m_video.fm77av_pal_r[m_video.fm77av_pal_selected],
 				m_video.fm77av_pal_g[m_video.fm77av_pal_selected],
 				m_video.fm77av_pal_b[m_video.fm77av_pal_selected]));
 			break;
 		case 3:
 			m_video.fm77av_pal_r[m_video.fm77av_pal_selected] = (data & 0x0f) << 4;
-			palette_set_color(machine(),m_video.fm77av_pal_selected+8,
+			m_palette->set_pen_color(m_video.fm77av_pal_selected+8,
 				rgb_t(m_video.fm77av_pal_r[m_video.fm77av_pal_selected],
 				m_video.fm77av_pal_g[m_video.fm77av_pal_selected],
 				m_video.fm77av_pal_b[m_video.fm77av_pal_selected]));
 			break;
 		case 4:
 			m_video.fm77av_pal_g[m_video.fm77av_pal_selected] = (data & 0x0f) << 4;
-			palette_set_color(machine(),m_video.fm77av_pal_selected+8,
+			m_palette->set_pen_color(m_video.fm77av_pal_selected+8,
 				rgb_t(m_video.fm77av_pal_r[m_video.fm77av_pal_selected],
 				m_video.fm77av_pal_g[m_video.fm77av_pal_selected],
 				m_video.fm77av_pal_b[m_video.fm77av_pal_selected]));
@@ -1593,11 +1593,11 @@ static const rgb_t fm7_initial_palette[8] = {
 	rgb_t(0xff, 0xff, 0xff), // 7
 };
 
-void fm7_state::palette_init()
+PALETTE_INIT_MEMBER(fm7_state, fm7)
 {
 	int x;
 
-	palette_set_colors(machine(), 0, fm7_initial_palette, ARRAY_LENGTH(fm7_initial_palette));
+	palette.set_pen_colors(0, fm7_initial_palette, ARRAY_LENGTH(fm7_initial_palette));
 	for(x=0;x<8;x++)
 		m_video.fm7_pal[x] = x;
 }

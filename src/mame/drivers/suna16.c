@@ -821,7 +821,7 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_suna16)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", suna16)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */
@@ -879,7 +879,7 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_suna16)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", suna16)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */
@@ -927,7 +927,7 @@ static MACHINE_CONFIG_START( sunaq, suna16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_suna16)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", suna16)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 
 
 	/* sound hardware */
@@ -988,7 +988,7 @@ static MACHINE_CONFIG_START( bestbest, suna16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_bestbest)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bestbest)
-	MCFG_PALETTE_LENGTH(256*8)
+	MCFG_PALETTE_ADD("palette", 256*8)
 
 
 	/* sound hardware */

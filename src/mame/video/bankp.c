@@ -33,13 +33,10 @@
 
 ***************************************************************************/
 
-void bankp_state::palette_init()
+PALETTE_INIT_MEMBER(bankp_state, bankp)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 32);
 
 	for (i = 0; i < 32; i++)
 	{
@@ -61,7 +58,7 @@ void bankp_state::palette_init()
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r,g,b));
 
 		color_prom++;
 	}
@@ -70,13 +67,13 @@ void bankp_state::palette_init()
 
 	/* charset #1 lookup table */
 	for (i = 0; i < m_gfxdecode->gfx(0)->colors() * m_gfxdecode->gfx(0)->granularity(); i++)
-		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(0)->colorbase() + i, *color_prom++ & 0x0f);
+		palette.set_pen_indirect(m_gfxdecode->gfx(0)->colorbase() + i, *color_prom++ & 0x0f);
 
 	color_prom += 128;  /* skip the bottom half of the PROM - seems to be not used */
 
 	/* charset #2 lookup table */
 	for (i = 0; i < m_gfxdecode->gfx(1)->colors() * m_gfxdecode->gfx(1)->granularity(); i++)
-		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(1)->colorbase() + i, *color_prom++ & 0x0f);
+		palette.set_pen_indirect(m_gfxdecode->gfx(1)->colorbase() + i, *color_prom++ & 0x0f);
 
 	/* the bottom half of the PROM seems to be not used */
 }
@@ -152,8 +149,8 @@ void bankp_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bankp_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bankp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, m_gfxdecode->gfx(1), 0);
-	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, m_gfxdecode->gfx(0), 0);
+	m_palette->configure_tilemap_groups(*m_bg_tilemap, *m_gfxdecode->gfx(1), 0);
+	m_palette->configure_tilemap_groups(*m_fg_tilemap, *m_gfxdecode->gfx(0), 0);
 
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_priority));

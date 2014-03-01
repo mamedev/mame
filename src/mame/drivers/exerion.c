@@ -420,8 +420,8 @@ static MACHINE_CONFIG_START( exerion, exerion_state )
 	MCFG_SCREEN_UPDATE_DRIVER(exerion_state, screen_update_exerion)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", exerion)
-	MCFG_PALETTE_LENGTH(256*3)
-
+	MCFG_PALETTE_ADD("palette", 256*3)
+	MCFG_PALETTE_INIT_OWNER(exerion_state, exerion)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

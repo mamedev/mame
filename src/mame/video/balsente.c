@@ -90,7 +90,7 @@ WRITE8_MEMBER(balsente_state::balsente_paletteram_w)
 	g = m_generic_paletteram_8[(offset & ~3) + 1];
 	b = m_generic_paletteram_8[(offset & ~3) + 2];
 
-	palette_set_color_rgb(machine(), offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
+	m_palette->set_pen_color(offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 
@@ -139,7 +139,7 @@ void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 	{
 		if (ypos >= (16 + BALSENTE_VBEND) && ypos >= cliprect.min_y && ypos <= cliprect.max_y)
 		{
-			const pen_t *pens = &machine().pens[m_palettebank_vis * 256];
+			const pen_t *pens = &m_palette->pen(m_palettebank_vis * 256);
 			UINT8 *old = &m_expanded_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
 			int currx = xpos;
 
@@ -206,7 +206,7 @@ void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 
 UINT32 balsente_state::screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pens = &machine().pens[m_palettebank_vis * 256];
+	const pen_t *pens = &m_palette->pen(m_palettebank_vis * 256);
 	int y, i;
 
 	/* draw scanlines from the VRAM directly */

@@ -191,7 +191,7 @@ WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
 	brightness = (double)(data & 0xff);
 	for (i = 0; i < 0x800; i++)
 	{
-		palette_set_pen_contrast(machine(), i, brightness/255);
+		m_palette->set_pen_contrast(i, brightness/255);
 	}
 }
 
@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( mwarr_map, AS_PROGRAM, 16, mwarr_state )
 	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_SHARE("mlow_scrollram")
 	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_SHARE("mhigh_scrollram")
 	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_SHARE("vidattrram")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x110000, 0x110001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("SYSTEM")
@@ -435,7 +435,7 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 
 			for (i = 0; i <= dy; i++)
 			{
-				gfx->prio_transpen(bitmap,
+				gfx->prio_transpen(m_palette,bitmap,
 							cliprect,
 							source[2]+i,
 							color,
@@ -444,7 +444,7 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 							screen.priority(),pri_mask,0 );
 
 				/* wrap around x */
-				gfx->prio_transpen(bitmap,
+				gfx->prio_transpen(m_palette,bitmap,
 							cliprect,
 							source[2]+i,
 							color,
@@ -453,7 +453,7 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 							screen.priority(),pri_mask,0 );
 
 				/* wrap around y */
-				gfx->prio_transpen(bitmap,
+				gfx->prio_transpen(m_palette,bitmap,
 							cliprect,
 							source[2]+i,
 							color,
@@ -462,7 +462,7 @@ void mwarr_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, con
 							screen.priority(),pri_mask,0 );
 
 				/* wrap around x & y */
-				gfx->prio_transpen(bitmap,
+				gfx->prio_transpen(m_palette,bitmap,
 							cliprect,
 							source[2]+i,
 							color,
@@ -563,8 +563,8 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mwarr_state, screen_update_mwarr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mwarr)
-	MCFG_PALETTE_LENGTH(0x800)
-
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

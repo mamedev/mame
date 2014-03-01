@@ -71,7 +71,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(quizshow);
 	UINT32 screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(quizshow_clock_timer_cb);
 };
@@ -83,12 +83,10 @@ public:
 
 ***************************************************************************/
 
-void quizshow_state::palette_init()
+PALETTE_INIT_MEMBER(quizshow_state, quizshow)
 {
-	machine().colortable = colortable_alloc(machine(), 2);
-
-	colortable_palette_set_color(machine().colortable, 0, rgb_t::black);
-	colortable_palette_set_color(machine().colortable, 1, rgb_t::white);
+	palette.set_indirect_color(0, rgb_t::black);
+	palette.set_indirect_color(1, rgb_t::white);
 
 	// normal, blink/off, invert, blink+invert
 	const int lut_pal[16] = {
@@ -99,7 +97,7 @@ void quizshow_state::palette_init()
 	};
 
 	for (int i = 0; i < 16 ; i++)
-		colortable_entry_set_value(machine().colortable, i, lut_pal[i]);
+		palette.set_pen_indirect(i, lut_pal[i]);
 }
 
 TILE_GET_INFO_MEMBER(quizshow_state::get_tile_info)
@@ -392,7 +390,8 @@ static MACHINE_CONFIG_START( quizshow, quizshow_state )
 	MCFG_SCREEN_UPDATE_DRIVER(quizshow_state, screen_update_quizshow)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", quizshow)
-	MCFG_PALETTE_LENGTH(8*2)
+	MCFG_PALETTE_ADD("palette", 8*2)
+	MCFG_PALETTE_INIT_OWNER(quizshow_state, quizshow)
 
 	/* sound hardware (discrete) */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

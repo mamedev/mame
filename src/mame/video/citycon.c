@@ -117,7 +117,7 @@ void citycon_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipx = !flipx;
 		}
 
-		m_gfxdecode->gfx(m_spriteram[offs + 1] & 0x80 ? 2 : 1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_spriteram[offs + 1] & 0x80 ? 2 : 1)->transpen(m_palette,bitmap,cliprect,
 				m_spriteram[offs + 1] & 0x7f,
 				m_spriteram[offs + 2] & 0x0f,
 				flipx,flip_screen(),
@@ -128,8 +128,8 @@ void citycon_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 inline void citycon_state::changecolor_RRRRGGGGBBBBxxxx( int color, int indx )
 {
-	int data = m_generic_paletteram_8[2 * indx | 1] | (m_generic_paletteram_8[2 * indx] << 8);
-	palette_set_color_rgb(machine(), color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
+	int data = m_palette->basemem().read8(2 * indx | 1) | (m_palette->basemem().read8(2 * indx) << 8);
+	m_palette->set_pen_color(color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
 UINT32 citycon_state::screen_update_citycon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -198,17 +198,17 @@ WRITE16_MEMBER(cischeat_state::bigrun_paletteram16_w)
 	int b = pal5bit(((word >> 3 ) & 0x1E ) | ((word >> 1) & 0x01));
 
 	// Scroll 0
-	if ( (offset >= 0x0e00/2) && (offset <= 0x0fff/2) ) { palette_set_color(machine(), 0x000 + offset - 0x0e00/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x0e00/2) && (offset <= 0x0fff/2) ) { m_palette->set_pen_color(0x000 + offset - 0x0e00/2, rgb_t(r,g,b) ); return;}
 	// Scroll 1
-	if ( (offset >= 0x1600/2) && (offset <= 0x17ff/2) ) { palette_set_color(machine(), 0x100 + offset - 0x1600/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x1600/2) && (offset <= 0x17ff/2) ) { m_palette->set_pen_color(0x100 + offset - 0x1600/2, rgb_t(r,g,b) ); return;}
 	// Road 0
-	if ( (offset >= 0x1800/2) && (offset <= 0x1fff/2) ) { palette_set_color(machine(), 0x200 + offset - 0x1800/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x1800/2) && (offset <= 0x1fff/2) ) { m_palette->set_pen_color(0x200 + offset - 0x1800/2, rgb_t(r,g,b) ); return;}
 	// Road 1
-	if ( (offset >= 0x2000/2) && (offset <= 0x27ff/2) ) { palette_set_color(machine(), 0x600 + offset - 0x2000/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x2000/2) && (offset <= 0x27ff/2) ) { m_palette->set_pen_color(0x600 + offset - 0x2000/2, rgb_t(r,g,b) ); return;}
 	// Sprites
-	if ( (offset >= 0x2800/2) && (offset <= 0x2fff/2) ) { palette_set_color(machine(), 0xa00 + offset - 0x2800/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x2800/2) && (offset <= 0x2fff/2) ) { m_palette->set_pen_color(0xa00 + offset - 0x2800/2, rgb_t(r,g,b) ); return;}
 	// Scroll 2
-	if ( (offset >= 0x3600/2) && (offset <= 0x37ff/2) ) { palette_set_color(machine(), 0xe00 + offset - 0x3600/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x3600/2) && (offset <= 0x37ff/2) ) { m_palette->set_pen_color(0xe00 + offset - 0x3600/2, rgb_t(r,g,b) ); return;}
 }
 
 static ADDRESS_MAP_START( bigrun_map, AS_PROGRAM, 16, cischeat_state )
@@ -251,17 +251,17 @@ WRITE16_MEMBER(cischeat_state::cischeat_paletteram16_w)
 	int b = pal5bit(((word >> 3 ) & 0x1E ) | ((word >> 1) & 0x01));
 
 	// Scroll 0
-	if ( (offset >= 0x1c00/2) && (offset <= 0x1fff/2) ) { palette_set_color(machine(), 0x000 + offset - 0x1c00/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x1c00/2) && (offset <= 0x1fff/2) ) { m_palette->set_pen_color(0x000 + offset - 0x1c00/2, rgb_t(r,g,b) ); return;}
 	// Scroll 1
-	if ( (offset >= 0x2c00/2) && (offset <= 0x2fff/2) ) { palette_set_color(machine(), 0x200 + offset - 0x2c00/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x2c00/2) && (offset <= 0x2fff/2) ) { m_palette->set_pen_color(0x200 + offset - 0x2c00/2, rgb_t(r,g,b) ); return;}
 	// Scroll 2
-	if ( (offset >= 0x6c00/2) && (offset <= 0x6fff/2) ) { palette_set_color(machine(), 0x400 + offset - 0x6c00/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x6c00/2) && (offset <= 0x6fff/2) ) { m_palette->set_pen_color(0x400 + offset - 0x6c00/2, rgb_t(r,g,b) ); return;}
 	// Road 0
-	if ( (offset >= 0x3800/2) && (offset <= 0x3fff/2) ) { palette_set_color(machine(), 0x600 + offset - 0x3800/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x3800/2) && (offset <= 0x3fff/2) ) { m_palette->set_pen_color(0x600 + offset - 0x3800/2, rgb_t(r,g,b) ); return;}
 	// Road 1
-	if ( (offset >= 0x4800/2) && (offset <= 0x4fff/2) ) { palette_set_color(machine(), 0xa00 + offset - 0x4800/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x4800/2) && (offset <= 0x4fff/2) ) { m_palette->set_pen_color(0xa00 + offset - 0x4800/2, rgb_t(r,g,b) ); return;}
 	// Sprites
-	if ( (offset >= 0x5000/2) && (offset <= 0x5fff/2) ) { palette_set_color(machine(), 0xe00 + offset - 0x5000/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x5000/2) && (offset <= 0x5fff/2) ) { m_palette->set_pen_color(0xe00 + offset - 0x5000/2, rgb_t(r,g,b) ); return;}
 }
 
 static ADDRESS_MAP_START( cischeat_map, AS_PROGRAM, 16, cischeat_state )
@@ -303,17 +303,17 @@ WRITE16_MEMBER(cischeat_state::f1gpstar_paletteram16_w)
 	int b = pal5bit(((word >> 3 ) & 0x1E ) | ((word >> 1) & 0x01));
 
 	// Scroll 0
-	if ( (offset >= 0x1e00/2) && (offset <= 0x1fff/2) ) { palette_set_color(machine(), 0x000 + offset - 0x1e00/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x1e00/2) && (offset <= 0x1fff/2) ) { m_palette->set_pen_color(0x000 + offset - 0x1e00/2, rgb_t(r,g,b) ); return;}
 	// Scroll 1
-	if ( (offset >= 0x2e00/2) && (offset <= 0x2fff/2) ) { palette_set_color(machine(), 0x100 + offset - 0x2e00/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x2e00/2) && (offset <= 0x2fff/2) ) { m_palette->set_pen_color(0x100 + offset - 0x2e00/2, rgb_t(r,g,b) ); return;}
 	// Scroll 2
-	if ( (offset >= 0x6e00/2) && (offset <= 0x6fff/2) ) { palette_set_color(machine(), 0x200 + offset - 0x6e00/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x6e00/2) && (offset <= 0x6fff/2) ) { m_palette->set_pen_color(0x200 + offset - 0x6e00/2, rgb_t(r,g,b) ); return;}
 	// Road 0
-	if ( (offset >= 0x3800/2) && (offset <= 0x3fff/2) ) { palette_set_color(machine(), 0x300 + offset - 0x3800/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x3800/2) && (offset <= 0x3fff/2) ) { m_palette->set_pen_color(0x300 + offset - 0x3800/2, rgb_t(r,g,b) ); return;}
 	// Road 1
-	if ( (offset >= 0x4800/2) && (offset <= 0x4fff/2) ) { palette_set_color(machine(), 0x700 + offset - 0x4800/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x4800/2) && (offset <= 0x4fff/2) ) { m_palette->set_pen_color(0x700 + offset - 0x4800/2, rgb_t(r,g,b) ); return;}
 	// Sprites
-	if ( (offset >= 0x5000/2) && (offset <= 0x5fff/2) ) { palette_set_color(machine(), 0xb00 + offset - 0x5000/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x5000/2) && (offset <= 0x5fff/2) ) { m_palette->set_pen_color(0xb00 + offset - 0x5000/2, rgb_t(r,g,b) ); return;}
 }
 
 /*  F1 GP Star tests:
@@ -384,11 +384,11 @@ WRITE16_MEMBER(cischeat_state::scudhamm_paletteram16_w)
 	int b = pal5bit(((newword >> 3 ) & 0x1E ) | ((newword >> 1) & 0x01));
 
 	// Scroll 0
-	if ( (offset >= 0x1e00/2) && (offset <= 0x1fff/2) ) { palette_set_color(machine(), 0x000 + offset - 0x1e00/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x1e00/2) && (offset <= 0x1fff/2) ) { m_palette->set_pen_color(0x000 + offset - 0x1e00/2, rgb_t(r,g,b) ); return;}
 	// Scroll 2
-	if ( (offset >= 0x4e00/2) && (offset <= 0x4fff/2) ) { palette_set_color(machine(), 0x100 + offset - 0x4e00/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x4e00/2) && (offset <= 0x4fff/2) ) { m_palette->set_pen_color(0x100 + offset - 0x4e00/2, rgb_t(r,g,b) ); return;}
 	// Sprites
-	if ( (offset >= 0x3000/2) && (offset <= 0x3fff/2) ) { palette_set_color(machine(), 0x200 + offset - 0x3000/2, rgb_t(r,g,b) ); return;}
+	if ( (offset >= 0x3000/2) && (offset <= 0x3fff/2) ) { m_palette->set_pen_color(0x200 + offset - 0x3000/2, rgb_t(r,g,b) ); return;}
 }
 
 
@@ -1569,7 +1569,7 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_HAS_SHADOWS)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(30) //TODO: wrong!
@@ -1579,7 +1579,8 @@ static MACHINE_CONFIG_START( bigrun, cischeat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_bigrun)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bigrun)
-	MCFG_PALETTE_LENGTH(16*16 * 3 + 64*16 * 2 + 64*16)  /* scroll 0,1,2; road 0,1; sprites */
+	MCFG_PALETTE_ADD("palette", 16*16 * 3 + 64*16 * 2 + 64*16)  /* scroll 0,1,2; road 0,1; sprites */
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(cischeat_state,bigrun)
 
@@ -1621,7 +1622,8 @@ static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_cischeat)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cischeat)
-	MCFG_PALETTE_LENGTH(32*16 * 3 + 64*16 * 2 + 128*16) /* scroll 0,1,2; road 0,1; sprites */
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(32*16 * 3 + 64*16 * 2 + 128*16) /* scroll 0,1,2; road 0,1; sprites */
 
 	MCFG_VIDEO_START_OVERRIDE(cischeat_state,cischeat)
 MACHINE_CONFIG_END
@@ -1647,7 +1649,8 @@ static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", f1gpstar)
-	MCFG_PALETTE_LENGTH(16*16 * 3 + 64*16 * 2 + 128*16) /* scroll 0,1,2; road 0,1; sprites */
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(16*16 * 3 + 64*16 * 2 + 128*16) /* scroll 0,1,2; road 0,1; sprites */
 
 	MCFG_VIDEO_START_OVERRIDE(cischeat_state,f1gpstar)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1702,7 +1705,7 @@ static MACHINE_CONFIG_START( scudhamm, cischeat_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, scudhamm_scanline, "screen", 0, 1)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_HAS_SHADOWS)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(30) //TODO: wrong!
@@ -1712,7 +1715,8 @@ static MACHINE_CONFIG_START( scudhamm, cischeat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", scudhamm)
-	MCFG_PALETTE_LENGTH(16*16+16*16+128*16)
+	MCFG_PALETTE_ADD("palette", 16*16+16*16+128*16)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	MCFG_VIDEO_START_OVERRIDE(cischeat_state,f1gpstar)
 

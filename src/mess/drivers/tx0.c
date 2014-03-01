@@ -228,7 +228,7 @@ static GFXDECODE_START( tx0 )
 GFXDECODE_END
 
 /* Initialise the palette */
-void tx0_state::palette_init()
+PALETTE_INIT_MEMBER(tx0_state, tx0)
 {
 	/* rgb components for the two color emissions */
 	const double r1 = .1, g1 = .1, b1 = .924, r2 = .7, g2 = .7, b2 = .076;
@@ -246,8 +246,6 @@ void tx0_state::palette_init()
 #endif
 	UINT8 i, r, g, b;
 
-	machine().colortable = colortable_alloc(machine(), total_colors_needed);
-
 	/* initialize CRT palette */
 
 	/* compute the decay factor per refresh frame */
@@ -263,7 +261,7 @@ void tx0_state::palette_init()
 		g = (int) ((g1*cur_level_1 + g2*cur_level_2) + .5);
 		b = (int) ((b1*cur_level_1 + b2*cur_level_2) + .5);
 		/* write color in palette */
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 		/* apply decay for next iteration */
 		cur_level_1 *= decay_1;
 		cur_level_2 *= decay_2;
@@ -283,22 +281,22 @@ void tx0_state::palette_init()
 	    mame_printf_debug("File %s line %d: Please take higher value for pen_crt_num_levels or smaller value for decay\n", __FILE__, __LINE__);*/
 #endif
 #endif
-	colortable_palette_set_color(machine().colortable, 0, rgb_t(0, 0, 0));
+	palette.set_indirect_color(0, rgb_t(0, 0, 0));
 
 	/* load static palette */
 	for ( i = 0; i < 6; i++ )
 	{
 		r = tx0_colors[i*3]; g = tx0_colors[i*3+1]; b = tx0_colors[i*3+2];
-		colortable_palette_set_color(machine().colortable, pen_crt_num_levels + i, rgb_t(r, g, b));
+		palette.set_indirect_color(pen_crt_num_levels + i, rgb_t(r, g, b));
 	}
 
 	/* copy colortable to palette */
 	for( i = 0; i < total_colors_needed; i++ )
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* set up palette for text */
 	for( i = 0; i < 6; i++ )
-		colortable_entry_set_value(machine().colortable, total_colors_needed + i, tx0_palette[i]);
+		palette.set_pen_indirect(total_colors_needed + i, tx0_palette[i]);
 }
 
 
@@ -1598,8 +1596,8 @@ static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 	MCFG_DEVICE_ADD("magtape", TX0_MAGTAPE, 0)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tx0)
-	MCFG_PALETTE_LENGTH(pen_crt_num_levels + sizeof(tx0_colors) / 3 + sizeof(tx0_palette))
-
+	MCFG_PALETTE_ADD("palette", pen_crt_num_levels + sizeof(tx0_colors) / 3 + sizeof(tx0_palette))
+	MCFG_PALETTE_INIT_OWNER(tx0_state, tx0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tx0_8kw, tx0_64kw )

@@ -39,10 +39,11 @@ public:
 	
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
-	UINT8      *m_objram;           /* Sprite RAM */
+	dynamic_array<UINT8> m_objram;           /* Sprite RAM */
 	int        m_flipscreen;
 	int        m_video_bank;
 	int        m_paletteram_bank;
+	dynamic_array<UINT8> m_paletteram;
 
 	/* sound-related */
 	int        m_sample_buffer;
@@ -82,8 +83,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mstworld_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(pang_paletteram_w);
 	DECLARE_READ8_MEMBER(pang_paletteram_r);
-	DECLARE_WRITE8_MEMBER(mgakuen_paletteram_w);
-	DECLARE_READ8_MEMBER(mgakuen_paletteram_r);
 	DECLARE_WRITE8_MEMBER(eeprom_cs_w);
 	DECLARE_WRITE8_MEMBER(eeprom_clock_w);
 	DECLARE_WRITE8_MEMBER(eeprom_serial_w);

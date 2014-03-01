@@ -26,9 +26,6 @@ PALETTE_INIT_MEMBER(gberet_state,gberet)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x20);
-
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
 	{
@@ -53,7 +50,7 @@ PALETTE_INIT_MEMBER(gberet_state,gberet)
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -62,7 +59,7 @@ PALETTE_INIT_MEMBER(gberet_state,gberet)
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	for (i = 0x100; i < 0x200; i++)
@@ -74,7 +71,7 @@ PALETTE_INIT_MEMBER(gberet_state,gberet)
 		else
 			ctabentry = 0;
 
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -121,7 +118,7 @@ TILE_GET_INFO_MEMBER(gberet_state::get_bg_tile_info)
 VIDEO_START_MEMBER(gberet_state,gberet)
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gberet_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, m_gfxdecode->gfx(0), 0x10);
+	m_palette->configure_tilemap_groups(*m_bg_tilemap, *m_gfxdecode->gfx(0), 0x10);
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
@@ -155,8 +152,8 @@ void gberet_state::gberet_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(1)->transmask(bitmap,cliprect, code, color, flipx, flipy, sx, sy,
-				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0));
+			m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy,
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0));
 		}
 	}
 }
@@ -207,8 +204,8 @@ void gberet_state::gberetb_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(1)->transmask(bitmap,cliprect, code, color, flipx, flipy, sx, sy,
-				colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0));
+			m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect, code, color, flipx, flipy, sx, sy,
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0));
 		}
 	}
 }

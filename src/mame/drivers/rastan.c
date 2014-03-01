@@ -202,7 +202,7 @@ WRITE8_MEMBER(rastan_state::rastan_msm5205_stop_w)
 static ADDRESS_MAP_START( rastan_map, AS_PROGRAM, 16, rastan_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x350008, 0x350009) AM_WRITENOP    /* 0 only (often) ? */
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(rastan_spritectrl_w)  /* sprite palette bank, coin counters & lockout */
 	AM_RANGE(0x390000, 0x390001) AM_READ_PORT("P1")
@@ -401,12 +401,15 @@ static MACHINE_CONFIG_START( rastan, rastan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rastan_state, screen_update_rastan)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", rastan)
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_PC080SN_ADD("pc080sn", rastan_pc080sn_intf)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	MCFG_PC080SN_PALETTE("palette")
 	MCFG_PC090OJ_ADD("pc090oj", rastan_pc090oj_intf)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
+	MCFG_PC090OJ_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -78,7 +78,7 @@ void shangha3_state::video_start()
 	{
 		/* Prepare the shadow table */
 		for (i = 0;i < 128;i++)
-			machine().shadow_table[i] = i+128;
+			m_palette->shadow_table()[i] = i+128;
 	}
 }
 
@@ -206,7 +206,7 @@ WRITE16_MEMBER(shangha3_state::shangha3_blitter_go_w)
 						if (flipy) dy = sy + sizey-15 - dy;
 						else dy = sy + dy;
 
-						m_gfxdecode->gfx(0)->transpen(rawbitmap,myclip,
+						m_gfxdecode->gfx(0)->transpen(m_palette,rawbitmap,myclip,
 								(tile & 0x0fff) | (code & 0xf000),
 								(tile >> 12) | (color & 0x70),
 								flipx,flipy,
@@ -219,26 +219,26 @@ WRITE16_MEMBER(shangha3_state::shangha3_blitter_go_w)
 				int w;
 
 if (zoomx <= 1 && zoomy <= 1)
-	m_gfxdecode->gfx(0)->zoom_transtable(rawbitmap,myclip,
+	m_gfxdecode->gfx(0)->zoom_transtable(m_palette,rawbitmap,myclip,
 			code,
 			color,
 			flipx,flipy,
 			sx,sy,
 			0x1000000,0x1000000,
-			drawmode_table,machine().shadow_table);
+			drawmode_table,m_palette->shadow_table());
 else
 {
 				w = (sizex+15)/16;
 
 				for (x = 0;x < w;x++)
 				{
-					m_gfxdecode->gfx(0)->zoom_transtable(rawbitmap,myclip,
+					m_gfxdecode->gfx(0)->zoom_transtable(m_palette,rawbitmap,myclip,
 							code,
 							color,
 							flipx,flipy,
 							sx + 16*x,sy,
 							(0x200-zoomx)*0x100,(0x200-zoomy)*0x100,
-							drawmode_table,machine().shadow_table);
+							drawmode_table,m_palette->shadow_table());
 
 					if ((code & 0x000f) == 0x0f)
 						code = (code + 0x100) & 0xfff0;

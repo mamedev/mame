@@ -102,7 +102,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pipeline);
 	UINT32 screen_update_pipeline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
 	required_device<cpu_device> m_maincpu;
@@ -168,7 +168,7 @@ WRITE8_MEMBER(pipeline_state::vram2_w)
 			if(offset<0x300)
 			{
 			offset&=0xff;
-			palette_set_color_rgb(machine(), offset, pal6bit(m_palram[offset]), pal6bit(m_palram[offset+0x100]), pal6bit(m_palram[offset+0x200]));
+			m_palette->set_pen_color(offset, pal6bit(m_palram[offset]), pal6bit(m_palram[offset+0x100]), pal6bit(m_palram[offset+0x200]));
 			}
 	}
 }
@@ -369,7 +369,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
-void pipeline_state::palette_init()
+PALETTE_INIT_MEMBER(pipeline_state, pipeline)
 {
 	int r,g,b,i,c;
 	UINT8 *prom1 = &memregion("proms")->base()[0x000];
@@ -384,7 +384,7 @@ void pipeline_state::palette_init()
 		r*=36;
 		g*=36;
 		b*=85;
-		palette_set_color(machine(), 0x100+i, rgb_t(r, g, b));
+		palette.set_pen_color(0x100+i, rgb_t(r, g, b));
 	}
 }
 
@@ -419,8 +419,8 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pipeline)
 
-	MCFG_PALETTE_LENGTH(0x100+0x100)
-
+	MCFG_PALETTE_ADD("palette", 0x100+0x100)
+	MCFG_PALETTE_INIT_OWNER(pipeline_state, pipeline)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

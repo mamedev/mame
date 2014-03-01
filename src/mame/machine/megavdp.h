@@ -203,6 +203,7 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// called when we hit 240 and 241 (used to control the z80 irq line on genesis, or the main irq on c2)
 	devcb2_write_line m_genesis_vdp_sndirqline_callback;
@@ -296,7 +297,6 @@ private:
 
 	address_space *m_space68k;
 	m68000_base_device* m_cpu68k;
-
 };
 
 

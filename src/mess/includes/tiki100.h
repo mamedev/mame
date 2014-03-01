@@ -124,7 +124,7 @@ public:
 	/* video state */
 	UINT8 m_scroll;
 	UINT8 m_mode;
-	UINT8 m_palette;
+	UINT8 m_palette_val;
 
 	/* keyboard state */
 	int m_keylatch;

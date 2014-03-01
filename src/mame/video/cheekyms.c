@@ -15,7 +15,7 @@ Functions to emulate the video hardware of the machine.
 /* bit 3 and 7 of the char color PROMs are used for something -- not currently emulated -
    thus GAME_IMPERFECT_GRAPHICS */
 
-void cheekyms_state::palette_init()
+PALETTE_INIT_MEMBER(cheekyms_state, cheekyms)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i, j, bit, r, g, b;
@@ -34,7 +34,7 @@ void cheekyms_state::palette_init()
 			bit = (color_prom[0x20 * (i / 2) + j] >> ((4 * (i & 1)) + 2)) & 0x01;
 			b = 0xff * bit;
 
-			palette_set_color(machine(), (i * 0x20) + j, rgb_t(r,g,b));
+			palette.set_pen_color((i * 0x20) + j, rgb_t(r,g,b));
 		}
 	}
 }
@@ -123,19 +123,19 @@ void cheekyms_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			if (!flip)
 				code++;
 
-			 gfx->transpen(bitmap,cliprect, code, color, 0, 0, x, y, 0);
+			 gfx->transpen(m_palette,bitmap,cliprect, code, color, 0, 0, x, y, 0);
 		}
 		else
 		{
 			if (m_spriteram[offs + 0] & 0x02)
 			{
-				 gfx->transpen(bitmap,cliprect, code | 0x20, color, 0, 0,        x, y, 0);
-				 gfx->transpen(bitmap,cliprect, code | 0x21, color, 0, 0, 0x10 + x, y, 0);
+				 gfx->transpen(m_palette,bitmap,cliprect, code | 0x20, color, 0, 0,        x, y, 0);
+				 gfx->transpen(m_palette,bitmap,cliprect, code | 0x21, color, 0, 0, 0x10 + x, y, 0);
 			}
 			else
 			{
-				 gfx->transpen(bitmap,cliprect, code | 0x20, color, 0, 0, x,        y, 0);
-				 gfx->transpen(bitmap,cliprect, code | 0x21, color, 0, 0, x, 0x10 + y, 0);
+				 gfx->transpen(m_palette,bitmap,cliprect, code | 0x20, color, 0, 0, x,        y, 0);
+				 gfx->transpen(m_palette,bitmap,cliprect, code | 0x21, color, 0, 0, x, 0x10 + y, 0);
 			}
 		}
 	}

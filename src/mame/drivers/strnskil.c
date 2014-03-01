@@ -352,8 +352,8 @@ static MACHINE_CONFIG_START( strnskil, strnskil_state )
 	MCFG_SCREEN_UPDATE_DRIVER(strnskil_state, screen_update_strnskil)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", strnskil)
-	MCFG_PALETTE_LENGTH(1024)
-
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INIT_OWNER(strnskil_state, strnskil)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

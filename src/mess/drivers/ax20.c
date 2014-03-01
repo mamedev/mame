@@ -48,7 +48,7 @@ UINT32 ax20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		{
 			UINT16 tile = m_p_vram[24 +  y * 128 + x ] & 0x7f;
 
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*12);
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect, tile, 0, 0, 0, x*8, y*12);
 		}
 	}
 
@@ -119,8 +119,7 @@ static MACHINE_CONFIG_START( ax20, ax20_state )
 	MCFG_SCREEN_SIZE(80*8, 24*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*12-1)
 	MCFG_GFXDECODE_ADD("gfxdecode", ax20)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* Devices */
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, ax20_floppy_interface)

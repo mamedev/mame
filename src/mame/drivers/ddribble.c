@@ -286,8 +286,8 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ddribble_state, screen_update_ddribble)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ddribble)
-	MCFG_PALETTE_LENGTH(64 + 256)
-
+	MCFG_PALETTE_ADD("palette", 64 + 256)
+	MCFG_PALETTE_INIT_OWNER(ddribble_state, ddribble)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

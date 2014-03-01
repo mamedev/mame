@@ -23,6 +23,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 	
 	void draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void draw_front_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
@@ -48,6 +49,7 @@ private:
 	UINT32 *       m_char_ram;
 	UINT32 *       m_reg;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	TILEMAP_MAPPER_MEMBER(scan_layer_8x8_0_size0);
 	TILEMAP_MAPPER_MEMBER(scan_layer_8x8_0_size1);
@@ -72,5 +74,8 @@ extern const device_type K001604;
 
 #define MCFG_K001604_GFXDECODE(_gfxtag) \
 	k001604_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_K001604_PALETTE(_palette_tag) \
+	k001604_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

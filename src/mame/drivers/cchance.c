@@ -222,6 +222,7 @@ static MACHINE_CONFIG_START( cchance, cchance_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_SETA001_SPRITE_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -232,8 +233,8 @@ static MACHINE_CONFIG_START( cchance, cchance_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cchance_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_DRIVER(cchance_state, screen_eof_tnzs)
 
-	MCFG_PALETTE_LENGTH(512)
-	MCFG_PALETTE_INIT_OVERRIDE(cchance_state,arknoid2)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(cchance_state,arknoid2)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

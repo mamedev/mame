@@ -704,8 +704,9 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_spectrum)
 	MCFG_SCREEN_VBLANK_DRIVER(spectrum_state, screen_eof_spectrum)
 
-	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(spectrum_state, spectrum )
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(spectrum_state, spectrum )
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", spectrum)
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum )
 

@@ -69,7 +69,7 @@ TODO :
 
 #include "emu.h"
 
-#include "cpu/tms9900/tms9900l.h"
+#include "cpu/tms9900/ti990_10.h"
 #include "sound/beep.h"
 #include "machine/ti99/ti990.h"
 #include "machine/ti99/990_hd.h"
@@ -123,18 +123,20 @@ void ti990_10_state::idle_callback(int state)
 }
 #endif
 
+/*
 static void rset_callback(device_t *device)
 {
-	ti990_cpuboard_reset();
+    ti990_cpuboard_reset();
 
-	/* clear controller panel and smi fault LEDs */
+    // clear controller panel and smi fault LEDs
 }
 
 static void lrex_callback(device_t *device)
 {
-	/* right??? */
-	ti990_hold_load(device->machine());
+    // right???
+    ti990_hold_load(device->machine());
 }
+*/
 
 /*
     TI990/10 video emulation.
@@ -187,37 +189,46 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(ti990_10_io, AS_IO, 8, ti990_10_state )
 	AM_RANGE(0x10, 0x11) AM_DEVREAD_LEGACY("vdt911", vdt911_cru_r)
 	AM_RANGE(0x80, 0x8f) AM_DEVWRITE_LEGACY("vdt911", vdt911_cru_w)
-	AM_RANGE(0x1fa, 0x1fb) AM_READ_LEGACY(ti990_10_mapper_cru_r)
-	AM_RANGE(0x1fc, 0x1fd) AM_READ_LEGACY(ti990_10_eir_cru_r)
+	AM_RANGE(0x1fa, 0x1fb) AM_NOP // AM_READ_LEGACY(ti990_10_mapper_cru_r)
+	AM_RANGE(0x1fc, 0x1fd) AM_NOP // AM_READ_LEGACY(ti990_10_eir_cru_r)
 	AM_RANGE(0x1fe, 0x1ff) AM_READ_LEGACY(ti990_panel_read)
-	AM_RANGE(0xfd0, 0xfdf) AM_WRITE_LEGACY(ti990_10_mapper_cru_w)
-	AM_RANGE(0xfe0, 0xfef) AM_WRITE_LEGACY(ti990_10_eir_cru_w)
+	AM_RANGE(0xfd0, 0xfdf) AM_NOP // AM_WRITE_LEGACY(ti990_10_mapper_cru_w)
+	AM_RANGE(0xfe0, 0xfef) AM_NOP // AM_WRITE_LEGACY(ti990_10_eir_cru_w)
 	AM_RANGE(0xff0, 0xfff) AM_WRITE_LEGACY(ti990_panel_write)
 
 ADDRESS_MAP_END
 
+/*
 static const ti990_10reset_param reset_params =
 {
-	/*idle_callback*/NULL,
-	rset_callback,
-	lrex_callback,
-	ti990_ckon_ckof_callback,
+    NULL,
+    rset_callback,
+    lrex_callback,
+    ti990_ckon_ckof_callback,
 
-	ti990_set_int2
-};
+    ti990_set_int2
+}; */
 
 static const ti990_tpc_interface ti990_tpc =
 {
 	ti990_set_int9
 };
 
+static TMS99xx_CONFIG( cpuconf )
+{
+	DEVCB_NULL, //DEVCB_DRIVER_MEMBER(ti990_10_state, external_operation),
+	DEVCB_NULL, //DEVCB_DRIVER_MEMBER(ti990_10_state, interrupt_level),
+	DEVCB_NULL,     // Instruction acquisition
+	DEVCB_NULL,     // Clock out
+	DEVCB_NULL,     // wait
+	DEVCB_NULL,      // Hold acknowledge
+	DEVCB_NULL     // data bus in
+};
+
 static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
-	MCFG_CPU_ADD("maincpu", TI990_10L, 4000000)
-	MCFG_CPU_CONFIG(reset_params)
-	MCFG_CPU_PROGRAM_MAP(ti990_10_memmap)
-	MCFG_CPU_IO_MAP(ti990_10_io)
+	MCFG_TMS99xx_ADD("maincpu", TI990_10, 4000000, ti990_10_memmap, ti990_10_io, cpuconf)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ti990_10_state, ti990_10_line_interrupt,  120/*or 100 in Europe*/)
 
 
@@ -228,12 +239,9 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	MCFG_SCREEN_SIZE(560, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ti990_10_state, screen_update_ti990_10)
-
-	MCFG_GFXDECODE_ADD("gfxdecode", vdt911)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_SCREEN_PALETTE("vdt911:palette")
 
 	MCFG_VDT911_VIDEO_ADD("vdt911", vdt911_intf)
-	MCFG_VDT911_VIDEO_GFXDECODE("gfxdecode")
 
 	/* 911 VDT has a beep tone generator */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

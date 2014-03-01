@@ -1550,7 +1550,7 @@ static ADDRESS_MAP_START( bshark_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x800000, 0x800007) AM_READWRITE(bshark_stick_r, bshark_stick_w)
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
@@ -1563,7 +1563,7 @@ static ADDRESS_MAP_START( bsharkjjs_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_ctrl_w)
 //  AM_RANGE(0x800000, 0x800007) AM_READWRITE(bshark_stick_r, bshark_stick_w) /* No analog stick, this is the Joystick version */
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
@@ -1591,7 +1591,7 @@ static ADDRESS_MAP_START( sci_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x200010, 0x20001f) AM_READ(sci_steer_input_r)
 //  AM_RANGE(0x400000, 0x400001) AM_WRITE(cpua_ctrl_w)  // ?? doesn't seem to fit what's written
 	AM_RANGE(0x420000, 0x420003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0xa20000, 0xa2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_SHARE("spriteram")
@@ -1685,7 +1685,7 @@ static ADDRESS_MAP_START( dblaxle_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x400010, 0x40001f) AM_READ(dblaxle_steer_input_r)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(dblaxle_cpua_ctrl_w)  /* could this be causing int6 ? */
 	AM_RANGE(0x620000, 0x620003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)      /* tilemap mirror */
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)      /* tilemaps */
 	AM_RANGE(0xa30000, 0xa3002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
@@ -1710,7 +1710,7 @@ static ADDRESS_MAP_START( racingb_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x300010, 0x30001f) AM_READ(dblaxle_steer_input_r)
 	AM_RANGE(0x500002, 0x500003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x520000, 0x520003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)      /* tilemaps */
 	AM_RANGE(0x930000, 0x93002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_SHARE("spriteram") /* mostly unused ? */
@@ -2993,7 +2993,6 @@ static const tc0480scp_interface taitoz_tc0480scp_intf =
 	0           /* col_base */
 };
 
-static const tc0110pcr_interface taitoz_tc0110pcr_intf = { 0 };
 
 static const tc0150rod_interface taitoz_tc0150rod_intf = { "gfx3" };
 
@@ -3085,14 +3084,16 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_contcirc)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
+	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_ADD("front", 0.0, 0.0,  0.7)
@@ -3148,14 +3149,16 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_chasehq)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", chasehq)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", chasehq_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
+	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_ADD("front",  0.0, 0.0, 0.7)
@@ -3213,14 +3216,16 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_contcirc)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
+	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3274,7 +3279,8 @@ static MACHINE_CONFIG_START( bshark, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_bshark)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
@@ -3346,7 +3352,8 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_sci)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
@@ -3409,14 +3416,16 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_chasehq)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", chasehq)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", chasehq_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
+	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_ADD("front",  0.0, 0.0, 0.7)
@@ -3474,14 +3483,16 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_aquajack)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
+	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3536,12 +3547,13 @@ static MACHINE_CONFIG_START( spacegun, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_spacegun)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
-	MCFG_PALETTE_LENGTH(4096)
-
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", spacegun_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0110PCR_ADD("tc0110pcr", taitoz_tc0110pcr_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr")
+	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3598,7 +3610,8 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_dblaxle)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dblaxle)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
@@ -3661,8 +3674,8 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_racingb)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dblaxle)
-	MCFG_PALETTE_LENGTH(4096)
-
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_TC0480SCP_ADD("tc0480scp", taitoz_tc0480scp_intf)

@@ -126,7 +126,7 @@ public:
 	UINT8   m_io_reg;
 	UINT8   m_irq_status;
 	UINT32  m_dpyaddr;
-	UINT16 *m_palette;
+	UINT16 *m_paletteram;
 	UINT32  m_speedup_count;
 	UINT32  m_tms_io_regs[0x80];
 	bitmap_ind16 m_update_bitmap;
@@ -156,7 +156,7 @@ void rastersp_state::machine_start()
 
 	m_nvram8 = auto_alloc_array(machine(), UINT8, NVRAM_SIZE);
 
-	m_palette = auto_alloc_array(machine(), UINT16, 0x8000);
+	m_paletteram = auto_alloc_array(machine(), UINT16, 0x8000);
 
 	membank("bank1")->set_base(m_dram);
 	membank("bank2")->set_base(&m_dram[0x10000/4]);
@@ -207,7 +207,7 @@ WRITE32_MEMBER( rastersp_state::dpylist_w )
 	// TODO: This should probably be done in sync with the video scan
 	if (m_dpyaddr == 0)
 	{
-		m_update_bitmap.fill(get_black_pen(machine()));
+		m_update_bitmap.fill(m_palette->black_pen());
 		return;
 	}
 
@@ -244,7 +244,7 @@ WRITE32_MEMBER( rastersp_state::dpylist_w )
 				UINT32 pixels = (word2 >> 16) & 0x1ff;
 				UINT32 palbase = (word2 >> 4) & 0xf00;
 
-				UINT16* palptr = &m_palette[palbase];
+				UINT16* palptr = &m_paletteram[palbase];
 				UINT8* srcptr = reinterpret_cast<UINT8*>(&m_dram[0]);
 
 				UINT32 acc = srcaddr << 8;
@@ -300,7 +300,7 @@ void rastersp_state::upload_palette(UINT32 word1, UINT32 word2)
 	while (entries--)
 	{
 		UINT32 data = m_dram[addr / 4];
-		m_palette[index++] = data & 0xffff;
+		m_paletteram[index++] = data & 0xffff;
 		addr += 4;
 	}
 }
@@ -906,8 +906,7 @@ static MACHINE_CONFIG_START( rastersp, rastersp_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRRR_GGGGGG_BBBBB)
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

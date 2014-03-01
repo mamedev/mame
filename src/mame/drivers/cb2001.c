@@ -72,7 +72,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_cb2001_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_cb2001_reel3_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(cb2001);
 	UINT32 screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;
@@ -340,7 +340,7 @@ e3 -> c6
 UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count,x,y;
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	count = 0x0000;
 
@@ -361,7 +361,7 @@ UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &b
 					tile += m_videobank*0x2000;
 
 
-					m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,colour,0,0,x*8,y*8);
+					m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tile,colour,0,0,x*8,y*8);
 
 					count++;
 				}
@@ -427,7 +427,7 @@ UINT32 cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 &b
 				tile += 0x1000;
 			}
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,tile,colour,0,0,x*8,y*8,0);
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,tile,colour,0,0,x*8,y*8,0);
 			count++;
 		}
 	}
@@ -775,7 +775,7 @@ static GFXDECODE_START( cb2001 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout32, 0x0, 32 )
 GFXDECODE_END
 
-void cb2001_state::palette_init()
+PALETTE_INIT_MEMBER(cb2001_state, cb2001)
 {
 	int i;
 	for (i = 0; i < 0x200; i++)
@@ -795,11 +795,11 @@ void cb2001_state::palette_init()
 
 		if (length==0x400) // are the cb2001 proms dumped incorrectly?
 		{
-			if (!(i&0x20)) palette_set_color(machine(), (i&0x1f) | ((i&~0x3f)>>1), rgb_t(r, g, b));
+			if (!(i&0x20)) palette.set_pen_color((i&0x1f) | ((i&~0x3f)>>1), rgb_t(r, g, b));
 		}
 		else
 		{
-			palette_set_color(machine(), i, rgb_t(r, g, b));
+			palette.set_pen_color(i, rgb_t(r, g, b));
 		}
 	}
 }
@@ -854,8 +854,8 @@ static MACHINE_CONFIG_START( cb2001, cb2001_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cb2001_state, screen_update_cb2001)
 
-	MCFG_PALETTE_LENGTH(0x100)
-
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(cb2001_state, cb2001)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

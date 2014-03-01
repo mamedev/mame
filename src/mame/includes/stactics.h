@@ -12,7 +12,7 @@ class stactics_state : public driver_device
 public:
 	stactics_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_palette(*this, "palette"),
+		m_palette_val(*this, "paletteram"),
 		m_motor_on(*this, "motor_on"),
 		m_lamps(*this, "lamps"),
 		m_display_buffer(*this, "display_buffer"),
@@ -27,7 +27,7 @@ public:
 	int    m_horiz_pos;
 	/* video state */
 
-	required_shared_ptr<UINT8> m_palette;
+	required_shared_ptr<UINT8> m_palette_val;
 	required_shared_ptr<UINT8> m_motor_on;
 	required_shared_ptr<UINT8> m_lamps;
 	required_shared_ptr<UINT8> m_display_buffer;

@@ -73,7 +73,7 @@ WRITE8_MEMBER(amspdwy_state::amspdwy_sound_w)
 
 static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                                             // ROM
-	AM_RANGE(0x8000, 0x801f) AM_WRITE(amspdwy_paletteram_w) AM_SHARE("paletteram")// Palette
+	AM_RANGE(0x8000, 0x801f) AM_WRITE(amspdwy_paletteram_w) AM_SHARE("palette")// Palette
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_SHARE("videoram")    // Layer, mirrored?
 	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_SHARE("colorram")  // Layer
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM                                             // Unused?
@@ -274,8 +274,8 @@ static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(amspdwy_state, screen_update_amspdwy)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", amspdwy)
-	MCFG_PALETTE_LENGTH(32)
-
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

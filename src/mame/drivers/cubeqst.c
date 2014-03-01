@@ -62,7 +62,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(cubeqst);
 	UINT32 screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
@@ -95,7 +95,7 @@ void cubeqst_state::video_start()
 }
 
 /* TODO: Use resistor values */
-void cubeqst_state::palette_init()
+PALETTE_INIT_MEMBER(cubeqst_state, cubeqst)
 {
 	int i;
 

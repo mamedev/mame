@@ -35,6 +35,7 @@ driver_device::driver_device(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, "Driver Device", tag, NULL, 0, "", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_generic_paletteram_8(*this, "paletteram"),
 		m_generic_paletteram2_8(*this, "paletteram2"),
 		m_generic_paletteram_16(*this, "paletteram"),
@@ -129,16 +130,6 @@ void driver_device::machine_start()
 //-------------------------------------------------
 
 void driver_device::sound_start()
-{
-}
-
-
-//-------------------------------------------------
-//  palette_init - default implementation which
-//  does nothing
-//-------------------------------------------------
-
-void driver_device::palette_init()
 {
 }
 
@@ -239,12 +230,6 @@ void driver_device::device_start()
 
 	// finish image devices init process
 	image_postdevice_init(machine());
-
-	// call palette_init if present
-	if (!m_callbacks[CB_PALETTE_INIT].isnull())
-		m_callbacks[CB_PALETTE_INIT]();
-	else
-		palette_init();
 
 	// start the various pieces
 	driver_start();
@@ -600,123 +585,6 @@ void driver_device::flip_screen_y_set(UINT32 on)
 
 
 //**************************************************************************
-//  8-BIT PALETTE WRITE HANDLERS
-//**************************************************************************
-
-// 3-3-2 RGB palette write handlers
-WRITE8_MEMBER( driver_device::paletteram_BBGGGRRR_byte_w ) { palette_8bit_byte_w<3,3,2, 0,3,6>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_RRRGGGBB_byte_w ) { palette_8bit_byte_w<3,3,2, 5,2,0>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_BBGGRRII_byte_w )
-{
-	m_generic_paletteram_8[offset] = data;
-	int i = (data >> 0) & 3;
-	palette_set_color_rgb(machine(), offset, pal4bit(((data >> 0) & 0x0c) | i),
-										pal4bit(((data >> 2) & 0x0c) | i),
-										pal4bit(((data >> 4) & 0x0c) | i));
-}
-
-
-
-//**************************************************************************
-//  16-BIT PALETTE WRITE HANDLERS
-//**************************************************************************
-
-// 4-4-4 RGB palette write handlers
-WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_byte_le_w ) { palette_16bit_byte_le_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_byte_be_w ) { palette_16bit_byte_be_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
-WRITE16_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_word_w ) { palette_16bit_word_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
-
-WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_byte_le_w ) { palette_16bit_byte_le_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_byte_be_w ) { palette_16bit_byte_be_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
-WRITE16_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_word_w ) { palette_16bit_word_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
-
-WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRBBBBGGGG_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 8,0,4>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRBBBBGGGG_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 8,0,4>(space, offset, data, mem_mask); }
-
-WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_byte_le_w ) { palette_16bit_byte_le_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_byte_be_w ) { palette_16bit_byte_be_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
-WRITE16_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_word_w ) { palette_16bit_word_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
-
-WRITE8_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_byte_be_w ) { palette_16bit_byte_be_w<4,4,4, 12,8,4>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 12,8,4>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 12,8,4>(space, offset, data, mem_mask); }
-WRITE16_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_word_w ) { palette_16bit_word_w<4,4,4, 12,8,4>(space, offset, data, mem_mask); }
-
-// 4-4-4-4 IRGB palette write handlers
-template<int _IShift, int _RShift, int _GShift, int _BShift>
-inline void set_color_irgb(running_machine &machine, pen_t color, UINT16 data)
-{
-	static const UINT8 ztable[16] = { 0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11 };
-	UINT8 i = ztable[(data >> _IShift) & 15];
-	UINT8 r = ((data >> _RShift) & 15) * i;
-	UINT8 g = ((data >> _GShift) & 15) * i;
-	UINT8 b = ((data >> _BShift) & 15) * i;
-	palette_set_color_rgb(machine, color, r, g, b);
-}
-
-WRITE16_MEMBER( driver_device::paletteram_IIIIRRRRGGGGBBBB_word_w )
-{
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	set_color_irgb<12,8,4,0>(machine(), offset, m_generic_paletteram_16[offset]);
-}
-
-WRITE16_MEMBER( driver_device::paletteram_RRRRGGGGBBBBIIII_word_w )
-{
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	set_color_irgb<0,12,8,4>(machine(), offset, m_generic_paletteram_16[offset]);
-}
-
-// 5-5-5 RGB palette write handlers
-WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_le_w ) { palette_16bit_byte_le_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_be_w ) { palette_16bit_byte_be_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
-WRITE16_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_word_w ) { palette_16bit_word_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
-
-WRITE8_MEMBER( driver_device::paletteram_xBBBBBRRRRRGGGGG_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<5,5,5, 5,0,10>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xBBBBBRRRRRGGGGG_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<5,5,5, 5,0,10>(space, offset, data, mem_mask); }
-
-WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_byte_le_w ) { palette_16bit_byte_le_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_byte_be_w ) { palette_16bit_byte_be_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
-WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
-WRITE16_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_word_w ) { palette_16bit_word_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
-WRITE32_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_dword_be_w ) { palette_16bit_dword_be_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
-WRITE32_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_dword_le_w ) { palette_16bit_dword_le_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
-
-WRITE8_MEMBER( driver_device::paletteram_xGGGGGRRRRRBBBBB_byte_le_w ) { palette_16bit_byte_le_w<5,5,5, 5,10,0>(space, offset, data, mem_mask); }
-
-WRITE16_MEMBER( driver_device::paletteram_xGGGGGRRRRRBBBBB_word_w ) { palette_16bit_word_w<5,5,5, 5,10,0>(space, offset, data, mem_mask); }
-WRITE16_MEMBER( driver_device::paletteram_xGGGGGBBBBBRRRRR_word_w ) { palette_16bit_word_w<5,5,5, 0,10,5>(space, offset, data, mem_mask); }
-WRITE16_MEMBER( driver_device::paletteram_RRRRRGGGGGBBBBBx_word_w ) { palette_16bit_word_w<5,5,5, 11,6,1>(space, offset, data, mem_mask); }
-WRITE16_MEMBER( driver_device::paletteram_GGGGGRRRRRBBBBBx_word_w ) { palette_16bit_word_w<5,5,5, 6,11,1>(space, offset, data, mem_mask); }
-WRITE16_MEMBER( driver_device::paletteram_RRRRGGGGBBBBRGBx_word_w )
-{
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	data = m_generic_paletteram_16[offset];
-	palette_set_color_rgb(machine(), offset, pal5bit(((data >> 11) & 0x1e) | ((data >> 3) & 0x01)),
-											pal5bit(((data >>  7) & 0x1e) | ((data >> 2) & 0x01)),
-											pal5bit(((data >>  3) & 0x1e) | ((data >> 1) & 0x01)));
-}
-
-
-//**************************************************************************
-//  32-BIT PALETTE WRITE HANDLERS
-//**************************************************************************
-
-// 8-8-8 RGB palette write handlers
-WRITE16_MEMBER( driver_device::paletteram_xrgb_word_be_w ) { palette_32bit_word_be_w<8,8,8, 16,8,0>(space, offset, data, mem_mask); }
-WRITE16_MEMBER( driver_device::paletteram_xbgr_word_be_w ) { palette_32bit_word_be_w<8,8,8, 0,8,16>(space, offset, data, mem_mask); }
-
-
-
-//**************************************************************************
 //  MISC READ/WRITE HANDLERS
 //**************************************************************************
 
@@ -732,142 +600,4 @@ READ8_MEMBER( driver_device::fatal_generic_read )
 WRITE8_MEMBER( driver_device::fatal_generic_write )
 {
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
-}
-
-
-/***************************************************************************
-    COMMON PALETTE INITIALIZATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    black - completely black palette
--------------------------------------------------*/
-
-PALETTE_INIT_MEMBER(driver_device, all_black)
-{
-	int i;
-
-	for (i = 0; i < machine().total_colors(); i++)
-	{
-		palette_set_color(machine(),i,rgb_t::black); /* black */
-	}
-}
-
-
-/*-------------------------------------------------
-    black_and_white - basic 2-color black & white
--------------------------------------------------*/
-
-PALETTE_INIT_MEMBER(driver_device, black_and_white)
-{
-	palette_set_color(machine(),0,rgb_t::black); /* black */
-	palette_set_color(machine(),1,rgb_t::white); /* white */
-}
-
-
-/*-------------------------------------------------
-    monochrome_amber - 2-color black & amber
--------------------------------------------------*/
-
-PALETTE_INIT_MEMBER(driver_device, monochrome_amber)
-{
-	palette_set_color(machine(), 0, rgb_t::black); /* black */
-	palette_set_color_rgb(machine(), 1, 0xf7, 0xaa, 0x00); /* amber */
-}
-
-
-/*-------------------------------------------------
-    monochrome_green - 2-color black & green
--------------------------------------------------*/
-
-PALETTE_INIT_MEMBER(driver_device, monochrome_green)
-{
-	palette_set_color(machine(), 0, rgb_t::black); /* black */
-	palette_set_color_rgb(machine(), 1, 0x00, 0xff, 0x00); /* green */
-}
-
-
-/*-------------------------------------------------
-    RRRR_GGGG_BBBB - standard 4-4-4 palette,
-    assuming the commonly used resistor values:
-
-    bit 3 -- 220 ohm resistor  -- RED/GREEN/BLUE
-          -- 470 ohm resistor  -- RED/GREEN/BLUE
-          -- 1  kohm resistor  -- RED/GREEN/BLUE
-    bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
--------------------------------------------------*/
-
-PALETTE_INIT_MEMBER(driver_device, RRRR_GGGG_BBBB)
-{
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	int i;
-
-	for (i = 0; i < machine().total_colors(); i++)
-	{
-		int bit0,bit1,bit2,bit3,r,g,b;
-
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		/* green component */
-		bit0 = (color_prom[i + machine().total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[i + machine().total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[i + machine().total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[i + machine().total_colors()] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		/* blue component */
-		bit0 = (color_prom[i + 2*machine().total_colors()] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*machine().total_colors()] >> 1) & 0x01;
-		bit2 = (color_prom[i + 2*machine().total_colors()] >> 2) & 0x01;
-		bit3 = (color_prom[i + 2*machine().total_colors()] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color(machine(),i,rgb_t(r,g,b));
-	}
-}
-
-
-
-/*-------------------------------------------------
-    RRRRR_GGGGG_BBBBB/BBBBB_GGGGG_RRRRR -
-    standard 5-5-5 palette for games using a
-    15-bit color space
--------------------------------------------------*/
-
-PALETTE_INIT_MEMBER(driver_device, RRRRR_GGGGG_BBBBB)
-{
-	int i;
-
-	for (i = 0; i < 0x8000; i++)
-		palette_set_color(machine(), i, rgb_t(pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0)));
-}
-
-
-PALETTE_INIT_MEMBER(driver_device, BBBBB_GGGGG_RRRRR)
-{
-	int i;
-
-	for (i = 0; i < 0x8000; i++)
-		palette_set_color(machine(), i, rgb_t(pal5bit(i >> 0), pal5bit(i >> 5), pal5bit(i >> 10)));
-}
-
-
-
-/*-------------------------------------------------
-    RRRRR_GGGGGG_BBBBB -
-    standard 5-6-5 palette for games using a
-    16-bit color space
--------------------------------------------------*/
-
-PALETTE_INIT_MEMBER(driver_device, RRRRR_GGGGGG_BBBBB)
-{
-	int i;
-
-	for (i = 0; i < 0x10000; i++)
-		palette_set_color(machine(), i, rgb_t(pal5bit(i >> 11), pal6bit(i >> 5), pal5bit(i >> 0)));
 }

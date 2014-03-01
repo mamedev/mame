@@ -403,8 +403,8 @@ static MACHINE_CONFIG_START( 4roses, _4roses_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 4roses)
 
-	MCFG_PALETTE_LENGTH(0x1000)
-	MCFG_PALETTE_INIT_OVERRIDE(_4roses_state,funworld)
+	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_PALETTE_INIT_OWNER(_4roses_state,funworld)
 	MCFG_VIDEO_START_OVERRIDE(_4roses_state,funworld)
 
 //  MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8, mc6845_intf) /* 2MHz, guess */

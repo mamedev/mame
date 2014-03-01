@@ -25,7 +25,7 @@ void dec0_state::update_24bitcol(int offset)
 	g = (m_generic_paletteram_16[offset] >> 8) & 0xff;
 	b = (m_generic_paletteram2_16[offset] >> 0) & 0xff;
 
-	palette_set_color(machine(),offset,rgb_t(r,g,b));
+	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
 WRITE16_MEMBER(dec0_state::dec0_paletteram_rg_w)
@@ -266,7 +266,7 @@ UINT32 dec0_state::screen_update_birdtry(screen_device &screen, bitmap_ind16 &bi
 
 	/* This game doesn't have the extra playfield chip on the game board, but
 	the palette does show through. */
-	bitmap.fill(machine().pens[768], cliprect);
+	bitmap.fill(m_palette->pen(768), cliprect);
 	m_tilegen2->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	m_spritegen->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram, 0x00, 0x00, 0x0f);
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);

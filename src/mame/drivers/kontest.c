@@ -54,8 +54,8 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 public:
+	DECLARE_PALETTE_INIT(kontest);
 	INTERRUPT_GEN_MEMBER(kontest_interrupt);
 };
 
@@ -66,7 +66,7 @@ public:
 
 ***************************************************************************/
 
-void kontest_state::palette_init()
+PALETTE_INIT_MEMBER(kontest_state, kontest)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
@@ -87,7 +87,7 @@ void kontest_state::palette_init()
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -135,7 +135,7 @@ UINT32 kontest_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap
 					res_y = y*8+yi;
 
 					if (cliprect.contains(res_x, res_y))
-						bitmap.pix32(res_y, res_x) = machine().pens[color|attr*4];
+						bitmap.pix32(res_y, res_x) = m_palette->pen(color|attr*4);
 				}
 			}
 		}
@@ -259,7 +259,8 @@ static MACHINE_CONFIG_START( kontest, kontest_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(kontest_state, kontest)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

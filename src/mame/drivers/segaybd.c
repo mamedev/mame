@@ -1194,7 +1194,7 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
-	MCFG_PALETTE_LENGTH(8192*3)
+	MCFG_PALETTE_ADD("palette", 8192*3)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

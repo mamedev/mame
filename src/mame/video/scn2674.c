@@ -36,7 +36,8 @@ const device_type SCN2674_VIDEO = &device_creator<scn2674_device>;
 scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SCN2674_VIDEO, "scn2674_device", tag, owner, clock, "scn2674_device", __FILE__),
 		m_interrupt_callback(*this),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this),
+		m_palette(*this)
 {
 }
 
@@ -50,6 +51,15 @@ void scn2674_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 	downcast<scn2674_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void scn2674_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<scn2674_device &>(device).m_palette.set_tag(tag);
+}
 
 void scn2674_device::device_start()
 {
@@ -730,7 +740,7 @@ void scn2674_device::scn2574_draw_common( running_machine &machine, _BitmapClass
 			attr = tiledat >>12;
 
 			if (attr)
-				m_gfxdecode->gfx(gfxregion)->opaque(bitmap,cliprect,tiledat,0,0,0,(x*8),(y*8));
+				m_gfxdecode->gfx(gfxregion)->opaque(m_palette,bitmap,cliprect,tiledat,0,0,0,(x*8),(y*8));
 
 		}
 		if (dbl_size&2)

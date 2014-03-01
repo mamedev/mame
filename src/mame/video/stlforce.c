@@ -106,7 +106,7 @@ void stlforce_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			ypos = 512-ypos;
 
 			
-						gfx->transpen(bitmap,
+						gfx->transpen(m_palette,bitmap,
 						cliprect,
 						num,
 						64+attr,

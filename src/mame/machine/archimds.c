@@ -847,7 +847,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 		if(reg == 0x40 && val & 0xfff)
 			logerror("WARNING: border color write here (PC=%08x)!\n",space.device().safe_pc());
 
-		palette_set_color_rgb(machine(), reg >> 2, pal4bit(r), pal4bit(g), pal4bit(b) );
+		m_palette->set_pen_color(reg >> 2, pal4bit(r), pal4bit(g), pal4bit(b) );
 
 		/* handle 8bpp colors here */
 		if(reg <= 0x3c)
@@ -860,7 +860,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 				g = ((val & 0x030) >> 4) | ((i & 0x20) >> 3) | ((i & 0x40) >> 3);
 				r = ((val & 0x007) >> 0) | ((i & 0x10) >> 1);
 
-				palette_set_color_rgb(machine(), (reg >> 2) + 0x100 + i, pal4bit(r), pal4bit(g), pal4bit(b) );
+				m_palette->set_pen_color((reg >> 2) + 0x100 + i, pal4bit(r), pal4bit(g), pal4bit(b) );
 			}
 		}
 

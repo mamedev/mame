@@ -10,6 +10,9 @@
 #define MCFG_SCN2674_GFXDECODE(_gfxtag) \
 	scn2674_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
+#define MCFG_SCN2674_PALETTE(_palette_tag) \
+	scn2674_device::static_set_palette_tag(*device, "^" _palette_tag);
+
 typedef void (*s2574_interrupt_callback_func)(running_machine &machine);
 
 static const UINT8 vsync_table[4] = {3,1,5,7}; //Video related
@@ -21,6 +24,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	template<class _irq> void set_callbacks(_irq irq) {
 		m_interrupt_callback.set_callback(irq);
@@ -116,6 +120,7 @@ protected:
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

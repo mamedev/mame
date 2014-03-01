@@ -375,8 +375,8 @@ static MACHINE_CONFIG_START( suprridr, suprridr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suprridr_state, screen_update_suprridr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", suprridr)
-	MCFG_PALETTE_LENGTH(96)
-
+	MCFG_PALETTE_ADD("palette", 96)
+	MCFG_PALETTE_INIT_OWNER(suprridr_state, suprridr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

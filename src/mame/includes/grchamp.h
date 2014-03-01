@@ -75,7 +75,7 @@ public:
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	void palette_generate();
 	UINT32 screen_update_grchamp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(grchamp_cpu0_interrupt);
 	INTERRUPT_GEN_MEMBER(grchamp_cpu1_interrupt);

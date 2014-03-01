@@ -19,7 +19,7 @@ void cbuster_state::update_24bitcol( int offset )
 	g = (UINT8)((float)((m_generic_paletteram_16[offset]  >> 8) & 0xff) * 1.75);
 	b = (UINT8)((float)((m_generic_paletteram2_16[offset] >> 0) & 0xff) * 1.75);
 
-	palette_set_color(machine(), offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
 WRITE16_MEMBER(cbuster_state::twocrude_palette_24bit_rg_w)

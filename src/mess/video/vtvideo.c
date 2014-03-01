@@ -47,14 +47,16 @@ const device_type RAINBOW_VIDEO = &device_creator<rainbow_video_device>;
 
 vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_video_interface(mconfig, *this)
+						device_video_interface(mconfig, *this),
+						m_palette(*this, "palette")
 {
 }
 
 
 vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, VT100_VIDEO, "VT100 Video", tag, owner, clock, "vt100_video", __FILE__),
-						device_video_interface(mconfig, *this)
+						device_video_interface(mconfig, *this),
+						m_palette(*this, "palette")
 {
 }
 
@@ -122,8 +124,8 @@ void vt100_video_device::device_start()
 
 void vt100_video_device::device_reset()
 {
-	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine(), 1, 0xff, 0xff, 0xff); // white
+	m_palette->set_pen_color(0, 0x00, 0x00, 0x00); // black
+	m_palette->set_pen_color(1, 0xff, 0xff, 0xff); // white
 
 	m_height = 25;
 	m_height_MAX = 25;
@@ -149,7 +151,7 @@ void rainbow_video_device::device_reset()
 	MHFU_counter = 0; // **** MHFU: OFF ON COLD BOOT ! ****
 
 	// (rest of the palette is set in the main program)
-	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00); // black
+	m_palette->set_pen_color(0, 0x00, 0x00, 0x00); // black
 
 	m_height = 24;  // <---- DEC-100
 	m_height_MAX = 48;
@@ -349,7 +351,7 @@ WRITE8_MEMBER( vt100_video_device::dc011_w )
 
 WRITE8_MEMBER( vt100_video_device::brightness_w )
 {
-	//palette_set_color_rgb(machine(), 1, data, data, data);
+	//m_palette->set_pen_color(1, data, data, data);
 }
 
 
@@ -749,21 +751,21 @@ void rainbow_video_device::palette_select ( int choice )
 	{
 			default:
 			case 0x01:
-						palette_set_color_rgb(machine(), 1, 0xff-100, 0xff-100, 0xff-100);  // WHITE (dim)
-						palette_set_color_rgb(machine(), 2, 0xff-50, 0xff-50, 0xff-50);     // WHITE NORMAL
-						palette_set_color_rgb(machine(), 3, 0xff, 0xff, 0xff);              // WHITE (brighter)
+						m_palette->set_pen_color(1, 0xff-100, 0xff-100, 0xff-100);  // WHITE (dim)
+						m_palette->set_pen_color(2, 0xff-50, 0xff-50, 0xff-50);     // WHITE NORMAL
+						m_palette->set_pen_color(3, 0xff, 0xff, 0xff);              // WHITE (brighter)
 						break;
 
 			case 0x02:
-						palette_set_color_rgb(machine(), 1, 0 , 205 -50, 100 - 50);        // GREEN (dim)
-						palette_set_color_rgb(machine(), 2, 0 , 205,     100     );        // GREEN (NORMAL)
-						palette_set_color_rgb(machine(), 3, 0,  205 +50, 100 + 50);        // GREEN (brighter)
+						m_palette->set_pen_color(1, 0 , 205 -50, 100 - 50);        // GREEN (dim)
+						m_palette->set_pen_color(2, 0 , 205,     100     );        // GREEN (NORMAL)
+						m_palette->set_pen_color(3, 0,  205 +50, 100 + 50);        // GREEN (brighter)
 						break;
 
 			case 0x03:
-						palette_set_color_rgb(machine(), 1, 213 - 47, 146 - 47, 82 - 47); // AMBER (dim)
-						palette_set_color_rgb(machine(), 2, 213,      146,      82     ); // AMBER (NORMAL)
-						palette_set_color_rgb(machine(), 3, 255,      193,      129    ); // AMBER (brighter)
+						m_palette->set_pen_color(1, 213 - 47, 146 - 47, 82 - 47); // AMBER (dim)
+						m_palette->set_pen_color(2, 213,      146,      82     ); // AMBER (NORMAL)
+						m_palette->set_pen_color(3, 255,      193,      129    ); // AMBER (brighter)
 						break;
 	}
 }
@@ -809,4 +811,32 @@ int rainbow_video_device::MHFU(int ASK)
 TIMER_CALLBACK_MEMBER( vt100_video_device::lba7_change )
 {
 	m_lba7 = (m_lba7) ? 0 : 1;
+}
+
+static MACHINE_CONFIG_FRAGMENT( vt100_video )
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor vt100_video_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( vt100_video );
+}
+
+static MACHINE_CONFIG_FRAGMENT( rainbow_video )
+	MCFG_PALETTE_ADD("palette", 4)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor rainbow_video_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( rainbow_video );
 }

@@ -76,10 +76,10 @@ static const gfx_layout p2000m_charlayout =
 
 PALETTE_INIT_MEMBER(p2000t_state,p2000m)
 {
-	palette_set_color(machine(),0,rgb_t::white); /* white */
-	palette_set_color(machine(),1,rgb_t::black); /* black */
-	palette_set_color(machine(),2,rgb_t::black); /* black */
-	palette_set_color(machine(),3,rgb_t::white); /* white */
+	palette.set_pen_color(0,rgb_t::white); /* white */
+	palette.set_pen_color(1,rgb_t::black); /* black */
+	palette.set_pen_color(2,rgb_t::black); /* black */
+	palette.set_pen_color(3,rgb_t::white); /* white */
 }
 
 static GFXDECODE_START( p2000m )
@@ -260,9 +260,9 @@ static MACHINE_CONFIG_START( p2000m, p2000t_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80 * 12 - 1, 0, 24 * 20 - 1)
 	MCFG_VIDEO_START_OVERRIDE(p2000t_state,p2000m)
 	MCFG_SCREEN_UPDATE_DRIVER(p2000t_state, screen_update_p2000m)
-	MCFG_GFXDECODE_ADD("gfxdecode",  p2000m )
-	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT_OVERRIDE(p2000t_state,p2000m)
+	MCFG_GFXDECODE_ADD("gfxdecode", p2000m )
+	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(p2000t_state,p2000m)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

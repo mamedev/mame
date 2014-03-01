@@ -27,7 +27,7 @@ PALETTE_INIT_MEMBER(snk6502_state,snk6502)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -55,7 +55,7 @@ PALETTE_INIT_MEMBER(snk6502_state,snk6502)
 
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		m_palette[i] = rgb_t(r, g, b);
+		m_palette_val[i] = rgb_t(r, g, b);
 
 		color_prom++;
 	}
@@ -63,14 +63,14 @@ PALETTE_INIT_MEMBER(snk6502_state,snk6502)
 	m_backcolor = 0;    /* background color can be changed by the game */
 
 	for (i = 0; i < TOTAL_COLORS(0); i++)
-		palette_set_color(machine(), COLOR(0, i), m_palette[i]);
+		palette.set_pen_color(COLOR(0, i), m_palette_val[i]);
 
 	for (i = 0; i < TOTAL_COLORS(1); i++)
 	{
 		if (i % 4 == 0)
-			palette_set_color(machine(), COLOR(1, i), m_palette[4 * m_backcolor + 0x20]);
+			palette.set_pen_color(COLOR(1, i), m_palette_val[4 * m_backcolor + 0x20]);
 		else
-			palette_set_color(machine(), COLOR(1, i), m_palette[i + 0x20]);
+			palette.set_pen_color(COLOR(1, i), m_palette_val[i + 0x20]);
 	}
 }
 
@@ -116,7 +116,7 @@ WRITE8_MEMBER(snk6502_state::snk6502_flipscreen_w)
 		m_backcolor = data & 7;
 
 		for (i = 0;i < 32;i += 4)
-			palette_set_color(machine(), COLOR(1, i), m_palette[4 * m_backcolor + 0x20]);
+			m_palette->set_pen_color(COLOR(1, i), m_palette_val[4 * m_backcolor + 0x20]);
 	}
 
 	/* bit 3 selects char bank */
@@ -198,7 +198,7 @@ PALETTE_INIT_MEMBER(snk6502_state,satansat)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -226,7 +226,7 @@ PALETTE_INIT_MEMBER(snk6502_state,satansat)
 
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		m_palette[i] = rgb_t(r, g, b);
+		m_palette_val[i] = rgb_t(r, g, b);
 
 		color_prom++;
 	}
@@ -234,14 +234,14 @@ PALETTE_INIT_MEMBER(snk6502_state,satansat)
 	m_backcolor = 0;    /* background color can be changed by the game */
 
 	for (i = 0; i < TOTAL_COLORS(0); i++)
-		palette_set_color(machine(), COLOR(0, i), m_palette[4 * (i % 4) + (i / 4)]);
+		palette.set_pen_color(COLOR(0, i), m_palette_val[4 * (i % 4) + (i / 4)]);
 
 	for (i = 0; i < TOTAL_COLORS(1); i++)
 	{
 		if (i % 4 == 0)
-			palette_set_color(machine(), COLOR(1, i), m_palette[m_backcolor + 0x10]);
+			palette.set_pen_color(COLOR(1, i), m_palette_val[m_backcolor + 0x10]);
 		else
-			palette_set_color(machine(), COLOR(1, i), m_palette[4 * (i % 4) + (i / 4) + 0x10]);
+			palette.set_pen_color(COLOR(1, i), m_palette_val[4 * (i % 4) + (i / 4) + 0x10]);
 	}
 }
 
@@ -272,7 +272,7 @@ WRITE8_MEMBER(snk6502_state::satansat_backcolor_w)
 		m_backcolor = data & 0x03;
 
 		for (i = 0; i < 16; i += 4)
-			palette_set_color(machine(), COLOR(1, i), m_palette[m_backcolor + 0x10]);
+			m_palette->set_pen_color(COLOR(1, i), m_palette_val[m_backcolor + 0x10]);
 	}
 }
 

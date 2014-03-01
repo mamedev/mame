@@ -4,14 +4,14 @@
 
 PALETTE_INIT_MEMBER(kc85_state,kc85)
 {
-	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
-	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 PALETTE_INIT_MEMBER(tandy200_state,tandy200)
 {
-	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
-	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 UINT32 kc85_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -56,8 +56,8 @@ MACHINE_CONFIG_FRAGMENT( kc85_video )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(kc85_state,kc85)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(kc85_state,kc85)
 
 	MCFG_HD44102_ADD(HD44102_0_TAG, SCREEN_TAG,   0,  0)
 	MCFG_HD44102_ADD(HD44102_1_TAG, SCREEN_TAG,  50,  0)
@@ -83,8 +83,8 @@ MACHINE_CONFIG_FRAGMENT( tandy200_video )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(tandy200_state,tandy200)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(tandy200_state,tandy200)
 
 	MCFG_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, tandy200_lcdc)

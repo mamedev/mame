@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( yunsung8, yunsung8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(yunsung8_state, screen_update_yunsung8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", yunsung8)
-	MCFG_PALETTE_LENGTH(2048)
+	MCFG_PALETTE_ADD("palette", 2048)
 
 
 	/* sound hardware */

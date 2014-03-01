@@ -98,7 +98,7 @@ public:
 	DECLARE_WRITE8_MEMBER(n7751_rom_control_w);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(othello);
 };
 
 
@@ -125,22 +125,22 @@ static MC6845_UPDATE_ROW( update_row )
 	}
 }
 
-void othello_state::palette_init()
+PALETTE_INIT_MEMBER(othello_state, othello)
 {
 	int i;
-	for (i = 0; i < machine().total_colors(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
-		palette_set_color(machine(), i, rgb_t(0xff, 0x00, 0xff));
+		palette.set_pen_color(i, rgb_t(0xff, 0x00, 0xff));
 	}
 
 	/* only colors  2,3,7,9,c,d,f are used */
-	palette_set_color(machine(), 0x02, rgb_t(0x00, 0xff, 0x00));
-	palette_set_color(machine(), 0x03, rgb_t(0xff, 0x7f, 0x00));
-	palette_set_color(machine(), 0x07, rgb_t(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 0x09, rgb_t(0xff, 0x00, 0x00));
-	palette_set_color(machine(), 0x0c, rgb_t(0x00, 0x00, 0xff));
-	palette_set_color(machine(), 0x0d, rgb_t(0x7f, 0x7f, 0x00));
-	palette_set_color(machine(), 0x0f, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(0x02, rgb_t(0x00, 0xff, 0x00));
+	palette.set_pen_color(0x03, rgb_t(0xff, 0x7f, 0x00));
+	palette.set_pen_color(0x07, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(0x09, rgb_t(0xff, 0x00, 0x00));
+	palette.set_pen_color(0x0c, rgb_t(0x00, 0x00, 0xff));
+	palette.set_pen_color(0x0d, rgb_t(0x7f, 0x7f, 0x00));
+	palette.set_pen_color(0x0f, rgb_t(0xff, 0xff, 0xff));
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, othello_state )
@@ -434,7 +434,8 @@ static MACHINE_CONFIG_START( othello, othello_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*6-1, 0*8, 64*8-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 
-	MCFG_PALETTE_LENGTH(0x10)
+	MCFG_PALETTE_ADD("palette", 0x10)
+	MCFG_PALETTE_INIT_OWNER(othello_state, othello)
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 1000000 /* ? MHz */, h46505_intf)   /* H46505 @ CPU clock */
 

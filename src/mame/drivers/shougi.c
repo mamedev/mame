@@ -113,7 +113,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_disable_and_clear_line_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(dummy_r);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(shougi);
 	UINT32 screen_update_shougi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(shougi_vblank_nmi);
 	required_device<cpu_device> m_maincpu;
@@ -140,7 +140,7 @@ public:
 ***************************************************************************/
 
 
-void shougi_state::palette_init()
+PALETTE_INIT_MEMBER(shougi_state, shougi)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -154,7 +154,7 @@ void shougi_state::palette_init()
 			3,  resistances_rg, weights_g,  1000, 0,
 			2,  resistances_b,  weights_b,  1000, 0);
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -175,7 +175,7 @@ void shougi_state::palette_init()
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -430,8 +430,8 @@ static MACHINE_CONFIG_START( shougi, shougi_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(shougi_state, screen_update_shougi)
 
-	MCFG_PALETTE_LENGTH(32)
-
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(shougi_state, shougi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

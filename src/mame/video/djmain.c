@@ -94,7 +94,7 @@ void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect
 					int zh = oy + (((y + 1) * yscale + (1 << 11)) >> 12) - sy;
 
 					
-								m_gfxdecode->gfx(0)->zoom_transpen(bitmap,
+								m_gfxdecode->gfx(0)->zoom_transpen(m_palette,bitmap,
 								cliprect,
 								c,
 								color,
@@ -112,7 +112,7 @@ void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect
 					int sy = oy + (y << 4);
 
 					
-							m_gfxdecode->gfx(0)->transpen(bitmap,
+							m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,
 							cliprect,
 							c,
 							color,
@@ -162,7 +162,7 @@ UINT32 djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &b
 				order[j] = temp;
 			}
 
-	bitmap.fill(machine().pens[0], cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	for (i = 0; i < NUM_LAYERS + 1; i++)
 	{

@@ -2,7 +2,7 @@
 #include "includes/usgames.h"
 
 
-void usgames_state::palette_init()
+PALETTE_INIT_MEMBER(usgames_state, usgames)
 {
 	int j;
 
@@ -25,7 +25,7 @@ void usgames_state::palette_init()
 		g = 0x7f * g * (i + 1);
 		b = 0x7f * b * (i + 1);
 
-		palette_set_color(machine(),j,rgb_t(r, g, b));
+		palette.set_pen_color(j,rgb_t(r, g, b));
 	}
 }
 

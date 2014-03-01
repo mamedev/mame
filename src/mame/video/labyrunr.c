@@ -2,13 +2,10 @@
 
 #include "includes/labyrunr.h"
 
-void labyrunr_state::palette_init()
+PALETTE_INIT_MEMBER(labyrunr_state, labyrunr)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int pal;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x80);
 
 	for (pal = 0; pal < 8; pal++)
 	{
@@ -18,7 +15,7 @@ void labyrunr_state::palette_init()
 			int i;
 
 			for (i = 0; i < 0x100; i++)
-				colortable_entry_set_value(machine().colortable, (pal << 8) | i, (pal << 4) | (i & 0x0f));
+				palette.set_pen_indirect((pal << 8) | i, (pal << 4) | (i & 0x0f));
 		}
 		/* sprites */
 		else
@@ -34,7 +31,7 @@ void labyrunr_state::palette_init()
 				else
 					ctabentry = (pal << 4) | (color_prom[i] & 0x0f);
 
-				colortable_entry_set_value(machine().colortable, (pal << 8) | i, ctabentry);
+				palette.set_pen_indirect((pal << 8) | i, ctabentry);
 			}
 		}
 	}
@@ -51,7 +48,7 @@ void labyrunr_state::set_pens(  )
 
 		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine().colortable, i >> 1, color);
+		m_palette->set_indirect_color(i >> 1, color);
 	}
 }
 
@@ -183,7 +180,7 @@ UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind1
 	set_pens();
 
 	screen.priority().fill(0, cliprect);
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if (~m_k007121->ctrlram_r(space, 3) & 0x20)
 	{
@@ -208,7 +205,7 @@ UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind1
 		}
 
 		m_layer0->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_OPAQUE, 0);
-		m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), machine().colortable, m_spriteram,(m_k007121->ctrlram_r(space, 6) & 0x30) * 2, 40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
+		m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), m_palette, m_spriteram,(m_k007121->ctrlram_r(space, 6) & 0x30) * 2, 40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
 		m_layer1->draw(screen, bitmap, finalclip1, TILEMAP_DRAW_OPAQUE, 0);
 	}
@@ -278,7 +275,7 @@ UINT32 labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind1
 		if(use_clip3[1])
 			m_layer1->draw(screen, bitmap, finalclip3, 0, 1);
 
-		m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), machine().colortable, m_spriteram, (m_k007121->ctrlram_r(space, 6) & 0x30) * 2,40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
+		m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), m_palette, m_spriteram, (m_k007121->ctrlram_r(space, 6) & 0x30) * 2,40,0,screen.priority(),(m_k007121->ctrlram_r(space, 3) & 0x40) >> 5);
 	}
 	return 0;
 }

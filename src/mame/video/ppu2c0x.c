@@ -302,7 +302,7 @@ inline void ppu2c0x_device::writebyte(offs_t address, UINT8 data)
  *
  *************************************/
 
-void ppu2c0x_device::init_palette( running_machine &machine, int first_entry )
+void ppu2c0x_device::init_palette( palette_device &palette, int first_entry )
 {
 	/* This routine builds a palette using a transformation from */
 	/* the YUV (Y, B-Y, R-Y) to the RGB color space */
@@ -408,7 +408,7 @@ void ppu2c0x_device::init_palette( running_machine &machine, int first_entry )
 					B = 255;
 
 				/* Round, and set the value */
-				palette_set_color_rgb(machine, first_entry++, floor(R + .5), floor(G + .5), floor(B + .5));
+				palette.set_pen_color(first_entry++, floor(R + .5), floor(G + .5), floor(B + .5));
 			}
 		}
 	}
@@ -416,13 +416,13 @@ void ppu2c0x_device::init_palette( running_machine &machine, int first_entry )
 	/* color tables are modified at run-time, and are initialized on 'ppu2c0x_reset' */
 }
 
-void ppu2c0x_device::init_palette_rgb( running_machine &machine, int first_entry )
+void ppu2c0x_device::init_palette_rgb( palette_device &palette, int first_entry )
 {
 	int color_emphasis, color_num;
 
 	int R, G, B;
 
-	UINT8 *palette_data = machine.root_device().memregion("palette")->base();
+	UINT8 *palette_data = machine().root_device().memregion("palette")->base();
 
 	/* Loop through the emphasis modes (8 total) */
 	for (color_emphasis = 0; color_emphasis < 8; color_emphasis++)
@@ -433,7 +433,7 @@ void ppu2c0x_device::init_palette_rgb( running_machine &machine, int first_entry
 				G = ((color_emphasis & 2) ? 7 : palette_data[color_num * 3 + 1]);
 				B = ((color_emphasis & 4) ? 7 : palette_data[color_num * 3 + 2]);
 
-				palette_set_color_rgb(machine, first_entry++, pal3bit(R), pal3bit(G), pal3bit(B));
+				palette.set_pen_color(first_entry++, pal3bit(R), pal3bit(G), pal3bit(B));
 			}
 	}
 

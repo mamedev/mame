@@ -52,7 +52,7 @@ public:
 	UINT8 m_col_reg;
 	UINT8 port_read_with_latch(UINT8 ext, UINT8 latch_state);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(channelf);
 	UINT32 screen_update_channelf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( channelf_cart );
 	required_device<channelf_sound_device> m_custom;

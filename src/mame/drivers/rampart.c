@@ -348,7 +348,7 @@ static MACHINE_CONFIG_START( rampart, rampart_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE_ADD("gfxdecode", rampart)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", rampart_state::s_mob_config)
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")

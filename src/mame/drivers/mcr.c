@@ -765,8 +765,8 @@ static ADDRESS_MAP_START( cpu_90009_map, AS_PROGRAM, 8, mcr_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xf1ff) AM_MIRROR(0x0200) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf400, 0xf41f) AM_MIRROR(0x03e0) AM_WRITE(paletteram_xxxxRRRRBBBBGGGG_byte_split_lo_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf800, 0xf81f) AM_MIRROR(0x03e0) AM_WRITE(paletteram_xxxxRRRRBBBBGGGG_byte_split_hi_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xf400, 0xf41f) AM_MIRROR(0x03e0) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xf81f) AM_MIRROR(0x03e0) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(mcr_90009_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -1852,7 +1852,8 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mcr_state, screen_update_mcr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mcr)
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
 
 	MCFG_VIDEO_START_OVERRIDE(mcr_state,mcr)
 
@@ -1882,7 +1883,9 @@ static MACHINE_CONFIG_DERIVED( mcr_90010, mcr_90009 )
 	MCFG_CPU_IO_MAP(cpu_90010_portmap)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(64)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 64)
+	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
 MACHINE_CONFIG_END
 
 
@@ -1900,7 +1903,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_91475, mcr_90010 )
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(128)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 128)
+	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
 
 	/* sound hardware */
 	MCFG_SAMPLES_ADD("samples", journey_samples_interface)

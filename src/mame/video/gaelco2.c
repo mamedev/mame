@@ -234,7 +234,7 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_palette_w)
 	b = pal5bit(b);
 
 	/* update game palette */
-	palette_set_color(machine(), 4096*0 + offset, rgb_t(r, g, b));
+	m_palette->set_pen_color(4096*0 + offset, rgb_t(r, g, b));
 
 	/* update shadow/highligh palettes */
 	for (i = 1; i < 16; i++){
@@ -246,7 +246,7 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_palette_w)
 		auxg = ADJUST_COLOR(g + pen_color_adjust[i]);
 		auxb = ADJUST_COLOR(b + pen_color_adjust[i]);
 
-		palette_set_color(machine(), 4096*i + offset, rgb_t(auxr, auxg, auxb));
+		m_palette->set_pen_color(4096*i + offset, rgb_t(auxr, auxg, auxb));
 	}
 }
 
@@ -377,7 +377,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 					/* normal sprite, pen 0 transparent */
 					if (color_effect == 0){
-						 gfx->transpen(bitmap,cliprect, number,
+						 gfx->transpen(m_palette,bitmap,cliprect, number,
 							color, xflip, yflip,
 							((sx + ex*16) & 0x3ff) + spr_x_adjust,
 							((sy + ey*16) & 0x1ff), 0);

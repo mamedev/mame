@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16, gotcha_state )
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(gotcha_oki_bank_w)
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1405ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x140000, 0x1405ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("SYSTEM")
@@ -275,7 +275,8 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gotcha_state, screen_update_gotcha)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gotcha)
-	MCFG_PALETTE_LENGTH(768)
+	MCFG_PALETTE_ADD("palette", 768)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
@@ -283,6 +284,7 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	decospr_device::set_is_bootleg(*device, true);
 	decospr_device::set_offsets(*device, 5,-1); // aligned to 2nd instruction screen in attract
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

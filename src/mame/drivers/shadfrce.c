@@ -271,7 +271,7 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_sound_brt_w)
 		double brt = (data & 0xff) / 255.0;
 
 		for (i = 0; i < 0x4000; i++)
-			palette_set_pen_contrast(machine(), i, brt);
+			m_palette->set_pen_contrast(i, brt);
 	}
 }
 
@@ -366,7 +366,7 @@ static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
 	AM_RANGE(0x102800, 0x103fff) AM_RAM
 	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(shadfrce_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x142000, 0x143fff) AM_RAM AM_SHARE("spvideoram") /* sprites */
-	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x180000, 0x187fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(shadfrce_bg0scrollx_w) /* SCROLL X */
 	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE(shadfrce_bg0scrolly_w) /* SCROLL Y */
 	AM_RANGE(0x1c0004, 0x1c0005) AM_WRITE(shadfrce_bg1scrollx_w) /* SCROLL X */
@@ -555,8 +555,8 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	MCFG_SCREEN_VBLANK_DRIVER(shadfrce_state, screen_eof_shadfrce)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", shadfrce)
-	MCFG_PALETTE_LENGTH(0x4000)
-
+	MCFG_PALETTE_ADD("palette", 0x4000)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -124,8 +124,8 @@ static MACHINE_CONFIG_START( a5120, a51xx_state )
 	MCFG_SCREEN_UPDATE_DRIVER(a51xx_state, screen_update_a5120)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", a51xx)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 MACHINE_CONFIG_END
 

@@ -8,27 +8,24 @@ Atari Sprint 8 video emulation
 #include "includes/sprint8.h"
 
 
-void sprint8_state::palette_init()
+PALETTE_INIT_MEMBER(sprint8_state, sprint8)
 {
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x12);
-
 	for (i = 0; i < 0x10; i++)
 	{
-		colortable_entry_set_value(machine().colortable, 2 * i + 0, 0x10);
-		colortable_entry_set_value(machine().colortable, 2 * i + 1, i);
+		palette.set_pen_indirect(2 * i + 0, 0x10);
+		palette.set_pen_indirect(2 * i + 1, i);
 	}
 
-	colortable_entry_set_value(machine().colortable, 0x20, 0x10);
-	colortable_entry_set_value(machine().colortable, 0x21, 0x10);
-	colortable_entry_set_value(machine().colortable, 0x22, 0x10);
-	colortable_entry_set_value(machine().colortable, 0x23, 0x11);
+	palette.set_pen_indirect(0x20, 0x10);
+	palette.set_pen_indirect(0x21, 0x10);
+	palette.set_pen_indirect(0x22, 0x10);
+	palette.set_pen_indirect(0x23, 0x11);
 }
 
 
-void sprint8_state::set_pens(sprint8_state *state, colortable_t *colortable)
+void sprint8_state::set_pens()
 {
 	int i;
 
@@ -36,30 +33,30 @@ void sprint8_state::set_pens(sprint8_state *state, colortable_t *colortable)
 	{
 		if (*m_team & 1)
 		{
-			colortable_palette_set_color(colortable, i + 0, rgb_t(0xff, 0x00, 0x00)); /* red     */
-			colortable_palette_set_color(colortable, i + 1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
-			colortable_palette_set_color(colortable, i + 2, rgb_t(0xff, 0xff, 0x00)); /* yellow  */
-			colortable_palette_set_color(colortable, i + 3, rgb_t(0x00, 0xff, 0x00)); /* green   */
-			colortable_palette_set_color(colortable, i + 4, rgb_t(0xff, 0x00, 0xff)); /* magenta */
-			colortable_palette_set_color(colortable, i + 5, rgb_t(0xe0, 0xc0, 0x70)); /* puce    */
-			colortable_palette_set_color(colortable, i + 6, rgb_t(0x00, 0xff, 0xff)); /* cyan    */
-			colortable_palette_set_color(colortable, i + 7, rgb_t(0xff, 0xaa, 0xaa)); /* pink    */
+			m_palette->set_indirect_color(i + 0, rgb_t(0xff, 0x00, 0x00)); /* red     */
+			m_palette->set_indirect_color(i + 1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+			m_palette->set_indirect_color(i + 2, rgb_t(0xff, 0xff, 0x00)); /* yellow  */
+			m_palette->set_indirect_color(i + 3, rgb_t(0x00, 0xff, 0x00)); /* green   */
+			m_palette->set_indirect_color(i + 4, rgb_t(0xff, 0x00, 0xff)); /* magenta */
+			m_palette->set_indirect_color(i + 5, rgb_t(0xe0, 0xc0, 0x70)); /* puce    */
+			m_palette->set_indirect_color(i + 6, rgb_t(0x00, 0xff, 0xff)); /* cyan    */
+			m_palette->set_indirect_color(i + 7, rgb_t(0xff, 0xaa, 0xaa)); /* pink    */
 		}
 		else
 		{
-			colortable_palette_set_color(colortable, i + 0, rgb_t(0xff, 0x00, 0x00)); /* red     */
-			colortable_palette_set_color(colortable, i + 1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
-			colortable_palette_set_color(colortable, i + 2, rgb_t(0xff, 0x00, 0x00)); /* red     */
-			colortable_palette_set_color(colortable, i + 3, rgb_t(0x00, 0x00, 0xff)); /* blue    */
-			colortable_palette_set_color(colortable, i + 4, rgb_t(0xff, 0x00, 0x00)); /* red     */
-			colortable_palette_set_color(colortable, i + 5, rgb_t(0x00, 0x00, 0xff)); /* blue    */
-			colortable_palette_set_color(colortable, i + 6, rgb_t(0xff, 0x00, 0x00)); /* red     */
-			colortable_palette_set_color(colortable, i + 7, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+			m_palette->set_indirect_color(i + 0, rgb_t(0xff, 0x00, 0x00)); /* red     */
+			m_palette->set_indirect_color(i + 1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+			m_palette->set_indirect_color(i + 2, rgb_t(0xff, 0x00, 0x00)); /* red     */
+			m_palette->set_indirect_color(i + 3, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+			m_palette->set_indirect_color(i + 4, rgb_t(0xff, 0x00, 0x00)); /* red     */
+			m_palette->set_indirect_color(i + 5, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+			m_palette->set_indirect_color(i + 6, rgb_t(0xff, 0x00, 0x00)); /* red     */
+			m_palette->set_indirect_color(i + 7, rgb_t(0x00, 0x00, 0xff)); /* blue    */
 		}
 	}
 
-	colortable_palette_set_color(colortable, 0x10, rgb_t(0x00, 0x00, 0x00));
-	colortable_palette_set_color(colortable, 0x11, rgb_t(0xff, 0xff, 0xff));
+	m_palette->set_indirect_color(0x10, rgb_t(0x00, 0x00, 0x00));
+	m_palette->set_indirect_color(0x11, rgb_t(0xff, 0xff, 0xff));
 }
 
 
@@ -138,7 +135,7 @@ void sprint8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (code & 0x80)
 			x |= 0x100;
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 			code ^ 7,
 			i,
 			!(code & 0x10), !(code & 0x08),
@@ -155,7 +152,7 @@ TIMER_CALLBACK_MEMBER(sprint8_state::sprint8_collision_callback)
 
 UINT32 sprint8_state::screen_update_sprint8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(this, machine().colortable);
+	set_pens();
 	m_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
@@ -186,7 +183,7 @@ void sprint8_state::screen_eof_sprint8(screen_device &screen, bool state)
 				if (p1[x] != 0x20 && p2[x] == 0x23)
 					machine().scheduler().timer_set(m_screen->time_until_pos(y + 24, x),
 							timer_expired_delegate(FUNC(sprint8_state::sprint8_collision_callback),this),
-							colortable_entry_get_value(machine().colortable, p1[x]));
+							m_palette->pen_indirect(p1[x]));
 		}
 	}
 }

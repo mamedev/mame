@@ -1,17 +1,14 @@
 #include "emu.h"
 #include "includes/rockrage.h"
 
-void rockrage_state::palette_init()
+PALETTE_INIT_MEMBER(rockrage_state, rockrage)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x40);
-
 	/* sprites */
 	for (i = 0x20; i < 0x40; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* characters */
 	for (i = 0x40; i < 0x140; i++)
@@ -19,10 +16,10 @@ void rockrage_state::palette_init()
 		UINT8 ctabentry;
 
 		ctabentry = (color_prom[(i - 0x40) + 0x000] & 0x0f) | 0x00;
-		colortable_entry_set_value(machine().colortable, i + 0x000, ctabentry);
+		palette.set_pen_indirect(i + 0x000, ctabentry);
 
 		ctabentry = (color_prom[(i - 0x40) + 0x100] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine().colortable, i + 0x100, ctabentry);
+		palette.set_pen_indirect(i + 0x100, ctabentry);
 	}
 }
 
@@ -38,7 +35,7 @@ static void set_pens( running_machine &machine )
 
 		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine.colortable, i >> 1, color);
+		state->m_palette->set_indirect_color(i >> 1, color);
 	}
 }
 

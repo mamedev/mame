@@ -36,7 +36,7 @@ Changes by Martin M. (pfloyd@gmx.net) 14.10.2001:
 
 ***************************************************************************/
 
-void megazone_state::palette_init()
+PALETTE_INIT_MEMBER(megazone_state, megazone)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -49,9 +49,6 @@ void megazone_state::palette_init()
 			3, &resistances_rg[0], rweights, 1000, 0,
 			3, &resistances_rg[0], gweights, 1000, 0,
 			2, &resistances_b[0],  bweights, 1000, 0);
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -76,7 +73,7 @@ void megazone_state::palette_init()
 		bit1 = BIT(color_prom[i], 7);
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -86,14 +83,14 @@ void megazone_state::palette_init()
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* characters */
 	for (i = 0x100; i < 0x200; i++)
 	{
 		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
@@ -133,7 +130,7 @@ UINT32 megazone_state::screen_update_megazone(screen_device &screen, bitmap_ind1
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap,m_tmpbitmap->cliprect(),
+		m_gfxdecode->gfx(1)->opaque(m_palette,*m_tmpbitmap,m_tmpbitmap->cliprect(),
 				((int)m_videoram[offs]) + ((m_colorram[offs] & (1 << 7) ? 256 : 0) ),
 				(m_colorram[offs] & 0x0f) + 0x10,
 				flipx,flipy,
@@ -180,12 +177,12 @@ UINT32 megazone_state::screen_update_megazone(screen_device &screen, bitmap_ind1
 			else
 				sx = sx + 32;
 
-			m_gfxdecode->gfx(0)->transmask(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transmask(m_palette,bitmap,cliprect,
 					spriteram[offs + 2],
 					color,
 					flipx,flipy,
 					sx,sy,
-					colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(0), color, 0));
+					m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0));
 		}
 	}
 
@@ -213,7 +210,7 @@ UINT32 megazone_state::screen_update_megazone(screen_device &screen, bitmap_ind1
 
 
 
-			m_gfxdecode->gfx(1)->opaque(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->opaque(m_palette,bitmap,cliprect,
 					((int)m_videoram2[offs]) + ((m_colorram2[offs] & (1 << 7) ? 256 : 0) ),
 					(m_colorram2[offs] & 0x0f) + 0x10,
 					flipx,flipy,

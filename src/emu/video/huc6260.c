@@ -34,8 +34,8 @@ PALETTE_INIT_MEMBER(huc6260_device, huc6260)
 		int b = pal3bit( ( i      ) & 7 );
 		int y = ( ( 66 * r + 129 * g + 25 * b + 128 ) >> 8 ) + 16;
 
-		palette_set_color_rgb( machine(), i, r, g, b );
-		palette_set_color_rgb( machine(), 512 + i, y, y, y );
+		palette.set_pen_color( i, r, g, b );
+		palette.set_pen_color( 512 + i, y, y, y );
 	}
 }
 
@@ -294,7 +294,8 @@ void huc6260_device::device_reset()
 }
 
 static MACHINE_CONFIG_FRAGMENT( huc6260 )
-	MCFG_PALETTE_INIT_OVERRIDE(huc6260_device, huc6260)
+	MCFG_PALETTE_ADD("palette",  HUC6260_PALETTE_SIZE )
+	MCFG_PALETTE_INIT_OWNER(huc6260_device, huc6260)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

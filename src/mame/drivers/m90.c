@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( m90_main_cpu_map, AS_PROGRAM, 16, m90_state )
 	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("bank1")  /* Quiz F1 only */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_SHARE("video_data")
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -84,7 +84,7 @@ static ADDRESS_MAP_START( dynablsb_main_cpu_map, AS_PROGRAM, 16, m90_state )
 	AM_RANGE(0x6000e, 0x60fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_SHARE("video_data")
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( bomblord_main_cpu_map, AS_PROGRAM, 16, m90_state )
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xc000e, 0xc0fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_SHARE("video_data")
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -735,8 +735,8 @@ static MACHINE_CONFIG_START( m90, m90_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m90_state, screen_update_m90)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", m90)
-	MCFG_PALETTE_LENGTH(512)
-
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -58,6 +58,7 @@ int K054338_read_register(int reg)
 
 void K054338_update_all_shadows(running_machine &machine, int rushingheroes_hack)
 {
+	driver_device *state = machine.driver_data<driver_device>();
 	int i, d;
 	int noclip = k54338_regs[K338_REG_CONTROL] & K338_CTL_CLIPSL;
 
@@ -70,15 +71,15 @@ void K054338_update_all_shadows(running_machine &machine, int rushingheroes_hack
 
 	if (!rushingheroes_hack)
 	{
-		palette_set_shadow_dRGB32(machine, 0, K054338_shdRGB[0], K054338_shdRGB[1], K054338_shdRGB[2], noclip);
-		palette_set_shadow_dRGB32(machine, 1, K054338_shdRGB[3], K054338_shdRGB[4], K054338_shdRGB[5], noclip);
-		palette_set_shadow_dRGB32(machine, 2, K054338_shdRGB[6], K054338_shdRGB[7], K054338_shdRGB[8], noclip);
+		state->m_palette->set_shadow_dRGB32(0, K054338_shdRGB[0], K054338_shdRGB[1], K054338_shdRGB[2], noclip);
+		state->m_palette->set_shadow_dRGB32(1, K054338_shdRGB[3], K054338_shdRGB[4], K054338_shdRGB[5], noclip);
+		state->m_palette->set_shadow_dRGB32(2, K054338_shdRGB[6], K054338_shdRGB[7], K054338_shdRGB[8], noclip);
 	}
 	else // rushing heroes seems to specify shadows in another format, or it's not being interpreted properly.
 	{
-		palette_set_shadow_dRGB32(machine, 0, -80, -80, -80, 0);
-		palette_set_shadow_dRGB32(machine, 1, -80, -80, -80, 0);
-		palette_set_shadow_dRGB32(machine, 2, -80, -80, -80, 0);
+		state->m_palette->set_shadow_dRGB32(0, -80, -80, -80, 0);
+		state->m_palette->set_shadow_dRGB32(1, -80, -80, -80, 0);
+		state->m_palette->set_shadow_dRGB32(2, -80, -80, -80, 0);
 	}
 }
 
@@ -310,6 +311,7 @@ int  k054338_device::register_r( int reg )
 
 void k054338_device::update_all_shadows( int rushingheroes_hack )
 {
+	driver_device *state = machine().driver_data<driver_device>();
 	int i, d;
 	int noclip = m_regs[K338_REG_CONTROL] & K338_CTL_CLIPSL;
 
@@ -323,15 +325,15 @@ void k054338_device::update_all_shadows( int rushingheroes_hack )
 
 	if (!rushingheroes_hack)
 	{
-		palette_set_shadow_dRGB32(machine(), 0, m_shd_rgb[0], m_shd_rgb[1], m_shd_rgb[2], noclip);
-		palette_set_shadow_dRGB32(machine(), 1, m_shd_rgb[3], m_shd_rgb[4], m_shd_rgb[5], noclip);
-		palette_set_shadow_dRGB32(machine(), 2, m_shd_rgb[6], m_shd_rgb[7], m_shd_rgb[8], noclip);
+		state->m_palette->set_shadow_dRGB32(0, m_shd_rgb[0], m_shd_rgb[1], m_shd_rgb[2], noclip);
+		state->m_palette->set_shadow_dRGB32(1, m_shd_rgb[3], m_shd_rgb[4], m_shd_rgb[5], noclip);
+		state->m_palette->set_shadow_dRGB32(2, m_shd_rgb[6], m_shd_rgb[7], m_shd_rgb[8], noclip);
 	}
 	else // rushing heroes seems to specify shadows in another format, or it's not being interpreted properly.
 	{
-		palette_set_shadow_dRGB32(machine(), 0, -80, -80, -80, 0);
-		palette_set_shadow_dRGB32(machine(), 1, -80, -80, -80, 0);
-		palette_set_shadow_dRGB32(machine(), 2, -80, -80, -80, 0);
+		state->m_palette->set_shadow_dRGB32(0, -80, -80, -80, 0);
+		state->m_palette->set_shadow_dRGB32(1, -80, -80, -80, 0);
+		state->m_palette->set_shadow_dRGB32(2, -80, -80, -80, 0);
 	}
 }
 

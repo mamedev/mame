@@ -624,7 +624,7 @@ static void s3c24xx_lcd_render_tft_01( device_t *device)
 		UINT32 data = s3c24xx_lcd_dma_read( device);
 		for (int j = 0; j < 32; j++)
 		{
-			*scanline++ = palette_get_color( device->machine(), (data >> 31) & 0x01);
+			*scanline++ = s3c24xx->m_palette->pen_color((data >> 31) & 0x01);
 			data = data << 1;
 			s3c24xx->lcd.hpos++;
 			if (s3c24xx->lcd.hpos >= s3c24xx->lcd.hpos_min + (s3c24xx->lcd.pagewidth_max << 4))
@@ -648,7 +648,7 @@ static void s3c24xx_lcd_render_tft_02( device_t *device)
 		UINT32 data = s3c24xx_lcd_dma_read( device);
 		for (int j = 0; j < 16; j++)
 		{
-			*scanline++ = palette_get_color( device->machine(), (data >> 30) & 0x03);
+			*scanline++ = s3c24xx->m_palette->pen_color((data >> 30) & 0x03);
 			data = data << 2;
 			s3c24xx->lcd.hpos++;
 			if (s3c24xx->lcd.hpos >= s3c24xx->lcd.hpos_min + (s3c24xx->lcd.pagewidth_max << 3))
@@ -672,7 +672,7 @@ static void s3c24xx_lcd_render_tft_04( device_t *device)
 		UINT32 data = s3c24xx_lcd_dma_read( device);
 		for (int j = 0; j < 8; j++)
 		{
-			*scanline++ = palette_get_color( device->machine(), (data >> 28) & 0x0F);
+			*scanline++ = s3c24xx->m_palette->pen_color((data >> 28) & 0x0F);
 			data = data << 4;
 			s3c24xx->lcd.hpos++;
 			if (s3c24xx->lcd.hpos >= s3c24xx->lcd.hpos_min + (s3c24xx->lcd.pagewidth_max << 2))
@@ -696,7 +696,7 @@ static void s3c24xx_lcd_render_tft_08( device_t *device)
 		UINT32 data = s3c24xx_lcd_dma_read( device);
 		for (int j = 0; j < 4; j++)
 		{
-			*scanline++ = palette_get_color( device->machine(), (data >> 24) & 0xFF);
+			*scanline++ = s3c24xx->m_palette->pen_color((data >> 24) & 0xFF);
 			data = data << 8;
 			s3c24xx->lcd.hpos++;
 			if (s3c24xx->lcd.hpos >= s3c24xx->lcd.hpos_min + (s3c24xx->lcd.pagewidth_max << 1))
@@ -1040,7 +1040,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_lcd_palette_w )
 	{
 		verboselog( device->machine(), 0, "s3c24xx_lcd_palette_w: unknown mask %08x\n", mem_mask);
 	}
-	palette_set_color( device->machine(), offset, s3c24xx_get_color_tft_16( device, data & 0xFFFF));
+	s3c24xx->m_palette->set_pen_color( offset, s3c24xx_get_color_tft_16( device, data & 0xFFFF));
 }
 
 /* Clock & Power Management */

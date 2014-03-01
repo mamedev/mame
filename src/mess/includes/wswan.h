@@ -145,7 +145,7 @@ public:
 	void wswan_clear_irq_line(int irq);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(wswan);
 	DECLARE_MACHINE_START(wscolor);
 	DECLARE_PALETTE_INIT(wscolor);
 	TIMER_CALLBACK_MEMBER(wswan_rtc_callback);

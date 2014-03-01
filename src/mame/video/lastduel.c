@@ -188,7 +188,7 @@ WRITE16_MEMBER(lastduel_state::lastduel_palette_word_w)
 	green = ((data >> 8)  & 0x0f) * bright * 0x11 / 0x1f;
 	blue  = ((data >> 4)  & 0x0f) * bright * 0x11 / 0x1f;
 
-	palette_set_color (machine(), offset, rgb_t(red, green, blue));
+	m_palette->set_pen_color (offset, rgb_t(red, green, blue));
 }
 
 /***************************************************************************
@@ -238,7 +238,7 @@ void lastduel_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		}
 
 		
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

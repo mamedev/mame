@@ -133,12 +133,12 @@ WRITE16_MEMBER(m92_state::m92_videocontrol_w)
 
 READ16_MEMBER(m92_state::m92_paletteram_r)
 {
-	return m_generic_paletteram_16[offset + 0x400 * m_palette_bank];
+	return m_palette->basemem().read16(offset + 0x400 * m_palette_bank);
 }
 
 WRITE16_MEMBER(m92_state::m92_paletteram_w)
 {
-	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset + 0x400 * m_palette_bank, data, mem_mask);
+	m_palette->write(space, offset + 0x400 * m_palette_bank, data, mem_mask);
 }
 
 /*****************************************************************************/
@@ -354,26 +354,26 @@ void m92_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 				{
 					if (flip_screen())
 					{
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
 								code + s_ptr, color, !flipx, !flipy,
 								464 - x, 240 - (y - row * 16),
 								screen.priority(), pri, 0);
 
 						// wrap around x
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
 								code + s_ptr, color, !flipx, !flipy,
 								464 - x + 512, 240 - (y - row * 16),
 								screen.priority(), pri, 0);
 					}
 					else
 					{
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
 								code + s_ptr, color, flipx, flipy,
 								x, y - row * 16,
 								screen.priority(), pri, 0);
 
 						// wrap around x
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
 								code + s_ptr, color, flipx, flipy,
 								x - 512, y - row * 16,
 								screen.priority(), pri, 0);
@@ -428,26 +428,26 @@ void m92_state::ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 				{
 					if (flip_screen())
 					{
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
 								code + s_ptr, color, !flipx, !flipy,
 								464 - x, 240 - (y - row * 16),
 								screen.priority(), pri, 0);
 
 						// wrap around x
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
 								code + s_ptr, color, !flipx, !flipy,
 								464 - x + 512, 240 - (y - row * 16),
 								screen.priority(), pri, 0);
 					}
 					else
 					{
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
 								code + s_ptr, color, flipx, flipy,
 								x, y - row * 16,
 								screen.priority(), pri, 0);
 
 						// wrap around x
-						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
 								code + s_ptr, color, flipx, flipy,
 								x - 512, y - row * 16,
 								screen.priority(), pri, 0);

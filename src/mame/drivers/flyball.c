@@ -69,7 +69,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(flyball);
 	UINT32 screen_update_flyball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(flyball_joystick_callback);
 	TIMER_CALLBACK_MEMBER(flyball_quarter_callback);
@@ -132,7 +132,7 @@ UINT32 flyball_state::screen_update_flyball(screen_device &screen, bitmap_ind16 
 	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw pitcher */
-	m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, m_pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
+	m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, m_pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
 
 	/* draw ball */
 
@@ -386,12 +386,12 @@ static GFXDECODE_START( flyball )
 GFXDECODE_END
 
 
-void flyball_state::palette_init()
+PALETTE_INIT_MEMBER(flyball_state, flyball)
 {
-	palette_set_color(machine(), 0, rgb_t(0x3F, 0x3F, 0x3F));  /* tiles, ball */
-	palette_set_color(machine(), 1, rgb_t(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 2, rgb_t(0xFF ,0xFF, 0xFF));  /* sprites */
-	palette_set_color(machine(), 3, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(0, rgb_t(0x3F, 0x3F, 0x3F));  /* tiles, ball */
+	palette.set_pen_color(1, rgb_t(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(2, rgb_t(0xFF ,0xFF, 0xFF));  /* sprites */
+	palette.set_pen_color(3, rgb_t(0x00, 0x00, 0x00));
 }
 
 
@@ -452,8 +452,8 @@ static MACHINE_CONFIG_START( flyball, flyball_state )
 	MCFG_SCREEN_UPDATE_DRIVER(flyball_state, screen_update_flyball)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", flyball)
-	MCFG_PALETTE_LENGTH(4)
-
+	MCFG_PALETTE_ADD("palette", 4)
+	MCFG_PALETTE_INIT_OWNER(flyball_state, flyball)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

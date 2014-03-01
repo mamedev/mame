@@ -999,12 +999,13 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hornet_state, screen_update_hornet)
 
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_ADD("palette", 65536)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	
 	MCFG_K037122_ADD("k037122_1", "screen", 0)
 	MCFG_K037122_GFXDECODE("gfxdecode")
+	MCFG_K037122_PALETTE("palette")
 
 	MCFG_K056800_ADD("k056800", XTAL_16_9344MHz)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
@@ -1075,9 +1076,11 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 	MCFG_DEVICE_REMOVE("k037122_1")
 	MCFG_K037122_ADD("k037122_1", "lscreen", 0)
 	MCFG_K037122_GFXDECODE("gfxdecode")
+	MCFG_K037122_PALETTE("palette")
 	
 	MCFG_K037122_ADD("k037122_2", "rscreen", 1)
 	MCFG_K037122_GFXDECODE("gfxdecode")
+	MCFG_K037122_PALETTE("palette")
 
 	MCFG_DEVICE_REMOVE("voodoo0")
 	MCFG_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, voodoo_l_intf)
@@ -1086,7 +1089,8 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 	MCFG_K033906_ADD("k033906_2", hornet_k033906_intf_1)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(65536)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 65536)
 
 	MCFG_DEVICE_REMOVE("screen")
 

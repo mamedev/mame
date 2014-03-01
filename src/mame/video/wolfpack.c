@@ -8,40 +8,37 @@ Atari Wolf Pack (prototype) video emulation
 #include "includes/wolfpack.h"
 
 
-void wolfpack_state::palette_init()
+PALETTE_INIT_MEMBER(wolfpack_state, wolfpack)
 {
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 8);
-
-	colortable_palette_set_color(machine().colortable, 0, rgb_t(0x00, 0x00, 0x00));
-	colortable_palette_set_color(machine().colortable, 1, rgb_t(0xc1, 0xc1, 0xc1));
-	colortable_palette_set_color(machine().colortable, 2, rgb_t(0x81, 0x81, 0x81));
-	colortable_palette_set_color(machine().colortable, 3, rgb_t(0x48, 0x48, 0x48));
+	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
+	palette.set_indirect_color(1, rgb_t(0xc1, 0xc1, 0xc1));
+	palette.set_indirect_color(2, rgb_t(0x81, 0x81, 0x81));
+	palette.set_indirect_color(3, rgb_t(0x48, 0x48, 0x48));
 
 	for (i = 0; i < 4; i++)
 	{
-		rgb_t color = colortable_palette_get_color(machine().colortable, i);
+		rgb_t color = palette.indirect_color(i);
 
-		colortable_palette_set_color(machine().colortable, 4 + i,
+		palette.set_indirect_color(4 + i,
 										rgb_t(color.r()   < 0xb8 ? color.r()   + 0x48 : 0xff,
-												color.g() < 0xb8 ? color.g() + 0x48 : 0xff,
+												color.g() < 0xb8 ? color.g()  + 0x48 : 0xff,
 												color.b()  < 0xb8 ? color.b()  + 0x48 : 0xff));
 	}
 
-	colortable_entry_set_value(machine().colortable, 0x00, 0);
-	colortable_entry_set_value(machine().colortable, 0x01, 1);
-	colortable_entry_set_value(machine().colortable, 0x02, 1);
-	colortable_entry_set_value(machine().colortable, 0x03, 0);
-	colortable_entry_set_value(machine().colortable, 0x04, 0);
-	colortable_entry_set_value(machine().colortable, 0x05, 2);
-	colortable_entry_set_value(machine().colortable, 0x06, 0);
-	colortable_entry_set_value(machine().colortable, 0x07, 3);
-	colortable_entry_set_value(machine().colortable, 0x08, 4);
-	colortable_entry_set_value(machine().colortable, 0x09, 5);
-	colortable_entry_set_value(machine().colortable, 0x0a, 6);
-	colortable_entry_set_value(machine().colortable, 0x0b, 7);
+	palette.set_pen_indirect(0x00, 0);
+	palette.set_pen_indirect(0x01, 1);
+	palette.set_pen_indirect(0x02, 1);
+	palette.set_pen_indirect(0x03, 0);
+	palette.set_pen_indirect(0x04, 0);
+	palette.set_pen_indirect(0x05, 2);
+	palette.set_pen_indirect(0x06, 0);
+	palette.set_pen_indirect(0x07, 3);
+	palette.set_pen_indirect(0x08, 4);
+	palette.set_pen_indirect(0x09, 5);
+	palette.set_pen_indirect(0x0a, 6);
+	palette.set_pen_indirect(0x0b, 7);
 }
 
 
@@ -143,7 +140,7 @@ void wolfpack_state::draw_ship(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	int chop = (scaler[m_ship_size >> 2] * m_ship_h_precess) >> 16;
 
 	
-		m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->zoom_transpen(m_palette,bitmap,cliprect,
 		m_ship_pic,
 		0,
 		m_ship_reflect, 0,
@@ -161,7 +158,7 @@ void wolfpack_state::draw_torpedo(bitmap_ind16 &bitmap, const rectangle &cliprec
 	int y;
 
 	
-		m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect,
 		m_torpedo_pic,
 		0,
 		0, 0,
@@ -197,7 +194,7 @@ void wolfpack_state::draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		rect.max_x = 255;
 
 	
-		m_gfxdecode->gfx(2)->transpen(bitmap,rect,
+		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,rect,
 		m_pt_pic,
 		0,
 		0, 0,
@@ -205,7 +202,7 @@ void wolfpack_state::draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		m_pt_pos_select ? 0x70 : 0xA0, 0);
 
 	
-		m_gfxdecode->gfx(2)->transpen(bitmap,rect,
+		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,rect,
 		m_pt_pic,
 		0,
 		0, 0,
@@ -214,7 +211,7 @@ void wolfpack_state::draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect)
 }
 
 
-void wolfpack_state::draw_water(colortable_t *colortable, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void wolfpack_state::draw_water(palette_device &palette, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle rect = cliprect;
 
@@ -229,7 +226,7 @@ void wolfpack_state::draw_water(colortable_t *colortable, bitmap_ind16 &bitmap, 
 		UINT16* p = &bitmap.pix16(y);
 
 		for (x = rect.min_x; x <= rect.max_x; x++)
-			p[x] = colortable_entry_get_value(colortable, p[x]) | 0x08;
+			p[x] = palette.pen_indirect(p[x]) | 0x08;
 	}
 }
 
@@ -245,8 +242,8 @@ UINT32 wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_ind1
 	if (m_ship_size & 0x40) color += 0x3a;
 	if (m_ship_size & 0x80) color += 0x48;
 
-	colortable_palette_set_color(machine().colortable, 3, rgb_t(color,color,color));
-	colortable_palette_set_color(machine().colortable, 7, rgb_t(color < 0xb8 ? color + 0x48 : 0xff,
+	m_palette->set_indirect_color(3, rgb_t(color,color,color));
+	m_palette->set_indirect_color(7, rgb_t(color < 0xb8 ? color + 0x48 : 0xff,
 																			color < 0xb8 ? color + 0x48 : 0xff,
 																			color < 0xb8 ? color + 0x48 : 0xff));
 
@@ -258,7 +255,7 @@ UINT32 wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_ind1
 			int code = m_alpha_num_ram[32 * i + j];
 
 			
-				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,
 				code,
 				m_video_invert,
 				0, 0,
@@ -269,7 +266,7 @@ UINT32 wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_ind1
 	draw_pt(bitmap, cliprect);
 	draw_ship(bitmap, cliprect);
 	draw_torpedo(bitmap, cliprect);
-	draw_water(machine().colortable, bitmap, cliprect);
+	draw_water(*m_palette, bitmap, cliprect);
 	return 0;
 }
 

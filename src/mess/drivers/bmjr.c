@@ -53,7 +53,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(bmjr);
 	UINT32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -275,8 +275,8 @@ static INPUT_PORTS_START( bmjr )
 
 	PORT_START("KEYC")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_UNUSED)
-	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT(0x04,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT(0x08,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("\xC2\xA5 / Left") PORT_CODE(KEYCODE_4_PAD)
 	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 
@@ -324,12 +324,12 @@ static GFXDECODE_START( bmjr )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bmjr_charlayout, 0, 4 )
 GFXDECODE_END
 
-void bmjr_state::palette_init()
+PALETTE_INIT_MEMBER(bmjr_state, bmjr)
 {
 	int i;
 
 	for(i=0;i<8;i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 }
 
 
@@ -359,7 +359,8 @@ static MACHINE_CONFIG_START( bmjr, bmjr_state )
 	MCFG_SCREEN_SIZE(256, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bmjr_state, screen_update_bmjr)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(bmjr_state, bmjr)
 	MCFG_GFXDECODE_ADD("gfxdecode", bmjr)
 
 	/* Audio */

@@ -189,6 +189,7 @@ public:
 	DECLARE_WRITE32_MEMBER(x2222_sound_w);
 	DECLARE_READ32_MEMBER(gstream_speedup_r);
 	DECLARE_READ32_MEMBER(x2222_speedup_r);
+	DECLARE_READ32_MEMBER(x2222_speedup2_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(x2222_toggle_r);
@@ -246,12 +247,12 @@ WRITE32_MEMBER(gstream_state::gstream_palette_w)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 
-	palette_set_color_rgb(machine(), offset * 2, pal5bit(m_paletteram[offset] >> (0 + 16)),
+	m_palette->set_pen_color(offset * 2, pal5bit(m_paletteram[offset] >> (0 + 16)),
 									pal5bit(m_paletteram[offset] >> (6 + 16)),
 									pal5bit(m_paletteram[offset] >> (11 + 16)));
 
 
-	palette_set_color_rgb(machine(),offset * 2 + 1,pal5bit(m_paletteram[offset] >> (0)),
+	m_palette->set_pen_color(offset * 2 + 1,pal5bit(m_paletteram[offset] >> (0)),
 									pal5bit(m_paletteram[offset] >> (6)),
 									pal5bit(m_paletteram[offset] >> (11)));
 }
@@ -398,7 +399,7 @@ static ADDRESS_MAP_START( x2222_32bit_map, AS_PROGRAM, 32, gstream_state )
 	AM_RANGE(0x4Ff00000, 0x4Ff00003) AM_WRITE(gstream_tilemap1_scrollx_w)
 
 	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_SHARE("nvram") // Backup RAM (maybe)
-	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
+	AM_RANGE(0xFFF00000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
 ADDRESS_MAP_END
 
 WRITE32_MEMBER(gstream_state::x2222_sound_w)
@@ -785,7 +786,7 @@ void gstream_state::draw_bg_gstream(bitmap_rgb32 &bitmap, const rectangle &clipr
 			if (m_gfxdecode->gfx(map+5))
 				drawgfx_transpen_x2222(bitmap,cliprect,m_gfxdecode->gfx(map),m_gfxdecode->gfx(map+5),code,0,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
 			else
-				m_gfxdecode->gfx(map)->transpen(bitmap,cliprect,code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
+				m_gfxdecode->gfx(map)->transpen(m_palette,bitmap,cliprect,code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
 
 			basex++;
 		}
@@ -841,10 +842,10 @@ UINT32 gstream_state::screen_update_gstream(screen_device &screen, bitmap_rgb32 
 		}
 		else
 		{
-			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y, 0);
-			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y-0x100, 0);
-			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y, 0);
-			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y-0x100, 0);
+			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y, 0);
+			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y-0x100, 0);
+			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y, 0);
+			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y-0x100, 0);
 
 		}
 	}
@@ -895,8 +896,8 @@ static MACHINE_CONFIG_START( gstream, gstream_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update_gstream)
 
-	MCFG_PALETTE_LENGTH(0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
-	MCFG_GFXDECODE_ADD("gfxdecode",gstream)
+	MCFG_PALETTE_ADD("palette", 0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
+	MCFG_GFXDECODE_ADD("gfxdecode", gstream)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -927,8 +928,8 @@ static MACHINE_CONFIG_START( x2222, gstream_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update_gstream)
 
-	MCFG_PALETTE_LENGTH(0x1000 + 0x400 + 0x400 + 0x400) // doesn't use a palette, but keep fake gfxdecode happy
-	MCFG_GFXDECODE_ADD("gfxdecode",x2222)
+	MCFG_PALETTE_ADD("palette", 0x1000 + 0x400 + 0x400 + 0x400) // doesn't use a palette, but keep fake gfxdecode happy
+	MCFG_GFXDECODE_ADD("gfxdecode", x2222)
 
 	// unknown sound hw (no sound roms dumped)
 
@@ -940,7 +941,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( gstream )
-	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x80000, "user1", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "gs_prg_01.u56", 0x000000, 0x080000, CRC(0d0c6a38) SHA1(a810bfc1c9158cccc37710d0ea7268e26e520cc2) )
 
 	ROM_REGION32_BE( 0x200000, "user2", 0 ) /* Hyperstone CPU Code */
@@ -984,14 +985,11 @@ ROM_END
 
 
 ROM_START( x2222 )
-	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* Hyperstone CPU Code */
-	ROM_LOAD( "older.bin", 0x000000, 0x080000, CRC(d12817bc) SHA1(2458f9d9020598a1646dfc848fddd323eebc5120) )
+	ROM_REGION32_BE( 0x100000, "user1", 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "test.bin", 0x000000, 0x100000, CRC(6260421e) SHA1(095e955d029e98e024d4ec5c7f93a6d4845a92a0) ) // final version - but debug enabled, values on screen, maybe there's a flag in the ROM we can turn off?
 
 	ROM_REGION32_BE( 0x0200000, "misc", 0 ) /* other code */
-	ROM_LOAD( "test.hye", 0x000000, 0x0112dda, CRC(c1142b2f) SHA1(5807930820a53604013a6ac66e4d4ebe3628e1fc) ) // this might be the correct revision for our gfx roms, but how do we convert it to a binary?
-	ROM_REGION32_BE( 0x0200000, "misc2", 0 ) /* other code */
-	ROM_LOAD( "older.hye", 0x000000, 0x010892f, CRC(cf3a004e) SHA1(1cba64cfa235b9540f33a5ee0cc02dfd267e00fc) ) // this corresponds to the older.bin we're using, for reference
-
+	ROM_LOAD( "test.hye", 0x000000, 0x0112dda, CRC(c1142b2f) SHA1(5807930820a53604013a6ac66e4d4ebe3628e1fc) ) // the above binary was built from this
 	
 	/* x2222 uses raw rgb16 data rather than 8bpp indexed, in order to use the same gfx decodes with a custom draw routine we arrange the data into 2 8bpp regions on init */
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )  /* sprite tiles (16x16x8) */
@@ -1019,9 +1017,7 @@ ROM_START( x2222 )
 	ROM_REGION( 0x200000, "gfx4_lower", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
 	/* filled in at init*/
 
-
-
-	ROM_REGION( 0x1000000, "sprites", 0 )  /* sprite tiles (16x16x16) */ // these sprite ROMs have the Boss tiles in the wrong location for the prototype program rom
+	ROM_REGION( 0x1000000, "sprites", 0 )  /* sprite tiles (16x16x16) */
 	ROM_LOAD( "spr11.bin", 0x000000, 0x200000, CRC(1d15b444) SHA1(27ace509a7e4ec2e62453636acf444a861bb85ce) )
 	ROM_LOAD( "spr21.bin", 0x200000, 0x1b8b00, CRC(1c392be2) SHA1(775882f588a8bef33a79fa4f25754a47dc82cb30) )
 	ROM_LOAD( "spr12.bin", 0x400000, 0x200000, CRC(73225936) SHA1(50507c52b932198659e08d22d3c0a92e7c69e5ba) )
@@ -1048,6 +1044,69 @@ ROM_START( x2222 )
 	ROM_LOAD( "x2222_sound", 0x000000, 0x080000,NO_DUMP ) // probably an oki.. is there a sound cpu too?
 ROM_END
 
+
+
+ROM_START( x2222o )
+	ROM_REGION32_BE( 0x100000, "user1", 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "older.bin", 0x080000, 0x080000, CRC(d12817bc) SHA1(2458f9d9020598a1646dfc848fddd323eebc5120) )
+
+	ROM_REGION32_BE( 0x0200000, "misc", 0 ) /* other code */
+	ROM_LOAD( "older.hye", 0x000000, 0x010892f, CRC(cf3a004e) SHA1(1cba64cfa235b9540f33a5ee0cc02dfd267e00fc) ) // this corresponds to the older.bin we're using, for reference
+	
+	/* x2222 uses raw rgb16 data rather than 8bpp indexed, in order to use the same gfx decodes with a custom draw routine we arrange the data into 2 8bpp regions on init */
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )  /* sprite tiles (16x16x8) */
+	/* filled in at init*/
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
+	/* filled in at init*/
+
+	ROM_REGION( 0x200000, "gfx3", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
+	/* filled in at init*/
+
+	ROM_REGION( 0x200000, "gfx4", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
+	/* filled in at init*/
+
+	/* 2nd 8-bits */
+	ROM_REGION( 0x800000, "gfx1_lower", ROMREGION_ERASE00 )  /* sprite tiles (16x16x8) */
+	/* filled in at init*/
+
+	ROM_REGION( 0x200000, "gfx2_lower", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
+	/* filled in at init*/
+
+	ROM_REGION( 0x200000, "gfx3_lower", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
+	/* filled in at init*/
+
+	ROM_REGION( 0x200000, "gfx4_lower", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
+	/* filled in at init*/
+
+	ROM_REGION( 0x1000000, "sprites", 0 )  /* sprite tiles (16x16x16) */ // these sprite ROMs have the Boss tiles in the wrong location for the prototype program rom
+	ROM_LOAD( "spr11.bin", 0x000000, 0x200000, BAD_DUMP CRC(1d15b444) SHA1(27ace509a7e4ec2e62453636acf444a861bb85ce) )
+	ROM_LOAD( "spr21.bin", 0x200000, 0x1b8b00, BAD_DUMP CRC(1c392be2) SHA1(775882f588a8bef33a79fa4f25754a47dc82cb30) )
+	ROM_LOAD( "spr12.bin", 0x400000, 0x200000, BAD_DUMP CRC(73225936) SHA1(50507c52b932198659e08d22d3c0a92e7c69e5ba) )
+	ROM_LOAD( "spr22.bin", 0x600000, 0x1b8b00, BAD_DUMP CRC(cf7ebfa1) SHA1(c968dcf768e5598240f5a131414a5607899b4bef) )
+	ROM_LOAD( "spr13.bin", 0x800000, 0x200000, BAD_DUMP CRC(52595c51) SHA1(a161a5f433aa7aa2f7824ea6b9b70d73ca63b62d) )
+	ROM_LOAD( "spr23.bin", 0xa00000, 0x1b8b00, BAD_DUMP CRC(d894461e) SHA1(14dccfa8c762d928eaea0ac4cfff7d1272b69fdd) )
+	ROM_LOAD( "spr14.bin", 0xc00000, 0x200000, BAD_DUMP CRC(f6cd6599) SHA1(170ea7a9a26fd8038df53fb333357766dabbe7c2) )
+	ROM_LOAD( "spr24.bin", 0xe00000, 0x1b8b00, BAD_DUMP CRC(9542cb08) SHA1(d40c1f0b7d3e9deb12284c2f2c2df0ac43cb6cd2) )
+
+	ROM_REGION( 0x400000, "bg1", 0 )  /* bg tiles (32x32x16) */
+	ROM_LOAD16_BYTE( "bg31.bin", 0x000000, 0x11ac00, CRC(12e67bc2) SHA1(18618a8931af3b3aeab34fd50424a7ffb3da6458) )
+	ROM_LOAD16_BYTE( "bg32.bin", 0x000001, 0x11ac00, CRC(95afa0da) SHA1(e534bc0874329475ce7efa836000fe29fc76c44c) )
+
+	ROM_REGION( 0x400000, "bg2", 0 )  /* bg tiles (32x32x16) */
+	ROM_LOAD16_BYTE( "bg21.bin", 0x000000, 0x1c8400, CRC(a10220f8) SHA1(9aa43a8e23cdf55d8623d2694b04971eaced9ba9) )
+	ROM_LOAD16_BYTE( "bg22.bin", 0x000001, 0x1c8400, CRC(966f7c1d) SHA1(4699a3014c7e66d0dabd8d7982f43114b71181b7) )
+
+	ROM_REGION( 0x400000, "bg3", 0 )  /* bg tiles (32x32x16) */
+	ROM_LOAD16_BYTE( "bg11.bin", 0x000000, 0x1bc800, CRC(68975462) SHA1(7a2458a3d2465b727f4f5bf45685f35eb4885975) )
+	ROM_LOAD16_BYTE( "bg12.bin", 0x000001, 0x1bc800, CRC(feef1240) SHA1(9eb123a19ade74d8b3ce4df0b04ca97c03fb9fdc) )
+
+	// no idea what the sound hw is?
+	ROM_REGION( 0x100000, "oki1", ROMREGION_ERASE00 )
+	ROM_LOAD( "x2222_sound", 0x000000, 0x080000,NO_DUMP ) // probably an oki.. is there a sound cpu too?
+ROM_END
+
+
 READ32_MEMBER(gstream_state::gstream_speedup_r)
 {
 	if (m_maincpu->pc() == 0xc0001592)
@@ -1067,6 +1126,16 @@ READ32_MEMBER(gstream_state::x2222_speedup_r)
 	}
 
 	return m_workram[0x7ffac / 4];
+}
+
+READ32_MEMBER(gstream_state::x2222_speedup2_r)
+{
+	if (m_maincpu->pc() == 0x23f44)
+	{
+		m_maincpu->eat_cycles(50);
+	}
+
+	return m_workram[0x84e3c / 4];
 }
 
 
@@ -1100,7 +1169,8 @@ void gstream_state::rearrange_sprite_data(UINT8* ROM, UINT32* NEW, UINT32* NEW2)
 
 DRIVER_INIT_MEMBER(gstream_state,x2222)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7ffac, 0x7ffaf, read32_delegate(FUNC(gstream_state::x2222_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7ffac, 0x7ffaf, read32_delegate(FUNC(gstream_state::x2222_speedup_r), this)); // older
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x84e3c, 0x84e3f, read32_delegate(FUNC(gstream_state::x2222_speedup2_r), this)); // newer
 
 	rearrange_sprite_data(memregion("sprites")->base(), (UINT32*)memregion("gfx1")->base(), (UINT32*)memregion("gfx1_lower")->base()  );
 	rearrange_tile_data(memregion("bg1")->base(), (UINT32*)memregion("gfx2")->base(), (UINT32*)memregion("gfx2_lower")->base());
@@ -1112,4 +1182,5 @@ DRIVER_INIT_MEMBER(gstream_state,x2222)
 
 
 GAME( 2002, gstream, 0, gstream, gstream, gstream_state, gstream, ROT270, "Oriental Soft Japan", "G-Stream G2020", GAME_SUPPORTS_SAVE )
-GAME( 2000, x2222,   0, x2222,   x2222,   gstream_state, x2222,   ROT270, "Oriental Soft", "X2222 (prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 2000, x2222,   0,     x2222,   x2222,   gstream_state, x2222,   ROT270, "Oriental Soft / Promat", "X2222 (final debug?)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 2000, x2222o,  x2222, x2222,   x2222,   gstream_state, x2222,   ROT270, "Oriental Soft / Promat", "X2222 (5-level prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )

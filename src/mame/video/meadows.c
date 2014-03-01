@@ -88,7 +88,7 @@ void meadows_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip)
 		int bank = i;                           /* that fixes it for now :-/ */
 		int flip = spriteram[i+8] >> 5;         /* bit #5 flip vertical flag */
 
-		m_gfxdecode->gfx(bank + 1)->transpen(bitmap,clip, code, 0, flip, 0, x, y, 0);
+		m_gfxdecode->gfx(bank + 1)->transpen(m_palette,bitmap,clip, code, 0, flip, 0, x, y, 0);
 	}
 }
 

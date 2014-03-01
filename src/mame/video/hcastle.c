@@ -8,13 +8,10 @@
 #include "includes/hcastle.h"
 
 
-void hcastle_state::palette_init()
+PALETTE_INIT_MEMBER(hcastle_state, hcastle)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int chip;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x80);
 
 	for (chip = 0; chip < 2; chip++)
 	{
@@ -34,7 +31,7 @@ void hcastle_state::palette_init()
 				else
 					ctabentry = (pal << 4) | (color_prom[(clut << 8) | i] & 0x0f);
 
-				colortable_entry_set_value(machine().colortable, (chip << 11) | (pal << 8) | i, ctabentry);
+				palette.set_pen_indirect((chip << 11) | (pal << 8) | i, ctabentry);
 			}
 		}
 	}
@@ -51,7 +48,7 @@ void hcastle_state::set_pens()
 
 		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine().colortable, i >> 1, color);
+		m_palette->set_indirect_color(i >> 1, color);
 	}
 }
 
@@ -204,7 +201,7 @@ void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	int base_color = (k007121->ctrlram_r(space, 6) & 0x30) * 2;
 	int bank_base = (bank == 0) ? 0x4000 * (m_gfx_bank & 1) : 0;
 
-	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(bank), machine().colortable, sbank, base_color, 0, bank_base, priority_bitmap, (UINT32)-1);
+	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(bank), m_palette, sbank, base_color, 0, bank_base, priority_bitmap, (UINT32)-1);
 }
 
 /*****************************************************************************/

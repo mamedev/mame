@@ -58,6 +58,7 @@
 #include "video/ramdac.h"
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
+#include "cpu/z80/z80daisy.h"
 
 class megaphx_state : public driver_device
 {
@@ -88,6 +89,9 @@ public:
 
 	DECLARE_READ16_MEMBER(megaphx_0x050002_r);
 	DECLARE_WRITE16_MEMBER(megaphx_0x050000_w);
+	DECLARE_READ8_MEMBER(megaphx_sound_sent_r);
+	DECLARE_READ8_MEMBER(megaphx_sound_cmd_r);
+	DECLARE_WRITE8_MEMBER(megaphx_sound_to_68k_w);
 
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_to1);
@@ -96,7 +100,12 @@ public:
 	DECLARE_READ8_MEMBER(port_c_r);
 	DECLARE_WRITE8_MEMBER(port_c_w);
 
+
 	UINT8 port_c_value;
+
+	int m_soundsent;
+	UINT8 m_sounddata;
+	UINT8 m_soundback;
 };
 
 
@@ -124,16 +133,21 @@ WRITE16_MEMBER(megaphx_state::tms_host_w)
 READ16_MEMBER(megaphx_state::megaphx_0x050002_r)
 {
 	int pc = machine().device("maincpu")->safe_pc();
-
+	int ret = m_soundback;
+	m_soundback = 0;
 	logerror("(%06x) megaphx_0x050002_r (from z80?) %04x\n", pc, mem_mask);
-	return ioport("P3")->read();
+	return ret ^ (rand()&0x40);  // the 0x40 should be returned by the z80, so this still isn't working
 }
 
 WRITE16_MEMBER(megaphx_state::megaphx_0x050000_w)
 {
 	int pc = machine().device("maincpu")->safe_pc();
+	space.machine().scheduler().synchronize();
 
 	logerror("(%06x) megaphx_0x050000_w (to z80?) %04x %04x\n", pc, data, mem_mask);
+	m_soundsent = 0xff;
+	m_sounddata = data;
+
 }
 
 
@@ -178,11 +192,34 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, megaphx_state )
 	AM_RANGE(0x4000, 0x401f) AM_RAM
 ADDRESS_MAP_END
 
+READ8_MEMBER(megaphx_state::megaphx_sound_cmd_r)
+{
+	return m_sounddata;
+}
+
+READ8_MEMBER(megaphx_state::megaphx_sound_sent_r)
+{
+	int ret = m_soundsent;
+	m_soundsent = 0;
+	return ret;
+}
+
+WRITE8_MEMBER(megaphx_state::megaphx_sound_to_68k_w)
+{
+	int pc = machine().device("audiocpu")->safe_pc();
+
+	logerror("(%04x) megaphx_sound_to_68k_w (to 68k?) %02x\n", pc, data);
+
+	m_soundback = data;
+}
+
 static ADDRESS_MAP_START( sound_io, AS_IO, 8, megaphx_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_RAM
+//	AM_RANGE(0x00, 0x07) AM_RAM
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x31, 0x31) AM_READNOP
+
+	AM_RANGE(0x30, 0x30) AM_READWRITE(megaphx_sound_cmd_r, megaphx_sound_to_68k_w)
+	AM_RANGE(0x31, 0x31) AM_READ(megaphx_sound_sent_r)
 ADDRESS_MAP_END
 
 
@@ -193,7 +230,7 @@ static void megaphx_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int sc
 	UINT16 *vram = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
 
-	const pen_t *paldata = screen.machine().pens;
+	const pen_t *paldata = state->m_palette->pens();
 
 	int coladdr = params->coladdr;
 	int x;
@@ -292,55 +329,6 @@ static INPUT_PORTS_START( megaphx )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("P3") // not dips according to service mode.. maybe comms with Z80?
-	PORT_DIPNAME( 0x0001, 0x0001,"X")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, megaphx_state,megaphx_rand_r, NULL)
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "Y" )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, megaphx_state )
@@ -399,7 +387,7 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_to0)
 {
-	printf("z80ctc_to0 %d\n", state);
+	logerror("z80ctc_to0 %d\n", state);
 }
 
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_to1)
@@ -409,16 +397,25 @@ WRITE_LINE_MEMBER(megaphx_state::z80ctc_to1)
 
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_to2)
 {
-	printf("z80ctc_to2 %d\n", state);
+	logerror("z80ctc_to2 %d\n", state);
 }
+
+	
 
 static Z80CTC_INTERFACE( z80ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),       // interrupt handler
-	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_to0),    // ZC/TO0 callback
+	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),       // runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
+	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_to0),    // ZC/TO0 callback // accessed
 	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_to1),    // ZC/TO1 callback
-	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_to2)     // ZC/TO2 callback
+	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_to2)     // ZC/TO2 callback // accessed
 };
+
+static const z80_daisy_config daisy_chain[] =
+{
+	{ "ctc" },
+	{ NULL }
+};
+
 
 // just for debug.. so we can see what is in each of the roms
 static GFXLAYOUT_RAW( megaphxlay, 336, 1, 336*8, 336*8 )
@@ -442,6 +439,7 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // unk freq
+	MCFG_CPU_CONFIG(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io)
 
@@ -456,11 +454,11 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/12, 424, 0, 338-1, 262, 0, 246-1)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 	
 	MCFG_GFXDECODE_ADD("gfxdecode", megaphx)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 MACHINE_CONFIG_END
 

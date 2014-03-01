@@ -287,24 +287,24 @@ static GFXDECODE_START( dragrace )
 GFXDECODE_END
 
 
-void dragrace_state::palette_init()
+PALETTE_INIT_MEMBER(dragrace_state, dragrace)
 {
-	palette_set_color(machine(), 0, rgb_t(0xFF, 0xFF, 0xFF));   /* 2 color tiles */
-	palette_set_color(machine(), 1, rgb_t(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 2, rgb_t(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 3, rgb_t(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 4, rgb_t(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 5, rgb_t(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 6, rgb_t(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 7, rgb_t(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 8, rgb_t(0xFF, 0xFF, 0xFF));   /* 4 color tiles */
-	palette_set_color(machine(), 9, rgb_t(0xB0, 0xB0, 0xB0));
-	palette_set_color(machine(), 10,rgb_t(0x5F, 0x5F, 0x5F));
-	palette_set_color(machine(), 11,rgb_t(0x00, 0x00, 0x00));
-	palette_set_color(machine(), 12,rgb_t(0xFF, 0xFF, 0xFF));
-	palette_set_color(machine(), 13,rgb_t(0x5F, 0x5F, 0x5F));
-	palette_set_color(machine(), 14,rgb_t(0xB0, 0xB0, 0xB0));
-	palette_set_color(machine(), 15,rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(0, rgb_t(0xFF, 0xFF, 0xFF));   /* 2 color tiles */
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(3, rgb_t(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(5, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(6, rgb_t(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(7, rgb_t(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(8, rgb_t(0xFF, 0xFF, 0xFF));   /* 4 color tiles */
+	palette.set_pen_color(9, rgb_t(0xB0, 0xB0, 0xB0));
+	palette.set_pen_color(10,rgb_t(0x5F, 0x5F, 0x5F));
+	palette.set_pen_color(11,rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(12,rgb_t(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(13,rgb_t(0x5F, 0x5F, 0x5F));
+	palette.set_pen_color(14,rgb_t(0xB0, 0xB0, 0xB0));
+	palette.set_pen_color(15,rgb_t(0x00, 0x00, 0x00));
 }
 
 
@@ -339,7 +339,8 @@ static MACHINE_CONFIG_START( dragrace, dragrace_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dragrace_state, screen_update_dragrace)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dragrace)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(dragrace_state, dragrace)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

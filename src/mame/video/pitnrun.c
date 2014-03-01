@@ -112,7 +112,7 @@ void pitnrun_state::pitnrun_spotlights()
 }
 
 
-void pitnrun_state::palette_init()
+PALETTE_INIT_MEMBER(pitnrun_state, pitnrun)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -132,7 +132,7 @@ void pitnrun_state::palette_init()
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 
 	/* fake bg palette for lightning effect*/
@@ -154,7 +154,7 @@ void pitnrun_state::palette_init()
 		g/=3;
 		b/=3;
 
-		palette_set_color_rgb(machine(),i+16,(r>0xff)?0xff:r,(g>0xff)?0xff:g,(b>0xff)?0xff:b);
+		palette.set_pen_color(i+16,(r>0xff)?0xff:r,(g>0xff)?0xff:g,(b>0xff)?0xff:b);
 
 	}
 }
@@ -196,7 +196,7 @@ void pitnrun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
 			(spriteram[offs+1]&0x3f)+((spriteram[offs+2]&0x80)>>1)+((spriteram[offs+2]&0x40)<<1),
 			pal,
 			flipx,flipy,

@@ -150,7 +150,7 @@ public:
 	DECLARE_DRIVER_INIT(jwildb52);
 	virtual void machine_start();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(sigmab52);
 	UINT32 screen_update_jwildb52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	required_device<cpu_device> m_maincpu;
@@ -236,7 +236,7 @@ if (!machine().input().code_pressed(KEYCODE_O))
 }
 
 
-void sigmab52_state::palette_init()
+PALETTE_INIT_MEMBER(sigmab52_state, sigmab52)
 {
 }
 
@@ -606,8 +606,8 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 
 	MCFG_HD63484_ADD("hd63484", jwildb52_hd63484_intf)
 
-	MCFG_PALETTE_LENGTH(256)
-
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(sigmab52_state, sigmab52)
 
 MACHINE_CONFIG_END
 

@@ -143,7 +143,7 @@ WRITE16_MEMBER(mcr68_state::mcr68_paletteram_w)
 
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	newword = m_generic_paletteram_16[offset];
-	palette_set_color_rgb(machine(), offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
+	m_palette->set_pen_color(offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
 }
 
 
@@ -153,7 +153,7 @@ WRITE16_MEMBER(mcr68_state::zwackery_paletteram_w)
 
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	newword = m_generic_paletteram_16[offset];
-	palette_set_color_rgb(machine(), offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
+	m_palette->set_pen_color(offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
 }
 
 
@@ -240,11 +240,11 @@ void mcr68_state::mcr68_update_sprites(screen_device &screen, bitmap_ind16 &bitm
 		    The color 8 is used to cover over other sprites. */
 
 		/* first draw the sprite, visible */
-		m_gfxdecode->gfx(1)->prio_transmask(bitmap,sprite_clip, code, color, flipx, flipy, x, y,
+		m_gfxdecode->gfx(1)->prio_transmask(m_palette,bitmap,sprite_clip, code, color, flipx, flipy, x, y,
 				screen.priority(), 0x00, 0x0101);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		m_gfxdecode->gfx(1)->prio_transmask(bitmap,sprite_clip, code, color, flipx, flipy, x, y,
+		m_gfxdecode->gfx(1)->prio_transmask(m_palette,bitmap,sprite_clip, code, color, flipx, flipy, x, y,
 				screen.priority(), 0x02, 0xfeff);
 	}
 }
@@ -297,11 +297,11 @@ void mcr68_state::zwackery_update_sprites(screen_device &screen, bitmap_ind16 &b
 		    The color 8 is used to cover over other sprites. */
 
 		/* first draw the sprite, visible */
-		m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect, code, color, flipx, flipy, x, y,
+		m_gfxdecode->gfx(1)->prio_transmask(m_palette,bitmap,cliprect, code, color, flipx, flipy, x, y,
 				screen.priority(), 0x00, 0x0101);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect, code, color, flipx, flipy, x, y,
+		m_gfxdecode->gfx(1)->prio_transmask(m_palette,bitmap,cliprect, code, color, flipx, flipy, x, y,
 				screen.priority(), 0x02, 0xfeff);
 	}
 }

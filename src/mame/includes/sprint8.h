@@ -38,7 +38,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(sprint8);
 	UINT32 screen_update_sprint8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sprint8(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(sprint8_collision_callback);
@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint8_screech_w);
 	DECLARE_WRITE8_MEMBER(sprint8_attract_w);
 	DECLARE_WRITE8_MEMBER(sprint8_motor_w);
-	void set_pens(sprint8_state *state, colortable_t *colortable);
+	void set_pens();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sprint8_set_collision(int n);
 	required_device<cpu_device> m_maincpu;

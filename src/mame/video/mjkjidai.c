@@ -112,7 +112,7 @@ void mjkjidai_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 		sx += 16;
 		sy += 1;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -125,7 +125,7 @@ void mjkjidai_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 UINT32 mjkjidai_state::screen_update_mjkjidai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!m_display_enable)
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 	else
 	{
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);

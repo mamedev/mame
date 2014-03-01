@@ -451,10 +451,10 @@ HD44780_PIXEL_UPDATE(psion_state::lz_pixel_update)
 	}
 }
 
-void psion_state::palette_init()
+PALETTE_INIT_MEMBER(psion_state, psion)
 {
-	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
-	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 static const gfx_layout psion_charlayout =
@@ -485,7 +485,8 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
 	MCFG_SCREEN_SIZE(6*16, 9*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(psion_state, psion)
 	MCFG_GFXDECODE_ADD("gfxdecode", psion)
 
 	MCFG_HD44780_ADD("hd44780")

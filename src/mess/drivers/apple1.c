@@ -301,9 +301,8 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", apple1)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_DEVICE_ADD( "pia", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(apple1_state,apple1_pia0_kbdin))

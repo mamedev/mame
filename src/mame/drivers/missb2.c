@@ -68,7 +68,7 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_ind16 &b
 	//popmessage("%02x",(*m_bgvram) & 0x1f);
 	for (bg_offs = ((*m_bgvram) << 4); bg_offs < (((*m_bgvram) << 4) | 0xf); bg_offs++)
 	{
-		m_gfxdecode->gfx(1)->opaque(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->opaque(m_palette,bitmap,cliprect,
 				bg_offs,
 				1,
 				0,0,
@@ -128,7 +128,7 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_ind16 &b
 					flipy = !flipy;
 				}
 
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 						code,
 						0,
 						flipx,flipy,
@@ -141,15 +141,15 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-INLINE void bg_changecolor_RRRRGGGGBBBBxxxx( running_machine &machine, pen_t color, int data )
+INLINE void bg_changecolor_RRRRGGGGBBBBxxxx( palette_device &palette, pen_t color, int data )
 {
-	palette_set_color_rgb(machine, color + 256, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
+	palette.set_pen_color(color + 256, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
 WRITE8_MEMBER(missb2_state::bg_paletteram_RRRRGGGGBBBBxxxx_be_w)
 {
 	m_bg_paletteram[offset] = data;
-	bg_changecolor_RRRRGGGGBBBBxxxx(machine(), offset / 2, m_bg_paletteram[offset | 1] | (m_bg_paletteram[offset & ~1] << 8));
+	bg_changecolor_RRRRGGGGBBBBxxxx(m_palette, offset / 2, m_bg_paletteram[offset | 1] | (m_bg_paletteram[offset & ~1] << 8));
 }
 
 WRITE8_MEMBER(missb2_state::missb2_bg_bank_w)
@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(bublbobl_sound_command_w)
 	AM_RANGE(0xfa03, 0xfa03) AM_WRITENOP // sound cpu reset
 	AM_RANGE(0xfa80, 0xfa80) AM_WRITENOP
@@ -476,7 +476,9 @@ static MACHINE_CONFIG_START( missb2, missb2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(missb2_state, screen_update_missb2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", missb2)
-	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -303,7 +303,7 @@ PALETTE_INIT_MEMBER(gluck2_state, gluck2)
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 
 	}
 }
@@ -568,8 +568,8 @@ static MACHINE_CONFIG_START( gluck2, gluck2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gluck2_state, screen_update_gluck2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gluck2)
-	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT_OVERRIDE(gluck2_state, gluck2)
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(gluck2_state, gluck2)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16, mc6845_intf) /* guess */
 

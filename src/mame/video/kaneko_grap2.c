@@ -15,7 +15,8 @@
 const device_type KANEKO_GRAP2 = &device_creator<kaneko_grap2_device>;
 
 kaneko_grap2_device::kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO_GRAP2, "kaneko_grap2_device", tag, owner, clock, "kaneko_grap2", __FILE__)
+	: device_t(mconfig, KANEKO_GRAP2, "kaneko_grap2_device", tag, owner, clock, "kaneko_grap2", __FILE__),
+	m_palette(*this)
 {
 	m_chipnum = 0;
 }
@@ -25,6 +26,16 @@ void kaneko_grap2_device::set_chipnum(device_t &device, int chipnum)
 {
 	kaneko_grap2_device &dev = downcast<kaneko_grap2_device &>(device);
 	dev.m_chipnum = chipnum;
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void kaneko_grap2_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<kaneko_grap2_device &>(device).m_palette.set_tag(tag);
 }
 
 
@@ -153,7 +164,7 @@ WRITE16_MEMBER(kaneko_grap2_device::galpani3_regs1_go_w)
 
 void kaneko_grap2_device::set_color_555_gp3(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
-	palette_set_color_rgb(machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+	m_palette->set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
 WRITE16_MEMBER(kaneko_grap2_device::galpani3_framebuffer1_palette_w)

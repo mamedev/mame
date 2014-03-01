@@ -258,7 +258,7 @@ static MACHINE_CONFIG_START( a6809, a6809_state )
 	MCFG_SCREEN_SIZE(40 * 12, 25 * 20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 12 - 1, 0, 25 * 20 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("saa5050", saa5050_device, screen_update)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

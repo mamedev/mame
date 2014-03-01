@@ -231,7 +231,7 @@ UINT32 williams_state::screen_update_williams2(screen_device &screen, bitmap_rgb
 
 	/* fetch the relevant pens */
 	for (x = 1; x < 16; x++)
-		pens[x] = palette_get_color(machine(), m_williams2_fg_color * 16 + x);
+		pens[x] = m_palette->pen_color(m_williams2_fg_color * 16 + x);
 
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -310,7 +310,7 @@ WRITE8_MEMBER(williams_state::williams2_paletteram_w)
 	b = ((entry_hi >> 0) & 15) * i;
 	g = ((entry_lo >> 4) & 15) * i;
 	r = ((entry_lo >> 0) & 15) * i;
-	palette_set_color(machine(), offset / 2, rgb_t(r, g, b));
+	m_palette->set_pen_color(offset / 2, rgb_t(r, g, b));
 }
 
 

@@ -249,7 +249,7 @@ void ssrj_state::draw_objects(bitmap_ind16 &bitmap, const rectangle &cliprect )
 					int offs = (i * 5 + k) * 64 + (31 - j) * 2;
 
 					code = m_vram3[offs] + 256 * m_vram3[offs + 1];
-					m_gfxdecode->gfx(0)->transpen(bitmap,
+					m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,
 						cliprect,
 						code&1023,
 						((code>>12)&0x3)+8,
@@ -265,12 +265,12 @@ void ssrj_state::draw_objects(bitmap_ind16 &bitmap, const rectangle &cliprect )
 }
 
 
-void ssrj_state::palette_init()
+PALETTE_INIT_MEMBER(ssrj_state, ssrj)
 {
 	int i, j;
 	for(i=0; i<4*4; i++)
 		for(j=0; j<8; j++)
-			palette_set_color_rgb(machine(), i*8+j, fakecols[i][j][0], fakecols[i][j][1], fakecols[i][j][2]);
+			palette.set_pen_color(i*8+j, fakecols[i][j][0], fakecols[i][j][1], fakecols[i][j][2]);
 }
 
 UINT32 ssrj_state::screen_update_ssrj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

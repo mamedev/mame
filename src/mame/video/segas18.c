@@ -189,7 +189,7 @@ UINT32 segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	// if no drawing is happening, fill with black and get out
 	if (!m_segaic16vid->segaic16_display_enable)
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 
@@ -252,7 +252,7 @@ UINT32 segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 #if DEBUG_VDP
 	if (m_vdp_enable && machine().input().code_pressed(KEYCODE_V))
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		update_system18_vdp(bitmap, cliprect);
 	}
 	if (vdp_enable && machine().input().code_pressed(KEYCODE_B))

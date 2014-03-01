@@ -77,7 +77,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(chinsan);
 	UINT32 screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(chin_adpcm_int);
 	required_device<cpu_device> m_maincpu;
@@ -92,13 +92,13 @@ public:
  *
  *************************************/
 
-void chinsan_state::palette_init()
+PALETTE_INIT_MEMBER(chinsan_state, chinsan)
 {
 	UINT8 *src = memregion( "color_proms" )->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
-		palette_set_color_rgb(machine(), i, pal4bit(src[i + 0x200]), pal4bit(src[i + 0x100]), pal4bit(src[i + 0x000]));
+		palette.set_pen_color(i, pal4bit(src[i + 0x200]), pal4bit(src[i + 0x100]), pal4bit(src[i + 0x000]));
 }
 
 void chinsan_state::video_start()
@@ -116,7 +116,7 @@ UINT32 chinsan_state::screen_update_chinsan(screen_device &screen, bitmap_ind16 
 			int tileno, colour;
 			tileno = m_video[count] | (m_video[count + 0x800] << 8);
 			colour = m_video[count + 0x1000] >> 3;
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tileno,colour,0,0,x*8,y*8);
+			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tileno,colour,0,0,x*8,y*8);
 			count++;
 		}
 	}
@@ -613,8 +613,8 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(chinsan_state, screen_update_chinsan)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", chinsan)
-	MCFG_PALETTE_LENGTH(0x100)
-
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(chinsan_state, chinsan)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

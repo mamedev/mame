@@ -165,7 +165,7 @@ int starcrus_state::collision_check_s1s2()
 
 	/* Draw ship 1 */
 	
-			m_gfxdecode->gfx(8+((m_s1_sprite&0x04)>>2))->opaque(*m_ship1_vid,
+			m_gfxdecode->gfx(8+((m_s1_sprite&0x04)>>2))->opaque(m_palette,*m_ship1_vid,
 			clip,
 			(m_s1_sprite&0x03)^0x03,
 			0,
@@ -174,7 +174,7 @@ int starcrus_state::collision_check_s1s2()
 
 	/* Draw ship 2 */
 	
-			m_gfxdecode->gfx(10+((m_s2_sprite&0x04)>>2))->opaque(*m_ship2_vid,
+			m_gfxdecode->gfx(10+((m_s2_sprite&0x04)>>2))->opaque(m_palette,*m_ship2_vid,
 			clip,
 			(m_s2_sprite&0x03)^0x03,
 			0,
@@ -216,7 +216,7 @@ int starcrus_state::collision_check_p1p2()
 	{
 		/* Draw score/projectile 1 */
 		
-				m_gfxdecode->gfx((m_p1_sprite&0x0c)>>2)->opaque(*m_proj1_vid,
+				m_gfxdecode->gfx((m_p1_sprite&0x0c)>>2)->opaque(m_palette,*m_proj1_vid,
 				clip,
 				(m_p1_sprite&0x03)^0x03,
 				0,
@@ -228,7 +228,7 @@ int starcrus_state::collision_check_p1p2()
 	{
 		/* Draw score/projectile 2 */
 		
-				m_gfxdecode->gfx(4+((m_p2_sprite&0x0c)>>2))->opaque(*m_proj2_vid,
+				m_gfxdecode->gfx(4+((m_p2_sprite&0x0c)>>2))->opaque(m_palette,*m_proj2_vid,
 				clip,
 				(m_p2_sprite&0x03)^0x03,
 				0,
@@ -270,7 +270,7 @@ int starcrus_state::collision_check_s1p1p2()
 
 	/* Draw ship 1 */
 	
-			m_gfxdecode->gfx(8+((m_s1_sprite&0x04)>>2))->opaque(*m_ship1_vid,
+			m_gfxdecode->gfx(8+((m_s1_sprite&0x04)>>2))->opaque(m_palette,*m_ship1_vid,
 			clip,
 			(m_s1_sprite&0x03)^0x03,
 			0,
@@ -281,7 +281,7 @@ int starcrus_state::collision_check_s1p1p2()
 	{
 		/* Draw projectile 1 */
 		
-				m_gfxdecode->gfx((m_p1_sprite&0x0c)>>2)->opaque(*m_proj1_vid,
+				m_gfxdecode->gfx((m_p1_sprite&0x0c)>>2)->opaque(m_palette,*m_proj1_vid,
 				clip,
 				(m_p1_sprite&0x03)^0x03,
 				0,
@@ -293,7 +293,7 @@ int starcrus_state::collision_check_s1p1p2()
 	{
 		/* Draw projectile 2 */
 		
-				m_gfxdecode->gfx(4+((m_p2_sprite&0x0c)>>2))->opaque(*m_proj2_vid,
+				m_gfxdecode->gfx(4+((m_p2_sprite&0x0c)>>2))->opaque(m_palette,*m_proj2_vid,
 				clip,
 				(m_p2_sprite&0x03)^0x03,
 				0,
@@ -341,7 +341,7 @@ int starcrus_state::collision_check_s2p1p2()
 
 	/* Draw ship 2 */
 	
-			m_gfxdecode->gfx(10+((m_s2_sprite&0x04)>>2))->opaque(*m_ship2_vid,
+			m_gfxdecode->gfx(10+((m_s2_sprite&0x04)>>2))->opaque(m_palette,*m_ship2_vid,
 			clip,
 			(m_s2_sprite&0x03)^0x03,
 			0,
@@ -352,7 +352,7 @@ int starcrus_state::collision_check_s2p1p2()
 	{
 		/* Draw projectile 1 */
 		
-				m_gfxdecode->gfx((m_p1_sprite&0x0c)>>2)->opaque(*m_proj1_vid,
+				m_gfxdecode->gfx((m_p1_sprite&0x0c)>>2)->opaque(m_palette,*m_proj1_vid,
 				clip,
 				(m_p1_sprite&0x03)^0x03,
 				0,
@@ -364,7 +364,7 @@ int starcrus_state::collision_check_s2p1p2()
 	{
 		/* Draw projectile 2 */
 		
-				m_gfxdecode->gfx(4+((m_p2_sprite&0x0c)>>2))->opaque(*m_proj2_vid,
+				m_gfxdecode->gfx(4+((m_p2_sprite&0x0c)>>2))->opaque(m_palette,*m_proj2_vid,
 				clip,
 				(m_p2_sprite&0x03)^0x03,
 				0,
@@ -394,7 +394,7 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 
 	/* Draw ship 1 */
 	
-			m_gfxdecode->gfx(8+((m_s1_sprite&0x04)>>2))->transpen(bitmap,
+			m_gfxdecode->gfx(8+((m_s1_sprite&0x04)>>2))->transpen(m_palette,bitmap,
 			cliprect,
 			(m_s1_sprite&0x03)^0x03,
 			0,
@@ -404,7 +404,7 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 
 	/* Draw ship 2 */
 	
-			m_gfxdecode->gfx(10+((m_s2_sprite&0x04)>>2))->transpen(bitmap,
+			m_gfxdecode->gfx(10+((m_s2_sprite&0x04)>>2))->transpen(m_palette,bitmap,
 			cliprect,
 			(m_s2_sprite&0x03)^0x03,
 			0,
@@ -414,7 +414,7 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 
 	/* Draw score/projectile 1 */
 	
-			m_gfxdecode->gfx((m_p1_sprite&0x0c)>>2)->transpen(bitmap,
+			m_gfxdecode->gfx((m_p1_sprite&0x0c)>>2)->transpen(m_palette,bitmap,
 			cliprect,
 			(m_p1_sprite&0x03)^0x03,
 			0,
@@ -424,7 +424,7 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 
 	/* Draw score/projectile 2 */
 	
-			m_gfxdecode->gfx(4+((m_p2_sprite&0x0c)>>2))->transpen(bitmap,
+			m_gfxdecode->gfx(4+((m_p2_sprite&0x0c)>>2))->transpen(m_palette,bitmap,
 			cliprect,
 			(m_p2_sprite&0x03)^0x03,
 			0,

@@ -97,25 +97,25 @@ PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
 		int r = i & 0x03;
 		int g = (i & 0x0c) >> 2;
 		int b = (i & 0x30) >> 4;
-		palette_set_color_rgb(machine(), i, pal2bit(r), pal2bit(g), pal2bit(b));
+		palette.set_pen_color(i, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
 	/* TMS9918 palette */
-	palette_set_color_rgb(machine(), 64+ 0,   0,   0,   0);
-	palette_set_color_rgb(machine(), 64+ 1,   0,   0,   0);
-	palette_set_color_rgb(machine(), 64+ 2,  33, 200,  66);
-	palette_set_color_rgb(machine(), 64+ 3,  94, 220, 120);
-	palette_set_color_rgb(machine(), 64+ 4,  84,  85, 237);
-	palette_set_color_rgb(machine(), 64+ 5, 125, 118, 252);
-	palette_set_color_rgb(machine(), 64+ 6, 212,  82,  77);
-	palette_set_color_rgb(machine(), 64+ 7,  66, 235, 245);
-	palette_set_color_rgb(machine(), 64+ 8, 252,  85,  84);
-	palette_set_color_rgb(machine(), 64+ 9, 255, 121, 120);
-	palette_set_color_rgb(machine(), 64+10, 212, 193,  84);
-	palette_set_color_rgb(machine(), 64+11, 230, 206, 128);
-	palette_set_color_rgb(machine(), 64+12,  33, 176,  59);
-	palette_set_color_rgb(machine(), 64+13, 201,  91, 186);
-	palette_set_color_rgb(machine(), 64+14, 204, 204, 204);
-	palette_set_color_rgb(machine(), 64+15, 255, 255, 255);
+	palette.set_pen_color(64+ 0,   0,   0,   0);
+	palette.set_pen_color(64+ 1,   0,   0,   0);
+	palette.set_pen_color(64+ 2,  33, 200,  66);
+	palette.set_pen_color(64+ 3,  94, 220, 120);
+	palette.set_pen_color(64+ 4,  84,  85, 237);
+	palette.set_pen_color(64+ 5, 125, 118, 252);
+	palette.set_pen_color(64+ 6, 212,  82,  77);
+	palette.set_pen_color(64+ 7,  66, 235, 245);
+	palette.set_pen_color(64+ 8, 252,  85,  84);
+	palette.set_pen_color(64+ 9, 255, 121, 120);
+	palette.set_pen_color(64+10, 212, 193,  84);
+	palette.set_pen_color(64+11, 230, 206, 128);
+	palette.set_pen_color(64+12,  33, 176,  59);
+	palette.set_pen_color(64+13, 201,  91, 186);
+	palette.set_pen_color(64+14, 204, 204, 204);
+	palette.set_pen_color(64+15, 255, 255, 255);
 }
 
 
@@ -127,7 +127,7 @@ PALETTE_INIT_MEMBER(sega315_5378_device, sega315_5378)
 		int r = i & 0x000f;
 		int g = (i & 0x00f0) >> 4;
 		int b = (i & 0x0f00) >> 8;
-		palette_set_color_rgb(machine(), i, pal4bit(r), pal4bit(g), pal4bit(b));
+		palette.set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
@@ -146,6 +146,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 	, m_palette_offset( 0 )
 	, m_supports_224_240( false )
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
+	, m_palette(*this, "palette")
 {
 }
 
@@ -158,6 +159,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_palette_offset( palette_offset )
 	, m_supports_224_240( supports_224_240 )
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
+	, m_palette(*this, "palette")
 {
 }
 
@@ -398,13 +400,13 @@ void sega315_5124_device::process_line_timer()
 		/* Draw left border */
 		rec.min_x = SEGA315_5124_LBORDER_START;
 		rec.max_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 1;
-		m_tmpbitmap.fill(machine().pens[m_current_palette[BACKDROP_COLOR]], rec);
+		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill(1, rec);
 
 		/* Draw right border */
 		rec.min_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256;
 		rec.max_x = rec.min_x + SEGA315_5124_RBORDER_WIDTH - 1;
-		m_tmpbitmap.fill(machine().pens[m_current_palette[BACKDROP_COLOR]], rec);
+		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill(1, rec);
 
 		/* Draw middle of the border */
@@ -440,13 +442,13 @@ void sega315_5124_device::process_line_timer()
 		/* Draw left border */
 		rec.min_x = SEGA315_5124_LBORDER_START;
 		rec.max_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 1;
-		m_tmpbitmap.fill(machine().pens[m_current_palette[BACKDROP_COLOR]], rec);
+		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill(1, rec);
 
 		/* Draw right border */
 		rec.min_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256;
 		rec.max_x = rec.min_x + SEGA315_5124_RBORDER_WIDTH - 1;
-		m_tmpbitmap.fill(machine().pens[m_current_palette[BACKDROP_COLOR]], rec);
+		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill(1, rec);
 
 		select_sprites( vpos - vpos_limit );
@@ -472,13 +474,13 @@ void sega315_5124_device::process_line_timer()
 		/* Draw left border */
 		rec.min_x = SEGA315_5124_LBORDER_START;
 		rec.max_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 1;
-		m_tmpbitmap.fill(machine().pens[m_current_palette[BACKDROP_COLOR]], rec);
+		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill(1, rec);
 
 		/* Draw right border */
 		rec.min_x = SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256;
 		rec.max_x = rec.min_x + SEGA315_5124_RBORDER_WIDTH - 1;
-		m_tmpbitmap.fill(machine().pens[m_current_palette[BACKDROP_COLOR]], rec);
+		m_tmpbitmap.fill(m_palette->pen(m_current_palette[BACKDROP_COLOR]), rec);
 		m_y1_bitmap.fill(1, rec);
 
 		/* Draw middle of the border */
@@ -1432,7 +1434,7 @@ void sega315_5124_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 	{
 		for (x = 0; x < 256; x++)
 		{
-			p_bitmap[x] = machine().pens[m_current_palette[BACKDROP_COLOR]];
+			p_bitmap[x] = m_palette->pen(m_current_palette[BACKDROP_COLOR]);
 			p_y1[x] = 1;
 		}
 	}
@@ -1440,7 +1442,7 @@ void sega315_5124_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 	{
 		for (x = 0; x < 256; x++)
 		{
-			p_bitmap[x] = machine().pens[blitline_buffer[x]];
+			p_bitmap[x] = m_palette->pen(blitline_buffer[x]);
 			p_y1[x] = ( priority_selected[x] & 0x0f ) ? 0 : 1;
 		}
 	}
@@ -1590,10 +1592,10 @@ void sega315_5378_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 
 			for (x = 0 + 48; x < 160 + 48; x++)
 			{
-				rgb_t   c1 = machine().pens[line1[x]];
-				rgb_t   c2 = machine().pens[line2[x]];
-				rgb_t   c3 = machine().pens[line3[x]];
-				rgb_t   c4 = machine().pens[line4[x]];
+				rgb_t   c1 = m_palette->pen(line1[x]);
+				rgb_t   c2 = m_palette->pen(line2[x]);
+				rgb_t   c3 = m_palette->pen(line3[x]);
+				rgb_t   c4 = m_palette->pen(line4[x]);
 				m_tmpbitmap.pix32(pixel_plot_y, pixel_offset_x + x) =
 					rgb_t((c1.r() / 6 + c2.r() / 3 + c3.r() / 3 + c4.r() / 6 ),
 						(c1.g() / 6 + c2.g() / 3 + c3.g() / 3 + c4.g() / 6 ),
@@ -1606,7 +1608,7 @@ void sega315_5378_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 
 	for (x = 0; x < 256; x++)
 	{
-		m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x + x) = machine().pens[blitline_buffer[x]];
+		m_tmpbitmap.pix32(pixel_plot_y + line, pixel_offset_x + x) = m_palette->pen(blitline_buffer[x]);
 	}
 }
 
@@ -1803,7 +1805,8 @@ void sega315_5124_device::device_reset()
 }
 
 static MACHINE_CONFIG_FRAGMENT( sega315_5124 )
-	MCFG_PALETTE_INIT_OVERRIDE(sega315_5124_device, sega315_5124)
+	MCFG_PALETTE_ADD("palette", SEGA315_5124_PALETTE_SIZE)
+	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -1824,7 +1827,8 @@ void sega315_5378_device::device_reset()
 }
 
 static MACHINE_CONFIG_FRAGMENT( sega315_5378 )
-	MCFG_PALETTE_INIT_OVERRIDE(sega315_5378_device, sega315_5378)
+	MCFG_PALETTE_ADD("palette", SEGA315_5378_PALETTE_SIZE)
+	MCFG_PALETTE_INIT_OWNER(sega315_5378_device, sega315_5378)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

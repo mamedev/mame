@@ -64,13 +64,13 @@ rgb_t lasso_state::get_color( int data )
 }
 
 
-void lasso_state::palette_init()
+PALETTE_INIT_MEMBER(lasso_state, lasso)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x40; i++)
-		palette_set_color(machine(), i, get_color(color_prom[i]));
+		palette.set_pen_color(i, get_color(color_prom[i]));
 }
 
 
@@ -79,15 +79,12 @@ PALETTE_INIT_MEMBER(lasso_state,wwjgtin)
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x40);
-
 	for (i = 0; i < 0x40; i++)
-		colortable_palette_set_color(machine().colortable, i, get_color(color_prom[i]));
+		palette.set_indirect_color(i, get_color(color_prom[i]));
 
 	/* characters/sprites */
 	for (i = 0; i < 0x40; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* track */
 	for (i = 0x40; i < 0x140; i++)
@@ -99,18 +96,18 @@ PALETTE_INIT_MEMBER(lasso_state,wwjgtin)
 		else
 			ctabentry = 0;
 
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
 
-void lasso_state::wwjgtin_set_last_four_colors( colortable_t *colortable )
+void lasso_state::wwjgtin_set_last_four_colors()
 {
 	int i;
 
 	/* the last palette entries can be changed */
 	for(i = 0; i < 3; i++)
-		colortable_palette_set_color(colortable, 0x3d + i, get_color(m_last_colors[i]));
+		m_palette->set_indirect_color(0x3d + i, get_color(m_last_colors[i]));
 }
 
 
@@ -301,7 +298,7 @@ void lasso_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect,
 		code = source[1] & 0x3f;
 		color = source[2] & 0x0f;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code | ((UINT16)m_gfxbank << 6),
 				color,
 				flipx, flipy,
@@ -354,7 +351,7 @@ void lasso_state::draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 UINT32 lasso_state::screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	palette_set_color(machine(), 0, get_color(*m_back_color));
+	m_palette->set_pen_color(0, get_color(*m_back_color));
 	bitmap.fill(0, cliprect);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -366,7 +363,7 @@ UINT32 lasso_state::screen_update_lasso(screen_device &screen, bitmap_ind16 &bit
 
 UINT32 lasso_state::screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	palette_set_color(machine(), 0, get_color(*m_back_color));
+	m_palette->set_pen_color(0, get_color(*m_back_color));
 	bitmap.fill(0, cliprect);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -378,8 +375,8 @@ UINT32 lasso_state::screen_update_chameleo(screen_device &screen, bitmap_ind16 &
 
 UINT32 lasso_state::screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	colortable_palette_set_color(machine().colortable, 0, get_color(*m_back_color));
-	wwjgtin_set_last_four_colors(machine().colortable);
+	m_palette->set_indirect_color(0, get_color(*m_back_color));
+	wwjgtin_set_last_four_colors();
 
 	m_track_tilemap->set_scrollx(0, m_track_scroll[0] + m_track_scroll[1] * 256);
 	m_track_tilemap->set_scrolly(0, m_track_scroll[2] + m_track_scroll[3] * 256);
@@ -387,7 +384,7 @@ UINT32 lasso_state::screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &b
 	if (m_track_enable)
 		m_track_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 
 	draw_sprites(bitmap, cliprect, 1);   // reverse order
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

@@ -15,18 +15,18 @@
 ******************************************************************************/
 READ16_MEMBER(niyanpai_state::niyanpai_palette_r)
 {
-	return m_palette[offset];
+	return m_palette_ptr[offset];
 }
 
 WRITE16_MEMBER(niyanpai_state::niyanpai_palette_w)
 {
 	int r, g, b;
 	int offs_h, offs_l;
-	UINT16 oldword = m_palette[offset];
+	UINT16 oldword = m_palette_ptr[offset];
 	UINT16 newword;
 
-	COMBINE_DATA(&m_palette[offset]);
-	newword = m_palette[offset];
+	COMBINE_DATA(&m_palette_ptr[offset]);
+	newword = m_palette_ptr[offset];
 
 	if (oldword != newword)
 	{
@@ -35,20 +35,20 @@ WRITE16_MEMBER(niyanpai_state::niyanpai_palette_w)
 
 		if (ACCESSING_BITS_8_15)
 		{
-			r  = ((m_palette[(0x000 + (offs_h * 0x180) + offs_l)] & 0xff00) >> 8);
-			g  = ((m_palette[(0x080 + (offs_h * 0x180) + offs_l)] & 0xff00) >> 8);
-			b  = ((m_palette[(0x100 + (offs_h * 0x180) + offs_l)] & 0xff00) >> 8);
+			r  = ((m_palette_ptr[(0x000 + (offs_h * 0x180) + offs_l)] & 0xff00) >> 8);
+			g  = ((m_palette_ptr[(0x080 + (offs_h * 0x180) + offs_l)] & 0xff00) >> 8);
+			b  = ((m_palette_ptr[(0x100 + (offs_h * 0x180) + offs_l)] & 0xff00) >> 8);
 
-			palette_set_color(machine(), ((offs_h << 8) + (offs_l << 1) + 0), rgb_t(r, g, b));
+			m_palette->set_pen_color(((offs_h << 8) + (offs_l << 1) + 0), rgb_t(r, g, b));
 		}
 
 		if (ACCESSING_BITS_0_7)
 		{
-			r  = ((m_palette[(0x000 + (offs_h * 0x180) + offs_l)] & 0x00ff) >> 0);
-			g  = ((m_palette[(0x080 + (offs_h * 0x180) + offs_l)] & 0x00ff) >> 0);
-			b  = ((m_palette[(0x100 + (offs_h * 0x180) + offs_l)] & 0x00ff) >> 0);
+			r  = ((m_palette_ptr[(0x000 + (offs_h * 0x180) + offs_l)] & 0x00ff) >> 0);
+			g  = ((m_palette_ptr[(0x080 + (offs_h * 0x180) + offs_l)] & 0x00ff) >> 0);
+			b  = ((m_palette_ptr[(0x100 + (offs_h * 0x180) + offs_l)] & 0x00ff) >> 0);
 
-			palette_set_color(machine(), ((offs_h << 8) + (offs_l << 1) + 1), rgb_t(r, g, b));
+			m_palette->set_pen_color(((offs_h << 8) + (offs_l << 1) + 1), rgb_t(r, g, b));
 		}
 	}
 }
@@ -365,7 +365,7 @@ void niyanpai_state::video_start()
 	m_videoworkram[0] = auto_alloc_array_clear(machine(), UINT16, width * height);
 	m_videoworkram[1] = auto_alloc_array_clear(machine(), UINT16, width * height);
 	m_videoworkram[2] = auto_alloc_array_clear(machine(), UINT16, width * height);
-	m_palette = auto_alloc_array(machine(), UINT16, 0x480);
+	m_palette_ptr = auto_alloc_array(machine(), UINT16, 0x480);
 	m_clut[0] = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_clut[1] = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_clut[2] = auto_alloc_array(machine(), UINT8, 0x1000);

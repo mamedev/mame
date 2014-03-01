@@ -96,7 +96,7 @@ public:
 	DECLARE_READ8_MEMBER( ti83p_port_0002_r );
 	virtual void machine_start();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(ti85);
 	DECLARE_MACHINE_RESET(ti85);
 	DECLARE_PALETTE_INIT(ti82);
 	DECLARE_MACHINE_START(ti86);

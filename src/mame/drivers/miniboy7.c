@@ -169,7 +169,7 @@ public:
 	DECLARE_WRITE8_MEMBER(miniboy7_colorram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(miniboy7);
 	UINT32 screen_update_miniboy7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -222,7 +222,7 @@ UINT32 miniboy7_state::screen_update_miniboy7(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void miniboy7_state::palette_init()
+PALETTE_INIT_MEMBER(miniboy7_state, miniboy7)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 /*  FIXME... Can't get the correct palette.
@@ -241,7 +241,7 @@ void miniboy7_state::palette_init()
 	/* 0000IBGR */
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0, bit1, bit2, r, g, b, inten, intenmin, intenmax;
 
@@ -265,7 +265,7 @@ void miniboy7_state::palette_init()
 		b = (bit2 * intenmin) + (inten * (bit2 * (intenmax - intenmin)));
 
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -450,7 +450,8 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", miniboy7)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(miniboy7_state, miniboy7)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/12, mc6845_intf) /* guess */
 

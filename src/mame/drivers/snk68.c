@@ -596,7 +596,7 @@ static MACHINE_CONFIG_START( pow, snk68_state )
 	MCFG_SCREEN_UPDATE_DRIVER(snk68_state, screen_update_pow)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pow)
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
 
 
 	/* sound hardware */

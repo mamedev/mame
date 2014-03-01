@@ -83,17 +83,14 @@ void pacland_state::switch_palette()
 
 		color_prom++;
 
-		colortable_palette_set_color(machine().colortable,i,rgb_t(r,g,b));
+		m_palette->set_indirect_color(i,rgb_t(r,g,b));
 	}
 }
 
-void pacland_state::palette_init()
+PALETTE_INIT_MEMBER(pacland_state, pacland)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 256);
 
 	m_color_prom = color_prom;  /* we'll need this later */
 	/* skip the palette data, it will be initialized later */
@@ -101,15 +98,15 @@ void pacland_state::palette_init()
 	/* color_prom now points to the beginning of the lookup table */
 
 	for (i = 0;i < 0x400;i++)
-		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(0)->colorbase() + i, *color_prom++);
+		palette.set_pen_indirect(m_gfxdecode->gfx(0)->colorbase() + i, *color_prom++);
 
 	/* Background */
 	for (i = 0;i < 0x400;i++)
-		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(1)->colorbase() + i, *color_prom++);
+		palette.set_pen_indirect(m_gfxdecode->gfx(1)->colorbase() + i, *color_prom++);
 
 	/* Sprites */
 	for (i = 0;i < 0x400;i++)
-		colortable_entry_set_value(machine().colortable, m_gfxdecode->gfx(2)->colorbase() + i, *color_prom++);
+		palette.set_pen_indirect(m_gfxdecode->gfx(2)->colorbase() + i, *color_prom++);
 
 	m_palette_bank = 0;
 	switch_palette();
@@ -128,7 +125,7 @@ void pacland_state::palette_init()
 		/* iterate over all palette entries except the last one */
 		for (palentry = 0; palentry < 0x100; palentry++)
 		{
-			UINT32 mask = colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(2), i, palentry);
+			UINT32 mask = palette.transpen_mask(*m_gfxdecode->gfx(2), i, palentry);
 
 			/* transmask[0] is a mask that is used to draw only high priority sprite pixels; thus, pens
 			   $00-$7F are opaque, and others are transparent */
@@ -207,8 +204,8 @@ void pacland_state::video_start()
 	assert(m_gfxdecode->gfx(0)->colors() <= TILEMAP_NUM_GROUPS);
 	for (color = 0; color < m_gfxdecode->gfx(0)->colors(); color++)
 	{
-		UINT32 mask = colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(0), color, 0x7f);
-		mask |= colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(0), color, 0xff);
+		UINT32 mask = m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0x7f);
+		mask |= m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0xff);
 		m_fg_tilemap->set_transmask(color, mask, 0);
 	}
 
@@ -314,13 +311,13 @@ void pacland_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 			for (x = 0;x <= sizex;x++)
 			{
 				if (whichmask != 0)
-					m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transmask(m_palette,bitmap,cliprect,
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,m_transmask[whichmask][color]);
 				else
-					m_gfxdecode->gfx(2)->prio_transmask(bitmap,cliprect,
+					m_gfxdecode->gfx(2)->prio_transmask(m_palette,bitmap,cliprect,
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,

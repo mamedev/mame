@@ -75,10 +75,10 @@ WRITE32_MEMBER(gunbustr_state::gunbustr_palette_w)
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
 	a = m_generic_paletteram_32[offset] >> 16;
-	palette_set_color_rgb(machine(),offset*2,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
+	m_palette->set_pen_color(offset*2,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
 
 	a = m_generic_paletteram_32[offset] &0xffff;
-	palette_set_color_rgb(machine(),offset*2+1,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
+	m_palette->set_pen_color(offset*2+1,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
 }
 
 CUSTOM_INPUT_MEMBER(gunbustr_state::coin_word_r)
@@ -312,7 +312,7 @@ static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gunbustr_state, screen_update_gunbustr)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gunbustr)
-	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_ADD("palette", 8192)
 
 
 	MCFG_TC0480SCP_ADD("tc0480scp", gunbustr_tc0480scp_intf)

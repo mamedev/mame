@@ -71,7 +71,7 @@ public:
 	DECLARE_DRIVER_INIT(sidam);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(wallc);
 	UINT32 screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -103,7 +103,7 @@ public:
 
 ***************************************************************************/
 
-void wallc_state::palette_init()
+PALETTE_INIT_MEMBER(wallc_state, wallc)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -117,7 +117,7 @@ void wallc_state::palette_init()
 			2,  resistances_rg, weights_g,  330,    0,
 			3,  resistances_b,  weights_b,  330,    655+220);
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit7,r,g,b;
 
@@ -137,7 +137,7 @@ void wallc_state::palette_init()
 		bit7 = (color_prom[i] >> 7) & 0x01;
 		b = combine_3_weights(weights_b, bit7, bit1, bit0);
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -318,8 +318,8 @@ static MACHINE_CONFIG_START( wallc, wallc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wallc_state, screen_update_wallc)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", wallc)
-	MCFG_PALETTE_LENGTH(32)
-
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(wallc_state, wallc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -473,4 +473,4 @@ DRIVER_INIT_MEMBER(wallc_state,sidam)
 
 GAME( 1984, wallc,  0,      wallc,  wallc, wallc_state, wallc,  ROT0, "Midcoin", "Wall Crash (set 1)", 0 )
 GAME( 1984, wallca, wallc,  wallc,  wallc, wallc_state, wallca, ROT0, "Midcoin", "Wall Crash (set 2)", 0 )
-GAME( 1984, sidampkr,0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam", "Unknown Sidam Poker", GAME_NOT_WORKING )
+GAME( 1984, sidampkr,0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam", "unknown Sidam Poker", GAME_NOT_WORKING )

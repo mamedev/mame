@@ -96,6 +96,7 @@ public:
 		UINT8   m_vsync;
 		UINT8   m_vblank;
 		UINT8   m_display_enable;
+		required_device<palette_device> m_palette;	
 };
 
 

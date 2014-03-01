@@ -184,14 +184,14 @@ void psikyosh_state::draw_bglayer( int layer, bitmap_rgb32 &bitmap, const rectan
 				tileno = (m_bgram[(tilebank * 0x800) / 4 + offs - 0x4000 / 4] & 0x0007ffff); /* seems to take into account spriteram, hence -0x4000 */
 				colour = (m_bgram[(tilebank * 0x800) / 4 + offs - 0x4000 / 4] & 0xff000000) >> 24;
 
-				gfx->alphatable(bitmap, cliprect, tileno, colour, 0, 0, (16 * sx + scrollx) & 0x1ff, ((16 * sy + scrolly) & (width - 1)), alpha, m_alphatable); /* normal */
+				gfx->alphatable(m_palette, bitmap, cliprect, tileno, colour, 0, 0, (16 * sx + scrollx) & 0x1ff, ((16 * sy + scrolly) & (width - 1)), alpha, m_alphatable); /* normal */
 
 				if (scrollx)
-					gfx->alphatable(bitmap, cliprect, tileno, colour, 0, 0, ((16 * sx + scrollx) & 0x1ff) - 0x200, ((16 * sy + scrolly) & (width - 1)), alpha, m_alphatable); /* wrap x */
+					gfx->alphatable(m_palette, bitmap, cliprect, tileno, colour, 0, 0, ((16 * sx + scrollx) & 0x1ff) - 0x200, ((16 * sy + scrolly) & (width - 1)), alpha, m_alphatable); /* wrap x */
 				if (scrolly)
-					gfx->alphatable(bitmap, cliprect, tileno, colour, 0, 0, (16 * sx + scrollx) & 0x1ff, ((16 * sy + scrolly) & (width - 1)) - width, alpha, m_alphatable); /* wrap y */
+					gfx->alphatable(m_palette, bitmap, cliprect, tileno, colour, 0, 0, (16 * sx + scrollx) & 0x1ff, ((16 * sy + scrolly) & (width - 1)) - width, alpha, m_alphatable); /* wrap y */
 				if (scrollx && scrolly)
-					gfx->alphatable(bitmap, cliprect, tileno, colour, 0, 0, ((16 * sx + scrollx) & 0x1ff) - 0x200, ((16 * sy + scrolly) & (width - 1)) - width, alpha, m_alphatable); /* wrap xy */
+					gfx->alphatable(m_palette, bitmap, cliprect, tileno, colour, 0, 0, ((16 * sx + scrollx) & 0x1ff) - 0x200, ((16 * sy + scrolly) & (width - 1)) - width, alpha, m_alphatable); /* wrap xy */
 
 				offs++;
 			}
@@ -232,7 +232,7 @@ void psikyosh_state::cache_bitmap(int scanline, gfx_element *gfx, int size, int 
 			int need_alpha = alpha < 0 ? -1 : 0xff; // store per-pen alpha in bitmap, otherwise don't since we'll need it per-line
 
 			if(tileno) { // valid tile, but blank in all games?
-				gfx->alphastore(m_bg_bitmap, m_bg_bitmap.cliprect(), tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha, m_alphatable);
+				gfx->alphastore(m_palette, m_bg_bitmap, m_bg_bitmap.cliprect(), tileno, colour, 0, 0, (16 * sx) & 0x1ff, ((16 * sy) & (width - 1)), need_alpha, m_alphatable);
 			}
 
 			offs++;
@@ -424,7 +424,7 @@ void psikyosh_state:: psikyosh_drawgfxzoom( bitmap_rgb32 &dest_bmp,const rectang
 			{
 				for (xtile = xstart; xtile != xend; xtile += xinc)
 				{
-					const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+					const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 					const UINT8 *code_base = gfx->get_data((code + code_offset++) % gfx->elements());
 
 					int x_index_base, y_index, sx, sy, ex, ey;
@@ -687,7 +687,7 @@ void psikyosh_state:: psikyosh_drawgfxzoom( bitmap_rgb32 &dest_bmp,const rectang
 		/* Start drawing */
 		if (gfx)
 		{
-			const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 
 			int sprite_screen_height = ((high * gfx->height() * (0x400 * 0x400)) / zoomy + 0x200) >> 10; /* Round up to nearest pixel */
 			int sprite_screen_width = ((wide * gfx->width() * (0x400 * 0x400)) / zoomx + 0x200) >> 10;

@@ -1,13 +1,13 @@
 #include "emu.h"
 #include "includes/xyonix.h"
 
-void xyonix_state::palette_init()
+PALETTE_INIT_MEMBER(xyonix_state, xyonix)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 
-	for (i = 0;i < machine().total_colors();i++)
+	for (i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -26,7 +26,7 @@ void xyonix_state::palette_init()
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 

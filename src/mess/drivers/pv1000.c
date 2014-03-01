@@ -168,7 +168,7 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(pv1000);
 	UINT32 screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
 	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
@@ -295,10 +295,10 @@ static INPUT_PORTS_START( pv1000 )
 INPUT_PORTS_END
 
 
-void pv1000_state::palette_init()
+PALETTE_INIT_MEMBER(pv1000_state, pv1000)
 {
 	for (int i = 0; i < 8; i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 
 
@@ -354,12 +354,12 @@ UINT32 pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &b
 			if ( tile < 0xe0 || m_force_pattern )
 			{
 				tile += ( m_pcg_bank << 8);
-				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
+				m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
 			}
 			else
 			{
 				tile -= 0xe0;
-				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
+				m_gfxdecode->gfx(1)->opaque(m_palette,bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
 			}
 		}
 	}
@@ -463,8 +463,10 @@ static MACHINE_CONFIG_START( pv1000, pv1000_state )
 	MCFG_SCREEN_RAW_PARAMS( 17897725/3, 380, 0, 256, 262, 0, 192 )
 	MCFG_SCREEN_UPDATE_DRIVER(pv1000_state, screen_update_pv1000)
 
-	MCFG_PALETTE_LENGTH( 8 )
-	MCFG_GFXDECODE_ADD("gfxdecode",  pv1000 )
+	MCFG_PALETTE_ADD( "palette", 8 )
+	MCFG_PALETTE_INIT_OWNER(pv1000_state, pv1000)
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", pv1000 )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD( "pv1000_sound", PV1000, 17897725 )

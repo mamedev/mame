@@ -11,7 +11,7 @@
 #define LOG 0
 
 
-static const rgb_t PALETTE[] =
+static const rgb_t PALETTE_1512[] =
 {
 	rgb_t::black,
 	rgb_t(0x00, 0x00, 0xaa),
@@ -434,7 +434,7 @@ void pc1512_state::draw_alpha(bitmap_rgb32 &bitmap, const rectangle &cliprect, U
 		{
 			int color = BIT(data, 7) ? fg : bg;
 
-			*p = PALETTE[color]; p++;
+			*p = PALETTE_1512[color]; p++;
 
 			data <<= 1;
 		}
@@ -478,7 +478,7 @@ void pc1512_state::draw_graphics_1(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 		for (int x = 0; x < 8; x++)
 		{
-			*p = PALETTE[get_color((BIT(b, 15) << 1) | BIT(b, 14))]; p++;
+			*p = PALETTE_1512[get_color((BIT(b, 15) << 1) | BIT(b, 14))]; p++;
 			b <<= 2;
 		}
 	}
@@ -501,7 +501,7 @@ void pc1512_state::draw_graphics_2(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 		for (int x = 0; x < 16; x++)
 		{
-			*p = PALETTE[(BIT(i, 15) << 3) | (BIT(r, 15) << 2) | (BIT(g, 15) << 1) | BIT(b, 15)]; p++;
+			*p = PALETTE_1512[(BIT(i, 15) << 3) | (BIT(r, 15) << 2) | (BIT(g, 15) << 1) | BIT(b, 15)]; p++;
 			i <<= 1; r <<= 1; g <<= 1; b <<= 1;
 		}
 	}
@@ -586,11 +586,11 @@ UINT32 pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		case ALPHA_40:
 		case ALPHA_80:
 		case GRAPHICS_1:
-			bitmap.fill(PALETTE[m_vdu_color & 0x0f], cliprect);
+			bitmap.fill(PALETTE_1512[m_vdu_color & 0x0f], cliprect);
 			break;
 
 		case GRAPHICS_2:
-			bitmap.fill(PALETTE[m_vdu_border & 0x0f], cliprect);
+			bitmap.fill(PALETTE_1512[m_vdu_border & 0x0f], cliprect);
 			break;
 		}
 

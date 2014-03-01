@@ -20,7 +20,8 @@ k037122_device::k037122_device(const machine_config &mconfig, const char *tag, d
 	m_char_ram(NULL),
 	m_reg(NULL),
 	m_gfx_index(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this),
+	m_palette(*this)
 {
 }
 
@@ -32,6 +33,16 @@ k037122_device::k037122_device(const machine_config &mconfig, const char *tag, d
 void k037122_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<k037122_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void k037122_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<k037122_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -61,7 +72,7 @@ void k037122_device::device_start()
 	m_layer[0]->set_transparent_pen(0);
 	m_layer[1]->set_transparent_pen(0);
 
-	m_gfxdecode->set_gfx(m_gfx_index,auto_alloc_clear(machine(), gfx_element(machine(), k037122_char_layout, (UINT8*)m_char_ram, machine().total_colors() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index,auto_alloc_clear(machine(), gfx_element(machine(), k037122_char_layout, (UINT8*)m_char_ram, m_palette->entries() / 16, 0)));
 
 	save_pointer(NAME(m_reg), 0x400 / 4);
 	save_pointer(NAME(m_char_ram), 0x200000 / 4);
@@ -137,7 +148,7 @@ void k037122_device::update_palette_color( UINT32 palette_base, int color )
 {
 	UINT32 data = m_tile_ram[(palette_base / 4) + color];
 
-	palette_set_color_rgb(machine(), color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
+	m_palette->set_pen_color(color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
 }
 
 READ32_MEMBER( k037122_device::sram_r )

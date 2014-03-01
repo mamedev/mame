@@ -291,7 +291,7 @@ WRITE16_MEMBER(taitoair_state::airsys_paletteram16_w)/* xxBBBBxRRRRxGGGG */
 	COMBINE_DATA(&m_paletteram[offset]);
 
 	a = m_paletteram[offset];
-	palette_set_color_rgb(machine(), offset, pal4bit(a >> 0), pal4bit(a >> 5), pal4bit(a >> 10));
+	m_palette->set_pen_color(offset, pal4bit(a >> 0), pal4bit(a >> 5), pal4bit(a >> 10));
 }
 
 WRITE16_MEMBER(taitoair_state::airsys_gradram_w)
@@ -322,7 +322,7 @@ WRITE16_MEMBER(taitoair_state::airsys_gradram_w)
 	//if(g == 0) { g = (pal_g); }
 	//if(b == 0) { b = (pal_b); }
 
-	palette_set_color_rgb(machine(), offset+0x2000, r, g, b);
+	m_palette->set_pen_color(offset+0x2000, r, g, b);
 }
 
 
@@ -718,8 +718,8 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoair_state, screen_update_taitoair)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", airsys)
-	MCFG_PALETTE_LENGTH(512*16+512*16)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
+
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512*16+512*16)
 
 	MCFG_TC0080VCO_ADD("tc0080vco", airsys_tc0080vco_intf)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")

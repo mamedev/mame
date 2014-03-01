@@ -1357,7 +1357,11 @@ public:
 		m_czattr(*this, "czattr"),
 		m_gmen_sh2(*this, "gmen_sh2"),
 		m_gmen_sh2_shared(*this, "gmen_sh2_shared"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lightx(*this, "LIGHTX"),
+		m_lighty(*this, "LIGHTY"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -1373,7 +1377,11 @@ public:
 	optional_device<cpu_device> m_gmen_sh2;
 	optional_shared_ptr<UINT32> m_gmen_sh2_shared;
 	required_device<gfxdecode_device> m_gfxdecode;
-
+	optional_ioport m_lightx;
+	optional_ioport m_lighty;
+	required_ioport m_p1;
+	required_ioport m_p2;
+	
 	c404_t m_c404;
 	c361_t m_c361;
 	c417_t m_c417;
@@ -2013,7 +2021,7 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 			p->front = !(h & 0x00000001);
 			p->rd.machine = &machine();
 			p->rd.texture_lookup = render_texture_lookup_nocache_point;
-			p->rd.pens = machine().pens + (color << 8);
+			p->rd.pens = m_palette->pens() + (color << 8);
 			render.poly_count++;
 		}
 
@@ -2109,7 +2117,7 @@ WRITE32_MEMBER(namcos23_state::s23_paletteram_w)
 		int r = nthbyte(m_generic_paletteram_32, which|0x00001);
 		int g = nthbyte(m_generic_paletteram_32, which|0x10001);
 		int b = nthbyte(m_generic_paletteram_32, which|0x20001);
-		palette_set_color(machine(), which/2, rgb_t(r,g,b));
+		m_palette->set_pen_color(which/2, rgb_t(r,g,b));
 	}
 }
 
@@ -2551,7 +2559,7 @@ WRITE16_MEMBER(namcos23_state::s23_ctl_w)
 
 		case 2: case 3:
 			// These may be coming from another CPU, in particular the I/O one
-			m_ctl_inp_buffer[offset-2] = ioport(offset == 2 ? "P1" : "P2")->read();
+			m_ctl_inp_buffer[offset-2] = (offset == 2 ? m_p1 : m_p2)->read();
 			break;
 		case 5:
 			if(m_ctl_vbl_active)
@@ -3074,8 +3082,8 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(namcos23_state::s23_iob_gun_r)
 {
-	UINT16 xpos = ioport("LIGHTX")->read();
-	UINT16 ypos = ioport("LIGHTY")->read();
+	UINT16 xpos = m_lightx->read();
+	UINT16 ypos = m_lighty->read();
 	// ypos is not completely understood yet, there should be a difference between case 1/4 and 2/5
 
 	switch(offset)
@@ -3455,7 +3463,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update_s23)
 
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3502,7 +3510,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update_s23)
 
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", namcos23)
 
@@ -3563,7 +3571,7 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update_s23)
 
-	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", namcos23)
 

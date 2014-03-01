@@ -136,9 +136,9 @@ void srmp6_state::update_palette()
 
 	for(i = 0; i < 0x800; i++)
 	{
-		r = m_generic_paletteram_16[i] >>  0 & 0x1F;
-		g = m_generic_paletteram_16[i] >>  5 & 0x1F;
-		b = m_generic_paletteram_16[i] >> 10 & 0x1F;
+		r = m_palette->basemem().read16(i) >>  0 & 0x1F;
+		g = m_palette->basemem().read16(i) >>  5 & 0x1F;
+		b = m_palette->basemem().read16(i) >> 10 & 0x1F;
 
 		if(brg < 0) {
 			r += (r * brg) >> 5;
@@ -156,7 +156,7 @@ void srmp6_state::update_palette()
 			b += ((0x1F - b) * brg) >> 5;
 			if(b > 0x1F) b = 0x1F;
 		}
-		palette_set_color(machine(), i, rgb_t(r << 3, g << 3, b << 3));
+		m_palette->set_pen_color(i, rgb_t(r << 3, g << 3, b << 3));
 	}
 }
 
@@ -167,7 +167,7 @@ void srmp6_state::video_start()
 	m_sprram_old = auto_alloc_array_clear(machine(), UINT16, 0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), tiles8x8_layout, (UINT8*)m_tileram, machine().total_colors() / 256, 0)));
+	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), tiles8x8_layout, (UINT8*)m_tileram, m_palette->entries() / 256, 0)));
 	m_gfxdecode->gfx(0)->set_granularity(256);
 
 	m_brightness = 0x60;
@@ -275,7 +275,7 @@ UINT32 srmp6_state::screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bit
 						else
 							yb=y+(height-yw-1)*8+global_y;
 
-						m_gfxdecode->gfx(0)->alpha(bitmap,cliprect,tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
+						m_gfxdecode->gfx(0)->alpha(m_palette,bitmap,cliprect,tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
 						tileno++;
 					}
 				}
@@ -504,7 +504,7 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 	INT8 r, g, b;
 	int brg = m_brightness - 0x60;
 
-	paletteram_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
+	m_palette->write(space, offset, data, mem_mask);
 
 	if(brg)
 	{
@@ -529,7 +529,7 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 			if(b > 0x1F) b = 0x1F;
 		}
 
-		palette_set_color(machine(), offset, rgb_t(r << 3, g << 3, b << 3));
+		m_palette->set_pen_color(offset, rgb_t(r << 3, g << 3, b << 3));
 	}
 }
 
@@ -546,7 +546,7 @@ static ADDRESS_MAP_START( srmp6_map, AS_PROGRAM, 16, srmp6_state )
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0)
 
 	AM_RANGE(0x300000, 0x300005) AM_READWRITE(srmp6_inputs_r, srmp6_input_select_w)     // inputs
-	AM_RANGE(0x480000, 0x480fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x480000, 0x480fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("palette")
 	AM_RANGE(0x4d0000, 0x4d0001) AM_READ(srmp6_irq_ack_r)
 
 	// OBJ RAM: checked [$400000-$47dfff]
@@ -677,7 +677,8 @@ static MACHINE_CONFIG_START( srmp6, srmp6_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp6_state, screen_update_srmp6)
 
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 

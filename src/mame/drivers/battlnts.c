@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( battlnts_map, AS_PROGRAM, 8, battlnts_state )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_device, read, write)    /* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_device, read, write)    /* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_device, scroll_r, scroll_w)      /* Scroll RAM */
-	AM_RANGE(0x2400, 0x24ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_be_w) AM_SHARE("paletteram")/* palette */
+	AM_RANGE(0x2400, 0x24ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* palette */
 	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_device, vreg_w)          /* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P2")
@@ -256,12 +256,14 @@ static MACHINE_CONFIG_START( battlnts, battlnts_state )
 	MCFG_SCREEN_UPDATE_DRIVER(battlnts_state, screen_update_battlnts)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", battlnts)
-	MCFG_PALETTE_LENGTH(128)
+	MCFG_PALETTE_ADD("palette", 128)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_K007342_ADD("k007342", bladestl_k007342_intf)
 	MCFG_K007342_GFXDECODE("gfxdecode")
 	
 	MCFG_K007420_ADD("k007420", bladestl_k007420_intf)
+	MCFG_K007420_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -29,7 +29,8 @@ public:
 	int m_palette_bank;
 	UINT8 m_scroll[2];
 	void create_palette();
-	void palette_init_1942p();
+	DECLARE_PALETTE_INIT(1942);
+	DECLARE_PALETTE_INIT(1942p);
 	DECLARE_WRITE8_MEMBER(c1942p_palette_w);
 
 	/* devices */
@@ -48,7 +49,6 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	void video_start_c1942p();
-	virtual void palette_init();
 	UINT32 screen_update_1942(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_1942p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(c1942_scanline);

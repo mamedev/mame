@@ -281,22 +281,6 @@ static INPUT_PORTS_START( cybikoxt )
 INPUT_PORTS_END
 
 ////////////////////
-// PALETTE INIT   //
-////////////////////
-
-void cybiko_state::palette_init()
-{
-	// init palette
-	for (int i = 0; i < 4; i++)
-	{
-		palette_set_color(machine(), i, rgb_t::white);
-#ifndef HD66421_BRIGHTNESS_DOES_NOT_WORK
-		palette_set_pen_contrast(machine(), i, 1.0 * i / (4 - 1));
-#endif
-	}
-}
-
-////////////////////
 // MACHINE DRIVER //
 ////////////////////
 
@@ -311,10 +295,9 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	MCFG_SCREEN_SIZE( HD66421_WIDTH, HD66421_HEIGHT )
 	MCFG_SCREEN_VISIBLE_AREA( 0, HD66421_WIDTH - 1, 0, HD66421_HEIGHT - 1 )
 	MCFG_SCREEN_UPDATE_DEVICE("hd66421", hd66421_device, update_screen)
-
+	MCFG_SCREEN_PALETTE("hd66421:palette")
 	// video
 	MCFG_HD66421_ADD("hd66421")
-	MCFG_PALETTE_LENGTH(4)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	// sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")

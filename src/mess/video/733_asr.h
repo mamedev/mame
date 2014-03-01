@@ -1,5 +1,5 @@
 
-#define asr733_chr_region "gfx1"
+#define asr733_chr_region ":gfx1"
 
 enum
 {
@@ -14,8 +14,6 @@ struct asr733_init_params_t
 	void (*int_callback)(running_machine &machine, int state);
 };
 
-GFXDECODE_EXTERN( asr733 );
-
 void asr733_init(running_machine &machine);
 class asr733_device : public device_t
 {
@@ -28,15 +26,14 @@ public:
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
 	
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
+public:	
+	required_device<palette_device> m_palette;
 private:
 	// internal state
 	void *m_token;
@@ -49,9 +46,6 @@ extern const device_type ASR733;
 #define MCFG_ASR733_VIDEO_ADD(_tag, _intf) \
 	MCFG_DEVICE_ADD(_tag, ASR733, 0) \
 	MCFG_DEVICE_CONFIG(_intf)
-
-#define MCFG_ASR733_VIDEO_GFXDECODE(_gfxtag) \
-	asr733_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 DECLARE_READ8_DEVICE_HANDLER(asr733_cru_r);
 DECLARE_WRITE8_DEVICE_HANDLER(asr733_cru_w);

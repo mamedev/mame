@@ -365,8 +365,9 @@ static MACHINE_CONFIG_START( turrett, turrett_state )
 	// to ensure in-sync streaming sound
 	MCFG_SCREEN_RAW_PARAMS(4000000, 512, 0, 336, 259, 0, 244)
 	MCFG_SCREEN_UPDATE_DRIVER(turrett_state, screen_update)
-	MCFG_PALETTE_LENGTH(32768)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRRR_GGGGG_BBBBB)
+	//MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+
+	MCFG_PALETTE_ADD("palette", 0x2000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

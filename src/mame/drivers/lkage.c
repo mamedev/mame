@@ -133,7 +133,7 @@ READ8_MEMBER(lkage_state::sound_status_r)
 static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf003) AM_RAM AM_SHARE("vreg") /* video registers */
 	AM_RANGE(0xf060, 0xf060) AM_WRITE(lkage_sound_command_w)
 	AM_RANGE(0xf061, 0xf061) AM_WRITENOP AM_READ(sound_status_r)
@@ -563,7 +563,8 @@ static MACHINE_CONFIG_START( lkage, lkage_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lkage_state, screen_update_lkage)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", lkage)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 
 	/* sound hardware */
@@ -607,7 +608,8 @@ static MACHINE_CONFIG_START( lkageb, lkage_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lkage_state, screen_update_lkage)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", lkage)
-	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 
 	/* sound hardware */

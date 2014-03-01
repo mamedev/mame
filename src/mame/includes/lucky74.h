@@ -45,7 +45,7 @@ public:
 	virtual void video_start();
 	virtual void machine_reset();
 	virtual void sound_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(lucky74);
 	UINT32 screen_update_lucky74(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nmi_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(lucky74_adpcm_int);

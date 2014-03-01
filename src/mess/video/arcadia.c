@@ -454,8 +454,8 @@ void arcadia_state::arcadia_draw_char(UINT8 *ch, int charcode, int y, int x)
 			{
 				m_bg[y+1][x>>3]|=b>>(x&7);
 				m_bg[y+1][(x>>3)+1]|=b<<(8-(x&7));
-				m_gfxdecode->gfx(0)->opaque(*m_bitmap,m_bitmap->cliprect(), b,colour, 0,0,x,y);
-				m_gfxdecode->gfx(0)->opaque(*m_bitmap,m_bitmap->cliprect(), b,colour, 0,0,x,y+1);
+				m_gfxdecode->gfx(0)->opaque(m_palette,*m_bitmap,m_bitmap->cliprect(), b,colour, 0,0,x,y);
+				m_gfxdecode->gfx(0)->opaque(m_palette,*m_bitmap,m_bitmap->cliprect(), b,colour, 0,0,x,y+1);
 			}
 		}
 	}
@@ -467,7 +467,7 @@ void arcadia_state::arcadia_draw_char(UINT8 *ch, int charcode, int y, int x)
 			m_bg[y][x>>3]|=b>>(x&7);
 			m_bg[y][(x>>3)+1]|=b<<(8-(x&7));
 
-			m_gfxdecode->gfx(0)->opaque(*m_bitmap,m_bitmap->cliprect(), b,colour, 0,0,x,y);
+			m_gfxdecode->gfx(0)->opaque(m_palette,*m_bitmap,m_bitmap->cliprect(), b,colour, 0,0,x,y);
 		}
 	}
 }

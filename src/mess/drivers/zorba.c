@@ -64,7 +64,7 @@ public:
 public:
 	const UINT8 *m_p_chargen;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void palette_init_zorba();
+	DECLARE_PALETTE_INIT(zorba);
 	required_shared_ptr<const UINT8> m_p_videoram;
 	DECLARE_DRIVER_INIT(zorba);
 	DECLARE_MACHINE_RESET(zorba);
@@ -250,9 +250,9 @@ WRITE8_MEMBER( zorba_state::pia0_porta_w )
 
 PALETTE_INIT_MEMBER( zorba_state, zorba )
 {
-	palette_set_color_rgb( machine(), 0, 0, 0, 0 ); /* Black */
-	palette_set_color_rgb( machine(), 1, 0, 255, 0 );   /* Full */
-	palette_set_color_rgb( machine(), 2, 0, 128, 0 );   /* Dimmed */
+	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
+	palette.set_pen_color(1, 0, 255, 0 );   /* Full */
+	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
 }
 
 static I8275_DISPLAY_PIXELS( zorba_update_chr )
@@ -356,8 +356,8 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_SCREEN_UPDATE_DRIVER(zorba_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 276)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 275)
-	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT_OVERRIDE(zorba_state, zorba)
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(zorba_state, zorba)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -623,8 +623,8 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_SCREEN_UPDATE_DRIVER( thomson_state, screen_update_thom )
 	MCFG_SCREEN_VBLANK_DRIVER( thomson_state, thom_vblank )
 
-	MCFG_PALETTE_LENGTH ( 4097 ) /* 12-bit color + transparency */
-	MCFG_PALETTE_INIT_OVERRIDE(thomson_state, thom)
+	MCFG_PALETTE_ADD ( "palette", 4097 ) /* 12-bit color + transparency */
+	MCFG_PALETTE_INIT_OWNER(thomson_state, thom)
 	MCFG_VIDEO_START_OVERRIDE( thomson_state, thom )
 	MCFG_DEFAULT_LAYOUT( layout_thomson )
 
@@ -672,9 +672,7 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(thomson_state, thom_irq_1))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1))
 
-	MCFG_DEVICE_ADD(THOM_PIA_MODEM, PIA6821, 0)
-
-/* acia */
+/* TODO: CONVERT THIS TO A SLOT DEVICE (RF 57-932) */
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
@@ -685,16 +683,21 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, dsr_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", mos6551_device, cts_w))
 
-/* TODO: CONVERT THIS TO A SLOT DEVICE */
+
+/* TODO: CONVERT THIS TO A SLOT DEVICE (CC 90-232) */
 	MCFG_TO7_IO_LINE_ADD("to7_io")
 
-/* TODO: MOVE THIS TO A MODEM SLOT DEVICE */
+
+/* TODO: CONVERT THIS TO A SLOT DEVICE (MD 90-120) */
+	MCFG_DEVICE_ADD(THOM_PIA_MODEM, PIA6821, 0)
+
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(thomson_state, to7_modem_tx_w))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(thomson_state, to7_modem_cb))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1200) /* 1200 bauds, might be divided by 16 */
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(thomson_state, write_acia_clock))
+
 
 /* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -779,7 +782,7 @@ static ADDRESS_MAP_START ( to770, AS_PROGRAM, 8, thomson_state )
 	AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
 	AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
 	AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE(to7_floppy_r, to7_floppy_w )
-	AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE( "pia_2", pia6821_device, read_alt, write_alt )
+	AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE( "to7_io:pia_2", pia6821_device, read_alt, write_alt )
 	AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE(to770_gatearray_r, to770_gatearray_w )
 	AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
 	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
@@ -974,7 +977,7 @@ static ADDRESS_MAP_START ( mo5, AS_PROGRAM, 8, thomson_state )
 	AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE(mo5_ext_w )
 	AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
 	AM_RANGE ( 0xa7d0, 0xa7df ) AM_READWRITE(to7_floppy_r, to7_floppy_w )
-	AM_RANGE ( 0xa7e0, 0xa7e3 ) AM_DEVREADWRITE( "pia_2", pia6821_device, read_alt, write_alt )
+	AM_RANGE ( 0xa7e0, 0xa7e3 ) AM_DEVREADWRITE( "to7_io:pia_2", pia6821_device, read_alt, write_alt )
 	AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE(mo5_gatearray_r, mo5_gatearray_w )
 	AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
 	AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )

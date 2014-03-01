@@ -369,7 +369,7 @@ UINT32 speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rgb3
 		{
 			if(srcline[x])
 			{
-				rgb_t color=palette_get_color(machine(), srcline[x]);
+				rgb_t color=m_palette->pen_color(srcline[x]);
 				PLOT_PIXEL_RGB(x,y,color.r(),color.g(),color.b());
 			}
 		}
@@ -403,7 +403,7 @@ static MACHINE_CONFIG_START( speglsht, speglsht_state )
 	MCFG_SCREEN_UPDATE_DRIVER(speglsht_state, screen_update_speglsht)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", speglsht)
-	MCFG_PALETTE_LENGTH(16*16*4+1)
+	MCFG_PALETTE_ADD("palette", 16*16*4+1)
 
 	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)
 

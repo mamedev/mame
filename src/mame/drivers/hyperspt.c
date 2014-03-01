@@ -308,8 +308,8 @@ static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hyperspt_state, screen_update_hyperspt)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", hyperspt)
-	MCFG_PALETTE_LENGTH(16*16+16*16)
-
+	MCFG_PALETTE_ADD("palette", 16*16+16*16)
+	MCFG_PALETTE_INIT_OWNER(hyperspt_state, hyperspt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

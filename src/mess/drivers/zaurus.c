@@ -1446,7 +1446,6 @@ protected:
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 #define VERBOSE_LEVEL ( 5 )
@@ -1729,10 +1728,6 @@ void zaurus_state::machine_reset()
 }
 
 
-void zaurus_state::palette_init()
-{
-}
-
 /* TODO: Hack */
 TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
 {
@@ -1764,7 +1759,7 @@ static MACHINE_CONFIG_START( zaurus, zaurus_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

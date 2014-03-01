@@ -24,13 +24,10 @@ Additional tweaking by Jarek Burczynski
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-void magmax_state::palette_init()
+PALETTE_INIT_MEMBER(magmax_state, magmax)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x100);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x100; i++)
@@ -39,7 +36,7 @@ void magmax_state::palette_init()
 		int g = pal4bit(color_prom[i + 0x100]);
 		int b = pal4bit(color_prom[i + 0x200]);
 
-		colortable_palette_set_color(machine().colortable, i, rgb_t(r, g, b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -47,18 +44,18 @@ void magmax_state::palette_init()
 
 	/* characters use colors 0-0x0f */
 	for (i = 0; i < 0x10; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/*sprites use colors 0x10-0x1f, color 0x1f being transparent*/
 	for (i = 0x10; i < 0x110; i++)
 	{
 		UINT8 ctabentry = (color_prom[i - 0x10] & 0x0f) | 0x10;
-		colortable_entry_set_value(machine().colortable, i, ctabentry);
+		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* background uses all colors (no lookup table) */
 	for (i = 0x110; i < 0x210; i++)
-		colortable_entry_set_value(machine().colortable, i, i - 0x110);
+		palette.set_pen_indirect(i, i - 0x110);
 
 }
 
@@ -200,12 +197,12 @@ UINT32 magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &b
 			if (code & 0x80)    /* sprite bankswitch */
 				code += (*m_vreg & 0x30) * 0x8;
 
-			m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect,
 					code,
 					color,
 					flipx, flipy,
 					sx, sy,
-					colortable_get_transpen_mask(machine().colortable, m_gfxdecode->gfx(1), color, 0x1f));
+					m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0x1f));
 		}
 	}
 
@@ -230,7 +227,7 @@ UINT32 magmax_state::screen_update_magmax(screen_device &screen, bitmap_ind16 &b
 				sy = 31 - sy;
 			}
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					code,
 					0,
 					m_flipscreen, m_flipscreen,

@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( mugsmash_map, AS_PROGRAM, 16, mugsmash_state )
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(mugsmash_videoram1_w) AM_SHARE("videoram1")
 	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(mugsmash_videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(mugsmash_reg_w) AM_SHARE("regs1") /* video registers*/
-	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x100000, 0x1005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x140007) AM_WRITE(mugsmash_reg2_w) AM_SHARE("regs2") /* sound + ? */
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* main ram? */
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM
@@ -409,7 +409,8 @@ static MACHINE_CONFIG_START( mugsmash, mugsmash_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mugsmash_state, screen_update_mugsmash)
 	MCFG_GFXDECODE_ADD("gfxdecode", mugsmash)
 
-	MCFG_PALETTE_LENGTH(0x300)
+	MCFG_PALETTE_ADD("palette", 0x300)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

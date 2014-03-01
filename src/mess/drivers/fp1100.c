@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_GFXDECODE_ADD("gfxdecode", fp1100)
 
 	/* Devices */

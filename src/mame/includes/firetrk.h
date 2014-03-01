@@ -107,7 +107,7 @@ public:
 	TILE_GET_INFO_MEMBER(montecar_get_tile_info2);
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(firetrk);
 	DECLARE_VIDEO_START(superbug);
 	DECLARE_VIDEO_START(montecar);
 	DECLARE_PALETTE_INIT(montecar);

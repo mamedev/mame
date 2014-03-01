@@ -80,7 +80,7 @@ void tunhunt_state::video_start()
 	m_fg_tilemap->set_scrollx(0, 64);
 }
 
-void tunhunt_state::palette_init()
+PALETTE_INIT_MEMBER(tunhunt_state, tunhunt)
 {
 	int i;
 
@@ -89,12 +89,9 @@ void tunhunt_state::palette_init()
 	 * graphics, which are unpacked ahead of time and drawn using MAME's drawgfx primitives.
 	 */
 
-	/* allocate the colortable */
-	machine().colortable = colortable_alloc(machine(), 0x10);
-
 	/* motion objects/box */
 	for (i = 0; i < 0x10; i++)
-		colortable_entry_set_value(machine().colortable, i, i);
+		palette.set_pen_indirect(i, i);
 
 	/* AlphaNumerics (1bpp)
 	 *  2 bits of hilite select from 4 different background colors
@@ -103,26 +100,26 @@ void tunhunt_state::palette_init()
 	 */
 
 	/* alpha hilite#0 */
-	colortable_entry_set_value(machine().colortable, 0x10, 0x0); /* background color#0 (transparent) */
-	colortable_entry_set_value(machine().colortable, 0x11, 0x4); /* foreground color */
+	palette.set_pen_indirect(0x10, 0x0); /* background color#0 (transparent) */
+	palette.set_pen_indirect(0x11, 0x4); /* foreground color */
 
 	/* alpha hilite#1 */
-	colortable_entry_set_value(machine().colortable, 0x12, 0x5); /* background color#1 */
-	colortable_entry_set_value(machine().colortable, 0x13, 0x4); /* foreground color */
+	palette.set_pen_indirect(0x12, 0x5); /* background color#1 */
+	palette.set_pen_indirect(0x13, 0x4); /* foreground color */
 
 	/* alpha hilite#2 */
-	colortable_entry_set_value(machine().colortable, 0x14, 0x6); /* background color#2 */
-	colortable_entry_set_value(machine().colortable, 0x15, 0x4); /* foreground color */
+	palette.set_pen_indirect(0x14, 0x6); /* background color#2 */
+	palette.set_pen_indirect(0x15, 0x4); /* foreground color */
 
 	/* alpha hilite#3 */
-	colortable_entry_set_value(machine().colortable, 0x16, 0xf); /* background color#3 */
-	colortable_entry_set_value(machine().colortable, 0x17, 0x4); /* foreground color */
+	palette.set_pen_indirect(0x16, 0xf); /* background color#3 */
+	palette.set_pen_indirect(0x17, 0x4); /* foreground color */
 
 	/* shell graphics; these are either 1bpp (2 banks) or 2bpp.  It isn't clear which.
 	 * In any event, the following pens are associated with the shell graphics:
 	 */
-	colortable_entry_set_value(machine().colortable, 0x18, 0);
-	colortable_entry_set_value(machine().colortable, 0x19, 4);//1;
+	palette.set_pen_indirect(0x18, 0);
+	palette.set_pen_indirect(0x19, 4);//1;
 }
 
 /*
@@ -192,7 +189,7 @@ void tunhunt_state::set_pens()
 		green   = APPLY_SHADE(green,shade);
 		blue    = APPLY_SHADE(blue,shade);
 
-		colortable_palette_set_color( machine().colortable,i,rgb_t(red,green,blue) );
+		m_palette->set_indirect_color( i,rgb_t(red,green,blue) );
 	}
 }
 
@@ -337,7 +334,7 @@ void tunhunt_state::draw_shell(bitmap_ind16 &bitmap,
 			for( sy=0; sy<256; sy+=16 )
 			{
 				
-					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					picture_code,
 					0, /* color */
 					0,0, /* flip */
@@ -362,7 +359,7 @@ void tunhunt_state::draw_shell(bitmap_ind16 &bitmap,
 
 	*/
 	
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 			picture_code,
 			0, /* color */
 			0,0, /* flip */

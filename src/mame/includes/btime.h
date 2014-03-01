@@ -12,7 +12,7 @@ public:
 		m_rambase(*this, "rambase"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_paletteram(*this, "paletteram"),
+		m_paletteram(*this, "palette"),
 		m_bnj_backgroundram(*this, "bnj_bgram"),
 		m_zoar_scrollram(*this, "zoar_scrollram"),
 		m_lnc_charbank(*this, "lnc_charbank"),

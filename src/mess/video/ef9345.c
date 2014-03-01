@@ -120,7 +120,7 @@ void ef9345_device::device_start()
 	m_charset = region();
 
 	m_screen_out.allocate(496, m_screen->height());
-	m_screen_out.set_palette(machine().palette);
+	m_screen_out.set_palette(m_screen->palette()->palette());
 
 	m_blink_timer->adjust(attotime::from_msec(500), 0, attotime::from_msec(500));
 

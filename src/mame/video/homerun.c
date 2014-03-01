@@ -87,7 +87,7 @@ WRITE8_MEMBER(homerun_state::homerun_color_w)
 	bit2 = (data >> 7) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	palette_set_color(machine(), offset, rgb_t(r,g,b));
+	m_palette->set_pen_color(offset, rgb_t(r,g,b));
 }
 
 
@@ -122,14 +122,14 @@ void homerun_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		int flipx = (spriteram[offs + 2] & 0x40) >> 6;
 		int flipy = (spriteram[offs + 2] & 0x80) >> 7;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,0);
 
 		// wraparound
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

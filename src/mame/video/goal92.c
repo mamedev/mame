@@ -121,7 +121,7 @@ void goal92_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		y = 256 - (y + 7);
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y,15);
 	}
@@ -158,7 +158,7 @@ UINT32 goal92_state::screen_update_goal92(screen_device &screen, bitmap_ind16 &b
 		m_fg_layer->set_scrolly(0, m_scrollram[3] + 8);
 	}
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_bg_layer->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, 2);

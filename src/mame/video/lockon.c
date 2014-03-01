@@ -96,7 +96,7 @@ static const res_net_info lockon_pd_net_info =
 	}
 };
 
-void lockon_state::palette_init()
+PALETTE_INIT_MEMBER(lockon_state, lockon)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
@@ -120,7 +120,7 @@ void lockon_state::palette_init()
 			b = compute_res_net((p1 & 0x1f), 2, &lockon_pd_net_info);
 		}
 
-		palette_set_color(machine(), i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -645,8 +645,8 @@ WRITE16_MEMBER(lockon_state::lockon_fb_clut_w)
 {
 	rgb_t color;
 
-	color = palette_get_color(machine(), 0x300 + (data & 0xff));
-	palette_set_color(machine(), 0x400 + offset, color);
+	color = m_palette->pen_color(0x300 + (data & 0xff));
+	m_palette->set_pen_color(0x400 + offset, color);
 }
 
 /* Rotation control register */
@@ -912,7 +912,7 @@ UINT32 lockon_state::screen_update_lockon(screen_device &screen, bitmap_ind16 &b
 	/* If screen output is disabled, fill with black */
 	if (!BIT(m_ctrl_reg, 7))
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
 	}
 

@@ -93,7 +93,7 @@ WRITE16_MEMBER( f1_state::palette_w )
 		g = ((m_p_paletteram[offset] & 4)>>1) | i;
 		b = ((m_p_paletteram[offset] & 8)>>2) | i;
 
-		palette_set_color_rgb(machine(), offset, pal2bit(r), pal2bit(g), pal2bit(b));
+		m_palette->set_pen_color(offset, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
 }
 
@@ -332,7 +332,7 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(f1_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_GFXDECODE_ADD("gfxdecode", act_f1)
 
 	/* Devices */

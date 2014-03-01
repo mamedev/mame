@@ -32,12 +32,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_mogura_tile_info);
 	virtual void machine_start();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(mogura);
 	UINT32 screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
-void mogura_state::palette_init()
+PALETTE_INIT_MEMBER(mogura_state, mogura)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i, j;
@@ -63,7 +63,7 @@ void mogura_state::palette_init()
 		bit2 = BIT(color_prom[i], 7);
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(), j, rgb_t(r, g, b));
+		palette.set_pen_color(j, rgb_t(r, g, b));
 		j += 4;
 		if (j > 31) j -= 31;
 	}
@@ -213,7 +213,8 @@ static MACHINE_CONFIG_START( mogura, mogura_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mogura_state, screen_update_mogura)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mogura)
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(mogura_state, mogura)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

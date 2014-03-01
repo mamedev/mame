@@ -69,7 +69,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(multi8);
 	UINT32 screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	void multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width);
@@ -183,7 +183,7 @@ UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &b
 				}
 			}
 
-			// m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile,color >> 5, 0, 0, x*8, y*8);
+			// m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect, tile,color >> 5, 0, 0, x*8, y*8);
 
 			// draw cursor
 			if(mc6845_cursor_addr+0xc000 == count)
@@ -575,12 +575,12 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL        /* update address callback */
 };
 
-void multi8_state::palette_init()
+PALETTE_INIT_MEMBER(multi8_state, multi8)
 {
 	UINT8 i;
 
 	for(i=0; i<8; i++)
-		palette_set_color_rgb(machine(), i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 }
 
 READ8_MEMBER( multi8_state::porta_r )
@@ -673,7 +673,8 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(multi8_state, screen_update_multi8)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(multi8_state, multi8)
 	MCFG_GFXDECODE_ADD("gfxdecode", multi8)
 
 	/* Audio */

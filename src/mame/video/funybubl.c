@@ -19,7 +19,7 @@ WRITE8_MEMBER(funybubl_state::funybubl_paldatawrite)
 	coldat = m_paletteram[colchanged * 4] | (m_paletteram[colchanged * 4 + 1] << 8) |
 			(m_paletteram[colchanged * 4 + 2] << 16) | (m_paletteram[colchanged * 4 + 3] << 24);
 
-	palette_set_color_rgb(machine(), colchanged, pal6bit(coldat >> 12), pal6bit(coldat >> 0), pal6bit(coldat >> 6));
+	m_palette->set_pen_color(colchanged, pal6bit(coldat >> 12), pal6bit(coldat >> 0), pal6bit(coldat >> 6));
 }
 
 
@@ -65,7 +65,7 @@ void funybubl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		// bits 0x40 and 0x10 not used?...
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, tile, 0, 0, 0, xpos, ypos, 255);
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, tile, 0, 0, 0, xpos, ypos, 255);
 		source -= 0x20;
 	}
 }
@@ -76,7 +76,7 @@ UINT32 funybubl_state::screen_update_funybubl(screen_device &screen, bitmap_ind1
 	int x, y, offs;
 	offs = 0;
 
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	/* tilemap .. convert it .. banking makes it slightly more annoying but still easy */
 	for (y = 0; y < 32; y++)
@@ -86,7 +86,7 @@ UINT32 funybubl_state::screen_update_funybubl(screen_device &screen, bitmap_ind1
 			int data;
 
 			data = m_banked_vram[offs] | (m_banked_vram[offs + 1] << 8);
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, data & 0x7fff, (data & 0x8000) ? 2 : 1, 0, 0, x*8, y*8, 0);
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, data & 0x7fff, (data & 0x8000) ? 2 : 1, 0, 0, x*8, y*8, 0);
 			offs += 2;
 		}
 	}

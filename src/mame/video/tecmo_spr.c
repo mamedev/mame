@@ -138,7 +138,7 @@ int spbactn_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, bit
 
 
 // comad bootleg of spbactn
-void galspnbl_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16* spriteram, int spriteram_bytes )
+void galspnbl_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, palette_device &palette, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, UINT16* spriteram, int spriteram_bytes )
 {
 	int offs;
 
@@ -169,7 +169,7 @@ void galspnbl_draw_sprites( screen_device &screen, gfxdecode_device *gfxdecode, 
 				{
 					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
 					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
-					gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+					gfxdecode->gfx(1)->transpen(palette,bitmap,cliprect,
 						code + layout[row][col],
 						color,
 						flipx,flipy,

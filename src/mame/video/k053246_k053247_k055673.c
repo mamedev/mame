@@ -358,9 +358,9 @@ void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const re
 
 	    VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
 	*/
-	if (machine().config().m_video_attributes & VIDEO_HAS_SHADOWS)
+	if (m_palette->shadows_enabled())
 	{
-		if (sizeof(typename _BitmapClass::pixel_t) == 4 && (machine().config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
+		if (sizeof(typename _BitmapClass::pixel_t) == 4 && (m_palette->hilights_enabled()))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -571,8 +571,8 @@ void k053247_device::zdrawgfxzoom32GP(
 	src_fh    = 16;
 	src_base  = m_gfx->get_data(code % m_gfx->elements());
 
-	pal_base  = m_gfx->machine().pens + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
-	shd_base  = m_gfx->machine().shadow_table;
+	pal_base  = m_palette->pens() + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
+	shd_base  = m_palette->shadow_table();
 
 	dst_ptr   = &bitmap.pix32(0);
 	dst_pitch = bitmap.rowpixels();
@@ -998,7 +998,8 @@ const device_type K053246 = &device_creator<k053247_device>;
 k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053246, "Konami 053246 & 053247", tag, owner, clock, "k053247", __FILE__),
 		device_video_interface(mconfig, *this),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this),
+		m_palette(*this)
 {
 	clear_all();
 }
@@ -1006,7 +1007,8 @@ k053247_device::k053247_device(const machine_config &mconfig, const char *tag, d
 k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
-		m_gfxdecode(*this)
+		m_gfxdecode(*this),
+		m_palette(*this)
 {
 	clear_all();
 }
@@ -1021,6 +1023,15 @@ void k053247_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 	downcast<k053247_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void k053247_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<k053247_device &>(device).m_palette.set_tag(tag);
+}
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -1081,12 +1092,12 @@ void k053247_device::device_start()
 	{
 	case NORMAL_PLANE_ORDER:
 		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / 128;
-		konami_decode_gfx(machine(), m_gfxdecode, m_intf_gfx_num, machine().root_device().memregion(m_intf_gfx_memory_region)->base(), total, &spritelayout, 4);
+		konami_decode_gfx(machine(), m_gfxdecode, m_palette, m_intf_gfx_num, machine().root_device().memregion(m_intf_gfx_memory_region)->base(), total, &spritelayout, 4);
 		break;
 
 	case TASMAN_PLANE_ORDER:
 		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / 128;
-		konami_decode_gfx(machine(), m_gfxdecode, m_intf_gfx_num, machine().root_device().memregion(m_intf_gfx_memory_region)->base(), total, &tasman_16x16_layout, 4);
+		konami_decode_gfx(machine(), m_gfxdecode, m_palette, m_intf_gfx_num, machine().root_device().memregion(m_intf_gfx_memory_region)->base(), total, &tasman_16x16_layout, 4);
 		break;
 
 	default:
@@ -1097,12 +1108,12 @@ void k053247_device::device_start()
 	{
 		if (m_screen->format() == BITMAP_FORMAT_RGB32)
 		{
-			if ((machine().config().m_video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
+			if (!m_palette->shadows_enabled() || !m_palette->hilights_enabled())
 				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
 		}
 		else
 		{
-			if (!(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
+			if (!(m_palette->shadows_enabled()))
 				popmessage("driver should use VIDEO_HAS_SHADOWS");
 		}
 	}
@@ -1277,29 +1288,29 @@ void k053247_device::alt_k055673_vh_start(running_machine &machine, const char *
 		}
 
 		total = size4 / 128;
-		konami_decode_gfx(machine, m_gfxdecode, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout, 5);
+		konami_decode_gfx(machine, m_gfxdecode, m_palette, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout, 5);
 		break;
 
 	case K055673_LAYOUT_RNG:
 		total = machine.root_device().memregion(gfx_memory_region)->bytes() / (16*16/2);
-		konami_decode_gfx(machine, m_gfxdecode, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout2, 4);
+		konami_decode_gfx(machine, m_gfxdecode, m_palette, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout2, 4);
 		break;
 
 	case K055673_LAYOUT_LE2:
 		total = machine.root_device().memregion(gfx_memory_region)->bytes() / (16*16);
-		konami_decode_gfx(machine, m_gfxdecode, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout3, 8);
+		konami_decode_gfx(machine, m_gfxdecode, m_palette, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout3, 8);
 		break;
 
 	case K055673_LAYOUT_GX6:
 		total = machine.root_device().memregion(gfx_memory_region)->bytes() / (16*16*6/8);
-		konami_decode_gfx(machine, m_gfxdecode, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout4, 6);
+		konami_decode_gfx(machine, m_gfxdecode, m_palette, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout4, 6);
 		break;
 
 	default:
 		fatalerror("Unsupported layout\n");
 	}
 
-	if (VERBOSE && !(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(m_palette->shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	m_dx = dx;

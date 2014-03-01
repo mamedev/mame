@@ -79,7 +79,7 @@ void popeye_state::convert_color_prom(const UINT8 *color_prom)
 		bit2 = ((color_prom[prom_offs] ^ m_invertmask) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(),16 + (2 * i) + 1,rgb_t(r,g,b));
+		m_palette->set_pen_color(16 + (2 * i) + 1,rgb_t(r,g,b));
 	}
 
 	color_prom += 32;
@@ -106,13 +106,13 @@ void popeye_state::convert_color_prom(const UINT8 *color_prom)
 		bit2 = ((color_prom[256] ^ m_invertmask) >> 3) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine(),48+i,rgb_t(r,g,b));
+		m_palette->set_pen_color(48+i,rgb_t(r,g,b));
 
 		color_prom++;
 	}
 }
 
-void popeye_state::palette_init()
+PALETTE_INIT_MEMBER(popeye_state, popeye)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	m_invertmask = 0xff;
@@ -160,7 +160,7 @@ void popeye_state::set_background_palette(int bank)
 		}
 		b = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
 
-		palette_set_color(machine(),i,rgb_t(r,g,b));
+		m_palette->set_pen_color(i,rgb_t(r,g,b));
 
 		color_prom++;
 	}
@@ -357,7 +357,7 @@ void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			sy = 496 - sy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
 					code ^ 0x1ff,
 					color,
 					flipx,flipy,

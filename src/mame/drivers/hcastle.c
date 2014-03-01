@@ -214,11 +214,14 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hcastle_state, screen_update_hcastle)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", hcastle)
-	MCFG_PALETTE_LENGTH(2*8*16*16)
+	MCFG_PALETTE_ADD("palette", 2*8*16*16)
+	MCFG_PALETTE_INIT_OWNER(hcastle_state, hcastle)
 
 
 	MCFG_K007121_ADD("k007121_1")
+	MCFG_K007121_PALETTE("palette")
 	MCFG_K007121_ADD("k007121_2")
+	MCFG_K007121_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -428,13 +428,13 @@ UINT32 bfcobra_state::screen_update_bfcobra(screen_device &screen, bitmap_rgb32 
 
 			if ( ( m_videomode & 0x81 ) == 1 || (m_videomode & 0x80 && pen & 0x80) )
 			{
-				*dest++ = machine().pens[hirescol[pen & 0x0f]];
-				*dest++ = machine().pens[hirescol[(pen >> 4) & 0x0f]];
+				*dest++ = m_palette->pen(hirescol[pen & 0x0f]);
+				*dest++ = m_palette->pen(hirescol[(pen >> 4) & 0x0f]);
 			}
 			else
 			{
-				*dest++ = machine().pens[lorescol[pen]];
-				*dest++ = machine().pens[lorescol[pen]];
+				*dest++ = m_palette->pen(lorescol[pen]);
+				*dest++ = m_palette->pen(lorescol[pen]);
 			}
 		}
 	}
@@ -772,7 +772,7 @@ READ8_MEMBER(bfcobra_state::ramdac_r)
 			if (*count == 0)
 			{
 				rgb_t color;
-				color = palette_get_color(machine(), ramdac.addr_r);
+				color = m_palette->pen_color(ramdac.addr_r);
 
 				ramdac.color_r[0] = color.r();
 				ramdac.color_r[1] = color.g();
@@ -817,7 +817,7 @@ WRITE8_MEMBER(bfcobra_state::ramdac_w)
 			ramdac.color_w[ramdac.count_w] = pal6bit(data);
 			if (++ramdac.count_w == 3)
 			{
-				palette_set_color_rgb(machine(), ramdac.addr_w, ramdac.color_w[0], ramdac.color_w[1], ramdac.color_w[2]);
+				m_palette->set_pen_color(ramdac.addr_w, ramdac.color_w[0], ramdac.color_w[1], ramdac.color_w[2]);
 				ramdac.count_w = 0;
 				ramdac.addr_w++;
 			}
@@ -1334,7 +1334,7 @@ void bfcobra_state::machine_reset()
 
 	for (pal = 0; pal < 256; ++pal)
 	{
-		palette_set_color_rgb(machine(), pal, pal3bit((pal>>5)&7), pal3bit((pal>>2)&7), pal2bit(pal&3));
+		m_palette->set_pen_color(pal, pal3bit((pal>>5)&7), pal3bit((pal>>2)&7), pal2bit(pal&3));
 	}
 
 	m_bank_data[0] = 1;
@@ -1745,7 +1745,7 @@ static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 256 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(bfcobra_state, screen_update_bfcobra)
 
-	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

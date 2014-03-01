@@ -113,7 +113,7 @@ UINT32 rbisland_state::screen_update_jumping(screen_device &screen, bitmap_ind16
 			data1 = spriteram[offs + 3];
 			color = (spriteram[offs + 4] & 0x0f) | sprite_colbank;
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
 					tile,
 					color,
 					data1 & 0x40, data1 & 0x80,

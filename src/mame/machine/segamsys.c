@@ -24,7 +24,6 @@
 UINT8* sms_mainram;
 UINT8* smsgg_backupram = 0;
 static TIMER_CALLBACK( sms_scanline_timer_callback );
-static struct sms_vdp *vdp2;
 static struct sms_vdp *vdp1;
 
 static struct sms_vdp *md_sms_vdp;
@@ -32,53 +31,9 @@ static struct sms_vdp *md_sms_vdp;
 /* All Accesses to VRAM go through here for safety */
 #define SMS_VDP_VRAM(address) chip->vram[(address)&0x3fff]
 
-#ifdef UNUSED_FUNCTION
-static ADDRESS_MAP_START( sms_map, AS_PROGRAM, 8, driver_device )
-//  AM_RANGE(0x0000 , 0xbfff) AM_ROM
-//  AM_RANGE(0xc000 , 0xdfff) AM_RAM AM_MIRROR(0x2000)
-ADDRESS_MAP_END
-#endif
-
-
 ADDRESS_MAP_START( sms_io_map, AS_IO, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
-
-static INPUT_PORTS_START( sms_common )
-	PORT_START("PAD1")      /* Joypad 1 (2 button) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 B") // a
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 C") // b
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PAD2")      /* Joypad 2 (2 button) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 B") // a
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 C") // b
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-INPUT_PORTS_START( sms )
-	PORT_INCLUDE( sms_common )
-
-	PORT_START("PAUSE")     /* Buttons on SMS Console */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pause Button") PORT_IMPULSE(1)
-INPUT_PORTS_END
-
-INPUT_PORTS_START( gamegear )
-	PORT_INCLUDE( sms_common )
-
-	PORT_START("GGSTART")       /* Extra GameGear button */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Start Button")
-INPUT_PORTS_END
 
 /* Precalculated tables for H/V counters.  Note the position the counter 'jumps' is marked with with
    an empty comment */
@@ -299,23 +254,12 @@ enum
 {
 	SMS_VDP = 0,  // SMS1 VDP
 	SMS2_VDP = 1, // SMS2 VDP, or Game Gear VDP running in SMS2 Mode
-	GG_VDP = 2,   // Game Gear VDP running in Game Gear Mode
 	GEN_VDP = 3   // Genesis VDP running in SMS2 Mode
 };
 
 static int sms_vdp_null_irq_callback(running_machine &machine, int status)
 {
 	return -1;
-}
-
-static int sms_vdp_cpu0_irq_callback(running_machine &machine, int status)
-{
-	if (status == 1)
-		machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
-	else
-		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
-
-	return 0;
 }
 
 static int sms_vdp_cpu1_irq_callback(running_machine &machine, int status)
@@ -420,17 +364,8 @@ static void *start_vdp(running_machine &machine, int type)
 
 	//printf("%d\n", (*chip->set_irq)(machine, 200));
 
-	if (chip->vdp_type==GG_VDP)
-	{
-		chip->cram = auto_alloc_array_clear(machine, UINT8, 0x0040);
-		chip->cram_mamecolours = auto_alloc_array_clear(machine, UINT32, 0x0080/2);
-		chip->gg_cram_latch = 0;
-	}
-	else
-	{
-		chip->cram = auto_alloc_array_clear(machine, UINT8, 0x0020);
-		chip->cram_mamecolours = auto_alloc_array(machine, UINT32, 0x0040/2);
-	}
+	chip->cram = auto_alloc_array_clear(machine, UINT8, 0x0020);
+	chip->cram_mamecolours = auto_alloc_array(machine, UINT32, 0x0040/2);
 
 	chip->tile_renderline = auto_alloc_array(machine, UINT8, 256+8);
 	memset(chip->tile_renderline,0x00,256+8);
@@ -452,20 +387,6 @@ void segae_md_sms_stop_scanline_timer(void)
 	md_sms_vdp->sms_scanline_timer->adjust(attotime::never);
 	memset(md_sms_vdp->vram,0x00,0x4000);
 }
-
-
-#ifdef UNUSED_FUNCTION
-static READ8_HANDLER( z80_unmapped_r )
-{
-	printf("unmapped z80 read %04x\n",offset);
-	return 0;
-}
-
-static WRITE8_HANDLER( z80_unmapped_w )
-{
-	printf("unmapped z80 write %04x\n",offset);
-}
-#endif
 
 static UINT8 vcounter_r(struct sms_vdp *chip)
 {
@@ -501,50 +422,17 @@ static void vdp_data_w(address_space &space, UINT8 data, struct sms_vdp* chip)
 	}
 	else if (chip->writemode==1)
 	{
-		if (chip->vdp_type==GG_VDP)
+		chip->cram[chip->addr_reg&0x1f]=data;
+
+		/* Set Colour */
 		{
-			if (!(chip->addr_reg&1))
-			{ /* Even address, value latched */
-				chip->gg_cram_latch = data;
-			}
-			else
-			{
-				chip->cram[(chip->addr_reg&0x3e)+1]=data;
-				chip->cram[(chip->addr_reg&0x3e)+0]=chip->gg_cram_latch;
-
-				/* Set Colour */
-				{
-					UINT16 palword;
-					UINT8 r,g,b;
-
-					palword = ((chip->cram[(chip->addr_reg&0x3e)+1])<<8)|(chip->cram[(chip->addr_reg&0x3e)+0]);
-
-					//printf("addr %04x palword %04x\n", chip->addr_reg&0x3f, palword);
-
-					r = (palword & 0x000f)>>0;
-					g = (palword & 0x00f0)>>4;
-					b = (palword & 0x0f00)>>8;
-					rgb_t rgb = rgb_t(pal4bit(r), pal4bit(g), pal4bit(b));
-					//palette_set_color(space.machine(),(chip->addr_reg&0x3e)/2, rgb);
-					chip->cram_mamecolours[(chip->addr_reg&0x3e)/2]=rgb;
-				}
-			}
-		}
-		else
-		{
-			chip->cram[chip->addr_reg&0x1f]=data;
-
-			/* Set Colour */
-			{
-				UINT8 r,g,b;
-				r = (data & 0x03)>>0;
-				g = (data & 0x0c)>>2;
-				b = (data & 0x30)>>4;
-				rgb_t rgb = rgb_t(pal2bit(r), pal2bit(g), pal2bit(b));
-				//palette_set_color(space.machine(),chip->addr_reg&0x1f, rgb);
-				chip->cram_mamecolours[chip->addr_reg&0x1f]=rgb;
-			}
-
+			UINT8 r,g,b;
+			r = (data & 0x03)>>0;
+			g = (data & 0x0c)>>2;
+			b = (data & 0x30)>>4;
+			rgb_t rgb = rgb_t(pal2bit(r), pal2bit(g), pal2bit(b));
+			//m_palette->set_pen_color(chip->addr_reg&0x1f, rgb);
+			chip->cram_mamecolours[chip->addr_reg&0x1f]=rgb;
 		}
 
 		chip->addr_reg++; chip->addr_reg&=0x3fff;
@@ -1071,44 +959,6 @@ static TIMER_CALLBACK( sms_scanline_timer_callback )
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-static void show_tiles(struct sms_vdp* chip)
-{
-	int x,y,xx,yy;
-	UINT16 count = 0;
-
-	for (y=0;y<16;y++)
-	{
-		for (x=0;x<32;x++)
-		{
-			for (yy=0;yy<8;yy++)
-			{
-				int drawypos = y*8+yy;
-				UINT32* lineptr = &chip->r_bitmap->pix32(drawypos);
-
-				UINT32 gfxdata = (SMS_VDP_VRAM(count)<<24)|(SMS_VDP_VRAM(count+1)<<16)|(SMS_VDP_VRAM(count+2)<<8)|(SMS_VDP_VRAM(count+3)<<0);
-
-				for (xx=0;xx<8;xx++)
-				{
-					int drawxpos = x*8+xx;
-
-					UINT8 pixel = (( (gfxdata>>(0+xx)  ) &0x00000001)<<3)|
-									(( (gfxdata>>(8+xx)  ) &0x00000001)<<2)|
-									(( (gfxdata>>(16+xx) ) &0x00000001)<<1)|
-									(( (gfxdata>>(24+xx) ) &0x00000001)<<0);
-
-					lineptr[drawxpos] = chip->cram_mamecolours[pixel+16];
-
-				}
-
-
-				count+=4;count&=0x3fff;
-			}
-		}
-	}
-}
-#endif
-
 /*
  Register $00 - Mode Control No. 1
 
@@ -1150,21 +1000,8 @@ static void end_of_frame(screen_device &screen, struct sms_vdp *chip)
 	UINT8 m5 = chip->is_pal;
 	chip->screen_mode = m1|(m2<<1)|(m3<<2)|(m4<<3)|(m5<<4);
 
-	if (chip->vdp_type!=GG_VDP) /* In GG mode the Game Gear resolution is fixed */
-	{
-		rectangle visarea(0, 256-1, 0, sms_mode_table[chip->screen_mode].sms2_height-1);
-
-		if (chip->chip_id==3) screen.configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
-
-	}
-	else /* 160x144 */
-	{
-		rectangle visarea((256-160)/2, (256-160)/2+160-1, (192-144)/2, (192-144)/2+144-1);
-
-		screen.configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
-	}
-
-
+	rectangle visarea(0, 256-1, 0, sms_mode_table[chip->screen_mode].sms2_height-1);
+	if (chip->chip_id==3) screen.configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 
 //  printf("Mode: %s is ok\n", sms_mode_table[chip->screen_mode].sms2_name);
 
@@ -1174,61 +1011,8 @@ static void end_of_frame(screen_device &screen, struct sms_vdp *chip)
 }
 
 
-SCREEN_VBLANK(sms)
-{
-	// rising edge
-	if (vblank_on)
-	{
-		end_of_frame(screen, md_sms_vdp);
-
-		// the SMS has a 'RESET' button on the machine, it generates an NMI
-		if (screen.machine().root_device().ioport("PAUSE")->read_safe(0x00))
-			screen.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
-
-static MACHINE_RESET(sms)
-{
-	md_sms_vdp->sms_scanline_timer->adjust(attotime::zero);
-}
-
-
-
-UINT8* vdp2_vram_bank0;
-UINT8* vdp2_vram_bank1;
-
 UINT8* vdp1_vram_bank0;
 UINT8* vdp1_vram_bank1;
-
-void segae_set_vram_banks(UINT8 data)
-{
-	if (data&0x80)
-	{
-		vdp1->vram = vdp1_vram_bank1;
-	}
-	else
-	{
-		vdp1->vram = vdp1_vram_bank0;
-	}
-
-	if (data&0x40)
-	{
-		vdp2->vram = vdp2_vram_bank1;
-	}
-	else
-	{
-		vdp2->vram = vdp2_vram_bank0;
-	}
-
-
-}
-
-MACHINE_RESET(systeme)
-{
-	vdp1->sms_scanline_timer->adjust(attotime::zero);
-	vdp2->sms_scanline_timer->adjust(attotime::zero);
-}
 
 MACHINE_RESET(megatech_md_sms)
 {
@@ -1238,16 +1022,6 @@ MACHINE_RESET(megatech_md_sms)
 MACHINE_RESET(megatech_bios)
 {
 	vdp1->sms_scanline_timer->adjust(attotime::zero);
-}
-
-SCREEN_VBLANK(systeme)
-{
-	// rising edge
-	if (vblank_on)
-	{
-		end_of_frame(screen, vdp1);
-		end_of_frame(screen, vdp2);
-	}
 }
 
 
@@ -1323,62 +1097,6 @@ SCREEN_UPDATE_RGB32(megaplay_bios)
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32(systeme)
-{
-//  show_tiles();
-	int x,y;
-
-	for (y=0;y<192;y++)
-	{
-		UINT32* lineptr = &bitmap.pix32(y);
-		UINT32* srcptr =  &vdp1->r_bitmap->pix32(y);
-
-		for (x=0;x<256;x++)
-		{
-			lineptr[x]=srcptr[x];
-		}
-
-	}
-
-	for (y=0;y<192;y++)
-	{
-		UINT32* lineptr = &bitmap.pix32(y);
-		UINT32* srcptr =  &vdp2->r_bitmap->pix32(y);
-
-		for (x=0;x<256;x++)
-		{
-			UINT16 src = srcptr[x];
-			if(!(src&0x80000000)) lineptr[x]=src;
-		}
-	}
-
-
-	return 0;
-}
-
-
-
-
-READ8_HANDLER( sms_vdp_2_data_r )
-{
-	return vdp_data_r(vdp2);
-}
-
-WRITE8_HANDLER( sms_vdp_2_data_w )
-{
-	vdp_data_w(space, data, vdp2);
-}
-
-READ8_HANDLER( sms_vdp_2_ctrl_r )
-{
-	return vdp_ctrl_r(space, vdp2);
-}
-
-WRITE8_HANDLER( sms_vdp_2_ctrl_w )
-{
-	vdp_ctrl_w(space, data, vdp2);
-}
-
 
 void init_for_megadrive(running_machine &machine)
 {
@@ -1405,124 +1123,6 @@ void init_megatech_bios(running_machine &machine)
 	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
 
 	smsgg_backupram = 0;
-}
-
-void init_smscm(running_machine &machine)
-{
-	megatech_set_genz80_as_sms_standard_map(machine, "maincpu", MAPPER_CODEMASTERS);
-
-	md_sms_vdp = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
-	md_sms_vdp->set_irq = sms_vdp_cpu0_irq_callback;
-	md_sms_vdp->is_pal = 1;
-	md_sms_vdp->sms_total_scanlines = 313;
-	md_sms_vdp->sms_framerate = 50;
-	md_sms_vdp->chip_id = 3;
-
-	vdp1_vram_bank0 = md_sms_vdp->vram;
-	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
-
-	smsgg_backupram = 0;
-}
-
-void init_smspal(running_machine &machine)
-{
-	megatech_set_genz80_as_sms_standard_map(machine, "maincpu", MAPPER_STANDARD);
-
-	md_sms_vdp = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
-	md_sms_vdp->set_irq = sms_vdp_cpu0_irq_callback;
-	md_sms_vdp->is_pal = 1;
-	md_sms_vdp->sms_total_scanlines = 313;
-	md_sms_vdp->sms_framerate = 50;
-	md_sms_vdp->chip_id = 3;
-
-	vdp1_vram_bank0 = md_sms_vdp->vram;
-	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
-
-	smsgg_backupram = 0;
-}
-
-void init_sms(running_machine &machine)
-{
-	megatech_set_genz80_as_sms_standard_map(machine, "maincpu", MAPPER_STANDARD);
-
-	md_sms_vdp = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
-	md_sms_vdp->set_irq = sms_vdp_cpu0_irq_callback;
-	md_sms_vdp->is_pal = 0;
-	md_sms_vdp->sms_total_scanlines = 262;
-	md_sms_vdp->sms_framerate = 60;
-	md_sms_vdp->chip_id = 3;
-
-	vdp1_vram_bank0 = md_sms_vdp->vram;
-	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
-
-	smsgg_backupram = 0;
-}
-
-static UINT8 ioport_gg00_r(running_machine& machine)
-{
-	UINT8 GG_START_BUTTON = machine.root_device().ioport("GGSTART")->read_safe(0x00);
-
-	return (GG_START_BUTTON << 7) |
-			(0               << 6) |
-			(0               << 5) |
-			(0               << 4) |
-			(0               << 3) |
-			(0               << 2) |
-			(0               << 1) |
-			(0               << 0);
-}
-
-
-READ8_HANDLER( sms_ioport_gg00_r )
-{
-	return ioport_gg00_r(space.machine());
-}
-
-
-void init_extra_gg_ports(running_machine& machine, const char* tag)
-{
-	address_space &io = machine.device(tag)->memory().space(AS_IO);
-	io.install_legacy_read_handler     (0x00, 0x00, FUNC(sms_ioport_gg00_r));
-}
-
-void init_smsgg(running_machine &machine)
-{
-	megatech_set_genz80_as_sms_standard_map(machine, "maincpu", MAPPER_STANDARD);
-	init_extra_gg_ports(machine, "maincpu");
-
-	md_sms_vdp = (struct sms_vdp *)start_vdp(machine, GG_VDP);
-	md_sms_vdp->set_irq = sms_vdp_cpu0_irq_callback;
-	md_sms_vdp->is_pal = 0;
-	md_sms_vdp->sms_total_scanlines = 262;
-	md_sms_vdp->sms_framerate = 60;
-	md_sms_vdp->chip_id = 3;
-
-	smsgg_backupram = 0;
-}
-
-
-void init_hazemd_segasyse(running_machine &machine)
-{
-	vdp1 = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
-//  vdp1->set_irq = sms_vdp_cpu0_irq_callback;
-	vdp1->is_pal = 0;
-	vdp1->sms_total_scanlines = 262;
-	vdp1->sms_framerate = 60;
-	vdp1->chip_id = 1;
-
-	vdp1_vram_bank0 = vdp1->vram;
-	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
-
-
-	vdp2 = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
-	vdp2->set_irq = sms_vdp_cpu0_irq_callback;
-	vdp2->is_pal = 0;
-	vdp2->sms_total_scanlines = 262;
-	vdp2->sms_framerate = 60;
-	vdp2->chip_id = 2;
-
-	vdp2_vram_bank0 = vdp2->vram;
-	vdp2_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
 }
 
 /* Functions to set up the Memory Map
@@ -1693,47 +1293,3 @@ void megatech_set_genz80_as_sms_standard_map(running_machine &machine, const cha
 	}
 //  smsgg_backupram = NULL;
 }
-
-static NVRAM_HANDLER( sms )
-{
-	if (smsgg_backupram!=NULL)
-	{
-		if (read_or_write)
-			file->write(smsgg_backupram, 0x2000);
-		else
-		{
-			if (file)
-			{
-				file->read(smsgg_backupram, 0x2000);
-			}
-		}
-	}
-}
-
-MACHINE_CONFIG_START( sms, driver_device )
-	MCFG_CPU_ADD("maincpu", Z80, 3579540)
-	//MCFG_CPU_PROGRAM_MAP(sms_map)
-	MCFG_CPU_IO_MAP(sms_io_map)
-
-	/* IRQ handled via the timers */
-	MCFG_MACHINE_RESET(sms)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
-	MCFG_SCREEN_UPDATE_STATIC(megatech_md_sms) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_STATIC(sms) /* Used to Sync the timing */
-
-	MCFG_PALETTE_LENGTH(0x200)
-
-	MCFG_NVRAM_HANDLER( sms )
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("snsnd", SN76496, 3579540)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END

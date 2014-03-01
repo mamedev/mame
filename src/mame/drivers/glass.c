@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16, glass_state )
 	AM_RANGE(0x102000, 0x102fff) AM_RAM                                                                     /* Extra Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                                             /* Video Registers */
 	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)                                                        /* CLR INT Video */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")    /* Palette */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                                               /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
@@ -205,8 +205,8 @@ static MACHINE_CONFIG_START( glass, glass_state )
 	MCFG_SCREEN_UPDATE_DRIVER(glass_state, screen_update_glass)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", glass)
-	MCFG_PALETTE_LENGTH(1024)
-
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

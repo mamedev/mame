@@ -25,7 +25,7 @@
  *
  *************************************/
 
-void dcheese_state::palette_init()
+PALETTE_INIT_MEMBER(dcheese_state, dcheese)
 {
 	const UINT16 *src = (UINT16 *)memregion("user1")->base();
 	int i;
@@ -35,7 +35,7 @@ void dcheese_state::palette_init()
 	for (i = 0; i < 65534; i++)
 	{
 		int data = *src++;
-		palette_set_color_rgb(machine(), i, pal6bit(data >> 0), pal5bit(data >> 6), pal5bit(data >> 11));
+		palette.set_pen_color(i, pal6bit(data >> 0), pal5bit(data >> 6), pal5bit(data >> 11));
 	}
 }
 

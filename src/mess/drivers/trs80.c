@@ -592,8 +592,7 @@ static MACHINE_CONFIG_START( trs80, trs80_state )       // the original model I,
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_trs80)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", trs80)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 
 	/* sound hardware */
@@ -677,8 +676,9 @@ static MACHINE_CONFIG_DERIVED( lnw80, model1 )
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode",lnw80)
 	
-	MCFG_PALETTE_LENGTH(8)
-	MCFG_PALETTE_INIT_OVERRIDE(trs80_state,lnw80)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(trs80_state,lnw80)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(80*6, 16*12)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*6-1,0,16*12-1)

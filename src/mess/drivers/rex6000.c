@@ -116,7 +116,7 @@ public:
 	DECLARE_WRITE8_MEMBER( flash_0xa000_w );
 
 	UINT8 identify_bank_type(UINT32 bank);
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(rex6000);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer1);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer2);
@@ -558,10 +558,10 @@ WRITE_LINE_MEMBER( rex6000_state::alarm_irq )
 }
 
 
-void rex6000_state::palette_init()
+PALETTE_INIT_MEMBER(rex6000_state, rex6000)
 {
-	palette_set_color(machine(), 0, rgb_t(138, 146, 148));
-	palette_set_color(machine(), 1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
@@ -660,7 +660,8 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	MCFG_SCREEN_SIZE(240, 120)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 120-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(rex6000_state, rex6000)
 	MCFG_GFXDECODE_ADD("gfxdecode", rex6000)
 
 	/* quickload */

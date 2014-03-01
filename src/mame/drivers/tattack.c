@@ -38,7 +38,7 @@ public:
 	DECLARE_DRIVER_INIT(tattack);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start();
-	virtual void palette_init();
+	DECLARE_PALETTE_INIT(tattack);
 	UINT32 screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -180,7 +180,7 @@ static GFXDECODE_START( tattack )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 1 )
 GFXDECODE_END
 
-void tattack_state::palette_init()
+PALETTE_INIT_MEMBER(tattack_state, tattack)
 {
 	int i,r,g,b;
 	for(i=0;i<8;i++)
@@ -194,8 +194,8 @@ void tattack_state::palette_init()
 		else
 			r=g=b=128;
 
-		palette_set_color(machine(),2*i,rgb_t(0x00,0x00,0x00));
-		palette_set_color(machine(),2*i+1,rgb_t(r,g,b));
+		palette.set_pen_color(2*i,rgb_t(0x00,0x00,0x00));
+		palette.set_pen_color(2*i+1,rgb_t(r,g,b));
 	}
 }
 
@@ -216,8 +216,8 @@ static MACHINE_CONFIG_START( tattack, tattack_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tattack_state, screen_update_tattack)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tattack)
-	MCFG_PALETTE_LENGTH(16)
-
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(tattack_state, tattack)
 
 	/* sound hardware */
 	/* Discrete ???? */

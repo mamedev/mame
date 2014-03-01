@@ -654,9 +654,9 @@ static MACHINE_CONFIG_START( fastfred, fastfred_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fastfred_state, screen_update_fastfred)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fastfred)
-	MCFG_PALETTE_LENGTH(32*8)
+	MCFG_PALETTE_ADD("palette", 32*8)
 
-	MCFG_PALETTE_INIT_OVERRIDE(fastfred_state,fastfred)
+	MCFG_PALETTE_INIT_OWNER(fastfred_state,fastfred)
 	MCFG_VIDEO_START_OVERRIDE(fastfred_state,fastfred)
 
 	/* sound hardware */
@@ -693,7 +693,8 @@ static MACHINE_CONFIG_DERIVED( imago, fastfred )
 	MCFG_MACHINE_START_OVERRIDE(fastfred_state,imago)
 
 	/* video hardware */
-	MCFG_PALETTE_LENGTH(256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", imago)
 
 	MCFG_VIDEO_START_OVERRIDE(fastfred_state,imago)

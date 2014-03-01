@@ -26,14 +26,13 @@ public:
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
+	DECLARE_PALETTE_INIT(xxx);
 protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
-	virtual void palette_init();
 };
 
 void xxx_state::video_start()
@@ -134,7 +133,7 @@ void xxx_state::machine_reset()
 }
 
 
-void xxx_state::palette_init()
+PALETTE_INIT_MEMBER(xxx_state, xxx)
 {
 }
 
@@ -156,8 +155,9 @@ static MACHINE_CONFIG_START( xxx, xxx_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", xxx)
 
-	MCFG_PALETTE_LENGTH(8)
-
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(xxx_state, xxx)
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 //  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
