@@ -501,14 +501,12 @@ void lethal_state::machine_start()
 
 void lethal_state::machine_reset()
 {
-	UINT8 *prgrom = (UINT8 *)memregion("maincpu")->base();
-	int i;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		m_layer_colorbase[i] = 0;
 
 	m_sprite_colorbase = 0;
 	m_cur_control2 = 0;
+	m_bank4800->set_bank(0);
 }
 
 static const k056832_interface lethalen_k056832_intf =
