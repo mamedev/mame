@@ -236,23 +236,29 @@ class witch_state : public driver_device
 public:
 	witch_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_gfx0_vram(*this, "gfx0_vram"),
 		m_gfx0_cram(*this, "gfx0_cram"),
 		m_gfx1_vram(*this, "gfx1_vram"),
 		m_gfx1_cram(*this, "gfx1_cram"),
-		m_sprite_ram(*this, "sprite_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_sprite_ram(*this, "sprite_ram") { }
 
 	tilemap_t *m_gfx0a_tilemap;
 	tilemap_t *m_gfx0b_tilemap;
 	tilemap_t *m_gfx1_tilemap;
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	
 	required_shared_ptr<UINT8> m_gfx0_vram;
 	required_shared_ptr<UINT8> m_gfx0_cram;
 	required_shared_ptr<UINT8> m_gfx1_vram;
 	required_shared_ptr<UINT8> m_gfx1_cram;
 	required_shared_ptr<UINT8> m_sprite_ram;
+	
 	int m_scrollx;
 	int m_scrolly;
 	UINT8 m_reg_a002;
@@ -277,12 +283,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_gfx1_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(witch_main_interrupt);
-	INTERRUPT_GEN_MEMBER(witch_sub_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -823,26 +824,18 @@ UINT32 witch_state::screen_update_witch(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(witch_state::witch_main_interrupt)
-{
-	device.execute().set_input_line(0,ASSERT_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(witch_state::witch_sub_interrupt)
-{
-	device.execute().set_input_line(0,ASSERT_LINE);
-}
-
 static MACHINE_CONFIG_START( witch, witch_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)    /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(map_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  witch_main_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  irq0_line_assert)
 
 	/* 2nd z80 */
 	MCFG_CPU_ADD("sub", Z80, CPU_CLOCK)    /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(map_sub)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  witch_sub_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  irq0_line_assert)
+	
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
