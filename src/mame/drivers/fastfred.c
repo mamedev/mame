@@ -693,8 +693,8 @@ static MACHINE_CONFIG_DERIVED( imago, fastfred )
 	MCFG_MACHINE_START_OVERRIDE(fastfred_state,imago)
 
 	/* video hardware */
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", imago)
 
 	MCFG_VIDEO_START_OVERRIDE(fastfred_state,imago)

@@ -186,8 +186,7 @@ static MACHINE_CONFIG_START( tourtabl, tourtabl_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200 )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
-
-	MCFG_PALETTE_ADD("palette", TIA_PALETTE_LENGTH)
+	MCFG_SCREEN_PALETTE("tia_video:palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

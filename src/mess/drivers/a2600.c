@@ -1953,8 +1953,7 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31 )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
-
-	MCFG_PALETTE_ADD( "palette", TIA_PALETTE_LENGTH )
+	MCFG_SCREEN_PALETTE("tia_video:palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1989,8 +1988,7 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31 )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
-
-	MCFG_PALETTE_ADD( "palette", TIA_PALETTE_LENGTH )
+	MCFG_SCREEN_PALETTE("tia_video:palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
