@@ -107,7 +107,7 @@ public:
     }
 
     token_t get_token_internal();
-    void error(const char *format, ...);
+    void error(const char *format, ...) ATTR_PRINTF(2,3);
 
 protected:
     void reset(const char *p) { m_px = p; m_line = 1; m_line_ptr = p; }
@@ -266,7 +266,7 @@ public:
             if (m_list[i].parse(setup, name))
                 return;
         }
-        setup.netlist().error("unable to find %s in source collection");
+        setup.netlist().error("unable to find %s in source collection", name.cstr());
     }
 
 private:

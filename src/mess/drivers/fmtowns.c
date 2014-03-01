@@ -218,7 +218,7 @@ void towns_state::init_serial_rom(running_machine &machine)
 	// TODO: init serial ROM contents
 	int x;
 	static const UINT8 code[8] = { 0x04,0x65,0x54,0xA4,0x95,0x45,0x35,0x5F };
-	UINT8* srom = machine.root_device().memregion("serial")->base();
+	UINT8* srom = m_serial->base();
 
 	memset(m_towns_serial_rom,0,256/8);
 
@@ -646,21 +646,21 @@ void towns_state::kb_sendcode(UINT8 scancode, int release)
 		case 0:  // key press
 			m_towns_kb_output = 0x80;
 			m_towns_kb_extend = scancode & 0x7f;
-			if(ioport("key3")->read() & 0x00080000)
+			if(m_key3->read() & 0x00080000)
 				m_towns_kb_output |= 0x04;
-			if(ioport("key3")->read() & 0x00040000)
+			if(m_key3->read() & 0x00040000)
 				m_towns_kb_output |= 0x08;
-			if(ioport("key3")->read() & 0x06400000)
+			if(m_key3->read() & 0x06400000)
 				m_towns_kb_output |= 0x20;
 			break;
 		case 1:  // key release
 			m_towns_kb_output = 0x90;
 			m_towns_kb_extend = scancode & 0x7f;
-			if(ioport("key3")->read() & 0x00080000)
+			if(m_key3->read() & 0x00080000)
 				m_towns_kb_output |= 0x04;
-			if(ioport("key3")->read() & 0x00040000)
+			if(m_key3->read() & 0x00040000)
 				m_towns_kb_output |= 0x08;
-			if(ioport("key3")->read() & 0x06400000)
+			if(m_key3->read() & 0x06400000)
 				m_towns_kb_output |= 0x20;
 			break;
 		case 2:  // extended byte
@@ -679,7 +679,7 @@ void towns_state::kb_sendcode(UINT8 scancode, int release)
 
 void towns_state::poll_keyboard()
 {
-	static const char *const kb_ports[4] = { "key1", "key2", "key3", "key4" };
+	ioport_port* kb_ports[4] = { m_key1, m_key2, m_key3, m_key4 };
 	int port,bit;
 	UINT8 scan;
 	UINT32 portval;
@@ -687,7 +687,7 @@ void towns_state::poll_keyboard()
 	scan = 0;
 	for(port=0;port<4;port++)
 	{
-		portval = ioport(kb_ports[port])->read();
+		portval = kb_ports[port]->read();
 		for(bit=0;bit<32;bit++)
 		{
 			if(((portval & (1<<bit))) != ((m_kb_prev[port] & (1<<bit))))
@@ -885,7 +885,7 @@ void towns_state::mouse_timeout()
 READ8_MEMBER(towns_state::towns_padport_r)
 {
 	UINT8 ret = 0x00;
-	UINT32 porttype = ioport("ctrltype")->read();
+	UINT32 porttype = m_ctrltype->read();
 	UINT8 extra1;
 	UINT8 extra2;
 	UINT32 state;
@@ -894,12 +894,12 @@ READ8_MEMBER(towns_state::towns_padport_r)
 	{
 		if((porttype & 0x0f) == 0x01)
 		{
-			extra1 = ioport("joy1_ex")->read();
+			extra1 = m_joy1_ex->read();
 
 			if(m_towns_pad_mask & 0x10)
-				ret |= (ioport("joy1")->read() & 0x3f) | 0x40;
+				ret |= (m_joy1->read() & 0x3f) | 0x40;
 			else
-				ret |= (ioport("joy1")->read() & 0x0f) | 0x30;
+				ret |= (m_joy1->read() & 0x0f) | 0x30;
 
 			if(extra1 & 0x01) // Run button = left+right
 				ret &= ~0x0c;
@@ -913,12 +913,12 @@ READ8_MEMBER(towns_state::towns_padport_r)
 		}
 		if((porttype & 0x0f) == 0x04)  // 6-button joystick
 		{
-			extra1 = ioport("6b_joy1_ex")->read();
+			extra1 = m_6b_joy1_ex->read();
 
 			if(m_towns_pad_mask & 0x10)
 				ret |= 0x7f;
 			else
-				ret |= (ioport("6b_joy1")->read() & 0x0f) | 0x70;
+				ret |= (m_6b_joy1->read() & 0x0f) | 0x70;
 
 			if(!(m_towns_pad_mask & 0x10))
 			{
@@ -967,7 +967,7 @@ READ8_MEMBER(towns_state::towns_padport_r)
 			}
 
 			// button states are always visible
-			state = ioport("mouse1")->read();
+			state = m_mouse1->read();
 			if(!(state & 0x01))
 				ret |= 0x10;
 			if(!(state & 0x02))
@@ -981,12 +981,12 @@ READ8_MEMBER(towns_state::towns_padport_r)
 	{
 		if((porttype & 0xf0) == 0x10)
 		{
-			extra2 = ioport("joy2_ex")->read();
+			extra2 = m_joy2_ex->read();
 
 			if(m_towns_pad_mask & 0x20)
-				ret |= ((ioport("joy2")->read() & 0x3f)) | 0x40;
+				ret |= ((m_joy2->read() & 0x3f)) | 0x40;
 			else
-				ret |= ((ioport("joy2")->read() & 0x0f)) | 0x30;
+				ret |= ((m_joy2->read() & 0x0f)) | 0x30;
 
 			if(extra2 & 0x01)
 				ret &= ~0x0c;
@@ -1000,12 +1000,12 @@ READ8_MEMBER(towns_state::towns_padport_r)
 		}
 		if((porttype & 0xf0) == 0x40)  // 6-button joystick
 		{
-			extra2 = ioport("6b_joy2_ex")->read();
+			extra2 = m_6b_joy2_ex->read();
 
 			if(m_towns_pad_mask & 0x20)
 				ret |= 0x7f;
 			else
-				ret |= ((ioport("6b_joy2")->read() & 0x0f)) | 0x70;
+				ret |= ((m_6b_joy2->read() & 0x0f)) | 0x70;
 
 			if(!(m_towns_pad_mask & 0x10))
 			{
@@ -1054,7 +1054,7 @@ READ8_MEMBER(towns_state::towns_padport_r)
 			}
 
 			// button states are always visible
-			state = ioport("mouse1")->read();
+			state = m_mouse1->read();
 			if(!(state & 0x01))
 				ret |= 0x10;
 			if(!(state & 0x02))
@@ -1070,7 +1070,7 @@ READ8_MEMBER(towns_state::towns_padport_r)
 WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 {
 	UINT8 current_x,current_y;
-	UINT32 type = ioport("ctrltype")->read();
+	UINT32 type = m_ctrltype->read();
 
 	m_towns_pad_mask = (data & 0xff);
 	if((type & 0x0f) == 0x02)  // mouse
@@ -1080,8 +1080,8 @@ WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 			if(m_towns_mouse_output == MOUSE_START)
 			{
 				m_towns_mouse_output = MOUSE_X_HIGH;
-				current_x = ioport("mouse2")->read();
-				current_y = ioport("mouse3")->read();
+				current_x = m_mouse2->read();
+				current_y = m_mouse3->read();
 				m_towns_mouse_x = m_prev_x - current_x;
 				m_towns_mouse_y = m_prev_y - current_y;
 				m_prev_x = current_x;
@@ -1096,8 +1096,8 @@ WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 			if(m_towns_mouse_output == MOUSE_START)
 			{
 				m_towns_mouse_output = MOUSE_SYNC;
-				current_x = ioport("mouse2")->read();
-				current_y = ioport("mouse3")->read();
+				current_x = m_mouse2->read();
+				current_y = m_mouse3->read();
 				m_towns_mouse_x = m_prev_x - current_x;
 				m_towns_mouse_y = m_prev_y - current_y;
 				m_prev_x = current_x;
@@ -1116,8 +1116,8 @@ WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 			if(m_towns_mouse_output == MOUSE_START)
 			{
 				m_towns_mouse_output = MOUSE_X_HIGH;
-				current_x = ioport("mouse2")->read();
-				current_y = ioport("mouse3")->read();
+				current_x = m_mouse2->read();
+				current_y = m_mouse3->read();
 				m_towns_mouse_x = m_prev_x - current_x;
 				m_towns_mouse_y = m_prev_y - current_y;
 				m_prev_x = current_x;
@@ -1132,8 +1132,8 @@ WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 			if(m_towns_mouse_output == MOUSE_START)
 			{
 				m_towns_mouse_output = MOUSE_SYNC;
-				current_x = ioport("mouse2")->read();
-				current_y = ioport("mouse3")->read();
+				current_x = m_mouse2->read();
+				current_y = m_mouse3->read();
 				m_towns_mouse_x = m_prev_x - current_x;
 				m_towns_mouse_y = m_prev_y - current_y;
 				m_prev_x = current_x;
@@ -1192,7 +1192,7 @@ void towns_state::towns_update_video_banks(address_space& space)
 
 	if(m_towns_mainmem_enable != 0)  // first MB is RAM
 	{
-		ROM = state->memregion("user")->base();
+		ROM = m_user->base();
 
 //      state->membank(1)->set_base(m_messram->pointer()+0xc0000);
 //      state->membank(2)->set_base(m_messram->pointer()+0xc8000);
@@ -1211,7 +1211,7 @@ void towns_state::towns_update_video_banks(address_space& space)
 	}
 	else  // enable I/O ports and VRAM
 	{
-		ROM = state->memregion("user")->base();
+		ROM = m_user->base();
 
 //      state->membank(1)->set_base(towns_gfxvram+(towns_vram_rplane*0x8000));
 //      state->membank(2)->set_base(towns_txtvram);

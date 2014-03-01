@@ -14,23 +14,6 @@
 
 #define ENABLE_VERBOSE_LOG (0)
 
-#if ENABLE_VERBOSE_LOG
-inline void craft_state::verboselog(int n_level, const char *s_fmt, ...)
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%08x: %s", m_maincpu->safe_pc(), buf );
-	}
-}
-#else
-#define verboselog(x,y,z,...)
-#endif
-
 #define MASTER_CLOCK    20000000
 
 #define VISIBLE_CYCLES      480
@@ -77,11 +60,24 @@ public:
 	DECLARE_DRIVER_INIT(craft);
 	virtual void machine_reset();
 	UINT32 screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-#if ENABLE_VERBOSE_LOG
-	inline void verboselog(int n_level, const char *s_fmt, ...);
-#endif
+	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<dac_device> m_dac;
 };
+
+inline void craft_state::verboselog(int n_level, const char *s_fmt, ...)
+{
+#if ENABLE_VERBOSE_LOG
+	if( VERBOSE_LEVEL >= n_level )
+	{
+		va_list v;
+		char buf[ 32768 ];
+		va_start( v, s_fmt );
+		vsprintf( buf, s_fmt, v );
+		va_end( v );
+		logerror( "%08x: %s", m_maincpu->safe_pc(), buf );
+	}
+#endif
+}
 
 void craft_state::machine_start()
 {

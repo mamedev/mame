@@ -198,6 +198,8 @@ void pacland_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pacland_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pacland_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
+	m_bg_tilemap->set_scrolldx(3, 340);
+	m_fg_tilemap->set_scrolldx(0, 336); /* scrolling portion needs an additional offset when flipped */
 	m_fg_tilemap->set_scroll_rows(32);
 
 	/* create one group per color code; for each group, set the transparency mask
@@ -271,7 +273,7 @@ WRITE8_MEMBER(pacland_state::pacland_bankswitch_w)
 ***************************************************************************/
 
 /* the sprite generator IC is the same as Mappy */
-void pacland_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int whichmask)
+void pacland_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int whichmask)
 {
 	UINT8 *spriteram = m_spriteram + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
@@ -298,7 +300,7 @@ void pacland_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		sprite &= ~sizex;
 		sprite &= ~(sizey << 1);
 
-		if (flip_screen())
+		if (flip)
 		{
 			flipx ^= 1;
 			flipy ^= 1;
@@ -365,16 +367,17 @@ void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const r
 UINT32 pacland_state::screen_update_pacland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int row;
+	int flip = flip_screen();
 
 	for (row = 5; row < 29; row++)
-		m_fg_tilemap->set_scrollx(row, flip_screen() ? m_scroll0-7 : m_scroll0);
-	m_bg_tilemap->set_scrollx(0, flip_screen() ? m_scroll1-4 : m_scroll1-3);
+		m_fg_tilemap->set_scrollx(row, m_scroll0 - (flip ? 7 : 0));
+	m_bg_tilemap->set_scrollx(0, m_scroll1);
 
 	/* draw high priority sprite pixels, setting priority bitmap to non-zero
 	   wherever there is a high-priority pixel; note that we draw to the bitmap
 	   which is safe because the bg_tilemap draw will overwrite everything */
 	screen.priority().fill(0x00, cliprect);
-	draw_sprites(screen, bitmap, cliprect, 0);
+	draw_sprites(screen, bitmap, cliprect, flip, 0);
 
 	/* draw background */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -383,12 +386,12 @@ UINT32 pacland_state::screen_update_pacland(screen_device &screen, bitmap_ind16 
 	draw_fg(screen, bitmap, cliprect, 0);
 
 	/* draw sprites with regular transparency */
-	draw_sprites(screen, bitmap, cliprect, 1);
+	draw_sprites(screen, bitmap, cliprect, flip, 1);
 
 	/* draw high priority fg tiles */
 	draw_fg(screen, bitmap, cliprect, 1);
 
 	/* draw sprite pixels with colortable values >= 0xf0, which have priority over everything */
-	draw_sprites(screen, bitmap, cliprect, 2);
+	draw_sprites(screen, bitmap, cliprect, flip, 2);
 	return 0;
 }

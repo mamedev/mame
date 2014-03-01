@@ -16,7 +16,7 @@
 static NETLIST_START(base)
 	TTL_INPUT(ttlhigh, 1)
 	TTL_INPUT(ttllow, 0)
-    NETDEV_GND()
+    GND()
 
 	NET_MODEL(".model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
 	NET_MODEL(".model 1N4148 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
@@ -259,10 +259,10 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 			}
 			break;
 		case netlist_terminal_t::DEVICE:
-			netlist().error("Device registration not yet supported - \n", name.cstr());
+			netlist().error("Device registration not yet supported - %s\n", name.cstr());
 			break;
 		case netlist_terminal_t::NETLIST:
-			netlist().error("Netlist registration not yet supported - \n", name.cstr());
+			netlist().error("Netlist registration not yet supported - %s\n", name.cstr());
 			break;
 	}
 }

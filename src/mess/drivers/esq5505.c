@@ -148,13 +148,15 @@
 static int shift = 32;
 #endif
 
-void print_to_stderr(const char *format, ...)
+#if 0
+static void ATTR_PRINTF(1,2) print_to_stderr(const char *format, ...)
 {
 	va_list arg;
 	va_start(arg, format);
 	vfprintf(stderr, format, arg);
 	va_end(arg);
 }
+#endif
 
 class esq5505_state : public driver_device
 {

@@ -150,7 +150,7 @@ public:
 	void draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
 	void draw_message_window(render_container *container, const char *text);
 
-	void CLIB_DECL popup_time(int seconds, const char *text, ...);
+	void CLIB_DECL popup_time(int seconds, const char *text, ...) ATTR_PRINTF(3,4);
 	void show_fps_temp(double seconds);
 	void set_show_fps(bool show);
 	bool show_fps() const;

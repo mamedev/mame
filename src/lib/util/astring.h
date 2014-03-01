@@ -109,10 +109,10 @@ public:
 	// formatted string helpers
 	int vprintf(const char *format, va_list args);
 	int catvprintf(const char *format, va_list args);
-	int printf(const char *format, ...) { va_list ap; va_start(ap, format); int result = this->vprintf(format, ap); va_end(ap); return result; }
-	int catprintf(const char *format, ...) { va_list ap; va_start(ap, format); int result = catvprintf(format, ap); va_end(ap); return result; }
-	astring &format(const char *format, ...) { va_list ap; va_start(ap, format); this->vprintf(format, ap); va_end(ap); return *this; }
-	astring &catformat(const char *format, ...) { va_list ap; va_start(ap, format); catvprintf(format, ap); va_end(ap); return *this; }
+	int printf(const char *format, ...) ATTR_PRINTF(2,3) { va_list ap; va_start(ap, format); int result = this->vprintf(format, ap); va_end(ap); return result; }
+	int catprintf(const char *format, ...) ATTR_PRINTF(2,3) { va_list ap; va_start(ap, format); int result = catvprintf(format, ap); va_end(ap); return result; }
+	astring &format(const char *format, ...) ATTR_PRINTF(2,3) { va_list ap; va_start(ap, format); this->vprintf(format, ap); va_end(ap); return *this; }
+	astring &catformat(const char *format, ...) ATTR_PRINTF(2,3) { va_list ap; va_start(ap, format); catvprintf(format, ap); va_end(ap); return *this; }
 
 	// comparison helpers
 	int cmp(const char *str2, int count) const;

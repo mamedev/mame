@@ -137,10 +137,14 @@ void namcos86_state::video_start()
 	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 	m_bg_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos86_state::get_tile_info3),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	m_bg_tilemap[0]->set_transparent_pen(7);
-	m_bg_tilemap[1]->set_transparent_pen(7);
-	m_bg_tilemap[2]->set_transparent_pen(7);
-	m_bg_tilemap[3]->set_transparent_pen(7);
+	for (int i = 0; i < 4; i++)
+	{
+		static const int xdisp[] = { 47, 49, 46, 48 };
+
+		m_bg_tilemap[i]->set_scrolldx(xdisp[i], 422 - xdisp[i]);
+		m_bg_tilemap[i]->set_scrolldy(-9, 9);
+		m_bg_tilemap[i]->set_transparent_pen(7);
+	}
 
 	m_spriteram = m_rthunder_spriteram + 0x1800;
 }
@@ -333,11 +337,10 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 static void set_scroll(running_machine &machine, int layer)
 {
 	namcos86_state *state = machine.driver_data<namcos86_state>();
-	static const int xdisp[4] = { 47, 49, 46, 48 };
 	int scrollx,scrolly;
 
-	scrollx = state->m_xscroll[layer] - xdisp[layer];
-	scrolly = state->m_yscroll[layer] + 9;
+	scrollx = state->m_xscroll[layer];
+	scrolly = state->m_yscroll[layer];
 	if (state->flip_screen())
 	{
 		scrollx = -scrollx;
@@ -353,9 +356,7 @@ UINT32 namcos86_state::screen_update_namcos86(screen_device &screen, bitmap_ind1
 	int layer;
 
 	/* flip screen is embedded in the sprite control registers */
-	/* can't use flip_screen_set() because the visible area is asymmetrical */
-	flip_screen_set_no_update(m_spriteram[0x07f6] & 1);
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	flip_screen_set(m_spriteram[0x07f6] & 1);
 	set_scroll(machine(), 0);
 	set_scroll(machine(), 1);
 	set_scroll(machine(), 2);

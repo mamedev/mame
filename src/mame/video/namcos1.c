@@ -126,10 +126,18 @@ void namcos1_state::video_start()
 	m_bg_tilemap[4] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info4),this),TILEMAP_SCAN_ROWS,8,8,36,28);
 	m_bg_tilemap[5] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info5),this),TILEMAP_SCAN_ROWS,8,8,36,28);
 
-	m_bg_tilemap[4]->set_scrolldx(73,512-73);
-	m_bg_tilemap[5]->set_scrolldx(73,512-73);
-	m_bg_tilemap[4]->set_scrolldy(0x10,0x110);
-	m_bg_tilemap[5]->set_scrolldy(0x10,0x110);
+	for (i = 0; i < 4; i++)
+	{
+		static const int xdisp[] = { 25, 27, 28, 29 };
+
+		m_bg_tilemap[i]->set_scrolldx(xdisp[i], 434 - xdisp[i]);
+		m_bg_tilemap[i]->set_scrolldy(-8, 256 + 8);
+	}
+
+	m_bg_tilemap[4]->set_scrolldx(73, 73);
+	m_bg_tilemap[5]->set_scrolldx(73, 73);
+	m_bg_tilemap[4]->set_scrolldy(16, 16);
+	m_bg_tilemap[5]->set_scrolldy(16, 16);
 
 	/* register videoram to the save state system (post-allocation) */
 	save_pointer(NAME(m_videoram), 0x8000);
@@ -367,10 +375,7 @@ UINT32 namcos1_state::screen_update_namcos1(screen_device &screen, bitmap_ind16 
 	rectangle new_clip = cliprect;
 
 	/* flip screen is embedded in the sprite control registers */
-	/* can't use flip_screen_set() because the visible area is asymmetrical */
-	flip_screen_set_no_update(m_spriteram[0x0ff6] & 1);
-	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-
+	flip_screen_set(m_spriteram[0x0ff6] & 1);
 
 	/* background color */
 	bitmap.fill(get_black_pen(machine()), cliprect);
@@ -395,11 +400,9 @@ UINT32 namcos1_state::screen_update_namcos1(screen_device &screen, bitmap_ind16 
 
 	for (i = 0;i < 4;i++)
 	{
-		static const int disp_x[] = { 25, 27, 28, 29 };
-
 		j = i << 2;
-		scrollx = ( m_playfield_control[j+1] + (m_playfield_control[j+0]<<8) ) - disp_x[i];
-		scrolly = ( m_playfield_control[j+3] + (m_playfield_control[j+2]<<8) ) + 8;
+		scrollx = ( m_playfield_control[j+1] + (m_playfield_control[j+0]<<8) );
+		scrolly = ( m_playfield_control[j+3] + (m_playfield_control[j+2]<<8) );
 
 		if (flip_screen())
 		{

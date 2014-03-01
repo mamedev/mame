@@ -82,16 +82,9 @@ void namcos2_shared_state::namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 		{
 			static const int adj[4] = { 4,2,1,0 };
 			int dx = 44+adj[i];
-			mTilemapInfo.tmap[i]->set_scrolldx( -dx, -(-384-dx) );
-			mTilemapInfo.tmap[i]->set_scrolldy( -24, 288 );
+			mTilemapInfo.tmap[i]->set_scrolldx( -dx, 288+dx );
+			mTilemapInfo.tmap[i]->set_scrolldy( -24, 224+24 );
 		}
-
-		mTilemapInfo.tmap[4]->set_scrolldx( 0, 96 );
-		mTilemapInfo.tmap[4]->set_scrolldy( 0, 40 );
-
-		mTilemapInfo.tmap[5]->set_scrolldx( 0, 96 );
-		mTilemapInfo.tmap[5]->set_scrolldy( 0, 40 );
-
 } /* namco_tilemap_init */
 
 void

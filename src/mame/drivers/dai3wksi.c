@@ -49,20 +49,31 @@ class dai3wksi_state : public driver_device
 public:
 	dai3wksi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_dai3wksi_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_ic77(*this, "ic77"),
 		m_ic78(*this, "ic78"),
 		m_ic79(*this, "ic79"),
 		m_ic80(*this, "ic80"),
-		m_ic81(*this, "ic81") { }
+		m_ic81(*this, "ic81"),
+		m_dai3wksi_videoram(*this, "videoram"),
+		m_in2(*this, "IN2") { }
 
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<samples_device> m_samples;
+	optional_device<sn76477_device> m_ic77;
+	optional_device<sn76477_device> m_ic78;
+	optional_device<sn76477_device> m_ic79;
+	optional_device<sn76477_device> m_ic80;
+	optional_device<sn76477_device> m_ic81;
+	
 	/* video */
 	required_shared_ptr<UINT8> m_dai3wksi_videoram;
 	int         m_dai3wksi_flipscreen;
 	int         m_dai3wksi_redscreen;
 	int         m_dai3wksi_redterop;
+	UINT32 screen_update_dai3wksi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	/* sound */
 	UINT8       m_port_last1;
@@ -72,16 +83,12 @@ public:
 	DECLARE_WRITE8_MEMBER(dai3wksi_audio_1_w);
 	DECLARE_WRITE8_MEMBER(dai3wksi_audio_2_w);
 	DECLARE_WRITE8_MEMBER(dai3wksi_audio_3_w);
+	
+	/* i/o ports */
+	required_ioport m_in2;
+	
 	virtual void machine_start();
 	virtual void machine_reset();
-	UINT32 screen_update_dai3wksi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<samples_device> m_samples;
-	optional_device<sn76477_device> m_ic77;
-	optional_device<sn76477_device> m_ic78;
-	optional_device<sn76477_device> m_ic79;
-	optional_device<sn76477_device> m_ic80;
-	optional_device<sn76477_device> m_ic81;
 };
 
 
@@ -166,7 +173,7 @@ UINT32 dai3wksi_state::screen_update_dai3wksi(screen_device &screen, bitmap_rgb3
 		}
 		else
 		{
-			if (ioport("IN2")->read() & 0x03)
+			if (m_in2->read() & 0x03)
 				color = vr_prom2[value];
 			else
 				color = vr_prom1[value];

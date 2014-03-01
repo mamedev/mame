@@ -1,14 +1,24 @@
 /********************************************************************
 
     G-Stream (c)2002 Oriental Soft Japan
+	X2222 (prototype) (c)2000 Oriental
+
+	---
+	X2222 has corrupt boss graphics because the program roms we use don't match the sprite roms.
+	--
 
     Hyperstone based hardware
 
     Simple Sprites (16x16x8bpp tiles)
     3 Simple Tilemaps (32x32x8bpp tiles)
 
+	X2222 uses raw 16bpp palette data instead of 8bpp indexed colours.
+
     todo: sprite lag (sprites need buffering?)
-          sound banking
+          sprite wraparound is imperfect
+
+    The following is confirmed on G-Stream only
+	---
 
     CPU:  E1-32XT
     Sound: 2x AD-65 (OKIM6295 clone)
@@ -31,7 +41,7 @@
     ---
 
     Dump Notes:::
-
+	
     G-Stream 2020, 2002 Oriental Soft Japan
 
     Shooter from Oriental soft, heavy influence from XII Stag
@@ -136,25 +146,23 @@ public:
 		m_workram(*this, "workram"),
 		m_vram(*this, "vram"),
 		m_paletteram(*this, "paletteram"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{
+		m_toggle = 0;
+	}
 
 	/* devices */
 	required_device<e132xt_device> m_maincpu;
 	required_device<okim6295_device> m_oki_1;
-	required_device<okim6295_device> m_oki_2;
+	optional_device<okim6295_device> m_oki_2;
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_vram;
-	required_shared_ptr<UINT32> m_paletteram;
-	
-	required_device<gfxdecode_device> m_gfxdecode;
+	optional_shared_ptr<UINT32> m_paletteram;
 //  UINT32 *  m_nvram;    // currently this uses generic nvram handling
 
 	/* video-related */
-	tilemap_t   *m_tilemap1;
-	tilemap_t   *m_tilemap2;
-	tilemap_t   *m_tilemap3;
 	UINT32    m_tmap1_scrollx;
 	UINT32    m_tmap2_scrollx;
 	UINT32    m_tmap3_scrollx;
@@ -165,6 +173,8 @@ public:
 	/* misc */
 	int       m_oki_bank_1;
 	int       m_oki_bank_2;
+	int		  m_toggle;
+	int		  m_xoffset;
 
 	DECLARE_WRITE32_MEMBER(gstream_palette_w);
 	DECLARE_WRITE32_MEMBER(gstream_vram_w);
@@ -176,19 +186,31 @@ public:
 	DECLARE_WRITE32_MEMBER(gstream_tilemap3_scrolly_w);
 	DECLARE_WRITE32_MEMBER(gstream_oki_banking_w);
 	DECLARE_WRITE32_MEMBER(gstream_oki_4040_w);
+	DECLARE_WRITE32_MEMBER(x2222_sound_w);
 	DECLARE_READ32_MEMBER(gstream_speedup_r);
+	DECLARE_READ32_MEMBER(x2222_speedup_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(x2222_toggle_r);
 	DECLARE_DRIVER_INIT(gstream);
-	TILE_GET_INFO_MEMBER(get_gs1_tile_info);
-	TILE_GET_INFO_MEMBER(get_gs2_tile_info);
-	TILE_GET_INFO_MEMBER(get_gs3_tile_info);
+	DECLARE_DRIVER_INIT(x2222);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update_gstream(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_gstream(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_bg_gstream(bitmap_rgb32 &bitmap, const rectangle &cliprect, int xscrl, int yscrl, int map, UINT32* ram, int palbase);
+
+	void rearrange_sprite_data(UINT8* ROM, UINT32* NEW, UINT32* NEW2);
+	void rearrange_tile_data(UINT8* ROM, UINT32* NEW, UINT32* NEW2);
+	
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
+CUSTOM_INPUT_MEMBER(gstream_state::x2222_toggle_r) // or the game hangs when starting, might be a status flag for the sound?
+{
+	m_toggle ^= 0xffff;
+	return m_toggle;
+}
 
 
 CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_service_r)
@@ -237,22 +259,6 @@ WRITE32_MEMBER(gstream_state::gstream_palette_w)
 WRITE32_MEMBER(gstream_state::gstream_vram_w)
 {
 	COMBINE_DATA(&m_vram[offset]);
-
-	if (ACCESSING_BITS_24_31)
-	{
-		if (offset < 0x400 / 4)
-		{
-			m_tilemap1->mark_tile_dirty(offset);
-		}
-		else if (offset >= 0x400 / 4 && offset < 0x800 / 4)
-		{
-			m_tilemap2->mark_tile_dirty(offset - (0x400 / 4));
-		}
-		else if (offset >= 0x800 / 4 && offset < 0xc00 / 4)
-		{
-			m_tilemap3->mark_tile_dirty(offset - (0x800 / 4));
-		}
-	}
 }
 
 WRITE32_MEMBER(gstream_state::gstream_tilemap1_scrollx_w)
@@ -376,6 +382,41 @@ static ADDRESS_MAP_START( gstream_io, AS_IO, 32, gstream_state )
 	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff) // music and samples
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( x2222_32bit_map, AS_PROGRAM, 32, gstream_state )
+	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_SHARE("workram") // work ram
+	AM_RANGE(0x40000000, 0x403fffff) AM_RAM // ?? data gets copied here if present, but game runs without it??
+	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_SHARE("vram") // video ram
+
+	AM_RANGE(0x4Fc00000, 0x4Fc00003) AM_WRITE(gstream_tilemap2_scrolly_w)
+	AM_RANGE(0x4Fd00000, 0x4Fd00003) AM_WRITE(gstream_tilemap2_scrollx_w)
+
+	AM_RANGE(0x4Fa00000, 0x4Fa00003) AM_WRITE(gstream_tilemap3_scrolly_w)
+	AM_RANGE(0x4Fb00000, 0x4Fb00003) AM_WRITE(gstream_tilemap3_scrollx_w)
+
+	AM_RANGE(0x4Fe00000, 0x4Fe00003) AM_WRITE(gstream_tilemap1_scrolly_w)
+	AM_RANGE(0x4Ff00000, 0x4Ff00003) AM_WRITE(gstream_tilemap1_scrollx_w)
+
+	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_SHARE("nvram") // Backup RAM (maybe)
+	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
+ADDRESS_MAP_END
+
+WRITE32_MEMBER(gstream_state::x2222_sound_w)
+{
+	// maybe sound in low 8-bits? but we have no samples anyway assuming it's an OKI
+	if (data & 0xffffff00)
+		printf("x2222_sound_w unk %08x\n", data);
+}
+
+static ADDRESS_MAP_START( x2222_io, AS_IO, 32, gstream_state )
+	AM_RANGE(0x4000, 0x4003) AM_READ_PORT("P1")
+	AM_RANGE(0x4004, 0x4007) AM_READ_PORT("P2")
+	AM_RANGE(0x4008, 0x400b) AM_READ_PORT("SYS")
+	AM_RANGE(0x4010, 0x4013) AM_READ_PORT("DSW")
+	AM_RANGE(0x4028, 0x402b) AM_WRITE( x2222_sound_w )
+	AM_RANGE(0x4034, 0x4037) AM_READ_PORT("IN4")
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( gstream )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -415,6 +456,97 @@ static INPUT_PORTS_START( gstream )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( x2222 )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SYS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_DIPNAME( 0x0002, 0x0002, "IN1" )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Free_Play ) ) // always 99 credits
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0006, 0x0004, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Lives ) )
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0008, "2" )
+	PORT_DIPSETTING(      0x0010, "3" )
+	PORT_DIPSETTING(      0x0018, "4" )
+	PORT_DIPNAME( 0x00e0, 0x0000, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0040, "2" )
+	PORT_DIPSETTING(      0x0060, "3" )
+	PORT_DIPSETTING(      0x0080, "4" )
+	PORT_DIPSETTING(      0x00a0, "5" )
+	PORT_DIPSETTING(      0x00c0, "6" )
+	PORT_DIPSETTING(      0x00e0, "7" )
+
+	PORT_START("IN4")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN4" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,x2222_toggle_r, NULL)
+INPUT_PORTS_END
+
+
 static const gfx_layout layout16x16 =
 {
 	16,16,
@@ -425,6 +557,7 @@ static const gfx_layout layout16x16 =
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
 	16*128,
 };
+
 
 static const gfx_layout layout32x32 =
 {
@@ -446,45 +579,221 @@ static const gfx_layout layout32x32 =
 
 static GFXDECODE_START( gstream )
 	GFXDECODE_ENTRY( "gfx2", 0, layout32x32, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx3", 0, layout32x32, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx4", 0, layout32x32, 0, 0x80 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0, 0x80 )
 GFXDECODE_END
 
 
-
-TILE_GET_INFO_MEMBER(gstream_state::get_gs1_tile_info)
-{
-	int tileno = (m_vram[tile_index + 0x000 / 4] & 0x0fff0000) >> 16;
-	int palette = (m_vram[tile_index + 0x000 / 4] & 0xc0000000) >> 30;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, palette + 0x10, 0);
-}
-
-TILE_GET_INFO_MEMBER(gstream_state::get_gs2_tile_info)
-{
-	int tileno = (m_vram[tile_index + 0x400 / 4] & 0x0fff0000) >> 16;
-	int palette = (m_vram[tile_index + 0x400 / 4] & 0xc0000000) >> 30;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno + 0x1000, palette + 0x14, 0);
-}
-
-
-TILE_GET_INFO_MEMBER(gstream_state::get_gs3_tile_info)
-{
-	int tileno = (m_vram[tile_index + 0x800 / 4] & 0x0fff0000) >> 16;
-	int palette = (m_vram[tile_index + 0x800 / 4] & 0xc0000000) >> 30;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno + 0x2000, palette + 0x18, 0);
-}
+static GFXDECODE_START( x2222 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout32x32, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx3", 0, layout32x32, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx4", 0, layout32x32, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout16x16, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx1_lower", 0, layout16x16, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx2_lower", 0, layout32x32, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx3_lower", 0, layout32x32, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx4_lower", 0, layout32x32, 0, 0x80 )
+GFXDECODE_END
 
 
 void gstream_state::video_start()
 {
-	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gstream_state::get_gs1_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
-	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gstream_state::get_gs2_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
-	m_tilemap3 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gstream_state::get_gs3_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 16, 16);
-
-	m_tilemap1->set_transparent_pen(0);
-	m_tilemap2->set_transparent_pen(0);
 }
 
-UINT32 gstream_state::screen_update_gstream(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+
+
+// custom drawgfx function for x2222 to draw RGB data instead of indexed data, needed because our regular drawgfx and tilemap code don't support that
+void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,gfx_element *gfx2,
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
+		UINT32 transpen)
+{
+	// use pen usage to optimize
+	code %= gfx->elements();
+
+	// render
+                        
+	do {
+		g_profiler.start(PROFILER_DRAWGFX);
+		do {
+
+			const UINT8 *srcdata, *srcdata2;
+			INT32 destendx, destendy;
+			INT32 srcx, srcy;
+			INT32 curx, cury;
+			INT32 dy;
+
+			assert(dest.valid());
+			assert(gfx != NULL);
+			assert(dest.cliprect().contains(cliprect));
+			assert(code < gfx->elements());
+
+			/* ignore empty/invalid cliprects */
+			if (cliprect.empty())
+				break;
+
+			/* compute final pixel in X and exit if we are entirely clipped */
+			destendx = destx + gfx->width() - 1;
+			if (destx > cliprect.max_x || destendx < cliprect.min_x)
+				break;
+
+			/* apply left clip */
+			srcx = 0;
+			if (destx < cliprect.min_x)
+			{
+				srcx = cliprect.min_x - destx;
+				destx = cliprect.min_x;
+			}
+
+			/* apply right clip */
+			if (destendx > cliprect.max_x)
+				destendx = cliprect.max_x;
+
+			/* compute final pixel in Y and exit if we are entirely clipped */
+			destendy = desty + gfx->height() - 1;
+			if (desty > cliprect.max_y || destendy < cliprect.min_y)
+				break;
+
+			/* apply top clip */
+			srcy = 0;
+			if (desty < cliprect.min_y)
+			{
+				srcy = cliprect.min_y - desty;
+				desty = cliprect.min_y;
+			}
+
+			/* apply bottom clip */
+			if (destendy > cliprect.max_y)
+				destendy = cliprect.max_y;
+
+			/* apply X flipping */
+			if (flipx)
+				srcx = gfx->width() - 1 - srcx;
+
+			/* apply Y flipping */
+			dy = gfx->rowbytes();
+			if (flipy)
+			{
+				srcy = gfx->height() - 1 - srcy;
+				dy = -dy;
+			}
+
+			/* fetch the source data */
+			srcdata = gfx->get_data(code);
+			srcdata2 = gfx2->get_data(code);
+
+			/* compute how many blocks of 4 pixels we have */
+			UINT32 leftovers = (destendx + 1 - destx);
+
+			/* adjust srcdata to point to the first source pixel of the row */
+			srcdata += srcy * gfx->rowbytes() + srcx;
+			srcdata2 += srcy * gfx->rowbytes() + srcx;
+
+			/* non-flipped 8bpp case */
+			if (!flipx)
+			{
+				/* iterate over pixels in Y */
+				for (cury = desty; cury <= destendy; cury++)
+				{
+					UINT32 *destptr = &dest.pixt<UINT32>(cury, destx);
+					const UINT8 *srcptr = srcdata;
+					const UINT8 *srcptr2 = srcdata2;
+					srcdata += dy;
+					srcdata2 += dy;
+
+
+
+					/* iterate over leftover pixels */
+					for (curx = 0; curx < leftovers; curx++)
+					{
+						UINT32 srcdata = (srcptr[0]);
+						UINT32 srcdata2 = (srcptr2[0]);
+				
+						UINT32 fullval = (srcdata | (srcdata2 << 8));
+						UINT32 r = ((fullval >> 0) & 0x1f) << 3;
+						UINT32 g = ((fullval >> 5) & 0x3f) << 2;
+						UINT32 b = ((fullval >> 11) & 0x1f) << 3;
+						UINT32 full = (r << 16) | (g << 8) | (b << 0);
+						if (full != 0)
+							destptr[0] = full;
+						
+						srcptr++;
+						srcptr2++;
+						destptr++;
+					}
+				}
+			}
+
+			/* flipped 8bpp case */
+			else
+			{
+				/* iterate over pixels in Y */
+				for (cury = desty; cury <= destendy; cury++)
+				{
+					UINT32 *destptr = &dest.pixt<UINT32>(cury, destx);
+					const UINT8 *srcptr = srcdata;
+					const UINT8 *srcptr2 = srcdata2;
+
+					srcdata += dy;
+					srcdata2 += dy;
+
+					/* iterate over leftover pixels */
+					for (curx = 0; curx < leftovers; curx++)
+					{
+						UINT32 srcdata = (srcptr[0]);
+						UINT32 srcdata2 = (srcptr2[0]);
+						
+						UINT32 fullval = (srcdata | (srcdata2 << 8));
+						UINT32 r = ((fullval >> 0) & 0x1f) << 3;
+						UINT32 g = ((fullval >> 5) & 0x3f) << 2;
+						UINT32 b = ((fullval >> 11) & 0x1f) << 3;
+						UINT32 full = (r << 16) | (g << 8) | (b << 0);
+						if (full != 0)
+							destptr[0] = full;
+						
+						srcptr--;
+						srcptr2--;
+						destptr++;
+					}
+				}
+			}
+		} while (0);
+		g_profiler.stop();
+	} while (0);
+}
+
+void gstream_state::draw_bg_gstream(bitmap_rgb32 &bitmap, const rectangle &cliprect, int xscrl, int yscrl, int map, UINT32* ram, int palbase )
+{
+	int scrollx;
+	int scrolly;
+
+	scrollx = xscrl&0x1ff;
+	scrolly = yscrl&0x1ff;
+
+	UINT16 basey = scrolly>>5;
+	for (int y=0;y<13;y++)
+	{
+		UINT16 basex = scrollx>>5;
+		for (int x=0;x<16;x++)
+		{
+			int vram_data = (ram[(basex&0x0f)+((basey&0x0f)*0x10)]);
+			int pal = (vram_data & 0xc0000000) >> 30;
+			int code = (vram_data & 0x0fff0000) >> 16;
+			
+			pal += palbase;
+
+			if (m_gfxdecode->gfx(map+5))
+				drawgfx_transpen_x2222(bitmap,cliprect,m_gfxdecode->gfx(map),m_gfxdecode->gfx(map+5),code,0,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
+			else
+				m_gfxdecode->gfx(map)->transpen(bitmap,cliprect,code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
+
+			basex++;
+		}
+		basey++;
+	}
+}
+
+UINT32 gstream_state::screen_update_gstream(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* The tilemaps and sprite are interleaved together.
 	   Even Words are tilemap tiles
@@ -498,40 +807,47 @@ UINT32 gstream_state::screen_update_gstream(screen_device &screen, bitmap_ind16 
 	   a value of 0xfffffffe gets set in the sprite list.
 	   this could corrupt the tile value as both words
 	   are being set ?!
+
+	   x2222 seems to set none of these bits but has other wraparound issues
+
 	*/
 
 	int i;
 
 	//popmessage("(1) %08x %08x (2) %08x %08x (3) %08x %08x", m_tmap1_scrollx, m_tmap1_scrolly, m_tmap2_scrollx, m_tmap2_scrolly, m_tmap3_scrollx, m_tmap3_scrolly );
+	bitmap.fill(0,cliprect);
 
-	m_tilemap3->set_scrollx(0, m_tmap3_scrollx >> 16);
-	m_tilemap3->set_scrolly(0, m_tmap3_scrolly >> 16);
 
-	m_tilemap1->set_scrollx(0, m_tmap1_scrollx >> 16);
-	m_tilemap1->set_scrolly(0, m_tmap1_scrolly >> 16);
+	draw_bg_gstream(bitmap, cliprect, m_tmap3_scrollx >> 16, m_tmap3_scrolly >> 16, 2, m_vram + 0x800/4, 0x18);
+	draw_bg_gstream(bitmap, cliprect, m_tmap2_scrollx >> 16, m_tmap2_scrolly >> 16, 1, m_vram + 0x400/4, 0x14); 
+	draw_bg_gstream(bitmap, cliprect, m_tmap1_scrollx >> 16, m_tmap1_scrolly >> 16, 0, m_vram + 0x000/4, 0x10); // move on top for x2222 , check
 
-	m_tilemap2->set_scrollx(0, m_tmap2_scrollx >> 16);
-	m_tilemap2->set_scrolly(0, m_tmap2_scrolly >> 16);
-
-	m_tilemap3->draw(screen, bitmap, cliprect, 0, 0);
-	m_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
-	m_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
 
 	for (i = 0x0000 / 4; i < 0x4000 / 4; i += 4)
 	{
 		/* Upper bits are used by the tilemaps */
 		int code = m_vram[i + 0] & 0xffff;
-		int x = m_vram[i + 1] & 0xffff;
-		int y = m_vram[i + 2] & 0xffff;
+		int x = m_vram[i + 1] & 0x1ff;
+		int y = m_vram[i + 2] & 0xff;
 		int col = m_vram[i + 3] & 0x1f;
 
-		/* co-ordinates are signed */
-		if (x & 0x8000) x -= 0x10000;
-		if (y & 0x8000) y -= 0x10000;
+		if (m_gfxdecode->gfx(4))
+		{
+			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, col, 0, 0, x - m_xoffset, y, 0);
+			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, col, 0, 0, x - m_xoffset, y-0x100, 0);
+			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, col, 0, 0, x - m_xoffset - 0x200, y, 0);
+			drawgfx_transpen_x2222(bitmap, cliprect, m_gfxdecode->gfx(3), m_gfxdecode->gfx(4), code, col, 0, 0, x - m_xoffset - 0x200 , y-0x100, 0);
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,code,col,0,0,x-2,y,0);
+		}
+		else
+		{
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y-0x100, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y-0x100, 0);
+
+		}
 	}
-
 	return 0;
 }
 
@@ -580,7 +896,7 @@ static MACHINE_CONFIG_START( gstream, gstream_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update_gstream)
 
 	MCFG_PALETTE_LENGTH(0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
-	MCFG_GFXDECODE_ADD("gfxdecode", gstream)
+	MCFG_GFXDECODE_ADD("gfxdecode",gstream)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -591,6 +907,37 @@ static MACHINE_CONFIG_START( gstream, gstream_state )
 	MCFG_OKIM6295_ADD("oki2", 1000000, OKIM6295_PIN7_HIGH) /* 1 Mhz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( x2222, gstream_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
+	MCFG_CPU_PROGRAM_MAP(x2222_32bit_map)
+	MCFG_CPU_IO_MAP(x2222_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
+
+
+//	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update_gstream)
+
+	MCFG_PALETTE_LENGTH(0x1000 + 0x400 + 0x400 + 0x400) // doesn't use a palette, but keep fake gfxdecode happy
+	MCFG_GFXDECODE_ADD("gfxdecode",x2222)
+
+	// unknown sound hw (no sound roms dumped)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_OKIM6295_ADD("oki1", 1000000, OKIM6295_PIN7_HIGH) /* 1 Mhz? */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+MACHINE_CONFIG_END
+
 
 ROM_START( gstream )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* Hyperstone CPU Code */
@@ -609,13 +956,17 @@ ROM_START( gstream )
 	ROM_LOAD32_WORD( "gs_gr_10.u182", 0xc00000, 0x200000, CRC(d696d15d) SHA1(85aaa5cdb35f3a8d3266bb8debec0558c860cb53) )
 	ROM_LOAD32_WORD( "gs_gr_14.u183", 0xc00002, 0x200000, CRC(6bd2a1e1) SHA1(aedca91643f14ececc101a7708255ce9b1d70f68) )
 
-	ROM_REGION( 0xc00000, "gfx2", 0 )  /* bg tiles (32x32x8) */
+	ROM_REGION( 0x400000, "gfx2", 0 )  /* bg tiles (32x32x8) */
 	ROM_LOAD( "gs_gr_01.u120", 0x000000, 0x200000, CRC(b82cfab8) SHA1(08f0eaef5c927fb056c6cc9342e39f445aae9062) )
 	ROM_LOAD( "gs_gr_02.u121", 0x200000, 0x200000, CRC(37e19cbd) SHA1(490ebb037fce09100ec4bba3f73ecdf101526641) )
-	ROM_LOAD( "gs_gr_03.u125", 0x400000, 0x200000, CRC(1a3b2b11) SHA1(a4b1dc1a9709f8f8f2ab2190d7badc246caa540f) )
-	ROM_LOAD( "gs_gr_04.u126", 0x600000, 0x200000, CRC(a4e8906c) SHA1(b285d7697cdaa62014cf65d09a19fcbd6a95bb98) )
-	ROM_LOAD( "gs_gr_05.u174", 0x800000, 0x200000, CRC(ef283a73) SHA1(8b598facb344eac33138611abc141a2acb375983) )
-	ROM_LOAD( "gs_gr_06.u175", 0xa00000, 0x200000, CRC(d4e3a2b2) SHA1(4577c007172c718bf7ca55a8ccee5455c281026c) )
+
+	ROM_REGION( 0x400000, "gfx3", 0 )  /* bg tiles (32x32x8) */
+	ROM_LOAD( "gs_gr_03.u125", 0x000000, 0x200000, CRC(1a3b2b11) SHA1(a4b1dc1a9709f8f8f2ab2190d7badc246caa540f) )
+	ROM_LOAD( "gs_gr_04.u126", 0x200000, 0x200000, CRC(a4e8906c) SHA1(b285d7697cdaa62014cf65d09a19fcbd6a95bb98) )
+
+	ROM_REGION( 0x400000, "gfx4", 0 )  /* bg tiles (32x32x8) */
+	ROM_LOAD( "gs_gr_05.u174", 0x000000, 0x200000, CRC(ef283a73) SHA1(8b598facb344eac33138611abc141a2acb375983) )
+	ROM_LOAD( "gs_gr_06.u175", 0x200000, 0x200000, CRC(d4e3a2b2) SHA1(4577c007172c718bf7ca55a8ccee5455c281026c) )
 
 	ROM_REGION( 0x100000, "oki1", 0 )
 	ROM_LOAD( "gs_snd_01.u192", 0x000000, 0x080000, CRC(79b64d3f) SHA1(b2166210d3a3b85b9ace90749a444c881f69d551) )
@@ -629,6 +980,74 @@ ROM_START( gstream )
 	ROM_LOAD( "gstream.nv", 0x000000, 0x2000, CRC(895d724b) SHA1(97941102f94923220d9beb270939f0ad9a40fe0e) )
 ROM_END
 
+
+
+
+ROM_START( x2222 )
+	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "older.bin", 0x000000, 0x080000, CRC(d12817bc) SHA1(2458f9d9020598a1646dfc848fddd323eebc5120) )
+
+	ROM_REGION32_BE( 0x0200000, "misc", 0 ) /* other code */
+	ROM_LOAD( "test.hye", 0x000000, 0x0112dda, CRC(c1142b2f) SHA1(5807930820a53604013a6ac66e4d4ebe3628e1fc) ) // this might be the correct revision for our gfx roms, but how do we convert it to a binary?
+	ROM_REGION32_BE( 0x0200000, "misc2", 0 ) /* other code */
+	ROM_LOAD( "older.hye", 0x000000, 0x010892f, CRC(cf3a004e) SHA1(1cba64cfa235b9540f33a5ee0cc02dfd267e00fc) ) // this corresponds to the older.bin we're using, for reference
+
+	
+	/* x2222 uses raw rgb16 data rather than 8bpp indexed, in order to use the same gfx decodes with a custom draw routine we arrange the data into 2 8bpp regions on init */
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )  /* sprite tiles (16x16x8) */
+	/* filled in at init*/
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
+	/* filled in at init*/
+
+	ROM_REGION( 0x200000, "gfx3", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
+	/* filled in at init*/
+
+	ROM_REGION( 0x200000, "gfx4", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
+	/* filled in at init*/
+
+	/* 2nd 8-bits */
+	ROM_REGION( 0x800000, "gfx1_lower", ROMREGION_ERASE00 )  /* sprite tiles (16x16x8) */
+	/* filled in at init*/
+
+	ROM_REGION( 0x200000, "gfx2_lower", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
+	/* filled in at init*/
+
+	ROM_REGION( 0x200000, "gfx3_lower", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
+	/* filled in at init*/
+
+	ROM_REGION( 0x200000, "gfx4_lower", ROMREGION_ERASE00 )  /* bg tiles (32x32x8) */
+	/* filled in at init*/
+
+
+
+	ROM_REGION( 0x1000000, "sprites", 0 )  /* sprite tiles (16x16x16) */ // these sprite ROMs have the Boss tiles in the wrong location for the prototype program rom
+	ROM_LOAD( "spr11.bin", 0x000000, 0x200000, CRC(1d15b444) SHA1(27ace509a7e4ec2e62453636acf444a861bb85ce) )
+	ROM_LOAD( "spr21.bin", 0x200000, 0x1b8b00, CRC(1c392be2) SHA1(775882f588a8bef33a79fa4f25754a47dc82cb30) )
+	ROM_LOAD( "spr12.bin", 0x400000, 0x200000, CRC(73225936) SHA1(50507c52b932198659e08d22d3c0a92e7c69e5ba) )
+	ROM_LOAD( "spr22.bin", 0x600000, 0x1b8b00, CRC(cf7ebfa1) SHA1(c968dcf768e5598240f5a131414a5607899b4bef) )
+	ROM_LOAD( "spr13.bin", 0x800000, 0x200000, CRC(52595c51) SHA1(a161a5f433aa7aa2f7824ea6b9b70d73ca63b62d) )
+	ROM_LOAD( "spr23.bin", 0xa00000, 0x1b8b00, CRC(d894461e) SHA1(14dccfa8c762d928eaea0ac4cfff7d1272b69fdd) )
+	ROM_LOAD( "spr14.bin", 0xc00000, 0x200000, CRC(f6cd6599) SHA1(170ea7a9a26fd8038df53fb333357766dabbe7c2) )
+	ROM_LOAD( "spr24.bin", 0xe00000, 0x1b8b00, CRC(9542cb08) SHA1(d40c1f0b7d3e9deb12284c2f2c2df0ac43cb6cd2) )
+
+	ROM_REGION( 0x400000, "bg1", 0 )  /* bg tiles (32x32x16) */
+	ROM_LOAD16_BYTE( "bg31.bin", 0x000000, 0x11ac00, CRC(12e67bc2) SHA1(18618a8931af3b3aeab34fd50424a7ffb3da6458) )
+	ROM_LOAD16_BYTE( "bg32.bin", 0x000001, 0x11ac00, CRC(95afa0da) SHA1(e534bc0874329475ce7efa836000fe29fc76c44c) )
+
+	ROM_REGION( 0x400000, "bg2", 0 )  /* bg tiles (32x32x16) */
+	ROM_LOAD16_BYTE( "bg21.bin", 0x000000, 0x1c8400, CRC(a10220f8) SHA1(9aa43a8e23cdf55d8623d2694b04971eaced9ba9) )
+	ROM_LOAD16_BYTE( "bg22.bin", 0x000001, 0x1c8400, CRC(966f7c1d) SHA1(4699a3014c7e66d0dabd8d7982f43114b71181b7) )
+
+	ROM_REGION( 0x400000, "bg3", 0 )  /* bg tiles (32x32x16) */
+	ROM_LOAD16_BYTE( "bg11.bin", 0x000000, 0x1bc800, CRC(68975462) SHA1(7a2458a3d2465b727f4f5bf45685f35eb4885975) )
+	ROM_LOAD16_BYTE( "bg12.bin", 0x000001, 0x1bc800, CRC(feef1240) SHA1(9eb123a19ade74d8b3ce4df0b04ca97c03fb9fdc) )
+
+	// no idea what the sound hw is?
+	ROM_REGION( 0x100000, "oki1", ROMREGION_ERASE00 )
+	ROM_LOAD( "x2222_sound", 0x000000, 0x080000,NO_DUMP ) // probably an oki.. is there a sound cpu too?
+ROM_END
+
 READ32_MEMBER(gstream_state::gstream_speedup_r)
 {
 	if (m_maincpu->pc() == 0xc0001592)
@@ -639,10 +1058,58 @@ READ32_MEMBER(gstream_state::gstream_speedup_r)
 	return m_workram[0xd1ee0 / 4];
 }
 
+
+READ32_MEMBER(gstream_state::x2222_speedup_r)
+{
+	if (m_maincpu->pc() == 0x22064)
+	{
+		m_maincpu->eat_cycles(50);
+	}
+
+	return m_workram[0x7ffac / 4];
+}
+
+
 DRIVER_INIT_MEMBER(gstream_state,gstream)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(FUNC(gstream_state::gstream_speedup_r), this));
+
+	m_xoffset = 2;
+}
+
+
+void gstream_state::rearrange_tile_data(UINT8* ROM, UINT32* NEW, UINT32* NEW2)
+{
+	int i;
+	for (i = 0; i < 0x80000; i++)
+	{
+		NEW[i]  = (ROM[(i * 8) + 0x000000] << 0) | (ROM[(i * 8) + 0x000001] << 8) | (ROM[(i * 8) + 0x000004] << 16) | (ROM[(i * 8) + 0x000005] << 24);
+		NEW2[i] = (ROM[(i * 8) + 0x000002] << 0) | (ROM[(i * 8) + 0x000003] << 8) | (ROM[(i * 8) + 0x000006] << 16) | (ROM[(i * 8) + 0x000007] << 24);
+	}
+}
+
+void gstream_state::rearrange_sprite_data(UINT8* ROM, UINT32* NEW, UINT32* NEW2)
+{
+	int i;
+	for (i = 0; i < 0x200000; i++)
+	{
+		NEW[i]  = (ROM[(i * 2) + 0xc00000] << 24) | (ROM[(i * 2) + 0x800000] << 16) | (ROM[(i * 2) + 0x400000] << 8) | (ROM[(i * 2) + 0x000000] << 0);
+		NEW2[i] = (ROM[(i * 2) + 0xc00001] << 24) | (ROM[(i * 2) + 0x800001] << 16) | (ROM[(i * 2) + 0x400001] << 8) | (ROM[(i * 2) + 0x000001] << 0);
+	}
+}
+
+DRIVER_INIT_MEMBER(gstream_state,x2222)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7ffac, 0x7ffaf, read32_delegate(FUNC(gstream_state::x2222_speedup_r), this));
+
+	rearrange_sprite_data(memregion("sprites")->base(), (UINT32*)memregion("gfx1")->base(), (UINT32*)memregion("gfx1_lower")->base()  );
+	rearrange_tile_data(memregion("bg1")->base(), (UINT32*)memregion("gfx2")->base(), (UINT32*)memregion("gfx2_lower")->base());
+	rearrange_tile_data(memregion("bg2")->base(), (UINT32*)memregion("gfx3")->base(), (UINT32*)memregion("gfx3_lower")->base());
+	rearrange_tile_data(memregion("bg3")->base(), (UINT32*)memregion("gfx4")->base(), (UINT32*)memregion("gfx4_lower")->base());
+
+	m_xoffset = 0;
 }
 
 
 GAME( 2002, gstream, 0, gstream, gstream, gstream_state, gstream, ROT270, "Oriental Soft", "G-Stream G2020", GAME_SUPPORTS_SAVE )
+GAME( 2000, x2222,   0, x2222,   x2222,   gstream_state, x2222,   ROT270, "Oriental Soft", "X2222 (prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )

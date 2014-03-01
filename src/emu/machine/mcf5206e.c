@@ -5,7 +5,7 @@
 #include "emu.h"
 #include "mcf5206e.h"
 
-void CLIB_DECL nolog(const char *format, ...) {}
+static void CLIB_DECL ATTR_PRINTF(1,2) nolog(const char *format, ...) {}
 
 //#define debuglog printf
 #define debuglog logerror

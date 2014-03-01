@@ -29,7 +29,7 @@
 #define VERBOSE (0)
 #if VERBOSE
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-void CLIB_DECL logerror(const char *text,...);
+void CLIB_DECL logerror(const char *text, ...) ATTR_PRINTF(1,2);
 #else
 #define LOG(x)
 #endif

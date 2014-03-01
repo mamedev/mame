@@ -259,7 +259,7 @@ public:
 	void watchdog_enable(bool enable = true);
 
 	// misc
-	void CLIB_DECL logerror(const char *format, ...);
+	void CLIB_DECL logerror(const char *format, ...) ATTR_PRINTF(2,3);
 	void CLIB_DECL vlogerror(const char *format, va_list args);
 	UINT32 rand();
 	const char *describe_context();

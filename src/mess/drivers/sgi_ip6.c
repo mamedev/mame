@@ -53,9 +53,9 @@ public:
 
 #define ENABLE_VERBOSE_LOG (1)
 
-#if ENABLE_VERBOSE_LOG
 inline void ATTR_PRINTF(3,4) sgi_ip6_state::verboselog( int n_level, const char *s_fmt, ... )
 {
+#if ENABLE_VERBOSE_LOG
 	if( VERBOSE_LEVEL >= n_level )
 	{
 		va_list v;
@@ -65,10 +65,8 @@ inline void ATTR_PRINTF(3,4) sgi_ip6_state::verboselog( int n_level, const char 
 		va_end( v );
 		logerror("%08x: %s", machine().device("maincpu")->safe_pc(), buf);
 	}
-}
-#else
-#define verboselog(x,y,z,...)
 #endif
+}
 
 /***************************************************************************
     VIDEO HARDWARE

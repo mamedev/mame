@@ -14,13 +14,11 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_VCCS(_name)                                                         \
+#define VCCS(_name)                                                                \
         NET_REGISTER_DEV(VCCS, _name)
-//NETDEV_PARAMI(_name, model, _model)
 
-#define NETDEV_VCVS(_name)                                                         \
+#define VCVS(_name)                                                                \
         NET_REGISTER_DEV(VCVS, _name)
-//NETDEV_PARAMI(_name, model, _model)
 
 // ----------------------------------------------------------------------------------------
 // nld_CCCS

@@ -1073,19 +1073,19 @@ static const namco_interface namco_config =
 static MACHINE_CONFIG_START( ns1, namcos1_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,49152000/32)
+	MCFG_CPU_ADD("maincpu", M6809,XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("sub", M6809,49152000/32)
+	MCFG_CPU_ADD("sub", M6809,XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", M6809,49152000/32)
+	MCFG_CPU_ADD("audiocpu", M6809,XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("mcu",HD63701,49152000/8)
+	MCFG_CPU_ADD("mcu",HD63701,XTAL_49_152MHz/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
@@ -1099,10 +1099,7 @@ static MACHINE_CONFIG_START( ns1, namcos1_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.606060)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(9 + 8*8, 9 + 44*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 9+8*8, 9+44*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos1_state, screen_update_namcos1)
 	MCFG_SCREEN_VBLANK_DRIVER(namcos1_state, screen_eof_namcos1)
 
@@ -1118,7 +1115,7 @@ static MACHINE_CONFIG_START( ns1, namcos1_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048/2)
+	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL_49_152MHz/2048/2)
 	MCFG_SOUND_CONFIG(namco_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)

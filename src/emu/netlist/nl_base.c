@@ -240,17 +240,17 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
 
     } else {
 #if 0
-        netlist_net_t &mcQ = m_mainclock->m_Q.net();
+        netlist_net_t &mc_net = m_mainclock->m_Q.net();
         const netlist_time inc = m_mainclock->m_inc;
 
         while (m_time < m_stop)
         {
             if (m_queue.is_not_empty())
             {
-                while (m_queue.peek().time() > mcQ.time())
+                while (m_queue.peek().time() > mc_net.time())
                 {
-                    m_time = mcQ.time();
-                    NETLIB_NAME(mainclock)::mc_update(mcQ, m_time + inc);
+                    m_time = mc_net.time();
+                    NETLIB_NAME(mainclock)::mc_update(mc_net, m_time + inc);
                 }
 
                 const netlist_queue_t::entry_t &e = m_queue.pop();
@@ -258,8 +258,8 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
                 e.object()->update_devs();
 
             } else {
-                m_time = mcQ.time();
-                NETLIB_NAME(mainclock)::mc_update(mcQ, m_time + inc);
+                m_time = mc_net.time();
+                NETLIB_NAME(mainclock)::mc_update(mc_net, m_time + inc);
             }
             if (FATAL_ERROR_AFTER_NS)
                 if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
@@ -268,9 +268,9 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
             add_to_stat(m_perf_out_processed, 1);
         }
 #else
-        netlist_net_t &mcQ = m_mainclock->m_Q.net();
+        netlist_net_t &mc_net = m_mainclock->m_Q.net();
         const netlist_time inc = m_mainclock->m_inc;
-        netlist_time mc_time = mcQ.time();
+        netlist_time mc_time = mc_net.time();
         netlist_time cur_time = m_time;
 
         while (cur_time < m_stop)
@@ -282,7 +282,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
                     cur_time = mc_time;
                     mc_time += inc;
                     m_time = cur_time;
-                    NETLIB_NAME(mainclock)::mc_update(mcQ);
+                    NETLIB_NAME(mainclock)::mc_update(mc_net);
                 }
 
                 const netlist_queue_t::entry_t &e = m_queue.pop();
@@ -293,7 +293,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
                 cur_time = mc_time;
                 mc_time += inc;
                 m_time = cur_time;
-                NETLIB_NAME(mainclock)::mc_update(mcQ);
+                NETLIB_NAME(mainclock)::mc_update(mc_net);
             }
             if (FATAL_ERROR_AFTER_NS)
                 if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
@@ -301,7 +301,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
 
             add_to_stat(m_perf_out_processed, 1);
         }
-        mcQ.set_time(mc_time);
+        mc_net.set_time(mc_time);
         m_time = cur_time;
 #endif
     }
@@ -825,20 +825,11 @@ ATTR_COLD double netlist_param_model_t::model_value(const pstring &entity, const
 // mainclock
 // ----------------------------------------------------------------------------------------
 
-#if 0
-ATTR_HOT inline void NETLIB_NAME(mainclock)::mc_update(netlist_net_t &net, const netlist_time curtime)
-{
-	net.m_new.Q ^= 1;
-	net.set_time(curtime);
-	net.update_devs();
-}
-#else
 ATTR_HOT inline void NETLIB_NAME(mainclock)::mc_update(netlist_net_t &net)
 {
     net.m_new.Q ^= 1;
     net.update_devs();
 }
-#endif
 
 NETLIB_START(mainclock)
 {

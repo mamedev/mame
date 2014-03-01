@@ -87,7 +87,25 @@ class towns_state : public driver_device
 			m_dma_2(*this, "dma_2"),
 			m_ram(*this, RAM_TAG),
 			m_nvram(*this, "nvram"),
-			m_nvram16(*this, "nvram16")
+			m_nvram16(*this, "nvram16"),
+			m_ctrltype(*this, "ctrltype"),
+			m_key1(*this, "key1"),
+			m_key2(*this, "key2"),
+			m_key3(*this, "key3"),
+			m_key4(*this, "key4"),
+			m_joy1(*this, "joy1"),
+			m_joy2(*this, "joy2"),
+			m_joy1_ex(*this, "joy1_ex"),
+			m_joy2_ex(*this, "joy2_ex"),
+			m_6b_joy1(*this, "6b_joy1"),
+			m_6b_joy2(*this, "6b_joy2"),
+			m_6b_joy1_ex(*this, "6b_joy1_ex"),
+			m_6b_joy2_ex(*this, "6b_joy2_ex"),
+			m_mouse1(*this, "mouse1"),
+			m_mouse2(*this, "mouse2"),
+			m_mouse3(*this, "mouse3"),
+			m_user(*this,"user"),
+			m_serial(*this,"serial")
 	{ }
 
 	/* devices */
@@ -254,6 +272,25 @@ class towns_state : public driver_device
 	void speaker_set_spkrdata(UINT8 data);
 	void speaker_set_input(UINT8 data);
 	UINT8 towns_cdrom_read_byte_software();
+
+	required_ioport m_ctrltype;
+	required_ioport m_key1;
+	required_ioport m_key2;
+	required_ioport m_key3;
+	required_ioport m_key4;
+	required_ioport m_joy1;
+	required_ioport m_joy2;
+	required_ioport m_joy1_ex;
+	required_ioport m_joy2_ex;
+	required_ioport m_6b_joy1;
+	required_ioport m_6b_joy2;
+	required_ioport m_6b_joy1_ex;
+	required_ioport m_6b_joy2_ex;
+	required_ioport m_mouse1;
+	required_ioport m_mouse2;
+	required_ioport m_mouse3;
+	required_memory_region m_user;
+	optional_memory_region m_serial;
 
 private:
 	static const device_timer_id TIMER_RTC = 0;

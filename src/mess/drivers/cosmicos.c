@@ -412,26 +412,6 @@ READ_LINE_MEMBER( cosmicos_state::ef4_r )
 	return BIT(m_buttons->read(), 0);
 }
 
-static COSMAC_SC_WRITE( cosmicos_sc_w )
-{
-	cosmicos_state *driver_state = device->machine().driver_data<cosmicos_state>();
-
-	int sc1 = BIT(sc, 1);
-
-	if (driver_state->m_sc1 && !sc1)
-	{
-		driver_state->clear_input_data();
-	}
-
-	if (sc1)
-	{
-		driver_state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, CLEAR_LINE);
-		driver_state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
-	}
-
-	driver_state->m_sc1 = sc1;
-}
-
 WRITE_LINE_MEMBER( cosmicos_state::q_w )
 {
 	/* cassette */
@@ -451,6 +431,24 @@ READ8_MEMBER( cosmicos_state::dma_r )
 	return m_data;
 }
 
+WRITE8_MEMBER( cosmicos_state::sc_w )
+{
+	int sc1 = BIT(data, 1);
+
+	if (m_sc1 && !sc1)
+	{
+		clear_input_data();
+	}
+
+	if (sc1)
+	{
+		m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, CLEAR_LINE);
+		m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
+	}
+
+	m_sc1 = sc1;
+}
+
 static COSMAC_INTERFACE( cosmicos_config )
 {
 	DEVCB_DRIVER_LINE_MEMBER(cosmicos_state, wait_r),
@@ -462,7 +460,7 @@ static COSMAC_INTERFACE( cosmicos_config )
 	DEVCB_DRIVER_LINE_MEMBER(cosmicos_state, q_w),
 	DEVCB_DRIVER_MEMBER(cosmicos_state, dma_r),
 	DEVCB_NULL,
-	cosmicos_sc_w,
+	DEVCB_DRIVER_MEMBER(cosmicos_state, sc_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

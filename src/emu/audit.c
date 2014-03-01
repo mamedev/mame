@@ -342,7 +342,7 @@ media_auditor::summary media_auditor::summarize(const char *name, astring *strin
 		{
 			string->catprintf("%-12s: %s", name, record->name());
 			if (record->expected_length() > 0)
-				string->catprintf(" (%d bytes)", record->expected_length());
+				string->catprintf(" (%" I64FMT "d bytes)", record->expected_length());
 			string->catprintf(" - ");
 		}
 
@@ -370,7 +370,7 @@ media_auditor::summary media_auditor::summarize(const char *name, astring *strin
 				break;
 
 			case audit_record::SUBSTATUS_FOUND_WRONG_LENGTH:
-				if (string != NULL) string->catprintf("INCORRECT LENGTH: %d bytes\n", record->actual_length());
+				if (string != NULL) string->catprintf("INCORRECT LENGTH: %" I64FMT "d bytes\n", record->actual_length());
 				break;
 
 			case audit_record::SUBSTATUS_NOT_FOUND:

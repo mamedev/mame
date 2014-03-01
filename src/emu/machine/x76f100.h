@@ -40,7 +40,7 @@ protected:
 	virtual void nvram_write( emu_file &file );
 
 private:
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ...);
+	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 
 	UINT8 *password();
 	void password_ok();

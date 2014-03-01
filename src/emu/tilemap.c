@@ -1715,9 +1715,9 @@ void tilemap_device::device_start()
 {
 	// check configuration
 	if (m_get_info.isnull())
-		throw emu_fatalerror("Tilemap device '%s' has no get info callback!");
+		throw emu_fatalerror("Tilemap device '%s' has no get info callback!", tag());
 	if (m_standard_mapper == TILEMAP_STANDARD_COUNT && m_mapper.isnull())
-		throw emu_fatalerror("Tilemap device '%s' has no mapper callback!");
+		throw emu_fatalerror("Tilemap device '%s' has no mapper callback!", tag());
 
 	// bind our callbacks
 	m_get_info.bind_relative_to(*owner());

@@ -74,7 +74,7 @@ private:
 	void build_output_prefix(astring &string);
 	void error_output(const char *format, va_list argptr);
 	void warning_output(const char *format, va_list argptr);
-	void output_via_delegate(output_delegate &delegate, const char *format, ...);
+	void output_via_delegate(output_delegate &delegate, const char *format, ...) ATTR_PRINTF(3,4);
 
 	// internal driver list
 	driver_enumerator       m_drivlist;

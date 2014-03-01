@@ -14,7 +14,7 @@
 
 #define LOGLEVEL            0
 
-#define LOG(level,...)      if(LOGLEVEL>=level) logerror(__VA_ARGS__)
+#define LOG(level, ...)     if(LOGLEVEL>=level) logerror(__VA_ARGS__)
 #define LOG_BITS(bits)      logerror("CS=%d CK=%d DI=%d DO=%d", (bits&CS_MASK) ? 1 : 0, (bits&CK_MASK) ? 1 : 0, (bits&DI_MASK) ? 1 : 0, (bits&DO_MASK) ? 1 : 0)
 
 const device_type ER59256 = &device_creator<er59256_device>;

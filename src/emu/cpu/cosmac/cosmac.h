@@ -151,10 +151,6 @@ enum cosmac_state_code
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef void (*cosmac_out_sc_func)(device_t *device, cosmac_state_code sc);
-#define COSMAC_SC_WRITE(name) void name(device_t *device, cosmac_state_code sc)
-
-
 // ======================> cosmac_interface
 
 struct cosmac_interface
@@ -168,7 +164,7 @@ struct cosmac_interface
 	devcb_write_line    m_out_q_cb;
 	devcb_read8         m_in_dma_cb;
 	devcb_write8        m_out_dma_cb;
-	cosmac_out_sc_func  m_out_sc_cb;
+	devcb_write8  		m_out_sc_cb;
 	devcb_write_line    m_out_tpa_cb;
 	devcb_write_line    m_out_tpb_cb;
 };
@@ -353,7 +349,7 @@ protected:
 	devcb_resolved_write_line   m_out_q_func;
 	devcb_resolved_read8        m_in_dma_func;
 	devcb_resolved_write8       m_out_dma_func;
-	cosmac_out_sc_func          m_out_sc_func;
+	devcb_resolved_write8       m_out_sc_func;
 	devcb_resolved_write_line   m_out_tpa_func;
 	devcb_resolved_write_line   m_out_tpb_func;
 
