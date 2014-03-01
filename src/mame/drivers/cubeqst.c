@@ -62,7 +62,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	DECLARE_PALETTE_INIT(cubeqst);
 	UINT32 screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
@@ -92,26 +91,6 @@ void cubeqst_state::video_start()
 {
 	m_video_field = 0;
 	m_depth_buffer = auto_alloc_array(machine(), UINT8, 512);
-}
-
-/* TODO: Use resistor values */
-PALETTE_INIT_MEMBER(cubeqst_state, cubeqst)
-{
-	int i;
-
-	m_colormap = auto_alloc_array(machine(), rgb_t, 65536);
-	for (i = 0; i < 65536; ++i)
-	{
-		UINT8 a, r, g, b, y;
-
-		a = (i >> 3) & 1;
-		b = (i >> 0) & 7;
-		g = (i >> 4) & 7;
-		r = (i >> 8) & 7;
-		y = ((i >> 12) & 0xf) * 2;
-
-		m_colormap[i] = rgb_t(a ? 0 : 255, y*r, y*g, y*b);
-	}
 }
 
 WRITE16_MEMBER(cubeqst_state::palette_w)
@@ -454,6 +433,22 @@ ADDRESS_MAP_END
 
 void cubeqst_state::machine_start()
 {
+	/* TODO: Use resistor values */
+	int i;
+
+	m_colormap = auto_alloc_array(machine(), rgb_t, 65536);
+	for (i = 0; i < 65536; ++i)
+	{
+		UINT8 a, r, g, b, y;
+
+		a = (i >> 3) & 1;
+		b = (i >> 0) & 7;
+		g = (i >> 4) & 7;
+		r = (i >> 8) & 7;
+		y = ((i >> 12) & 0xf) * 2;
+
+		m_colormap[i] = rgb_t(a ? 0 : 255, y*r, y*g, y*b);
+	}
 }
 
 void cubeqst_state::machine_reset()
