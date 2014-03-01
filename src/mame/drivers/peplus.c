@@ -145,7 +145,7 @@ Super PE+
   XKnnnnnn  Spot Keno Programs. Different options for each set, but all use the same XnnnnnnK data roms
    XnnnnnnK Spot Keno Data. Uses CG2120 with CAP1267
   XSnnnnnn  Slot Programs. Different options for each set, but all use the same XnnnnnnS data roms
-  XnnnnnnT  Slot Program. For Slant (table top) machines??
+  XnnnnnnT  Tournament Slot Programs? Different options for each set, but all use the same XnnnnnnS data roms
    XnnnnnnS Slot Data. Each set requires specific CG graphics + CAP color prom
 
 The CG graphics + CAP color proms along with which program sets they belong to is a closely guarded secret by IGT.
