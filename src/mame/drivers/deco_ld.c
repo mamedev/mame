@@ -480,6 +480,7 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 	MCFG_GFXDECODE_ADD("gfxdecode", rblaster)
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
 	/* sound hardware */
 	/* TODO: mixing */

@@ -252,8 +252,8 @@ void stactics_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clip
 						(pixel_f << 5) |
 						(pixel_e << 6) |
 						(pixel_d << 7) |
-						((m_palette[0] & 0x01) << 8) |
-						((m_palette[1] & 0x01) << 9);
+						((m_palette_val[0] & 0x01) << 8) |
+						((m_palette_val[1] & 0x01) << 9);
 
 			/* compute the effective pixel coordinate after adjusting for the
 			   mirror movement - this is mechanical on the real machine */
