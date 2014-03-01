@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x3a0e, 0x3a0e) AM_WRITE(xain_68705_w)
 	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(xainCPUA_bankswitch_w)
 	AM_RANGE(0x3c00, 0x3dff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x3e00, 0x3fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette_ext")
+	AM_RANGE(0x3e00, 0x3fff) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

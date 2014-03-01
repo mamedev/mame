@@ -3221,6 +3221,9 @@ static MACHINE_CONFIG_DERIVED( ssi, taito_f2_tc0510nio )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ssi_map)
 
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_ssi)
 	MCFG_SCREEN_MODIFY("screen")
@@ -3238,6 +3241,9 @@ static MACHINE_CONFIG_DERIVED( gunfront, taito_f2_tc0510nio )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gunfront_map)
 
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_gunfront)
 	MCFG_SCREEN_MODIFY("screen")
@@ -3333,6 +3339,8 @@ static MACHINE_CONFIG_DERIVED( koshien, taito_f2_tc0510nio )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(koshien_map)
 
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_koshien)
 	MCFG_SCREEN_MODIFY("screen")
@@ -3350,6 +3358,9 @@ static MACHINE_CONFIG_DERIVED( yuyugogo, taito_f2_tc0510nio )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(yuyugogo_map)
 
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_yuyugogo)

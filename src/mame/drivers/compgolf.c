@@ -256,6 +256,7 @@ static MACHINE_CONFIG_START( compgolf, compgolf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(compgolf_state, screen_update_compgolf)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(compgolf_state, compgolf)
 	MCFG_GFXDECODE_ADD("gfxdecode", compgolf)
 
 
