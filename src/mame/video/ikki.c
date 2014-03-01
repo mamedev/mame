@@ -91,7 +91,7 @@ void ikki_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (y > 240)
 			y = y - 256;
 
-		 m_gfxdecode->gfx(1)->transmask(m_sprite_bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transmask(m_sprite_bitmap,cliprect,
 				code, color,
 				m_flipscreen,m_flipscreen,
 				x,y,

@@ -129,7 +129,7 @@ void rocnrope_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	{
 		int color = spriteram_2[offs] & 0x0f;
 
-		 m_gfxdecode->gfx(0)->transmask(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transmask(bitmap,cliprect,
 				spriteram[offs + 1],
 				color,
 				spriteram_2[offs] & 0x40,~spriteram_2[offs] & 0x80,

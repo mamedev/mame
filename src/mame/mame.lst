@@ -740,6 +740,7 @@ gutangtn        // GX359 (c) 1982 Konami + Sega license
 cottong         // bootleg
 locoboot        // bootleg
 commsega        // (c) 1983 Sega
+
 // the following ones all have a custom I/O chip
 bosco           // (c) 1981
 boscoo          // (c) 1981
@@ -793,9 +794,11 @@ galaga3a        // (c) 1984
 galaga3b        // (c) 1984
 galaga3c        // (c) 1984
 galaga3m        // (c) 1984
+
 // Libble Rabble board (first Japanese game using a 68000)
 liblrabl        // (c) 1983
 toypop          // (c) 1986
+
 // Z8000 games
 polepos         // (c) 1982
 poleposj        // (c) 1982
@@ -839,8 +842,6 @@ wndrmomo        // (c) 1987
 // Thunder Ceptor HW
 tceptor         // (c) 1986
 tceptor2        // (c) 1986
-
-kungfur         // (c) 1987
 
 // Namco System 1 games
 shadowld        // (c) 1987
@@ -1104,6 +1105,8 @@ taiko10
 gdvsgd
 
 // Misc Namco games
+cswat           // (c) 1984
+kungfur         // (c) 1987
 30test          // (c) 1997
 25pacman        // (c) 2006 Ver 3.0
 25pacmano       // (c) 2005 Ver 2.0 - Same hardware as 20pacgal
@@ -10416,6 +10419,8 @@ jolyccrb        // (c) 1993 Soft Design
 jolycdit        // 199? bootleg
 jolycdib        // 1990 bootleg
 jolycdic        // 1993 bootleg
+jolycdid        // 1990 bootleg
+jolycdie        // 1990 bootleg
 sjcd2kx3        // (c) 1985 M.P.
 jolycdab        // (c) 1986 Inter Games
 jolycdsp        // (c) 1992 TAB-Austria
@@ -10451,6 +10456,7 @@ royalcrdc       // (c) 1991 TAB-Austria
 royalcrdd       // (c) 1991 TAB-Austria
 royalcrde       // (c) 1991 TAB-Austria
 royalcrdf       // (c) 1991 Evona Electronic
+royalcrdg       // (c) 1991 TAB-Austria
 royalcrdt       // (c) 1991 TAB-Austria orig
 royalcrdp       // (c) 1993 Digital Dreams
 lluck3x3        // (c) 1991 TAB-Austria

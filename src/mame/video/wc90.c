@@ -126,7 +126,7 @@ WRITE8_MEMBER(wc90_state::wc90_txvideoram_w)
 ***************************************************************************/
 
 #define WC90_DRAW_SPRITE( code, sx, sy ) \
-					 m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, code, flags >> 4, \
+					m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, code, flags >> 4, \
 					bank&1, bank&2, sx, sy, 0 )
 
 static const char p32x32[4][4] = {

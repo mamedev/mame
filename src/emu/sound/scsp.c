@@ -982,8 +982,10 @@ static void SCSP_w16(scsp_state *scsp,address_space &space,unsigned int addr,uns
 		//DSP
 		if(addr<0x780)  //COEF
 			*((unsigned short *) (scsp->DSP.COEF+(addr-0x700)/2))=val;
-		else if(addr<0x800)
+		else if(addr<0x7c0)
 			*((unsigned short *) (scsp->DSP.MADRS+(addr-0x780)/2))=val;
+		else if(addr<0x800)	// MADRS is mirrored twice
+			*((unsigned short *) (scsp->DSP.MADRS+(addr-0x7c0)/2))=val;
 		else if(addr<0xC00)
 		{
 			*((unsigned short *) (scsp->DSP.MPRO+(addr-0x800)/2))=val;
@@ -1022,8 +1024,10 @@ static unsigned short SCSP_r16(scsp_state *scsp, address_space &space, unsigned 
 		//DSP
 		if(addr<0x780)  //COEF
 			v= *((unsigned short *) (scsp->DSP.COEF+(addr-0x700)/2));
-		else if(addr<0x800)
+		else if(addr<0x7c0)
 			v= *((unsigned short *) (scsp->DSP.MADRS+(addr-0x780)/2));
+		else if(addr<0x800)
+			v= *((unsigned short *) (scsp->DSP.MADRS+(addr-0x7c0)/2));
 		else if(addr<0xC00)
 			v= *((unsigned short *) (scsp->DSP.MPRO+(addr-0x800)/2));
 		else if(addr<0xE00)

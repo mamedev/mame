@@ -275,6 +275,16 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
+		m_read_wait(*this),
+		m_read_clear(*this),
+		m_read_ef1(*this),
+		m_read_ef2(*this),
+		m_read_ef3(*this),
+		m_read_ef4(*this),
+		m_write_q(*this),
+		m_read_dma(*this),
+		m_write_dma(*this),
+		m_write_sc(*this),
 		m_op(0),
 		m_state(COSMAC_STATE_1_RESET),
 		m_mode(COSMAC_MODE_RESET),
@@ -286,7 +296,7 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 		m_direct(NULL)
 {
 	for (int i = 0; i < 4; i++)
-		EF[i] = CLEAR_LINE;
+		m_ef[i] = CLEAR_LINE;
 }
 
 
@@ -311,32 +321,23 @@ cdp1802_device::cdp1802_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cosmac_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const cosmac_interface *intf = reinterpret_cast<const cosmac_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<cosmac_interface *>(this) = *intf;
-
-	// or error out if none provided
-	else
-	{
-		fatalerror("COSMAC_INTERFACE for cpu '%s' not defined!\n", tag());
-	}
-}
-
-
-//-------------------------------------------------
 //  device_start - start up the device
 //-------------------------------------------------
 
 void cosmac_device::device_start()
 {
+	// resolve callbacks
+	m_read_wait.resolve_safe(0);
+	m_read_clear.resolve_safe(0);
+	m_read_ef1.resolve();
+	m_read_ef2.resolve();
+	m_read_ef3.resolve();
+	m_read_ef4.resolve();
+	m_write_q.resolve_safe();
+	m_read_dma.resolve_safe(0);
+	m_write_dma.resolve_safe();
+	m_write_sc.resolve_safe();
+
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
@@ -362,20 +363,6 @@ void cosmac_device::device_start()
 	state_add(COSMAC_DF,    "DF",   m_df).mask(0x1).noshow();
 	state_add(COSMAC_IE,    "IE",   m_ie).mask(0x1).noshow();
 	state_add(COSMAC_Q,     "Q",    m_q).mask(0x1).noshow();
-
-	// resolve callbacks
-	m_in_wait_func.resolve(m_in_wait_cb, *this);
-	m_in_clear_func.resolve(m_in_clear_cb, *this);
-	m_in_ef_func[0].resolve(m_in_ef1_cb, *this);
-	m_in_ef_func[1].resolve(m_in_ef2_cb, *this);
-	m_in_ef_func[2].resolve(m_in_ef3_cb, *this);
-	m_in_ef_func[3].resolve(m_in_ef4_cb, *this);
-	m_out_q_func.resolve(m_out_q_cb, *this);
-	m_in_dma_func.resolve(m_in_dma_cb, *this);
-	m_out_dma_func.resolve(m_out_dma_cb, *this);
-	m_out_sc_func.resolve(m_out_sc_cb, *this);
-	m_out_tpa_func.resolve(m_out_tpa_cb, *this);
-	m_out_tpb_func.resolve(m_out_tpb_cb, *this);
 
 	// register our state for saving
 	save_item(NAME(m_op));
@@ -813,8 +800,8 @@ inline void cosmac_device::debug()
 
 inline void cosmac_device::sample_wait_clear()
 {
-	int wait = m_in_wait_func();
-	int clear = m_in_clear_func();
+	int wait = m_read_wait();
+	int clear = m_read_clear();
 
 	m_pmode = m_mode;
 	m_mode = (cosmac_mode) ((clear << 1) | wait);
@@ -827,13 +814,10 @@ inline void cosmac_device::sample_wait_clear()
 
 inline void cosmac_device::sample_ef_lines()
 {
-	for (int i = 0; i < 4; i++)
-	{
-		if (!m_in_ef_func[i].isnull())
-		{
-			EF[i] = m_in_ef_func[i]();
-		}
-	}
+	if (!m_read_ef1.isnull()) EF[0] = m_read_ef1();
+	if (!m_read_ef2.isnull()) EF[1] = m_read_ef2();
+	if (!m_read_ef3.isnull()) EF[2] = m_read_ef3();
+	if (!m_read_ef4.isnull()) EF[3] = m_read_ef4();
 }
 
 
@@ -843,7 +827,7 @@ inline void cosmac_device::sample_ef_lines()
 
 inline void cosmac_device::output_state_code()
 {
-	m_out_sc_func(0, COSMAC_STATE_CODE[m_state]);
+	m_write_sc((offs_t)0, COSMAC_STATE_CODE[m_state]);
 }
 
 
@@ -855,7 +839,7 @@ inline void cosmac_device::set_q_flag(int state)
 {
 	Q = state;
 
-	m_out_q_func(Q);
+	m_write_q(Q);
 }
 
 
@@ -958,7 +942,7 @@ inline void cosmac_device::execute_instruction()
 
 inline void cosmac_device::dma_input()
 {
-	RAM_W(R[0], m_in_dma_func(R[0]));
+	RAM_W(R[0], m_read_dma(R[0]));
 
 	R[0]++;
 
@@ -995,7 +979,7 @@ inline void cosmac_device::dma_input()
 
 inline void cosmac_device::dma_output()
 {
-	m_out_dma_func(R[0], RAM_R(R[0]));
+	m_write_dma((offs_t)R[0], RAM_R(R[0]));
 
 	R[0]++;
 

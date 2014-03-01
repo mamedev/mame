@@ -133,7 +133,7 @@ UINT32 megazone_state::screen_update_megazone(screen_device &screen, bitmap_ind1
 			flipy = !flipy;
 		}
 
-		 m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap,m_tmpbitmap->cliprect(),
+		m_gfxdecode->gfx(1)->opaque(*m_tmpbitmap,m_tmpbitmap->cliprect(),
 				((int)m_videoram[offs]) + ((m_colorram[offs] & (1 << 7) ? 256 : 0) ),
 				(m_colorram[offs] & 0x0f) + 0x10,
 				flipx,flipy,
@@ -213,7 +213,7 @@ UINT32 megazone_state::screen_update_megazone(screen_device &screen, bitmap_ind1
 
 
 
-			 m_gfxdecode->gfx(1)->opaque(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->opaque(bitmap,cliprect,
 					((int)m_videoram2[offs]) + ((m_colorram2[offs] & (1 << 7) ? 256 : 0) ),
 					(m_colorram2[offs] & 0x0f) + 0x10,
 					flipx,flipy,

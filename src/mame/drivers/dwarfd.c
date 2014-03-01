@@ -837,7 +837,7 @@ void dwarfd_state::drawCrt( bitmap_rgb32 &bitmap,const rectangle &cliprect )
 				else
 					b = 1;
 			}
-			 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				tile + (m_bank + bank2) * 128,
 				0,
 				0, 0,

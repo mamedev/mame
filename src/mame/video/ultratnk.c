@@ -75,7 +75,7 @@ UINT32 ultratnk_state::screen_update_ultratnk(screen_device &screen, bitmap_ind1
 
 		if (!(attr & 0x80))
 		{
-			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				(code >> 3) | bank,
 				i,
 				0, 0,
@@ -124,7 +124,7 @@ void ultratnk_state::screen_eof_ultratnk(screen_device &screen, bool state)
 			if (code & 4)
 				bank = 32;
 
-			 m_gfxdecode->gfx(1)->transpen(m_helper,rect,
+			m_gfxdecode->gfx(1)->transpen(m_helper,rect,
 				(code >> 3) | bank,
 				4,
 				0, 0,

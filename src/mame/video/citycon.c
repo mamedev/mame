@@ -117,7 +117,7 @@ void citycon_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipx = !flipx;
 		}
 
-		 m_gfxdecode->gfx(m_spriteram[offs + 1] & 0x80 ? 2 : 1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(m_spriteram[offs + 1] & 0x80 ? 2 : 1)->transpen(bitmap,cliprect,
 				m_spriteram[offs + 1] & 0x7f,
 				m_spriteram[offs + 2] & 0x0f,
 				flipx,flip_screen(),

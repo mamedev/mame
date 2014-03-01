@@ -232,7 +232,7 @@ void kingofb_state::kingofb_draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 			flipy = !flipy;
 		}
 
-		 m_gfxdecode->gfx(2 + bank)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2 + bank)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -289,7 +289,7 @@ void kingofb_state::ringking_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 			flipy = !flipy;
 		}
 
-		 m_gfxdecode->gfx(2 + bank)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2 + bank)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);

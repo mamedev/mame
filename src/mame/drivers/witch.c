@@ -218,6 +218,12 @@ TODO :
     - Hook up the OKI M5202
 */
 
+#define MAIN_CLOCK        XTAL_12MHz
+#define CPU_CLOCK         MAIN_CLOCK / 4
+#define YM2203_CLOCK      MAIN_CLOCK / 4
+#define ES8712_CLOCK      8000				// 8Khz, it's the only clock for sure (pin13) it come from pin14 of M5205.
+
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/es8712.h"
@@ -297,7 +303,7 @@ TILE_GET_INFO_MEMBER(witch_state::get_gfx0b_tile_info)
 
 	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			1,
-			code,//tiles beyond 0x7ff only for sprites?
+			code,	//tiles beyond 0x7ff only for sprites?
 			color & 0x0f,
 			0);
 }
@@ -829,12 +835,12 @@ INTERRUPT_GEN_MEMBER(witch_state::witch_sub_interrupt)
 
 static MACHINE_CONFIG_START( witch, witch_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 3)    /* 4MHz?? */
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)    /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(map_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  witch_main_interrupt)
 
 	/* 2nd z80 */
-	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz / 3)    /* 4MHz?? */
+	MCFG_CPU_ADD("sub", Z80, CPU_CLOCK)    /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(map_sub)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  witch_sub_interrupt)
 
@@ -855,14 +861,14 @@ static MACHINE_CONFIG_START( witch, witch_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ES8712_ADD("essnd", 8000) /* ?? */
+	MCFG_ES8712_ADD("essnd", ES8712_CLOCK) 			/* 8Khz, it's the only clock for sure (pin13) it comes from pin14 of M5205 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)   /* 1.5MHz?? */
+	MCFG_SOUND_ADD("ym1", YM2203, YM2203_CLOCK)		/* 3 MHz */
 	MCFG_YM2203_AY8910_INTF(&ay8910_config_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz / 8)   /* 1.5MHz?? */
+	MCFG_SOUND_ADD("ym2", YM2203, YM2203_CLOCK)		/* 3 MHz */
 	MCFG_YM2203_AY8910_INTF(&ay8910_config_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 

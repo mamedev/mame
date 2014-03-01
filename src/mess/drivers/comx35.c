@@ -514,22 +514,6 @@ WRITE8_MEMBER( comx35_state::sc_w )
 	}
 }
 
-static COSMAC_INTERFACE( cosmac_intf )
-{
-	DEVCB_LINE_VCC,                                 // wait
-	DEVCB_DRIVER_LINE_MEMBER(comx35_state, clear_r),// clear
-	DEVCB_NULL,                                     // EF1
-	DEVCB_DRIVER_LINE_MEMBER(comx35_state, ef2_r),  // EF2
-	DEVCB_NULL,                                     // EF3
-	DEVCB_DRIVER_LINE_MEMBER(comx35_state, ef4_r),  // EF4
-	DEVCB_DRIVER_LINE_MEMBER(comx35_state, q_w),    // Q
-	DEVCB_NULL,                                     // DMA in
-	DEVCB_NULL,                                     // DMA out
-	DEVCB_DRIVER_MEMBER(comx35_state, sc_w),        // SC
-	DEVCB_NULL,                                     // TPA
-	DEVCB_NULL                                      // TPB
-};
-
 
 //-------------------------------------------------
 //  cassette_interface cassette_intf
@@ -634,7 +618,12 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_CPU_CLK_PAL)
 	MCFG_CPU_PROGRAM_MAP(comx35_mem)
 	MCFG_CPU_IO_MAP(comx35_io)
-	MCFG_CPU_CONFIG(cosmac_intf)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(comx35_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(comx35_state, ef2_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(comx35_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(comx35_state, q_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(comx35_state, sc_w))
 
 	// sound and video hardware
 	MCFG_FRAGMENT_ADD(comx35_pal_video)
@@ -677,7 +666,12 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_CPU_CLK_NTSC)
 	MCFG_CPU_PROGRAM_MAP(comx35_mem)
 	MCFG_CPU_IO_MAP(comx35_io)
-	MCFG_CPU_CONFIG(cosmac_intf)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(comx35_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(comx35_state, ef2_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(comx35_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(comx35_state, q_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(comx35_state, sc_w))
 
 	// sound and video hardware
 	MCFG_FRAGMENT_ADD(comx35_ntsc_video)

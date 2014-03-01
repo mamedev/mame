@@ -40,7 +40,7 @@ UINT32 poolshrk_state::screen_update_poolshrk(screen_device &screen, bitmap_ind1
 		int hpos = m_hpos_ram[i];
 		int vpos = m_vpos_ram[i];
 
-		 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, i, (i == 0) ? 0 : 1, 0, 0,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, i, (i == 0) ? 0 : 1, 0, 0,
 			248 - hpos, vpos - 15, 0);
 	}
 

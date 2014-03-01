@@ -149,7 +149,7 @@ void astrocorp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 				{
 					for (xwrap = 0 ; xwrap <= 0x200 ; xwrap += 0x200)
 					{
-						 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 								code, 0,
 								0, 0,
 								sx + x * 16 - xwrap, sy + y * 16 - ywrap, 0xff);

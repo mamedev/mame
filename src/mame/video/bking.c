@@ -229,20 +229,20 @@ UINT32 bking_state::screen_update_bking(screen_device &screen, bitmap_ind16 &bit
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the balls */
-	 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+	m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 		m_ball1_pic,
 		m_palette_bank,
 		0, 0,
 		m_xld1, m_yld1, 0);
 
-	 m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
+	m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 		m_ball2_pic,
 		m_palette_bank,
 		0, 0,
 		m_xld2, m_yld2, 0);
 
 	/* draw the crow */
-	 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+	m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 		m_crow_pic,
 		m_palette_bank,
 		m_crow_flip, m_crow_flip,
@@ -269,7 +269,7 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 			xld = m_xld1;
 			yld = m_yld1;
 
-			 m_gfxdecode->gfx(2)->opaque(m_colmap_ball,rect, m_ball1_pic, 0, 0, 0, 0, 0);
+			m_gfxdecode->gfx(2)->opaque(m_colmap_ball,rect, m_ball1_pic, 0, 0, 0, 0, 0);
 
 			latch = 0x0c00;
 		}
@@ -278,7 +278,7 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 			xld = m_xld2;
 			yld = m_yld2;
 
-			 m_gfxdecode->gfx(3)->opaque(m_colmap_ball,rect, m_ball2_pic, 0, 0, 0, 0, 0);
+			m_gfxdecode->gfx(3)->opaque(m_colmap_ball,rect, m_ball2_pic, 0, 0, 0, 0, 0);
 
 			latch = 0x0400;
 		}

@@ -88,14 +88,14 @@ UINT32 mgolf_state::screen_update_mgolf(screen_device &screen, bitmap_ind16 &bit
 	/* draw sprites */
 	for (i = 0; i < 2; i++)
 	{
-		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			m_video_ram[0x399 + 4 * i],
 			i,
 			0, 0,
 			m_video_ram[0x390 + 2 * i] - 7,
 			m_video_ram[0x398 + 4 * i] - 16, 0);
 
-		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			m_video_ram[0x39b + 4 * i],
 			i,
 			0, 0,

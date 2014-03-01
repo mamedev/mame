@@ -177,18 +177,20 @@ static const cassette_interface pecom_cassette_interface =
 
 /* Machine driver */
 static MACHINE_CONFIG_START( pecom64, pecom_state )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_DOT_CLK_PAL/3)
 	MCFG_CPU_PROGRAM_MAP(pecom64_mem)
 	MCFG_CPU_IO_MAP(pecom64_io)
-	MCFG_CPU_CONFIG(pecom64_cdp1802_config)
-
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(pecom_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(pecom_state, ef2_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(pecom_state, q_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(pecom_state, sc_w))
 
 	// sound and video hardware
-
 	MCFG_FRAGMENT_ADD(pecom_video)
 
+	// devices
 	MCFG_CASSETTE_ADD( "cassette", pecom_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","pecom_cass")
 

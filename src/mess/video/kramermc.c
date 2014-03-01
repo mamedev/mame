@@ -37,7 +37,7 @@ UINT32 kramermc_state::screen_update_kramermc(screen_device &screen, bitmap_ind1
 		for(x = 0; x < 64; x++ )
 		{
 			int code = space.read_byte(KRAMERMC_VIDEO_MEMORY + x + y*64);
-			 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,  code , 0, 0,0, x*8,y*8);
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,  code , 0, 0,0, x*8,y*8);
 		}
 	}
 	return 0;

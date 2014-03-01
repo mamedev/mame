@@ -98,7 +98,7 @@ UINT32 destroyr_state::screen_update_destroyr(screen_device &screen, bitmap_ind1
 				continue;
 		}
 
-		 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, num, 0, flipx, 0, horz, 16 * i, 0);
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, num, 0, flipx, 0, horz, 16 * i, 0);
 	}
 
 	/* draw alpha numerics */
@@ -108,7 +108,7 @@ UINT32 destroyr_state::screen_update_destroyr(screen_device &screen, bitmap_ind1
 		{
 			int num = m_alpha_num_ram[32 * i + j];
 
-			 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, num, 0, 0, 0, 8 * j, 8 * i, 0);
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, num, 0, 0, 0, 8 * j, 8 * i, 0);
 		}
 	}
 
@@ -119,13 +119,13 @@ UINT32 destroyr_state::screen_update_destroyr(screen_device &screen, bitmap_ind1
 		int horz = 256 - m_minor_obj_ram[i + 2];
 		int vert = 256 - m_minor_obj_ram[i + 4];
 
-		 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, num, 0, 0, 0, horz, vert, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, num, 0, 0, 0, horz, vert, 0);
 	}
 
 	/* draw waves */
 	for (i = 0; i < 4; i++)
 	{
-		 m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, m_wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
+		m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, m_wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
 	}
 
 	/* draw cursor */

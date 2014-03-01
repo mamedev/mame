@@ -150,7 +150,7 @@ static COSMAC_EF_READ( pecom64_ef_r )
     return flags;
 }
 */
-WRITE_LINE_MEMBER(pecom_state::pecom64_q_w)
+WRITE_LINE_MEMBER(pecom_state::q_w)
 {
 	m_cassette->output(state ? -1.0 : +1.0);
 }
@@ -175,19 +175,3 @@ WRITE8_MEMBER(pecom_state::sc_w )
 		break;
 	}
 }
-
-COSMAC_INTERFACE( pecom64_cdp1802_config )
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_LINE_MEMBER(pecom_state,clear_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pecom_state,ef2_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pecom_state,pecom64_q_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pecom_state,sc_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};

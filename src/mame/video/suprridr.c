@@ -207,7 +207,7 @@ UINT32 suprridr_state::screen_update_suprridr(screen_device &screen, bitmap_ind1
 			fy = !fy;
 			y = 240 - y;
 		}
-		 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, code, color, fx, fy, x, y, 0);
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, code, color, fx, fy, x, y, 0);
 	}
 	return 0;
 }

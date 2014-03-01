@@ -111,7 +111,7 @@ void funkybee_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipx = !flipx;
 		}
 
-		 m_gfxdecode->gfx(2 + m_gfx_bank)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2 + m_gfx_bank)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);

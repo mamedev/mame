@@ -21,6 +21,7 @@
 #include "sound/beep.h"
 #include "imagedev/cartslot.h"
 #include "rendlay.h"
+#include "gl3000s.lh"
 
 
 class pc2000_state : public driver_device
@@ -178,6 +179,7 @@ ADDRESS_MAP_END
 
 UINT32 gl3000s_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0);
 	m_lcdc_l->screen_update(screen, bitmap, cliprect);
 	m_lcdc_r->screen_update(screen, bitmap, cliprect);
 	return 0;
@@ -194,7 +196,7 @@ int gl3000s_sed1520_screen_update(device_t &device, bitmap_ind16 &bitmap, const 
 			for (int yi=0; yi<8; yi++)
 			{
 				int px = start_x - (adc ? (80 - x) : x);
-				int py = y*8 + yi;
+				int py = 8 + y*8 + yi;
 
 				if (cliprect.contains(px, py))
 					bitmap.pix16(py, px) = (vram[addr % 0x140] >> yi) & 1;
@@ -213,6 +215,57 @@ SED1520_UPDATE_CB(gl3000s_screen_update_right)
 
 SED1520_UPDATE_CB(gl3000s_screen_update_left)
 {
+	UINT8 sec[3];
+	UINT8 points[2][3];
+	memset(sec, 0, sizeof(sec));
+	memset(points, 0, sizeof(points));
+
+	for (int y=0; y<2; y++)
+		for (int x=59; x<85; x++)
+		{
+			UINT8 data = vram[(y*0x50 + x) % 0x140];
+			int dpos = (x - 74) / 2;
+
+			for (int yi=0; yi<8; yi++)
+			{
+				int state = (data >> yi) & 1;
+
+				if (y == 0 && (x == 74 || x == 76 || x == 78) && yi == 7)         sec[dpos] |= (state << 0);
+				else if (y == 0 && (x == 74 || x == 76 || x == 78) && yi == 0)    sec[dpos] |= (state << 2);
+				else if (y == 0 && (x == 75 || x == 77 || x == 79) && yi == 7)    sec[dpos] |= (state << 5);
+				else if (y == 0 && (x == 75 || x == 77 || x == 79) && yi == 0)    sec[dpos] |= (state << 4);
+				else if (y == 0 && (x == 75 || x == 77 || x == 79) && yi == 1)    sec[dpos] |= (state << 3);
+				else if (y == 1 && (x == 74 || x == 76 || x == 78) && yi == 7)    sec[dpos] |= (state << 1);
+				else if (y == 1 && (x == 75 || x == 77 || x == 79) && yi == 7)    sec[dpos] |= (state << 6);
+
+				else if ((x == 74 || x == 76 || x == 78) && yi == 3)    points[y][dpos] |= (state << 0);
+				else if ((x == 74 || x == 76 || x == 78) && yi == 4)    points[y][dpos] |= (state << 1);
+				else if ((x == 74 || x == 76 || x == 78) && yi == 5)    points[y][dpos] |= (state << 2);
+				else if ((x == 75 || x == 77 || x == 79) && yi == 3)    points[y][dpos] |= (state << 5);
+				else if ((x == 75 || x == 77 || x == 79) && yi == 4)    points[y][dpos] |= (state << 6);
+				else if ((x == 75 || x == 77 || x == 79) && yi == 5)    points[y][dpos] |= (state << 4);
+				else if ((x == 75 || x == 77 || x == 79) && yi == 6)    points[y][dpos] |= (state << 3);
+
+				else if (y == 1 && x >= 65 && x <= 68 && yi == 7)       output_set_indexed_value("LEV", x - 64, state);
+				else if (x >= 59  && x <= 60 && yi == 7)                output_set_indexed_value("TRY", x - 58 + (y ? 0 : 1), state);
+				else if (y == 1 && x >= 61 && x <= 64 && yi == 7)       output_set_indexed_value("TICK", x - 59, state);
+				else if (y == 0 && x >= 61 && x <= 64 && yi == 7)       output_set_indexed_value("TICK", 62 - x + (x >= 63 ? 8 : 0), state);
+
+				else if (x < 74 && yi < 7)
+				{
+					int cx = x - 59;
+					bitmap.pix16(yi, (y ? 0 : 89) + (16 - (cx + cx / 5))) = state;
+				}
+			}
+		}
+
+	for(int i=0; i<3; i++)
+	{
+		output_set_indexed_value("TIME", i, sec[i]);
+		output_set_indexed_value("P1", i, points[1][i]);
+		output_set_indexed_value("P2", i, points[0][i]);
+	}
+
 	return gl3000s_sed1520_screen_update(device, bitmap, cliprect, vram, start_line, adc, 58);
 }
 
@@ -838,9 +891,11 @@ static MACHINE_CONFIG_DERIVED_CLASS( gl3000s, pc2000, gl3000s_state )
 	MCFG_SED1520_ADD("sed1520_r", gl3000s_screen_update_right)  // right panel is 61 pixels (59-119)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(120, 16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 16-1)
+	MCFG_SCREEN_SIZE(120, 24)
+	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 24-1)
 	MCFG_SCREEN_UPDATE_DRIVER( gl3000s_state, screen_update )
+
+	MCFG_DEFAULT_LAYOUT(layout_gl3000s)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gl3000s)
 MACHINE_CONFIG_END

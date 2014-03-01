@@ -134,7 +134,7 @@ private:
 	UINT16  m_regs[(6<<3)+1+1];
 	UINT8   m_num_follow;
 	UINT8   m_cur_follow;
-	UINT8   m_regs_follow[4];
+	UINT8   m_regs_follow[5];
 	UINT8   m_read_num_follow;
 	UINT8   m_read_cur_follow;
 	UINT8   m_read_regs_follow[7];

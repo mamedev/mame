@@ -28,7 +28,7 @@ void skyraid_state::draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		y = 136 + 16 * (i ^ 1);
 
 		for (x = 0; x < bitmap.width(); x += 16)
-			 m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, *p++, 0, 0, 0,   x, y, 0);
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, *p++, 0, 0, 0,   x, y, 0);
 	}
 }
 
@@ -77,7 +77,7 @@ void skyraid_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		vert -= 31;
 
 		if (flag & 1)
-			 m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code ^ 15, code >> 3, 0, 0,
 				horz / 2, vert, 2);
 	}
@@ -99,7 +99,7 @@ void skyraid_state::draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprec
 		vert -= 15;
 		horz -= 31;
 
-		 m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			code ^ 15, 0, 0, 0,
 			horz / 2, vert, 0);
 	}

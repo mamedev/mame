@@ -67,7 +67,7 @@ enum
 
 
 // register write mask
-static const int REGISTER_WRITE_MASK[2][16] =
+static const int register_write_mask[2][16] =
 {
 	{ 0xf, 0x7, 0xf, 0x7, 0xf, 0x3, 0x7, 0xf, 0x3, 0xf, 0x1, 0xf, 0xf, 0xf, 0xf, 0xf },
 	{ 0x3, 0x1, 0xf, 0x7, 0xf, 0x3, 0x7, 0xf, 0x3, 0x0, 0x1, 0x3, 0x0, 0xf, 0xf, 0xf }
@@ -329,8 +329,9 @@ void rp5c15_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 READ8_MEMBER( rp5c15_device::read )
 {
 	UINT8 data = 0;
+	offset &= 0x0f;
 
-	switch (offset & 0x0f)
+	switch (offset)
 	{
 	case REGISTER_MODE:
 		data = m_mode;
@@ -346,7 +347,7 @@ READ8_MEMBER( rp5c15_device::read )
 		break;
 	}
 
-	if (LOG) logerror("RP5C15 '%s' Register %u Read %02x\n", tag(), offset & 0x0f, data);
+	if (LOG) logerror("RP5C15 '%s' Register %u Read %02x\n", tag(), offset, data);
 
 	return data & 0x0f;
 }
@@ -358,12 +359,13 @@ READ8_MEMBER( rp5c15_device::read )
 
 WRITE8_MEMBER( rp5c15_device::write )
 {
-	int mode = m_mode & MODE_MASK;
+	data &= 0x0f;
+	offset &= 0x0f;
 
-	switch (offset & 0x0f)
+	switch (offset)
 	{
 	case REGISTER_MODE:
-		m_mode = data & 0x0f;
+		m_mode = data;
 
 		if (LOG)
 		{
@@ -378,14 +380,12 @@ WRITE8_MEMBER( rp5c15_device::write )
 		break;
 
 	case REGISTER_RESET:
-		m_reset = data & 0x0f;
+		m_reset = data;
 
 		if (data & RESET_ALARM)
 		{
-			int i;
-
 			// reset alarm registers
-			for (i = REGISTER_1_MINUTE; i < REGISTER_1_MONTH; i++)
+			for (int i = REGISTER_1_MINUTE; i < REGISTER_1_MONTH; i++)
 			{
 				m_reg[MODE01][i] = 0;
 			}
@@ -401,17 +401,17 @@ WRITE8_MEMBER( rp5c15_device::write )
 		break;
 
 	default:
-		switch (mode)
+		switch (m_mode & MODE_MASK)
 		{
 		case MODE00:
-			m_reg[mode][offset & 0x0f] = data & REGISTER_WRITE_MASK[mode][offset & 0x0f];
+			m_reg[MODE00][offset] = data & register_write_mask[MODE00][offset];
 
 			set_time(false, read_counter(REGISTER_1_YEAR), read_counter(REGISTER_1_MONTH), read_counter(REGISTER_1_DAY), m_reg[MODE00][REGISTER_DAY_OF_THE_WEEK],
 				read_counter(REGISTER_1_HOUR), read_counter(REGISTER_1_MINUTE), read_counter(REGISTER_1_SECOND));
 			break;
 
 		case MODE01:
-			switch (offset & 0x0f)
+			switch (offset)
 			{
 			case REGISTER_CLOCK_OUTPUT:
 				switch (data & 0x07)
@@ -447,25 +447,25 @@ WRITE8_MEMBER( rp5c15_device::write )
 					break;
 				}
 
-				m_reg[mode][offset & 0x0f] = data & REGISTER_WRITE_MASK[mode][offset & 0x0f];
+				m_reg[MODE01][offset] = data & register_write_mask[MODE01][offset];
 				break;
 
 			case REGISTER_ADJUST:
-				if (BIT(data, 0))
+				if (data & 0x01)
 				{
 					adjust_seconds();
 				}
-				m_reg[mode][offset & 0x0f] = data & REGISTER_WRITE_MASK[mode][offset & 0x0f];
+				m_reg[MODE01][offset] = data & register_write_mask[MODE01][offset];
 				break;
 
 			default:
-				m_reg[mode][offset & 0x0f] = data & REGISTER_WRITE_MASK[mode][offset & 0x0f];
+				m_reg[MODE01][offset] = data & register_write_mask[MODE01][offset];
 				break;
 			}
 			break;
 		}
 
-		if (LOG) logerror("RP5C15 '%s' Register %u Write %02x\n", tag(), offset & 0x0f, data);
+		if (LOG) logerror("RP5C15 '%s' Register %u Write %02x\n", tag(), offset, data);
 		break;
 	}
 }

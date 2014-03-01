@@ -1,3 +1,5 @@
+// license:MAME|LGPL-2.1+
+// copyright-holders:Michael Zapf
 /*
     ti990/4 driver
 
@@ -30,14 +32,15 @@ TODO:
 * programmer panel
 * emulate other devices: card reader, printer
 
+    Original implementation: Raphael Nabet
+    Rewritten by Michael Zapf 2013
 */
 
 /*if 1, use 911 VDT; if 0, use 733 ASR  */
 #define VIDEO_911 0
 
 #include "emu.h"
-#include "cpu/tms9900/tms9900l.h"
-#include "machine/ti99/ti990.h"
+#include "cpu/tms9900/tms9900.h"
 #if VIDEO_911
 #include "video/911_vdt.h"
 #include "sound/beep.h"
@@ -56,28 +59,108 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	device_t *m_terminal;
-	DECLARE_WRITE8_MEMBER(rset_callback);
-	DECLARE_WRITE8_MEMBER(ckon_ckof_callback);
-	DECLARE_WRITE8_MEMBER(lrex_callback);
+	DECLARE_READ8_MEMBER( panel_read );
+	DECLARE_WRITE8_MEMBER( panel_write );
+	DECLARE_WRITE8_MEMBER( external_operation );
+	DECLARE_READ8_MEMBER( interrupt_level );
+
 	DECLARE_DRIVER_INIT(ti990_4);
-	virtual void machine_reset();
+	DECLARE_MACHINE_RESET(ti990_4);
+
 	virtual void video_start();
 	UINT32 screen_update_ti990_4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ti990_4_line_interrupt);
 	void idle_callback(int state);
-	required_device<cpu_device> m_maincpu;
+	required_device<tms9900_device> m_maincpu;
+
+private:
+	void        hold_load();
+	void        device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	int         m_intlines;
+	int         m_int_level;
+	emu_timer*  m_nmi_timer;
+	void        reset_int_lines();
+	void        set_int_line(int line, int state);
+	void        line_interrupt();
+
+	void        set_int3(int state);
+	void        set_int6(int state);
+	void        set_int7(int state);
+	bool        m_ckon_state;
 };
 
-
-void ti990_4_state::machine_reset()
+enum
 {
-	ti990_hold_load(machine());
+	NMI_TIMER_ID = 1
+};
 
-	ti990_reset_int();
-
-	fd800_machine_init(machine(), ti990_set_int7);
+void ti990_4_state::hold_load()
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_nmi_timer->adjust(attotime::from_msec(100));
 }
 
+/*
+    NMI timer callback
+*/
+void ti990_4_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+READ8_MEMBER( ti990_4_state::panel_read )
+{
+	if (offset == 1)
+		return 0x48;
+
+	return 0;
+}
+
+WRITE8_MEMBER( ti990_4_state::panel_write )
+{
+}
+
+void ti990_4_state::set_int_line(int line, int state)
+{
+	if (state)
+		m_intlines |= (1 << line);
+	else
+		m_intlines &= ~(1 << line);
+
+	if (m_intlines != 0)
+	{
+		m_int_level = 0;
+		while ((m_intlines & (1 << m_int_level))==0) m_int_level++;
+		m_maincpu->set_input_line(INT_9900_INTREQ, ASSERT_LINE);  /* interrupt it, baby */
+	}
+	else
+		m_maincpu->set_input_line(INT_9900_INTREQ, CLEAR_LINE);
+}
+
+void ti990_4_state::set_int3(int state)
+{
+	set_int_line(3, state);
+}
+
+void ti990_4_state::set_int6(int state)
+{
+	set_int_line(6, state);
+}
+
+void ti990_4_state::set_int7(int state)
+{
+	set_int_line(7, state);
+}
+
+void ti990_4_state::reset_int_lines()
+{
+	m_intlines = 0;
+}
+
+void ti990_4_state::line_interrupt()
+{
+	if (m_ckon_state) set_int_line(5, ASSERT_LINE);
+}
 
 INTERRUPT_GEN_MEMBER(ti990_4_state::ti990_4_line_interrupt)
 {
@@ -87,34 +170,7 @@ INTERRUPT_GEN_MEMBER(ti990_4_state::ti990_4_line_interrupt)
 	asr733_keyboard(m_terminal);
 #endif
 
-	ti990_line_interrupt(machine());
-}
-
-#ifdef UNUSED_FUNCTION
-void ti990_4_state::idle_callback(int state)
-{
-}
-#endif
-
-WRITE8_MEMBER(ti990_4_state::rset_callback)
-{
-	ti990_cpuboard_reset();
-
-	/* ... */
-
-	/* clear controller panel and smi fault LEDs */
-}
-
-WRITE8_MEMBER(ti990_4_state::ckon_ckof_callback)
-{
-	device_t *maincpu = m_maincpu;
-	ti990_ckon_ckof_callback(maincpu, (offset & 0x1000) ? 1 : 0);
-}
-
-WRITE8_MEMBER(ti990_4_state::lrex_callback)
-{
-	/* right??? */
-	ti990_hold_load(machine());
+	line_interrupt();
 }
 
 #if VIDEO_911
@@ -147,7 +203,7 @@ UINT32 ti990_4_state::screen_update_ti990_4(screen_device &screen, bitmap_ind16 
 
 static const asr733_init_params_t asr733_intf =
 {
-	ti990_set_int6
+	// set_int6
 };
 
 void ti990_4_state::video_start()
@@ -163,11 +219,44 @@ UINT32 ti990_4_state::screen_update_ti990_4(screen_device &screen, bitmap_ind16 
 
 #endif
 
+WRITE8_MEMBER( ti990_4_state::external_operation )
+{
+	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
+	switch (offset)
+	{
+	case IDLE_OP:
+		return;
+	case RSET_OP:
+		m_ckon_state = false;
+		// clear controller panel and smi fault LEDs
+		break;
+	case CKON_OP:
+		m_ckon_state = true;
+		break;
+	case CKOF_OP:
+		m_ckon_state = false;
+		set_int_line(5, 0);
+		break;
+	case LREX_OP:
+		// TODO: Verify this
+		hold_load();
+		break;
+
+	default:
+		logerror("ti99_4x: External operation %s not implemented on TI-990/4 board\n", extop[offset]);
+	}
+}
+
+READ8_MEMBER( ti990_4_state::interrupt_level )
+{
+	return m_int_level;
+}
+
 /*
     Memory map - see description above
 */
 
-static ADDRESS_MAP_START(ti990_4_memmap, AS_PROGRAM, 16, ti990_4_state )
+static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti990_4_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM /* dynamic RAM */
 	AM_RANGE(0x8000, 0xf7ff) AM_NOP /* reserved for expansion */
 	AM_RANGE(0xf800, 0xfbff) AM_RAM /* static RAM? */
@@ -197,7 +286,7 @@ ADDRESS_MAP_END
     0x0a0-0x0bf: VDT3 (int ??? - wired to int 9, unused)
 */
 
-static ADDRESS_MAP_START(ti990_4_cru_map, AS_IO, 8, ti990_4_state )
+static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti990_4_state )
 #if VIDEO_911
 	AM_RANGE(0x10, 0x11) AM_DEVREAD_LEGACY("vdt911", vdt911_cru_r)
 	AM_RANGE(0x80, 0x8f) AM_DEVWRITE_LEGACY("vdt911", vdt911_cru_w)
@@ -209,22 +298,9 @@ static ADDRESS_MAP_START(ti990_4_cru_map, AS_IO, 8, ti990_4_state )
 	AM_RANGE(0x08, 0x0b) AM_READ_LEGACY(fd800_cru_r)
 	AM_RANGE(0x40, 0x5f) AM_WRITE_LEGACY(fd800_cru_w)
 
-	AM_RANGE(0x1fe, 0x1ff) AM_READ_LEGACY(ti990_panel_read)
-	AM_RANGE(0xff0, 0xfff) AM_WRITE_LEGACY(ti990_panel_write)
-
-	/* external instruction decoding */
-/*  AM_RANGE(0x2000, 0x2fff) AM_WRITE(idle_callback)*/
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(rset_callback)
-	AM_RANGE(0x5000, 0x6fff) AM_WRITE(ckon_ckof_callback)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(lrex_callback)
+	AM_RANGE(0x1fe, 0x1ff) AM_READ( panel_read )
+	AM_RANGE(0xff0, 0xfff) AM_WRITE( panel_write )
 ADDRESS_MAP_END
-
-#if 0
-static const tms9900reset_param reset_params =
-{
-	idle_callback
-};
-#endif
 
 static const floppy_interface ti990_4_floppy_interface =
 {
@@ -239,14 +315,32 @@ static const floppy_interface ti990_4_floppy_interface =
 	NULL
 };
 
+static TMS99xx_CONFIG( cpuconf )
+{
+	DEVCB_DRIVER_MEMBER(ti990_4_state, external_operation),
+	DEVCB_DRIVER_MEMBER(ti990_4_state, interrupt_level),
+	DEVCB_NULL,     // Instruction acquisition
+	DEVCB_NULL,     // Clock out
+	DEVCB_NULL,     // wait
+	DEVCB_NULL,      // Hold acknowledge
+	DEVCB_NULL     // data bus in
+};
+
+MACHINE_RESET_MEMBER(ti990_4_state,ti990_4)
+{
+	hold_load();
+	reset_int_lines();
+	m_ckon_state = false;
+//  fd800_machine_init(machine(), ti990_4_state::set_int7);
+}
+
 static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
-	MCFG_CPU_ADD("maincpu", TMS9900L, 3000000)
-	MCFG_CPU_PROGRAM_MAP(ti990_4_memmap)
-	MCFG_CPU_IO_MAP(ti990_4_cru_map)
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, cpuconf)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ti990_4_state, ti990_4_line_interrupt,  120/*or TIME_IN_HZ(100) in Europe*/)
 
+	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
 
 	/* video hardware - we emulate a single 911 vdt display */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -330,6 +424,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ti990_4_state,ti990_4)
 {
+	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
+
 #if VIDEO_911
 	vdt911_init(machine());
 #else

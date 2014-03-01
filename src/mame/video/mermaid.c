@@ -310,7 +310,7 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			m_bg_tilemap->draw(screen, m_helper, rect, 0, 0);
 
-			 m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
 
 			m_coll_bit2 |= collision_check(rect);
 
@@ -321,7 +321,7 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			m_fg_tilemap->draw(screen, m_helper, rect, 0, 0);
 
-			 m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
 
 			m_coll_bit1 |= collision_check(rect);
 
@@ -359,10 +359,10 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 						sy2 = 240 - sy2;
 					}
 
-					 m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
+					m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
 				}
 
-			 m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
 
 			m_coll_bit0 |= collision_check(rect);
 		}
@@ -440,10 +440,10 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 						sy2 = 240 - sy2;
 					}
 
-					 m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
+					m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
 				}
 
-			 m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
 
 			m_coll_bit3 |= collision_check(rect);
 		}
@@ -521,10 +521,10 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 						sy2 = 240 - sy2;
 					}
 
-					 m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
+					m_gfxdecode->gfx(1)->transpen(m_helper,rect, code2, 0, flipx2, flipy2, sx2, sy2, 0);
 				}
 
-			 m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(m_helper2,rect, code, 0, flipx, flipy, sx, sy, 0);
 
 			m_coll_bit6 |= collision_check(rect);
 		}

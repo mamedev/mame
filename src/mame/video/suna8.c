@@ -378,7 +378,7 @@ void suna8_state::draw_normal_sprites(bitmap_ind16 &bitmap,const rectangle &clip
 					sy = max_y - sy;    tile_flipy = !tile_flipy;
 				}
 
-				 m_gfxdecode->gfx(which)->transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(which)->transpen(bitmap,cliprect,
 							tile + (attr & 0x3)*0x100 + gfxbank,
 							(((attr >> 2) & 0xf) | colorbank) + 0x10 * m_palettebank,    // hardhea2 player2
 							tile_flipx, tile_flipy,
