@@ -199,6 +199,9 @@
 #define MCFG_PALETTE_FORMAT(_format) \
 	palette_device::static_set_format(*device, PALETTE_FORMAT_##_format);
 
+#define MCFG_PALETTE_ENDIANNESS(_endianness) \
+	palette_device::static_set_endianness(*device, _endianness);
+
 #define MCFG_PALETTE_ENTRIES(_entries) \
 	palette_device::static_set_entries(*device, _entries);
 
@@ -323,6 +326,7 @@ public:
 	// static configuration
 	static void static_set_init(device_t &device, palette_init_delegate init);
 	static void static_set_format(device_t &device, raw_to_rgb_converter raw_to_rgb);
+	static void static_set_endianness(device_t &device, endianness_t endianness);
 	static void static_set_entries(device_t &device, int entries);
 	static void static_enable_shadows(device_t &device);
 	static void static_enable_hilights(device_t &device);
@@ -406,6 +410,8 @@ private:
 
 	// palette RAM
 	raw_to_rgb_converter m_raw_to_rgb;			// format of palette RAM
+	endianness_t		m_endianness;			// endianness of palette RAM
+	bool				m_endianness_supplied;	// endianness supplied in static config
 	memory_array		m_paletteram;			// base memory
 	memory_array		m_paletteram_ext;		// extended memory
 

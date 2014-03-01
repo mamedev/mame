@@ -25,6 +25,7 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 		m_enable_shadows(0),
 		m_enable_hilights(0),
 		m_raw_to_rgb(raw_to_rgb_converter()),
+		m_endianness_supplied(false),
 		m_palette(NULL),
 		m_pens(NULL),
 		m_shadow_table(NULL),
@@ -48,6 +49,14 @@ void palette_device::static_set_init(device_t &device, palette_init_delegate ini
 void palette_device::static_set_format(device_t &device, raw_to_rgb_converter raw_to_rgb)
 {
 	downcast<palette_device &>(device).m_raw_to_rgb = raw_to_rgb;
+}
+
+
+void palette_device::static_set_endianness(device_t &device, endianness_t endianness)
+{
+	palette_device &palette = downcast<palette_device &>(device);
+	palette.m_endianness = endianness;
+	palette.m_endianness_supplied = true;
 }
 
 
@@ -364,15 +373,27 @@ void palette_device::device_start()
 
 		// make sure we have specified a format
 		assert(m_raw_to_rgb.bytes_per_entry() > 0);
-		
+
 		// determine bytes per entry
 		int bytes_per_entry = m_raw_to_rgb.bytes_per_entry();
-		if (share_ext == NULL)
-			m_paletteram.set(*share, bytes_per_entry);
+
+		if (m_endianness_supplied)
+		{
+			// forcing endianness only makes sense when the RAM is narrower than the palette format and not split
+			assert(share_ext == NULL && share->width() < bytes_per_entry);
+
+			m_paletteram.set(share->ptr(), share->bytes(), share->width(), m_endianness, bytes_per_entry);
+		}
 		else
 		{
-			m_paletteram.set(*share, bytes_per_entry / 2);
-			m_paletteram_ext.set(*share_ext, bytes_per_entry / 2);
+			m_endianness = share->endianness();
+			if (share_ext == NULL)
+				m_paletteram.set(*share, bytes_per_entry);
+			else
+			{
+				m_paletteram.set(*share, bytes_per_entry / 2);
+				m_paletteram_ext.set(*share_ext, bytes_per_entry / 2);
+			}
 		}
 	}
 
