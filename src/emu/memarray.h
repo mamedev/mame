@@ -57,6 +57,9 @@ public:
 	void set(const memory_share &share, int bpe);
 	void set(const memory_array &array);
 
+	// piecewise configuration
+	void set_endianness(endianness_t endianness) { set(m_base, m_bytes, m_membits, endianness, m_bytes_per_entry); }
+
 	// getters
 	void *base() const { return m_base; }
 	UINT32 bytes() const { return m_bytes; }

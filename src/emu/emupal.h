@@ -205,6 +205,9 @@
 #define MCFG_PALETTE_ENTRIES(_entries) \
 	palette_device::static_set_entries(*device, _entries);
 
+#define MCFG_PALETTE_INDIRECT_ENTRIES(_entries) \
+	palette_device::static_set_indirect_entries(*device, _entries);
+
 #define MCFG_PALETTE_ENABLE_SHADOWS() \
 	palette_device::static_enable_shadows(*device);
 
@@ -328,6 +331,7 @@ public:
 	static void static_set_format(device_t &device, raw_to_rgb_converter raw_to_rgb);
 	static void static_set_endianness(device_t &device, endianness_t endianness);
 	static void static_set_entries(device_t &device, int entries);
+	static void static_set_indirect_entries(device_t &device, int entries);
 	static void static_enable_shadows(device_t &device);
 	static void static_enable_hilights(device_t &device);
 	
@@ -405,13 +409,14 @@ protected:
 private:
 	// configuration state
 	int					m_entries;				// number of entries in the palette
+	int					m_indirect_entries;		// number of initial indirect entries in the palette
 	bool				m_enable_shadows;		// are shadows enabled?
 	bool				m_enable_hilights;		// are hilights enabled?
+	endianness_t		m_endianness;			// endianness of palette RAM
+	bool				m_endianness_supplied;	// endianness supplied in static config
 
 	// palette RAM
 	raw_to_rgb_converter m_raw_to_rgb;			// format of palette RAM
-	endianness_t		m_endianness;			// endianness of palette RAM
-	bool				m_endianness_supplied;	// endianness supplied in static config
 	memory_array		m_paletteram;			// base memory
 	memory_array		m_paletteram_ext;		// extended memory
 
