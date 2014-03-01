@@ -26,6 +26,7 @@ public:
 	UINT8 m_bitmap_type;
 	tilemap_t *m_fg_tilemap;
 	UINT8 m_lastflip;
+	int	  m_field;
 
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(protection_w);
@@ -48,6 +49,8 @@ public:
 	void set_background_palette(int bank);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
