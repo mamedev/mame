@@ -38,9 +38,9 @@ TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
 {
 	int color, tile_number, attrib;
 
-	attrib = m_txvideoram16[tile_index];
+	attrib = m_tx_videoram[tile_index];
 	tile_number = attrib & 0x3ff;
-	color = ((attrib >> 10) | 0x40) & 0x7f;
+	color = attrib >> 10;
 	SET_TILE_INFO_MEMBER(m_gfxdecode, 
 			2,
 			tile_number,
@@ -156,19 +156,19 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 	m_vdp0->gp9001_gfxrom_is_banked = 1;
 }
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_txvideoram16_w)
+WRITE16_MEMBER(toaplan2_state::toaplan2_tx_videoram_w)
 {
-	COMBINE_DATA(&m_txvideoram16[offset]);
+	COMBINE_DATA(&m_tx_videoram[offset]);
 	if (offset < 64*32)
 		m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_txscrollram16_w)
+WRITE16_MEMBER(toaplan2_state::toaplan2_tx_linescroll_w)
 {
 	/*** Line-Scroll RAM for Text Layer ***/
-	COMBINE_DATA(&m_txscrollram16[offset]);
+	COMBINE_DATA(&m_tx_linescroll[offset]);
 
-	m_tx_tilemap->set_scrollx(offset, m_txscrollram16[offset]);
+	m_tx_tilemap->set_scrollx(offset, m_tx_linescroll[offset]);
 }
 
 WRITE16_MEMBER(toaplan2_state::toaplan2_tx_gfxram16_w)
@@ -192,14 +192,14 @@ WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
 
 	UINT16 *dest = m_tx_gfxram16;
 
-	memcpy(dest, m_txvideoram16, m_txvideoram16.bytes());
-	dest += (m_txvideoram16.bytes()/2);
-	memcpy(dest, m_generic_paletteram_16, m_generic_paletteram_16.bytes());
-	dest += (m_generic_paletteram_16.bytes()/2);
-	memcpy(dest, m_txvideoram16_offs, m_txvideoram16_offs.bytes());
-	dest += (m_txvideoram16_offs.bytes()/2);
-	memcpy(dest, m_txscrollram16, m_txscrollram16.bytes());
-	dest += (m_txscrollram16.bytes()/2);
+	memcpy(dest, m_tx_videoram, m_tx_videoram.bytes());
+	dest += (m_tx_videoram.bytes()/2);
+	memcpy(dest, m_paletteram, m_paletteram.bytes());
+	dest += (m_paletteram.bytes()/2);
+	memcpy(dest, m_tx_lineselect, m_tx_lineselect.bytes());
+	dest += (m_tx_lineselect.bytes()/2);
+	memcpy(dest, m_tx_linescroll, m_tx_linescroll.bytes());
+	dest += (m_tx_linescroll.bytes()/2);
 	memcpy(dest, m_mainram16, m_mainram16.bytes());
 
 	for (int i = 0; i < 1024; i++)
@@ -379,13 +379,13 @@ UINT32 toaplan2_state::screen_update_truxton2(screen_device &screen, bitmap_ind1
 	/* it seems likely that flipx can be set per line! */
 	/* however, none of the games does it, and emulating it in the */
 	/* MAME tilemap system without being ultra slow would be tricky */
-	m_tx_tilemap->set_flip(m_txvideoram16_offs[0] & 0x8000 ? 0 : TILEMAP_FLIPX);
+	m_tx_tilemap->set_flip(m_tx_lineselect[0] & 0x8000 ? 0 : TILEMAP_FLIPX);
 
 	/* line select is used for 'for use in' and '8ing' screen on bbakraid, 'Raizing' logo on batrider */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		clip.min_y = clip.max_y = y;
-		m_tx_tilemap->set_scrolly(0, m_txvideoram16_offs[y] - y);
+		m_tx_tilemap->set_scrolly(0, m_tx_lineselect[y] - y);
 		m_tx_tilemap->draw(screen, bitmap, clip, 0);
 	}
 	return 0;
