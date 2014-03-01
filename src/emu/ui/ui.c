@@ -458,15 +458,17 @@ float ui_manager::get_line_height()
 {
 	INT32 raw_font_pixel_height = get_font()->pixel_height();
 	render_target &ui_target = machine().render().ui_target();
+	INT32 target_pixel_width = ui_target.width();
 	INT32 target_pixel_height = ui_target.height();
-	float one_to_one_line_height;
-	float scale_factor;
 
-	// compute the font pixel height at the nominal size
-	one_to_one_line_height = (float)raw_font_pixel_height / (float)target_pixel_height;
+	// compute the font pixel width/height at the nominal size
+	float one_to_one_line_width = (float)raw_font_pixel_height / (float)target_pixel_width;
+	float one_to_one_line_height = (float)raw_font_pixel_height / (float)target_pixel_height;
 
 	// determine the scale factor
-	scale_factor = UI_TARGET_FONT_HEIGHT / one_to_one_line_height;
+	float scale_factor = MIN(
+		UI_TARGET_FONT_WIDTH / one_to_one_line_width,
+		UI_TARGET_FONT_HEIGHT / one_to_one_line_height);
 
 	// if our font is small-ish, do integral scaling
 	if (raw_font_pixel_height < 24)
