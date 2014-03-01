@@ -41,7 +41,7 @@ inline void im6402_device::set_dr(int state)
 {
 	m_dr = state;
 
-	m_out_dr_func(state);
+	m_write_dr(state);
 }
 
 
@@ -53,7 +53,7 @@ inline void im6402_device::set_tbre(int state)
 {
 	m_tbre = state;
 
-	m_out_tbre_func(state);
+	m_write_tbre(state);
 }
 
 
@@ -65,7 +65,7 @@ inline void im6402_device::set_tre(int state)
 {
 	m_tre = state;
 
-	m_out_tre_func(state);
+	m_write_tre(state);
 }
 
 
@@ -78,36 +78,16 @@ inline void im6402_device::set_tre(int state)
 //  im6402_device - constructor
 //-------------------------------------------------
 
-im6402_device::im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IM6402, "Intersil IM6402", tag, owner, clock, "im6402", __FILE__),
-		device_serial_interface(mconfig, *this),
-		m_rrc_count(0),
-		m_trc_count(0)
+im6402_device::im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, IM6402, "Intersil IM6402", tag, owner, clock, "im6402", __FILE__),
+	device_serial_interface(mconfig, *this),
+	m_write_tro(*this),
+	m_write_dr(*this),
+	m_write_tbre(*this),
+	m_write_tre(*this),
+	m_rrc_count(0),
+	m_trc_count(0)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void im6402_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const im6402_interface *intf = reinterpret_cast<const im6402_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<im6402_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_tro_cb, 0, sizeof(m_out_tro_cb));
-		memset(&m_out_dr_cb, 0, sizeof(m_out_dr_cb));
-		memset(&m_out_tbre_cb, 0, sizeof(m_out_tbre_cb));
-		memset(&m_out_tre_cb, 0, sizeof(m_out_tre_cb));
-	}
 }
 
 
@@ -118,10 +98,10 @@ void im6402_device::device_config_complete()
 void im6402_device::device_start()
 {
 	// resolve callbacks
-	m_out_tro_func.resolve(m_out_tro_cb, *this);
-	m_out_dr_func.resolve(m_out_dr_cb, *this);
-	m_out_tbre_func.resolve(m_out_tbre_cb, *this);
-	m_out_tre_func.resolve(m_out_tre_cb, *this);
+	m_write_tro.resolve_safe();
+	m_write_dr.resolve_safe();
+	m_write_tbre.resolve_safe();
+	m_write_tre.resolve_safe();
 
 	// create the timers
 	if (m_rrc > 0)
@@ -163,7 +143,7 @@ void im6402_device::device_reset()
 	receive_register_reset();
 	transmit_register_reset();
 
-	m_out_tro_func(1);
+	m_write_tro(1);
 
 	m_rrc_count = 0;
 	m_trc_count = 0;
@@ -178,10 +158,16 @@ void im6402_device::device_reset()
 	set_tre(ASSERT_LINE);
 }
 
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
 void im6402_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	device_serial_interface::device_timer(timer, id, param, ptr);
 }
+
 
 //-------------------------------------------------
 //  tra_callback -
@@ -189,7 +175,7 @@ void im6402_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void im6402_device::tra_callback()
 {
-	m_out_tro_func(transmit_register_get_data_bit());
+	m_write_tro(transmit_register_get_data_bit());
 }
 
 

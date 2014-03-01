@@ -876,16 +876,6 @@ static mc2661_interface wicat_video_uart1_intf =
 	DEVCB_NULL   // XSYNC out
 };
 
-struct im6402_interface wicat_video_uart_intf =
-{
-	0,  // RRC
-	0,  // TRC
-	DEVCB_NULL, //m_out_tro_cb;
-	DEVCB_DRIVER_LINE_MEMBER(wicat_state,kb_data_ready), //m_out_dr_cb;
-	DEVCB_NULL, //m_out_tbre_cb;
-	DEVCB_NULL, //m_out_tre_cb;
-};
-
 static mm58274c_interface wicat_rtc_intf =
 {
 	0,  // 12 hour
@@ -961,7 +951,8 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_CPU_IO_MAP(wicat_video_io)
 
 	MCFG_AM9517A_ADD("videodma", XTAL_8MHz, wicat_videodma_intf)  // clock is a bit of guess
-	MCFG_IM6402_ADD("videouart", wicat_video_uart_intf)
+	MCFG_IM6402_ADD("videouart", 0, 0)
+	MCFG_IM6402_DR_CALLBACK(WRITELINE(wicat_state, kb_data_ready))
 	MCFG_MC2661_ADD("videouart0", XTAL_5_0688MHz, wicat_video_uart0_intf)  // the INS2651 looks similar enough to the MC2661...
 	MCFG_MC2661_ADD("videouart1", XTAL_5_0688MHz, wicat_video_uart1_intf)
 	MCFG_X2210_ADD("vsram")  // XD2210

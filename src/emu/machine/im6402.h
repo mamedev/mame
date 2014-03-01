@@ -49,16 +49,25 @@
 
 
 /***************************************************************************
-    DEVICE CONFIGURATION MACROS
+    INTERFACE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_IM6402_ADD(_tag, _config) \
+#define MCFG_IM6402_ADD(_tag, _rrc, _trc) \
 	MCFG_DEVICE_ADD(_tag, IM6402, 0) \
-	MCFG_DEVICE_CONFIG(_config)
+	im6402_device::set_rrc(*device, _rrc); \
+	im6402_device::set_trc(*device, _trc);
 
+#define MCFG_IM6402_TRO_CALLBACK(_write) \
+	devcb = &im6402_device::set_tro_wr_callback(*device, DEVCB2_##_write);
 
-#define IM6402_INTERFACE(_name) \
-	const im6402_interface (_name) =
+#define MCFG_IM6402_DR_CALLBACK(_write) \
+	devcb = &im6402_device::set_dr_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_IM6402_TBRE_CALLBACK(_write) \
+	devcb = &im6402_device::set_tbre_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_IM6402_TRE_CALLBACK(_write) \
+	devcb = &im6402_device::set_tre_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -66,29 +75,21 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-// ======================> im6402_interface
-
-struct im6402_interface
-{
-	int m_rrc;
-	int m_trc;
-
-	devcb_write_line    m_out_tro_cb;
-	devcb_write_line    m_out_dr_cb;
-	devcb_write_line    m_out_tbre_cb;
-	devcb_write_line    m_out_tre_cb;
-};
-
-
 // ======================> im6402_device
 
 class im6402_device :  public device_t,
-						public device_serial_interface,
-						public im6402_interface
+					   public device_serial_interface
 {
 public:
 	// construction/destruction
 	im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	static void set_rrc(device_t &device, int rrc) { downcast<im6402_device &>(device).m_rrc = rrc; }
+	static void set_trc(device_t &device, int trc) { downcast<im6402_device &>(device).m_trc = trc; }
+	template<class _Object> static devcb2_base &set_tro_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tro.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dr_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_dr.set_callback(object); }
+	template<class _Object> static devcb2_base &set_tbre_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tbre.set_callback(object); }
+	template<class _Object> static devcb2_base &set_tre_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tre.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read ) { return m_rbr; }
 	DECLARE_WRITE8_MEMBER( write );
@@ -116,10 +117,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_serial_interface overrides
 	virtual void tra_callback();
@@ -132,10 +132,10 @@ private:
 	inline void set_tbre(int state);
 	inline void set_tre(int state);
 
-	devcb_resolved_write_line   m_out_tro_func;
-	devcb_resolved_write_line   m_out_dr_func;
-	devcb_resolved_write_line   m_out_tbre_func;
-	devcb_resolved_write_line   m_out_tre_func;
+	devcb2_write_line   m_write_tro;
+	devcb2_write_line   m_write_dr;
+	devcb2_write_line   m_write_tbre;
+	devcb2_write_line   m_write_tre;
 
 	// status
 	int m_dr;
@@ -155,10 +155,12 @@ private:
 
 	// receiver
 	UINT8 m_rbr;
+	int m_rrc;
 	int m_rrc_count;
 
 	// transmitter
 	UINT8 m_tbr;
+	int m_trc;
 	int m_trc_count;
 };
 
