@@ -11,12 +11,12 @@
   ---- --xx xxxx xxxx = Tile number
   xxxx xx-- ---- ---- = Color (0 - 3Fh) + 40h
 
-  Text flip / ???      $0000-01EF (some games go to $01FF (excess?))
-  ---x xxxx xxxx xxxx = ??? line something (line to draw ?) ???
-  x--- ---- ---- ---- = flip for the Text tile
+  Line select / flip   $0000-01EF (some games go to $01FF (excess?))
+  ---x xxxx xxxx xxxx = Line select for each line
+  x--- ---- ---- ---- = X flip for each line ???
 
-  Text X line-scroll ? $0000-01EF (some games go to $01FF (excess?))
-  ---- ---x xxxx xxxx = X-Scroll for each line
+  Line scroll          $0000-01EF (some games go to $01FF (excess?))
+  ---- ---x xxxx xxxx = X scroll for each line
 
 
 ***************************************************************************/
@@ -55,17 +55,14 @@ TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
 ***************************************************************************/
 
 
-void toaplan2_state::truxton2_create_tx_tilemap()
+void toaplan2_state::create_tx_tilemap(int dx, int dx_flipped)
 {
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
 	m_tx_tilemap->set_scroll_rows(8*32); /* line scrolling */
 	m_tx_tilemap->set_scroll_cols(1);
+	m_tx_tilemap->set_scrolldx(dx, dx_flipped);
 	m_tx_tilemap->set_transparent_pen(0);
-}
-
-void toaplan2_state::register_state_save()
-{
-	save_item(NAME(m_tx_flip));
 }
 
 void toaplan2_state::truxton2_postload()
@@ -90,8 +87,6 @@ VIDEO_START_MEMBER(toaplan2_state,toaplan2)
 		m_screen->register_screen_bitmap(m_secondary_render_bitmap);
 		m_vdp1->custom_priority_bitmap = &m_custom_priority_bitmap;
 	}
-
-	register_state_save();
 }
 
 VIDEO_START_MEMBER(toaplan2_state,truxton2)
@@ -102,8 +97,7 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 	m_gfxdecode->gfx(2)->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
-	truxton2_create_tx_tilemap();
-	m_tx_tilemap->set_scrolldx(0x1d4 +1, 0x2a);
+	create_tx_tilemap(0x1d5, 0x16a);
 }
 
 VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
@@ -111,7 +105,7 @@ VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	truxton2_create_tx_tilemap();
+	create_tx_tilemap();
 
 	/* This bootleg has additional layer offsets on the VDP */
 	m_vdp0->bg.extra_xoffset.normal  = -0x1d6  -26;
@@ -127,8 +121,6 @@ VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
 	m_vdp0->sp.extra_yoffset.normal  = 8;//-0x1ef  -128;
 
 	m_vdp0->init_scroll_regs();
-
-	m_tx_tilemap->set_scrolldx(0, 0);
 }
 
 VIDEO_START_MEMBER(toaplan2_state,bgaregga)
@@ -136,8 +128,7 @@ VIDEO_START_MEMBER(toaplan2_state,bgaregga)
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	truxton2_create_tx_tilemap();
-	m_tx_tilemap->set_scrolldx(0x1d4, 0x2a);
+	create_tx_tilemap(0x1d4, 0x16b);
 }
 
 VIDEO_START_MEMBER(toaplan2_state,bgareggabl)
@@ -145,8 +136,7 @@ VIDEO_START_MEMBER(toaplan2_state,bgareggabl)
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	truxton2_create_tx_tilemap();
-	m_tx_tilemap->set_scrolldx(0x04, 0x2a);
+	create_tx_tilemap(4, 4);
 }
 
 VIDEO_START_MEMBER(toaplan2_state,batrider)
@@ -160,8 +150,7 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 	m_gfxdecode->gfx(2)->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
-	truxton2_create_tx_tilemap();
-	m_tx_tilemap->set_scrolldx(0x1d4, 0x2a);
+	create_tx_tilemap(0x1d4, 0x16b);
 
 	/* Has special banking */
 	m_vdp0->gp9001_gfxrom_is_banked = 1;
@@ -170,49 +159,16 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 WRITE16_MEMBER(toaplan2_state::toaplan2_txvideoram16_w)
 {
 	COMBINE_DATA(&m_txvideoram16[offset]);
-	if (offset < m_txvideoram16.bytes()/4)
+	if (offset < 64*32)
 		m_tx_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(toaplan2_state::toaplan2_txvideoram16_offs_w)
-{
-	// FIXME: implement line select and per-line flipping for all games
-	// see toaplan2_state::screen_update_batrider()
-
-	UINT16 oldword = m_txvideoram16_offs[offset];
-
-	if (oldword != data)
-	{
-		if (offset == 0)            /* Wrong ! */
-		{
-			if (data & 0x8000)      /* Flip off */
-			{
-				m_tx_flip = 0;
-				m_tx_tilemap->set_flip(m_tx_flip);
-				m_tx_tilemap->set_scrolly(0, 0);
-			}
-			else                    /* Flip on */
-			{
-				m_tx_flip = (TILEMAP_FLIPY | TILEMAP_FLIPX);
-				m_tx_tilemap->set_flip(m_tx_flip);
-				m_tx_tilemap->set_scrolly(0, -16);
-			}
-		}
-		COMBINE_DATA(&m_txvideoram16_offs[offset]);
-	}
-//  logerror("Writing %04x to text offs RAM offset %04x\n",data,offset);
 }
 
 WRITE16_MEMBER(toaplan2_state::toaplan2_txscrollram16_w)
 {
 	/*** Line-Scroll RAM for Text Layer ***/
-
-	int data_tx = data;
-
-	m_tx_tilemap->set_scrollx(offset, data_tx);
-
-//  logerror("Writing %04x to text scroll RAM offset %04x\n",data,offset);
 	COMBINE_DATA(&m_txscrollram16[offset]);
+
+	m_tx_tilemap->set_scrollx(offset, m_txscrollram16[offset]);
 }
 
 WRITE16_MEMBER(toaplan2_state::toaplan2_tx_gfxram16_w)
@@ -270,8 +226,9 @@ WRITE16_MEMBER(toaplan2_state::batrider_objectbank_w)
 	}
 }
 
+
 // Dogyuun doesn't appear to require fancy mixing?
-UINT32 toaplan2_state::screen_update_toaplan2_dual(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 toaplan2_state::screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_vdp1)
 	{
@@ -292,7 +249,7 @@ UINT32 toaplan2_state::screen_update_toaplan2_dual(screen_device &screen, bitmap
 
 
 // renders to 2 bitmaps, and mixes output
-UINT32 toaplan2_state::screen_update_toaplan2_mixed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  bitmap.fill(0, cliprect);
 //  gp9001_custom_priority_bitmap->fill(0, cliprect);
@@ -390,6 +347,7 @@ UINT32 toaplan2_state::screen_update_toaplan2_mixed(screen_device &screen, bitma
 	return 0;
 }
 
+
 UINT32 toaplan2_state::screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_vdp0)
@@ -402,55 +360,38 @@ UINT32 toaplan2_state::screen_update_toaplan2(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 toaplan2_state::screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+
+/* fixeightbl and bgareggabl do not use the lineselect or linescroll tables */
+UINT32 toaplan2_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_toaplan2(screen, bitmap, cliprect);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0);
 	return 0;
 }
 
 
-UINT32 toaplan2_state::screen_update_batrider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 toaplan2_state::screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_toaplan2(screen, bitmap, cliprect);
 
-	int line;
-	rectangle clip;
-	const rectangle &visarea = screen.visible_area();
+	rectangle clip = cliprect;
 
-	clip = visarea;
+	/* it seems likely that flipx can be set per line! */
+	/* however, none of the games does it, and emulating it in the */
+	/* MAME tilemap system without being ultra slow would be tricky */
+	m_tx_tilemap->set_flip(m_txvideoram16_offs[0] & 0x8000 ? 0 : TILEMAP_FLIPX);
 
-	/* used for 'for use in' and '8ing' screen on bbakraid, raizing on batrider */
-	for (line = 0; line < 256;line++)
+	/* line select is used for 'for use in' and '8ing' screen on bbakraid, 'Raizing' logo on batrider */
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		if (m_tx_flip)
-		{
-			clip.min_y = clip.max_y = 256 - line;
-			m_tx_tilemap->set_scrolly(0, 256 - line + m_txvideoram16_offs[256 - line]);
-		}
-		else
-		{
-			clip.min_y = clip.max_y = line;
-			m_tx_tilemap->set_scrolly(0,     - line + m_txvideoram16_offs[      line]);
-		}
-		m_tx_tilemap->draw(screen, bitmap, clip, 0, 0);
+		clip.min_y = clip.max_y = y;
+		m_tx_tilemap->set_scrolly(0, m_txvideoram16_offs[y] - y);
+		m_tx_tilemap->draw(screen, bitmap, clip, 0);
 	}
 	return 0;
 }
 
 
-
-UINT32 toaplan2_state::screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	screen_update_toaplan2_dual(screen, bitmap, cliprect);
-	return 0;
-}
-
-UINT32 toaplan2_state::screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	screen_update_toaplan2_mixed(screen, bitmap, cliprect);
-	return 0;
-}
 
 void toaplan2_state::screen_eof_toaplan2(screen_device &screen, bool state)
 {

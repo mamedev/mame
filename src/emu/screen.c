@@ -1371,7 +1371,7 @@ crt_monitor::crt_monitor(void)
 	set_param(m_param);
 	m_horz_pixel = 0;
 	m_vert_pixel = 0;
-	resize(288*11/8 * 3, 288*11/8 * 3 / 4 * 3);
+//	resize(288*11/8 * 3, 288*11/8 * 3 / 4 * 3);
 
 }
 

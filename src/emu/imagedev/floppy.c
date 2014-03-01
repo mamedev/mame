@@ -557,16 +557,18 @@ int floppy_image_device::find_index(UINT32 position, const UINT32 *buf, int buf_
 UINT32 floppy_image_device::find_position(attotime &base, attotime when)
 {
 	base = revolution_start_time;
-	UINT32 revc = revolution_count;
 	attotime delta = when - base;
 
 	while(delta >= rev_time) {
 		delta -= rev_time;
 		base += rev_time;
-		revc++;
+	}
+	while(delta < attotime::zero) {
+		delta += rev_time;
+		base -= rev_time;
 	}
 
-	return (delta*rpm/300.).as_ticks(1000000000);
+	return (delta*rpm/300.0).as_ticks(1000000000);
 }
 
 attotime floppy_image_device::get_next_transition(attotime from_when)
@@ -647,6 +649,7 @@ void floppy_image_device::write_flux(attotime start, attotime end, int transitio
 			write_zone(buf, cells, index, pos, next_pos, cur_mg);
 		else {
 			write_zone(buf, cells, index, pos, 200000000, cur_mg);
+			index = 0;
 			write_zone(buf, cells, index, 0, next_pos, cur_mg);
 		}
 		pos = next_pos;

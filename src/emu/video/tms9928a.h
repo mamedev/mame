@@ -118,6 +118,7 @@ private:
 	void check_interrupt();
 	void update_backdrop();
 	void update_table_masks();
+	void set_palette();
 
 	static const device_timer_id TIMER_LINE = 0;
 
