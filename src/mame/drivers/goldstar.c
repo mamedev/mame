@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xfd00, 0xfdff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xfd00, 0xfdff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
@@ -7438,8 +7438,11 @@ ROM_END
 	Super Nove by Playmark
 */
 ROM_START( super9 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "27e010.30",       0x0000, 0x20000, CRC(1aaea8d3) SHA1(71395a6d74a7cd55606daa57d17ff4628aa5f577) )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27e010.30",       0x0000, 0x10000, CRC(1aaea8d3) SHA1(71395a6d74a7cd55606daa57d17ff4628aa5f577) )
+	ROM_IGNORE(                          0x10000)	/* Discarding 2nd half */
+//	ROM_LOAD( "27e010.30",       0x0000, 0x10000, CRC(1aaea8d3) SHA1(71395a6d74a7cd55606daa57d17ff4628aa5f577) )
+//	ROM_CONTINUE(                0x0000, 0x10000)	/* Discarding 1st half */
 		
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "nearcpu.bin",      0x00000, 0x20000, CRC(643cff6f) SHA1(305ca9182c3f6d69e09be38b854b3d7bdfa75439) )
