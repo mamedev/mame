@@ -277,6 +277,7 @@ static MACHINE_CONFIG_START( momoko, momoko_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", momoko)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

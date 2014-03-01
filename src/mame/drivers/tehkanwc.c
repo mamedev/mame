@@ -670,6 +670,7 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", tehkanwc)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

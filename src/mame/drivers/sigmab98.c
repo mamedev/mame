@@ -1703,6 +1703,7 @@ static MACHINE_CONFIG_START( gegege, sigmab98_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", sigmab98)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1744,7 +1745,7 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", sigmab98)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -258,6 +258,7 @@ static MACHINE_CONFIG_START( speedbal, speedbal_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", speedbal)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

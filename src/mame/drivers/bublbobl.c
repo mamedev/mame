@@ -773,6 +773,7 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", bublbobl)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -854,6 +855,7 @@ static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", bublbobl)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

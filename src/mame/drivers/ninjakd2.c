@@ -950,6 +950,7 @@ static MACHINE_CONFIG_START( ninjakd2, ninjakd2_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", ninjakd2)
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1009,6 +1010,7 @@ static MACHINE_CONFIG_DERIVED( robokid, mnight )
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 0x400)  // RAM is this large, but still only 0x300 colors used
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,robokid)
 	MCFG_SCREEN_MODIFY("screen")
