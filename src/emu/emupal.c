@@ -374,12 +374,8 @@ void palette_device::device_start()
 			m_paletteram.set(*share, bytes_per_entry / 2);
 			m_paletteram_ext.set(*share_ext, bytes_per_entry / 2);
 		}
-
-		// look for an extension entry
-		if (share_ext != NULL)
-			m_paletteram_ext.set(*share_ext, m_raw_to_rgb.bytes_per_entry());
 	}
-    
+
 	// reset all our data
 	screen_device *device = machine().first_screen();
 	m_format = (device != NULL) ? device->format() : BITMAP_FORMAT_INVALID;
