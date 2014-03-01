@@ -14,11 +14,11 @@
 // ----------------------------------------------------------------------------------------
 
 #define QBJT_SW(_name, _model)                                           \
-        NET_REGISTER_DEV(QBJT_switch, _name)                                    \
+        NET_REGISTER_DEV(QBJT_switch, _name)                             \
         NETDEV_PARAMI(_name,  model,   _model)
 
 #define QBJT_EB(_name, _model)                                           \
-        NET_REGISTER_DEV(QBJT_EB, _name)                                        \
+        NET_REGISTER_DEV(QBJT_EB, _name)                                 \
         NETDEV_PARAMI(_name,  model,   _model)
 
 
@@ -167,8 +167,10 @@ public:
 
     NETLIB_UPDATE_TERMINALS()
     {
-        m_gD_BE.update_diode(-m_D_EB.deltaV());
-        m_gD_BC.update_diode(-m_D_CB.deltaV());
+        double polarity = (qtype() == BJT_NPN ? 1.0 : -1.0);
+
+        m_gD_BE.update_diode(-m_D_EB.deltaV() * polarity);
+        m_gD_BC.update_diode(-m_D_CB.deltaV() * polarity);
 
         double gee = m_gD_BE.G();
         double gcc = m_gD_BC.G();
@@ -176,8 +178,8 @@ public:
         double gce =  m_alpha_f * gee;
         double sIe = -m_gD_BE.I() + m_alpha_r * m_gD_BC.I();
         double sIc = m_alpha_f * m_gD_BE.I() - m_gD_BC.I();
-        double Ie = sIe + gee * m_gD_BE.Vd() - gec * m_gD_BC.Vd();
-        double Ic = sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd();
+        double Ie = (sIe + gee * m_gD_BE.Vd() - gec * m_gD_BC.Vd()) * polarity;
+        double Ic = (sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd()) * polarity;
         //double Ie = sIe + gee * -m_D_EB.deltaV() - gec * -m_D_CB.deltaV();
         //double Ic = sIc - gce * -m_D_EB.deltaV() + gcc * -m_D_CB.deltaV();
         //printf("EB %f sIe %f sIc %f\n", m_D_BE.deltaV(), sIe, sIc);
