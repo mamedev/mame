@@ -528,6 +528,11 @@ void ui_menubar::draw_child_menu(menu_item *menu, float x, float y)
 	for (int i = 0; i < ARRAY_LENGTH(max_widths); i++)
 		max_width += max_widths[i];
 
+	// are we going to go over the right of the screen?
+	float right = x + max_width + (spacing * 3);
+	if (right > 1.0f)
+		x = MAX(0.0f, x - (right - 1.0f));
+
 	// draw the menu outline
 	machine().ui().draw_outlined_box(
 		container(),
@@ -538,7 +543,6 @@ void ui_menubar::draw_child_menu(menu_item *menu, float x, float y)
 		adjust_color(UI_BACKGROUND_COLOR));
 
 	// draw the individual items
-	float mx = x;
 	float my = y;
 	for(menu_item *mi = menu->child(); mi != NULL; mi = mi->next())
 	{
@@ -546,9 +550,9 @@ void ui_menubar::draw_child_menu(menu_item *menu, float x, float y)
 		{
 			// draw separator
 			container()->add_line(
-				mx,
+				x,
 				my + spacing + separator_height / 2,
-				mx + max_width + (spacing * 2),
+				x + max_width + (spacing * 2),
 				my + spacing + separator_height / 2,
 				separator_height / 8,
 				adjust_color(UI_BORDER_COLOR),
@@ -559,21 +563,29 @@ void ui_menubar::draw_child_menu(menu_item *menu, float x, float y)
 			// draw normal text
 			draw_menu_item_text(
 				mi,
-				mx + spacing,
+				x + spacing,
 				my + spacing,
-				mx + spacing + max_width,
+				x + spacing + max_width,
 				my + spacing + text_height,
 				true,
 				max_widths);
+		}
 
-			// child menu open?
-			if (is_child_menu_visible(mi))
-			{
-				draw_child_menu(
-					mi,
-					x + max_width + (spacing * 2),
-					my);
-			}
+		// move down...
+		my += (mi->is_separator() ? separator_height : text_height);
+	}
+
+	// draw child menus
+	my = y;
+	for(menu_item *mi = menu->child(); mi != NULL; mi = mi->next())
+	{
+		// child menu open?
+		if (!mi->is_separator() && is_child_menu_visible(mi))
+		{
+			draw_child_menu(
+				mi,
+				x + max_width + (spacing * 2),
+				my);
 		}
 
 		// move down...
