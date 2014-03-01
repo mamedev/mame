@@ -191,7 +191,8 @@ public:
 			m_v9938_1(*this, "v9938_1"),
 			m_microtouch(*this, "microtouch") ,
 			m_uart(*this, "ns16550"),
-			m_maincpu(*this, "maincpu") { }
+			m_maincpu(*this, "maincpu"),
+			m_palette(*this, "v9938_0:palette") { }
 
 	UINT8* m_ram;
 	required_device<z80pio_device> m_z80pio_0;
@@ -244,6 +245,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(meritm_vdp0_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(meritm_vdp1_interrupt);
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 
@@ -1119,8 +1121,7 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, 262*2)
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(meritm_state, screen_update_meritm)
-
-	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_SCREEN_PALETTE("v9938_0:palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
