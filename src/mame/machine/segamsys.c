@@ -1000,8 +1000,8 @@ static void end_of_frame(screen_device &screen, struct sms_vdp *chip)
 	UINT8 m5 = chip->is_pal;
 	chip->screen_mode = m1|(m2<<1)|(m3<<2)|(m4<<3)|(m5<<4);
 
-	rectangle visarea((256-160)/2, (256-160)/2+160-1, (192-144)/2, (192-144)/2+144-1);
-	screen.configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
+	rectangle visarea(0, 256-1, 0, sms_mode_table[chip->screen_mode].sms2_height-1);
+	if (chip->chip_id==3) screen.configure(256, 256, visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 
 //  printf("Mode: %s is ok\n", sms_mode_table[chip->screen_mode].sms2_name);
 
