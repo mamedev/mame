@@ -3572,6 +3572,7 @@ DRIVER_INIT_MEMBER(dec8_state,ghostb)
 
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
+	m_palette->update();
 }
 
 DRIVER_INIT_MEMBER(dec8_state,meikyuh)
@@ -3584,6 +3585,7 @@ DRIVER_INIT_MEMBER(dec8_state,meikyuh)
 
 	membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
+	m_palette->update();
 }
 
 DRIVER_INIT_MEMBER(dec8_state,csilver)

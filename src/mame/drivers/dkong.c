@@ -3230,6 +3230,7 @@ DRIVER_INIT_MEMBER(dkong_state,dkingjr)
 	{
 		prom[i]^=0xff; // invert color data
 	}
+	m_palette->update();
 }
 
 

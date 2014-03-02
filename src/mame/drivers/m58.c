@@ -441,6 +441,7 @@ DRIVER_INIT_MEMBER(m58_state,yard85)
 		buffer[i] = region[0x20f-i];
 	}
 	memcpy(region+0x200, buffer, 0x10);
+	m_palette->update();
 }
 
 GAME( 1983, 10yard,   0,        yard,     yard, driver_device,     0, ROT0, "Irem", "10-Yard Fight (World, set 1)", GAME_SUPPORTS_SAVE ) // no copyright

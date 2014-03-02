@@ -10169,6 +10169,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, bchancep)
 	{
 		ROM[i] = ROM[i] ^ 0x0f;
 	}
+	m_palette->update();
 }
 
 

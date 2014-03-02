@@ -1469,6 +1469,7 @@ DRIVER_INIT_MEMBER(trackfld_state,mastkin)
 		else
 			prom[i + 0x20] = (i + i / 16) & 0x0f;
 	}
+	m_palette->update();
 }
 
 DRIVER_INIT_MEMBER(trackfld_state,wizzquiz)
