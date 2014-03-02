@@ -272,6 +272,9 @@ void ui_emu_menubar::build_options_menu()
 
 	// throttle
 	float throttle_rates[] = { 10.0f, 5.0f, 2.0f, 1.0f, 0.5f, 0.2f, 0.1f, 0.0f };
+	float current_throttle_rate = machine().video().throttled()
+		? machine().video().throttle_rate()
+		: 0.0f;
 	menu_item &throttle_menu = options_menu.append("Throttle");
 	for (int i = 0; i < ARRAY_LENGTH(throttle_rates); i++)
 	{
@@ -283,7 +286,7 @@ void ui_emu_menubar::build_options_menu()
 		}
 
 		menu_item &menu = throttle_menu.append(item, &ui_emu_menubar::set_throttle_rate, *this, throttle_rates[i]);
-		menu.set_checked(machine().video().throttle_rate() == throttle_rates[i]);
+		menu.set_checked(current_throttle_rate == throttle_rates[i]);
 	}
 
 	// frame skip
