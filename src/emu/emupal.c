@@ -440,8 +440,8 @@ void palette_device::device_start()
 	// save indirection tables if explicitly requested
 	if (m_indirect_entries > 0)
 	{
-		save_item(NAME(m_indirect_entries));
-		save_item(NAME(m_entries));
+		save_item(NAME(m_indirect_colors));
+		save_item(NAME(m_indirect_pens));
 	}
 }
 
