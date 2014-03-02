@@ -86,4 +86,8 @@
 
 #include "nld_legacy.h"
 
+NETLIST_EXTERN(diode_models);
+NETLIST_EXTERN(bjt_models);
+
+
 #endif

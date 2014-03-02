@@ -49,9 +49,13 @@
 
 #define NETLIST_NAME(_name) netlist ## _ ## _name
 
+#define NETLIST_EXTERN(_name)                                                       \
+ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &setup)
+
 #define NETLIST_START(_name)                                                        \
 ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &setup)                          \
 {
+
 
 #define NETLIST_END()  }
 
