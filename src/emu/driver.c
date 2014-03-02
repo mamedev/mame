@@ -226,7 +226,16 @@ void driver_device::device_start()
 
 	// call the game-specific init
 	if (m_system->driver_init != NULL)
+	{
 		(*m_system->driver_init)(machine());
+
+		// update palettes to allow changes in driver_init
+		palette_device_iterator pal_deviter(*this);
+		for (palette_device *palette = pal_deviter.first(); palette != NULL; palette = pal_deviter.next())
+		{
+			palette->update();
+		}
+	}
 
 	// finish image devices init process
 	image_postdevice_init(machine());

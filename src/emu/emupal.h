@@ -388,6 +388,8 @@ public:
 	void palette_init_BBBBBGGGGGRRRRR(palette_device &palette);
 	void palette_init_RRRRRGGGGGGBBBBB(palette_device &palette);
 	
+	// helper to update palette when data changed
+	void update() { if (!m_init.isnull()) m_init(*this); }
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
