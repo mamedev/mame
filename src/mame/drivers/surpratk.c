@@ -29,9 +29,9 @@ READ8_MEMBER(surpratk_state::bankedram_r)
 	if (m_videobank & 0x02)
 	{
 		if (m_videobank & 0x04)
-			return m_generic_paletteram_8[offset + 0x0800];
+			return m_paletteram[offset + 0x0800];
 		else
-			return m_generic_paletteram_8[offset];
+			return m_paletteram[offset];
 	}
 	else if (m_videobank & 0x01)
 		return m_k053244->k053245_r(space, offset);
@@ -178,8 +178,10 @@ void surpratk_state::machine_start()
 	membank("bank1")->configure_entries(28, 4, &ROM[0x08000], 0x2000);
 	membank("bank1")->set_entry(0);
 
-	m_generic_paletteram_8.allocate(0x1000);
+	m_paletteram.resize(0x1000);
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
 
+	save_item(NAME(m_paletteram));
 	save_item(NAME(m_videobank));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));

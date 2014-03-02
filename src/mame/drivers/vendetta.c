@@ -156,7 +156,7 @@ void vendetta_state::vendetta_video_banking( int select )
 		space.install_read_bank(m_video_banking_base + 0x2000, m_video_banking_base + 0x2fff, "bank4" );
 		space.install_write_handler(m_video_banking_base + 0x2000, m_video_banking_base + 0x2fff, write8_delegate(FUNC(palette_device::write), m_palette.target()) );
 		space.install_readwrite_handler(m_video_banking_base + 0x0000, m_video_banking_base + 0x0fff, read8_delegate(FUNC(k053247_device::k053247_r), (k053247_device*)m_k053246), write8_delegate(FUNC(k053247_device::k053247_w), (k053247_device*)m_k053246) );
-		membank("bank4")->set_base(m_generic_paletteram_8);
+		membank("bank4")->set_base(m_paletteram);
 	}
 	else
 	{
@@ -449,8 +449,10 @@ void vendetta_state::machine_start()
 	membank("bank1")->configure_entries(0, 28, &ROM[0x10000], 0x2000);
 	membank("bank1")->set_entry(0);
 
-	m_generic_paletteram_8.allocate(0x1000);
-
+	m_paletteram.resize(0x1000);
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
+	
+	save_item(NAME(m_paletteram));
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));

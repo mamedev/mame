@@ -35,7 +35,7 @@ READ8_MEMBER(spy_state::spy_bankedram1_r)
 {
 	if (m_rambank & 1)
 	{
-		return m_generic_paletteram_8[offset];
+		return m_paletteram[offset];
 	}
 	else if (m_rambank & 2)
 	{
@@ -496,9 +496,12 @@ void spy_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
 
-	m_generic_paletteram_8.allocate(0x800);
+	m_paletteram.resize(0x800);
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
+	
 	memset(m_pmcram, 0, sizeof(m_pmcram));
 
+	save_item(NAME(m_paletteram));
 	save_item(NAME(m_rambank));
 	save_item(NAME(m_pmcbank));
 	save_item(NAME(m_video_enable));
