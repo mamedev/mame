@@ -146,7 +146,7 @@
 #define PALETTE_FORMAT_RRRGGGBB raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 5,2,0>)
 
 // standard 2-2-2-2 formats
-#define PALETTE_FORMAT_BBGGRRII raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_irgb_decoder<2,2,2,2, 0,2,4,6>)
+#define PALETTE_FORMAT_BBGGRRII raw_to_rgb_converter(1, &raw_to_rgb_converter::BBGGRRII_decoder)
 
 // standard 4-4-4 formats
 #define PALETTE_FORMAT_xxxxBBBBGGGGRRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 0,4,8>)
@@ -299,6 +299,15 @@ public:
 		UINT8 r = (i * palexpand<_RedBits>(raw >> _RedShift)) >> 8;
 		UINT8 g = (i * palexpand<_GreenBits>(raw >> _GreenShift)) >> 8;
 		UINT8 b = (i * palexpand<_BlueBits>(raw >> _BlueShift)) >> 8;
+		return rgb_t(r, g, b);
+	}
+
+	static rgb_t BBGGRRII_decoder(UINT32 raw)
+	{
+		UINT8 i = (raw >> 0) & 3;
+		UINT8 r = pal4bit(((raw >> 0) & 0x0c) | i);
+		UINT8 g = pal4bit(((raw >> 2) & 0x0c) | i);
+		UINT8 b = pal4bit(((raw >> 4) & 0x0c) | i);
 		return rgb_t(r, g, b);
 	}
 	
