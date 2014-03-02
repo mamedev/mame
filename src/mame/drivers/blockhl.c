@@ -188,6 +188,7 @@ void blockhl_state::machine_start()
 	m_paletteram.resize(m_palette->entries() * 2);
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
 	
+	save_item(NAME(m_paletteram));
 	save_item(NAME(m_palette_selected));
 	save_item(NAME(m_rombank));
 }

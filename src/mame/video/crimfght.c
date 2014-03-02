@@ -64,6 +64,8 @@ void crimfght_state::video_start()
 	m_layer_colorbase[1] = 4;
 	m_layer_colorbase[2] = 8;
 	m_sprite_colorbase = 16;
+	
+	save_item(NAME(m_paletteram));
 }
 
 

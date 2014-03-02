@@ -23,6 +23,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_ram;
+	dynamic_array<UINT8> m_paletteram;
 
 	/* video-related */
 	int        m_layer_colorbase[3];
