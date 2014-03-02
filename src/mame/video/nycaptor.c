@@ -67,13 +67,12 @@ void nycaptor_state::video_start()
 	m_bg_tilemap->set_transmask(1, 0xfe00, 0x01ff);//split 1
 	m_bg_tilemap->set_transmask(2, 0xfffc, 0x0003);//split 2
 	m_bg_tilemap->set_transmask(3, 0xfff0, 0x000f);//split 3
+	m_bg_tilemap->set_scroll_cols(32);
 
 	m_paletteram.resize(m_palette->entries());
 	m_paletteram_ext.resize(m_palette->entries());
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_LITTLE, 1);
 	m_palette->extmem().set(m_paletteram_ext, ENDIANNESS_LITTLE, 1);
-
-	m_bg_tilemap->set_scroll_cols(32);
 
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_paletteram_ext));
@@ -106,9 +105,6 @@ READ8_MEMBER(nycaptor_state::nycaptor_palette_r)
 
 WRITE8_MEMBER(nycaptor_state::nycaptor_gfxctrl_w)
 {
-	if (m_gfxctrl == data)
-		return;
-
 	m_gfxctrl = data;
 
 	if (m_char_bank != ((data & 0x18) >> 3))

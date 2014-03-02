@@ -41,11 +41,6 @@ READ8_MEMBER(xxmissio_state::xxmissio_bgram_r)
 	return m_bgram[offset];
 }
 
-WRITE8_MEMBER(xxmissio_state::xxmissio_paletteram_w)
-{
-	m_palette->write(space,offset,data);
-}
-
 /****************************************************************************/
 
 TILE_GET_INFO_MEMBER(xxmissio_state::get_bg_tile_info)
