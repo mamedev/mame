@@ -215,8 +215,10 @@ void netlist_mame_stream_input_t::custom_netlist_additions(netlist_setup_t &setu
 
     pstring sparam = pstring::sprintf("STREAM_INPUT.CHAN%d", m_channel);
     setup.register_param(sparam, m_param_name);
-    pstring mparam = pstring::sprintf("STREAM_INPUT.MULT%d", m_channel);
-    setup.register_param(mparam, m_mult);
+    sparam = pstring::sprintf("STREAM_INPUT.MULT%d", m_channel);
+    setup.register_param(sparam, m_mult);
+    sparam = pstring::sprintf("STREAM_INPUT.OFFSET%d", m_channel);
+    setup.register_param(sparam, m_offset);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -253,6 +255,7 @@ void netlist_mame_stream_output_t::custom_netlist_additions(netlist_setup_t &set
 
     setup.register_param(sname + ".CHAN" , m_channel);
     setup.register_param(sname + ".MULT",  m_mult);
+    setup.register_param(sname + ".OFFSET",  m_offset);
     setup.register_link(sname + ".IN", m_out_name);
 }
 

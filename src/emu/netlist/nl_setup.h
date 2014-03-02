@@ -38,14 +38,8 @@
 #define NET_CONNECT(_name, _input, _output)                                         \
 		setup.register_link(# _name "." # _input, # _output);
 
-#if 0
-#define NET_C(_term1, _term2, term...)                                                      \
-		setup.register_link(NET_STR(_term1) , NET_STR(_term2));
-#endif
-
-#define NET_C(_term1, _terms...)                                                      \
+#define NET_C(_term1, _terms...)                                                    \
         setup.register_link_arr( #_term1 ", " # _terms);
-
 
 #define PARAM(_name, _val)                                                          \
 		setup.register_param(# _name, _val);
