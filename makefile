@@ -276,6 +276,11 @@ BUILD_MIDILIB = 1
 # sanity check the configuration
 #-------------------------------------------------
 
+# enable symbols as it is useless without them
+ifdef SANITIZE
+SYMBOLS = 1
+endif
+
 # specify a default optimization level if none explicitly stated
 ifndef OPTIMIZE
 ifndef SYMBOLS
@@ -292,6 +297,7 @@ PROFILER = 1
 endif
 endif
 
+# TODO: also move it up, so it isn't optimized by default?
 # allow gprof profiling as well, which overrides the internal PROFILER
 # also enable symbols as it is useless without them
 ifdef PROFILE
@@ -300,11 +306,6 @@ SYMBOLS = 1
 ifndef SYMLEVEL
 SYMLEVEL = 1
 endif
-endif
-
-# enable symbols as it is useless without them
-ifdef SANITIZE
-SYMBOLS = 1
 endif
 
 # set the symbols level
