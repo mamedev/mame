@@ -515,6 +515,7 @@ ifneq ($(filter A2BUS,$(BUSES)),)
 BUSOBJS += $(BUSOBJ)/a2bus/a2bus.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2lang.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2diskii.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2diskiing.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2mockingboard.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2cffa.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2memexp.o
@@ -537,6 +538,7 @@ BUSOBJS += $(BUSOBJ)/a2bus/a2zipdrive.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2applicard.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2hsscsi.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2ultraterm.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2pic.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2estd80col.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2eext80col.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2eramworks3.o
