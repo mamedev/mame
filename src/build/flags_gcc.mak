@@ -1,11 +1,6 @@
 # TODO: needs to use $(CC)
 TEST_GCC := $(shell gcc --version)
 
-ifeq ($(findstring 4.4.,$(TEST_GCC)),)
-	#if we use new tools
-	LDFLAGS += -static-libstdc++
-endif
-
 ifeq ($(findstring 4.7.,$(TEST_GCC)),4.7.)
 	CCOMFLAGS += -Wno-narrowing -Wno-attributes
 endif
