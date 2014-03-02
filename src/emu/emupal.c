@@ -96,10 +96,12 @@ void palette_device::static_enable_hilights(device_t &device)
 
 void palette_device::set_indirect_color(int index, rgb_t rgb)
 {
-	// ensure the array is expanded enough to handle the index, then set it
+	// if we have a static size, make sure we're in range
 	assert(m_indirect_entries == 0 || index < m_indirect_entries);
-	if (m_indirect_entries == 0)
-		m_indirect_colors.resize_keep_and_clear_new(((index + 1 + 255) / 256) * 256);
+
+	// otherwise, ensure the array is expanded enough to handle the index
+	while (m_indirect_colors.count() <= index)
+		m_indirect_colors.append(rgb_t(0));
 
 	// alpha doesn't matter
 	rgb.set_a(255);
@@ -110,8 +112,8 @@ void palette_device::set_indirect_color(int index, rgb_t rgb)
 		m_indirect_colors[index] = rgb;
 
 		// update the palette for any colortable entries that reference it
-		for (UINT32 pen = 0; pen < m_indirect_entry.count(); pen++)
-			if (m_indirect_entry[pen] == index)
+		for (UINT32 pen = 0; pen < m_indirect_pens.count(); pen++)
+			if (m_indirect_pens[pen] == index)
 				m_palette->entry_set_color(pen, rgb);
 	}
 }
@@ -126,8 +128,8 @@ void palette_device::set_pen_indirect(pen_t pen, UINT16 index)
 	assert(pen < m_entries);
 
 	// allocate the array if needed
-	m_indirect_entry.resize(m_entries);
-	m_indirect_entry[pen] = index;
+	m_indirect_pens.resize(m_entries);
+	m_indirect_pens[pen] = index;
 
 	// permit drivers to configure the pens prior to the colors if they desire
 	if (index < m_indirect_colors.count())
@@ -146,16 +148,16 @@ UINT32 palette_device::transpen_mask(gfx_element &gfx, int color, int transcolor
 	UINT32 entry = gfx.colorbase() + (color % gfx.colors()) * gfx.granularity();
 
 	// make sure we are in range
-	assert(entry < m_indirect_entry.count());
+	assert(entry < m_indirect_pens.count());
 	assert(gfx.depth() <= 32);
 
 	// either gfx->color_depth entries or as many as we can get up until the end
-	int count = MIN(gfx.depth(), m_indirect_entry.count() - entry);
+	int count = MIN(gfx.depth(), m_indirect_pens.count() - entry);
 
 	// set a bit anywhere the transcolor matches
 	UINT32 mask = 0;
 	for (int bit = 0; bit < count; bit++)
-		if (m_indirect_entry[entry++] == transcolor)
+		if (m_indirect_pens[entry++] == transcolor)
 			mask |= 1 << bit;
 
 	// return the final mask
@@ -416,9 +418,12 @@ void palette_device::device_start()
 		if (m_indirect_entries > 0)
 		{
 			m_indirect_colors.resize(m_indirect_entries);
-			m_indirect_entry.resize(m_entries);
+			for (int color = 0; color < m_indirect_entries; color++)
+				m_indirect_colors[color] = rgb_t(0);
+
+			m_indirect_pens.resize(m_entries);
 			for (int pen = 0; pen < m_entries; pen++)
-				m_indirect_entry[pen] = pen % m_indirect_entries;
+				m_indirect_pens[pen] = pen % m_indirect_entries;
 		}
 	}
 

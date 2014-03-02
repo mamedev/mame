@@ -337,7 +337,7 @@ public:
 	
 	// getters
 	int entries() const { return m_entries; }
-	int indirect_entries() const { return m_indirect_entry.count(); }
+	int indirect_entries() const { return m_indirect_colors.count(); }
 	palette_t *palette() const { return m_palette; }
 	const pen_t &pen(int index) const { return m_pens[index]; }
 	const pen_t *pens() const { return m_pens; }
@@ -358,7 +358,7 @@ public:
 	void set_pen_contrast(pen_t pen, double bright) { m_palette->entry_set_contrast(pen, bright); }
 
 	// indirection (aka colortables)
-	UINT16 pen_indirect(int index) const { return m_indirect_entry[index]; }
+	UINT16 pen_indirect(int index) const { return m_indirect_pens[index]; }
 	rgb_t indirect_color(int index) const { return m_indirect_colors[index]; }
 	void set_indirect_color(int index, rgb_t rgb);
 	void set_pen_indirect(pen_t pen, UINT16 index);
@@ -432,7 +432,7 @@ private:
 	
 	// indirection state
 	dynamic_array<rgb_t> m_indirect_colors;		// actual colors set for indirection
-	dynamic_array<UINT16> m_indirect_entry;		// indirection values
+	dynamic_array<UINT16> m_indirect_pens;		// indirection values
 
 	struct shadow_table_data
 	{
