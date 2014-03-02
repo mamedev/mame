@@ -14,26 +14,11 @@
 #include "sound/sn76496.h"
 #include "machine/mc8123.h"
 #include "machine/segacrpt.h"
-#include "includes/segamsys.h"
-#include "drivlgcy.h"
-#include "scrlegcy.h"
-#include "mcfglgcy.h"
+#include "includes/megadriv.h"
 
-
-//static UINT8* sms_rom;
-UINT8* sms_mainram;
-UINT8* smsgg_backupram = 0;
-static TIMER_CALLBACK( sms_scanline_timer_callback );
-static struct sms_vdp *vdp1;
-
-static struct sms_vdp *md_sms_vdp;
 
 /* All Accesses to VRAM go through here for safety */
 #define SMS_VDP_VRAM(address) chip->vram[(address)&0x3fff]
-
-ADDRESS_MAP_START( sms_io_map, AS_IO, 8, driver_device )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
 
 /* Precalculated tables for H/V counters.  Note the position the counter 'jumps' is marked with with
    an empty comment */
@@ -257,12 +242,12 @@ enum
 	GEN_VDP = 3   // Genesis VDP running in SMS2 Mode
 };
 
-static int sms_vdp_null_irq_callback(running_machine &machine, int status)
+int segamsys_state::sms_vdp_null_irq_callback(running_machine &machine, int status)
 {
 	return -1;
 }
 
-static int sms_vdp_cpu1_irq_callback(running_machine &machine, int status)
+int segamsys_state::sms_vdp_cpu1_irq_callback(running_machine &machine, int status)
 {
 	if (status == 1)
 		machine.device("genesis_snd_z80")->execute().set_input_line(0, HOLD_LINE);
@@ -273,7 +258,7 @@ static int sms_vdp_cpu1_irq_callback(running_machine &machine, int status)
 }
 
 
-static int sms_vdp_cpu2_irq_callback(running_machine &machine, int status)
+int segamsys_state::sms_vdp_cpu2_irq_callback(running_machine &machine, int status)
 {
 	if (status == 1)
 		machine.device("mtbios")->execute().set_input_line(0, HOLD_LINE);
@@ -284,62 +269,15 @@ static int sms_vdp_cpu2_irq_callback(running_machine &machine, int status)
 }
 
 
-
-
-struct sms_vdp
-{
-	UINT8 chip_id;
-
-	UINT8  cmd_pend;
-	UINT8  cmd_part1;
-	UINT8  cmd_part2;
-	UINT16 addr_reg;
-	UINT8  cmd_reg;
-	UINT8  regs[0x10];
-	UINT8  readbuf;
-	UINT8* vram;
-	UINT8* cram;
-	UINT8  writemode;
-	bitmap_rgb32* r_bitmap;
-	UINT8* tile_renderline;
-	UINT8* sprite_renderline;
-
-	UINT8 sprite_collision;
-	UINT8 sprite_overflow;
-
-	UINT8  yscroll;
-	UINT8  hint_counter;
-
-	UINT8 frame_irq_pending;
-	UINT8 line_irq_pending;
-
-	UINT8 vdp_type;
-
-	UINT8 gg_cram_latch; // gamegear specific.
-
-	/* below are MAME specific, to make things easier */
-	UINT8 screen_mode;
-	UINT8 is_pal;
-	int sms_scanline_counter;
-	int sms_total_scanlines;
-	int sms_framerate;
-	emu_timer* sms_scanline_timer;
-	UINT32* cram_mamecolours; // for use on RGB_DIRECT screen
-	int  (*set_irq)(running_machine &machine, int state);
-
-};
-
-
-
-static void *start_vdp(running_machine &machine, int type)
+void *segamsys_state::start_vdp(int type)
 {
 	struct sms_vdp *chip;
 
-	chip = auto_alloc_clear(machine, struct sms_vdp);
+	chip = auto_alloc_clear(machine(), struct sms_vdp);
 
 	chip->vdp_type = type;
 
-	chip->set_irq = sms_vdp_null_irq_callback;
+	chip->set_irq = segamsys_state::sms_vdp_null_irq_callback;
 
 	chip->cmd_pend = 0;
 	chip->cmd_part1 = 0;
@@ -360,35 +298,35 @@ static void *start_vdp(running_machine &machine, int type)
 	chip->regs[0xa] = 0;
 	/* b-f don't matter */
 	chip->readbuf = 0;
-	chip->vram = auto_alloc_array_clear(machine, UINT8, 0x4000);
+	chip->vram = auto_alloc_array_clear(machine(), UINT8, 0x4000);
 
 	//printf("%d\n", (*chip->set_irq)(machine, 200));
 
-	chip->cram = auto_alloc_array_clear(machine, UINT8, 0x0020);
-	chip->cram_mamecolours = auto_alloc_array(machine, UINT32, 0x0040/2);
+	chip->cram = auto_alloc_array_clear(machine(), UINT8, 0x0020);
+	chip->cram_mamecolours = auto_alloc_array(machine(), UINT32, 0x0040/2);
 
-	chip->tile_renderline = auto_alloc_array(machine, UINT8, 256+8);
+	chip->tile_renderline = auto_alloc_array(machine(), UINT8, 256+8);
 	memset(chip->tile_renderline,0x00,256+8);
 
-	chip->sprite_renderline = auto_alloc_array(machine, UINT8, 256+32);
+	chip->sprite_renderline = auto_alloc_array(machine(), UINT8, 256+32);
 	memset(chip->sprite_renderline,0x00,256+32);
 
 	chip->writemode = 0;
-	chip->r_bitmap = auto_bitmap_rgb32_alloc(machine, 256, 256);
+	chip->r_bitmap = auto_bitmap_rgb32_alloc(machine(), 256, 256);
 
-	chip->sms_scanline_timer = machine.scheduler().timer_alloc(FUNC(sms_scanline_timer_callback), chip);
+	chip->sms_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segamsys_state::sms_scanline_timer_callback),this), chip);
 
 	return chip;
 }
 
 /* stop timer and clear ram.. used on megatech when we switch between genesis and sms mode */
-void segae_md_sms_stop_scanline_timer(void)
+void segamsys_state::segae_md_sms_stop_scanline_timer()
 {
 	md_sms_vdp->sms_scanline_timer->adjust(attotime::never);
 	memset(md_sms_vdp->vram,0x00,0x4000);
 }
 
-static UINT8 vcounter_r(struct sms_vdp *chip)
+UINT8 segamsys_state::vcounter_r(struct sms_vdp *chip)
 {
 //  return vc_pal_224[sms_scanline_counter%(sizeof vc_pal_224)];
 	UINT8 retvalue;
@@ -401,7 +339,7 @@ static UINT8 vcounter_r(struct sms_vdp *chip)
 }
 
 
-static UINT8 vdp_data_r(struct sms_vdp *chip)
+UINT8 segamsys_state::vdp_data_r(struct sms_vdp *chip)
 {
 	UINT8 retdata = chip->readbuf;
 	chip->readbuf = SMS_VDP_VRAM(chip->addr_reg);
@@ -409,7 +347,7 @@ static UINT8 vdp_data_r(struct sms_vdp *chip)
 	return retdata;
 }
 
-static void vdp_data_w(address_space &space, UINT8 data, struct sms_vdp* chip)
+void segamsys_state::vdp_data_w(address_space &space, UINT8 data, struct sms_vdp* chip)
 {
 	/* data writes clear the pending flag */
 	chip->cmd_pend = 0;
@@ -442,7 +380,7 @@ static void vdp_data_w(address_space &space, UINT8 data, struct sms_vdp* chip)
 
 }
 
-static UINT8 vdp_ctrl_r(address_space &space, struct sms_vdp *chip)
+UINT8 segamsys_state::vdp_ctrl_r(address_space &space, struct sms_vdp *chip)
 {
 	UINT8 retvalue;
 
@@ -456,20 +394,20 @@ static UINT8 vdp_ctrl_r(address_space &space, struct sms_vdp *chip)
 	chip->sprite_collision = 0;
 	chip->sprite_overflow = 0;
 
-	(chip->set_irq)(space.machine(), 0); // clear IRQ;
+	(chip->set_irq)(machine(), 0); // clear IRQ;
 
 
 	return retvalue;
 }
 
 /* check me */
-static void vdp_update_code_addr_regs(struct sms_vdp *chip)
+void segamsys_state::vdp_update_code_addr_regs(struct sms_vdp *chip)
 {
 	chip->addr_reg = ((chip->cmd_part2&0x3f)<<8) | chip->cmd_part1;
 	chip->cmd_reg = (chip->cmd_part2&0xc0)>>6;
 }
 
-static void vdp_set_register(running_machine &machine, struct sms_vdp *chip)
+void segamsys_state::vdp_set_register(struct sms_vdp *chip)
 {
 	UINT8 reg = chip->cmd_part2&0x0f;
 	chip->regs[reg] = chip->cmd_part1;
@@ -482,11 +420,11 @@ static void vdp_set_register(running_machine &machine, struct sms_vdp *chip)
 	{
 		if ((chip->regs[0x1]&0x20) && chip->frame_irq_pending)
 		{
-			(chip->set_irq)(machine, 1); // set IRQ;
+			(chip->set_irq)(machine(), 1); // set IRQ;
 		}
 		else
 		{
-			(chip->set_irq)(machine, 0); // clear IRQ;
+			(chip->set_irq)(machine(), 0); // clear IRQ;
 		}
 	}
 
@@ -494,11 +432,11 @@ static void vdp_set_register(running_machine &machine, struct sms_vdp *chip)
 	{
 		if ((chip->regs[0x0]&0x10) && chip->line_irq_pending)
 		{
-			(chip->set_irq)(machine, 1); // set IRQ;
+			(chip->set_irq)(machine(), 1); // set IRQ;
 		}
 		else
 		{
-			(chip->set_irq)(machine, 0); // clear IRQ;
+			(chip->set_irq)(machine(), 0); // clear IRQ;
 		}
 	}
 
@@ -506,7 +444,7 @@ static void vdp_set_register(running_machine &machine, struct sms_vdp *chip)
 //  printf("VDP: setting register %01x to %02x\n",reg, chip->cmd_part1);
 }
 
-static void vdp_ctrl_w(address_space &space, UINT8 data, struct sms_vdp *chip)
+void segamsys_state::vdp_ctrl_w(address_space &space, UINT8 data, struct sms_vdp *chip)
 {
 	if (chip->cmd_pend)
 	{ /* Part 2 of a command word write */
@@ -527,7 +465,7 @@ static void vdp_ctrl_w(address_space &space, UINT8 data, struct sms_vdp *chip)
 				break;
 
 			case 0x2: /* REG setting */
-				vdp_set_register(space.machine(), chip);
+				vdp_set_register(chip);
 				chip->writemode = 0;
 				break;
 
@@ -546,27 +484,27 @@ static void vdp_ctrl_w(address_space &space, UINT8 data, struct sms_vdp *chip)
 
 /* for the Genesis */
 
-READ8_HANDLER( md_sms_vdp_vcounter_r )
+READ8_MEMBER(segamsys_state::md_sms_vdp_vcounter_r )
 {
 	return vcounter_r(md_sms_vdp);
 }
 
-READ8_HANDLER( md_sms_vdp_data_r )
+READ8_MEMBER(segamsys_state::md_sms_vdp_data_r )
 {
 	return vdp_data_r(md_sms_vdp);
 }
 
-WRITE8_HANDLER( md_sms_vdp_data_w )
+WRITE8_MEMBER(segamsys_state::md_sms_vdp_data_w )
 {
 	vdp_data_w(space, data, md_sms_vdp);
 }
 
-READ8_HANDLER( md_sms_vdp_ctrl_r )
+READ8_MEMBER(segamsys_state::md_sms_vdp_ctrl_r )
 {
 	return vdp_ctrl_r(space, md_sms_vdp);
 }
 
-WRITE8_HANDLER( md_sms_vdp_ctrl_w )
+WRITE8_MEMBER(segamsys_state::md_sms_vdp_ctrl_w )
 {
 	vdp_ctrl_w(space, data, md_sms_vdp);
 }
@@ -574,32 +512,32 @@ WRITE8_HANDLER( md_sms_vdp_ctrl_w )
 
 /* Read / Write Handlers - call other functions */
 
-READ8_HANDLER( sms_vcounter_r )
+READ8_MEMBER(segamsys_state::sms_vcounter_r )
 {
 	return vcounter_r(vdp1);
 }
 
-READ8_HANDLER( sms_vdp_data_r )
+READ8_MEMBER(segamsys_state::sms_vdp_data_r )
 {
 	return vdp_data_r(vdp1);
 }
 
-WRITE8_HANDLER( sms_vdp_data_w )
+WRITE8_MEMBER(segamsys_state::sms_vdp_data_w )
 {
 	vdp_data_w(space, data, vdp1);
 }
 
-READ8_HANDLER( sms_vdp_ctrl_r )
+READ8_MEMBER(segamsys_state::sms_vdp_ctrl_r )
 {
 	return vdp_ctrl_r(space, vdp1);
 }
 
-WRITE8_HANDLER( sms_vdp_ctrl_w )
+WRITE8_MEMBER(segamsys_state::sms_vdp_ctrl_w )
 {
 	vdp_ctrl_w(space, data, vdp1);
 }
 
-static void draw_tile_line(int drawxpos, int tileline, UINT16 tiledata, UINT8* linebuf, struct sms_vdp* chip)
+void segamsys_state::draw_tile_line(int drawxpos, int tileline, UINT16 tiledata, UINT8* linebuf, struct sms_vdp* chip)
 {
 	int xx;
 	UINT32 gfxdata;
@@ -653,7 +591,7 @@ static void draw_tile_line(int drawxpos, int tileline, UINT16 tiledata, UINT8* l
 	}
 }
 
-static void sms_render_spriteline(int scanline, struct sms_vdp* chip)
+void segamsys_state::sms_render_spriteline(int scanline, struct sms_vdp* chip)
 {
 	int spritenum;
 	int height = 8;
@@ -774,7 +712,7 @@ static void sms_render_spriteline(int scanline, struct sms_vdp* chip)
 	}
 }
 
-static void sms_render_tileline(int scanline, struct sms_vdp* chip)
+void segamsys_state::sms_render_tileline(int scanline, struct sms_vdp* chip)
 {
 	int column = 0;
 	int count = 32;
@@ -827,7 +765,7 @@ static void sms_render_tileline(int scanline, struct sms_vdp* chip)
 
 }
 
-static void sms_copy_to_renderbuffer(int scanline, struct sms_vdp* chip)
+void segamsys_state::sms_copy_to_renderbuffer(int scanline, struct sms_vdp* chip)
 {
 	int x;
 	UINT32* lineptr = &chip->r_bitmap->pix32(scanline);
@@ -868,7 +806,7 @@ static void sms_copy_to_renderbuffer(int scanline, struct sms_vdp* chip)
 
 }
 
-static void sms_draw_scanline(int scanline, struct sms_vdp* chip)
+void segamsys_state::sms_draw_scanline(int scanline, struct sms_vdp* chip)
 {
 	if (scanline>=0 && scanline<sms_mode_table[chip->screen_mode].sms2_height)
 	{
@@ -880,7 +818,7 @@ static void sms_draw_scanline(int scanline, struct sms_vdp* chip)
 }
 
 
-static TIMER_CALLBACK( sms_scanline_timer_callback )
+TIMER_CALLBACK_MEMBER( segamsys_state::sms_scanline_timer_callback )
 {
 	/* This function is called at the very start of every scanline starting at the very
 	   top-left of the screen.  The first scanline is scanline 0 (we set scanline to -1 in
@@ -924,11 +862,11 @@ static TIMER_CALLBACK( sms_scanline_timer_callback )
 				chip->hint_counter=chip->regs[0xa];
 				if (chip->regs[0x0]&0x10)
 				{
-					(chip->set_irq)(machine, 1); // set IRQ;
+					(chip->set_irq)(machine(), 1); // set IRQ;
 				}
 				else
 				{
-					(chip->set_irq)(machine, 0); // clear IRQ;
+					(chip->set_irq)(machine(), 0); // clear IRQ;
 				}
 			}
 
@@ -944,11 +882,11 @@ static TIMER_CALLBACK( sms_scanline_timer_callback )
 			chip->frame_irq_pending = 1;
 			if (chip->regs[0x1]&0x20)
 			{
-				(chip->set_irq)(machine, 1); // set IRQ;
+				(chip->set_irq)(machine(), 1); // set IRQ;
 			}
 			else
 			{
-				(chip->set_irq)(machine, 0); // clear IRQ;
+				(chip->set_irq)(machine(), 0); // clear IRQ;
 			}
 		}
 	}
@@ -991,7 +929,7 @@ static TIMER_CALLBACK( sms_scanline_timer_callback )
 	Even though some games set bit 7, it does nothing.
 	*/
 
-static void end_of_frame(screen_device &screen, struct sms_vdp *chip)
+void segamsys_state::end_of_frame(screen_device &screen, struct sms_vdp *chip)
 {
 	UINT8 m1 = (chip->regs[0x1]&0x10)>>4;
 	UINT8 m2 = (chip->regs[0x0]&0x02)>>1;
@@ -1011,35 +949,32 @@ static void end_of_frame(screen_device &screen, struct sms_vdp *chip)
 }
 
 
-UINT8* vdp1_vram_bank0;
-UINT8* vdp1_vram_bank1;
-
-MACHINE_RESET(megatech_md_sms)
+MACHINE_RESET_MEMBER(segamsys_state,megatech_md_sms)
 {
 	md_sms_vdp->sms_scanline_timer->adjust(attotime::zero);
 }
 
-MACHINE_RESET(megatech_bios)
+MACHINE_RESET_MEMBER(segamsys_state,megatech_bios)
 {
 	vdp1->sms_scanline_timer->adjust(attotime::zero);
 }
 
 
-SCREEN_VBLANK(megatech_md_sms)
+void segamsys_state::screen_eof_megatech_md_sms(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 		end_of_frame(screen, md_sms_vdp);
 }
 
-SCREEN_VBLANK(megatech_bios)
+void segamsys_state::screen_eof_megatech_bios(screen_device &screen, bool state)
 {
 	// rising edge
-	if (vblank_on)
+	if (state)
 		end_of_frame(screen, vdp1);
 }
 
-SCREEN_UPDATE_RGB32(megatech_md_sms)
+UINT32 segamsys_state::screen_update_megatech_md_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 
@@ -1058,7 +993,7 @@ SCREEN_UPDATE_RGB32(megatech_md_sms)
 }
 
 
-SCREEN_UPDATE_RGB32(megatech_bios)
+UINT32 segamsys_state::screen_update_megatech_bios(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 
@@ -1076,7 +1011,7 @@ SCREEN_UPDATE_RGB32(megatech_bios)
 	return 0;
 }
 
-SCREEN_UPDATE_RGB32(megaplay_bios)
+UINT32 segamsys_state::screen_update_megaplay_bios(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 
@@ -1098,10 +1033,10 @@ SCREEN_UPDATE_RGB32(megaplay_bios)
 }
 
 
-void init_for_megadrive(running_machine &machine)
+void segamsys_state::init_for_megadrive()
 {
-	md_sms_vdp = (struct sms_vdp *)start_vdp(machine, GEN_VDP);
-	md_sms_vdp->set_irq = sms_vdp_cpu1_irq_callback;
+	md_sms_vdp = (struct sms_vdp *)start_vdp(GEN_VDP);
+	md_sms_vdp->set_irq = segamsys_state::sms_vdp_cpu1_irq_callback;
 	md_sms_vdp->is_pal = 0;
 	md_sms_vdp->sms_total_scanlines = 262;
 	md_sms_vdp->sms_framerate = 60;
@@ -1110,17 +1045,17 @@ void init_for_megadrive(running_machine &machine)
 
 
 
-void init_megatech_bios(running_machine &machine)
+void segamsys_state::init_megatech_bios()
 {
-	vdp1 = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
-	vdp1->set_irq = sms_vdp_cpu2_irq_callback;
+	vdp1 = (struct sms_vdp *)start_vdp(SMS2_VDP);
+	vdp1->set_irq = segamsys_state::sms_vdp_cpu2_irq_callback;
 	vdp1->is_pal = 0;
 	vdp1->sms_total_scanlines = 262;
 	vdp1->sms_framerate = 60;
 	vdp1->chip_id = 1;
 
 	vdp1_vram_bank0 = vdp1->vram;
-	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
+	vdp1_vram_bank1 = auto_alloc_array(machine(), UINT8, 0x4000);
 
 	smsgg_backupram = 0;
 }
@@ -1132,61 +1067,57 @@ void init_megatech_bios(running_machine &machine)
 
 */
 
-static READ8_HANDLER( z80_unmapped_port_r )
+READ8_MEMBER( segamsys_state::sms_z80_unmapped_port_r )
 {
 //  printf("unmapped z80 port read %04x\n",offset);
 	return 0;
 }
 
-static WRITE8_HANDLER( z80_unmapped_port_w )
+WRITE8_MEMBER( segamsys_state::sms_z80_unmapped_port_w )
 {
 //  printf("unmapped z80 port write %04x\n",offset);
 }
 
-static READ8_HANDLER( z80_unmapped_r )
+READ8_MEMBER( segamsys_state::sms_z80_unmapped_r )
 {
 	printf("unmapped z80 read %04x\n",offset);
 	return 0;
 }
 
-static WRITE8_HANDLER( z80_unmapped_w )
+WRITE8_MEMBER( segamsys_state::sms_z80_unmapped_w )
 {
 	printf("unmapped z80 write %04x\n",offset);
 }
 
-static UINT8* sms_rom;
-
 
 /* the SMS inputs should be more complex, like the megadrive ones */
-READ8_HANDLER (megatech_sms_ioport_dc_r)
+READ8_MEMBER (segamsys_state::megatech_sms_ioport_dc_r)
 {
-	running_machine &machine = space.machine();
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 4: TL-A; bit 5: TR-A */
-	return (machine.root_device().ioport("PAD1")->read() & 0x3f) | ((machine.root_device().ioport("PAD2")->read() & 0x03) << 6);
+	return (machine().root_device().ioport("PAD1")->read() & 0x3f) | ((machine().root_device().ioport("PAD2")->read() & 0x03) << 6);
 }
 
-READ8_HANDLER (megatech_sms_ioport_dd_r)
+READ8_MEMBER (segamsys_state::megatech_sms_ioport_dd_r)
 {
-	running_machine &machine = space.machine();
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
-	return ((machine.root_device().ioport("PAD2")->read() & 0x3c) >> 2) | 0x10;
+	return ((machine().root_device().ioport("PAD2")->read() & 0x3c) >> 2) | 0x10;
 }
 
 
-READ8_HANDLER( smsgg_backupram_r )
+READ8_MEMBER( segamsys_state::smsgg_backupram_r )
 {
 	return smsgg_backupram[offset];
 }
 
-WRITE8_HANDLER( smsgg_backupram_w )
+WRITE8_MEMBER( segamsys_state::smsgg_backupram_w )
 {
 	smsgg_backupram[offset] = data;
 }
 
 
-static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
+WRITE8_MEMBER( segamsys_state::mt_sms_standard_rom_bank_w )
 {
 	int bank = data&0x1f;
 	//logerror("bank w %02x %02x\n", offset, data);
@@ -1198,7 +1129,7 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 			logerror("bank w %02x %02x\n", offset, data);
 			if ((data & 0x08) && smsgg_backupram)
 			{
-				space.install_legacy_readwrite_handler(0x8000, 0x9fff, FUNC(smsgg_backupram_r), FUNC(smsgg_backupram_w));
+				space.install_readwrite_handler(0x8000, 0x9fff, read8_delegate(FUNC(segamsys_state::smsgg_backupram_r),this), write8_delegate(FUNC(segamsys_state::smsgg_backupram_w),this));
 			}
 			else
 			{
@@ -1221,75 +1152,75 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 	}
 }
 
-static WRITE8_HANDLER( codemasters_rom_bank_0000_w )
+WRITE8_MEMBER( segamsys_state::codemasters_rom_bank_0000_w )
 {
 	int bank = data&0x1f;
 	memcpy(sms_rom+0x0000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
-static WRITE8_HANDLER( codemasters_rom_bank_4000_w )
+WRITE8_MEMBER( segamsys_state::codemasters_rom_bank_4000_w )
 {
 	int bank = data&0x1f;
 	memcpy(sms_rom+0x4000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
-static WRITE8_HANDLER( codemasters_rom_bank_8000_w )
+WRITE8_MEMBER( segamsys_state::codemasters_rom_bank_8000_w )
 {
 	int bank = data&0x1f;
 	memcpy(sms_rom+0x8000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 
-static void megatech_set_genz80_as_sms_standard_ports(running_machine &machine, const char* tag)
+void segamsys_state::megatech_set_genz80_as_sms_standard_ports(const char* tag)
 {
 	/* INIT THE PORTS *********************************************************************************************/
 
-	address_space &io = machine.device(tag)->memory().space(AS_IO);
-	sn76496_base_device *sn = machine.device<sn76496_base_device>("snsnd");
+	address_space &io = machine().device(tag)->memory().space(AS_IO);
+	sn76496_base_device *sn = machine().device<sn76496_base_device>("snsnd");
 
-	io.install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_port_r), FUNC(z80_unmapped_port_w));
+	io.install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(segamsys_state::z80_unmapped_port_r),this), write8_delegate(FUNC(segamsys_state::sms_z80_unmapped_port_w),this));
 
-	io.install_legacy_read_handler      (0x7e, 0x7e, FUNC(md_sms_vdp_vcounter_r));
+	io.install_read_handler      (0x7e, 0x7e, read8_delegate(FUNC(segamsys_state::md_sms_vdp_vcounter_r),this));
 	io.install_write_handler            (0x7e, 0x7f, write8_delegate(FUNC(sn76496_device::write),sn));
-	io.install_legacy_readwrite_handler (0xbe, 0xbe, FUNC(md_sms_vdp_data_r), FUNC(md_sms_vdp_data_w));
-	io.install_legacy_readwrite_handler (0xbf, 0xbf, FUNC(md_sms_vdp_ctrl_r), FUNC(md_sms_vdp_ctrl_w));
+	io.install_readwrite_handler (0xbe, 0xbe, read8_delegate(FUNC(segamsys_state::md_sms_vdp_data_r),this), write8_delegate(FUNC(segamsys_state::md_sms_vdp_data_w),this));
+	io.install_readwrite_handler (0xbf, 0xbf, read8_delegate(FUNC(segamsys_state::md_sms_vdp_ctrl_r),this), write8_delegate(FUNC(segamsys_state::md_sms_vdp_ctrl_w),this));
 
-	io.install_legacy_read_handler      (0x10, 0x10, FUNC(megatech_sms_ioport_dd_r)); // super tetris
+	io.install_read_handler      (0x10, 0x10, read8_delegate(FUNC(segamsys_state::megatech_sms_ioport_dd_r),this)); // super tetris
 
-	io.install_legacy_read_handler      (0xdc, 0xdc, FUNC(megatech_sms_ioport_dc_r));
-	io.install_legacy_read_handler      (0xdd, 0xdd, FUNC(megatech_sms_ioport_dd_r));
-	io.install_legacy_read_handler      (0xde, 0xde, FUNC(megatech_sms_ioport_dd_r));
-	io.install_legacy_read_handler      (0xdf, 0xdf, FUNC(megatech_sms_ioport_dd_r)); // adams family
+	io.install_read_handler      (0xdc, 0xdc, read8_delegate(FUNC(segamsys_state::megatech_sms_ioport_dc_r),this));
+	io.install_read_handler      (0xdd, 0xdd, read8_delegate(FUNC(segamsys_state::megatech_sms_ioport_dd_r),this));
+	io.install_read_handler      (0xde, 0xde, read8_delegate(FUNC(segamsys_state::megatech_sms_ioport_dd_r),this));
+	io.install_read_handler      (0xdf, 0xdf, read8_delegate(FUNC(segamsys_state::megatech_sms_ioport_dd_r),this)); // adams family
 }
 
-void megatech_set_genz80_as_sms_standard_map(running_machine &machine, const char* tag, int mapper)
+void segamsys_state::megatech_set_genz80_as_sms_standard_map(const char* tag, int mapper)
 {
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
 
-	/* catch any addresses that don't get mapped */
-	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_r), FUNC(z80_unmapped_w));
+	/* catch any addresses that don't get mapped */	
+	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(segamsys_state::z80_unmapped_r),this), write8_delegate(FUNC(segamsys_state::z80_unmapped_w),this));
 
 	/* main ram area */
-	sms_mainram = (UINT8 *)machine.device(tag)->memory().space(AS_PROGRAM).install_ram(0xc000, 0xdfff, 0, 0x2000);
+	sms_mainram = (UINT8 *)machine().device(tag)->memory().space(AS_PROGRAM).install_ram(0xc000, 0xdfff, 0, 0x2000);
 	memset(sms_mainram,0x00,0x2000);
 
-	megatech_set_genz80_as_sms_standard_ports(machine,  tag);
+	megatech_set_genz80_as_sms_standard_ports(tag);
 
 	/* fixed rom bank area */
-	sms_rom = (UINT8 *)machine.device(tag)->memory().space(AS_PROGRAM).install_rom(0x0000, 0xbfff, NULL);
+	sms_rom = (UINT8 *)machine().device(tag)->memory().space(AS_PROGRAM).install_rom(0x0000, 0xbfff, NULL);
 
-	memcpy(sms_rom, machine.root_device().memregion("maincpu")->base(), 0xc000);
+	memcpy(sms_rom, machine().root_device().memregion("maincpu")->base(), 0xc000);
 
 	if (mapper == MAPPER_STANDARD )
 	{
-		machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_write_handler(0xfffc, 0xffff, FUNC(mt_sms_standard_rom_bank_w));
+		machine().device(tag)->memory().space(AS_PROGRAM).install_write_handler(0xfffc, 0xffff, write8_delegate(FUNC(segamsys_state::mt_sms_standard_rom_bank_w),this));
 
 	}
 	else if (mapper == MAPPER_CODEMASTERS )
 	{
-		machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x0000, 0x0000, FUNC(codemasters_rom_bank_0000_w));
-		machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x4000, 0x4000, FUNC(codemasters_rom_bank_4000_w));
-		machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x8000, 0x8000, FUNC(codemasters_rom_bank_8000_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0000, 0x0000, write8_delegate(FUNC(segamsys_state::codemasters_rom_bank_0000_w),this));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(segamsys_state::codemasters_rom_bank_4000_w),this));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x8000, 0x8000, write8_delegate(FUNC(segamsys_state::codemasters_rom_bank_8000_w),this));
 	}
 //  smsgg_backupram = NULL;
 }

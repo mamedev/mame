@@ -73,11 +73,8 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 #include "sound/sn76496.h"
 #include "rendlay.h"
 
-#include "includes/segamsys.h"
 #include "includes/megadriv.h"
 #include "imagedev/cartslot.h"
-
-#include "scrlegcy.h"
 
 #define MASTER_CLOCK        53693100
 
@@ -245,7 +242,7 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_run_state )
 	{
 		printf("enabling SMS Z80\n");
 		m_current_game_is_sms = 1;
-		megatech_set_genz80_as_sms_standard_map(machine(), "genesis_snd_z80", MAPPER_STANDARD);
+		megatech_set_genz80_as_sms_standard_map("genesis_snd_z80", MAPPER_STANDARD);
 		//m_z80snd->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		m_z80snd->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
@@ -415,7 +412,7 @@ static ADDRESS_MAP_START( megatech_bios_portmap, AS_IO, 8, mtech_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x3f, 0x3f) AM_WRITE(megatech_bios_port_ctrl_w)
 
-	AM_RANGE(0x7f, 0x7f) AM_READ_LEGACY(sms_vcounter_r) AM_WRITE(megatech_bios_port_7f_w)
+	AM_RANGE(0x7f, 0x7f) AM_READWRITE(sms_vcounter_r, megatech_bios_port_7f_w)
 	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE( "vdp1", sega315_5124_device, vram_read, vram_write )
 	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE( "vdp1", sega315_5124_device, register_read, register_write )
 
@@ -444,7 +441,7 @@ DRIVER_INIT_MEMBER(mtech_state,mt_crt)
 
 VIDEO_START_MEMBER(mtech_state,mtnew)
 {
-	init_for_megadrive(machine()); // create an sms vdp too, for compatibility mode
+	init_for_megadrive(); // create an sms vdp too, for compatibility mode
 	VIDEO_START_CALL_MEMBER(megadriv);
 }
 
@@ -455,17 +452,16 @@ UINT32 mtech_state::screen_update_mtnew(screen_device &screen, bitmap_rgb32 &bit
 	if (!m_current_game_is_sms)
 		screen_update_megadriv(screen, bitmap, cliprect);
 	else
-		SCREEN_UPDATE32_CALL(megatech_md_sms);
+		screen_update_megatech_md_sms(screen, bitmap, cliprect);
 	return 0;
 }
 
 void mtech_state::screen_eof_mtnew(screen_device &screen, bool state)
 {
-	bool vblank_on = state;
 	if (!m_current_game_is_sms)
 		screen_eof_megadriv(screen, state);
 	else
-		SCREEN_VBLANK_CALL(megatech_md_sms);
+		screen_eof_megatech_md_sms(screen, state);
 }
 
 MACHINE_RESET_MEMBER(mtech_state,mtnew)
@@ -473,7 +469,7 @@ MACHINE_RESET_MEMBER(mtech_state,mtnew)
 	m_mt_bank_addr = 0;
 
 	MACHINE_RESET_CALL_MEMBER(megadriv);
-	MACHINE_RESET_CALL_LEGACY(megatech_md_sms);
+	MACHINE_RESET_CALL_MEMBER(megatech_md_sms);
 	megatech_select_game(0);
 }
 

@@ -5343,7 +5343,6 @@ src/mame/includes/segag80r.h svneol=native#text/plain
 src/mame/includes/segag80v.h svneol=native#text/plain
 src/mame/includes/segahang.h svneol=native#text/plain
 src/mame/includes/segaipt.h svneol=native#text/plain
-src/mame/includes/segamsys.h svneol=native#text/plain
 src/mame/includes/segaorun.h svneol=native#text/plain
 src/mame/includes/segas16a.h svneol=native#text/plain
 src/mame/includes/segas16b.h svneol=native#text/plain

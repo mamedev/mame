@@ -19,12 +19,8 @@
 
 #define SCREEN_UPDATE32_CALL(name)      SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
 
-#define SCREEN_VBLANK_CALL(name)        SCREEN_VBLANK_NAME(name)(NULL, screen, vblank_on)
-
 #define MCFG_SCREEN_UPDATE_STATIC(_func) \
 	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func));
-#define MCFG_SCREEN_VBLANK_STATIC(_func) \
-	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&screen_vblank_##_func, "screen_vblank_" #_func));
 
 
 //**************************************************************************
