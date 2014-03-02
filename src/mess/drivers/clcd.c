@@ -783,6 +783,7 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(clcd_state, hprot1)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
