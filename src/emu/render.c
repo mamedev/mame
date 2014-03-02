@@ -53,9 +53,6 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define MINIMUM_TARGET_WIDTH	320
-#define MINIMUM_TARGET_HEIGHT	240
-
 #define INTERNAL_FLAG_CHAR      0x00000001
 
 enum
@@ -1242,8 +1239,11 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 					? rectangle(0, 639, 0, 479)	// use a hard-coded default visible area for vector screens
 					: screen->visible_area();
 
-				// we want to bump up the visible area so that we have a more usable menubar
-				INT32 factor = (INT32) ceil(MAX((float)MINIMUM_TARGET_WIDTH / visarea.width(), (float)MINIMUM_TARGET_HEIGHT / visarea.height()));
+				// is our visible area too small?  if so, we need to bump up the size
+				float minimum_width = m_manager.machine().options().minimum_width();
+				float minimum_height = m_manager.machine().options().minimum_height();
+				INT32 factor = (INT32) ceil(MAX(minimum_width / visarea.width(), minimum_height / visarea.height()));
+				factor = MAX(factor, 1);
 				visarea.min_x *= factor;
 				visarea.min_y *= factor;
 				visarea.max_x *= factor;
