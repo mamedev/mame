@@ -515,7 +515,6 @@ ifneq ($(filter A2BUS,$(BUSES)),)
 BUSOBJS += $(BUSOBJ)/a2bus/a2bus.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2lang.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2diskii.o
-BUSOBJS += $(BUSOBJ)/a2bus/a2diskiing.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2mockingboard.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2cffa.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2memexp.o
