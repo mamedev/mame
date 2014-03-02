@@ -267,6 +267,20 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 	}
 }
 
+void netlist_setup_t::register_link_arr(const pstring &terms)
+{
+    nl_util::pstring_list list = nl_util::split(terms,", ");
+    if (list.count() < 2)
+        netlist().error("You must pass at least 2 terminals to NET_C");
+    pstring last = list[0];
+    for (int i = 1; i < list.count(); i++)
+    {
+        register_link(last, list[i]);
+        last = list[i];
+    }
+}
+
+
 void netlist_setup_t::register_link(const pstring &sin, const pstring &sout)
 {
 	link_t temp = link_t(build_fqn(sin), build_fqn(sout));

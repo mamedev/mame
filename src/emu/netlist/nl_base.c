@@ -528,6 +528,20 @@ ATTR_COLD void netlist_net_t::init_object(netlist_base_t &nl, const pstring &ana
 	nl.m_nets.add(this);
 }
 
+ATTR_COLD void netlist_net_t::save_register()
+{
+    save(NAME(m_last.Analog));
+    save(NAME(m_cur.Analog));
+    save(NAME(m_new.Analog));
+    save(NAME(m_last.Q));
+    save(NAME(m_cur.Q));
+    save(NAME(m_new.Q));
+    save(NAME(m_time));
+    save(NAME(m_active));
+    save(NAME(m_in_queue));
+    netlist_object_t::save_register();
+}
+
 ATTR_COLD void netlist_net_t::register_railterminal(netlist_output_t &mr)
 {
 	assert(m_railterminal == NULL);
@@ -586,12 +600,12 @@ ATTR_HOT ATTR_ALIGN static void update_dev(const netlist_core_terminal_t *inp, c
 	}
 }
 
-ATTR_HOT ATTR_ALIGN void netlist_net_t::update_devs()
+ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
 {
 	assert(m_num_cons != 0);
 	assert(this->isRailNet());
 
-	static const UINT32 masks[4] = { 1, 5, 3, 1 };
+	const UINT32 masks[4] = { 1, 5, 3, 1 };
     const UINT32 mask = masks[ (m_last.Q  << 1) | m_new.Q ];
 
     m_in_queue = 2; /* mark as taken ... */

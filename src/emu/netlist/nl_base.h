@@ -654,19 +654,7 @@ public:
 
 protected:
 
-    ATTR_COLD virtual void save_register()
-    {
-        save(NAME(m_last.Analog));
-        save(NAME(m_cur.Analog));
-        save(NAME(m_new.Analog));
-        save(NAME(m_last.Q));
-        save(NAME(m_cur.Q));
-        save(NAME(m_new.Q));
-        save(NAME(m_time));
-        save(NAME(m_active));
-        save(NAME(m_in_queue));
-        netlist_object_t::save_register();
-    }
+    ATTR_COLD virtual void save_register();
     ATTR_COLD virtual void reset();
 
 
