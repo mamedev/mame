@@ -55,8 +55,6 @@ void aliens_sprite_callback( running_machine &machine, int *code, int *color, in
 
 void aliens_state::video_start()
 {
-	m_generic_paletteram_8.allocate(0x400);
-
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 4;
 	m_layer_colorbase[2] = 8;

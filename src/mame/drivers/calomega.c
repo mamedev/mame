@@ -3835,6 +3835,7 @@ DRIVER_INIT_MEMBER(calomega_state,standard)
 		if (BPR[x] == 0x07)
 			BPR[x] = 0x04;  /* blue background */
 	}
+	m_palette->update();
 }
 
 DRIVER_INIT_MEMBER(calomega_state,elgrande)
@@ -3848,6 +3849,7 @@ DRIVER_INIT_MEMBER(calomega_state,elgrande)
 		if (BPR[x] == 0x07)
 			BPR[x] = 0x00; /* black background */
 	}
+	m_palette->update();
 }
 
 DRIVER_INIT_MEMBER(calomega_state,jjpoker)
@@ -3861,6 +3863,7 @@ DRIVER_INIT_MEMBER(calomega_state,jjpoker)
 		if (BPR[x] == 0x02)
 			BPR[x] = 0x00;  /* black background */
 	}
+	m_palette->update();
 }
 
 DRIVER_INIT_MEMBER(calomega_state,comg080)
@@ -3874,7 +3877,8 @@ DRIVER_INIT_MEMBER(calomega_state,comg080)
 		if (BPR[x] == 0x07)
 			BPR[x] = 0x04;  /* blue background */
 	}
-
+	m_palette->update();
+	
 	/* Injecting missing Start and NMI vectors...
 	   Start = $2042;  NMI = $26f8;
 	   Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.

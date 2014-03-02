@@ -779,6 +779,7 @@ DRIVER_INIT_MEMBER(kingofb_state,ringking3)
 	/* expand the first color PROM to look like the kingofb ones... */
 	for (i = 0; i < 0x100; i++)
 		RAM[i] = RAM[i + 0x100] >> 4;
+	m_palette->update();
 }
 
 DRIVER_INIT_MEMBER(kingofb_state,ringkingw)
@@ -800,6 +801,7 @@ DRIVER_INIT_MEMBER(kingofb_state,ringkingw)
 			PROMS[j + 0x200 + 0x40 * k] = USER1[i + 0x800 + 0x100 * k]; /* B */
 		}
 	}
+	m_palette->update();
 }
 
 

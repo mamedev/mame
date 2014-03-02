@@ -481,7 +481,7 @@ static MACHINE_CONFIG_START( threeds, pastelg_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pastelg_state, screen_update_pastelg)
 
 	MCFG_PALETTE_ADD("palette", 32)
-
+	MCFG_PALETTE_INIT_OWNER(pastelg_state, pastelg)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

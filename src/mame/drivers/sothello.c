@@ -388,8 +388,7 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
 	MCFG_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
-
-	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_SCREEN_PALETTE("v9938:palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

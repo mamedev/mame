@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( lethalth_map, AS_PROGRAM, 16, m92_state )
 	AM_RANGE(0x80000, 0x8ffff) AM_RAM_WRITE(m92_vram_w) AM_SHARE("vram_data")
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w) AM_SHARE("palette")
+	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)
 	AM_RANGE(0xf9000, 0xf900f) AM_WRITE(m92_spritecontrol_w) AM_SHARE("spritecontrol")
 	AM_RANGE(0xf9800, 0xf9801) AM_WRITE(m92_videocontrol_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
@@ -356,7 +356,7 @@ static ADDRESS_MAP_START( m92_map, AS_PROGRAM, 16, m92_state )
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m92_vram_w) AM_SHARE("vram_data")
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w) AM_SHARE("palette")
+	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)
 	AM_RANGE(0xf9000, 0xf900f) AM_WRITE(m92_spritecontrol_w) AM_SHARE("spritecontrol")
 	AM_RANGE(0xf9800, 0xf9801) AM_WRITE(m92_videocontrol_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
@@ -997,38 +997,18 @@ static MACHINE_CONFIG_DERIVED( hook, m92 )
 	MCFG_V25_CONFIG(hook_decryption_table)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ppan, m92_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",V33,XTAL_18MHz/2)
-	MCFG_CPU_PROGRAM_MAP(m92_map)
+static MACHINE_CONFIG_DERIVED( ppan, m92 )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(ppan_portmap)
 
-	/* no Sound CPU */
+	MCFG_DEVICE_REMOVE("soundcpu")
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_DEVICE_REMOVE("irem")
 
-	MCFG_MACHINE_START_OVERRIDE(m92_state,m92)
-	MCFG_MACHINE_RESET_OVERRIDE(m92_state,m92)
-
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m92_state, m92_scanline_interrupt, "screen", 0, 1)
-
-	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram") // not really...
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(m92_state, screen_update_ppan)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", m92)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
 	MCFG_VIDEO_START_OVERRIDE(m92_state,ppan)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

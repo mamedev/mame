@@ -797,8 +797,7 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 	MCFG_SCREEN_UPDATE_DEVICE("v9938", v9938_device, screen_update)
 	MCFG_SCREEN_SIZE(544, 524)
 	MCFG_SCREEN_VISIBLE_AREA(0, 544 - 1, 0, 480 - 1)
-
-	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_SCREEN_PALETTE("v9938:palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

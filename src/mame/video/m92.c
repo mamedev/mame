@@ -133,7 +133,7 @@ WRITE16_MEMBER(m92_state::m92_videocontrol_w)
 
 READ16_MEMBER(m92_state::m92_paletteram_r)
 {
-	return m_palette->basemem().read16(offset + 0x400 * m_palette_bank);
+	return m_paletteram[offset + 0x400 * m_palette_bank];
 }
 
 WRITE16_MEMBER(m92_state::m92_paletteram_w)
@@ -283,7 +283,8 @@ VIDEO_START_MEMBER(m92_state,m92)
 		state_save_register_item_array(machine(), "layer", NULL, laynum, layer->control);
 	}
 
-	m_generic_paletteram_16.allocate(0x1000/2);
+	m_paletteram.resize(m_palette->entries());
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_LITTLE, 2);
 
 	memset(m_spriteram->live(),0,0x800);
 	memset(m_spriteram->buffer(),0,0x800);
@@ -294,6 +295,7 @@ VIDEO_START_MEMBER(m92_state,m92)
 	save_item(NAME(m_raster_irq_position));
 	save_item(NAME(m_sprite_buffer_busy));
 	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_paletteram));
 }
 
 VIDEO_START_MEMBER(m92_state,ppan)

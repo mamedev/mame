@@ -77,7 +77,7 @@ PALETTE_INIT_MEMBER(tceptor_state, tceptor)
 	/* tceptor2: only 0x23 */
 	memset(m_is_mask_spr, 0, sizeof m_is_mask_spr);
 	for (i = 0; i < 0x400; i++)
-		if (m_palette->pen_indirect(i | 0x400) == SPR_MASK_COLOR)
+		if (palette.pen_indirect(i | 0x400) == SPR_MASK_COLOR)
 			m_is_mask_spr[i >> 4] = 1;
 }
 
@@ -253,7 +253,7 @@ void tceptor_state::decode_bg(const char * region)
 	auto_free(machine(), buffer);
 
 	/* decode the graphics */
-	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), bg_layout, memregion(region)->base(), 64, 2048)));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), bg_layout, memregion(region)->base(), 64, 0x0a00)));
 }
 
 void tceptor_state::decode_sprite(int gfx_index, const gfx_layout *layout, const void *data)

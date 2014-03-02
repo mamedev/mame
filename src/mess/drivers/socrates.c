@@ -1410,7 +1410,7 @@ static MACHINE_CONFIG_START( socrates_pal, socrates_state )
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
 
 	MCFG_PALETTE_ADD("palette", 256)
-
+	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1455,6 +1455,7 @@ static MACHINE_CONFIG_START( iqunlimz, iqunlim_state )
 	MCFG_SCREEN_SIZE(256, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

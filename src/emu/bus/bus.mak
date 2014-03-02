@@ -537,6 +537,7 @@ BUSOBJS += $(BUSOBJ)/a2bus/a2zipdrive.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2applicard.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2hsscsi.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2ultraterm.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2pic.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2estd80col.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2eext80col.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2eramworks3.o

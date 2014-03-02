@@ -810,7 +810,7 @@ static ADDRESS_MAP_START( srdarwin_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(i8751_h_r, dec8_sound_w)  /* Sound */
 	AM_RANGE(0x2001, 0x2001) AM_READWRITE(i8751_l_r, flip_screen_w)     /* Flipscreen */
 	AM_RANGE(0x2800, 0x288f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x3000, 0x308f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette_ext")
+	AM_RANGE(0x3000, 0x308f) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")   /* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN0")    /* Player 1 */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN1")    /* Player 2 (cocktail) + VBL */
@@ -3572,6 +3572,7 @@ DRIVER_INIT_MEMBER(dec8_state,ghostb)
 
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
+	m_palette->update();
 }
 
 DRIVER_INIT_MEMBER(dec8_state,meikyuh)
@@ -3584,6 +3585,7 @@ DRIVER_INIT_MEMBER(dec8_state,meikyuh)
 
 	membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
+	m_palette->update();
 }
 
 DRIVER_INIT_MEMBER(dec8_state,csilver)

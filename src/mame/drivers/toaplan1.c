@@ -19,8 +19,9 @@ Supported games:
     hellfire1   B90         HellFire (1 Player version) Uses Taito rom ID number
     hellfire2a  B90         HellFire (2 Player older version) Uses Taito rom ID number
     hellfire1a  B90         HellFire (1 Player older version) Uses Taito rom ID number
-    zerowing    TP-O15      Zero Wing
-    zerowing2   TP-O15      Zero Wing (2 player simultaneous version, Williams Electronics Games, Inc)
+    zerowing    TP-O15      Zero Wing (2 player simultaneous version)
+    zerowing1   TP-O15      Zero Wing (1 Player version)
+    zerowingw   TP-O15      Zero Wing (2 player simultaneous version, Williams Electronics Games, Inc)
     demonwld    TP-O16      Demon's World/Horror Story [1990]
     demonwl1    TP-O16      Demon's World/Horror Story [1989] (Taito license)
     demonwl2    TP-O16      Demon's World/Horror Story [1989] (early edition)
@@ -2270,7 +2271,34 @@ ROM_START( hellfire1a )
 	ROM_LOAD( "12.6b",     0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* N82S123AN bprom -  ??? */
 ROM_END
 
-ROM_START( zerowing )
+ROM_START( zerowing ) /* 2 player simultaneous version */
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
+	ROM_LOAD16_BYTE( "o15-11ii.bin",  0x000000, 0x08000, CRC(e697ecb9) SHA1(444bf4c06844bd119cf152a35a5483e0f0dcecd4) )
+	ROM_LOAD16_BYTE( "o15-12ii.bin",  0x000001, 0x08000, CRC(b29ee3ad) SHA1(631695dfe5c2ee39effcfa4312ea6c14f7b7c302) )
+	ROM_LOAD16_BYTE( "o15-09.rom",    0x040000, 0x20000, CRC(13764e95) SHA1(61da49b73ba81edd951e96e9ce6673c1c3bd65f2) )
+	ROM_LOAD16_BYTE( "o15-10.rom",    0x040001, 0x20000, CRC(351ba71a) SHA1(937331549140506711b08252497cc0f2efa58268) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound Z80 code */
+	ROM_LOAD( "o15-13.rom",  0x0000, 0x8000, CRC(e7b72383) SHA1(ea1f6f33a86d14d58bd396fd46081462f00177d5) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "o15-05.rom",  0x00000, 0x20000, CRC(4e5dd246) SHA1(5366b4a6f3c900a4f57a6583b7399163a06f42d7) )
+	ROM_LOAD16_BYTE( "o15-06.rom",  0x00001, 0x20000, CRC(c8c6d428) SHA1(76ee5bcb8f10fe201fc5c32697beee3de9d8b751) )
+	ROM_LOAD16_BYTE( "o15-07.rom",  0x40000, 0x20000, CRC(efc40e99) SHA1(a04fad4197a7fb4787cd9bebf43e1d9b02b2f61b) )
+	ROM_LOAD16_BYTE( "o15-08.rom",  0x40001, 0x20000, CRC(1b019eab) SHA1(c9569ca85696825142acc5cde9ac829e82b1ca1b) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "o15-03.rom",  0x00000, 0x20000, CRC(7f245fd3) SHA1(efbcb3663d4accc4f8128a8fee5475bc109bc17a) )
+	ROM_LOAD16_BYTE( "o15-04.rom",  0x00001, 0x20000, CRC(0b1a1289) SHA1(ce6c06342392d11952873e3b1d6aea8dc02a551c) )
+	ROM_LOAD16_BYTE( "o15-01.rom",  0x40000, 0x20000, CRC(70570e43) SHA1(acc9baec71b0930cb2f193677e0663efa5d5551d) )
+	ROM_LOAD16_BYTE( "o15-02.rom",  0x40001, 0x20000, CRC(724b487f) SHA1(06af31520866eea69aebbd5d428f80e882289a15) )
+
+	ROM_REGION( 0x40, "proms", 0 )      /* nibble bproms, lo/hi order to be determined */
+	ROM_LOAD( "tp015_14.bpr",  0x00, 0x20, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )   /* sprite attribute (flip/position) ?? */
+	ROM_LOAD( "tp015_15.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
+ROM_END
+
+ROM_START( zerowing1 ) /* 1 player version */
 	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o15-11.rom",  0x000000, 0x08000, CRC(6ff2b9a0) SHA1(c9f2a631f185689dfc42a451d85fac23c2f4b64b) )
 	ROM_LOAD16_BYTE( "o15-12.rom",  0x000001, 0x08000, CRC(9773e60b) SHA1(b733e9d38a233d010cc5ea41e7e61695082c3a22) )
@@ -2297,7 +2325,7 @@ ROM_START( zerowing )
 	ROM_LOAD( "tp015_15.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
-ROM_START( zerowing2 ) /* 2 player simultaneous version */
+ROM_START( zerowingw ) /* 2 player simultaneous version (Williams Electronics) */
 	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o15-11iiw.bin",  0x000000, 0x08000, CRC(38b0bb5b) SHA1(e5a4c0b6c279a55701c82bf9e285a806054f8d23) )
 	ROM_LOAD16_BYTE( "o15-12iiw.bin",  0x000001, 0x08000, CRC(74c91e6f) SHA1(8cf5d10a5f4efda0903a4c5d56599861ccc8f1c1) )
@@ -2840,8 +2868,9 @@ GAME( 1989, hellfire,   0,        hellfire, hellfire,  toaplan1_state, toaplan1,
 GAME( 1989, hellfire1,  hellfire, hellfire, hellfire1, toaplan1_state, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P set)", 0 )
 GAME( 1989, hellfire2a, hellfire, hellfire, hellfire2a,toaplan1_state, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P set, older)", 0 )
 GAME( 1989, hellfire1a, hellfire, hellfire, hellfire1a,toaplan1_state, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P set, older)", 0 )
-GAME( 1989, zerowing,   0,        zerowing, zerowing,  toaplan1_state, toaplan1, ROT0,   "Toaplan", "Zero Wing (1P set)", 0 )
-GAME( 1989, zerowing2,  zerowing, zerowing, zerowing2, toaplan1_state, toaplan1, ROT0,   "Toaplan / Williams Electronics", "Zero Wing (2P set)", 0 )
+GAME( 1989, zerowing,   0,        zerowing, zerowing2, toaplan1_state, toaplan1, ROT0,   "Toaplan", "Zero Wing (2P set)", 0 )
+GAME( 1989, zerowing1,  zerowing, zerowing, zerowing,  toaplan1_state, toaplan1, ROT0,   "Toaplan", "Zero Wing (1P set)", 0 )
+GAME( 1989, zerowingw,  zerowing, zerowing, zerowing2, toaplan1_state, toaplan1, ROT0,   "Toaplan / Williams Electronics", "Zero Wing (2P set, Williams Electronics)", 0 )
 GAME( 1990, demonwld,   0,        demonwld, demonwld,  toaplan1_state, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 1)", 0 )
 GAME( 1989, demonwld1,  demonwld, demonwld, demonwld1, toaplan1_state, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 2)", 0 )
 GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, toaplan1_state, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 3)", 0 )

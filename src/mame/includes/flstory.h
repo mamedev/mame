@@ -25,10 +25,11 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
-	int      m_char_bank;
-	int      m_palette_bank;
-	int      m_flipscreen;
-	int      m_gfxctrl;
+	dynamic_array<UINT8> m_paletteram;
+	dynamic_array<UINT8> m_paletteram_ext;
+	UINT8    m_gfxctrl;
+	UINT8    m_char_bank;
+	UINT8    m_palette_bank;
 
 	/* sound-related */
 	UINT8    m_snd_data;
@@ -103,8 +104,6 @@ public:
 	DECLARE_WRITE8_MEMBER(flstory_videoram_w);
 	DECLARE_WRITE8_MEMBER(flstory_palette_w);
 	DECLARE_READ8_MEMBER(flstory_palette_r);
-	DECLARE_WRITE8_MEMBER(flstory_palette_ext_w);
-	DECLARE_READ8_MEMBER(flstory_palette_ext_r);
 	DECLARE_WRITE8_MEMBER(flstory_gfxctrl_w);
 	DECLARE_READ8_MEMBER(victnine_gfxctrl_r);
 	DECLARE_WRITE8_MEMBER(victnine_gfxctrl_w);

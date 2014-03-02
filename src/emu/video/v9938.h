@@ -78,8 +78,6 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	DECLARE_PALETTE_INIT(v9938);
-
 	UINT8 vram_r();
 	UINT8 status_r();
 	void palette_w(UINT8 data);
@@ -247,6 +245,7 @@ class v9938_device : public v99x8_device
 public:
 	v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_PALETTE_INIT(v9938);
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 };

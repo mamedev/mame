@@ -41,8 +41,8 @@ PALETTE_INIT( pocketc )
 
 	for( i = 0; i < 8; i++ )
 	{
-		palette.set_indirect_color(i*2, pocketc_colortable[i][0]);
-		palette.set_indirect_color(i*2+1, pocketc_colortable[i][1]);
+		palette.set_pen_indirect(i*2, pocketc_colortable[i][0]);
+		palette.set_pen_indirect(i*2+1, pocketc_colortable[i][1]);
 	}
 }
 

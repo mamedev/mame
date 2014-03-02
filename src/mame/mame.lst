@@ -2584,7 +2584,8 @@ hellfire1       // B90 / TP-??? (c) 1989 Toaplan + Taito license
 hellfire2a      // B90 / TP-??? (c) 1989 Toaplan + Taito license
 hellfire1a      // B90 / TP-??? (c) 1989 Toaplan + Taito license
 zerowing        // TP-O15 (c) 1989 Toaplan
-zerowing2       // TP-O15 (c) 1989 Williams Electronics
+zerowing1       // TP-O15 (c) 1989 Toaplan
+zerowingw       // TP-O15 (c) 1989 Williams Electronics
 demonwld        // TP-O16 (c) 1990 Toaplan (+ Taito license when set to Japan)
 demonwld1       // TP-O16 (c) 1989 Toaplan + Taito license
 demonwld2       // TP-O16 (c) 1989 Toaplan
@@ -11047,6 +11048,7 @@ skylncr         // (c) 1995 Bordun International
 butrfly         // (c) 1995 Bordun International
 madzoo          // (c) 1995 Bordun International
 leader          // Bootleg?
+unkbor          // (c) 199? Bordun International
 livequiz        // (c) 1999 Andamiro
 hammer          // (c) 2000 Andamiro
 discoboy        // (c) 1993 Soft Art Co.
@@ -11183,6 +11185,7 @@ newmcard        // (c) 19?? unknown
 brasil          // (c) 2000 unknown
 fashion         // (c) 2000 unknown
 ciclone         // (c) 2000 unknown
+record          // (c) 2000 High Video
 
 // V30-based italian gambling games
 tour4000        // (c) 2000 High Video
@@ -11194,6 +11197,8 @@ cfever61        // (c) 2000 High Video
 cfever1k        // (c) 2000 High Video
 girotutt        // (c) 2000 High Video
 nyjoker         //
+grancapi        // (c) 2000 High Video
+magicbom        // (c) 2000 High Video
 
 // Sure games
 mil4000         // (c) 2000 Sure Milano

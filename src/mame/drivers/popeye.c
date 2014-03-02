@@ -24,8 +24,9 @@ Notes:
 
 INTERRUPT_GEN_MEMBER(popeye_state::popeye_interrupt)
 {
+	m_field ^= 1;
 	/* NMIs are enabled by the I register?? How can that be? */
-	if (device.state().state_int(Z80_I) & 1)    /* skyskipr: 0/1, popeye: 2/3 but also 0/1 */
+	if (device.state().state_int(Z80_I) & 1)	/* skyskipr: 0/1, popeye: 2/3 but also 0/1 */
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -203,6 +204,11 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
+static CUSTOM_INPUT( pop_field_r )
+{
+	popeye_state *state = field.machine().driver_data<popeye_state>();
+	return state->m_field ^ 1;
+}
 
 static INPUT_PORTS_START( popeye )
 	PORT_START("P1")    /* IN0 */
@@ -230,7 +236,7 @@ static INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(pop_field_r, (void *) 0) /* inverted init e/o signal (even odd) */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )

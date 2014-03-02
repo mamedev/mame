@@ -244,7 +244,7 @@ b0 is set if b2 and b1 are set (remember, color bus is 3 bits)
 
 */
 
-PALETTE_INIT_MEMBER(v99x8_device, v9938)
+PALETTE_INIT_MEMBER(v9938_device, v9938)
 {
 	int i;
 
@@ -272,7 +272,9 @@ PALETTE_INIT_MEMBER(v9958_device, v9958)
 	UINT8 pal[19268*3];
 
 	// init v9938 512-color palette
-	PALETTE_INIT_NAME(v9938)(palette);
+	for (i=0;i<512;i++)
+		palette.set_pen_color(i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
+
 
 	if(palette.entries() != 19780)
 		fatalerror("V9958: not enough palette, must be 19780");
@@ -3260,7 +3262,7 @@ void v99x8_device::update_command()
 }
 
 static MACHINE_CONFIG_FRAGMENT( v9938 )
-	MCFG_PALETTE_ADD("palette", 19780)
+	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(v9938_device, v9938)
 MACHINE_CONFIG_END
 

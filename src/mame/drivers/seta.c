@@ -7658,9 +7658,11 @@ static MACHINE_CONFIG_START( usclssic, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_usclssic)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", usclssic)
-	MCFG_PALETTE_ADD("palette", 16*32 + 64*32*2)        /* sprites, layer */
 
+	MCFG_PALETTE_ADD("palette", 16*32 + 64*32*2)        /* sprites, layer */
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
 	MCFG_PALETTE_INIT_OWNER(seta_state,usclssic) /* layer is 6 planes deep */
+
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
@@ -7834,9 +7836,11 @@ static MACHINE_CONFIG_START( blandia, seta_state )
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", blandia)
-	MCFG_PALETTE_ADD("palette", (16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
 
+	MCFG_PALETTE_ADD("palette", (16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x600*2)
 	MCFG_PALETTE_INIT_OWNER(seta_state,blandia)              /* layers 1&2 are 6 planes deep */
+
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
@@ -7869,9 +7873,11 @@ static MACHINE_CONFIG_START( blandiap, seta_state )
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", blandia)
-	MCFG_PALETTE_ADD("palette", (16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
 
+	MCFG_PALETTE_ADD("palette", (16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x600*2)
 	MCFG_PALETTE_INIT_OWNER(seta_state,blandia)              /* layers 1&2 are 6 planes deep */
+
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
@@ -8115,6 +8121,7 @@ static MACHINE_CONFIG_START( setaroul, seta_state )
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_setaroul)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", setaroul)
+
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(seta_state,setaroul)
 
@@ -8197,9 +8204,11 @@ static MACHINE_CONFIG_START( extdwnhl, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", zingzip)
-	MCFG_PALETTE_ADD("palette", 16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
 
+	MCFG_PALETTE_ADD("palette", 16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,zingzip)          /* layer 1 gfx is 6 planes deep */
+
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
@@ -8260,9 +8269,11 @@ static MACHINE_CONFIG_START( gundhara, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jjsquawk)
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
 
+	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,gundhara)             /* layers are 6 planes deep (seta_state,but have only 4 palettes) */
+
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
@@ -8303,9 +8314,11 @@ static MACHINE_CONFIG_START( jjsquawk, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jjsquawk)
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
 
+	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,jjsquawk)             /* layers are 6 planes deep */
+
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
@@ -8337,9 +8350,11 @@ static MACHINE_CONFIG_START( jjsquawb, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jjsquawk)
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
 
+	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,jjsquawk)             /* layers are 6 planes deep */
+
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
@@ -8540,8 +8555,9 @@ static MACHINE_CONFIG_START( madshark, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jjsquawk)
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
 
+	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,jjsquawk)             /* layers are 6 planes deep */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -9115,9 +9131,11 @@ static MACHINE_CONFIG_START( zingzip, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", zingzip)
-	MCFG_PALETTE_ADD("palette", 16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
 
+	MCFG_PALETTE_ADD("palette", 16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,zingzip)              /* layer 1 gfx is 6 planes deep */
+
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
@@ -9219,9 +9237,11 @@ static MACHINE_CONFIG_START( crazyfgt, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", crazyfgt)
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer1, layer2 */
 
+	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer1, layer2 */
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
 	MCFG_PALETTE_INIT_OWNER(seta_state,gundhara)             /* layers are 6 planes deep (seta_state,but have only 4 palettes) */
+
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
@@ -9285,9 +9305,10 @@ static MACHINE_CONFIG_START( inttoote, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_inttoote)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", inttoote)
-	MCFG_PALETTE_ADD("palette", 512 * 1)
 
+	MCFG_PALETTE_ADD("palette", 512 * 1)
 	MCFG_PALETTE_INIT_OWNER(seta_state,inttoote)
+
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */

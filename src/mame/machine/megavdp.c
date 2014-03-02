@@ -32,6 +32,17 @@ sega_genesis_vdp_device::sega_genesis_vdp_device(const machine_config &mconfig, 
 	m_palwrite_base = -1;
 }	
 
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void sega_genesis_vdp_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<sega_genesis_vdp_device &>(device).m_palette.set_tag(tag);
+}
+
+
 static MACHINE_CONFIG_FRAGMENT( sega_genesis_vdp )
 	MCFG_PALETTE_ADD("palette", 0x200)
 MACHINE_CONFIG_END

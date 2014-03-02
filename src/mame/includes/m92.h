@@ -39,6 +39,8 @@ public:
 	required_shared_ptr<UINT16> m_spritecontrol;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
+	optional_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	UINT16 m_sound_status;
 	UINT8 m_irq_vectorbase;
@@ -50,6 +52,7 @@ public:
 	UINT16 m_pf_master_control[4];
 	INT32 m_sprite_list;
 	UINT8 m_palette_bank;
+	dynamic_array<UINT16> m_paletteram;
 
 	DECLARE_READ16_MEMBER(m92_eeprom_r);
 	DECLARE_WRITE16_MEMBER(m92_eeprom_w);
@@ -91,8 +94,7 @@ public:
 	void m92_update_scroll_positions();
 	void m92_draw_tiles(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void m92_sprite_interrupt();
-	optional_device<okim6295_device> m_oki;
-	required_device<gfxdecode_device> m_gfxdecode;
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

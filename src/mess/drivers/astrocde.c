@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( astrocde, astrocde_mess_state )
 	MCFG_SCREEN_UPDATE_DRIVER(astrocde_state, screen_update_astrocde)
 
 	MCFG_PALETTE_ADD("palette", 512)
-
+	MCFG_PALETTE_INIT_OWNER(astrocde_state, astrocde)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

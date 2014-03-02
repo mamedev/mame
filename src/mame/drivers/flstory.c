@@ -84,8 +84,7 @@ static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
-	AM_RANGE(0xdd00, 0xddff) AM_READWRITE(flstory_palette_r, flstory_palette_w) AM_SHARE("palette")
-	AM_RANGE(0xde00, 0xdeff) AM_READWRITE(flstory_palette_ext_r, flstory_palette_ext_w) AM_SHARE("palette_ext")
+	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work RAM */
 ADDRESS_MAP_END
@@ -111,8 +110,7 @@ static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
-	AM_RANGE(0xdd00, 0xddff) AM_READWRITE(flstory_palette_r, flstory_palette_w) AM_SHARE("palette")
-	AM_RANGE(0xde00, 0xdeff) AM_READWRITE(flstory_palette_ext_r, flstory_palette_ext_w) AM_SHARE("palette_ext")
+	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
@@ -147,8 +145,7 @@ static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
-	AM_RANGE(0xdd00, 0xddff) AM_READWRITE(flstory_palette_r, flstory_palette_w) AM_SHARE("palette")
-	AM_RANGE(0xde00, 0xdeff) AM_READWRITE(flstory_palette_ext_r, flstory_palette_ext_w) AM_SHARE("palette_ext")
+	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
 
@@ -355,8 +352,7 @@ static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_SHARE("scrlram")
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 //  AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
-	AM_RANGE(0xdd00, 0xddff) AM_READWRITE(flstory_palette_r, flstory_palette_w) AM_SHARE("palette")
-	AM_RANGE(0xde00, 0xdeff) AM_READWRITE(flstory_palette_ext_r, flstory_palette_ext_w) AM_SHARE("palette_ext")
+	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
 
@@ -996,10 +992,9 @@ static const msm5232_interface msm5232_config =
 void flstory_state::machine_start()
 {
 	/* video */
+	save_item(NAME(m_gfxctrl));
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_palette_bank));
-	save_item(NAME(m_flipscreen));
-	save_item(NAME(m_gfxctrl));
 	/* sound */
 	save_item(NAME(m_snd_data));
 	save_item(NAME(m_snd_flag));
@@ -1032,10 +1027,9 @@ MACHINE_RESET_MEMBER(flstory_state,flstory)
 	MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */
+	m_gfxctrl = 0;
 	m_char_bank = 0;
 	m_palette_bank = 0;
-	m_flipscreen = 0;
-	m_gfxctrl = 0;
 	/* sound */
 	m_snd_data = 0;
 	m_snd_flag = 0;

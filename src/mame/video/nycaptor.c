@@ -25,16 +25,6 @@ int nycaptor_state::nycaptor_spot(  )
 	return 0;
 }
 
-WRITE8_MEMBER(nycaptor_state::nycaptor_spriteram_w)
-{
-	m_spriteram[offset] = data;
-}
-
-READ8_MEMBER(nycaptor_state::nycaptor_spriteram_r)
-{
-	return m_spriteram[offset];
-}
-
 TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)
 {
 	int pal = m_videoram[tile_index * 2 + 1] & 0x0f;
@@ -71,19 +61,21 @@ TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)
 
 void nycaptor_state::video_start()
 {
-	m_spriteram = auto_alloc_array(machine(), UINT8, 160);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nycaptor_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 );
 
 	m_bg_tilemap->set_transmask(0, 0xf800, 0x7ff); //split 0
 	m_bg_tilemap->set_transmask(1, 0xfe00, 0x01ff);//split 1
 	m_bg_tilemap->set_transmask(2, 0xfffc, 0x0003);//split 2
 	m_bg_tilemap->set_transmask(3, 0xfff0, 0x000f);//split 3
-
-	m_generic_paletteram_8.allocate(0x200);
-	m_generic_paletteram2_8.allocate(0x200);
 	m_bg_tilemap->set_scroll_cols(32);
 
-	save_pointer(NAME(m_spriteram), 160);
+	m_paletteram.resize(m_palette->entries());
+	m_paletteram_ext.resize(m_palette->entries());
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_LITTLE, 1);
+	m_palette->extmem().set(m_paletteram_ext, ENDIANNESS_LITTLE, 1);
+
+	save_item(NAME(m_paletteram));
+	save_item(NAME(m_paletteram_ext));
 }
 
 WRITE8_MEMBER(nycaptor_state::nycaptor_videoram_w)
@@ -92,18 +84,13 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_videoram_r)
-{
-	return m_videoram[offset];
-}
-
 WRITE8_MEMBER(nycaptor_state::nycaptor_palette_w)
 {
 	if (m_gametype == 2) //colt
 		return;
 
 	if (offset & 0x100)
-		m_palette->write(space, (offset & 0xff) + (m_palette_bank << 8), data);
+		m_palette->write_ext(space, (offset & 0xff) + (m_palette_bank << 8), data);
 	else
 		m_palette->write(space, (offset & 0xff) + (m_palette_bank << 8), data);
 }
@@ -111,16 +98,13 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_palette_w)
 READ8_MEMBER(nycaptor_state::nycaptor_palette_r)
 {
 	if (offset & 0x100)
-		return m_generic_paletteram2_8[(offset & 0xff) + (m_palette_bank << 8)];
+		return m_paletteram_ext[(offset & 0xff) + (m_palette_bank << 8)];
 	else
-		return m_generic_paletteram_8 [(offset & 0xff) + (m_palette_bank << 8)];
+		return m_paletteram[(offset & 0xff) + (m_palette_bank << 8)];
 }
 
 WRITE8_MEMBER(nycaptor_state::nycaptor_gfxctrl_w)
 {
-	if (m_gfxctrl == data)
-		return;
-
 	m_gfxctrl = data;
 
 	if (m_char_bank != ((data & 0x18) >> 3))
@@ -136,11 +120,6 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_gfxctrl_w)
 READ8_MEMBER(nycaptor_state::nycaptor_gfxctrl_r)
 {
 	return m_gfxctrl;
-}
-
-READ8_MEMBER(nycaptor_state::nycaptor_scrlram_r)
-{
-	return m_scrlram[offset];
 }
 
 WRITE8_MEMBER(nycaptor_state::nycaptor_scrlram_w)

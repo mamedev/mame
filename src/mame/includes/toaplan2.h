@@ -24,9 +24,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
 		m_shared_ram16(*this, "shared_ram16"),
-		m_txvideoram16(*this, "txvideoram16"),
-		m_txvideoram16_offs(*this, "txvram_offs"),
-		m_txscrollram16(*this, "txscrollram16"),
+		m_paletteram(*this, "palette"),
+		m_tx_videoram(*this, "tx_videoram"),
+		m_tx_lineselect(*this, "tx_lineselect"),
+		m_tx_linescroll(*this, "tx_linescroll"),
 		m_tx_gfxram16(*this, "tx_gfxram16"),
 		m_mainram16(*this, "mainram16"),
 		m_maincpu(*this, "maincpu"),
@@ -42,9 +43,10 @@ public:
 
 	optional_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	optional_shared_ptr<UINT16> m_shared_ram16;     // Really 8 bit RAM connected to Z180
-	optional_shared_ptr<UINT16> m_txvideoram16;
-	optional_shared_ptr<UINT16> m_txvideoram16_offs;
-	optional_shared_ptr<UINT16> m_txscrollram16;
+	optional_shared_ptr<UINT16> m_paletteram;
+	optional_shared_ptr<UINT16> m_tx_videoram;
+	optional_shared_ptr<UINT16> m_tx_lineselect;
+	optional_shared_ptr<UINT16> m_tx_linescroll;
 	optional_shared_ptr<UINT16> m_tx_gfxram16;
 	optional_shared_ptr<UINT16> m_mainram16;
 
@@ -107,8 +109,8 @@ public:
 	DECLARE_WRITE8_MEMBER(batrider_clear_nmi_w);
 	DECLARE_READ16_MEMBER(bbakraid_eeprom_r);
 	DECLARE_WRITE16_MEMBER(bbakraid_eeprom_w);
-	DECLARE_WRITE16_MEMBER(toaplan2_txvideoram16_w);
-	DECLARE_WRITE16_MEMBER(toaplan2_txscrollram16_w);
+	DECLARE_WRITE16_MEMBER(toaplan2_tx_videoram_w);
+	DECLARE_WRITE16_MEMBER(toaplan2_tx_linescroll_w);
 	DECLARE_WRITE16_MEMBER(toaplan2_tx_gfxram16_w);
 	DECLARE_WRITE16_MEMBER(batrider_textdata_dma_w);
 	DECLARE_WRITE16_MEMBER(batrider_unknown_dma_w);

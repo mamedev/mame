@@ -115,11 +115,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom") { }
 
-	virtual void machine_start()
-	{
-		m_generic_paletteram_16.allocate(0x10000);
-	}
-
 	tilemap_t *m_tmap;
 	tilemap_t *m_tmap2;
 	optional_shared_ptr<UINT32> m_tmapram;
@@ -134,7 +129,6 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram_w);
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram2_w);
-	DECLARE_WRITE32_MEMBER(paletteram32_xBBBBBGGGGGRRRRR_dword_w);
 	DECLARE_WRITE32_MEMBER(darkhors_input_sel_w);
 	DECLARE_READ32_MEMBER(darkhors_input_sel_r);
 	DECLARE_WRITE32_MEMBER(darkhors_unk1_w);
@@ -304,12 +298,6 @@ WRITE32_MEMBER(darkhors_state::darkhors_eeprom_w)
 	}
 }
 
-WRITE32_MEMBER(darkhors_state::paletteram32_xBBBBBGGGGGRRRRR_dword_w)
-{
-	if (ACCESSING_BITS_16_31)   m_palette->write(space, offset*2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_BITS_0_15)    m_palette->write(space, offset*2+1, data, mem_mask);
-}
-
 WRITE32_MEMBER(darkhors_state::darkhors_input_sel_w)
 {
 	COMBINE_DATA(&m_input_sel);
@@ -370,7 +358,7 @@ static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(darkhors_tmapram2_w) AM_SHARE("tmapram2")
 	AM_RANGE(0x874000, 0x87dfff) AM_RAM
 	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w)
+	AM_RANGE(0x880000, 0x89ffff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY   // this should still be palette ram!
 	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_SHARE("tmapscroll")
 	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITEONLY AM_SHARE("tmapscroll2")
@@ -395,7 +383,7 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, darkhors_state )
 
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w, 0xffffffff );
 
-	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w)
+	AM_RANGE(0x880000, 0x89ffff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY   // this should still be palette ram!
 
 	AM_RANGE(0x8C0000, 0x8C00ff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w, 0xffffffff );
@@ -421,7 +409,7 @@ static ADDRESS_MAP_START( jclub2o_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
 
 	AM_RANGE(0x600000, 0x67ffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w, 0xffffffff );
-	AM_RANGE(0x680000, 0x69ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w)
+	AM_RANGE(0x680000, 0x69ffff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x6a0000, 0x6bffff) AM_RAM
 	AM_RANGE(0x6C0000, 0x6C00ff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w, 0xffffffff );
 	AM_RANGE(0x700000, 0x7fffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_gfxram_r, st0020_gfxram_w, 0xffffffff );
@@ -704,6 +692,7 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", darkhors)
 	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state,darkhors)
 
@@ -753,6 +742,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state,jclub2)
 MACHINE_CONFIG_END
@@ -814,6 +804,7 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_jclub2o)
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	

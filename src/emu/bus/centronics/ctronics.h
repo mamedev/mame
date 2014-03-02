@@ -105,7 +105,7 @@ class centronics_device : public device_t,
 public:
 	centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _Object> static devcb2_base &set_strobe_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_data0_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_strobe_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_strobe_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_data0_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_data0_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_data1_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_data1_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_data2_handler(device_t &device, _Object object) { return downcast<centronics_device &>(device).m_data2_handler.set_callback(object); }

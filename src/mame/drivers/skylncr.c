@@ -1,33 +1,32 @@
-/*************************************************************************************************************
+/***************************************************************************************************
 
-    Sky Lancer / Mad Zoo
+  Sky Lancer / Mad Zoo
+  Bordun International.
 
-    Original preliminary driver by Luca Elia.
-    Additional Work: Roberto Fresca & David Haywood.
+  Original preliminary driver by Luca Elia.
+  Additional Work: Roberto Fresca & David Haywood.
 
+****************************************************************************************************
 
-**************************************************************************************************************
+  Notes:
 
-    Notes:
+  - Some of the tiles look badly scaled down, and others appear to have columns swapped.
+    This might actually be correct.
 
-    - Some of the tiles look badly scaled down, and others appear to have columns swapped.
-      This might actually be correct.
+  - Skylncr and madzoo can run with the same program roms, they're basically graphics swaps.
 
-    - Skylncr and madzoo can run with the same program roms, they're basically graphics swaps.
+  - To enter the Service Mode, press F2. All the game settings are there.
+    Change regular values using DIP switches, and jackpot value using STOP2 and STOP3.
+    To exit the mode, press START. You must reset the machine (F3) to update the changes.
 
-    - To enter the Service Mode, press F2. All the game settings are there.
-      Change regular values using DIP switches, and jackpot value using STOP2 and STOP3.
-      To exit the mode, press START. You must reset the machine (F3) to update the changes.
-
-    - Press key 0 to navigate between statistics pages. Press START to exit the mode.
-
-
-    TODO:
-
-    - Proper M5M82C255 device emulation.
+  - Press key 0 to navigate between statistics pages. Press START to exit the mode.
 
 
-*************************************************************************************************************/
+  TODO:
+
+  - Proper M5M82C255 device emulation.
+
+***************************************************************************************************/
 
 
 #define MASTER_CLOCK        XTAL_12MHz  /* confirmed */
@@ -866,6 +865,36 @@ ROM_START( leader )
 	ROM_LOAD16_BYTE( "leadergfx2.dmp22", 0x40001, 0x20000, CRC(04cc0118) SHA1(016ccbe7daf8c4676830aadcc906a64e2826d11a) )
 ROM_END
 
+/*
+  Unknown Bordun International game...
+  PCB looks similar to Sky Lancer.
+  
+  With the big M5M82C255 for I/O,
+  a daughterboard with Z80 CPU,
+  a Xilinx CPLD...}
+
+  Graphics set is for a game like Gold Star or Lucky 8.
+  Title is in japanese plus -'97-
+  (seeing the decoded tiles)
+
+*/
+ROM_START( unkbor )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bor.u15",  0x00000, 0x8000, CRC(a5da4f92) SHA1(82ac70bd379649f130db017aa226d0247db0f3cd) )
+
+	ROM_REGION( 0x40000, "gfx1", 0 )	// 0-1 6-5
+	ROM_LOAD16_BYTE( "bor.u23", 0x00000, 0x10000, CRC(82c9db19) SHA1(3611fb59bb7c962c7fabe7a29fa72b632fa69bed) )
+	ROM_LOAD16_BYTE( "bor.u25", 0x00001, 0x10000, CRC(42ee9b7a) SHA1(b39f677f58072ea7dcd7f49208be1a7b70bdc5e5) )
+	ROM_LOAD16_BYTE( "bor.u24", 0x20000, 0x10000, CRC(6d70879b) SHA1(83cbe67cda95e5f3d95065015f6b1b2044b88989) )
+	ROM_LOAD16_BYTE( "bor.u26", 0x20001, 0x10000, CRC(1b8b84ac) SHA1(b914bad0b1fb58cf581d1227e8127c6afb906fb7) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "bor.u19", 0x00000, 0x10000, CRC(daf651a7) SHA1(d4e472aa90aa2b52c997b2f2272007b139e3cbc2) )
+	ROM_LOAD16_BYTE( "bor.u21", 0x00001, 0x10000, CRC(1d88bc70) SHA1(49246d96a4ce2b8e9b10e928d7dd13973feac883) )
+	ROM_LOAD16_BYTE( "bor.u20", 0x20000, 0x10000, CRC(7e28ba2f) SHA1(ac8d4e95efce87456f569a71650bd7afcb59095e) )
+	ROM_LOAD16_BYTE( "bor.u22", 0x20001, 0x10000, CRC(52f98575) SHA1(b786c441d5ef47ff4cb50835c6ac6889cb169c6e) )
+ROM_END
+
 
 /**********************************
 *           Driver Init           *
@@ -882,8 +911,9 @@ DRIVER_INIT_MEMBER(skylncr_state,skylncr)
 *                  Game Drivers                     *
 ****************************************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT     INIT     ROT    COMPANY                 FULLNAME                            FLAGS  */
+/*    YEAR  NAME      PARENT   MACHINE   INPUT    STATE           INIT     ROT    COMPANY                 FULLNAME                            FLAGS  */
 GAME( 1995, skylncr,  0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "Sky Lancer (Bordun, ver.U450C)",    0 )
 GAME( 1995, butrfly,  0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "Butterfly Video Game (ver.U350C)",  0 )
 GAME( 1995, madzoo,   0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "Mad Zoo (ver.U450C)",               0 )
 GAME( 1995, leader,   0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "bootleg",              "Leader",                            GAME_NOT_WORKING )
+GAME( 199?, unkbor,   0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "unknown Bordun game",               GAME_NOT_WORKING )

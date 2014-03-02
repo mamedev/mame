@@ -146,7 +146,7 @@
 #define PALETTE_FORMAT_RRRGGGBB raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 5,2,0>)
 
 // standard 2-2-2-2 formats
-#define PALETTE_FORMAT_BBGGRRII raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_irgb_decoder<2,2,2,2, 0,2,4,6>)
+#define PALETTE_FORMAT_BBGGRRII raw_to_rgb_converter(1, &raw_to_rgb_converter::BBGGRRII_decoder)
 
 // standard 4-4-4 formats
 #define PALETTE_FORMAT_xxxxBBBBGGGGRRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 0,4,8>)
@@ -204,6 +204,9 @@
 
 #define MCFG_PALETTE_ENTRIES(_entries) \
 	palette_device::static_set_entries(*device, _entries);
+
+#define MCFG_PALETTE_INDIRECT_ENTRIES(_entries) \
+	palette_device::static_set_indirect_entries(*device, _entries);
 
 #define MCFG_PALETTE_ENABLE_SHADOWS() \
 	palette_device::static_enable_shadows(*device);
@@ -298,6 +301,15 @@ public:
 		UINT8 b = (i * palexpand<_BlueBits>(raw >> _BlueShift)) >> 8;
 		return rgb_t(r, g, b);
 	}
+
+	static rgb_t BBGGRRII_decoder(UINT32 raw)
+	{
+		UINT8 i = (raw >> 0) & 3;
+		UINT8 r = pal4bit(((raw >> 0) & 0x0c) | i);
+		UINT8 g = pal4bit(((raw >> 2) & 0x0c) | i);
+		UINT8 b = pal4bit(((raw >> 4) & 0x0c) | i);
+		return rgb_t(r, g, b);
+	}
 	
 	// other standard decoders
 	static rgb_t RRRRGGGGBBBBRGBx_decoder(UINT32 raw);	// bits 3/2/1 are LSb
@@ -328,12 +340,13 @@ public:
 	static void static_set_format(device_t &device, raw_to_rgb_converter raw_to_rgb);
 	static void static_set_endianness(device_t &device, endianness_t endianness);
 	static void static_set_entries(device_t &device, int entries);
+	static void static_set_indirect_entries(device_t &device, int entries);
 	static void static_enable_shadows(device_t &device);
 	static void static_enable_hilights(device_t &device);
 	
 	// getters
 	int entries() const { return m_entries; }
-	int indirect_entries() const { return m_indirect_entry.count(); }
+	int indirect_entries() const { return m_indirect_colors.count(); }
 	palette_t *palette() const { return m_palette; }
 	const pen_t &pen(int index) const { return m_pens[index]; }
 	const pen_t *pens() const { return m_pens; }
@@ -354,7 +367,7 @@ public:
 	void set_pen_contrast(pen_t pen, double bright) { m_palette->entry_set_contrast(pen, bright); }
 
 	// indirection (aka colortables)
-	UINT16 pen_indirect(int index) const { return m_indirect_entry[index]; }
+	UINT16 pen_indirect(int index) const { return m_indirect_pens[index]; }
 	rgb_t indirect_color(int index) const { return m_indirect_colors[index]; }
 	void set_indirect_color(int index, rgb_t rgb);
 	void set_pen_indirect(pen_t pen, UINT16 index);
@@ -384,6 +397,8 @@ public:
 	void palette_init_BBBBBGGGGGRRRRR(palette_device &palette);
 	void palette_init_RRRRRGGGGGGBBBBB(palette_device &palette);
 	
+	// helper to update palette when data changed
+	void update() { if (!m_init.isnull()) m_init(*this); }
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
@@ -405,13 +420,14 @@ protected:
 private:
 	// configuration state
 	int					m_entries;				// number of entries in the palette
+	int					m_indirect_entries;		// number of initial indirect entries in the palette
 	bool				m_enable_shadows;		// are shadows enabled?
 	bool				m_enable_hilights;		// are hilights enabled?
+	endianness_t		m_endianness;			// endianness of palette RAM
+	bool				m_endianness_supplied;	// endianness supplied in static config
 
 	// palette RAM
 	raw_to_rgb_converter m_raw_to_rgb;			// format of palette RAM
-	endianness_t		m_endianness;			// endianness of palette RAM
-	bool				m_endianness_supplied;	// endianness supplied in static config
 	memory_array		m_paletteram;			// base memory
 	memory_array		m_paletteram_ext;		// extended memory
 
@@ -427,7 +443,7 @@ private:
 	
 	// indirection state
 	dynamic_array<rgb_t> m_indirect_colors;		// actual colors set for indirection
-	dynamic_array<UINT16> m_indirect_entry;		// indirection values
+	dynamic_array<UINT16> m_indirect_pens;		// indirection values
 
 	struct shadow_table_data
 	{

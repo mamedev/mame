@@ -161,7 +161,8 @@ public:
 	template<class _Object> static devcb2_base &set_genesis_vdp_lv4irqline_callback(device_t &device, _Object object) { return downcast<sega_genesis_vdp_device &>(device).m_genesis_vdp_lv4irqline_callback.set_callback(object); }
 	static void set_genesis_vdp_alt_timing(device_t &device, int use_alt_timing);
 	static void set_genesis_vdp_palwrite_base(device_t &device, int palwrite_base);
-
+	static void static_set_palette_tag(device_t &device, const char *tag);
+	
 	int m_use_alt_timing; // use MAME scanline timer instead, render only one scanline to a single line buffer, to be rendered by a partial update call.. experimental
 
 	int m_palwrite_base; // if we want to write to the actual MAME palette..
