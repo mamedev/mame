@@ -367,6 +367,8 @@ ToDo:
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "sound/speaker.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/centronics/image.h"
 
 class cat_state : public driver_device
 {
@@ -382,6 +384,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		//m_nvram(*this, "nvram"), // merge with svram?
 		m_duart(*this, "duartn68681"),
+		m_ctx(*this, "ctx"),
+		m_ctx_data_out(*this, "ctx_data_out"),
 		m_acia6850(*this, "acia6850"),
 		m_via0(*this, "via6522_0"),
 		m_via1(*this, "via6522_1"),
@@ -403,6 +407,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	//optional_device<nvram_device> m_nvram;
 	optional_device<duartn68681_device> m_duart; // only cat uses this
+	optional_device<centronics_device> m_ctx;	// cat only?
+	optional_device<output_latch_device> m_ctx_data_out; // cat only?
 	optional_device<acia6850_device> m_acia6850; // only swyft uses this
 	optional_device<via6522_device> m_via0; // only swyft uses this
 	optional_device<via6522_device> m_via1; // only swyft uses this
@@ -613,6 +619,7 @@ WRITE16_MEMBER( cat_state::cat_printer_data_w )
 #ifdef DEBUG_PRINTER_DATA_W
 	fprintf(stderr,"Write to Printer Data address %06X, data %04X\n", 0x800004+(offset<<1), data);
 #endif
+	m_ctx_data_out->write(data>>8);
 }
 // 0x800006-0x800007: Floppy data register (called fd.dwr in the cat source code)
 READ16_MEMBER( cat_state::cat_floppy_data_r )
@@ -1135,6 +1142,12 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(cat_state, cat_duart_output))
 
+	MCFG_CENTRONICS_ADD("ctx", centronics_printers, "image")
+	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, ip1_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, ip4_w)) 
+
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -1254,8 +1267,6 @@ ADDRESS_MAP_END
 
 MACHINE_START_MEMBER(cat_state,swyft)
 {
-	//m_6ms_timer = timer_alloc(TIMER_COUNTER_6MS); // CRUDE HACK
-
 	m_via0->write_ca1(1);
 	m_via0->write_ca2(1);
 	m_via0->write_cb1(1);
@@ -1269,8 +1280,6 @@ MACHINE_START_MEMBER(cat_state,swyft)
 
 MACHINE_RESET_MEMBER(cat_state,swyft)
 {
-	//m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(cat_state::cat_int_ack),this));
-	//m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL_19_968MHz/2)/65536)); // horrible hack
 }
 
 VIDEO_START_MEMBER(cat_state,swyft)
