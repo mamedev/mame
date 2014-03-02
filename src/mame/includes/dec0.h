@@ -25,6 +25,8 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT8> m_robocop_shared_ram;
 	optional_shared_ptr<UINT8> m_hippodrm_shared_ram;
+	dynamic_array<UINT16> m_paletteram;
+	dynamic_array<UINT16> m_paletteram_ext;
 
 	optional_device<deco_bac06_device> m_tilegen1;
 	optional_device<deco_bac06_device> m_tilegen2;

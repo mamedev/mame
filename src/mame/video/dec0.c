@@ -375,6 +375,11 @@ VIDEO_START_MEMBER(dec0_state,dec0)
 
 VIDEO_START_MEMBER(dec0_automat_state,automat)
 {
+	VIDEO_START_CALL_MEMBER(dec0_nodma);
+	m_paletteram.resize(0x800);
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
+
+	save_item(NAME(m_paletteram));
 }
 
 /******************************************************************************/

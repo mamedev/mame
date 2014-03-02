@@ -581,7 +581,7 @@ ADDRESS_MAP_END
 READ16_MEMBER( dec0_automat_state::automat_palette_r )
 {
 	offset ^=0xf;
-	return m_generic_paletteram_16[offset];
+	return m_paletteram[offset];
 }
 
 WRITE16_MEMBER( dec0_automat_state::automat_palette_w )
@@ -617,7 +617,7 @@ static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, dec0_automat_state )
 	AM_RANGE(0x300000, 0x30001f) AM_READ(dec0_rotary_r)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READ(dec0_controls_r)
 	AM_RANGE(0x30c000, 0x30c01f) AM_WRITE(automat_control_w)            /* Priority, sound, etc. */
-	AM_RANGE(0x310000, 0x3107ff) AM_READWRITE(automat_palette_r, automat_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x310000, 0x3107ff) AM_READWRITE(automat_palette_r, automat_palette_w)
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM
 
 	// video regs are moved to here..
@@ -651,7 +651,7 @@ static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16, dec0_automat_state )
 	AM_RANGE(0x300c00, 0x300fff) AM_RAM
 	AM_RANGE(0x301000, 0x3017ff) AM_DEVREADWRITE("tilegen3", deco_bac06_device, pf_data_r, pf_data_w)
 	AM_RANGE(0x301800, 0x307fff) AM_RAM AM_SHARE("ram") /* Sly spy main ram */
-	AM_RANGE(0x310000, 0x3107ff) AM_READWRITE(automat_palette_r, automat_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x310000, 0x3107ff) AM_READWRITE(automat_palette_r, automat_palette_w)
 	AM_RANGE(0xb08000, 0xb08fff) AM_RAM AM_SHARE("spriteram") /* Sprites */
 ADDRESS_MAP_END
 
@@ -1415,7 +1415,7 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_automat)
-	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
+	MCFG_VIDEO_START_OVERRIDE(dec0_automat_state,automat)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,0,0);
@@ -1433,6 +1433,8 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 	MCFG_DECO_MXC06_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+
 	MCFG_GFXDECODE_ADD("gfxdecode", automat)
 
 	/* sound hardware */
@@ -1472,7 +1474,7 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_secretab)
-	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
+	MCFG_VIDEO_START_OVERRIDE(dec0_automat_state,automat)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,0,0);
@@ -1491,6 +1493,7 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 	
 
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_GFXDECODE_ADD("gfxdecode", secretab)
 
 	/* sound hardware */
