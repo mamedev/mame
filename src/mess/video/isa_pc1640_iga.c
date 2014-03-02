@@ -82,6 +82,9 @@ isa8_pc1640_iga_device::isa8_pc1640_iga_device(const machine_config &mconfig, co
 
 void isa8_pc1640_iga_device::device_start()
 {
+	if (m_palette != NULL && !m_palette->started())
+		throw device_missing_dependencies();
+
 	astring tempstring;
 
 	set_isa_device();
