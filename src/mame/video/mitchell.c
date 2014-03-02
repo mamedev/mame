@@ -245,7 +245,7 @@ WRITE8_MEMBER(mitchell_state::pang_paletteram_w)
 
 READ8_MEMBER(mitchell_state::pang_paletteram_r)
 {
-	return m_palette->basemem().read8(offset + (m_paletteram_bank ? 0x800 : 0x000));
+	return m_paletteram[offset + (m_paletteram_bank ? 0x800 : 0x000)];
 }
 
 
