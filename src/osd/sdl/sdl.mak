@@ -103,6 +103,12 @@ else
 DEFS += -DSDLMAME_SDL2=0
 endif
 
+# minimal preliminary ARM support
+ifeq ($(findstring arm,$(UNAME)),arm)
+	NOASM = 1
+	DEFS += -DSDLMAME_ARM
+endif
+
 ifdef NOASM
 DEFS += -DSDLMAME_NOASM
 endif
@@ -202,9 +208,6 @@ LIBS += -lutil
 # /usr/local/include is not considered a system include directory
 # on FreeBSD. GL.h resides there and throws warnings
 CCOMFLAGS += -isystem /usr/local/include
-# No clue here. There is a popmessage(NULL) in uimenu.c which
-# triggers a non-null format warning on FreeBSD only.
-CCOMFLAGS += -Wno-format
 NO_USE_MIDI = 1
 endif
 
@@ -434,15 +437,9 @@ SDLOS_TARGETOS = $(BASE_TARGETOS)
 #-------------------------------------------------
 # TEST_GCC for GCC version-specific stuff
 #-------------------------------------------------
+
 ifneq ($(TARGETOS),emscripten)
-
-ifeq (,$(findstring clang,$(CC)))
 TEST_GCC = $(shell gcc --version)
-
-# is it Clang symlinked/renamed to GCC (Xcode 5.0 on OS X)?
-ifeq ($(findstring clang,$(TEST_GCC)),clang)
-	CCOMFLAGS += -Wno-cast-align -Wno-constant-logical-operand -Wno-shift-count-overflow -Wno-tautological-constant-out-of-range-compare -Wno-tautological-compare -Wno-self-assign-field
-endif
 
 # Ubuntu 12.10 GCC 4.7.2 autodetect
 ifeq ($(findstring 4.7.2-2ubuntu1,$(TEST_GCC)),4.7.2-2ubuntu1)
@@ -452,29 +449,10 @@ $(error Ubuntu 12.10 detected.  Please install the gcc-4.6 and g++-4.6 packages)
 endif
 CC = @gcc-4.6
 LD = @g++-4.6
-TEST_GCC = $(shell gcc-4.6 --version)
+endif
 endif
 
-ifeq ($(findstring 4.7.,$(TEST_GCC)),4.7.)
-	CCOMFLAGS += -Wno-narrowing -Wno-attributes
-endif
-
-# array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
-ifeq ($(findstring 4.8.,$(TEST_GCC)),4.8.)
-	CCOMFLAGS += -Wno-narrowing -Wno-attributes -Wno-unused-local-typedefs -Wno-unused-variable -Wno-array-bounds -Wno-strict-overflow
-endif
-
-# minimal preliminary ARM support
-ifeq ($(findstring arm,$(UNAME)),arm)
-	CCOMFLAGS += -Wno-cast-align
-	DEFS += -DSDLMAME_NOASM -DSDLMAME_ARM
-endif
-
-else    # compiler is specifically Clang
-	CCOMFLAGS += -Wno-cast-align -Wno-constant-logical-operand -Wno-shift-count-overflow -Wno-tautological-constant-out-of-range-compare -Wno-tautological-compare -Wno-self-assign-field
-endif
-
-endif
+include $(SRC)/build/cc_detection.mak
 
 #-------------------------------------------------
 # Unix
