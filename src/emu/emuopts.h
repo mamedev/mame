@@ -113,6 +113,8 @@ enum
 #define OPTION_GAMMA                "gamma"
 #define OPTION_PAUSE_BRIGHTNESS     "pause_brightness"
 #define OPTION_EFFECT               "effect"
+#define OPTION_MINIMUM_WIDTH        "minimum_width"
+#define OPTION_MINIMUM_HEIGHT       "minimum_height"
 
 // core vector options
 #define OPTION_ANTIALIAS            "antialias"
@@ -279,6 +281,8 @@ public:
 	float gamma() const { return float_value(OPTION_GAMMA); }
 	float pause_brightness() const { return float_value(OPTION_PAUSE_BRIGHTNESS); }
 	const char *effect() const { return value(OPTION_EFFECT); }
+	int minimum_width() const { return int_value(OPTION_MINIMUM_WIDTH); }
+	int minimum_height() const { return int_value(OPTION_MINIMUM_HEIGHT); }
 
 	// core vector options
 	bool antialias() const { return bool_value(OPTION_ANTIALIAS); }
