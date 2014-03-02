@@ -265,7 +265,7 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_flipscreen_w)
 READ16_MEMBER(wwfwfest_state::wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
-	return m_generic_paletteram_16[offset];
+	return m_paletteram[offset];
 }
 
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w)
@@ -800,6 +800,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddragon3_state::ddragon3_scanline)
 
 void ddragon3_state::machine_start()
 {
+	m_paletteram.resize(m_palette->entries());
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
+	
 	save_item(NAME(m_vreg));
 	save_item(NAME(m_bg_scrollx));
 	save_item(NAME(m_bg_scrolly));
