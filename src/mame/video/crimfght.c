@@ -57,7 +57,8 @@ void crimfght_sprite_callback( running_machine &machine, int *code, int *color, 
 
 void crimfght_state::video_start()
 {
-	m_generic_paletteram_8.allocate(0x400);
+	m_paletteram.resize(0x400);
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
 
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 4;

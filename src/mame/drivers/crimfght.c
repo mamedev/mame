@@ -397,7 +397,7 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 	{
 		device->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x03ff, "bank3");
 		device->memory().space(AS_PROGRAM).install_write_handler(0x0000, 0x03ff, write8_delegate(FUNC(palette_device::write), state->m_palette.target()));
-		state->membank("bank3")->set_base(state->m_generic_paletteram_8);
+		state->membank("bank3")->set_base(state->m_paletteram);
 	}
 	else
 		device->memory().space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");                             /* RAM */
