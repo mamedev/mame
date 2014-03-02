@@ -602,6 +602,7 @@ public:
 		register_input("IN", m_in);
 		register_param("CHAN", m_channel, 0);
         register_param("MULT", m_mult, 1000.0);
+        register_param("OFFSET", m_offset, 0.0);
         m_sample = netlist_time::from_hz(1); //sufficiently big enough
         save(NAME(m_last_buffer));
 	}
@@ -628,7 +629,7 @@ public:
 	{
 		double val = INPANALOG(m_in);
 		sound_update(netlist().time());
-		m_cur = (stream_sample_t) (val * m_mult.Value());
+		m_cur = (stream_sample_t) (val * m_mult.Value() + m_offset.Value());
 	}
 
 	ATTR_HOT void buffer_reset(netlist_time upto)
@@ -639,6 +640,7 @@ public:
 
 	netlist_param_int_t m_channel;
     netlist_param_double_t m_mult;
+    netlist_param_double_t m_offset;
     stream_sample_t *m_buffer;
     netlist_time m_sample;
 
@@ -675,6 +677,7 @@ public:
         {
             register_param(pstring::sprintf("CHAN%d", i), m_param_name[i], "");
             register_param(pstring::sprintf("MULT%d", i), m_param_mult[i], 1.0);
+            register_param(pstring::sprintf("OFFSET%d", i), m_param_offset[i], 0.0);
         }
         m_num_channel = 0;
     }
@@ -709,7 +712,7 @@ public:
             if (m_buffer[i] == NULL)
                 break; // stop, called outside of stream_update
             double v = m_buffer[i][m_pos];
-            m_param[i]->setTo(v * m_param_mult[i].Value());
+            m_param[i]->setTo(v * m_param_mult[i].Value() + m_param_offset[i].Value());
         }
         m_pos++;
         OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
@@ -724,6 +727,7 @@ public:
     netlist_param_double_t *m_param[MAX_INPUT_CHANNELS];
     stream_sample_t *m_buffer[MAX_INPUT_CHANNELS];
     netlist_param_double_t m_param_mult[MAX_INPUT_CHANNELS];
+    netlist_param_double_t m_param_offset[MAX_INPUT_CHANNELS];
     netlist_time m_inc;
 
 private:

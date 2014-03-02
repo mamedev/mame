@@ -38,8 +38,8 @@
 #define NET_CONNECT(_name, _input, _output)                                         \
 		setup.register_link(# _name "." # _input, # _output);
 
-#define NET_C(_input, _output)                                                      \
-		setup.register_link(NET_STR(_input) , NET_STR(_output));
+#define NET_C(_term1, _terms...)                                                    \
+        setup.register_link_arr( #_term1 ", " # _terms);
 
 #define PARAM(_name, _val)                                                          \
 		setup.register_param(# _name, _val);
@@ -123,6 +123,7 @@ public:
 	void register_model(const pstring &model);
 	void register_alias(const pstring &alias, const pstring &out);
 	void register_alias_nofqn(const pstring &alias, const pstring &out);
+    void register_link_arr(const pstring &terms);
 	void register_link(const pstring &sin, const pstring &sout);
 	void register_param(const pstring &param, const pstring &value);
 	void register_param(const pstring &param, const double value);

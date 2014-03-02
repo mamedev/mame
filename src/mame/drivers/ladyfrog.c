@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ladyfrog)
 	MCFG_PALETTE_ADD("palette", 512)
-
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

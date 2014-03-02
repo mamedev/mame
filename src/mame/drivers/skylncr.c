@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-  Sky Lancer / Mad Zoo
+  Sky Lancer / Mad Zoo / Super Star '97
   Bordun International.
 
   Original preliminary driver by Luca Elia.
@@ -100,6 +100,7 @@ public:
 	DECLARE_WRITE8_MEMBER(reelscroll4_w);
 	DECLARE_WRITE8_MEMBER(skylncr_coin_w);
 	DECLARE_READ8_MEMBER(ret_ff);
+	DECLARE_READ8_MEMBER(ret_unk);
 	DECLARE_READ8_MEMBER(ret_00);
 	DECLARE_WRITE8_MEMBER(skylncr_nmi_enable_w);
 	DECLARE_DRIVER_INIT(skylncr);
@@ -344,6 +345,12 @@ READ8_MEMBER(skylncr_state::ret_ff)
 	return 0xff;
 }
 
+READ8_MEMBER(skylncr_state::ret_unk)
+{
+//	return 0xff;
+	return (machine().rand() & 0xff);
+}
+
 #ifdef UNUSED_FUNCTION
 READ8_MEMBER(skylncr_state::ret_00)
 {
@@ -457,6 +464,22 @@ static const gfx_layout layout8x8x8 =
 	8*8*4
 };
 
+static const gfx_layout layout8x8x8_alt =	/* for sstar97 */
+{
+	8,8,
+	RGN_FRAC(1,2),
+	8,
+	{ STEP8(0,1) },
+	{
+		8*0,RGN_FRAC(1,2)+8*0,
+		8*1,RGN_FRAC(1,2)+8*1,
+		8*2,RGN_FRAC(1,2)+8*2,
+		8*3,RGN_FRAC(1,2)+8*3
+	},
+	{ STEP8(0,8*4) },
+	8*8*4
+};
+
 static const gfx_layout layout8x32x8 =
 {
 	8,32,
@@ -497,6 +520,25 @@ static const gfx_layout layout8x32x8_rot =
 	8*32*8/2
 };
 
+static const gfx_layout layout8x32x8_alt =	/* for sstar97 */
+{
+	8,32,
+	RGN_FRAC(1,2),
+	8,
+	{ STEP8(0,1) },
+	{
+		RGN_FRAC(1,2)+8*1, 8*1,
+		8*0, RGN_FRAC(1,2)+8*0,
+		RGN_FRAC(1,2)+8*3, 8*3,
+		8*2, RGN_FRAC(1,2)+8*2
+	},
+	{
+		STEP16(0,8*4),
+		STEP16(16*8*4,8*4)
+	},
+	8*32*8/2
+};
+
 
 /**************************************
 *           Graphics Decode           *
@@ -506,6 +548,11 @@ static GFXDECODE_START( skylncr )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8,        0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8,       0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_rot,   0, 2 )
+GFXDECODE_END
+
+static GFXDECODE_START( sstar97 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0, 2 )
 GFXDECODE_END
 
 
@@ -731,12 +778,19 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", skylncr)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( sstar97, skylncr )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_GFXDECODE_MODIFY("gfxdecode", sstar97)
 MACHINE_CONFIG_END
 
 
@@ -869,30 +923,47 @@ ROM_END
   Unknown Bordun International game...
   PCB looks similar to Sky Lancer.
   
-  With the big M5M82C255 for I/O,
-  a daughterboard with Z80 CPU,
-  a Xilinx CPLD...}
+  1x M5M82C255ASP for I/O,
+  1x daughterboard with Z80 CPU,
+  1x AY-3-8910A
 
+  1x Xilinx XC2064-33 CPLD...
+
+  1x 12.000 Mhz crystal
+
+  2x UM70C171-66
+  1x HM6116LP-4
+  5x HM6116L-120
+  
   Graphics set is for a game like Gold Star or Lucky 8.
   Title is in japanese plus -'97-
   (seeing the decoded tiles)
 
-*/
-ROM_START( unkbor )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "bor.u15",  0x00000, 0x8000, CRC(a5da4f92) SHA1(82ac70bd379649f130db017aa226d0247db0f3cd) )
+  One extra ROM (u48) is blank.
+  Sure is the one that store the palette at offset $C000.
+  
+  Also suspect that graphics ROMs are underdumped since
+  they lack of at least 4 extra big girl pictures. 
+  
+  BP 170 to see the palette registers...
 
-	ROM_REGION( 0x40000, "gfx1", 0 )	// 0-1 6-5
-	ROM_LOAD16_BYTE( "bor.u23", 0x00000, 0x10000, CRC(82c9db19) SHA1(3611fb59bb7c962c7fabe7a29fa72b632fa69bed) )
-	ROM_LOAD16_BYTE( "bor.u25", 0x00001, 0x10000, CRC(42ee9b7a) SHA1(b39f677f58072ea7dcd7f49208be1a7b70bdc5e5) )
-	ROM_LOAD16_BYTE( "bor.u24", 0x20000, 0x10000, CRC(6d70879b) SHA1(83cbe67cda95e5f3d95065015f6b1b2044b88989) )
-	ROM_LOAD16_BYTE( "bor.u26", 0x20001, 0x10000, CRC(1b8b84ac) SHA1(b914bad0b1fb58cf581d1227e8127c6afb906fb7) )
+*/
+ROM_START( sstar97 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "27256.u15",    0x0000, 0x8000,          CRC(a5da4f92) SHA1(82ac70bd379649f130db017aa226d0247db0f3cd) )
+	ROM_LOAD( "unknown.u48",  0x8000, 0x8000, BAD_DUMP CRC(9f4c02e3) SHA1(05975184130ea7dd3bb5d32eff77b585bd53e6b5) )	// palette borrowed from other game
+
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "bor_dun_4.u23", 0x00000, 0x10000, CRC(82c9db19) SHA1(3611fb59bb7c962c7fabe7a29fa72b632fa69bed) )
+	ROM_LOAD16_BYTE( "bor_dun_2.u25", 0x00001, 0x10000, CRC(42ee9b7a) SHA1(b39f677f58072ea7dcd7f49208be1a7b70bdc5e5) )
+	ROM_LOAD16_BYTE( "bor_dun_3.u24", 0x20000, 0x10000, CRC(6d70879b) SHA1(83cbe67cda95e5f3d95065015f6b1b2044b88989) )
+	ROM_LOAD16_BYTE( "bor_dun_1.u26", 0x20001, 0x10000, CRC(1b8b84ac) SHA1(b914bad0b1fb58cf581d1227e8127c6afb906fb7) )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "bor.u19", 0x00000, 0x10000, CRC(daf651a7) SHA1(d4e472aa90aa2b52c997b2f2272007b139e3cbc2) )
-	ROM_LOAD16_BYTE( "bor.u21", 0x00001, 0x10000, CRC(1d88bc70) SHA1(49246d96a4ce2b8e9b10e928d7dd13973feac883) )
-	ROM_LOAD16_BYTE( "bor.u20", 0x20000, 0x10000, CRC(7e28ba2f) SHA1(ac8d4e95efce87456f569a71650bd7afcb59095e) )
-	ROM_LOAD16_BYTE( "bor.u22", 0x20001, 0x10000, CRC(52f98575) SHA1(b786c441d5ef47ff4cb50835c6ac6889cb169c6e) )
+	ROM_LOAD16_BYTE( "bor_dun_8.u19", 0x00000, 0x10000, CRC(daf651a7) SHA1(d4e472aa90aa2b52c997b2f2272007b139e3cbc2) )
+	ROM_LOAD16_BYTE( "bor_dun_6.u21", 0x00001, 0x10000, CRC(1d88bc70) SHA1(49246d96a4ce2b8e9b10e928d7dd13973feac883) )
+	ROM_LOAD16_BYTE( "bor_dun_7.u20", 0x20000, 0x10000, CRC(7e28ba2f) SHA1(ac8d4e95efce87456f569a71650bd7afcb59095e) )
+	ROM_LOAD16_BYTE( "bor_dun_5.u22", 0x20001, 0x10000, CRC(52f98575) SHA1(b786c441d5ef47ff4cb50835c6ac6889cb169c6e) )
 ROM_END
 
 
@@ -916,4 +987,4 @@ GAME( 1995, skylncr,  0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0,
 GAME( 1995, butrfly,  0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "Butterfly Video Game (ver.U350C)",  0 )
 GAME( 1995, madzoo,   0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "Mad Zoo (ver.U450C)",               0 )
 GAME( 1995, leader,   0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "bootleg",              "Leader",                            GAME_NOT_WORKING )
-GAME( 199?, unkbor,   0,       skylncr,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "unknown Bordun game",               GAME_NOT_WORKING )
+GAME( 199?, sstar97,  0,       sstar97,  skylncr, skylncr_state,  skylncr, ROT0, "Bordun International", "Super Star '97",                    GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )

@@ -38,7 +38,7 @@ INTERRUPT_GEN_MEMBER(blockhl_state::blockhl_interrupt)
 READ8_MEMBER(blockhl_state::bankedram_r)
 {
 	if (m_palette_selected)
-		return m_generic_paletteram_8[offset];
+		return m_paletteram[offset];
 	else
 		return m_ram[offset];
 }
@@ -185,6 +185,10 @@ void blockhl_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
+	m_paletteram.resize(m_palette->entries() * 2);
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
+	
+	save_item(NAME(m_paletteram));
 	save_item(NAME(m_palette_selected));
 	save_item(NAME(m_rombank));
 }

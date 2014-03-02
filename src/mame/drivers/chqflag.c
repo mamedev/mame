@@ -47,7 +47,7 @@ WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 	{
 		space.install_read_bank(0x1800, 0x1fff, "bank5");
 		space.install_write_handler(0x1800, 0x1fff, write8_delegate(FUNC(palette_device::write),m_palette.target()));
-		membank("bank5")->set_base(m_generic_paletteram_8);
+		membank("bank5")->set_base(m_paletteram);
 
 		if (m_k051316_readroms)
 			space.install_readwrite_handler(0x1000, 0x17ff, read8_delegate(FUNC(k051316_device::rom_r), (k051316_device*)m_k051316_1), write8_delegate(FUNC(k051316_device::write), (k051316_device*)m_k051316_1)); /* 051316 #1 (ROM test) */
@@ -308,6 +308,10 @@ void chqflag_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
+	m_paletteram.resize(m_palette->entries() * 2);
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
+	
+	save_item(NAME(m_paletteram));
 	save_item(NAME(m_k051316_readroms));
 	save_item(NAME(m_last_vreg));
 	save_item(NAME(m_analog_ctrl));

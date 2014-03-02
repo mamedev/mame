@@ -276,6 +276,11 @@ BUILD_MIDILIB = 1
 # sanity check the configuration
 #-------------------------------------------------
 
+# enable symbols as it is useless without them
+ifdef SANITIZE
+SYMBOLS = 1
+endif
+
 # specify a default optimization level if none explicitly stated
 ifndef OPTIMIZE
 ifndef SYMBOLS
@@ -292,6 +297,7 @@ PROFILER = 1
 endif
 endif
 
+# TODO: also move it up, so it isn't optimized by default?
 # allow gprof profiling as well, which overrides the internal PROFILER
 # also enable symbols as it is useless without them
 ifdef PROFILE
@@ -300,11 +306,6 @@ SYMBOLS = 1
 ifndef SYMLEVEL
 SYMLEVEL = 1
 endif
-endif
-
-# enable symbols as it is useless without them
-ifdef SANITIZE
-SYMBOLS = 1
 endif
 
 # set the symbols level
@@ -556,22 +557,8 @@ COBJFLAGS += \
 # warnings only applicable to C++ compiles
 CPPONLYFLAGS += \
 	-Woverloaded-virtual
-
-ifneq (,$(findstring clang,$(CC)))
-CCOMFLAGS += \
-	-Wno-cast-align \
-	-Wno-tautological-compare \
-	-Wno-constant-logical-operand \
-	-Wno-format-security \
-	-Wno-shift-count-overflow \
-	-Wno-self-assign-field
-
-# TODO: needs to use $(CC)
-TEST_CLANG := $(shell clang --version)
-ifeq ($(findstring 3.4,$(TEST_CLANG)),3.4)
-CCOMFLAGS += -Wno-inline-new-delete
-endif
-endif
+	
+include $(SRC)/build/cc_detection.mak
 
 ifdef SANITIZE
 CCOMFLAGS += -fsanitize=$(SANITIZE)

@@ -54,8 +54,6 @@ Bugs:
 #include "sound/sn76496.h"
 
 #include "includes/megadriv.h"
-#include "includes/segamsys.h"
-#include "scrlegcy.h"
 
 #define MASTER_CLOCK        53693100
 
@@ -591,8 +589,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( megaplay_bios_io_map, AS_IO, 8, mplay_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_device, write)  /* SN76489 */
-	AM_RANGE(0xbe, 0xbe) AM_READWRITE_LEGACY(sms_vdp_data_r, sms_vdp_data_w)    /* VDP */
-	AM_RANGE(0xbf, 0xbf) AM_READWRITE_LEGACY(sms_vdp_ctrl_r, sms_vdp_ctrl_w)    /* VDP */
+	AM_RANGE(0xbe, 0xbe) AM_READWRITE(sms_vdp_data_r, sms_vdp_data_w)    /* VDP */
+	AM_RANGE(0xbf, 0xbf) AM_READWRITE(sms_vdp_ctrl_r, sms_vdp_ctrl_w)    /* VDP */
 ADDRESS_MAP_END
 
 
@@ -609,8 +607,8 @@ UINT32 mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &b
 {
 	//printf("megplay vu\n");
 	screen_update_megadriv(screen,bitmap,cliprect);
-//  SCREEN_UPDATE32_CALL(megaplay_normal);
-	SCREEN_UPDATE32_CALL(megaplay_bios);
+//  screen_update_megaplay_normal(screen,bitmap,cliprect);
+	screen_update_megaplay_bios(screen,bitmap,cliprect);
 	return 0;
 }
 
@@ -621,14 +619,13 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	m_mp_bios_bank_addr = 0;
 	m_readpos = 1;
 	MACHINE_RESET_CALL_MEMBER(megadriv);
-	MACHINE_RESET_CALL_LEGACY(megatech_bios);
+	MACHINE_RESET_CALL_MEMBER(megatech_bios);
 }
 
 void mplay_state::screen_eof_megaplay(screen_device &screen, bool state)
 {
-	bool vblank_on = state;
 	screen_eof_megadriv(screen,state);
-	SCREEN_VBLANK_CALL(megatech_bios);
+	screen_eof_megatech_bios(screen,state);
 }
 
 static MACHINE_CONFIG_START( megaplay, mplay_state )
@@ -874,7 +871,7 @@ DRIVER_INIT_MEMBER(mplay_state,megaplay)
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(FUNC(mplay_state::megadriv_68k_read_z80_extra_ram),this), write16_delegate(FUNC(mplay_state::megadriv_68k_write_z80_extra_ram),this));
 
-	init_megatech_bios(machine());
+	init_megatech_bios();
 
 }
 

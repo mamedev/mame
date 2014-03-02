@@ -274,20 +274,18 @@ endif
 # add our prefix files to the mix
 CCOMFLAGS += -include $(WINSRC)/winprefix.h
 
+include $(SRC)/build/cc_detection.mak
+
 # ensure we statically link the gcc runtime lib
 LDFLAGS += -static-libgcc
+
 # TODO: needs to use $(CC)
 TEST_GCC := $(shell gcc --version)
 ifeq ($(findstring 4.4.,$(TEST_GCC)),)
 	#if we use new tools
 	LDFLAGS += -static-libstdc++
 endif
-ifeq ($(findstring 4.7.,$(TEST_GCC)),4.7.)
-	CCOMFLAGS += -Wno-narrowing -Wno-attributes
-endif
-ifeq ($(findstring 4.8.,$(TEST_GCC)),4.8.)
-	CCOMFLAGS += -Wno-narrowing -Wno-attributes -Wno-unused-local-typedefs
-endif
+
 # add the windows libraries
 LIBS += -luser32 -lgdi32 -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -lwsock32
 

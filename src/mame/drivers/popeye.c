@@ -21,6 +21,92 @@ Notes:
 #include "sound/ay8910.h"
 #include "sound/flt_rc.h"
 #include "includes/popeye.h"
+#include "machine/netlist.h"
+#include "netlist/devices/net_lib.h"
+
+/* This is the output stage of the audio circuit.
+ * It is solely an impedance changer and could be left away
+ */
+
+static NETLIST_START(nl_popeye_imp_changer)
+    RES(R62, 510000)
+    RES(R63, 100)
+    RES(R64, 510000)
+    RES(R65, 2100)
+    RES(R66, 330)
+    RES(R67, 51)
+
+    QBJT_EB(Q8, "2SC1815")
+    QBJT_EB(Q9, "2SA1015")
+
+    NET_C(V5, R62.1, Q8.C, R66.1)
+    NET_C(R62.2, R64.1, R63.1, C7.2)
+    NET_C(R63.2, Q8.B)
+    NET_C(Q8.E, R65.1, Q9.B)
+    NET_C(R66.2, Q9.E, R67.1)
+
+    NET_C(GND, Q9.C, R65.2, R64.2)
+NETLIST_END()
+
+static NETLIST_START(nl_popeye)
+
+    /* Standard stuff */
+
+    SOLVER(Solver, 48000)
+    PARAM(Solver.ACCURACY, 1e-5)
+    ANALOG_INPUT(V5, 5)
+
+    /* AY 8910 internal resistors */
+
+    RES(R_AY1_1, 1000);
+    RES(R_AY1_2, 1000);
+    RES(R_AY1_3, 1000);
+
+    RES(R52, 2000)
+    RES(R55, 2000)
+    RES(R58, 2000)
+    RES(R53, 2000)
+    RES(R56, 2000)
+    RES(R59, 2000)
+    RES(R51, 20000)
+    RES(R57, 30000)
+    RES(R60, 30000)
+
+    RES(R61, 120000)
+
+    RES(ROUT, 5000)
+
+    CAP(C4, 0.047e-6)
+    CAP(C5, 330e-12)
+    CAP(C6, 330e-12)
+    CAP(C7, 3.3e-6)
+    CAP(C40, 680e-12)
+
+    NET_C(V5, R_AY1_1.1, R_AY1_2.1, R_AY1_3.1)
+
+    NET_C(R_AY1_1.2, R52.1, R53.1)
+    NET_C(R_AY1_2.2, R55.1, R56.1)
+    NET_C(R_AY1_3.2, R58.1, R59.1)
+
+    NET_C(R53.2, R51.1, C4.1)
+    NET_C(R56.2, R57.1, C5.1)
+    NET_C(R59.2, R60.1, C6.1)
+
+    NET_C(R51.2, R57.2, R60.2, R61.1, C40.1, C7.1)
+
+    NET_C(GND, R52.2, R55.2, R58.2, C4.2, C5.2, C6.2, R61.2, C40.2)
+
+    INCLUDE(nl_popeye_imp_changer)
+
+    /* output resistor (actually located in TV */
+
+    NET_C(R67.2, ROUT.1)
+
+    NET_C(GND, ROUT.2)
+
+NETLIST_END()
+
+
 
 INTERRUPT_GEN_MEMBER(popeye_state::popeye_interrupt)
 {
@@ -371,15 +457,15 @@ static const ay8910_interface ay8910_config =
 };
 
 /* Does Sky Skipper have the same filtering? */
-static const flt_rc_config filter_config =
+static const ay8910_interface ay8910_nl_config =
 {
-	FLT_RC_LOWPASS,
-	2000,
-	20000,
-	0,
-	CAP_N(47)
+    AY8910_RESISTOR_OUTPUT,
+    AY8910_DEFAULT_LOADS,
+    DEVCB_INPUT_PORT("DSW0"),
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_DRIVER_MEMBER(popeye_state,popeye_portB_w)
 };
-
 
 static MACHINE_CONFIG_START( skyskipr, popeye_state )
 	/* basic machine hardware */
@@ -415,13 +501,23 @@ static MACHINE_CONFIG_DERIVED( popeye, skyskipr )
 
 	MCFG_SOUND_MODIFY("aysnd")
 	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(0, "filter", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
+    MCFG_SOUND_CONFIG(ay8910_nl_config)
+    MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
+    MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
+    MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
 
-	MCFG_FILTER_RC_ADD("filter", 0)
-	MCFG_SOUND_CONFIG(filter_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+    /* NETLIST configuration using internal AY8910 resistor values */
+
+    MCFG_SOUND_ADD("snd_nl", NETLIST_SOUND, 48000)
+    MCFG_NETLIST_SETUP(nl_popeye)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+    MCFG_NETLIST_STREAM_INPUT("snd_nl", 0, "R_AY1_1.R")
+    MCFG_NETLIST_STREAM_INPUT("snd_nl", 1, "R_AY1_2.R")
+    MCFG_NETLIST_STREAM_INPUT("snd_nl", 2, "R_AY1_3.R")
+
+    MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "ROUT.1")
+    MCFG_NETLIST_ANALOG_MULT_OFFSET(30000.0, -65000.0)
 
 	MCFG_VIDEO_START_OVERRIDE(popeye_state,popeye)
 MACHINE_CONFIG_END
