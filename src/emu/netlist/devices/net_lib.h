@@ -54,6 +54,7 @@
 #include "nld_signal.h"
 #include "nld_system.h"
 
+#include "nld_4066.h"
 #include "nld_7400.h"
 #include "nld_7402.h"
 #include "nld_7404.h"
@@ -85,5 +86,9 @@
 #include "../analog/nld_twoterm.h"
 
 #include "nld_legacy.h"
+
+NETLIST_EXTERN(diode_models);
+NETLIST_EXTERN(bjt_models);
+
 
 #endif

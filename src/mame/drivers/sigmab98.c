@@ -112,6 +112,7 @@ public:
 	required_shared_ptr<UINT8> m_nvram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
+	dynamic_array<UINT8> m_paletteram;
 
 	UINT8 m_reg;
 	UINT8 m_rombank;
@@ -1214,7 +1215,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_palette_w)
 
 READ8_MEMBER(sigmab98_state::itazuram_palette_r)
 {
-	return m_generic_paletteram_8[offset];
+	return m_paletteram[offset];
 }
 
 static ADDRESS_MAP_START( itazuram_map, AS_PROGRAM, 8, sigmab98_state )
@@ -1396,7 +1397,7 @@ READ8_MEMBER(sigmab98_state::tdoboon_c000_r)
 
 		case 0x66:  // PALETTERAM + TABLE?
 			if (offset < 0x200)
-				return m_generic_paletteram_8[offset];
+				return m_paletteram[offset];
 			break;
 
 		case 0x67:  // REGS
@@ -2142,9 +2143,10 @@ DRIVER_INIT_MEMBER(sigmab98_state,itazuram)
 	m_rombank = 0x0f;
 
 	// RAM banks
-	m_generic_paletteram_8.allocate(0x3000);
-	memset(m_generic_paletteram_8, 0, 0x3000);
-	membank("palbank")->set_base(m_generic_paletteram_8);
+	m_paletteram.resize(0x3000);
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);	
+	memset(m_paletteram, 0, 0x3000);
+	membank("palbank")->set_base(m_paletteram);
 	m_rambank = 0x64;
 
 	m_spriteram.allocate(0x1000 * 5);

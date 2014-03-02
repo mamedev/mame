@@ -45,8 +45,13 @@ typedef delegate<void ()> save_prepost_delegate;
 // use this to declare a given type is a simple, non-pointer type that can be
 // saved; in general, this is intended only to be used for specific enum types
 // defined by your device
-#define ALLOW_SAVE_TYPE(TYPE) template<> struct save_manager::type_checker<TYPE> { static const bool is_atom = true; static const bool is_pointer = false; }
+#define ALLOW_SAVE_TYPE(TYPE) \
+	template<> struct save_manager::type_checker<TYPE> { static const bool is_atom = true; static const bool is_pointer = false; }
 
+// use this as above, but also to declare that dynamic_array<TYPE> is safe as well
+#define ALLOW_SAVE_TYPE_AND_ARRAY(TYPE) \
+	ALLOW_SAVE_TYPE(TYPE); \
+	template<> inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<TYPE> &value, const char *name) { save_memory(module, tag, index, name, &value[0], sizeof(TYPE), value.count()); }
 
 
 // register items with explicit tags
@@ -195,22 +200,22 @@ private:
 
 
 // template specializations to enumerate the fundamental atomic types you are allowed to save
-ALLOW_SAVE_TYPE(char);
-ALLOW_SAVE_TYPE(bool);
-ALLOW_SAVE_TYPE(INT8);
-ALLOW_SAVE_TYPE(UINT8);
-ALLOW_SAVE_TYPE(INT16);
-ALLOW_SAVE_TYPE(UINT16);
-ALLOW_SAVE_TYPE(INT32);
-ALLOW_SAVE_TYPE(UINT32);
-ALLOW_SAVE_TYPE(INT64);
-ALLOW_SAVE_TYPE(UINT64);
-ALLOW_SAVE_TYPE(PAIR);
-ALLOW_SAVE_TYPE(PAIR64);
-ALLOW_SAVE_TYPE(float);
-ALLOW_SAVE_TYPE(double);
-ALLOW_SAVE_TYPE(endianness_t);
-ALLOW_SAVE_TYPE(rgb_t);
+ALLOW_SAVE_TYPE_AND_ARRAY(char);
+ALLOW_SAVE_TYPE_AND_ARRAY(bool);
+ALLOW_SAVE_TYPE_AND_ARRAY(INT8);
+ALLOW_SAVE_TYPE_AND_ARRAY(UINT8);
+ALLOW_SAVE_TYPE_AND_ARRAY(INT16);
+ALLOW_SAVE_TYPE_AND_ARRAY(UINT16);
+ALLOW_SAVE_TYPE_AND_ARRAY(INT32);
+ALLOW_SAVE_TYPE_AND_ARRAY(UINT32);
+ALLOW_SAVE_TYPE_AND_ARRAY(INT64);
+ALLOW_SAVE_TYPE_AND_ARRAY(UINT64);
+ALLOW_SAVE_TYPE_AND_ARRAY(PAIR);
+ALLOW_SAVE_TYPE_AND_ARRAY(PAIR64);
+ALLOW_SAVE_TYPE_AND_ARRAY(float);
+ALLOW_SAVE_TYPE_AND_ARRAY(double);
+ALLOW_SAVE_TYPE_AND_ARRAY(endianness_t);
+ALLOW_SAVE_TYPE_AND_ARRAY(rgb_t);
 
 
 
@@ -258,55 +263,6 @@ inline void save_manager::save_item(const char *module, const char *tag, int ind
 	save_memory(module, tag, index, tempstr, &value.attoseconds, sizeof(value.attoseconds));
 	tempstr.cpy(name).cat(".seconds");
 	save_memory(module, tag, index, tempstr, &value.seconds, sizeof(value.seconds));
-}
-
-
-//-------------------------------------------------
-//  save_item - specialized save_item for
-//  dynamic_arrays
-//-------------------------------------------------
-
-// surely there must be a syntax for doing this templated??
-template<>
-inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<UINT8> &value, const char *name)
-{
-	save_memory(module, tag, index, name, &value[0], sizeof(UINT8), value.count());
-}
-
-template<>
-inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<UINT16> &value, const char *name)
-{
-	save_memory(module, tag, index, name, &value[0], sizeof(UINT16), value.count());
-}
-
-template<>
-inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<INT32> &value, const char *name)
-{
-	save_memory(module, tag, index, name, &value[0], sizeof(INT32), value.count());
-}
-
-template<>
-inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<UINT32> &value, const char *name)
-{
-	save_memory(module, tag, index, name, &value[0], sizeof(UINT32), value.count());
-}
-
-template<>
-inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<UINT64> &value, const char *name)
-{
-	save_memory(module, tag, index, name, &value[0], sizeof(UINT64), value.count());
-}
-
-template<>
-inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<float> &value, const char *name)
-{
-	save_memory(module, tag, index, name, &value[0], sizeof(float), value.count());
-}
-
-template<>
-inline void save_manager::save_item(const char *module, const char *tag, int index, dynamic_array<double> &value, const char *name)
-{
-	save_memory(module, tag, index, name, &value[0], sizeof(double), value.count());
 }
 
 

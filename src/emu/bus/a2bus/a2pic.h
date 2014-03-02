@@ -33,14 +33,6 @@ public:
 
 	required_ioport m_dsw1;
 
-	DECLARE_WRITE_LINE_MEMBER( datain0_w );
-	DECLARE_WRITE_LINE_MEMBER( datain1_w );
-	DECLARE_WRITE_LINE_MEMBER( datain2_w );
-	DECLARE_WRITE_LINE_MEMBER( datain3_w );
-	DECLARE_WRITE_LINE_MEMBER( datain4_w );
-	DECLARE_WRITE_LINE_MEMBER( datain5_w );
-	DECLARE_WRITE_LINE_MEMBER( datain6_w );
-	DECLARE_WRITE_LINE_MEMBER( datain7_w );
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 
 protected:
@@ -53,6 +45,8 @@ protected:
 	virtual UINT8 read_cnxx(address_space &space, UINT8 offset);
 
 	required_device<centronics_device> m_ctx;
+	required_device<input_buffer_device> m_ctx_data_in;
+	required_device<output_latch_device> m_ctx_data_out;
 
 	void start_strobe();
 	void clear_strobe();
@@ -60,7 +54,7 @@ protected:
 private:
 	UINT8 *m_rom;
 	bool m_started;
-	UINT8 m_ack, m_datain;
+	UINT8 m_ack;
 	bool m_irqenable;
 	bool m_autostrobe;
 	emu_timer *m_timer;

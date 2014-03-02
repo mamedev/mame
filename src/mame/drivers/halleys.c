@@ -245,6 +245,8 @@ public:
 	emu_timer *m_blitter_reset_timer;
 	offs_t m_collision_detection;
 	int m_latch_delay;
+	dynamic_array<UINT8> m_paletteram;
+	
 	DECLARE_WRITE8_MEMBER(bgtile_w);
 	DECLARE_READ8_MEMBER(blitter_status_r);
 	DECLARE_READ8_MEMBER(blitter_r);
@@ -1125,6 +1127,8 @@ READ8_MEMBER(halleys_state::collision_id_r)
 PALETTE_INIT_MEMBER(halleys_state, halleys)
 {
 	UINT32 d, r, g, b, i, j, count;
+	// allocate memory for internal palette
+	m_internal_palette = auto_alloc_array(machine(), UINT32, PALETTE_SIZE);
 	UINT32 *pal_ptr = m_internal_palette;
 
 	for (count=0; count<1024; count++)
@@ -1184,7 +1188,7 @@ void halleys_state::halleys_decode_rgb(UINT32 *r, UINT32 *g, UINT32 *b, int addr
 	int bit0, bit1, bit2, bit3, bit4;
 
 	// the four 16x4-bit SN74S189 SRAM chips are assumed be the game's 32-byte palette RAM
-	sram_189 = m_generic_paletteram_8;
+	sram_189 = m_paletteram;
 
 	// each of the three 32-byte 6330 PROM is wired to an RGB component output
 	prom_6330 = memregion("proms")->base();
@@ -1220,7 +1224,7 @@ WRITE8_MEMBER(halleys_state::halleys_paletteram_IIRRGGBB_w)
 	UINT32 d, r, g, b, i, j;
 	UINT32 *pal_ptr = m_internal_palette;
 
-	m_generic_paletteram_8[offset] = data;
+	m_paletteram[offset] = data;
 	d = (UINT32)data;
 	j = d | BG_RGB;
 	pal_ptr[offset] = j;
@@ -1270,6 +1274,11 @@ void halleys_state::video_start()
 
 		m_alpha_table[(src<<8)+dst] = c | BG_RGB;
 	}
+	
+	m_paletteram.resize(m_palette->entries());
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_LITTLE, 1);
+	
+	m_bgcolor         = m_palette->black_pen();
 }
 
 
@@ -1680,7 +1689,7 @@ static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0xff9c, 0xff9c) AM_WRITE(firq_ack_w)
 	AM_RANGE(0xff00, 0xffbf) AM_RAM AM_SHARE("io_ram")  // I/O write fall-through
 
-	AM_RANGE(0xffc0, 0xffdf) AM_RAM_WRITE(halleys_paletteram_IIRRGGBB_w) AM_SHARE("paletteram")
+	AM_RANGE(0xffc0, 0xffdf) AM_RAM_WRITE(halleys_paletteram_IIRRGGBB_w)
 	AM_RANGE(0xffe0, 0xffff) AM_READ(vector_r)
 ADDRESS_MAP_END
 
@@ -1943,7 +1952,6 @@ void halleys_state::machine_reset()
 	m_blitter_busy    = 0;
 	m_collision_count = 0;
 	m_stars_enabled   = 0;
-	m_bgcolor         = m_palette->black_pen();
 	m_fftail = m_ffhead = m_ffcount = 0;
 
 	memset(m_io_ram, 0xff, m_io_ram.bytes());
@@ -2181,10 +2189,6 @@ void halleys_state::init_common()
 
 	// allocate memory for alpha table
 	m_alpha_table = auto_alloc_array(machine(), UINT32, 0x10000);
-
-
-	// allocate memory for internal palette
-	m_internal_palette = auto_alloc_array(machine(), UINT32, PALETTE_SIZE);
 
 
 	// allocate memory for hardware collision list

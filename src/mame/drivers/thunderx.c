@@ -45,7 +45,7 @@ void thunderx_state::device_timer(emu_timer &timer, device_timer_id id, int para
 READ8_MEMBER(thunderx_state::scontra_bankedram_r)
 {
 	if (m_palette_selected)
-		return m_generic_paletteram_8[offset];
+		return m_paletteram[offset];
 	else
 		return m_ram[offset];
 }
@@ -76,7 +76,7 @@ READ8_MEMBER(thunderx_state::thunderx_bankedram_r)
 		}
 	}
 	else
-		return m_generic_paletteram_8[offset];
+		return m_paletteram[offset];
 }
 
 WRITE8_MEMBER(thunderx_state::thunderx_bankedram_w)
@@ -602,8 +602,10 @@ static const k051960_interface thunderx_k051960_intf =
 
 MACHINE_START_MEMBER(thunderx_state,scontra)
 {
-	m_generic_paletteram_8.allocate(0x800);
-
+	m_paletteram.resize(0x800);
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
+	
+	save_item(NAME(m_paletteram));
 	save_item(NAME(m_priority));
 	save_item(NAME(m_1f98_data));
 	save_item(NAME(m_palette_selected));

@@ -23,15 +23,11 @@ const device_type A2BUS_PIC = &device_creator<a2bus_pic_device>;
 
 MACHINE_CONFIG_FRAGMENT( pic )
 	MCFG_CENTRONICS_ADD(PIC_CENTRONICS_TAG, centronics_printers, "image")
-	MCFG_CENTRONICS_DATA0_HANDLER(WRITELINE(a2bus_pic_device, datain0_w))
-	MCFG_CENTRONICS_DATA1_HANDLER(WRITELINE(a2bus_pic_device, datain1_w))
-	MCFG_CENTRONICS_DATA2_HANDLER(WRITELINE(a2bus_pic_device, datain2_w))
-	MCFG_CENTRONICS_DATA3_HANDLER(WRITELINE(a2bus_pic_device, datain3_w))
-	MCFG_CENTRONICS_DATA4_HANDLER(WRITELINE(a2bus_pic_device, datain4_w))
-	MCFG_CENTRONICS_DATA5_HANDLER(WRITELINE(a2bus_pic_device, datain5_w))
-	MCFG_CENTRONICS_DATA6_HANDLER(WRITELINE(a2bus_pic_device, datain6_w))
-	MCFG_CENTRONICS_DATA7_HANDLER(WRITELINE(a2bus_pic_device, datain7_w))
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("ctx_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(a2bus_pic_device, ack_w))
+
+	MCFG_DEVICE_ADD("ctx_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", PIC_CENTRONICS_TAG)
 MACHINE_CONFIG_END
 
 ROM_START( pic )
@@ -105,6 +101,8 @@ a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, const char *ta
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
 		m_ctx(*this, PIC_CENTRONICS_TAG),
+		m_ctx_data_in(*this, "ctx_data_in"),
+		m_ctx_data_out(*this, "ctx_data_out"),
 		m_started(false)
 {
 }
@@ -114,6 +112,8 @@ a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type ty
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
 		m_ctx(*this, PIC_CENTRONICS_TAG),
+		m_ctx_data_in(*this, "ctx_data_in"),
+		m_ctx_data_out(*this, "ctx_data_out"),
 		m_started(false)
 {
 }
@@ -134,7 +134,6 @@ void a2bus_pic_device::device_start()
 	m_timer->adjust(attotime::never);
 
 	save_item(NAME(m_ack));
-	save_item(NAME(m_datain));
 	save_item(NAME(m_irqenable));
 	save_item(NAME(m_autostrobe));
 }
@@ -143,7 +142,6 @@ void a2bus_pic_device::device_reset()
 {
 	m_started = true;
 	m_ack = 0;
-	m_datain = 0;
 	m_irqenable = false;
 	m_autostrobe = false;
 	lower_slot_irq();
@@ -185,7 +183,7 @@ UINT8 a2bus_pic_device::read_c0nx(address_space &space, UINT8 offset)
 	switch (offset)
 	{
 		case 3:	
-			return m_datain;
+			return m_ctx_data_in->read();
 
 		case 4:
 			return m_ack;
@@ -214,14 +212,7 @@ void a2bus_pic_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data
 	switch (offset)
 	{
 		case 0:	// set data out and send a strobe
-			m_ctx->write_data0(data&0x01);
-			m_ctx->write_data1((data&0x02)>>1);
-			m_ctx->write_data2((data&0x04)>>2);
-			m_ctx->write_data3((data&0x08)>>3);
-			m_ctx->write_data4((data&0x10)>>4);
-			m_ctx->write_data5((data&0x20)>>5);
-			m_ctx->write_data6((data&0x40)>>6);
-			m_ctx->write_data7((data&0x80)>>7);
+			m_ctx_data_out->write(data);
 
 			if (m_autostrobe)
 			{
@@ -244,15 +235,6 @@ void a2bus_pic_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data
 			break;
 	}
 }
-
-WRITE_LINE_MEMBER( a2bus_pic_device::datain0_w ) { m_datain &= ~0x01; m_datain |= (state == ASSERT_LINE) ? 0x01 : 0; }
-WRITE_LINE_MEMBER( a2bus_pic_device::datain1_w ) { m_datain &= ~0x02; m_datain |= (state == ASSERT_LINE) ? 0x02 : 0; } 
-WRITE_LINE_MEMBER( a2bus_pic_device::datain2_w ) { m_datain &= ~0x04; m_datain |= (state == ASSERT_LINE) ? 0x04 : 0; } 
-WRITE_LINE_MEMBER( a2bus_pic_device::datain3_w ) { m_datain &= ~0x08; m_datain |= (state == ASSERT_LINE) ? 0x08 : 0; } 
-WRITE_LINE_MEMBER( a2bus_pic_device::datain4_w ) { m_datain &= ~0x10; m_datain |= (state == ASSERT_LINE) ? 0x10 : 0; } 
-WRITE_LINE_MEMBER( a2bus_pic_device::datain5_w ) { m_datain &= ~0x20; m_datain |= (state == ASSERT_LINE) ? 0x20 : 0; } 
-WRITE_LINE_MEMBER( a2bus_pic_device::datain6_w ) { m_datain &= ~0x40; m_datain |= (state == ASSERT_LINE) ? 0x40 : 0; } 
-WRITE_LINE_MEMBER( a2bus_pic_device::datain7_w ) { m_datain &= ~0x80; m_datain |= (state == ASSERT_LINE) ? 0x80 : 0; } 
 
 WRITE_LINE_MEMBER( a2bus_pic_device::ack_w ) 
 {
