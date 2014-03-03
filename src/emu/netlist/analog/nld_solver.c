@@ -82,14 +82,14 @@ ATTR_HOT void netlist_matrix_solver_t::update_inputs()
 {
     for (netlist_core_terminal_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
     {
-        if ((*p)->net().m_last.Analog != (*p)->net().m_cur.Analog)
+        if ((*p)->net().m_last_Analog != (*p)->net().m_cur_Analog)
         {
             (*p)->netdev().update_dev();
         }
     }
     for (netlist_core_terminal_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
     {
-        (*p)->net().m_last.Analog = (*p)->net().m_cur.Analog;
+        (*p)->net().m_last_Analog = (*p)->net().m_cur_Analog;
     }
 
 }
@@ -365,7 +365,7 @@ ATTR_HOT double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
     double cerr2 = 0;
     for (int i = 0; i < this->N(); i++)
     {
-        double e = (V[i] - this->m_nets[i]->m_cur.Analog);
+        double e = (V[i] - this->m_nets[i]->m_cur_Analog);
         double e2 = (RHS[i] - this->m_RHS[i]);
         cerr += e * e;
         cerr2 += e2 * e2;
@@ -380,7 +380,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
 {
     for (int i = 0; i < this->N(); i++)
     {
-        this->m_nets[i]->m_cur.Analog = this->m_nets[i]->m_new.Analog = V[i];
+        this->m_nets[i]->m_cur_Analog = this->m_nets[i]->m_new_Analog = V[i];
     }
     if (RHS != NULL)
     {
@@ -453,10 +453,10 @@ ATTR_HOT int netlist_matrix_solver_direct1_t::solve_non_dynamic()
 
     double new_val =  m_RHS[0] / m_A[0][0];
 #endif
-    double e = (new_val - net->m_cur.Analog);
+    double e = (new_val - net->m_cur_Analog);
     double cerr = e * e;
 
-    net->m_cur.Analog = net->m_new.Analog = new_val;
+    net->m_cur_Analog = net->m_new_Analog = new_val;
 
     if (is_dynamic() && (cerr  > m_params.m_accuracy * m_params.m_accuracy))
     {
@@ -585,13 +585,13 @@ ATTR_HOT int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve_non_dy
                 iIdr += terms[i]->m_go * terms[i]->m_otherterm->net().Q_Analog();
             }
 
-            //double new_val = (net->m_cur.Analog * gabs[k] + iIdr) / (gtot[k]);
-            double new_val = net->m_cur.Analog * one_m_w[k] + iIdr * w[k];
+            //double new_val = (net->m_cur_Analog * gabs[k] + iIdr) / (gtot[k]);
+            double new_val = net->m_cur_Analog * one_m_w[k] + iIdr * w[k];
 
-            double e = (new_val - net->m_cur.Analog);
+            double e = (new_val - net->m_cur_Analog);
             cerr += e * e;
 
-            net->m_cur.Analog = net->m_new.Analog = new_val;
+            net->m_cur_Analog = net->m_new_Analog = new_val;
         }
         if (resched || cerr / m_nets.count() > m_params.m_accuracy * m_params.m_accuracy)
         {

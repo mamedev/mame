@@ -484,16 +484,19 @@ template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, n
 ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamily)
 	: netlist_object_t(atype, afamily)
     , m_solver(NULL)
+    , m_railterminal(NULL)
 	, m_head(NULL)
 	, m_num_cons(0)
 	, m_time(netlist_time::zero)
 	, m_active(0)
 	, m_in_queue(2)
-	, m_railterminal(NULL)
 {
-    m_last.Analog = 0.0;
-    m_new.Analog = 0.0;
-    m_cur.Analog = 0.0;
+    m_last_Q = 0;
+    m_new_Q = 0;
+    m_cur_Q = 0;
+    m_last_Analog = 0.0;
+    m_new_Analog = 0.0;
+    m_cur_Analog = 0.0;
 };
 
 ATTR_COLD netlist_net_t::~netlist_net_t()
@@ -504,12 +507,12 @@ ATTR_COLD netlist_net_t::~netlist_net_t()
 
 ATTR_COLD void netlist_net_t::reset()
 {
-    m_last.Analog = 0.0;
-    m_cur.Analog = 0.0;
-    m_new.Analog = 0.0;
-    m_last.Q = 0; // set to something we will never hit.
-    m_new.Q = 0;
-    m_cur.Q = 0;
+    m_last_Analog = 0.0;
+    m_cur_Analog = 0.0;
+    m_new_Analog = 0.0;
+    m_last_Q = 0; // set to something we will never hit.
+    m_new_Q = 0;
+    m_cur_Q = 0;
     m_time = netlist_time::zero;
     m_active = 0;
     m_in_queue = 2;
@@ -530,12 +533,12 @@ ATTR_COLD void netlist_net_t::init_object(netlist_base_t &nl, const pstring &ana
 
 ATTR_COLD void netlist_net_t::save_register()
 {
-    save(NAME(m_last.Analog));
-    save(NAME(m_cur.Analog));
-    save(NAME(m_new.Analog));
-    save(NAME(m_last.Q));
-    save(NAME(m_cur.Q));
-    save(NAME(m_new.Q));
+    save(NAME(m_last_Analog));
+    save(NAME(m_cur_Analog));
+    save(NAME(m_new_Analog));
+    save(NAME(m_last_Q));
+    save(NAME(m_cur_Q));
+    save(NAME(m_new_Q));
     save(NAME(m_time));
     save(NAME(m_active));
     save(NAME(m_in_queue));
@@ -606,12 +609,13 @@ ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
 	assert(this->isRailNet());
 
 	const UINT32 masks[4] = { 1, 5, 3, 1 };
-    const UINT32 mask = masks[ (m_last.Q  << 1) | m_new.Q ];
+    const UINT32 mask = masks[ (m_last_Q  << 1) | m_new_Q ];
+    netlist_core_terminal_t *p = m_head;
 
     m_in_queue = 2; /* mark as taken ... */
-    m_cur = m_new;
+    m_cur_Q = m_new_Q;
 
-    netlist_core_terminal_t *p = m_head;
+    m_cur_Analog = m_new_Analog;
 
 #if 1
     switch (m_num_cons)
@@ -638,7 +642,8 @@ ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
         p = p->m_update_list_next;
     } while (p != NULL);
 #endif
-    m_last = m_cur;
+    m_last_Q = m_cur_Q;
+    m_last_Analog = m_cur_Analog;
 }
 
 ATTR_HOT void netlist_net_t::solve()
@@ -719,9 +724,9 @@ ATTR_COLD netlist_logic_output_t::netlist_logic_output_t()
 
 ATTR_COLD void netlist_logic_output_t::initial(const netlist_sig_t val)
 {
-	net().m_cur.Q = val;
-	net().m_new.Q = val;
-    net().m_last.Q = val;
+	net().m_cur_Q = val;
+	net().m_new_Q = val;
+    net().m_last_Q = val;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -740,16 +745,16 @@ ATTR_COLD netlist_ttl_output_t::netlist_ttl_output_t()
 ATTR_COLD netlist_analog_output_t::netlist_analog_output_t()
 	: netlist_output_t(OUTPUT, ANALOG)
 {
-    net().m_last.Analog = 0.97;
-	net().m_cur.Analog = 0.98;
-	net().m_new.Analog = 0.99;
+    net().m_last_Analog = 0.97;
+	net().m_cur_Analog = 0.98;
+	net().m_new_Analog = 0.99;
 }
 
 ATTR_COLD void netlist_analog_output_t::initial(const double val)
 {
-    net().m_cur.Analog = val * 0.98;
-	net().m_cur.Analog = val * 0.99;
-	net().m_new.Analog = val * 1.0;
+    net().m_cur_Analog = val * 0.98;
+	net().m_cur_Analog = val * 0.99;
+	net().m_new_Analog = val * 1.0;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -844,7 +849,7 @@ ATTR_COLD double netlist_param_model_t::model_value(const pstring &entity, const
 
 ATTR_HOT inline void NETLIB_NAME(mainclock)::mc_update(netlist_net_t &net)
 {
-    net.m_new.Q ^= 1;
+    net.m_new_Q ^= 1;
     net.update_devs();
 }
 
@@ -870,7 +875,7 @@ NETLIB_UPDATE(mainclock)
 {
 	netlist_net_t &net = m_Q.net();
 	// this is only called during setup ...
-	net.m_new.Q = !net.m_new.Q;
+	net.m_new_Q = !net.m_new_Q;
 	net.set_time(netlist().time() + m_inc);
 }
 
