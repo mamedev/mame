@@ -829,10 +829,10 @@ void console_create_window(running_machine &machine)
 	{
 		NSInteger tag;
 		for (tag = 1; tag <= 8; tag <<= 1) {
-			NSString	*title = [NSString stringWithFormat:@"%ld-byte Chunks", tag];
+			NSString	*title = [NSString stringWithFormat:@"%ld-byte Chunks", (long)tag];
 			NSMenuItem	*chunkItem = [menu insertItemWithTitle:title
 														action:@selector(showChunkSize:)
-												 keyEquivalent:[NSString stringWithFormat:@"%ld", tag]
+												 keyEquivalent:[NSString stringWithFormat:@"%ld", (long)tag]
 													   atIndex:index++];
 			[chunkItem setTarget:self];
 			[chunkItem setTag:tag];
