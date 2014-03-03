@@ -100,7 +100,6 @@ public:
 	DECLARE_WRITE8_MEMBER(reelscroll4_w);
 	DECLARE_WRITE8_MEMBER(skylncr_coin_w);
 	DECLARE_READ8_MEMBER(ret_ff);
-	DECLARE_READ8_MEMBER(ret_unk);
 	DECLARE_READ8_MEMBER(ret_00);
 	DECLARE_WRITE8_MEMBER(skylncr_nmi_enable_w);
 	DECLARE_DRIVER_INIT(skylncr);
@@ -343,12 +342,6 @@ WRITE8_MEMBER(skylncr_state::skylncr_coin_w)
 READ8_MEMBER(skylncr_state::ret_ff)
 {
 	return 0xff;
-}
-
-READ8_MEMBER(skylncr_state::ret_unk)
-{
-//	return 0xff;
-	return (machine().rand() & 0xff);
 }
 
 #ifdef UNUSED_FUNCTION
