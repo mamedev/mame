@@ -1428,6 +1428,8 @@ static MACHINE_CONFIG_DERIVED( to9, to7 )
 
 	MCFG_MC6846_MODIFY( "mc6846", to9_timer )
 
+	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
