@@ -21,7 +21,7 @@ Supported games:
     hellfire1a  B90         HellFire (1 Player older version) Uses Taito rom ID number
     zerowing    TP-O15      Zero Wing (2 player simultaneous version)
     zerowing1   TP-O15      Zero Wing (1 Player version)
-    zerowingu   TP-O15      Zero Wing (2 player simultaneous version, Williams Electronics Games, Inc)
+    zerowingw   TP-O15      Zero Wing (2 player simultaneous version, Williams Electronics Games, Inc)
     demonwld    TP-O16      Demon's World/Horror Story [1990]
     demonwl1    TP-O16      Demon's World/Horror Story [1989] (Taito license)
     demonwl2    TP-O16      Demon's World/Horror Story [1989] (early edition)
@@ -2325,7 +2325,7 @@ ROM_START( zerowing1 ) /* 1 player version */
 	ROM_LOAD( "tp015_15.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
-ROM_START( zerowingu ) /* 2 player simultaneous version (Williams Electronics) */
+ROM_START( zerowingw ) /* 2 player simultaneous version (Williams Electronics) */
 	ROM_REGION( 0x080000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o15-11iiw.bin",  0x000000, 0x08000, CRC(38b0bb5b) SHA1(e5a4c0b6c279a55701c82bf9e285a806054f8d23) )
 	ROM_LOAD16_BYTE( "o15-12iiw.bin",  0x000001, 0x08000, CRC(74c91e6f) SHA1(8cf5d10a5f4efda0903a4c5d56599861ccc8f1c1) )
@@ -2870,7 +2870,7 @@ GAME( 1989, hellfire2a, hellfire, hellfire, hellfire2a,toaplan1_state, toaplan1,
 GAME( 1989, hellfire1a, hellfire, hellfire, hellfire1a,toaplan1_state, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P set, older)", 0 )
 GAME( 1989, zerowing,   0,        zerowing, zerowing2, toaplan1_state, toaplan1, ROT0,   "Toaplan", "Zero Wing (2P set)", 0 )
 GAME( 1989, zerowing1,  zerowing, zerowing, zerowing,  toaplan1_state, toaplan1, ROT0,   "Toaplan", "Zero Wing (1P set)", 0 )
-GAME( 1989, zerowingu,  zerowing, zerowing, zerowing2, toaplan1_state, toaplan1, ROT0,   "Toaplan (Williams license)", "Zero Wing (US, 2P set)", 0 )
+GAME( 1989, zerowingw,  zerowing, zerowing, zerowing2, toaplan1_state, toaplan1, ROT0,   "Toaplan (Williams license)", "Zero Wing (2P set, Williams license)", 0 )
 GAME( 1990, demonwld,   0,        demonwld, demonwld,  toaplan1_state, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 1)", 0 )
 GAME( 1989, demonwld1,  demonwld, demonwld, demonwld1, toaplan1_state, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 2)", 0 )
 GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, toaplan1_state, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 3)", 0 )
