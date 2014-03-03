@@ -2451,6 +2451,7 @@ static MACHINE_CONFIG_DERIVED( guttang, galaxian )
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
+	MCFG_PALETTE_INIT_OWNER(galaxold_state,galaxold)
 //  MCFG_PALETTE_INIT_OWNER(galaxold_state,scrambold)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
 MACHINE_CONFIG_END
