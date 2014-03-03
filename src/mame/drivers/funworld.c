@@ -5863,6 +5863,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 	auto_free(machine(), buffer);
 
+	m_palette->update();
 }
 
 
