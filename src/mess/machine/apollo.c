@@ -29,17 +29,8 @@
  */
 
 #include "includes/apollo.h"
-
 #include "machine/pc_fdc.h"
 #include "formats/apollo_dsk.h"
-
-#include "emuopts.h"
-#include "devlegcy.h"
-
-#if defined(APOLLO_FOR_LINUX)
-#include <fcntl.h>
-#include <unistd.h>
-#endif
 
 #define APOLLO_IRQ_VECTOR 0xa0
 #define APOLLO_IRQ_PTM 0
@@ -784,27 +775,6 @@ static const ptm6840_interface apollo_ptm_config = {
  DN3000/DN3500 Realtime Calendar MC146818 at 0x8900/0x10900
  ***************************************************************************/
 
-static DEVICE_RESET( apollo_rtc ) 
-{
-	address_space &space = device->machine().device(MAINCPU)->memory().space(AS_PROGRAM);
-	apollo_state *state = device->machine().driver_data<apollo_state>();
-	UINT8 year = state->apollo_rtc_r(space, 9);
-
-	// change year according to configuration settings
-	if (year < 20 && apollo_config(APOLLO_CONF_DATE_1990))
-	{
-		year+=80;
-		state->apollo_rtc_w(space, 9, year);
-	}
-	else if (year >= 80 && !apollo_config(APOLLO_CONF_DATE_1990))
-	{
-		year -=80;
-		state->apollo_rtc_w(space, 9, year);
-	}
-
-	//SLOG1(("reset apollo_rtc year=%d", year));
-}
-
 WRITE8_MEMBER(apollo_state::apollo_rtc_w)
 {
 	m_rtc->write(space, 0, offset);
@@ -1064,12 +1034,25 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 
 MACHINE_RESET_MEMBER(apollo_state,apollo)
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	UINT8 year = apollo_rtc_r(space, 9);
+
 	//MLOG1(("machine_reset_apollo"));
 
 	// set configuration
 	apollo_csr_set_servicemode(apollo_config(APOLLO_CONF_SERVICE_MODE));
 
-	device_reset_apollo_rtc(machine().device(APOLLO_RTC_TAG));
+	// change year according to configuration settings
+	if (year < 20 && apollo_config(APOLLO_CONF_DATE_1990))
+	{
+		year+=80;
+		apollo_rtc_w(space, 9, year);
+	}
+	else if (year >= 80 && !apollo_config(APOLLO_CONF_DATE_1990))
+	{
+		year -=80;
+		apollo_rtc_w(space, 9, year);
+	}
 
 	ptm_counter = 0;
 	sio_output_data = 0xff;
