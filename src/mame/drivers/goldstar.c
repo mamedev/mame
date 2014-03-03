@@ -6366,6 +6366,42 @@ static MACHINE_CONFIG_START( goldfrui, goldstar_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_START( super9, goldstar_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(goldstar_map)
+//	MCFG_CPU_PROGRAM_MAP(nfm_map)
+	MCFG_CPU_IO_MAP(goldstar_readport)
+//	MCFG_CPU_IO_MAP(unkch_portmap)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", goldstar)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+
 PALETTE_INIT_MEMBER(goldstar_state,cm)
 {
 	/* BBGGGRRR */
@@ -7436,6 +7472,12 @@ ROM_END
 
 /*
 	Super Nove by Playmark
+	
+	bp 2db
+	the next call ($0C33) hangs the game
+	since there are ascii strings there
+	instead of code.
+	
 */
 ROM_START( super9 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -11910,6 +11952,28 @@ DRIVER_INIT_MEMBER(goldstar_state,tonypok)
 
 }
 
+DRIVER_INIT_MEMBER(goldstar_state, super9)
+{
+	int i;
+	UINT8 *src = memregion("gfx1")->base();
+	for (i = 0;i < 0x20000;i++)
+	{
+//		src[i] = BITSWAP8(src[i], 7,4,2,1,6,5,3,0);
+//		src[i] = BITSWAP8(src[i], 7,3,2,6,1,5,4,0);
+//		src[i] = BITSWAP8(src[i], 7,3,2,6,5,1,4,0);
+		src[i] = BITSWAP8(src[i], 3,7,6,2,5,1,0,4);	// endianess
+	}
+
+	UINT8 *src2 = memregion("gfx2")->base();
+	for (i = 0;i < 0x8000;i++)
+	{
+//		src2[i] = BITSWAP8(src2[i], 7,4,2,1,6,5,3,0);
+//		src2[i] = BITSWAP8(src2[i], 7,3,2,6,1,5,4,0);
+		src2[i] = BITSWAP8(src2[i], 3,7,6,2,5,1,0,4);	// endianess
+	}
+
+}
+
 
 /*********************************************
 *                Game Drivers                *
@@ -11922,7 +11986,7 @@ GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,        
 GAME(  199?, chrygld,   0,        chrygld,  chrygld,  goldstar_state, chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
 GAME(  199?, chry10,    0,        chrygld,  chry10,   goldstar_state, chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )	// maybe fullname should be 'Gold Fruit (main 40%)'
-GAME(  2001, super9,    goldstar, goldstbl, goldstar, driver_device,  0,         ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING)	// need to decode gfx and see the program loops/reset... 
+GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING)	// need to decode gfx and see the program loops/reset... 
 
 // are these really dyna, or bootlegs?
 GAME(  199?, ncb3,      0,        ncb3,     ncb3,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0 )
