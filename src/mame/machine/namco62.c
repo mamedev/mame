@@ -10,16 +10,12 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "namco62.h"
+#include "machine/namco62.h"
 #include "cpu/mb88xx/mb88xx.h"
 
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-
-
-
-
 
 
 /***************************************************************************
@@ -54,13 +50,36 @@ namco_62xx_device::namco_62xx_device(const machine_config &mconfig, const char *
 }
 
 //-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void namco_62xx_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const namco_62xx_interface *intf = reinterpret_cast<const namco_62xx_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<namco_62xx_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_in[0], 0, sizeof(m_in[0]));
+		memset(&m_in[1], 0, sizeof(m_in[1]));
+		memset(&m_in[2], 0, sizeof(m_in[2]));
+		memset(&m_in[3], 0, sizeof(m_in[3]));
+		memset(&m_out[0], 0, sizeof(m_out[0]));
+		memset(&m_out[1], 0, sizeof(m_out[1]));
+	}
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void namco_62xx_device::device_start()
 {
-	astring tempstring;
-
 	/* find our CPU */
 	m_cpu = subdevice("mcu");
 	assert(m_cpu != NULL);

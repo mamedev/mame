@@ -36,7 +36,7 @@ protected:
 			TYPE_NAMCO56XX,
 			TYPE_NAMCO58XX,
 			TYPE_NAMCO59XX,
-		};
+	};
 
 	// internal state
 	UINT8          m_ram[16];
