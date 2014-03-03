@@ -576,7 +576,7 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", zodiack)
 	MCFG_PALETTE_ADD("palette", 4*8+2*8+2*1)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(48+1)
 	MCFG_PALETTE_INIT_OWNER(zodiack_state,zodiack)
 
 	/* sound hardware */

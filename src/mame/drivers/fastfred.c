@@ -654,8 +654,9 @@ static MACHINE_CONFIG_START( fastfred, fastfred_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fastfred_state, screen_update_fastfred)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fastfred)
-	MCFG_PALETTE_ADD("palette", 32*8)
 
+	MCFG_PALETTE_ADD("palette", 32*8)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(fastfred_state,fastfred)
 	MCFG_VIDEO_START_OVERRIDE(fastfred_state,fastfred)
 

@@ -487,7 +487,6 @@ static MACHINE_CONFIG_START( base, lasso_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)    /* guess, but avoids glitching of Chameleon's high score table */
@@ -497,8 +496,6 @@ static MACHINE_CONFIG_START( base, lasso_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_lasso)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", lasso)
-	MCFG_PALETTE_ADD("palette", 0x40)
-	MCFG_PALETTE_INIT_OWNER(lasso_state, lasso)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -516,6 +513,8 @@ static MACHINE_CONFIG_DERIVED( lasso, base )
 	MCFG_CPU_ADD("blitter", M6502, 11289000/16) /* guess */
 	MCFG_CPU_PROGRAM_MAP(lasso_coprocessor_map)
 
+	MCFG_PALETTE_ADD("palette", 0x40)
+	MCFG_PALETTE_INIT_OWNER(lasso_state, lasso)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( chameleo, base )
@@ -528,6 +527,9 @@ static MACHINE_CONFIG_DERIVED( chameleo, base )
 	MCFG_CPU_PROGRAM_MAP(chameleo_audio_map)
 
 	/* video hardware */
+	MCFG_PALETTE_ADD("palette", 0x40)
+	MCFG_PALETTE_INIT_OWNER(lasso_state, lasso)
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_chameleo)
 MACHINE_CONFIG_END
@@ -549,8 +551,9 @@ static MACHINE_CONFIG_DERIVED( wwjgtin, base )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)  // Smaller visible area?
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_wwjgtin)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", wwjgtin) // Has 1 additional layer
-	MCFG_DEVICE_REMOVE("palette")
+
 	MCFG_PALETTE_ADD("palette", 0x40 + 16*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(64)
 	MCFG_PALETTE_INIT_OWNER(lasso_state,wwjgtin)
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,wwjgtin)
 
@@ -572,7 +575,7 @@ static MACHINE_CONFIG_DERIVED( pinbo, base )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pinbo)
-	MCFG_DEVICE_REMOVE("palette")
+
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)
 	MCFG_SCREEN_MODIFY("screen")

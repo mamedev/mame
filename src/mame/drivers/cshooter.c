@@ -451,6 +451,7 @@ static MACHINE_CONFIG_START( airraid, cshooter_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cshooter)
 	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
 	MCFG_PALETTE_INIT_OWNER(cshooter_state, cshooter)
 
 	/* sound hardware */

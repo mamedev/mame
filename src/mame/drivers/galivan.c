@@ -438,6 +438,7 @@ static MACHINE_CONFIG_START( galivan, galivan_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", galivan)
 	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)
 	
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
@@ -484,6 +485,7 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", galivan)
 	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)
 
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)

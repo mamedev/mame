@@ -1241,7 +1241,9 @@ static MACHINE_CONFIG_START( equites, equites_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", equites)
 	MCFG_PALETTE_ADD("palette", 0x180)
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
 	MCFG_PALETTE_INIT_OWNER(equites_state,equites)
+
 	MCFG_VIDEO_START_OVERRIDE(equites_state,equites)
 
 	MCFG_MACHINE_START_OVERRIDE(equites_state,equites)
@@ -1278,7 +1280,9 @@ static MACHINE_CONFIG_START( splndrbt, equites_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", splndrbt)
 	MCFG_PALETTE_ADD("palette", 0x280)
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
 	MCFG_PALETTE_INIT_OWNER(equites_state,splndrbt)
+
 	MCFG_VIDEO_START_OVERRIDE(equites_state,splndrbt)
 
 	MCFG_MACHINE_START_OVERRIDE(equites_state,equites)

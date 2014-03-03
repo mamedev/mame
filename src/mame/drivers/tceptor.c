@@ -384,6 +384,7 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", tceptor)
 	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_INDIRECT_ENTRIES(1024)
 	MCFG_PALETTE_INIT_OWNER(tceptor_state, tceptor)
 	
 	MCFG_DEFAULT_LAYOUT(layout_horizont)

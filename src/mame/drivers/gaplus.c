@@ -597,6 +597,7 @@ static MACHINE_CONFIG_START( gaplus, gaplus_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gaplus)
 	MCFG_PALETTE_ADD("palette", 64*4+64*8)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(gaplus_state, gaplus)
 
 	/* sound hardware */

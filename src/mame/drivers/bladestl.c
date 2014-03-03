@@ -336,6 +336,7 @@ static MACHINE_CONFIG_START( bladestl, bladestl_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bladestl)
 	MCFG_PALETTE_ADD("palette", 32 + 16*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32+16)
 	MCFG_PALETTE_INIT_OWNER(bladestl_state, bladestl)
 
 	MCFG_K007342_ADD("k007342", bladestl_k007342_intf)

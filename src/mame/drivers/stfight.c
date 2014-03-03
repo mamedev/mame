@@ -563,6 +563,7 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", stfight)
 	MCFG_PALETTE_ADD("palette", 16*4+16*16+16*16+16*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(stfight_state, stfight)
 
 	/* sound hardware */

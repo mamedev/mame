@@ -259,6 +259,7 @@ static MACHINE_CONFIG_START( ikki, ikki_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ikki)
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
 	MCFG_PALETTE_INIT_OWNER(ikki_state, ikki)
 
 	/* sound hardware */

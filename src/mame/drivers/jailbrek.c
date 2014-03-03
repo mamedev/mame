@@ -253,6 +253,7 @@ static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", jailbrek)
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(jailbrek_state, jailbrek)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

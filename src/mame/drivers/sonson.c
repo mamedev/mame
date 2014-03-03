@@ -257,6 +257,7 @@ static MACHINE_CONFIG_START( sonson, sonson_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", sonson)
 
 	MCFG_PALETTE_ADD("palette", 64*4+32*8)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(sonson_state, sonson)
 
 	/* sound hardware */

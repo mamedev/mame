@@ -319,6 +319,7 @@ static MACHINE_CONFIG_START( travrusa, travrusa_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", travrusa)
 
 	MCFG_PALETTE_ADD("palette", 16*8+16*8)
+	MCFG_PALETTE_INDIRECT_ENTRIES(128+16)
 	MCFG_PALETTE_INIT_OWNER(travrusa_state, travrusa)
 
 	/* sound hardware */

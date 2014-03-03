@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( zerohour, ladybug_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", redclash)
 	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
 	MCFG_PALETTE_INIT_OWNER(ladybug_state,redclash)
 	MCFG_VIDEO_START_OVERRIDE(ladybug_state,redclash)
 
@@ -393,7 +393,7 @@ static MACHINE_CONFIG_START( redclash, ladybug_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", redclash)
 	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
 	MCFG_PALETTE_INIT_OWNER(ladybug_state,redclash)
 	MCFG_VIDEO_START_OVERRIDE(ladybug_state,redclash)
 

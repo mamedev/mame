@@ -261,6 +261,7 @@ static MACHINE_CONFIG_START( portrait, portrait_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", portrait)
 	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x40)
 	MCFG_PALETTE_INIT_OWNER(portrait_state, portrait)
 
 	/* sound hardware */

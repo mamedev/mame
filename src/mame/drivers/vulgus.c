@@ -230,6 +230,7 @@ static MACHINE_CONFIG_START( vulgus, vulgus_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", vulgus)
 
 	MCFG_PALETTE_ADD("palette", 64*4+16*16+4*32*8)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(vulgus_state, vulgus)
 
 	/* sound hardware */

@@ -870,8 +870,8 @@ static MACHINE_CONFIG_START( rallyx, rallyx_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", rallyx)
 
 	MCFG_PALETTE_ADD("palette", 64*4+4)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_ENABLE_SHADOWS()
-
 	MCFG_PALETTE_INIT_OWNER(rallyx_state,rallyx)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,rallyx)
 
@@ -908,8 +908,8 @@ static MACHINE_CONFIG_START( jungler, rallyx_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", jungler)
 
 	MCFG_PALETTE_ADD("palette", 64*4+4+64)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32+64)
 	MCFG_PALETTE_ENABLE_SHADOWS()
-
 	MCFG_PALETTE_INIT_OWNER(rallyx_state,jungler)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,jungler)
 

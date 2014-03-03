@@ -400,6 +400,7 @@ static MACHINE_CONFIG_START( m52, m52_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", m52)
 	MCFG_PALETTE_ADD("palette", 128*4+16*4+3*4)
+	MCFG_PALETTE_INDIRECT_ENTRIES(512+32+32)
 	MCFG_PALETTE_INIT_OWNER(m52_state, m52)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

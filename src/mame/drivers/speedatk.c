@@ -339,6 +339,7 @@ static MACHINE_CONFIG_START( speedatk, speedatk_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", speedatk)
 	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(speedatk_state, speedatk)
 
 	/* sound hardware */

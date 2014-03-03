@@ -315,6 +315,7 @@ static MACHINE_CONFIG_START( ultratnk, ultratnk_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ultratnk)
 	MCFG_PALETTE_ADD("palette", 10)
+	MCFG_PALETTE_INDIRECT_ENTRIES(4)
 	MCFG_PALETTE_INIT_OWNER(ultratnk_state, ultratnk)
 
 	/* sound hardware */

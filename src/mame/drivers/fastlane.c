@@ -219,6 +219,7 @@ static MACHINE_CONFIG_START( fastlane, fastlane_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fastlane)
 	MCFG_PALETTE_ADD("palette", 1024*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
 	MCFG_PALETTE_INIT_OWNER(fastlane_state, fastlane)
 
 	MCFG_K007121_ADD("k007121")

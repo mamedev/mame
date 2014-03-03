@@ -538,6 +538,7 @@ static MACHINE_CONFIG_START( dderby, dmndrby_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dmndrby)
 	MCFG_PALETTE_ADD("palette", 0x300)
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x20)
 	MCFG_PALETTE_INIT_OWNER(dmndrby_state, dmndrby)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

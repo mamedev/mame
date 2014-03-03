@@ -78,8 +78,7 @@ PALETTE_INIT_MEMBER(zodiack_state,zodiack)
 	palette.set_indirect_color(0x30, rgb_t::white);
 
 	for (i = 0; i < 0x20; i++)
-		if ((i & 3) == 0)
-			palette.set_pen_indirect(i, 0);
+		palette.set_pen_indirect(i, (i & 3) ? i : 0);
 
 	for (i = 0; i < 0x10; i += 2)
 	{

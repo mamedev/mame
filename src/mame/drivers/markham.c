@@ -195,6 +195,7 @@ static MACHINE_CONFIG_START( markham, markham_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", markham)
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(markham_state, markham)
 
 	/* sound hardware */

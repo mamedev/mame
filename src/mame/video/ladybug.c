@@ -29,7 +29,7 @@
 
 ***************************************************************************/
 
-static void palette_init_common( palette_device &palette, const UINT8 *color_prom, int colortable_size,
+static void palette_init_common( palette_device &palette, const UINT8 *color_prom,
 								int r_bit0, int r_bit1, int g_bit0, int g_bit1, int b_bit0, int b_bit1 )
 {
 	static const int resistances[2] = { 470, 220 };
@@ -93,7 +93,7 @@ static void palette_init_common( palette_device &palette, const UINT8 *color_pro
 PALETTE_INIT_MEMBER(ladybug_state,ladybug)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	palette_init_common(palette, color_prom, 0x20, 0, 5, 2, 6, 4, 7);
+	palette_init_common(palette, color_prom, 0, 5, 2, 6, 4, 7);
 }
 
 PALETTE_INIT_MEMBER(ladybug_state,sraider)
@@ -102,7 +102,7 @@ PALETTE_INIT_MEMBER(ladybug_state,sraider)
 	int i;
 
 	/* the resistor net may be probably different than Lady Bug */
-	palette_init_common(palette, color_prom, 0x41, 3, 0, 5, 4, 7, 6);
+	palette_init_common(palette, color_prom, 3, 0, 5, 4, 7, 6);
 
 	/* star colors */
 	for (i = 0x20; i < 0x40; i++)

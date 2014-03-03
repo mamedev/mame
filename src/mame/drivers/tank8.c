@@ -343,6 +343,7 @@ static MACHINE_CONFIG_START( tank8, tank8_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tank8)
 	MCFG_PALETTE_ADD("palette", 20)
+	MCFG_PALETTE_INDIRECT_ENTRIES(10)
 	MCFG_PALETTE_INIT_OWNER(tank8_state, tank8)
 
 	/* sound hardware */

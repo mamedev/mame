@@ -301,6 +301,7 @@ static MACHINE_CONFIG_START( bankp, bankp_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bankp)
 	MCFG_PALETTE_ADD("palette", 32*4+16*8)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(bankp_state, bankp)
 
 	/* sound hardware */
