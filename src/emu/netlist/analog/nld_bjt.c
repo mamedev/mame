@@ -77,10 +77,10 @@ NETLIB_START(QBJT_switch)
 
     save(NAME(m_state_on));
 
-    m_RB.set(NETLIST_GMIN, 0.0, 0.0);
-    m_RC.set(NETLIST_GMIN, 0.0, 0.0);
+    m_RB.set(netlist().gmin(), 0.0, 0.0);
+    m_RC.set(netlist().gmin(), 0.0, 0.0);
 
-    m_BC_dummy.set(NETLIST_GMIN, 0.0, 0.0);
+    m_BC_dummy.set(netlist().gmin(), 0.0, 0.0);
 
     m_state_on = 0;
 
@@ -105,8 +105,8 @@ NETLIB_START(QBJT_switch)
 
         m_gB = d.gI(0.005 / alpha);
 
-        if (m_gB < NETLIST_GMIN)
-            m_gB = NETLIST_GMIN;
+        if (m_gB < netlist().gmin())
+            m_gB = netlist().gmin();
         m_gC =  d.gI(0.005); // very rough estimate
         //printf("%f %f \n", m_V, m_gB);
     }
@@ -157,8 +157,8 @@ NETLIB_START(QBJT_EB)
         m_alpha_f = BF / (1.0 + BF);
         m_alpha_r = BR / (1.0 + BR);
 
-        m_gD_BE.set_param(IS / m_alpha_f, NF);
-        m_gD_BC.set_param(IS / m_alpha_r, NR);
+        m_gD_BE.set_param(IS / m_alpha_f, NF, netlist().gmin());
+        m_gD_BC.set_param(IS / m_alpha_r, NR, netlist().gmin());
     }
 }
 

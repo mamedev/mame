@@ -14,7 +14,7 @@
 NETLIB_START(VCCS)
 {
     register_param("G", m_G, 1.0);
-    register_param("RI", m_RI, 1.0 / NETLIST_GMIN);
+    register_param("RI", m_RI, 1.0 / netlist().gmin());
 
     register_terminal("IP", m_IP);
     register_terminal("IN", m_IN);

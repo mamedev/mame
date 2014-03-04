@@ -170,6 +170,7 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
 		netlist_param_double_t m_sync_delay;
 		netlist_param_double_t m_accuracy;
 		netlist_param_double_t m_convergence;
+        netlist_param_double_t m_gmin;
         netlist_param_int_t m_resched_loops;
         netlist_param_int_t m_parallel;
 
@@ -185,6 +186,8 @@ public:
 		ATTR_HOT inline void schedule();
 
 		ATTR_COLD void post_start();
+
+		ATTR_HOT inline double gmin() { return m_gmin.Value(); }
 );
 
 ATTR_HOT inline void NETLIB_NAME(solver)::schedule()

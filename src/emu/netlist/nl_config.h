@@ -36,7 +36,7 @@
 
 #define NETLIST_CLOCK               (NETLIST_INTERNAL_RES)
 
-#define NETLIST_GMIN    (1e-9)
+#define NETLIST_GMIN_DEFAULT    (1e-9)
 
 typedef UINT8 netlist_sig_t;
 

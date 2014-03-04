@@ -155,6 +155,18 @@ netlist_base_t::~netlist_base_t()
 	pstring::resetmem();
 }
 
+ATTR_COLD void netlist_base_t::save_register()
+{
+    save(NAME(m_queue.callback()));
+    save(NAME(m_time));
+    netlist_object_t::save_register();
+}
+
+ATTR_HOT const double netlist_base_t::gmin() const
+{
+    return solver()->gmin();
+}
+
 ATTR_COLD void netlist_base_t::start()
 {
     /* find the main clock and solver ... */
@@ -163,11 +175,17 @@ ATTR_COLD void netlist_base_t::start()
     m_solver = get_single_device<NETLIB_NAME(solver)>("solver");
     m_gnd = get_single_device<NETLIB_NAME(gnd)>("gnd");
 
+    /* make sure the solver is started first! */
+
+    if (m_solver != NULL)
+        m_solver->start_dev();
+
     NL_VERBOSE_OUT(("Initializing devices ...\n"));
     for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
     {
         netlist_device_t *dev = entry->object();
-        dev->start_dev();
+        if (dev != m_solver)
+            dev->start_dev();
     }
 
 }
@@ -504,6 +522,48 @@ ATTR_COLD netlist_net_t::~netlist_net_t()
     netlist().remove_save_items(this);
 }
 
+ATTR_HOT void netlist_net_t::inc_active()
+{
+    m_active++;
+
+    if (USE_DEACTIVE_DEVICE)
+    {
+        if (m_active == 1 && m_in_queue > 0)
+        {
+            m_last_Q = m_cur_Q;
+            m_last_Analog = m_cur_Analog; // FIXME: Needed here ?
+            railterminal().netdev().inc_active();
+            m_cur_Q = m_new_Q;
+            m_cur_Analog = m_new_Analog;
+        }
+    }
+
+    if (m_active == 1 && m_in_queue == 0)
+    {
+        if (m_time > netlist().time())
+        {
+            m_in_queue = 1;     /* pending */
+            netlist().push_to_queue(this, m_time);
+        }
+        else
+        {
+            m_cur_Q = m_last_Q = m_new_Q;
+            m_cur_Analog = m_last_Analog = m_new_Analog;  // FIXME: Needed here?
+            m_in_queue = 2;
+        }
+    }
+}
+
+ATTR_HOT void netlist_net_t::dec_active()
+{
+    m_active--;
+    if (USE_DEACTIVE_DEVICE)
+    {
+        if (m_active == 0)
+            railterminal().netdev().dec_active();
+    }
+}
+
 
 ATTR_COLD void netlist_net_t::reset()
 {
@@ -668,8 +728,8 @@ ATTR_COLD netlist_core_terminal_t::netlist_core_terminal_t(const type_t atype, c
 ATTR_COLD netlist_terminal_t::netlist_terminal_t()
 : netlist_core_terminal_t(TERMINAL, ANALOG)
 , m_Idr(0.0)
-, m_go(NETLIST_GMIN)
-, m_gt(NETLIST_GMIN)
+, m_go(NETLIST_GMIN_DEFAULT)
+, m_gt(NETLIST_GMIN_DEFAULT)
 , m_otherterm(NULL)
 {
 }
@@ -680,9 +740,18 @@ ATTR_COLD void netlist_terminal_t::reset()
     //netlist_terminal_core_terminal_t::reset();
     set_state(STATE_INP_ACTIVE);
     m_Idr = 0.0;
-    m_go = NETLIST_GMIN;
-    m_gt = NETLIST_GMIN;
+    m_go = netlist().gmin();
+    m_gt = netlist().gmin();
 }
+
+ATTR_COLD void netlist_terminal_t::save_register()
+{
+    save(NAME(m_Idr));
+    save(NAME(m_go));
+    save(NAME(m_gt));
+    netlist_core_terminal_t::save_register();
+}
+
 
 ATTR_COLD void netlist_core_terminal_t::set_net(netlist_net_t &anet)
 {

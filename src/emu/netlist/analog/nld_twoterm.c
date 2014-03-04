@@ -7,6 +7,34 @@
 #include "nld_solver.h"
 
 // ----------------------------------------------------------------------------------------
+// netlist_generic_diode
+// ----------------------------------------------------------------------------------------
+
+ATTR_COLD netlist_generic_diode::netlist_generic_diode()
+{
+    m_Vd = 0.7;
+}
+
+ATTR_COLD void netlist_generic_diode::set_param(const double Is, const double n, double gmin)
+{
+    m_Is = Is;
+    m_n = n;
+    m_gmin = gmin;
+
+    m_Vt = 0.0258 * m_n;
+
+    m_Vcrit = m_Vt * log(m_Vt / m_Is / sqrt(2.0));
+    m_VtInv = 1.0 / m_Vt;
+}
+
+ATTR_COLD void netlist_generic_diode::save(pstring name, netlist_object_t &parent)
+{
+    parent.save(m_Vd, name + ".m_Vd");
+    parent.save(m_Id, name + ".m_Id");
+    parent.save(m_G, name + ".m_G");
+}
+
+// ----------------------------------------------------------------------------------------
 // nld_twoterm
 // ----------------------------------------------------------------------------------------
 
@@ -49,7 +77,7 @@ NETLIB_START(R_base)
 NETLIB_RESET(R_base)
 {
     NETLIB_NAME(twoterm)::reset();
-    set_R(1.0 / NETLIST_GMIN);
+    set_R(1.0 / netlist().gmin());
 }
 
 NETLIB_UPDATE(R_base)
@@ -60,7 +88,7 @@ NETLIB_UPDATE(R_base)
 NETLIB_START(R)
 {
 	NETLIB_NAME(R_base)::start();
-	register_param("R", m_R, 1.0 / NETLIST_GMIN);
+	register_param("R", m_R, 1.0 / netlist().gmin());
 }
 
 NETLIB_RESET(R)
@@ -98,7 +126,7 @@ NETLIB_START(POT)
 
 	connect(m_R2.m_P, m_R1.m_N);
 
-	register_param("R", m_R, 1.0 / NETLIST_GMIN);
+	register_param("R", m_R, 1.0 / netlist().gmin());
 	register_param("DIAL", m_Dial, 0.5);
 	register_param("DIALLOG", m_DialIsLog, 0);
 
@@ -121,8 +149,8 @@ NETLIB_UPDATE_PARAM(POT)
 	double v = m_Dial.Value();
 	if (m_DialIsLog.Value())
 		v = (exp(v) - 1.0) / (exp(1.0) - 1.0);
-	m_R1.set_R(MAX(m_R.Value() * v, NETLIST_GMIN));
-	m_R2.set_R(MAX(m_R.Value() * (1.0 - v), NETLIST_GMIN));
+	m_R1.set_R(MAX(m_R.Value() * v, netlist().gmin()));
+	m_R2.set_R(MAX(m_R.Value() * (1.0 - v), netlist().gmin()));
 	// force a schedule all
     m_R1.update_dev();
     m_R2.update_dev();
@@ -140,13 +168,13 @@ NETLIB_START(C)
 	register_param("C", m_C, 1e-6);
 
 	// set up the element
-    set(NETLIST_GMIN, 0.0, -5.0 / NETLIST_GMIN);
+    set(netlist().gmin(), 0.0, -5.0 / netlist().gmin());
     //set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
 }
 
 NETLIB_RESET(C)
 {
-    set(NETLIST_GMIN, 0.0, -5.0 / NETLIST_GMIN);
+    set(netlist().gmin(), 0.0, -5.0 / netlist().gmin());
     //set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
 }
 
@@ -180,7 +208,7 @@ NETLIB_UPDATE_PARAM(D)
 	double Is = m_model.model_value("Is", 1e-15);
 	double n = m_model.model_value("N", 1);
 
-	m_D.set_param(Is, n);
+	m_D.set_param(Is, n, netlist().gmin());
 }
 
 NETLIB_UPDATE(D)

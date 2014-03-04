@@ -454,13 +454,7 @@ public:
     netlist_terminal_t *m_otherterm;
 
 protected:
-    ATTR_COLD virtual void save_register()
-    {
-        save(NAME(m_Idr));
-        save(NAME(m_go));
-        save(NAME(m_gt));
-        netlist_core_terminal_t::save_register();
-    }
+    ATTR_COLD virtual void save_register();
 
     ATTR_COLD virtual void reset();
 };
@@ -574,10 +568,13 @@ public:
     ATTR_HOT inline const netlist_core_terminal_t & RESTRICT  railterminal() const { return *m_railterminal; }
 
     /* Everything below is used by the logic subsystem */
-
+#if 0
     ATTR_HOT inline void inc_active();
     ATTR_HOT inline void dec_active();
-
+#else
+    ATTR_HOT void inc_active();
+    ATTR_HOT void dec_active();
+#endif
     ATTR_HOT inline const netlist_sig_t Q() const
     {
         assert(family() == LOGIC);
@@ -922,6 +919,8 @@ public:
     ATTR_HOT virtual void step_time(const double st) { }
     ATTR_HOT virtual void update_terminals() { }
 
+
+
 #if (NL_KEEP_STATISTICS)
     /* stats */
     osd_ticks_t total_time;
@@ -1026,6 +1025,7 @@ public:
     ATTR_HOT inline const netlist_time time() const { return m_time; }
     ATTR_HOT inline NETLIB_NAME(solver) *solver() const { return m_solver; }
     ATTR_HOT inline NETLIB_NAME(gnd) *gnd() const { return m_gnd; }
+    ATTR_HOT const double gmin() const;
 
     ATTR_HOT inline void push_to_queue(netlist_net_t *out, const netlist_time attime)
     {
@@ -1105,12 +1105,7 @@ protected:
 
     /* from netlist_object */
     ATTR_COLD virtual void reset();
-    ATTR_COLD virtual void save_register()
-    {
-        save(NAME(m_queue.callback()));
-        save(NAME(m_time));
-        netlist_object_t::save_register();
-    }
+    ATTR_COLD virtual void save_register();
 
 #if (NL_KEEP_STATISTICS)
     // performance
@@ -1213,6 +1208,7 @@ ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time delay)
     }
 }
 
+#if 0
 ATTR_HOT inline void netlist_net_t::inc_active()
 {
     m_active++;
@@ -1254,6 +1250,7 @@ ATTR_HOT inline void netlist_net_t::dec_active()
             railterminal().netdev().dec_active();
     }
 }
+#endif
 
 ATTR_HOT inline const netlist_sig_t netlist_logic_input_t::Q() const
 {
@@ -1269,6 +1266,7 @@ ATTR_HOT inline const double netlist_analog_input_t::Q_Analog() const
 {
     return net().Q_Analog();
 }
+
 
 // ----------------------------------------------------------------------------------------
 // net_dev class factory

@@ -38,7 +38,7 @@ NETLIB_UPDATE(4066)
 
     if (in < low)
     {
-        m_R.set_R(1.0 / NETLIST_GMIN);
+        m_R.set_R(1.0 / netlist().gmin());
         m_R.update_dev();
     }
     else if (in > high)
