@@ -23,6 +23,7 @@ enum
 	UPD7810_TMM, UPD7810_ETMM, UPD7810_EOM, UPD7810_SML, UPD7810_SMH,
 	UPD7810_ANM, UPD7810_MKL, UPD7810_MKH, UPD7810_ZCM,
 	UPD7810_TXB, UPD7810_RXB, UPD7810_CR0, UPD7810_CR1, UPD7810_CR2, UPD7810_CR3,
+	UPD7810_AN0, UPD7810_AN1, UPD7810_AN2, UPD7810_AN3, UPD7810_AN4, UPD7810_AN5, UPD7810_AN6, UPD7810_AN7,
 	UPD7810_TXD, UPD7810_RXD, UPD7810_SCK, UPD7810_TI, UPD7810_TO, UPD7810_CI, UPD7810_CO0, UPD7810_CO1
 };
 
@@ -55,6 +56,31 @@ enum
 #define MCFG_UPD7810_RXD(_devcb) \
 	upd7810_device::set_rxd_func(*device, DEVCB2_##_devcb);
 
+#define MCFG_UPD7810_AN0(_devcb) \
+	upd7810_device::set_an0_func(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD7810_AN1(_devcb) \
+	upd7810_device::set_an1_func(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD7810_AN2(_devcb) \
+	upd7810_device::set_an2_func(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD7810_AN3(_devcb) \
+	upd7810_device::set_an3_func(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD7810_AN4(_devcb) \
+	upd7810_device::set_an4_func(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD7810_AN5(_devcb) \
+	upd7810_device::set_an5_func(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD7810_AN6(_devcb) \
+	upd7810_device::set_an6_func(*device, DEVCB2_##_devcb);
+
+#define MCFG_UPD7810_AN7(_devcb) \
+	upd7810_device::set_an7_func(*device, DEVCB2_##_devcb);
+
+
 class upd7810_device : public cpu_device 
 {
 public:
@@ -66,6 +92,14 @@ public:
 	template<class _Object> static devcb2_base &set_to_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_to_func.set_callback(object); }
 	template<class _Object> static devcb2_base &set_txd_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_txd_func.set_callback(object); }
 	template<class _Object> static devcb2_base &set_rxd_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_rxd_func.set_callback(object); }
+	template<class _Object> static devcb2_base &set_an0_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an0_func.set_callback(object); }
+	template<class _Object> static devcb2_base &set_an1_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an1_func.set_callback(object); }
+	template<class _Object> static devcb2_base &set_an2_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an2_func.set_callback(object); }
+	template<class _Object> static devcb2_base &set_an3_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an3_func.set_callback(object); }
+	template<class _Object> static devcb2_base &set_an4_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an4_func.set_callback(object); }
+	template<class _Object> static devcb2_base &set_an5_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an5_func.set_callback(object); }
+	template<class _Object> static devcb2_base &set_an6_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an6_func.set_callback(object); }
+	template<class _Object> static devcb2_base &set_an7_func(device_t &device, _Object object) { return downcast<upd7810_device &>(device).m_an7_func.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -96,6 +130,14 @@ protected:
 	devcb2_write_line  m_to_func;
 	devcb2_write_line  m_txd_func;
 	devcb2_read_line   m_rxd_func;
+	devcb2_read_line   m_an0_func;
+	devcb2_read_line   m_an1_func;
+	devcb2_read_line   m_an2_func;
+	devcb2_read_line   m_an3_func;
+	devcb2_read_line   m_an4_func;
+	devcb2_read_line   m_an5_func;
+	devcb2_read_line   m_an6_func;
+	devcb2_read_line   m_an7_func;
 
 	typedef void (upd7810_device::*opcode_func)();
 
@@ -176,6 +218,7 @@ protected:
 	UINT8   m_eom;    /* 16-bit timer/event counter output control */
 	UINT8   m_sml;    /* serial interface parameters low */
 	UINT8   m_smh;    /* -"- high */
+	UINT8   m_panm;   /* previous analog to digital converter operating parameters */
 	UINT8   m_anm;    /* analog to digital converter operating parameters */
 	UINT8   m_mkl;    /* interrupt mask low */
 	UINT8   m_mkh;    /* -"- high */
@@ -221,6 +264,11 @@ protected:
 	INT32   m_ovcf;   /* overflow counter for fixed clock div 3 mode */
 	INT32   m_ovcs;   /* overflow counter for serial I/O */
 	UINT8   m_edges;  /* rising/falling edge flag for serial I/O */
+	UINT16  m_adcnt;  /* A/D converter cycle count */
+	UINT8   m_adtot;  /* A/D converter total cycles per conversion */
+	int     m_adout;  /* currently selected A/D converter output register */
+	int     m_adin;   /* currently selected A/D converter input */
+	int     m_adrange;/* in scan mode, A/D converter range (AN0-AN3 or AN4-AN7) */
 
 	const struct opcode_s *m_opXX;    /* opcode table */
 	const struct opcode_s *m_op48;

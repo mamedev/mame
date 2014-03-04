@@ -421,6 +421,14 @@ upd7810_device::upd7810_device(const machine_config &mconfig, const char *tag, d
 	, m_to_func(*this)
 	, m_txd_func(*this)
 	, m_rxd_func(*this)
+	, m_an0_func(*this)
+	, m_an1_func(*this)
+	, m_an2_func(*this)
+	, m_an3_func(*this)
+	, m_an4_func(*this)
+	, m_an5_func(*this)
+	, m_an6_func(*this)
+	, m_an7_func(*this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
 {
@@ -439,6 +447,14 @@ upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, 
 	, m_to_func(*this)
 	, m_txd_func(*this)
 	, m_rxd_func(*this)
+	, m_an0_func(*this)
+	, m_an1_func(*this)
+	, m_an2_func(*this)
+	, m_an3_func(*this)
+	, m_an4_func(*this)
+	, m_an5_func(*this)
+	, m_an6_func(*this)
+	, m_an7_func(*this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
 {
@@ -620,6 +636,7 @@ offs_t upd78c05_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 #define EOM     m_eom
 #define SML     m_sml
 #define SMH     m_smh
+#define PANM    m_panm
 #define ANM     m_anm
 #define MKL     m_mkl
 #define MKH     m_mkh
@@ -1634,6 +1651,93 @@ void upd7810_device::handle_timers(int cycles)
 		}
 		break;
 	}
+
+	/**** ADC ****/
+	m_adcnt += cycles;
+	if (PANM != ANM)
+	{
+		/* reset A/D converter */
+		m_adcnt = 0;
+		if (ANM & 0x10)
+			m_adtot = 144;
+		else
+			m_adtot = 192;
+		m_adout = 0;
+		if (ANM & 0x01)
+		{
+			/* select mode */
+			m_adin = (ANM >> 1) & 0x07;
+		}
+		else
+		{
+			/* scan mode */
+			m_adin    = 0;
+			m_adrange = (ANM >> 1) & 0x04;
+		}
+	}
+	PANM = ANM;
+	if (ANM & 0x01)
+	{
+		/* select mode */
+		while (m_adcnt > m_adtot)
+		{
+			UINT8 cr = 0;
+			m_adcnt -= m_adtot;
+			switch (m_adin)
+			{
+				case 0: cr = m_an0_func(); break;
+				case 1: cr = m_an1_func(); break;
+				case 2: cr = m_an2_func(); break;
+				case 3: cr = m_an3_func(); break;
+				case 4: cr = m_an4_func(); break;
+				case 5: cr = m_an5_func(); break;
+				case 6: cr = m_an6_func(); break;
+				case 7: cr = m_an7_func(); break;
+			}
+			switch (m_adout)
+			{
+				case 0: CR0 = cr; break;
+				case 1: CR1 = cr; break;
+				case 2: CR2 = cr; break;
+				case 3: CR3 = cr; break;
+			}
+			m_adout = (m_adout + 1) & 0x07;
+			if (m_adout == 0)
+				IRR |= INTFAD;
+		}
+	}
+	else
+	{
+		/* scan mode */
+		while (m_adcnt > m_adtot)
+		{
+			UINT8 cr = 0;
+			m_adcnt -= m_adtot;
+			switch (m_adin | m_adrange)
+			{
+				case 0: cr = m_an0_func(); break;
+				case 1: cr = m_an1_func(); break;
+				case 2: cr = m_an2_func(); break;
+				case 3: cr = m_an3_func(); break;
+				case 4: cr = m_an4_func(); break;
+				case 5: cr = m_an5_func(); break;
+				case 6: cr = m_an6_func(); break;
+				case 7: cr = m_an7_func(); break;
+			}
+			switch (m_adout)
+			{
+				case 0: CR0 = cr; break;
+				case 1: CR1 = cr; break;
+				case 2: CR2 = cr; break;
+				case 3: CR3 = cr; break;
+			}
+			m_adin  = (m_adin  + 1) & 0x07;
+			m_adout = (m_adout + 1) & 0x07;
+			if (m_adout == 0)
+				IRR |= INTFAD;
+		}
+	}
+
 }
 
 void upd7801_device::handle_timers(int cycles)
@@ -1685,6 +1789,14 @@ void upd7810_device::base_device_start()
 	m_to_func.resolve_safe();
 	m_txd_func.resolve_safe();
 	m_rxd_func.resolve_safe(0);
+	m_an0_func.resolve_safe(0);
+	m_an1_func.resolve_safe(0);
+	m_an2_func.resolve_safe(0);
+	m_an3_func.resolve_safe(0);
+	m_an4_func.resolve_safe(0);
+	m_an5_func.resolve_safe(0);
+	m_an6_func.resolve_safe(0);
+	m_an7_func.resolve_safe(0);
 
 	save_item(NAME(m_ppc.w.l));
 	save_item(NAME(m_pc.w.l));
@@ -1946,7 +2058,13 @@ void upd7810_device::device_reset()
 	m_ovcf = 0;
 	m_ovcs = 0;
 	m_edges = 0;
+	m_adcnt = 0;
+	m_adtot = 0;
+	m_adout = 0;
+	m_adin = 0;
+	m_adrange = 0;
 
+	PANM = 0xff;
 	ETMM = 0xff;
 	TMM = 0xff;
 	MA = 0xff;
