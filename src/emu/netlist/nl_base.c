@@ -257,7 +257,6 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
             m_time = m_stop;
 
     } else {
-#if 0
         netlist_net_t &mc_net = m_mainclock->m_Q.net();
         const netlist_time inc = m_mainclock->m_inc;
         netlist_time mc_time = mc_net.time();
@@ -289,43 +288,6 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
             add_to_stat(m_perf_out_processed, 1);
         }
         mc_net.set_time(mc_time);
-#else
-        netlist_net_t &mc_net = m_mainclock->m_Q.net();
-        const netlist_time inc = m_mainclock->m_inc;
-        netlist_time mc_time = mc_net.time();
-        netlist_time cur_time = m_time;
-
-        while (cur_time < m_stop)
-        {
-            if (m_queue.is_not_empty())
-            {
-                while (m_queue.peek()->exec_time() > mc_time)
-                {
-                    cur_time = mc_time;
-                    mc_time += inc;
-                    m_time = cur_time;
-                    NETLIB_NAME(mainclock)::mc_update(mc_net);
-                }
-
-                const netlist_queue_t::entry_t *e = m_queue.pop();
-                cur_time = e->exec_time();
-                m_time = cur_time;
-                e->object()->update_devs();
-            } else {
-                cur_time = mc_time;
-                mc_time += inc;
-                m_time = cur_time;
-                NETLIB_NAME(mainclock)::mc_update(mc_net);
-            }
-            if (FATAL_ERROR_AFTER_NS)
-                if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
-                    error("Stopped");
-
-            add_to_stat(m_perf_out_processed, 1);
-        }
-        mc_net.set_time(mc_time);
-        m_time = cur_time;
-#endif
     }
 }
 

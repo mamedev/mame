@@ -185,9 +185,9 @@ public:
     ATTR_HOT inline bool is_empty() const { return (m_end == &m_list[0]); }
     ATTR_HOT inline bool is_not_empty() const { return (m_end > &m_list[0]); }
 
-    ATTR_HOT ATTR_ALIGN inline void push(const entry_t &e)
+    ATTR_HOT ATTR_ALIGN void push(const entry_t &e)
     {
-        entry_t * RESTRICT i = m_end++;
+        entry_t * i = m_end++;
         const _Time e_time = e.exec_time();
         while ((i > &m_list[0]) && (e_time > (i - 1)->exec_time()) )
         {
@@ -231,8 +231,7 @@ public:
 
 private:
 
-    entry_t * RESTRICT m_end;
-    //entry_t *m_list;
+    entry_t * m_end;
     entry_t m_list[_Size];
 
 };

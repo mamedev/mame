@@ -568,13 +568,9 @@ public:
     ATTR_HOT inline const netlist_core_terminal_t & RESTRICT  railterminal() const { return *m_railterminal; }
 
     /* Everything below is used by the logic subsystem */
-#if 0
-    ATTR_HOT inline void inc_active();
-    ATTR_HOT inline void dec_active();
-#else
     ATTR_HOT void inc_active();
     ATTR_HOT void dec_active();
-#endif
+
     ATTR_HOT inline const netlist_sig_t Q() const
     {
         assert(family() == LOGIC);
@@ -1198,59 +1194,17 @@ ATTR_HOT inline void netlist_input_t::activate_lh()
 ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time delay)
 {
     //if (UNEXPECTED(m_num_cons == 0 || is_queued()))
-    if (is_queued())
-        return;
-    m_time = netlist().time() + delay;
-    m_in_queue = (m_active > 0);     /* queued ? */
-    if (EXPECTED(m_in_queue))
+    if (!is_queued())
     {
-        netlist().push_to_queue(this, m_time);
-    }
-}
-
-#if 0
-ATTR_HOT inline void netlist_net_t::inc_active()
-{
-    m_active++;
-
-    if (USE_DEACTIVE_DEVICE)
-    {
-        if (m_active == 1 && m_in_queue > 0)
+        m_time = netlist().time() + delay;
+        m_in_queue = (m_active > 0);     /* queued ? */
+        if (EXPECTED(m_in_queue))
         {
-            m_last_Q = m_cur_Q;
-            m_last_Analog = m_cur_Analog; // FIXME: Needed here ?
-            railterminal().netdev().inc_active();
-            m_cur_Q = m_new_Q;
-            m_cur_Analog = m_new_Analog;
-        }
-    }
-
-    if (m_active == 1 && m_in_queue == 0)
-    {
-        if (m_time > netlist().time())
-        {
-            m_in_queue = 1;     /* pending */
             netlist().push_to_queue(this, m_time);
         }
-        else
-        {
-            m_cur_Q = m_last_Q = m_new_Q;
-            m_cur_Analog = m_last_Analog = m_new_Analog;  // FIXME: Needed here?
-            m_in_queue = 2;
-        }
     }
 }
 
-ATTR_HOT inline void netlist_net_t::dec_active()
-{
-    m_active--;
-    if (USE_DEACTIVE_DEVICE)
-    {
-        if (m_active == 0)
-            railterminal().netdev().dec_active();
-    }
-}
-#endif
 
 ATTR_HOT inline const netlist_sig_t netlist_logic_input_t::Q() const
 {
