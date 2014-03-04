@@ -5608,6 +5608,18 @@ static const gfx_layout charlayout_goldfrui =
 };
 
 
+static const gfx_layout charlayout_cb3e =
+{
+	8,8,    /* 8*8 characters */
+	4096,    /* 4096 characters */
+	3,      /* 3 bits per pixel */
+	{ 2, 4, 6 }, /* the bitplanes are packed in one byte */
+	{ 2*8+0, 2*8+1, 3*8+0, 3*8+1, 0*8+0, 0*8+1, 1*8+0, 1*8+1 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8   /* every char takes 32 consecutive bytes */
+};
+
+
 static const gfx_layout tilelayout =
 {
 	8,32,    /* 8*32 characters */
@@ -5651,6 +5663,19 @@ static const gfx_layout tilelayout_chry10 =
 	128*8   /* every char takes 128 consecutive bytes */
 };
 
+static const gfx_layout tilelayout_cb3e =
+{
+	8,32,    /* 8*32 characters */
+	256,    /* 256 tiles */
+	4,      /* 4 bits per pixel */
+	{ 0, 2, 4, 6 },
+	{ 2*8+0, 2*8+1,3*8+0, 3*8+1,  0, 1, 1*8+0, 1*8+1 },
+	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
+			32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8,
+			64*8, 68*8, 72*8, 76*8, 80*8, 84*8, 88*8, 92*8,
+			96*8, 100*8, 104*8, 108*8, 112*8, 116*8, 120*8, 124*8 },
+	128*8   /* every char takes 128 consecutive bytes */
+};
 
 
 static const gfx_layout tiles8x8x3_layout =
@@ -5823,6 +5848,11 @@ GFXDECODE_END
 static GFXDECODE_START( cb3c )
 	GFXDECODE_ENTRY( "gfx1", 0, cb3c_tiles8x8_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, cb3c_tiles8x32_layout, 128,  8 )
+GFXDECODE_END
+
+static GFXDECODE_START( cb3e )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout_cb3e,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_cb3e, 128,  8 )
 GFXDECODE_END
 
 static GFXDECODE_START( ncb3 )
@@ -6489,6 +6519,47 @@ static MACHINE_CONFIG_START( chrygld, goldstar_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
+
+
+static MACHINE_CONFIG_START( cb3e, goldstar_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(ncb3_map)
+	MCFG_CPU_IO_MAP(ncb3_readwriteport)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
+
+	/* 3x 8255 */
+	MCFG_I8255A_ADD( "ppi8255_0", ncb3_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ncb3_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", ncb3_ppi8255_2_intf )
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", cb3e)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -11313,6 +11384,30 @@ ROM_START( megaline )
 	ROM_LOAD( "tbp24s10.m3", 0x0000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) )
 ROM_END
 
+/*
+Z80
+8255 (I think x3 2 have no mark)
+Ay-3-8910
+5 x 8dipswithcs
+12Mhz xtal
+
+rom 3v202 is the prg 
+*/
+ROM_START( cb3e )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3v202.u22",  0x00000, 0x10000, CRC(f127d203) SHA1(d23b9e5972e797e7c18e9e8e2e70c01f381a4c4d) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "2.u6",      0x00000, 0x20000, CRC(e3be1d33) SHA1(5cc3b5d6e371e8bb414b552c68770666e3914ae4) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "1.u3",      0x00000, 0x08000, CRC(919bd692) SHA1(1aeb66f1e4555b731858833445000593e613f74d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.u1",      0x00000, 0x0100, CRC(d4eaa276) SHA1(b6598ee64ac3d41ca979c8667de8576cfb304451) )
+	ROM_CONTINUE(               0x00000, 0x0100)	// 2nd half has the data.
+ROM_END
+
 
 /*********************************************************************************************************************/
 
@@ -11960,8 +12055,7 @@ DRIVER_INIT_MEMBER(goldstar_state, super9)
 	{
 //		src[i] = BITSWAP8(src[i], 7,4,2,1,6,5,3,0);
 //		src[i] = BITSWAP8(src[i], 7,3,2,6,1,5,4,0);
-//		src[i] = BITSWAP8(src[i], 7,3,2,6,5,1,4,0);
-		src[i] = BITSWAP8(src[i], 3,7,6,2,5,1,0,4);	// endianess
+		src[i] = BITSWAP8(src[i], 7,3,2,6,5,1,4,0);
 	}
 
 	UINT8 *src2 = memregion("gfx2")->base();
@@ -11970,6 +12064,37 @@ DRIVER_INIT_MEMBER(goldstar_state, super9)
 //		src2[i] = BITSWAP8(src2[i], 7,4,2,1,6,5,3,0);
 //		src2[i] = BITSWAP8(src2[i], 7,3,2,6,1,5,4,0);
 		src2[i] = BITSWAP8(src2[i], 3,7,6,2,5,1,0,4);	// endianess
+	}
+
+}
+
+DRIVER_INIT_MEMBER(goldstar_state, cb3e)
+{
+	int A;
+	UINT8 *ROM = memregion("maincpu")->base();
+	do_blockswaps(ROM);
+
+	// a data bitswap
+	for (A = 0;A < 0x10000;A++)
+	{
+		UINT8 dat = ROM[A];
+		dat =  BITSWAP8(dat,5,6,3,4,7,2,1,0);
+		ROM[A] = dat;
+	}
+
+	dump_to_file(ROM);
+
+	int i;
+	UINT8 *src = memregion("gfx1")->base();
+	for (i = 0;i < 0x20000;i++)
+	{
+		src[i] = BITSWAP8(src[i], 4,3,2,5,6,1,0,7);		// fixme: find the exact function
+	}
+
+	UINT8 *src2 = memregion("gfx2")->base();
+	for (i = 0;i < 0x8000;i++)
+	{
+		src2[i] = BITSWAP8(src2[i], 4,3,2,5,6,1,0,7);	// fixme: swapped by pairs, and inside.
 	}
 
 }
@@ -11994,7 +12119,8 @@ GAME(  199?, cb3a,      ncb3,     ncb3,     cb3a,     driver_device,  0,        
 GAME(  199?, cb3,       ncb3,     ncb3,     ncb3,     goldstar_state, cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0 )
 GAME(  199?, cb3b,      ncb3,     cherrys,  ncb3,     goldstar_state, cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0 )
 GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  goldstar_state, cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)",               GAME_NOT_WORKING)
-GAME(  199?, cb3d,      ncb3,     ncb3,     ncb3,     driver_device,  0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    GAME_NOT_WORKING) // fix prom decode
+GAME(  199?, cb3d,      ncb3,     ncb3,     ncb3,     driver_device,  0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    GAME_NOT_WORKING)			// fix prom decode
+GAME(  199?, cb3e,      ncb3,     cb3e,     chrygld,  goldstar_state, cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", GAME_IMPERFECT_GRAPHICS )	// need to decode gfx properly (one channel different)
 
 GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  driver_device,  0,         ROT0, "Dyna",              "Cherry Master '97",                           GAME_NOT_WORKING) // fix prom decode
 
