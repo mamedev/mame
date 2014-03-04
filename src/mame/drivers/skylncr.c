@@ -41,12 +41,13 @@
   |   Coin Scores      Key In Scores      |
   |   Payout Limit     Key Out Score      |
   |   Max Bet          Min Bet            |
-  |   <unknown>        <unknown>          |
+  |   Special Bonus %  Super Star %       |
   |   Bonus Base       Max Win Bonus      |
   |   Double-Up Y/N    Bonus Scores       |
   |                                       |
   '---------------------------------------'
 
+  'Special Bonus' and 'Super Star' appearance, are per 1000. 
   You also can find the MAME DIP switches menu already translated.
   The <unknown> items still need translation.
 
@@ -194,8 +195,11 @@ TILE_GET_INFO_MEMBER(skylncr_state::get_tile_info)
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_1_tile_info)
 {
+	UINT8 bank = 1;
 	UINT16 code = m_reeltiles_1_ram[ tile_index ] + (m_reeltileshigh_1_ram[ tile_index ] << 8);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, TILE_FLIPYX( 0 ));
+//	if (code > 0x200)
+//		bank = 2;	
+	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, 0, TILE_FLIPYX( 0 ));
 }
 
 TILE_GET_INFO_MEMBER(skylncr_state::get_reel_2_tile_info)
@@ -599,6 +603,7 @@ GFXDECODE_END
 static GFXDECODE_START( sstar97 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8_alt,    0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8_alt,   0x100, 2 )
 GFXDECODE_END
 
 
@@ -796,7 +801,7 @@ static INPUT_PORTS_START( sstar97 )
 	PORT_DIPSETTING(    0x01, "70%" )
 	PORT_DIPSETTING(    0x10, "80%" )
 	PORT_DIPSETTING(    0x00, "90%" )
-	PORT_DIPNAME( 0x0e, 0x0e, "Unknown (1st col, 6th row)" )
+	PORT_DIPNAME( 0x0e, 0x0e, "Special Bonus Appearance (per 1000)" )
 	PORT_DIPSETTING(    0x0e, "5" )
 	PORT_DIPSETTING(    0x0c, "6" )
 	PORT_DIPSETTING(    0x0a, "7" )
@@ -877,7 +882,7 @@ static INPUT_PORTS_START( sstar97 )
 	PORT_DIPSETTING(    0x10, "64" )
 	PORT_DIPSETTING(    0x08, "72" )
 	PORT_DIPSETTING(    0x00, "80" )
-	PORT_DIPNAME( 0xe0, 0xe0, "Unknown (2nd col, 6th row)" )
+	PORT_DIPNAME( 0xe0, 0xe0, "Super Star Appearance (per 1000)" )
 	PORT_DIPSETTING(    0xe0, "6" )
 	PORT_DIPSETTING(    0xc0, "8" )
 	PORT_DIPSETTING(    0xa0, "10" )
@@ -1110,6 +1115,7 @@ ROM_END
   Super Star '97
   Bordun International.
 
+  For amusement only (as seen in the title).
   PCB looks similar to Sky Lancer.
 
   1x M5M82C255ASP for I/O,
