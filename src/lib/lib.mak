@@ -181,6 +181,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/sc3000_bit.o  \
 	$(LIBOBJ)/formats/sf7000_dsk.o  \
 	$(LIBOBJ)/formats/smx_dsk.o     \
+	$(LIBOBJ)/formats/sol_cas.o     \
 	$(LIBOBJ)/formats/sorc_dsk.o    \
 	$(LIBOBJ)/formats/sorc_cas.o    \
 	$(LIBOBJ)/formats/sord_cas.o    \
