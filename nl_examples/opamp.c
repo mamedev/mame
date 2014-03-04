@@ -65,11 +65,11 @@ NETLIST_START(opamp)
 
     /* The opamp model */
 
-    NETDEV_VCCS(G1)
+    VCCS(G1)
     PARAM(G1.G, 100)  // typical OP-AMP amplification 100 * 1000 = 100000
     RES(RP1, 1000)
     CAP(CP1, 1.59e-6)   // <== change to 1.59e-3 for 10Khz bandwidth
-    NETDEV_VCVS(EBUF)
+    VCVS(EBUF)
     PARAM(EBUF.RO, 50)
     PARAM(EBUF.G, 1)
 
