@@ -1165,7 +1165,7 @@ ATTR_HOT inline void netlist_param_double_t::setTo(const double param)
 
 ATTR_HOT inline void netlist_input_t::inactivate()
 {
-    if (!is_state(STATE_INP_PASSIVE))
+    if (EXPECTED(!is_state(STATE_INP_PASSIVE)))
     {
         set_state(STATE_INP_PASSIVE);
         net().dec_active();
@@ -1174,7 +1174,7 @@ ATTR_HOT inline void netlist_input_t::inactivate()
 
 ATTR_HOT inline void netlist_input_t::activate()
 {
-    if (is_state(STATE_INP_PASSIVE))
+    if (EXPECTED(is_state(STATE_INP_PASSIVE)))
     {
         net().inc_active();
         set_state(STATE_INP_ACTIVE);
@@ -1202,11 +1202,12 @@ ATTR_HOT inline void netlist_input_t::activate_lh()
 
 ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time delay)
 {
-    if (is_queued() || m_num_cons == 0)
+    //if (UNEXPECTED(m_num_cons == 0 || is_queued()))
+    if (is_queued())
         return;
     m_time = netlist().time() + delay;
     m_in_queue = (m_active > 0);     /* queued ? */
-    if (m_in_queue)
+    if (EXPECTED(m_in_queue))
     {
         netlist().push_to_queue(this, m_time);
     }
