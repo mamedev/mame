@@ -715,7 +715,8 @@ void vdt911_keyboard(device_t *device)
 }
 
 static MACHINE_CONFIG_FRAGMENT( vdt911 )
-	MCFG_PALETTE_ADD("palette", 8)	
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INDIRECT_ENTRIES(3)
 	MCFG_PALETTE_INIT_OWNER(vdt911_device, vdt911)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", vdt911)

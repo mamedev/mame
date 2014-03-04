@@ -341,6 +341,7 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mz700)
 	MCFG_PALETTE_ADD("palette", 256*2)
+	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(mz_state, mz)
 
 	/* sound hardware */

@@ -373,6 +373,7 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", aquarius )
 	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(aquarius_state, aquarius)
 
 	/* sound hardware */
