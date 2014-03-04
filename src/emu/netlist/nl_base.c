@@ -591,7 +591,7 @@ ATTR_COLD void netlist_net_t::register_con(netlist_core_terminal_t &terminal)
 		m_active++;
 }
 
-ATTR_HOT ATTR_ALIGN static void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask)
+ATTR_HOT ATTR_ALIGN static inline void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask)
 {
 	if ((inp->state() & mask) != 0)
 	{
@@ -603,7 +603,7 @@ ATTR_HOT ATTR_ALIGN static void update_dev(const netlist_core_terminal_t *inp, c
 	}
 }
 
-ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
+ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 {
 	assert(m_num_cons != 0);
 	assert(this->isRailNet());

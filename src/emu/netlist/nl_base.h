@@ -565,7 +565,6 @@ public:
     ATTR_COLD void merge_net(netlist_net_t *othernet);
     ATTR_COLD void register_railterminal(netlist_output_t &mr);
 
-    /* inline not always works out */
     ATTR_HOT inline void update_devs();
 
     ATTR_HOT inline const netlist_time time() const { return m_time; }
