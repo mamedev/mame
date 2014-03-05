@@ -14,44 +14,19 @@
 
 
 //**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type MOS8722 = &device_creator<mos8722_device>;
+
+
+
+//**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
 #define LOG 0
 
-
-// registers
-enum
-{
-	CR = 0,
-	PCRA, LCRA = PCRA,
-	PCRB, LCRB = PCRB,
-	PCRC, LCRC = PCRC,
-	PCRD, LCRD = PCRD,
-	MCR,
-	RCR,
-	P0L,
-	P0H,
-	P1L,
-	P1H,
-	VR
-};
-
-
-// configuration register
-enum
-{
-	CR_IO_SYSTEM_IO = 0,
-	CR_IO_HI_ROM
-};
-
-enum
-{
-	CR_ROM_SYSTEM_ROM = 0,
-	CR_ROM_INT_FUNC_ROM,
-	CR_ROM_EXT_FUNC_ROM,
-	CR_ROM_RAM
-};
 
 #define CR_IO           BIT(m_reg[CR], 0)
 #define CR_ROM_LO       BIT(m_reg[CR], 1)
@@ -73,14 +48,6 @@ enum
 static const offs_t RCR_BOTTOM_ADDRESS[4] = { 0x0400, 0x1000, 0x0400, 0x1000 };
 static const offs_t RCR_TOP_ADDRESS[4] =    { 0xf000, 0xf000, 0xe000, 0xc000 };
 
-enum
-{
-	RCR_SHARE_1K = 0,
-	RCR_SHARE_4K,
-	RCR_SHARE_8K,
-	RCR_SHARE_16K
-};
-
 #define RCR_SHARE       (m_reg[RCR] & 0x03)
 #define RCR_BOTTOM      BIT(m_reg[RCR], 2)
 #define RCR_TOP         BIT(m_reg[RCR], 3)
@@ -97,13 +64,6 @@ enum
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type MOS8722 = &device_creator<mos8722_device>;
-
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -111,34 +71,14 @@ const device_type MOS8722 = &device_creator<mos8722_device>;
 //  mos8722_device - constructor
 //-------------------------------------------------
 
-mos8722_device::mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MOS8722, "MOS8722", tag, owner, clock, "mos8722", __FILE__)
+mos8722_device::mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, MOS8722, "MOS8722", tag, owner, clock, "mos8722", __FILE__),
+	m_write_z80en(*this),
+	m_write_fsdir(*this),
+	m_read_game(*this),
+	m_read_exrom(*this),
+	m_read_sense40(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mos8722_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mos8722_interface *intf = reinterpret_cast<const mos8722_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mos8722_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_z80en_cb, 0, sizeof(m_out_z80en_cb));
-		memset(&m_out_fsdir_cb, 0, sizeof(m_out_fsdir_cb));
-		memset(&m_in_game_cb, 0, sizeof(m_in_game_cb));
-		memset(&m_in_exrom_cb, 0, sizeof(m_in_exrom_cb));
-		memset(&m_in_sense40_cb, 0, sizeof(m_in_sense40_cb));
-	}
 }
 
 
@@ -149,11 +89,11 @@ void mos8722_device::device_config_complete()
 void mos8722_device::device_start()
 {
 	// resolve callbacks
-	m_out_z80en_func.resolve(m_out_z80en_cb, *this);
-	m_out_fsdir_func.resolve(m_out_fsdir_cb, *this);
-	m_in_game_func.resolve(m_in_game_cb, *this);
-	m_in_exrom_func.resolve(m_in_exrom_cb, *this);
-	m_in_sense40_func.resolve(m_in_sense40_cb, *this);
+	m_write_z80en.resolve_safe();
+	m_write_fsdir.resolve_safe();
+	m_read_game.resolve_safe(1);
+	m_read_exrom.resolve_safe(1);
+	m_read_sense40.resolve_safe(1);
 }
 
 
@@ -173,8 +113,8 @@ void mos8722_device::device_reset()
 	m_p0h_latch = 0;
 	m_p1h_latch = 0;
 
-	m_out_z80en_func(MCR_8500);
-	m_out_fsdir_func(MCR_FSDIR);
+	m_write_z80en(MCR_8500);
+	m_write_fsdir(MCR_FSDIR);
 }
 
 
@@ -197,9 +137,9 @@ UINT8 mos8722_device::read(offs_t offset, UINT8 data)
 		case MCR:
 			data = m_reg[MCR] | 0x06;
 
-			data &= ((m_in_game_func() << 4) | ~0x10);
-			data &= ((m_in_exrom_func() << 5) | ~0x20);
-			data &= ((m_in_sense40_func() << 7) | ~0x80);
+			data &= ((m_read_game() << 4) | ~0x10);
+			data &= ((m_read_exrom() << 5) | ~0x20);
+			data &= ((m_read_sense40() << 7) | ~0x80);
 			break;
 
 		case VR:
@@ -261,8 +201,8 @@ WRITE8_MEMBER( mos8722_device::write )
 
 			m_reg[MCR] = data;
 
-			if (_8500 != MCR_8500) m_out_z80en_func(MCR_8500);
-			if (fsdir != MCR_FSDIR) m_out_fsdir_func(MCR_FSDIR);
+			if (_8500 != MCR_8500) m_write_z80en(MCR_8500);
+			if (fsdir != MCR_FSDIR) m_write_fsdir(MCR_FSDIR);
 			break;
 		}
 

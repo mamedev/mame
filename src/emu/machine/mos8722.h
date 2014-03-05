@@ -49,13 +49,20 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MOS8722_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, MOS8722, 0)   \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_MOS8722_Z80EN_CALLBACK(_write) \
+	devcb = &mos8722_device::set_z80en_wr_callback(*device, DEVCB2_##_write);
 
+#define MCFG_MOS8722_FSDIR_CALLBACK(_write) \
+	devcb = &mos8722_device::set_fsdir_wr_callback(*device, DEVCB2_##_write);
 
-#define MOS8722_INTERFACE(name) \
-	const mos8722_interface (name) =
+#define MCFG_MOS8722_GAME_CALLBACK(_read) \
+	devcb = &mos8722_device::set_game_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_MOS8722_EXROM_CALLBACK(_read) \
+	devcb = &mos8722_device::set_exrom_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_MOS8722_SENSE40_CALLBACK(_read) \
+	devcb = &mos8722_device::set_sense40_rd_callback(*device, DEVCB2_##_read);
 
 
 
@@ -63,26 +70,20 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> mos8722_interface
-
-struct mos8722_interface
-{
-	devcb_write_line    m_out_z80en_cb;
-	devcb_write_line    m_out_fsdir_cb;
-	devcb_read_line     m_in_game_cb;
-	devcb_read_line     m_in_exrom_cb;
-	devcb_read_line     m_in_sense40_cb;
-};
-
-
 // ======================> mos8722_device
 
-class mos8722_device :  public device_t,
-						public mos8722_interface
+class mos8722_device :  public device_t
 {
 public:
 	// construction/destruction
 	mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_z80en_wr_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_write_z80en.set_callback(object); }
+	template<class _Object> static devcb2_base &set_fsdir_wr_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_write_fsdir.set_callback(object); }
+	template<class _Object> static devcb2_base &set_game_rd_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_read_game.set_callback(object); }
+	template<class _Object> static devcb2_base &set_exrom_rd_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_read_exrom.set_callback(object); }
+	template<class _Object> static devcb2_base &set_sense40_rd_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_read_sense40.set_callback(object); }
+
 
 	UINT8 read(offs_t offset, UINT8 data);
 	DECLARE_WRITE8_MEMBER( write );
@@ -93,16 +94,53 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
-	devcb_resolved_write_line   m_out_z80en_func;
-	devcb_resolved_write_line   m_out_fsdir_func;
-	devcb_resolved_read_line    m_in_game_func;
-	devcb_resolved_read_line    m_in_exrom_func;
-	devcb_resolved_read_line    m_in_sense40_func;
+	enum
+	{
+		CR = 0,
+		PCRA, LCRA = PCRA,
+		PCRB, LCRB = PCRB,
+		PCRC, LCRC = PCRC,
+		PCRD, LCRD = PCRD,
+		MCR,
+		RCR,
+		P0L,
+		P0H,
+		P1L,
+		P1H,
+		VR
+	};
+
+	enum
+	{
+		CR_IO_SYSTEM_IO = 0,
+		CR_IO_HI_ROM
+	};
+
+	enum
+	{
+		CR_ROM_SYSTEM_ROM = 0,
+		CR_ROM_INT_FUNC_ROM,
+		CR_ROM_EXT_FUNC_ROM,
+		CR_ROM_RAM
+	};
+
+	enum
+	{
+		RCR_SHARE_1K = 0,
+		RCR_SHARE_4K,
+		RCR_SHARE_8K,
+		RCR_SHARE_16K
+	};
+
+	devcb2_write_line   m_write_z80en;
+	devcb2_write_line   m_write_fsdir;
+	devcb2_read_line    m_read_game;
+	devcb2_read_line    m_read_exrom;
+	devcb2_read_line    m_read_sense40;
 
 	UINT8 m_reg[16];
 
