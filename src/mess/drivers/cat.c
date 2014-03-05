@@ -331,7 +331,7 @@ ToDo:
 
 // Defines
 
-#undef DEBUG_VIDEO_ENABLE_W
+#undef DEBUG_GA2OPR_W
 #undef DEBUG_VIDEO_CONTROL_W
 
 #undef DEBUG_FLOPPY_CONTROL_W
@@ -340,8 +340,8 @@ ToDo:
 #undef DEBUG_FLOPPY_DATA_R
 #undef DEBUG_FLOPPY_STATUS_R
 
-#undef DEBUG_PRINTER_DATA_W
-#undef DEBUG_PRINTER_CONTROL_W
+#define DEBUG_PRINTER_DATA_W 1
+#define DEBUG_PRINTER_CONTROL_W 1
 
 #undef DEBUG_MODEM_R
 #undef DEBUG_MODEM_W
@@ -491,7 +491,7 @@ public:
 	UINT8 m_duart_inp;
 	/* gate array 2 has a 16-bit counter inside which counts at 10mhz and
 	   rolls over at FFFF->0000; on roll-over (or maybe at FFFF terminal count)
-	   it triggers the KTOBF output. It does this every 6.5535ms, which causes
+	   it triggers the KTDBF output. It does this every 6.5535ms, which causes
 	   a 74LS74 d-latch at IC100 to switch the state of the DUART IP2 line;
 	   this causes the DUART to fire an interrupt, which makes the 68000 read
 	   the keyboard.
@@ -613,7 +613,9 @@ WRITE16_MEMBER( cat_state::cat_keyboard_w )
 	m_keyboard_line = data >> 8;
 }
 
-// 0x800004-0x800005 write = printer data
+// 0x800004-0x800005 'pr.data' write 
+// /DSTB (centronics pin 1) is implied by the cat source code to be pulsed
+// low (for some unknown period of time) upon any write to this port.
 WRITE16_MEMBER( cat_state::cat_printer_data_w )
 {
 #ifdef DEBUG_PRINTER_DATA_W
@@ -680,23 +682,27 @@ READ16_MEMBER( cat_state::cat_keyboard_r )
 			case 0x80: retVal = m_y7->read() << 8; break;
 		}
 	}
+	if ((m_pr_cont != 0x0800) && (m_pr_cont != 0x0900) && (m_pr_cont != 0x0a00))
+	{
+		fprintf(stderr,"Read from keyboard in %06X with unexpected pr_cont %04X\n", 0x80000a+(offset<<1), m_pr_cont);
+	}
 	return retVal;
 }
 
 // 0x80000c-0x80000d (unused in cat source code; may have originally been a separate read only port where 800006 would have been write-only)
 
-// 0x80000e-0x80000f read
+// 0x80000e-0x80000f 'pr.cont' read
 READ16_MEMBER( cat_state::cat_battery_r )
 {
 	/*
 	 * FEDCBA98 (76543210 is open bus)
-	 * |||||||\-- ?
-	 * ||||||\--- ?
-	 * |||||\---- ?
-	 * ||||\----- ?
-	 * |||\------ ?
-	 * ||\------- ?
-	 * |\-------- ?
+	 * |||||||\-- ? possibly PE (pin 1) read ("PAPER OUT" pin 12 of centronics port)
+	 * ||||||\--- ? possibly SLCT/ERR (pin 3) read ("not selected or error" NAND of pins 32 and 13 of centronics port)
+	 * |||||\---- (always 0?)
+	 * ||||\----- (always 0?)
+	 * |||\------ (always 0?)
+	 * ||\------- (always 0?)
+	 * |\-------- (always 0?)
 	 * \--------- Battery status (0 = good, 1 = bad)
 	 */
 	/* just return that battery is full, i.e. bit 15 is 0 */
@@ -704,15 +710,15 @@ READ16_MEMBER( cat_state::cat_battery_r )
 	// TODO: hook this to a dipswitch
 	return 0x0080;
 }
-// 0x80000e-0x80000f write
+// 0x80000e-0x80000f 'pr.cont' write
 WRITE16_MEMBER( cat_state::cat_printer_control_w )
 {
 	/*
 	 * FEDCBA98 (76543210 is ignored)
 	 * |||||||\-- CC line enable (pin 34) (verified from cat source code)
 	 * ||||||\--- LEDE line enable (pin 33) (verified from cat source code)
-	 * |||||\---- ? May control pin 32?
-	 * ||||\----- ? always seems to be written as high?
+	 * |||||\---- ?
+	 * ||||\----- ? may be IPP (pin 2) write (non-standard pin 34 of centronics port) or another watchdog reset bit; may also be /DSTB-enable-on-pr.data-write 
 	 * |||\------ ?
 	 * ||\------- ?
 	 * |\-------- ?
@@ -743,13 +749,13 @@ WRITE16_MEMBER( cat_state::cat_modem_w )
 #endif
 }
 
-// 0x830000: 6ms counter (used for KTOBF)
+// 0x830000: 6ms counter (used for KTDBF)
 READ16_MEMBER( cat_state::cat_6ms_counter_r )
 {
 	return m_6ms_counter;
 }
 
-/* 0x840001: 'opr' Output Port Register
+/* 0x840001: 'opr' or 'ga2opr' Output Port Register
  * writing 0x1c (or probably anything with bit 3 set) here resets the watchdog
  * if the watchdog expires an NMI is sent to the cpu
  */
@@ -851,7 +857,7 @@ static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("svram") AM_MIRROR(0x18C000)// SRAM powered by battery
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("svrom",0x0000) AM_MIRROR(0x180000) // SV ROM
 	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_SHARE("p_cat_vram") AM_MIRROR(0x180000) // 512 KB RAM
-	AM_RANGE(0x600000, 0x67ffff) AM_READWRITE(cat_2e80_r,cat_video_control_w) AM_MIRROR(0x180000) // Gate Array #1: Video
+	AM_RANGE(0x600000, 0x67ffff) AM_READWRITE(cat_2e80_r,cat_video_control_w) AM_MIRROR(0x180000) // Gate Array #1: Video Addressing and Timing, dram refresh timing, dram /cs and /wr (ga2 does the actual video invert/display and access to the dram data bus)
 	AM_RANGE(0x800000, 0x800001) AM_READWRITE(cat_floppy_control_r, cat_floppy_control_w) AM_MIRROR(0x18FFE0) // floppy control lines and readback
 	AM_RANGE(0x800002, 0x800003) AM_READWRITE(cat_0080_r, cat_keyboard_w) AM_MIRROR(0x18FFE0) // keyboard col write
 	AM_RANGE(0x800004, 0x800005) AM_READWRITE(cat_0080_r, cat_printer_data_w) AM_MIRROR(0x18FFE0) // Centronics Printer Data
@@ -864,8 +870,8 @@ static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	AM_RANGE(0x810000, 0x81001f) AM_DEVREADWRITE8("duartn68681", duartn68681_device, read, write, 0xff ) AM_MIRROR(0x18FFE0)
 	AM_RANGE(0x820000, 0x82003f) AM_READWRITE(cat_modem_r,cat_modem_w) AM_MIRROR(0x18FFC0) // AMI S35213 Modem Chip, all access is on bit 7
 	AM_RANGE(0x830000, 0x830001) AM_READ(cat_6ms_counter_r) AM_MIRROR(0x18FFFE) // 16bit 6ms counter clocked by output of another 16bit counter clocked at 10mhz
-	AM_RANGE(0x840000, 0x840001) AM_READWRITE(cat_2e80_r,cat_opr_w) AM_MIRROR(0x18FFFE) // Output port register (video enable, invert, watchdog reset)
-	//AM_RANGE(0x850000, 0x850001) AM_READ(cat_video_status) AM_MIRROR(0x18FFFE) // video status and watchdog read: hblank, vblank or draw?
+	AM_RANGE(0x840000, 0x840001) AM_READWRITE(cat_2e80_r,cat_opr_w) AM_MIRROR(0x18FFFE) // GA2 Output port register (video enable, invert, watchdog reset, phone relays)
+	//AM_RANGE(0x850000, 0x850001) AM_READ(cat_wdt_r) AM_MIRROR(0x18FFFE) // watchdog and power fail state read
 	AM_RANGE(0x860000, 0x860001) AM_READWRITE(cat_0000_r, cat_tcb_w) AM_MIRROR(0x18FFFE) // Test mode
 	AM_RANGE(0x870000, 0x870001) AM_READ(cat_2e80_r) AM_MIRROR(0x18FFFE) // Open bus?
 	AM_RANGE(0xA00000, 0xA00001) AM_READ(cat_2e80_r) AM_MIRROR(0x1FFFFE) // Open bus/dtack? The 0xA00000-0xA3ffff area is ram used for shadow rom storage on cat developer machines, which is either banked over top of, or jumped to instead of the normal rom
@@ -999,7 +1005,7 @@ void cat_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 
 TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 {
-	// This is effectively also the KTOBF line 'clock' output to the d-latch before the duart
+	// This is effectively also the KTDBF line 'clock' output to the d-latch before the duart
 	// Hence, invert the d-latch on the duart's input ports.
 	// n68681 now properly generates interrupts when this bit changes, the previous hack is no longer necessary.
 	m_duart_inp ^= 0x04;
@@ -1066,7 +1072,7 @@ UINT32 cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 /* The duart is the only thing actually connected to the cpu IRQ pin
- * The KTOBF output of the gate array 2 (itself the terminal count output
+ * The KTDBF output of the gate array 2 (itself the terminal count output
  * of a 16-bit counter clocked at ~10mhz, hence 6.5536ms period) goes to a
  * d-latch and inputs on ip2 of the duart, causing the duart to fire an irq;
  * this is used by the cat to read the keyboard.
@@ -1091,10 +1097,10 @@ WRITE_LINE_MEMBER(cat_state::cat_duart_txa)
 
 /* mc68681 DUART Input pins:
  * IP0: CTS [using the DUART builtin hardware-CTS feature?]
- * IP1: Centronics ACK (IP1 changes state 0->1 or 1->0 on the falling edge of /ACK using a d-latch)
- * IP2: KTOBF (IP2 changes state 0->1 or 1->0 on the rising edge of KTOBF using a d-latch; KTOBF is a 6.5536ms-period squarewave generated by one of the gate arrays, I need to check with a scope to see whether it is a single spike/pulse every 6.5536ms or if from the gate array it inverts every 6.5536ms, documentation isn't 100% clear but I suspect the former) [uses the Delta IP2 state change detection feature to generate an interrupt; I'm not sure if IP2 is used as a counter clock source but given the beep frequency of the real unit I very much doubt it, 6.5536ms is too slow]
+ * IP1: Centronics /ACK (pin 10) positive edge detect (IP1 changes state 0->1 or 1->0 on the rising edge of /ACK using a 74ls74a d-flipflop)
+ * IP2: KTDBF (IP2 changes state 0->1 or 1->0 on the rising edge of KTDBF using a 74ls74a d-flipflop; KTDBF is a 6.5536ms-period squarewave generated by one of the gate arrays, I need to check with a scope to see whether it is a single spike/pulse every 6.5536ms or if from the gate array it inverts every 6.5536ms, documentation isn't 100% clear but I suspect the former) [uses the Delta IP2 state change detection feature to generate an interrupt; I'm not sure if IP2 is used as a counter clock source but given the beep frequency of the real unit I very much doubt it, 6.5536ms is too slow]
  * IP3: RG ("ring" input)
- * IP4: Centronics BUSY
+ * IP4: Centronics BUSY (pin 11), inverted
  * IP5: DSR
  */
 
@@ -1137,7 +1143,7 @@ static MACHINE_CONFIG_START( cat, cat_state )
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
-	MCFG_DUARTN68681_ADD( "duartn68681", XTAL_19_968MHz*2/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
+	MCFG_DUARTN68681_ADD( "duartn68681", (XTAL_19_968MHz*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(cat_state, cat_duart_irq_handler))
 	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(cat_state, cat_duart_output))
@@ -1626,7 +1632,7 @@ ROM_START( cat )
 	 * Based on the inputs and outputs of this pal, almost if not the entire
 	 * open bus and mirrored areas of the cat address space could be made
 	 * to cause bus errors. REMAP was probably used to 'open up' the A00000-A7ffff
-	 * shadow rom/ram area and make it writable without erroring.
+	 * shadow rom/ram area and make it writeable without erroring.
 	 */
 ROM_END
 
