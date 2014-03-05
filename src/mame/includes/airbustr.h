@@ -16,7 +16,6 @@ public:
 		m_colorram2(*this, "colorram2"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_paletteram(*this, "paletteram"),
 		m_master(*this, "master"),
 		m_slave(*this, "slave"),
 		m_audiocpu(*this, "audiocpu"),
@@ -32,7 +31,6 @@ public:
 	required_shared_ptr<UINT8> m_colorram2;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_paletteram;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -67,7 +65,6 @@ public:
 	DECLARE_READ8_MEMBER(soundcommand2_r);
 	DECLARE_WRITE8_MEMBER(soundcommand_w);
 	DECLARE_WRITE8_MEMBER(soundcommand2_w);
-	DECLARE_WRITE8_MEMBER(airbustr_paletteram_w);
 	DECLARE_WRITE8_MEMBER(airbustr_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(airbustr_videoram_w);
 	DECLARE_WRITE8_MEMBER(airbustr_colorram_w);

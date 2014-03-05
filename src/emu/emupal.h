@@ -141,6 +141,9 @@
 #define PALETTE_FORMAT_RRRRGGGGBBBBRGBx raw_to_rgb_converter(2, &raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder)
 #define PALETTE_FORMAT_xRGBRRRRGGGGBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_decoder)
 
+// standard 5-6-5 formats
+#define PALETTE_FORMAT_BBBBBGGGGGGRRRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,6,5, 0,5,11>)
+
 // standard 8-8-8 formats
 #define PALETTE_FORMAT_XRGB raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 16,8,0>)
 #define PALETTE_FORMAT_XBGR raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 0,8,16>)
