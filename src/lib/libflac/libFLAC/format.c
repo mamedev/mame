@@ -36,8 +36,8 @@
 #include <stdio.h>
 #include <stdlib.h> /* for qsort() */
 #include <string.h> /* for memset() */
-#include "flac/assert.h"
-#include "flac/format.h"
+#include "FLAC/assert.h"
+#include "FLAC/format.h"
 #include "private/format.h"
 
 #ifndef FLaC__INLINE

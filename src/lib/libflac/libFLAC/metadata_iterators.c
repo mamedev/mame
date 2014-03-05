@@ -59,8 +59,8 @@
 
 #include "private/metadata.h"
 
-#include "flac/assert.h"
-#include "flac/stream_decoder.h"
+#include "FLAC/assert.h"
+#include "FLAC/stream_decoder.h"
 #include "share/alloc.h"
 
 #ifdef max
@@ -1835,8 +1835,8 @@ FLAC_API FLAC__Metadata_Iterator *FLAC__metadata_iterator_new(void)
 	FLAC__Metadata_Iterator *iterator = (FLAC__Metadata_Iterator*)calloc(1, sizeof(FLAC__Metadata_Iterator));
 
 	/* calloc() implies:
-	    iterator->current = 0;
-	    iterator->chain = 0;
+		iterator->current = 0;
+		iterator->chain = 0;
 	*/
 
 	return iterator;

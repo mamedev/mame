@@ -34,8 +34,8 @@
 #endif
 
 #include <math.h>
-#include "flac/assert.h"
-#include "flac/format.h"
+#include "FLAC/assert.h"
+#include "FLAC/format.h"
 #include "private/window.h"
 
 #ifndef FLAC__INTEGER_ONLY_LIBRARY

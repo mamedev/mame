@@ -2,8 +2,8 @@
 #  include <config.h>
 #endif
 
-#include <stdlib.h>     /* for malloc() */
-#include <string.h>     /* for memcpy() */
+#include <stdlib.h>		/* for malloc() */
+#include <string.h>		/* for memcpy() */
 
 #include "private/md5.h"
 #include "share/alloc.h"
@@ -47,7 +47,7 @@
 
 /* This is the central step in the MD5 algorithm. */
 #define MD5STEP(f,w,x,y,z,in,s) \
-		(w += f(x,y,z) + in, w = (w<<s | w>>(32-s)) + x)
+	 (w += f(x,y,z) + in, w = (w<<s | w>>(32-s)) + x)
 
 /*
  * The core of the MD5 algorithm, this alters an existing MD5 hash to
@@ -143,7 +143,7 @@ static void byteSwap(FLAC__uint32 *buf, unsigned words)
 {
 	register FLAC__uint32 x;
 	do {
-		x = *buf;
+		x = *buf; 
 		x = ((x << 8) & 0xff00ff00) | ((x >> 8) & 0x00ff00ff);
 		*buf++ = (x >> 16) | (x << 16);
 	} while (--words);
@@ -186,9 +186,9 @@ static void FLAC__MD5Update(FLAC__MD5Context *ctx, FLAC__byte const *buf, unsign
 
 	t = ctx->bytes[0];
 	if ((ctx->bytes[0] = t + len) < t)
-		ctx->bytes[1]++;    /* Carry from low to high */
+		ctx->bytes[1]++;	/* Carry from low to high */
 
-	t = 64 - (t & 0x3f);    /* Space available in ctx->in (at least 1) */
+	t = 64 - (t & 0x3f);	/* Space available in ctx->in (at least 1) */
 	if (t > len) {
 		memcpy((FLAC__byte *)ctx->in + 64 - t, buf, len);
 		return;
@@ -237,7 +237,7 @@ void FLAC__MD5Init(FLAC__MD5Context *ctx)
  */
 void FLAC__MD5Final(FLAC__byte digest[16], FLAC__MD5Context *ctx)
 {
-	int count = ctx->bytes[0] & 0x3f;   /* Number of bytes in ctx->in */
+	int count = ctx->bytes[0] & 0x3f;	/* Number of bytes in ctx->in */
 	FLAC__byte *p = (FLAC__byte *)ctx->in + count;
 
 	/* Set the first char of padding to 0x80.  There is always room. */
@@ -246,7 +246,7 @@ void FLAC__MD5Final(FLAC__byte digest[16], FLAC__MD5Context *ctx)
 	/* Bytes of padding needed to make 56 bytes (-8..55) */
 	count = 56 - 1 - count;
 
-	if (count < 0) {    /* Padding forces an extra block */
+	if (count < 0) {	/* Padding forces an extra block */
 		memset(p, 0, count + 8);
 		byteSwapX16(ctx->in);
 		FLAC__MD5Transform(ctx->buf, ctx->in);

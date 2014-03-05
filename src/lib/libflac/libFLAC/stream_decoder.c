@@ -46,7 +46,7 @@
 #define ftello ftell
 #endif
 #endif
-#include "flac/assert.h"
+#include "FLAC/assert.h"
 #include "share/alloc.h"
 #include "protected/stream_decoder.h"
 #include "private/bitreader.h"
@@ -3145,11 +3145,11 @@ FLAC__bool seek_to_absolute_sample_(FLAC__StreamDecoder *decoder, FLAC__uint64 s
 			}
 			/* our last move backwards wasn't big enough, try again */
 			approx_bytes_per_frame = approx_bytes_per_frame? approx_bytes_per_frame * 2 : 16;
-			continue;
+			continue;	
 		}
 		/* allow one seek over upper bound, so we can get a correct upper_bound_sample for streams with unknown total_samples */
 		first_seek = false;
-
+		
 		/* make sure we are not seeking in corrupted stream */
 		if (this_frame_sample < lower_bound_sample) {
 			decoder->protected_->state = FLAC__STREAM_DECODER_SEEK_ERROR;
@@ -3189,7 +3189,7 @@ FLAC__bool seek_to_absolute_sample_ogg_(FLAC__StreamDecoder *decoder, FLAC__uint
 	FLAC__bool did_a_seek;
 	unsigned iteration = 0;
 
-	/* In the first iterations, we will calculate the target byte position
+	/* In the first iterations, we will calculate the target byte position 
 	 * by the distance from the target sample to left_sample and
 	 * right_sample (let's call it "proportional search").  After that, we
 	 * will switch to binary search.
