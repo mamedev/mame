@@ -102,6 +102,7 @@ EMUOBJS = \
 	$(EMUOBJ)/dimemory.o \
 	$(EMUOBJ)/dinetwork.o \
 	$(EMUOBJ)/dinvram.o \
+	$(EMUOBJ)/dioutput.o \
 	$(EMUOBJ)/dirtc.o \
 	$(EMUOBJ)/diserial.o \
 	$(EMUOBJ)/dislot.o \
