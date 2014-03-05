@@ -17,8 +17,6 @@
  - Rapid button of japanese Master System
  - Keyboard support for Sega Mark III (sg1000m3 driver)
  - Mark III expansion slot, used by keyboard and FM module
- - Bus contention and data garbage on SMS when accessing multiple device slots
- - Disabling of work RAM (no known software relies on that)
  - Software compatibility flags, by region and/or BIOS
  - Emulate SRAM cartridges? (for use with Bock's dump tool)
  - Support for other DE-9 compatible controllers, like the Mega Drive 6-Button
@@ -241,8 +239,7 @@ static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(read_0000)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(read_4000)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(read_8000)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("mainram")                     /* RAM */
-	AM_RANGE(0xe000, 0xfff7) AM_RAM AM_SHARE("mainram")                     /* RAM (mirror) */
+	AM_RANGE(0xc000, 0xfff7) AM_READWRITE(read_ram, write_ram)
 	AM_RANGE(0xfff8, 0xfffb) AM_READWRITE(sms_sscope_r, sms_sscope_w)       /* 3-D glasses */
 	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
 ADDRESS_MAP_END
@@ -252,18 +249,7 @@ static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(read_0000)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(read_4000)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(read_8000)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("mainram")                     /* RAM */
-	AM_RANGE(0xe000, 0xfffb) AM_RAM AM_SHARE("mainram")                     /* RAM (mirror) */
-	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( smssdisp_mem, AS_PROGRAM, 8, smssdisp_state )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(store_write_cart)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(store_read_0000)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(store_read_4000)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(store_read_8000)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("mainram")                     /* RAM */
-	AM_RANGE(0xe000, 0xfffb) AM_RAM AM_SHARE("mainram")                     /* RAM (mirror) */
+	AM_RANGE(0xc000, 0xfff7) AM_READWRITE(read_ram, write_ram)
 	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
 ADDRESS_MAP_END
 
@@ -280,7 +266,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sms_io, AS_IO, 8, sms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(sms_bios_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(sms_mem_control_w)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_WRITE(sms_io_control_w)
 	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
 	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("segapsg", segapsg_device, write)
@@ -333,7 +319,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( smsj_io, AS_IO, 8, sms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_bios_w)
+	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_mem_control_w)
 	AM_RANGE(0x3f, 0x3f)                 AM_WRITE(sms_io_control_w)
 	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
 	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("segapsg", segapsg_device, write)
@@ -360,11 +346,11 @@ static ADDRESS_MAP_START( gg_io, AS_IO, 8, sms_state )
 	AM_RANGE(0x01, 0x05)                 AM_READWRITE(gg_sio_r, gg_sio_w)
 	AM_RANGE(0x06, 0x06)                 AM_DEVWRITE("gamegear", gamegear_device, stereo_w)
 	AM_RANGE(0x07, 0x07)                 AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0x06) AM_WRITE(sms_bios_w)
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0x06) AM_WRITE(sms_mem_control_w)
 	AM_RANGE(0x09, 0x09) AM_MIRROR(0x06) AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_WRITE(sms_bios_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_WRITE(sms_mem_control_w)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1e) AM_WRITE(sms_bios_w)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1e) AM_WRITE(sms_mem_control_w)
 	AM_RANGE(0x21, 0x21) AM_MIRROR(0x1e) AM_WRITE(sms_io_control_w)
 	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
 	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("gamegear", gamegear_device, write)
@@ -610,7 +596,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( sms_sdisp, smssdisp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_53_693175MHz/15)
-	MCFG_CPU_PROGRAM_MAP(smssdisp_mem)  // This adds the multicart accesses
+	MCFG_CPU_PROGRAM_MAP(sms_mem)
 	MCFG_CPU_IO_MAP(sms_io)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))

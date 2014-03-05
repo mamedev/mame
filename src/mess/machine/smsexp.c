@@ -120,6 +120,15 @@ WRITE8_MEMBER(sms_expansion_slot_device::write_ram)
 		m_device->write_ram(space, offset, data);
 }
 
+int sms_expansion_slot_device::get_lphaser_xoffs()
+{
+	if (m_device)
+		return m_device->get_lphaser_xoffs();
+	else
+		return 0;
+}
+
+
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( sms_expansion_devices )

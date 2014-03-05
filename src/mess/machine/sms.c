@@ -7,11 +7,12 @@
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-#define ENABLE_NONE      0
-#define ENABLE_EXPANSION 1
-#define ENABLE_CARD      2
-#define ENABLE_CART      3
-#define ENABLE_BIOS      4
+#define ENABLE_NONE      0x00
+#define ENABLE_EXPANSION 0x01
+#define ENABLE_CARD      0x02
+#define ENABLE_CART      0x04
+#define ENABLE_BIOS      0x08
+#define ENABLE_EXT_RAM   0x10
 
 
 void sms_state::lphaser_hcount_latch()
@@ -108,7 +109,7 @@ READ8_MEMBER(sms_state::sms_fm_detect_r)
 	}
 	else
 	{
-		if (!m_is_mark_iii && (m_bios_port & IO_CHIP))
+		if (!m_is_mark_iii && (m_mem_ctrl_reg & IO_CHIP))
 		{
 			return 0xff;
 		}
@@ -234,7 +235,7 @@ READ8_MEMBER(sms_state::sms_input_port_dc_r)
 		return m_port_dc_reg;
 	}
 
-	if (m_bios_port & IO_CHIP)
+	if (m_mem_ctrl_reg & IO_CHIP)
 	{
 		return 0xff;
 	}
@@ -262,7 +263,7 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 		return m_port_dd_reg;
 	}
 
-	if (m_bios_port & IO_CHIP)
+	if (m_mem_ctrl_reg & IO_CHIP)
 		return 0xff;
 
 	sms_get_inputs(space);
@@ -348,13 +349,13 @@ READ8_MEMBER(sms_state::sms_sscope_r)
 		return m_sscope_state;
 	}
 
-	return m_mainram[0x1FF8 + offset];
+	return read_ram(space, 0x3ff8 + offset);
 }
 
 
 WRITE8_MEMBER(sms_state::sms_sscope_w)
 {
-	m_mainram[0x1FF8 + offset] = data;
+	write_ram(space, 0x3ff8 + offset, data);
 
 	int sscope = m_port_scope->read();
 
@@ -376,73 +377,77 @@ WRITE8_MEMBER(sms_state::sms_sscope_w)
 }
 
 
+READ8_MEMBER(sms_state::read_ram)
+{
+	if (m_mem_device_enabled & ENABLE_EXT_RAM)
+	{
+		UINT8 data = 0xff;
+
+		if (m_mem_device_enabled & ENABLE_CART)
+			data &= m_cartslot->read_ram(space, offset);
+		if (m_mem_device_enabled & ENABLE_CARD)
+			data &= m_cardslot->read_ram(space, offset);
+		if (m_mem_device_enabled & ENABLE_EXPANSION)
+			data &= m_expslot->read_ram(space, offset);
+
+		return data;
+	}
+	else
+	{
+		return m_mainram[offset & 0x1fff];
+	}
+}
+
+
+WRITE8_MEMBER(sms_state::write_ram)
+{
+	if (m_mem_device_enabled & ENABLE_EXT_RAM)
+	{
+		if (m_mem_device_enabled & ENABLE_CART)
+			m_cartslot->write_ram(space, offset, data);
+		if (m_mem_device_enabled & ENABLE_CARD)
+			m_cardslot->write_ram(space, offset, data);
+		if (m_mem_device_enabled & ENABLE_EXPANSION)
+			m_expslot->write_ram(space, offset, data);
+	}
+	else
+	{
+		m_mainram[offset & 0x1fff] = data;
+	}
+}
+
+
 READ8_MEMBER(sms_state::sms_mapper_r)
 {
-	return m_mainram[0x1ffc + offset];
+	return read_ram(space, 0x3ffc + offset);
 }
 
 
 WRITE8_MEMBER(sms_state::sms_mapper_w)
 {
-	bool bios_selected = false;
-	bool cartridge_selected = false;
-	bool card_selected = false;
-	bool expansion_selected = false;
-
 	m_mapper[offset] = data;
-	m_mainram[0x1ffc + offset] = data;
-
-	if (m_is_mark_iii)
-	{
-		if (m_cartslot && m_cartslot->m_cart)
-			cartridge_selected = true;
-		else if (m_cardslot && m_cardslot->m_cart)
-			card_selected = true;
-		else
-			return; // nothing to page in
-	}
-	else if (m_bios_port & IO_BIOS_ROM || (m_is_gamegear && m_BIOS == NULL))
-	{
-		if (!(m_bios_port & IO_CARTRIDGE) || (m_is_gamegear && m_BIOS == NULL))
-			cartridge_selected = true;
-		else if (!(m_bios_port & IO_CARD))
-			card_selected = true;
-		else if (!(m_bios_port & IO_EXPANSION))
-			expansion_selected = true;
-		else
-			return; // nothing to page in
-	}
-	else
-	{
-		if (!m_BIOS)
-			return; // nothing to page in
-		bios_selected = true;
-	}
+	write_ram(space, 0x3ffc + offset, data);
 
 	switch (offset)
 	{
 		case 0: // Control RAM/ROM
-			if (!(data & 0x08) && bios_selected && !(m_bios_port & IO_BIOS_ROM))    // BIOS ROM
+			if (!(data & 0x08) && (m_mem_device_enabled & ENABLE_BIOS))    // BIOS ROM
 			{
 				if (!m_has_bios_0400 && !m_has_bios_2000)
 				{
-					m_bank_enabled[2] = ENABLE_BIOS;
 					m_bios_page[2] = m_mapper[3];
 				}
 			}
-			else if (cartridge_selected)    // CART ROM/RAM
+			if (m_mem_device_enabled & ENABLE_CART)    // CART ROM/RAM
 			{
-				m_bank_enabled[2] = ENABLE_CART;
 				m_cartslot->write_mapper(space, offset, data);
 			}
-			else if (card_selected)    // CARD ROM/RAM
+			if (m_mem_device_enabled & ENABLE_CARD)    // CARD ROM/RAM
 			{
-				m_bank_enabled[2] = ENABLE_CARD;
 				m_cardslot->write_mapper(space, offset, data);
 			}
-			else if (expansion_selected)    // expansion slot
+			if (m_mem_device_enabled & ENABLE_EXPANSION)    // expansion slot
 			{
-				m_bank_enabled[2] = ENABLE_EXPANSION;
 				m_expslot->write_mapper(space, offset, data);
 			}
 			break;
@@ -450,30 +455,54 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 		case 1: // Select 16k ROM bank for 0400-3fff
 		case 2: // Select 16k ROM bank for 4000-7fff
 		case 3: // Select 16k ROM bank for 8000-bfff
-			if (bios_selected)
+			if (m_mem_device_enabled & ENABLE_BIOS)
 			{
 				if (!m_has_bios_0400 && !m_has_bios_2000)
 				{
-					m_bank_enabled[offset - 1] = ENABLE_BIOS;
 					m_bios_page[offset - 1] = data & (m_bios_page_count - 1);
 				}
 			}
-			else if (cartridge_selected || m_is_gamegear)
+			if (m_mem_device_enabled & ENABLE_CART)
 			{
-				m_bank_enabled[offset - 1] = ENABLE_CART;
 				m_cartslot->write_mapper(space, offset, data);
 			}
-			else if (card_selected)
+			if (m_mem_device_enabled & ENABLE_CARD)
 			{
-				m_bank_enabled[offset - 1] = ENABLE_CARD;
 				m_cardslot->write_mapper(space, offset, data);
 			}
-			else if (expansion_selected)
+			if (m_mem_device_enabled & ENABLE_EXPANSION)
 			{
-				m_bank_enabled[offset - 1] = ENABLE_EXPANSION;
 				m_expslot->write_mapper(space, offset, data);
 			}
 			break;
+	}
+}
+
+
+UINT8 sms_state::read_bus(address_space &space, unsigned int page, UINT16 base_addr, UINT16 offset)
+{
+	if (m_mem_device_enabled != ENABLE_NONE)
+	{
+		UINT8 data = 0xff;
+
+		// SMS2 behavior described by Charles MacDonald's SMS notes:
+		// "If the BIOS is enabled at the same time the cartridge slot is,
+		// the data from both sources are logically ANDed together when read."
+
+		if (m_mem_device_enabled & ENABLE_BIOS)
+			data &= m_BIOS[(m_bios_page[page] * 0x4000) + (offset & 0x3fff)];
+		if (m_mem_device_enabled & ENABLE_CART)
+			data &= m_cartslot->read_cart(space, base_addr + offset);
+		if (m_mem_device_enabled & ENABLE_CARD)
+			data &= m_cardslot->read_cart(space, base_addr + offset);
+		if (m_mem_device_enabled & ENABLE_EXPANSION)
+			data &= m_expslot->read(space, base_addr + offset);
+
+		return data;
+	}
+	else
+	{
+		return m_region_maincpu->base()[offset];
 	}
 }
 
@@ -482,168 +511,61 @@ READ8_MEMBER(sms_state::read_0000)
 {
 	if (offset < 0x400)
 	{
-		if (m_bank_enabled[3] == ENABLE_BIOS)
-		{
-			if (m_BIOS)
-				return m_BIOS[(m_bios_page[3] * 0x4000) + (offset & 0x3fff)];
-		}
-		if (m_bank_enabled[3] == ENABLE_CART)
-			return m_cartslot->read_cart(space, offset);
-		if (m_cardslot && m_bank_enabled[3] == ENABLE_CARD)
-			return m_cardslot->read_cart(space, offset);
-		if (m_expslot && m_bank_enabled[3] == ENABLE_EXPANSION)
-			return m_expslot->read(space, offset);
+		return read_bus(space, 3, 0x0000, offset);
 	}
 	else
 	{
-		if (m_bank_enabled[0] == ENABLE_BIOS)
-		{
-			if (m_BIOS)
-				return m_BIOS[(m_bios_page[0] * 0x4000) + (offset & 0x3fff)];
-		}
-		if (m_bank_enabled[0] == ENABLE_CART)
-			return m_cartslot->read_cart(space, offset);
-		if (m_cardslot && m_bank_enabled[0] == ENABLE_CARD)
-			return m_cardslot->read_cart(space, offset);
-		if (m_expslot && m_bank_enabled[0] == ENABLE_EXPANSION)
-			return m_expslot->read(space, offset);
+		return read_bus(space, 0, 0x0000, offset);
 	}
-	return m_region_maincpu->base()[offset];
 }
 
 READ8_MEMBER(sms_state::read_4000)
 {
-	if (m_bank_enabled[1] == ENABLE_BIOS)
-	{
-		if (m_BIOS)
-			return m_BIOS[(m_bios_page[1] * 0x4000) + (offset & 0x3fff)];
-	}
-
-	if (m_bank_enabled[1] == ENABLE_CART)
-		return m_cartslot->read_cart(space, offset + 0x4000);
-	if (m_cardslot && m_bank_enabled[1] == ENABLE_CARD)
-		return m_cardslot->read_cart(space, offset + 0x4000);
-	if (m_expslot && m_bank_enabled[1] == ENABLE_EXPANSION)
-		return m_expslot->read(space, offset + 0x4000);
-
-	return m_region_maincpu->base()[offset];
+	return read_bus(space, 1, 0x4000, offset);
 }
 
 READ8_MEMBER(sms_state::read_8000)
 {
-	if (m_bank_enabled[2] == ENABLE_BIOS)
-	{
-		if (m_BIOS)
-			return m_BIOS[(m_bios_page[2] * 0x4000) + (offset & 0x3fff)];
-	}
-
-	if (m_bank_enabled[2] == ENABLE_CART)
-		return m_cartslot->read_cart(space, offset + 0x8000);
-	if (m_cardslot && m_bank_enabled[2] == ENABLE_CARD)
-		return m_cardslot->read_cart(space, offset + 0x8000);
-	if (m_expslot && m_bank_enabled[2] == ENABLE_EXPANSION)
-		return m_expslot->read(space, offset + 0x8000);
-
-	return m_region_maincpu->base()[offset];
+	return read_bus(space, 2, 0x8000, offset);
 }
 
 WRITE8_MEMBER(sms_state::write_cart)
 {
-	if (m_bank_enabled[0] == ENABLE_CART)
+	if (m_mem_device_enabled & ENABLE_CART)
 		m_cartslot->write_cart(space, offset, data);
-	if (m_cardslot && m_bank_enabled[0] == ENABLE_CARD)
+	if (m_mem_device_enabled & ENABLE_CARD)
 		m_cardslot->write_cart(space, offset, data);
-	if (m_expslot && m_bank_enabled[0] == ENABLE_EXPANSION)
+	if (m_mem_device_enabled & ENABLE_EXPANSION)
 		m_expslot->write(space, offset, data);
 }
 
-READ8_MEMBER(smssdisp_state::store_read_0000)
-{
-	if (offset < 0x400)
-	{
-		if (m_bank_enabled[3] == ENABLE_BIOS)
-		{
-			if (m_BIOS)
-				return m_BIOS[(m_bios_page[3] * 0x4000) + (offset & 0x3fff)];
-		}
-		if (m_bank_enabled[3] == ENABLE_CART)
-			return m_slots[m_current_cartridge]->read_cart(space, offset);
-		if (m_bank_enabled[3] == ENABLE_CARD)
-			return m_cards[m_current_cartridge]->read_cart(space, offset);
-	}
-	else
-	{
-		if (m_bank_enabled[0] == ENABLE_BIOS)
-		{
-			if (m_BIOS)
-				return m_BIOS[(m_bios_page[0] * 0x4000) + (offset & 0x3fff)];
-		}
-		if (m_bank_enabled[0] == ENABLE_CART)
-			return m_slots[m_current_cartridge]->read_cart(space, offset);
-		if (m_bank_enabled[0] == ENABLE_CARD)
-			return m_cards[m_current_cartridge]->read_cart(space, offset);
-	}
-
-	return m_region_maincpu->base()[offset];
-}
-
-READ8_MEMBER(smssdisp_state::store_read_4000)
-{
-	if (m_bank_enabled[1] == ENABLE_BIOS)
-	{
-		if (m_BIOS)
-			return m_BIOS[(m_bios_page[1] * 0x4000) + (offset & 0x3fff)];
-	}
-	if (m_bank_enabled[1] == ENABLE_CART)
-		return m_slots[m_current_cartridge]->read_cart(space, offset + 0x4000);
-	if (m_bank_enabled[1] == ENABLE_CARD)
-		return m_cards[m_current_cartridge]->read_cart(space, offset + 0x4000);
-
-	return m_region_maincpu->base()[offset];
-}
-
-READ8_MEMBER(smssdisp_state::store_read_8000)
-{
-	if (m_bank_enabled[2] == ENABLE_BIOS)
-	{
-		if (m_BIOS)
-			return m_BIOS[(m_bios_page[2] * 0x4000) + (offset & 0x3fff)];
-	}
-	if (m_bank_enabled[2] == ENABLE_CART)
-		return m_slots[m_current_cartridge]->read_cart(space, offset + 0x8000);
-	if (m_bank_enabled[2] == ENABLE_CARD)
-		return m_cards[m_current_cartridge]->read_cart(space, offset + 0x8000);
-
-	return m_region_maincpu->base()[offset];
-}
-
-WRITE8_MEMBER(smssdisp_state::store_write_cart)
-{
-	// this might only work because we are not emulating properly the cart/card selection system
-	// it will have to be reviewed when proper emulation is worked on!
-	if (m_bank_enabled[0] == ENABLE_CART)
-		m_slots[m_current_cartridge]->write_cart(space, offset, data);
-	if (m_bank_enabled[0] == ENABLE_CARD)
-		m_cards[m_current_cartridge]->write_cart(space, offset, data);
-}
 
 READ8_MEMBER(smssdisp_state::store_cart_peek)
 {
-	if (m_bank_enabled[1] == ENABLE_CART)
-		return m_slots[m_current_cartridge]->read_cart(space, 0x4000 + (offset & 0x1fff));
-	if (m_bank_enabled[1] == ENABLE_CARD)
-		return m_cards[m_current_cartridge]->read_cart(space, 0x4000 + (offset & 0x1fff));
+	if (m_mem_device_enabled != ENABLE_NONE)
+	{
+		UINT8 data = 0xff;
 
-	return m_region_maincpu->base()[offset];
+		if (m_mem_device_enabled & ENABLE_CART)
+			data &= m_cartslot->read_cart(space, 0x4000 + (offset & 0x1fff));
+		if (m_mem_device_enabled & ENABLE_CARD)
+			data &= m_cardslot->read_cart(space, 0x4000 + (offset & 0x1fff));
+
+		return data;
+	}
+	else
+	{
+		return m_region_maincpu->base()[offset];
+	}
 }
 
-WRITE8_MEMBER(sms_state::sms_bios_w)
+WRITE8_MEMBER(sms_state::sms_mem_control_w)
 {
-	m_bios_port = data;
+	m_mem_ctrl_reg = data;
 
-	logerror("bios write %02x, pc: %04x\n", data, space.device().safe_pc());
+	logerror("memory control reg write %02x, pc: %04x\n", data, space.device().safe_pc());
 
-	setup_rom();
+	setup_media_slots();
 }
 
 
@@ -698,93 +620,91 @@ READ8_MEMBER(sms_state::gg_sio_r)
 }
 
 
-void sms_state::setup_rom()
+void sms_state::setup_enabled_slots()
 {
-	m_bank_enabled[3] = ENABLE_NONE;
-	m_bank_enabled[0] = ENABLE_NONE;
-	m_bank_enabled[1] = ENABLE_NONE;
-	m_bank_enabled[2] = ENABLE_NONE;
+	m_mem_device_enabled = ENABLE_NONE;
 
 	if (m_is_mark_iii)
 	{
 		// Mark III uses the card slot by default, but has hardware method
-		// that prioritizes the cartridge slot if it has a cartridge inserted.
+		// (/CART pin) that prioritizes the cartridge slot if it has media
+		// inserted. Japanese 3-D cartridges do not connect the /CART pin,
+		// to not disable the card adaptor used by the 3-D glasses.
 		if (m_cartslot && m_cartslot->m_cart)
 		{
-			m_bank_enabled[3] = ENABLE_CART;
-			m_bank_enabled[0] = ENABLE_CART;
-			m_bank_enabled[1] = ENABLE_CART;
-			m_bank_enabled[2] = ENABLE_CART;
-			logerror("Switched in cartridge rom.\n");
+			m_mem_device_enabled |= ENABLE_CART;
+			logerror("Cartridge ROM/RAM enabled.\n");
 		}
-		else
+		else if (m_cardslot && m_cardslot->m_cart)
 		{
-			m_bank_enabled[3] = ENABLE_CARD;
-			m_bank_enabled[0] = ENABLE_CARD;
-			m_bank_enabled[1] = ENABLE_CARD;
-			m_bank_enabled[2] = ENABLE_CARD;
-			logerror("Switching to card rom port.\n");
+			m_mem_device_enabled |= ENABLE_CARD;
+			logerror("Card ROM port enabled.\n");
 		}
 		return;
 	}
 
-	/* 2. check and set up expansion port */
-	if (!(m_bios_port & IO_EXPANSION) && (m_bios_port & IO_CARTRIDGE) && (m_bios_port & IO_CARD))
+	if (!(m_mem_ctrl_reg & IO_EXPANSION) && m_expslot && m_expslot->m_device)
 	{
-		m_bank_enabled[3] = ENABLE_EXPANSION;
-		m_bank_enabled[0] = ENABLE_EXPANSION;
-		m_bank_enabled[1] = ENABLE_EXPANSION;
-		m_bank_enabled[2] = ENABLE_EXPANSION;
-		logerror("Switching to expansion port.\n");
+		m_mem_device_enabled |= ENABLE_EXPANSION;
+		logerror("Expansion port enabled.\n");
 	}
 
-	/* 3. check and set up card rom */
-	if (!(m_bios_port & IO_CARD) && (m_bios_port & IO_CARTRIDGE) && (m_bios_port & IO_EXPANSION))
+	if (!(m_mem_ctrl_reg & IO_CARD) && m_cardslot && m_cardslot->m_cart)
 	{
-		m_bank_enabled[3] = ENABLE_CARD;
-		m_bank_enabled[0] = ENABLE_CARD;
-		m_bank_enabled[1] = ENABLE_CARD;
-		m_bank_enabled[2] = ENABLE_CARD;
-		logerror("Switching to card rom port.\n");
+		m_mem_device_enabled |= ENABLE_CARD;
+		logerror("Card ROM port enabled.\n");
 	}
 
-	/* 4. check and set up cartridge rom */
-	/* if ((!(bios_port & IO_CARTRIDGE) && (bios_port & IO_EXPANSION) && (bios_port & IO_CARD)) || state->m_is_gamegear) { */
-	/* Out Run Europa initially writes a value to port 3E where IO_CARTRIDGE, IO_EXPANSION and IO_CARD are reset */
-	if ((!(m_bios_port & IO_CARTRIDGE)) || m_is_gamegear)
+	if (!(m_mem_ctrl_reg & IO_CARTRIDGE) && m_cartslot && m_cartslot->m_cart)
 	{
-		m_bank_enabled[3] = ENABLE_CART;
-		m_bank_enabled[0] = ENABLE_CART;
-		m_bank_enabled[1] = ENABLE_CART;
-		m_bank_enabled[2] = ENABLE_CART;
-		logerror("Switched in cartridge rom.\n");
+		m_mem_device_enabled |= ENABLE_CART;
+		logerror("Cartridge ROM/RAM enabled.\n");
 	}
 
-	/* 5. check and set up bios rom */
-	if (!(m_bios_port & IO_BIOS_ROM))
+	if (!(m_mem_ctrl_reg & IO_BIOS_ROM) && m_BIOS)
 	{
-		if (m_has_bios_0400)
+		m_mem_device_enabled |= ENABLE_BIOS;
+		logerror("BIOS enabled.\n");
+	}
+}
+
+
+void sms_state::setup_media_slots()
+{
+	setup_enabled_slots();
+
+	if (m_mem_device_enabled == ENABLE_NONE)
+		return;
+
+	// Setup cartridge RAM
+	if (!m_is_mark_iii && (m_mem_ctrl_reg & IO_WORK_RAM)) // Work RAM disabled (1).
+	{
+		m_mem_device_enabled |= ENABLE_EXT_RAM;
+	}
+	else if (!m_is_gamegear && m_is_region_japan && (m_mem_device_enabled & ENABLE_CART))
+	{
+		// a bunch of SG1000 carts (compatible with SG1000 Mark III) use their own RAM...
+		// TODO: are BASIC and Music actually compatible with Mark III??
+		if (m_cartslot->get_type() == SEGA8_BASIC_L3 ||
+		    m_cartslot->get_type() == SEGA8_MUSIC_EDITOR ||
+		    m_cartslot->get_type() == SEGA8_DAHJEE_TYPEA ||
+		    m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB)
 		{
-			// 1K bios
-			m_bank_enabled[3] = ENABLE_BIOS;
-			logerror("Switched in 0x0400 bios.\n");
+			m_mem_device_enabled |= ENABLE_EXT_RAM;
 		}
-		if (m_has_bios_2000)
-		{
-			// 8K bios
-			m_bank_enabled[3] = ENABLE_BIOS;
-			m_bank_enabled[0] = ENABLE_BIOS;
-			logerror("Switched in 0x2000 bios.\n");
-		}
-		if (m_has_bios_full)
-		{
-			// larger bios
-			m_bank_enabled[3] = ENABLE_BIOS;
-			m_bank_enabled[0] = ENABLE_BIOS;
-			m_bank_enabled[1] = ENABLE_BIOS;
-			m_bank_enabled[2] = ENABLE_BIOS;
-			logerror("Switched in full bios.\n");
-		}
+	}
+
+	// Set offset for Light Phaser
+	if (!m_is_mark_iii)
+	{
+		m_lphaser_x_offs = 44;
+
+		if (m_mem_device_enabled & ENABLE_CART)
+			m_lphaser_x_offs = m_cartslot->m_cart->get_lphaser_xoffs();
+		else if (m_mem_device_enabled & ENABLE_CARD)
+			m_lphaser_x_offs = m_cardslot->m_cart->get_lphaser_xoffs();
+		else if (m_mem_device_enabled & ENABLE_EXPANSION)
+			m_lphaser_x_offs = m_expslot->m_device->get_lphaser_xoffs();
 	}
 }
 
@@ -812,11 +732,11 @@ void sms_state::setup_bios()
 
 	if (!m_is_mark_iii)
 	{
-		m_bios_port = (IO_EXPANSION | IO_CARTRIDGE | IO_CARD);
+		m_mem_ctrl_reg = (IO_EXPANSION | IO_CARTRIDGE | IO_CARD);
 		if (!m_BIOS)
 		{
-			m_bios_port &= ~(IO_CARTRIDGE);
-			m_bios_port |= IO_BIOS_ROM;
+			m_mem_ctrl_reg &= ~(IO_CARTRIDGE);
+			m_mem_ctrl_reg |= IO_BIOS_ROM;
 		}
 	}
 }
@@ -825,7 +745,16 @@ MACHINE_START_MEMBER(sms_state,sms)
 {
 	char str[7];
 
+	m_cartslot = machine().device<sega8_cart_slot_device>("slot");
+	m_cardslot = machine().device<sega8_card_slot_device>("mycard");
+	m_expslot = machine().device<sms_expansion_slot_device>("exp");
 	m_space = &m_maincpu->space(AS_PROGRAM);
+
+	if (m_mainram == NULL)
+	{
+		m_mainram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
+		save_pointer(NAME(m_mainram), 0x2000);
+	}
 
 	// alibaba and blockhol are ports of games for the MSX system. The
 	// MSX bios usually initializes callback "vectors" at the top of RAM.
@@ -837,14 +766,14 @@ MACHINE_START_MEMBER(sms_state,sms)
 	// Japan region (including Korea), until confirmed on other consoles.
 	if (m_is_region_japan)
 	{
-		memset((UINT8*)m_space->get_write_ptr(0xc000), 0xf0, 0x1fff);
+		memset(m_mainram, 0xf0, 0x2000);
 	}
 
 	save_item(NAME(m_paused));
 	save_item(NAME(m_mapper));
 	save_item(NAME(m_port_dc_reg));
 	save_item(NAME(m_port_dd_reg));
-	save_item(NAME(m_bank_enabled));
+	save_item(NAME(m_mem_device_enabled));
 
 	if (m_has_fm)
 	{
@@ -853,7 +782,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 
 	if (!m_is_mark_iii)
 	{
-		save_item(NAME(m_bios_port));
+		save_item(NAME(m_mem_ctrl_reg));
 		save_item(NAME(m_bios_page));
 		save_item(NAME(m_io_ctrl_reg));
 		save_item(NAME(m_ctrl1_th_latch));
@@ -884,16 +813,6 @@ MACHINE_START_MEMBER(sms_state,sms)
 			m_cards[i] = machine().device<sega8_card_slot_device>(str);
 		}
 	}
-
-	// a bunch of SG1000 carts (compatible with SG1000 Mark III) can access directly system RAM... let's install here the necessary handlers
-	// TODO: are BASIC and Music actually compatible with Mark III??
-	// TODO: handle device slot switching for when running on a SMS.
-	if (m_cartslot->get_type() == SEGA8_BASIC_L3 || m_cartslot->get_type() == SEGA8_MUSIC_EDITOR
-			|| m_cartslot->get_type() == SEGA8_DAHJEE_TYPEA || m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB)
-	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(sega8_cart_slot_device::read_ram),(sega8_cart_slot_device*)m_cartslot));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, 0, 0, write8_delegate(FUNC(sega8_cart_slot_device::write_ram),(sega8_cart_slot_device*)m_cartslot));
-	}
 }
 
 MACHINE_RESET_MEMBER(sms_state,sms)
@@ -904,13 +823,10 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 	if (!m_is_mark_iii)
 	{
 		m_io_ctrl_reg = 0xff;
-		m_bios_port = 0;
 		m_ctrl1_th_latch = 0;
 		m_ctrl2_th_latch = 0;
 		m_ctrl1_th_state = 1;
 		m_ctrl2_th_state = 1;
-		// TODO: change to work also with other device slots and handle SMS slot switching.
-		m_lphaser_x_offs = (m_cartslot->m_cart) ? m_cartslot->m_cart->get_lphaser_xoffs() : 44;
 	}
 
 	if (m_is_gamegear)
@@ -933,7 +849,7 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 	}
 
 	setup_bios();
-	setup_rom();
+	setup_media_slots();
 }
 
 READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)
@@ -945,14 +861,29 @@ READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)
 WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
 {
 	UINT8 slot = data >> 4;
-	UINT8 slottype = data & 0x08;
+	UINT8 slottype;
 
+	// There are two known models of the Store Display Unit:
+	//
+	// - the one with 16 cart slots and 3 card slots;
+	// - the one with 16 cart slots and 16 card slots.
+	//
+	// On front panel of both models there are only 16 game switches, 
+	// that seems to change the active cart/card slot pair or, for the 4th
+	// game switch onward of the 16-3 model, the active cart slot only.
+
+	m_cartslot = m_slots[slot];
+	m_cardslot = m_cards[slot];
+
+	// TODO: check how the selection between the cart and the card slot of
+	// the active pair behaves, and how the slot type bit is set:
+	//
+	// - is there a priority set by hardware, as on Mark III?
+	// - does the BIOS a detection routine to check the presence of ROM on
+	// each slot of the pair, to enable the first where a ROM was found?
+
+	slottype = data & 0x08;
 	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot );
-	/* cartridge? slot #0 */
-	//if (slottype == 0)
-	//  m_current_cartridge = slot;
-
-	setup_rom();
 }
 
 
