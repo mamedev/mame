@@ -30,7 +30,8 @@ public:
 		m_filter1r(*this, "filter1r"),
 		m_filter2(*this, "filter2"),
 		m_filter3(*this, "filter3"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT16> m_spritemap;
 	required_shared_ptr<UINT16> m_raster_ctrl;
@@ -50,7 +51,8 @@ public:
 	required_device<filter_volume_device> m_filter2;
 	required_device<filter_volume_device> m_filter3;
 	required_device<gfxdecode_device> m_gfxdecode;
-
+	required_device<palette_device> m_palette;
+	
 	// Misc
 	UINT16  m_cpua_ctrl;
 	INT32   m_ioc220_port;

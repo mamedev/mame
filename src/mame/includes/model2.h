@@ -29,7 +29,9 @@ public:
 		m_tgp(*this, "tgp"),
 		m_dsp(*this, "dsp"),
 		m_drivecpu(*this, "drivecpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_bufferram;
@@ -49,6 +51,8 @@ public:
 	optional_device<cpu_device> m_dsp;
 	optional_device<cpu_device> m_drivecpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	UINT32 m_intreq;
 	UINT32 m_intena;

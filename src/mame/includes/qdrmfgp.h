@@ -17,7 +17,8 @@ public:
 		m_k053252(*this, "k053252"),
 		m_ata(*this, "ata"),
 		m_inputs_port(*this, "INPUTS"),
-		m_dsw_port(*this, "DSW")
+		m_dsw_port(*this, "DSW"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -30,6 +31,7 @@ public:
 	required_device<ata_interface_device> m_ata;
 	required_ioport m_inputs_port;
 	required_ioport m_dsw_port;
+	required_device<palette_device> m_palette;
 
 	UINT8 *m_sndram;
 	UINT16 m_control;

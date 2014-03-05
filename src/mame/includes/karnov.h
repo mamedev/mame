@@ -19,7 +19,8 @@ public:
 		m_ram(*this, "ram"),
 		m_videoram(*this, "videoram"),
 		m_pf_data(*this, "pf_data"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -33,6 +34,7 @@ public:
 	required_shared_ptr<UINT16> m_pf_data;
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	/* video-related */
 	bitmap_ind16    *m_bitmap_f;

@@ -451,7 +451,8 @@ public:
 		m_colram(*this, "colram"),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT8>  m_nvram;
 	required_shared_ptr<UINT8> m_workram;
@@ -487,6 +488,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

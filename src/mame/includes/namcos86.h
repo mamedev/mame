@@ -11,7 +11,8 @@ public:
 		m_cpu1(*this, "cpu1"),
 		m_cpu2(*this, "cpu2"),
 		m_cus30(*this, "namco"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	UINT8 *m_spriteram;
 	int m_wdog;
@@ -22,6 +23,7 @@ public:
 	required_device<cpu_device> m_cpu2;
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	int m_tilebank;
 	int m_xscroll[4];
 	int m_yscroll[4];

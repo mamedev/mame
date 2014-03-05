@@ -17,7 +17,8 @@ public:
 		m_tomahawk_protection(*this, "tomahawk_prot"),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
-		m_sn(*this, "snsnd") { }
+		m_sn(*this, "snsnd"),
+		m_screen(*this, "screen") { }
 
 	/* video-related */
 	required_shared_ptr<UINT8> m_videoram;
@@ -43,6 +44,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<samples_device> m_samples;  // astrof & abattle
 	optional_device<sn76477_device> m_sn; // tomahawk
+	required_device<screen_device> m_screen;
 	DECLARE_READ8_MEMBER(irq_clear_r);
 	DECLARE_WRITE8_MEMBER(astrof_videoram_w);
 	DECLARE_WRITE8_MEMBER(tomahawk_videoram_w);

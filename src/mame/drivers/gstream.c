@@ -146,7 +146,8 @@ public:
 		m_workram(*this, "workram"),
 		m_vram(*this, "vram"),
 		m_paletteram(*this, "paletteram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") 
 	{
 		m_toggle = 0;
 	}
@@ -205,6 +206,7 @@ public:
 	void rearrange_tile_data(UINT8* ROM, UINT32* NEW, UINT32* NEW2);
 	
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 CUSTOM_INPUT_MEMBER(gstream_state::x2222_toggle_r) // or the game hangs when starting, might be a status flag for the sound?

@@ -20,7 +20,8 @@ public:
 			m_okimusic(*this, "okimusic") ,
 		m_mainram(*this, "mainram"),
 		m_systemram(*this, "systemram"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_palette(*this, "palette")
 	{ }
 
 	/* devices */
@@ -34,6 +35,7 @@ public:
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_systemram;
 	optional_device<decospr_device> m_sprgen;
+	required_device<palette_device> m_palette;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
 

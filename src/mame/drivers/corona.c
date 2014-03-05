@@ -323,7 +323,8 @@ public:
 	corona_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu"),
+		m_screen(*this, "screen") { }
 
 	UINT8 m_blitter_x_reg;
 	UINT8 m_blitter_y_reg;
@@ -354,6 +355,7 @@ public:
 	UINT32 screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<screen_device> m_screen;
 };
 
 

@@ -216,7 +216,9 @@ public:
 		m_montype(*this, "MONTYPE"),
 		m_vram(*this,"vram"),
 		m_vram16(*this,"vram16"),
-		m_via2_ca1_hack(0)
+		m_via2_ca1_hack(0),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -445,7 +447,8 @@ private:
 	UINT64 m_hmc_reg, m_hmc_shiftout;
 
 	int m_via2_ca1_hack;
-
+	optional_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
 public:
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;

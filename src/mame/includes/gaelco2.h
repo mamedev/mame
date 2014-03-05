@@ -12,7 +12,8 @@ public:
 		m_vregs(*this, "vregs"),
 		m_snowboar_protection(*this, "snowboar_prot"),
 		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_device<m68000_device> m_maincpu;
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -20,6 +21,7 @@ public:
 	optional_shared_ptr<UINT16> m_snowboar_protection;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	int m_clr_gun_int;
 	UINT8 m_analog_ports[2];

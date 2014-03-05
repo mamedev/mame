@@ -69,7 +69,8 @@ public:
 		m_kbd(*this, "kbd"),
 		m_vram_bank(0),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG)
+		m_ram(*this, RAM_TAG),
+		m_palette(*this, "palette") 
 	{
 	}
 
@@ -147,6 +148,7 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<palette_device> m_palette;
 };
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )

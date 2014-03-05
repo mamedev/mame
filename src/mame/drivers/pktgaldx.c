@@ -347,6 +347,7 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", pktgaldx)
 
 	MCFG_DECOCOMN_ADD("deco_common")
+	MCFG_DECOCOMN_PALETTE("palette")
 
 	MCFG_DECO16IC_ADD("tilegen1", pktgaldx_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")

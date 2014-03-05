@@ -16,7 +16,9 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_seibu_sound(*this, "seibu_sound"),
 		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_background1_videoram16;
@@ -29,6 +31,8 @@ public:
 	optional_device<seibu_sound_device> m_seibu_sound;
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;	
 
 	int m_msm5205next;
 	int m_toggle;

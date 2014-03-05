@@ -23,7 +23,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_sn_1(*this, "sn76489.1"),
 		m_sn_2(*this, "sn76489.2"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -47,6 +48,7 @@ public:
 	optional_device<sn76489_device> m_sn_1;
 	optional_device<sn76489_device> m_sn_2;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_READ8_MEMBER(sound_status_r);

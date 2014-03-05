@@ -105,7 +105,8 @@ public:
 	vboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maintimer(*this, "timer_main"),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette") 
 	{
 		m_vip_regs.INTPND = 0;
 		m_vip_regs.INTENB = 0;
@@ -152,6 +153,7 @@ public:
 
 	required_device<timer_device> m_maintimer;
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 
 	DECLARE_READ32_MEMBER(io_r);
 	DECLARE_WRITE32_MEMBER(io_w);

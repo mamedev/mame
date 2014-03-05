@@ -128,7 +128,9 @@ public:
 		m_regs(*this, "regs"),
 		m_galgames_ram(*this, "galgames_ram"),
 		m_oki(*this, "oki"),
-		m_duart(*this, "duart68681"){ }
+		m_duart(*this, "duart68681"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<microtouch_serial_device> m_microtouch;
@@ -136,6 +138,8 @@ public:
 	optional_shared_ptr<UINT16> m_galgames_ram;
 	required_device<okim6295_device> m_oki;
 	optional_device<duartn68681_device> m_duart;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	int m_okibank;
 	UINT8 m_rtc_ram[8];

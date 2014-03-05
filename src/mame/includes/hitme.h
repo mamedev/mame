@@ -20,7 +20,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -49,6 +50,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 };
 
 

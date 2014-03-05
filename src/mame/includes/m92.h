@@ -31,7 +31,9 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
 			m_oki(*this, "oki"),
-			m_gfxdecode(*this, "gfxdecode")
+			m_gfxdecode(*this, "gfxdecode"),
+			m_screen(*this, "screen"),
+			m_palette(*this, "palette")
 	{ }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -41,7 +43,9 @@ public:
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
-
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
 	UINT16 m_sound_status;
 	UINT8 m_irq_vectorbase;
 	UINT32 m_raster_irq_position;

@@ -49,7 +49,8 @@ public:
 			m_hgdc2(*this, "upd7220_gfx"),
 			m_fdc(*this, "upd765a"),
 			m_video_ram(*this, "video_ram"),
-			m_beeper(*this, "beeper")
+			m_beeper(*this, "beeper"),
+			m_palette(*this, "palette") 
 	{ }
 
 	// devices
@@ -60,6 +61,7 @@ public:
 	required_device<upd765a_device> m_fdc;
 	required_shared_ptr<UINT8> m_video_ram;
 	required_device<beep_device> m_beeper;
+	required_device<palette_device> m_palette;
 
 	UINT8 *m_ipl_rom;
 	UINT8 *m_basic_rom;

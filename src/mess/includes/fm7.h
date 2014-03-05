@@ -138,7 +138,8 @@ public:
 		m_keymod(*this, "key_modifiers"),
 		m_joy1(*this, "joy1"),
 		m_joy2(*this, "joy2"),
-		m_dsw(*this, "DSW")
+		m_dsw(*this, "DSW"),
+		m_palette(*this, "palette") 
 	{
 	}
 
@@ -336,6 +337,7 @@ public:
 	required_ioport m_joy1;
 	required_ioport m_joy2;
 	required_ioport m_dsw;
+	required_device<palette_device> m_palette;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

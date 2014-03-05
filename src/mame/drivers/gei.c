@@ -84,12 +84,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
-		m_ticket(*this, "ticket") { }
+		m_ticket(*this, "ticket"),
+		m_screen(*this, "screen") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
 	optional_device<ticket_dispenser_device> m_ticket;
-	
+	required_device<screen_device> m_screen;
+
 	virtual void video_start();
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

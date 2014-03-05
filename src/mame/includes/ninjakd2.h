@@ -14,7 +14,9 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -23,6 +25,8 @@ public:
 	required_shared_ptr<UINT8> m_fg_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	const INT16* m_sampledata;
 	UINT8 m_omegaf_io_protection[3];

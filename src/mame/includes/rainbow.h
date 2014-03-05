@@ -17,7 +17,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_pc080sn(*this, "pc080sn"),
 		m_pc090oj(*this, "pc090oj"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_spriteram;
@@ -41,6 +42,7 @@ public:
 	required_device<pc080sn_device> m_pc080sn;
 	optional_device<pc090oj_device> m_pc090oj;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_WRITE16_MEMBER(jumping_sound_w);
 	DECLARE_READ8_MEMBER(jumping_latch_r);

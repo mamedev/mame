@@ -23,7 +23,9 @@ public:
 		m_subcpu(*this, "sub"),
 		m_adpcm1(*this, "adpcm1"),
 		m_adpcm2(*this, "adpcm2"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_rambase;
@@ -71,6 +73,8 @@ public:
 	optional_device<msm5205_device> m_adpcm1;
 	optional_device<msm5205_device> m_adpcm2;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 
 	int scanline_to_vcount(int scanline);

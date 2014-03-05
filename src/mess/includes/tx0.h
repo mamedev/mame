@@ -133,7 +133,8 @@ public:
 	tx0_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	tape_reader_t m_tape_reader;
 	tape_puncher_t m_tape_puncher;
@@ -196,6 +197,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tx0_io_reset_callback);
 	void magtape_callback();
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 /* defines for each bit and mask in input port "CSW" */

@@ -97,7 +97,8 @@ public:
 		m_fbram(*this, "fb_ram"),
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") 
 	{
 		m_soundlatch = 0;
 		m_bank = 0;
@@ -113,6 +114,7 @@ public:
 	required_shared_ptr<UINT8> m_cram;
 	
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	UINT8 m_soundlatch;
 	UINT8 m_bank;

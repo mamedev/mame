@@ -112,7 +112,8 @@ public:
 		m_reelscroll3(*this, "reelscroll3"),
 		m_reelscroll4(*this, "reelscroll4"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	tilemap_t *m_tmap;
 	required_shared_ptr<UINT8> m_videoram;
@@ -167,6 +168,7 @@ public:
 	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

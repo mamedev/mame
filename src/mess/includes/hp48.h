@@ -46,7 +46,8 @@ public:
 	hp48_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac") { }
+		m_dac(*this, "dac"),
+		m_palette(*this, "palette")  { }
 
 	UINT8 *m_videoram;
 	UINT8 m_io[64];
@@ -90,6 +91,7 @@ public:
 	void hp48_apply_modules();
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
+	required_device<palette_device> m_palette;
 	void hp48_pulse_irq( int irq_line);
 	void hp48_rs232_start_recv_byte( UINT8 data );
 	void hp48_rs232_send_byte(  );

@@ -99,7 +99,8 @@ public:
 		m_dac2(*this, "dac2"),
 		m_nvram(*this, "nvram"),
 		m_io_in0(*this, "IN0"),
-		m_io_in1(*this, "IN1") { }
+		m_io_in1(*this, "IN1"),
+		m_palette(*this, "palette")  { }
 
 	virtual void video_start();
 
@@ -189,6 +190,7 @@ protected:
 	required_device<nvram_device> m_nvram;
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;
+	required_device<palette_device> m_palette;
 
 	UINT32 s3c240x_get_fclk(int reg);
 	UINT32 s3c240x_get_hclk(int reg);

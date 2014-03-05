@@ -35,7 +35,8 @@ public:
 		m_dpoker_coin_in_timer(*this, "dp_coinin"),
 		m_dpoker_hopper_timer(*this, "dp_hopper"),
 		m_samples(*this, "samples"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{ }
 
 	// these should be required but can't because mcr68 shares with us
@@ -54,6 +55,7 @@ public:
 	optional_device<timer_device> m_dpoker_hopper_timer;
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(mcr_control_port_w);
 	DECLARE_WRITE8_MEMBER(mcr_ipu_laserdisk_w);

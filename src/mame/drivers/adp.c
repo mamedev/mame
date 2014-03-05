@@ -160,13 +160,17 @@ public:
 		m_h63484(*this, "h63484"),
 		m_microtouch(*this, "microtouch"),
 		m_maincpu(*this, "maincpu"),
-		m_duart(*this, "duart68681")
+		m_duart(*this, "duart68681"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 		{ }
 
 	required_device<h63484_device> m_h63484;
 	required_device<microtouch_serial_device> m_microtouch;
 	required_device<cpu_device> m_maincpu;
 	required_device<duartn68681_device> m_duart;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

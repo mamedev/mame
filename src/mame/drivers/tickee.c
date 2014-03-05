@@ -46,7 +46,8 @@ public:
 		m_vram(*this, "vram"),
 		m_control(*this, "control"),
 		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki") { }
+		m_oki(*this, "oki"),
+		m_screen(*this, "screen") { }
 
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_vram;
@@ -75,6 +76,7 @@ public:
 	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
+	required_device<screen_device> m_screen;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

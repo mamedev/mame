@@ -87,7 +87,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_priority_ram(*this, "priority_ram"),
 		m_vbowl_trackball(*this, "vbowl_trackball"),
-		m_oki(*this, "oki"){ }
+		m_oki(*this, "oki"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_priority_ram;
@@ -219,6 +221,8 @@ public:
 	void lhb2_decrypt_gfx();
 	void drgnwrld_gfx_decrypt();
 	optional_device<okim6295_device> m_oki;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 };
 
 

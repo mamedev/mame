@@ -156,13 +156,14 @@ class z100_state : public driver_device
 public:
 	z100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pia0(*this, "pia0"),
-	m_pia1(*this, "pia1"),
-	m_picm(*this, "pic8259_master"),
-	m_pics(*this, "pic8259_slave"),
-	m_fdc(*this, "z207_fdc"),
-	m_crtc(*this, "crtc")
+		m_maincpu(*this, "maincpu"),
+		m_pia0(*this, "pia0"),
+		m_pia1(*this, "pia1"),
+		m_picm(*this, "pic8259_master"),
+		m_pics(*this, "pic8259_slave"),
+		m_fdc(*this, "z207_fdc"),
+		m_crtc(*this, "crtc"),
+		m_palette(*this, "palette") 
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -172,6 +173,8 @@ public:
 	required_device<pic8259_device> m_pics;
 	required_device<fd1797_device> m_fdc;
 	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
+	
 	DECLARE_READ8_MEMBER(z100_vram_r);
 	DECLARE_WRITE8_MEMBER(z100_vram_w);
 	DECLARE_READ8_MEMBER(keyb_data_r);

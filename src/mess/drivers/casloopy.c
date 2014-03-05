@@ -161,7 +161,8 @@ public:
 		m_bios_rom(*this, "bios_rom"),
 		m_vregs(*this, "vregs"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<UINT32> m_bios_rom;
 	required_shared_ptr<UINT32> m_vregs;
@@ -187,6 +188,7 @@ public:
 	DECLARE_WRITE8_MEMBER(casloopy_bitmap_w);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

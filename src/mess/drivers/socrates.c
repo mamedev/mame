@@ -121,11 +121,13 @@ public:
 	socrates_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_sound(*this, "soc_snd")
+		m_sound(*this, "soc_snd"),
+		m_screen(*this, "screen")
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
-
+	required_device<screen_device> m_screen;
+	
 	rgb_t m_palette_val[256];
 
 	UINT8 m_data[8];

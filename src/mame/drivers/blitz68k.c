@@ -67,7 +67,8 @@ public:
 			m_leds0(*this, "leds0"),
 			m_leds1(*this, "leds1"),
 			m_leds2(*this, "leds2") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette")  { }
 
 	optional_shared_ptr<UINT16> m_nvram;
 	UINT8 *m_blit_buffer;
@@ -178,6 +179,7 @@ public:
 	UINT32 screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(steaser_mcu_sim);
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 /*************************************************************************************************************

@@ -11,7 +11,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"){ }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"){ }
 
 	required_shared_ptr<UINT16> m_videoram1;
 	required_shared_ptr<UINT16> m_videoram2;
@@ -25,6 +26,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_WRITE16_MEMBER(mugsmash_reg2_w);
 	DECLARE_READ16_MEMBER(mugsmash_input_ports_r);

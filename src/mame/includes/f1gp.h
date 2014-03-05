@@ -26,7 +26,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_audiocpu(*this, "audiocpu"),
-		m_k053936(*this, "k053936") { }
+		m_k053936(*this, "k053936"),
+		m_palette(*this, "palette")  { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_sharedram;
@@ -72,6 +73,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<k053936_device> m_k053936;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_WRITE8_MEMBER(f1gp_sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);

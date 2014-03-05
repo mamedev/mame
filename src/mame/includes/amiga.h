@@ -401,7 +401,9 @@ public:
 			m_pot1dat_port(*this, "POT1DAT"),
 			m_p1joy_port(*this, "P1JOY"),
 			m_p2joy_port(*this, "P2JOY"),
-			m_bank1(*this, "bank1")
+			m_bank1(*this, "bank1"),
+			m_screen(*this, "screen"),
+			m_palette(*this, "palette")
 
 	{ }
 
@@ -425,6 +427,9 @@ public:
 	optional_ioport m_p2joy_port;
 	optional_memory_bank m_bank1;
 
+	required_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
+	
 	address_space* m_maincpu_program_space;
 
 	const amiga_machine_interface *m_intf;

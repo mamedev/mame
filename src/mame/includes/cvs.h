@@ -35,7 +35,9 @@ public:
 			m_s2636_0(*this, "s2636_0"),
 			m_s2636_1(*this, "s2636_1"),
 			m_s2636_2(*this, "s2636_2"),
-			m_gfxdecode(*this, "gfxdecode")
+			m_gfxdecode(*this, "gfxdecode"),
+			m_screen(*this, "screen"),
+			m_palette(*this, "palette") 
 	{
 	}
 
@@ -77,6 +79,8 @@ public:
 	optional_device<s2636_device> m_s2636_1;
 	optional_device<s2636_device> m_s2636_2;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	
 	/* memory */
 	UINT8      m_color_ram[0x400];

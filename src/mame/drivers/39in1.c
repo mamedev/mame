@@ -34,7 +34,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_eeprom(*this, "eeprom"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette")  { }
 
 	UINT32 m_seed;
 	UINT32 m_magic;
@@ -94,6 +95,7 @@ public:
 	void pxa255_lcd_check_load_next_branch(int channel);
 	void pxa255_start();
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 

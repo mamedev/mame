@@ -427,6 +427,8 @@ public:
 
 	optional_device<atari_sound_comm_device> m_soundcomm;
 	optional_device<gfxdecode_device> m_gfxdecode;
+	optional_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
 };
 
 

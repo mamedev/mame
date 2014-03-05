@@ -13,7 +13,8 @@ class aristmk6_state : public driver_device
 public:
 	aristmk6_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette")  { }
 
 	UINT32 m_test_x,m_test_y,m_start_offs;
 	UINT8 m_type;
@@ -21,6 +22,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 

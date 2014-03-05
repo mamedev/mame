@@ -49,7 +49,9 @@ public:
 		m_i2cmem(*this, "i2cmem"),
 		m_wd1772(*this, "wd1772"),
 		m_region_maincpu(*this, "maincpu"),
-		m_region_vram(*this, "vram") { }
+		m_region_vram(*this, "vram"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	optional_device<aakart_device> m_kart;
 	void archimedes_init();
@@ -92,6 +94,8 @@ protected:
 	optional_device<device_t> m_wd1772;
 	required_memory_region m_region_maincpu;
 	required_memory_region m_region_vram;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	dac_device *m_dac[8];
 
 private:

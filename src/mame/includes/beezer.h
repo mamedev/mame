@@ -11,7 +11,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_custom(*this, "custom") { }
+		m_custom(*this, "custom"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	int m_pbus;
@@ -20,6 +22,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<beezer_sound_device> m_custom;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(beezer_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(beezer_map_w);

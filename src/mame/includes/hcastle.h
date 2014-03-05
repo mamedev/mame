@@ -23,7 +23,8 @@ public:
 		m_k007121_2(*this, "k007121_2"),
 		m_k007232(*this, "k007232"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_device<buffered_spriteram8_device> m_spriteram2;
@@ -71,4 +72,5 @@ public:
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };

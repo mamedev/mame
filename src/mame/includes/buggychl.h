@@ -20,7 +20,9 @@ public:
 		m_mcu(*this, "mcu"),
 		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_charram;
@@ -51,6 +53,9 @@ public:
 	required_device<buggychl_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);

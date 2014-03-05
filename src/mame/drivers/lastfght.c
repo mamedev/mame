@@ -71,7 +71,9 @@ class lastfght_state : public driver_device
 public:
 	lastfght_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
+		m_maincpu(*this,"maincpu"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 		{ }
 
 	/* video-related */
@@ -99,6 +101,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	/* memory */
 	UINT8   m_colorram[256 * 3];

@@ -17,10 +17,12 @@ class tim100_state : public driver_device
 public:
 	tim100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_palette(*this, "palette") 
 		{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	virtual void machine_reset();
 };
 

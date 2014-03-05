@@ -34,7 +34,8 @@ public:
 		m_pic8259(*this, "pic8259"),
 		m_speaker(*this, "speaker"),
 		m_region_maincpu(*this, "maincpu"),
-		m_region_gfx1(*this, "gfx1") { }
+		m_region_gfx1(*this, "gfx1"),
+		m_palette(*this, "palette")  { }
 
 	UINT8 m_color;
 	UINT8 m_video_page;
@@ -87,7 +88,7 @@ protected:
 	required_memory_region m_region_maincpu;
 	required_memory_region m_region_gfx1;
 	ioport_port *m_io_port[16];
-
+	required_device<palette_device> m_palette;
 	void pk8020_set_bank(UINT8 data);
 };
 

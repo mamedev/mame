@@ -189,7 +189,8 @@ public:
 		m_mainsub_shared_ram(*this, "mainsub_shared"),
 		m_ctrl(*this, "ctrl"),
 		m_maincpu(*this,"maincpu"),
-		m_subcpu(*this,"sub")
+		m_subcpu(*this,"sub"),
+		m_palette(*this, "palette")
 		{ }
 
 	optional_device<kaneko_view2_tilemap_device> m_view2_0;
@@ -209,6 +210,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<palette_device> m_palette;
 	sknsspr_device* m_spritegen1;
 	sknsspr_device* m_spritegen2;
 

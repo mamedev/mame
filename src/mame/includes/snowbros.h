@@ -13,7 +13,8 @@ public:
 		m_pandora(*this, "pandora"),
 		m_hyperpac_ram(*this, "hyperpac_ram"),
 		m_bootleg_spriteram16(*this, "spriteram16b"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -23,6 +24,8 @@ public:
 	optional_shared_ptr<UINT16> m_hyperpac_ram;
 	optional_shared_ptr<UINT16> m_bootleg_spriteram16;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	
 	int m_sb3_music_is_playing;
 	int m_sb3_music;
 	UINT8 m_semicom_prot_offset;

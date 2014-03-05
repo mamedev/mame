@@ -20,7 +20,8 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_slave(*this, "slave"),
 		m_mcu(*this, "mcu"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_screen(*this, "screen") { }
 
 	UINT8 m_sound_latch;
 	UINT8 m_ls74;
@@ -104,6 +105,8 @@ public:
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_mcu;
 	optional_device<msm5205_device> m_msm;
+	required_device<screen_device> m_screen;
+	
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

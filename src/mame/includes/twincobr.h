@@ -19,7 +19,9 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
 		m_spritegen(*this, "toaplan_scu"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{ }
 
 	optional_shared_ptr<UINT8> m_sharedram;
@@ -125,7 +127,8 @@ public:
 	required_device<cpu_device> m_dsp;
 	required_device<toaplan_scu_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
-
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 };
 
 

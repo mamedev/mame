@@ -29,7 +29,8 @@ public:
 		m_screen_ram(*this, "screen_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_dsp0(*this, "dsp0"),
-		m_dsp1(*this, "dsp1") { }
+		m_dsp1(*this, "dsp1"),
+		m_palette(*this, "palette") { }
 
 	UINT8 m_r_color_table[256];
 	UINT8 m_g_color_table[256];
@@ -72,6 +73,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp0;
 	optional_device<cpu_device> m_dsp1;
+	required_device<palette_device> m_palette;
 };
 
 

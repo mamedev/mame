@@ -10,7 +10,8 @@ public:
 		m_objectram0(*this, "objectram0"),
 		m_videoram0(*this, "videoram0"),
 		m_cpuc(*this, "cpuc"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT8> m_objectram1;
 	required_shared_ptr<UINT8> m_videoram1;
@@ -20,6 +21,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram0;
 	required_device<cpu_device> m_cpuc;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	int m_cpua_bank;
 	int m_cpub_bank;

@@ -165,7 +165,8 @@ public:
 		m_bank5(*this, "bank5"),
 		m_bank6(*this, "bank6"),
 		m_bank7(*this, "bank7"),
-		m_bank8(*this, "bank8") { }
+		m_bank8(*this, "bank8"),
+		m_palette(*this, "palette")  { }
 
 	required_device<i8255_device> m_ppi;
 
@@ -289,6 +290,7 @@ protected:
 	optional_memory_bank m_bank6;
 	optional_memory_bank m_bank7;
 	optional_memory_bank m_bank8;
+	required_device<palette_device> m_palette;
 
 	void draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
 	void draw_bitmap_2bpp(bitmap_ind16 &bitmap,const rectangle &cliprect, int attr);

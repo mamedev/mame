@@ -60,7 +60,8 @@ public:
 			m_vfd(*this, "vfd"),
 			m_vram(*this, "vram") ,
 		m_maincpu(*this, "maincpu"),
-		m_upd7759(*this, "upd") { }
+		m_upd7759(*this, "upd"),
+		m_palette(*this, "palette") { }
 
 	UINT8 m_tms_irq;
 	UINT8 m_duart_1_irq;
@@ -116,6 +117,7 @@ public:
 	void update_irqs();
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
+	optional_device<palette_device> m_palette;
 };
 
 

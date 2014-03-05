@@ -8,7 +8,9 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
-		m_dac(*this, "dac")  { }
+		m_dac(*this, "dac"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")  { }
 
 
 	static const UINT8  mahmajn_mlt[8];
@@ -125,4 +127,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<dac_device> m_dac;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 };

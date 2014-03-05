@@ -201,12 +201,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
-		m_wram(*this, "wram")
+		m_wram(*this, "wram"),
+		m_palette(*this, "palette") 
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_shared_ptr<UINT16> m_wram;
+	required_device<palette_device> m_palette;
 
 	UINT16 *m_blit_buffer;
 	UINT16 m_blit_ram[0x10];

@@ -69,7 +69,8 @@ public:
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_ctc(*this, "ctc"),
-		port_c_value(0)
+		port_c_value(0),
+		m_palette(*this, "palette") 
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -102,7 +103,7 @@ public:
 
 
 	UINT8 port_c_value;
-
+	required_device<palette_device> m_palette;
 	int m_soundsent;
 	UINT8 m_sounddata;
 	UINT8 m_soundback;

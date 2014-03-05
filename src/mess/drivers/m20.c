@@ -64,7 +64,8 @@ public:
 		m_fd1797(*this, "fd1797"),
 		m_floppy0(*this, "fd1797:0:5dd"),
 		m_floppy1(*this, "fd1797:1:5dd"),
-		m_p_videoram(*this, "p_videoram")
+		m_p_videoram(*this, "p_videoram"),
+		m_palette(*this, "palette") 
 	{
 	}
 
@@ -79,6 +80,7 @@ public:
 	required_device<floppy_image_device> m_floppy1;
 
 	required_shared_ptr<UINT16> m_p_videoram;
+	required_device<palette_device> m_palette;
 
 	virtual void machine_start();
 	virtual void machine_reset();

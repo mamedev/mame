@@ -33,7 +33,9 @@ public:
 		m_speech(*this, "segaspeech"),
 		m_usbsnd(*this, "usbsnd"),
 		m_005snd(*this, "005"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -47,6 +49,8 @@ public:
 	optional_device<usb_sound_device> m_usbsnd;
 	optional_device<sega005_sound_device> m_005snd;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	UINT8 m_sound_state[2];
 	UINT8 m_sound_rate;

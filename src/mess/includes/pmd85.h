@@ -50,7 +50,8 @@ public:
 		m_bank14(*this, "bank14"),
 		m_bank15(*this, "bank15"),
 		m_bank16(*this, "bank16"),
-		m_io_dsw0(*this, "DSW0") { }
+		m_io_dsw0(*this, "DSW0"),
+		m_palette(*this, "palette")  { }
 
 	UINT8 m_rom_module_present;
 	UINT8 m_ppi_port_outputs[4][3];
@@ -136,6 +137,7 @@ protected:
 	optional_memory_bank m_bank16;
 	optional_ioport m_io_dsw0;
 	ioport_port *m_io_port[16];
+	required_device<palette_device> m_palette;
 
 	void pmd851_update_memory();
 	void pmd852a_update_memory();

@@ -23,7 +23,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_pit(*this, "pit8253"),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG),
+		m_palette(*this, "palette")  { }
 
 	UINT8 m_b2m_8255_porta;
 	UINT8 m_b2m_video_scroll;
@@ -43,7 +44,8 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pit8253_device> m_pit;
 	required_device<ram_device> m_ram;
-
+	required_device<palette_device> m_palette;
+	
 	/* devices */
 	fd1793_t *m_fdc;
 	pic8259_device *m_pic;

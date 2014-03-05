@@ -14,7 +14,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_mjk_adpcm(*this, "adpcm"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT8> m_nvram;
 	required_shared_ptr<UINT8> m_spriteram1;
@@ -25,6 +26,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mjkjidai_adpcm_device> m_mjk_adpcm;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	int m_keyb;
 	int m_nvram_init_count;

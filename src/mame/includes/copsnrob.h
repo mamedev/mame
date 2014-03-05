@@ -20,7 +20,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_trucky;
@@ -41,6 +43,8 @@ public:
 	UINT32 screen_update_copsnrob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;	
 };
 
 /*----------- defined in audio/copsnrob.c -----------*/

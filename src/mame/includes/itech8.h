@@ -22,7 +22,8 @@ public:
 		m_subcpu(*this, "sub"),
 		m_tms34061(*this, "tms34061"),
 		m_tlc34076(*this, "tlc34076"),
-		m_visarea(0, 0, 0, 0) { }
+		m_visarea(0, 0, 0, 0),
+		m_screen(*this, "screen") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -30,6 +31,7 @@ public:
 	required_device<tms34061_device> m_tms34061;
 	required_device<tlc34076_device> m_tlc34076;
 	rectangle m_visarea;
+	required_device<screen_device> m_screen;
 	UINT8 m_grom_bank;
 
 	UINT8 m_blitter_int;

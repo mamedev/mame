@@ -834,6 +834,7 @@ static MACHINE_CONFIG_START( rohga, rohga_state )
 	MCFG_VIDEO_START_OVERRIDE(rohga_state,rohga)
 
 	MCFG_DECOCOMN_ADD("deco_common")
+	MCFG_DECOCOMN_PALETTE("palette")
 
 	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
@@ -893,6 +894,7 @@ static MACHINE_CONFIG_START( wizdfire, rohga_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECOCOMN_ADD("deco_common")
+	MCFG_DECOCOMN_PALETTE("palette")
 
 	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
@@ -960,6 +962,7 @@ static MACHINE_CONFIG_START( nitrobal, rohga_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECOCOMN_ADD("deco_common")
+	MCFG_DECOCOMN_PALETTE("palette")
 
 	MCFG_DECO16IC_ADD("tilegen1", nitrobal_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
@@ -1030,6 +1033,7 @@ static MACHINE_CONFIG_START( schmeisr, rohga_state )
 	MCFG_VIDEO_START_OVERRIDE(rohga_state,schmeisr)
 
 	MCFG_DECOCOMN_ADD("deco_common")
+	MCFG_DECOCOMN_PALETTE("palette")
 
 	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")

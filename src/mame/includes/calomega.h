@@ -11,7 +11,8 @@ public:
 		m_aciabaud(*this, "aciabaud"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") 
 	{
 	}
 
@@ -56,6 +57,7 @@ private:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	UINT8 m_tx_line;
 	int m_s903_mux_data;
 	int m_s905_mux_data;

@@ -28,7 +28,8 @@ public:
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
 		m_k053252(*this, "k053252"),
-		m_k054000(*this, "k054000") { }
+		m_k054000(*this, "k054000"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	UINT8 *    m_ram;
@@ -52,6 +53,7 @@ public:
 	required_device<k053251_device> m_k053251;
 	optional_device<k053252_device> m_k053252;
 	optional_device<k054000_device> m_k054000;
+	required_device<palette_device> m_palette;
 	DECLARE_WRITE8_MEMBER(vendetta_eeprom_w);
 	DECLARE_READ8_MEMBER(vendetta_K052109_r);
 	DECLARE_WRITE8_MEMBER(vendetta_K052109_w);

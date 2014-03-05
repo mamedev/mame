@@ -58,7 +58,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -128,6 +129,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<gfxdecode_device> m_gfxdecode;
+	optional_device<palette_device> m_palette;
 };
 
 

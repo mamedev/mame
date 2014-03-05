@@ -10,7 +10,8 @@ public:
 		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_device<discrete_device> m_discrete;
@@ -35,6 +36,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 };
 
 /*----------- defined in audio/blockade.c -----------*/

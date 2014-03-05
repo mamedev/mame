@@ -30,7 +30,8 @@ public:
 	m_fdc(*this, "wd1793"),
 	m_ppi(*this, "ppi8255"),
 	m_ppi2(*this, "ppi8255_2"),
-	m_ram(*this, RAM_TAG)
+	m_ram(*this, RAM_TAG),
+	m_palette(*this, "palette") 
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -39,6 +40,7 @@ public:
 	required_device<i8255_device> m_ppi;
 	required_device<i8255_device> m_ppi2;
 	required_device<ram_device> m_ram;
+	required_device<palette_device> m_palette;
 	DECLARE_READ8_MEMBER(vector06_8255_portb_r);
 	DECLARE_READ8_MEMBER(vector06_8255_portc_r);
 	DECLARE_WRITE8_MEMBER(vector06_8255_porta_w);

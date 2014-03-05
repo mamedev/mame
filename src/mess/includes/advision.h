@@ -20,12 +20,14 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, I8048_TAG),
 			m_soundcpu(*this, COP411_TAG),
-			m_dac(*this, "dac")
+			m_dac(*this, "dac"),
+			m_palette(*this, "palette") 
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<dac_device> m_dac;
+	required_device<palette_device> m_palette;
 
 	virtual void machine_start();
 	virtual void machine_reset();

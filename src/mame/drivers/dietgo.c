@@ -233,6 +233,7 @@ static MACHINE_CONFIG_START( dietgo, dietgo_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", dietgo)
 
 	MCFG_DECOCOMN_ADD("deco_common")
+	MCFG_DECOCOMN_PALETTE("palette")
 
 	MCFG_DECO16IC_ADD("tilegen1", dietgo_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")

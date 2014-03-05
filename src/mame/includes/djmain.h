@@ -13,7 +13,8 @@ public:
 		m_k056832(*this, "k056832"),
 		m_k055555(*this, "k055555"),
 		m_ata(*this, "ata"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -71,6 +72,7 @@ public:
 	required_device<k055555_device> m_k055555;
 	required_device<ata_interface_device> m_ata;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 /*----------- defined in video/djmain.c -----------*/

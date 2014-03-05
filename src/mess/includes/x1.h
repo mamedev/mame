@@ -80,7 +80,8 @@ public:
 	m_fdc(*this, "fdc"),
 	m_crtc(*this, "crtc"),
 	m_ctc(*this, "ctc"),
-	m_gfxdecode(*this, "gfxdecode")
+	m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") 
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -230,6 +231,7 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 /*----------- defined in machine/x1.c -----------*/

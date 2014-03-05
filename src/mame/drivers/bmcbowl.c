@@ -119,13 +119,15 @@ public:
 		m_stats_ram(*this, "nvram", 16),
 		m_vid1(*this, "vid1"),
 		m_vid2(*this, "vid2"),
-		m_colorram(*this, "colorram", 16) { }
+		m_colorram(*this, "colorram", 16),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_stats_ram;
 	required_shared_ptr<UINT16> m_vid1;
 	required_shared_ptr<UINT16> m_vid2;
 	required_shared_ptr<UINT8> m_colorram;
+	required_device<palette_device> m_palette;
 	int m_clr_offset;
 	int m_bmc_input;
 	DECLARE_READ16_MEMBER(bmc_random_read);

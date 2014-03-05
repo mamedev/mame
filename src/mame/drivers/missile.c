@@ -369,7 +369,9 @@ public:
 		m_track0_x(*this, "TRACK0_X"),
 		m_track0_y(*this, "TRACK0_Y"),
 		m_track1_x(*this, "TRACK1_X"),
-		m_track1_y(*this, "TRACK1_Y")
+		m_track1_y(*this, "TRACK1_Y"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<m6502_device> m_maincpu;
@@ -383,6 +385,8 @@ public:
 	required_ioport m_track0_y;
 	required_ioport m_track1_x;
 	required_ioport m_track1_y;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	const UINT8 *m_mainrom;
 	const UINT8 *m_writeprom;

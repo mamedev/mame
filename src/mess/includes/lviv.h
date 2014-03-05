@@ -21,7 +21,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG),
+		m_palette(*this, "palette")  { }
 
 	unsigned char * m_video_ram;
 	unsigned short m_colortable[1][4];
@@ -49,6 +50,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_device<palette_device> m_palette;
 	void lviv_update_palette(UINT8 pal);
 	void lviv_update_memory ();
 	void lviv_setup_snapshot (UINT8 * data);

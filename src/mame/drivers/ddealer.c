@@ -131,7 +131,8 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_mcu_shared_ram(*this, "mcu_shared_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_vregs;
@@ -167,6 +168,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(ddealer_mcu_sim);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	void ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy);
 };
 

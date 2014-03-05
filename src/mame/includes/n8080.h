@@ -12,7 +12,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_dac(*this, "dac"),
-		m_sn(*this, "snsnd") { }
+		m_sn(*this, "snsnd"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -50,6 +52,9 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<dac_device> m_dac;
 	optional_device<sn76477_device> m_sn;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
 	DECLARE_WRITE8_MEMBER(n8080_shift_bits_w);
 	DECLARE_WRITE8_MEMBER(n8080_shift_data_w);
 	DECLARE_READ8_MEMBER(n8080_shift_r);

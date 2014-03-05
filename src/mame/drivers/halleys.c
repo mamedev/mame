@@ -214,7 +214,8 @@ public:
 		m_blitter_ram(*this, "blitter_ram"),
 		m_io_ram(*this, "io_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_palette(*this, "palette") { }
 
 	UINT16 *m_render_layer[MAX_LAYERS];
 	UINT8 m_sound_fifo[MAX_SOUNDS];
@@ -282,6 +283,7 @@ public:
 	void init_common();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<palette_device> m_palette;
 };
 
 

@@ -55,7 +55,8 @@ public:
 		m_video(*this, "video"),
 		m_maincpu(*this, "maincpu"),
 		m_adpcm(*this, "adpcm"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video;
@@ -83,6 +84,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

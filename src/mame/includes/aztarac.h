@@ -15,13 +15,15 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_vector(*this, "vector"),
 		m_nvram(*this, "nvram") ,
-		m_vectorram(*this, "vectorram") { }
+		m_vectorram(*this, "vectorram"),
+		m_screen(*this, "screen") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<vector_device> m_vector;
 	required_shared_ptr<UINT16> m_nvram;
 	required_shared_ptr<UINT16> m_vectorram;
+	required_device<screen_device> m_screen;	
 
 	int m_sound_status;
 	int m_xcenter;

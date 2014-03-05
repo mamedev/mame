@@ -18,7 +18,9 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_dac1(*this, "dac1"),
-		m_dac2(*this, "dac2") { }
+		m_dac2(*this, "dac2"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	int m_inputport;
 	int m_dipswbitsel;
@@ -137,6 +139,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac1;
 	required_device<dac_device> m_dac2;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

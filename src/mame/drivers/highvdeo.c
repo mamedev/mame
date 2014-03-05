@@ -111,7 +111,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_blit_ram(*this, "blit_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_okim6376(*this, "oki") { }
+		m_okim6376(*this, "oki"),
+		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<UINT16> m_blit_ram;
 	UINT16 m_vblank_bit;
@@ -154,6 +155,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq_80186);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6376_device> m_okim6376;
+	required_device<palette_device> m_palette;
 };
 
 

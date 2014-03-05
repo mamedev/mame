@@ -231,10 +231,14 @@ public:
 	wheelfir_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "subcpu") { }
+		m_subcpu(*this, "subcpu"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	INT32 *m_zoom_table;
 	UINT16 *m_blitter_data;

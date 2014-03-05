@@ -34,7 +34,8 @@ public:
 			m_vdc(*this, CDP1861_TAG),
 			m_clear(*this, "CLEAR"),
 			m_a(*this, "A"),
-			m_b(*this, "B")
+			m_b(*this, "B"),
+			m_screen(*this, "screen")
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
@@ -43,7 +44,8 @@ public:
 	required_ioport m_clear;
 	required_ioport m_a;
 	required_ioport m_b;
-
+	required_device<screen_device> m_screen;
+	
 	virtual void machine_start();
 	virtual void machine_reset();
 

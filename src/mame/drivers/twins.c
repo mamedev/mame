@@ -60,11 +60,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
-		m_paletteram(*this, "paletteram") { }
+		m_paletteram(*this, "paletteram"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_paletteram;
+	required_device<palette_device> m_palette;
 	UINT16 m_paloff;
 	DECLARE_READ16_MEMBER(twins_port4_r);
 	DECLARE_WRITE16_MEMBER(twins_port4_w);

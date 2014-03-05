@@ -100,7 +100,8 @@ public:
 		m_txram(*this, "txram"),
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -109,6 +110,7 @@ public:
 	optional_shared_ptr<UINT8> m_mainram;
 	optional_shared_ptr<UINT8> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	tilemap_t *m_txtilemap;
 	int m_coin_stat;

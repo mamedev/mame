@@ -79,12 +79,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tms34061(*this, "tms34061"),
-		m_sn(*this, "snsnd") { }
+		m_sn(*this, "snsnd"),
+		m_palette(*this, "palette") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34061_device> m_tms34061;
 	required_device<sn76489_device> m_sn;
+	required_device<palette_device> m_palette;
 
 	struct ef9369 m_pal;
 	emu_timer *m_fdc_timer;

@@ -574,7 +574,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_spc700(*this, "spc700"),
-		m_superfx(*this, "superfx") { }
+		m_superfx(*this, "superfx"),
+		m_screen(*this, "screen") { }
 
 	/* misc */
 	UINT16                m_hblank_offset;
@@ -638,6 +639,8 @@ public:
 	required_device<spc700_device> m_soundcpu;
 	required_device<snes_sound_device> m_spc700;
 	optional_device<cpu_device> m_superfx;
+	required_device<screen_device> m_screen;
+
 
 	DECLARE_DIRECT_UPDATE_MEMBER(snes_spc_direct);
 	DECLARE_DIRECT_UPDATE_MEMBER(snes_direct);

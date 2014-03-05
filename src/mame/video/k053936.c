@@ -460,7 +460,7 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 		int tilebpp, int blend, int alpha, int clip, int pixeldouble_output )
 {
 	static const int colormask[8]={1,3,7,0xf,0x1f,0x3f,0x7f,0xff};
-	driver_device *state = machine.driver_data<driver_device>();
+	palette_device *m_palette = machine.first_screen()->palette();
 	int cy, cx;
 	int ecx;
 	int src_pitch, incxy, incxx;
@@ -506,7 +506,7 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 	ecx = tx = -tx;
 
 	tilebpp = (tilebpp-1) & 7;
-	pal_base = state->m_palette->pens();
+	pal_base = m_palette->pens();
 	cmask = colormask[tilebpp];
 
 	src_pitch = src_bitmap.rowpixels();

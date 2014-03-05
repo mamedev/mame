@@ -18,7 +18,9 @@ public:
 		m_x1(*this, "x1snd"),
 		m_oki(*this, "oki"),
 		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode"){ }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<tmp68301_device> m_tmp68301;
@@ -34,6 +36,8 @@ public:
 	optional_device<okim9810_device> m_oki;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	int m_xoffset;
 	int m_yoffset;

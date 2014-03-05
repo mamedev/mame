@@ -34,7 +34,9 @@ public:
 		m_tile_ram(*this, "tile_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"){ }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_tile_ram;
@@ -47,6 +49,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_READ8_MEMBER(boxer_input_r);
 	DECLARE_READ8_MEMBER(boxer_misc_r);

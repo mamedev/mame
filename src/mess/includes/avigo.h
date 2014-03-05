@@ -35,7 +35,8 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_speaker(*this, "speaker"),
 			m_uart(*this, "ns16550"),
-			m_serport(*this, "serport")
+			m_serport(*this, "serport"),
+			m_palette(*this, "palette") 
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -43,6 +44,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ns16550_device> m_uart;
 	required_device<rs232_port_device> m_serport;
+	required_device<palette_device> m_palette;
 
 	// defined in drivers/avigo.c
 	virtual void machine_start();

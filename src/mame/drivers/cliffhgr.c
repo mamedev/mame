@@ -95,7 +95,8 @@ public:
 			m_port_bank(0),
 			m_phillips_code(0) ,
 		m_maincpu(*this, "maincpu"),
-		m_discrete(*this, "discrete") { }
+		m_discrete(*this, "discrete"),
+		m_screen(*this, "screen") { }
 
 	required_device<pioneer_pr8210_device> m_laserdisc;
 
@@ -119,6 +120,7 @@ public:
 	TIMER_CALLBACK_MEMBER(cliff_irq_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
+	required_device<screen_device> m_screen;	
 };
 
 

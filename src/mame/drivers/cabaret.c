@@ -36,7 +36,8 @@ public:
 		m_bg_scroll(*this, "bg_scroll"),
 		m_bg_tile_ram(*this, "bg_tile_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT8> m_fg_tile_ram;
 	required_shared_ptr<UINT8> m_fg_color_ram;
@@ -61,6 +62,7 @@ public:
 	INTERRUPT_GEN_MEMBER(cabaret_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

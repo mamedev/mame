@@ -10,7 +10,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
 		m_68705(*this, "68705"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	UINT8 m_cpu2_m6000;
 	required_shared_ptr<UINT8> m_fg_videoram;
@@ -75,4 +76,5 @@ public:
 	required_device<cpu_device> m_subcpu;
 	optional_device<cpu_device> m_68705;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };

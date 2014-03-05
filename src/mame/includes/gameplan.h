@@ -40,7 +40,8 @@ public:
 			m_riot(*this, "riot"),
 			m_via_0(*this, "via6522_0"),
 			m_via_1(*this, "via6522_1"),
-			m_via_2(*this, "via6522_2") { }
+			m_via_2(*this, "via6522_2"),
+			m_screen(*this, "screen") { }
 
 	/* machine state */
 	UINT8   m_current_port;
@@ -62,6 +63,7 @@ public:
 	required_device<via6522_device> m_via_0;
 	required_device<via6522_device> m_via_1;
 	required_device<via6522_device> m_via_2;
+	required_device<screen_device> m_screen;
 	DECLARE_WRITE8_MEMBER(io_select_w);
 	DECLARE_READ8_MEMBER(io_port_r);
 	DECLARE_WRITE_LINE_MEMBER(coin_w);

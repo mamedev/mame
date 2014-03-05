@@ -47,7 +47,9 @@ public:
 		m_shrike_shared(*this, "shrike_shared"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_68k(*this, "68k") { }
+		m_68k(*this, "68k"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_device<timer_device> m_scanline_timer;
 
@@ -216,6 +218,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_68k;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;	
 };
 
 

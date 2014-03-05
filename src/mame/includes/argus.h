@@ -14,7 +14,9 @@ public:
 		m_butasan_bg1ram(*this, "butasan_bg1ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode")  { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")  { }
 
 	optional_shared_ptr<UINT8> m_bg0_scrollx;
 	optional_shared_ptr<UINT8> m_bg0_scrolly;
@@ -103,4 +105,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 };

@@ -20,7 +20,9 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_scanline(*this, "scanline"),
 		m_maincpu(*this, "maincpu"),
-		m_custom(*this, "custom") { }
+		m_custom(*this, "custom"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT8> m_imageram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -28,7 +30,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<exidy440_sound_device> m_custom;
-
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
 	UINT8 m_bank;
 	const UINT8 *m_showdown_bank_data[2];
 	INT8 m_showdown_bank_select;

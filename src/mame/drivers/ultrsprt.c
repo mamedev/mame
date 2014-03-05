@@ -20,7 +20,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k056800(*this, "k056800"),
-		m_workram(*this, "workram") { }
+		m_workram(*this, "workram"),
+		m_palette(*this, "palette") { }
 
 	static const UINT32 VRAM_PAGES      = 2;
 	static const UINT32 VRAM_PAGE_BYTES = 512 * 1024;
@@ -29,6 +30,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k056800_device> m_k056800;
 	required_shared_ptr<UINT32> m_workram;
+	required_device<palette_device> m_palette;
 
 	DECLARE_READ32_MEMBER(vram_r);
 	DECLARE_WRITE32_MEMBER(vram_w);

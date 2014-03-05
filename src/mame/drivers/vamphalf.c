@@ -83,7 +83,8 @@ public:
 			m_oki(*this, "oki"),
 			m_oki2(*this, "oki_2"),
 			m_eeprom(*this, "eeprom"),
-			m_gfxdecode(*this, "gfxdecode") {
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette")  {
 			m_has_extra_gfx = 0;
 		}
 
@@ -98,6 +99,7 @@ public:
 	optional_device<okim6295_device> m_oki2;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	int m_flip_bit;
 	int m_flipscreen;

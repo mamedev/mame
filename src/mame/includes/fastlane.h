@@ -21,7 +21,9 @@ public:
 		m_k007232_1(*this, "k007232_1"),
 		m_k007232_2(*this, "k007232_2"),
 		m_k007121(*this, "k007121"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 
@@ -43,6 +45,8 @@ public:
 	required_device<k007232_device> m_k007232_2;
 	required_device<k007121_device> m_k007121;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(k007121_registers_w);
 	DECLARE_WRITE8_MEMBER(fastlane_bankswitch_w);

@@ -31,7 +31,8 @@ public:
 		m_position_ram(*this, "position_ram"),
 		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_playfield_ram;
@@ -61,6 +62,7 @@ public:
 	void dragrace_update_misc_flags( address_space &space );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 };
 
 /*----------- defined in audio/dragrace.c -----------*/

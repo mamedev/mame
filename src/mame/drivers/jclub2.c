@@ -113,7 +113,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_gdfs_st0020(*this, "st0020_spr"),
 		m_maincpu(*this, "maincpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_palette(*this, "palette") { }
 
 	tilemap_t *m_tmap;
 	tilemap_t *m_tmap2;
@@ -127,6 +128,7 @@ public:
 	optional_device<st0020_device> m_gdfs_st0020;
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<palette_device> m_palette;
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram_w);
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram2_w);
 	DECLARE_WRITE32_MEMBER(darkhors_input_sel_w);

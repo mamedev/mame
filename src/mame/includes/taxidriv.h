@@ -13,7 +13,8 @@ public:
 		m_vram7(*this, "vram7"),
 		m_scroll(*this, "scroll"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	int m_s1;
 	int m_s2;
@@ -57,4 +58,5 @@ public:
 	UINT32 screen_update_taxidriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };

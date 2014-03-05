@@ -27,7 +27,8 @@ public:
 	chsuper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_gfxdecode(*this, "gfxdecode") { }
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette")  { }
 
 	DECLARE_WRITE8_MEMBER(chsuper_vram_w);
 	DECLARE_READ8_MEMBER(ff_r);
@@ -37,7 +38,7 @@ public:
 
 	required_device<z180_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-
+	required_device<palette_device> m_palette;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:

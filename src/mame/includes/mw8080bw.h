@@ -48,7 +48,8 @@ public:
 		m_samples2(*this, "samples2"),
 		m_sn1(*this, "sn1"),
 		m_sn2(*this, "sn2"),
-		m_sn(*this, "snsnd")
+		m_sn(*this, "snsnd"),
+		m_screen(*this, "screen")
 	{ }
 
 	/* device/memory pointers */
@@ -89,6 +90,7 @@ public:
 	optional_device<sn76477_device> m_sn1;
 	optional_device<sn76477_device> m_sn2;
 	optional_device<sn76477_device> m_sn;
+	required_device<screen_device> m_screen;
 
 	DECLARE_READ8_MEMBER(mw8080bw_shift_result_rev_r);
 	DECLARE_READ8_MEMBER(mw8080bw_reversable_shift_result_r);

@@ -50,7 +50,8 @@ class itgambl3_state : public driver_device
 public:
 	itgambl3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette")  { }
 
 	int m_test_x;
 	int m_test_y;
@@ -60,6 +61,7 @@ public:
 	DECLARE_PALETTE_INIT(itgambl3);
 	UINT32 screen_update_itgambl3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 

@@ -32,7 +32,8 @@ public:
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") 
 	{ }
 
 	UINT8 *m_char_rom;
@@ -59,6 +60,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device>m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 void fp6000_state::video_start()

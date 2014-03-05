@@ -35,7 +35,8 @@ public:
 			m_laserdisc(*this, "laserdisc") ,
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	UINT8 m_ld_in_latch;
@@ -57,6 +58,7 @@ public:
 	INTERRUPT_GEN_MEMBER(superdq_vblank);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 TILE_GET_INFO_MEMBER(superdq_state::get_tile_info)

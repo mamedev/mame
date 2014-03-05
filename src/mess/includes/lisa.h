@@ -117,7 +117,8 @@ public:
 		m_io_line6(*this, "LINE6"),
 		m_io_line7(*this, "LINE7"),
 		m_io_mouse_x(*this, "MOUSE_X"),
-		m_io_mouse_y(*this, "MOUSE_Y")
+		m_io_mouse_y(*this, "MOUSE_Y"),
+		m_palette(*this, "palette") 
 	{ }
 
 	required_device<m68000_base_device> m_maincpu;
@@ -140,6 +141,8 @@ public:
 	required_ioport m_io_line7;
 	required_ioport m_io_mouse_x;
 	required_ioport m_io_mouse_y;
+	
+	required_device<palette_device> m_palette;
 
 	UINT8 *m_ram_ptr;
 	UINT8 *m_rom_ptr;

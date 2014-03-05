@@ -359,6 +359,7 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
 	MCFG_DECOCOMN_ADD("deco_common")
+	MCFG_DECOCOMN_PALETTE("palette")
 
 	MCFG_DECO16IC_ADD("tilegen1", boogwing_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")

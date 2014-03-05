@@ -105,7 +105,9 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_nvram(*this, "nvram"),
 		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode"){ }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_spriteram;
@@ -113,6 +115,8 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	dynamic_array<UINT8> m_paletteram;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;	
 
 	UINT8 m_reg;
 	UINT8 m_rombank;

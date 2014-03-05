@@ -7,13 +7,15 @@ public:
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	tilemap_t *m_pant[2];
 
 	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);

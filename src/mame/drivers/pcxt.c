@@ -78,7 +78,8 @@ public:
 			m_pic8259_1(*this,"pic8259_1"),
 			m_dma8237_1(*this,"dma8237_1") ,
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker") { }
+		m_speaker(*this, "speaker"),
+		m_palette(*this, "palette") { }
 
 	UINT8 m_bg_bank;
 	int m_bank;
@@ -131,6 +132,7 @@ public:
 	void pcxt_speaker_set_spkrdata(UINT8 data);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<palette_device> m_palette;
 };
 
 UINT32 pcxt_state::screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

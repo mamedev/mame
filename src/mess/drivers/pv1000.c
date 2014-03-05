@@ -144,7 +144,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "pv1000_sound"),
 		m_p_videoram(*this, "p_videoram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 		{ }
 
 	DECLARE_WRITE8_MEMBER(pv1000_io_w);
@@ -174,6 +176,8 @@ public:
 	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pv1000_cart );
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 };
 
 

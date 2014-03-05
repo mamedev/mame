@@ -112,7 +112,8 @@ public:
 			m_aux1_port(*this, "AUX1"),
 			m_aux2_port(*this, "AUX2"),
 			m_bank1(*this, "bank1"),
-			m_msm6376(*this, "msm6376")
+			m_msm6376(*this, "msm6376"),
+			m_palette(*this, "palette")
 	{}
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -304,6 +305,7 @@ protected:
 	UINT8 m_numbanks;
 	mpu4_chr_table* m_current_chr_table;
 	const bwb_chr_table* m_bwb_chr_table1;
+	optional_device<palette_device> m_palette;
 };
 
 /* mpu4.c, used by mpu4vid.c */

@@ -19,7 +19,8 @@ public:
 		m_tilemapram(*this, "tilemapram"),
 		m_spriteram(*this, "spriteram"),
 		m_ioc_ram(*this, "ioc_ram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{ }
 
 	/* devices */
@@ -33,6 +34,7 @@ public:
 	required_shared_ptr<UINT16> m_ioc_ram;
 	
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 //  UINT16 *    m_paletteram; // currently this uses generic palette handling
 
 	/* video-related */

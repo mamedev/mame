@@ -16,7 +16,8 @@ public:
 
 	lethalj_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen") { }
 
 	UINT16 m_blitter_data[8];
 	UINT16 *m_screenram;
@@ -39,6 +40,7 @@ public:
 	virtual void video_start();
 	inline void get_crosshair_xy(int player, int *x, int *y);
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

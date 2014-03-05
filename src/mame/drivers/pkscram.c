@@ -26,7 +26,8 @@ public:
 		m_pkscramble_mdtilemap_ram(*this, "mdtilemap_ram"),
 		m_pkscramble_bgtilemap_ram(*this, "bgtilemap_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen") { }
 
 	UINT16 m_out;
 	UINT8 m_interrupt_line_active;
@@ -51,6 +52,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;	
 };
 
 

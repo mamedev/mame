@@ -12,11 +12,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_clut(*this, "clut"),
 		m_maincpu(*this, "maincpu"),
-		m_nb1413m3(*this, "nb1413m3")   { }
+		m_nb1413m3(*this, "nb1413m3"),
+		m_screen(*this, "screen")   { }
 
 	required_shared_ptr<UINT8> m_clut;
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
+	required_device<screen_device> m_screen;
+
 	int m_blitter_destx;
 	int m_blitter_desty;
 	int m_blitter_sizex;

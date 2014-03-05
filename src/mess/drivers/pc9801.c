@@ -451,7 +451,8 @@ public:
 		m_video_ram_2(*this, "video_ram_2"),
 		m_beeper(*this, "beeper"),
 		m_ram(*this, RAM_TAG),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") 
 	{
 	}
 
@@ -473,6 +474,8 @@ public:
 	required_shared_ptr<UINT8> m_video_ram_2;
 	required_device<beep_device> m_beeper;
 	optional_device<ram_device> m_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -753,7 +756,6 @@ public:
 	DECLARE_DRIVER_INIT(pc9801_kanji);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	inline void set_dma_channel(int channel, int state);
-	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 

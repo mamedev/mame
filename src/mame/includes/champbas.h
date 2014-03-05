@@ -22,7 +22,8 @@ public:
 		m_dac(*this, "dac"),
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
-		m_gfxdecode(*this, "gfxdecode"){ }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bg_videoram;
@@ -78,4 +79,5 @@ public:
 	optional_device<dac_device> m_dac1;
 	optional_device<dac_device> m_dac2;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };

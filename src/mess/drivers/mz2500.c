@@ -70,7 +70,8 @@ public:
 		m_rtc(*this, RP5C15_TAG),
 		m_pit(*this, "pit"),
 		m_beeper(*this, "beeper"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") 
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -216,6 +217,7 @@ public:
 	void mz2500_reconfigure_screen();
 	UINT8 pal_256_param(int index, int param);
 	void mz2500_reset(mz2500_state *state, UINT8 type);
+	required_device<palette_device> m_palette;
 };
 
 

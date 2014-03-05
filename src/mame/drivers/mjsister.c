@@ -24,7 +24,8 @@ public:
 
 	mjsister_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette") { }
 
 	/* video-related */
 	bitmap_ind16 *m_tmpbitmap0;
@@ -50,6 +51,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	dac_device *m_dac;
 
 	/* memory */

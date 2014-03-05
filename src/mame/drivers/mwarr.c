@@ -63,7 +63,8 @@ public:
 		m_mwarr_ram(*this, "mwarr_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_oki2(*this, "oki2"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
@@ -107,6 +108,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki2;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

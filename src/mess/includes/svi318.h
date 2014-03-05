@@ -81,7 +81,8 @@ public:
 		m_line9(*this, "LINE9"),
 		m_line10(*this, "LINE10"),
 		m_joysticks(*this, "JOYSTICKS"),
-		m_buttons(*this, "BUTTONS") { }
+		m_buttons(*this, "BUTTONS"),
+		m_palette(*this, "palette")  { }
 
 	SVI_318 m_svi;
 	UINT8 *m_pcart;
@@ -141,6 +142,7 @@ protected:
 	required_ioport m_line10;
 	required_ioport m_joysticks;
 	required_ioport m_buttons;
+	optional_device<palette_device> m_palette;
 
 	void svi318_set_banks();
 	void svi318_80col_init();

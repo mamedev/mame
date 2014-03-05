@@ -54,7 +54,9 @@ public:
 			m_midvplus_misc(*this, "midvplus_misc"),
 			m_videoram(*this, "videoram", 32),
 			m_textureram(*this, "textureram") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	optional_shared_ptr<UINT32> m_nvram;
 	required_shared_ptr<UINT32> m_ram_base;
@@ -131,6 +133,8 @@ public:
 	UINT32 screen_update_midvunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_timer_cb);
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

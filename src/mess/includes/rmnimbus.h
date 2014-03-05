@@ -399,7 +399,8 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_eeprom(*this, ER59256_TAG),
 		m_via(*this, VIA_TAG),
-		m_centronics(*this, CENTRONICS_TAG)
+		m_centronics(*this, CENTRONICS_TAG),
+		m_palette(*this, "palette") 
 	{
 	}
 
@@ -411,6 +412,7 @@ public:
 	required_device<er59256_device> m_eeprom;
 	required_device<via6522_device> m_via;
 	required_device<centronics_device> m_centronics;
+	required_device<palette_device> m_palette;
 
 	UINT32 m_debug_machine;
 //  i186_state m_i186;

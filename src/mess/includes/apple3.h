@@ -49,7 +49,8 @@ public:
 		m_rtc(*this, "rtc"),
 		m_speaker(*this, SPEAKER_TAG),
 		m_dac(*this, DAC_TAG),
-		m_kbspecial(*this, "keyb_special")
+		m_kbspecial(*this, "keyb_special"),
+		m_palette(*this, "palette") 
 	{
 	}
 
@@ -65,6 +66,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<dac_device> m_dac;
 	required_ioport m_kbspecial;
+	required_device<palette_device> m_palette;
 
 	DECLARE_READ8_MEMBER(apple3_memory_r);
 	DECLARE_WRITE8_MEMBER(apple3_memory_w);

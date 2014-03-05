@@ -30,7 +30,8 @@ public:
 		m_ram(*this, "ram"),
 		m_shared_ram(*this, "shared_ram"),
 		m_spriteram(*this, "spriteram"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
@@ -47,6 +48,7 @@ public:
 	UINT8 m_dislayer[6];
 	required_shared_ptr<UINT32> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_WRITE32_MEMBER(color_ram_w);
 	DECLARE_READ32_MEMBER(undrfire_input_r);

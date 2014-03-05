@@ -22,7 +22,8 @@ public:
 		m_coinstate_timer(*this, "coinstate"),
 		m_nsub_coinage_timer(*this, "nsub_coin"),
 		m_videoram(*this, "videoram"),
-		m_characterram(*this, "characterram")
+		m_characterram(*this, "characterram"),
+		m_screen(*this, "screen")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -34,6 +35,7 @@ public:
 	optional_device<timer_device> m_nsub_coinage_timer;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_characterram;
+	required_device<screen_device> m_screen;
 
 	UINT8 m_coin_status;
 	UINT8 m_palette_bank;

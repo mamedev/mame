@@ -32,7 +32,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_samples(*this, "samples") { }
+		m_samples(*this, "samples"),
+		m_screen(*this, "screen") { }
 
 	UINT8 m_sound_latch;
 	emu_timer *m_interrupt_timer;
@@ -66,6 +67,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<samples_device> m_samples;
+	required_device<screen_device> m_screen;	
 };
 
 /*----------- defined in audio/spacefb.c -----------*/

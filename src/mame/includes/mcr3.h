@@ -5,7 +5,8 @@ class mcr3_state : public mcr_state
 public:
 	mcr3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mcr_state(mconfig, type, tag),
-			m_spyhunt_alpharam(*this, "spyhunt_alpha") { }
+			m_spyhunt_alpharam(*this, "spyhunt_alpha"),
+		m_screen(*this, "screen") { }
 
 	UINT8 m_input_mux;
 	UINT8 m_latched_input;
@@ -81,7 +82,5 @@ public:
 	DECLARE_WRITE8_MEMBER(spyhuntpr_a900_w);
 	DECLARE_WRITE8_MEMBER(spyhuntpr_port04_w);
 	DECLARE_WRITE8_MEMBER(spyhuntpr_fd00_w);
-
-
-
+	required_device<screen_device> m_screen;
 };

@@ -197,7 +197,9 @@ public:
 		m_czram(*this, "czram"),
 		m_motor_timer(*this, "motor_timer"),
 		m_pc_pedal_interrupt(*this, "pc_p_int"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -224,6 +226,9 @@ public:
 	optional_device<timer_device> m_motor_timer;
 	optional_device<timer_device> m_pc_pedal_interrupt;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
 
 	UINT8 m_syscontrol[0x20];
 	bool m_dsp_irq_enabled;

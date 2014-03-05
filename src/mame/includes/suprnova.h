@@ -31,7 +31,8 @@ public:
 		m_v3t_ram(*this, "v3t_ram"),
 		m_main_ram(*this, "main_ram"),
 		m_cache_ram(*this, "cache_ram"),
-		m_gfxdecode(*this, "gfxdecode"){ }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT32> m_spriteram;
@@ -48,6 +49,7 @@ public:
 	required_shared_ptr<UINT32> m_main_ram;
 	required_shared_ptr<UINT32> m_cache_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	hit_t m_hit;
 	UINT32 m_timer_0_temp[4];
 	bitmap_ind16 m_sprite_bitmap;

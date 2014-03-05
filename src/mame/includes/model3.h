@@ -26,7 +26,8 @@ public:
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_soundram(*this, "soundram"),
 		m_audiocpu(*this, "audiocpu"),
-		m_eeprom(*this, "eeprom"){ }
+		m_eeprom(*this, "eeprom"),
+		m_screen(*this, "screen"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<lsi53c810_device> m_lsi53c810;
@@ -210,6 +211,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
 	required_device<cpu_device> m_audiocpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<screen_device> m_screen;	
 };
 
 

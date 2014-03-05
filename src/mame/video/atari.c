@@ -708,7 +708,7 @@ static void cclk_init(void)
  ************************************************************************/
 VIDEO_START( atari )
 {
-	driver_device *state = machine.driver_data<driver_device>();
+	palette_device *m_palette = machine.first_screen()->palette();
 	int i;
 
 	LOG(("atari antic_vh_start\n"));
@@ -745,7 +745,7 @@ VIDEO_START( atari )
 
 	/* reset the ANTIC color tables */
 	for( i = 0; i < 256; i ++ )
-		antic.color_lookup[i] = (state->m_palette->pen(0) << 8) + state->m_palette->pen(0);
+		antic.color_lookup[i] = (m_palette->pen(0) << 8) + m_palette->pen(0);
 
 	LOG(("atari cclk_init\n"));
 	cclk_init();

@@ -33,7 +33,8 @@ public:
 		m_ttl7474_1c_2(*this, "7474_1c_2"),
 		m_ttl7474_1a_1(*this, "7474_1a_1"),
 		m_ttl7474_1a_2(*this, "7474_1a_2"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 		{}
 
 	required_shared_ptr<UINT8> m_alpharam;
@@ -63,6 +64,7 @@ public:
 	required_device<ttl7474_device> m_ttl7474_1a_1;
 	required_device<ttl7474_device> m_ttl7474_1a_2;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	bitmap_ind16 *m_sprite_sprite_collision_bitmap1;
 	bitmap_ind16 *m_sprite_sprite_collision_bitmap2;

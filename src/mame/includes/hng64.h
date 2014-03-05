@@ -35,7 +35,9 @@ public:
 		m_3d_1(*this, "3d_1"),
 		m_3d_2(*this, "3d_2"),
 		m_com_ram(*this, "com_ram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -62,6 +64,8 @@ public:
 	//required_shared_ptr<UINT8> m_com_mmu_mem;
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	int m_mcu_type;
 

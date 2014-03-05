@@ -225,7 +225,8 @@ class smsmfg_state : public driver_device
 public:
 	smsmfg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen") { }
 
 	UINT8 m_communication_port[4];
 	UINT8 m_communication_port_status;
@@ -248,6 +249,7 @@ public:
 	DECLARE_MACHINE_START(sureshot);
 	UINT32 screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;	
 };
 
 

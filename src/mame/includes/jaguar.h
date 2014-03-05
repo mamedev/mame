@@ -61,7 +61,8 @@ public:
 			m_eeprom_bit_count(0),
 			m_protection_check(0) ,
 		m_eeprom(*this, "eeprom"),
-		m_ide(*this, "ide")
+		m_ide(*this, "ide"),
+		m_screen(*this, "screen")
 	{
 	}
 
@@ -342,4 +343,5 @@ protected:
 	void jaguar_nvram_save();
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<vt83c461_device> m_ide;
+	required_device<screen_device> m_screen;
 };

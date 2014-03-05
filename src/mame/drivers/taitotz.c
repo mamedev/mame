@@ -544,7 +544,8 @@ public:
 		m_iocpu(*this, "iocpu"),
 		m_work_ram(*this, "work_ram"),
 		m_mbox_ram(*this, "mbox_ram"),
-		m_ata(*this, "ata")
+		m_ata(*this, "ata"),
+		m_screen(*this, "screen")
 	{
 	}
 
@@ -553,6 +554,7 @@ public:
 	required_shared_ptr<UINT64> m_work_ram;
 	required_shared_ptr<UINT16> m_mbox_ram;
 	required_device<ata_interface_device> m_ata;
+	required_device<screen_device> m_screen;
 
 	DECLARE_READ64_MEMBER(ppc_common_r);
 	DECLARE_WRITE64_MEMBER(ppc_common_w);

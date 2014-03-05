@@ -41,7 +41,8 @@ public:
 		: pcat_base_state(mconfig, type, tag),
 		m_region_user1(*this, "user1"),
 		m_region_user5(*this, "user5"),
-		m_bank1(*this, "bank1") { }
+		m_bank1(*this, "bank1"),
+		m_palette(*this, "palette") { }
 
 	UINT32 *m_bios_ram;
 	UINT8 m_mxtc_config_reg[256];
@@ -50,6 +51,7 @@ public:
 	required_memory_region m_region_user1;
 	required_memory_region m_region_user5;
 	required_memory_bank m_bank1;
+	required_device<palette_device> m_palette;
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);

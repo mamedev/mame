@@ -25,7 +25,8 @@ public:
 			m_mainram(*this, "sram"),
 			m_maincpu(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
-			m_gfxdecode(*this, "gfxdecode")
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette")
 		{
 			m_irq4_disabled = 0;
 		}
@@ -53,6 +54,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	device_t *m_ics;
 
 	/* used by rendering */

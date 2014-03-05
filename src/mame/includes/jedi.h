@@ -30,7 +30,8 @@ public:
 		m_audio_comm_stat(*this, "audio_comm_stat"),
 		m_speech_data(*this, "speech_data"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_screen(*this, "screen") { }
 
 	required_shared_ptr<UINT8> m_nvram;
 
@@ -88,6 +89,7 @@ public:
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<screen_device> m_screen;
 };
 
 /*----------- defined in audio/jedi.c -----------*/

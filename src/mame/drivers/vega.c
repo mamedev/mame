@@ -105,13 +105,15 @@ public:
 	m_i8255(*this, "ppi8255"),
 	m_ins8154(*this, "ins8154"),
 	m_ay8910(*this, "ay8910"),
-	m_gfxdecode(*this, "gfxdecode") {}
+	m_gfxdecode(*this, "gfxdecode"),
+	m_palette(*this, "palette") {}
 
 	required_device<cpu_device>     m_maincpu;
 	required_device<i8255_device>   m_i8255;
 	required_device<ins8154_device> m_ins8154;
 	required_device<ay8910_device>  m_ay8910;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	int m_p2_data;
 	int m_ext_offset_w;

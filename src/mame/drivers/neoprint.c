@@ -38,7 +38,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_upd4990a(*this, "upd4990a"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT16> m_npvidram;
 	required_shared_ptr<UINT16> m_npvidregs;
@@ -46,6 +48,8 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<upd4990a_old_device> m_upd4990a;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	UINT8 m_audio_result;
 	UINT8 m_bank_val;

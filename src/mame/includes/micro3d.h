@@ -32,7 +32,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_upd7759(*this, "upd7759"),
 		m_drmath(*this, "drmath"),
-		m_vgb(*this, "vgb") { }
+		m_vgb(*this, "vgb"),
+		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<UINT16> m_shared_ram;
 	device_t            *m_duart68681;
@@ -137,6 +138,7 @@ public:
 	required_device<upd7759_device> m_upd7759;
 	required_device<cpu_device> m_drmath;
 	required_device<cpu_device> m_vgb;
+	required_device<palette_device> m_palette;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
