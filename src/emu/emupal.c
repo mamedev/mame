@@ -332,6 +332,21 @@ WRITE32_MEMBER(palette_device::write)
 	update_for_write(offset * 4, 4);
 }
 
+READ8_MEMBER(palette_device::read)
+{
+	return m_paletteram.read8(offset);
+}
+
+READ16_MEMBER(palette_device::read)
+{
+	return m_paletteram.read16(offset);
+}
+
+READ32_MEMBER(palette_device::read)
+{
+	return m_paletteram.read32(offset);
+}
+
 
 //-------------------------------------------------
 //  write_ext - write a byte to the extended 

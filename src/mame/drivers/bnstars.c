@@ -105,7 +105,6 @@ public:
 			m_ms32_bg1_ram(*this, "bg1_ram"),
 			m_ms32_roz0_ram(*this, "roz0_ram"),
 			m_ms32_roz1_ram(*this, "roz1_ram"),
-			m_ms32_pal_ram(*this, "pal_ram"),
 			m_ms32_roz_ctrl(*this, "roz_ctrl"),
 			m_ms32_spram(*this, "spram"),
 			m_ms32_tx0_scroll(*this, "tx0_scroll"),
@@ -125,7 +124,6 @@ public:
 	required_shared_ptr<UINT32> m_ms32_bg1_ram;
 	required_shared_ptr<UINT32> m_ms32_roz0_ram;
 	required_shared_ptr<UINT32> m_ms32_roz1_ram;
-	required_shared_ptr_array<UINT32, 2> m_ms32_pal_ram;
 	required_shared_ptr_array<UINT32, 2> m_ms32_roz_ctrl;
 	required_shared_ptr<UINT32> m_ms32_spram;
 	required_shared_ptr<UINT32> m_ms32_tx0_scroll;
@@ -142,8 +140,6 @@ public:
 	DECLARE_WRITE32_MEMBER(ms32_bg1_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_roz0_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_roz1_ram_w);
-	DECLARE_WRITE32_MEMBER(ms32_pal0_ram_w);
-	DECLARE_WRITE32_MEMBER(ms32_pal1_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_spramx_w);
 	DECLARE_READ32_MEMBER(bnstars1_r);
 	DECLARE_READ32_MEMBER(bnstars2_r);
@@ -162,7 +158,6 @@ public:
 	UINT32 screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ms32_interrupt);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip);
-	void update_color(int color, int screen);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size, int region);
 	void irq_init();
 	void irq_raise(int level);
@@ -360,29 +355,6 @@ WRITE32_MEMBER(bnstars_state::ms32_roz1_ram_w)
 }
 
 
-void bnstars_state::update_color(int color, int screen)
-{
-	int r,g,b;
-
-	r = ((m_ms32_pal_ram[screen][color*2] & 0xff00) >>8 );
-	g = ((m_ms32_pal_ram[screen][color*2] & 0x00ff) >>0 );
-	b = ((m_ms32_pal_ram[screen][color*2+1] & 0x00ff) >>0 );
-
-	m_palette->set_pen_color(color+screen*0x8000,rgb_t(r,g,b));
-}
-
-WRITE32_MEMBER(bnstars_state::ms32_pal0_ram_w)
-{
-	COMBINE_DATA(&m_ms32_pal_ram[0][offset]);
-	update_color(offset/2, 0);
-}
-
-WRITE32_MEMBER(bnstars_state::ms32_pal1_ram_w)
-{
-	COMBINE_DATA(&m_ms32_pal_ram[1][offset]);
-	update_color(offset/2, 1);
-}
-
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
 void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size, int region)
@@ -501,7 +473,7 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 			pri_mask = 0xfe;
 
 		gfx->set_source_clip(tx, xsize, ty, ysize);
-		gfx->prio_zoom_transpen(m_palette,bitmap,cliprect,
+		gfx->prio_zoom_transpen(*screen.palette(),bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,
@@ -569,7 +541,7 @@ UINT32 bnstars_state::screen_update_bnstars_right(screen_device &screen, bitmap_
 {
 	screen.priority().fill(0, cliprect);
 
-	bitmap.fill(0x8000+0, cliprect);    /* bg color */
+	bitmap.fill(0, cliprect);    /* bg color */
 
 
 	m_ms32_bg_tilemap[1]->set_scrollx(0, m_ms32_bg1_scroll[0x00/4] + m_ms32_bg1_scroll[0x08/4] + 0x10 );
@@ -630,9 +602,7 @@ static INPUT_PORTS_START( bnstars )
 	PORT_DIPSETTING(  0x00020000, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_DIPNAME(     0x00080000, 0x00080000, "Service Mode ? 1" )
-	PORT_DIPSETTING(  0x00080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
+	PORT_SERVICE( 0x00080000, IP_ACTIVE_LOW )
 	PORT_DIPNAME(     0x00100000, 0x00100000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(  0x00100000, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
@@ -1240,10 +1210,10 @@ static GFXDECODE_START( bnstars )
 	GFXDECODE_ENTRY( "gfx4", 0, bglayout,     0x1000, 0x10 ) /* Bg scr1 */
 	GFXDECODE_ENTRY( "gfx5", 0, txlayout,     0x6000, 0x10 ) /* Tx scr1 */
 
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x8000+0x0000, 0x10 )
-	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x8000+0x5000, 0x10 ) /* Roz scr2 */
-	GFXDECODE_ENTRY( "gfx6", 0, bglayout,     0x8000+0x1000, 0x10 ) /* Bg scr2 */
-	GFXDECODE_ENTRY( "gfx7", 0, txlayout,     0x8000+0x6000, 0x10 ) /* Tx scr2 */
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
+	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x5000, 0x10 ) /* Roz scr2 */
+	GFXDECODE_ENTRY( "gfx6", 0, bglayout,     0x1000, 0x10 ) /* Bg scr2 */
+	GFXDECODE_ENTRY( "gfx7", 0, txlayout,     0x6000, 0x10 ) /* Tx scr2 */
 
 GFXDECODE_END
 
@@ -1311,8 +1281,10 @@ static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	/* wrote together */
 	AM_RANGE(0xfd040000, 0xfd047fff) AM_RAM // priority ram
 	AM_RANGE(0xfd080000, 0xfd087fff) AM_RAM
-	AM_RANGE(0xfd200000, 0xfd237fff) AM_RAM_WRITE(ms32_pal1_ram_w) AM_SHARE("pal_ram.1")
-	AM_RANGE(0xfd400000, 0xfd437fff) AM_RAM_WRITE(ms32_pal0_ram_w) AM_SHARE("pal_ram.0")
+
+	AM_RANGE(0xfd200000, 0xfd237fff) AM_DEVREADWRITE16("palette2", palette_device, read, write, 0x0000ffff) AM_SHARE("palette2")
+	AM_RANGE(0xfd400000, 0xfd437fff) AM_DEVREADWRITE16("palette",  palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
+
 	AM_RANGE(0xfe000000, 0xfe01ffff) AM_RAM_WRITE(ms32_roz1_ram_w) AM_SHARE("roz1_ram")
 	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM_WRITE(ms32_roz0_ram_w) AM_SHARE("roz0_ram")
 	AM_RANGE(0xfe800000, 0xfe83ffff) AM_RAM_WRITE(ms32_spramx_w) AM_SHARE("spram")
@@ -1392,7 +1364,12 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bnstars)
-	MCFG_PALETTE_ADD("palette", 0x8000*2)
+	MCFG_PALETTE_ADD("palette", 0x8000)
+	MCFG_PALETTE_FORMAT(XBRG)
+
+	MCFG_PALETTE_ADD("palette2", 0x8000)
+	MCFG_PALETTE_FORMAT(XBRG)
+
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -1402,6 +1379,7 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bnstars_state, screen_update_bnstars_left)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1409,6 +1387,7 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bnstars_state, screen_update_bnstars_right)
+	MCFG_SCREEN_PALETTE("palette2")
 
 
 	/* sound hardware */
