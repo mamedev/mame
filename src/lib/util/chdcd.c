@@ -262,6 +262,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	/* bits/sample */
 	osd_read(file, &bits, offset, 2, &actual);
 	offset += actual;
+	bits = LITTLE_ENDIANIZE_INT16(bits);
 	if (bits != 16)
 	{
 		osd_close(file);
@@ -705,7 +706,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 }
 
 /*-------------------------------------------------
-    chdcd_parse_toc - parse a CDRWin format CUE file
+    chdcd_parse_cue - parse a CDRWin format CUE file
 -------------------------------------------------*/
 
 chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
