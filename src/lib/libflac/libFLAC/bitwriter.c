@@ -35,7 +35,15 @@
 
 #include <stdlib.h> /* for malloc() */
 #include <string.h> /* for memcpy(), memset() */
-
+#ifdef _MSC_VER
+#include <winsock.h> /* for ntohl() */
+#elif defined FLAC__SYS_DARWIN
+#include <machine/endian.h> /* for ntohl() */
+#elif defined __MINGW32__
+#include <winsock.h> /* for ntohl() */
+#else
+#include <netinet/in.h> /* for ntohl() */
+#endif
 #if 0 /* UNUSED */
 #include "private/bitmath.h"
 #endif
@@ -58,7 +66,7 @@ typedef FLAC__uint32 bwword;
 #ifdef _MSC_VER
 #define SWAP_BE_WORD_TO_HOST(x) local_swap32_(x)
 #else
-#define SWAP_BE_WORD_TO_HOST(x) local_swap32_(x)
+#define SWAP_BE_WORD_TO_HOST(x) ntohl(x)
 #endif
 #endif
 
@@ -99,10 +107,9 @@ struct FLAC__BitWriter {
 	unsigned bits; /* # of used bits in accum */
 };
 
-
+#ifdef _MSC_VER
 /* OPT: an MSVC built-in would be better */
-#if !WORDS_BIGENDIAN
-static FLAC__uint32 local_swap32_(FLAC__uint32 x)
+static _inline FLAC__uint32 local_swap32_(FLAC__uint32 x)
 {
 	x = ((x<<8)&0xFF00FF00) | ((x>>8)&0x00FF00FF);
 	return (x>>16) | (x<<16);
