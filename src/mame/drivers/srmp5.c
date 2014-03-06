@@ -69,6 +69,7 @@ public:
 
 	UINT32 m_databank;
 	UINT16 *m_tileram;
+	UINT16 *m_palram;
 	UINT16 *m_sprram;
 
 	UINT8 m_input_select;
@@ -81,7 +82,8 @@ public:
 #ifdef DEBUG_CHAR
 	UINT8 m_tileduty[0x2000];
 #endif
-
+	DECLARE_READ32_MEMBER(srmp5_palette_r);
+	DECLARE_WRITE32_MEMBER(srmp5_palette_w);
 	DECLARE_WRITE32_MEMBER(bank_w);
 	DECLARE_READ32_MEMBER(tileram_r);
 	DECLARE_WRITE32_MEMBER(tileram_w);
@@ -135,8 +137,8 @@ UINT32 srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bit
 						UINT8 pen = pixels[address];
 						if(pen)
 						{
-							UINT32 pixdata=m_palette->pen(pen);
-							bitmap.pix32(yw * 16 + y, xw * 16 + x) = pixdata;
+							UINT16 pixdata=m_palram[pen];
+							bitmap.pix32(yw * 16 + y, xw * 16 + x) = ((pixdata&0x7c00)>>7) | ((pixdata&0x3e0)<<6) | ((pixdata&0x1f)<<19);
 						}
 						address++;
 					}
@@ -187,8 +189,8 @@ UINT32 srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bit
 								{
 									if(cliprect.contains(xb+xs2, yb+ys2))
 									{
-										UINT32 pixdata=m_palette->pen(pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8));
-										bitmap.pix32(yb + ys2, xb + xs2) = pixdata;
+										UINT16 pixdata=m_palram[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
+										bitmap.pix32(yb+ys2, xb+xs2) = ((pixdata&0x7c00)>>7) | ((pixdata&0x3e0)<<6) | ((pixdata&0x1f)<<19);
 									}
 								}
 								++address;
@@ -219,7 +221,16 @@ UINT32 srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
+READ32_MEMBER(srmp5_state::srmp5_palette_r)
+{
+	return m_palram[offset];
+}
 
+WRITE32_MEMBER(srmp5_state::srmp5_palette_w)
+{
+	COMBINE_DATA(&m_palram[offset]);
+	m_palette->set_pen_color(offset, rgb_t(data << 3 & 0xFF, data >> 2 & 0xFF, data >> 7 & 0xFF));
+}
 WRITE32_MEMBER(srmp5_state::bank_w)
 {
 	COMBINE_DATA(&m_databank);
@@ -343,7 +354,7 @@ static ADDRESS_MAP_START( srmp5_mem, AS_PROGRAM, 32, srmp5_state )
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READNOP // debug? 'Toru'
 
 	AM_RANGE(0x0a000000, 0x0a0fffff) AM_READWRITE(spr_r, spr_w)
-	AM_RANGE(0x0a100000, 0x0a17ffff) AM_DEVREADWRITE16("palette",  palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
+	AM_RANGE(0x0a100000, 0x0a17ffff) AM_READWRITE(srmp5_palette_r, srmp5_palette_w)
 	//0?N???A?????????i??????????
 	AM_RANGE(0x0a180000, 0x0a180003) AM_READNOP // write 0x00000400
 	AM_RANGE(0x0a180000, 0x0a18011f) AM_READWRITE(srmp5_vidregs_r, srmp5_vidregs_w)
@@ -542,8 +553,6 @@ static MACHINE_CONFIG_START( srmp5, srmp5_state )
 	MCFG_SCREEN_UPDATE_DRIVER(srmp5_state, screen_update_srmp5)
 
 	MCFG_PALETTE_ADD("palette", 0x1800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
 #ifdef DEBUG_CHAR
 	MCFG_GFXDECODE_ADD("gfxdecode", srmp5 )
 #endif
@@ -588,6 +597,7 @@ DRIVER_INIT_MEMBER(srmp5_state,srmp5)
 
 	m_tileram = auto_alloc_array(machine(), UINT16, 0x100000/2);
 	m_sprram  = auto_alloc_array(machine(), UINT16, 0x080000/2);
+	m_palram  = auto_alloc_array(machine(), UINT16, 0x040000/2);
 #ifdef DEBUG_CHAR
 	memset(m_tileduty, 1, 0x2000);
 #endif
