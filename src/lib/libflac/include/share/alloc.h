@@ -27,10 +27,6 @@
  * before #including this file,  otherwise SIZE_MAX might not be defined
  */
 
-#ifndef SIZE_MAX
-#define SIZE_MAX (4294967295U)
-#endif
-
 #include <limits.h> /* for SIZE_MAX */
 #if !defined _MSC_VER && !defined __MINGW32__ && !defined __EMX__
 #include <stdint.h> /* for SIZE_MAX in case limits.h didn't get it */
