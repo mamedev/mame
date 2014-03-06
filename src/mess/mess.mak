@@ -2223,7 +2223,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/eacc.o      \
 	$(MESS_DRIVERS)/elwro800.o  \
 	$(MESS_DRIVERS)/eti660.o    \
-	$(MESS_DRIVERS)/fanucs15.o	\
+	$(MESS_DRIVERS)/fanucs15.o  \
 	$(MESS_DRIVERS)/fk1.o       \
 	$(MESS_DRIVERS)/ft68m.o     \
 	$(MESS_DRIVERS)/grfd2301.o  \
@@ -2231,6 +2231,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/hprot1.o    \
 	$(MESS_DRIVERS)/hpz80unk.o  \
 	$(MESS_DRIVERS)/ht68k.o     \
+	$(MESS_DRIVERS)/hunter2.o   \
 	$(MESS_DRIVERS)/ibm6580.o   \
 	$(MESS_DRIVERS)/ie15.o      \
 	$(MESS_DRIVERS)/if800.o     \
