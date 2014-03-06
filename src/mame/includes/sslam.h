@@ -43,7 +43,6 @@ public:
 	DECLARE_READ8_MEMBER(playmark_snd_command_r);
 	DECLARE_WRITE8_MEMBER(playmark_oki_w);
 	DECLARE_WRITE8_MEMBER(playmark_snd_control_w);
-	DECLARE_WRITE16_MEMBER(sslam_paletteram_w);
 	DECLARE_WRITE16_MEMBER(sslam_tx_tileram_w);
 	DECLARE_WRITE16_MEMBER(sslam_md_tileram_w);
 	DECLARE_WRITE16_MEMBER(sslam_bg_tileram_w);

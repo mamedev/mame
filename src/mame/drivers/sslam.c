@@ -383,7 +383,7 @@ static ADDRESS_MAP_START( sslam_program_map, AS_PROGRAM, 16, sslam_state )
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(sslam_tx_tileram_w) AM_SHARE("tx_tileram")
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_SHARE("regs")
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(sslam_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( powerbls_map, AS_PROGRAM, 16, sslam_state )
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_SHARE("regs")
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2803ff) AM_RAM_WRITE(sslam_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x280000, 0x2803ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("IN1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("IN2")
@@ -715,6 +715,7 @@ static MACHINE_CONFIG_START( sslam, sslam_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sslam)
 	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(sslam_state,sslam)
 
@@ -745,6 +746,7 @@ static MACHINE_CONFIG_START( powerbls, sslam_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", powerbls)
 	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(sslam_state,powerbls)
 
