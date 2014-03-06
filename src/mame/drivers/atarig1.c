@@ -434,7 +434,6 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE_ADD("gfxdecode", atarig1)
 	MCFG_PALETTE_ADD("palette", 1280)
 
@@ -443,6 +442,7 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, atarig1_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	/* note: these parameters are from published specs, not derived */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarig1_state, screen_update_atarig1)

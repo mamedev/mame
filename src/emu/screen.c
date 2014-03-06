@@ -55,6 +55,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_yscale(1.0f),
 		m_palette_tag(NULL),
 		m_palette_base(0),
+		m_video_attributes(0),
 		m_container(NULL),
 		m_width(100),
 		m_height(100),
@@ -229,6 +230,16 @@ void screen_device::static_set_palette(device_t &device, const char *palette, in
 
 
 //-------------------------------------------------
+//  static_set_video_attributes - set the screen 
+//  video attributes
+//-------------------------------------------------
+
+void screen_device::static_set_video_attributes(device_t &device, UINT32 flags)
+{
+	screen_device &screen = downcast<screen_device &>(device);
+	screen.m_video_attributes = flags;
+}
+//-------------------------------------------------
 //  device_validity_check - verify device
 //  configuration
 //-------------------------------------------------
@@ -322,7 +333,7 @@ void screen_device::device_start()
 	m_scanline0_timer = timer_alloc(TID_SCANLINE0);
 
 	// allocate a timer to generate per-scanline updates
-	if ((machine().config().m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
+	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
 		m_scanline_timer = timer_alloc(TID_SCANLINE);
 
 	// configure the screen with the default parameters
@@ -333,7 +344,7 @@ void screen_device::device_start()
 	m_vblank_end_time = attotime(0, m_vblank_period);
 
 	// start the timer to generate per-scanline updates
-	if ((machine().config().m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
+	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
 		m_scanline_timer->adjust(time_until_pos(0));
 
 	// create burn-in bitmap
@@ -570,7 +581,7 @@ bool screen_device::update_partial(int scanline)
 	LOG_PARTIAL_UPDATES(("Partial: update_partial(%s, %d): ", tag(), scanline));
 
 	// these two checks only apply if we're allowed to skip frames
-	if (!(machine().config().m_video_attributes & VIDEO_ALWAYS_UPDATE))
+	if (!(m_video_attributes & VIDEO_ALWAYS_UPDATE))
 	{
 		// if skipping this frame, bail
 		if (machine().video().skip_this_frame())
@@ -813,7 +824,7 @@ void screen_device::vblank_begin()
 	m_vblank_end_time = m_vblank_start_time + attotime(0, m_vblank_period);
 
 	// if this is the primary screen and we need to update now
-	if (this == machine().primary_screen && !(machine().config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+	if (this == machine().primary_screen && !(m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
 		machine().video().frame_update();
 
 	// call the screen specific callbacks
@@ -847,7 +858,7 @@ void screen_device::vblank_end()
 		m_screen_vblank(*this, false);
 
 	// if this is the primary screen and we need to update now
-	if (this == machine().primary_screen && (machine().config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+	if (this == machine().primary_screen && (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
 		machine().video().frame_update();
 
 	// increment the frame number counter
@@ -866,7 +877,7 @@ bool screen_device::update_quads()
 	if (machine().render().is_live(*this))
 	{
 		// only update if empty and not a vector game; otherwise assume the driver did it directly
-		if (m_type != SCREEN_TYPE_VECTOR && (machine().config().m_video_attributes & VIDEO_SELF_RENDER) == 0)
+		if (m_type != SCREEN_TYPE_VECTOR && (m_video_attributes & VIDEO_SELF_RENDER) == 0)
 		{
 			// if we're not skipping the frame and if the screen actually changed, then update the texture
 			if (!machine().video().skip_this_frame() && m_changed)

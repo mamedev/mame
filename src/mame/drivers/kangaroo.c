@@ -436,12 +436,10 @@ static MACHINE_CONFIG_START( nomcu, kangaroo_state )
 
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 320*2, 0*2, 256*2, 260, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(kangaroo_state, screen_update_kangaroo)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

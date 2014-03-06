@@ -2152,9 +2152,8 @@ static MACHINE_CONFIG_START( sys1ppi, system1_state )
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)  /* needed for proper hardware collisions */
-
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)  /* needed for proper hardware collisions */
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 260, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system1)
 

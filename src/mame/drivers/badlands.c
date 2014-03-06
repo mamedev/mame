@@ -509,7 +509,6 @@ static MACHINE_CONFIG_START( badlands, badlands_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE_ADD("gfxdecode", badlands)
 	MCFG_PALETTE_ADD("palette", 256)
 
@@ -518,6 +517,7 @@ static MACHINE_CONFIG_START( badlands, badlands_state )
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
@@ -712,7 +712,6 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE_ADD("gfxdecode", badlandsb)
 	MCFG_PALETTE_ADD("palette", 256)
 
@@ -721,6 +720,7 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)

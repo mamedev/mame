@@ -370,9 +370,8 @@ static MACHINE_CONFIG_START( beathead, beathead_state )
 	MCFG_TIMER_DRIVER_ADD("scan_timer", beathead_state, scanline_callback)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(beathead_state, screen_update)
 	MCFG_SCREEN_SIZE(42*8, 262)

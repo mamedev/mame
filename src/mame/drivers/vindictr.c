@@ -189,7 +189,6 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE_ADD("gfxdecode", vindictr)
 	MCFG_PALETTE_ADD("palette", 2048*8)
 
@@ -199,6 +198,7 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)

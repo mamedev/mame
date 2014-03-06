@@ -544,7 +544,6 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_GFXDECODE_ADD("gfxdecode", atarig42)
 	MCFG_PALETTE_ADD("palette", 2048)
 
@@ -552,6 +551,7 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, atarig42_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)

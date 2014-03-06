@@ -27,7 +27,6 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		m_watchdog_time(attotime::zero),
 		m_nvram_handler(NULL),
 		m_memcard_handler(NULL),
-		m_video_attributes(0),
 		m_default_layout(NULL),
 		m_gamedrv(gamedrv),
 		m_options(options),

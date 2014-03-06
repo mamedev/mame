@@ -868,8 +868,8 @@ static MACHINE_CONFIG_DERIVED( spaceod, g80r_base )
 	/* basic machine hardware */
 
 	/* background board changes */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spaceod)
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 64+64)

@@ -393,10 +393,8 @@ UINT32 stactics_state::screen_update_stactics(screen_device &screen, bitmap_ind1
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( stactics_video )
-
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
