@@ -39,13 +39,13 @@ public:
 	TIMER_CALLBACK_MEMBER( motor_callback );
 
 	DECLARE_READ8_MEMBER(mc1502_fdc_r);
+	DECLARE_READ8_MEMBER(mc1502_fdcv2_r);
 	DECLARE_WRITE8_MEMBER(mc1502_fdc_w);
 	DECLARE_WRITE_LINE_MEMBER( mc1502_fdc_irq_drq );
 
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
 
 private:
 	required_device<fd1793_t> m_fdc;
