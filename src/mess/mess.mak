@@ -480,6 +480,7 @@ MACHINES += Z80SIO
 MACHINES += Z80STI
 MACHINES += Z8536
 MACHINES += MM58167
+#MACHINES += PROFILE
 
 #-------------------------------------------------
 # specify available bus cores
@@ -849,6 +850,7 @@ $(MESSOBJ)/isa.a: \
 	$(MESS_MACHINE)/isa_wd1002a_wx1.o\
 	$(MESS_MACHINE)/isa_dectalk.o \
 	$(MESS_MACHINE)/isa_pds.o \
+	$(MESS_MACHINE)/omti8621.o  \
 	$(MESS_VIDEO)/isa_cga.o     \
 	$(MESS_VIDEO)/isa_svga_cirrus.o \
 	$(MESS_VIDEO)/isa_ega.o     \
@@ -936,7 +938,6 @@ $(MESSOBJ)/apollo.a:            \
 	$(MESS_DRIVERS)/apollo.o    \
 	$(MESS_VIDEO)/apollo.o      \
 	$(MESS_MACHINE)/sc499.o     \
-	$(MESS_MACHINE)/omti8621.o  \
 	$(MESS_MACHINE)/apollo_dbg.o  \
 	$(MESS_MACHINE)/apollo_eth.o  \
 	$(MESS_MACHINE)/apollo_net.o  \

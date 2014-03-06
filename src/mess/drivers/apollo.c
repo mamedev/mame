@@ -10,7 +10,6 @@
  *  Adapted February 19, 2012 for general MAME/MESS standards by R. Belmont
  *
  *  TODO: use MESS ram device and MCFG_RAM_* to handle RAM sizing.
- *        AT bus stuff indicates ISA compatibility?  If so, convert to use MESS ISA bus infrastructure, including 3c505?
  *        Remove need for instruction hook.
  *        Convert to modern address map.
  *
@@ -29,7 +28,6 @@
 
 #include "includes/apollo.h"
 #include "machine/apollo_kbd.h"
-#include "machine/pc_fdc.h"
 
 #include "debugger.h"
 
@@ -46,8 +44,10 @@
 #define APOLLO_MAX_NO_OF_LOG_LINES 1000000
 
 // ISA/AT Bus notes
-// I/O space: Apollo address = PC I/O address * 0x80 + 0x40000, so PC I/O addresses from 0 to 0x3ff are supported.
-// example: 3c503 Ethernet is at I/O 300h on PC, which is (0x300 * 0x80) + 0x40000 = 0x58000
+// I/O space: to get the Apollo address = take the PC I/O address, keep the low 3 bits how they are, and shift the rest left 7, inserting zeros.  
+// then add 0x40000 for the I/O base.
+//
+// example: 3c503 Ethernet is at I/O 300h on PC, which is (%1100000000 -> 1 1000 0000 0000 0000) + 0x40000 = 0x58000
 //
 // Memory space: addresses from 0x80000 to 0xffffff are supported, including the possibility of stock PC MDA at a0000
 
@@ -570,97 +570,31 @@ WRITE32_MEMBER(apollo_state::apollo_rom_w)
  DN3000/DN3500 AT Bus I/O space
  ***************************************************************************/
 
-READ16_MEMBER(apollo_state::apollo_atbus_io_r){
-	UINT16 data = 0xffff;
-	offs_t address = ATBUS_IO_BASE + offset * 2;
+READ16_MEMBER(apollo_state::apollo_atbus_io_r)
+{
+	UINT32 isa_addr = (offset & 3) + ((offset & ~0x1ff)>>7);
 
-	switch (address & ~7) {
-	case 0x04d000: /* Fixed Disk Controller 1 */
-	case 0x04d400: /* Fixed Disk Controller 2 */
-	case 0x050000: /* Tape Controller */
-	case 0x054000: /* domain_os at 0x3C4BF15A ? */
-	case 0x054400: /* domain_os at 0x3C4BF1A8 ? */
-	case 0x054800: /* domain_os at 0x3C4BF15A ? */
-	case 0x054c00: /* domain_os at 0x3C4BF1A8 ? */
-	case 0x055808: /* domain_os at 0x3C4C4784 ? */
-	case 0x055c08: /* domain_os at 0x3C4C4784 ? */
-	case 0x058800: /* alternate 802.3 Network Controller */
-	case 0x059000: /* Apollo Token Ring Controller 0 */
-	case 0x05a000: /* alternate Network Controller */
-	case 0x05d800: /* alternate color or mono graphics */
-	case 0x05dc00: /* alternate color or mono graphics */
-	case 0x05e800: /* alternate mono or color graphics */
-	case 0x05ec00: /* alternate mono or color graphics */
-		// omit logging
-		break;
-	default:
-		SLOG1(("AT Bus I/O word read from %08x = %04x & %04x", address, data, mem_mask));
-	}
-
-	// set bit AT-Compatible I/O Timeout in CPU Status Register
-	// Note: should be set for broken hardware only
-	// apollo_csr_set_status_register(APOLLO_CSR_SR_ATBUS_IO_TIMEOUT,   APOLLO_CSR_SR_ATBUS_IO_TIMEOUT);
-	return data;
+	return m_isa->io16_r(space, isa_addr, mem_mask);
 }
 
-WRITE16_MEMBER(apollo_state::apollo_atbus_io_w){
-	offs_t address = ATBUS_IO_BASE + offset * 2;
+WRITE16_MEMBER(apollo_state::apollo_atbus_io_w)
+{
+	UINT32 isa_addr = (offset & 3) + ((offset & ~0x1ff)>>7);
 
-	switch (address & ~7) {
-	case 0x04d000: /* Fixed Disk Controller 1 */
-	case 0x04d400: /* Fixed Disk Controller 2 */
-	case 0x050000: /* Tape Controller */
-	case 0x054000: /* domain_os at 0x3C4BF15A ? */
-	case 0x054400: /* domain_os at 0x3C4BF1A8 ? */
-	case 0x054800: /* domain_os at 0x3C4BF15A ? */
-	case 0x054c00: /* domain_os at 0x3C4BF1A8 ? */
-	case 0x058800: /* alternate 802.3 Network Controller */
-	case 0x059000: /* Apollo Token Ring Controller 0 */
-	case 0x05a000: /* alternate Network Controller */
-	case 0x05d800: /* alternate color or mono graphics */
-	case 0x05dc00: /* alternate color or mono graphics */
-	case 0x05e800: /* alternate mono or color graphics */
-	case 0x05ec00: /* alternate mono or color graphics */
-		// omit logging
-		break;
-	default:
-		SLOG1(("AT Bus I/O word write to %08x = %04x & %04x ",
-						ATBUS_IO_BASE+ offset * 2, data, mem_mask))
-		;
-	}
-
-	// set bit AT-Compatible I/O Timeout in CPU Status Register
-	// Note: should be set for broken hardware only
-	// apollo_csr_set_status_register(APOLLO_CSR_SR_ATBUS_IO_TIMEOUT,   APOLLO_CSR_SR_ATBUS_IO_TIMEOUT);
+	m_isa->io16_w(space, isa_addr, data, mem_mask);
 }
 
 /***************************************************************************
  DN3000/DN3500 AT Bus memory space
  ***************************************************************************/
 
-READ32_MEMBER(apollo_state::apollo_atbus_memory_r){
-	UINT32 data = 0xffffffff;
-	offs_t address = ATBUS_MEMORY_BASE +  offset * 4;
-	if (VERBOSE < 2 && (address & 0xfff) == 0 && address >= 0x80000 && address < 0x1000000) {
-		// omit logging for memory sizing the AT Bus memory
-	} else {
-		SLOG1(("AT Bus memory dword read from %08x = %08x & %08x",address, data, mem_mask));
-	}
-
-	// set bit AT-Compatible Memory Timeout in CPU Status Register
-	// Note: should be set for broken hardware only
-	// apollo_csr_set_status_register(APOLLO_CSR_SR_ATBUS_MEM_TIMEOUT, APOLLO_CSR_SR_ATBUS_MEM_TIMEOUT);
-
-	return data;
+READ16_MEMBER(apollo_state::apollo_atbus_memory_r)
+{
+	return 0xffff;
 }
 
-WRITE32_MEMBER(apollo_state::apollo_atbus_memory_w){
-	SLOG1(("AT Bus memory dword write to %08x = %08x & %08x ",
-					ATBUS_MEMORY_BASE+offset * 4, data, mem_mask));
-
-	// set bit AT-Compatible Memory Timeout in CPU Status Register
-	// Note: should be set for broken hardware only
-	// apollo_csr_set_status_register(APOLLO_CSR_SR_ATBUS_MEM_TIMEOUT, APOLLO_CSR_SR_ATBUS_MEM_TIMEOUT);
+WRITE16_MEMBER(apollo_state::apollo_atbus_memory_w)
+{
 }
 
 /***************************************************************************
@@ -754,10 +688,8 @@ static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x016400, 0x0164ff) AM_READWRITE16(selective_clear_locations_r, selective_clear_locations_w, 0xffffffff )
 		AM_RANGE(0x017000, 0x017fff) AM_READWRITE16(apollo_address_translation_map_r, apollo_address_translation_map_w, 0xffffffff )
 
-		AM_RANGE(0x04D000, 0x04D007) AM_DEVREADWRITE16_LEGACY(APOLLO_WDC_TAG, omti8621_r, omti8621_w, 0xffffffff)
 		AM_RANGE(0x050000, 0x050007) AM_DEVREADWRITE8_LEGACY(APOLLO_CTAPE_TAG, sc499_r, sc499_w, 0xffffffff)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_FDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
 		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
@@ -773,7 +705,7 @@ static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32, apollo_state )
 		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM /* 8MB RAM */
 		AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_SHARE("messram")
 
-		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
+		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE16(apollo_atbus_memory_r, apollo_atbus_memory_w, 0xffffffff)
 
 //      AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
 //      AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
@@ -805,10 +737,8 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x016400, 0x0164ff) AM_READWRITE16(selective_clear_locations_r, selective_clear_locations_w, 0xffffffff )
 		AM_RANGE(0x017000, 0x017fff) AM_READWRITE16(apollo_address_translation_map_r, apollo_address_translation_map_w, 0xffffffff )
 
-		AM_RANGE(0x04D000, 0x04D007) AM_DEVREADWRITE16_LEGACY(APOLLO_WDC_TAG, omti8621_r, omti8621_w, 0xffffffff)
 		AM_RANGE(0x050000, 0x050007) AM_DEVREADWRITE8_LEGACY(APOLLO_CTAPE_TAG, sc499_r, sc499_w, 0xffffffff)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_FDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -816,7 +746,7 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
 
 		AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_SHARE("messram")
 
-		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
+		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE16(apollo_atbus_memory_r, apollo_atbus_memory_w, 0xffffffff)
 
 //      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
 		AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
@@ -837,10 +767,8 @@ static ADDRESS_MAP_START(dn3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x009400, 0x0094ff) AM_DEVREADWRITE8(APOLLO_PIC1_TAG, pic8259_device, read, write, 0xffffffff)
 		AM_RANGE(0x009500, 0x0095ff) AM_DEVREADWRITE8(APOLLO_PIC2_TAG, pic8259_device, read, write, 0xffffffff)
 		AM_RANGE(0x009600, 0x0096ff) AM_READWRITE16(apollo_node_id_r, apollo_node_id_w, 0xffffffff)
-		AM_RANGE(0x04D000, 0x04D007) AM_DEVREADWRITE16_LEGACY(APOLLO_WDC_TAG, omti8621_r, omti8621_w, 0xffffffff)
 		AM_RANGE(0x050000, 0x050007) AM_DEVREADWRITE8_LEGACY(APOLLO_CTAPE_TAG, sc499_r, sc499_w, 0xffffffff)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_FDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
 		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
@@ -856,7 +784,7 @@ static ADDRESS_MAP_START(dn3000_map, AS_PROGRAM, 32, apollo_state )
 		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
 		AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_SHARE("messram")
 
-		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
+		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE16(apollo_atbus_memory_r, apollo_atbus_memory_w, 0xffffffff)
 
 		AM_RANGE(0x000000, 0xffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 ADDRESS_MAP_END
@@ -878,10 +806,8 @@ static ADDRESS_MAP_START(dsp3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x009500, 0x0095ff) AM_DEVREADWRITE8(APOLLO_PIC2_TAG, pic8259_device, read, write, 0xffffffff)
 		AM_RANGE(0x009600, 0x0096ff) AM_READWRITE16(apollo_node_id_r, apollo_node_id_w, 0xffffffff)
 
-		AM_RANGE(0x04D000, 0x04D007) AM_DEVREADWRITE16_LEGACY(APOLLO_WDC_TAG, omti8621_r, omti8621_w, 0xffffffff)
 		AM_RANGE(0x050000, 0x050007) AM_DEVREADWRITE8_LEGACY(APOLLO_CTAPE_TAG, sc499_r, sc499_w, 0xffffffff)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_FDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -891,7 +817,7 @@ static ADDRESS_MAP_START(dsp3000_map, AS_PROGRAM, 32, apollo_state )
 		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
 		AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_SHARE("messram")
 
-		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
+		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE16(apollo_atbus_memory_r, apollo_atbus_memory_w, 0xffffffff)
 
 		AM_RANGE(0x000000, 0xffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 ADDRESS_MAP_END
@@ -921,10 +847,8 @@ static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x016400, 0x0164ff) AM_READWRITE16(selective_clear_locations_r, selective_clear_locations_w, 0xffffffff )
 		AM_RANGE(0x017000, 0x017fff) AM_READWRITE16(apollo_address_translation_map_r, apollo_address_translation_map_w, 0xffffffff )
 
-		AM_RANGE(0x04D000, 0x04D007) AM_DEVREADWRITE16_LEGACY(APOLLO_WDC_TAG, omti8621_r, omti8621_w, 0xffffffff)
 		AM_RANGE(0x050000, 0x050007) AM_DEVREADWRITE8_LEGACY(APOLLO_CTAPE_TAG, sc499_r, sc499_w, 0xffffffff)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_FDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
 		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
@@ -940,7 +864,7 @@ static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
 		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM  /* 8MB RAM */
 		AM_RANGE(DN5500_RAM_BASE, DN5500_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_SHARE("messram")
 
-		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
+		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE16(apollo_atbus_memory_r, apollo_atbus_memory_w, 0xffffffff)
 
 //      AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
 //      AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
@@ -975,10 +899,8 @@ static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x016400, 0x0164ff) AM_READWRITE16(selective_clear_locations_r, selective_clear_locations_w, 0xffffffff )
 		AM_RANGE(0x017000, 0x017fff) AM_READWRITE16(apollo_address_translation_map_r, apollo_address_translation_map_w, 0xffffffff )
 
-		AM_RANGE(0x04D000, 0x04D007) AM_DEVREADWRITE16_LEGACY(APOLLO_WDC_TAG, omti8621_r, omti8621_w, 0xffffffff)
 		AM_RANGE(0x050000, 0x050007) AM_DEVREADWRITE8_LEGACY(APOLLO_CTAPE_TAG, sc499_r, sc499_w, 0xffffffff)
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_FDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -987,7 +909,7 @@ static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
 		// FIXME: must match with RAM size in driver/apollo_sio.c
 		AM_RANGE(DN5500_RAM_BASE, DN5500_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_SHARE("messram")
 
-		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE(apollo_atbus_memory_r, apollo_atbus_memory_w)
+		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE16(apollo_atbus_memory_r, apollo_atbus_memory_w, 0xffffffff)
 
 		AM_RANGE(0x07000000, 0x0700FFFF) AM_READWRITE8(dn5500_io_protection_map_r, dn5500_io_protection_map_w, 0xffffffff )
 //      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
@@ -1005,9 +927,10 @@ void apollo_state::machine_reset()
 	MACHINE_RESET_CALL_MEMBER(apollo);
 
 	// set configuration
-	omti8621_set_verbose(apollo_config(APOLLO_CONF_DISK_TRACE));
 	threecom3c505_set_verbose(apollo_config(APOLLO_CONF_NET_TRACE));
 
+	// we can't do this any more
+	#if 0
 	if (apollo_config(APOLLO_CONF_NODE_ID))
 	{
 		UINT8 db[0x50];
@@ -1019,14 +942,13 @@ void apollo_state::machine_reset()
 			memcmp (db+0x22, "APOLLO", 6) == 0 &&
 			omti8621_get_sector(machine().device(APOLLO_WDC_TAG), sector1, db,  sizeof(db), 0) == sizeof(db))
 		{
-//          MLOG2(("machine_reset_dn3500: node ID is %06X (from ROM)", node_id));
-
 			// set node_id from UID of logical volume 1 of logical unit 0
 			node_id = (((db[0x49] << 8) | db[0x4a]) << 8) | db[0x4b];
 
-//          MLOG2(("machine_reset_dn3500: node ID is %06X (from disk)", node_id));
+          MLOG2(("machine_reset_dn3500: node ID is %06X (from disk)", node_id));
 		}
 	}
+	#endif
 
 	m68k_set_instruction_hook(m_maincpu, apollo_instruction_hook);
 }
@@ -1044,7 +966,6 @@ static void apollo_reset_instr_callback(device_t *device)
 	// reset the ISA bus devices
 	apollo->m_ctape->device_reset();
 	machine.device(APOLLO_ETH_TAG)->reset();
-	machine.device(APOLLO_WDC_TAG)->reset();
 
 	if (!apollo_is_dsp3x00())
 	{

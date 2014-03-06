@@ -3,7 +3,9 @@
  *
  *  Created on: August 30, 2010
  *      Author: Hans Ostermeyer
- *
+ * 
+ *  Converted to ISA device by R. Belmont
+ * 
  *  Released for general non-commercial use under the MAME license
  *  Visit http://mamedev.org for licensing and usage restrictions.
  *
@@ -17,16 +19,18 @@ static int verbose = VERBOSE;
 
 #include "machine/omti8621.h"
 #include "image.h"
-#include "devlegcy.h"
+#include "formats/pc_dsk.h"
+#include "formats/naslite_dsk.h"
+#include "formats/apollo_dsk.h"
 
-#define LOG(x)  { logerror ("%s: ", cpu_context(state->device)); logerror x; logerror ("\n"); }
+#define LOG(x)  { logerror ("%s: ", cpu_context(this)); logerror x; logerror ("\n"); }
 #define LOG1(x) { if (verbose > 0) LOG(x)}
 #define LOG2(x) { if (verbose > 1) LOG(x)}
 #define LOG3(x) { if (verbose > 2) LOG(x)}
 
 #define DLOG(x) { logerror ("%s: ", cpu_context(disk->device)); logerror x; logerror ("\n"); }
 #define DLOG1(x)    { if (verbose > 0) DLOG(x)}
-#define DLOG2(x)    { if (verbose > 1) DLOG(x)}
+#define DLOG2(x)    { if (verbose > 1) DLOG(x)} 							  
 
 #define OMTI_DISK_SECTOR_SIZE 1056
 
@@ -36,11 +40,47 @@ static int verbose = VERBOSE;
 
 #define OMTI_MAX_BLOCK_COUNT 32
 
-#define OMTI_MAX_LUN 1
 #define OMTI_DISK0_TAG "omti_disk0"
 #define OMTI_DISK1_TAG "omti_disk1"
 
-#define CDB_SIZE 10
+#define OMTI_FDC_TAG "omti_fdc"
+
+#define OMTI_CPU_REGION "omti_cpu"
+#define OMTI_BIOS_REGION "omti_bios"
+
+// forward declaration of image class
+extern const device_type OMTI_DISK;
+
+class omti_disk_image_device :  public device_t,
+								public device_image_interface
+{
+public:
+	// construction/destruction
+	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_HARDDISK; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "awd"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+
+	virtual bool call_create(int format_type, option_resolution *format_options);
+
+	disk_data *token() { return &m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+
+	disk_data m_token;
+};
 
 /*
  * I/O register offsets
@@ -129,78 +169,6 @@ enum {
 #define OMTI_CMD_READ_CONFIGURATION 0xec
 #define OMTI_CMD_INVALID_COMMAND 0xff
 
-struct disk_data
-{
-	device_t *device;
-	UINT16 type;
-	UINT16 cylinders;
-	UINT16 heads;
-	UINT16 sectors;
-	UINT32 sectorbytes;
-	UINT32 sector_count;
-
-	device_image_interface *image;
-
-	// configuration data
-	UINT8 config_data[10];
-
-	// ESDI defect list data
-	UINT8 esdi_defect_list[256];
-};
-
-struct omti8621_state {
-	device_t *device;
-	omti8621_set_irq irq_handler;
-
-	disk_data *disk[OMTI_MAX_LUN+1];
-
-	UINT16 jumper;
-
-	/* stored tc state - state present at pins */
-	int tc_state;
-
-	/* stored int state */
-	int int_state;
-
-	UINT8 omti_state;
-
-	UINT8 status_port;
-	UINT8 config_port;
-	UINT8 mask_port;
-
-	// command descriptor block
-	UINT8 command_buffer[CDB_SIZE];
-	int command_length;
-	int command_index;
-	int command_status;
-
-	// data buffer
-	UINT8 *sector_buffer;
-	UINT8 *data_buffer;
-	int data_length;
-	int data_index;
-
-	// sense data
-	UINT8 sense_data[4];
-
-	// these are used only to satisfy dex
-	UINT32 diskaddr_ecc_error;
-	UINT32 diskaddr_format_bad_track;
-	UINT8 alternate_track_buffer[4];
-	UINT32 alternate_track_address[2];
-};
-
-/***************************************************************************
- get_safe_token - makes sure that the passed
- in device is, in fact, a 8621 controller
- ***************************************************************************/
-
-INLINE omti8621_state *get_safe_token(device_t *device) {
-	assert(device != NULL);
-	assert(device->type() == OMTI8621);
-	return (omti8621_state *) downcast<omti8621_device *>(device)->token();
-}
-
 /***************************************************************************
  cpu_context - return a string describing the current CPU context
  ***************************************************************************/
@@ -224,52 +192,237 @@ static const char *cpu_context(const device_t *device) {
 	return statebuf;
 }
 
+static SLOT_INTERFACE_START( pc_hd_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
+SLOT_INTERFACE_END
+
+MACHINE_CONFIG_FRAGMENT( omti_disk )
+	MCFG_DEVICE_ADD(OMTI_DISK0_TAG, OMTI_DISK, 0)
+	MCFG_DEVICE_ADD(OMTI_DISK1_TAG, OMTI_DISK, 0)
+
+	MCFG_PC_FDC_AT_ADD(OMTI_FDC_TAG)
+	MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":0", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":1", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
+MACHINE_CONFIG_END
+
+FLOPPY_FORMATS_MEMBER( omti8621_device::floppy_formats )
+	FLOPPY_APOLLO_FORMAT,
+	FLOPPY_PC_FORMAT,
+	FLOPPY_NASLITE_FORMAT
+FLOPPY_FORMATS_END
+
+// this card has two EPROMs: a program for the on-board Z8 CPU,
+// and a PC BIOS to make the card bootable on a PC.
+// we need both!
+ROM_START( omti8621 )
+	ROM_REGION(0x1000, OMTI_CPU_REGION, 0)
+	ROM_LOAD("omti_z8.bin", 0x0000, 0x1000, NO_DUMP)
+
+	ROM_REGION(0x1000, OMTI_BIOS_REGION, 0)
+	ROM_LOAD("omti_bios", 0x0000, 0x1000, NO_DUMP)
+ROM_END
+
+static INPUT_PORTS_START( omti_port )
+	PORT_START("IO_BASE")
+	PORT_DIPNAME( 0x07, 0x04, "ESDI I/O base")
+	PORT_DIPSETTING(    0x00, "0320h" )
+	PORT_DIPSETTING(    0x01, "0324h" )
+	PORT_DIPSETTING(    0x02, "0328h" )
+	PORT_DIPSETTING(    0x03, "032Ch" )
+	PORT_DIPSETTING(    0x04, "01A0h" )
+	PORT_DIPSETTING(    0x05, "01A4h" )
+	PORT_DIPSETTING(    0x06, "01A8h" )
+	PORT_DIPSETTING(    0x07, "01ACh" )
+	PORT_DIPNAME( 0x08, 0x00, "Floppy I/O base")
+	PORT_DIPSETTING(    0x00, "03F0h" )
+	PORT_DIPSETTING(    0x01, "0370h" )
+
+	PORT_START("BIOS_OPTS")
+	PORT_DIPNAME( 0x01, 0x00, "BIOS control")
+	PORT_DIPSETTING(    0x00, "Disabled" )
+	PORT_DIPSETTING(    0x01, "Enabled" )
+	PORT_DIPNAME( 0x02, 0x00, "BIOS base")
+	PORT_DIPSETTING(    0x00, "C8000h" )
+	PORT_DIPSETTING(    0x01, "CA000h" )
+INPUT_PORTS_END
+
+machine_config_constructor omti8621_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( omti_disk );
+}
+
+const rom_entry *omti8621_device::device_rom_region() const
+{
+	return ROM_NAME( omti8621 );
+}
+
+ioport_constructor omti8621_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( omti_port );
+}
+
+/*-------------------------------------------------
+    device start callback
+-------------------------------------------------*/
+
+void omti8621_device::device_start()
+{
+	set_isa_device();
+
+	m_installed = false;
+
+	sector_buffer = auto_alloc_array(machine(), UINT8, OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
+	assert(sector_buffer != NULL);
+
+	m_timer = timer_alloc(0, NULL);
+
+	device_t *device0 = subdevice(OMTI_DISK0_TAG);
+	our_disks[0] = (disk_data *) downcast<omti_disk_image_device *>(device0)->token();
+
+	device_t *device1 = subdevice(OMTI_DISK1_TAG);
+	our_disks[1] = (disk_data *) downcast<omti_disk_image_device *>(device1)->token();
+}
+
+/*-------------------------------------------------
+    device reset callback
+-------------------------------------------------*/
+
+void omti8621_device::device_reset()
+{
+	static const int io_bases[8] = { 0x320, 0x324, 0x328, 0x32c, 0x1a0, 0x1a4, 0x1a8, 0x1ac };
+
+	LOG2(("device_reset_omti8621"));
+
+	// you can't read I/O ports in device_start() even if they're required_ioport<> in your class!
+	if (!m_installed)
+	{
+		int esdi_base = io_bases[m_iobase->read() & 7];
+
+		// install the ESDI ports
+		m_isa->install16_device(esdi_base, esdi_base + 7, 0, 0, read16_delegate(FUNC(omti8621_device::read), this), write16_delegate(FUNC(omti8621_device::write), this));
+
+		// and the onboard AT FDC ports
+		if (m_iobase->read() & 8)
+		{
+			m_isa->install_device(0x0370, 0x0377, *m_fdc, &pc_fdc_interface::map);
+		}
+		else
+		{
+			m_isa->install_device(0x03f0, 0x03f7, *m_fdc, &pc_fdc_interface::map);
+		}
+
+		m_fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(omti8621_device::fdc_irq_w), this));
+		m_fdc->setup_drq_cb(pc_fdc_interface::line_cb(FUNC(omti8621_device::fdc_drq_w), this));
+
+		m_installed = true;
+	}
+
+	set_jumper(our_disks[0]->type);
+
+	// should go from reset to idle after 100 us
+	// state->omti_state = OMTI_STATE_RESET;
+	omti_state = OMTI_STATE_IDLE;
+
+	status_port =  OMTI_STATUS_NU6 | OMTI_STATUS_NU7;
+	config_port = ~jumper;
+	mask_port = 0;
+
+	// default the sector data buffer with model and status information
+	// (i.e. set sector data buffer for cmd=0x0e READ SECTOR BUFFER)
+
+	memset(sector_buffer, 0, OMTI_DISK_SECTOR_SIZE);
+	memcpy(sector_buffer, "8621VB.4060487xx", 0x10);
+	sector_buffer[0x10] = 0; // ROM Checksum error
+	sector_buffer[0x11] = 0; // Processor Register error
+	sector_buffer[0x12] = 0; // Buffer RAM error
+	sector_buffer[0x13] = 0; // Sequencer Register File error
+	sector_buffer[0x14] = 0xc0; // 32K buffer size
+	// TODO: add missing Default values for LUN 0, 1 and 3
+
+	command_length = 0;
+	command_index = 0;
+	command_status = 0;
+
+	data_index = 0;
+	data_length = 0;
+
+	clear_sense_data();
+
+	diskaddr_ecc_error = 0;
+	diskaddr_format_bad_track = 0;
+	alternate_track_address[0] = 0;
+	alternate_track_address[1] = 0;
+}
+
+const device_type ISA16_OMTI8621 = &device_creator<omti8621_device>;
+
+omti8621_device::omti8621_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ISA16_OMTI8621, "OMTI 8621 ESDI/floppy controller", tag, owner, clock, "omti8621", __FILE__),
+	device_isa16_card_interface(mconfig, *this),
+	m_fdc(*this, OMTI_FDC_TAG),
+	m_iobase(*this, "IO_BASE"),
+	m_biosopts(*this, "BIOS_OPTS")
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void omti8621_device::device_config_complete()
+{
+}
+
 /*-------------------------------------------------
  set_interrupt - update the IRQ state
  -------------------------------------------------*/
 
-static void set_interrupt(const omti8621_state *state, enum line_state line_state) {
-	if (state->irq_handler != NULL) {
-		LOG2(("set_interrupt: status_port=%x", state->status_port));
-		(*state->irq_handler)(&state->device->machine(), line_state);
-	}
+void omti8621_device::set_interrupt(enum line_state line_state) 
+{
+	LOG2(("set_interrupt: status_port=%x, line_state %d", status_port, line_state));
+	m_isa->irq14_w(line_state);
 }
 
-static TIMER_CALLBACK(set_interrupt_caba ) {
-	const omti8621_state *state =(omti8621_state *)ptr;
-	set_interrupt(state, ASSERT_LINE);
+void omti8621_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	set_interrupt(ASSERT_LINE); 
 }
 
 /***************************************************************************
  clear_sense_data - clear the sense data
  ***************************************************************************/
 
-static void clear_sense_data(omti8621_state *state) {
+void omti8621_device::clear_sense_data() {
 	LOG2(("clear_sense_data"));
-	memset(state->sense_data, 0, sizeof(state->sense_data));
+	memset(sense_data, 0, sizeof(sense_data));
 }
 
 /***************************************************************************
  set_sense_data - set the sense data from code and command descriptor block
  ***************************************************************************/
 
-static void set_sense_data(omti8621_state *state, UINT8 code, const UINT8 * cdb) {
+void omti8621_device::set_sense_data(UINT8 code, const UINT8 * cdb) {
 	LOG2(("set_sense_data code=%x", code));
-	state->sense_data[0]=code;
-	state->sense_data[1]=cdb[1];
-	state->sense_data[2]=cdb[2];
-	state->sense_data[3]=cdb[3];
+	sense_data[0]=code;
+	sense_data[1]=cdb[1];
+	sense_data[2]=cdb[2];
+	sense_data[3]=cdb[3];
 }
 
 /***************************************************************************
  set_configuration_data - set the configuration data for drive lun
  ***************************************************************************/
 
-static void set_configuration_data(omti8621_state *state, UINT8 lun) {
+void omti8621_device::set_configuration_data(UINT8 lun) {
 	LOG2(("set_configuration_data lun=%x", lun));
 
 	// initialize the configuration data
-	disk_data *disk = state->disk[lun];
+	disk_data *disk = our_disks[lun];
 
 	disk->config_data[0] = (disk->cylinders - 1) >> 8; // Number of Cylinders (MSB)
 	disk->config_data[1] = (disk->cylinders - 1) & 0xff; // Number of Cylinders (LSB) (-1)
@@ -284,52 +437,10 @@ static void set_configuration_data(omti8621_state *state, UINT8 lun) {
 }
 
 /***************************************************************************
- omti_reset - reset the OMTI controller
- ***************************************************************************/
-
-static void omti_reset(omti8621_state *state) {
-	LOG2(("omti_reset"));
-
-	// should go from reset to idle after 100 us
-	// state->omti_state = OMTI_STATE_RESET;
-	state->omti_state = OMTI_STATE_IDLE;
-
-	state->status_port =  OMTI_STATUS_NU6 | OMTI_STATUS_NU7;
-	state->config_port = ~state->jumper;
-	state->mask_port = 0;
-
-	// default the sector data buffer with model and status information
-	// (i.e. set sector data buffer for cmd=0x0e READ SECTOR BUFFER)
-
-	memset(state->sector_buffer, 0, OMTI_DISK_SECTOR_SIZE);
-	memcpy(state->sector_buffer, "8621VB.4060487xx", 0x10);
-	state->sector_buffer[0x10] = 0; // ROM Checksum error
-	state->sector_buffer[0x11] = 0; // Processor Register error
-	state->sector_buffer[0x12] = 0; // Buffer RAM error
-	state->sector_buffer[0x13] = 0; // Sequencer Register File error
-	state->sector_buffer[0x14] = 0xc0; // 32K buffer size
-	// TODO: add missing Default values for LUN 0, 1 and 3
-
-	state->command_length = 0;
-	state->command_index = 0;
-	state->command_status = 0;
-
-	state->data_index = 0;
-	state->data_length = 0;
-
-	clear_sense_data(state) ;
-
-	state->diskaddr_ecc_error = 0;
-	state->diskaddr_format_bad_track = 0;
-	state->alternate_track_address[0] = 0;
-	state->alternate_track_address[1] = 0;
-}
-
-/***************************************************************************
  get_lun - get logical unit number from a command descriptor block (in bit 5)
  ***************************************************************************/
 
-static UINT8 get_lun(const UINT8 * cdb)
+UINT8 omti8621_device::get_lun(const UINT8 * cdb)
 {
 	return   (cdb[1] & 0x20) >> 5;
 }
@@ -338,7 +449,7 @@ static UINT8 get_lun(const UINT8 * cdb)
  check_disk_address - check disk address, set sense data and return true for no error
  ***************************************************************************/
 
-static UINT8 check_disk_address(omti8621_state *state, const UINT8 *cdb)
+UINT8 omti8621_device::check_disk_address(const UINT8 *cdb)
 {
 	UINT8 sense_code = OMTI_SENSE_CODE_NO_ERROR;
 	UINT8 lun = get_lun(cdb);
@@ -346,7 +457,7 @@ static UINT8 check_disk_address(omti8621_state *state, const UINT8 *cdb)
 	UINT16 sector = cdb[2] & 0x3f;
 	UINT32 cylinder = cdb[3] + ((cdb[2] & 0xc0) << 2) + ((cdb[1] & 0x80) << 3);
 	UINT8 block_count = cdb[4];
-	disk_data *disk = state->disk[lun];
+	disk_data *disk = our_disks[lun];
 
 	UINT32 disk_track = cylinder * disk->heads + head;
 	UINT32 disk_addr = (disk_track * disk->sectors) + sector;
@@ -366,19 +477,19 @@ static UINT8 check_disk_address(omti8621_state *state, const UINT8 *cdb)
 		sense_code = OMTI_SENSE_CODE_ILLEGAL_ADDRESS | OMTI_SENSE_CODE_ADDRESS_VALID;
 	} else if (cylinder >= disk->cylinders) {
 		sense_code = OMTI_SENSE_CODE_ILLEGAL_ADDRESS | OMTI_SENSE_CODE_ADDRESS_VALID;
-	} else if ( disk_track == state->diskaddr_format_bad_track && disk_track != 0) {
+	} else if ( disk_track == diskaddr_format_bad_track && disk_track != 0) {
 		sense_code = OMTI_SENSE_CODE_BAD_TRACK;
-	} else if (disk_addr == state->diskaddr_ecc_error && disk_addr != 0) {
+	} else if (disk_addr == diskaddr_ecc_error && disk_addr != 0) {
 		sense_code = OMTI_SENSE_CODE_ECC_ERROR;
-	} else if (disk_track == state->alternate_track_address[1] && disk_track != 0) {
+	} else if (disk_track == alternate_track_address[1] && disk_track != 0) {
 		sense_code = OMTI_SENSE_CODE_ALTERNATE_TRACK;
 	}
 
 	if (sense_code == OMTI_SENSE_CODE_NO_ERROR) {
-		clear_sense_data(state);
+		clear_sense_data();
 	} else {
-		state->command_status |= OMTI_COMMAND_STATUS_ERROR;
-		set_sense_data(state, sense_code, cdb);
+		command_status |= OMTI_COMMAND_STATUS_ERROR;
+		set_sense_data(sense_code, cdb);
 	}
 	return sense_code == OMTI_SENSE_CODE_NO_ERROR;
 }
@@ -387,46 +498,47 @@ static UINT8 check_disk_address(omti8621_state *state, const UINT8 *cdb)
  get_disk_track - get disk track from a command descriptor block
  ***************************************************************************/
 
-static UINT32 get_disk_track(const omti8621_state *state, const UINT8 * cdb) {
+UINT32 omti8621_device::get_disk_track(const UINT8 * cdb) {
 	UINT8 lun = get_lun(cdb);
 	UINT16 head = cdb[1] & 0x1f;
 	UINT32 cylinder = cdb[3] + ((cdb[2] & 0xc0) << 2) + ((cdb[1] & 0x80) << 3);
-	return cylinder * state->disk[lun]->heads + head;
+	return cylinder * our_disks[lun]->heads + head;
 }
 
 /***************************************************************************
  get_disk_address - get disk address from a command descriptor block
  ***************************************************************************/
 
-static UINT32 get_disk_address(const omti8621_state *state, const UINT8 * cdb) {
+UINT32 omti8621_device::get_disk_address(const UINT8 * cdb) {
 	UINT8 lun = get_lun(cdb);
 	UINT16 sector = cdb[2] & 0x3f;
-	return get_disk_track(state, cdb) * state->disk[lun]->sectors + sector;
+	return get_disk_track(cdb) * our_disks[lun]->sectors + sector;
 }
 
 /***************************************************************************
  set_data_transfer - setup for data transfer from/to data
  ***************************************************************************/
 
-static void set_data_transfer(omti8621_state *state, UINT8 *data, UINT16 length) {
+void omti8621_device::set_data_transfer(UINT8 *data, UINT16 length) 
+{
 	// set controller for read data transfer
-	state->omti_state = OMTI_STATE_DATA;
-	state->status_port |= OMTI_STATUS_REQ | OMTI_STATUS_IO | OMTI_STATUS_BUSY;
-	state->status_port &= ~OMTI_STATUS_CD;
+	omti_state = OMTI_STATE_DATA;
+	status_port |= OMTI_STATUS_REQ | OMTI_STATUS_IO | OMTI_STATUS_BUSY;
+	status_port &= ~OMTI_STATUS_CD;
 
-	state->data_buffer = data;
-	state->data_length = length;
-	state->data_index = 0;
+	data_buffer = data;
+	data_length = length;
+	data_index = 0;
 }
 
 /***************************************************************************
  read_sectors_from_disk - read sectors starting at diskaddr into sector_buffer
  ***************************************************************************/
 
-static void read_sectors_from_disk(omti8621_state *state, INT32 diskaddr,
-		UINT8 count, UINT8 lun) {
-	UINT8 *data_buffer = state->sector_buffer;
-	device_image_interface *image = state->disk[lun]->image;
+void omti8621_device::read_sectors_from_disk(INT32 diskaddr, UINT8 count, UINT8 lun) 
+{
+	UINT8 *data_buffer = sector_buffer;
+	device_image_interface *image = our_disks[lun]->image;
 
 	while (count-- > 0) {
 		LOG2(("read_sectors_from_disk lun=%d diskaddr=%x", lun, diskaddr));
@@ -443,10 +555,10 @@ static void read_sectors_from_disk(omti8621_state *state, INT32 diskaddr,
  write_sectors_to_disk - write sectors starting at diskaddr from sector_buffer
  ***************************************************************************/
 
-static void write_sectors_to_disk(omti8621_state *state, INT32 diskaddr,
-		UINT8 count, UINT8 lun) {
-	UINT8 *data_buffer = state->sector_buffer;
-	device_image_interface *image = state->disk[lun]->image;
+void omti8621_device::write_sectors_to_disk(INT32 diskaddr, UINT8 count, UINT8 lun) 
+{
+	UINT8 *data_buffer = sector_buffer;
+	device_image_interface *image = our_disks[lun]->image;
 
 	while (count-- > 0) {
 		LOG2(("write_sectors_to_disk lun=%d diskaddr=%x", lun, diskaddr));
@@ -454,9 +566,9 @@ static void write_sectors_to_disk(omti8621_state *state, INT32 diskaddr,
 		image->fseek( diskaddr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
 		image->fwrite( data_buffer, OMTI_DISK_SECTOR_SIZE);
 
-		if (diskaddr == state->diskaddr_ecc_error) {
+		if (diskaddr == diskaddr_ecc_error) {
 			// reset previous ECC error
-			state->diskaddr_ecc_error = 0;
+			diskaddr_ecc_error = 0;
 		}
 
 		diskaddr++;
@@ -468,22 +580,22 @@ static void write_sectors_to_disk(omti8621_state *state, INT32 diskaddr,
  copy_sectors - copy sectors
  ***************************************************************************/
 
-static void copy_sectors(omti8621_state *state, INT32 dst_addr, INT32 src_addr,
-		UINT8 count, UINT8 lun) {
-	device_image_interface *image = state->disk[lun]->image;
+void omti8621_device::copy_sectors(INT32 dst_addr, INT32 src_addr, UINT8 count, UINT8 lun) 
+{
+	device_image_interface *image = our_disks[lun]->image;
 
 	LOG2(("copy_sectors lun=%d src_addr=%x dst_addr=%x count=%x", lun, src_addr, dst_addr, count));
 
 	while (count-- > 0) {
 		image->fseek( src_addr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
-		image->fread( state->sector_buffer, OMTI_DISK_SECTOR_SIZE);
+		image->fread( sector_buffer, OMTI_DISK_SECTOR_SIZE);
 
 		image->fseek( dst_addr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
-		image->fwrite( state->sector_buffer, OMTI_DISK_SECTOR_SIZE);
+		image->fwrite( sector_buffer, OMTI_DISK_SECTOR_SIZE);
 
-		if (dst_addr == state->diskaddr_ecc_error) {
+		if (dst_addr == diskaddr_ecc_error) {
 			// reset previous ECC error
-			state->diskaddr_ecc_error = 0;
+			diskaddr_ecc_error = 0;
 		}
 
 		src_addr++;
@@ -495,36 +607,37 @@ static void copy_sectors(omti8621_state *state, INT32 dst_addr, INT32 src_addr,
  format track - format a track
  ***************************************************************************/
 
-static void format_track(omti8621_state *state, const UINT8 * cdb) {
+void omti8621_device::format_track(const UINT8 * cdb) 
+{
 	UINT8 lun = get_lun(cdb);
-	UINT32 disk_addr = get_disk_address(state, cdb);
-	UINT32 disk_track = get_disk_track(state, cdb);
+	UINT32 disk_addr = get_disk_address(cdb);
+	UINT32 disk_track = get_disk_track(cdb);
 
-	if (state->diskaddr_ecc_error == disk_addr) {
+	if (diskaddr_ecc_error == disk_addr) {
 		// reset previous ECC error
-		state->diskaddr_ecc_error = 0;
+		diskaddr_ecc_error = 0;
 	}
 
-	if (state->diskaddr_format_bad_track == disk_track) {
+	if (diskaddr_format_bad_track == disk_track) {
 		// reset previous bad track formatting
-		state->diskaddr_format_bad_track = 0;
+		diskaddr_format_bad_track = 0;
 	}
 
-	if (state->alternate_track_address[0] == disk_track) {
+	if (alternate_track_address[0] == disk_track) {
 		// reset source of alternate track address
-		state->alternate_track_address[0] = 0;
+		alternate_track_address[0] = 0;
 	}
 
-	if (state->alternate_track_address[1] == disk_track) {
+	if (alternate_track_address[1] == disk_track) {
 		// reset alternate track address
-		state->alternate_track_address[1] = 0;
+		alternate_track_address[1] = 0;
 	}
 
-	if (check_disk_address(state, cdb) ) {
+	if (check_disk_address(cdb) ) {
 		if ((cdb[5] & 0x40) == 0) {
-			memset(state->sector_buffer, 0x6C, OMTI_DISK_SECTOR_SIZE * state->disk[lun]->sectors);
+			memset(sector_buffer, 0x6C, OMTI_DISK_SECTOR_SIZE * our_disks[lun]->sectors);
 		}
-		write_sectors_to_disk(state, disk_addr, state->disk[lun]->sectors, lun);
+		write_sectors_to_disk(disk_addr, our_disks[lun]->sectors, lun);
 	}
 
 }
@@ -533,9 +646,9 @@ static void format_track(omti8621_state *state, const UINT8 * cdb) {
  set_esdi_defect_list - setup the (emty) ESDI defect list
  ***************************************************************************/
 
-static void set_esdi_defect_list(omti8621_state *state, UINT8 lun, UINT8 head)
+void omti8621_device::set_esdi_defect_list(UINT8 lun, UINT8 head)
 {
-	disk_data *disk = state->disk[lun];
+	disk_data *disk = our_disks[lun];
 
 	memset(disk->esdi_defect_list, 0, sizeof(disk->esdi_defect_list));
 	disk->esdi_defect_list[0] = 1; // month
@@ -549,11 +662,11 @@ static void set_esdi_defect_list(omti8621_state *state, UINT8 lun, UINT8 head)
  log_command - log command from a command descriptor block
  ***************************************************************************/
 
-static void log_command(const omti8621_state *state,
-		const UINT8 cdb[], const UINT16 cdb_length) {
+void omti8621_device::log_command(const UINT8 cdb[], const UINT16 cdb_length) 
+{
 	if (verbose > 0) {
 		int i;
-		logerror("%s: OMTI command ", cpu_context(state->device));
+		logerror("%s: OMTI command ", cpu_context(this));
 		switch (cdb[0]) {
 		case OMTI_CMD_TEST_DRIVE_READY: // 0x00
 			logerror("Test Drive Ready");
@@ -637,7 +750,7 @@ static void log_command(const omti8621_state *state,
 		case OMTI_CMD_READ_DATA_TO_BUFFER: // 0x1E
 		case OMTI_CMD_WRITE_DATA_FROM_BUFFER: // 0x1F
 		case OMTI_CMD_COPY: // 0x20
-			logerror(" (diskaddr=%x count=%x)", get_disk_address(state, cdb), cdb[4]);
+			logerror(" (diskaddr=%x count=%x)", get_disk_address(cdb), cdb[4]);
 			break;
 		}
 		logerror("\n");
@@ -648,16 +761,17 @@ static void log_command(const omti8621_state *state,
  log_data - log data in the common data buffer
  ***************************************************************************/
 
-static void log_data(const omti8621_state *state) {
+void omti8621_device::log_data() 
+{
 	if (verbose > 0) {
 		int i;
-		logerror("%s: OMTI data (length=%02x)", cpu_context(state->device),
-				state->data_length);
-		for (i = 0; i < state->data_length && i < OMTI_DISK_SECTOR_SIZE; i++) {
-			logerror(" %02x", state->data_buffer[i]);
+		logerror("%s: OMTI data (length=%02x)", cpu_context(this),
+				data_length);
+		for (i = 0; i < data_length && i < OMTI_DISK_SECTOR_SIZE; i++) {
+			logerror(" %02x", data_buffer[i]);
 		}
 
-		if (i < state->data_length) {
+		if (i < data_length) {
 			logerror(" ...");
 		}
 		logerror("\n");
@@ -668,32 +782,32 @@ static void log_data(const omti8621_state *state) {
  do_command
  ***************************************************************************/
 
-static void do_command(omti8621_state *state,
-		const UINT8 cdb[], const UINT16 cdb_length) {
+void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length) 
+{
 	UINT8 lun = get_lun(cdb);
-	disk_data *disk = state->disk[lun];
+	disk_data *disk = our_disks[lun];
 	int command_duration = 0; // ms
 
-	log_command( state, cdb, cdb_length);
+	log_command( cdb, cdb_length);
 
 	// default to read status and status is successful completion
-	state->omti_state = OMTI_STATE_STATUS;
-	state->status_port |= OMTI_STATUS_IO | OMTI_STATUS_CD;
-	state->command_status = lun ? OMTI_COMMAND_STATUS_LUN : 0;
+	omti_state = OMTI_STATE_STATUS;
+	status_port |= OMTI_STATUS_IO | OMTI_STATUS_CD;
+	command_status = lun ? OMTI_COMMAND_STATUS_LUN : 0;
 
-	if (state->mask_port & OMTI_MASK_INTE) {
-		set_interrupt(state, CLEAR_LINE);
+	if (mask_port & OMTI_MASK_INTE) {
+		set_interrupt(CLEAR_LINE);
 	}
 
 	if (!disk->image->exists()) {
-		state->command_status |= OMTI_COMMAND_STATUS_ERROR; // no such drive
+		command_status |= OMTI_COMMAND_STATUS_ERROR; // no such drive
 	}
 
 	switch (cdb[0]) {
 	case OMTI_CMD_TEST_DRIVE_READY: // 0x00
 		if (!disk->image->exists())
 		{
-			set_sense_data(state, OMTI_SENSE_CODE_DRIVE_NOT_READY, cdb);
+			set_sense_data(OMTI_SENSE_CODE_DRIVE_NOT_READY, cdb);
 		}
 		break;
 
@@ -701,79 +815,79 @@ static void do_command(omti8621_state *state,
 		break;
 
 	case OMTI_CMD_REQUEST_SENSE: // 0x03
-		set_data_transfer(state, state->sense_data, sizeof(state->sense_data));
+		set_data_transfer(sense_data, sizeof(sense_data));
 		break;
 
 	case OMTI_CMD_READ_VERIFY: // 0x05
-		check_disk_address(state, cdb);
+		check_disk_address(cdb);
 		break;
 
 	case OMTI_CMD_FORMAT_TRACK: // 0x06
-		format_track(state, cdb);
+		format_track(cdb);
 		break;
 
 	case OMTI_CMD_FORMAT_BAD_TRACK: // 0x07
-		state->diskaddr_format_bad_track = get_disk_address(state, cdb);
+		diskaddr_format_bad_track = get_disk_address(cdb);
 		break;
 
 	case OMTI_CMD_READ: // 0x08
-		if (check_disk_address(state, cdb)) {
+		if (check_disk_address(cdb)) {
 			// read data from controller
-			read_sectors_from_disk(state, get_disk_address(state, cdb), cdb[4], lun);
-			set_data_transfer(state, state->sector_buffer,  OMTI_DISK_SECTOR_SIZE*cdb[4]);
+			read_sectors_from_disk(get_disk_address(cdb), cdb[4], lun);
+			set_data_transfer(sector_buffer,  OMTI_DISK_SECTOR_SIZE*cdb[4]);
 		}
 		break;
 
 	case OMTI_CMD_WRITE: // 0x0A
-		log_data(state);
-		if (check_disk_address(state, cdb)) {
-			write_sectors_to_disk(state, get_disk_address(state, cdb), cdb[4], lun);
+		log_data();
+		if (check_disk_address(cdb)) {
+			write_sectors_to_disk(get_disk_address(cdb), cdb[4], lun);
 		}
 		break;
 
 	case OMTI_CMD_SEEK: // 0x0B
-		check_disk_address(state, cdb);
+		check_disk_address(cdb);
 		break;
 
 	case OMTI_CMD_READ_SECTOR_BUFFER: // 0x0E
-		set_data_transfer(state, state->sector_buffer, OMTI_DISK_SECTOR_SIZE*cdb[4]);
+		set_data_transfer(sector_buffer, OMTI_DISK_SECTOR_SIZE*cdb[4]);
 		break;
 
 	case OMTI_CMD_WRITE_SECTOR_BUFFER: // 0x0F
-		log_data(state);
+		log_data();
 		break;
 
 	case OMTI_CMD_COPY: // 0x20
-		if (check_disk_address(state, cdb) && check_disk_address(state, cdb+4)) {
+		if (check_disk_address(cdb) && check_disk_address(cdb+4)) {
 			// copy sectors
-			copy_sectors (state, get_disk_address(state,  cdb+4), get_disk_address(state, cdb), cdb[4], lun);
+			copy_sectors (get_disk_address(cdb+4), get_disk_address(cdb), cdb[4], lun);
 		}
 		break;
 
 	case OMTI_CMD_READ_ESDI_DEFECT_LIST: // 0x37
-		set_esdi_defect_list(state, get_lun(cdb), cdb[1] & 0x1f);
-		set_data_transfer(state, disk->esdi_defect_list, sizeof(disk->esdi_defect_list));
+		set_esdi_defect_list(get_lun(cdb), cdb[1] & 0x1f);
+		set_data_transfer(disk->esdi_defect_list, sizeof(disk->esdi_defect_list));
 		break;
 
 	case OMTI_CMD_ASSIGN_ALTERNATE_TRACK: // 0x11
-		log_data(state);
-		state->alternate_track_address[0] = get_disk_track(state, cdb);
-		state->alternate_track_address[1] = get_disk_track(state, state->alternate_track_buffer-1);;
+		log_data();
+		alternate_track_address[0] = get_disk_track(cdb);
+		alternate_track_address[1] = get_disk_track(alternate_track_buffer-1);;
 		break;
 
 	case OMTI_CMD_READ_DATA_TO_BUFFER: // 0x1E
-		if (check_disk_address(state, cdb)) {
+		if (check_disk_address(cdb)) {
 			// read data from controller
-			read_sectors_from_disk (state, get_disk_address(state, cdb), cdb[4], lun);
+			read_sectors_from_disk (get_disk_address(cdb), cdb[4], lun);
 			// Domain/OS doesn't expect zero access time
 			command_duration += 1; // 1 ms is enough, average time would be 30 ms)
 		}
 		break;
 
 	case OMTI_CMD_WRITE_DATA_FROM_BUFFER: // 0x1F
-		log_data(state);
-		if (check_disk_address(state, cdb)) {
-			write_sectors_to_disk(state, get_disk_address(state, cdb), cdb[4], lun);
+		log_data();
+		if (check_disk_address(cdb)) {
+			write_sectors_to_disk(get_disk_address(cdb), cdb[4], lun);
 		}
 		break;
 
@@ -784,50 +898,53 @@ static void do_command(omti8621_state *state,
 		break;
 
 	case OMTI_CMD_READ_LONG: // 0xE5
-		if (check_disk_address(state, cdb)) {
+		if (check_disk_address(cdb)) {
 			// read data from controller
-			read_sectors_from_disk(state, get_disk_address(state, cdb), cdb[4], lun);
-			set_data_transfer(state, state->sector_buffer, OMTI_DISK_SECTOR_SIZE+6);
+			read_sectors_from_disk(get_disk_address(cdb), cdb[4], lun);
+			set_data_transfer(sector_buffer, OMTI_DISK_SECTOR_SIZE+6);
 		}
 		break;
 
 	case OMTI_CMD_WRITE_LONG: // 0xE6
-		log_data(state);
-		if (check_disk_address(state, cdb)) {
-			UINT32 diskaddr =  get_disk_address(state, cdb);
-			write_sectors_to_disk(state, diskaddr, cdb[4], lun);
+		log_data();
+		if (check_disk_address(cdb)) {
+			UINT32 diskaddr =  get_disk_address(cdb);
+			write_sectors_to_disk(diskaddr, cdb[4], lun);
 			// this will spoil the ECC code
-			state->diskaddr_ecc_error = diskaddr;
+			diskaddr_ecc_error = diskaddr;
 		}
 		break;
 
 	case OMTI_CMD_READ_CONFIGURATION: // 0xEC
-		set_configuration_data(state, get_lun(cdb));
-		set_data_transfer(state, disk->config_data, sizeof(disk->config_data));
+		set_configuration_data(get_lun(cdb));
+		set_data_transfer(disk->config_data, sizeof(disk->config_data));
 		break;
 
 	case OMTI_CMD_INVALID_COMMAND: // 0xFF
-		set_sense_data(state, OMTI_SENSE_CODE_INVALID_COMMAND, cdb);
-		state->command_status |= OMTI_COMMAND_STATUS_ERROR;
+		set_sense_data(OMTI_SENSE_CODE_INVALID_COMMAND, cdb);
+		command_status |= OMTI_COMMAND_STATUS_ERROR;
 		break;
 
 	default:
 		LOG(("do_command: UNEXPECTED command %02x",cdb[0]));
-		set_sense_data(state, OMTI_SENSE_CODE_INVALID_COMMAND, cdb);
-		state->command_status |= OMTI_COMMAND_STATUS_ERROR;
+		set_sense_data(OMTI_SENSE_CODE_INVALID_COMMAND, cdb);
+		command_status |= OMTI_COMMAND_STATUS_ERROR;
 		break;
 	}
 
-	if (state->mask_port & OMTI_MASK_INTE) {
-//      if (state->omti_state != OMTI_STATE_STATUS) {
-//          LOG(("do_command: UNEXPECTED omti_state %02x",state->omti_state));
+	if (mask_port & OMTI_MASK_INTE) {
+//      if (omti_state != OMTI_STATE_STATUS) {
+//          LOG(("do_command: UNEXPECTED omti_state %02x",omti_state));
 //      }
-		state->status_port |= OMTI_STATUS_IREQ;
-		if (command_duration == 0) {
-			set_interrupt(state, ASSERT_LINE);
-		} else {
-			// FIXME: should delay state->omti_state and state->status_port as well
-			state->device->machine().scheduler().timer_set(attotime::from_msec(command_duration), FUNC(set_interrupt_caba), 0, state);
+		status_port |= OMTI_STATUS_IREQ;
+		if (command_duration == 0) 
+		{
+			set_interrupt(ASSERT_LINE);
+		} 
+		else 
+		{
+			// FIXME: should delay omti_state and status_port as well
+			m_timer->adjust(attotime::from_msec(command_duration), 0);
 		}
 	}
 }
@@ -836,7 +953,8 @@ static void do_command(omti8621_state *state,
  get_command_length
  ***************************************************************************/
 
-static UINT8 get_command_length(UINT8 command_byte) {
+UINT8 omti8621_device::get_command_length(UINT8 command_byte) 
+{
 	return command_byte == OMTI_CMD_COPY ? 10 : 6;
 }
 
@@ -844,15 +962,16 @@ static UINT8 get_command_length(UINT8 command_byte) {
  get_data
  ***************************************************************************/
 
-static UINT16 get_data(omti8621_state *state) {
+UINT16 omti8621_device::get_data() 
+{
 	UINT16 data = 0xff;
-	if (state->data_index < state->data_length) {
-		data = state->data_buffer[state->data_index++] << 8;
-		data |= state->data_buffer[state->data_index++];
-		if (state->data_index >= state->data_length) {
-			state->omti_state = OMTI_STATE_STATUS;
-			state->status_port |= OMTI_STATUS_IO | OMTI_STATUS_CD;
-			log_data(state);
+	if (data_index < data_length) {
+		data = data_buffer[data_index++] << 8;
+		data |= data_buffer[data_index++];
+		if (data_index >= data_length) {
+			omti_state = OMTI_STATE_STATUS;
+			status_port |= OMTI_STATUS_IO | OMTI_STATUS_CD;
+			log_data();
 		}
 	} else {
 		LOG(("UNEXPECTED reading OMTI 8621 data (buffer length exceeded)"));
@@ -864,12 +983,13 @@ static UINT16 get_data(omti8621_state *state) {
  set_data
  ***************************************************************************/
 
-static void set_data(omti8621_state *state, UINT16 data) {
-	if (state->data_index < state->data_length) {
-		state->data_buffer[state->data_index++] = data >> 8;
-		state->data_buffer[state->data_index++] = data & 0xff;
-		if (state->data_index >= state->data_length) {
-			do_command(state, state->command_buffer, state->command_index);
+void omti8621_device::set_data(UINT16 data) 
+{
+	if (data_index < data_length) {
+		data_buffer[data_index++] = data >> 8;
+		data_buffer[data_index++] = data & 0xff;
+		if (data_index >= data_length) {
+			do_command(command_buffer, command_index);
 		}
 	} else {
 		LOG(("UNEXPECTED writing OMTI 8621 data (buffer length exceeded)"));
@@ -877,52 +997,70 @@ static void set_data(omti8621_state *state, UINT16 data) {
 }
 
 /***************************************************************************
- DN3500 Disk Controller-AT Register at 0x4D000
- ***************************************************************************/
+ OMTI8621 Disk Controller-AT Registers
+***************************************************************************/
 
-static WRITE8_DEVICE_HANDLER( omti8621_w8 ) {
-	omti8621_state *state = get_safe_token(device);
+WRITE16_MEMBER(omti8621_device::write)
+{
+	switch (mem_mask) 
+	{
+		case 0x00ff:
+			write8(space, offset*2+1, data, mem_mask);
+			break;
 
-	switch (offset) {
+		case 0xff00:
+			write8(space, offset*2, data>>8, mem_mask>>8);
+			break;
+
+		default:
+			set_data(data);
+			break;
+	}
+}
+
+WRITE8_MEMBER(omti8621_device::write8)
+{
+	switch (offset) 
+	{
 	case OMTI_PORT_DATA_OUT: //  0x00
-		switch (state->omti_state) {
+		switch (omti_state) {
 		case OMTI_STATE_COMMAND:
 			LOG2(("writing OMTI 8621 Command Register at offset %02x = %02x", offset, data));
-			if (state->command_index == 0) {
-				state->command_length = get_command_length(data);
+			if (command_index == 0) {
+				command_length = get_command_length(data);
 			}
 
-			if (state->command_index < state->command_length) {
-				state->command_buffer[state->command_index++] = data;
+			if (command_index < command_length) {
+				command_buffer[command_index++] = data;
 			} else {
 				LOG(("UNEXPECTED writing OMTI 8621 Data Register at offset %02x = %02x (command length exceeded)", offset, data));
 			}
 
-			if (state->command_index == state->command_length) {
-				switch (state->command_buffer[0]) {
+			if (command_index == command_length) {
+				switch (command_buffer[0]) {
 				case OMTI_CMD_WRITE: // 0x0A
 					// TODO: check diskaddr
 					// Fall through
 				case OMTI_CMD_WRITE_SECTOR_BUFFER: // 0x0F
-					set_data_transfer(state, state->sector_buffer,
-							OMTI_DISK_SECTOR_SIZE * state->command_buffer[4]);
-					state->status_port &= ~OMTI_STATUS_IO;
+					set_data_transfer(sector_buffer,
+							OMTI_DISK_SECTOR_SIZE * command_buffer[4]);
+					status_port &= ~OMTI_STATUS_IO;
 					break;
 
 				case OMTI_CMD_ASSIGN_ALTERNATE_TRACK: // 0x11
-					set_data_transfer(state, state->alternate_track_buffer, sizeof(state->alternate_track_buffer));
-					state->status_port &= ~OMTI_STATUS_IO;
+					set_data_transfer(alternate_track_buffer, sizeof(alternate_track_buffer));
+					status_port &= ~OMTI_STATUS_IO;
 					break;
 
 				case OMTI_CMD_WRITE_LONG: // 0xE6
 					// TODO: check diskaddr
-					set_data_transfer(state, state->sector_buffer,
-							(OMTI_DISK_SECTOR_SIZE +6) * state->command_buffer[4]);
-					state->status_port &= ~OMTI_STATUS_IO;
+					set_data_transfer(sector_buffer,
+							(OMTI_DISK_SECTOR_SIZE +6) * command_buffer[4]);
+					status_port &= ~OMTI_STATUS_IO;
 					break;
 
 				default:
-					do_command(state, state->command_buffer, state->command_index);
+					do_command(command_buffer, command_index);
 					break;
 				}
 			}
@@ -933,38 +1071,38 @@ static WRITE8_DEVICE_HANDLER( omti8621_w8 ) {
 			break;
 
 		default:
-			LOG(("UNEXPECTED writing OMTI 8621 Data Register at offset %02x = %02x (omti state = %02x)", offset, data, state->omti_state));
+			LOG(("UNEXPECTED writing OMTI 8621 Data Register at offset %02x = %02x (omti state = %02x)", offset, data, omti_state));
 			break;
 		}
 		break;
 
 	case OMTI_PORT_RESET: // 0x01
 		LOG2(("writing OMTI 8621 Reset Register at offset %02x = %02x", offset, data));
-		omti_reset(state);
+		device_reset();
 		break;
 
 	case OMTI_PORT_SELECT: // 0x02
-		LOG2(("writing OMTI 8621 Select Register at offset %02x = %02x (omti state = %02x)", offset, data, state->omti_state));
-		state->omti_state = OMTI_STATE_COMMAND;
+		LOG2(("writing OMTI 8621 Select Register at offset %02x = %02x (omti state = %02x)", offset, data, omti_state));
+		omti_state = OMTI_STATE_COMMAND;
 
-		state->status_port |= OMTI_STATUS_BUSY | OMTI_STATUS_REQ | OMTI_STATUS_CD;
-		state->status_port &= ~OMTI_STATUS_IO;
+		status_port |= OMTI_STATUS_BUSY | OMTI_STATUS_REQ | OMTI_STATUS_CD;
+		status_port &= ~OMTI_STATUS_IO;
 
-		state->command_status = 0;
-		state->command_index = 0;
+		command_status = 0;
+		command_index = 0;
 		break;
 
 	case OMTI_PORT_MASK: // 0x03
 		LOG2(("writing OMTI 8621 Mask Register at offset %02x = %02x", offset, data));
-		state->mask_port = data;
+		mask_port = data;
 
 		if ((data & OMTI_MASK_INTE) == 0) {
-			state->status_port &= ~OMTI_STATUS_IREQ;
-			set_interrupt(state, CLEAR_LINE);
+			status_port &= ~OMTI_STATUS_IREQ;
+			set_interrupt(CLEAR_LINE);
 		}
 
 		if ((data & OMTI_MASK_DMAE) == 0) {
-			state->status_port &= ~OMTI_STATUS_DREQ;
+			status_port &= ~OMTI_STATUS_DREQ;
 		}
 		break;
 
@@ -974,50 +1112,67 @@ static WRITE8_DEVICE_HANDLER( omti8621_w8 ) {
 	}
 }
 
-static READ8_DEVICE_HANDLER( omti8621_r8 ) {
-	omti8621_state *state = get_safe_token(device);
-	UINT8 data = 0xff;
+READ16_MEMBER(omti8621_device::read)
+{
+	switch (mem_mask) 
+	{
+		case 0x00ff:
+			return read8(space, offset*2+1, mem_mask);
+		case 0xff00:
+			return read8(space, offset*2, mem_mask >> 8) << 8;
+		default:
+			return get_data();
+	}
+}
 
+READ8_MEMBER(omti8621_device::read8)
+{
+	UINT8 data = 0xff;
 	static UINT8 last_data = 0xff;
 
 	switch (offset) {
 	case OMTI_PORT_DATA_IN: // 0x00
-		if (state->status_port & OMTI_STATUS_CD) {
-			data = state->command_status;
-			switch (state->omti_state) {
+		if (status_port & OMTI_STATUS_CD) 
+		{
+			data = command_status;
+			switch (omti_state) 
+			{
 			case OMTI_STATE_COMMAND:
-				LOG2(("reading OMTI 8621 Data Status Register at offset %02x = %02x (omti state = %02x)", offset, data, state->omti_state));
+				LOG2(("reading OMTI 8621 Data Status Register 1 at offset %02x = %02x (omti state = %02x)", offset, data, omti_state));
 				break;
 			case OMTI_STATE_STATUS:
-				state->omti_state = OMTI_STATE_IDLE;
-				state->status_port &= ~(OMTI_STATUS_BUSY | OMTI_STATUS_CD  | OMTI_STATUS_IO | OMTI_STATUS_REQ);
-				LOG2(("reading OMTI 8621 Data Status Register at offset %02x = %02x", offset, data));
+				omti_state = OMTI_STATE_IDLE;
+				status_port &= ~(OMTI_STATUS_BUSY | OMTI_STATUS_CD  | OMTI_STATUS_IO | OMTI_STATUS_REQ);
+				LOG2(("reading OMTI 8621 Data Status Register 2 at offset %02x = %02x", offset, data));
 				break;
 			default:
-				LOG(("UNEXPECTED reading OMTI 8621 Data Status Register at offset %02x = %02x (omti state = %02x)", offset, data, state->omti_state));
+				LOG(("UNEXPECTED reading OMTI 8621 Data Status Register 3 at offset %02x = %02x (omti state = %02x)", offset, data, omti_state));
 				break;
 			}
-		} else {
-			LOG(("UNEXPECTED reading OMTI 8621 Data Register at offset %02x = %02x (status bit C/D = 0)", offset, data));
+		} 
+		else 
+		{
+			LOG(("UNEXPECTED reading OMTI 8621 Data Register 4 at offset %02x = %02x (status bit C/D = 0)", offset, data));
 		}
 		break;
 
 	case OMTI_PORT_STATUS: // 0x01
-		data = state->status_port;
+		data = status_port;
 		// omit excessive logging
-		if (data != last_data) {
-			LOG2(("reading OMTI 8621 Status Register at offset %02x = %02x", offset, data));
+		if (data != last_data) 
+		{
+			LOG2(("reading OMTI 8621 Status Register 5 at offset %02x = %02x", offset, data));
 //          last_data = data;
 		}
 		break;
 
 	case OMTI_PORT_CONFIG: // 0x02
-		data = state->config_port;
+		data = config_port;
 		LOG2(("reading OMTI 8621 Configuration Register at offset %02x = %02x", offset, data));
 		break;
 
 	case OMTI_PORT_MASK: // 0x03
-		data = state->mask_port ;
+		data = mask_port ;
 		// win.dex will update the mask register with read-modify-write
 		// LOG2(("reading OMTI 8621 Mask Register at offset %02x = %02x (UNEXPECTED!)", offset, data));
 		break;
@@ -1030,54 +1185,18 @@ static READ8_DEVICE_HANDLER( omti8621_r8 ) {
 	return data;
 }
 
-WRITE16_DEVICE_HANDLER(omti8621_w ) {
-	omti8621_state *state = get_safe_token(device);
-
-	switch (mem_mask) {
-	case 0x00ff:
-		omti8621_w8(device, space, offset*2+1, data, mem_mask);
-		break;
-	case 0xff00:
-		omti8621_w8(device, space, offset*2, data>>8, mem_mask>>8);
-		break;
-	default:
-		LOG3(("writing OMTI 8621 Data Word Register to %0x = %04x & %04x", offset, data, mem_mask));
-		set_data(state, data);
-		break;
-	}
-}
-
-READ16_DEVICE_HANDLER( omti8621_r ) {
-	omti8621_state *state = get_safe_token(device);
-	UINT16 data;
-	switch (mem_mask) {
-	case 0x00ff:
-		data = omti8621_r8(device, space, offset*2+1, mem_mask);
-		break;
-	case 0xff00:
-		data = omti8621_r8(device, space, offset*2, mem_mask >> 8) << 8;
-		break;
-	default:
-		data = get_data(state);
-		LOG3(("reading OMTI 8621 Data Word Register from %0x = %04x & %04x", offset, data, mem_mask));
-		break;
-	}
-	return data;
-}
-
-void omti8621_set_verbose(int on_off)
+void omti8621_device::set_verbose(int on_off)
 {
 	verbose = on_off == 0 ? 0 : VERBOSE > 1 ? VERBOSE : 1;
 }
 
 /***************************************************************************
- omti8621_get_sector - get sector diskaddr of logical unit lun into data_buffer
+ get_sector - get sector diskaddr of logical unit lun into data_buffer
  ***************************************************************************/
 
-UINT32 omti8621_get_sector(device_t *device, INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun)
+UINT32 omti8621_device::get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun)
 {
-	omti8621_state *state = get_safe_token(device);
-	disk_data *disk = state->disk[lun];
+	disk_data *disk = our_disks[lun];
 
 	if (disk->image == NULL || !disk->image->exists())
 	{
@@ -1102,63 +1221,41 @@ UINT32 omti8621_get_sector(device_t *device, INT32 diskaddr, UINT8 *data_buffer,
  omti_set_jumper - set OMI jumpers
  ***************************************************************************/
 
-static void omti_set_jumper(omti8621_state *state, UINT16 disk_type)
+void omti8621_device::set_jumper(UINT16 disk_type)
 {
-	LOG1(("omti_set_jumper: disk type=%x", disk_type));
+	LOG1(("set_jumper: disk type=%x", disk_type));
 
 	switch (disk_type)
 	{
 	case OMTI_DISK_TYPE_348_MB: // Maxtor 380 MB (348-MB FA formatted)
-		state->jumper = OMTI_CONFIG_W22 | OMTI_CONFIG_W23;
+		jumper = OMTI_CONFIG_W22 | OMTI_CONFIG_W23;
 		break;
 
 	case OMTI_DISK_TYPE_155_MB: // Micropolis 170 MB (155-MB formatted)
 	default:
-		state->jumper = OMTI_CONFIG_W20;
+		jumper = OMTI_CONFIG_W20;
 		break;
 	}
 }
 
+// FDC uses the standard IRQ 6 / DMA 2, doesn't appear to be configurable
+void omti8621_device::fdc_irq_w(bool state)
+{
+	m_isa->irq6_w(state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void omti8621_device::fdc_drq_w(bool state)
+{
+	m_isa->drq2_w(state ? ASSERT_LINE : CLEAR_LINE);
+}
 
 //##########################################################################
-class omti_disk_image_device :  public device_t,
-								public device_image_interface
-{
-public:
-	// construction/destruction
-	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_HARDDISK; }
-
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "awd"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
-
-	virtual bool call_create(int format_type, option_resolution *format_options);
-
-	disk_data *token() { return &m_token; }
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-
-	disk_data m_token;
-};
 
 // device type definition
-extern const device_type OMTI_DISK;
-
 const device_type OMTI_DISK = &device_creator<omti_disk_image_device>;
 
 omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, OMTI_DISK, "Winchester", tag, owner, clock, "omti_disk_image", __FILE__),
+	: device_t(mconfig, OMTI_DISK, "OMTI8621 ESDI disk", tag, owner, clock, "omti_disk_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }
@@ -1279,89 +1376,3 @@ bool omti_disk_image_device::call_create(int format_type, option_resolution *for
 	return IMAGE_INIT_PASS;
 }
 
-MACHINE_CONFIG_FRAGMENT( omti_disk )
-	MCFG_DEVICE_ADD(OMTI_DISK0_TAG, OMTI_DISK, 0)
-	MCFG_DEVICE_ADD(OMTI_DISK1_TAG, OMTI_DISK, 0)
-MACHINE_CONFIG_END
-
-/*-------------------------------------------------
-    device start callback
--------------------------------------------------*/
-
-static DEVICE_START( omti8621 ) {
-	omti8621_state *state = get_safe_token(device);
-
-	const omti8621_config *config =
-			(const omti8621_config *) device->static_config();
-
-	/* validate basic stuff */
-	assert(device != NULL);
-	assert(device->type() == OMTI8621);
-
-	/* store a pointer back to the device */
-	state->device = device;
-
-	// note: we must have state->device before we can log
-	LOG2(("device_start_omti8621"));
-
-	state->irq_handler = config->set_irq;
-
-	state->sector_buffer = auto_alloc_array(device->machine(), UINT8,
-			OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
-	assert(state->sector_buffer != NULL);
-
-	device_t *device0 = device->machine().device(OMTI_DISK0_TAG);
-	state->disk[0] = (disk_data *) downcast<omti_disk_image_device *>(device0)->token();
-
-	device_t *device1 = device->machine().device(OMTI_DISK1_TAG);
-	state->disk[1] = (disk_data *) downcast<omti_disk_image_device *>(device1)->token();
-}
-
-/*-------------------------------------------------
-    device reset callback
--------------------------------------------------*/
-
-static DEVICE_RESET( omti8621 )
-{
-	omti8621_state *state = get_safe_token(device);
-	LOG2(("device_reset_omti8621"));
-
-	omti_set_jumper(state, state->disk[0]->type);
-	omti_reset(state);
-}
-
-const device_type OMTI8621 = &device_creator<omti8621_device>;
-
-omti8621_device::omti8621_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, OMTI8621, "OMTI 8621", tag, owner, clock, "omti8621", __FILE__)
-{
-	m_token = global_alloc_clear(omti8621_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void omti8621_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void omti8621_device::device_start()
-{
-	DEVICE_START_NAME( omti8621 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void omti8621_device::device_reset()
-{
-	DEVICE_RESET_NAME( omti8621 )(this);
-}
