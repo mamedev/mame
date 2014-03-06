@@ -169,7 +169,7 @@ for root, dirs, files in os.walk(inputPath):
 		elif command == "copy":
 			inFile += ".chd"
 		else:
-			print "unsupported mode"
+			print "unsupported mode '%s'" % command
 			continue
 		if os.path.exists(inFile):
 			cmd = [chdmanBin, command, "-f", "-i", inFile, "-o", tempFile] + params
