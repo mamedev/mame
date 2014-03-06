@@ -113,6 +113,7 @@ public:
 			m_ms32_tx1_scroll(*this, "tx1_scroll"),
 			m_ms32_bg1_scroll(*this, "bg1_scroll") ,
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -135,6 +136,7 @@ public:
 	UINT32 m_bnstars1_mahjong_select;
 	int m_ms32_reverse_sprite_order;
 	int m_flipscreen;
+	UINT32 m_to_main;
 	UINT16 m_irqreq;
 	DECLARE_WRITE32_MEMBER(ms32_tx0_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_tx1_ram_w);
@@ -149,6 +151,13 @@ public:
 	DECLARE_READ32_MEMBER(bnstars2_r);
 	DECLARE_READ32_MEMBER(bnstars3_r);
 	DECLARE_WRITE32_MEMBER(bnstars1_mahjong_select_w);
+	DECLARE_WRITE32_MEMBER(ms32_sound_w);
+	DECLARE_READ32_MEMBER(ms32_sound_r);
+	DECLARE_WRITE32_MEMBER(reset_sub_w);
+	DECLARE_READ8_MEMBER(latch_r);
+	DECLARE_WRITE8_MEMBER(ms32_snd_bank_w);
+	DECLARE_WRITE8_MEMBER(to_main_w);
+	void configure_banks();
 	DECLARE_DRIVER_INIT(bnstars);
 	TILE_GET_INFO_MEMBER(get_ms32_tx0_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_tx1_tile_info);
@@ -168,6 +177,7 @@ public:
 	void irq_raise(int level);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
@@ -1286,18 +1296,59 @@ WRITE32_MEMBER(bnstars_state::bnstars1_mahjong_select_w)
 //  printf("%08x\n",m_bnstars1_mahjong_select);
 }
 
+WRITE32_MEMBER(bnstars_state::ms32_sound_w)
+{
+	soundlatch_byte_w(space, 0, data & 0xff);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+
+	// give the Z80 time to respond
+	space.device().execute().spin_until_time(attotime::from_usec(40));
+}
+
+READ32_MEMBER(bnstars_state::ms32_sound_r)
+{
+	return m_to_main^0xff;
+}
+
+WRITE32_MEMBER(bnstars_state::reset_sub_w)
+{
+	if(data) m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
+}
+
+READ8_MEMBER(bnstars_state::latch_r)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_byte_r(space,0)^0xff;
+}
+
+WRITE8_MEMBER(bnstars_state::ms32_snd_bank_w)
+{
+	membank("bank4")->set_entry((data >> 0) & 0x0F);
+	membank("bank5")->set_entry((data >> 4) & 0x0F);
+}
+
+WRITE8_MEMBER(bnstars_state::to_main_w)
+{
+	m_to_main=data;
+	irq_raise(1);
+}
+
 static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 
+	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE(ms32_sound_w)
+	
 	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ(bnstars1_r )
 	AM_RANGE(0xfcc00008, 0xfcc0000b) AM_READ(bnstars2_r )
 	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ(bnstars3_r )
 
 	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITENOP
+	AM_RANGE(0xfce00038, 0xfce0003b) AM_WRITE(reset_sub_w)
 
 	AM_RANGE(0xfce00050, 0xfce00053) AM_WRITENOP
 	AM_RANGE(0xfce00058, 0xfce0005b) AM_WRITENOP
 	AM_RANGE(0xfce0005c, 0xfce0005f) AM_WRITENOP
+	AM_RANGE(0xfce00300, 0xfce00303) AM_WRITENOP
 
 	AM_RANGE(0xfce00400, 0xfce0045f) AM_WRITEONLY AM_SHARE("roz_ctrl.0")
 	AM_RANGE(0xfce00700, 0xfce0075f) AM_WRITEONLY AM_SHARE("roz_ctrl.1") // guess
@@ -1308,6 +1359,8 @@ static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 
 	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(bnstars1_mahjong_select_w) // ?
 
+	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
+	
 	/* wrote together */
 	AM_RANGE(0xfd040000, 0xfd047fff) AM_RAM // priority ram
 	AM_RANGE(0xfd080000, 0xfd087fff) AM_RAM
@@ -1325,12 +1378,18 @@ static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-#if 0
-static ADDRESS_MAP_START( bnstars_z80_map, AS_PROGRAM, 8, bnstars_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+static ADDRESS_MAP_START( bnstars_sound_map, AS_PROGRAM, 8, bnstars_state )
+	AM_RANGE(0x0000, 0x3eff) AM_ROM
+	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREADWRITE("ymf2", ymf271_device, read, write)
+	AM_RANGE(0x3f10, 0x3f10) AM_READWRITE(latch_r,to_main_w)
+	AM_RANGE(0x3f20, 0x3f2f) AM_DEVREADWRITE("ymf1", ymf271_device, read, write)
+	AM_RANGE(0x3f40, 0x3f40) AM_WRITENOP   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
+	AM_RANGE(0x3f70, 0x3f70) AM_WRITENOP   // watchdog? banking? very noisy
+	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(ms32_snd_bank_w)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank4")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
-#endif
-
 
 IRQ_CALLBACK_MEMBER(bnstars_state::irq_callback)
 {
@@ -1372,9 +1431,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(bnstars_state::ms32_interrupt)
 	if( (scanline % 8) == 0 && scanline <= 224 ) irq_raise(0);
 }
 
+void bnstars_state::configure_banks()
+{
+	save_item(NAME(m_to_main));
+	membank("bank4")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x14000, 0x4000);
+	membank("bank5")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x14000, 0x4000);
+}
+
 void bnstars_state::machine_reset()
 {
 	irq_init();
+	membank("bank4")->set_entry(0);
+	membank("bank5")->set_entry(1);
 }
 
 
@@ -1385,8 +1453,8 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_CPU_PROGRAM_MAP(bnstars_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bnstars_state, ms32_interrupt, "lscreen", 0, 1)
 
-//  MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-//  MCFG_CPU_PROGRAM_MAP(bnstars_z80_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(bnstars_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
@@ -1468,7 +1536,7 @@ ROM_START( bnstars1 )
 	ROM_LOAD( "vsjanshi5.6", 0x000000, 0x080000, CRC(fdbbac21) SHA1(c77d852e53126cc8ebfe1e79d1134e42b54d1aab) )
 
 	/* Sound Program (one, driving both screen sound) */
-	ROM_REGION( 0x50000, "cpu1", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "sb93145.5",  0x000000, 0x040000, CRC(0424e899) SHA1(fbcdebfa3d5f52b10cf30f7e416f5f53994e4d55) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1493,6 +1561,7 @@ DRIVER_INIT_MEMBER(bnstars_state,bnstars)
 	decrypt_ms32_bg(machine(), 0x00001,0x9b, "gfx6");
 
 	membank("bank1")->set_base(memregion("maincpu")->base());
+	configure_banks();
 }
 
-GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars_state, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars_state, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
