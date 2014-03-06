@@ -2,14 +2,13 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    HD61830 LCD Timing Controller emulation
+    Hitachi HD61830 LCD Timing Controller emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
-#include "emu.h"
 #include "hd61830.h"
 
 
@@ -19,6 +18,7 @@
 //**************************************************************************
 
 const device_type HD61830 = &device_creator<hd61830_device>;
+const device_type HD61830B = &device_creator<hd61830_device>;
 
 
 // default address map
@@ -186,10 +186,10 @@ const address_space_config *hd61830_device::memory_space_config(address_spacenum
 void hd61830_device::set_busy_flag()
 {
 	// set busy flag
-	m_bf = true;
+	//m_bf = true; TODO figure out correct timing
 
 	// adjust busy timer
-	m_busy_timer->adjust(attotime::from_usec(CYCLES[m_ir]));
+	m_busy_timer->adjust(clocks_to_attotime(CYCLES[m_ir]));
 }
 
 

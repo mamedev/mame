@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    HD61830 LCD Timing Controller emulation
+    Hitachi HD61830 LCD Timing Controller emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -93,7 +93,7 @@ private:
 
 	emu_timer *m_busy_timer;
 	//address_space *m_data;
-
+	
 	bool m_bf;                      // busy flag
 
 	UINT8 m_ir;                     // instruction register
@@ -121,6 +121,7 @@ private:
 
 // device type definition
 extern const device_type HD61830;
+extern const device_type HD61830B;
 
 
 

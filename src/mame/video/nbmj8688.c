@@ -96,7 +96,11 @@ PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_16bit)
 	}
 }
 
-
+PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_lcd)
+{
+	palette.set_pen_color(0, rgb_t(28, 123, 57));
+	palette.set_pen_color(1, rgb_t(0, 0, 0));
+}
 
 WRITE8_MEMBER(nbmj8688_state::nbmj8688_clut_w)
 {
@@ -582,75 +586,19 @@ VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_pure_16bit)
 VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_pure_16bit_LCD)
 {
 	m_mjsikaku_gfxmode = GFXTYPE_PURE_16BIT;
-
-	m_HD61830B_ram[0] = auto_alloc_array(machine(), UINT8, 0x10000);
-	m_HD61830B_ram[1] = auto_alloc_array(machine(), UINT8, 0x10000);
-
 	common_video_start();
-}
-
-
-/******************************************************************************
-
-Quick and dirty implementation of the bare minimum required to elmulate the
-Hitachi HD61830B LCD controller.
-
-******************************************************************************/
-
-void nbmj8688_state::nbmj8688_HD61830B_instr_w(address_space &space,int offset,int data,int chip)
-{
-	m_HD61830B_instr[chip] = data;
-}
-
-void nbmj8688_state::nbmj8688_HD61830B_data_w(address_space &space,int offset,int data,int chip)
-{
-	switch (m_HD61830B_instr[chip])
-	{
-		case 0x0a:  // set cursor address (low order)
-			m_HD61830B_addr[chip] = (m_HD61830B_addr[chip] & 0xff00) | data;
-			break;
-		case 0x0b:  // set cursor address (high order)
-			m_HD61830B_addr[chip] = (m_HD61830B_addr[chip] & 0x00ff) | (data << 8);
-			break;
-		case 0x0c:  // write display data
-			m_HD61830B_ram[chip][m_HD61830B_addr[chip]++] = data;
-			break;
-		default:
-logerror("HD61830B unsupported instruction %02x %02x\n",m_HD61830B_instr[chip],data);
-			break;
-	}
-}
-
-WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_0_instr_w)
-{
-	nbmj8688_HD61830B_instr_w(space,offset,data,0);
-}
-
-WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_1_instr_w)
-{
-	nbmj8688_HD61830B_instr_w(space,offset,data,1);
 }
 
 WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_both_instr_w)
 {
-	nbmj8688_HD61830B_instr_w(space,offset,data,0);
-	nbmj8688_HD61830B_instr_w(space,offset,data,1);
-}
-
-WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_0_data_w)
-{
-	nbmj8688_HD61830B_data_w(space,offset,data,0);
-}
-
-WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_1_data_w)
-{
-	nbmj8688_HD61830B_data_w(space,offset,data,1);
+	m_lcdc0->control_w(space, offset, data);
+	m_lcdc1->control_w(space, offset, data);
 }
 
 WRITE8_MEMBER(nbmj8688_state::nbmj8688_HD61830B_both_data_w)
 {
-	nbmj8688_HD61830B_data_w(space,offset,data,0);
-	nbmj8688_HD61830B_data_w(space,offset,data,1);
+	m_lcdc0->data_w(space, offset, data);
+	m_lcdc1->data_w(space, offset, data);
 }
 
 
@@ -694,37 +642,5 @@ if(machine().input().code_pressed_once(KEYCODE_T))
 //  else
 //      bitmap.fill(0);
 
-	return 0;
-}
-
-
-
-UINT32 nbmj8688_state::screen_update_mbmj8688_lcd0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int x, y, b;
-
-	for (y = 0;y < 64;y++)
-		for (x = 0;x < 60;x++)
-		{
-			int data = m_HD61830B_ram[0][y * 60 + x];
-
-			for (b = 0;b < 8;b++)
-				bitmap.pix16(y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
-		}
-	return 0;
-}
-
-UINT32 nbmj8688_state::screen_update_mbmj8688_lcd1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int x, y, b;
-
-	for (y = 0;y < 64;y++)
-		for (x = 0;x < 60;x++)
-		{
-			int data = m_HD61830B_ram[1][y * 60 + x];
-
-			for (b = 0;b < 8;b++)
-				bitmap.pix16(y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
-		}
 	return 0;
 }

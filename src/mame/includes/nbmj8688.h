@@ -1,3 +1,4 @@
+#include "video/hd61830.h"
 #include "includes/nb1413m3.h"
 
 class nbmj8688_state : public driver_device
@@ -8,13 +9,18 @@ public:
 		TIMER_BLITTER
 	};
 
-	nbmj8688_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	nbmj8688_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_nb1413m3(*this, "nb1413m3")   { }
+		m_nb1413m3(*this, "nb1413m3"),
+		m_lcdc0(*this, "lcdc0"),
+		m_lcdc1(*this, "lcdc1")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
+	optional_device<hd61830_device> m_lcdc0;
+	optional_device<hd61830_device> m_lcdc1;
 
 	int m_mjsikaku_scrolly;
 	int m_blitter_destx;
@@ -34,9 +40,6 @@ public:
 	bitmap_ind16 *m_mjsikaku_tmpbitmap;
 	UINT16 *m_mjsikaku_videoram;
 	UINT8 *m_clut;
-	UINT8 *m_HD61830B_ram[2];
-	int m_HD61830B_instr[2];
-	int m_HD61830B_addr[2];
 	int m_mjsikaku_flipscreen_old;
 	DECLARE_READ8_MEMBER(ff_r);
 	DECLARE_WRITE8_MEMBER(barline_output_w);
@@ -49,11 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER(secolove_romsel_w);
 	DECLARE_WRITE8_MEMBER(crystalg_romsel_w);
 	DECLARE_WRITE8_MEMBER(seiha_romsel_w);
-	DECLARE_WRITE8_MEMBER(nbmj8688_HD61830B_0_instr_w);
-	DECLARE_WRITE8_MEMBER(nbmj8688_HD61830B_1_instr_w);
 	DECLARE_WRITE8_MEMBER(nbmj8688_HD61830B_both_instr_w);
-	DECLARE_WRITE8_MEMBER(nbmj8688_HD61830B_0_data_w);
-	DECLARE_WRITE8_MEMBER(nbmj8688_HD61830B_1_data_w);
 	DECLARE_WRITE8_MEMBER(nbmj8688_HD61830B_both_data_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 	void mjsikaku_vramflip();
@@ -66,6 +65,7 @@ public:
 	DECLARE_PALETTE_INIT(mbmj8688_12bit);
 	DECLARE_VIDEO_START(mbmj8688_pure_16bit_LCD);
 	DECLARE_PALETTE_INIT(mbmj8688_16bit);
+	DECLARE_PALETTE_INIT(mbmj8688_lcd);
 	DECLARE_VIDEO_START(mbmj8688_8bit);
 	DECLARE_PALETTE_INIT(mbmj8688_8bit);
 	DECLARE_VIDEO_START(mbmj8688_hybrid_16bit);
@@ -74,15 +74,11 @@ public:
 	DECLARE_READ8_MEMBER(dipsw1_r);
 	DECLARE_READ8_MEMBER(dipsw2_r);
 	UINT32 screen_update_mbmj8688(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_mbmj8688_lcd0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_mbmj8688_lcd1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_pixel(int x, int y);
 	void writeram_low(int x, int y, int color);
 	void writeram_high(int x, int y, int color);
 	void mbmj8688_gfxdraw(int gfxtype);
 	void common_video_start();
-	void nbmj8688_HD61830B_instr_w(address_space &space,int offset,int data,int chip);
-	void nbmj8688_HD61830B_data_w(address_space &space,int offset,int data,int chip);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
