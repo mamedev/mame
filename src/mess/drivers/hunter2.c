@@ -10,7 +10,8 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-
+#include "video/hd61830.h"
+#include "rendlay.h"
 
 class hunter2_state : public driver_device
 {
@@ -22,6 +23,7 @@ public:
 
 	DECLARE_DRIVER_INIT(hunter2);
 	DECLARE_WRITE8_MEMBER(porte0_w);
+	DECLARE_PALETTE_INIT(hunter2);
 
 private:
 	virtual void machine_reset();
@@ -39,6 +41,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(hunter2_io, AS_IO, 8, hunter2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("lcdc", hd61830_device, data_r, data_w)
+	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("lcdc", hd61830_device, status_r, control_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(porte0_w)
 ADDRESS_MAP_END
 
@@ -111,11 +115,28 @@ DRIVER_INIT_MEMBER( hunter2_state, hunter2 )
 	membank("bankw2")->configure_entries(16, 16, &ram[0x08000], 0xc000);
 }
 
+PALETTE_INIT_MEMBER(hunter2_state, hunter2)
+{
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
+}
+
 static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, 4000000)
 	MCFG_CPU_PROGRAM_MAP(hunter2_mem)
 	MCFG_CPU_IO_MAP(hunter2_io)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(80)
+	MCFG_SCREEN_UPDATE_DEVICE("lcdc", hd61830_device, screen_update)
+	MCFG_SCREEN_SIZE(280, 90)
+	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 69)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(hunter2_state, hunter2)
+	MCFG_DEVICE_ADD("lcdc", HD61830, XTAL_4_9152MHz/2/2) // unknown clock
 MACHINE_CONFIG_END
 
 /* ROM definition */
