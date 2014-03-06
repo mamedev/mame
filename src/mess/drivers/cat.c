@@ -1191,9 +1191,9 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(cat_state, cat_duart_output))
 
 	MCFG_CENTRONICS_ADD("ctx", centronics_printers, "image")
+	//MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, prn_ack_ff)) // FINISH ME
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, ip1_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, ip4_w)) 
-
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, ip4_w)) MCFG_DEVCB_XOR(1)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
