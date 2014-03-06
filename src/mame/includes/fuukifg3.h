@@ -23,7 +23,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_spriteram(*this, "spriteram"),
-		m_paletteram(*this, "paletteram"),
 		m_vregs(*this, "vregs"),
 		m_priority(*this, "priority"),
 		m_tilebank(*this, "tilebank"),
@@ -36,7 +35,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr_array<UINT32,4> m_vram;
 	required_shared_ptr<UINT32> m_spriteram;
-	required_shared_ptr<UINT32> m_paletteram;
 	required_shared_ptr<UINT32> m_vregs;
 	required_shared_ptr<UINT32> m_priority;
 	required_shared_ptr<UINT32> m_tilebank;
@@ -59,7 +57,6 @@ public:
 	required_device<palette_device> m_palette;
 	
 	
-	DECLARE_WRITE32_MEMBER(paletteram32_xRRRRRGGGGGBBBBB_dword_w);
 	DECLARE_READ32_MEMBER(snd_020_r);
 	DECLARE_WRITE32_MEMBER(snd_020_w);
 	DECLARE_WRITE32_MEMBER(fuuki32_vregs_w);

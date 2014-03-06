@@ -45,10 +45,6 @@ public:
 	int m_debugsprites;
 	int m_show_unknown;
 	UINT16 *m_spriteram;
-	DECLARE_WRITE16_MEMBER(bigrun_paletteram16_w);
-	DECLARE_WRITE16_MEMBER(cischeat_paletteram16_w);
-	DECLARE_WRITE16_MEMBER(f1gpstar_paletteram16_w);
-	DECLARE_WRITE16_MEMBER(scudhamm_paletteram16_w);
 	DECLARE_WRITE16_MEMBER(scudhamm_motor_command_w);
 	DECLARE_WRITE16_MEMBER(scudhamm_leds_w);
 	DECLARE_WRITE16_MEMBER(scudhamm_enable_w);
