@@ -35,8 +35,6 @@ public:
 		m_bg_2_videoram(*this, "bg_videoram_2"),
 		m_attr_videoram(*this, "attr_videoram"),
 		m_attr_2_videoram(*this, "attr_videoram_2"),
-		m_paletteram_1(*this, "paletteram_1"),
-		m_paletteram_2(*this, "paletteram_2"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
@@ -49,8 +47,6 @@ public:
 	required_shared_ptr<UINT16> m_attr_videoram;
 	required_shared_ptr<UINT16> m_attr_2_videoram;
 
-	required_shared_ptr<UINT16> m_paletteram_1;
-	required_shared_ptr<UINT16> m_paletteram_2;
 
 	DECLARE_WRITE16_MEMBER(fresh_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(fresh_attr_videoram_w);
@@ -59,8 +55,6 @@ public:
 	DECLARE_WRITE16_MEMBER(fresh_attr_2_videoram_w);
 	TILE_GET_INFO_MEMBER(get_fresh_bg_2_tile_info);
 
-	DECLARE_WRITE16_MEMBER(fresh_paletteram_1_w);
-	DECLARE_WRITE16_MEMBER(fresh_paletteram_2_w);
 
 	UINT16 m_d30000_value;
 
@@ -85,7 +79,6 @@ public:
 	{
 		logerror("c76000_write (scroll 3) %04x (m_d30000_value = %04x)\n", data, m_d30000_value);
 	}
-	void update_palette(int offset);
 
 	DECLARE_READ16_MEMBER( unk_r )
 	{
@@ -151,27 +144,6 @@ WRITE16_MEMBER(fresh_state::fresh_attr_2_videoram_w)
 }
 
 
-void fresh_state::update_palette( int offset )
-{
-	UINT16 pal1 = m_paletteram_1[offset];
-	UINT8 pal2 = m_paletteram_2[offset];
-
-	m_palette->set_pen_color(offset,rgb_t(pal1&0xff,(pal1>>8)&0xff,pal2));
-}
-
-WRITE16_MEMBER(fresh_state::fresh_paletteram_1_w)
-{
-	COMBINE_DATA(&m_paletteram_1[offset]);
-	update_palette(offset);
-}
-
-WRITE16_MEMBER(fresh_state::fresh_paletteram_2_w)
-{
-	COMBINE_DATA(&m_paletteram_2[offset]);
-	update_palette(offset);
-}
-
-
 
 
 void fresh_state::video_start()
@@ -214,8 +186,8 @@ static ADDRESS_MAP_START( fresh_map, AS_PROGRAM, 16, fresh_state )
 
 
 	// written together
-	AM_RANGE(0xC40000, 0xC417ff) AM_RAM_WRITE(fresh_paletteram_1_w) AM_SHARE( "paletteram_1" ) // 16-bit
-	AM_RANGE(0xC50000, 0xC517ff) AM_RAM_WRITE(fresh_paletteram_2_w) AM_SHARE( "paletteram_2" ) // 8-bit
+	AM_RANGE(0xC40000, 0xC417ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xC50000, 0xC517ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 
 //  AM_RANGE(0xD00000, 0xD00001) AM_RAM
 //  AM_RANGE(0xD10000, 0xD10001) AM_RAM
@@ -629,6 +601,8 @@ static MACHINE_CONFIG_START( fresh, fresh_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fresh_state, screen_update_fresh)
 
 	MCFG_PALETTE_ADD("palette", 0x1000) // or 0xc00
+	MCFG_PALETTE_FORMAT(XBGR)
+
 	MCFG_GFXDECODE_ADD("gfxdecode", fresh)
 
 	/* sound hw? */

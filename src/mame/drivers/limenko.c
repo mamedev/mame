@@ -62,7 +62,6 @@ public:
 	int m_prev_sprites_count;
 	UINT8 m_spotty_sound_cmd;
 	DECLARE_WRITE32_MEMBER(limenko_coincounter_w);
-	DECLARE_WRITE32_MEMBER(limenko_paletteram_w);
 	DECLARE_WRITE32_MEMBER(bg_videoram_w);
 	DECLARE_WRITE32_MEMBER(md_videoram_w);
 	DECLARE_WRITE32_MEMBER(fg_videoram_w);
@@ -109,23 +108,7 @@ WRITE32_MEMBER(limenko_state::limenko_coincounter_w)
 	coin_counter_w(machine(),0,data & 0x10000);
 }
 
-WRITE32_MEMBER(limenko_state::limenko_paletteram_w)
-{
-	UINT16 paldata;
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	if(ACCESSING_BITS_0_15)
-	{
-		paldata = m_generic_paletteram_32[offset] & 0x7fff;
-		m_palette->set_pen_color(offset * 2 + 1, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
-	}
-
-	if(ACCESSING_BITS_16_31)
-	{
-		paldata = (m_generic_paletteram_32[offset] >> 16) & 0x7fff;
-		m_palette->set_pen_color(offset * 2 + 0, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
-	}
-}
 
 WRITE32_MEMBER(limenko_state::bg_videoram_w)
 {
@@ -234,7 +217,7 @@ static ADDRESS_MAP_START( limenko_map, AS_PROGRAM, 32, limenko_state )
 	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_SHARE("videoreg")
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
@@ -261,7 +244,7 @@ static ADDRESS_MAP_START( spotty_map, AS_PROGRAM, 32, limenko_state )
 	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_SHARE("videoreg")
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
@@ -770,7 +753,7 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", limenko)
 	MCFG_PALETTE_ADD("palette", 0x1000)
-
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -801,6 +784,7 @@ static MACHINE_CONFIG_START( spotty, limenko_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", limenko)
 	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 
 	/* sound hardware */
