@@ -145,7 +145,6 @@ public:
 			m_oki_2(*this, "oki2") ,
 		m_workram(*this, "workram"),
 		m_vram(*this, "vram"),
-		m_paletteram(*this, "paletteram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") 
 	{
@@ -160,7 +159,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_vram;
-	optional_shared_ptr<UINT32> m_paletteram;
 //  UINT32 *  m_nvram;    // currently this uses generic nvram handling
 
 	/* video-related */
@@ -177,7 +175,6 @@ public:
 	int		  m_toggle;
 	int		  m_xoffset;
 
-	DECLARE_WRITE32_MEMBER(gstream_palette_w);
 	DECLARE_WRITE32_MEMBER(gstream_vram_w);
 	DECLARE_WRITE32_MEMBER(gstream_tilemap1_scrollx_w);
 	DECLARE_WRITE32_MEMBER(gstream_tilemap1_scrolly_w);
@@ -245,19 +242,6 @@ CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_r)
 }
 
 
-WRITE32_MEMBER(gstream_state::gstream_palette_w)
-{
-	COMBINE_DATA(&m_paletteram[offset]);
-
-	m_palette->set_pen_color(offset * 2, pal5bit(m_paletteram[offset] >> (0 + 16)),
-									pal5bit(m_paletteram[offset] >> (6 + 16)),
-									pal5bit(m_paletteram[offset] >> (11 + 16)));
-
-
-	m_palette->set_pen_color(offset * 2 + 1,pal5bit(m_paletteram[offset] >> (0)),
-									pal5bit(m_paletteram[offset] >> (6)),
-									pal5bit(m_paletteram[offset] >> (11)));
-}
 
 WRITE32_MEMBER(gstream_state::gstream_vram_w)
 {
@@ -301,7 +285,7 @@ static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32, gstream_state )
 	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION("user2",0) // main game rom
 	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE(gstream_tilemap3_scrollx_w)
 	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE(gstream_tilemap3_scrolly_w)
-	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x4F800000, 0x4F800003) AM_WRITE(gstream_tilemap1_scrollx_w)
 	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)
@@ -899,6 +883,9 @@ static MACHINE_CONFIG_START( gstream, gstream_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update_gstream)
 
 	MCFG_PALETTE_ADD("palette", 0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
+	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
+
+
 	MCFG_GFXDECODE_ADD("gfxdecode", gstream)
 
 

@@ -130,7 +130,6 @@ public:
 	DECLARE_WRITE32_MEMBER(rabbit_tilemap1_w);
 	DECLARE_WRITE32_MEMBER(rabbit_tilemap2_w);
 	DECLARE_WRITE32_MEMBER(rabbit_tilemap3_w);
-	DECLARE_WRITE32_MEMBER(rabbit_paletteram_dword_w);
 	DECLARE_READ32_MEMBER(rabbit_tilemap0_r);
 	DECLARE_READ32_MEMBER(rabbit_tilemap1_r);
 	DECLARE_READ32_MEMBER(rabbit_tilemap2_r);
@@ -514,17 +513,7 @@ UINT32 rabbit_state::screen_update_rabbit(screen_device &screen, bitmap_ind16 &b
 }
 
 
-WRITE32_MEMBER(rabbit_state::rabbit_paletteram_dword_w)
-{
-	int r,g,b;
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	b = ((m_generic_paletteram_32[offset] & 0x000000ff) >>0);
-	r = ((m_generic_paletteram_32[offset] & 0x0000ff00) >>8);
-	g = ((m_generic_paletteram_32[offset] & 0x00ff0000) >>16);
-
-	m_palette->set_pen_color(offset,rgb_t(r,g,b));
-}
 
 READ32_MEMBER(rabbit_state::rabbit_tilemap0_r)
 {
@@ -736,7 +725,7 @@ static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
 	AM_RANGE(0x488000, 0x48bfff) AM_READWRITE(rabbit_tilemap2_r,rabbit_tilemap2_w)
 	AM_RANGE(0x48c000, 0x48ffff) AM_READWRITE(rabbit_tilemap3_r,rabbit_tilemap3_w)
 	AM_RANGE(0x494000, 0x497fff) AM_RAM AM_SHARE("spriteram") // sprites?
-	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_WRITE(rabbit_paletteram_dword_w) AM_SHARE("paletteram")
+	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -910,6 +899,7 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rabbit_state, screen_update_rabbit)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000)
+	MCFG_PALETTE_FORMAT(XGRB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
