@@ -28,25 +28,24 @@ public:
 	missb2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: bublbobl_state(mconfig, type, tag),
 			m_bgvram(*this, "bgvram"),
-			m_bg_paletteram(*this, "bg_paletteram") { }
+			m_bgpalette(*this, "bgpalette")
+			{ }
 
 	required_shared_ptr<UINT8> m_bgvram;
-	required_shared_ptr<UINT8> m_bg_paletteram;
-	DECLARE_WRITE8_MEMBER(bg_paletteram_RRRRGGGGBBBBxxxx_be_w);
+	required_device<palette_device> m_bgpalette;
 	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_DRIVER_INIT(missb2);
 	DECLARE_MACHINE_START(missb2);
 	DECLARE_MACHINE_RESET(missb2);
-	UINT32 screen_update_missb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(missb2_interrupt);
+	UINT32 screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void configure_banks();
 };
 
 
 /* Video Hardware */
 
-UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 	int sx, sy, xc, yc;
@@ -68,9 +67,9 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_ind16 &b
 	//popmessage("%02x",(*m_bgvram) & 0x1f);
 	for (bg_offs = ((*m_bgvram) << 4); bg_offs < (((*m_bgvram) << 4) | 0xf); bg_offs++)
 	{
-		m_gfxdecode->gfx(1)->opaque(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->opaque(m_bgpalette,bitmap,cliprect,
 				bg_offs,
-				1,
+				0,
 				0,0,
 				0,(bg_offs & 0xf) * 0x10);
 	}
@@ -141,16 +140,6 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-INLINE void bg_changecolor_RRRRGGGGBBBBxxxx( palette_device &palette, pen_t color, int data )
-{
-	palette.set_pen_color(color + 256, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
-}
-
-WRITE8_MEMBER(missb2_state::bg_paletteram_RRRRGGGGBBBBxxxx_be_w)
-{
-	m_bg_paletteram[offset] = data;
-	bg_changecolor_RRRRGGGGBBBBxxxx(m_palette, offset / 2, m_bg_paletteram[offset | 1] | (m_bg_paletteram[offset & ~1] << 8));
-}
 
 WRITE8_MEMBER(missb2_state::missb2_bg_bank_w)
 {
@@ -193,7 +182,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")    // ROM data for the background palette ram
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")    // ROM data for the background palette ram
 	AM_RANGE(0xb000, 0xb1ff) AM_ROM         // banked ???
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(bg_paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("bg_paletteram")
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("bgpalette", palette_device, write) AM_SHARE("bgpalette")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM         // main ???
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(missb2_bg_bank_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP
@@ -422,12 +411,7 @@ WRITE_LINE_MEMBER(missb2_state::irqhandler)
 //  m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-/* Interrupt Generator */
 
-INTERRUPT_GEN_MEMBER(missb2_state::missb2_interrupt)
-{
-	device.execute().set_input_line(0, HOLD_LINE);
-}
 
 /* Machine Driver */
 
@@ -460,7 +444,6 @@ static MACHINE_CONFIG_START( missb2, missb2_state )
 	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)  // 3 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  missb2_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
@@ -476,9 +459,13 @@ static MACHINE_CONFIG_START( missb2, missb2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(missb2_state, screen_update_missb2)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", missb2)
-	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_PALETTE_ADD("bgpalette", 256)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
