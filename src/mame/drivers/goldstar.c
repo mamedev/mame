@@ -12068,33 +12068,32 @@ DRIVER_INIT_MEMBER(goldstar_state, super9)
 
 DRIVER_INIT_MEMBER(goldstar_state, cb3e)
 {
-	int A;
+/*  program bitswap */
+	int i;
 	UINT8 *ROM = memregion("maincpu")->base();
 	do_blockswaps(ROM);
 
-	// a data bitswap
-	for (A = 0;A < 0x10000;A++)
+	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 dat = ROM[A];
-		dat =  BITSWAP8(dat,5,6,3,4,7,2,1,0);
-		ROM[A] = dat;
+		UINT8 dat = ROM[i];
+		dat =  BITSWAP8(dat, 5, 6, 3, 4, 7, 2, 1, 0);
+		ROM[i] = dat;
 	}
 
-	dump_to_file(ROM);
-
-	int i;
+/*  bank 1 graphics */
+//	int i;
 	UINT8 *src = memregion("gfx1")->base();
-	for (i = 0;i < 0x20000;i++)
+	for (i = 0; i < 0x20000; i++)
 	{
-		src[i] = BITSWAP8(src[i], 4,3,2,5,6,1,0,7);		// fixme: find the exact function
+		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);		// OK
 	}
 
+/*  bank 2 graphics */
 	UINT8 *src2 = memregion("gfx2")->base();
-	for (i = 0;i < 0x8000;i++)
+	for (i = 0; i < 0x8000; i++)
 	{
-		src2[i] = BITSWAP8(src2[i], 4,3,2,5,6,1,0,7);	// fixme: swapped by pairs, and inside.
+		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);	// OK
 	}
-
 }
 
 
@@ -12118,7 +12117,7 @@ GAME(  199?, cb3,       ncb3,     ncb3,     ncb3,     goldstar_state, cb3,      
 GAME(  199?, cb3b,      ncb3,     cherrys,  ncb3,     goldstar_state, cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0 )
 GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  goldstar_state, cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)",               GAME_NOT_WORKING)
 GAME(  199?, cb3d,      ncb3,     ncb3,     ncb3,     driver_device,  0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0 )
-GAME(  199?, cb3e,      ncb3,     cb3e,     chrygld,  goldstar_state, cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", GAME_IMPERFECT_GRAPHICS )	// need to decode gfx properly (one channel different)
+GAME(  199?, cb3e,      ncb3,     cb3e,     chrygld,  goldstar_state, cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0 )
 
 GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  driver_device,  0,         ROT0, "Dyna",              "Cherry Master '97",                           GAME_NOT_WORKING) // fix prom decode
 
