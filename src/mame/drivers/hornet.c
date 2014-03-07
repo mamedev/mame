@@ -1089,8 +1089,8 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 	MCFG_K033906_ADD("k033906_2", hornet_k033906_intf_1)
 
 	/* video hardware */
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 65536)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(65536)
 
 	MCFG_DEVICE_REMOVE("screen")
 

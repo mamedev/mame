@@ -2370,8 +2370,8 @@ static MACHINE_CONFIG_DERIVED( pc6001m2, pc6001 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001_state, screen_update_pc6001m2)
 	
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 16+16)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(16+16)
 	MCFG_PALETTE_INIT_OWNER(pc6001_state,pc6001m2)
 
 	/* basic machine hardware */

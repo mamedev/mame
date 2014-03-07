@@ -552,8 +552,8 @@ static MACHINE_CONFIG_DERIVED( ti82, ti81 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("t6a04", t6a04_device, screen_update)
 	
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(2)
 	MCFG_PALETTE_INIT_OWNER(ti85_state, ti82 )
 
 	MCFG_T6A04_ADD("t6a04", ti82_display)
@@ -582,8 +582,8 @@ static MACHINE_CONFIG_DERIVED( ti83, ti81 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("t6a04", t6a04_device, screen_update)
 	
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(2)
 	MCFG_PALETTE_INIT_OWNER(ti85_state, ti82 )
 
 	MCFG_T6A04_ADD("t6a04", ti82_display)
@@ -616,8 +616,8 @@ static MACHINE_CONFIG_DERIVED( ti83p, ti81 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("t6a04", t6a04_device, screen_update)
 	
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(2)
 	MCFG_PALETTE_INIT_OWNER(ti85_state, ti82 )
 
 	MCFG_T6A04_ADD("t6a04", ti82_display)

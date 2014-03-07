@@ -871,8 +871,8 @@ static MACHINE_CONFIG_DERIVED( spaceod, g80r_base )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spaceod)
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 64+64)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
 	MCFG_FRAGMENT_ADD(spaceod_sound_board)
@@ -888,8 +888,8 @@ static MACHINE_CONFIG_DERIVED( monsterb, g80r_base )
 
 	/* background board changes */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 64+64)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
 	MCFG_FRAGMENT_ADD(monsterb_sound_board)
@@ -902,8 +902,8 @@ static MACHINE_CONFIG_DERIVED( pignewt, g80r_base )
 
 	/* background board changes */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 64+64)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
 	MCFG_SEGAUSB_ADD("usbsnd")
@@ -921,8 +921,8 @@ static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", monsterb)
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 64+64)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(64+64)
 
 	/* sound boards */
 

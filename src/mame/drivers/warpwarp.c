@@ -750,8 +750,8 @@ static MACHINE_CONFIG_DERIVED( navarone, geebee )
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 2k)
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 2*2)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(2*2)
 
 	MCFG_PALETTE_INIT_OWNER(warpwarp_state,navarone)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,navarone)
