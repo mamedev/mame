@@ -11407,6 +11407,48 @@ ROM_START( megaline )
 ROM_END
 
 
+/*
+  Win Cherry (ver 0.16 - 19990219)
+
+  1x Z0840006PSC-Z80CPU 8-bit Microprocessor.
+  1x KC89C72            Programmable Sound Generator.
+  1x TDA2003            Audio Amplifier.
+
+  1x 27C256 (ic9) dumped.
+  1x 27C512 (ic2) dumped.
+  1x M27C1001 (ic6) dumped.
+  1x AM27C29PC (not dumped yet).
+
+  1x CY62256LL-70PC Static RAM.
+  1x LP6264D-70LL   Static RAM.
+
+  1x XC9572-PC84AKJ9837 CPLD (read protected).
+  1x XC9572-PC84ASJ9833 CPLD (read protected).
+
+  1x oscillator 12.000 MHz.
+  1x 2x28 JAMMA edge connector.
+  2x pushbutton (MANAG. - STATIS.).
+  1x trimmer (volume).
+  5x 8 DIP switches.
+  1x battery (missing).
+
+*/
+
+ROM_START( wcherry )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wc20%388.ic2",  0x00000, 0x10000, CRC(b1ea0e6a) SHA1(2dd3f2cfffc1e47b45c29daa9d7df7af956b599c) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "wincherryb.ic6",  0x00000, 0x20000, CRC(cace16f5) SHA1(a6caddc6ccd30901e2332a42f339a1da022de410) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "wincherrya.ic9",  0x00000, 0x08000, CRC(919bd692) SHA1(1aeb66f1e4555b731858833445000593e613f74d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27c29pc",      0x00000, 0x0200, BAD_DUMP CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
+ROM_END
+
+
 /*********************************************************************************************************************/
 
 DRIVER_INIT_MEMBER(goldstar_state,goldstar)
@@ -12109,6 +12151,8 @@ GAME(  199?, chrygld,   0,        chrygld,  chrygld,  goldstar_state, chrygld,  
 GAME(  199?, chry10,    0,        chrygld,  chry10,   goldstar_state, chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )	// maybe fullname should be 'Gold Fruit (main 40%)'
 GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING)	// need to decode gfx and see the program loops/reset... 
+GAME(  2001, wcherry,   0,        chrygld,  chry10,   goldstar_state, chry10,    ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            GAME_NOT_WORKING)
+
 
 // are these really dyna, or bootlegs?
 GAME(  199?, ncb3,      0,        ncb3,     ncb3,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0 )
