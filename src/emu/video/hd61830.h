@@ -84,7 +84,7 @@ private:
 
 	void set_busy_flag();
 
-	void draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ra);
+	UINT16 draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ra);
 	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 ma, int x, int y, UINT8 md);
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -49,7 +49,7 @@ const rom_entry *hd61830_device::device_rom_region() const
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
+#define LOG 1
 
 static const int CYCLES[] =
 {
@@ -370,17 +370,20 @@ WRITE8_MEMBER( hd61830_device::data_w )
 //  draw_scanline - draw one graphics scanline
 //-------------------------------------------------
 
-void hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ra)
+UINT16 hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ra)
 {
-	for (int sx = 0; sx < m_hn; sx++)
+	for (int sx = 0; sx < m_hn; sx+=2)
 	{
-		UINT8 data = readbyte(ra++);
+		UINT8 data1 = readbyte(ra++);
+		UINT8 data2 = readbyte(ra++);
 
 		for (int x = 0; x < m_hp; x++)
 		{
-			bitmap.pix16(y, (sx * m_hp) + x) = BIT(data, x);
+			bitmap.pix16(y, (sx * m_hp) + x) = BIT(data1, x);
+			bitmap.pix16(y, (sx * m_hp) + x + m_hp) = BIT(data2, x);
 		}
 	}
+	return ra;
 }
 
 
@@ -390,16 +393,15 @@ void hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &clipre
 
 void hd61830_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	UINT16 rac1 = m_dsa;
+	UINT16 rac2 = rac1 + (m_nx * m_hn);
 	for (int y = 0; y < m_nx; y++)
 	{
-		UINT16 rac1 = m_dsa + (y * m_hn);
-		UINT16 rac2 = rac1 + (m_nx * m_hn);
-
 		/* draw upper half scanline */
-		draw_scanline(bitmap, cliprect, y, rac1);
+		rac1 = draw_scanline(bitmap, cliprect, y, rac1);
 
 		/* draw lower half scanline */
-		draw_scanline(bitmap, cliprect, y + m_nx, rac2);
+		rac2 = draw_scanline(bitmap, cliprect, y + m_nx, rac2);
 	}
 }
 
