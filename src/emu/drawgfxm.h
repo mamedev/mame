@@ -121,6 +121,27 @@ do                                                                              
 while (0)
 
 /*-------------------------------------------------
+    PIXEL_OP_REBASE_OPAQUE - render all pixels
+    regardless of pen, adding 'color' to the
+    pen value
+-------------------------------------------------*/
+
+#define PIXEL_OP_REBASE_OPAQUE(DEST, PRIORITY, SOURCE)                              \
+do                                                                                  \
+{                                                                                   \
+	(DEST) = color + (SOURCE);                                                      \
+}                                                                                   \
+while (0)
+#define PIXEL_OP_REBASE_OPAQUE_PRIORITY(DEST, PRIORITY, SOURCE)                     \
+do                                                                                  \
+{                                                                                   \
+	if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                                  \
+		(DEST) = color + (SOURCE);                                                  \
+	(PRIORITY) = 31;                                                                \
+}                                                                                   \
+while (0)
+
+/*-------------------------------------------------
     PIXEL_OP_REMAP_TRANSPEN - render all pixels
     except those matching 'trans_pen', mapping the
     pen via the 'paldata' array
@@ -202,6 +223,40 @@ do                                                                              
 while (0)
 
 /*-------------------------------------------------
+    PIXEL_OP_REBASE_TRANSMASK - render all pixels
+    except those matching 'trans_mask', adding
+    'color' to the pen value
+-------------------------------------------------*/
+
+#define PIXEL_OP_REBASE_TRANSMASK(DEST, PRIORITY, SOURCE)                           \
+do                                                                                  \
+{                                                                                   \
+	UINT32 srcdata = (SOURCE);                                                      \
+	if (((trans_mask >> srcdata) & 1) == 0)                                         \
+		(DEST) = color + srcdata;                                                   \
+}                                                                                   \
+while (0)
+#define PIXEL_OP_REBASE_TRANSMASK_PRIORITY(DEST, PRIORITY, SOURCE)                  \
+do                                                                                  \
+{                                                                                   \
+	UINT32 srcdata = (SOURCE);                                                      \
+	if (((trans_mask >> srcdata) & 1) == 0)                                         \
+	{                                                                               \
+		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
+			(DEST) = color + srcdata;                                               \
+		(PRIORITY) = 31;                                                            \
+	}                                                                               \
+}                                                                                   \
+while (0)
+
+/*-------------------------------------------------
+    PIXEL_OP_REBASE_TRANSTABLE - look up each pen in
+    'pentable'; if the entry is DRAWMODE_NONE,
+    don't draw it; if the entry is DRAWMODE_SOURCE,
+    add 'color' to the pen value; if the entry is
+    DRAWMODE_SHADOW, generate a shadow of the
+    destination pixel using 'shadowtable'
+
     PIXEL_OP_REMAP_TRANSTABLE - look up each pen in
     'pentable'; if the entry is DRAWMODE_NONE,
     don't draw it; if the entry is DRAWMODE_SOURCE,
@@ -210,7 +265,7 @@ while (0)
     the destination pixel using 'shadowtable'
 -------------------------------------------------*/
 
-#define PIXEL_OP_REMAP_TRANSTABLE16(DEST, PRIORITY, SOURCE)                         \
+#define PIXEL_OP_REBASE_TRANSTABLE16(DEST, PRIORITY, SOURCE)                        \
 do                                                                                  \
 {                                                                                   \
 	UINT32 srcdata = (SOURCE);                                                      \
@@ -218,7 +273,7 @@ do                                                                              
 	if (entry != DRAWMODE_NONE)                                                     \
 	{                                                                               \
 		if (entry == DRAWMODE_SOURCE)                                               \
-			(DEST) = paldata[srcdata];                                              \
+			(DEST) = color + srcdata;                                               \
 		else                                                                        \
 			(DEST) = shadowtable[DEST];                                             \
 	}                                                                               \
@@ -238,7 +293,7 @@ do                                                                              
 	}                                                                               \
 }                                                                                   \
 while (0)
-#define PIXEL_OP_REMAP_TRANSTABLE16_PRIORITY(DEST, PRIORITY, SOURCE)                \
+#define PIXEL_OP_REBASE_TRANSTABLE16_PRIORITY(DEST, PRIORITY, SOURCE)               \
 do                                                                                  \
 {                                                                                   \
 	UINT32 srcdata = (SOURCE);                                                      \
@@ -249,7 +304,7 @@ do                                                                              
 		if (entry == DRAWMODE_SOURCE)                                               \
 		{                                                                           \
 			if (((1 << (pridata & 0x1f)) & pmask) == 0)                             \
-				(DEST) = paldata[srcdata];                                          \
+				(DEST) = color + srcdata;                                           \
 			(PRIORITY) = 31;                                                        \
 		}                                                                           \
 		else if ((pridata & 0x80) == 0 && ((1 << (pridata & 0x1f)) & pmask) == 0)   \
