@@ -89,16 +89,17 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
-#include "sound/ymf271.h"
 #include "rendlay.h"
+#include "sound/ymf271.h"
+#include "includes/ms32.h"
 #include "machine/jalcrpt.h"
 
 
-class bnstars_state : public driver_device
+class bnstars_state : public ms32_state
 {
 public:
 	bnstars_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: ms32_state(mconfig, type, tag),
 			m_ms32_tx0_ram(*this, "tx0_ram"),
 			m_ms32_tx1_ram(*this, "tx1_ram"),
 			m_ms32_bg0_ram(*this, "bg0_ram"),
@@ -111,11 +112,7 @@ public:
 			m_ms32_tx0_scroll(*this, "tx0_scroll"),
 			m_ms32_bg0_scroll(*this, "bg0_scroll"),
 			m_ms32_tx1_scroll(*this, "tx1_scroll"),
-			m_ms32_bg1_scroll(*this, "bg1_scroll") ,
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+			m_ms32_bg1_scroll(*this, "bg1_scroll")  { }
 
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];
@@ -134,10 +131,6 @@ public:
 	required_shared_ptr<UINT32> m_ms32_tx1_scroll;
 	required_shared_ptr<UINT32> m_ms32_bg1_scroll;
 	UINT32 m_bnstars1_mahjong_select;
-	int m_ms32_reverse_sprite_order;
-	int m_flipscreen;
-	UINT32 m_to_main;
-	UINT16 m_irqreq;
 	DECLARE_WRITE32_MEMBER(ms32_tx0_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_tx1_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_bg0_ram_w);
@@ -146,18 +139,8 @@ public:
 	DECLARE_WRITE32_MEMBER(ms32_roz1_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_pal0_ram_w);
 	DECLARE_WRITE32_MEMBER(ms32_pal1_ram_w);
-	DECLARE_WRITE32_MEMBER(ms32_spramx_w);
 	DECLARE_READ32_MEMBER(bnstars1_r);
-	DECLARE_READ32_MEMBER(bnstars2_r);
-	DECLARE_READ32_MEMBER(bnstars3_r);
 	DECLARE_WRITE32_MEMBER(bnstars1_mahjong_select_w);
-	DECLARE_WRITE32_MEMBER(ms32_sound_w);
-	DECLARE_READ32_MEMBER(ms32_sound_r);
-	DECLARE_WRITE32_MEMBER(reset_sub_w);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(ms32_snd_bank_w);
-	DECLARE_WRITE8_MEMBER(to_main_w);
-	void configure_banks();
 	DECLARE_DRIVER_INIT(bnstars);
 	TILE_GET_INFO_MEMBER(get_ms32_tx0_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_tx1_tile_info);
@@ -169,17 +152,9 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(ms32_interrupt);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int chip);
 	void update_color(int color, int screen);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size, int region);
-	void irq_init();
-	void irq_raise(int level);
-	IRQ_CALLBACK_MEMBER(irq_callback);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 
@@ -443,14 +418,14 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	const UINT32    *finish = sprram_top + (sprram_size - 0x10) / 4;
 
 
-	if (m_ms32_reverse_sprite_order == 1)
+	if (m_reverse_sprite_order == 1)
 	{
 		source  = sprram_top + (sprram_size - 0x10) / 4;
 		finish  = sprram_top;
 	}
 
 
-	for (;m_ms32_reverse_sprite_order ? (source>=finish) : (source<finish); m_ms32_reverse_sprite_order ? (source-=4) : (source+=4))
+	for (;m_reverse_sprite_order ? (source>=finish) : (source<finish); m_reverse_sprite_order ? (source-=4) : (source+=4))
 	{
 		attr    =   source[ 0 ];
 
@@ -518,13 +493,6 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 				sx,sy,
 				xzoom, yzoom, screen.priority(),pri_mask, 0);
 	}   /* end sprite loop */
-}
-
-
-
-WRITE32_MEMBER(bnstars_state::ms32_spramx_w)
-{
-	COMBINE_DATA(&m_ms32_spram[offset]);
 }
 
 
@@ -1280,58 +1248,12 @@ READ32_MEMBER(bnstars_state::bnstars1_r)
 	}
 }
 
-READ32_MEMBER(bnstars_state::bnstars2_r)
-{
-	return ioport("IN4")->read();
-}
-
-READ32_MEMBER(bnstars_state::bnstars3_r)
-{
-	return ioport("IN5")->read();
-}
-
 WRITE32_MEMBER(bnstars_state::bnstars1_mahjong_select_w)
 {
 	m_bnstars1_mahjong_select = data;
 //  printf("%08x\n",m_bnstars1_mahjong_select);
 }
 
-WRITE32_MEMBER(bnstars_state::ms32_sound_w)
-{
-	soundlatch_byte_w(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-
-	// give the Z80 time to respond
-	space.device().execute().spin_until_time(attotime::from_usec(40));
-}
-
-READ32_MEMBER(bnstars_state::ms32_sound_r)
-{
-	return m_to_main^0xff;
-}
-
-WRITE32_MEMBER(bnstars_state::reset_sub_w)
-{
-	if(data) m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
-}
-
-READ8_MEMBER(bnstars_state::latch_r)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_byte_r(space,0)^0xff;
-}
-
-WRITE8_MEMBER(bnstars_state::ms32_snd_bank_w)
-{
-	membank("bank4")->set_entry((data >> 0) & 0x0F);
-	membank("bank5")->set_entry((data >> 4) & 0x0F);
-}
-
-WRITE8_MEMBER(bnstars_state::to_main_w)
-{
-	m_to_main=data;
-	irq_raise(1);
-}
 
 static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
@@ -1339,8 +1261,8 @@ static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE(ms32_sound_w)
 	
 	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ(bnstars1_r )
-	AM_RANGE(0xfcc00008, 0xfcc0000b) AM_READ(bnstars2_r )
-	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ(bnstars3_r )
+	AM_RANGE(0xfcc00008, 0xfcc0000b) AM_READ_PORT("IN4")
+	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ_PORT("IN5")
 
 	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITENOP
 	AM_RANGE(0xfce00038, 0xfce0003b) AM_WRITE(reset_sub_w)
@@ -1368,7 +1290,7 @@ static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0xfd400000, 0xfd437fff) AM_RAM_WRITE(ms32_pal0_ram_w) AM_SHARE("pal_ram.0")
 	AM_RANGE(0xfe000000, 0xfe01ffff) AM_RAM_WRITE(ms32_roz1_ram_w) AM_SHARE("roz1_ram")
 	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM_WRITE(ms32_roz0_ram_w) AM_SHARE("roz0_ram")
-	AM_RANGE(0xfe800000, 0xfe83ffff) AM_RAM_WRITE(ms32_spramx_w) AM_SHARE("spram")
+	AM_RANGE(0xfe800000, 0xfe83ffff) AM_RAM AM_SHARE("spram")
 	AM_RANGE(0xfea00000, 0xfea07fff) AM_RAM_WRITE(ms32_tx1_ram_w) AM_SHARE("tx1_ram")
 	AM_RANGE(0xfea08000, 0xfea0ffff) AM_RAM_WRITE(ms32_bg1_ram_w) AM_SHARE("bg1_ram")
 	AM_RANGE(0xfec00000, 0xfec07fff) AM_RAM_WRITE(ms32_tx0_ram_w) AM_SHARE("tx0_ram")
@@ -1390,53 +1312,6 @@ static ADDRESS_MAP_START( bnstars_sound_map, AS_PROGRAM, 8, bnstars_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank4")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
-
-IRQ_CALLBACK_MEMBER(bnstars_state::irq_callback)
-{
-	int i;
-	for(i=15; i>=0 && !(m_irqreq & (1<<i)); i--);
-	m_irqreq &= ~(1<<i);
-	if(!m_irqreq)
-		device.execute().set_input_line(0, CLEAR_LINE);
-	return i;
-}
-
-void bnstars_state::irq_init()
-{
-	m_irqreq = 0;
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(bnstars_state::irq_callback),this));
-}
-
-void bnstars_state::irq_raise(int level)
-{
-	m_irqreq |= (1<<level);
-	m_maincpu->set_input_line(0, ASSERT_LINE);
-}
-
-/* TODO: fix this arrangement (derived from old deprecat lib) */
-TIMER_DEVICE_CALLBACK_MEMBER(bnstars_state::ms32_interrupt)
-{
-	int scanline = param;
-	if( scanline == 0 ) irq_raise(10);
-	if( scanline == 8)  irq_raise(9);
-	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
-	   kirarast needs it too, at least 8 per frame, but waits for a variable amount
-	   47pi2 needs ?? per frame (otherwise it hangs when you lose)
-	   in different points. Could this be a raster interrupt?
-	   Other games using it but not needing it to work:
-	   desertwr
-	   p47aces
-	   */
-	if( (scanline % 8) == 0 && scanline <= 224 ) irq_raise(0);
-}
-
-void bnstars_state::configure_banks()
-{
-	save_item(NAME(m_to_main));
-	membank("bank4")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x14000, 0x4000);
-	membank("bank5")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x14000, 0x4000);
-}
 
 void bnstars_state::machine_reset()
 {
