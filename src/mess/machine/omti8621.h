@@ -78,6 +78,10 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
+	virtual UINT8 dack_r(int line);
+	virtual void dack_w(int line, UINT8 data);
+	virtual void eop_w(int state);
+
 	void set_interrupt(enum line_state line_state);
 
 private:

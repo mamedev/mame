@@ -1249,6 +1249,21 @@ void omti8621_device::fdc_drq_w(bool state)
 	m_isa->drq2_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+UINT8 omti8621_device::dack_r(int line)
+{
+	return m_fdc->dma_r();
+}
+
+void omti8621_device::dack_w(int line, UINT8 data)
+{
+	return m_fdc->dma_w(data);
+}
+
+void omti8621_device::eop_w(int state)
+{
+	m_fdc->tc_w(state == ASSERT_LINE);
+}
+
 //##########################################################################
 
 // device type definition
