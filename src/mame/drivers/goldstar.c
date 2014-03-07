@@ -11514,8 +11514,7 @@ ROM_END
   1x CY62256LL-70PC Static RAM.
   1x LP6264D-70LL   Static RAM.
 
-  1x XC9572-PC84AKJ9837 CPLD (read protected).
-  1x XC9572-PC84ASJ9833 CPLD (read protected).
+  2x Xilinx XC9572-PC84 CPLD's (read protected).
 
   1x oscillator 12.000 MHz.
   1x 2x28 JAMMA edge connector.
