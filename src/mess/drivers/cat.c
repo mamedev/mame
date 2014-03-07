@@ -345,9 +345,10 @@ ToDo:
 #undef DEBUG_MODEM_W
 
 #undef DEBUG_DUART_OUTPUT_LINES
-#undef DEBUG_DUART_INPUT_LINES
-#undef DEBUG_DUART_TXD
-// TODO: the duart irq handler doesn't work because there was no easy way to strobe the duart to force it to check its inputs; now with devcb there is, but it hasn't been hooked up yet
+// data sent to rs232 port
+#undef DEBUG_DUART_TXA
+// data sent to modem chip
+#undef DEBUG_DUART_TXB
 #undef DEBUG_DUART_IRQ_HANDLER
 
 #undef DEBUG_TEST_W
@@ -405,13 +406,14 @@ public:
 	required_device<cpu_device> m_maincpu;
 	//optional_device<nvram_device> m_nvram;
 	optional_device<duartn68681_device> m_duart; // only cat uses this
-	optional_device<centronics_device> m_ctx;	// cat only?
-	optional_device<output_latch_device> m_ctx_data_out; // cat only?
+	optional_device<centronics_device> m_ctx;
+	optional_device<output_latch_device> m_ctx_data_out;
 	optional_device<acia6850_device> m_acia6850; // only swyft uses this
 	optional_device<via6522_device> m_via0; // only swyft uses this
 	optional_device<via6522_device> m_via1; // only swyft uses this
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
+	DECLARE_WRITE_LINE_MEMBER(cat_duart_txb);
 	DECLARE_WRITE8_MEMBER(cat_duart_output);
 	optional_device<speaker_sound_device> m_speaker;
 	optional_shared_ptr<UINT16> m_svram;
@@ -1130,10 +1132,17 @@ WRITE_LINE_MEMBER(cat_state::cat_duart_irq_handler)
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, irqvector);
 }
 
-WRITE_LINE_MEMBER(cat_state::cat_duart_txa)
+WRITE_LINE_MEMBER(cat_state::cat_duart_txa) // semit sends stuff here; connects to the serial port on the back
 {
-#ifdef DEBUG_DUART_TXD
-	fprintf(stderr, "Duart TXD: data %02X\n", data);
+#ifdef DEBUG_DUART_TXA
+	fprintf(stderr, "Duart TXA: data %02X\n", state);
+#endif
+}
+
+WRITE_LINE_MEMBER(cat_state::cat_duart_txb) // memit sends stuff here; connects to the modem chip
+{
+#ifdef DEBUG_DUART_TXB
+	fprintf(stderr, "Duart TXB: data %02X\n", state);
 #endif
 }
 
@@ -1188,12 +1197,13 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_DUARTN68681_ADD( "duartn68681", (XTAL_19_968MHz*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(cat_state, cat_duart_irq_handler))
 	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
+	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txb))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(cat_state, cat_duart_output))
 
 	MCFG_CENTRONICS_ADD("ctx", centronics_printers, "image")
 	//MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, prn_ack_ff)) // FINISH ME
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, ip1_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, ip4_w)) MCFG_DEVCB_XOR(1)
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, ip4_w))// MCFG_DEVCB_XOR(1)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
