@@ -17,9 +17,9 @@
 #include "machine/ins8250.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
-#include "machine/i82371ab.h"
-#include "machine/i82371sb.h"
-#include "machine/i82439tx.h"
+#include "bus/pci/i82371ab.h"
+#include "bus/pci/i82371sb.h"
+#include "bus/pci/i82439tx.h"
 #include "machine/cs8221.h"
 #include "machine/pit8253.h"
 #include "video/pc_cga.h"
@@ -29,7 +29,7 @@
 
 #include "imagedev/harddriv.h"
 #include "machine/am9517a.h"
-#include "machine/pci.h"
+#include "bus/pci/pci.h"
 
 #include "sound/dac.h"
 #include "sound/speaker.h"

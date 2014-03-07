@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    machine/mpc105.h
+    mpc105.h
 
     Motorola MPC105 PCI bridge
 
@@ -9,7 +9,7 @@
 #ifndef MPC105_H
 #define MPC105_H
 
-#include "machine/pci.h"
+#include "pci.h"
 
 #define MPC105_MEMORYBANK_COUNT     8
 

@@ -418,7 +418,6 @@ MACHINES += NMC9306
 MACHINES += NSCSI
 MACHINES += PCCARD
 MACHINES += PCF8593
-MACHINES += PCI
 MACHINES += PCKEYBRD
 MACHINES += PD4990A_OLD
 MACHINES += PIC8259
@@ -485,6 +484,7 @@ MACHINES += PC_LPT
 MACHINES += PC_FDC
 MACHINES += DP8390
 MACHINES += MPU401
+MACHINES += AT_KEYBC
 #MACHINES += PROFILE
 
 #-------------------------------------------------
@@ -512,6 +512,7 @@ BUSES += ISBX
 BUSES += KC
 BUSES += MIDI
 BUSES += NUBUS
+BUSES += PCI
 BUSES += PC_JOY
 BUSES += PC_KBD
 BUSES += PET
@@ -648,7 +649,6 @@ DRVLIBS += \
 	$(MESSOBJ)/parker.a \
 	$(MESSOBJ)/pc.a \
 	$(MESSOBJ)/pc9801.a \
-	$(MESSOBJ)/pcshare.a \
 	$(MESSOBJ)/pdp1.a \
 	$(MESSOBJ)/pel.a \
 	$(MESSOBJ)/philips.a \
@@ -811,7 +811,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/kr2376.o    \
 	$(MESS_MACHINE)/mb8795.o    \
 	$(MESS_MACHINE)/microdrv.o  \
-	$(MESS_MACHINE)/mpc105.o    \
 	$(MESS_MACHINE)/msm6222b.o  \
 	$(MESS_MACHINE)/ncr5380.o   \
 	$(MESS_MACHINE)/ncr5390.o   \
@@ -955,7 +954,6 @@ $(MESSOBJ)/ascii.a:             \
 	$(MESS_MACHINE)/msx_slot.o  \
 
 $(MESSOBJ)/at.a:                \
-	$(MESS_MACHINE)/at_keybc.o  \
 	$(MESS_MACHINE)/cs8221.o    \
 	$(MESS_MACHINE)/at.o        \
 	$(MESS_DRIVERS)/at.o        \
@@ -1639,13 +1637,6 @@ $(MESSOBJ)/pc9801.a:            \
 	$(MESS_MACHINE)/pc9801_118.o\
 	$(MESS_MACHINE)/pc9801_cbus.o   \
 	$(MESS_MACHINE)/pc9801_kbd.o\
-
-$(MESSOBJ)/pcshare.a:           \
-	$(MESS_MACHINE)/i82371ab.o  \
-	$(MESS_MACHINE)/i82371sb.o  \
-	$(MESS_MACHINE)/i82439tx.o  \
-	$(MESS_MACHINE)/northbridge.o \
-	$(MESS_MACHINE)/southbridge.o \
 
 $(MESSOBJ)/pdp1.a:              \
 	$(MESS_VIDEO)/pdp1.o        \

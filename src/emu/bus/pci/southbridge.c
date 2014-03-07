@@ -6,7 +6,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/southbridge.h"
+#include "southbridge.h"
 #include "bus/pc_kbd/keyboards.h"
 
 

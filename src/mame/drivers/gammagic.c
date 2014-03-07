@@ -64,7 +64,7 @@ static ADDRESS_MAP_START( gammagic_io, AS_IO, 32, gammagic_state)
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 	AM_RANGE(0x0400, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
@@ -131,7 +131,7 @@ static MACHINE_CONFIG_START( gammagic, gammagic_state )
 
 //  MCFG_I82371SB_ADD("i82371sb")
 //  MCFG_I82439TX_ADD("i82439tx", "maincpu", "user")
-	MCFG_PCI_BUS_ADD("pcibus", 0)
+	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 //  MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
 //  MCFG_PCI_BUS_DEVICE(1, "i82371sb", i82371sb_pci_read, i82371sb_pci_write)
 	/* video hardware */

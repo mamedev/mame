@@ -45,6 +45,7 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/isa \
 	$(EMUOBJ)/bus/isbx \
 	$(EMUOBJ)/bus/midi \
+	$(EMUOBJ)/bus/pci \
 	$(EMUOBJ)/bus/pc_joy \
 	$(EMUOBJ)/bus/pc_kbd \
 	$(EMUOBJ)/bus/pet \

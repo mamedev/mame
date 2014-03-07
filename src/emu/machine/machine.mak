@@ -1652,3 +1652,11 @@ ifneq ($(filter MPU401,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/mpu401.o
 endif
 
+#-------------------------------------------------
+#
+#@src/emu/machine/at_keybc.h,MACHINES += AT_KEYBC
+#-------------------------------------------------
+
+ifneq ($(filter AT_KEYBC,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/at_keybc.o
+endif

@@ -667,3 +667,19 @@ BUSOBJS += $(BUSOBJ)/midi/midi.o
 BUSOBJS += $(BUSOBJ)/midi/midiinport.o
 BUSOBJS += $(BUSOBJ)/midi/midioutport.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/pci/pci.h,BUSES += PCI
+#-------------------------------------------------
+
+ifneq ($(filter PCI,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/pci/pci.o
+BUSOBJS += $(BUSOBJ)/pci/i82371ab.o
+BUSOBJS += $(BUSOBJ)/pci/i82371sb.o
+BUSOBJS += $(BUSOBJ)/pci/i82439tx.o
+BUSOBJS += $(BUSOBJ)/pci/northbridge.o
+BUSOBJS += $(BUSOBJ)/pci/southbridge.o
+BUSOBJS += $(BUSOBJ)/pci/mpc105.o
+endif
+

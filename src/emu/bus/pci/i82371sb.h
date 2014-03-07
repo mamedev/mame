@@ -9,8 +9,8 @@
 #ifndef __I82371SB_H__
 #define __I82371SB_H__
 
-#include "machine/pci.h"
-#include "machine/southbridge.h"
+#include "pci.h"
+#include "southbridge.h"
 
 // ======================> i82371sb_device
 

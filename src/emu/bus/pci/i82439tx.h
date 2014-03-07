@@ -9,8 +9,8 @@
 #ifndef __I82439TX_H__
 #define __I82439TX_H__
 
-#include "machine/pci.h"
-#include "machine/northbridge.h"
+#include "pci.h"
+#include "northbridge.h"
 
 #define MCFG_I82439TX_CPU( _tag ) \
 	i82439tx_device::static_set_cpu(*device, _tag);

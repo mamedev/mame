@@ -14,7 +14,7 @@
 #include "machine/at_keybc.h"
 
 #include "imagedev/harddriv.h"
-#include "machine/pci.h"
+#include "pci.h"
 
 #include "sound/dac.h"
 #include "sound/speaker.h"

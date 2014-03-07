@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    machine/pci.c
+    pci.c
 
     PCI bus
 
@@ -70,7 +70,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/pci.h"
+#include "pci.h"
 
 #define LOG_PCI 0
 
@@ -78,23 +78,21 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PCI_BUS_LEGACY = &device_creator<pci_bus_legacy_device>;
+const device_type PCI_BUS = &device_creator<pci_bus_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  pci_bus_legacy_device - constructor
+//  pci_bus_device - constructor
 //-------------------------------------------------
-pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PCI_BUS_LEGACY, "PCI Bus Legacy", tag, owner, clock, "pci_bus_legacy", __FILE__),
+pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock, "pci_bus", __FILE__),
 		m_father(NULL)
 {
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {
 		m_devtag[i]= NULL;
-		m_read_callback[i] = NULL;
-		m_write_callback[i] = NULL;
 	}
 	m_siblings_count = 0;
 }
@@ -103,7 +101,7 @@ pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, cons
     INLINE FUNCTIONS
 ***************************************************************************/
 
-READ32_MEMBER( pci_bus_legacy_device::read )
+READ32_MEMBER( pci_bus_device::read )
 {
 	UINT32 result = 0xffffffff;
 	int function, reg;
@@ -119,12 +117,11 @@ READ32_MEMBER( pci_bus_legacy_device::read )
 		case 1:
 			if (m_devicenum != -1)
 			{
-				pci_read_func read = m_busnumaddr->m_read_callback[m_devicenum];
-				if (read != NULL)
+				if (m_busnumaddr->m_device[m_devicenum] != NULL)
 				{
 					function = (m_address >> 8) & 0x07;
 					reg = (m_address >> 0) & 0xfc;
-					result = (*read)(m_busnumaddr, m_busnumaddr->m_device[m_devicenum], function, reg, mem_mask);
+					result = m_busnumaddr->m_device[m_devicenum]->pci_read(m_busnumaddr, function, reg, mem_mask);
 				}
 			}
 			break;
@@ -138,10 +135,10 @@ READ32_MEMBER( pci_bus_legacy_device::read )
 
 
 
-pci_bus_legacy_device *pci_bus_legacy_device::pci_search_bustree(int busnum, int devicenum, pci_bus_legacy_device *pcibus)
+pci_bus_device *pci_bus_device::pci_search_bustree(int busnum, int devicenum, pci_bus_device *pcibus)
 {
 	int a;
-	pci_bus_legacy_device *ret;
+	pci_bus_device *ret;
 
 	if (pcibus->m_busnum == busnum)
 	{
@@ -158,7 +155,7 @@ pci_bus_legacy_device *pci_bus_legacy_device::pci_search_bustree(int busnum, int
 
 
 
-WRITE32_MEMBER( pci_bus_legacy_device::write )
+WRITE32_MEMBER( pci_bus_device::write )
 {
 	offset %= 2;
 
@@ -191,12 +188,11 @@ WRITE32_MEMBER( pci_bus_legacy_device::write )
 		case 1:
 			if (m_devicenum != -1)
 			{
-				pci_write_func write = m_busnumaddr->m_write_callback[m_devicenum];
-				if (write != NULL)
+				if (m_busnumaddr->m_device[m_devicenum] != NULL)
 				{
 					int function = (m_address >> 8) & 0x07;
 					int reg = (m_address >> 0) & 0xfc;
-					(*write)(m_busnumaddr, m_busnumaddr->m_device[m_devicenum], function, reg, data, mem_mask);
+					m_busnumaddr->m_device[m_devicenum]->pci_write(m_busnumaddr, function, reg, data, mem_mask);
 				}
 				if (LOG_PCI)
 					logerror("  function:%d register:%d\n", (m_address >> 8) & 0x07, (m_address >> 0) & 0xfc);
@@ -207,7 +203,7 @@ WRITE32_MEMBER( pci_bus_legacy_device::write )
 
 
 
-READ64_MEMBER(pci_bus_legacy_device::read_64be)
+READ64_MEMBER(pci_bus_device::read_64be)
 {
 	UINT64 result = 0;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
@@ -218,7 +214,7 @@ READ64_MEMBER(pci_bus_legacy_device::read_64be)
 	return FLIPENDIAN_INT64(result);
 }
 
-WRITE64_MEMBER(pci_bus_legacy_device::write_64be)
+WRITE64_MEMBER(pci_bus_device::write_64be)
 {
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
@@ -229,7 +225,7 @@ WRITE64_MEMBER(pci_bus_legacy_device::write_64be)
 }
 
 
-void pci_bus_legacy_device::add_sibling(pci_bus_legacy_device *sibling, int busnum)
+void pci_bus_device::add_sibling(pci_bus_device *sibling, int busnum)
 {
 	m_siblings[m_siblings_count] = sibling;
 	m_siblings_busnum[m_siblings_count] = busnum;
@@ -242,7 +238,7 @@ void pci_bus_legacy_device::add_sibling(pci_bus_legacy_device *sibling, int busn
 //  restore
 //-------------------------------------------------
 
-void pci_bus_legacy_device::device_post_load()
+void pci_bus_device::device_post_load()
 {
 	if (m_devicenum != -1)
 	{
@@ -254,18 +250,25 @@ void pci_bus_legacy_device::device_post_load()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pci_bus_legacy_device::device_start()
+void pci_bus_device::device_start()
 {
 	/* store a pointer back to the device */
 	m_devicenum = -1;
 
+	char id[3];
 	/* find all our devices */
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++)
-		if (m_devtag[i] != NULL)
-			m_device[i] = machine().device(m_devtag[i]);
+	{
+		sprintf(id, "%d", i);
+		pci_connector *conn = downcast<pci_connector *>(subdevice(id));
+		if (conn!=NULL)
+			m_device[i] = conn->get_device();
+		else
+			m_device[i] = NULL;
+	}
 
 	if (m_father != NULL) {
-		pci_bus_legacy_device *father = machine().device<pci_bus_legacy_device>(m_father);
+		pci_bus_device *father = machine().device<pci_bus_device>(m_father);
 		if (father)
 			father->add_sibling(this, m_busnum);
 	}
@@ -281,10 +284,49 @@ void pci_bus_legacy_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void pci_bus_legacy_device::device_reset()
+void pci_bus_device::device_reset()
 {
 	/* reset the drive state */
 	m_devicenum = -1;
 	m_address = 0;
 }
 
+//-------------------------------------------------
+//  pci_device_interface - constructor
+//-------------------------------------------------
+
+pci_device_interface::pci_device_interface(const machine_config &mconfig, device_t &device)
+	: device_slot_card_interface(mconfig, device)
+{
+}
+
+//-------------------------------------------------
+//  ~pci_device_interface - destructor
+//-------------------------------------------------
+
+pci_device_interface::~pci_device_interface()
+{
+}
+
+
+const device_type PCI_CONNECTOR = &device_creator<pci_connector>;
+
+
+pci_connector::pci_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, PCI_CONNECTOR, "PCI device connector abstraction", tag, owner, clock, "pci_connector", __FILE__),
+	device_slot_interface(mconfig, *this)
+{
+}
+
+pci_connector::~pci_connector()
+{
+}
+
+void pci_connector::device_start()
+{
+}
+
+pci_device_interface *pci_connector::get_device()
+{
+	return dynamic_cast<pci_device_interface *>(get_card_device());
+}
