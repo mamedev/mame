@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "sound/discrete.h"
-#include "sound/ay8910.h"
 
 class wiz_state : public driver_device
 {
@@ -50,10 +49,6 @@ public:
 	UINT8 m_main_nmi_mask;
 	UINT8 m_sound_nmi_mask;
 	UINT8 m_sprite_bank;
-	
-	UINT64 m_sound_shiftreg; // unknown size, this should be more than enough
-	static const int m_sound_shiftmax = 8;
-	UINT8 m_sound_shiftptr;
 	
 	int m_dsc0;
 	int m_dsc1;

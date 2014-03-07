@@ -83,7 +83,11 @@ TODO:
   * stinger popcorn enemies at beginning of the game should have higher priority
     than that 'vacuum cleaner' enemy sphere,
   * the cloud in kungfut should have higher prio than player char
-- Improve stinger/scion discrete sound
+- Improve stinger/scion discrete sound, shot sound should include noise
+- stinger/scion audiocpu jumps to lalaland after receiving a soundlatch of 0x90,
+  basically resetting itself. I assume this is a game bug
+- scion insert-coin sound sometimes repeats or is silent due to soundlatch timing,
+  this could be a game bug as well
 - Background noise in scion (but not scionc). Note that the sound program is
   almost identical, except for three patches affecting noise period, noise
   channel C enable and channel C volume. So it looks just like a bug in the
@@ -298,38 +302,6 @@ WRITE8_MEMBER(wiz_state::wiz_main_nmi_mask_w)
 	m_main_nmi_mask = data & 1;
 }
 
-WRITE8_MEMBER(wiz_state::wiz_soundlatch_w)
-{
-	// shift in soundlatch
-	if (m_sound_shiftptr < m_sound_shiftmax)
-	{
-		if (data != 0)
-		{
-			m_sound_shiftreg |= (data << (m_sound_shiftptr * 8));
-			m_sound_shiftptr++;
-		}
-	}
-	else
-	{
-		// doesn't happen
-		logerror("wiz_soundlatch_w overflow\n");
-	}
-	
-	// d7: reset sound cpu?
-	if (data & 0x80)
-	{
-		m_sound_shiftreg = 0;
-		m_sound_shiftptr = 0;
-		m_sound_nmi_mask = 0;
-
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
-	else
-	{
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	}
-}
-
 
 static ADDRESS_MAP_START( kungfut_main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -351,7 +323,7 @@ static ADDRESS_MAP_START( kungfut_main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0xf008, 0xf008) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
 	AM_RANGE(0xf018, 0xf018) AM_READ_PORT("IN1")
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(wiz_soundlatch_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf818, 0xf818) AM_WRITE(wiz_bgcolor_w)
 ADDRESS_MAP_END
 
@@ -378,27 +350,26 @@ WRITE8_MEMBER(wiz_state::wiz_sound_nmi_mask_w)
 	m_sound_nmi_mask = data & 1;
 }
 
-READ8_MEMBER(wiz_state::wiz_soundlatch_r)
-{
-	// shift out soundlatch
-	UINT8 ret = m_sound_shiftreg & 0xff;
-	m_sound_shiftreg >>= 8;
-	m_sound_shiftptr -= (m_sound_shiftptr != 0);
-	return ret;
-}
-
-
-static ADDRESS_MAP_START( stinger_sound_map, AS_PROGRAM, 8, wiz_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(wiz_soundlatch_r, wiz_sound_nmi_mask_w) AM_MIRROR(0x4000)
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("8910.1", ay8910_device, address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_device, address_data_w)
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kungfut_sound_map, AS_PROGRAM, 8, wiz_state )
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("8910.3", ay8910_device, address_data_w) // one more ay8910
-	AM_IMPORT_FROM( stinger_sound_map )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("8910.3", ay8910_device, address_data_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("8910.1", ay8910_device, address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_device, address_data_w)
+	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_byte_r, wiz_sound_nmi_mask_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( stinger_sound_map, AS_PROGRAM, 8, wiz_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_byte_r, wiz_sound_nmi_mask_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITENOP // ?
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("8910.1", ay8910_device, address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_device, address_data_w)
+	AM_RANGE(0x5000, 0x7fff) AM_READNOP // prevent error.log spam, cpu jumps here by accident
 ADDRESS_MAP_END
 
 
@@ -761,12 +732,9 @@ GFXDECODE_END
 
 void wiz_state::machine_reset()
 {
-	m_dsc0 = m_dsc1 = 1;
-
 	m_main_nmi_mask = 0;
-	m_sound_shiftreg = 0;
-	m_sound_shiftptr = 0;
 	m_sound_nmi_mask = 0;
+	m_dsc0 = m_dsc1 = 1;
 
 	m_sprite_bank = 0;
 	m_charbank[0] = m_charbank[1] = 0;
@@ -779,13 +747,10 @@ void wiz_state::machine_reset()
 void wiz_state::machine_start()
 {
 	// register for savestates
+	save_item(NAME(m_main_nmi_mask));
+	save_item(NAME(m_sound_nmi_mask));
 	save_item(NAME(m_dsc0));
 	save_item(NAME(m_dsc1));
-
-	save_item(NAME(m_main_nmi_mask));
-	save_item(NAME(m_sound_shiftreg));
-	save_item(NAME(m_sound_shiftptr));
-	save_item(NAME(m_sound_nmi_mask));
 	
 	save_item(NAME(m_sprite_bank));
 	save_item(NAME(m_charbank));
@@ -819,8 +784,6 @@ static MACHINE_CONFIG_START( kungfut, wiz_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 18432000/6) /* 3.072 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(kungfut_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(wiz_state, wiz_sound_interrupt, 4*60) /* ??? */
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
