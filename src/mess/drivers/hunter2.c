@@ -41,8 +41,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(hunter2_io, AS_IO, 8, hunter2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("lcdc", hd61830_device, data_r, data_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("lcdc", hd61830_device, data_w)
 	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("lcdc", hd61830_device, status_r, control_w)
+	AM_RANGE(0x3e, 0x3e) AM_DEVREAD("lcdc", hd61830_device, data_r)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(porte0_w)
 ADDRESS_MAP_END
 
