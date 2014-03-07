@@ -10,12 +10,13 @@
 #include "imagedev/cassette.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/isa.h"
+#include "bus/isa/isa.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/xsu_cards.h"
+#include "bus/isa/xsu_cards.h"
 #include "sound/speaker.h"
+#include "bus/centronics/ctronics.h"
 
 class mc1502_state : public driver_device
 {

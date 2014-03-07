@@ -40,7 +40,7 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "video/pc_aga.h"
 
 #include "machine/pc_fdc.h"
-#include "machine/pc_joy.h"
+#include "bus/pc_joy/pc_joy.h"
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
 

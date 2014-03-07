@@ -29,8 +29,8 @@
 #include "machine/mc146818.h"
 #include "machine/apollo_kbd.h"
 #include "machine/clock.h"
-#include "machine/isa.h"
-#include "machine/isa_cards.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0

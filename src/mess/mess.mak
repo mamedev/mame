@@ -307,6 +307,7 @@ VIDEOS += UPD7220
 VIDEOS += UPD7227
 VIDEOS += V9938
 #VIDEOS += VOODOO
+VIDEOS += CRTC_EGA
 
 #-------------------------------------------------
 # specify available machine cores
@@ -480,6 +481,10 @@ MACHINES += Z80SIO
 MACHINES += Z80STI
 MACHINES += Z8536
 MACHINES += MM58167
+MACHINES += PC_LPT
+MACHINES += PC_FDC
+MACHINES += DP8390
+MACHINES += MPU401
 #MACHINES += PROFILE
 
 #-------------------------------------------------
@@ -502,10 +507,12 @@ BUSES += EP64
 BUSES += IEEE488
 BUSES += IMI7000
 BUSES += IQ151
+BUSES += ISA
 BUSES += ISBX
 BUSES += KC
 BUSES += MIDI
 BUSES += NUBUS
+BUSES += PC_JOY
 BUSES += PC_KBD
 BUSES += PET
 BUSES += PLUS4
@@ -601,7 +608,6 @@ DRVLIBS += \
 	$(MESSOBJ)/intel.a \
 	$(MESSOBJ)/interton.a \
 	$(MESSOBJ)/intv.a \
-	$(MESSOBJ)/isa.a \
 	$(MESSOBJ)/isc.a \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/koei.a \
@@ -795,12 +801,10 @@ $(MESSOBJ)/mame.a: \
 
 $(MESSOBJ)/shared.a: \
 	$(MESS_AUDIO)/mea8000.o     \
-	$(MESS_MACHINE)/3c503.o     \
 	$(MESS_MACHINE)/68561mpcc.o \
 	$(MESS_MACHINE)/8530scc.o   \
 	$(MESS_MACHINE)/appldriv.o  \
 	$(MESS_MACHINE)/applefdc.o  \
-	$(MESS_MACHINE)/dp8390.o    \
 	$(MESS_MACHINE)/hd63450.o   \
 	$(MESS_MACHINE)/i8271.o     \
 	$(MESS_MACHINE)/kb3600.o    \
@@ -808,13 +812,9 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/mb8795.o    \
 	$(MESS_MACHINE)/microdrv.o  \
 	$(MESS_MACHINE)/mpc105.o    \
-	$(MESS_MACHINE)/mpu401.o \
 	$(MESS_MACHINE)/msm6222b.o  \
 	$(MESS_MACHINE)/ncr5380.o   \
 	$(MESS_MACHINE)/ncr5390.o   \
-	$(MESS_MACHINE)/ne1000.o    \
-	$(MESS_MACHINE)/ne2000.o    \
-	$(MESS_MACHINE)/pc_lpt.o    \
 	$(MESS_MACHINE)/s1410.o     \
 	$(MESS_MACHINE)/sa1403d.o   \
 	$(MESS_MACHINE)/sed1200.o   \
@@ -824,42 +824,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/sonydriv.o  \
 	$(MESS_MACHINE)/teleprinter.o   \
 	$(MESS_MACHINE)/z80bin.o    \
-
-$(MESSOBJ)/isa.a: \
-	$(MESS_MACHINE)/isa.o       \
-	$(MESS_MACHINE)/isa_cards.o \
-	$(MESS_VIDEO)/isa_mda.o     \
-	$(MESS_MACHINE)/isa_wdxt_gen.o  \
-	$(MESS_MACHINE)/isa_adlib.o \
-	$(MESS_MACHINE)/isa_com.o   \
-	$(MESS_MACHINE)/isa_fdc.o   \
-	$(MESS_MACHINE)/isa_mufdc.o	\
-	$(MESS_MACHINE)/isa_finalchs.o  \
-	$(MESS_MACHINE)/isa_gblaster.o  \
-	$(MESS_MACHINE)/isa_gus.o   \
-	$(MESS_MACHINE)/isa_hdc.o   \
-	$(MESS_MACHINE)/isa_ibm_mfc.o   \
-	$(MESS_MACHINE)/isa_mpu401.o \
-	$(MESS_MACHINE)/isa_sblaster.o  \
-	$(MESS_MACHINE)/isa_stereo_fx.o \
-	$(MESS_MACHINE)/isa_ssi2001.o   \
-	$(MESS_MACHINE)/isa_ide.o   \
-	$(MESS_MACHINE)/isa_xtide.o   \
-	$(MESS_MACHINE)/isa_side116.o	\
-	$(MESS_MACHINE)/isa_aha1542.o   \
-	$(MESS_MACHINE)/isa_wd1002a_wx1.o\
-	$(MESS_MACHINE)/isa_dectalk.o \
-	$(MESS_MACHINE)/isa_pds.o \
-	$(MESS_MACHINE)/omti8621.o  \
-	$(MESS_VIDEO)/isa_cga.o     \
-	$(MESS_VIDEO)/isa_svga_cirrus.o \
-	$(MESS_VIDEO)/isa_ega.o     \
-	$(MESS_VIDEO)/isa_vga.o     \
-	$(MESS_VIDEO)/isa_vga_ati.o \
-	$(MESS_VIDEO)/isa_svga_tseng.o      \
-	$(MESS_VIDEO)/isa_svga_s3.o \
-	$(MESS_VIDEO)/s3virge.o \
-	$(MESS_VIDEO)/isa_pc1640_iga.o     \
 
 #-------------------------------------------------
 # manufacturer-specific groupings for drivers
@@ -1677,10 +1641,6 @@ $(MESSOBJ)/pc9801.a:            \
 	$(MESS_MACHINE)/pc9801_kbd.o\
 
 $(MESSOBJ)/pcshare.a:           \
-	$(MESS_MACHINE)/pc_fdc.o    \
-	$(MESS_MACHINE)/pc_joy.o    \
-	$(MESS_MACHINE)/pc_joy_sw.o \
-	$(MESS_VIDEO)/crtc_ega.o    \
 	$(MESS_MACHINE)/i82371ab.o  \
 	$(MESS_MACHINE)/i82371sb.o  \
 	$(MESS_MACHINE)/i82439tx.o  \
@@ -2166,14 +2126,8 @@ $(MESSOBJ)/xussrpc.a:            \
 	$(MESS_DRIVERS)/ec184x.o    \
 	$(MESS_DRIVERS)/iskr103x.o  \
 	$(MESS_DRIVERS)/poisk1.o    \
-	$(MESS_MACHINE)/p1_fdc.o    \
-	$(MESS_MACHINE)/p1_hdc.o    \
-	$(MESS_MACHINE)/p1_rom.o    \
 	$(MESS_VIDEO)/poisk1.o      \
 	$(MESS_DRIVERS)/mc1502.o    \
-	$(MESS_MACHINE)/mc1502_fdc.o\
-	$(MESS_MACHINE)/mc1502_rom.o\
-	$(MESS_MACHINE)/xsu_cards.o \
 
 $(MESSOBJ)/yamaha.a:            \
 	$(MESS_DRIVERS)/ymmu100.o   \

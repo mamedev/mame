@@ -292,6 +292,58 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/isa/isa.h,BUSES += ISA
+#-------------------------------------------------
+
+ifneq ($(filter ISA,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/isa/isa.o
+BUSOBJS += $(BUSOBJ)/isa/isa_cards.o
+BUSOBJS += $(BUSOBJ)/isa/mda.o
+BUSOBJS += $(BUSOBJ)/isa/wdxt_gen.o
+BUSOBJS += $(BUSOBJ)/isa/adlib.o
+BUSOBJS += $(BUSOBJ)/isa/com.o
+BUSOBJS += $(BUSOBJ)/isa/fdc.o
+BUSOBJS += $(BUSOBJ)/isa/mufdc.o
+BUSOBJS += $(BUSOBJ)/isa/finalchs.o
+BUSOBJS += $(BUSOBJ)/isa/gblaster.o
+BUSOBJS += $(BUSOBJ)/isa/gus.o
+BUSOBJS += $(BUSOBJ)/isa/hdc.o
+BUSOBJS += $(BUSOBJ)/isa/ibm_mfc.o
+BUSOBJS += $(BUSOBJ)/isa/mpu401.o
+BUSOBJS += $(BUSOBJ)/isa/sblaster.o
+BUSOBJS += $(BUSOBJ)/isa/stereo_fx.o
+BUSOBJS += $(BUSOBJ)/isa/ssi2001.o
+BUSOBJS += $(BUSOBJ)/isa/ide.o
+BUSOBJS += $(BUSOBJ)/isa/xtide.o
+BUSOBJS += $(BUSOBJ)/isa/side116.o
+BUSOBJS += $(BUSOBJ)/isa/aha1542.o
+BUSOBJS += $(BUSOBJ)/isa/wd1002a_wx1.o
+BUSOBJS += $(BUSOBJ)/isa/dectalk.o
+BUSOBJS += $(BUSOBJ)/isa/pds.o
+BUSOBJS += $(BUSOBJ)/isa/omti8621.o
+BUSOBJS += $(BUSOBJ)/isa/cga.o
+BUSOBJS += $(BUSOBJ)/isa/svga_cirrus.o
+BUSOBJS += $(BUSOBJ)/isa/ega.o
+BUSOBJS += $(BUSOBJ)/isa/vga.o
+BUSOBJS += $(BUSOBJ)/isa/vga_ati.o
+BUSOBJS += $(BUSOBJ)/isa/svga_tseng.o
+BUSOBJS += $(BUSOBJ)/isa/svga_s3.o
+BUSOBJS += $(BUSOBJ)/isa/s3virge.o
+BUSOBJS += $(BUSOBJ)/isa/pc1640_iga.o
+BUSOBJS += $(BUSOBJ)/isa/3c503.o
+BUSOBJS += $(BUSOBJ)/isa/ne1000.o
+BUSOBJS += $(BUSOBJ)/isa/ne2000.o
+BUSOBJS += $(BUSOBJ)/isa/lpt.o
+BUSOBJS += $(BUSOBJ)/isa/p1_fdc.o
+BUSOBJS += $(BUSOBJ)/isa/p1_hdc.o
+BUSOBJS += $(BUSOBJ)/isa/p1_rom.o
+BUSOBJS += $(BUSOBJ)/isa/mc1502_fdc.o
+BUSOBJS += $(BUSOBJ)/isa/mc1502_rom.o
+BUSOBJS += $(BUSOBJ)/isa/xsu_cards.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/bus/isbx/isbx.h,BUSES += ISBX
 #-------------------------------------------------
 
@@ -314,6 +366,17 @@ BUSOBJS += $(BUSOBJ)/kc/d004.o
 BUSOBJS += $(BUSOBJ)/kc/ram.o
 BUSOBJS += $(BUSOBJ)/kc/rom.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/pc_joy/pc_joy.h,BUSES += PC_JOY
+#-------------------------------------------------
+
+ifneq ($(filter PC_JOY,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/pc_joy/pc_joy.o
+BUSOBJS += $(BUSOBJ)/pc_joy/pc_joy_sw.o
+endif
+
 
 #-------------------------------------------------
 #

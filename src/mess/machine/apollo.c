@@ -30,7 +30,7 @@
 
 #include "includes/apollo.h"
 
-#include "machine/omti8621.h"
+#include "bus/isa/omti8621.h"
 
 #define APOLLO_IRQ_VECTOR 0xa0
 #define APOLLO_IRQ_PTM 0

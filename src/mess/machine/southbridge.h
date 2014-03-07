@@ -20,8 +20,8 @@
 #include "sound/speaker.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
-#include "machine/isa.h"
-#include "machine/isa_cards.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
 
 #include "machine/pc_lpt.h"
 #include "bus/pc_kbd/pc_kbdc.h"

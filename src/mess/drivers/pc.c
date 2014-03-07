@@ -77,7 +77,7 @@ video HW too.
 #include "video/pc_t1t.h"
 
 #include "machine/pc_fdc.h"
-#include "machine/pc_joy.h"
+#include "bus/pc_joy/pc_joy.h"
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
 

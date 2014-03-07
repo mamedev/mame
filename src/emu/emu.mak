@@ -42,8 +42,10 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/ep64 \
 	$(EMUOBJ)/bus/ieee488 \
 	$(EMUOBJ)/bus/imi7000 \
+	$(EMUOBJ)/bus/isa \
 	$(EMUOBJ)/bus/isbx \
 	$(EMUOBJ)/bus/midi \
+	$(EMUOBJ)/bus/pc_joy \
 	$(EMUOBJ)/bus/pc_kbd \
 	$(EMUOBJ)/bus/pet \
 	$(EMUOBJ)/bus/plus4 \
