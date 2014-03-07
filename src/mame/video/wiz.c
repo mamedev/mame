@@ -125,22 +125,20 @@ void wiz_state::draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int 
 	/* draw the tiles. They are characters, but draw them as sprites. */
 	for (int offs = 0x400-1; offs >= 0; offs--)
 	{
-		int scroll;
-
 		int code = vram[offs];
 		int sx = offs & 0x1f;
 		int sy = offs >> 5;
 		int color = aram[sx << 1 | 1] & 7;
 		
+		// wiz/kungfut hw allows more color variety on screen
 		if (colortype)
-			color = layer ? (cram[offs] & 7) : ((color & 4) | (vram[offs] & 3));
+			color = layer ? (cram[offs] & 7) : ((color & 4) | (code & 3));
 
-		scroll = (8*sy + 256 - aram[2 * sx]) & 0xff;
+		int scroll = (8*sy + 256 - aram[sx << 1]) & 0xff;
 		if (m_flipy)
-		{
 			scroll = (248 - scroll) & 0xff;
-		}
-		if (m_flipx) sx = 31 - sx;
+		if (m_flipx)
+			sx = 31 - sx;
 
 		gfx->transpen(m_palette,bitmap,cliprect,
 			code,
