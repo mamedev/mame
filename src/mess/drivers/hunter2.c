@@ -11,7 +11,9 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/hd61830.h"
+#include "machine/mm58274c.h"
 #include "rendlay.h"
+#include "sound/speaker.h"
 
 class hunter2_state : public driver_device
 {
@@ -19,15 +21,18 @@ public:
 	hunter2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
 	{ }
 
-	DECLARE_DRIVER_INIT(hunter2);
+	DECLARE_WRITE8_MEMBER(port86_w);
 	DECLARE_WRITE8_MEMBER(porte0_w);
 	DECLARE_PALETTE_INIT(hunter2);
+	DECLARE_DRIVER_INIT(hunter2);
 
 private:
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
 };
 
 static ADDRESS_MAP_START(hunter2_mem, AS_PROGRAM, 8, hunter2_state)
@@ -44,6 +49,8 @@ static ADDRESS_MAP_START(hunter2_io, AS_IO, 8, hunter2_state)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("lcdc", hd61830_device, data_w)
 	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("lcdc", hd61830_device, status_r, control_w)
 	AM_RANGE(0x3e, 0x3e) AM_DEVREAD("lcdc", hd61830_device, data_r)
+	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("rtc", mm58274c_device, read, write)
+	AM_RANGE(0x86, 0x86) AM_WRITE(port86_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(porte0_w)
 ADDRESS_MAP_END
 
@@ -51,6 +58,14 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( hunter2 )
 INPUT_PORTS_END
+
+WRITE8_MEMBER( hunter2_state::port86_w )
+{
+	 m_speaker->level_w(BIT(data, 0));
+}
+
+
+
 
 /*
 data   bank0    bank1    bank2
@@ -122,6 +137,17 @@ PALETTE_INIT_MEMBER(hunter2_state, hunter2)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
+//-------------------------------------------------
+//  mm58274c_interface rtc_intf
+//-------------------------------------------------
+
+// this is all guess
+static const mm58274c_interface rtc_intf =
+{
+	0,  /*  mode 24*/
+	1   /*  first day of week */
+};
+
 static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, 4000000)
@@ -138,6 +164,14 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hunter2_state, hunter2)
 	MCFG_DEVICE_ADD("lcdc", HD61830, XTAL_4_9152MHz/2/2) // unknown clock
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* Devices */
+	MCFG_MM58274C_ADD("rtc", rtc_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
