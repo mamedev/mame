@@ -1457,8 +1457,9 @@ vt520 // 1994 Digital Equipment Corporation
 vk100 // 1980 Digital Equipment Corporation
 dectalk // 1982 Digital Equipment Corporation
 mc7105 // Elektronika MC7105
-rainbow // DEC Rainbow 100B
-rainb190    // DEC Rainbow 190
+rainbow100  // 1982 DEC Rainbow 100-A
+rainbow     // 1983 DEC Rainbow 100-B
+rainbow190  // 1985 DEC Rainbow 190
 
 // Memotech
 mtx512  // 1983 Memotech MTX 512

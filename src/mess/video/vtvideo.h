@@ -65,6 +65,7 @@ protected:
 
 	// dc012 attributes
 	UINT8 m_scroll_latch;
+	UINT8 m_scroll_latch_valid;
 	UINT8 m_blink_flip_flop;
 	UINT8 m_reverse_field;
 	UINT8 m_basic_attribute;
