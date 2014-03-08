@@ -29,6 +29,153 @@ static int verbose = VERBOSE;
 #define SC499_CTAPE_TAG "sc499_ctape"
 extern const device_type SC499_CTAPE;
 
+static INPUT_PORTS_START( sc499_port )
+	PORT_START("IO_BASE")
+	PORT_DIPNAME( 0x3f8, 0x200, "SC499 I/O base (jumpers A3-A9)")
+	PORT_DIPSETTING(     0x008, "008h" )
+	PORT_DIPSETTING(     0x010, "010h" )
+	PORT_DIPSETTING(     0x018, "018h" )
+	PORT_DIPSETTING(     0x020, "020h" )
+	PORT_DIPSETTING(     0x028, "028h" )
+	PORT_DIPSETTING(     0x030, "030h" )
+	PORT_DIPSETTING(     0x038, "038h" )
+	PORT_DIPSETTING(     0x040, "040h" )
+	PORT_DIPSETTING(     0x048, "048h" )
+	PORT_DIPSETTING(     0x050, "050h" )
+	PORT_DIPSETTING(     0x058, "058h" )
+	PORT_DIPSETTING(     0x060, "060h" )
+	PORT_DIPSETTING(     0x068, "068h" )
+	PORT_DIPSETTING(     0x070, "070h" )
+	PORT_DIPSETTING(     0x078, "078h" )
+	PORT_DIPSETTING(     0x080, "080h" )
+	PORT_DIPSETTING(     0x088, "088h" )
+	PORT_DIPSETTING(     0x090, "090h" )
+	PORT_DIPSETTING(     0x098, "098h" )
+	PORT_DIPSETTING(     0x0a0, "0a0h" )
+	PORT_DIPSETTING(     0x0a8, "0a8h" )
+	PORT_DIPSETTING(     0x0b0, "0b0h" )
+	PORT_DIPSETTING(     0x0b8, "0b8h" )
+	PORT_DIPSETTING(     0x0c0, "0c0h" )
+	PORT_DIPSETTING(     0x0c8, "0c8h" )
+	PORT_DIPSETTING(     0x0d0, "0d0h" )
+	PORT_DIPSETTING(     0x0d8, "0d8h" )
+	PORT_DIPSETTING(     0x0e0, "0e0h" )
+	PORT_DIPSETTING(     0x0e8, "0e8h" )
+	PORT_DIPSETTING(     0x0f0, "0f0h" )
+	PORT_DIPSETTING(     0x0f8, "0f8h" )
+	PORT_DIPSETTING(     0x100, "0100h" )
+	PORT_DIPSETTING(     0x108, "0108h" )
+	PORT_DIPSETTING(     0x110, "0110h" )
+	PORT_DIPSETTING(     0x118, "0118h" )
+	PORT_DIPSETTING(     0x120, "0120h" )
+	PORT_DIPSETTING(     0x128, "0128h" )
+	PORT_DIPSETTING(     0x130, "0130h" )
+	PORT_DIPSETTING(     0x138, "0138h" )
+	PORT_DIPSETTING(     0x140, "0140h" )
+	PORT_DIPSETTING(     0x148, "0148h" )
+	PORT_DIPSETTING(     0x150, "0150h" )
+	PORT_DIPSETTING(     0x158, "0158h" )
+	PORT_DIPSETTING(     0x160, "0160h" )
+	PORT_DIPSETTING(     0x168, "0168h" )
+	PORT_DIPSETTING(     0x170, "0170h" )
+	PORT_DIPSETTING(     0x178, "0178h" )
+	PORT_DIPSETTING(     0x180, "0180h" )
+	PORT_DIPSETTING(     0x188, "0188h" )
+	PORT_DIPSETTING(     0x190, "0190h" )
+	PORT_DIPSETTING(     0x198, "0198h" )
+	PORT_DIPSETTING(     0x1a0, "01a0h" )
+	PORT_DIPSETTING(     0x1a8, "01a8h" )
+	PORT_DIPSETTING(     0x1b0, "01b0h" )
+	PORT_DIPSETTING(     0x1b8, "01b8h" )
+	PORT_DIPSETTING(     0x1c0, "01c0h" )
+	PORT_DIPSETTING(     0x1c8, "01c8h" )
+	PORT_DIPSETTING(     0x1d0, "01d0h" )
+	PORT_DIPSETTING(     0x1d8, "01d8h" )
+	PORT_DIPSETTING(     0x1e0, "01e0h" )
+	PORT_DIPSETTING(     0x1e8, "01e8h" )
+	PORT_DIPSETTING(     0x1f0, "01f0h" )
+	PORT_DIPSETTING(     0x1f8, "01f8h" )
+	PORT_DIPSETTING(     0x200, "0200h" )
+	PORT_DIPSETTING(     0x208, "0208h" )
+	PORT_DIPSETTING(     0x210, "0210h" )
+	PORT_DIPSETTING(     0x218, "0218h" )
+	PORT_DIPSETTING(     0x220, "0220h" )
+	PORT_DIPSETTING(     0x228, "0228h" )
+	PORT_DIPSETTING(     0x230, "0230h" )
+	PORT_DIPSETTING(     0x238, "0238h" )
+	PORT_DIPSETTING(     0x240, "0240h" )
+	PORT_DIPSETTING(     0x248, "0248h" )
+	PORT_DIPSETTING(     0x250, "0250h" )
+	PORT_DIPSETTING(     0x258, "0258h" )
+	PORT_DIPSETTING(     0x260, "0260h" )
+	PORT_DIPSETTING(     0x268, "0268h" )
+	PORT_DIPSETTING(     0x270, "0270h" )
+	PORT_DIPSETTING(     0x278, "0278h" )
+	PORT_DIPSETTING(     0x280, "0280h" )
+	PORT_DIPSETTING(     0x288, "0288h" )
+	PORT_DIPSETTING(     0x290, "0290h" )
+	PORT_DIPSETTING(     0x298, "0298h" )
+	PORT_DIPSETTING(     0x2a0, "02a0h" )
+	PORT_DIPSETTING(     0x2a8, "02a8h" )
+	PORT_DIPSETTING(     0x2b0, "02b0h" )
+	PORT_DIPSETTING(     0x2b8, "02b8h" )
+	PORT_DIPSETTING(     0x2c0, "02c0h" )
+	PORT_DIPSETTING(     0x2c8, "02c8h" )
+	PORT_DIPSETTING(     0x2d0, "02d0h" )
+	PORT_DIPSETTING(     0x2d8, "02d8h" )
+	PORT_DIPSETTING(     0x2e0, "02e0h" )
+	PORT_DIPSETTING(     0x2e8, "02e8h" )
+	PORT_DIPSETTING(     0x2f0, "02f0h" )
+	PORT_DIPSETTING(     0x2f8, "02f8h" )
+	PORT_DIPSETTING(     0x300, "0300h" )
+	PORT_DIPSETTING(     0x308, "0308h" )
+	PORT_DIPSETTING(     0x310, "0310h" )
+	PORT_DIPSETTING(     0x318, "0318h" )
+	PORT_DIPSETTING(     0x320, "0320h" )
+	PORT_DIPSETTING(     0x328, "0328h" )
+	PORT_DIPSETTING(     0x330, "0330h" )
+	PORT_DIPSETTING(     0x338, "0338h" )
+	PORT_DIPSETTING(     0x340, "0340h" )
+	PORT_DIPSETTING(     0x348, "0348h" )
+	PORT_DIPSETTING(     0x350, "0350h" )
+	PORT_DIPSETTING(     0x358, "0358h" )
+	PORT_DIPSETTING(     0x360, "0360h" )
+	PORT_DIPSETTING(     0x368, "0368h" )
+	PORT_DIPSETTING(     0x370, "0370h" )
+	PORT_DIPSETTING(     0x378, "0378h" )
+	PORT_DIPSETTING(     0x380, "0380h" )
+	PORT_DIPSETTING(     0x388, "0388h" )
+	PORT_DIPSETTING(     0x390, "0390h" )
+	PORT_DIPSETTING(     0x398, "0398h" )
+	PORT_DIPSETTING(     0x3a0, "03a0h" )
+	PORT_DIPSETTING(     0x3a8, "03a8h" )
+	PORT_DIPSETTING(     0x3b0, "03b0h" )
+	PORT_DIPSETTING(     0x3b8, "03b8h" )
+	PORT_DIPSETTING(     0x3c0, "03c0h" )
+	PORT_DIPSETTING(     0x3c8, "03c8h" )
+	PORT_DIPSETTING(     0x3d0, "03d0h" )
+	PORT_DIPSETTING(     0x3d8, "03d8h" )
+	PORT_DIPSETTING(     0x3e0, "03e0h" )
+	PORT_DIPSETTING(     0x3e8, "03e8h" )
+	PORT_DIPSETTING(     0x3f0, "03f0h" )
+	PORT_DIPSETTING(     0x3f8, "03f8h" )
+
+	PORT_START("IRQ_DRQ")
+	PORT_DIPNAME( 0x07, 0x05, "SC499 IRQ (jumpers IRQ2-IRQ7)")
+	PORT_DIPSETTING(    0x02, "IRQ 2" )
+	PORT_DIPSETTING(    0x03, "IRQ 3" )
+	PORT_DIPSETTING(    0x04, "IRQ 4" )
+	PORT_DIPSETTING(    0x05, "IRQ 5" )
+	PORT_DIPSETTING(    0x06, "IRQ 6" )
+	PORT_DIPSETTING(    0x07, "IRQ 7" )
+
+	PORT_DIPNAME( 0x30, 0x10, "SC499 DMA (jumpers DRQ1-DRQ3)")
+	PORT_DIPSETTING(    0x10, "IRQ 1" )
+	PORT_DIPSETTING(    0x20, "IRQ 2" )
+	PORT_DIPSETTING(    0x30, "IRQ 3" )
+
+INPUT_PORTS_END
+
 MACHINE_CONFIG_FRAGMENT( sc499_ctape )
 	MCFG_DEVICE_ADD(SC499_CTAPE_TAG, SC499_CTAPE, 0)
 MACHINE_CONFIG_END
@@ -169,8 +316,15 @@ const device_type SC499 = &device_creator<sc499_device>;
 
 sc499_device::sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SC499, "Archive SC-499", tag, owner, clock, "sc499", __FILE__),
-	device_isa8_card_interface(mconfig, *this)
+	device_isa8_card_interface(mconfig, *this),
+	m_iobase(*this, "IO_BASE"),
+	m_irqdrq(*this, "IRQ_DRQ")
 {
+}
+
+ioport_constructor sc499_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( sc499_port );
 }
 
 //-------------------------------------------------
@@ -237,8 +391,13 @@ void sc499_device::device_reset()
 
 	if (!m_installed)
 	{
-		m_isa->install_device(0x0200, 0x0207, 0, 0, read8_delegate(FUNC(sc499_device::read), this), write8_delegate(FUNC(sc499_device::write), this));
-		m_isa->set_dma_channel(1, this, true);
+		int base = m_iobase->read();
+
+		m_irq = m_irqdrq->read() & 7;
+		m_drq = m_irqdrq->read()>>4;
+
+		m_isa->install_device(base, base+7, 0, 0, read8_delegate(FUNC(sc499_device::read), this), write8_delegate(FUNC(sc499_device::write), this));
+		m_isa->set_dma_channel(m_drq, this, true);
 	}
 }
 
@@ -479,7 +638,16 @@ void sc499_device::set_interrupt(enum line_state state)
 	if (state != irq_state)
 	{
 		LOG2(("set_interrupt(%d)",state)); 
-		m_isa->irq5_w(state);
+		switch (m_irq)
+		{
+			case 2: m_isa->irq2_w(state); break;
+			case 3: m_isa->irq3_w(state); break;
+			case 4: m_isa->irq4_w(state); break;
+			case 5: m_isa->irq5_w(state); break;
+			case 6: m_isa->irq6_w(state); break;
+			case 7: m_isa->irq7_w(state); break;
+			default: logerror("sc499: invalid IRQ %d\n", m_irq); break;
+		}
 		irq_state = state;
 	}
 }
@@ -493,7 +661,15 @@ void sc499_device::set_dma_drq(enum line_state state)
 	if (state != dma_drq_state)
 	{
 		LOG2(("set_dma_drq(%d)",state)); 
-		m_isa->drq1_w(state);
+
+		switch (m_drq)
+		{
+			case 1: m_isa->drq1_w(state); break;
+			case 2: m_isa->drq2_w(state); break;
+			case 3: m_isa->drq3_w(state); break;
+			default: logerror("sc499: invalid DRQ %d\n", m_drq); break;
+		}
+		
 		dma_drq_state = state;
 	}
 }
