@@ -1060,6 +1060,7 @@ void sgb_lcd_device::update_scanline()
 				data <<= m_layer[l].xshift;
 
 				/* Figure out which palette we're using */
+				assert(((m_end_x - i) >> 3) >= 0 && ((m_end_x - i) >> 3) < ARRAY_LENGTH(m_sgb_pal_map));
 				sgb_palette = m_sgb_pal_map[(m_end_x - i) >> 3][m_current_line >> 3] << 2;
 
 				while (i > 0)
@@ -1088,6 +1089,7 @@ void sgb_lcd_device::update_scanline()
 						m_layer[l].xshift = 0;
 						tile_index = (map[m_layer[l].xindex] ^ m_gb_tile_no_mod) * 16;
 						data = tiles[tile_index] | (tiles[tile_index + 1] << 8);
+						assert(((m_end_x - i) >> 3) >= 0 && ((m_end_x - i) >> 3) < ARRAY_LENGTH(m_sgb_pal_map));
 						sgb_palette = m_sgb_pal_map[(m_end_x - i) >> 3][m_current_line >> 3] << 2;
 					}
 				}

@@ -278,6 +278,7 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	{
 		for(x=0;x<(bitmap.width()-1)/8;x++)  // columns
 		{
+			assert(((y*128)+x) >= 0 && ((y*128)+x) < ARRAY_LENGTH(m_char_ram));
 			UINT8 ch = m_char_ram[(y*128)+x];
 			if(m_attr_ram[(y*128)+x] & 0x10) // double-size
 				dbl_mode++;
