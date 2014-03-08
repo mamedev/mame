@@ -316,6 +316,7 @@ static const UINT8 channel2page_register[8] = { 7, 3, 1, 2, 0, 11, 9, 10};
 static UINT8 dn3000_dma_channel1 = 1; // 1 = memory/ctape, 2 = floppy dma channel
 static UINT8 dn3000_dma_channel2 = 5; // 5 = memory dma channel
 
+#if 0
 INLINE am9517a_device *get_device_dma8237_1(device_t *device) {
 	return device->machine().driver_data<apollo_state>()->m_dma8237_1;
 }
@@ -323,6 +324,7 @@ INLINE am9517a_device *get_device_dma8237_1(device_t *device) {
 INLINE am9517a_device *get_device_dma8237_2(device_t *device) {
 	return device->machine().driver_data<apollo_state>()->m_dma8237_2;
 }
+#endif
 
 /*-------------------------------------------------
  DN3000/DN3500 DMA Controller 1 at 0x9000/0x10c00
