@@ -70,8 +70,8 @@ const gfx_layout segas24_tile::char_layout = {
 void segas24_tile::tile_info(int offset, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	UINT16 val = tile_ram[tile_index|offset];
+	SET_TILE_INFO_MEMBER(*m_gfxdecode, char_gfx_index, val & tile_mask, (val >> 7) & 0xff, 0);
 	tileinfo.category = (val & 0x8000) != 0;
-	tileinfo.set(machine(), *m_gfxdecode, char_gfx_index, val & tile_mask, (val >> 7) & 0xff, 0);
 }
 
 TILE_GET_INFO_MEMBER(segas24_tile::tile_info_0s)
