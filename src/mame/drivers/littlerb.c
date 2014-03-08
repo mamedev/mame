@@ -96,10 +96,10 @@ public:
 	littlerb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_screen(*this, "screen"),			
+			m_screen(*this, "screen"),
 			m_dacl(*this, "dacl"),
 			m_dacr(*this, "dacr"),
-#if USE_TMS	
+#if USE_TMS
 			m_vram(*this, "vram")
 #else
 			m_region4(*this, "region4"),
@@ -123,7 +123,7 @@ public:
 	UINT8 sound_data_shift();
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_scanline);
 
-#if USE_TMS	
+#if USE_TMS
 	required_shared_ptr<UINT16> m_vram;
 
 	DECLARE_READ16_MEMBER(tms_host_r);
