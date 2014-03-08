@@ -31,12 +31,16 @@ public:
 
 	int sc499_receive(const UINT8 data[], int length);
 
+	required_ioport m_iobase;
+	required_ioport m_irqdrq;
+
 private:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 	// ISA overrides
 	virtual UINT8 dack_r(int line);
@@ -110,6 +114,7 @@ private:
 	emu_timer * m_timer; // timer to delay functions
 	emu_timer * m_timer1; // timer to delay functions
 	int m_timer_type;
+	int m_irq, m_drq;
 
 	bool m_installed;
 };

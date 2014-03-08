@@ -900,7 +900,6 @@ $(MESSOBJ)/apf.a:               \
 $(MESSOBJ)/apollo.a:            \
 	$(MESS_DRIVERS)/apollo.o    \
 	$(MESS_VIDEO)/apollo.o      \
-	$(MESS_MACHINE)/sc499.o     \
 	$(MESS_MACHINE)/apollo_dbg.o  \
 	$(MESS_MACHINE)/apollo_eth.o  \
 	$(MESS_MACHINE)/apollo_net.o  \

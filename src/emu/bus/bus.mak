@@ -340,6 +340,7 @@ BUSOBJS += $(BUSOBJ)/isa/p1_rom.o
 BUSOBJS += $(BUSOBJ)/isa/mc1502_fdc.o
 BUSOBJS += $(BUSOBJ)/isa/mc1502_rom.o
 BUSOBJS += $(BUSOBJ)/isa/xsu_cards.o
+BUSOBJS += $(BUSOBJ)/isa/sc499.o
 endif
 
 #-------------------------------------------------

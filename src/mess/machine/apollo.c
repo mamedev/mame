@@ -31,7 +31,7 @@
 #include "includes/apollo.h"
 
 #include "bus/isa/omti8621.h"
-#include "machine/sc499.h"
+#include "bus/isa/sc499.h"
 
 #define APOLLO_IRQ_VECTOR 0xa0
 #define APOLLO_IRQ_PTM 0
