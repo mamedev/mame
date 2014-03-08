@@ -1,8 +1,8 @@
 /*
  * sc499.c - ARCHIVE SC-499 cartridge tape controller (for Apollo DN3x00)
- *_DeviceClass
  *  Created on: April 17, 2011
- *      Author: Hans Ostermeyer
+ *  	Author: Hans Ostermeyer
+ *  	ISA conversion by R. Belmont
  *
  *  Released for general non-commercial use under the MAME license
  *  Visit http://mamedev.org for licensing and usage restrictions.
@@ -15,7 +15,7 @@
  *
  */
 
-#include "machine/sc499.h"
+#include "sc499.h"
 
 #define VERBOSE 0
 
@@ -26,15 +26,23 @@ static int verbose = VERBOSE;
 #define LOG2(x) { if (verbose > 1) LOG(x)}
 #define LOG3(x) { if (verbose > 2) LOG(x)}
 
-#define  MAINCPU "maincpu"
+#define SC499_CTAPE_TAG "sc499_ctape"
+extern const device_type SC499_CTAPE;
+
+MACHINE_CONFIG_FRAGMENT( sc499_ctape )
+	MCFG_DEVICE_ADD(SC499_CTAPE_TAG, SC499_CTAPE, 0)
+MACHINE_CONFIG_END
+
+machine_config_constructor sc499_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( sc499_ctape );
+}
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-//const device_type SC499 = sc499_device_config::static_alloc_device_config;
-
-sc499_device *sc499_device::m_device;
+const device_type ISA8_SC499 = &device_creator<sc499_device>;
 
 //**************************************************************************
 //  CONSTANTS
@@ -132,7 +140,6 @@ sc499_device *sc499_device::m_device;
 
 // ctape device data
 
-#define SC499_CTAPE_TAG "sc499_ctape"
 #define SC499_CTAPE_BLOCK_SIZE 512
 #define SC499_CTAPE_MAX_BLOCK_COUNT (60*1024*1024/SC499_CTAPE_BLOCK_SIZE)
 
@@ -161,19 +168,9 @@ const device_type SC499 = &device_creator<sc499_device>;
 //-------------------------------------------------
 
 sc499_device::sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SC499, "Archive SC-499", tag, owner, clock, "sc499", __FILE__)
+	: device_t(mconfig, SC499, "Archive SC-499", tag, owner, clock, "sc499", __FILE__),
+	device_isa8_card_interface(mconfig, *this)
 {
-	memset(static_cast<sc499_interface *>(this), 0, sizeof(sc499_interface));
-}
-
-//-------------------------------------------------
-//  static_set_interface - set the interface struct
-//-------------------------------------------------
-
-void sc499_device::static_set_interface(device_t &device, const sc499_interface &interface)
-{
-	sc499_device &sc499 = downcast<sc499_device &>(device);
-	static_cast<sc499_interface &>(sc499) = interface;
 }
 
 //-------------------------------------------------
@@ -182,15 +179,16 @@ void sc499_device::static_set_interface(device_t &device, const sc499_interface 
 
 void sc499_device::device_start()
 {
-	// FIXME: temporary hack: we allow only one device:
-	sc499_device::m_device = this;
+	set_isa_device();
 
 	LOG1(("start sc499"));
 
-	m_timer = m_device->machine().scheduler().timer_alloc(FUNC(static_timer_func), this);
-	m_timer1 = m_device->machine().scheduler().timer_alloc(FUNC(static_timer_func), this);
+	m_timer = timer_alloc(0, NULL);
+	m_timer1 = timer_alloc(1, NULL);
 
-	device_t *ctape_device = machine().device(SC499_CTAPE_TAG);
+	m_installed = false;
+
+	device_t *ctape_device = subdevice(SC499_CTAPE_TAG);
 	m_image = dynamic_cast<device_image_interface *> (ctape_device);
 
 	if (m_image->image_core_file() == NULL)
@@ -212,8 +210,6 @@ void sc499_device::device_start()
 
 void sc499_device::device_reset()
 {
-	LOG1(("reset sc499"));
-
 	m_data = 0;
 	m_command = SC499_CMD_NO_COMMAND;
 	m_status  = SC499_STAT_RDY; // | SC499_STAT_EXC;
@@ -238,6 +234,12 @@ void sc499_device::device_reset()
 
 	irq_state = CLEAR_LINE;
 	dma_drq_state = CLEAR_LINE;
+
+	if (!m_installed)
+	{
+		m_isa->install_device(0x0200, 0x0207, 0, 0, read8_delegate(FUNC(sc499_device::read), this), write8_delegate(FUNC(sc499_device::write), this));
+		m_isa->set_dma_channel(1, this, true);
+	}
 }
 
 /*-------------------------------------------------
@@ -248,21 +250,12 @@ const char *sc499_device::cpu_context()
 {
 	static char statebuf[64]; /* string buffer containing state description */
 
-	device_t *cpu = machine().device(MAINCPU);
 	osd_ticks_t t = osd_ticks();
 	int s = t / osd_ticks_per_second();
 	int ms = (t % osd_ticks_per_second()) / 1000;
 
-	/* if we have an executing CPU, output data */
-	if (cpu != NULL)
-	{
-		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
-				cpu->safe_pcbase(), tag());
-	}
-	else
-	{
-		sprintf(statebuf, "%d.%03d", s, ms);
-	}
+	sprintf(statebuf, "%d.%03d%s:", s, ms, tag());
+
 	return statebuf;
 }
 
@@ -336,11 +329,11 @@ void sc499_device::check_tape()
  timer_func - handle timer interrupts
  -------------------------------------------------*/
 
-void sc499_device::timer_func(int timer_type)
+void sc499_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	LOG2(("timer_func param=%d status=%x",timer_type, m_status));
+	LOG2(("timer_func param=%d status=%x", param, m_status));
 
-	switch (timer_type)
+	switch (param)
 	{
 	case SC499_TIMER_1: // set ready
 		m_status &= ~SC499_STAT_RDY;
@@ -397,27 +390,27 @@ void sc499_device::timer_func(int timer_type)
 			if (++m_underrun_counter >= 5000)
 			{
 				// stop tape (after 30 seconds) - probably the DMA handshake failed.
-				m_timer1->adjust(attotime::never, timer_type, attotime::never);
+				m_timer1->adjust(attotime::never, param, attotime::never);
 				m_status &= ~SC499_STAT_EXC;
 				m_status &= ~SC499_STAT_DIR;
 				tape_status_clear(SC499_ST_CLEAR_ALL);
 				tape_status_set(SC499_ST_READ_ERROR);
 
 				LOG(("timer_func param=%d status=%x tape_pos=%d - read data underrun aborted at %d",
-						timer_type, m_status, m_tape_pos, m_underrun_counter));
+						param, m_status, m_tape_pos, m_underrun_counter));
 			}
 			else
 			{
 				LOG2(("timer_func param=%d status=%x tape_pos=%d - read data underrun %d",
-						timer_type, m_status, m_tape_pos, m_underrun_counter));
+						param, m_status, m_tape_pos, m_underrun_counter));
 			}
 			break;
 		}
 		else if ( m_tape_pos > m_ctape_block_count || !(m_status & SC499_STAT_RDY))
 		{
 			LOG1(("timer_func param=%d status=%x tape_pos=%d - end-of-tape or not ready",
-								timer_type, m_status, m_tape_pos));
-			m_timer1->adjust(attotime::never, timer_type, attotime::never);
+								param, m_status, m_tape_pos));
+			m_timer1->adjust(attotime::never, param, attotime::never);
 			m_status &= ~SC499_STAT_EXC;
 			m_status &= ~SC499_STAT_DIR;
 			tape_status_clear(SC499_ST_CLEAR_ALL);
@@ -432,14 +425,14 @@ void sc499_device::timer_func(int timer_type)
 			if  (m_underrun_counter > 0)
 			{
 				LOG1(("timer_func param=%d status=%x tape_pos=%d - read data underrun ended at %d",
-						timer_type, m_status, m_tape_pos, m_underrun_counter));
+						param, m_status, m_tape_pos, m_underrun_counter));
 			}
 
 			read_block();
 			m_underrun_counter = 0;
 			if (block_is_filemark())
 			{
-				m_timer1->adjust(attotime::never, timer_type, attotime::never);
+				m_timer1->adjust(attotime::never, param, attotime::never);
 			}
 			else if (m_current_command == SC499_CMD_READ_DATA)
 			{
@@ -470,16 +463,11 @@ void sc499_device::timer_func(int timer_type)
 		break;
 
 	default:
-		LOG(("timer_func param=%d UNEXPECTED",timer_type));
+		LOG(("timer_func param=%d UNEXPECTED", param));
 		m_timer->reset();
 		break;
 	}
 
-}
-
-TIMER_CALLBACK( sc499_device::static_timer_func )
-{
-	reinterpret_cast<sc499_device *> (ptr)->timer_func(param);
 }
 
 /*-------------------------------------------------
@@ -488,10 +476,10 @@ TIMER_CALLBACK( sc499_device::static_timer_func )
 
 void sc499_device::set_interrupt(enum line_state state)
 {
-	if (set_irq != NULL && state != irq_state)
+	if (state != irq_state)
 	{
-		LOG2(("set_interrupt(%d)",state));
-		(*set_irq)(this, state);
+		LOG2(("set_interrupt(%d)",state)); 
+		m_isa->irq5_w(state);
 		irq_state = state;
 	}
 }
@@ -502,10 +490,10 @@ void sc499_device::set_interrupt(enum line_state state)
 
 void sc499_device::set_dma_drq(enum line_state state)
 {
-	if (dma_drq != NULL && state != dma_drq_state)
+	if (state != dma_drq_state)
 	{
-		LOG2(("set_dma_drq(%d)",state));
-		(*dma_drq)(this, state);
+		LOG2(("set_dma_drq(%d)",state)); 
+		m_isa->drq1_w(state);
 		dma_drq_state = state;
 	}
 }
@@ -661,6 +649,10 @@ void sc499_device::do_reset()
 	m_current_command = m_command;
 	m_status = ~(SC499_STAT_DIR | SC499_STAT_EXC);
 	m_control = 0;
+
+	m_first_block_hack = 1;
+	m_nasty_readahead = 0;
+	m_read_block_pending = 0;
 
 	if (m_has_cartridge)
 	{
@@ -845,9 +837,9 @@ void sc499_device::write_dma_reset( UINT8 data)
 	m_control = 0;
 }
 
-void sc499_device::write_port(offs_t offset, UINT8 data)
+WRITE8_MEMBER(sc499_device::write)
 {
-	switch (offset)
+	switch (offset^1)
 	{
 	case SC499_PORT_COMMAND: // write command
 		write_command_port(data);
@@ -867,12 +859,11 @@ void sc499_device::write_port(offs_t offset, UINT8 data)
 	}
 }
 
-//READ8_DEVICE_HANDLER( sc499_r )
-UINT8 sc499_device::read_port(offs_t offset)
+READ8_MEMBER(sc499_device::read)
 {
 	UINT8 data = 0xff;
 
-	switch (offset)
+	switch (offset^1)
 	{
 	case SC499_PORT_DATA: // read data (status data)
 		data = read_data_port();
@@ -889,7 +880,7 @@ UINT8 sc499_device::read_port(offs_t offset)
 	return data;
 }
 
-void sc499_device::set_tc_state(int state)
+void sc499_device::eop_w(int state)
 {
 	LOG2(("set_tc_state: block=%d state=%x", m_tape_pos-1, state));
 	if (state == 0)
@@ -915,7 +906,8 @@ void sc499_device::set_tc_state(int state)
 	}
 }
 
-UINT8 sc499_device::dack_read() {
+UINT8 sc499_device::dack_r(int line)
+{
 	UINT8 data = 0xff;
 
 //  set_dma_drq(CLEAR_LINE);
@@ -948,7 +940,8 @@ UINT8 sc499_device::dack_read() {
 	return data;
 }
 
-void sc499_device::dack_write(UINT8 data) {
+void sc499_device::dack_w(int line, UINT8 data) 
+{
 	LOG3(("dack_write: data=%x", data));
 
 	if (m_ctape_block_index < SC499_CTAPE_BLOCK_SIZE)
@@ -1106,40 +1099,6 @@ void sc499_device::block_set_filemark()
 	}
 }
 
-//**************************************************************************
-//  GLOBAL STUBS
-//**************************************************************************
-
-READ8_DEVICE_HANDLER( sc499_r )
-{
-	return downcast<sc499_device *> (device)->read_port(offset);
-}
-
-WRITE8_DEVICE_HANDLER( sc499_w )
-{
-	downcast<sc499_device *> (device)->write_port(offset, data);
-}
-
-void sc499_set_tc_state(running_machine *machine, int state)
-{
-	sc499_device::m_device->set_tc_state(state);
-}
-
-UINT8 sc499_dack_r(running_machine *machine)
-{
-	return sc499_device::m_device->dack_read();
-}
-
-void sc499_dack_w(running_machine *machine, UINT8 data)
-{
-	sc499_device::m_device->dack_write(data);
-}
-
-void sc499_set_verbose(int on_off)
-{
-	verbose = on_off == 0 ? 0 : VERBOSE > 1 ? VERBOSE : 1;
-}
-
 //##########################################################################
 class sc499_ctape_image_device :    public device_t,
 									public device_image_interface
@@ -1165,9 +1124,6 @@ protected:
 	virtual void device_start() { };
 };
 
-// device type definition
-extern const device_type SC499_CTAPE;
-
 const device_type SC499_CTAPE = &device_creator<sc499_ctape_image_device>;
 
 sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -1181,6 +1137,3 @@ void sc499_ctape_image_device::device_config_complete()
 	update_names(SC499_CTAPE, "ctape", "ct");
 };
 
-MACHINE_CONFIG_FRAGMENT( sc499_ctape )
-	MCFG_DEVICE_ADD(SC499_CTAPE_TAG, SC499_CTAPE, 0)
-MACHINE_CONFIG_END

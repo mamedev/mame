@@ -31,6 +31,7 @@
 #include "includes/apollo.h"
 
 #include "bus/isa/omti8621.h"
+#include "machine/sc499.h"
 
 #define APOLLO_IRQ_VECTOR 0xa0
 #define APOLLO_IRQ_PTM 0
@@ -323,10 +324,6 @@ INLINE am9517a_device *get_device_dma8237_2(device_t *device) {
 	return device->machine().driver_data<apollo_state>()->m_dma8237_2;
 }
 
-static void apollo_dma_ctape_drq(device_t *device, int state) {
-	DLOG1(("apollo_dma_ctape_drq: state=%x", state));
-	get_device_dma8237_1(device)->dreq1_w(state);
-}
 /*-------------------------------------------------
  DN3000/DN3500 DMA Controller 1 at 0x9000/0x10c00
  -------------------------------------------------*/
@@ -485,31 +482,11 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_word){
 	SLOG1(("dma write word at offset %x+%03x = %02x", page_offset, offset, data));
 }
 
-READ8_MEMBER(apollo_state::apollo_dma8237_ctape_dack_r ) {
-	UINT8 data = sc499_dack_r(&space.machine());
-	CLOG2(("dma ctape dack read %02x",data));
-
-	// hack for DN3000: select appropriate DMA channel No.
-	dn3000_dma_channel1 = 1; // 1 = ctape, 2 = floppy dma channel
-
-	return data;
-}
-
-WRITE8_MEMBER(apollo_state::apollo_dma8237_ctape_dack_w ) {
-	CLOG2(("dma ctape dack write %02x", data));
-	sc499_dack_w(&space.machine(), data);
-
-	// hack for DN3000: select appropriate DMA channel No.
-	// Note: too late for this byte, but next bytes will be ok
-	dn3000_dma_channel1 = 1; // 1 = ctape, 2 = floppy dma channel
-}
-
 WRITE_LINE_MEMBER(apollo_state::apollo_dma8237_out_eop ) {
 	CLOG1(("dma out eop state %02x", state));
 	m_cur_eop = state == ASSERT_LINE;
 	if(m_dma_channel != -1)
 		m_isa->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
-	sc499_set_tc_state(&machine(), state);
 }
 
 WRITE_LINE_MEMBER(apollo_state::apollo_dma_1_hrq_changed ) {
@@ -537,8 +514,8 @@ static I8237_INTERFACE( apollo_dma8237_1_config )
 	DEVCB_DRIVER_LINE_MEMBER(apollo_state, apollo_dma8237_out_eop),
 	DEVCB_DRIVER_MEMBER(apollo_state, apollo_dma_read_byte),
 	DEVCB_DRIVER_MEMBER(apollo_state, apollo_dma_write_byte),
-	{ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dma8237_0_dack_r), DEVCB_DRIVER_MEMBER(apollo_state, apollo_dma8237_ctape_dack_r), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dma8237_2_dack_r), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dma8237_3_dack_r)},
-	{ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dma8237_0_dack_w), DEVCB_DRIVER_MEMBER(apollo_state, apollo_dma8237_ctape_dack_w), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dma8237_2_dack_w), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dma8237_3_dack_w)},
+	{ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dma8237_0_dack_r), DEVCB_DRIVER_MEMBER(apollo_state, pc_dma8237_1_dack_r), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dma8237_2_dack_r), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dma8237_3_dack_r)},
+	{ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dma8237_0_dack_w), DEVCB_DRIVER_MEMBER(apollo_state, pc_dma8237_1_dack_w), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dma8237_2_dack_w), DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dma8237_3_dack_w)},
 	{ DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dack0_w), DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dack1_w), DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dack2_w), DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, apollo_state, pc_dack3_w) }
 };
 
@@ -850,22 +827,6 @@ static THREECOM3C505_INTERFACE(apollo_3c505_config) = {
  DN3500 Cartridge Tape DEVICE Configuration
  ***************************************************************************/
 
-static void apollo_ctape_set_irq(const device_t *device, int state) {
-	DLOG2(("apollo_ctape_set_irq: state=%x", state ));
-	device->machine().driver_data<apollo_state>()->apollo_pic_set_irq_line(APOLLO_IRQ_CTAPE, state);
-}
-
-
-static void apollo_ctape_dma_drq(const device_t *device, int state) {
-	DLOG2(("apollo_ctape_dma_drq: state=%x", state ));
-	apollo_dma_ctape_drq(device->machine().driver_data<apollo_state>()->m_maincpu, state);
-}
-
-static const sc499_interface apollo_ctape_config = {
-	apollo_ctape_set_irq,
-	apollo_ctape_dma_drq,
-};
-
 //##########################################################################
 // machine/apollo.c - APOLLO DS3500 CPU Board
 //##########################################################################
@@ -902,6 +863,7 @@ static const isa16bus_interface isabus_intf =
 
 static SLOT_INTERFACE_START(apollo_isa_cards)
 	SLOT_INTERFACE("wdc", ISA16_OMTI8621)	// Combo ESDI/AT floppy controller
+	SLOT_INTERFACE("ctape", ISA8_SC499)		// Archive SC499 cartridge tape
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( common )
@@ -926,14 +888,13 @@ MACHINE_CONFIG_FRAGMENT( common )
 	MCFG_ISA16_BUS_ADD(APOLLO_ISA_TAG, ":"MAINCPU, isabus_intf)
 	MCFG_ISA16_BUS_CUSTOM_SPACES()
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa1", apollo_isa_cards, "wdc", false)
-	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa2", apollo_isa_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa2", apollo_isa_cards, "ctape", false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa3", apollo_isa_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa4", apollo_isa_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa5", apollo_isa_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa6", apollo_isa_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa7", apollo_isa_cards, NULL, false)
 
-	MCFG_SC499_ADD(APOLLO_CTAPE_TAG, apollo_ctape_config)
 	MCFG_THREECOM3C505_ADD(APOLLO_ETH_TAG, apollo_3c505_config)
 MACHINE_CONFIG_END
 
