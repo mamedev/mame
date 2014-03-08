@@ -130,6 +130,7 @@ void duartn68681_device::device_reset()
 	OPR = 0;  /* Output Port Register */
 	CTR.d = 0;  /* Counter/Timer Preset Value */
 	IP_last_state = 0;  /* last state of IP bits */
+	m_read_vector = false;
 	// "reset clears internal registers (SRA, SRB, IMR, ISR, OPR, OPCR) puts OP0-7 in the high state, stops the counter/timer, and puts channels a/b in the inactive state"
 
 	write_outport(OPR ^ 0xff);
@@ -166,6 +167,7 @@ void duartn68681_device::update_interrupts()
 	{
 		LOG(( "68681: Interrupt line not active (IMR & ISR = %02X)\n", ISR & IMR));
 		write_irq(CLEAR_LINE);
+		m_read_vector = false;	// clear IACK too
 	}
 };
 
@@ -313,6 +315,18 @@ READ8_MEMBER( duartn68681_device::read )
 			else
 			{
 				r = IP_last_state;
+			}
+
+			r |= 0x80;	// bit 7 is always set
+
+			// bit 6 is /IACK (note the active-low)
+			if (m_read_vector)
+			{
+				r &= ~0x40;
+			}
+			else
+			{
+				r |= 0x40;
 			}
 			break; 
 
@@ -523,14 +537,14 @@ WRITE_LINE_MEMBER( duartn68681_device::ip3_w )
 WRITE_LINE_MEMBER( duartn68681_device::ip4_w )
 {
 	UINT8 newIP = (IP_last_state & ~0x10) | (state == ASSERT_LINE) ? 0x10 : 0;
-// TODO: special mode for ip4
+// TODO: special mode for ip4 (Ch. A Rx clock)
 	IP_last_state = newIP;
 }
 
 WRITE_LINE_MEMBER( duartn68681_device::ip5_w )
 {
 	UINT8 newIP = (IP_last_state & ~0x20) | (state == ASSERT_LINE) ? 0x20 : 0;
-// TODO: special mode for ip5
+// TODO: special mode for ip5 (Ch. B Tx clock)
 	IP_last_state = newIP;
 }
 
