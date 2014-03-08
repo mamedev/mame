@@ -980,6 +980,7 @@ ROM_START( jclub2o )
 ROM_END
 
 /*
+  Jockey Club II (26-mar-1997)
   8 Horses, old style PCB.
   Maybe upgraded to a release candidate software revision.
 */  
