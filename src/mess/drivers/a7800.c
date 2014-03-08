@@ -1095,7 +1095,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( a7800 )
-	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_FILL(0x0000, 0x40000, 0xff)
 	ROM_SYSTEM_BIOS( 0, "a7800", "Atari 7800" )
 	ROMX_LOAD("7800.u7", 0xf000, 0x1000, CRC(5d13730c) SHA1(d9d134bb6b36907c615a594cc7688f7bfcef5b43), ROM_BIOS(1))
@@ -1104,7 +1104,7 @@ ROM_START( a7800 )
 ROM_END
 
 ROM_START( a7800p )
-	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_FILL(0x0000, 0x40000, 0xff)
 	ROM_LOAD("7800pal.rom", 0xc000, 0x4000, CRC(d5b61170) SHA1(5a140136a16d1d83e4ff32a19409ca376a8df874))
 ROM_END
