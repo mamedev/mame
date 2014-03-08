@@ -314,6 +314,8 @@ void omti8621_device::device_reset()
 			m_isa->install_device(0x03f0, 0x03f7, *m_fdc, &pc_fdc_interface::map);
 		}
 
+		m_isa->set_dma_channel(2, this, TRUE);
+
 		m_fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(omti8621_device::fdc_irq_w), this));
 		m_fdc->setup_drq_cb(pc_fdc_interface::line_cb(FUNC(omti8621_device::fdc_drq_w), this));
 
