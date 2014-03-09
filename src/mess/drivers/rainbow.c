@@ -1246,6 +1246,7 @@ MACHINE_CONFIG_END
 // FIXME: 12-19606-02 and 12-19678-04 are just PART NUMBERS from the 100-A field manual.
 // Someone who knows the DEC naming conventions should correct them -
 ROM_START( rainbow100 )
+	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD( "12-19606-02a.bin", 0xFA000, 0x2000, NO_DUMP) // ROM (FA000-FBFFF) (E89) 8 K
 	ROM_LOAD( "12-19606-02b.bin", 0xFC000, 0x2000, NO_DUMP) // ROM (FC000-FDFFF) (E90) 8 K
 	ROM_LOAD( "12-19678-04.bin", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K
