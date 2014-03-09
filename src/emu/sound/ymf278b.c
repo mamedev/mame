@@ -479,17 +479,8 @@ void ymf278b_device::retrigger_note(YMF278BSlot *slot)
 	compute_envelope(slot);
 }
 
-void ymf278b_device::C_w(UINT8 reg, UINT8 data, int init)
+void ymf278b_device::C_w(UINT8 reg, UINT8 data)
 {
-	if (!init)
-	{
-		// PCM regs are only accessible if NEW2 is set
-		if (~m_exp & 2)
-			return;
-
-		m_stream->update();
-	}
-
 	// Handle slot registers specifically
 	if (reg >= 0x08 && reg <= 0xf7)
 	{
@@ -526,7 +517,7 @@ void ymf278b_device::C_w(UINT8 reg, UINT8 data, int init)
 
 				// copy internal registers data
 				for (i = 7; i < 12; i++)
-					C_w(8 + snum + (i-2) * 24, p[i], 1);
+					C_w(8 + snum + (i-2) * 24, p[i]);
 
 				// status register LD bit is on for approx 300us
 				m_status_ld = 1;
@@ -665,11 +656,13 @@ void ymf278b_device::C_w(UINT8 reg, UINT8 data, int init)
 				break;
 
 			case 0x03:
+				data &= 0x3f; // !
+				break;
 			case 0x04:
 				break;
 			case 0x05:
 				// set memory address
-				m_memadr = (m_pcmregs[3] & 0x3f) << 16 | m_pcmregs[4] << 8 | data;
+				m_memadr = m_pcmregs[3] << 16 | m_pcmregs[4] << 8 | data;
 				break;
 
 			case 0x06:
@@ -731,8 +724,14 @@ WRITE8_MEMBER( ymf278b_device::write )
 			break;
 
 		case 5:
+			// PCM regs are only accessible if NEW2 is set
+			if (~m_exp & 2)
+				break;
+
+			m_stream->update();
+
 			timer_busy_start(1);
-			C_w(m_port_C, data, 0);
+			C_w(m_port_C, data);
 			break;
 
 		default:
@@ -813,10 +812,10 @@ void ymf278b_device::device_reset()
 		A_w(i, 0);
 	B_w(5, 0);
 	for (i = 0; i < 8; i++)
-		C_w(i, 0, 1);
+		C_w(i, 0);
 	for (i = 0xff; i >= 8; i--)
-		C_w(i, 0, 1);
-	C_w(0xf8, 0x1b, 1);
+		C_w(i, 0);
+	C_w(0xf8, 0x1b);
 
 	m_port_AB = m_port_C = 0;
 	m_lastport = 0;

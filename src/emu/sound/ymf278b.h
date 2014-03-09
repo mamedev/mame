@@ -85,7 +85,7 @@ private:
 	void A_w(UINT8 reg, UINT8 data);
 	void B_w(UINT8 reg, UINT8 data);
 	void retrigger_note(YMF278BSlot *slot);
-	void C_w(UINT8 reg, UINT8 data, int init);
+	void C_w(UINT8 reg, UINT8 data);
 	void timer_busy_start(int is_pcm);
 	void precompute_rate_tables();
 	void register_save_state();
