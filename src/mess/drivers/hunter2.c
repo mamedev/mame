@@ -42,13 +42,18 @@ public:
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_READ8_MEMBER(port02_r);
+	DECLARE_WRITE8_MEMBER(port60_w);
+	DECLARE_WRITE8_MEMBER(port80_w);
 	DECLARE_WRITE8_MEMBER(port86_w);
+	DECLARE_WRITE8_MEMBER(portbb_w);
 	DECLARE_WRITE8_MEMBER(porte0_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(a_timer);
 	DECLARE_PALETTE_INIT(hunter2);
 	DECLARE_DRIVER_INIT(hunter2);
 
 private:
 	UINT8 m_keydata;
+	UINT8 m_irq_mask;
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -69,11 +74,15 @@ static ADDRESS_MAP_START(hunter2_io, AS_IO, 8, hunter2_state)
 	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w)
 	AM_RANGE(0x02, 0x02) AM_READ(port02_r)
+	AM_RANGE(0x03, 0x1F) AM_WRITENOP
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("lcdc", hd61830_device, data_w)
 	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("lcdc", hd61830_device, status_r, control_w)
 	AM_RANGE(0x3e, 0x3e) AM_DEVREAD("lcdc", hd61830_device, data_r)
 	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("rtc", mm58274c_device, read, write)
+	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(port80_w)
 	AM_RANGE(0x86, 0x86) AM_WRITE(port86_w)
+	AM_RANGE(0xbb, 0xbb) AM_WRITE(portbb_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(porte0_w)
 ADDRESS_MAP_END
 
@@ -174,7 +183,21 @@ WRITE8_MEMBER( hunter2_state::port01_w )
 
 READ8_MEMBER( hunter2_state::port02_r )
 {
-	return 8;
+	return 0x2c;
+}
+
+WRITE8_MEMBER( hunter2_state::port60_w )
+{
+/* according to the website,
+Bit 2: Backlight toggle
+Bits 1,0,7,6: Contrast level.
+00 is being written here
+*/
+}
+
+WRITE8_MEMBER( hunter2_state::port80_w )
+{
+// bit 0 does something
 }
 
 WRITE8_MEMBER( hunter2_state::port86_w )
@@ -182,6 +205,16 @@ WRITE8_MEMBER( hunter2_state::port86_w )
 	m_speaker->level_w(BIT(data, 0));
 }
 
+/*
+Bit 0 = Enable normal interrupts
+Bit 1 = Enable RSTC interrupts 
+Bit 2 = Enable RSTB interrupts
+Bit 3 = Enable RSTA interrupts
+*/
+WRITE8_MEMBER( hunter2_state::portbb_w )
+{
+	m_irq_mask = data;
+}
 
 /*
 data   bank0    bank1    bank2
@@ -220,6 +253,8 @@ WRITE8_MEMBER( hunter2_state::porte0_w )
 
 void hunter2_state::machine_reset()
 {
+	m_keydata = 0xff;
+	m_irq_mask = 0;
 	membank("bankr0")->set_entry(0);
 	membank("bankr1")->set_entry(0);
 	membank("bankr2")->set_entry(0);
@@ -264,6 +299,12 @@ static const mm58274c_interface rtc_intf =
 	1   /*  first day of week */
 };
 
+TIMER_DEVICE_CALLBACK_MEMBER(hunter2_state::a_timer)
+{
+	if BIT(m_irq_mask, 3)
+		m_maincpu->set_input_line(NSC800_RSTA, HOLD_LINE);
+}
+
 static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, 4000000)
@@ -288,6 +329,7 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 
 	/* Devices */
 	MCFG_MM58274C_ADD("rtc", rtc_intf)
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("hunter_a", hunter2_state, a_timer, attotime::from_hz(61))
 MACHINE_CONFIG_END
 
 /* ROM definition */
