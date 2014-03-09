@@ -302,7 +302,7 @@ protected:
 		MFM,                    //!< One byte in p1 to be mfm-encoded, msb first, repeated p2 times
 		MFMBITS,                //!< A value of p2 bits in p1 to be mfm-encoded, msb first
 		GCR5,                   //!< One byte in p1 to be gcr5-encoded, repeated p2 times
-		_8N1,					//!< One byte in p1 to be 8N1-encoded, repeated p2 times
+		_8N1,                   //!< One byte in p1 to be 8N1-encoded, repeated p2 times
 		RAW,                    //!< One 16 bits word in p1 to be written raw, msb first, repeated p2 times
 		RAWBYTE,                //!< One 8 bit byte in p1 to be written raw, msb first, repeated p2 times
 		RAWBITS,                //!< A value of p2 bits in p1 to be copied as-is, msb first
@@ -311,7 +311,7 @@ protected:
 		TRACK_ID_DOS2_GCR5,     //!< Track id byte, gcr5-encoded
 		TRACK_ID_DOS25_GCR5,    //!< Track id byte, gcr5-encoded
 		TRACK_ID_GCR6,          //!< Track id low 6 bits, gcr6-encoded
-		TRACK_ID_8N1,			//!< Track id byte, 8N1-encoded
+		TRACK_ID_8N1,           //!< Track id byte, 8N1-encoded
 		HEAD_ID,                //!< Head id byte, mfm-encoded
 		HEAD_ID_FM,             //!< Head id byte, fm-encoded
 		HEAD_ID_SWAP,           //!< Head id byte swapped (0->1, 1->0), mfm-encoded
@@ -320,7 +320,7 @@ protected:
 		SECTOR_ID_FM,           //!< Sector id byte, fm-encoded
 		SECTOR_ID_GCR5,         //!< Sector id byte, gcr5-encoded
 		SECTOR_ID_GCR6,         //!< Sector id byte, gcr6-encoded
-		SECTOR_ID_8N1,			//!< Sector id byte, 8N1-encoded
+		SECTOR_ID_8N1,          //!< Sector id byte, 8N1-encoded
 		SIZE_ID,                //!< Sector size code on one byte [log2(size/128)], mfm-encoded
 		SIZE_ID_FM,             //!< Sector size code on one byte [log2(size/128)], fm-encoded
 		SECTOR_INFO_GCR6,       //!< Sector info byte, gcr6-encoded
@@ -337,14 +337,14 @@ protected:
 		SECTOR_DATA_E,          //!< Sector data to mfm-encode, even bits only, which in p1, -1 for the current one per the sector id
 		SECTOR_DATA_GCR5,       //!< Sector data to gcr5-encode, which in p1, -1 for the current one per the sector id
 		SECTOR_DATA_MAC,        //!< Transformed sector data + checksum, mac style, id in p1, -1 for the current one per the sector id
-		SECTOR_DATA_8N1,		//!< Sector data to 8N1-encode, which in p1, -1 for the current one per the sector id
+		SECTOR_DATA_8N1,        //!< Sector data to 8N1-encode, which in p1, -1 for the current one per the sector id
 
 		CRC_CCITT_START,        //!< Start a CCITT CRC calculation, with the usual x^16 + x^12 + x^5 + 1 (11021) polynomial, p1 = crc id
 		CRC_CCITT_FM_START,     //!< Start a CCITT CRC calculation, with the usual x^16 + x^12 + x^5 + 1 (11021) polynomial, p1 = crc id
 		CRC_AMIGA_START,        //!< Start an amiga checksum calculation, p1 = crc id
-		CRC_CBM_START,          //<! Start a CBM checksum calculation (xor of original data values, gcr5-encoded), p1 = crc id
+		CRC_CBM_START,          //!< Start a CBM checksum calculation (xor of original data values, gcr5-encoded), p1 = crc id
 		CRC_MACHEAD_START,      //!< Start of the mac gcr6 sector header checksum calculation (xor of pre-encode 6-bits values, gcr6-encoded)
-		CRC_FCS_START,			//!< Start a Compucolor File Control System checksum calculation, p1 = crc id
+		CRC_FCS_START,          //!< Start a Compucolor File Control System checksum calculation, p1 = crc id
 		CRC_END,                //!< End the checksum, p1 = crc id
 		CRC,                    //!< Write a checksum in the apporpriate format, p1 = crc id
 
@@ -561,6 +561,8 @@ protected:
 	//! GCR6 decode
 	void gcr6_decode(UINT8 e0, UINT8 e1, UINT8 e2, UINT8 e3, UINT8 &va, UINT8 &vb, UINT8 &vc);
 
+	UINT8 sbyte_mfm_r(const UINT8 *bitstream, int &pos, int track_size);
+
 private:
 	enum { CRC_NONE, CRC_AMIGA, CRC_CBM, CRC_CCITT, CRC_CCITT_FM, CRC_MACHEAD, CRC_FCS };
 	enum { MAX_CRC_COUNT = 64 };
@@ -589,7 +591,6 @@ private:
 
 	int sbit_r(const UINT8 *bitstream, int pos);
 	int sbit_rp(const UINT8 *bitstream, int &pos, int track_size);
-	UINT8 sbyte_mfm_r(const UINT8 *bitstream, int &pos, int track_size);
 
 	int calc_sector_index(int num, int interleave, int skew, int total_sectors, int track_head);
 };
