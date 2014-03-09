@@ -49,42 +49,43 @@ public:
 	};
 
 	alphatro_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_crtc(*this, "crtc"),
-	m_usart(*this, "usart"),
-	m_cass(*this, "cassette"),
-	m_beep(*this, "beeper"),
-	m_p_ram(*this, "p_ram"),
-	m_p_videoram(*this, "videoram"){ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_crtc;
-	required_device<i8251_device> m_usart;
-	required_device<cassette_image_device> m_cass;
-	required_device<beep_device> m_beep;
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_usart(*this, "usart")
+		, m_cass(*this, "cassette")
+		, m_beep(*this, "beeper")
+		, m_p_ram(*this, "main_ram")
+	{ }
 
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
+	DECLARE_PALETTE_INIT(alphatro);
 	TIMER_DEVICE_CALLBACK_MEMBER(alphatro_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(alphatro_p);
-
-	required_shared_ptr<UINT8> m_p_ram;
 	required_shared_ptr<UINT8> m_p_videoram;
-	emu_timer* m_sys_timer;
 	UINT8 *m_p_chargen;
-	virtual void video_start();
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	DECLARE_PALETTE_INIT(alphatro);
+	UINT16 m_flashcnt;
+
 private:
 	UINT8 m_timer_bit;
 	UINT8 m_cass_data[4];
 	bool m_cass_state;	
+	emu_timer* m_sys_timer;
+	virtual void video_start();
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	required_device<i8251_device> m_usart;
+	required_device<cassette_image_device> m_cass;
+	required_device<beep_device> m_beep;
+	required_shared_ptr<UINT8> m_p_ram;
 };
 
 READ8_MEMBER( alphatro_state::port10_r )
@@ -155,36 +156,51 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 	alphatro_state *state = device->machine().driver_data<alphatro_state>();
 	const rgb_t *pens = bitmap.palette()->entry_list_raw();
 	bool palette = BIT(state->ioport("CONFIG")->read(), 5);
-	UINT8 chr,gfx,attr,fg,inv;
+	state->m_flashcnt++;
+	bool inv;
+	UINT8 chr,gfx,attr,bg,fg;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
-		inv = (x == cursor_x) ? 0xff : 0;
+		inv = (x == cursor_x);
 		mem = (ma + x) & 0x7ff;
 		chr = state->m_p_videoram[mem];
 		attr = state->m_p_videoram[mem | 0x800];
 		fg = (palette) ? 8 : attr & 7; // amber or RGB
+		bg = (palette) ? 0 : (attr & 0x38) >> 3;
 
-		if (BIT(attr, 7)) // reverse video for fkey labels
+		if BIT(attr, 7) // reverse video
 		{
-			inv ^= 0xff;
+			inv ^= 1;
 			chr &= 0x7f;
 		}
 
+		if (BIT(attr, 6) & BIT(state->m_flashcnt, 13)) // flashing
+		{
+			inv ^= 1;
+		}
+
 		/* get pattern of pixels for that character scanline */
-		gfx = state->m_p_chargen[(chr<<4) | ra] ^ inv;
+		gfx = state->m_p_chargen[(chr<<4) | ra];
+
+		if (inv)
+		{
+			UINT8 t = bg;
+			bg = fg;
+			fg = t;
+		}
 
 		/* Display a scanline of a character (8 pixels) */
-		*p++ = pens[BIT(gfx, 7) ? fg : 0];
-		*p++ = pens[BIT(gfx, 6) ? fg : 0];
-		*p++ = pens[BIT(gfx, 5) ? fg : 0];
-		*p++ = pens[BIT(gfx, 4) ? fg : 0];
-		*p++ = pens[BIT(gfx, 3) ? fg : 0];
-		*p++ = pens[BIT(gfx, 2) ? fg : 0];
-		*p++ = pens[BIT(gfx, 1) ? fg : 0];
-		*p++ = pens[BIT(gfx, 0) ? fg : 0];
+		*p++ = pens[BIT(gfx, 7) ? fg : bg];
+		*p++ = pens[BIT(gfx, 6) ? fg : bg];
+		*p++ = pens[BIT(gfx, 5) ? fg : bg];
+		*p++ = pens[BIT(gfx, 4) ? fg : bg];
+		*p++ = pens[BIT(gfx, 3) ? fg : bg];
+		*p++ = pens[BIT(gfx, 2) ? fg : bg];
+		*p++ = pens[BIT(gfx, 1) ? fg : bg];
+		*p++ = pens[BIT(gfx, 0) ? fg : bg];
 	}
 }
 
@@ -194,7 +210,7 @@ INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
 }
 
 static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
-	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("p_ram")
+	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
