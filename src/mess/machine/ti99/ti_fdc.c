@@ -397,7 +397,8 @@ void ti_fdc_device::device_config_complete()
 }
 
 FLOPPY_FORMATS_MEMBER(ti_fdc_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT
+	FLOPPY_TI99_SDF_FORMAT,
+	FLOPPY_TI99_TDF_FORMAT
 FLOPPY_FORMATS_END_NO_DEFAULTS
 
 static SLOT_INTERFACE_START( tifdc_floppies )
@@ -407,7 +408,7 @@ SLOT_INTERFACE_END
 MACHINE_CONFIG_FRAGMENT( ti_fdc )
 	MCFG_FD1771x_ADD(FDC_TAG, XTAL_1MHz)
 	MCFG_FLOPPY_DRIVE_ADD("0", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("1", tifdc_floppies, NULL, ti_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("1", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("2", tifdc_floppies, NULL, ti_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
 
