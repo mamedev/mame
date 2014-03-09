@@ -66,7 +66,8 @@ a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, const char *
 		device_t(mconfig, A2BUS_MIDI, "6850 MIDI card", tag, owner, clock, "a2midi", __FILE__),
 		device_a2bus_card_interface(mconfig, *this),
 		m_ptm(*this, MIDI_PTM_TAG),
-		m_acia(*this, MIDI_ACIA_TAG)
+		m_acia(*this, MIDI_ACIA_TAG),
+		m_ptm_irq(false)
 {
 }
 
@@ -74,7 +75,8 @@ a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, device_type 
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_a2bus_card_interface(mconfig, *this),
 		m_ptm(*this, MIDI_PTM_TAG),
-		m_acia(*this, MIDI_ACIA_TAG)
+		m_acia(*this, MIDI_ACIA_TAG),
+		m_ptm_irq(false)
 {
 }
 
