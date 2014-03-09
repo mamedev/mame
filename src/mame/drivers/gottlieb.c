@@ -2403,6 +2403,33 @@ ROM_START( 3stooges )
 ROM_END
 
 
+ROM_START( 3stoogesa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gv113ram4.bin",   0x2000, 0x1000, CRC(a00365be) SHA1(a151e1dfd8a251e6558968ea1df5a8516286d2c1) ) /* Came from PCB with low serial # */
+	ROM_LOAD( "gv113rom4.bin",   0x6000, 0x2000, CRC(a8f9d51d) SHA1(c9b18e31fea6fd01171528dd583b4d4f9b9078ed) )
+	ROM_LOAD( "gv113rom3.bin",   0x8000, 0x2000, CRC(60bda7b6) SHA1(7dd7633397d3ccdbd7885a5436f422f575ecd0cc) )
+	ROM_LOAD( "gv113rom2.bin",   0xa000, 0x2000, CRC(9bb95798) SHA1(91cf203cf59c5a96ed5de8f4c5743bd91350c16f) )
+	ROM_LOAD( "gv113rom1.bin",   0xc000, 0x2000, CRC(0a8ce58d) SHA1(0eb50431b3f44dd63b3aa82e005111073319cba4) )
+	ROM_LOAD( "gv113rom0.bin",   0xe000, 0x2000, CRC(f245fe18) SHA1(6ec545063ba9df31b536a845a21ba40dbb9d0624) )
+
+	ROM_REGION( 0x10000, "r2sound:audiocpu", 0 )
+	ROM_LOAD( "drom1",        0xc000, 0x2000, CRC(87a9fa10) SHA1(9c07837dce1384d6b51b716aa8ceeb5bc247a911) )
+
+	ROM_REGION( 0x10000, "r2sound:speechcpu", 0 )
+	ROM_LOAD( "yrom2",        0xc000, 0x2000, CRC(90f9c940) SHA1(646dacc902cf235948ac9c064c92390e2764370b) )
+	ROM_LOAD( "yrom1",        0xe000, 0x2000, CRC(55f8ab30) SHA1(a6b6318f12fd4a1fab61b82cde33759da615d5b2) )
+
+	ROM_REGION( 0x2000, "bgtiles", ROMREGION_ERASE00 )
+	/* no ROMs; RAM is used instead */
+
+	ROM_REGION( 0x8000, "sprites", 0 )
+	ROM_LOAD( "gv113fg3",     0x0000, 0x2000, CRC(28071212) SHA1(33ce5cfae3491658f8b4cb977dc2da0a75dffee4) )
+	ROM_LOAD( "gv113fg2",     0x2000, 0x2000, CRC(9fa3dfde) SHA1(693327c60691748bf16e486b2962ebe019009a69) )
+	ROM_LOAD( "gv113fg1",     0x4000, 0x2000, CRC(fb223854) SHA1(b1eaad971edd2f3a2aed66c5f9d0f27d6ffd5466) )
+	ROM_LOAD( "gv113fg0",     0x6000, 0x2000, CRC(95762c53) SHA1(e486a232e6b62ab21b9c3be521606dea2a451889) )
+ROM_END
+
+
 ROM_START( vidvince )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gv132_ram4_2732.c9c10",   0x2000, 0x1000, CRC(67a4927b) SHA1(41dfd13ea24bb3b0f8f917f4af5f6b33af1bc2e7) )
@@ -2519,29 +2546,30 @@ DRIVER_INIT_MEMBER(gottlieb_state,vidvince)
  *************************************/
 
 /* games using rev 1 sound board */
-GAME( 1982, reactor,   0,        reactor,   reactor,  gottlieb_state, ramtiles, ROT0,   "Gottlieb", "Reactor", GAME_IMPERFECT_SOUND )
-GAME( 1982, qbert,     0,        qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb", "Q*bert (US set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1982, qberta,    qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb", "Q*bert (US set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1982, reactor,   0,        reactor,   reactor,  gottlieb_state, ramtiles, ROT0,   "Gottlieb",                  "Reactor", GAME_IMPERFECT_SOUND )
+GAME( 1982, qbert,     0,        qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 1)", GAME_IMPERFECT_SOUND )
+GAME( 1982, qberta,    qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 2)", GAME_IMPERFECT_SOUND )
 GAME( 1982, qbertj,    qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1982, myqbert,   qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb", "Mello Yello Q*bert", GAME_IMPERFECT_SOUND )
-GAME( 1982, qberttst,  qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb", "Q*bert (early test version)", GAME_IMPERFECT_SOUND )
-GAME( 1982, qbtrktst,  qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb", "Q*bert Board Input Test Rom", GAME_IMPERFECT_SOUND )
-GAME( 1982, insector,  0,        gottlieb1, insector, gottlieb_state, romtiles, ROT0,   "Gottlieb", "Insector (prototype)", 0 )
-GAME( 1982, tylz,      0,        tylz,      tylz,     gottlieb_state, romtiles, ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
-GAME( 1984, argusg,    0,        gottlieb1, argusg,   gottlieb_state, ramtiles, ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
-GAME( 1983, mplanets,  0,        gottlieb1, mplanets, gottlieb_state, romtiles, ROT270, "Gottlieb", "Mad Planets", 0 )
+GAME( 1982, myqbert,   qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb",                  "Mello Yello Q*bert", GAME_IMPERFECT_SOUND )
+GAME( 1982, qberttst,  qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", GAME_IMPERFECT_SOUND )
+GAME( 1982, qbtrktst,  qbert,    qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", GAME_IMPERFECT_SOUND )
+GAME( 1982, insector,  0,        gottlieb1, insector, gottlieb_state, romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", 0 )
+GAME( 1982, tylz,      0,        tylz,      tylz,     gottlieb_state, romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
+GAME( 1984, argusg,    0,        gottlieb1, argusg,   gottlieb_state, ramtiles, ROT0,   "Gottlieb",                  "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
+GAME( 1983, mplanets,  0,        gottlieb1, mplanets, gottlieb_state, romtiles, ROT270, "Gottlieb",                  "Mad Planets", 0 )
 GAME( 1983, mplanetsuk,mplanets, gottlieb1, mplanets, gottlieb_state, romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
-GAME( 1983, krull,     0,        gottlieb1, krull,    gottlieb_state, ramtiles, ROT270, "Gottlieb", "Krull", 0 )
-GAME( 1983, kngtmare,  0,        gottlieb1, kngtmare, gottlieb_state, romtiles, ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
-GAME( 1983, sqbert,    0,        qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", GAME_IMPERFECT_SOUND )
-GAME( 1983, qbertqub,  0,        qbert,     qbertqub, gottlieb_state, qbertqub, ROT270, "Mylstar", "Q*bert's Qubes", GAME_IMPERFECT_SOUND )
-GAME( 1984, curvebal,  0,        gottlieb1, curvebal, gottlieb_state, romtiles, ROT270, "Mylstar", "Curve Ball", 0 )
+GAME( 1983, krull,     0,        gottlieb1, krull,    gottlieb_state, ramtiles, ROT270, "Gottlieb",                  "Krull", 0 )
+GAME( 1983, kngtmare,  0,        gottlieb1, kngtmare, gottlieb_state, romtiles, ROT0,   "Gottlieb",                  "Knightmare (prototype)", GAME_NO_SOUND ) // Missing sound ROMs
+GAME( 1983, sqbert,    0,        qbert,     qbert,    gottlieb_state, qbert,    ROT270, "Mylstar",                   "Faster, Harder, More Challenging Q*bert (prototype)", GAME_IMPERFECT_SOUND )
+GAME( 1983, qbertqub,  0,        qbert,     qbertqub, gottlieb_state, qbertqub, ROT270, "Mylstar",                   "Q*bert's Qubes", GAME_IMPERFECT_SOUND )
+GAME( 1984, curvebal,  0,        gottlieb1, curvebal, gottlieb_state, romtiles, ROT270, "Mylstar",                   "Curve Ball", 0 )
 
 /* games using rev 2 sound board */
-GAME( 1983, screwloo, 0,         screwloo,  screwloo, gottlieb_state, screwloo, ROT0,   "Mylstar", "Screw Loose (prototype)", 0 )
-GAME( 1983, mach3,    0,         g2laser,   mach3,    gottlieb_state, romtiles, ROT0,   "Mylstar", "M.A.C.H. 3", 0 )
-GAME( 1984, cobram3,  cobra,     cobram3,   cobram3,  gottlieb_state, romtiles, ROT0,   "Data East", "Cobra Command (M.A.C.H. 3 hardware)", 0 )
-GAME( 1984, usvsthem, 0,         g2laser,   usvsthem, gottlieb_state, romtiles, ROT0,   "Mylstar", "Us vs. Them", 0 )
-GAME( 1984, 3stooges, 0,         gottlieb2, 3stooges, gottlieb_state, stooges,  ROT0,   "Mylstar", "The Three Stooges In Brides Is Brides", 0 )
-GAME( 1984, vidvince, 0,         gottlieb2, vidvince, gottlieb_state, vidvince, ROT0,   "Mylstar", "Video Vince and the Game Factory (prototype)", GAME_IMPERFECT_GRAPHICS ) // sprite wrapping issues
-GAME( 1984, wizwarz,  0,         gottlieb2, wizwarz,  gottlieb_state, romtiles, ROT0,   "Mylstar", "Wiz Warz (prototype)", 0 )
+GAME( 1983, screwloo,  0,        screwloo,  screwloo, gottlieb_state, screwloo, ROT0,   "Mylstar",                   "Screw Loose (prototype)", 0 )
+GAME( 1983, mach3,     0,        g2laser,   mach3,    gottlieb_state, romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3", 0 )
+GAME( 1984, cobram3,   cobra,    cobram3,   cobram3,  gottlieb_state, romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware)", 0 )
+GAME( 1984, usvsthem,  0,        g2laser,   usvsthem, gottlieb_state, romtiles, ROT0,   "Mylstar",                   "Us vs. Them", 0 )
+GAME( 1984, 3stooges,  0,        gottlieb2, 3stooges, gottlieb_state, stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 1)", 0 )
+GAME( 1984, 3stoogesa, 3stooges, gottlieb2, 3stooges, gottlieb_state, stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 2)", 0 )
+GAME( 1984, vidvince,  0,        gottlieb2, vidvince, gottlieb_state, vidvince, ROT0,   "Mylstar",                   "Video Vince and the Game Factory (prototype)", GAME_IMPERFECT_GRAPHICS ) // sprite wrapping issues
+GAME( 1984, wizwarz,   0,        gottlieb2, wizwarz,  gottlieb_state, romtiles, ROT0,   "Mylstar",                   "Wiz Warz (prototype)", 0 )
