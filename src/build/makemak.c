@@ -496,6 +496,7 @@ int main(int argc, char *argv[])
 		include_mapping("src/emu/video/video.mak");
 		include_mapping("src/emu/sound/sound.mak");
 		include_mapping("src/emu/machine/machine.mak");
+		include_mapping("src/emu/bus/bus.mak");
 		if (librarylist!=NULL)
 		{
 			printf("OBJDIRS += \\\n");
