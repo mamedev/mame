@@ -27,6 +27,43 @@ const device_type WD1770x = &device_creator<wd1770_t>;
 const device_type WD1772x = &device_creator<wd1772_t>;
 const device_type WD1773x = &device_creator<wd1773_t>;
 
+/*
+    Debugging flags. Set to 0 or 1.
+*/
+
+// Shows shift register contents
+#define TRACE_SHIFT 0
+
+// Shows operations on the CPU side
+#define TRACE_COMP 0
+
+// Shows command invocation
+#define TRACE_COMMAND 0
+
+// Shows sync actions
+#define TRACE_SYNC 0
+
+// Show control lines
+#define TRACE_LINES 0
+
+// Show events
+#define TRACE_EVENT 0
+
+// Show sector match operation
+#define TRACE_MATCH 0
+
+// Show track description
+#define TRACE_DESC 0
+
+// Show write operation on image
+#define TRACE_WRITE 0
+
+// Show transitions
+#define TRACE_TRANSITION 0
+
+// Show state machine
+#define TRACE_STATE 0
+
 wd_fdc_t::wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
@@ -150,7 +187,7 @@ void wd_fdc_t::dden_w(bool _dden)
 
 	if(dden != _dden) {
 		dden = _dden;
-		logerror("%s: select %s\n", tag(), dden ? "fm" : "mfm");
+		if (TRACE_LINES) logerror("%s: select %s\n", tag(), dden ? "fm" : "mfm");
 	}
 }
 
@@ -169,6 +206,7 @@ astring wd_fdc_t::ttsn()
 
 void wd_fdc_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	if (TRACE_EVENT) logerror("%s: Event fired for timer %d\n", tag(), (int)id);
 	live_sync();
 
 	switch(id) {
@@ -196,6 +234,7 @@ void wd_fdc_t::command_end()
 
 void wd_fdc_t::seek_start(int state)
 {
+	if (TRACE_COMMAND) logerror("%s: seek %d\n", tag(), data);
 	main_state = state;
 	status = (status & ~(S_CRC|S_RNF|S_SPIN)) | S_BUSY;
 	if(head_control) {
@@ -215,6 +254,7 @@ void wd_fdc_t::seek_continue()
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
+			if (TRACE_STATE) logerror("%s: SPINUP\n", tag());
 			if(!(status & S_MON)) {
 				spinup();
 				return;
@@ -225,9 +265,11 @@ void wd_fdc_t::seek_continue()
 			break;
 
 		case SPINUP_WAIT:
+			if (TRACE_STATE) logerror("%s: SPINUP_WAIT\n", tag());
 			return;
 
 		case SPINUP_DONE:
+			if (TRACE_STATE) logerror("%s: SPINUP_DONE\n", tag());
 			if(main_state == RESTORE && floppy && !floppy->trk00_r()) {
 				sub_state = SEEK_WAIT_STEP_TIME;
 				delay_cycles(t_gen, step_times[command & 3]);
@@ -243,6 +285,7 @@ void wd_fdc_t::seek_continue()
 			break;
 
 		case SEEK_MOVE:
+			if (TRACE_STATE) logerror("%s: SEEK_MOVE\n", tag());
 			if(floppy) {
 				floppy->dir_w(last_dir);
 				floppy->stp_w(0);
@@ -258,9 +301,11 @@ void wd_fdc_t::seek_continue()
 			return;
 
 		case SEEK_WAIT_STEP_TIME:
+			if (TRACE_STATE) logerror("%s: SEEK_WAIT_STEP_TIME\n", tag());
 			return;
 
 		case SEEK_WAIT_STEP_TIME_DONE: {
+			if (TRACE_STATE) logerror("%s: SEEK_WAIT_STEP_TIME\n", tag());
 			bool done = false;
 			switch(main_state) {
 			case RESTORE:
@@ -293,13 +338,16 @@ void wd_fdc_t::seek_continue()
 		}
 
 		case SEEK_WAIT_STABILIZATION_TIME:
+			if (TRACE_STATE) logerror("%s: SEEK_WAIT_STABILIZATION_TIME\n", tag());
 			return;
 
 		case SEEK_WAIT_STABILIZATION_TIME_DONE:
+			if (TRACE_STATE) logerror("%s: SEEK_WAIT_STABILIZATION_TIME_DONE\n", tag());
 			sub_state = SEEK_DONE;
 			break;
 
 		case SEEK_DONE:
+			if (TRACE_STATE) logerror("%s: SEEK_DONE\n", tag());
 			status |= S_HLD;
 			if(command & 0x04) {
 				if(!is_ready()) {
@@ -316,6 +364,7 @@ void wd_fdc_t::seek_continue()
 			return;
 
 		case SCAN_ID:
+			if (TRACE_STATE) logerror("%s: SCAN_ID\n", tag());
 			if(cur_live.idbuf[0] != track) {
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
@@ -329,6 +378,7 @@ void wd_fdc_t::seek_continue()
 			return;
 
 		case SCAN_ID_FAILED:
+			if (TRACE_STATE) logerror("%s: SCAN_ID_FAILED\n", tag());
 			status |= S_RNF;
 			command_end();
 			return;
@@ -342,7 +392,7 @@ void wd_fdc_t::seek_continue()
 
 bool wd_fdc_t::sector_matches() const
 {
-	if(0)
+	if(TRACE_MATCH)
 		logerror("%s: matching %02x %02x %02x %02x - %02x %02x\n", tag(),
 					cur_live.idbuf[0], cur_live.idbuf[1], cur_live.idbuf[2], cur_live.idbuf[3],
 					track, sector);
@@ -364,6 +414,7 @@ bool wd_fdc_t::is_ready()
 
 void wd_fdc_t::read_sector_start()
 {
+	if (TRACE_COMMAND) logerror("%s: read sector%s (c=%02x) t=%d, s=%d\n", tag(), command & 0x10 ? " multiple" : "", command, track, sector);
 	if(!is_ready()) {
 		command_end();
 		return;
@@ -384,6 +435,7 @@ void wd_fdc_t::read_sector_continue()
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
+			if (TRACE_STATE) logerror("%s: SPINUP\n", tag());
 			if(!(status & S_MON)) {
 				spinup();
 				return;
@@ -392,9 +444,11 @@ void wd_fdc_t::read_sector_continue()
 			break;
 
 		case SPINUP_WAIT:
+			if (TRACE_STATE) logerror("%s: SPINUP_WAIT\n", tag());
 			return;
 
 		case SPINUP_DONE:
+			if (TRACE_STATE) logerror("%s: SPINUP_DONE\n", tag());
 			if(command & 4) {
 				sub_state = SETTLE_WAIT;
 				delay_cycles(t_gen, settle_time());
@@ -405,15 +459,18 @@ void wd_fdc_t::read_sector_continue()
 			}
 
 		case SETTLE_WAIT:
+			if (TRACE_STATE) logerror("%s: SETTLE_WAIT\n", tag());
 			return;
 
 		case SETTLE_DONE:
+			if (TRACE_STATE) logerror("%s: SETTLE_DONE\n", tag());
 			sub_state = SCAN_ID;
 			counter = 0;
 			live_start(SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
+			if (TRACE_STATE) logerror("%s: SCAN_ID\n", tag());
 			if(!sector_matches()) {
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
@@ -429,11 +486,13 @@ void wd_fdc_t::read_sector_continue()
 			return;
 
 		case SCAN_ID_FAILED:
+			if (TRACE_STATE) logerror("%s: SCAN_ID_FAILED\n", tag());
 			status |= S_RNF;
 			command_end();
 			return;
 
 		case SECTOR_READ:
+			if (TRACE_STATE) logerror("%s: SECTOR_READ\n", tag());
 			if(cur_live.crc)
 				status |= S_CRC;
 
@@ -455,6 +514,8 @@ void wd_fdc_t::read_sector_continue()
 
 void wd_fdc_t::read_track_start()
 {
+	if (TRACE_COMMAND) logerror("%s: read track (c=%02x) t=%d\n", tag(), command, track);
+
 	if(!is_ready()) {
 		command_end();
 		return;
@@ -475,6 +536,7 @@ void wd_fdc_t::read_track_continue()
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
+			if (TRACE_STATE) logerror("%s: SPINUP\n", tag());
 			if(!(status & S_MON)) {
 				spinup();
 				return;
@@ -483,9 +545,11 @@ void wd_fdc_t::read_track_continue()
 			break;
 
 		case SPINUP_WAIT:
+			if (TRACE_STATE) logerror("%s: SPINUP_WAIT\n", tag());
 			return;
 
 		case SPINUP_DONE:
+			if (TRACE_STATE) logerror("%s: SPINUP_DONE\n", tag());
 			if(command & 4) {
 				sub_state = SETTLE_WAIT;
 				delay_cycles(t_gen, settle_time());
@@ -497,21 +561,26 @@ void wd_fdc_t::read_track_continue()
 			}
 
 		case SETTLE_WAIT:
+			if (TRACE_STATE) logerror("%s: SETTLE_WAIT\n", tag());
 			return;
 
 		case SETTLE_DONE:
+			if (TRACE_STATE) logerror("%s: SETTLE_DONE\n", tag());
 			sub_state = WAIT_INDEX;
 			return;
 
 		case WAIT_INDEX:
+			if (TRACE_STATE) logerror("%s: WAIT_INDEX\n", tag());
 			return;
 
 		case WAIT_INDEX_DONE:
+			if (TRACE_STATE) logerror("%s: WAIT_INDEX_DONE\n", tag());
 			sub_state = TRACK_DONE;
 			live_start(READ_TRACK_DATA);
 			return;
 
 		case TRACK_DONE:
+			if (TRACE_STATE) logerror("%s: TRACK_DONE\n", tag());
 			command_end();
 			return;
 
@@ -524,6 +593,7 @@ void wd_fdc_t::read_track_continue()
 
 void wd_fdc_t::read_id_start()
 {
+	if (TRACE_COMMAND) logerror("%s: read id (c=%02x)\n", tag(), command);
 	if(!is_ready()) {
 		command_end();
 		return;
@@ -544,6 +614,7 @@ void wd_fdc_t::read_id_continue()
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
+			if (TRACE_STATE) logerror("%s: SPINUP\n", tag());
 			if(!(status & S_MON)) {
 				spinup();
 				return;
@@ -552,9 +623,11 @@ void wd_fdc_t::read_id_continue()
 			break;
 
 		case SPINUP_WAIT:
+			if (TRACE_STATE) logerror("%s: SPINUP_WAIT\n", tag());
 			return;
 
 		case SPINUP_DONE:
+			if (TRACE_STATE) logerror("%s: SPINUP_DONE\n", tag());
 			if(command & 4) {
 				sub_state = SETTLE_WAIT;
 				delay_cycles(t_gen, settle_time());
@@ -565,19 +638,23 @@ void wd_fdc_t::read_id_continue()
 			}
 
 		case SETTLE_WAIT:
+			if (TRACE_STATE) logerror("%s: SETTLE_WAIT\n", tag());
 			return;
 
 		case SETTLE_DONE:
+			if (TRACE_STATE) logerror("%s: SETTLE_DONE\n", tag());
 			sub_state = SCAN_ID;
 			counter = 0;
 			live_start(SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
+			if (TRACE_STATE) logerror("%s: SCAN_ID\n", tag());
 			command_end();
 			return;
 
 		case SCAN_ID_FAILED:
+			if (TRACE_STATE) logerror("%s: SCAN_ID_FAILED\n", tag());
 			status |= S_RNF;
 			command_end();
 			return;
@@ -591,6 +668,8 @@ void wd_fdc_t::read_id_continue()
 
 void wd_fdc_t::write_track_start()
 {
+	if (TRACE_COMMAND) logerror("%s: write track (c=%02x) t=%d\n", tag(), command, track);
+
 	if(!is_ready()) {
 		command_end();
 		return;
@@ -616,6 +695,7 @@ void wd_fdc_t::write_track_continue()
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
+			if (TRACE_STATE) logerror("%s: SPINUP\n", tag());
 			if(!(status & S_MON)) {
 				spinup();
 				return;
@@ -624,9 +704,11 @@ void wd_fdc_t::write_track_continue()
 			break;
 
 		case SPINUP_WAIT:
+			if (TRACE_STATE) logerror("%s: SPINUP_WAIT\n", tag());
 			return;
 
 		case SPINUP_DONE:
+			if (TRACE_STATE) logerror("%s: SPINUP_DONE\n", tag());
 			if(command & 4) {
 				sub_state = SETTLE_WAIT;
 				delay_cycles(t_gen, settle_time());
@@ -637,18 +719,22 @@ void wd_fdc_t::write_track_continue()
 			}
 
 		case SETTLE_WAIT:
+			if (TRACE_STATE) logerror("%s: SETTLE_WAIT\n", tag());
 			return;
 
 		case SETTLE_DONE:
+			if (TRACE_STATE) logerror("%s: SETTLE_DONE\n", tag());
 			set_drq();
 			sub_state = DATA_LOAD_WAIT;
 			delay_cycles(t_gen, 192);
 			return;
 
 		case DATA_LOAD_WAIT:
+			if (TRACE_STATE) logerror("%s: DATA_LOAD_WAIT\n", tag());
 			return;
 
 		case DATA_LOAD_WAIT_DONE:
+			if (TRACE_STATE) logerror("%s: DATA_LOAD_WAIT_DONE\n", tag());
 			if(drq) {
 				status |= S_LOST;
 				command_end();
@@ -658,15 +744,18 @@ void wd_fdc_t::write_track_continue()
 			break;
 
 		case WAIT_INDEX:
+			if (TRACE_STATE) logerror("%s: WAIT_INDEX\n", tag());
 			return;
 
 		case WAIT_INDEX_DONE:
+			if (TRACE_STATE) logerror("%s: WAIT_INDEX_DONE\n", tag());
 			sub_state = TRACK_DONE;
 			live_start(WRITE_TRACK_DATA);
 			pll_start_writing(machine().time());
 			return;
 
 		case TRACK_DONE:
+			if (TRACE_STATE) logerror("%s: TRACK_DONE\n", tag());
 			if(format_last_byte_count) {
 				char buf[32];
 				if(format_last_byte_count > 1)
@@ -675,7 +764,7 @@ void wd_fdc_t::write_track_continue()
 					sprintf(buf, "%02x", format_last_byte);
 				format_description_string += buf;
 			}
-			logerror("%s: track description %s\n", tag(), format_description_string.cstr());
+			if (TRACE_DESC) logerror("%s: track description %s\n", tag(), format_description_string.cstr());
 			command_end();
 			return;
 
@@ -689,6 +778,8 @@ void wd_fdc_t::write_track_continue()
 
 void wd_fdc_t::write_sector_start()
 {
+	if (TRACE_COMMAND) logerror("%s: write sector%s (c=%02x) t=%d, s=%d\n", tag(), command & 0x10 ? " multiple" : "", command, track, sector);
+
 	if(!is_ready()) {
 		command_end();
 		return;
@@ -709,6 +800,7 @@ void wd_fdc_t::write_sector_continue()
 	for(;;) {
 		switch(sub_state) {
 		case SPINUP:
+			if (TRACE_STATE) logerror("%s: SPINUP\n", tag());
 			if(!(status & S_MON)) {
 				spinup();
 				return;
@@ -717,9 +809,11 @@ void wd_fdc_t::write_sector_continue()
 			break;
 
 		case SPINUP_WAIT:
+			if (TRACE_STATE) logerror("%s: SPINUP_WAIT\n", tag());
 			return;
 
 		case SPINUP_DONE:
+			if (TRACE_STATE) logerror("%s: SPINUP_DONE\n", tag());
 			if(command & 4) {
 				sub_state = SETTLE_WAIT;
 				delay_cycles(t_gen, settle_time());
@@ -730,15 +824,18 @@ void wd_fdc_t::write_sector_continue()
 			}
 
 		case SETTLE_WAIT:
+			if (TRACE_STATE) logerror("%s: SETTLE_WAIT\n", tag());
 			return;
 
 		case SETTLE_DONE:
+			if (TRACE_STATE) logerror("%s: SETTLE_DONE\n", tag());
 			sub_state = SCAN_ID;
 			counter = 0;
 			live_start(SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
+			if (TRACE_STATE) logerror("%s: SCAN_ID\n", tag());
 			if(!sector_matches()) {
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
@@ -754,11 +851,13 @@ void wd_fdc_t::write_sector_continue()
 			return;
 
 		case SCAN_ID_FAILED:
+			if (TRACE_STATE) logerror("%s: SCAN_ID_FAILED\n", tag());
 			status |= S_RNF;
 			command_end();
 			return;
 
 		case SECTOR_WRITE:
+			if (TRACE_STATE) logerror("%s: SECTOR_WRITE\n", tag());
 			if(command & 0x10) {
 				sector++;
 				sub_state = SPINUP_DONE;
@@ -777,6 +876,8 @@ void wd_fdc_t::write_sector_continue()
 
 void wd_fdc_t::interrupt_start()
 {
+	if (TRACE_COMMAND) logerror("%s: Forced interrupt (c=%02x)\n", tag(), command);
+
 	if(status & S_BUSY) {
 		main_state = sub_state = cur_live.state = IDLE;
 		cur_live.tm = attotime::never;
@@ -870,8 +971,6 @@ void wd_fdc_t::do_generic()
 
 void wd_fdc_t::do_cmd_w()
 {
-	//  fprintf(stderr, "%s: command %02x\n", ttsn().cstr(), cmd_buffer);
-
 	// Only available command when busy is interrupt
 	if(main_state != IDLE && (cmd_buffer & 0xf0) != 0xd0) {
 		cmd_buffer = -1;
@@ -881,22 +980,54 @@ void wd_fdc_t::do_cmd_w()
 	cmd_buffer = -1;
 
 	switch(command & 0xf0) {
-	case 0x00: logerror("%s: restore\n", tag()); last_dir = 1; seek_start(RESTORE); break;
-	case 0x10: logerror("%s: seek %d\n", tag(), data); last_dir = data > track ? 0 : 1; seek_start(SEEK); break;
-	case 0x20: case 0x30: logerror("%s: step\n", tag()); seek_start(STEP); break;
-	case 0x40: case 0x50: logerror("%s: step +\n", tag()); last_dir = 0; seek_start(STEP); break;
-	case 0x60: case 0x70: logerror("%s: step -\n", tag()); last_dir = 1; seek_start(STEP); break;
-	case 0x80: case 0x90: logerror("%s: read sector%s %d, %d - %02x\n", tag(), command & 0x10 ? " multiple" : "", track, sector, command); read_sector_start(); break;
-	case 0xa0: case 0xb0: logerror("%s: write sector%s %d, %d\n", tag(), command & 0x10 ? " multiple" : "", track, sector); write_sector_start(); break;
-	case 0xc0: logerror("%s: read id\n", tag()); read_id_start(); break;
-	case 0xd0: logerror("%s: interrupt\n", tag()); interrupt_start(); break;
-	case 0xe0: logerror("%s: read track %d\n", tag(), track); read_track_start(); break;
-	case 0xf0: logerror("%s: write track %d\n", tag(), track); write_track_start(); break;
+	case 0x00:
+		last_dir = 1;
+		seek_start(RESTORE);
+		break;
+	case 0x10:
+		last_dir = data > track ? 0 : 1;
+		seek_start(SEEK);
+		break;
+	case 0x20:
+	case 0x30:
+		seek_start(STEP);
+		break;
+	case 0x40:
+	case 0x50:
+		last_dir = 0;
+		seek_start(STEP);
+		break;
+	case 0x60:
+	case 0x70:
+		last_dir = 1;
+		seek_start(STEP);
+		break;
+	case 0x80:
+	case 0x90:
+		read_sector_start();
+		break;
+	case 0xa0:
+	case 0xb0:
+		write_sector_start();
+		break;
+	case 0xc0:
+		read_id_start();
+		break;
+	case 0xd0:
+		interrupt_start();
+		break;
+	case 0xe0:
+		read_track_start();
+		break;
+	case 0xf0:
+		write_track_start();
+		break;
 	}
 }
 
 void wd_fdc_t::cmd_w(UINT8 val)
 {
+	if (TRACE_COMP) logerror("%s: Initiating command %02x\n", tag(), val);
 	if (inverted_bus) val ^= 0xff;
 
 	if(intrq && !(intrq_cond & I_IMM)) {
@@ -1231,12 +1362,12 @@ void wd_fdc_t::live_sync()
 {
 	if(!cur_live.tm.is_never()) {
 		if(cur_live.tm > machine().time()) {
-			//          fprintf(stderr, "%s: Rolling back and replaying (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
+			if (TRACE_SYNC) logerror("%s: Rolling back and replaying (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
 			rollback();
 			live_run(machine().time());
 			pll_commit(floppy, cur_live.tm);
 		} else {
-			//          fprintf(stderr, "%s: Committing (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
+			if (TRACE_SYNC) logerror("%s: Committing (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
 			pll_commit(floppy, cur_live.tm);
 			if(cur_live.next_state != -1) {
 				cur_live.state = cur_live.next_state;
@@ -1301,7 +1432,7 @@ bool wd_fdc_t::write_one_bit(attotime limit)
 
 void wd_fdc_t::live_write_raw(UINT16 raw)
 {
-	//  logerror("write %04x %04x\n", raw, cur_live.crc);
+	if (TRACE_WRITE) logerror("%s: write raw %04x, CRC=%04x\n", tag(), raw, cur_live.crc);
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = raw & 1;
 }
@@ -1320,7 +1451,7 @@ void wd_fdc_t::live_write_mfm(UINT8 mfm)
 	}
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = context;
-	//  logerror("write %02x   %04x %04x\n", mfm, cur_live.crc, raw);
+	if (TRACE_WRITE) logerror("%s: live_write_mfm byte=%02x, raw=%04x, CRC=%04x\n", tag(), mfm, raw, cur_live.crc);
 }
 
 
@@ -1333,7 +1464,7 @@ void wd_fdc_t::live_write_fm(UINT8 fm)
 	cur_live.data_reg = fm;
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = fm & 1;
-	//  logerror("write %02x   %04x %04x\n", fm, cur_live.crc, raw);
+	if (TRACE_WRITE) logerror("%s: live_write_fm byte=%02x, raw=%04x, CRC=%04x\n", tag(), fm, raw, cur_live.crc);
 }
 
 void wd_fdc_t::live_run(attotime limit)
@@ -1361,10 +1492,11 @@ void wd_fdc_t::live_run(attotime limit)
 	for(;;) {
 		switch(cur_live.state) {
 		case SEARCH_ADDRESS_MARK_HEADER:
+			if (TRACE_STATE) logerror("%s: SEARCH_ADDRESS_MARK_HEADER\n", tag());
 			if(read_one_bit(limit))
 				return;
-#if 0
-			fprintf(stderr, "%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+
+			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -1374,7 +1506,6 @@ void wd_fdc_t::live_run(attotime limit)
 					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
 					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
 					cur_live.bit_counter);
-#endif
 
 			if(!dden && cur_live.shift_reg == 0x4489) {
 				cur_live.crc = 0x443b;
@@ -1395,10 +1526,12 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case READ_HEADER_BLOCK_HEADER: {
+			if (TRACE_STATE) logerror("%s: READ_HEADER_BLOCK_HEADER\n", tag());
+
 			if(read_one_bit(limit))
 				return;
-#if 0
-			fprintf(stderr, "%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+
+			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -1408,7 +1541,7 @@ void wd_fdc_t::live_run(attotime limit)
 					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
 					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
 					cur_live.bit_counter);
-#endif
+
 			if(cur_live.bit_counter & 15)
 				break;
 
@@ -1435,6 +1568,7 @@ void wd_fdc_t::live_run(attotime limit)
 		}
 
 		case READ_ID_BLOCK_TO_LOCAL: {
+			if (TRACE_STATE) logerror("%s: READ_ID_BLOCK_TO_LOCAL\n", tag());
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter & 15)
@@ -1449,16 +1583,17 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 		}
 
-		case READ_ID_BLOCK_TO_DMA: {
+		case READ_ID_BLOCK_TO_DMA:
+			if (TRACE_STATE) logerror("%s: READ_ID_BLOCK_TO_DMA\n", tag());
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter & 15)
 				break;
 			live_delay(READ_ID_BLOCK_TO_DMA_BYTE);
 			return;
-		}
 
 		case READ_ID_BLOCK_TO_DMA_BYTE:
+			if (TRACE_STATE) logerror("%s: READ_ID_BLOCK_TO_DMA_BYTE\n", tag());
 			data = cur_live.data_reg;
 			if(cur_live.bit_counter == 16)
 				sector = data;
@@ -1479,10 +1614,11 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case SEARCH_ADDRESS_MARK_DATA:
+			if (TRACE_STATE) logerror("%s: SEARCH_ADDRESS_MARK_DATA\n", tag());
 			if(read_one_bit(limit))
 				return;
-#if 0
-			fprintf(stderr, "%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+
+			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -1492,7 +1628,7 @@ void wd_fdc_t::live_run(attotime limit)
 					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
 					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
 					cur_live.bit_counter >> 4, cur_live.bit_counter & 15);
-#endif
+
 			if(!dden) {
 				if(cur_live.bit_counter > 43*16) {
 					live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
@@ -1526,10 +1662,11 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case READ_DATA_BLOCK_HEADER: {
+			if (TRACE_STATE) logerror("%s: READ_DATA_BLOCK_HEADER\n", tag());
 			if(read_one_bit(limit))
 				return;
-#if 0
-			fprintf(stderr, "%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+
+			if (TRACE_SHIFT) logerror("%s: shift = %04x data=%02x counter=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
 					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -1539,7 +1676,7 @@ void wd_fdc_t::live_run(attotime limit)
 					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
 					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
 					cur_live.bit_counter);
-#endif
+
 			if(cur_live.bit_counter & 15)
 				break;
 
@@ -1563,11 +1700,13 @@ void wd_fdc_t::live_run(attotime limit)
 		}
 
 		case SEARCH_ADDRESS_MARK_DATA_FAILED:
+			if (TRACE_STATE) logerror("%s: SEARCH_ADDRESS_MARK_DATA_FAILED\n", tag());
 			status |= S_RNF;
 			cur_live.state = IDLE;
 			return;
 
 		case READ_SECTOR_DATA: {
+			if (TRACE_STATE) logerror("%s: READ_SECTOR_DATA\n", tag());
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter & 15)
@@ -1585,11 +1724,11 @@ void wd_fdc_t::live_run(attotime limit)
 					return;
 				}
 			}
-
 			break;
 		}
 
 		case READ_SECTOR_DATA_BYTE:
+			if (TRACE_STATE) logerror("%s: READ_SECTOR_DATA_BYTE\n", tag());
 			data = cur_live.data_reg;
 			set_drq();
 			cur_live.state = READ_SECTOR_DATA;
@@ -1597,6 +1736,7 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case READ_TRACK_DATA: {
+			if (TRACE_STATE) logerror("%s: READ_TRACK_DATA\n", tag());
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter != 16
@@ -1622,11 +1762,11 @@ void wd_fdc_t::live_run(attotime limit)
 				live_delay(READ_TRACK_DATA_BYTE);
 				return;
 			}
-
 			break;
 		}
 
 		case READ_TRACK_DATA_BYTE:
+			if (TRACE_STATE) logerror("%s: READ_TRACK_DATA_BYTE\n", tag());
 			data = cur_live.data_reg;
 			set_drq();
 			cur_live.state = READ_TRACK_DATA;
@@ -1634,6 +1774,7 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case WRITE_TRACK_DATA:
+			if (TRACE_STATE) logerror("%s: WRITE_TRACK_DATA\n", tag());
 			if(drq) {
 				status |= S_LOST;
 				data = 0;
@@ -1731,6 +1872,7 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case WRITE_BYTE:
+			if (TRACE_STATE) logerror("%s: WRITE_BYTE\n", tag());
 			if(write_one_bit(limit))
 				return;
 			if(cur_live.bit_counter == 0) {
@@ -1742,6 +1884,7 @@ void wd_fdc_t::live_run(attotime limit)
 		case WRITE_BYTE_DONE:
 			switch(sub_state) {
 			case TRACK_DONE:
+				if (TRACE_STATE) logerror("%s: WRITE_BYTE_DONE / TRACK_DONE\n", tag());
 				if(cur_live.previous_type == live_info::PT_CRC_1) {
 					cur_live.previous_type = live_info::PT_CRC_2;
 					if(dden)
@@ -1756,6 +1899,7 @@ void wd_fdc_t::live_run(attotime limit)
 				break;
 
 			case SECTOR_WRITE:
+				if (TRACE_STATE) logerror("%s: WRITE_BYTE_DONE / SECTOR_WRITE\n", tag());
 				cur_live.state = WRITE_BYTE;
 				cur_live.bit_counter = 16;
 				cur_live.byte_counter++;
@@ -1834,6 +1978,7 @@ void wd_fdc_t::live_run(attotime limit)
 			break;
 
 		case WRITE_SECTOR_PRE:
+			if (TRACE_STATE) logerror("%s: WRITE_SECTOR_PRE\n", tag());
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter != 16)
@@ -1842,6 +1987,7 @@ void wd_fdc_t::live_run(attotime limit)
 			return;
 
 		case WRITE_SECTOR_PRE_BYTE:
+			if (TRACE_STATE) logerror("%s: WRITE_SECTOR_PRE_BYTE\n", tag());
 			cur_live.state = WRITE_SECTOR_PRE;
 			cur_live.byte_counter++;
 			cur_live.bit_counter = 0;
@@ -1850,14 +1996,31 @@ void wd_fdc_t::live_run(attotime limit)
 				set_drq();
 				checkpoint();
 				break;
-			case 11:
+
+			// MZ: There is an inconsistency in the wd177x specs.
+			// The flow chart of wd177x for sector writing (page 1-12)
+			// says that after the sector header there is a 11 byte delay
+			// before the DR check and another 1 byte delay to the start of
+			// writing 0x00 (for FM). For MFM we have an additional 11 byte
+			// delay before the 0x00 sequence.
+			// However, the text of the section "Write sector" (1-9) and
+			// pages 1-17 and 1-18 imply that in Gap 2, the 0x00 sequence
+			// starts 11 bytes after the CRC field in FM and 22 bytes after
+			// the CRC field in MFM.
+			//
+			// I suppose the sum of the delays in the flow chart should be
+			// 11 and 22, so we shorten the 9-byte delay to 8 bytes.
+
+			// case 11:
+			case 10:
 				if(drq) {
 					status |= S_LOST;
 					cur_live.state = IDLE;
 					return;
 				}
 				break;
-			case 12:
+			// case 12:
+			case 11:
 				if(dden) {
 					cur_live.state = WRITE_BYTE;
 					cur_live.bit_counter = 16;
@@ -2046,15 +2209,15 @@ void wd_fdc_digital_t::digital_pll_t::reset(attotime when)
 int wd_fdc_digital_t::digital_pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit)
 {
 	attotime when = floppy ? floppy->get_next_transition(ctime) : attotime::never;
-#if 0
-	if(!when.is_never())
-		fprintf(stderr, "transition_time=%s\n", tts(when).cstr());
-#endif
 
+	/* if (TRACE_TRANSITION)
+	    if(!when.is_never())
+	        logerror("transition_time=%s\n", tts(when).cstr());
+	*/
 	for(;;) {
-		//      fprintf(stderr, "slot=%2d, counter=%03x\n", slot, counter);
+		// if (TRACE_TRANSITION) logerror("slot=%2d, counter=%03x\n", slot, counter);
 		attotime etime = ctime+delays[slot];
-		//      fprintf(stderr, "etime=%s\n", tts(etime).cstr());
+		// if (TRACE_TRANSITION) logerror("etime=%s\n", tts(etime).cstr());
 		if(etime > limit)
 			return -1;
 		if(transition_time == 0xffff && !when.is_never() && etime >= when)
@@ -2080,7 +2243,7 @@ int wd_fdc_digital_t::digital_pll_t::get_next_bit(attotime &tm, floppy_image_dev
 		if(counter & 0x800)
 			break;
 	}
-	//  fprintf(stderr, "first transition, time=%03x, inc=%3d\n", transition_time, increment);
+	if (TRACE_TRANSITION) logerror("first transition, time=%03x, inc=%3d\n", transition_time, increment);
 	int bit = transition_time != 0xffff;
 
 	if(transition_time != 0xffff) {
