@@ -40,7 +40,7 @@
 
     's' is a 4-bit scale value.  '0000000', '1111111', '2222222' and
     '6543333' are signed 7-bits values corresponding to the 4 samples.
-    To compute the final 16bits value just shift left by (9-s).
+    To compute the final 16bits value, left-align and shift right by s.
     Yes, that simple.
 
     ---------------------------------------------------------
@@ -170,13 +170,11 @@ INT16 *zsg2_device::prepare_samples(UINT32 offset)
 	m_full_samples[offset|3] = (block >> (8+1) & 0x40) | (block >> (16+2) & 0x20) | (block >> (24+3) & 0x10) | (block & 0xf);
 	
 	// sign-extend and shift
-	int shift = 9 - (block >> 4 & 0xf);
+	UINT8 shift = block >> 4 & 0xf;
 	for (int i = offset; i < (offset + 4); i++)
 	{
-		if (m_full_samples[i] & 0x40)
-			m_full_samples[i] = (INT8)(m_full_samples[i] | 0x80);
-		if (shift > 0)
-			m_full_samples[i] <<= shift;
+		m_full_samples[i] <<= 9;
+		m_full_samples[i] >>= shift;
 	}
 	
 	return &m_full_samples[offset];
