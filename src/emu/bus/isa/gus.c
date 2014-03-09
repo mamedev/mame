@@ -440,6 +440,7 @@ void gf1_device::device_reset()
 {
 	int x;
 
+	memset(m_voice, 0x00, sizeof(m_voice));
 	// init voices
 	for(x=0;x<32;x++)
 	{
