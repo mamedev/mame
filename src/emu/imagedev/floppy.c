@@ -11,6 +11,12 @@
 #include "formats/imageutl.h"
 #include "ui/filesel.h"
 
+/*
+    Debugging flags. Set to 0 or 1.
+*/
+
+// Show step operation
+#define TRACE_STEP 0
 
 // device type definition
 const device_type FLOPPY_CONNECTOR = &device_creator<floppy_connector>;
@@ -525,7 +531,7 @@ void floppy_image_device::stp_w(int state)
 				if ( cyl < tracks-1 ) cyl++;
 			}
 			if(ocyl != cyl)
-				logerror("%s: track %d\n", tag(), cyl);
+				if (TRACE_STEP) logerror("%s: track %d\n", tag(), cyl);
 			/* Update disk detection if applicable */
 			if (exists())
 			{
