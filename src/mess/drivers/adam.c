@@ -289,8 +289,6 @@ Mark Gordon
 
     TODO:
 
-    - fix MC6801 serial I/O
-    - floppy
     - printer
     - SPI
     - sound (PSG RDY -> Z80 WAIT)
@@ -891,6 +889,7 @@ WRITE8_MEMBER( adam_state::joystick_w )
 
 READ8_MEMBER( adam_state::input1_r )
 {
+	// TODO serious tagmap abuse here
 	return coleco_paddle_read(machine(), 0, m_joy_mode, m_joy_status0);
 }
 
@@ -901,6 +900,7 @@ READ8_MEMBER( adam_state::input1_r )
 
 READ8_MEMBER( adam_state::input2_r )
 {
+	// TODO serious tagmap abuse here
 	return coleco_paddle_read(machine(), 1, m_joy_mode, m_joy_status1);
 }
 
