@@ -1,4 +1,4 @@
-// license:BSD-3-Clause or GPL
+// license:BSD-3-Clause|GPL-2.0+
 // copyright-holders:Darkstar
 /**********************************************************************
  *

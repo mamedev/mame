@@ -140,10 +140,10 @@ MACHINE_CONFIG_END
 
 ROM_START( dectalk_isa )
 	ROM_REGION( 0x4000, "dectalk_cpu", 0 )
-	ROM_LOAD16_BYTE("pc_boot_hxl.am27c64.d6.bin", 0x0000, 0x2000, CRC(7492f1e3) SHA1(fe6946a227f01c94f2b99220320a616445c96ee0))
-	ROM_LOAD16_BYTE("pc_boot_hxh.am27c64.d8.bin", 0x0001, 0x2000, CRC(1fe7fe40) SHA1(6e89c237f01aa22e0d21ff4d6fdf8137c6ace374))
+	ROM_LOAD16_BYTE("pc_boot_hxl.am27c64.d6.e26", 0x0000, 0x2000, CRC(7492f1e3) SHA1(fe6946a227f01c94f2b99220320a616445c96ee0)) // Some cards have a different label on the chip which lists the sum16: 31AC (matches contents)
+	ROM_LOAD16_BYTE("pc_boot_hxh.am27c64.d8.e27", 0x0001, 0x2000, CRC(1fe7fe40) SHA1(6e89c237f01aa22e0d21ff4d6fdf8137c6ace374)) // Some cards have a different label on the chip which lists the sum16: 1A25 (matches contents)
 	ROM_REGION( 0x2000, "dectalk_dsp", 0 )
-	ROM_LOAD("spc_034c__2-1-92.tms320p15nl.d3.bin", 0x0000, 0x2000, CRC(d8b1201e) SHA1(4b873a5e882205fcac79a27562054b5c4d1a117c))
+	ROM_LOAD("spc_034c__2-1-92.tms320p15nl.d3.bin", 0x0000, 0x2000, CRC(d8b1201e) SHA1(4b873a5e882205fcac79a27562054b5c4d1a117c)) 
 ROM_END
 
 const rom_entry* dectalk_isa_device::device_rom_region() const
