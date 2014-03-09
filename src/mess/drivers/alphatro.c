@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald, Robbbert
 /***************************************************************************
 
-    Triumph-Adler's Alphatronic PC
+    Triumph-Adler (or Royal) Alphatronic PC
 
     skeleton driver
 
@@ -10,19 +10,30 @@
 
     Other chips: 8251, 8257, 8259
     Crystals: 16MHz, 17.73447MHz
-    Floppy format: 2 sides, 40 tracks, 16 sectors, 256 bytes = 320kb.
-    FDC (unknown) is in a plug-in module.
+    Floppy format: 13cm, 2 sides, 40 tracks, 16 sectors, 256 bytes = 320kb.
+    FDC (uPD765) is in a plug-in module, with an undumped rom.
 
     Has a socket for monochrome (to the standard amber monitor),
     and another for RGB. We emulate this with a configuration switch.
 
-    The Z80 must start at E000, but unlike other designs (Super80 for
-    example) which cause the ROMs to appear everywhere during boot,
-    this one (it seems) holds the data bus low until E000 is reached.
-    This kind of boot still needs to be emulated.
-
     This machine has 64k RAM, the ROMs being copied into RAM when
     needed.
+
+    There are several mystery ports which might be connected to the floppy
+    disk system. These are Port 30 (in and out), Port 20 (out) and certain
+    bits of Port 10 (in). This unit communicates via a simple parallel
+    interface.
+
+    Port 10 bit 6 when high switches A000-DFFF over to roms that are in
+    a cart which is plugged into the RomPack socket. If C3 is found at
+    A000 or C000, then a jump is made to that address. It is however
+    possible that one of these addresses might be for the rom in the
+    floppy controller unit.
+
+
+    ToDo:
+    - Fix cassette loading (broke during devcb2 conversion)
+    - Add fdc, then connect up software list
 
 ***************************************************************************/
 
@@ -45,7 +56,6 @@ public:
 	enum
 	{
 		TIMER_SYSTEM,
-		TIMER_ALPHATRO_BEEP_OFF
 	};
 
 	alphatro_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -101,18 +111,11 @@ WRITE8_MEMBER( alphatro_state::port10_w )
 // Bit 2 ? after a cload
 // Bit 3 -> cassette relay
 // Bit 4 -> BEEP
+// Bit 6 -> 1 = select ROM pack
 
-	UINT16 length = 0;
 	data &= 0xfe;
 
-	if (data == 0x10)
-		length = 400; // BEEP command
-
-	if (length)
-	{
-		timer_set(attotime::from_msec(length), TIMER_ALPHATRO_BEEP_OFF);
-		m_beep->set_state(1);
-	}
+	m_beep->set_state(BIT(data, 4));
 
 	m_cass->change_state( BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
@@ -126,9 +129,6 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 	case TIMER_SYSTEM:
 		m_timer_bit ^= 0x80;
-		break;
-	case TIMER_ALPHATRO_BEEP_OFF:
-		m_beep->set_state(0);
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in alphatro_state::device_timer");
@@ -377,10 +377,12 @@ void alphatro_state::machine_start()
 void alphatro_state::machine_reset()
 {
 	// do what the IPL does
-	UINT8* ROM = memregion("maincpu")->base();
+	UINT8* ROM = memregion("roms")->base();
 	m_maincpu->set_pc(0xe000);
-	memcpy(m_p_ram, ROM, 0xf000); // copy BASIC to RAM, which the undumped IPL is supposed to do.
-	memcpy(m_p_videoram, ROM+0x1000, 0x1000);
+	// If BASIC is missing then it boots into the Monitor
+	memcpy(m_p_ram, ROM, 0x6000); // Copy BASIC to RAM
+	// Top half of this rom has keyboard tables and appears to be unused
+	memcpy(m_p_ram+0xe000, ROM+0xe000, 0x1000); // copy BIOS + Monitor to RAM
 
 	// probably not correct, exact meaning of port is unknown, vblank/vsync is too slow.
 	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));
@@ -388,8 +390,8 @@ void alphatro_state::machine_reset()
 	m_cass_state = 1;
 	m_cass_data[0] = 0;
 	m_cass_data[1] = 0;
-	m_usart->write_rxd(0);
 	m_cass_data[3] = 0;
+	m_usart->write_rxd(0);
 	m_beep->set_state(0);
 	m_beep->set_frequency(950);    /* piezo-device needs to be measured */
 }
@@ -453,7 +455,7 @@ static const cassette_interface alphatro_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
-	(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
 	"alphatro_cass",
 	NULL
 };
@@ -489,7 +491,7 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_DEVICE_ADD("usart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(alphatro_state, txdata_callback))
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19225) // USART clock - this value loads a real tape
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19225)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(alphatro_state, write_usart_clock))
 
 	MCFG_CASSETTE_ADD("cassette", alphatro_cassette_interface)
@@ -511,7 +513,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( alphatro )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00)
+	ROM_REGION( 0x10000, "roms", ROMREGION_ERASE00)
 	ROM_LOAD( "613256.ic-1058", 0x0000, 0x6000, CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467) )
 	ROM_LOAD( "2764.ic-1038",   0xe000, 0x2000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49) )
 
