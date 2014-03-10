@@ -228,6 +228,7 @@ void tms9995_device::device_reset()
 	m_reset = true;     // for the main loop
 	m_servicing_interrupt = false;   // only for debugging
 	m_request_auto_wait_state = false;
+	memset(m_flag, 0, sizeof(m_flag));
 }
 
 const char* tms9995_device::s_statename[20] =
