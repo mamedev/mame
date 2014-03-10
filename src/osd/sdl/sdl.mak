@@ -410,16 +410,13 @@ OSDOBJS += $(SDLOBJ)/draw13.o
 endif
 
 # add an ARCH define
-DEFS += "-DSDLMAME_ARCH=$(ARCHOPTS)" -DSYNC_IMPLEMENTATION=$(SYNC_IMPLEMENTATION)
+DEFS += -DSDLMAME_ARCH="$(ARCHOPTS)" -DSYNC_IMPLEMENTATION=$(SYNC_IMPLEMENTATION)
 
 #-------------------------------------------------
 # Generic defines and additions
 #-------------------------------------------------
 
 OSDCLEAN = sdlclean
-
-# add the debugger includes
-INCPATH += -Isrc/debug
 
 # copy off the include paths before the sdlprefix & sdl-config stuff shows up
 MOCINCPATH := $(INCPATH)
