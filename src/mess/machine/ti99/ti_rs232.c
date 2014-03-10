@@ -1054,6 +1054,7 @@ void ti_rs232_pio_device::device_reset()
 	m_pio_direction_in = false;
 	m_pio_handshakeout = false;
 	m_pio_spareout = false;
+	m_pio_writable = false;
 	m_flag0 = false;
 
 	set_bit(0, CTS, 0);
