@@ -24,8 +24,7 @@ TILE_GET_INFO_MEMBER(vastar_state::get_fg_tile_info)
 	code = videoram[tile_index + 0x800] | (videoram[tile_index + 0x400] << 8);
 	color = videoram[tile_index];
 	fxy = (code & 0xc00) >> 10; // maybe, based on the other layers
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code,
 			color & 0x3f,
 			TILE_FLIPXY(fxy));
@@ -39,8 +38,7 @@ TILE_GET_INFO_MEMBER(vastar_state::get_bg1_tile_info)
 	code = videoram[tile_index + 0x800] | (videoram[tile_index] << 8);
 	color = videoram[tile_index + 0xc00];
 	fxy = (code & 0xc00) >> 10;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			4,
+	SET_TILE_INFO_MEMBER(4,
 			code,
 			color & 0x3f,
 			TILE_FLIPXY(fxy));
@@ -54,8 +52,7 @@ TILE_GET_INFO_MEMBER(vastar_state::get_bg2_tile_info)
 	code = videoram[tile_index + 0x800] | (videoram[tile_index] << 8);
 	color = videoram[tile_index + 0xc00];
 	fxy = (code & 0xc00) >> 10;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			3,
+	SET_TILE_INFO_MEMBER(3,
 			code,
 			color & 0x3f,
 			TILE_FLIPXY(fxy));
@@ -70,9 +67,9 @@ TILE_GET_INFO_MEMBER(vastar_state::get_bg2_tile_info)
 
 void vastar_state::video_start()
 {
-	m_fg_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vastar_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,8,8,32,32);
-	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vastar_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
-	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vastar_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_fg_tilemap  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(vastar_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(vastar_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(vastar_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg1_tilemap->set_transparent_pen(0);

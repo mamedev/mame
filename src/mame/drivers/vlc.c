@@ -286,7 +286,7 @@ static TILE_GET_INFO_MEMBER( nevada_state::get_bg_tile_info )
     int bank = (attr & 0x02) >> 1;
     int color = (attr & 0x3c) >> 2;
 
-    SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
+    SET_TILE_INFO_MEMBER(bank, code, color, 0);
 
 }
 */

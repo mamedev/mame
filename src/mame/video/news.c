@@ -11,8 +11,7 @@
 TILE_GET_INFO_MEMBER(news_state::get_fg_tile_info)
 {
 	int code = (m_fgram[tile_index * 2] << 8) | m_fgram[tile_index * 2 + 1];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code & 0x0fff,
 			(code & 0xf000) >> 12,
 			0);
@@ -27,8 +26,7 @@ TILE_GET_INFO_MEMBER(news_state::get_bg_tile_info)
 	if ((code & 0x0e00) == 0x0e00)
 		code = (code & 0x1ff) | (m_bgpic << 9);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code,
 			color,
 			0);
@@ -44,10 +42,10 @@ TILE_GET_INFO_MEMBER(news_state::get_bg_tile_info)
 
 void news_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(news_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(news_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(news_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(news_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

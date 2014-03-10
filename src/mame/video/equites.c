@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(equites_state::equites_fg_info)
 	int tile = m_fg_videoram[2 * tile_index];
 	int color = m_fg_videoram[2 * tile_index + 1] & 0x1f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 	if (color & 0x10)
 		tileinfo.flags |= TILE_FORCE_LAYER0;
 }
@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(equites_state::splndrbt_fg_info)
 	int tile = m_fg_videoram[2 * tile_index] + (m_fg_char_bank << 8);
 	int color = m_fg_videoram[2 * tile_index + 1] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 	if (color & 0x10)
 		tileinfo.flags |= TILE_FORCE_LAYER0;
 }
@@ -85,7 +85,7 @@ TILE_GET_INFO_MEMBER(equites_state::equites_bg_info)
 	int color = (data & 0xf000) >> 12;
 	int fxy = (data & 0x0600) >> 9;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color, TILE_FLIPXY(fxy));
+	SET_TILE_INFO_MEMBER(1, tile, color, TILE_FLIPXY(fxy));
 }
 
 TILE_GET_INFO_MEMBER(equites_state::splndrbt_bg_info)
@@ -95,7 +95,7 @@ TILE_GET_INFO_MEMBER(equites_state::splndrbt_bg_info)
 	int color = (data & 0xf800) >> 11;
 	int fxy = (data & 0x0600) >> 9;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color, TILE_FLIPXY(fxy));
+	SET_TILE_INFO_MEMBER(1, tile, color, TILE_FLIPXY(fxy));
 	tileinfo.group = color;
 }
 
@@ -112,10 +112,10 @@ VIDEO_START_MEMBER(equites_state,equites)
 	m_fg_videoram = auto_alloc_array(machine(), UINT8, 0x800);
 	save_pointer(NAME(m_fg_videoram), 0x800);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::equites_fg_info),this), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(equites_state::equites_fg_info),this), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::equites_bg_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(equites_state::equites_bg_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(0, -10);
 }
@@ -127,11 +127,11 @@ VIDEO_START_MEMBER(equites_state,splndrbt)
 	m_fg_videoram = auto_alloc_array(machine(), UINT8, 0x800);
 	save_pointer(NAME(m_fg_videoram), 0x800);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::splndrbt_fg_info),this), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(equites_state::splndrbt_fg_info),this), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrolldx(8, -8);
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(equites_state::splndrbt_bg_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(equites_state::splndrbt_bg_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_palette->configure_tilemap_groups(*m_bg_tilemap, *m_gfxdecode->gfx(1), 0x10);
 }
 

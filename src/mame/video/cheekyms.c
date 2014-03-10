@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(cheekyms_state::cheekyms_get_tile_info)
 			color = palette | (x >> 1);
 	}
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 void cheekyms_state::video_start()
@@ -98,7 +98,7 @@ void cheekyms_state::video_start()
 	height = m_screen->height();
 	m_bitmap_buffer = auto_bitmap_ind16_alloc(machine(), width, height);
 
-	m_cm_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cheekyms_state::cheekyms_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_cm_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cheekyms_state::cheekyms_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_cm_tilemap->set_transparent_pen(0);
 }
 

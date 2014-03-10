@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_bg2_tile_info)
 	int color = attr >> 12;
 	int flags = (attr & 0x800) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(prehisle_state::get_bg_tile_info)
@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_bg_tile_info)
 	int color = attr >> 12;
 	int flags = (attr & 0x800) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, flags);
+	SET_TILE_INFO_MEMBER(2, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(prehisle_state::get_fg_tile_info)
@@ -83,18 +83,18 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_fg_tile_info)
 	int code = attr & 0xfff;
 	int color = attr >> 12;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 void prehisle_state::video_start()
 {
-	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_bg2_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(prehisle_state::get_bg2_tile_info),this), TILEMAP_SCAN_COLS,
 			16, 16, 1024, 32);
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(prehisle_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			16, 16, 256, 32);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(prehisle_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(prehisle_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(15);

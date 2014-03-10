@@ -50,7 +50,7 @@ TILEMAP_MAPPER_MEMBER(m10_state::tilemap_scan)
 
 TILE_GET_INFO_MEMBER(m10_state::get_tile_info)
 {
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_videoram[tile_index], m_colorram[tile_index] & 0x07, 0);
+	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], m_colorram[tile_index] & 0x07, 0);
 }
 
 
@@ -95,7 +95,7 @@ inline void m10_state::plot_pixel_m10( bitmap_ind16 &bm, int x, int y, int col )
 
 VIDEO_START_MEMBER(m10_state,m10)
 {
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
 	m_tx_tilemap->set_transparent_pen(0);
 
 	m_back_gfx = auto_alloc(machine(), gfx_element(machine(), backlayout, m_chargen, 8, 0));
@@ -108,7 +108,7 @@ VIDEO_START_MEMBER(m10_state,m15)
 {
 	m_gfxdecode->set_gfx(0,auto_alloc(machine(), gfx_element(machine(), charlayout, m_chargen, 8, 0)));
 
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
 
 	return ;
 }

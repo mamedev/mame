@@ -411,8 +411,7 @@ TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
 	int color = m_videoram[tile_index + 0x400] & 0x3f;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			(m_videoram[tile_index] & 0x7f) | (flip_screen() ? 0x80 : 0) | (m_galaga_gfxbank << 8),
 			color,
 			flip_screen() ? TILE_FLIPX : 0);
@@ -429,7 +428,7 @@ TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
 
 VIDEO_START_MEMBER(galaga_state,galaga)
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaga_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(galaga_state::tilemap_scan),this),8,8,36,28);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaga_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(galaga_state::tilemap_scan),this),8,8,36,28);
 	m_palette->configure_tilemap_groups(*m_fg_tilemap, *m_gfxdecode->gfx(0), 0x1f);
 
 	m_galaga_gfxbank = 0;

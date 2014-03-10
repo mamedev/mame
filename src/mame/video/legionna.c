@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_back_tile_info)
 	tile &= 0xfff;
 	tile |= m_back_gfx_bank;        /* Heatbrl uses banking */
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tile,color,0);
+	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info)
@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 5,tile,color,0);
+	SET_TILE_INFO_MEMBER(5,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_denji)
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_denji)
 	tile &= 0xfff;
 	tile |= m_mid_gfx_bank;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 5,tile,color,0);
+	SET_TILE_INFO_MEMBER(5,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_cupsoc)
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_cupsoc)
 	tile |= 0x1000;
 	color += 0x10;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tile,color,0);
+	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info)/* this is giving bad tiles... */
@@ -117,7 +117,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info)/* this is giving bad ti
 	// legionnaire tile numbers / gfx set wrong, see screen after coin insertion
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 4,tile,color,0);
+	SET_TILE_INFO_MEMBER(4,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info_denji)
@@ -128,7 +128,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info_denji)
 	tile &= 0xfff;
 	tile |= m_fore_gfx_bank;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 4,tile,color,0);
+	SET_TILE_INFO_MEMBER(4,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
@@ -138,15 +138,15 @@ TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tile,color,0);
+	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
 VIDEO_START_MEMBER(legionna_state,legionna)
 {
-	m_background_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_foreground_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_midground_layer =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_text_layer =       &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
+	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_text_layer =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
 	m_scrollram16 = auto_alloc_array(machine(), UINT16, 0x60/2);
 	m_sprite_xoffs = 0;
@@ -163,10 +163,10 @@ VIDEO_START_MEMBER(legionna_state,legionna)
 
 VIDEO_START_MEMBER(legionna_state,denjinmk)
 {
-	m_background_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_foreground_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info_denji),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_midground_layer =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_denji),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_text_layer =       &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
+	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info_denji),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_denji),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_text_layer =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
 	m_scrollram16 = auto_alloc_array(machine(), UINT16, 0x60/2);
 	m_sprite_xoffs = 0;
@@ -183,10 +183,10 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 
 VIDEO_START_MEMBER(legionna_state,cupsoc)
 {
-	m_background_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_foreground_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_midground_layer =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_cupsoc),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_text_layer =       &machine().tilemap().create(tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
+	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_cupsoc),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_text_layer =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
 	m_scrollram16 = auto_alloc_array(machine(), UINT16, 0x60/2);
 	m_sprite_xoffs = 0;

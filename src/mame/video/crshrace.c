@@ -13,14 +13,14 @@ TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info1)
 {
 	int code = m_videoram1[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, (code & 0xfff) + (m_roz_bank << 12), code >> 12, 0);
+	SET_TILE_INFO_MEMBER(1, (code & 0xfff) + (m_roz_bank << 12), code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info2)
 {
 	int code = m_videoram2[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 
@@ -39,8 +39,8 @@ UINT32 crshrace_state::crshrace_tile_callback( UINT32 code )
 
 void crshrace_state::video_start()
 {
-	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_tilemap1->set_transparent_pen(0x0f);
 	m_tilemap2->set_transparent_pen(0xff);

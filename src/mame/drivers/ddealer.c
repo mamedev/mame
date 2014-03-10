@@ -182,8 +182,7 @@ WRITE16_MEMBER(ddealer_state::ddealer_flipscreen_w)
 TILE_GET_INFO_MEMBER(ddealer_state::get_back_tile_info)
 {
 	int code = m_back_vram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code & 0xfff,
 			code >> 12,
 			0);
@@ -192,7 +191,7 @@ TILE_GET_INFO_MEMBER(ddealer_state::get_back_tile_info)
 void ddealer_state::video_start()
 {
 	m_flipscreen = 0;
-	m_back_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ddealer_state::get_back_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_back_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ddealer_state::get_back_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 }
 
 void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy)

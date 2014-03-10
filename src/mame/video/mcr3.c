@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(mcr3_state::get_bg_tile_info)
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
 	int color = (data >> 12) & 3;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, TILE_FLIPYX((data >> 10) & 3));
+	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((data >> 10) & 3));
 }
 #endif
 
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(mcr3_state::mcrmono_get_bg_tile_info)
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
 	int color = ((data >> 12) & 3) ^ 3;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, TILE_FLIPYX((data >> 10) & 3));
+	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((data >> 10) & 3));
 }
 
 
@@ -52,13 +52,13 @@ TILE_GET_INFO_MEMBER(mcr3_state::spyhunt_get_bg_tile_info)
 	UINT8 *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int code = (data & 0x3f) | ((data >> 1) & 0x40);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, (data & 0x40) ? TILE_FLIPY : 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, (data & 0x40) ? TILE_FLIPY : 0);
 }
 
 
 TILE_GET_INFO_MEMBER(mcr3_state::spyhunt_get_alpha_tile_info)
 {
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, m_spyhunt_alpharam[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(2, m_spyhunt_alpharam[tile_index], 0, 0);
 }
 
 
@@ -97,7 +97,7 @@ PALETTE_INIT_MEMBER(mcr3_state,spyhunt)
 VIDEO_START_MEMBER(mcr3_state,mcr3)
 {
 	/* initialize the background tilemap */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
 }
 #endif
 
@@ -105,17 +105,17 @@ VIDEO_START_MEMBER(mcr3_state,mcr3)
 VIDEO_START_MEMBER(mcr3_state,mcrmono)
 {
 	/* initialize the background tilemap */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::mcrmono_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::mcrmono_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
 }
 
 
 VIDEO_START_MEMBER(mcr3_state,spyhunt)
 {
 	/* initialize the background tilemap */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(mcr3_state::spyhunt_bg_scan),this),  64,32, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(mcr3_state::spyhunt_bg_scan),this),  64,32, 64,32);
 
 	/* initialize the text tilemap */
-	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_alpha_tile_info),this), TILEMAP_SCAN_COLS,  16,16, 32,32);
+	m_alpha_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_alpha_tile_info),this), TILEMAP_SCAN_COLS,  16,16, 32,32);
 	m_alpha_tilemap->set_transparent_pen(0);
 	m_alpha_tilemap->set_scrollx(0, 16);
 
@@ -128,10 +128,10 @@ VIDEO_START_MEMBER(mcr3_state,spyhunt)
 VIDEO_START_MEMBER(mcr3_state,spyhuntpr)
 {
 	/* initialize the background tilemap */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(mcr3_state::spyhunt_bg_scan),this),  64,16, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(mcr3_state::spyhunt_bg_scan),this),  64,16, 64,32);
 
 	/* initialize the text tilemap */
-	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_alpha_tile_info),this), TILEMAP_SCAN_COLS,  16,8, 32,32);
+	m_alpha_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_alpha_tile_info),this), TILEMAP_SCAN_COLS,  16,8, 32,32);
 	m_alpha_tilemap->set_transparent_pen(0);
 	m_alpha_tilemap->set_scrollx(0, 16);
 

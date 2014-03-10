@@ -253,8 +253,7 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_top0_tile_info)
 	}
 
 	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-			tile_region,
+	SET_TILE_INFO_MEMBER(tile_region,
 			tile_number,
 			color,
 			0);
@@ -276,8 +275,7 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_fg0_tile_info)
 	}
 
 	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-			tile_region,
+	SET_TILE_INFO_MEMBER(tile_region,
 			tile_number,
 			color,
 			0);
@@ -297,8 +295,7 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_bg0_tile_info)
 	}
 
 	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-			tile_region,
+	SET_TILE_INFO_MEMBER(tile_region,
 			tile_number,
 			color,
 			0);
@@ -309,9 +306,9 @@ void gp9001vdp_device::create_tilemaps(int region)
 {
 	tile_region = region;
 
-	top.tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_top0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	fg.tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_fg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	bg.tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	top.tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_top0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	fg.tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_fg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	bg.tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 
 	top.tmap->set_transparent_pen(0);
 	fg.tmap->set_transparent_pen(0);

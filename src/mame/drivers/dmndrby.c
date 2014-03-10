@@ -342,8 +342,7 @@ TILE_GET_INFO_MEMBER(dmndrby_state::get_dmndrby_tile_info)
 	int flipx = (attr&0x40)>>6;
 
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2,
+	SET_TILE_INFO_MEMBER(2,
 			code,
 			col,
 			TILE_FLIPYX(flipx) );
@@ -353,7 +352,7 @@ TILE_GET_INFO_MEMBER(dmndrby_state::get_dmndrby_tile_info)
 void dmndrby_state::video_start()
 {
 	m_racetrack_tilemap_rom = memregion("user1")->base();
-	m_racetrack_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dmndrby_state::get_dmndrby_tile_info),this),TILEMAP_SCAN_ROWS,16,16, 16, 512);
+	m_racetrack_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dmndrby_state::get_dmndrby_tile_info),this),TILEMAP_SCAN_ROWS,16,16, 16, 512);
 	m_racetrack_tilemap->mark_all_dirty();
 
 }

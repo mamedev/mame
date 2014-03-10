@@ -10,7 +10,7 @@ TILE_GET_INFO_MEMBER(sbugger_state::get_sbugger_tile_info)
 	tileno = m_videoram[tile_index];
 	color = m_videoram_attr[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,color,0);
+	SET_TILE_INFO_MEMBER(0,tileno,color,0);
 }
 
 WRITE8_MEMBER(sbugger_state::sbugger_videoram_w)
@@ -27,7 +27,7 @@ WRITE8_MEMBER(sbugger_state::sbugger_videoram_attr_w)
 
 void sbugger_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sbugger_state::get_sbugger_tile_info),this), TILEMAP_SCAN_ROWS, 8, 16, 64, 16);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sbugger_state::get_sbugger_tile_info),this), TILEMAP_SCAN_ROWS, 8, 16, 64, 16);
 }
 
 UINT32 sbugger_state::screen_update_sbugger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

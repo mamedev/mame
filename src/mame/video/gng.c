@@ -19,8 +19,7 @@
 TILE_GET_INFO_MEMBER(gng_state::get_fg_tile_info)
 {
 	UINT8 attr = m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			m_fgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x0f,
 			TILE_FLIPYX((attr & 0x30) >> 4));
@@ -29,8 +28,7 @@ TILE_GET_INFO_MEMBER(gng_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(gng_state::get_bg_tile_info)
 {
 	UINT8 attr = m_bgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			m_bgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x07,
 			TILE_FLIPYX((attr & 0x30) >> 4));
@@ -47,8 +45,8 @@ TILE_GET_INFO_MEMBER(gng_state::get_bg_tile_info)
 
 void gng_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gng_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gng_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gng_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(gng_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(3);
 	m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */

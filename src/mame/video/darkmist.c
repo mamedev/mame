@@ -20,8 +20,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
 	code+=(attr&3)<<8;
 	pal=(attr>>4);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-		1,
+	SET_TILE_INFO_MEMBER(1,
 		code,
 		pal,
 		0);
@@ -41,8 +40,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
 
 	pal+=16;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-		1,
+	SET_TILE_INFO_MEMBER(1,
 		code,
 		pal,
 		0);
@@ -61,8 +59,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 
 	pal+=48;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-		0,
+	SET_TILE_INFO_MEMBER(0,
 		code,
 		pal,
 		0);
@@ -116,9 +113,9 @@ void darkmist_state::set_pens()
 
 void darkmist_state::video_start()
 {
-	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(darkmist_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,512,64 );
-	m_fgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(darkmist_state::get_fgtile_info),this),TILEMAP_SCAN_ROWS,16,16,64,256 );
-	m_txtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(darkmist_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,512,64 );
+	m_fgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_fgtile_info),this),TILEMAP_SCAN_ROWS,16,16,64,256 );
+	m_txtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 	m_fgtilemap->set_transparent_pen(0);
 	m_txtilemap->set_transparent_pen(0);
 }

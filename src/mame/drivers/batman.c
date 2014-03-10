@@ -210,9 +210,9 @@ static MACHINE_CONFIG_START( batman, batman_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
-	MCFG_ATARI_VAD_PLAYFIELD(batman_state, get_playfield_tile_info)
-	MCFG_ATARI_VAD_PLAYFIELD2(batman_state, get_playfield2_tile_info)
-	MCFG_ATARI_VAD_ALPHA(batman_state, get_alpha_tile_info)
+	MCFG_ATARI_VAD_PLAYFIELD(batman_state, "gfxdecode", get_playfield_tile_info)
+	MCFG_ATARI_VAD_PLAYFIELD2(batman_state, "gfxdecode", get_playfield2_tile_info)
+	MCFG_ATARI_VAD_ALPHA(batman_state, "gfxdecode", get_alpha_tile_info)
 	MCFG_ATARI_VAD_MOB(batman_state::s_mob_config, "gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)

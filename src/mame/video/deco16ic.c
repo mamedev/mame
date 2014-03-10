@@ -235,16 +235,16 @@ void deco16ic_device::device_start()
 	if (m_full_width12&1)
 		fullwidth = 1;
 
-	m_pf1_tilemap_16x16 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ?64 : 32);
-//  m_pf1_tilemap_8x8 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, m_full_width12 ? 64 : 32, 32);
-	m_pf1_tilemap_8x8 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, 64 , 32); // nitroball
+	m_pf1_tilemap_16x16 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ?64 : 32);
+//  m_pf1_tilemap_8x8 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, m_full_width12 ? 64 : 32, 32);
+	m_pf1_tilemap_8x8 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, 64 , 32); // nitroball
 
 	if (m_split)
-		m_pf2_tilemap_16x16 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
+		m_pf2_tilemap_16x16 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
 	else
-		m_pf2_tilemap_16x16 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
+		m_pf2_tilemap_16x16 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
 
-	m_pf2_tilemap_8x8 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, fullwidth ? 64 : 32, fullheight ? 64 : 32);
+	m_pf2_tilemap_8x8 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, fullwidth ? 64 : 32, fullheight ? 64 : 32);
 
 	m_pf1_tilemap_8x8->set_transparent_pen(0);
 	m_pf2_tilemap_8x8->set_transparent_pen(0);
@@ -318,8 +318,7 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info)
 		}
 	}
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-			m_pf12_16x16_gfx_bank,
+	SET_TILE_INFO_MEMBER(m_pf12_16x16_gfx_bank,
 			(tile & 0xfff) | m_pf2_bank,
 			(colour & m_pf2_colourmask) + m_pf2_colour_bank,
 			flags);
@@ -350,16 +349,14 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info)
 		// Captain America operates this chip in 8bpp mode.
 		// In 8bpp mode you appear to only get 1 layer, not 2, but you also
 		// have an extra 2 tile bits, and 2 less colour bits.
-		SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-				m_pf12_16x16_gfx_bank,
+		SET_TILE_INFO_MEMBER(m_pf12_16x16_gfx_bank,
 				(tile & 0x3fff) | m_pf1_bank,
 				((colour & m_pf1_colourmask) + m_pf1_colour_bank)>>2,
 				flags);
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-				m_pf12_16x16_gfx_bank,
+		SET_TILE_INFO_MEMBER(m_pf12_16x16_gfx_bank,
 				(tile & 0xfff) | m_pf1_bank,
 				(colour & m_pf1_colourmask) + m_pf1_colour_bank,
 				flags);
@@ -386,8 +383,7 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info_b)
 		}
 	}
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-			m_pf12_8x8_gfx_bank,
+	SET_TILE_INFO_MEMBER(m_pf12_8x8_gfx_bank,
 			(tile & 0xfff) | m_pf2_bank,
 			(colour & m_pf2_colourmask) + m_pf2_colour_bank,
 			flags);
@@ -413,8 +409,7 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info_b)
 		}
 	}
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-			m_pf12_8x8_gfx_bank,
+	SET_TILE_INFO_MEMBER(m_pf12_8x8_gfx_bank,
 			(tile & 0xfff) | m_pf1_bank,
 			(colour & m_pf1_colourmask) + m_pf1_colour_bank,
 			flags);

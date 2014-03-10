@@ -99,8 +99,7 @@ Offset:
 TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_0)
 {
 	UINT16 code = m_vram_0[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			(code & 0x07ff) + (m_tile_bank*0x800),
 			((code & 0xf000) >> (16-4)) + ((code & 0x0800) >> (11-4)),
 			0);
@@ -139,8 +138,7 @@ Offset:
 TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_1)
 {
 	UINT16 code = m_vram_1[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code & 0x0fff,
 			(code & 0xf000) >> (16-4),
 			0);
@@ -166,8 +164,8 @@ WRITE16_MEMBER(powerins_state::powerins_vram_1_w)
 
 void powerins_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(powerins_state::powerins_get_memory_offset_0),this),16,16,DIM_NX_0, DIM_NY_0 );
-	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_1),this),TILEMAP_SCAN_COLS,8,8,DIM_NX_1, DIM_NY_1 );
+	m_tilemap_0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(powerins_state::powerins_get_memory_offset_0),this),16,16,DIM_NX_0, DIM_NY_0 );
+	m_tilemap_1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_1),this),TILEMAP_SCAN_COLS,8,8,DIM_NX_1, DIM_NY_1 );
 
 	m_tilemap_0->set_scroll_rows(1);
 	m_tilemap_0->set_scroll_cols(1);

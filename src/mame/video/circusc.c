@@ -101,7 +101,7 @@ TILE_GET_INFO_MEMBER(circusc_state::get_tile_info)
 	UINT8 attr = m_colorram[tile_index];
 	tileinfo.category = (attr & 0x10) >> 4;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,
+	SET_TILE_INFO_MEMBER(0,
 					m_videoram[tile_index] + ((attr & 0x20) << 3),
 					attr & 0x0f,
 					TILE_FLIPYX((attr & 0xc0) >> 6));
@@ -117,7 +117,7 @@ TILE_GET_INFO_MEMBER(circusc_state::get_tile_info)
 
 void circusc_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(circusc_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(circusc_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_cols(32);
 }

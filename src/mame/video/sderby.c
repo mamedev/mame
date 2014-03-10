@@ -10,7 +10,7 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_tile_info)
 	tileno = m_videoram[tile_index*2];
 	colour = m_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
 }
 
 WRITE16_MEMBER(sderby_state::sderby_videoram_w)
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_md_tile_info)
 	tileno = m_md_videoram[tile_index*2];
 	colour = m_md_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tileno,colour+16,0);
+	SET_TILE_INFO_MEMBER(1,tileno,colour+16,0);
 }
 
 WRITE16_MEMBER(sderby_state::sderby_md_videoram_w)
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_fg_tile_info)
 	tileno = m_fg_videoram[tile_index*2];
 	colour = m_fg_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,colour+32,0);
+	SET_TILE_INFO_MEMBER(0,tileno,colour+32,0);
 }
 
 WRITE16_MEMBER(sderby_state::sderby_fg_videoram_w)
@@ -87,12 +87,12 @@ void sderby_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,i
 
 void sderby_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
-	m_md_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_md_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
+	m_md_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_md_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
 
 	m_md_tilemap->set_transparent_pen(0);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_fg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_fg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 

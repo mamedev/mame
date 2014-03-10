@@ -980,12 +980,12 @@ TILE_GET_INFO_MEMBER(peplus_state::get_bg_tile_info)
 		color += 0x10;
 	}
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 void peplus_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(peplus_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(peplus_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 	m_palette_ram = auto_alloc_array(machine(), UINT8, 0x3000);
 	memset(m_palette_ram, 0, 0x3000);
 	m_palette_ram2 = auto_alloc_array(machine(), UINT8, 0x3000);

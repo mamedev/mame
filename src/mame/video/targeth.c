@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_targeth_screen0)
 	int data2 = m_videoram[(tile_index << 1) + 1];
 	int code = data & 0x3fff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
+	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
 }
 
 TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_targeth_screen1)
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_targeth_screen1)
 	int data2 = m_videoram[(0x2000/2) + (tile_index << 1) + 1];
 	int code = data & 0x3fff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
+	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
 }
 
 /***************************************************************************
@@ -71,8 +71,8 @@ WRITE16_MEMBER(targeth_state::targeth_vram_w)
 
 void targeth_state::video_start()
 {
-	m_pant[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_targeth_screen0),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_pant[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_targeth_screen1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_targeth_screen0),this),TILEMAP_SCAN_ROWS,16,16,64,32);
+	m_pant[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(targeth_state::get_tile_info_targeth_screen1),this),TILEMAP_SCAN_ROWS,16,16,64,32);
 
 	m_pant[0]->set_transparent_pen(0);
 }

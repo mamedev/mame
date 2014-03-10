@@ -12,7 +12,7 @@ TILE_GET_INFO_MEMBER(triplhnt_state::get_tile_info)
 {
 	int code = m_playfield_ram[tile_index] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, code == 0x3f ? 1 : 0, 0);
+	SET_TILE_INFO_MEMBER(2, code, code == 0x3f ? 1 : 0, 0);
 }
 
 
@@ -20,7 +20,7 @@ void triplhnt_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_helper);
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(triplhnt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(triplhnt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 

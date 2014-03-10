@@ -70,7 +70,7 @@ const gfx_layout segas24_tile::char_layout = {
 void segas24_tile::tile_info(int offset, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	UINT16 val = tile_ram[tile_index|offset];
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, char_gfx_index, val & tile_mask, (val >> 7) & 0xff, 0);
+	SET_TILE_INFO_MEMBER(char_gfx_index, val & tile_mask, (val >> 7) & 0xff, 0);
 	tileinfo.category = (val & 0x8000) != 0;
 }
 
@@ -104,10 +104,10 @@ void segas24_tile::device_start()
 	char_ram = auto_alloc_array(machine(), UINT16, 0x80000/2);
 	tile_ram = auto_alloc_array(machine(), UINT16, 0x10000/2);
 
-	tile_layer[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_0s),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
-	tile_layer[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_0w),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
-	tile_layer[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_1s),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
-	tile_layer[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_1w),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	tile_layer[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_0s),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	tile_layer[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_0w),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	tile_layer[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_1s),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	tile_layer[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(segas24_tile::tile_info_1w),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
 
 	tile_layer[0]->set_transparent_pen(0);
 	tile_layer[1]->set_transparent_pen(0);

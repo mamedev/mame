@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(ksayakyu_state::get_ksayakyu_tile_info)
 	int code = memregion("user1")->base()[tile_index];
 	int attr = memregion("user1")->base()[tile_index + 0x2000];
 	code += (attr & 3) << 8;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, ((attr >> 2) & 0x0f) * 2, (attr & 0x80) ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(1, code, ((attr >> 2) & 0x0f) * 2, (attr & 0x80) ? TILE_FLIPX : 0);
 }
 
 /*
@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(ksayakyu_state::get_text_tile_info)
 
 	code |= (attr & 3) << 8;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 /*
@@ -114,8 +114,8 @@ void ksayakyu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 void ksayakyu_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ksayakyu_state::get_ksayakyu_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 * 8);
-	m_textmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ksayakyu_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ksayakyu_state::get_ksayakyu_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 * 8);
+	m_textmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ksayakyu_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_textmap->set_transparent_pen(0);
 }
 

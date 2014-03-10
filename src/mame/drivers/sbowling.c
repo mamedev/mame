@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(sbowling_state::get_sb_tile_info)
 	UINT8 *rom = memregion("user1")->base();
 	int tileno = rom[tile_index + m_bgmap * 1024];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
 }
 
 static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int flip)
@@ -131,7 +131,7 @@ UINT32 sbowling_state::screen_update_sbowling(screen_device &screen, bitmap_ind1
 void sbowling_state::video_start()
 {
 	m_tmpbitmap = auto_bitmap_ind16_alloc(machine(),32*8,32*8);
-	m_sb_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sbowling_state::get_sb_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_sb_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sbowling_state::get_sb_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 WRITE8_MEMBER(sbowling_state::pix_shift_w)

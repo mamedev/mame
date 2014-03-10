@@ -99,7 +99,7 @@ TILE_GET_INFO_MEMBER(battlane_state::get_tile_info_bg)
 	int gfxn = (attr & 0x01) + 1;
 	int color = (attr >> 1) & 0x03;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, gfxn, code, color, 0);
+	SET_TILE_INFO_MEMBER(gfxn, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(battlane_state::battlane_tilemap_scan_rows_2x2)
@@ -135,7 +135,7 @@ TILEMAP_MAPPER_MEMBER(battlane_state::battlane_tilemap_scan_rows_2x2)
 
 void battlane_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(battlane_state::get_tile_info_bg),this), tilemap_mapper_delegate(FUNC(battlane_state::battlane_tilemap_scan_rows_2x2),this), 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(battlane_state::get_tile_info_bg),this), tilemap_mapper_delegate(FUNC(battlane_state::battlane_tilemap_scan_rows_2x2),this), 16, 16, 32, 32);
 	m_screen_bitmap.allocate(32 * 8, 32 * 8);
 }
 

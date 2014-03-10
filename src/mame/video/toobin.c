@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(toobin_state::get_alpha_tile_info)
 	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 0x0f;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, (data >> 10) & 1);
+	SET_TILE_INFO_MEMBER(2, code, color, (data >> 10) & 1);
 }
 
 
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(toobin_state::get_playfield_tile_info)
 	UINT32 data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3fff;
 	int color = (data >> 16) & 0x0f;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, TILE_FLIPYX(data >> 14));
+	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX(data >> 14));
 	tileinfo.category = (data >> 20) & 3;
 }
 

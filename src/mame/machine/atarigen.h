@@ -45,36 +45,40 @@
 	MCFG_DEVICE_ADD(_tag, ATARI_VAD, 0) \
 	MCFG_VIDEO_SET_SCREEN(_screen) \
 	devcb = &atari_vad_device::static_set_scanline_int_cb(*device, DEVCB2_##_intcb);
-#define MCFG_ATARI_VAD_PLAYFIELD(_class, _getinfo) \
+
+#define MCFG_ATARI_VAD_PLAYFIELD(_class, _gfxtag, _getinfo) \
 	{ astring fulltag(device->tag(), ":playfield"); device_t *device; \
 	MCFG_TILEMAP_ADD(fulltag) \
+	MCFG_TILEMAP_GFXDECODE("^" _gfxtag) \
 	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
 	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
 	MCFG_TILEMAP_TILE_SIZE(8,8) \
 	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_COLS, 64,64) }
 
-#define MCFG_ATARI_VAD_PLAYFIELD2(_class, _getinfo) \
+#define MCFG_ATARI_VAD_PLAYFIELD2(_class, _gfxtag, _getinfo) \
 	{ astring fulltag(device->tag(), ":playfield2"); device_t *device; \
 	MCFG_TILEMAP_ADD(fulltag) \
+	MCFG_TILEMAP_GFXDECODE("^" _gfxtag) \
 	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
 	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
 	MCFG_TILEMAP_TILE_SIZE(8,8) \
 	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_COLS, 64,64) \
 	MCFG_TILEMAP_TRANSPARENT_PEN(0) }
 
-#define MCFG_ATARI_VAD_ALPHA(_class, _getinfo) \
+#define MCFG_ATARI_VAD_ALPHA(_class, _gfxtag, _getinfo) \
 	{ astring fulltag(device->tag(), ":alpha"); device_t *device; \
 	MCFG_TILEMAP_ADD(fulltag) \
+	MCFG_TILEMAP_GFXDECODE("^" _gfxtag) \
 	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
 	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
 	MCFG_TILEMAP_TILE_SIZE(8,8) \
 	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_ROWS, 64,32) \
 	MCFG_TILEMAP_TRANSPARENT_PEN(0) }
 
-#define MCFG_ATARI_VAD_MOB(_config, _gfxdecode) \
+#define MCFG_ATARI_VAD_MOB(_config, _gfxtag) \
 	{ astring fulltag(device->tag(), ":mob"); device_t *device; \
 	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag, "^^screen", _config) \
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("^" _gfxdecode) }
+	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("^" _gfxtag) }
 	
 
 

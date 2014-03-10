@@ -307,20 +307,20 @@ TILE_GET_INFO_MEMBER(m63_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] | ((attr & 0x30) << 4);
 	int color = (attr & 0x0f) + (m_pal_bank << 4);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(m63_state::get_fg_tile_info)
 {
 	int code = m_videoram2[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, m_fg_flag);
+	SET_TILE_INFO_MEMBER(0, code, 0, m_fg_flag);
 }
 
 VIDEO_START_MEMBER(m63_state,m63)
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m63_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m63_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m63_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m63_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_cols(32);
 	m_fg_tilemap->set_transparent_pen(0);

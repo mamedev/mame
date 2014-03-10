@@ -13,7 +13,7 @@ TILE_GET_INFO_MEMBER(mjkjidai_state::get_tile_info)
 	int attr = m_videoram[tile_index + 0x800];
 	int code = m_videoram[tile_index] + ((attr & 0x1f) << 8);
 	int color = m_videoram[tile_index + 0x1000];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,color >> 3,0);
+	SET_TILE_INFO_MEMBER(0,code,color >> 3,0);
 }
 
 
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(mjkjidai_state::get_tile_info)
 
 void mjkjidai_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mjkjidai_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mjkjidai_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
 

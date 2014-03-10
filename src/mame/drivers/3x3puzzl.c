@@ -103,8 +103,7 @@ protected:
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
 {
 	UINT16 code = m_videoram1_buffer[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code,
 			0,
 			0);
@@ -113,8 +112,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 {
 	UINT16 code = m_videoram2_buffer[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code,
 			1,
 			0);
@@ -123,8 +121,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile3_info)
 {
 	UINT16 code = m_videoram3_buffer[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2,
+	SET_TILE_INFO_MEMBER(2,
 			code,
 			2,
 			0);
@@ -172,9 +169,9 @@ WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrolly_w)
 
 void _3x3puzzle_state::video_start()
 {
-	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile1_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile2_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tilemap3 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile3_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile1_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile2_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap3 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile3_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap2->set_transparent_pen(0);
 	m_tilemap3->set_transparent_pen(0);
 }

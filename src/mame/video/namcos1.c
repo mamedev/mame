@@ -56,7 +56,7 @@ inline void namcos1_state::bg_get_info(tile_data &tileinfo,int tile_index,UINT8 
 
 	tile_index <<= 1;
 	code = info_vram[tile_index + 1] + ((info_vram[tile_index] & 0x3f) << 8);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,0,0);
+	SET_TILE_INFO_MEMBER(0,code,0,0);
 	tileinfo.mask_data = &m_tilemap_maskdata[code << 3];
 }
 
@@ -66,7 +66,7 @@ inline void namcos1_state::fg_get_info(tile_data &tileinfo,int tile_index,UINT8 
 
 	tile_index <<= 1;
 	code = info_vram[tile_index + 1] + ((info_vram[tile_index] & 0x3f) << 8);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,0,0);
+	SET_TILE_INFO_MEMBER(0,code,0,0);
 	tileinfo.mask_data = &m_tilemap_maskdata[code << 3];
 }
 
@@ -119,12 +119,12 @@ void namcos1_state::video_start()
 	m_spriteram = auto_alloc_array(machine(), UINT8, 0x1000);
 
 	/* initialize playfields */
-	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info1),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info2),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info3),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_bg_tilemap[4] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info4),this),TILEMAP_SCAN_ROWS,8,8,36,28);
-	m_bg_tilemap[5] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info5),this),TILEMAP_SCAN_ROWS,8,8,36,28);
+	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info1),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info2),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::bg_get_info3),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[4] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info4),this),TILEMAP_SCAN_ROWS,8,8,36,28);
+	m_bg_tilemap[5] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos1_state::fg_get_info5),this),TILEMAP_SCAN_ROWS,8,8,36,28);
 
 	for (i = 0; i < 4; i++)
 	{

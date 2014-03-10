@@ -19,8 +19,7 @@
 TILE_GET_INFO_MEMBER(srumbler_state::get_fg_tile_info)
 {
 	UINT8 attr = m_foregroundram[2*tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			m_foregroundram[2*tile_index + 1] + ((attr & 0x03) << 8),
 			(attr & 0x3c) >> 2,
 			(attr & 0x40) ? TILE_FORCE_LAYER0 : 0);
@@ -29,8 +28,7 @@ TILE_GET_INFO_MEMBER(srumbler_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(srumbler_state::get_bg_tile_info)
 {
 	UINT8 attr = m_backgroundram[2*tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			m_backgroundram[2*tile_index + 1] + ((attr & 0x07) << 8),
 			(attr & 0xe0) >> 5,
 			((attr & 0x08) ? TILE_FLIPY : 0));
@@ -47,8 +45,8 @@ TILE_GET_INFO_MEMBER(srumbler_state::get_bg_tile_info)
 
 void srumbler_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(srumbler_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(srumbler_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,    16,16,64,64);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(srumbler_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(srumbler_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,    16,16,64,64);
 
 	m_fg_tilemap->set_transparent_pen(3);
 

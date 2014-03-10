@@ -16,21 +16,21 @@ TILE_GET_INFO_MEMBER(f1gp_state::f1gp_get_roz_tile_info)
 {
 	int code = m_rozvideoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, code & 0x7ff, code >> 12, 0);
+	SET_TILE_INFO_MEMBER(3, code & 0x7ff, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(f1gp_state::f1gp2_get_roz_tile_info)
 {
 	int code = m_rozvideoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, (code & 0x7ff) + (m_roz_bank << 11), code >> 12, 0);
+	SET_TILE_INFO_MEMBER(2, (code & 0x7ff) + (m_roz_bank << 11), code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(f1gp_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code & 0x7fff, 0, (code & 0x8000) ? TILE_FLIPY : 0);
+	SET_TILE_INFO_MEMBER(0, code & 0x7fff, 0, (code & 0x8000) ? TILE_FLIPY : 0);
 }
 
 
@@ -45,8 +45,8 @@ TILE_GET_INFO_MEMBER(f1gp_state::get_fg_tile_info)
 
 VIDEO_START_MEMBER(f1gp_state,f1gp)
 {
-	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_roz_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0xff);
 
@@ -59,8 +59,8 @@ VIDEO_START_MEMBER(f1gp_state,f1gp)
 
 VIDEO_START_MEMBER(f1gp_state,f1gpb)
 {
-	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_roz_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0xff);
 
@@ -91,8 +91,8 @@ UINT32 f1gp_state::f1gp_ol2_tile_callback( UINT32 code )
 
 VIDEO_START_MEMBER(f1gp_state,f1gp2)
 {
-	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::f1gp2_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_roz_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::f1gp2_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0xff);
 	m_roz_tilemap->set_transparent_pen(0x0f);

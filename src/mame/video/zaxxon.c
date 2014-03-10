@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(zaxxon_state::get_bg_tile_info)
 	int code = source[eff_index] + 256 * (source[eff_index + size] & 3);
 	int color = source[eff_index + size] >> 4;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 
@@ -85,7 +85,7 @@ TILE_GET_INFO_MEMBER(zaxxon_state::zaxxon_get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_color_codes[sx + 32 * (sy / 4)] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color * 2, 0);
+	SET_TILE_INFO_MEMBER(0, code, color * 2, 0);
 }
 
 
@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(zaxxon_state::razmataz_get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_color_codes[code] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color * 2, 0);
+	SET_TILE_INFO_MEMBER(0, code, color * 2, 0);
 }
 
 
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(zaxxon_state::congo_get_fg_tile_info)
 	int code = m_videoram[tile_index] + (m_congo_fg_bank << 8);
 	int color = m_colorram[tile_index] & 0x1f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color * 2, 0);
+	SET_TILE_INFO_MEMBER(0, code, color * 2, 0);
 }
 
 
@@ -126,8 +126,8 @@ void zaxxon_state::video_start_common(tilemap_get_info_delegate fg_tile_info)
 	memset(m_congo_custom, 0, sizeof(m_congo_custom));
 
 	/* create a background and foreground tilemap */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(zaxxon_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,512);
-	m_fg_tilemap = &machine().tilemap().create(fg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(zaxxon_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,512);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, fg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
 	/* configure the foreground tilemap */
 	m_fg_tilemap->set_transparent_pen(0);

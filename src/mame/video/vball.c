@@ -29,8 +29,7 @@ TILE_GET_INFO_MEMBER(vball_state::get_bg_tile_info)
 {
 	UINT8 code = m_vb_videoram[tile_index];
 	UINT8 attr = m_vb_attribram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code + ((attr & 0x1f) << 8) + (m_gfxset<<8),
 			(attr >> 5) & 0x7,
 			0);
@@ -39,7 +38,7 @@ TILE_GET_INFO_MEMBER(vball_state::get_bg_tile_info)
 
 void vball_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vball_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(vball_state::background_scan),this), 8, 8,64,64);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(vball_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(vball_state::background_scan),this), 8, 8,64,64);
 
 	m_bg_tilemap->set_scroll_rows(32);
 	m_gfxset=0;

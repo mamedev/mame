@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(eprom_state::get_alpha_tile_info)
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
+	SET_TILE_INFO_MEMBER(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(eprom_state::get_playfield_tile_info)
 	UINT16 data2 = tilemap.extmem_read(tile_index) >> 8;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, (data1 >> 15) & 1);
+	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
 }
 
 
@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(eprom_state::guts_get_playfield_tile_info)
 	UINT16 data2 = tilemap.extmem_read(tile_index) >> 8;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, (data1 >> 15) & 1);
+	SET_TILE_INFO_MEMBER(2, code, color, (data1 >> 15) & 1);
 }
 
 

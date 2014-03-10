@@ -52,7 +52,7 @@ inline void fuuki32_state::get_tile_info8bpp(tile_data &tileinfo, tilemap_memory
 {
 	UINT16 code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
 	UINT16 attr = (m_vram[_N_][tile_index] & 0x0000ffff);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1 + _N_, code, (attr & 0x3f) >> 4, TILE_FLIPYX((attr >> 6) & 3));
+	SET_TILE_INFO_MEMBER(1 + _N_, code, (attr & 0x3f) >> 4, TILE_FLIPYX((attr >> 6) & 3));
 }
 
 TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_0){ get_tile_info8bpp(tileinfo, tile_index, 0); }
@@ -62,7 +62,7 @@ inline void fuuki32_state::get_tile_info4bpp(tile_data &tileinfo, tilemap_memory
 {
 	UINT16 code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
 	UINT16 attr = (m_vram[_N_][tile_index] & 0x0000ffff);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
+	SET_TILE_INFO_MEMBER(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
 }
 
 TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_2){ get_tile_info4bpp(tileinfo, tile_index, 2); }
@@ -96,10 +96,10 @@ void fuuki32_state::video_start()
 	save_pointer(NAME(m_buf_spriteram), m_spriteram.bytes() / 4);
 	save_pointer(NAME(m_buf_spriteram2), m_spriteram.bytes() / 4);
 
-	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki32_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_tilemap[0]->set_transparent_pen(0xff);    // 8 bits
 	m_tilemap[1]->set_transparent_pen(0xff);    // 8 bits

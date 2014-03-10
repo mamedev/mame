@@ -24,8 +24,7 @@
 TILE_GET_INFO_MEMBER(tecmo_state::get_bg_tile_info)
 {
 	UINT8 attr = m_bgvideoram[tile_index+0x200];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			3,
+	SET_TILE_INFO_MEMBER(3,
 			m_bgvideoram[tile_index] + ((attr & 0x07) << 8),
 			attr >> 4,
 			0);
@@ -34,8 +33,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::get_fg_tile_info)
 {
 	UINT8 attr = m_fgvideoram[tile_index+0x200];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2,
+	SET_TILE_INFO_MEMBER(2,
 			m_fgvideoram[tile_index] + ((attr & 0x07) << 8),
 			attr >> 4,
 			0);
@@ -44,8 +42,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_bg_tile_info)
 {
 	UINT8 attr = m_bgvideoram[tile_index+0x200];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			3,
+	SET_TILE_INFO_MEMBER(3,
 			m_bgvideoram[tile_index] + ((attr & 0x70) << 4),
 			attr & 0x0f,
 			0);
@@ -54,8 +51,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_bg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_fg_tile_info)
 {
 	UINT8 attr = m_fgvideoram[tile_index+0x200];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2,
+	SET_TILE_INFO_MEMBER(2,
 			m_fgvideoram[tile_index] + ((attr & 0x70) << 4),
 			attr & 0x0f,
 			0);
@@ -64,8 +60,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_fg_tile_info)
 TILE_GET_INFO_MEMBER(tecmo_state::get_tx_tile_info)
 {
 	UINT8 attr = m_txvideoram[tile_index+0x400];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			m_txvideoram[tile_index] + ((attr & 0x03) << 8),
 			attr >> 4,
 			0);
@@ -83,15 +78,15 @@ VIDEO_START_MEMBER(tecmo_state,tecmo)
 {
 	if (m_video_type == 2)  /* gemini */
 	{
-		m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::gemini_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
-		m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::gemini_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
+		m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::gemini_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
+		m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::gemini_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
 	}
 	else    /* rygar, silkworm */
 	{
-		m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
-		m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
+		m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
+		m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
 	}
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tecmo_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tecmo_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);

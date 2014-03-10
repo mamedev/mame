@@ -13,8 +13,7 @@
 TILE_GET_INFO_MEMBER(tail2nos_state::get_tile_info)
 {
 	UINT16 code = m_bgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			(code & 0x1fff) + (m_charbank << 13),
 			((code & 0xe000) >> 13) + m_charpalette * 16,
 			0);
@@ -53,7 +52,7 @@ void tail2nos_state::tail2nos_postload()
 
 void tail2nos_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tail2nos_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tail2nos_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_bg_tilemap->set_transparent_pen(15);
 

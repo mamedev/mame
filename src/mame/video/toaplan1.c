@@ -142,8 +142,7 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf1_tile_info)
 	tile_number = m_pf1_tilevram16[2*tile_index+1] & 0x7fff;
 	attrib = m_pf1_tilevram16[2*tile_index];
 	color = attrib & 0x3f;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			color,
 			0);
@@ -159,8 +158,7 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf2_tile_info)
 	tile_number = m_pf2_tilevram16[2*tile_index+1] & 0x7fff;
 	attrib = m_pf2_tilevram16[2*tile_index];
 	color = attrib & 0x3f;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			color,
 			0);
@@ -176,8 +174,7 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf3_tile_info)
 	tile_number = m_pf3_tilevram16[2*tile_index+1] & 0x7fff;
 	attrib = m_pf3_tilevram16[2*tile_index];
 	color = attrib & 0x3f;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			color,
 			0);
@@ -193,8 +190,7 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf4_tile_info)
 	tile_number = m_pf4_tilevram16[2*tile_index+1] & 0x7fff;
 	attrib = m_pf4_tilevram16[2*tile_index];
 	color = attrib & 0x3f;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			color,
 			0);
@@ -211,10 +207,10 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf4_tile_info)
 
 void toaplan1_state::toaplan1_create_tilemaps()
 {
-	m_pf1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_pf2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_pf3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf3_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_pf4_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf4_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pf1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pf2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pf3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf3_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pf4_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf4_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_pf1_tilemap->set_transparent_pen(0);
 	m_pf2_tilemap->set_transparent_pen(0);

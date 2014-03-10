@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(polygonet_state::ttl_get_tile_info)
 
 	attr = m_ttl_vram[tile_index]>>12;  /* palette in all 4 bits? */
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, m_ttl_gfx_index, code, attr, 0);
+	SET_TILE_INFO_MEMBER(m_ttl_gfx_index, code, attr, 0);
 }
 
 TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
 	attr = (m_roz_vram[tile_index] >> 12) + 16; /* roz base palette is palette 16 */
 	code = m_roz_vram[tile_index] & 0x3ff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, attr, 0);
+	SET_TILE_INFO_MEMBER(0, code, attr, 0);
 }
 
 READ32_MEMBER(polygonet_state::polygonet_ttl_ram_r)
@@ -102,12 +102,12 @@ void polygonet_state::video_start()
 	m_gfxdecode->set_gfx(m_ttl_gfx_index, auto_alloc(machine(), gfx_element(machine(), charlayout, memregion("gfx1")->base(), m_palette->entries() / 16, 0)));
 
 	/* create the tilemap */
-	m_ttl_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(polygonet_state::ttl_get_tile_info),this), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan),this),  8, 8, 64, 32);
+	m_ttl_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(polygonet_state::ttl_get_tile_info),this), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan),this),  8, 8, 64, 32);
 
 	m_ttl_tilemap->set_transparent_pen(0);
 
 	/* set up the roz t-map too */
-	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(polygonet_state::roz_get_tile_info),this), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan_cols),this), 16, 16, 32, 64);
+	m_roz_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(polygonet_state::roz_get_tile_info),this), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan_cols),this), 16, 16, 32, 64);
 	m_roz_tilemap->set_transparent_pen(0);
 
 	/* save states */

@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(alpha68k_state::get_tile_info)
 
 	tile = tile | (m_bank_base << 8);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
 WRITE16_MEMBER(alpha68k_state::alpha68k_videoram_w)
@@ -61,7 +61,7 @@ WRITE16_MEMBER(alpha68k_state::alpha68k_videoram_w)
 
 VIDEO_START_MEMBER(alpha68k_state,alpha68k)
 {
-	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(alpha68k_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(alpha68k_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	m_fix_tilemap->set_transparent_pen(0);
 }
 

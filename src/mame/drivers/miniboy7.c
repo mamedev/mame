@@ -208,12 +208,12 @@ TILE_GET_INFO_MEMBER(miniboy7_state::get_bg_tile_info)
 	if (bank == 1)  /* temporary hack to point to the 3rd gfx bank */
 		bank = 2;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, bank, code, color, 0);
+	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
 void miniboy7_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(miniboy7_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 37, 37);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(miniboy7_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 37, 37);
 }
 
 UINT32 miniboy7_state::screen_update_miniboy7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

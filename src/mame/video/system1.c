@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(system1_state::tile_get_info)
 	UINT32 code = ((tiledata >> 4) & 0x800) | (tiledata & 0x7ff);
 	UINT32 color = (tiledata >> 5) & 0xff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 
@@ -129,7 +129,7 @@ void system1_state::video_start_common(int pagecount)
 	/* create the tilemap pages */
 	for (pagenum = 0; pagenum < pagecount; pagenum++)
 	{
-		m_tilemap_page[pagenum] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(system1_state::tile_get_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+		m_tilemap_page[pagenum] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(system1_state::tile_get_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 		m_tilemap_page[pagenum]->set_transparent_pen(0);
 		m_tilemap_page[pagenum]->set_user_data(m_videoram + 0x800 * pagenum);
 	}

@@ -24,8 +24,7 @@ TILE_GET_INFO_MEMBER(lwings_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
 	int color = m_fgvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code + ((color & 0xc0) << 2),
 			color & 0x0f,
 			TILE_FLIPYX((color & 0x30) >> 4));
@@ -35,8 +34,7 @@ TILE_GET_INFO_MEMBER(lwings_state::lwings_get_bg1_tile_info)
 {
 	int code = m_bg1videoram[tile_index];
 	int color = m_bg1videoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code + ((color & 0xe0) << 3),
 			color & 0x07,
 			TILE_FLIPYX((color & 0x18) >> 3));
@@ -47,8 +45,7 @@ TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
 	int code = m_bg1videoram[tile_index];
 	int color = m_bg1videoram[tile_index + 0x400];
 	code += (color & 0xe0)<<3;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code,
 			m_bg2_avenger_hw ? ((color & 7) ^ 6) : (color & 7),
 			((color & 0x10) ? TILE_FLIPX : 0));
@@ -65,8 +62,7 @@ TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
 	tile_index = (tile_index + m_bg2_image * 0x20) & mask;
 	code = rom[tile_index];
 	color = rom[tile_index + 1];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			3,
+	SET_TILE_INFO_MEMBER(3,
 			code + ((color & 0x80) << 1),
 			color & 0x07,
 			TILE_FLIPYX((color & 0x30) >> 4));
@@ -80,17 +76,17 @@ TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
 
 void lwings_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::lwings_get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::lwings_get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(3);
 }
 
 VIDEO_START_MEMBER(lwings_state,trojan)
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::trojan_get_bg1_tile_info),this),TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(lwings_state::get_bg2_memory_offset),this), 16, 16, 32, 16);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::trojan_get_bg1_tile_info),this),TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(lwings_state::get_bg2_memory_offset),this), 16, 16, 32, 16);
 
 	m_fg_tilemap->set_transparent_pen(3);
 	m_bg1_tilemap->set_transmask(0, 0xffff, 0x0001); /* split type 0 is totally transparent in front half */

@@ -9,7 +9,7 @@ TILE_GET_INFO_MEMBER(oneshot_state::get_oneshot_bg_tile_info)
 {
 	int tileno = m_bg_videoram[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
 }
 
 WRITE16_MEMBER(oneshot_state::oneshot_bg_videoram_w)
@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(oneshot_state::get_oneshot_mid_tile_info)
 {
 	int tileno = m_mid_videoram[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, 2, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, 2, 0);
 }
 
 WRITE16_MEMBER(oneshot_state::oneshot_mid_videoram_w)
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(oneshot_state::get_oneshot_fg_tile_info)
 {
 	int tileno = m_fg_videoram[tile_index * 2 + 1];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, 3, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, 3, 0);
 }
 
 WRITE16_MEMBER(oneshot_state::oneshot_fg_videoram_w)
@@ -49,9 +49,9 @@ WRITE16_MEMBER(oneshot_state::oneshot_fg_videoram_w)
 
 void oneshot_state::video_start()
 {
-	m_bg_tilemap =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_bg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_mid_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_mid_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_bg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_mid_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_mid_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_mid_tilemap->set_transparent_pen(0);

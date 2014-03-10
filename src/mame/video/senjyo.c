@@ -25,8 +25,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_fg_tile_info)
 	if (m_is_senjyo && (tile_index & 0x1f) >= 32-8)
 		flags |= TILE_FORCE_LAYER0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			m_fgvideoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x07,
 			flags);
@@ -36,8 +35,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::senjyo_bg1_tile_info)
 {
 	UINT8 code = m_bg1videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code,
 			(code & 0x70) >> 4,
 			0);
@@ -50,8 +48,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::starforc_bg1_tile_info)
 	static const UINT8 colormap[8] = { 0, 2, 4, 6, 1, 3, 5, 7 };
 	UINT8 code = m_bg1videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code,
 			colormap[(code & 0xe0) >> 5],
 			0);
@@ -61,8 +58,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg2_tile_info)
 {
 	UINT8 code = m_bg2videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2,
+	SET_TILE_INFO_MEMBER(2,
 			code,
 			(code & 0xe0) >> 5,
 			0);
@@ -72,8 +68,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg3_tile_info)
 {
 	UINT8 code = m_bg3videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			3,
+	SET_TILE_INFO_MEMBER(3,
 			code,
 			(code & 0xe0) >> 5,
 			0);
@@ -89,19 +84,19 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg3_tile_info)
 
 void senjyo_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	if (m_is_senjyo)
 	{
-		m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::senjyo_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
-		m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),this),    TILEMAP_SCAN_ROWS, 16, 16, 16, 48);   /* only 16x32 used by Star Force */
-		m_bg3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),this),    TILEMAP_SCAN_ROWS, 16, 16, 16, 56);   /* only 16x32 used by Star Force */
+		m_bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::senjyo_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
+		m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),this),    TILEMAP_SCAN_ROWS, 16, 16, 16, 48);   /* only 16x32 used by Star Force */
+		m_bg3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),this),    TILEMAP_SCAN_ROWS, 16, 16, 16, 56);   /* only 16x32 used by Star Force */
 	}
 	else
 	{
-		m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::starforc_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
-		m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),this),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32); /* only 16x32 used by Star Force */
-		m_bg3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),this),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32); /* only 16x32 used by Star Force */
+		m_bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::starforc_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
+		m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::get_bg2_tile_info),this),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32); /* only 16x32 used by Star Force */
+		m_bg3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(senjyo_state::get_bg3_tile_info),this),      TILEMAP_SCAN_ROWS, 16, 16, 16, 32); /* only 16x32 used by Star Force */
 	}
 
 	m_fg_tilemap->set_transparent_pen(0);

@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(punchout_state::top_get_info)
 	int code = m_bg_top_videoram[tile_index*2] + ((attr & 0x03) << 8);
 	int color = ((attr & 0x7c) >> 2);
 	int flipx = attr & 0x80;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flipx ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(0, code, color, flipx ? TILE_FLIPX : 0);
 }
 
 TILE_GET_INFO_MEMBER(punchout_state::armwrest_top_get_info)
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(punchout_state::armwrest_top_get_info)
 	int attr = m_bg_top_videoram[tile_index*2 + 1];
 	int code = m_bg_top_videoram[tile_index*2] + ((attr & 0x03) << 8) + ((attr & 0x80) << 3);
 	int color = ((attr & 0x7c) >> 2);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(punchout_state::bot_get_info)
@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(punchout_state::bot_get_info)
 	int code = m_bg_bot_videoram[tile_index*2] + ((attr & 0x03) << 8);
 	int color = ((attr & 0x7c) >> 2);
 	int flipx = attr & 0x80;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flipx ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(1, code, color, flipx ? TILE_FLIPX : 0);
 }
 
 TILE_GET_INFO_MEMBER(punchout_state::armwrest_bot_get_info)
@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(punchout_state::armwrest_bot_get_info)
 	int code = m_bg_bot_videoram[tile_index*2] + ((attr & 0x03) << 8);
 	int color = ((attr & 0x7c) >> 2) + 0x40;
 	int flipx = attr & 0x80;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flipx ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(0, code, color, flipx ? TILE_FLIPX : 0);
 }
 
 TILE_GET_INFO_MEMBER(punchout_state::bs1_get_info)
@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(punchout_state::bs1_get_info)
 	int code = m_spr1_videoram[tile_index*4] + ((m_spr1_videoram[tile_index*4 + 1] & 0x1f) << 8);
 	int color = attr & 0x1f;
 	int flipx = attr & 0x80;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, flipx ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(2, code, color, flipx ? TILE_FLIPX : 0);
 }
 
 TILE_GET_INFO_MEMBER(punchout_state::bs2_get_info)
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(punchout_state::bs2_get_info)
 	int code = m_spr2_videoram[tile_index*4] + ((m_spr2_videoram[tile_index*4 + 1] & 0x0f) << 8);
 	int color = attr & 0x3f;
 	int flipx = attr & 0x80;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, code, color, flipx ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(3, code, color, flipx ? TILE_FLIPX : 0);
 }
 
 TILE_GET_INFO_MEMBER(punchout_state::armwrest_fg_get_info)
@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(punchout_state::armwrest_fg_get_info)
 	int code = m_armwrest_fg_videoram[tile_index*2] + 256 * (attr & 0x07);
 	int color = ((attr & 0xf8) >> 3);
 	int flipx = attr & 0x80;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flipx ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(1, code, color, flipx ? TILE_FLIPX : 0);
 }
 
 TILEMAP_MAPPER_MEMBER(punchout_state::armwrest_bs1_scan)
@@ -121,12 +121,12 @@ TILEMAP_MAPPER_MEMBER(punchout_state::armwrest_bs1_scan_flipx)
 
 void punchout_state::video_start()
 {
-	m_bg_top_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(punchout_state::top_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
-	m_bg_bot_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(punchout_state::bot_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
+	m_bg_top_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::top_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_bg_bot_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::bot_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,32);
 	m_bg_bot_tilemap->set_scroll_rows(32);
 
-	m_spr1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(punchout_state::bs1_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 16,32);
-	m_spr2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(punchout_state::bs2_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 16,32);
+	m_spr1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::bs1_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 16,32);
+	m_spr2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::bs2_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 16,32);
 
 	m_fg_tilemap = NULL;
 
@@ -137,13 +137,13 @@ void punchout_state::video_start()
 
 VIDEO_START_MEMBER(punchout_state,armwrest)
 {
-	m_bg_top_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(punchout_state::armwrest_top_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
-	m_bg_bot_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(punchout_state::armwrest_bot_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_bg_top_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::armwrest_top_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_bg_bot_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::armwrest_bot_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
-	m_spr1_tilemap =       &machine().tilemap().create(tilemap_get_info_delegate(FUNC(punchout_state::bs1_get_info),this), tilemap_mapper_delegate(FUNC(punchout_state::armwrest_bs1_scan),this),  8,8, 32,16);
-	m_spr1_tilemap_flipx = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(punchout_state::bs1_get_info),this), tilemap_mapper_delegate(FUNC(punchout_state::armwrest_bs1_scan_flipx),this),  8,8, 32,16);
-	m_spr2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(punchout_state::bs2_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 16,32);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(punchout_state::armwrest_fg_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_spr1_tilemap =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::bs1_get_info),this), tilemap_mapper_delegate(FUNC(punchout_state::armwrest_bs1_scan),this),  8,8, 32,16);
+	m_spr1_tilemap_flipx = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::bs1_get_info),this), tilemap_mapper_delegate(FUNC(punchout_state::armwrest_bs1_scan_flipx),this),  8,8, 32,16);
+	m_spr2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::bs2_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 16,32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(punchout_state::armwrest_fg_get_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
 	m_spr1_tilemap->set_transparent_pen(0x07);
 	m_spr1_tilemap_flipx->set_transparent_pen(0x07);

@@ -195,7 +195,7 @@ void k051316_device::device_start()
 
 	m_bpp = is_tail2nos ? 4 : m_bpp; // tail2nos is passed with bpp = -4 to setup the custom charlayout!
 
-	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k051316_device::get_tile_info0),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k051316_device::get_tile_info0),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x800);
 
@@ -284,8 +284,7 @@ void k051316_device::get_tile_info( tile_data &tileinfo, int tile_index )
 
 	m_callback(machine(), &code, &color, &flags);
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-			m_gfx_num,
+	SET_TILE_INFO_MEMBER(m_gfx_num,
 			code,
 			color,
 			flags);

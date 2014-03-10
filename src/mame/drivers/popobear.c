@@ -180,7 +180,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg0_tile_info)
 	int base = tilemap_base[0];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg1_tile_info)
@@ -188,7 +188,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg1_tile_info)
 	int base = tilemap_base[1];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg2_tile_info)
@@ -196,7 +196,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg2_tile_info)
 	int base = tilemap_base[2];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg3_tile_info)
@@ -204,7 +204,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg3_tile_info)
 	int base = tilemap_base[3];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 
@@ -226,10 +226,10 @@ void popobear_state::video_start()
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), popobear_char_layout, (UINT8 *)m_vram_rearranged, m_palette->entries() / 16, 0)));
 
-	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_bg_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
 	m_bg_tilemap[0]->set_transparent_pen(0);
 	m_bg_tilemap[1]->set_transparent_pen(0);

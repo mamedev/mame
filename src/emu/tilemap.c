@@ -343,7 +343,7 @@ tilemap_t::tilemap_t()
 //  init - initialize the tilemap
 //-------------------------------------------------
 
-tilemap_t &tilemap_t::init(tilemap_manager &manager, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows)
+tilemap_t &tilemap_t::init(tilemap_manager &manager, gfxdecode_device &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows)
 {
 	// populate managers and devices
 	m_manager = &manager;
@@ -401,8 +401,9 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, tilemap_get_info_delegate t
 	// create the initial mappings
 	mappings_create();
 
-	// set up the default pen mask
+	// set up the default tile data
 	memset(&m_tileinfo, 0, sizeof(m_tileinfo));
+	m_tileinfo.decoder = &decoder;
 	m_tileinfo.pen_mask = 0xff;
 	m_tileinfo.gfxnum = 0xff;
 
@@ -1497,18 +1498,18 @@ static const struct
 	{ FUNC(tilemap_t::scan_cols_flip_xy) }
 };
 
-tilemap_t &tilemap_manager::create(tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
+tilemap_t &tilemap_manager::create(gfxdecode_device &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
 {
 	if (allocated == NULL)
 		allocated = auto_alloc(machine(), tilemap_t);
-	return m_tilemap_list.append(allocated->init(*this, tile_get_info, mapper, tilewidth, tileheight, cols, rows));
+	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, mapper, tilewidth, tileheight, cols, rows));
 }
 
-tilemap_t &tilemap_manager::create(tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
+tilemap_t &tilemap_manager::create(gfxdecode_device &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
 {
 	if (allocated == NULL)
 		allocated = auto_alloc(machine(), tilemap_t);
-	return m_tilemap_list.append(allocated->init(*this, tile_get_info, tilemap_mapper_delegate(s_standard_mappers[mapper].func, s_standard_mappers[mapper].name, machine().driver_data()), tilewidth, tileheight, cols, rows));
+	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(s_standard_mappers[mapper].func, s_standard_mappers[mapper].name, machine().driver_data()), tilewidth, tileheight, cols, rows));
 }
 
 
@@ -1550,6 +1551,7 @@ const device_type TILEMAP = &device_creator<tilemap_device>;
 
 tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TILEMAP, "Tilemap", tag, owner, clock, "tilemap", __FILE__),
+		m_gfxdecode(*this),
 		m_standard_mapper(TILEMAP_STANDARD_COUNT),
 		m_tile_width(8),
 		m_tile_height(8),
@@ -1558,6 +1560,17 @@ tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, d
 		m_transparent_pen_set(false),
 		m_transparent_pen(0)
 {
+}
+
+
+//-------------------------------------------------
+//  static_set_gfxdecode_tag: Set the tag of the
+//  gfx decoder
+//-------------------------------------------------
+
+void tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
+{
+	downcast<tilemap_device &>(device).m_gfxdecode.set_tag(tag);
 }
 
 
@@ -1723,9 +1736,9 @@ void tilemap_device::device_start()
 
 	// allocate the tilemap
 	if (m_standard_mapper == TILEMAP_STANDARD_COUNT)
-		machine().tilemap().create(m_get_info, m_mapper, m_tile_width, m_tile_height, m_num_columns, m_num_rows, this);
+		machine().tilemap().create(m_gfxdecode, m_get_info, m_mapper, m_tile_width, m_tile_height, m_num_columns, m_num_rows, this);
 	else
-		machine().tilemap().create(m_get_info, m_standard_mapper, m_tile_width, m_tile_height, m_num_columns, m_num_rows, this);
+		machine().tilemap().create(m_gfxdecode, m_get_info, m_standard_mapper, m_tile_width, m_tile_height, m_num_columns, m_num_rows, this);
 
 	// find the memory, if present
 	const memory_share *share = memshare(tag());

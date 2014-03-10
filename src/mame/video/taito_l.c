@@ -15,8 +15,7 @@ TILE_GET_INFO_MEMBER(taitol_state::get_bg18_tile_info)
 			| ((m_bankc[(attr & 0xc) >> 2]) << 10)
 			| (m_horshoes_gfxbank << 12);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code,
 			(attr & 0xf0) >> 4,
 			0);
@@ -30,8 +29,7 @@ TILE_GET_INFO_MEMBER(taitol_state::get_bg19_tile_info)
 			| ((m_bankc[(attr & 0xc) >> 2]) << 10)
 			| (m_horshoes_gfxbank << 12);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code,
 			(attr & 0xf0) >> 4,
 			0);
@@ -42,8 +40,7 @@ TILE_GET_INFO_MEMBER(taitol_state::get_ch1a_tile_info)
 	int attr = m_rambanks[2 * tile_index + 0xa000 + 1];
 	int code = m_rambanks[2 * tile_index + 0xa000] | ((attr & 0x01) << 8) | ((attr & 0x04) << 7);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2,
+	SET_TILE_INFO_MEMBER(2,
 			code,
 			(attr & 0xf0) >> 4,
 			0);
@@ -61,9 +58,9 @@ VIDEO_START_MEMBER(taitol_state,taitol)
 {
 	int i;
 
-	m_bg18_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(taitol_state::get_bg18_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_bg19_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(taitol_state::get_bg19_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_ch1a_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(taitol_state::get_ch1a_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg18_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_bg18_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg19_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_bg19_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_ch1a_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_ch1a_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_bg18_tilemap->set_transparent_pen(0);
 	m_ch1a_tilemap->set_transparent_pen(0);

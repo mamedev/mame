@@ -124,13 +124,13 @@ TILE_GET_INFO_MEMBER(nsmpoker_state::get_bg_tile_info)
 //  int bank = (attr & 0x08) >> 3;
 //  int color = (attr & 0x03);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode,  0 /* bank */, code, 0 /* color */, 0);
+	SET_TILE_INFO_MEMBER(0 /* bank */, code, 0 /* color */, 0);
 }
 
 
 void nsmpoker_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nsmpoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nsmpoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

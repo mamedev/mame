@@ -78,8 +78,7 @@ TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
 {
 	UINT8 *gfx = memregion("gfx5")->base();
 	int code = gfx[2 * tile_index + 0] * 256 + gfx[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			BG_GFX,
+	SET_TILE_INFO_MEMBER(BG_GFX,
 			code,
 			code >> 12,
 			0);
@@ -95,8 +94,7 @@ TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(ginganin_state::get_fg_tile_info)
 {
 	UINT16 code = m_fgram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			FG_GFX,
+	SET_TILE_INFO_MEMBER(FG_GFX,
 			code,
 			code >> 12,
 			0);
@@ -118,8 +116,7 @@ WRITE16_MEMBER(ginganin_state::ginganin_fgram16_w)
 TILE_GET_INFO_MEMBER(ginganin_state::get_txt_tile_info)
 {
 	UINT16 code = m_txtram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			TXT_GFX,
+	SET_TILE_INFO_MEMBER(TXT_GFX,
 			code,
 			code >> 12,
 			0);
@@ -134,9 +131,9 @@ WRITE16_MEMBER(ginganin_state::ginganin_txtram16_w)
 
 void ginganin_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ginganin_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, BG_NX, BG_NY);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ginganin_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, FG_NX, FG_NY);
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ginganin_state::get_txt_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, TXT_NX, TXT_NY);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ginganin_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, BG_NX, BG_NY);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ginganin_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, FG_NX, FG_NY);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ginganin_state::get_txt_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, TXT_NX, TXT_NY);
 
 	m_fg_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);

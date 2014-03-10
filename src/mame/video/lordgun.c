@@ -66,7 +66,7 @@ inline void lordgun_state::get_tile_info(tile_data &tileinfo, tilemap_memory_ind
 	UINT16 attr = m_vram[_N_][tile_index * 2 + 0 ];
 	UINT16 code = m_vram[_N_][ tile_index * 2 + 1 ];
 	UINT16 pri  = (attr & 0x0e00) >> 9;
-	SET_TILE_INFO_MEMBER(m_gfxdecode,  _N_, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((_N_ + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
+	SET_TILE_INFO_MEMBER(_N_, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((_N_ + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
 TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0); }
@@ -99,16 +99,16 @@ void lordgun_state::video_start()
 	int h = m_screen->height();
 
 	// 0x800 x 200
-	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,8,8, 0x100, 0x40 );
+	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,8,8, 0x100, 0x40 );
 
 	// 0x800 x 200
-	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x80,0x20 );
+	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x80,0x20 );
 
 	// 0x800 x 200
-	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS,32,32, 0x40,0x10 );
+	m_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS,32,32, 0x40,0x10 );
 
 	// 0x200 x 100
-	m_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS,8,8, 0x40,0x20 );
+	m_tilemap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lordgun_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS,8,8, 0x40,0x20 );
 
 	m_tilemap[0]->set_scroll_rows(1);
 	m_tilemap[0]->set_scroll_cols(1);

@@ -955,7 +955,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_back_tile_info)
 
 	tile = (tile & 0xfff) | (bg_bank << 12);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tile+0x0000,color,0);
+	SET_TILE_INFO_MEMBER(1,tile+0x0000,color,0);
 }
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
@@ -965,7 +965,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
 
 	tile = (tile & 0xfff) | (mid_bank << 12);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tile,color,0);
+	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
@@ -975,7 +975,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
 
 	tile = (tile & 0xfff) | (fg_bank << 12);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tile,color,0);
+	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
 TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
@@ -985,7 +985,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tile,color,0);
+	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
 /* VIDEO START (move to video file) */
@@ -993,10 +993,10 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 VIDEO_START_MEMBER(raiden2_state,raiden2)
 {
-	text_layer       = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
-	background_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	midground_layer  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_mid_tile_info),this),  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	foreground_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(raiden2_state::get_fore_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	text_layer       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
+	background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	midground_layer  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_mid_tile_info),this),  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_fore_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
 
 	midground_layer->set_transparent_pen(15);
 	foreground_layer->set_transparent_pen(15);

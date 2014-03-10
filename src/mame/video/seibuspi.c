@@ -545,7 +545,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_text_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
@@ -557,7 +557,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
 	tile &= 0x1fff;
 	tile |= m_rf2_layer_bank << 14 & 0x4000; // (d0)
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color, 0);
+	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
@@ -570,7 +570,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
 	tile |= 0x2000;
 	tile |= m_rf2_layer_bank << 13 & 0x4000; // (d1)
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color + 16, 0);
+	SET_TILE_INFO_MEMBER(1, tile, color + 16, 0);
 }
 
 TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
@@ -584,7 +584,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
 	tile |= m_layer_bank >> 14 & 0x2000; // (d27)
 	tile |= m_rf2_layer_bank << 12 & 0x4000; // (d2)
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color + 8, 0);
+	SET_TILE_INFO_MEMBER(1, tile, color + 8, 0);
 }
 
 
@@ -617,10 +617,10 @@ void seibuspi_state::video_start()
 	m_palette_ram = auto_alloc_array_clear(machine(), UINT32, m_palette_ram_size/4);
 	m_sprite_ram = auto_alloc_array_clear(machine(), UINT32, m_sprite_ram_size/4);
 
-	m_text_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64,32);
-	m_back_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_back_tile_info),this), TILEMAP_SCAN_COLS, 16,16,32,32);
-	m_midl_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_midl_tile_info),this), TILEMAP_SCAN_COLS, 16,16,32,32);
-	m_fore_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_fore_tile_info),this), TILEMAP_SCAN_COLS, 16,16,32,32);
+	m_text_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seibuspi_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64,32);
+	m_back_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seibuspi_state::get_back_tile_info),this), TILEMAP_SCAN_COLS, 16,16,32,32);
+	m_midl_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seibuspi_state::get_midl_tile_info),this), TILEMAP_SCAN_COLS, 16,16,32,32);
+	m_fore_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seibuspi_state::get_fore_tile_info),this), TILEMAP_SCAN_COLS, 16,16,32,32);
 
 	m_text_layer->set_transparent_pen(31);
 	m_back_layer->set_transparent_pen(63);

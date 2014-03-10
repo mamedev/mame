@@ -26,7 +26,7 @@ inline void fromance_state::get_fromance_tile_info( tile_data &tileinfo, int til
 				m_local_videoram[layer][0x2000 + tile_index];
 	int color = m_local_videoram[layer][tile_index] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, layer, tile, color, 0);
+	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(fromance_state::get_fromance_bg_tile_info){ get_fromance_tile_info(tileinfo, tile_index, 0); }
@@ -39,7 +39,7 @@ inline void fromance_state::get_nekkyoku_tile_info( tile_data &tileinfo, int til
 				m_local_videoram[layer][0x1000 + tile_index];
 	int color = m_local_videoram[layer][tile_index + 0x2000] & 0x3f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, layer, tile, color, 0);
+	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_bg_tile_info){ get_nekkyoku_tile_info(tileinfo, tile_index, 0); }
@@ -88,8 +88,8 @@ void fromance_state::init_common(  )
 VIDEO_START_MEMBER(fromance_state,fromance)
 {
 	/* allocate tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 
 	init_common();
 }
@@ -97,8 +97,8 @@ VIDEO_START_MEMBER(fromance_state,fromance)
 VIDEO_START_MEMBER(fromance_state,nekkyoku)
 {
 	/* allocate tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 
 	init_common();
 }

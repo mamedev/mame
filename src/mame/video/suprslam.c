@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_tile_info)
 	tileno += m_screen_bank;
 	colour = colour >> 12;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, colour, 0);
 }
 
 
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_bg_tile_info)
 	tileno += m_bg_bank;
 	colour = colour >> 12;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
 }
 
 
@@ -55,8 +55,8 @@ UINT32 suprslam_state::suprslam_tile_callback( UINT32 code )
 
 void suprslam_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_screen_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_screen_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_screen_tilemap->set_transparent_pen(15);
 }

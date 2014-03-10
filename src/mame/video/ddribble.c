@@ -93,8 +93,7 @@ TILE_GET_INFO_MEMBER(ddribble_state::get_fg_tile_info)
 {
 	UINT8 attr = m_fg_videoram[tile_index];
 	int num = m_fg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + ((m_charbank[0] & 2) << 10);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			num,
 			0,
 			TILE_FLIPYX((attr & 0x30) >> 4));
@@ -104,8 +103,7 @@ TILE_GET_INFO_MEMBER(ddribble_state::get_bg_tile_info)
 {
 	UINT8 attr = m_bg_videoram[tile_index];
 	int num = m_bg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + (m_charbank[1] << 11);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			num,
 			0,
 			TILE_FLIPYX((attr & 0x30) >> 4));
@@ -119,8 +117,8 @@ TILE_GET_INFO_MEMBER(ddribble_state::get_bg_tile_info)
 
 void ddribble_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ddribble_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(ddribble_state::tilemap_scan),this), 8, 8, 64, 32);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ddribble_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(ddribble_state::tilemap_scan),this), 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ddribble_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(ddribble_state::tilemap_scan),this), 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ddribble_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(ddribble_state::tilemap_scan),this), 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }

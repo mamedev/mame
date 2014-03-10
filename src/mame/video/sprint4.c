@@ -38,9 +38,9 @@ TILE_GET_INFO_MEMBER(sprint4_state::sprint4_tile_info)
 	UINT8 code = videoram[tile_index];
 
 	if ((code & 0x30) == 0x30)
-		SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code & ~0x40, (code >> 6) ^ 3, 0);
+		SET_TILE_INFO_MEMBER(0, code & ~0x40, (code >> 6) ^ 3, 0);
 	else
-		SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 4, 0);
+		SET_TILE_INFO_MEMBER(0, code, 4, 0);
 }
 
 
@@ -48,7 +48,7 @@ void sprint4_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_helper);
 
-	m_playfield = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sprint4_state::sprint4_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_playfield = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sprint4_state::sprint4_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

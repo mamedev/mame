@@ -79,13 +79,13 @@ WRITE8_MEMBER(spoker_state::bg_tile_w)
 TILE_GET_INFO_MEMBER(spoker_state::get_bg_tile_info)
 {
 	int code = m_bg_tile_ram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1 + (tile_index & 3), code & 0xff, 0, 0);
+	SET_TILE_INFO_MEMBER(1 + (tile_index & 3), code & 0xff, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(spoker_state::get_fg_tile_info)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, (4*(code >> 14)+3), 0);
+	SET_TILE_INFO_MEMBER(0, code, (4*(code >> 14)+3), 0);
 }
 
 WRITE8_MEMBER(spoker_state::fg_tile_w)
@@ -102,8 +102,8 @@ WRITE8_MEMBER(spoker_state::fg_color_w)
 
 void spoker_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  32, 128, 8);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  128, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  32, 128, 8);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  128, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 

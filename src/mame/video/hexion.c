@@ -13,8 +13,7 @@
 inline void hexion_state::get_tile_info(tile_data &tileinfo,int tile_index,UINT8 *ram)
 {
 	tile_index *= 4;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			ram[tile_index] + ((ram[tile_index+1] & 0x3f) << 8),
 			ram[tile_index+2] & 0x0f,
 			0);
@@ -40,8 +39,8 @@ TILE_GET_INFO_MEMBER(hexion_state::get_tile_info1)
 
 void hexion_state::video_start()
 {
-	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hexion_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hexion_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,     8,8,64,32);
+	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hexion_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hexion_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,     8,8,64,32);
 
 	m_bg_tilemap[0]->set_transparent_pen(0);
 	m_bg_tilemap[1]->set_scrollx(0,-4);

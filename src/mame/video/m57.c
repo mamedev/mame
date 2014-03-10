@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(m57_state::get_tile_info)
 	UINT8 attr = m_videoram[tile_index * 2 + 0];
 	UINT16 code = m_videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, attr & 0x0f, TILE_FLIPXY(attr >> 4));
+	SET_TILE_INFO_MEMBER(0, code, attr & 0x0f, TILE_FLIPXY(attr >> 4));
 }
 
 
@@ -138,7 +138,7 @@ WRITE8_MEMBER(m57_state::m57_videoram_w)
 
 void m57_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m57_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m57_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(256);
 
 	save_item(NAME(m_flipscreen));

@@ -18,8 +18,7 @@ TILE_GET_INFO_MEMBER(quizpani_state::bg_tile_info)
 {
 	int code = m_bg_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			(code & 0xfff) + (0x1000 * m_bgbank),
 			code >> 12,
 			0);
@@ -29,8 +28,7 @@ TILE_GET_INFO_MEMBER(quizpani_state::txt_tile_info)
 {
 	int code = m_txt_videoram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			(code & 0xfff) + (0x1000 * m_txtbank),
 			code >> 12,
 			0);
@@ -68,8 +66,8 @@ WRITE16_MEMBER(quizpani_state::quizpani_tilesbank_w)
 
 void quizpani_state::video_start()
 {
-	m_bg_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(quizpani_state::bg_tile_info),this), tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),this),16,16,256,32);
-	m_txt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(quizpani_state::txt_tile_info),this),tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),this),16,16,256,32);
+	m_bg_tilemap  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpani_state::bg_tile_info),this), tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),this),16,16,256,32);
+	m_txt_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpani_state::txt_tile_info),this),tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),this),16,16,256,32);
 	m_txt_tilemap->set_transparent_pen(15);
 }
 

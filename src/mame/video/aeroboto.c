@@ -24,8 +24,7 @@
 TILE_GET_INFO_MEMBER(aeroboto_state::get_tile_info)
 {
 	UINT8 code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code + (m_charbank << 8),
 			m_tilecolor[code],
 			(m_tilecolor[code] >= 0x33) ? 0 : TILE_FORCE_LAYER0);
@@ -41,7 +40,7 @@ TILE_GET_INFO_MEMBER(aeroboto_state::get_tile_info)
 
 void aeroboto_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aeroboto_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(aeroboto_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_rows(64);
 

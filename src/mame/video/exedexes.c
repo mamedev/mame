@@ -129,14 +129,14 @@ TILE_GET_INFO_MEMBER(exedexes_state::get_bg_tile_info)
 	int color = tilerom[tile_index + (8 * 8)];
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(exedexes_state::get_fg_tile_info)
 {
 	int code = memregion("gfx5")->base()[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, 0, 0);
+	SET_TILE_INFO_MEMBER(2, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(exedexes_state::get_tx_tile_info)
@@ -146,7 +146,7 @@ TILE_GET_INFO_MEMBER(exedexes_state::get_tx_tile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(exedexes_state::exedexes_bg_tilemap_scan)
@@ -163,9 +163,9 @@ TILEMAP_MAPPER_MEMBER(exedexes_state::exedexes_fg_tilemap_scan)
 
 void exedexes_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(exedexes_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(exedexes_state::exedexes_bg_tilemap_scan),this), 32, 32, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(exedexes_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(exedexes_state::exedexes_fg_tilemap_scan),this), 16, 16, 128, 128);
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(exedexes_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(exedexes_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(exedexes_state::exedexes_bg_tilemap_scan),this), 32, 32, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(exedexes_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(exedexes_state::exedexes_fg_tilemap_scan),this), 16, 16, 128, 128);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(exedexes_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_palette->configure_tilemap_groups(*m_tx_tilemap, *m_gfxdecode->gfx(0), 0xcf);

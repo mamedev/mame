@@ -138,7 +138,7 @@ VIDEO_START_MEMBER(williams_state,williams2)
 	m_generic_paletteram_8.allocate(0x400 * 2);
 
 	/* create the tilemap */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(williams_state::get_tile_info),this), TILEMAP_SCAN_COLS,  24,16, 128,16);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(williams_state::get_tile_info),this), TILEMAP_SCAN_COLS,  24,16, 128,16);
 	m_bg_tilemap->set_scrolldx(2, 0);
 
 	state_save_register();
@@ -382,7 +382,7 @@ TILE_GET_INFO_MEMBER(williams_state::get_tile_info)
 			break;
 	}
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
+	SET_TILE_INFO_MEMBER(0, data & mask, color, (data & ~mask) ? TILE_FLIPX : 0);
 }
 
 

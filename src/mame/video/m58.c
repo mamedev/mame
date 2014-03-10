@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(m58_state::yard_get_bg_tile_info)
 	int color = attr & 0x1f;
 	int flags = (attr & 0x20) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 
@@ -175,7 +175,7 @@ void m58_state::video_start()
 	int height = m_screen->height();
 	const rectangle &visarea = m_screen->visible_area();
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m58_state::yard_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(m58_state::yard_tilemap_scan_rows),this),  8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m58_state::yard_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(m58_state::yard_tilemap_scan_rows),this),  8, 8, 64, 32);
 	m_bg_tilemap->set_scrolldx(visarea.min_x, width - (visarea.max_x + 1));
 	m_bg_tilemap->set_scrolldy(visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
 

@@ -22,8 +22,7 @@ TILE_GET_INFO_MEMBER(lemmings_state::get_tile_info)
 {
 	UINT16 tile = m_vram_data[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2,
+	SET_TILE_INFO_MEMBER(2,
 			tile&0x7ff,
 			(tile>>12)&0xf,
 			0);
@@ -31,7 +30,7 @@ TILE_GET_INFO_MEMBER(lemmings_state::get_tile_info)
 
 void lemmings_state::video_start()
 {
-	m_vram_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lemmings_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_vram_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lemmings_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	m_vram_tilemap->set_transparent_pen(0);
 	m_bitmap0.fill(0x100);

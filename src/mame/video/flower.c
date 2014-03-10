@@ -101,7 +101,7 @@ TILE_GET_INFO_MEMBER(flower_state::get_bg0_tile_info)
 	int color = m_bg0ram[tile_index+0x100];
 	/* Todo - may be tile flip bits? */
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color>>4, 0);
+	SET_TILE_INFO_MEMBER(2, code, color>>4, 0);
 }
 
 TILE_GET_INFO_MEMBER(flower_state::get_bg1_tile_info)
@@ -110,7 +110,7 @@ TILE_GET_INFO_MEMBER(flower_state::get_bg1_tile_info)
 	int color = m_bg1ram[tile_index+0x100];
 	/* Todo - may be tile flip bits? */
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color>>4, 0);
+	SET_TILE_INFO_MEMBER(2, code, color>>4, 0);
 }
 
 TILE_GET_INFO_MEMBER(flower_state::get_text_tile_info)
@@ -119,15 +119,15 @@ TILE_GET_INFO_MEMBER(flower_state::get_text_tile_info)
 	int color = m_textram[tile_index+0x400];
 	/* Todo - may be tile flip bits? */
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color>>2, 0);
+	SET_TILE_INFO_MEMBER(0, code, color>>2, 0);
 }
 
 void flower_state::video_start()
 {
-	m_bg0_tilemap        = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flower_state::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS,16,16,16,16);
-	m_bg1_tilemap        = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flower_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,16,16,16,16);
-	m_text_tilemap       = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flower_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	m_text_right_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flower_state::get_text_tile_info),this),TILEMAP_SCAN_COLS, 8, 8, 2,32);
+	m_bg0_tilemap        = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS,16,16,16,16);
+	m_bg1_tilemap        = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,16,16,16,16);
+	m_text_tilemap       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_text_right_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flower_state::get_text_tile_info),this),TILEMAP_SCAN_COLS, 8, 8, 2,32);
 
 	m_bg1_tilemap->set_transparent_pen(15);
 	m_text_tilemap->set_transparent_pen(3);

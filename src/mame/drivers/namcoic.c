@@ -48,7 +48,7 @@ inline void namcos2_shared_state::namcoic_get_tile_info(tile_data &tileinfo,int 
 	int tile, mask;
 	mTilemapInfo.cb( machine(), vram[tile_index], &tile, &mask );
 	tileinfo.mask_data = mTilemapInfo.maskBaseAddr+mask*8;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, mTilemapInfo.gfxbank,tile,0,0);
+	SET_TILE_INFO_MEMBER(mTilemapInfo.gfxbank,tile,0,0);
 } /* get_tile_info */
 
 TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info0 ) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x0000]); }
@@ -68,14 +68,14 @@ void namcos2_shared_state::namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 	mTilemapInfo.videoram = auto_alloc_array(machine(), UINT16,  0x10000 );
 
 		/* four scrolling tilemaps */
-		mTilemapInfo.tmap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-		mTilemapInfo.tmap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-		mTilemapInfo.tmap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-		mTilemapInfo.tmap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info3),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+		mTilemapInfo.tmap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info0),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+		mTilemapInfo.tmap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+		mTilemapInfo.tmap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+		mTilemapInfo.tmap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info3),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
 		/* two non-scrolling tilemaps */
-		mTilemapInfo.tmap[4] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info4),this),TILEMAP_SCAN_ROWS,8,8,36,28);
-		mTilemapInfo.tmap[5] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info5),this),TILEMAP_SCAN_ROWS,8,8,36,28);
+		mTilemapInfo.tmap[4] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info4),this),TILEMAP_SCAN_ROWS,8,8,36,28);
+		mTilemapInfo.tmap[5] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos2_shared_state::get_tile_info5),this),TILEMAP_SCAN_ROWS,8,8,36,28);
 
 		/* define offsets for scrolling */
 		for( i=0; i<4; i++ )
@@ -1014,7 +1014,7 @@ void namcos2_shared_state::c169_roz_get_info(tile_data &tileinfo, int tile_index
 			tile &= 0x3fff; // cap mask offset
 			break;
 	}
-	SET_TILE_INFO_MEMBER(m_gfxdecode, m_c169_roz_gfxbank, mangle, 0/*color*/, 0/*flag*/);
+	SET_TILE_INFO_MEMBER(m_c169_roz_gfxbank, mangle, 0/*color*/, 0/*flag*/);
 	tileinfo.mask_data = m_c169_roz_mask + 32*tile;
 }
 
@@ -1043,13 +1043,13 @@ void namcos2_shared_state::c169_roz_init(int gfxbank, const char *maskregion)
 	m_c169_roz_gfxbank = gfxbank;
 	m_c169_roz_mask = memregion(maskregion)->base();
 
-	m_c169_roz_tilemap[0] = &machine().tilemap().create(
+	m_c169_roz_tilemap[0] = &machine().tilemap().create(m_gfxdecode,
 		tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info0), this),
 		tilemap_mapper_delegate(FUNC(namcos2_shared_state::c169_roz_mapper), this),
 		16,16,
 		256,256);
 
-	m_c169_roz_tilemap[1] = &machine().tilemap().create(
+	m_c169_roz_tilemap[1] = &machine().tilemap().create(m_gfxdecode,
 		tilemap_get_info_delegate(FUNC(namcos2_shared_state::c169_roz_get_info1), this),
 		tilemap_mapper_delegate(FUNC(namcos2_shared_state::c169_roz_mapper), this),
 		16,16,
@@ -1446,7 +1446,7 @@ void namco_c45_road_device::device_start()
 	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], 0x3f, 0xf00)));
 
 	// create a tilemap for the road
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),
 		TILEMAP_SCAN_ROWS, ROAD_TILE_SIZE, ROAD_TILE_SIZE, ROAD_COLS, ROAD_ROWS);
 }
 
@@ -1484,7 +1484,7 @@ TILE_GET_INFO_MEMBER( namco_c45_road_device::get_road_info )
 	UINT16 data = m_ram[tile_index];
 	int tile = data & 0x3ff;
 	int color = data >> 10;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
 //-------------------------------------------------

@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_fg)
 {
 	int code  = m_videoram_fg[tile_index] & 0xfff;
 	int color = (m_videoram_fg[tile_index] & 0xf000) >> 12;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 
@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_bg)
 {
 	int code  = m_videoram_bg[tile_index] & 0xfff;
 	int color = (m_videoram_bg[tile_index] & 0xf000) >> 12;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 
@@ -132,8 +132,8 @@ void drtomy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void drtomy_state::video_start()
 {
-	m_tilemap_bg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_bg),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap_fg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_fg),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap_bg = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_bg),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap_fg = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_fg),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_tilemap_fg->set_transparent_pen(0);
 }

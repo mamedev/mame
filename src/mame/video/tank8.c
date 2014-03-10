@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(tank8_state::tank8_get_tile_info)
 			color |= 4;
 	}
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	SET_TILE_INFO_MEMBER(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 
@@ -102,7 +102,7 @@ void tank8_state::video_start()
 	m_screen->register_screen_bitmap(m_helper2);
 	m_screen->register_screen_bitmap(m_helper3);
 
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tank8_state::tank8_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tank8_state::tank8_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	/* VBLANK starts on scanline #256 and ends on scanline #24 */
 

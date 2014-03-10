@@ -483,14 +483,14 @@ TILE_GET_INFO_MEMBER(twin16_state::get_text_tile_info)
 	if (attr&0x2000) flags|=TILE_FLIPX;
 	if (attr&0x4000) flags|=TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 VIDEO_START_MEMBER(twin16_state,twin16)
 {
 	m_gfx_rom = (UINT16 *)memregion("gfx2")->base();
 
-	m_text_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(twin16_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_text_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(twin16_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_text_tilemap->set_transparent_pen(0);
 
 	m_palette->set_shadow_factor(0.4); // screenshots estimate

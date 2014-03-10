@@ -87,8 +87,7 @@ TILE_GET_INFO_MEMBER(carjmbre_state::get_carjmbre_tile_info)
 	UINT8 attr = m_videoram[tile_index + 0x400];
 	tile_number += (attr & 0x80) << 1; /* bank */
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			attr & 0xf,
 			0);
@@ -96,7 +95,7 @@ TILE_GET_INFO_MEMBER(carjmbre_state::get_carjmbre_tile_info)
 
 void carjmbre_state::video_start()
 {
-	m_cj_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(carjmbre_state::get_carjmbre_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_cj_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(carjmbre_state::get_carjmbre_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_bgcolor));
 }

@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(centiped_state::centiped_get_tile_info)
 	UINT8 *videoram = m_videoram;
 
 	int data = videoram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, (data & 0x3f) + 0x40, 0, TILE_FLIPYX(data >> 6));
+	SET_TILE_INFO_MEMBER(0, (data & 0x3f) + 0x40, 0, TILE_FLIPYX(data >> 6));
 }
 
 
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(centiped_state::warlords_get_tile_info)
 	int data = videoram[tile_index];
 	int color = ((tile_index & 0x10) >> 4) | ((tile_index & 0x200) >> 8) | (m_flipscreen >> 5);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, data & 0x3f, color, TILE_FLIPYX(data >> 6));
+	SET_TILE_INFO_MEMBER(0, data & 0x3f, color, TILE_FLIPYX(data >> 6));
 }
 
 
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(centiped_state::milliped_get_tile_info)
 	/* Flip both x and y if flipscreen is non-zero */
 	int flip_tiles = (m_flipscreen) ? 0x03 : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, (data & 0x3f) + 0x40 + (bank * 0x80), color, TILE_FLIPYX(flip_tiles));
+	SET_TILE_INFO_MEMBER(0, (data & 0x3f) + 0x40 + (bank * 0x80), color, TILE_FLIPYX(flip_tiles));
 }
 
 
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(centiped_state::bullsdrt_get_tile_info)
 	int data = videoram[tile_index];
 	int bank = m_bullsdrt_tiles_bankram[tile_index & 0x1f] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, (data & 0x3f) + 0x40 * bank, 0, TILE_FLIPYX(data >> 6));
+	SET_TILE_INFO_MEMBER(0, (data & 0x3f) + 0x40 * bank, 0, TILE_FLIPYX(data >> 6));
 }
 
 
@@ -95,7 +95,7 @@ VIDEO_START_MEMBER(centiped_state,centiped)
 	init_common();
 	init_penmask();
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::centiped_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(centiped_state::centiped_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -103,7 +103,7 @@ VIDEO_START_MEMBER(centiped_state,warlords)
 {
 	init_common();
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::warlords_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(centiped_state::warlords_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -112,7 +112,7 @@ VIDEO_START_MEMBER(centiped_state,milliped)
 	init_common();
 	init_penmask();
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::milliped_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(centiped_state::milliped_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -121,7 +121,7 @@ VIDEO_START_MEMBER(centiped_state,bullsdrt)
 	init_common();
 	init_penmask();
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(centiped_state::bullsdrt_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(centiped_state::bullsdrt_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

@@ -275,8 +275,8 @@ static MACHINE_CONFIG_START( relief, relief_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
-	MCFG_ATARI_VAD_PLAYFIELD(relief_state, get_playfield_tile_info)
-	MCFG_ATARI_VAD_PLAYFIELD2(relief_state, get_playfield2_tile_info)
+	MCFG_ATARI_VAD_PLAYFIELD(relief_state, "gfxdecode", get_playfield_tile_info)
+	MCFG_ATARI_VAD_PLAYFIELD2(relief_state, "gfxdecode", get_playfield2_tile_info)
 	MCFG_ATARI_VAD_MOB(relief_state::s_mob_config, "gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)

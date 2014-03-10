@@ -78,7 +78,7 @@ TILE_GET_INFO_MEMBER(skyarmy_state::get_skyarmy_tile_info)
 	int code = m_videoram[tile_index];
 	int attr = BITSWAP8(m_colorram[tile_index], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode,  0, code, attr, 0);
+	SET_TILE_INFO_MEMBER(0, code, attr, 0);
 }
 
 WRITE8_MEMBER(skyarmy_state::skyarmy_videoram_w)
@@ -124,7 +124,7 @@ PALETTE_INIT_MEMBER(skyarmy_state, skyarmy)
 
 void skyarmy_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skyarmy_state::get_skyarmy_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(skyarmy_state::get_skyarmy_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap->set_scroll_cols(32);
 }
 

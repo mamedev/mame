@@ -69,12 +69,12 @@ TILE_GET_INFO_MEMBER(tankbatt_state::get_bg_tile_info)
 	int code = videoram[tile_index];
 	int color = videoram[tile_index] | 0x01;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 void tankbatt_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tankbatt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tankbatt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 void tankbatt_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -36,11 +36,11 @@ void namcona1_state::tilemap_get_info(
 
 	if( data & 0x8000 )
 	{
-		SET_TILE_INFO_MEMBER(m_gfxdecode,  gfx,tile,tilemap_color,TILE_FORCE_LAYER0 );
+		SET_TILE_INFO_MEMBER(gfx,tile,tilemap_color,TILE_FORCE_LAYER0 );
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(m_gfxdecode,  gfx,tile,tilemap_color,0 );
+		SET_TILE_INFO_MEMBER(gfx,tile,tilemap_color,0 );
 		if (ENDIANNESS_NATIVE == ENDIANNESS_BIG)
 			tileinfo.mask_data = (UINT8 *)(m_shaperam+4*tile);
 		else
@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(namcona1_state::roz_get_info)
 	}
 	if( data & 0x8000 )
 	{
-		SET_TILE_INFO_MEMBER(m_gfxdecode,  gfx,tile,tilemap_color,TILE_FORCE_LAYER0 );
+		SET_TILE_INFO_MEMBER(gfx,tile,tilemap_color,TILE_FORCE_LAYER0 );
 	}
 	else
 	{
@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(namcona1_state::roz_get_info)
 			conv_data[7] = source[3]&0xff;
 			mask_data = conv_data;
 		}
-		SET_TILE_INFO_MEMBER(m_gfxdecode,  gfx,tile,tilemap_color,0 );
+		SET_TILE_INFO_MEMBER(gfx,tile,tilemap_color,0 );
 		tileinfo.mask_data = mask_data;
 	}
 } /* roz_get_info */
@@ -275,7 +275,7 @@ static void UpdateGfx(running_machine &machine)
 
 void namcona1_state::video_start()
 {
-	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcona1_state::roz_get_info),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
+	m_roz_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::roz_get_info),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
 	m_roz_palette = -1;
 
 	for( int i=0; i<NAMCONA1_NUM_TILEMAPS; i++ )
@@ -283,10 +283,10 @@ void namcona1_state::video_start()
 		m_tilemap_palette_bank[i] = -1;
 	}
 	
-	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info0),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
-	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info1),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
-	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info2),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
-	m_bg_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info3),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
+	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info0),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
+	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info1),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
+	m_bg_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info2),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
+	m_bg_tilemap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info3),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
 
 	m_shaperam           = auto_alloc_array_clear(machine(), UINT16, 0x2000*4/2 );
 	m_cgram              = auto_alloc_array_clear(machine(), UINT16, 0x1000*0x40/2 );

@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(lockon_state::get_lockon_tile_info)
 	UINT32 col = (m_char_ram[tile_index] >> 10) & 0x3f;
 
 	col = (col & 0x1f) + (col & 0x20 ? 64 : 0);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, col, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, col, 0);
 }
 
 
@@ -885,7 +885,7 @@ void lockon_state::hud_draw( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 void lockon_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lockon_state::get_lockon_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lockon_state::get_lockon_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap->set_transparent_pen(0);
 
 	/* Allocate the two frame buffers for rotation */

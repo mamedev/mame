@@ -90,8 +90,8 @@ void k007342_device::device_config_complete()
 
 void k007342_device::device_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info0),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
-	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info1),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info0),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info1),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
 
 	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 	m_scroll_ram = auto_alloc_array_clear(machine(), UINT8, 0x0200);
@@ -298,8 +298,7 @@ void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, int lay
 
 	m_callback(machine(), layer, m_regs[1], &code, &color, &flags);
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-			m_gfxnum,
+	SET_TILE_INFO_MEMBER(m_gfxnum,
 			code,
 			color,
 			flags);

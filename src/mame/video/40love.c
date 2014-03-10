@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(fortyl_state::get_bg_tile_info)
 		code = (code & 0x3f) | tile_l_bank | 0x100;
 	code |= tile_h_bank;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode,    0,
+	SET_TILE_INFO_MEMBER(0,
 			code,
 			tile_attrib & 0x07,
 			0);
@@ -107,7 +107,7 @@ void fortyl_state::video_start()
 	m_tmp_bitmap1 = auto_bitmap_ind16_alloc(machine(), 256, 256);
 	m_tmp_bitmap2 = auto_bitmap_ind16_alloc(machine(), 256, 256);
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fortyl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fortyl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_xoffset = 128;    // this never changes
 

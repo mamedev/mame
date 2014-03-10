@@ -17,12 +17,12 @@ TILE_GET_INFO_MEMBER(himesiki_state::get_bg_tile_info)
 
 	code &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, col, 0);
+	SET_TILE_INFO_MEMBER(0, code, col, 0);
 }
 
 void himesiki_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(himesiki_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(himesiki_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 WRITE8_MEMBER(himesiki_state::himesiki_bg_ram_w)

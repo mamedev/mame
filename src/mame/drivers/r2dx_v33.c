@@ -90,7 +90,7 @@ TILE_GET_INFO_MEMBER(r2dx_v33_state::get_bg_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tile + 0x0000,color,0);
+	SET_TILE_INFO_MEMBER(1,tile + 0x0000,color,0);
 }
 
 TILE_GET_INFO_MEMBER(r2dx_v33_state::get_md_tile_info)
@@ -100,7 +100,7 @@ TILE_GET_INFO_MEMBER(r2dx_v33_state::get_md_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,tile + 0x2000,color,0);
+	SET_TILE_INFO_MEMBER(2,tile + 0x2000,color,0);
 }
 
 TILE_GET_INFO_MEMBER(r2dx_v33_state::get_fg_tile_info)
@@ -110,7 +110,7 @@ TILE_GET_INFO_MEMBER(r2dx_v33_state::get_fg_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 3,tile + 0x1000,color,0);
+	SET_TILE_INFO_MEMBER(3,tile + 0x1000,color,0);
 }
 
 TILE_GET_INFO_MEMBER(r2dx_v33_state::get_tx_tile_info)
@@ -120,7 +120,7 @@ TILE_GET_INFO_MEMBER(r2dx_v33_state::get_tx_tile_info)
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 4,tile,color,0);
+	SET_TILE_INFO_MEMBER(4,tile,color,0);
 }
 
 /* copied from Legionnaire */
@@ -211,10 +211,10 @@ void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 void r2dx_v33_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_md_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_md_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS,8, 8, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_md_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_md_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(r2dx_v33_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS,8, 8, 64,32);
 
 	m_bg_tilemap->set_transparent_pen(15);
 	m_md_tilemap->set_transparent_pen(15);

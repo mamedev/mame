@@ -238,7 +238,7 @@ inline void dooyong_state::lastday_get_tile_info(tile_data &tileinfo, int tile_i
 		flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 	}
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, graphics, code, color, flags);
+	SET_TILE_INFO_MEMBER(graphics, code, color, flags);
 }
 
 inline void dooyong_state::rshark_get_tile_info(tile_data &tileinfo, int tile_index,
@@ -258,7 +258,7 @@ inline void dooyong_state::rshark_get_tile_info(tile_data &tileinfo, int tile_in
 	int color = tilerom2[offs] & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, graphics, code, color, flags);
+	SET_TILE_INFO_MEMBER(graphics, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(dooyong_state::get_bg_tile_info)
@@ -305,7 +305,7 @@ TILE_GET_INFO_MEMBER(dooyong_state::flytiger_get_fg_tile_info)
 	int color = (attr & 0x78) >> 3;
 	int flags = ((attr & 0x02) ? TILE_FLIPX : 0) | ((attr & 0x04) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, m_fg_gfx, code, color, flags);
+	SET_TILE_INFO_MEMBER(m_fg_gfx, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(dooyong_state::get_tx_tile_info)
@@ -330,7 +330,7 @@ TILE_GET_INFO_MEMBER(dooyong_state::get_tx_tile_info)
 	code = m_txvideoram[offs] | ((attr & 0x0f) << 8);
 	color = (attr & 0xf0) >> 4;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 
@@ -621,11 +621,11 @@ VIDEO_START_MEMBER(dooyong_state,lastday)
 	m_tx_tilemap_mode = 0;
 
 	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
 			8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -660,11 +660,11 @@ VIDEO_START_MEMBER(dooyong_state,gulfstrm)
 	m_tx_tilemap_mode = 0;
 
 	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
 			8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -698,11 +698,11 @@ VIDEO_START_MEMBER(dooyong_state,pollux)
 	m_tx_tilemap_mode = 0;
 
 	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
 			8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -736,13 +736,13 @@ VIDEO_START_MEMBER(dooyong_state,bluehawk)
 	m_tx_tilemap_mode = 1;
 
 	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_fg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg2_tile_info),this), TILEMAP_SCAN_COLS,
+	m_fg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg2_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
 			8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -773,11 +773,11 @@ VIDEO_START_MEMBER(dooyong_state,flytiger)
 	m_tx_tilemap_mode = 0;
 
 	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::flytiger_get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::flytiger_get_fg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
 			8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -808,11 +808,11 @@ VIDEO_START_MEMBER(dooyong_state,primella)
 	m_tx_tilemap_mode = 1;
 
 	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,
 			8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -847,13 +847,13 @@ VIDEO_START_MEMBER(dooyong_state,rshark)
 	m_fg2_gfx = 1;
 
 	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			16, 16, 64, 32);
-	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg2_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg2_tile_info),this), TILEMAP_SCAN_COLS,
 			16, 16, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,
 			16, 16, 64, 32);
-	m_fg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_fg2_tile_info),this), TILEMAP_SCAN_COLS,
+	m_fg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_fg2_tile_info),this), TILEMAP_SCAN_COLS,
 			16, 16, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -881,7 +881,7 @@ VIDEO_START_MEMBER(dooyong_state,popbingo)
 	m_bg_gfx = 1;
 
 	/* Create tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dooyong_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,
 			32, 32, 32, 8);
 	m_bg2_tilemap = m_fg_tilemap = m_fg2_tilemap = NULL;    /* Stop scroll handler from crashing on these */
 

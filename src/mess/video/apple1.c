@@ -82,8 +82,7 @@ TILE_GET_INFO_MEMBER(apple1_state::terminal_gettileinfo)
 	if ((tile_index == m_current_terminal->cur_offset) && !m_current_terminal->cur_hidden && m_current_terminal->getcursorcode)
 		code = m_current_terminal->getcursorcode(code);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-		gfxfont,    /* gfx */
+	SET_TILE_INFO_MEMBER(gfxfont,    /* gfx */
 		code,       /* character */
 		color,      /* color */
 		0);         /* flags */
@@ -190,7 +189,7 @@ terminal_t *apple1_state::terminal_create(
 	term = (terminal_t *) auto_alloc_array(machine(), char, sizeof(terminal_t) - sizeof(term->mem)
 		+ (num_cols * num_rows * sizeof(termchar_t)));
 
-	term->tm = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(apple1_state::terminal_gettileinfo),this), TILEMAP_SCAN_ROWS,
+	term->tm = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(apple1_state::terminal_gettileinfo),this), TILEMAP_SCAN_ROWS,
 		char_width, char_height, num_cols, num_rows);
 
 	term->gfx = gfx;
