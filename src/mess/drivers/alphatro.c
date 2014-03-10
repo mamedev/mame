@@ -79,7 +79,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(alphatro_p);
 	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 *m_p_chargen;
-	UINT16 m_flashcnt;
+	UINT8 m_flashcnt;
 
 private:
 	UINT8 m_timer_bit;
@@ -156,7 +156,7 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 	alphatro_state *state = device->machine().driver_data<alphatro_state>();
 	const rgb_t *pens = bitmap.palette()->entry_list_raw();
 	bool palette = BIT(state->ioport("CONFIG")->read(), 5);
-	state->m_flashcnt++;
+	if (y==0) state->m_flashcnt++;
 	bool inv;
 	UINT8 chr,gfx,attr,bg,fg;
 	UINT16 mem,x;
@@ -177,7 +177,7 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 			chr &= 0x7f;
 		}
 
-		if (BIT(attr, 6) & BIT(state->m_flashcnt, 13)) // flashing
+		if (BIT(attr, 6) & BIT(state->m_flashcnt, 4)) // flashing
 		{
 			inv ^= 1;
 		}
