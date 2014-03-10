@@ -235,25 +235,8 @@ WRITE8_MEMBER( special_state::specimx_select_bank )
 	specimx_set_bank(offset, data);
 }
 
-WRITE_LINE_MEMBER( special_state::specimx_pit8253_out0_changed )
-{
-	m_specimx_audio->set_input( 0, state );
-}
-
-WRITE_LINE_MEMBER( special_state::specimx_pit8253_out1_changed )
-{
-	m_specimx_audio->set_input( 1, state );
-}
-
-WRITE_LINE_MEMBER( special_state::specimx_pit8253_out2_changed )
-{
-	m_specimx_audio->set_input( 2, state );
-}
-
-
 MACHINE_START_MEMBER(special_state,specimx)
 {
-	m_specimx_audio = machine().device<specimx_sound_device>("custom");
 	m_drive = 0;
 	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(special_state::fdc_drq), this));
 }

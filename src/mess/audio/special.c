@@ -76,11 +76,24 @@ void specimx_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 }
 
 
-void specimx_sound_device::set_input(int index, int state)
+//-------------------------------------------------
+//  PIT callbacks
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(specimx_sound_device::set_input_ch0)
 {
-	if (m_mixer_channel!=NULL)
-	{
-		m_mixer_channel->update();
-	}
-	m_specimx_input[index] = state;
+	m_mixer_channel->update();
+	m_specimx_input[0] = state;
+}
+
+WRITE_LINE_MEMBER(specimx_sound_device::set_input_ch1)
+{
+	m_mixer_channel->update();
+	m_specimx_input[1] = state;
+}
+
+WRITE_LINE_MEMBER(specimx_sound_device::set_input_ch2)
+{
+	m_mixer_channel->update();
+	m_specimx_input[2] = state;
 }
