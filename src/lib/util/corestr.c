@@ -127,6 +127,7 @@ char *core_strdup(const char *str)
 char *core_i64_hex_format(UINT64 value, UINT8 mindigits)
 {
 	static char buffer[16][64];
+	// TODO: this can overflow - e.g. when a lot of unmapped writes are logged
 	static int index;
 	char *bufbase = &buffer[index++ % 16][0];
 	char *bufptr = bufbase;
@@ -155,6 +156,7 @@ char *core_i64_hex_format(UINT64 value, UINT8 mindigits)
 char *core_i64_oct_format(UINT64 value, UINT8 mindigits)
 {
 	static char buffer[22][64];
+	// TODO: this can overflow
 	static int index;
 	char *bufbase = &buffer[index++ % 22][0];
 	char *bufptr = bufbase;
