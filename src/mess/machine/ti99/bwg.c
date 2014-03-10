@@ -335,7 +335,7 @@ READ8Z_MEMBER(snug_bwg_device::crureadz)
 
 WRITE8_MEMBER(snug_bwg_device::cruwrite)
 {
-	int drive; //, drivebit;
+//	int drive, drivebit;
 
 	if ((offset & 0xff00)==m_cru_base)
 	{
