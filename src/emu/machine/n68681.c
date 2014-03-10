@@ -106,6 +106,8 @@ void duartn68681_device::device_start()
 
 	duart_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(duartn68681_device::duart_timer_callback),this), NULL);
 
+	IP_last_state = 0;
+
 	save_item(NAME(ACR));
 	save_item(NAME(IMR));
 	save_item(NAME(ISR));
@@ -129,7 +131,6 @@ void duartn68681_device::device_reset()
 	OPCR = 0; /* Output Port Conf. Register */
 	OPR = 0;  /* Output Port Register */
 	CTR.d = 0;  /* Counter/Timer Preset Value */
-	IP_last_state = 0;  /* last state of IP bits */
 	m_read_vector = false;
 	// "reset clears internal registers (SRA, SRB, IMR, ISR, OPR, OPCR) puts OP0-7 in the high state, stops the counter/timer, and puts channels a/b in the inactive state"
 
