@@ -252,6 +252,7 @@ SOUNDS += AWACS
 SOUNDS += T6721A
 SOUNDS += MOS7360
 SOUNDS += ESQPUMP
+SOUNDS += VRC6
 
 #-------------------------------------------------
 # specify available video cores
@@ -511,6 +512,7 @@ BUSES += ISA
 BUSES += ISBX
 BUSES += KC
 BUSES += MIDI
+BUSES += NES
 BUSES += NUBUS
 BUSES += PCI
 BUSES += PC_JOY
@@ -519,6 +521,7 @@ BUSES += PET
 BUSES += PLUS4
 BUSES += RS232
 BUSES += S100
+BUSES += SNES
 BUSES += TVC
 BUSES += VCS
 BUSES += VIC10
@@ -1487,70 +1490,10 @@ $(MESSOBJ)/next.a:              \
 	$(MESS_MACHINE)/nextmo.o    \
 
 $(MESSOBJ)/nintendo.a:          \
-	$(MESS_MACHINE)/nes_nxrom.o  \
-	$(MESS_MACHINE)/nes_mmc1.o  \
-	$(MESS_MACHINE)/nes_mmc2.o  \
-	$(MESS_MACHINE)/nes_mmc3.o  \
-	$(MESS_MACHINE)/nes_mmc3_clones.o  \
-	$(MESS_MACHINE)/nes_mmc5.o  \
-	$(MESS_MACHINE)/nes_act53.o  \
-	$(MESS_MACHINE)/nes_aladdin.o  \
-	$(MESS_MACHINE)/nes_ave.o  \
-	$(MESS_MACHINE)/nes_bandai.o  \
-	$(MESS_MACHINE)/nes_benshieng.o  \
-	$(MESS_MACHINE)/nes_bootleg.o  \
-	$(MESS_MACHINE)/nes_camerica.o  \
-	$(MESS_MACHINE)/nes_cne.o  \
-	$(MESS_MACHINE)/nes_cony.o  \
-	$(MESS_MACHINE)/nes_datach.o  \
-	$(MESS_MACHINE)/nes_discrete.o  \
-	$(MESS_MACHINE)/nes_event.o  \
-	$(MESS_MACHINE)/nes_ggenie.o  \
-	$(MESS_MACHINE)/nes_hes.o  \
-	$(MESS_MACHINE)/nes_henggedianzi.o  \
-	$(MESS_MACHINE)/nes_hosenkan.o  \
-	$(MESS_MACHINE)/nes_irem.o  \
-	$(MESS_MACHINE)/nes_jaleco.o  \
-	$(MESS_MACHINE)/nes_jy.o  \
-	$(MESS_MACHINE)/nes_kaiser.o  \
-	$(MESS_MACHINE)/nes_karastudio.o  \
-	$(MESS_MACHINE)/nes_konami.o  \
-	$(MESS_AUDIO)/vrc6.o          \
-	$(MESS_MACHINE)/nes_legacy.o  \
-	$(MESS_MACHINE)/nes_multigame.o  \
-	$(MESS_MACHINE)/nes_namcot.o  \
-	$(MESS_MACHINE)/nes_nanjing.o  \
-	$(MESS_MACHINE)/nes_ntdec.o  \
-	$(MESS_MACHINE)/nes_pirate.o  \
-	$(MESS_MACHINE)/nes_pt554.o  \
-	$(MESS_MACHINE)/nes_racermate.o  \
-	$(MESS_MACHINE)/nes_rcm.o  \
-	$(MESS_MACHINE)/nes_rexsoft.o  \
-	$(MESS_MACHINE)/nes_sachen.o  \
-	$(MESS_MACHINE)/nes_somari.o  \
-	$(MESS_MACHINE)/nes_tengen.o  \
-	$(MESS_MACHINE)/nes_txc.o  \
-	$(MESS_MACHINE)/nes_sunsoft.o  \
-	$(MESS_MACHINE)/nes_sunsoft_dcs.o  \
-	$(MESS_MACHINE)/nes_taito.o  \
-	$(MESS_MACHINE)/nes_waixing.o  \
-	$(MESS_MACHINE)/nes_slot.o  \
 	$(MESS_VIDEO)/nes.o         \
 	$(MESS_MACHINE)/nes.o       \
 	$(MESS_DRIVERS)/nes.o       \
 	$(MESS_MACHINE)/snescx4.o   \
-	$(MESS_MACHINE)/sns_slot.o  \
-	$(MESS_MACHINE)/sns_rom.o   \
-	$(MESS_MACHINE)/sns_rom21.o \
-	$(MESS_MACHINE)/sns_bsx.o   \
-	$(MESS_MACHINE)/sns_sa1.o   \
-	$(MESS_MACHINE)/sns_sdd1.o  \
-	$(MESS_MACHINE)/sns_sfx.o   \
-	$(MESS_MACHINE)/sns_sgb.o   \
-	$(MESS_MACHINE)/sns_spc7110.o \
-	$(MESS_MACHINE)/sns_sufami.o\
-	$(MESS_MACHINE)/sns_upd.o   \
-	$(MESS_MACHINE)/sns_event.o  \
 	$(MESS_DRIVERS)/snes.o      \
 	$(MESS_DRIVERS)/n64.o       \
 	$(MESS_AUDIO)/gb.o          \

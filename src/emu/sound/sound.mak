@@ -875,3 +875,12 @@ ifneq ($(filter ZSG2,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/zsg2.o
 endif
 
+#-------------------------------------------------
+# VRC6
+#@src/emu/sound/vrc6.h,SOUNDS += VRC6
+#-------------------------------------------------
+
+ifneq ($(filter VRC6,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/vrc6.o
+endif
+

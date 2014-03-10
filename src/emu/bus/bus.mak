@@ -685,3 +685,79 @@ BUSOBJS += $(BUSOBJ)/pci/southbridge.o
 BUSOBJS += $(BUSOBJ)/pci/mpc105.o
 endif
 
+#-------------------------------------------------
+#
+#@src/emu/bus/nes/nes_slot.h,BUSES += NES
+#-------------------------------------------------
+
+ifneq ($(filter NES,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/nes/nes_slot.o
+BUSOBJS += $(BUSOBJ)/nes/nes_carts.o
+BUSOBJS += $(BUSOBJ)/nes/act53.o
+BUSOBJS += $(BUSOBJ)/nes/aladdin.o
+BUSOBJS += $(BUSOBJ)/nes/ave.o
+BUSOBJS += $(BUSOBJ)/nes/bandai.o
+BUSOBJS += $(BUSOBJ)/nes/benshieng.o
+BUSOBJS += $(BUSOBJ)/nes/bootleg.o
+BUSOBJS += $(BUSOBJ)/nes/camerica.o
+BUSOBJS += $(BUSOBJ)/nes/cne.o
+BUSOBJS += $(BUSOBJ)/nes/cony.o
+BUSOBJS += $(BUSOBJ)/nes/datach.o
+BUSOBJS += $(BUSOBJ)/nes/discrete.o
+BUSOBJS += $(BUSOBJ)/nes/event.o
+BUSOBJS += $(BUSOBJ)/nes/ggenie.o
+BUSOBJS += $(BUSOBJ)/nes/henggedianzi.o
+BUSOBJS += $(BUSOBJ)/nes/hes.o
+BUSOBJS += $(BUSOBJ)/nes/hosenkan.o
+BUSOBJS += $(BUSOBJ)/nes/irem.o
+BUSOBJS += $(BUSOBJ)/nes/jaleco.o
+BUSOBJS += $(BUSOBJ)/nes/jy.o
+BUSOBJS += $(BUSOBJ)/nes/kaiser.o
+BUSOBJS += $(BUSOBJ)/nes/karastudio.o
+BUSOBJS += $(BUSOBJ)/nes/konami.o
+BUSOBJS += $(BUSOBJ)/nes/legacy.o
+BUSOBJS += $(BUSOBJ)/nes/mmc1.o
+BUSOBJS += $(BUSOBJ)/nes/mmc2.o
+BUSOBJS += $(BUSOBJ)/nes/mmc3.o
+BUSOBJS += $(BUSOBJ)/nes/mmc3_clones.o
+BUSOBJS += $(BUSOBJ)/nes/mmc5.o
+BUSOBJS += $(BUSOBJ)/nes/multigame.o
+BUSOBJS += $(BUSOBJ)/nes/namcot.o
+BUSOBJS += $(BUSOBJ)/nes/nanjing.o
+BUSOBJS += $(BUSOBJ)/nes/ntdec.o
+BUSOBJS += $(BUSOBJ)/nes/nxrom.o
+BUSOBJS += $(BUSOBJ)/nes/pirate.o
+BUSOBJS += $(BUSOBJ)/nes/pt554.o
+BUSOBJS += $(BUSOBJ)/nes/racermate.o
+BUSOBJS += $(BUSOBJ)/nes/rcm.o
+BUSOBJS += $(BUSOBJ)/nes/rexsoft.o
+BUSOBJS += $(BUSOBJ)/nes/sachen.o
+BUSOBJS += $(BUSOBJ)/nes/somari.o
+BUSOBJS += $(BUSOBJ)/nes/sunsoft.o
+BUSOBJS += $(BUSOBJ)/nes/sunsoft_dcs.o
+BUSOBJS += $(BUSOBJ)/nes/taito.o
+BUSOBJS += $(BUSOBJ)/nes/tengen.o
+BUSOBJS += $(BUSOBJ)/nes/txc.o
+BUSOBJS += $(BUSOBJ)/nes/waixing.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/snes/snes_slot.h,BUSES += SNES
+#-------------------------------------------------
+
+ifneq ($(filter SNES,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/snes/snes_slot.o
+BUSOBJS += $(BUSOBJ)/snes/snes_carts.o
+BUSOBJS += $(BUSOBJ)/snes/bsx.o
+BUSOBJS += $(BUSOBJ)/snes/event.o
+BUSOBJS += $(BUSOBJ)/snes/rom.o
+BUSOBJS += $(BUSOBJ)/snes/rom21.o
+BUSOBJS += $(BUSOBJ)/snes/sa1.o
+BUSOBJS += $(BUSOBJ)/snes/sdd1.o
+BUSOBJS += $(BUSOBJ)/snes/sfx.o
+BUSOBJS += $(BUSOBJ)/snes/sgb.o
+BUSOBJS += $(BUSOBJ)/snes/spc7110.o
+BUSOBJS += $(BUSOBJ)/snes/sufami.o
+BUSOBJS += $(BUSOBJ)/snes/upd.o
+endif

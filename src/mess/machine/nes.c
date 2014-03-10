@@ -12,7 +12,6 @@
 #include "includes/nes.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/flopdrv.h"
-#include "hashfile.h"
 
 /***************************************************************************
     CONSTANTS

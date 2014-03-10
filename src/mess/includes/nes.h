@@ -11,62 +11,10 @@
 
 
 #include "video/ppu2c0x.h"
-#include "machine/nes_slot.h"
+#include "bus/nes/nes_slot.h"
+#include "bus/nes/nes_carts.h"
 #include "sound/nes_apu.h"
 #include "imagedev/cassette.h"
-
-// official PCBs
-#include "machine/nes_nxrom.h"
-#include "machine/nes_mmc1.h"
-#include "machine/nes_mmc2.h"
-#include "machine/nes_mmc3.h"
-#include "machine/nes_mmc5.h"
-#include "machine/nes_bandai.h"
-#include "machine/nes_datach.h"
-#include "machine/nes_discrete.h"
-#include "machine/nes_event.h"
-#include "machine/nes_irem.h"
-#include "machine/nes_jaleco.h"
-#include "machine/nes_karastudio.h"
-#include "machine/nes_konami.h"
-#include "machine/nes_namcot.h"
-#include "machine/nes_pt554.h"
-#include "machine/nes_sunsoft.h"
-#include "machine/nes_sunsoft_dcs.h"
-#include "machine/nes_taito.h"
-// unlicensed/bootleg/pirate PCBs
-#include "machine/nes_act53.h"
-#include "machine/nes_aladdin.h"
-#include "machine/nes_ave.h"
-#include "machine/nes_benshieng.h"
-#include "machine/nes_camerica.h"
-#include "machine/nes_cne.h"
-#include "machine/nes_cony.h"
-#include "machine/nes_ggenie.h"
-#include "machine/nes_hes.h"
-#include "machine/nes_henggedianzi.h"
-#include "machine/nes_hosenkan.h"
-#include "machine/nes_jy.h"
-#include "machine/nes_kaiser.h"
-#include "machine/nes_legacy.h"
-#include "machine/nes_nanjing.h"
-#include "machine/nes_ntdec.h"
-#include "machine/nes_racermate.h"
-#include "machine/nes_rcm.h"
-#include "machine/nes_rexsoft.h"
-#include "machine/nes_sachen.h"
-#include "machine/nes_somari.h"
-#include "machine/nes_tengen.h"
-#include "machine/nes_txc.h"
-#include "machine/nes_waixing.h"
-// misc unlicensed/bootleg/pirate PCBs
-#include "machine/nes_bootleg.h"
-#include "machine/nes_multigame.h"
-#include "machine/nes_pirate.h"
-#include "machine/nes_mmc3_clones.h"
-
-
-SLOT_INTERFACE_EXTERN(nes_cart);
 
 /***************************************************************************
     CONSTANTS

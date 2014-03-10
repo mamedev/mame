@@ -64,6 +64,8 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/kc \
 	$(EMUOBJ)/bus/tvc \
 	$(EMUOBJ)/bus/z88 \
+	$(EMUOBJ)/bus/nes \
+	$(EMUOBJ)/bus/snes \
 	$(EMUOBJ)/drivers \
 	$(EMUOBJ)/machine \
 	$(EMUOBJ)/layout \
