@@ -372,6 +372,7 @@ void horizon_ramdisk_device::device_reset(void)
 	m_use_rambo = (ioport("RAMBO")->read()!=0);
 
 	m_page = 0;
+	m_selected = false;
 }
 
 INPUT_CHANGED_MEMBER( horizon_ramdisk_device::ks_changed )
