@@ -456,7 +456,7 @@ WRITE8_MEMBER( duartn68681_device::write )
 
 WRITE_LINE_MEMBER( duartn68681_device::ip0_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x01) | (state == ASSERT_LINE) ? 1 : 0;
+	UINT8 newIP = (IP_last_state & ~0x01) | ((state == ASSERT_LINE) ? 1 : 0);
 
 	if (newIP != IP_last_state)
 	{
@@ -476,7 +476,7 @@ WRITE_LINE_MEMBER( duartn68681_device::ip0_w )
 
 WRITE_LINE_MEMBER( duartn68681_device::ip1_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x02) | (state == ASSERT_LINE) ? 2 : 0;
+	UINT8 newIP = (IP_last_state & ~0x02) | ((state == ASSERT_LINE) ? 2 : 0);
 
 	if (newIP != IP_last_state)
 	{
@@ -496,7 +496,7 @@ WRITE_LINE_MEMBER( duartn68681_device::ip1_w )
 
 WRITE_LINE_MEMBER( duartn68681_device::ip2_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x04) | (state == ASSERT_LINE) ? 4 : 0;
+	UINT8 newIP = (IP_last_state & ~0x04) | ((state == ASSERT_LINE) ? 4 : 0);
 
 	if (newIP != IP_last_state)
 	{
@@ -516,7 +516,7 @@ WRITE_LINE_MEMBER( duartn68681_device::ip2_w )
 
 WRITE_LINE_MEMBER( duartn68681_device::ip3_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x08) | (state == ASSERT_LINE) ? 8 : 0;
+	UINT8 newIP = (IP_last_state & ~0x08) | ((state == ASSERT_LINE) ? 8 : 0);
 
 	if (newIP != IP_last_state)
 	{
@@ -536,14 +536,14 @@ WRITE_LINE_MEMBER( duartn68681_device::ip3_w )
 
 WRITE_LINE_MEMBER( duartn68681_device::ip4_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x10) | (state == ASSERT_LINE) ? 0x10 : 0;
+	UINT8 newIP = (IP_last_state & ~0x10) | ((state == ASSERT_LINE) ? 0x10 : 0);
 // TODO: special mode for ip4 (Ch. A Rx clock)
 	IP_last_state = newIP;
 }
 
 WRITE_LINE_MEMBER( duartn68681_device::ip5_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x20) | (state == ASSERT_LINE) ? 0x20 : 0;
+	UINT8 newIP = (IP_last_state & ~0x20) | ((state == ASSERT_LINE) ? 0x20 : 0);
 // TODO: special mode for ip5 (Ch. B Tx clock)
 	IP_last_state = newIP;
 }
