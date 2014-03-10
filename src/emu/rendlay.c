@@ -1167,9 +1167,9 @@ void layout_element::component::load_bitmap()
 
 		// log an error
 		if (!m_alphafile[0])
-			mame_printf_warning("Unable to load component bitmap '%s'", m_imagefile[0].cstr());
+			mame_printf_warning("Unable to load component bitmap '%s'\n", m_imagefile[0].cstr());
 		else
-			mame_printf_warning("Unable to load component bitmap '%s'/'%s'", m_imagefile[0].cstr(), m_alphafile[0].cstr());
+			mame_printf_warning("Unable to load component bitmap '%s'/'%s'\n", m_imagefile[0].cstr(), m_alphafile[0].cstr());
 	}
 }
 

@@ -1639,7 +1639,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 		if (filename[0] != '<')
 			mame_printf_warning("Error in XML file '%s': %s\n", filename, err.string());
 		else
-			mame_printf_warning("Error in XML string: %s", err.string());
+			mame_printf_warning("Error in XML string: %s\n", err.string());
 		result = false;
 	}
 
