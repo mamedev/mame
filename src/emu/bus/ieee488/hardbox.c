@@ -74,22 +74,27 @@ const device_type HARDBOX = &device_creator<hardbox_device>;
 
 ROM_START( hardbox )
 	ROM_REGION( 0x2000, Z80_TAG, 0 )
-	ROM_DEFAULT_BIOS("v3.1")
+	ROM_DEFAULT_BIOS("v2.4")
 
-	ROM_SYSTEM_BIOS( 0, "v2.3", "Version 2.3" )
+	ROM_SYSTEM_BIOS( 0, "v2.3", "Version 2.3 (Corvus)" )
 	ROMX_LOAD( "295-2.3.ic3", 0x0000, 0x1000, CRC(a3eb5fc2) SHA1(39941b45b0696db928615c41c7eae18d951d9ada), ROM_BIOS(1) )
 	ROMX_LOAD( "296-2.3.ic4", 0x1000, 0x1000, CRC(fb55b058) SHA1(8f9ec313ec6beaf7b513edf39d9628e6abcc7bc3), ROM_BIOS(1) )
 
-	ROM_SYSTEM_BIOS( 1, "v2.4", "Version 2.4" )
+	ROM_SYSTEM_BIOS( 1, "v2.4", "Version 2.4 (Corvus)" )
 	ROMX_LOAD( "289.ic3", 0x0000, 0x1000, CRC(c39e058f) SHA1(45b390d7125a40f84c7b411a479218baff079746), ROM_BIOS(2) )
 	ROMX_LOAD( "290.ic4", 0x1000, 0x1000, CRC(62f51405) SHA1(fdfa0d7b7e8d0182f2df0aa8163c790506104dcf), ROM_BIOS(2) )
 
-	ROM_SYSTEM_BIOS( 2, "v3.1", "Version 3.1" )
+	ROM_SYSTEM_BIOS( 2, "v3.1", "Version 3.1 (Sunol)" )
 	ROMX_LOAD( "295-3.1.ic3", 0x0000, 0x1000, CRC(654a5db1) SHA1(c40859526921e3d8bfd58fc28cc9cc64e59ec638), ROM_BIOS(3) )
 	ROMX_LOAD( "296-3.1.ic4", 0x1000, 0x1000, CRC(4c62ddc0) SHA1(151f99dc554d3762b805fc8383cf1b3e1455784f), ROM_BIOS(3) )
 
 	/* Note: Two sets of EPROMs were found marked only "295" and "296" but they have different contents.
-	         The version numbers listed are the ROM version reported by the HardBox diagnostics program. */
+	         The version numbers listed are the ROM version reported by the HardBox diagnostics program.
+	         Disassembling the ROMs showed that v2.3 and v2.4 are for Corvus Systems drives but v3.1 is
+	         for Sunol Systems drives.  Both types use the Corvus flat cable interface but there may be
+	         some programming differences, e.g. the v3.1 firmware for Sunol does not have the park heads 
+		 routine in the Corvus versions.  MESS emulates a Corvus drive so we default to the last 
+		 known HardBox firmware for Corvus (v2.4). */
 ROM_END
 
 
