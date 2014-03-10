@@ -1091,6 +1091,8 @@ void snug_bwg_legacy_device::device_reset()
 	m_WAITena = false;
 	m_rtc_enabled = false;
 	m_selected = false;
+	m_dataregLB = false;
+	m_inDsrArea = false;
 
 	m_dip1 = ioport("BWGDIP1")->read();
 	m_dip2 = ioport("BWGDIP2")->read();
