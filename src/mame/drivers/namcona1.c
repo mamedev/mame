@@ -166,7 +166,6 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/namcona1.h"
-#include "sound/c140.h"
 #include "cpu/m37710/m37710.h"
 
 #define MASTER_CLOCK    XTAL_50_113MHz
@@ -175,10 +174,9 @@ Notes:
 /*************************************************************************/
 
 /* FIXME: These two functions shouldn't be necessary? */
-static void simulate_mcu( running_machine &machine )
+void namcona1_state::simulate_mcu()
 {
-	namcona1_state *state = machine.driver_data<namcona1_state>();
-	state->m_workram[0xf60/2] = 0x0000; /* mcu ready */
+	m_workram[0xf60/2] = 0x0000; /* mcu ready */
 }
 
 
@@ -300,23 +298,22 @@ READ16_MEMBER(namcona1_state::namcona1_vreg_r)
 	return m_vreg[offset];
 } /* namcona1_vreg_r */
 
-static int transfer_dword( running_machine &machine, UINT32 dest, UINT32 source )
+int namcona1_state::transfer_dword( UINT32 dest, UINT32 source )
 {
-	namcona1_state *state = machine.driver_data<namcona1_state>();
 	UINT16 data;
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	if( source>=0x400000 && source<0xc00000 )
 	{
-		data = state->m_mpBank1[(source-0x400000)/2];
+		data = m_mpBank1[(source-0x400000)/2];
 	}
 	else if( source>=0xc00000 && source<0xe00000 )
 	{
-		data = state->m_mpBank0[(source-0xc00000)/2];
+		data = m_mpBank0[(source-0xc00000)/2];
 	}
 	else if( source<0x80000 && source>=0x1000 )
 	{
-		data = state->m_workram[source/2];
+		data = m_workram[source/2];
 	}
 	else
 	{
@@ -325,19 +322,19 @@ static int transfer_dword( running_machine &machine, UINT32 dest, UINT32 source 
 	}
 	if( dest>=0xf00000 && dest<0xf02000 )
 	{
-		state->namcona1_paletteram_w(space, (dest-0xf00000)/2, data, 0xffff );
+		namcona1_paletteram_w(space, (dest-0xf00000)/2, data, 0xffff );
 	}
 	else if( dest>=0xf40000 && dest<0xf80000 )
 	{
-		state->namcona1_gfxram_w(space, (dest-0xf40000)/2, data, 0xffff );
+		namcona1_gfxram_w(space, (dest-0xf40000)/2, data, 0xffff );
 	}
 	else if( dest>=0xff0000 && dest<0xffc000 )
 	{
-		state->namcona1_videoram_w(space, (dest-0xff0000)/2, data, 0xffff );
+		namcona1_videoram_w(space, (dest-0xff0000)/2, data, 0xffff );
 	}
 	else if( dest>=0xfff000 && dest<0x1000000 )
 	{
-		state->m_spriteram[(dest-0xfff000)/2] = data;
+		m_spriteram[(dest-0xfff000)/2] = data;
 	}
 	else
 	{
@@ -418,24 +415,23 @@ static void blit_setup( int format, int *bytes_per_row, int *pitch, int mode )
 	}
 } /* blit_setup */
 
-static void namcona1_blit( running_machine &machine )
+void namcona1_state::namcona1_blit()
 {
-	namcona1_state *state = machine.driver_data<namcona1_state>();
-	int src0 = state->m_vreg[0x0];
-	int src1 = state->m_vreg[0x1];
-	int src2 = state->m_vreg[0x2];
+	int src0 = m_vreg[0x0];
+	int src1 = m_vreg[0x1];
+	int src2 = m_vreg[0x2];
 
-	int dst0 = state->m_vreg[0x3];
-	int dst1 = state->m_vreg[0x4];
-	int dst2 = state->m_vreg[0x5];
+	int dst0 = m_vreg[0x3];
+	int dst1 = m_vreg[0x4];
+	int dst2 = m_vreg[0x5];
 
-	int gfxbank = state->m_vreg[0x6];
+	int gfxbank = m_vreg[0x6];
 
 	/* dest and source are provided as dword offsets */
-	UINT32 src_baseaddr = 2*(0xffffff&((state->m_vreg[0x7]<<16)|state->m_vreg[0x8]));
-	UINT32 dst_baseaddr = 2*(0xffffff&((state->m_vreg[0x9]<<16)|state->m_vreg[0xa]));
+	UINT32 src_baseaddr = 2*(0xffffff&((m_vreg[0x7]<<16)|m_vreg[0x8]));
+	UINT32 dst_baseaddr = 2*(0xffffff&((m_vreg[0x9]<<16)|m_vreg[0xa]));
 
-	int num_bytes = state->m_vreg[0xb];
+	int num_bytes = m_vreg[0xb];
 
 	int dst_offset, src_offset;
 	int dst_bytes_per_row, dst_pitch;
@@ -471,7 +467,7 @@ static void namcona1_blit( running_machine &machine )
 
 	while( num_bytes>0 )
 	{
-		if( transfer_dword(machine,
+		if( transfer_dword(
 			dst_baseaddr + dst_offset,
 			src_baseaddr + src_offset ) )
 		{
@@ -503,7 +499,7 @@ WRITE16_MEMBER(namcona1_state::namcona1_vreg_w)
 	switch( offset )
 	{
 	case 0x18/2:
-		namcona1_blit(machine());
+		namcona1_blit();
 		/* see also 0x1e */
 		break;
 
@@ -613,23 +609,21 @@ WRITE16_MEMBER(namcona1_state::na1mcu_shared_w)
 
 READ16_MEMBER(namcona1_state::snd_r)
 {
-	c140_device *device = machine().device<c140_device>("c140");
 	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
-	return device->c140_r(space,offset*2+1) | device->c140_r(space,offset*2)<<8;
+	return m_c140->c140_r(space,offset*2+1) | m_c140->c140_r(space,offset*2)<<8;
 }
 
 WRITE16_MEMBER(namcona1_state::snd_w)
 {
-	c140_device *device = machine().device<c140_device>("c140");
 	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
 	if (ACCESSING_BITS_0_7)
 	{
-		device->c140_w(space,(offset*2)+1, data);
+		m_c140->c140_w(space,(offset*2)+1, data);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		device->c140_w(space,(offset*2), data>>8);
+		m_c140->c140_w(space,(offset*2), data>>8);
 	}
 }
 
@@ -725,7 +719,7 @@ WRITE8_MEMBER(namcona1_state::port8_w)
 
 void namcona1_state::machine_start()
 {
-	machine().device<c140_device>("c140")->set_base(m_workram);
+	m_c140->set_base(m_workram);
 }
 
 // for games with the MCU emulated, the MCU boots the 68000.  don't allow it before that.
@@ -889,7 +883,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::namcona1_interrupt)
 	// vblank
 	if (scanline == 224)
 	{
-		simulate_mcu( machine() );
+		simulate_mcu( );
 		if (enabled & 8)
 			m_maincpu->set_input_line(4, HOLD_LINE);
 	}
@@ -982,30 +976,29 @@ static MACHINE_CONFIG_DERIVED( namcona2, namcona1 )
 MACHINE_CONFIG_END
 
 
-static void init_namcona1( running_machine &machine, int gametype )
+void namcona1_state::init_namcona1( int gametype )
 {
-	namcona1_state *state = machine.driver_data<namcona1_state>();
-	UINT16 *pMem = (UINT16 *)state->memregion( "maincpu" )->base();
+	UINT16 *pMem = (UINT16 *)memregion( "maincpu" )->base();
 
-	state->m_gametype = gametype;
-	state->m_mpBank0 = &pMem[0x80000/2];
-	state->m_mpBank1 = state->m_mpBank0 +  0x200000/2;
+	m_gametype = gametype;
+	m_mpBank0 = &pMem[0x80000/2];
+	m_mpBank1 = m_mpBank0 +  0x200000/2;
 
-	state->m_mEnableInterrupts = 0;
+	m_mEnableInterrupts = 0;
 }
 
-DRIVER_INIT_MEMBER(namcona1_state,bkrtmaq)   { init_namcona1(machine(), NAMCO_BKRTMAQ); }
-DRIVER_INIT_MEMBER(namcona1_state,cgangpzl)  { init_namcona1(machine(), NAMCO_CGANGPZL); }
-DRIVER_INIT_MEMBER(namcona1_state,emeralda)  { init_namcona1(machine(), NAMCO_EMERALDA); } /* NA-2 Hardware */
-DRIVER_INIT_MEMBER(namcona1_state,emeraldj)  { init_namcona1(machine(), NAMCO_EMERALDA); } /* NA-1 Hardware */
-DRIVER_INIT_MEMBER(namcona1_state,exbania)   { init_namcona1(machine(), NAMCO_EXBANIA); }
-DRIVER_INIT_MEMBER(namcona1_state,fa)        { init_namcona1(machine(), NAMCO_FA); }
-DRIVER_INIT_MEMBER(namcona1_state,knckhead)  { init_namcona1(machine(), NAMCO_KNCKHEAD); }
-DRIVER_INIT_MEMBER(namcona1_state,numanath)  { init_namcona1(machine(), NAMCO_NUMANATH); }
-DRIVER_INIT_MEMBER(namcona1_state,quiztou)   { init_namcona1(machine(), NAMCO_QUIZTOU); }
-DRIVER_INIT_MEMBER(namcona1_state,swcourt)   { init_namcona1(machine(), NAMCO_SWCOURT); }
-DRIVER_INIT_MEMBER(namcona1_state,tinklpit)  { init_namcona1(machine(), NAMCO_TINKLPIT); }
-DRIVER_INIT_MEMBER(namcona1_state,xday2)     { init_namcona1(machine(), NAMCO_XDAY2); }
+DRIVER_INIT_MEMBER(namcona1_state,bkrtmaq)   { init_namcona1(NAMCO_BKRTMAQ); }
+DRIVER_INIT_MEMBER(namcona1_state,cgangpzl)  { init_namcona1(NAMCO_CGANGPZL); }
+DRIVER_INIT_MEMBER(namcona1_state,emeralda)  { init_namcona1(NAMCO_EMERALDA); } /* NA-2 Hardware */
+DRIVER_INIT_MEMBER(namcona1_state,emeraldj)  { init_namcona1(NAMCO_EMERALDA); } /* NA-1 Hardware */
+DRIVER_INIT_MEMBER(namcona1_state,exbania)   { init_namcona1(NAMCO_EXBANIA); }
+DRIVER_INIT_MEMBER(namcona1_state,fa)        { init_namcona1(NAMCO_FA); }
+DRIVER_INIT_MEMBER(namcona1_state,knckhead)  { init_namcona1(NAMCO_KNCKHEAD); }
+DRIVER_INIT_MEMBER(namcona1_state,numanath)  { init_namcona1(NAMCO_NUMANATH); }
+DRIVER_INIT_MEMBER(namcona1_state,quiztou)   { init_namcona1(NAMCO_QUIZTOU); }
+DRIVER_INIT_MEMBER(namcona1_state,swcourt)   { init_namcona1(NAMCO_SWCOURT); }
+DRIVER_INIT_MEMBER(namcona1_state,tinklpit)  { init_namcona1(NAMCO_TINKLPIT); }
+DRIVER_INIT_MEMBER(namcona1_state,xday2)     { init_namcona1(NAMCO_XDAY2); }
 
 ROM_START( bkrtmaq )
 	ROM_REGION( 0xa80000, "maincpu", 0 )
