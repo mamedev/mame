@@ -62,6 +62,7 @@
   * Royal Card (Austrian, set 5),                     TAB Austria,        1991.
   * Royal Card (Austrian, set 6),                     TAB Austria,        1991.
   * Royal Card (Austrian, set 7, CMC C1030 HW),       bootleg,            1991.
+  * Royal Card (French),                              TAB Austria,        1991.
   * Royal Card (TAB original),                        TAB Austria,        1991.
   * Royal Card (Slovak, encrypted),                   Evona Electronic,   1991.
   * Royal Card Professional 2.0,                      Digital Dreams,     1993.
@@ -966,6 +967,12 @@
   - Added Jolly Card (Italian, different colors, set 2).
   - Added Royal Card (Austrian, set 7).
     These are running in bootleg hardware.
+  - Added technical notes.
+
+  [2014/03/09]
+  - Added Royal Card (French).
+    This set is original, but running in a bootleg board.
+  - Added a default NVRAM to get the game working.
   - Added technical notes.
 
 
@@ -4667,6 +4674,48 @@ ROM_START( royalcrdg )   /* CMC C1030 PCB, EP910EC-30 CPLD, NON encrypted graphi
 ROM_END
 
 
+/*
+  Royal Card (French)
+  Year:         1991
+  Manufacturer: TAB Austria
+
+  1x 6502A     (missing)
+  2x EF6821P   Peripheral Interface Adapter
+  1x 68A45     CRT Controller (CRTC)
+  1x YM2149F   Programmable Sound Generator
+  1x oscillator 16000.000KHz
+
+  3x 27256     1, 2, 3 (dumped)
+  1x N82S147AN         (dumped)
+
+  1x 6264
+  1x 6116
+
+  2x PEEL18CV8P-25 (read protected) -> Extracted with CmD's PALdumper
+  1x GAL16V8-25 (read protected) -> Extracted with CmD's PALdumper
+
+  1x 28x2 JAMMA edge connector
+  1x trimmer (volume)
+  1x 8 DIP switches
+  1x battery (missing)
+
+*/
+ROM_START( royalcdfr )   /* Seems bootleg PCB, non encrypted graphics */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3.bin", 0x8000, 0x8000, CRC(69b944c1) SHA1(6ef76bff01f20376117dd7f67e5890eca754fcfb) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(85e77661) SHA1(7d7a765c1bfcfeb9eb91d2519b22d734f20eab24) )
+	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "royalcdfr_nvram.bin", 0x0000, 0x0800, CRC(bda344d4) SHA1(7793d289147bf03c0d8256d4023252c9677ac8ff) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "n82s147an.bin", 0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
+ROM_END
+
+
 ROM_START( royalcrdp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u16_m27c256b.bin", 0x8000, 0x8000, CRC(162996ff) SHA1(122c13ee9842e692d31490f216eb972df2321b7f) )
@@ -6214,6 +6263,7 @@ GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  driver_device,  0,       
 GAMEL( 1991, royalcrdt, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (TAB original)",                       0,                       layout_jollycrd )
 GAME(  1991, royalcrdf, royalcrd, royalcd1, royalcrd,  funworld_state, royalcdc, ROT0, "Evona Electronic","Royal Card (Slovak, encrypted)",                  GAME_NOT_WORKING )
 GAMEL( 1990, royalcrdg, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "bootleg",         "Royal Card (Austrian, set 7, CMC C1030 HW)",      0,                       layout_jollycrd ) // big CPLD
+GAMEL( 1991, royalcdfr, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (French)",                             0,                       layout_jollycrd ) // big CPLD
 GAME(  1993, royalcrdp, royalcrd, cuoreuno, royalcrd,  driver_device,  0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    0 )
 GAMEL( 199?, witchryl,  0,        witchryl, witchryl,  driver_device,  0,        ROT0, "Video Klein",     "Witch Royal (Export version 2.1)",                0,                       layout_jollycrd )
 
