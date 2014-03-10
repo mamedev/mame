@@ -383,7 +383,6 @@ const char *threecom3c505_device::cpu_context()
 {
 	static char statebuf[64]; /* string buffer containing state description */
 
-	device_t *cpu = machine().device(MAINCPU);
 	osd_ticks_t t = osd_ticks();
 	int s = t / osd_ticks_per_second();
 	int ms = (t % osd_ticks_per_second()) / 1000;
