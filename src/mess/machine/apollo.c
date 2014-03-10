@@ -32,6 +32,7 @@
 
 #include "bus/isa/omti8621.h"
 #include "bus/isa/sc499.h"
+#include "machine/3c505.h"
 
 #define APOLLO_IRQ_VECTOR 0xa0
 #define APOLLO_IRQ_PTM 0
@@ -782,53 +783,6 @@ WRITE_LINE_MEMBER(apollo_state::sio2_irq_handler)
 	apollo_pic_set_irq_line(APOLLO_IRQ_SIO2, state);
 }
 
-/***************************************************************************
- DN3500 3c505 DEVICE Configuration
- ***************************************************************************/
-
-static void apollo_3c505_set_irq(device_t *device, int state) {
-	// DLOG2(("apollo_3c505_interrupt: state=%x", state ));
-	device->machine().driver_data<apollo_state>()->apollo_pic_set_irq_line(APOLLO_IRQ_ETH1, state);
-}
-
-static int apollo_3c505_tx_data(device_t *device,
-		const UINT8 tx_data_buffer[], int tx_data_length) {
-	// transmit all transmitted packets to the apollo_netserver
-	apollo_netserver_receive(device, tx_data_buffer, tx_data_length);
-
-	// transmit all transmitted packets to the host ethernet (ignore any errors)
-	return apollo_eth_transmit(device, tx_data_buffer, tx_data_length);
-}
-
-static int apollo_3c505_setfilter(device_t *device, int node_id)
-{
-	return apollo_eth_setfilter(device, node_id);
-}
-
-static int apollo_3c505_rx_data(device_t *device,
-		const UINT8 rx_data_buffer[], int rx_data_length) {
-	// transmit all received packets to the threecom3c505 receiver
-	return threecom3c505_receive(device, rx_data_buffer, rx_data_length);
-}
-
-static void apollo_3c505_tx_init(device_t *device) {
-	apollo_eth_init(device, apollo_3c505_rx_data);
-
-	// setup to receive all packets from the apollo_netserver
-	apollo_netserver_init(device->machine().options().media_path(), apollo_3c505_rx_data);
-}
-
-static THREECOM3C505_INTERFACE(apollo_3c505_config) = {
-	apollo_3c505_set_irq,
-	apollo_3c505_tx_init,
-	apollo_3c505_tx_data,
-	apollo_3c505_setfilter
-};
-
-/***************************************************************************
- DN3500 Cartridge Tape DEVICE Configuration
- ***************************************************************************/
-
 //##########################################################################
 // machine/apollo.c - APOLLO DS3500 CPU Board
 //##########################################################################
@@ -866,6 +820,7 @@ static const isa16bus_interface isabus_intf =
 static SLOT_INTERFACE_START(apollo_isa_cards)
 	SLOT_INTERFACE("wdc", ISA16_OMTI8621)	// Combo ESDI/AT floppy controller
 	SLOT_INTERFACE("ctape", ISA8_SC499)		// Archive SC499 cartridge tape
+	SLOT_INTERFACE("3c505", ISA16_3C505)	// 3Com 3C505 Ethernet card
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( common )
@@ -891,13 +846,11 @@ MACHINE_CONFIG_FRAGMENT( common )
 	MCFG_ISA16_BUS_CUSTOM_SPACES()
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa1", apollo_isa_cards, "wdc", false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa2", apollo_isa_cards, "ctape", false)
-	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa3", apollo_isa_cards, NULL, false)
+	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa3", apollo_isa_cards, "3c505", false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa4", apollo_isa_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa5", apollo_isa_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa6", apollo_isa_cards, NULL, false)
 	MCFG_ISA16_SLOT_ADD(APOLLO_ISA_TAG, "isa7", apollo_isa_cards, NULL, false)
-
-	MCFG_THREECOM3C505_ADD(APOLLO_ETH_TAG, apollo_3c505_config)
 MACHINE_CONFIG_END
 
 // for machines with the keyboard and a graphics head

@@ -15,6 +15,7 @@
 #define THREECOM3C505_H_
 
 #include "emu.h"
+#include "bus/isa/isa.h"
 
 #define CMD_BUFFER_SIZE 100
 #define ETH_BUFFER_SIZE 2048
@@ -23,44 +24,6 @@
 #define ETHERNET_ADDR_SIZE 6                 /* size of ethernet addr */
 
 #define RX_FIFO_SIZE 32
-
-/***************************************************************************
- FUNCTION PROTOTYPES
- ***************************************************************************/
-
-DECLARE_READ8_DEVICE_HANDLER( threecom3c505_r );
-DECLARE_WRITE8_DEVICE_HANDLER( threecom3c505_w );
-
-int threecom3c505_receive(device_t *device, const UINT8 *data, int length);
-
-void threecom3c505_set_verbose(int on_off);
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_THREECOM3C505_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, THREECOM3C505, 0) \
-	threecom3c505_device::static_set_interface(*device, _interface);
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-typedef void (*threecom3c505_set_irq)(device_t *, int);
-typedef void (*threecom3c505_tx_init)(device_t *);
-typedef int (*threecom3c505_tx_data)(device_t *, const UINT8 *, int);
-typedef int (*threecom3c505_setfilter)(device_t *, int);
-
-struct threecom3c505_interface
-{
-	threecom3c505_set_irq set_irq;
-	threecom3c505_tx_init tx_init;
-	threecom3c505_tx_data tx_data;
-	threecom3c505_setfilter setfilter;
-};
-
-#define THREECOM3C505_INTERFACE(name) const struct threecom3c505_interface (name)
 
 // ======================> PCB data structure
 
@@ -157,25 +120,25 @@ struct pcb_struct
 
 class threecom3c505_device:  public device_t,
 						public device_network_interface,
-						public threecom3c505_interface
+						public device_isa16_card_interface
 {
 public:
 	// construction/destruction
 	threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// static configuration helpers
-	static void static_set_interface(device_t &device, const threecom3c505_interface &interface);
-
-	void recv_cb(UINT8 *buf, int len);
-
 	// device register I/O
-	UINT8 read_port(offs_t offset);
-	void write_port(offs_t offset, UINT8 data);
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
+
+	required_ioport m_iobase;
+	required_ioport m_irqdrq;
 
 private:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual ioport_constructor device_input_ports() const;
 
 	const char *cpu_context();
 
@@ -240,7 +203,6 @@ private:
 
 	void do_receive_command();
 	void set_command_pending(int onoff);
-	void do_command();
 
 	int ethernet_packet_is_for_me(const UINT8 mac_address[]);
 
@@ -251,8 +213,8 @@ private:
 	void write_control_port( UINT8 data);
 	UINT8 read_status_port();
 
-		// pointer to myself (nasty: used for cpu_context)
-	threecom3c505_device *m_device;
+	void do_command();
+	virtual void recv_cb(UINT8 *data, int length);
 
 	UINT8 m_reg[16];
 
@@ -297,9 +259,12 @@ private:
 	enum line_state irq_state;
 
 	emu_timer * m_do_command_timer; // timer to delay command execution
+
+	bool m_installed;
+	int m_irq, m_drq;
 };
 
 // device type definition
-extern const device_type THREECOM3C505;
+extern const device_type ISA16_3C505;
 
 #endif /* THREECOM3C505_H_ */

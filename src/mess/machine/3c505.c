@@ -3,7 +3,8 @@
  *
  *  Created on: August 27, 2010
  *      Author: Hans Ostermeyer
- *
+ *  	ISA conversion by R. Belmont
+ * 
  *  Released for general non-commercial use under the MAME license
  *  Visit http://mamedev.org for licensing and usage restrictions.
  *
@@ -21,7 +22,7 @@
 
 static int verbose = VERBOSE;
 
-#define LOG(x)  { logerror ("%s: ", m_device->cpu_context()); logerror x; logerror ("\n"); }
+#define LOG(x)  { logerror x; logerror ("\n"); }
 #define LOG1(x) { if (verbose > 0) LOG(x)}
 #define LOG2(x) { if (verbose > 1) LOG(x)}
 
@@ -184,32 +185,119 @@ enum
 #define INT_LOOPBACK    0x08
 #define EXT_LOOPBACK    0x10
 
+static INPUT_PORTS_START( tc3c505_port )
+	PORT_START("IO_BASE")
+	PORT_DIPNAME( 0x3f0, 0x300, "3C505 I/O base")
+	PORT_DIPSETTING(     0x010, "010h" )
+	PORT_DIPSETTING(     0x020, "020h" )
+	PORT_DIPSETTING(     0x030, "030h" )
+	PORT_DIPSETTING(     0x040, "040h" )
+	PORT_DIPSETTING(     0x050, "050h" )
+	PORT_DIPSETTING(     0x060, "060h" )
+	PORT_DIPSETTING(     0x070, "070h" )
+	PORT_DIPSETTING(     0x080, "080h" )
+	PORT_DIPSETTING(     0x090, "090h" )
+	PORT_DIPSETTING(     0x0a0, "0a0h" )
+	PORT_DIPSETTING(     0x0b0, "0b0h" )
+	PORT_DIPSETTING(     0x0c0, "0c0h" )
+	PORT_DIPSETTING(     0x0d0, "0d0h" )
+	PORT_DIPSETTING(     0x0e0, "0e0h" )
+	PORT_DIPSETTING(     0x0f0, "0f0h" )
+	PORT_DIPSETTING(     0x100, "0100h" )
+	PORT_DIPSETTING(     0x110, "0110h" )
+	PORT_DIPSETTING(     0x120, "0120h" )
+	PORT_DIPSETTING(     0x130, "0130h" )
+	PORT_DIPSETTING(     0x140, "0140h" )
+	PORT_DIPSETTING(     0x150, "0150h" )
+	PORT_DIPSETTING(     0x160, "0160h" )
+	PORT_DIPSETTING(     0x170, "0170h" )
+	PORT_DIPSETTING(     0x180, "0180h" )
+	PORT_DIPSETTING(     0x190, "0190h" )
+	PORT_DIPSETTING(     0x1a0, "01a0h" )
+	PORT_DIPSETTING(     0x1b0, "01b0h" )
+	PORT_DIPSETTING(     0x1c0, "01c0h" )
+	PORT_DIPSETTING(     0x1d0, "01d0h" )
+	PORT_DIPSETTING(     0x1e0, "01e0h" )
+	PORT_DIPSETTING(     0x1f0, "01f0h" )
+	PORT_DIPSETTING(     0x200, "0200h" )
+	PORT_DIPSETTING(     0x210, "0210h" )
+	PORT_DIPSETTING(     0x220, "0220h" )
+	PORT_DIPSETTING(     0x230, "0230h" )
+	PORT_DIPSETTING(     0x240, "0240h" )
+	PORT_DIPSETTING(     0x250, "0250h" )
+	PORT_DIPSETTING(     0x260, "0260h" )
+	PORT_DIPSETTING(     0x270, "0270h" )
+	PORT_DIPSETTING(     0x280, "0280h" )
+	PORT_DIPSETTING(     0x290, "0290h" )
+	PORT_DIPSETTING(     0x2a0, "02a0h" )
+	PORT_DIPSETTING(     0x2b0, "02b0h" )
+	PORT_DIPSETTING(     0x2c0, "02c0h" )
+	PORT_DIPSETTING(     0x2d0, "02d0h" )
+	PORT_DIPSETTING(     0x2e0, "02e0h" )
+	PORT_DIPSETTING(     0x2f0, "02f0h" )
+	PORT_DIPSETTING(     0x300, "0300h" )
+	PORT_DIPSETTING(     0x310, "0310h" )
+	PORT_DIPSETTING(     0x320, "0320h" )
+	PORT_DIPSETTING(     0x330, "0330h" )
+	PORT_DIPSETTING(     0x340, "0340h" )
+	PORT_DIPSETTING(     0x350, "0350h" )
+	PORT_DIPSETTING(     0x360, "0360h" )
+	PORT_DIPSETTING(     0x370, "0370h" )
+	PORT_DIPSETTING(     0x380, "0380h" )
+	PORT_DIPSETTING(     0x390, "0390h" )
+	PORT_DIPSETTING(     0x3a0, "03a0h" )
+	PORT_DIPSETTING(     0x3b0, "03b0h" )
+	PORT_DIPSETTING(     0x3c0, "03c0h" )
+	PORT_DIPSETTING(     0x3d0, "03d0h" )
+	PORT_DIPSETTING(     0x3e0, "03e0h" )
+	PORT_DIPSETTING(     0x3f0, "03f0h" )
+
+	PORT_START("IRQ_DRQ")
+	PORT_DIPNAME( 0x0f, 0x0a, "3C505 IRQ")
+	PORT_DIPSETTING(    0x03, "IRQ 3" )
+	PORT_DIPSETTING(    0x04, "IRQ 4" )
+	PORT_DIPSETTING(    0x05, "IRQ 5" )
+	PORT_DIPSETTING(    0x06, "IRQ 6" )
+	PORT_DIPSETTING(    0x07, "IRQ 7" )
+	PORT_DIPSETTING(    0x09, "IRQ 9" )
+	PORT_DIPSETTING(    0x0a, "IRQ 10" )
+	PORT_DIPSETTING(    0x0b, "IRQ 11" )
+	PORT_DIPSETTING(    0x0c, "IRQ 12" )
+	PORT_DIPSETTING(    0x0e, "IRQ 14" )
+	PORT_DIPSETTING(    0x0f, "IRQ 15" )
+
+	PORT_DIPNAME( 0x70, 0x00, "3C505 DMA")
+	PORT_DIPSETTING(    0x10, "DRQ 1" )
+	PORT_DIPSETTING(    0x30, "DRQ 3" )
+	PORT_DIPSETTING(    0x50, "DRQ 5" )
+	PORT_DIPSETTING(    0x60, "DRQ 6" )
+	PORT_DIPSETTING(    0x70, "DRQ 7" )
+
+INPUT_PORTS_END
+
 /***************************************************************************
  IMPLEMENTATION
  ***************************************************************************/
 
 // device type definition
-const device_type THREECOM3C505 = &device_creator<threecom3c505_device> ;
+const device_type ISA16_3C505 = &device_creator<threecom3c505_device> ;
 
 //-------------------------------------------------
 // threecom3c505_device - constructor
 //-------------------------------------------------
 
 threecom3c505_device::threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, THREECOM3C505, "Threecom 3C505", tag, owner, clock, "threecom3c505", __FILE__),
-		device_network_interface(mconfig, *this, 10.0f)
+	: device_t(mconfig, ISA16_3C505, "3Com 3C505 Network Adaptor", tag, owner, clock, "3c505", __FILE__),
+	device_network_interface(mconfig, *this, 10.0f),
+	device_isa16_card_interface(mconfig, *this),
+	m_iobase(*this, "IO_BASE"),
+	m_irqdrq(*this, "IRQ_DRQ")
 {
-	memset(static_cast<threecom3c505_interface *>(this), 0, sizeof(threecom3c505_interface));
 }
 
-//-------------------------------------------------
-//  static_set_interface - set the interface struct
-//-------------------------------------------------
-
-void threecom3c505_device::static_set_interface(device_t &device, const threecom3c505_interface &interface)
+ioport_constructor threecom3c505_device::device_input_ports() const
 {
-	threecom3c505_device &threecom3c505 = downcast<threecom3c505_device &> (device);
-	static_cast<threecom3c505_interface &> (threecom3c505) = interface;
+	return INPUT_PORTS_NAME( tc3c505_port );
 }
 
 //-------------------------------------------------
@@ -218,20 +306,18 @@ void threecom3c505_device::static_set_interface(device_t &device, const threecom
 
 void threecom3c505_device::device_start()
 {
-	m_device = this;
+	set_isa_device();
+
 	LOG1(("start 3COM 3C505"));
+
+	m_installed = false;
 
 	m_rx_fifo.start(this, RX_FIFO_SIZE, ETH_BUFFER_SIZE);
 	m_rx_data_buffer.start(this, ETH_BUFFER_SIZE);
 	m_tx_data_buffer.start(this, ETH_BUFFER_SIZE);
 	m_program_buffer.start(this, PGM_BUFFER_SIZE);
 
-	if (tx_init != NULL)
-	{
-		(*tx_init)(this);
-	}
-
-	m_do_command_timer = m_device->machine().scheduler().timer_alloc(FUNC(static_do_command), this);
+	m_do_command_timer = timer_alloc(0, NULL);
 }
 
 //-------------------------------------------------
@@ -275,6 +361,18 @@ void threecom3c505_device::device_reset()
 	memset(m_multicast_list, 0, sizeof(m_multicast_list));
 	set_filter_list();
 	set_promisc(true);
+
+	if (!m_installed)
+	{
+		int base = m_iobase->read();
+
+		m_irq = m_irqdrq->read() & 0xf;
+		m_drq = (m_irqdrq->read() >> 4) & 0x7;
+
+		m_isa->install_device(base, base + ELP_IO_EXTENT - 1, 0, 0, read8_delegate(FUNC(threecom3c505_device::read), this), write8_delegate(FUNC(threecom3c505_device::write), this));
+
+		m_installed = true;
+	}
 }
 
 /***************************************************************************
@@ -290,16 +388,7 @@ const char *threecom3c505_device::cpu_context()
 	int s = t / osd_ticks_per_second();
 	int ms = (t % osd_ticks_per_second()) / 1000;
 
-	/* if we have an executing CPU, output data */
-	if (cpu != NULL)
-	{
-		sprintf(statebuf, "%d.%03d %s pc=%08x - %s", s, ms, cpu->tag(),
-				cpu->safe_pcbase(), tag());
-	}
-	else
-	{
-		sprintf(statebuf, "%d.%03d", s, ms);
-	}
+	sprintf(statebuf, "%d.%03d:%s:", s, ms, tag());
 	return statebuf;
 }
 
@@ -455,14 +544,6 @@ void threecom3c505_device::set_filter_list()
 	memcpy(m_filter_list, m_station_address, ETHERNET_ADDR_SIZE);
 	memset(m_filter_list + ETHERNET_ADDR_SIZE, 0xff, ETHERNET_ADDR_SIZE);
 	memcpy(m_filter_list + ETHERNET_ADDR_SIZE * 2, m_multicast_list, sizeof(m_multicast_list));
-
-	if (setfilter != NULL)
-	{
-		int node_id = (((m_station_address[3] << 8) + m_station_address[4]) << 8) + m_station_address[5];
-		LOG2(("set_filter_list node_id=%x",node_id));
-		(*setfilter)(this, node_id);
-	}
-
 }
 
 /*-------------------------------------------------
@@ -474,9 +555,20 @@ void threecom3c505_device::set_interrupt(enum line_state state)
 	if (state != irq_state)
 	{
 		LOG2(("set_interrupt(%d)",state));
-		if (set_irq != NULL)
+		switch (m_irq)
 		{
-			(*set_irq)(this, state);
+			case 3: m_isa->irq3_w(state); break;
+			case 4: m_isa->irq4_w(state); break;
+			case 5: m_isa->irq5_w(state); break;
+			case 6: m_isa->irq6_w(state); break;
+			case 7: m_isa->irq7_w(state); break;
+			case 9: m_isa->irq2_w(state); break;	// IRQ 9 on ISA16 goes to IRQ 2
+			case 10: m_isa->irq10_w(state); break;
+			case 11: m_isa->irq11_w(state); break;
+			case 12: m_isa->irq12_w(state); break;
+			case 14: m_isa->irq14_w(state); break;
+			case 15: m_isa->irq15_w(state); break;
+			default: logerror("3c505: invalid IRQ %d\n", m_irq); break;
 		}
 		irq_state = state;
 	}
@@ -745,12 +837,12 @@ void threecom3c505_device::set_command_pending(int state)
 }
 
 /***************************************************************************
- do_command
+   execute the commands (formerly do_command)
  ***************************************************************************/
 
-TIMER_CALLBACK( threecom3c505_device::static_do_command )
+void threecom3c505_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	reinterpret_cast<threecom3c505_device *> (ptr)->do_command();
+	do_command();
 }
 
 void threecom3c505_device::do_command()
@@ -1134,13 +1226,6 @@ UINT8 threecom3c505_device::read_command_port()
 					LOG(("read_command_port(): !!! failed to send Ethernet packet"));
 				}
 
-				if (tx_data != NULL && //
-						(*tx_data)(this, m_tx_data_buffer.get_data(), m_tx_data_buffer.get_length()) == 0)
-				{
-					// FIXME: failed to transmit the Ethernet packet
-					LOG(("read_command_port(): !!! failed to transmit Ethernet packet"));
-				}
-
 				m_tx_data_buffer.reset();
 				if (m_command_buffer[0] != CMD_TRANSMIT_PACKET_F9)
 				{
@@ -1420,7 +1505,7 @@ UINT8 threecom3c505_device::read_status_port()
  write_port
  ***************************************************************************/
 
-void threecom3c505_device::write_port(offs_t offset, UINT8 data)
+WRITE8_MEMBER(threecom3c505_device::write)
 {
 	m_reg[offset & 0x0f] = data;
 	LOG2(("writing 3C505 Register at offset %02x = %02x", offset, data));
@@ -1448,8 +1533,7 @@ void threecom3c505_device::write_port(offs_t offset, UINT8 data)
  read_port
  ***************************************************************************/
 
-//READ8_DEVICE_HANDLER( threecom3c505_r )
-UINT8 threecom3c505_device::read_port(offs_t offset)
+READ8_MEMBER(threecom3c505_device::read)
 {
 	// data to omit excessive logging
 	static UINT8 last_data = 0xff;
@@ -1492,27 +1576,3 @@ UINT8 threecom3c505_device::read_port(offs_t offset)
 	return data;
 }
 
-//**************************************************************************
-//  GLOBAL STUBS
-//**************************************************************************
-
-READ8_DEVICE_HANDLER( threecom3c505_r )
-{
-	return downcast<threecom3c505_device *> (device)->read_port(offset);
-}
-
-WRITE8_DEVICE_HANDLER( threecom3c505_w )
-{
-	downcast<threecom3c505_device *> (device)->write_port(offset, data);
-}
-
-int threecom3c505_receive(device_t *device, const UINT8 data[], int length)
-{
-	downcast<threecom3c505_device *> (device)->recv_cb((UINT8 *) data, length);
-	return 1;
-}
-
-void threecom3c505_set_verbose(int on_off)
-{
-	verbose = on_off == 0 ? 0 : VERBOSE > 1 ? VERBOSE : 1;
-}

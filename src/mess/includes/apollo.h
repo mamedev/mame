@@ -20,7 +20,6 @@
 #include "bus/rs232/rs232.h"
 #include "machine/terminal.h"
 #include "machine/ram.h"
-#include "machine/3c505.h"
 #include "machine/6840ptm.h"
 #include "machine/n68681.h"
 #include "machine/am9517a.h"
@@ -288,33 +287,6 @@ INPUT_PORTS_EXTERN(apollo_config);
 UINT16 apollo_csr_get_control_register(void);
 UINT16 apollo_csr_get_status_register(void);
 void apollo_csr_set_status_register(UINT16 mask, UINT16 data);
-
-/*----------- machine/apollo_eth.c -----------*/
-
-// ethernet transmitter
-
-int apollo_eth_transmit(device_t* device,
-		const UINT8 data_buffer[], const int data_length);
-
-int apollo_eth_setfilter(device_t *device, int node_id);
-// ethernet receiver callback
-
-typedef int (*apollo_eth_receive)(device_t *, const UINT8 *, int);
-
-void apollo_eth_init(device_t *device, apollo_eth_receive rx_data);
-
-/*----------- machine/apollo_net.c -----------*/
-
-// netserver receiver
-
-int apollo_netserver_receive(device_t* device,
-		const UINT8 rx_data_buffer[], const int rx_data_length);
-
-// transmitter callback
-
-typedef int (*apollo_netserver_transmit)(device_t *, const UINT8 *, int);
-
-void apollo_netserver_init(const char *root_path,  apollo_netserver_transmit tx_data);
 
 /*----------- video/apollo.c -----------*/
 

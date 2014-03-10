@@ -688,8 +688,6 @@ static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x016400, 0x0164ff) AM_READWRITE16(selective_clear_locations_r, selective_clear_locations_w, 0xffffffff )
 		AM_RANGE(0x017000, 0x017fff) AM_READWRITE16(apollo_address_translation_map_r, apollo_address_translation_map_w, 0xffffffff )
 
-		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-
 		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
 
@@ -736,8 +734,6 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x016400, 0x0164ff) AM_READWRITE16(selective_clear_locations_r, selective_clear_locations_w, 0xffffffff )
 		AM_RANGE(0x017000, 0x017fff) AM_READWRITE16(apollo_address_translation_map_r, apollo_address_translation_map_w, 0xffffffff )
 
-		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
 		AM_RANGE(0x080000, 0x081fff) AM_ROM /* 3C505 boot ROM  */
@@ -765,7 +761,6 @@ static ADDRESS_MAP_START(dn3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x009400, 0x0094ff) AM_DEVREADWRITE8(APOLLO_PIC1_TAG, pic8259_device, read, write, 0xffffffff)
 		AM_RANGE(0x009500, 0x0095ff) AM_DEVREADWRITE8(APOLLO_PIC2_TAG, pic8259_device, read, write, 0xffffffff)
 		AM_RANGE(0x009600, 0x0096ff) AM_READWRITE16(apollo_node_id_r, apollo_node_id_w, 0xffffffff)
-		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
 
 		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
@@ -802,8 +797,6 @@ static ADDRESS_MAP_START(dsp3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x009400, 0x0094ff) AM_DEVREADWRITE8(APOLLO_PIC1_TAG, pic8259_device, read, write, 0xffffffff)
 		AM_RANGE(0x009500, 0x0095ff) AM_DEVREADWRITE8(APOLLO_PIC2_TAG, pic8259_device, read, write, 0xffffffff)
 		AM_RANGE(0x009600, 0x0096ff) AM_READWRITE16(apollo_node_id_r, apollo_node_id_w, 0xffffffff)
-
-		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -842,8 +835,6 @@ static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
 
 		AM_RANGE(0x016400, 0x0164ff) AM_READWRITE16(selective_clear_locations_r, selective_clear_locations_w, 0xffffffff )
 		AM_RANGE(0x017000, 0x017fff) AM_READWRITE16(apollo_address_translation_map_r, apollo_address_translation_map_w, 0xffffffff )
-
-		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
 
 		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
@@ -894,8 +885,6 @@ static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x016400, 0x0164ff) AM_READWRITE16(selective_clear_locations_r, selective_clear_locations_w, 0xffffffff )
 		AM_RANGE(0x017000, 0x017fff) AM_READWRITE16(apollo_address_translation_map_r, apollo_address_translation_map_w, 0xffffffff )
 
-		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
-
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
 		AM_RANGE(0x080000, 0x081fff) AM_ROM /* 3C505 boot ROM  */
@@ -919,9 +908,6 @@ void apollo_state::machine_reset()
 	//MLOG1(("machine_reset_dn3500"));
 
 	MACHINE_RESET_CALL_MEMBER(apollo);
-
-	// set configuration
-	threecom3c505_set_verbose(apollo_config(APOLLO_CONF_NET_TRACE));
 
 	// we can't do this any more
 	#if 0
@@ -959,7 +945,6 @@ static void apollo_reset_instr_callback(device_t *device)
 
 	// reset the ISA bus devices
 	apollo->m_isa->reset();
-	machine.device(APOLLO_ETH_TAG)->reset();
 
 	if (!apollo_is_dsp3x00())
 	{
