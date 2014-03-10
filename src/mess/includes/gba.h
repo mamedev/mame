@@ -3,7 +3,7 @@
 
 #include "audio/gb.h"
 #include "machine/intelfsh.h"
-#include "machine/gba_slot.h"
+#include "bus/gba/gba_slot.h"
 #include "sound/dac.h"
 
 #define DISPSTAT_VBL            0x0001

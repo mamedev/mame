@@ -9,7 +9,7 @@
 
 #include "audio/gb.h"
 #include "cpu/lr35902/lr35902.h"
-#include "machine/gb_slot.h"
+#include "bus/gameboy/gb_slot.h"
 #include "machine/ram.h"
 #include "video/gb_lcd.h"
 

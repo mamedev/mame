@@ -20,6 +20,7 @@ BUSOBJ = $(EMUOBJ)/bus
 #-------------------------------------------------
 
 ifneq ($(filter ABCBUS,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/abcbus
 BUSOBJS += $(BUSOBJ)/abcbus/abcbus.o
 BUSOBJS += $(BUSOBJ)/abcbus/abc890.o
 BUSOBJS += $(BUSOBJ)/abcbus/dos.o
@@ -42,6 +43,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter ADAM,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/adam
 BUSOBJS += $(BUSOBJ)/adam/exp.o
 BUSOBJS += $(BUSOBJ)/adam/adamlink.o
 BUSOBJS += $(BUSOBJ)/adam/ide.o
@@ -55,6 +57,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter ADAMNET,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/adamnet
 BUSOBJS += $(BUSOBJ)/adamnet/adamnet.o
 BUSOBJS += $(BUSOBJ)/adamnet/ddp.o
 BUSOBJS += $(BUSOBJ)/adamnet/fdc.o
@@ -70,6 +73,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter BW2,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/bw2
 BUSOBJS += $(BUSOBJ)/bw2/exp.o
 BUSOBJS += $(BUSOBJ)/bw2/ramcard.o
 endif
@@ -82,6 +86,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter C64,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/c64
 BUSOBJS += $(BUSOBJ)/c64/exp.o
 BUSOBJS += $(BUSOBJ)/c64/c128_comal80.o
 BUSOBJS += $(BUSOBJ)/c64/comal80.o
@@ -163,6 +168,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter CBM2,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/cbm2
 BUSOBJS += $(BUSOBJ)/cbm2/exp.o
 BUSOBJS += $(BUSOBJ)/cbm2/24k.o
 BUSOBJS += $(BUSOBJ)/cbm2/hrg.o
@@ -177,6 +183,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter CBMIEC,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/cbmiec
 BUSOBJS += $(BUSOBJ)/cbmiec/cbmiec.o
 BUSOBJS += $(BUSOBJ)/cbmiec/c1541.o
 BUSOBJS += $(BUSOBJ)/cbmiec/c1571.o
@@ -196,6 +203,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter COMX35,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/comx35
 BUSOBJS += $(BUSOBJ)/comx35/exp.o
 BUSOBJS += $(BUSOBJ)/comx35/clm.o
 BUSOBJS += $(BUSOBJ)/comx35/expbox.o
@@ -214,6 +222,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter ECBBUS,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/ecbbus
 BUSOBJS += $(BUSOBJ)/ecbbus/ecbbus.o
 BUSOBJS += $(BUSOBJ)/ecbbus/grip.o
 endif
@@ -225,6 +234,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter ECONET,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/econet
 BUSOBJS += $(BUSOBJ)/econet/econet.o
 BUSOBJS += $(BUSOBJ)/econet/e01.o
 endif
@@ -236,6 +246,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter EP64,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/ep64
 BUSOBJS += $(BUSOBJ)/ep64/exp.o
 BUSOBJS += $(BUSOBJ)/ep64/exdos.o
 endif
@@ -247,6 +258,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter IEEE488,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/ieee488
 BUSOBJS += $(BUSOBJ)/ieee488/ieee488.o
 BUSOBJS += $(BUSOBJ)/ieee488/c2031.o
 BUSOBJS += $(BUSOBJ)/ieee488/c2040.o
@@ -267,6 +279,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter IQ151,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/iq151
 BUSOBJS += $(BUSOBJ)/iq151/iq151.o
 BUSOBJS += $(BUSOBJ)/iq151/disc2.o
 BUSOBJS += $(BUSOBJ)/iq151/grafik.o
@@ -285,6 +298,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter IMI7000,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/imi7000
 BUSOBJS += $(BUSOBJ)/imi7000/imi7000.o
 BUSOBJS += $(BUSOBJ)/imi7000/imi5000h.o
 endif
@@ -296,6 +310,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter ISA,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/isa
 BUSOBJS += $(BUSOBJ)/isa/isa.o
 BUSOBJS += $(BUSOBJ)/isa/isa_cards.o
 BUSOBJS += $(BUSOBJ)/isa/mda.o
@@ -350,6 +365,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter ISBX,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/isbx
 BUSOBJS += $(BUSOBJ)/isbx/isbx.o
 BUSOBJS += $(BUSOBJ)/isbx/compis_fdc.o
 BUSOBJS += $(BUSOBJ)/isbx/isbc_218a.o
@@ -362,6 +378,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter KC,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/kc
 BUSOBJS += $(BUSOBJ)/kc/kc.o
 BUSOBJS += $(BUSOBJ)/kc/d002.o
 BUSOBJS += $(BUSOBJ)/kc/d004.o
@@ -375,6 +392,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter PC_JOY,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/pc_joy
 BUSOBJS += $(BUSOBJ)/pc_joy/pc_joy.o
 BUSOBJS += $(BUSOBJ)/pc_joy/pc_joy_sw.o
 endif
@@ -386,6 +404,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter PC_KBD,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/pc_kbd
 BUSOBJS += $(BUSOBJ)/pc_kbd/pc_kbdc.o
 BUSOBJS += $(BUSOBJ)/pc_kbd/keyboards.o
 BUSOBJS += $(BUSOBJ)/pc_kbd/ec1841.o
@@ -406,6 +425,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter PET,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/pet
 BUSOBJS += $(BUSOBJ)/pet/cass.o
 BUSOBJS += $(BUSOBJ)/pet/c2n.o
 BUSOBJS += $(BUSOBJ)/pet/diag264_lb_tape.o
@@ -424,6 +444,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter PLUS4,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/plus4
 BUSOBJS += $(BUSOBJ)/plus4/exp.o
 BUSOBJS += $(BUSOBJ)/plus4/c1551.o
 BUSOBJS += $(BUSOBJ)/plus4/sid.o
@@ -439,6 +460,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter S100,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/s100
 BUSOBJS += $(BUSOBJ)/s100/s100.o
 BUSOBJS += $(BUSOBJ)/s100/dj2db.o
 BUSOBJS += $(BUSOBJ)/s100/djdma.o
@@ -455,6 +477,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter TVC,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/tvc
 BUSOBJS += $(BUSOBJ)/tvc/tvc.o
 BUSOBJS += $(BUSOBJ)/tvc/hbf.o
 endif
@@ -466,6 +489,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter VCS,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/vcs
 BUSOBJS += $(BUSOBJ)/vcs/ctrl.o
 BUSOBJS += $(BUSOBJ)/vcs/joystick.o
 BUSOBJS += $(BUSOBJ)/vcs/joybooster.o
@@ -482,6 +506,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter VIC10,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/vic10
 BUSOBJS += $(BUSOBJ)/vic10/exp.o
 BUSOBJS += $(BUSOBJ)/vic10/std.o
 endif
@@ -494,6 +519,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter VIC20,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/vic20
 BUSOBJS += $(BUSOBJ)/vic20/exp.o
 BUSOBJS += $(BUSOBJ)/vic20/megacart.o
 BUSOBJS += $(BUSOBJ)/vic20/std.o
@@ -514,6 +540,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter VIDBRAIN,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/vidbrain
 BUSOBJS += $(BUSOBJ)/vidbrain/exp.o
 BUSOBJS += $(BUSOBJ)/vidbrain/std.o
 BUSOBJS += $(BUSOBJ)/vidbrain/money_minder.o
@@ -528,6 +555,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter VIP,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/vip
 BUSOBJS += $(BUSOBJ)/vip/byteio.o
 BUSOBJS += $(BUSOBJ)/vip/vp620.o
 BUSOBJS += $(BUSOBJ)/vip/exp.o
@@ -547,6 +575,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter WANGPC,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/wangpc
 BUSOBJS += $(BUSOBJ)/wangpc/wangpc.o
 BUSOBJS += $(BUSOBJ)/wangpc/emb.o
 BUSOBJS += $(BUSOBJ)/wangpc/lic.o
@@ -565,6 +594,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter Z88,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/z88
 BUSOBJS += $(BUSOBJ)/z88/z88.o
 BUSOBJS += $(BUSOBJ)/z88/flash.o
 BUSOBJS += $(BUSOBJ)/z88/ram.o
@@ -577,6 +607,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter A2BUS,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/a2bus
 BUSOBJS += $(BUSOBJ)/a2bus/a2bus.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2lang.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2diskii.o
@@ -614,6 +645,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter NUBUS,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/nubus
 BUSOBJS += $(BUSOBJ)/nubus/nubus.o
 BUSOBJS += $(BUSOBJ)/nubus/nubus_48gc.o
 BUSOBJS += $(BUSOBJ)/nubus/nubus_cb264.o
@@ -639,6 +671,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter CENTRONICS,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/centronics
 BUSOBJS += $(BUSOBJ)/centronics/ctronics.o
 BUSOBJS += $(BUSOBJ)/centronics/comxpl80.o
 BUSOBJS += $(BUSOBJ)/centronics/covox.o
@@ -652,6 +685,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter RS232,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/rs232
 BUSOBJS += $(BUSOBJ)/rs232/keyboard.o
 BUSOBJS += $(BUSOBJ)/rs232/null_modem.o
 BUSOBJS += $(BUSOBJ)/rs232/rs232.o
@@ -665,6 +699,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter MIDI,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/midi
 BUSOBJS += $(BUSOBJ)/midi/midi.o
 BUSOBJS += $(BUSOBJ)/midi/midiinport.o
 BUSOBJS += $(BUSOBJ)/midi/midioutport.o
@@ -676,6 +711,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter PCI,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/pci
 BUSOBJS += $(BUSOBJ)/pci/pci.o
 BUSOBJS += $(BUSOBJ)/pci/i82371ab.o
 BUSOBJS += $(BUSOBJ)/pci/i82371sb.o
@@ -691,6 +727,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter NES,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/nes
 BUSOBJS += $(BUSOBJ)/nes/nes_slot.o
 BUSOBJS += $(BUSOBJ)/nes/nes_carts.o
 BUSOBJS += $(BUSOBJ)/nes/act53.o
@@ -747,6 +784,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter SNES,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/snes
 BUSOBJS += $(BUSOBJ)/snes/snes_slot.o
 BUSOBJS += $(BUSOBJ)/snes/snes_carts.o
 BUSOBJS += $(BUSOBJ)/snes/bsx.o
@@ -761,3 +799,95 @@ BUSOBJS += $(BUSOBJ)/snes/spc7110.o
 BUSOBJS += $(BUSOBJ)/snes/sufami.o
 BUSOBJS += $(BUSOBJ)/snes/upd.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/megadrive/md_slot.h,BUSES += MEGADRIVE
+#-------------------------------------------------
+
+ifneq ($(filter MEGADRIVE,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/megadrive
+BUSOBJS += $(BUSOBJ)/megadrive/md_slot.o
+BUSOBJS += $(BUSOBJ)/megadrive/md_carts.o
+BUSOBJS += $(BUSOBJ)/megadrive/eeprom.o
+BUSOBJS += $(BUSOBJ)/megadrive/jcart.o
+BUSOBJS += $(BUSOBJ)/megadrive/rom.o
+BUSOBJS += $(BUSOBJ)/megadrive/sk.o
+BUSOBJS += $(BUSOBJ)/megadrive/stm95.o
+BUSOBJS += $(BUSOBJ)/megadrive/svp.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/saturn/sat_slot.h,BUSES += SATURN
+#-------------------------------------------------
+
+ifneq ($(filter SATURN,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/saturn
+BUSOBJS += $(BUSOBJ)/saturn/sat_slot.o
+BUSOBJS += $(BUSOBJ)/saturn/bram.o
+BUSOBJS += $(BUSOBJ)/saturn/dram.o
+BUSOBJS += $(BUSOBJ)/saturn/rom.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/sega8/sega8_slot.h,BUSES += SEGA8
+#-------------------------------------------------
+
+ifneq ($(filter SEGA8,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/sega8
+BUSOBJS += $(BUSOBJ)/sega8/sega8_slot.o
+BUSOBJS += $(BUSOBJ)/sega8/rom.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/sms_ctrl/smsctrl.h,BUSES += SMS_CTRL
+#-------------------------------------------------
+
+ifneq ($(filter SMS_CTRL,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/sms_ctrl
+BUSOBJS += $(BUSOBJ)/sms_ctrl/smsctrl.o
+BUSOBJS += $(BUSOBJ)/sms_ctrl/joypad.o
+BUSOBJS += $(BUSOBJ)/sms_ctrl/lphaser.o
+BUSOBJS += $(BUSOBJ)/sms_ctrl/paddle.o
+BUSOBJS += $(BUSOBJ)/sms_ctrl/rfu.o
+BUSOBJS += $(BUSOBJ)/sms_ctrl/sports.o
+BUSOBJS += $(BUSOBJ)/sms_ctrl/sportsjp.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/sms_exp/smsexp.h,BUSES += SMS_EXP
+#-------------------------------------------------
+
+ifneq ($(filter SMS_EXP,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/sms_exp
+BUSOBJS += $(BUSOBJ)/sms_exp/smsexp.o
+BUSOBJS += $(BUSOBJ)/sms_exp/gender.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/gameboy/gb_slot.h,BUSES += GAMEBOY
+#-------------------------------------------------
+
+ifneq ($(filter GAMEBOY,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/gameboy
+BUSOBJS += $(BUSOBJ)/gameboy/gb_slot.o
+BUSOBJS += $(BUSOBJ)/gameboy/rom.o
+BUSOBJS += $(BUSOBJ)/gameboy/mbc.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/gba/gba_slot.h,BUSES += GBA
+#-------------------------------------------------
+
+ifneq ($(filter GBA,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/gba
+BUSOBJS += $(BUSOBJ)/gba/gba_slot.o
+BUSOBJS += $(BUSOBJ)/gba/rom.o
+endif
+

@@ -512,6 +512,7 @@ BUSES += ISA
 BUSES += ISBX
 BUSES += KC
 BUSES += MIDI
+BUSES += MEGADRIVE
 BUSES += NES
 BUSES += NUBUS
 BUSES += PCI
@@ -530,6 +531,12 @@ BUSES += VIDBRAIN
 BUSES += VIP
 BUSES += WANGPC
 BUSES += Z88
+BUSES += SATURN
+BUSES += GAMEBOY
+BUSES += GBA
+BUSES += SEGA8
+BUSES += SMS_CTRL
+BUSES += SMS_EXP
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -1499,15 +1506,10 @@ $(MESSOBJ)/nintendo.a:          \
 	$(MESS_AUDIO)/gb.o          \
 	$(MESS_VIDEO)/gb_lcd.o      \
 	$(MESS_MACHINE)/gb.o        \
-	$(MESS_MACHINE)/gb_slot.o   \
-	$(MESS_MACHINE)/gb_rom.o    \
-	$(MESS_MACHINE)/gb_mbc.o    \
 	$(MESS_DRIVERS)/gb.o        \
 	$(MESS_DRIVERS)/pokemini.o  \
 	$(MESS_DRIVERS)/vboy.o      \
 	$(MESS_AUDIO)/vboy.o        \
-	$(MESS_MACHINE)/gba_slot.o  \
-	$(MESS_MACHINE)/gba_rom.o   \
 	$(MESS_DRIVERS)/gba.o       \
 	$(MESS_VIDEO)/gba.o         \
 
@@ -1667,35 +1669,13 @@ $(MESSOBJ)/sanyo.a:             \
 
 $(MESSOBJ)/sega.a:              \
 	$(MESS_DRIVERS)/sg1000.o    \
-	$(MESS_MACHINE)/md_slot.o   \
-	$(MESS_MACHINE)/md_rom.o    \
-	$(MESS_MACHINE)/md_sk.o     \
-	$(MESS_MACHINE)/md_eeprom.o \
-	$(MESS_MACHINE)/md_jcart.o  \
-	$(MESS_MACHINE)/md_stm95.o  \
-	$(MESS_MACHINE)/md_svp.o    \
 	$(MESS_DRIVERS)/megadriv.o  \
 	$(MESS_DRIVERS)/segapico.o  \
 	$(MESS_DRIVERS)/dccons.o    \
 	$(MAME_MACHINE)/gdrom.o     \
 	$(MESS_MACHINE)/dccons.o    \
-	$(MESS_MACHINE)/sat_slot.o  \
-	$(MESS_MACHINE)/sat_rom.o   \
-	$(MESS_MACHINE)/sat_dram.o  \
-	$(MESS_MACHINE)/sat_bram.o  \
 	$(MESS_DRIVERS)/saturn.o    \
 	$(MESS_MACHINE)/sms.o       \
-	$(MESS_MACHINE)/smsctrl.o   \
-	$(MESS_MACHINE)/sms_joypad.o  \
-	$(MESS_MACHINE)/sms_lphaser.o \
-	$(MESS_MACHINE)/sms_paddle.o  \
-	$(MESS_MACHINE)/sms_sports.o  \
-	$(MESS_MACHINE)/sms_sportsjp.o \
-	$(MESS_MACHINE)/sms_rfu.o     \
-	$(MESS_MACHINE)/sega8_slot.o  \
-	$(MESS_MACHINE)/sega8_rom.o \
-	$(MESS_MACHINE)/smsexp.o    \
-	$(MESS_MACHINE)/sms_gender.o  \
 	$(MESS_DRIVERS)/sms.o       \
 	$(MESS_DRIVERS)/svmu.o      \
 

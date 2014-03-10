@@ -443,8 +443,8 @@ space. This mapper uses 32KB sized banks.
 #include "emu.h"
 #include "rendlay.h"
 #include "includes/gb.h"
-#include "machine/gb_rom.h"
-#include "machine/gb_mbc.h"
+#include "bus/gameboy/rom.h"
+#include "bus/gameboy/mbc.h"
 
 
 /* Initial value of the cpu registers (hacks until we get bios dumps) */

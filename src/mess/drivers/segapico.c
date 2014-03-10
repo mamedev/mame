@@ -117,8 +117,8 @@ C = MB3514 / 9325 M36
 
 #include "emu.h"
 #include "includes/megadriv.h"
-#include "machine/md_slot.h"
-#include "machine/md_rom.h"
+#include "bus/megadrive/md_slot.h"
+#include "bus/megadrive/rom.h"
 #include "includes/md_cons.h"
 #include "sound/upd7759.h"
 
