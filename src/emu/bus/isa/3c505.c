@@ -16,7 +16,7 @@
  *  - http://www.bitsavers.org/pdf/3Com/1569-03_EtherLink_Plus_Technical_Reference_Jan89.pdf
  */
 
-#include "machine/3c505.h"
+#include "3c505.h"
 
 #define VERBOSE 0
 

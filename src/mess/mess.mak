@@ -902,7 +902,6 @@ $(MESSOBJ)/apollo.a:            \
 	$(MESS_VIDEO)/apollo.o      \
 	$(MESS_MACHINE)/apollo_dbg.o  \
 	$(MESS_MACHINE)/apollo_kbd.o  \
-	$(MESS_MACHINE)/3c505.o     \
 	$(MESS_MACHINE)/apollo.o    \
 
 $(MESSOBJ)/apple.a:             \
