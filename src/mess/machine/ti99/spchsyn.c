@@ -133,6 +133,7 @@ WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
 
 void ti_speech_synthesizer_device::device_start()
 {
+	m_read_mode = false;
 }
 
 void ti_speech_synthesizer_device::device_config_complete()
