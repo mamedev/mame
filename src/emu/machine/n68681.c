@@ -74,7 +74,8 @@ duartn68681_device::duartn68681_device(const machine_config &mconfig, const char
 	ip3clk(0),
 	ip4clk(0),
 	ip5clk(0),
-	ip6clk(0)
+	ip6clk(0),
+	IP_last_state(0)
 {
 }
 
@@ -105,8 +106,6 @@ void duartn68681_device::device_start()
 	write_outport.resolve_safe();
 
 	duart_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(duartn68681_device::duart_timer_callback),this), NULL);
-
-	IP_last_state = 0;
 
 	save_item(NAME(ACR));
 	save_item(NAME(IMR));
