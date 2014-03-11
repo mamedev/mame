@@ -13,6 +13,7 @@
 #ifndef __COREALLOC_H__
 #define __COREALLOC_H__
 
+#include <stdlib.h>
 #include <new>
 #include "osdcore.h"
 

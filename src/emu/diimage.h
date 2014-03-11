@@ -96,8 +96,8 @@ private:
 
 class device_image_interface;
 struct feature_list;
-struct software_part;
-struct software_info;
+class software_part;
+class software_info;
 
 // device image interface function types
 typedef delegate<int (device_image_interface &)> device_image_load_delegate;
