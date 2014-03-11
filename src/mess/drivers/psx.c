@@ -671,7 +671,7 @@ Consoles not dumped:
 
 DTL-H1001H
 SCPH-5001
-SCPH-5002
+SCPH-5002 (this is not mentioned in SCPH-102B.pdf so it's likely it doesn't exist)
 SCPH-5003
 SCPH-103
 
