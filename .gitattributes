@@ -5910,6 +5910,7 @@ src/mame/layout/cdi.lay svneol=native#text/xml
 src/mame/layout/cgold2.lay svneol=native#text/xml
 src/mame/layout/chance32.lay svneol=native#text/xml
 src/mame/layout/changela.lay svneol=native#text/xml
+src/mame/layout/cherryb3.lay svneol=native#text/xml
 src/mame/layout/chqflag.lay svneol=native#text/xml
 src/mame/layout/circus.lay svneol=native#text/xml
 src/mame/layout/cischeat.lay svneol=native#text/xml

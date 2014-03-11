@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(ncb3_port81_w);
+	DECLARE_WRITE8_MEMBER(cb3_lamps_w);
 	DECLARE_WRITE8_MEMBER(cm_outport1_w);
 	DECLARE_WRITE8_MEMBER(lucky8_outport_w);
 	DECLARE_WRITE8_MEMBER(magodds_outb850_w);

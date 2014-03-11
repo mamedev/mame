@@ -117,6 +117,7 @@
 #include "machine/nvram.h"
 #include "includes/goldstar.h"
 
+#include "cherryb3.lh"
 #include "lucky8.lh"
 #include "bingowng.lh"
 
@@ -134,6 +135,28 @@ READ8_MEMBER(goldstar_state::protection_r)
 	m_dataoffset %= 4;
 	return data[m_dataoffset++];
 }
+
+WRITE8_MEMBER(goldstar_state::cb3_lamps_w)
+{
+/*  bits
+  7654 3210
+  ---- ---x  Stop 2 / Big
+  ---- --x-  Bet / Double
+  ---- -x--  Stop 1 / Take
+  ---- x---  Collect or separate Bet?
+  ---x ----  Stop 3 / Small / Info
+  --x- ----  Start / Stop All
+*/
+	output_set_lamp_value(0, (data) & 1);       /* Stop 2 / Big */
+	output_set_lamp_value(1, (data >> 1) & 1);  /* Bet / Double */
+	output_set_lamp_value(2, (data >> 2) & 1);  /* Stop 1 / Take */
+	output_set_lamp_value(3, (data >> 3) & 1);  /* Collect or separate Bet */
+	output_set_lamp_value(4, (data >> 4) & 1);  /* Stop 3 / Small / Info */
+	output_set_lamp_value(5, (data >> 5) & 1);  /* Start / Stop All */
+
+//	popmessage("lamps: %02X", data);
+}
+
 
 static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
@@ -198,15 +221,15 @@ static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8, goldstar_state )
 
 	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-//  AM_RANGE(0xf850, 0xf850) AM_WRITE(ncb3_p1_flip_w)   // need flip?
-//  AM_RANGE(0xf860, 0xf860) AM_WRITE(ncb3_p2_flip_w)   // need flip?
+	AM_RANGE(0xf850, 0xf850) AM_WRITE(cb3_lamps_w)		/* Control Set 1 lamps */
+	AM_RANGE(0xf860, 0xf860) AM_WRITE(cb3_lamps_w)		/* Control Set 2 lamps */
 	AM_RANGE(0xf870, 0xf870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ncb3_readwriteport, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) AM_READ(ncb3_unkread_r)    // read from 0x00 when controls set1 is used...
-//  AM_RANGE(0x02, 0x02) AM_READ(ncb3_unkread_r)    // read from 0x02 when controls set2 is used...
+//  AM_RANGE(0x00, 0x00) AM_READ(ncb3_unkread_r)    // read from 0x00 when controls set 1 is used...
+//  AM_RANGE(0x02, 0x02) AM_READ(ncb3_unkread_r)    // read from 0x02 when controls set 2 is used...
 //  AM_RANGE(0x06, 0x06) AM_READ(ncb3_unkread_r)    // unknown...
 //  AM_RANGE(0x08, 0x08) AM_READ(ncb3_unkread_r)    // unknown...
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW5")   /* confirmed for ncb3 */
@@ -216,29 +239,32 @@ ADDRESS_MAP_END
 
 /* ncb3 findings...
 
+  c101-c102 = unknown writes...
   f800-f803 = 8255_1 (ctrl=9b) ; portA, B & C (input)
   f810-f813 = 8255_2 (ctrl=9b) ; portA, B & C (input)
   f820-f823 = 8255_3 (ctrl=90) ; portA (input); ports B & C (output)
   f830      = AY8910 RW
   f840      = AY8910 ctrl
-  f850      = Unknown
+  f850      = control set 1 lamps
+  f860      = control set 2 lamps
   f870      = PSG (init writes)
 
 
   I/O
 
   00 = RW  (chrygld, ncb3 in ctrl set1)
-  02 = RW  (ncb3 in ctrl set2)
-  06 = RW
+  02 = R  (W - ncb3 in ctrl set2)
+  06 = W
   08 = RW
   81 =  W
 
   00-0f = initial seq. writes
 
-  Controls Set1 = write to f850 (0x1a), read from 0002.
-  Controls Set2 = write to f860 (0x1a), read from 0000.
+  Controls Set 1 = write lamps to f850, read from 0002.
+  Controls Set 2 = write lamps to f860, read from 0000.
 
-  Controls Set2 is using reels stop buttons from Controls Set1.
+  Controls Set 2 is using reels stop buttons from Controls Set 1.
+  So, seems that control set 2 was meant for non-stop reels.
 
 */
 
@@ -249,14 +275,14 @@ static ADDRESS_MAP_START( wcherry_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	
 	/* Not sure... Need to be checked */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w ) AM_SHARE("fg_vidram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w ) AM_SHARE("fg_atrram")
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
 	AM_RANGE(0xf040, 0xf07f) AM_RAM AM_SHARE("reel1_scroll")
 	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_SHARE("reel3_scroll")
+	AM_RANGE(0xf0c0, 0xf0ff) AM_RAM AM_SHARE("reel3_scroll")
 
     /* Not really PPI's... They are emulated/simulated inside the CPLDs */
 	AM_RANGE(0xf600, 0xf603) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
@@ -268,6 +294,7 @@ static ADDRESS_MAP_START( wcherry_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf650, 0xf650) AM_WRITENOP	// AM_WRITE(output_w)  // unknown register: 0x3e
 	AM_RANGE(0xf660, 0xf660) AM_WRITENOP	// AM_WRITE(output_w)  // unknown register: 0x3e
 	AM_RANGE(0xf670, 0xf670) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
+
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -12261,13 +12288,13 @@ GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, wcherry,  
 
 
 // are these really dyna, or bootlegs?
-GAME(  199?, ncb3,      0,        ncb3,     ncb3,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0 )
-GAME(  199?, cb3a,      ncb3,     ncb3,     cb3a,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0 )
-GAME(  199?, cb3,       ncb3,     ncb3,     ncb3,     goldstar_state, cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0 )
-GAME(  199?, cb3b,      ncb3,     cherrys,  ncb3,     goldstar_state, cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0 )
+GAMEL( 199?, ncb3,      0,        ncb3,     ncb3,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0,                 layout_cherryb3 )
+GAMEL( 199?, cb3a,      ncb3,     ncb3,     cb3a,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0,                 layout_cherryb3 )
+GAMEL( 199?, cb3,       ncb3,     ncb3,     ncb3,     goldstar_state, cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0,                 layout_cherryb3 )
+GAMEL( 199?, cb3b,      ncb3,     cherrys,  ncb3,     goldstar_state, cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0,                 layout_cherryb3 )
 GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  goldstar_state, cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)",               GAME_NOT_WORKING)
-GAME(  199?, cb3d,      ncb3,     ncb3,     ncb3,     driver_device,  0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0 )
-GAME(  199?, cb3e,      ncb3,     cb3e,     chrygld,  goldstar_state, cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0 )
+GAMEL( 199?, cb3d,      ncb3,     ncb3,     ncb3,     driver_device,  0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
+GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  goldstar_state, cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_cherryb3 )
 
 GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  driver_device,  0,         ROT0, "Dyna",              "Cherry Master '97",                           GAME_NOT_WORKING) // fix prom decode
 

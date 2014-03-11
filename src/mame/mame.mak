@@ -2458,7 +2458,8 @@ $(DRIVERS)/goldnpkr.o:  $(LAYOUT)/goldnpkr.lh \
 
 $(DRIVERS)/lbeach.o:    $(LAYOUT)/lbeach.lh
 
-$(DRIVERS)/goldstar.o:  $(LAYOUT)/lucky8.lh \
+$(DRIVERS)/goldstar.o:  $(LAYOUT)/cherryb3.lh \
+			$(LAYOUT)/lucky8.lh \
 			$(LAYOUT)/bingowng.lh
 
 $(DRIVERS)/grchamp.o:   $(LAYOUT)/grchamp.lh
