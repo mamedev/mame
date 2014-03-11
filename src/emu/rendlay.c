@@ -105,7 +105,7 @@ enum
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const render_screen_list render_target::s_empty_screen_list;
+render_screen_list render_target::s_empty_screen_list;
 
 
 

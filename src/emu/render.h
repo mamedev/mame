@@ -711,7 +711,7 @@ private:
 	INT32                   m_clear_extent_count;       // number of clear extents
 	INT32                   m_clear_extents[MAX_CLEAR_EXTENTS]; // array of clear extents
 
-	static const render_screen_list s_empty_screen_list;
+	static render_screen_list s_empty_screen_list;
 };
 
 
