@@ -33,7 +33,8 @@ public:
 	: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_oki(*this, "oki"),
-	m_vram(*this, "vram"){ }
+	m_vram(*this, "vram"),
+	m_palette(*this, "palette") { }
 
 	DECLARE_WRITE16_MEMBER(irq2_ack_w);
 	DECLARE_WRITE16_MEMBER(irq3_ack_w);
@@ -50,6 +51,7 @@ protected:
 	required_device<okim6295_device> m_oki;
 
 	required_shared_ptr<UINT16> m_vram;
+	required_device<palette_device> m_palette;
 	// driver_device overrides
 	virtual void video_start();
 

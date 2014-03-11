@@ -23,7 +23,8 @@ public:
 		m_nmk_bgvideoram3(*this, "nmk_bgvideoram3"),
 		m_afega_scroll_0(*this, "afega_scroll_0"),
 		m_afega_scroll_1(*this, "afega_scroll_1"),
-		m_gfxdecode(*this, "gfxdecode") {}
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") {}
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -43,6 +44,7 @@ public:
 	optional_shared_ptr<UINT16> m_afega_scroll_0;
 	optional_shared_ptr<UINT16> m_afega_scroll_1;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	int mask[4*2];
 	int m_simple_scroll;
 	int m_redraw_bitmap;

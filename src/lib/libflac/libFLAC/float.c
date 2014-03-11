@@ -33,7 +33,7 @@
 #  include <config.h>
 #endif
 
-#include "flac/assert.h"
+#include "FLAC/assert.h"
 
 #include "private/float.h"
 
@@ -282,7 +282,7 @@ FLAC__uint32 FLAC__fixedpoint_log2(FLAC__uint32 x, unsigned fracbits, unsigned p
 
 	if(x < ONE)
 		return 0;
-
+	
 	if(precision > LOG2_LOOKUP_PRECISION)
 		precision = LOG2_LOOKUP_PRECISION;
 

@@ -25,18 +25,18 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_spriteram(*this, "spriteram") ,
 		m_bgram(*this, "bgram"),
-		m_paletteram(*this, "paletteram"),
 		m_zoomram(*this, "zoomram"),
 		m_vidregs(*this, "vidregs"),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_device<buffered_spriteram32_device> m_spriteram;
 	required_shared_ptr<UINT32> m_bgram;
-	required_shared_ptr<UINT32> m_paletteram;
 	required_shared_ptr<UINT32> m_zoomram;
 	required_shared_ptr<UINT32> m_vidregs;
 	required_shared_ptr<UINT32> m_ram;
@@ -52,9 +52,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE32_MEMBER(psikyosh_irqctrl_w);
-	DECLARE_WRITE32_MEMBER(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);
 	DECLARE_WRITE32_MEMBER(psikyosh_vidregs_w);
 	DECLARE_READ32_MEMBER(mjgtaste_input_r);
 	DECLARE_WRITE32_MEMBER(psh_eeprom_w);

@@ -91,7 +91,9 @@ public:
 		m_cga_ram(*this, "cga_ram"),
 		m_bios_ram(*this, "bios_ram"),
 		m_vram(*this, "vram"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_device<ide_controller_32_device> m_ide;
 	required_shared_ptr<UINT32> m_main_ram;
@@ -99,6 +101,8 @@ public:
 	required_shared_ptr<UINT32> m_bios_ram;
 	required_shared_ptr<UINT32> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	UINT8 m_pal[768];
 
 

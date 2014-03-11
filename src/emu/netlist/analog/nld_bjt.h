@@ -94,7 +94,7 @@ public:
       m_RB(netlist_object_t::ANALOG),
       m_RC(netlist_object_t::ANALOG),
       m_BC_dummy(netlist_object_t::ANALOG),
-      m_gB(NETLIST_GMIN), m_gC(NETLIST_GMIN), m_V(0.0), m_state_on(0) { }
+      m_gB(NETLIST_GMIN_DEFAULT), m_gC(NETLIST_GMIN_DEFAULT), m_V(0.0), m_state_on(0) { }
 
     NETLIB_UPDATE_TERMINALS()
     {
@@ -109,9 +109,9 @@ public:
             if (!new_state )
             {
                 // not conducting
-                gb = NETLIST_GMIN;
+                gb = netlist().gmin();
                 v = 0;
-                gc = NETLIST_GMIN;
+                gc = netlist().gmin();
             }
             m_RB.set(gb, v,   0.0);
             m_RC.set(gc, 0.0, 0.0);

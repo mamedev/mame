@@ -20,7 +20,8 @@ public:
 		m_bitmap_color(*this, "bitmap_color"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_cvsd(*this, "cvsd") { }
+		m_cvsd(*this, "cvsd"),
+		m_screen(*this, "screen") { }
 
 	UINT8 m_ay8910_latch_1;
 	UINT8 m_ay8910_latch_2;
@@ -33,6 +34,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<hc55516_device> m_cvsd;
+	required_device<screen_device> m_screen;
 
 	UINT8 *m_bitmap_colorram;
 	UINT8 m_control_xor;

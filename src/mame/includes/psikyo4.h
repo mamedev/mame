@@ -23,7 +23,8 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "lpalette"),
-		m_palette2(*this, "rpalette")
+		m_palette2(*this, "rpalette"),
+		m_screen(*this, "screen")		
 	{ }
 
 	/* memory pointers */
@@ -70,4 +71,5 @@ public:
 
 	required_device<palette_device> m_palette;
 	required_device<palette_device> m_palette2;
+	optional_device<screen_device> m_screen;
 };

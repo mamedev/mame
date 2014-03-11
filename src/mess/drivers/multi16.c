@@ -17,13 +17,15 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_pic(*this, "pic8259"),
-	m_crtc(*this, "crtc")
+	m_crtc(*this, "crtc"),
+		m_palette(*this, "palette") 
 	,
 		m_p_vram(*this, "p_vram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
 	DECLARE_WRITE8_MEMBER(multi16_6845_address_w);
 	DECLARE_WRITE8_MEMBER(multi16_6845_data_w);
 	DECLARE_WRITE_LINE_MEMBER(multi16_set_int_line);

@@ -38,7 +38,8 @@ public:
 		m_reg(*this, "reg"),
 		m_videoram(*this, "videoram"),
 		m_joy(*this, "JOY"),
-		m_joy2(*this, "JOY2") { }
+		m_joy2(*this, "JOY2"),
+		m_palette(*this, "palette")  { }
 
 	svision_sound_device *m_sound;
 	int *m_dma_finished;
@@ -72,6 +73,7 @@ protected:
 	required_shared_ptr<UINT8> m_videoram;
 	required_ioport m_joy;
 	optional_ioport m_joy2;
+	required_device<palette_device> m_palette;
 
 	memory_region *m_user1;
 	memory_bank *m_bank1;

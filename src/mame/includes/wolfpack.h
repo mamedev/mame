@@ -13,13 +13,17 @@ public:
 		m_alpha_num_ram(*this, "alpha_num_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_s14001a(*this, "speech"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT8> m_alpha_num_ram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s14001a_device> m_s14001a;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	int m_collision;
 	unsigned m_current_index;

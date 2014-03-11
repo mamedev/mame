@@ -90,7 +90,8 @@ public:
 		m_ram_attr(*this, "raattr"),
 		m_ram_video(*this, "ravideo"),
 		m_backup_ram(*this, "backup_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen") { }
 
 	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
 	pen_t m_pens[NUM_PENS];
@@ -126,6 +127,7 @@ public:
 	virtual void machine_start();
 	DECLARE_MACHINE_START(casino5);
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 };
 
 

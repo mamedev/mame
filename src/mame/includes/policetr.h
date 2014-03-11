@@ -18,7 +18,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
 		m_maincpu(*this, "maincpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	UINT32 m_control_data;
 	UINT32 m_bsmt_data_bank;
@@ -60,7 +62,8 @@ public:
 	void render_display_list(offs_t offset);
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

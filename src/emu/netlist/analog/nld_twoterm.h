@@ -175,10 +175,7 @@ protected:
 class netlist_generic_diode
 {
 public:
-    netlist_generic_diode()
-    {
-        m_Vd = 0.7;
-    }
+    ATTR_COLD netlist_generic_diode();
 
     ATTR_HOT inline void update_diode(const double nVd)
     {
@@ -187,7 +184,7 @@ public:
         if (nVd < -5.0 * m_Vt)
         {
             m_Vd = nVd;
-            m_G = NETLIST_GMIN;
+            m_G = m_gmin;
             m_Id = - m_Is;
         }
         else if (nVd < m_Vcrit)
@@ -196,7 +193,7 @@ public:
 
             const double eVDVt = exp(m_Vd * m_VtInv);
             m_Id = m_Is * (eVDVt - 1.0);
-            m_G = m_Is * m_VtInv * eVDVt + NETLIST_GMIN;
+            m_G = m_Is * m_VtInv * eVDVt + m_gmin;
         }
         else
         {
@@ -210,22 +207,13 @@ public:
             const double eVDVt = exp(m_Vd * m_VtInv);
             m_Id = m_Is * (eVDVt - 1.0);
 
-            m_G = m_Is * m_VtInv * eVDVt + NETLIST_GMIN;
+            m_G = m_Is * m_VtInv * eVDVt + m_gmin;
         }
 
         //printf("nVd %f m_Vd %f Vcrit %f\n", nVd, m_Vd, m_Vcrit);
     }
 
-    void set_param(const double Is, const double n)
-    {
-        m_Is = Is;
-        m_n = n;
-
-        m_Vt = 0.0258 * m_n;
-
-        m_Vcrit = m_Vt * log(m_Vt / m_Is / sqrt(2.0));
-        m_VtInv = 1.0 / m_Vt;
-    }
+    ATTR_COLD void set_param(const double Is, const double n, double gmin);
 
     ATTR_HOT inline double I() const { return m_Id; }
     ATTR_HOT inline double G() const { return m_G; }
@@ -234,12 +222,7 @@ public:
 
     /* owning object must save those ... */
 
-    void save(pstring name, netlist_object_t &parent)
-    {
-        parent.save(m_Vd, name + ".m_Vd");
-        parent.save(m_Id, name + ".m_Id");
-        parent.save(m_G, name + ".m_G");
-    }
+    ATTR_COLD void save(pstring name, netlist_object_t &parent);
 
 private:
     double m_Vd;
@@ -249,6 +232,7 @@ private:
     double m_Vt;
     double m_Is;
     double m_n;
+    double m_gmin;
 
     double m_VtInv;
     double m_Vcrit;

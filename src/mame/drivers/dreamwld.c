@@ -127,17 +127,16 @@ public:
 	dreamwld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
-		m_paletteram(*this, "paletteram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_bg2_videoram(*this, "bg2_videoram"),
 		m_vregs(*this, "vregs"),
 		m_workram(*this, "workram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_spriteram;
-	required_shared_ptr<UINT32> m_paletteram;
 	required_shared_ptr<UINT32> m_bg_videoram;
 	required_shared_ptr<UINT32> m_bg2_videoram;
 	required_shared_ptr<UINT32> m_vregs;
@@ -159,7 +158,6 @@ public:
 	DECLARE_READ32_MEMBER(dreamwld_protdata_r);
 	DECLARE_WRITE32_MEMBER(dreamwld_6295_0_bank_w);
 	DECLARE_WRITE32_MEMBER(dreamwld_6295_1_bank_w);
-	DECLARE_WRITE32_MEMBER(dreamwld_palette_w);
 	TILE_GET_INFO_MEMBER(get_dreamwld_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_dreamwld_bg2_tile_info);
 	virtual void machine_start();
@@ -170,6 +168,7 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 
@@ -444,30 +443,12 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_6295_1_bank_w)
 		logerror("OKI1: unk bank write %x mem_mask %8x\n", data, mem_mask);
 }
 
-// why doesn't using paletteram_xRRRRRGGGGGBBBBB_word_w with a 16-bit handler work? colours are
-// severely corrupt on dream world's semicom screen + many sprites, seems palette values get duplicated.
-WRITE32_MEMBER(dreamwld_state::dreamwld_palette_w)
-{
-	UINT16 dat;
-	int color;
-
-	COMBINE_DATA(&m_paletteram[offset]);
-	color = offset * 2;
-
-	dat = m_paletteram[offset] & 0x7fff;
-	m_palette->set_pen_color(color+1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
-
-	dat = (m_paletteram[offset] >> 16) & 0x7fff;
-	m_palette->set_pen_color(color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
-}
-
-
 
 static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITENOP
 
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_WRITE(dreamwld_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_SHARE("bg_videoram")
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_SHARE("bg2_videoram")
 	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_SHARE("vregs")  // scroll regs etc.
@@ -603,6 +584,8 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_SCREEN_VBLANK_DRIVER(dreamwld_state, screen_eof_dreamwld)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
 	MCFG_GFXDECODE_ADD("gfxdecode", dreamwld)
 
 

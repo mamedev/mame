@@ -13,7 +13,8 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_mastercpu(*this, "master"),
 		m_slavecpu(*this, "slave"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoctrl;
@@ -32,6 +33,7 @@ public:
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_READ8_MEMBER(jackalr_rotary_r);
 	DECLARE_WRITE8_MEMBER(jackal_flipscreen_w);

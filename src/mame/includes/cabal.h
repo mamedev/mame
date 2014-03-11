@@ -16,7 +16,8 @@ public:
 		m_adpcm2(*this, "adpcm2"),
 		m_msm1(*this, "msm1"),
 		m_msm2(*this, "msm2"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_colorram;
@@ -30,6 +31,7 @@ public:
 	optional_device<msm5205_device> m_msm1;
 	optional_device<msm5205_device> m_msm2;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	tilemap_t *m_background_layer;
 	tilemap_t *m_text_layer;

@@ -67,6 +67,7 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "diexec.h"
 #include "opresolv.h"
 #include "diimage.h"
+#include "dioutput.h"
 #include "diserial.h"
 #include "dislot.h"
 #include "disound.h"

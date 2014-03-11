@@ -32,7 +32,8 @@ public:
 		m_tc0100scn(*this, "tc0100scn"),
 		m_tc0140syt(*this, "tc0140syt"),
 		m_tc0220ioc(*this, "tc0220ioc"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spritemap;
@@ -66,6 +67,7 @@ public:
 	required_device<tc0140syt_device> m_tc0140syt;
 	required_device<tc0220ioc_device> m_tc0220ioc;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_READ16_MEMBER(sharedram_r);
 	DECLARE_WRITE16_MEMBER(sharedram_w);

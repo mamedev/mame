@@ -9,7 +9,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_discrete(*this, "discrete"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -25,6 +26,7 @@ public:
 	required_device<samples_device> m_samples;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	/* game id */
 	int m_game_id;

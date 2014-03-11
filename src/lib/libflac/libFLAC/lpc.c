@@ -34,8 +34,8 @@
 #endif
 
 #include <math.h>
-#include "flac/assert.h"
-#include "flac/format.h"
+#include "FLAC/assert.h"
+#include "FLAC/format.h"
 #include "private/bitmath.h"
 #include "private/lpc.h"
 #if defined DEBUG || defined FLAC__OVERFLOW_DETECT || defined FLAC__OVERFLOW_DETECT_VERBOSE
@@ -238,7 +238,7 @@ int FLAC__lpc_quantize_coefficients(const FLAC__real lp_coeff[], unsigned order,
 		FLAC__double error = 0.0;
 		FLAC__int32 q;
 #ifdef DEBUG
-		//fprintf(stderr,"FLAC__lpc_quantize_coefficients: negative shift=%d order=%u cmax=%f\n", *shift, order, cmax);
+		fprintf(stderr,"FLAC__lpc_quantize_coefficients: negative shift=%d order=%u cmax=%f\n", *shift, order, cmax);
 #endif
 		for(i = 0; i < order; i++) {
 			error += lp_coeff[i] / (1 << nshift);
@@ -305,10 +305,10 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients(const FLAC__int32 *data, u
 
 	/* Here's a slower but clearer version:
 	for(i = 0; i < data_len; i++) {
-	    sum = 0;
-	    for(j = 0; j < order; j++)
-	        sum += qlp_coeff[j] * data[i-j-1];
-	    residual[i] = data[i] - (sum >> lp_quantization);
+		sum = 0;
+		for(j = 0; j < order; j++)
+			sum += qlp_coeff[j] * data[i-j-1];
+		residual[i] = data[i] - (sum >> lp_quantization);
 	}
 	*/
 }
@@ -516,18 +516,18 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients(const FLAC__int32 *data, u
 				case 15: sum += qlp_coeff[14] * data[i-15];
 				case 14: sum += qlp_coeff[13] * data[i-14];
 				case 13: sum += qlp_coeff[12] * data[i-13];
-							sum += qlp_coeff[11] * data[i-12];
-							sum += qlp_coeff[10] * data[i-11];
-							sum += qlp_coeff[ 9] * data[i-10];
-							sum += qlp_coeff[ 8] * data[i- 9];
-							sum += qlp_coeff[ 7] * data[i- 8];
-							sum += qlp_coeff[ 6] * data[i- 7];
-							sum += qlp_coeff[ 5] * data[i- 6];
-							sum += qlp_coeff[ 4] * data[i- 5];
-							sum += qlp_coeff[ 3] * data[i- 4];
-							sum += qlp_coeff[ 2] * data[i- 3];
-							sum += qlp_coeff[ 1] * data[i- 2];
-							sum += qlp_coeff[ 0] * data[i- 1];
+				         sum += qlp_coeff[11] * data[i-12];
+				         sum += qlp_coeff[10] * data[i-11];
+				         sum += qlp_coeff[ 9] * data[i-10];
+				         sum += qlp_coeff[ 8] * data[i- 9];
+				         sum += qlp_coeff[ 7] * data[i- 8];
+				         sum += qlp_coeff[ 6] * data[i- 7];
+				         sum += qlp_coeff[ 5] * data[i- 6];
+				         sum += qlp_coeff[ 4] * data[i- 5];
+				         sum += qlp_coeff[ 3] * data[i- 4];
+				         sum += qlp_coeff[ 2] * data[i- 3];
+				         sum += qlp_coeff[ 1] * data[i- 2];
+				         sum += qlp_coeff[ 0] * data[i- 1];
 			}
 			residual[i] = data[i] - (sum >> lp_quantization);
 		}
@@ -778,18 +778,18 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide(const FLAC__int32 *da
 				case 15: sum += qlp_coeff[14] * (FLAC__int64)data[i-15];
 				case 14: sum += qlp_coeff[13] * (FLAC__int64)data[i-14];
 				case 13: sum += qlp_coeff[12] * (FLAC__int64)data[i-13];
-							sum += qlp_coeff[11] * (FLAC__int64)data[i-12];
-							sum += qlp_coeff[10] * (FLAC__int64)data[i-11];
-							sum += qlp_coeff[ 9] * (FLAC__int64)data[i-10];
-							sum += qlp_coeff[ 8] * (FLAC__int64)data[i- 9];
-							sum += qlp_coeff[ 7] * (FLAC__int64)data[i- 8];
-							sum += qlp_coeff[ 6] * (FLAC__int64)data[i- 7];
-							sum += qlp_coeff[ 5] * (FLAC__int64)data[i- 6];
-							sum += qlp_coeff[ 4] * (FLAC__int64)data[i- 5];
-							sum += qlp_coeff[ 3] * (FLAC__int64)data[i- 4];
-							sum += qlp_coeff[ 2] * (FLAC__int64)data[i- 3];
-							sum += qlp_coeff[ 1] * (FLAC__int64)data[i- 2];
-							sum += qlp_coeff[ 0] * (FLAC__int64)data[i- 1];
+				         sum += qlp_coeff[11] * (FLAC__int64)data[i-12];
+				         sum += qlp_coeff[10] * (FLAC__int64)data[i-11];
+				         sum += qlp_coeff[ 9] * (FLAC__int64)data[i-10];
+				         sum += qlp_coeff[ 8] * (FLAC__int64)data[i- 9];
+				         sum += qlp_coeff[ 7] * (FLAC__int64)data[i- 8];
+				         sum += qlp_coeff[ 6] * (FLAC__int64)data[i- 7];
+				         sum += qlp_coeff[ 5] * (FLAC__int64)data[i- 6];
+				         sum += qlp_coeff[ 4] * (FLAC__int64)data[i- 5];
+				         sum += qlp_coeff[ 3] * (FLAC__int64)data[i- 4];
+				         sum += qlp_coeff[ 2] * (FLAC__int64)data[i- 3];
+				         sum += qlp_coeff[ 1] * (FLAC__int64)data[i- 2];
+				         sum += qlp_coeff[ 0] * (FLAC__int64)data[i- 1];
 			}
 			residual[i] = data[i] - (FLAC__int32)(sum >> lp_quantization);
 		}
@@ -835,10 +835,10 @@ void FLAC__lpc_restore_signal(const FLAC__int32 residual[], unsigned data_len, c
 
 	/* Here's a slower but clearer version:
 	for(i = 0; i < data_len; i++) {
-	    sum = 0;
-	    for(j = 0; j < order; j++)
-	        sum += qlp_coeff[j] * data[i-j-1];
-	    data[i] = residual[i] + (sum >> lp_quantization);
+		sum = 0;
+		for(j = 0; j < order; j++)
+			sum += qlp_coeff[j] * data[i-j-1];
+		data[i] = residual[i] + (sum >> lp_quantization);
 	}
 	*/
 }
@@ -1046,18 +1046,18 @@ void FLAC__lpc_restore_signal(const FLAC__int32 residual[], unsigned data_len, c
 				case 15: sum += qlp_coeff[14] * data[i-15];
 				case 14: sum += qlp_coeff[13] * data[i-14];
 				case 13: sum += qlp_coeff[12] * data[i-13];
-							sum += qlp_coeff[11] * data[i-12];
-							sum += qlp_coeff[10] * data[i-11];
-							sum += qlp_coeff[ 9] * data[i-10];
-							sum += qlp_coeff[ 8] * data[i- 9];
-							sum += qlp_coeff[ 7] * data[i- 8];
-							sum += qlp_coeff[ 6] * data[i- 7];
-							sum += qlp_coeff[ 5] * data[i- 6];
-							sum += qlp_coeff[ 4] * data[i- 5];
-							sum += qlp_coeff[ 3] * data[i- 4];
-							sum += qlp_coeff[ 2] * data[i- 3];
-							sum += qlp_coeff[ 1] * data[i- 2];
-							sum += qlp_coeff[ 0] * data[i- 1];
+				         sum += qlp_coeff[11] * data[i-12];
+				         sum += qlp_coeff[10] * data[i-11];
+				         sum += qlp_coeff[ 9] * data[i-10];
+				         sum += qlp_coeff[ 8] * data[i- 9];
+				         sum += qlp_coeff[ 7] * data[i- 8];
+				         sum += qlp_coeff[ 6] * data[i- 7];
+				         sum += qlp_coeff[ 5] * data[i- 6];
+				         sum += qlp_coeff[ 4] * data[i- 5];
+				         sum += qlp_coeff[ 3] * data[i- 4];
+				         sum += qlp_coeff[ 2] * data[i- 3];
+				         sum += qlp_coeff[ 1] * data[i- 2];
+				         sum += qlp_coeff[ 0] * data[i- 1];
 			}
 			data[i] = residual[i] + (sum >> lp_quantization);
 		}
@@ -1308,18 +1308,18 @@ void FLAC__lpc_restore_signal_wide(const FLAC__int32 residual[], unsigned data_l
 				case 15: sum += qlp_coeff[14] * (FLAC__int64)data[i-15];
 				case 14: sum += qlp_coeff[13] * (FLAC__int64)data[i-14];
 				case 13: sum += qlp_coeff[12] * (FLAC__int64)data[i-13];
-							sum += qlp_coeff[11] * (FLAC__int64)data[i-12];
-							sum += qlp_coeff[10] * (FLAC__int64)data[i-11];
-							sum += qlp_coeff[ 9] * (FLAC__int64)data[i-10];
-							sum += qlp_coeff[ 8] * (FLAC__int64)data[i- 9];
-							sum += qlp_coeff[ 7] * (FLAC__int64)data[i- 8];
-							sum += qlp_coeff[ 6] * (FLAC__int64)data[i- 7];
-							sum += qlp_coeff[ 5] * (FLAC__int64)data[i- 6];
-							sum += qlp_coeff[ 4] * (FLAC__int64)data[i- 5];
-							sum += qlp_coeff[ 3] * (FLAC__int64)data[i- 4];
-							sum += qlp_coeff[ 2] * (FLAC__int64)data[i- 3];
-							sum += qlp_coeff[ 1] * (FLAC__int64)data[i- 2];
-							sum += qlp_coeff[ 0] * (FLAC__int64)data[i- 1];
+				         sum += qlp_coeff[11] * (FLAC__int64)data[i-12];
+				         sum += qlp_coeff[10] * (FLAC__int64)data[i-11];
+				         sum += qlp_coeff[ 9] * (FLAC__int64)data[i-10];
+				         sum += qlp_coeff[ 8] * (FLAC__int64)data[i- 9];
+				         sum += qlp_coeff[ 7] * (FLAC__int64)data[i- 8];
+				         sum += qlp_coeff[ 6] * (FLAC__int64)data[i- 7];
+				         sum += qlp_coeff[ 5] * (FLAC__int64)data[i- 6];
+				         sum += qlp_coeff[ 4] * (FLAC__int64)data[i- 5];
+				         sum += qlp_coeff[ 3] * (FLAC__int64)data[i- 4];
+				         sum += qlp_coeff[ 2] * (FLAC__int64)data[i- 3];
+				         sum += qlp_coeff[ 1] * (FLAC__int64)data[i- 2];
+				         sum += qlp_coeff[ 0] * (FLAC__int64)data[i- 1];
 			}
 			data[i] = residual[i] + (FLAC__int32)(sum >> lp_quantization);
 		}

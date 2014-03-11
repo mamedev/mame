@@ -32,7 +32,9 @@ public:
 		m_oki2(*this, "oki2"),
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_deco_tilegen2(*this, "tilegen2"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -91,6 +93,8 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen2;
 	
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	
 	UINT8 m_irq_source;
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_nslasher);

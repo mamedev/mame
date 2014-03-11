@@ -2,61 +2,23 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    HD61830 LCD Timing Controller emulation
+    Hitachi HD61830 LCD Timing Controller emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
-#include "emu.h"
 #include "hd61830.h"
 
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
+//  DEVICE DEFINITIONS
 //**************************************************************************
 
-#define LOG 0
-
-enum
-{
-	INSTRUCTION_MODE_CONTROL = 0,
-	INSTRUCTION_CHARACTER_PITCH,
-	INSTRUCTION_NUMBER_OF_CHARACTERS,
-	INSTRUCTION_NUMBER_OF_TIME_DIVISIONS,
-	INSTRUCTION_CURSOR_POSITION,
-	INSTRUCTION_DISPLAY_START_LOW = 8,
-	INSTRUCTION_DISPLAY_START_HIGH,
-	INSTRUCTION_CURSOR_ADDRESS_LOW,
-	INSTRUCTION_CURSOR_ADDRESS_HIGH,
-	INSTRUCTION_DISPLAY_DATA_WRITE,
-	INSTRUCTION_DISPLAY_DATA_READ,
-	INSTRUCTION_CLEAR_BIT,
-	INSTRUCTION_SET_BIT
-};
-
-static const int CYCLES[] =
-{
-	4, 4, 4, 4, 4, -1, -1, -1, 4, 4, 4, 4, 6, 6, 36, 36
-};
-
-const int MODE_EXTERNAL_CG      = 0x01;
-const int MODE_GRAPHIC          = 0x02;
-const int MODE_CURSOR           = 0x04;
-const int MODE_BLINK            = 0x08;
-const int MODE_MASTER           = 0x10;
-const int MODE_DISPLAY_ON       = 0x20;
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// device type definition
 const device_type HD61830 = &device_creator<hd61830_device>;
+const device_type HD61830B = &device_creator<hd61830_device>;
 
 
 // default address map
@@ -71,6 +33,35 @@ ROM_START( hd61830 )
 	ROM_LOAD( "hd61830.bin", 0x000, 0x5c0, BAD_DUMP CRC(06a934da) SHA1(bf3f074db5dc92e6f530cb18d6c013563099a87d) ) // typed in from manual
 ROM_END
 
+
+//-------------------------------------------------
+//  device_rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *hd61830_device::device_rom_region() const
+{
+	return ROM_NAME(hd61830);
+}
+
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 0
+
+static const int CYCLES[] =
+{
+	4, 4, 4, 4, 4, -1, -1, -1, 4, 4, 4, 4, 6, 6, 36, 36
+};
+
+const int MODE_EXTERNAL_CG      = 0x01;
+const int MODE_GRAPHIC          = 0x02;
+const int MODE_CURSOR           = 0x04;
+const int MODE_BLINK            = 0x08;
+const int MODE_MASTER           = 0x10;
+const int MODE_DISPLAY_ON       = 0x20;
 
 
 
@@ -107,48 +98,18 @@ inline void hd61830_device::writebyte(offs_t address, UINT8 data)
 //  hd61830_device - constructor
 //-------------------------------------------------
 
-hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HD61830, "Hitachi HD61830", tag, owner, clock, "hd61830", __FILE__),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_bf(false),
-		m_cac(0),
-		m_blink(0),
-		m_cursor(0),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(hd61830)),
-		m_region_hd61830(*this, "hd61830")
+hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, HD61830, "Hitachi HD61830", tag, owner, clock, "hd61830", __FILE__),
+	device_memory_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
+	m_read_rd(*this),
+	m_bf(false),
+	m_cac(0),
+	m_blink(0),
+	m_cursor(0),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(hd61830)),
+	m_region_hd61830(*this, "hd61830")
 {
-}
-
-
-//-------------------------------------------------
-//  device_rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *hd61830_device::device_rom_region() const
-{
-	return ROM_NAME(hd61830);
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void hd61830_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const hd61830_interface *intf = reinterpret_cast<const hd61830_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<hd61830_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_rd_cb, 0, sizeof(m_in_rd_cb));
-	}
 }
 
 
@@ -162,7 +123,7 @@ void hd61830_device::device_start()
 	m_busy_timer = timer_alloc();
 
 	// resolve callbacks
-	m_in_rd_func.resolve(m_in_rd_cb, *this);
+	m_read_rd.resolve_safe(0);
 
 	// register for state saving
 	save_item(NAME(m_bf));
@@ -225,10 +186,10 @@ const address_space_config *hd61830_device::memory_space_config(address_spacenum
 void hd61830_device::set_busy_flag()
 {
 	// set busy flag
-	m_bf = true;
+	//m_bf = true; TODO figure out correct timing
 
 	// adjust busy timer
-	m_busy_timer->adjust(attotime::from_usec(CYCLES[m_ir]));
+	m_busy_timer->adjust(clocks_to_attotime(CYCLES[m_ir]));
 }
 
 
@@ -459,7 +420,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 			if (m_mcr & MODE_EXTERNAL_CG)
 			{
-				data = m_in_rd_func((cl << 12) | md);
+				data = m_read_rd((cl << 12) | md);
 			}
 			else
 			{

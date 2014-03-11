@@ -38,7 +38,9 @@ public:
 		m_bank_cartridge(*this, "cartridge"),
 		m_bank_audio_main(*this, "audio_main"),
 		m_upd4990a(*this, "upd4990a"),
-		m_save_ram(*this, "saveram") { }
+		m_save_ram(*this, "saveram"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	DECLARE_WRITE16_MEMBER(io_control_w);
 	DECLARE_READ16_MEMBER(memcard_r);
@@ -332,6 +334,9 @@ protected:
 	// MVS-specific devices
 	optional_device<upd4990a_old_device> m_upd4990a;
 	optional_shared_ptr<UINT16> m_save_ram;
+
+	required_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
 
 	// configuration
 	enum {NEOGEO_MVS, NEOGEO_AES, NEOGEO_CD} m_type;

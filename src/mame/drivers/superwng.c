@@ -38,7 +38,8 @@ public:
 		m_videoram_fg(*this, "videorafg"),
 		m_colorram_bg(*this, "colorrabg"),
 		m_colorram_fg(*this, "colorrafg"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") 
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -48,6 +49,7 @@ public:
 	required_shared_ptr<UINT8> m_colorram_bg;
 	required_shared_ptr<UINT8> m_colorram_fg;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	UINT8 m_tile_bank;
 	UINT8 m_sound_byte;

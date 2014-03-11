@@ -87,7 +87,8 @@ public:
 		m_g_ram(*this, "g_ram"),
 		m_cha_ram(*this, "cha_ram"),
 		m_dot_ram(*this, "dot_ram"),
-		m_power_ram(*this, "power_ram")
+		m_power_ram(*this, "power_ram"),
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -107,6 +108,8 @@ public:
 	required_shared_ptr<UINT16> m_cha_ram;
 	required_shared_ptr<UINT16> m_dot_ram;
 	required_shared_ptr<UINT8>  m_power_ram;
+	
+	required_device<palette_device> m_palette;
 
 	UINT16  *m_dma_ram;
 	UINT8   m_dma_cpu_bank;

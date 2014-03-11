@@ -34,7 +34,8 @@ public:
 		m_votrax(*this, "votrax"),
 		m_astrocade_sound1(*this, "astrocade1"),
 		m_videoram(*this, "videoram"),
-		m_protected_ram(*this, "protected_ram") { }
+		m_protected_ram(*this, "protected_ram"),
+		m_screen(*this, "screen") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
@@ -43,6 +44,7 @@ public:
 	optional_device<astrocade_device> m_astrocade_sound1;
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_protected_ram;
+	required_device<screen_device> m_screen;
 
 	UINT8 m_video_config;
 	UINT8 m_sparkle[4];

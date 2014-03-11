@@ -26,7 +26,8 @@ public:
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram"),
 		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{
 		m_coin_lockout = true;
 	}
@@ -37,6 +38,7 @@ public:
 	required_shared_ptr<UINT32> m_spriteram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	bool m_coin_lockout;
 	UINT16 m_coin_word;

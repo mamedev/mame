@@ -20,17 +20,17 @@
 #include "bus/rs232/rs232.h"
 #include "machine/terminal.h"
 #include "machine/ram.h"
-#include "machine/omti8621.h"
 #include "machine/sc499.h"
 #include "machine/3c505.h"
 #include "machine/6840ptm.h"
 #include "machine/n68681.h"
-#include "machine/pc_fdc.h"
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/mc146818.h"
 #include "machine/apollo_kbd.h"
 #include "machine/clock.h"
+#include "machine/isa.h"
+#include "machine/isa_cards.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -98,12 +98,9 @@ int apollo_instruction_hook(m68000_base_device *device, offs_t curpc);
 
 void apollo_set_cache_status_register(UINT8 mask, UINT8 data);
 
-void apollo_terminal_write(UINT8 data);
-
 /*----------- machine/apollo.c -----------*/
 
 #define APOLLO_CONF_TAG "conf"
-#define APOLLO_FDC_TAG  "fdc"
 #define APOLLO_DMA1_TAG "dma8237_1"
 #define APOLLO_DMA2_TAG "dma8237_2"
 #define APOLLO_KBD_TAG  "kbd"
@@ -114,8 +111,8 @@ void apollo_terminal_write(UINT8 data);
 #define APOLLO_SIO_TAG  "sio"
 #define APOLLO_SIO2_TAG "sio2"
 #define APOLLO_ETH_TAG  "3c505"
-#define APOLLO_WDC_TAG  "omti8621"
 #define APOLLO_CTAPE_TAG "ctape"
+#define APOLLO_ISA_TAG "isabus"
 
 class apollo_state : public driver_device
 {
@@ -125,14 +122,15 @@ public:
 			m_maincpu(*this, MAINCPU),
 			m_ctape(*this, APOLLO_CTAPE_TAG),
 			m_messram_ptr(*this, "messram"),
-			m_dma8237_1(*this, "dma8237_1"),
-			m_dma8237_2(*this, "dma8237_2"),
-			m_pic8259_master(*this, "pic8259_master"),
-			m_pic8259_slave(*this, "pic8259_slave"),
+			m_dma8237_1(*this, APOLLO_DMA1_TAG),
+			m_dma8237_2(*this, APOLLO_DMA2_TAG),
+			m_pic8259_master(*this, APOLLO_PIC1_TAG),
+			m_pic8259_slave(*this, APOLLO_PIC2_TAG),
 			m_ptm(*this, APOLLO_PTM_TAG),
 			m_sio(*this, APOLLO_SIO_TAG),
 			m_sio2(*this, APOLLO_SIO2_TAG),
-			m_rtc(*this, APOLLO_RTC_TAG)
+			m_rtc(*this, APOLLO_RTC_TAG),
+			m_isa(*this, APOLLO_ISA_TAG)
 			{ }
 
 	required_device<m68000_base_device> m_maincpu;
@@ -147,6 +145,7 @@ public:
 	required_device<duartn68681_device> m_sio;
 	optional_device<duartn68681_device> m_sio2;
 	required_device<mc146818_device> m_rtc;
+	required_device<isa16_device> m_isa;
 
 	DECLARE_WRITE16_MEMBER(apollo_csr_status_register_w);
 	DECLARE_READ16_MEMBER(apollo_csr_status_register_r);
@@ -185,8 +184,8 @@ public:
 	DECLARE_WRITE32_MEMBER(apollo_rom_w);
 	DECLARE_READ16_MEMBER(apollo_atbus_io_r);
 	DECLARE_WRITE16_MEMBER(apollo_atbus_io_w);
-	DECLARE_READ32_MEMBER(apollo_atbus_memory_r);
-	DECLARE_WRITE32_MEMBER(apollo_atbus_memory_w);
+	DECLARE_READ16_MEMBER(apollo_atbus_memory_r);
+	DECLARE_WRITE16_MEMBER(apollo_atbus_memory_w);
 	DECLARE_WRITE8_MEMBER(dn5500_memory_present_register_w);
 	DECLARE_READ8_MEMBER(dn5500_memory_present_register_r);
 	DECLARE_WRITE8_MEMBER(dn5500_11500_w);
@@ -208,9 +207,6 @@ public:
 	DECLARE_MACHINE_RESET(apollo);
 	DECLARE_MACHINE_START(apollo);
 
-	void fdc_interrupt(bool state);
-	void fdc_dma_drq(bool state);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	IRQ_CALLBACK_MEMBER(apollo_irq_acknowledge);
 	IRQ_CALLBACK_MEMBER(apollo_pic_acknowledge);
 	void apollo_bus_error();
@@ -220,8 +216,6 @@ public:
 	DECLARE_WRITE8_MEMBER( apollo_dma8237_ctape_dack_w );
 	DECLARE_READ8_MEMBER( apollo_dma8237_fdc_dack_r );
 	DECLARE_WRITE8_MEMBER( apollo_dma8237_fdc_dack_w );
-	DECLARE_READ8_MEMBER( apollo_dma8237_wdc_dack_r );
-	DECLARE_WRITE8_MEMBER( apollo_dma8237_wdc_dack_w );
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma8237_out_eop );
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma_1_hrq_changed );
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma_2_hrq_changed );
@@ -234,11 +228,37 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_timer_tick );
 	DECLARE_READ8_MEMBER( apollo_pic8259_get_slave_ack );
 
+	DECLARE_READ8_MEMBER(pc_dma8237_0_dack_r);
+	DECLARE_READ8_MEMBER(pc_dma8237_1_dack_r);
+	DECLARE_READ8_MEMBER(pc_dma8237_2_dack_r);
+	DECLARE_READ8_MEMBER(pc_dma8237_3_dack_r);
+	DECLARE_READ8_MEMBER(pc_dma8237_5_dack_r);
+	DECLARE_READ8_MEMBER(pc_dma8237_6_dack_r);
+	DECLARE_READ8_MEMBER(pc_dma8237_7_dack_r);
+	DECLARE_WRITE8_MEMBER(pc_dma8237_0_dack_w);
+	DECLARE_WRITE8_MEMBER(pc_dma8237_1_dack_w);
+	DECLARE_WRITE8_MEMBER(pc_dma8237_2_dack_w);
+	DECLARE_WRITE8_MEMBER(pc_dma8237_3_dack_w);
+	DECLARE_WRITE8_MEMBER(pc_dma8237_5_dack_w);
+	DECLARE_WRITE8_MEMBER(pc_dma8237_6_dack_w);
+	DECLARE_WRITE8_MEMBER(pc_dma8237_7_dack_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack4_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack5_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack6_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
+
 	void apollo_pic_set_irq_line(int irq, int state);
+	void select_dma_channel(int channel, bool state);
 
 private:
 	UINT32 ptm_counter;
 	UINT8 sio_output_data;
+	int m_dma_channel;
+	bool m_cur_eop;
 };
 
 MACHINE_CONFIG_EXTERN( apollo );

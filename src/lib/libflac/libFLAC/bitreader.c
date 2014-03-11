@@ -33,14 +33,13 @@
 #  include <config.h>
 #endif
 
-
 #include <stdlib.h> /* for malloc() */
 #include <string.h> /* for memcpy(), memset() */
 
 #include "private/bitmath.h"
 #include "private/bitreader.h"
 #include "private/crc.h"
-#include "flac/assert.h"
+#include "FLAC/assert.h"
 
 /* Things should be fastest when this matches the machine word size */
 /* WATCHOUT: if you change this you must also change the following #defines down to COUNT_ZERO_MSBS below to match */
@@ -295,13 +294,13 @@ FLAC__BitReader *FLAC__bitreader_new(void)
 	FLAC__BitReader *br = (FLAC__BitReader*)calloc(1, sizeof(FLAC__BitReader));
 
 	/* calloc() implies:
-	    memset(br, 0, sizeof(FLAC__BitReader));
-	    br->buffer = 0;
-	    br->capacity = 0;
-	    br->words = br->bytes = 0;
-	    br->consumed_words = br->consumed_bits = 0;
-	    br->read_callback = 0;
-	    br->client_data = 0;
+		memset(br, 0, sizeof(FLAC__BitReader));
+		br->buffer = 0;
+		br->capacity = 0;
+		br->words = br->bytes = 0;
+		br->consumed_words = br->consumed_bits = 0;
+		br->read_callback = 0;
+		br->client_data = 0;
 	*/
 	return br;
 }
@@ -829,6 +828,7 @@ FLAC__bool FLAC__bitreader_read_rice_signed_block(FLAC__BitReader *br, int vals[
 	cwords = br->consumed_words;
 
 	while(1) {
+
 		/* read unary part */
 		while(1) {
 			while(cwords < br->words) { /* if we've not consumed up to a partial tail word... */
@@ -1011,6 +1011,7 @@ break2:
 	ucbits = (br->words-cwords)*FLAC__BITS_PER_WORD + br->bytes*8 - cbits;
 
 	while(1) {
+
 		/* read unary part */
 		while(1) {
 			while(cwords < br->words) { /* if we've not consumed up to a partial tail word... */

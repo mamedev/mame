@@ -96,12 +96,8 @@ void palette_device::static_enable_hilights(device_t &device)
 
 void palette_device::set_indirect_color(int index, rgb_t rgb)
 {
-	// if we have a static size, make sure we're in range
-	assert(m_indirect_entries == 0 || index < m_indirect_entries);
-
-	// otherwise, ensure the array is expanded enough to handle the index
-	while (m_indirect_colors.count() <= index)
-		m_indirect_colors.append(rgb_t(0));
+	// make sure we are in range
+	assert(index < m_indirect_entries);
 
 	// alpha doesn't matter
 	rgb.set_a(255);
@@ -125,15 +121,12 @@ void palette_device::set_indirect_color(int index, rgb_t rgb)
 
 void palette_device::set_pen_indirect(pen_t pen, UINT16 index)
 {
-	assert(pen < m_entries);
+	// make sure we are in range
+	assert(pen < m_entries && index < m_indirect_entries);
 
-	// allocate the array if needed
-	m_indirect_pens.resize(m_entries);
 	m_indirect_pens[pen] = index;
 
-	// permit drivers to configure the pens prior to the colors if they desire
-	if (index < m_indirect_colors.count())
-		m_palette->entry_set_color(pen, m_indirect_colors[index]);
+	m_palette->entry_set_color(pen, m_indirect_colors[index]);
 }
 
 
@@ -312,7 +305,7 @@ inline void palette_device::update_for_write(offs_t byte_offset, int bytes_modif
 		UINT32 data = m_paletteram.read(base + index);
 		if (m_paletteram_ext.base() != NULL)
 			data |= m_paletteram_ext.read(base + index) << (8 * bpe);
-		set_pen_color(base + index, m_raw_to_rgb(data));
+		m_palette->entry_set_color(base + index, m_raw_to_rgb(data));
 	}
 }
 
@@ -337,6 +330,21 @@ WRITE32_MEMBER(palette_device::write)
 {
 	m_paletteram.write32(offset, data, mem_mask);
 	update_for_write(offset * 4, 4);
+}
+
+READ8_MEMBER(palette_device::read)
+{
+	return m_paletteram.read8(offset);
+}
+
+READ16_MEMBER(palette_device::read)
+{
+	return m_paletteram.read16(offset);
+}
+
+READ32_MEMBER(palette_device::read)
+{
+	return m_paletteram.read32(offset);
 }
 
 
@@ -419,7 +427,10 @@ void palette_device::device_start()
 		{
 			m_indirect_colors.resize(m_indirect_entries);
 			for (int color = 0; color < m_indirect_entries; color++)
-				m_indirect_colors[color] = rgb_t(0);
+			{
+				// alpha = 0 ensures change is detected the first time set_indirect_color() is called
+				m_indirect_colors[color] = rgb_t(0, 0, 0, 0);
+			}
 
 			m_indirect_pens.resize(m_entries);
 			for (int pen = 0; pen < m_entries; pen++)
@@ -427,7 +438,7 @@ void palette_device::device_start()
 		}
 	}
 
-	// call the initialization helper if present (this will expand the indirection tables to full size)
+	// call the initialization helper if present
 	if (!m_init.isnull())
 		m_init(*this);
 
@@ -437,7 +448,7 @@ void palette_device::device_start()
 	save_item(NAME(m_save_pen));
 	save_item(NAME(m_save_contrast));
 	
-	// save indirection tables if explicitly requested
+	// save indirection tables if we have them
 	if (m_indirect_entries > 0)
 	{
 		save_item(NAME(m_indirect_colors));

@@ -25,7 +25,8 @@ public:
 		m_oki2(*this, "oki2"),
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_decocomn(*this, "deco_common"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	optional_device<deco104_device> m_deco104;
 
@@ -45,6 +46,7 @@ public:
 	optional_device<deco16ic_device> m_deco_tilegen1;
 	optional_device<decocomn_device> m_decocomn;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_READ16_MEMBER(pckgaldx_unknown_r);
 	DECLARE_READ16_MEMBER(pckgaldx_protection_r);

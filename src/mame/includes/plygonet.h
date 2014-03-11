@@ -21,7 +21,8 @@ public:
 		m_shared_ram(*this, "shared_ram"),
 		m_dsp56k_p_mirror(*this, "dsp56k_p_mirror"),
 		m_dsp56k_p_8000(*this, "dsp56k_p_8000"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -36,6 +37,7 @@ public:
 	required_shared_ptr<UINT16> m_dsp56k_p_mirror;
 	required_shared_ptr<UINT16> m_dsp56k_p_8000;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	ioport_port *m_inputs[4];
 	UINT8 m_sys0;
 	UINT8 m_sys1;

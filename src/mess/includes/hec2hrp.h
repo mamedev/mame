@@ -79,7 +79,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_disc2cpu(*this, "disc2cpu"),
 		m_cassette(*this, "cassette"),
-		m_sn(*this, "sn76477") { }
+		m_sn(*this, "sn76477"),
+		m_palette(*this, "palette")  { }
 
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_hector_videoram;
@@ -151,6 +152,7 @@ public:
 	optional_device<cpu_device> m_disc2cpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<sn76477_device> m_sn;
+	required_device<palette_device> m_palette;
 	int isHectorWithDisc2();
 	int isHectorWithMiniDisc();
 	int isHectorHR();

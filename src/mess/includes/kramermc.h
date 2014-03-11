@@ -15,7 +15,8 @@ public:
 	kramermc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	UINT8 m_key_row;
 	DECLARE_DRIVER_INIT(kramermc);
@@ -27,6 +28,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kramermc_port_a_w);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

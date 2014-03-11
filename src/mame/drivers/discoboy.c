@@ -54,7 +54,8 @@ public:
 		m_audiocpu(*this, "audiocpu") ,
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	/* video-related */
 	UINT8    m_ram_bank;
@@ -97,6 +98,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

@@ -16,7 +16,9 @@ public:
 			m_peny1port(*this, "PEN_Y_P1"),
 			m_penx2port(*this, "PEN_X_P2"),
 			m_peny2port(*this, "PEN_Y_P2"),
-			m_sndbank(*this, "sound_bank")
+			m_sndbank(*this, "sound_bank"),
+			m_screen(*this, "screen"),
+			m_palette(*this, "palette")
 		{ }
 
 	int m_coin_counter_bit;
@@ -36,7 +38,8 @@ public:
 	optional_ioport m_penx2port;
 	optional_ioport m_peny2port;
 	optional_memory_bank m_sndbank;
-
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	DECLARE_READ32_MEMBER(eolith_custom_r);
 	DECLARE_WRITE32_MEMBER(systemcontrol_w);

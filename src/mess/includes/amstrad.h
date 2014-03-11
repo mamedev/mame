@@ -151,7 +151,9 @@ public:
 		m_io_analog1(*this, "analog1"),
 		m_io_analog2(*this, "analog2"),
 		m_io_analog3(*this, "analog3"),
-		m_io_analog4(*this, "analog4") { }
+		m_io_analog4(*this, "analog4"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_device<z80_device> m_maincpu;
 	required_device<ay8910_device> m_ay;
@@ -286,7 +288,9 @@ protected:
 	optional_ioport m_io_analog2;
 	optional_ioport m_io_analog3;
 	optional_ioport m_io_analog4;
-
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
 	void amstrad_init_lookups();
 	void amstrad_vh_update_mode();
 	void amstrad_plus_dma_parse(int channel);

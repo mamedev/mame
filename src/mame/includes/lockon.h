@@ -37,7 +37,9 @@ public:
 		m_f2203_1r(*this, "f2203.1r"),
 		m_f2203_2r(*this, "f2203.2r"),
 		m_f2203_3r(*this, "f2203.3r"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_char_ram;
@@ -88,6 +90,8 @@ public:
 	required_device<filter_volume_device> m_f2203_2r;
 	required_device<filter_volume_device> m_f2203_3r;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_READ16_MEMBER(lockon_crtc_r);
 	DECLARE_WRITE16_MEMBER(lockon_crtc_w);

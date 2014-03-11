@@ -16,7 +16,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_vlm(*this, "vlm"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	int m_rp5c01_mode_sel;
 	int m_rp5c01_mem[16*4];
@@ -33,6 +34,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<vlm5030_device> m_vlm;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	tilemap_t *m_bg_top_tilemap;
 	tilemap_t *m_bg_bot_tilemap;

@@ -17,12 +17,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ay1(*this, "ay1"),
 		m_vector(*this, "vector"),
-		m_rambase(*this, "rambase") { }
+		m_rambase(*this, "rambase"),
+		m_screen(*this, "screen") { }
 
 	required_device<ccpu_cpu_device> m_maincpu;
 	optional_device<ay8910_device> m_ay1;
 	required_device<vector_device> m_vector;
 	optional_shared_ptr<UINT16> m_rambase;
+	required_device<screen_device> m_screen;
 
 	UINT8 m_sound_control;
 	void (*m_sound_handler)(running_machine &,UINT8 sound_val, UINT8 bits_changed);

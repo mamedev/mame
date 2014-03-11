@@ -26,10 +26,12 @@ class a7000_state : public driver_device
 public:
 	a7000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette") 
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	DECLARE_READ32_MEMBER(a7000_iomd_r);
 	DECLARE_WRITE32_MEMBER(a7000_iomd_w);
 	DECLARE_WRITE32_MEMBER(a7000_vidc20_w);

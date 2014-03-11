@@ -662,18 +662,13 @@ PALETTE_INIT_MEMBER(portfolio_state, portfolio)
 //  HD61830_INTERFACE( lcdc_intf )
 //-------------------------------------------------
 
-READ8_MEMBER(portfolio_state::hd61830_rd_r)
+READ8_MEMBER( portfolio_state::hd61830_rd_r )
 {
 	UINT16 address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);
 	UINT8 data = m_char_rom->base()[address];
 
 	return data;
 }
-
-static HD61830_INTERFACE( lcdc_intf )
-{
-	DEVCB_DRIVER_MEMBER(portfolio_state,hd61830_rd_r)
-};
 
 
 //-------------------------------------------------
@@ -856,7 +851,8 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", portfolio)
 
-	MCFG_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
+	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL_4_9152MHz/2/2)
+	MCFG_HD61830_RD_CALLBACK(READ8(portfolio_state, hd61830_rd_r))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

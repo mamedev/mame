@@ -198,7 +198,9 @@ public:
 	segac2_state(const machine_config &mconfig, device_type type, const char *tag)
 	: md_base_state(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
-		m_upd7759(*this, "upd") { }
+		m_upd7759(*this, "upd"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	// for Print Club only
 	int m_cam_data;
@@ -277,6 +279,9 @@ public:
 	DECLARE_READ16_MEMBER(ichirjbl_prot_r);
 	DECLARE_WRITE_LINE_MEMBER(segac2_irq2_interrupt);
 	optional_device<upd7759_device> m_upd7759;
+	optional_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
 };
 
 

@@ -663,6 +663,7 @@ NETLIB_START(solver)
     register_param("CONVERG", m_convergence, 0.3);
     register_param("RESCHED_LOOPS", m_resched_loops, 35);
     register_param("PARALLEL", m_parallel, 0);
+    register_param("GMIN", m_gmin, NETLIST_GMIN_DEFAULT);
 
     // internal staff
 

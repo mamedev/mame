@@ -23,7 +23,7 @@
     Diet Family                     (c) 2001 SemiCom
     Final Godori                    (c) 2001 SemiCom            (version 2.20.5915)
     Wivern Wings / Wyvern Wings     (c) 2001 SemiCom
-    Mr. Kicker                      (c) 2001 SemiCom [1]
+    Mr. Kicker                      (c) 2001 SemiCom
     Toy Land Adventure              (c) 2001 SemiCom
     Age Of Heroes - Silkroad 2      (c) 2001 Unico              (v0.63 - 2001/02/07)
     Boong-Ga Boong-Ga (Spank 'em)   (c) 2001 Taff System
@@ -32,9 +32,6 @@
  - dquizgo2: bugged video test
 
  Notes:
- [1]    Mr. Kicker game code crashes if the eeprom values are empty, because it replaces
-        the SP register with a bogus value at PC = $18D0 before crashing. It could be an
-        original game bug or a hyperstone core bug. Also happens with High Score update.
 
  Mr Kicker is also known to exist (not dumped) on the F-E1-16-010 PCB that
    Semicom also used for Toy Land Adventure & SemiComDate Quiz Go Go Episode 2 game.
@@ -56,6 +53,7 @@
 TODO:
 - boonggab: simulate photo sensors with a "stroke strength"
 - boonggab: what are sensors bit used for? are they used in the japanese version?
+- wyvernsg: fails a protection check after ~1 hour of play?
 
 *********************************************************************/
 
@@ -83,7 +81,8 @@ public:
 			m_oki(*this, "oki"),
 			m_oki2(*this, "oki_2"),
 			m_eeprom(*this, "eeprom"),
-			m_gfxdecode(*this, "gfxdecode") {
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette")  {
 			m_has_extra_gfx = 0;
 		}
 
@@ -98,6 +97,7 @@ public:
 	optional_device<okim6295_device> m_oki2;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	int m_flip_bit;
 	int m_flipscreen;
@@ -113,7 +113,6 @@ public:
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
 	DECLARE_WRITE32_MEMBER(flipscreen32_w);
 	DECLARE_WRITE16_MEMBER(jmpbreak_flipscreen_w);
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ32_MEMBER(wyvernwg_prot_r);
 	DECLARE_WRITE32_MEMBER(wyvernwg_prot_w);
 	DECLARE_READ32_MEMBER(finalgdr_prot_r);
@@ -245,18 +244,6 @@ WRITE16_MEMBER(vamphalf_state::jmpbreak_flipscreen_w)
 }
 
 
-WRITE32_MEMBER(vamphalf_state::paletteram32_w)
-{
-	UINT16 paldata;
-
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-
-	paldata = m_generic_paletteram_32[offset] & 0xffff;
-	m_palette->set_pen_color(offset*2 + 1, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
-
-	paldata = (m_generic_paletteram_32[offset] >> 16) & 0xffff;
-	m_palette->set_pen_color(offset*2 + 0, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
-}
 
 READ32_MEMBER(vamphalf_state::wyvernwg_prot_r)
 {
@@ -419,7 +406,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( common_32bit_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("wram32")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -535,7 +522,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aoh_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("wram32")
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("tiles32")
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x80210000, 0x80210003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x80220000, 0x80220003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("user1",0)

@@ -56,7 +56,9 @@ public:
 		m_bg4_ram(*this, "bg4_ram"),
 		m_fg_ram(*this, "fg_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg1_ram;
@@ -100,6 +102,8 @@ public:
 	void show_out(  );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;	
 };
 
 

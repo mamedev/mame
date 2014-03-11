@@ -74,11 +74,11 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	UINT16 m_x;
 	required_shared_ptr<UINT32> m_spriteram;
-	DECLARE_WRITE32_MEMBER(fs_paletteram_w);
 	DECLARE_READ32_MEMBER(in0_r);
 	DECLARE_WRITE32_MEMBER(output_w);
 	DECLARE_DRIVER_INIT(feversoc);
@@ -88,6 +88,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 
@@ -126,23 +127,7 @@ UINT32 feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE32_MEMBER(feversoc_state::fs_paletteram_w)
-{
-	int r,g,b;
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	r = ((m_generic_paletteram_32[offset] & 0x001f0000)>>16) << 3;
-	g = ((m_generic_paletteram_32[offset] & 0x03e00000)>>16) >> 2;
-	b = ((m_generic_paletteram_32[offset] & 0x7c000000)>>16) >> 7;
-
-	m_palette->set_pen_color(offset*2+0,rgb_t(r,g,b));
-
-	r = (m_generic_paletteram_32[offset] & 0x001f) << 3;
-	g = (m_generic_paletteram_32[offset] & 0x03e0) >> 2;
-	b = (m_generic_paletteram_32[offset] & 0x7c00) >> 7;
-
-	m_palette->set_pen_color(offset*2+1,rgb_t(r,g,b));
-}
 
 READ32_MEMBER(feversoc_state::in0_r)
 {
@@ -183,7 +168,7 @@ static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff0000)
 //  AM_RANGE(0x06010000, 0x06017fff) AM_RAM //contains RISE11 keys and other related stuff.
 //  AM_RANGE(0x06010060, 0x06010063) //bit 0 almost certainly irq ack
-	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_WRITE(fs_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_DEVWRITE("palette",  palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static const gfx_layout spi_spritelayout =
@@ -276,6 +261,7 @@ static MACHINE_CONFIG_START( feversoc, feversoc_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", feversoc)
 	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 
 	/* sound hardware */

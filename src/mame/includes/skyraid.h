@@ -10,7 +10,8 @@ public:
 		m_obj_ram(*this, "obj_ram"),
 		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	int m_analog_range;
 	int m_analog_offset;
@@ -37,6 +38,7 @@ public:
 	void draw_trapezoid(bitmap_ind16& dst, bitmap_ind16& src);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 /*----------- defined in audio/skyraid.c -----------*/

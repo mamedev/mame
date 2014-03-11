@@ -218,7 +218,9 @@ public:
 			m_videoram(*this, "videoram"),
 			m_charram(*this, "charram"),
 			m_spriteram(*this, "spriteram"),
-			m_gfxdecode(*this, "gfxdecode")
+			m_gfxdecode(*this, "gfxdecode"),
+			m_screen(*this, "screen"),
+			m_palette(*this, "palette")
 	{ }
 
 	// devices
@@ -233,7 +235,9 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	
 	required_device<gfxdecode_device> m_gfxdecode;
-
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
 	UINT8 m_knocker_prev;
 	UINT8 m_joystick_select;
 	UINT8 m_track[2];

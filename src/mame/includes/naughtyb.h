@@ -11,7 +11,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_naughtyb_custom(*this, "naughtyb_custom"),
 		m_popflame_custom(*this, "popflame_custom"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_videoram2;
@@ -20,6 +22,9 @@ public:
 	optional_device<naughtyb_sound_device> m_naughtyb_custom;
 	optional_device<popflame_sound_device> m_popflame_custom;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
 	
 	UINT8 m_popflame_prot_seed;
 	int m_r_index;

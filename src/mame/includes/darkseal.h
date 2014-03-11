@@ -15,7 +15,8 @@ public:
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
 		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_palette(*this, "palette") { }
 
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
@@ -39,4 +40,5 @@ public:
 	void update_24bitcol(int offset);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<palette_device> m_palette;
 };

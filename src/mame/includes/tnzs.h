@@ -30,7 +30,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_seta001(*this, "spritegen"),
 		m_dac(*this, "dac"),
-		m_samples(*this, "samples") { }
+		m_samples(*this, "samples"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
@@ -119,4 +120,5 @@ public:
 	optional_device<seta001_device> m_seta001;
 	optional_device<dac_device> m_dac;
 	optional_device<samples_device> m_samples;
+	required_device<palette_device> m_palette;
 };

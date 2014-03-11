@@ -34,7 +34,9 @@ public:
 		m_io_paddle(*this, "PADDLE"),
 		m_io_trackx(*this, "TRACKX"),
 		m_io_tracky(*this, "TRACKY"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -178,4 +180,6 @@ protected:
 	optional_ioport m_io_trackx;
 	optional_ioport m_io_tracky;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;	
 };

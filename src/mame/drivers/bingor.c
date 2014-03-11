@@ -449,7 +449,8 @@ public:
 	bingor_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_blit_ram(*this, "blit_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<UINT16> m_blit_ram;
 	DECLARE_READ16_MEMBER(test_r);
@@ -459,6 +460,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(unk_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 

@@ -12,7 +12,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_msm(*this, "msm"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	UINT8 *        m_videoram;
@@ -42,4 +43,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pcm_w);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };

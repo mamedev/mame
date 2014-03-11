@@ -87,7 +87,8 @@ public:
 		m_tms(*this, "tms"),
 		m_videoram(*this, "videoram"),
 		m_question_offset(*this, "question_offset"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") 
 			{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -96,6 +97,7 @@ public:
 	tilemap_t *m_tilemap;
 	required_shared_ptr<UINT8> m_question_offset;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	UINT8 m_question_offset_low;
 	UINT8 m_question_offset_mid;
 	UINT8 m_question_offset_high;

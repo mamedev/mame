@@ -16,7 +16,9 @@ public:
 		m_vram_1ras(*this, "vram_1ras"),
 		m_maincpu(*this, "maincpu"),
 		m_tmp68301(*this, "tmp68301"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_vram_0;
@@ -57,4 +59,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 };

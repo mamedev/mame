@@ -33,8 +33,6 @@
 #  include <config.h>
 #endif
 
-
-
 #include <stdlib.h> /* for malloc() */
 #include <string.h> /* for memcpy(), memset() */
 
@@ -43,7 +41,7 @@
 #endif
 #include "private/bitwriter.h"
 #include "private/crc.h"
-#include "flac/assert.h"
+#include "FLAC/assert.h"
 #include "share/alloc.h"
 
 /* Things should be fastest when this matches the machine word size */

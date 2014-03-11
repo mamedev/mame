@@ -306,7 +306,8 @@ public:
 	dwarfd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") 
 		{ }
 
 	/* video-related */
@@ -335,6 +336,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_WRITE8_MEMBER(i8275_preg_w);
 	DECLARE_READ8_MEMBER(i8275_preg_r);

@@ -8,7 +8,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_master(*this,"master"),
 		m_slave(*this,"slave"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),		
+		m_palette(*this, "palette") { }
 
 	UINT8 m_s_port3;
 	UINT8 m_port7;
@@ -21,6 +22,7 @@ public:
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_WRITE8_MEMBER(sprcros2_m_port7_w);
 	DECLARE_WRITE8_MEMBER(sprcros2_s_port3_w);

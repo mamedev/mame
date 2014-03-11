@@ -36,7 +36,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	tilemap_t *m_tilemap;
 	required_shared_ptr<UINT8> m_videoram;
@@ -79,6 +80,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)

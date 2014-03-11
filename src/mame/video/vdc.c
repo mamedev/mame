@@ -440,14 +440,14 @@ SCREEN_UPDATE_IND16( pce )
 
 static void draw_black_line(running_machine &machine, int line)
 {
-	driver_device *state = machine.driver_data<driver_device>();
+	palette_device *m_palette=machine.first_screen()->palette();
 	int i;
 
 	/* our line buffer */
 	UINT16 *line_buffer = &vce.bmp->pix16(line);
 
 	for( i=0; i< VDC_WPF; i++ )
-		line_buffer[i] = state->m_palette->black_pen();
+		line_buffer[i] = m_palette->black_pen();
 }
 
 static void draw_overscan_line(int line)

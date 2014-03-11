@@ -136,13 +136,15 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
-		m_vcu(*this,"vcu")
+		m_vcu(*this,"vcu"),
+		m_screen(*this, "screen")
 		{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<mb_vcu_device> m_vcu;
+	required_device<screen_device> m_screen;
 
 	/* video-related */
 	bitmap_ind16 m_tmpbitmaps[4];

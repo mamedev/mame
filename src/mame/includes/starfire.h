@@ -27,7 +27,8 @@ public:
 		m_starfire_colorram(*this, "colorram"),
 		m_starfire_videoram(*this, "videoram"),
 		m_samples(*this, "samples"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen") { }
 
 	required_shared_ptr<UINT8> m_starfire_colorram;
 	required_shared_ptr<UINT8> m_starfire_videoram;
@@ -64,4 +65,5 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	void get_pens(pen_t *pens);
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 };

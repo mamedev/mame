@@ -80,7 +80,8 @@ public:
 		m_dmaram(*this, "dmaram"),
 		m_video_regs(*this, "video_regs"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	UINT16* m_tileram;
 	required_shared_ptr<UINT16> m_sprram;
@@ -112,6 +113,7 @@ public:
 	UINT32 process(UINT8 b,UINT32 dst_offset);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 #define VERBOSE 0

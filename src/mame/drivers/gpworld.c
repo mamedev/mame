@@ -59,7 +59,8 @@ public:
 		m_palette_ram(*this, "palette_ram"),
 		m_tile_ram(*this, "tile_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	UINT8 m_nmi_enable;
 	UINT8 m_start_lamp;
@@ -85,6 +86,7 @@ public:
 	void gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

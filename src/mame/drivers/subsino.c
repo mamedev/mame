@@ -249,7 +249,8 @@ public:
 		m_reel3_ram(*this, "reel3_ram"),
 		m_stisub_out_c(*this, "stisub_out_c"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") {
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") {
 	}
 
 	required_shared_ptr<UINT8> m_colorram;
@@ -326,6 +327,7 @@ public:
 	virtual void machine_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 void subsino_state::machine_start()

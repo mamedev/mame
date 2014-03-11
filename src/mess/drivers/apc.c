@@ -82,7 +82,8 @@ public:
 		m_dmac(*this, "i8237"),
 		m_pit(*this, "pit8253"),
 		m_video_ram_1(*this, "video_ram_1"),
-		m_video_ram_2(*this, "video_ram_2")
+		m_video_ram_2(*this, "video_ram_2"),
+		m_palette(*this, "palette") 
 	{ }
 
 	// devices
@@ -100,6 +101,8 @@ public:
 
 	required_shared_ptr<UINT8> m_video_ram_1;
 	required_shared_ptr<UINT8> m_video_ram_2;
+	
+	required_device<palette_device> m_palette;
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

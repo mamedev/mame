@@ -190,7 +190,8 @@ public:
 		m_k001604(*this, "k001604"),
 		m_k056800(*this, "k056800"),
 		m_k056832(*this, "k056832"),
-		m_workram(*this, "workram") { }
+		m_workram(*this, "workram"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -199,6 +200,7 @@ public:
 	required_device<k056800_device> m_k056800;
 	optional_device<k056832_device> m_k056832;
 	optional_shared_ptr<UINT32> m_workram;
+	required_device<palette_device> m_palette;
 
 	UINT32 *m_sharc_dataram;
 	UINT8 m_led_reg0;

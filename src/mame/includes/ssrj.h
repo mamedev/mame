@@ -9,7 +9,8 @@ public:
 		m_vram4(*this, "vram4"),
 		m_scrollram(*this, "scrollram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	int m_oldport;
 	tilemap_t *m_tilemap1;
@@ -36,4 +37,5 @@ public:
 	void draw_objects(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };

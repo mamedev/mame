@@ -19,7 +19,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_upd7759(*this, "upd"),
 		m_msm5205(*this, "msm5205"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	UINT8 *    m_videoram;
@@ -56,6 +57,7 @@ public:
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<msm5205_device> m_msm5205;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_WRITE8_MEMBER(combatsc_vreg_w);
 	DECLARE_WRITE8_MEMBER(combatscb_sh_irqtrigger_w);

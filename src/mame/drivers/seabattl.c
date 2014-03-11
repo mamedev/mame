@@ -54,7 +54,9 @@ public:
 		m_s2636(*this, "s2636"),
 		m_waveenable(false),
 		m_collision(0),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -96,6 +98,8 @@ public:
 	bool m_waveenable;
 	UINT8 m_collision;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;	
 };
 
 
@@ -475,48 +479,6 @@ static const s2636_interface s2636_config =
 	//"s2636snd"
 };
 
-static DM9368_INTERFACE( digit_score_thousand_intf )
-{
-	0,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static DM9368_INTERFACE( digit_score_hundred_intf )
-{
-	1,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static DM9368_INTERFACE( digit_score_half_a_score_intf )
-{
-	2,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static DM9368_INTERFACE( digit_score_unity_intf )
-{
-	3,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static DM9368_INTERFACE( digit_time_half_a_score_intf )
-{
-	4,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static DM9368_INTERFACE( digit_time_unity_intf )
-{
-	5,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( seabattl, seabattl_state )
 
 	/* basic machine hardware */
@@ -528,12 +490,18 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 	MCFG_S2636_ADD("s2636", s2636_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_DM9368_ADD("sc_thousand", digit_score_thousand_intf)
-	MCFG_DM9368_ADD("sc_hundred", digit_score_hundred_intf)
-	MCFG_DM9368_ADD("sc_half", digit_score_half_a_score_intf)
-	MCFG_DM9368_ADD("sc_unity", digit_score_unity_intf)
-	MCFG_DM9368_ADD("tm_half", digit_time_half_a_score_intf)
-	MCFG_DM9368_ADD("tm_unity", digit_time_unity_intf)
+	MCFG_DEVICE_ADD("sc_thousand", DM9368, 0)
+	MCFG_OUTPUT_INDEX(0)
+	MCFG_DEVICE_ADD("sc_hundred", DM9368, 0)
+	MCFG_OUTPUT_INDEX(1)
+	MCFG_DEVICE_ADD("sc_half", DM9368, 0)
+	MCFG_OUTPUT_INDEX(2)
+	MCFG_DEVICE_ADD("sc_unity", DM9368, 0)
+	MCFG_OUTPUT_INDEX(3)
+	MCFG_DEVICE_ADD("tm_half", DM9368, 0)
+	MCFG_OUTPUT_INDEX(4)
+	MCFG_DEVICE_ADD("tm_unity", DM9368, 0)
+	MCFG_OUTPUT_INDEX(5)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)

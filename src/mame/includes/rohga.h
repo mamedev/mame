@@ -33,7 +33,8 @@ public:
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
 		m_pf4_rowscroll(*this, "pf4_rowscroll"),
 		m_sprgen1(*this, "spritegen1"),
-		m_sprgen2(*this, "spritegen2")
+		m_sprgen2(*this, "spritegen2"),
+		m_palette(*this, "palette")
 	{ }
 
 	/* devices */
@@ -57,6 +58,8 @@ public:
 
 	optional_device<decospr_device> m_sprgen1;
 	optional_device<decospr_device> m_sprgen2;
+	
+	required_device<palette_device> m_palette;
 
 	DECLARE_READ16_MEMBER(rohga_irq_ack_r);
 	DECLARE_WRITE16_MEMBER(wizdfire_irq_ack_w);

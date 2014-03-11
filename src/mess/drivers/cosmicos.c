@@ -509,13 +509,6 @@ static const cassette_interface cosmicos_cassette_interface =
 	NULL
 };
 
-static DM9368_INTERFACE( led_intf )
-{
-	0,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
@@ -533,7 +526,7 @@ static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT( layout_cosmicos )
-	MCFG_DM9368_ADD(DM9368_TAG, led_intf)
+	MCFG_DEVICE_ADD(DM9368_TAG, DM9368, 0)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("digit", cosmicos_state, digit_tick, attotime::from_hz(100))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("interrupt", cosmicos_state, int_tick, attotime::from_hz(1000))
 

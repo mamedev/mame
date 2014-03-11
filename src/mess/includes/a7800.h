@@ -34,7 +34,8 @@ public:
 		m_io_vblank(*this, "vblank"),
 		m_io_console_buttons(*this, "console_buttons"),
 		m_bank10(NULL),
-		m_bank11(NULL) { }
+		m_bank11(NULL),
+		m_screen(*this, "screen") { }
 
 	int m_lines;
 	int m_ispal;
@@ -113,6 +114,7 @@ protected:
 	required_ioport m_io_console_buttons;
 	memory_bank *m_bank10;
 	memory_bank *m_bank11;
+	required_device<screen_device> m_screen;	
 
 	void maria_draw_scanline();
 	int is_holey(unsigned int addr);

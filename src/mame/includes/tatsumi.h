@@ -29,7 +29,8 @@ public:
 		m_subcpu(*this, "sub"),
 		m_subcpu2(*this, "sub2"),
 		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	optional_shared_ptr<UINT16> m_videoram;
 	optional_shared_ptr<UINT16> m_cyclwarr_cpua_ram;
@@ -142,6 +143,7 @@ public:
 	optional_device<cpu_device> m_subcpu2;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 /*----------- defined in machine/tatsumi.c -----------*/

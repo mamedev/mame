@@ -20,7 +20,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k056800(*this, "k056800"),
-		m_workram(*this, "workram") { }
+		m_workram(*this, "workram"),
+		m_palette(*this, "palette") { }
 
 	static const UINT32 VRAM_PAGES      = 2;
 	static const UINT32 VRAM_PAGE_BYTES = 512 * 1024;
@@ -29,10 +30,10 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k056800_device> m_k056800;
 	required_shared_ptr<UINT32> m_workram;
+	required_device<palette_device> m_palette;
 
 	DECLARE_READ32_MEMBER(vram_r);
 	DECLARE_WRITE32_MEMBER(vram_w);
-	DECLARE_WRITE32_MEMBER(palette_w);
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
 	DECLARE_WRITE32_MEMBER(int_ack_w);
@@ -73,16 +74,6 @@ UINT32 ultrsprt_state::screen_update_ultrsprt(screen_device &screen, bitmap_ind1
 	}
 
 	return 0;
-}
-
-
-WRITE32_MEMBER(ultrsprt_state::palette_w)
-{
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	data = m_generic_paletteram_32[offset];
-
-	m_palette->set_pen_color((offset*2)+0, rgb_t(pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16)));
-	m_palette->set_pen_color((offset*2)+1, rgb_t(pal5bit(data >> 10), pal5bit(data >>  5), pal5bit(data >>  0)));
 }
 
 
@@ -144,7 +135,7 @@ static ADDRESS_MAP_START( ultrsprt_map, AS_PROGRAM, 32, ultrsprt_state )
 	AM_RANGE(0x700000c0, 0x700000cf) AM_WRITENOP // Written following DMA interrupt - unused int ack?
 	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE(int_ack_w)
 	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_DEVWRITE("palette",  palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x00600000) AM_ROM AM_REGION("program", 0)
 ADDRESS_MAP_END
 
@@ -240,6 +231,7 @@ static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ultrsprt_state, screen_update_ultrsprt)
 
 	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
 	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)

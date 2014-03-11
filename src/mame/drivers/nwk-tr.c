@@ -237,7 +237,8 @@ public:
 		m_dsp(*this, "dsp"),
 		m_k056800(*this, "k056800"),
 		m_k001604(*this, "k001604"),
-		m_adc12138(*this, "adc12138") { }
+		m_adc12138(*this, "adc12138"),
+		m_palette(*this, "palette") { }
 
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
@@ -251,6 +252,7 @@ public:
 	required_device<k056800_device> m_k056800;
 	required_device<k001604_device> m_k001604;
 	required_device<adc12138_device> m_adc12138;
+	required_device<palette_device> m_palette;
 	emu_timer *m_sound_irq_timer;
 	int m_fpga_uploaded;
 	int m_lanc2_ram_r;

@@ -396,7 +396,7 @@ UINT32 taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 &b
 UINT32 taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
+	const pen_t *palette = m_palette->pens();
 	UINT8 video_control = m_tc0180vcu->get_videoctrl(space, 0);
 	int x, y;
 

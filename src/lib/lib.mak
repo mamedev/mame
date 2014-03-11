@@ -181,6 +181,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/sc3000_bit.o  \
 	$(LIBOBJ)/formats/sf7000_dsk.o  \
 	$(LIBOBJ)/formats/smx_dsk.o     \
+	$(LIBOBJ)/formats/sol_cas.o     \
 	$(LIBOBJ)/formats/sorc_dsk.o    \
 	$(LIBOBJ)/formats/sorc_cas.o    \
 	$(LIBOBJ)/formats/sord_cas.o    \
@@ -346,6 +347,12 @@ ARCHFLAGS = -DWORDS_BIGENDIAN=0
 endif
 
 FLACOPTS=-DFLAC__NO_ASM -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H=0 -DFLAC__HAS_OGG=0 -Wno-unused-function $(ARCHFLAGS) -O0
+ifdef MSVC_BUILD
+	# vconv will convert the \" to just a "
+	FLACOPTS += -DVERSION=\\\"1.2.1\\\"
+else
+	FLACOPTS += -DVERSION=\"1.2.1\"
+endif
 ifneq (,$(findstring clang,$(CC)))
 	FLACOPTS += -Wno-unused-const-variable
 endif
@@ -369,7 +376,7 @@ LIBFLACOBJS = \
 
 $(OBJ)/libflac.a: $(LIBFLACOBJS)
 
-$(LIBOBJ)/libflac/%.o: $(LIBSRC)/libflac/libflac/%.c | $(OSPREBUILD)
+$(LIBOBJ)/libflac/%.o: $(LIBSRC)/libflac/libFLAC/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CONLYFLAGS) $(CCOMFLAGS) $(FLACOPTS) -I$(LIBSRC)/libflac/include -c $< -o $@
 

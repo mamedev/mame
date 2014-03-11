@@ -53,7 +53,8 @@ public:
 			m_dac_l(*this, "dac_l"),
 			m_dac_r(*this, "dac_r"),
 			m_tms_timer1(*this, "tms_timer1"),
-			m_tms_tx_timer(*this, "tms_tx_timer")
+			m_tms_tx_timer(*this, "tms_tx_timer"),
+			m_palette(*this, "palette")
 	{}
 
 	#define VIDEO_ADDR_MASK     0x3fffffff
@@ -99,6 +100,7 @@ public:
 	required_device<dac_device>     m_dac_r;
 	required_device<timer_device>   m_tms_timer1;
 	required_device<timer_device>   m_tms_tx_timer;
+	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE32_MEMBER(cyrix_cache_w);
 	DECLARE_READ8_MEMBER(nvram_r);

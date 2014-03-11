@@ -236,7 +236,8 @@ public:
 	pdp1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	pdp1_reset_param_t m_reset_param;
 	int m_io_status;
@@ -300,5 +301,6 @@ public:
 	void pdp1_keyboard();
 	void pdp1_lightpen();
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 #endif /* PDP1_H_ */

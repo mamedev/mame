@@ -15,7 +15,9 @@ public:
 		m_port_80(*this, "port_80"),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -30,6 +32,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	UINT8          m_irq_mask;
 	DECLARE_WRITE8_MEMBER(cheekyms_port_40_w);

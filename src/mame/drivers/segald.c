@@ -35,7 +35,8 @@ public:
 		m_color_ram(*this, "color_ram"),
 		m_fix_ram(*this, "fix_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	UINT8 m_nmi_enable;
 
@@ -65,6 +66,7 @@ public:
 	void astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 /* VIDEO GOODS */

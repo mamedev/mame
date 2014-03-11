@@ -46,7 +46,8 @@ public:
 		m_videoram_mask(*this, "videoram_mask"),
 		m_scanline_latch(*this, "scanline_latch"),
 		m_bank0(*this, "bank0"),
-		m_bank1(*this, "bank1") { }
+		m_bank1(*this, "bank1"),
+		m_screen(*this, "screen") { }
 
 	/* devices */
 	required_device<m6809_base_device> m_maincpu;
@@ -82,6 +83,8 @@ public:
 
 	optional_memory_bank m_bank0;
 	optional_memory_bank m_bank1;
+	required_device<screen_device> m_screen;
+
 	pen_t m_pens[0x400];
 	DECLARE_WRITE8_MEMBER(zookeep_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(qix_data_firq_w);

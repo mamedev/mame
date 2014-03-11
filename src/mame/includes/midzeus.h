@@ -21,7 +21,9 @@ public:
 			m_tms32031_control(*this, "tms32031_ctl"),
 			m_zeusbase(*this, "zeusbase") ,
 		m_m48t35(*this, "m48t35"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT32> m_nvram;
 	required_shared_ptr<UINT32> m_ram_base;
@@ -29,6 +31,9 @@ public:
 	required_shared_ptr<UINT32> m_tms32031_control;
 	required_shared_ptr<UINT32> m_zeusbase;
 	optional_device<timekeeper_device> m_m48t35;
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	optional_device<palette_device> m_palette;
 
 	DECLARE_WRITE32_MEMBER(cmos_w);
 	DECLARE_READ32_MEMBER(cmos_r);
@@ -70,7 +75,6 @@ public:
 	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
 	void exit_handler();
 	void exit_handler2();
-	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in video/midzeus2.c -----------*/

@@ -610,7 +610,9 @@ public:
 		m_gfxcpu(*this, "gfxcpu"),
 		m_gfx_pagetable(*this, "pagetable"),
 		m_k001604(*this, "k001604"),
-		m_ata(*this, "ata")
+		m_ata(*this, "ata"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -620,7 +622,9 @@ public:
 	required_shared_ptr<UINT64> m_gfx_pagetable;
 	required_device<k001604_device> m_k001604;
 	required_device<ata_interface_device> m_ata;
-
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
 	DECLARE_READ64_MEMBER(main_comram_r);
 	DECLARE_WRITE64_MEMBER(main_comram_w);
 	DECLARE_READ64_MEMBER(main_fifo_r);

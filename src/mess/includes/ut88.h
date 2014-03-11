@@ -43,7 +43,8 @@ public:
 		m_io_line7(*this, "LINE7"),
 		m_io_line8(*this, "LINE8") ,
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	required_device<cassette_image_device> m_cassette;
 	optional_device<i8255_device> m_ppi;
@@ -85,6 +86,7 @@ protected:
 	optional_ioport m_io_line8;
 	required_device<cpu_device> m_maincpu;
 	optional_device<gfxdecode_device> m_gfxdecode;
+	optional_device<palette_device> m_palette;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 

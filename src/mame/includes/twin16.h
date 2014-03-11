@@ -17,7 +17,9 @@ public:
 		m_subcpu(*this, "sub"),
 		m_k007232(*this, "k007232"),
 		m_upd7759(*this, "upd"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_text_ram;
@@ -74,6 +76,8 @@ public:
 	required_device<k007232_device> m_k007232;
 	required_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;	
 };
 
 class cuebrickj_state : public twin16_state

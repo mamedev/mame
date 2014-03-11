@@ -13,7 +13,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_audio2(*this, "audio2"),
 		m_dac2(*this, "dac2"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	int m_dsw;
 	int m_active_8910;
@@ -60,4 +61,5 @@ public:
 	required_device<cpu_device> m_audio2;
 	required_device<dac_device> m_dac2;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };

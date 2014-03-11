@@ -29,55 +29,63 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef FLAC__ORDINALS_H
-#define FLAC__ORDINALS_H
+#ifndef FLAC__EXPORT_H
+#define FLAC__EXPORT_H
 
-#if !(defined(_MSC_VER) || defined(__BORLANDC__) || defined(__EMX__))
-#include <inttypes.h>
-#endif
+/** \file include/FLAC/export.h
+ *
+ *  \brief
+ *  This module contains #defines and symbols for exporting function
+ *  calls, and providing version information and compiled-in features.
+ *
+ *  See the \link flac_export export \endlink module.
+ */
 
-typedef signed char FLAC__int8;
-typedef unsigned char FLAC__uint8;
+/** \defgroup flac_export FLAC/export.h: export symbols
+ *  \ingroup flac
+ *
+ *  \brief
+ *  This module contains #defines and symbols for exporting function
+ *  calls, and providing version information and compiled-in features.
+ *
+ *  If you are compiling with MSVC and will link to the static library
+ *  (libFLAC.lib) you should define FLAC__NO_DLL in your project to
+ *  make sure the symbols are exported properly.
+ *
+ * \{
+ */
 
-#if defined(_MSC_VER) || defined(__BORLANDC__)
-typedef __int16 FLAC__int16;
-typedef __int32 FLAC__int32;
-typedef __int64 FLAC__int64;
-typedef unsigned __int16 FLAC__uint16;
-typedef unsigned __int32 FLAC__uint32;
-typedef unsigned __int64 FLAC__uint64;
-#elif defined(__EMX__)
-typedef short FLAC__int16;
-typedef long FLAC__int32;
-typedef long long FLAC__int64;
-typedef unsigned short FLAC__uint16;
-typedef unsigned long FLAC__uint32;
-typedef unsigned long long FLAC__uint64;
+#if defined(FLAC__NO_DLL) || !defined(_MSC_VER)
+#define FLAC_API
+
 #else
-typedef int16_t FLAC__int16;
-typedef int32_t FLAC__int32;
-typedef int64_t FLAC__int64;
-typedef uint16_t FLAC__uint16;
-typedef uint32_t FLAC__uint32;
-typedef uint64_t FLAC__uint64;
+
+#ifdef FLAC_API_EXPORTS
+#define	FLAC_API	_declspec(dllexport)
+#else
+#define FLAC_API	_declspec(dllimport)
+
+#endif
 #endif
 
-typedef int FLAC__bool;
+/** These #defines will mirror the libtool-based library version number, see
+ * http://www.gnu.org/software/libtool/manual.html#Libtool-versioning
+ */
+#define FLAC_API_VERSION_CURRENT 10
+#define FLAC_API_VERSION_REVISION 0 /**< see above */
+#define FLAC_API_VERSION_AGE 2 /**< see above */
 
-typedef FLAC__uint8 FLAC__byte;
-
-#ifdef true
-#undef true
-#endif
-#ifdef false
-#undef false
-#endif
-#ifndef __cplusplus
-#define true 1
-#define false 0
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-// MAME addition -- seems lame to make this a command-line parameter
-#define VERSION "1.2.1"
+/** \c 1 if the library has been compiled with support for Ogg FLAC, else \c 0. */
+extern FLAC_API int FLAC_API_SUPPORTS_OGG_FLAC;
+
+#ifdef __cplusplus
+}
+#endif
+
+/* \} */
 
 #endif

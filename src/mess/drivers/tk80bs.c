@@ -37,7 +37,8 @@ public:
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") 
 	{
 	}
 
@@ -53,6 +54,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

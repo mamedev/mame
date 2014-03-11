@@ -30,7 +30,8 @@ public:
 		m_shared_ram(*this, "shared_ram"),
 		m_ram2(*this, "ram2"),
 		m_sprgen1(*this, "spritegen1"),
-		m_sprgen2(*this, "spritegen2")
+		m_sprgen2(*this, "spritegen2"),
+		m_palette(*this, "palette")
 	{ }
 
 	/* devices */
@@ -53,6 +54,7 @@ public:
 
 	optional_device<decospr_device> m_sprgen1;
 	optional_device<decospr_device> m_sprgen2;
+	required_device<palette_device> m_palette;
 
 	DECLARE_READ16_MEMBER(dassault_control_r);
 	DECLARE_WRITE16_MEMBER(dassault_control_w);

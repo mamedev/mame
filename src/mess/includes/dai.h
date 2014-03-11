@@ -64,7 +64,8 @@ public:
 		m_tms5501(*this, "tms5501"),
 		m_sound(*this, "custom"),
 		m_cassette(*this, "cassette"),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG),
+		m_palette(*this, "palette")  { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -72,6 +73,7 @@ public:
 	required_device<dai_sound_device> m_sound;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_device<palette_device> m_palette;
 
 	UINT8 m_paddle_select;
 	UINT8 m_paddle_enable;

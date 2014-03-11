@@ -56,7 +56,8 @@ public:
 		m_io_sysa(*this, "SYSA"),
 		m_io_dswa(*this, "DSWA"),
 		m_io_dswb(*this, "DSWB"),
-		m_io_dswc(*this, "DSWC") { }
+		m_io_dswc(*this, "DSWC"),
+		m_palette(*this, "palette") { }
 
 	/* video-related */
 	UINT8 m_blit_raw_data[3];
@@ -127,7 +128,8 @@ protected:
 	required_ioport m_io_dswa;
 	required_ioport m_io_dswb;
 	required_ioport m_io_dswc;
-
+	required_device<palette_device> m_palette;
+	
 	UINT8 nightgal_gfx_nibble( int niboffset );
 	void plot_nightgal_gfx_pixel( UINT8 pix, int x, int y );
 };

@@ -22,7 +22,9 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k056832(*this, "k056832"),
 		m_k054338(*this, "k054338"),
-		m_k055555(*this, "k055555") { }
+		m_k055555(*this, "k055555"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen") { }
 
 	/* memory pointers */
 	UINT8 *    m_ram;
@@ -41,6 +43,8 @@ public:
 	required_device<k056832_device> m_k056832;
 	required_device<k054338_device> m_k054338;
 	required_device<k055555_device> m_k055555;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	DECLARE_READ16_MEMBER(control_r);
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_WRITE16_MEMBER(control2_w);

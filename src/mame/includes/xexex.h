@@ -33,7 +33,8 @@ public:
 		m_k053250(*this, "k053250"),
 		m_k053251(*this, "k053251"),
 		m_k053252(*this, "k053252"),
-		m_k054338(*this, "k054338") { }
+		m_k054338(*this, "k054338"),
+		m_screen(*this, "screen") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_workram;
@@ -69,6 +70,7 @@ public:
 	required_device<k053251_device> m_k053251;
 	required_device<k053252_device> m_k053252;
 	required_device<k054338_device> m_k054338;
+	required_device<screen_device> m_screen;
 	DECLARE_READ16_MEMBER(K053247_scattered_word_r);
 	DECLARE_WRITE16_MEMBER(K053247_scattered_word_w);
 	DECLARE_READ16_MEMBER(spriteram_mirror_r);

@@ -17,7 +17,9 @@ public:
 		m_bullsdrt_tiles_bankram(*this, "bullsdrt_bank"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	optional_shared_ptr<UINT8> m_rambase;
 	required_shared_ptr<UINT8> m_videoram;
@@ -91,4 +93,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;	
 };

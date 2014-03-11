@@ -232,7 +232,8 @@ public:
 		, m_keyrow15(*this, "ROW15")
 		, m_keyrow16(*this, "ROW16")
 		, m_vram(*this, "vram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") 
 	{ }
 
 	// devices
@@ -280,6 +281,7 @@ private:
 	UINT8 m_bank;
 	UINT8 m_kbdrow, m_kbdcol, m_kbdclk, m_kbdread;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 void itt3030_state::video_start()

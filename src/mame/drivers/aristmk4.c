@@ -288,7 +288,8 @@ public:
 		m_ay2(*this, "ay2"),
 		m_samples(*this, "samples"),
 		m_mkiv_vram(*this, "mkiv_vram"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc146818_device> m_rtc;
@@ -298,6 +299,7 @@ public:
 	
 	required_shared_ptr<UINT8> m_mkiv_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	int m_rtc_address_strobe;
 	int m_rtc_data_strobe;

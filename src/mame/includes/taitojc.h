@@ -49,7 +49,9 @@ public:
 		m_main_ram(*this, "main_ram"),
 		m_dsp_shared_ram(*this, "dsp_shared"),
 		m_palette_ram(*this, "palette_ram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 	{
 		m_mcu_output = 0;
 		m_speed_meter = 0;
@@ -70,6 +72,8 @@ public:
 	required_shared_ptr<UINT32> m_palette_ram;
 	
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	taitojc_renderer *m_renderer;
 

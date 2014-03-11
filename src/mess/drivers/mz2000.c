@@ -66,7 +66,8 @@ public:
 		m_io_keyc(*this, "KEYC"),
 		m_io_keyd(*this, "KEYD"),
 		m_io_unused(*this, "UNUSED"),
-		m_io_config(*this, "CONFIG") { }
+		m_io_config(*this, "CONFIG"),
+		m_palette(*this, "palette")  { }
 
 	required_device<cassette_image_device> m_cass;
 
@@ -143,6 +144,7 @@ protected:
 	required_ioport m_io_keyd;
 	required_ioport m_io_unused;
 	required_ioport m_io_config;
+	required_device<palette_device> m_palette;
 };
 
 void mz2000_state::video_start()

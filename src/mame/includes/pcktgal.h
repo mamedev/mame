@@ -11,7 +11,8 @@ public:
 		m_msm(*this, "msm"),
 		m_tilegen1(*this, "tilegen1"),
 		m_spriteram(*this, "spriteram"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -19,6 +20,7 @@ public:
 	required_device<deco_bac06_device> m_tilegen1;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_WRITE8_MEMBER(pcktgal_bank_w);
 	DECLARE_WRITE8_MEMBER(pcktgal_sound_bank_w);

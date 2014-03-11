@@ -111,7 +111,8 @@ public:
 		m_mem_fe00(*this, "mem_fe00"),
 		m_mem_fffa(*this, "mem_fffa"),
 		m_maincpu(*this, "maincpu"),
-		m_sound(*this, "custom") { }
+		m_sound(*this, "custom"),
+		m_palette(*this, "palette")  { }
 
 	virtual void video_start();
 
@@ -124,7 +125,7 @@ public:
 	required_shared_ptr<UINT8> m_mem_fffa;
 	required_device<cpu_device> m_maincpu;
 	required_device<lynx_sound_device> m_sound;
-
+	required_device<palette_device> m_palette;
 	UINT16 m_granularity;
 	int m_sign_AB;
 	int m_sign_CD;

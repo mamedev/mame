@@ -9,7 +9,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audio (*this, "m72"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT8> m_paletteram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -17,6 +18,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<m72_audio_device> m_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	int m_gfxbank;
 	tilemap_t *m_bg_tilemap;

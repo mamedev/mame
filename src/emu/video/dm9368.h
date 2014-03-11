@@ -33,13 +33,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_DM9368_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, DM9368, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define DM9368_INTERFACE(name) \
-	const dm9368_interface (name) =
+#define MCFG_DM9368_RBO_CALLBACK(_write) \
+	devcb = &dm9368_device::set_rbo_wr_callback(*device, DEVCB2_##_read);
 
 
 
@@ -47,46 +42,31 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-
-// ======================> dm9368_interface
-
-struct dm9368_interface
-{
-	int m_digit;
-
-	devcb_read_line         m_in_rbi_cb;
-	devcb_write_line        m_out_rbo_cb;
-};
-
-
-
 // ======================> dm9368_device
 
 class dm9368_device :   public device_t,
-						public dm9368_interface
+						public device_output_interface
 {
 public:
 	// construction/destruction
 	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void a_w(UINT8 data);
-	DECLARE_WRITE_LINE_MEMBER( rbi_w );
-	DECLARE_READ_LINE_MEMBER( rbo_r );
+
+	DECLARE_WRITE_LINE_MEMBER( rbi_w ) { m_rbi = state; }
+	DECLARE_READ_LINE_MEMBER( rbo_r ) { return m_rbo; }
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 private:
-	inline int get_rbi();
-	inline void set_rbo(int state);
-
-	devcb_resolved_read_line    m_in_rbi_func;
-	devcb_resolved_write_line   m_out_rbo_func;
+	devcb2_write_line   m_write_rbo;
 
 	int m_rbi;
 	int m_rbo;
+
+	static const UINT8 m_segment_data[];
 };
 
 

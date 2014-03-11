@@ -24,7 +24,9 @@ public:
 		m_road16_memory(*this, "road16_memory"),
 		m_alpha16_memory(*this, "alpha16_memory"),
 		m_view16_memory(*this, "view16_memory"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -44,6 +46,9 @@ public:
 	required_shared_ptr<UINT16> m_alpha16_memory;
 	required_shared_ptr<UINT16> m_view16_memory;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
 	UINT16 m_vertical_position_modifier[256];
 	UINT16 m_road16_vscroll;
 	tilemap_t *m_bg_tilemap;

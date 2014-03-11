@@ -43,7 +43,8 @@ public:
 			m_soundcpu(*this, "sound_cpu"),
 			m_tms(*this, "tms5220nl"),
 			m_pal_ram(*this, "pal_ram"),
-			m_dac(*this, "dac") { }
+			m_dac(*this, "dac"),
+			m_screen(*this, "screen") { }
 
 	required_device<cpu_device> m_framecpu;
 	required_device<esrip_device> m_videocpu;
@@ -121,6 +122,7 @@ public:
 	TIMER_CALLBACK_MEMBER(hblank_start_callback);
 	TIMER_CALLBACK_MEMBER(hblank_end_callback);
 	required_device<dac_device> m_dac;
+	required_device<screen_device> m_screen;	
 };
 
 

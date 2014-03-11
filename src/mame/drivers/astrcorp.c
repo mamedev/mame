@@ -46,14 +46,14 @@ public:
 	astrocorp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
-		m_paletteram(*this, "paletteram"),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_paletteram;
 
 	/* video-related */
 	bitmap_ind16 m_bitmap;
@@ -65,7 +65,6 @@ public:
 	DECLARE_WRITE16_MEMBER(skilldrp_outputs_w);
 	DECLARE_WRITE16_MEMBER(astrocorp_screen_enable_w);
 	DECLARE_READ16_MEMBER(astrocorp_unk_r);
-	DECLARE_WRITE16_MEMBER(astrocorp_palette_w);
 	DECLARE_WRITE16_MEMBER(astrocorp_sound_bank_w);
 	DECLARE_WRITE16_MEMBER(skilldrp_sound_bank_w);
 	DECLARE_DRIVER_INIT(showhanc);
@@ -77,6 +76,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 };
 
 /***************************************************************************
@@ -286,16 +287,6 @@ READ16_MEMBER(astrocorp_state::astrocorp_unk_r)
 	return 0xffff;  // bit 3?
 }
 
-// 5-6-5 Palette: BBBBB-GGGGGG-RRRRR
-WRITE16_MEMBER(astrocorp_state::astrocorp_palette_w)
-{
-	COMBINE_DATA(&m_paletteram[offset]);
-	m_palette->set_pen_color(offset,
-		pal5bit((m_paletteram[offset] >>  0) & 0x1f),
-		pal6bit((m_paletteram[offset] >>  5) & 0x3f),
-		pal5bit((m_paletteram[offset] >> 11) & 0x1f)
-	);
-}
 
 static ADDRESS_MAP_START( showhand_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
@@ -305,7 +296,7 @@ static ADDRESS_MAP_START( showhand_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x058000, 0x058001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x05a000, 0x05a001 ) AM_WRITE(showhand_outputs_w)
 	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
+	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE( 0x070000, 0x073fff ) AM_RAM AM_SHARE("nvram") // battery
 	AM_RANGE( 0x080000, 0x080001 ) AM_WRITE(astrocorp_sound_bank_w)
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_screen_enable_w)
@@ -314,7 +305,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( showhanc_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
+	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE( 0x070000, 0x070001 ) AM_WRITE(astrocorp_sound_bank_w)
 	AM_RANGE( 0x080000, 0x080fff ) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE( 0x082000, 0x082001 ) AM_WRITE(astrocorp_draw_sprites_w)
@@ -335,7 +326,7 @@ static ADDRESS_MAP_START( skilldrp_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x208000, 0x208001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x20a000, 0x20a001 ) AM_WRITE(skilldrp_outputs_w)
 	AM_RANGE( 0x20e000, 0x20e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x380000, 0x3801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
+	AM_RANGE( 0x380000, 0x3801ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE( 0x400000, 0x400001 ) AM_WRITE(astrocorp_screen_enable_w)
 	AM_RANGE( 0x500000, 0x507fff ) AM_RAM AM_SHARE("nvram") // battery
 	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE(skilldrp_sound_bank_w)
@@ -351,7 +342,7 @@ static ADDRESS_MAP_START( speeddrp_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x388000, 0x388001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x38a000, 0x38a001 ) AM_WRITE(skilldrp_outputs_w)
 	AM_RANGE( 0x38e000, 0x38e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x480000, 0x4801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_SHARE("paletteram")
+	AM_RANGE( 0x480000, 0x4801ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE( 0x500000, 0x500001 ) AM_WRITE(astrocorp_screen_enable_w)
 	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE(skilldrp_sound_bank_w)
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -495,6 +486,7 @@ static MACHINE_CONFIG_START( showhand, astrocorp_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
 
@@ -546,6 +538,7 @@ static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(astrocorp_state,astrocorp)
 

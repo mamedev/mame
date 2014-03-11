@@ -71,9 +71,8 @@
         correct version of BASIC be loaded first. Paste works, but it is very
         very slow. Perhaps we need something faster such as what Solace has.
       - SVT (Solace Virtual Tape) files are a representation of a cassette,
-        usually holding about 4 games, just like a multifile tape. It will
-        need a 'format' program to be written to convert it to be loadable
-        via the cassette device.
+        usually holding about 4 games, just like a multifile tape. This format
+        is partially supported.
       - HEX files appear to be the standard Intel format, and can be loaded
         by Solace.
       - The remaining formats (OPN, PL, PRN, SMU, SOL, ASM and LIB) appear
@@ -107,6 +106,7 @@
 #include "sound/wave.h"
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
+#include "formats/sol_cas.h"
 
 
 struct cass_data_t {
@@ -134,23 +134,22 @@ public:
 	};
 
 	sol20_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_cass1(*this, "cassette"),
-		m_cass2(*this, "cassette2"),
-		m_uart(*this, "uart"),
-		m_uart_s(*this, "uart_s"),
-		m_p_videoram(*this, "videoram"),
-		m_iop_arrows(*this, "ARROWS"),
-		m_iop_config(*this, "CONFIG"),
-		m_iop_s1(*this, "S1"),
-		m_iop_s2(*this, "S2"),
-		m_iop_s3(*this, "S3"),
-		m_iop_s4(*this, "S4"),
-		m_cassette1(*this, "cassette"),
-		m_cassette2(*this, "cassette2")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass1(*this, "cassette")
+		, m_cass2(*this, "cassette2")
+		, m_uart(*this, "uart")
+		, m_uart_s(*this, "uart_s")
+		, m_p_videoram(*this, "videoram")
+		, m_iop_arrows(*this, "ARROWS")
+		, m_iop_config(*this, "CONFIG")
+		, m_iop_s1(*this, "S1")
+		, m_iop_s2(*this, "S2")
+		, m_iop_s3(*this, "S3")
+		, m_iop_s4(*this, "S4")
+		, m_cassette1(*this, "cassette")
+		, m_cassette2(*this, "cassette2")
+	{ }
 
 	DECLARE_READ8_MEMBER( sol20_f8_r );
 	DECLARE_READ8_MEMBER( sol20_f9_r );
@@ -165,12 +164,24 @@ public:
 	DECLARE_WRITE8_MEMBER( sol20_fd_w );
 	DECLARE_WRITE8_MEMBER( sol20_fe_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
+	DECLARE_DRIVER_INIT(sol20);
+	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
+	TIMER_CALLBACK_MEMBER(sol20_boot);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	UINT8 m_sol20_fa;
-	cass_data_t m_cass_data;
 	virtual void machine_reset();
 	virtual void machine_start();
 	virtual void video_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT8 m_sol20_fc;
+	UINT8 m_sol20_fe;
+	const UINT8 *m_p_chargen;
+	UINT8 m_framecnt;
+	cass_data_t m_cass_data;
+	emu_timer *m_cassette_timer;
+	cassette_image_device *cassette_device_image();
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass1;
 	required_device<cassette_image_device> m_cass2;
@@ -183,24 +194,8 @@ public:
 	required_ioport m_iop_s2;
 	required_ioport m_iop_s3;
 	required_ioport m_iop_s4;
-
-private:
-	UINT8 m_sol20_fc;
-	UINT8 m_sol20_fe;
-	const UINT8 *m_p_chargen;
-	UINT8 m_framecnt;
-	emu_timer *m_cassette_timer;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
-
-public:
-	DECLARE_DRIVER_INIT(sol20);
-	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
-	TIMER_CALLBACK_MEMBER(sol20_boot);
-	cassette_image_device *cassette_device_image();
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -564,9 +559,9 @@ static const ay31015_config sol20_ay31015_config =
 
 static const cassette_interface sol20_cassette_interface =
 {
-	cassette_default_formats,
+	sol20_cassette_formats,//cassette_default_formats,
 	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
 	NULL,
 	NULL
 };

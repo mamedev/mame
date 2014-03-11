@@ -21,6 +21,9 @@ public:
 	decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~decocomn_device() {}
 
+	// static configuration
+	static void static_set_palette_tag(device_t &device, const char *tag);
+	
 	DECLARE_WRITE16_MEMBER( nonbuffered_palette_w );
 	DECLARE_WRITE16_MEMBER( buffered_palette_w );
 	DECLARE_WRITE16_MEMBER( palette_dma_w );
@@ -38,6 +41,7 @@ private:
 	// internal state
 	UINT8 *m_dirty_palette;
 	UINT16 m_priority;
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type DECOCOMN;
@@ -51,4 +55,7 @@ extern const device_type DECOCOMN;
 #define MCFG_DECOCOMN_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, DECOCOMN, 0)
 
+#define MCFG_DECOCOMN_PALETTE(_palette_tag) \
+	decocomn_device::static_set_palette_tag(*device, "^" _palette_tag);
+	
 #endif

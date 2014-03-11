@@ -18,7 +18,8 @@ public:
 		m_k054539(*this, "k054539"),
 		m_k052109(*this, "k052109"),
 		m_k053246(*this, "k053246"),
-		m_k053251(*this, "k053251") { }
+		m_k053251(*this, "k053251"),
+		m_screen(*this, "screen") { }
 
 	/* memory pointers */
 //  UINT16 *   m_paletteram;    // currently this uses generic palette handling
@@ -48,6 +49,7 @@ public:
 	required_device<k052109_device> m_k052109;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
+	required_device<screen_device> m_screen;
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_READ16_MEMBER(sound_status_r);
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);

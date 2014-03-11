@@ -61,7 +61,8 @@ public:
 		m_io_line9(*this, "LINE9"),
 		m_io_line10(*this, "LINE10"),
 		m_io_line11(*this, "LINE11"),
-		m_io_line12(*this, "LINE12") { }
+		m_io_line12(*this, "LINE12"),
+		m_palette(*this, "palette")  { }
 
 	DECLARE_WRITE8_MEMBER(specimx_select_bank);
 	DECLARE_WRITE8_MEMBER(video_memory_w);
@@ -148,6 +149,7 @@ protected:
 	required_ioport m_io_line11;
 	required_ioport m_io_line12;
 
+	required_device<palette_device> m_palette;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 

@@ -15,14 +15,16 @@ public:
 		m_workram(*this, "workram"),
 		m_spriteram_2(*this, "spriteram_2"),
 		m_mcu_ram(*this, "mcu_ram"),
-		m_mcu(*this, "mcu"),
-		m_msm(*this, "msm"),
-		m_dac_1(*this, "dac1"),
-		m_dac_2(*this, "dac2"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_samples(*this, "samples"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_mcu(*this, "mcu"),
+		m_msm(*this, "msm"),
+		m_dac_1(*this, "dac1"),
+		m_dac_2(*this, "dac2") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
@@ -62,10 +64,17 @@ public:
 #endif
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<samples_device> m_samples;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	optional_device<cpu_device> m_mcu;
 	required_device<msm5232_device> m_msm;
 	required_device<dac_device> m_dac_1;
 	required_device<dac_device> m_dac_2;
+	
 	DECLARE_WRITE8_MEMBER(equites_c0f8_w);
 	DECLARE_WRITE8_MEMBER(equites_cymbal_ctrl_w);
 	DECLARE_WRITE8_MEMBER(equites_dac_latch_w);
@@ -125,8 +134,4 @@ public:
 	void equites_update_dac(  );
 	void unpack_block( const char *region, int offset, int size );
 	void unpack_region( const char *region );
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<samples_device> m_samples;
-	required_device<gfxdecode_device> m_gfxdecode;
 };

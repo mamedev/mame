@@ -203,7 +203,8 @@ public:
 		m_io_port(*this, "io_port"),
 		m_maincpu(*this, "maincpu"),
 		m_i2cmem(*this, "i2cmem"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") 
 	{
 	}
 
@@ -286,6 +287,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

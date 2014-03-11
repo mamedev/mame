@@ -54,7 +54,8 @@ public:
 			m_ctc_int(CLEAR_LINE),
 			m_sio_int(CLEAR_LINE),
 			m_p_scrollram(*this, "p_scrollram"),
-			m_p_paletteram(*this, "p_paletteram")
+			m_p_paletteram(*this, "p_paletteram"),
+			m_palette(*this, "palette") 
 	{ }
 
 	virtual void machine_start();
@@ -71,6 +72,7 @@ public:
 	int m_sio_int;
 	required_shared_ptr<UINT16> m_p_scrollram;
 	required_shared_ptr<UINT16> m_p_paletteram;
+	required_device<palette_device> m_palette;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

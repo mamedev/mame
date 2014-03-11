@@ -182,7 +182,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_io9400(*this, "io9400"),
 		m_io9401(*this, "io9401"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -193,6 +194,7 @@ public:
 	DECLARE_PALETTE_INIT(spaceg);
 	UINT32 screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 /*************************************

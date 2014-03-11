@@ -30,7 +30,8 @@ public:
 		m_2610_1r(*this, "2610.1.r"),
 		m_2610_2l(*this, "2610.2.l"),
 		m_2610_2r(*this, "2610.2.r"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -54,6 +55,7 @@ public:
 	required_device<filter_volume_device> m_2610_2l;
 	required_device<filter_volume_device> m_2610_2r;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(warriorb_sound_w);

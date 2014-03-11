@@ -11,7 +11,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_cus30(*this, "namco"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	UINT8 m_inputport_selected;
 	required_shared_ptr<UINT8> m_videoram;
@@ -21,6 +22,7 @@ public:
 	required_device<cpu_device> m_mcu;
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_tx_tilemap;
 	UINT8 m_priority;

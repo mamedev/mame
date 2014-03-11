@@ -15,7 +15,9 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_videoram;
@@ -42,6 +44,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	optional_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_WRITE8_MEMBER(ojankohs_rombank_w);
 	DECLARE_WRITE8_MEMBER(ojankoy_rombank_w);

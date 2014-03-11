@@ -15,7 +15,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
-		m_tms(*this, "tms") { }
+		m_tms(*this, "tms"),
+		m_palette(*this, "palette") { }
 
 	UINT8 *m_videoram;
 	UINT8 m_input_select;
@@ -47,4 +48,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_device<tms9927_device> m_tms;
+	required_device<palette_device> m_palette;
 };

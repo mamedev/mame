@@ -29,7 +29,9 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_tc0100scn(*this, "tc0100scn"),
 		m_tc0480scp(*this, "tc0480scp"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT32> m_ram;
 	required_shared_ptr<UINT32> m_spriteram;
@@ -39,6 +41,9 @@ public:
 	required_device<tc0100scn_device> m_tc0100scn;
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
 	UINT16 m_coin_word;
 	UINT16 m_frame_counter;
 	int m_tc0110pcr_addr;

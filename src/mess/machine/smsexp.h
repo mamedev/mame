@@ -51,12 +51,14 @@ public:
 	DECLARE_WRITE8_MEMBER(write_mapper);
 	DECLARE_READ8_MEMBER(read_ram);
 	DECLARE_WRITE8_MEMBER(write_ram);
+	
+	int get_lphaser_xoffs();
+
+	device_sms_expansion_slot_interface *m_device;
 
 protected:
 	// device-level overrides
 	virtual void device_start();
-
-	device_sms_expansion_slot_interface *m_device;
 };
 
 
@@ -76,6 +78,8 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_mapper) {};
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; };
 	virtual DECLARE_WRITE8_MEMBER(write_ram) { };
+
+	virtual int get_lphaser_xoffs() { return 0; };
 };
 
 

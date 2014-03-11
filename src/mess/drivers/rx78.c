@@ -56,7 +56,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cass(*this, "cassette"),
-		m_ram(*this, RAM_TAG)
+		m_ram(*this, RAM_TAG),
+		m_palette(*this, "palette") 
 	{ }
 
 	DECLARE_READ8_MEMBER( key_r );
@@ -82,6 +83,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<ram_device> m_ram;
+	required_device<palette_device> m_palette;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( rx78_cart );
 };
 

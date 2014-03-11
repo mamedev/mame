@@ -24,7 +24,8 @@ public:
 		m_upd7759(*this, "upd7759"),
 		m_tms34061(*this, "tms34061"),
 		m_vfd(*this, "vfd"),
-		m_direct_port(*this, "DIRECT") { }
+		m_direct_port(*this, "DIRECT"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia6850_0;
@@ -34,6 +35,7 @@ public:
 	optional_device<tms34061_device> m_tms34061;
 	optional_device<roc10937_t> m_vfd;
 	required_ioport m_direct_port;
+	optional_device<palette_device> m_palette;
 
 	UINT8 m_palette_val[16][3];
 	int m_pal_addr;

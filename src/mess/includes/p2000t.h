@@ -21,7 +21,8 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_speaker(*this, "speaker"),
 			m_videoram(*this, "videoram"),
-			m_gfxdecode(*this, "gfxdecode")
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette") 
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -47,6 +48,7 @@ public:
 	UINT32 screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(p2000_interrupt);
 	optional_device<gfxdecode_device> m_gfxdecode;
+	optional_device<palette_device> m_palette;
 };
 
 #endif /* P2000T_H_ */

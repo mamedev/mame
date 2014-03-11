@@ -77,7 +77,8 @@ public:
 		m_extra(*this, "EXTRA"),
 		m_buttons(*this, "BUTTONS"),
 		m_config(*this, "config"),
-		m_80column_dips(*this, "80column_dips") { }
+		m_80column_dips(*this, "80column_dips"),
+		m_palette(*this, "palette")  { }
 
 	required_device<wd1770_t> m_fdc;
 	required_device<screen_device> m_color_screen;
@@ -150,6 +151,7 @@ protected:
 	required_ioport m_buttons;
 	required_ioport m_config;
 	optional_ioport m_80column_dips;
+	optional_device<palette_device> m_palette;
 
 	void einstein_scan_keyboard();
 	void einstein_page_rom();

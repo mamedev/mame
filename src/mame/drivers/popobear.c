@@ -90,7 +90,8 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_spr(*this, "spr"),
 		m_vregs(*this, "vregs"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 
 	{
 		tilemap_base[0] = 0xf0000;
@@ -108,7 +109,8 @@ public:
 	required_shared_ptr<UINT16> m_spr;
 	required_shared_ptr<UINT16> m_vregs;
 	optional_device<gfxdecode_device> m_gfxdecode;
-
+	required_device<palette_device> m_palette;
+	
 	UINT16* m_vram;
 	UINT16* m_vram_rearranged;
 

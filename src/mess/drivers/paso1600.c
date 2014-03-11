@@ -26,7 +26,8 @@ public:
 		m_crtc(*this, "crtc"),
 		m_p_vram(*this, "vram"),
 		m_p_gvram(*this, "gvram"),
-		m_gfxdecode(*this, "gfxdecode"){ }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
@@ -49,7 +50,7 @@ public:
 	required_shared_ptr<UINT16> m_p_vram;
 	required_shared_ptr<UINT16> m_p_gvram;
 	required_device<gfxdecode_device> m_gfxdecode;
-
+	required_device<palette_device> m_palette;
 	struct{
 		UINT8 portb;
 	}m_keyb;

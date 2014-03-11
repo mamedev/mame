@@ -144,8 +144,6 @@ static NETLIST_START(pong_schematics)
 
     TTL_7404_INVERT(e4d, STOPG)
 
-#if 1
-
     TTL_7404_INVERT(c9f, c9c.Q)
     TTL_7404_INVERT(c9c, c9f.Q)
 
@@ -153,19 +151,6 @@ static NETLIST_START(pong_schematics)
     NET_C(c9c.Q, coinsw.1)
     NET_C(c9f.Q, coinsw.2)
 
-#else
-    RES(RYf, 50)   // output impedance - not in schematics, hack (till better proxies exist)
-    RES(RYc, 50)   // output impedance - not in schematics, hack (till better proxies exist)
-
-    TTL_7404_INVERT(c9f, RYc.2)
-    TTL_7404_INVERT(c9c, RYf.2)
-    NET_C(c9f.Q, RYf.1)
-    NET_C(c9c.Q, RYc.1)
-
-    SWITCH2(coinsw)
-    NET_C(RYc.2, coinsw.1)
-    NET_C(RYf.2, coinsw.2)
-#endif
     NET_C(coinsw.Q, GND)
 
     /* Antenna circuit */
@@ -980,7 +965,7 @@ MACHINE_CONFIG_END
 
 ROM_START( pong ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* enough for netlist */
-    ROM_LOAD( "pong.netlist", 0x000000, 17790 /*0x0043d9*/, CRC(64edd5a0) SHA1(9e661f2fba44f46015fdccffa7766dd4e61cdc7d) )
+    ROM_LOAD( "pong.netlist", 0x000000, 0x00457f, CRC(72d5e4fe) SHA1(7bb15828223c34915c5e2869dd7917532a4bb7b4) )
 ROM_END
 
 ROM_START( pongf ) /* dummy to satisfy game entry*/
@@ -993,7 +978,7 @@ ROM_START( pongd ) /* dummy to satisfy game entry*/
 ROM_END
 #endif
 
-GAME( 1972, pong,  0, pong, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E) external", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING)
+GAME( 1972, pong,  0, pong, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E) external", GAME_SUPPORTS_SAVE)
 GAME( 1972, pongf,  0, pongf, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E)", GAME_SUPPORTS_SAVE )
 #if PONGD
 GAME( 1974, pongd,  0, pongd, pongd, driver_device,  0, ROT0, "Atari", "Pong Doubles", GAME_SUPPORTS_SAVE )

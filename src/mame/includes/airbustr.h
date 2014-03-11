@@ -16,12 +16,13 @@ public:
 		m_colorram2(*this, "colorram2"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_paletteram(*this, "paletteram"),
 		m_master(*this, "master"),
 		m_slave(*this, "slave"),
 		m_audiocpu(*this, "audiocpu"),
 		m_pandora(*this, "pandora"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette")
 		{ }
 
 	/* memory pointers */
@@ -30,7 +31,6 @@ public:
 	required_shared_ptr<UINT8> m_colorram2;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_paletteram;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -52,6 +52,8 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<kaneko_pandora_device> m_pandora;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_READ8_MEMBER(devram_r);
 	DECLARE_WRITE8_MEMBER(master_nmi_trigger_w);
@@ -63,7 +65,6 @@ public:
 	DECLARE_READ8_MEMBER(soundcommand2_r);
 	DECLARE_WRITE8_MEMBER(soundcommand_w);
 	DECLARE_WRITE8_MEMBER(soundcommand2_w);
-	DECLARE_WRITE8_MEMBER(airbustr_paletteram_w);
 	DECLARE_WRITE8_MEMBER(airbustr_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(airbustr_videoram_w);
 	DECLARE_WRITE8_MEMBER(airbustr_colorram_w);

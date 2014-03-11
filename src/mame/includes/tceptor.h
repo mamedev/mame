@@ -17,7 +17,8 @@ public:
 		m_sprite_ram(*this, "sprite_ram"),
 		m_c45_road(*this, "c45_road"),
 		m_2dscreen(*this, "2dscreen"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	UINT8 m_m6809_irq_enable;
 	UINT8 m_m68k_irq_enable;
@@ -65,6 +66,7 @@ public:
 	optional_device<namco_c45_road_device> m_c45_road;
 	required_device<screen_device> m_2dscreen;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);

@@ -126,7 +126,9 @@ public:
 			m_attr0(*this, "attr0"),
 			m_vram1(*this, "vram1"),
 			m_attr1(*this, "attr1"),
-			m_gfxdecode(*this, "gfxdecode")
+			m_gfxdecode(*this, "gfxdecode"),
+			m_screen(*this, "screen"),
+			m_palette(*this, "palette")
 			{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -137,7 +139,9 @@ public:
 	required_shared_ptr<UINT8> m_vram1;
 	required_shared_ptr<UINT8> m_attr1;
 	required_device<gfxdecode_device> m_gfxdecode;
-
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
 	UINT8 m_laserdisc_data;
 	int m_nmimask;
 	DECLARE_WRITE8_MEMBER(rblaster_sound_w);

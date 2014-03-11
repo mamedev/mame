@@ -72,7 +72,8 @@ public:
 		m_palram(*this, "palram"),
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
-		m_rtc_portc(0)
+		m_rtc_portc(0),
+		m_palette(*this, "palette") 
 	{
 	}
 
@@ -132,6 +133,7 @@ public:
 	WRITE_LINE_MEMBER(rtc_portc_2_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 2)) | ((state & 1) << 2); }
 	WRITE_LINE_MEMBER(rtc_portc_3_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 3)) | ((state & 1) << 3); }
 	UINT8 m_rtc_portc;
+	required_device<palette_device> m_palette;
 };
 
 void pc100_state::video_start()

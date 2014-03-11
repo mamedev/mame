@@ -243,7 +243,8 @@ public:
 		m_gfx0_cram(*this, "gfx0_cram"),
 		m_gfx1_vram(*this, "gfx1_vram"),
 		m_gfx1_cram(*this, "gfx1_cram"),
-		m_sprite_ram(*this, "sprite_ram") { }
+		m_sprite_ram(*this, "sprite_ram"),
+		m_palette(*this, "palette")  { }
 
 	tilemap_t *m_gfx0a_tilemap;
 	tilemap_t *m_gfx0b_tilemap;
@@ -258,6 +259,7 @@ public:
 	required_shared_ptr<UINT8> m_gfx1_vram;
 	required_shared_ptr<UINT8> m_gfx1_cram;
 	required_shared_ptr<UINT8> m_sprite_ram;
+	required_device<palette_device> m_palette;
 	
 	int m_scrollx;
 	int m_scrolly;

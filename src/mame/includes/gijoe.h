@@ -21,7 +21,8 @@ public:
 		m_k054539(*this, "k054539"),
 		m_k056832(*this, "k056832"),
 		m_k053246(*this, "k053246"),
-		m_k053251(*this, "k053251") { }
+		m_k053251(*this, "k053251"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -47,6 +48,7 @@ public:
 	required_device<k056832_device> m_k056832;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
+	required_device<palette_device> m_palette;
 	DECLARE_READ16_MEMBER(control2_r);
 	DECLARE_WRITE16_MEMBER(control2_w);
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);

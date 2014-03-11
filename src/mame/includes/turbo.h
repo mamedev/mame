@@ -30,7 +30,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_sprite_position(*this, "spritepos"),
 		m_samples(*this, "samples"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen")
 	{ }
 
 	/* device/memory pointers */
@@ -49,6 +50,7 @@ public:
 	required_device<samples_device> m_samples;
 	
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 
 	UINT8 *     m_buckrog_bitmap_ram;
 

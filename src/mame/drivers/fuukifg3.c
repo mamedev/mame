@@ -164,33 +164,6 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 #include "includes/fuukifg3.h"
 
 
-WRITE32_MEMBER(fuuki32_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w)
-{
-	if(ACCESSING_BITS_16_31)
-	{
-		int r,g,b;
-		COMBINE_DATA(&m_paletteram[offset]);
-
-		r = (m_paletteram[offset] & 0x7c000000) >> (10 + 16);
-		g = (m_paletteram[offset] & 0x03e00000) >> (5 + 16);
-		b = (m_paletteram[offset] & 0x001f0000) >> (0 + 16);
-
-		m_palette->set_pen_color(offset * 2, pal5bit(r), pal5bit(g), pal5bit(b));
-	}
-
-	if(ACCESSING_BITS_0_15)
-	{
-		int r,g,b;
-		COMBINE_DATA(&m_paletteram[offset]);
-
-		r = (m_paletteram[offset] & 0x00007c00) >> (10);
-		g = (m_paletteram[offset] & 0x000003e0) >> (5);
-		b = (m_paletteram[offset] & 0x0000001f) >> (0);
-
-		m_palette->set_pen_color(offset * 2 + 1, pal5bit(r), pal5bit(g), pal5bit(b));
-	}
-}
-
 /***************************************************************************
 
 
@@ -243,7 +216,7 @@ static ADDRESS_MAP_START( fuuki32_map, AS_PROGRAM, 32, fuuki32_state )
 	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki32_vram_3_w) AM_SHARE("vram.3")  // Tilemap bg2
 	AM_RANGE(0x508000, 0x517fff) AM_RAM                                                                     // More tilemap, or linescroll? Seems to be empty all of the time
 	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_SHARE("paletteram") // Palette
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette",  palette_device, write) AM_SHARE("palette") // Palette
 
 	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("800000") AM_WRITENOP                                         // Coin
 	AM_RANGE(0x810000, 0x810003) AM_READ_PORT("810000") AM_WRITENOP                                         // Player Inputs
@@ -593,7 +566,7 @@ static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fuuki32)
 	MCFG_PALETTE_ADD("palette", 0x4000/2)
-
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

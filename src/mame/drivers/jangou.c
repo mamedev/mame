@@ -46,7 +46,8 @@ public:
 		m_cpu_1(*this, "cpu1"),
 		m_nsc(*this, "nsc"),
 		m_msm(*this, "msm"),
-		m_cvsd(*this, "cvsd") { }
+		m_cvsd(*this, "cvsd"),
+		m_palette(*this, "palette") { }
 
 	/* sound-related */
 	// Jangou CVSD Sound
@@ -68,6 +69,7 @@ public:
 	optional_device<cpu_device> m_nsc;
 	optional_device<msm5205_device> m_msm;
 	optional_device<hc55516_device> m_cvsd;
+	required_device<palette_device> m_palette;
 
 	/* video-related */
 	UINT8        m_pen_data[0x10];

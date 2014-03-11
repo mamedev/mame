@@ -18,7 +18,7 @@
 	</software>
 
 	<software name="mickkuda">
-		<description>Mickey no Kudamono Yasan</description>
+		<description>Mickey no Kudamonoya-san</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="670-0405?"/>
@@ -77,8 +77,8 @@
 		</part>
 	</software>
 
-	<software name="micknako">
-		<description>Tokyo Disneyland - Mickey no Nakayoshi Kotankentai</description>
+	<software name="micknatk">
+		<description>Tokyo Disneyland - Mickey no Nakayoshi Tankentai</description>
 		<year>1998</year>
 		<publisher>Sega?</publisher>
 		<info name="serial" value="T-25502K?"/>

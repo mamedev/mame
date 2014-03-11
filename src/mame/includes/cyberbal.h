@@ -34,7 +34,8 @@ public:
 			m_lscreen(*this, "lscreen"),
 			m_rscreen(*this, "rscreen"),
 			m_paletteram_0(*this, "paletteram_0"),
-			m_paletteram_1(*this, "paletteram_1") { }
+			m_paletteram_1(*this, "paletteram_1"),
+			m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<m6502_device> m_audiocpu;
@@ -53,6 +54,7 @@ public:
 	optional_device<screen_device> m_rscreen;
 	optional_shared_ptr<UINT16> m_paletteram_0;
 	optional_shared_ptr<UINT16> m_paletteram_1;
+	required_device<palette_device> m_palette;
 	UINT16          m_current_slip[2];
 	UINT8           m_playfield_palette_bank[2];
 	UINT16          m_playfield_xscroll[2];

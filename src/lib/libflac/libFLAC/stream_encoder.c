@@ -33,6 +33,14 @@
 #  include <config.h>
 #endif
 
+#if defined _MSC_VER || defined __MINGW32__
+#include <io.h> /* for _setmode() */
+#include <fcntl.h> /* for _O_BINARY */
+#endif
+#if defined __CYGWIN__ || defined __EMX__
+#include <io.h> /* for setmode(), O_BINARY */
+#include <fcntl.h> /* for _O_BINARY */
+#endif
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h> /* for malloc() */
@@ -46,8 +54,8 @@
 #define ftello ftell
 #endif
 #endif
-#include "flac/assert.h"
-#include "flac/stream_decoder.h"
+#include "FLAC/assert.h"
+#include "FLAC/stream_decoder.h"
 #include "share/alloc.h"
 #include "protected/stream_encoder.h"
 #include "private/bitwriter.h"
@@ -90,7 +98,7 @@
  * parameter estimation in this encoder is very good, almost always
  * yielding compression within 0.1% of the optimal parameters.
  */
-#undef ENABLE_RICE_PARAMETER_SEARCH
+#undef ENABLE_RICE_PARAMETER_SEARCH 
 
 
 typedef struct {
@@ -226,7 +234,7 @@ static unsigned evaluate_lpc_subframe_(
 #endif
 
 static unsigned evaluate_verbatim_subframe_(
-	FLAC__StreamEncoder *encoder,
+	FLAC__StreamEncoder *encoder, 
 	const FLAC__int32 signal[],
 	unsigned blocksize,
 	unsigned subframe_bps,
@@ -827,7 +835,7 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 				metadata_picture_has_type1 = true;
 				/* standard icon must be 32x32 pixel PNG */
 				if(
-					m->data.picture.type == FLAC__STREAM_METADATA_PICTURE_TYPE_FILE_ICON_STANDARD &&
+					m->data.picture.type == FLAC__STREAM_METADATA_PICTURE_TYPE_FILE_ICON_STANDARD && 
 					(
 						(strcmp(m->data.picture.mime_type, "image/png") && strcmp(m->data.picture.mime_type, "-->")) ||
 						m->data.picture.width != 32 ||
@@ -1174,7 +1182,7 @@ FLAC_API FLAC__StreamEncoderInitStatus FLAC__stream_encoder_init_ogg_stream(
 		/*is_ogg=*/true
 	);
 }
-
+ 
 static FLAC__StreamEncoderInitStatus init_FILE_internal_(
 	FLAC__StreamEncoder *encoder,
 	FILE *file,
@@ -1236,7 +1244,7 @@ static FLAC__StreamEncoderInitStatus init_FILE_internal_(
 
 	return init_status;
 }
-
+ 
 FLAC_API FLAC__StreamEncoderInitStatus FLAC__stream_encoder_init_FILE(
 	FLAC__StreamEncoder *encoder,
 	FILE *file,
@@ -1246,7 +1254,7 @@ FLAC_API FLAC__StreamEncoderInitStatus FLAC__stream_encoder_init_FILE(
 {
 	return init_FILE_internal_(encoder, file, progress_callback, client_data, /*is_ogg=*/false);
 }
-
+ 
 FLAC_API FLAC__StreamEncoderInitStatus FLAC__stream_encoder_init_ogg_FILE(
 	FLAC__StreamEncoder *encoder,
 	FILE *file,
@@ -4126,7 +4134,7 @@ unsigned get_wasted_bits_(FLAC__int32 signal[], unsigned samples)
 
 	if(shift > 0) {
 		for(i = 0; i < samples; i++)
-				signal[i] >>= shift;
+			 signal[i] >>= shift;
 	}
 
 	return shift;
@@ -4336,7 +4344,6 @@ FLAC__StreamEncoderWriteStatus file_write_callback_(const FLAC__StreamEncoder *e
  */
 FILE *get_binary_stdout_(void)
 {
-#if 0
 	/* if something breaks here it is probably due to the presence or
 	 * absence of an underscore before the identifiers 'setmode',
 	 * 'fileno', and/or 'O_BINARY'; check your system header files.
@@ -4349,6 +4356,6 @@ FILE *get_binary_stdout_(void)
 #elif defined __EMX__
 	setmode(fileno(stdout), O_BINARY);
 #endif
-#endif
+
 	return stdout;
 }

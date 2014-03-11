@@ -20,7 +20,8 @@ public:
 		m_kaneko_spr(*this, "kan_spr"),
 		m_spriteram(*this, "spriteram"),
 		m_oki2(*this, "oki2"),
-		m_eeprom(*this, "eeprom")
+		m_eeprom(*this, "eeprom"),
+		m_palette(*this, "palette")
 		{ }
 
 	required_shared_ptr_array<UINT16, 2> m_bg8;
@@ -72,4 +73,5 @@ public:
 	DECLARE_WRITE16_MEMBER( galpani2_bg15_w );
 	required_device<okim6295_device> m_oki2;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<palette_device> m_palette;
 };

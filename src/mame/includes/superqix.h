@@ -12,7 +12,8 @@ public:
 		m_bitmapram(*this, "bitmapram"),
 		m_bitmapram2(*this, "bitmapram2"),
 		m_samples(*this, "samples"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_mcu;
@@ -22,6 +23,7 @@ public:
 	optional_shared_ptr<UINT8> m_bitmapram2;
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	INT16 *m_samplebuf;
 	UINT8 m_port1;

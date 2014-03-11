@@ -41,7 +41,8 @@ public:
 		m_io_options(*this, "OPTIONS"),
 		m_io_ecs_cntrlsel(*this, "ECS_CNTRLSEL"),
 		m_io_test(*this, "TEST"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<sp0256_device> m_intellivoice;
@@ -143,6 +144,7 @@ protected:
 	optional_ioport m_io_test;
 	
 	optional_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	ioport_port *m_keypad[4];
 	ioport_port *m_disc[4];

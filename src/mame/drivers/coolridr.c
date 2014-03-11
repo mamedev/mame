@@ -320,7 +320,8 @@ public:
 		m_io_an6(*this, "AN6"),
 		m_io_an7(*this, "AN7"),
 		m_io_config(*this, "CONFIG"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen")
 	{
 	}
 
@@ -364,6 +365,7 @@ public:
 	required_ioport m_io_an7;
 	required_ioport m_io_config;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 
 	bitmap_ind16 m_temp_bitmap_sprites;
 	bitmap_ind16 m_temp_bitmap_sprites2;

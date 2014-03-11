@@ -54,7 +54,8 @@ public:
 			m_videoram3(*this, "videoram3"),
 			m_maincpu(*this, "maincpu"),
 			m_oki(*this, "oki"),
-			m_gfxdecode(*this, "gfxdecode")
+			m_gfxdecode(*this, "gfxdecode"),
+			m_screen(*this, "screen")
 	{ }
 
 	/* memory pointers */
@@ -70,7 +71,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
-
+	required_device<screen_device> m_screen;
+	
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

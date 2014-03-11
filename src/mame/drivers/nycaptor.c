@@ -192,11 +192,12 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
+#include "cpu/z80/z80.h"
+#include "includes/nycaptor.h"
 #include "includes/taitoipt.h"
 #include "sound/ay8910.h"
-#include "includes/nycaptor.h"
+#include "sound/dac.h"
 
 
 WRITE8_MEMBER(nycaptor_state::sub_cpu_halt_w)
@@ -467,6 +468,11 @@ static ADDRESS_MAP_START( cyclshtg_slave_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xdf03, 0xdf03) AM_READ(nycaptor_gfxctrl_r)
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITENOP
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("sharedram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cyclshtg_sound_map, AS_PROGRAM, 8, nycaptor_state )
+	AM_RANGE(0xd600, 0xd600) AM_DEVWRITE("dac", dac_device, write_signed8) //otherwise no girl's scream, see MT03975
+	AM_IMPORT_FROM( nycaptor_sound_map )
 ADDRESS_MAP_END
 
 READ8_MEMBER(nycaptor_state::unk_r)
@@ -741,8 +747,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( nycaptor )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )//16 kolorow
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )//paleta 2, 16 kolorow
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )//16 colors
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )//palette 2, 16 colors
 GFXDECODE_END
 
 
@@ -876,7 +882,7 @@ static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(nycaptor_sound_map)
+	MCFG_CPU_PROGRAM_MAP(cyclshtg_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nycaptor_state, irq0_line_hold, 2*60)
 
 #ifdef USE_MCU
@@ -921,6 +927,9 @@ static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
+	
+	MCFG_DAC_ADD("dac")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -936,7 +945,7 @@ static MACHINE_CONFIG_START( bronx, nycaptor_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)
-	MCFG_CPU_PROGRAM_MAP(nycaptor_sound_map)
+	MCFG_CPU_PROGRAM_MAP(cyclshtg_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(nycaptor_state, irq0_line_hold, 2*60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120))
@@ -976,6 +985,9 @@ static MACHINE_CONFIG_START( bronx, nycaptor_state )
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
+	
+	MCFG_DAC_ADD("dac")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

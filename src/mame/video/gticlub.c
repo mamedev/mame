@@ -1576,13 +1576,13 @@ void K001005_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void K001005_swap_buffers(running_machine &machine)
 {
-	driver_device *state = machine.driver_data<driver_device>();
+	palette_device *m_palette = machine.first_screen()->palette();
 	K001005_bitmap_page ^= 1;
 
 	//if (K001005_status == 2)
 	{
 		float zvalue = ZBUFFER_MAX;
-		K001005_bitmap[K001005_bitmap_page]->fill(state->m_palette->pen(0)&0x00ffffff, K001005_cliprect);
+		K001005_bitmap[K001005_bitmap_page]->fill(m_palette->pen(0)&0x00ffffff, K001005_cliprect);
 		K001005_zbuffer->fill(*(int*)&zvalue, K001005_cliprect);
 	}
 }

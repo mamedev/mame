@@ -19,13 +19,15 @@ public:
 	tgtpanic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen") { }
 
 	required_shared_ptr<UINT8> m_ram;
 	UINT8 m_color;
 	DECLARE_WRITE8_MEMBER(color_w);
 	UINT32 screen_update_tgtpanic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 };
 
 

@@ -164,7 +164,8 @@ public:
 		m_view2_0(*this, "view2_0"),
 		m_kaneko_spr(*this, "kan_spr"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette") { }
 
 	optional_shared_ptr<UINT16> m_galsnew_bg_pixram;
 	optional_shared_ptr<UINT16> m_galsnew_fg_pixram;
@@ -185,6 +186,7 @@ public:
 	UINT32 screen_update_galsnew(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(expro02_scanline);
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 

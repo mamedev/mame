@@ -41,7 +41,8 @@ public:
 			m_io_x5(*this, "X5"),
 			m_io_x6(*this, "X6"),
 			m_io_x7(*this, "X7"),
-			m_io_config(*this, "CONFIG")
+			m_io_config(*this, "CONFIG"),
+			m_palette(*this, "palette") 
 	{ }
 
 	DECLARE_READ8_MEMBER( super80v_low_r );
@@ -114,6 +115,7 @@ public:
 	required_ioport m_io_x6;
 	required_ioport m_io_x7;
 	required_ioport m_io_config;
+	required_device<palette_device> m_palette;
 	void palette_set_colors_rgb(const UINT8 *colors);
 	void super80_cassette_motor( UINT8 data );
 	void driver_init_common(  );

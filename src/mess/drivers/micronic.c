@@ -330,11 +330,6 @@ PALETTE_INIT_MEMBER(micronic_state, micronic)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-static HD61830_INTERFACE( lcdc_intf )
-{
-	DEVCB_NULL
-};
-
 void micronic_state::machine_start()
 {
 	/* ROM banks */
@@ -379,7 +374,7 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(micronic_state, micronic)
 
-	MCFG_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
+	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL_4_9152MHz/2/2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )

@@ -32,7 +32,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_dsp1(*this, "dsp1"),
-		m_dsp2(*this, "dsp2") { }
+		m_dsp2(*this, "dsp2"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	optional_shared_ptr<UINT16> m_main_ram;
 	optional_shared_ptr<UINT16> m_nvram;
@@ -193,4 +195,6 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_dsp1;
 	optional_device<cpu_device> m_dsp2;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;	
 };

@@ -242,7 +242,8 @@ public:
 		m_acia6850_0(*this, "acia6850_2"),
 		m_acia6850_1(*this, "acia6850_2"),
 		m_acia6850_2(*this, "acia6850_2"),
-		m_upd7759(*this, "upd")
+		m_upd7759(*this, "upd"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -316,6 +317,7 @@ public:
 	required_device<acia6850_device> m_acia6850_1;
 	required_device<acia6850_device> m_acia6850_2;
 	required_device<upd7759_device> m_upd7759;
+	required_device<palette_device> m_palette;
 };
 
 

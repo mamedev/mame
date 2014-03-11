@@ -56,7 +56,8 @@ public:
 		m_ppi8255_0(*this, "ppi8255_0"),
 		m_ppi8255_1(*this, "ppi8255_1"),
 		m_videoram(*this, "videoram"),
-		m_samples(*this, "samples"){ }
+		m_samples(*this, "samples"),
+		m_screen(*this, "screen"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8255_device>  m_ppi8255_0;
@@ -72,6 +73,8 @@ public:
 	UINT8      m_color_latch;
 
 	required_device<samples_device> m_samples;
+	required_device<screen_device> m_screen;
+	
 	DECLARE_WRITE8_MEMBER(color_latch_w);
 	DECLARE_WRITE8_MEMBER(spaceint_videoram_w);
 	DECLARE_READ8_MEMBER(kamikaze_ppi_r);

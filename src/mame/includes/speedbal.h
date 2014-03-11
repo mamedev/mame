@@ -7,7 +7,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_background_videoram(*this, "bg_videoram"),
 		m_foreground_videoram(*this, "fg_videoram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -15,6 +16,7 @@ public:
 	required_shared_ptr<UINT8> m_background_videoram;
 	required_shared_ptr<UINT8> m_foreground_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	bool m_leds_start;
 	UINT32 m_leds_shiftreg;

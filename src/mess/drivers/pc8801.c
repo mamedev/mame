@@ -309,7 +309,8 @@ public:
 			m_cassette(*this, "cassette"),
 			m_beeper(*this, "beeper"),
 			m_opna(*this, "opna"),
-			m_opn(*this, "opn")
+			m_opn(*this, "opn"),
+			m_palette(*this, "palette") 
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -320,6 +321,8 @@ public:
 	required_device<beep_device> m_beeper;
 	required_device<ym2608_device> m_opna;
 	required_device<ym2203_device> m_opn;
+	required_device<palette_device> m_palette;
+	
 	UINT8 *m_work_ram;
 	UINT8 *m_hi_work_ram;
 	UINT8 *m_ext_work_ram;

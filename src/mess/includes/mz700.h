@@ -31,7 +31,8 @@ public:
 		m_cassette(*this, "cassette"),
 		m_centronics(*this, "centronics"),
 		m_ram(*this, RAM_TAG),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	int m_mz700;                /* 1 if running on an mz700 */
 
@@ -112,6 +113,7 @@ public:
 	optional_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

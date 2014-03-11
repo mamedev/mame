@@ -27,7 +27,8 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_fdc(*this, "fdc"),
 	m_crtc(*this, "crtc"),
-	m_p_vram(*this, "p_vram"){ }
+	m_p_vram(*this, "p_vram"),
+	m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mb8877_device> m_fdc;
@@ -37,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
 	DECLARE_WRITE8_MEMBER(myb3k_fdc_output_w);
 	required_shared_ptr<UINT8> m_p_vram;
+	required_device<palette_device> m_palette;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	UINT8 m_vmode;
 	virtual void machine_start();

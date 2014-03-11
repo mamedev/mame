@@ -223,7 +223,7 @@ UINT32 toobin_state::screen_update_toobin(screen_device &screen, bitmap_rgb32 &b
 
 	/* draw and merge the MO */
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
+	const pen_t *palette = m_palette->pens();
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32 *dest = &bitmap.pix32(y);

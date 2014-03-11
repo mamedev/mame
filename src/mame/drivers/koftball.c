@@ -44,7 +44,8 @@ public:
 		m_bmc_1_videoram(*this, "bmc_1_videoram"),
 		m_bmc_2_videoram(*this, "bmc_2_videoram"),
 		m_colorram(*this, "colorram", 16),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_main_ram;
@@ -52,6 +53,7 @@ public:
 	required_shared_ptr<UINT16> m_bmc_2_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
 	int m_clr_offset;

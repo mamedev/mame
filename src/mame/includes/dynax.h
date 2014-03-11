@@ -17,7 +17,9 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
 			m_oki(*this, "oki"),
-			m_msm(*this, "msm")
+			m_msm(*this, "msm"),
+			m_screen(*this, "screen"),
+			m_palette(*this, "palette")
 		{ }
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
@@ -164,6 +166,8 @@ public:
 	device_t *m_ymsnd;
 	optional_device<okim6295_device> m_oki;
 	optional_device<msm5205_device> m_msm;
+	optional_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	device_t *m_top_scr;
 	device_t *m_bot_scr;
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);

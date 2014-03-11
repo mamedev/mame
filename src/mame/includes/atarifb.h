@@ -27,7 +27,9 @@ public:
 		m_scroll_register(*this, "scroll_register"),
 		m_maincpu(*this, "maincpu"),
 		m_discrete(*this, "discrete"),
-		m_gfxdecode(*this, "gfxdecode"){ }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"){ }
 
 	/* video-related */
 	required_shared_ptr<UINT8> m_alphap1_videoram;
@@ -63,7 +65,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
 	DECLARE_WRITE8_MEMBER(atarifb_out1_w);
 	DECLARE_WRITE8_MEMBER(atarifb4_out1_w);
 	DECLARE_WRITE8_MEMBER(abaseb_out1_w);

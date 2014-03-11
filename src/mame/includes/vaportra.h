@@ -18,7 +18,8 @@ public:
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_deco_tilegen2(*this, "tilegen2"),
 		m_spritegen(*this, "spritegen"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	UINT16 *  m_pf1_rowscroll;
@@ -36,6 +37,8 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen2;
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	required_device<palette_device> m_palette;
+	
 	DECLARE_WRITE16_MEMBER(vaportra_sound_w);
 	DECLARE_READ16_MEMBER(vaportra_control_r);
 	DECLARE_READ8_MEMBER(vaportra_soundlatch_r);

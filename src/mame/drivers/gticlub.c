@@ -248,7 +248,8 @@ public:
 		m_dsp2(*this, "dsp2"),
 		m_k056800(*this, "k056800"),
 		m_adc1038(*this, "adc1038"),
-		m_eeprom(*this, "eeprom")  { }
+		m_eeprom(*this, "eeprom"),
+		m_palette(*this, "palette")  { }
 
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
@@ -259,8 +260,9 @@ public:
 	required_device<adsp21062_device> m_dsp;
 	optional_device<cpu_device> m_dsp2;
 	required_device<k056800_device> m_k056800;
-	required_device<adc1038_device> m_adc1038;
+	required_device<adc1038_device> m_adc1038;	
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ32_MEMBER(gticlub_k001604_tile_r);

@@ -42,13 +42,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
 		m_main_ram(*this, "main_ram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
 	required_shared_ptr<UINT8> m_main_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 
 	tilemap_t *m_tilemap;
 	UINT32 m_clocks;

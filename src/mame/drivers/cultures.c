@@ -27,7 +27,8 @@ public:
 		m_bg2_regs_x(*this, "bg2_regs_x"),
 		m_bg2_regs_y(*this, "bg2_regs_y"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	UINT8     m_paletteram[0x4000];
 	/* memory pointers */
@@ -62,6 +63,7 @@ public:
 	INTERRUPT_GEN_MEMBER(cultures_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

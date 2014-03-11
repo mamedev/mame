@@ -7,7 +7,8 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	UINT8 m_ninjakun_io_a002_ctrl;
 	optional_shared_ptr<UINT8> m_fg_videoram;
@@ -51,4 +52,5 @@ public:
 	void lineswap_gfx_roms(const char *region, const int bit);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };

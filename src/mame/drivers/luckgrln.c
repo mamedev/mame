@@ -104,7 +104,8 @@ public:
 		m_luck_vram2(*this, "luck_vram2"),
 		m_luck_vram3(*this, "luck_vram3"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")  { }
 
 	UINT8 m_nmi_enable;
 	tilemap_t *m_reel1_tilemap;
@@ -156,6 +157,7 @@ public:
 	INTERRUPT_GEN_MEMBER(luckgrln_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

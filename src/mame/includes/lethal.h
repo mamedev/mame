@@ -20,7 +20,8 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_bank4800(*this, "bank4800"),
 		m_k056832(*this, "k056832"),
-		m_k053244(*this, "k053244") { }
+		m_k053244(*this, "k053244"),
+		m_palette(*this, "palette") { }
 
 	/* video-related */
 	int        m_layer_colorbase[4];
@@ -35,6 +36,7 @@ public:
 	required_device<address_map_bank_device> m_bank4800;
 	required_device<k056832_device> m_k056832;
 	required_device<k05324x_device> m_k053244;
+	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(control2_w);
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);

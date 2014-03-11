@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    HD61830 LCD Timing Controller emulation
+    Hitachi HD61830 LCD Timing Controller emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -19,23 +19,11 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-
-
-
-//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_HD61830_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, HD61830, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define HD61830_INTERFACE(name) \
-	const hd61830_interface (name) =
+#define MCFG_HD61830_RD_CALLBACK(_read) \
+	devcb = &hd61830_device::set_rd_rd_callback(*device, DEVCB2_##_read);
 
 
 
@@ -43,25 +31,17 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> hd61830_interface
-
-struct hd61830_interface
-{
-	devcb_read8 m_in_rd_cb;
-};
-
-
-
 // ======================> hd61830_device
 
 class hd61830_device :  public device_t,
 						public device_memory_interface,
-						public device_video_interface,
-						public hd61830_interface
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_rd_rd_callback(device_t &device, _Object object) { return downcast<hd61830_device &>(device).m_read_rd.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( control_w );
@@ -74,7 +54,6 @@ public:
 protected:
 	// device-level overrides
 	virtual const rom_entry *device_rom_region() const;
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -86,6 +65,23 @@ protected:
 	inline void writebyte(offs_t address, UINT8 data);
 
 private:
+	enum
+	{
+		INSTRUCTION_MODE_CONTROL = 0,
+		INSTRUCTION_CHARACTER_PITCH,
+		INSTRUCTION_NUMBER_OF_CHARACTERS,
+		INSTRUCTION_NUMBER_OF_TIME_DIVISIONS,
+		INSTRUCTION_CURSOR_POSITION,
+		INSTRUCTION_DISPLAY_START_LOW = 8,
+		INSTRUCTION_DISPLAY_START_HIGH,
+		INSTRUCTION_CURSOR_ADDRESS_LOW,
+		INSTRUCTION_CURSOR_ADDRESS_HIGH,
+		INSTRUCTION_DISPLAY_DATA_WRITE,
+		INSTRUCTION_DISPLAY_DATA_READ,
+		INSTRUCTION_CLEAR_BIT,
+		INSTRUCTION_SET_BIT
+	};
+
 	void set_busy_flag();
 
 	void draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ra);
@@ -93,11 +89,11 @@ private:
 	void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 ma, int x, int y, UINT8 md);
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	devcb_resolved_read8 m_in_rd_func;
+	devcb2_read8 m_read_rd;
 
 	emu_timer *m_busy_timer;
 	//address_space *m_data;
-
+	
 	bool m_bf;                      // busy flag
 
 	UINT8 m_ir;                     // instruction register
@@ -125,6 +121,7 @@ private:
 
 // device type definition
 extern const device_type HD61830;
+extern const device_type HD61830B;
 
 
 

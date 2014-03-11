@@ -59,8 +59,8 @@
 
 #include "private/metadata.h"
 
-#include "flac/assert.h"
-#include "flac/stream_decoder.h"
+#include "FLAC/assert.h"
+#include "FLAC/stream_decoder.h"
 #include "share/alloc.h"
 
 #ifdef max
@@ -1835,8 +1835,8 @@ FLAC_API FLAC__Metadata_Iterator *FLAC__metadata_iterator_new(void)
 	FLAC__Metadata_Iterator *iterator = (FLAC__Metadata_Iterator*)calloc(1, sizeof(FLAC__Metadata_Iterator));
 
 	/* calloc() implies:
-	    iterator->current = 0;
-	    iterator->chain = 0;
+		iterator->current = 0;
+		iterator->chain = 0;
 	*/
 
 	return iterator;
@@ -2426,7 +2426,7 @@ FLAC__Metadata_SimpleIteratorStatus read_metadata_block_data_picture_cb_(FLAC__I
 	len = FLAC__STREAM_METADATA_PICTURE_TYPE_LEN / 8;
 	if(read_cb(buffer, 1, len, handle) != len)
 		return FLAC__METADATA_SIMPLE_ITERATOR_STATUS_READ_ERROR;
-	block->type = /*(FLAC__StreamMetadata_Picture_Type)*/unpack_uint32_(buffer, len); // changed for MAME, check
+	block->type = (FLAC__StreamMetadata_Picture_Type)unpack_uint32_(buffer, len);
 
 	if((status = read_metadata_block_data_picture_cstring_cb_(handle, read_cb, (FLAC__byte**)(&(block->mime_type)), &len, FLAC__STREAM_METADATA_PICTURE_MIME_TYPE_LENGTH_LEN)) != FLAC__METADATA_SIMPLE_ITERATOR_STATUS_OK)
 		return status;

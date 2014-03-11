@@ -98,7 +98,8 @@ public:
 		m_adbmicro(*this, ADBMICRO_TAG),
 		#endif
 		m_adb_mousex(*this, "adb_mouse_x"),
-		m_adb_mousey(*this, "adb_mouse_y")
+		m_adb_mousey(*this, "adb_mouse_y"),
+		m_palette(*this, "palette") 
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -109,6 +110,7 @@ public:
 	#endif
 
 	required_ioport  m_adb_mousex, m_adb_mousey;
+	required_device<palette_device> m_palette;
 
 	UINT8 *m_slowmem;
 	UINT8 m_newvideo;

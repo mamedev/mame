@@ -9,13 +9,15 @@ public:
 		m_spriteram(*this,"spriteram"),
 		m_backgroundram(*this, "backgroundram"),
 		m_foregroundram(*this, "foregroundram"),
-		m_gfxdecode(*this, "gfxdecode"){ }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_shared_ptr<UINT8> m_backgroundram;
 	required_shared_ptr<UINT8> m_foregroundram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	int m_scroll[4];

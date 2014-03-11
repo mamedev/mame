@@ -106,7 +106,8 @@ public:
 			m_vram(*this, "vram"),
 			m_objram(*this, "objram"),
 			m_rcram(*this, "rcram"),
-			m_z80_ram(*this, "z80_ram") { }
+			m_z80_ram(*this, "z80_ram"),
+			m_screen(*this, "screen") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mathcpu;
@@ -116,6 +117,7 @@ public:
 	required_shared_ptr<UINT16> m_objram;
 	required_shared_ptr<UINT16> m_rcram;
 	required_shared_ptr<UINT8> m_z80_ram;
+	required_device<screen_device> m_screen;
 
 	emu_timer *m_interrupt_timer;
 

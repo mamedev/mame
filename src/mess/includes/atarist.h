@@ -117,7 +117,8 @@ public:
 			m_ikbd_mouse_py(IKBD_MOUSE_PHASE_STATIC),
 			m_ikbd_mouse_pc(0),
 			m_ikbd_joy(1),
-			m_monochrome(1)
+			m_monochrome(1),
+			m_palette(*this, "palette") 
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -328,6 +329,7 @@ public:
 	IRQ_CALLBACK_MEMBER(atarist_int_ack);
 
 	int m_monochrome;
+	required_device<palette_device> m_palette;
 	virtual DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 protected:

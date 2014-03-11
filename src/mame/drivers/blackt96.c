@@ -103,7 +103,8 @@ public:
 		m_spriteram6(*this, "spriteram6"),
 		m_spriteram7(*this, "spriteram7"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT16> m_tilemapram;
 	required_shared_ptr<UINT16> m_spriteram0;
@@ -155,6 +156,7 @@ public:
 	void draw_page(bitmap_ind16 &bitmap, const rectangle &cliprect, int page);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 #define GET_INFO( ram ) \

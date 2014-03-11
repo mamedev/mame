@@ -14,8 +14,19 @@ decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, DECOCOMN, "Data East Common Video Functions", tag, owner, clock, "decocomn", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_dirty_palette(NULL),
-	m_priority(0)
+	m_priority(0),
+	m_palette(*this)
 {
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void decocomn_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<decocomn_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -74,7 +85,7 @@ WRITE16_MEMBER( decocomn_device::nonbuffered_palette_w )
 	g = (state->m_generic_paletteram_16[offset + 1] >> 8) & 0xff;
 	r = (state->m_generic_paletteram_16[offset + 1] >> 0) & 0xff;
 
-	state->m_palette->set_pen_color(offset / 2, rgb_t(r,g,b));
+	m_palette->set_pen_color(offset / 2, rgb_t(r,g,b));
 }
 
 WRITE16_MEMBER( decocomn_device::buffered_palette_w )
@@ -90,7 +101,7 @@ WRITE16_MEMBER( decocomn_device::palette_dma_w )
 {
 	driver_device *state = space.machine().driver_data();
 
-	const int m = state->m_palette->entries();
+	const int m = m_palette->entries();
 	int r, g, b, i;
 
 	for (i = 0; i < m; i++)
@@ -103,7 +114,7 @@ WRITE16_MEMBER( decocomn_device::palette_dma_w )
 			g = (state->m_generic_paletteram_16[i * 2 + 1] >> 8) & 0xff;
 			r = (state->m_generic_paletteram_16[i * 2 + 1] >> 0) & 0xff;
 
-			state->m_palette->set_pen_color(i, rgb_t(r,g,b));
+			m_palette->set_pen_color(i, rgb_t(r,g,b));
 		}
 	}
 }

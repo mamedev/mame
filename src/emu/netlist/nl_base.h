@@ -454,13 +454,7 @@ public:
     netlist_terminal_t *m_otherterm;
 
 protected:
-    ATTR_COLD virtual void save_register()
-    {
-        save(NAME(m_Idr));
-        save(NAME(m_go));
-        save(NAME(m_gt));
-        netlist_core_terminal_t::save_register();
-    }
+    ATTR_COLD virtual void save_register();
 
     ATTR_COLD virtual void reset();
 };
@@ -565,7 +559,6 @@ public:
     ATTR_COLD void merge_net(netlist_net_t *othernet);
     ATTR_COLD void register_railterminal(netlist_output_t &mr);
 
-    /* inline not always works out */
     ATTR_HOT inline void update_devs();
 
     ATTR_HOT inline const netlist_time time() const { return m_time; }
@@ -575,9 +568,8 @@ public:
     ATTR_HOT inline const netlist_core_terminal_t & RESTRICT  railterminal() const { return *m_railterminal; }
 
     /* Everything below is used by the logic subsystem */
-
-    ATTR_HOT inline void inc_active();
-    ATTR_HOT inline void dec_active();
+    ATTR_HOT void inc_active();
+    ATTR_HOT void dec_active();
 
     ATTR_HOT inline const netlist_sig_t Q() const
     {
@@ -923,6 +915,8 @@ public:
     ATTR_HOT virtual void step_time(const double st) { }
     ATTR_HOT virtual void update_terminals() { }
 
+
+
 #if (NL_KEEP_STATISTICS)
     /* stats */
     osd_ticks_t total_time;
@@ -1027,6 +1021,7 @@ public:
     ATTR_HOT inline const netlist_time time() const { return m_time; }
     ATTR_HOT inline NETLIB_NAME(solver) *solver() const { return m_solver; }
     ATTR_HOT inline NETLIB_NAME(gnd) *gnd() const { return m_gnd; }
+    ATTR_HOT const double gmin() const;
 
     ATTR_HOT inline void push_to_queue(netlist_net_t *out, const netlist_time attime)
     {
@@ -1106,12 +1101,7 @@ protected:
 
     /* from netlist_object */
     ATTR_COLD virtual void reset();
-    ATTR_COLD virtual void save_register()
-    {
-        save(NAME(m_queue.callback()));
-        save(NAME(m_time));
-        netlist_object_t::save_register();
-    }
+    ATTR_COLD virtual void save_register();
 
 #if (NL_KEEP_STATISTICS)
     // performance
@@ -1166,7 +1156,7 @@ ATTR_HOT inline void netlist_param_double_t::setTo(const double param)
 
 ATTR_HOT inline void netlist_input_t::inactivate()
 {
-    if (!is_state(STATE_INP_PASSIVE))
+    if (EXPECTED(!is_state(STATE_INP_PASSIVE)))
     {
         set_state(STATE_INP_PASSIVE);
         net().dec_active();
@@ -1175,7 +1165,7 @@ ATTR_HOT inline void netlist_input_t::inactivate()
 
 ATTR_HOT inline void netlist_input_t::activate()
 {
-    if (is_state(STATE_INP_PASSIVE))
+    if (EXPECTED(is_state(STATE_INP_PASSIVE)))
     {
         net().inc_active();
         set_state(STATE_INP_ACTIVE);
@@ -1203,57 +1193,18 @@ ATTR_HOT inline void netlist_input_t::activate_lh()
 
 ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time delay)
 {
-    if (is_queued() || m_num_cons == 0)
-        return;
-    m_time = netlist().time() + delay;
-    m_in_queue = (m_active > 0);     /* queued ? */
-    if (m_in_queue)
+    //if (UNEXPECTED(m_num_cons == 0 || is_queued()))
+    if (!is_queued())
     {
-        netlist().push_to_queue(this, m_time);
-    }
-}
-
-ATTR_HOT inline void netlist_net_t::inc_active()
-{
-    m_active++;
-
-    if (USE_DEACTIVE_DEVICE)
-    {
-        if (m_active == 1 && m_in_queue > 0)
+        m_time = netlist().time() + delay;
+        m_in_queue = (m_active > 0);     /* queued ? */
+        if (EXPECTED(m_in_queue))
         {
-            m_last_Q = m_cur_Q;
-            m_last_Analog = m_cur_Analog; // FIXME: Needed here ?
-            railterminal().netdev().inc_active();
-            m_cur_Q = m_new_Q;
-            m_cur_Analog = m_new_Analog;
-        }
-    }
-
-    if (m_active == 1 && m_in_queue == 0)
-    {
-        if (m_time > netlist().time())
-        {
-            m_in_queue = 1;     /* pending */
             netlist().push_to_queue(this, m_time);
         }
-        else
-        {
-            m_cur_Q = m_last_Q = m_new_Q;
-            m_cur_Analog = m_last_Analog = m_new_Analog;  // FIXME: Needed here?
-            m_in_queue = 2;
-        }
     }
 }
 
-ATTR_HOT inline void netlist_net_t::dec_active()
-{
-    m_active--;
-    if (USE_DEACTIVE_DEVICE)
-    {
-        if (m_active == 0)
-            railterminal().netdev().dec_active();
-    }
-}
 
 ATTR_HOT inline const netlist_sig_t netlist_logic_input_t::Q() const
 {
@@ -1269,6 +1220,7 @@ ATTR_HOT inline const double netlist_analog_input_t::Q_Analog() const
 {
     return net().Q_Analog();
 }
+
 
 // ----------------------------------------------------------------------------------------
 // net_dev class factory

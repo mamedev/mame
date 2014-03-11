@@ -9,7 +9,9 @@ public:
 		m_s2636_0_ram(*this, "s2636_0_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_s2636_sound(*this, "s2636snd"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_s2636_0_ram;
@@ -17,6 +19,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<s2636_device> m_s2636_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_spritebitmap;

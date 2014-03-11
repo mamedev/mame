@@ -37,11 +37,6 @@ UINT32 tandy200_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-static HD61830_INTERFACE( lcdc_intf )
-{
-	DEVCB_NULL
-};
-
 static ADDRESS_MAP_START( tandy200_lcdc, AS_0, 8, tandy200_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
@@ -86,6 +81,6 @@ MACHINE_CONFIG_FRAGMENT( tandy200_video )
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(tandy200_state,tandy200)
 
-	MCFG_HD61830_ADD(HD61830_TAG, XTAL_4_9152MHz/2/2, lcdc_intf)
+	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL_4_9152MHz/2/2)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, tandy200_lcdc)
 MACHINE_CONFIG_END

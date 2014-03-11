@@ -44,7 +44,8 @@ public:
 		m_filter1_3r(*this, "filter1.3r"),
 		m_msm5205_l(*this, "msm5205.l"),
 		m_msm5205_r(*this, "msm5205.r"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -91,6 +92,7 @@ public:
 	required_device<filter_volume_device> m_msm5205_l;
 	required_device<filter_volume_device> m_msm5205_r;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(darius_watchdog_w);

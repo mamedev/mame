@@ -45,7 +45,9 @@ public:
 		m_chargen(*this, "chargen"),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_memory;
@@ -74,6 +76,8 @@ public:
 	device_t *m_ic8j2;
 	required_device<samples_device> m_samples;
 	optional_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	
 	DECLARE_WRITE8_MEMBER(m10_ctrl_w);
 	DECLARE_WRITE8_MEMBER(m11_ctrl_w);

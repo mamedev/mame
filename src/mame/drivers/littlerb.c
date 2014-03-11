@@ -96,6 +96,7 @@ public:
 	littlerb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_screen(*this, "screen"),			
 			m_dacl(*this, "dacl"),
 			m_dacr(*this, "dacr"),
 #if USE_TMS	
@@ -111,6 +112,7 @@ public:
 
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<dac_device> m_dacl;
 	required_device<dac_device> m_dacr;
 	UINT8 m_sound_index_l,m_sound_index_r;

@@ -28,7 +28,8 @@ public:
 		m_s14001a(*this, "speech"),
 		m_ls181_10c(*this, "ls181_10c"),
 		m_ls181_12c(*this, "ls181_12c"),
-		m_custom(*this, "exidy") { }
+		m_custom(*this, "exidy"),
+		m_screen(*this, "screen") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
@@ -38,6 +39,7 @@ public:
 	required_device<ttl74181_device> m_ls181_10c;
 	required_device<ttl74181_device> m_ls181_12c;
 	required_device<exidy_sound_device> m_custom;
+	required_device<screen_device> m_screen;
 
 	UINT8 m_magicram_control;
 	UINT8 m_last_shift_data;

@@ -82,7 +82,9 @@ public:
 		m_outputs(*this, "outputs"),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	UINT8 *m_hm86171_colorram;
 	layer_t m_layers[2];
@@ -168,6 +170,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 private:
 	inline void ss9601_get_tile_info(layer_t *l, tile_data &tileinfo, tilemap_memory_index tile_index);

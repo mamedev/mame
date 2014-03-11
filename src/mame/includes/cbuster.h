@@ -22,7 +22,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_deco_tilegen1(*this, "tilegen1"),
-		m_deco_tilegen2(*this, "tilegen2")
+		m_deco_tilegen2(*this, "tilegen2"),
+		m_palette(*this, "palette")
 	{ }
 
 	/* memory pointers */
@@ -45,6 +46,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
+	required_device<palette_device> m_palette;
 	DECLARE_WRITE16_MEMBER(twocrude_control_w);
 	DECLARE_READ16_MEMBER(twocrude_control_r);
 	DECLARE_WRITE16_MEMBER(twocrude_palette_24bit_rg_w);
