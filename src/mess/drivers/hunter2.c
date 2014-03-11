@@ -29,6 +29,7 @@
 #include "machine/mm58274c.h"
 #include "rendlay.h"
 #include "sound/speaker.h"
+#include "machine/nsc810.h"
 
 class hunter2_state : public driver_device
 {
@@ -40,6 +41,7 @@ public:
 	{ }
 
 	DECLARE_READ8_MEMBER(port00_r);
+	DECLARE_READ8_MEMBER(port01_r);
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_READ8_MEMBER(port02_r);
 	DECLARE_WRITE8_MEMBER(port60_w);
@@ -50,6 +52,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(a_timer);
 	DECLARE_PALETTE_INIT(hunter2);
 	DECLARE_DRIVER_INIT(hunter2);
+	DECLARE_WRITE_LINE_MEMBER(timer0_out);
 
 private:
 	UINT8 m_keydata;
@@ -70,11 +73,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(hunter2_io, AS_IO, 8, hunter2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("nsc810", nsc810_device, read, write) // device not yet emulated
-	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w)
-	AM_RANGE(0x02, 0x02) AM_READ(port02_r)
-	AM_RANGE(0x03, 0x1F) AM_WRITENOP
+	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("iotimer", nsc810_device, read, write) // device not yet emulated
+//	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
+//	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w)
+//	AM_RANGE(0x02, 0x02) AM_READ(port02_r)
+//	AM_RANGE(0x03, 0x1F) AM_WRITENOP
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("lcdc", hd61830_device, data_w)
 	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("lcdc", hd61830_device, status_r, control_w)
 	AM_RANGE(0x3e, 0x3e) AM_DEVREAD("lcdc", hd61830_device, data_r)
@@ -176,14 +179,21 @@ READ8_MEMBER( hunter2_state::port00_r )
 	return data;
 }
 
+READ8_MEMBER( hunter2_state::port01_r )
+{
+	// TODO: bit 7 = RS232 DSR line
+	return 0x00;
+}
+
 WRITE8_MEMBER( hunter2_state::port01_w )
 {
 	m_keydata = data;
+	logerror("Key row select %02x\n",data);
 }
 
 READ8_MEMBER( hunter2_state::port02_r )
 {
-	return 0x2c;
+	return 0x28;
 }
 
 WRITE8_MEMBER( hunter2_state::port60_w )
@@ -305,6 +315,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(hunter2_state::a_timer)
 		m_maincpu->set_input_line(NSC800_RSTA, HOLD_LINE);
 }
 
+WRITE_LINE_MEMBER(hunter2_state::timer0_out)
+{
+	if(state == ASSERT_LINE)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, 4000000)
@@ -330,6 +346,14 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	/* Devices */
 	MCFG_MM58274C_ADD("rtc", rtc_intf)
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("hunter_a", hunter2_state, a_timer, attotime::from_hz(61))
+
+	MCFG_NSC810_ADD("iotimer",XTAL_4MHz,XTAL_4MHz)
+	MCFG_NSC810_PORTA_READ(READ8(hunter2_state,port00_r))
+	MCFG_NSC810_PORTB_READ(READ8(hunter2_state,port01_r))
+	MCFG_NSC810_PORTB_WRITE(WRITE8(hunter2_state,port01_w))
+	MCFG_NSC810_PORTC_READ(READ8(hunter2_state,port02_r))
+	MCFG_NSC810_TIMER0_OUT(WRITELINE(hunter2_state,timer0_out))
+	MCFG_NSC810_TIMER1_OUT(INPUTLINE("maincpu",NSC800_RSTA))
 MACHINE_CONFIG_END
 
 /* ROM definition */

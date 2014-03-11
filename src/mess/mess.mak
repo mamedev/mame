@@ -486,6 +486,7 @@ MACHINES += PC_FDC
 MACHINES += DP8390
 MACHINES += MPU401
 MACHINES += AT_KEYBC
+MACHINES += NSC810
 #MACHINES += PROFILE
 
 #-------------------------------------------------
@@ -2096,6 +2097,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/hpz80unk.o  \
 	$(MESS_DRIVERS)/ht68k.o     \
 	$(MESS_DRIVERS)/hunter2.o   \
+	$(EMU_MACHINE)/nsc810.o    \
 	$(MESS_DRIVERS)/ibm6580.o   \
 	$(MESS_DRIVERS)/ie15.o      \
 	$(MESS_DRIVERS)/if800.o     \
