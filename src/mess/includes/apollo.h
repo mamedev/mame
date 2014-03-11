@@ -228,6 +228,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack5_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack6_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
+	TIMER_CALLBACK_MEMBER( apollo_rtc_timer );
 
 	void apollo_pic_set_irq_line(int irq, int state);
 	void select_dma_channel(int channel, bool state);
@@ -237,6 +238,7 @@ private:
 	UINT8 sio_output_data;
 	int m_dma_channel;
 	bool m_cur_eop;
+	emu_timer *m_dn3000_timer;
 };
 
 MACHINE_CONFIG_EXTERN( apollo );

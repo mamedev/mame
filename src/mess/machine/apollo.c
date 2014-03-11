@@ -317,16 +317,6 @@ static const UINT8 channel2page_register[8] = { 7, 3, 1, 2, 0, 11, 9, 10};
 static UINT8 dn3000_dma_channel1 = 1; // 1 = memory/ctape, 2 = floppy dma channel
 static UINT8 dn3000_dma_channel2 = 5; // 5 = memory dma channel
 
-#if 0
-INLINE am9517a_device *get_device_dma8237_1(device_t *device) {
-	return device->machine().driver_data<apollo_state>()->m_dma8237_1;
-}
-
-INLINE am9517a_device *get_device_dma8237_2(device_t *device) {
-	return device->machine().driver_data<apollo_state>()->m_dma8237_2;
-}
-#endif
-
 /*-------------------------------------------------
  DN3000/DN3500 DMA Controller 1 at 0x9000/0x10c00
  -------------------------------------------------*/
@@ -737,16 +727,16 @@ READ8_MEMBER(apollo_state::apollo_rtc_r)
 	return data;
 }
 
-static TIMER_CALLBACK( apollo_rtc_timer )
+// TODO: this is covering for missing mc146818 functionality
+TIMER_CALLBACK_MEMBER( apollo_state::apollo_rtc_timer )
 {
-	apollo_state *state = machine.driver_data<apollo_state>();
-	address_space &space = machine.device(MAINCPU)->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	// FIXME: reading register 0x0c will clear all interrupt flags
-	if ((state->apollo_rtc_r(space, 0x0c) & 0x80))
+	if ((apollo_rtc_r(space, 0x0c) & 0x80))
 	{
 		//SLOG2(("apollo_rtc_timer - set_irq_line %d", APOLLO_IRQ_RTC));
-		state->apollo_pic_set_irq_line(APOLLO_IRQ_RTC, 1);
+		apollo_pic_set_irq_line(APOLLO_IRQ_RTC, 1);
 	}
 }
 
@@ -899,7 +889,7 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 	{
 		//MLOG1(("faking mc146818 interrupts (DN3000 only)"));
 		// fake mc146818 interrupts (DN3000 only)
-		machine().scheduler().timer_pulse(attotime::from_hz(2), FUNC(apollo_rtc_timer));
+		m_dn3000_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apollo_state::apollo_rtc_timer),this));
 	}
 }
 
@@ -930,4 +920,9 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 
 	ptm_counter = 0;
 	sio_output_data = 0xff;
+
+	if (apollo_is_dn3000())
+	{
+		m_dn3000_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
+	}
 }
