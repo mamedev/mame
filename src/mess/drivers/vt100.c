@@ -427,7 +427,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
 
-	MCFG_VT100_VIDEO_ADD("vt100_video", vt100_video_interface)
+	MCFG_VT100_VIDEO_ADD("vt100_video", "screen", vt100_video_interface)
 
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))

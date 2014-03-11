@@ -101,13 +101,16 @@ extern const device_type VT100_VIDEO;
 extern const device_type RAINBOW_VIDEO;
 
 
-#define MCFG_VT100_VIDEO_ADD(_tag, _intrf) \
+#define MCFG_VT100_VIDEO_ADD(_tag, _screen_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, VT100_VIDEO, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_DEVICE_CONFIG(_intrf) \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag)
 
-#define MCFG_RAINBOW_VIDEO_ADD(_tag, _intrf) \
+#define MCFG_RAINBOW_VIDEO_ADD(_tag, _screen_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, RAINBOW_VIDEO, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+	MCFG_DEVICE_CONFIG(_intrf) \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag)
+	
 
 
 #endif

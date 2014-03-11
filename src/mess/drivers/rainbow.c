@@ -1213,7 +1213,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", rainbow)
 	
-	MCFG_RAINBOW_VIDEO_ADD("vt100_video", video_interface)
+	MCFG_RAINBOW_VIDEO_ADD("vt100_video", "screen", video_interface)
 
 	MCFG_FD1793_ADD("wd1793", rainbow_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(floppy_intf)
