@@ -534,6 +534,7 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cgenie )
 	MCFG_PALETTE_ADD("palette", 108)
+	MCFG_PALETTE_INDIRECT_ENTRIES(49)
 
 	// Actually the video is driven by an HD46505 clocked at XTAL_17_73447MHz/16
 

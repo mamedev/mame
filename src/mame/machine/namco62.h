@@ -10,7 +10,7 @@ struct namco_62xx_interface
 };
 
 class namco_62xx_device : public device_t,
-									public namco_62xx_interface
+							public namco_62xx_interface
 {
 public:
 	namco_62xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -21,6 +21,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;

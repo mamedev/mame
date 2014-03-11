@@ -597,76 +597,34 @@ static I8237_INTERFACE( apollo_dma8237_2_config )
 #undef VERBOSE
 #define VERBOSE 0
 
-INLINE pic8259_device *get_pic8259_master(device_t *device) {
-	return device->machine().driver_data<apollo_state>()->m_pic8259_master;
-}
-
-INLINE pic8259_device *get_pic8259_slave(device_t *device) {
-	return device->machine().driver_data<apollo_state>()->m_pic8259_slave;
-}
-
-/*-------------------------------------------------
- Interrupt Controller 8259 PIC #1 at 0x9400/0x11000
- -------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER(apollo_pic8259_master_w ) {
-	DLOG1(("writing %s at offset %X = %02x", device->tag(), offset, data));
-	downcast<pic8259_device *>(device)->write(space, offset, data);
-}
-
-READ8_DEVICE_HANDLER( apollo_pic8259_master_r ) {
-	UINT8 data = downcast<pic8259_device *>(device)->read(space, offset);
-	DLOG1(("reading %s at offset %X = %02x", device->tag(), offset, data));
-	return data;
-}
-
-/*-------------------------------------------------
- Interrupt Controller 8259 PIC #2 at 0x9500/0x11100
- -------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER(apollo_pic8259_slave_w ) {
-	DLOG1(("writing %s at offset %X = %02x", device->tag(), offset, data));
-	downcast<pic8259_device *>(device)->write(space, offset, data);
-}
-
-READ8_DEVICE_HANDLER( apollo_pic8259_slave_r ) {
-	UINT8 data = downcast<pic8259_device *>(device)->read(space, offset);
-	DLOG1(("reading %s at offset %X = %02x", device->tag(), offset, data));
-	return data;
-}
-
-static void apollo_pic_set_irq_line(device_t *device, int irq, int state) {
-	// don't log PTM interrupts
-	if (irq != APOLLO_IRQ_PTM) {
-		DLOG1(("apollo_pic_set_irq_line: irq=%d state=%d", irq, state));
-	}
-
+void apollo_state::apollo_pic_set_irq_line(int irq, int state) 
+{
 	switch (irq) {
-	case 0: get_pic8259_master(device)->ir0_w(state); break;
-	case 1: get_pic8259_master(device)->ir1_w(state); break;
-	case 2: get_pic8259_master(device)->ir2_w(state); break;
-	case 3: get_pic8259_master(device)->ir3_w(state); break;
-	case 4: get_pic8259_master(device)->ir4_w(state); break;
-	case 5: get_pic8259_master(device)->ir5_w(state); break;
-	case 6: get_pic8259_master(device)->ir6_w(state); break;
-	case 7: get_pic8259_master(device)->ir7_w(state); break;
+	case 0: m_pic8259_master->ir0_w(state); break;
+	case 1: m_pic8259_master->ir1_w(state); break;
+	case 2: m_pic8259_master->ir2_w(state); break;
+	case 3: m_pic8259_master->ir3_w(state); break;
+	case 4: m_pic8259_master->ir4_w(state); break;
+	case 5: m_pic8259_master->ir5_w(state); break;
+	case 6: m_pic8259_master->ir6_w(state); break;
+	case 7: m_pic8259_master->ir7_w(state); break;
 
-	case 8: get_pic8259_slave(device)->ir0_w(state); break;
-	case 9: get_pic8259_slave(device)->ir1_w(state); break;
-	case 10: get_pic8259_slave(device)->ir2_w(state); break;
-	case 11: get_pic8259_slave(device)->ir3_w(state); break;
-	case 12: get_pic8259_slave(device)->ir4_w(state); break;
-	case 13: get_pic8259_slave(device)->ir5_w(state); break;
-	case 14: get_pic8259_slave(device)->ir6_w(state); break;
-	case 15: get_pic8259_slave(device)->ir7_w(state); break;
+	case 8:  m_pic8259_slave->ir0_w(state); break;
+	case 9:  m_pic8259_slave->ir1_w(state); break;
+	case 10: m_pic8259_slave->ir2_w(state); break;
+	case 11: m_pic8259_slave->ir3_w(state); break;
+	case 12: m_pic8259_slave->ir4_w(state); break;
+	case 13: m_pic8259_slave->ir5_w(state); break;
+	case 14: m_pic8259_slave->ir6_w(state); break;
+	case 15: m_pic8259_slave->ir7_w(state); break;
 	}
 }
 
 IRQ_CALLBACK_MEMBER(apollo_state::apollo_pic_acknowledge)
 {
-	UINT32 vector = get_pic8259_master(&device)->acknowledge();
+	UINT32 vector = m_pic8259_master->acknowledge();
 	if ((vector & 0x0f) == APOLLO_IRQ_PIC_SLAVE) {
-		vector = get_pic8259_slave(&device)->acknowledge();
+		vector = m_pic8259_slave->acknowledge();
 	}
 
 	// don't log ptm interrupts
@@ -719,7 +677,7 @@ WRITE_LINE_MEMBER( apollo_state::apollo_pic8259_slave_set_int_line ) {
 		device_t *device = m_pic8259_slave;
 		DLOG1(("apollo_pic8259_slave_set_int_line: %x", state));
 		interrupt_line = state;
-		apollo_pic_set_irq_line(device, 3, state);
+		apollo_pic_set_irq_line(3, state);
 	}
 }
 
@@ -749,7 +707,7 @@ WRITE_LINE_MEMBER(apollo_state::apollo_ptm_timer_tick)
 
 WRITE_LINE_MEMBER(apollo_state::apollo_ptm_irq_function)
 {
-	apollo_pic_set_irq_line(this, APOLLO_IRQ_PTM, state);
+	apollo_pic_set_irq_line(APOLLO_IRQ_PTM, state);
 }
 
 //  Timer 1's input is a 250-kHz (4-microsecond period) signal.
@@ -806,7 +764,7 @@ static TIMER_CALLBACK( apollo_rtc_timer )
 	if ((state->apollo_rtc_r(space, 0x0c) & 0x80))
 	{
 		//SLOG2(("apollo_rtc_timer - set_irq_line %d", APOLLO_IRQ_RTC));
-		apollo_pic_set_irq_line(&space.device(), APOLLO_IRQ_RTC, 1);
+		state->apollo_pic_set_irq_line(APOLLO_IRQ_RTC, 1);
 	}
 }
 
@@ -816,14 +774,14 @@ static TIMER_CALLBACK( apollo_rtc_timer )
 
 WRITE_LINE_MEMBER(apollo_state::sio_irq_handler)
 {
-	apollo_pic_set_irq_line(this, APOLLO_IRQ_SIO1, state);
+	apollo_pic_set_irq_line(APOLLO_IRQ_SIO1, state);
 }
 
 WRITE8_MEMBER(apollo_state::sio_output)
 {
 	if ((data & 0x80) != (sio_output_data & 0x80)) 
 	{
-		apollo_pic_set_irq_line(this, APOLLO_IRQ_DIAG, (data & 0x80) ? 1 : 0);
+		apollo_pic_set_irq_line(APOLLO_IRQ_DIAG, (data & 0x80) ? 1 : 0);
 		sio_output_data = data;
 	}
 }
@@ -840,7 +798,7 @@ WRITE8_MEMBER(apollo_state::sio_output)
 
 WRITE_LINE_MEMBER(apollo_state::sio2_irq_handler)
 {
-	apollo_pic_set_irq_line(this, APOLLO_IRQ_SIO2, state);
+	apollo_pic_set_irq_line(APOLLO_IRQ_SIO2, state);
 }
 
 //##########################################################################
@@ -857,7 +815,7 @@ SLOT_INTERFACE_END
 
 
 void apollo_state::fdc_interrupt(bool state) {
-	apollo_pic_set_irq_line( m_maincpu, APOLLO_IRQ_FDC, state ? ASSERT_LINE : CLEAR_LINE);
+	apollo_pic_set_irq_line(APOLLO_IRQ_FDC, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void apollo_state::fdc_dma_drq(bool state) {
@@ -870,7 +828,7 @@ void apollo_state::fdc_dma_drq(bool state) {
 
 static void apollo_3c505_set_irq(device_t *device, int state) {
 	// DLOG2(("apollo_3c505_interrupt: state=%x", state ));
-	apollo_pic_set_irq_line(device->machine().driver_data<apollo_state>()->m_maincpu, APOLLO_IRQ_ETH1, state);
+	device->machine().driver_data<apollo_state>()->apollo_pic_set_irq_line(APOLLO_IRQ_ETH1, state);
 }
 
 static int apollo_3c505_tx_data(device_t *device,
@@ -914,7 +872,7 @@ static THREECOM3C505_INTERFACE(apollo_3c505_config) = {
 static void apollo_wdc_set_irq(const running_machine *machine, int state) {
 //  FIXME:
 //  MLOG2(("apollo_wdc_set_irq: state=%x", state ));
-	apollo_pic_set_irq_line(machine->driver_data<apollo_state>()->m_maincpu, APOLLO_IRQ_WIN1, state);
+	machine->driver_data<apollo_state>()->apollo_pic_set_irq_line(APOLLO_IRQ_WIN1, state);
 }
 
 static const omti8621_config apollo_wdc_config = {
@@ -927,7 +885,7 @@ static const omti8621_config apollo_wdc_config = {
 
 static void apollo_ctape_set_irq(const device_t *device, int state) {
 	DLOG2(("apollo_ctape_set_irq: state=%x", state ));
-	apollo_pic_set_irq_line(device->machine().driver_data<apollo_state>()->m_maincpu, APOLLO_IRQ_CTAPE, state);
+	device->machine().driver_data<apollo_state>()->apollo_pic_set_irq_line(APOLLO_IRQ_CTAPE, state);
 }
 
 

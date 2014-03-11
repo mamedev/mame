@@ -37,6 +37,7 @@ def sha1sum(path):
 	return sha1.hexdigest()
 
 def extractcdAndCompare(type):
+	global failure
 	extractFileDir = os.path.join(tempFilePath, type + "_output")
 	if not os.path.exists(extractFileDir):
 		os.makedirs(extractFileDir)
@@ -49,8 +50,8 @@ def extractcdAndCompare(type):
 		print d + " - extractcd (" + type + ") failed with " + str(exitcode) + " (" + stderr + ")"
 		failure = True
 	
-	sha1_extract = sha1sum(extractFile);
-	sha1_extract_bin = sha1sum(extractFileBin);
+	sha1_extract = sha1sum(extractFile)
+	sha1_extract_bin = sha1sum(extractFileBin)
 	
 	extractFileDir = os.path.join(tempFilePath, type + "_temp")
 	if not os.path.exists(extractFileDir):
@@ -64,8 +65,8 @@ def extractcdAndCompare(type):
 		print d + " - extractcd (" + type + ") failed with " + str(exitcode) + " (" + stderr + ")"
 		failure = True
 		
-	sha1_extract_2 = sha1sum(extractFile);
-	sha1_extract_bin_2 = sha1sum(extractFileBin);
+	sha1_extract_2 = sha1sum(extractFile)
+	sha1_extract_bin_2 = sha1sum(extractFileBin)
 		
 	if not sha1_extract == sha1_extract_2:
 		print "expected: " + sha1_extract + " found: " + sha1_extract_2
@@ -78,6 +79,7 @@ def extractcdAndCompare(type):
 		failure = True
 		
 def extractAndCompare(command, ext):
+	global failure
 	extractFileDir = os.path.join(tempFilePath, ext + "_output")
 	if not os.path.exists(extractFileDir):
 		os.makedirs(extractFileDir)
@@ -89,7 +91,7 @@ def extractAndCompare(command, ext):
 		print d + " - " + command + " (" + ext + ") failed with " + str(exitcode) + " (" + stderr + ")"
 		failure = True
 	
-	sha1_extract = sha1sum(extractFile);
+	sha1_extract = sha1sum(extractFile)
 	
 	extractFileDir = os.path.join(tempFilePath, ext + "_temp")
 	if not os.path.exists(extractFileDir):
@@ -102,7 +104,7 @@ def extractAndCompare(command, ext):
 		print d + " - " + command + " (" + ext + ") failed with " + str(exitcode) + " (" + stderr + ")"
 		failure = True
 		
-	sha1_extract_2 = sha1sum(extractFile);
+	sha1_extract_2 = sha1sum(extractFile)
 		
 	if not sha1_extract == sha1_extract_2:
 		print "expected: " + sha1_extract + " found: " + sha1_extract_2
@@ -139,8 +141,6 @@ for root, dirs, files in os.walk(inputPath):
 	for d in dirs:
 		if d.startswith("."):
 			continue
-
-		failure = False
 
 		command = ext = d.split("_", 2)[0]			
 		inFile = os.path.join(root, d, "in")

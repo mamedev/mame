@@ -234,6 +234,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_timer_tick );
 	DECLARE_READ8_MEMBER( apollo_pic8259_get_slave_ack );
 
+	void apollo_pic_set_irq_line(int irq, int state);
+
 private:
 	UINT32 ptm_counter;
 	UINT8 sio_output_data;
@@ -287,27 +289,6 @@ INPUT_PORTS_EXTERN(apollo_config);
 UINT16 apollo_csr_get_control_register(void);
 UINT16 apollo_csr_get_status_register(void);
 void apollo_csr_set_status_register(UINT16 mask, UINT16 data);
-
-
-/*----------- machine/apollo_dma.c -----------*/
-
-
-
-
-
-/*----------- machine/apollo_pic.c -----------*/
-
-DECLARE_WRITE8_DEVICE_HANDLER(apollo_pic8259_master_w ) ;
-DECLARE_READ8_DEVICE_HANDLER( apollo_pic8259_master_r );
-
-DECLARE_WRITE8_DEVICE_HANDLER(apollo_pic8259_slave_w );
-DECLARE_READ8_DEVICE_HANDLER( apollo_pic8259_slave_r );
-
-/*----------- machine/apollo_rtc.c -----------*/
-
-
-/*----------- machine/apollo_fdc.c -----------*/
-
 
 /*----------- machine/apollo_eth.c -----------*/
 

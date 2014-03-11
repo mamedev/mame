@@ -556,13 +556,6 @@ public:
     friend class netlist_analog_output_t;
     friend class netlist_setup_t;
 
-    struct hybrid_t
-    {
-        inline hybrid_t() : Q(0), Analog(0.0) {}
-        netlist_sig_t Q;
-        double        Analog;
-    };
-
     ATTR_COLD netlist_net_t(const type_t atype, const family_t afamily);
     ATTR_COLD virtual ~netlist_net_t();
 
@@ -575,8 +568,8 @@ public:
     /* inline not always works out */
     ATTR_HOT inline void update_devs();
 
-    ATTR_HOT inline const netlist_time &time() const { return m_time; }
-    ATTR_HOT inline void set_time(const netlist_time &ntime) { m_time = ntime; }
+    ATTR_HOT inline const netlist_time time() const { return m_time; }
+    ATTR_HOT inline void set_time(const netlist_time ntime) { m_time = ntime; }
 
     ATTR_HOT inline bool isRailNet() const { return !(m_railterminal == NULL); }
     ATTR_HOT inline const netlist_core_terminal_t & RESTRICT  railterminal() const { return *m_railterminal; }
@@ -589,26 +582,26 @@ public:
     ATTR_HOT inline const netlist_sig_t Q() const
     {
         assert(family() == LOGIC);
-        return m_cur.Q;
+        return m_cur_Q;
     }
 
     ATTR_HOT inline const netlist_sig_t last_Q() const
     {
         assert(family() == LOGIC);
-        return m_last.Q;
+        return m_last_Q;
     }
 
     ATTR_HOT inline const netlist_sig_t new_Q() const
     {
         assert(family() == LOGIC);
-        return m_new.Q;
+        return m_new_Q;
     }
 
     ATTR_HOT inline const double Q_Analog() const
     {
         //assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
         assert(family() == ANALOG);
-        return m_cur.Analog;
+        return m_cur_Analog;
     }
 
     ATTR_HOT inline void push_to_queue(const netlist_time delay);
@@ -620,14 +613,14 @@ public:
     ATTR_COLD inline netlist_sig_t &Q_state_ptr()
     {
         assert(family() == LOGIC);
-        return m_cur.Q;
+        return m_cur_Q;
     }
 
     ATTR_COLD inline double &Q_Analog_state_ptr()
     {
         //assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
         assert(family() == ANALOG);
-        return m_cur.Analog;
+        return m_cur_Analog;
     }
 
     ATTR_HOT inline int num_cons() const { return m_num_cons; }
@@ -638,6 +631,7 @@ public:
     terminal_list_t m_terms;
     terminal_list_t m_rails;
     netlist_matrix_solver_t *m_solver;
+    netlist_core_terminal_t * RESTRICT m_railterminal;
 
     ATTR_HOT void solve();
 
@@ -647,23 +641,24 @@ protected:  //FIXME: needed by current solver code
 
     UINT16 m_num_cons;
 
-public:
-    hybrid_t m_last;
-    hybrid_t m_cur;
-    hybrid_t m_new;
-
-protected:
-
     ATTR_COLD virtual void save_register();
     ATTR_COLD virtual void reset();
 
 
 private:
+    netlist_sig_t m_new_Q;
+    netlist_sig_t m_cur_Q;
+    netlist_sig_t m_last_Q;
+
     netlist_time m_time;
     INT32        m_active;
     UINT8        m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
-    netlist_core_terminal_t * RESTRICT m_railterminal;
+public:
+    double m_last_Analog;
+    double m_cur_Analog;
+    double m_new_Analog;
+
 };
 
 
@@ -706,9 +701,9 @@ public:
 
     ATTR_HOT inline void set_Q(const netlist_sig_t newQ, const netlist_time delay)
     {
-        if (EXPECTED(newQ !=  net().m_new.Q))
+        if (EXPECTED(newQ !=  net().m_new_Q))
         {
-            net().m_new.Q = newQ;
+            net().m_new_Q = newQ;
             net().push_to_queue(delay);
         }
     }
@@ -735,9 +730,9 @@ public:
 
     ATTR_HOT inline void set_Q(const double newQ, const netlist_time delay)
     {
-        if (newQ != net().m_new.Analog)
+        if (newQ != net().m_new_Analog)
         {
-            net().m_new.Analog = newQ;
+            net().m_new_Analog = newQ;
             net().push_to_queue(delay);
         }
     }
@@ -1226,9 +1221,11 @@ ATTR_HOT inline void netlist_net_t::inc_active()
     {
         if (m_active == 1 && m_in_queue > 0)
         {
-            m_last = m_cur;
+            m_last_Q = m_cur_Q;
+            m_last_Analog = m_cur_Analog; // FIXME: Needed here ?
             railterminal().netdev().inc_active();
-            m_cur = m_new;
+            m_cur_Q = m_new_Q;
+            m_cur_Analog = m_new_Analog;
         }
     }
 
@@ -1241,7 +1238,8 @@ ATTR_HOT inline void netlist_net_t::inc_active()
         }
         else
         {
-            m_cur = m_last = m_new;
+            m_cur_Q = m_last_Q = m_new_Q;
+            m_cur_Analog = m_last_Analog = m_new_Analog;  // FIXME: Needed here?
             m_in_queue = 2;
         }
     }

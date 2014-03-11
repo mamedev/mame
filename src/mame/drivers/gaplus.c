@@ -211,14 +211,14 @@ WRITE8_MEMBER(gaplus_state::gaplus_freset_w)
 static const namco_62xx_interface namco_62xx_intf =
 {
 	{   /* port read handlers */
-		//DEVCB_INPUT_PORT("IN0L"),
-		//DEVCB_INPUT_PORT("IN0H"),
-		//DEVCB_INPUT_PORT("IN1L"),
-		//DEVCB_INPUT_PORT("IN1H")
+		DEVCB_NULL, //DEVCB_INPUT_PORT("IN0L"),
+		DEVCB_NULL, //DEVCB_INPUT_PORT("IN0H"),
+		DEVCB_NULL, //DEVCB_INPUT_PORT("IN1L"),
+		DEVCB_NULL  //DEVCB_INPUT_PORT("IN1H")
 	},
 	{   /* port write handlers */
-		//DEVCB_DRIVER_MEMBER(out_0),
-		//DEVCB_DRIVER_MEMBER(out_1)
+		DEVCB_NULL, //DEVCB_DRIVER_MEMBER(out_0),
+		DEVCB_NULL  //DEVCB_DRIVER_MEMBER(out_1)
 	}
 };
 

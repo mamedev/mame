@@ -2870,7 +2870,7 @@ GAME( 1989, hellfire2a, hellfire, hellfire, hellfire2a,toaplan1_state, toaplan1,
 GAME( 1989, hellfire1a, hellfire, hellfire, hellfire1a,toaplan1_state, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P set, older)", 0 )
 GAME( 1989, zerowing,   0,        zerowing, zerowing2, toaplan1_state, toaplan1, ROT0,   "Toaplan", "Zero Wing (2P set)", 0 )
 GAME( 1989, zerowing1,  zerowing, zerowing, zerowing,  toaplan1_state, toaplan1, ROT0,   "Toaplan", "Zero Wing (1P set)", 0 )
-GAME( 1989, zerowingw,  zerowing, zerowing, zerowing2, toaplan1_state, toaplan1, ROT0,   "Toaplan / Williams Electronics", "Zero Wing (2P set, Williams Electronics)", 0 )
+GAME( 1989, zerowingw,  zerowing, zerowing, zerowing2, toaplan1_state, toaplan1, ROT0,   "Toaplan (Williams license)", "Zero Wing (2P set, Williams license)", 0 )
 GAME( 1990, demonwld,   0,        demonwld, demonwld,  toaplan1_state, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 1)", 0 )
 GAME( 1989, demonwld1,  demonwld, demonwld, demonwld1, toaplan1_state, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 2)", 0 )
 GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, toaplan1_state, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 3)", 0 )
