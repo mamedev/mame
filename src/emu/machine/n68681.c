@@ -74,7 +74,8 @@ duartn68681_device::duartn68681_device(const machine_config &mconfig, const char
 	ip3clk(0),
 	ip4clk(0),
 	ip5clk(0),
-	ip6clk(0)
+	ip6clk(0),
+	IP_last_state(0)
 {
 }
 
@@ -129,7 +130,6 @@ void duartn68681_device::device_reset()
 	OPCR = 0; /* Output Port Conf. Register */
 	OPR = 0;  /* Output Port Register */
 	CTR.d = 0;  /* Counter/Timer Preset Value */
-	IP_last_state = 0;  /* last state of IP bits */
 	m_read_vector = false;
 	// "reset clears internal registers (SRA, SRB, IMR, ISR, OPR, OPCR) puts OP0-7 in the high state, stops the counter/timer, and puts channels a/b in the inactive state"
 
@@ -456,7 +456,7 @@ WRITE8_MEMBER( duartn68681_device::write )
 
 WRITE_LINE_MEMBER( duartn68681_device::ip0_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x01) | (state == ASSERT_LINE) ? 1 : 0;
+	UINT8 newIP = (IP_last_state & ~0x01) | ((state == ASSERT_LINE) ? 1 : 0);
 
 	if (newIP != IP_last_state)
 	{
@@ -476,7 +476,7 @@ WRITE_LINE_MEMBER( duartn68681_device::ip0_w )
 
 WRITE_LINE_MEMBER( duartn68681_device::ip1_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x02) | (state == ASSERT_LINE) ? 2 : 0;
+	UINT8 newIP = (IP_last_state & ~0x02) | ((state == ASSERT_LINE) ? 2 : 0);
 
 	if (newIP != IP_last_state)
 	{
@@ -496,7 +496,7 @@ WRITE_LINE_MEMBER( duartn68681_device::ip1_w )
 
 WRITE_LINE_MEMBER( duartn68681_device::ip2_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x04) | (state == ASSERT_LINE) ? 4 : 0;
+	UINT8 newIP = (IP_last_state & ~0x04) | ((state == ASSERT_LINE) ? 4 : 0);
 
 	if (newIP != IP_last_state)
 	{
@@ -516,7 +516,7 @@ WRITE_LINE_MEMBER( duartn68681_device::ip2_w )
 
 WRITE_LINE_MEMBER( duartn68681_device::ip3_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x08) | (state == ASSERT_LINE) ? 8 : 0;
+	UINT8 newIP = (IP_last_state & ~0x08) | ((state == ASSERT_LINE) ? 8 : 0);
 
 	if (newIP != IP_last_state)
 	{
@@ -536,14 +536,14 @@ WRITE_LINE_MEMBER( duartn68681_device::ip3_w )
 
 WRITE_LINE_MEMBER( duartn68681_device::ip4_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x10) | (state == ASSERT_LINE) ? 0x10 : 0;
+	UINT8 newIP = (IP_last_state & ~0x10) | ((state == ASSERT_LINE) ? 0x10 : 0);
 // TODO: special mode for ip4 (Ch. A Rx clock)
 	IP_last_state = newIP;
 }
 
 WRITE_LINE_MEMBER( duartn68681_device::ip5_w )
 {
-	UINT8 newIP = (IP_last_state & ~0x20) | (state == ASSERT_LINE) ? 0x20 : 0;
+	UINT8 newIP = (IP_last_state & ~0x20) | ((state == ASSERT_LINE) ? 0x20 : 0);
 // TODO: special mode for ip5 (Ch. B Tx clock)
 	IP_last_state = newIP;
 }

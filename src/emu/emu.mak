@@ -28,44 +28,6 @@ OBJDIRS += \
 	$(EMUOBJ)/debugint \
 	$(EMUOBJ)/audio \
 	$(EMUOBJ)/bus \
-	$(EMUOBJ)/bus/abcbus \
-	$(EMUOBJ)/bus/adam \
-	$(EMUOBJ)/bus/adamnet \
-	$(EMUOBJ)/bus/bw2 \
-	$(EMUOBJ)/bus/c64 \
-	$(EMUOBJ)/bus/cbm2 \
-	$(EMUOBJ)/bus/cbmiec \
-	$(EMUOBJ)/bus/centronics \
-	$(EMUOBJ)/bus/comx35 \
-	$(EMUOBJ)/bus/ecbbus \
-	$(EMUOBJ)/bus/econet \
-	$(EMUOBJ)/bus/ep64 \
-	$(EMUOBJ)/bus/ieee488 \
-	$(EMUOBJ)/bus/imi7000 \
-	$(EMUOBJ)/bus/isa \
-	$(EMUOBJ)/bus/isbx \
-	$(EMUOBJ)/bus/midi \
-	$(EMUOBJ)/bus/pci \
-	$(EMUOBJ)/bus/pc_joy \
-	$(EMUOBJ)/bus/pc_kbd \
-	$(EMUOBJ)/bus/pet \
-	$(EMUOBJ)/bus/plus4 \
-	$(EMUOBJ)/bus/rs232 \
-	$(EMUOBJ)/bus/s100 \
-	$(EMUOBJ)/bus/vcs \
-	$(EMUOBJ)/bus/vic10 \
-	$(EMUOBJ)/bus/vic20 \
-	$(EMUOBJ)/bus/vidbrain \
-	$(EMUOBJ)/bus/vip \
-	$(EMUOBJ)/bus/wangpc \
-	$(EMUOBJ)/bus/a2bus \
-	$(EMUOBJ)/bus/nubus \
-	$(EMUOBJ)/bus/iq151 \
-	$(EMUOBJ)/bus/kc \
-	$(EMUOBJ)/bus/tvc \
-	$(EMUOBJ)/bus/z88 \
-	$(EMUOBJ)/bus/nes \
-	$(EMUOBJ)/bus/snes \
 	$(EMUOBJ)/drivers \
 	$(EMUOBJ)/machine \
 	$(EMUOBJ)/layout \

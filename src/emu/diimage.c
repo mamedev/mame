@@ -1005,9 +1005,9 @@ done:
 		if (!m_init_phase)
 		{
 			if (device().machine().phase() == MACHINE_PHASE_RUNNING)
-				popmessage("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, error());
+				popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
 			else
-				mame_printf_error("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
+				mame_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, error());
 		}
 		clear();
 	}

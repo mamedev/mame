@@ -282,6 +282,7 @@ void nouspikel_usb_smartmedia_device::device_reset()
 	m_feeprom_page = 0;
 	m_sram_page = 0;
 	m_cru_register = 0;
+	m_tms9995_mode = false;
 	// m_tms9995_mode = (device->type()==TMS9995);
 
 	if (m_genmod)

@@ -985,7 +985,7 @@ int renderer::device_create_resources()
 				D3DPOOL_DEFAULT, &m_vertexbuf);
 	if (result != D3D_OK)
 	{
-		printf("Error creating vertex buffer (%08X)", (UINT32)result);
+		mame_printf_error("Error creating vertex buffer (%08X)\n", (UINT32)result);
 		return 1;
 	}
 
@@ -994,7 +994,7 @@ int renderer::device_create_resources()
 		d3dintf->post_fx_available) ? D3DFVF_XYZW : D3DFVF_XYZRHW)));
 	if (result != D3D_OK)
 	{
-		mame_printf_error("Error setting vertex format (%08X)", (UINT32)result);
+		mame_printf_error("Error setting vertex format (%08X)\n", (UINT32)result);
 		return 1;
 	}
 
@@ -1182,7 +1182,7 @@ int renderer::device_test_cooperative()
 		// if it didn't work, punt to GDI
 		if (result != D3D_OK)
 		{
-			printf("Unable to reset, result %08x\n", (UINT32)result);
+			mame_printf_error("Unable to reset, result %08x\n", (UINT32)result);
 			return 1;
 		}
 
@@ -1888,7 +1888,7 @@ void renderer::primitive_flush_pending()
 
 		if (vertnum + m_poly[polynum].get_vertcount() > m_numverts)
 		{
-			printf("Error: vertnum (%d) plus poly vertex count (%d) > %d\n", vertnum, m_poly[polynum].get_vertcount(), m_numverts);
+			mame_printf_error("Error: vertnum (%d) plus poly vertex count (%d) > %d\n", vertnum, m_poly[polynum].get_vertcount(), m_numverts);
 			fflush(stdout);
 		}
 
@@ -2110,7 +2110,7 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 
 error:
 	d3dintf->post_fx_available = false;
-	printf("Direct3D: Critical warning: A texture failed to allocate. Expect things to get bad quickly.\n");
+	mame_printf_error("Direct3D: Critical warning: A texture failed to allocate. Expect things to get bad quickly.\n");
 	if (m_d3dsurface != NULL)
 		(*d3dintf->surface.release)(m_d3dsurface);
 	if (m_d3dtex != NULL)

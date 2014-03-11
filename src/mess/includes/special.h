@@ -83,9 +83,6 @@ public:
 	DECLARE_WRITE8_MEMBER(specialist_8255_porta_w);
 	DECLARE_WRITE8_MEMBER(specialist_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(specialist_8255_portc_w);
-	DECLARE_WRITE_LINE_MEMBER(specimx_pit8253_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(specimx_pit8253_out1_changed);
-	DECLARE_WRITE_LINE_MEMBER(specimx_pit8253_out2_changed);
 	void specimx_set_bank(offs_t i, UINT8 data);
 	void erik_set_bank();
 	UINT8 *m_specimx_colorram;
@@ -93,7 +90,6 @@ public:
 	UINT8 m_erik_color_2;
 	UINT8 m_erik_background;
 	UINT8 m_specimx_color;
-	specimx_sound_device *m_specimx_audio;
 	int m_specialist_8255_porta;
 	int m_specialist_8255_portb;
 	int m_specialist_8255_portc;
@@ -173,16 +169,17 @@ class specimx_sound_device : public device_t,
 public:
 	specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~specimx_sound_device() { }
-
+	
+	DECLARE_WRITE_LINE_MEMBER(set_input_ch0);
+	DECLARE_WRITE_LINE_MEMBER(set_input_ch1);
+	DECLARE_WRITE_LINE_MEMBER(set_input_ch2);
+	
 protected:
 	// device-level overrides
 	virtual void device_start();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-
-public:
-	void set_input(int index, int state);
 
 private:
 	sound_stream *m_mixer_channel;

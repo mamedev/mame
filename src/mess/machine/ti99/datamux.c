@@ -387,6 +387,7 @@ WRITE_LINE_MEMBER( ti99_datamux_device::ready_line )
 void ti99_datamux_device::device_start(void)
 {
 	m_ram16b = NULL;
+	m_muxready = ASSERT_LINE;
 }
 
 void ti99_datamux_device::device_stop(void)

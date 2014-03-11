@@ -80,9 +80,6 @@
 
 // ----------------------------------
 
-#define FLOPPY_FORMATS_END_NO_DEFAULTS ,\
-		NULL };
-
 #define MOTOR_TIMER 1
 #define CLOCK_TAG "mm58274c"
 #define FDC_TAG "wd1773"
@@ -335,7 +332,7 @@ READ8Z_MEMBER(snug_bwg_device::crureadz)
 
 WRITE8_MEMBER(snug_bwg_device::cruwrite)
 {
-//	int drive, drivebit;
+//  int drive, drivebit;
 
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -622,7 +619,7 @@ INPUT_PORTS_END
 FLOPPY_FORMATS_MEMBER(snug_bwg_device::floppy_formats)
 	FLOPPY_TI99_SDF_FORMAT,
 	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END_NO_DEFAULTS
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( bwg_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )        // 40 tracks
@@ -1094,6 +1091,8 @@ void snug_bwg_legacy_device::device_reset()
 	m_WAITena = false;
 	m_rtc_enabled = false;
 	m_selected = false;
+	m_dataregLB = false;
+	m_inDsrArea = false;
 
 	m_dip1 = ioport("BWGDIP1")->read();
 	m_dip2 = ioport("BWGDIP2")->read();

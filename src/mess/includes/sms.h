@@ -19,9 +19,9 @@
 #define CONTROL1_TAG   "ctrl1"
 #define CONTROL2_TAG   "ctrl2"
 
-#include "machine/smsctrl.h"
-#include "machine/smsexp.h"
-#include "machine/sega8_slot.h"
+#include "bus/sms_ctrl/smsctrl.h"
+#include "bus/sms_exp/smsexp.h"
+#include "bus/sega8/sega8_slot.h"
 
 
 class sms_state : public driver_device

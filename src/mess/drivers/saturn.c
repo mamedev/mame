@@ -47,10 +47,10 @@ test1f diagnostic hacks:
 #include "imagedev/chd_cd.h"
 #include "coreutil.h"
 
-#include "machine/sat_slot.h"
-#include "machine/sat_rom.h"
-#include "machine/sat_dram.h"
-#include "machine/sat_bram.h"
+#include "bus/saturn/sat_slot.h"
+#include "bus/saturn/rom.h"
+#include "bus/saturn/dram.h"
+#include "bus/saturn/bram.h"
 
 #include "mcfglgcy.h"
 

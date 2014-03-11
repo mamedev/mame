@@ -46,9 +46,6 @@
 #define MOTOR_TIMER 1
 
 #define TI_FDC_TAG "ti_dssd_controller"
-#define FLOPPY_FORMATS_END_NO_DEFAULTS ,\
-		NULL };
-
 
 ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 			: ti_expansion_card_device(mconfig, TI99_FDC, "TI-99 Standard DSSD Floppy Controller", tag, owner, clock, "ti99_fdc", __FILE__),
@@ -399,7 +396,7 @@ void ti_fdc_device::device_config_complete()
 FLOPPY_FORMATS_MEMBER(ti_fdc_device::floppy_formats)
 	FLOPPY_TI99_SDF_FORMAT,
 	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END_NO_DEFAULTS
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( tifdc_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )

@@ -3614,7 +3614,7 @@ time_t ioport_manager::playback_init()
 	mame_printf_info("INP version %d.%d\n", header[0x10], header[0x11]);
 	time_t basetime = header[0x08] | (header[0x09] << 8) | (header[0x0a] << 16) | (header[0x0b] << 24) |
 						((UINT64)header[0x0c] << 32) | ((UINT64)header[0x0d] << 40) | ((UINT64)header[0x0e] << 48) | ((UINT64)header[0x0f] << 56);
-	mame_printf_info("Created %s", ctime(&basetime));
+	mame_printf_info("Created %s\n", ctime(&basetime));
 	mame_printf_info("Recorded using %s\n", header + 0x20);
 
 	// verify the header against the current game

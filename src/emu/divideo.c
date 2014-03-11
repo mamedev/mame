@@ -73,7 +73,7 @@ void device_video_interface::interface_validity_check(validity_checker &valid) c
 		{
 			screen = device().siblingdevice<screen_device>(m_screen_tag);
 			if (screen == NULL)
-				mame_printf_error("Screen '%s' not found, explicitly set for device '%s'", m_screen_tag, device().tag());
+				mame_printf_error("Screen '%s' not found, explicitly set for device '%s'\n", m_screen_tag, device().tag());
 		}
 
 		// otherwise, look for a single match
@@ -82,13 +82,13 @@ void device_video_interface::interface_validity_check(validity_checker &valid) c
 			screen_device_iterator iter(device().mconfig().root_device());
 			screen = iter.first();
 			if (iter.next() != NULL)
-				mame_printf_error("No screen specified for device '%s', but multiple screens found", device().tag());
+				mame_printf_error("No screen specified for device '%s', but multiple screens found\n", device().tag());
 		}
 	}
 
 	// error if no screen is found
 	if (screen == NULL && m_screen_required)
-		mame_printf_error("Device '%s' requires a screen", device().tag());
+		mame_printf_error("Device '%s' requires a screen\n", device().tag());
 }
 
 

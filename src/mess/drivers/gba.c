@@ -20,7 +20,7 @@
 #include "sound/dac.h"
 #include "audio/gb.h"
 #include "includes/gba.h"
-#include "machine/gba_rom.h"
+#include "bus/gba/rom.h"
 #include "rendlay.h"
 
 #define VERBOSE_LEVEL   (0)
