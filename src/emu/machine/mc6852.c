@@ -129,8 +129,6 @@ void mc6852_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_cr));
 	save_item(NAME(m_scr));
-	save_item(NAME(m_rx_fifo));
-	save_item(NAME(m_tx_fifo));
 	save_item(NAME(m_tdr));
 	save_item(NAME(m_tsr));
 	save_item(NAME(m_rdr));
