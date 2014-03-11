@@ -239,6 +239,43 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 l
 
 
 //============================================================
+//  osd_truncate
+//============================================================
+
+file_error osd_truncate(osd_file *file, UINT64 offset)
+{
+	DWORD result;
+	LONG upper = offset >> 32;
+
+	switch (file->type)
+	{
+		case WINFILE_FILE:
+			// attempt to set the file pointer
+			result = SetFilePointer(file->handle, (UINT32)offset, &upper, FILE_BEGIN);
+			if (result == INVALID_SET_FILE_POINTER)
+			{
+				DWORD error = GetLastError();
+				if (error != NO_ERROR)
+					return win_error_to_mame_file_error(error);
+			}
+
+			// then perform the truncation
+			if (!SetEndOfFile(file->handle))
+				return win_error_to_mame_file_error(GetLastError());
+			break;
+		case WINFILE_SOCKET:
+			return FILERR_FAILURE;
+			break;
+		case WINFILE_PTTY:
+			return FILERR_FAILURE;
+			break;
+
+	}
+	return FILERR_NONE;
+}
+
+
+//============================================================
 //  osd_close
 //============================================================
 

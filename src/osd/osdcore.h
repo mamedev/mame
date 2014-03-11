@@ -167,6 +167,23 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 l
 
 
 /*-----------------------------------------------------------------------------
+    osd_truncate: change the size of an open file
+
+    Parameters:
+
+        file - handle to a file previously opened via osd_open
+
+        offset - future size of the file
+
+    Return value:
+
+        a file_error describing any error that occurred while writing to
+        the file, or FILERR_NONE if no error occurred
+-----------------------------------------------------------------------------*/
+file_error osd_truncate(osd_file *file, UINT64 offset);
+
+
+/*-----------------------------------------------------------------------------
     osd_rmfile: deletes a file
 
     Parameters:
