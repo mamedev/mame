@@ -9,10 +9,6 @@
    Sprites 4bpp instead of 2bpp
    Many code changes
 
-   Todo:
-
-    Verify frequencies etc.
-
 */
 
 /* README
@@ -200,15 +196,24 @@ static GFXDECODE_START( pokechmp )
 	GFXDECODE_ENTRY( "sprites", 0x00000, pokechmp_spritelayout,   0,  32 ) /* sprites */
 GFXDECODE_END
 
+/*
+Clocks - from Billiard List PCB
+Main 6502: 1mhz
+Sound 6502: 1mhz
+YM2203: 1mhz
+YM3014: 1.5mhz
+OKI M6295 (an AD65 on this board, note pin 7 is low): 1.5mhz
+
+*/
 
 static MACHINE_CONFIG_START( pokechmp, pokechmp_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 4000000)
+	MCFG_CPU_ADD("maincpu", M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(pokechmp_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pokechmp_state,  nmi_line_pulse)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 4000000)
+	MCFG_CPU_ADD("audiocpu", M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(pokechmp_sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pokechmp_state,  irq0_line_hold)
 
@@ -227,13 +232,13 @@ static MACHINE_CONFIG_START( pokechmp, pokechmp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_SOUND_ADD("ym1", YM2203, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
+	MCFG_SOUND_ADD("ym2", YM3812, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 4000000/4, OKIM6295_PIN7_HIGH) // ?? unknown frequency
+	MCFG_OKIM6295_ADD("oki", 1500000, OKIM6295_PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) /* sound fx */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, pokechmp_oki_map)
@@ -277,4 +282,31 @@ ROM_START( pokechmp )
 	ROM_LOAD( "pokechamp_10_27c040.bin",       0x00000, 0x80000, CRC(b54806ed) SHA1(c6e1485c263ebd9102ff1e8c09b4c4ca5f63c3da) )
 ROM_END
 
-GAME( 1995, pokechmp, 0, pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Poke Champ", 0 )
+
+ROM_START(billlist)
+	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_LOAD("billiard_list.1", 0x00000, 0x20000, CRC(4ef416f7) SHA1(e995410e2c79a3fbd2ac76a80dc6c412eb454e52) )
+
+	ROM_REGION(0x18000, "audiocpu", 0)     /* 96k for code + 96k for decrypted opcodes */
+	ROM_LOAD("pokechamp_09_27c512.bin", 0x10000, 0x8000, BAD_DUMP CRC(c78f6483) SHA1(a0d063effd8d1850f674edccb6e7a285b2311d21)) // wasn't dumped from this set
+	ROM_CONTINUE(0x08000, 0x8000)
+
+	ROM_REGION(0x100000, "bgs", 0)
+	ROM_LOAD("billiard_list.6", 0x00000, 0x40000, CRC(e674f7c0) SHA1(8a610a92ae141f3004497dc3ce102d07a178683f) )
+	ROM_LOAD("billiard_list.5", 0x40000, 0x40000, CRC(f50d1510) SHA1(e09c6b1d0a5bdb44b3b5ae6bd54b169abd978af5) )
+	ROM_LOAD("billiard_list.4", 0x80000, 0x40000, CRC(7466c0be) SHA1(6e82d9d8ec5bdeca2f6c7b9ca0f31aabf3faacea) )
+	ROM_LOAD("billiard_list.3", 0xc0000, 0x40000, CRC(1ac4fa42) SHA1(2da5c6aa7e6b34ad1a2f052a41a2e607e2f904c2) )
+
+	ROM_REGION(0x20000, "sprites", 0)
+	/* the first half of all these roms is identical.  For rom 3 both halves match.  Correct decode is to ignore the first half */
+	ROM_LOAD("pokechamp_02_27c512.bin", 0x00000, 0x08000, BAD_DUMP CRC(1ff44545) SHA1(2eee44484accce7b0ba21babf6e8344b234a4e87)) ROM_CONTINUE(0x00000, 0x8000) // wasn't dumped from this set
+	ROM_LOAD("pokechamp_01_27c512.bin", 0x08000, 0x08000, BAD_DUMP CRC(338fc412) SHA1(bb8ae99ee6a399a8c67bedb88d0837fd0a4a426c)) ROM_CONTINUE(0x08000, 0x8000) // ""
+	ROM_LOAD("pokechamp_04_27c512.bin", 0x10000, 0x08000, BAD_DUMP CRC(ee6991af) SHA1(8eca3cdfd2eb74257253957a87b245b7f85bd038)) ROM_CONTINUE(0x10000, 0x8000) // ""
+	ROM_LOAD("pokechamp_03_27c512.bin", 0x18000, 0x08000, BAD_DUMP CRC(99f9884a) SHA1(096d6ce70dc51fb9142e80e1ec45d6d7225481f5)) ROM_CONTINUE(0x18000, 0x8000) // ""
+
+	ROM_REGION(0x80000, "oki", 0)
+	ROM_LOAD("billiard_list.x", 0x00000, 0x80000, CRC(b54806ed) SHA1(c6e1485c263ebd9102ff1e8c09b4c4ca5f63c3da) )
+ROM_END
+
+GAME( 1995, pokechmp, 0,        pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Poke Champ", 0 )
+GAME( 1995, billlist, pokechmp, pokechmp, pokechmp, pokechmp_state, pokechmp, ROT0, "D.G.R.M.", "Billard List", 0)
