@@ -223,29 +223,9 @@ const device_type UPD1771C = &device_creator<upd1771c_device>;
 
 upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, UPD1771C, "NEC uPD1771C 017", tag, owner, clock, "upd1771c", __FILE__),
-					device_sound_interface(mconfig, *this)
+					device_sound_interface(mconfig, *this),
+					m_ack_handler(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void upd1771c_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const upd1771_interface *intf = reinterpret_cast<const upd1771_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<upd1771_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_ack_callback, 0, sizeof(m_ack_callback));
-	}
 }
 
 //-------------------------------------------------
@@ -255,7 +235,7 @@ void upd1771c_device::device_config_complete()
 void upd1771c_device::device_start()
 {
 	/* resolve callbacks */
-	m_ack_out_func.resolve(m_ack_callback, *this);
+	m_ack_handler.resolve();
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd1771c_device::ack_callback),this));
 
@@ -374,7 +354,7 @@ WRITE8_MEMBER( upd1771c_device::write )
 	//if (LOG)
 	//  logerror( "upd1771_w: received byte 0x%02x\n", data );
 
-	m_ack_out_func(0);
+	m_ack_handler(0);
 
 	if (m_index < MAX_PACKET_SIZE)
 		m_packet[m_index++] = data;
@@ -476,7 +456,7 @@ WRITE_LINE_MEMBER( upd1771c_device::pcm_write )
 
 TIMER_CALLBACK_MEMBER( upd1771c_device::ack_callback )
 {
-	m_ack_out_func(1);
+	m_ack_handler(1);
 }
 
 

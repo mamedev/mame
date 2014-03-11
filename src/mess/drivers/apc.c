@@ -982,8 +982,6 @@ PALETTE_INIT_MEMBER(apc_state,apc)
 		palette.set_pen_color(i, pal1bit(0), pal1bit(0), pal1bit(0));
 }
 
-static const upd1771_interface upd1771c_config = { DEVCB_NULL };
-
 static MACHINE_CONFIG_START( apc, apc_state )
 
 	/* basic machine hardware */
@@ -1028,7 +1026,6 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD( "upd1771c", UPD1771C, MAIN_CLOCK ) //uPD1771C-006
-	MCFG_SOUND_CONFIG( upd1771c_config )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
