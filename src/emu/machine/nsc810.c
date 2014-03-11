@@ -191,17 +191,17 @@ WRITE8_MEMBER(nsc810_device::write)
 		{
 		case REG_PORTA:
 			m_portA_latch = data & ~m_ddrA;
-			m_portA_w(data & m_ddrA);
+			m_portA_w((0xff & ~m_ddrA) | (data & m_ddrA));
 			if(LOG) logerror("NSC810 '%s': Port A data write %02x\n",tag(),data);
 			break;
 		case REG_PORTB:
 			m_portB_latch = data & ~m_ddrB;
-			m_portB_w(data & m_ddrB);
+			m_portB_w((0xff & ~m_ddrB) | (data & m_ddrB));
 			if(LOG) logerror("NSC810 '%s': Port B data write %02x\n",tag(),data);
 			break;
 		case REG_PORTC:
 			m_portC_latch = data & ~m_ddrC;
-			m_portC_w(data & m_ddrC);
+			m_portC_w((0xff & ~m_ddrC) | (data & m_ddrC));
 			if(LOG) logerror("NSC810 '%s': Port C data write %02x\n",tag(),data);
 			break;
 		case REG_DDRA:
