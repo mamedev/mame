@@ -149,7 +149,7 @@ READ8_MEMBER( hardbox_device::ppi0_pc_r )
 	UINT8 data = ioport("SW1")->read();
 
 	/* DIP switches on PC1,PC2,PC3 configure the IEEE-488 primary address.
-	   We get the address from m_address instead. */
+	   We get the address from the slot instead. */
 	data |= ((m_slot->get_address() - 8) << 1) ^ 0xff;
 
 	return data;
