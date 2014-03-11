@@ -50,10 +50,8 @@ QUICKLOAD_LOAD_MEMBER( c128_state, cbm_c64 )
 
 inline void c128_state::check_interrupts()
 {
-	int restore = !BIT(m_restore->read(), 0);
-
 	int irq = m_cia1_irq || m_vic_irq || m_exp_irq;
-	int nmi = m_cia2_irq || restore || m_exp_nmi;
+	int nmi = m_cia2_irq || !m_restore || m_exp_nmi;
 	//int aec = m_exp_dma && m_z80_busack;
 	//int rdy = m_vic_aec && m_z80en && m_vic_ba;
 	//int busreq = !m_z80en || !(m_z80_busack && !aec)
@@ -493,8 +491,10 @@ ADDRESS_MAP_END
 //  INPUT_PORTS( c128 )
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( c128_state::restore )
+WRITE_LINE_MEMBER( c128_state::write_restore )
 {
+	m_restore = state;
+
 	check_interrupts();
 }
 
@@ -615,7 +615,7 @@ static INPUT_PORTS_START( c128 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ALT") PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(LALT))
 
 	PORT_START( "RESTORE" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESTORE") PORT_CODE(KEYCODE_PRTSCR)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESTORE") PORT_CODE(KEYCODE_PRTSCR) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, c128_state, write_restore)
 
 	PORT_START( "LOCK" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))

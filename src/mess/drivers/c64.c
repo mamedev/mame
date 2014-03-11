@@ -48,10 +48,8 @@ QUICKLOAD_LOAD_MEMBER( c64_state, cbm_c64 )
 
 void c64_state::check_interrupts()
 {
-	int restore = 0; // TODO: push restore m_restore ? !BIT(m_restore->read(), 0) : CLEAR_LINE;
-
 	int irq = m_cia1_irq || m_vic_irq || m_exp_irq;
-	int nmi = m_cia2_irq || restore || m_exp_nmi;
+	int nmi = m_cia2_irq || !m_restore || m_exp_nmi;
 	//int rdy = m_exp_dma && m_vic_ba;
 
 	m_maincpu->set_input_line(M6510_IRQ_LINE, irq);
@@ -366,6 +364,13 @@ ADDRESS_MAP_END
 //  INPUT_PORTS( c64 )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( c64_state::write_restore )
+{
+	m_restore = state;
+
+	check_interrupts();
+}
+
 static INPUT_PORTS_START( c64 )
 	PORT_START( "ROW0" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Down Up") PORT_CODE(KEYCODE_RALT)        PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR(UCHAR_MAMEKEY(UP))
@@ -448,7 +453,7 @@ static INPUT_PORTS_START( c64 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)                                 PORT_CHAR('1') PORT_CHAR('!')
 
 	PORT_START( "RESTORE" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESTORE") PORT_CODE(KEYCODE_PRTSCR)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESTORE") PORT_CODE(KEYCODE_PRTSCR) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, c64_state, write_restore)
 
 	PORT_START( "LOCK" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
