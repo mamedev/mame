@@ -258,6 +258,7 @@ static MACHINE_CONFIG_START( bsktball, bsktball_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bsktball)
 	MCFG_PALETTE_ADD("palette", 2*4 + 4*4*4*4)
+	MCFG_PALETTE_INDIRECT_ENTRIES(4)
 	MCFG_PALETTE_INIT_OWNER(bsktball_state, bsktball)
 
 	/* sound hardware */

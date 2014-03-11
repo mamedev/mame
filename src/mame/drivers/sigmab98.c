@@ -920,7 +920,7 @@ READ8_MEMBER(sigmab98_state::haekaka_b000_r)
 
 		case 0x67:  // PALETTERAM + TABLE? + REGS
 			if (offset < 0x200)
-				return m_generic_paletteram_8[offset];
+				return m_paletteram[offset];
 			else if (offset == (0xc013-0xb000))
 				return haekaka_vblank_r(space, offset);
 			break;
@@ -1154,7 +1154,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rambank_w)
 			switch (data)
 			{
 				case 0x52:  membank("palbank")->set_base(m_nvram);                                  break;
-				case 0x64:  membank("palbank")->set_base(m_generic_paletteram_8);   break;
+				case 0x64:  membank("palbank")->set_base(m_paletteram);   break;
 				default:
 					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", machine().describe_context(), data, m_reg2);
 					return;
@@ -2256,8 +2256,9 @@ ROM_END
 DRIVER_INIT_MEMBER(sigmab98_state,haekaka)
 {
 	// RAM banks
-	m_generic_paletteram_8.allocate(0x200);
-	memset(m_generic_paletteram_8, 0, 0x200);
+	m_paletteram.resize(0x200);
+	memset(m_paletteram, 0, 0x200);
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
 
 	m_spriteram.allocate(0x1000);
 	memset(m_spriteram, 0, 0x1000);

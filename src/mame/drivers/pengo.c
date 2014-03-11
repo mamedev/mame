@@ -384,6 +384,7 @@ static MACHINE_CONFIG_START( pengo, pengo_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", pengo)
 	MCFG_PALETTE_ADD("palette", 128*4)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pengo_state,pacman)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

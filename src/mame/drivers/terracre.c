@@ -531,6 +531,7 @@ static MACHINE_CONFIG_START( amazon, terracre_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", terracre)
 	MCFG_PALETTE_ADD("palette", 1*16+16*16+16*256)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(terracre_state, terracre)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -564,6 +565,7 @@ static MACHINE_CONFIG_START( ym3526, terracre_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", terracre)
 	MCFG_PALETTE_ADD("palette", 1*16+16*16+16*256)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(terracre_state, terracre)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -597,6 +599,7 @@ static MACHINE_CONFIG_START( ym2203, terracre_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", terracre)
 	MCFG_PALETTE_ADD("palette", 1*16+16*16+16*256)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(terracre_state, terracre)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

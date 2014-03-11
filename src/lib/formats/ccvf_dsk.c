@@ -142,6 +142,9 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	image->set_variant(f.variant);
 
+	global_free(bytes);
+	global_free(img);
+
 	return true;
 }
 

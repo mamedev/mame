@@ -202,6 +202,7 @@ static MACHINE_CONFIG_START( shaolins, shaolins_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", shaolins)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(shaolins_state, shaolins)
 
 	/* sound hardware */

@@ -296,6 +296,7 @@ static MACHINE_CONFIG_START( fcombat, fcombat_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fcombat)
 	MCFG_PALETTE_ADD("palette", 256*3)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(fcombat_state, fcombat)
 
 	/* audio hardware */

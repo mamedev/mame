@@ -215,6 +215,7 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", hcastle)
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_INIT_OWNER(hcastle_state, hcastle)
 
 

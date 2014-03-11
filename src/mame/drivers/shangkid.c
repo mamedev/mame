@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( dynamski, shangkid_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dynamski)
 	MCFG_PALETTE_ADD("palette", 16*4+16*4)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(shangkid_state,dynamski)
 
 	/* sound hardware */

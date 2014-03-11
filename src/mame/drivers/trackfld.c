@@ -911,7 +911,7 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", trackfld)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)
 	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
 
@@ -963,7 +963,7 @@ static MACHINE_CONFIG_START( yieartf, trackfld_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", trackfld)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)
 	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
 

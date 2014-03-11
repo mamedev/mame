@@ -244,6 +244,7 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", darkmist)
 	MCFG_PALETTE_ADD("palette", 0x100*4)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
 	MCFG_PALETTE_INIT_OWNER(darkmist_state, darkmist)
 
 	/* sound hardware */

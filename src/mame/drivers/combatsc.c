@@ -732,7 +732,7 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", combatsc)
 	MCFG_PALETTE_ADD("palette", 8*16*16)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatsc)
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatsc)
 
@@ -785,7 +785,7 @@ static MACHINE_CONFIG_START( combatscb, combatsc_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", combatscb)
 	MCFG_PALETTE_ADD("palette", 8*16*16)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_INIT_OWNER(combatsc_state,combatscb)
 	MCFG_VIDEO_START_OVERRIDE(combatsc_state,combatscb)
 

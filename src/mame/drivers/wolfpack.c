@@ -315,6 +315,7 @@ static MACHINE_CONFIG_START( wolfpack, wolfpack_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", wolfpack)
 	MCFG_PALETTE_ADD("palette", 12)
+	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(wolfpack_state, wolfpack)
 
 	/* sound hardware */

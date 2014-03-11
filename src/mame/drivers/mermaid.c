@@ -451,6 +451,7 @@ static MACHINE_CONFIG_START( mermaid, mermaid_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mermaid)
 	MCFG_PALETTE_ADD("palette", 4*16+2*2)
+	MCFG_PALETTE_INDIRECT_ENTRIES(64+1)
 	MCFG_PALETTE_INIT_OWNER(mermaid_state, mermaid)
 
 	/* sound hardware */

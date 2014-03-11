@@ -248,8 +248,9 @@ static MACHINE_CONFIG_START( firebatl, clshroad_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", firebatl)
 	MCFG_PALETTE_ADD("palette", 512+64*4)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(clshroad_state,firebatl)
+
 	MCFG_VIDEO_START_OVERRIDE(clshroad_state,firebatl)
 
 	/* sound hardware */

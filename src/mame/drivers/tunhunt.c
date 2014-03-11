@@ -309,6 +309,7 @@ static MACHINE_CONFIG_START( tunhunt, tunhunt_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tunhunt)
 	MCFG_PALETTE_ADD("palette", 0x1a)
+	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(tunhunt_state, tunhunt)
 
 	/* sound hardware */

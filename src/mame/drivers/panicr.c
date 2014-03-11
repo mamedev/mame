@@ -623,6 +623,7 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", panicr)
 	MCFG_PALETTE_ADD("palette", 256*4)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(panicr_state, panicr)
 
 	/* sound hardware */

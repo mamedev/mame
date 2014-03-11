@@ -21,7 +21,7 @@ static void mystwarr_decode_tiles(running_machine &machine)
 	UINT8 *d, *decoded;
 	int gfxnum;
 
-	for (gfxnum = 0; gfxnum < ARRAY_LENGTH(state->m_gfxdecode->gfx()); gfxnum++)
+	for (gfxnum = 0; gfxnum < MAX_GFX_ELEMENTS; gfxnum++)
 		if (state->m_gfxdecode->gfx(gfxnum) != NULL && state->m_gfxdecode->gfx(gfxnum)->srcdata() == s)
 			break;
 	assert(gfxnum != ARRAY_LENGTH(state->m_gfxdecode->gfx()));

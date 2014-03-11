@@ -499,6 +499,7 @@ static MACHINE_CONFIG_START( sprint2, sprint2_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sprint2)
 	MCFG_PALETTE_ADD("palette", 12)
+	MCFG_PALETTE_INDIRECT_ENTRIES(4)
 	MCFG_PALETTE_INIT_OWNER(sprint2_state, sprint2)
 
 	/* sound hardware */

@@ -237,6 +237,7 @@ static MACHINE_CONFIG_START( exedexes, exedexes_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", exedexes)
 	
 	MCFG_PALETTE_ADD("palette", 64*4+64*4+16*16+16*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(exedexes_state, exedexes)
 
 	/* sound hardware */

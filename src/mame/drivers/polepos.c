@@ -920,6 +920,7 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", polepos)
 	MCFG_PALETTE_ADD("palette", 0x0f00)
+	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_DEFAULT_LAYOUT(layout_polepos)
 
 	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)
@@ -999,6 +1000,7 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", polepos)
 	MCFG_PALETTE_ADD("palette", 0x0f00)
+	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_DEFAULT_LAYOUT(layout_topracer)
 
 	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)

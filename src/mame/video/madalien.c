@@ -388,6 +388,7 @@ MACHINE_CONFIG_FRAGMENT( madalien_video )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", madalien)
 	MCFG_PALETTE_ADD("palette", 0x30)
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x20)
 	MCFG_PALETTE_INIT_OWNER(madalien_state,madalien)
 	MCFG_VIDEO_START_OVERRIDE(madalien_state,madalien)
 

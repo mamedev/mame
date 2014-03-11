@@ -287,6 +287,7 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ddribble)
 	MCFG_PALETTE_ADD("palette", 64 + 256)
+	MCFG_PALETTE_INDIRECT_ENTRIES(64)
 	MCFG_PALETTE_INIT_OWNER(ddribble_state, ddribble)
 
 	/* sound hardware */

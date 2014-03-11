@@ -356,6 +356,7 @@ static MACHINE_CONFIG_START( pandoras, pandoras_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pandoras)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pandoras_state, pandoras)
 
 	/* sound hardware */

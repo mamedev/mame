@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( jrpacman, jrpacman_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jrpacman)
 	MCFG_PALETTE_ADD("palette", 128*4)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(jrpacman_state,pacman)
 	MCFG_VIDEO_START_OVERRIDE(jrpacman_state,jrpacman)
 

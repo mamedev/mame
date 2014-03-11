@@ -1721,6 +1721,7 @@ static MACHINE_CONFIG_FRAGMENT( superpac_common )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", superpac)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,superpac)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1801,6 +1802,7 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", phozon)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,phozon)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1838,6 +1840,7 @@ static MACHINE_CONFIG_FRAGMENT( mappy_common )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", mappy)
 	MCFG_PALETTE_ADD("palette", 64*4+16*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,mappy)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

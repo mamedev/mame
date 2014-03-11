@@ -493,7 +493,7 @@ static MACHINE_CONFIG_START( kingofb, kingofb_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", kingobox)
 	MCFG_PALETTE_ADD("palette", 256+8*2)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
 	MCFG_PALETTE_INIT_OWNER(kingofb_state,kingofb)
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,kingofb)
 
@@ -543,7 +543,7 @@ static MACHINE_CONFIG_START( ringking, kingofb_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", rk)
 	MCFG_PALETTE_ADD("palette", 256+8*2)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
 	MCFG_PALETTE_INIT_OWNER(kingofb_state,ringking)
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,ringking)
 

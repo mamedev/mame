@@ -3330,6 +3330,7 @@ static MACHINE_CONFIG_START( pacman, pacman_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", pacman)
 	MCFG_PALETTE_ADD("palette", 128*4)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pacman_state,pacman)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

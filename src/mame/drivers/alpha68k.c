@@ -1964,7 +1964,9 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_sstingry)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sstingry)
+
 	MCFG_PALETTE_ADD("palette", 256 + 1)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
 
 	/* sound hardware */
@@ -2009,8 +2011,9 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_kyros)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", kyros)
-	MCFG_PALETTE_ADD("palette", 256 + 1)
 
+	MCFG_PALETTE_ADD("palette", 256 + 1)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
 
 	/* sound hardware */
@@ -2054,8 +2057,9 @@ static MACHINE_CONFIG_START( jongbou, alpha68k_state )
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_kyros)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jongbou)
-	MCFG_PALETTE_ADD("palette", 256 + 1)
 
+	MCFG_PALETTE_ADD("palette", 256 + 1)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
 
 	/* sound hardware */
@@ -2090,6 +2094,7 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", paddle)
 
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,paddlem)
 
 	/* sound hardware */
@@ -2307,6 +2312,7 @@ static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", tnextspc)
 
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,paddlem)
 
 	/* sound hardware */

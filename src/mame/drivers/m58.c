@@ -198,6 +198,7 @@ static MACHINE_CONFIG_START( yard, m58_state )
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", yard)
 	MCFG_PALETTE_ADD("palette", 256+256+256)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256+256+16)
 	MCFG_PALETTE_INIT_OWNER(m58_state, m58)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

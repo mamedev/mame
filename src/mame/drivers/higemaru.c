@@ -175,6 +175,7 @@ static MACHINE_CONFIG_START( higemaru, higemaru_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", higemaru)
 
 	MCFG_PALETTE_ADD("palette", 32*4+16*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(higemaru_state, higemaru)
 
 	/* sound hardware */

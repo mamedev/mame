@@ -687,7 +687,7 @@ static MACHINE_CONFIG_START( gsword, gsword_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gsword)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(gsword_state,gsword)
 
 	/* sound hardware */
@@ -730,7 +730,7 @@ static MACHINE_CONFIG_START( josvolly, gsword_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gsword)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
-
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(gsword_state,josvolly)
 
 	/* sound hardware */

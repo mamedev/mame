@@ -338,6 +338,7 @@ static MACHINE_CONFIG_START( quasar, quasar_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", quasar)
 	MCFG_PALETTE_ADD("palette", (64+1)*8+(4*256))
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x500)
 	MCFG_PALETTE_INIT_OWNER(quasar_state,quasar)
 
 	MCFG_S2636_ADD("s2636_0", s2636_0_config)
