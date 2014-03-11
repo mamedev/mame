@@ -722,6 +722,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_UPD7220_ADD("upd7220", XTAL_4_433619MHz/2, hgdc_intf, upd7220_map) //unknown clock
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	// devices
 	MCFG_I80130_ADD(I80130_TAG, XTAL_16MHz/2, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w))

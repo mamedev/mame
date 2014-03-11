@@ -221,7 +221,7 @@ SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(amstr_com)
 	SLOT_INTERFACE("microsoft_mouse", MSFT_SERIAL_MOUSE)
-	SLOT_INTERFACE("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
+	SLOT_INTERFACE("mousesys_mouse", MSYSTEM_SERIAL_MOUSE)
 SLOT_INTERFACE_END
 
 #define MCFG_CPU_PC(mem, port, type, clock, vblankfunc) \

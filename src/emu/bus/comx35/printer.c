@@ -73,6 +73,7 @@ static MACHINE_CONFIG_FRAGMENT( comx_prn )
 	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
 	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit2))
 	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit3))
+    MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 MACHINE_CONFIG_END
