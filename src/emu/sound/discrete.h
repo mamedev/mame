@@ -3803,7 +3803,7 @@ public:
 			_ElementType *newarr = global_alloc_array_clear(_ElementType, m_allocated);
 			for (int i=0; i < m_count; i++)
 				newarr[i] = m_arr[i];
-			global_free(m_arr);
+			global_free_array(m_arr);
 			m_arr = newarr;
 		}
 		m_arr[m_count] = object;

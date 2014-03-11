@@ -622,7 +622,7 @@ static inline int clamp(const int v)
 
 spu_device::sample_cache::~sample_cache()
 {
-	global_free(data);
+	global_free_array(data);
 	while (loop_cache)
 	{
 		sample_loop_cache *lc=loop_cache;
