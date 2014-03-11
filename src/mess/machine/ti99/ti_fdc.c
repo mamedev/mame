@@ -373,6 +373,8 @@ void ti_fdc_device::device_reset()
 	m_WAITena = false;
 	m_selected = false;
 	m_debug_dataout = false;
+	m_inDsrArea = false;
+	m_WDsel = false;
 
 	for (int i=0; i < 3; i++)
 	{
@@ -712,6 +714,8 @@ void ti_fdc_legacy_device::device_reset(void)
 	m_IRQ = CLEAR_LINE;
 	m_WAITena = false;
 	m_selected = false;
+	m_inDsrArea = false;
+	m_WDsel = false;
 
 	ti99_set_80_track_drives(FALSE);
 	floppy_type_t type = FLOPPY_STANDARD_5_25_DSDD_40;
