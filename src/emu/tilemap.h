@@ -433,7 +433,7 @@ struct tile_data
 	UINT8           gfxnum;         // defaults to 0xff; specify index of machine.gfx for auto-invalidation on dirty
 	gfxdecode_device *decoder;
 	
-	void set(running_machine &machine, gfxdecode_device &_decoder, int _gfxnum, int rawcode, int rawcolor, int _flags)
+	void set(gfxdecode_device &_decoder, int _gfxnum, int rawcode, int rawcolor, int _flags)
 	{
 		decoder = &_decoder;
 		gfx_element *gfx = _decoder.gfx(_gfxnum);
@@ -442,14 +442,6 @@ struct tile_data
 		palette_base = gfx->colorbase() + gfx->granularity() * rawcolor;
 		flags = _flags;
 		gfxnum = _gfxnum;
-	}
-
-	void set(running_machine &machine, gfx_element &gfx, int rawcode, int rawcolor, int _flags)
-	{
-		int code = rawcode % gfx.elements();
-		pen_data = gfx.get_data(code);
-		palette_base = gfx.colorbase() + gfx.granularity() * rawcolor;
-		flags = _flags;
 	}
 };
 
@@ -647,7 +639,6 @@ private:
 	bool                        m_all_tiles_dirty;      // true if all tiles are dirty
 	bool                        m_all_tiles_clean;      // true if all tiles are clean
 	UINT32                      m_palette_offset;       // palette offset
-	UINT32                      m_pen_data_offset;      // pen data offset
 	UINT32                      m_gfx_used;             // bitmask of gfx items used
 	UINT32                      m_gfx_dirtyseq[MAX_GFX_ELEMENTS]; // dirtyseq values from last check
 
@@ -774,7 +765,7 @@ private:
 #define TILEMAP_MAPPER_MEMBER(_name)    tilemap_memory_index _name(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 
 // useful macro inside of a TILE_GET_INFO callback to set tile information
-#define SET_TILE_INFO_MEMBER(DECODER,GFX,CODE,COLOR,FLAGS)  tileinfo.set(machine(), DECODER, GFX, CODE, COLOR, FLAGS)
+#define SET_TILE_INFO_MEMBER(DECODER,GFX,CODE,COLOR,FLAGS)  tileinfo.set(DECODER, GFX, CODE, COLOR, FLAGS)
 
 // Macros for setting tile attributes in the TILE_GET_INFO callback:
 //   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0

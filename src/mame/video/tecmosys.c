@@ -239,7 +239,7 @@ void tecmosys_state::tecmosys_do_final_mix(bitmap_rgb32 &bitmap)
 
 			if (srcptr2[x]&0x3fff)
 			{
-				penvalue2 = m_generic_paletteram_16[srcptr2[x]&0x3fff];
+				penvalue2 = m_palette->basemem().read(srcptr2[x] & 0x3fff);
 				colour2 = paldata[srcptr2[x]&0x3fff];
 			}
 			else

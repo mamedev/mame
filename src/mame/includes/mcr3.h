@@ -75,11 +75,6 @@ public:
 	void mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy, int interlaced);
 	void mcr_common_init();
 
-	DECLARE_WRITE8_MEMBER(spyhuntpr_a800_w);
-	DECLARE_WRITE8_MEMBER(spyhuntpr_a801_w);
-	DECLARE_WRITE8_MEMBER(spyhuntpr_a802_w);
-	DECLARE_WRITE8_MEMBER(spyhuntpr_a803_w);
-	DECLARE_WRITE8_MEMBER(spyhuntpr_a900_w);
 	DECLARE_WRITE8_MEMBER(spyhuntpr_port04_w);
 	DECLARE_WRITE8_MEMBER(spyhuntpr_fd00_w);
 	required_device<screen_device> m_screen;

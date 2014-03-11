@@ -163,6 +163,7 @@ galaxiana       // (c) Namco
 galaxianm       // (c) Midway
 galaxianmo      // (c) Midway
 galaxiant       // (c) Taito
+galaxiani       // (c) Irem
 galaxrf         // bootleg (Recreativos Franco)
 superg          // hack
 galapx          // hack
@@ -844,12 +845,12 @@ tceptor         // (c) 1986
 tceptor2        // (c) 1986
 
 // Namco System 1 games
-shadowld        // (c) 1987
-youkaidk        // (c) 1987 (Japan new version)
-youkaidko       // (c) 1987 (Japan old version)
-dspirit         // (c) 1987 (Japan new version)
-dspirito        // (c) 1987 (Japan old version)
-dspirita        // (c) 1987 (Atari license)
+shadowld        // (c) 1987 (YD3)
+youkaidk2       // (c) 1987 (Japan, YD2, Rev B)
+youkaidk1       // (c) 1987 (Japan, YD1)
+dspirit         // (c) 1987 (DS3)
+dspirit2        // (c) 1987 (DS2, Atari had rights to US market)
+dspirit1        // (c) 1987 (DS1)
 blazer          // (c) 1987 (Japan)
 quester         // (c) 1987 (Japan)
 questers        // (c) 1987 (Japan)
@@ -858,17 +859,17 @@ pacmaniaj       // (c) 1987 (Japan)
 galaga88        // (c) 1987
 galaga88j       // (c) 1987 (Japan)
 ws              // (c) 1988 (Japan)
-berabohm        // (c) 1988 (Japan)
-berabohmo       // (c) 1988 (Japan)
+berabohm        // (c) 1988 (Japan, Rev C)
+berabohmb       // (c) 1988 (Japan, Rev B)
 				// 1988 Alice in Wonderland (English version of Marchen maze)
 mmaze           // (c) 1988 (Japan)
 bakutotu        // (c) 1988 (Japan)
 wldcourt        // (c) 1988 (Japan)
-splatter        // (c) 1988 (World)
-splattero       // (c) 1988 (World)
+splatter        // (c) 1988 (World, SH3)
+splatter2       // (c) 1988 (World, SH2)
 splatterj       // (c) 1988 (Japan)
 faceoff         // (c) 1988 (Japan)
-rompers         // (c) 1989 (Japan)
+rompers         // (c) 1989 (Japan, Rev B)
 romperso        // (c) 1989 (Japan)
 blastoff        // (c) 1989 (Japan)
 ws89            // (c) 1989 (Japan)
@@ -1889,6 +1890,7 @@ mach3           // GV-109 (c) 1983 Mylstar
 cobram3         // ...... (c) 1984 Data East
 usvsthem        // GV-??? (c) 198? Mylstar
 3stooges        // GV-113 (c) 1984 Mylstar
+3stoogesa       // GV-113 (c) 1984 Mylstar
 qbertqub        // GV-119 (c) 1983 Mylstar
 screwloo        // GV-123 (c) 1983 Mylstar - never released
 curvebal        // GV-134 (c) 1984 Mylstar
@@ -8917,6 +8919,7 @@ gdfs            // (c) 1995 Banpresto
 
 jclub2          // (c) 199? Seta
 jclub2o         // (c) 199? Seta
+jclub2ob        // (c) 199? Seta
 darkhors        // bootleg of Jockey Club II
 
 // ST-0016 based games (ST-0016 is a SoC Z80-based HW)
@@ -9461,6 +9464,7 @@ moonlght        // bootleg
 chry10          // bootleg
 chrygld         // bootleg
 goldfrui        // bootleg
+wcherry         // bootleg
 super9          // (c) 2001 Playmark
 cabaret         // (c) 1992 AMT
 cpoker          // (c) 1993? IGS
@@ -10461,6 +10465,7 @@ royalcrdd       // (c) 1991 TAB-Austria
 royalcrde       // (c) 1991 TAB-Austria
 royalcrdf       // (c) 1991 Evona Electronic
 royalcrdg       // (c) 1991 TAB-Austria
+royalcdfr       // (c) 1991 TAB-Austria
 royalcrdt       // (c) 1991 TAB-Austria orig
 royalcrdp       // (c) 1993 Digital Dreams
 lluck3x3        // (c) 1991 TAB-Austria
@@ -10742,6 +10747,7 @@ pokerdub        // 198?, Unknown
 pokerduc        // 198?, Unknown
 bchancep        // 198?, Unknown
 pokermon        // 1987, Unknown
+pokersis        // 198?, Sisteme France.
 
 // Cal Omega
 comg074         // (c) 1981 Cal Omega Inc.

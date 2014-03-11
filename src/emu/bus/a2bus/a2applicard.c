@@ -113,6 +113,7 @@ void a2bus_applicard_device::device_start()
 void a2bus_applicard_device::device_reset()
 {
 	m_bROMAtZ80Zero = true;
+	m_z80stat = false;
 }
 
 UINT8 a2bus_applicard_device::read_c0nx(address_space &space, UINT8 offset)

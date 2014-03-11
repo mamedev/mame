@@ -4,15 +4,14 @@
     [ DC012 and DC011 emulation ]
 
     01/05/2009 Initial implementation [Miodrag Milanovic]
-    xx/xx/2013 portions by Karl-Ludwig Deisenhofer.
+    Portions (2013, 2014) by Karl-Ludwig Deisenhofer.
 
-    DEC VIDEO : STATE AS OF NOVEMBER 2013
-    -------------------------------------
-    - NOT FULLY WORKING : scrolling requires implementation of 'scrolling region'. Multiple regions could be present.
-                          Split & full screen modes exist. Scroll should be synced with beam or DMA.
-                          See 4.7.4 and up in VT manual.
-
+    DEC VIDEO : STATE AS OF MARCH 2014
+    ----------------------------------
     - TESTS REQUIRED : do line and character attributes (plus combinations) match real hardware?
+
+	- JUMPY SOFT SCROLL : Soft scroll *should* be synced with beam or DMA (line linking/unlinking is done during VBI, in less than 550ms).
+                          See 4.7.4 and up in VT manual.
 
     - UNDOCUMENTED FEATURES of DC011 / DC012 (CLUES WANTED)
        A. (VT 100): DEC VT terminals are said to have a feature that doubles the number of lines
@@ -133,6 +132,8 @@ void vt100_video_device::device_reset()
 	m_lba7 = 0;
 
 	m_scroll_latch = 0;
+	m_scroll_latch_valid = 0;
+
 	m_blink_flip_flop = 0;
 	m_reverse_field = 0;
 	m_basic_attribute = 0;
@@ -159,6 +160,8 @@ void rainbow_video_device::device_reset()
 	m_lba7 = 0;
 
 	m_scroll_latch = 0;
+	m_scroll_latch_valid = 0;
+
 	m_blink_flip_flop = 0;
 	m_reverse_field = 0;
 	m_basic_attribute = 0;
@@ -238,13 +241,17 @@ WRITE8_MEMBER( vt100_video_device::dc012_w )
 		// Also see VT100 Technical Manual: 4.7.4 Address Shuffling to 4.7.9 Split Screen Smooth Scrolling.
 		if (!(data & 0x04))
 		{
+			m_scroll_latch_valid = 0; // LSB is written first.
+
 			// set lower part scroll
-			m_scroll_latch = (m_scroll_latch & 0x0c) | (data & 0x03);
+			m_scroll_latch = data & 0x03;
 		}
 		else
 		{
 			// set higher part scroll
 			m_scroll_latch = (m_scroll_latch & 0x03) | ((data & 0x03) << 2);
+
+			m_scroll_latch_valid = 1; // MSB is written last. 
 		}
 	}
 	else
@@ -521,17 +528,13 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 
 	display_type = display_type & 3;
 
-	// CASE 1 A)
-	// SCREEN ATTRIBUTES (see VT-180 manual 6-30):
-	// 'reverse field' = reverse video over entire screen (identical on Rainbow-100)
+	static int old_scroll_region;
 
-	// What does 'base attribute' do on Rainbow-100 ?
-	// VT-100 interpretation ('without AVO, eigth char.bit defines base attribute') most likely not correct!
-	// OR 'base attribute' = reverse or underline (depending on the selection of the cursor at SETUP) ??
-	// VT-100 manual 4-75 / 4-98 says: reverse = (reverse field H) XOR (reverse video H = base attribute input)
+	// * SCREEN ATTRIBUTES (see VT-180 manual 6-30) *
+	// 'reverse field' = reverse video over entire screen
 
 	// For reference: a complete truth table can be taken from TABLE 4-6-4 / VT100 technical manual.
-	// Following simple IF statements implement it in full. Code should not be shuffled!
+	// Following simple IF statements implement it in full. Code segments should not be shuffled.
 	invert = invert ^ m_reverse_field ^ m_basic_attribute;
 
 	fg_intensity = bold + 2;   // FOREGROUND (FG):  normal (2) or bright (3)
@@ -558,9 +561,42 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 	bool double_width  = (display_type != 3) ? true  : false; // all except normal: double width
 	bool double_height = (display_type &  1) ? false : true;  // 0,2 = double height
 
-	for (int i = 0; i < 10; i++)
+	for (int scan_line = 0; scan_line < 10; scan_line++)
 	{
-		y_preset = y * 10 + i;
+		y_preset = y * 10 + scan_line;
+
+		// Offset to bitmap in char-rom (used later below)
+		int i = scan_line;
+
+ 		// Affects 'i'  / 'y_preset' / 'scan_line' (= LOOP VARIABLE) 
+        if ( m_scroll_latch_valid == 1)
+	    {
+		 // **** START IF SCROLL REGION:
+		 if ( (old_scroll_region == 0) && (scroll_region == 1) )
+		 {	
+			if (scan_line == 0)  // * EXECUTED ONCE *
+			{	
+			    scan_line = m_scroll_latch; // write less lines  ! SIDE EFFECT ON LOOP !
+				i = m_scroll_latch;         // set hard offset to char-rom
+			}
+		 } 
+
+		 // **** MIDDLE OF REGION:
+		 if ( (old_scroll_region == 1) && (scroll_region == 1) )
+		 {
+			if (	( y * 10 + scan_line - m_scroll_latch ) >=	 0 )
+				      y_preset = y * 10 + scan_line - m_scroll_latch;
+		 } 
+
+		 // **** END OF SCROLL REGION:
+		 if ( (old_scroll_region == 1) && (scroll_region == 0) )
+		 { 
+			if (i > (9 - m_scroll_latch) )
+			{	old_scroll_region = m_scroll_latch_valid; // keep track
+				return;							// WHAT HAPPENS WITH THE REST OF THE LINE (BLANK ?)
+			}
+		 } 
+	    } // (IF) scroll latch valid
 
 		switch (display_type)
 		{
@@ -652,7 +688,7 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 				bitmap.pix16(y_preset, x_preset + 9) = bit;
 		}
 
-	} // for
+	} // for (scan_line)
 
 }
 
@@ -757,9 +793,9 @@ void rainbow_video_device::palette_select ( int choice )
 						break;
 
 			case 0x02:
-						m_palette->set_pen_color(1, 0 , 205 -50, 100 - 50);        // GREEN (dim)
-						m_palette->set_pen_color(2, 0 , 205,     100     );        // GREEN (NORMAL)
-						m_palette->set_pen_color(3, 0,  205 +50, 100 + 50);        // GREEN (brighter)
+						m_palette->set_pen_color(1, 0 , 205 -50, 70 - 50);        // GREEN (dim)
+						m_palette->set_pen_color(2, 0 , 205,     70     );        // GREEN (NORMAL)
+						m_palette->set_pen_color(3, 0,  205 +50, 70 + 50);        // GREEN (brighter)
 						break;
 
 			case 0x03:

@@ -492,8 +492,8 @@ static MACHINE_CONFIG_DERIVED( weststry, bloodbro )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq6_line_hold)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", weststry)
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_SCREEN_MODIFY("screen")

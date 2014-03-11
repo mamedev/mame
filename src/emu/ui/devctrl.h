@@ -30,7 +30,7 @@ protected:
 
 private:
 	// device iterator
-//	typedef device_type_iterator<&device_creator<_DeviceType>, _DeviceType> device_iterator;
+	typedef device_type_iterator<&device_creator<_DeviceType>, _DeviceType> iterator;
 
 	_DeviceType *	m_device;
 	int				m_count;
@@ -45,7 +45,7 @@ template<class _DeviceType>
 ui_menu_device_control<_DeviceType>::ui_menu_device_control(running_machine &machine, render_container *container, _DeviceType *device)
 	: ui_menu(machine, container)
 {
-	device_iterator iter(machine.root_device());
+	iterator iter(machine.root_device());
 	m_device = device ? device : downcast<_DeviceType *>(iter.first());
 	m_count = iter.count();
 }
@@ -58,7 +58,7 @@ ui_menu_device_control<_DeviceType>::ui_menu_device_control(running_machine &mac
 template<class _DeviceType>
 int ui_menu_device_control<_DeviceType>::current_index()
 {
-	device_iterator iter(machine().root_device());
+	iterator iter(machine().root_device());
 	return iter.indexof(*m_device);
 }
 
@@ -73,7 +73,7 @@ void ui_menu_device_control<_DeviceType>::previous()
 	// left arrow - rotate left through cassette devices
 	if (m_device != NULL)
 	{
-		device_iterator iter(machine().root_device());
+		iterator iter(machine().root_device());
 		int index = iter.indexof(*m_device);
 		if (index > 0)
 			index--;
@@ -94,7 +94,7 @@ void ui_menu_device_control<_DeviceType>::next()
 	// right arrow - rotate right through cassette devices
 	if (m_device != NULL)
 	{
-		device_iterator iter(machine().root_device());
+		iterator iter(machine().root_device());
 		int index = iter.indexof(*m_device);
 		if (index < m_count - 1)
 			index++;

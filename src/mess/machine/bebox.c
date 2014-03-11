@@ -101,7 +101,7 @@
 #include "machine/pic8259.h"
 #include "machine/am9517a.h"
 #include "machine/ataintf.h"
-#include "machine/pci.h"
+#include "bus/pci/pci.h"
 #include "machine/intelfsh.h"
 #include "machine/53c810.h"
 #include "machine/ram.h"

@@ -20,7 +20,6 @@
 #include "bus/rs232/rs232.h"
 #include "machine/terminal.h"
 #include "machine/ram.h"
-#include "machine/sc499.h"
 #include "machine/3c505.h"
 #include "machine/6840ptm.h"
 #include "machine/n68681.h"
@@ -29,8 +28,8 @@
 #include "machine/mc146818.h"
 #include "machine/apollo_kbd.h"
 #include "machine/clock.h"
-#include "machine/isa.h"
-#include "machine/isa_cards.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -54,20 +53,7 @@
 
 #define  MAINCPU "maincpu"
 
-// Note: defining APOLLO_FOR_LINUX will provide following unportable extensions:
-// * a real Apollo keyboard may be attached at /dev/ttyS0
-// * SIO1 of the DSP3x00 will be connected with stdout and stdin
-// * the 3c505 emulation will be connected with the real ethernet at ETH0
-//
-// Enabling this is >NOT< supported by MESSdev and this code will be removed.
-// Do *not* report any issues on Mametesters if this is enabled!
-
-#if defined(__linux__)
-//#define APOLLO_FOR_LINUX
-#endif
-
 /*----------- machine/apollo_dbg.c -----------*/
-
 int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc);
 
 /*----------- drivers/apollo.c -----------*/
@@ -111,7 +97,6 @@ void apollo_set_cache_status_register(UINT8 mask, UINT8 data);
 #define APOLLO_SIO_TAG  "sio"
 #define APOLLO_SIO2_TAG "sio2"
 #define APOLLO_ETH_TAG  "3c505"
-#define APOLLO_CTAPE_TAG "ctape"
 #define APOLLO_ISA_TAG "isabus"
 
 class apollo_state : public driver_device
@@ -120,7 +105,6 @@ public:
 	apollo_state(const machine_config &mconfig, device_type type, const char *tag)
 			: driver_device(mconfig, type, tag),
 			m_maincpu(*this, MAINCPU),
-			m_ctape(*this, APOLLO_CTAPE_TAG),
 			m_messram_ptr(*this, "messram"),
 			m_dma8237_1(*this, APOLLO_DMA1_TAG),
 			m_dma8237_2(*this, APOLLO_DMA2_TAG),
@@ -134,7 +118,6 @@ public:
 			{ }
 
 	required_device<m68000_base_device> m_maincpu;
-	required_device<sc499_device> m_ctape;
 	required_shared_ptr<UINT32> m_messram_ptr;
 
 	required_device<am9517a_device> m_dma8237_1;
@@ -212,10 +195,6 @@ public:
 	void apollo_bus_error();
 	DECLARE_WRITE8_MEMBER( apollo_kbd_putchar );
 	DECLARE_READ_LINE_MEMBER( apollo_kbd_is_german );
-	DECLARE_READ8_MEMBER( apollo_dma8237_ctape_dack_r );
-	DECLARE_WRITE8_MEMBER( apollo_dma8237_ctape_dack_w );
-	DECLARE_READ8_MEMBER( apollo_dma8237_fdc_dack_r );
-	DECLARE_WRITE8_MEMBER( apollo_dma8237_fdc_dack_w );
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma8237_out_eop );
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma_1_hrq_changed );
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma_2_hrq_changed );

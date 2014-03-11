@@ -426,8 +426,8 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_specimx)
 	MCFG_VIDEO_START_OVERRIDE(special_state,specimx)
 	
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(special_state, specimx )
 
 	/* audio hardware */

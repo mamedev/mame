@@ -507,3 +507,13 @@ endif
 ifneq ($(filter VOODOO,$(VIDEOS)),)
 VIDEOOBJS+= $(VIDEOOBJ)/voodoo.o
 endif
+
+
+#-------------------------------------------------
+#
+#@src/emu/video/crtc_ega.h,VIDEOS += CRTC_EGA
+#-------------------------------------------------
+
+ifneq ($(filter CRTC_EGA,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/crtc_ega.o
+endif

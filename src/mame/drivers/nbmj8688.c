@@ -2802,8 +2802,8 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV_256, NBMJDRV_4096 )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(256)
 
 	MCFG_PALETTE_INIT_OWNER(nbmj8688_state,mbmj8688_8bit)
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_8bit)
@@ -2815,8 +2815,8 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV_65536, NBMJDRV_4096 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 65536)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(65536)
 
 	MCFG_PALETTE_INIT_OWNER(nbmj8688_state,mbmj8688_16bit)
 	MCFG_VIDEO_START_OVERRIDE(nbmj8688_state,mbmj8688_hybrid_16bit)

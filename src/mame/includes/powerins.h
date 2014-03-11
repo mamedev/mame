@@ -39,7 +39,6 @@ public:
 	DECLARE_READ8_MEMBER(powerinb_fake_ym2203_r);
 	DECLARE_WRITE16_MEMBER(powerins_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(powerins_tilebank_w);
-	DECLARE_WRITE16_MEMBER(powerins_paletteram16_w);
 	DECLARE_WRITE16_MEMBER(powerins_vram_0_w);
 	DECLARE_WRITE16_MEMBER(powerins_vram_1_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);

@@ -1197,10 +1197,10 @@ ROM_START( shadowld )
 ROM_END
 
 /* Youkai Douchuuki (Shadowland Japan) */
-ROM_START( youkaidk )
+ROM_START( youkaidk2 )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
-	ROM_LOAD( "yd1.sd0",            0x0c000, 0x10000, CRC(a9cb51fb) SHA1(c46345b36306d35f73e25d0c8b1af53936927f0b) )
-	ROM_LOAD( "yd1.sd1",            0x1c000, 0x10000, CRC(65d1dc0d) SHA1(e758fa5279c1a36c7dad941091694daed13f8b9a) )
+	ROM_LOAD( "yd1_s0.bin",         0x0c000, 0x10000, CRC(a9cb51fb) SHA1(c46345b36306d35f73e25d0c8b1af53936927f0b) )
+	ROM_LOAD( "yd1_s1.bin",         0x1c000, 0x10000, CRC(65d1dc0d) SHA1(e758fa5279c1a36c7dad941091694daed13f8b9a) )
 
 	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "yd1_p0.bin",      0x000000, CRC(07e49883) SHA1(b1e720b4d134893d3d9768d3f59162b31488a079) )
@@ -1240,7 +1240,7 @@ ROM_START( youkaidk )
 ROM_END
 
 /* Youkai Douchuuki (Shadowland Japan old version) */
-ROM_START( youkaidko )
+ROM_START( youkaidk1 )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "yd1.sd0",            0x0c000, 0x10000, CRC(a9cb51fb) SHA1(c46345b36306d35f73e25d0c8b1af53936927f0b) )
 	ROM_LOAD( "yd1.sd1",            0x1c000, 0x10000, CRC(65d1dc0d) SHA1(e758fa5279c1a36c7dad941091694daed13f8b9a) )
@@ -1282,7 +1282,7 @@ ROM_START( youkaidko )
 	ROM_LOAD( "yd_obj-4.bin",       0x80000, 0x20000, CRC(ef97bffb) SHA1(35bf2102cad41e50e59a31279e69c26d337f2353) )
 ROM_END
 
-/* Dragon Spirit */
+/* Dragon Spirit (DS3)*/
 ROM_START( dspirit )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "ds1_s0.bin",         0x0c000, 0x10000, CRC(27100065) SHA1(e8fbacaa43a5b858fce2ca3b579b90c1e016396b) )
@@ -1327,21 +1327,21 @@ ROM_START( dspirit )
 	ROM_LOAD_HS( "ds1_o4.bin",      0x80000, 0x10000, CRC(a6246fcb) SHA1(39de4fdb175ab16b791cdc5d757ff7bfee8e3d2b) )
 ROM_END
 
-/* Dragon Spirit (old version) */
-ROM_START( dspirito )
+/* Dragon Spirit (DS2, Atari had the license/rights for US distribution) */
+ROM_START( dspirit2 )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "ds1_s0.bin",         0x0c000, 0x10000, CRC(27100065) SHA1(e8fbacaa43a5b858fce2ca3b579b90c1e016396b) )
 	ROM_LOAD( "ds1_s1.bin",         0x1c000, 0x10000, CRC(b398645f) SHA1(e83208e2aea7b57b4a26f123a43c112e30495aca) )
 
 	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
-	ROM_LOAD_512( "ds1_p0.bin",      0x000000, CRC(b22a2856) SHA1(8dea168e341460757c924bb510df4d4e9cdd908d) )
-	ROM_LOAD_512( "ds1_p1.bin",      0x080000, CRC(f7e3298a) SHA1(76c924ed1311e7e292bd67f57c1e831054625bb6) )
-	ROM_LOAD_512( "ds1_p2.bin",      0x100000, CRC(3c9b0100) SHA1(1def48a28b68e1e36cd1a165eb7127b05982c54d) )
-	ROM_LOAD_512( "ds1_p3.bin",      0x180000, CRC(c6e5954b) SHA1(586fc108f264e91a4bbbb05153dd1aa19be81b5b) )
-	ROM_LOAD_512( "ds1_p4.bin",      0x200000, CRC(f3307870) SHA1(a85d28c5dc55cbfa6c384d71e724db44c547d976) )
-	ROM_LOAD_512( "ds1_p5.bin",      0x280000, CRC(9a3a1028) SHA1(505808834677c433e0a4cfbf387b2874e2d0fc47) )
-	ROM_LOAD_512( "ds1_p6.bin",      0x300000, CRC(a82737b4) SHA1(13865eb05a5d7b5cf06316ad8e71da3abbad335a) )
-	ROM_LOAD_512( "ds1_p7.bin",      0x380000, CRC(f4c0d75e) SHA1(87ac334b5d66b9b66ee0d4fe222afb76ff190534) )
+	ROM_LOAD_512( "ds1_p0.bin",     0x000000, CRC(b22a2856) SHA1(8dea168e341460757c924bb510df4d4e9cdd908d) )
+	ROM_LOAD_512( "ds1_p1.bin",     0x080000, CRC(f7e3298a) SHA1(76c924ed1311e7e292bd67f57c1e831054625bb6) )
+	ROM_LOAD_512( "ds1_p2.bin",     0x100000, CRC(3c9b0100) SHA1(1def48a28b68e1e36cd1a165eb7127b05982c54d) )
+	ROM_LOAD_512( "ds1_p3.bin",     0x180000, CRC(c6e5954b) SHA1(586fc108f264e91a4bbbb05153dd1aa19be81b5b) )
+	ROM_LOAD_512( "ds1_p4.bin",     0x200000, CRC(f3307870) SHA1(a85d28c5dc55cbfa6c384d71e724db44c547d976) )
+	ROM_LOAD_512( "ds1_p5.bin",     0x280000, CRC(9a3a1028) SHA1(505808834677c433e0a4cfbf387b2874e2d0fc47) )
+	ROM_LOAD_512( "ds2-pr6d.s11",   0x300000, CRC(5382447d) SHA1(3034d3a57b493c86673ee0aa7172bae778edd76a) ) // aka 8722-1107.bin for Atari's part number
+	ROM_LOAD_512( "ds2-pr7d.t11",   0x380000, CRC(80ff492a) SHA1(716ff7444edc0dfcce0fda2d213feb183435471f) ) // aka 8722-1108.bin for Atari's part number
 
 	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
 	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
@@ -1372,8 +1372,8 @@ ROM_START( dspirito )
 	ROM_LOAD_HS( "ds1_o4.bin",      0x80000, 0x10000, CRC(a6246fcb) SHA1(39de4fdb175ab16b791cdc5d757ff7bfee8e3d2b) )
 ROM_END
 
-/* Dragon Spirit (Atari license) */
-ROM_START( dspirita )
+/* Dragon Spirit (DS1) */
+ROM_START( dspirit1 )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "ds1_s0.bin",         0x0c000, 0x10000, CRC(27100065) SHA1(e8fbacaa43a5b858fce2ca3b579b90c1e016396b) )
 	ROM_LOAD( "ds1_s1.bin",         0x1c000, 0x10000, CRC(b398645f) SHA1(e83208e2aea7b57b4a26f123a43c112e30495aca) )
@@ -1385,8 +1385,8 @@ ROM_START( dspirita )
 	ROM_LOAD_512( "ds1_p3.bin",      0x180000, CRC(c6e5954b) SHA1(586fc108f264e91a4bbbb05153dd1aa19be81b5b) )
 	ROM_LOAD_512( "ds1_p4.bin",      0x200000, CRC(f3307870) SHA1(a85d28c5dc55cbfa6c384d71e724db44c547d976) )
 	ROM_LOAD_512( "ds1_p5.bin",      0x280000, CRC(9a3a1028) SHA1(505808834677c433e0a4cfbf387b2874e2d0fc47) )
-	ROM_LOAD_512( "8722-1107.bin",   0x300000, CRC(5382447d) SHA1(3034d3a57b493c86673ee0aa7172bae778edd76a) ) // aka ds2-pr6d.s11
-	ROM_LOAD_512( "8722-1108.bin",   0x380000, CRC(80ff492a) SHA1(716ff7444edc0dfcce0fda2d213feb183435471f) ) // aka ds2-pr7d.t11
+	ROM_LOAD_512( "ds1_p6.bin",      0x300000, CRC(a82737b4) SHA1(13865eb05a5d7b5cf06316ad8e71da3abbad335a) )
+	ROM_LOAD_512( "ds1_p7.bin",      0x380000, CRC(f4c0d75e) SHA1(87ac334b5d66b9b66ee0d4fe222afb76ff190534) )
 
 	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
 	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
@@ -1604,8 +1604,8 @@ ROM_START( galaga88 )
 	/* 180000-1fffff empty */
 	/* 200000-27ffff empty */
 	ROM_LOAD_512( "g81_p5.bin",      0x280000, CRC(4fbd3f6c) SHA1(40d8dadc0a36b4c1886778cfc8d380a34aea2505) )
-	ROM_LOAD_512( "g8x_p6.bin",      0x300000, CRC(403d01c1) SHA1(86109087b10c4fbcc940df6a84f7546de56303d2) )
-	ROM_LOAD_512( "g8x_p7.bin",      0x380000, CRC(df75b7fc) SHA1(cb810e7ba05bd8e873559e529e25a99adbf6307d) )
+	ROM_LOAD_512( "g8x_p6.bin",      0x300000, CRC(403d01c1) SHA1(86109087b10c4fbcc940df6a84f7546de56303d2) ) /* Unknown number for the "x" */
+	ROM_LOAD_512( "g8x_p7.bin",      0x380000, CRC(df75b7fc) SHA1(cb810e7ba05bd8e873559e529e25a99adbf6307d) ) /* Unknown number for the "x" */
 
 	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
 	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
@@ -1759,7 +1759,7 @@ ROM_START( berabohm )
 	ROM_LOAD( "bm_obj-7.bin",       0xe0000, 0x20000, CRC(377c81ed) SHA1(85f4682c6079863793f5575d261a33309c221ba7) )
 ROM_END
 
-ROM_START( berabohmo )
+ROM_START( berabohmb )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "bm1_s0.bin",         0x0c000, 0x10000, CRC(d5d53cb1) SHA1(af5db529550382dab61197eb46e02110efc4c21b) )
 
@@ -2085,7 +2085,7 @@ ROM_START( splatter )
 	ROM_LOAD( "sh_obj-7.bin",       0xe0000, 0x20000, CRC(08b1953a) SHA1(f84f97e8e14ed6fcf99565d2603651831101ed2f) )
 ROM_END
 
-ROM_START( splattero )
+ROM_START( splatter2 )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "sh1_snd0.bin",       0x0c000, 0x10000, CRC(90abd4ad) SHA1(caeba5befcf57d90671786c7ef1ce49d54821949) )
 	ROM_LOAD( "sh1_snd1.bin",       0x1c000, 0x10000, CRC(8ece9e0a) SHA1(578da932a7684c6f633dde1d6412011c727c2380) )
@@ -2210,7 +2210,7 @@ ROM_START( faceoff )
 	ROM_LOAD( "fo1_o4.bin",         0x80000, 0x20000, CRC(985f04c7) SHA1(03fcb84c9134aa4521ce9549d09925a4f7a82318) )
 ROM_END
 
-/* Rompers */
+/* Rompers (revision B) */
 ROM_START( rompers )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "rp1_snd0.bin",       0x0c000, 0x10000, CRC(c7c8d649) SHA1(a60a58b4fc8e3f65e4e686b51fd2c17c9d74c444) )
@@ -2248,7 +2248,7 @@ ROM_START( rompers )
 	ROM_LOAD( "rp1_obj6.bin",       0xc0000, 0x10000, CRC(6bf2aca6) SHA1(ecd6022c0e4022ebfc571ee20d89369921cf3f1d) )
 ROM_END
 
-/* Rompers (old version) */
+/* Rompers */
 ROM_START( romperso )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "rp1_snd0.bin",       0x0c000, 0x10000, CRC(c7c8d649) SHA1(a60a58b4fc8e3f65e4e686b51fd2c17c9d74c444) )
@@ -2497,7 +2497,7 @@ ROM_START( boxyboy )
 	/* 200000-27ffff empty */
 	/* 280000-2fffff empty */
 	/* 300000-37ffff empty */
-	ROM_LOAD_512 ( "sbx_prg7.bin",    0x380000, CRC(7787c72e) SHA1(84b064165788481fbfb4836291c9c4000abcf7ce) )
+	ROM_LOAD_512 ( "sbx_prg7.bin",    0x380000, CRC(7787c72e) SHA1(84b064165788481fbfb4836291c9c4000abcf7ce) ) /* Unknown number for the "x" */
 
 	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
 	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
@@ -2691,12 +2691,12 @@ ROM_END
 
 
 
-GAME( 1987, shadowld, 0,        ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Shadowland", 0 )
-GAME( 1987, youkaidk, shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan new version)", 0 )
-GAME( 1987, youkaidko,shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan old version)", 0 )
-GAME( 1987, dspirit,  0,        ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco", "Dragon Spirit (new version)", 0 )
-GAME( 1987, dspirito, dspirit,  ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco", "Dragon Spirit (old version)", 0 )
-GAME( 1987, dspirita, dspirit,  ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco (Atari license)", "Dragon Spirit (Atari license)", 0 )
+GAME( 1987, shadowld, 0,        ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Shadowland (YD3)", 0 )
+GAME( 1987, youkaidk2,shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (YD2, Rev B)", 0 )
+GAME( 1987, youkaidk1,shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (YD1)", 0 )
+GAME( 1987, dspirit,  0,        ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco", "Dragon Spirit (DS3)", 0 )
+GAME( 1987, dspirit2, dspirit,  ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco", "Dragon Spirit (DS2)", 0 ) /* Atari had rights to US market */
+GAME( 1987, dspirit1, dspirit,  ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco", "Dragon Spirit (DS1)", 0 )
 GAME( 1987, blazer,   0,        ns1,     ns1, namcos1_state,      blazer,   ROT90,  "Namco", "Blazer (Japan)", 0 )
 GAME( 1987, quester,  0,        ns1,     quester, namcos1_state,  quester,  ROT90,  "Namco", "Quester (Japan)", 0 )
 GAME( 1987, questers, quester,  ns1,     quester, namcos1_state,  quester,  ROT90,  "Namco", "Quester Special Edition (Japan)", 0 )
@@ -2705,24 +2705,24 @@ GAME( 1987, pacmaniaj,pacmania, ns1,     pacmania, namcos1_state, pacmania, ROT9
 GAME( 1987, galaga88, 0,        ns1,     galaga88, namcos1_state, galaga88, ROT270, "Namco", "Galaga '88", 0 )
 GAME( 1987, galaga88j,galaga88, ns1,     galaga88, namcos1_state, galaga88, ROT90,  "Namco", "Galaga '88 (Japan)", 0 )
 GAME( 1988, ws,       0,        ns1,     ns1, namcos1_state,      ws,       ROT180, "Namco", "World Stadium (Japan)", 0 )
-GAME( 1988, berabohm, 0,        ns1,     berabohm, namcos1_state, berabohm, ROT180, "Namco", "Beraboh Man (Japan version C)", 0 )
-GAME( 1988, berabohmo,berabohm, ns1,     berabohm, namcos1_state, berabohm, ROT180, "Namco", "Beraboh Man (Japan version B)", 0 )
+GAME( 1988, berabohm, 0,        ns1,     berabohm, namcos1_state, berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev C)", 0 )
+GAME( 1988, berabohmb,berabohm, ns1,     berabohm, namcos1_state, berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev B)", 0 )
 GAME( 1988, mmaze,    0,        ns1,     mmaze, namcos1_state,    alice,    ROT180, "Namco", "Marchen Maze (Japan)", 0 )
 GAME( 1988, bakutotu, 0,        ns1,     bakutotu, namcos1_state, bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", 0 )
 GAME( 1988, wldcourt, 0,        ns1,     wldcourt, namcos1_state, wldcourt, ROT180, "Namco", "World Court (Japan)", 0 )
-GAME( 1988, splatter, 0,        ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World new version)", 0 )
-GAME( 1988, splattero,splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World old version)", 0 )
-GAME( 1988, splatterj,splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (Japan)", 0 )
+GAME( 1988, splatter, 0,        ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (SH3)", 0 )
+GAME( 1988, splatter2,splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (SH2)", 0 )
+GAME( 1988, splatterj,splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (Japan, SH1)", 0 )
 GAME( 1988, faceoff,  0,        ns1,     faceoff, namcos1_state,  faceoff,  ROT180, "Namco", "Face Off (Japan)", 0 )
-GAME( 1989, rompers,  0,        ns1,     ns1, namcos1_state,      rompers,  ROT90,  "Namco", "Rompers (Japan)", 0 )
-GAME( 1989, romperso, rompers,  ns1,     ns1, namcos1_state,      rompers,  ROT90,  "Namco", "Rompers (Japan old version)", 0 )
+GAME( 1989, rompers,  0,        ns1,     ns1, namcos1_state,      rompers,  ROT90,  "Namco", "Rompers (Japan, Rev B)", 0 )
+GAME( 1989, romperso, rompers,  ns1,     ns1, namcos1_state,      rompers,  ROT90,  "Namco", "Rompers (Japan)", 0 )
 GAME( 1989, blastoff, 0,        ns1,     ns1, namcos1_state,      blastoff, ROT90,  "Namco", "Blast Off (Japan)", 0 )
 GAME( 1989, ws89,     ws,       ns1,     ws89, namcos1_state,     ws89,     ROT180, "Namco", "World Stadium '89 (Japan)", 0 )
 GAME( 1989, dangseed, 0,        ns1,     dangseed, namcos1_state, dangseed, ROT90,  "Namco", "Dangerous Seed (Japan)", 0 )
 GAME( 1990, ws90,     ws,       ns1,     ws90, namcos1_state,     ws90,     ROT180, "Namco", "World Stadium '90 (Japan)", 0 )
 GAME( 1990, pistoldm, 0,        ns1,     ns1, namcos1_state,      pistoldm, ROT0,   "Namco", "Pistol Daimyo no Bouken (Japan)", 0 )
-GAME( 1990, boxyboy,  0,        ns1,     boxyboy, namcos1_state,  soukobdx, ROT0,   "Namco", "Boxy Boy (US)", 0 )
-GAME( 1990, soukobdx, boxyboy,  ns1,     boxyboy, namcos1_state,  soukobdx, ROT0,   "Namco", "Souko Ban Deluxe (Japan)", 0 )
+GAME( 1990, boxyboy,  0,        ns1,     boxyboy, namcos1_state,  soukobdx, ROT0,   "Namco", "Boxy Boy (SB?)", 0 )
+GAME( 1990, soukobdx, boxyboy,  ns1,     boxyboy, namcos1_state,  soukobdx, ROT0,   "Namco", "Souko Ban Deluxe (Japan, SB1)", 0 )
 GAME( 1990, puzlclub, 0,        ns1,     puzlclub, namcos1_state, puzlclub, ROT90,  "Namco", "Puzzle Club (Japan prototype)", 0 )
 GAME( 1991, tankfrce, 0,        ns1,     ns1, namcos1_state,      tankfrce, ROT0,   "Namco", "Tank Force (US, 2 Player)", 0 )
 GAME( 1991, tankfrce4,tankfrce, ns1,     tankfrc4, namcos1_state, tankfrc4, ROT0,   "Namco", "Tank Force (US, 4 Player)", 0 )

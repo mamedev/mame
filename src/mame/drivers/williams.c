@@ -1447,9 +1447,8 @@ static MACHINE_CONFIG_START( defender, williams_state )
 	MCFG_TIMER_DRIVER_ADD("240_timer", williams_state, williams_count240_callback)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 10, 304, 260, 7, 245)
 	MCFG_SCREEN_UPDATE_DRIVER(williams_state, screen_update_williams)
 
@@ -1672,11 +1671,11 @@ static MACHINE_CONFIG_START( williams2, williams_state )
 	MCFG_TIMER_DRIVER_ADD("254_timer", williams_state, williams2_endscreen_callback)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_GFXDECODE_ADD("gfxdecode", williams2)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 8, 284, 260, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(williams_state, screen_update_williams2)
 

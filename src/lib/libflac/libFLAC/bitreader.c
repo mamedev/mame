@@ -35,7 +35,15 @@
 
 #include <stdlib.h> /* for malloc() */
 #include <string.h> /* for memcpy(), memset() */
-
+#ifdef _MSC_VER
+#include <winsock.h> /* for ntohl() */
+#elif defined FLAC__SYS_DARWIN
+#include <machine/endian.h> /* for ntohl() */
+#elif defined __MINGW32__
+#include <winsock.h> /* for ntohl() */
+#else
+#include <netinet/in.h> /* for ntohl() */
+#endif
 #include "private/bitmath.h"
 #include "private/bitreader.h"
 #include "private/crc.h"
@@ -56,7 +64,7 @@ typedef FLAC__uint32 brword;
 #ifdef _MSC_VER
 #define SWAP_BE_WORD_TO_HOST(x) local_swap32_(x)
 #else
-#define SWAP_BE_WORD_TO_HOST(x) local_swap32_(x)
+#define SWAP_BE_WORD_TO_HOST(x) ntohl(x)
 #endif
 #endif
 /* counts the # of zero MSBs in a word */
@@ -141,17 +149,15 @@ struct FLAC__BitReader {
 	FLAC__CPUInfo cpu_info;
 };
 
-
-#if !WORDS_BIGENDIAN
-static FLAC__uint32 local_swap32_(FLAC__uint32 x)
+#ifdef _MSC_VER
+/* OPT: an MSVC built-in would be better */
+static _inline FLAC__uint32 local_swap32_(FLAC__uint32 x)
 {
 	x = ((x<<8)&0xFF00FF00) | ((x>>8)&0x00FF00FF);
 	return (x>>16) | (x<<16);
 }
-#endif
 
-#if defined(_MSC_VER) && defined(_M_IX86)
-/* OPT: an MSVC built-in would be better */
+#if defined(_M_IX86)
 static void local_swap32_block_(FLAC__uint32 *start, FLAC__uint32 len)
 {
 	__asm {
@@ -169,6 +175,7 @@ loop1:
 done1:
 	}
 }
+#endif
 #endif
 
 static FLaC__INLINE void crc16_update_word_(FLAC__BitReader *br, brword word)

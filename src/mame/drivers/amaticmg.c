@@ -918,8 +918,8 @@ static MACHINE_CONFIG_DERIVED( amaticmg2, amaticmg )
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", amaticmg2)
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(0x10000)
 	MCFG_PALETTE_INIT_OWNER(amaticmg_state,amaticmg2)
 MACHINE_CONFIG_END
 

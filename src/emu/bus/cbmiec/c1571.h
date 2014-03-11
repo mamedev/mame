@@ -20,8 +20,8 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/64h156.h"
 #include "machine/6522via.h"
-#include "machine/isa.h"
-#include "machine/isa_wd1002a_wx1.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/wd1002a_wx1.h"
 #include "machine/mos6526.h"
 #include "machine/wd_fdc.h"
 

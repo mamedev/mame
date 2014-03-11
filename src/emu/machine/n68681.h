@@ -109,7 +109,7 @@ public:
 	// API
 	DECLARE_READ8_HANDLER(read);
 	DECLARE_WRITE8_HANDLER(write);
-	UINT8 get_irq_vector() { return IVR; }
+	UINT8 get_irq_vector() { m_read_vector = true; return IVR; }
 
 	DECLARE_WRITE_LINE_MEMBER( rx_a_w ) { m_chanA->device_serial_interface::rx_w((UINT8)state); }
 	DECLARE_WRITE_LINE_MEMBER( rx_b_w ) { m_chanB->device_serial_interface::rx_w((UINT8)state); }
@@ -151,6 +151,8 @@ private:
 	UINT8 OPR;  /* Output Port Register */
 	PAIR  CTR;  /* Counter/Timer Preset Value */
 	UINT8 IPCR; /* Input Port Control Register */
+
+	bool m_read_vector;	// if this is read and IRQ is active, it counts as pulling IACK
 
 	/* state */
 	UINT8 IP_last_state; /* last state of IP bits */

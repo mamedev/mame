@@ -14,8 +14,8 @@
 
 #include "bus/rs232/keyboard.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/isa.h"
-#include "machine/isa_cards.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
 #include "machine/mc68901.h"
 
 #define M68K_TAG "maincpu"

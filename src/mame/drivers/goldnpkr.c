@@ -9755,6 +9755,28 @@ ROM_START( pokermon )
 	ROM_LOAD( "mb.bin",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+ROM_START( pokersis )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* seems  to contains 4 selectable programs, but vectors lack of sense */
+	ROM_LOAD( "gsub1.bin",      0x0000, 0x10000, CRC(d585dd64) SHA1(acc371aa8c6c9d1ae784e62eae9c90fd05fad0fc) )
+
+	ROM_REGION( 0x18000, "gfx", 0 )
+	ROM_LOAD( "gs1.bin",  0x00000, 0x8000, CRC(47834a0b) SHA1(5fbc7443fe22ebb35a2449647259dc06420ba3fd) )
+	ROM_LOAD( "gs2.bin",  0x08000, 0x8000, CRC(e882a2cc) SHA1(97819db7cef02a60ed689bb8c0c074807c08dc40) )
+	ROM_LOAD( "gs3.bin",  0x10000, 0x8000, CRC(12c37991) SHA1(e63a0504e697daddcdfcf90b2a136c4180a431a7) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(                 0x0000, 0x1000, 0 )   /* filling the R-G bitplanes */
+	ROM_COPY( "gfx", 0x14800, 0x1000, 0x0800 )      /* text and suppossed 1bpp gfx */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "gfx", 0x04000, 0x0000, 0x0800 )  /* cards gfx, bitplane 1 */
+	ROM_COPY( "gfx", 0x0c000, 0x0800, 0x0800 )  /* cards gfx, bitplane 2 */
+	ROM_COPY( "gfx", 0x14000, 0x1000, 0x0800 )  /* cards gfx, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s129n.bin",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
 
 /*********************************************
 *                Driver Init                 *
@@ -10311,5 +10333,6 @@ GAME(  1987, caspoker,  0,        goldnpkr, caspoker, driver_device,  0,        
 GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, driver_device,  0,        ROT0,   "<unknown>",                "unknown French poker game",               GAME_NOT_WORKING )   // lacks of 2nd program ROM.
 GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, goldnpkr_state, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )   // encrypted.
 
-GAMEL( 198?, bchancep,  0,        bchancep, goldnpkr, goldnpkr_state, bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel hardware)", GAME_NOT_WORKING, layout_goldnpkr )
-GAME(  1987, pokermon,  0,        mondial,  mondial,  driver_device,  0,        ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",    0 )
+GAMEL( 198?, bchancep,  0,        bchancep, goldnpkr, goldnpkr_state, bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW)", GAME_NOT_WORKING, layout_goldnpkr )
+GAME(  1987, pokermon,  0,        mondial,  mondial,  driver_device,  0,        ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )					// banked selectable program
+GAME(  198?, pokersis,  0,        bchancep, goldnpkr, driver_device,  0,        ROT0,   "Sisteme France",           "unknown Sisteme France Poker",            GAME_NOT_WORKING )	// fix banking (4 prgs?)...

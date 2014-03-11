@@ -970,10 +970,9 @@ static MACHINE_CONFIG_START( cinemat_nojmi_4k, cinemat_state )
 	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-
 	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_REFRESH_RATE(MASTER_CLOCK/4/16/16/16/16/2)
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1023, 0, 767)
@@ -1154,13 +1153,13 @@ ROM_START( spaceshp )
 	ROMX_LOAD( "pr06.84", 0x0801, 0x0400, CRC(f19c8eb0) SHA1(80f66d00caaf258232ea5e6adf515899abf53896), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) )
 	ROMX_LOAD( "pr05.86", 0x0801, 0x0400, CRC(3dbc6360) SHA1(8d59dfee6e02ec29f755cc1c85ae236621009715), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
 
-	ROM_REGION( 0x1a0, "proms", 0 )
+	ROM_REGION( 0x1a0, "proms", 0 ) // CCPU PROMS
 	ROM_LOAD( "pr13.139", 0x0000, 0x0100, CRC(9edbf536) SHA1(036ad8a231284e05f44b1106d38fc0c7e041b6e8) )
 	ROM_LOAD( "pr17.138", 0x0100, 0x0020, CRC(29dbfb87) SHA1(d8c40ab010b2ea30f29b2c443819e2b69f376c04) )
-	ROM_LOAD( "pr18.137", 0x0120, 0x0020, CRC(98b7bd46) SHA1(fd7d0cac8783964bac36918e0ffcc07e2ea2081a) )
+	ROM_LOAD( "pr18.137", 0x0120, 0x0020, CRC(98b7bd46) SHA1(fd7d0cac8783964bac36918e0ffcc07e2ea2081a) ) // this one differs from default
 	ROM_LOAD( "pr19.136", 0x0140, 0x0020, CRC(07492cda) SHA1(32df9148797c23f70db47b840139c40e046dd710) )
-	ROM_LOAD( "pr20.72" , 0x0160, 0x0020, CRC(791ec9e1) SHA1(6f7fcce4aa3be9020595235568381588adaab88e) )
-	ROM_LOAD( "pr21.143", 0x0180, 0x0020, CRC(a481ca71) SHA1(ce145d61686f600cc16b77febfd5c783bf8c13b0) )
+	ROM_LOAD( "pr21.143", 0x0160, 0x0020, CRC(a481ca71) SHA1(ce145d61686f600cc16b77febfd5c783bf8c13b0) )
+	ROM_LOAD( "pr20.72" , 0x0180, 0x0020, CRC(791ec9e1) SHA1(6f7fcce4aa3be9020595235568381588adaab88e) )
 ROM_END
 
 
@@ -1325,17 +1324,17 @@ ROM_END
 ROM_START( spaceftr )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "fortrest7.7t", 0x0000, 0x0800, CRC(65d0a225) SHA1(e1fbee5ff42dd040ab2e90bbe2189fcb76d6167e) )
-
-	/* The original fortresp7.7p ROM image was a bad dump, a comparison showed only two bytes difference between it
-	and starcast.p7 from starcas1. A disassembly proved that the two affected bytes resulted in bogus opcodes, which
-	ultimately caused the game to fail. The current ROM taken from starcas1 can be assumed to be equal to a correct
-	dump of fortresp7.7p. The BAD_DUMP flag is kept in just to be sure. */
-	ROM_LOAD16_BYTE( "fortresp7.7p", 0x0001, 0x0800, BAD_DUMP CRC(d8f58d9a) SHA1(abba459431dcacc75099b0d340b957be71b89cfd) ) // taken from starcas1, read note above
-
+	ROM_LOAD16_BYTE( "fortresp7.7p", 0x0001, 0x0800, CRC(d8f58d9a) SHA1(abba459431dcacc75099b0d340b957be71b89cfd) )
 	ROM_LOAD16_BYTE( "fortresu7.7u", 0x1000, 0x0800, CRC(13b0287c) SHA1(366a23fd10684975bd5ee190e5227e47a0298ad5) )
 	ROM_LOAD16_BYTE( "fortresr7.7r", 0x1001, 0x0800, CRC(a2c1ed52) SHA1(ed9743f44ee98c9e7c2a6819ec681af7c7a97fc9) )
 
-	CCPU_PROMS
+	ROM_REGION( 0x1a0, "proms", 0 ) // CCPU PROMS
+	ROM_LOAD("prom.f14",       0x000, 0x100, CRC(9edbf536) SHA1(036ad8a231284e05f44b1106d38fc0c7e041b6e8) )
+	ROM_LOAD("prom.e14",       0x100, 0x020, CRC(29dbfb87) SHA1(d8c40ab010b2ea30f29b2c443819e2b69f376c04) )
+	ROM_LOAD("prom.d14",       0x120, 0x020, CRC(9a05afbf) SHA1(5d806a42424942ba5ef0b70a1d629315b37f931b) )
+	ROM_LOAD("prom.c14",       0x140, 0x020, CRC(07492cda) SHA1(32df9148797c23f70db47b840139c40e046dd710) )
+	ROM_LOAD("prom.j14",       0x160, 0x020, CRC(a481ca71) SHA1(ce145d61686f600cc16b77febfd5c783bf8c13b0) )
+	ROM_LOAD("prom6331-1j.e8", 0x180, 0x020, CRC(8c85e786) SHA1(b95be00ea97263196b40672b5b239d53218eca4d) ) // this one differs from default
 ROM_END
 
 

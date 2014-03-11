@@ -584,10 +584,10 @@ void gfx_element::decode(UINT32 code)
 void gfx_element::opaque(palette_device &palette, bitmap_ind16 &dest, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty)
 {
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
+	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
 	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
+	DRAWGFX_CORE(UINT16, PIXEL_OP_REBASE_OPAQUE, NO_PRIORITY);
 }
 
 void gfx_element::opaque(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -628,9 +628,9 @@ void gfx_element::transpen(palette_device &palette, bitmap_ind16 &dest, const re
 	}
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
+	color = colorbase() + granularity() * (color % colors());
 	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN, NO_PRIORITY);
+	DRAWGFX_CORE(UINT16, PIXEL_OP_REBASE_TRANSPEN, NO_PRIORITY);
 }
 
 void gfx_element::transpen(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -726,9 +726,9 @@ void gfx_element::transmask(palette_device &palette, bitmap_ind16 &dest, const r
 	}
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
+	color = colorbase() + granularity() * (color % colors());
 	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSMASK, NO_PRIORITY);
+	DRAWGFX_CORE(UINT16, PIXEL_OP_REBASE_TRANSMASK, NO_PRIORITY);
 }
 
 void gfx_element::transmask(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -773,10 +773,10 @@ void gfx_element::transtable(palette_device &palette, bitmap_ind16 &dest, const 
 	assert(pentable != NULL);
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
+	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
 	DECLARE_NO_PRIORITY;
-	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSTABLE16, NO_PRIORITY);
+	DRAWGFX_CORE(UINT16, PIXEL_OP_REBASE_TRANSTABLE16, NO_PRIORITY);
 }
 
 void gfx_element::transtable(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -838,10 +838,10 @@ void gfx_element::zoom_opaque(palette_device &palette, bitmap_ind16 &dest, const
 		return opaque(palette, dest, cliprect, code, color, flipx, flipy, destx, desty);
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
+	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
 	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
+	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REBASE_OPAQUE, NO_PRIORITY);
 }
 
 void gfx_element::zoom_opaque(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -892,9 +892,9 @@ void gfx_element::zoom_transpen(palette_device &palette, bitmap_ind16 &dest, con
 	}
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
+	color = colorbase() + granularity() * (color % colors());
 	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN, NO_PRIORITY);
+	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REBASE_TRANSPEN, NO_PRIORITY);
 }
 
 void gfx_element::zoom_transpen(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1006,9 +1006,9 @@ void gfx_element::zoom_transmask(palette_device &palette, bitmap_ind16 &dest, co
 	}
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
+	color = colorbase() + granularity() * (color % colors());
 	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSMASK, NO_PRIORITY);
+	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REBASE_TRANSMASK, NO_PRIORITY);
 }
 
 void gfx_element::zoom_transmask(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1061,10 +1061,10 @@ void gfx_element::zoom_transtable(palette_device &palette, bitmap_ind16 &dest, c
 		return transtable(palette, dest, cliprect, code, color, flipx, flipy, destx, desty, pentable, shadowtable);
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
+	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
 	DECLARE_NO_PRIORITY;
-	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSTABLE16, NO_PRIORITY);
+	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REBASE_TRANSTABLE16, NO_PRIORITY);
 }
 
 void gfx_element::zoom_transtable(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1134,9 +1134,9 @@ void gfx_element::prio_opaque(palette_device &palette, bitmap_ind16 &dest, const
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
+	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
-	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE_PRIORITY, UINT8);
+	DRAWGFX_CORE(UINT16, PIXEL_OP_REBASE_OPAQUE_PRIORITY, UINT8);
 }
 
 void gfx_element::prio_opaque(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1185,8 +1185,8 @@ void gfx_element::prio_transpen(palette_device &palette, bitmap_ind16 &dest, con
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
-	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN_PRIORITY, UINT8);
+	color = colorbase() + granularity() * (color % colors());
+	DRAWGFX_CORE(UINT16, PIXEL_OP_REBASE_TRANSPEN_PRIORITY, UINT8);
 }
 
 void gfx_element::prio_transpen(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1291,8 +1291,8 @@ void gfx_element::prio_transmask(palette_device &palette, bitmap_ind16 &dest, co
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
-	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSMASK_PRIORITY, UINT8);
+	color = colorbase() + granularity() * (color % colors());
+	DRAWGFX_CORE(UINT16, PIXEL_OP_REBASE_TRANSMASK_PRIORITY, UINT8);
 }
 
 void gfx_element::prio_transmask(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1343,9 +1343,9 @@ void gfx_element::prio_transtable(palette_device &palette, bitmap_ind16 &dest, c
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
+	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
-	DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSTABLE16_PRIORITY, UINT8);
+	DRAWGFX_CORE(UINT16, PIXEL_OP_REBASE_TRANSTABLE16_PRIORITY, UINT8);
 }
 
 void gfx_element::prio_transtable(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1416,9 +1416,9 @@ void gfx_element::prio_zoom_opaque(palette_device &palette, bitmap_ind16 &dest, 
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
+	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
-	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE_PRIORITY, UINT8);
+	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REBASE_OPAQUE_PRIORITY, UINT8);
 }
 
 void gfx_element::prio_zoom_opaque(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1476,8 +1476,8 @@ void gfx_element::prio_zoom_transpen(palette_device &palette, bitmap_ind16 &dest
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
-	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN_PRIORITY, UINT8);
+	color = colorbase() + granularity() * (color % colors());
+	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REBASE_TRANSPEN_PRIORITY, UINT8);
 }
 
 void gfx_element::prio_zoom_transpen(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1604,8 +1604,8 @@ void gfx_element::prio_zoom_transmask(palette_device &palette, bitmap_ind16 &des
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
-	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSMASK_PRIORITY, UINT8);
+	color = colorbase() + granularity() * (color % colors());
+	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REBASE_TRANSMASK_PRIORITY, UINT8);
 }
 
 void gfx_element::prio_zoom_transmask(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,
@@ -1666,9 +1666,9 @@ void gfx_element::prio_zoom_transtable(palette_device &palette, bitmap_ind16 &de
 	pmask |= 1 << 31;
 
 	// render
-	const pen_t *paldata = &palette.pen(colorbase() + granularity() * (color % colors()));
+	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
-	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSTABLE16_PRIORITY, UINT8);
+	DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REBASE_TRANSTABLE16_PRIORITY, UINT8);
 }
 
 void gfx_element::prio_zoom_transtable(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,

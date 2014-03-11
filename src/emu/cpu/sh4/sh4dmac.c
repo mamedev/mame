@@ -436,6 +436,7 @@ void sh4_dma_ddt(device_t *device, struct sh4_ddt_dma *s)
 	if (sh4->cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_dma_ddt uses sh4->m[] with SH3\n");
 
+	assert(s->channel >= 0 && s->channel < ARRAY_LENGTH(sh4->dma_timer_active));
 	if (sh4->dma_timer_active[s->channel])
 		return;
 	if (s->mode >= 0) {

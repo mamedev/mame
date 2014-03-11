@@ -284,8 +284,8 @@ static MACHINE_CONFIG_START( circus, circus_state )
 
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)          /* needed for proper hardware collisions */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)          /* needed for proper hardware collisions */
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)   /* frames per second, vblank duration (complete guess) */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
@@ -386,8 +386,8 @@ static MACHINE_CONFIG_START( ripcord, circus_state )
 
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)          /* needed for proper hardware collisions */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)          /* needed for proper hardware collisions */
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)   /* frames per second, vblank duration (complete guess) */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)

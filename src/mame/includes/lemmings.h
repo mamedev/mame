@@ -12,7 +12,6 @@ public:
 		m_deco146(*this, "ioprot"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2") ,
-		m_paletteram(*this, "paletteram"),
 		m_control_data(*this, "control_data"),
 		m_vram_data(*this, "vram_data"),
 		m_pixel_0_data(*this, "pixel_0_data"),
@@ -35,7 +34,6 @@ public:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<buffered_spriteram16_device> m_spriteram2;
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_paletteram;
 	required_shared_ptr<UINT16> m_control_data;
 	required_shared_ptr<UINT16> m_vram_data;
 	required_shared_ptr<UINT16> m_pixel_0_data;
@@ -45,7 +43,6 @@ public:
 
 	DECLARE_WRITE16_MEMBER(lemmings_control_w);
 	DECLARE_READ16_MEMBER(lemmings_trackball_r);
-	DECLARE_WRITE16_MEMBER(lemmings_palette_24bit_w);
 	void lemmings_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
 	DECLARE_WRITE8_MEMBER(lemmings_sound_ack_w);
 	DECLARE_WRITE16_MEMBER(lemmings_pixel_0_w);

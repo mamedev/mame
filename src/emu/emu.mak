@@ -42,8 +42,11 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/ep64 \
 	$(EMUOBJ)/bus/ieee488 \
 	$(EMUOBJ)/bus/imi7000 \
+	$(EMUOBJ)/bus/isa \
 	$(EMUOBJ)/bus/isbx \
 	$(EMUOBJ)/bus/midi \
+	$(EMUOBJ)/bus/pci \
+	$(EMUOBJ)/bus/pc_joy \
 	$(EMUOBJ)/bus/pc_kbd \
 	$(EMUOBJ)/bus/pet \
 	$(EMUOBJ)/bus/plus4 \
@@ -273,7 +276,8 @@ include $(EMUSRC)/bus/bus.mak
 # core optional library
 #-------------------------------------------------
 
-$(LIBOPTIONAL): $(CPUOBJS) $(SOUNDOBJS) $(VIDEOOBJS) $(MACHINEOBJS) $(BUSOBJS) $(NETLISTOBJS)
+$(LIBOPTIONAL): $(CPUOBJS) $(SOUNDOBJS) $(VIDEOOBJS) $(MACHINEOBJS) $(NETLISTOBJS)
+$(LIBBUS): $(BUSOBJS)
 
 #-------------------------------------------------
 # additional dependencies

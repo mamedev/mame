@@ -1342,6 +1342,9 @@ int floppy_image_format_t::calc_sector_index(int num, int interleave, int skew, 
 		i += interleave;
 		i %= total_sectors;
 		sec++;
+		// This line prevents lock-ups of the emulator when the interleave is not appropriate
+		if (sec > total_sectors)
+			throw emu_fatalerror("Format error: interleave %d not appropriate for %d sectors per track\n", interleave, total_sectors);
 	}
 	// use skew param
 	sec -= track_head * skew;

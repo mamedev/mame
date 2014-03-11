@@ -890,8 +890,7 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_SCREEN_RAW_PARAMS( XTAL_16MHz, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
 	MCFG_SCREEN_VBLANK_DRIVER(amstrad_state, screen_eof_amstrad)
-
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_cpc)
@@ -966,8 +965,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_SCREEN_RAW_PARAMS( ( XTAL_40MHz * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
 	MCFG_SCREEN_VBLANK_DRIVER(amstrad_state, screen_eof_amstrad)
-
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
@@ -1026,8 +1024,7 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	MCFG_SCREEN_RAW_PARAMS( ( XTAL_40MHz * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
 	MCFG_SCREEN_VBLANK_DRIVER(amstrad_state, screen_eof_amstrad)
-
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
@@ -1058,8 +1055,8 @@ static MACHINE_CONFIG_DERIVED( aleste, amstrad )
 	MCFG_SOUND_CONFIG(ay8912_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 32+64)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(32+64)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,aleste)
 	MCFG_MC146818_ADD( "rtc", XTAL_4_194304Mhz )
 

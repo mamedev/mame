@@ -66,7 +66,6 @@ public:
 	DECLARE_READ32_MEMBER(randomtmmjprds);
 	DECLARE_WRITE32_MEMBER(tmmjprd_blitter_w);
 	DECLARE_READ32_MEMBER(tmmjprd_mux_r);
-	DECLARE_WRITE32_MEMBER(tmmjprd_paletteram_dword_w);
 	DECLARE_WRITE32_MEMBER(tmmjprd_brt_1_w);
 	DECLARE_WRITE32_MEMBER(tmmjprd_brt_2_w);
 	DECLARE_WRITE32_MEMBER(tmmjprd_eeprom_write);
@@ -626,17 +625,6 @@ static INPUT_PORTS_START( tmmjprd )
 INPUT_PORTS_END
 
 
-WRITE32_MEMBER(tmmjprd_state::tmmjprd_paletteram_dword_w)
-{
-	int r,g,b;
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-
-	b = ((m_generic_paletteram_32[offset] & 0x000000ff) >>0);
-	r = ((m_generic_paletteram_32[offset] & 0x0000ff00) >>8);
-	g = ((m_generic_paletteram_32[offset] & 0x00ff0000) >>16);
-
-	m_palette->set_pen_color(offset,rgb_t(r,g,b));
-}
 
 
 /* notice that data & 0x4 is always cleared on brt_1 and set on brt_2.        *
@@ -703,7 +691,7 @@ static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 	AM_RANGE(0x28c000, 0x28ffff) AM_READWRITE(tmmjprd_tilemap3_r,tmmjprd_tilemap3_w)
 	/* ?? is palette ram shared with sprites in this case or just a different map */
 	AM_RANGE(0x290000, 0x29bfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_WRITE(tmmjprd_paletteram_dword_w) AM_SHARE("paletteram")
+	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0x400000, 0x400003) AM_READ(tmmjprd_mux_r) AM_WRITE(tmmjprd_eeprom_write)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM
@@ -769,6 +757,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 //  MCFG_SCREEN_SIZE(64*16, 64*16)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_PALETTE_FORMAT(XGRB)
 
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)

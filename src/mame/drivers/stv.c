@@ -1009,8 +1009,8 @@ static MACHINE_CONFIG_START( stv, stv_state )
 	MCFG_TIMER_DRIVER_ADD("sh1_cmd", stv_state, stv_sh1_sim)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 427, 0, 320, 263, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(stv_state, screen_update_stv_vdp2)
 	MCFG_PALETTE_ADD("palette", 2048+(2048*2))//standard palette + extra memory for rgb brightness.

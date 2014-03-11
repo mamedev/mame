@@ -1615,3 +1615,48 @@ ifneq ($(filter MM58167,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/mm58167.o
 endif
 
+
+#-------------------------------------------------
+#
+#@src/emu/machine/dp8390.h,MACHINES += DP8390
+#-------------------------------------------------
+
+ifneq ($(filter DP8390,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/dp8390.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/machine/pc_lpt.h,MACHINES += PC_LPT
+#-------------------------------------------------
+
+ifneq ($(filter PC_LPT,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/pc_lpt.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/machine/pc_fdc.h,MACHINES += PC_FDC
+#-------------------------------------------------
+
+ifneq ($(filter PC_FDC,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/pc_fdc.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/machine/mpu401.h,MACHINES += MPU401
+#-------------------------------------------------
+
+ifneq ($(filter MPU401,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/mpu401.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/machine/at_keybc.h,MACHINES += AT_KEYBC
+#-------------------------------------------------
+
+ifneq ($(filter AT_KEYBC,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/at_keybc.o
+endif

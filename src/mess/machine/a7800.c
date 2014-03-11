@@ -128,6 +128,9 @@ void a7800_state::machine_reset()
 
 	/* set banks to default states */
 	memory = m_region_maincpu->base();
+	if(m_cart_type & 0x20)  //supercart bankram
+	m_bank1->set_base(memory + 0xf0000 );
+	else
 	m_bank1->set_base(memory + 0x4000 );
 	m_bank2->set_base(memory + 0x8000 );
 	m_bank3->set_base(memory + 0xA000 );
@@ -159,6 +162,8 @@ void a7800_state::machine_reset()
     bit 1 0x02 - supercart bank switched
     bit 2 0x04 - supercart RAM at $4000
     bit 3 0x08 - additional state->m_ROM at $4000
+    bit 4 0x10 - bank 6 at $4000
+    bit 5 0x20 - supercart banked RAM
 
     bit 8-15 - Special
         0 = Normal cart
@@ -395,6 +400,13 @@ WRITE8_MEMBER(a7800_state::a7800_cart_w)
 	{
 		if(m_cart_type & 0x04)
 		{
+			//adjust write location if supercart bankram is in use
+			if(m_cart_type & 0x20) 
+		{
+			UINT8 *currentbank1 = (UINT8 *)m_bank1->base();
+			currentbank1[offset] = data;
+		}
+		else
 			m_ROM[0x4000 + offset] = data;
 		}
 		else if(m_cart_type & 0x01)
@@ -409,10 +421,23 @@ WRITE8_MEMBER(a7800_state::a7800_cart_w)
 
 	if(( m_cart_type & 0x02 ) &&( offset >= 0x4000 ) )
 	{
+			/* check if bankram is used */
+		if( m_cart_type & 0x20 )
+		{
+			m_bank1->set_base(memory + 0xf0000+((data & 0x20)<<9));
+		}
 		/* fix for 64kb supercart */
 		if( m_cart_size == 0x10000 )
 		{
 			data &= 0x03;
+		 		}
+		else if( m_cart_size == 0x40000 )
+		{
+			data &= 0x0f;
+		}
+		else if( m_cart_size == 0x80000 )
+		{
+			data &= 0x1f;
 		}
 		else
 		{

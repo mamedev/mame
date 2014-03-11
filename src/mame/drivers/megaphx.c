@@ -1,5 +1,14 @@
-/* Megaphoenix
+/* 
+   Dinamic / Inder arcade hardware
+
+   Mega Phoenix
  
+ also known to exist on this hardware:
+   Hammer Boy
+   Nonamed (ever finished? only code seen has 1991 date and is vastly incomplete) (versions exist for Amstrad CPC, MSX and Spectrum)
+
+
+
   trivia: Test mode graphics are the same as Little Robin(?!)
 
 */
@@ -13,7 +22,7 @@
     a cross hatch pattern amongst other things?
 
 
-  'SYS' port - is it a serial port from an IO / protection chip? one bit has multiple meanings.
+
   
   - sound..
 
@@ -59,6 +68,7 @@
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
 #include "cpu/z80/z80daisy.h"
+#include "sound/dac.h"
 
 class megaphx_state : public driver_device
 {
@@ -69,8 +79,12 @@ public:
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_ctc(*this, "ctc"),
+		m_dac0(*this, "dac0" ),
+		m_dac1(*this, "dac1" ),
+		m_dac2(*this, "dac2" ),
+		m_dac3(*this, "dac3" ),
 		port_c_value(0),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -78,6 +92,10 @@ public:
 	required_shared_ptr<UINT16> m_vram;
 	required_device<z80ctc_device> m_ctc;
 
+	required_device<dac_device> m_dac0;
+	required_device<dac_device> m_dac1;
+	required_device<dac_device> m_dac2;
+	required_device<dac_device> m_dac3;
 
 	DECLARE_DRIVER_INIT(megaphx);
 	DECLARE_MACHINE_RESET(megaphx);
@@ -94,13 +112,41 @@ public:
 	DECLARE_READ8_MEMBER(megaphx_sound_cmd_r);
 	DECLARE_WRITE8_MEMBER(megaphx_sound_to_68k_w);
 
+
+	DECLARE_WRITE8_MEMBER(dac0_value_write);
+	DECLARE_WRITE8_MEMBER(dac0_gain_write);
+	DECLARE_WRITE8_MEMBER(dac1_value_write);
+	DECLARE_WRITE8_MEMBER(dac1_gain_write);
+	DECLARE_WRITE8_MEMBER(dac2_value_write);
+	DECLARE_WRITE8_MEMBER(dac2_gain_write);
+	DECLARE_WRITE8_MEMBER(dac3_value_write);
+	DECLARE_WRITE8_MEMBER(dac3_gain_write);
+
+	DECLARE_WRITE8_MEMBER(dac0_rombank_write);
+	DECLARE_WRITE8_MEMBER(dac1_rombank_write);
+	DECLARE_WRITE8_MEMBER(dac2_rombank_write);
+	DECLARE_WRITE8_MEMBER(dac3_rombank_write);
+
+	UINT8 dac_gain[4];
+
+
+	/*
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_to1);
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_to2);
+	*/
 
 	DECLARE_READ8_MEMBER(port_c_r);
 	DECLARE_WRITE8_MEMBER(port_c_w);
 
+	int m_pic_is_reset;
+	int m_pic_shift_pos;
+	int m_pic_data;
+	int m_pic_data_bit;
+	int m_pic_clock;
+	int m_pic_readbit;
+
+	UINT16 m_pic_result;
 
 	UINT8 port_c_value;
 	required_device<palette_device> m_palette;
@@ -108,6 +154,8 @@ public:
 	UINT8 m_sounddata;
 	UINT8 m_soundback;
 };
+
+#include "sound/dac.h"
 
 
 
@@ -133,19 +181,19 @@ WRITE16_MEMBER(megaphx_state::tms_host_w)
 
 READ16_MEMBER(megaphx_state::megaphx_0x050002_r)
 {
-	int pc = machine().device("maincpu")->safe_pc();
+//	int pc = machine().device("maincpu")->safe_pc();
 	int ret = m_soundback;
 	m_soundback = 0;
-	logerror("(%06x) megaphx_0x050002_r (from z80?) %04x\n", pc, mem_mask);
+	//logerror("(%06x) megaphx_0x050002_r (from z80?) %04x\n", pc, mem_mask);
 	return ret ^ (rand()&0x40);  // the 0x40 should be returned by the z80, so this still isn't working
 }
 
 WRITE16_MEMBER(megaphx_state::megaphx_0x050000_w)
 {
-	int pc = machine().device("maincpu")->safe_pc();
+//	int pc = machine().device("maincpu")->safe_pc();
 	space.machine().scheduler().synchronize();
 
-	logerror("(%06x) megaphx_0x050000_w (to z80?) %04x %04x\n", pc, data, mem_mask);
+	//logerror("(%06x) megaphx_0x050000_w (to z80?) %04x %04x\n", pc, data, mem_mask);
 	m_soundsent = 0xff;
 	m_sounddata = data;
 
@@ -163,7 +211,11 @@ static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
 	AM_RANGE(0x050002, 0x050003) AM_READ(megaphx_0x050002_r) // z80 comms?
 
 
-	AM_RANGE(0x060000, 0x060007) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
+	AM_RANGE(0x060004, 0x060005) AM_READ8( port_c_r, 0x00ff )
+	
+	AM_RANGE(0x060006, 0x060007) AM_WRITE8( port_c_w, 0x00ff )
+
+	AM_RANGE(0x060000, 0x060003) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
 	
 	AM_RANGE(0x800000, 0x83ffff) AM_ROM  AM_REGION("roms01", 0x00000) // code + bg gfx are in here
 	AM_RANGE(0x840000, 0x87ffff) AM_ROM  AM_REGION("roms23", 0x00000) // bg gfx are in here
@@ -190,7 +242,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, megaphx_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x401f) AM_RAM
+	AM_RANGE(0x4000, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("snddata")
 ADDRESS_MAP_END
 
 READ8_MEMBER(megaphx_state::megaphx_sound_cmd_r)
@@ -207,18 +260,104 @@ READ8_MEMBER(megaphx_state::megaphx_sound_sent_r)
 
 WRITE8_MEMBER(megaphx_state::megaphx_sound_to_68k_w)
 {
-	int pc = machine().device("audiocpu")->safe_pc();
+//	int pc = machine().device("audiocpu")->safe_pc();
 
-	logerror("(%04x) megaphx_sound_to_68k_w (to 68k?) %02x\n", pc, data);
+	//logerror("(%04x) megaphx_sound_to_68k_w (to 68k?) %02x\n", pc, data);
 
 	m_soundback = data;
 }
 
+WRITE8_MEMBER(megaphx_state::dac0_value_write)
+{
+//	printf("dac0_data_write %02x\n", data);
+	m_dac0->write_unsigned8(data);
+}
+
+WRITE8_MEMBER(megaphx_state::dac0_gain_write)
+{
+//	printf("dac0_gain_write %02x\n", data);
+	dac_gain[0] = data;
+}
+
+WRITE8_MEMBER(megaphx_state::dac1_value_write)
+{
+//	printf("dac1_data_write %02x\n", data);
+	m_dac1->write_unsigned8(data);
+}
+
+WRITE8_MEMBER(megaphx_state::dac1_gain_write)
+{
+//	printf("dac1_gain_write %02x\n", data);
+	dac_gain[1] = data;
+}
+
+WRITE8_MEMBER(megaphx_state::dac2_value_write)
+{
+//	printf("dac2_data_write %02x\n", data);
+	m_dac2->write_unsigned8(data);
+}
+
+WRITE8_MEMBER(megaphx_state::dac2_gain_write)
+{
+//	printf("dac2_gain_write %02x\n", data);
+	dac_gain[2] = data;
+}
+
+WRITE8_MEMBER(megaphx_state::dac3_value_write)
+{
+//	printf("dac3_data_write %02x\n", data);
+	m_dac3->write_unsigned8(data);
+}
+
+WRITE8_MEMBER(megaphx_state::dac3_gain_write)
+{
+//	printf("dac3_gain_write %02x\n", data);
+	dac_gain[3] = data;
+}
+
+WRITE8_MEMBER(megaphx_state::dac0_rombank_write)
+{
+
+}
+
+WRITE8_MEMBER(megaphx_state::dac1_rombank_write)
+{
+
+}
+
+WRITE8_MEMBER(megaphx_state::dac2_rombank_write)
+{
+
+}
+
+WRITE8_MEMBER(megaphx_state::dac3_rombank_write)
+{
+
+}
+
+
 static ADDRESS_MAP_START( sound_io, AS_IO, 8, megaphx_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x07) AM_RAM
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	AM_RANGE(0x00, 0x00) AM_WRITE(dac0_value_write)
+	AM_RANGE(0x01, 0x01) AM_WRITE(dac0_gain_write)
+	AM_RANGE(0x02, 0x02) AM_WRITE(dac1_value_write)
+	AM_RANGE(0x03, 0x03) AM_WRITE(dac1_gain_write)
+	AM_RANGE(0x04, 0x04) AM_WRITE(dac2_value_write)
+	AM_RANGE(0x05, 0x05) AM_WRITE(dac2_gain_write)
+	AM_RANGE(0x06, 0x06) AM_WRITE(dac3_value_write)
+	AM_RANGE(0x07, 0x07) AM_WRITE(dac3_gain_write)
 
+	// not 100% sure how rom banking works.. but each channel can specify a different bank for the 0x8000 range.  Maybe the bank happens when the interrupt triggers so each channel reads the correct data? (so we'd need to put the actual functions in the CTC callbacks)
+	AM_RANGE(0x10, 0x10) AM_WRITE(dac0_rombank_write)
+	AM_RANGE(0x11, 0x11) AM_WRITE(dac1_rombank_write)
+	AM_RANGE(0x12, 0x12) AM_WRITE(dac2_rombank_write)
+	AM_RANGE(0x13, 0x13) AM_WRITE(dac3_rombank_write)
+
+
+	
+
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	
 	AM_RANGE(0x30, 0x30) AM_READWRITE(megaphx_sound_cmd_r, megaphx_sound_to_68k_w)
 	AM_RANGE(0x31, 0x31) AM_READ(megaphx_sound_sent_r)
 ADDRESS_MAP_END
@@ -290,8 +429,8 @@ static INPUT_PORTS_START( megaphx )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // shield
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // unused ? (in test mode)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) // test mode
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) // test mode
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) // high score entry
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) // high score entry
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -300,24 +439,22 @@ static INPUT_PORTS_START( megaphx )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // shield
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) // unused ? (in test mode)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) // test mode
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) // test mode
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) // high score entry
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) //high score entry
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
 
-	PORT_START("SYS") // some kind of serial port, or multiplexed port?
-	PORT_DIPNAME( 0x0001, 0x0001, "4" )
+	PORT_START("PIC1") // via PIC
+	PORT_DIPNAME( 0x0001, 0x0001, "XX" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) ) // must be 'on' to boot, but is also p1 and p2 start in test mode? multiplexed?
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, megaphx_state,megaphx_rand_r, NULL)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -330,6 +467,57 @@ static INPUT_PORTS_START( megaphx )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DSW1") // via PIC
+	PORT_DIPNAME( 0x0007, 0x0003, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0007, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x0038, 0x0018, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(      0x0038, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0028, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x00c0, 0x0080, DEF_STR( Lives ) )
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0040, "2" )
+	PORT_DIPSETTING(      0x0080, "3" )
+	PORT_DIPSETTING(      0x00c0, "4" )
+
+
+	PORT_START("DSW2") // via PIC  // some of these are difficulty
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x0002, IP_ACTIVE_HIGH ) 
+	PORT_DIPNAME( 0x0004, 0x0004, "DSW2-04"  )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "DSW2-08"  )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "DSW2-10"  )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "DSW2-20"  )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "DSW2-40"  )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "DSW2-80" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
 INPUT_PORTS_END
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, megaphx_state )
@@ -341,36 +529,123 @@ static RAMDAC_INTERFACE( ramdac_intf )
 	1
 };
 
+/* why don't the port_c read/writes work properly when hooked through the 8255? */
+
+// the PIC is accessed serially through clock / data lines, each time 16-bits are accessed..
+// not 100% sure if the command takes effect after all 16-bits are written, or after 8..
 
 READ8_MEMBER(megaphx_state::port_c_r)
 {
-	// it isn't a simple multiplex on this value.
-	//printf("read port c - write value was %02x\n", port_c_value);
-	int pc = machine().device("maincpu")->safe_pc();
-
-	logerror("(%06x) port_c_r (thru 8255)\n", pc);
 	
-	return ioport("SYS")->read();
+	//printf("read port c - write value was %02x\n", port_c_value);
+
+//	int pc = machine().device("maincpu")->safe_pc();
+	UINT8 ret = 0;
+
+//	printf("(%06x) port_c_r (thru 8255)\n", pc);
+	
+	if (m_pic_clock == 1) ret |= 0x08;
+	if (m_pic_readbit == 1) ret |= 0x02;
+//	return ioport("SYS")->read();
+	return ret;
 }
 
 
 WRITE8_MEMBER(megaphx_state::port_c_w)
 {
-	int pc = machine().device("maincpu")->safe_pc();
+	
 
 
-	if((data != 0x0f) &&
-	   (data != 0x4f) &&
-	   (data != 0x8f) &&
-	   (data != 0x9f) &&
-	   (data != 0xcf) &&
-   	   (data != 0xdf) &&
-	   (data != 0xff))
-			printf("(%06x) port_c_w (thru 8255) %02x\n", pc, data);
+//	int pc = machine().device("maincpu")->safe_pc();
+	port_c_value = (data & 0x0f);
 
-	logerror("(%06x) port_c_w (thru 8255) %02x\n", pc, data);
+	if (port_c_value == 0x9)
+	{
+	//	printf("Assert PIC reset line\n");
+		m_pic_is_reset = 1;
+	}
+	else if (port_c_value == 0x8)
+	{
+	//	printf("Clear PIC reset line\n");
+		m_pic_is_reset = 0;
+	
+		m_pic_shift_pos = 0;
+		m_pic_data = 0;
+		m_pic_data_bit = 0;
+		m_pic_readbit = 0;
+		m_pic_clock = 1;
 
-	port_c_value = (data & 0xf0) >> 4;
+	}
+	else if (port_c_value == 0xd)
+	{
+	//	printf("Set PIC data line\n");
+		m_pic_data_bit = 1;
+	}
+	else if (port_c_value == 0xc)
+	{
+	//	printf("Clear PIC data line\n");
+		m_pic_data_bit = 0;
+	}
+	else if (port_c_value == 0xf)
+	{
+		if (m_pic_clock == 0)
+		{
+		//	printf("Set PIC clock line | pos %d | bit %d\n", m_pic_shift_pos, m_pic_data_bit);
+			
+
+
+
+
+			m_pic_clock = 1;
+		
+		}
+	}
+	else if (port_c_value == 0xe)
+	{
+
+		if (m_pic_clock == 1)
+		{
+			m_pic_data |= m_pic_data_bit << m_pic_shift_pos;
+
+			if (m_pic_shift_pos == 8)
+			{
+				//printf("------------------ sending command %02x\n", m_pic_data);
+
+				if (m_pic_data == 0xfe) // get software version??
+				{
+					m_pic_result = (ioport("PIC1")->read()) | (0XFF << 8);
+				}
+				else if (m_pic_data == 0x82) // dsw1
+				{
+					m_pic_result = (ioport("PIC1")->read()) | ((ioport("DSW1")->read()) << 8);
+				}
+				else if (m_pic_data == 0x86) // dsw2
+				{
+					m_pic_result = (ioport("PIC1")->read()) | ((ioport("DSW2")->read()) << 8);
+				}
+				else
+				{
+					printf("unknown PIC command %02x\n", m_pic_data);
+				}
+			}
+
+			m_pic_readbit = (m_pic_result >> (m_pic_shift_pos)) & 1;
+
+
+			m_pic_shift_pos++;
+
+
+			//	printf("Clear PIC clock line\n");
+			m_pic_clock = 0;
+		}
+	}
+	else
+	{
+	//	printf("Unknown write to PIC %02x (PC %06x)\n", port_c_value, pc);
+	}
+
+
+
 }
 
 
@@ -380,12 +655,12 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 	DEVCB_NULL,                     /* Port A write */
 	DEVCB_INPUT_PORT("P1"),        /* Port B read */
 	DEVCB_NULL,                     /* Port B write */
-	DEVCB_DRIVER_MEMBER(megaphx_state,port_c_r),        /* Port C read */
-	DEVCB_DRIVER_MEMBER(megaphx_state,port_c_w),        /* Port C write */
+	DEVCB_NULL,        /* Port C read */ // should be connected to above functions but values are incorrect
+	DEVCB_NULL,        /* Port C write */  // should be connected to above functions but values are incorrect
 };
 
 
-
+/*
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_to0)
 {
 	logerror("z80ctc_to0 %d\n", state);
@@ -393,22 +668,22 @@ WRITE_LINE_MEMBER(megaphx_state::z80ctc_to0)
 
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_to1)
 {
-	printf("z80ctc_to1 %d\n", state);
+	logerror("z80ctc_to1 %d\n", state);
 }
 
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_to2)
 {
 	logerror("z80ctc_to2 %d\n", state);
 }
-
+*/
 	
 
-static Z80CTC_INTERFACE( z80ctc_intf )
+static Z80CTC_INTERFACE( z80ctc_intf ) // runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
 {
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),       // runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
-	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_to0),    // ZC/TO0 callback // accessed
-	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_to1),    // ZC/TO1 callback
-	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_to2)     // ZC/TO2 callback // accessed
+	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),    // for channel 0
+	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),    // for channel 1
+	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),    // for channel 2
+	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0)     // for channel 3
 };
 
 static const z80_daisy_config daisy_chain[] =
@@ -461,6 +736,17 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
+	MCFG_SPEAKER_STANDARD_MONO("mono")	
+	MCFG_DAC_ADD("dac0")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_DAC_ADD("dac1")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_DAC_ADD("dac2")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_DAC_ADD("dac3")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(megaphx_state,megaphx)
@@ -468,6 +754,9 @@ DRIVER_INIT_MEMBER(megaphx_state,megaphx)
 	UINT16 *src = (UINT16*)memregion( "roms67" )->base();
 	// copy vector table? - it must be writable because the game write the irq vector..
 	memcpy(m_mainram, src, 0x80);
+
+	membank("snddata")->configure_entries(0, 8, memregion("user2")->base(), 0x8000);
+	membank("snddata")->set_entry(0);
 }
 
 
@@ -489,8 +778,8 @@ ROM_START( megaphx )
 	ROM_LOAD16_BYTE( "mph5.u25", 0x000000, 0x20000, CRC(c95ccb69) SHA1(9d14cbfafd943f6ff461a7f373170a35e36eb695) )
 
 	ROM_REGION( 0x200000, "user2", 0 )
-	ROM_LOAD( "sonido_mph1.u39", 0x000000, 0x20000, CRC(f5e65557) SHA1(5ae759c2bcef96fbda42f088c02b6dec208030f3) )
-	ROM_LOAD( "sonido_mph2.u38", 0x000000, 0x20000, CRC(7444d0f9) SHA1(9739b48993bccea5530533b67808d13d6155ffe3) )
+	ROM_LOAD( "sonido_mph1.u39", 0x00000, 0x20000, CRC(f5e65557) SHA1(5ae759c2bcef96fbda42f088c02b6dec208030f3) )
+	ROM_LOAD( "sonido_mph2.u38", 0x20000, 0x20000, CRC(7444d0f9) SHA1(9739b48993bccea5530533b67808d13d6155ffe3) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 )
 	ROM_LOAD( "sonido_mph0.u35", 0x000000, 0x2000,  CRC(abc1b140) SHA1(8384a162d85cf9ea870d22f44b1ca64001c6a083) )
@@ -498,6 +787,8 @@ ROM_START( megaphx )
 	ROM_REGION( 0x100000, "pals", 0 ) // jedutil won't convert these? are they bad?
 	ROM_LOAD( "p31_u31_palce16v8h-25.jed", 0x000, 0xbd4, CRC(05ef04b7) SHA1(330dd81a832b6675fb0473868c26fe9bec2da854) )
 	ROM_LOAD( "p40_u29_palce16v8h-25.jed", 0x000, 0xbd4, CRC(44b7e51c) SHA1(b8b34f3b319d664ec3ad72ed87d9f65701f183a5) )
+
+	// there is a PIC responsible for some I/O tasks (what type? what internal rom size?)
 ROM_END
 
-GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, megaphx, ROT0, "Dinamic / Inder", "MegaPhoenix", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, megaphx, ROT0, "Dinamic / Inder", "Mega Phoenix", GAME_NO_SOUND | GAME_NOT_WORKING )

@@ -752,6 +752,7 @@ inline uint8 nesapu_device::apu_read(int address)
 /* WRITE VALUE TO TEMP REGISTRY AND QUEUE EVENT */
 inline void nesapu_device::apu_write(int address, uint8 value)
 {
+	assert(address >= 0 && address < ARRAY_LENGTH(m_APU.regs));
 	m_APU.regs[address]=value;
 	m_stream->update();
 	apu_regwrite(address,value);

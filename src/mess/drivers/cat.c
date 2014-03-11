@@ -338,17 +338,19 @@ ToDo:
 #undef DEBUG_FLOPPY_DATA_R
 #undef DEBUG_FLOPPY_STATUS_R
 
-#undef DEBUG_PRINTER_DATA_W
+#define DEBUG_PRINTER_DATA_W 1
 #undef DEBUG_PRINTER_CONTROL_W
 
 #undef DEBUG_MODEM_R
 #undef DEBUG_MODEM_W
 
 #undef DEBUG_DUART_OUTPUT_LINES
-#undef DEBUG_DUART_INPUT_LINES
-#undef DEBUG_DUART_TXD
-// TODO: the duart irq handler doesn't work because there was no easy way to strobe the duart to force it to check its inputs; now with devcb there is, but it hasn't been hooked up yet
+// data sent to rs232 port
+#undef DEBUG_DUART_TXA
+// data sent to modem chip
+#undef DEBUG_DUART_TXB
 #undef DEBUG_DUART_IRQ_HANDLER
+#define DEBUG_PRN_FF 1
 
 #undef DEBUG_TEST_W
 
@@ -405,14 +407,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	//optional_device<nvram_device> m_nvram;
 	optional_device<duartn68681_device> m_duart; // only cat uses this
-	optional_device<centronics_device> m_ctx;	// cat only?
-	optional_device<output_latch_device> m_ctx_data_out; // cat only?
+	optional_device<centronics_device> m_ctx;
+	optional_device<output_latch_device> m_ctx_data_out;
 	optional_device<acia6850_device> m_acia6850; // only swyft uses this
 	optional_device<via6522_device> m_via0; // only swyft uses this
 	optional_device<via6522_device> m_via1; // only swyft uses this
-	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
-	DECLARE_WRITE8_MEMBER(cat_duart_output);
 	optional_device<speaker_sound_device> m_speaker;
 	optional_shared_ptr<UINT16> m_svram;
 	optional_shared_ptr<UINT16> m_p_cat_videoram;
@@ -439,6 +438,12 @@ public:
 
 	UINT32 screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
+	DECLARE_WRITE_LINE_MEMBER(cat_duart_txb);
+	DECLARE_WRITE8_MEMBER(cat_duart_output);
+	DECLARE_WRITE_LINE_MEMBER(prn_ack_ff);
 
 	DECLARE_READ16_MEMBER(cat_floppy_control_r);
 	DECLARE_WRITE16_MEMBER(cat_floppy_control_w);
@@ -502,6 +507,7 @@ public:
 	/* the /ACK line from the centronics printer port goes through a similar
 	   flipflop to the ktobf line as well, so duart IP4 inverts on /ACK rising edge
 	 */
+	UINT8 m_duart_prn_ack_prev_state;
 	UINT8 m_duart_prn_ack_ff;
 	/* Gate array 2 is in charge of serializing the video for display to the screen;
 	   Gate array 1 is in charge of vblank/hblank timing, and in charge of refreshing
@@ -1062,8 +1068,9 @@ IRQ_CALLBACK_MEMBER(cat_state::cat_int_ack)
 
 MACHINE_START_MEMBER(cat_state,cat)
 {
-	m_duart_ktobf_ff = 0;
-	m_duart_prn_ack_ff = 0;
+	m_duart_ktobf_ff = 0; // reset doesnt touch this
+	m_duart_prn_ack_prev_state = 1; // technically uninitialized
+	m_duart_prn_ack_ff = 0; // reset doesnt touch this
 	m_6ms_counter = 0;
 	m_wdt_counter = 0;
 	m_video_enable = 1;
@@ -1075,8 +1082,6 @@ MACHINE_START_MEMBER(cat_state,cat)
 MACHINE_RESET_MEMBER(cat_state,cat)
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(cat_state::cat_int_ack),this));
-	m_duart_ktobf_ff = 0;
-	m_duart_prn_ack_ff = 0;
 	m_6ms_counter = 0;
 	m_wdt_counter = 0;
 	m_floppy_control = 0;
@@ -1119,6 +1124,8 @@ UINT32 cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap,
  * of a 16-bit counter clocked at ~10mhz, hence 6.5536ms period) goes to a
  * d-latch and inputs on ip2 of the duart, causing the duart to fire an irq;
  * this is used by the cat to read the keyboard.
+ * The duart also will, if configured to do so, fire an int when the state
+ * changes of the centronics /ACK pin; this is used while printing.
  */
 WRITE_LINE_MEMBER(cat_state::cat_duart_irq_handler)
 {
@@ -1130,10 +1137,17 @@ WRITE_LINE_MEMBER(cat_state::cat_duart_irq_handler)
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, irqvector);
 }
 
-WRITE_LINE_MEMBER(cat_state::cat_duart_txa)
+WRITE_LINE_MEMBER(cat_state::cat_duart_txa) // semit sends stuff here; connects to the serial port on the back
 {
-#ifdef DEBUG_DUART_TXD
-	fprintf(stderr, "Duart TXD: data %02X\n", data);
+#ifdef DEBUG_DUART_TXA
+	fprintf(stderr, "Duart TXA: data %02X\n", state);
+#endif
+}
+
+WRITE_LINE_MEMBER(cat_state::cat_duart_txb) // memit sends stuff here; connects to the modem chip
+{
+#ifdef DEBUG_DUART_TXB
+	fprintf(stderr, "Duart TXB: data %02X\n", state);
 #endif
 }
 
@@ -1164,6 +1178,19 @@ WRITE8_MEMBER(cat_state::cat_duart_output)
 	m_speaker->level_w((data >> 3) & 1);
 }
 
+WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the rising edge of /ACK
+{
+	if ((m_duart_prn_ack_prev_state == 0) && (state == 1))
+	{
+		m_duart_prn_ack_ff ^= 1;
+	}
+	m_duart->ip1_w(m_duart_prn_ack_ff);
+	m_duart_prn_ack_prev_state = state;
+#ifdef DEBUG_PRN_FF
+	fprintf(stderr, "Printer ACK: state %02X, flipflop is now %02x\n", state, m_duart_prn_ack_ff);
+#endif
+}
+
 static MACHINE_CONFIG_START( cat, cat_state )
 
 	/* basic machine hardware */
@@ -1188,12 +1215,12 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_DUARTN68681_ADD( "duartn68681", (XTAL_19_968MHz*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(cat_state, cat_duart_irq_handler))
 	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
+	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txb))
 	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(cat_state, cat_duart_output))
 
 	MCFG_CENTRONICS_ADD("ctx", centronics_printers, "image")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, ip1_w))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, ip4_w)) 
-
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(cat_state, prn_ack_ff))
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, ip4_w)) MCFG_DEVCB_XOR(1)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

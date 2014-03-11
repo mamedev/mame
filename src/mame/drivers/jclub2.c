@@ -979,6 +979,24 @@ ROM_START( jclub2o )
 	ROM_LOAD( "sx006-04.u87", 0x00000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
 ROM_END
 
+/*
+  Jockey Club II (26-mar-1997)
+  8 Horses, old style PCB.
+  Maybe upgraded to a release candidate software revision.
+*/  
+ROM_START( jclub2ob )
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68EC020 code + compressed gfx
+	ROM_LOAD16_WORD_SWAP( "sx006a-01.u26",0x00000, 0x200000, CRC(55e249bc) SHA1(ed0f066ed17f047760b712cbbfba1a62d4b452ba) )
+
+	ROM_REGION( 0x200000, "patch", 0 )  // 68EC020 code
+	// it appears that the operator could place a ROM in the socket next to the main CPU rom to update the main program rom by
+	// overriding the initial 0x80000 bytes of the program rom.
+	ROM_LOAD16_WORD_SWAP( "203x-rom1.u27",0x00000, 0x080000, CRC(7446ed3e) SHA1(b0936e42549280e2965159270429c4fdacba114a) )
+
+	ROM_REGION( 0x80000, "st0016", 0 ) // z80 core (used for sound?)
+	ROM_LOAD( "sx006-04.u87", 0x00000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
+ROM_END
+
 /***************************************************************************
 
 
@@ -1011,6 +1029,8 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 	}
 }
 
-GAME( 199?, jclub2,   0,      jclub2,  darkhors, driver_device, 0,        ROT0, "Seta", "Jockey Club II (newer hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, jclub2o,  jclub2, jclub2o, darkhors, driver_device, 0,        ROT0, "Seta", "Jockey Club II (older hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2001, darkhors, jclub2, darkhors,darkhors, darkhors_state, darkhors, ROT0, "bootleg", "Dark Horse (bootleg of Jockey Club II)", GAME_IMPERFECT_GRAPHICS )
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY    FULLNAME                                 FLAGS  */
+GAME( 199?, jclub2,   0,      jclub2,   darkhors, driver_device,  0,        ROT0, "Seta",    "Jockey Club II (newer hardware)",        GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, jclub2o,  jclub2, jclub2o,  darkhors, driver_device,  0,        ROT0, "Seta",    "Jockey Club II (older hardware, set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, jclub2ob, jclub2, jclub2o,  darkhors, driver_device,  0,        ROT0, "Seta",    "Jockey Club II (older hardware, set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2001, darkhors, jclub2, darkhors, darkhors, darkhors_state, darkhors, ROT0, "bootleg", "Dark Horse (bootleg of Jockey Club II)", GAME_IMPERFECT_GRAPHICS )

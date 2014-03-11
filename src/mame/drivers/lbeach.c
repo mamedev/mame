@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( lbeach, lbeach_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511-32, 0, 255-24)
 	MCFG_SCREEN_UPDATE_DRIVER(lbeach_state, screen_update_lbeach)
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // needed for collision detection
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // needed for collision detection
 
 	MCFG_GFXDECODE_ADD("gfxdecode", lbeach)
 	MCFG_PALETTE_ADD("palette", 2+8+2)

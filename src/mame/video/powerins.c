@@ -67,28 +67,6 @@ WRITE16_MEMBER(powerins_state::powerins_tilebank_w)
 
 
 
-/***************************************************************************
-
-                                    Palette
-
-***************************************************************************/
-
-
-WRITE16_MEMBER(powerins_state::powerins_paletteram16_w)
-{
-	/*  byte 0    byte 1    */
-	/*  RRRR GGGG BBBB RGBx */
-	/*  4321 4321 4321 000x */
-
-	UINT16 newword = COMBINE_DATA(&m_generic_paletteram_16[offset]);
-
-	int r = ((newword >> 11) & 0x1E ) | ((newword >> 3) & 0x01);
-	int g = ((newword >>  7) & 0x1E ) | ((newword >> 2) & 0x01);
-	int b = ((newword >>  3) & 0x1E ) | ((newword >> 1) & 0x01);
-
-	m_palette->set_pen_color( offset, pal5bit(r),pal5bit(g),pal5bit(b) );
-}
-
 
 /***************************************************************************
 

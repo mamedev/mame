@@ -2,7 +2,7 @@
 // copyright-holders:Barry Rodewald, Robbbert
 /***************************************************************************
 
-    Triumph-Adler's Alphatronic PC
+    Triumph-Adler (or Royal) Alphatronic PC
 
     skeleton driver
 
@@ -10,19 +10,30 @@
 
     Other chips: 8251, 8257, 8259
     Crystals: 16MHz, 17.73447MHz
-    Floppy format: 2 sides, 40 tracks, 16 sectors, 256 bytes = 320kb.
-    FDC (unknown) is in a plug-in module.
+    Floppy format: 13cm, 2 sides, 40 tracks, 16 sectors, 256 bytes = 320kb.
+    FDC (uPD765) is in a plug-in module, with an undumped rom.
 
     Has a socket for monochrome (to the standard amber monitor),
     and another for RGB. We emulate this with a configuration switch.
 
-    The Z80 must start at E000, but unlike other designs (Super80 for
-    example) which cause the ROMs to appear everywhere during boot,
-    this one (it seems) holds the data bus low until E000 is reached.
-    This kind of boot still needs to be emulated.
-
     This machine has 64k RAM, the ROMs being copied into RAM when
     needed.
+
+    There are several mystery ports which might be connected to the floppy
+    disk system. These are Port 30 (in and out), Port 20 (out) and certain
+    bits of Port 10 (in). This unit communicates via a simple parallel
+    interface.
+
+    Port 10 bit 6 when high switches A000-DFFF over to roms that are in
+    a cart which is plugged into the RomPack socket. If C3 is found at
+    A000 or C000, then a jump is made to that address. It is however
+    possible that one of these addresses might be for the rom in the
+    floppy controller unit.
+
+
+    ToDo:
+    - Fix cassette loading (broke during devcb2 conversion)
+    - Add fdc, then connect up software list
 
 ***************************************************************************/
 
@@ -45,46 +56,46 @@ public:
 	enum
 	{
 		TIMER_SYSTEM,
-		TIMER_ALPHATRO_BEEP_OFF
 	};
 
 	alphatro_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_crtc(*this, "crtc"),
-	m_usart(*this, "usart"),
-	m_cass(*this, "cassette"),
-	m_beep(*this, "beeper"),
-	m_p_ram(*this, "p_ram"),
-	m_p_videoram(*this, "videoram"){ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_crtc;
-	required_device<i8251_device> m_usart;
-	required_device<cassette_image_device> m_cass;
-	required_device<beep_device> m_beep;
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_usart(*this, "usart")
+		, m_cass(*this, "cassette")
+		, m_beep(*this, "beeper")
+		, m_p_ram(*this, "main_ram")
+	{ }
 
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
+	DECLARE_PALETTE_INIT(alphatro);
 	TIMER_DEVICE_CALLBACK_MEMBER(alphatro_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(alphatro_p);
-
-	required_shared_ptr<UINT8> m_p_ram;
 	required_shared_ptr<UINT8> m_p_videoram;
-	emu_timer* m_sys_timer;
 	UINT8 *m_p_chargen;
-	virtual void video_start();
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	DECLARE_PALETTE_INIT(alphatro);
+	UINT16 m_flashcnt;
+
 private:
 	UINT8 m_timer_bit;
 	UINT8 m_cass_data[4];
 	bool m_cass_state;	
+	emu_timer* m_sys_timer;
+	virtual void video_start();
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	required_device<i8251_device> m_usart;
+	required_device<cassette_image_device> m_cass;
+	required_device<beep_device> m_beep;
+	required_shared_ptr<UINT8> m_p_ram;
 };
 
 READ8_MEMBER( alphatro_state::port10_r )
@@ -100,18 +111,11 @@ WRITE8_MEMBER( alphatro_state::port10_w )
 // Bit 2 ? after a cload
 // Bit 3 -> cassette relay
 // Bit 4 -> BEEP
+// Bit 6 -> 1 = select ROM pack
 
-	UINT16 length = 0;
 	data &= 0xfe;
 
-	if (data == 0x10)
-		length = 400; // BEEP command
-
-	if (length)
-	{
-		timer_set(attotime::from_msec(length), TIMER_ALPHATRO_BEEP_OFF);
-		m_beep->set_state(1);
-	}
+	m_beep->set_state(BIT(data, 4));
 
 	m_cass->change_state( BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
@@ -125,9 +129,6 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 	case TIMER_SYSTEM:
 		m_timer_bit ^= 0x80;
-		break;
-	case TIMER_ALPHATRO_BEEP_OFF:
-		m_beep->set_state(0);
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in alphatro_state::device_timer");
@@ -155,36 +156,51 @@ static MC6845_UPDATE_ROW( alphatro_update_row )
 	alphatro_state *state = device->machine().driver_data<alphatro_state>();
 	const rgb_t *pens = bitmap.palette()->entry_list_raw();
 	bool palette = BIT(state->ioport("CONFIG")->read(), 5);
-	UINT8 chr,gfx,attr,fg,inv;
+	state->m_flashcnt++;
+	bool inv;
+	UINT8 chr,gfx,attr,bg,fg;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
-		inv = (x == cursor_x) ? 0xff : 0;
+		inv = (x == cursor_x);
 		mem = (ma + x) & 0x7ff;
 		chr = state->m_p_videoram[mem];
 		attr = state->m_p_videoram[mem | 0x800];
 		fg = (palette) ? 8 : attr & 7; // amber or RGB
+		bg = (palette) ? 0 : (attr & 0x38) >> 3;
 
-		if (BIT(attr, 7)) // reverse video for fkey labels
+		if BIT(attr, 7) // reverse video
 		{
-			inv ^= 0xff;
+			inv ^= 1;
 			chr &= 0x7f;
 		}
 
+		if (BIT(attr, 6) & BIT(state->m_flashcnt, 13)) // flashing
+		{
+			inv ^= 1;
+		}
+
 		/* get pattern of pixels for that character scanline */
-		gfx = state->m_p_chargen[(chr<<4) | ra] ^ inv;
+		gfx = state->m_p_chargen[(chr<<4) | ra];
+
+		if (inv)
+		{
+			UINT8 t = bg;
+			bg = fg;
+			fg = t;
+		}
 
 		/* Display a scanline of a character (8 pixels) */
-		*p++ = pens[BIT(gfx, 7) ? fg : 0];
-		*p++ = pens[BIT(gfx, 6) ? fg : 0];
-		*p++ = pens[BIT(gfx, 5) ? fg : 0];
-		*p++ = pens[BIT(gfx, 4) ? fg : 0];
-		*p++ = pens[BIT(gfx, 3) ? fg : 0];
-		*p++ = pens[BIT(gfx, 2) ? fg : 0];
-		*p++ = pens[BIT(gfx, 1) ? fg : 0];
-		*p++ = pens[BIT(gfx, 0) ? fg : 0];
+		*p++ = pens[BIT(gfx, 7) ? fg : bg];
+		*p++ = pens[BIT(gfx, 6) ? fg : bg];
+		*p++ = pens[BIT(gfx, 5) ? fg : bg];
+		*p++ = pens[BIT(gfx, 4) ? fg : bg];
+		*p++ = pens[BIT(gfx, 3) ? fg : bg];
+		*p++ = pens[BIT(gfx, 2) ? fg : bg];
+		*p++ = pens[BIT(gfx, 1) ? fg : bg];
+		*p++ = pens[BIT(gfx, 0) ? fg : bg];
 	}
 }
 
@@ -194,7 +210,7 @@ INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
 }
 
 static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
-	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("p_ram")
+	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -361,10 +377,12 @@ void alphatro_state::machine_start()
 void alphatro_state::machine_reset()
 {
 	// do what the IPL does
-	UINT8* ROM = memregion("maincpu")->base();
+	UINT8* ROM = memregion("roms")->base();
 	m_maincpu->set_pc(0xe000);
-	memcpy(m_p_ram, ROM, 0xf000); // copy BASIC to RAM, which the undumped IPL is supposed to do.
-	memcpy(m_p_videoram, ROM+0x1000, 0x1000);
+	// If BASIC is missing then it boots into the Monitor
+	memcpy(m_p_ram, ROM, 0x6000); // Copy BASIC to RAM
+	// Top half of this rom has keyboard tables and appears to be unused
+	memcpy(m_p_ram+0xe000, ROM+0xe000, 0x1000); // copy BIOS + Monitor to RAM
 
 	// probably not correct, exact meaning of port is unknown, vblank/vsync is too slow.
 	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));
@@ -372,8 +390,8 @@ void alphatro_state::machine_reset()
 	m_cass_state = 1;
 	m_cass_data[0] = 0;
 	m_cass_data[1] = 0;
-	m_usart->write_rxd(0);
 	m_cass_data[3] = 0;
+	m_usart->write_rxd(0);
 	m_beep->set_state(0);
 	m_beep->set_frequency(950);    /* piezo-device needs to be measured */
 }
@@ -437,7 +455,7 @@ static const cassette_interface alphatro_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
-	(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
 	"alphatro_cass",
 	NULL
 };
@@ -473,7 +491,7 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_DEVICE_ADD("usart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(alphatro_state, txdata_callback))
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19225) // USART clock - this value loads a real tape
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, 19225)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(alphatro_state, write_usart_clock))
 
 	MCFG_CASSETTE_ADD("cassette", alphatro_cassette_interface)
@@ -495,7 +513,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( alphatro )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00)
+	ROM_REGION( 0x10000, "roms", ROMREGION_ERASE00)
 	ROM_LOAD( "613256.ic-1058", 0x0000, 0x6000, CRC(ceea4cb3) SHA1(b332dea0a2d3bb2978b8422eb0723960388bb467) )
 	ROM_LOAD( "2764.ic-1038",   0xe000, 0x2000, CRC(e337db3b) SHA1(6010bade6a21975636383179903b58a4ca415e49) )
 

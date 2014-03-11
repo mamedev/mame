@@ -1,28 +1,19 @@
+// license:BSD-3-Clause
+// copyright-holders:Michael Zapf
 /*********************************************************************
  *
  * formats/ti99_dsk.c
  *
- * TI99 and Geneve disk images
- * Sector Dump and Track Dump format
+ * TI-99 family disk images
  *
  * used by TI-99/4, TI-99/4A, TI-99/8, SGCPU ("TI-99/4P"), and Geneve
  *
- * The Sector Dump Format is also known as v9t9 (named after the first TI
- * emulator to use this format). It is a contiguous sequence of sector contents
- * without track data. The first sector of the disk is located at the start of
- * the image, while the last sector is at its end.
+ * Sector Dump Format, aka "v9t9" format
+ *    customized wd177x_format
+ *    no track data
  *
- * There is also a variant of the SDF which adds three sectors at the end
- * containing a map of bad sectors. This was introduced by a tool to read
- * real TI floppy disks on a PC. As other emulators tolerate this additional
- * bad sector map, we just check whether there are 3 more sectors and ignore
- * them.
- *
- * The Track Dump Format is also known as pc99 (again, named after the first
- * TI emulator to use this format). It is a contiguous sequence of track
- * contents, containing all information including address marks and CRC, but it
- * does not contain clock signals. Therefore, the format requires that the
- * address marks be at the same positions within each track.
+ * Track Dump Format, aka "pc99" format
+ *    contains all track information, but no clock patterns
  *
  * Both formats allow for a broad range of medium sizes. All sectors are 256
  * bytes long. The most common formats are 9 sectors per track, single-sided,
@@ -31,7 +22,892 @@
  * DSDD). There are rare occurances of 8/16 sectors/track
  * (prototypical TI double-density controller) and 35 track media. Newer
  * controllers and ROMs allow for up to 36 sectors per track and 80 tracks on
- * both sides, which is 2,88 MiB (DSHD80).
+ * both sides, which is 1,44 MiB (DSHD80).
+ *
+ * The second half of this file contains the legacy implementation.
+ *
+ * Michael Zapf, Feb 2014
+ *
+ ********************************************************************/
+
+#include "emu.h"
+#include <string.h>
+#include <assert.h>
+#include <time.h>
+
+#include "imageutl.h"
+#include "ti99_dsk.h"
+
+#define SECTOR_SIZE 256
+
+// Debugging
+#define TRACE 0
+
+/*
+    Sector Dump Format
+    ------------------
+    The Sector Dump Format is also known as v9t9 format (named after the first
+    TI emulator to use this format). It is a contiguous sequence of sector
+    contents without track data. The first sector of the disk is located at
+    the start of the image, while the last sector is at its end. The sectors
+    are ordered by their logical number as used in the TI file system.
+
+    In this implementation, the sector dump format is just a kind of
+    wd177x_format with minor customizations, which allows us to keep the code
+    small. The difference is the logical ordering of tracks and sectors.
+
+    The TI file system orders all tracks on side 0 as going inwards,
+    and then all tracks on side 1 going outwards.
+
+        00 01 02 03 ... 38 39     side 0
+        79 78 77 76 ... 41 40     side 1
+
+    The SDF format stores the tracks and their sectors in logical order
+        00 01 02 03 ... 38 39 [40 41 ... 79]
+
+    There is also a variant of the SDF which adds three sectors at the end
+    containing a map of bad sectors. This was introduced by a tool to read
+    real TI floppy disks on a PC. As other emulators tolerate this additional
+    bad sector map, we just check whether there are 3 more sectors and ignore
+    them.
+*/
+const char *ti99_sdf_format::name() const
+{
+	return "sdf";
+}
+
+const char *ti99_sdf_format::description() const
+{
+	return "TI99 sector dump floppy disk image";
+}
+
+const char *ti99_sdf_format::extensions() const
+{
+	return "dsk";
+}
+
+bool ti99_sdf_format::supports_save() const
+{
+	return true;
+}
+
+int ti99_sdf_format::identify(io_generic *io, UINT32 form_factor)
+{
+	UINT64 file_size = io_generic_size(io);
+	int vote = 0;
+
+	vib_t vib;
+
+	// Adding support for another sector image format which adds 768 bytes
+	// as a bad sector map
+	if ((file_size / SECTOR_SIZE) % 10 == 3)
+	{
+		if (TRACE) logerror("ti99_dsk: Stripping map of bad sectors at image end\n");
+		file_size -= SECTOR_SIZE*3;
+	}
+
+	// Formats with 9 or 18 sectors per track
+	if (((file_size % 92160)==0)
+		&& (   (file_size/92160==1)
+			|| (file_size/92160==2)
+			|| (file_size/92160==4)
+			|| (file_size/92160==8)
+			|| ((file_size/92160==16)&& (form_factor==floppy_image::FF_35)))) vote = 50;
+
+	// Formats with 16 sectors per track (rare)
+	if (((file_size % 163840)==0)
+		&& (   (file_size/163840==1)
+			|| (file_size/163840==2))) vote = 50;
+
+	if (vote > 0)
+	{
+		// Read first sector (Volume Information Block)
+		io_generic_read(io, &vib, 0, sizeof(vib_t));
+
+		// Check from contents
+		if ((vib.id[0]=='D')&&(vib.id[1]=='S')&&(vib.id[2]=='K'))
+		{
+			if (TRACE) logerror("ti99_dsk: Found formatted SDF disk medium\n");
+			vote = 100;
+		}
+		else
+		{
+			if (TRACE) logerror("ti99_dsk: No valid VIB found; disk may be unformatted\n");
+		}
+	}
+	else if (TRACE) logerror("ti99_dsk: Disk image obviously not a SDF image\n");
+	return vote;
+}
+
+int ti99_sdf_format::find_size(io_generic *io, UINT32 form_factor)
+{
+	UINT64 file_size = io_generic_size(io);
+	vib_t vib;
+
+	int vib_enc = 0;
+
+	// See above
+	if ((file_size / SECTOR_SIZE) % 10 == 3) file_size -= SECTOR_SIZE*3;
+
+	// Read first sector
+	io_generic_read(io, &vib, 0, sizeof(vib_t));
+
+	// Check from contents
+	if ((vib.id[0]=='D')&&(vib.id[1]=='S')&&(vib.id[2]=='K'))
+	{
+		// Find out more about the density. SSDD happens to be the same size
+		// as DSSD in the sector dump format, so we need to ask the
+		// VIB if available. Oherwise, we assume that we have a DSSD medium.
+		vib_enc = (vib.density < 2)? floppy_image::FM : floppy_image::MFM;
+		if (TRACE) logerror("ti99_dsk: VIB says that disk is %s density\n", (vib_enc==floppy_image::FM)? "single":"double");
+	}
+
+	for (int i=0; formats[i].form_factor != 0; i++)
+	{
+		if (formats[i].form_factor != form_factor)
+		{
+			if (TRACE) logerror("ti99_dsk: format %d has different form factor\n", i);
+			continue;
+		}
+		if (TRACE) logerror("ti99_dsk: trying sec=%d, tr=%d, head=%d, ss=%d for file size %d\n", formats[i].sector_count, formats[i].track_count, formats[i].head_count, formats[i].sector_base_size, (int)file_size);
+
+		if (formats[i].sector_count * formats[i].track_count * formats[i].head_count * formats[i].sector_base_size == (int)file_size)
+		{
+			if (vib_enc == formats[i].encoding || vib_enc==0)
+			{
+				if (TRACE) logerror("ti99_dsk: format %d matches\n", i);
+				return i;
+			}
+			else
+			{
+				if (TRACE) logerror("ti99_dsk: format %d matches by size, but encoding does not match\n", i);
+			}
+		}
+	}
+	return -1;
+}
+
+int ti99_sdf_format::get_image_offset(const format &f, int head, int track)
+{
+	int logicaltrack = head * f.track_count;
+	logicaltrack += ((head&1)==0)?  track : (f.track_count - 1 - track);
+	if (TRACE) logerror("ti99_dsk: track %d, head %d -> logical track %d\n", track, head, logicaltrack);
+	return logicaltrack * compute_track_size(f);
+}
+
+// Format: form_factor, variant, encoding, cell_size, sector_count, track_count,
+//         head_count, sector_base_size, per_sector_size, sector_base_id,
+//         per_sector_id, gap1, gap2, gap3
+
+const ti99_sdf_format::format ti99_sdf_format::formats[] =
+{
+	{   //  90K 5.25" single sided single density
+		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
+		4000, 9, 40, 1, SECTOR_SIZE, {}, 0, {}, 16, 11, 45
+	},
+	{   //  180K 5.25" double sided single density
+		floppy_image::FF_525, floppy_image::DSSD, floppy_image::FM,
+		4000, 9, 40, 2, SECTOR_SIZE, {}, 0, {}, 16, 11, 45
+	},
+	{   //  160K 5.25" single sided double density 16 sectors (rare)
+		floppy_image::FF_525, floppy_image::DSSD, floppy_image::FM,
+		2000, 16, 40, 1, SECTOR_SIZE, {}, 0, {}, 40, 22, 24
+	},
+	{   //  180K 5.25" single sided double density
+		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
+		2000, 18, 40, 1, SECTOR_SIZE, {}, 0, {}, 40, 22, 24
+	},
+	{   //  320K 5.25" double sided double density 16 sectors (rare)
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+		2000, 16, 40, 2, SECTOR_SIZE, {}, 0, {}, 40, 22, 24
+	},
+	{   //  360K 5.25" double sided double density
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+		2000, 18, 40, 2, SECTOR_SIZE, {}, 0, {}, 40, 22, 24
+	},
+	{   //  720K 5.25" double sided quad density (80 tracks)
+		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
+		2000, 18, 80, 2, SECTOR_SIZE, {}, 0, {}, 40, 22, 24
+	},
+	{   //  720K 3.5" double sided double density (80 tracks)
+		floppy_image::FF_35, floppy_image::DSDD, floppy_image::MFM,
+		2000, 18, 80, 2, SECTOR_SIZE, {}, 0, {}, 40, 22, 24
+	},
+	{   //  1440K 3.5" double sided high density (80 tracks)
+		floppy_image::FF_35, floppy_image::DSHD, floppy_image::MFM,
+		1000, 36, 80, 2, SECTOR_SIZE, {}, 0, {}, 40, 22, 24
+	},
+	{ 0 }
+};
+
+/*
+    FM track image for sector dump format
+*/
+floppy_image_format_t::desc_e* ti99_sdf_format::get_desc_fm(const format &f, int &current_size, int &end_gap_index)
+{
+	static floppy_image_format_t::desc_e desc_fm[] =
+	{
+		{ SECTOR_INTERLEAVE_SKEW, 3, 3 },       // skew/2 because of track*2+head
+		{ FM, 0x00, f.gap_1 },                  // Gap 1 (note that we have 00 instead of ff)
+		{ SECTOR_LOOP_START, 0, 8 },            // 9 sectors
+			{ FM, 0x00, 6 },                    // pre-id gap
+			{ CRC_CCITT_FM_START, 1 },
+			{   RAW, 0xf57e, 1 },               // IDAM (fe, clock=c7; 11110101 01111110)
+			{   TRACK_ID_FM },
+			{   HEAD_ID_FM },
+			{   SECTOR_ID_FM },
+			{   SIZE_ID_FM },
+			{ CRC_END, 1 },
+			{ CRC, 1 },
+			{ FM, 0xff, f.gap_2 },               // Gap 2
+			{ FM, 0x00, 6 },
+			{ CRC_CCITT_FM_START, 2 },
+			{   RAW, 0xf56f, 1 },                // DAM (fb, clock=c7; 11110101 01101111)
+			{   SECTOR_DATA_FM, -1 },            // Sector data
+			{ CRC_END, 2 },
+			{ CRC, 2 },
+			{ FM, 0xff, f.gap_3 },               // Gap 3
+		{ SECTOR_LOOP_END },
+		{ FM, 0xff, 0 },                         // track lead-out (end gap, 231)
+		{ END }
+	};
+	current_size = (f.gap_1 + 9 * (6 + 1 + 4 + 2 + f.gap_2 + 6 + 1 + SECTOR_SIZE + 2 + f.gap_3) + 0) * 16;
+	end_gap_index = 21;
+
+	return desc_fm;
+}
+
+/*
+    MFM track image for sector dump format
+*/
+floppy_image_format_t::desc_e* ti99_sdf_format::get_desc_mfm(const format &f, int &current_size, int &end_gap_index)
+{
+	static floppy_image_format_t::desc_e desc_mfm[] =
+	{
+		{ SECTOR_INTERLEAVE_SKEW, 6, 6 },         // Possible ilv: 0, 4, 6, 10, 12, 16.
+		{ MFM, 0x4e, f.gap_1 },                  // track lead-in
+		{ SECTOR_LOOP_START, 0, 17 },            // 18 sectors
+			{ CRC_CCITT_START, 1 },
+			{   RAW, 0x4489, 3 },                 // A1 sync mark
+			{   MFM, 0xfe, 1 },                  // IDAM
+			{   TRACK_ID },
+			{   HEAD_ID },
+			{   SECTOR_ID },
+			{   SIZE_ID },
+			{ CRC_END, 1 },
+			{ CRC, 1 },
+			{ MFM, 0x4e, f.gap_2 },                   // Gap 2
+			{ MFM, 0x00, 12 },
+			{ CRC_CCITT_START, 2 },
+			{   RAW, 0x4489, 3 },                // A1
+			{   MFM, 0xfb, 1 },                  // DAM
+			{   SECTOR_DATA, -1 },               // Sector data
+			{ CRC_END, 2 },
+			{ CRC, 2 },
+			{ MFM, 0x4e, f.gap_3 },                   // Gap 3
+		{ SECTOR_LOOP_END },
+		{ MFM, 0x4e, 0 },                      // track lead-out (712)
+		{ END }
+	};
+	current_size = (f.gap_1 + 18 * (3 + 1 + 4 + 2 + f.gap_2 + 12 + 3 + 1 + SECTOR_SIZE + 2 + f.gap_3) + 0) * 16;
+	end_gap_index = 22;
+
+	return desc_mfm;
+}
+
+const floppy_format_type FLOPPY_TI99_SDF_FORMAT = &floppy_image_format_creator<ti99_sdf_format>;
+
+/*
+    Track Dump Format
+    -----------------
+    The Track Dump Format is also known as pc99 (again, named after the first
+    TI emulator to use this format). It is a contiguous sequence of track
+    contents, containing all information including address marks and CRC, but it
+    does not contain clock signals. Therefore, the format requires that the
+    address marks be at the same positions within each track.
+
+    For FM recording, each track is exactly 3253 bytes long in this format.
+    For MFM recording, track length is 6872 bytes.
+
+    Accordingly, we get a multiple of these values as the image length.
+    There are no single-sided images (when single-sided, the upper half of
+    the image is empty).
+
+    DSSD: 260240 bytes
+    DSDD: 549760 bytes
+
+    We do not support other geometries in this format.
+
+    Tracks are stored from outside to inside of head 0, then outside to inside of head 1:
+
+    [Head0/track0] [Head0/track1] ... [Head0/track39] [Head1/track0] [Head1/track1] ... [Head1/track39]
+
+    Known Issues:
+    - When formatting a disk in MFM encoding, BwG with Disk Manager 2 creates
+      a format that is not compatible with TDF.
+      It differs not only with respect to the Gap_1 size but also wrt the
+      pre-id gap length and therefore causes a different track layout
+      (sectors are apart by 346 instead of 340 bytes).
+*/
+
+const char *ti99_tdf_format::name() const
+{
+	return "tdf";
+}
+
+const char *ti99_tdf_format::description() const
+{
+	return "TI99 track dump floppy disk image";
+}
+
+const char *ti99_tdf_format::extensions() const
+{
+	return "dsk,dtk";
+}
+
+bool ti99_tdf_format::supports_save() const
+{
+	return true;
+}
+
+/*
+    Determine whether the image file can be interpreted as a track dump
+*/
+int ti99_tdf_format::identify(io_generic *io, UINT32 form_factor)
+{
+	UINT64 file_size = io_generic_size(io);
+	int vote = 0;
+	UINT8 trackdata[500];
+
+	// Formats with 9 or 18 sectors per track
+	if ((file_size == 260240) || (file_size == 549760))
+		vote = 50;
+
+	if (vote > 0)
+	{
+		if (TRACE) logerror("ti99_dsk: Image looks like a TDF image\n");
+
+		// Get some bytes from track 0
+		io_generic_read(io, trackdata, 0, 500);
+
+		int start = find_start(trackdata, 500, (file_size < 500000)? floppy_image::FM : floppy_image::MFM);
+		if (start != -1)
+		{
+			if (TRACE) logerror("ti99_dsk: Start of image complies with TDF\n");
+			vote = 100;
+		}
+		else
+		{
+			logerror("ti99_dsk: Image does not comply with TDF; may be broken or unformatted\n");
+		}
+	}
+	else logerror("ti99_dsk: Disk image obviously not a TDF image\n");
+	return vote;
+}
+
+/*
+    Find the proper format for this image.
+*/
+int ti99_tdf_format::find_size(io_generic *io, UINT32 form_factor)
+{
+	UINT64 file_size = io_generic_size(io);
+
+	for (int i=0; formats[i].form_factor != 0; i++)
+	{
+		if (formats[i].form_factor != form_factor)
+		{
+			if (TRACE) logerror("ti99_dsk: format %d has different form factor\n", i);
+			continue;
+		}
+		if (TRACE) logerror("ti99_dsk: trying format %d with encoding=%s, tr=%d, head=%d for file size %d\n", i, (formats[i].encoding==floppy_image::FM)? "FM" : "MFM", formats[i].track_count, formats[i].head_count, (int)file_size);
+		if (formats[i].track_size * formats[i].track_count * formats[i].head_count == (int)file_size)
+		{
+			if (TRACE) logerror("ti99_dsk: format %d matches\n", i);
+			return i;
+		}
+	}
+	return -1;
+}
+
+/*
+    Find out where the address marks are. Unfortunately, the TDF offers no
+    clock signals. So we are looking for this pattern:
+
+    FM: (00)*6, FE, (xx)*6, (FF)*11, (00)*6, FB
+    MFM: (00)*10, (a1)*3, fe, (xx)*6, (4e)*22, (00)*12
+
+    Returns the position of the start of the pre-IDAM gap.
+*/
+int ti99_tdf_format::find_start(UINT8* trackdata, int track_size, int encoding)
+{
+	int pos = 0;
+	int pos1 = 0;
+
+	// Does not make sense to look any further but the first 400 bytes.
+	while (pos < 400)
+	{
+		if (encoding==floppy_image::FM)
+		{
+			// FM
+			if (!has_byteseq(trackdata, track_size, 0x00, pos, 6))
+			{
+				pos++;
+				continue;
+			}
+			pos1 = pos + 6;
+			if (trackdata[pos1]!=0xfe)
+			{
+				pos++;
+				continue;
+			}
+			pos1 += 7;
+			if (!has_byteseq(trackdata, track_size, 0xff, pos1, 11))
+			{
+				pos++;
+				continue;
+			}
+			pos1 += 11;
+			if (!has_byteseq(trackdata, track_size, 0x00, pos1, 6))
+			{
+				pos++;
+				continue;
+			}
+			pos1 += 6;
+			if (trackdata[pos1]!=0xfb)
+			{
+				pos++;
+				continue;
+			}
+		}
+		else
+		{
+			// MFM
+			if (!has_byteseq(trackdata, track_size, 0x00, pos, 10))
+			{
+				pos++;
+				continue;
+			}
+			pos1 = pos + 10;
+			if (!has_byteseq(trackdata, track_size, 0xa1, pos1, 3))
+			{
+				pos++;
+				continue;
+			}
+			pos1 += 3;
+			if (trackdata[pos1]!=0xfe)
+			{
+				pos++;
+				continue;
+			}
+			pos1 += 7;
+			if (!has_byteseq(trackdata, track_size, 0x4e, pos1, 22))
+			{
+				pos++;
+				continue;
+			}
+			pos1 += 22;
+			if (!has_byteseq(trackdata, track_size, 0x00, pos1, 12))
+			{
+				pos++;
+				continue;
+			}
+		}
+		return pos;
+	}
+	return -1;
+}
+
+/*
+    Determine the offset from the start of the image, given the head and track.
+    At this location the track will be saved to the file.
+*/
+int ti99_tdf_format::get_image_offset(const format &f, int head, int track)
+{
+	return ((f.track_count * head) + track) * f.track_size;
+}
+
+/*
+    Load the TDF image from disk and convert it into a sequence of flux levels.
+*/
+bool ti99_tdf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+{
+	int type = find_size(io, form_factor);
+	if(type == -1)
+		return false;
+
+	UINT8 trackdata[6872];
+	const format &f = formats[type];
+
+	// Read the image
+	for(int head=0; head < f.head_count; head++)
+	{
+		for(int track=0; track < f.track_count; track++)
+		{
+			io_generic_read(io, trackdata, get_image_offset(f, head, track), f.track_size);
+			if (f.encoding==floppy_image::FM)
+				generate_track_fm(track, head, f.cell_size, trackdata, image);
+			else
+				generate_track_mfm(track, head, f.cell_size, trackdata, image);
+		}
+	}
+	return true;
+}
+
+/*
+    Check whether a sequence of bytes is at the given position.
+*/
+bool ti99_tdf_format::has_byteseq(UINT8* trackdata, int track_size, UINT8 byte, int pos, int count)
+{
+	while ((pos < track_size) && (count > 0))
+	{
+		if (trackdata[pos] != byte) return false;
+		pos++;
+		count--;
+	}
+	return true;
+}
+
+void ti99_tdf_format::generate_track_fm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image)
+{
+	int track_size_cells = 200000000/cell_size;
+	UINT32 *buffer = global_alloc_array_clear(UINT32, 200000000/cell_size);
+
+	// The TDF has a long track lead-out that makes the track length sum up
+	// to 3253; this is too long for the number of cells in the real track.
+	// This was either an error when that format was defined,
+	// or it is due to the fact that when reading a track via
+	// the controller, after the track has been read, the controller still
+	// delivers some FF values until it times out.
+
+	// Accordingly, we limit the track size to cell_number / 16,
+	// which means 3125 for FM
+	// This also means that Gap 4 (lead-out) is not 231 bytes long but only 103 bytes
+
+	int track_size = track_size_cells / 16;
+
+	int offset = 0;
+	short crc1, crc2, found_crc;
+
+	int start = find_start(trackdata, track_size, floppy_image::FM);
+	bool broken = false;
+
+	if (start == -1)
+	{
+		logerror("ti99_dsk: TDF: Start of track %d, head %d not found. Assuming broken format, starting at offset 16.\n", track, head);
+		start = 16;
+		broken = true;
+	}
+
+	// Found a track; we now know where the address marks are:
+	// (start is positioned at the pre-id gap)
+	// IDAM: start + 6 + n*334
+	// DAM:  start + 30 + n*334
+	// and the CRCs are at
+	// CRC1: start + 11 + n*334
+	// CRC2: start + 287 + n*334
+	// If the CRCs are F7F7, we recalculate them.
+	for (int i=0; i < track_size; i++)
+	{
+		if (((i-start-6)%334==0) && (i < start + 9*334))
+		{
+			// IDAM
+			raw_w(buffer, offset, 16, 0xf57e);
+		}
+		else
+		{
+			if (((i-start-30)%334==0) && (i < start + 9*334))
+			{
+				// DAM
+				raw_w(buffer, offset, 16, 0xf56f);
+			}
+			else
+			{
+				if (((i-start-11)%334==0) && (i < start + 9*334))
+				{
+					// CRC1
+					crc1 = ccitt_crc16(0xffff, &trackdata[i-5], 5);
+					found_crc = (trackdata[i]<<8 | trackdata[i+1]);
+					if ((found_crc & 0xffff) == 0xf7f7)
+					{
+						// PC99 format: no real CRC; replace it
+						// logerror("Warning: PC99 format using pseudo CRC1; replace by %04x\n", crc1);
+						trackdata[i] = (crc1 >> 8) & 0xff;
+						trackdata[i+1] = crc1 & 0xff;
+						found_crc = crc1;
+					}
+					if ((crc1 != found_crc) && !broken)
+					{
+						logerror("ti99_dsk: Warning: CRC1 does not match (track=%d, head=%d). Found = %04x, calc = %04x\n", track, head, found_crc& 0xffff, crc1& 0xffff);
+					}
+				}
+				else
+				{
+					if (((i-start-287)%334==0) && (i < start + 9*334))
+					{
+						// CRC2
+						crc2 = ccitt_crc16(0xffff, &trackdata[i-SECTOR_SIZE-1], SECTOR_SIZE+1);
+						found_crc = (trackdata[i]<<8 | trackdata[i+1]);
+						if ((found_crc & 0xffff) == 0xf7f7)
+						{
+							// PC99 format: no real CRC; replace it
+							// logerror("Warning: PC99 format using pseudo CRC2; replace by %04x\n", crc2);
+							trackdata[i] = (crc2 >> 8) & 0xff;
+							trackdata[i+1] = crc2 & 0xff;
+							found_crc = crc2;
+						}
+						if ((crc2 != found_crc) && !broken)
+						{
+							logerror("ti99_dsk: Warning: CRC2 does not match (track=%d, head=%d). Found = %04x, calc = %04x\n", track, head, found_crc& 0xffff, crc2& 0xffff);
+						}
+					}
+				}
+				fm_w(buffer, offset, 8, trackdata[i]);
+			}
+		}
+	}
+
+	generate_track_from_levels(track, head, buffer, track_size_cells, 0, image);
+
+	global_free(buffer);
+}
+
+void ti99_tdf_format::generate_track_mfm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image)
+{
+	int track_size_cells = 200000000/cell_size;
+	UINT32 *buffer = global_alloc_array_clear(UINT32, 200000000/cell_size);
+
+	// See above
+	// We limit the track size to cell_number / 16, which means 6250 for MFM
+	// Here, Gap 4 is actually only 90 bytes long
+	// (not 712 as specified in the TDF format)
+	int track_size = track_size_cells / 16;
+	int start = find_start(trackdata, track_size, floppy_image::MFM);
+	bool broken = false;
+
+	int offset = 0;
+	short crc1, crc2, found_crc;
+
+	if (start == -1)
+	{
+		logerror("ti99_dsk: TDF: Start of track %d, head %d not found. Assuming broken format, starting at offset 40.\n", track, head);
+		start = 40;
+		broken = true;
+	}
+
+	// Found a track; we now know where the address marks are:
+	// (start is positioned at the pre-id gap)
+	// IDAM: start + 10 + n*340 (starting at first a1)
+	// DAM:  start + 54 + n*340 (starting at first a1)
+	// and the CRCs are at
+	// CRC1: start + 18 + n*340
+	// CRC2: start + 314 + n*334
+
+	for (int i=0; i < track_size; i++)
+	{
+		if (((i-start-10)%340==0) && (i < start + 18*340))
+		{
+			// IDAM
+			for (int j=0; j < 3; j++)
+				raw_w(buffer, offset, 16, 0x4489);  // 3 times A1
+			mfm_w(buffer, offset, 8, 0xfe);
+			i += 3;
+		}
+		else
+		{
+			if (((i-start-54)%340==0) && (i < start + 18*340))
+			{
+				// DAM
+				for (int j=0; j < 3; j++)
+					raw_w(buffer, offset, 16, 0x4489);  // 3 times A1
+				mfm_w(buffer, offset, 8, 0xfb);
+				i += 3;
+			}
+			else
+			{
+				if (((i-start-18)%340==0) && (i < start + 18*340))
+				{
+					// CRC1
+					// The CRC also covers the three A1 bytes!
+					crc1 = ccitt_crc16(0xffff, &trackdata[i-8], 8);
+					found_crc = (trackdata[i]<<8 | trackdata[i+1]);
+					if ((found_crc & 0xffff) == 0xf7f7)
+					{
+						// PC99 format: pseudo CRC; replace it
+						// logerror("Warning: PC99 format using pseudo CRC1; replace by %04x\n", crc1);
+						trackdata[i] = (crc1 >> 8) & 0xff;
+						trackdata[i+1] = crc1 & 0xff;
+						found_crc = crc1;
+					}
+					if (crc1 != found_crc && !broken)
+					{
+						logerror("ti99_dsk: Warning: CRC1 does not match (track=%d, head=%d). Found = %04x, calc = %04x\n", track, head, found_crc & 0xffff, crc1& 0xffff);
+					}
+				}
+				else
+				{
+					if ((i > 340) && ((i-start-314)%340==0) && (i < start + 18*340))
+					{
+						// CRC2
+						crc2 = ccitt_crc16(0xffff, &trackdata[i-SECTOR_SIZE-4], SECTOR_SIZE+4);
+						found_crc = (trackdata[i]<<8 | trackdata[i+1]);
+						if ((found_crc & 0xffff) == 0xf7f7)
+						{
+							// PC99 format: pseudo CRC; replace it
+							// logerror("Warning: PC99 format using pseudo CRC2; replace by %04x\n", crc2);
+							trackdata[i] = (crc2 >> 8) & 0xff;
+							trackdata[i+1] = crc2 & 0xff;
+							found_crc = crc2;
+						}
+						if (crc2 != found_crc && !broken)
+						{
+							logerror("ti99_dsk: Warning: CRC2 does not match (track=%d, head=%d). Found = %04x, calc = %04x\n", track, head, found_crc& 0xffff,  crc2& 0xffff);
+						}
+					}
+				}
+				mfm_w(buffer, offset, 8, trackdata[i]);
+			}
+		}
+	}
+
+	generate_track_from_levels(track, head, buffer, track_size_cells, 0, image);
+
+	global_free(buffer);
+}
+
+/*
+    Get the track bytes from the bitstream. We store this sequence as the
+    contents of the TDF.
+
+    Note that this is risky to some extend. Since write splices may shift
+    in theory, we must be aware that dumping the bits may not be guaranteed
+    to deliver the sector contents properly. On the other hand, the floppy
+    implementation currently works very precisely, so it is not likely that
+    we get shifted splices.
+
+    To make this more stable we should better retrieve all sectors
+    separately (by extract_sectors_from_bitstream), then paste the sectors
+    back into the respective positions of the track image, then save this
+    rebuilt track image. Hence, as the track data outside of the sectors remain
+    unchanged after formatting, we can ensure a proper positioning of the
+    sectors for the TDF.
+*/
+void ti99_tdf_format::extract_track_from_bitstream(const UINT8 *bitstream, int track_size, UINT8 *trackdata)
+{
+	int pos = 0;
+	int tpos = 0;
+	int lastpos = -1;
+	while ((pos < track_size) && (pos > lastpos)) {
+		// When pos < lastpos, we wrapped around the track end
+		lastpos = pos;
+		UINT8 byte = sbyte_mfm_r(bitstream, pos, track_size);
+		trackdata[tpos++] = byte;
+	}
+}
+
+bool ti99_tdf_format::save(io_generic *io, floppy_image *image)
+{
+	int act_track_size = 0;
+
+	UINT8 bitstream[500000/8];
+	UINT8 trackdata[6872];
+
+	// From the track_size alone we cannot tell whether this is FM or MFM
+	// We will have to try both ways; start with the size of the existing file
+
+	int type = (io_generic_size(io) > 500000)? 1 : 0;
+
+	// If this choice fails we must try the other way
+	// If this fails again, we go for the first option again and save a possibly
+	// broken format
+
+	bool goodformat = true;
+	for (int option=0; option < 3; option++)
+	{
+		const format &f = formats[type];
+		if (TRACE) logerror("ti99_dsk: Trying format %d (TDF) for saving\n", type);
+		goodformat = true;
+
+		// We expect a bitstream of length 50000 for FM and 100000 for MFM
+		for(int head=0; (head < 2) && goodformat; head++)
+		{
+			for(int track=0; (track < 40) && goodformat; track++)
+			{
+				// Retrieve the cells from the flux sequence
+				generate_bitstream_from_track(track, head, f.cell_size, bitstream, act_track_size, image);
+
+				// Maybe the track has become longer due to moving splices
+				if (act_track_size > 200000000/f.cell_size)
+				{
+					// Truncate the track
+					act_track_size = 200000000/f.cell_size;
+				}
+
+				// Get the bytes from the cells
+				extract_track_from_bitstream(bitstream, act_track_size, trackdata);
+
+				// Do we get a reasonable track format?
+				// Test this for track 0 only (we won't be able to change that
+				// for each single track, anyway)
+
+				if ((track == 0) && (head == 0) && (option < 2))
+				{
+				//  for (int i=0; i < 256; i++)
+				//      logerror("%02x%c", trackdata[i], (i%16==15)? '\n' : ' ');
+
+					goodformat = (find_start(trackdata, act_track_size, f.encoding) != -1);
+					if (!goodformat) logerror("ti99_dsk: Format %d (TDF) not suitable for saving\n", type);
+				}
+
+				if (goodformat)
+				{
+					// Pad the trackdata according to the TDF spec
+					for (int i = act_track_size; i <  f.track_size; i++)
+						trackdata[i] = f.gapbytes;
+
+					// Save to the file
+					io_generic_write(io, trackdata, get_image_offset(f, head, track), f.track_size);
+				}
+			}
+		}
+		if (!goodformat)
+		{
+			// If 0 then next is 1 and fallback is 0.
+			// If 1 then next is 0 and fallback is 1.
+			type = (type+1) % 2;
+		}
+		else
+			return true;
+	}
+
+	// We won't reach this line
+	return true;
+}
+
+/*
+    Supported formats for the track dump format.
+    There are only two formats: FM double-sided and MFM double-sided.
+*/
+const ti99_tdf_format::format ti99_tdf_format::formats[] =
+{
+	{   //  180K 5.25" double sided single density
+		floppy_image::FF_525, floppy_image::DSSD, floppy_image::FM,
+		4000, 9, 40, 2, 3253, 0xff
+	},
+	{   //  360K 5.25" double sided double density
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+		2000, 18, 40, 2, 6872, 0x4e
+	},
+	{ 0 }
+};
+
+const floppy_format_type FLOPPY_TI99_TDF_FORMAT = &floppy_image_format_creator<ti99_tdf_format>;
+
+
+//==========================================================================
+
+/**************************************************************
+ *
+ *    Legacy implementation
  *
  * Different to earlier implementations, these format implementations provide
  * full track read/write capabilities. For the SDF format, the missing track
@@ -72,244 +948,9 @@
  * FIXME: If image is broken with good first track and defect higher tracks,
  *        tdf_guess_geometry fails to define a geometry. The guessing should
  *        always be done.
- ********************************************************************/
-
-#include "emu.h"
-#include <string.h>
-#include <assert.h>
-#include <time.h>
-
-#include "imageutl.h"
-#include "ti99_dsk.h"
-
-/*
-    New format implementation. See below for legacy implementation.
-*/
-const char *ti99_sdf_format::name() const
-{
-	return "sdf";
-}
-
-const char *ti99_sdf_format::description() const
-{
-	return "TI99 sector dump floppy disk image";
-}
-
-const char *ti99_sdf_format::extensions() const
-{
-	return "dsk";
-}
-
-bool ti99_sdf_format::supports_save() const
-{
-	return true;
-}
-
-int ti99_sdf_format::identify(io_generic *io, UINT32 form_factor)
-{
-	UINT64 file_size = io_generic_size(io);
-
-	// Adding support for another sector image format which adds 768 bytes
-	// as a bad sector map
-	if ((file_size / 256) % 10 == 3)
-	{
-		logerror("Stripping map of bad sectors at image end\n");
-		file_size -= 768;
-	}
-
-	// Formats with 9 sectors per track
-	if (((file_size % 92160)==0)
-		&& (   (file_size/92160==1)
-			|| (file_size/92160==2)
-			|| (file_size/92160==4)
-			|| (file_size/92160==8)
-			|| (file_size/92160==16))) return 50;
-
-	// Formats with 16 sectors per track (rare)
-	if (((file_size % 163840)==0)
-		&& (   (file_size/163840==1)
-			|| (file_size/163840==2))) return 50;
-
-	logerror("Unrecognized disk image geometry\n");
-	return 0;
-}
-
-int ti99_sdf_format::find_size(io_generic *io, UINT32 form_factor)
-{
-	UINT64 file_size = io_generic_size(io);
-
-	// See above
-	if ((file_size / 256) % 10 == 3) file_size -= 768;
-
-	for (int i=0; formats[i].form_factor != 0; i++)
-	{
-		logerror("ti99_dsk: trying size=%d, sec=%d, tr=%d, head=%d, ss=%d\n", (int)file_size, formats[i].sector_count, formats[i].track_count, formats[i].head_count, formats[i].sector_base_size);
-		if (formats[i].sector_count * formats[i].track_count * formats[i].head_count * formats[i].sector_base_size == (int)file_size)
-		{
-			logerror("ti99_dsk: format %d matches\n", i);
-			return i;
-		}
-	}
-	return -1;
-}
-
-int ti99_sdf_format::get_image_offset(const format &f, int head, int track)
-{
-	// Note that the logical track arrangement on TI disks is
-	//
-	//   00 01 02 03 ... 38 39     side 0
-	//   79 78 77 76 ... 41 40     side 1
-	//
-	// and that the SDF format stores the tracks in logical order
-	//   00 01 02 03 ... 38 39 [40 41 ... 79]
-	//
-	int logicaltrack = head * f.track_count;
-	logicaltrack += ((head&1)==0)?  track : (f.track_count - 1 - track);
-	logerror("ti99_dsk: track %d, head %d -> logical track %d\n", track, head, logicaltrack);
-	return logicaltrack * compute_track_size(f);
-}
-
-/*
- * Common formats:
- * 90 KiB = 40 tracks / 1 side / 9 sectors = SSSD
- * 180 KiB = 40 tracks / 2 side / 9 sectors = DSSD (most common)
- *         = 40 tracks / 1 side / 18 sectors = SSDD (rare)
- *         = 80 tracks / 1 side / 9 sectors = SSSD80 (rare)
- * 360 KiB = 40 tracks / 2 side / 18 sectors = DSDD (most common)
- *         = 80 tracks / 2 side / 9 sectors = DSSD80 (rare)
- *         = 80 tracks / 1 side / 18 sectors = SSDD80 (rare)
- *         = 40 tracks / 1 side / 36 sectors = SSHD (rare)
- * 720 KiB = 80 tracks / 2 side / 18 sectors = DSDD80 (most common)
- * 1440 KiB= 80 tracks / 2 side / 36 sectors = DSHD80 (most common)
- *
- * Moreover, there may be formats with 35 tracks (ancient) and 8 sectors/track.
- * We only check for the 8 sector formats.
- * 160 KiB = 40 tracks / 1 side / 16 sectors = SSDD8
- * 320 KiB = 40 tracks / 2 side / 16 sectors = DSDD8
- */
-/* const ti99_sdf_format::file_format ti99_sdf_format::file_formats[] =
-{
-    {   90,    floppy_image::SSSD,  9, 40, 1, 4000  },  // 5.25, 3.5 with double-step
-    {   160,   floppy_image::DSSD,  8, 40, 2, 4000  },  // 5.25, 3.5 with double-step
-    {   180,   floppy_image::DSSD,  9, 40, 2, 4000  },  // 5.25, 3.5 with double-step
-    {   180,   floppy_image::SSDD, 18, 40, 2, 2000  },  // 5.25, 3.5 with double-step
-    {   320,   floppy_image::DSDD, 16, 40, 2, 2000  },  // 5.25, 3.5 with double-step
-    {   360,   floppy_image::DSDD, 18, 40, 2, 2000  },  // 5.25, 3.5 with double-step
-    {   720,   floppy_image::DSDD, 18, 80, 2, 2000  },  // 3.5
-    {   1440,  floppy_image::DSHD, 36, 80, 2, 1000  },  // 3.5
-    {   0, 0, 0, 0, 0, 0 }
-    // Add more formats with VIB check
-}; */
-
-// Format: form_factor, variant, encoding, cell_size, sector_count, track_count,
-//         head_count, sector_base_size, per_sector_size, sector_base_id,
-//         per_sector_id, gap1, gap2, gap3
-
-const ti99_sdf_format::format ti99_sdf_format::formats[] =
-{
-	{   //  90K 5.25" single density single sided
-		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 9, 40, 1, 256, {}, 0, {}, 16, 11, 45
-	},
-	{   //  180K 5.25" single density double sided
-		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 9, 40, 2, 256, {}, 0, {}, 16, 11, 45
-	},
-	{   //  360K 5.25" double density double sided
-		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000, 18, 40, 2, 256, {}, 0, {}, 40, 22, 24
-	},
-
-	{ 0 }
-};
-
-/*
- * FM track image
- */
-floppy_image_format_t::desc_e* ti99_sdf_format::get_desc_fm(const format &f, int &current_size, int &end_gap_index)
-{
-	static floppy_image_format_t::desc_e desc_fm[] =
-	{
-		{ SECTOR_INTERLEAVE_SKEW, 3, 3 },        // skew/2 because of track*2+head
-		{ FM, 0x00, f.gap_1 },                       // Gap 1 (note that we have 00 instead of ff)
-		{ SECTOR_LOOP_START, 0, 8 },            // 9 sectors
-			{ FM, 0x00, 6 },                    // pre-id gap
-			{ CRC_CCITT_FM_START, 1 },
-			{   RAW, 0xf57e, 1 },                 // IDAM (fe, clock=c7; 11110101 01111110)
-			{   TRACK_ID_FM },
-			{   HEAD_ID_FM },
-			{   SECTOR_ID_FM },
-			{   SIZE_ID_FM },
-			{ CRC_END, 1 },
-			{ CRC, 1 },
-			{ FM, 0xff, f.gap_2 },                    // Gap 2
-			{ FM, 0x00, 6 },
-			{ CRC_CCITT_FM_START, 2 },
-			{   RAW, 0xf56f, 1 },                // DAM (fb, clock=c7; 11110101 01101111)
-			{   SECTOR_DATA_FM, -1 },            // Sector data
-			{ CRC_END, 2 },
-			{ CRC, 2 },
-			{ FM, 0xff, f.gap_3 },                   // Gap 3
-		{ SECTOR_LOOP_END },
-		{ FM, 0xff, 0 },                     // track lead-out (end gap, 231)
-		{ END }
-	};
-	current_size = (f.gap_1 + 9 * (6 + 1 + 4 + 2 + f.gap_2 + 6 + 1 + 256 + 2 + f.gap_3) + 0) * 16;
-	end_gap_index = 21;
-
-	return desc_fm;
-}
-
-/*
- * MFM track image
- */
-floppy_image_format_t::desc_e* ti99_sdf_format::get_desc_mfm(const format &f, int &current_size, int &end_gap_index)
-{
-	static floppy_image_format_t::desc_e desc_mfm[] =
-	{
-		{ SECTOR_INTERLEAVE_SKEW, 10, 0 },
-		{ MFM, 0x4e, f.gap_1 },                  // track lead-in
-		{ SECTOR_LOOP_START, 0, 17 },            // 18 sectors
-			{ CRC_CCITT_START, 1 },
-			{   RAW, 0x4489, 3 },                 // A1 sync mark
-			{   MFM, 0xfe, 1 },                  // IDAM
-			{   TRACK_ID },
-			{   HEAD_ID },
-			{   SECTOR_ID },
-			{   SIZE_ID },
-			{ CRC_END, 1 },
-			{ CRC, 1 },
-			{ MFM, 0x4e, f.gap_2 },                   // Gap 2
-			{ MFM, 0x00, 12 },
-			{ CRC_CCITT_START, 2 },
-			{   RAW, 0x4489, 3 },                // A1
-			{   MFM, 0xfb, 1 },                  // DAM
-			{   SECTOR_DATA, -1 },               // Sector data
-			{ CRC_END, 2 },
-			{ CRC, 2 },
-			{ MFM, 0x4e, f.gap_3 },                   // Gap 3
-		{ SECTOR_LOOP_END },
-		{ MFM, 0x4e, 0 },                      // track lead-out (712)
-		{ END }
-	};
-	current_size = (f.gap_1 + 18 * (3 + 1 + 4 + 2 + f.gap_2 + 12 + 3 + 1 + 256 + 2 + f.gap_3) + 0) * 16;
-	end_gap_index = 22;
-
-	return desc_mfm;
-}
-
-const floppy_format_type FLOPPY_TI99_SDF_FORMAT = &floppy_image_format_creator<ti99_sdf_format>;
-
-//==========================================================================
-#define SECTOR_SIZE 256
-#define TI99_IDAM_LENGTH 7
-
-
-/**************************************************************
-
-    Legacy implementation
-
 **************************************************************/
+
+#define TI99_IDAM_LENGTH 7
 
 /*
     Determines whether we are using 80 track drives. This variable is

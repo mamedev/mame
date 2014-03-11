@@ -168,8 +168,8 @@ static MACHINE_CONFIG_DERIVED( wscolor, wswan )
 	MCFG_CPU_PROGRAM_MAP(wscolor_mem)
 	MCFG_MACHINE_START_OVERRIDE(wswan_state, wscolor )
 	
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(4096)
 	MCFG_PALETTE_INIT_OWNER(wswan_state, wscolor )
 
 

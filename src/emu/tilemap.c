@@ -375,7 +375,6 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, tilemap_get_info_delegate t
 	m_all_tiles_dirty = true;
 	m_all_tiles_clean = false;
 	m_palette_offset = 0;
-	m_pen_data_offset = 0;
 	m_gfx_used = 0;
 	memset(m_gfx_dirtyseq, 0, sizeof(m_gfx_dirtyseq));
 
@@ -417,7 +416,6 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, tilemap_get_info_delegate t
 	machine().save().save_item("tilemap", NULL, instance, NAME(m_enable));
 	machine().save().save_item("tilemap", NULL, instance, NAME(m_attributes));
 	machine().save().save_item("tilemap", NULL, instance, NAME(m_palette_offset));
-	machine().save().save_item("tilemap", NULL, instance, NAME(m_pen_data_offset));
 	machine().save().save_item("tilemap", NULL, instance, NAME(m_scrollrows));
 	machine().save().save_item("tilemap", NULL, instance, NAME(m_scrollcols));
 	machine().save().save_item("tilemap", NULL, instance, NAME(m_rowscroll));
@@ -743,7 +741,7 @@ g_profiler.start(PROFILER_TILEMAP_UPDATE);
 	// draw the tile, using either direct or transparent
 	UINT32 x0 = m_tilewidth * col;
 	UINT32 y0 = m_tileheight * row;
-	m_tileflags[logindex] = tile_draw(m_tileinfo.pen_data + m_pen_data_offset, x0, y0,
+	m_tileflags[logindex] = tile_draw(m_tileinfo.pen_data, x0, y0,
 		m_tileinfo.palette_base, m_tileinfo.category, m_tileinfo.group, flags, m_tileinfo.pen_mask);
 
 	// if mask data is specified, apply it

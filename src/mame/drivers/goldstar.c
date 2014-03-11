@@ -243,6 +243,57 @@ ADDRESS_MAP_END
 */
 
 
+static ADDRESS_MAP_START( wcherry_map, AS_PROGRAM, 8, goldstar_state )
+	AM_RANGE(0x0000, 0xb7ff) AM_ROM
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xc000, 0xc7ff) AM_ROM
+	
+	/* Not sure... Need to be checked */
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
+	AM_RANGE(0xf040, 0xf07f) AM_RAM AM_SHARE("reel1_scroll")
+	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_SHARE("reel2_scroll")
+	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_SHARE("reel3_scroll")
+
+    /* Not really PPI's... They are emulated/simulated inside the CPLDs */
+	AM_RANGE(0xf600, 0xf603) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
+	AM_RANGE(0xf610, 0xf613) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
+	AM_RANGE(0xf620, 0xf623) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
+
+	AM_RANGE(0xf630, 0xf630) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
+	AM_RANGE(0xf640, 0xf640) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0xf650, 0xf650) AM_WRITENOP	// AM_WRITE(output_w)  // unknown register: 0x3e
+	AM_RANGE(0xf660, 0xf660) AM_WRITENOP	// AM_WRITE(output_w)  // unknown register: 0x3e
+	AM_RANGE(0xf670, 0xf670) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( wcherry_readwriteport, AS_IO, 8, goldstar_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_END
+
+/* wcherry findings...
+
+  0000-bfff = ROM space.
+  b000-b7ff = NVRAM.
+  c000-c7ff = ROM space.
+
+  f600-f603 = 8255_1 (ctrl=9b) ; portA, B & C (input)
+  f610-f613 = 8255_2 (ctrl=9b) ; portA, B & C (input)
+  f620-f623 = 8255_3 (ctrl=90) ; portA (input); ports B & C (output)
+  f630      = AY8910 RW
+  f640      = AY8910 ctrl
+  f650      = Unknown. Seems a register. Writes 0x3e.
+  f660      = Unknown. Seems a register. Writes 0x3e.
+  f670      = PSG (init writes)
+
+
+  I/O
+
+*/
 
 
 WRITE8_MEMBER(goldstar_state::cm_outport1_w)
@@ -6655,6 +6706,47 @@ static MACHINE_CONFIG_START( ncb3, goldstar_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_START( wcherry, goldstar_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(wcherry_map)
+	MCFG_CPU_IO_MAP(wcherry_readwriteport)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
+
+	/* 3x 8255 */
+	MCFG_I8255A_ADD( "ppi8255_0", ncb3_ppi8255_0_intf )
+	MCFG_I8255A_ADD( "ppi8255_1", ncb3_ppi8255_1_intf )
+	MCFG_I8255A_ADD( "ppi8255_2", ncb3_ppi8255_2_intf )
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", cb3e)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
+
+
 static MACHINE_CONFIG_START( cm, goldstar_state )
 
 	/* basic machine hardware */
@@ -11407,6 +11499,47 @@ ROM_START( megaline )
 ROM_END
 
 
+/*
+  Win Cherry (ver 0.16 - 19990219)
+
+  1x Z0840006PSC-Z80CPU 8-bit Microprocessor.
+  1x KC89C72            Programmable Sound Generator.
+  1x TDA2003            Audio Amplifier.
+
+  1x 27C256 (ic9) dumped.
+  1x 27C512 (ic2) dumped.
+  1x M27C1001 (ic6) dumped.
+  1x AM27C29PC (not dumped yet).
+
+  1x CY62256LL-70PC Static RAM.
+  1x LP6264D-70LL   Static RAM.
+
+  2x Xilinx XC9572-PC84 CPLD's (read protected).
+
+  1x oscillator 12.000 MHz.
+  1x 2x28 JAMMA edge connector.
+  2x pushbutton (MANAG. - STATIS.).
+  1x trimmer (volume).
+  5x 8 DIP switches.
+  1x battery (missing).
+
+*/
+
+ROM_START( wcherry )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wc20%388.ic2",  0x00000, 0x10000, CRC(b1ea0e6a) SHA1(2dd3f2cfffc1e47b45c29daa9d7df7af956b599c) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "wincherryb.ic6",  0x00000, 0x20000, CRC(cace16f5) SHA1(a6caddc6ccd30901e2332a42f339a1da022de410) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "wincherrya.ic9",  0x00000, 0x08000, CRC(919bd692) SHA1(1aeb66f1e4555b731858833445000593e613f74d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27c29pc",      0x00000, 0x0200, BAD_DUMP CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )	// borrowed from other game.
+ROM_END
+
+
 /*********************************************************************************************************************/
 
 DRIVER_INIT_MEMBER(goldstar_state,goldstar)
@@ -12068,33 +12201,50 @@ DRIVER_INIT_MEMBER(goldstar_state, super9)
 
 DRIVER_INIT_MEMBER(goldstar_state, cb3e)
 {
-	int A;
+/*  program bitswap */
+	int i;
 	UINT8 *ROM = memregion("maincpu")->base();
 	do_blockswaps(ROM);
 
-	// a data bitswap
-	for (A = 0;A < 0x10000;A++)
+	for (i = 0; i < 0x10000; i++)
 	{
-		UINT8 dat = ROM[A];
-		dat =  BITSWAP8(dat,5,6,3,4,7,2,1,0);
-		ROM[A] = dat;
+		UINT8 dat = ROM[i];
+		dat =  BITSWAP8(dat, 5, 6, 3, 4, 7, 2, 1, 0);
+		ROM[i] = dat;
 	}
 
-	dump_to_file(ROM);
+/*  bank 1 graphics */
+//	int i;
+	UINT8 *src = memregion("gfx1")->base();
+	for (i = 0; i < 0x20000; i++)
+	{
+		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);		// OK
+	}
 
+/*  bank 2 graphics */
+	UINT8 *src2 = memregion("gfx2")->base();
+	for (i = 0; i < 0x8000; i++)
+	{
+		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);	// OK
+	}
+}
+
+DRIVER_INIT_MEMBER(goldstar_state, wcherry)
+{
+/*  bank 1 graphics */
 	int i;
 	UINT8 *src = memregion("gfx1")->base();
-	for (i = 0;i < 0x20000;i++)
+	for (i = 0; i < 0x20000; i++)
 	{
-		src[i] = BITSWAP8(src[i], 4,3,2,5,6,1,0,7);		// fixme: find the exact function
+		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);		// OK
 	}
 
+/*  bank 2 graphics */
 	UINT8 *src2 = memregion("gfx2")->base();
-	for (i = 0;i < 0x8000;i++)
+	for (i = 0; i < 0x8000; i++)
 	{
-		src2[i] = BITSWAP8(src2[i], 4,3,2,5,6,1,0,7);	// fixme: swapped by pairs, and inside.
+		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);	// OK
 	}
-
 }
 
 
@@ -12108,8 +12258,10 @@ GAME(  199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device,  0,        
 GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",         0 )
 GAME(  199?, chrygld,   0,        chrygld,  chrygld,  goldstar_state, chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
 GAME(  199?, chry10,    0,        chrygld,  chry10,   goldstar_state, chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
-GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )	// maybe fullname should be 'Gold Fruit (main 40%)'
+GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )					// maybe fullname should be 'Gold Fruit (main 40%)'
 GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING)	// need to decode gfx and see the program loops/reset... 
+GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            GAME_NOT_WORKING)
+
 
 // are these really dyna, or bootlegs?
 GAME(  199?, ncb3,      0,        ncb3,     ncb3,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0 )
@@ -12118,7 +12270,7 @@ GAME(  199?, cb3,       ncb3,     ncb3,     ncb3,     goldstar_state, cb3,      
 GAME(  199?, cb3b,      ncb3,     cherrys,  ncb3,     goldstar_state, cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0 )
 GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  goldstar_state, cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)",               GAME_NOT_WORKING)
 GAME(  199?, cb3d,      ncb3,     ncb3,     ncb3,     driver_device,  0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0 )
-GAME(  199?, cb3e,      ncb3,     cb3e,     chrygld,  goldstar_state, cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", GAME_IMPERFECT_GRAPHICS )	// need to decode gfx properly (one channel different)
+GAME(  199?, cb3e,      ncb3,     cb3e,     chrygld,  goldstar_state, cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0 )
 
 GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  driver_device,  0,         ROT0, "Dyna",              "Cherry Master '97",                           GAME_NOT_WORKING) // fix prom decode
 

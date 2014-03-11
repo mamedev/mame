@@ -858,9 +858,8 @@ static MACHINE_CONFIG_START( firetrk, firetrk_state )
 	MCFG_WATCHDOG_VBLANK_INIT(5)
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(320, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
@@ -893,8 +892,8 @@ static MACHINE_CONFIG_DERIVED( superbug, firetrk )
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,superbug)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", superbug)
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 28)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(28)
 	MCFG_PALETTE_INIT_OWNER(firetrk_state, firetrk)
 
 	/* sound hardware */
@@ -917,8 +916,8 @@ static MACHINE_CONFIG_DERIVED( montecar, firetrk )
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,montecar)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", montecar)
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 46)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(46)
 	MCFG_PALETTE_INIT_OWNER(firetrk_state,montecar)
 
 	/* sound hardware */

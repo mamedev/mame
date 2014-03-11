@@ -9,7 +9,7 @@
 #ifndef CIRRUS_H
 #define CIRRUS_H
 
-#include "machine/pci.h"
+#include "bus/pci/pci.h"
 
 // ======================> cirrus_device
 

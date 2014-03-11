@@ -2,16 +2,22 @@
     DEC Rainbow 100
 
     Driver-in-progress by R. Belmont and Miodrag Milanovic.
-    Portions (2013) by Karl-Ludwig Deisenhofer (VT video, floppy, preliminary keyboard, DIP switches).
+    Portions (2013-2014) by Karl-Ludwig Deisenhofer (VT video, preliminary floppy, keyboard, DIP switches).
 
-    STATE AS OF DECEMBER 2013
-    --------------------------
+    STATE AS OF MARCH 2014
+    ----------------------
+	Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
+	While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
+
+	Currently, there are 2 showstoppers:
+	(1) IRQ logic for 100-B needs further work (text in RBCONVERT.ZIP has details concerning -A versus -B)
+    (2) Keyboard emulation incomplete (inhibits the system from booting with ERROR 50 on cold or ERROR 13 on warm boot).
+
     - FLOPPY TIMING: 'wd17xx_complete_command' * must * be hard wired to about 13 usecs.
       Line 1063 in 'wd17xx.c' has to be changed (until legacy code here is removed):
       -      w->timer_cmd->adjust(attotime::from_usec(usecs));
       +      w->timer_cmd->adjust(attotime::from_usec(13));
 
-    - WORKAROUND AVAILABLE: keyboard emulation incomplete (inhibits the system from booting with ERROR 50 on cold or ERROR 13 on warm boot).
     - NOT WORKING: serial (ERROR 60).
     - NOT WORKING: printer interface (ERROR 40). Like error 60 not mission-critical.
 
@@ -28,7 +34,9 @@
             * Color graphics option (uses NEC upd7220 GDC)
             * Extended communication option (same as BUNDLE_OPTION ?)
 
-    - OTHER UPGRADES (NEC_V20 should be easy, the TURBOW is harder to come by)
+    - OTHER HARDWARE UPGRADES:
+			* Suitable Solutions ClikClok (real time clock)
+			
             * Suitable Solutions TURBOW286: 12 Mhz, 68-pin, low power AMD N80L286-12 and WAYLAND/EDSUN EL286-88-10-B ( 80286 to 8088 Processor Signal Converter )
               plus DC 7174 or DT 7174 (barely readable). Add-on card, replaces main 8088 cpu (via ribbon cable). Altered BOOT ROM labeled 'TBSS1.3 - 3ED4'.
 
@@ -429,10 +437,13 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	// ===========================================================
 	// HARD DISC SIZES AND LIMITS
 	//   HARDWARE:
-	//      Controller has a built-in limit of 8 heads / 1024 cylinders (67 MB). Standard geometry is 4 surfaces.
-	//   SOFTWARE: the DEC boot loader (and FDISK from DOS 3.10) initially allowed a maximum hard disc size of 20 MB.
-	//   - DOS 3 has a 1024 cylinder limit (32 MB).
+	//      Controller has a built-in limit of 8 heads / 1024 cylinders (67 MB). Standard geometry is 4 surfaces!
+	//   BOOT LOADERS:
+	//   - the DEC boot loader (and FDISK from DOS 3.10) initially allowed a maximum hard disc size of 20 MB.
 	//   - the custom boot loader that comes with 'WUTIL 3.2' allows 117 MB and 8 surfaces.
+	//   SOFTWARE: 
+	//   - MS-DOS 2 allows a maximum partition size of 16 MB (sizes > 15 MB are incompatible to DOS 3)
+	//   - MS-DOS 3 has a global 1024 cylinder limit (32 MB).
 	AM_RANGE (0x68, 0x68) AM_READ(hd_status_68_r)
 ADDRESS_MAP_END
 
@@ -517,14 +528,18 @@ static INPUT_PORTS_START( rainbow100b_in )
 		PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 INPUT_PORTS_END
 
-// 800K native format (80 * 10). Also reads VT-180 disks and PC-DOS 360 k disks
-// ( both: 512 byte sectors, single sided, 9 sectors per track, 40 tracks )
+// Native 400K format (80 T * 10 S * 512 bytes) on 'quad density' RX50 drives 
+// ( 5.25" single sided; 300 rpm; MFM 250 kbps; 96 - 100 tpi ).
+//     
+// Additionally, the BIOS can *read* VT-180 disks and MS-DOS 160 k disks
+// - MS-DOS: FORMAT A: /F:160 and MEDIACHK ON
+// ( 40 tracks; single sided with 9 or 8 sectors per track )
 static LEGACY_FLOPPY_OPTIONS_START( dec100_floppy )
 	LEGACY_FLOPPY_OPTION( dec100_floppy, "td0", "Teledisk floppy disk image", td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, NULL )
-	LEGACY_FLOPPY_OPTION( dec100_floppy, "img", "DEC Rainbow 100", basicdsk_identify_default, basicdsk_construct_default,    NULL,
+	LEGACY_FLOPPY_OPTION( dec100_floppy, "img", "DEC Rainbow 100", basicdsk_identify_default, basicdsk_construct_default,    NULL,             
 		HEADS([1])
 		TRACKS(40/[80])
-		SECTORS(9/[10])
+		SECTORS(8/9/[10])
 		SECTOR_LENGTH([512])
 		INTERLEAVE([0])
 		FIRST_SECTOR_ID([1])
@@ -1221,9 +1236,26 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
+// 'Rainbow 100-A' (introduced May 1982) is first-generation hardware with ROM 04.03.11 
+// - 64 K base RAM on board (instead of 128 K on 'B' model).  832 K RAM max.
+// - inability to boot from hard disc (mind the inadequate PSU)
+// - cannot control bit 7 of IRQ vector (prevents DOS 2.0x from booting on unmodified hardware)
+// - limited palette with color graphics option (4 instead of 16 colors)
+// - smaller ROMs (3 x 2764) with fewer routines (no documented way to beep...)
 
+// FIXME: 12-19606-02 and 12-19678-04 are just PART NUMBERS from the 100-A field manual.
+// Someone who knows the DEC naming conventions should correct them -
+ROM_START( rainbow100 )
+	ROM_REGION(0x100000,"maincpu", 0)
+	ROM_LOAD( "12-19606-02a.bin", 0xFA000, 0x2000, NO_DUMP) // ROM (FA000-FBFFF) (E89) 8 K
+	ROM_LOAD( "12-19606-02b.bin", 0xFC000, 0x2000, NO_DUMP) // ROM (FC000-FDFFF) (E90) 8 K
+	ROM_LOAD( "12-19678-04.bin", 0xFE000, 0x2000, NO_DUMP)  // ROM (FE000-FFFFF) (E91) 8 K
 
-// ROM definition for 100-B
+	ROM_REGION(0x1000, "chargen", 0)
+	ROM_LOAD( "chargen.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
+ROM_END
+
+// ROM definition for 100-B (different revisions built until ~ May 1986; see MP-01491-00)
 ROM_START( rainbow )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD( "23-022e5-00.bin",  0xf0000, 0x4000, CRC(9d1332b4) SHA1(736306d2a36bd44f95a39b36ebbab211cc8fea6e))
@@ -1238,22 +1270,25 @@ ROM_START( rainbow )
 	ROM_LOAD( "chargen.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f))
 ROM_END
 
-// 'Rainbow 190 B' (announced March 1985) is identical hardware with alternate ROM v5.05
-// According to an article in Wall Street Journal, it came with a 10 MB HD and 640 K RAM.
+// 'Rainbow 190 B' (announced March 1985) is identical to 100-B, with alternate ROM v5.05.
+// According to an article in Wall Street Journal it came with a 10 MB HD and 640 K RAM.
 
 // We have no version history. The BOOT 2.4 README reveals 'recent ROM changes for MASS 11'
-// in January 1985. These were not contained in the older version 04.03.11 (for PC-100-A)
-// and also not present in version 05.03 (from PC-100B / PC100B+).
+// in January 1985. These were not present in the older version 04.03.11 (for PC-100-A)
+// and also not in version 05.03 (from PC-100B / PC100B+).
 
 // A first glance:
 // => jump tables (F4000-F40083 and FC000-FC004D) were not extended.
 // => absolute addresses of some internal routines have changed.
 // => programs that do not rely on specific ROM versions should be compatible.
-ROM_START( rainb190 )
+
+// FIXME: ROM names are made up.
+// Someone who knows the DEC naming conventions should correct them -
+ROM_START( rainbow190 )
 	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD( "dec190rom0.bin",  0xf0000, 0x4000, CRC(FAC191D2) )
+	ROM_LOAD( "dec190rom0.bin",  0xf0000, 0x4000, CRC(FAC191D2) SHA1(4aff5b1e031d3b5eafc568b23e68235270bb34de) )
 	ROM_RELOAD(0xf4000,0x4000)
-	ROM_LOAD( "dec190rom1.bin", 0xf8000, 0x4000, CRC(5CE59632) )
+	ROM_LOAD( "dec190rom1.bin", 0xf8000, 0x4000, CRC(5CE59632) SHA1(d29793f7014c57a4e7cb77bbf6e84f9113635ed2) )
 
 	ROM_RELOAD(0xfc000,0x4000)
 	ROM_REGION(0x1000, "chargen", 0)
@@ -1263,6 +1298,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME         PARENT   COMPAT  MACHINE       INPUT      STATE          INIT COMPANY                         FULLNAME       FLAGS */
+COMP( 1982, rainbow100 , rainbow,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 100-A", GAME_IS_SKELETON						 )
 COMP( 1983, rainbow   , 0      ,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 100-B", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS)
-COMP( 1985, rainb190, rainbow,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 190-B", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS)
+COMP( 1985, rainbow190 , rainbow,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 190-B", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS)
 

@@ -78,16 +78,16 @@ enum laserdisc_field_code
 #define MCFG_LASERDISC_SCREEN_ADD_NTSC(_tag, _ldtag) \
 	MCFG_DEVICE_MODIFY(_ldtag) \
 	laserdisc_device::static_set_screen(*device, _tag); \
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
 	MCFG_SCREEN_ADD(_tag, RASTER) \
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz*2, 910, 0, 704, 525, 44, 524) \
 	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
 // not correct yet; fix me...
 #define MCFG_LASERDISC_SCREEN_ADD_PAL(_tag, _ldtag) \
 	MCFG_DEVICE_MODIFY(_ldtag) \
 	laserdisc_device::static_set_screen(*device, _tag); \
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
 	MCFG_SCREEN_ADD(_tag, RASTER) \
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 910, 0, 704, 525.0/2, 0, 480/2) \
 	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
 
