@@ -157,6 +157,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(gdfs_interrupt);
 	void update_irq_state();
 	IRQ_CALLBACK_MEMBER(ssv_irq_callback);
+	void ssv_drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,int shadow);
 	void draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int scroll);
 	void draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -995,6 +995,7 @@ static MACHINE_CONFIG_START( wgp, wgp_state )
 
 	MCFG_TC0100SCN_ADD("tc0100scn", wgp_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1019,6 +1020,7 @@ static MACHINE_CONFIG_DERIVED( wgp2, wgp )
 	MCFG_DEVICE_REMOVE("tc0100scn")
 	MCFG_TC0100SCN_ADD("tc0100scn", wgp2_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 

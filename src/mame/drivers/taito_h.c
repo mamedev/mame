@@ -700,6 +700,7 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 
 	MCFG_TC0080VCO_ADD("tc0080vco", syvalion_tc0080vco_intf)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
+	MCFG_TC0080VCO_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -743,6 +744,7 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 
 	MCFG_TC0080VCO_ADD("tc0080vco", recordbr_tc0080vco_intf)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
+	MCFG_TC0080VCO_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -794,6 +796,7 @@ static MACHINE_CONFIG_START( dleague, taitoh_state )
 
 	MCFG_TC0080VCO_ADD("tc0080vco", recordbr_tc0080vco_intf)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
+	MCFG_TC0080VCO_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

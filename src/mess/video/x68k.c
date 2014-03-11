@@ -1094,11 +1094,11 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), x68k_pcg_8, memregion("user1")->base(), 32, 0)));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(m_palette, x68k_pcg_8, memregion("user1")->base(), 32, 0)));
 
 	gfx_index++;
 
-	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), x68k_pcg_16, memregion("user1")->base(), 32, 0)));
+	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(m_palette, x68k_pcg_16, memregion("user1")->base(), 32, 0)));
 	m_gfxdecode->gfx(gfx_index)->set_colors(32);
 
 	/* Tilemaps */

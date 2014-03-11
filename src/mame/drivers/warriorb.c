@@ -534,8 +534,12 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2d_tc0100scn_intf_l)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2d_tc0100scn_intf_r)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette2")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr_1")
 	MCFG_TC0110PCR_PALETTE("palette")
 	MCFG_TC0110PCR_ADD("tc0110pcr_2")
@@ -604,8 +608,12 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 
 	MCFG_TC0100SCN_ADD("tc0100scn_1", warriorb_tc0100scn_intf_l)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0100SCN_ADD("tc0100scn_2", warriorb_tc0100scn_intf_r)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette2")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr_1")
 	MCFG_TC0110PCR_PALETTE("palette")
 	MCFG_TC0110PCR_ADD("tc0110pcr_2")

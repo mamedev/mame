@@ -114,12 +114,11 @@ Start the video hardware emulation.
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(btime_state,btime)
+VIDEO_START_MEMBER(btime_state,disco)
 {
-	if (m_gfxdecode->gfx(0)->srcdata() == NULL)
-		m_gfxdecode->gfx(0)->set_source(m_deco_charram);
-	if (m_gfxdecode->gfx(1)->srcdata() == NULL)
-		m_gfxdecode->gfx(1)->set_source(m_deco_charram);
+	// graphics are in RAM
+	m_gfxdecode->gfx(0)->set_source(m_deco_charram);
+	m_gfxdecode->gfx(1)->set_source(m_deco_charram);
 }
 
 
@@ -131,8 +130,6 @@ VIDEO_START_MEMBER(btime_state,bnj)
 	m_background_bitmap = auto_bitmap_ind16_alloc(machine(), 2 * width, height);
 
 	save_item(NAME(*m_background_bitmap));
-
-	VIDEO_START_CALL_MEMBER(btime);
 }
 
 

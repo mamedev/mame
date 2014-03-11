@@ -667,7 +667,7 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 											if (c&0x02) dest[x] |= 0x4000;
 											if (c&0x04) dest[x] |= 0x8000;
 											if (c&0x08) dest[x] |= 0x10000;
-											if (c&0xf0) dest[x] |= gfx->machine().rand(); // ?? not used?
+											if (c&0xf0) dest[x] |= machine().rand(); // ?? not used?
 										}
 										else
 										{
@@ -904,12 +904,12 @@ void cps3_state::video_start()
 	save_pointer(NAME(m_char_ram), 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), cps3_tiles8x8_layout, (UINT8 *)m_ss_ram, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(m_palette, cps3_tiles8x8_layout, (UINT8 *)m_ss_ram, m_palette->entries() / 16, 0)));
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(1, auto_alloc(machine(), gfx_element(machine(), cps3_tiles16x16_layout, (UINT8 *)m_char_ram, m_palette->entries() / 64, 0)));
+	m_gfxdecode->set_gfx(1, auto_alloc(machine(), gfx_element(m_palette, cps3_tiles16x16_layout, (UINT8 *)m_char_ram, m_palette->entries() / 64, 0)));
 	m_gfxdecode->gfx(1)->set_granularity(64);
 
 	//decode_charram();

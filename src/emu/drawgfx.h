@@ -133,12 +133,12 @@ class gfx_element
 {
 public:
 	// construction/destruction
-	gfx_element(running_machine &machine);
-	gfx_element(running_machine &machine, const gfx_layout &gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base);
-	gfx_element(running_machine &machine, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity);
+	gfx_element();
+	gfx_element(palette_device *palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base);
+	gfx_element(palette_device *palette, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity);
 
 	// getters
-	running_machine &machine() const { return m_machine; }
+	palette_device *palette() const { return m_palette; }
 	UINT16 width() const { return m_width; }
 	UINT16 height() const { return m_height; }
 	UINT32 elements() const { return m_total_elements; }
@@ -149,15 +149,14 @@ public:
 	UINT32 rowbytes() const { return m_line_modulo; }
 	bool has_pen_usage() const { return (m_pen_usage.count() > 0); }
 
-	// a bit gross that people muck with this stuff...
-	const UINT8 *srcdata() const { return m_srcdata; }
+	// used by tilemaps
 	UINT32 dirtyseq() const { return m_dirtyseq; }
-	UINT32 *pen_usage() { return &m_pen_usage[0]; }
 
 	// setters
 	void set_layout(const gfx_layout &gl, const UINT8 *srcdata);
 	void set_raw_layout(const UINT8 *srcdata, UINT32 width, UINT32 height, UINT32 total, UINT32 linemod, UINT32 charmod);
 	void set_source(const UINT8 *source) { m_srcdata = source; if (m_layout_is_raw) m_gfxdata = const_cast<UINT8 *>(source); memset(m_dirty, 1, elements()); }
+	void set_palette(palette_device *palette) { m_palette = palette; }
 	void set_colors(UINT32 colors) { m_total_colors = colors; }
 	void set_colorbase(UINT16 colorbase) { m_color_base = colorbase; }
 	void set_granularity(UINT16 granularity) { m_color_granularity = granularity; }
@@ -227,8 +226,6 @@ public:
 	void prio_transtable(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, bitmap_ind8 &priority, UINT32 pmask, const UINT8 *pentable, const pen_t *shadowtable);
 	void prio_alpha(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, bitmap_ind8 &priority, UINT32 pmask, UINT32 transpen, UINT8 alpha);
 
-
-
 	// ----- priority masked zoomed graphics drawing -----
 
 	// specific prio_zoom implementations for each transparency type
@@ -244,13 +241,15 @@ public:
 	void prio_zoom_transtable(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask, const UINT8 *pentable, const pen_t *shadowtable);
 	void prio_zoom_alpha(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask, UINT32 transpen, UINT8 alpha);
 
-
+	// implementations moved here from specific drivers
 	void prio_transpen_additive(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, bitmap_ind8 &priority, UINT32 pmask, UINT32 trans_pen);
 	void prio_zoom_transpen_additive(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,UINT32 scalex, UINT32 scaley, bitmap_ind8 &priority, UINT32 pmask,UINT32 trans_pen);
 	void alphastore(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,int fixedalpha, UINT8 *alphatable);
 	void alphatable(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, int fixedalpha ,UINT8 *alphatable);
 private:
 	// internal state
+	palette_device  *m_palette;             // palette used for drawing
+
 	UINT16          m_width;                // current pixel width of each element (changeble with source clipping)
 	UINT16          m_height;               // current pixel height of each element (changeble with source clipping)
 	UINT16          m_startx;               // current source clip X offset
@@ -281,8 +280,6 @@ private:
 	dynamic_array<UINT32> m_layout_planeoffset;// plane offsets
 	dynamic_array<UINT32> m_layout_xoffset; // X offsets
 	dynamic_array<UINT32> m_layout_yoffset; // Y offsets
-
-	running_machine &m_machine;             // pointer to the owning machine
 };
 
 
@@ -466,6 +463,7 @@ protected:
 	
 private:
 	// configuration state
+	palette_device *        m_palette;
 	const gfx_decode_entry *m_gfxdecodeinfo;            // pointer to array of graphics decoding information
 	gfx_element *           m_gfx[MAX_GFX_ELEMENTS];		// array of pointers to graphic sets (chars, sprites)
 };

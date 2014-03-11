@@ -552,6 +552,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 
 	MCFG_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	MCFG_TC0480SCP_PALETTE("palette")
 	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
@@ -599,6 +600,7 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 
 	MCFG_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	MCFG_TC0480SCP_PALETTE("palette")
 	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */

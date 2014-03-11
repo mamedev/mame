@@ -723,6 +723,7 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 
 	MCFG_TC0080VCO_ADD("tc0080vco", airsys_tc0080vco_intf)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
+	MCFG_TC0080VCO_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

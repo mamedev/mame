@@ -360,7 +360,7 @@ void igs017_state::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect, i
 	if ( addr + dimx * dimy >= m_sprites_gfx_size )
 		return;
 
-	gfx_element gfx(machine(), m_sprites_gfx + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
+	gfx_element gfx(m_palette, m_sprites_gfx + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
 
 	gfx.transpen(m_palette, bitmap,cliprect,
 				0, color,

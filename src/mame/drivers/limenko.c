@@ -91,6 +91,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,int priority);
 	void draw_sprites(UINT32 *sprites, const rectangle &cliprect, int count);
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -310,11 +311,10 @@ TILE_GET_INFO_MEMBER(limenko_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-static void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int priority)
 {
-	limenko_state *state = gfx->machine().driver_data<limenko_state>();
 	int pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 
@@ -385,7 +385,7 @@ static void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_
 			{
 				const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 				UINT16 *dest = &dest_bmp.pix16(y);
-				UINT8 *pri = &state->m_sprites_bitmap_pri.pix8(y);
+				UINT8 *pri = &m_sprites_bitmap_pri.pix8(y);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -452,7 +452,7 @@ void limenko_state::draw_sprites(UINT32 *sprites, const rectangle &cliprect, int
 			continue;
 
 		/* prepare GfxElement on the fly */
-		gfx_element gfx(machine(), gfxdata, width, height, width, m_palette->entries(), 0, 256);
+		gfx_element gfx(m_palette, gfxdata, width, height, width, m_palette->entries(), 0, 256);
 
 		draw_single_sprite(m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y,pri);
 

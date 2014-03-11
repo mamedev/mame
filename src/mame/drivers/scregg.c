@@ -271,7 +271,6 @@ static MACHINE_CONFIG_START( dommy, scregg_state )
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_PALETTE_INIT_OWNER(scregg_state,btime)
-	MCFG_VIDEO_START_OVERRIDE(scregg_state,btime)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -303,7 +302,6 @@ static MACHINE_CONFIG_START( scregg, scregg_state )
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_PALETTE_INIT_OWNER(scregg_state,btime)
-	MCFG_VIDEO_START_OVERRIDE(scregg_state,btime)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

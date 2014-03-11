@@ -372,8 +372,10 @@ static MACHINE_CONFIG_START( groundfx, groundfx_state )
 
 	MCFG_TC0100SCN_ADD("tc0100scn", groundfx_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette")
 	MCFG_TC0480SCP_ADD("tc0480scp", groundfx_tc0480scp_intf)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	MCFG_TC0480SCP_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_en_sound)

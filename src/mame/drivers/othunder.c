@@ -693,6 +693,8 @@ static MACHINE_CONFIG_START( othunder, othunder_state )
 
 	MCFG_TC0100SCN_ADD("tc0100scn", othunder_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 

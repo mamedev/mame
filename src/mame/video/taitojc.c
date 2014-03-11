@@ -315,7 +315,7 @@ void taitojc_state::video_start()
 	m_tile_ram = auto_alloc_array_clear(machine(), UINT32, 0x4000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), taitojc_char_layout, (UINT8 *)m_char_ram, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(m_palette, taitojc_char_layout, (UINT8 *)m_char_ram, m_palette->entries() / 16, 0)));
 
 	m_texture = auto_alloc_array(machine(), UINT8, 0x400000);
 

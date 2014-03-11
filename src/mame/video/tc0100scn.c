@@ -142,7 +142,8 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 	m_bg1_colbank(0),
 	m_tx_colbank(0),
 	m_dblwidth(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this),
+	m_palette(*this)
 {
 }
 
@@ -154,6 +155,16 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 void tc0100scn_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<tc0100scn_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void tc0100scn_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<tc0100scn_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -272,7 +283,7 @@ void tc0100scn_device::device_start()
 									/* we call this here, so that they can be modified at video_start*/
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, auto_alloc_clear(machine(), gfx_element(machine(), tc0100scn_charlayout, (UINT8 *)m_char_ram, 64, 0)));
+	m_gfxdecode->set_gfx(m_txnum, auto_alloc_clear(machine(), gfx_element(m_palette, tc0100scn_charlayout, (UINT8 *)m_char_ram, 64, 0)));
 
 	save_pointer(NAME(m_ram), TC0100SCN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));

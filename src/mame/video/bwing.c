@@ -222,17 +222,6 @@ void bwing_state::video_start()
 
 //  m_bgfx = m_gfxdecode->gfx(3);
 	m_gfxdecode->gfx(3)->set_source(m_srbase[1] + 0x1000);
-/*
-    WTF??
-
-    dwptr = m_gfxdecode->gfx(2)->pen_usage();
-    if (dwptr)
-    {
-        dwptr[0] = 0;
-        for(i = 1; i < BW_NTILES; i++)
-            dwptr[i) = -1;
-    }
-*/
 }
 
 //****************************************************************************

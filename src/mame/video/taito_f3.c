@@ -2539,7 +2539,7 @@ static void scanline_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 /******************************************************************************/
 
 #define PSET_T                  \
-	c = *source & state->m_sprite_pen_mask; \
+	c = *source & m_sprite_pen_mask; \
 	if(c)                       \
 	{                           \
 		p=*pri;                 \
@@ -2554,7 +2554,7 @@ static void scanline_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	p=*pri;                     \
 	if(!p || p==0xff)           \
 	{                           \
-		*dest = pal[*source & state->m_sprite_pen_mask];    \
+		*dest = pal[*source & m_sprite_pen_mask];    \
 		*pri = pri_dst;         \
 	}
 
@@ -2563,15 +2563,14 @@ static void scanline_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	dest++;                     \
 	pri++;
 
-INLINE void f3_drawgfx(
-		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+inline void taito_f3_state::f3_drawgfx(bitmap_rgb32 &dest_bmp,const rectangle &clip,
+		gfx_element *gfx,
 		int code,
 		int color,
 		int flipx,int flipy,
 		int sx,int sy,
 		UINT8 pri_dst)
 {
-	taito_f3_state *state = gfx->machine().driver_data<taito_f3_state>();
 	rectangle myclip;
 
 	pri_dst=1<<pri_dst;
@@ -2583,7 +2582,7 @@ INLINE void f3_drawgfx(
 
 	if( gfx )
 	{
-		const pen_t *pal = &state->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+		const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
 		{
@@ -2646,12 +2645,12 @@ INLINE void f3_drawgfx(
 //              if (dest_bmp.bpp == 32)
 				{
 					int y=ey-sy;
-					int x=(ex-sx-1)|(state->m_tile_opaque_sp[code % gfx->elements()]<<4);
+					int x=(ex-sx-1)|(m_tile_opaque_sp[code % gfx->elements()]<<4);
 					const UINT8 *source0 = code_base + y_index * 16 + x_index_base;
 					UINT32 *dest0 = &dest_bmp.pix32(sy, sx);
-					UINT8 *pri0 = &state->m_pri_alp_bitmap.pix8(sy, sx);
+					UINT8 *pri0 = &m_pri_alp_bitmap.pix8(sy, sx);
 					int yadv = dest_bmp.rowpixels();
-					int yadvp = state->m_pri_alp_bitmap.rowpixels();
+					int yadvp = m_pri_alp_bitmap.rowpixels();
 					dy=dy*16;
 					while(1)
 					{
@@ -2713,8 +2712,8 @@ INLINE void f3_drawgfx(
 #undef NEXT_P
 
 
-INLINE void f3_drawgfxzoom(
-		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+inline void taito_f3_state::f3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,
+		gfx_element *gfx,
 		int code,
 		int color,
 		int flipx,int flipy,
@@ -2722,7 +2721,6 @@ INLINE void f3_drawgfxzoom(
 		int scalex, int scaley,
 		UINT8 pri_dst)
 {
-	taito_f3_state *state = gfx->machine().driver_data<taito_f3_state>();
 	rectangle myclip;
 
 	pri_dst=1<<pri_dst;
@@ -2734,7 +2732,7 @@ INLINE void f3_drawgfxzoom(
 
 	if( gfx )
 	{
-		const pen_t *pal = &state->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+		const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const UINT8 *code_base = gfx->get_data(code % gfx->elements());
 
 		{
@@ -2801,12 +2799,12 @@ INLINE void f3_drawgfxzoom(
 					{
 						const UINT8 *source = code_base + (y_index>>16) * 16;
 						UINT32 *dest = &dest_bmp.pix32(y);
-						UINT8 *pri = &state->m_pri_alp_bitmap.pix8(y);
+						UINT8 *pri = &m_pri_alp_bitmap.pix8(y);
 
 						int x, x_index = x_index_base;
 						for( x=sx; x<ex; x++ )
 						{
-							int c = source[x_index>>16] & state->m_sprite_pen_mask;
+							int c = source[x_index>>16] & m_sprite_pen_mask;
 							if(c)
 							{
 								UINT8 p=pri[x];
@@ -3102,31 +3100,30 @@ static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_
 #undef CALC_ZOOM
 
 
-static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void taito_f3_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	const struct tempsprite *sprite_ptr;
-	gfx_element *sprite_gfx = state->m_gfxdecode->gfx(2);
+	gfx_element *sprite_gfx = m_gfxdecode->gfx(2);
 
-	sprite_ptr = state->m_sprite_end;
-	state->m_sprite_pri_usage=0;
+	sprite_ptr = m_sprite_end;
+	m_sprite_pri_usage=0;
 
 	// if sprites use more than 4bpp, the bottom bits of the color code must be masked out.
 	// This fixes (at least) stage 1 battle ships and attract mode explosions in Ray Force.
 
-	while (sprite_ptr != state->m_spritelist)
+	while (sprite_ptr != m_spritelist)
 	{
 		int pri;
 		sprite_ptr--;
 
 		pri=sprite_ptr->pri;
-		state->m_sprite_pri_usage|=1<<pri;
+		m_sprite_pri_usage|=1<<pri;
 
 		if(sprite_ptr->zoomx==16 && sprite_ptr->zoomy==16)
 			f3_drawgfx(
 					bitmap,cliprect,sprite_gfx,
 					sprite_ptr->code,
-					sprite_ptr->color & (~state->m_sprite_extra_planes),
+					sprite_ptr->color & (~m_sprite_extra_planes),
 					sprite_ptr->flipx,sprite_ptr->flipy,
 					sprite_ptr->x,sprite_ptr->y,
 					pri);
@@ -3134,7 +3131,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 			f3_drawgfxzoom(
 					bitmap,cliprect,sprite_gfx,
 					sprite_ptr->code,
-					sprite_ptr->color & (~state->m_sprite_extra_planes),
+					sprite_ptr->color & (~m_sprite_extra_planes),
 					sprite_ptr->flipx,sprite_ptr->flipy,
 					sprite_ptr->x,sprite_ptr->y,
 					sprite_ptr->zoomx,sprite_ptr->zoomy,
@@ -3189,7 +3186,7 @@ UINT32 taito_f3_state::screen_update_f3(screen_device &screen, bitmap_rgb32 &bit
 		get_sprite_info(machine(), m_spriteram);
 
 	/* Update sprite buffer */
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 
 	/* Parse sprite, alpha & clipping parts of lineram */
 	get_spritealphaclip_info(this);

@@ -651,7 +651,7 @@ static void wecleman_draw_road(running_machine &machine, bitmap_rgb32 &bitmap, c
 ------------------------------------------------------------------------*/
 
 // blends two 8x8x16bpp direct RGB tilemaps
-static void draw_cloud(bitmap_rgb32 &bitmap,
+void wecleman_state::draw_cloud(bitmap_rgb32 &bitmap,
 					gfx_element *gfx,
 					UINT16 *tm_base,
 					int x0, int y0,             // target coordinate
@@ -660,7 +660,6 @@ static void draw_cloud(bitmap_rgb32 &bitmap,
 					int tmw_l2, int tmh_l2,     // tilemap width and height in log(2)
 					int alpha, int pal_offset ) // alpha(0-3f), # of color codes to shift
 {
-	wecleman_state *state = gfx->machine().driver_data<wecleman_state>();
 	const UINT8 *src_ptr;
 	UINT16 *tmap_ptr;
 	UINT32 *dst_base, *dst_ptr;
@@ -689,7 +688,7 @@ static void draw_cloud(bitmap_rgb32 &bitmap,
 
 	dst_base = &bitmap.pix32(y0+dy, x0+dx);
 
-	pal_base = state->m_palette->pens() + pal_offset * gfx->granularity();
+	pal_base = m_palette->pens() + pal_offset * gfx->granularity();
 
 	alpha <<= 6;
 
@@ -733,9 +732,9 @@ static void draw_cloud(bitmap_rgb32 &bitmap,
 						dg = (dstrgb >> 11) & 0x1f;
 						db = (dstrgb >> 19) & 0x1f;
 
-						dr = (state->m_t32x32pm[dr - sr + alpha] >> 5) + dr;
-						dg = (state->m_t32x32pm[dg - sg + alpha] >> 5) + dg;
-						db = (state->m_t32x32pm[db - sb + alpha] >> 5) + db;
+						dr = (m_t32x32pm[dr - sr + alpha] >> 5) + dr;
+						dg = (m_t32x32pm[dg - sg + alpha] >> 5) + dg;
+						db = (m_t32x32pm[db - sb + alpha] >> 5) + db;
 
 						dst_ptr[tx] = rgb_t(pal5bit(db), pal5bit(dg), pal5bit(dr));
 					}
@@ -1070,8 +1069,7 @@ UINT32 wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rgb3
 		((pen_t *)mrct)[0] = ((pen_t *)mrct)[0x40] = ((pen_t *)mrct)[0x200] = ((pen_t *)mrct)[0x205];
 
 		if (video_on)
-			draw_cloud(
-			bitmap,
+			draw_cloud(bitmap,
 			m_gfxdecode->gfx(0),
 			m_pageram+0x1800,
 			BMP_PAD, BMP_PAD,

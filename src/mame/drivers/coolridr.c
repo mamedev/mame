@@ -321,6 +321,7 @@ public:
 		m_io_an7(*this, "AN7"),
 		m_io_config(*this, "CONFIG"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_screen(*this, "screen")
 	{
 	}
@@ -365,6 +366,7 @@ public:
 	required_ioport m_io_an7;
 	required_ioport m_io_config;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
 	bitmap_ind16 m_temp_bitmap_sprites;
@@ -563,7 +565,7 @@ void coolridr_state::video_start()
 	m_screen->register_screen_bitmap(m_screen1_bitmap);
 	m_screen->register_screen_bitmap(m_screen2_bitmap);
 
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), h1_tile_layout, m_h1_pcg, 8, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(m_palette, h1_tile_layout, m_h1_pcg, 8, 0)));
 }
 
 /*

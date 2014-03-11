@@ -60,7 +60,8 @@ const device_type IQ151_VIDEO64 = &device_creator<iq151_video64_device>;
 iq151_video64_device::iq151_video64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, IQ151_VIDEO64, "IQ151 video64", tag, owner, clock, "iq151_video64", __FILE__),
 		device_iq151cart_interface( mconfig, *this ),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, ":palette")
 {
 }
 
@@ -73,7 +74,7 @@ void iq151_video64_device::device_start()
 	m_videoram = (UINT8*)memregion("videoram")->base();
 	m_chargen = (UINT8*)memregion("chargen")->base();
 
-	m_gfxdecode->set_gfx(0,auto_alloc(machine(), gfx_element(machine(), iq151_video64_charlayout, m_chargen, 1, 0)));
+	m_gfxdecode->set_gfx(0,auto_alloc(machine(), gfx_element(m_palette, iq151_video64_charlayout, m_chargen, 1, 0)));
 }
 
 //-------------------------------------------------

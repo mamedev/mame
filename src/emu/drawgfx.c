@@ -73,6 +73,7 @@ const device_type GFXDECODE = &device_creator<gfxdecode_device>;
 
 gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GFXDECODE, "gfxdecode", tag, owner, clock, "gfxdecode", __FILE__),
+		m_palette(NULL),
 		m_gfxdecodeinfo(NULL)
 {
 	memset(m_gfx, 0, sizeof(m_gfx));
@@ -243,7 +244,7 @@ void gfxdecode_device::device_start()
 		glcopy.total = total;
 
 		// allocate the graphics
-		m_gfx[curgfx] = auto_alloc(machine(), gfx_element(machine(), glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start));
+		m_gfx[curgfx] = auto_alloc(machine(), gfx_element(m_palette, glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start));
 	}
 }
 
@@ -336,8 +337,9 @@ void gfxdecode_device::device_validity_check(validity_checker &valid) const
 //  gfx_element - constructor
 //-------------------------------------------------
 
-gfx_element::gfx_element(running_machine &machine)
-	: m_width(0),
+gfx_element::gfx_element()
+	: m_palette(NULL),
+		m_width(0),
 		m_height(0),
 		m_startx(0),
 		m_starty(0),
@@ -355,13 +357,13 @@ gfx_element::gfx_element(running_machine &machine)
 		m_gfxdata(NULL),
 		m_layout_is_raw(false),
 		m_layout_planes(0),
-		m_layout_charincrement(0),
-		m_machine(machine)
+		m_layout_charincrement(0)
 {
 }
 
-gfx_element::gfx_element(running_machine &machine, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity)
-	: m_width(width),
+gfx_element::gfx_element(palette_device *palette, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity)
+	: m_palette(palette),
+		m_width(width),
 		m_height(height),
 		m_startx(0),
 		m_starty(0),
@@ -379,13 +381,13 @@ gfx_element::gfx_element(running_machine &machine, UINT8 *base, UINT32 width, UI
 		m_gfxdata(base),
 		m_layout_is_raw(true),
 		m_layout_planes(0),
-		m_layout_charincrement(0),
-		m_machine(machine)
+		m_layout_charincrement(0)
 {
 }
 
-gfx_element::gfx_element(running_machine &machine, const gfx_layout &gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base)
-	: m_width(0),
+gfx_element::gfx_element(palette_device *palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base)
+	: m_palette(palette),
+		m_width(0),
 		m_height(0),
 		m_startx(0),
 		m_starty(0),
@@ -403,8 +405,7 @@ gfx_element::gfx_element(running_machine &machine, const gfx_layout &gl, const U
 		m_gfxdata(NULL),
 		m_layout_is_raw(false),
 		m_layout_planes(0),
-		m_layout_charincrement(0),
-		m_machine(machine)
+		m_layout_charincrement(0)
 {
 	// set the layout
 	set_layout(gl, srcdata);

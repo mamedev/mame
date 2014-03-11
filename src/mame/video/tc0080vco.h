@@ -21,6 +21,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
@@ -69,6 +70,7 @@ public:
 
 	INT32          m_flipscreen;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
@@ -85,5 +87,8 @@ extern const device_type TC0080VCO;
 	
 #define MCFG_TC0080VCO_GFXDECODE(_gfxtag) \
 	tc0080vco_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_TC0080VCO_PALETTE(_palette_tag) \
+	tc0080vco_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

@@ -988,7 +988,7 @@ void smc777_state::machine_start()
 	save_pointer(NAME(m_gvram), 0x8000);
 	save_pointer(NAME(m_pcg), 0x800);
 
-	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), smc777_charlayout, (UINT8 *)m_pcg, 8, 0)));
+	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(m_palette, smc777_charlayout, (UINT8 *)m_pcg, 8, 0)));
 }
 
 void smc777_state::machine_reset()

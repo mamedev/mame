@@ -261,6 +261,7 @@ static MACHINE_CONFIG_START( parentj, taitoo_state )
 
 	MCFG_TC0080VCO_ADD("tc0080vco", parentj_intf)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
+	MCFG_TC0080VCO_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
