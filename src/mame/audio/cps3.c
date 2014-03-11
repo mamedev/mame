@@ -67,25 +67,29 @@ void cps3_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 			3  xxxxxxxx xxxxxxxx  -------- --------  frequency
 			   -------- --------  xxxxxxxx xxxxxxxx  loop address low
 			4  -------- --------  xxxxxxxx xxxxxxxx  loop address high
-			5  xxxxxxxx xxxxxxxx  -------- --------  end address low
+			5  xxxxxxxx xxxxxxxx  -------- --------  end address low (*)
 			   -------- --------  xxxxxxxx xxxxxxxx  end address high
-			6  xxxxxxxx xxxxxxxx  -------- --------  ?
-			   -------- --------  -------- xxxxxxxx  ?
-			7  xxxxxxxx xxxxxxxx  -------- --------  volume right
-			   -------- --------  xxxxxxxx xxxxxxxx  volume left
+			6  xxxxxxxx xxxxxxxx  -------- --------  end address low (*)
+			   -------- --------  xxxxxxxx xxxxxxxx  end address high
+			7  xxxxxxxx xxxxxxxx  -------- --------  volume right (signed?)
+			   -------- --------  xxxxxxxx xxxxxxxx  volume left (signed?)
+			
+			(*) reg 5 and 6 are always the same. One of them probably means loop-end address,
+			    but we won't know which until we do tests on real hw.
 			*/
 			cps3_voice *vptr = &m_voice[i];
 
 			UINT32 start = (vptr->regs[1] >> 16 & 0x0000ffff) | (vptr->regs[1] << 16 & 0xffff0000);
 			UINT32 end   = (vptr->regs[5] >> 16 & 0x0000ffff) | (vptr->regs[5] << 16 & 0xffff0000);
 			UINT32 loop  = (vptr->regs[3] & 0x0000ffff) | (vptr->regs[4] << 16 & 0xffff0000);
+			bool loop_enable = (vptr->regs[2] & 1) ? true : false;
 			UINT32 step  = vptr->regs[3] >> 16 & 0xffff;
 
 			INT16 vol_l = (vptr->regs[7] & 0xffff);
 			INT16 vol_r = (vptr->regs[7] >> 16 & 0xffff);
-
+			
 			UINT32 pos = vptr->pos;
-			UINT16 frac = vptr->frac;
+			UINT32 frac = vptr->frac;
 			
 			/* TODO */
 			start -= 0x400000;
@@ -93,21 +97,23 @@ void cps3_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 			loop -= 0x400000;
 
 			/* Go through the buffer and add voice contributions */
-			for (int j = 0; j < samples; j ++)
+			for (int j = 0; j < samples; j++)
 			{
 				INT32 sample;
 
 				pos += (frac >> 12);
 				frac &= 0xfff;
 
-				if (start + pos >= end)
+				if ((start + pos) >= end)
 				{
-					if (vptr->regs[2])
+					if (loop_enable)
 					{
-						pos = loop - start;
+						// loop
+						pos = (pos + loop) - end;
 					}
 					else
 					{
+						// key off
 						m_key &= ~(1 << i);
 						break;
 					}
@@ -116,8 +122,8 @@ void cps3_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 				sample = m_base[BYTE4_XOR_LE(start + pos)];
 				frac += step;
 
-				outputs[0][j] += (sample * (vol_l >> 8));
-				outputs[1][j] += (sample * (vol_r >> 8));
+				outputs[0][j] += ((sample * vol_l) >> 8);
+				outputs[1][j] += ((sample * vol_r) >> 8);
 			}
 
 			vptr->pos = pos;
@@ -137,6 +143,8 @@ WRITE32_MEMBER( cps3_sound_device::cps3_sound_w )
 	}
 	else if (offset == 0x80)
 	{
+		assert((mem_mask & 0xffff0000) == 0xffff0000); // doesn't happen
+		
 		UINT16 key = data >> 16;
 
 		for (int i = 0; i < CPS3_VOICES; i++)
