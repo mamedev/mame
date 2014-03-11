@@ -104,7 +104,7 @@ void *malloc_file_line(size_t size, const char *file, int line, bool array, bool
 	void *result = array ? osd_malloc_array(size) : osd_malloc(size);
 	if (result == NULL)
 	{
-		fprintf(stderr, "Failed to allocate %d bytes (%s:%d)\n", size, file, line);
+		fprintf(stderr, "Failed to allocate %d bytes (%s:%d)\n", UINT32(size), file, line);
 		osd_break_into_debugger("Failed to allocate RAM");
 		if (throw_on_fail)
 			throw std::bad_alloc();

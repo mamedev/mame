@@ -78,7 +78,7 @@ void resource_pool::add(resource_pool_item &item, size_t size, const char *type)
 	// before, so if we don't find it, check 4 bytes ahead
 	item.m_id = ++s_id;
 	if (LOG_ALLOCS)
-		fprintf(stderr, "#%06d, add %s, %d bytes\n", (UINT32)item.m_id, type, size);
+		fprintf(stderr, "#%06d, add %s, %d bytes\n", (UINT32)item.m_id, type, UINT32(size));
 
 	// find the entry to insert after
 	resource_pool_item *insert_after;

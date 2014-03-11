@@ -456,7 +456,7 @@ void software_list_device::find_approx_matches(const char *name, int matches, so
 
 void software_list_device::release()
 {
-fprintf(stderr, "Resetting %s\n", m_file.filename());
+	mame_printf_verbose("Resetting %s\n", m_file.filename());
 	m_parsed = false;
 	m_description = NULL;
 	m_errors.reset();
@@ -736,7 +736,8 @@ softlist_parser::softlist_parser(software_list_device &list, astring &errors)
 	  m_current_part(NULL),
 	  m_pos(POS_ROOT)
 {
-fprintf(stderr, "Parsing %s\n", m_list.m_file.filename());
+	mame_printf_verbose("Parsing %s\n", m_list.m_file.filename());
+
 	// set up memory callbacks
 	XML_Memory_Handling_Suite memcallbacks;
 	memcallbacks.malloc_fcn = expat_malloc;
@@ -769,7 +770,7 @@ fprintf(stderr, "Parsing %s\n", m_list.m_file.filename());
 
 	// free the parser
 	XML_ParserFree(m_parser);
-fprintf(stderr, "Parsing complete\n");
+	mame_printf_verbose("Parsing complete\n");
 }
 
 
