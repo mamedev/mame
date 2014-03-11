@@ -152,26 +152,11 @@ const device_type C64_TDOS = &device_creator<c64_tdos_cartridge_device>;
 
 
 //-------------------------------------------------
-//  MC6852_INTERFACE( ssda_intf )
-//-------------------------------------------------
-
-static MC6852_INTERFACE( ssda_intf )
-{
-	0,
-	0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_multiscreen )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_tdos )
-	MCFG_MC6852_ADD(MC68A52P_TAG, XTAL_6_5MHz, ssda_intf)
+	MCFG_DEVICE_ADD(MC68A52P_TAG, MC6852, XTAL_6_5MHz)
 
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END

@@ -393,16 +393,6 @@ WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
 	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
 }
 
-static MC6852_INTERFACE( ssda_intf )
-{
-	0,
-	0,
-	DEVCB_DEVICE_LINE_MEMBER(HC55516_TAG, hc55516_device, digit_w),
-	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, ssda_irq_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 WRITE8_MEMBER( victor9k_state::via1_pa_w )
 {
@@ -981,7 +971,9 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE(I8259A_TAG, pic8259_device, ir2_w))
 
 	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_30MHz/30, mpsc_intf)
-	MCFG_MC6852_ADD(MC6852_TAG, XTAL_30MHz/30, ssda_intf)
+	MCFG_DEVICE_ADD(MC6852_TAG, MC6852, XTAL_30MHz/30)
+	MCFG_MC6852_TX_DATA_CALLBACK(DEVWRITELINE(HC55516_TAG, hc55516_device, digit_w))
+	MCFG_MC6852_IRQ_CALLBACK(WRITELINE(victor9k_state, ssda_irq_w))
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, XTAL_30MHz/30)
 	MCFG_VIA6522_READPA_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
