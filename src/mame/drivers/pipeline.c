@@ -115,8 +115,7 @@ public:
 TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info)
 {
 	int code = m_vram2[tile_index]+m_vram2[tile_index+0x800]*256;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-		0,
+	SET_TILE_INFO_MEMBER(0,
 		code,
 		0,
 		0);
@@ -126,21 +125,17 @@ TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info2)
 {
 	int code =m_vram1[tile_index]+((m_vram1[tile_index+0x800]>>4))*256;
 	int color=((m_vram1[tile_index+0x800])&0xf);
-	SET_TILE_INFO_MEMBER
-	(
-		m_gfxdecode,
-		1,
+	SET_TILE_INFO_MEMBER(1,
 		code,
 		color,
-		0
-	);
+		0);
 }
 
 void pipeline_state::video_start()
 {
 	m_palram=auto_alloc_array(machine(), UINT8, 0x1000);
-	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
-	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
+	m_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
+	m_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
 	m_tilemap2->set_transparent_pen(0);
 }
 

@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_tx_tile_info)
 	tileno = m_txram[tile_index *2]   & 0xffff;
 	colour = m_txram[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 3,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(3,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_roz_tile_info)
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_roz_tile_info)
 	tileno = m_rozram[tile_index *2]   & 0xffff;
 	colour = m_rozram[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
 	tileno = m_bgram[tile_index *2]   & 0xffff;
 	colour = m_bgram[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(2,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_extra_tile_info)
@@ -57,17 +57,17 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_extra_tile_info)
 	tileno = m_f1superb_extraram[tile_index *2]   & 0xffff;
 	colour = m_f1superb_extraram[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 4,tileno,colour+0x50,0);
+	SET_TILE_INFO_MEMBER(4,tileno,colour+0x50,0);
 }
 
 
 
 void ms32_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_tx_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,64,64);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
-	m_bg_tilemap_alt = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,256,16); // alt layout, controller by register?
-	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_roz_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_tx_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,64,64);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_bg_tilemap_alt = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,256,16); // alt layout, controller by register?
+	m_roz_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_roz_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
 
 
 	/* set up tile layers */
@@ -115,7 +115,7 @@ VIDEO_START_MEMBER(ms32_state,f1superb)
 {
 	ms32_state::video_start();
 
-	m_extra_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_extra_tile_info),this),TILEMAP_SCAN_ROWS,2048,1,1,0x400);
+	m_extra_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ms32_state::get_ms32_extra_tile_info),this),TILEMAP_SCAN_ROWS,2048,1,1,0x400);
 }
 
 /********** PALETTE WRITES **********/

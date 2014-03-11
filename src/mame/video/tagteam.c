@@ -131,12 +131,12 @@ TILE_GET_INFO_MEMBER(tagteam_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + 256 * m_colorram[tile_index];
 	int color = m_palettebank << 1;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 void tagteam_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tagteam_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tagteam_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X,
 			8, 8, 32, 32);
 }
 

@@ -197,8 +197,7 @@ TILE_GET_INFO_MEMBER(panicr_state::get_bgtile_info)
 	code=memregion("user1")->base()[tile_index];
 	attr=memregion("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-		1,
+	SET_TILE_INFO_MEMBER(1,
 		code,
 		(attr & 0xf0) >> 4,
 		0);
@@ -213,8 +212,7 @@ TILE_GET_INFO_MEMBER(panicr_state::get_infotile_info_2)
 	code=memregion("user1")->base()[tile_index];
 	attr=memregion("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-		3,
+	SET_TILE_INFO_MEMBER(3,
 		code,
 		0,
 		0);
@@ -231,8 +229,7 @@ TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-		0,
+	SET_TILE_INFO_MEMBER(0,
 		code + ((attr & 8) << 5),
 		color,
 		0);
@@ -241,10 +238,10 @@ TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
 
 void panicr_state::video_start()
 {
-	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
-	m_infotilemap_2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_infotile_info_2),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
+	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
+	m_infotilemap_2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_infotile_info_2),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
 
-	m_txttilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_txttilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 	m_palette->configure_tilemap_groups(*m_txttilemap, *m_gfxdecode->gfx(0), 0);
 }
 

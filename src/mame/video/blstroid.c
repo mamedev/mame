@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(blstroid_state::get_playfield_tile_info)
 	UINT16 data = tilemap.basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 13) & 0x07;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 

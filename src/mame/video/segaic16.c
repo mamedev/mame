@@ -644,7 +644,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16a_tile_info )
 	int code = ((data >> 1) & 0x1000) | (data & 0xfff);
 	int color = (data >> 5) & 0x7f;
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 	tileinfo.category = (data >> 12) & 1;
 }
 
@@ -656,7 +656,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16a_text_info )
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 	tileinfo.category = (data >> 11) & 1;
 }
 
@@ -858,7 +858,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_tile_info )
 
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -871,7 +871,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_text_info )
 	int color = (data >> 9) & 0x07;
 	int code = data & 0x1ff;
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, bank * info->banksize + code, color, 0);
+	SET_TILE_INFO_MEMBER(0, bank * info->banksize + code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -885,7 +885,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_alt_tile_info 
 
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -898,7 +898,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_alt_text_info 
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 0, bank * info->banksize + code, color, 0);
+	SET_TILE_INFO_MEMBER(0, bank * info->banksize + code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
@@ -1103,7 +1103,7 @@ void segaic16_video_device::segaic16_tilemap_init(running_machine &machine, int 
 	}
 
 	/* create the tilemap for the text layer */
-	info->textmap = &machine.tilemap().create(get_text_info, TILEMAP_SCAN_ROWS,  8,8, 64,28);
+	info->textmap = &machine.tilemap().create(m_gfxdecode, get_text_info, TILEMAP_SCAN_ROWS,  8,8, 64,28);
 
 	/* configure it */
 	info->textmap_info.rambase = info->textram;
@@ -1119,7 +1119,7 @@ void segaic16_video_device::segaic16_tilemap_init(running_machine &machine, int 
 	for (pagenum = 0; pagenum < info->numpages; pagenum++)
 	{
 		/* each page is 64x32 */
-		info->tilemaps[pagenum] = &machine.tilemap().create(get_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,32);
+		info->tilemaps[pagenum] = &machine.tilemap().create(m_gfxdecode, get_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,32);
 
 		/* configure the tilemap */
 		info->tmap_info[pagenum].rambase = info->tileram + pagenum * 64*32;

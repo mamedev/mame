@@ -17,14 +17,14 @@ TILE_GET_INFO_MEMBER(terracre_state::get_bg_tile_info)
 	 * ----.--xx.xxxx.xxxx */
 	unsigned data = m_amazon_videoram[tile_index];
 	unsigned color = data>>11;
-	SET_TILE_INFO_MEMBER(m_gfxdecode,  1,data&0x3ff,color,0 );
+	SET_TILE_INFO_MEMBER(1,data&0x3ff,color,0 );
 }
 
 TILE_GET_INFO_MEMBER(terracre_state::get_fg_tile_info)
 {
 	UINT16 *videoram = m_videoram;
 	int data = videoram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode,  0,data&0xff,0,0 );
+	SET_TILE_INFO_MEMBER(0,data&0xff,0,0 );
 }
 
 void terracre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -181,8 +181,8 @@ WRITE16_MEMBER(terracre_state::amazon_scrollx_w)
 
 void terracre_state::video_start()
 {
-	m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(terracre_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
-	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(terracre_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
+	m_background = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(terracre_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
+	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(terracre_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
 	m_foreground->set_transparent_pen(0xf);
 
 	/* register for saving */

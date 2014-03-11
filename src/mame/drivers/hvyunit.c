@@ -174,12 +174,12 @@ TILE_GET_INFO_MEMBER(hvyunit_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + ((attr & 0x0f) << 8);
 	int color = (attr >> 4);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 void hvyunit_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hvyunit_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hvyunit_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
 UINT32 hvyunit_state::screen_update_hvyunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

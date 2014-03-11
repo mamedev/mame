@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_bg)
 	int color = ((m_colorram[tile_index] >> 4) & 0x0f) | m_palette_bank;
 	int flags = m_colorram[tile_index] & 0x08 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_fg)
@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_fg)
 	int color = ((m_colorram2[tile_index] >> 4) & 0x0f) | m_palette_bank;
 	int flags = m_colorram2[tile_index] & 0x08 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
 /* Sauro */
@@ -79,10 +79,10 @@ WRITE8_MEMBER(sauro_state::sauro_scroll_fg_w)
 
 VIDEO_START_MEMBER(sauro_state,sauro)
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS,
 			8, 8, 32, 32);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_fg),this), TILEMAP_SCAN_COLS,
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_fg),this), TILEMAP_SCAN_COLS,
 			8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
@@ -148,7 +148,7 @@ UINT32 sauro_state::screen_update_sauro(screen_device &screen, bitmap_ind16 &bit
 
 VIDEO_START_MEMBER(sauro_state,trckydoc)
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS,
 			8, 8, 32, 32);
 }
 

@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(good_state::get_fg_tile_info)
 {
 	int tileno = m_fg_tilemapram[tile_index * 2];
 	int attr = m_fg_tilemapram[tile_index * 2 + 1] & 0xf;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, attr, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, attr, 0);
 }
 
 WRITE16_MEMBER(good_state::bg_tilemapram_w)
@@ -88,15 +88,15 @@ TILE_GET_INFO_MEMBER(good_state::get_bg_tile_info)
 {
 	int tileno = m_bg_tilemapram[tile_index * 2];
 	int attr = m_bg_tilemapram[tile_index * 2 + 1] & 0xf;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, attr, 0);
+	SET_TILE_INFO_MEMBER(1, tileno, attr, 0);
 }
 
 
 
 void good_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(good_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(good_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(good_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(good_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0xf);
 }
 

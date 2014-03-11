@@ -132,8 +132,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 
 	number = m_page[0][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			number,
 			color,
 			0);
@@ -166,8 +165,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1)
 
 	number = m_page[1][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			number,
 			color,
 			0);
@@ -180,8 +178,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info)
 	int number = m_page[0][tile_index + 0xc00];
 	int color = 16 + (attributes & 0x0f);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			number,
 			color,
 			0);
@@ -213,8 +210,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0_bootleg)
 	color = pal*16;// + (attributes & 0x0f);
 	number = m_page[0][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			number,
 			color,
 			0);
@@ -245,8 +241,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1_bootleg)
 	color = pal * 16;// + (attributes & 0x0f);
 	number = m_page[1][tile_index + 0x400] + 256 * bank;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			number,
 			color,
 			0);
@@ -258,8 +253,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info_bootleg)
 	int number = m_page[0][tile_index + 0xc00];
 	int color = 16;// + (attributes & 0x0f);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			number,
 			color,
 			0);
@@ -273,9 +267,9 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info_bootleg)
 
 VIDEO_START_MEMBER(combatsc_state,combatsc)
 {
-	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_textlayer =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_textlayer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_spriteram[0] = auto_alloc_array_clear(machine(), UINT8, 0x800);
 	m_spriteram[1] = auto_alloc_array_clear(machine(), UINT8, 0x800);
@@ -292,9 +286,9 @@ VIDEO_START_MEMBER(combatsc_state,combatsc)
 
 VIDEO_START_MEMBER(combatsc_state,combatscb)
 {
-	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_textlayer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_textlayer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_text_info_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_spriteram[0] = auto_alloc_array_clear(machine(), UINT8, 0x800);
 	m_spriteram[1] = auto_alloc_array_clear(machine(), UINT8, 0x800);

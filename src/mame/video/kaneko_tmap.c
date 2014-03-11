@@ -136,7 +136,7 @@ void kaneko_view2_tilemap_device::get_tile_info(tile_data &tileinfo, tilemap_mem
 {
 	UINT16 code_hi = m_vram[_N_][ 2 * tile_index + 0];
 	UINT16 code_lo = m_vram[_N_][ 2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, m_tilebase, code_lo + m_vram_tile_addition[_N_], (code_hi >> 2) & 0x3f, TILE_FLIPXY( code_hi & 3 ));
+	SET_TILE_INFO_MEMBER(m_tilebase, code_lo + m_vram_tile_addition[_N_], (code_hi >> 2) & 0x3f, TILE_FLIPXY( code_hi & 3 ));
 	tileinfo.category   =   (code_hi >> 8) & 7;
 }
 
@@ -152,9 +152,9 @@ void kaneko_view2_tilemap_device::device_start()
 	m_vscroll[1] = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);
 	m_regs = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x20/2);
 
-	m_tmap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info_0),this), TILEMAP_SCAN_ROWS,
+	m_tmap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info_0),this), TILEMAP_SCAN_ROWS,
 											16,16, 0x20,0x20    );
-	m_tmap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info_1),this), TILEMAP_SCAN_ROWS,
+	m_tmap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info_1),this), TILEMAP_SCAN_ROWS,
 											16,16, 0x20,0x20    );
 
 	m_tmap[0]->set_transparent_pen(0);

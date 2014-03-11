@@ -236,7 +236,7 @@ static MACHINE_CONFIG_START( shuuz, shuuz_state )
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
-	MCFG_ATARI_VAD_PLAYFIELD(shuuz_state, get_playfield_tile_info)
+	MCFG_ATARI_VAD_PLAYFIELD(shuuz_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_MOB(shuuz_state::s_mob_config, "gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)

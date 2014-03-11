@@ -11,8 +11,7 @@
 TILE_GET_INFO_MEMBER(cbasebal_state::get_bg_tile_info)
 {
 	UINT8 attr = m_scrollram[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			m_scrollram[2 * tile_index] + ((attr & 0x07) << 8) + 0x800 * m_tilebank,
 			(attr & 0xf0) >> 4,
 			(attr & 0x08) ? TILE_FLIPX : 0);
@@ -21,8 +20,7 @@ TILE_GET_INFO_MEMBER(cbasebal_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(cbasebal_state::get_fg_tile_info)
 {
 	UINT8 attr = m_textram[tile_index + 0x800];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			m_textram[tile_index] + ((attr & 0xf0) << 4),
 			attr & 0x07,
 			(attr & 0x08) ? TILE_FLIPX : 0);
@@ -41,8 +39,8 @@ void cbasebal_state::video_start()
 	m_textram = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_scrollram = auto_alloc_array(machine(), UINT8, 0x1000);
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cbasebal_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cbasebal_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cbasebal_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cbasebal_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(3);
 

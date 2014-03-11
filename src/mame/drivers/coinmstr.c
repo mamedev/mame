@@ -1103,12 +1103,12 @@ TILE_GET_INFO_MEMBER(coinmstr_state::get_bg_tile_info)
 
 	tile |= (m_attr_ram3[tile_index + 0x0240] & 0x03) << (6+4);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
 void coinmstr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(coinmstr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 46, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(coinmstr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 46, 32);
 }
 
 UINT32 coinmstr_state::screen_update_coinmstr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

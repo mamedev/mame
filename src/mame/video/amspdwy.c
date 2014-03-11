@@ -44,8 +44,7 @@ TILE_GET_INFO_MEMBER(amspdwy_state::get_tile_info)
 {
 	UINT8 code = m_videoram[tile_index];
 	UINT8 color = m_colorram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code + ((color & 0x18)<<5),
 			color & 0x07,
 			0);
@@ -73,7 +72,7 @@ TILEMAP_MAPPER_MEMBER(amspdwy_state::tilemap_scan_cols_back)
 
 void amspdwy_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(amspdwy_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(amspdwy_state::tilemap_scan_cols_back),this), 8, 8, 0x20, 0x20);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(amspdwy_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(amspdwy_state::tilemap_scan_cols_back),this), 8, 8, 0x20, 0x20);
 }
 
 

@@ -109,14 +109,14 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 	tileinfo.category = (attr & 0x80) ? 1 : 0;
 	if (bank) code += m_gfx_bank * 0x100;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 
 
 VIDEO_START_MEMBER(blueprnt_state,blueprnt)
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
 

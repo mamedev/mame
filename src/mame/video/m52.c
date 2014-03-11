@@ -133,7 +133,7 @@ TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
 		flag |= TILE_FORCE_LAYER0; /* lines 0 to 6 are opaqe? */
 	}
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color & 0x3f, flag);
+	SET_TILE_INFO_MEMBER(0, code, color & 0x3f, flag);
 }
 
 
@@ -146,7 +146,7 @@ TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
 
 void m52_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m52_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m52_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(127, 127);

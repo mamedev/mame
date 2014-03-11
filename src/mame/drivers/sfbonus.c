@@ -785,8 +785,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_tile_info)
 	int flipx = (m_tilemap_ram[(tile_index*2)+1] & 0x80)>>7;
 	int flipy = (m_tilemap_ram[(tile_index*2)+1] & 0x40)>>5;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code,
 			0,
 			TILE_FLIPYX(flipx | flipy));
@@ -800,8 +799,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel_tile_info)
 
 	int priority = (m_reel_ram[(tile_index*2)+1] & 0x40)>>6;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code,
 			priority,  // colour aboused as priority
 			TILE_FLIPYX(flipx | flipy));
@@ -815,8 +813,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel2_tile_info)
 
 	int priority = (m_reel2_ram[(tile_index*2)+1] & 0x40)>>6;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code,
 			priority,  // colour abused as priority
 			TILE_FLIPYX(flipx | flipy));
@@ -830,8 +827,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel3_tile_info)
 
 	int priority = (m_reel3_ram[(tile_index*2)+1] & 0x40)>>6;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code,
 			priority,  // colour abused as priority
 			TILE_FLIPYX(flipx | flipy));
@@ -845,8 +841,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel4_tile_info)
 
 	int priority = (m_reel4_ram[(tile_index*2)+1] & 0x40)>>6;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code,
 			priority, // colour abused as priority
 			TILE_FLIPYX(flipx | flipy));
@@ -908,11 +903,11 @@ void sfbonus_state::video_start()
 {
 	m_temp_reel_bitmap = auto_bitmap_ind16_alloc(machine(),1024,512);
 
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 128, 64);
-	m_reel_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
-	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
-	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
-	m_reel4_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel4_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 128, 64);
+	m_reel_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
+	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
+	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
+	m_reel4_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sfbonus_state::get_sfbonus_reel4_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 16);
 
 	m_tilemap->set_transparent_pen(0);
 	m_reel_tilemap->set_transparent_pen(255);

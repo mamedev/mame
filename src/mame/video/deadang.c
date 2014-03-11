@@ -41,14 +41,14 @@ TILE_GET_INFO_MEMBER(deadang_state::get_pf3_tile_info)
 {
 	const UINT16 *bgMap = (const UINT16 *)memregion("gfx6")->base();
 	int code= bgMap[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 4,code&0x7ff,code>>12,0);
+	SET_TILE_INFO_MEMBER(4,code&0x7ff,code>>12,0);
 }
 
 TILE_GET_INFO_MEMBER(deadang_state::get_pf2_tile_info)
 {
 	const UINT16 *bgMap = (const UINT16 *)memregion("gfx7")->base();
 	int code= bgMap[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 3,code&0x7ff,code>>12,0);
+	SET_TILE_INFO_MEMBER(3,code&0x7ff,code>>12,0);
 }
 
 TILE_GET_INFO_MEMBER(deadang_state::get_pf1_tile_info)
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(deadang_state::get_pf1_tile_info)
 	int color=tile >> 12;
 	tile=tile&0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2,tile+m_deadangle_tilebank*0x1000,color,0);
+	SET_TILE_INFO_MEMBER(2,tile+m_deadangle_tilebank*0x1000,color,0);
 }
 
 TILE_GET_INFO_MEMBER(deadang_state::get_text_tile_info)
@@ -66,15 +66,15 @@ TILE_GET_INFO_MEMBER(deadang_state::get_text_tile_info)
 	int tile=(videoram[tile_index] & 0xff) | ((videoram[tile_index] >> 6) & 0x300);
 	int color=(videoram[tile_index] >> 8)&0xf;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tile,color,0);
+	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
 void deadang_state::video_start()
 {
-	m_pf3_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deadang_state::get_pf3_tile_info),this),tilemap_mapper_delegate(FUNC(deadang_state::bg_scan),this),16,16,128,256);
-	m_pf2_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deadang_state::get_pf2_tile_info),this),tilemap_mapper_delegate(FUNC(deadang_state::bg_scan),this),16,16,128,256);
-	m_pf1_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deadang_state::get_pf1_tile_info),this),TILEMAP_SCAN_COLS,16,16, 32, 32);
-	m_text_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deadang_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_pf3_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deadang_state::get_pf3_tile_info),this),tilemap_mapper_delegate(FUNC(deadang_state::bg_scan),this),16,16,128,256);
+	m_pf2_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deadang_state::get_pf2_tile_info),this),tilemap_mapper_delegate(FUNC(deadang_state::bg_scan),this),16,16,128,256);
+	m_pf1_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deadang_state::get_pf1_tile_info),this),TILEMAP_SCAN_COLS,16,16, 32, 32);
+	m_text_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deadang_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_pf2_layer->set_transparent_pen(15);
 	m_pf1_layer->set_transparent_pen(15);

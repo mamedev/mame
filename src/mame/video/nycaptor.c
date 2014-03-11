@@ -51,8 +51,7 @@ TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)
 	}
 #endif
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			m_videoram[tile_index * 2] + ((m_videoram[tile_index * 2 + 1] & 0xc0) << 2) + 0x400 * m_char_bank,
 			pal, 0
 			);
@@ -61,7 +60,7 @@ TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)
 
 void nycaptor_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nycaptor_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 );
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nycaptor_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 );
 
 	m_bg_tilemap->set_transmask(0, 0xf800, 0x7ff); //split 0
 	m_bg_tilemap->set_transmask(1, 0xfe00, 0x01ff);//split 1

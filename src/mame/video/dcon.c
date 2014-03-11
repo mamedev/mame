@@ -49,8 +49,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_back_tile_info)
 
 	tile&=0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			tile,
 			color,
 			0);
@@ -63,8 +62,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_fore_tile_info)
 
 	tile&=0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2,
+	SET_TILE_INFO_MEMBER(2,
 			tile,
 			color,
 			0);
@@ -77,8 +75,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_mid_tile_info)
 
 	tile&=0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			3,
+	SET_TILE_INFO_MEMBER(3,
 			tile|m_gfx_bank_select,
 			color,
 			0);
@@ -91,8 +88,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_text_tile_info)
 
 	tile&=0xfff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			tile,
 			color,
 			0);
@@ -100,10 +96,10 @@ TILE_GET_INFO_MEMBER(dcon_state::get_text_tile_info)
 
 void dcon_state::video_start()
 {
-	m_background_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dcon_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,     16,16,32,32);
-	m_foreground_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dcon_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_midground_layer =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dcon_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_text_layer =       &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dcon_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
+	m_background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dcon_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,     16,16,32,32);
+	m_foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dcon_state::get_fore_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_midground_layer =  &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dcon_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_text_layer =       &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dcon_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
 
 	m_midground_layer->set_transparent_pen(15);
 	m_foreground_layer->set_transparent_pen(15);

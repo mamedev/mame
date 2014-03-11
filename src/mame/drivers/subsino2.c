@@ -194,7 +194,7 @@ inline void subsino2_state::ss9601_get_tile_info(layer_t *l, tile_data &tileinfo
 		case TILE_8x32:     addr = tile_index & (~0x180);   offs = (tile_index/0x80) & 3;                           break;
 		case TILE_64x32:    addr = tile_index & (~0x187);   offs = ((tile_index/0x80) & 3) + (tile_index & 7) * 4;  break;
 	}
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, (l->videorams[VRAM_HI][addr] << 8) + l->videorams[VRAM_LO][addr] + offs, 0, 0);
+	SET_TILE_INFO_MEMBER(0, (l->videorams[VRAM_HI][addr] << 8) + l->videorams[VRAM_LO][addr] + offs, 0, 0);
 }
 
 // Layer 0
@@ -590,7 +590,10 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 	{
 		layer_t *l = &m_layers[i];
 
-		l->tmap = &machine().tilemap().create(i ? tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_1),this) : tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8,8, 0x80,0x40);
+		l->tmap = &machine().tilemap().create(m_gfxdecode, i ?
+											  tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_1),this) :
+											  tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_0),this),
+											  TILEMAP_SCAN_ROWS, 8,8, 0x80,0x40);
 
 		l->tmap->set_transparent_pen(0);
 

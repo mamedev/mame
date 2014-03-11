@@ -131,8 +131,7 @@ inline void hyprduel_state::get_tile_info( tile_data &tileinfo, int tile_index, 
 	else
 	{
 		tileinfo.group = 0;
-		SET_TILE_INFO_MEMBER(m_gfxdecode, 
-				0,
+		SET_TILE_INFO_MEMBER(0,
 				(tile & 0xfffff) + (code & 0xf),
 				(((tile & 0x0ff00000) >> 20)) + 0x100,
 				TILE_FLIPXY((code & 0x6000) >> 13));
@@ -169,8 +168,7 @@ inline void hyprduel_state::get_tile_info_8bit( tile_data &tileinfo, int tile_in
 	else if ((tile & 0x00f00000) == 0x00f00000) /* draw tile as 8bpp */
 	{
 		tileinfo.group = 1;
-		SET_TILE_INFO_MEMBER(m_gfxdecode, 
-				1,
+		SET_TILE_INFO_MEMBER(1,
 				(tile & 0xfffff) + 2*(code & 0xf),
 				((tile & 0x0f000000) >> 24) + 0x10,
 				TILE_FLIPXY((code & 0x6000) >> 13));
@@ -178,8 +176,7 @@ inline void hyprduel_state::get_tile_info_8bit( tile_data &tileinfo, int tile_in
 	else
 	{
 		tileinfo.group = 0;
-		SET_TILE_INFO_MEMBER(m_gfxdecode, 
-				0,
+		SET_TILE_INFO_MEMBER(0,
 				(tile & 0xfffff) + (code & 0xf),
 				(((tile & 0x0ff00000) >> 20)) + 0x100,
 				TILE_FLIPXY((code & 0x6000) >> 13));
@@ -216,8 +213,7 @@ inline void hyprduel_state::get_tile_info_16x16_8bit( tile_data &tileinfo, int t
 	else if ((tile & 0x00f00000) == 0x00f00000) /* draw tile as 8bpp */
 	{
 		tileinfo.group = 1;
-		SET_TILE_INFO_MEMBER(m_gfxdecode, 
-				3,
+		SET_TILE_INFO_MEMBER(3,
 				(tile & 0xfffff) + 8*(code & 0xf),
 				((tile & 0x0f000000) >> 24) + 0x10,
 				TILE_FLIPXY((code & 0x6000) >> 13));
@@ -225,8 +221,7 @@ inline void hyprduel_state::get_tile_info_16x16_8bit( tile_data &tileinfo, int t
 	else
 	{
 		tileinfo.group = 0;
-		SET_TILE_INFO_MEMBER(m_gfxdecode, 
-				2,
+		SET_TILE_INFO_MEMBER(2,
 				(tile & 0xfffff) + 4*(code & 0xf),
 				(((tile & 0x0ff00000) >> 20)) + 0x100,
 				TILE_FLIPXY((code & 0x6000) >> 13));
@@ -360,9 +355,9 @@ VIDEO_START_MEMBER(hyprduel_state,common_14220)
 	save_pointer(NAME(m_tiletable_old), m_tiletable.bytes() / 2);
 	save_pointer(NAME(m_dirtyindex), m_tiletable.bytes() / 4);
 
-	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_0_8bit),this), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
-	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_1_8bit),this), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
-	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_2_8bit),this), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
+	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_0_8bit),this), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
+	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_1_8bit),this), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
+	m_bg_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hyprduel_state::get_tile_info_2_8bit),this), TILEMAP_SCAN_ROWS, 8, 8, WIN_NX, WIN_NY);
 
 	m_bg_tilemap[0]->map_pen_to_layer(0, 15,  TILEMAP_PIXEL_TRANSPARENT);
 	m_bg_tilemap[0]->map_pen_to_layer(1, 255, TILEMAP_PIXEL_TRANSPARENT);

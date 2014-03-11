@@ -188,8 +188,7 @@ TILE_GET_INFO_MEMBER(igrosoft_gamble_state::get_igrosoft_gamble_tile_info)
 
 	tileinfo.category = (attr&0x100)>>8;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code&0x1fff,
 			attr&0x7,
 			0);
@@ -199,8 +198,7 @@ TILE_GET_INFO_MEMBER(igrosoft_gamble_state::get_igrosoft_gamble_reel_tile_info)
 {
 	int code = m_vid[tile_index*2+0x2000] | (m_vid[tile_index*2+0x2001] << 8);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			(code&0x1fff)+0x2000,
 			(code>>14)+0x8,
 			0);
@@ -211,10 +209,10 @@ void igrosoft_gamble_state::video_start()
 	memset(m_vid,0x00,sizeof(m_vid));
 	save_item(NAME(m_vid));
 
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igrosoft_gamble_state::get_igrosoft_gamble_tile_info),this),TILEMAP_SCAN_ROWS,16,16, 64, 32);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igrosoft_gamble_state::get_igrosoft_gamble_tile_info),this),TILEMAP_SCAN_ROWS,16,16, 64, 32);
 	m_tilemap->set_transparent_pen(255);
 
-	m_reel_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igrosoft_gamble_state::get_igrosoft_gamble_reel_tile_info),this),TILEMAP_SCAN_ROWS,16,16, 64, 64);
+	m_reel_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igrosoft_gamble_state::get_igrosoft_gamble_reel_tile_info),this),TILEMAP_SCAN_ROWS,16,16, 64, 64);
 	m_reel_tilemap->set_transparent_pen(255);
 	m_reel_tilemap->set_scroll_cols(64);
 }

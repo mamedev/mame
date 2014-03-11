@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(superwng_state::get_bg_tile_info)
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, attr & 0xf, flipx|flipy);
+	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, flipx|flipy);
 }
 
 TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
@@ -108,13 +108,13 @@ TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, attr & 0xf, flipx|flipy);
+	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, flipx|flipy);
 }
 
 void superwng_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(superwng_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(superwng_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(superwng_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(superwng_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scrollx(0, 64);
 }

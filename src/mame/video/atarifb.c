@@ -23,7 +23,7 @@ void atarifb_state::get_tile_info_common( tile_data &tileinfo, tilemap_memory_in
 	if (disable)
 		code = 0;   /* I *know* this is a space */
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, (flip ? TILE_FLIPX | TILE_FLIPY : 0));
+	SET_TILE_INFO_MEMBER(0, code, 0, (flip ? TILE_FLIPX | TILE_FLIPY : 0));
 }
 
 
@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(atarifb_state::field_get_tile_info)
 	int code = m_field_videoram[tile_index] & 0x3f;
 	int flipyx = m_field_videoram[tile_index] >> 6;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, TILE_FLIPYX(flipyx));
+	SET_TILE_INFO_MEMBER(1, code, 0, TILE_FLIPYX(flipyx));
 }
 
 
@@ -86,9 +86,9 @@ WRITE8_MEMBER(atarifb_state::atarifb_field_videoram_w)
 
 void atarifb_state::video_start()
 {
-	m_alpha1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarifb_state::alpha1_get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 3, 32);
-	m_alpha2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarifb_state::alpha2_get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 3, 32);
-	m_field_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarifb_state::field_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_alpha1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(atarifb_state::alpha1_get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 3, 32);
+	m_alpha2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(atarifb_state::alpha2_get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 3, 32);
+	m_field_tilemap  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(atarifb_state::field_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

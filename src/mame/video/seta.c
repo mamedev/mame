@@ -367,7 +367,7 @@ inline void seta_state::twineagl_tile_info( tile_data &tileinfo, int tile_index,
 	UINT16 attr =   vram[ tile_index + 0x800 ];
 	if ((code & 0x3e00) == 0x3e00)
 		code = (code & 0xc07f) | ((m_twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);
-	SET_TILE_INFO_MEMBER(m_gfxdecode,  1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
+	SET_TILE_INFO_MEMBER(1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
 TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info_0){ twineagl_tile_info(tileinfo, tile_index, 0x0000 ); }
@@ -391,7 +391,7 @@ inline void seta_state::get_tile_info( tile_data &tileinfo, int tile_index, int 
 		popmessage("Missing Color Mode = 1 for Layer = %d. Contact MAMETesters.",layer);
 	}
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode,  gfx, m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
+	SET_TILE_INFO_MEMBER(gfx, m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
 TILE_GET_INFO_MEMBER(seta_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0, 0x0000 ); }
@@ -442,18 +442,18 @@ VIDEO_START_MEMBER(seta_state,seta_2_layers)
 	   at any given time */
 
 	/* layer 0 */
-	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,
+	m_tilemap_0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,
 									16,16, 64,32 );
 
-	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,
+	m_tilemap_1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,
 									16,16, 64,32 );
 
 
 	/* layer 1 */
-	m_tilemap_2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS,
+	m_tilemap_2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS,
 									16,16, 64,32 );
 
-	m_tilemap_3 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS,
+	m_tilemap_3 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS,
 									16,16, 64,32 );
 
 	m_tilemaps_flip = 0;
@@ -484,10 +484,10 @@ VIDEO_START_MEMBER(seta_state,seta_1_layer)
 	   at any given time */
 
 	/* layer 0 */
-	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,
+	m_tilemap_0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,
 									16,16, 64,32 );
 
-	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,
+	m_tilemap_1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,
 									16,16, 64,32 );
 
 	m_color_mode_shift = 4;
@@ -513,10 +513,10 @@ VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
 	   at any given time */
 
 	/* layer 0 */
-	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::twineagl_get_tile_info_0),this), TILEMAP_SCAN_ROWS,
+	m_tilemap_0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::twineagl_get_tile_info_0),this), TILEMAP_SCAN_ROWS,
 									16,16, 64,32 );
 
-	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seta_state::twineagl_get_tile_info_1),this), TILEMAP_SCAN_ROWS,
+	m_tilemap_1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(seta_state::twineagl_get_tile_info_1),this), TILEMAP_SCAN_ROWS,
 									16,16, 64,32 );
 
 	m_tilemap_0->set_transparent_pen(0);

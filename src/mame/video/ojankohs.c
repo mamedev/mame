@@ -161,7 +161,7 @@ TILE_GET_INFO_MEMBER(ojankohs_state::ojankohs_get_tile_info)
 		color |= (m_gfxreg & 0xe0) >> 2;
 	}
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, 0);
+	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(ojankohs_state::ojankoy_get_tile_info)
@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(ojankohs_state::ojankoy_get_tile_info)
 	int flipx = ((m_colorram[tile_index] & 0x40) >> 6) ? TILEMAP_FLIPX : 0;
 	int flipy = ((m_colorram[tile_index] & 0x80) >> 7) ? TILEMAP_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile, color, (flipx | flipy));
+	SET_TILE_INFO_MEMBER(0, tile, color, (flipx | flipy));
 }
 
 
@@ -255,7 +255,7 @@ WRITE8_MEMBER(ojankohs_state::ojankoc_videoram_w)
 
 VIDEO_START_MEMBER(ojankohs_state,ojankohs)
 {
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ojankohs_state::ojankohs_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ojankohs_state::ojankohs_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
 //  m_videoram = auto_alloc_array(machine(), UINT8, 0x1000);
 //  m_colorram = auto_alloc_array(machine(), UINT8, 0x1000);
 //  m_paletteram = auto_alloc_array(machine(), UINT8, 0x800);
@@ -263,7 +263,7 @@ VIDEO_START_MEMBER(ojankohs_state,ojankohs)
 
 VIDEO_START_MEMBER(ojankohs_state,ojankoy)
 {
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ojankohs_state::ojankoy_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ojankohs_state::ojankoy_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
 //  m_videoram = auto_alloc_array(machine(), UINT8, 0x2000);
 //  m_colorram = auto_alloc_array(machine(), UINT8, 0x1000);
 }

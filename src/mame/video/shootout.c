@@ -45,8 +45,7 @@ TILE_GET_INFO_MEMBER(shootout_state::get_bg_tile_info)
 	int tile_number = m_videoram[tile_index] + 256*(attributes&7);
 	int color = attributes>>4;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2,
+	SET_TILE_INFO_MEMBER(2,
 			tile_number,
 			color,
 			0);
@@ -58,8 +57,7 @@ TILE_GET_INFO_MEMBER(shootout_state::get_fg_tile_info)
 	int tile_number = m_textram[tile_index] + 256*(attributes&0x3);
 	int color = attributes>>4;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			color,
 			0);
@@ -79,8 +77,8 @@ WRITE8_MEMBER(shootout_state::shootout_textram_w)
 
 void shootout_state::video_start()
 {
-	m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shootout_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shootout_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_background = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shootout_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shootout_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_foreground->set_transparent_pen(0 );
 }
 

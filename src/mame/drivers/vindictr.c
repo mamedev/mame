@@ -192,8 +192,8 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", vindictr)
 	MCFG_PALETTE_ADD("palette", 2048*8)
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", 2, vindictr_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, vindictr_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
+	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, vindictr_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, vindictr_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", vindictr_state::s_mob_config)
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 

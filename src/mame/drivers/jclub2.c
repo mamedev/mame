@@ -167,14 +167,14 @@ TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_0)
 {
 	UINT16 tile     =   m_tmapram[tile_index] >> 16;
 	UINT16 color    =   m_tmapram[tile_index] & 0xffff;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
+	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
 TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_1)
 {
 	UINT16 tile     =   m_tmapram2[tile_index] >> 16;
 	UINT16 color    =   m_tmapram2[tile_index] & 0xffff;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
+	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
 WRITE32_MEMBER(darkhors_state::darkhors_tmapram_w)
@@ -224,8 +224,8 @@ void darkhors_state::draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle
 
 VIDEO_START_MEMBER(darkhors_state,darkhors)
 {
-	m_tmap =    &machine().tilemap().create(tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
-	m_tmap2= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
+	m_tmap =    &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
+	m_tmap2= &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
 	m_tmap->set_transparent_pen(0);
 	m_tmap2->set_transparent_pen(0);
 

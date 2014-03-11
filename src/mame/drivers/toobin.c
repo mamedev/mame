@@ -206,8 +206,8 @@ static MACHINE_CONFIG_START( toobin, toobin_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
-	MCFG_TILEMAP_ADD_STANDARD("playfield", 4, toobin_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", 2, toobin_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,48, 0)
+	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 4, toobin_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, toobin_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,48, 0)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", toobin_state::s_mob_config)
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 

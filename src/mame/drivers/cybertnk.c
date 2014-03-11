@@ -249,8 +249,7 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap0_tile_info)
 	int pal = (code & 0xe000) >> 13;
 	pal     |=(code & 0x1c00) >> 7;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code & 0x1fff,
 			pal,
 			0);
@@ -262,8 +261,7 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap1_tile_info)
 	int pal = (code & 0xe000) >> 13;
 	pal     |=(code & 0x1c00) >> 7;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code & 0x1fff,
 			pal,
 			0);
@@ -275,8 +273,7 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap2_tile_info)
 	int pal = (code & 0xe000) >> 13;
 	pal     |=(code & 0x1c00) >> 7;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2,
+	SET_TILE_INFO_MEMBER(2,
 			code & 0x1fff,
 			pal,
 			0);
@@ -284,13 +281,13 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap2_tile_info)
 
 void cybertnk_state::video_start()
 {
-	m_tilemap0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
 	m_tilemap0_tilemap->set_transparent_pen(0);
 
-	m_tilemap1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
 	m_tilemap1_tilemap->set_transparent_pen(0);
 
-	m_tilemap2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
 	m_tilemap2_tilemap->set_transparent_pen(0);
 }
 

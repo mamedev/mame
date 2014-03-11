@@ -188,35 +188,35 @@ TILE_GET_INFO_MEMBER(ladybug_state::get_bg_tile_info)
 	int code = m_videoram[tile_index] + 32 * (m_colorram[tile_index] & 0x08);
 	int color = m_colorram[tile_index] & 0x07;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(ladybug_state::get_grid_tile_info)
 {
 	if (tile_index < 512)
-		SET_TILE_INFO_MEMBER(m_gfxdecode, 3, tile_index, 0, 0);
+		SET_TILE_INFO_MEMBER(3, tile_index, 0, 0);
 	else
 	{
 		int temp = tile_index / 32;
 		tile_index = (31 - temp) * 32 + (tile_index % 32);
-		SET_TILE_INFO_MEMBER(m_gfxdecode, 4, tile_index, 0, 0);
+		SET_TILE_INFO_MEMBER(4, tile_index, 0, 0);
 	}
 }
 
 VIDEO_START_MEMBER(ladybug_state,ladybug)
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ladybug_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ladybug_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 	m_bg_tilemap->set_transparent_pen(0);
 }
 
 VIDEO_START_MEMBER(ladybug_state,sraider)
 {
-	m_grid_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ladybug_state::get_grid_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_grid_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ladybug_state::get_grid_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_grid_tilemap->set_scroll_rows(32);
 	m_grid_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ladybug_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ladybug_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 	m_bg_tilemap->set_transparent_pen(0);
 }

@@ -109,13 +109,13 @@ TILE_GET_INFO_MEMBER(flyball_state::flyball_get_tile_info)
 		code += 64;
 	}
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, flags);
+	SET_TILE_INFO_MEMBER(0, code, 0, flags);
 }
 
 
 void flyball_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(flyball_state::flyball_get_tile_info),this), tilemap_mapper_delegate(FUNC(flyball_state::flyball_get_memory_offset),this), 8, 16, 32, 16);
+	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(flyball_state::flyball_get_tile_info),this), tilemap_mapper_delegate(FUNC(flyball_state::flyball_get_memory_offset),this), 8, 16, 32, 16);
 }
 
 

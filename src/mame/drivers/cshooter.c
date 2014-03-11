@@ -155,7 +155,7 @@ TILE_GET_INFO_MEMBER(cshooter_state::get_cstx_tile_info)
 	int attr = (m_txram[tile_index*2+1]);
 	int color = attr & 0xf;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, (code << 1) | ((attr & 0x20) >> 5), color, 0);
+	SET_TILE_INFO_MEMBER(0, (code << 1) | ((attr & 0x20) >> 5), color, 0);
 }
 
 WRITE8_MEMBER(cshooter_state::cshooter_txram_w)
@@ -166,7 +166,7 @@ WRITE8_MEMBER(cshooter_state::cshooter_txram_w)
 
 void cshooter_state::video_start()
 {
-	m_txtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cshooter_state::get_cstx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
+	m_txtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cshooter_state::get_cstx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
 	m_txtilemap->set_transparent_pen(0);
 }
 

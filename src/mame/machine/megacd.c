@@ -858,14 +858,14 @@ TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_16x16_1x1_tile_info )
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_1x1(tile_region,tileno,(int)tile_index);
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, tile_region, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(tile_region, tileno, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_32x32_1x1_tile_info )
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_1x1(tile_region,tileno,(int)tile_index);
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, tile_region, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(tile_region, tileno, 0, 0);
 }
 
 
@@ -873,14 +873,14 @@ TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_16x16_16x16_tile_info )
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_16x16(tile_region,tileno,(int)tile_index);
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, tile_region, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(tile_region, tileno, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_32x32_16x16_tile_info )
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_16x16(tile_region,tileno,(int)tile_index);
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, tile_region, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(tile_region, tileno, 0, 0);
 }
 
 // non-tilemap functions to get a pixel from a 'tilemap' based on the above, but looking up each pixel, as to avoid the heavy cache bitmap
@@ -1628,10 +1628,10 @@ void sega_segacd_device::device_start()
 	m_gfxdecode->set_gfx(14, auto_alloc(machine(), gfx_element(machine(), sega_32x32_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
 	m_gfxdecode->set_gfx(15, auto_alloc(machine(), gfx_element(machine(), sega_32x32_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0)));
 
-	segacd_stampmap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_16x16_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	segacd_stampmap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_32x32_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 8, 8);
-	segacd_stampmap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_16x16_16x16_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 256, 256); // 128kb!
-	segacd_stampmap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_32x32_16x16_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 128, 128); // 32kb!
+	segacd_stampmap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_16x16_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	segacd_stampmap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_32x32_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 8, 8);
+	segacd_stampmap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_16x16_16x16_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 256, 256); // 128kb!
+	segacd_stampmap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_32x32_16x16_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 128, 128); // 32kb!
 
 	// todo register save state stuff
 }

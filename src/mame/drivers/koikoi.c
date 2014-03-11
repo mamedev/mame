@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(koikoi_state::get_tile_info)
 	int color = (m_videoram[tile_index + 0x400] & 0x1f);
 	int flip  = (m_videoram[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode,  0, code, color, flip);
+	SET_TILE_INFO_MEMBER(0, code, color, flip);
 }
 
 PALETTE_INIT_MEMBER(koikoi_state, koikoi)
@@ -141,7 +141,7 @@ PALETTE_INIT_MEMBER(koikoi_state, koikoi)
 
 void koikoi_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(koikoi_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(koikoi_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 UINT32 koikoi_state::screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

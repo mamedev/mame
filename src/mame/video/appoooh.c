@@ -104,8 +104,7 @@ TILE_GET_INFO_MEMBER(appoooh_state::get_fg_tile_info)
 {
 	int code = m_fg_videoram[tile_index] + 256 * ((m_fg_colorram[tile_index] >> 5) & 7);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code,
 			m_fg_colorram[tile_index] & 0x0f,
 			(m_fg_colorram[tile_index] & 0x10 ) ? TILEMAP_FLIPX : 0
@@ -116,8 +115,7 @@ TILE_GET_INFO_MEMBER(appoooh_state::get_bg_tile_info)
 {
 	int code = m_bg_videoram[tile_index] + 256 * ((m_bg_colorram[tile_index] >> 5) & 7);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code,
 			m_bg_colorram[tile_index] & 0x0f,
 			(m_bg_colorram[tile_index] & 0x10 ) ? TILEMAP_FLIPX : 0
@@ -132,8 +130,8 @@ TILE_GET_INFO_MEMBER(appoooh_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(appoooh_state,appoooh)
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(appoooh_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(appoooh_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(appoooh_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(appoooh_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrolldy(8, 8);

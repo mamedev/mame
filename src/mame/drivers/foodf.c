@@ -369,7 +369,7 @@ static MACHINE_CONFIG_START( foodf, foodf_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", foodf)
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("playfield", 2, foodf_state, get_playfield_tile_info, 8,8, SCAN_COLS, 32,32, 0)
+	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("playfield", "gfxdecode", 2, foodf_state, get_playfield_tile_info, 8,8, SCAN_COLS, 32,32, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 256, 259, 0, 224)

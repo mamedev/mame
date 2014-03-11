@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(djboy_state::get_bg_tile_info)
 	if (color & 8)
 		code |= 0x1000;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);    /* no flip */
+	SET_TILE_INFO_MEMBER(1, code, color, 0);    /* no flip */
 }
 
 WRITE8_MEMBER(djboy_state::djboy_videoram_w)
@@ -37,7 +37,7 @@ WRITE8_MEMBER(djboy_state::djboy_videoram_w)
 
 void djboy_state::video_start()
 {
-	m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(djboy_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_background = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(djboy_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 }
 
 WRITE8_MEMBER(djboy_state::djboy_paletteram_w)

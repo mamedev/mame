@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info1)
 	int colour = (m_videoram1[tile_index * 2] & 0x3f00) >> 8;
 	int pri = (m_videoram1[tile_index * 2] & 0xc000) >> 14;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,colour + m_palette_bank1 * 0x40, 0);
+	SET_TILE_INFO_MEMBER(0,tileno,colour + m_palette_bank1 * 0x40, 0);
 	tileinfo.category = pri;
 }
 
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info2)
 	int colour = (m_videoram2[tile_index * 2] & 0x3f00) >> 8;
 	int pri = (m_videoram2[tile_index * 2] & 0xc000) >> 14;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, colour + m_palette_bank2 * 0x40, 0);
+	SET_TILE_INFO_MEMBER(1, tileno, colour + m_palette_bank2 * 0x40, 0);
 	tileinfo.category = pri;
 }
 
@@ -246,10 +246,10 @@ UINT32 mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 
 
 void mcatadv_state::video_start()
 {
-	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcatadv_state::get_mcatadv_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcatadv_state::get_mcatadv_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_tilemap1->set_transparent_pen(0);
 
-	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcatadv_state::get_mcatadv_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcatadv_state::get_mcatadv_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_tilemap2->set_transparent_pen(0);
 
 	m_spriteram_old = auto_alloc_array_clear(machine(), UINT16, m_spriteram.bytes() / 2);

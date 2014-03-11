@@ -2138,7 +2138,7 @@ TILE_GET_INFO_MEMBER(namcos23_state::TextTilemapGetInfo)
 	* ----.xx--.----.---- flip
 	* ----.--xx.xxxx.xxxx code
 	*/
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10));
+	SET_TILE_INFO_MEMBER(0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10));
 }
 
 WRITE32_MEMBER(namcos23_state::s23_textram_w)
@@ -2161,7 +2161,7 @@ WRITE32_MEMBER(namcos23_state::s23_textchar_w)
 VIDEO_START_MEMBER(namcos23_state,s23)
 {
 	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<UINT8 *>(m_charram.target()));
-	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_bgtilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcos23_state::TextTilemapGetInfo),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_bgtilemap->set_transparent_pen(0xf);
 	m_bgtilemap->set_scrolldx(860, 860);
 	m_render.polymgr = poly_alloc(machine(), 10000, sizeof(namcos23_render_data), 0);

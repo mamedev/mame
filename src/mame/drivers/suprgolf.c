@@ -88,8 +88,7 @@ TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 	int code = m_videoram[tile_index*2]+256*(m_videoram[tile_index*2+1]);
 	int color = m_videoram[tile_index*2+0x800] & 0x7f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-		0,
+	SET_TILE_INFO_MEMBER(0,
 		code,
 		color,
 		0);
@@ -97,7 +96,7 @@ TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 
 void suprgolf_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprgolf_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(suprgolf_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 	m_paletteram = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_bg_vram = auto_alloc_array(machine(), UINT8, 0x2000*0x20);
 	m_bg_fb = auto_alloc_array(machine(), UINT16, 0x2000*0x20);

@@ -137,7 +137,7 @@ TILE_GET_INFO_MEMBER(chaknpop_state::chaknpop_get_tx_tile_info)
 
 	tile |= tile_h_bank;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile, color, 0);
+	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
 
 
@@ -150,7 +150,7 @@ void chaknpop_state::video_start()
 	UINT8 *RAM = memregion("maincpu")->base();
 
 	/*                          info                       offset             type             w   h  col row */
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(chaknpop_state::chaknpop_get_tx_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(chaknpop_state::chaknpop_get_tx_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
 
 	m_vram1 = &RAM[0x10000];
 	m_vram2 = &RAM[0x12000];

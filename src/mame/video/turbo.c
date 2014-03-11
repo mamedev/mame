@@ -154,21 +154,21 @@ PALETTE_INIT_MEMBER(turbo_state,buckrog)
 TILE_GET_INFO_MEMBER(turbo_state::get_fg_tile_info)
 {
 	int code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, code >> 2, 0);
+	SET_TILE_INFO_MEMBER(0, code, code >> 2, 0);
 }
 
 
 VIDEO_START_MEMBER(turbo_state,turbo)
 {
 	/* initialize the foreground tilemap */
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 }
 
 
 VIDEO_START_MEMBER(turbo_state,buckrog)
 {
 	/* initialize the foreground tilemap */
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
 	/* allocate the bitmap RAM */
 	m_buckrog_bitmap_ram = auto_alloc_array(machine(), UINT8, 0xe000);

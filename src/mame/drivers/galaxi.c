@@ -114,31 +114,31 @@ public:
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg1_tile_info)
 {
 	UINT16 code = m_bg1_ram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0x10 + (code >> 12), 0);
+	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg2_tile_info)
 {
 	UINT16 code = m_bg2_ram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0x10 + (code >> 12), 0);
+	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg3_tile_info)
 {
 	UINT16 code = m_bg3_ram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, (code >> 12), 0);
+	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_bg4_tile_info)
 {
 	UINT16 code = m_bg4_ram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, (code >> 12), 0);
+	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxi_state::get_fg_tile_info)
 {
 	UINT16 code = m_fg_ram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0x20 + (code >> 12), 0);
+	SET_TILE_INFO_MEMBER(1, code, 0x20 + (code >> 12), 0);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_bg1_w)
@@ -173,12 +173,12 @@ WRITE16_MEMBER(galaxi_state::galaxi_fg_w)
 
 void galaxi_state::video_start()
 {
-	m_bg1_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	m_bg2_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	m_bg3_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
-	m_bg4_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg4_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg1_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg2_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg3_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
+	m_bg4_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_bg4_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
 
-	m_fg_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20);
+	m_fg_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxi_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20);
 
 	m_bg1_tmap->set_transparent_pen(0);
 	m_bg2_tmap->set_transparent_pen(0);

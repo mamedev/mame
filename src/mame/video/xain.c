@@ -49,8 +49,7 @@ TILEMAP_MAPPER_MEMBER(xain_state::back_scan)
 TILE_GET_INFO_MEMBER(xain_state::get_bgram0_tile_info)
 {
 	int attr = m_bgram0[tile_index | 0x400];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2,
+	SET_TILE_INFO_MEMBER(2,
 			m_bgram0[tile_index] | ((attr & 7) << 8),
 			(attr & 0x70) >> 4,
 			(attr & 0x80) ? TILE_FLIPX : 0);
@@ -59,8 +58,7 @@ TILE_GET_INFO_MEMBER(xain_state::get_bgram0_tile_info)
 TILE_GET_INFO_MEMBER(xain_state::get_bgram1_tile_info)
 {
 	int attr = m_bgram1[tile_index | 0x400];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			m_bgram1[tile_index] | ((attr & 7) << 8),
 			(attr & 0x70) >> 4,
 			(attr & 0x80) ? TILE_FLIPX : 0);
@@ -69,8 +67,7 @@ TILE_GET_INFO_MEMBER(xain_state::get_bgram1_tile_info)
 TILE_GET_INFO_MEMBER(xain_state::get_char_tile_info)
 {
 	int attr = m_charram[tile_index | 0x400];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			m_charram[tile_index] | ((attr & 3) << 8),
 			(attr & 0xe0) >> 5,
 			0);
@@ -85,9 +82,9 @@ TILE_GET_INFO_MEMBER(xain_state::get_char_tile_info)
 
 void xain_state::video_start()
 {
-	m_bgram0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(xain_state::get_bgram0_tile_info),this),tilemap_mapper_delegate(FUNC(xain_state::back_scan),this),16,16,32,32);
-	m_bgram1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(xain_state::get_bgram1_tile_info),this),tilemap_mapper_delegate(FUNC(xain_state::back_scan),this),16,16,32,32);
-	m_char_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(xain_state::get_char_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_bgram0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(xain_state::get_bgram0_tile_info),this),tilemap_mapper_delegate(FUNC(xain_state::back_scan),this),16,16,32,32);
+	m_bgram1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(xain_state::get_bgram1_tile_info),this),tilemap_mapper_delegate(FUNC(xain_state::back_scan),this),16,16,32,32);
+	m_char_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(xain_state::get_char_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	m_bgram0_tilemap->set_transparent_pen(0);
 	m_bgram1_tilemap->set_transparent_pen(0);

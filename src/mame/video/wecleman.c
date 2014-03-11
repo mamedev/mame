@@ -419,7 +419,7 @@ static void sprite_draw(running_machine &machine, _BitmapClass &bitmap, const re
 TILE_GET_INFO_MEMBER(wecleman_state::wecleman_get_txt_tile_info)
 {
 	int code = m_txtram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
+	SET_TILE_INFO_MEMBER(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
 WRITE16_MEMBER(wecleman_state::wecleman_txtram_w)
@@ -467,7 +467,7 @@ TILE_GET_INFO_MEMBER(wecleman_state::wecleman_get_bg_tile_info)
 	int page = m_bgpage[((tile_index&0x7f)>>6) + ((tile_index>>12)<<1)];
 	int code = m_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
+	SET_TILE_INFO_MEMBER(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
 /*------------------------------------------------------------------------
@@ -480,7 +480,7 @@ TILE_GET_INFO_MEMBER(wecleman_state::wecleman_get_fg_tile_info)
 	int code = m_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
 
 	if (!code || code==0xffff) code = 0x20;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
+	SET_TILE_INFO_MEMBER(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
 /*------------------------------------------------------------------------
@@ -928,19 +928,19 @@ VIDEO_START_MEMBER(wecleman_state,wecleman)
 
 	m_sprite_list = auto_alloc_array_clear(machine(), struct sprite, NUM_SPRITES);
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_bg_tile_info),this),
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_bg_tile_info),this),
 								TILEMAP_SCAN_ROWS,
 									/* We draw part of the road below */
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2 );
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_fg_tile_info),this),
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_fg_tile_info),this),
 								TILEMAP_SCAN_ROWS,
 
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2);
 
-	m_txt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_txt_tile_info),this),
+	m_txt_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_txt_tile_info),this),
 									TILEMAP_SCAN_ROWS,
 
 									8,8,

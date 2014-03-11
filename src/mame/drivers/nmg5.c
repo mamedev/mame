@@ -850,13 +850,13 @@ static INPUT_PORTS_START( wondstck )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 INPUT_PORTS_END
 
-TILE_GET_INFO_MEMBER(nmg5_state::fg_get_tile_info){ SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_fg_videoram[tile_index] | (m_gfx_bank << 16), 0, 0);}
-TILE_GET_INFO_MEMBER(nmg5_state::bg_get_tile_info){ SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_bg_videoram[tile_index] | (m_gfx_bank << 16), 1, 0);}
+TILE_GET_INFO_MEMBER(nmg5_state::fg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_fg_videoram[tile_index] | (m_gfx_bank << 16), 0, 0);}
+TILE_GET_INFO_MEMBER(nmg5_state::bg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_bg_videoram[tile_index] | (m_gfx_bank << 16), 1, 0);}
 
 void nmg5_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nmg5_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nmg5_state::fg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::fg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 

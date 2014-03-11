@@ -99,8 +99,7 @@ TILE_GET_INFO_MEMBER(stfight_state::get_fg_tile_info)
 	attr = fgMap[0x8000+tile_index];
 	tile_base = ((attr & 0x80) << 2) | ((attr & 0x20) << 3);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			tile_base + fgMap[tile_index],
 			attr & 0x07,
 			0);
@@ -123,8 +122,7 @@ TILE_GET_INFO_MEMBER(stfight_state::get_bg_tile_info)
 	tile_bank = (attr & 0x20) >> 5;
 	tile_base = (attr & 0x80) << 1;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2+tile_bank,
+	SET_TILE_INFO_MEMBER(2+tile_bank,
 			tile_base + bgMap[tile_index],
 			attr & 0x07,
 			0);
@@ -137,8 +135,7 @@ TILE_GET_INFO_MEMBER(stfight_state::get_tx_tile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			m_text_char_ram[tile_index] + ((attr & 0x80) << 1),
 			attr & 0x0f,
 			TILE_FLIPYX((attr & 0x60) >> 5));
@@ -152,8 +149,7 @@ TILE_GET_INFO_MEMBER(stfight_state::get_cshooter_tx_tile_info)
 
 	tileinfo.group = color;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			(tile << 1) | ((attr & 0x20) >> 5),
 			attr & 0x0f,
 			/*TILE_FLIPYX((attr & 0x60) >> 5)*/0);
@@ -168,9 +164,9 @@ TILE_GET_INFO_MEMBER(stfight_state::get_cshooter_tx_tile_info)
 
 VIDEO_START_MEMBER(stfight_state,stfight)
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_state::bg_scan),this),16,16,128,256);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_state::fg_scan),this),16,16,128,256);
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stfight_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_state::bg_scan),this),16,16,128,256);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stfight_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_state::fg_scan),this),16,16,128,256);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stfight_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
 
 	m_fg_tilemap->set_transparent_pen(0x0f);
 	m_palette->configure_tilemap_groups(*m_tx_tilemap, *m_gfxdecode->gfx(0), 0xcf);
@@ -178,9 +174,9 @@ VIDEO_START_MEMBER(stfight_state,stfight)
 
 VIDEO_START_MEMBER(stfight_state,cshooter)
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_state::bg_scan),this),16,16,128,256);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_state::fg_scan),this),16,16,128,256);
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stfight_state::get_cshooter_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stfight_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_state::bg_scan),this),16,16,128,256);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stfight_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(stfight_state::fg_scan),this),16,16,128,256);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stfight_state::get_cshooter_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
 
 	m_fg_tilemap->set_transparent_pen(0x0f);
 	m_palette->configure_tilemap_groups(*m_tx_tilemap, *m_gfxdecode->gfx(0), 0xcf);

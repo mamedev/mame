@@ -251,9 +251,9 @@ void k052109_device::device_start()
 	/* deinterleave the graphics, if needed */
 	konami_deinterleave_gfx(machine(), m_gfx_memory_region, m_deinterleave);
 
-	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k052109_device::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k052109_device::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k052109_device::get_tile_info2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k052109_device::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k052109_device::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k052109_device::get_tile_info2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x6000);
 
@@ -739,8 +739,7 @@ void k052109_device::get_tile_info( tile_data &tileinfo, int tile_index, int lay
 	if (flipy && (m_tileflip_enable & 2))
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-			m_gfx_num,
+	SET_TILE_INFO_MEMBER(m_gfx_num,
 			code,
 			color,
 			flags);

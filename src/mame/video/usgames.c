@@ -38,12 +38,12 @@ TILE_GET_INFO_MEMBER(usgames_state::get_usgames_tile_info)
 	tileno = m_videoram[tile_index*2];
 	colour = m_videoram[tile_index*2+1];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
 void usgames_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(usgames_state::get_usgames_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(usgames_state::get_usgames_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 	m_gfxdecode->gfx(0)->set_source(m_charram);
 }
 

@@ -17,7 +17,7 @@
 TILE_GET_INFO_MEMBER(kyugo_state::get_fg_tile_info)
 {
 	int code = m_fgvideoram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,
+	SET_TILE_INFO_MEMBER(0,
 					code,
 					2 * m_color_codes[code >> 3] + m_fgcolor,
 					0);
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(kyugo_state::get_bg_tile_info)
 {
 	int code = m_bgvideoram[tile_index];
 	int attr = m_bgattribram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,
+	SET_TILE_INFO_MEMBER(1,
 					code | ((attr & 0x03) << 8),
 					(attr >> 4) | (m_bgpalbank << 4),
 					TILE_FLIPYX((attr & 0x0c) >> 2));
@@ -45,8 +45,8 @@ void kyugo_state::video_start()
 {
 	m_color_codes = memregion("proms")->base() + 0x300;
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kyugo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(kyugo_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(kyugo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(kyugo_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 

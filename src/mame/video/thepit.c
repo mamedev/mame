@@ -112,7 +112,7 @@ TILE_GET_INFO_MEMBER(thepit_state::get_tile_info)
 {
 	UINT8 fore_color = m_colorram[tile_index] % m_gfxdecode->gfx(0)->colors();
 	UINT8 code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2 * m_graphics_bank, code, fore_color, 0);
+	SET_TILE_INFO_MEMBER(2 * m_graphics_bank, code, fore_color, 0);
 }
 
 
@@ -125,9 +125,9 @@ TILE_GET_INFO_MEMBER(thepit_state::get_tile_info)
 
 void thepit_state::video_start()
 {
-	m_solid_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(thepit_state::solid_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_solid_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(thepit_state::solid_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(thepit_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(thepit_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 	m_tilemap->set_transparent_pen(0);
 
 	m_solid_tilemap->set_scroll_cols(32);

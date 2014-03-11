@@ -200,14 +200,14 @@ void tc0100scn_device::device_start()
 	   we're safe as it uses single width tilemaps. */
 
 	/* Single width versions */
-	m_tilemap[0][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[2][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[2][0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	/* Double width versions */
-	m_tilemap[0][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_tilemap[1][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_tilemap[2][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap[0][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_tilemap[1][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_tilemap[2][1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0100scn_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
 	m_tilemap[0][0]->set_transparent_pen(0);
 	m_tilemap[1][0]->set_transparent_pen(0);
@@ -318,8 +318,7 @@ void tc0100scn_device::common_get_bg0_tile_info( tile_data &tileinfo, int tile_i
 		attr = ram[2 * tile_index];
 	}
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-			gfxnum,
+	SET_TILE_INFO_MEMBER(gfxnum,
 			code,
 			(((attr * m_bg_col_mult) + m_bg0_colbank) & 0xff) + colbank,
 			TILE_FLIPYX((attr & 0xc000) >> 14));
@@ -341,8 +340,7 @@ void tc0100scn_device::common_get_bg1_tile_info( tile_data &tileinfo, int tile_i
 		attr = ram[2 * tile_index];
 	}
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-			gfxnum,
+	SET_TILE_INFO_MEMBER(gfxnum,
 			code,
 			(((attr * m_bg_col_mult) + m_bg1_colbank) & 0xff) + colbank,
 			TILE_FLIPYX((attr & 0xc000) >> 14));
@@ -352,8 +350,7 @@ void tc0100scn_device::common_get_tx_tile_info( tile_data &tileinfo, int tile_in
 {
 	int attr = ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-			gfxnum,
+	SET_TILE_INFO_MEMBER(gfxnum,
 			attr & 0xff,
 			((((attr >> 6) & 0xfc) * m_tx_col_mult + (m_tx_colbank << 2)) & 0x3ff) + colbank * 4,
 			TILE_FLIPYX((attr & 0xc000) >> 14));

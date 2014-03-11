@@ -58,8 +58,7 @@ TILE_GET_INFO_MEMBER(metro_state::metro_k053936_get_tile_info)
 {
 	int code = m_k053936_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			4,
+	SET_TILE_INFO_MEMBER(4,
 			code & 0x7fff,
 			0xe,
 			0);
@@ -69,8 +68,7 @@ TILE_GET_INFO_MEMBER(metro_state::metro_k053936_gstrik2_get_tile_info)
 {
 	int code = m_k053936_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			4,
+	SET_TILE_INFO_MEMBER(4,
 			(code & 0x7fff)>>2,
 			0xe,
 			0);
@@ -326,7 +324,7 @@ VIDEO_START_MEMBER(metro_state,blzntrnd)
 
 	m_has_zoom = 1;
 
-	m_k053936_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 512);
+	m_k053936_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 512);
 
 	m_tilemap_scrolldx[0] = 8;
 	m_tilemap_scrolldx[1] = 8;
@@ -339,7 +337,7 @@ VIDEO_START_MEMBER(metro_state,gstrik2)
 
 	m_has_zoom = 1;
 
-	m_k053936_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_gstrik2_get_tile_info),this), tilemap_mapper_delegate(FUNC(metro_state::tilemap_scan_gstrik2),this), 16, 16, 128, 256);
+	m_k053936_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_gstrik2_get_tile_info),this), tilemap_mapper_delegate(FUNC(metro_state::tilemap_scan_gstrik2),this), 16, 16, 128, 256);
 
 	m_tilemap_scrolldx[0] = 8;
 	m_tilemap_scrolldx[1] = 0;

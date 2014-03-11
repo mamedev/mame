@@ -72,27 +72,27 @@ TILE_GET_INFO_MEMBER(cultures_state::get_bg1_tile_info)
 {
 	UINT8 *region = memregion("gfx3")->base() + 0x200000 + 0x80000 * m_bg1_bank;
 	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, code >> 12, 0);
+	SET_TILE_INFO_MEMBER(2, code, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(cultures_state::get_bg2_tile_info)
 {
 	UINT8 *region = memregion("gfx2")->base() + 0x200000 + 0x80000 * m_bg2_bank;
 	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, code >> 12, 0);
+	SET_TILE_INFO_MEMBER(1, code, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(cultures_state::get_bg0_tile_info)
 {
 	int code = m_bg0_videoram[tile_index * 2] + (m_bg0_videoram[tile_index * 2 + 1] << 8);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, code >> 12, 0);
+	SET_TILE_INFO_MEMBER(0, code, code >> 12, 0);
 }
 
 void cultures_state::video_start()
 {
-	m_bg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cultures_state::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 128);
-	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cultures_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
-	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cultures_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
+	m_bg0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 128);
+	m_bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
+	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
 
 	m_bg1_tilemap->set_transparent_pen(0);
 	m_bg0_tilemap->set_transparent_pen(0);

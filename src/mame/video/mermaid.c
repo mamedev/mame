@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(mermaid_state::get_bg_tile_info)
 	int sx = tile_index % 32;
 	int color = (sx >= 26) ? 0 : 1;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(mermaid_state::get_fg_tile_info)
@@ -156,15 +156,15 @@ TILE_GET_INFO_MEMBER(mermaid_state::get_fg_tile_info)
 	code |= m_rougien_gfxbank1 * 0x2800;
 	code |= m_rougien_gfxbank2 * 0x2400;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 void mermaid_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mermaid_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mermaid_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mermaid_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mermaid_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_scroll_cols(32);
 	m_fg_tilemap->set_transparent_pen(0);
 

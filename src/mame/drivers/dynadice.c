@@ -205,14 +205,14 @@ GFXDECODE_END
 TILE_GET_INFO_MEMBER(dynadice_state::get_tile_info)
 {
 	int code = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, 0);
+	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
 void dynadice_state::video_start()
 {
 	/* pacman - style videoram layout */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_top_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_top_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
 	m_bg_tilemap->set_scrollx(0, -16);
 }
 

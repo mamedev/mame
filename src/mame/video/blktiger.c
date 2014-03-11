@@ -37,8 +37,7 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 	};
 	UINT8 attr = m_scroll_ram[2 * tile_index + 1];
 	int color = (attr & 0x78) >> 3;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			m_scroll_ram[2 * tile_index] + ((attr & 0x07) << 8),
 			color,
 			(attr & 0x80) ? TILE_FLIPX : 0);
@@ -48,8 +47,7 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 TILE_GET_INFO_MEMBER(blktiger_state::get_tx_tile_info)
 {
 	UINT8 attr = m_txvideoram[tile_index + 0x400];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			m_txvideoram[tile_index] + ((attr & 0xe0) << 3),
 			attr & 0x1f,
 			0);
@@ -71,9 +69,9 @@ void blktiger_state::video_start()
 
 	m_scroll_ram = auto_alloc_array(machine(), UINT8, BGRAM_BANK_SIZE * BGRAM_BANKS);
 
-	m_tx_tilemap =    &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blktiger_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap8x4 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(blktiger_state::bg8x4_scan),this), 16, 16, 128, 64);
-	m_bg_tilemap4x8 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(blktiger_state::bg4x8_scan),this), 16, 16, 64, 128);
+	m_tx_tilemap =    &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blktiger_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap8x4 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(blktiger_state::bg8x4_scan),this), 16, 16, 128, 64);
+	m_bg_tilemap4x8 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(blktiger_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(blktiger_state::bg4x8_scan),this), 16, 16, 64, 128);
 
 	m_tx_tilemap->set_transparent_pen(3);
 

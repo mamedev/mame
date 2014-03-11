@@ -11,7 +11,7 @@ TILE_GET_INFO_MEMBER(pirates_state::get_tx_tile_info)
 	int code = m_tx_tileram[tile_index*2];
 	int colr = m_tx_tileram[tile_index*2+1];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,colr,0);
+	SET_TILE_INFO_MEMBER(0,code,colr,0);
 }
 
 TILE_GET_INFO_MEMBER(pirates_state::get_fg_tile_info)
@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(pirates_state::get_fg_tile_info)
 	int code = m_fg_tileram[tile_index*2];
 	int colr = m_fg_tileram[tile_index*2+1]+0x80;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,colr,0);
+	SET_TILE_INFO_MEMBER(0,code,colr,0);
 }
 
 TILE_GET_INFO_MEMBER(pirates_state::get_bg_tile_info)
@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(pirates_state::get_bg_tile_info)
 	int code = m_bg_tileram[tile_index*2];
 	int colr = m_bg_tileram[tile_index*2+1]+ 0x100;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,code,colr,0);
+	SET_TILE_INFO_MEMBER(0,code,colr,0);
 }
 
 
@@ -35,11 +35,11 @@ TILE_GET_INFO_MEMBER(pirates_state::get_bg_tile_info)
 
 void pirates_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pirates_state::get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,36,32);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pirates_state::get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,36,32);
 
 	/* Not sure how big they can be, Pirates uses only 32 columns, Genix 44 */
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pirates_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pirates_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,     8,8,64,32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pirates_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pirates_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,     8,8,64,32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);

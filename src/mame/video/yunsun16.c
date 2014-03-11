@@ -51,8 +51,7 @@ TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_0)
 {
 	UINT16 code = m_vram_0[2 * tile_index + 0];
 	UINT16 attr = m_vram_0[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			TMAP_GFX,
+	SET_TILE_INFO_MEMBER(TMAP_GFX,
 			code,
 			attr & 0xf,
 			(attr & 0x20) ? TILE_FLIPX : 0);
@@ -62,8 +61,7 @@ TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_1)
 {
 	UINT16 code = m_vram_1[2 * tile_index + 0];
 	UINT16 attr = m_vram_1[2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			TMAP_GFX,
+	SET_TILE_INFO_MEMBER(TMAP_GFX,
 			code,
 			attr & 0xf,
 			(attr & 0x20) ? TILE_FLIPX : 0);
@@ -92,9 +90,9 @@ WRITE16_MEMBER(yunsun16_state::yunsun16_vram_1_w)
 
 void yunsun16_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(yunsun16_state::yunsun16_tilemap_scan_pages),this),
+	m_tilemap_0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(yunsun16_state::yunsun16_tilemap_scan_pages),this),
 								16,16, TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
-	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info_1),this),tilemap_mapper_delegate(FUNC(yunsun16_state::yunsun16_tilemap_scan_pages),this),
+	m_tilemap_1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info_1),this),tilemap_mapper_delegate(FUNC(yunsun16_state::yunsun16_tilemap_scan_pages),this),
 								16,16, TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
 	m_tilemap_0->set_scrolldx(-0x34, 0);

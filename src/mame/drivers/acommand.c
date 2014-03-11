@@ -121,8 +121,7 @@ TILEMAP_MAPPER_MEMBER(acommand_state::bg_scan)
 TILE_GET_INFO_MEMBER(acommand_state::ac_get_bg_tile_info)
 {
 	int code = m_ac_bgvram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code & 0xfff,
 			(code & 0xf000) >> 12,
 			0);
@@ -131,8 +130,7 @@ TILE_GET_INFO_MEMBER(acommand_state::ac_get_bg_tile_info)
 TILE_GET_INFO_MEMBER(acommand_state::ac_get_tx_tile_info)
 {
 	int code = m_ac_txvram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code & 0xfff,
 			(code & 0xf000) >> 12,
 			0);
@@ -198,8 +196,8 @@ void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void acommand_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(acommand_state::ac_get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,512,32);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(acommand_state::ac_get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(acommand_state::bg_scan),this),16,16,256,16);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(acommand_state::ac_get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,512,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(acommand_state::ac_get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(acommand_state::bg_scan),this),16,16,256,16);
 
 	m_ac_vregs = auto_alloc_array(machine(), UINT16, 0x80/2);
 

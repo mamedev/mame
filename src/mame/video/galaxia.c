@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(galaxia_state::get_galaxia_bg_tile_info)
 	UINT8 code = m_video_ram[tile_index] & 0x7f; // d7 unused
 	UINT8 color = m_color_ram[tile_index] & 3; // highest bits unused
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(galaxia_state::get_astrowar_bg_tile_info)
@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(galaxia_state::get_astrowar_bg_tile_info)
 	UINT8 code = m_video_ram[tile_index];
 	UINT8 color = m_color_ram[tile_index] & 7; // highest bits unused
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 void galaxia_state::init_common()
@@ -85,7 +85,7 @@ VIDEO_START_MEMBER(galaxia_state,galaxia)
 {
 	init_common();
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxia_state::get_galaxia_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxia_state::get_galaxia_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(8);
 
@@ -95,7 +95,7 @@ VIDEO_START_MEMBER(galaxia_state,astrowar)
 {
 	init_common();
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxia_state::get_astrowar_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxia_state::get_astrowar_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(8);
 	m_bg_tilemap->set_scrolldx(8, 8);

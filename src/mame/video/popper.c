@@ -108,8 +108,7 @@ TILE_GET_INFO_MEMBER(popper_state::get_popper_p123_tile_info)
 	UINT8 attr = m_attribram[tile_index];
 	tile_number += m_gfx_bank << 8;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			(attr & 0xf),
 			0);
@@ -125,8 +124,7 @@ TILE_GET_INFO_MEMBER(popper_state::get_popper_p0_tile_info)
 	//pen 0 only in front if colour set as well
 	tileinfo.group = (attr & 0x70) ? ((attr & 0x80) >> 7) : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			((attr & 0x70) >> 4) + 8,
 			0);
@@ -138,8 +136,7 @@ TILE_GET_INFO_MEMBER(popper_state::get_popper_ol_p123_tile_info)
 	UINT8 attr  = m_ol_attribram[tile_index];
 	tile_number += m_gfx_bank << 8;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			(attr & 0xf),
 			0);
@@ -155,8 +152,7 @@ TILE_GET_INFO_MEMBER(popper_state::get_popper_ol_p0_tile_info)
 	//pen 0 only in front if colour set as well
 	tileinfo.group = (attr & 0x70) ? ((attr & 0x80) >> 7) : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			((attr & 0x70) >> 4) + 8,
 			0);
@@ -164,10 +160,10 @@ TILE_GET_INFO_MEMBER(popper_state::get_popper_ol_p0_tile_info)
 
 void popper_state::video_start()
 {
-	m_p123_tilemap    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popper_state::get_popper_p123_tile_info),this),    TILEMAP_SCAN_COLS, 8, 8, 33, 32 );
-	m_p0_tilemap      = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popper_state::get_popper_p0_tile_info),this),      TILEMAP_SCAN_COLS, 8, 8, 33, 32);
-	m_ol_p123_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popper_state::get_popper_ol_p123_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
-	m_ol_p0_tilemap   = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popper_state::get_popper_ol_p0_tile_info),this),   TILEMAP_SCAN_COLS, 8, 8, 2, 32);
+	m_p123_tilemap    = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popper_state::get_popper_p123_tile_info),this),    TILEMAP_SCAN_COLS, 8, 8, 33, 32 );
+	m_p0_tilemap      = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popper_state::get_popper_p0_tile_info),this),      TILEMAP_SCAN_COLS, 8, 8, 33, 32);
+	m_ol_p123_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popper_state::get_popper_ol_p123_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
+	m_ol_p0_tilemap   = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popper_state::get_popper_ol_p0_tile_info),this),   TILEMAP_SCAN_COLS, 8, 8, 2, 32);
 
 	m_p123_tilemap->set_transmask(0, 0x0f, 0x01);
 	m_p123_tilemap->set_transmask(1, 0x01, 0x0f);

@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(tunhunt_state::get_fg_tile_info)
 	int color = attr >> 6;
 	int flags = color ? TILE_FORCE_LAYER0 : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, flags);
+	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
 void tunhunt_state::video_start()
@@ -74,7 +74,7 @@ void tunhunt_state::video_start()
 
 	m_tmpbitmap.allocate(256, 64, m_screen->format());
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tunhunt_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tunhunt_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrollx(0, 64);

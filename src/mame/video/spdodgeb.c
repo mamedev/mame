@@ -55,8 +55,7 @@ TILE_GET_INFO_MEMBER(spdodgeb_state::get_bg_tile_info)
 {
 	UINT8 code = m_videoram[tile_index];
 	UINT8 attr = m_videoram[tile_index + 0x800];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code + ((attr & 0x1f) << 8),
 			((attr & 0xe0) >> 5) + 8 * m_tile_palbank,
 			0);
@@ -71,7 +70,7 @@ TILE_GET_INFO_MEMBER(spdodgeb_state::get_bg_tile_info)
 
 void spdodgeb_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spdodgeb_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(spdodgeb_state::background_scan),this),8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spdodgeb_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(spdodgeb_state::background_scan),this),8,8,64,32);
 }
 
 

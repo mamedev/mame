@@ -114,7 +114,7 @@ TILE_GET_INFO_MEMBER(ssozumo_state::get_bg_tile_info)
 	int color = (m_colorram[tile_index] & 0x30) >> 4;
 	int flags = ((tile_index % 32) >= 16) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, flags);
+	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(ssozumo_state::get_fg_tile_info)
@@ -122,15 +122,15 @@ TILE_GET_INFO_MEMBER(ssozumo_state::get_fg_tile_info)
 	int code = m_videoram2[tile_index] + 256 * (m_colorram2[tile_index] & 0x07);
 	int color = (m_colorram2[tile_index] & 0x30) >> 4;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 void ssozumo_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ssozumo_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X,
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ssozumo_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X,
 			16, 16, 16, 32);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ssozumo_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X,
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ssozumo_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X,
 			8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);

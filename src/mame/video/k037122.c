@@ -66,8 +66,8 @@ void k037122_device::device_start()
 	m_tile_ram = auto_alloc_array_clear(machine(), UINT32, 0x20000 / 4);
 	m_reg = auto_alloc_array_clear(machine(), UINT32, 0x400 / 4);
 
-	m_layer[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k037122_device::tile_info_layer0),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_layer[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k037122_device::tile_info_layer1),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_layer[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k037122_device::tile_info_layer0),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_layer[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k037122_device::tile_info_layer1),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
 	m_layer[0]->set_transparent_pen(0);
 	m_layer[1]->set_transparent_pen(0);
@@ -107,7 +107,7 @@ TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer0)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, m_gfx_index, tile, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer1)
@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer1)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, m_gfx_index, tile, color, flags);
+	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, flags);
 }
 
 

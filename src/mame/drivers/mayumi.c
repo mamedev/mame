@@ -64,12 +64,12 @@ TILE_GET_INFO_MEMBER(mayumi_state::get_tile_info)
 	int code = m_videoram[tile_index] + (m_videoram[tile_index + 0x800] & 0x1f) * 0x100;
 	int col = (m_videoram[tile_index + 0x1000] >> 3) & 0x1f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, col, 0);
+	SET_TILE_INFO_MEMBER(0, code, col, 0);
 }
 
 void mayumi_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mayumi_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mayumi_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 WRITE8_MEMBER(mayumi_state::mayumi_videoram_w)

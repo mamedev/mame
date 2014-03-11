@@ -26,8 +26,7 @@ TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info1)
 	UINT8 *videoram = m_videoram;
 	int code;
 	code = videoram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-		0,
+	SET_TILE_INFO_MEMBER(0,
 		code,
 		0,
 		0);
@@ -37,8 +36,7 @@ TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info2)
 {
 	int code;
 	code = m_videoram2[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-		1,
+	SET_TILE_INFO_MEMBER(1,
 		code + (m_char_bank<<8),
 		m_color_select&1,
 		0);
@@ -161,8 +159,8 @@ PALETTE_INIT_MEMBER(pitnrun_state, pitnrun)
 
 void pitnrun_state::video_start()
 {
-	m_fg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pitnrun_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
-	m_bg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pitnrun_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,32*4,32 );
+	m_fg = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pitnrun_state::get_tile_info1),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_bg = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pitnrun_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,32*4,32 );
 	m_fg->set_transparent_pen(0 );
 	m_tmp_bitmap[0] = auto_bitmap_ind16_alloc(machine(),128,128);
 	m_tmp_bitmap[1] = auto_bitmap_ind16_alloc(machine(),128,128);

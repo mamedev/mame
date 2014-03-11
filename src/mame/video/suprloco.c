@@ -78,8 +78,7 @@ PALETTE_INIT_MEMBER(suprloco_state, suprloco)
 TILE_GET_INFO_MEMBER(suprloco_state::get_tile_info)
 {
 	UINT8 attr = m_videoram[2*tile_index+1];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			m_videoram[2*tile_index] | ((attr & 0x03) << 8),
 			(attr & 0x1c) >> 2,
 			0);
@@ -96,7 +95,7 @@ TILE_GET_INFO_MEMBER(suprloco_state::get_tile_info)
 
 void suprloco_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprloco_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(suprloco_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_bg_tilemap->set_scroll_rows(32);
 }

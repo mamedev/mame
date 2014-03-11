@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(mainsnk_state::get_tx_tile_info)
 {
 	int code = m_fgram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,
+	SET_TILE_INFO_MEMBER(0,
 			code,
 			0,
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
@@ -59,8 +59,7 @@ TILE_GET_INFO_MEMBER(mainsnk_state::get_bg_tile_info)
 {
 	int code = (m_bgram[tile_index]);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			m_bg_tile_offset + code,
 			0,
 			0);
@@ -69,8 +68,8 @@ TILE_GET_INFO_MEMBER(mainsnk_state::get_bg_tile_info)
 
 void mainsnk_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mainsnk_state::get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(mainsnk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mainsnk_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,    8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mainsnk_state::get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(mainsnk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mainsnk_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,    8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_scrolldy(8, 8);

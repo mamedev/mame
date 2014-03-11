@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(silvmil_state::get_bg_tile_info)
 	int color = (data >> 12) & 0x0f;
 	int bank = m_silvmil_tilebank[(data&0xc00)>>10]*0x400;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile + bank, color + 0x20, 0);
+	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x20, 0);
 }
 
 TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
 	int color = (data >> 12) & 0x0f;
 	int bank = m_silvmil_tilebank[(data&0xc00)>>10]*0x400;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tile + bank, color + 0x10, 0);
+	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x10, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(silvmil_state::deco16_scan_rows)
@@ -147,8 +147,8 @@ TILEMAP_MAPPER_MEMBER(silvmil_state::deco16_scan_rows)
 
 void silvmil_state::video_start()
 {
-	m_bg_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(silvmil_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
-	m_fg_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(silvmil_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
+	m_bg_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
+	m_fg_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
 
 	m_fg_layer->set_transparent_pen(0);
 }

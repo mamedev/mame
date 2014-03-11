@@ -99,14 +99,14 @@ public:
 TILE_GET_INFO_MEMBER(midas_state::get_tile_info)
 {
 	UINT16 code = m_gfxram[ tile_index + 0x7000 ];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code & 0xfff, (code >> 12) & 0xf, TILE_FLIPXY( 0 ));
+	SET_TILE_INFO_MEMBER(1, code & 0xfff, (code >> 12) & 0xf, TILE_FLIPXY( 0 ));
 }
 
 void midas_state::video_start()
 {
 	m_gfxram = auto_alloc_array(machine(), UINT16, 0x20000/2);
 
-	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(midas_state::get_tile_info),this), TILEMAP_SCAN_COLS,8,8,0x80,0x20);
+	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(midas_state::get_tile_info),this), TILEMAP_SCAN_COLS,8,8,0x80,0x20);
 
 	m_tmap->set_transparent_pen(0);
 }

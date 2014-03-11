@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::get_bg_tile_info)
 	int data = LOW_BYTE(videoram[tile_index * 2]) | (LOW_BYTE(videoram[tile_index * 2 + 1]) << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0xc00);
 	int color = (~data >> 12) & 3;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, TILE_FLIPYX((data >> 10) & 3));
+	SET_TILE_INFO_MEMBER(0, code, color, TILE_FLIPYX((data >> 10) & 3));
 	if (m_gfxdecode->gfx(0)->elements() < 0x1000)
 		tileinfo.category = (data >> 15) & 1;
 }
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::zwackery_get_bg_tile_info)
 	UINT16 *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int color = (data >> 13) & 7;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
+	SET_TILE_INFO_MEMBER(0, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
 }
 
 
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::zwackery_get_fg_tile_info)
 	UINT16 *videoram = m_videoram;
 	int data = videoram[tile_index];
 	int color = (data >> 13) & 7;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
+	SET_TILE_INFO_MEMBER(2, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
 	tileinfo.category = (color != 0);
 }
 
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::zwackery_get_fg_tile_info)
 VIDEO_START_MEMBER(mcr68_state,mcr68)
 {
 	/* initialize the background tilemap */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr68_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr68_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
 	m_bg_tilemap->set_transparent_pen(0);
 }
 
@@ -76,10 +76,10 @@ VIDEO_START_MEMBER(mcr68_state,zwackery)
 	int code, y, x;
 
 	/* initialize the background tilemap */
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr68_state::zwackery_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr68_state::zwackery_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
 
 	/* initialize the foreground tilemap */
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mcr68_state::zwackery_get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr68_state::zwackery_get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	/* allocate memory for the assembled gfx data */

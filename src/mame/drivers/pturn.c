@@ -147,7 +147,7 @@ TILE_GET_INFO_MEMBER(pturn_state::get_pturn_tile_info)
 
 	tileno=tile_lookup[tileno>>4]|(tileno&0xf)|(m_fgbank<<8);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,m_fgpalette,0);
+	SET_TILE_INFO_MEMBER(0,tileno,m_fgpalette,0);
 }
 
 
@@ -161,14 +161,14 @@ TILE_GET_INFO_MEMBER(pturn_state::get_pturn_bg_tile_info)
 	{
 		palno=25;
 	}
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1,tileno+m_bgbank*256,palno,0);
+	SET_TILE_INFO_MEMBER(1,tileno+m_bgbank*256,palno,0);
 }
 
 void pturn_state::video_start()
 {
-	m_fgmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pturn_state::get_pturn_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,32,32);
+	m_fgmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pturn_state::get_pturn_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,32,32);
 	m_fgmap->set_transparent_pen(0);
-	m_bgmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pturn_state::get_pturn_bg_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,32,32*8);
+	m_bgmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pturn_state::get_pturn_bg_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,32,32*8);
 	m_bgmap->set_transparent_pen(0);
 }
 

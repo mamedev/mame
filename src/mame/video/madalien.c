@@ -90,7 +90,7 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_1)
 {
 	UINT8 *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
+	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
 
 
@@ -98,13 +98,13 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_2)
 {
 	UINT8 *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6) + 0x80;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
+	SET_TILE_INFO_MEMBER(1, map[tile_index], BIT(*m_video_flags, 2) ? 2 : 0, 0);
 }
 
 
 TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_FG)
 {
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_videoram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
 }
 
 WRITE8_MEMBER(madalien_state::madalien_videoram_w)
@@ -131,14 +131,14 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 		16, 16, 32, 32
 	};
 
-	m_tilemap_fg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
+	m_tilemap_fg = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_tilemap_fg->set_transparent_pen(0);
 
 	for (i = 0; i < 4; i++)
 	{
-		m_tilemap_edge1[i] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge1[i] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 
-		m_tilemap_edge2[i] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge2[i] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 	}
 
 	m_headlight_bitmap = auto_bitmap_ind16_alloc(machine(), 128, 128);

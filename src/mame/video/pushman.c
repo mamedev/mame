@@ -19,8 +19,7 @@ TILE_GET_INFO_MEMBER(pushman_state::get_back_tile_info)
 	int tile;
 
 	tile = bg_map[tile_index << 1] + (bg_map[(tile_index << 1) + 1] << 8);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2,
+	SET_TILE_INFO_MEMBER(2,
 			(tile & 0xff) | ((tile & 0x4000) >> 6),
 			(tile >> 8) & 0xf,
 			(tile & 0x2000) ? TILE_FLIPX : 0);
@@ -29,8 +28,7 @@ TILE_GET_INFO_MEMBER(pushman_state::get_back_tile_info)
 TILE_GET_INFO_MEMBER(pushman_state::get_text_tile_info)
 {
 	int tile = m_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			(tile & 0xff) | ((tile & 0xc000) >> 6) | ((tile & 0x2000) >> 3),
 			(tile >> 8) & 0xf,
 			(tile & 0x1000) ? TILE_FLIPY : 0);  /* not used? from Tiger Road */
@@ -46,8 +44,8 @@ TILE_GET_INFO_MEMBER(pushman_state::get_text_tile_info)
 
 void pushman_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pushman_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(pushman_state::background_scan_rows),this), 32, 32, 128, 64);
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pushman_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pushman_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(pushman_state::background_scan_rows),this), 32, 32, 128, 64);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pushman_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(3);
 }

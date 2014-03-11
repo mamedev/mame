@@ -83,8 +83,7 @@ TILE_GET_INFO_MEMBER(hcastle_state::get_fg_tile_info)
 				((attr >> (bit2    )) & 0x08) |
 				((attr >> (bit3 - 1)) & 0x10);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			tile + bank * 0x100 + m_pf1_bankbase,
 			((ctrl_6 & 0x30) * 2 + 16) + color,
 			0);
@@ -107,8 +106,7 @@ TILE_GET_INFO_MEMBER(hcastle_state::get_bg_tile_info)
 				((attr >> (bit2    )) & 0x08) |
 				((attr >> (bit3 - 1)) & 0x10);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			tile + bank * 0x100 + m_pf2_bankbase,
 			((ctrl_6 & 0x30) * 2 + 16) + color,
 			0);
@@ -124,8 +122,8 @@ TILE_GET_INFO_MEMBER(hcastle_state::get_bg_tile_info)
 
 void hcastle_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hcastle_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(hcastle_state::tilemap_scan),this), 8, 8, 64, 32);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(hcastle_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(hcastle_state::tilemap_scan),this), 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hcastle_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(hcastle_state::tilemap_scan),this), 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(hcastle_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(hcastle_state::tilemap_scan),this), 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }

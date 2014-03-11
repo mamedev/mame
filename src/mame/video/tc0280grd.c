@@ -71,7 +71,7 @@ void tc0280grd_device::device_config_complete()
 
 void tc0280grd_device::device_start()
 {
-	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0280grd_device::tc0280grd_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0280grd_device::tc0280grd_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap->set_transparent_pen(0);
 
 	m_ram = auto_alloc_array_clear(machine(), UINT16, TC0280GRD_RAM_SIZE / 2);
@@ -99,8 +99,7 @@ void tc0280grd_device::device_reset()
 TILE_GET_INFO_MEMBER(tc0280grd_device::tc0280grd_get_tile_info)
 {
 	int attr = m_ram[tile_index];
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-			m_gfxnum,
+	SET_TILE_INFO_MEMBER(m_gfxnum,
 			attr & 0x3fff,
 			((attr & 0xc000) >> 14) + m_base_color,
 			0);

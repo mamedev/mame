@@ -120,21 +120,21 @@ TILE_GET_INFO_MEMBER(lbeach_state::get_bg_tile_info)
 	// d6,d7: color
 	UINT8 code = m_bg_vram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code & 0x1f, code >> 6 & 3, 0);
+	SET_TILE_INFO_MEMBER(1, code & 0x1f, code >> 6 & 3, 0);
 }
 
 TILE_GET_INFO_MEMBER(lbeach_state::get_fg_tile_info)
 {
 	UINT8 code = m_fg_vram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 void lbeach_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lbeach_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lbeach_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lbeach_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lbeach_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_screen->register_screen_bitmap(m_colmap_car);

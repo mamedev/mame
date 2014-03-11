@@ -153,7 +153,7 @@ TILE_GET_INFO_MEMBER(igs_m027_state::get_tx_tilemap_tile_info)
 	tileno = m_igs_tx_videoram[tile_index] & 0xffff;
 	colour = (m_igs_tx_videoram[tile_index]>>0x10) & 0xffff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
 /* BG Layer */
@@ -172,7 +172,7 @@ TILE_GET_INFO_MEMBER(igs_m027_state::get_bg_tilemap_tile_info)
 	tileno = m_igs_bg_videoram[tile_index] & 0xffff;
 	colour = (m_igs_bg_videoram[tile_index]>>0x10) & 0xffff;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0,tileno,colour,0);
+	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
 
@@ -191,10 +191,10 @@ WRITE32_MEMBER(igs_m027_state::igs_palette32_w)
 
 void igs_m027_state::video_start()
 {
-	m_igs_tx_tilemap= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igs_m027_state::get_tx_tilemap_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_igs_tx_tilemap= &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs_m027_state::get_tx_tilemap_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 	m_igs_tx_tilemap->set_transparent_pen(15);
-	m_igs_bg_tilemap= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igs_m027_state::get_bg_tilemap_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	//m_igs_bg_tilemap= &machine().tilemap().create(tilemap_get_info_delegate(FUNC(igs_m027_state::get_bg_tilemap_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_igs_bg_tilemap= &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs_m027_state::get_bg_tilemap_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	//m_igs_bg_tilemap= &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs_m027_state::get_bg_tilemap_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 	//m_igs_bg_tilemap->set_transparent_pen(15);
 	logerror("Video START OK!\n");
 }

@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_thoop2_screen0)
 
 	tileinfo.category = (data2 >> 6) & 0x03;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03));
+	SET_TILE_INFO_MEMBER(1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03));
 }
 
 
@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_thoop2_screen1)
 
 	tileinfo.category = (data2 >> 6) & 0x03;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03));
+	SET_TILE_INFO_MEMBER(1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03));
 }
 
 /***************************************************************************
@@ -81,8 +81,8 @@ void thoop2_state::video_start()
 {
 	int i;
 
-	m_pant[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_thoop2_screen0),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_pant[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_thoop2_screen1),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_pant[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_thoop2_screen0),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_pant[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(thoop2_state::get_tile_info_thoop2_screen1),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 
 	m_pant[0]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 	m_pant[1]->set_transmask(0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */

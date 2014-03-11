@@ -133,14 +133,14 @@ public:
 TILE_GET_INFO_MEMBER(quizpun2_state::get_bg_tile_info)
 {
 	UINT16 code = m_bg_ram[ tile_index * 2 ] + m_bg_ram[ tile_index * 2 + 1 ] * 256;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(quizpun2_state::get_fg_tile_info)
 {
 	UINT16 code  = m_fg_ram[ tile_index * 4 ] + m_fg_ram[ tile_index * 4 + 1 ] * 256;
 	UINT8  color = m_fg_ram[ tile_index * 4 + 2 ];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color & 0x0f, 0);
+	SET_TILE_INFO_MEMBER(1, code, color & 0x0f, 0);
 }
 
 WRITE8_MEMBER(quizpun2_state::bg_ram_w)
@@ -157,8 +157,8 @@ WRITE8_MEMBER(quizpun2_state::fg_ram_w)
 
 void quizpun2_state::video_start()
 {
-	m_bg_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(quizpun2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,8,16,0x20,0x20);
-	m_fg_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(quizpun2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,8,16,0x20,0x20);
+	m_bg_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpun2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,8,16,0x20,0x20);
+	m_fg_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpun2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,8,16,0x20,0x20);
 
 	m_bg_tmap->set_transparent_pen(0);
 	m_fg_tmap->set_transparent_pen(0);

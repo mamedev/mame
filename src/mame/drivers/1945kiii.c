@@ -97,12 +97,12 @@ WRITE16_MEMBER(k3_state::k3_bgram_w)
 TILE_GET_INFO_MEMBER(k3_state::get_k3_bg_tile_info)
 {
 	int tileno = m_bgram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
 }
 
 void k3_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k3_state::get_k3_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 64);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k3_state::get_k3_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 64);
 }
 
 void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)

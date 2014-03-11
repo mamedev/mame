@@ -112,12 +112,12 @@ PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
 
 TILE_GET_INFO_MEMBER(tiamc1_state::get_bg1_tile_info)
 {
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_tileram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(tiamc1_state::get_bg2_tile_info)
 {
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_tileram[tile_index + 1024], 0, 0);
+	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index + 1024], 0, 0);
 }
 
 void tiamc1_state::video_start()
@@ -136,10 +136,10 @@ void tiamc1_state::video_start()
 
 	save_pointer(NAME(video_ram), 0x3040);
 
-	m_bg_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 
-	m_bg_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 
 	m_bg_vshift = 0;

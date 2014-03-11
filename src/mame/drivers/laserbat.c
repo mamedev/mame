@@ -476,12 +476,12 @@ GFXDECODE_END
 TILE_GET_INFO_MEMBER(laserbat_state::get_tile_info)
 {
 	// wrong color index!
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, m_videoram[tile_index], m_colorram[tile_index] & 0x7f, 0);
+	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], m_colorram[tile_index] & 0x7f, 0);
 }
 
 void laserbat_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(laserbat_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(laserbat_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	save_item(NAME(m_videoram));
 	save_item(NAME(m_colorram));

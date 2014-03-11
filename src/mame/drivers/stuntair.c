@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_fg_tile_info)
 
 	// where does the FG palette come from? it's a 1bpp layer..
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno&0x7f, 0, opaque?TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
+	SET_TILE_INFO_MEMBER(0, tileno&0x7f, 0, opaque?TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
 }
 
 TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
@@ -180,16 +180,16 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
 	tileno |= (m_bgattrram[tile_index] & 0x08)<<5;
 	int colour = (m_bgattrram[tile_index] & 0x07);
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(1, tileno, colour, 0);
 }
 
 
 void stuntair_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

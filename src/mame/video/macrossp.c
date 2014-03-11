@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scra_tile_info)
 			break;
 	}
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
+	SET_TILE_INFO_MEMBER(1, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
 }
 
 /*** SCR B LAYER ***/
@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scrb_tile_info)
 			break;
 	}
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
+	SET_TILE_INFO_MEMBER(2, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
 }
 
 /*** SCR C LAYER ***/
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scrc_tile_info)
 			break;
 	}
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
+	SET_TILE_INFO_MEMBER(3, tileno, color, TILE_FLIPYX((attr & 0xc0000000) >> 30));
 }
 
 /*** TEXT LAYER ***/
@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_text_tile_info)
 	tileno = m_text_videoram[tile_index] & 0x0000ffff;
 	colour = (m_text_videoram[tile_index] & 0x00fe0000) >> 17;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 4, tileno, colour, 0);
+	SET_TILE_INFO_MEMBER(4, tileno, colour, 0);
 }
 
 
@@ -138,10 +138,10 @@ void macrossp_state::video_start()
 	m_spriteram_old = auto_alloc_array_clear(machine(), UINT32, m_spriteram.bytes() / 4);
 	m_spriteram_old2 = auto_alloc_array_clear(machine(), UINT32, m_spriteram.bytes() / 4);
 
-	m_text_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_text_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_scra_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_scra_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_scrb_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_scrb_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_scrc_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_scrc_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_text_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_text_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_scra_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_scra_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_scrb_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_scrb_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_scrc_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(macrossp_state::get_macrossp_scrc_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_text_tilemap->set_transparent_pen(0);
 	m_scra_tilemap->set_transparent_pen(0);

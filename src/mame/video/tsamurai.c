@@ -18,8 +18,7 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_bg_tile_info)
 	int tile_number = m_bg_videoram[2*tile_index];
 	tile_number += (( attributes & 0xc0 ) >> 6 ) * 256;  /* legacy */
 	tile_number += (( attributes & 0x20 ) >> 5 ) * 1024; /* Mission 660 add-on*/
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			tile_number,
 			attributes & 0x1f,
 			0);
@@ -30,8 +29,7 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_fg_tile_info)
 	int tile_number = m_videoram[tile_index];
 	if (m_textbank1 & 0x01) tile_number += 256; /* legacy */
 	if (m_textbank2 & 0x01) tile_number += 512; /* Mission 660 add-on */
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			tile_number,
 			m_colorram[((tile_index&0x1f)*2)+1] & 0x1f,
 			0);
@@ -46,8 +44,8 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_fg_tile_info)
 
 VIDEO_START_MEMBER(tsamurai_state,tsamurai)
 {
-	m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tsamurai_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
-	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tsamurai_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_background = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tsamurai_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tsamurai_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_background->set_transparent_pen(0);
 	m_foreground->set_transparent_pen(0);
@@ -234,8 +232,7 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_vsgongf_tile_info)
 	int tile_number = m_videoram[tile_index];
 	int color = m_vsgongf_color&0x1f;
 	if( m_textbank1 ) tile_number += 0x100;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			tile_number,
 			color,
 			0);
@@ -243,7 +240,7 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_vsgongf_tile_info)
 
 VIDEO_START_MEMBER(tsamurai_state,vsgongf)
 {
-	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tsamurai_state::get_vsgongf_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tsamurai_state::get_vsgongf_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 }
 
 UINT32 tsamurai_state::screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

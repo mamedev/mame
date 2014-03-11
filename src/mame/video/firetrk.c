@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::firetrk_get_tile_info1)
 	if (m_flash)
 		color = color | 0x04;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 
@@ -137,7 +137,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::superbug_get_tile_info1)
 	if (m_flash)
 		color = color | 0x04;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 
@@ -149,7 +149,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::montecar_get_tile_info1)
 	if (m_flash)
 		color = color | 0x04;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, color, 0);
+	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 
@@ -165,7 +165,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::firetrk_get_tile_info2)
 	if ((code & 0x3c) == 0x0c)
 		color = 2;   /* palette 0, 2 */
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::superbug_get_tile_info2)
 	if ((code & 0x38) == 0x00)
 		color = 2;   /* palette 0, 2 */
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code, color, 0);
+	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 
@@ -203,7 +203,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::montecar_get_tile_info2)
 	if ((code & 0x30) == 0x30)
 		color = 0;   /* palette 0, 0 */
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, code & 0x3f, color, 0);
+	SET_TILE_INFO_MEMBER(2, code & 0x3f, color, 0);
 }
 
 
@@ -212,8 +212,8 @@ void firetrk_state::video_start()
 	m_screen->register_screen_bitmap(m_helper1);
 	m_screen->register_screen_bitmap(m_helper2);
 
-	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(firetrk_state::firetrk_get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(firetrk_state::firetrk_get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrk_state::firetrk_get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrk_state::firetrk_get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 
@@ -222,8 +222,8 @@ VIDEO_START_MEMBER(firetrk_state,superbug)
 	m_screen->register_screen_bitmap(m_helper1);
 	m_screen->register_screen_bitmap(m_helper2);
 
-	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(firetrk_state::superbug_get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(firetrk_state::superbug_get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrk_state::superbug_get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrk_state::superbug_get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 
@@ -232,8 +232,8 @@ VIDEO_START_MEMBER(firetrk_state,montecar)
 	m_screen->register_screen_bitmap(m_helper1);
 	m_screen->register_screen_bitmap(m_helper2);
 
-	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(firetrk_state::montecar_get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(firetrk_state::montecar_get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrk_state::montecar_get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrk_state::montecar_get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 

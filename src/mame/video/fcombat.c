@@ -16,7 +16,7 @@ TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 
 	tileno = memregion("user1")->base()[tile_index];
 	palno = 0x18; //memregion("user2")->base()[tile_index] >> 3;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 2, tileno, palno, 0);
+	SET_TILE_INFO_MEMBER(2, tileno, palno, 0);
 }
 
 
@@ -98,7 +98,7 @@ PALETTE_INIT_MEMBER(fcombat_state, fcombat)
 
 void fcombat_state::video_start()
 {
-	m_bgmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fcombat_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32 * 8 * 2, 32);
+	m_bgmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(fcombat_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32 * 8 * 2, 32);
 }
 
 

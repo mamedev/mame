@@ -332,7 +332,7 @@ TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
 void popeye_state::video_start()
@@ -342,7 +342,7 @@ void popeye_state::video_start()
 
 	m_bitmap_type = TYPE_SKYSKIPR;
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_lastflip = 0;
@@ -361,7 +361,7 @@ VIDEO_START_MEMBER(popeye_state,popeye)
 
 	m_bitmap_type = TYPE_POPEYE;
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
     m_lastflip = 0;

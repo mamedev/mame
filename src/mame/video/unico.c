@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(unico_state::get_tile_info)
 	UINT16 *vram = (UINT16 *)tilemap.user_data();
 	UINT16 code = vram[2 * tile_index + 0 ];
 	UINT16 attr = vram[2 * tile_index + 1 ];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
+	SET_TILE_INFO_MEMBER(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
 }
 
 READ16_MEMBER(unico_state::unico_vram_r) { return m_vram[offset]; }
@@ -133,13 +133,13 @@ VIDEO_START_MEMBER(unico_state,unico)
 	save_pointer(NAME(m_scroll), 0x18/2);
 	save_pointer(NAME(m_spriteram), 0x800/2);
 
-	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
+	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
 									16,16,  0x40, 0x40);
 
-	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
+	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
 									16,16,  0x40, 0x40);
 
-	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
+	m_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
 									16,16,  0x40, 0x40);
 
 	m_tilemap[0]->set_user_data(&m_vram[0x8000/2]);

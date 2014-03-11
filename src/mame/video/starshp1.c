@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(starshp1_state::get_tile_info)
 {
 	UINT8 code = m_playfield_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code & 0x3f, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code & 0x3f, 0, 0);
 }
 
 
@@ -56,7 +56,7 @@ void starshp1_state::video_start()
 
 	int i;
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(starshp1_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  16, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(starshp1_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  16, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 

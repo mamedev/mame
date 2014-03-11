@@ -59,9 +59,9 @@ void tc0180vcu_device::device_config_complete()
 
 void tc0180vcu_device::device_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
@@ -231,9 +231,7 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_bg_tile_info)
 	int tile  = m_ram[tile_index + m_bg_rambank[0]];
 	int color = m_ram[tile_index + m_bg_rambank[1]];
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-		1,
-		tile,
+	SET_TILE_INFO_MEMBER(1, tile,
 		m_bg_color_base + (color & 0x3f),
 		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
@@ -243,9 +241,7 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_fg_tile_info)
 	int tile  = m_ram[tile_index + m_fg_rambank[0]];
 	int color = m_ram[tile_index + m_fg_rambank[1]];
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-		1,
-		tile,
+	SET_TILE_INFO_MEMBER(1, tile,
 		m_fg_color_base + (color & 0x3f),
 		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
@@ -254,8 +250,7 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_tx_tile_info)
 {
 	int tile = m_ram[tile_index + m_tx_rambank];
 
-	SET_TILE_INFO_MEMBER(*m_gfxdecode, 
-		0,
+	SET_TILE_INFO_MEMBER(0,
 		(tile & 0x07ff) | ((m_ctrl[4 + ((tile & 0x800) >> 11)]>>8) << 11),
 		m_tx_color_base + ((tile >> 12) & 0x0f),
 		0);

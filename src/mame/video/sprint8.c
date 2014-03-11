@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info1)
 
 	}
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	SET_TILE_INFO_MEMBER(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 
@@ -96,7 +96,7 @@ TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info2)
 	else
 		color = 17;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	SET_TILE_INFO_MEMBER(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 
@@ -113,8 +113,8 @@ void sprint8_state::video_start()
 	m_screen->register_screen_bitmap(m_helper1);
 	m_screen->register_screen_bitmap(m_helper2);
 
-	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sprint8_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
-	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sprint8_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sprint8_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sprint8_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 
 	m_tilemap1->set_scrolly(0, +24);
 	m_tilemap2->set_scrolly(0, +24);

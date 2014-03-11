@@ -19,14 +19,14 @@
 TILE_GET_INFO_MEMBER(suprridr_state::get_tile_info)
 {
 	UINT8 code = m_bgram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, 0, 0);
+	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 
 TILE_GET_INFO_MEMBER(suprridr_state::get_tile_info2)
 {
 	UINT8 code = m_fgram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, code, 0, 0);
+	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
 
@@ -39,9 +39,9 @@ TILE_GET_INFO_MEMBER(suprridr_state::get_tile_info2)
 
 void suprridr_state::video_start()
 {
-	m_fg_tilemap          = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info2),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
-	m_bg_tilemap          = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info),this),  TILEMAP_SCAN_ROWS,       8,8, 32,32);
-	m_bg_tilemap_noscroll = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info),this),  TILEMAP_SCAN_ROWS,       8,8, 32,32);
+	m_fg_tilemap          = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info2),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_bg_tilemap          = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info),this),  TILEMAP_SCAN_ROWS,       8,8, 32,32);
+	m_bg_tilemap_noscroll = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(suprridr_state::get_tile_info),this),  TILEMAP_SCAN_ROWS,       8,8, 32,32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }

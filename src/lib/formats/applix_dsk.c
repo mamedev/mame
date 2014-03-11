@@ -27,7 +27,7 @@ const char *applix_format::description() const
 
 const char *applix_format::extensions() const
 {
-	return "dsk";
+	return "raw";
 }
 
 // Unverified gap sizes

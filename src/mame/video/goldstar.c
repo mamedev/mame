@@ -63,8 +63,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_fg_tile_info)
 	int code = m_fg_vidram[tile_index];
 	int attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code | (attr & 0xf0)<<4,
 			attr&0x0f,
 			0);
@@ -75,8 +74,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_magical_fg_tile_info)
 	int code = m_fg_vidram[tile_index];
 	int attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			(code | (attr & 0xf0)<<4)+m_tile_bank*0x1000,
 			attr&0x0f,
 			0);
@@ -89,8 +87,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_fg_tile_info)
 	int code = m_fg_vidram[tile_index];
 	int attr = m_fg_atrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code | (attr & 0x0f)<<8,
 			(attr&0xf0)>>4,
 			0);
@@ -108,8 +105,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel1_tile_info)
 {
 	int code = m_reel1_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code,
 			m_bgcolor,
 			0);
@@ -126,8 +122,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel2_tile_info)
 {
 	int code = m_reel2_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code,
 			m_bgcolor,
 			0);
@@ -143,8 +138,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel3_tile_info)
 {
 	int code = m_reel3_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code,
 			m_bgcolor,
 			0);
@@ -175,8 +169,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_unkch_reel1_tile_info)
 	int code = m_reel1_ram[tile_index];
 	int attr = m_reel1_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code | (attr & 0x0f)<<8,
 			(attr&0xf0)>>4,
 			0);
@@ -187,8 +180,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_unkch_reel2_tile_info)
 	int code = m_reel2_ram[tile_index];
 	int attr = m_reel2_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code | (attr & 0x0f)<<8,
 			(attr&0xf0)>>4,
 			0);
@@ -199,8 +191,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_unkch_reel3_tile_info)
 	int code = m_reel3_ram[tile_index];
 	int attr = m_reel3_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code | (attr & 0x0f)<<8,
 			(attr&0xf0)>>4,
 			0);
@@ -211,15 +202,15 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_unkch_reel3_tile_info)
 
 VIDEO_START_MEMBER(goldstar_state,goldstar)
 {
-	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 	m_reel2_tilemap->set_scroll_cols(64);
 	m_reel3_tilemap->set_scroll_cols(64);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	// is there an enable reg for this game?
@@ -228,11 +219,11 @@ VIDEO_START_MEMBER(goldstar_state,goldstar)
 
 VIDEO_START_MEMBER(goldstar_state,bingowng)
 {
-	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	// is there an enable reg for this game?
@@ -241,15 +232,15 @@ VIDEO_START_MEMBER(goldstar_state,bingowng)
 
 VIDEO_START_MEMBER(goldstar_state,magical)
 {
-	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(32);
 	m_reel2_tilemap->set_scroll_cols(32);
 	m_reel3_tilemap->set_scroll_cols(32);
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_magical_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_magical_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	// is there an enable reg for this game?
@@ -258,9 +249,9 @@ VIDEO_START_MEMBER(goldstar_state,magical)
 
 VIDEO_START_MEMBER(goldstar_state,unkch)
 {
-	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(32);
 	m_reel2_tilemap->set_scroll_cols(32);
@@ -270,7 +261,7 @@ VIDEO_START_MEMBER(goldstar_state,unkch)
 	m_cmaster_girl_pal = 0;
 	m_unkch_vidreg = 0x00;
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_cherrym_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_cherrym_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_cm_enable_reg = 0x0b;
@@ -278,9 +269,9 @@ VIDEO_START_MEMBER(goldstar_state,unkch)
 
 VIDEO_START_MEMBER(goldstar_state,cherrym)
 {
-	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 	m_reel2_tilemap->set_scroll_cols(64);
@@ -289,7 +280,7 @@ VIDEO_START_MEMBER(goldstar_state,cherrym)
 	m_cmaster_girl_num = 0;
 	m_cmaster_girl_pal = 0;
 
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_cherrym_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_cherrym_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_cm_enable_reg = 0x0b;

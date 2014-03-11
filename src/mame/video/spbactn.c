@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_bg_tile_info)
 {
 	int attr = m_bgvideoram[tile_index];
 	int tileno = m_bgvideoram[tile_index+0x2000];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 1, tileno, ((attr & 0x00f0)>>4)+0x80, 0);
+	SET_TILE_INFO_MEMBER(1, tileno, ((attr & 0x00f0)>>4)+0x80, 0);
 }
 
 
@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_fg_tile_info)
 	else
 		color |= 0x0080;
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, tileno, color, 0);
+	SET_TILE_INFO_MEMBER(0, tileno, color, 0);
 }
 
 
@@ -77,8 +77,8 @@ VIDEO_START_MEMBER(spbactn_state,spbactn)
 	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
 	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
 
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spbactn_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spbactn_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spbactn_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spbactn_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -88,7 +88,7 @@ VIDEO_START_MEMBER(spbactn_state,spbactnp)
 {
 	VIDEO_START_CALL_MEMBER(spbactn);
 	// no idea..
-	m_extra_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spbactn_state::get_extra_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 16, 16);
+	m_extra_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spbactn_state::get_extra_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 16, 16);
 }
 WRITE16_MEMBER( spbactn_state::spbatnp_90002_w )
 {
@@ -140,7 +140,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_extra_tile_info)
 {
 	int tileno = m_extraram[(tile_index*2)+1];
 	tileno |= m_extraram[(tile_index*2)] << 8;
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 3, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(3, tileno, 0, 0);
 }
 
 

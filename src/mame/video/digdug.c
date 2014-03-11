@@ -97,8 +97,7 @@ TILE_GET_INFO_MEMBER(digdug_state::bg_get_tile_info)
 	   tilemap RAM, therefore allowing to pick some bits of the color code from
 	   the top 4 bits of alpha code. This feature is not used by Dig Dug. */
 	int color = m_bg_disable ? 0xf : (code >> 4);
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			2,
+	SET_TILE_INFO_MEMBER(2,
 			code,
 			color | m_bg_color_bank,
 			0);
@@ -124,8 +123,7 @@ TILE_GET_INFO_MEMBER(digdug_state::tx_get_tile_info)
 	   timing signals, while x flip is done by selecting the 2nd character set.
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			(code & 0x7f) | (flip_screen() ? 0x80 : 0),
 			color,
 			flip_screen() ? TILE_FLIPX : 0);
@@ -141,8 +139,8 @@ TILE_GET_INFO_MEMBER(digdug_state::tx_get_tile_info)
 
 VIDEO_START_MEMBER(digdug_state,digdug)
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(digdug_state::bg_get_tile_info),this),tilemap_mapper_delegate(FUNC(digdug_state::tilemap_scan),this),8,8,36,28);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(digdug_state::tx_get_tile_info),this),tilemap_mapper_delegate(FUNC(digdug_state::tilemap_scan),this),8,8,36,28);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(digdug_state::bg_get_tile_info),this),tilemap_mapper_delegate(FUNC(digdug_state::tilemap_scan),this),8,8,36,28);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(digdug_state::tx_get_tile_info),this),tilemap_mapper_delegate(FUNC(digdug_state::tilemap_scan),this),8,8,36,28);
 
 	m_fg_tilemap->set_transparent_pen(0);
 

@@ -359,6 +359,8 @@ enum tilemap_standard_mapper
 // primitives
 #define MCFG_TILEMAP_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, TILEMAP, 0)
+#define MCFG_TILEMAP_GFXDECODE(_gfxtag) \
+	tilemap_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 #define MCFG_TILEMAP_BYTES_PER_ENTRY(_bpe) \
 	tilemap_device::static_set_bytes_per_entry(*device, _bpe);
 #define MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
@@ -377,27 +379,31 @@ enum tilemap_standard_mapper
 	tilemap_device::static_set_transparent_pen(*device, _pen);
 
 // common cases
-#define MCFG_TILEMAP_ADD_STANDARD(_tag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows) \
+#define MCFG_TILEMAP_ADD_STANDARD(_tag, _gfxtag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows) \
 	MCFG_TILEMAP_ADD(_tag) \
+	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
 	MCFG_TILEMAP_BYTES_PER_ENTRY(_bytes_per_entry) \
 	MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
 	MCFG_TILEMAP_LAYOUT_STANDARD(_mapper, _columns, _rows) \
 	MCFG_TILEMAP_TILE_SIZE(_tilewidth, _tileheight)
-#define MCFG_TILEMAP_ADD_CUSTOM(_tag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows) \
+#define MCFG_TILEMAP_ADD_CUSTOM(_tag, _gfxtag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows) \
 	MCFG_TILEMAP_ADD(_tag) \
+	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
 	MCFG_TILEMAP_BYTES_PER_ENTRY(_bytes_per_entry) \
 	MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
 	MCFG_TILEMAP_LAYOUT_CB_DRIVER(_class, _mapper, _columns, _rows) \
 	MCFG_TILEMAP_TILE_SIZE(_tilewidth, _tileheight)
-#define MCFG_TILEMAP_ADD_STANDARD_TRANSPEN(_tag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows, _transpen) \
+#define MCFG_TILEMAP_ADD_STANDARD_TRANSPEN(_tag, _gfxtag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows, _transpen) \
 	MCFG_TILEMAP_ADD(_tag) \
+	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
 	MCFG_TILEMAP_BYTES_PER_ENTRY(_bytes_per_entry) \
 	MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
 	MCFG_TILEMAP_LAYOUT_STANDARD(_mapper, _columns, _rows) \
 	MCFG_TILEMAP_TILE_SIZE(_tilewidth, _tileheight) \
 	MCFG_TILEMAP_TRANSPARENT_PEN(_transpen)
-#define MCFG_TILEMAP_ADD_CUSTOM_TRANSPEN(_tag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows, _transpen) \
+#define MCFG_TILEMAP_ADD_CUSTOM_TRANSPEN(_tag, _gfxtag, _bytes_per_entry, _class, _method, _tilewidth, _tileheight, _mapper, _columns, _rows, _transpen) \
 	MCFG_TILEMAP_ADD(_tag) \
+	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
 	MCFG_TILEMAP_BYTES_PER_ENTRY(_bytes_per_entry) \
 	MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
 	MCFG_TILEMAP_LAYOUT_CB_DRIVER(_columns, _mapper, _rows, _class) \
@@ -423,6 +429,7 @@ typedef UINT32 tilemap_memory_index;
 // tile_data is filled in by the get_tile_info callback
 struct tile_data
 {
+	gfxdecode_device *decoder;      // set in tilemap_t::init()
 	const UINT8 *   pen_data;       // required
 	const UINT8 *   mask_data;      // required
 	pen_t           palette_base;   // defaults to 0
@@ -430,13 +437,11 @@ struct tile_data
 	UINT8           group;          // defaults to 0; range from 0..TILEMAP_NUM_GROUPS
 	UINT8           flags;          // defaults to 0; one or more of TILE_* flags above
 	UINT8           pen_mask;       // defaults to 0xff; mask to apply to pen_data while rendering the tile
-	UINT8           gfxnum;         // defaults to 0xff; specify index of machine.gfx for auto-invalidation on dirty
-	gfxdecode_device *decoder;
+	UINT8           gfxnum;         // defaults to 0xff; specify index of gfx for auto-invalidation on dirty
 	
-	void set(gfxdecode_device &_decoder, int _gfxnum, int rawcode, int rawcolor, int _flags)
+	void set(int _gfxnum, int rawcode, int rawcolor, int _flags)
 	{
-		decoder = &_decoder;
-		gfx_element *gfx = _decoder.gfx(_gfxnum);
+		gfx_element *gfx = decoder->gfx(_gfxnum);
 		int code = rawcode % gfx->elements();
 		pen_data = gfx->get_data(code);
 		palette_base = gfx->colorbase() + gfx->granularity() * rawcolor;
@@ -480,7 +485,7 @@ protected:
 	tilemap_t();
 	virtual ~tilemap_t();
 
-	tilemap_t &init(tilemap_manager &manager, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows);
+	tilemap_t &init(tilemap_manager &manager, gfxdecode_device &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows);
 
 public:
 	// getters
@@ -677,8 +682,8 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 	// tilemap creation
-	tilemap_t &create(tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = NULL);
-	tilemap_t &create(tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = NULL);
+	tilemap_t &create(gfxdecode_device &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = NULL);
+	tilemap_t &create(gfxdecode_device &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = NULL);
 
 	// tilemap list information
 	tilemap_t *find(int index) { return m_tilemap_list.find(index); }
@@ -712,6 +717,7 @@ public:
 	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration
+	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_bytes_per_entry(device_t &device, int bpe);
 	static void static_set_info_callback(device_t &device, tilemap_get_info_delegate tile_get_info);
 	static void static_set_layout(device_t &device, tilemap_standard_mapper mapper, int columns, int rows);
@@ -735,6 +741,9 @@ protected:
 	virtual void device_start();
 
 private:
+	// devices
+	required_device<gfxdecode_device> m_gfxdecode;
+
 	// configuration state
 	tilemap_get_info_delegate m_get_info;
 	tilemap_standard_mapper m_standard_mapper;
@@ -765,7 +774,7 @@ private:
 #define TILEMAP_MAPPER_MEMBER(_name)    tilemap_memory_index _name(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 
 // useful macro inside of a TILE_GET_INFO callback to set tile information
-#define SET_TILE_INFO_MEMBER(DECODER,GFX,CODE,COLOR,FLAGS)  tileinfo.set(DECODER, GFX, CODE, COLOR, FLAGS)
+#define SET_TILE_INFO_MEMBER(GFX,CODE,COLOR,FLAGS)  tileinfo.set(GFX, CODE, COLOR, FLAGS)
 
 // Macros for setting tile attributes in the TILE_GET_INFO callback:
 //   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0

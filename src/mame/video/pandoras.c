@@ -88,8 +88,7 @@ PALETTE_INIT_MEMBER(pandoras_state, pandoras)
 TILE_GET_INFO_MEMBER(pandoras_state::get_tile_info0)
 {
 	UINT8 attr = m_colorram[tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			m_videoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x0f,
 			TILE_FLIPYX((attr & 0xc0) >> 6));
@@ -104,7 +103,7 @@ TILE_GET_INFO_MEMBER(pandoras_state::get_tile_info0)
 
 void pandoras_state::video_start()
 {
-	m_layer0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pandoras_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pandoras_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	save_item(NAME(m_flipscreen));
 }

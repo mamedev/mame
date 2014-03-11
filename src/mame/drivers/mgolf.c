@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(mgolf_state::get_tile_info)
 {
 	UINT8 code = m_video_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 0, code, code >> 7, 0);
+	SET_TILE_INFO_MEMBER(0, code, code >> 7, 0);
 }
 
 
@@ -78,7 +78,7 @@ WRITE8_MEMBER(mgolf_state::mgolf_vram_w)
 
 void mgolf_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mgolf_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mgolf_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

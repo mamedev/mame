@@ -19,8 +19,7 @@ TILE_GET_INFO_MEMBER(goindol_state::get_fg_tile_info)
 {
 	int code = m_fg_videoram[2 * tile_index + 1];
 	int attr = m_fg_videoram[2 * tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			0,
+	SET_TILE_INFO_MEMBER(0,
 			code | ((attr & 0x7) << 8) | (m_char_bank << 11),
 			(attr & 0xf8) >> 3,
 			0);
@@ -30,8 +29,7 @@ TILE_GET_INFO_MEMBER(goindol_state::get_bg_tile_info)
 {
 	int code = m_bg_videoram[2 * tile_index + 1];
 	int attr = m_bg_videoram[2 * tile_index];
-	SET_TILE_INFO_MEMBER(m_gfxdecode, 
-			1,
+	SET_TILE_INFO_MEMBER(1,
 			code | ((attr & 0x7) << 8) | (m_char_bank << 11),
 			(attr & 0xf8) >> 3,
 			0);
@@ -47,8 +45,8 @@ TILE_GET_INFO_MEMBER(goindol_state::get_bg_tile_info)
 
 void goindol_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goindol_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goindol_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goindol_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goindol_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
