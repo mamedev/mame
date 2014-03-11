@@ -761,6 +761,18 @@ void palette_device::palette_init_monochrome_green(palette_device &palette)
 
 
 /*-------------------------------------------------
+    palette_init_monochrome_green_highlight - 3-color black & green
+-------------------------------------------------*/
+
+void palette_device::palette_init_monochrome_green_highlight(palette_device &palette)
+{
+	palette.set_pen_color(0, rgb_t::black); // black
+	palette.set_pen_color(1, rgb_t(0x00, 0x80, 0x00)); // green
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
+}
+
+
+/*-------------------------------------------------
     RRRR_GGGG_BBBB - standard 4-4-4 palette,
     assuming the commonly used resistor values:
 
