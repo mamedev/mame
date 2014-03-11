@@ -157,7 +157,7 @@ struct cps3_voice
 
 	UINT32 regs[8];
 	UINT32 pos;
-	UINT16 frac;
+	UINT32 frac;
 };
 
 // ======================> cps3_sound_device
