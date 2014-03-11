@@ -867,6 +867,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
 	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
 	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/6, hgdc_intf, upd7220_map) // unk clock
+	MCFG_VIDEO_SET_SCREEN("screen")
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir2_w))
 	MCFG_UPD765A_ADD("upd765", true, true)
