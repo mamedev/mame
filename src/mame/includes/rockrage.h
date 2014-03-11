@@ -48,8 +48,8 @@ public:
 	DECLARE_PALETTE_INIT(rockrage);
 	UINT32 screen_update_rockrage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rockrage_interrupt);
+	void set_pens();
+	K007342_CALLBACK_MEMBER(rockrage_tile_callback);
 };
 
-/*----------- defined in video/rockrage.c -----------*/
-void rockrage_tile_callback(running_machine &machine, int layer, int bank, int *code, int *color, int *flags);
 void rockrage_sprite_callback(running_machine &machine, int *code, int *color);

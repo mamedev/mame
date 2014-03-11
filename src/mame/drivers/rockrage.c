@@ -220,11 +220,6 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static const k007342_interface rockrage_k007342_intf =
-{
-	0,  rockrage_tile_callback
-};
-
 static const k007420_interface rockrage_k007420_intf =
 {
 	0x3ff, rockrage_sprite_callback
@@ -267,7 +262,9 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rockrage_state, screen_update_rockrage)
 
-	MCFG_K007342_ADD("k007342", rockrage_k007342_intf)
+	MCFG_K007342_ADD("k007342")
+	MCFG_K007342_GFXNUM(0)
+	MCFG_K007342_CALLBACK_OWNER(rockrage_state, rockrage_tile_callback)
 	MCFG_K007342_GFXDECODE("gfxdecode")
 	
 	MCFG_K007420_ADD("k007420", rockrage_k007420_intf)

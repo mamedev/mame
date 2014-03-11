@@ -49,7 +49,9 @@ k007342_device::k007342_device(const machine_config &mconfig, const char *tag, d
 	//m_regs[8],
 	//m_scrollx[2],
 	//m_scrolly[2],
-	m_gfxdecode(*this)
+	m_gfxdecode(*this),
+	m_callback(k007342_delegate()),
+	m_gfxnum(0)
 {
 }
 
@@ -64,32 +66,14 @@ void k007342_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k007342_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const k007342_interface *intf = reinterpret_cast<const k007342_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<k007342_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_gfxnum = 0;
-		m_callback = NULL;
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void k007342_device::device_start()
 {
+	// bind the init function
+    m_callback.bind_relative_to(*owner());
+	
 	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info0),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
 	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info1),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
 
@@ -295,8 +279,10 @@ void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, int lay
 	flags = TILE_FLIPYX((color & 0x30) >> 4);
 
 	tileinfo.category = (color & 0x80) >> 7;
-
-	m_callback(machine(), layer, m_regs[1], &code, &color, &flags);
+	
+	if (!m_callback.isnull())
+		m_callback(layer, m_regs[1], &code, &color, &flags);
+	
 
 	SET_TILE_INFO_MEMBER(m_gfxnum,
 			code,

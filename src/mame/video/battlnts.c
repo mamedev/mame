@@ -7,12 +7,10 @@
 
 ***************************************************************************/
 
-void battlnts_tile_callback(running_machine &machine, int layer, int bank, int *code, int *color, int *flags)
+K007342_CALLBACK_MEMBER(battlnts_state::battlnts_tile_callback)
 {
-	battlnts_state *state = machine.driver_data<battlnts_state>();
-
 	*code |= ((*color & 0x0f) << 9) | ((*color & 0x40) << 2);
-	*color = state->m_layer_colorbase[layer];
+	*color = m_layer_colorbase[layer];
 }
 
 /***************************************************************************

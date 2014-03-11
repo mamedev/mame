@@ -40,8 +40,8 @@ public:
 	INTERRUPT_GEN_MEMBER(battlnts_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	K007342_CALLBACK_MEMBER(battlnts_tile_callback);
 };
 
 /*----------- defined in video/battlnts.c -----------*/
-void battlnts_tile_callback(running_machine &machine, int layer, int bank, int *code, int *color, int *flags);
 void battlnts_sprite_callback(running_machine &machine, int *code, int *color);
