@@ -853,6 +853,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 
 	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL_4_9152MHz/2/2)
 	MCFG_HD61830_RD_CALLBACK(READ8(portfolio_state, hd61830_rd_r))
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
