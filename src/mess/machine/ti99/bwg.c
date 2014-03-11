@@ -560,6 +560,13 @@ void snug_bwg_device::device_reset()
 	m_selected = false;
 	m_debug_dataout = false;
 	m_rtc_enabled = false;
+	m_dataregLB = false;
+	m_lastK = false;
+	m_RTCsel = false;
+	m_inDsrArea = false;
+	m_address = 0;
+	m_WDsel = false;
+	m_WDsel0 = false;
 
 	for (int i=0; i < 4; i++)
 	{
