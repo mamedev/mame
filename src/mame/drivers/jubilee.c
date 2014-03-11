@@ -8,7 +8,7 @@
 
   Games running on this hardware:
 
-  * Double-Up Poker (Jubilee),  198?,  Jubilee.
+  * Double-Up Poker (Jubilee),  1985,  Jubilee.
 
 
 *****************************************************************************************
@@ -27,17 +27,17 @@
   Jubilee Sales Pty Ltd.
   BD No V63-261 ISS1.
 
-  1x TMS9980 CPU
-  1x MC6845P CRTC
+  1x TMS9980 CPU.
+  1x MC6845P CRTC.
 
   1x TC5517AP-2 (2048 words x 8 bits Asynchronous CMOS Static RAM), tied to a battery.
-  1x 2114       (1024 words x 4 bits RAM)
+  1x 2114       (1024 words x 4 bits RAM).
 
   3x 2732 labelled 1, 2 and 3.
-  3x 2764 labelled Red Blue and Green.
+  3x 2764 labelled Red, Blue and Green (the last one also has '22-3-85'). 
 
   1x 6.0 MHz crystal.
-  1x Unknown lithium battery.
+  1x Panasonic BR-2/3A lithium battery (3V, 1200 mAh).
 
 
   From some forums...
@@ -122,6 +122,7 @@
   0080-0080    ; Unknown Read. Maybe a leftover.
   00C8-00C8    ; Multiplexed Input Port.
   0CC2-0CC6    ; Input Port mux selectors.
+  0CD0-0CD4    ; Lamps.
   0CE2-0CE2    ; Clear Interrupts line.
 
 
@@ -211,6 +212,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	UINT8 mux_sel;
+	UINT8 muxlamps;
 	
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
@@ -328,7 +330,12 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 		m_maincpu->set_input_line(INT_9980A_LEVEL1, CLEAR_LINE);
 	}
 
-	/* Inputs Multiplexion */
+/*  Inputs Multiplexion...
+
+    Should be 0CC0 added as selector?
+    Was tested and didn't see any input driven by its state.
+    This doesn't mean that couln't be possible.
+*/
 
 	if (((offset<<1)==0x0cc2)&&(data==1))
 	{
@@ -345,12 +352,202 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 		mux_sel = 3;
 	}
 
+
+/*  Lamps, sounds and other writes:
+
+    0CD0 = HOLD3 lamp.
+    0CD2 = HOLD2 lamp.
+    0CD4 = HOLD1 lamp.
+	
+    Can't find more. Could be a kind of multiplexion.
+    The input selectors don't seems to be completely involved,
+    but 0CC6 is set to 1 when hold 1-2-3 turn on, thing that
+    could be normal due to the end value for the state routine.
+
+    Writes to analize:
+    0CC0 (write too often... maybe input selector)
+    0CCC (write a bit less often...)
+	
+    0CE6 = could be either a 'Insert Coin' lamp,
+    or coin lockout (inverted), since is active
+    low during the game. when the game is over,
+    is set to 1.
+
+    Also...
+
+    Pressing cancel ---> writes 1 to 0CE8
+    Pressing bet ------> writes 1 to 0CEA
+    Pressing hold4 ----> writes 1 to 0CEC
+    Pressing hold5 ----> writes 1 to 0CEE
+    Pressing hand pay -> writes 1 to 0CF0
+    Pressing hold1 ----> writes 1 to 0CF2
+    Pressing hold2 ----> writes 1 to 0CF4
+    Pressing hold3 ----> writes 1 to 0CF6
+    Pressing reset ----> writes 1 to 0CF8
+    Pressing deal -----> writes 1 to 0D00
+
+	(See below, in sound writes...)
+*/
+
+	if (((offset<<1)==0x0ccc)&&(data==1))
+	{
+		muxlamps = 1;
+	}
+	if (((offset<<1)==0x0ccc)&&(data==0))
+	{
+		muxlamps = 2;
+	}
+
+/*  the following structure has 3 states, because I tested the inputs
+    selectors 0CC2-0CC4-0CC6 as lamps multiplexers unsuccessfuly.   
+*/
+	if (((offset<<1)==0x0cd0)&&(data==1))
+	{
+		if (muxlamps == 1)
+			{
+				output_set_lamp_value(0, (data & 1));  /* lamp */
+				logerror("CRU: LAAAAAAMP 0 write to address %04x: %d\n", offset<<1, data & 1);
+//				popmessage("LAMP 0");
+			}
+		if (muxlamps == 2)
+			{
+				output_set_lamp_value(3, (data & 1));  /* lamp */
+				logerror("CRU: LAAAAAAMP 3 write to address %04x: %d\n", offset<<1, data & 1);
+//				popmessage("LAMP 3");
+			}
+		if (muxlamps == 3)
+			{
+				output_set_lamp_value(6, (data & 1));  /* lamp */
+				logerror("CRU: LAAAAAAMP 6 write to address %04x: %d\n", offset<<1, data & 1);
+//				popmessage("LAMP 6");
+			}
+	}
+	
+	if (((offset<<1)==0x0cd2)&&(data==1))
+	{
+		if (muxlamps == 1)
+			{
+				output_set_lamp_value(1, (data & 1));  /* lamp */
+				logerror("CRU: LAAAAAAMP 1 write to address %04x: %d\n", offset<<1, data & 1);
+//				popmessage("LAMP 1");
+			}
+		if (muxlamps == 2)
+			{
+				output_set_lamp_value(4, (data & 1));  /* lamp */
+				logerror("CRU: LAAAAAAMP 4 write to address %04x: %d\n", offset<<1, data & 1);
+//				popmessage("LAMP 4");
+			}
+		if (muxlamps == 3)
+			{
+				output_set_lamp_value(7, (data & 1));  /* lamp */
+				logerror("CRU: LAAAAAAMP 7 write to address %04x: %d\n", offset<<1, data & 1);
+//				popmessage("LAMP 7");
+			}
+	}
+	
+	if (((offset<<1)==0x0cd4)&&(data==1))
+	{
+		if (muxlamps == 1)
+			{
+				output_set_lamp_value(2, (data & 1));  /* lamp */
+				logerror("CRU: LAAAAAAMP 2 write to address %04x: %d\n", offset<<1, data & 1);
+//				popmessage("LAMP 2");
+			}
+		if (muxlamps == 2)
+			{
+				output_set_lamp_value(5, (data & 1));  /* lamp */
+				logerror("CRU: LAAAAAAMP 5 write to address %04x: %d\n", offset<<1, data & 1);
+//				popmessage("LAMP 5");
+			}
+		if (muxlamps == 3)
+			{
+				output_set_lamp_value(8, (data & 1));  /* lamp */
+				logerror("CRU: LAAAAAAMP 8 write to address %04x: %d\n", offset<<1, data & 1);
+//				popmessage("LAMP 8");
+			}
+	}
+
+/*  Sound writes?...
+
+    In case of discrete circuitry, the following writes
+    could be the trigger for each sound.
+
+    Pressing cancel ---> writes 1 to 0CE8
+    Pressing bet ------> writes 1 to 0CEA
+    Pressing hold4 ----> writes 1 to 0CEC
+    Pressing hold5 ----> writes 1 to 0CEE
+    Pressing hand pay -> writes 1 to 0CF0
+    Pressing hold1 ----> writes 1 to 0CF2
+    Pressing hold2 ----> writes 1 to 0CF4
+    Pressing hold3 ----> writes 1 to 0CF6
+    Pressing reset ----> writes 1 to 0CF8
+    Pressing deal -----> writes 1 to 0D00
+*/
+	
+	if (((offset<<1)==0x0ce8)&&(data==1))
+	{
+		logerror("CRU: SOUND 'CANCEL' write to address %04x: %d\n", offset<<1, data & 1);
+//		popmessage("SOUND 'CANCEL': %04x", offset<<1);
+	}
+	
+	if (((offset<<1)==0x0cea)&&(data==1))
+	{
+		logerror("CRU: SOUND 'BET' write to address %04x: %d\n", offset<<1, data & 1);
+//		popmessage("SOUND 'BET': %04x", offset<<1);
+	}
+	
+	if (((offset<<1)==0x0cec)&&(data==1))
+	{
+		logerror("CRU: SOUND 'HOLD4' write to address %04x: %d\n", offset<<1, data & 1);
+//		popmessage("SOUND 'HOLD 4': %04x", offset<<1);
+	}
+	
+	if (((offset<<1)==0x0cee)&&(data==1))
+	{
+		logerror("CRU: SOUND 'HOLD5' write to address %04x: %d\n", offset<<1, data & 1);
+//		popmessage("SOUND 'HOLD 5': %04x", offset<<1);
+	}
+	
+	if (((offset<<1)==0x0cf0)&&(data==1))
+	{
+		logerror("CRU: SOUND 'HAND PAY' write to address %04x: %d\n", offset<<1, data & 1);
+//		popmessage("SOUND 'HAND PAY': %04x", offset<<1);
+	}
+	
+	if (((offset<<1)==0x0cf2)&&(data==1))
+	{
+		logerror("CRU: SOUND 'HOLD1' write to address %04x: %d\n", offset<<1, data & 1);
+//		popmessage("SOUND 'HOLD 1': %04x", offset<<1);
+	}
+	
+	if (((offset<<1)==0x0cf4)&&(data==1))
+	{
+		logerror("CRU: SOUND 'HOLD2' write to address %04x: %d\n", offset<<1, data & 1);
+//		popmessage("SOUND 'HOLD 2': %04x", offset<<1);
+	}
+	
+	if (((offset<<1)==0x0cf6)&&(data==1))
+	{
+		logerror("CRU: SOUND 'HOLD3' write to address %04x: %d\n", offset<<1, data & 1);
+//		popmessage("SOUND 'HOLD 3': %04x", offset<<1);
+	}
+	
+	if (((offset<<1)==0x0cf8)&&(data==1))
+	{
+		logerror("CRU: SOUND 'RESET' write to address %04x: %d\n", offset<<1, data & 1);
+//		popmessage("SOUND 'RESET': %04x", offset<<1);
+	}
+
+	if (((offset<<1)==0x0d00)&&(data==1))
+	{
+		logerror("CRU: SOUND 'DEAL' write to address %04x: %d\n", offset<<1, data & 1);
+//		popmessage("SOUND 'DEAL': %04x", offset<<1);
+	}
+
+
 	/* for debug purposes */
 
-	if (data==1)
-	{
-		logerror("CRU write to address %04x: %d\n", offset<<1, data & 1);
-	}
+	logerror("CRU write to address %04x: %d\n", offset<<1, data & 1);
 }
 
 READ8_MEMBER(jubilee_state::mux_port_r)
@@ -521,8 +718,8 @@ ROM_START( jubileep )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "ic47.bin",   0x0000, 0x2000, CRC(55dc8482) SHA1(53f22bd66e5fcad5e2397998bc58109c3c19af96) ) /* red */
-	ROM_LOAD( "ic48.bin",   0x2000, 0x2000, CRC(74e9ffd9) SHA1(7349fea72a349a58014b795ec6c29647e7159d39) ) /* green */
-	ROM_LOAD( "ic49.bin",   0x4000, 0x2000, CRC(ec65d259) SHA1(9e82e4043cbea26b91965a19507a5f00dc3ba01a) ) /* blue */
+	ROM_LOAD( "ic48.bin",   0x2000, 0x2000, CRC(a687ec96) SHA1(6a3e0d3796a1505c6d68a9194e9b2b4ef8df5649) ) /* green */
+	ROM_LOAD( "ic49.bin",   0x4000, 0x2000, CRC(3e0bc116) SHA1(613c57f0a8baaaa4a04c243a3a139983fa7854e5) ) /* blue */
 
 	ROM_REGION( 0x0800, "videoworkram", 0 )    /* default NVRAM */
 	ROM_LOAD( "jubileep_videoworkram.bin", 0x0000, 0x0800, CRC(595bf2b3) SHA1(ae311873b15d8cebfb6ef6a80f27fafc9544178c) )
@@ -534,4 +731,4 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY    FULLNAME                    FLAGS */
-GAME( 198?, jubileep, 0,      jubileep, jubileep, driver_device, 0,    ROT0, "Jubilee", "Double-Up Poker (Jubilee)", GAME_NO_SOUND )
+GAME( 1985, jubileep, 0,      jubileep, jubileep, driver_device, 0,    ROT0, "Jubilee", "Double-Up Poker (Jubilee)", GAME_NO_SOUND )
