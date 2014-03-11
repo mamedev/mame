@@ -1279,20 +1279,23 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 
 			for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
 			{
-				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), "dummy", option->devtype(), 0);
-				if (!dev->configured())
-					dev->config_complete();
-
-				fprintf(m_output, "\t\t\t<slotoption");
-				fprintf(m_output, " name=\"%s\"", xml_normalize_string(option->name()));
-				fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname()));
-				if (slot->default_option())
+				if (option->selectable())
 				{
-					if (strcmp(slot->default_option(),option->name())==0)
-						fprintf(m_output, " default=\"yes\"");
+					device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), "dummy", option->devtype(), 0);
+					if (!dev->configured())
+						dev->config_complete();
+
+					fprintf(m_output, "\t\t\t<slotoption");
+					fprintf(m_output, " name=\"%s\"", xml_normalize_string(option->name()));
+					fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname()));
+					if (slot->default_option())
+					{
+						if (strcmp(slot->default_option(),option->name())==0)
+							fprintf(m_output, " default=\"yes\"");
+					}
+					fprintf(m_output, "/>\n");
+					const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), "dummy");
 				}
-				fprintf(m_output, "/>\n");
-				const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), "dummy");
 			}
 
 			fprintf(m_output, "\t\t</slot>\n");
