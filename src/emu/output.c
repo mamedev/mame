@@ -78,6 +78,7 @@ static void output_exit(running_machine &machine);
     INLINE FUNCTIONS
 ***************************************************************************/
 
+#if 0
 /*-------------------------------------------------
     copy_string - make a copy of a string
 -------------------------------------------------*/
@@ -88,6 +89,7 @@ INLINE const char *copy_string(const char *string)
 	strcpy(newstring, string);
 	return newstring;
 }
+#endif
 
 
 /*-------------------------------------------------
